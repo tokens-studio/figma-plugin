@@ -1,0 +1,190 @@
+@tailwind base;
+
+@tailwind components;
+
+body {
+    @apply font-body text-sm;
+}
+
+.heading {
+    @apply text-2xl font-bold text-gray-900 leading-none capitalize;
+}
+
+.heading-small {
+    @apply text-xs;
+}
+
+.navbar {
+    transform: translateY(-1px);
+}
+
+.property-wrapper {
+    @apply mb-2 rounded py-2 px-2 border border-gray-200;
+}
+
+.property-wrapper .heading {
+    @apply text-xxs bg-white -mt-3 -ml-1 px-1 inline-flex;
+}
+
+.property-wrapper .property-wrapper {
+    @apply mb-0 rounded-none p-1 border-t border-gray-300;
+}
+
+.property-wrapper:last-of-type {
+    @apply mb-0;
+}
+
+.property-value {
+    @apply text-gray-500 text-xs font-normal;
+}
+
+.button-group {
+    @apply rounded inline-flex border border-gray-400 overflow-hidden;
+}
+
+.button-value {
+    @apply text-gray-600 text-xs font-bold;
+}
+
+.button-extra {
+    @apply border-l border-black px-2 py-1;
+}
+
+.button-disabled .button-extra {
+    @apply border-gray-500;
+}
+
+.rotate {
+    animation: rotate 1000ms linear infinite;
+}
+
+@keyframes rotate {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.button-group .button {
+    @apply border-none rounded-none;
+}
+
+.button {
+    @apply border border-black rounded text-gray-800 font-bold text-xxs px-1 py-1;
+}
+
+.button-disabled {
+    @apply border-gray-500;
+}
+
+.button:hover {
+    @apply bg-gray-100;
+}
+
+.button-ghost {
+    @apply border-transparent bg-transparent;
+}
+
+.button-property {
+    @apply px-0 py-0;
+}
+
+.button-active {
+    box-shadow: inset 0 0 0 1px black;
+}
+
+.button-active.button-active-fill {
+    border: none;
+}
+
+.button-active-fill::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    border-radius: 100%;
+    width: 100%;
+    height: 100%;
+    transform: scale(0.9);
+    border: 2px solid white;
+    pointer-events: none;
+}
+
+.button-text {
+    @apply px-2 py-1;
+}
+
+.button-edit:hover .button-text {
+    @apply opacity-25;
+}
+
+.button-edit-overlay {
+    @apply opacity-0 absolute top-0 left-0 right-0 bottom-0 flex items-center justify-center;
+}
+
+.button-edit:hover .button-edit-overlay {
+    @apply opacity-100;
+}
+
+.button-link {
+    @apply bg-transparent border-transparent;
+}
+
+.button-secondary {
+    @apply bg-white text-black border border-gray-200;
+}
+
+.button-secondary:hover {
+    @apply bg-gray-100;
+}
+
+.button-primary {
+    @apply bg-primary-500 text-white border-transparent;
+}
+
+.button-primary:hover {
+    @apply bg-primary-400;
+}
+
+.button-large {
+    @apply py-2 px-4;
+}
+
+button[disabled] {
+    @apply opacity-50;
+}
+
+textarea {
+    @apply w-full border bg-white text-xxs p-3 rounded;
+}
+
+[data-reach-dialog-content] {
+    width: 75vw !important;
+}
+
+[data-reach-dialog-overlay] {
+    @apply z-1;
+}
+
+.modal-wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    @apply p-2 z-20;
+}
+
+.modal-content {
+    overflow-y: auto;
+    @apply bg-white h-full rounded shadow-lg p-2;
+}
+
+.input {
+    @apply bg-white border border-gray-300 text-sm p-2 rounded shadow-sm w-24;
+}
+
+@tailwind utilities;
