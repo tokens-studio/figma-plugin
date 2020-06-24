@@ -187,6 +187,20 @@ const setValuesOnNode = (node, values, data) => {
             }
         }
     }
+    if (values.border) {
+        if (typeof node.strokes !== 'undefined') {
+            const paints = figma.getLocalPaintStyles();
+            const path = data.border.split('.');
+            const pathname = path.slice(1, path.length).join('/');
+            const matchingStyles = paints.filter((n) => n.name === pathname);
+            if (matchingStyles.length) {
+                matchingStyles[0].paints = [{color: hexToFigmaRGB(values.border), type: 'SOLID'}];
+                node.strokeStyleId = matchingStyles[0].id;
+            } else {
+                node.strokes = [{type: 'SOLID', color: hexToFigmaRGB(values.border)}];
+            }
+        }
+    }
     if (values.spacing) {
         if (typeof node.horizontalPadding !== 'undefined') {
             node.horizontalPadding = Number(values.spacing);

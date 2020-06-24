@@ -88,7 +88,7 @@ body {
 }
 
 .button-property {
-    @apply px-1 py-2 rounded-sm;
+    @apply px-1 py-1 rounded-sm;
 }
 
 .button-active {
@@ -99,7 +99,7 @@ body {
     border: none;
 }
 
-.button-active-fill::before {
+/* .button-active-fill::before {
     content: '';
     position: absolute;
     left: 0;
@@ -110,7 +110,7 @@ body {
     transform: scale(0.9);
     border: 2px solid white;
     pointer-events: none;
-}
+} */
 
 .button-text {
     @apply px-2 py-1;
@@ -166,6 +166,19 @@ textarea {
 
 [data-reach-dialog-overlay] {
     @apply z-1;
+}
+
+[data-reach-menu-item] {
+    @apply py-1 px-2 flex items-center !important;
+}
+
+[data-reach-menu-item][data-selected] {
+    @apply bg-gray-200 text-black !important;
+}
+
+[data-reach-menu-list],
+[data-reach-menu-items] {
+    @apply py-2 !important;
 }
 
 .modal-wrapper {

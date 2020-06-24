@@ -74,17 +74,29 @@ const TokenButton = ({type, name, path, token, disabled, editMode, selectionValu
             break;
         case 'spacing':
             properties = [
-                {label: 'All', name: 'spacing', clear: ['horizontalPadding', 'verticalPadding', 'itemSpacing']},
-                {label: 'Horizontal', name: 'horizontalPadding'},
-                {label: 'Vertical', name: 'verticalPadding'},
-                {label: 'Gap', name: 'itemSpacing'},
+                {
+                    label: 'All',
+                    icon: 'Spacing',
+                    name: 'spacing',
+                    clear: ['horizontalPadding', 'verticalPadding', 'itemSpacing'],
+                },
+                {label: 'Horizontal', name: 'horizontalPadding', icon: 'HorizontalPadding'},
+                {label: 'Vertical', name: 'verticalPadding', icon: 'VerticalPadding'},
+                {label: 'Gap', name: 'itemSpacing', icon: 'Gap'},
             ];
             break;
         case 'fill':
+            properties = [
+                {
+                    label: 'Fill',
+                    name: 'fill',
+                },
+                {
+                    label: 'Border',
+                    name: 'border',
+                },
+            ];
             style = {
-                width: '24px',
-                height: '24px',
-                borderRadius: '100%',
                 backgroundColor: token,
                 borderColor: '#ccc',
             };
@@ -110,7 +122,7 @@ const TokenButton = ({type, name, path, token, disabled, editMode, selectionValu
                     type="button"
                     onClick={() => onClick(properties)}
                 >
-                    {showValue && <div className="button-text">{name}</div>}
+                    <div className="button-text">{showValue ? name : <span className="px-3" />}</div>
                     {editMode && <div className="button-edit-overlay">Edit</div>}
                 </button>
                 {!editMode && properties.length > 1 && (

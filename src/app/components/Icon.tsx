@@ -6,6 +6,10 @@ import IconLoading from './icons/IconLoading';
 import IconStyle from './icons/IconStyle';
 import IconHelp from './icons/IconHelp';
 import IconGithub from './icons/IconGithub';
+import IconHorizontalPadding from './icons/IconHorizontalPadding';
+import IconVerticalPadding from './icons/IconVerticalPadding';
+import IconGap from './icons/IconGap';
+import IconSpacing from './icons/IconSpacing';
 
 const icons = {
     edit: IconEdit,
@@ -14,6 +18,10 @@ const icons = {
     style: IconStyle,
     help: IconHelp,
     github: IconGithub,
+    HorizontalPadding: IconHorizontalPadding,
+    VerticalPadding: IconVerticalPadding,
+    Gap: IconGap,
+    Spacing: IconSpacing,
 };
 
 const Icon = ({name}) => {
