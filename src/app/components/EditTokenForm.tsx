@@ -18,12 +18,6 @@ const EditTokenForm = ({
     };
     const [tokenValue, setTokenValue] = React.useState(defaultValue);
 
-    React.useEffect(() => {
-        return () => {
-            setShowEditForm(false);
-        };
-    }, [setShowEditForm]);
-
     const handleChange = (e) => {
         e.persist();
         setTokenValue((prevState) => ({...prevState, [e.target.name]: e.target.value}));
