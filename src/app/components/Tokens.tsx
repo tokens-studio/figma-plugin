@@ -37,6 +37,11 @@ const Tokens = ({createStyles, setSingleTokenValue, setPluginValue, onUpdate, to
         setEditToken({token, name, path});
     };
 
+    const closeForm = () => {
+        setShowOptions('');
+        setShowEditForm(false);
+    };
+
     const showNewForm = (path) => {
         showForm({token: '', name: '', path});
     };
@@ -122,7 +127,7 @@ const Tokens = ({createStyles, setSingleTokenValue, setPluginValue, onUpdate, to
                         </Tooltip>
                     </div>
                     {showOptions === values[0] && (
-                        <Modal isOpen={showOptions} close={() => setShowOptions('')}>
+                        <Modal isOpen={showOptions} close={closeForm}>
                             <div className="flex flex-col-reverse">
                                 {showEditForm && (
                                     <EditTokenForm

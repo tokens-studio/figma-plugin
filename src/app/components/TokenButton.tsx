@@ -2,9 +2,19 @@ import * as React from 'react';
 import Tooltip from './Tooltip';
 import MoreButton from './MoreButton';
 
+function colorByHashCode(value) {
+    let hash = 0;
+    if (value.length === 0) return hash;
+    for (let i = 0; i < value.length; i += 1) {
+        hash = value.charCodeAt(i) * 30 + hash;
+    }
+    const shortened = Math.abs(hash % 360);
+    return `${shortened},100%,85%`;
+}
+
 const TokenButton = ({type, name, path, token, disabled, editMode, selectionValues, setPluginValue, showForm}) => {
     let style;
-    let showValue = true;
+    const showValue = true;
     let properties = [type];
     const buttonClass = [];
     const active = selectionValues[type] === [path, name].join('.');
@@ -31,9 +41,14 @@ const TokenButton = ({type, name, path, token, disabled, editMode, selectionValu
             setPluginValue(newProps);
         }
     };
+    style = {
+        '--bgColor': colorByHashCode(name.toString()),
+        backgroundColor: 'hsl(var(--bgColor))',
+        border: 'none',
+    };
     switch (type) {
         case 'borderRadius':
-            style = {borderRadius: `${token}px`};
+            style = {...style, borderRadius: `${token}px`};
             properties = [
                 {
                     label: 'All',
@@ -52,31 +67,44 @@ const TokenButton = ({type, name, path, token, disabled, editMode, selectionValu
             ];
             break;
         case 'opacity':
-            style = {opacity: `${token}%`};
+            style = {
+                ...style,
+                backgroundColor: `rgba(0,0,0, ${Number(token.slice(0, token.length - 1)) / 100})`,
+            };
             break;
         case 'spacing':
             properties = [
-                {label: 'All', name: 'spacing', clear: ['horizontalPadding', 'verticalPadding', 'itemSpacing']},
-                {label: 'Horizontal', name: 'horizontalPadding'},
-                {label: 'Vertical', name: 'verticalPadding'},
-                {label: 'Gap', name: 'itemSpacing'},
+                {
+                    label: 'All',
+                    icon: 'Spacing',
+                    name: 'spacing',
+                    clear: ['horizontalPadding', 'verticalPadding', 'itemSpacing'],
+                },
+                {label: 'Horizontal', name: 'horizontalPadding', icon: 'HorizontalPadding'},
+                {label: 'Vertical', name: 'verticalPadding', icon: 'VerticalPadding'},
+                {label: 'Gap', name: 'itemSpacing', icon: 'Gap'},
             ];
             break;
         case 'fill':
+            properties = [
+                {
+                    label: 'Fill',
+                    name: 'fill',
+                },
+                {
+                    label: 'Border',
+                    name: 'border',
+                },
+            ];
             style = {
-                width: '24px',
-                height: '24px',
-                borderRadius: '100%',
                 backgroundColor: token,
                 borderColor: '#ccc',
             };
             if (active) {
                 buttonClass.push('button-active-fill');
             }
-            showValue = false;
             break;
         default:
-            style = {};
             break;
     }
     return (
@@ -93,7 +121,7 @@ const TokenButton = ({type, name, path, token, disabled, editMode, selectionValu
                     type="button"
                     onClick={() => onClick(properties)}
                 >
-                    {showValue && <div className="button-text">{name}</div>}
+                    <div className="button-text">{showValue ? name : <span className="px-3" />}</div>
                     {editMode && <div className="button-edit-overlay">Edit</div>}
                 </button>
                 {!editMode && properties.length > 1 && (

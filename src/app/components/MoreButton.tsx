@@ -1,6 +1,7 @@
 import * as React from 'react';
 import {Menu, MenuList, MenuButton, MenuItem} from '@reach/menu-button';
 import '@reach/menu-button/styles.css';
+import Icon from './Icon';
 
 const MoreButton = ({properties, disabled, path, value, selectionValues, onClick}) => {
     return (
@@ -17,6 +18,11 @@ const MoreButton = ({properties, disabled, path, value, selectionValues, onClick
 
                                 return (
                                     <MenuItem key={property.label} onSelect={() => onClick([property.name], isActive)}>
+                                        {property.icon && (
+                                            <div className="mr-2">
+                                                <Icon name={property.icon} />
+                                            </div>
+                                        )}
                                         {isActive && '✔'}
                                         {property.label}
                                     </MenuItem>

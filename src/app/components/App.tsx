@@ -9,6 +9,8 @@ import StartScreen from './StartScreen';
 import Heading from './Heading';
 import Navbar from './Navbar';
 import Icon from './Icon';
+import * as defaultJSON from '../presets/default.json';
+import * as pjs from '../../../package.json';
 
 interface SelectionValue {
     borderRadius: string | undefined;
@@ -148,6 +150,10 @@ const App = () => {
         });
     }
 
+    const setDefaultTokens = () => {
+        setStringTokens(JSON5.stringify(defaultJSON, null, 2));
+    };
+
     React.useEffect(() => {
         onInitiate();
         window.onmessage = (event) => {
@@ -224,6 +230,7 @@ const App = () => {
                             stringTokens={stringTokens}
                             error={error}
                             onUpdate={onUpdate}
+                            setDefaultTokens={setDefaultTokens}
                         />
                     )}
                     {active === 'inspector' && (
@@ -235,7 +242,7 @@ const App = () => {
                     )}
                 </div>
                 <div className="p-4 flex-shrink-0 flex items-center justify-between">
-                    <div className="text-gray-600 text-xxs">Figma Tokens 0.1.0</div>
+                    <div className="text-gray-600 text-xxs">Figma Tokens {pjs.version}</div>
                     <div className="text-gray-600 text-xxs">
                         <a
                             className="flex items-center"
