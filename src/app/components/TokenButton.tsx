@@ -14,7 +14,7 @@ function colorByHashCode(value) {
 
 const TokenButton = ({type, name, path, token, disabled, editMode, selectionValues, setPluginValue, showForm}) => {
     let style;
-    let showValue = true;
+    const showValue = true;
     let properties = [type];
     const buttonClass = [];
     const active = selectionValues[type] === [path, name].join('.');
@@ -103,7 +103,6 @@ const TokenButton = ({type, name, path, token, disabled, editMode, selectionValu
             if (active) {
                 buttonClass.push('button-active-fill');
             }
-            showValue = false;
             break;
         default:
             break;

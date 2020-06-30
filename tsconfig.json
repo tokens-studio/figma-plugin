@@ -9,6 +9,7 @@
     "removeComments": true,
     "noImplicitAny": false,
     "moduleResolution": "node",
+    "resolveJsonModule": true,
     "typeRoots": [
       "./node_modules/@types",
       "./node_modules/@figma"
