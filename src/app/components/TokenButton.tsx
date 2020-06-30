@@ -44,7 +44,6 @@ const TokenButton = ({type, name, path, token, disabled, editMode, selectionValu
     style = {
         '--bgColor': colorByHashCode(name.toString()),
         backgroundColor: 'hsl(var(--bgColor))',
-        border: 'none',
     };
     switch (type) {
         case 'borderRadius':
@@ -107,6 +106,11 @@ const TokenButton = ({type, name, path, token, disabled, editMode, selectionValu
         default:
             break;
     }
+
+    if (!editMode && properties.length > 1) {
+        buttonClass.push('button-has-extras');
+    }
+
     return (
         <Tooltip label={`${name}: ${token}`}>
             <div

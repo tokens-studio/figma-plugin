@@ -72,7 +72,7 @@ body {
 }
 
 .button {
-    @apply border border-black rounded text-gray-800 font-bold text-xxs px-1 py-1;
+    @apply border border-gray-400 rounded text-gray-800 font-bold text-xs px-4 py-2;
 }
 
 .button-disabled {
@@ -80,15 +80,23 @@ body {
 }
 
 .button:hover {
-    @apply bg-gray-100;
+    @apply bg-gray-100 border-gray-600;
 }
 
 .button-ghost {
-    @apply border-transparent bg-transparent;
+    @apply border-transparent bg-transparent px-2 py-1;
 }
 
 .button-property {
-    @apply px-1 py-1 rounded-sm;
+    @apply px-2 py-1 rounded-sm;
+}
+
+.button-property:hover {
+    @apply bg-opacity-75;
+}
+
+.button-has-extras {
+    @apply pr-0;
 }
 
 .button-active {
