@@ -88,7 +88,7 @@ body {
 }
 
 .button-property {
-    @apply px-2 py-1 rounded-sm;
+    @apply rounded-sm border-transparent px-0 py-0;
 }
 
 .button-property:hover {
@@ -107,6 +107,17 @@ body {
     border: none;
 }
 
+.button-property-color {
+    @apply border-gray-400;
+}
+
+.button-property-color .button-text::before {
+    @apply w-4 h-4 my-auto mr-2;
+    content: '';
+    border-radius: 100%;
+    background-color: var(--backgroundColor);
+}
+
 /* .button-active-fill::before {
     content: '';
     position: absolute;
@@ -121,7 +132,7 @@ body {
 } */
 
 .button-text {
-    @apply px-2 py-1;
+    @apply px-2 py-1 flex items-center justify-center;
 }
 
 .button-edit:hover .button-text {
