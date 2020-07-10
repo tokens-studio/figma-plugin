@@ -96,9 +96,10 @@ const TokenButton = ({type, name, path, token, disabled, editMode, selectionValu
                 },
             ];
             style = {
-                backgroundColor: token,
-                borderColor: '#ccc',
+                '--backgroundColor': token,
             };
+            buttonClass.push('button-property-color');
+
             if (active) {
                 buttonClass.push('button-active-fill');
             }
