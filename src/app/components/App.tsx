@@ -11,6 +11,7 @@ import Navbar from './Navbar';
 import Icon from './Icon';
 import * as defaultJSON from '../presets/default.json';
 import * as pjs from '../../../package.json';
+import {useTokenState} from '../store/TokenContext';
 
 interface SelectionValue {
     borderRadius: string | undefined;
@@ -18,11 +19,6 @@ interface SelectionValue {
     verticalPadding: string | undefined;
     itemSpacing: string | undefined;
 }
-
-// interface Target {
-//     property: string | undefined;
-//     name: string | undefined;
-// }
 
 const goToNodeId = (id) => {
     parent.postMessage(
@@ -39,44 +35,10 @@ const goToNodeId = (id) => {
 const App = () => {
     const [disabled, setDisabled] = React.useState(false);
     const [selectionValues, setSelectionValues] = React.useState<SelectionValue>({} as SelectionValue);
-    // const [target, setTarget] = React.useState<Target>({} as Target);
     const [active, setActive] = React.useState('start');
-    const [error, setError] = React.useState('');
-    const [loading, setLoading] = React.useState(true);
     const [remoteComponents, setRemoteComponents] = React.useState([]);
-    const [tokens, setTokens] = React.useState({});
 
-    const [stringTokens, setStringTokens] = React.useState(JSON.stringify(tokens, null, 4));
-
-    React.useEffect(() => {
-        let newTokensFromString;
-        try {
-            newTokensFromString = JSON5.parse(stringTokens);
-            setError('');
-        } catch (e) {
-            console.log({e}, stringTokens);
-            setError('Invalid JSON');
-        }
-        if (newTokensFromString) {
-            setTokens(newTokensFromString);
-        }
-    }, [stringTokens]);
-
-    const onUpdate = () => {
-        setLoading(true);
-        setTimeout(() => {
-            parent.postMessage(
-                {
-                    pluginMessage: {
-                        type: 'update',
-                        values: selectionValues,
-                        tokens,
-                    },
-                },
-                '*'
-            );
-        }, 100);
-    };
+    const {state, setStringTokens, setPreviousTokens, setLoading} = useTokenState();
 
     const onSetNodeData = (data = {}) => {
         setLoading(true);
@@ -89,7 +51,7 @@ const App = () => {
                             ...selectionValues,
                             ...data,
                         },
-                        tokens,
+                        tokens: JSON5.parse(state.tokens),
                     },
                 },
                 '*'
@@ -111,34 +73,15 @@ const App = () => {
         }, 100);
     };
 
-    const createStyles = () => {
-        setTimeout(() => {
-            parent.postMessage(
-                {
-                    pluginMessage: {
-                        type: 'create-styles',
-                        tokens,
-                    },
-                },
-                '*'
-            );
-        }, 100);
-    };
-
     const onInitiate = () => {
         parent.postMessage({pluginMessage: {type: 'initiate'}}, '*');
     };
 
-    function setSingleTokenValue({name, token}) {
-        const obj = tokens;
+    function setSingleTokenValue({parent, name, token}) {
+        const obj = JSON5.parse(state.tokens[parent].values);
         objectPath.set(obj, name, token);
-        setStringTokens(JSON5.stringify(obj, null, 2));
+        setStringTokens({parent, tokens: JSON5.stringify(obj, null, 2)});
     }
-
-    function handlesetStringTokens(val) {
-        setStringTokens(val);
-    }
-
     function setPluginValue(value) {
         setSelectionValues((prevState) => {
             const newPluginValue = {
@@ -149,10 +92,6 @@ const App = () => {
             return {...newPluginValue};
         });
     }
-
-    const setDefaultTokens = () => {
-        setStringTokens(JSON5.stringify(defaultJSON, null, 2));
-    };
 
     React.useEffect(() => {
         onInitiate();
@@ -174,7 +113,8 @@ const App = () => {
             } else if (type === 'tokenvalues') {
                 setLoading(false);
                 if (values) {
-                    setStringTokens(JSON.stringify(values, null, 2));
+                    console.log('Got values', values);
+                    setPreviousTokens(values);
                     setActive('tokens');
                 }
             }
@@ -183,7 +123,7 @@ const App = () => {
 
     return (
         <>
-            {loading && (
+            {state.loading && (
                 <div className="fixed w-full z-20">
                     <div className="flex items-center space-x-2 bg-gray-300 p-2 rounded m-2">
                         <div className="inline-flex rotate">
@@ -210,32 +150,19 @@ const App = () => {
                             ))}
                         </div>
                     )}
-                    {active === 'start' && !loading && (
-                        <StartScreen setActive={setActive} setStringTokens={setStringTokens} />
-                    )}
+                    {active === 'start' && !state.loading && <StartScreen setActive={setActive} />}
                     {active === 'tokens' && (
                         <Tokens
                             disabled={disabled}
                             setSingleTokenValue={setSingleTokenValue}
                             setPluginValue={setPluginValue}
-                            tokens={tokens}
-                            onUpdate={onUpdate}
                             selectionValues={selectionValues}
-                            createStyles={createStyles}
                         />
                     )}
-                    {active === 'json' && (
-                        <JSONEditor
-                            handlesetStringTokens={handlesetStringTokens}
-                            stringTokens={stringTokens}
-                            error={error}
-                            onUpdate={onUpdate}
-                            setDefaultTokens={setDefaultTokens}
-                        />
-                    )}
+                    {active === 'json' && <JSONEditor />}
                     {active === 'inspector' && (
                         <Inspector
-                            tokens={tokens}
+                            tokens={state.tokens.main.values}
                             removeTokenValues={removeTokenValues}
                             selectionValues={selectionValues}
                         />

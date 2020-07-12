@@ -1,18 +1,17 @@
 import * as React from 'react';
-import JSON5 from 'json5';
 import Heading from './Heading';
 import Button from './Button';
-import * as defaultJSON from '../presets/default.json';
+import {useTokenState} from '../store/TokenContext';
 
-const StartScreen = ({setActive, setStringTokens}) => {
+const StartScreen = ({setActive}) => {
+    const {setTokens, setDefaultTokens} = useTokenState();
     const setEmptyTokens = () => {
         setActive('json');
-        setStringTokens(JSON5.stringify({}, null, 2));
+        setTokens({tokens: {main: '{}'}});
     };
-    const setDefaultTokens = () => {
+    const handleSetDefaultTokens = () => {
         setActive('tokens');
-
-        setStringTokens(JSON5.stringify(defaultJSON, null, 2));
+        setDefaultTokens();
     };
     return (
         <div className="my-auto h-auto space-y-4">
@@ -37,7 +36,7 @@ const StartScreen = ({setActive, setStringTokens}) => {
                     <Button size="large" variant="secondary" onClick={setEmptyTokens}>
                         Edit JSON
                     </Button>
-                    <Button size="large" variant="primary" onClick={setDefaultTokens}>
+                    <Button size="large" variant="primary" onClick={handleSetDefaultTokens}>
                         Use Preset
                     </Button>
                 </div>

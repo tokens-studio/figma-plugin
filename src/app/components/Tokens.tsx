@@ -1,10 +1,13 @@
 import * as React from 'react';
+import JSON5 from 'json5';
 import Modal from './Modal';
 import Heading from './Heading';
 import Icon from './Icon';
 import EditTokenForm from './EditTokenForm';
 import TokenButton from './TokenButton';
 import Tooltip from './Tooltip';
+import {useTokenState} from '../store/TokenContext';
+import Button from './Button';
 
 const mappedTokens = (tokens) => {
     const properties = {
@@ -17,7 +20,10 @@ const mappedTokens = (tokens) => {
     return Object.entries(Object.assign(properties, tokens));
 };
 
-const Tokens = ({createStyles, setSingleTokenValue, setPluginValue, onUpdate, tokens, selectionValues, disabled}) => {
+const Tokens = ({setSingleTokenValue, setPluginValue, selectionValues, disabled}) => {
+    const {state, setStringTokens, createStyles, updateTokens} = useTokenState();
+    const [activeToken, setActiveToken] = React.useState('main');
+
     const [editToken, setEditToken] = React.useState({
         token: '',
         name: '',
@@ -28,8 +34,8 @@ const Tokens = ({createStyles, setSingleTokenValue, setPluginValue, onUpdate, to
 
     const submitTokenValue = ({token, name, path}) => {
         setEditToken({token, name, path});
-        setSingleTokenValue({name: [path, name].join('.'), token});
-        onUpdate();
+        setSingleTokenValue({parent: activeToken, name: [path, name].join('.'), token});
+        updateTokens();
     };
 
     const showForm = ({token, name, path}) => {
@@ -51,7 +57,6 @@ const Tokens = ({createStyles, setSingleTokenValue, setPluginValue, onUpdate, to
             {tokenValues.map((item) => {
                 const [key, value] = item;
                 const stringPath = [path, key].filter((n) => n).join('.');
-                // const isActive = [path, key].join('.') === selectionValues[type];
                 return (
                     <React.Fragment key={stringPath}>
                         {typeof value === 'object' ? (
@@ -172,9 +177,23 @@ const Tokens = ({createStyles, setSingleTokenValue, setPluginValue, onUpdate, to
         );
     };
 
-    const renderTokens = () => (
+    return (
         <div>
-            {mappedTokens(tokens).map((tokenValues) => {
+            {Object.keys(state.tokens).map((key) => {
+                return (
+                    <Button
+                        key={key}
+                        variant={activeToken === key ? 'primary' : 'secondary'}
+                        onClick={() => setActiveToken(key)}
+                    >
+                        {key}
+                    </Button>
+                );
+            })}
+            <Button variant="ghost" onClick={() => setStringTokens({parent: '2', tokens: '{}'})}>
+                New +
+            </Button>
+            {mappedTokens(JSON5.parse(state.tokens[activeToken].values)).map((tokenValues) => {
                 switch (tokenValues[0]) {
                     case 'borderRadius':
                         return (
@@ -237,8 +256,6 @@ const Tokens = ({createStyles, setSingleTokenValue, setPluginValue, onUpdate, to
             })}
         </div>
     );
-
-    return <div>{renderTokens()}</div>;
 };
 
 export default Tokens;

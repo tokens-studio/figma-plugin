@@ -1,11 +1,47 @@
 import * as React from 'react';
+import JSON5 from 'json5';
+import defaultJSON from '../presets/default';
 
-const UserContext = React.createContext({});
+const parseTokenValues = (tokens) => {
+    // TODO: Implement plugin version for checking if we should change structure
+    console.log('parsing old data', tokens);
+    if (tokens.version !== '') {
+        console.log('Pluginversion', tokens.version);
+        return tokens.values;
+    }
+    console.log('No version');
+    const newTokens = {
+        main: {
+            values: JSON5.stringify(tokens.values, null, 2),
+        },
+    };
+    return newTokens;
+};
+
+const TokenContext = React.createContext(null);
+
+const defaultState = {
+    loading: true,
+    tokens: {
+        main: {
+            values: JSON5.stringify(defaultJSON(), null, 2),
+        },
+    },
+};
+
+function parseTokens(tokens) {
+    try {
+        JSON5.parse(tokens);
+        return false;
+    } catch (e) {
+        return true;
+    }
+}
 
 function stateReducer(state, action) {
     switch (action.type) {
         case 'SET_TOKENS':
-            console.log('SETTING TOKENS');
+            console.log('SET_TOKENS', action);
             return {
                 ...state,
                 tokens: {
@@ -13,103 +49,115 @@ function stateReducer(state, action) {
                     ...action.tokens,
                 },
             };
-        case 'RESET_SELECTED':
-            console.log('RESET USER');
-
+        case 'SET_STRING_TOKENS':
+            console.log('SET_STRING_TOKENS', action);
             return {
                 ...state,
-                hasSelected: false,
+                tokens: {
+                    ...state.tokens,
+                    [action.data.parent]: {
+                        hasErrored: parseTokens(action.data.tokens),
+                        values: action.data.tokens,
+                    },
+                },
             };
-        case 'RESTORE_STATE':
-            console.log('RESTORE STATE');
-
-            return {
-                ...action.state,
-            };
-        case 'SET_AVAILABLE_USERS':
-            console.log('SET_AVAILABLE_USERS', action.users);
-
+        case 'SET_PREVIOUS_TOKENS':
+            console.log('SET_PREVIOUS_TOKENS', action);
             return {
                 ...state,
-                availableUsers: action.users,
+                tokens: parseTokenValues(action.tokens),
             };
+        case 'SET_DEFAULT_TOKENS':
+            return defaultState;
+        case 'SET_LOADING':
+            return {
+                ...state,
+                loading: action.state,
+            };
+        case 'UPDATE_TOKENS':
+            parent.postMessage(
+                {
+                    pluginMessage: {
+                        type: 'update',
+                        tokens: JSON5.parse(state.tokens),
+                    },
+                },
+                '*'
+            );
+            return state;
+        case 'CREATE_STYLES':
+            parent.postMessage(
+                {
+                    pluginMessage: {
+                        type: 'create-styles',
+                        tokens: JSON5.parse(state.tokens),
+                    },
+                },
+                '*'
+            );
+            return state;
         default:
             throw new Error('Not implemented');
     }
 }
 
-function UserProvider({children}) {
-    const [state, dispatch] = React.useReducer(stateReducer, {
-        selectedUser: null,
-        hasSelected: false,
-        availableUsers: [],
-    });
+function TokenProvider({children}) {
+    const [state, dispatch] = React.useReducer(stateReducer, defaultState);
 
-    React.useEffect(() => {
-        console.log('Setting userContext from Storage');
+    // React.useEffect(() => {
+    //     let newTokensFromString;
+    //     try {
+    //         newTokensFromString = JSON5.parse(stringTokens);
+    //         setError('');
+    //     } catch (e) {
+    //         console.log({e}, stringTokens);
+    //         setError('Invalid JSON');
+    //     }
+    //     if (newTokensFromString) {
+    //         setTokens(newTokensFromString);
+    //     }
+    // }, [stringTokens]);
 
-        async function storeData() {
-            try {
-                await AsyncStorage.setItem('userContext', JSON.stringify(state));
-            } catch (e) {
-                // saving error
-            }
-        }
-
-        storeData();
-    }, [state]);
-
-    React.useEffect(() => {
-        const bootstrapAsync = async () => {
-            console.log('Reading userContext from Storage');
-
-            let parsedContext;
-
-            try {
-                const storedUserContext = await AsyncStorage.getItem('userContext');
-                if (storedUserContext) {
-                    parsedContext = JSON.parse(storedUserContext);
-                    dispatch({type: 'RESTORE_STATE', state: parsedContext});
-                }
-            } catch (e) {
-                // Restoring token failed
-            }
-
-            // After restoring token, we may need to validate it in production apps
-
-            // This will switch to the App screen or Auth screen and this loading
-            // screen will be unmounted and thrown away.
-        };
-
-        bootstrapAsync();
-    }, []);
-
-    const userContext = React.useMemo(
+    const tokenContext = React.useMemo(
         () => ({
             state,
-            setUser: (data) => {
-                dispatch({type: 'SET_USER', user: data});
+            setTokens: (tokens) => {
+                dispatch({type: 'SET_TOKENS', tokens});
             },
-            resetSelection: () => {
-                dispatch({type: 'RESET_SELECTED'});
+            setStringTokens: (data: {parent: string; tokens: string}) => {
+                dispatch({type: 'SET_STRING_TOKENS', data});
             },
-            setAvailableUsers: (data) => {
-                console.log('Setting available', data);
-                dispatch({type: 'SET_AVAILABLE_USERS', users: data});
+            setDefaultTokens: () => {
+                dispatch({type: 'SET_DEFAULT_TOKENS'});
+            },
+            setPreviousTokens: (tokens) => {
+                console.log('SETTING PREVIOUS', {tokens});
+                dispatch({type: 'SET_PREVIOUS_TOKENS', tokens});
+            },
+            updateTokens: () => {
+                console.log('updating');
+                dispatch({type: 'UPDATE_TOKENS'});
+            },
+            createStyles: () => {
+                console.log('CREATE_STYLES');
+                dispatch({type: 'CREATE_STYLES'});
+            },
+            setLoading: (boolean) => {
+                dispatch({type: 'SET_LOADING', state: boolean});
             },
         }),
         [state]
     );
 
-    return <UserContext.Provider value={userContext}>{children}</UserContext.Provider>;
+    return <TokenContext.Provider value={tokenContext}>{children}</TokenContext.Provider>;
 }
 
-function useUserState() {
-    const context = React.useContext(UserContext);
+function useTokenState() {
+    const context = React.useContext(TokenContext);
     if (context === undefined) {
-        throw new Error('useUserState must be used within a CountProvider');
+        throw new Error('useTokenState must be used within a TokenProvider');
     }
     return context;
 }
 
-export {UserProvider, useUserState, UserContext};
+export {TokenProvider, useTokenState, TokenContext};

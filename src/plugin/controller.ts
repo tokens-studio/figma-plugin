@@ -1,4 +1,5 @@
 import {hexToFigmaRGB} from '@figma-plugin/helpers';
+import JSON5 from 'json5';
 
 const Dot = require('dot-object');
 const objectPath = require('object-path');
@@ -121,12 +122,14 @@ const findAllWithPluginData = (arr) => {
 };
 
 const mapValuesToTokens = (object, values) => {
+    console.log({object, values});
     const array = Object.entries(values).map(([key, value]) => ({[key]: objectPath.get(object, value)}));
     array.map((item) => ({[item.key]: item.value}));
     return Object.assign({}, ...array);
 };
 
 const setValuesOnNode = (node, values, data) => {
+    console.log('SET VALUE', node, values, data);
     if (values.borderRadius) {
         if (typeof node.cornerRadius !== 'undefined') {
             node.cornerRadius = Number(values.borderRadius || values.borderRadiusTopLeft);
@@ -227,10 +230,11 @@ const setValuesOnNode = (node, values, data) => {
 
 const updateNodes = (nodes, tokens) => {
     const nodesWithData = findAllWithPluginData(nodes);
+    const mainTokens = JSON5.parse(tokens.main.values);
     nodesWithData.forEach((node) => {
         const data = fetchPluginData(node);
         if (data) {
-            const mappedValues = mapValuesToTokens(tokens, data);
+            const mappedValues = mapValuesToTokens(mainTokens, data);
             setValuesOnNode(node, mappedValues, data);
         }
     });
@@ -238,14 +242,18 @@ const updateNodes = (nodes, tokens) => {
 };
 
 const setTokenData = (data) => {
+    console.log('SETTING PLUGIN DATA ON ROOT', data);
+    figma.root.setSharedPluginData('tokens', 'version', '0.3');
     figma.root.setSharedPluginData('tokens', 'values', JSON.stringify(data));
 };
 
 const getTokenData = () => {
     const value = figma.root.getSharedPluginData('tokens', 'values');
+    const version = figma.root.getSharedPluginData('tokens', 'version');
+    console.log('GETTING PLUGIN DATA', value);
     if (value) {
         const parsedValues = JSON.parse(value);
-        return parsedValues;
+        return {values: parsedValues, version};
     }
 };
 
@@ -311,6 +319,7 @@ figma.ui.onmessage = (msg) => {
     }
 
     if (msg.type === 'set-node-data') {
+        console.log('SETTING NODE DATA', msg.values, msg.tokens);
         try {
             updatePluginData(figma.currentPage.selection, msg.values);
             updateNodes(figma.currentPage.selection, msg.tokens);
