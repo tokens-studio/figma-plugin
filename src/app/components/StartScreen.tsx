@@ -4,14 +4,16 @@ import Button from './Button';
 import {useTokenState} from '../store/TokenContext';
 
 const StartScreen = ({setActive}) => {
-    const {setTokens, setDefaultTokens} = useTokenState();
+    const {setTokens, setDefaultTokens, setLoading} = useTokenState();
     const setEmptyTokens = () => {
         setActive('json');
-        setTokens({tokens: {main: '{}'}});
+        setTokens({tokens: {options: '{}', decisions: '{}'}});
+        setLoading(false);
     };
     const handleSetDefaultTokens = () => {
         setActive('tokens');
         setDefaultTokens();
+        setLoading(false);
     };
     return (
         <div className="my-auto h-auto space-y-4">

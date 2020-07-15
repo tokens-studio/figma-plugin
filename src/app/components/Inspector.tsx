@@ -1,14 +1,16 @@
 import * as React from 'react';
 import objectPath from 'object-path';
+import {useTokenState} from '../store/TokenContext';
 
-const Inspector = ({selectionValues, tokens, removeTokenValues}) => {
+const Inspector = ({tokens, removeTokenValues}) => {
+    const {state} = useTokenState();
     const getValue = (value) => {
         return objectPath.get(tokens, value);
     };
     return (
         <div className="space-y-2">
             <div className="space-y-1">
-                {Object.entries(selectionValues).map(([key, value]) => (
+                {Object.entries(state.selectionValues).map(([key, value]) => (
                     <div key={key}>
                         <code className="flex space-x-2">
                             <div style={{fontWeight: 'bold'}}>{key}</div>:{' '}

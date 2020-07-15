@@ -1,4 +1,4 @@
-export default function base() {
+export function defaultJSON() {
     return {
         spacing: {
             xs: 4,
@@ -20,7 +20,6 @@ export default function base() {
             xl: 16,
         },
         colors: {
-            primary: '#18A0FB',
             indigo: '#5c6ac4',
             blue: '#007ace',
             red: '#de3618',
@@ -40,6 +39,15 @@ export default function base() {
             low: '10%',
             md: '50%',
             high: '90%',
+        },
+    };
+}
+
+export function defaultDecisions() {
+    return {
+        colors: {
+            primary: '$colors.blue',
+            danger: '$colors.red',
         },
     };
 }

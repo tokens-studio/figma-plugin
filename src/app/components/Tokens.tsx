@@ -20,10 +20,9 @@ const mappedTokens = (tokens) => {
     return Object.entries(Object.assign(properties, tokens));
 };
 
-const Tokens = ({setSingleTokenValue, setPluginValue, selectionValues, disabled}) => {
-    const {state, setStringTokens, createStyles, updateTokens} = useTokenState();
-    const [activeToken, setActiveToken] = React.useState('main');
-
+const Tokens = ({setSingleTokenValue, setPluginValue, disabled}) => {
+    const {state, createStyles, updateTokens} = useTokenState();
+    const [activeToken, setActiveToken] = React.useState('options');
     const [editToken, setEditToken] = React.useState({
         token: '',
         name: '',
@@ -76,7 +75,6 @@ const Tokens = ({setSingleTokenValue, setPluginValue, selectionValues, disabled}
                                     disabled={disabled}
                                     setPluginValue={setPluginValue}
                                     showForm={showForm}
-                                    selectionValues={selectionValues}
                                 />
                             </div>
                         )}
@@ -88,6 +86,7 @@ const Tokens = ({setSingleTokenValue, setPluginValue, selectionValues, disabled}
 
     const TokenListing = ({label, explainer = '', help = '', createButton = false, property, type = '', values}) => {
         const [showHelp, setShowHelp] = React.useState(false);
+        console.log({values});
         return (
             <div className="mb-2 pb-2 border-b border-gray-200">
                 <div className="flex justify-between space-x-4 items-center">
@@ -179,21 +178,21 @@ const Tokens = ({setSingleTokenValue, setPluginValue, selectionValues, disabled}
 
     return (
         <div>
-            {Object.keys(state.tokens).map((key) => {
-                return (
-                    <Button
-                        key={key}
-                        variant={activeToken === key ? 'primary' : 'secondary'}
-                        onClick={() => setActiveToken(key)}
-                    >
-                        {key}
-                    </Button>
-                );
-            })}
-            <Button variant="ghost" onClick={() => setStringTokens({parent: '2', tokens: '{}'})}>
-                New +
-            </Button>
+            <div className="space-x-2">
+                {Object.keys(state.tokens).map((key) => {
+                    return (
+                        <Button
+                            key={key}
+                            variant={activeToken === key ? 'primary' : 'secondary'}
+                            onClick={() => setActiveToken(key)}
+                        >
+                            {key.toUpperCase()}
+                        </Button>
+                    );
+                })}
+            </div>
             {mappedTokens(JSON5.parse(state.tokens[activeToken].values)).map((tokenValues) => {
+                console.log({tokenValues});
                 switch (tokenValues[0]) {
                     case 'borderRadius':
                         return (

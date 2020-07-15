@@ -1,6 +1,7 @@
 import * as React from 'react';
 import Tooltip from './Tooltip';
 import MoreButton from './MoreButton';
+import {useTokenState} from '../store/TokenContext';
 
 function colorByHashCode(value) {
     let hash = 0;
@@ -12,12 +13,13 @@ function colorByHashCode(value) {
     return `${shortened},100%,85%`;
 }
 
-const TokenButton = ({type, name, path, token, disabled, editMode, selectionValues, setPluginValue, showForm}) => {
+const TokenButton = ({type, name, path, token, disabled, editMode, setPluginValue, showForm}) => {
+    const {state} = useTokenState();
     let style;
     const showValue = true;
     let properties = [type];
     const buttonClass = [];
-    const active = selectionValues[type] === [path, name].join('.');
+    const active = state.selectionValues[type] === [path, name].join('.');
     if (editMode) {
         buttonClass.push('button-edit');
     }
@@ -132,7 +134,6 @@ const TokenButton = ({type, name, path, token, disabled, editMode, selectionValu
                 {!editMode && properties.length > 1 && (
                     <MoreButton
                         disabled={disabled}
-                        selectionValues={selectionValues}
                         properties={properties}
                         onClick={onClick}
                         value={name}

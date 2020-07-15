@@ -1,30 +1,57 @@
 import * as React from 'react';
 import JSON5 from 'json5';
-import defaultJSON from '../presets/default';
+import {defaultJSON, defaultDecisions} from '../presets/default';
+import {mergeTokens, reduceToValues} from '../components/utils';
+
+export interface SelectionValue {
+    borderRadius: string | undefined;
+    horizontalPadding: string | undefined;
+    verticalPadding: string | undefined;
+    itemSpacing: string | undefined;
+}
 
 const parseTokenValues = (tokens) => {
-    // TODO: Implement plugin version for checking if we should change structure
-    console.log('parsing old data', tokens);
     if (tokens.version !== '') {
-        console.log('Pluginversion', tokens.version);
-        return tokens.values;
+        try {
+            console.log('Values', tokens.values);
+            const reducedTokens = Object.entries(tokens.values).reduce((prev, group) => {
+                // Retrieve all aliases and fill in their real value
+                prev.push({[group[0]]: {values: group[1]}});
+                return prev;
+            }, []);
+
+            const assigned = Object.assign({}, ...reducedTokens);
+            return assigned;
+        } catch (e) {
+            console.error('Error reading tokens', e);
+            console.log("Here's the tokens");
+            console.log(tokens);
+        }
+    } else {
+        console.log('not a version prop');
+        const newTokens = {
+            options: {
+                values: JSON5.stringify(tokens.values, null, 2),
+            },
+            decisions: {
+                values: '{}',
+            },
+        };
+        return newTokens;
     }
-    console.log('No version');
-    const newTokens = {
-        main: {
-            values: JSON5.stringify(tokens.values, null, 2),
-        },
-    };
-    return newTokens;
 };
 
 const TokenContext = React.createContext(null);
 
 const defaultState = {
     loading: true,
+    selectionValues: {},
     tokens: {
-        main: {
+        options: {
             values: JSON5.stringify(defaultJSON(), null, 2),
+        },
+        decisions: {
+            values: JSON5.stringify(defaultDecisions(), null, 2),
         },
     },
 };
@@ -79,7 +106,7 @@ function stateReducer(state, action) {
                 {
                     pluginMessage: {
                         type: 'update',
-                        tokens: JSON5.parse(state.tokens),
+                        tokens: reduceToValues(state.tokens),
                     },
                 },
                 '*'
@@ -90,12 +117,33 @@ function stateReducer(state, action) {
                 {
                     pluginMessage: {
                         type: 'create-styles',
-                        tokens: JSON5.parse(state.tokens),
+                        tokens: state.tokens,
                     },
                 },
                 '*'
             );
             return state;
+        case 'SET_NODE_DATA':
+            parent.postMessage(
+                {
+                    pluginMessage: {
+                        type: 'set-node-data',
+                        values: {
+                            ...state.selectionValues,
+                            ...action.data,
+                        },
+                        tokens: mergeTokens(state.tokens),
+                    },
+                },
+                '*'
+            );
+            return state;
+
+        case 'SET_SELECTION_VALUES':
+            return {
+                ...state,
+                selectionValues: action.data,
+            };
         default:
             throw new Error('Not implemented');
     }
@@ -103,20 +151,6 @@ function stateReducer(state, action) {
 
 function TokenProvider({children}) {
     const [state, dispatch] = React.useReducer(stateReducer, defaultState);
-
-    // React.useEffect(() => {
-    //     let newTokensFromString;
-    //     try {
-    //         newTokensFromString = JSON5.parse(stringTokens);
-    //         setError('');
-    //     } catch (e) {
-    //         console.log({e}, stringTokens);
-    //         setError('Invalid JSON');
-    //     }
-    //     if (newTokensFromString) {
-    //         setTokens(newTokensFromString);
-    //     }
-    // }, [stringTokens]);
 
     const tokenContext = React.useMemo(
         () => ({
@@ -144,6 +178,12 @@ function TokenProvider({children}) {
             },
             setLoading: (boolean) => {
                 dispatch({type: 'SET_LOADING', state: boolean});
+            },
+            setNodeData: (data: SelectionValue) => {
+                dispatch({type: 'SET_NODE_DATA', data});
+            },
+            setSelectionValues: (data: SelectionValue) => {
+                dispatch({type: 'SET_SELECTION_VALUES', data});
             },
         }),
         [state]

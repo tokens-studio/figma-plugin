@@ -5,23 +5,22 @@ import Button from './Button';
 
 const JSONEditor = () => {
     const {state, setStringTokens, setDefaultTokens, updateTokens} = React.useContext(TokenContext);
-    const [activeToken, setActiveToken] = React.useState('main');
+    const [activeToken, setActiveToken] = React.useState('options');
     return (
         <div className="space-y-2">
-            {Object.keys(state.tokens).map((key) => {
-                return (
-                    <Button
-                        key={key}
-                        variant={activeToken === key ? 'primary' : 'secondary'}
-                        onClick={() => setActiveToken(key)}
-                    >
-                        {key}
-                    </Button>
-                );
-            })}
-            <Button variant="ghost" onClick={() => setStringTokens({parent: '2', tokens: '{}'})}>
-                New +
-            </Button>
+            <div className="space-x-2">
+                {Object.keys(state.tokens).map((key) => {
+                    return (
+                        <Button
+                            key={key}
+                            variant={activeToken === key ? 'primary' : 'secondary'}
+                            onClick={() => setActiveToken(key)}
+                        >
+                            {key}
+                        </Button>
+                    );
+                })}
+            </div>
 
             <Textarea
                 placeholder="Enter JSON"

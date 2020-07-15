@@ -9,16 +9,9 @@ import StartScreen from './StartScreen';
 import Heading from './Heading';
 import Navbar from './Navbar';
 import Icon from './Icon';
-import * as defaultJSON from '../presets/default.json';
 import * as pjs from '../../../package.json';
-import {useTokenState} from '../store/TokenContext';
-
-interface SelectionValue {
-    borderRadius: string | undefined;
-    horizontalPadding: string | undefined;
-    verticalPadding: string | undefined;
-    itemSpacing: string | undefined;
-}
+import {useTokenState, SelectionValue} from '../store/TokenContext';
+import {mergeTokens} from './utils';
 
 const goToNodeId = (id) => {
     parent.postMessage(
@@ -34,29 +27,16 @@ const goToNodeId = (id) => {
 
 const App = () => {
     const [disabled, setDisabled] = React.useState(false);
-    const [selectionValues, setSelectionValues] = React.useState<SelectionValue>({} as SelectionValue);
     const [active, setActive] = React.useState('start');
     const [remoteComponents, setRemoteComponents] = React.useState([]);
 
-    const {state, setStringTokens, setPreviousTokens, setLoading} = useTokenState();
+    const {state, setStringTokens, setPreviousTokens, setLoading, setSelectionValues, setNodeData} = useTokenState();
 
     const onSetNodeData = (data = {}) => {
+        console.log('setting data in plugin', data);
+
         setLoading(true);
-        setTimeout(() => {
-            parent.postMessage(
-                {
-                    pluginMessage: {
-                        type: 'set-node-data',
-                        values: {
-                            ...selectionValues,
-                            ...data,
-                        },
-                        tokens: JSON5.parse(state.tokens),
-                    },
-                },
-                '*'
-            );
-        }, 100);
+        setNodeData(data);
     };
 
     const removeTokenValues = () => {
@@ -83,9 +63,9 @@ const App = () => {
         setStringTokens({parent, tokens: JSON5.stringify(obj, null, 2)});
     }
     function setPluginValue(value) {
-        setSelectionValues((prevState) => {
+        setSelectionValues(() => {
             const newPluginValue = {
-                ...prevState,
+                ...state.selectionValue,
                 ...value,
             };
             onSetNodeData(newPluginValue);
@@ -102,20 +82,21 @@ const App = () => {
                 if (values) {
                     setSelectionValues(values);
                 } else {
-                    setSelectionValues({} as SelectionValue);
+                    setSelectionValues({});
                 }
             } else if (type === 'noselection') {
                 setDisabled(true);
-                setSelectionValues({} as SelectionValue);
+                setSelectionValues({});
             } else if (type === 'remotecomponents') {
                 setLoading(false);
                 setRemoteComponents(values.remotes);
             } else if (type === 'tokenvalues') {
                 setLoading(false);
                 if (values) {
-                    console.log('Got values', values);
                     setPreviousTokens(values);
+                    console.log('After set prev');
                     setActive('tokens');
+                    console.log('After set active');
                 }
             }
         };
@@ -156,15 +137,13 @@ const App = () => {
                             disabled={disabled}
                             setSingleTokenValue={setSingleTokenValue}
                             setPluginValue={setPluginValue}
-                            selectionValues={selectionValues}
                         />
                     )}
                     {active === 'json' && <JSONEditor />}
                     {active === 'inspector' && (
                         <Inspector
-                            tokens={state.tokens.main.values}
+                            tokens={JSON5.parse(state.tokens.options.values)}
                             removeTokenValues={removeTokenValues}
-                            selectionValues={selectionValues}
                         />
                     )}
                 </div>
