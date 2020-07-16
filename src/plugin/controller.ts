@@ -1,4 +1,4 @@
-import {hexToFigmaRGB} from '@figma-plugin/helpers';
+import {hexToFigmaRGB, webRGBToFigmaRGB} from '@figma-plugin/helpers';
 
 const Dot = require('dot-object');
 const objectPath = require('object-path');
@@ -126,6 +126,32 @@ const mapValuesToTokens = (object, values) => {
     return Object.assign({}, ...array);
 };
 
+interface RGBA {
+    r: number;
+    g: number;
+    b: number;
+    a?: number;
+}
+
+const convertToFigmaColor = (input) => {
+    let color;
+    let opacity;
+    if (input.startsWith('rgb')) {
+        const rgbValues = input.replace(/^rgba?\(|\s+|\)$/g, '').split(',');
+        const {r, g, b, a = 1} = webRGBToFigmaRGB(rgbValues);
+        color = {r, g, b};
+        opacity = Number(a);
+    } else {
+        const {r, g, b, a = 1}: RGBA = hexToFigmaRGB(input);
+        color = {r, g, b};
+        opacity = Number(a);
+    }
+    return {
+        color,
+        opacity,
+    };
+};
+
 const setValuesOnNode = (node, values, data) => {
     if (values.borderRadius) {
         if (typeof node.cornerRadius !== 'undefined') {
@@ -179,11 +205,12 @@ const setValuesOnNode = (node, values, data) => {
             const path = data.fill.split('.');
             const pathname = path.slice(1, path.length).join('/');
             const matchingStyles = paints.filter((n) => n.name === pathname);
+            const figmaColor = convertToFigmaColor(values.fill);
             if (matchingStyles.length) {
-                matchingStyles[0].paints = [{color: hexToFigmaRGB(values.fill), type: 'SOLID'}];
+                matchingStyles[0].paints = [{...figmaColor, type: 'SOLID'}];
                 node.fillStyleId = matchingStyles[0].id;
             } else {
-                node.fills = [{type: 'SOLID', color: hexToFigmaRGB(values.fill)}];
+                node.fills = [{type: 'SOLID', ...figmaColor}];
             }
         }
     }
@@ -193,11 +220,13 @@ const setValuesOnNode = (node, values, data) => {
             const path = data.border.split('.');
             const pathname = path.slice(1, path.length).join('/');
             const matchingStyles = paints.filter((n) => n.name === pathname);
+            const figmaColor = convertToFigmaColor(values.border);
+
             if (matchingStyles.length) {
-                matchingStyles[0].paints = [{color: hexToFigmaRGB(values.border), type: 'SOLID'}];
+                matchingStyles[0].paints = [{...figmaColor, type: 'SOLID'}];
                 node.strokeStyleId = matchingStyles[0].id;
             } else {
-                node.strokes = [{type: 'SOLID', color: hexToFigmaRGB(values.border)}];
+                node.strokes = [{type: 'SOLID', ...figmaColor}];
             }
         }
     }
@@ -272,11 +301,12 @@ const updateStyles = (tokens, shouldCreate = false) => {
     Object.entries(cols).map(([key, value]) => {
         const matchingStyle = paints.filter((n) => n.name === key);
         if (typeof value === 'string') {
+            const figmaColor = convertToFigmaColor(value);
             if (matchingStyle.length) {
-                matchingStyle[0].paints = [{color: hexToFigmaRGB(value), type: 'SOLID'}];
+                matchingStyle[0].paints = [{...figmaColor, type: 'SOLID'}];
             } else if (shouldCreate) {
                 const newStyle = figma.createPaintStyle();
-                newStyle.paints = [{color: hexToFigmaRGB(value), type: 'SOLID'}];
+                newStyle.paints = [{...figmaColor, type: 'SOLID'}];
                 newStyle.name = key;
             }
         }
