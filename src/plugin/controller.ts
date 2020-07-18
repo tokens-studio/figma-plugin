@@ -221,9 +221,7 @@ const setValuesOnNode = (node, values, data) => {
 };
 
 const updateNodes = (nodes, tokens) => {
-    console.log('UPDATING NODES', tokens);
     const nodesWithData = findAllWithPluginData(nodes);
-    console.log('nodes with data', nodesWithData, tokens);
     nodesWithData.forEach((node) => {
         const data = fetchPluginData(node);
         if (data) {
@@ -235,7 +233,6 @@ const updateNodes = (nodes, tokens) => {
 };
 
 const setTokenData = (data) => {
-    console.log('SETTING PLUGIN DATA ON ROOT', data);
     figma.root.setSharedPluginData('tokens', 'version', '0.3');
     figma.root.setSharedPluginData('tokens', 'values', JSON.stringify(data));
 };
@@ -245,7 +242,6 @@ const getTokenData = () => {
     const version = figma.root.getSharedPluginData('tokens', 'version');
     if (value) {
         const parsedValues = JSON.parse(value);
-        console.log({parsedValues});
         return {values: parsedValues, version};
     }
 };
@@ -309,7 +305,6 @@ figma.ui.onmessage = (msg) => {
     }
 
     if (msg.type === 'set-node-data') {
-        console.log('SETTING NODE DATA', msg.values, msg.tokens);
         try {
             updatePluginData(figma.currentPage.selection, msg.values);
             updateNodes(figma.currentPage.selection, msg.tokens);
@@ -342,8 +337,6 @@ figma.ui.onmessage = (msg) => {
     }
 
     if (msg.type === 'update') {
-        console.log('should update', msg);
-
         setTokenData(msg.tokenValues);
         updateStyles(msg.tokens, false);
         updateNodes(figma.currentPage.children, msg.tokens);

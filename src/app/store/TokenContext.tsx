@@ -2,6 +2,7 @@ import * as React from 'react';
 import JSON5 from 'json5';
 import {defaultJSON, defaultDecisions} from '../presets/default';
 import TokenData, {TokenProps} from '../components/TokenData';
+import * as pjs from '../../../package.json';
 
 export interface SelectionValue {
     borderRadius: string | undefined;
@@ -13,7 +14,7 @@ export interface SelectionValue {
 const TokenContext = React.createContext(null);
 
 const defaultTokens: TokenProps = {
-    version: '1.0',
+    version: pjs.version,
     values: {
         options: JSON5.stringify(defaultJSON(), null, 2),
         decisions: JSON5.stringify(defaultDecisions(), null, 2),
@@ -30,7 +31,6 @@ const defaultState = {
 function stateReducer(state, action) {
     switch (action.type) {
         case 'SET_TOKENS':
-            console.log('SET_TOKENS', action);
             return {
                 ...state,
                 tokens: {
@@ -39,13 +39,11 @@ function stateReducer(state, action) {
                 },
             };
         case 'SET_TOKEN_DATA':
-            console.log('SET_TOKEN_DATA', action);
             return {
                 ...state,
                 tokenData: action.data,
             };
         case 'SET_STRING_TOKENS':
-            console.log('SET_STRING_TOKENS', action);
             state.tokenData.updateTokenValues(action.data.parent, action.data.tokens);
             return state;
         case 'SET_DEFAULT_TOKENS':
@@ -56,7 +54,6 @@ function stateReducer(state, action) {
                 loading: action.state,
             };
         case 'UPDATE_TOKENS':
-            console.log('update tokens');
             parent.postMessage(
                 {
                     pluginMessage: {
@@ -80,7 +77,6 @@ function stateReducer(state, action) {
             );
             return state;
         case 'SET_NODE_DATA':
-            console.log('setting node data', state.tokenData);
             parent.postMessage(
                 {
                     pluginMessage: {
@@ -96,7 +92,6 @@ function stateReducer(state, action) {
             );
             return state;
         case 'REMOVE_NODE_DATA':
-            console.log('removing node data');
             parent.postMessage(
                 {
                     pluginMessage: {
@@ -108,7 +103,6 @@ function stateReducer(state, action) {
             return state;
 
         case 'SET_SELECTION_VALUES':
-            console.log('set selection val node data');
             return {
                 ...state,
                 selectionValues: action.data,
@@ -135,13 +129,12 @@ function TokenProvider({children}) {
             },
             setDefaultTokens: () => {
                 dispatch({type: 'SET_DEFAULT_TOKENS'});
+                dispatch({type: 'SET_LOADING', state: false});
             },
             updateTokens: () => {
-                console.log('updating');
                 dispatch({type: 'UPDATE_TOKENS'});
             },
             createStyles: () => {
-                console.log('CREATE_STYLES');
                 dispatch({type: 'CREATE_STYLES'});
             },
             setLoading: (boolean) => {
@@ -161,15 +154,6 @@ function TokenProvider({children}) {
         }),
         [state]
     );
-
-    React.useEffect(() => {
-        console.log('Daata changed', state.tokenData);
-    }, [state.tokenData]);
-
-    // React.useEffect(() => {
-    //     console.log('tokens changed');
-    //     dispatch({type: 'SET_MERGED_TOKENS', tokens: state.tokens});
-    // }, [state.tokens]);
 
     return <TokenContext.Provider value={tokenContext}>{children}</TokenContext.Provider>;
 }

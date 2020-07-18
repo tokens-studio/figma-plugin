@@ -7,7 +7,6 @@ import EditTokenForm from './EditTokenForm';
 import TokenButton from './TokenButton';
 import Tooltip from './Tooltip';
 import {useTokenState} from '../store/TokenContext';
-import Button from './Button';
 
 const mappedTokens = (tokens) => {
     const properties = {
@@ -22,7 +21,7 @@ const mappedTokens = (tokens) => {
 
 const Tokens = ({setSingleTokenValue, setPluginValue, disabled}) => {
     const {state, createStyles, updateTokens} = useTokenState();
-    const [activeToken, setActiveToken] = React.useState('options');
+    const [activeToken] = React.useState('options');
     const [editToken, setEditToken] = React.useState({
         token: '',
         name: '',
@@ -130,7 +129,7 @@ const Tokens = ({setSingleTokenValue, setPluginValue, disabled}) => {
                         </Tooltip>
                     </div>
                     {showOptions === values[0] && (
-                        <Modal isOpen={showOptions} close={closeForm}>
+                        <Modal title={`Modal for ${values[0]}`} isOpen={showOptions} close={closeForm}>
                             <div className="flex flex-col-reverse">
                                 {showEditForm && (
                                     <EditTokenForm
@@ -177,19 +176,6 @@ const Tokens = ({setSingleTokenValue, setPluginValue, disabled}) => {
 
     return (
         <div>
-            <div className="space-x-2">
-                {Object.keys(state.tokenData.tokens).map((key) => {
-                    return (
-                        <Button
-                            key={key}
-                            variant={activeToken === key ? 'primary' : 'secondary'}
-                            onClick={() => setActiveToken(key)}
-                        >
-                            {key.toUpperCase()}
-                        </Button>
-                    );
-                })}
-            </div>
             {mappedTokens(JSON5.parse(state.tokenData.tokens[activeToken].values)).map((tokenValues) => {
                 switch (tokenValues[0]) {
                     case 'borderRadius':
