@@ -1,6 +1,6 @@
 import * as React from 'react';
 import JSON5 from 'json5';
-import {defaultJSON, defaultDecisions} from '../presets/default';
+import {defaultJSON} from '../presets/default';
 import TokenData, {TokenProps} from '../components/TokenData';
 import * as pjs from '../../../package.json';
 
@@ -17,41 +17,57 @@ const defaultTokens: TokenProps = {
     version: pjs.version,
     values: {
         options: JSON5.stringify(defaultJSON(), null, 2),
-        decisions: JSON5.stringify(defaultDecisions(), null, 2),
+    },
+};
+
+const emptyTokens: TokenProps = {
+    version: pjs.version,
+    values: {
+        options: "{ black: '#000'}",
     },
 };
 
 const defaultState = {
+    tokens: defaultTokens,
     loading: true,
     tokenData: new TokenData(defaultTokens),
     selectionValues: {},
+};
+
+const emptyState = {
     tokens: defaultTokens,
+    loading: true,
+    tokenData: new TokenData(emptyTokens),
+    selectionValues: {},
 };
 
 function stateReducer(state, action) {
     switch (action.type) {
-        case 'SET_TOKENS':
-            return {
-                ...state,
-                tokens: {
-                    ...state.tokens,
-                    ...action.tokens,
-                },
-            };
         case 'SET_TOKEN_DATA':
             return {
                 ...state,
                 tokenData: action.data,
             };
-        case 'SET_STRING_TOKENS':
-            state.tokenData.updateTokenValues(action.data.parent, action.data.tokens);
-            return state;
         case 'SET_DEFAULT_TOKENS':
             return defaultState;
+        case 'SET_EMPTY_TOKENS':
+            return emptyState;
         case 'SET_LOADING':
             return {
                 ...state,
                 loading: action.state,
+            };
+        case 'SET_STRING_TOKENS':
+            state.tokenData.updateTokenValues(action.data.parent, action.data.tokens);
+            return {
+                ...state,
+                tokens: {
+                    ...state.tokens,
+                    [action.data.parent]: {
+                        hasErrored: state.tokenData.checkTokenValidity(action.data.tokens),
+                        values: action.data.tokens,
+                    },
+                },
             };
         case 'UPDATE_TOKENS':
             parent.postMessage(
@@ -129,6 +145,10 @@ function TokenProvider({children}) {
             },
             setDefaultTokens: () => {
                 dispatch({type: 'SET_DEFAULT_TOKENS'});
+                dispatch({type: 'SET_LOADING', state: false});
+            },
+            setEmptyTokens: () => {
+                dispatch({type: 'SET_EMPTY_TOKENS'});
                 dispatch({type: 'SET_LOADING', state: false});
             },
             updateTokens: () => {

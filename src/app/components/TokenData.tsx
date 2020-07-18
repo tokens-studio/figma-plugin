@@ -5,9 +5,7 @@ import {mergeDeep} from '../../plugin/helpers';
 
 export interface TokenProps {
     values: {
-        [key: string]: {
-            [key: string]: string;
-        };
+        [key: string]: string;
     };
     version: string;
 }
@@ -91,14 +89,20 @@ export default class TokenData {
     }
 
     updateTokenValues(parent: string, tokens: TokenGroup): void {
-        this.tokens = {
+        const hasErrored: boolean = this.checkTokenValidity(tokens);
+
+        const newTokens = {
             ...this.tokens,
             [parent]: {
-                hasErrored: this.checkTokenValidity(tokens),
+                hasErrored,
                 values: tokens,
             },
         };
-        this.setMergedTokens();
+        this.tokens = newTokens;
+
+        if (!hasErrored) {
+            this.setMergedTokens();
+        }
     }
 
     getTokens() {

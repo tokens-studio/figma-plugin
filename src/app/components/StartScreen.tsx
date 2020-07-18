@@ -4,13 +4,13 @@ import Button from './Button';
 import {useTokenState} from '../store/TokenContext';
 
 const StartScreen = ({setActive}) => {
-    const {setTokens, setDefaultTokens, setLoading} = useTokenState();
-    const setEmptyTokens = () => {
+    const {setEmptyTokens, setDefaultTokens, setLoading} = useTokenState();
+    const onSetEmptyTokens = () => {
         setActive('json');
-        setTokens({tokens: {options: '{}', decisions: '{}'}});
+        setEmptyTokens();
         setLoading(false);
     };
-    const handleSetDefaultTokens = () => {
+    const onSetDefaultTokens = () => {
         setActive('tokens');
         setDefaultTokens();
         setLoading(false);
@@ -35,10 +35,10 @@ const StartScreen = ({setActive}) => {
             <div className="space-y-2 p-4 bg-gray-300 rounded">
                 <p>Seems like you don't have any tokens defined. Start by defining your tokens or use our preset.</p>
                 <div className="space-x-2">
-                    <Button size="large" variant="secondary" onClick={setEmptyTokens}>
+                    <Button size="large" variant="secondary" onClick={onSetEmptyTokens}>
                         Edit JSON
                     </Button>
-                    <Button size="large" variant="primary" onClick={handleSetDefaultTokens}>
+                    <Button size="large" variant="primary" onClick={onSetDefaultTokens}>
                         Use Preset
                     </Button>
                 </div>

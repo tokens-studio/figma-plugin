@@ -174,6 +174,8 @@ const Tokens = ({setSingleTokenValue, setPluginValue, disabled}) => {
         );
     };
 
+    if (state.tokenData.tokens[activeToken].hasErrored) return <div>JSON malformed, check in Editor</div>;
+
     return (
         <div>
             {mappedTokens(JSON5.parse(state.tokenData.tokens[activeToken].values)).map((tokenValues) => {
