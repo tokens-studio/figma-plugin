@@ -10,8 +10,8 @@ import Heading from './Heading';
 import Navbar from './Navbar';
 import Icon from './Icon';
 import * as pjs from '../../../package.json';
-import {useTokenState, SelectionValue} from '../store/TokenContext';
-import {mergeTokens} from './utils';
+import {useTokenState} from '../store/TokenContext';
+import TokenData from './TokenData';
 
 const goToNodeId = (id) => {
     parent.postMessage(
@@ -30,27 +30,10 @@ const App = () => {
     const [active, setActive] = React.useState('start');
     const [remoteComponents, setRemoteComponents] = React.useState([]);
 
-    const {state, setStringTokens, setPreviousTokens, setLoading, setSelectionValues, setNodeData} = useTokenState();
+    const {state, setStringTokens, setTokenData, setLoading, setSelectionValues, setNodeData} = useTokenState();
 
     const onSetNodeData = (data = {}) => {
-        console.log('setting data in plugin', data);
-
-        setLoading(true);
         setNodeData(data);
-    };
-
-    const removeTokenValues = () => {
-        setLoading(true);
-        setTimeout(() => {
-            parent.postMessage(
-                {
-                    pluginMessage: {
-                        type: 'remove-node-data',
-                    },
-                },
-                '*'
-            );
-        }, 100);
     };
 
     const onInitiate = () => {
@@ -58,19 +41,18 @@ const App = () => {
     };
 
     function setSingleTokenValue({parent, name, token}) {
-        const obj = JSON5.parse(state.tokens[parent].values);
+        const obj = JSON5.parse(state.tokenData.tokens[parent].values);
         objectPath.set(obj, name, token);
         setStringTokens({parent, tokens: JSON5.stringify(obj, null, 2)});
     }
     function setPluginValue(value) {
-        setSelectionValues(() => {
-            const newPluginValue = {
-                ...state.selectionValue,
-                ...value,
-            };
-            onSetNodeData(newPluginValue);
-            return {...newPluginValue};
-        });
+        setSelectionValues(value);
+
+        const newPluginValue = {
+            ...state.selectionValue,
+            ...value,
+        };
+        onSetNodeData(newPluginValue);
     }
 
     React.useEffect(() => {
@@ -93,10 +75,8 @@ const App = () => {
             } else if (type === 'tokenvalues') {
                 setLoading(false);
                 if (values) {
-                    setPreviousTokens(values);
-                    console.log('After set prev');
+                    setTokenData(new TokenData(values));
                     setActive('tokens');
-                    console.log('After set active');
                 }
             }
         };
@@ -140,12 +120,7 @@ const App = () => {
                         />
                     )}
                     {active === 'json' && <JSONEditor />}
-                    {active === 'inspector' && (
-                        <Inspector
-                            tokens={JSON5.parse(state.tokens.options.values)}
-                            removeTokenValues={removeTokenValues}
-                        />
-                    )}
+                    {active === 'inspector' && <Inspector />}
                 </div>
                 <div className="p-4 flex-shrink-0 flex items-center justify-between">
                     <div className="text-gray-600 text-xxs">Figma Tokens {pjs.version}</div>

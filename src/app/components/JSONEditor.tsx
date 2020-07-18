@@ -9,7 +9,7 @@ const JSONEditor = () => {
     return (
         <div className="space-y-2">
             <div className="space-x-2">
-                {Object.keys(state.tokens).map((key) => {
+                {Object.keys(state.tokenData.tokens).map((key) => {
                     return (
                         <Button
                             key={key}
@@ -25,9 +25,9 @@ const JSONEditor = () => {
             <Textarea
                 placeholder="Enter JSON"
                 rows={20}
-                hasErrored={state.tokens[activeToken].hasErrored}
+                hasErrored={state.tokenData.tokens[activeToken].hasErrored}
                 onChange={(val) => setStringTokens({parent: activeToken, tokens: val})}
-                value={state.tokens[activeToken].values}
+                value={state.tokenData.tokens[activeToken].values}
             />
             <div className="space-x-2">
                 <button className="button" type="button" onClick={updateTokens}>

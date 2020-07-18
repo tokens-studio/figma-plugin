@@ -1,6 +1,4 @@
 import {hexToFigmaRGB} from '@figma-plugin/helpers';
-import JSON5 from 'json5';
-import {mergeDeep} from './helpers';
 
 const Dot = require('dot-object');
 const objectPath = require('object-path');
@@ -93,12 +91,7 @@ function updatePluginData(nodes, values) {
                 edit: Object.keys(newVals).join(', '),
             });
         }
-        item.setPluginData(
-            'values',
-            JSON.stringify({
-                ...newVals,
-            })
-        );
+        item.setPluginData('values', JSON.stringify(newVals));
     });
 }
 
@@ -349,7 +342,9 @@ figma.ui.onmessage = (msg) => {
     }
 
     if (msg.type === 'update') {
-        setTokenData(msg.tokens);
+        console.log('should update', msg);
+
+        setTokenData(msg.tokenValues);
         updateStyles(msg.tokens, false);
         updateNodes(figma.currentPage.children, msg.tokens);
         notifyRemoteComponents({nodes: successfulNodes.length, remotes: remoteComponents});

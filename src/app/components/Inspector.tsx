@@ -2,10 +2,10 @@ import * as React from 'react';
 import objectPath from 'object-path';
 import {useTokenState} from '../store/TokenContext';
 
-const Inspector = ({tokens, removeTokenValues}) => {
-    const {state} = useTokenState();
+const Inspector = () => {
+    const {state, removeNodeData} = useTokenState();
     const getValue = (value) => {
-        return objectPath.get(tokens, value);
+        return objectPath.get(state.tokenData.getMergedTokens(), value);
     };
     return (
         <div className="space-y-2">
@@ -22,7 +22,7 @@ const Inspector = ({tokens, removeTokenValues}) => {
                     </div>
                 ))}
             </div>
-            <button className="button" type="button" onClick={removeTokenValues}>
+            <button className="button" type="button" onClick={removeNodeData}>
                 Remove tokens from layer
             </button>
         </div>

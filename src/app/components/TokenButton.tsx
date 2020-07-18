@@ -15,6 +15,8 @@ function colorByHashCode(value) {
 
 const TokenButton = ({type, name, path, token, disabled, editMode, setPluginValue, showForm}) => {
     const {state} = useTokenState();
+    const realTokenValue = state.tokenData.getAliasValue(token);
+    const displayValue = realTokenValue || token;
     let style;
     const showValue = true;
     let properties = [type];
@@ -49,7 +51,7 @@ const TokenButton = ({type, name, path, token, disabled, editMode, setPluginValu
     };
     switch (type) {
         case 'borderRadius':
-            style = {...style, borderRadius: `${token}px`};
+            style = {...style, borderRadius: `${displayValue}px`};
             properties = [
                 {
                     label: 'All',
@@ -70,7 +72,7 @@ const TokenButton = ({type, name, path, token, disabled, editMode, setPluginValu
         case 'opacity':
             style = {
                 ...style,
-                backgroundColor: `rgba(0,0,0, ${Number(token.slice(0, token.length - 1)) / 100})`,
+                backgroundColor: `rgba(0,0,0, ${Number(displayValue.slice(0, displayValue.length - 1)) / 100})`,
             };
             break;
         case 'spacing':
@@ -98,7 +100,7 @@ const TokenButton = ({type, name, path, token, disabled, editMode, setPluginValu
                 },
             ];
             style = {
-                '--backgroundColor': token,
+                '--backgroundColor': displayValue,
             };
             buttonClass.push('button-property-color');
 
@@ -115,7 +117,7 @@ const TokenButton = ({type, name, path, token, disabled, editMode, setPluginValu
     }
 
     return (
-        <Tooltip label={`${name}: ${token}`}>
+        <Tooltip label={`${name}: ${token}${realTokenValue ? `: ${realTokenValue}` : ''}`}>
             <div
                 className={`relative flex button button-property ${buttonClass.join(' ')} ${
                     disabled && 'button-disabled'

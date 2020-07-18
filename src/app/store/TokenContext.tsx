@@ -1,7 +1,7 @@
 import * as React from 'react';
 import JSON5 from 'json5';
 import {defaultJSON, defaultDecisions} from '../presets/default';
-import {mergeTokens, reduceToValues} from '../components/utils';
+import TokenData, {TokenProps} from '../components/TokenData';
 
 export interface SelectionValue {
     borderRadius: string | undefined;
@@ -10,60 +10,22 @@ export interface SelectionValue {
     itemSpacing: string | undefined;
 }
 
-const parseTokenValues = (tokens) => {
-    if (tokens.version !== '') {
-        try {
-            console.log('Values', tokens.values);
-            const reducedTokens = Object.entries(tokens.values).reduce((prev, group) => {
-                // Retrieve all aliases and fill in their real value
-                prev.push({[group[0]]: {values: group[1]}});
-                return prev;
-            }, []);
-
-            const assigned = Object.assign({}, ...reducedTokens);
-            return assigned;
-        } catch (e) {
-            console.error('Error reading tokens', e);
-            console.log("Here's the tokens");
-            console.log(tokens);
-        }
-    } else {
-        console.log('not a version prop');
-        const newTokens = {
-            options: {
-                values: JSON5.stringify(tokens.values, null, 2),
-            },
-            decisions: {
-                values: '{}',
-            },
-        };
-        return newTokens;
-    }
-};
-
 const TokenContext = React.createContext(null);
 
-const defaultState = {
-    loading: true,
-    selectionValues: {},
-    tokens: {
-        options: {
-            values: JSON5.stringify(defaultJSON(), null, 2),
-        },
-        decisions: {
-            values: JSON5.stringify(defaultDecisions(), null, 2),
-        },
+const defaultTokens: TokenProps = {
+    version: '1.0',
+    values: {
+        options: JSON5.stringify(defaultJSON(), null, 2),
+        decisions: JSON5.stringify(defaultDecisions(), null, 2),
     },
 };
 
-function parseTokens(tokens) {
-    try {
-        JSON5.parse(tokens);
-        return false;
-    } catch (e) {
-        return true;
-    }
-}
+const defaultState = {
+    loading: true,
+    tokenData: new TokenData(defaultTokens),
+    selectionValues: {},
+    tokens: defaultTokens,
+};
 
 function stateReducer(state, action) {
     switch (action.type) {
@@ -76,24 +38,16 @@ function stateReducer(state, action) {
                     ...action.tokens,
                 },
             };
+        case 'SET_TOKEN_DATA':
+            console.log('SET_TOKEN_DATA', action);
+            return {
+                ...state,
+                tokenData: action.data,
+            };
         case 'SET_STRING_TOKENS':
             console.log('SET_STRING_TOKENS', action);
-            return {
-                ...state,
-                tokens: {
-                    ...state.tokens,
-                    [action.data.parent]: {
-                        hasErrored: parseTokens(action.data.tokens),
-                        values: action.data.tokens,
-                    },
-                },
-            };
-        case 'SET_PREVIOUS_TOKENS':
-            console.log('SET_PREVIOUS_TOKENS', action);
-            return {
-                ...state,
-                tokens: parseTokenValues(action.tokens),
-            };
+            state.tokenData.updateTokenValues(action.data.parent, action.data.tokens);
+            return state;
         case 'SET_DEFAULT_TOKENS':
             return defaultState;
         case 'SET_LOADING':
@@ -102,11 +56,13 @@ function stateReducer(state, action) {
                 loading: action.state,
             };
         case 'UPDATE_TOKENS':
+            console.log('update tokens');
             parent.postMessage(
                 {
                     pluginMessage: {
                         type: 'update',
-                        tokens: reduceToValues(state.tokens),
+                        tokenValues: state.tokenData.reduceToValues(),
+                        tokens: state.tokenData.getMergedTokens(),
                     },
                 },
                 '*'
@@ -117,13 +73,14 @@ function stateReducer(state, action) {
                 {
                     pluginMessage: {
                         type: 'create-styles',
-                        tokens: state.tokens,
+                        tokens: state.tokenData.getMergedTokens(),
                     },
                 },
                 '*'
             );
             return state;
         case 'SET_NODE_DATA':
+            console.log('setting node data', state.tokenData);
             parent.postMessage(
                 {
                     pluginMessage: {
@@ -132,7 +89,18 @@ function stateReducer(state, action) {
                             ...state.selectionValues,
                             ...action.data,
                         },
-                        tokens: mergeTokens(state.tokens),
+                        tokens: state.tokenData.getMergedTokens(),
+                    },
+                },
+                '*'
+            );
+            return state;
+        case 'REMOVE_NODE_DATA':
+            console.log('removing node data');
+            parent.postMessage(
+                {
+                    pluginMessage: {
+                        type: 'remove-node-data',
                     },
                 },
                 '*'
@@ -140,6 +108,7 @@ function stateReducer(state, action) {
             return state;
 
         case 'SET_SELECTION_VALUES':
+            console.log('set selection val node data');
             return {
                 ...state,
                 selectionValues: action.data,
@@ -158,15 +127,14 @@ function TokenProvider({children}) {
             setTokens: (tokens) => {
                 dispatch({type: 'SET_TOKENS', tokens});
             },
+            setTokenData: (data: TokenData) => {
+                dispatch({type: 'SET_TOKEN_DATA', data});
+            },
             setStringTokens: (data: {parent: string; tokens: string}) => {
                 dispatch({type: 'SET_STRING_TOKENS', data});
             },
             setDefaultTokens: () => {
                 dispatch({type: 'SET_DEFAULT_TOKENS'});
-            },
-            setPreviousTokens: (tokens) => {
-                console.log('SETTING PREVIOUS', {tokens});
-                dispatch({type: 'SET_PREVIOUS_TOKENS', tokens});
             },
             updateTokens: () => {
                 console.log('updating');
@@ -180,7 +148,12 @@ function TokenProvider({children}) {
                 dispatch({type: 'SET_LOADING', state: boolean});
             },
             setNodeData: (data: SelectionValue) => {
+                dispatch({type: 'SET_LOADING', state: true});
                 dispatch({type: 'SET_NODE_DATA', data});
+            },
+            removeNodeData: (data: SelectionValue) => {
+                dispatch({type: 'SET_LOADING', state: true});
+                dispatch({type: 'REMOVE_NODE_DATA', data});
             },
             setSelectionValues: (data: SelectionValue) => {
                 dispatch({type: 'SET_SELECTION_VALUES', data});
@@ -188,6 +161,15 @@ function TokenProvider({children}) {
         }),
         [state]
     );
+
+    React.useEffect(() => {
+        console.log('Daata changed', state.tokenData);
+    }, [state.tokenData]);
+
+    // React.useEffect(() => {
+    //     console.log('tokens changed');
+    //     dispatch({type: 'SET_MERGED_TOKENS', tokens: state.tokens});
+    // }, [state.tokens]);
 
     return <TokenContext.Provider value={tokenContext}>{children}</TokenContext.Provider>;
 }

@@ -86,7 +86,6 @@ const Tokens = ({setSingleTokenValue, setPluginValue, disabled}) => {
 
     const TokenListing = ({label, explainer = '', help = '', createButton = false, property, type = '', values}) => {
         const [showHelp, setShowHelp] = React.useState(false);
-        console.log({values});
         return (
             <div className="mb-2 pb-2 border-b border-gray-200">
                 <div className="flex justify-between space-x-4 items-center">
@@ -179,7 +178,7 @@ const Tokens = ({setSingleTokenValue, setPluginValue, disabled}) => {
     return (
         <div>
             <div className="space-x-2">
-                {Object.keys(state.tokens).map((key) => {
+                {Object.keys(state.tokenData.tokens).map((key) => {
                     return (
                         <Button
                             key={key}
@@ -191,8 +190,7 @@ const Tokens = ({setSingleTokenValue, setPluginValue, disabled}) => {
                     );
                 })}
             </div>
-            {mappedTokens(JSON5.parse(state.tokens[activeToken].values)).map((tokenValues) => {
-                console.log({tokenValues});
+            {mappedTokens(JSON5.parse(state.tokenData.tokens[activeToken].values)).map((tokenValues) => {
                 switch (tokenValues[0]) {
                     case 'borderRadius':
                         return (
