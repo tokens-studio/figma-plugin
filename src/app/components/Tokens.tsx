@@ -1,5 +1,6 @@
 import * as React from 'react';
 import JSON5 from 'json5';
+import {objectPath} from 'object-path';
 import Modal from './Modal';
 import Heading from './Heading';
 import Icon from './Icon';
@@ -19,8 +20,8 @@ const mappedTokens = (tokens) => {
     return Object.entries(Object.assign(properties, tokens));
 };
 
-const Tokens = ({setSingleTokenValue, setPluginValue, disabled}) => {
-    const {state, createStyles, updateTokens} = useTokenState();
+const Tokens = ({disabled}) => {
+    const {state, setStringTokens, createStyles, updateTokens} = useTokenState();
     const [activeToken] = React.useState('options');
     const [editToken, setEditToken] = React.useState({
         token: '',
@@ -30,9 +31,21 @@ const Tokens = ({setSingleTokenValue, setPluginValue, disabled}) => {
     const [showEditForm, setShowEditForm] = React.useState(false);
     const [showOptions, setShowOptions] = React.useState('');
 
-    const submitTokenValue = ({token, name, path}) => {
+    function setSingleTokenValue({parent, name, token, options}) {
+        const obj = JSON5.parse(state.tokenData.tokens[parent].values);
+        const newValue = options
+            ? {
+                  value: token,
+                  ...options,
+              }
+            : token;
+        objectPath.set(obj, name, newValue);
+        setStringTokens({parent, tokens: JSON5.stringify(obj, null, 2)});
+    }
+
+    const submitTokenValue = ({token, name, path, options}) => {
         setEditToken({token, name, path});
-        setSingleTokenValue({parent: activeToken, name: [path, name].join('.'), token});
+        setSingleTokenValue({parent: activeToken, name: [path, name].join('.'), token, options});
         updateTokens();
     };
 
@@ -72,7 +85,6 @@ const Tokens = ({setSingleTokenValue, setPluginValue, disabled}) => {
                                     path={path}
                                     token={value}
                                     disabled={disabled}
-                                    setPluginValue={setPluginValue}
                                     showForm={showForm}
                                 />
                             </div>

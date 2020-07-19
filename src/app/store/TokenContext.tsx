@@ -50,7 +50,7 @@ function stateReducer(state, action) {
             };
         case 'SET_DEFAULT_TOKENS':
             state.tokenData.setTokens(defaultTokens);
-            break;
+            return state;
         case 'SET_EMPTY_TOKENS':
             return emptyState;
         case 'SET_LOADING':
