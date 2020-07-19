@@ -23,7 +23,7 @@ const defaultTokens: TokenProps = {
 const emptyTokens: TokenProps = {
     version: pjs.version,
     values: {
-        options: "{ black: '#000'}",
+        options: '{ }',
     },
 };
 
@@ -49,7 +49,8 @@ function stateReducer(state, action) {
                 tokenData: action.data,
             };
         case 'SET_DEFAULT_TOKENS':
-            return defaultState;
+            state.tokenData.setTokens(defaultTokens);
+            break;
         case 'SET_EMPTY_TOKENS':
             return emptyState;
         case 'SET_LOADING':

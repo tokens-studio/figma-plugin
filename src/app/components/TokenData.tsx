@@ -35,7 +35,7 @@ export default class TokenData {
         this.setMergedTokens();
     }
 
-    private setTokens(tokens: TokenProps): void {
+    setTokens(tokens: TokenProps): void {
         const parsed = this.parseTokenValues(tokens);
         if (!parsed) return;
         this.tokens = parsed;

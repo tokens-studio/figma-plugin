@@ -1,7 +1,5 @@
 import * as React from 'react';
 import '../styles/main.css';
-import objectPath from 'object-path';
-import JSON5 from 'json5';
 import JSONEditor from './JSONEditor';
 import Inspector from './Inspector';
 import Tokens from './Tokens';
@@ -30,30 +28,11 @@ const App = () => {
     const [active, setActive] = React.useState('start');
     const [remoteComponents, setRemoteComponents] = React.useState([]);
 
-    const {state, setStringTokens, setTokenData, setLoading, setSelectionValues, setNodeData} = useTokenState();
-
-    const onSetNodeData = (data = {}) => {
-        setNodeData(data);
-    };
+    const {state, setTokenData, setLoading, setSelectionValues} = useTokenState();
 
     const onInitiate = () => {
         parent.postMessage({pluginMessage: {type: 'initiate'}}, '*');
     };
-
-    function setSingleTokenValue({parent, name, token}) {
-        const obj = JSON5.parse(state.tokenData.tokens[parent].values);
-        objectPath.set(obj, name, token);
-        setStringTokens({parent, tokens: JSON5.stringify(obj, null, 2)});
-    }
-    function setPluginValue(value) {
-        setSelectionValues(value);
-
-        const newPluginValue = {
-            ...state.selectionValue,
-            ...value,
-        };
-        onSetNodeData(newPluginValue);
-    }
 
     React.useEffect(() => {
         onInitiate();
@@ -112,13 +91,7 @@ const App = () => {
                         </div>
                     )}
                     {active === 'start' && !state.loading && <StartScreen setActive={setActive} />}
-                    {active === 'tokens' && (
-                        <Tokens
-                            disabled={disabled}
-                            setSingleTokenValue={setSingleTokenValue}
-                            setPluginValue={setPluginValue}
-                        />
-                    )}
+                    {active === 'tokens' && <Tokens disabled={disabled} />}
                     {active === 'json' && <JSONEditor />}
                     {active === 'inspector' && <Inspector />}
                 </div>

@@ -13,8 +13,8 @@ function colorByHashCode(value) {
     return `${shortened},100%,85%`;
 }
 
-const TokenButton = ({type, name, path, token, disabled, editMode, setPluginValue, showForm}) => {
-    const {state} = useTokenState();
+const TokenButton = ({type, name, path, token, disabled, editMode, showForm}) => {
+    const {state, setSelectionValues, setNodeData} = useTokenState();
     const realTokenValue = state.tokenData.getAliasValue(token);
     const displayValue = realTokenValue || token;
     let style;
@@ -22,6 +22,17 @@ const TokenButton = ({type, name, path, token, disabled, editMode, setPluginValu
     let properties = [type];
     const buttonClass = [];
     const active = state.selectionValues[type] === [path, name].join('.');
+
+    function setPluginValue(value) {
+        setSelectionValues(value);
+
+        const newPluginValue = {
+            ...state.selectionValue,
+            ...value,
+        };
+        setNodeData(newPluginValue);
+    }
+
     if (editMode) {
         buttonClass.push('button-edit');
     }
