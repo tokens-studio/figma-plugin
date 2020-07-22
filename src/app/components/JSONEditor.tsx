@@ -1,13 +1,21 @@
 import * as React from 'react';
 import Textarea from './Textarea';
+import {TokenContext} from '../store/TokenContext';
 
-const JSONEditor = ({handlesetStringTokens, stringTokens, error, onUpdate, setDefaultTokens}) => {
+const JSONEditor = () => {
+    const {state, setStringTokens, setDefaultTokens, updateTokens} = React.useContext(TokenContext);
+    const [activeToken] = React.useState('options');
     return (
         <div className="space-y-2">
-            <Textarea placeholder="Enter JSON" rows={20} onChange={handlesetStringTokens} value={stringTokens} />
-            <div>{error}</div>
+            <Textarea
+                placeholder="Enter JSON"
+                rows={20}
+                hasErrored={state.tokenData.tokens[activeToken].hasErrored}
+                onChange={(val) => setStringTokens({parent: activeToken, tokens: val})}
+                value={state.tokenData.tokens[activeToken].values}
+            />
             <div className="space-x-2">
-                <button className="button" type="button" onClick={onUpdate}>
+                <button className="button" type="button" onClick={updateTokens}>
                     Save & update
                 </button>
                 <button className="button" type="button" onClick={setDefaultTokens}>

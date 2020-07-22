@@ -1,10 +1,13 @@
 import * as React from 'react';
+import JSON5 from 'json5';
+import objectPath from 'object-path';
 import Modal from './Modal';
 import Heading from './Heading';
 import Icon from './Icon';
 import EditTokenForm from './EditTokenForm';
 import TokenButton from './TokenButton';
 import Tooltip from './Tooltip';
+import {useTokenState} from '../store/TokenContext';
 
 const mappedTokens = (tokens) => {
     const properties = {
@@ -17,7 +20,9 @@ const mappedTokens = (tokens) => {
     return Object.entries(Object.assign(properties, tokens));
 };
 
-const Tokens = ({createStyles, setSingleTokenValue, setPluginValue, onUpdate, tokens, selectionValues, disabled}) => {
+const Tokens = ({disabled}) => {
+    const {state, setStringTokens, createStyles, updateTokens} = useTokenState();
+    const [activeToken] = React.useState('options');
     const [editToken, setEditToken] = React.useState({
         token: '',
         name: '',
@@ -26,10 +31,22 @@ const Tokens = ({createStyles, setSingleTokenValue, setPluginValue, onUpdate, to
     const [showEditForm, setShowEditForm] = React.useState(false);
     const [showOptions, setShowOptions] = React.useState('');
 
-    const submitTokenValue = ({token, name, path}) => {
+    function setSingleTokenValue({parent, name, token, options}) {
+        const obj = JSON5.parse(state.tokenData.tokens[parent].values);
+        const newValue = options
+            ? {
+                  value: token,
+                  ...options,
+              }
+            : token;
+        objectPath.set(obj, name, newValue);
+        setStringTokens({parent, tokens: JSON5.stringify(obj, null, 2)});
+    }
+
+    const submitTokenValue = ({token, name, path, options}) => {
         setEditToken({token, name, path});
-        setSingleTokenValue({name: [path, name].join('.'), token});
-        onUpdate();
+        setSingleTokenValue({parent: activeToken, name: [path, name].join('.'), token, options});
+        updateTokens();
     };
 
     const showForm = ({token, name, path}) => {
@@ -51,7 +68,6 @@ const Tokens = ({createStyles, setSingleTokenValue, setPluginValue, onUpdate, to
             {tokenValues.map((item) => {
                 const [key, value] = item;
                 const stringPath = [path, key].filter((n) => n).join('.');
-                // const isActive = [path, key].join('.') === selectionValues[type];
                 return (
                     <React.Fragment key={stringPath}>
                         {typeof value === 'object' ? (
@@ -69,9 +85,7 @@ const Tokens = ({createStyles, setSingleTokenValue, setPluginValue, onUpdate, to
                                     path={path}
                                     token={value}
                                     disabled={disabled}
-                                    setPluginValue={setPluginValue}
                                     showForm={showForm}
-                                    selectionValues={selectionValues}
                                 />
                             </div>
                         )}
@@ -127,7 +141,7 @@ const Tokens = ({createStyles, setSingleTokenValue, setPluginValue, onUpdate, to
                         </Tooltip>
                     </div>
                     {showOptions === values[0] && (
-                        <Modal isOpen={showOptions} close={closeForm}>
+                        <Modal title={`Modal for ${values[0]}`} isOpen={showOptions} close={closeForm}>
                             <div className="flex flex-col-reverse">
                                 {showEditForm && (
                                     <EditTokenForm
@@ -172,9 +186,11 @@ const Tokens = ({createStyles, setSingleTokenValue, setPluginValue, onUpdate, to
         );
     };
 
-    const renderTokens = () => (
+    if (state.tokenData.tokens[activeToken].hasErrored) return <div>JSON malformed, check in Editor</div>;
+
+    return (
         <div>
-            {mappedTokens(tokens).map((tokenValues) => {
+            {mappedTokens(JSON5.parse(state.tokenData.tokens[activeToken].values)).map((tokenValues) => {
                 switch (tokenValues[0]) {
                     case 'borderRadius':
                         return (
@@ -237,8 +253,6 @@ const Tokens = ({createStyles, setSingleTokenValue, setPluginValue, onUpdate, to
             })}
         </div>
     );
-
-    return <div>{renderTokens()}</div>;
 };
 
 export default Tokens;

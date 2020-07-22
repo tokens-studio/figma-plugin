@@ -91,12 +91,7 @@ function updatePluginData(nodes, values) {
                 edit: Object.keys(newVals).join(', '),
             });
         }
-        item.setPluginData(
-            'values',
-            JSON.stringify({
-                ...newVals,
-            })
-        );
+        item.setPluginData('values', JSON.stringify(newVals));
     });
 }
 
@@ -205,12 +200,12 @@ const setValuesOnNode = (node, values, data) => {
             const path = data.fill.split('.');
             const pathname = path.slice(1, path.length).join('/');
             const matchingStyles = paints.filter((n) => n.name === pathname);
-            const figmaColor = convertToFigmaColor(values.fill);
+            const {color, opacity} = convertToFigmaColor(values.fill);
             if (matchingStyles.length) {
-                matchingStyles[0].paints = [{...figmaColor, type: 'SOLID'}];
+                matchingStyles[0].paints = [{color, opacity, type: 'SOLID'}];
                 node.fillStyleId = matchingStyles[0].id;
             } else {
-                node.fills = [{type: 'SOLID', ...figmaColor}];
+                node.fills = [{type: 'SOLID', color, opacity}];
             }
         }
     }
@@ -220,13 +215,13 @@ const setValuesOnNode = (node, values, data) => {
             const path = data.border.split('.');
             const pathname = path.slice(1, path.length).join('/');
             const matchingStyles = paints.filter((n) => n.name === pathname);
-            const figmaColor = convertToFigmaColor(values.border);
+            const {color, opacity} = convertToFigmaColor(values.border);
 
             if (matchingStyles.length) {
-                matchingStyles[0].paints = [{...figmaColor, type: 'SOLID'}];
+                matchingStyles[0].paints = [{color, opacity, type: 'SOLID'}];
                 node.strokeStyleId = matchingStyles[0].id;
             } else {
-                node.strokes = [{type: 'SOLID', ...figmaColor}];
+                node.strokes = [{type: 'SOLID', color, opacity}];
             }
         }
     }
@@ -267,14 +262,16 @@ const updateNodes = (nodes, tokens) => {
 };
 
 const setTokenData = (data) => {
+    figma.root.setSharedPluginData('tokens', 'version', '0.3');
     figma.root.setSharedPluginData('tokens', 'values', JSON.stringify(data));
 };
 
 const getTokenData = () => {
     const value = figma.root.getSharedPluginData('tokens', 'values');
+    const version = figma.root.getSharedPluginData('tokens', 'version');
     if (value) {
         const parsedValues = JSON.parse(value);
-        return parsedValues;
+        return {values: parsedValues, version};
     }
 };
 
@@ -301,19 +298,16 @@ const updateStyles = (tokens, shouldCreate = false) => {
     Object.entries(cols).map(([key, value]) => {
         const matchingStyle = paints.filter((n) => n.name === key);
         if (typeof value === 'string') {
-            const figmaColor = convertToFigmaColor(value);
+            const {color, opacity} = convertToFigmaColor(value);
             if (matchingStyle.length) {
-                matchingStyle[0].paints = [{...figmaColor, type: 'SOLID'}];
+                matchingStyle[0].paints = [{color, opacity, type: 'SOLID'}];
             } else if (shouldCreate) {
                 const newStyle = figma.createPaintStyle();
-                newStyle.paints = [{...figmaColor, type: 'SOLID'}];
+                newStyle.paints = [{color, opacity, type: 'SOLID'}];
                 newStyle.name = key;
             }
         }
     });
-
-    // TODO: List all style names by traversing object and setting keys as the style name, and value as style value
-    // e.g. primary.500 becomes primary/500 style.
 };
 
 figma.on('selectionchange', () => {
@@ -373,7 +367,7 @@ figma.ui.onmessage = (msg) => {
     }
 
     if (msg.type === 'update') {
-        setTokenData(msg.tokens);
+        setTokenData(msg.tokenValues);
         updateStyles(msg.tokens, false);
         updateNodes(figma.currentPage.children, msg.tokens);
         notifyRemoteComponents({nodes: successfulNodes.length, remotes: remoteComponents});

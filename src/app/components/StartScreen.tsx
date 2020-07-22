@@ -1,18 +1,19 @@
 import * as React from 'react';
-import JSON5 from 'json5';
 import Heading from './Heading';
 import Button from './Button';
-import * as defaultJSON from '../presets/default.json';
+import {useTokenState} from '../store/TokenContext';
 
-const StartScreen = ({setActive, setStringTokens}) => {
-    const setEmptyTokens = () => {
+const StartScreen = ({setActive}) => {
+    const {setEmptyTokens, setDefaultTokens, setLoading} = useTokenState();
+    const onSetEmptyTokens = () => {
         setActive('json');
-        setStringTokens(JSON5.stringify({}, null, 2));
+        setEmptyTokens();
+        setLoading(false);
     };
-    const setDefaultTokens = () => {
+    const onSetDefaultTokens = () => {
         setActive('tokens');
-
-        setStringTokens(JSON5.stringify(defaultJSON, null, 2));
+        setDefaultTokens();
+        setLoading(false);
     };
     return (
         <div className="my-auto h-auto space-y-4">
@@ -34,10 +35,10 @@ const StartScreen = ({setActive, setStringTokens}) => {
             <div className="space-y-2 p-4 bg-gray-300 rounded">
                 <p>Seems like you don't have any tokens defined. Start by defining your tokens or use our preset.</p>
                 <div className="space-x-2">
-                    <Button size="large" variant="secondary" onClick={setEmptyTokens}>
+                    <Button size="large" variant="secondary" onClick={onSetEmptyTokens}>
                         Edit JSON
                     </Button>
-                    <Button size="large" variant="primary" onClick={setDefaultTokens}>
+                    <Button size="large" variant="primary" onClick={onSetDefaultTokens}>
                         Use Preset
                     </Button>
                 </div>

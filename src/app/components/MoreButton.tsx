@@ -2,8 +2,10 @@ import * as React from 'react';
 import {Menu, MenuList, MenuButton, MenuItem} from '@reach/menu-button';
 import '@reach/menu-button/styles.css';
 import Icon from './Icon';
+import {useTokenState} from '../store/TokenContext';
 
-const MoreButton = ({properties, disabled, path, value, selectionValues, onClick}) => {
+const MoreButton = ({properties, disabled, path, value, onClick}) => {
+    const {state} = useTokenState();
     return (
         <div>
             <Menu>
@@ -14,7 +16,7 @@ const MoreButton = ({properties, disabled, path, value, selectionValues, onClick
                         </MenuButton>
                         <MenuList>
                             {properties.map((property) => {
-                                const isActive = selectionValues[property.name] === `${path}.${value}`;
+                                const isActive = state.selectionValues[property.name] === `${path}.${value}`;
 
                                 return (
                                     <MenuItem key={property.label} onSelect={() => onClick([property.name], isActive)}>
