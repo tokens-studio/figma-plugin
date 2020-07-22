@@ -28,7 +28,7 @@ const App = () => {
     const [active, setActive] = React.useState('start');
     const [remoteComponents, setRemoteComponents] = React.useState([]);
 
-    const {state, setTokenData, setLoading, setSelectionValues} = useTokenState();
+    const {state, setTokenData, setLoading, setSelectionValues, resetSelectionValues} = useTokenState();
 
     const onInitiate = () => {
         parent.postMessage({pluginMessage: {type: 'initiate'}}, '*');
@@ -38,16 +38,17 @@ const App = () => {
         onInitiate();
         window.onmessage = (event) => {
             const {type, values} = event.data.pluginMessage;
+
             if (type === 'selection') {
                 setDisabled(false);
                 if (values) {
                     setSelectionValues(values);
                 } else {
-                    setSelectionValues({});
+                    resetSelectionValues();
                 }
             } else if (type === 'noselection') {
                 setDisabled(true);
-                setSelectionValues({});
+                resetSelectionValues();
             } else if (type === 'remotecomponents') {
                 setLoading(false);
                 setRemoteComponents(values.remotes);

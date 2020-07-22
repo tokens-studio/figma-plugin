@@ -200,12 +200,12 @@ const setValuesOnNode = (node, values, data) => {
             const path = data.fill.split('.');
             const pathname = path.slice(1, path.length).join('/');
             const matchingStyles = paints.filter((n) => n.name === pathname);
-            const figmaColor = convertToFigmaColor(values.fill);
+            const {color, opacity} = convertToFigmaColor(values.fill);
             if (matchingStyles.length) {
-                matchingStyles[0].paints = [{...figmaColor, type: 'SOLID'}];
+                matchingStyles[0].paints = [{color, opacity, type: 'SOLID'}];
                 node.fillStyleId = matchingStyles[0].id;
             } else {
-                node.fills = [{type: 'SOLID', ...figmaColor}];
+                node.fills = [{type: 'SOLID', color, opacity}];
             }
         }
     }
@@ -215,13 +215,13 @@ const setValuesOnNode = (node, values, data) => {
             const path = data.border.split('.');
             const pathname = path.slice(1, path.length).join('/');
             const matchingStyles = paints.filter((n) => n.name === pathname);
-            const figmaColor = convertToFigmaColor(values.border);
+            const {color, opacity} = convertToFigmaColor(values.border);
 
             if (matchingStyles.length) {
-                matchingStyles[0].paints = [{...figmaColor, type: 'SOLID'}];
+                matchingStyles[0].paints = [{color, opacity, type: 'SOLID'}];
                 node.strokeStyleId = matchingStyles[0].id;
             } else {
-                node.strokes = [{type: 'SOLID', ...figmaColor}];
+                node.strokes = [{type: 'SOLID', color, opacity}];
             }
         }
     }
@@ -298,12 +298,12 @@ const updateStyles = (tokens, shouldCreate = false) => {
     Object.entries(cols).map(([key, value]) => {
         const matchingStyle = paints.filter((n) => n.name === key);
         if (typeof value === 'string') {
-            const figmaColor = convertToFigmaColor(value);
+            const {color, opacity} = convertToFigmaColor(value);
             if (matchingStyle.length) {
-                matchingStyle[0].paints = [{...figmaColor, type: 'SOLID'}];
+                matchingStyle[0].paints = [{color, opacity, type: 'SOLID'}];
             } else if (shouldCreate) {
                 const newStyle = figma.createPaintStyle();
-                newStyle.paints = [{...figmaColor, type: 'SOLID'}];
+                newStyle.paints = [{color, opacity, type: 'SOLID'}];
                 newStyle.name = key;
             }
         }

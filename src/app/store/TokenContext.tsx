@@ -127,6 +127,11 @@ function stateReducer(state, action) {
                     ...action.data,
                 },
             };
+        case 'RESET_SELECTION_VALUES':
+            return {
+                ...state,
+                selectionValues: {},
+            };
         default:
             throw new Error('Not implemented');
     }
@@ -174,6 +179,9 @@ function TokenProvider({children}) {
             },
             setSelectionValues: (data: SelectionValue) => {
                 dispatch({type: 'SET_SELECTION_VALUES', data});
+            },
+            resetSelectionValues: () => {
+                dispatch({type: 'RESET_SELECTION_VALUES'});
             },
         }),
         [state]
