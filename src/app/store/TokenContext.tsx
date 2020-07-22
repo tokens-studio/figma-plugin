@@ -122,7 +122,10 @@ function stateReducer(state, action) {
         case 'SET_SELECTION_VALUES':
             return {
                 ...state,
-                selectionValues: action.data,
+                selectionValues: {
+                    ...state.selectionValues,
+                    ...action.data,
+                },
             };
         default:
             throw new Error('Not implemented');

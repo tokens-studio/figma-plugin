@@ -25,7 +25,6 @@ const TokenButton = ({type, name, path, token, disabled, editMode, showForm}) =>
 
     function setPluginValue(value) {
         setSelectionValues(value);
-
         const newPluginValue = {
             ...state.selectionValue,
             ...value,

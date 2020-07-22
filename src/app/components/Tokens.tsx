@@ -1,6 +1,6 @@
 import * as React from 'react';
 import JSON5 from 'json5';
-import {objectPath} from 'object-path';
+import objectPath from 'object-path';
 import Modal from './Modal';
 import Heading from './Heading';
 import Icon from './Icon';
