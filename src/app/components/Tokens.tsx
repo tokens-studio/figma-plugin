@@ -70,7 +70,7 @@ const Tokens = ({disabled}) => {
                 const stringPath = [path, key].filter((n) => n).join('.');
                 return (
                     <React.Fragment key={stringPath}>
-                        {typeof value === 'object' ? (
+                        {typeof value === 'object' && type !== 'typography' ? (
                             <div className="property-wrapper w-full mt-2">
                                 <Heading size="small">{key}</Heading>
 
@@ -238,6 +238,19 @@ const Tokens = ({disabled}) => {
                             <React.Fragment key={tokenValues[0]}>
                                 <TokenListing property="Spacing" label="Spacing" type="spacing" values={tokenValues} />
                             </React.Fragment>
+                        );
+                    case 'typography':
+                        return (
+                            <div key={tokenValues[0]}>
+                                <TokenListing
+                                    createButton
+                                    help="If a (local) style is found with the same name it will match to that, if not, will use raw font values. Use 'Create Style' to batch-create styles from your tokens (e.g. in your design library). In the future we'll load all 'remote' styles and reference them inside the JSON."
+                                    label="Typography"
+                                    property="Typography"
+                                    type="typography"
+                                    values={tokenValues}
+                                />
+                            </div>
                         );
                     default:
                         return (

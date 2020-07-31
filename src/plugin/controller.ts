@@ -1,4 +1,5 @@
-import {hexToFigmaRGB, webRGBToFigmaRGB} from '@figma-plugin/helpers';
+/* eslint-disable no-param-reassign */
+import {convertLineHeightToFigma, convertToFigmaColor} from './helpers';
 
 const Dot = require('dot-object');
 const objectPath = require('object-path');
@@ -121,33 +122,7 @@ const mapValuesToTokens = (object, values) => {
     return Object.assign({}, ...array);
 };
 
-interface RGBA {
-    r: number;
-    g: number;
-    b: number;
-    a?: number;
-}
-
-const convertToFigmaColor = (input) => {
-    let color;
-    let opacity;
-    if (input.startsWith('rgb')) {
-        const rgbValues = input.replace(/^rgba?\(|\s+|\)$/g, '').split(',');
-        const {r, g, b, a = 1} = webRGBToFigmaRGB(rgbValues);
-        color = {r, g, b};
-        opacity = Number(a);
-    } else {
-        const {r, g, b, a = 1}: RGBA = hexToFigmaRGB(input);
-        color = {r, g, b};
-        opacity = Number(a);
-    }
-    return {
-        color,
-        opacity,
-    };
-};
-
-const setValuesOnNode = (node, values, data) => {
+const setValuesOnNode = async (node, values, data) => {
     if (values.borderRadius) {
         if (typeof node.cornerRadius !== 'undefined') {
             node.cornerRadius = Number(values.borderRadius || values.borderRadiusTopLeft);
@@ -202,10 +177,36 @@ const setValuesOnNode = (node, values, data) => {
             const matchingStyles = paints.filter((n) => n.name === pathname);
             const {color, opacity} = convertToFigmaColor(values.fill);
             if (matchingStyles.length) {
-                matchingStyles[0].paints = [{color, opacity, type: 'SOLID'}];
+                // matchingStyles[0].paints = [{color, opacity, type: 'SOLID'}];
                 node.fillStyleId = matchingStyles[0].id;
             } else {
                 node.fills = [{type: 'SOLID', color, opacity}];
+            }
+        }
+    }
+    if (values.typography) {
+        if (node.type === 'TEXT') {
+            console.log('is text');
+            const styles = figma.getLocalTextStyles();
+            console.log('has styles', styles);
+            const path = data.typography.split('.'); // extract to helper fn
+            const pathname = path.slice(1, path.length).join('/');
+            const matchingStyles = styles.filter((n) => n.name === pathname);
+            const {fontFamily, fontWeight, lineHeight, fontSize} = values.typography;
+
+            if (matchingStyles.length) {
+                console.log('style found', fontSize);
+                // matchingStyles[0].fontName = {family: fontFamily, style: fontWeight};
+                // matchingStyles[0].fontSize = fontSize;
+                // matchingStyles[0].lineHeight = convertLineHeightToFigma(lineHeight);
+                node.textStyleId = matchingStyles[0].id;
+            } else {
+                console.log('no style found', fontSize);
+
+                await figma.loadFontAsync({family: fontFamily, style: fontWeight});
+                node.fontName = {family: fontFamily, style: fontWeight};
+                node.fontSize = fontSize;
+                node.lineHeight = convertLineHeightToFigma(lineHeight);
             }
         }
     }
@@ -291,9 +292,8 @@ const removePluginData = (nodes) => {
     });
 };
 
-const updateStyles = (tokens, shouldCreate = false) => {
-    if (!tokens.colors) return;
-    const cols = dot.dot(tokens.colors);
+const updateColorStyles = (colorTokens, shouldCreate = false) => {
+    const cols = dot.dot(colorTokens);
     const paints = figma.getLocalPaintStyles();
     Object.entries(cols).map(([key, value]) => {
         const matchingStyle = paints.filter((n) => n.name === key);
@@ -308,6 +308,49 @@ const updateStyles = (tokens, shouldCreate = false) => {
             }
         }
     });
+};
+
+interface TextStyle {
+    familyName: string;
+    fontWeight: string;
+    fontSize: number;
+    lineHeight: string | number;
+}
+
+const updateTextStyles = (textTokens, shouldCreate = false) => {
+    const cols = dot.dot(textTokens);
+    const textStyles = figma.getLocalTextStyles();
+    Object.entries(cols).map(async ([key, value]: [string, TextStyle]) => {
+        console.log({key, value});
+
+        const matchingStyle = textStyles.filter((n) => n.name === key);
+        let style;
+        if (matchingStyle.length) {
+            [style] = matchingStyle;
+        } else if (shouldCreate) {
+            style = figma.createTextStyle();
+        }
+
+        // const {familyName, fontWeight, fontSize, lineHeight} = value;
+
+        // style.name = key;
+        // style.fontName = {
+        //     family: familyName,
+        //     style: fontWeight,
+        // };
+        // style.fontSize = fontSize;
+        // style.lineHeight = convertLineHeightToFigma(lineHeight);
+    });
+};
+
+const updateStyles = (tokens, shouldCreate = false): void => {
+    if (!tokens.colors && !tokens.typography) return;
+    if (tokens.colors) {
+        updateColorStyles(tokens.colors, shouldCreate);
+    }
+    if (tokens.typography) {
+        updateTextStyles(tokens.typography, shouldCreate);
+    }
 };
 
 figma.on('selectionchange', () => {

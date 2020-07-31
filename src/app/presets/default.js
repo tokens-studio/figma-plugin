@@ -40,6 +40,49 @@ export function defaultJSON() {
             md: '50%',
             high: '90%',
         },
+        fontFamilies: {
+            display: 'Inter',
+            body: 'Roboto',
+        },
+        lineHeights: {
+            heading: 1.1,
+            body: 1.4,
+        },
+        fontWeights: {
+            'heading-light': 300,
+            'heading-bold': 700,
+            'body-regular': 400,
+            'body-bold': 600,
+        },
+        fontSizes: {
+            h1: 28,
+            h2: 24,
+            h3: 22,
+            h4: 20,
+            h5: 18,
+            h6: 16,
+            body: 16,
+        },
+        typography: {
+            'H1-Bold': {
+                fontFamily: '$fontFamilies.display',
+                fontWeight: '$fontWeights.heading-bold',
+                lineHeight: '$lineHeights.heading',
+                fontSize: '$fontSizes.h1',
+            },
+            'H2-Regular': {
+                fontFamily: '$fontFamilies.display',
+                fontWeight: '$fontWeights.body-regular',
+                lineHeight: '$lineHeights.body',
+                fontSize: '$fontSizes.h2',
+            },
+            Body: {
+                fontFamily: '$fontFamilies.body',
+                fontWeight: '$fontWeights.body-light',
+                lineHeight: '$lineHeights.heading',
+                fontSize: '$fontSizes.body',
+            },
+        },
     };
 }
 
