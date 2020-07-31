@@ -23,6 +23,11 @@ const EditTokenForm = ({
         setTokenValue((prevState) => ({...prevState, [e.target.name]: e.target.value}));
     };
 
+    const handleObjectChange = (e) => {
+        e.persist();
+        setTokenValue((prevState) => ({...prevState, token: {...prevState.token, [e.target.name]: e.target.value}}));
+    };
+
     const handleSubmit = (e) => {
         e.preventDefault();
         submitTokenValue(tokenValue);
@@ -36,15 +41,30 @@ const EditTokenForm = ({
         <form onSubmit={handleSubmit} className="space-y-4 border p-2 border-gray-200 rounded">
             <Input required full label="Name" value={tokenValue.name} onChange={handleChange} type="text" name="name" />
             <div>
-                <Input
-                    full
-                    label={property}
-                    value={tokenValue.token}
-                    onChange={handleChange}
-                    type="text"
-                    name="token"
-                    required
-                />
+                {typeof tokenValue.token === 'object' ? (
+                    Object.entries(tokenValue.token).map(([key, value]) => (
+                        <Input
+                            full
+                            label={key}
+                            value={value}
+                            onChange={handleObjectChange}
+                            type="text"
+                            name={key}
+                            required
+                        />
+                    ))
+                ) : (
+                    <Input
+                        full
+                        label={property}
+                        value={tokenValue.token}
+                        onChange={handleChange}
+                        type="text"
+                        name="token"
+                        required
+                    />
+                )}
+
                 {explainer && <div className="mt-1 text-xxs text-gray-600">{explainer}</div>}
             </div>
             <div className="flex space-x-2 justify-end">

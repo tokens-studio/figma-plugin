@@ -200,6 +200,13 @@ textarea {
     @apply py-2 !important;
 }
 
+[data-reach-tooltip] {
+    @apply text-xs;
+    max-width: 50%;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
 .modal-wrapper {
     position: fixed;
     top: 0;
