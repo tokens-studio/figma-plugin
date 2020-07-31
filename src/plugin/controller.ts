@@ -1,106 +1,28 @@
 /* eslint-disable no-param-reassign */
-import {convertLineHeightToFigma, convertToFigmaColor} from './helpers';
+import {convertToFigmaColor} from './helpers';
+import {updateStyles, setTextValuesOnTarget} from './styles';
+import store from './store';
+import {
+    notifyNoSelection,
+    sendPluginValues,
+    notifyTokenValues,
+    updatePluginData,
+    notifyRemoteComponents,
+    fetchPluginData,
+} from './notifiers';
 
-const Dot = require('dot-object');
 const objectPath = require('object-path');
-
-const dot = new Dot('/');
-
-let remoteComponents = [];
-let successfulNodes = [];
 
 figma.showUI(__html__, {
     width: 400,
     height: 600,
 });
 
-function notifyNoSelection() {
-    figma.ui.postMessage({
-        type: 'noselection',
-    });
-}
-
-function notifyRemoteComponents({nodes, remotes}) {
-    const opts = {timeout: 600};
-    if (nodes > 0 && remotes.length > 0) {
-        figma.notify(`Updated ${nodes} nodes, unable to update ${remotes.length} remote components`, opts);
-    } else if (nodes > 0 && remotes.length == 0) {
-        figma.notify(`Success! Updated ${nodes} nodes`, opts);
-    } else if (nodes == 0) {
-        figma.notify(`No nodes updated`, opts);
-    } else {
-        figma.notify(`No nodes with connected tokens found`, opts);
-    }
-    figma.ui.postMessage({
-        type: 'remotecomponents',
-        values: {
-            nodes,
-            remotes,
-        },
-    });
-    successfulNodes = [];
-    remoteComponents = [];
-}
-
-function notifySelection(nodes = undefined, values = undefined) {
-    figma.ui.postMessage({
-        type: 'selection',
-        nodes,
-        values,
-    });
-}
-
-function fetchPluginData(node) {
-    const previousValues = node.getPluginData('values');
-    if (!previousValues) return;
-    return JSON.parse(previousValues);
-}
-
-function sendPluginValues(nodes) {
-    if (nodes.length > 1) {
-        notifySelection(nodes[0].id);
-    } else {
-        const pluginValues = fetchPluginData(nodes[0]);
-        if (pluginValues) {
-            notifySelection(nodes[0].id, pluginValues);
-        } else {
-            notifySelection(nodes[0].id);
-        }
-    }
-}
-
-function notifyTokenValues(values = undefined) {
-    figma.ui.postMessage({
-        type: 'tokenvalues',
-        values,
-    });
-}
-
-function updatePluginData(nodes, values) {
-    nodes.map((item) => {
-        const currentVals = fetchPluginData(item);
-        const newVals = Object.assign(currentVals || {}, values);
-        Object.entries(newVals).forEach(([key, value]) => {
-            if (value === 'delete') {
-                delete newVals[key];
-            }
-        });
-        if (Object.keys(newVals).length === 0 && newVals.constructor === Object) {
-            item.setRelaunchData({});
-        } else {
-            item.setRelaunchData({
-                edit: Object.keys(newVals).join(', '),
-            });
-        }
-        item.setPluginData('values', JSON.stringify(newVals));
-    });
-}
-
 const findAllWithPluginData = (arr) => {
     return arr.reduce((prev, el) => {
         if (el.masterComponent?.getPluginData('values')) {
             if (el.masterComponent.remote) {
-                remoteComponents.push(el);
+                store.remoteComponents.push(el);
             } else {
                 prev.push(el.masterComponent);
             }
@@ -186,27 +108,15 @@ const setValuesOnNode = async (node, values, data) => {
     }
     if (values.typography) {
         if (node.type === 'TEXT') {
-            console.log('is text');
             const styles = figma.getLocalTextStyles();
-            console.log('has styles', styles);
             const path = data.typography.split('.'); // extract to helper fn
             const pathname = path.slice(1, path.length).join('/');
             const matchingStyles = styles.filter((n) => n.name === pathname);
-            const {fontFamily, fontWeight, lineHeight, fontSize} = values.typography;
 
             if (matchingStyles.length) {
-                console.log('style found', fontSize);
-                // matchingStyles[0].fontName = {family: fontFamily, style: fontWeight};
-                // matchingStyles[0].fontSize = fontSize;
-                // matchingStyles[0].lineHeight = convertLineHeightToFigma(lineHeight);
                 node.textStyleId = matchingStyles[0].id;
             } else {
-                console.log('no style found', fontSize);
-
-                await figma.loadFontAsync({family: fontFamily, style: fontWeight});
-                node.fontName = {family: fontFamily, style: fontWeight};
-                node.fontSize = fontSize;
-                node.lineHeight = convertLineHeightToFigma(lineHeight);
+                setTextValuesOnTarget(node, values.typography);
             }
         }
     }
@@ -259,7 +169,7 @@ const updateNodes = (nodes, tokens) => {
             setValuesOnNode(node, mappedValues, data);
         }
     });
-    successfulNodes.push(...nodesWithData);
+    store.successfulNodes.push(...nodesWithData);
 };
 
 const setTokenData = (data) => {
@@ -288,69 +198,8 @@ const removePluginData = (nodes) => {
     nodes.map((item) => {
         item.setRelaunchData({});
         item.setPluginData('values', '');
-        successfulNodes.push(item);
+        store.successfulNodes.push(item);
     });
-};
-
-const updateColorStyles = (colorTokens, shouldCreate = false) => {
-    const cols = dot.dot(colorTokens);
-    const paints = figma.getLocalPaintStyles();
-    Object.entries(cols).map(([key, value]) => {
-        const matchingStyle = paints.filter((n) => n.name === key);
-        if (typeof value === 'string') {
-            const {color, opacity} = convertToFigmaColor(value);
-            if (matchingStyle.length) {
-                matchingStyle[0].paints = [{color, opacity, type: 'SOLID'}];
-            } else if (shouldCreate) {
-                const newStyle = figma.createPaintStyle();
-                newStyle.paints = [{color, opacity, type: 'SOLID'}];
-                newStyle.name = key;
-            }
-        }
-    });
-};
-
-interface TextStyle {
-    familyName: string;
-    fontWeight: string;
-    fontSize: number;
-    lineHeight: string | number;
-}
-
-const updateTextStyles = (textTokens, shouldCreate = false) => {
-    const cols = dot.dot(textTokens);
-    const textStyles = figma.getLocalTextStyles();
-    Object.entries(cols).map(async ([key, value]: [string, TextStyle]) => {
-        console.log({key, value});
-
-        const matchingStyle = textStyles.filter((n) => n.name === key);
-        let style;
-        if (matchingStyle.length) {
-            [style] = matchingStyle;
-        } else if (shouldCreate) {
-            style = figma.createTextStyle();
-        }
-
-        // const {familyName, fontWeight, fontSize, lineHeight} = value;
-
-        // style.name = key;
-        // style.fontName = {
-        //     family: familyName,
-        //     style: fontWeight,
-        // };
-        // style.fontSize = fontSize;
-        // style.lineHeight = convertLineHeightToFigma(lineHeight);
-    });
-};
-
-const updateStyles = (tokens, shouldCreate = false): void => {
-    if (!tokens.colors && !tokens.typography) return;
-    if (tokens.colors) {
-        updateColorStyles(tokens.colors, shouldCreate);
-    }
-    if (tokens.typography) {
-        updateTextStyles(tokens.typography, shouldCreate);
-    }
 };
 
 figma.on('selectionchange', () => {
@@ -385,7 +234,7 @@ figma.ui.onmessage = (msg) => {
         } catch (e) {
             console.error(e);
         }
-        notifyRemoteComponents({nodes: successfulNodes.length, remotes: remoteComponents});
+        notifyRemoteComponents({nodes: store.successfulNodes.length, remotes: store.remoteComponents});
         return;
     }
 
@@ -396,7 +245,7 @@ figma.ui.onmessage = (msg) => {
         } catch (e) {
             console.error(e);
         }
-        notifyRemoteComponents({nodes: successfulNodes.length, remotes: remoteComponents});
+        notifyRemoteComponents({nodes: store.successfulNodes.length, remotes: store.remoteComponents});
         return;
     }
 
@@ -413,7 +262,7 @@ figma.ui.onmessage = (msg) => {
         setTokenData(msg.tokenValues);
         updateStyles(msg.tokens, false);
         updateNodes(figma.currentPage.children, msg.tokens);
-        notifyRemoteComponents({nodes: successfulNodes.length, remotes: remoteComponents});
+        notifyRemoteComponents({nodes: store.successfulNodes.length, remotes: store.remoteComponents});
         return;
     }
     if (msg.type === 'gotonode') {
