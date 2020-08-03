@@ -8,6 +8,7 @@ import EditTokenForm from './EditTokenForm';
 import TokenButton from './TokenButton';
 import Tooltip from './Tooltip';
 import {useTokenState} from '../store/TokenContext';
+import {isTypographyToken} from './utils';
 
 const mappedTokens = (tokens) => {
     const properties = {
@@ -65,12 +66,11 @@ const Tokens = ({disabled}) => {
 
     const renderKeyValue = ({tokenValues, path = '', type = '', editMode = false}) => (
         <div className="flex justify-start flex-row flex-wrap">
-            {tokenValues.map((item) => {
-                const [key, value] = item;
+            {tokenValues.map(([key, value]) => {
                 const stringPath = [path, key].filter((n) => n).join('.');
                 return (
                     <React.Fragment key={stringPath}>
-                        {typeof value === 'object' && type !== 'typography' ? (
+                        {typeof value === 'object' && !isTypographyToken(value) ? (
                             <div className="property-wrapper w-full mt-2">
                                 <Heading size="small">{key}</Heading>
 

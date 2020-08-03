@@ -4,6 +4,13 @@ import {convertLineHeightToFigma, convertToFigmaColor} from './helpers';
 
 const dot = new Dot('/');
 
+interface TextStyle {
+    familyName: string;
+    fontWeight: string;
+    fontSize: number;
+    lineHeight: string | number;
+}
+
 const updateColorStyles = (colorTokens, shouldCreate = false) => {
     const cols = dot.dot(colorTokens);
     const paints = figma.getLocalPaintStyles();
@@ -22,13 +29,6 @@ const updateColorStyles = (colorTokens, shouldCreate = false) => {
     });
 };
 
-interface TextStyle {
-    familyName: string;
-    fontWeight: string;
-    fontSize: number;
-    lineHeight: string | number;
-}
-
 export const setTextValuesOnTarget = async (target, values) => {
     const {fontFamily, fontWeight, fontSize, lineHeight} = values;
     await figma.loadFontAsync({family: fontFamily, style: fontWeight});
@@ -42,10 +42,28 @@ export const setTextValuesOnTarget = async (target, values) => {
 };
 
 const updateTextStyles = (textTokens, shouldCreate = false) => {
+    const cols = dot.dot(textTokens);
+    // Iterate over textTokens to create objects that match figma styles
+    // e.g. H1/Bold ...
+    const tokenObj = Object.entries(cols).reduce((acc, [key, val]) => {
+        // Split token object by `/`
+        let parrentKey: string | string[] = key.split('/');
+
+        // Store current key for future reference, e.g. fontFamily, lineHeight and remove it from key
+        const curKey = parrentKey.pop();
+
+        // Merge object again, now that we have the parent reference
+        parrentKey = parrentKey.join('/');
+        acc[parrentKey] = acc[parrentKey] || {};
+        Object.assign(acc[parrentKey], {[curKey]: val});
+        return acc;
+    }, {});
+
     const textStyles = figma.getLocalTextStyles();
 
-    Object.entries(textTokens).map(([key, value]: [string, TextStyle]) => {
+    Object.entries(tokenObj).map(([key, value]: [string, TextStyle]): void => {
         const matchingStyle = textStyles.filter((n) => n.name === key);
+
         if (matchingStyle.length) {
             setTextValuesOnTarget(matchingStyle[0], value);
         } else if (shouldCreate) {

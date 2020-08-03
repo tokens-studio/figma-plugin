@@ -4,7 +4,7 @@ const TabButton = ({name, label, active, setActive}) => (
     <button
         type="button"
         className={`w-14 p-2 text-xxs focus:outline-none focus:shadow-none cursor-pointer hover:bg-gray-200 ${
-            active === name ? 'text-black font-bold' : 'text-gray-600'
+            active === name ? 'text-black font-medium' : 'text-gray-600'
         }`}
         name="text"
         onClick={() => setActive(name)}

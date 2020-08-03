@@ -106,6 +106,9 @@ const setValuesOnNode = async (node, values, data) => {
             }
         }
     }
+
+    // TODO: Allow only setting certain text values
+
     if (values.typography) {
         if (node.type === 'TEXT') {
             const styles = figma.getLocalTextStyles();

@@ -17,6 +17,7 @@ const Inspector = () => {
                             <div className="p-1 bg-gray-700 rounded text-white text-xxs">
                                 ${typeof value === 'string' && value.split('.').join('-')}
                             </div>
+                            {/* TODO: Handle typography object tokens */}
                             <div className="text-gray-500">{`/* ${getValue(value)} */`}</div>
                         </code>
                     </div>

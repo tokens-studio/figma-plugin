@@ -23,6 +23,7 @@ export function defaultJSON() {
             indigo: '#5c6ac4',
             blue: '#007ace',
             red: '#de3618',
+            redTransparent: 'rgba(255,0,0,0.5)',
             grey: {
                 100: '#f5f5f5',
                 200: '#eeeeee',
@@ -34,6 +35,8 @@ export function defaultJSON() {
                 800: '#424242',
                 900: '#212121',
             },
+            brand: '$colors.red',
+            accent: '$colors.blue',
         },
         opacity: {
             low: '10%',
@@ -49,10 +52,10 @@ export function defaultJSON() {
             body: 1.4,
         },
         fontWeights: {
-            'heading-light': 300,
-            'heading-bold': 700,
-            'body-regular': 400,
-            'body-bold': 600,
+            headingRegular: 'Regular',
+            headingBold: 'Bold',
+            bodyRegular: 'Regular',
+            bodyBold: 'Bold',
         },
         fontSizes: {
             h1: 28,
@@ -64,21 +67,27 @@ export function defaultJSON() {
             body: 16,
         },
         typography: {
-            'H1-Bold': {
+            'H1/Bold': {
                 fontFamily: '$fontFamilies.display',
-                fontWeight: '$fontWeights.heading-bold',
+                fontWeight: '$fontWeights.headingBold',
                 lineHeight: '$lineHeights.heading',
                 fontSize: '$fontSizes.h1',
             },
-            'H2-Regular': {
+            'H1/Regular': {
                 fontFamily: '$fontFamilies.display',
-                fontWeight: '$fontWeights.body-regular',
-                lineHeight: '$lineHeights.body',
+                fontWeight: '$fontWeights.headingRegular',
+                lineHeight: '$lineHeights.heading',
+                fontSize: '$fontSizes.h1',
+            },
+            'H2/Bold': {
+                fontFamily: '$fontFamilies.display',
+                fontWeight: '$fontWeights.hedingBold',
+                lineHeight: '$lineHeights.heading',
                 fontSize: '$fontSizes.h2',
             },
             Body: {
                 fontFamily: '$fontFamilies.body',
-                fontWeight: '$fontWeights.body-light',
+                fontWeight: '$fontWeights.bodyRegular',
                 lineHeight: '$lineHeights.heading',
                 fontSize: '$fontSizes.body',
             },
