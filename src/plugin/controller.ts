@@ -44,6 +44,14 @@ const mapValuesToTokens = (object, values) => {
     return Object.assign({}, ...array);
 };
 
+const removeTokensFromNode = (node, tokens) => {
+    const data = fetchPluginData(node);
+    tokens.map((token) => {
+        delete data[token];
+    });
+    node.setPluginData('values', JSON.stringify(data));
+};
+
 const setValuesOnNode = async (node, values, data) => {
     if (values.borderRadius) {
         if (typeof node.cornerRadius !== 'undefined') {
@@ -111,6 +119,9 @@ const setValuesOnNode = async (node, values, data) => {
 
     if (values.typography) {
         if (node.type === 'TEXT') {
+            // First remove all other typography tokens from layer
+
+            removeTokensFromNode(node, ['fontWeights', 'fontFamilies', 'lineHeights', 'fontSizes']);
             const styles = figma.getLocalTextStyles();
             const path = data.typography.split('.'); // extract to helper fn
             const pathname = path.slice(1, path.length).join('/');
@@ -121,6 +132,16 @@ const setValuesOnNode = async (node, values, data) => {
             } else {
                 setTextValuesOnTarget(node, values.typography);
             }
+        }
+    }
+    if (values.fontFamilies || values.fontWeights || values.lineHeights || values.fontSizes) {
+        if (node.type === 'TEXT') {
+            setTextValuesOnTarget(node, {
+                fontFamily: values.fontFamilies,
+                fontWeight: values.fontWeights,
+                lineHeight: values.lineHeights,
+                fontSize: values.fontSizes,
+            });
         }
     }
     if (values.border) {

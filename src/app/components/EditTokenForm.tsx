@@ -5,6 +5,7 @@ const EditTokenForm = ({
     submitTokenValue,
     explainer = '',
     property,
+    schema,
     setShowEditForm,
     isPristine,
     initialToken,
@@ -17,7 +18,6 @@ const EditTokenForm = ({
         path,
     };
     const [tokenValue, setTokenValue] = React.useState(defaultValue);
-    // TODO: Handle Initial form set of typography tokens
 
     const handleChange = (e) => {
         e.persist();

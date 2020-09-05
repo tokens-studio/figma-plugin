@@ -17,6 +17,11 @@ const mappedTokens = (tokens) => {
         colors: {},
         borderRadius: {},
         opacity: {},
+        fontFamilies: {},
+        fontWeights: {},
+        fontSizes: {},
+        lineHeights: {},
+        typography: {},
     };
     return Object.entries(Object.assign(properties, tokens));
 };
@@ -60,11 +65,16 @@ const Tokens = ({disabled}) => {
         setShowEditForm(false);
     };
 
-    const showNewForm = (path) => {
-        showForm({token: '', name: '', path});
+    const showNewForm = (path, schema) => {
+        let initialToken = '';
+        if (schema) {
+            initialToken = schema;
+        }
+
+        showForm({token: initialToken, name: '', path});
     };
 
-    const renderKeyValue = ({tokenValues, path = '', type = '', editMode = false}) => (
+    const renderKeyValue = ({tokenValues, schema, path = '', type = '', editMode = false}) => (
         <div className="flex justify-start flex-row flex-wrap">
             {tokenValues.map(([key, value]) => {
                 const stringPath = [path, key].filter((n) => n).join('.');
@@ -74,7 +84,13 @@ const Tokens = ({disabled}) => {
                             <div className="property-wrapper w-full mt-2">
                                 <Heading size="small">{key}</Heading>
 
-                                {renderKeyValue({tokenValues: Object.entries(value), path: stringPath, type, editMode})}
+                                {renderKeyValue({
+                                    tokenValues: Object.entries(value),
+                                    schema,
+                                    path: stringPath,
+                                    type,
+                                    editMode,
+                                })}
                             </div>
                         ) : (
                             <div className="flex mb-1 mr-1">
@@ -95,7 +111,25 @@ const Tokens = ({disabled}) => {
         </div>
     );
 
-    const TokenListing = ({label, explainer = '', help = '', createButton = false, property, type = '', values}) => {
+    const TokenListing = ({
+        label,
+        schema,
+        explainer = '',
+        help = '',
+        createButton = false,
+        property,
+        type = '',
+        values,
+    }: {
+        label: string;
+        schema?: object;
+        explainer?: string;
+        help?: string;
+        createButton?: boolean;
+        property: string;
+        type?: string;
+        values?: string | object;
+    }) => {
         const [showHelp, setShowHelp] = React.useState(false);
         return (
             <div className="mb-2 pb-2 border-b border-gray-200">
@@ -133,7 +167,7 @@ const Tokens = ({disabled}) => {
                                 type="button"
                                 onClick={() => {
                                     setShowOptions(values[0]);
-                                    showNewForm(values[0]);
+                                    showNewForm(values[0], schema);
                                 }}
                             >
                                 <Icon name="add" />
@@ -150,6 +184,7 @@ const Tokens = ({disabled}) => {
                                         initialName={editToken.name}
                                         path={editToken.path}
                                         property={property}
+                                        schema={schema}
                                         isPristine={editToken.name === ''}
                                         initialToken={editToken.token}
                                         setShowEditForm={setShowEditForm}
@@ -159,6 +194,7 @@ const Tokens = ({disabled}) => {
                                 <div className="mb-4">
                                     {renderKeyValue({
                                         tokenValues: Object.entries(values[1]),
+                                        schema,
                                         path: values[0],
                                         type,
                                         editMode: true,
@@ -170,7 +206,7 @@ const Tokens = ({disabled}) => {
                                         <button
                                             type="button"
                                             className="button button-ghost"
-                                            onClick={() => showNewForm(values[0])}
+                                            onClick={() => showNewForm(values[0], schema)}
                                         >
                                             <Icon name="add" />
                                         </button>
@@ -181,7 +217,7 @@ const Tokens = ({disabled}) => {
                     )}
                 </div>
                 {showHelp && <div className="mb-4 text-xxs text-gray-600">{help}</div>}
-                {renderKeyValue({tokenValues: Object.entries(values[1]), path: values[0], type})}
+                {renderKeyValue({tokenValues: Object.entries(values[1]), schema, path: values[0], type})}
             </div>
         );
     };
@@ -248,6 +284,7 @@ const Tokens = ({disabled}) => {
                                     label="Typography"
                                     property="Typography"
                                     type="typography"
+                                    schema={{fontFamily: '', fontWeight: '', lineHeight: '', fontSize: ''}}
                                     values={tokenValues}
                                 />
                             </div>

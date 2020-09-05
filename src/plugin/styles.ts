@@ -31,6 +31,7 @@ const updateColorStyles = (colorTokens, shouldCreate = false) => {
 
 export const setTextValuesOnTarget = async (target, values) => {
     const {fontFamily, fontWeight, fontSize, lineHeight} = values;
+
     await figma.loadFontAsync({family: fontFamily, style: fontWeight});
 
     target.fontName = {
