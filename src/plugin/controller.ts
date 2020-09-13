@@ -44,13 +44,15 @@ const mapValuesToTokens = (object, values) => {
     return Object.assign({}, ...array);
 };
 
-const removeTokensFromNode = (node, tokens) => {
-    const data = fetchPluginData(node);
-    tokens.map((token) => {
-        delete data[token];
-    });
-    node.setPluginData('values', JSON.stringify(data));
-};
+// Not needed for now
+// const removeTokensFromNode = (node, tokens) => {
+//     const data = fetchPluginData(node);
+//     tokens.map((token) => {
+//         data[token] = {};
+//     });
+
+//     updatePluginData([node], data);
+// };
 
 const setValuesOnNode = async (node, values, data) => {
     if (values.borderRadius) {
@@ -115,13 +117,10 @@ const setValuesOnNode = async (node, values, data) => {
         }
     }
 
-    // TODO: Allow only setting certain text values
-
+    // TYPOGRAPHY
+    // Either set typography or individual values, if typography is present we prefer that.
     if (values.typography) {
         if (node.type === 'TEXT') {
-            // First remove all other typography tokens from layer
-
-            removeTokensFromNode(node, ['fontWeights', 'fontFamilies', 'lineHeights', 'fontSizes']);
             const styles = figma.getLocalTextStyles();
             const path = data.typography.split('.'); // extract to helper fn
             const pathname = path.slice(1, path.length).join('/');
@@ -133,8 +132,7 @@ const setValuesOnNode = async (node, values, data) => {
                 setTextValuesOnTarget(node, values.typography);
             }
         }
-    }
-    if (values.fontFamilies || values.fontWeights || values.lineHeights || values.fontSizes) {
+    } else if (values.fontFamilies || values.fontWeights || values.lineHeights || values.fontSizes) {
         if (node.type === 'TEXT') {
             setTextValuesOnTarget(node, {
                 fontFamily: values.fontFamilies,

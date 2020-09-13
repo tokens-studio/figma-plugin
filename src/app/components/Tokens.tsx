@@ -184,7 +184,6 @@ const Tokens = ({disabled}) => {
                                         initialName={editToken.name}
                                         path={editToken.path}
                                         property={property}
-                                        schema={schema}
                                         isPristine={editToken.name === ''}
                                         initialToken={editToken.token}
                                         setShowEditForm={setShowEditForm}

@@ -5,7 +5,6 @@ const EditTokenForm = ({
     submitTokenValue,
     explainer = '',
     property,
-    schema,
     setShowEditForm,
     isPristine,
     initialToken,

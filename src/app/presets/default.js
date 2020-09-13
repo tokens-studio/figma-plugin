@@ -44,7 +44,7 @@ export function defaultJSON() {
             high: '90%',
         },
         fontFamilies: {
-            display: 'Inter',
+            heading: 'Inter',
             body: 'Roboto',
         },
         lineHeights: {
@@ -68,19 +68,19 @@ export function defaultJSON() {
         },
         typography: {
             'H1/Bold': {
-                fontFamily: '$fontFamilies.display',
+                fontFamily: '$fontFamilies.heading',
                 fontWeight: '$fontWeights.headingBold',
                 lineHeight: '$lineHeights.heading',
                 fontSize: '$fontSizes.h1',
             },
             'H1/Regular': {
-                fontFamily: '$fontFamilies.display',
+                fontFamily: '$fontFamilies.heading',
                 fontWeight: '$fontWeights.headingRegular',
                 lineHeight: '$lineHeights.heading',
                 fontSize: '$fontSizes.h1',
             },
             'H2/Bold': {
-                fontFamily: '$fontFamilies.display',
+                fontFamily: '$fontFamilies.heading',
                 fontWeight: '$fontWeights.hedingBold',
                 lineHeight: '$lineHeights.heading',
                 fontSize: '$fontSizes.h2',
