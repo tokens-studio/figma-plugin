@@ -208,7 +208,7 @@ const updateNodes = (nodes, tokens) => {
 };
 
 const setTokenData = (data) => {
-    figma.root.setSharedPluginData('tokens', 'version', '0.3');
+    figma.root.setSharedPluginData('tokens', 'version', '0.4');
     figma.root.setSharedPluginData('tokens', 'values', JSON.stringify(data));
 };
 
