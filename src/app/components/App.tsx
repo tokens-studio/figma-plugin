@@ -70,7 +70,7 @@ const App = () => {
                         <div className="inline-flex rotate">
                             <Icon name="loading" />
                         </div>
-                        <div className="font-bold text-xxs">Hold on, updating...</div>
+                        <div className="font-medium text-xxs">Hold on, updating...</div>
                     </div>
                 </div>
             )}
@@ -83,7 +83,7 @@ const App = () => {
                             {remoteComponents.map((comp) => (
                                 <button
                                     type="button"
-                                    className="p-2 text-xxs font-bold bg-gray-100"
+                                    className="p-2 text-xxs font-medium bg-gray-100"
                                     onClick={() => goToNodeId(comp.id)}
                                 >
                                     {comp.id}

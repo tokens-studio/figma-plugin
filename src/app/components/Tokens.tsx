@@ -8,6 +8,7 @@ import EditTokenForm from './EditTokenForm';
 import TokenButton from './TokenButton';
 import Tooltip from './Tooltip';
 import {useTokenState} from '../store/TokenContext';
+import {isTypographyToken} from './utils';
 
 const mappedTokens = (tokens) => {
     const properties = {
@@ -16,6 +17,11 @@ const mappedTokens = (tokens) => {
         colors: {},
         borderRadius: {},
         opacity: {},
+        fontFamilies: {},
+        fontWeights: {},
+        fontSizes: {},
+        lineHeights: {},
+        typography: {},
     };
     return Object.entries(Object.assign(properties, tokens));
 };
@@ -59,22 +65,32 @@ const Tokens = ({disabled}) => {
         setShowEditForm(false);
     };
 
-    const showNewForm = (path) => {
-        showForm({token: '', name: '', path});
+    const showNewForm = (path, schema) => {
+        let initialToken = '';
+        if (schema) {
+            initialToken = schema;
+        }
+
+        showForm({token: initialToken, name: '', path});
     };
 
-    const renderKeyValue = ({tokenValues, path = '', type = '', editMode = false}) => (
+    const renderKeyValue = ({tokenValues, schema, path = '', type = '', editMode = false}) => (
         <div className="flex justify-start flex-row flex-wrap">
-            {tokenValues.map((item) => {
-                const [key, value] = item;
+            {tokenValues.map(([key, value]) => {
                 const stringPath = [path, key].filter((n) => n).join('.');
                 return (
                     <React.Fragment key={stringPath}>
-                        {typeof value === 'object' ? (
+                        {typeof value === 'object' && !isTypographyToken(value) ? (
                             <div className="property-wrapper w-full mt-2">
                                 <Heading size="small">{key}</Heading>
 
-                                {renderKeyValue({tokenValues: Object.entries(value), path: stringPath, type, editMode})}
+                                {renderKeyValue({
+                                    tokenValues: Object.entries(value),
+                                    schema,
+                                    path: stringPath,
+                                    type,
+                                    editMode,
+                                })}
                             </div>
                         ) : (
                             <div className="flex mb-1 mr-1">
@@ -95,7 +111,25 @@ const Tokens = ({disabled}) => {
         </div>
     );
 
-    const TokenListing = ({label, explainer = '', help = '', createButton = false, property, type = '', values}) => {
+    const TokenListing = ({
+        label,
+        schema,
+        explainer = '',
+        help = '',
+        createButton = false,
+        property,
+        type = '',
+        values,
+    }: {
+        label: string;
+        schema?: object;
+        explainer?: string;
+        help?: string;
+        createButton?: boolean;
+        property: string;
+        type?: string;
+        values?: string | object;
+    }) => {
         const [showHelp, setShowHelp] = React.useState(false);
         return (
             <div className="mb-2 pb-2 border-b border-gray-200">
@@ -133,7 +167,7 @@ const Tokens = ({disabled}) => {
                                 type="button"
                                 onClick={() => {
                                     setShowOptions(values[0]);
-                                    showNewForm(values[0]);
+                                    showNewForm(values[0], schema);
                                 }}
                             >
                                 <Icon name="add" />
@@ -159,6 +193,7 @@ const Tokens = ({disabled}) => {
                                 <div className="mb-4">
                                     {renderKeyValue({
                                         tokenValues: Object.entries(values[1]),
+                                        schema,
                                         path: values[0],
                                         type,
                                         editMode: true,
@@ -170,7 +205,7 @@ const Tokens = ({disabled}) => {
                                         <button
                                             type="button"
                                             className="button button-ghost"
-                                            onClick={() => showNewForm(values[0])}
+                                            onClick={() => showNewForm(values[0], schema)}
                                         >
                                             <Icon name="add" />
                                         </button>
@@ -181,7 +216,7 @@ const Tokens = ({disabled}) => {
                     )}
                 </div>
                 {showHelp && <div className="mb-4 text-xxs text-gray-600">{help}</div>}
-                {renderKeyValue({tokenValues: Object.entries(values[1]), path: values[0], type})}
+                {renderKeyValue({tokenValues: Object.entries(values[1]), schema, path: values[0], type})}
             </div>
         );
     };
@@ -238,6 +273,67 @@ const Tokens = ({disabled}) => {
                             <React.Fragment key={tokenValues[0]}>
                                 <TokenListing property="Spacing" label="Spacing" type="spacing" values={tokenValues} />
                             </React.Fragment>
+                        );
+                    case 'typography':
+                        return (
+                            <div key={tokenValues[0]}>
+                                <TokenListing
+                                    createButton
+                                    help="If a (local) style is found with the same name it will match to that, if not, will use raw font values. Use 'Create Style' to batch-create styles from your tokens (e.g. in your design library). In the future we'll load all 'remote' styles and reference them inside the JSON."
+                                    label="Typography"
+                                    property="Typography"
+                                    type="typography"
+                                    schema={{fontFamily: '', fontWeight: '', lineHeight: '', fontSize: ''}}
+                                    values={tokenValues}
+                                />
+                            </div>
+                        );
+                    case 'fontFamilies':
+                        return (
+                            <div key={tokenValues[0]}>
+                                <TokenListing
+                                    help="Only works in combination with a Font Weight"
+                                    label="Font Families"
+                                    property="Font Family"
+                                    type="fontFamilies"
+                                    values={tokenValues}
+                                />
+                            </div>
+                        );
+                    case 'fontWeights':
+                        return (
+                            <div key={tokenValues[0]}>
+                                <TokenListing
+                                    help="Only works in combination with a Font Family"
+                                    label="Font Weights"
+                                    property="Font Weight"
+                                    type="fontWeights"
+                                    values={tokenValues}
+                                />
+                            </div>
+                        );
+                    case 'lineHeights':
+                        return (
+                            <div key={tokenValues[0]}>
+                                <TokenListing
+                                    label="Line Heights"
+                                    explainer="e.g. 100% or 14"
+                                    property="Line Height"
+                                    type="lineHeights"
+                                    values={tokenValues}
+                                />
+                            </div>
+                        );
+                    case 'fontSizes':
+                        return (
+                            <div key={tokenValues[0]}>
+                                <TokenListing
+                                    label="Font Sizes"
+                                    property="Font Size"
+                                    type="fontSizes"
+                                    values={tokenValues}
+                                />
+                            </div>
                         );
                     default:
                         return (

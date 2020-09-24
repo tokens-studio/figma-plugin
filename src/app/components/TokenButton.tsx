@@ -127,7 +127,7 @@ const TokenButton = ({type, name, path, token, disabled, editMode, showForm}) =>
     }
 
     return (
-        <Tooltip label={`${name}: ${token}${realTokenValue ? `: ${realTokenValue}` : ''}`}>
+        <Tooltip label={`${name}: ${JSON.stringify(token, null, 2)}${realTokenValue ? `: ${realTokenValue}` : ''}`}>
             <div
                 className={`relative flex button button-property ${buttonClass.join(' ')} ${
                     disabled && 'button-disabled'

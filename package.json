@@ -16,6 +16,7 @@
 		"@figma-plugin/helpers": "^0.13.2",
 		"@reach/dialog": "^0.10.3",
 		"@reach/menu-button": "^0.10.3",
+		"@reach/portal": "^0.10.5",
 		"@reach/tooltip": "^0.10.3",
 		"dot-object": "^2.1.3",
 		"json5": "^2.1.3",

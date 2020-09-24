@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
+
 @tailwind base;
 
 @tailwind components;
@@ -7,7 +9,7 @@ body {
 }
 
 .heading {
-    @apply text-2xl font-bold text-gray-900 leading-none capitalize;
+    @apply text-2xl font-medium text-gray-900 leading-none capitalize;
 }
 
 .heading-small {
@@ -43,7 +45,7 @@ body {
 }
 
 .button-value {
-    @apply text-gray-600 text-xs font-bold;
+    @apply text-gray-600 text-xs font-medium;
 }
 
 .button-extra {
@@ -72,7 +74,7 @@ body {
 }
 
 .button {
-    @apply border border-gray-400 rounded text-gray-800 font-bold text-xs px-4 py-2;
+    @apply border border-gray-400 rounded text-gray-800 font-medium text-xs px-4 py-2;
 }
 
 .button-disabled {
@@ -198,6 +200,13 @@ textarea {
 [data-reach-menu-list],
 [data-reach-menu-items] {
     @apply py-2 !important;
+}
+
+[data-reach-tooltip] {
+    @apply text-xs;
+    max-width: 50%;
+    text-overflow: ellipsis;
+    overflow: hidden;
 }
 
 .modal-wrapper {
