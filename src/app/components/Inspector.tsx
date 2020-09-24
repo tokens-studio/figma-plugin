@@ -12,13 +12,12 @@ const Inspector = () => {
             <div className="space-y-1">
                 {Object.entries(state.selectionValues).map(([key, value]) => (
                     <div key={key}>
-                        <code className="flex space-x-2">
+                        <code className="flex space-x-2 flex-wrap">
                             <div style={{fontWeight: 'bold'}}>{key}</div>:{' '}
                             <div className="p-1 bg-gray-700 rounded text-white text-xxs">
                                 ${typeof value === 'string' && value.split('.').join('-')}
                             </div>
-                            {/* TODO: Handle typography object tokens */}
-                            <div className="text-gray-500">{`/* ${getValue(value)} */`}</div>
+                            <div className="text-gray-500 break-all">{`/* ${JSON.stringify(getValue(value))} */`}</div>
                         </code>
                     </div>
                 ))}

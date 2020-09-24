@@ -33,7 +33,7 @@ export const setTextValuesOnTarget = async (target, values) => {
     const {fontFamily, fontWeight, fontSize, lineHeight} = values;
     const family = fontFamily || target.fontName.family;
     const style = fontWeight || target.fontName.style;
-    const font = await figma.loadFontAsync({family, style});
+    await figma.loadFontAsync({family, style});
 
     if (fontFamily && fontWeight) {
         target.fontName = {
