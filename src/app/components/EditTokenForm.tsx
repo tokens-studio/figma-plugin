@@ -44,6 +44,7 @@ const EditTokenForm = ({
                 {typeof tokenValue.token === 'object' ? (
                     Object.entries(tokenValue.token).map(([key, value]) => (
                         <Input
+                            key={key}
                             full
                             label={key}
                             value={value}

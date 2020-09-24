@@ -55,6 +55,7 @@ const mapValuesToTokens = (object, values) => {
 // };
 
 const setValuesOnNode = async (node, values, data) => {
+    // BORDER RADIUS
     if (values.borderRadius) {
         if (typeof node.cornerRadius !== 'undefined') {
             node.cornerRadius = Number(values.borderRadius || values.borderRadiusTopLeft);
@@ -80,6 +81,8 @@ const setValuesOnNode = async (node, values, data) => {
             node.bottomLeftRadius = Number(values.borderRadiusBottomLeft);
         }
     }
+
+    // OPACITY
     if (values.opacity) {
         if (typeof node.opacity !== 'undefined') {
             let num;
@@ -91,16 +94,22 @@ const setValuesOnNode = async (node, values, data) => {
             node.opacity = num;
         }
     }
+
+    // SIZING: WIDTH
     if (values.width) {
         if (typeof node.resize !== 'undefined') {
             node.resize(Number(values.width), node.height);
         }
     }
+
+    // SIZING: HEIGHT
     if (values.height) {
         if (typeof node.resize !== 'undefined') {
             node.resize(node.width, Number(values.height));
         }
     }
+
+    // FILL
     if (values.fill) {
         if (typeof node.fills !== 'undefined') {
             const paints = figma.getLocalPaintStyles();
@@ -142,6 +151,8 @@ const setValuesOnNode = async (node, values, data) => {
             });
         }
     }
+
+    // BORDER WIDTH
     if (values.border) {
         if (typeof node.strokes !== 'undefined') {
             const paints = figma.getLocalPaintStyles();
@@ -158,6 +169,8 @@ const setValuesOnNode = async (node, values, data) => {
             }
         }
     }
+
+    // SPACING
     if (values.spacing) {
         if (typeof node.horizontalPadding !== 'undefined') {
             node.horizontalPadding = Number(values.spacing);

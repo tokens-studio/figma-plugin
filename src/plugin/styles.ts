@@ -30,10 +30,12 @@ const updateColorStyles = (colorTokens, shouldCreate = false) => {
 };
 
 export const setTextValuesOnTarget = async (target, values) => {
-    const {fontFamily: family, fontWeight: style, fontSize, lineHeight} = values;
+    const {fontFamily, fontWeight, fontSize, lineHeight} = values;
+    const family = fontFamily || target.fontName.family;
+    const style = fontWeight || target.fontName.style;
+    const font = await figma.loadFontAsync({family, style});
 
-    if (family && style) {
-        await figma.loadFontAsync({family, style});
+    if (fontFamily && fontWeight) {
         target.fontName = {
             family,
             style,
@@ -41,7 +43,7 @@ export const setTextValuesOnTarget = async (target, values) => {
     }
 
     if (fontSize) {
-        target.fontSize = fontSize;
+        target.fontSize = Number(fontSize);
     }
     if (lineHeight) {
         target.lineHeight = convertLineHeightToFigma(lineHeight);

@@ -288,6 +288,52 @@ const Tokens = ({disabled}) => {
                                 />
                             </div>
                         );
+                    case 'fontFamilies':
+                        return (
+                            <div key={tokenValues[0]}>
+                                <TokenListing
+                                    help="Only works in combination with a Font Weight"
+                                    label="Font Families"
+                                    property="Font Family"
+                                    type="fontFamilies"
+                                    values={tokenValues}
+                                />
+                            </div>
+                        );
+                    case 'fontWeights':
+                        return (
+                            <div key={tokenValues[0]}>
+                                <TokenListing
+                                    help="Only works in combination with a Font Family"
+                                    label="Font Weights"
+                                    property="Font Weight"
+                                    type="fontWeights"
+                                    values={tokenValues}
+                                />
+                            </div>
+                        );
+                    case 'lineHeights':
+                        return (
+                            <div key={tokenValues[0]}>
+                                <TokenListing
+                                    label="Line Heights"
+                                    property="Line Height"
+                                    type="lineHeights"
+                                    values={tokenValues}
+                                />
+                            </div>
+                        );
+                    case 'fontSizes':
+                        return (
+                            <div key={tokenValues[0]}>
+                                <TokenListing
+                                    label="Font Sizes"
+                                    property="Font Size"
+                                    type="fontSizes"
+                                    values={tokenValues}
+                                />
+                            </div>
+                        );
                     default:
                         return (
                             <TokenListing

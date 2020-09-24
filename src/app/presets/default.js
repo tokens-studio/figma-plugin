@@ -48,8 +48,8 @@ export function defaultJSON() {
             body: 'Roboto',
         },
         lineHeights: {
-            heading: 1.1,
-            body: 1.4,
+            heading: '110%',
+            body: '140%',
         },
         fontWeights: {
             headingRegular: 'Regular',
