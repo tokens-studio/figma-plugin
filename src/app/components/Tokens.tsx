@@ -317,6 +317,7 @@ const Tokens = ({disabled}) => {
                             <div key={tokenValues[0]}>
                                 <TokenListing
                                     label="Line Heights"
+                                    explainer="e.g. 100% or 14"
                                     property="Line Height"
                                     type="lineHeights"
                                     values={tokenValues}
