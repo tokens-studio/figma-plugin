@@ -71,12 +71,16 @@ export function updatePluginData(nodes, values) {
                 delete newVals[key];
             }
         });
-        if (Object.keys(newVals).length === 0 && newVals.constructor === Object) {
-            item.setRelaunchData({});
-        } else {
-            item.setRelaunchData({
-                edit: Object.keys(newVals).join(', '),
-            });
+        try {
+            if (Object.keys(newVals).length === 0 && newVals.constructor === Object) {
+                item.setRelaunchData({});
+            } else {
+                item.setRelaunchData({
+                    edit: Object.keys(newVals).join(', '),
+                });
+            }
+        } catch (e) {
+            console.error({e});
         }
         item.setPluginData('values', JSON.stringify(newVals));
     });
