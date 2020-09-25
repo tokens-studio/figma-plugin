@@ -161,7 +161,7 @@ const Tokens = ({disabled}) => {
                                 <Icon name="edit" />
                             </button>
                         </Tooltip>
-                        <Tooltip label="Add a new token">
+                        <Tooltip label="Add a new token" variant="right">
                             <button
                                 className="button button-ghost"
                                 type="button"
