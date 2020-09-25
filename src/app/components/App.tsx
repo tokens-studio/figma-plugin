@@ -75,10 +75,10 @@ const App = () => {
                 </div>
             )}
             <div className="h-full flex flex-col">
-                <div className="flex-grow flex flex-col space-y-4 p-4">
+                <div className="flex-grow flex flex-col">
                     {active !== 'start' && <Navbar active={active} setActive={setActive} />}
                     {remoteComponents.length > 0 && (
-                        <div>
+                        <div className="px-4 pb-4">
                             <Heading size="small">Unable to update remote components</Heading>
                             {remoteComponents.map((comp) => (
                                 <button
@@ -91,10 +91,12 @@ const App = () => {
                             ))}
                         </div>
                     )}
-                    {active === 'start' && !state.loading && <StartScreen setActive={setActive} />}
-                    {active === 'tokens' && <Tokens disabled={disabled} />}
-                    {active === 'json' && <JSONEditor />}
-                    {active === 'inspector' && <Inspector />}
+                    <div className="px-4">
+                        {active === 'start' && !state.loading && <StartScreen setActive={setActive} />}
+                        {active === 'tokens' && <Tokens disabled={disabled} />}
+                        {active === 'json' && <JSONEditor />}
+                        {active === 'inspector' && <Inspector />}
+                    </div>
                 </div>
                 <div className="p-4 flex-shrink-0 flex items-center justify-between">
                     <div className="text-gray-600 text-xxs">Figma Tokens {pjs.version}</div>
