@@ -82,7 +82,7 @@ body {
 }
 
 .button:hover {
-    @apply bg-gray-100 border-gray-600;
+    @apply bg-gray-100;
 }
 
 .button-ghost {
