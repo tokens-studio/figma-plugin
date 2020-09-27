@@ -32,6 +32,7 @@ const defaultState = {
     loading: true,
     tokenData: new TokenData(defaultTokens),
     selectionValues: {},
+    displayType: 'GRID',
 };
 
 const emptyState = {
@@ -39,6 +40,7 @@ const emptyState = {
     loading: true,
     tokenData: new TokenData(emptyTokens),
     selectionValues: {},
+    displayType: 'GRID',
 };
 
 function stateReducer(state, action) {
@@ -132,6 +134,21 @@ function stateReducer(state, action) {
                 ...state,
                 selectionValues: {},
             };
+        case 'SET_SHOW_EDIT_FORM':
+            return {
+                ...state,
+                showEditForm: action.bool,
+            };
+        case 'SET_SHOW_OPTIONS':
+            return {
+                ...state,
+                showOptions: action.data,
+            };
+        case 'SET_DISPLAY_TYPE':
+            return {
+                ...state,
+                displayType: action.data,
+            };
         default:
             throw new Error('Not implemented');
     }
@@ -182,6 +199,15 @@ function TokenProvider({children}) {
             },
             resetSelectionValues: () => {
                 dispatch({type: 'RESET_SELECTION_VALUES'});
+            },
+            setShowEditForm: (bool: boolean) => {
+                dispatch({type: 'SET_SHOW_EDIT_FORM', bool});
+            },
+            setShowOptions: (data: string) => {
+                dispatch({type: 'SET_SHOW_OPTIONS', data});
+            },
+            setDisplayType: (data: string) => {
+                dispatch({type: 'SET_DISPLAY_TYPE', data});
             },
         }),
         [state]

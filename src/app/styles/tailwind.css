@@ -20,12 +20,16 @@ body {
     transform: translateY(-1px);
 }
 
-.property-wrapper {
-    @apply mb-2 rounded py-2 px-2 border border-gray-200;
+.button-property + .property-wrapper {
+    @apply mt-4;
+}
+
+.property-wrapper:not(:last-of-type) {
+    @apply mb-4;
 }
 
 .property-wrapper .heading {
-    @apply text-xxs bg-white -mt-3 -ml-1 px-1 inline-flex;
+    @apply text-xs text-gray-500 mb-2;
 }
 
 .property-wrapper .property-wrapper {
@@ -74,7 +78,7 @@ body {
 }
 
 .button {
-    @apply border border-gray-400 rounded text-gray-800 font-medium text-xs px-4 py-2;
+    @apply border border-gray-400 rounded text-gray-800 font-medium text-xs p-3;
 }
 
 .button-disabled {
@@ -89,35 +93,52 @@ body {
     @apply border-transparent bg-transparent px-2 py-1;
 }
 
+.button-ghost:hover {
+    @apply bg-gray-200;
+}
+
 .button-property {
-    @apply rounded-sm border-transparent px-0 py-0;
+    @apply border-none rounded bg-gray-100 px-0 py-0;
 }
 
 .button-property:hover {
     @apply bg-opacity-75;
 }
 
-.button-has-extras {
-    @apply pr-0;
+.button-property-edit {
+    @apply opacity-0;
+}
+
+.button-property:hover .button-property-edit {
+    @apply opacity-100;
 }
 
 .button-active {
-    box-shadow: inset 0 0 0 1px black;
-}
-
-.button-active.button-active-fill {
-    border: none;
+    @apply bg-primary-100;
 }
 
 .button-property-color {
-    @apply border-gray-400;
+    @apply rounded-full bg-transparent;
+}
+
+.button-property-color .button-active {
+    box-shadow: none;
 }
 
 .button-property-color .button-text::before {
-    @apply w-4 h-4 my-auto mr-2;
+    @apply w-6 h-6 my-auto flex-shrink-0;
+    border: 2px solid white;
     content: '';
     border-radius: 100%;
     background-color: var(--backgroundColor);
+}
+
+.button-property-color-listing {
+    @apply rounded w-full p-1 -mb-1;
+}
+
+.button-active-fill .button-text::before {
+    box-shadow: 0 0 0 1px black;
 }
 
 /* .button-active-fill::before {
@@ -134,7 +155,15 @@ body {
 } */
 
 .button-text {
-    @apply px-2 py-1 flex items-center justify-center;
+    @apply px-2 py-1 flex items-center justify-start flex-shrink-0;
+}
+
+.button-property-color .button-text span {
+    @apply ml-2;
+}
+
+.button-property-color .button-text {
+    @apply p-0;
 }
 
 .button-edit:hover .button-text {
@@ -181,25 +210,17 @@ textarea {
     @apply w-full border bg-white text-xxs p-3 rounded;
 }
 
+form {
+    margin-block-end: 0;
+}
+
 [data-reach-dialog-content] {
     width: 75vw !important;
+    padding: 0 !important;
 }
 
 [data-reach-dialog-overlay] {
     @apply z-1;
-}
-
-[data-reach-menu-item] {
-    @apply py-1 px-2 flex items-center !important;
-}
-
-[data-reach-menu-item][data-selected] {
-    @apply bg-gray-200 text-black !important;
-}
-
-[data-reach-menu-list],
-[data-reach-menu-items] {
-    @apply py-2 !important;
 }
 
 [data-reach-tooltip] {
@@ -225,7 +246,52 @@ textarea {
 }
 
 .input {
-    @apply bg-white border border-gray-300 text-sm p-2 rounded shadow-sm w-24;
+    @apply bg-white border border-gray-300 text-xs p-2 rounded shadow-sm w-24;
+}
+
+.react-contextmenu {
+    @apply bg-gray-900;
+    background-clip: padding-box;
+    border-radius: 0.25rem;
+    color: #fff;
+    font-size: 14px;
+    margin: 2px 0 0;
+    min-width: 160px;
+    outline: none;
+    opacity: 0;
+    padding: 5px 0;
+    pointer-events: none;
+    text-align: left;
+    transition: opacity 250ms ease !important;
+}
+
+.react-contextmenu.react-contextmenu--visible {
+    opacity: 1;
+    pointer-events: auto;
+    z-index: 9999;
+}
+
+.react-contextmenu-item {
+    background: 0 0;
+    border: 0;
+    color: #fff;
+    cursor: pointer;
+    font-weight: 400;
+    line-height: 1.5;
+    padding: 3px 20px;
+    text-align: inherit;
+    white-space: nowrap;
+}
+
+.react-contextmenu-item:hover {
+    @apply bg-primary-500 text-white;
+}
+
+.react-contextmenu-item--divider {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    cursor: inherit;
+    margin-bottom: 3px;
+    padding: 2px 0;
 }
 
 @tailwind utilities;

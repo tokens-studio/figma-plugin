@@ -16,7 +16,7 @@ const StartScreen = ({setActive}) => {
         setLoading(false);
     };
     return (
-        <div className="my-auto h-auto space-y-4">
+        <div className="my-auto h-auto space-y-4 p-4">
             <div>
                 <Heading size="small">Welcome to</Heading>
                 <Heading>Figma Tokens</Heading>

@@ -8,7 +8,7 @@ const Inspector = () => {
         return objectPath.get(state.tokenData.getMergedTokens(), value);
     };
     return (
-        <div className="space-y-2">
+        <div className="space-y-2 p-4">
             <div className="space-y-1">
                 {Object.entries(state.selectionValues)
                     .filter(([, value]) => value !== 'delete')

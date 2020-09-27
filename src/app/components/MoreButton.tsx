@@ -1,39 +1,36 @@
 import * as React from 'react';
-import {Menu, MenuList, MenuButton, MenuItem} from '@reach/menu-button';
-import '@reach/menu-button/styles.css';
+import {ContextMenu, MenuItem, ContextMenuTrigger} from 'react-contextmenu';
 import Icon from './Icon';
 import {useTokenState} from '../store/TokenContext';
 
-const MoreButton = ({properties, disabled, path, value, onClick}) => {
+const MoreButton = ({properties, children, path, value, onClick, onEdit}) => {
     const {state} = useTokenState();
-    return (
-        <div>
-            <Menu>
-                {({isExpanded}) => (
-                    <>
-                        <MenuButton disabled={disabled} className="button-extra">
-                            <span aria-hidden="true">{isExpanded ? '⏶' : '⏷'}</span>
-                        </MenuButton>
-                        <MenuList>
-                            {properties.map((property) => {
-                                const isActive = state.selectionValues[property.name] === `${path}.${value}`;
+    const visibleProperties = properties.filter((p) => p.label);
 
-                                return (
-                                    <MenuItem key={property.label} onSelect={() => onClick([property.name], isActive)}>
-                                        {property.icon && (
-                                            <div className="mr-2">
-                                                <Icon name={property.icon} />
-                                            </div>
-                                        )}
-                                        {isActive && '✔'}
-                                        {property.label}
-                                    </MenuItem>
-                                );
-                            })}
-                        </MenuList>
-                    </>
-                )}
-            </Menu>
+    return (
+        <div className="w-full">
+            <ContextMenuTrigger id={`${path}-${value}`}>{children}</ContextMenuTrigger>
+            <ContextMenu id={`${path}-${value}`} className="text-xs">
+                {visibleProperties.map((property) => {
+                    const isActive = state.selectionValues[property.name] === `${path}.${value}`;
+
+                    return (
+                        <MenuItem key={property.label} onClick={() => onClick([property.name], isActive)}>
+                            <div className="flex items-center">
+                                {property.icon && (
+                                    <div className="mr-2 text-white">
+                                        <Icon name={property.icon} />
+                                    </div>
+                                )}
+                                {isActive && '✔'}
+                                {property.label}
+                            </div>
+                        </MenuItem>
+                    );
+                })}
+                {visibleProperties?.length > 1 && <MenuItem divider />}
+                <MenuItem onClick={() => onEdit()}>Edit Token</MenuItem>
+            </ContextMenu>
         </div>
     );
 };

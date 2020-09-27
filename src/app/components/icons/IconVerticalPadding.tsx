@@ -6,10 +6,17 @@ const IconVerticalPadding = () => (
             fillRule="evenodd"
             clipRule="evenodd"
             d="M1.04082 0.0408172L17.0408 0.0408186L17.0408 1.04082L1.04082 1.04082L1.04082 0.0408172Z"
-            fill="black"
+            fill="currentColor"
         />
-        <rect x="13" y="4" width="8" height="8" transform="rotate(90 13 4)" fill="black" />
-        <rect x="16.9592" y="15.0408" width="1" height="16" transform="rotate(90 16.9592 15.0408)" fill="black" />
+        <rect x="13" y="4" width="8" height="8" transform="rotate(90 13 4)" fill="currentColor" />
+        <rect
+            x="16.9592"
+            y="15.0408"
+            width="1"
+            height="16"
+            transform="rotate(90 16.9592 15.0408)"
+            fill="currentColor"
+        />
     </svg>
 );
 

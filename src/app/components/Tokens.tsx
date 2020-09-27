@@ -27,15 +27,22 @@ const mappedTokens = (tokens) => {
 };
 
 const Tokens = ({disabled}) => {
-    const {state, setStringTokens, createStyles, updateTokens} = useTokenState();
+    const {
+        state,
+        setStringTokens,
+        createStyles,
+        updateTokens,
+        setShowEditForm,
+        setShowOptions,
+        setDisplayType,
+    } = useTokenState();
     const [activeToken] = React.useState('options');
     const [editToken, setEditToken] = React.useState({
         token: '',
         name: '',
         path: '',
     });
-    const [showEditForm, setShowEditForm] = React.useState(false);
-    const [showOptions, setShowOptions] = React.useState('');
+    const {showEditForm, showOptions} = state;
 
     function setSingleTokenValue({parent, name, token, options}) {
         const obj = JSON5.parse(state.tokenData.tokens[parent].values);
@@ -81,7 +88,7 @@ const Tokens = ({disabled}) => {
                 return (
                     <React.Fragment key={stringPath}>
                         {typeof value === 'object' && !isTypographyToken(value) ? (
-                            <div className="property-wrapper w-full mt-2">
+                            <div className="property-wrapper w-full">
                                 <Heading size="small">{key}</Heading>
 
                                 {renderKeyValue({
@@ -93,17 +100,15 @@ const Tokens = ({disabled}) => {
                                 })}
                             </div>
                         ) : (
-                            <div className="flex mb-1 mr-1">
-                                <TokenButton
-                                    type={type}
-                                    editMode={editMode}
-                                    name={key}
-                                    path={path}
-                                    token={value}
-                                    disabled={disabled}
-                                    showForm={showForm}
-                                />
-                            </div>
+                            <TokenButton
+                                type={type}
+                                editMode={editMode}
+                                name={key}
+                                path={path}
+                                token={value}
+                                disabled={disabled}
+                                showForm={showForm}
+                            />
                         )}
                     </React.Fragment>
                 );
@@ -117,6 +122,7 @@ const Tokens = ({disabled}) => {
         explainer = '',
         help = '',
         createButton = false,
+        showDisplayToggle = false,
         property,
         type = '',
         values,
@@ -126,14 +132,15 @@ const Tokens = ({disabled}) => {
         explainer?: string;
         help?: string;
         createButton?: boolean;
+        showDisplayToggle?: boolean;
         property: string;
         type?: string;
         values?: string | object;
     }) => {
         const [showHelp, setShowHelp] = React.useState(false);
         return (
-            <div className="mb-2 pb-2 border-b border-gray-200">
-                <div className="flex justify-between space-x-4 items-center">
+            <div className="p-4 border-b border-gray-200">
+                <div className="flex justify-between space-x-4 items-center mb-2">
                     <Heading size="small">
                         {label}
                         {help && (
@@ -145,6 +152,17 @@ const Tokens = ({disabled}) => {
                         )}
                     </Heading>
                     <div>
+                        {showDisplayToggle && (
+                            <Tooltip label={state.displayType === 'GRID' ? 'Show as List' : 'Show as Grid'}>
+                                <button
+                                    onClick={() => setDisplayType(state.displayType === 'GRID' ? 'LIST' : 'GRID')}
+                                    type="button"
+                                    className="button button-ghost"
+                                >
+                                    <Icon name={state.displayType === 'GRID' ? 'list' : 'grid'} />
+                                </button>
+                            </Tooltip>
+                        )}
                         {createButton && (
                             <Tooltip label="Create Styles">
                                 <button onClick={createStyles} type="button" className="button button-ghost">
@@ -186,11 +204,10 @@ const Tokens = ({disabled}) => {
                                         property={property}
                                         isPristine={editToken.name === ''}
                                         initialToken={editToken.token}
-                                        setShowEditForm={setShowEditForm}
                                     />
                                 )}
 
-                                <div className="mb-4">
+                                <div className="px-4 pb-4">
                                     {renderKeyValue({
                                         tokenValues: Object.entries(values[1]),
                                         schema,
@@ -199,17 +216,34 @@ const Tokens = ({disabled}) => {
                                         editMode: true,
                                     })}
                                 </div>
-                                <div className="flex items-center justify-between mb-4">
+                                <div className="flex items-center justify-between p-4">
                                     <Heading size="small">{property}</Heading>
-                                    <Tooltip label="Add a new token">
-                                        <button
-                                            type="button"
-                                            className="button button-ghost"
-                                            onClick={() => showNewForm(values[0], schema)}
-                                        >
-                                            <Icon name="add" />
-                                        </button>
-                                    </Tooltip>
+                                    <div>
+                                        {showDisplayToggle && (
+                                            <Tooltip
+                                                label={state.displayType === 'GRID' ? 'Show as List' : 'Show as Grid'}
+                                            >
+                                                <button
+                                                    onClick={() =>
+                                                        setDisplayType(state.displayType === 'GRID' ? 'LIST' : 'GRID')
+                                                    }
+                                                    type="button"
+                                                    className="button button-ghost"
+                                                >
+                                                    <Icon name={state.displayType === 'GRID' ? 'list' : 'grid'} />
+                                                </button>
+                                            </Tooltip>
+                                        )}
+                                        <Tooltip label="Add a new token">
+                                            <button
+                                                type="button"
+                                                className="button button-ghost"
+                                                onClick={() => showNewForm(values[0], schema)}
+                                            >
+                                                <Icon name="add" />
+                                            </button>
+                                        </Tooltip>
+                                    </div>
                                 </div>
                             </div>
                         </Modal>
@@ -252,6 +286,7 @@ const Tokens = ({disabled}) => {
                         return (
                             <div key={tokenValues[0]}>
                                 <TokenListing
+                                    showDisplayToggle
                                     createButton
                                     help="If a (local) style is found with the same name it will match to that, if not, will use hex value. Use 'Create Style' to batch-create styles from your tokens (e.g. in your design library). In the future we'll load all 'remote' styles and reference them inside the JSON."
                                     label="Fill"

@@ -19,8 +19,9 @@ module.exports = {
                     '900': '#212121',
                 },
                 primary: {
-                    400: '#3A84DF',
-                    500: '#206AC3',
+                    100: '#daebf7',
+                    400: '#3CB1FF',
+                    500: '#18A0FB',
                 },
             },
             fontSize: {
