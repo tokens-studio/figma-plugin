@@ -62,10 +62,12 @@ const TokenButton = ({type, name, path, token, disabled, editMode, showForm}) =>
             setPluginValue(newProps);
         }
     };
-    // style = {
-    //     '--bgColor': colorByHashCode(name.toString()),
-    //     backgroundColor: 'hsl(var(--bgColor))',
-    // };
+    if (state.colorMode) {
+        style = {
+            '--bgColor': colorByHashCode(name.toString()),
+            backgroundColor: 'hsl(var(--bgColor))',
+        };
+    }
     switch (type) {
         case 'borderRadius':
             style = {...style, borderRadius: `${displayValue}px`};

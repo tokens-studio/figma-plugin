@@ -3,8 +3,9 @@ import * as React from 'react';
 type ButtonProps = {
     type?: 'button' | 'submit';
     variant: 'secondary' | 'primary' | 'ghost';
-    onClick: any;
+    onClick?: any;
     size?: 'large' | 'small';
+    href?: string;
 };
 
 const Button: React.FunctionComponent<ButtonProps> = ({
@@ -13,6 +14,7 @@ const Button: React.FunctionComponent<ButtonProps> = ({
     onClick,
     variant,
     children,
+    href,
 }) => {
     let variantClass;
     switch (variant) {
@@ -34,6 +36,14 @@ const Button: React.FunctionComponent<ButtonProps> = ({
         default:
             break;
     }
+    if (href) {
+        return (
+            <a target="_blank" rel="noreferrer" className={`button ${[variantClass, sizeClass].join(' ')}`} href={href}>
+                {children}
+            </a>
+        );
+    }
+
     return (
         // eslint-disable-next-line react/button-has-type
         <button type={type} className={`button ${[variantClass, sizeClass].join(' ')}`} onClick={onClick}>

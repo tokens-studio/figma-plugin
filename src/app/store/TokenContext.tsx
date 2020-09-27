@@ -33,6 +33,7 @@ const defaultState = {
     tokenData: new TokenData(defaultTokens),
     selectionValues: {},
     displayType: 'GRID',
+    colorMode: false,
 };
 
 const emptyState = {
@@ -41,6 +42,7 @@ const emptyState = {
     tokenData: new TokenData(emptyTokens),
     selectionValues: {},
     displayType: 'GRID',
+    colorMode: false,
 };
 
 function stateReducer(state, action) {
@@ -149,6 +151,11 @@ function stateReducer(state, action) {
                 ...state,
                 displayType: action.data,
             };
+        case 'TOGGLE_COLOR_MODE':
+            return {
+                ...state,
+                colorMode: !state.colorMode,
+            };
         default:
             throw new Error('Not implemented');
     }
@@ -208,6 +215,9 @@ function TokenProvider({children}) {
             },
             setDisplayType: (data: string) => {
                 dispatch({type: 'SET_DISPLAY_TYPE', data});
+            },
+            toggleColorMode: () => {
+                dispatch({type: 'TOGGLE_COLOR_MODE'});
             },
         }),
         [state]

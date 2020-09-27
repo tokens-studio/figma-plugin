@@ -1,6 +1,7 @@
 import * as React from 'react';
 import objectPath from 'object-path';
 import {useTokenState} from '../store/TokenContext';
+import Button from './Button';
 
 const Inspector = () => {
     const {state, removeNodeData} = useTokenState();
@@ -26,9 +27,9 @@ const Inspector = () => {
                         </div>
                     ))}
             </div>
-            <button className="button" type="button" onClick={removeNodeData}>
+            <Button variant="secondary" onClick={removeNodeData}>
                 Remove tokens from layer
-            </button>
+            </Button>
         </div>
     );
 };

@@ -1,4 +1,7 @@
 import * as React from 'react';
+import {useTokenState} from '../store/TokenContext';
+import Button from './Button';
+import Icon from './Icon';
 
 const TabButton = ({name, label, active, setActive, first = false}) => (
     <button
@@ -14,11 +17,17 @@ const TabButton = ({name, label, active, setActive, first = false}) => (
 );
 
 const Navbar = ({active, setActive}) => {
+    const {state, toggleColorMode} = useTokenState();
     return (
-        <div className="sticky top-0 navbar bg-white flex justify-content-between z-1 border-b border-gray-200">
-            <TabButton first name="tokens" label="Tokens" active={active} setActive={setActive} />
-            <TabButton name="json" label="JSON" active={active} setActive={setActive} />
-            <TabButton name="inspector" label="Inspector" active={active} setActive={setActive} />
+        <div className="sticky top-0 navbar bg-white flex items-center justify-between z-1 border-b border-gray-200">
+            <div>
+                <TabButton first name="tokens" label="Tokens" active={active} setActive={setActive} />
+                <TabButton name="json" label="JSON" active={active} setActive={setActive} />
+                <TabButton name="inspector" label="Inspector" active={active} setActive={setActive} />
+            </div>
+            <Button variant="ghost" onClick={toggleColorMode}>
+                <Icon name={state.colorMode ? 'blend' : 'blendempty'} />
+            </Button>
         </div>
     );
 };

@@ -1,6 +1,7 @@
 import * as React from 'react';
 import Textarea from './Textarea';
 import {TokenContext} from '../store/TokenContext';
+import Button from './Button';
 
 const JSONEditor = () => {
     const {state, setStringTokens, setDefaultTokens, updateTokens} = React.useContext(TokenContext);
@@ -14,13 +15,13 @@ const JSONEditor = () => {
                 onChange={(val) => setStringTokens({parent: activeToken, tokens: val})}
                 value={state.tokenData.tokens[activeToken].values}
             />
-            <div className="space-x-2">
-                <button className="button button-primary" type="button" onClick={updateTokens}>
-                    Save & update
-                </button>
-                <button className="button" type="button" onClick={setDefaultTokens}>
+            <div className="space-x-2 flex justify-between">
+                <Button variant="secondary" size="large" onClick={setDefaultTokens}>
                     Reset to Default
-                </button>
+                </Button>
+                <Button variant="primary" size="large" onClick={updateTokens}>
+                    Save & update
+                </Button>
             </div>
         </div>
     );

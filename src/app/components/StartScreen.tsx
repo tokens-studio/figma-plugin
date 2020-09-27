@@ -4,12 +4,7 @@ import Button from './Button';
 import {useTokenState} from '../store/TokenContext';
 
 const StartScreen = ({setActive}) => {
-    const {setEmptyTokens, setDefaultTokens, setLoading} = useTokenState();
-    const onSetEmptyTokens = () => {
-        setActive('json');
-        setEmptyTokens();
-        setLoading(false);
-    };
+    const {setDefaultTokens, setLoading} = useTokenState();
     const onSetDefaultTokens = () => {
         setActive('tokens');
         setDefaultTokens();
@@ -17,31 +12,23 @@ const StartScreen = ({setActive}) => {
     };
     return (
         <div className="my-auto h-auto space-y-4 p-4">
-            <div>
-                <Heading size="small">Welcome to</Heading>
-                <Heading>Figma Tokens</Heading>
+            <Heading size="small">Welcome to Figma Tokens.</Heading>
+            <div className="text-xs">
+                Making design tokens a single source of truth for designers and developers using Figma. Design tokens
+                are an integral part of any design system - this plugin enhances Figma Styles by a variety of other
+                features.
             </div>
-            <div>
-                A place to make Tokens A Single Source of Truth. Read more about it{' '}
-                <a
+            <div className="space-x-2 flex justify-between">
+                <Button
                     href="https://blog.prototypr.io/making-design-tokens-a-single-source-of-truth-for-figma-tool-76618abdeb88"
-                    target="_blank"
-                    rel="noreferrer"
+                    size="large"
+                    variant="secondary"
                 >
-                    here
-                </a>
-                .
-            </div>
-            <div className="space-y-2 p-4 bg-gray-300 rounded">
-                <p>Seems like you don't have any tokens defined. Start by defining your tokens or use our preset.</p>
-                <div className="space-x-2">
-                    <Button size="large" variant="secondary" onClick={onSetEmptyTokens}>
-                        Edit JSON
-                    </Button>
-                    <Button size="large" variant="primary" onClick={onSetDefaultTokens}>
-                        Use Preset
-                    </Button>
-                </div>
+                    Learn more
+                </Button>
+                <Button size="large" variant="primary" onClick={onSetDefaultTokens}>
+                    Configure Tokens
+                </Button>
             </div>
         </div>
     );
