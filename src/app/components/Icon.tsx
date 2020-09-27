@@ -10,6 +10,10 @@ import IconHorizontalPadding from './icons/IconHorizontalPadding';
 import IconVerticalPadding from './icons/IconVerticalPadding';
 import IconGap from './icons/IconGap';
 import IconSpacing from './icons/IconSpacing';
+import IconList from './icons/IconList';
+import IconGrid from './icons/IconGrid';
+import IconBlend from './icons/IconBlend';
+import IconBlendEmpty from './icons/IconBlendEmpty';
 
 const icons = {
     edit: IconEdit,
@@ -22,6 +26,10 @@ const icons = {
     VerticalPadding: IconVerticalPadding,
     Gap: IconGap,
     Spacing: IconSpacing,
+    list: IconList,
+    grid: IconGrid,
+    blend: IconBlend,
+    blendempty: IconBlendEmpty,
 };
 
 const Icon = ({name}) => {

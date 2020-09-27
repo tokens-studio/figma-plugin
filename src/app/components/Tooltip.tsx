@@ -8,6 +8,7 @@ import Portal from '@reach/portal';
 
 type TooltipProps = {
     label: string;
+    variant?: 'right' | 'centered';
 };
 
 const centered = (triggerRect, tooltipRect) => {
@@ -20,7 +21,16 @@ const centered = (triggerRect, tooltipRect) => {
     };
 };
 
-function TriangleTooltip({children, label}) {
+const right = (triggerRect, tooltipRect) => {
+    const triggerRight = triggerRect.right;
+    const pos = triggerRight - tooltipRect.width;
+    return {
+        left: pos,
+        top: triggerRect.bottom + 8 + window.scrollY,
+    };
+};
+
+function TriangleTooltip({children, label, variant}) {
     // get the props from useTooltip
     const [trigger, tooltip] = useTooltip();
     // destructure off what we need to position the triangle
@@ -38,8 +48,11 @@ function TriangleTooltip({children, label}) {
                     <div
                         style={{
                             position: 'absolute',
-                            left: triggerRect && triggerRect.left - 10 + triggerRect.width / 2,
-                            top: triggerRect && triggerRect.bottom + window.scrollY,
+                            left:
+                                triggerRect?.left -
+                                10 +
+                                (variant === 'right' ? triggerRect.width - 20 : triggerRect.width / 2),
+                            top: triggerRect?.bottom + window.scrollY,
                             width: 0,
                             height: 0,
                             wordBreak: 'break-word',
@@ -61,14 +74,16 @@ function TriangleTooltip({children, label}) {
                     borderRadius: '3px',
                     padding: '0.5em 1em',
                 }}
-                position={centered}
+                position={variant === 'right' ? right : centered}
             />
         </>
     );
 }
 
-const Tooltip: React.FunctionComponent<TooltipProps> = ({label, children}) => (
-    <TriangleTooltip label={label}>{children}</TriangleTooltip>
+const Tooltip: React.FunctionComponent<TooltipProps> = ({label, children, variant = 'centered'}) => (
+    <TriangleTooltip label={label} variant={variant}>
+        {children}
+    </TriangleTooltip>
 );
 
 export default Tooltip;

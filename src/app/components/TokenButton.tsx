@@ -2,6 +2,7 @@ import * as React from 'react';
 import Tooltip from './Tooltip';
 import MoreButton from './MoreButton';
 import {useTokenState} from '../store/TokenContext';
+import Icon from './Icon';
 
 function colorByHashCode(value) {
     let hash = 0;
@@ -14,14 +15,20 @@ function colorByHashCode(value) {
 }
 
 const TokenButton = ({type, name, path, token, disabled, editMode, showForm}) => {
-    const {state, setSelectionValues, setNodeData} = useTokenState();
+    const {state, setSelectionValues, setNodeData, setShowOptions} = useTokenState();
     const realTokenValue = state.tokenData.getAliasValue(token);
     const displayValue = realTokenValue || token;
     let style;
-    const showValue = true;
+    let showValue = true;
+    let showEditButton = false;
     let properties = [type];
     const buttonClass = [];
     const active = state.selectionValues[type] === [path, name].join('.');
+
+    const handleEditClick = () => {
+        setShowOptions(path);
+        showForm({name, token, path});
+    };
 
     function setPluginValue(value) {
         setSelectionValues(value);
@@ -55,10 +62,12 @@ const TokenButton = ({type, name, path, token, disabled, editMode, showForm}) =>
             setPluginValue(newProps);
         }
     };
-    style = {
-        '--bgColor': colorByHashCode(name.toString()),
-        backgroundColor: 'hsl(var(--bgColor))',
-    };
+    if (state.colorMode) {
+        style = {
+            '--bgColor': colorByHashCode(name.toString()),
+            backgroundColor: 'hsl(var(--bgColor))',
+        };
+    }
     switch (type) {
         case 'borderRadius':
             style = {...style, borderRadius: `${displayValue}px`};
@@ -99,6 +108,7 @@ const TokenButton = ({type, name, path, token, disabled, editMode, showForm}) =>
             ];
             break;
         case 'fill':
+            showValue = false;
             properties = [
                 {
                     label: 'Fill',
@@ -113,6 +123,11 @@ const TokenButton = ({type, name, path, token, disabled, editMode, showForm}) =>
                 '--backgroundColor': displayValue,
             };
             buttonClass.push('button-property-color');
+            if (state.displayType === 'LIST') {
+                buttonClass.push('button-property-color-listing');
+                showValue = true;
+                if (!editMode) showEditButton = true;
+            }
 
             if (active) {
                 buttonClass.push('button-active-fill');
@@ -122,38 +137,40 @@ const TokenButton = ({type, name, path, token, disabled, editMode, showForm}) =>
             break;
     }
 
-    if (!editMode && properties.length > 1) {
-        buttonClass.push('button-has-extras');
-    }
-
     return (
-        <Tooltip label={`${name}: ${JSON.stringify(token, null, 2)}${realTokenValue ? `: ${realTokenValue}` : ''}`}>
-            <div
-                className={`relative flex button button-property ${buttonClass.join(' ')} ${
-                    disabled && 'button-disabled'
-                } `}
-                style={style}
-            >
-                <button
-                    className="w-full h-full"
-                    disabled={editMode ? false : disabled}
-                    type="button"
-                    onClick={() => onClick(properties)}
+        <div
+            className={`relative mb-1 mr-1 flex button button-property ${buttonClass.join(' ')} ${
+                disabled && 'button-disabled'
+            } `}
+            style={style}
+        >
+            <MoreButton properties={properties} onClick={onClick} onEdit={handleEditClick} value={name} path={path}>
+                <Tooltip
+                    label={`${name}: ${JSON.stringify(token, null, 2)}${realTokenValue ? `: ${realTokenValue}` : ''}`}
                 >
-                    <div className="button-text">{showValue ? name : <span className="px-3" />}</div>
-                    {editMode && <div className="button-edit-overlay">Edit</div>}
-                </button>
-                {!editMode && properties.length > 1 && (
-                    <MoreButton
-                        disabled={disabled}
-                        properties={properties}
-                        onClick={onClick}
-                        value={name}
-                        path={path}
-                    />
-                )}
-            </div>
-        </Tooltip>
+                    <button
+                        className="w-full h-full"
+                        disabled={editMode ? false : disabled}
+                        type="button"
+                        onClick={() => onClick(properties)}
+                    >
+                        <div className="button-text">{showValue && <span>{name}</span>}</div>
+                        {editMode && <div className="button-edit-overlay">Edit</div>}
+                    </button>
+                </Tooltip>
+            </MoreButton>
+            {showEditButton && (
+                <Tooltip label="Edit Token">
+                    <button
+                        className="ml-auto button button-ghost button-property-edit"
+                        type="button"
+                        onClick={handleEditClick}
+                    >
+                        <Icon name="edit" />
+                    </button>
+                </Tooltip>
+            )}
+        </div>
     );
 };
 

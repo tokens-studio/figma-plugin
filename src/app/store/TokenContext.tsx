@@ -32,6 +32,8 @@ const defaultState = {
     loading: true,
     tokenData: new TokenData(defaultTokens),
     selectionValues: {},
+    displayType: 'GRID',
+    colorMode: false,
 };
 
 const emptyState = {
@@ -39,6 +41,8 @@ const emptyState = {
     loading: true,
     tokenData: new TokenData(emptyTokens),
     selectionValues: {},
+    displayType: 'GRID',
+    colorMode: false,
 };
 
 function stateReducer(state, action) {
@@ -132,6 +136,26 @@ function stateReducer(state, action) {
                 ...state,
                 selectionValues: {},
             };
+        case 'SET_SHOW_EDIT_FORM':
+            return {
+                ...state,
+                showEditForm: action.bool,
+            };
+        case 'SET_SHOW_OPTIONS':
+            return {
+                ...state,
+                showOptions: action.data,
+            };
+        case 'SET_DISPLAY_TYPE':
+            return {
+                ...state,
+                displayType: action.data,
+            };
+        case 'TOGGLE_COLOR_MODE':
+            return {
+                ...state,
+                colorMode: !state.colorMode,
+            };
         default:
             throw new Error('Not implemented');
     }
@@ -182,6 +206,18 @@ function TokenProvider({children}) {
             },
             resetSelectionValues: () => {
                 dispatch({type: 'RESET_SELECTION_VALUES'});
+            },
+            setShowEditForm: (bool: boolean) => {
+                dispatch({type: 'SET_SHOW_EDIT_FORM', bool});
+            },
+            setShowOptions: (data: string) => {
+                dispatch({type: 'SET_SHOW_OPTIONS', data});
+            },
+            setDisplayType: (data: string) => {
+                dispatch({type: 'SET_DISPLAY_TYPE', data});
+            },
+            toggleColorMode: () => {
+                dispatch({type: 'TOGGLE_COLOR_MODE'});
             },
         }),
         [state]

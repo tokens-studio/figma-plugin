@@ -75,10 +75,10 @@ const App = () => {
                 </div>
             )}
             <div className="h-full flex flex-col">
-                <div className="flex-grow flex flex-col space-y-4 p-4">
+                <div className="flex-grow flex flex-col">
                     {active !== 'start' && <Navbar active={active} setActive={setActive} />}
                     {remoteComponents.length > 0 && (
-                        <div>
+                        <div className="p-4">
                             <Heading size="small">Unable to update remote components</Heading>
                             {remoteComponents.map((comp) => (
                                 <button

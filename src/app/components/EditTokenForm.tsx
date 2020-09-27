@@ -1,22 +1,15 @@
 import * as React from 'react';
+import {useTokenState} from '../store/TokenContext';
 import Input from './Input';
 
-const EditTokenForm = ({
-    submitTokenValue,
-    explainer = '',
-    property,
-    setShowEditForm,
-    isPristine,
-    initialToken,
-    initialName,
-    path,
-}) => {
+const EditTokenForm = ({submitTokenValue, explainer = '', property, isPristine, initialToken, initialName, path}) => {
     const defaultValue = {
         token: initialToken,
         name: initialName,
         path,
     };
     const [tokenValue, setTokenValue] = React.useState(defaultValue);
+    const {setShowEditForm} = useTokenState();
 
     const handleChange = (e) => {
         e.persist();
@@ -38,36 +31,34 @@ const EditTokenForm = ({
         setShowEditForm(false);
     };
     return (
-        <form onSubmit={handleSubmit} className="space-y-4 border p-2 border-gray-200 rounded">
+        <form onSubmit={handleSubmit} className="space-y-4 border border-t p-4 border-gray-200 rounded">
             <Input required full label="Name" value={tokenValue.name} onChange={handleChange} type="text" name="name" />
-            <div>
-                {typeof tokenValue.token === 'object' ? (
-                    Object.entries(tokenValue.token).map(([key, value]) => (
-                        <Input
-                            key={key}
-                            full
-                            label={key}
-                            value={value}
-                            onChange={handleObjectChange}
-                            type="text"
-                            name={key}
-                            required
-                        />
-                    ))
-                ) : (
+            {typeof tokenValue.token === 'object' ? (
+                Object.entries(tokenValue.token).map(([key, value]) => (
                     <Input
+                        key={key}
                         full
-                        label={property}
-                        value={tokenValue.token}
-                        onChange={handleChange}
+                        label={key}
+                        value={value}
+                        onChange={handleObjectChange}
                         type="text"
-                        name="token"
+                        name={key}
                         required
                     />
-                )}
+                ))
+            ) : (
+                <Input
+                    full
+                    label={property}
+                    value={tokenValue.token}
+                    onChange={handleChange}
+                    type="text"
+                    name="token"
+                    required
+                />
+            )}
 
-                {explainer && <div className="mt-1 text-xxs text-gray-600">{explainer}</div>}
-            </div>
+            {explainer && <div className="mt-1 text-xxs text-gray-600">{explainer}</div>}
             <div className="flex space-x-2 justify-end">
                 <button className="button button-link" type="button" onClick={handleReset}>
                     Cancel
