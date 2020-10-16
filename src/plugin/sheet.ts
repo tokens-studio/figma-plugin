@@ -1,5 +1,6 @@
 /* eslint-disable no-param-reassign */
 import Dot from 'dot-object';
+import {convertToFigmaColor} from './helpers';
 
 const dot = new Dot('/');
 
@@ -29,11 +30,15 @@ const updateTokenSheet = (tokens) => {
     const paints = figma.getLocalPaintStyles();
     const row = existingTokenLayer || createRow('Tokens', 'VERTICAL');
 
-    function createColorTile(key) {
+    function createColorTile(key, value) {
         const rect = figma.createRectangle();
-        const matchingStyle = paints.filter((n) => n.name === key);
+        const matchingStyle = paints.find((n) => n.name === key);
+        if (matchingStyle) {
+            rect.fillStyleId = matchingStyle.id;
+        } else {
+            rect.fills = [{type: 'SOLID', color: convertToFigmaColor(value)}];
+        }
 
-        rect.fillStyleId = matchingStyle[0].id;
         rect.name = key;
         return rect;
     }
@@ -54,12 +59,12 @@ const updateTokenSheet = (tokens) => {
         if (ancestorRow) {
             if (!ancestorRow.findChild((n) => n.name === key)) {
                 console.log('Ancestor node DOES exist', ancestorRow.name);
-                const rect = createColorTile(key);
+                const rect = createColorTile(key, value);
                 ancestorRow.appendChild(rect);
             }
         } else if (!row.findChild((n) => n.name === key)) {
             console.log('Ancestor node does not exist');
-            const rect = createColorTile(key);
+            const rect = createColorTile(key, value);
             row.appendChild(rect);
         }
     });
