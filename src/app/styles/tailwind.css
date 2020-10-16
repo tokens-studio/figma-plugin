@@ -33,7 +33,11 @@ body {
 }
 
 .property-wrapper .property-wrapper {
-    @apply mb-0 rounded-none p-1 border-t border-gray-300;
+    @apply mb-0 rounded-none pl-2 pb-2 border-l border-gray-300;
+}
+
+.property-wrapper .property-wrapper .heading {
+    @apply text-xxs uppercase;
 }
 
 .property-wrapper:last-of-type {
@@ -127,10 +131,11 @@ body {
 
 .button-property-color .button-text::before {
     @apply w-6 h-6 my-auto flex-shrink-0;
-    border: 2px solid white;
+    border: 1px solid white;
     content: '';
     border-radius: 100%;
     background-color: var(--backgroundColor);
+    border-color: var(--borderColor);
 }
 
 .button-property-color-listing {
