@@ -28,7 +28,14 @@ const App = () => {
     const [active, setActive] = React.useState('start');
     const [remoteComponents, setRemoteComponents] = React.useState([]);
 
-    const {state, setTokenData, setLoading, setSelectionValues, resetSelectionValues} = useTokenState();
+    const {
+        state,
+        setTokenData,
+        setLoading,
+        setSelectionValues,
+        resetSelectionValues,
+        setTokensFromStyles,
+    } = useTokenState();
 
     const onInitiate = () => {
         parent.postMessage({pluginMessage: {type: 'initiate'}}, '*');
@@ -56,6 +63,12 @@ const App = () => {
                 setLoading(false);
                 if (values) {
                     setTokenData(new TokenData(values));
+                    setActive('tokens');
+                }
+            } else if (type === 'styles') {
+                setLoading(false);
+                if (values) {
+                    setTokensFromStyles(values);
                     setActive('tokens');
                 }
             }

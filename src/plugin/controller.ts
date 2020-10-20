@@ -1,6 +1,6 @@
 /* eslint-disable no-param-reassign */
 import {convertToFigmaColor} from './helpers';
-import {updateStyles, setTextValuesOnTarget} from './styles';
+import {pullStyles, updateStyles, setTextValuesOnTarget} from './styles';
 import store from './store';
 import {
     notifyNoSelection,
@@ -247,63 +247,59 @@ figma.on('selectionchange', () => {
 });
 
 figma.ui.onmessage = (msg) => {
-    if (msg.type === 'initiate') {
-        const previousTokens = getTokenData();
-        notifyTokenValues(previousTokens);
+    switch (msg.type) {
+        case 'initiate':
+            const previousTokens = getTokenData();
+            notifyTokenValues(previousTokens);
 
-        const nodes = figma.currentPage.selection;
+            const nodes = figma.currentPage.selection;
 
-        if (!nodes.length) {
-            notifyNoSelection();
+            if (!nodes.length) {
+                notifyNoSelection();
+                return;
+            }
+            sendPluginValues(nodes);
             return;
-        }
-        sendPluginValues(nodes);
-        return;
-    }
+        case 'set-node-data':
+            try {
+                updatePluginData(figma.currentPage.selection, msg.values);
+                updateNodes(figma.currentPage.selection, msg.tokens);
+                sendPluginValues(figma.currentPage.selection);
+            } catch (e) {
+                console.error(e);
+            }
+            notifyRemoteComponents({nodes: store.successfulNodes.length, remotes: store.remoteComponents});
+            return;
 
-    if (msg.type === 'set-node-data') {
-        try {
-            updatePluginData(figma.currentPage.selection, msg.values);
-            updateNodes(figma.currentPage.selection, msg.tokens);
-            sendPluginValues(figma.currentPage.selection);
-        } catch (e) {
-            console.error(e);
-        }
-        notifyRemoteComponents({nodes: store.successfulNodes.length, remotes: store.remoteComponents});
-        return;
-    }
+        case 'remove-node-data':
+            try {
+                removePluginData(figma.currentPage.selection);
+                sendPluginValues(figma.currentPage.selection);
+            } catch (e) {
+                console.error(e);
+            }
+            notifyRemoteComponents({nodes: store.successfulNodes.length, remotes: store.remoteComponents});
+            return;
+        case 'create-styles':
+            try {
+                updateStyles(msg.tokens, true);
+            } catch (e) {
+                console.error(e);
+            }
+            return;
+        case 'update':
+            setTokenData(msg.tokenValues);
+            updateStyles(msg.tokens, false);
+            updateNodes(figma.currentPage.children, msg.tokens);
+            notifyRemoteComponents({nodes: store.successfulNodes.length, remotes: store.remoteComponents});
+            return;
+        case 'gotonode':
+            goToNode(msg.id);
+            break;
+        case 'pull-styles':
+            pullStyles(msg.styleTypes);
+            break;
 
-    if (msg.type === 'remove-node-data') {
-        try {
-            removePluginData(figma.currentPage.selection);
-            sendPluginValues(figma.currentPage.selection);
-        } catch (e) {
-            console.error(e);
-        }
-        notifyRemoteComponents({nodes: store.successfulNodes.length, remotes: store.remoteComponents});
-        return;
+        default:
     }
-
-    if (msg.type === 'create-styles') {
-        try {
-            updateStyles(msg.tokens, true);
-        } catch (e) {
-            console.error(e);
-        }
-        return;
-    }
-
-    if (msg.type === 'update') {
-        setTokenData(msg.tokenValues);
-        updateStyles(msg.tokens, false);
-        updateNodes(figma.currentPage.children, msg.tokens);
-        notifyRemoteComponents({nodes: store.successfulNodes.length, remotes: store.remoteComponents});
-        return;
-    }
-    if (msg.type === 'gotonode') {
-        goToNode(msg.id);
-        return;
-    }
-
-    figma.closePlugin();
 };

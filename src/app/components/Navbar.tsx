@@ -1,7 +1,7 @@
 import * as React from 'react';
 import {useTokenState} from '../store/TokenContext';
-import Button from './Button';
 import Icon from './Icon';
+import Tooltip from './Tooltip';
 
 const TabButton = ({name, label, active, setActive, first = false}) => (
     <button
@@ -17,7 +17,7 @@ const TabButton = ({name, label, active, setActive, first = false}) => (
 );
 
 const Navbar = ({active, setActive}) => {
-    const {state, toggleColorMode} = useTokenState();
+    const {state, toggleColorMode, pullStyles} = useTokenState();
     return (
         <div className="sticky top-0 navbar bg-white flex items-center justify-between z-1 border-b border-gray-200">
             <div>
@@ -25,9 +25,18 @@ const Navbar = ({active, setActive}) => {
                 <TabButton name="json" label="JSON" active={active} setActive={setActive} />
                 <TabButton name="inspector" label="Inspector" active={active} setActive={setActive} />
             </div>
-            <Button variant="ghost" onClick={toggleColorMode}>
-                <Icon name={state.colorMode ? 'blend' : 'blendempty'} />
-            </Button>
+            <div>
+                <Tooltip variant="right" label="Import Color Styles">
+                    <button className="button button-ghost" type="button" onClick={pullStyles}>
+                        <Icon name="import" />
+                    </button>
+                </Tooltip>
+                <Tooltip variant="right" label={state.colorMode ? 'Disable Color UI' : 'Enable Color UI'}>
+                    <button className="button button-ghost" type="button" onClick={toggleColorMode}>
+                        <Icon name={state.colorMode ? 'blend' : 'blendempty'} />
+                    </button>
+                </Tooltip>
+            </div>
         </div>
     );
 };

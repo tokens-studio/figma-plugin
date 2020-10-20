@@ -76,6 +76,23 @@ export default class TokenData {
         }
     }
 
+    convertDotPathToNestedObject(path, value) {
+        const [last, ...paths] = path.split('/').reverse();
+        return paths.reduce((acc, el) => ({[el]: acc}), {[last]: value});
+    }
+
+    injectTokens(tokens): void {
+        const receivedStyles = {};
+        Object.entries(tokens).map(([parent, values]: [string, SingleToken[]]) => {
+            values.map((token: TokenGroup) => {
+                mergeDeep(receivedStyles, {[parent]: this.convertDotPathToNestedObject(token[0], token[1])});
+            });
+        });
+        const newTokens = mergeDeep(JSON5.parse(this.tokens.options.values), receivedStyles);
+        this.tokens.options.values = JSON5.stringify(newTokens, null, 2);
+        this.setMergedTokens();
+    }
+
     setMergedTokens(): void {
         this.mergedTokens = mergeDeep(
             {},

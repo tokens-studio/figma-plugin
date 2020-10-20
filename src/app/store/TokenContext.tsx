@@ -45,12 +45,32 @@ const emptyState = {
     colorMode: false,
 };
 
+function updateTokens(state: any) {
+    parent.postMessage(
+        {
+            pluginMessage: {
+                type: 'update',
+                tokenValues: state.tokenData.reduceToValues(),
+                tokens: state.tokenData.getMergedTokens(),
+            },
+        },
+        '*'
+    );
+}
+
 function stateReducer(state, action) {
     switch (action.type) {
         case 'SET_TOKEN_DATA':
             return {
                 ...state,
                 tokenData: action.data,
+            };
+        case 'SET_TOKENS_FROM_STYLES':
+            state.tokenData.injectTokens(action.data);
+            updateTokens(state);
+            return {
+                ...state,
+                tokens: state.tokenData.tokens,
             };
         case 'SET_DEFAULT_TOKENS':
             state.tokenData.setTokens(defaultTokens);
@@ -75,16 +95,7 @@ function stateReducer(state, action) {
                 },
             };
         case 'UPDATE_TOKENS':
-            parent.postMessage(
-                {
-                    pluginMessage: {
-                        type: 'update',
-                        tokenValues: state.tokenData.reduceToValues(),
-                        tokens: state.tokenData.getMergedTokens(),
-                    },
-                },
-                '*'
-            );
+            updateTokens(state);
             return state;
         case 'CREATE_STYLES':
             parent.postMessage(
@@ -117,6 +128,20 @@ function stateReducer(state, action) {
                 {
                     pluginMessage: {
                         type: 'remove-node-data',
+                    },
+                },
+                '*'
+            );
+            return state;
+        case 'PULL_STYLES':
+            parent.postMessage(
+                {
+                    pluginMessage: {
+                        type: 'pull-styles',
+                        styleTypes: {
+                            textStyles: true,
+                            colorStyles: true,
+                        },
                     },
                 },
                 '*'
@@ -170,6 +195,9 @@ function TokenProvider({children}) {
             setTokens: (tokens) => {
                 dispatch({type: 'SET_TOKENS', tokens});
             },
+            setTokensFromStyles: (data) => {
+                dispatch({type: 'SET_TOKENS_FROM_STYLES', data});
+            },
             setTokenData: (data: TokenData) => {
                 dispatch({type: 'SET_TOKEN_DATA', data});
             },
@@ -218,6 +246,9 @@ function TokenProvider({children}) {
             },
             toggleColorMode: () => {
                 dispatch({type: 'TOGGLE_COLOR_MODE'});
+            },
+            pullStyles: () => {
+                dispatch({type: 'PULL_STYLES'});
             },
         }),
         [state]
