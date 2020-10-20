@@ -1,6 +1,8 @@
 /* eslint-disable no-param-reassign */
+import {figmaRGBToHex} from '@figma-plugin/helpers';
 import Dot from 'dot-object';
 import {convertLineHeightToFigma, convertToFigmaColor} from './helpers';
+import {notifyStyleValues} from './notifiers';
 
 const dot = new Dot('/');
 
@@ -91,4 +93,25 @@ export function updateStyles(tokens, shouldCreate = false): void {
     if (tokens.typography) {
         updateTextStyles(tokens.typography, shouldCreate);
     }
+}
+
+export function pullStyles(styleTypes): void {
+    let colors;
+    let typography;
+    if (styleTypes.colorStyles) {
+        colors = figma
+            .getLocalPaintStyles()
+            .filter((style) => style.paints.length === 1 && style.paints[0].type === 'SOLID')
+            .map((style) => {
+                const paint = style.paints[0];
+                const {r, g, b} = paint.color;
+                const a = paint.opacity;
+                return [style.name, figmaRGBToHex({r, g, b, a})];
+            });
+    }
+    if (styleTypes.textStyles) {
+        typography = figma.getLocalTextStyles();
+        console.log({typography});
+    }
+    notifyStyleValues({colors});
 }

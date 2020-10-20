@@ -62,6 +62,14 @@ export function notifyTokenValues(values = undefined) {
     });
 }
 
+export function notifyStyleValues(values = undefined) {
+    console.log('sending styles vals', values);
+    figma.ui.postMessage({
+        type: 'styles',
+        values,
+    });
+}
+
 export function updatePluginData(nodes, values) {
     nodes.map((item) => {
         const currentVals = fetchPluginData(item);

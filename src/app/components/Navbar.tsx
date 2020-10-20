@@ -17,7 +17,7 @@ const TabButton = ({name, label, active, setActive, first = false}) => (
 );
 
 const Navbar = ({active, setActive}) => {
-    const {state, toggleColorMode} = useTokenState();
+    const {state, toggleColorMode, pullStyles} = useTokenState();
     return (
         <div className="sticky top-0 navbar bg-white flex items-center justify-between z-1 border-b border-gray-200">
             <div>
@@ -25,6 +25,9 @@ const Navbar = ({active, setActive}) => {
                 <TabButton name="json" label="JSON" active={active} setActive={setActive} />
                 <TabButton name="inspector" label="Inspector" active={active} setActive={setActive} />
             </div>
+            <Button variant="ghost" onClick={pullStyles}>
+                <Icon name={state.colorMode ? 'blend' : 'blendempty'} />
+            </Button>
             <Button variant="ghost" onClick={toggleColorMode}>
                 <Icon name={state.colorMode ? 'blend' : 'blendempty'} />
             </Button>
