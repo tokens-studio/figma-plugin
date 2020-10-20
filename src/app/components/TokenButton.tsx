@@ -3,51 +3,7 @@ import Tooltip from './Tooltip';
 import MoreButton from './MoreButton';
 import {useTokenState} from '../store/TokenContext';
 import Icon from './Icon';
-
-function lightOrDark(color) {
-    // Variables for red, green, blue values
-    let r;
-    let g;
-    let b;
-    let hsp;
-
-    // Check the format of the color, HEX or RGB?
-    if (color.match(/^rgb/)) {
-        // If RGB --> store the red, green, blue values in separate variables
-        color = color.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d+(?:\.\d+)?))?\)$/);
-
-        r = color[1];
-        g = color[2];
-        b = color[3];
-    } else {
-        // If hex --> Convert it to RGB: http://gist.github.com/983661
-        color = +`0x${color.slice(1).replace(color.length < 5 && /./g, '$&$&')}`;
-
-        r = color >> 16;
-        g = (color >> 8) & 255;
-        b = color & 255;
-    }
-
-    // HSP (Highly Sensitive Poo) equation from http://alienryderflex.com/hsp.html
-    hsp = Math.sqrt(0.299 * (r * r) + 0.587 * (g * g) + 0.114 * (b * b));
-
-    // Using the HSP value, determine whether the color is light or dark
-    if (hsp > 245.5) {
-        return 'light';
-    }
-
-    return 'dark';
-}
-
-function colorByHashCode(value) {
-    let hash = 0;
-    if (value.length === 0) return hash;
-    for (let i = 0; i < value.length; i += 1) {
-        hash = value.charCodeAt(i) * 30 + hash;
-    }
-    const shortened = Math.abs(hash % 360);
-    return `${shortened},100%,85%`;
-}
+import {lightOrDark, colorByHashCode} from './utils';
 
 const TokenButton = ({type, name, path, token, disabled, editMode, showForm}) => {
     const {state, setSelectionValues, setNodeData, setShowOptions} = useTokenState();
@@ -81,7 +37,7 @@ const TokenButton = ({type, name, path, token, disabled, editMode, showForm}) =>
         buttonClass.push('button-active');
     }
     const onClick = (givenProperties, isActive = active) => {
-        const propsToSet = givenProperties;
+        const propsToSet = Array.isArray(givenProperties) ? givenProperties : new Array(givenProperties);
         if (editMode) {
             showForm({name, token, path});
         } else {
@@ -91,7 +47,7 @@ const TokenButton = ({type, name, path, token, disabled, editMode, showForm}) =>
                 value = 'delete';
                 propsToSet[0].forcedValue = tokenValue;
             }
-            const newProps = givenProperties
+            const newProps = propsToSet
                 .map((i) => [[i.name || i], i.forcedValue || value])
                 .reduce((acc, [key, val]) => ({...acc, [key]: val}), {});
             setPluginValue(newProps);
@@ -188,7 +144,7 @@ const TokenButton = ({type, name, path, token, disabled, editMode, showForm}) =>
                         className="w-full h-full"
                         disabled={editMode ? false : disabled}
                         type="button"
-                        onClick={() => onClick(properties)}
+                        onClick={() => onClick(properties[0])}
                     >
                         <div className="button-text">{showValue && <span>{name}</span>}</div>
                         {editMode && <div className="button-edit-overlay">Edit</div>}
