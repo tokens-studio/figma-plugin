@@ -84,8 +84,8 @@ export default class TokenData {
     injectTokens(tokens): void {
         const receivedStyles = {};
         Object.entries(tokens).map(([parent, values]: [string, SingleToken[]]) => {
-            values.map(([key, value]) => {
-                mergeDeep(receivedStyles, {[parent]: this.convertDotPathToNestedObject(key, value)});
+            values.map((token: TokenGroup) => {
+                mergeDeep(receivedStyles, {[parent]: this.convertDotPathToNestedObject(token[0], token[1])});
             });
         });
         const newTokens = mergeDeep(JSON5.parse(this.tokens.options.values), receivedStyles);

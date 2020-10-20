@@ -97,21 +97,24 @@ export function updateStyles(tokens, shouldCreate = false): void {
 
 export function pullStyles(styleTypes): void {
     let colors;
-    let typography;
+    // let typography;
     if (styleTypes.colorStyles) {
         colors = figma
             .getLocalPaintStyles()
             .filter((style) => style.paints.length === 1 && style.paints[0].type === 'SOLID')
             .map((style) => {
                 const paint = style.paints[0];
-                const {r, g, b} = paint.color;
-                const a = paint.opacity;
-                return [style.name, figmaRGBToHex({r, g, b, a})];
+                if (paint.type === 'SOLID') {
+                    const {r, g, b} = paint.color;
+                    const a = paint.opacity;
+                    return [style.name, figmaRGBToHex({r, g, b, a})];
+                }
+                return null;
             });
     }
-    if (styleTypes.textStyles) {
-        typography = figma.getLocalTextStyles();
-        console.log({typography});
-    }
+    // Not used yet, but this is where we fetch text styles and should bring those into values that can be used by our tokens
+    // if (styleTypes.textStyles) {
+    //     typography = figma.getLocalTextStyles();
+    // }
     notifyStyleValues({colors});
 }
