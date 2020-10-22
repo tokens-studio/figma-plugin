@@ -81,7 +81,7 @@ export function defaultJSON() {
             },
             'H2/Bold': {
                 fontFamily: '$fontFamilies.heading',
-                fontWeight: '$fontWeights.hedingBold',
+                fontWeight: '$fontWeights.headingBold',
                 lineHeight: '$lineHeights.heading',
                 fontSize: '$fontSizes.h2',
             },

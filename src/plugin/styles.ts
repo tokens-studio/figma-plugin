@@ -1,6 +1,7 @@
 /* eslint-disable no-param-reassign */
 import {figmaRGBToHex} from '@figma-plugin/helpers';
 import Dot from 'dot-object';
+import {hashCode} from '../app/components/utils';
 import {convertLineHeightToFigma, convertToFigmaColor} from './helpers';
 import {notifyStyleValues} from './notifiers';
 
@@ -97,7 +98,7 @@ export function updateStyles(tokens, shouldCreate = false): void {
 
 export function pullStyles(styleTypes): void {
     let colors;
-    // let typography;
+    let typography;
     if (styleTypes.colorStyles) {
         colors = figma
             .getLocalPaintStyles()
@@ -113,8 +114,33 @@ export function pullStyles(styleTypes): void {
             });
     }
     // Not used yet, but this is where we fetch text styles and should bring those into values that can be used by our tokens
-    // if (styleTypes.textStyles) {
-    //     typography = figma.getLocalTextStyles();
-    // }
-    notifyStyleValues({colors});
+    if (styleTypes.textStyles) {
+        const fontSizes = [];
+        const fontCombinations = [];
+        const lineHeights = [];
+
+        typography = figma.getLocalTextStyles();
+        typography.map((style) => {
+            if (!fontSizes.includes(style.fontSize)) fontSizes.push(style.fontSize);
+            fontCombinations.push(style.fontName);
+            lineHeights.push(style.lineHeight);
+        });
+
+        fontSizes.sort((a, b) => a - b);
+        const uniqueFontCombinations = fontCombinations.filter(
+            (v, i, a) => a.findIndex((t) => t.family === v.family && t.style === v.style) === i
+        );
+
+        const fontFamilies = [...new Set(uniqueFontCombinations.map((font) => font.family))].map((font, idx) => [
+            `font-${hashCode(font)}`,
+            font,
+        ]);
+        const fontWeights = uniqueFontCombinations.map((font, idx) => [
+            `font-${hashCode(font.family)}-${idx}`,
+            font.style,
+        ]);
+
+        console.log({typography, lineHeights, fontSizes, uniqueFontCombinations, fontFamilies, fontWeights});
+    }
+    notifyStyleValues({colors: []});
 }
