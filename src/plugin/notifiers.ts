@@ -80,12 +80,11 @@ export function updatePluginData(nodes, values) {
         });
         try {
             if (Object.keys(newVals).length === 0 && newVals.constructor === Object) {
-                item.setRelaunchData({});
-            } else {
+                if (item.type !== 'INSTANCE') item.setRelaunchData({});
+            } else if (item.type !== 'INSTANCE')
                 item.setRelaunchData({
                     edit: Object.keys(newVals).join(', '),
                 });
-            }
         } catch (e) {
             console.error({e});
         }

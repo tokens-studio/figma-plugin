@@ -26,6 +26,9 @@ export function isTypographyToken(token) {
 
 // Light or dark check for Token Buttons: If color is very bright e.g. white we show a different style
 export function lightOrDark(color) {
+    if (typeof color !== 'string') {
+        return;
+    }
     // Variables for red, green, blue values
     let r;
     let g;
