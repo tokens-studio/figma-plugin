@@ -141,18 +141,27 @@ const setValuesOnNode = async (node, values, data) => {
                 setTextValuesOnTarget(node, values.typography);
             }
         }
-    } else if (values.fontFamilies || values.fontWeights || values.lineHeights || values.fontSizes) {
+    } else if (
+        values.fontFamilies ||
+        values.fontWeights ||
+        values.lineHeights ||
+        values.fontSizes ||
+        values.letterSpacing ||
+        values.paragraphSpacing
+    ) {
         if (node.type === 'TEXT') {
             setTextValuesOnTarget(node, {
                 fontFamily: values.fontFamilies,
                 fontWeight: values.fontWeights,
                 lineHeight: values.lineHeights,
                 fontSize: values.fontSizes,
+                letterSpacing: values.letterSpacing,
+                paragraphSpacing: values.paragraphSpacing,
             });
         }
     }
 
-    // BORDER WIDTH
+    // BORDER COLOR
     if (values.border) {
         if (typeof node.strokes !== 'undefined') {
             const paints = figma.getLocalPaintStyles();

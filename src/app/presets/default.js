@@ -51,6 +51,14 @@ export function defaultJSON() {
             heading: '110%',
             body: '140%',
         },
+        letterSpacing: {
+            default: 0,
+            increased: '150%',
+        },
+        paragraphSpacing: {
+            h1: 32,
+            h2: 26,
+        },
         fontWeights: {
             headingRegular: 'Regular',
             headingBold: 'Bold',
