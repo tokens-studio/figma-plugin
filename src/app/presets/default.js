@@ -19,6 +19,13 @@ export function defaultJSON() {
             lg: 8,
             xl: 16,
         },
+        borderWidth: {
+            none: 0,
+            xs: 1,
+            sm: 2,
+            md: 4,
+            lg: 8,
+        },
         colors: {
             indigo: '#5c6ac4',
             blue: '#007ace',

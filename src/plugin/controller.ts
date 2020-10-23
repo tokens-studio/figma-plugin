@@ -44,16 +44,6 @@ const mapValuesToTokens = (object, values) => {
     return Object.assign({}, ...array);
 };
 
-// Not needed for now
-// const removeTokensFromNode = (node, tokens) => {
-//     const data = fetchPluginData(node);
-//     tokens.map((token) => {
-//         data[token] = {};
-//     });
-
-//     updatePluginData([node], data);
-// };
-
 const setValuesOnNode = async (node, values, data) => {
     // BORDER RADIUS
     if (values.borderRadius) {
@@ -79,6 +69,14 @@ const setValuesOnNode = async (node, values, data) => {
     if (values.borderRadiusBottomLeft) {
         if (typeof node.bottomLeftRadius !== 'undefined') {
             node.bottomLeftRadius = Number(values.borderRadiusBottomLeft);
+        }
+    }
+
+    // BORDER WIDTH
+    if (values.borderWidth) {
+        // Has to be larger than 0
+        if (typeof node.strokeWeight !== 'undefined' && Number(values.borderWidth) >= 0) {
+            node.strokeWeight = Number(values.borderWidth);
         }
     }
 
