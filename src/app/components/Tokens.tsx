@@ -16,6 +16,7 @@ const mappedTokens = (tokens) => {
         spacing: {},
         colors: {},
         borderRadius: {},
+        borderWidth: {},
         opacity: {},
         fontFamilies: {},
         fontWeights: {},
@@ -270,6 +271,17 @@ const Tokens = ({disabled}) => {
                                 label="Border Radius"
                                 property="Border Radius"
                                 type="borderRadius"
+                                values={tokenValues}
+                            />
+                        );
+                    case 'borderWidth':
+                        return (
+                            <TokenListing
+                                key={tokenValues[0]}
+                                label="Border Width"
+                                explainer="Enter as a number, e.g. 4"
+                                property="Border Width"
+                                type="borderWidth"
                                 values={tokenValues}
                             />
                         );
