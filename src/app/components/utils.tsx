@@ -1,5 +1,20 @@
+import {Parser} from 'expr-eval';
+
+import {hexToRgb} from '../../plugin/helpers';
+
+const parser = new Parser();
+
 export function isObject(item) {
     return item && typeof item === 'object' && !Array.isArray(item);
+}
+
+export function checkAndEvaluateMath(expr) {
+    try {
+        parser.evaluate(expr);
+        return parser.evaluate(expr);
+    } catch (ex) {
+        return expr;
+    }
 }
 
 export function mergeDeep(target, ...sources) {
@@ -24,39 +39,59 @@ export function isTypographyToken(token) {
     return 'fontFamily' in token || 'fontWeight' in token || 'fontSize' in token || 'lineHeight' in token;
 }
 
-// Light or dark check for Token Buttons: If color is very bright e.g. white we show a different style
-export function lightOrDark(color) {
+export function convertToRgb(color: string) {
     if (typeof color !== 'string') {
-        return;
+        return color;
     }
-    // Variables for red, green, blue values
-    let r;
-    let g;
-    let b;
-    let hsp;
-
-    // Check the format of the color, HEX or RGB?
+    const hexRegex = /#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})/g;
     if (color.match(/^rgb/)) {
-        // If RGB --> store the red, green, blue values in separate variables
-        [, r, g, b] = color.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d+(?:\.\d+)?))?\)$/);
-    } else {
-        // If hex --> Convert it to RGB: http://gist.github.com/983661
-        color = +`0x${color.slice(1).replace(color.length < 5 && /./g, '$&$&')}`;
+        // If rgb contains hex value, extract rgb values from there
+        if (color.match(hexRegex)) {
+            const {r, g, b} = hexToRgb(color.match(hexRegex)[0]);
 
-        r = color >> 16;
-        g = (color >> 8) & 255;
-        b = color & 255;
+            return color.replace(hexRegex, [r, g, b].join(', '));
+        }
+        return color;
     }
+    return color;
+}
 
-    // HSP (Highly Sensitive Poo) equation from http://alienryderflex.com/hsp.html
-    hsp = Math.sqrt(0.299 * (r * r) + 0.587 * (g * g) + 0.114 * (b * b));
-
-    // Using the HSP value, determine whether the color is light or dark
-    if (hsp > 245.5) {
+// Light or dark check for Token Buttons: If color is very bright e.g. white we show a different style
+export function lightOrDark(color: string) {
+    if (typeof color !== 'string') {
         return 'light';
     }
+    try {
+        let r: number | string;
+        let g: number | string;
+        let b: number | string;
+        let hsp: number | string;
 
-    return 'dark';
+        // Check the format of the color, HEX or RGB?
+        if (color.match(/^rgb/)) {
+            // If RGB --> store the red, green, blue values in separate variables
+            [, r, g, b] = color.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d+(?:\.\d+)?))?\)$/);
+        } else {
+            // If hex --> Convert it to RGB: http://gist.github.com/983661
+            const extractedColor = +`0x${color.slice(1).replace(color.length < 5 && /./g, '$&$&')}`;
+
+            r = extractedColor >> 16;
+            g = (extractedColor >> 8) & 255;
+            b = extractedColor & 255;
+        }
+        console.log({r, g, b});
+
+        // HSP (Highly Sensitive Poo) equation from http://alienryderflex.com/hsp.html
+        hsp = Math.sqrt(0.299 * (r * r) + 0.587 * (g * g) + 0.114 * (b * b));
+
+        // Using the HSP value, determine whether the color is light or dark
+        if (hsp < 245.5) {
+            return 'dark';
+        }
+    } catch (e) {
+        console.error(e);
+    }
+    return 'light';
 }
 
 // Sets random color depending on Hash for use in colorful UI

@@ -27,15 +27,6 @@ const emptyTokens: TokenProps = {
     },
 };
 
-const defaultState = {
-    tokens: defaultTokens,
-    loading: true,
-    tokenData: new TokenData(defaultTokens),
-    selectionValues: {},
-    displayType: 'GRID',
-    colorMode: false,
-};
-
 const emptyState = {
     tokens: defaultTokens,
     loading: true,
@@ -187,7 +178,7 @@ function stateReducer(state, action) {
 }
 
 function TokenProvider({children}) {
-    const [state, dispatch] = React.useReducer(stateReducer, defaultState);
+    const [state, dispatch] = React.useReducer(stateReducer, emptyState);
 
     const tokenContext = React.useMemo(
         () => ({

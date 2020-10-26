@@ -2,6 +2,7 @@
 import JSON5 from 'json5';
 import objectPath from 'object-path';
 import {mergeDeep} from '../../plugin/helpers';
+import {convertToRgb, checkAndEvaluateMath} from './utils';
 
 export interface TokenProps {
     values: {
@@ -94,6 +95,7 @@ export default class TokenData {
     }
 
     setMergedTokens(): void {
+        console.log('SETTING MERGED TOKENS', this.tokens);
         this.mergedTokens = mergeDeep(
             {},
             ...Object.entries(this.tokens).reduce((acc, cur) => {
@@ -142,7 +144,7 @@ export default class TokenData {
     }
 
     private checkIfAlias(token: SingleToken): boolean {
-        return typeof token === 'string' && token.startsWith('$');
+        return typeof token === 'string' && token.includes('$');
     }
 
     private findAllAliases({
@@ -152,6 +154,7 @@ export default class TokenData {
         key?: string;
         arr?: [string, SingleToken | TokenObject][];
     }) {
+        console.log('FINDING ALL ALIASES');
         return arr.reduce((prev, el) => {
             if (typeof el[1] === 'object') {
                 const newKey = key ? [key, el[0]].join('.') : el[0];
@@ -177,9 +180,15 @@ export default class TokenData {
 
     getAliasValue(token: SingleToken, tokens = this.mergedTokens): string | null {
         if (this.checkIfAlias(token) && typeof token === 'string') {
-            return objectPath.get(tokens, token.substring(1));
+            let returnedValue = token;
+            const tokenRegex = /(\$[^\s,]+)/g;
+            const tokenReferences = token.match(tokenRegex);
+            if (tokenReferences.length > 0) {
+                const resolvedReferences = tokenReferences.map((ref) => objectPath.get(tokens, ref.substring(1)));
+                returnedValue = token.replace(tokenReferences, resolvedReferences);
+            }
+            return convertToRgb(checkAndEvaluateMath(returnedValue));
         }
-        return null;
     }
 
     setResolvedAlias(tokens: TokenGroup, target: string, source: string): void {
