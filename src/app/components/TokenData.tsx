@@ -95,7 +95,6 @@ export default class TokenData {
     }
 
     setMergedTokens(): void {
-        console.log('SETTING MERGED TOKENS', this.tokens);
         this.mergedTokens = mergeDeep(
             {},
             ...Object.entries(this.tokens).reduce((acc, cur) => {
@@ -154,7 +153,6 @@ export default class TokenData {
         key?: string;
         arr?: [string, SingleToken | TokenObject][];
     }) {
-        console.log('FINDING ALL ALIASES');
         return arr.reduce((prev, el) => {
             if (typeof el[1] === 'object') {
                 const newKey = key ? [key, el[0]].join('.') : el[0];
@@ -185,7 +183,9 @@ export default class TokenData {
             const tokenReferences = token.match(tokenRegex);
             if (tokenReferences.length > 0) {
                 const resolvedReferences = tokenReferences.map((ref) => objectPath.get(tokens, ref.substring(1)));
-                returnedValue = token.replace(tokenReferences, resolvedReferences);
+                tokenReferences.forEach((reference, index) => {
+                    returnedValue = returnedValue.replace(reference, resolvedReferences[index]);
+                });
             }
             return convertToRgb(checkAndEvaluateMath(returnedValue));
         }

@@ -65,7 +65,6 @@ export function lightOrDark(color: string) {
         let r: number | string;
         let g: number | string;
         let b: number | string;
-        let hsp: number | string;
 
         // Check the format of the color, HEX or RGB?
         if (color.match(/^rgb/)) {
@@ -79,10 +78,10 @@ export function lightOrDark(color: string) {
             g = (extractedColor >> 8) & 255;
             b = extractedColor & 255;
         }
-        console.log({r, g, b});
-
         // HSP (Highly Sensitive Poo) equation from http://alienryderflex.com/hsp.html
-        hsp = Math.sqrt(0.299 * (r * r) + 0.587 * (g * g) + 0.114 * (b * b));
+        const hsp = Math.sqrt(
+            0.299 * (Number(r) * Number(r)) + 0.587 * (Number(g) * Number(g)) + 0.114 * (Number(b) * Number(b))
+        );
 
         // Using the HSP value, determine whether the color is light or dark
         if (hsp < 245.5) {
