@@ -1,7 +1,7 @@
 /* eslint-disable no-param-reassign */
 import {figmaRGBToHex} from '@figma-plugin/helpers';
 import Dot from 'dot-object';
-import {hashCode} from '../app/components/utils';
+import {slugify} from '../app/components/utils';
 import {
     convertFigmaToLetterSpacing,
     convertFigmaToLineHeight,
@@ -131,7 +131,6 @@ export function pullStyles(styleTypes): void {
                 return null;
             });
     }
-    // Not used yet, but this is where we fetch text styles and should bring those into values that can be used by our tokens
     if (styleTypes.textStyles) {
         const rawFontSizes = [];
         const fontCombinations = [];
@@ -157,12 +156,12 @@ export function pullStyles(styleTypes): void {
             .filter((v, i, a) => a.findIndex((t) => t.unit === v.unit && t.value === v.value) === i)
             .map((lh, idx) => [idx, convertFigmaToLineHeight(lh)]);
 
-        fontFamilies = [...new Set(uniqueFontCombinations.map((font) => font.family))].map((font) => [
-            `font-${hashCode(font)}`,
-            font,
+        fontFamilies = [...new Set(uniqueFontCombinations.map((font) => font.family))].map((fontFamily) => [
+            `font-${slugify(fontFamily)}`,
+            fontFamily,
         ]);
 
-        fontWeights = uniqueFontCombinations.map((font, idx) => [`font-${hashCode(font.family)}-${idx}`, font.style]);
+        fontWeights = uniqueFontCombinations.map((font, idx) => [`font-${slugify(font.family)}-${idx}`, font.style]);
 
         paragraphSpacing = rawParagraphSpacing.sort((a, b) => a - b).map((size, idx) => [idx, size]);
 
@@ -174,7 +173,7 @@ export function pullStyles(styleTypes): void {
             const obj = {
                 fontFamily: `$fontFamilies.${fontFamilies.find((el: string[]) => el[1] === style.fontName.family)[0]}`,
                 fontWeight: `$fontWeights.${
-                    fontWeights.find((el: string[]) => el[0].includes(hashCode(style.fontName.family)))[0]
+                    fontWeights.find((el: string[]) => el[0].includes(slugify(style.fontName.family)))[0]
                 }`,
                 lineHeight: `$lineHeights.${
                     lineHeights.find(
