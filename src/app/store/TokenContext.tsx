@@ -1,6 +1,6 @@
 import * as React from 'react';
 import JSON5 from 'json5';
-import {defaultJSON} from '../presets/default';
+import {defaultJSON} from '../../config/default';
 import TokenData, {TokenProps} from '../components/TokenData';
 import * as pjs from '../../../package.json';
 
@@ -104,10 +104,7 @@ function stateReducer(state, action) {
                 {
                     pluginMessage: {
                         type: 'set-node-data',
-                        values: {
-                            ...state.selectionValues,
-                            ...action.data,
-                        },
+                        values: action.data,
                         tokens: state.tokenData.getMergedTokens(),
                     },
                 },
@@ -142,14 +139,13 @@ function stateReducer(state, action) {
         case 'SET_SELECTION_VALUES':
             return {
                 ...state,
-                selectionValues: {
-                    ...state.selectionValues,
-                    ...action.data,
-                },
+                loading: false,
+                selectionValues: action.data,
             };
         case 'RESET_SELECTION_VALUES':
             return {
                 ...state,
+                loading: false,
                 selectionValues: {},
             };
         case 'SET_SHOW_EDIT_FORM':
@@ -213,11 +209,9 @@ function TokenProvider({children}) {
                 dispatch({type: 'SET_LOADING', state: boolean});
             },
             setNodeData: (data: SelectionValue) => {
-                dispatch({type: 'SET_LOADING', state: true});
                 dispatch({type: 'SET_NODE_DATA', data});
             },
             removeNodeData: (data: SelectionValue) => {
-                dispatch({type: 'SET_LOADING', state: true});
                 dispatch({type: 'REMOVE_NODE_DATA', data});
             },
             setSelectionValues: (data: SelectionValue) => {

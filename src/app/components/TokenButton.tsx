@@ -6,8 +6,8 @@ import Icon from './Icon';
 import {lightOrDark, colorByHashCode} from './utils';
 
 const TokenButton = ({type, name, path, token, disabled, editMode, showForm}) => {
-    const {state, setSelectionValues, setNodeData, setShowOptions} = useTokenState();
-    const realTokenValue = state.tokenData.getAliasValue(token);
+    const {state, setSelectionValues, setNodeData, setShowOptions, setLoading} = useTokenState();
+    const realTokenValue = token;
     const displayValue = realTokenValue || token;
     let style;
     let showValue = true;
@@ -22,12 +22,9 @@ const TokenButton = ({type, name, path, token, disabled, editMode, showForm}) =>
     };
 
     function setPluginValue(value) {
+        setLoading(true);
         setSelectionValues(value);
-        const newPluginValue = {
-            ...state.selectionValue,
-            ...value,
-        };
-        setNodeData(newPluginValue);
+        setNodeData(value);
     }
 
     if (editMode) {

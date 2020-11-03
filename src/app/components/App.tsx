@@ -73,6 +73,7 @@ const App = () => {
                 }
             }
         };
+        console.log('end of onemssage');
     }, []);
 
     return (
