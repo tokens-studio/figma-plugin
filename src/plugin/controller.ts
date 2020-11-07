@@ -184,6 +184,7 @@ const updateNodes = (nodes, tokens) => {
             return data;
         }
     });
+
     return returnedValues[0];
 };
 
@@ -219,18 +220,17 @@ figma.on('selectionchange', () => {
 });
 
 const findAllWithData = () => {
-    console.log('finding all');
-    return figma.root.findAll((node) => {
+    const nodes = figma.root.findAll((node): any => {
         const pluginValues = fetchAllPluginData(node);
         if (pluginValues) return node;
     });
+    return nodes;
 };
 
 figma.ui.onmessage = async (msg) => {
     switch (msg.type) {
         case 'initiate':
             notifyTokenValues(getTokenData());
-            updatePluginData(findAllWithData(), getTokenData());
 
             if (!figma.currentPage.selection.length) {
                 notifyNoSelection();
@@ -267,7 +267,9 @@ figma.ui.onmessage = async (msg) => {
         case 'update':
             setTokenData(msg.tokenValues);
             updateStyles(msg.tokens, false);
-            updateNodes(findAllWithData(), msg.tokens);
+            const nodesWithData = findAllWithData();
+            updateNodes(nodesWithData, msg.tokens);
+            updatePluginData(nodesWithData, {});
             notifyRemoteComponents({nodes: store.successfulNodes.length, remotes: store.remoteComponents});
             return;
         case 'gotonode':

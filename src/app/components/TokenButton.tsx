@@ -1,12 +1,13 @@
 import * as React from 'react';
 import Tooltip from './Tooltip';
 import MoreButton from './MoreButton';
-import {useTokenState} from '../store/TokenContext';
+import {useTokenState, useTokenDispatch} from '../store/TokenContext';
 import Icon from './Icon';
 import {lightOrDark, colorByHashCode} from './utils';
 
 const TokenButton = ({type, name, path, token, disabled, editMode, showForm}) => {
-    const {state, setSelectionValues, setNodeData, setShowOptions, setLoading} = useTokenState();
+    const {colorMode, displayType, selectionValues} = useTokenState();
+    const {setSelectionValues, setNodeData, setShowOptions, setLoading} = useTokenDispatch();
     const realTokenValue = token;
     const displayValue = realTokenValue || token;
     let style;
@@ -14,7 +15,7 @@ const TokenButton = ({type, name, path, token, disabled, editMode, showForm}) =>
     let showEditButton = false;
     let properties = [type];
     const buttonClass = [];
-    const active = state.selectionValues[type] === [path, name].join('.');
+    const active = selectionValues[type] === [path, name].join('.');
 
     const handleEditClick = () => {
         setShowOptions(path);
@@ -50,7 +51,7 @@ const TokenButton = ({type, name, path, token, disabled, editMode, showForm}) =>
             setPluginValue(newProps);
         }
     };
-    if (state.colorMode) {
+    if (colorMode) {
         style = {
             '--bgColor': colorByHashCode(name.toString()),
             backgroundColor: 'hsl(var(--bgColor))',
@@ -112,7 +113,7 @@ const TokenButton = ({type, name, path, token, disabled, editMode, showForm}) =>
                 '--borderColor': lightOrDark(displayValue) === 'light' ? '#f5f5f5' : 'white',
             };
             buttonClass.push('button-property-color');
-            if (state.displayType === 'LIST') {
+            if (displayType === 'LIST') {
                 buttonClass.push('button-property-color-listing');
                 showValue = true;
                 if (!editMode) showEditButton = true;

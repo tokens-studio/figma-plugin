@@ -33,16 +33,17 @@ export function notifyRemoteComponents({nodes, remotes}) {
             remotes,
         },
     });
+
     store.successfulNodes = [];
     store.remoteComponents = [];
 }
 
 export function fetchOldPluginData(node) {
-    // const previousValues = node.getPluginData('values');
-    // if (!previousValues) {
-    //     return;
-    // }
-    // return JSON.parse(previousValues);
+    const previousValues = node.getPluginData('values');
+    if (!previousValues) {
+        return;
+    }
+    return JSON.parse(previousValues);
 }
 
 export function fetchPluginData(node, value: string) {
@@ -55,7 +56,10 @@ export function fetchAllPluginData(node) {
         if (data) prev.push([prop, JSON.parse(data)]);
         return prev;
     }, []);
-    if (pluginData.length > 0) {
+
+    if (pluginData.length == 1 && pluginData[0][0] === 'values') {
+        return pluginData[0][1];
+    } else if (pluginData.length > 0) {
         return Object.fromEntries(pluginData);
     }
     return null;
@@ -70,7 +74,6 @@ export function sendPluginValues(nodes, values?) {
         if (!pluginValues) {
             pluginValues = fetchAllPluginData(nodes[0]);
         }
-        console.log('vals', pluginValues);
         notifySelection(nodes[0].id, pluginValues);
     }
 }
@@ -105,22 +108,23 @@ export function removePluginData(nodes, key?) {
 }
 
 export function updatePluginData(nodes, values) {
-    const curVals = values;
     nodes.map((node) => {
-        Object.entries(curVals).forEach(([key, value]) => {
+        const curVals = fetchAllPluginData(node);
+        const newVals = Object.assign(curVals || {}, values);
+        Object.entries(newVals).forEach(([key, value]) => {
             if (value === 'delete') {
-                delete curVals[key];
+                delete newVals[key];
                 removePluginData([node], key);
             } else {
                 node.setPluginData(key, JSON.stringify(value));
             }
         });
         try {
-            if (Object.keys(curVals).length === 0 && curVals.constructor === Object) {
+            if (Object.keys(newVals).length === 0 && newVals.constructor === Object) {
                 if (node.type !== 'INSTANCE') node.setRelaunchData({});
             } else if (node.type !== 'INSTANCE')
                 node.setRelaunchData({
-                    edit: Object.keys(curVals).join(', '),
+                    edit: Object.keys(newVals).join(', '),
                 });
         } catch (e) {
             console.error({e});

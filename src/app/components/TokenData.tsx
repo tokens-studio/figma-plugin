@@ -177,7 +177,6 @@ export default class TokenData {
     }
 
     getAliasValue(token: SingleToken, tokens = this.mergedTokens): string | null {
-        console.log('getting alias val');
         if (this.checkIfAlias(token) && typeof token === 'string') {
             let returnedValue = token;
             const tokenRegex = /(\$[^\s,]+)/g;
