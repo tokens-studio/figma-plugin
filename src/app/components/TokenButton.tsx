@@ -6,9 +6,9 @@ import Icon from './Icon';
 import {lightOrDark, colorByHashCode} from './utils';
 
 const TokenButton = ({type, name, path, token, disabled, editMode, showForm}) => {
-    const {colorMode, displayType, selectionValues} = useTokenState();
+    const {colorMode, displayType, selectionValues, tokenData} = useTokenState();
     const {setSelectionValues, setNodeData, setShowOptions, setLoading} = useTokenDispatch();
-    const realTokenValue = tokenData.getAliasValue(token);	
+    const realTokenValue = tokenData.getAliasValue(token);
     const displayValue = realTokenValue || token;
     let style;
     let showValue = true;
