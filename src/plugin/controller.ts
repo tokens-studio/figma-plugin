@@ -245,7 +245,7 @@ figma.ui.onmessage = async (msg) => {
             } catch (e) {
                 console.error(e);
             }
-            // notifyRemoteComponents({nodes: store.successfulNodes.length, remotes: store.remoteComponents});
+            notifyRemoteComponents({nodes: store.successfulNodes.length, remotes: store.remoteComponents});
             return;
 
         case 'remove-node-data':
