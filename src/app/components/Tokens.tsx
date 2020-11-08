@@ -157,18 +157,18 @@ const Tokens = ({disabled}) => {
         values?: string | object;
     }) => {
         const [showHelp, setShowHelp] = React.useState(false);
-        const [isCollapsed, toggleGroup] = React.useState(false);
+        const [isCollapsed, toggleCollapse] = React.useState(false);
 
         React.useEffect(() => {
-            toggleGroup(collapsed);
+            toggleCollapse(collapsed);
         }, [collapsed]);
 
         const handleToggleCollapse = (e) => {
             e.stopPropagation();
             if (e.altKey) {
-                setCollapsed(!collapsed);
+                setCollapsed(!isCollapsed);
             } else {
-                toggleGroup(!isCollapsed);
+                toggleCollapse(!isCollapsed);
             }
         };
 
@@ -176,22 +176,26 @@ const Tokens = ({disabled}) => {
             <div className="border-b border-gray-200">
                 <div className="flex justify-between space-x-8 items-center relative">
                     <button
-                        className="flex items-center space-x-2 w-full h-full p-4"
+                        className="flex items-center w-full h-full p-4 space-x-2"
                         type="button"
                         onClick={handleToggleCollapse}
                     >
-                        {isCollapsed ? (
-                            <svg width="6" height="6" viewBox="0 0 6 6" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M5 3L1 0v6l4-3z" fill="currentColor"></path>
-                            </svg>
-                        ) : (
-                            <svg width="6" height="6" viewBox="0 0 6 6" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M3 5l3-4H0l3 4z" fill="currentColor"></path>
-                            </svg>
-                        )}
+                        <Tooltip label="Alt + Click to collapse all">
+                            <div className="p-2 -m-2">
+                                {isCollapsed ? (
+                                    <svg width="6" height="6" viewBox="0 0 6 6" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M5 3L1 0v6l4-3z" fill="currentColor"></path>
+                                    </svg>
+                                ) : (
+                                    <svg width="6" height="6" viewBox="0 0 6 6" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M3 5l3-4H0l3 4z" fill="currentColor"></path>
+                                    </svg>
+                                )}
+                            </div>
+                        </Tooltip>
                         <Heading size="small">{label}</Heading>
                     </button>
-                    <div className="absolute right-0 p-4">
+                    <div className="absolute right-0 mr-2">
                         {help && (
                             <Tooltip label={showHelp ? 'Hide help' : 'Show help'}>
                                 <button
