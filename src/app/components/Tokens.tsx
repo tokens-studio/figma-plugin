@@ -28,9 +28,10 @@ const mappedTokens = (tokens) => {
 };
 
 const Tokens = ({disabled}) => {
-    const {showEditForm, showOptions, tokenData, displayType} = useTokenState();
+    const {collapsed, showEditForm, showOptions, tokenData, displayType} = useTokenState();
     const {
         setStringTokens,
+        setCollapsed,
         createStyles,
         updateTokens,
         setLoading,
@@ -156,20 +157,56 @@ const Tokens = ({disabled}) => {
         values?: string | object;
     }) => {
         const [showHelp, setShowHelp] = React.useState(false);
+        const [isCollapsed, toggleCollapse] = React.useState(false);
+
+        React.useEffect(() => {
+            toggleCollapse(collapsed);
+        }, [collapsed]);
+
+        const handleToggleCollapse = (e) => {
+            e.stopPropagation();
+            if (e.altKey) {
+                setCollapsed(!isCollapsed);
+            } else {
+                toggleCollapse(!isCollapsed);
+            }
+        };
+
         return (
-            <div className="p-4 border-b border-gray-200">
-                <div className="flex justify-between space-x-4 items-center mb-2">
-                    <Heading size="small">
-                        {label}
+            <div className="border-b border-gray-200">
+                <div className="flex justify-between space-x-8 items-center relative">
+                    <button
+                        className="flex items-center w-full h-full p-4 space-x-2"
+                        type="button"
+                        onClick={handleToggleCollapse}
+                    >
+                        <Tooltip label="Alt + Click to collapse all">
+                            <div className="p-2 -m-2">
+                                {isCollapsed ? (
+                                    <svg width="6" height="6" viewBox="0 0 6 6" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M5 3L1 0v6l4-3z" fill="currentColor"></path>
+                                    </svg>
+                                ) : (
+                                    <svg width="6" height="6" viewBox="0 0 6 6" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M3 5l3-4H0l3 4z" fill="currentColor"></path>
+                                    </svg>
+                                )}
+                            </div>
+                        </Tooltip>
+                        <Heading size="small">{label}</Heading>
+                    </button>
+                    <div className="absolute right-0 mr-2">
                         {help && (
                             <Tooltip label={showHelp ? 'Hide help' : 'Show help'}>
-                                <button className="ml-1" type="button" onClick={() => setShowHelp(!showHelp)}>
+                                <button
+                                    className="button button-ghost"
+                                    type="button"
+                                    onClick={() => setShowHelp(!showHelp)}
+                                >
                                     <Icon name="help" />
                                 </button>
                             </Tooltip>
                         )}
-                    </Heading>
-                    <div>
                         {showDisplayToggle && (
                             <Tooltip label={displayType === 'GRID' ? 'Show as List' : 'Show as Grid'}>
                                 <button
@@ -277,14 +314,18 @@ const Tokens = ({disabled}) => {
                         </Modal>
                     )}
                 </div>
-                {showHelp && <div className="mb-4 text-xxs text-gray-600">{help}</div>}
-                {renderKeyValue({
-                    tokenValues: Object.entries(values[1]),
-                    property: values[0],
-                    schema,
-                    path: values[0],
-                    type,
-                })}
+                {showHelp && <div className="px-4 pb-4 text-xxs text-gray-600">{help}</div>}
+                {!isCollapsed && (
+                    <div className="px-4 pb-4">
+                        {renderKeyValue({
+                            tokenValues: Object.entries(values[1]),
+                            property: values[0],
+                            schema,
+                            path: values[0],
+                            type,
+                        })}
+                    </div>
+                )}
             </div>
         );
     };

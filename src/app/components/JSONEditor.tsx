@@ -5,7 +5,7 @@ import Button from './Button';
 
 const JSONEditor = () => {
     const {tokenData} = useTokenState();
-    const {setStringTokens, setDefaultTokens, updateTokens, setLoading} = useTokenDispatch();
+    const {setStringTokens, setEmptyTokens, setDefaultTokens, updateTokens, setLoading} = useTokenDispatch();
     const [activeToken] = React.useState('options');
 
     const handleUpdate = async () => {
@@ -22,9 +22,14 @@ const JSONEditor = () => {
                 value={tokenData.tokens[activeToken].values}
             />
             <div className="space-x-2 flex justify-between">
-                <Button variant="secondary" size="large" onClick={setDefaultTokens}>
-                    Reset to Default
-                </Button>
+                <div className="space-x-2 flex">
+                    <Button variant="secondary" size="large" onClick={setDefaultTokens}>
+                        Reset to Default
+                    </Button>
+                    <Button variant="secondary" size="large" onClick={setEmptyTokens}>
+                        Clear
+                    </Button>
+                </div>
                 <Button variant="primary" size="large" onClick={handleUpdate}>
                     Save & update
                 </Button>

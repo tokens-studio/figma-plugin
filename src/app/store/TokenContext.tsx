@@ -29,6 +29,7 @@ export enum ActionType {
     SetShowOptions = 'SET_SHOW_OPTIONS',
     SetDisplayType = 'SET_DISPLAY_TYPE',
     ToggleColorMode = 'TOGGLE_COLOR_MODE',
+    SetCollapsed = 'SET_COLLAPSED',
 }
 
 const defaultTokens: TokenProps = {
@@ -48,6 +49,7 @@ const emptyTokens: TokenProps = {
 const emptyState = {
     tokens: defaultTokens,
     loading: true,
+    collapsed: false,
     tokenData: new TokenData(emptyTokens),
     selectionValues: {},
     displayType: 'GRID',
@@ -87,7 +89,10 @@ function stateReducer(state, action) {
                 tokens: state.tokenData.tokens,
             };
         case ActionType.SetEmptyTokens:
-            return emptyState;
+            return {
+                ...state,
+                emptyState,
+            };
         case ActionType.SetLoading:
             return {
                 ...state,
@@ -188,6 +193,11 @@ function stateReducer(state, action) {
                 ...state,
                 colorMode: !state.colorMode,
             };
+        case ActionType.SetCollapsed:
+            return {
+                ...state,
+                collapsed: !state.collapsed,
+            };
         default:
             throw new Error('Not implemented');
     }
@@ -253,6 +263,9 @@ function TokenProvider({children}) {
             },
             pullStyles: () => {
                 dispatch({type: ActionType.PullStyles});
+            },
+            setCollapsed: () => {
+                dispatch({type: ActionType.SetCollapsed});
             },
         }),
         [dispatch]
