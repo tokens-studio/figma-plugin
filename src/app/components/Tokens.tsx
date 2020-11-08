@@ -90,7 +90,22 @@ const Tokens = ({disabled}) => {
                     <React.Fragment key={stringPath}>
                         {typeof value === 'object' && !isTypographyToken(value) ? (
                             <div className="property-wrapper w-full">
-                                <Heading size="small">{key}</Heading>
+                                <div className="flex items-center justify-between">
+                                    <Heading size="small">{key}</Heading>
+                                    {editMode && (
+                                        <Tooltip label="Add a new token in group" variant="right">
+                                            <button
+                                                className="button button-ghost"
+                                                type="button"
+                                                onClick={() => {
+                                                    showNewForm([path, key].join('.'), schema);
+                                                }}
+                                            >
+                                                <Icon name="add" />
+                                            </button>
+                                        </Tooltip>
+                                    )}
+                                </div>
 
                                 {renderKeyValue({
                                     tokenValues: Object.entries(value),
@@ -240,6 +255,17 @@ const Tokens = ({disabled}) => {
                                                 onClick={() => showNewForm(values[0], schema)}
                                             >
                                                 <Icon name="add" />
+                                            </button>
+                                        </Tooltip>
+                                        <Tooltip label="Add a new group" variant="right">
+                                            <button
+                                                className="button button-ghost"
+                                                type="button"
+                                                onClick={() => {
+                                                    showNewForm(values[0], {});
+                                                }}
+                                            >
+                                                <Icon name="folder" />
                                             </button>
                                         </Tooltip>
                                     </div>
