@@ -166,13 +166,11 @@ function stateReducer(state, action) {
                 selectionValues: action.data,
             };
         case ActionType.ResetSelectionValues:
-            let newState = {
+            return {
                 ...state,
                 loading: false,
                 selectionValues: {},
             };
-
-            return newState;
         case ActionType.SetShowEditForm:
             return {
                 ...state,

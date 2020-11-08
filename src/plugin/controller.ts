@@ -89,7 +89,7 @@ const setValuesOnNode = async (node, values, data) => {
     }
 
     // FILL
-    if (values.fill) {
+    if (values.fill && typeof values.fill === 'string') {
         if (typeof node.fills !== 'undefined') {
             const paints = figma.getLocalPaintStyles();
             const path = data.fill.split('.');
@@ -267,9 +267,8 @@ figma.ui.onmessage = async (msg) => {
         case 'update':
             setTokenData(msg.tokenValues);
             updateStyles(msg.tokens, false);
-            const nodesWithData = findAllWithData();
-            updateNodes(nodesWithData, msg.tokens);
-            updatePluginData(nodesWithData, {});
+            updateNodes(findAllWithData(), msg.tokens);
+            updatePluginData(findAllWithData(), {});
             notifyRemoteComponents({nodes: store.successfulNodes.length, remotes: store.remoteComponents});
             return;
         case 'gotonode':

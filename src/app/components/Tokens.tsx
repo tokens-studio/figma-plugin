@@ -33,6 +33,7 @@ const Tokens = ({disabled}) => {
         setStringTokens,
         createStyles,
         updateTokens,
+        setLoading,
         setShowEditForm,
         setShowOptions,
         setDisplayType,
@@ -55,9 +56,10 @@ const Tokens = ({disabled}) => {
         setStringTokens({parent, tokens: JSON5.stringify(obj, null, 2)});
     }
 
-    const submitTokenValue = ({token, name, path, options}) => {
+    const submitTokenValue = async ({token, name, path, options}) => {
         setEditToken({token, name, path});
         setSingleTokenValue({parent: activeToken, name: [path, name].join('.'), token, options});
+        await setLoading(true);
         updateTokens();
     };
 

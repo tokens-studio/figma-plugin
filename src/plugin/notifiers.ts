@@ -59,7 +59,8 @@ export function fetchAllPluginData(node) {
 
     if (pluginData.length == 1 && pluginData[0][0] === 'values') {
         return pluginData[0][1];
-    } else if (pluginData.length > 0) {
+    }
+    if (pluginData.length > 0) {
         return Object.fromEntries(pluginData);
     }
     return null;
@@ -94,16 +95,19 @@ export function notifyStyleValues(values = undefined) {
 
 export function removePluginData(nodes, key?) {
     nodes.map((node) => {
-        node.setRelaunchData({});
-        if (key) {
-            node.setPluginData(key, '');
-        } else {
-            Object.keys(properties).forEach((prop) => {
-                node.setPluginData(prop, '');
-            });
+        try {
+            node.setRelaunchData({});
+        } finally {
+            if (key) {
+                node.setPluginData(key, '');
+            } else {
+                Object.keys(properties).forEach((prop) => {
+                    node.setPluginData(prop, '');
+                });
+            }
+            node.setPluginData('values', '');
+            store.successfulNodes.push(node);
         }
-        node.setPluginData('values', '');
-        store.successfulNodes.push(node);
     });
 }
 
@@ -122,13 +126,13 @@ export function updatePluginData(nodes, values) {
         try {
             if (Object.keys(newVals).length === 0 && newVals.constructor === Object) {
                 if (node.type !== 'INSTANCE') node.setRelaunchData({});
-            } else if (node.type !== 'INSTANCE')
-                node.setRelaunchData({
-                    edit: Object.keys(newVals).join(', '),
-                });
-        } catch (e) {
-            console.error({e});
+            } else if (node.type !== 'INSTANCE') {
+                // node.setRelaunchData({
+                //     edit: Object.keys(newVals).join(', '),
+                // });
+            }
+        } finally {
+            node.setPluginData('values', '');
         }
-        node.setPluginData('values', '');
     });
 }

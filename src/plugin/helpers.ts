@@ -73,7 +73,8 @@ export function hexToRgb(hex) {
         : null;
 }
 
-export function convertToFigmaColor(input) {
+export function convertToFigmaColor(input: string) {
+    if (typeof input !== 'string') return null;
     let color;
     let opacity;
     if (input.startsWith('rgb')) {
