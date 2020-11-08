@@ -5,7 +5,7 @@ import {useTokenState, useTokenDispatch} from '../store/TokenContext';
 import Icon from './Icon';
 import {lightOrDark, colorByHashCode} from './utils';
 
-const TokenButton = ({type, name, path, token, disabled, editMode, showForm}) => {
+const TokenButton = ({type, property, name, path, token, disabled, editMode, showForm}) => {
     const {colorMode, displayType, selectionValues, tokenData} = useTokenState();
     const {setSelectionValues, setNodeData, setShowOptions, setLoading} = useTokenDispatch();
     const realTokenValue = tokenData.getAliasValue(token);
@@ -18,7 +18,8 @@ const TokenButton = ({type, name, path, token, disabled, editMode, showForm}) =>
     const active = selectionValues[type] === [path, name].join('.');
 
     const handleEditClick = () => {
-        setShowOptions(path);
+        console.log('clicked edit', property, type, path, name, token, path);
+        setShowOptions(property);
         showForm({name, token, path});
     };
 

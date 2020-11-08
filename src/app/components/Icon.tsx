@@ -15,6 +15,7 @@ import IconGrid from './icons/IconGrid';
 import IconBlend from './icons/IconBlend';
 import IconBlendEmpty from './icons/IconBlendEmpty';
 import IconImport from './icons/IconImport';
+import IconFolder from './icons/IconFolder';
 
 const icons = {
     edit: IconEdit,
@@ -32,6 +33,7 @@ const icons = {
     blend: IconBlend,
     blendempty: IconBlendEmpty,
     import: IconImport,
+    folder: IconFolder,
 };
 
 const Icon = ({name}) => {

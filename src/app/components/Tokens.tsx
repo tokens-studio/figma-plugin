@@ -82,7 +82,7 @@ const Tokens = ({disabled}) => {
         showForm({token: initialToken, name: '', path});
     };
 
-    const renderKeyValue = ({tokenValues, schema, path = '', type = '', editMode = false}) => (
+    const renderKeyValue = ({tokenValues, property, schema, path = '', type = '', editMode = false}) => (
         <div className="flex justify-start flex-row flex-wrap">
             {tokenValues.map(([key, value]) => {
                 const stringPath = [path, key].filter((n) => n).join('.');
@@ -90,10 +90,26 @@ const Tokens = ({disabled}) => {
                     <React.Fragment key={stringPath}>
                         {typeof value === 'object' && !isTypographyToken(value) ? (
                             <div className="property-wrapper w-full">
-                                <Heading size="small">{key}</Heading>
+                                <div className="flex items-center justify-between">
+                                    <Heading size="small">{key}</Heading>
+                                    {editMode && (
+                                        <Tooltip label="Add a new token in group" variant="right">
+                                            <button
+                                                className="button button-ghost"
+                                                type="button"
+                                                onClick={() => {
+                                                    showNewForm([path, key].join('.'), schema);
+                                                }}
+                                            >
+                                                <Icon name="add" />
+                                            </button>
+                                        </Tooltip>
+                                    )}
+                                </div>
 
                                 {renderKeyValue({
                                     tokenValues: Object.entries(value),
+                                    property,
                                     schema,
                                     path: stringPath,
                                     type,
@@ -102,6 +118,7 @@ const Tokens = ({disabled}) => {
                             </div>
                         ) : (
                             <TokenButton
+                                property={property}
                                 type={type}
                                 editMode={editMode}
                                 name={key}
@@ -211,6 +228,7 @@ const Tokens = ({disabled}) => {
                                 <div className="px-4 pb-4">
                                     {renderKeyValue({
                                         tokenValues: Object.entries(values[1]),
+                                        property: values[0],
                                         schema,
                                         path: values[0],
                                         type,
@@ -242,6 +260,17 @@ const Tokens = ({disabled}) => {
                                                 <Icon name="add" />
                                             </button>
                                         </Tooltip>
+                                        <Tooltip label="Add a new group" variant="right">
+                                            <button
+                                                className="button button-ghost"
+                                                type="button"
+                                                onClick={() => {
+                                                    showNewForm(values[0], {});
+                                                }}
+                                            >
+                                                <Icon name="folder" />
+                                            </button>
+                                        </Tooltip>
                                     </div>
                                 </div>
                             </div>
@@ -249,7 +278,13 @@ const Tokens = ({disabled}) => {
                     )}
                 </div>
                 {showHelp && <div className="mb-4 text-xxs text-gray-600">{help}</div>}
-                {renderKeyValue({tokenValues: Object.entries(values[1]), schema, path: values[0], type})}
+                {renderKeyValue({
+                    tokenValues: Object.entries(values[1]),
+                    property: values[0],
+                    schema,
+                    path: values[0],
+                    type,
+                })}
             </div>
         );
     };
