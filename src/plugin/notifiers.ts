@@ -113,23 +113,33 @@ export function removePluginData(nodes, key?) {
 
 export function updatePluginData(nodes, values) {
     nodes.map((node) => {
-        const curVals = fetchAllPluginData(node);
-        const newVals = Object.assign(curVals || {}, values);
-        Object.entries(newVals).forEach(([key, value]) => {
+        const currentValuesOnNode = fetchAllPluginData(node);
+        const newValuesOnNode = Object.assign(currentValuesOnNode || {}, values);
+        Object.entries(newValuesOnNode).forEach(([key, value]) => {
             if (value === 'delete') {
-                delete newVals[key];
+                delete newValuesOnNode[key];
                 removePluginData([node], key);
             } else {
                 node.setPluginData(key, JSON.stringify(value));
             }
         });
         try {
-            if (Object.keys(newVals).length === 0 && newVals.constructor === Object) {
-                if (node.type !== 'INSTANCE') node.setRelaunchData({});
-            } else if (node.type !== 'INSTANCE') {
-                // node.setRelaunchData({
-                //     edit: Object.keys(newVals).join(', '),
-                // });
+            if (node.type !== 'INSTANCE') {
+                if (Object.keys(newValuesOnNode).length === 0 && newValuesOnNode.constructor === Object) {
+                    try {
+                        node.setRelaunchData({});
+                    } catch (e) {
+                        console.error('Updating relaunchData on instance children not supported.');
+                    }
+                } else {
+                    try {
+                        node.setRelaunchData({
+                            edit: Object.keys(newValuesOnNode).join(', '),
+                        });
+                    } catch (e) {
+                        console.error('Updating relaunchData on instance children not supported.');
+                    }
+                }
             }
         } finally {
             node.setPluginData('values', '');
