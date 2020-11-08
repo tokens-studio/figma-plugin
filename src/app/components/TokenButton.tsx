@@ -18,7 +18,6 @@ const TokenButton = ({type, property, name, path, token, disabled, editMode, sho
     const active = selectionValues[type] === [path, name].join('.');
 
     const handleEditClick = () => {
-        console.log('clicked edit', property, type, path, name, token, path);
         setShowOptions(property);
         showForm({name, token, path});
     };

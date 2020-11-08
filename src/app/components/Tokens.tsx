@@ -9,7 +9,6 @@ import TokenButton from './TokenButton';
 import Tooltip from './Tooltip';
 import {useTokenState, useTokenDispatch} from '../store/TokenContext';
 import {isTypographyToken} from './utils';
-import Button from './Button';
 
 const mappedTokens = (tokens) => {
     const properties = {
@@ -164,21 +163,42 @@ const Tokens = ({disabled}) => {
             toggleGroup(collapsed);
         }, [collapsed]);
 
+        const handleToggleCollapse = (e) => {
+            e.stopPropagation();
+            if (e.altKey) {
+                setCollapsed(!collapsed);
+            } else {
+                toggleGroup(!isCollapsed);
+            }
+        };
+
         return (
-            <div className="p-4 border-b border-gray-200">
-                <div className="flex justify-between space-x-8 items-center mb-2">
+            <div className="border-b border-gray-200">
+                <div className="flex justify-between space-x-8 items-center relative">
                     <button
-                        className="flex items-center space-x-2 justify-between"
+                        className="flex items-center space-x-2 w-full h-full p-4"
                         type="button"
-                        onClick={() => toggleGroup(!isCollapsed)}
+                        onClick={handleToggleCollapse}
                     >
+                        {isCollapsed ? (
+                            <svg width="6" height="6" viewBox="0 0 6 6" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M5 3L1 0v6l4-3z" fill="currentColor"></path>
+                            </svg>
+                        ) : (
+                            <svg width="6" height="6" viewBox="0 0 6 6" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M3 5l3-4H0l3 4z" fill="currentColor"></path>
+                            </svg>
+                        )}
                         <Heading size="small">{label}</Heading>
-                        {isCollapsed ? '▾' : '▴'}
                     </button>
-                    <div>
+                    <div className="absolute right-0 p-4">
                         {help && (
                             <Tooltip label={showHelp ? 'Hide help' : 'Show help'}>
-                                <button className="ml-1" type="button" onClick={() => setShowHelp(!showHelp)}>
+                                <button
+                                    className="button button-ghost"
+                                    type="button"
+                                    onClick={() => setShowHelp(!showHelp)}
+                                >
                                     <Icon name="help" />
                                 </button>
                             </Tooltip>
@@ -290,9 +310,9 @@ const Tokens = ({disabled}) => {
                         </Modal>
                     )}
                 </div>
-                {showHelp && <div className="mb-4 text-xxs text-gray-600">{help}</div>}
+                {showHelp && <div className="px-4 pb-4 text-xxs text-gray-600">{help}</div>}
                 {!isCollapsed && (
-                    <div>
+                    <div className="px-4 pb-4">
                         {renderKeyValue({
                             tokenValues: Object.entries(values[1]),
                             property: values[0],
@@ -310,11 +330,6 @@ const Tokens = ({disabled}) => {
 
     return (
         <div>
-            <div className="p-4">
-                <Button variant="secondary" size="small" onClick={() => setCollapsed(!collapsed)}>
-                    {collapsed ? 'Expand All' : 'Collapse All'}
-                </Button>
-            </div>
             {mappedTokens(JSON5.parse(tokenData.tokens[activeToken].values)).map((tokenValues) => {
                 switch (tokenValues[0]) {
                     case 'borderRadius':

@@ -207,10 +207,6 @@ body {
     @apply py-3 px-4;
 }
 
-.button-large {
-    @apply py-1 px-2;
-}
-
 button[disabled] {
     @apply opacity-50;
 }
