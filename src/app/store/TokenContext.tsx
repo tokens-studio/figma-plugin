@@ -86,9 +86,6 @@ function stateReducer(state, action) {
                 ...state,
                 tokens: state.tokenData.tokens,
             };
-        case ActionType.SetDefaultTokens:
-            state.tokenData.setTokens(defaultTokens);
-            return state;
         case ActionType.SetEmptyTokens:
             return emptyState;
         case ActionType.SetLoading:
@@ -214,7 +211,7 @@ function TokenProvider({children}) {
                 dispatch({type: ActionType.SetStringTokens, data});
             },
             setDefaultTokens: () => {
-                dispatch({type: ActionType.SetDefaultTokens});
+                dispatch({type: ActionType.SetTokenData, data: new TokenData(defaultTokens)});
                 dispatch({type: ActionType.SetLoading, state: false});
             },
             setEmptyTokens: () => {

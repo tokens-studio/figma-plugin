@@ -139,6 +139,7 @@ export default class TokenData {
     }
 
     getMergedTokens(): TokenGroup {
+        console.log('getting merged tokens', this.mergedTokens, this.tokens);
         return this.mergedTokens;
     }
 
