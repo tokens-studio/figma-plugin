@@ -82,7 +82,7 @@ const Tokens = ({disabled}) => {
         showForm({token: initialToken, name: '', path});
     };
 
-    const renderKeyValue = ({tokenValues, schema, path = '', type = '', editMode = false}) => (
+    const renderKeyValue = ({tokenValues, property, schema, path = '', type = '', editMode = false}) => (
         <div className="flex justify-start flex-row flex-wrap">
             {tokenValues.map(([key, value]) => {
                 const stringPath = [path, key].filter((n) => n).join('.');
@@ -109,6 +109,7 @@ const Tokens = ({disabled}) => {
 
                                 {renderKeyValue({
                                     tokenValues: Object.entries(value),
+                                    property,
                                     schema,
                                     path: stringPath,
                                     type,
@@ -117,6 +118,7 @@ const Tokens = ({disabled}) => {
                             </div>
                         ) : (
                             <TokenButton
+                                property={property}
                                 type={type}
                                 editMode={editMode}
                                 name={key}
@@ -226,6 +228,7 @@ const Tokens = ({disabled}) => {
                                 <div className="px-4 pb-4">
                                     {renderKeyValue({
                                         tokenValues: Object.entries(values[1]),
+                                        property: values[0],
                                         schema,
                                         path: values[0],
                                         type,
@@ -275,7 +278,13 @@ const Tokens = ({disabled}) => {
                     )}
                 </div>
                 {showHelp && <div className="mb-4 text-xxs text-gray-600">{help}</div>}
-                {renderKeyValue({tokenValues: Object.entries(values[1]), schema, path: values[0], type})}
+                {renderKeyValue({
+                    tokenValues: Object.entries(values[1]),
+                    property: values[0],
+                    schema,
+                    path: values[0],
+                    type,
+                })}
             </div>
         );
     };
