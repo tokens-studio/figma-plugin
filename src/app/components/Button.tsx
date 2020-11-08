@@ -33,6 +33,9 @@ const Button: React.FunctionComponent<ButtonProps> = ({
         case 'large':
             sizeClass = 'button-large';
             break;
+        case 'small':
+            sizeClass = 'button-small';
+            break;
         default:
             break;
     }

@@ -9,6 +9,7 @@ import TokenButton from './TokenButton';
 import Tooltip from './Tooltip';
 import {useTokenState, useTokenDispatch} from '../store/TokenContext';
 import {isTypographyToken} from './utils';
+import Button from './Button';
 
 const mappedTokens = (tokens) => {
     const properties = {
@@ -28,9 +29,10 @@ const mappedTokens = (tokens) => {
 };
 
 const Tokens = ({disabled}) => {
-    const {showEditForm, showOptions, tokenData, displayType} = useTokenState();
+    const {collapsed, showEditForm, showOptions, tokenData, displayType} = useTokenState();
     const {
         setStringTokens,
+        setCollapsed,
         createStyles,
         updateTokens,
         setLoading,
@@ -156,11 +158,24 @@ const Tokens = ({disabled}) => {
         values?: string | object;
     }) => {
         const [showHelp, setShowHelp] = React.useState(false);
+        const [isCollapsed, toggleGroup] = React.useState(false);
+
+        React.useEffect(() => {
+            toggleGroup(collapsed);
+        }, [collapsed]);
+
         return (
             <div className="p-4 border-b border-gray-200">
-                <div className="flex justify-between space-x-4 items-center mb-2">
-                    <Heading size="small">
-                        {label}
+                <div className="flex justify-between space-x-8 items-center mb-2">
+                    <button
+                        className="flex items-center space-x-2 justify-between"
+                        type="button"
+                        onClick={() => toggleGroup(!isCollapsed)}
+                    >
+                        <Heading size="small">{label}</Heading>
+                        {isCollapsed ? '▾' : '▴'}
+                    </button>
+                    <div>
                         {help && (
                             <Tooltip label={showHelp ? 'Hide help' : 'Show help'}>
                                 <button className="ml-1" type="button" onClick={() => setShowHelp(!showHelp)}>
@@ -168,8 +183,6 @@ const Tokens = ({disabled}) => {
                                 </button>
                             </Tooltip>
                         )}
-                    </Heading>
-                    <div>
                         {showDisplayToggle && (
                             <Tooltip label={displayType === 'GRID' ? 'Show as List' : 'Show as Grid'}>
                                 <button
@@ -278,13 +291,17 @@ const Tokens = ({disabled}) => {
                     )}
                 </div>
                 {showHelp && <div className="mb-4 text-xxs text-gray-600">{help}</div>}
-                {renderKeyValue({
-                    tokenValues: Object.entries(values[1]),
-                    property: values[0],
-                    schema,
-                    path: values[0],
-                    type,
-                })}
+                {!isCollapsed && (
+                    <div>
+                        {renderKeyValue({
+                            tokenValues: Object.entries(values[1]),
+                            property: values[0],
+                            schema,
+                            path: values[0],
+                            type,
+                        })}
+                    </div>
+                )}
             </div>
         );
     };
@@ -293,6 +310,11 @@ const Tokens = ({disabled}) => {
 
     return (
         <div>
+            <div className="p-4">
+                <Button variant="secondary" size="small" onClick={() => setCollapsed(!collapsed)}>
+                    {collapsed ? 'Expand All' : 'Collapse All'}
+                </Button>
+            </div>
             {mappedTokens(JSON5.parse(tokenData.tokens[activeToken].values)).map((tokenValues) => {
                 switch (tokenValues[0]) {
                     case 'borderRadius':
