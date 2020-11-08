@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {useTokenState} from '../store/TokenContext';
+import {useTokenDispatch} from '../store/TokenContext';
 import Input from './Input';
 
 const EditTokenForm = ({submitTokenValue, explainer = '', property, isPristine, initialToken, initialName, path}) => {
@@ -9,7 +9,7 @@ const EditTokenForm = ({submitTokenValue, explainer = '', property, isPristine, 
         path,
     };
     const [tokenValue, setTokenValue] = React.useState(defaultValue);
-    const {setShowEditForm} = useTokenState();
+    const {setShowEditForm} = useTokenDispatch();
 
     const handleChange = (e) => {
         e.persist();

@@ -4,7 +4,7 @@ import Icon from './Icon';
 import {useTokenState} from '../store/TokenContext';
 
 const MoreButton = ({properties, children, path, value, onClick, onEdit}) => {
-    const {state} = useTokenState();
+    const {selectionValues} = useTokenState();
     const visibleProperties = properties.filter((p) => p.label);
 
     return (
@@ -12,7 +12,7 @@ const MoreButton = ({properties, children, path, value, onClick, onEdit}) => {
             <ContextMenuTrigger id={`${path}-${value}`}>{children}</ContextMenuTrigger>
             <ContextMenu id={`${path}-${value}`} className="text-xs">
                 {visibleProperties.map((property) => {
-                    const isActive = state.selectionValues[property.name] === `${path}.${value}`;
+                    const isActive = selectionValues[property.name] === `${path}.${value}`;
 
                     return (
                         <MenuItem key={property.label} onClick={() => onClick([property.name], isActive)}>

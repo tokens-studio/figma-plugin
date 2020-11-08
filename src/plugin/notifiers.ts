@@ -1,4 +1,5 @@
 import store from './store';
+import properties from '../config/properties';
 
 export function notifyNoSelection() {
     figma.ui.postMessage({
@@ -32,26 +33,49 @@ export function notifyRemoteComponents({nodes, remotes}) {
             remotes,
         },
     });
+
     store.successfulNodes = [];
     store.remoteComponents = [];
 }
 
-export function fetchPluginData(node) {
+export function fetchOldPluginData(node) {
     const previousValues = node.getPluginData('values');
-    if (!previousValues) return;
+    if (!previousValues) {
+        return;
+    }
     return JSON.parse(previousValues);
 }
 
-export function sendPluginValues(nodes) {
+export function fetchPluginData(node, value: string) {
+    return node.getPluginData(value);
+}
+
+export function fetchAllPluginData(node) {
+    const pluginData = Object.keys(properties).reduce((prev, prop) => {
+        const data = fetchPluginData(node, prop);
+        if (data) prev.push([prop, JSON.parse(data)]);
+        return prev;
+    }, []);
+
+    if (pluginData.length == 1 && pluginData[0][0] === 'values') {
+        return pluginData[0][1];
+    }
+    if (pluginData.length > 0) {
+        return Object.fromEntries(pluginData);
+    }
+    return null;
+}
+
+export function sendPluginValues(nodes, values?) {
+    let pluginValues = values;
+
     if (nodes.length > 1) {
         notifySelection(nodes[0].id);
     } else {
-        const pluginValues = fetchPluginData(nodes[0]);
-        if (pluginValues) {
-            notifySelection(nodes[0].id, pluginValues);
-        } else {
-            notifySelection(nodes[0].id);
+        if (!pluginValues) {
+            pluginValues = fetchAllPluginData(nodes[0]);
         }
+        notifySelection(nodes[0].id, pluginValues);
     }
 }
 
@@ -69,25 +93,56 @@ export function notifyStyleValues(values = undefined) {
     });
 }
 
+export function removePluginData(nodes, key?) {
+    nodes.map((node) => {
+        try {
+            node.setRelaunchData({});
+        } finally {
+            if (key) {
+                node.setPluginData(key, '');
+            } else {
+                Object.keys(properties).forEach((prop) => {
+                    node.setPluginData(prop, '');
+                });
+            }
+            node.setPluginData('values', '');
+            store.successfulNodes.push(node);
+        }
+    });
+}
+
 export function updatePluginData(nodes, values) {
-    nodes.map((item) => {
-        const currentVals = fetchPluginData(item);
-        const newVals = Object.assign(currentVals || {}, values);
-        Object.entries(newVals).forEach(([key, value]) => {
+    nodes.map((node) => {
+        const currentValuesOnNode = fetchAllPluginData(node);
+        const newValuesOnNode = Object.assign(currentValuesOnNode || {}, values);
+        Object.entries(newValuesOnNode).forEach(([key, value]) => {
             if (value === 'delete') {
-                delete newVals[key];
+                delete newValuesOnNode[key];
+                removePluginData([node], key);
+            } else {
+                node.setPluginData(key, JSON.stringify(value));
             }
         });
         try {
-            if (Object.keys(newVals).length === 0 && newVals.constructor === Object) {
-                if (item.type !== 'INSTANCE') item.setRelaunchData({});
-            } else if (item.type !== 'INSTANCE')
-                item.setRelaunchData({
-                    edit: Object.keys(newVals).join(', '),
-                });
-        } catch (e) {
-            console.error({e});
+            if (node.type !== 'INSTANCE') {
+                if (Object.keys(newValuesOnNode).length === 0 && newValuesOnNode.constructor === Object) {
+                    try {
+                        node.setRelaunchData({});
+                    } catch (e) {
+                        console.error('Updating relaunchData on instance children not supported.');
+                    }
+                } else {
+                    try {
+                        node.setRelaunchData({
+                            edit: Object.keys(newValuesOnNode).join(', '),
+                        });
+                    } catch (e) {
+                        console.error('Updating relaunchData on instance children not supported.');
+                    }
+                }
+            }
+        } finally {
+            node.setPluginData('values', '');
         }
-        item.setPluginData('values', JSON.stringify(newVals));
     });
 }

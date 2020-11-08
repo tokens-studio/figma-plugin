@@ -7,7 +7,7 @@ import Icon from './Icon';
 import EditTokenForm from './EditTokenForm';
 import TokenButton from './TokenButton';
 import Tooltip from './Tooltip';
-import {useTokenState} from '../store/TokenContext';
+import {useTokenState, useTokenDispatch} from '../store/TokenContext';
 import {isTypographyToken} from './utils';
 
 const mappedTokens = (tokens) => {
@@ -28,25 +28,24 @@ const mappedTokens = (tokens) => {
 };
 
 const Tokens = ({disabled}) => {
+    const {showEditForm, showOptions, tokenData, displayType} = useTokenState();
     const {
-        state,
         setStringTokens,
         createStyles,
         updateTokens,
+        setLoading,
         setShowEditForm,
         setShowOptions,
         setDisplayType,
-    } = useTokenState();
+    } = useTokenDispatch();
     const [activeToken] = React.useState('options');
     const [editToken, setEditToken] = React.useState({
         token: '',
         name: '',
         path: '',
     });
-    const {showEditForm, showOptions} = state;
-
     function setSingleTokenValue({parent, name, token, options}) {
-        const obj = JSON5.parse(state.tokenData.tokens[parent].values);
+        const obj = JSON5.parse(tokenData.tokens[parent].values);
         const newValue = options
             ? {
                   value: token,
@@ -57,9 +56,10 @@ const Tokens = ({disabled}) => {
         setStringTokens({parent, tokens: JSON5.stringify(obj, null, 2)});
     }
 
-    const submitTokenValue = ({token, name, path, options}) => {
+    const submitTokenValue = async ({token, name, path, options}) => {
         setEditToken({token, name, path});
         setSingleTokenValue({parent: activeToken, name: [path, name].join('.'), token, options});
+        await setLoading(true);
         updateTokens();
     };
 
@@ -154,13 +154,13 @@ const Tokens = ({disabled}) => {
                     </Heading>
                     <div>
                         {showDisplayToggle && (
-                            <Tooltip label={state.displayType === 'GRID' ? 'Show as List' : 'Show as Grid'}>
+                            <Tooltip label={displayType === 'GRID' ? 'Show as List' : 'Show as Grid'}>
                                 <button
-                                    onClick={() => setDisplayType(state.displayType === 'GRID' ? 'LIST' : 'GRID')}
+                                    onClick={() => setDisplayType(displayType === 'GRID' ? 'LIST' : 'GRID')}
                                     type="button"
                                     className="button button-ghost"
                                 >
-                                    <Icon name={state.displayType === 'GRID' ? 'list' : 'grid'} />
+                                    <Icon name={displayType === 'GRID' ? 'list' : 'grid'} />
                                 </button>
                             </Tooltip>
                         )}
@@ -221,17 +221,15 @@ const Tokens = ({disabled}) => {
                                     <Heading size="small">{property}</Heading>
                                     <div>
                                         {showDisplayToggle && (
-                                            <Tooltip
-                                                label={state.displayType === 'GRID' ? 'Show as List' : 'Show as Grid'}
-                                            >
+                                            <Tooltip label={displayType === 'GRID' ? 'Show as List' : 'Show as Grid'}>
                                                 <button
                                                     onClick={() =>
-                                                        setDisplayType(state.displayType === 'GRID' ? 'LIST' : 'GRID')
+                                                        setDisplayType(displayType === 'GRID' ? 'LIST' : 'GRID')
                                                     }
                                                     type="button"
                                                     className="button button-ghost"
                                                 >
-                                                    <Icon name={state.displayType === 'GRID' ? 'list' : 'grid'} />
+                                                    <Icon name={displayType === 'GRID' ? 'list' : 'grid'} />
                                                 </button>
                                             </Tooltip>
                                         )}
@@ -256,11 +254,11 @@ const Tokens = ({disabled}) => {
         );
     };
 
-    if (state.tokenData.tokens[activeToken].hasErrored) return <div>JSON malformed, check in Editor</div>;
+    if (tokenData.tokens[activeToken].hasErrored) return <div>JSON malformed, check in Editor</div>;
 
     return (
         <div>
-            {mappedTokens(JSON5.parse(state.tokenData.tokens[activeToken].values)).map((tokenValues) => {
+            {mappedTokens(JSON5.parse(tokenData.tokens[activeToken].values)).map((tokenValues) => {
                 switch (tokenValues[0]) {
                     case 'borderRadius':
                         return (

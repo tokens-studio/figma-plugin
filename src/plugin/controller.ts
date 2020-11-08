@@ -8,7 +8,8 @@ import {
     notifyTokenValues,
     updatePluginData,
     notifyRemoteComponents,
-    fetchPluginData,
+    fetchAllPluginData,
+    removePluginData,
 } from './notifiers';
 
 const objectPath = require('object-path');
@@ -17,26 +18,6 @@ figma.showUI(__html__, {
     width: 400,
     height: 600,
 });
-
-const findAllWithPluginData = (arr) => {
-    return arr.reduce((prev, el) => {
-        if (el.masterComponent?.getPluginData('values')) {
-            if (el.masterComponent.remote) {
-                store.remoteComponents.push(el);
-            } else {
-                prev.push(el.masterComponent);
-            }
-            return prev;
-        }
-        if (el.getPluginData('values')) {
-            prev.push(el);
-        }
-        if (el.children) {
-            prev.push(...findAllWithPluginData(el.children));
-        }
-        return prev;
-    }, []);
-};
 
 const mapValuesToTokens = (object, values) => {
     const array = Object.entries(values).map(([key, value]) => ({[key]: objectPath.get(object, value)}));
@@ -108,7 +89,7 @@ const setValuesOnNode = async (node, values, data) => {
     }
 
     // FILL
-    if (values.fill) {
+    if (values.fill && typeof values.fill === 'string') {
         if (typeof node.fills !== 'undefined') {
             const paints = figma.getLocalPaintStyles();
             const path = data.fill.split('.');
@@ -194,15 +175,17 @@ const setValuesOnNode = async (node, values, data) => {
 };
 
 const updateNodes = (nodes, tokens) => {
-    const nodesWithData = findAllWithPluginData(nodes);
-    nodesWithData.forEach((node) => {
-        const data = fetchPluginData(node);
+    const returnedValues = nodes.map((node) => {
+        const data = fetchAllPluginData(node);
         if (data) {
             const mappedValues = mapValuesToTokens(tokens, data);
             setValuesOnNode(node, mappedValues, data);
+            store.successfulNodes.push(node);
+            return data;
         }
     });
-    store.successfulNodes.push(...nodesWithData);
+
+    return returnedValues[0];
 };
 
 const setTokenData = (data) => {
@@ -227,14 +210,6 @@ const goToNode = (id) => {
     }
 };
 
-const removePluginData = (nodes) => {
-    nodes.map((item) => {
-        item.setRelaunchData({});
-        item.setPluginData('values', '');
-        store.successfulNodes.push(item);
-    });
-};
-
 figma.on('selectionchange', () => {
     const nodes = figma.currentPage.selection;
     if (!nodes.length) {
@@ -244,25 +219,29 @@ figma.on('selectionchange', () => {
     sendPluginValues(nodes);
 });
 
-figma.ui.onmessage = (msg) => {
+const findAllWithData = () => {
+    const nodes = figma.root.findAll((node): any => {
+        const pluginValues = fetchAllPluginData(node);
+        if (pluginValues) return node;
+    });
+    return nodes;
+};
+
+figma.ui.onmessage = async (msg) => {
     switch (msg.type) {
         case 'initiate':
-            const previousTokens = getTokenData();
-            notifyTokenValues(previousTokens);
+            notifyTokenValues(getTokenData());
 
-            const nodes = figma.currentPage.selection;
-
-            if (!nodes.length) {
+            if (!figma.currentPage.selection.length) {
                 notifyNoSelection();
                 return;
             }
-            sendPluginValues(nodes);
+            sendPluginValues(figma.currentPage.selection);
             return;
         case 'set-node-data':
             try {
                 updatePluginData(figma.currentPage.selection, msg.values);
-                updateNodes(figma.currentPage.selection, msg.tokens);
-                sendPluginValues(figma.currentPage.selection);
+                sendPluginValues(figma.currentPage.selection, updateNodes(figma.currentPage.selection, msg.tokens));
             } catch (e) {
                 console.error(e);
             }
@@ -288,7 +267,8 @@ figma.ui.onmessage = (msg) => {
         case 'update':
             setTokenData(msg.tokenValues);
             updateStyles(msg.tokens, false);
-            updateNodes(figma.currentPage.children, msg.tokens);
+            updateNodes(findAllWithData(), msg.tokens);
+            updatePluginData(findAllWithData(), {});
             notifyRemoteComponents({nodes: store.successfulNodes.length, remotes: store.remoteComponents});
             return;
         case 'gotonode':
