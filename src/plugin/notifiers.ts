@@ -1,5 +1,6 @@
 import store from './store';
 import properties from '../config/properties';
+import {removeValuesFromNode} from './node';
 
 export function notifyNoSelection() {
     figma.ui.postMessage({
@@ -100,9 +101,11 @@ export function removePluginData(nodes, key?) {
         } finally {
             if (key) {
                 node.setPluginData(key, '');
+                removeValuesFromNode(node, key);
             } else {
                 Object.keys(properties).forEach((prop) => {
                     node.setPluginData(prop, '');
+                    removeValuesFromNode(node, prop);
                 });
             }
             node.setPluginData('values', '');
