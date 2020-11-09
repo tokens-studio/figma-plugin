@@ -176,7 +176,9 @@ const Tokens = ({disabled}) => {
             <div className="border-b border-gray-200">
                 <div className="flex justify-between space-x-8 items-center relative">
                     <button
-                        className="flex items-center w-full h-full p-4 space-x-2"
+                        className={`flex items-center w-full h-full p-4 space-x-2 hover:bg-gray-100 focus:outline-none ${
+                            isCollapsed ? 'opacity-50' : null
+                        }`}
                         type="button"
                         onClick={handleToggleCollapse}
                     >
@@ -184,11 +186,11 @@ const Tokens = ({disabled}) => {
                             <div className="p-2 -m-2">
                                 {isCollapsed ? (
                                     <svg width="6" height="6" viewBox="0 0 6 6" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M5 3L1 0v6l4-3z" fill="currentColor"></path>
+                                        <path d="M5 3L1 0v6l4-3z" fill="currentColor" />
                                     </svg>
                                 ) : (
                                     <svg width="6" height="6" viewBox="0 0 6 6" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M3 5l3-4H0l3 4z" fill="currentColor"></path>
+                                        <path d="M3 5l3-4H0l3 4z" fill="currentColor" />
                                     </svg>
                                 )}
                             </div>
@@ -315,8 +317,8 @@ const Tokens = ({disabled}) => {
                     )}
                 </div>
                 {showHelp && <div className="px-4 pb-4 text-xxs text-gray-600">{help}</div>}
-                {!isCollapsed && (
-                    <div className="px-4 pb-4">
+                {Object.entries(values[1]).length > 0 && (
+                    <div className={`px-4 pb-4 ${isCollapsed ? 'hidden' : null}`}>
                         {renderKeyValue({
                             tokenValues: Object.entries(values[1]),
                             property: values[0],
