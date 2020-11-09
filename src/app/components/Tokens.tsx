@@ -227,7 +227,7 @@ const Tokens = ({disabled}) => {
                                 </button>
                             </Tooltip>
                         )}
-                        <Tooltip label="Edit token values">
+                        <Tooltip label="Edit token values" variant="right">
                             <button
                                 className="button button-ghost"
                                 type="button"
