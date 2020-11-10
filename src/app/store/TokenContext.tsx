@@ -91,7 +91,7 @@ function stateReducer(state, action) {
         case ActionType.SetEmptyTokens:
             return {
                 ...state,
-                emptyState,
+                ...emptyState,
             };
         case ActionType.SetLoading:
             return {
