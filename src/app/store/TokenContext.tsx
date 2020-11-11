@@ -225,6 +225,7 @@ function TokenProvider({children}) {
                 dispatch({type: ActionType.SetTokenData, data});
             },
             setStringTokens: (data: {parent: string; tokens: string}) => {
+                console.log(data);
                 dispatch({type: ActionType.SetStringTokens, data});
             },
             setDefaultTokens: () => {
