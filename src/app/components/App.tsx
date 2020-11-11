@@ -24,7 +24,6 @@ const goToNodeId = (id) => {
 };
 
 const App = () => {
-    const [disabled, setDisabled] = React.useState(false);
     const [active, setActive] = React.useState('start');
     const [remoteComponents, setRemoteComponents] = React.useState([]);
 
@@ -32,6 +31,7 @@ const App = () => {
     const {
         setTokenData,
         setLoading,
+        setDisabled,
         setSelectionValues,
         resetSelectionValues,
         setTokensFromStyles,
@@ -105,7 +105,7 @@ const App = () => {
                         </div>
                     )}
                     {active === 'start' && !loading && <StartScreen setActive={setActive} />}
-                    {active === 'tokens' && <Tokens disabled={disabled} />}
+                    {active === 'tokens' && <Tokens />}
                     {active === 'json' && <JSONEditor />}
                     {active === 'inspector' && <Inspector />}
                 </div>
