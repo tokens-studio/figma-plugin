@@ -1,15 +1,15 @@
 {
 	"name": "figma-tokens",
-	"version": "0.5.0",
+	"version": "0.6.0",
 	"description": "Figma Design Tokens",
 	"license": "ISC",
 	"scripts": {
 		"build-css": "postcss src/app/styles/tailwind.css -o src/app/styles/main.css",
 		"watch-css": "postcss src/app/styles/tailwind.css -o src/app/styles/main.css -w",
-		"watch-js": "/usr/local/bin/node node_modules/.bin/webpack --mode=development --watch",
-		"build-js": "/usr/local/bin/node node_modules/.bin/webpack --mode=production",
-		"build": "npm run build-css && npm run build-js",
-		"build:watch": "concurrently 'npm:watch-css' 'npm:watch-js'",
+		"watch-js": "webpack --mode=development --watch",
+		"build-js": "webpack --mode=production",
+		"build": "yarn build-css && yarn build-js",
+		"build:watch": "concurrently 'yarn watch-css' 'yarn watch-js'",
 		"prettier:format": "prettier --write 'src/**/*.{js,jsx,ts,tsx,css,json}' "
 	},
 	"dependencies": {

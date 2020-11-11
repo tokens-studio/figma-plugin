@@ -8,7 +8,7 @@ import Heading from './Heading';
 import Navbar from './Navbar';
 import Icon from './Icon';
 import * as pjs from '../../../package.json';
-import {useTokenState} from '../store/TokenContext';
+import {useTokenState, useTokenDispatch} from '../store/TokenContext';
 import TokenData from './TokenData';
 
 const goToNodeId = (id) => {
@@ -24,18 +24,18 @@ const goToNodeId = (id) => {
 };
 
 const App = () => {
-    const [disabled, setDisabled] = React.useState(false);
     const [active, setActive] = React.useState('start');
     const [remoteComponents, setRemoteComponents] = React.useState([]);
 
+    const {loading} = useTokenState();
     const {
-        state,
         setTokenData,
         setLoading,
+        setDisabled,
         setSelectionValues,
         resetSelectionValues,
         setTokensFromStyles,
-    } = useTokenState();
+    } = useTokenDispatch();
 
     const onInitiate = () => {
         parent.postMessage({pluginMessage: {type: 'initiate'}}, '*');
@@ -77,7 +77,7 @@ const App = () => {
 
     return (
         <>
-            {state.loading && (
+            {loading && (
                 <div className="fixed w-full z-20">
                     <div className="flex items-center space-x-2 bg-gray-300 p-2 rounded m-2">
                         <div className="inline-flex rotate">
@@ -104,8 +104,8 @@ const App = () => {
                             ))}
                         </div>
                     )}
-                    {active === 'start' && !state.loading && <StartScreen setActive={setActive} />}
-                    {active === 'tokens' && <Tokens disabled={disabled} />}
+                    {active === 'start' && !loading && <StartScreen setActive={setActive} />}
+                    {active === 'tokens' && <Tokens />}
                     {active === 'json' && <JSONEditor />}
                     {active === 'inspector' && <Inspector />}
                 </div>

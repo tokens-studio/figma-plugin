@@ -1,10 +1,10 @@
 import * as React from 'react';
 import Heading from './Heading';
 import Button from './Button';
-import {useTokenState} from '../store/TokenContext';
+import {useTokenDispatch} from '../store/TokenContext';
 
 const StartScreen = ({setActive}) => {
-    const {setDefaultTokens, setLoading} = useTokenState();
+    const {setDefaultTokens, setLoading} = useTokenDispatch();
     const onSetDefaultTokens = () => {
         setActive('tokens');
         setDefaultTokens();
