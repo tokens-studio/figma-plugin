@@ -17,6 +17,7 @@ export enum ActionType {
     SetDefaultTokens = 'SET_DEFAULT_TOKENS',
     SetEmptyTokens = 'SET_EMPTY_TOKENS',
     SetLoading = 'SET_LOADING',
+    SetDisabled = 'SET_DISABLED',
     SetStringTokens = 'SET_STRING_TOKENS',
     UpdateTokens = 'UPDATE_TOKENS',
     CreateStyles = 'CREATE_STYLES',
@@ -49,6 +50,7 @@ const emptyTokens: TokenProps = {
 const emptyState = {
     tokens: defaultTokens,
     loading: true,
+    disabled: false,
     collapsed: false,
     tokenData: new TokenData(emptyTokens),
     selectionValues: {},
@@ -97,6 +99,11 @@ function stateReducer(state, action) {
             return {
                 ...state,
                 loading: action.state,
+            };
+        case ActionType.SetDisabled:
+            return {
+                ...state,
+                disabled: action.state,
             };
         case ActionType.SetStringTokens:
             state.tokenData.updateTokenValues(action.data.parent, action.data.tokens);
@@ -236,6 +243,9 @@ function TokenProvider({children}) {
             },
             setLoading: (boolean) => {
                 dispatch({type: ActionType.SetLoading, state: boolean});
+            },
+            setDisabled: (boolean) => {
+                dispatch({type: ActionType.SetDisabled, state: boolean});
             },
             setNodeData: (data: SelectionValue) => {
                 dispatch({type: ActionType.SetNodeData, data});

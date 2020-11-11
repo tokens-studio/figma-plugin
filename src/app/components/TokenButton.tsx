@@ -5,8 +5,8 @@ import {useTokenState, useTokenDispatch} from '../store/TokenContext';
 import Icon from './Icon';
 import {lightOrDark, colorByHashCode} from './utils';
 
-const TokenButton = ({type, property, name, path, token, disabled, editMode, showForm}) => {
-    const {colorMode, displayType, selectionValues, tokenData} = useTokenState();
+const TokenButton = ({type, property, name, path, token, editMode, showForm}) => {
+    const {colorMode, displayType, selectionValues, tokenData, disabled} = useTokenState();
     const {setSelectionValues, setNodeData, setShowOptions, setLoading} = useTokenDispatch();
     const realTokenValue = tokenData.getAliasValue(token);
     const displayValue = realTokenValue || token;
