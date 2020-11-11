@@ -1,5 +1,51 @@
 import {convertToFigmaColor} from './helpers';
+import {fetchAllPluginData} from './pluginData';
 import {setTextValuesOnTarget} from './styles';
+import store from './store';
+const objectPath = require('object-path');
+import * as pjs from '../../package.json';
+
+export function updateNodes(nodes, tokens) {
+    const returnedValues = nodes.map((node) => {
+        const data = fetchAllPluginData(node);
+        if (data) {
+            const mappedValues = mapValuesToTokens(tokens, data);
+            setValuesOnNode(node, mappedValues, data);
+            store.successfulNodes.push(node);
+            return data;
+        }
+    });
+
+    return returnedValues[0];
+}
+
+export function mapValuesToTokens(object, values) {
+    const array = Object.entries(values).map(([key, value]) => ({[key]: objectPath.get(object, value)}));
+    array.map((item) => ({[item.key]: item.value}));
+    return Object.assign({}, ...array);
+}
+
+export function setTokenData(tokens) {
+    figma.root.setSharedPluginData('tokens', 'version', pjs.version);
+    figma.root.setSharedPluginData('tokens', 'values', JSON.stringify(tokens));
+}
+
+export function getTokenData() {
+    const values = figma.root.getSharedPluginData('tokens', 'values');
+    const version = figma.root.getSharedPluginData('tokens', 'version');
+    if (values) {
+        const parsedValues = JSON.parse(values);
+        return {values: parsedValues, version};
+    }
+}
+
+export function goToNode(id) {
+    const node = figma.getNodeById(id);
+    if (node?.type === 'INSTANCE') {
+        figma.currentPage.selection = [node];
+        figma.viewport.scrollAndZoomIntoView([node]);
+    }
+}
 
 export async function setValuesOnNode(node, values, data) {
     // BORDER RADIUS
