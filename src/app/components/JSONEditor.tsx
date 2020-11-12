@@ -7,22 +7,19 @@ import Heading from './Heading';
 import {useTokenState, useTokenDispatch} from '../store/TokenContext';
 import Button from './Button';
 
-const mappedTokens = (tokens) => {
-    const properties = {
-        sizing: {},
-        spacing: {},
-        colors: {},
-        borderRadius: {},
-        borderWidth: {},
-        opacity: {},
-        fontFamilies: {},
-        fontWeights: {},
-        fontSizes: {},
-        lineHeights: {},
-        typography: {},
-    };
-    return Object.entries(Object.assign(properties, tokens));
-};
+const supportedProperties = [
+    'sizing',
+    'spacing',
+    'colors',
+    'borderRadius',
+    'borderWidth',
+    'opacity',
+    'fontFamilies',
+    'fontWeights',
+    'fontSizes',
+    'lineHeights',
+    'typography',
+];
 
 const JSONEditor = () => {
     const {tokenData} = useTokenState();
@@ -93,31 +90,28 @@ const JSONEditor = () => {
                     )}
                 </div>
             </div>
-
-            {mappedTokens(JSON5.parse(tokenData.tokens[activeToken].values)).map((token) => {
-                console.log(token[0]);
-
+            {supportedProperties.map((token) => {
                 let handleClick = () => {
-                    if (openToken === token[0]) {
+                    if (openToken === token) {
                         setOpenToken('');
                     } else {
-                        setOpenToken(token[0]);
+                        setOpenToken(token);
                     }
                 };
 
                 return (
-                    <div className="border-b border-gray-200">
+                    <div className="border-b border-gray-200" key={token}>
                         <div className="flex flex-col justify-between items-center">
                             <button
                                 className={`flex items-center w-full h-full p-4 space-x-2 hover:bg-gray-100 focus:outline-none ${
-                                    openToken === token[0] ? 'opacity-50' : null
+                                    openToken === token ? 'opacity-50' : null
                                 }`}
                                 type="button"
                                 onClick={handleClick}
                             >
                                 <Tooltip label="Alt + Click to collapse all">
                                     <div className="p-2 -m-2">
-                                        {openToken !== token[0] ? (
+                                        {openToken !== token ? (
                                             <svg
                                                 width="6"
                                                 height="6"
@@ -138,9 +132,9 @@ const JSONEditor = () => {
                                         )}
                                     </div>
                                 </Tooltip>
-                                <Heading size="small">{token[0]}</Heading>
+                                <Heading size="small">{token}</Heading>
                             </button>
-                            {openToken === token[0] && <JSONToken token={token[0]} />}
+                            {openToken === token && <JSONToken token={token} />}
                         </div>
                     </div>
                 );

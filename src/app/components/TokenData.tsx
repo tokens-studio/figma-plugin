@@ -108,7 +108,6 @@ export default class TokenData {
 
     updateTokenValues(parent: string, tokens: TokenGroup): void {
         const hasErrored: boolean = this.checkTokenValidity(tokens);
-
         const newTokens = {
             ...this.tokens,
             [parent]: {
@@ -117,7 +116,6 @@ export default class TokenData {
             },
         };
         this.tokens = newTokens;
-
         if (!hasErrored) {
             this.setMergedTokens();
         }
