@@ -15,14 +15,6 @@ export function fetchPluginData(node, value: string) {
     return node.getPluginData(value);
 }
 
-export function findAllWithData() {
-    const nodes = figma.root.findAll((node): any => {
-        const pluginValues = fetchAllPluginData(node);
-        if (pluginValues) return node;
-    });
-    return nodes;
-}
-
 export function fetchAllPluginData(node) {
     const pluginData = Object.keys(properties).reduce((prev, prop) => {
         const data = fetchPluginData(node, prop);
@@ -37,6 +29,14 @@ export function fetchAllPluginData(node) {
         return Object.fromEntries(pluginData);
     }
     return null;
+}
+
+export function findAllWithData() {
+    const nodes = figma.root.findAll((node): any => {
+        const pluginValues = fetchAllPluginData(node);
+        if (pluginValues) return node;
+    });
+    return nodes;
 }
 
 export function sendPluginValues(nodes, values?) {

@@ -1,4 +1,6 @@
 import * as React from 'react';
+import objectPath from 'object-path';
+import JSON5 from 'json5';
 import {useTokenDispatch, useTokenState} from '../store/TokenContext';
 import EditTokenForm from './EditTokenForm';
 import Heading from './Heading';
@@ -6,8 +8,6 @@ import Icon from './Icon';
 import Modal from './Modal';
 import renderKeyValue from './renderKeyValue';
 import Tooltip from './Tooltip';
-import objectPath from 'object-path';
-import JSON5 from 'json5';
 
 const TokenListing = ({
     label,

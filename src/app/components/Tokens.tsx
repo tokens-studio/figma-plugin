@@ -77,10 +77,9 @@ const Tokens = () => {
                         );
                     case 'sizing':
                         return (
-                            <React.Fragment key={tokenValues[0]}>
-                                <TokenListing label="Width" property="Sizing" type="width" values={tokenValues} />
-                                <TokenListing label="Height" property="Sizing" type="height" values={tokenValues} />
-                            </React.Fragment>
+                            <div key={tokenValues[0]}>
+                                <TokenListing label="Sizing" property="Sizing" type="sizing" values={tokenValues} />
+                            </div>
                         );
                     case 'spacing':
                         return (

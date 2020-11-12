@@ -1,8 +1,9 @@
+/* eslint-disable default-case */
+import objectPath from 'object-path';
 import {convertToFigmaColor} from './helpers';
 import {fetchAllPluginData} from './pluginData';
 import {setTextValuesOnTarget} from './styles';
 import store from './store';
-const objectPath = require('object-path');
 import * as pjs from '../../package.json';
 
 export function updateNodes(nodes, tokens) {
@@ -93,6 +94,13 @@ export async function setValuesOnNode(node, values, data) {
                 num = Number(values.opacity);
             }
             node.opacity = num;
+        }
+    }
+
+    // SIZING: BOTH
+    if (values.sizing) {
+        if (typeof node.resize !== 'undefined') {
+            node.resize(Number(values.sizing), Number(values.sizing));
         }
     }
 

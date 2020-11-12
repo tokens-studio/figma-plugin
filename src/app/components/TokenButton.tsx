@@ -7,7 +7,7 @@ import {lightOrDark, colorByHashCode} from './utils';
 
 const TokenButton = ({type, property, name, path, token, editMode, showForm}) => {
     const {colorMode, displayType, selectionValues, tokenData, disabled} = useTokenState();
-    const {setSelectionValues, setNodeData, setShowOptions, setLoading} = useTokenDispatch();
+    const {setNodeData, setShowOptions, setLoading, deleteToken} = useTokenDispatch();
     const realTokenValue = tokenData.getAliasValue(token);
     const displayValue = realTokenValue || token;
     let style;
@@ -22,9 +22,12 @@ const TokenButton = ({type, property, name, path, token, editMode, showForm}) =>
         showForm({name, token, path});
     };
 
+    const handleDeleteClick = () => {
+        deleteToken({parent: 'options', path, name});
+    };
+
     function setPluginValue(value) {
         setLoading(true);
-        setSelectionValues(value);
         setNodeData(value);
     }
 
@@ -96,6 +99,17 @@ const TokenButton = ({type, property, name, path, token, editMode, showForm}) =>
                 {label: 'Gap', name: 'itemSpacing', icon: 'Gap'},
             ];
             break;
+        case 'sizing':
+            properties = [
+                {
+                    label: 'All',
+                    name: 'sizing',
+                    clear: ['width', 'height'],
+                },
+                {label: 'Width', name: 'width'},
+                {label: 'Height', name: 'height'},
+            ];
+            break;
         case 'fill':
             showValue = false;
             properties = [
@@ -134,7 +148,14 @@ const TokenButton = ({type, property, name, path, token, editMode, showForm}) =>
             } `}
             style={style}
         >
-            <MoreButton properties={properties} onClick={onClick} onEdit={handleEditClick} value={name} path={path}>
+            <MoreButton
+                properties={properties}
+                onClick={onClick}
+                onEdit={handleEditClick}
+                onDelete={handleDeleteClick}
+                value={name}
+                path={path}
+            >
                 <Tooltip
                     label={`${name}: ${JSON.stringify(token, null, 2)}${realTokenValue ? `: ${realTokenValue}` : ''}`}
                 >
