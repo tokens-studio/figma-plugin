@@ -19,10 +19,10 @@ if you want to nest your tokens you can do that. Go to the Edit Tokens dialog o 
 ## Applying Tokens
 There are two ways how you can apply tokens to your selection:
 
-### Default
+### Default behaviour (left-click)
 When you left-click a token this token is being put on your selection (multiple layers selected are possible!). For certain tokens we assume defaults, such as for `Colors` we assume you want to apply `Fill`.
 
-### Specifying what to apply
+### Specifying what to apply (right-click)
 You can right-click tokens to specify what property should be set, such as in `Spacing` the `Horizontal Spacing`, `Vertical Spacing` or `Gap` properties individually
 
 
