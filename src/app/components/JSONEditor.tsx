@@ -1,5 +1,4 @@
 import * as React from 'react';
-import JSON5 from 'json5';
 import JSONToken from './JSONToken';
 import Textarea from './Textarea';
 import Tooltip from './Tooltip';
@@ -73,8 +72,8 @@ const JSONEditor = () => {
                                 onChange={(val) => setStringTokens({parent: activeToken, tokens: val})}
                                 value={tokenData.tokens[activeToken].values}
                             />
-                            <div className="mt-2 flex justify-between">
-                                <div className="space-x-2 flex">
+                            <div className="mt-2 flex w-full">
+                                <div className="space-x-2 flex mr-2">
                                     <Button variant="secondary" size="large" onClick={setDefaultTokens}>
                                         Reset to Default
                                     </Button>

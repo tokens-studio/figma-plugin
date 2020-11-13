@@ -23,16 +23,16 @@ const JSONToken = ({token}: {token: string}) => {
                 onChange={(val) => setStringTokens({parent: activeToken, tokens: value.replace(regex, val)})}
                 value={value.match(regex)[0]}
             />
-            <div className="mt-2 flex justify-between">
-                <div className="space-x-2 flex">
-                    <Button variant="secondary" size="small" onClick={setDefaultTokens}>
+            <div className="mt-2 flex w-full">
+                <div className="space-x-2 flex mr-2">
+                    <Button variant="secondary" size="large" onClick={setDefaultTokens}>
                         Reset to Default
                     </Button>
-                    <Button variant="secondary" size="small" onClick={setEmptyTokens}>
+                    <Button variant="secondary" size="large" onClick={setEmptyTokens}>
                         Clear
                     </Button>
                 </div>
-                <Button variant="primary" size="small" onClick={handleUpdate}>
+                <Button variant="primary" size="large" onClick={handleUpdate}>
                     Save & update
                 </Button>
             </div>
