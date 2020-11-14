@@ -15,7 +15,6 @@ const TokenButton = ({type, property, name, path, token, editMode, showForm}) =>
     let showEditButton = false;
     let properties = [type];
     const buttonClass = [];
-    const active = selectionValues[type] === [path, name].join('.');
 
     const handleEditClick = () => {
         setShowOptions(property);
@@ -31,29 +30,6 @@ const TokenButton = ({type, property, name, path, token, editMode, showForm}) =>
         setNodeData(value);
     }
 
-    if (editMode) {
-        buttonClass.push('button-edit');
-    }
-    if (active) {
-        buttonClass.push('button-active');
-    }
-    const onClick = (givenProperties, isActive = active) => {
-        const propsToSet = Array.isArray(givenProperties) ? givenProperties : new Array(givenProperties);
-        if (editMode) {
-            showForm({name, token, path});
-        } else {
-            const tokenValue = [path, name].join('.');
-            let value = isActive ? 'delete' : tokenValue;
-            if (propsToSet[0].clear && !active) {
-                value = 'delete';
-                propsToSet[0].forcedValue = tokenValue;
-            }
-            const newProps = propsToSet
-                .map((i) => [[i.name || i], i.forcedValue || value])
-                .reduce((acc, [key, val]) => ({...acc, [key]: val}), {});
-            setPluginValue(newProps);
-        }
-    };
     if (colorMode) {
         style = {
             '--bgColor': colorByHashCode(name.toString()),
@@ -132,14 +108,41 @@ const TokenButton = ({type, property, name, path, token, editMode, showForm}) =>
                 showValue = true;
                 if (!editMode) showEditButton = true;
             }
-
-            if (active) {
-                buttonClass.push('button-active-fill');
-            }
             break;
         default:
             break;
     }
+
+    const active = selectionValues[type] === [path, name].join('.');
+    const semiActive = properties.some((prop) => selectionValues[prop.name] === [path, name].join('.'));
+
+    if (editMode) {
+        buttonClass.push('button-edit');
+    }
+    if (active) {
+        buttonClass.push('button-active');
+    } else if (semiActive) {
+        buttonClass.push('button-semi-active');
+    }
+
+    const onClick = (givenProperties, isActive = active) => {
+        const propsToSet = Array.isArray(givenProperties) ? givenProperties : new Array(givenProperties);
+        if (editMode) {
+            showForm({name, token, path});
+        } else {
+            const tokenValue = [path, name].join('.');
+            let value = isActive ? 'delete' : tokenValue;
+            if (propsToSet[0].clear && !active) {
+                value = 'delete';
+                propsToSet[0].forcedValue = tokenValue;
+            }
+            const newProps = {
+                [propsToSet[0].name || propsToSet[0]]: propsToSet[0].forcedValue || value,
+            };
+            if (propsToSet[0].clear) propsToSet[0].clear.map((item) => Object.assign(newProps, {[item]: 'delete'}));
+            setPluginValue(newProps);
+        }
+    };
 
     return (
         <div
