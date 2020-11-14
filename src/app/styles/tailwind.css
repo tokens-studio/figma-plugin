@@ -150,7 +150,7 @@ body {
     @apply rounded w-full p-1 -mb-1;
 }
 
-.button-property-color .button-active .button-text::before {
+.button-property-color.button-active .button-text::before {
     box-shadow: 0 0 0 1px black;
 }
 
