@@ -106,19 +106,27 @@ body {
 }
 
 .button-property:hover {
-    @apply bg-opacity-75;
+    @apply bg-gray-100 bg-opacity-50;
 }
 
 .button-property-edit {
     @apply opacity-0;
 }
 
-.button-property:hover .button-property-edit {
-    @apply opacity-100;
-}
-
 .button-active {
     @apply bg-primary-100;
+}
+
+.button-active:hover {
+    @apply bg-primary-100 bg-opacity-75;
+}
+
+.button-semi-active {
+    @apply bg-primary-100 bg-opacity-50;
+}
+
+.button-semi-active:hover {
+    @apply bg-primary-100 bg-opacity-25;
 }
 
 .button-property-color {
@@ -142,7 +150,7 @@ body {
     @apply rounded w-full p-1 -mb-1;
 }
 
-.button-active-fill .button-text::before {
+.button-property-color.button-active .button-text::before {
     box-shadow: 0 0 0 1px black;
 }
 

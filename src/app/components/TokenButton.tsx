@@ -7,7 +7,7 @@ import {lightOrDark, colorByHashCode} from './utils';
 
 const TokenButton = ({type, property, name, path, token, editMode, showForm}) => {
     const {colorMode, displayType, selectionValues, tokenData, disabled} = useTokenState();
-    const {setSelectionValues, setNodeData, setShowOptions, setLoading} = useTokenDispatch();
+    const {setNodeData, setShowOptions, setLoading, deleteToken} = useTokenDispatch();
     const realTokenValue = tokenData.getAliasValue(token);
     const displayValue = realTokenValue || token;
     let style;
@@ -15,42 +15,21 @@ const TokenButton = ({type, property, name, path, token, editMode, showForm}) =>
     let showEditButton = false;
     let properties = [type];
     const buttonClass = [];
-    const active = selectionValues[type] === [path, name].join('.');
 
     const handleEditClick = () => {
         setShowOptions(property);
         showForm({name, token, path});
     };
 
+    const handleDeleteClick = () => {
+        deleteToken({parent: 'options', path, name});
+    };
+
     function setPluginValue(value) {
         setLoading(true);
-        setSelectionValues(value);
         setNodeData(value);
     }
 
-    if (editMode) {
-        buttonClass.push('button-edit');
-    }
-    if (active) {
-        buttonClass.push('button-active');
-    }
-    const onClick = (givenProperties, isActive = active) => {
-        const propsToSet = Array.isArray(givenProperties) ? givenProperties : new Array(givenProperties);
-        if (editMode) {
-            showForm({name, token, path});
-        } else {
-            const tokenValue = [path, name].join('.');
-            let value = isActive ? 'delete' : tokenValue;
-            if (propsToSet[0].clear && !active) {
-                value = 'delete';
-                propsToSet[0].forcedValue = tokenValue;
-            }
-            const newProps = propsToSet
-                .map((i) => [[i.name || i], i.forcedValue || value])
-                .reduce((acc, [key, val]) => ({...acc, [key]: val}), {});
-            setPluginValue(newProps);
-        }
-    };
     if (colorMode) {
         style = {
             '--bgColor': colorByHashCode(name.toString()),
@@ -96,6 +75,17 @@ const TokenButton = ({type, property, name, path, token, editMode, showForm}) =>
                 {label: 'Gap', name: 'itemSpacing', icon: 'Gap'},
             ];
             break;
+        case 'sizing':
+            properties = [
+                {
+                    label: 'All',
+                    name: 'sizing',
+                    clear: ['width', 'height'],
+                },
+                {label: 'Width', name: 'width'},
+                {label: 'Height', name: 'height'},
+            ];
+            break;
         case 'fill':
             showValue = false;
             properties = [
@@ -118,14 +108,41 @@ const TokenButton = ({type, property, name, path, token, editMode, showForm}) =>
                 showValue = true;
                 if (!editMode) showEditButton = true;
             }
-
-            if (active) {
-                buttonClass.push('button-active-fill');
-            }
             break;
         default:
             break;
     }
+
+    const active = selectionValues[type] === [path, name].join('.');
+    const semiActive = properties.some((prop) => selectionValues[prop.name] === [path, name].join('.'));
+
+    if (editMode) {
+        buttonClass.push('button-edit');
+    }
+    if (active) {
+        buttonClass.push('button-active');
+    } else if (semiActive) {
+        buttonClass.push('button-semi-active');
+    }
+
+    const onClick = (givenProperties, isActive = active) => {
+        const propsToSet = Array.isArray(givenProperties) ? givenProperties : new Array(givenProperties);
+        if (editMode) {
+            showForm({name, token, path});
+        } else {
+            const tokenValue = [path, name].join('.');
+            let value = isActive ? 'delete' : tokenValue;
+            if (propsToSet[0].clear && !active) {
+                value = 'delete';
+                propsToSet[0].forcedValue = tokenValue;
+            }
+            const newProps = {
+                [propsToSet[0].name || propsToSet[0]]: propsToSet[0].forcedValue || value,
+            };
+            if (propsToSet[0].clear) propsToSet[0].clear.map((item) => Object.assign(newProps, {[item]: 'delete'}));
+            setPluginValue(newProps);
+        }
+    };
 
     return (
         <div
@@ -134,7 +151,14 @@ const TokenButton = ({type, property, name, path, token, editMode, showForm}) =>
             } `}
             style={style}
         >
-            <MoreButton properties={properties} onClick={onClick} onEdit={handleEditClick} value={name} path={path}>
+            <MoreButton
+                properties={properties}
+                onClick={onClick}
+                onEdit={handleEditClick}
+                onDelete={handleDeleteClick}
+                value={name}
+                path={path}
+            >
                 <Tooltip
                     label={`${name}: ${JSON.stringify(token, null, 2)}${realTokenValue ? `: ${realTokenValue}` : ''}`}
                 >

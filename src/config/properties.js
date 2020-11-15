@@ -1,5 +1,6 @@
 export default {
     values: {},
+    sizing: {},
     height: {},
     width: {},
     spacing: {},
