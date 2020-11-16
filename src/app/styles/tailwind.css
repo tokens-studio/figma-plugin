@@ -241,6 +241,7 @@ form {
     max-width: 50%;
     text-overflow: ellipsis;
     overflow: hidden;
+    z-index: 999;
 }
 
 .modal-wrapper {

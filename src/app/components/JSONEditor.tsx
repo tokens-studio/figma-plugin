@@ -5,6 +5,7 @@ import Tooltip from './Tooltip';
 import Heading from './Heading';
 import {useTokenState, useTokenDispatch} from '../store/TokenContext';
 import Button from './Button';
+import Modal from './Modal';
 
 const supportedProperties = [
     'sizing',
@@ -25,15 +26,54 @@ const JSONEditor = () => {
     const {setStringTokens, setEmptyTokens, setDefaultTokens, updateTokens, setLoading} = useTokenDispatch();
     const [activeToken] = React.useState('options');
     const [openToken, setOpenToken] = React.useState('all');
+    const [confirmModalVisible, showConfirmModal] = React.useState('');
 
     const handleUpdate = async () => {
         await setLoading(true);
         updateTokens();
     };
 
+    const handleSetDefault = () => {
+        setDefaultTokens();
+        showConfirmModal('');
+    };
+
+    const handleSetEmpty = () => {
+        setEmptyTokens();
+        showConfirmModal('');
+    };
+
     return (
-        <div className="">
+        <div>
             <div className="border-b border-gray-200">
+                <Modal
+                    title="Are you sure?"
+                    isOpen={confirmModalVisible === 'reset'}
+                    close={() => showConfirmModal('')}
+                >
+                    <div className="flex justify-center space-x-2">
+                        <Button variant="secondary" size="large" onClick={() => showConfirmModal('')}>
+                            Cancel
+                        </Button>
+                        <Button variant="primary" size="large" onClick={handleSetDefault}>
+                            Yes, set to default.
+                        </Button>
+                    </div>
+                </Modal>
+                <Modal
+                    title="Are you sure?"
+                    isOpen={confirmModalVisible === 'delete'}
+                    close={() => showConfirmModal('')}
+                >
+                    <div className="flex justify-center space-x-2">
+                        <Button variant="secondary" size="large" onClick={() => showConfirmModal('')}>
+                            Cancel
+                        </Button>
+                        <Button variant="primary" size="large" onClick={handleSetEmpty}>
+                            Yes, clear all Tokens.
+                        </Button>
+                    </div>
+                </Modal>
                 <div className="flex flex-col justify-between items-center">
                     <button
                         className={`flex items-center w-full h-full p-4 space-x-2 hover:bg-gray-100 focus:outline-none ${
@@ -74,10 +114,10 @@ const JSONEditor = () => {
                             />
                             <div className="mt-2 flex w-full">
                                 <div className="space-x-2 flex mr-2">
-                                    <Button variant="secondary" size="large" onClick={setDefaultTokens}>
+                                    <Button variant="secondary" size="large" onClick={() => showConfirmModal('reset')}>
                                         Reset to Default
                                     </Button>
-                                    <Button variant="secondary" size="large" onClick={setEmptyTokens}>
+                                    <Button variant="secondary" size="large" onClick={() => showConfirmModal('delete')}>
                                         Clear
                                     </Button>
                                 </div>
@@ -90,7 +130,7 @@ const JSONEditor = () => {
                 </div>
             </div>
             {supportedProperties.map((token) => {
-                let handleClick = () => {
+                const handleClick = () => {
                     if (openToken === token) {
                         setOpenToken('');
                     } else {
