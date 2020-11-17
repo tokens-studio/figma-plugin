@@ -23,7 +23,7 @@ textarea::-webkit-scrollbar-thumb {
 }
 
 .heading {
-    @apply text-lg font-semibold text-gray-900 leading-none capitalize;
+    @apply font-semibold text-gray-900 leading-none capitalize;
 }
 
 .heading-small {
