@@ -6,7 +6,7 @@ ReactModal.setAppElement('#react-page');
 
 const customStyles = {
     overlay: {
-        backgroundColor: 'rgba(0,0,0,0.5)',
+        backgroundColor: 'rgba(0,0,0,0.2)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -42,7 +42,7 @@ const Modal = ({
     <ReactModal isOpen={isOpen} onRequestClose={close} style={customStyles} contentLabel={title || null}>
         <div className={full ? 'p-0' : 'p-8'}>
             {title && (
-                <div className="mb-4 flex justify-center text-center">
+                <div className="mb-4">
                     <Heading size="small">{title}</Heading>
                 </div>
             )}
