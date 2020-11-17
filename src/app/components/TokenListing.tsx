@@ -177,7 +177,7 @@ const TokenListing = ({
                     </Tooltip>
                 </div>
                 {showOptions === values[0] && (
-                    <Modal full isOpen={showOptions} close={closeForm}>
+                    <Modal full isOpen={showOptions === values[0]} close={closeForm}>
                         <div className="flex flex-col-reverse">
                             {showEditForm && (
                                 <EditTokenForm

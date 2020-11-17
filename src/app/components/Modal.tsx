@@ -37,10 +37,10 @@ const Modal = ({
     full?: boolean;
     isOpen: boolean;
     close: Function;
-    children: any;
+    children: React.ReactNode;
 }) => (
     <ReactModal isOpen={isOpen} onRequestClose={close} style={customStyles} contentLabel={title || null}>
-        <div className={full ? 'p-0' : 'p-3'}>
+        <div className={full ? 'p-0' : 'p-8'}>
             {title && (
                 <div className="mb-4 flex justify-center text-center">
                     <Heading size="small">{title}</Heading>
