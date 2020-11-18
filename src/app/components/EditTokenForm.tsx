@@ -32,6 +32,7 @@ const EditTokenForm = ({submitTokenValue, explainer = '', property, isPristine, 
     const handleReset = () => {
         setShowEditForm(false);
     };
+
     return (
         <Modal isOpen={true} close={handleReset} title={title}>
             <form onSubmit={handleSubmit} className="space-y-4 flex flex-col justify-start">

@@ -158,6 +158,7 @@ const TokenButton = ({type, property, name, path, token, editMode, showForm}) =>
                 onDelete={handleDeleteClick}
                 value={name}
                 path={path}
+                mode={editMode ? 'edit' : 'list'}
             >
                 <Tooltip
                     label={`${name}: ${JSON.stringify(token, null, 2)}${realTokenValue ? `: ${realTokenValue}` : ''}`}

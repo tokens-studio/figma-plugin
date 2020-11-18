@@ -10,7 +10,7 @@ const customStyles = {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '1rem',
+        padding: '2rem',
         zIndex: '1',
     },
     content: {
