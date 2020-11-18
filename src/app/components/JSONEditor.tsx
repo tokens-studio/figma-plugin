@@ -71,7 +71,7 @@ const JSONEditor = () => {
                     <Textarea
                         className="flex-grow"
                         placeholder="Enter JSON"
-                        rows={24}
+                        rows={23}
                         hasErrored={tokenData.tokens[activeToken].hasErrored}
                         onChange={(val) => setStringTokens({parent: activeToken, tokens: val})}
                         value={tokenData.tokens[activeToken].values}
