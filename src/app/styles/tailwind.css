@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
 
 @tailwind base;
 
@@ -8,12 +8,26 @@ body {
     @apply font-body text-sm;
 }
 
+body::-webkit-scrollbar,
+.ReactModal__Content::-webkit-scrollbar,
+textarea::-webkit-scrollbar {
+    width: 9px;
+}
+
+body::-webkit-scrollbar-thumb,
+.ReactModal__Content::-webkit-scrollbar-thumb,
+textarea::-webkit-scrollbar-thumb {
+    @apply bg-gray-400;
+    border-radius: 9px;
+    border: 2px solid white;
+}
+
 .heading {
-    @apply text-2xl font-medium text-gray-900 leading-none capitalize;
+    @apply font-semibold text-gray-900 leading-none capitalize;
 }
 
 .heading-small {
-    @apply text-xs;
+    @apply text-xs font-medium;
 }
 
 .navbar {
@@ -221,6 +235,11 @@ button[disabled] {
 
 textarea {
     @apply w-full border bg-white text-xxs p-3 rounded font-mono;
+    resize: none;
+}
+
+textarea:focus {
+    @apply border border-gray-600 outline-none;
 }
 
 form {

@@ -29,6 +29,7 @@ module.exports = {
             },
             fontFamily: {
                 body: ['Inter', 'sans-serif'],
+                mono: ['JetBrainsMono', 'monospace'],
             },
             zIndex: {
                 1: '1',

@@ -24,7 +24,7 @@ const Navbar = ({active, setActive}) => {
             <div>
                 <TabButton first name="tokens" label="Tokens" active={active} setActive={setActive} />
                 <TabButton name="json" label="JSON" active={active} setActive={setActive} />
-                <TabButton name="inspector" label="Inspector" active={active} setActive={setActive} />
+                <TabButton name="inspector" label="Inspect" active={active} setActive={setActive} />
             </div>
             <div>
                 <Tooltip variant="right" label="Import Color Styles">

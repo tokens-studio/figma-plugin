@@ -3,14 +3,14 @@ import {ContextMenu, MenuItem, ContextMenuTrigger} from 'react-contextmenu';
 import Icon from './Icon';
 import {useTokenState} from '../store/TokenContext';
 
-const MoreButton = ({properties, children, path, value, onClick, onEdit, onDelete}) => {
+const MoreButton = ({properties, children, path, value, onClick, onEdit, onDelete, mode}) => {
     const {selectionValues} = useTokenState();
     const visibleProperties = properties.filter((p) => p.label);
 
     return (
         <div className="w-full">
-            <ContextMenuTrigger id={`${path}-${value}`}>{children}</ContextMenuTrigger>
-            <ContextMenu id={`${path}-${value}`} className="text-xs">
+            <ContextMenuTrigger id={`${path}-${value}-${mode}`}>{children}</ContextMenuTrigger>
+            <ContextMenu id={`${path}-${value}-${mode}`} className="text-xs">
                 {visibleProperties.map((property) => {
                     const isActive = selectionValues[property.name] === `${path}.${value}`;
 
