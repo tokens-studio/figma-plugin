@@ -56,13 +56,15 @@ figma.ui.onmessage = async (msg) => {
                 console.error(e);
             }
             return;
-        case 'update':
+        case 'update': {
+            const allWithData = findAllWithData();
             setTokenData(msg.tokenValues);
             updateStyles(msg.tokens, false);
-            updateNodes(findAllWithData(), msg.tokens);
-            updatePluginData(findAllWithData(), {});
+            updateNodes(allWithData, msg.tokens);
+            updatePluginData(allWithData, {});
             notifyRemoteComponents({nodes: store.successfulNodes.length, remotes: store.remoteComponents});
             return;
+        }
         case 'gotonode':
             goToNode(msg.id);
             break;

@@ -1,4 +1,5 @@
-import {removeValuesFromNode} from './node';
+import {findAll} from '@figma-plugin/helpers';
+import {removeValuesFromNode} from './updateNode';
 import {notifySelection} from './notifiers';
 import store from './store';
 import properties from '../config/properties';
@@ -16,14 +17,19 @@ export function fetchPluginData(node, value: string) {
 }
 
 export function fetchAllPluginData(node) {
-    const pluginData = Object.keys(properties).reduce((prev, prop) => {
+    const pluginData = [];
+    let i = 0;
+    const len = Object.keys(properties).length;
+    while (i < len) {
+        const prop = Object.keys(properties)[i];
         const data = fetchPluginData(node, prop);
-        if (data) prev.push([prop, JSON.parse(data)]);
-        return prev;
-    }, []);
+        if (data) pluginData.push([prop, JSON.parse(data)]);
 
-    if (pluginData.length == 1 && pluginData[0][0] === 'values') {
-        return pluginData[0][1];
+        i += 1;
+    }
+
+    if (pluginData.length === 1 && pluginData[0][0] === 'values') {
+        return node ? pluginData[0][1] : pluginData[0][1];
     }
     if (pluginData.length > 0) {
         return Object.fromEntries(pluginData);
@@ -32,7 +38,7 @@ export function fetchAllPluginData(node) {
 }
 
 export function findAllWithData() {
-    const nodes = figma.root.findAll((node): any => {
+    const nodes = findAll(figma.currentPage.children, (node): any => {
         const pluginValues = fetchAllPluginData(node);
         if (pluginValues) return node;
     });
