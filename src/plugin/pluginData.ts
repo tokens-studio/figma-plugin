@@ -38,7 +38,7 @@ export function fetchAllPluginData(node) {
 }
 
 export function findAllWithData() {
-    const nodes = findAll(figma.currentPage.children, (node): any => {
+    const nodes = findAll(figma.root.children, (node): any => {
         const pluginValues = fetchAllPluginData(node);
         if (pluginValues) return node;
     });
