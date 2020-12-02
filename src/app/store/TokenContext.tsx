@@ -1,7 +1,7 @@
 import * as React from 'react';
 import JSON5 from 'json5';
 import objectPath from 'object-path';
-import {defaultJSON} from '../../config/default';
+import defaultJSON from '../../config/default.json';
 import TokenData, {TokenProps} from '../components/TokenData';
 import * as pjs from '../../../package.json';
 
@@ -38,7 +38,7 @@ export enum ActionType {
 const defaultTokens: TokenProps = {
     version: pjs.version,
     values: {
-        options: JSON5.stringify(defaultJSON(), null, 2),
+        options: JSON.stringify(defaultJSON, null, 2),
     },
 };
 
@@ -125,7 +125,7 @@ function stateReducer(state, action) {
         case ActionType.DeleteToken: {
             const obj = JSON5.parse(state.tokenData.tokens[action.data.parent].values);
             objectPath.del(obj, [action.data.path, action.data.name].join('.'));
-            const tokens = JSON5.stringify(obj, null, 2);
+            const tokens = JSON.stringify(obj, null, 2);
             state.tokenData.updateTokenValues(action.data.parent, tokens);
             const newState = {
                 ...state,

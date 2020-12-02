@@ -61,7 +61,7 @@ const TokenListing = ({
               }
             : token;
         objectPath.set(obj, name, newValue);
-        setStringTokens({parent, tokens: JSON5.stringify(obj, null, 2)});
+        setStringTokens({parent, tokens: JSON.stringify(obj, null, 2)});
     }
 
     const closeForm = () => {
