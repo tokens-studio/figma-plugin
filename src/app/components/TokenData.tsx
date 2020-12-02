@@ -23,7 +23,7 @@ interface Tokens {
 
 interface TokenObject {
     hasErrored?: boolean;
-    values: TokenGroup;
+    values: string;
 }
 
 export default class TokenData {
@@ -42,7 +42,7 @@ export default class TokenData {
         this.tokens = parsed;
     }
 
-    private checkTokenValidity(tokens: TokenGroup): boolean {
+    private checkTokenValidity(tokens: string): boolean {
         try {
             JSON5.parse(tokens);
             return false;
@@ -71,7 +71,7 @@ export default class TokenData {
         } else {
             return {
                 options: {
-                    values: JSON5.stringify(tokens.values, null, 2),
+                    values: JSON.stringify(tokens.values, null, 2),
                 },
             };
         }
@@ -90,7 +90,7 @@ export default class TokenData {
             });
         });
         const newTokens = mergeDeep(JSON5.parse(this.tokens.options.values), receivedStyles);
-        this.tokens.options.values = JSON5.stringify(newTokens, null, 2);
+        this.tokens.options.values = JSON.stringify(newTokens, null, 2);
         this.setMergedTokens();
     }
 
@@ -106,9 +106,8 @@ export default class TokenData {
         this.setAllAliases();
     }
 
-    updateTokenValues(parent: string, tokens: TokenGroup): void {
+    updateTokenValues(parent: string, tokens: string): void {
         const hasErrored: boolean = this.checkTokenValidity(tokens);
-
         const newTokens = {
             ...this.tokens,
             [parent]: {
@@ -117,7 +116,6 @@ export default class TokenData {
             },
         };
         this.tokens = newTokens;
-
         if (!hasErrored) {
             this.setMergedTokens();
         }

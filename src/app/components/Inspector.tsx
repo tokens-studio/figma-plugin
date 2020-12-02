@@ -1,17 +1,18 @@
 import * as React from 'react';
 import objectPath from 'object-path';
-import {useTokenState} from '../store/TokenContext';
+import {useTokenState, useTokenDispatch} from '../store/TokenContext';
 import Button from './Button';
 
 const Inspector = () => {
-    const {state, removeNodeData} = useTokenState();
+    const {selectionValues, tokenData} = useTokenState();
+    const {removeNodeData} = useTokenDispatch();
     const getValue = (value) => {
-        return objectPath.get(state.tokenData.getMergedTokens(), value);
+        return objectPath.get(tokenData.getMergedTokens(), value);
     };
     return (
         <div className="space-y-2 p-4">
             <div className="space-y-1">
-                {Object.entries(state.selectionValues)
+                {Object.entries(selectionValues)
                     .filter(([, value]) => value !== 'delete')
                     .map(([key, value]) => (
                         <div key={key}>

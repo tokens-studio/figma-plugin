@@ -1,6 +1,7 @@
 import * as React from 'react';
 import JSON5 from 'json5';
-import {defaultJSON} from '../presets/default';
+import objectPath from 'object-path';
+import defaultJSON from '../../config/default.json';
 import TokenData, {TokenProps} from '../components/TokenData';
 import * as pjs from '../../../package.json';
 
@@ -11,12 +12,33 @@ export interface SelectionValue {
     itemSpacing: string | undefined;
 }
 
-const TokenContext = React.createContext(null);
+export enum ActionType {
+    SetTokenData = 'SET_TOKEN_DATA',
+    SetTokensFromStyles = 'SET_TOKENS_FROM_STYLES',
+    SetDefaultTokens = 'SET_DEFAULT_TOKENS',
+    SetEmptyTokens = 'SET_EMPTY_TOKENS',
+    SetLoading = 'SET_LOADING',
+    SetDisabled = 'SET_DISABLED',
+    SetStringTokens = 'SET_STRING_TOKENS',
+    UpdateTokens = 'UPDATE_TOKENS',
+    DeleteToken = 'DELETE_TOKEN',
+    CreateStyles = 'CREATE_STYLES',
+    SetNodeData = 'SET_NODE_DATA',
+    RemoveNodeData = 'REMOVE_NODE_DATA',
+    PullStyles = 'PULL_STYLES',
+    SetSelectionValues = 'SET_SELECTION_VALUES',
+    ResetSelectionValues = 'RESET_SELECTION_VALUES',
+    SetShowEditForm = 'SET_SHOW_EDIT_FORM',
+    SetShowOptions = 'SET_SHOW_OPTIONS',
+    SetDisplayType = 'SET_DISPLAY_TYPE',
+    ToggleColorMode = 'TOGGLE_COLOR_MODE',
+    SetCollapsed = 'SET_COLLAPSED',
+}
 
 const defaultTokens: TokenProps = {
     version: pjs.version,
     values: {
-        options: JSON5.stringify(defaultJSON(), null, 2),
+        options: JSON.stringify(defaultJSON, null, 2),
     },
 };
 
@@ -30,11 +52,18 @@ const emptyTokens: TokenProps = {
 const emptyState = {
     tokens: defaultTokens,
     loading: true,
+    disabled: false,
+    collapsed: false,
     tokenData: new TokenData(emptyTokens),
     selectionValues: {},
     displayType: 'GRID',
     colorMode: false,
+    showEditForm: false,
+    showOptions: false,
 };
+
+const TokenStateContext = React.createContext(emptyState);
+const TokenDispatchContext = React.createContext(null);
 
 function updateTokens(state: any) {
     parent.postMessage(
@@ -51,29 +80,34 @@ function updateTokens(state: any) {
 
 function stateReducer(state, action) {
     switch (action.type) {
-        case 'SET_TOKEN_DATA':
+        case ActionType.SetTokenData:
             return {
                 ...state,
                 tokenData: action.data,
             };
-        case 'SET_TOKENS_FROM_STYLES':
+        case ActionType.SetTokensFromStyles:
             state.tokenData.injectTokens(action.data);
             updateTokens(state);
             return {
                 ...state,
                 tokens: state.tokenData.tokens,
             };
-        case 'SET_DEFAULT_TOKENS':
-            state.tokenData.setTokens(defaultTokens);
-            return state;
-        case 'SET_EMPTY_TOKENS':
-            return emptyState;
-        case 'SET_LOADING':
+        case ActionType.SetEmptyTokens:
+            return {
+                ...state,
+                ...emptyState,
+            };
+        case ActionType.SetLoading:
             return {
                 ...state,
                 loading: action.state,
             };
-        case 'SET_STRING_TOKENS':
+        case ActionType.SetDisabled:
+            return {
+                ...state,
+                disabled: action.state,
+            };
+        case ActionType.SetStringTokens:
             state.tokenData.updateTokenValues(action.data.parent, action.data.tokens);
             return {
                 ...state,
@@ -85,10 +119,28 @@ function stateReducer(state, action) {
                     },
                 },
             };
-        case 'UPDATE_TOKENS':
+        case ActionType.UpdateTokens:
             updateTokens(state);
             return state;
-        case 'CREATE_STYLES':
+        case ActionType.DeleteToken: {
+            const obj = JSON5.parse(state.tokenData.tokens[action.data.parent].values);
+            objectPath.del(obj, [action.data.path, action.data.name].join('.'));
+            const tokens = JSON.stringify(obj, null, 2);
+            state.tokenData.updateTokenValues(action.data.parent, tokens);
+            const newState = {
+                ...state,
+                tokens: {
+                    ...state.tokens,
+                    [action.data.parent]: {
+                        hasErrored: state.tokenData.checkTokenValidity(tokens),
+                        values: tokens,
+                    },
+                },
+            };
+            updateTokens(newState);
+            return newState;
+        }
+        case ActionType.CreateStyles:
             parent.postMessage(
                 {
                     pluginMessage: {
@@ -99,22 +151,19 @@ function stateReducer(state, action) {
                 '*'
             );
             return state;
-        case 'SET_NODE_DATA':
+        case ActionType.SetNodeData:
             parent.postMessage(
                 {
                     pluginMessage: {
                         type: 'set-node-data',
-                        values: {
-                            ...state.selectionValues,
-                            ...action.data,
-                        },
+                        values: action.data,
                         tokens: state.tokenData.getMergedTokens(),
                     },
                 },
                 '*'
             );
             return state;
-        case 'REMOVE_NODE_DATA':
+        case ActionType.RemoveNodeData:
             parent.postMessage(
                 {
                     pluginMessage: {
@@ -124,7 +173,7 @@ function stateReducer(state, action) {
                 '*'
             );
             return state;
-        case 'PULL_STYLES':
+        case ActionType.PullStyles:
             parent.postMessage(
                 {
                     pluginMessage: {
@@ -139,38 +188,42 @@ function stateReducer(state, action) {
             );
             return state;
 
-        case 'SET_SELECTION_VALUES':
+        case ActionType.SetSelectionValues:
             return {
                 ...state,
-                selectionValues: {
-                    ...state.selectionValues,
-                    ...action.data,
-                },
+                loading: false,
+                selectionValues: action.data,
             };
-        case 'RESET_SELECTION_VALUES':
+        case ActionType.ResetSelectionValues:
             return {
                 ...state,
+                loading: false,
                 selectionValues: {},
             };
-        case 'SET_SHOW_EDIT_FORM':
+        case ActionType.SetShowEditForm:
             return {
                 ...state,
                 showEditForm: action.bool,
             };
-        case 'SET_SHOW_OPTIONS':
+        case ActionType.SetShowOptions:
             return {
                 ...state,
                 showOptions: action.data,
             };
-        case 'SET_DISPLAY_TYPE':
+        case ActionType.SetDisplayType:
             return {
                 ...state,
                 displayType: action.data,
             };
-        case 'TOGGLE_COLOR_MODE':
+        case ActionType.ToggleColorMode:
             return {
                 ...state,
                 colorMode: !state.colorMode,
+            };
+        case ActionType.SetCollapsed:
+            return {
+                ...state,
+                collapsed: !state.collapsed,
             };
         default:
             throw new Error('Not implemented');
@@ -182,78 +235,95 @@ function TokenProvider({children}) {
 
     const tokenContext = React.useMemo(
         () => ({
-            state,
             setTokens: (tokens) => {
                 dispatch({type: 'SET_TOKENS', tokens});
             },
             setTokensFromStyles: (data) => {
-                dispatch({type: 'SET_TOKENS_FROM_STYLES', data});
+                dispatch({type: ActionType.SetTokensFromStyles, data});
             },
             setTokenData: (data: TokenData) => {
-                dispatch({type: 'SET_TOKEN_DATA', data});
+                dispatch({type: ActionType.SetTokenData, data});
             },
             setStringTokens: (data: {parent: string; tokens: string}) => {
-                dispatch({type: 'SET_STRING_TOKENS', data});
+                dispatch({type: ActionType.SetStringTokens, data});
             },
             setDefaultTokens: () => {
-                dispatch({type: 'SET_DEFAULT_TOKENS'});
-                dispatch({type: 'SET_LOADING', state: false});
+                dispatch({type: ActionType.SetTokenData, data: new TokenData(defaultTokens)});
+                dispatch({type: ActionType.SetLoading, state: false});
             },
             setEmptyTokens: () => {
-                dispatch({type: 'SET_EMPTY_TOKENS'});
-                dispatch({type: 'SET_LOADING', state: false});
+                dispatch({type: ActionType.SetEmptyTokens});
+                dispatch({type: ActionType.SetLoading, state: false});
             },
             updateTokens: () => {
-                dispatch({type: 'UPDATE_TOKENS'});
+                dispatch({type: ActionType.UpdateTokens});
+            },
+            deleteToken: (data) => {
+                dispatch({type: ActionType.DeleteToken, data});
             },
             createStyles: () => {
-                dispatch({type: 'CREATE_STYLES'});
+                dispatch({type: ActionType.CreateStyles});
             },
             setLoading: (boolean) => {
-                dispatch({type: 'SET_LOADING', state: boolean});
+                dispatch({type: ActionType.SetLoading, state: boolean});
+            },
+            setDisabled: (boolean) => {
+                dispatch({type: ActionType.SetDisabled, state: boolean});
             },
             setNodeData: (data: SelectionValue) => {
-                dispatch({type: 'SET_LOADING', state: true});
-                dispatch({type: 'SET_NODE_DATA', data});
+                dispatch({type: ActionType.SetNodeData, data});
             },
             removeNodeData: (data: SelectionValue) => {
-                dispatch({type: 'SET_LOADING', state: true});
-                dispatch({type: 'REMOVE_NODE_DATA', data});
+                dispatch({type: ActionType.RemoveNodeData, data});
             },
             setSelectionValues: (data: SelectionValue) => {
-                dispatch({type: 'SET_SELECTION_VALUES', data});
+                dispatch({type: ActionType.SetSelectionValues, data});
             },
             resetSelectionValues: () => {
-                dispatch({type: 'RESET_SELECTION_VALUES'});
+                dispatch({type: ActionType.ResetSelectionValues});
             },
             setShowEditForm: (bool: boolean) => {
-                dispatch({type: 'SET_SHOW_EDIT_FORM', bool});
+                dispatch({type: ActionType.SetShowEditForm, bool});
             },
             setShowOptions: (data: string) => {
-                dispatch({type: 'SET_SHOW_OPTIONS', data});
+                dispatch({type: ActionType.SetShowOptions, data});
             },
             setDisplayType: (data: string) => {
-                dispatch({type: 'SET_DISPLAY_TYPE', data});
+                dispatch({type: ActionType.SetDisplayType, data});
             },
             toggleColorMode: () => {
-                dispatch({type: 'TOGGLE_COLOR_MODE'});
+                dispatch({type: ActionType.ToggleColorMode});
             },
             pullStyles: () => {
-                dispatch({type: 'PULL_STYLES'});
+                dispatch({type: ActionType.PullStyles});
+            },
+            setCollapsed: () => {
+                dispatch({type: ActionType.SetCollapsed});
             },
         }),
-        [state]
+        [dispatch]
     );
 
-    return <TokenContext.Provider value={tokenContext}>{children}</TokenContext.Provider>;
+    return (
+        <TokenStateContext.Provider value={state}>
+            <TokenDispatchContext.Provider value={tokenContext}>{children}</TokenDispatchContext.Provider>
+        </TokenStateContext.Provider>
+    );
 }
 
 function useTokenState() {
-    const context = React.useContext(TokenContext);
+    const context = React.useContext(TokenStateContext);
     if (context === undefined) {
         throw new Error('useTokenState must be used within a TokenProvider');
     }
     return context;
 }
+function useTokenDispatch() {
+    const context = React.useContext(TokenDispatchContext);
+    if (context === undefined) {
+        throw new Error('useTokenDispatch must be used within a TokenProvider');
+    }
+    return context;
+}
 
-export {TokenProvider, useTokenState, TokenContext};
+export {TokenProvider, useTokenState, useTokenDispatch};

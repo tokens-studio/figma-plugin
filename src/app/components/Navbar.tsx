@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {useTokenState} from '../store/TokenContext';
+import {useTokenState, useTokenDispatch} from '../store/TokenContext';
 import Icon from './Icon';
 import Tooltip from './Tooltip';
 
@@ -17,13 +17,14 @@ const TabButton = ({name, label, active, setActive, first = false}) => (
 );
 
 const Navbar = ({active, setActive}) => {
-    const {state, toggleColorMode, pullStyles} = useTokenState();
+    const {colorMode} = useTokenState();
+    const {toggleColorMode, pullStyles} = useTokenDispatch();
     return (
         <div className="sticky top-0 navbar bg-white flex items-center justify-between z-1 border-b border-gray-200">
             <div>
                 <TabButton first name="tokens" label="Tokens" active={active} setActive={setActive} />
                 <TabButton name="json" label="JSON" active={active} setActive={setActive} />
-                <TabButton name="inspector" label="Inspector" active={active} setActive={setActive} />
+                <TabButton name="inspector" label="Inspect" active={active} setActive={setActive} />
             </div>
             <div>
                 <Tooltip variant="right" label="Import Styles">
@@ -31,9 +32,9 @@ const Navbar = ({active, setActive}) => {
                         <Icon name="import" />
                     </button>
                 </Tooltip>
-                <Tooltip variant="right" label={state.colorMode ? 'Disable Color UI' : 'Enable Color UI'}>
+                <Tooltip variant="right" label={colorMode ? 'Disable Color UI' : 'Enable Color UI'}>
                     <button className="button button-ghost" type="button" onClick={toggleColorMode}>
-                        <Icon name={state.colorMode ? 'blend' : 'blendempty'} />
+                        <Icon name={colorMode ? 'blend' : 'blendempty'} />
                     </button>
                 </Tooltip>
             </div>
