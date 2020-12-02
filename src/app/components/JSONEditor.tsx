@@ -1,15 +1,25 @@
 import * as React from 'react';
+import YAML from 'js-yaml';
 import Textarea from './Textarea';
 import Heading from './Heading';
 import {useTokenState, useTokenDispatch} from '../store/TokenContext';
 import Button from './Button';
 import Modal from './Modal';
 
+const schema = YAML.DEFAULT_SAFE_SCHEMA;
+schema.compiledTypeMap.scalar['tag:yaml.org,2002:null'].represent.lowercase = function () {
+    return '';
+};
+
 const JSONEditor = () => {
     const {tokenData} = useTokenState();
     const {setStringTokens, setEmptyTokens, setDefaultTokens, updateTokens, setLoading} = useTokenDispatch();
     const [activeToken] = React.useState('options');
     const [confirmModalVisible, showConfirmModal] = React.useState('');
+    const [isJSON, setIsJSON] = React.useState(true);
+    const [YAMLValue, setYAMLValue] = React.useState(undefined);
+
+    var hasErrored = false;
 
     const handleUpdate = async () => {
         await setLoading(true);
@@ -25,6 +35,38 @@ const JSONEditor = () => {
         setEmptyTokens();
         showConfirmModal('');
     };
+
+    const handleChange = (val) => {
+        setStringTokens({parent: activeToken, tokens: val});
+    };
+
+    const checkForError = (obj) => {
+        if (hasErrored) return;
+        for (var i in obj) {
+            if (hasErrored) return;
+            var child = obj[i];
+            if (child === null) {
+                console.log('child is null');
+                hasErrored = true;
+            } else if (typeof child == 'object') {
+                checkForError(child);
+            }
+        }
+    };
+
+    const handleYMLChange = (val) => {
+        setYAMLValue(val);
+        const json = JSON.stringify(YAML.safeLoad(val), null, 2);
+        hasErrored = false;
+        checkForError(JSON.parse(json));
+        if (!hasErrored) handleChange(json);
+    };
+
+    React.useEffect(() => {
+        if (!tokenData.tokens[activeToken].hasErrored) {
+            setYAMLValue(YAML.safeDump(JSON.parse(tokenData.tokens[activeToken].values)));
+        }
+    }, [tokenData.tokens[activeToken].values]);
 
     return (
         <div className="flex flex-col flex-grow">
@@ -68,14 +110,41 @@ const JSONEditor = () => {
             </Modal>
             <div className="flex flex-col justify-between items-center flex-grow">
                 <div className="flex flex-col p-4 w-full items-center flex-grow">
-                    <Textarea
-                        className="flex-grow"
-                        placeholder="Enter JSON"
-                        rows={23}
-                        hasErrored={tokenData.tokens[activeToken].hasErrored}
-                        onChange={(val) => setStringTokens({parent: activeToken, tokens: val})}
-                        value={tokenData.tokens[activeToken].values}
-                    />
+                    <div className="flex flex-row space-x-2">
+                        <Button
+                            onClick={() => setIsJSON(true)}
+                            size="small"
+                            variant={`${isJSON ? 'primary' : 'secondary'}`}
+                        >
+                            JSON
+                        </Button>
+                        <Button
+                            onClick={() => setIsJSON(false)}
+                            size="small"
+                            variant={`${!isJSON ? 'primary' : 'secondary'}`}
+                        >
+                            YAML
+                        </Button>
+                    </div>
+                    {isJSON ? (
+                        <Textarea
+                            className="flex-grow"
+                            placeholder="Enter JSON"
+                            rows={23}
+                            hasErrored={tokenData.tokens[activeToken].hasErrored}
+                            onChange={handleChange}
+                            value={tokenData.tokens[activeToken].values}
+                        />
+                    ) : (
+                        <Textarea
+                            className="flex-grow"
+                            placeholder="Enter YML"
+                            rows={23}
+                            onChange={handleYMLChange}
+                            hasErrored={tokenData.tokens[activeToken].hasErrored}
+                            value={YAMLValue}
+                        />
+                    )}
                 </div>
             </div>
 
