@@ -158,6 +158,15 @@
         "heading": "110%",
         "body": "140%"
     },
+    "letterSpacing": {
+        "default": 0,
+        "increased": "150%",
+        "decreased": "-5%"
+    },
+    "paragraphSpacing": {
+        "h1": 32,
+        "h2": 26
+    },
     "fontWeights": {
         "headingRegular": "Regular",
         "headingBold": "Bold",
@@ -178,25 +187,40 @@
             "fontFamily": "$fontFamilies.heading",
             "fontWeight": "$fontWeights.headingBold",
             "lineHeight": "$lineHeights.heading",
-            "fontSize": "$fontSizes.h1"
+            "fontSize": "$fontSizes.h1",
+            "paragraphSpacing": "$paragraphSpacing.h1",
+            "letterSpacing": "$letterSpacing.decreased"
         },
         "H1/Regular": {
             "fontFamily": "$fontFamilies.heading",
             "fontWeight": "$fontWeights.headingRegular",
             "lineHeight": "$lineHeights.heading",
-            "fontSize": "$fontSizes.h1"
+            "fontSize": "$fontSizes.h1",
+            "paragraphSpacing": "$paragraphSpacing.h1",
+            "letterSpacing": "$letterSpacing.decreased"
         },
         "H2/Bold": {
             "fontFamily": "$fontFamilies.heading",
             "fontWeight": "$fontWeights.headingBold",
             "lineHeight": "$lineHeights.heading",
-            "fontSize": "$fontSizes.h2"
+            "fontSize": "$fontSizes.h2",
+            "paragraphSpacing": "$paragraphSpacing.h2",
+            "letterSpacing": "$letterSpacing.decreased"
+        },
+        "H2/Regular": {
+            "fontFamily": "$fontFamilies.heading",
+            "fontWeight": "$fontWeights.headingRegular",
+            "lineHeight": "$lineHeights.heading",
+            "fontSize": "$fontSizes.h2",
+            "paragraphSpacing": "$paragraphSpacing.h2",
+            "letterSpacing": "$letterSpacing.decreased"
         },
         "Body": {
             "fontFamily": "$fontFamilies.body",
             "fontWeight": "$fontWeights.bodyRegular",
             "lineHeight": "$lineHeights.heading",
-            "fontSize": "$fontSizes.body"
+            "fontSize": "$fontSizes.body",
+            "paragraphSpacing": "$paragraphSpacing.h2"
         }
     }
 }

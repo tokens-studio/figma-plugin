@@ -21,4 +21,6 @@ export default {
     fontSizes: {},
     lineHeights: {},
     typography: {},
+    letterSpacing: {},
+    paragraphSpacing: {},
 };

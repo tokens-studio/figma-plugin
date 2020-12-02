@@ -76,7 +76,7 @@ export function convertFigmaToLineHeight(inputValue) {
 export function convertLetterSpacingToFigma(inputValue) {
     let letterSpacing;
     const value = inputValue.toString();
-    const numbers = /^\d+(\.\d+)?$/;
+    const numbers = /^-?\d+(\.\d+)?$/;
     if (value.trim().slice(-1) === '%' && value.trim().slice(0, -1).match(numbers)) {
         letterSpacing = {
             unit: 'PERCENT',

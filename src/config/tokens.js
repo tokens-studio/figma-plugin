@@ -15,11 +15,6 @@ export default {
     lineHeights: ['lineHeights'],
     fontSizes: ['fontSizes'],
     fontFamilies: ['fontFamilies'],
-
     values: {},
-    fontFamilies: {},
     fontWeights: {},
-    fontSizes: {},
-    lineHeights: {},
-    typography: {},
 };
