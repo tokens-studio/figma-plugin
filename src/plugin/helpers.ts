@@ -62,6 +62,43 @@ export function convertLineHeightToFigma(inputValue) {
     return lineHeight;
 }
 
+export function convertFigmaToLineHeight(inputValue) {
+    const {unit, value} = inputValue;
+    if (unit === 'PIXELS') {
+        return +value.toFixed(2);
+    }
+    if (unit === 'PERCENT') {
+        return `${+value.toFixed(2)}%`;
+    }
+    return 'AUTO';
+}
+
+export function convertLetterSpacingToFigma(inputValue) {
+    let letterSpacing;
+    const value = inputValue.toString();
+    const numbers = /^-?\d+(\.\d+)?$/;
+    if (value.trim().slice(-1) === '%' && value.trim().slice(0, -1).match(numbers)) {
+        letterSpacing = {
+            unit: 'PERCENT',
+            value: Number(value.slice(0, -1)),
+        };
+    } else if (value.match(numbers)) {
+        letterSpacing = {
+            unit: 'PIXELS',
+            value: Number(value),
+        };
+    }
+    return letterSpacing;
+}
+
+export function convertFigmaToLetterSpacing(inputValue) {
+    const {unit, value} = inputValue;
+    if (unit === 'PERCENT') {
+        return `${+value.toFixed(2)}%`;
+    }
+    return +value.toFixed(2);
+}
+
 export function hexToRgb(hex) {
     const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
     return result

@@ -103,3 +103,23 @@ export function colorByHashCode(value) {
     const shortened = Math.abs(hash % 360);
     return `${shortened},100%,85%`;
 }
+
+// Not in use for now, converts string to hashCode
+export function hashCode(s) {
+    return s.split('').reduce(function (a, b) {
+        a = (a << 5) - a + b.charCodeAt(0);
+        return a & a;
+    }, 0);
+}
+
+// Converts string to slug
+export function slugify(text: string) {
+    return text
+        .toString() // Cast to string
+        .toLowerCase() // Convert the string to lowercase letters
+        .normalize('NFD') // The normalize() method returns the Unicode Normalization Form of a given string.
+        .trim() // Remove whitespace from both sides of a string
+        .replace(/\s+/g, '-') // Replace spaces with -
+        .replace(/[^\w-]+/g, '') // Remove all non-word chars
+        .replace(/--+/g, '-'); // Replace multiple - with single -
+}

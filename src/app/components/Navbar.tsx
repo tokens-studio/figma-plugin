@@ -27,7 +27,7 @@ const Navbar = ({active, setActive}) => {
                 <TabButton name="inspector" label="Inspect" active={active} setActive={setActive} />
             </div>
             <div>
-                <Tooltip variant="right" label="Import Color Styles">
+                <Tooltip variant="right" label="Import Styles">
                     <button className="button button-ghost" type="button" onClick={pullStyles}>
                         <Icon name="import" />
                     </button>

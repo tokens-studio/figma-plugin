@@ -78,7 +78,7 @@ export default class TokenData {
     }
 
     convertDotPathToNestedObject(path, value) {
-        const [last, ...paths] = path.split('/').reverse();
+        const [last, ...paths] = path.toString().split('/').reverse();
         return paths.reduce((acc, el) => ({[el]: acc}), {[last]: value});
     }
 

@@ -15,6 +15,8 @@ const mappedTokens = (tokens) => {
         fontWeights: {},
         fontSizes: {},
         lineHeights: {},
+        letterSpacing: {},
+        paragraphSpacing: {},
         typography: {},
     };
     return Object.entries(Object.assign(properties, tokens));
@@ -144,6 +146,28 @@ const Tokens = () => {
                                     label="Font Sizes"
                                     property="Font Size"
                                     type="fontSizes"
+                                    values={tokenValues}
+                                />
+                            </div>
+                        );
+                    case 'letterSpacing':
+                        return (
+                            <div key={tokenValues[0]}>
+                                <TokenListing
+                                    label="Letter Spacing"
+                                    property="Letter Spacing"
+                                    type="letterSpacing"
+                                    values={tokenValues}
+                                />
+                            </div>
+                        );
+                    case 'paragraphSpacing':
+                        return (
+                            <div key={tokenValues[0]}>
+                                <TokenListing
+                                    label="Paragraph Spacing"
+                                    property="ParagraphSpacing"
+                                    type="paragraphSpacing"
                                     values={tokenValues}
                                 />
                             </div>

@@ -1,7 +1,14 @@
 /* eslint-disable no-param-reassign */
 import {figmaRGBToHex} from '@figma-plugin/helpers';
 import Dot from 'dot-object';
-import {convertLineHeightToFigma, convertToFigmaColor} from './helpers';
+import {slugify} from '../app/components/utils';
+import {
+    convertFigmaToLetterSpacing,
+    convertFigmaToLineHeight,
+    convertLetterSpacingToFigma,
+    convertLineHeightToFigma,
+    convertToFigmaColor,
+} from './helpers';
 import {notifyStyleValues} from './notifiers';
 
 const dot = new Dot('/');
@@ -32,7 +39,7 @@ const updateColorStyles = (colorTokens, shouldCreate = false) => {
 };
 
 export const setTextValuesOnTarget = async (target, values) => {
-    const {fontFamily, fontWeight, fontSize, lineHeight} = values;
+    const {fontFamily, fontWeight, fontSize, lineHeight, letterSpacing, paragraphSpacing} = values;
     const family = fontFamily || target.fontName.family;
     const style = fontWeight || target.fontName.style;
     await figma.loadFontAsync({family, style});
@@ -49,6 +56,12 @@ export const setTextValuesOnTarget = async (target, values) => {
     }
     if (lineHeight) {
         target.lineHeight = convertLineHeightToFigma(lineHeight);
+    }
+    if (letterSpacing) {
+        target.letterSpacing = convertLetterSpacingToFigma(letterSpacing);
+    }
+    if (paragraphSpacing) {
+        target.paragraphSpacing = Number(paragraphSpacing);
     }
 };
 
@@ -97,7 +110,13 @@ export function updateStyles(tokens, shouldCreate = false): void {
 
 export function pullStyles(styleTypes): void {
     let colors;
-    // let typography;
+    let typography;
+    let fontFamilies;
+    let lineHeights;
+    let fontWeights;
+    let fontSizes;
+    let letterSpacing;
+    let paragraphSpacing;
     if (styleTypes.colorStyles) {
         colors = figma
             .getLocalPaintStyles()
@@ -112,9 +131,76 @@ export function pullStyles(styleTypes): void {
                 return null;
             });
     }
-    // Not used yet, but this is where we fetch text styles and should bring those into values that can be used by our tokens
-    // if (styleTypes.textStyles) {
-    //     typography = figma.getLocalTextStyles();
-    // }
-    notifyStyleValues({colors});
+    if (styleTypes.textStyles) {
+        const rawFontSizes = [];
+        const fontCombinations = [];
+        const rawLineHeights = [];
+        const rawParagraphSpacing = [];
+        const rawLetterSpacing = [];
+
+        const figmaTextStyles = figma.getLocalTextStyles();
+        figmaTextStyles.map((style) => {
+            if (!rawFontSizes.includes(style.fontSize)) rawFontSizes.push(style.fontSize);
+            fontCombinations.push(style.fontName);
+            rawLineHeights.push(style.lineHeight);
+            if (!rawParagraphSpacing.includes(style.paragraphSpacing)) rawParagraphSpacing.push(style.paragraphSpacing);
+            rawLetterSpacing.push(style.letterSpacing);
+        });
+
+        fontSizes = rawFontSizes.sort((a, b) => a - b).map((size, idx) => [idx, size]);
+        const uniqueFontCombinations = fontCombinations.filter(
+            (v, i, a) => a.findIndex((t) => t.family === v.family && t.style === v.style) === i
+        );
+
+        lineHeights = rawLineHeights
+            .filter((v, i, a) => a.findIndex((t) => t.unit === v.unit && t.value === v.value) === i)
+            .map((lh, idx) => [idx, convertFigmaToLineHeight(lh)]);
+
+        fontFamilies = [...new Set(uniqueFontCombinations.map((font) => font.family))].map((fontFamily) => [
+            `font-${slugify(fontFamily)}`,
+            fontFamily,
+        ]);
+
+        fontWeights = uniqueFontCombinations.map((font, idx) => [`font-${slugify(font.family)}-${idx}`, font.style]);
+
+        paragraphSpacing = rawParagraphSpacing.sort((a, b) => a - b).map((size, idx) => [idx, size]);
+
+        letterSpacing = rawLetterSpacing
+            .filter((v, i, a) => a.findIndex((t) => t.unit === v.unit && t.value === v.value) === i)
+            .map((lh, idx) => [idx, convertFigmaToLetterSpacing(lh)]);
+
+        typography = figmaTextStyles.map((style) => {
+            const obj = {
+                fontFamily: `$fontFamilies.${fontFamilies.find((el: string[]) => el[1] === style.fontName.family)[0]}`,
+                fontWeight: `$fontWeights.${
+                    fontWeights.find((el: string[]) => el[0].includes(slugify(style.fontName.family)))[0]
+                }`,
+                lineHeight: `$lineHeights.${
+                    lineHeights.find(
+                        (el: [number, string | number]) => el[1] === convertFigmaToLineHeight(style.lineHeight)
+                    )[0]
+                }`,
+                fontSize: `$fontSizes.${fontSizes.find((el: number[]) => el[1] === style.fontSize)[0]}`,
+                letterSpacing: `$letterSpacing.${
+                    letterSpacing.find(
+                        (el: [number, string | number]) => el[1] === convertFigmaToLetterSpacing(style.letterSpacing)
+                    )[0]
+                }`,
+                paragraphSpacing: `$paragraphSpacing.${
+                    paragraphSpacing.find((el: number[]) => el[1] === style.paragraphSpacing)[0]
+                }`,
+            };
+            return [style.name, obj];
+        });
+    }
+    notifyStyleValues({
+        colors,
+        fontFamilies,
+        lineHeights,
+        fontWeights,
+        fontSizes,
+        letterSpacing,
+        paragraphSpacing,
+        typography,
+    });
 }
