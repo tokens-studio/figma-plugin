@@ -5,6 +5,7 @@ import Heading from './Heading';
 import {useTokenState, useTokenDispatch} from '../store/TokenContext';
 import Button from './Button';
 import Modal from './Modal';
+import TabButton from './TabButton';
 
 const schema = YAML.DEFAULT_SAFE_SCHEMA;
 schema.compiledTypeMap.scalar['tag:yaml.org,2002:null'].represent.lowercase = function () {
@@ -19,7 +20,7 @@ const JSONEditor = () => {
     const [isJSON, setIsJSON] = React.useState(true);
     const [YAMLValue, setYAMLValue] = React.useState(undefined);
 
-    var hasErrored = false;
+    let hasErrored = false;
 
     const handleUpdate = async () => {
         await setLoading(true);
@@ -42,16 +43,15 @@ const JSONEditor = () => {
 
     const checkForError = (obj) => {
         if (hasErrored) return;
-        for (var i in obj) {
+        Object.keys(obj).map((i) => {
             if (hasErrored) return;
-            var child = obj[i];
+            const child = obj[i];
             if (child === null) {
-                console.log('child is null');
                 hasErrored = true;
-            } else if (typeof child == 'object') {
+            } else if (typeof child === 'object') {
                 checkForError(child);
             }
-        }
+        });
     };
 
     const handleYMLChange = (val) => {
@@ -109,28 +109,16 @@ const JSONEditor = () => {
                 </div>
             </Modal>
             <div className="flex flex-col justify-between items-center flex-grow">
-                <div className="flex flex-col p-4 w-full items-center flex-grow">
-                    <div className="flex flex-row space-x-2">
-                        <Button
-                            onClick={() => setIsJSON(true)}
-                            size="small"
-                            variant={`${isJSON ? 'primary' : 'secondary'}`}
-                        >
-                            JSON
-                        </Button>
-                        <Button
-                            onClick={() => setIsJSON(false)}
-                            size="small"
-                            variant={`${!isJSON ? 'primary' : 'secondary'}`}
-                        >
-                            YAML
-                        </Button>
+                <div className="flex flex-col px-4 pb-4 w-full items-center flex-grow">
+                    <div className="flex flex-row ml-auto space-x-2">
+                        <TabButton name="json" label="JSON" active={isJSON} setActive={() => setIsJSON(true)} />
+                        <TabButton name="yml" label="YML" active={!isJSON} setActive={() => setIsJSON(false)} />
                     </div>
                     {isJSON ? (
                         <Textarea
                             className="flex-grow"
                             placeholder="Enter JSON"
-                            rows={23}
+                            rows={20}
                             hasErrored={tokenData.tokens[activeToken].hasErrored}
                             onChange={handleChange}
                             value={tokenData.tokens[activeToken].values}
@@ -139,7 +127,7 @@ const JSONEditor = () => {
                         <Textarea
                             className="flex-grow"
                             placeholder="Enter YML"
-                            rows={23}
+                            rows={20}
                             onChange={handleYMLChange}
                             hasErrored={tokenData.tokens[activeToken].hasErrored}
                             value={YAMLValue}
