@@ -1,5 +1,6 @@
 export default {
     values: {},
+    sizing: {},
     height: {},
     width: {},
     spacing: {},
@@ -20,4 +21,6 @@ export default {
     fontSizes: {},
     lineHeights: {},
     typography: {},
+    letterSpacing: {},
+    paragraphSpacing: {},
 };

@@ -3,14 +3,14 @@ import {ContextMenu, MenuItem, ContextMenuTrigger} from 'react-contextmenu';
 import Icon from './Icon';
 import {useTokenState} from '../store/TokenContext';
 
-const MoreButton = ({properties, children, path, value, onClick, onEdit}) => {
+const MoreButton = ({properties, children, path, value, onClick, onEdit, onDelete, mode}) => {
     const {selectionValues} = useTokenState();
     const visibleProperties = properties.filter((p) => p.label);
 
     return (
         <div className="w-full">
-            <ContextMenuTrigger id={`${path}-${value}`}>{children}</ContextMenuTrigger>
-            <ContextMenu id={`${path}-${value}`} className="text-xs">
+            <ContextMenuTrigger id={`${path}-${value}-${mode}`}>{children}</ContextMenuTrigger>
+            <ContextMenu id={`${path}-${value}-${mode}`} className="text-xs">
                 {visibleProperties.map((property) => {
                     const isActive = selectionValues[property.name] === `${path}.${value}`;
 
@@ -29,7 +29,8 @@ const MoreButton = ({properties, children, path, value, onClick, onEdit}) => {
                     );
                 })}
                 {visibleProperties?.length > 1 && <MenuItem divider />}
-                <MenuItem onClick={() => onEdit()}>Edit Token</MenuItem>
+                <MenuItem onClick={onEdit}>Edit Token</MenuItem>
+                <MenuItem onClick={onDelete}>Delete Token</MenuItem>
             </ContextMenu>
         </div>
     );

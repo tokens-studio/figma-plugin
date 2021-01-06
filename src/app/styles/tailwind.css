@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
 
 @tailwind base;
 
@@ -8,12 +8,26 @@ body {
     @apply font-body text-sm;
 }
 
+body::-webkit-scrollbar,
+.ReactModal__Content::-webkit-scrollbar,
+textarea::-webkit-scrollbar {
+    width: 9px;
+}
+
+body::-webkit-scrollbar-thumb,
+.ReactModal__Content::-webkit-scrollbar-thumb,
+textarea::-webkit-scrollbar-thumb {
+    @apply bg-gray-400;
+    border-radius: 9px;
+    border: 2px solid white;
+}
+
 .heading {
-    @apply text-2xl font-medium text-gray-900 leading-none capitalize;
+    @apply font-semibold text-gray-900 leading-none capitalize;
 }
 
 .heading-small {
-    @apply text-xs;
+    @apply text-xs font-medium;
 }
 
 .navbar {
@@ -106,19 +120,27 @@ body {
 }
 
 .button-property:hover {
-    @apply bg-opacity-75;
+    @apply bg-gray-100 bg-opacity-50;
 }
 
 .button-property-edit {
     @apply opacity-0;
 }
 
-.button-property:hover .button-property-edit {
-    @apply opacity-100;
-}
-
 .button-active {
     @apply bg-primary-100;
+}
+
+.button-active:hover {
+    @apply bg-primary-100 bg-opacity-75;
+}
+
+.button-semi-active {
+    @apply bg-primary-100 bg-opacity-50;
+}
+
+.button-semi-active:hover {
+    @apply bg-primary-100 bg-opacity-25;
 }
 
 .button-property-color {
@@ -142,7 +164,7 @@ body {
     @apply rounded w-full p-1 -mb-1;
 }
 
-.button-active-fill .button-text::before {
+.button-property-color.button-active .button-text::before {
     box-shadow: 0 0 0 1px black;
 }
 
@@ -213,6 +235,11 @@ button[disabled] {
 
 textarea {
     @apply w-full border bg-white text-xxs p-3 rounded font-mono;
+    resize: none;
+}
+
+textarea:focus {
+    @apply border border-gray-600 outline-none;
 }
 
 form {

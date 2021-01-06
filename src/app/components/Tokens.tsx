@@ -15,6 +15,8 @@ const mappedTokens = (tokens) => {
         fontWeights: {},
         fontSizes: {},
         lineHeights: {},
+        letterSpacing: {},
+        paragraphSpacing: {},
         typography: {},
     };
     return Object.entries(Object.assign(properties, tokens));
@@ -77,10 +79,9 @@ const Tokens = () => {
                         );
                     case 'sizing':
                         return (
-                            <React.Fragment key={tokenValues[0]}>
-                                <TokenListing label="Width" property="Sizing" type="width" values={tokenValues} />
-                                <TokenListing label="Height" property="Sizing" type="height" values={tokenValues} />
-                            </React.Fragment>
+                            <div key={tokenValues[0]}>
+                                <TokenListing label="Sizing" property="Sizing" type="sizing" values={tokenValues} />
+                            </div>
                         );
                     case 'spacing':
                         return (
@@ -145,6 +146,28 @@ const Tokens = () => {
                                     label="Font Sizes"
                                     property="Font Size"
                                     type="fontSizes"
+                                    values={tokenValues}
+                                />
+                            </div>
+                        );
+                    case 'letterSpacing':
+                        return (
+                            <div key={tokenValues[0]}>
+                                <TokenListing
+                                    label="Letter Spacing"
+                                    property="Letter Spacing"
+                                    type="letterSpacing"
+                                    values={tokenValues}
+                                />
+                            </div>
+                        );
+                    case 'paragraphSpacing':
+                        return (
+                            <div key={tokenValues[0]}>
+                                <TokenListing
+                                    label="Paragraph Spacing"
+                                    property="ParagraphSpacing"
+                                    type="paragraphSpacing"
                                     values={tokenValues}
                                 />
                             </div>

@@ -45,32 +45,39 @@ const App = () => {
         onInitiate();
         window.onmessage = (event) => {
             const {type, values} = event.data.pluginMessage;
-
-            if (type === 'selection') {
-                setDisabled(false);
-                if (values) {
-                    setSelectionValues(values);
-                } else {
+            switch (type) {
+                case 'selection':
+                    setDisabled(false);
+                    if (values) {
+                        setSelectionValues(values);
+                    } else {
+                        resetSelectionValues();
+                    }
+                    break;
+                case 'noselection':
+                    setDisabled(true);
                     resetSelectionValues();
-                }
-            } else if (type === 'noselection') {
-                setDisabled(true);
-                resetSelectionValues();
-            } else if (type === 'remotecomponents') {
-                setLoading(false);
-                setRemoteComponents(values.remotes);
-            } else if (type === 'tokenvalues') {
-                setLoading(false);
-                if (values) {
-                    setTokenData(new TokenData(values));
-                    setActive('tokens');
-                }
-            } else if (type === 'styles') {
-                setLoading(false);
-                if (values) {
-                    setTokensFromStyles(values);
-                    setActive('tokens');
-                }
+                    break;
+                case 'remotecomponents':
+                    setLoading(false);
+                    setRemoteComponents(values.remotes);
+                    break;
+                case 'tokenvalues':
+                    setLoading(false);
+                    if (values) {
+                        setTokenData(new TokenData(values));
+                        setActive('tokens');
+                    }
+                    break;
+                case 'styles':
+                    setLoading(false);
+                    if (values) {
+                        setTokensFromStyles(values);
+                        setActive('tokens');
+                    }
+                    break;
+                default:
+                    break;
             }
         };
     }, []);
@@ -110,7 +117,7 @@ const App = () => {
                     {active === 'inspector' && <Inspector />}
                 </div>
                 <div className="p-4 flex-shrink-0 flex items-center justify-between">
-                    <div className="text-gray-600 text-xxs">Figma Tokens {pjs.version}</div>
+                    <div className="text-gray-600 text-xxs">Figma Tokens Version {pjs.version}</div>
                     <div className="text-gray-600 text-xxs">
                         <a
                             className="flex items-center"

@@ -1,6 +1,7 @@
 import * as React from 'react';
 import JSON5 from 'json5';
-import {defaultJSON} from '../../config/default';
+import objectPath from 'object-path';
+import defaultJSON from '../../config/default.json';
 import TokenData, {TokenProps} from '../components/TokenData';
 import * as pjs from '../../../package.json';
 
@@ -20,6 +21,7 @@ export enum ActionType {
     SetDisabled = 'SET_DISABLED',
     SetStringTokens = 'SET_STRING_TOKENS',
     UpdateTokens = 'UPDATE_TOKENS',
+    DeleteToken = 'DELETE_TOKEN',
     CreateStyles = 'CREATE_STYLES',
     SetNodeData = 'SET_NODE_DATA',
     RemoveNodeData = 'REMOVE_NODE_DATA',
@@ -36,7 +38,7 @@ export enum ActionType {
 const defaultTokens: TokenProps = {
     version: pjs.version,
     values: {
-        options: JSON5.stringify(defaultJSON(), null, 2),
+        options: JSON.stringify(defaultJSON, null, 2),
     },
 };
 
@@ -120,6 +122,24 @@ function stateReducer(state, action) {
         case ActionType.UpdateTokens:
             updateTokens(state);
             return state;
+        case ActionType.DeleteToken: {
+            const obj = JSON5.parse(state.tokenData.tokens[action.data.parent].values);
+            objectPath.del(obj, [action.data.path, action.data.name].join('.'));
+            const tokens = JSON.stringify(obj, null, 2);
+            state.tokenData.updateTokenValues(action.data.parent, tokens);
+            const newState = {
+                ...state,
+                tokens: {
+                    ...state.tokens,
+                    [action.data.parent]: {
+                        hasErrored: state.tokenData.checkTokenValidity(tokens),
+                        values: tokens,
+                    },
+                },
+            };
+            updateTokens(newState);
+            return newState;
+        }
         case ActionType.CreateStyles:
             parent.postMessage(
                 {
@@ -237,6 +257,9 @@ function TokenProvider({children}) {
             },
             updateTokens: () => {
                 dispatch({type: ActionType.UpdateTokens});
+            },
+            deleteToken: (data) => {
+                dispatch({type: ActionType.DeleteToken, data});
             },
             createStyles: () => {
                 dispatch({type: ActionType.CreateStyles});

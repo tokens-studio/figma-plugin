@@ -1,4 +1,6 @@
 import * as React from 'react';
+import objectPath from 'object-path';
+import JSON5 from 'json5';
 import {useTokenDispatch, useTokenState} from '../store/TokenContext';
 import EditTokenForm from './EditTokenForm';
 import Heading from './Heading';
@@ -6,8 +8,6 @@ import Icon from './Icon';
 import Modal from './Modal';
 import renderKeyValue from './renderKeyValue';
 import Tooltip from './Tooltip';
-import objectPath from 'object-path';
-import JSON5 from 'json5';
 
 const TokenListing = ({
     label,
@@ -61,7 +61,7 @@ const TokenListing = ({
               }
             : token;
         objectPath.set(obj, name, newValue);
-        setStringTokens({parent, tokens: JSON5.stringify(obj, null, 2)});
+        setStringTokens({parent, tokens: JSON.stringify(obj, null, 2)});
     }
 
     const closeForm = () => {
@@ -177,7 +177,7 @@ const TokenListing = ({
                     </Tooltip>
                 </div>
                 {showOptions === values[0] && (
-                    <Modal title={`Modal for ${values[0]}`} isOpen={showOptions} close={closeForm}>
+                    <Modal full isOpen={showOptions === values[0]} close={closeForm}>
                         <div className="flex flex-col-reverse">
                             {showEditForm && (
                                 <EditTokenForm
