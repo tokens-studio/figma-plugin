@@ -98,6 +98,7 @@ const TokenButton = ({type, property, name, path, token, editMode, showForm}) =>
                     name: 'border',
                 },
             ];
+
             style = {
                 '--backgroundColor': displayValue,
                 '--borderColor': lightOrDark(displayValue) === 'light' ? '#f5f5f5' : 'white',

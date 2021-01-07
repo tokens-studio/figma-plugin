@@ -116,8 +116,8 @@ export function hslaToRgba(hslaValues) {
     let l = hslaValues[2];
     let a = 1;
 
-    if (hslaToRgba[3]) {
-        a = hslaToRgba[3];
+    if (hslaValues[3]) {
+        a = hslaValues[3];
     }
 
     // Must be fractions of 1
@@ -172,8 +172,9 @@ export function convertToFigmaColor(input) {
         color = {r, g, b};
         opacity = Number(a);
     } else if (input.startsWith('hsl')) {
-        const hslValues = input.replace(/^hsla?\(|\s+|\)$/g, '').split(',');
+        const hslValues = input.replace(/^hsla?\(|\s+|%|\)$/g, '').split(',');
         const rgbValues: any = hslaToRgba(hslValues);
+        console.log(rgbValues);
         const {r, g, b, a = 1} = webRGBToFigmaRGB(rgbValues);
         color = {r, g, b};
         opacity = Number(a);
