@@ -10,6 +10,7 @@ import Icon from './Icon';
 import * as pjs from '../../../package.json';
 import {useTokenState, useTokenDispatch} from '../store/TokenContext';
 import TokenData from './TokenData';
+import {initializeWithThemerData} from './utils';
 
 const goToNodeId = (id) => {
     parent.postMessage(
@@ -35,6 +36,7 @@ const App = () => {
         setSelectionValues,
         resetSelectionValues,
         setTokensFromStyles,
+        setApiData,
     } = useTokenDispatch();
 
     const onInitiate = () => {
@@ -43,8 +45,8 @@ const App = () => {
 
     React.useEffect(() => {
         onInitiate();
-        window.onmessage = (event) => {
-            const {type, values} = event.data.pluginMessage;
+        window.onmessage = async (event) => {
+            const {type, values, id, secret, status} = event.data.pluginMessage;
             switch (type) {
                 case 'selection':
                     setDisabled(false);
@@ -74,6 +76,22 @@ const App = () => {
                     if (values) {
                         setTokensFromStyles(values);
                         setActive('tokens');
+                    }
+                    break;
+                case 'apiCredentials':
+                    if (status === false) {
+                        console.log('falsy api credentials');
+                    } else {
+                        console.log('Populate fields with data', id, secret);
+                        setApiData({id, secret});
+                        // setTokenData(new TokenData(values));
+                        // initalize themer data
+                        const values = await initializeWithThemerData(id, secret);
+                        setLoading(false);
+                        if (values) {
+                            setActive('tokens');
+                            setTokenData(new TokenData(values));
+                        }
                     }
                     break;
                 default:

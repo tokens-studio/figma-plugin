@@ -40,6 +40,18 @@ export function mergeDeep(target, ...sources) {
     return mergeDeep(target, ...sources);
 }
 
+// update credentials
+export function updateCredentials(secret, id) {
+    (async () => {
+        try {
+            await figma.clientStorage.setAsync('apiSecret', secret);
+            await figma.clientStorage.setAsync('apiID', id);
+        } catch (err) {
+            figma.notify('There was an issue saving your credentials. Please try again.');
+        }
+    })();
+}
+
 export function convertLineHeightToFigma(inputValue) {
     let lineHeight;
     const value = inputValue.toString();

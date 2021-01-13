@@ -52,28 +52,20 @@ export default class TokenData {
     }
 
     private parseTokenValues(tokens: TokenProps): Tokens | null {
-        if (tokens.version !== '') {
-            try {
-                const reducedTokens = Object.entries(tokens.values).reduce((prev, group) => {
-                    prev.push({[group[0]]: {values: group[1]}});
-                    return prev;
-                }, []);
+        try {
+            const reducedTokens = Object.entries(tokens.values).reduce((prev, group) => {
+                prev.push({[group[0]]: {values: group[1]}});
+                return prev;
+            }, []);
 
-                const assigned = Object.assign({}, ...reducedTokens);
+            const assigned = Object.assign({}, ...reducedTokens);
 
-                return assigned;
-            } catch (e) {
-                console.error('Error reading tokens', e);
-                console.log("Here's the tokens");
-                console.log(tokens);
-                return null;
-            }
-        } else {
-            return {
-                options: {
-                    values: JSON.stringify(tokens.values, null, 2),
-                },
-            };
+            return assigned;
+        } catch (e) {
+            console.error('Error reading tokens', e);
+            console.log("Here's the tokens");
+            console.log(tokens);
+            return null;
         }
     }
 

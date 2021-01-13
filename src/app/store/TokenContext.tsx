@@ -4,6 +4,7 @@ import objectPath from 'object-path';
 import defaultJSON from '../../config/default.json';
 import TokenData, {TokenProps} from '../components/TokenData';
 import * as pjs from '../../../package.json';
+import {updateRemoteTokens} from '../components/utils';
 
 export interface SelectionValue {
     borderRadius: string | undefined;
@@ -33,6 +34,7 @@ export enum ActionType {
     SetDisplayType = 'SET_DISPLAY_TYPE',
     ToggleColorMode = 'TOGGLE_COLOR_MODE',
     SetCollapsed = 'SET_COLLAPSED',
+    SetApiData = 'SET_API_DATA',
 }
 
 const defaultTokens: TokenProps = {
@@ -60,12 +62,19 @@ const emptyState = {
     colorMode: false,
     showEditForm: false,
     showOptions: false,
+    api: {
+        id: '',
+        secret: '',
+    },
 };
 
 const TokenStateContext = React.createContext(emptyState);
 const TokenDispatchContext = React.createContext(null);
 
 function updateTokens(state: any) {
+    console.log('send new tokens to jsonbin');
+    updateRemoteTokens(state.tokenData.reduceToValues(), state.api.id, state.api.secret);
+
     parent.postMessage(
         {
             pluginMessage: {
@@ -225,6 +234,11 @@ function stateReducer(state, action) {
                 ...state,
                 collapsed: !state.collapsed,
             };
+        case ActionType.SetApiData:
+            return {
+                ...state,
+                api: action.data,
+            };
         default:
             throw new Error('Not implemented');
     }
@@ -299,6 +313,9 @@ function TokenProvider({children}) {
             },
             setCollapsed: () => {
                 dispatch({type: ActionType.SetCollapsed});
+            },
+            setApiData: (data: {id: string; secret: string}) => {
+                dispatch({type: ActionType.SetApiData, data});
             },
         }),
         [dispatch]

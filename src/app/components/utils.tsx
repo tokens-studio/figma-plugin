@@ -1,6 +1,6 @@
 import {Parser} from 'expr-eval';
-
 import {hexToRgb} from '../../plugin/helpers';
+import * as pjs from '../../../package.json';
 
 const parser = new Parser();
 
@@ -122,4 +122,195 @@ export function slugify(text: string) {
         .replace(/\s+/g, '-') // Replace spaces with -
         .replace(/[^\w-]+/g, '') // Remove all non-word chars
         .replace(/--+/g, '-'); // Replace multiple - with single -
+}
+
+// Populate themes
+export function populateThemes(data) {
+    parent.postMessage(
+        {
+            pluginMessage: {
+                type: 'notify',
+                msg: 'There was an error connecting',
+            },
+        },
+        '*'
+    );
+}
+
+export async function updateRemoteTokens(tokens, id, secret) {
+    if (!id && !secret) return;
+
+    parent.postMessage(
+        {
+            pluginMessage: {
+                type: 'notify',
+                msg: 'Updating Token values...',
+            },
+        },
+        '*'
+    );
+
+    const tokenObj = {
+        version: pjs.version,
+        values: {
+            options: JSON.parse(tokens.options),
+        },
+    };
+
+    const response = await fetch(`https://api.jsonbin.io/b/${id}`, {
+        method: 'PUT', // *GET, POST, PUT, DELETE, etc.
+        mode: 'cors', // no-cors, *cors, same-origin
+        cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+        credentials: 'same-origin', // include, *same-origin, omit
+        body: JSON.stringify(tokenObj, null, 2),
+        headers: {
+            'Content-Type': 'application/json',
+            'secret-key': secret,
+            versioning: false,
+            // 'Content-Type': 'application/x-www-form-urlencoded',
+        },
+    });
+}
+
+// Initialize plugin with data
+export async function initializeWithThemerData(apiID, apiSecret) {
+    const id = apiID;
+    const secret = apiSecret;
+    let tokenValues;
+
+    if (!id && secret) {
+        console.log('got secret but no values');
+        // Create a new bin
+        // send msg to plugin
+        // parent.postMessage(
+        //     {
+        //         pluginMessage: {
+        //             type: 'notify',
+        //             msg: 'Creating your bin...',
+        //         },
+        //     },
+        //     '*'
+        // );
+
+        // // create a new bin
+        // const xhr = new XMLHttpRequest();
+        // xhr.open('POST', 'https://api.jsonbin.io/b', true);
+        // xhr.setRequestHeader('Access-Control-Allow-Credentials', true);
+        // xhr.setRequestHeader('Content-type', 'application/json');
+        // xhr.setRequestHeader('secret-key', secret);
+        // xhr.responseType = 'text';
+        // xhr.onload = () => {
+        //     if (xhr.status >= 200 && xhr.status < 300) {
+        //         const response = JSON.parse(xhr.response);
+        //         id = response.id;
+        //         initializeWithThemerData(id, secret);
+        //     } else {
+        //         // send msg to plugin
+        //         parent.postMessage(
+        //             {
+        //                 pluginMessage: {
+        //                     type: 'notify',
+        //                     msg: 'There was an error connecting',
+        //                 },
+        //             },
+        //             '*'
+        //         );
+
+        //         // loadingScreen('off');
+
+        //         // connectedToBin = false;
+        //     }
+        // };
+        // xhr.send('[{}]');
+    } else if (id && secret) {
+        console.log('got both', {id, secret});
+
+        // send msg to plugin
+        parent.postMessage(
+            {
+                pluginMessage: {
+                    type: 'notify',
+                    msg: 'Connecting to JSONbin.io',
+                },
+            },
+            '*'
+        );
+
+        // make xml http request
+        const response = await fetch(`https://api.jsonbin.io/b/${id}/latest`, {
+            method: 'GET', // *GET, POST, PUT, DELETE, etc.
+            mode: 'cors', // no-cors, *cors, same-origin
+            cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+            credentials: 'same-origin', // include, *same-origin, omit
+            headers: {
+                'Content-Type': 'application/json',
+                'secret-key': secret,
+                // 'Content-Type': 'application/x-www-form-urlencoded',
+            },
+        });
+
+        if (response) {
+            parent.postMessage(
+                {
+                    pluginMessage: {
+                        type: 'initialThemerData',
+                        id,
+                        secret,
+                        msg: 'Connection successful',
+                    },
+                },
+                '*'
+            );
+            const jsonBinData = await response.json();
+            const obj = {
+                version: jsonBinData.version,
+                values: {
+                    options: JSON.stringify(jsonBinData.values.options, null, 2),
+                },
+            };
+
+            tokenValues = obj;
+        }
+
+        // populate latest data from API
+
+        // update admin state
+        // adminValidation();
+
+        // populate list of themes
+
+        // connected
+        // console.log('connected to bin');
+        // connectedToBin = true;
+        // send msg to plugin
+        parent.postMessage(
+            {
+                pluginMessage: {
+                    type: 'notify',
+                    msg: 'There was an error connecting',
+                },
+            },
+            '*'
+        );
+
+        // loadingScreen('off');
+
+        // connectedToBin = false;
+    } else {
+        // send msg to plugin
+        parent.postMessage(
+            {
+                pluginMessage: {
+                    type: 'notify',
+                    msg: 'There was an error. Please check your API credentials.',
+                },
+            },
+            '*'
+        );
+
+        // loading
+        // loadingScreen('off');
+    }
+
+    return tokenValues;
 }
