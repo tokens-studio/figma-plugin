@@ -143,20 +143,24 @@ export async function setValuesOnNode(node, values, data) {
 
     // SPACING
     if (values.spacing) {
-        if (typeof node.horizontalPadding !== 'undefined') {
-            node.horizontalPadding = Number(values.spacing);
-            node.verticalPadding = Number(values.spacing);
+        if (typeof node.paddingLeft !== 'undefined') {
+            node.paddingLeft = Number(values.spacing);
+            node.paddingRight = Number(values.spacing);
+            node.paddingTop = Number(values.spacing);
+            node.paddingBottom = Number(values.spacing);
             node.itemSpacing = Number(values.spacing);
         }
     }
     if (values.horizontalPadding) {
-        if (typeof node.horizontalPadding !== 'undefined') {
-            node.horizontalPadding = Number(values.horizontalPadding);
+        if (typeof node.paddingLeft !== 'undefined') {
+            node.paddingLeft = Number(values.horizontalPadding);
+            node.paddingRight = Number(values.horizontalPadding);
         }
     }
     if (values.verticalPadding) {
-        if (typeof node.verticalPadding !== 'undefined') {
-            node.verticalPadding = Number(values.verticalPadding);
+        if (typeof node.paddingTop !== 'undefined') {
+            node.paddingTop = Number(values.verticalPadding);
+            node.paddingBottom = Number(values.verticalPadding);
         }
     }
     if (values.itemSpacing) {
@@ -215,20 +219,24 @@ export async function removeValuesFromNode(node, prop) {
             }
             break;
         case 'spacing':
-            if (typeof node.horizontalPadding !== 'undefined') {
-                node.horizontalPadding = 0;
-                node.verticalPadding = 0;
+            if (typeof node.paddingLeft !== 'undefined') {
+                node.paddingLeft = 0;
+                node.paddingRight = 0;
+                node.paddingTop = 0;
+                node.paddingBottom = 0;
                 node.itemSpacing = 0;
             }
             break;
         case 'horizontalPadding':
-            if (typeof node.horizontalPadding !== 'undefined') {
-                node.horizontalPadding = 0;
+            if (typeof node.paddingLeft !== 'undefined') {
+                node.paddingLeft = 0;
+                node.paddingRight = 0;
             }
             break;
         case 'verticalPadding':
-            if (typeof node.verticalPadding !== 'undefined') {
-                node.verticalPadding = 0;
+            if (typeof node.paddingTop !== 'undefined') {
+                node.paddingTop = 0;
+                node.paddingBottom = 0;
             }
             break;
         case 'itemSpacing':
