@@ -52,7 +52,7 @@ const TokenListing = ({
         name: '',
         path: '',
     });
-    function setSingleTokenValue({parent, name, token, options}) {
+    function setSingleTokenValue({parent, name, token, options, oldName}) {
         const obj = JSON5.parse(tokenData.tokens[parent].values);
         const newValue = options
             ? {
@@ -61,7 +61,12 @@ const TokenListing = ({
               }
             : token;
         objectPath.set(obj, name, newValue);
-        setStringTokens({parent, tokens: JSON.stringify(obj, null, 2)});
+        if (oldName === name) {
+            setStringTokens({parent, tokens: JSON.stringify(obj, null, 2)});
+        } else {
+            objectPath.del(obj, oldName);
+            setStringTokens({parent, tokens: JSON.stringify(obj, null, 2).replace(`$${oldName}`, `$${name}`)});
+        }
     }
 
     const closeForm = () => {
@@ -80,7 +85,13 @@ const TokenListing = ({
 
     const submitTokenValue = async ({token, name, path, options}) => {
         setEditToken({token, name, path});
-        setSingleTokenValue({parent: activeToken, name: [path, name].join('.'), token, options});
+        setSingleTokenValue({
+            parent: activeToken,
+            name: [path, name].join('.'),
+            token,
+            options,
+            oldName: [path, editToken.name].join('.'),
+        });
         await setLoading(true);
         updateTokens();
     };

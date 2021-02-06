@@ -141,7 +141,7 @@ export default class TokenData {
     }
 
     private checkIfAlias(token: SingleToken): boolean {
-        return typeof token === 'string' && token.includes('$');
+        return typeof token === 'string' && token.includes('$') && token.length > 1;
     }
 
     private findAllAliases({
