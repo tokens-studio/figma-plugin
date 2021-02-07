@@ -41,11 +41,12 @@ export function mergeDeep(target, ...sources) {
 }
 
 // update credentials
-export function updateCredentials(secret, id) {
+export function updateCredentials(secret, id, provider) {
     (async () => {
         try {
             await figma.clientStorage.setAsync('apiSecret', secret);
             await figma.clientStorage.setAsync('apiID', id);
+            await figma.clientStorage.setAsync('apiProvider', provider);
         } catch (err) {
             figma.notify('There was an issue saving your credentials. Please try again.');
         }
@@ -123,7 +124,7 @@ export function hexToRgb(hex) {
 }
 
 export function hslaToRgba(hslaValues) {
-    let h = hslaValues[0];
+    const h = hslaValues[0];
     let s = hslaValues[1];
     let l = hslaValues[2];
     let a = 1;
@@ -136,34 +137,34 @@ export function hslaToRgba(hslaValues) {
     s /= 100;
     l /= 100;
 
-    let c = (1 - Math.abs(2 * l - 1)) * s,
-        x = c * (1 - Math.abs(((h / 60) % 2) - 1)),
-        m = l - c / 2,
-        r = 0,
-        g = 0,
-        b = 0;
+    const c = (1 - Math.abs(2 * l - 1)) * s;
+    const x = c * (1 - Math.abs(((h / 60) % 2) - 1));
+    const m = l - c / 2;
+    let r = 0;
+    let g = 0;
+    let b = 0;
 
-    if (0 <= h && h < 60) {
+    if (h >= 0 && h < 60) {
         r = c;
         g = x;
         b = 0;
-    } else if (60 <= h && h < 120) {
+    } else if (h >= 60 && h < 120) {
         r = x;
         g = c;
         b = 0;
-    } else if (120 <= h && h < 180) {
+    } else if (h >= 120 && h < 180) {
         r = 0;
         g = c;
         b = x;
-    } else if (180 <= h && h < 240) {
+    } else if (h >= 180 && h < 240) {
         r = 0;
         g = x;
         b = c;
-    } else if (240 <= h && h < 300) {
+    } else if (h >= 240 && h < 300) {
         r = x;
         g = 0;
         b = c;
-    } else if (300 <= h && h < 360) {
+    } else if (h >= 300 && h < 360) {
         r = c;
         g = 0;
         b = x;

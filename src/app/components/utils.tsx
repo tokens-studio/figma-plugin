@@ -1,6 +1,7 @@
 import {Parser} from 'expr-eval';
-import {hexToRgb} from '../../plugin/helpers';
+import {hexToRgb, updateCredentials} from '../../plugin/helpers';
 import * as pjs from '../../../package.json';
+import {useTokenDispatch} from '../store/TokenContext';
 
 const parser = new Parser();
 
@@ -138,6 +139,7 @@ export function populateThemes(data) {
 }
 
 export async function updateRemoteTokens(tokens, id, secret) {
+    console.log('updating remote', id, secret, tokens);
     if (!id && !secret) return;
 
     parent.postMessage(
@@ -157,6 +159,8 @@ export async function updateRemoteTokens(tokens, id, secret) {
         },
     };
 
+    console.log({tokenObj});
+
     const response = await fetch(`https://api.jsonbin.io/b/${id}`, {
         method: 'PUT', // *GET, POST, PUT, DELETE, etc.
         mode: 'cors', // no-cors, *cors, same-origin
@@ -167,122 +171,46 @@ export async function updateRemoteTokens(tokens, id, secret) {
             'Content-Type': 'application/json',
             'secret-key': secret,
             versioning: false,
-            // 'Content-Type': 'application/x-www-form-urlencoded',
         },
     });
+
+    console.log('got response', response);
+    const resp = await response.json();
+    console.log('got response', resp);
 }
 
-// Initialize plugin with data
-export async function initializeWithThemerData(apiID, apiSecret) {
-    const id = apiID;
-    const secret = apiSecret;
-    let tokenValues;
-
-    if (!id && secret) {
-        console.log('got secret but no values');
-        // Create a new bin
-        // send msg to plugin
-        // parent.postMessage(
-        //     {
-        //         pluginMessage: {
-        //             type: 'notify',
-        //             msg: 'Creating your bin...',
-        //         },
-        //     },
-        //     '*'
-        // );
-
-        // // create a new bin
-        // const xhr = new XMLHttpRequest();
-        // xhr.open('POST', 'https://api.jsonbin.io/b', true);
-        // xhr.setRequestHeader('Access-Control-Allow-Credentials', true);
-        // xhr.setRequestHeader('Content-type', 'application/json');
-        // xhr.setRequestHeader('secret-key', secret);
-        // xhr.responseType = 'text';
-        // xhr.onload = () => {
-        //     if (xhr.status >= 200 && xhr.status < 300) {
-        //         const response = JSON.parse(xhr.response);
-        //         id = response.id;
-        //         initializeWithThemerData(id, secret);
-        //     } else {
-        //         // send msg to plugin
-        //         parent.postMessage(
-        //             {
-        //                 pluginMessage: {
-        //                     type: 'notify',
-        //                     msg: 'There was an error connecting',
-        //                 },
-        //             },
-        //             '*'
-        //         );
-
-        //         // loadingScreen('off');
-
-        //         // connectedToBin = false;
-        //     }
-        // };
-        // xhr.send('[{}]');
-    } else if (id && secret) {
-        console.log('got both', {id, secret});
-
-        // send msg to plugin
+export async function createNewBin(apiSecret, tokens, setApiData) {
+    const provider = 'jsonbin';
+    console.log('creating new');
+    const response = await fetch(`https://api.jsonbin.io/b`, {
+        method: 'POST', // *GET, POST, PUT, DELETE, etc.
+        mode: 'cors', // no-cors, *cors, same-origin
+        cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+        credentials: 'same-origin', // include, *same-origin, omit
+        body: '{"Sample": "Hello World"}',
+        headers: {
+            'Content-Type': 'application/json',
+            'secret-key': apiSecret,
+        },
+    });
+    if (response) {
+        const jsonBinData = await response.json();
+        console.log('got response', jsonBinData, provider);
+        setApiData({id: jsonBinData.id, secret: apiSecret, provider});
+        updateRemoteTokens(tokens, jsonBinData.id, apiSecret);
         parent.postMessage(
             {
                 pluginMessage: {
-                    type: 'notify',
-                    msg: 'Connecting to JSONbin.io',
+                    type: 'credentials',
+                    id: jsonBinData.id,
+                    secret: apiSecret,
+                    provider,
+                    msg: 'Connection successful',
                 },
             },
             '*'
         );
-
-        // make xml http request
-        const response = await fetch(`https://api.jsonbin.io/b/${id}/latest`, {
-            method: 'GET', // *GET, POST, PUT, DELETE, etc.
-            mode: 'cors', // no-cors, *cors, same-origin
-            cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
-            credentials: 'same-origin', // include, *same-origin, omit
-            headers: {
-                'Content-Type': 'application/json',
-                'secret-key': secret,
-                // 'Content-Type': 'application/x-www-form-urlencoded',
-            },
-        });
-
-        if (response) {
-            parent.postMessage(
-                {
-                    pluginMessage: {
-                        type: 'initialThemerData',
-                        id,
-                        secret,
-                        msg: 'Connection successful',
-                    },
-                },
-                '*'
-            );
-            const jsonBinData = await response.json();
-            const obj = {
-                version: jsonBinData.version,
-                values: {
-                    options: JSON.stringify(jsonBinData.values.options, null, 2),
-                },
-            };
-
-            tokenValues = obj;
-        }
-
-        // populate latest data from API
-
-        // update admin state
-        // adminValidation();
-
-        // populate list of themes
-
-        // connected
-        // console.log('connected to bin');
-        // connectedToBin = true;
-        // send msg to plugin
+    } else {
         parent.postMessage(
             {
                 pluginMessage: {
@@ -292,25 +220,72 @@ export async function initializeWithThemerData(apiID, apiSecret) {
             },
             '*'
         );
+    }
+}
 
-        // loadingScreen('off');
+// Initialize plugin with data
+export async function initializeWithThemerData(apiID, apiSecret) {
+    const id = apiID;
+    const secret = apiSecret;
+    let tokenValues;
 
-        // connectedToBin = false;
-    } else {
-        // send msg to plugin
+    if (!id && !secret) return;
+    // send msg to plugin
+    parent.postMessage(
+        {
+            pluginMessage: {
+                type: 'notify',
+                msg: 'Connecting to JSONbin.io',
+            },
+        },
+        '*'
+    );
+
+    const response = await fetch(`https://api.jsonbin.io/b/${id}/latest`, {
+        method: 'GET', // *GET, POST, PUT, DELETE, etc.
+        mode: 'cors', // no-cors, *cors, same-origin
+        cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+        credentials: 'same-origin', // include, *same-origin, omit
+        headers: {
+            'Content-Type': 'application/json',
+            'secret-key': secret,
+        },
+    });
+
+    if (response) {
         parent.postMessage(
             {
                 pluginMessage: {
-                    type: 'notify',
-                    msg: 'There was an error. Please check your API credentials.',
+                    type: 'credentials',
+                    id,
+                    secret,
+                    provider: 'jsonbin',
+                    msg: 'Connection successful',
                 },
             },
             '*'
         );
+        const jsonBinData = await response.json();
+        console.log('got data', jsonBinData);
+        const obj = {
+            version: jsonBinData.version,
+            values: {
+                options: JSON.stringify(jsonBinData.values.options, null, 2),
+            },
+        };
 
-        // loading
-        // loadingScreen('off');
+        tokenValues = obj;
     }
+
+    parent.postMessage(
+        {
+            pluginMessage: {
+                type: 'notify',
+                msg: 'There was an error connecting',
+            },
+        },
+        '*'
+    );
 
     return tokenValues;
 }

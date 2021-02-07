@@ -1,6 +1,7 @@
 import * as React from 'react';
 import '../styles/main.css';
 import JSONEditor from './JSONEditor';
+import Settings from './Settings';
 import Inspector from './Inspector';
 import Tokens from './Tokens';
 import StartScreen from './StartScreen';
@@ -46,7 +47,7 @@ const App = () => {
     React.useEffect(() => {
         onInitiate();
         window.onmessage = async (event) => {
-            const {type, values, id, secret, status} = event.data.pluginMessage;
+            const {type, values, id, secret, provider, status} = event.data.pluginMessage;
             switch (type) {
                 case 'selection':
                     setDisabled(false);
@@ -82,15 +83,15 @@ const App = () => {
                     if (status === false) {
                         console.log('falsy api credentials');
                     } else {
-                        console.log('Populate fields with data', id, secret);
-                        setApiData({id, secret});
+                        console.log('Populate fields with data', id, secret, provider);
+                        setApiData({id, secret, provider});
                         // setTokenData(new TokenData(values));
                         // initalize themer data
-                        const values = await initializeWithThemerData(id, secret);
+                        const remoteValues = await initializeWithThemerData(id, secret);
                         setLoading(false);
-                        if (values) {
+                        if (remoteValues) {
                             setActive('tokens');
-                            setTokenData(new TokenData(values));
+                            setTokenData(new TokenData(remoteValues));
                         }
                     }
                     break;
@@ -132,6 +133,7 @@ const App = () => {
                     {active === 'start' && !loading && <StartScreen setActive={setActive} />}
                     {active === 'tokens' && <Tokens />}
                     {active === 'json' && <JSONEditor />}
+                    {active === 'settings' && <Settings />}
                     {active === 'inspector' && <Inspector />}
                 </div>
                 <div className="p-4 flex-shrink-0 flex items-center justify-between">

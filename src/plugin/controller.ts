@@ -26,6 +26,7 @@ figma.ui.onmessage = async (msg) => {
             try {
                 const apiID = await figma.clientStorage.getAsync('apiID');
                 const apiSecret = await figma.clientStorage.getAsync('apiSecret');
+                const apiProvider = await figma.clientStorage.getAsync('apiProvider');
 
                 if (apiID && apiSecret) {
                     console.log('Got values from storage');
@@ -35,6 +36,7 @@ figma.ui.onmessage = async (msg) => {
                         status: true,
                         id: apiID,
                         secret: apiSecret,
+                        provider: apiProvider,
                     });
                 } else {
                     console.log('NO values from storage');
@@ -57,9 +59,9 @@ figma.ui.onmessage = async (msg) => {
             }
             sendPluginValues(figma.currentPage.selection);
             return;
-        case 'initialThemerData':
-            console.log('initialized credentials');
-            updateCredentials(msg.secret, msg.id);
+        case 'credentials':
+            console.log('initialized credentials', msg.secret, msg.id, msg.provider);
+            updateCredentials(msg.secret, msg.id, msg.provider);
             figma.notify(msg.msg, {timeout: 1000});
             break;
         case 'set-node-data':

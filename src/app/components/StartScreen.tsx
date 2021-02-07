@@ -24,7 +24,7 @@ const StartScreen = ({setActive}) => {
         setApiID(e.target.value);
     };
     const handleSyncClick = () => {
-        setApiData({id: apiID, secret: apiSecret});
+        setApiData({id: apiID, secret: apiSecret, provider: 'jsonbin'});
         const values = initializeWithThemerData(apiID, apiSecret);
         if (values) {
             setActive('tokens');

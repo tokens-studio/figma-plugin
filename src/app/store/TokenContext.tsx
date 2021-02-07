@@ -65,6 +65,7 @@ const emptyState = {
     api: {
         id: '',
         secret: '',
+        provider: '',
     },
 };
 
@@ -72,7 +73,6 @@ const TokenStateContext = React.createContext(emptyState);
 const TokenDispatchContext = React.createContext(null);
 
 function updateTokens(state: any) {
-    console.log('send new tokens to jsonbin');
     updateRemoteTokens(state.tokenData.reduceToValues(), state.api.id, state.api.secret);
 
     parent.postMessage(
@@ -314,7 +314,7 @@ function TokenProvider({children}) {
             setCollapsed: () => {
                 dispatch({type: ActionType.SetCollapsed});
             },
-            setApiData: (data: {id: string; secret: string}) => {
+            setApiData: (data: {id: string; secret: string; provider: string}) => {
                 dispatch({type: ActionType.SetApiData, data});
             },
         }),
