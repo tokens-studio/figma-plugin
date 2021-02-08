@@ -82,7 +82,7 @@ const JSONEditor = () => {
             <div className="flex justify-between w-full px-4 bg-white">
                 <div className="space-x-2 flex mr-2">
                     <Button variant="secondary" size="large" onClick={() => showConfirmModal('reset')}>
-                        Reset to Default
+                        Fill with example data
                     </Button>
                     <Button variant="secondary" size="large" onClick={() => showConfirmModal('delete')}>
                         Clear

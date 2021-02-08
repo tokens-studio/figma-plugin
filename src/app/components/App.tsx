@@ -116,7 +116,9 @@ const App = () => {
                     {active === 'json' && <JSONEditor />}
                     {active === 'inspector' && <Inspector />}
                 </div>
-                <div className="p-4 flex-shrink-0 flex items-center justify-between">
+                <div
+                    className={`p-4 flex-shrink-0 flex items-center justify-between ${active === 'tokens' && 'mb-16'}`}
+                >
                     <div className="text-gray-600 text-xxs">Figma Tokens Version {pjs.version}</div>
                     <div className="text-gray-600 text-xxs">
                         <a

@@ -1,4 +1,3 @@
-import {findAll} from '@figma-plugin/helpers';
 import {removeValuesFromNode} from './updateNode';
 import {notifySelection} from './notifiers';
 import store from './store';
@@ -37,8 +36,9 @@ export function fetchAllPluginData(node) {
     return null;
 }
 
-export function findAllWithData() {
-    const nodes = findAll(figma.root.children, (node): any => {
+export function findAllWithData({pageOnly = false}) {
+    const root = pageOnly ? figma.currentPage : figma.root;
+    const nodes = root.findAll((node): any => {
         const pluginValues = fetchAllPluginData(node);
         if (pluginValues) return node;
     });
