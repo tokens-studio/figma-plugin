@@ -2,36 +2,15 @@ import * as React from 'react';
 import Heading from './Heading';
 import Button from './Button';
 import {useTokenDispatch} from '../store/TokenContext';
-import Input from './Input';
-import {initializeWithThemerData} from './utils';
-import {setTokenData} from '../../plugin/node';
-import TokenData from './TokenData';
 
 const StartScreen = ({setActive}) => {
-    const {setDefaultTokens, setLoading, setApiData} = useTokenDispatch();
-    const [apiID, setApiID] = React.useState('');
-    const [apiSecret, setApiSecret] = React.useState('');
+    const {setDefaultTokens, setLoading} = useTokenDispatch();
     const onSetDefaultTokens = () => {
         setActive('tokens');
         setDefaultTokens();
         setLoading(false);
     };
 
-    const handleApiSecretChange = (e) => {
-        setApiSecret(e.target.value);
-    };
-    const handleApiIDChange = (e) => {
-        setApiID(e.target.value);
-    };
-    const handleSyncClick = () => {
-        setApiData({id: apiID, secret: apiSecret, provider: 'jsonbin'});
-        const values = initializeWithThemerData(apiID, apiSecret);
-        if (values) {
-            setActive('tokens');
-            setTokenData(new TokenData(values));
-            setLoading(false);
-        }
-    };
     return (
         <div className="my-auto h-auto space-y-4 p-4">
             <Heading size="small">Welcome to Figma Tokens.</Heading>
@@ -50,29 +29,6 @@ const StartScreen = ({setActive}) => {
                 </Button>
                 <Button size="large" variant="primary" onClick={onSetDefaultTokens}>
                     Configure Tokens
-                </Button>
-            </div>
-            <div className="space-x-2 flex justify-between">
-                <Input
-                    full
-                    label="API Secret"
-                    value={apiSecret}
-                    onChange={handleApiSecretChange}
-                    type="text"
-                    name="apiSecret"
-                    required
-                />
-                <Input
-                    full
-                    label="API ID"
-                    value={apiID}
-                    onChange={handleApiIDChange}
-                    type="text"
-                    name="apiUrl"
-                    required
-                />
-                <Button size="large" variant="primary" onClick={handleSyncClick}>
-                    Set Sync
                 </Button>
             </div>
         </div>
