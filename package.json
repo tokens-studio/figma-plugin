@@ -1,6 +1,6 @@
 {
 	"name": "figma-tokens",
-	"version": "30",
+	"version": "32",
 	"description": "Figma Design Tokens",
 	"license": "ISC",
 	"scripts": {
