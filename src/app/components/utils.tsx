@@ -72,7 +72,8 @@ export function lightOrDark(color: string) {
             [, r, g, b] = color.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d+(?:\.\d+)?))?\)$/);
         } else {
             // If hex --> Convert it to RGB: http://gist.github.com/983661
-            const extractedColor = +`0x${color.slice(1).replace(color.length < 5 && /./g, '$&$&')}`;
+            const baseColor = color.slice(0, 7);
+            const extractedColor = +`0x${baseColor.slice(1).replace(baseColor.length < 5 && /./g, '$&$&')}`;
 
             r = extractedColor >> 16;
             g = (extractedColor >> 8) & 255;

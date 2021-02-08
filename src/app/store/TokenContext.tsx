@@ -33,6 +33,7 @@ export enum ActionType {
     SetDisplayType = 'SET_DISPLAY_TYPE',
     ToggleColorMode = 'TOGGLE_COLOR_MODE',
     SetCollapsed = 'SET_COLLAPSED',
+    ToggleUpdatePageOnly = 'TOGGLE_UPDATE_PAGE_ONLY',
 }
 
 const defaultTokens: TokenProps = {
@@ -60,6 +61,7 @@ const emptyState = {
     colorMode: false,
     showEditForm: false,
     showOptions: false,
+    updatePageOnly: true,
 };
 
 const TokenStateContext = React.createContext(emptyState);
@@ -72,6 +74,7 @@ function updateTokens(state: any) {
                 type: 'update',
                 tokenValues: state.tokenData.reduceToValues(),
                 tokens: state.tokenData.getMergedTokens(),
+                updatePageOnly: state.updatePageOnly,
             },
         },
         '*'
@@ -225,6 +228,11 @@ function stateReducer(state, action) {
                 ...state,
                 collapsed: !state.collapsed,
             };
+        case ActionType.ToggleUpdatePageOnly:
+            return {
+                ...state,
+                updatePageOnly: action.bool,
+            };
         default:
             throw new Error('Not implemented');
     }
@@ -299,6 +307,9 @@ function TokenProvider({children}) {
             },
             setCollapsed: () => {
                 dispatch({type: ActionType.SetCollapsed});
+            },
+            toggleUpdatePageOnly: (bool: boolean) => {
+                dispatch({type: ActionType.ToggleUpdatePageOnly, bool});
             },
         }),
         [dispatch]

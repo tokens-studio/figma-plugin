@@ -4,6 +4,19 @@
 
 @tailwind components;
 
+:root {
+    /* SPACING + SIZING */
+    --size-xxxsmall: 4px;
+    --size-xxsmall: 8px;
+    --size-xsmall: 16px;
+    --size-small: 24px;
+    --size-medium: 32px;
+    --size-large: 40px;
+    --size-xlarge: 48px;
+    --size-xxlarge: 64px;
+    --size-xxxlarge: 80px;
+}
+
 body {
     @apply font-body text-sm;
 }
@@ -324,6 +337,84 @@ form {
     cursor: inherit;
     margin-bottom: 3px;
     padding: 2px 0;
+}
+
+/* switch */
+.switch {
+    align-items: center;
+    cursor: default;
+    display: flex;
+    height: var(--size-medium);
+    position: relative;
+    /*
+      &__toggle:focus + &__label:before {
+          box-shadow: 0 0 0 2px var(--blue);
+      }
+      */
+}
+
+.switch__toggle {
+    opacity: 0;
+}
+
+.switch__toggle:checked + .switch__label:before {
+    color: black;
+    background-color: black;
+}
+
+.switch__toggle:checked + .switch__label:after {
+    transform: translateX(12px);
+}
+
+.switch__toggle:checked:disabled + .switch__label:before {
+    border: 1px solid black;
+    background-color: black;
+}
+
+.switch__toggle:disabled + .switch__label {
+    color: black;
+    opacity: 0.3;
+}
+
+.switch__label {
+    align-items: center;
+    color: black;
+    display: flex;
+    height: 100%;
+    margin-left: -16px;
+    padding: 0 var(--size-xsmall) 0 calc(var(--size-xlarge) - 2px);
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.switch__label:before {
+    background-color: white;
+    border: 1px solid black;
+    border-radius: 6px;
+    content: '';
+    display: block;
+    height: 10px;
+    left: 8px;
+    position: absolute;
+    top: 10px;
+    transition: background-color 0 0.2s;
+    width: 22px;
+}
+
+.switch__label:after {
+    background-color: white;
+    border: 1px solid black;
+    border-radius: 50%;
+    content: '';
+    display: block;
+    height: 10px;
+    left: 8px;
+    position: absolute;
+    top: 10px;
+    transition: transform 0.2s;
+    width: 10px;
 }
 
 @tailwind utilities;
