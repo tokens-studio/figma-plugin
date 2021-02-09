@@ -26,7 +26,8 @@ When you left-click a token this token is being put on your selection (multiple 
 You can right-click tokens to specify what property should be set, such as in `Spacing` the `Horizontal Spacing`, `Vertical Spacing` or `Gap` properties individually
 
 
-
+# More information
+I will provide more information and some Getting Started videos on my personal website: [jansix.at/resources/figma-tokens](https://jansix.at/resources/figma-tokens)
 
 # Contribute
 * Run `yarn` to install dependencies.

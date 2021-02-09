@@ -173,7 +173,10 @@ export function pullStyles(styleTypes): void {
             const obj = {
                 fontFamily: `$fontFamilies.${fontFamilies.find((el: string[]) => el[1] === style.fontName.family)[0]}`,
                 fontWeight: `$fontWeights.${
-                    fontWeights.find((el: string[]) => el[0].includes(slugify(style.fontName.family)))[0]
+                    fontWeights.find(
+                        (el: string[]) =>
+                            el[0].includes(slugify(style.fontName.family)) && el[1] === style.fontName.style
+                    )[0]
                 }`,
                 lineHeight: `$lineHeights.${
                     lineHeights.find(

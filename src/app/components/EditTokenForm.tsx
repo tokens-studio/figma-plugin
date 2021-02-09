@@ -34,7 +34,7 @@ const EditTokenForm = ({submitTokenValue, explainer = '', property, isPristine, 
     };
 
     return (
-        <Modal isOpen={true} close={handleReset} title={title}>
+        <Modal isOpen close={handleReset} title={title}>
             <form onSubmit={handleSubmit} className="space-y-4 flex flex-col justify-start">
                 <Input
                     required
