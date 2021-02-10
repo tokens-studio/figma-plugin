@@ -1,7 +1,7 @@
 import {Parser} from 'expr-eval';
-import {hexToRgb, updateCredentials} from '../../plugin/helpers';
+import {hexToRgb} from '../../plugin/helpers';
 import * as pjs from '../../../package.json';
-import {useTokenDispatch} from '../store/TokenContext';
+import {StorageProviderType} from '../store/TokenContext';
 
 const parser = new Parser();
 
@@ -139,19 +139,9 @@ export function populateThemes(data) {
     );
 }
 
-export async function updateRemoteTokens(tokens, id, secret) {
+export async function updateRemoteTokens({tokens, id, secret}) {
     console.log('updating remote', id, secret, tokens);
     if (!id && !secret) return;
-
-    parent.postMessage(
-        {
-            pluginMessage: {
-                type: 'notify',
-                msg: 'Updating Token values...',
-            },
-        },
-        '*'
-    );
 
     const tokenObj = {
         version: pjs.version,
@@ -159,8 +149,6 @@ export async function updateRemoteTokens(tokens, id, secret) {
             options: JSON.parse(tokens.options),
         },
     };
-
-    console.log({tokenObj});
 
     const response = await fetch(`https://api.jsonbin.io/b/${id}`, {
         method: 'PUT', // *GET, POST, PUT, DELETE, etc.
@@ -175,14 +163,11 @@ export async function updateRemoteTokens(tokens, id, secret) {
         },
     });
 
-    console.log('got response', response);
-    const resp = await response.json();
-    console.log('got response', resp);
+    await response.json();
 }
 
-export async function createNewBin(apiSecret, tokens, setApiData) {
+export async function createNewBin({secret, tokens, name, setApiData, setStorageType}) {
     const provider = 'jsonbin';
-    console.log('creating new');
     const response = await fetch(`https://api.jsonbin.io/b`, {
         method: 'POST', // *GET, POST, PUT, DELETE, etc.
         mode: 'cors', // no-cors, *cors, same-origin
@@ -191,20 +176,21 @@ export async function createNewBin(apiSecret, tokens, setApiData) {
         body: '{"Sample": "Hello World"}',
         headers: {
             'Content-Type': 'application/json',
-            'secret-key': apiSecret,
+            'secret-key': secret,
         },
     });
     if (response) {
         const jsonBinData = await response.json();
-        console.log('got response', jsonBinData, provider);
-        setApiData({id: jsonBinData.id, secret: apiSecret, provider});
-        updateRemoteTokens(tokens, jsonBinData.id, apiSecret);
+        setApiData({id: jsonBinData.id, name, secret, provider});
+        setStorageType({id: jsonBinData.id, provider}, true);
+        updateRemoteTokens({tokens, id: jsonBinData.id, secret});
         parent.postMessage(
             {
                 pluginMessage: {
                     type: 'credentials',
                     id: jsonBinData.id,
-                    secret: apiSecret,
+                    name,
+                    secret,
                     provider,
                     msg: 'Connection successful',
                 },
@@ -225,22 +211,10 @@ export async function createNewBin(apiSecret, tokens, setApiData) {
 }
 
 // Initialize plugin with data
-export async function initializeWithThemerData(apiID, apiSecret) {
-    const id = apiID;
-    const secret = apiSecret;
+export async function fetchDataFromJSONBin(id, secret, name): Promise<any> {
     let tokenValues;
 
     if (!id && !secret) return;
-    // send msg to plugin
-    parent.postMessage(
-        {
-            pluginMessage: {
-                type: 'notify',
-                msg: 'Connecting to JSONbin.io',
-            },
-        },
-        '*'
-    );
 
     const response = await fetch(`https://api.jsonbin.io/b/${id}/latest`, {
         method: 'GET', // *GET, POST, PUT, DELETE, etc.
@@ -254,11 +228,14 @@ export async function initializeWithThemerData(apiID, apiSecret) {
     });
 
     if (response) {
+        const jsonBinData = await response.json();
+        console.log('got data', jsonBinData);
         parent.postMessage(
             {
                 pluginMessage: {
                     type: 'credentials',
                     id,
+                    name,
                     secret,
                     provider: 'jsonbin',
                     msg: 'Connection successful',
@@ -266,16 +243,19 @@ export async function initializeWithThemerData(apiID, apiSecret) {
             },
             '*'
         );
-        const jsonBinData = await response.json();
-        console.log('got data', jsonBinData);
-        const obj = {
-            version: jsonBinData.version,
-            values: {
-                options: JSON.stringify(jsonBinData.values.options, null, 2),
-            },
-        };
+        if (jsonBinData?.values?.options) {
+            const obj = {
+                version: jsonBinData.version,
+                name,
+                values: {
+                    options: JSON.stringify(jsonBinData.values.options, null, 2),
+                },
+            };
 
-        tokenValues = obj;
+            tokenValues = obj;
+        } else {
+            console.log('No values on remote, should we push local?');
+        }
     }
 
     parent.postMessage(

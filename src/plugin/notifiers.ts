@@ -1,3 +1,4 @@
+import {apiData, StorageType} from '../app/store/TokenContext';
 import store from './store';
 
 export function notifyNoSelection() {
@@ -41,6 +42,20 @@ export function notifyTokenValues(values = undefined) {
     figma.ui.postMessage({
         type: 'tokenvalues',
         values,
+    });
+}
+
+export function notifyStorageType(storageType: StorageType) {
+    figma.ui.postMessage({
+        type: 'receivedStorageType',
+        storageType,
+    });
+}
+
+export function notifyAPIProviders(providers: apiData[]) {
+    figma.ui.postMessage({
+        type: 'apiProviders',
+        providers,
     });
 }
 

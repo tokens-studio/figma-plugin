@@ -11,7 +11,7 @@ import Icon from './Icon';
 import * as pjs from '../../../package.json';
 import {useTokenState, useTokenDispatch} from '../store/TokenContext';
 import TokenData from './TokenData';
-import {initializeWithThemerData} from './utils';
+import {fetchDataFromJSONBin} from './utils';
 
 const goToNodeId = (id) => {
     parent.postMessage(
@@ -38,6 +38,8 @@ const App = () => {
         resetSelectionValues,
         setTokensFromStyles,
         setApiData,
+        setStorageType,
+        setAPIProviders,
     } = useTokenDispatch();
 
     const onInitiate = () => {
@@ -47,7 +49,7 @@ const App = () => {
     React.useEffect(() => {
         onInitiate();
         window.onmessage = async (event) => {
-            const {type, values, id, secret, provider, status} = event.data.pluginMessage;
+            const {type, values, id, secret, name, provider, status, storageType, providers} = event.data.pluginMessage;
             switch (type) {
                 case 'selection':
                     setDisabled(false);
@@ -79,21 +81,29 @@ const App = () => {
                         setActive('tokens');
                     }
                     break;
+                case 'receivedStorageType':
+                    console.log('receivedStorageType', storageType);
+                    setStorageType(storageType);
+                    break;
                 case 'apiCredentials':
                     if (status === false) {
                         console.log('falsy api credentials');
                     } else {
-                        console.log('Populate fields with data', id, secret, provider);
-                        setApiData({id, secret, provider});
+                        console.log('Populate fields with data', id, secret, name, provider);
+                        setApiData({id, secret, name, provider});
                         // setTokenData(new TokenData(values));
                         // initalize themer data
-                        const remoteValues = await initializeWithThemerData(id, secret);
+                        const remoteValues = await fetchDataFromJSONBin(id, secret, name);
                         setLoading(false);
                         if (remoteValues) {
                             setActive('tokens');
                             setTokenData(new TokenData(remoteValues));
                         }
                     }
+                    break;
+                case 'apiProviders':
+                    console.log('setting api providers');
+                    setAPIProviders(providers);
                     break;
                 default:
                     break;

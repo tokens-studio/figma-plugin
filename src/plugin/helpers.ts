@@ -41,16 +41,36 @@ export function mergeDeep(target, ...sources) {
 }
 
 // update credentials
-export function updateCredentials(secret, id, provider) {
-    (async () => {
-        try {
-            await figma.clientStorage.setAsync('apiSecret', secret);
-            await figma.clientStorage.setAsync('apiID', id);
-            await figma.clientStorage.setAsync('apiProvider', provider);
-        } catch (err) {
-            figma.notify('There was an issue saving your credentials. Please try again.');
+export async function updateCredentials({secret, id, name, provider}) {
+    console.log('Updating credentials', secret, id, name, provider);
+
+    try {
+        const data = await figma.clientStorage.getAsync('apiProviders');
+        let existingProviders = [];
+        if (data) {
+            const parsedData = await JSON.parse(data);
+
+            existingProviders = parsedData;
+
+            const matchingProvider = parsedData.find(
+                (i) => i.secret === secret && i.id === id && i.provider === provider
+            );
+
+            if (!parsedData || !matchingProvider) {
+                console.log('got no existing providers or any matching provider, pushing new');
+                console.log('existing providers now are', existingProviders);
+                existingProviders.push({secret, id, name, provider});
+            }
+        } else {
+            console.log('no previous data');
+            existingProviders.push({secret, id, name, provider});
         }
-    })();
+        console.log('existing providers now are', existingProviders);
+        console.log('setting providers to', JSON.stringify(existingProviders));
+        await figma.clientStorage.setAsync('apiProviders', JSON.stringify(existingProviders));
+    } catch (err) {
+        figma.notify('There was an issue saving your credentials. Please try again.');
+    }
 }
 
 export function convertLineHeightToFigma(inputValue) {

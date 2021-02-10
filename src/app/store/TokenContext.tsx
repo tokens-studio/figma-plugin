@@ -36,6 +36,8 @@ export enum ActionType {
     SetCollapsed = 'SET_COLLAPSED',
     SetApiData = 'SET_API_DATA',
     ToggleUpdatePageOnly = 'TOGGLE_UPDATE_PAGE_ONLY',
+    SetStorageType = 'SET_STORAGE_TYPE',
+    SetAPIProviders = 'SET_API_PROVIDERS',
 }
 
 const defaultTokens: TokenProps = {
@@ -44,6 +46,24 @@ const defaultTokens: TokenProps = {
         options: JSON.stringify(defaultJSON, null, 2),
     },
 };
+
+export type StorageType = {
+    provider: StorageProviderType;
+    id?: string;
+};
+
+export type apiData = {
+    id: string;
+    secret: string;
+    provider: string;
+    name: string;
+};
+
+export enum StorageProviderType {
+    LOCAL = 'local',
+    ARCADE = 'arcade',
+    JSONBIN = 'jsonbin',
+}
 
 const emptyTokens: TokenProps = {
     version: pjs.version,
@@ -63,11 +83,16 @@ const emptyState = {
     colorMode: false,
     showEditForm: false,
     showOptions: false,
+    storageType: {
+        provider: StorageProviderType.LOCAL,
+    },
     api: {
         id: '',
         secret: '',
         provider: '',
+        name: '',
     },
+    apiProviders: [],
     updatePageOnly: true,
 };
 
@@ -75,7 +100,8 @@ const TokenStateContext = React.createContext(emptyState);
 const TokenDispatchContext = React.createContext(null);
 
 function updateTokens(state: any) {
-    updateRemoteTokens(state.tokenData.reduceToValues(), state.api.id, state.api.secret);
+    if (state.storageType.provider !== StorageProviderType.LOCAL)
+        updateRemoteTokens(state.tokenData.reduceToValues(), state.api.id, state.api.secret);
 
     parent.postMessage(
         {
@@ -242,10 +268,34 @@ function stateReducer(state, action) {
                 ...state,
                 api: action.data,
             };
+        case ActionType.SetAPIProviders:
+            return {
+                ...state,
+                apiProviders: action.data,
+            };
         case ActionType.ToggleUpdatePageOnly:
             return {
                 ...state,
                 updatePageOnly: action.bool,
+            };
+        case ActionType.SetStorageType:
+            console.log('Action storage type set', action.data, action.bool);
+            if (action.bool) {
+                console.log('tokens are', state.tokenData.getMergedTokens());
+                parent.postMessage(
+                    {
+                        pluginMessage: {
+                            type: 'set-storage-type',
+                            storageType: action.data,
+                            tokens: state.tokenData.getMergedTokens(),
+                        },
+                    },
+                    '*'
+                );
+            }
+            return {
+                ...state,
+                storageType: action.data,
             };
         default:
             throw new Error('Not implemented');
@@ -322,11 +372,17 @@ function TokenProvider({children}) {
             setCollapsed: () => {
                 dispatch({type: ActionType.SetCollapsed});
             },
-            setApiData: (data: {id: string; secret: string; provider: string}) => {
+            setApiData: (data: apiData) => {
                 dispatch({type: ActionType.SetApiData, data});
             },
             toggleUpdatePageOnly: (bool: boolean) => {
                 dispatch({type: ActionType.ToggleUpdatePageOnly, bool});
+            },
+            setStorageType: (data: StorageType, bool = false) => {
+                dispatch({type: ActionType.SetStorageType, data, bool});
+            },
+            setAPIProviders: (data: apiData[]) => {
+                dispatch({type: ActionType.SetAPIProviders, data});
             },
         }),
         [dispatch]

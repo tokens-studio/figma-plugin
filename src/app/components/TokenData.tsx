@@ -37,7 +37,9 @@ export default class TokenData {
     }
 
     setTokens(tokens: TokenProps): void {
+        console.log('parsing', tokens);
         const parsed = this.parseTokenValues(tokens);
+        console.log('Parsed', parsed);
         if (!parsed) return;
         this.tokens = parsed;
     }
@@ -87,6 +89,7 @@ export default class TokenData {
     }
 
     setMergedTokens(): void {
+        console.log('merging', this.tokens);
         this.mergedTokens = mergeDeep(
             {},
             ...Object.entries(this.tokens).reduce((acc, cur) => {
@@ -94,6 +97,7 @@ export default class TokenData {
                 return acc;
             }, [])
         );
+        console.log('merged', this.mergedTokens);
 
         this.setAllAliases();
     }
