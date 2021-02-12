@@ -38,6 +38,7 @@ const Tokens = () => {
 
     return (
         <div>
+            Last updated: {tokenData.getUpdatedAt()}
             {mappedTokens(JSON5.parse(tokenData.tokens[activeToken].values)).map((tokenValues) => {
                 switch (tokenValues[0]) {
                     case 'borderRadius':

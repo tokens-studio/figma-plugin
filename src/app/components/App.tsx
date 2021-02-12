@@ -11,25 +11,14 @@ import Icon from './Icon';
 import * as pjs from '../../../package.json';
 import {useTokenState, useTokenDispatch} from '../store/TokenContext';
 import TokenData from './TokenData';
-import {fetchDataFromJSONBin} from './utils';
-
-const goToNodeId = (id) => {
-    parent.postMessage(
-        {
-            pluginMessage: {
-                type: 'gotonode',
-                id,
-            },
-        },
-        '*'
-    );
-};
+import {fetchDataFromJSONBin} from './updateRemoteTokens';
+import {goToNodeId} from './utils';
 
 const App = () => {
     const [active, setActive] = React.useState('start');
     const [remoteComponents, setRemoteComponents] = React.useState([]);
 
-    const {loading} = useTokenState();
+    const {loading, tokenData} = useTokenState();
     const {
         setTokenData,
         setLoading,
@@ -49,7 +38,7 @@ const App = () => {
     React.useEffect(() => {
         onInitiate();
         window.onmessage = async (event) => {
-            const {type, values, id, secret, name, provider, status, storageType, providers} = event.data.pluginMessage;
+            const {type, values, credentials, status, storageType, providers} = event.data.pluginMessage;
             switch (type) {
                 case 'selection':
                     setDisabled(false);
@@ -67,13 +56,15 @@ const App = () => {
                     setLoading(false);
                     setRemoteComponents(values.remotes);
                     break;
-                case 'tokenvalues':
+                case 'tokenvalues': {
+                    console.log('setting token values', values);
                     setLoading(false);
                     if (values) {
                         setTokenData(new TokenData(values));
                         setActive('tokens');
                     }
                     break;
+                }
                 case 'styles':
                     setLoading(false);
                     if (values) {
@@ -82,27 +73,28 @@ const App = () => {
                     }
                     break;
                 case 'receivedStorageType':
-                    console.log('receivedStorageType', storageType);
                     setStorageType(storageType);
                     break;
-                case 'apiCredentials':
+                case 'apiCredentials': {
                     if (status === false) {
                         console.log('falsy api credentials');
                     } else {
-                        console.log('Populate fields with data', id, secret, name, provider);
+                        const {id, secret, name, provider} = credentials;
                         setApiData({id, secret, name, provider});
                         // setTokenData(new TokenData(values));
                         // initalize themer data
                         const remoteValues = await fetchDataFromJSONBin(id, secret, name);
-                        setLoading(false);
                         if (remoteValues) {
+                            console.log('got remote values', remoteValues);
                             setActive('tokens');
-                            setTokenData(new TokenData(remoteValues));
+                            tokenData.setUpdatedAt(remoteValues.updatedAt);
+                            setTokenData(new TokenData(remoteValues), remoteValues.updatedAt);
                         }
+                        setLoading(false);
                     }
                     break;
+                }
                 case 'apiProviders':
-                    console.log('setting api providers');
                     setAPIProviders(providers);
                     break;
                 default:

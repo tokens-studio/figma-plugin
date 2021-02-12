@@ -1,7 +1,6 @@
 import {Parser} from 'expr-eval';
 import {hexToRgb} from '../../plugin/helpers';
-import * as pjs from '../../../package.json';
-import {StorageProviderType} from '../store/TokenContext';
+import {postToFigma} from '../../plugin/notifiers';
 
 const parser = new Parser();
 
@@ -126,147 +125,9 @@ export function slugify(text: string) {
         .replace(/--+/g, '-'); // Replace multiple - with single -
 }
 
-// Populate themes
-export function populateThemes(data) {
-    parent.postMessage(
-        {
-            pluginMessage: {
-                type: 'notify',
-                msg: 'There was an error connecting',
-            },
-        },
-        '*'
-    );
-}
-
-export async function updateRemoteTokens({tokens, id, secret}) {
-    console.log('updating remote', id, secret, tokens);
-    if (!id && !secret) return;
-
-    const tokenObj = {
-        version: pjs.version,
-        values: {
-            options: JSON.parse(tokens.options),
-        },
-    };
-
-    const response = await fetch(`https://api.jsonbin.io/b/${id}`, {
-        method: 'PUT', // *GET, POST, PUT, DELETE, etc.
-        mode: 'cors', // no-cors, *cors, same-origin
-        cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
-        credentials: 'same-origin', // include, *same-origin, omit
-        body: JSON.stringify(tokenObj, null, 2),
-        headers: {
-            'Content-Type': 'application/json',
-            'secret-key': secret,
-            versioning: false,
-        },
+export function goToNodeId(id) {
+    postToFigma({
+        type: 'gotonode',
+        id,
     });
-
-    await response.json();
-}
-
-export async function createNewBin({secret, tokens, name, setApiData, setStorageType}) {
-    const provider = 'jsonbin';
-    const response = await fetch(`https://api.jsonbin.io/b`, {
-        method: 'POST', // *GET, POST, PUT, DELETE, etc.
-        mode: 'cors', // no-cors, *cors, same-origin
-        cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
-        credentials: 'same-origin', // include, *same-origin, omit
-        body: '{"Sample": "Hello World"}',
-        headers: {
-            'Content-Type': 'application/json',
-            'secret-key': secret,
-        },
-    });
-    if (response) {
-        const jsonBinData = await response.json();
-        setApiData({id: jsonBinData.id, name, secret, provider});
-        setStorageType({id: jsonBinData.id, provider}, true);
-        updateRemoteTokens({tokens, id: jsonBinData.id, secret});
-        parent.postMessage(
-            {
-                pluginMessage: {
-                    type: 'credentials',
-                    id: jsonBinData.id,
-                    name,
-                    secret,
-                    provider,
-                    msg: 'Connection successful',
-                },
-            },
-            '*'
-        );
-    } else {
-        parent.postMessage(
-            {
-                pluginMessage: {
-                    type: 'notify',
-                    msg: 'There was an error connecting',
-                },
-            },
-            '*'
-        );
-    }
-}
-
-// Initialize plugin with data
-export async function fetchDataFromJSONBin(id, secret, name): Promise<any> {
-    let tokenValues;
-
-    if (!id && !secret) return;
-
-    const response = await fetch(`https://api.jsonbin.io/b/${id}/latest`, {
-        method: 'GET', // *GET, POST, PUT, DELETE, etc.
-        mode: 'cors', // no-cors, *cors, same-origin
-        cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
-        credentials: 'same-origin', // include, *same-origin, omit
-        headers: {
-            'Content-Type': 'application/json',
-            'secret-key': secret,
-        },
-    });
-
-    if (response) {
-        const jsonBinData = await response.json();
-        console.log('got data', jsonBinData);
-        parent.postMessage(
-            {
-                pluginMessage: {
-                    type: 'credentials',
-                    id,
-                    name,
-                    secret,
-                    provider: 'jsonbin',
-                    msg: 'Connection successful',
-                },
-            },
-            '*'
-        );
-        if (jsonBinData?.values?.options) {
-            const obj = {
-                version: jsonBinData.version,
-                name,
-                values: {
-                    options: JSON.stringify(jsonBinData.values.options, null, 2),
-                },
-            };
-
-            tokenValues = obj;
-        } else {
-            console.log('No values on remote, should we push local?');
-        }
-    }
-
-    parent.postMessage(
-        {
-            pluginMessage: {
-                type: 'notify',
-                msg: 'There was an error connecting',
-            },
-        },
-        '*'
-    );
-
-    return tokenValues;
 }

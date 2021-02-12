@@ -1,52 +1,62 @@
 import * as React from 'react';
-import {StorageProviderType, useTokenDispatch, useTokenState} from '../store/TokenContext';
+import {useTokenDispatch, useTokenState} from '../store/TokenContext';
+import {StorageProviderType} from '../store/types';
 import Button from './Button';
-import {setTokenData} from '../../plugin/node';
 import Input from './Input';
-import {createNewBin, fetchDataFromJSONBin} from './utils';
+import {createNewBin, fetchDataFromJSONBin} from './updateRemoteTokens';
 import Heading from './Heading';
+import TokenData from './TokenData';
 
 const Settings = () => {
     const {tokenData, storageType, api, apiProviders} = useTokenState();
-    const {setLoading, setApiData, setStorageType} = useTokenDispatch();
-    const [apiID, setApiID] = React.useState(api.id);
-    const [apiSecret, setApiSecret] = React.useState(api.secret);
-    const [apiName, setApiName] = React.useState(api.name);
+    const {setLoading, setApiData, setStorageType, setTokenData} = useTokenDispatch();
+    const [localApiState, setLocalApiState] = React.useState({
+        id: api.id,
+        secret: api.secret,
+        name: api.name,
+    });
 
     React.useEffect(() => {
-        setApiID(api.id);
-        setApiSecret(api.secret);
+        setLocalApiState({id: api.id, name: api.name, secret: api.secret});
     }, [api]);
 
-    const handleApiSecretChange = (e) => {
-        setApiSecret(e.target.value);
-    };
-    const handleApiNameChange = (e) => {
-        setApiName(e.target.value);
-    };
-    const handleApiIDChange = (e) => {
-        setApiID(e.target.value);
+    const handleChange = (e) => {
+        setLocalApiState({...localApiState, [e.target.name]: e.target.value});
     };
 
     const handleCreateNewClick = async () => {
-        setApiData({secret: apiSecret, provider: 'jsonbin', name: apiName});
+        setApiData({secret: localApiState.secret, provider: 'jsonbin', name: localApiState.name});
         createNewBin({
-            secret: apiSecret,
+            secret: localApiState.secret,
             tokens: tokenData.reduceToValues(),
-            name: apiName,
+            name: localApiState.name,
             setApiData,
             setStorageType,
         });
     };
 
-    const handleSyncClick = async () => {
+    const handleSyncClick = async ({
+        id = localApiState.id,
+        secret = localApiState.secret,
+        name = localApiState.name,
+        provider,
+    }) => {
         setLoading(true);
-        setStorageType({provider: StorageProviderType.JSONBIN, id: apiID}, true);
-        setApiData({id: apiID, secret: apiSecret, name: apiName, provider: 'jsonbin'});
-        const tokenValues = await fetchDataFromJSONBin(apiID, apiSecret, apiName);
-        // check if this works
-        if (tokenValues?.values?.options) setTokenData(tokenValues.values);
+        setStorageType({provider, id, name}, true);
+        setApiData({id, secret, name, provider: 'jsonbin'});
+        const remoteValues = await fetchDataFromJSONBin(id, secret, name);
+        if (remoteValues) {
+            const oldUpdated = tokenData.getUpdatedAt();
+            const newUpdated = remoteValues.updatedAt;
+            console.log('exactly the same tokens, saving', oldUpdated, newUpdated);
+            setTokenData(new TokenData(remoteValues), newUpdated);
+        }
         setLoading(false);
+    };
+
+    const restoreStoredProvider = (provider) => {
+        setLocalApiState(provider);
+        handleSyncClick(provider);
     };
 
     return (
@@ -82,36 +92,39 @@ const Settings = () => {
                             <Input
                                 full
                                 label="Name"
-                                value={apiName}
-                                onChange={handleApiNameChange}
+                                value={localApiState.name}
+                                onChange={handleChange}
                                 type="text"
-                                name="apiName"
+                                name="name"
                                 required
                             />
                             <div className="space-x-2 flex justify-between items-end">
                                 <Input
                                     full
                                     label="Secret"
-                                    value={apiSecret}
-                                    onChange={handleApiSecretChange}
+                                    value={localApiState.secret}
+                                    onChange={handleChange}
                                     type="text"
-                                    name="apiSecret"
+                                    name="secret"
                                     required
                                 />
                                 <Input
                                     full
                                     label="ID (optional)"
-                                    placeholder="Leave blank to create new"
-                                    value={apiID}
-                                    onChange={handleApiIDChange}
+                                    value={localApiState.id}
+                                    onChange={handleChange}
                                     type="text"
-                                    name="apiUrl"
+                                    name="id"
                                     required
                                 />
                                 <Button
                                     size="large"
                                     variant="primary"
-                                    onClick={() => (apiID ? handleSyncClick() : handleCreateNewClick())}
+                                    onClick={() =>
+                                        localApiState.id
+                                            ? handleSyncClick({provider: StorageProviderType.JSONBIN})
+                                            : handleCreateNewClick()
+                                    }
                                 >
                                     Save
                                 </Button>
@@ -122,14 +135,19 @@ const Settings = () => {
                         <div>
                             <Heading>Stored providers</Heading>
                             <div className="flex flex-col space-y-2">
-                                {/* allow users to remove saved providers */}
-                                {apiProviders.map(({provider, id, name}) => (
-                                    <div key={`${provider}-${id}`}>
-                                        {provider}
-                                        {id}
-                                        {name}
-                                    </div>
-                                ))}
+                                {/* allow users to remove saved providers or activate other set */}
+                                {apiProviders
+                                    .filter((item) => item.provider === storageType.provider)
+                                    .map(({provider, id, name, secret}) => (
+                                        <button
+                                            key={`${provider}-${id}`}
+                                            type="button"
+                                            onClick={() => restoreStoredProvider({provider, id, name, secret})}
+                                        >
+                                            <div className="font-bold">{name}</div>
+                                            <div className="text-xs text-gray-600">{id}</div>
+                                        </button>
+                                    ))}
                             </div>
                         </div>
                     )}

@@ -1,14 +1,39 @@
-import {apiData, StorageType} from '../app/store/TokenContext';
+import {apiData, StorageType} from '../app/store/types';
 import store from './store';
 
+export function postToFigma(props) {
+    parent.postMessage(
+        {
+            pluginMessage: props,
+        },
+        '*'
+    );
+}
+
+export function notifyUI(msg, opts = {}) {
+    figma.notify(msg, opts);
+}
+
+export function notifyToUI(msg, opts = {}) {
+    postToFigma({
+        type: 'notify',
+        msg,
+        opts,
+    });
+}
+
+export function postToUI(props) {
+    figma.ui.postMessage(props);
+}
+
 export function notifyNoSelection() {
-    figma.ui.postMessage({
+    postToUI({
         type: 'noselection',
     });
 }
 
 export function notifySelection(nodes = undefined, values = undefined) {
-    figma.ui.postMessage({
+    postToUI({
         type: 'selection',
         nodes,
         values,
@@ -18,15 +43,15 @@ export function notifySelection(nodes = undefined, values = undefined) {
 export function notifyRemoteComponents({nodes, remotes}) {
     const opts = {timeout: 600};
     if (nodes > 0 && remotes.length > 0) {
-        figma.notify(`Updated ${nodes} nodes, unable to update ${remotes.length} remote components`, opts);
+        notifyUI(`Updated ${nodes} nodes, unable to update ${remotes.length} remote components`, opts);
     } else if (nodes > 0 && remotes.length === 0) {
-        figma.notify(`Success! Updated ${nodes} nodes`, opts);
+        notifyUI(`Success! Updated ${nodes} nodes`, opts);
     } else if (nodes === 0) {
-        figma.notify(`No nodes updated`, opts);
+        notifyUI(`No nodes updated`, opts);
     } else {
-        figma.notify(`No nodes with connected tokens found`, opts);
+        notifyUI(`No nodes with connected tokens found`, opts);
     }
-    figma.ui.postMessage({
+    postToUI({
         type: 'remotecomponents',
         values: {
             nodes,
@@ -39,29 +64,17 @@ export function notifyRemoteComponents({nodes, remotes}) {
 }
 
 export function notifyTokenValues(values = undefined) {
-    figma.ui.postMessage({
-        type: 'tokenvalues',
-        values,
-    });
+    postToUI({type: 'tokenvalues', values});
 }
 
 export function notifyStorageType(storageType: StorageType) {
-    figma.ui.postMessage({
-        type: 'receivedStorageType',
-        storageType,
-    });
+    postToUI({type: 'receivedStorageType', storageType});
 }
 
 export function notifyAPIProviders(providers: apiData[]) {
-    figma.ui.postMessage({
-        type: 'apiProviders',
-        providers,
-    });
+    postToUI({type: 'apiProviders', providers});
 }
 
 export function notifyStyleValues(values = undefined) {
-    figma.ui.postMessage({
-        type: 'styles',
-        values,
-    });
+    postToUI({type: 'styles', values});
 }

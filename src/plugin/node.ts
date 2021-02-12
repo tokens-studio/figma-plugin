@@ -4,7 +4,7 @@ import {fetchAllPluginData} from './pluginData';
 import store from './store';
 import * as pjs from '../../package.json';
 import {setValuesOnNode} from './updateNode';
-import {StorageType} from '../app/store/TokenContext';
+import {StorageType} from '../app/store/types';
 
 export function mapValuesToTokens(object, values) {
     const array = Object.entries(values).map(([key, value]) => ({[key]: objectPath.get(object, value)}));
@@ -12,36 +12,34 @@ export function mapValuesToTokens(object, values) {
     return Object.assign({}, ...array);
 }
 
-export function setTokenData(tokens) {
+export function setTokenData(tokens, updatedAt: string) {
     figma.root.setSharedPluginData('tokens', 'version', pjs.version);
     figma.root.setSharedPluginData('tokens', 'values', JSON.stringify(tokens));
+    figma.root.setSharedPluginData('tokens', 'updatedAt', updatedAt);
 }
 
 export function getTokenData() {
     const values = figma.root.getSharedPluginData('tokens', 'values');
     const version = figma.root.getSharedPluginData('tokens', 'version');
+    const updatedAt = figma.root.getSharedPluginData('tokens', 'updatedAt');
     if (values) {
         const parsedValues = JSON.parse(values);
-        return {values: parsedValues, version};
+        return {values: parsedValues, updatedAt, version};
     }
 }
 
 // set storage type (i.e. local or some remote provider)
-export function saveStorageType({provider, id}: StorageType) {
-    console.log('setting storage type', {provider, id});
-    figma.root.setSharedPluginData('tokens', 'storageType', JSON.stringify({provider, id}));
+export function saveStorageType({provider, id, name}: StorageType) {
+    figma.root.setSharedPluginData('tokens', 'storageType', JSON.stringify({provider, id, name}));
 }
 
 export function getSavedStorageType(): StorageType {
     const values = figma.root.getSharedPluginData('tokens', 'storageType');
 
-    console.log('values are', values);
     if (values) {
-        console.log('values are', {values});
-        const {provider, id} = JSON.parse(values);
-        return {provider, id};
+        const {provider, name, id} = JSON.parse(values);
+        return {provider, name, id};
     }
-    console.log('no values returning local');
     return {provider: 'local'};
 }
 

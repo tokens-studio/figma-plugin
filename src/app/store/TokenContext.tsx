@@ -4,7 +4,9 @@ import objectPath from 'object-path';
 import defaultJSON from '../../config/default.json';
 import TokenData, {TokenProps} from '../components/TokenData';
 import * as pjs from '../../../package.json';
-import {updateRemoteTokens} from '../components/utils';
+import {updateRemoteTokens} from '../components/updateRemoteTokens';
+import {StorageProviderType, apiData, StorageType} from './types';
+import {postToFigma} from '../../plugin/notifiers';
 
 export interface SelectionValue {
     borderRadius: string | undefined;
@@ -42,31 +44,15 @@ export enum ActionType {
 
 const defaultTokens: TokenProps = {
     version: pjs.version,
+    updatedAt: Date.now().toString(),
     values: {
         options: JSON.stringify(defaultJSON, null, 2),
     },
 };
 
-export type StorageType = {
-    provider: StorageProviderType;
-    id?: string;
-};
-
-export type apiData = {
-    id: string;
-    secret: string;
-    provider: string;
-    name: string;
-};
-
-export enum StorageProviderType {
-    LOCAL = 'local',
-    ARCADE = 'arcade',
-    JSONBIN = 'jsonbin',
-}
-
 const emptyTokens: TokenProps = {
     version: pjs.version,
+    updatedAt: Date.now().toString(),
     values: {
         options: '{ }',
     },
@@ -99,21 +85,23 @@ const emptyState = {
 const TokenStateContext = React.createContext(emptyState);
 const TokenDispatchContext = React.createContext(null);
 
-function updateTokens(state: any) {
+async function updateTokensOnSources(state: any, updatedAt: string) {
+    console.log('setting tokens on source', updatedAt);
     if (state.storageType.provider !== StorageProviderType.LOCAL)
-        updateRemoteTokens(state.tokenData.reduceToValues(), state.api.id, state.api.secret);
+        await updateRemoteTokens({
+            tokens: state.tokenData.reduceToValues(),
+            id: state.api.id,
+            secret: state.api.secret,
+            updatedAt,
+        });
 
-    parent.postMessage(
-        {
-            pluginMessage: {
-                type: 'update',
-                tokenValues: state.tokenData.reduceToValues(),
-                tokens: state.tokenData.getMergedTokens(),
-                updatePageOnly: state.updatePageOnly,
-            },
-        },
-        '*'
-    );
+    postToFigma({
+        type: 'update',
+        tokenValues: state.tokenData.reduceToValues(),
+        tokens: state.tokenData.getMergedTokens(),
+        updatePageOnly: state.updatePageOnly,
+        updatedAt,
+    });
 }
 
 function stateReducer(state, action) {
@@ -125,7 +113,8 @@ function stateReducer(state, action) {
             };
         case ActionType.SetTokensFromStyles:
             state.tokenData.injectTokens(action.data);
-            updateTokens(state);
+            state.tokenData.setUpdatedAt(action.updatedAt);
+            updateTokensOnSources(state, action.updatedAt);
             return {
                 ...state,
                 tokens: state.tokenData.tokens,
@@ -146,7 +135,8 @@ function stateReducer(state, action) {
                 disabled: action.state,
             };
         case ActionType.SetStringTokens:
-            state.tokenData.updateTokenValues(action.data.parent, action.data.tokens);
+            console.log('setting string tokens', action.updatedAt);
+            state.tokenData.updateTokenValues(action.data.parent, action.data.tokens, action.updatedAt);
             return {
                 ...state,
                 tokens: {
@@ -158,13 +148,13 @@ function stateReducer(state, action) {
                 },
             };
         case ActionType.UpdateTokens:
-            updateTokens(state);
+            updateTokensOnSources(state, action.updatedAt);
             return state;
         case ActionType.DeleteToken: {
             const obj = JSON5.parse(state.tokenData.tokens[action.data.parent].values);
             objectPath.del(obj, [action.data.path, action.data.name].join('.'));
             const tokens = JSON.stringify(obj, null, 2);
-            state.tokenData.updateTokenValues(action.data.parent, tokens);
+            state.tokenData.updateTokenValues(action.data.parent, tokens, action.updatedAt);
             const newState = {
                 ...state,
                 tokens: {
@@ -175,55 +165,35 @@ function stateReducer(state, action) {
                     },
                 },
             };
-            updateTokens(newState);
+            updateTokensOnSources(newState, action.updatedAt);
             return newState;
         }
         case ActionType.CreateStyles:
-            parent.postMessage(
-                {
-                    pluginMessage: {
-                        type: 'create-styles',
-                        tokens: state.tokenData.getMergedTokens(),
-                    },
-                },
-                '*'
-            );
+            postToFigma({
+                type: 'create-styles',
+                tokens: state.tokenData.getMergedTokens(),
+            });
             return state;
         case ActionType.SetNodeData:
-            parent.postMessage(
-                {
-                    pluginMessage: {
-                        type: 'set-node-data',
-                        values: action.data,
-                        tokens: state.tokenData.getMergedTokens(),
-                    },
-                },
-                '*'
-            );
+            postToFigma({
+                type: 'set-node-data',
+                values: action.data,
+                tokens: state.tokenData.getMergedTokens(),
+            });
             return state;
         case ActionType.RemoveNodeData:
-            parent.postMessage(
-                {
-                    pluginMessage: {
-                        type: 'remove-node-data',
-                    },
-                },
-                '*'
-            );
+            postToFigma({
+                type: 'remove-node-data',
+            });
             return state;
         case ActionType.PullStyles:
-            parent.postMessage(
-                {
-                    pluginMessage: {
-                        type: 'pull-styles',
-                        styleTypes: {
-                            textStyles: true,
-                            colorStyles: true,
-                        },
-                    },
+            postToFigma({
+                type: 'pull-styles',
+                styleTypes: {
+                    textStyles: true,
+                    colorStyles: true,
                 },
-                '*'
-            );
+            });
             return state;
 
         case ActionType.SetSelectionValues:
@@ -268,30 +238,24 @@ function stateReducer(state, action) {
                 ...state,
                 api: action.data,
             };
-        case ActionType.SetAPIProviders:
+        case ActionType.SetAPIProviders: {
             return {
                 ...state,
                 apiProviders: action.data,
             };
+        }
         case ActionType.ToggleUpdatePageOnly:
             return {
                 ...state,
                 updatePageOnly: action.bool,
             };
         case ActionType.SetStorageType:
-            console.log('Action storage type set', action.data, action.bool);
             if (action.bool) {
-                console.log('tokens are', state.tokenData.getMergedTokens());
-                parent.postMessage(
-                    {
-                        pluginMessage: {
-                            type: 'set-storage-type',
-                            storageType: action.data,
-                            tokens: state.tokenData.getMergedTokens(),
-                        },
-                    },
-                    '*'
-                );
+                postToFigma({
+                    type: 'set-storage-type',
+                    storageType: action.data,
+                    tokens: state.tokenData.getMergedTokens(),
+                });
             }
             return {
                 ...state,
@@ -305,19 +269,18 @@ function stateReducer(state, action) {
 function TokenProvider({children}) {
     const [state, dispatch] = React.useReducer(stateReducer, emptyState);
 
+    const updatedAt = Date.now().toString();
+
     const tokenContext = React.useMemo(
         () => ({
-            setTokens: (tokens) => {
-                dispatch({type: 'SET_TOKENS', tokens});
-            },
             setTokensFromStyles: (data) => {
-                dispatch({type: ActionType.SetTokensFromStyles, data});
+                dispatch({type: ActionType.SetTokensFromStyles, data, updatedAt});
             },
             setTokenData: (data: TokenData) => {
-                dispatch({type: ActionType.SetTokenData, data});
+                dispatch({type: ActionType.SetTokenData, data, updatedAt});
             },
             setStringTokens: (data: {parent: string; tokens: string}) => {
-                dispatch({type: ActionType.SetStringTokens, data});
+                dispatch({type: ActionType.SetStringTokens, data, updatedAt});
             },
             setDefaultTokens: () => {
                 dispatch({type: ActionType.SetTokenData, data: new TokenData(defaultTokens)});
@@ -328,10 +291,10 @@ function TokenProvider({children}) {
                 dispatch({type: ActionType.SetLoading, state: false});
             },
             updateTokens: () => {
-                dispatch({type: ActionType.UpdateTokens});
+                dispatch({type: ActionType.UpdateTokens, updatedAt});
             },
             deleteToken: (data) => {
-                dispatch({type: ActionType.DeleteToken, data});
+                dispatch({type: ActionType.DeleteToken, data, updatedAt});
             },
             createStyles: () => {
                 dispatch({type: ActionType.CreateStyles});
@@ -367,7 +330,7 @@ function TokenProvider({children}) {
                 dispatch({type: ActionType.ToggleColorMode});
             },
             pullStyles: () => {
-                dispatch({type: ActionType.PullStyles});
+                dispatch({type: ActionType.PullStyles, updatedAt});
             },
             setCollapsed: () => {
                 dispatch({type: ActionType.SetCollapsed});
@@ -385,7 +348,7 @@ function TokenProvider({children}) {
                 dispatch({type: ActionType.SetAPIProviders, data});
             },
         }),
-        [dispatch]
+        [dispatch, updatedAt]
     );
 
     return (

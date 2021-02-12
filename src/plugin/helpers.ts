@@ -1,5 +1,6 @@
 /* eslint-disable no-param-reassign */
 import {webRGBToFigmaRGB, hexToFigmaRGB} from '@figma-plugin/helpers';
+import {notifyAPIProviders, notifyUI} from './notifiers';
 
 interface RGBA {
     r: number;
@@ -42,8 +43,6 @@ export function mergeDeep(target, ...sources) {
 
 // update credentials
 export async function updateCredentials({secret, id, name, provider}) {
-    console.log('Updating credentials', secret, id, name, provider);
-
     try {
         const data = await figma.clientStorage.getAsync('apiProviders');
         let existingProviders = [];
@@ -52,24 +51,25 @@ export async function updateCredentials({secret, id, name, provider}) {
 
             existingProviders = parsedData;
 
-            const matchingProvider = parsedData.find(
+            const matchingProvider = existingProviders.find(
                 (i) => i.secret === secret && i.id === id && i.provider === provider
             );
 
+            if (matchingProvider) {
+                matchingProvider.name = name;
+            }
+
             if (!parsedData || !matchingProvider) {
-                console.log('got no existing providers or any matching provider, pushing new');
-                console.log('existing providers now are', existingProviders);
                 existingProviders.push({secret, id, name, provider});
             }
         } else {
-            console.log('no previous data');
             existingProviders.push({secret, id, name, provider});
         }
-        console.log('existing providers now are', existingProviders);
-        console.log('setting providers to', JSON.stringify(existingProviders));
         await figma.clientStorage.setAsync('apiProviders', JSON.stringify(existingProviders));
+        const newProviders = await figma.clientStorage.getAsync('apiProviders');
+        notifyAPIProviders(JSON.parse(newProviders));
     } catch (err) {
-        figma.notify('There was an issue saving your credentials. Please try again.');
+        notifyUI('There was an issue saving your credentials. Please try again.');
     }
 }
 

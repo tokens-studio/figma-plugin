@@ -7,11 +7,11 @@ import {
     notifyRemoteComponents,
     notifyStorageType,
     notifyAPIProviders,
+    notifyUI,
 } from './notifiers';
 import {findAllWithData, removePluginData, sendPluginValues, updatePluginData} from './pluginData';
 import {getTokenData, updateNodes, setTokenData, goToNode, saveStorageType, getSavedStorageType} from './node';
 import {updateCredentials} from './helpers';
-import {StorageProviderType} from '../app/store/TokenContext';
 
 figma.showUI(__html__, {
     width: 400,
@@ -33,21 +33,16 @@ const compareProvidersWithStored = (providers, storageType) => {
         const matchingSet = parsedProviders.find((i) => i.provider === storageType.provider && i.id === storageType.id);
 
         if (matchingSet) {
-            console.log('Got matching set, returning api credentials');
             //    send a message to the UI with the credentials stored in the client
             figma.ui.postMessage({
                 type: 'apiCredentials',
                 status: true,
-                id: matchingSet.id,
-                secret: matchingSet.secret,
-                provider: matchingSet.provider,
+                credentials: matchingSet,
             });
         } else {
             console.log('got no matching set');
         }
     } else {
-        console.log('NO values from storage');
-
         //    send a message to the UI that says there are no credentials stored in the client
         figma.ui.postMessage({
             type: 'apiCredentials',
@@ -133,7 +128,7 @@ figma.ui.onmessage = async (msg) => {
             return;
         case 'update': {
             const allWithData = findAllWithData({pageOnly: msg.updatePageOnly});
-            setTokenData(msg.tokenValues);
+            setTokenData(msg.tokenValues, msg.updatedAt);
             updateStyles(msg.tokens, false);
             updateNodes(allWithData, msg.tokens);
             updatePluginData(allWithData, {});
@@ -146,7 +141,9 @@ figma.ui.onmessage = async (msg) => {
         case 'pull-styles':
             pullStyles(msg.styleTypes);
             break;
-
+        case 'notify':
+            notifyUI(msg.msg, msg.opts);
+            break;
         default:
     }
 };

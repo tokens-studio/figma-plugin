@@ -8,6 +8,7 @@ export interface TokenProps {
     values: {
         [key: string]: string;
     };
+    updatedAt: string;
     version: string;
 }
 
@@ -31,15 +32,17 @@ export default class TokenData {
 
     tokens: Tokens;
 
+    updatedAt: string;
+
     constructor(data: TokenProps) {
         this.setTokens(data);
         this.setMergedTokens();
     }
 
     setTokens(tokens: TokenProps): void {
-        console.log('parsing', tokens);
         const parsed = this.parseTokenValues(tokens);
-        console.log('Parsed', parsed);
+        console.log('parsing', tokens);
+        this.setUpdatedAt(tokens.updatedAt);
         if (!parsed) return;
         this.tokens = parsed;
     }
@@ -89,7 +92,6 @@ export default class TokenData {
     }
 
     setMergedTokens(): void {
-        console.log('merging', this.tokens);
         this.mergedTokens = mergeDeep(
             {},
             ...Object.entries(this.tokens).reduce((acc, cur) => {
@@ -97,12 +99,11 @@ export default class TokenData {
                 return acc;
             }, [])
         );
-        console.log('merged', this.mergedTokens);
 
         this.setAllAliases();
     }
 
-    updateTokenValues(parent: string, tokens: string): void {
+    updateTokenValues(parent: string, tokens: string, updatedAt: string): void {
         const hasErrored: boolean = this.checkTokenValidity(tokens);
         const newTokens = {
             ...this.tokens,
@@ -111,6 +112,7 @@ export default class TokenData {
                 values: tokens,
             },
         };
+        this.setUpdatedAt(updatedAt);
         this.tokens = newTokens;
         if (!hasErrored) {
             this.setMergedTokens();
@@ -119,6 +121,14 @@ export default class TokenData {
 
     getTokens() {
         return this.tokens;
+    }
+
+    getUpdatedAt() {
+        return this.updatedAt;
+    }
+
+    setUpdatedAt(value: string) {
+        this.updatedAt = value;
     }
 
     reduceToValues() {
