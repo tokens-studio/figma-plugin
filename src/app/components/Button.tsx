@@ -6,6 +6,7 @@ type ButtonProps = {
     onClick?: any;
     size?: 'large' | 'small';
     href?: string;
+    disabled?: boolean;
 };
 
 const Button: React.FunctionComponent<ButtonProps> = ({
@@ -15,6 +16,7 @@ const Button: React.FunctionComponent<ButtonProps> = ({
     variant,
     children,
     href,
+    disabled = false,
 }) => {
     let variantClass;
     switch (variant) {
@@ -46,7 +48,12 @@ const Button: React.FunctionComponent<ButtonProps> = ({
 
     return (
         // eslint-disable-next-line react/button-has-type
-        <button type={type} className={`button ${[variantClass, sizeClass].join(' ')}`} onClick={onClick}>
+        <button
+            disabled={disabled}
+            type={type}
+            className={`button ${[variantClass, sizeClass].join(' ')}`}
+            onClick={onClick}
+        >
             {children}
         </button>
     );

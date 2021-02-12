@@ -4,7 +4,8 @@ import {fetchAllPluginData} from './pluginData';
 import store from './store';
 import * as pjs from '../../package.json';
 import {setValuesOnNode} from './updateNode';
-import {StorageType} from '../app/store/types';
+import {StorageProviderType, StorageType} from '../app/store/types';
+import {TokenProps} from '../app/components/TokenData';
 
 export function mapValuesToTokens(object, values) {
     const array = Object.entries(values).map(([key, value]) => ({[key]: objectPath.get(object, value)}));
@@ -18,14 +19,17 @@ export function setTokenData(tokens, updatedAt: string) {
     figma.root.setSharedPluginData('tokens', 'updatedAt', updatedAt);
 }
 
-export function getTokenData() {
+export function getTokenData(): {values: TokenProps; updatedAt: string; version: string} {
     const values = figma.root.getSharedPluginData('tokens', 'values');
     const version = figma.root.getSharedPluginData('tokens', 'version');
     const updatedAt = figma.root.getSharedPluginData('tokens', 'updatedAt');
     if (values) {
+        console.log('got values', values, version, updatedAt);
         const parsedValues = JSON.parse(values);
         return {values: parsedValues, updatedAt, version};
     }
+    console.log('got no values');
+    return null;
 }
 
 // set storage type (i.e. local or some remote provider)
@@ -40,7 +44,7 @@ export function getSavedStorageType(): StorageType {
         const {provider, name, id} = JSON.parse(values);
         return {provider, name, id};
     }
-    return {provider: 'local'};
+    return {provider: StorageProviderType.LOCAL};
 }
 
 export function goToNode(id) {

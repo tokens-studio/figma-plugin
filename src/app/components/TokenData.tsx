@@ -18,11 +18,11 @@ interface TokenGroup {
     [key: string]: SingleToken;
 }
 
-interface Tokens {
+export interface Tokens {
     [key: string]: TokenObject;
 }
 
-interface TokenObject {
+export interface TokenObject {
     hasErrored?: boolean;
     values: string;
 }
@@ -41,7 +41,6 @@ export default class TokenData {
 
     setTokens(tokens: TokenProps): void {
         const parsed = this.parseTokenValues(tokens);
-        console.log('parsing', tokens);
         this.setUpdatedAt(tokens.updatedAt);
         if (!parsed) return;
         this.tokens = parsed;

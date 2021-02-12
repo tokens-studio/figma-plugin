@@ -2,7 +2,7 @@ import * as React from 'react';
 import JSON5 from 'json5';
 import objectPath from 'object-path';
 import defaultJSON from '../../config/default.json';
-import TokenData, {TokenProps} from '../components/TokenData';
+import TokenData, {TokenProps, Tokens} from '../components/TokenData';
 import * as pjs from '../../../package.json';
 import {updateRemoteTokens} from '../components/updateRemoteTokens';
 import {StorageProviderType, apiData, StorageType} from './types';
@@ -44,7 +44,7 @@ export enum ActionType {
 
 const defaultTokens: TokenProps = {
     version: pjs.version,
-    updatedAt: Date.now().toString(),
+    updatedAt: new Date().toString(),
     values: {
         options: JSON.stringify(defaultJSON, null, 2),
     },
@@ -52,10 +52,27 @@ const defaultTokens: TokenProps = {
 
 const emptyTokens: TokenProps = {
     version: pjs.version,
-    updatedAt: Date.now().toString(),
+    updatedAt: new Date().toString(),
     values: {
         options: '{ }',
     },
+};
+
+type StateType = {
+    storageType: StorageType;
+    tokens: Tokens;
+    loading: boolean;
+    disabled: boolean;
+    collapsed: boolean;
+    tokenData: TokenData;
+    selectionValues: object;
+    displayType: 'GRID' | 'LIST';
+    colorMode: boolean;
+    showEditForm: boolean;
+    showOptions: boolean;
+    api: apiData;
+    apiProviders: apiData[];
+    updatePageOnly: boolean;
 };
 
 const emptyState = {
@@ -85,14 +102,18 @@ const emptyState = {
 const TokenStateContext = React.createContext(emptyState);
 const TokenDispatchContext = React.createContext(null);
 
-async function updateTokensOnSources(state: any, updatedAt: string) {
+async function updateTokensOnSources(state: StateType, updatedAt: string) {
     console.log('setting tokens on source', updatedAt);
     if (state.storageType.provider !== StorageProviderType.LOCAL)
-        await updateRemoteTokens({
+        updateRemoteTokens({
             tokens: state.tokenData.reduceToValues(),
             id: state.api.id,
             secret: state.api.secret,
             updatedAt,
+            oldUpdatedAt: state.tokenData.getUpdatedAt(),
+        }).then(() => {
+            console.log('success');
+            state.tokenData.setUpdatedAt(updatedAt);
         });
 
     postToFigma({
@@ -113,7 +134,6 @@ function stateReducer(state, action) {
             };
         case ActionType.SetTokensFromStyles:
             state.tokenData.injectTokens(action.data);
-            state.tokenData.setUpdatedAt(action.updatedAt);
             updateTokensOnSources(state, action.updatedAt);
             return {
                 ...state,
@@ -123,6 +143,7 @@ function stateReducer(state, action) {
             return {
                 ...state,
                 ...emptyState,
+                apiProviders: state.apiProviders,
             };
         case ActionType.SetLoading:
             return {
@@ -135,7 +156,6 @@ function stateReducer(state, action) {
                 disabled: action.state,
             };
         case ActionType.SetStringTokens:
-            console.log('setting string tokens', action.updatedAt);
             state.tokenData.updateTokenValues(action.data.parent, action.data.tokens, action.updatedAt);
             return {
                 ...state,
@@ -239,6 +259,7 @@ function stateReducer(state, action) {
                 api: action.data,
             };
         case ActionType.SetAPIProviders: {
+            console.log('setting api in cont', action.data);
             return {
                 ...state,
                 apiProviders: action.data,
@@ -269,7 +290,7 @@ function stateReducer(state, action) {
 function TokenProvider({children}) {
     const [state, dispatch] = React.useReducer(stateReducer, emptyState);
 
-    const updatedAt = Date.now().toString();
+    const updatedAt = new Date().toString();
 
     const tokenContext = React.useMemo(
         () => ({

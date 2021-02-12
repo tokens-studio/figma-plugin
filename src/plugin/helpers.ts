@@ -73,6 +73,24 @@ export async function updateCredentials({secret, id, name, provider}) {
     }
 }
 
+export async function removeSingleCredential({secret, id}) {
+    try {
+        const data = await figma.clientStorage.getAsync('apiProviders');
+        let existingProviders = [];
+        if (data) {
+            const parsedData = await JSON.parse(data);
+
+            existingProviders = parsedData.filter((i) => i.secret !== secret && i.id !== id);
+            console.log('existing prov now are', existingProviders);
+        }
+        await figma.clientStorage.setAsync('apiProviders', JSON.stringify(existingProviders));
+        const newProviders = await figma.clientStorage.getAsync('apiProviders');
+        notifyAPIProviders(JSON.parse(newProviders));
+    } catch (err) {
+        notifyUI('There was an issue saving your credentials. Please try again.');
+    }
+}
+
 export function convertLineHeightToFigma(inputValue) {
     let lineHeight;
     const value = inputValue.toString();

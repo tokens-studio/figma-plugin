@@ -82,7 +82,6 @@ const App = () => {
                         const {id, secret, name, provider} = credentials;
                         setApiData({id, secret, name, provider});
                         // setTokenData(new TokenData(values));
-                        // initalize themer data
                         const remoteValues = await fetchDataFromJSONBin(id, secret, name);
                         if (remoteValues) {
                             console.log('got remote values', remoteValues);
@@ -97,6 +96,10 @@ const App = () => {
                 case 'apiProviders':
                     setAPIProviders(providers);
                     break;
+                case 'gotMergeConflict': {
+                    console.log('got merge conflict');
+                    break;
+                }
                 default:
                     break;
             }

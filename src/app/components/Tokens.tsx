@@ -4,6 +4,7 @@ import JSON5 from 'json5';
 import {useTokenDispatch, useTokenState} from '../store/TokenContext';
 import TokenListing from './TokenListing';
 import Button from './Button';
+import {StorageProviderType} from '../store/types';
 
 const mappedTokens = (tokens) => {
     const properties = {
@@ -25,7 +26,7 @@ const mappedTokens = (tokens) => {
 };
 
 const Tokens = () => {
-    const {tokenData, updatePageOnly} = useTokenState();
+    const {tokenData, updatePageOnly, storageType} = useTokenState();
     const [activeToken] = React.useState('options');
     const {updateTokens, setLoading, toggleUpdatePageOnly} = useTokenDispatch();
 
@@ -38,7 +39,9 @@ const Tokens = () => {
 
     return (
         <div>
-            Last updated: {tokenData.getUpdatedAt()}
+            {storageType.provider !== StorageProviderType.LOCAL && (
+                <div className="text-xxs text-gray-600 p-2">Last updated {tokenData.getUpdatedAt()}</div>
+            )}
             {mappedTokens(JSON5.parse(tokenData.tokens[activeToken].values)).map((tokenValues) => {
                 switch (tokenValues[0]) {
                     case 'borderRadius':

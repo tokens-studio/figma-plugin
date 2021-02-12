@@ -3,9 +3,10 @@ import {useTokenDispatch, useTokenState} from '../store/TokenContext';
 import {StorageProviderType} from '../store/types';
 import Button from './Button';
 import Input from './Input';
-import {createNewBin, fetchDataFromJSONBin} from './updateRemoteTokens';
+import {compareUpdatedAt, createNewBin, fetchDataFromJSONBin} from './updateRemoteTokens';
 import Heading from './Heading';
 import TokenData from './TokenData';
+import {postToFigma} from '../../plugin/notifiers';
 
 const Settings = () => {
     const {tokenData, storageType, api, apiProviders} = useTokenState();
@@ -30,6 +31,7 @@ const Settings = () => {
             secret: localApiState.secret,
             tokens: tokenData.reduceToValues(),
             name: localApiState.name,
+            updatedAt: tokenData.getUpdatedAt(),
             setApiData,
             setStorageType,
         });
@@ -44,12 +46,18 @@ const Settings = () => {
         setLoading(true);
         setStorageType({provider, id, name}, true);
         setApiData({id, secret, name, provider: 'jsonbin'});
-        const remoteValues = await fetchDataFromJSONBin(id, secret, name);
-        if (remoteValues) {
-            const oldUpdated = tokenData.getUpdatedAt();
-            const newUpdated = remoteValues.updatedAt;
-            console.log('exactly the same tokens, saving', oldUpdated, newUpdated);
-            setTokenData(new TokenData(remoteValues), newUpdated);
+        const remoteTokens = await fetchDataFromJSONBin(id, secret, name);
+        if (remoteTokens) {
+            const comparison = await compareUpdatedAt(tokenData.getUpdatedAt(), remoteTokens);
+            console.log('Comparing', comparison);
+            if (comparison === 'remote_older') {
+                console.log(
+                    'Remote is older, ask user if they want to overwrite their local progress or upload to remote.'
+                );
+            } else {
+                console.log('Writing remote values to local token state');
+                setTokenData(new TokenData(remoteTokens), remoteTokens.updatedAt);
+            }
         }
         setLoading(false);
     };
@@ -59,99 +67,129 @@ const Settings = () => {
         handleSyncClick(provider);
     };
 
+    const deleteProvider = ({id, secret}) => {
+        postToFigma({
+            type: 'remove-single-credential',
+            id,
+            secret,
+        });
+    };
+
     return (
         <div className="flex flex-col flex-grow">
-            <div className="p-4 space-y-4">
-                <div className="border p-4">
-                    <div className="space-y-2">
-                        <Heading>Token Storage</Heading>
-                        <div className="flex flex-row gap-2">
-                            <button
-                                className={`font-bold focus:outline-none text-xs flex p-2 rounded border ${
-                                    storageType?.provider === StorageProviderType.LOCAL && 'border-blue-500 bg-blue-100'
-                                }`}
-                                type="button"
-                                onClick={() => setStorageType({provider: StorageProviderType.LOCAL}, true)}
-                            >
-                                Local
-                            </button>
-                            <button
-                                className={`font-bold focus:outline-none text-xs flex p-2 rounded border ${
-                                    storageType?.provider === StorageProviderType.JSONBIN &&
-                                    'border-blue-500 bg-blue-100'
-                                }`}
-                                type="button"
-                                onClick={() => setStorageType({...storageType, provider: StorageProviderType.JSONBIN})}
-                            >
-                                JSONbin
-                            </button>
-                        </div>
+            <div className="border-b p-4 space-y-4">
+                <div className="space-y-4">
+                    <Heading>Token Storage</Heading>
+                    <div className="flex flex-row gap-2">
+                        <button
+                            className={`font-bold focus:outline-none text-xs flex p-2 rounded border ${
+                                storageType?.provider === StorageProviderType.LOCAL && 'border-blue-500 bg-blue-100'
+                            }`}
+                            type="button"
+                            onClick={() => setStorageType({provider: StorageProviderType.LOCAL}, true)}
+                        >
+                            Local
+                        </button>
+                        <button
+                            className={`font-bold focus:outline-none text-xs flex p-2 rounded border ${
+                                storageType?.provider === StorageProviderType.JSONBIN && 'border-blue-500 bg-blue-100'
+                            }`}
+                            type="button"
+                            onClick={() => setStorageType({...storageType, provider: StorageProviderType.JSONBIN})}
+                        >
+                            JSONbin
+                        </button>
                     </div>
-                    {storageType?.provider === StorageProviderType.JSONBIN && (
-                        <div>
+                </div>
+                {storageType?.provider === StorageProviderType.JSONBIN && (
+                    <div className="space-y-4">
+                        <div className="text-xxs text-gray-600">
+                            Create an account at{' '}
+                            <a href="https://jsonbin.io/" target="_blank" rel="noreferrer" className="underline">
+                                JSONbin.io
+                            </a>
+                            , copy the Secret Key into the field, and click on save. If you or your team already have a
+                            version stored, add the secret and the corresponding ID.
+                        </div>
+                        <Input
+                            full
+                            label="Name"
+                            value={localApiState.name}
+                            onChange={handleChange}
+                            type="text"
+                            name="name"
+                            required
+                        />
+                        <div className="gap-2 flex justify-between items-end">
                             <Input
                                 full
-                                label="Name"
-                                value={localApiState.name}
+                                label="Secret"
+                                value={localApiState.secret}
                                 onChange={handleChange}
                                 type="text"
-                                name="name"
+                                name="secret"
                                 required
                             />
-                            <div className="space-x-2 flex justify-between items-end">
-                                <Input
-                                    full
-                                    label="Secret"
-                                    value={localApiState.secret}
-                                    onChange={handleChange}
-                                    type="text"
-                                    name="secret"
-                                    required
-                                />
-                                <Input
-                                    full
-                                    label="ID (optional)"
-                                    value={localApiState.id}
-                                    onChange={handleChange}
-                                    type="text"
-                                    name="id"
-                                    required
-                                />
-                                <Button
-                                    size="large"
-                                    variant="primary"
-                                    onClick={() =>
-                                        localApiState.id
-                                            ? handleSyncClick({provider: StorageProviderType.JSONBIN})
-                                            : handleCreateNewClick()
-                                    }
-                                >
-                                    Save
-                                </Button>
-                            </div>
+                            <Input
+                                full
+                                label="ID (optional)"
+                                value={localApiState.id}
+                                onChange={handleChange}
+                                type="text"
+                                name="id"
+                                required
+                            />
+                            <Button
+                                variant="primary"
+                                disabled={!localApiState.secret && !localApiState.name}
+                                onClick={() =>
+                                    localApiState.id
+                                        ? handleSyncClick({provider: StorageProviderType.JSONBIN})
+                                        : handleCreateNewClick()
+                                }
+                            >
+                                Save
+                            </Button>
                         </div>
-                    )}
-                    {apiProviders.length > 0 && (
-                        <div>
-                            <Heading>Stored providers</Heading>
-                            <div className="flex flex-col space-y-2">
-                                {/* allow users to remove saved providers or activate other set */}
-                                {apiProviders
-                                    .filter((item) => item.provider === storageType.provider)
-                                    .map(({provider, id, name, secret}) => (
-                                        <button
-                                            key={`${provider}-${id}`}
-                                            type="button"
+                    </div>
+                )}
+                {apiProviders.length > 0 && storageType.provider !== StorageProviderType.LOCAL && (
+                    <div className="space-y-4">
+                        <Heading size="small">Stored providers for {storageType.provider}</Heading>
+                        <div className="flex flex-col gap-2">
+                            {apiProviders
+                                .filter((item) => item.provider === storageType.provider)
+                                .map(({provider, id, name, secret}) => (
+                                    <div
+                                        key={`${provider}-${id}`}
+                                        className={`border text-left flex flex-row justify-between hover:bg-gray-100 rounded p-2 ${
+                                            storageType.id === id && storageType.provider === provider
+                                                ? 'border-blue-500'
+                                                : 'border-gray-300'
+                                        }`}
+                                    >
+                                        <div className="flex flex-col flex-grow">
+                                            <div className="font-bold text-xs">{name}</div>
+                                            <div className="text-xxs text-gray-600">{id}</div>
+                                            <button
+                                                type="button"
+                                                className="underline text-red-600 text-xxs text-left"
+                                                onClick={() => deleteProvider({id, secret})}
+                                            >
+                                                Delete
+                                            </button>
+                                        </div>
+                                        <Button
+                                            variant="secondary"
                                             onClick={() => restoreStoredProvider({provider, id, name, secret})}
                                         >
-                                            <div className="font-bold">{name}</div>
-                                            <div className="text-xs text-gray-600">{id}</div>
-                                        </button>
-                                    ))}
-                            </div>
+                                            Apply
+                                        </Button>
+                                    </div>
+                                ))}
                         </div>
-                    )}
-                </div>
+                    </div>
+                )}
             </div>
         </div>
     );

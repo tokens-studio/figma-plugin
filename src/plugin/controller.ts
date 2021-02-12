@@ -11,7 +11,7 @@ import {
 } from './notifiers';
 import {findAllWithData, removePluginData, sendPluginValues, updatePluginData} from './pluginData';
 import {getTokenData, updateNodes, setTokenData, goToNode, saveStorageType, getSavedStorageType} from './node';
-import {updateCredentials} from './helpers';
+import {removeSingleCredential, updateCredentials} from './helpers';
 
 figma.showUI(__html__, {
     width: 400,
@@ -77,7 +77,13 @@ figma.ui.onmessage = async (msg) => {
                     }
                     default: {
                         console.log('Storage Type Local, fetching local tokens');
-                        notifyTokenValues(getTokenData());
+                        const oldTokens = getTokenData();
+                        if (oldTokens) {
+                            console.log('yay tokens', oldTokens);
+                            notifyTokenValues(oldTokens);
+                        } else {
+                            console.log('no tokens, maybe set empty?');
+                        }
                     }
                 }
             } catch (err) {
@@ -94,6 +100,11 @@ figma.ui.onmessage = async (msg) => {
         case 'credentials': {
             const {secret, id, provider, name} = msg;
             updateCredentials({secret, id, name, provider});
+            break;
+        }
+        case 'remove-single-credential': {
+            const {secret, id} = msg;
+            removeSingleCredential({secret, id});
             break;
         }
         case 'set-storage-type':
