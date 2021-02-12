@@ -27,7 +27,8 @@
 		"react-dom": "^16.8.6",
 		"react-modal": "^3.11.2",
 		"react-player": "^2.8.2",
-		"react-svg-loader": "^3.0.3"
+		"react-svg-loader": "^3.0.3",
+		"timeago.js": "^4.0.2"
 	},
 	"devDependencies": {
 		"@figma/plugin-typings": "^1.15.0",

@@ -1,6 +1,7 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import * as React from 'react';
 import JSON5 from 'json5';
+import * as timeago from 'timeago.js';
 import {useTokenDispatch, useTokenState} from '../store/TokenContext';
 import TokenListing from './TokenListing';
 import Button from './Button';
@@ -40,7 +41,9 @@ const Tokens = () => {
     return (
         <div>
             {storageType.provider !== StorageProviderType.LOCAL && (
-                <div className="text-xxs text-gray-600 p-2">Last updated {tokenData.getUpdatedAt()}</div>
+                <div className="text-xxs text-gray-600 p-2 flex flex-row gap-2">
+                    Last updated {timeago.format(tokenData.getUpdatedAt())}
+                </div>
             )}
             {mappedTokens(JSON5.parse(tokenData.tokens[activeToken].values)).map((tokenValues) => {
                 switch (tokenValues[0]) {

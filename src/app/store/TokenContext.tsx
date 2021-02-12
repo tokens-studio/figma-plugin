@@ -88,6 +88,8 @@ const emptyState = {
     showOptions: false,
     storageType: {
         provider: StorageProviderType.LOCAL,
+        id: '',
+        name: '',
     },
     api: {
         id: '',

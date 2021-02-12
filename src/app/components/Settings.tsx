@@ -17,6 +17,10 @@ const Settings = () => {
         name: api.name,
     });
 
+    const isActive = (provider, id) => {
+        return storageType.id === id && storageType.provider === provider;
+    };
+
     React.useEffect(() => {
         setLocalApiState({id: api.id, name: api.name, secret: api.secret});
     }, [api]);
@@ -163,9 +167,7 @@ const Settings = () => {
                                     <div
                                         key={`${provider}-${id}`}
                                         className={`border text-left flex flex-row justify-between hover:bg-gray-100 rounded p-2 ${
-                                            storageType.id === id && storageType.provider === provider
-                                                ? 'border-blue-500'
-                                                : 'border-gray-300'
+                                            isActive(provider, id) ? 'border-blue-500' : 'border-gray-300'
                                         }`}
                                     >
                                         <div className="flex flex-col flex-grow">
@@ -181,6 +183,7 @@ const Settings = () => {
                                         </div>
                                         <Button
                                             variant="secondary"
+                                            disabled={isActive(provider, id)}
                                             onClick={() => restoreStoredProvider({provider, id, name, secret})}
                                         >
                                             Apply
