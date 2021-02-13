@@ -4,8 +4,6 @@ import JSON5 from 'json5';
 import {useTokenDispatch, useTokenState} from '../store/TokenContext';
 import TokenListing from './TokenListing';
 import Button from './Button';
-import {StorageProviderType} from '../../types/api';
-import SyncBar from './SyncBar';
 
 const mappedTokens = (tokens) => {
     const properties = {
@@ -39,7 +37,6 @@ const Tokens = () => {
 
     return (
         <div>
-            {storageType.provider !== StorageProviderType.LOCAL && <SyncBar />}
             {mappedTokens(JSON5.parse(tokenData.tokens[activeToken].values)).map((tokenValues) => {
                 switch (tokenValues[0]) {
                     case 'borderRadius':

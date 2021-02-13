@@ -1,70 +1,20 @@
 import {TokenProps} from '../../types/tokens';
 import {StorageProviderType} from '../../types/api';
 import {postToFigma, notifyToUI} from '../../plugin/notifiers';
-import * as pjs from '../../../package.json';
 import {StateType} from '../../types/state';
 import {MessageToPluginTypes} from '../../types/messages';
-
-export async function compareUpdatedAt(oldUpdatedAt, newUpdatedAt) {
-    if (newUpdatedAt > oldUpdatedAt) {
-        return 'remote_newer';
-    }
-    if (newUpdatedAt === oldUpdatedAt) {
-        return 'same';
-    }
-    return 'remote_older';
-}
-
-async function readTokensFromJSONBin({secret, id}): Promise<TokenProps> | null {
-    const response = await fetch(`https://api.jsonbin.io/b/${id}/latest`, {
-        method: 'GET',
-        mode: 'cors',
-        cache: 'no-cache',
-        credentials: 'same-origin',
-        headers: {
-            'Content-Type': 'application/json',
-            'secret-key': secret,
-        },
-    });
-
-    if (response) {
-        return response.json();
-    }
-    notifyToUI('There was an error connecting, check your sync settings');
-    return null;
-}
-
-async function writeTokensToJSONBin({secret, id, tokenObj}): Promise<TokenProps> | null {
-    const response = await fetch(`https://api.jsonbin.io/b/${id}`, {
-        method: 'PUT',
-        mode: 'cors',
-        cache: 'no-cache',
-        credentials: 'same-origin',
-        body: tokenObj,
-        headers: {
-            'Content-Type': 'application/json',
-            'secret-key': secret,
-        },
-    });
-
-    const res = await response.json();
-
-    if (response.ok) {
-        notifyToUI('Updated Remote');
-        return res;
-    }
-    notifyToUI('Error updating remote');
-    return null;
-}
+import {createNewJSONBin, fetchDataFromJSONBin, updateJSONBinTokens} from './providers/jsonbin';
 
 export async function updateRemoteTokens({
+    provider,
     tokens,
     id,
     secret,
     updatedAt,
     oldUpdatedAt,
 }: {
-    tokens: any;
+    provider: StorageProviderType;
+    tokens: TokenProps;
     id: string;
     secret: string;
     updatedAt: string;
@@ -74,98 +24,20 @@ export async function updateRemoteTokens({
 
     if (!id && !secret) return;
 
-    const tokenObj = JSON.stringify(
-        {
-            version: pjs.version,
-            updatedAt,
-            values: {
-                options: JSON.parse(tokens.options),
-            },
-        },
-        null,
-        2
-    );
-
-    if (oldUpdatedAt) {
-        const remoteTokens = await readTokensFromJSONBin({secret, id});
-        const comparison = await compareUpdatedAt(oldUpdatedAt, remoteTokens.updatedAt);
-        if (comparison === 'remote_older') {
-            writeTokensToJSONBin({secret, id, tokenObj});
-        } else {
-            // Tell the user to choose between:
-            // A) Pull Remote values and replace local changes
-            // B) Overwrite Remote changes
-            console.log('Not updating remote, add Modal asking user to choose how to handle this');
+    switch (provider) {
+        case StorageProviderType.JSONBIN: {
+            updateJSONBinTokens({
+                tokens,
+                id,
+                secret,
+                updatedAt,
+                oldUpdatedAt,
+            });
+            break;
         }
-    } else {
-        writeTokensToJSONBin({secret, id, tokenObj});
+        default:
+            throw new Error('Not implemented');
     }
-}
-
-export async function createNewBin({secret, tokens, name, updatedAt, setApiData, setStorageType}) {
-    notifyToUI('Creating new bin...');
-
-    const provider = StorageProviderType.JSONBIN;
-    const response = await fetch(`https://api.jsonbin.io/b`, {
-        method: 'POST',
-        mode: 'cors',
-        cache: 'no-cache',
-        credentials: 'same-origin',
-        body: '{"Empty": "Bin"}',
-        headers: {
-            'Content-Type': 'application/json',
-            'secret-key': secret,
-        },
-    });
-    const jsonBinData = await response.json();
-    if (jsonBinData.success) {
-        setApiData({id: jsonBinData.id, name, secret, provider});
-        setStorageType({id: jsonBinData.id, name, provider}, true);
-        updateRemoteTokens({tokens, id: jsonBinData.id, secret, updatedAt});
-        postToFigma({
-            type: MessageToPluginTypes.CREDENTIALS,
-            id: jsonBinData.id,
-            name,
-            secret,
-            provider,
-        });
-    } else {
-        notifyToUI('There was an error connecting');
-    }
-}
-// Read tokens from JSONBin
-
-export async function fetchDataFromJSONBin(id, secret, name): Promise<any> {
-    let tokenValues;
-
-    if (!id && !secret) return;
-
-    const jsonBinData = await readTokensFromJSONBin({id, secret});
-
-    if (jsonBinData) {
-        postToFigma({
-            type: MessageToPluginTypes.CREDENTIALS,
-            id,
-            name,
-            secret,
-            provider: StorageProviderType.JSONBIN,
-        });
-        if (jsonBinData?.values?.options) {
-            const obj = {
-                version: jsonBinData.version,
-                updatedAt: jsonBinData.updatedAt,
-                values: {
-                    options: JSON.stringify(jsonBinData.values.options, null, 2),
-                },
-            };
-
-            tokenValues = obj;
-        } else {
-            notifyToUI('No tokens stored on remote');
-        }
-    }
-
-    return tokenValues;
 }
 
 export async function pullRemoteTokens({id, secret, provider, name}) {
@@ -189,6 +61,7 @@ export async function pullRemoteTokens({id, secret, provider, name}) {
 export async function updateTokensOnSources(state: StateType, updatedAt: string) {
     if (state.storageType.provider !== StorageProviderType.LOCAL)
         updateRemoteTokens({
+            provider: state.storageType.provider,
             tokens: state.tokenData.reduceToValues(),
             id: state.api.id,
             secret: state.api.secret,
@@ -205,4 +78,26 @@ export async function updateTokensOnSources(state: StateType, updatedAt: string)
         updatePageOnly: state.updatePageOnly,
         updatedAt,
     });
+}
+
+export async function createNewBin({provider, secret, tokens, name, updatedAt, setApiData, setStorageType}) {
+    notifyToUI('Creating new bin...');
+
+    switch (provider) {
+        case StorageProviderType.JSONBIN: {
+            return createNewJSONBin({provider, secret, tokens, name, updatedAt, setApiData, setStorageType});
+        }
+        default:
+            throw new Error('Not implemented');
+    }
+}
+
+export async function fetchDataFromRemote(id, secret, name, provider): Promise<TokenProps> {
+    switch (provider) {
+        case StorageProviderType.JSONBIN: {
+            return fetchDataFromJSONBin(id, secret, name);
+        }
+        default:
+            throw new Error('Not implemented');
+    }
 }

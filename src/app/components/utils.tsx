@@ -132,3 +132,13 @@ export function goToNodeId(id) {
         id,
     });
 }
+
+export async function compareUpdatedAt(oldUpdatedAt, newUpdatedAt) {
+    if (newUpdatedAt > oldUpdatedAt) {
+        return 'remote_newer';
+    }
+    if (newUpdatedAt === oldUpdatedAt) {
+        return 'same';
+    }
+    return 'remote_older';
+}

@@ -11,7 +11,7 @@ import Icon from './Icon';
 import * as pjs from '../../../package.json';
 import {useTokenState, useTokenDispatch} from '../store/TokenContext';
 import TokenData from './TokenData';
-import {fetchDataFromJSONBin} from '../store/remoteTokens';
+import {fetchDataFromRemote} from '../store/remoteTokens';
 import {goToNodeId} from './utils';
 import {postToFigma} from '../../plugin/notifiers';
 import {MessageFromPluginTypes, MessageToPluginTypes} from '../../types/messages';
@@ -83,7 +83,7 @@ const App = () => {
                         const {id, secret, name, provider} = credentials;
                         setApiData({id, secret, name, provider});
                         // setTokenData(new TokenData(values));
-                        const remoteValues = await fetchDataFromJSONBin(id, secret, name);
+                        const remoteValues = await fetchDataFromRemote(id, secret, name, provider);
                         if (remoteValues) {
                             console.log('got remote values', remoteValues);
                             setActive('tokens');

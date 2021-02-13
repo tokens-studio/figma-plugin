@@ -3,11 +3,12 @@ import {useTokenDispatch, useTokenState} from '../store/TokenContext';
 import {StorageProviderType} from '../../types/api';
 import Button from './Button';
 import Input from './Input';
-import {compareUpdatedAt, createNewBin, fetchDataFromJSONBin} from '../store/remoteTokens';
+import {createNewBin, fetchDataFromRemote} from '../store/remoteTokens';
 import Heading from './Heading';
 import TokenData from './TokenData';
 import {postToFigma} from '../../plugin/notifiers';
 import {MessageToPluginTypes} from '../../types/messages';
+import {compareUpdatedAt} from './utils';
 
 const Settings = () => {
     const {tokenData, storageType, api, apiProviders} = useTokenState();
@@ -30,9 +31,10 @@ const Settings = () => {
         setLocalApiState({...localApiState, [e.target.name]: e.target.value});
     };
 
-    const handleCreateNewClick = async () => {
-        setApiData({secret: localApiState.secret, provider: StorageProviderType.JSONBIN, name: localApiState.name});
+    const handleCreateNewClick = async (provider) => {
+        setApiData({secret: localApiState.secret, provider, name: localApiState.name});
         createNewBin({
+            provider,
             secret: localApiState.secret,
             tokens: tokenData.reduceToValues(),
             name: localApiState.name,
@@ -50,8 +52,9 @@ const Settings = () => {
     }) => {
         setLoading(true);
         setStorageType({provider, id, name}, true);
-        setApiData({id, secret, name, provider: StorageProviderType.JSONBIN});
-        const remoteTokens = await fetchDataFromJSONBin(id, secret, name);
+        setApiData({id, secret, name, provider});
+        const remoteTokens = await fetchDataFromRemote(id, secret, name, provider);
+        console.log('syncing', remoteTokens);
         if (remoteTokens) {
             const comparison = await compareUpdatedAt(tokenData.getUpdatedAt(), remoteTokens);
             if (comparison === 'remote_older') {
@@ -148,7 +151,7 @@ const Settings = () => {
                                 onClick={() =>
                                     localApiState.id
                                         ? handleSyncClick({provider: StorageProviderType.JSONBIN})
-                                        : handleCreateNewClick()
+                                        : handleCreateNewClick(StorageProviderType.JSONBIN)
                                 }
                             >
                                 Save
