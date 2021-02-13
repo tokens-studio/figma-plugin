@@ -165,20 +165,24 @@ const Settings = () => {
                                 .map(({provider, id, name, secret}) => (
                                     <div
                                         key={`${provider}-${id}`}
-                                        className={`border text-left flex flex-row justify-between hover:bg-gray-100 rounded p-2 ${
-                                            isActive(provider, id) ? 'border-blue-300' : 'border-gray-300'
+                                        className={`border text-left flex flex-row justify-between rounded p-2 ${
+                                            isActive(provider, id)
+                                                ? 'border-blue-300'
+                                                : 'hover:bg-gray-100 border-gray-300'
                                         }`}
                                     >
                                         <div className="flex flex-col flex-grow">
                                             <div className="font-bold text-xs">{name}</div>
                                             <div className="text-xxs text-gray-600">{id}</div>
-                                            <button
-                                                type="button"
-                                                className="underline text-red-600 text-xxs text-left"
-                                                onClick={() => deleteProvider({id, secret})}
-                                            >
-                                                Delete
-                                            </button>
+                                            {!isActive(provider, id) && (
+                                                <button
+                                                    type="button"
+                                                    className="underline text-red-600 text-xxs text-left"
+                                                    onClick={() => deleteProvider({id, secret})}
+                                                >
+                                                    Delete
+                                                </button>
+                                            )}
                                         </div>
                                         <Button
                                             variant="secondary"

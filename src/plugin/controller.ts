@@ -13,6 +13,7 @@ import {findAllWithData, removePluginData, sendPluginValues, updatePluginData} f
 import {getTokenData, updateNodes, setTokenData, goToNode, saveStorageType, getSavedStorageType} from './node';
 import {removeSingleCredential, updateCredentials} from './helpers';
 import {MessageFromPluginTypes, MessageToPluginTypes} from '../types/messages';
+import {StorageProviderType} from '../types/api';
 
 figma.showUI(__html__, {
     width: 400,
@@ -66,7 +67,7 @@ figma.ui.onmessage = async (msg) => {
 
                 switch (storageType.provider) {
                     //   Somehow setting this to an ENUM doesn't work :-|
-                    case 'jsonbin': {
+                    case StorageProviderType.JSONBIN: {
                         compareProvidersWithStored(apiProviders, storageType);
 
                         break;

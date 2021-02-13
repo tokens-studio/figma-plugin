@@ -105,7 +105,7 @@ export async function updateRemoteTokens({
 export async function createNewBin({secret, tokens, name, updatedAt, setApiData, setStorageType}) {
     notifyToUI('Creating new bin...');
 
-    const provider = 'jsonbin';
+    const provider = StorageProviderType.JSONBIN;
     const response = await fetch(`https://api.jsonbin.io/b`, {
         method: 'POST',
         mode: 'cors',
@@ -148,7 +148,7 @@ export async function fetchDataFromJSONBin(id, secret, name): Promise<any> {
             id,
             name,
             secret,
-            provider: 'jsonbin',
+            provider: StorageProviderType.JSONBIN,
         });
         if (jsonBinData?.values?.options) {
             const obj = {
@@ -175,7 +175,7 @@ export async function pullRemoteTokens({id, secret, provider, name}) {
     let tokenValues;
 
     switch (provider) {
-        case 'jsonbin': {
+        case StorageProviderType.JSONBIN: {
             tokenValues = await fetchDataFromJSONBin(id, secret, name);
             notifyToUI('Updated!');
             break;
