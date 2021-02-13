@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/label-has-associated-control */
 import * as React from 'react';
 import {useTokenDispatch, useTokenState} from '../store/TokenContext';
 import {StorageProviderType} from '../../types/api';
@@ -11,8 +12,15 @@ import {MessageToPluginTypes} from '../../types/messages';
 import {compareUpdatedAt} from './utils';
 
 const Settings = () => {
-    const {tokenData, storageType, api, apiProviders} = useTokenState();
-    const {setLoading, setApiData, setStorageType, setTokenData} = useTokenDispatch();
+    const {tokenData, storageType, api, apiProviders, updateAfterApply} = useTokenState();
+    const {
+        setLoading,
+        setApiData,
+        setStorageType,
+        setTokenData,
+        toggleUpdateAfterApply,
+        updateTokens,
+    } = useTokenDispatch();
     const [localApiState, setLocalApiState] = React.useState({
         id: api.id,
         secret: api.secret,
@@ -63,6 +71,10 @@ const Settings = () => {
                 );
             } else {
                 setTokenData(new TokenData(remoteTokens), remoteTokens.updatedAt);
+                if (updateAfterApply) {
+                    console.log('should update!', remoteTokens);
+                    updateTokens(false);
+                }
             }
         }
         setLoading(false);
@@ -161,7 +173,21 @@ const Settings = () => {
                 )}
                 {apiProviders.length > 0 && storageType.provider !== StorageProviderType.LOCAL && (
                     <div className="space-y-4">
-                        <Heading size="small">Stored providers for {storageType.provider}</Heading>
+                        <div className="flex flex-row justify-between items-center">
+                            <Heading size="small">Stored providers for {storageType.provider}</Heading>
+                            <div className="switch flex items-center">
+                                <input
+                                    className="switch__toggle"
+                                    type="checkbox"
+                                    id="updatemode"
+                                    checked={updateAfterApply}
+                                    onChange={() => toggleUpdateAfterApply(!updateAfterApply)}
+                                />
+                                <label className="switch__label text-xs" htmlFor="updatemode">
+                                    Update on apply
+                                </label>
+                            </div>
+                        </div>
                         <div className="flex flex-col gap-2">
                             {apiProviders
                                 .filter((item) => item.provider === storageType.provider)
@@ -183,7 +209,7 @@ const Settings = () => {
                                                     className="underline text-red-600 text-xxs text-left"
                                                     onClick={() => deleteProvider({id, secret})}
                                                 >
-                                                    Delete
+                                                    Delete local credentials
                                                 </button>
                                             )}
                                         </div>

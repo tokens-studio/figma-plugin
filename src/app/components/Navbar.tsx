@@ -20,8 +20,8 @@ const TabButton = ({name, label, active, setActive, first = false}) => (
 );
 
 const Navbar = ({active, setActive}) => {
-    const {colorMode, storageType, api} = useTokenState();
-    const {toggleColorMode, pullStyles, setLoading, setTokenData} = useTokenDispatch();
+    const {storageType, api} = useTokenState();
+    const {pullStyles, setLoading, setTokenData} = useTokenDispatch();
 
     const handlePull = async () => {
         setLoading(true);
@@ -49,11 +49,6 @@ const Navbar = ({active, setActive}) => {
                 <Tooltip variant="right" label="Import Styles">
                     <button className="button button-ghost" type="button" onClick={pullStyles}>
                         <Icon name="import" />
-                    </button>
-                </Tooltip>
-                <Tooltip variant="right" label={colorMode ? 'Disable Color UI' : 'Enable Color UI'}>
-                    <button className="button button-ghost" type="button" onClick={toggleColorMode}>
-                        <Icon name={colorMode ? 'blend' : 'blendempty'} />
                     </button>
                 </Tooltip>
             </div>

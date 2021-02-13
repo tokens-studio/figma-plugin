@@ -58,8 +58,9 @@ export async function pullRemoteTokens({id, secret, provider, name}) {
     return tokenValues;
 }
 
-export async function updateTokensOnSources(state: StateType, updatedAt: string) {
-    if (state.storageType.provider !== StorageProviderType.LOCAL)
+export async function updateTokensOnSources(state: StateType, updatedAt: string, shouldUpdate = true) {
+    console.log('should update is', shouldUpdate);
+    if (state.storageType.provider !== StorageProviderType.LOCAL && shouldUpdate)
         updateRemoteTokens({
             provider: state.storageType.provider,
             tokens: state.tokenData.reduceToValues(),

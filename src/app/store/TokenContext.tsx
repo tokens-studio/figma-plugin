@@ -40,6 +40,7 @@ export enum ActionType {
     SetCollapsed = 'SET_COLLAPSED',
     SetApiData = 'SET_API_DATA',
     ToggleUpdatePageOnly = 'TOGGLE_UPDATE_PAGE_ONLY',
+    ToggleUpdateAfterApply = 'TOGGLE_UPDATE_AFTER_APPLY',
     SetStorageType = 'SET_STORAGE_TYPE',
     SetAPIProviders = 'SET_API_PROVIDERS',
 }
@@ -84,6 +85,7 @@ const emptyState = {
     },
     apiProviders: [],
     updatePageOnly: true,
+    updateAfterApply: true,
 };
 
 const TokenStateContext = React.createContext(emptyState);
@@ -132,7 +134,7 @@ function stateReducer(state, action) {
                 },
             };
         case ActionType.UpdateTokens:
-            updateTokensOnSources(state, action.updatedAt);
+            updateTokensOnSources(state, action.updatedAt, action.shouldUpdate);
             return state;
         case ActionType.DeleteToken: {
             const obj = JSON5.parse(state.tokenData.tokens[action.data.parent].values);
@@ -233,6 +235,11 @@ function stateReducer(state, action) {
                 ...state,
                 updatePageOnly: action.bool,
             };
+        case ActionType.ToggleUpdateAfterApply:
+            return {
+                ...state,
+                updateAfterApply: action.bool,
+            };
         case ActionType.SetStorageType:
             if (action.bool) {
                 postToFigma({
@@ -274,8 +281,8 @@ function TokenProvider({children}) {
                 dispatch({type: ActionType.SetEmptyTokens});
                 dispatch({type: ActionType.SetLoading, state: false});
             },
-            updateTokens: () => {
-                dispatch({type: ActionType.UpdateTokens, updatedAt});
+            updateTokens: (shouldUpdate = true) => {
+                dispatch({type: ActionType.UpdateTokens, updatedAt, shouldUpdate});
             },
             deleteToken: (data) => {
                 dispatch({type: ActionType.DeleteToken, data, updatedAt});
@@ -324,6 +331,9 @@ function TokenProvider({children}) {
             },
             toggleUpdatePageOnly: (bool: boolean) => {
                 dispatch({type: ActionType.ToggleUpdatePageOnly, bool});
+            },
+            toggleUpdateAfterApply: (bool: boolean) => {
+                dispatch({type: ActionType.ToggleUpdateAfterApply, bool});
             },
             setStorageType: (data: StorageType, bool = false) => {
                 dispatch({type: ActionType.SetStorageType, data, bool});
