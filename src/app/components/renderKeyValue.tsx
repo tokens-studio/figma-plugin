@@ -3,7 +3,7 @@ import Heading from './Heading';
 import Icon from './Icon';
 import TokenButton from './TokenButton';
 import Tooltip from './Tooltip';
-import {isTypographyToken} from './utils';
+import {isSingleToken, isTypographyToken} from './utils';
 
 const renderKeyValue = ({
     tokenValues,
@@ -20,7 +20,7 @@ const renderKeyValue = ({
             const stringPath = [path, key].filter((n) => n).join('.');
             return (
                 <React.Fragment key={stringPath}>
-                    {typeof value === 'object' && !isTypographyToken(value) ? (
+                    {typeof value === 'object' && !isTypographyToken(value) && !isSingleToken(value) ? (
                         <div className="property-wrapper w-full">
                             <div className="flex items-center justify-between">
                                 <Heading size="small">{key}</Heading>

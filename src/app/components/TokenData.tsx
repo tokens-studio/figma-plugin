@@ -140,8 +140,30 @@ export default class TokenData {
         return this.mergedTokens;
     }
 
+    private checkIfValueToken(token: SingleToken): token is {value: string | number} {
+        return typeof token === 'object' && (typeof token?.value === 'string' || typeof token?.value === 'number');
+    }
+
+    private checkIfValueTokenAlias(token: SingleToken): boolean {
+        if (this.checkIfValueToken(token)) {
+            return token.value.toString().includes('$') && token.value.toString().length > 1;
+        }
+        return false;
+    }
+
     private checkIfAlias(token: SingleToken): boolean {
-        return typeof token === 'string' && token.includes('$') && token.length > 1;
+        let aliasToken = false;
+        if (typeof token === 'string') {
+            aliasToken = token.includes('$') && token.length > 1;
+        } else {
+            aliasToken = this.checkIfValueTokenAlias(token);
+        }
+        if (aliasToken) {
+            const tokenToCheck = this.checkIfValueToken(token) ? token.value : token;
+            const resolvedAlias = this.getResolvedAlias(this.mergedTokens, tokenToCheck.toString().substring(1));
+            return typeof resolvedAlias !== 'undefined';
+        }
+        return false;
     }
 
     private findAllAliases({
@@ -175,21 +197,41 @@ export default class TokenData {
     }
 
     getAliasValue(token: SingleToken, tokens = this.mergedTokens): string | null {
-        if (this.checkIfAlias(token) && typeof token === 'string') {
-            let returnedValue = token;
+        if (this.checkIfAlias(token)) {
+            let returnedValue = this.checkIfValueToken(token) ? (token.value as string) : (token as string);
             const tokenRegex = /(\$[^\s,]+)/g;
-            const tokenReferences = token.match(tokenRegex);
+            const tokenReferences = returnedValue.toString().match(tokenRegex);
             if (tokenReferences.length > 0) {
                 const resolvedReferences = tokenReferences.map((ref) => objectPath.get(tokens, ref.substring(1)));
                 tokenReferences.forEach((reference, index) => {
-                    returnedValue = returnedValue.replace(reference, resolvedReferences[index]);
+                    returnedValue = returnedValue.replace(
+                        reference,
+                        resolvedReferences[index].value ?? resolvedReferences[index]
+                    );
                 });
             }
             return convertToRgb(checkAndEvaluateMath(returnedValue));
         }
+        return null;
+    }
+
+    getTokenValue(token: SingleToken): string | null {
+        if (this.checkIfAlias(token)) {
+            return this.getAliasValue(token);
+        }
+        return String(this.checkIfValueToken(token) ? token.value : token);
     }
 
     setResolvedAlias(tokens: TokenGroup, target: string, source: string): void {
         objectPath.set(tokens, target, source);
+    }
+
+    getResolvedAlias(tokens: TokenGroup, token: string): string {
+        try {
+            return objectPath.get(tokens, token);
+        } catch (e) {
+            console.log('error', e);
+        }
+        return null;
     }
 }

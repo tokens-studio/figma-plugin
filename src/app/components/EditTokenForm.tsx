@@ -3,15 +3,19 @@ import {useTokenDispatch} from '../store/TokenContext';
 import Input from './Input';
 import Modal from './Modal';
 
-const EditTokenForm = ({submitTokenValue, explainer = '', property, isPristine, initialToken, initialName, path}) => {
+const EditTokenForm = ({submitTokenValue, explainer = '', property, isPristine, initialValue, initialName, path}) => {
     const title = isPristine ? `New Token in ${path}` : `${path}.${initialName}`;
     const defaultValue = {
-        token: initialToken,
+        value: initialValue.value ?? initialValue,
         name: initialName,
         path,
     };
     const [tokenValue, setTokenValue] = React.useState(defaultValue);
     const {setShowEditForm} = useTokenDispatch();
+
+    React.useEffect(() => {
+        console.log('showing edit form', tokenValue, initialValue);
+    });
 
     const handleChange = (e) => {
         e.persist();
@@ -20,7 +24,7 @@ const EditTokenForm = ({submitTokenValue, explainer = '', property, isPristine, 
 
     const handleObjectChange = (e) => {
         e.persist();
-        setTokenValue((prevState) => ({...prevState, token: {...prevState.token, [e.target.name]: e.target.value}}));
+        setTokenValue((prevState) => ({...prevState, value: {...prevState.value, [e.target.name]: e.target.value}}));
     };
 
     const handleSubmit = (e) => {
@@ -45,8 +49,8 @@ const EditTokenForm = ({submitTokenValue, explainer = '', property, isPristine, 
                     type="text"
                     name="name"
                 />
-                {typeof tokenValue.token === 'object' ? (
-                    Object.entries(tokenValue.token).map(([key, value]) => (
+                {typeof tokenValue.value === 'object' ? (
+                    Object.entries(tokenValue.value).map(([key, value]) => (
                         <Input
                             key={key}
                             full
@@ -62,10 +66,10 @@ const EditTokenForm = ({submitTokenValue, explainer = '', property, isPristine, 
                     <Input
                         full
                         label={property}
-                        value={tokenValue.token}
+                        value={tokenValue.value}
                         onChange={handleChange}
                         type="text"
-                        name="token"
+                        name="value"
                         required
                     />
                 )}

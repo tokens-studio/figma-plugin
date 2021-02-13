@@ -9,7 +9,7 @@ const TokenButton = ({type, property, name, path, token, editMode, showForm}) =>
     const {colorMode, displayType, selectionValues, tokenData, disabled} = useTokenState();
     const {setNodeData, setShowOptions, setLoading, deleteToken} = useTokenDispatch();
     const realTokenValue = tokenData.getAliasValue(token);
-    const displayValue = realTokenValue || token;
+    const displayValue = tokenData.getTokenValue(token);
     let style;
     let showValue = true;
     let showEditButton = false;
@@ -18,7 +18,7 @@ const TokenButton = ({type, property, name, path, token, editMode, showForm}) =>
 
     const handleEditClick = () => {
         setShowOptions(property);
-        showForm({name, token, path});
+        showForm({name, value: token, path});
     };
 
     const handleDeleteClick = () => {
@@ -129,7 +129,7 @@ const TokenButton = ({type, property, name, path, token, editMode, showForm}) =>
     const onClick = (givenProperties, isActive = active) => {
         const propsToSet = Array.isArray(givenProperties) ? givenProperties : new Array(givenProperties);
         if (editMode) {
-            showForm({name, token, path});
+            showForm({name, value: token, path});
         } else {
             const tokenValue = [path, name].join('.');
             let value = isActive ? 'delete' : tokenValue;

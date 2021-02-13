@@ -48,18 +48,20 @@ const TokenListing = ({
     const [isIntCollapsed, setIntCollapsed] = React.useState(false);
 
     const [editToken, setEditToken] = React.useState({
-        token: '',
+        value: '',
         name: '',
         path: '',
     });
-    function setSingleTokenValue({parent, name, token, options, oldName}) {
+    function setSingleTokenValue({parent, name, value, options, oldName}) {
         const obj = JSON5.parse(tokenData.tokens[parent].values);
         const newValue = options
             ? {
-                  value: token,
+                  value,
                   ...options,
               }
-            : token;
+            : {
+                  value,
+              };
         objectPath.set(obj, name, newValue);
         if (oldName === name) {
             setStringTokens({parent, tokens: JSON.stringify(obj, null, 2)});
@@ -74,31 +76,32 @@ const TokenListing = ({
         setShowEditForm(false);
     };
 
-    const showNewForm = (path, schema) => {
-        let initialToken = '';
-        if (schema) {
-            initialToken = schema;
-        }
-
-        showForm({token: initialToken, name: '', path});
+    const showForm = ({value, name, path}) => {
+        console.log('show form', value, name);
+        setShowEditForm(true);
+        setEditToken({value, name, path});
     };
 
-    const submitTokenValue = async ({token, name, path, options}) => {
-        setEditToken({token, name, path});
+    const showNewForm = (path, formSchema) => {
+        let initialToken = '';
+        if (formSchema) {
+            initialToken = formSchema;
+        }
+
+        showForm({value: initialToken, name: '', path});
+    };
+
+    const submitTokenValue = async ({value, name, path, options}) => {
+        setEditToken({value, name, path});
         setSingleTokenValue({
             parent: activeToken,
             name: [path, name].join('.'),
-            token,
+            value,
             options,
             oldName: [path, editToken.name].join('.'),
         });
         await setLoading(true);
         updateTokens();
-    };
-
-    const showForm = ({token, name, path}) => {
-        setShowEditForm(true);
-        setEditToken({token, name, path});
     };
 
     React.useEffect(() => {
@@ -198,7 +201,7 @@ const TokenListing = ({
                                     path={editToken.path}
                                     property={property}
                                     isPristine={editToken.name === ''}
-                                    initialToken={editToken.token}
+                                    initialValue={editToken.value}
                                 />
                             )}
 
