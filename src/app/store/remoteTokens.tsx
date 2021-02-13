@@ -1,6 +1,9 @@
+import {TokenProps} from '../../types/tokens';
+import {StorageProviderType} from '../../types/api';
+import {postToFigma, notifyToUI} from '../../plugin/notifiers';
 import * as pjs from '../../../package.json';
-import {notifyToUI, postToFigma} from '../../plugin/notifiers';
-import {TokenProps} from './TokenData';
+import {StateType} from '../../types/state';
+import {MessageToPluginTypes} from '../../types/messages';
 
 export async function compareUpdatedAt(oldUpdatedAt, newUpdatedAt) {
     if (newUpdatedAt > oldUpdatedAt) {
@@ -120,7 +123,7 @@ export async function createNewBin({secret, tokens, name, updatedAt, setApiData,
         setStorageType({id: jsonBinData.id, name, provider}, true);
         updateRemoteTokens({tokens, id: jsonBinData.id, secret, updatedAt});
         postToFigma({
-            type: 'credentials',
+            type: MessageToPluginTypes.CREDENTIALS,
             id: jsonBinData.id,
             name,
             secret,
@@ -141,7 +144,7 @@ export async function fetchDataFromJSONBin(id, secret, name): Promise<any> {
 
     if (jsonBinData) {
         postToFigma({
-            type: 'credentials',
+            type: MessageToPluginTypes.CREDENTIALS,
             id,
             name,
             secret,
@@ -181,4 +184,25 @@ export async function pullRemoteTokens({id, secret, provider, name}) {
             throw new Error('Not implemented');
     }
     return tokenValues;
+}
+
+export async function updateTokensOnSources(state: StateType, updatedAt: string) {
+    if (state.storageType.provider !== StorageProviderType.LOCAL)
+        updateRemoteTokens({
+            tokens: state.tokenData.reduceToValues(),
+            id: state.api.id,
+            secret: state.api.secret,
+            updatedAt,
+            oldUpdatedAt: state.tokenData.getUpdatedAt(),
+        }).then(() => {
+            state.tokenData.setUpdatedAt(updatedAt);
+        });
+
+    postToFigma({
+        type: MessageToPluginTypes.UPDATE,
+        tokenValues: state.tokenData.reduceToValues(),
+        tokens: state.tokenData.getMergedTokens(),
+        updatePageOnly: state.updatePageOnly,
+        updatedAt,
+    });
 }

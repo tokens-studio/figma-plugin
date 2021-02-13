@@ -4,10 +4,10 @@ export type StorageType = {
     name?: string;
 };
 
-export type apiData = {
+export type ApiDataType = {
     id: string;
     secret: string;
-    provider: string;
+    provider: StorageProviderType;
     name: string;
 };
 

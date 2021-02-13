@@ -1,12 +1,13 @@
 import * as React from 'react';
 import {useTokenDispatch, useTokenState} from '../store/TokenContext';
-import {StorageProviderType} from '../store/types';
+import {StorageProviderType} from '../../types/api';
 import Button from './Button';
 import Input from './Input';
-import {compareUpdatedAt, createNewBin, fetchDataFromJSONBin} from './updateRemoteTokens';
+import {compareUpdatedAt, createNewBin, fetchDataFromJSONBin} from '../store/remoteTokens';
 import Heading from './Heading';
 import TokenData from './TokenData';
 import {postToFigma} from '../../plugin/notifiers';
+import {MessageToPluginTypes} from '../../types/messages';
 
 const Settings = () => {
     const {tokenData, storageType, api, apiProviders} = useTokenState();
@@ -30,7 +31,7 @@ const Settings = () => {
     };
 
     const handleCreateNewClick = async () => {
-        setApiData({secret: localApiState.secret, provider: 'jsonbin', name: localApiState.name});
+        setApiData({secret: localApiState.secret, provider: StorageProviderType.JSONBIN, name: localApiState.name});
         createNewBin({
             secret: localApiState.secret,
             tokens: tokenData.reduceToValues(),
@@ -49,7 +50,7 @@ const Settings = () => {
     }) => {
         setLoading(true);
         setStorageType({provider, id, name}, true);
-        setApiData({id, secret, name, provider: 'jsonbin'});
+        setApiData({id, secret, name, provider: StorageProviderType.JSONBIN});
         const remoteTokens = await fetchDataFromJSONBin(id, secret, name);
         if (remoteTokens) {
             const comparison = await compareUpdatedAt(tokenData.getUpdatedAt(), remoteTokens);
@@ -71,7 +72,7 @@ const Settings = () => {
 
     const deleteProvider = ({id, secret}) => {
         postToFigma({
-            type: 'remove-single-credential',
+            type: MessageToPluginTypes.REMOVE_SINGLE_CREDENTIAL,
             id,
             secret,
         });

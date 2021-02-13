@@ -4,11 +4,8 @@ import JSON5 from 'json5';
 import {useTokenDispatch, useTokenState} from '../store/TokenContext';
 import TokenListing from './TokenListing';
 import Button from './Button';
-import {StorageProviderType} from '../store/types';
-import Tooltip from './Tooltip';
-import Icon from './Icon';
-import TokenData from './TokenData';
-import {pullRemoteTokens} from './updateRemoteTokens';
+import {StorageProviderType} from '../../types/api';
+import SyncBar from './SyncBar';
 
 const mappedTokens = (tokens) => {
     const properties = {
@@ -30,37 +27,19 @@ const mappedTokens = (tokens) => {
 };
 
 const Tokens = () => {
-    const {tokenData, updatePageOnly, storageType, api} = useTokenState();
+    const {tokenData, updatePageOnly, storageType} = useTokenState();
     const [activeToken] = React.useState('options');
-    const {updateTokens, toggleUpdatePageOnly, setTokenData, setLoading} = useTokenDispatch();
+    const {updateTokens, toggleUpdatePageOnly} = useTokenDispatch();
 
     const handleUpdate = async () => {
         updateTokens();
-    };
-
-    const handlePull = async () => {
-        setLoading(true);
-        const updatedTokens = await pullRemoteTokens(api);
-        setTokenData(new TokenData(updatedTokens), updatedTokens.updatedAt);
-        setLoading(false);
     };
 
     if (tokenData.tokens[activeToken].hasErrored) return <div>JSON malformed, check in Editor</div>;
 
     return (
         <div>
-            {storageType.provider !== StorageProviderType.LOCAL && (
-                <div className="flex flex-row items-center px-4">
-                    <div className="text-xxs text-gray-600 py-2 flex flex-row gap-1">
-                        Sync active ({storageType.provider})
-                    </div>
-                    <Tooltip label={`Pull from ${storageType.provider}`}>
-                        <button onClick={handlePull} type="button" className="button button-ghost">
-                            <Icon name="refresh" />
-                        </button>
-                    </Tooltip>
-                </div>
-            )}
+            {storageType.provider !== StorageProviderType.LOCAL && <SyncBar />}
             {mappedTokens(JSON5.parse(tokenData.tokens[activeToken].values)).map((tokenValues) => {
                 switch (tokenValues[0]) {
                     case 'borderRadius':

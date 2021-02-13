@@ -4,8 +4,8 @@ import {fetchAllPluginData} from './pluginData';
 import store from './store';
 import * as pjs from '../../package.json';
 import {setValuesOnNode} from './updateNode';
-import {StorageProviderType, StorageType} from '../app/store/types';
-import {TokenProps} from '../app/components/TokenData';
+import {TokenProps} from '../types/tokens';
+import {StorageProviderType, StorageType} from '../types/api';
 
 export function mapValuesToTokens(object, values) {
     const array = Object.entries(values).map(([key, value]) => ({[key]: objectPath.get(object, value)}));

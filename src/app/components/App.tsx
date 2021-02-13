@@ -11,8 +11,10 @@ import Icon from './Icon';
 import * as pjs from '../../../package.json';
 import {useTokenState, useTokenDispatch} from '../store/TokenContext';
 import TokenData from './TokenData';
-import {fetchDataFromJSONBin} from './updateRemoteTokens';
+import {fetchDataFromJSONBin} from '../store/remoteTokens';
 import {goToNodeId} from './utils';
+import {postToFigma} from '../../plugin/notifiers';
+import {MessageFromPluginTypes, MessageToPluginTypes} from '../../types/messages';
 
 const App = () => {
     const [active, setActive] = React.useState('start');
@@ -32,7 +34,7 @@ const App = () => {
     } = useTokenDispatch();
 
     const onInitiate = () => {
-        parent.postMessage({pluginMessage: {type: 'initiate'}}, '*');
+        postToFigma({type: MessageToPluginTypes.INITIATE});
     };
 
     React.useEffect(() => {
@@ -40,7 +42,7 @@ const App = () => {
         window.onmessage = async (event) => {
             const {type, values, credentials, status, storageType, providers} = event.data.pluginMessage;
             switch (type) {
-                case 'selection':
+                case MessageFromPluginTypes.SELECTION:
                     setDisabled(false);
                     if (values) {
                         setSelectionValues(values);
@@ -48,15 +50,15 @@ const App = () => {
                         resetSelectionValues();
                     }
                     break;
-                case 'noselection':
+                case MessageFromPluginTypes.NO_SELECTION:
                     setDisabled(true);
                     resetSelectionValues();
                     break;
-                case 'remotecomponents':
+                case MessageFromPluginTypes.REMOTE_COMPONENTS:
                     setLoading(false);
                     setRemoteComponents(values.remotes);
                     break;
-                case 'tokenvalues': {
+                case MessageFromPluginTypes.TOKEN_VALUES: {
                     setLoading(false);
                     if (values) {
                         setTokenData(new TokenData(values));
@@ -64,17 +66,17 @@ const App = () => {
                     }
                     break;
                 }
-                case 'styles':
+                case MessageFromPluginTypes.STYLES:
                     setLoading(false);
                     if (values) {
                         setTokensFromStyles(values);
                         setActive('tokens');
                     }
                     break;
-                case 'receivedStorageType':
+                case MessageFromPluginTypes.RECEIVED_STORAGE_TYPE:
                     setStorageType(storageType);
                     break;
-                case 'apiCredentials': {
+                case MessageFromPluginTypes.API_CREDENTIALS: {
                     if (status === false) {
                         console.log('falsy api credentials');
                     } else {
@@ -92,13 +94,9 @@ const App = () => {
                     }
                     break;
                 }
-                case 'apiProviders':
+                case MessageFromPluginTypes.API_PROVIDERS:
                     setAPIProviders(providers);
                     break;
-                case 'gotMergeConflict': {
-                    console.log('got merge conflict');
-                    break;
-                }
                 default:
                     break;
             }

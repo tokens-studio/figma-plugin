@@ -2,30 +2,8 @@
 import JSON5 from 'json5';
 import objectPath from 'object-path';
 import {mergeDeep} from '../../plugin/helpers';
+import {SingleToken, TokenGroup, TokenObject, TokenProps, Tokens} from '../../types/tokens';
 import {convertToRgb, checkAndEvaluateMath} from './utils';
-
-export interface TokenProps {
-    values: {
-        [key: string]: string;
-    };
-    updatedAt: string;
-    version: string;
-}
-
-type SingleToken = string | number | TokenGroup;
-
-interface TokenGroup {
-    [key: string]: SingleToken;
-}
-
-export interface Tokens {
-    [key: string]: TokenObject;
-}
-
-export interface TokenObject {
-    hasErrored?: boolean;
-    values: string;
-}
 
 export default class TokenData {
     mergedTokens: TokenGroup;

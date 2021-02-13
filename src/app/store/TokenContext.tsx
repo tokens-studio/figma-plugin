@@ -2,11 +2,13 @@ import * as React from 'react';
 import JSON5 from 'json5';
 import objectPath from 'object-path';
 import defaultJSON from '../../config/default.json';
-import TokenData, {TokenProps, Tokens} from '../components/TokenData';
+import TokenData from '../components/TokenData';
 import * as pjs from '../../../package.json';
-import {updateRemoteTokens} from '../components/updateRemoteTokens';
-import {StorageProviderType, apiData, StorageType} from './types';
+import {TokenProps} from '../../types/tokens';
+import {StorageProviderType, ApiDataType, StorageType} from '../../types/api';
 import {postToFigma} from '../../plugin/notifiers';
+import {updateTokensOnSources} from './remoteTokens';
+import {MessageToPluginTypes} from '../../types/messages';
 
 export interface SelectionValue {
     borderRadius: string | undefined;
@@ -58,23 +60,6 @@ const emptyTokens: TokenProps = {
     },
 };
 
-type StateType = {
-    storageType: StorageType;
-    tokens: Tokens;
-    loading: boolean;
-    disabled: boolean;
-    collapsed: boolean;
-    tokenData: TokenData;
-    selectionValues: object;
-    displayType: 'GRID' | 'LIST';
-    colorMode: boolean;
-    showEditForm: boolean;
-    showOptions: boolean;
-    api: apiData;
-    apiProviders: apiData[];
-    updatePageOnly: boolean;
-};
-
 const emptyState = {
     tokens: defaultTokens,
     loading: true,
@@ -103,27 +88,6 @@ const emptyState = {
 
 const TokenStateContext = React.createContext(emptyState);
 const TokenDispatchContext = React.createContext(null);
-
-async function updateTokensOnSources(state: StateType, updatedAt: string) {
-    if (state.storageType.provider !== StorageProviderType.LOCAL)
-        updateRemoteTokens({
-            tokens: state.tokenData.reduceToValues(),
-            id: state.api.id,
-            secret: state.api.secret,
-            updatedAt,
-            oldUpdatedAt: state.tokenData.getUpdatedAt(),
-        }).then(() => {
-            state.tokenData.setUpdatedAt(updatedAt);
-        });
-
-    postToFigma({
-        type: 'update',
-        tokenValues: state.tokenData.reduceToValues(),
-        tokens: state.tokenData.getMergedTokens(),
-        updatePageOnly: state.updatePageOnly,
-        updatedAt,
-    });
-}
 
 function stateReducer(state, action) {
     switch (action.type) {
@@ -190,25 +154,25 @@ function stateReducer(state, action) {
         }
         case ActionType.CreateStyles:
             postToFigma({
-                type: 'create-styles',
+                type: MessageToPluginTypes.CREATE_STYLES,
                 tokens: state.tokenData.getMergedTokens(),
             });
             return state;
         case ActionType.SetNodeData:
             postToFigma({
-                type: 'set-node-data',
+                type: MessageToPluginTypes.SET_NODE_DATA,
                 values: action.data,
                 tokens: state.tokenData.getMergedTokens(),
             });
             return state;
         case ActionType.RemoveNodeData:
             postToFigma({
-                type: 'remove-node-data',
+                type: MessageToPluginTypes.REMOVE_NODE_DATA,
             });
             return state;
         case ActionType.PullStyles:
             postToFigma({
-                type: 'pull-styles',
+                type: MessageToPluginTypes.PULL_STYLES,
                 styleTypes: {
                     textStyles: true,
                     colorStyles: true,
@@ -272,7 +236,7 @@ function stateReducer(state, action) {
         case ActionType.SetStorageType:
             if (action.bool) {
                 postToFigma({
-                    type: 'set-storage-type',
+                    type: MessageToPluginTypes.SET_STORAGE_TYPE,
                     storageType: action.data,
                     tokens: state.tokenData.getMergedTokens(),
                 });
@@ -355,7 +319,7 @@ function TokenProvider({children}) {
             setCollapsed: () => {
                 dispatch({type: ActionType.SetCollapsed});
             },
-            setApiData: (data: apiData) => {
+            setApiData: (data: ApiDataType) => {
                 dispatch({type: ActionType.SetApiData, data});
             },
             toggleUpdatePageOnly: (bool: boolean) => {
@@ -364,7 +328,7 @@ function TokenProvider({children}) {
             setStorageType: (data: StorageType, bool = false) => {
                 dispatch({type: ActionType.SetStorageType, data, bool});
             },
-            setAPIProviders: (data: apiData[]) => {
+            setAPIProviders: (data: ApiDataType[]) => {
                 dispatch({type: ActionType.SetAPIProviders, data});
             },
         }),

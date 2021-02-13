@@ -1,4 +1,5 @@
-import {apiData, StorageType} from '../app/store/types';
+import {ApiDataType, StorageType} from '../types/api';
+import {MessageFromPluginTypes, MessageToPluginTypes} from '../types/messages';
 import store from './store';
 
 export function postToFigma(props) {
@@ -16,7 +17,7 @@ export function notifyUI(msg, opts = {}) {
 
 export function notifyToUI(msg, opts = {}) {
     postToFigma({
-        type: 'notify',
+        type: MessageToPluginTypes.NOTIFY,
         msg,
         opts,
     });
@@ -28,13 +29,13 @@ export function postToUI(props) {
 
 export function notifyNoSelection() {
     postToUI({
-        type: 'noselection',
+        type: MessageFromPluginTypes.NO_SELECTION,
     });
 }
 
 export function notifySelection(nodes = undefined, values = undefined) {
     postToUI({
-        type: 'selection',
+        type: MessageFromPluginTypes.SELECTION,
         nodes,
         values,
     });
@@ -52,7 +53,7 @@ export function notifyRemoteComponents({nodes, remotes}) {
         notifyUI(`No nodes with connected tokens found`, opts);
     }
     postToUI({
-        type: 'remotecomponents',
+        type: MessageFromPluginTypes.REMOTE_COMPONENTS,
         values: {
             nodes,
             remotes,
@@ -64,17 +65,17 @@ export function notifyRemoteComponents({nodes, remotes}) {
 }
 
 export function notifyTokenValues(values = undefined) {
-    postToUI({type: 'tokenvalues', values});
+    postToUI({type: MessageFromPluginTypes.TOKEN_VALUES, values});
 }
 
 export function notifyStorageType(storageType: StorageType) {
-    postToUI({type: 'receivedStorageType', storageType});
+    postToUI({type: MessageFromPluginTypes.RECEIVED_STORAGE_TYPE, storageType});
 }
 
-export function notifyAPIProviders(providers: apiData[]) {
-    postToUI({type: 'apiProviders', providers});
+export function notifyAPIProviders(providers: ApiDataType[]) {
+    postToUI({type: MessageFromPluginTypes.API_PROVIDERS, providers});
 }
 
 export function notifyStyleValues(values = undefined) {
-    postToUI({type: 'styles', values});
+    postToUI({type: MessageFromPluginTypes.STYLES, values});
 }

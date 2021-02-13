@@ -1,6 +1,7 @@
 import {Parser} from 'expr-eval';
 import {hexToRgb} from '../../plugin/helpers';
 import {postToFigma} from '../../plugin/notifiers';
+import {MessageToPluginTypes} from '../../types/messages';
 
 const parser = new Parser();
 
@@ -127,7 +128,7 @@ export function slugify(text: string) {
 
 export function goToNodeId(id) {
     postToFigma({
-        type: 'gotonode',
+        type: MessageToPluginTypes.GO_TO_NODE,
         id,
     });
 }

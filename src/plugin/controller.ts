@@ -12,6 +12,7 @@ import {
 import {findAllWithData, removePluginData, sendPluginValues, updatePluginData} from './pluginData';
 import {getTokenData, updateNodes, setTokenData, goToNode, saveStorageType, getSavedStorageType} from './node';
 import {removeSingleCredential, updateCredentials} from './helpers';
+import {MessageFromPluginTypes, MessageToPluginTypes} from '../types/messages';
 
 figma.showUI(__html__, {
     width: 400,
@@ -35,7 +36,7 @@ const compareProvidersWithStored = (providers, storageType) => {
         if (matchingSet) {
             //    send a message to the UI with the credentials stored in the client
             figma.ui.postMessage({
-                type: 'apiCredentials',
+                type: MessageFromPluginTypes.API_CREDENTIALS,
                 status: true,
                 credentials: matchingSet,
             });
@@ -45,7 +46,7 @@ const compareProvidersWithStored = (providers, storageType) => {
     } else {
         //    send a message to the UI that says there are no credentials stored in the client
         figma.ui.postMessage({
-            type: 'apiCredentials',
+            type: MessageFromPluginTypes.API_CREDENTIALS,
             status: false,
         });
         //   Read no values from storage
@@ -55,7 +56,7 @@ const compareProvidersWithStored = (providers, storageType) => {
 
 figma.ui.onmessage = async (msg) => {
     switch (msg.type) {
-        case 'initiate':
+        case MessageToPluginTypes.INITIATE:
             try {
                 const apiProviders = await figma.clientStorage.getAsync('apiProviders');
                 const storageType = await getSavedStorageType();
@@ -90,20 +91,20 @@ figma.ui.onmessage = async (msg) => {
             }
             sendPluginValues(figma.currentPage.selection);
             return;
-        case 'credentials': {
+        case MessageToPluginTypes.CREDENTIALS: {
             const {secret, id, provider, name} = msg;
             updateCredentials({secret, id, name, provider});
             break;
         }
-        case 'remove-single-credential': {
+        case MessageToPluginTypes.REMOVE_SINGLE_CREDENTIAL: {
             const {secret, id} = msg;
             removeSingleCredential({secret, id});
             break;
         }
-        case 'set-storage-type':
+        case MessageToPluginTypes.SET_STORAGE_TYPE:
             saveStorageType(msg.storageType);
             break;
-        case 'set-node-data':
+        case MessageToPluginTypes.SET_NODE_DATA:
             try {
                 updatePluginData(figma.currentPage.selection, msg.values);
                 sendPluginValues(figma.currentPage.selection, updateNodes(figma.currentPage.selection, msg.tokens));
@@ -113,7 +114,7 @@ figma.ui.onmessage = async (msg) => {
             notifyRemoteComponents({nodes: store.successfulNodes.length, remotes: store.remoteComponents});
             return;
 
-        case 'remove-node-data':
+        case MessageToPluginTypes.REMOVE_NODE_DATA:
             try {
                 removePluginData(figma.currentPage.selection);
                 sendPluginValues(figma.currentPage.selection);
@@ -122,14 +123,14 @@ figma.ui.onmessage = async (msg) => {
             }
             notifyRemoteComponents({nodes: store.successfulNodes.length, remotes: store.remoteComponents});
             return;
-        case 'create-styles':
+        case MessageToPluginTypes.CREATE_STYLES:
             try {
                 updateStyles(msg.tokens, true);
             } catch (e) {
                 console.error(e);
             }
             return;
-        case 'update': {
+        case MessageToPluginTypes.UPDATE: {
             const allWithData = findAllWithData({pageOnly: msg.updatePageOnly});
             setTokenData(msg.tokenValues, msg.updatedAt);
             updateStyles(msg.tokens, false);
@@ -138,13 +139,13 @@ figma.ui.onmessage = async (msg) => {
             notifyRemoteComponents({nodes: store.successfulNodes.length, remotes: store.remoteComponents});
             return;
         }
-        case 'gotonode':
+        case MessageToPluginTypes.GO_TO_NODE:
             goToNode(msg.id);
             break;
-        case 'pull-styles':
+        case MessageToPluginTypes.PULL_STYLES:
             pullStyles(msg.styleTypes);
             break;
-        case 'notify':
+        case MessageToPluginTypes.NOTIFY:
             notifyUI(msg.msg, msg.opts);
             break;
         default:
