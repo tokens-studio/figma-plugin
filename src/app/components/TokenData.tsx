@@ -192,6 +192,7 @@ export default class TokenData {
             }
             return convertToRgb(checkAndEvaluateMath(returnedValue));
         }
+        return null;
     }
 
     setResolvedAlias(tokens: TokenGroup, target: string, source: string): void {

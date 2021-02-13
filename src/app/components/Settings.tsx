@@ -53,13 +53,11 @@ const Settings = () => {
         const remoteTokens = await fetchDataFromJSONBin(id, secret, name);
         if (remoteTokens) {
             const comparison = await compareUpdatedAt(tokenData.getUpdatedAt(), remoteTokens);
-            console.log('Comparing', comparison);
             if (comparison === 'remote_older') {
                 console.log(
                     'Remote is older, ask user if they want to overwrite their local progress or upload to remote.'
                 );
             } else {
-                console.log('Writing remote values to local token state');
                 setTokenData(new TokenData(remoteTokens), remoteTokens.updatedAt);
             }
         }
@@ -167,7 +165,7 @@ const Settings = () => {
                                     <div
                                         key={`${provider}-${id}`}
                                         className={`border text-left flex flex-row justify-between hover:bg-gray-100 rounded p-2 ${
-                                            isActive(provider, id) ? 'border-blue-500' : 'border-gray-300'
+                                            isActive(provider, id) ? 'border-blue-300' : 'border-gray-300'
                                         }`}
                                     >
                                         <div className="flex flex-col flex-grow">

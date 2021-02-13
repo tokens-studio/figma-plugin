@@ -105,7 +105,6 @@ const TokenStateContext = React.createContext(emptyState);
 const TokenDispatchContext = React.createContext(null);
 
 async function updateTokensOnSources(state: StateType, updatedAt: string) {
-    console.log('setting tokens on source', updatedAt);
     if (state.storageType.provider !== StorageProviderType.LOCAL)
         updateRemoteTokens({
             tokens: state.tokenData.reduceToValues(),
@@ -114,7 +113,6 @@ async function updateTokensOnSources(state: StateType, updatedAt: string) {
             updatedAt,
             oldUpdatedAt: state.tokenData.getUpdatedAt(),
         }).then(() => {
-            console.log('success');
             state.tokenData.setUpdatedAt(updatedAt);
         });
 
@@ -261,7 +259,6 @@ function stateReducer(state, action) {
                 api: action.data,
             };
         case ActionType.SetAPIProviders: {
-            console.log('setting api in cont', action.data);
             return {
                 ...state,
                 apiProviders: action.data,

@@ -57,7 +57,6 @@ const App = () => {
                     setRemoteComponents(values.remotes);
                     break;
                 case 'tokenvalues': {
-                    console.log('setting token values', values);
                     setLoading(false);
                     if (values) {
                         setTokenData(new TokenData(values));

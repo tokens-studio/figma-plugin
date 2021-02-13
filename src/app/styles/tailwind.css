@@ -102,7 +102,7 @@ textarea::-webkit-scrollbar-thumb {
 }
 
 .heading {
-    @apply font-semibold text-gray-900 leading-none capitalize;
+    @apply font-semibold text-gray-900 leading-none;
 }
 
 .heading-small {

@@ -57,11 +57,8 @@ figma.ui.onmessage = async (msg) => {
     switch (msg.type) {
         case 'initiate':
             try {
-                console.log('initiating');
                 const apiProviders = await figma.clientStorage.getAsync('apiProviders');
                 const storageType = await getSavedStorageType();
-                console.log('received a storage type of ', storageType);
-                console.log('received api providers ', apiProviders);
 
                 notifyStorageType(storageType);
                 if (apiProviders) notifyAPIProviders(JSON.parse(apiProviders));
@@ -69,17 +66,13 @@ figma.ui.onmessage = async (msg) => {
                 switch (storageType.provider) {
                     //   Somehow setting this to an ENUM doesn't work :-|
                     case 'jsonbin': {
-                        console.log('Storage Type JSONBin, trying to find matching apiProvider');
-
                         compareProvidersWithStored(apiProviders, storageType);
 
                         break;
                     }
                     default: {
-                        console.log('Storage Type Local, fetching local tokens');
                         const oldTokens = getTokenData();
                         if (oldTokens) {
-                            console.log('yay tokens', oldTokens);
                             notifyTokenValues(oldTokens);
                         } else {
                             console.log('no tokens, maybe set empty?');
@@ -108,7 +101,6 @@ figma.ui.onmessage = async (msg) => {
             break;
         }
         case 'set-storage-type':
-            console.log('set storage type', msg.storageType, msg.tokens);
             saveStorageType(msg.storageType);
             break;
         case 'set-node-data':

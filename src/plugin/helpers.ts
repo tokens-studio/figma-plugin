@@ -81,7 +81,6 @@ export async function removeSingleCredential({secret, id}) {
             const parsedData = await JSON.parse(data);
 
             existingProviders = parsedData.filter((i) => i.secret !== secret && i.id !== id);
-            console.log('existing prov now are', existingProviders);
         }
         await figma.clientStorage.setAsync('apiProviders', JSON.stringify(existingProviders));
         const newProviders = await figma.clientStorage.getAsync('apiProviders');

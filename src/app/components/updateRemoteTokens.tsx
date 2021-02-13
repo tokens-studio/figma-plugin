@@ -3,16 +3,12 @@ import {notifyToUI, postToFigma} from '../../plugin/notifiers';
 import {TokenProps} from './TokenData';
 
 export async function compareUpdatedAt(oldUpdatedAt, newUpdatedAt) {
-    console.log('comparing', oldUpdatedAt, newUpdatedAt);
     if (newUpdatedAt > oldUpdatedAt) {
-        console.log('Remote is newer');
         return 'remote_newer';
     }
     if (newUpdatedAt === oldUpdatedAt) {
-        console.log('remote and old are the same');
         return 'same';
     }
-    console.log('Local state is newer');
     return 'remote_older';
 }
 
@@ -91,7 +87,6 @@ export async function updateRemoteTokens({
         const remoteTokens = await readTokensFromJSONBin({secret, id});
         const comparison = await compareUpdatedAt(oldUpdatedAt, remoteTokens.updatedAt);
         if (comparison === 'remote_older') {
-            console.log('Updating remote, as its older');
             writeTokensToJSONBin({secret, id, tokenObj});
         } else {
             // Tell the user to choose between:
@@ -100,7 +95,6 @@ export async function updateRemoteTokens({
             console.log('Not updating remote, add Modal asking user to choose how to handle this');
         }
     } else {
-        console.log('fresh bin');
         writeTokensToJSONBin({secret, id, tokenObj});
     }
 }
@@ -146,7 +140,6 @@ export async function fetchDataFromJSONBin(id, secret, name): Promise<any> {
     const jsonBinData = await readTokensFromJSONBin({id, secret});
 
     if (jsonBinData) {
-        console.log('data is', jsonBinData);
         postToFigma({
             type: 'credentials',
             id,
@@ -169,5 +162,23 @@ export async function fetchDataFromJSONBin(id, secret, name): Promise<any> {
         }
     }
 
+    return tokenValues;
+}
+
+export async function pullRemoteTokens({id, secret, provider, name}) {
+    if (!id && !secret) return;
+
+    notifyToUI('Fetching from remote...');
+    let tokenValues;
+
+    switch (provider) {
+        case 'jsonbin': {
+            tokenValues = await fetchDataFromJSONBin(id, secret, name);
+            notifyToUI('Updated!');
+            break;
+        }
+        default:
+            throw new Error('Not implemented');
+    }
     return tokenValues;
 }

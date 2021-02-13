@@ -1,11 +1,14 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import * as React from 'react';
 import JSON5 from 'json5';
-import * as timeago from 'timeago.js';
 import {useTokenDispatch, useTokenState} from '../store/TokenContext';
 import TokenListing from './TokenListing';
 import Button from './Button';
 import {StorageProviderType} from '../store/types';
+import Tooltip from './Tooltip';
+import Icon from './Icon';
+import TokenData from './TokenData';
+import {pullRemoteTokens} from './updateRemoteTokens';
 
 const mappedTokens = (tokens) => {
     const properties = {
@@ -27,13 +30,19 @@ const mappedTokens = (tokens) => {
 };
 
 const Tokens = () => {
-    const {tokenData, updatePageOnly, storageType} = useTokenState();
+    const {tokenData, updatePageOnly, storageType, api} = useTokenState();
     const [activeToken] = React.useState('options');
-    const {updateTokens, setLoading, toggleUpdatePageOnly} = useTokenDispatch();
+    const {updateTokens, toggleUpdatePageOnly, setTokenData, setLoading} = useTokenDispatch();
 
     const handleUpdate = async () => {
-        await setLoading(true);
         updateTokens();
+    };
+
+    const handlePull = async () => {
+        setLoading(true);
+        const updatedTokens = await pullRemoteTokens(api);
+        setTokenData(new TokenData(updatedTokens), updatedTokens.updatedAt);
+        setLoading(false);
     };
 
     if (tokenData.tokens[activeToken].hasErrored) return <div>JSON malformed, check in Editor</div>;
@@ -41,8 +50,15 @@ const Tokens = () => {
     return (
         <div>
             {storageType.provider !== StorageProviderType.LOCAL && (
-                <div className="text-xxs text-gray-600 p-2 flex flex-row gap-2">
-                    Last updated {timeago.format(tokenData.getUpdatedAt())}
+                <div className="flex flex-row items-center px-4">
+                    <div className="text-xxs text-gray-600 py-2 flex flex-row gap-1">
+                        Sync active ({storageType.provider})
+                    </div>
+                    <Tooltip label={`Pull from ${storageType.provider}`}>
+                        <button onClick={handlePull} type="button" className="button button-ghost">
+                            <Icon name="refresh" />
+                        </button>
+                    </Tooltip>
                 </div>
             )}
             {mappedTokens(JSON5.parse(tokenData.tokens[activeToken].values)).map((tokenValues) => {
