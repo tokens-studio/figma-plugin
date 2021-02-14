@@ -12,28 +12,20 @@ import {MessageToPluginTypes} from '../../types/messages';
 import {compareUpdatedAt} from './utils';
 
 const Settings = () => {
-    const {tokenData, storageType, api, apiProviders, updateAfterApply} = useTokenState();
+    const {tokenData, storageType, localApiState, api, apiProviders, updateAfterApply} = useTokenState();
     const {
         setLoading,
+        setLocalApiState,
         setApiData,
         setStorageType,
         setTokenData,
         toggleUpdateAfterApply,
         updateTokens,
     } = useTokenDispatch();
-    const [localApiState, setLocalApiState] = React.useState({
-        id: api.id,
-        secret: api.secret,
-        name: api.name,
-    });
 
     const isActive = (provider, id) => {
         return storageType.id === id && storageType.provider === provider;
     };
-
-    React.useEffect(() => {
-        setLocalApiState({id: api.id, name: api.name, secret: api.secret});
-    }, [api]);
 
     const handleChange = (e) => {
         setLocalApiState({...localApiState, [e.target.name]: e.target.value});
@@ -80,6 +72,10 @@ const Settings = () => {
         setLoading(false);
     };
 
+    React.useEffect(() => {
+        console.log('localapistate', localApiState);
+    }, []);
+
     const restoreStoredProvider = (provider) => {
         setLocalApiState(provider);
         handleSyncClick(provider);
@@ -101,7 +97,7 @@ const Settings = () => {
                     <div className="flex flex-row gap-2">
                         <button
                             className={`font-bold focus:outline-none text-xs flex p-2 rounded border ${
-                                storageType?.provider === StorageProviderType.LOCAL && 'border-blue-500 bg-blue-100'
+                                localApiState?.provider === StorageProviderType.LOCAL && 'border-blue-500 bg-blue-100'
                             }`}
                             type="button"
                             onClick={() => setStorageType({provider: StorageProviderType.LOCAL}, true)}
@@ -110,16 +106,16 @@ const Settings = () => {
                         </button>
                         <button
                             className={`font-bold focus:outline-none text-xs flex p-2 rounded border ${
-                                storageType?.provider === StorageProviderType.JSONBIN && 'border-blue-500 bg-blue-100'
+                                localApiState?.provider === StorageProviderType.JSONBIN && 'border-blue-500 bg-blue-100'
                             }`}
                             type="button"
-                            onClick={() => setStorageType({...storageType, provider: StorageProviderType.JSONBIN})}
+                            onClick={() => setLocalApiState({...localApiState, provider: StorageProviderType.JSONBIN})}
                         >
                             JSONbin
                         </button>
                     </div>
                 </div>
-                {storageType?.provider === StorageProviderType.JSONBIN && (
+                {localApiState?.provider === StorageProviderType.JSONBIN && (
                     <div className="space-y-4">
                         <div className="text-xxs text-gray-600">
                             Create an account at{' '}
@@ -171,10 +167,10 @@ const Settings = () => {
                         </div>
                     </div>
                 )}
-                {apiProviders.length > 0 && storageType.provider !== StorageProviderType.LOCAL && (
+                {apiProviders.length > 0 && localApiState.provider !== StorageProviderType.LOCAL && (
                     <div className="space-y-4">
                         <div className="flex flex-row justify-between items-center">
-                            <Heading size="small">Stored providers for {storageType.provider}</Heading>
+                            <Heading size="small">Stored providers for {localApiState.provider}</Heading>
                             <div className="switch flex items-center">
                                 <input
                                     className="switch__toggle"
@@ -190,7 +186,7 @@ const Settings = () => {
                         </div>
                         <div className="flex flex-col gap-2">
                             {apiProviders
-                                .filter((item) => item.provider === storageType.provider)
+                                .filter((item) => item.provider === localApiState.provider)
                                 .map(({provider, id, name, secret}) => (
                                     <div
                                         key={`${provider}-${id}`}

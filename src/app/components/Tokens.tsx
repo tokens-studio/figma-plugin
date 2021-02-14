@@ -25,7 +25,7 @@ const mappedTokens = (tokens) => {
 };
 
 const Tokens = () => {
-    const {tokenData, updatePageOnly, storageType} = useTokenState();
+    const {tokenData, updatePageOnly} = useTokenState();
     const [activeToken] = React.useState('options');
     const {updateTokens, toggleUpdatePageOnly} = useTokenDispatch();
 

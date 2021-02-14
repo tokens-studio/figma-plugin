@@ -7,7 +7,7 @@ import {StorageProviderType} from '../../types/api';
 
 const StartScreen = ({setActive}) => {
     const {storageType} = useTokenState();
-    const {setEmptyTokens, setLoading} = useTokenDispatch();
+    const {setEmptyTokens, setLoading, setLocalApiState} = useTokenDispatch();
     const onSetDefaultTokens = () => {
         setActive('tokens');
         setEmptyTokens();
@@ -15,6 +15,12 @@ const StartScreen = ({setActive}) => {
     };
     const onSetSyncClick = () => {
         setActive('settings');
+        console.log({storageType});
+        setLocalApiState({
+            id: storageType.id,
+            name: storageType.name,
+            provider: storageType.provider,
+        });
     };
 
     return (

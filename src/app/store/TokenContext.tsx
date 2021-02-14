@@ -43,6 +43,7 @@ export enum ActionType {
     ToggleUpdateAfterApply = 'TOGGLE_UPDATE_AFTER_APPLY',
     SetStorageType = 'SET_STORAGE_TYPE',
     SetAPIProviders = 'SET_API_PROVIDERS',
+    SetLocalApiState = 'SET_LOCAL_API_STATE',
 }
 
 const defaultTokens: TokenProps = {
@@ -82,6 +83,12 @@ const emptyState = {
         secret: '',
         provider: '',
         name: '',
+    },
+    localApiState: {
+        id: '',
+        secret: '',
+        name: '',
+        provider: '',
     },
     apiProviders: [],
     updatePageOnly: true,
@@ -224,6 +231,11 @@ function stateReducer(state, action) {
                 ...state,
                 api: action.data,
             };
+        case ActionType.SetLocalApiState:
+            return {
+                ...state,
+                localApiState: action.data,
+            };
         case ActionType.SetAPIProviders: {
             return {
                 ...state,
@@ -328,6 +340,9 @@ function TokenProvider({children}) {
             },
             setApiData: (data: ApiDataType) => {
                 dispatch({type: ActionType.SetApiData, data});
+            },
+            setLocalApiState: (data: ApiDataType) => {
+                dispatch({type: ActionType.SetLocalApiState, data});
             },
             toggleUpdatePageOnly: (bool: boolean) => {
                 dispatch({type: ActionType.ToggleUpdatePageOnly, bool});

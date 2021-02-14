@@ -2,8 +2,7 @@ import * as React from 'react';
 import {useTokenState, useTokenDispatch} from '../store/TokenContext';
 import Icon from './Icon';
 import Tooltip from './Tooltip';
-import {pullRemoteTokens} from '../store/remoteTokens';
-import TokenData from './TokenData';
+import {useRemoteTokens} from '../store/remoteTokens';
 import {StorageProviderType} from '../../types/api';
 
 const TabButton = ({name, label, active, setActive, first = false}) => (
@@ -20,15 +19,9 @@ const TabButton = ({name, label, active, setActive, first = false}) => (
 );
 
 const Navbar = ({active, setActive}) => {
-    const {storageType, api} = useTokenState();
-    const {pullStyles, setLoading, setTokenData} = useTokenDispatch();
-
-    const handlePull = async () => {
-        setLoading(true);
-        const updatedTokens = await pullRemoteTokens(api);
-        setTokenData(new TokenData(updatedTokens), updatedTokens.updatedAt);
-        setLoading(false);
-    };
+    const {storageType} = useTokenState();
+    const {pullStyles} = useTokenDispatch();
+    const {pullTokens} = useRemoteTokens();
 
     return (
         <div className="sticky top-0 navbar bg-white flex items-center justify-between z-1 border-b border-gray-200">
@@ -41,7 +34,7 @@ const Navbar = ({active, setActive}) => {
             <div>
                 {storageType.provider !== StorageProviderType.LOCAL && (
                     <Tooltip label={`Pull from ${storageType.provider}`}>
-                        <button onClick={handlePull} type="button" className="button button-ghost">
+                        <button onClick={pullTokens} type="button" className="button button-ghost">
                             <Icon name="refresh" />
                         </button>
                     </Tooltip>

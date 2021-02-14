@@ -117,6 +117,7 @@ export async function createNewJSONBin({provider, secret, tokens, name, updatedA
 // Read tokens from JSONBin
 
 export async function fetchDataFromJSONBin(id, secret, name): Promise<TokenProps> {
+    console.log('executing jsonbin', id, secret, name);
     let tokenValues;
 
     if (!id && !secret) return;

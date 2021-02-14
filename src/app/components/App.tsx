@@ -29,6 +29,7 @@ const App = () => {
         resetSelectionValues,
         setTokensFromStyles,
         setApiData,
+        setLocalApiState,
         setStorageType,
         setAPIProviders,
     } = useTokenDispatch();
@@ -82,6 +83,7 @@ const App = () => {
                     } else {
                         const {id, secret, name, provider} = credentials;
                         setApiData({id, secret, name, provider});
+                        setLocalApiState({id, secret, name, provider});
                         // setTokenData(new TokenData(values));
                         const remoteValues = await fetchDataFromRemote(id, secret, name, provider);
                         if (remoteValues) {

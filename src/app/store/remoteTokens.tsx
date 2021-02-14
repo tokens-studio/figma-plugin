@@ -1,9 +1,12 @@
+import * as React from 'react';
 import {TokenProps} from '../../types/tokens';
 import {StorageProviderType} from '../../types/api';
 import {postToFigma, notifyToUI} from '../../plugin/notifiers';
 import {StateType} from '../../types/state';
 import {MessageToPluginTypes} from '../../types/messages';
 import {createNewJSONBin, fetchDataFromJSONBin, updateJSONBinTokens} from './providers/jsonbin';
+import TokenData from '../components/TokenData';
+import {useTokenDispatch, useTokenState} from './TokenContext';
 
 export async function updateRemoteTokens({
     provider,
@@ -40,22 +43,34 @@ export async function updateRemoteTokens({
     }
 }
 
-export async function pullRemoteTokens({id, secret, provider, name}) {
-    if (!id && !secret) return;
+export function useRemoteTokens() {
+    const {api} = useTokenState();
+    const {setLoading, setTokenData, updateTokens} = useTokenDispatch();
+    const {id, secret, provider, name} = api;
 
-    notifyToUI('Fetching from remote...');
-    let tokenValues;
+    const pullTokens = async () => {
+        if (!id && !secret) return;
 
-    switch (provider) {
-        case StorageProviderType.JSONBIN: {
-            tokenValues = await fetchDataFromJSONBin(id, secret, name);
-            notifyToUI('Updated!');
-            break;
+        setLoading(true);
+
+        notifyToUI('Fetching from remote...');
+        let tokenValues;
+
+        switch (provider) {
+            case StorageProviderType.JSONBIN: {
+                tokenValues = await fetchDataFromJSONBin(id, secret, name);
+                notifyToUI('Updated!');
+                break;
+            }
+            default:
+                throw new Error('Not implemented');
         }
-        default:
-            throw new Error('Not implemented');
-    }
-    return tokenValues;
+        setTokenData(new TokenData(tokenValues), tokenValues.updatedAt);
+        updateTokens(false);
+        setLoading(false);
+    };
+
+    return {pullTokens};
 }
 
 export async function updateTokensOnSources(state: StateType, updatedAt: string, shouldUpdate = true) {
