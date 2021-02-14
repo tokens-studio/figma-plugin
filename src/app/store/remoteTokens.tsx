@@ -1,4 +1,3 @@
-import * as React from 'react';
 import {TokenProps} from '../../types/tokens';
 import {StorageProviderType} from '../../types/api';
 import {postToFigma, notifyToUI} from '../../plugin/notifiers';

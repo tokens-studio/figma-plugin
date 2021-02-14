@@ -33,7 +33,7 @@ const Navbar = ({active, setActive}) => {
             </div>
             <div>
                 {storageType.provider !== StorageProviderType.LOCAL && (
-                    <Tooltip label={`Pull from ${storageType.provider}`}>
+                    <Tooltip variant="right" label={`Pull from ${storageType.provider}`}>
                         <button onClick={pullTokens} type="button" className="button button-ghost">
                             <Icon name="refresh" />
                         </button>

@@ -92,6 +92,7 @@ export async function createNewJSONBin({provider, secret, tokens, name, updatedA
         headers: {
             'Content-Type': 'application/json',
             'secret-key': secret,
+            versioning: 'false',
         },
     });
     const jsonBinData = await response.json();

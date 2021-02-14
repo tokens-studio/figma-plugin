@@ -12,7 +12,7 @@ import {MessageToPluginTypes} from '../../types/messages';
 import {compareUpdatedAt} from './utils';
 
 const Settings = () => {
-    const {tokenData, storageType, localApiState, api, apiProviders, updateAfterApply} = useTokenState();
+    const {tokenData, storageType, localApiState, apiProviders, updateAfterApply} = useTokenState();
     const {
         setLoading,
         setLocalApiState,
@@ -192,17 +192,17 @@ const Settings = () => {
                                         key={`${provider}-${id}`}
                                         className={`border text-left flex flex-row justify-between rounded p-2 ${
                                             isActive(provider, id)
-                                                ? 'border-blue-300'
-                                                : 'hover:bg-gray-100 border-gray-300'
+                                                ? 'bg-blue-100 bg-opacity-50 border-blue-400'
+                                                : 'hover:border-blue-300 border-gray-300'
                                         }`}
                                     >
                                         <div className="flex flex-col flex-grow">
                                             <div className="font-bold text-xs">{name}</div>
-                                            <div className="text-xxs text-gray-600">{id}</div>
+                                            <div className="text-xxs opacity-75">{id}</div>
                                             {!isActive(provider, id) && (
                                                 <button
                                                     type="button"
-                                                    className="underline text-red-600 text-xxs text-left"
+                                                    className="underline text-red-600 text-xxs text-left inline-flex"
                                                     onClick={() => deleteProvider({id, secret})}
                                                 >
                                                     Delete local credentials
