@@ -53,6 +53,7 @@ const TokenListing = ({
         path: '',
     });
     function setSingleTokenValue({parent, name, value, options, oldName}) {
+        console.log('setting single token val', parent, name, value, options, oldName);
         const obj = JSON5.parse(tokenData.tokens[parent].values);
         const newValue = options
             ? {
@@ -63,11 +64,14 @@ const TokenListing = ({
                   value,
               };
         objectPath.set(obj, name, newValue);
-        if (oldName === name) {
+        if (oldName === name || !oldName) {
             setStringTokens({parent, tokens: JSON.stringify(obj, null, 2)});
         } else {
             objectPath.del(obj, oldName);
-            setStringTokens({parent, tokens: JSON.stringify(obj, null, 2).replace(`$${oldName}`, `$${name}`)});
+            setStringTokens({
+                parent,
+                tokens: JSON.stringify(obj, null, 2).split(`$${oldName}`).join(`$${name}`),
+            });
         }
     }
 
@@ -92,13 +96,14 @@ const TokenListing = ({
     };
 
     const submitTokenValue = async ({value, name, path, options}) => {
+        console.log('setting token value', value, name, path, options, editToken);
         setEditToken({value, name, path});
         setSingleTokenValue({
             parent: activeToken,
             name: [path, name].join('.'),
             value,
             options,
-            oldName: [path, editToken.name].join('.'),
+            oldName: editToken.name ? [path, editToken.name].join('.') : null,
         });
         await setLoading(true);
         updateTokens();
