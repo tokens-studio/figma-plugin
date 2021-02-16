@@ -3,7 +3,7 @@ import Tooltip from './Tooltip';
 import MoreButton from './MoreButton';
 import {useTokenState, useTokenDispatch} from '../store/TokenContext';
 import Icon from './Icon';
-import {lightOrDark, colorByHashCode} from './utils';
+import {lightOrDark, colorByHashCode, isTypographyToken} from './utils';
 
 const TokenButton = ({type, property, name, path, token, editMode, showForm}) => {
     const {colorMode, displayType, selectionValues, tokenData, disabled} = useTokenState();
@@ -145,6 +145,21 @@ const TokenButton = ({type, property, name, path, token, editMode, showForm}) =>
         }
     };
 
+    const getTokenDisplay = (tokenVal) => {
+        console.log('checking token', tokenVal);
+        const valueToCheck = tokenVal.value ?? tokenVal;
+        if (isTypographyToken(valueToCheck)) {
+            console.log('is typo', tokenVal);
+            return `${valueToCheck.fontFamily} / ${valueToCheck.fontWeight}`;
+        }
+        if (typeof valueToCheck !== 'string' && typeof valueToCheck !== 'number') {
+            console.log('is object or arra', valueToCheck);
+            return JSON.stringify(valueToCheck, null, 2);
+        }
+
+        return valueToCheck;
+    };
+
     return (
         <div
             className={`relative mb-1 mr-1 flex button button-property ${buttonClass.join(' ')} ${
@@ -161,9 +176,7 @@ const TokenButton = ({type, property, name, path, token, editMode, showForm}) =>
                 path={path}
                 mode={editMode ? 'edit' : 'list'}
             >
-                <Tooltip
-                    label={`${name}: ${JSON.stringify(token, null, 2)}${realTokenValue ? `: ${realTokenValue}` : ''}`}
-                >
+                <Tooltip label={`${name}: ${getTokenDisplay(token)}`}>
                     <button
                         className="w-full h-full"
                         disabled={editMode ? false : disabled}
