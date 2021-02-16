@@ -8,7 +8,7 @@ import Modal from './Modal';
 const JSONEditor = () => {
     const {tokenData} = useTokenState();
     const {setStringTokens, setEmptyTokens, setDefaultTokens, updateTokens, setLoading} = useTokenDispatch();
-    const [activeToken] = React.useState('options');
+    const [activeToken, setActiveToken] = React.useState(Object.keys(tokenData.tokens)[0]);
     const [confirmModalVisible, showConfirmModal] = React.useState('');
 
     const handleUpdate = async () => {
@@ -26,8 +26,18 @@ const JSONEditor = () => {
         showConfirmModal('');
     };
 
+    React.useEffect(() => {
+        console.log('tokens', tokenData.tokens);
+        console.log('mergedTokens', tokenData.getMergedTokens());
+    }, [tokenData]);
+
     return (
         <div className="flex flex-col flex-grow">
+            {Object.entries(tokenData.tokens).map((i) => (
+                <button type="button" onClick={() => setActiveToken(i[0])}>
+                    {i[0]}
+                </button>
+            ))}
             <Modal isOpen={confirmModalVisible === 'reset'} close={() => showConfirmModal('')}>
                 <div className="flex justify-center flex-col text-center space-y-4">
                     <div className="space-y-2">

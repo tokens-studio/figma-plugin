@@ -5,7 +5,7 @@ import {useTokenState, useTokenDispatch} from '../store/TokenContext';
 const JSONToken = ({token}: {token: string}) => {
     const {tokenData} = useTokenState();
     const {setStringTokens} = useTokenDispatch();
-    const [activeToken] = React.useState('options');
+    const [activeToken] = React.useState('global');
     const regex = new RegExp(String.raw`${token}: {.*?},`, 's');
     const value = ` ${tokenData.tokens[activeToken].values}`.slice(1);
 

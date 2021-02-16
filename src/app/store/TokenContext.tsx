@@ -50,7 +50,7 @@ const defaultTokens: TokenProps = {
     version: pjs.version,
     updatedAt: new Date().toString(),
     values: {
-        options: JSON.stringify(defaultJSON, null, 2),
+        global: JSON.stringify(defaultJSON, null, 2),
     },
 };
 
@@ -58,7 +58,7 @@ const emptyTokens: TokenProps = {
     version: pjs.version,
     updatedAt: new Date().toString(),
     values: {
-        options: '{ }',
+        global: '{ }',
     },
 };
 

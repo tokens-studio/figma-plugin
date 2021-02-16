@@ -42,7 +42,7 @@ const TokenListing = ({
         setDisplayType,
     } = useTokenDispatch();
 
-    const [activeToken] = React.useState('options');
+    const [activeToken] = React.useState('global');
 
     const [showHelp, setShowHelp] = React.useState(false);
     const [isIntCollapsed, setIntCollapsed] = React.useState(false);
@@ -113,6 +113,12 @@ const TokenListing = ({
             setIntCollapsed(!isIntCollapsed);
         }
     };
+
+    React.useEffect(() => {
+        console.log('token listing', values);
+    }, [values]);
+
+    // if (!Object.entries(values[1]).length > 0) return null;
 
     return (
         <div className="border-b border-gray-200">

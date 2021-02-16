@@ -26,7 +26,7 @@ const mappedTokens = (tokens) => {
 
 const Tokens = () => {
     const {tokenData, updatePageOnly} = useTokenState();
-    const [activeToken] = React.useState('options');
+    const [activeToken] = React.useState('global');
     const {updateTokens, toggleUpdatePageOnly} = useTokenDispatch();
 
     const handleUpdate = async () => {
@@ -72,14 +72,15 @@ const Tokens = () => {
                             />
                         );
                     case 'colors':
+                    case 'color':
                         return (
                             <div key={tokenValues[0]}>
                                 <TokenListing
                                     showDisplayToggle
                                     createButton
                                     help="If a (local) style is found with the same name it will match to that, if not, will use hex value. Use 'Create Style' to batch-create styles from your tokens (e.g. in your design library). In the future we'll load all 'remote' styles and reference them inside the JSON."
-                                    label="Fill"
-                                    property="Fill"
+                                    label="Colors"
+                                    property="Colors"
                                     type="fill"
                                     values={tokenValues}
                                 />
@@ -148,6 +149,7 @@ const Tokens = () => {
                             </div>
                         );
                     case 'fontSizes':
+                    case 'fontSize':
                         return (
                             <div key={tokenValues[0]}>
                                 <TokenListing

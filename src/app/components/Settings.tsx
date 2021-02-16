@@ -61,6 +61,11 @@ const Settings = () => {
                 console.log(
                     'Remote is older, ask user if they want to overwrite their local progress or upload to remote.'
                 );
+                setTokenData(new TokenData(remoteTokens), remoteTokens.updatedAt);
+                if (updateAfterApply) {
+                    console.log('should update!', remoteTokens);
+                    updateTokens(false);
+                }
             } else {
                 setTokenData(new TokenData(remoteTokens), remoteTokens.updatedAt);
                 if (updateAfterApply) {
@@ -100,7 +105,10 @@ const Settings = () => {
                                 localApiState?.provider === StorageProviderType.LOCAL && 'border-blue-500 bg-blue-100'
                             }`}
                             type="button"
-                            onClick={() => setStorageType({provider: StorageProviderType.LOCAL}, true)}
+                            onClick={() => {
+                                setLocalApiState({provider: StorageProviderType.LOCAL});
+                                setStorageType({provider: StorageProviderType.LOCAL}, true);
+                            }}
                         >
                             Local
                         </button>
@@ -113,9 +121,18 @@ const Settings = () => {
                         >
                             JSONbin
                         </button>
+                        <button
+                            className={`font-bold focus:outline-none text-xs flex p-2 rounded border ${
+                                localApiState?.provider === StorageProviderType.ARCADE && 'border-blue-500 bg-blue-100'
+                            }`}
+                            type="button"
+                            onClick={() => setLocalApiState({...localApiState, provider: StorageProviderType.ARCADE})}
+                        >
+                            Arcade
+                        </button>
                     </div>
                 </div>
-                {localApiState?.provider === StorageProviderType.JSONBIN && (
+                {localApiState?.provider !== StorageProviderType.LOCAL && (
                     <div className="space-y-4">
                         <div className="text-xxs text-gray-600">
                             Create an account at{' '}
@@ -158,8 +175,8 @@ const Settings = () => {
                                 disabled={!localApiState.secret && !localApiState.name}
                                 onClick={() =>
                                     localApiState.id
-                                        ? handleSyncClick({provider: StorageProviderType.JSONBIN})
-                                        : handleCreateNewClick(StorageProviderType.JSONBIN)
+                                        ? handleSyncClick({provider: localApiState.provider})
+                                        : handleCreateNewClick(localApiState.provider)
                                 }
                             >
                                 Save

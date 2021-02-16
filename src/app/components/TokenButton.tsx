@@ -22,7 +22,7 @@ const TokenButton = ({type, property, name, path, token, editMode, showForm}) =>
     };
 
     const handleDeleteClick = () => {
-        deleteToken({parent: 'options', path, name});
+        deleteToken({parent: 'global', path, name});
     };
 
     function setPluginValue(value) {

@@ -4,6 +4,7 @@ import {postToFigma, notifyToUI} from '../../plugin/notifiers';
 import {StateType} from '../../types/state';
 import {MessageToPluginTypes} from '../../types/messages';
 import {createNewJSONBin, fetchDataFromJSONBin, updateJSONBinTokens} from './providers/jsonbin';
+import {createNewArcade, fetchDataFromArcade, updateArcadeTokens} from './providers/arcade';
 import TokenData from '../components/TokenData';
 import {useTokenDispatch, useTokenState} from './TokenContext';
 
@@ -52,12 +53,17 @@ export function useRemoteTokens() {
 
         setLoading(true);
 
-        notifyToUI('Fetching from remote...');
+        notifyToUI('Fetching from remote...', provider);
         let tokenValues;
 
         switch (provider) {
             case StorageProviderType.JSONBIN: {
                 tokenValues = await fetchDataFromJSONBin(id, secret, name);
+                notifyToUI('Updated!');
+                break;
+            }
+            case StorageProviderType.ARCADE: {
+                tokenValues = await fetchDataFromArcade(id, secret, name);
                 notifyToUI('Updated!');
                 break;
             }
@@ -102,6 +108,9 @@ export async function createNewBin({provider, secret, tokens, name, updatedAt, s
         case StorageProviderType.JSONBIN: {
             return createNewJSONBin({provider, secret, tokens, name, updatedAt, setApiData, setStorageType});
         }
+        case StorageProviderType.ARCADE: {
+            return createNewArcade({provider, secret, tokens, name, updatedAt, setApiData, setStorageType});
+        }
         default:
             throw new Error('Not implemented');
     }
@@ -111,6 +120,9 @@ export async function fetchDataFromRemote(id, secret, name, provider): Promise<T
     switch (provider) {
         case StorageProviderType.JSONBIN: {
             return fetchDataFromJSONBin(id, secret, name);
+        }
+        case StorageProviderType.ARCADE: {
+            return fetchDataFromArcade(id, secret, name);
         }
         default:
             throw new Error('Not implemented');
