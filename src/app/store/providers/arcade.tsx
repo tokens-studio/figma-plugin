@@ -1,9 +1,9 @@
-import * as pjs from '../../../../package.json';
+// import * as pjs from '../../../../package.json';
 import {notifyToUI, postToFigma} from '../../../plugin/notifiers';
 import {StorageProviderType} from '../../../types/api';
 import {MessageToPluginTypes} from '../../../types/messages';
 import {TokenProps} from '../../../types/tokens';
-import {compareUpdatedAt} from '../../components/utils';
+// import {compareUpdatedAt} from '../../components/utils';
 
 export async function readTokensFromArcade({secret, id}): Promise<TokenProps> | null {
     try {
@@ -33,6 +33,7 @@ export async function readTokensFromArcade({secret, id}): Promise<TokenProps> | 
 }
 
 export async function writeTokensToArcade({secret, id, tokenObj}): Promise<TokenProps> | null {
+    console.log({secret, id, tokenObj});
     // const response = await fetch(`https://api.jsonbin.io/b/${id}`, {
     //     method: 'PUT',
     //     mode: 'cors',
@@ -57,6 +58,7 @@ export async function writeTokensToArcade({secret, id, tokenObj}): Promise<Token
 }
 
 export async function updateArcadeTokens({tokens, id, secret, updatedAt, oldUpdatedAt = null}) {
+    console.log({tokens, id, secret, updatedAt, oldUpdatedAt});
     // const tokenObj = JSON.stringify(
     //     {
     //         version: pjs.version,
@@ -87,6 +89,7 @@ export async function updateArcadeTokens({tokens, id, secret, updatedAt, oldUpda
 }
 
 export async function createNewArcade({provider, secret, tokens, name, updatedAt, setApiData, setStorageType}) {
+    console.log({provider, secret, tokens, name, updatedAt, setApiData, setStorageType});
     // const response = await fetch(`https://api.jsonbin.io/b`, {
     //     method: 'POST',
     //     mode: 'cors',

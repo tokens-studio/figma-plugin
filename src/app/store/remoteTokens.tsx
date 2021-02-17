@@ -4,7 +4,7 @@ import {postToFigma, notifyToUI} from '../../plugin/notifiers';
 import {StateType} from '../../types/state';
 import {MessageToPluginTypes} from '../../types/messages';
 import {createNewJSONBin, fetchDataFromJSONBin, updateJSONBinTokens} from './providers/jsonbin';
-import {createNewArcade, fetchDataFromArcade, updateArcadeTokens} from './providers/arcade';
+import {createNewArcade, fetchDataFromArcade} from './providers/arcade';
 import TokenData from '../components/TokenData';
 import {useTokenDispatch, useTokenState} from './TokenContext';
 
