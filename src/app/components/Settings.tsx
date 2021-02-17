@@ -132,111 +132,115 @@ const Settings = () => {
                         </button>
                     </div>
                 </div>
-                {localApiState?.provider !== StorageProviderType.LOCAL && (
-                    <div className="space-y-4">
-                        <div className="text-xxs text-gray-600">
-                            Create an account at{' '}
-                            <a href="https://jsonbin.io/" target="_blank" rel="noreferrer" className="underline">
-                                JSONbin.io
-                            </a>
-                            , copy the Secret Key into the field, and click on save. If you or your team already have a
-                            version stored, add the secret and the corresponding ID.
-                        </div>
-                        <Input
-                            full
-                            label="Name"
-                            value={localApiState.name}
-                            onChange={handleChange}
-                            type="text"
-                            name="name"
-                            required
-                        />
-                        <div className="gap-2 flex justify-between items-end">
+                {[StorageProviderType.JSONBIN, StorageProviderType.ARCADE].includes(
+                    localApiState?.provider as StorageProviderType
+                ) && (
+                    <>
+                        <div className="space-y-4">
+                            <div className="text-xxs text-gray-600">
+                                Create an account at{' '}
+                                <a href="https://jsonbin.io/" target="_blank" rel="noreferrer" className="underline">
+                                    JSONbin.io
+                                </a>
+                                , copy the Secret Key into the field, and click on save. If you or your team already
+                                have a version stored, add the secret and the corresponding ID.
+                            </div>
                             <Input
                                 full
-                                label="Secret"
-                                value={localApiState.secret}
+                                label="Name"
+                                value={localApiState.name}
                                 onChange={handleChange}
                                 type="text"
-                                name="secret"
+                                name="name"
                                 required
                             />
-                            <Input
-                                full
-                                label="ID (optional)"
-                                value={localApiState.id}
-                                onChange={handleChange}
-                                type="text"
-                                name="id"
-                                required
-                            />
-                            <Button
-                                variant="primary"
-                                disabled={!localApiState.secret && !localApiState.name}
-                                onClick={() =>
-                                    localApiState.id
-                                        ? handleSyncClick({provider: localApiState.provider})
-                                        : handleCreateNewClick(localApiState.provider)
-                                }
-                            >
-                                Save
-                            </Button>
-                        </div>
-                    </div>
-                )}
-                {apiProviders.length > 0 && localApiState.provider !== StorageProviderType.LOCAL && (
-                    <div className="space-y-4">
-                        <div className="flex flex-row justify-between items-center">
-                            <Heading size="small">Stored providers for {localApiState.provider}</Heading>
-                            <div className="switch flex items-center">
-                                <input
-                                    className="switch__toggle"
-                                    type="checkbox"
-                                    id="updatemode"
-                                    checked={updateAfterApply}
-                                    onChange={() => toggleUpdateAfterApply(!updateAfterApply)}
+                            <div className="gap-2 flex justify-between items-end">
+                                <Input
+                                    full
+                                    label="Secret"
+                                    value={localApiState.secret}
+                                    onChange={handleChange}
+                                    type="text"
+                                    name="secret"
+                                    required
                                 />
-                                <label className="switch__label text-xs" htmlFor="updatemode">
-                                    Update on apply
-                                </label>
+                                <Input
+                                    full
+                                    label="ID (optional)"
+                                    value={localApiState.id}
+                                    onChange={handleChange}
+                                    type="text"
+                                    name="id"
+                                    required
+                                />
+                                <Button
+                                    variant="primary"
+                                    disabled={!localApiState.secret && !localApiState.name}
+                                    onClick={() =>
+                                        localApiState.id
+                                            ? handleSyncClick({provider: localApiState.provider})
+                                            : handleCreateNewClick(localApiState.provider)
+                                    }
+                                >
+                                    Save
+                                </Button>
                             </div>
                         </div>
-                        <div className="flex flex-col gap-2">
-                            {apiProviders
-                                .filter((item) => item.provider === localApiState.provider)
-                                .map(({provider, id, name, secret}) => (
-                                    <div
-                                        key={`${provider}-${id}`}
-                                        className={`border text-left flex flex-row justify-between rounded p-2 ${
-                                            isActive(provider, id)
-                                                ? 'bg-blue-100 bg-opacity-50 border-blue-400'
-                                                : 'hover:border-blue-300 border-gray-300'
-                                        }`}
-                                    >
-                                        <div className="flex flex-col flex-grow">
-                                            <div className="font-bold text-xs">{name}</div>
-                                            <div className="text-xxs opacity-75">{id}</div>
-                                            {!isActive(provider, id) && (
-                                                <button
-                                                    type="button"
-                                                    className="underline text-red-600 text-xxs text-left inline-flex"
-                                                    onClick={() => deleteProvider({id, secret})}
-                                                >
-                                                    Delete local credentials
-                                                </button>
-                                            )}
-                                        </div>
-                                        <Button
-                                            variant="secondary"
-                                            disabled={isActive(provider, id)}
-                                            onClick={() => restoreStoredProvider({provider, id, name, secret})}
-                                        >
-                                            Apply
-                                        </Button>
+                        {apiProviders.length > 0 && (
+                            <div className="space-y-4">
+                                <div className="flex flex-row justify-between items-center">
+                                    <Heading size="small">Stored providers for {localApiState.provider}</Heading>
+                                    <div className="switch flex items-center">
+                                        <input
+                                            className="switch__toggle"
+                                            type="checkbox"
+                                            id="updatemode"
+                                            checked={updateAfterApply}
+                                            onChange={() => toggleUpdateAfterApply(!updateAfterApply)}
+                                        />
+                                        <label className="switch__label text-xs" htmlFor="updatemode">
+                                            Update on apply
+                                        </label>
                                     </div>
-                                ))}
-                        </div>
-                    </div>
+                                </div>
+                                <div className="flex flex-col gap-2">
+                                    {apiProviders
+                                        .filter((item) => item.provider === localApiState.provider)
+                                        .map(({provider, id, name, secret}) => (
+                                            <div
+                                                key={`${provider}-${id}`}
+                                                className={`border text-left flex flex-row justify-between rounded p-2 ${
+                                                    isActive(provider, id)
+                                                        ? 'bg-blue-100 bg-opacity-50 border-blue-400'
+                                                        : 'hover:border-blue-300 border-gray-300'
+                                                }`}
+                                            >
+                                                <div className="flex flex-col flex-grow">
+                                                    <div className="font-bold text-xs">{name}</div>
+                                                    <div className="text-xxs opacity-75">{id}</div>
+                                                    {!isActive(provider, id) && (
+                                                        <button
+                                                            type="button"
+                                                            className="underline text-red-600 text-xxs text-left inline-flex"
+                                                            onClick={() => deleteProvider({id, secret})}
+                                                        >
+                                                            Delete local credentials
+                                                        </button>
+                                                    )}
+                                                </div>
+                                                <Button
+                                                    variant="secondary"
+                                                    disabled={isActive(provider, id)}
+                                                    onClick={() => restoreStoredProvider({provider, id, name, secret})}
+                                                >
+                                                    Apply
+                                                </Button>
+                                            </div>
+                                        ))}
+                                </div>
+                            </div>
+                        )}
+                    </>
                 )}
             </div>
         </div>
