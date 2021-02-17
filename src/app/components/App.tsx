@@ -10,6 +10,7 @@ import Icon from './Icon';
 import * as pjs from '../../../package.json';
 import {useTokenState, useTokenDispatch} from '../store/TokenContext';
 import TokenData from './TokenData';
+import Add from '../../icons/add.svg';
 
 const goToNodeId = (id) => {
     parent.postMessage(
@@ -94,6 +95,8 @@ const App = () => {
                     </div>
                 </div>
             )}
+            | Add
+            <Add />
             <div className="h-full flex flex-col">
                 <div className="flex-grow flex flex-col">
                     {active !== 'start' && <Navbar active={active} setActive={setActive} />}
