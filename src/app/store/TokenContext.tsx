@@ -44,13 +44,14 @@ export enum ActionType {
     SetStorageType = 'SET_STORAGE_TYPE',
     SetAPIProviders = 'SET_API_PROVIDERS',
     SetLocalApiState = 'SET_LOCAL_API_STATE',
+    SetActiveTokenSet = 'SET_ACTIVE_TOKEN_SET',
 }
 
 const defaultTokens: TokenProps = {
     version: pjs.version,
     updatedAt: new Date().toString(),
     values: {
-        global: JSON.stringify(defaultJSON, null, 2),
+        options: JSON.stringify(defaultJSON, null, 2),
     },
 };
 
@@ -58,11 +59,12 @@ const emptyTokens: TokenProps = {
     version: pjs.version,
     updatedAt: new Date().toString(),
     values: {
-        global: '{ }',
+        options: '{ }',
     },
 };
 
 const emptyState = {
+    activeTokenSet: 'options',
     tokens: defaultTokens,
     loading: true,
     disabled: false,
@@ -103,6 +105,7 @@ function stateReducer(state, action) {
         case ActionType.SetTokenData:
             return {
                 ...state,
+                activeTokenSet: Object.keys(action.data.tokens)[0],
                 tokenData: action.data,
             };
         case ActionType.SetTokensFromStyles:
@@ -252,6 +255,11 @@ function stateReducer(state, action) {
                 ...state,
                 updateAfterApply: action.bool,
             };
+        case ActionType.SetActiveTokenSet:
+            return {
+                ...state,
+                activeTokenSet: action.data,
+            };
         case ActionType.SetStorageType:
             if (action.bool) {
                 postToFigma({
@@ -355,6 +363,9 @@ function TokenProvider({children}) {
             },
             setAPIProviders: (data: ApiDataType[]) => {
                 dispatch({type: ActionType.SetAPIProviders, data});
+            },
+            setActiveTokenSet: (data: string) => {
+                dispatch({type: ActionType.SetActiveTokenSet, data});
             },
         }),
         [dispatch, updatedAt]

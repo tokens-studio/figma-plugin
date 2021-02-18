@@ -4,11 +4,11 @@ import Heading from './Heading';
 import {useTokenState, useTokenDispatch} from '../store/TokenContext';
 import Button from './Button';
 import Modal from './Modal';
+import ThemeSelector from './ThemeSelector';
 
 const JSONEditor = () => {
-    const {tokenData} = useTokenState();
+    const {tokenData, activeTokenSet} = useTokenState();
     const {setStringTokens, setEmptyTokens, setDefaultTokens, updateTokens, setLoading} = useTokenDispatch();
-    const [activeToken, setActiveToken] = React.useState(Object.keys(tokenData.tokens)[0]);
     const [confirmModalVisible, showConfirmModal] = React.useState('');
 
     const handleUpdate = async () => {
@@ -33,11 +33,7 @@ const JSONEditor = () => {
 
     return (
         <div className="flex flex-col flex-grow">
-            {Object.entries(tokenData.tokens).map((i) => (
-                <button type="button" onClick={() => setActiveToken(i[0])}>
-                    {i[0]}
-                </button>
-            ))}
+            <ThemeSelector />
             <Modal isOpen={confirmModalVisible === 'reset'} close={() => showConfirmModal('')}>
                 <div className="flex justify-center flex-col text-center space-y-4">
                     <div className="space-y-2">
@@ -77,14 +73,14 @@ const JSONEditor = () => {
                 </div>
             </Modal>
             <div className="flex flex-col justify-between items-center flex-grow">
-                <div className="flex flex-col p-4 w-full items-center flex-grow">
+                <div className="flex flex-col p-4 pt-2 w-full items-center flex-grow">
                     <Textarea
                         className="flex-grow"
                         placeholder="Enter JSON"
                         rows={23}
-                        hasErrored={tokenData.tokens[activeToken].hasErrored}
-                        onChange={(val) => setStringTokens({parent: activeToken, tokens: val})}
-                        value={tokenData.tokens[activeToken].values}
+                        hasErrored={tokenData.tokens[activeTokenSet].hasErrored}
+                        onChange={(val) => setStringTokens({parent: activeTokenSet, tokens: val})}
+                        value={tokenData.tokens[activeTokenSet].values}
                     />
                 </div>
             </div>

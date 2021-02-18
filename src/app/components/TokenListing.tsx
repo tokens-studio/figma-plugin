@@ -30,7 +30,7 @@ const TokenListing = ({
     type?: string;
     values?: string | object;
 }) => {
-    const {collapsed, showEditForm, showOptions, tokenData, displayType} = useTokenState();
+    const {collapsed, showEditForm, showOptions, tokenData, displayType, activeTokenSet} = useTokenState();
     const {
         setStringTokens,
         setCollapsed,
@@ -41,8 +41,6 @@ const TokenListing = ({
         setShowOptions,
         setDisplayType,
     } = useTokenDispatch();
-
-    const [activeToken] = React.useState('global');
 
     const [showHelp, setShowHelp] = React.useState(false);
     const [isIntCollapsed, setIntCollapsed] = React.useState(false);
@@ -86,7 +84,7 @@ const TokenListing = ({
     const submitTokenValue = async ({token, name, path, options}) => {
         setEditToken({token, name, path});
         setSingleTokenValue({
-            parent: activeToken,
+            parent: activeTokenSet,
             name: [path, name].join('.'),
             token,
             options,

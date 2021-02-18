@@ -4,6 +4,7 @@ import JSON5 from 'json5';
 import {useTokenDispatch, useTokenState} from '../store/TokenContext';
 import TokenListing from './TokenListing';
 import Button from './Button';
+import ThemeSelector from './ThemeSelector';
 
 const mappedTokens = (tokens) => {
     const properties = {
@@ -25,19 +26,19 @@ const mappedTokens = (tokens) => {
 };
 
 const Tokens = () => {
-    const {tokenData, updatePageOnly} = useTokenState();
-    const [activeToken] = React.useState('global');
+    const {tokenData, updatePageOnly, activeTokenSet} = useTokenState();
     const {updateTokens, toggleUpdatePageOnly} = useTokenDispatch();
 
     const handleUpdate = async () => {
         updateTokens();
     };
 
-    if (tokenData.tokens[activeToken].hasErrored) return <div>JSON malformed, check in Editor</div>;
+    if (tokenData.tokens[activeTokenSet].hasErrored) return <div>JSON malformed, check in Editor</div>;
 
     return (
         <div>
-            {mappedTokens(JSON5.parse(tokenData.tokens[activeToken].values)).map((tokenValues) => {
+            <ThemeSelector />
+            {mappedTokens(JSON5.parse(tokenData.tokens[activeTokenSet].values)).map((tokenValues) => {
                 switch (tokenValues[0]) {
                     case 'borderRadius':
                         return (
