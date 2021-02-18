@@ -30,16 +30,19 @@ interface ColorToken {
 
 const updateColorStyles = (colorTokens, shouldCreate = false) => {
     const cols = dot.dot(colorTokens);
-    console.log('cols are', cols);
+    console.log('cols are', colorTokens);
     const paints = figma.getLocalPaintStyles();
     Object.entries(cols).map(([key, token]: [string, ColorToken]) => {
         const splitKey = key.split('/');
+        // not working for color styles with description and value
         if (splitKey[splitKey.length - 1] === 'value') splitKey.pop();
         const styleKey = splitKey.join('/');
 
         const value = isSingleToken(token) ? token.value : token;
-        if (paints.length < 1) return;
-        const matchingStyle = paints.filter((n) => n.name === styleKey);
+        let matchingStyle = [];
+        if (paints.length > 0) {
+            matchingStyle = paints.filter((n) => n.name === styleKey);
+        }
         if (typeof value === 'string') {
             const {color, opacity} = convertToFigmaColor(value);
             if (matchingStyle.length) {

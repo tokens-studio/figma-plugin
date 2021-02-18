@@ -202,15 +202,12 @@ export default class TokenData {
 
     getAliasValue(token: SingleToken, tokens = this.mergedTokens): string | null {
         if (this.checkIfAlias(token)) {
-            console.log('getting alias value', token);
             let returnedValue = this.checkIfValueToken(token) ? (token.value as string) : (token as string);
-            console.log('returned value', returnedValue);
             const tokenRegex = /(\$[^\s,]+)/g;
             const tokenReferences = returnedValue.toString().match(tokenRegex);
             if (tokenReferences.length > 0) {
                 const resolvedReferences = tokenReferences.map((ref) => objectPath.get(tokens, ref.substring(1)));
                 tokenReferences.forEach((reference, index) => {
-                    console.log('aliased value', resolvedReferences[index]);
                     returnedValue = returnedValue.replace(
                         reference,
                         resolvedReferences[index].value ?? resolvedReferences[index]

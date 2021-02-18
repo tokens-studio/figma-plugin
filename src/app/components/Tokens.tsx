@@ -83,9 +83,7 @@ const Tokens = () => {
                                     property="Colors"
                                     type="fill"
                                     schema={{
-                                        value: {
-                                            value: 'color',
-                                        },
+                                        value: 'color',
                                         options: {
                                             description: '',
                                         },

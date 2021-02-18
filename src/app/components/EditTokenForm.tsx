@@ -76,7 +76,7 @@ const EditTokenForm = ({
                     type="text"
                     name="name"
                 />
-                {schema ? (
+                {typeof schema === 'object' ? (
                     Object.entries(schema).map(([key, schemaValue]: [string, string]) => (
                         <Input
                             key={key}

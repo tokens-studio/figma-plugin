@@ -11,14 +11,11 @@ export function mapValuesToTokens(object, values) {
         const resolvedValue = objectPath.get(object, token);
         const value = isSingleToken(resolvedValue) ? resolvedValue.value : resolvedValue;
 
-        console.log('value is', resolvedValue, value);
-
         return {
             [key]: value,
         };
     });
     array.map((item) => ({[item.key]: item.value}));
-    console.log('array is', array);
     return Object.assign({}, ...array);
 }
 
