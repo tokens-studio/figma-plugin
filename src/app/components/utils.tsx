@@ -40,8 +40,8 @@ export function isTypographyToken(token) {
     return 'fontFamily' in token || 'fontWeight' in token || 'fontSize' in token || 'lineHeight' in token;
 }
 
-export function isSingleToken(token) {
-    return 'value' in token;
+export function isSingleToken(token): token is {value: string} {
+    return typeof token === 'object' && 'value' in token;
 }
 
 export function convertToRgb(color: string) {

@@ -13,10 +13,6 @@ const EditTokenForm = ({submitTokenValue, explainer = '', property, isPristine, 
     const [tokenValue, setTokenValue] = React.useState(defaultValue);
     const {setShowEditForm} = useTokenDispatch();
 
-    React.useEffect(() => {
-        console.log('showing edit form', tokenValue, initialValue);
-    });
-
     const handleChange = (e) => {
         e.persist();
         setTokenValue((prevState) => ({...prevState, [e.target.name]: e.target.value}));

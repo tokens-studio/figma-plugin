@@ -8,7 +8,6 @@ import {lightOrDark, colorByHashCode, isTypographyToken} from './utils';
 const TokenButton = ({type, property, name, path, token, editMode, showForm}) => {
     const {colorMode, displayType, selectionValues, tokenData, disabled} = useTokenState();
     const {setNodeData, setShowOptions, setLoading, deleteToken} = useTokenDispatch();
-    const realTokenValue = tokenData.getAliasValue(token);
     const displayValue = tokenData.getTokenValue(token);
     let style;
     let showValue = true;
@@ -146,7 +145,6 @@ const TokenButton = ({type, property, name, path, token, editMode, showForm}) =>
     };
 
     const getTokenDisplay = (tokenVal) => {
-        console.log('checking token', tokenVal);
         const valueToCheck = tokenVal.value ?? tokenVal;
         if (isTypographyToken(valueToCheck)) {
             console.log('is typo', tokenVal);

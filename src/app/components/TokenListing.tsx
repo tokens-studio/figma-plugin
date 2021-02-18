@@ -63,8 +63,9 @@ const TokenListing = ({
             : {
                   value,
               };
-        objectPath.set(obj, name, newValue);
-        if (oldName === name || !oldName) {
+        const newName = name.toString();
+        objectPath.set(obj, newName, newValue);
+        if (oldName === newName || !oldName) {
             setStringTokens({parent, tokens: JSON.stringify(obj, null, 2)});
         } else {
             objectPath.del(obj, oldName);

@@ -1,7 +1,7 @@
 /* eslint-disable no-param-reassign */
 import {figmaRGBToHex} from '@figma-plugin/helpers';
 import Dot from 'dot-object';
-import {slugify} from '../app/components/utils';
+import {isSingleToken, slugify} from '../app/components/utils';
 import {
     convertFigmaToLetterSpacing,
     convertFigmaToLineHeight,
@@ -23,8 +23,9 @@ interface TextStyle {
 const updateColorStyles = (colorTokens, shouldCreate = false) => {
     const cols = dot.dot(colorTokens);
     const paints = figma.getLocalPaintStyles();
-    Object.entries(cols).map(([key, value]) => {
+    Object.entries(cols).map(([key, token]) => {
         const matchingStyle = paints.filter((n) => n.name === key);
+        const value = isSingleToken(token) ? token.value : token;
         if (typeof value === 'string') {
             const {color, opacity} = convertToFigmaColor(value);
             if (matchingStyle.length) {
@@ -66,27 +67,41 @@ export const setTextValuesOnTarget = async (target, values) => {
 };
 
 const updateTextStyles = (textTokens, shouldCreate = false) => {
+    const tokenBase = Object.entries(textTokens).map((token) => {});
+    console.log('textTokens', textTokens);
     const cols = dot.dot(textTokens);
+    console.log('cols', cols);
     // Iterate over textTokens to create objects that match figma styles
     // e.g. H1/Bold ...
-    const tokenObj = Object.entries(cols).reduce((acc, [key, val]) => {
+    const tokenObj = Object.entries(cols).reduce((acc, [key, token]) => {
         // Split token object by `/`
+        console.log('Key is', key, token);
         let parrentKey: string | string[] = key.split('/');
+        console.log('Parrent is', parrentKey, token);
+        const value = isSingleToken(token) ? token.value : token;
+        console.log('val is', value, token);
 
         // Store current key for future reference, e.g. fontFamily, lineHeight and remove it from key
         const curKey = parrentKey.pop();
+        console.log('curKey is', curKey, token);
 
         // Merge object again, now that we have the parent reference
         parrentKey = parrentKey.join('/');
+        console.log('new parrentKey is', parrentKey, token);
+
         acc[parrentKey] = acc[parrentKey] || {};
-        Object.assign(acc[parrentKey], {[curKey]: val});
+        Object.assign(acc[parrentKey], {[curKey]: value});
+        console.log('acc is', acc);
         return acc;
     }, {});
 
     const textStyles = figma.getLocalTextStyles();
 
-    Object.entries(tokenObj).map(([key, value]: [string, TextStyle]): void => {
+    console.log('token obj', tokenObj);
+    Object.entries(tokenObj).map(([key, token]: [string, TextStyle]): void => {
         const matchingStyle = textStyles.filter((n) => n.name === key);
+        const value = isSingleToken(token) ? token.value : token;
+        console.log('setting typography style to', value, token);
 
         if (matchingStyle.length) {
             setTextValuesOnTarget(matchingStyle[0], value);
@@ -100,6 +115,7 @@ const updateTextStyles = (textTokens, shouldCreate = false) => {
 
 export function updateStyles(tokens, shouldCreate = false): void {
     if (!tokens.colors && !tokens.typography) return;
+    console.log('tokens are', tokens);
     if (tokens.colors) {
         updateColorStyles(tokens.colors, shouldCreate);
     }
