@@ -3,10 +3,28 @@ import {useTokenDispatch} from '../store/TokenContext';
 import Input from './Input';
 import Modal from './Modal';
 
-const EditTokenForm = ({submitTokenValue, explainer = '', property, isPristine, initialValue, initialName, path}) => {
+const EditTokenForm = ({
+    submitTokenValue,
+    explainer = '',
+    property,
+    isPristine,
+    initialValue,
+    initialName,
+    path,
+    schema,
+    optionsSchema,
+}) => {
     const title = isPristine ? `New Token in ${path}` : `${path}.${initialName}`;
+
+    React.useEffect(() => {
+        console.log('Initialvalue is', initialValue);
+    }, [initialValue]);
+
     const defaultValue = {
         value: initialValue.value ?? initialValue,
+        options: {
+            description: initialValue.description,
+        },
         name: initialName,
         path,
     };
@@ -23,8 +41,17 @@ const EditTokenForm = ({submitTokenValue, explainer = '', property, isPristine, 
         setTokenValue((prevState) => ({...prevState, value: {...prevState.value, [e.target.name]: e.target.value}}));
     };
 
+    const handleOptionsChange = (e) => {
+        e.persist();
+        setTokenValue((prevState) => ({
+            ...prevState,
+            options: {...prevState.options, [e.target.name]: e.target.value},
+        }));
+    };
+
     const handleSubmit = (e) => {
         e.preventDefault();
+        console.log('submitting', tokenValue);
         submitTokenValue(tokenValue);
         setShowEditForm(false);
     };
@@ -32,6 +59,10 @@ const EditTokenForm = ({submitTokenValue, explainer = '', property, isPristine, 
     const handleReset = () => {
         setShowEditForm(false);
     };
+
+    React.useEffect(() => {
+        console.log('token val in edit is', tokenValue, schema, optionsSchema);
+    }, [schema, tokenValue, optionsSchema]);
 
     return (
         <Modal isOpen close={handleReset} title={title}>
@@ -45,16 +76,17 @@ const EditTokenForm = ({submitTokenValue, explainer = '', property, isPristine, 
                     type="text"
                     name="name"
                 />
-                {typeof tokenValue.value === 'object' ? (
-                    Object.entries(tokenValue.value).map(([key, value]) => (
+                {schema ? (
+                    Object.entries(schema).map(([key, schemaValue]: [string, string]) => (
                         <Input
                             key={key}
                             full
                             label={key}
-                            value={value}
+                            value={tokenValue.value ? tokenValue.value[key] : tokenValue[key]}
                             onChange={handleObjectChange}
                             type="text"
                             name={key}
+                            custom={schemaValue}
                             required
                         />
                     ))
@@ -69,6 +101,21 @@ const EditTokenForm = ({submitTokenValue, explainer = '', property, isPristine, 
                         required
                     />
                 )}
+
+                {optionsSchema
+                    ? Object.entries(optionsSchema).map(([key, schemaValue]: [string, string]) => (
+                          <Input
+                              key={key}
+                              full
+                              label={key}
+                              value={tokenValue.options[key]}
+                              onChange={handleOptionsChange}
+                              type="text"
+                              name={key}
+                              custom={schemaValue}
+                          />
+                      ))
+                    : null}
 
                 {explainer && <div className="mt-1 text-xxs text-gray-600">{explainer}</div>}
                 <div className="flex space-x-2 justify-end">

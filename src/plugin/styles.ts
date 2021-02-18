@@ -13,19 +13,33 @@ import {notifyStyleValues} from './notifiers';
 
 const dot = new Dot('/');
 
-interface TextStyle {
-    familyName: string;
-    fontWeight: string;
-    fontSize: number;
-    lineHeight: string | number;
+interface TypographyToken {
+    value: {
+        familyName: string;
+        fontWeight: string;
+        fontSize: number;
+        lineHeight: string | number;
+    };
+    description?: string;
+}
+
+interface ColorToken {
+    value: string;
+    description?: string;
 }
 
 const updateColorStyles = (colorTokens, shouldCreate = false) => {
     const cols = dot.dot(colorTokens);
+    console.log('cols are', cols);
     const paints = figma.getLocalPaintStyles();
-    Object.entries(cols).map(([key, token]) => {
-        const matchingStyle = paints.filter((n) => n.name === key);
+    Object.entries(cols).map(([key, token]: [string, ColorToken]) => {
+        const splitKey = key.split('/');
+        if (splitKey[splitKey.length - 1] === 'value') splitKey.pop();
+        const styleKey = splitKey.join('/');
+
         const value = isSingleToken(token) ? token.value : token;
+        if (paints.length < 1) return;
+        const matchingStyle = paints.filter((n) => n.name === styleKey);
         if (typeof value === 'string') {
             const {color, opacity} = convertToFigmaColor(value);
             if (matchingStyle.length) {
@@ -33,14 +47,18 @@ const updateColorStyles = (colorTokens, shouldCreate = false) => {
             } else if (shouldCreate) {
                 const newStyle = figma.createPaintStyle();
                 newStyle.paints = [{color, opacity, type: 'SOLID'}];
-                newStyle.name = key;
+                newStyle.name = styleKey;
+                if (token.description) {
+                    newStyle.description = token.description;
+                }
             }
         }
     });
+    console.log('done with colors', cols);
 };
 
 export const setTextValuesOnTarget = async (target, values) => {
-    const {fontFamily, fontWeight, fontSize, lineHeight, letterSpacing, paragraphSpacing} = values;
+    const {fontFamily, fontWeight, fontSize, lineHeight, letterSpacing, paragraphSpacing, description} = values;
     const family = fontFamily || target.fontName.family;
     const style = fontWeight || target.fontName.style;
     await figma.loadFontAsync({family, style});
@@ -64,44 +82,38 @@ export const setTextValuesOnTarget = async (target, values) => {
     if (paragraphSpacing) {
         target.paragraphSpacing = Number(paragraphSpacing);
     }
+    if (description) {
+        target.description = description;
+    }
 };
 
 const updateTextStyles = (textTokens, shouldCreate = false) => {
-    const tokenBase = Object.entries(textTokens).map((token) => {});
-    console.log('textTokens', textTokens);
     const cols = dot.dot(textTokens);
-    console.log('cols', cols);
     // Iterate over textTokens to create objects that match figma styles
     // e.g. H1/Bold ...
     const tokenObj = Object.entries(cols).reduce((acc, [key, token]) => {
         // Split token object by `/`
-        console.log('Key is', key, token);
         let parrentKey: string | string[] = key.split('/');
-        console.log('Parrent is', parrentKey, token);
         const value = isSingleToken(token) ? token.value : token;
-        console.log('val is', value, token);
 
         // Store current key for future reference, e.g. fontFamily, lineHeight and remove it from key
         const curKey = parrentKey.pop();
-        console.log('curKey is', curKey, token);
+        if (parrentKey[parrentKey.length - 1] === 'value') parrentKey.pop();
 
         // Merge object again, now that we have the parent reference
         parrentKey = parrentKey.join('/');
-        console.log('new parrentKey is', parrentKey, token);
 
         acc[parrentKey] = acc[parrentKey] || {};
         Object.assign(acc[parrentKey], {[curKey]: value});
-        console.log('acc is', acc);
         return acc;
     }, {});
 
     const textStyles = figma.getLocalTextStyles();
 
-    console.log('token obj', tokenObj);
-    Object.entries(tokenObj).map(([key, token]: [string, TextStyle]): void => {
+    console.log('tokenObj is', tokenObj);
+
+    Object.entries(tokenObj).map(([key, value]: [string, TypographyToken]) => {
         const matchingStyle = textStyles.filter((n) => n.name === key);
-        const value = isSingleToken(token) ? token.value : token;
-        console.log('setting typography style to', value, token);
 
         if (matchingStyle.length) {
             setTextValuesOnTarget(matchingStyle[0], value);
@@ -111,6 +123,8 @@ const updateTextStyles = (textTokens, shouldCreate = false) => {
             setTextValuesOnTarget(style, value);
         }
     });
+
+    console.log('done with type', tokenObj);
 };
 
 export function updateStyles(tokens, shouldCreate = false): void {
@@ -122,6 +136,7 @@ export function updateStyles(tokens, shouldCreate = false): void {
     if (tokens.typography) {
         updateTextStyles(tokens.typography, shouldCreate);
     }
+    console.log('end of tokenupdate');
 }
 
 export function pullStyles(styleTypes): void {
@@ -142,7 +157,9 @@ export function pullStyles(styleTypes): void {
                 if (paint.type === 'SOLID') {
                     const {r, g, b} = paint.color;
                     const a = paint.opacity;
-                    return [style.name, figmaRGBToHex({r, g, b, a})];
+                    const options = {description: 'foobydoo'};
+                    console.log('options are', options);
+                    return [style.name, {value: figmaRGBToHex({r, g, b, a}), options}];
                 }
                 return null;
             });
@@ -209,7 +226,11 @@ export function pullStyles(styleTypes): void {
                     paragraphSpacing.find((el: number[]) => el[1] === style.paragraphSpacing)[0]
                 }`,
             };
-            return [style.name, obj];
+            const description = style.description ?? null;
+
+            console.log('style descr', description, style);
+
+            return [style.name, {value: obj, description}];
         });
     }
     notifyStyleValues({

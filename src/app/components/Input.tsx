@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-const Input = ({name, required = false, tabindex = null, label, full, onChange, value, type}) => (
+const Input = ({name, required = false, tabindex = null, label, full, onChange, value, type, custom = ''}) => (
     <label htmlFor={name} className="text-xxs font-medium block">
         <div>{label}</div>
         <input
@@ -11,6 +11,7 @@ const Input = ({name, required = false, tabindex = null, label, full, onChange, 
             name={name}
             onChange={onChange}
             required={required}
+            data-custom={custom}
         />
     </label>
 );

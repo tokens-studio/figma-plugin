@@ -68,6 +68,7 @@ const TokenStateContext = React.createContext(emptyState);
 const TokenDispatchContext = React.createContext(null);
 
 function updateTokens(state: any) {
+    console.log('tokendata', state.tokenData);
     parent.postMessage(
         {
             pluginMessage: {

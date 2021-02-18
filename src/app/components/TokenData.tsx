@@ -133,10 +133,13 @@ export default class TokenData {
 
         const assigned = mergeDeep({}, ...reducedTokens);
 
+        console.log('assigned', assigned);
+
         return assigned;
     }
 
     getMergedTokens(): TokenGroup {
+        console.log('Merged tokens are', this.mergedTokens);
         return this.mergedTokens;
     }
 
@@ -186,24 +189,28 @@ export default class TokenData {
         }, []);
     }
 
-    setAllAliases(): void {
-        const aliases = this.findAllAliases({arr: Object.entries(this.mergedTokens)});
+    setAllAliases(aliasArray = Object.entries(this.mergedTokens)): void {
+        const aliases = this.findAllAliases({arr: aliasArray});
 
         if (aliases.length > 0) {
             aliases.forEach((alias) => {
                 this.setResolvedAlias(this.mergedTokens, alias[0], this.getAliasValue(alias[1], this.mergedTokens));
             });
+            this.setAllAliases();
         }
     }
 
     getAliasValue(token: SingleToken, tokens = this.mergedTokens): string | null {
         if (this.checkIfAlias(token)) {
+            console.log('getting alias value', token);
             let returnedValue = this.checkIfValueToken(token) ? (token.value as string) : (token as string);
+            console.log('returned value', returnedValue);
             const tokenRegex = /(\$[^\s,]+)/g;
             const tokenReferences = returnedValue.toString().match(tokenRegex);
             if (tokenReferences.length > 0) {
                 const resolvedReferences = tokenReferences.map((ref) => objectPath.get(tokens, ref.substring(1)));
                 tokenReferences.forEach((reference, index) => {
+                    console.log('aliased value', resolvedReferences[index]);
                     returnedValue = returnedValue.replace(
                         reference,
                         resolvedReferences[index].value ?? resolvedReferences[index]

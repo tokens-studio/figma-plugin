@@ -57,8 +57,9 @@ figma.ui.onmessage = async (msg) => {
             }
             return;
         case 'update': {
+            console.log('Tokens', msg.tokens);
+            console.log('TokenValues', msg.tokenValues);
             const allWithData = findAllWithData({pageOnly: msg.updatePageOnly});
-            console.log('tokens', msg.tokens, msg.tokenValues);
             setTokenData(msg.tokenValues);
             updateStyles(msg.tokens, false);
             updateNodes(allWithData, msg.tokens);

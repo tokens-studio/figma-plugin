@@ -147,11 +147,9 @@ const TokenButton = ({type, property, name, path, token, editMode, showForm}) =>
     const getTokenDisplay = (tokenVal) => {
         const valueToCheck = tokenVal.value ?? tokenVal;
         if (isTypographyToken(valueToCheck)) {
-            console.log('is typo', tokenVal);
             return `${valueToCheck.fontFamily} / ${valueToCheck.fontWeight}`;
         }
         if (typeof valueToCheck !== 'string' && typeof valueToCheck !== 'number') {
-            console.log('is object or arra', valueToCheck);
             return JSON.stringify(valueToCheck, null, 2);
         }
 

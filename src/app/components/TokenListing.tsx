@@ -21,7 +21,10 @@ const TokenListing = ({
     values,
 }: {
     label: string;
-    schema?: object;
+    schema?: {
+        value: object | string;
+        options: object | string;
+    };
     explainer?: string;
     help?: string;
     createButton?: boolean;
@@ -55,6 +58,7 @@ const TokenListing = ({
     function setSingleTokenValue({parent, name, value, options, oldName}) {
         console.log('setting single token val', parent, name, value, options, oldName);
         const obj = JSON5.parse(tokenData.tokens[parent].values);
+        console.log('setting value', name, value, options);
         const newValue = options
             ? {
                   value,
@@ -97,7 +101,7 @@ const TokenListing = ({
     };
 
     const submitTokenValue = async ({value, name, path, options}) => {
-        console.log('setting token value', value, name, path, options, editToken);
+        console.log('setting token value', name, value, options);
         setEditToken({value, name, path});
         setSingleTokenValue({
             parent: activeToken,
@@ -208,6 +212,8 @@ const TokenListing = ({
                                     property={property}
                                     isPristine={editToken.name === ''}
                                     initialValue={editToken.value}
+                                    schema={schema?.value}
+                                    optionsSchema={schema?.options}
                                 />
                             )}
 
