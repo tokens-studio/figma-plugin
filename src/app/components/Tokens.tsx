@@ -79,9 +79,15 @@ const Tokens = () => {
                                     showDisplayToggle
                                     createButton
                                     help="If a (local) style is found with the same name it will match to that, if not, will use hex value. Use 'Create Style' to batch-create styles from your tokens (e.g. in your design library). In the future we'll load all 'remote' styles and reference them inside the JSON."
-                                    label="Fill"
-                                    property="Fill"
+                                    label="Colors"
+                                    property="Color"
                                     type="fill"
+                                    schema={{
+                                        value: 'color',
+                                        options: {
+                                            description: '',
+                                        },
+                                    }}
                                     values={tokenValues}
                                 />
                             </div>
@@ -107,7 +113,17 @@ const Tokens = () => {
                                     label="Typography"
                                     property="Typography"
                                     type="typography"
-                                    schema={{fontFamily: '', fontWeight: '', lineHeight: '', fontSize: ''}}
+                                    schema={{
+                                        value: {
+                                            fontFamily: '',
+                                            fontWeight: '',
+                                            lineHeight: '',
+                                            fontSize: '',
+                                        },
+                                        options: {
+                                            description: '',
+                                        },
+                                    }}
                                     values={tokenValues}
                                 />
                             </div>

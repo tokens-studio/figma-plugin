@@ -1,7 +1,7 @@
 /* eslint-disable no-param-reassign */
 import {figmaRGBToHex} from '@figma-plugin/helpers';
 import Dot from 'dot-object';
-import {slugify} from '../app/components/utils';
+import {isSingleToken, slugify} from '../app/components/utils';
 import {
     convertFigmaToLetterSpacing,
     convertFigmaToLineHeight,
@@ -13,33 +13,25 @@ import {notifyStyleValues} from './notifiers';
 
 const dot = new Dot('/');
 
-interface TextStyle {
-    familyName: string;
-    fontWeight: string;
-    fontSize: number;
-    lineHeight: string | number;
+interface TypographyToken {
+    value: {
+        fontFamily?: string;
+        fontWeight?: string;
+        fontSize?: string;
+        lineHeight?: string | number;
+        letterSpacing?: string;
+        paragraphSpacing?: string;
+    };
+    description?: string;
 }
 
-const updateColorStyles = (colorTokens, shouldCreate = false) => {
-    const cols = dot.dot(colorTokens);
-    const paints = figma.getLocalPaintStyles();
-    Object.entries(cols).map(([key, value]) => {
-        const matchingStyle = paints.filter((n) => n.name === key);
-        if (typeof value === 'string') {
-            const {color, opacity} = convertToFigmaColor(value);
-            if (matchingStyle.length) {
-                matchingStyle[0].paints = [{color, opacity, type: 'SOLID'}];
-            } else if (shouldCreate) {
-                const newStyle = figma.createPaintStyle();
-                newStyle.paints = [{color, opacity, type: 'SOLID'}];
-                newStyle.name = key;
-            }
-        }
-    });
-};
+interface ColorToken {
+    value: string;
+    description?: string;
+}
 
-export const setTextValuesOnTarget = async (target, values) => {
-    const {fontFamily, fontWeight, fontSize, lineHeight, letterSpacing, paragraphSpacing} = values;
+export const setTextValuesOnTarget = async (target, token) => {
+    const {fontFamily, fontWeight, fontSize, lineHeight, letterSpacing, paragraphSpacing, description} = token;
     const family = fontFamily || target.fontName.family;
     const style = fontWeight || target.fontName.style;
     await figma.loadFontAsync({family, style});
@@ -63,33 +55,89 @@ export const setTextValuesOnTarget = async (target, values) => {
     if (paragraphSpacing) {
         target.paragraphSpacing = Number(paragraphSpacing);
     }
+    if (description) {
+        target.description = description;
+    }
+};
+
+const setColorValuesOnTarget = (target, token) => {
+    const {description, value} = token;
+    const {color, opacity} = convertToFigmaColor(value);
+
+    target.paints = [{color, opacity, type: 'SOLID'}];
+    if (description) {
+        target.description = description;
+    }
+};
+
+const tokenProps = ['description', 'value'];
+const typographyProps = ['fontSize', 'lineHeight', 'fontFamily', 'fontWeight', 'letterSpacing', 'paragraphSpacing'];
+
+const createTokenObj = (dotTokens) => {
+    // dotToken is e.g. as "H1/Regular/value/fontFamilies
+    return Object.entries(dotTokens).reduce((acc, [key, token]) => {
+        // Split token object by `/`
+        const splitParent: string | string[] = key.split('/');
+        // parentKey is now ["H1", "Regular", "fontFamilies"]
+        const value = isSingleToken(token) ? token.value : token;
+
+        // Store current key for future reference, e.g. fontFamily, lineHeight and remove it from key
+        let curKey = splitParent[splitParent.length - 1];
+        if (typographyProps.includes(curKey)) curKey = splitParent.pop();
+        if (tokenProps.includes(splitParent[splitParent.length - 1])) splitParent.pop();
+
+        // Merge object again, now that we have the parent reference
+        const newParentKey = splitParent.join('/');
+
+        // Set key to 'value' if parent and key match
+        let objToSet = {
+            [curKey]: value,
+        };
+        if (splitParent[splitParent.length - 1] === curKey) {
+            objToSet = {value};
+        }
+
+        acc[newParentKey] = acc[newParentKey] || {};
+        Object.assign(acc[newParentKey], objToSet);
+        return acc;
+    }, {});
+};
+
+const updateColorStyles = (colorTokens, shouldCreate = false) => {
+    // Iterate over colorTokens to create objects that match figma styles
+    const cols = dot.dot(colorTokens);
+    const tokenObj = createTokenObj(cols);
+    const paints = figma.getLocalPaintStyles();
+
+    Object.entries(tokenObj).map(([key, value]: [string, ColorToken]) => {
+        let matchingStyles = [];
+        if (paints.length > 0) {
+            matchingStyles = paints.filter((n) => n.name === key);
+        }
+        if (matchingStyles.length) {
+            setColorValuesOnTarget(matchingStyles[0], value);
+        } else if (shouldCreate) {
+            const style = figma.createPaintStyle();
+            style.name = key;
+            setColorValuesOnTarget(style, value);
+        }
+    });
 };
 
 const updateTextStyles = (textTokens, shouldCreate = false) => {
-    const cols = dot.dot(textTokens);
     // Iterate over textTokens to create objects that match figma styles
-    // e.g. H1/Bold ...
-    const tokenObj = Object.entries(cols).reduce((acc, [key, val]) => {
-        // Split token object by `/`
-        let parrentKey: string | string[] = key.split('/');
-
-        // Store current key for future reference, e.g. fontFamily, lineHeight and remove it from key
-        const curKey = parrentKey.pop();
-
-        // Merge object again, now that we have the parent reference
-        parrentKey = parrentKey.join('/');
-        acc[parrentKey] = acc[parrentKey] || {};
-        Object.assign(acc[parrentKey], {[curKey]: val});
-        return acc;
-    }, {});
-
+    const cols = dot.dot(textTokens);
+    const tokenObj = createTokenObj(cols);
     const textStyles = figma.getLocalTextStyles();
 
-    Object.entries(tokenObj).map(([key, value]: [string, TextStyle]): void => {
-        const matchingStyle = textStyles.filter((n) => n.name === key);
+    Object.entries(tokenObj).map(([key, value]: [string, TypographyToken]) => {
+        let matchingStyles = [];
+        if (textStyles.length > 0) {
+            matchingStyles = textStyles.filter((n) => n.name === key);
+        }
 
-        if (matchingStyle.length) {
-            setTextValuesOnTarget(matchingStyle[0], value);
+        if (matchingStyles.length) {
+            setTextValuesOnTarget(matchingStyles[0], value);
         } else if (shouldCreate) {
             const style = figma.createTextStyle();
             style.name = key;
@@ -126,7 +174,12 @@ export function pullStyles(styleTypes): void {
                 if (paint.type === 'SOLID') {
                     const {r, g, b} = paint.color;
                     const a = paint.opacity;
-                    return [style.name, figmaRGBToHex({r, g, b, a})];
+                    const styleObject: ColorToken = {value: figmaRGBToHex({r, g, b, a})};
+
+                    if (style.description) {
+                        styleObject.description = style.description;
+                    }
+                    return [style.name, styleObject];
                 }
                 return null;
             });
@@ -193,7 +246,12 @@ export function pullStyles(styleTypes): void {
                     paragraphSpacing.find((el: number[]) => el[1] === style.paragraphSpacing)[0]
                 }`,
             };
-            return [style.name, obj];
+            const styleObject: TypographyToken = {value: obj};
+
+            if (style.description) {
+                styleObject.description = style.description;
+            }
+            return [style.name, styleObject];
         });
     }
     notifyStyleValues({

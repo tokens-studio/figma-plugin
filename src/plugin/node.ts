@@ -4,9 +4,17 @@ import {fetchAllPluginData} from './pluginData';
 import store from './store';
 import * as pjs from '../../package.json';
 import {setValuesOnNode} from './updateNode';
+import {isSingleToken} from '../app/components/utils';
 
 export function mapValuesToTokens(object, values) {
-    const array = Object.entries(values).map(([key, value]) => ({[key]: objectPath.get(object, value)}));
+    const array = Object.entries(values).map(([key, token]) => {
+        const resolvedValue = objectPath.get(object, token);
+        const value = isSingleToken(resolvedValue) ? resolvedValue.value : resolvedValue;
+
+        return {
+            [key]: value,
+        };
+    });
     array.map((item) => ({[item.key]: item.value}));
     return Object.assign({}, ...array);
 }

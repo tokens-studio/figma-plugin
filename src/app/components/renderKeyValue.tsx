@@ -3,7 +3,7 @@ import Heading from './Heading';
 import Icon from './Icon';
 import TokenButton from './TokenButton';
 import Tooltip from './Tooltip';
-import {isTypographyToken} from './utils';
+import {isSingleToken, isTypographyToken} from './utils';
 
 const renderKeyValue = ({
     tokenValues,
@@ -18,9 +18,10 @@ const renderKeyValue = ({
     <div className="flex justify-start flex-row flex-wrap">
         {tokenValues.map(([key, value]) => {
             const stringPath = [path, key].filter((n) => n).join('.');
+
             return (
                 <React.Fragment key={stringPath}>
-                    {typeof value === 'object' && !isTypographyToken(value) ? (
+                    {typeof value === 'object' && !isTypographyToken(value) && !isSingleToken(value) ? (
                         <div className="property-wrapper w-full">
                             <div className="flex items-center justify-between">
                                 <Heading size="small">{key}</Heading>
@@ -30,7 +31,7 @@ const renderKeyValue = ({
                                             className="button button-ghost"
                                             type="button"
                                             onClick={() => {
-                                                showNewForm([path, key].join('.'), schema);
+                                                showNewForm([path, key].join('.'));
                                             }}
                                         >
                                             <Icon name="add" />
