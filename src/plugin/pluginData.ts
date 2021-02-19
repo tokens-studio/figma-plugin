@@ -57,6 +57,7 @@ export function sendPluginValues(nodes, values?) {
         notifySelection(nodes[0].id, pluginValues);
     }
 }
+
 export function removePluginData(nodes, key?) {
     nodes.map((node) => {
         try {
