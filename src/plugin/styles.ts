@@ -28,40 +28,8 @@ interface ColorToken {
     description?: string;
 }
 
-const updateColorStyles = (colorTokens, shouldCreate = false) => {
-    const cols = dot.dot(colorTokens);
-    console.log('cols are', colorTokens);
-    const paints = figma.getLocalPaintStyles();
-    Object.entries(cols).map(([key, token]: [string, ColorToken]) => {
-        const splitKey = key.split('/');
-        // not working for color styles with description and value
-        if (splitKey[splitKey.length - 1] === 'value') splitKey.pop();
-        const styleKey = splitKey.join('/');
-
-        const value = isSingleToken(token) ? token.value : token;
-        let matchingStyle = [];
-        if (paints.length > 0) {
-            matchingStyle = paints.filter((n) => n.name === styleKey);
-        }
-        if (typeof value === 'string') {
-            const {color, opacity} = convertToFigmaColor(value);
-            if (matchingStyle.length) {
-                matchingStyle[0].paints = [{color, opacity, type: 'SOLID'}];
-            } else if (shouldCreate) {
-                const newStyle = figma.createPaintStyle();
-                newStyle.paints = [{color, opacity, type: 'SOLID'}];
-                newStyle.name = styleKey;
-                if (token.description) {
-                    newStyle.description = token.description;
-                }
-            }
-        }
-    });
-    console.log('done with colors', cols);
-};
-
-export const setTextValuesOnTarget = async (target, values) => {
-    const {fontFamily, fontWeight, fontSize, lineHeight, letterSpacing, paragraphSpacing, description} = values;
+export const setTextValuesOnTarget = async (target, token) => {
+    const {fontFamily, fontWeight, fontSize, lineHeight, letterSpacing, paragraphSpacing, description} = token;
     const family = fontFamily || target.fontName.family;
     const style = fontWeight || target.fontName.style;
     await figma.loadFontAsync({family, style});
@@ -90,56 +58,100 @@ export const setTextValuesOnTarget = async (target, values) => {
     }
 };
 
-const updateTextStyles = (textTokens, shouldCreate = false) => {
-    const cols = dot.dot(textTokens);
-    // Iterate over textTokens to create objects that match figma styles
-    // e.g. H1/Bold ...
-    const tokenObj = Object.entries(cols).reduce((acc, [key, token]) => {
+const setColorValuesOnTarget = (target, token) => {
+    const {description, value} = token;
+    const {color, opacity} = convertToFigmaColor(value);
+
+    target.paints = [{color, opacity, type: 'SOLID'}];
+    if (description) {
+        target.description = description;
+    }
+};
+
+const tokenProps = ['description', 'value'];
+const typographyProps = ['fontSize', 'lineHeight', 'fontFamily', 'fontWeight', 'letterSpacing', 'paragraphSpacing'];
+
+const createTokenObj = (dotTokens) => {
+    // dotToken is e.g. as "H1/Regular/value/fontFamilies
+    return Object.entries(dotTokens).reduce((acc, [key, token]) => {
         // Split token object by `/`
-        let parrentKey: string | string[] = key.split('/');
+        const splitParent: string | string[] = key.split('/');
+        // parentKey is now ["H1", "Regular", "fontFamilies"]
         const value = isSingleToken(token) ? token.value : token;
 
         // Store current key for future reference, e.g. fontFamily, lineHeight and remove it from key
-        const curKey = parrentKey.pop();
-        if (parrentKey[parrentKey.length - 1] === 'value') parrentKey.pop();
+        let curKey = splitParent[splitParent.length - 1];
+        if (typographyProps.includes(curKey)) curKey = splitParent.pop();
+        if (tokenProps.includes(splitParent[splitParent.length - 1])) splitParent.pop();
 
         // Merge object again, now that we have the parent reference
-        parrentKey = parrentKey.join('/');
+        const newParentKey = splitParent.join('/');
 
-        acc[parrentKey] = acc[parrentKey] || {};
-        Object.assign(acc[parrentKey], {[curKey]: value});
+        // Set key to 'value' if parent and key match
+        let objToSet = {
+            [curKey]: value,
+        };
+        if (splitParent[splitParent.length - 1] === curKey) {
+            objToSet = {value};
+        }
+
+        acc[newParentKey] = acc[newParentKey] || {};
+        Object.assign(acc[newParentKey], objToSet);
         return acc;
     }, {});
+};
 
+const updateColorStyles = (colorTokens, shouldCreate = false) => {
+    // Iterate over colorTokens to create objects that match figma styles
+    const cols = dot.dot(colorTokens);
+    const tokenObj = createTokenObj(cols);
+    const paints = figma.getLocalPaintStyles();
+
+    Object.entries(tokenObj).map(([key, value]: [string, ColorToken]) => {
+        let matchingStyles = [];
+        if (paints.length > 0) {
+            matchingStyles = paints.filter((n) => n.name === key);
+        }
+        if (matchingStyles.length) {
+            setColorValuesOnTarget(matchingStyles[0], value);
+        } else if (shouldCreate) {
+            const style = figma.createPaintStyle();
+            style.name = key;
+            setColorValuesOnTarget(style, value);
+        }
+    });
+};
+
+const updateTextStyles = (textTokens, shouldCreate = false) => {
+    // Iterate over textTokens to create objects that match figma styles
+    const cols = dot.dot(textTokens);
+    const tokenObj = createTokenObj(cols);
     const textStyles = figma.getLocalTextStyles();
 
-    console.log('tokenObj is', tokenObj);
-
     Object.entries(tokenObj).map(([key, value]: [string, TypographyToken]) => {
-        const matchingStyle = textStyles.filter((n) => n.name === key);
+        let matchingStyles = [];
+        if (textStyles.length > 0) {
+            matchingStyles = textStyles.filter((n) => n.name === key);
+        }
 
-        if (matchingStyle.length) {
-            setTextValuesOnTarget(matchingStyle[0], value);
+        if (matchingStyles.length) {
+            setTextValuesOnTarget(matchingStyles[0], value);
         } else if (shouldCreate) {
             const style = figma.createTextStyle();
             style.name = key;
             setTextValuesOnTarget(style, value);
         }
     });
-
-    console.log('done with type', tokenObj);
 };
 
 export function updateStyles(tokens, shouldCreate = false): void {
     if (!tokens.colors && !tokens.typography) return;
-    console.log('tokens are', tokens);
     if (tokens.colors) {
         updateColorStyles(tokens.colors, shouldCreate);
     }
     if (tokens.typography) {
         updateTextStyles(tokens.typography, shouldCreate);
     }
-    console.log('end of tokenupdate');
 }
 
 export function pullStyles(styleTypes): void {
@@ -160,9 +172,8 @@ export function pullStyles(styleTypes): void {
                 if (paint.type === 'SOLID') {
                     const {r, g, b} = paint.color;
                     const a = paint.opacity;
-                    const options = {description: 'foobydoo'};
-                    console.log('options are', options);
-                    return [style.name, {value: figmaRGBToHex({r, g, b, a}), options}];
+                    const description = style.description ?? null;
+                    return [style.name, {value: figmaRGBToHex({r, g, b, a}), description}];
                 }
                 return null;
             });
@@ -230,8 +241,6 @@ export function pullStyles(styleTypes): void {
                 }`,
             };
             const description = style.description ?? null;
-
-            console.log('style descr', description, style);
 
             return [style.name, {value: obj, description}];
         });

@@ -16,10 +16,6 @@ const EditTokenForm = ({
 }) => {
     const title = isPristine ? `New Token in ${path}` : `${path}.${initialName}`;
 
-    React.useEffect(() => {
-        console.log('Initialvalue is', initialValue);
-    }, [initialValue]);
-
     const defaultValue = {
         value: initialValue.value ?? initialValue,
         options: {
@@ -51,7 +47,6 @@ const EditTokenForm = ({
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        console.log('submitting', tokenValue);
         submitTokenValue(tokenValue);
         setShowEditForm(false);
     };
@@ -59,10 +54,6 @@ const EditTokenForm = ({
     const handleReset = () => {
         setShowEditForm(false);
     };
-
-    React.useEffect(() => {
-        console.log('token val in edit is', tokenValue, schema, optionsSchema);
-    }, [schema, tokenValue, optionsSchema]);
 
     return (
         <Modal isOpen close={handleReset} title={title}>

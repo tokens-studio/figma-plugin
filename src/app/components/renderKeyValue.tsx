@@ -18,6 +18,7 @@ const renderKeyValue = ({
     <div className="flex justify-start flex-row flex-wrap">
         {tokenValues.map(([key, value]) => {
             const stringPath = [path, key].filter((n) => n).join('.');
+
             return (
                 <React.Fragment key={stringPath}>
                     {typeof value === 'object' && !isTypographyToken(value) && !isSingleToken(value) ? (
@@ -30,7 +31,7 @@ const renderKeyValue = ({
                                             className="button button-ghost"
                                             type="button"
                                             onClick={() => {
-                                                showNewForm([path, key].join('.'), schema);
+                                                showNewForm([path, key].join('.'));
                                             }}
                                         >
                                             <Icon name="add" />

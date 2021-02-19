@@ -133,13 +133,10 @@ export default class TokenData {
 
         const assigned = mergeDeep({}, ...reducedTokens);
 
-        console.log('assigned', assigned);
-
         return assigned;
     }
 
     getMergedTokens(): TokenGroup {
-        console.log('Merged tokens are', this.mergedTokens);
         return this.mergedTokens;
     }
 
