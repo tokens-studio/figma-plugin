@@ -15,10 +15,12 @@ const dot = new Dot('/');
 
 interface TypographyToken {
     value: {
-        familyName: string;
-        fontWeight: string;
-        fontSize: number;
-        lineHeight: string | number;
+        fontFamily?: string;
+        fontWeight?: string;
+        fontSize?: string;
+        lineHeight?: string | number;
+        letterSpacing?: string;
+        paragraphSpacing?: string;
     };
     description?: string;
 }
@@ -172,8 +174,12 @@ export function pullStyles(styleTypes): void {
                 if (paint.type === 'SOLID') {
                     const {r, g, b} = paint.color;
                     const a = paint.opacity;
-                    const description = style.description ?? null;
-                    return [style.name, {value: figmaRGBToHex({r, g, b, a}), description}];
+                    const styleObject: ColorToken = {value: figmaRGBToHex({r, g, b, a})};
+
+                    if (style.description) {
+                        styleObject.description = style.description;
+                    }
+                    return [style.name, styleObject];
                 }
                 return null;
             });
@@ -240,9 +246,12 @@ export function pullStyles(styleTypes): void {
                     paragraphSpacing.find((el: number[]) => el[1] === style.paragraphSpacing)[0]
                 }`,
             };
-            const description = style.description ?? null;
+            const styleObject: TypographyToken = {value: obj};
 
-            return [style.name, {value: obj, description}];
+            if (style.description) {
+                styleObject.description = style.description;
+            }
+            return [style.name, styleObject];
         });
     }
     notifyStyleValues({

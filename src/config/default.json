@@ -183,37 +183,41 @@
         "body": 16
     },
     "typography": {
-        "H1/Bold": {
-            "fontFamily": "$fontFamilies.heading",
-            "fontWeight": "$fontWeights.headingBold",
-            "lineHeight": "$lineHeights.heading",
-            "fontSize": "$fontSizes.h1",
-            "paragraphSpacing": "$paragraphSpacing.h1",
-            "letterSpacing": "$letterSpacing.decreased"
+        "H1": {
+            "Bold": {
+                "fontFamily": "$fontFamilies.heading",
+                "fontWeight": "$fontWeights.headingBold",
+                "lineHeight": "$lineHeights.heading",
+                "fontSize": "$fontSizes.h1",
+                "paragraphSpacing": "$paragraphSpacing.h1",
+                "letterSpacing": "$letterSpacing.decreased"
+            },
+            "Regular": {
+                "fontFamily": "$fontFamilies.heading",
+                "fontWeight": "$fontWeights.headingRegular",
+                "lineHeight": "$lineHeights.heading",
+                "fontSize": "$fontSizes.h1",
+                "paragraphSpacing": "$paragraphSpacing.h1",
+                "letterSpacing": "$letterSpacing.decreased"
+            }
         },
-        "H1/Regular": {
-            "fontFamily": "$fontFamilies.heading",
-            "fontWeight": "$fontWeights.headingRegular",
-            "lineHeight": "$lineHeights.heading",
-            "fontSize": "$fontSizes.h1",
-            "paragraphSpacing": "$paragraphSpacing.h1",
-            "letterSpacing": "$letterSpacing.decreased"
-        },
-        "H2/Bold": {
-            "fontFamily": "$fontFamilies.heading",
-            "fontWeight": "$fontWeights.headingBold",
-            "lineHeight": "$lineHeights.heading",
-            "fontSize": "$fontSizes.h2",
-            "paragraphSpacing": "$paragraphSpacing.h2",
-            "letterSpacing": "$letterSpacing.decreased"
-        },
-        "H2/Regular": {
-            "fontFamily": "$fontFamilies.heading",
-            "fontWeight": "$fontWeights.headingRegular",
-            "lineHeight": "$lineHeights.heading",
-            "fontSize": "$fontSizes.h2",
-            "paragraphSpacing": "$paragraphSpacing.h2",
-            "letterSpacing": "$letterSpacing.decreased"
+        "H2": {
+            "Bold": {
+                "fontFamily": "$fontFamilies.heading",
+                "fontWeight": "$fontWeights.headingBold",
+                "lineHeight": "$lineHeights.heading",
+                "fontSize": "$fontSizes.h2",
+                "paragraphSpacing": "$paragraphSpacing.h2",
+                "letterSpacing": "$letterSpacing.decreased"
+            },
+            "Regular": {
+                "fontFamily": "$fontFamilies.heading",
+                "fontWeight": "$fontWeights.headingRegular",
+                "lineHeight": "$lineHeights.heading",
+                "fontSize": "$fontSizes.h2",
+                "paragraphSpacing": "$paragraphSpacing.h2",
+                "letterSpacing": "$letterSpacing.decreased"
+            }
         },
         "Body": {
             "fontFamily": "$fontFamilies.body",

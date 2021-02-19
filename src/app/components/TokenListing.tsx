@@ -191,7 +191,7 @@ const TokenListing = ({
                             type="button"
                             onClick={() => {
                                 setShowOptions(values[0]);
-                                showNewForm(values[0], schema);
+                                showNewForm(values[0]);
                             }}
                         >
                             <Icon name="add" />
