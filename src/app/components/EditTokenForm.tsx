@@ -90,6 +90,7 @@ const EditTokenForm = ({
                         type="text"
                         name="value"
                         required
+                        custom={schema}
                     />
                 )}
 
