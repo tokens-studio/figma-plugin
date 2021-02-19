@@ -2,6 +2,8 @@ import * as React from 'react';
 import objectPath from 'object-path';
 import {useTokenState, useTokenDispatch} from '../store/TokenContext';
 import Button from './Button';
+import Icon from './Icon';
+import Tooltip from './Tooltip';
 
 const Inspector = () => {
     const {selectionValues, tokenData} = useTokenState();
@@ -15,22 +17,35 @@ const Inspector = () => {
                 {Object.entries(selectionValues)
                     .filter(([, value]) => value !== 'delete')
                     .map(([key, value]) => (
-                        <div key={key}>
+                        <div key={key} className="flex flex-row justify-between items-start">
                             <code className="flex space-x-2 flex-wrap">
-                                <div style={{fontWeight: 'bold'}}>{key}</div>:{' '}
+                                <div className="font-bold">{key}</div>:{' '}
                                 <div className="p-1 bg-gray-700 rounded text-white text-xxs">
                                     ${typeof value === 'string' && value.split('.').join('-')}
                                 </div>
-                                <div className="text-gray-500 break-all">{`/* ${JSON.stringify(
-                                    getValue(value)
-                                )} */`}</div>
+                                <div className="text-gray-500 break-all">
+                                    {`/* ${JSON.stringify(getValue(value))} */`}
+                                </div>
                             </code>
+                            <Tooltip label="Remove token from layer" variant="right">
+                                <button
+                                    className="button button-ghost"
+                                    type="button"
+                                    onClick={() => removeNodeData(key)}
+                                >
+                                    <Icon name="trash" />
+                                </button>
+                            </Tooltip>
                         </div>
                     ))}
             </div>
-            <Button variant="secondary" onClick={removeNodeData}>
-                Remove tokens from layer
-            </Button>
+            {Object.entries(selectionValues).length > 0 ? (
+                <Button variant="secondary" onClick={() => removeNodeData()}>
+                    Remove all tokens from layer
+                </Button>
+            ) : (
+                <div className="text-sm">No tokens stored on layer</div>
+            )}
         </div>
     );
 };

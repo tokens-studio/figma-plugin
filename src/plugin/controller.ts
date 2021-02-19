@@ -117,7 +117,7 @@ figma.ui.onmessage = async (msg) => {
 
         case MessageToPluginTypes.REMOVE_NODE_DATA:
             try {
-                removePluginData(figma.currentPage.selection);
+                removePluginData(figma.currentPage.selection, msg.key);
                 sendPluginValues(figma.currentPage.selection);
             } catch (e) {
                 console.error(e);

@@ -182,6 +182,7 @@ function stateReducer(state, action) {
         case ActionType.RemoveNodeData:
             postToFigma({
                 type: MessageToPluginTypes.REMOVE_NODE_DATA,
+                key: action.data,
             });
             return state;
         case ActionType.PullStyles:
@@ -326,7 +327,7 @@ function TokenProvider({children}) {
             setNodeData: (data: SelectionValue) => {
                 dispatch({type: ActionType.SetNodeData, data});
             },
-            removeNodeData: (data: SelectionValue) => {
+            removeNodeData: (data?: string) => {
                 dispatch({type: ActionType.RemoveNodeData, data});
             },
             setSelectionValues: (data: SelectionValue) => {
