@@ -34,6 +34,7 @@ export enum ActionType {
     SetSelectionValues = 'SET_SELECTION_VALUES',
     ResetSelectionValues = 'RESET_SELECTION_VALUES',
     SetShowEditForm = 'SET_SHOW_EDIT_FORM',
+    SetShowNewGroupForm = 'SET_SHOW_NEW_GROUP_FORM',
     SetShowOptions = 'SET_SHOW_OPTIONS',
     SetDisplayType = 'SET_DISPLAY_TYPE',
     ToggleColorMode = 'TOGGLE_COLOR_MODE',
@@ -74,6 +75,7 @@ const emptyState = {
     displayType: 'GRID',
     colorMode: false,
     showEditForm: false,
+    showNewGroupForm: false,
     showOptions: false,
     storageType: {
         provider: StorageProviderType.LOCAL,
@@ -209,6 +211,11 @@ function stateReducer(state, action) {
                 ...state,
                 showEditForm: action.bool,
             };
+        case ActionType.SetShowNewGroupForm:
+            return {
+                ...state,
+                showNewGroupForm: action.bool,
+            };
         case ActionType.SetShowOptions:
             return {
                 ...state,
@@ -330,6 +337,9 @@ function TokenProvider({children}) {
             },
             setShowEditForm: (bool: boolean) => {
                 dispatch({type: ActionType.SetShowEditForm, bool});
+            },
+            setShowNewGroupForm: (bool: boolean) => {
+                dispatch({type: ActionType.SetShowNewGroupForm, bool});
             },
             setShowOptions: (data: string) => {
                 dispatch({type: ActionType.SetShowOptions, data});

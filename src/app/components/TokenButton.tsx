@@ -3,13 +3,12 @@ import Tooltip from './Tooltip';
 import MoreButton from './MoreButton';
 import {useTokenState, useTokenDispatch} from '../store/TokenContext';
 import Icon from './Icon';
-import {lightOrDark, colorByHashCode} from './utils';
+import {lightOrDark, colorByHashCode, isTypographyToken} from './utils';
 
 const TokenButton = ({type, property, name, path, token, editMode, showForm}) => {
     const {colorMode, displayType, selectionValues, tokenData, disabled} = useTokenState();
     const {setNodeData, setShowOptions, setLoading, deleteToken} = useTokenDispatch();
-    const realTokenValue = tokenData.getAliasValue(token);
-    const displayValue = realTokenValue || token;
+    const displayValue = tokenData.getTokenValue(token);
     let style;
     let showValue = true;
     let showEditButton = false;
@@ -18,7 +17,7 @@ const TokenButton = ({type, property, name, path, token, editMode, showForm}) =>
 
     const handleEditClick = () => {
         setShowOptions(property);
-        showForm({name, token, path});
+        showForm({name, value: token, path});
     };
 
     const handleDeleteClick = () => {
@@ -129,7 +128,7 @@ const TokenButton = ({type, property, name, path, token, editMode, showForm}) =>
     const onClick = (givenProperties, isActive = active) => {
         const propsToSet = Array.isArray(givenProperties) ? givenProperties : new Array(givenProperties);
         if (editMode) {
-            showForm({name, token, path});
+            showForm({name, value: token, path});
         } else {
             const tokenValue = [path, name].join('.');
             let value = isActive ? 'delete' : tokenValue;
@@ -143,6 +142,18 @@ const TokenButton = ({type, property, name, path, token, editMode, showForm}) =>
             if (propsToSet[0].clear) propsToSet[0].clear.map((item) => Object.assign(newProps, {[item]: 'delete'}));
             setPluginValue(newProps);
         }
+    };
+
+    const getTokenDisplay = (tokenVal) => {
+        const valueToCheck = tokenVal.value ?? tokenVal;
+        if (isTypographyToken(valueToCheck)) {
+            return `${valueToCheck.fontFamily} / ${valueToCheck.fontWeight}`;
+        }
+        if (typeof valueToCheck !== 'string' && typeof valueToCheck !== 'number') {
+            return JSON.stringify(valueToCheck, null, 2);
+        }
+
+        return valueToCheck;
     };
 
     return (
@@ -161,9 +172,7 @@ const TokenButton = ({type, property, name, path, token, editMode, showForm}) =>
                 path={path}
                 mode={editMode ? 'edit' : 'list'}
             >
-                <Tooltip
-                    label={`${name}: ${JSON.stringify(token, null, 2)}${realTokenValue ? `: ${realTokenValue}` : ''}`}
-                >
+                <Tooltip label={`${name}: ${getTokenDisplay(token)}`}>
                     <button
                         className="w-full h-full"
                         disabled={editMode ? false : disabled}

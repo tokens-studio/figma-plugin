@@ -8,6 +8,7 @@ import Icon from './Icon';
 import Modal from './Modal';
 import renderKeyValue from './renderKeyValue';
 import Tooltip from './Tooltip';
+import NewGroupForm from './NewGroupForm';
 
 const TokenListing = ({
     label,
@@ -21,7 +22,10 @@ const TokenListing = ({
     values,
 }: {
     label: string;
-    schema?: object;
+    schema?: {
+        value: object | string;
+        options: object | string;
+    };
     explainer?: string;
     help?: string;
     createButton?: boolean;
@@ -30,7 +34,15 @@ const TokenListing = ({
     type?: string;
     values?: string | object;
 }) => {
-    const {collapsed, showEditForm, showOptions, tokenData, displayType, activeTokenSet} = useTokenState();
+    const {
+        collapsed,
+        showEditForm,
+        showNewGroupForm,
+        showOptions,
+        tokenData,
+        displayType,
+        activeTokenSet,
+    } = useTokenState();
     const {
         setStringTokens,
         setCollapsed,
@@ -38,6 +50,7 @@ const TokenListing = ({
         updateTokens,
         setLoading,
         setShowEditForm,
+        setShowNewGroupForm,
         setShowOptions,
         setDisplayType,
     } = useTokenDispatch();
@@ -46,24 +59,35 @@ const TokenListing = ({
     const [isIntCollapsed, setIntCollapsed] = React.useState(false);
 
     const [editToken, setEditToken] = React.useState({
-        token: '',
+        value: '',
         name: '',
         path: '',
     });
-    function setSingleTokenValue({parent, name, token, options, oldName}) {
+    function setSingleTokenValue({parent, name, value, options, oldName, newGroup = false}) {
         const obj = JSON5.parse(tokenData.tokens[parent].values);
-        const newValue = options
-            ? {
-                  value: token,
-                  ...options,
-              }
-            : token;
-        objectPath.set(obj, name, newValue);
-        if (oldName === name) {
+        let newValue;
+        if (newGroup) {
+            newValue = {};
+        } else {
+            newValue = options
+                ? {
+                      value,
+                      ...options,
+                  }
+                : {
+                      value,
+                  };
+        }
+        const newName = name.toString();
+        objectPath.set(obj, newName, newValue);
+        if (oldName === newName || !oldName) {
             setStringTokens({parent, tokens: JSON.stringify(obj, null, 2)});
         } else {
             objectPath.del(obj, oldName);
-            setStringTokens({parent, tokens: JSON.stringify(obj, null, 2).replace(`$${oldName}`, `$${name}`)});
+            setStringTokens({
+                parent,
+                tokens: JSON.stringify(obj, null, 2).split(`$${oldName}`).join(`$${name}`),
+            });
         }
     }
 
@@ -72,31 +96,26 @@ const TokenListing = ({
         setShowEditForm(false);
     };
 
-    const showNewForm = (path, schema) => {
-        let initialToken = '';
-        if (schema) {
-            initialToken = schema;
-        }
-
-        showForm({token: initialToken, name: '', path});
+    const showForm = ({value, name, path}) => {
+        setShowEditForm(true);
+        setEditToken({value, name, path});
     };
 
-    const submitTokenValue = async ({token, name, path, options}) => {
-        setEditToken({token, name, path});
+    const showNewForm = (path) => {
+        showForm({value: '', name: '', path});
+    };
+
+    const submitTokenValue = async ({value, name, path, options}) => {
+        setEditToken({value, name, path});
         setSingleTokenValue({
             parent: activeTokenSet,
             name: [path, name].join('.'),
-            token,
+            value,
             options,
-            oldName: [path, editToken.name].join('.'),
+            oldName: editToken.name ? [path, editToken.name].join('.') : null,
         });
         await setLoading(true);
         updateTokens();
-    };
-
-    const showForm = ({token, name, path}) => {
-        setShowEditForm(true);
-        setEditToken({token, name, path});
     };
 
     React.useEffect(() => {
@@ -184,7 +203,7 @@ const TokenListing = ({
                             type="button"
                             onClick={() => {
                                 setShowOptions(values[0]);
-                                showNewForm(values[0], schema);
+                                showNewForm(values[0]);
                             }}
                         >
                             <Icon name="add" />
@@ -202,8 +221,13 @@ const TokenListing = ({
                                     path={editToken.path}
                                     property={property}
                                     isPristine={editToken.name === ''}
-                                    initialToken={editToken.token}
+                                    initialValue={editToken.value}
+                                    schema={schema?.value}
+                                    optionsSchema={schema?.options}
                                 />
+                            )}
+                            {showNewGroupForm && (
+                                <NewGroupForm path={values[0]} setSingleTokenValue={setSingleTokenValue} />
                             )}
 
                             <div className="px-4 pb-4">
@@ -236,7 +260,7 @@ const TokenListing = ({
                                         <button
                                             type="button"
                                             className="button button-ghost"
-                                            onClick={() => showNewForm(values[0], schema)}
+                                            onClick={() => showNewForm(values[0])}
                                         >
                                             <Icon name="add" />
                                         </button>
@@ -246,7 +270,7 @@ const TokenListing = ({
                                             className="button button-ghost"
                                             type="button"
                                             onClick={() => {
-                                                showNewForm(values[0], {});
+                                                setShowNewGroupForm(true);
                                             }}
                                         >
                                             <Icon name="folder" />

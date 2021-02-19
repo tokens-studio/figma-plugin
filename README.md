@@ -7,6 +7,8 @@
 
 # How to use
 
+I'm currently in the process of building a dedicated Documentation page. Visit it by going to http://docs.tokens.studio/ — it's still very early, but will hopefully provide some useful information.
+
 ## Get started
 When you first open the plugin we give you a set of pre-defined tokens that can be used as-is to show you what is possible. You can delete these tokens by going to the `JSON` tab and hitting the `Clear` button to remove all tokens.
 
