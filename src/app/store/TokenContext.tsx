@@ -173,6 +173,7 @@ function stateReducer(state, action) {
                 {
                     pluginMessage: {
                         type: 'remove-node-data',
+                        key: action.data,
                     },
                 },
                 '*'
@@ -288,7 +289,7 @@ function TokenProvider({children}) {
             setNodeData: (data: SelectionValue) => {
                 dispatch({type: ActionType.SetNodeData, data});
             },
-            removeNodeData: (data: SelectionValue) => {
+            removeNodeData: (data?: string) => {
                 dispatch({type: ActionType.RemoveNodeData, data});
             },
             setSelectionValues: (data: SelectionValue) => {
