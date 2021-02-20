@@ -1,8 +1,14 @@
 /* eslint-disable class-methods-use-this */
 import JSON5 from 'json5';
 import objectPath from 'object-path';
+import Dot from 'dot-object';
 import {mergeDeep} from '../../plugin/helpers';
-import {convertToRgb, checkAndEvaluateMath} from './utils';
+import {convertToRgb, checkAndEvaluateMath, isSingleToken} from './utils';
+
+const dot = new Dot('/');
+
+const tokenProps = ['description', 'value'];
+const typographyProps = ['fontSize', 'lineHeight', 'fontFamily', 'fontWeight', 'letterSpacing', 'paragraphSpacing'];
 
 export interface TokenProps {
     values: {
@@ -132,12 +138,58 @@ export default class TokenData {
         }, []);
 
         const assigned = mergeDeep({}, ...reducedTokens);
+        console.log('reduce to values', reducedTokens, this.tokens, assigned);
 
         return assigned;
     }
 
     getMergedTokens(): TokenGroup {
         return this.mergedTokens;
+    }
+
+    createTokenObj(dotTokens) {
+        // dotToken is e.g. as "H1/Regular/value/fontFamilies
+        return Object.entries(dotTokens).reduce((acc, [key, token]) => {
+            // Split token object by `/`
+            const splitParent: string | string[] = key.split('/');
+            // parentKey is now ["H1", "Regular", "fontFamilies"]
+            const value = isSingleToken(token) ? token.value : token;
+
+            // Store current key for future reference, e.g. fontFamily, lineHeight and remove it from key
+            let curKey = splitParent[splitParent.length - 1];
+            if (typographyProps.includes(curKey)) curKey = splitParent.pop();
+            if (tokenProps.includes(splitParent[splitParent.length - 1])) splitParent.pop();
+
+            // Merge object again, now that we have the parent reference
+            const newParentKey = splitParent.join('/');
+
+            // Set key to 'value' if parent and key match
+            let objToSet = {
+                [curKey]: value,
+            };
+            if (splitParent[splitParent.length - 1] === curKey) {
+                objToSet = {value};
+            }
+
+            acc[newParentKey] = acc[newParentKey] || {};
+            Object.assign(acc[newParentKey], objToSet);
+            return acc;
+        }, {});
+    }
+
+    getFormattedTokens() {
+        const cols = dot.dot(this.mergedTokens);
+
+        const tokens = this.createTokenObj(cols);
+        const tokenObj = {};
+        console.log({tokens});
+        Object.entries(tokens).forEach(([key, value]) => {
+            console.log('setting', key, key.split('/').join('.').toString(), value);
+            objectPath.set(tokenObj, key.split('/').join('.').toString(), value);
+        });
+        console.log({tokenObj});
+
+        return JSON.stringify(tokenObj, null, 2);
     }
 
     private checkIfValueToken(token: SingleToken): token is {value: string | number} {

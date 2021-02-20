@@ -76,6 +76,13 @@ const JSONEditor = () => {
                         onChange={(val) => setStringTokens({parent: activeToken, tokens: val})}
                         value={tokenData.tokens[activeToken].values}
                     />
+                    <Textarea
+                        className="flex-grow"
+                        rows={23}
+                        isDisabled
+                        hasErrored={tokenData.tokens[activeToken].hasErrored}
+                        value={tokenData.getFormattedTokens()}
+                    />
                 </div>
             </div>
 
