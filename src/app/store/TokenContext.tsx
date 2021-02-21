@@ -62,7 +62,7 @@ const emptyState = {
     colorMode: false,
     showEditForm: false,
     showNewGroupForm: false,
-    showOptions: false,
+    showOptions: '',
     updatePageOnly: true,
 };
 

@@ -147,9 +147,10 @@ const updateTextStyles = (textTokens, shouldCreate = false) => {
 };
 
 export function updateStyles(tokens, shouldCreate = false): void {
-    if (!tokens.colors && !tokens.typography) return;
-    if (tokens.colors) {
-        updateColorStyles(tokens.colors, shouldCreate);
+    const colorTokens = tokens.colors || tokens.color;
+    if (!colorTokens && !tokens.typography) return;
+    if (colorTokens) {
+        updateColorStyles(colorTokens, shouldCreate);
     }
     if (tokens.typography) {
         updateTextStyles(tokens.typography, shouldCreate);

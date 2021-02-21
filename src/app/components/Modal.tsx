@@ -4,7 +4,7 @@ import Heading from './Heading';
 
 ReactModal.setAppElement('#react-page');
 
-const customStyles = {
+const customStyles = (large) => ({
     overlay: {
         backgroundColor: 'rgba(0,0,0,0.2)',
         display: 'flex',
@@ -23,23 +23,26 @@ const customStyles = {
         overflow: 'auto',
         maxHeight: '100%',
         border: 'none',
+        width: large ? '100%' : 'auto',
     },
-};
+});
 
 const Modal = ({
     title,
     full,
+    large,
     isOpen,
     close,
     children,
 }: {
     title?: string;
     full?: boolean;
+    large?: boolean;
     isOpen: boolean;
     close: Function;
     children: React.ReactNode;
 }) => (
-    <ReactModal isOpen={isOpen} onRequestClose={close} style={customStyles} contentLabel={title || null}>
+    <ReactModal isOpen={isOpen} onRequestClose={close} style={customStyles(large)} contentLabel={title || null}>
         <div className={full ? 'p-0' : 'p-8'}>
             {title && (
                 <div className="mb-4">

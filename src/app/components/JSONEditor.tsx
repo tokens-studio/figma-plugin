@@ -10,6 +10,7 @@ const JSONEditor = () => {
     const {setStringTokens, setEmptyTokens, setDefaultTokens, updateTokens, setLoading} = useTokenDispatch();
     const [activeToken] = React.useState('options');
     const [confirmModalVisible, showConfirmModal] = React.useState('');
+    const [exportModalVisible, showExportModal] = React.useState(false);
 
     const handleUpdate = async () => {
         await setLoading(true);
@@ -28,6 +29,44 @@ const JSONEditor = () => {
 
     return (
         <div className="flex flex-col flex-grow">
+            <Modal large isOpen={exportModalVisible} close={() => showExportModal(false)}>
+                <div className="flex flex-col space-y-4 w-full">
+                    <Heading>Export</Heading>
+                    <p className="text-xs">
+                        This is an early version of a tokens export, if you encounter any issues please raise an{' '}
+                        <a
+                            target="_blank"
+                            rel="noreferrer"
+                            className="underline"
+                            href="https://github.com/six7/figma-tokens/issues"
+                        >
+                            issue
+                        </a>
+                        .
+                    </p>
+                    <Heading size="small">Output example</Heading>
+                    <Textarea
+                        className="flex-grow"
+                        rows={10}
+                        isDisabled
+                        hasErrored={tokenData.tokens[activeToken].hasErrored}
+                        value={tokenData.getFormattedTokens()}
+                    />
+                    <div className="space-x-4 flex justify-between">
+                        <Button variant="secondary" onClick={() => showExportModal(false)}>
+                            Cancel
+                        </Button>
+                        <Button
+                            href={`data:text/json;charset=utf-8,${encodeURIComponent(tokenData.getFormattedTokens())}`}
+                            download="tokens.json"
+                            variant="primary"
+                            size="large"
+                        >
+                            Download
+                        </Button>
+                    </div>
+                </div>
+            </Modal>
             <Modal isOpen={confirmModalVisible === 'reset'} close={() => showConfirmModal('')}>
                 <div className="flex justify-center flex-col text-center space-y-4">
                     <div className="space-y-2">
@@ -38,10 +77,10 @@ const JSONEditor = () => {
                         </p>
                     </div>
                     <div className="space-x-4">
-                        <Button variant="secondary" size="large" onClick={() => showConfirmModal('')}>
+                        <Button variant="secondary" onClick={() => showConfirmModal('')}>
                             Cancel
                         </Button>
-                        <Button variant="primary" size="large" onClick={handleSetDefault}>
+                        <Button variant="primary" onClick={handleSetDefault}>
                             Yes, set to default.
                         </Button>
                     </div>
@@ -57,10 +96,10 @@ const JSONEditor = () => {
                         </p>
                     </div>
                     <div className="space-x-4">
-                        <Button variant="secondary" size="large" onClick={() => showConfirmModal('')}>
+                        <Button variant="secondary" onClick={() => showConfirmModal('')}>
                             Cancel
                         </Button>
-                        <Button variant="primary" size="large" onClick={handleSetEmpty}>
+                        <Button variant="primary" onClick={handleSetEmpty}>
                             Yes, clear all tokens.
                         </Button>
                     </div>
@@ -76,28 +115,26 @@ const JSONEditor = () => {
                         onChange={(val) => setStringTokens({parent: activeToken, tokens: val})}
                         value={tokenData.tokens[activeToken].values}
                     />
-                    <Textarea
-                        className="flex-grow"
-                        rows={23}
-                        isDisabled
-                        hasErrored={tokenData.tokens[activeToken].hasErrored}
-                        value={tokenData.getFormattedTokens()}
-                    />
                 </div>
             </div>
 
             <div className="flex justify-between w-full px-4 bg-white">
                 <div className="space-x-2 flex mr-2">
-                    <Button variant="secondary" size="large" onClick={() => showConfirmModal('reset')}>
-                        Fill with example data
+                    <Button variant="secondary" onClick={() => showConfirmModal('reset')}>
+                        Load preset
                     </Button>
-                    <Button variant="secondary" size="large" onClick={() => showConfirmModal('delete')}>
+                    <Button variant="secondary" onClick={() => showConfirmModal('delete')}>
                         Clear
                     </Button>
                 </div>
-                <Button variant="primary" size="large" onClick={handleUpdate}>
-                    Save & update
-                </Button>
+                <div className="space-x-2 flex">
+                    <Button variant="secondary" onClick={() => showExportModal(true)}>
+                        Export
+                    </Button>
+                    <Button variant="primary" onClick={handleUpdate}>
+                        Save & update
+                    </Button>
+                </div>
             </div>
         </div>
     );

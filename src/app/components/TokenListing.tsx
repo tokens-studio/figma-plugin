@@ -18,7 +18,7 @@ const TokenListing = ({
     createButton = false,
     showDisplayToggle = false,
     property,
-    type = '',
+    tokenType = '',
     values,
 }: {
     label: string;
@@ -31,7 +31,7 @@ const TokenListing = ({
     createButton?: boolean;
     showDisplayToggle?: boolean;
     property: string;
-    type?: string;
+    tokenType?: string;
     values?: string | object;
 }) => {
     const {collapsed, showEditForm, showNewGroupForm, showOptions, tokenData, displayType} = useTokenState();
@@ -46,6 +46,8 @@ const TokenListing = ({
         setShowOptions,
         setDisplayType,
     } = useTokenDispatch();
+
+    console.log('starting tokenlsiting', tokenType);
 
     const [activeToken] = React.useState('options');
 
@@ -125,6 +127,10 @@ const TokenListing = ({
         }
     };
 
+    console.log('values', values);
+
+    if (!values) return null;
+
     return (
         <div className="border-b border-gray-200">
             <div className="flex justify-between space-x-8 items-center relative">
@@ -181,7 +187,7 @@ const TokenListing = ({
                         </Tooltip>
                     )}
                     <Tooltip label="Edit token values" variant="right">
-                        <button className="button button-ghost" type="button" onClick={() => setShowOptions(values[0])}>
+                        <button className="button button-ghost" type="button" onClick={() => setShowOptions(tokenType)}>
                             <Icon name="edit" />
                         </button>
                     </Tooltip>
@@ -190,16 +196,16 @@ const TokenListing = ({
                             className="button button-ghost"
                             type="button"
                             onClick={() => {
-                                setShowOptions(values[0]);
-                                showNewForm(values[0]);
+                                setShowOptions(tokenType);
+                                showNewForm(tokenType);
                             }}
                         >
                             <Icon name="add" />
                         </button>
                     </Tooltip>
                 </div>
-                {showOptions === values[0] && (
-                    <Modal full isOpen={showOptions === values[0]} close={closeForm}>
+                {showOptions === tokenType && (
+                    <Modal full isOpen={showOptions === tokenType} close={closeForm}>
                         <div className="flex flex-col-reverse">
                             {showEditForm && (
                                 <EditTokenForm
@@ -215,18 +221,18 @@ const TokenListing = ({
                                 />
                             )}
                             {showNewGroupForm && (
-                                <NewGroupForm path={values[0]} setSingleTokenValue={setSingleTokenValue} />
+                                <NewGroupForm path={tokenType} setSingleTokenValue={setSingleTokenValue} />
                             )}
 
                             <div className="px-4 pb-4">
                                 {renderKeyValue({
-                                    tokenValues: Object.entries(values[1]),
+                                    tokenValues: Object.entries(values),
                                     showNewForm,
                                     showForm,
-                                    property: values[0],
+                                    property: tokenType,
                                     schema,
-                                    path: values[0],
-                                    type,
+                                    path: tokenType,
+                                    type: tokenType,
                                     editMode: true,
                                 })}
                             </div>
@@ -248,7 +254,7 @@ const TokenListing = ({
                                         <button
                                             type="button"
                                             className="button button-ghost"
-                                            onClick={() => showNewForm(values[0])}
+                                            onClick={() => showNewForm(tokenType)}
                                         >
                                             <Icon name="add" />
                                         </button>
@@ -271,16 +277,16 @@ const TokenListing = ({
                 )}
             </div>
             {showHelp && <div className="px-4 pb-4 text-xxs text-gray-600">{help}</div>}
-            {Object.entries(values[1]).length > 0 && (
+            {Object.entries(values).length > 0 && (
                 <div className={`px-4 pb-4 ${isIntCollapsed ? 'hidden' : null}`}>
                     {renderKeyValue({
-                        tokenValues: Object.entries(values[1]),
+                        tokenValues: Object.entries(values),
                         showNewForm,
                         showForm,
-                        property: values[0],
+                        property: tokenType,
                         schema,
-                        path: values[0],
-                        type,
+                        path: tokenType,
+                        type: tokenType,
                     })}
                 </div>
             )}

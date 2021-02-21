@@ -2,6 +2,7 @@
 import JSON5 from 'json5';
 import objectPath from 'object-path';
 import Dot from 'dot-object';
+import set from 'set-value';
 import {mergeDeep} from '../../plugin/helpers';
 import {convertToRgb, checkAndEvaluateMath, isSingleToken} from './utils';
 
@@ -138,12 +139,12 @@ export default class TokenData {
         }, []);
 
         const assigned = mergeDeep({}, ...reducedTokens);
-        console.log('reduce to values', reducedTokens, this.tokens, assigned);
 
         return assigned;
     }
 
     getMergedTokens(): TokenGroup {
+        console.log('merged', this.mergedTokens);
         return this.mergedTokens;
     }
 
@@ -184,10 +185,8 @@ export default class TokenData {
         const tokenObj = {};
         console.log({tokens});
         Object.entries(tokens).forEach(([key, value]) => {
-            console.log('setting', key, key.split('/').join('.').toString(), value);
-            objectPath.set(tokenObj, key.split('/').join('.').toString(), value);
+            set(tokenObj, key.split('/').join('.').toString(), value);
         });
-        console.log({tokenObj});
 
         return JSON.stringify(tokenObj, null, 2);
     }
@@ -198,7 +197,10 @@ export default class TokenData {
 
     private checkIfValueTokenAlias(token: SingleToken): boolean {
         if (this.checkIfValueToken(token)) {
-            return token.value.toString().includes('$') && token.value.toString().length > 1;
+            return (
+                (token.value.toString().includes('$') || token.value.toString().includes('{')) &&
+                token.value.toString().length > 1
+            );
         }
         return false;
     }
@@ -206,13 +208,16 @@ export default class TokenData {
     private checkIfAlias(token: SingleToken): boolean {
         let aliasToken = false;
         if (typeof token === 'string') {
-            aliasToken = token.includes('$') && token.length > 1;
+            aliasToken = (token.includes('$') || token.includes('{')) && token.length > 1;
         } else {
             aliasToken = this.checkIfValueTokenAlias(token);
         }
         if (aliasToken) {
             const tokenToCheck = this.checkIfValueToken(token) ? token.value : token;
-            const resolvedAlias = this.getResolvedAlias(this.mergedTokens, tokenToCheck.toString().substring(1));
+            const tokenReference = tokenToCheck.toString().startsWith('$')
+                ? tokenToCheck.toString().substring(1)
+                : tokenToCheck.toString().slice(1, -1);
+            const resolvedAlias = this.getResolvedAlias(this.mergedTokens, tokenReference);
             return typeof resolvedAlias !== 'undefined';
         }
         return false;
@@ -252,10 +257,12 @@ export default class TokenData {
     getAliasValue(token: SingleToken, tokens = this.mergedTokens): string | null {
         if (this.checkIfAlias(token)) {
             let returnedValue = this.checkIfValueToken(token) ? (token.value as string) : (token as string);
-            const tokenRegex = /(\$[^\s,]+)/g;
+            const tokenRegex = /(\$[^\s,]+)|(\{[^\s,]+\})/g;
             const tokenReferences = returnedValue.toString().match(tokenRegex);
             if (tokenReferences.length > 0) {
-                const resolvedReferences = tokenReferences.map((ref) => objectPath.get(tokens, ref.substring(1)));
+                const resolvedReferences = tokenReferences.map((ref) => {
+                    return objectPath.get(tokens, ref.startsWith('$') ? ref.substring(1) : ref.slice(1, -1));
+                });
                 tokenReferences.forEach((reference, index) => {
                     returnedValue = returnedValue.replace(
                         reference,

@@ -85,7 +85,7 @@ const TokenButton = ({type, property, name, path, token, editMode, showForm}) =>
                 {label: 'Height', name: 'height'},
             ];
             break;
-        case 'fill':
+        case 'color':
             showValue = false;
             properties = [
                 {
