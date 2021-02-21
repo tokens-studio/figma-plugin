@@ -5,29 +5,129 @@ import {useTokenDispatch, useTokenState} from '../store/TokenContext';
 import TokenListing from './TokenListing';
 import Button from './Button';
 
+interface TokenListingType {
+    label: string;
+    property: string;
+    type: string;
+    values: object;
+    help?: string;
+    explainer?: string;
+    schema?: {
+        value: object | string;
+        options: object | string;
+    };
+}
+
 const mappedTokens = (tokens) => {
     const properties = {
-        sizing: {},
-        spacing: {},
-        colors: {},
-        borderRadius: {},
-        borderWidth: {},
-        opacity: {},
-        fontFamilies: {},
-        fontWeights: {},
-        fontSizes: {},
-        lineHeights: {},
-        letterSpacing: {},
-        paragraphSpacing: {},
-        typography: {},
+        sizing: {
+            label: 'Sizing',
+            property: 'Sizing',
+            type: 'sizing',
+        },
+        spacing: {
+            label: 'Spacing',
+            property: 'Spacing',
+            type: 'spacing',
+        },
+        color: {
+            label: 'Colors',
+            property: 'Color',
+            type: 'color',
+            schema: {
+                value: 'color',
+                options: {
+                    description: '',
+                },
+            },
+            help:
+                "If a (local) style is found with the same name it will match to that, if not, will use hex value. Use 'Create Style' to batch-create styles from your tokens (e.g. in your design library). In the future we'll load all 'remote' styles and reference them inside the JSON.",
+        },
+        borderRadius: {
+            label: 'Border Radius',
+            property: 'Border Radius',
+            type: 'borderRadius',
+        },
+        borderWidth: {
+            label: 'Border Width',
+            property: 'Border Width',
+            type: 'borderWidth',
+            explainer: 'Enter as a number, e.g. 4',
+        },
+        opacity: {
+            label: 'Opacity',
+            property: 'Opacity',
+            type: 'opacity',
+            explainer: 'Set as 50%',
+        },
+        typography: {
+            label: 'Typography',
+            property: 'Typography',
+            type: 'typography',
+            schema: {
+                value: {
+                    fontFamily: '',
+                    fontWeight: '',
+                    lineHeight: '',
+                    fontSize: '',
+                },
+                options: {
+                    description: '',
+                },
+            },
+            help:
+                "If a (local) style is found with the same name it will match to that, if not, will use raw font values. Use 'Create Style' to batch-create styles from your tokens (e.g. in your design library). In the future we'll load all 'remote' styles and reference them inside the JSON.",
+        },
+        fontFamilies: {
+            help: 'Only works in combination with a Font Weight',
+            label: 'Font Families',
+            property: 'Font Family',
+            type: 'fontFamilies',
+        },
+        fontWeights: {
+            help: 'Only works in combination with a Font Family',
+            label: 'Font Weights',
+            property: 'Font Weight',
+            type: 'fontWeights',
+        },
+        lineHeights: {
+            label: 'Line Heights',
+            explainer: 'e.g. 100% or 14',
+            property: 'Line Height',
+            type: 'lineHeights',
+        },
+        fontSizes: {
+            label: 'Font Sizes',
+            property: 'Font Size',
+            type: 'fontSizes',
+        },
+        letterSpacing: {
+            label: 'Letter Spacing',
+            property: 'Letter Spacing',
+            type: 'letterSpacing',
+        },
+        paragraphSpacing: {
+            label: 'Paragraph Spacing',
+            property: 'ParagraphSpacing',
+            type: 'paragraphSpacing',
+        },
     };
-    return Object.entries(Object.assign(tokens, properties));
+    Object.entries(tokens).forEach(([key, values]: [string, object]) => {
+        properties[key] = {
+            ...properties[key],
+            label: properties[key]?.label ?? key,
+            type: properties[key]?.type ?? key,
+            property: properties[key]?.property ?? key,
+            values,
+        };
+    });
+    return Object.entries(properties);
 };
 
 const Tokens = () => {
     const {tokenData, updatePageOnly} = useTokenState();
     const [activeToken] = React.useState('options');
-    const {updateTokens, setLoading, toggleUpdatePageOnly} = useTokenDispatch();
+    const {updateTokens, setLoading, toggleUpdatePageOnly, toggleShowEmptyGroups} = useTokenDispatch();
 
     const handleUpdate = async () => {
         await setLoading(true);
@@ -40,107 +140,24 @@ const Tokens = () => {
 
     return (
         <div>
-            <TokenListing
-                label="Border Radius"
-                property="Border Radius"
-                tokenType="borderRadius"
-                values={tokenValues.borderRadius}
-            />
-            <TokenListing
-                label="Border Width"
-                explainer="Enter as a number, e.g. 4"
-                property="Border Width"
-                tokenType="borderWidth"
-                values={tokenValues.borderWidth}
-            />
-            <TokenListing
-                label="Opacity"
-                property="Opacity"
-                explainer="Set as 50%"
-                tokenType="opacity"
-                values={tokenValues.opacity}
-            />
-            <TokenListing
-                showDisplayToggle
-                createButton
-                help="If a (local) style is found with the same name it will match to that, if not, will use hex value. Use 'Create Style' to batch-create styles from your tokens (e.g. in your design library). In the future we'll load all 'remote' styles and reference them inside the JSON."
-                label="Colors"
-                property="Color"
-                tokenType="color"
-                schema={{
-                    value: 'color',
-                    options: {
-                        description: '',
-                    },
-                }}
-                values={tokenValues.colors || tokenValues.color}
-            />
-            <TokenListing label="Sizing" property="Sizing" tokenType="sizing" values={tokenValues.sizing} />
-            <TokenListing property="Spacing" label="Spacing" tokenType="spacing" values={tokenValues.spacing} />
-            <TokenListing
-                createButton
-                help="If a (local) style is found with the same name it will match to that, if not, will use raw font values. Use 'Create Style' to batch-create styles from your tokens (e.g. in your design library). In the future we'll load all 'remote' styles and reference them inside the JSON."
-                label="Typography"
-                property="Typography"
-                tokenType="typography"
-                schema={{
-                    value: {
-                        fontFamily: '',
-                        fontWeight: '',
-                        lineHeight: '',
-                        fontSize: '',
-                    },
-                    options: {
-                        description: '',
-                    },
-                }}
-                values={tokenValues.typography}
-            />
-            <TokenListing
-                help="Only works in combination with a Font Weight"
-                label="Font Families"
-                property="Font Family"
-                tokenType="fontFamilies"
-                values={tokenValues.fontFamilies}
-            />
-            <TokenListing
-                help="Only works in combination with a Font Family"
-                label="Font Weights"
-                property="Font Weight"
-                tokenType="fontWeights"
-                values={tokenValues.fontWeights}
-            />
-            <TokenListing
-                label="Line Heights"
-                explainer="e.g. 100% or 14"
-                property="Line Height"
-                tokenType="lineHeights"
-                values={tokenValues.lineHeights}
-            />
-            <TokenListing
-                label="Font Sizes"
-                property="Font Size"
-                tokenType="fontSizes"
-                values={tokenValues.fontSizes}
-            />
-            <TokenListing
-                label="Letter Spacing"
-                property="Letter Spacing"
-                tokenType="letterSpacing"
-                values={tokenValues.letterSpacing}
-            />
-            <TokenListing
-                label="Paragraph Spacing"
-                property="ParagraphSpacing"
-                tokenType="paragraphSpacing"
-                values={tokenValues.paragraphSpacing}
-            />
-            {/* <TokenListing
-                property={tokenValues[0]}
-                label={tokenValues[0]}
-                values={tokenValues}
-                tokenType={tokenValues[0]}
-            /> */}
+            {mappedTokens(tokenValues).map(([key, group]: [string, TokenListingType]) => {
+                return (
+                    <div key={key}>
+                        <TokenListing
+                            label={group.label}
+                            explainer={group.explainer}
+                            schema={group.schema}
+                            help={group.help}
+                            property={group.property}
+                            tokenType={group.type}
+                            values={group.values}
+                        />
+                    </div>
+                );
+            })}
+            <button onClick={toggleShowEmptyGroups} type="button">
+                Show empty groups
+            </button>
             <div className="fixed bottom-0 left-0 w-full bg-white flex justify-between items-center p-2 border-t border-gray-200">
                 <div className="switch flex items-center">
                     <input

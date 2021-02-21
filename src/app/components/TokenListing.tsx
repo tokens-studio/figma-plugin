@@ -15,8 +15,6 @@ const TokenListing = ({
     schema,
     explainer = '',
     help = '',
-    createButton = false,
-    showDisplayToggle = false,
     property,
     tokenType = '',
     values,
@@ -28,13 +26,19 @@ const TokenListing = ({
     };
     explainer?: string;
     help?: string;
-    createButton?: boolean;
-    showDisplayToggle?: boolean;
     property: string;
-    tokenType?: string;
-    values?: string | object;
+    tokenType: string;
+    values: object;
 }) => {
-    const {collapsed, showEditForm, showNewGroupForm, showOptions, tokenData, displayType} = useTokenState();
+    const {
+        collapsed,
+        showEmptyGroups,
+        showEditForm,
+        showNewGroupForm,
+        showOptions,
+        tokenData,
+        displayType,
+    } = useTokenState();
     const {
         setStringTokens,
         setCollapsed,
@@ -47,12 +51,13 @@ const TokenListing = ({
         setDisplayType,
     } = useTokenDispatch();
 
-    console.log('starting tokenlsiting', tokenType);
+    const createButton = tokenType === 'color';
+    const showDisplayToggle = tokenType === 'color';
 
     const [activeToken] = React.useState('options');
 
     const [showHelp, setShowHelp] = React.useState(false);
-    const [isIntCollapsed, setIntCollapsed] = React.useState(false);
+    const [isIntCollapsed, setIntCollapsed] = React.useState(!values);
 
     const [editToken, setEditToken] = React.useState({
         value: '',
@@ -115,8 +120,15 @@ const TokenListing = ({
     };
 
     React.useEffect(() => {
-        setIntCollapsed(collapsed);
-    }, [collapsed]);
+        console.log('is int collapsed', isIntCollapsed, collapsed);
+    }, []);
+
+    React.useEffect(() => {
+        if (values) {
+            console.log('updating collapsed');
+            setIntCollapsed(collapsed);
+        }
+    }, [collapsed, values]);
 
     const handleSetIntCollapsed = (e) => {
         e.stopPropagation();
@@ -127,9 +139,9 @@ const TokenListing = ({
         }
     };
 
-    console.log('values', values);
+    console.log('values', tokenType, Boolean(values), values);
 
-    if (!values) return null;
+    if (!values && !showEmptyGroups) return null;
 
     return (
         <div className="border-b border-gray-200">
@@ -225,16 +237,17 @@ const TokenListing = ({
                             )}
 
                             <div className="px-4 pb-4">
-                                {renderKeyValue({
-                                    tokenValues: Object.entries(values),
-                                    showNewForm,
-                                    showForm,
-                                    property: tokenType,
-                                    schema,
-                                    path: tokenType,
-                                    type: tokenType,
-                                    editMode: true,
-                                })}
+                                {values &&
+                                    renderKeyValue({
+                                        tokenValues: Object.entries(values),
+                                        showNewForm,
+                                        showForm,
+                                        property: tokenType,
+                                        schema,
+                                        path: tokenType,
+                                        type: tokenType,
+                                        editMode: true,
+                                    })}
                             </div>
                             <div className="flex items-center justify-between p-4">
                                 <Heading size="small">{property}</Heading>
@@ -277,7 +290,7 @@ const TokenListing = ({
                 )}
             </div>
             {showHelp && <div className="px-4 pb-4 text-xxs text-gray-600">{help}</div>}
-            {Object.entries(values).length > 0 && (
+            {values && Object.entries(values).length > 0 && (
                 <div className={`px-4 pb-4 ${isIntCollapsed ? 'hidden' : null}`}>
                     {renderKeyValue({
                         tokenValues: Object.entries(values),

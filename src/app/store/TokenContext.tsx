@@ -35,6 +35,7 @@ export enum ActionType {
     ToggleColorMode = 'TOGGLE_COLOR_MODE',
     SetCollapsed = 'SET_COLLAPSED',
     ToggleUpdatePageOnly = 'TOGGLE_UPDATE_PAGE_ONLY',
+    ToggleShowEmptyGroups = 'TOGGLE_SHOW_EMPTY_GROUPS',
 }
 
 const defaultTokens: TokenProps = {
@@ -62,6 +63,7 @@ const emptyState = {
     colorMode: false,
     showEditForm: false,
     showNewGroupForm: false,
+    showEmptyGroups: false,
     showOptions: '',
     updatePageOnly: true,
 };
@@ -241,6 +243,11 @@ function stateReducer(state, action) {
                 ...state,
                 updatePageOnly: action.bool,
             };
+        case ActionType.ToggleShowEmptyGroups:
+            return {
+                ...state,
+                showEmptyGroups: !state.showEmptyGroups,
+            };
         default:
             throw new Error('Not implemented');
     }
@@ -321,6 +328,9 @@ function TokenProvider({children}) {
             },
             toggleUpdatePageOnly: (bool: boolean) => {
                 dispatch({type: ActionType.ToggleUpdatePageOnly, bool});
+            },
+            toggleShowEmptyGroups: () => {
+                dispatch({type: ActionType.ToggleShowEmptyGroups});
             },
         }),
         [dispatch]
