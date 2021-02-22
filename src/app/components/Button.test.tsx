@@ -1,5 +1,5 @@
 import React from 'react';
-import {render} from '../../../__tests__/config/setupTest';
+import {render} from '../../../tests/config/setupTest';
 import Button from './Button';
 
 describe('Button', () => {

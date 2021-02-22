@@ -1,5 +1,4 @@
 import * as React from 'react';
-import '../styles/main.css';
 import JSONEditor from './JSONEditor';
 import Inspector from './Inspector';
 import Tokens from './Tokens';
@@ -44,7 +43,9 @@ const App = () => {
 
     React.useEffect(() => {
         onInitiate();
+        console.log('initiating');
         window.onmessage = (event) => {
+            console.log('got onmessage', event);
             const {type, values} = event.data.pluginMessage;
             switch (type) {
                 case 'selection':
@@ -63,13 +64,15 @@ const App = () => {
                     setLoading(false);
                     setRemoteComponents(values.remotes);
                     break;
-                case 'tokenvalues':
+                case 'tokenvalues': {
+                    console.log('got token values', values);
                     setLoading(false);
                     if (values) {
                         setTokenData(new TokenData(values));
                         setActive('tokens');
                     }
                     break;
+                }
                 case 'styles':
                     setLoading(false);
                     if (values) {
@@ -82,6 +85,8 @@ const App = () => {
             }
         };
     }, []);
+
+    console.log('am loading', loading);
 
     return (
         <>

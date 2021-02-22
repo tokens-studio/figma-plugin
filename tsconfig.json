@@ -14,6 +14,12 @@
     "typeRoots": [
       "./node_modules/@types",
       "./node_modules/@figma"
+    ],
+  },
+  "paths": {
+    "*": [
+      "./node_modules/@types",
+      "./node_modules/@figma"
     ]
   }
 }
