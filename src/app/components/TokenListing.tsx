@@ -131,10 +131,6 @@ const TokenListing = ({
         }
     };
 
-    React.useEffect(() => {
-        console.log('token listing', values);
-    }, [values]);
-
     // if (!Object.entries(values[1]).length > 0) return null;
 
     return (

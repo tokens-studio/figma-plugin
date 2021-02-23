@@ -12,7 +12,7 @@ import {MessageToPluginTypes} from '../../types/messages';
 import {compareUpdatedAt} from './utils';
 
 const Settings = () => {
-    const {tokenData, storageType, localApiState, apiProviders, updateAfterApply} = useTokenState();
+    const {tokenData, storageType, localApiState, apiProviders, updateAfterApply, usedTokenSet} = useTokenState();
     const {
         setLoading,
         setLocalApiState,
@@ -61,13 +61,13 @@ const Settings = () => {
                 console.log(
                     'Remote is older, ask user if they want to overwrite their local progress or upload to remote.'
                 );
-                setTokenData(new TokenData(remoteTokens), remoteTokens.updatedAt);
+                setTokenData(new TokenData(remoteTokens, Object.keys(remoteTokens.values)), remoteTokens.updatedAt);
                 if (updateAfterApply) {
                     console.log('should update!', remoteTokens);
                     updateTokens(false);
                 }
             } else {
-                setTokenData(new TokenData(remoteTokens), remoteTokens.updatedAt);
+                setTokenData(new TokenData(remoteTokens, Object.keys(remoteTokens.values)), remoteTokens.updatedAt);
                 if (updateAfterApply) {
                     console.log('should update!', remoteTokens);
                     updateTokens(false);

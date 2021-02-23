@@ -70,7 +70,7 @@ export function useRemoteTokens() {
             default:
                 throw new Error('Not implemented');
         }
-        setTokenData(new TokenData(tokenValues), tokenValues.updatedAt);
+        setTokenData(new TokenData(tokenValues, Object.keys(tokenValues.values)), tokenValues.updatedAt);
         updateTokens(false);
         setLoading(false);
     };

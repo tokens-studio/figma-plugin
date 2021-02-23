@@ -10,11 +10,13 @@ export default class TokenData {
 
     tokens: Tokens;
 
+    usedTokenSet: string[];
+
     updatedAt: string;
 
-    constructor(data: TokenProps) {
+    constructor(data: TokenProps, usedTokenSet) {
         this.setTokens(data);
-        this.setMergedTokens();
+        this.setMergedTokens(usedTokenSet);
     }
 
     setTokens(tokens: TokenProps): void {
@@ -56,7 +58,7 @@ export default class TokenData {
         return paths.reduce((acc, el) => ({[el]: acc}), {[last]: value});
     }
 
-    injectTokens(tokens): void {
+    injectTokens(tokens, usedTokenSet): void {
         const receivedStyles = {};
         Object.entries(tokens).map(([parent, values]: [string, SingleToken[]]) => {
             values.map((token: TokenGroup) => {
@@ -65,14 +67,15 @@ export default class TokenData {
         });
         const newTokens = mergeDeep(JSON5.parse(this.tokens.options.values), receivedStyles);
         this.tokens.options.values = JSON.stringify(newTokens, null, 2);
-        this.setMergedTokens();
+        this.setMergedTokens(usedTokenSet);
     }
 
-    setMergedTokens(): void {
+    setMergedTokens(usedTokenSet: string[]): void {
         this.mergedTokens = mergeDeep(
             {},
             ...Object.entries(this.tokens).reduce((acc, cur) => {
-                acc.push(JSON5.parse(cur[1].values));
+                console.log('merging', this.tokens, usedTokenSet, cur);
+                if (usedTokenSet.includes(cur[0])) acc.push(JSON5.parse(cur[1].values));
                 return acc;
             }, [])
         );
@@ -80,7 +83,7 @@ export default class TokenData {
         this.setAllAliases();
     }
 
-    updateTokenValues(parent: string, tokens: string, updatedAt: string): void {
+    updateTokenValues(parent: string, tokens: string, updatedAt: string, usedTokenSet: string[]): void {
         const hasErrored: boolean = this.checkTokenValidity(tokens);
         const newTokens = {
             ...this.tokens,
@@ -92,7 +95,7 @@ export default class TokenData {
         this.setUpdatedAt(updatedAt);
         this.tokens = newTokens;
         if (!hasErrored) {
-            this.setMergedTokens();
+            this.setMergedTokens(usedTokenSet);
         }
     }
 
@@ -120,6 +123,7 @@ export default class TokenData {
     }
 
     getMergedTokens(): TokenGroup {
+        console.log('Merged tokens are', this.mergedTokens);
         return this.mergedTokens;
     }
 

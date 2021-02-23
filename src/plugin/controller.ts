@@ -133,6 +133,7 @@ figma.ui.onmessage = async (msg) => {
             return;
         case MessageToPluginTypes.UPDATE: {
             const allWithData = findAllWithData({pageOnly: msg.updatePageOnly});
+            console.log('tokens received', msg.tokens);
             setTokenData(msg.tokenValues, msg.updatedAt);
             updateStyles(msg.tokens, false);
             updateNodes(allWithData, msg.tokens);

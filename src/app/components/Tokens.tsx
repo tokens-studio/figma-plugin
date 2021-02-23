@@ -225,7 +225,7 @@ const Tokens = () => {
                     </label>
                 </div>
                 <Button variant="primary" size="large" onClick={handleUpdate}>
-                    Update
+                    Update {updatePageOnly ? 'page' : 'document'}
                 </Button>
             </div>
         </div>

@@ -7,7 +7,7 @@ import Modal from './Modal';
 import ThemeSelector from './ThemeSelector';
 
 const JSONEditor = () => {
-    const {tokenData, activeTokenSet} = useTokenState();
+    const {tokenData, activeTokenSet, usedTokenSet} = useTokenState();
     const {setStringTokens, setEmptyTokens, setDefaultTokens, updateTokens, setLoading} = useTokenDispatch();
     const [confirmModalVisible, showConfirmModal] = React.useState('');
 
@@ -28,7 +28,7 @@ const JSONEditor = () => {
 
     React.useEffect(() => {
         console.log('tokens', tokenData.tokens);
-        console.log('mergedTokens', tokenData.getMergedTokens());
+        console.log('mergedTokens', tokenData.getMergedTokens(usedTokenSet));
     }, [tokenData]);
 
     return (

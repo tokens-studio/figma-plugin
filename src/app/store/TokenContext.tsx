@@ -46,6 +46,7 @@ export enum ActionType {
     SetAPIProviders = 'SET_API_PROVIDERS',
     SetLocalApiState = 'SET_LOCAL_API_STATE',
     SetActiveTokenSet = 'SET_ACTIVE_TOKEN_SET',
+    ToggleUsedTokenSet = 'TOGGLE_USED_TOKEN_SET',
 }
 
 const defaultTokens: TokenProps = {
@@ -66,11 +67,12 @@ const emptyTokens: TokenProps = {
 
 const emptyState = {
     activeTokenSet: 'options',
+    usedTokenSet: ['options'],
     tokens: defaultTokens,
     loading: true,
     disabled: false,
     collapsed: false,
-    tokenData: new TokenData(emptyTokens),
+    tokenData: new TokenData(emptyTokens, ['options']),
     selectionValues: {},
     displayType: 'GRID',
     colorMode: false,
@@ -108,10 +110,11 @@ function stateReducer(state, action) {
             return {
                 ...state,
                 activeTokenSet: Object.keys(action.data.tokens)[0],
+                usedTokenSet: [Object.keys(action.data.tokens)[0]],
                 tokenData: action.data,
             };
         case ActionType.SetTokensFromStyles:
-            state.tokenData.injectTokens(action.data);
+            state.tokenData.injectTokens(action.data, state.usedTokenSet);
             updateTokensOnSources(state, action.updatedAt);
             return {
                 ...state,
@@ -134,7 +137,12 @@ function stateReducer(state, action) {
                 disabled: action.state,
             };
         case ActionType.SetStringTokens:
-            state.tokenData.updateTokenValues(action.data.parent, action.data.tokens, action.updatedAt);
+            state.tokenData.updateTokenValues(
+                action.data.parent,
+                action.data.tokens,
+                action.updatedAt,
+                state.usedTokenSet
+            );
             return {
                 ...state,
                 tokens: {
@@ -152,7 +160,7 @@ function stateReducer(state, action) {
             const obj = JSON5.parse(state.tokenData.tokens[action.data.parent].values);
             objectPath.del(obj, [action.data.path, action.data.name].join('.'));
             const tokens = JSON.stringify(obj, null, 2);
-            state.tokenData.updateTokenValues(action.data.parent, tokens, action.updatedAt);
+            state.tokenData.updateTokenValues(action.data.parent, tokens, action.updatedAt, state.usedTokenSet);
             const newState = {
                 ...state,
                 tokens: {
@@ -169,14 +177,14 @@ function stateReducer(state, action) {
         case ActionType.CreateStyles:
             postToFigma({
                 type: MessageToPluginTypes.CREATE_STYLES,
-                tokens: state.tokenData.getMergedTokens(),
+                tokens: state.tokenData.getMergedTokens(state.usedTokenSet),
             });
             return state;
         case ActionType.SetNodeData:
             postToFigma({
                 type: MessageToPluginTypes.SET_NODE_DATA,
                 values: action.data,
-                tokens: state.tokenData.getMergedTokens(),
+                tokens: state.tokenData.getMergedTokens(state.usedTokenSet),
             });
             return state;
         case ActionType.RemoveNodeData:
@@ -201,6 +209,16 @@ function stateReducer(state, action) {
                 loading: false,
                 selectionValues: action.data,
             };
+        case ActionType.ToggleUsedTokenSet: {
+            const newState = {
+                ...state,
+                usedTokenSet: state.usedTokenSet.includes(action.data)
+                    ? state.usedTokenSet.filter((n) => n !== action.data)
+                    : [...new Set([...state.usedTokenSet, action.data])],
+            };
+            state.tokenData.setMergedTokens(newState.usedTokenSet);
+            return newState;
+        }
         case ActionType.ResetSelectionValues:
             return {
                 ...state,
@@ -302,7 +320,7 @@ function TokenProvider({children}) {
                 dispatch({type: ActionType.SetStringTokens, data, updatedAt});
             },
             setDefaultTokens: () => {
-                dispatch({type: ActionType.SetTokenData, data: new TokenData(defaultTokens)});
+                dispatch({type: ActionType.SetTokenData, data: new TokenData(defaultTokens, ['options'])});
                 dispatch({type: ActionType.SetLoading, state: false});
             },
             setEmptyTokens: () => {
@@ -368,6 +386,9 @@ function TokenProvider({children}) {
             },
             toggleUpdateAfterApply: (bool: boolean) => {
                 dispatch({type: ActionType.ToggleUpdateAfterApply, bool});
+            },
+            toggleUsedTokenSet: (data: string) => {
+                dispatch({type: ActionType.ToggleUsedTokenSet, data});
             },
             setStorageType: (data: StorageType, bool = false) => {
                 dispatch({type: ActionType.SetStorageType, data, bool});

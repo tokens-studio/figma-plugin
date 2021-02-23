@@ -62,7 +62,7 @@ const App = () => {
                 case MessageFromPluginTypes.TOKEN_VALUES: {
                     setLoading(false);
                     if (values) {
-                        setTokenData(new TokenData(values));
+                        setTokenData(new TokenData(values, Object.keys(values.values)));
                         setActive('tokens');
                     }
                     break;
@@ -90,7 +90,10 @@ const App = () => {
                             console.log('got remote values', remoteValues);
                             setActive('tokens');
                             tokenData.setUpdatedAt(remoteValues.updatedAt);
-                            setTokenData(new TokenData(remoteValues), remoteValues.updatedAt);
+                            setTokenData(
+                                new TokenData(remoteValues, Object.keys(remoteValues.values)),
+                                remoteValues.updatedAt
+                            );
                         }
                         setLoading(false);
                     }
