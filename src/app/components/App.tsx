@@ -76,12 +76,14 @@ const App = () => {
                     break;
                 case MessageFromPluginTypes.RECEIVED_STORAGE_TYPE:
                     setStorageType(storageType);
+                    console.log('got storage type', storageType);
                     break;
                 case MessageFromPluginTypes.API_CREDENTIALS: {
                     if (status === false) {
                         console.log('falsy api credentials');
                     } else {
                         const {id, secret, name, provider} = credentials;
+                        console.log('got credentials', credentials);
                         setApiData({id, secret, name, provider});
                         setLocalApiState({id, secret, name, provider});
                         // setTokenData(new TokenData(values));
@@ -99,9 +101,12 @@ const App = () => {
                     }
                     break;
                 }
-                case MessageFromPluginTypes.API_PROVIDERS:
+                case MessageFromPluginTypes.API_PROVIDERS: {
+                    console.log('got api providers', providers);
+
                     setAPIProviders(providers);
                     break;
+                }
                 default:
                     break;
             }

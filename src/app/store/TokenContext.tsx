@@ -260,11 +260,13 @@ function stateReducer(state, action) {
                 ...state,
                 api: action.data,
             };
-        case ActionType.SetLocalApiState:
+        case ActionType.SetLocalApiState: {
+            console.log('setting local api state', action.data);
             return {
                 ...state,
                 localApiState: action.data,
             };
+        }
         case ActionType.SetAPIProviders: {
             return {
                 ...state,
@@ -379,6 +381,7 @@ function TokenProvider({children}) {
                 dispatch({type: ActionType.SetApiData, data});
             },
             setLocalApiState: (data: ApiDataType) => {
+                console.log('setting local api state', data);
                 dispatch({type: ActionType.SetLocalApiState, data});
             },
             toggleUpdatePageOnly: (bool: boolean) => {

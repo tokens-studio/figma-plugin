@@ -135,7 +135,7 @@ const TokenListing = ({
 
     return (
         <div className="border-b border-gray-200">
-            <div className="flex justify-between space-x-8 items-center relative">
+            <div className="relative flex items-center justify-between space-x-8">
                 <button
                     className={`flex items-center w-full h-full p-4 space-x-2 hover:bg-gray-100 focus:outline-none ${
                         isIntCollapsed ? 'opacity-50' : null
@@ -278,7 +278,7 @@ const TokenListing = ({
                     </Modal>
                 )}
             </div>
-            {showHelp && <div className="px-4 pb-4 text-xxs text-gray-600">{help}</div>}
+            {showHelp && <div className="px-4 pb-4 text-gray-600 text-xxs">{help}</div>}
             {Object.entries(values[1]).length > 0 && (
                 <div className={`px-4 pb-4 ${isIntCollapsed ? 'hidden' : null}`}>
                     {renderKeyValue({

@@ -33,7 +33,7 @@ const compareProvidersWithStored = (providers, storageType) => {
     if (providers) {
         const parsedProviders = JSON.parse(providers);
         const matchingSet = parsedProviders.find((i) => i.provider === storageType.provider && i.id === storageType.id);
-
+        console.log('matching?', {parsedProviders, matchingSet});
         if (matchingSet) {
             //    send a message to the UI with the credentials stored in the client
             figma.ui.postMessage({
@@ -64,10 +64,11 @@ figma.ui.onmessage = async (msg) => {
 
                 notifyStorageType(storageType);
                 if (apiProviders) notifyAPIProviders(JSON.parse(apiProviders));
-
+                console.log('checking if matches', storageType);
                 switch (storageType.provider) {
                     //   Somehow setting this to an ENUM doesn't work :-|
-                    case StorageProviderType.JSONBIN: {
+                    case StorageProviderType.JSONBIN:
+                    case StorageProviderType.ARCADE: {
                         compareProvidersWithStored(apiProviders, storageType);
 
                         break;
