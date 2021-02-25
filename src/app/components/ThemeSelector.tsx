@@ -17,6 +17,7 @@ export default function ThemeSelector() {
         <div className="flex flex-row gap-2 px-4 pt-2 pb-0">
             {totalTokenSets.map((tokenSet) => (
                 <button
+                    key={tokenSet}
                     className={`font-bold items-center gap-2 focus:outline-none text-xs flex p-2 rounded border ${
                         activeTokenSet === tokenSet && 'border-blue-500 bg-blue-100'
                     }`}

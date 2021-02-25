@@ -56,13 +56,13 @@ const Settings = () => {
                 console.log(
                     'Remote is older, ask user if they want to overwrite their local progress or upload to remote.'
                 );
-                setTokenData(new TokenData(remoteTokens, Object.keys(remoteTokens.values)), remoteTokens.updatedAt);
+                setTokenData(new TokenData(remoteTokens));
                 if (updateAfterApply) {
                     console.log('should update!', remoteTokens);
                     updateTokens(false);
                 }
             } else {
-                setTokenData(new TokenData(remoteTokens, Object.keys(remoteTokens.values)), remoteTokens.updatedAt);
+                setTokenData(new TokenData(remoteTokens));
                 if (updateAfterApply) {
                     console.log('should update!', remoteTokens);
                     updateTokens(false);

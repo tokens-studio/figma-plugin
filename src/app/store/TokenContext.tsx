@@ -21,7 +21,6 @@ export enum ActionType {
     SetTokenData = 'SET_TOKEN_DATA',
     SetTokensFromStyles = 'SET_TOKENS_FROM_STYLES',
     SetDefaultTokens = 'SET_DEFAULT_TOKENS',
-    SetEmptyTokens = 'SET_EMPTY_TOKENS',
     SetLoading = 'SET_LOADING',
     SetDisabled = 'SET_DISABLED',
     SetStringTokens = 'SET_STRING_TOKENS',
@@ -57,7 +56,7 @@ const defaultTokens: TokenProps = {
     },
 };
 
-const emptyTokens: TokenProps = {
+export const emptyTokens: TokenProps = {
     version: pjs.version,
     updatedAt: new Date().toString(),
     values: {
@@ -72,7 +71,7 @@ const emptyState = {
     loading: true,
     disabled: false,
     collapsed: false,
-    tokenData: new TokenData(emptyTokens, ['options']),
+    tokenData: null,
     selectionValues: {},
     displayType: 'GRID',
     colorMode: false,
@@ -114,17 +113,11 @@ function stateReducer(state, action) {
                 tokenData: action.data,
             };
         case ActionType.SetTokensFromStyles:
-            state.tokenData.injectTokens(action.data, state.usedTokenSet);
+            state.tokenData.injectTokens(action.data);
             updateTokensOnSources(state, action.updatedAt);
             return {
                 ...state,
                 tokens: state.tokenData.tokens,
-            };
-        case ActionType.SetEmptyTokens:
-            return {
-                ...state,
-                ...emptyState,
-                apiProviders: state.apiProviders,
             };
         case ActionType.SetLoading:
             return {
@@ -137,12 +130,7 @@ function stateReducer(state, action) {
                 disabled: action.state,
             };
         case ActionType.SetStringTokens:
-            state.tokenData.updateTokenValues(
-                action.data.parent,
-                action.data.tokens,
-                action.updatedAt,
-                state.usedTokenSet
-            );
+            state.tokenData.updateTokenValues(action.data.parent, action.data.tokens, action.updatedAt);
             return {
                 ...state,
                 tokens: {
@@ -157,10 +145,12 @@ function stateReducer(state, action) {
             updateTokensOnSources(state, action.updatedAt, action.shouldUpdate);
             return state;
         case ActionType.DeleteToken: {
+            console.log('deleting token', action, state.tokenData);
             const obj = JSON5.parse(state.tokenData.tokens[action.data.parent].values);
             objectPath.del(obj, [action.data.path, action.data.name].join('.'));
             const tokens = JSON.stringify(obj, null, 2);
-            state.tokenData.updateTokenValues(action.data.parent, tokens, action.updatedAt, state.usedTokenSet);
+            state.tokenData.updateTokenValues(action.data.parent, tokens, action.updatedAt);
+            console.log('state', state.tokens);
             const newState = {
                 ...state,
                 tokens: {
@@ -177,14 +167,14 @@ function stateReducer(state, action) {
         case ActionType.CreateStyles:
             postToFigma({
                 type: MessageToPluginTypes.CREATE_STYLES,
-                tokens: state.tokenData.getMergedTokens(state.usedTokenSet),
+                tokens: state.tokenData.getMergedTokens(),
             });
             return state;
         case ActionType.SetNodeData:
             postToFigma({
                 type: MessageToPluginTypes.SET_NODE_DATA,
                 values: action.data,
-                tokens: state.tokenData.getMergedTokens(state.usedTokenSet),
+                tokens: state.tokenData.getMergedTokens(),
             });
             return state;
         case ActionType.RemoveNodeData:
@@ -216,7 +206,7 @@ function stateReducer(state, action) {
                     ? state.usedTokenSet.filter((n) => n !== action.data)
                     : [...new Set([...state.usedTokenSet, action.data])],
             };
-            state.tokenData.setMergedTokens(newState.usedTokenSet);
+            state.tokenData.setUsedTokenSet(newState.usedTokenSet);
             return newState;
         }
         case ActionType.ResetSelectionValues:
@@ -301,7 +291,7 @@ function stateReducer(state, action) {
                 storageType: action.data,
             };
         default:
-            throw new Error('Not implemented');
+            throw new Error('Context not implemented');
     }
 }
 
@@ -322,11 +312,11 @@ function TokenProvider({children}) {
                 dispatch({type: ActionType.SetStringTokens, data, updatedAt});
             },
             setDefaultTokens: () => {
-                dispatch({type: ActionType.SetTokenData, data: new TokenData(defaultTokens, ['options'])});
+                dispatch({type: ActionType.SetTokenData, data: new TokenData(defaultTokens)});
                 dispatch({type: ActionType.SetLoading, state: false});
             },
             setEmptyTokens: () => {
-                dispatch({type: ActionType.SetEmptyTokens});
+                dispatch({type: ActionType.SetTokenData, data: new TokenData(emptyTokens)});
                 dispatch({type: ActionType.SetLoading, state: false});
             },
             updateTokens: (shouldUpdate = true) => {

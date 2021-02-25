@@ -1,0 +1,12 @@
+window.postMessage({
+  "pluginMessage": {
+    "type": "tokenvalues",
+    "values": {
+      "version": "5",
+      "values": {
+        "global": JSON.stringify({ "colors": { "brand": "#ff0000" } }, null, 2),
+        "light": JSON.stringify({ "colors": { "brand": "#00ff00" } }, null, 2),
+      }
+    }
+  }
+})

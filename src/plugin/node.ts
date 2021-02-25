@@ -21,7 +21,7 @@ export function mapValuesToTokens(object, values) {
     return Object.assign({}, ...array);
 }
 
-export function setTokenData(tokens, updatedAt: string) {
+export function setTokensOnDocument(tokens, updatedAt: string) {
     figma.root.setSharedPluginData('tokens', 'version', pjs.version);
     figma.root.setSharedPluginData('tokens', 'values', JSON.stringify(tokens));
     figma.root.setSharedPluginData('tokens', 'updatedAt', updatedAt);

@@ -7,124 +7,19 @@ import Tokens from './Tokens';
 import StartScreen from './StartScreen';
 import Heading from './Heading';
 import Navbar from './Navbar';
-import Icon from './Icon';
-import * as pjs from '../../../package.json';
-import {useTokenState, useTokenDispatch} from '../store/TokenContext';
-import TokenData from './TokenData';
-import {fetchDataFromRemote} from '../store/remoteTokens';
 import {goToNodeId} from './utils';
-import {postToFigma} from '../../plugin/notifiers';
-import {MessageFromPluginTypes, MessageToPluginTypes} from '../../types/messages';
+import LoadingBar from './LoadingBar';
+import Footer from './Footer';
+import Initiator from './Initiator';
 
 const App = () => {
     const [active, setActive] = React.useState('start');
     const [remoteComponents, setRemoteComponents] = React.useState([]);
 
-    const {loading, tokenData} = useTokenState();
-    const {
-        setTokenData,
-        setLoading,
-        setDisabled,
-        setSelectionValues,
-        resetSelectionValues,
-        setTokensFromStyles,
-        setApiData,
-        setLocalApiState,
-        setStorageType,
-        setAPIProviders,
-    } = useTokenDispatch();
-
-    const onInitiate = () => {
-        postToFigma({type: MessageToPluginTypes.INITIATE});
-    };
-
-    React.useEffect(() => {
-        onInitiate();
-        window.onmessage = async (event) => {
-            const {type, values, credentials, status, storageType, providers} = event.data.pluginMessage;
-            switch (type) {
-                case MessageFromPluginTypes.SELECTION:
-                    setDisabled(false);
-                    if (values) {
-                        setSelectionValues(values);
-                    } else {
-                        resetSelectionValues();
-                    }
-                    break;
-                case MessageFromPluginTypes.NO_SELECTION:
-                    setDisabled(true);
-                    resetSelectionValues();
-                    break;
-                case MessageFromPluginTypes.REMOTE_COMPONENTS:
-                    setLoading(false);
-                    setRemoteComponents(values.remotes);
-                    break;
-                case MessageFromPluginTypes.TOKEN_VALUES: {
-                    setLoading(false);
-                    if (values) {
-                        setTokenData(new TokenData(values, Object.keys(values.values)));
-                        setActive('tokens');
-                    }
-                    break;
-                }
-                case MessageFromPluginTypes.STYLES:
-                    setLoading(false);
-                    if (values) {
-                        setTokensFromStyles(values);
-                        setActive('tokens');
-                    }
-                    break;
-                case MessageFromPluginTypes.RECEIVED_STORAGE_TYPE:
-                    setStorageType(storageType);
-                    console.log('got storage type', storageType);
-                    break;
-                case MessageFromPluginTypes.API_CREDENTIALS: {
-                    if (status === false) {
-                        console.log('falsy api credentials');
-                    } else {
-                        const {id, secret, name, provider} = credentials;
-                        console.log('got credentials', credentials);
-                        setApiData({id, secret, name, provider});
-                        setLocalApiState({id, secret, name, provider});
-                        // setTokenData(new TokenData(values));
-                        const remoteValues = await fetchDataFromRemote(id, secret, name, provider);
-                        if (remoteValues) {
-                            console.log('got remote values', remoteValues);
-                            setActive('tokens');
-                            tokenData.setUpdatedAt(remoteValues.updatedAt);
-                            setTokenData(
-                                new TokenData(remoteValues, Object.keys(remoteValues.values)),
-                                remoteValues.updatedAt
-                            );
-                        }
-                        setLoading(false);
-                    }
-                    break;
-                }
-                case MessageFromPluginTypes.API_PROVIDERS: {
-                    console.log('got api providers', providers);
-
-                    setAPIProviders(providers);
-                    break;
-                }
-                default:
-                    break;
-            }
-        };
-    }, []);
-
     return (
         <>
-            {loading && (
-                <div className="fixed w-full z-20">
-                    <div className="flex items-center space-x-2 bg-gray-300 p-2 rounded m-2">
-                        <div className="inline-flex rotate">
-                            <Icon name="loading" />
-                        </div>
-                        <div className="font-medium text-xxs">Hold on, updating...</div>
-                    </div>
-                </div>
-            )}
+            <Initiator setActive={setActive} setRemoteComponents={setRemoteComponents} />
+            <LoadingBar />
             <div className="h-full flex flex-col">
                 <div className="flex-grow flex flex-col">
                     {active !== 'start' && <Navbar active={active} setActive={setActive} />}
@@ -142,28 +37,13 @@ const App = () => {
                             ))}
                         </div>
                     )}
-                    {active === 'start' && !loading && <StartScreen setActive={setActive} />}
+                    {active === 'start' && <StartScreen setActive={setActive} />}
                     {active === 'tokens' && <Tokens />}
                     {active === 'json' && <JSONEditor />}
                     {active === 'settings' && <Settings />}
                     {active === 'inspector' && <Inspector />}
                 </div>
-                <div
-                    className={`p-4 flex-shrink-0 flex items-center justify-between ${active === 'tokens' && 'mb-16'}`}
-                >
-                    <div className="text-gray-600 text-xxs">Figma Tokens Version {pjs.version}</div>
-                    <div className="text-gray-600 text-xxs">
-                        <a
-                            className="flex items-center"
-                            href="https://github.com/six7/figma-tokens"
-                            target="_blank"
-                            rel="noreferrer"
-                        >
-                            <span className="mr-1">Feedback / Issues</span>
-                            <Icon name="github" />
-                        </a>
-                    </div>
-                </div>
+                <Footer active={active} />
             </div>
         </>
     );

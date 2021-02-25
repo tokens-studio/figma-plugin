@@ -10,7 +10,7 @@ import {
     notifyUI,
 } from './notifiers';
 import {findAllWithData, removePluginData, sendPluginValues, updatePluginData} from './pluginData';
-import {getTokenData, updateNodes, setTokenData, goToNode, saveStorageType, getSavedStorageType} from './node';
+import {getTokenData, updateNodes, setTokensOnDocument, goToNode, saveStorageType, getSavedStorageType} from './node';
 import {removeSingleCredential, updateCredentials} from './helpers';
 import {MessageFromPluginTypes, MessageToPluginTypes} from '../types/messages';
 import {StorageProviderType} from '../types/api';
@@ -135,7 +135,7 @@ figma.ui.onmessage = async (msg) => {
         case MessageToPluginTypes.UPDATE: {
             const allWithData = findAllWithData({pageOnly: msg.updatePageOnly});
             console.log('tokens received', msg.tokens);
-            setTokenData(msg.tokenValues, msg.updatedAt);
+            setTokensOnDocument(msg.tokenValues, msg.updatedAt);
             updateStyles(msg.tokens, false);
             updateNodes(allWithData, msg.tokens);
             updatePluginData(allWithData, {});

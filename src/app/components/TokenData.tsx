@@ -14,16 +14,21 @@ export default class TokenData {
 
     updatedAt: string;
 
-    constructor(data: TokenProps, usedTokenSet) {
+    constructor(data: TokenProps) {
+        console.log('constructing', data);
         this.setTokens(data);
-        this.setMergedTokens(usedTokenSet);
+        this.setMergedTokens();
     }
 
     setTokens(tokens: TokenProps): void {
+        console.log('setting tokens', tokens);
         const parsed = this.parseTokenValues(tokens);
-        this.setUpdatedAt(tokens.updatedAt);
+        this.setUpdatedAt(tokens.updatedAt || new Date().toString());
         if (!parsed) return;
+        console.log('got parsed', parsed);
+
         this.tokens = parsed;
+        this.setUsedTokenSet([Object.keys(parsed)[0]]);
     }
 
     private checkTokenValidity(tokens: string): boolean {
@@ -58,7 +63,7 @@ export default class TokenData {
         return paths.reduce((acc, el) => ({[el]: acc}), {[last]: value});
     }
 
-    injectTokens(tokens, usedTokenSet): void {
+    injectTokens(tokens): void {
         const receivedStyles = {};
         Object.entries(tokens).map(([parent, values]: [string, SingleToken[]]) => {
             values.map((token: TokenGroup) => {
@@ -67,23 +72,33 @@ export default class TokenData {
         });
         const newTokens = mergeDeep(JSON5.parse(this.tokens.options.values), receivedStyles);
         this.tokens.options.values = JSON.stringify(newTokens, null, 2);
-        this.setMergedTokens(usedTokenSet);
+        this.setMergedTokens();
     }
 
-    setMergedTokens(usedTokenSet: string[]): void {
-        this.mergedTokens = mergeDeep(
-            {},
-            ...Object.entries(this.tokens).reduce((acc, cur) => {
-                console.log('merging', this.tokens, usedTokenSet, cur);
-                if (usedTokenSet.includes(cur[0])) acc.push(JSON5.parse(cur[1].values));
-                return acc;
-            }, [])
-        );
-
-        this.setAllAliases();
+    setUsedTokenSet(usedTokenSet: string[]): void {
+        console.log('Setting used tokens to', usedTokenSet);
+        this.usedTokenSet = usedTokenSet;
+        this.setMergedTokens();
     }
 
-    updateTokenValues(parent: string, tokens: string, updatedAt: string, usedTokenSet: string[]): void {
+    setMergedTokens(): void {
+        console.log('Getting merged tokens, used set is', this.tokens, this.usedTokenSet);
+
+        if (Object.entries(this.tokens)) {
+            this.mergedTokens = mergeDeep(
+                {},
+                ...Object.entries(this.tokens).reduce((acc, cur) => {
+                    console.log('merging', this.tokens, this.usedTokenSet, cur);
+                    if (this.usedTokenSet.includes(cur[0])) acc.push(JSON5.parse(cur[1].values));
+                    return acc;
+                }, [])
+            );
+
+            this.setAllAliases();
+        }
+    }
+
+    updateTokenValues(parent: string, tokens: string, updatedAt: string): void {
         const hasErrored: boolean = this.checkTokenValidity(tokens);
         const newTokens = {
             ...this.tokens,
@@ -95,7 +110,7 @@ export default class TokenData {
         this.setUpdatedAt(updatedAt);
         this.tokens = newTokens;
         if (!hasErrored) {
-            this.setMergedTokens(usedTokenSet);
+            this.setMergedTokens();
         }
     }
 
