@@ -85,11 +85,9 @@ export async function removeSingleCredential({secret, id}) {
                     return i.secret === secret && i.id === id ? null : i;
                 })
                 .filter((i) => i);
-            console.log('existing prov are', existingProviders);
         }
         await figma.clientStorage.setAsync('apiProviders', JSON.stringify(existingProviders));
         const newProviders = await figma.clientStorage.getAsync('apiProviders');
-        console.log('new providers are', newProviders);
         notifyAPIProviders(JSON.parse(newProviders));
     } catch (err) {
         notifyUI('There was an issue saving your credentials. Please try again.');

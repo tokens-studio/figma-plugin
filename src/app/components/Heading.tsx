@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-const Heading = ({size = '', children, keepCase = false}) => (
+const Heading = ({size = '', children, keepCase = true}) => (
     <p className={`heading ${keepCase ? '' : 'capitalize'} ${size === 'small' ? 'heading-small' : ''}`}>{children}</p>
 );
 

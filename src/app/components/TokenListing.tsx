@@ -42,6 +42,7 @@ const TokenListing = ({
         tokenData,
         displayType,
         activeTokenSet,
+        editProhibited,
     } = useTokenState();
     const {
         setStringTokens,
@@ -189,12 +190,18 @@ const TokenListing = ({
                         </Tooltip>
                     )}
                     <Tooltip label="Edit token values" variant="right">
-                        <button className="button button-ghost" type="button" onClick={() => setShowOptions(values[0])}>
+                        <button
+                            disabled={editProhibited}
+                            className="button button-ghost"
+                            type="button"
+                            onClick={() => setShowOptions(values[0])}
+                        >
                             <Icon name="edit" />
                         </button>
                     </Tooltip>
                     <Tooltip label="Add a new token" variant="right">
                         <button
+                            disabled={editProhibited}
                             className="button button-ghost"
                             type="button"
                             onClick={() => {
@@ -254,6 +261,7 @@ const TokenListing = ({
                                     )}
                                     <Tooltip label="Add a new token">
                                         <button
+                                            disabled={editProhibited}
                                             type="button"
                                             className="button button-ghost"
                                             onClick={() => showNewForm(values[0])}
@@ -263,6 +271,7 @@ const TokenListing = ({
                                     </Tooltip>
                                     <Tooltip label="Add a new group" variant="right">
                                         <button
+                                            disabled={editProhibited}
                                             className="button button-ghost"
                                             type="button"
                                             onClick={() => {

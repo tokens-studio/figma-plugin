@@ -33,7 +33,6 @@ const compareProvidersWithStored = (providers, storageType) => {
     if (providers) {
         const parsedProviders = JSON.parse(providers);
         const matchingSet = parsedProviders.find((i) => i.provider === storageType.provider && i.id === storageType.id);
-        console.log('matching?', {parsedProviders, matchingSet});
         if (matchingSet) {
             //    send a message to the UI with the credentials stored in the client
             figma.ui.postMessage({
@@ -41,16 +40,14 @@ const compareProvidersWithStored = (providers, storageType) => {
                 status: true,
                 credentials: matchingSet,
             });
-        } else {
-            console.log('got no matching set');
         }
     } else {
-        //    send a message to the UI that says there are no credentials stored in the client
+        // send a message to the UI that says there are no credentials stored in the client
         figma.ui.postMessage({
             type: MessageFromPluginTypes.API_CREDENTIALS,
             status: false,
         });
-        //   Read no values from storage
+        // Read no values from storage
         notifyTokenValues();
     }
 };
@@ -64,7 +61,6 @@ figma.ui.onmessage = async (msg) => {
 
                 notifyStorageType(storageType);
                 if (apiProviders) notifyAPIProviders(JSON.parse(apiProviders));
-                console.log('checking if matches', storageType);
                 switch (storageType.provider) {
                     //   Somehow setting this to an ENUM doesn't work :-|
                     case StorageProviderType.JSONBIN:
@@ -77,8 +73,6 @@ figma.ui.onmessage = async (msg) => {
                         const oldTokens = getTokenData();
                         if (oldTokens) {
                             notifyTokenValues(oldTokens);
-                        } else {
-                            console.log('no tokens, maybe set empty?');
                         }
                     }
                 }
@@ -134,7 +128,6 @@ figma.ui.onmessage = async (msg) => {
             return;
         case MessageToPluginTypes.UPDATE: {
             const allWithData = findAllWithData({pageOnly: msg.updatePageOnly});
-            console.log('tokens received', msg.tokens);
             setTokensOnDocument(msg.tokenValues, msg.updatedAt);
             updateStyles(msg.tokens, false);
             updateNodes(allWithData, msg.tokens);

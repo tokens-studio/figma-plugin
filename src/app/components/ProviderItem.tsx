@@ -11,7 +11,6 @@ const ProviderItem = ({provider, id, secret, name, handleSync}) => {
     const {setLocalApiState} = useTokenDispatch();
 
     const restoreStoredProvider = () => {
-        console.log('restoring', provider);
         setLocalApiState({provider, id, secret, name});
         handleSync({provider, id, secret, name});
     };
@@ -35,7 +34,7 @@ const ProviderItem = ({provider, id, secret, name, handleSync}) => {
                 isActive() ? 'bg-blue-100 bg-opacity-50 border-blue-400' : 'hover:border-blue-300 border-gray-300'
             }`}
         >
-            <div className="flex flex-col flex-grow">
+            <div className="flex flex-col flex-grow items-start">
                 <div className="text-xs font-bold">{name}</div>
                 <div className="opacity-75 text-xxs">{id}</div>
                 {!isActive() && (

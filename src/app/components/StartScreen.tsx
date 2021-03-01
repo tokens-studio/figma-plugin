@@ -15,7 +15,6 @@ const StartScreen = ({setActive}) => {
     };
     const onSetSyncClick = () => {
         setActive('settings');
-        console.log({storageType});
         setLocalApiState({
             id: storageType.id,
             name: storageType.name,

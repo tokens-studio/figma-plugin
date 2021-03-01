@@ -118,7 +118,6 @@ export async function createNewJSONBin({provider, secret, tokens, name, updatedA
 // Read tokens from JSONBin
 
 export async function fetchDataFromJSONBin(id, secret, name): Promise<TokenProps> {
-    console.log('executing jsonbin', id, secret, name);
     let tokenValues;
 
     if (!id && !secret) return;
@@ -133,9 +132,7 @@ export async function fetchDataFromJSONBin(id, secret, name): Promise<TokenProps
             secret,
             provider: StorageProviderType.JSONBIN,
         });
-        console.log('data is', jsonBinData);
         if (jsonBinData?.values) {
-            console.log('got options!');
             const obj = {
                 version: jsonBinData.version,
                 updatedAt: jsonBinData.updatedAt,

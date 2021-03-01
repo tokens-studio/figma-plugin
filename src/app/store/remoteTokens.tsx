@@ -79,8 +79,10 @@ export function useRemoteTokens() {
 }
 
 export async function updateTokensOnSources(state: StateType, updatedAt: string, shouldUpdate = true) {
-    console.log('should update is', shouldUpdate);
-    if (state.storageType.provider !== StorageProviderType.LOCAL && shouldUpdate)
+    const isNotRemoteOrArcade = ![StorageProviderType.LOCAL, StorageProviderType.ARCADE].includes(
+        state.storageType.provider
+    );
+    if (isNotRemoteOrArcade && shouldUpdate)
         updateRemoteTokens({
             provider: state.storageType.provider,
             tokens: state.tokenData.reduceToValues(),

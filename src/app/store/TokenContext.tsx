@@ -98,6 +98,7 @@ const emptyState = {
     apiProviders: [],
     updatePageOnly: true,
     updateAfterApply: true,
+    editProhibited: true,
 };
 
 const TokenStateContext = React.createContext(emptyState);
@@ -145,12 +146,10 @@ function stateReducer(state, action) {
             updateTokensOnSources(state, action.updatedAt, action.shouldUpdate);
             return state;
         case ActionType.DeleteToken: {
-            console.log('deleting token', action, state.tokenData);
             const obj = JSON5.parse(state.tokenData.tokens[action.data.parent].values);
             objectPath.del(obj, [action.data.path, action.data.name].join('.'));
             const tokens = JSON.stringify(obj, null, 2);
             state.tokenData.updateTokenValues(action.data.parent, tokens, action.updatedAt);
-            console.log('state', state.tokens);
             const newState = {
                 ...state,
                 tokens: {
@@ -251,7 +250,6 @@ function stateReducer(state, action) {
                 api: action.data,
             };
         case ActionType.SetLocalApiState: {
-            console.log('setting local api state', action.data);
             return {
                 ...state,
                 localApiState: action.data,
@@ -288,6 +286,7 @@ function stateReducer(state, action) {
             }
             return {
                 ...state,
+                editProhibited: action.data.provider === StorageProviderType.ARCADE,
                 storageType: action.data,
             };
         default:
@@ -371,7 +370,6 @@ function TokenProvider({children}) {
                 dispatch({type: ActionType.SetApiData, data});
             },
             setLocalApiState: (data: ApiDataType) => {
-                console.log('setting local api state', data);
                 dispatch({type: ActionType.SetLocalApiState, data});
             },
             toggleUpdatePageOnly: (bool: boolean) => {

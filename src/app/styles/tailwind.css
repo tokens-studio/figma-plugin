@@ -405,6 +405,10 @@ form {
     padding: 2px 0;
 }
 
+.react-contextmenu-item--disabled {
+    @apply opacity-50;
+}
+
 /* switch */
 .switch {
     align-items: center;

@@ -15,17 +15,14 @@ export default class TokenData {
     updatedAt: string;
 
     constructor(data: TokenProps) {
-        console.log('constructing', data);
         this.setTokens(data);
         this.setMergedTokens();
     }
 
     setTokens(tokens: TokenProps): void {
-        console.log('setting tokens', tokens);
         const parsed = this.parseTokenValues(tokens);
         this.setUpdatedAt(tokens.updatedAt || new Date().toString());
         if (!parsed) return;
-        console.log('got parsed', parsed);
 
         this.tokens = parsed;
         this.setUsedTokenSet([Object.keys(parsed)[0]]);
@@ -76,19 +73,15 @@ export default class TokenData {
     }
 
     setUsedTokenSet(usedTokenSet: string[]): void {
-        console.log('Setting used tokens to', usedTokenSet);
         this.usedTokenSet = usedTokenSet;
         this.setMergedTokens();
     }
 
     setMergedTokens(): void {
-        console.log('Getting merged tokens, used set is', this.tokens, this.usedTokenSet);
-
         if (Object.entries(this.tokens)) {
             this.mergedTokens = mergeDeep(
                 {},
                 ...Object.entries(this.tokens).reduce((acc, cur) => {
-                    console.log('merging', this.tokens, this.usedTokenSet, cur);
                     if (this.usedTokenSet.includes(cur[0])) acc.push(JSON5.parse(cur[1].values));
                     return acc;
                 }, [])
@@ -138,7 +131,6 @@ export default class TokenData {
     }
 
     getMergedTokens(): TokenGroup {
-        console.log('Merged tokens are', this.mergedTokens);
         return this.mergedTokens;
     }
 

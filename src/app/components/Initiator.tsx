@@ -6,7 +6,6 @@ import {useTokenDispatch, useTokenState} from '../store/TokenContext';
 import TokenData from './TokenData';
 
 export default function Initiator({setActive, setRemoteComponents}) {
-    const {tokenData} = useTokenState();
     const {
         setTokenData,
         setLoading,
@@ -21,7 +20,6 @@ export default function Initiator({setActive, setRemoteComponents}) {
     } = useTokenDispatch();
 
     const onInitiate = () => {
-        console.log('Initiating');
         postToFigma({type: MessageToPluginTypes.INITIATE});
     };
 
@@ -65,21 +63,17 @@ export default function Initiator({setActive, setRemoteComponents}) {
                         break;
                     case MessageFromPluginTypes.RECEIVED_STORAGE_TYPE:
                         setStorageType(storageType);
-                        console.log('got storage type', storageType);
                         break;
                     case MessageFromPluginTypes.API_CREDENTIALS: {
                         if (status === false) {
                             console.log('falsy api credentials');
                         } else {
                             const {id, secret, name, provider} = credentials;
-                            console.log('got credentials', credentials);
                             setApiData({id, secret, name, provider});
                             setLocalApiState({id, secret, name, provider});
                             // setTokenData(new TokenData(values));
                             const remoteValues = await fetchDataFromRemote(id, secret, name, provider);
                             if (remoteValues) {
-                                console.log('got remote values', remoteValues);
-                                console.log('setting updated at');
                                 setTokenData(new TokenData(remoteValues));
                                 setActive('tokens');
                             }
@@ -88,8 +82,6 @@ export default function Initiator({setActive, setRemoteComponents}) {
                         break;
                     }
                     case MessageFromPluginTypes.API_PROVIDERS: {
-                        console.log('got api providers', providers);
-
                         setAPIProviders(providers);
                         break;
                     }

@@ -9,11 +9,12 @@ import Heading from './Heading';
 import TokenData from './TokenData';
 import {compareUpdatedAt} from './utils';
 import ProviderItem from './ProviderItem';
+import Modal from './Modal';
 
-const ProviderButton = ({text, onClick, isActive}) => (
+const ProviderButton = ({text, onClick, isActive, isStored}) => (
     <button
         className={`font-bold focus:outline-none text-xs flex p-2 rounded border ${
-            isActive && 'border-blue-500 bg-blue-100'
+            isActive ? 'border-blue-500 bg-blue-100' : isStored && 'border-blue-300 bg-blue-100 bg-opacity-50'
         }`}
         type="button"
         onClick={onClick}
@@ -23,7 +24,7 @@ const ProviderButton = ({text, onClick, isActive}) => (
 );
 
 const Settings = () => {
-    const {tokenData, localApiState, apiProviders, updateAfterApply} = useTokenState();
+    const {tokenData, storageType, localApiState, apiProviders, updateAfterApply} = useTokenState();
     const {
         setLocalApiState,
         setApiData,
@@ -33,6 +34,8 @@ const Settings = () => {
         updateTokens,
         setTokenData,
     } = useTokenDispatch();
+
+    const [confirmModalVisible, showConfirmModal] = React.useState(false);
 
     const handleChange = (e) => {
         setLocalApiState({...localApiState, [e.target.name]: e.target.value});
@@ -44,27 +47,20 @@ const Settings = () => {
         name = localApiState.name,
         provider,
     }) => {
-        console.log('syncing', id, secret, name, provider);
         setLoading(true);
         setStorageType({provider, id, name}, true);
         setApiData({id, secret, name, provider});
         const remoteTokens = await fetchDataFromRemote(id, secret, name, provider);
-        console.log('syncing', remoteTokens);
         if (remoteTokens) {
             const comparison = await compareUpdatedAt(tokenData.getUpdatedAt(), remoteTokens);
             if (comparison === 'remote_older') {
-                console.log(
-                    'Remote is older, ask user if they want to overwrite their local progress or upload to remote.'
-                );
                 setTokenData(new TokenData(remoteTokens));
                 if (updateAfterApply) {
-                    console.log('should update!', remoteTokens);
                     updateTokens(false);
                 }
             } else {
                 setTokenData(new TokenData(remoteTokens));
                 if (updateAfterApply) {
-                    console.log('should update!', remoteTokens);
                     updateTokens(false);
                 }
             }
@@ -84,10 +80,6 @@ const Settings = () => {
             setStorageType,
         });
     };
-
-    React.useEffect(() => {
-        console.log('localapistate', localApiState);
-    }, []);
 
     const selectedRemoteProvider = () => {
         return [StorageProviderType.JSONBIN, StorageProviderType.ARCADE].includes(
@@ -115,8 +107,11 @@ const Settings = () => {
             case StorageProviderType.ARCADE:
                 return (
                     <div>
-                        Arcade is currently in Early Access. If you have an Arcade account, use your project's ID and
-                        your API key to gain access.
+                        <a href="https://usearcade.com" target="_blank" rel="noreferrer">
+                            Arcade
+                        </a>{' '}
+                        is currently in Early Access. If you have an Arcade account, use your project ID and your API
+                        key to gain access.
                     </div>
                 );
             default:
@@ -126,20 +121,43 @@ const Settings = () => {
 
     return (
         <div className="flex flex-col flex-grow">
+            <Modal isOpen={confirmModalVisible} close={() => showConfirmModal(false)}>
+                <div className="flex justify-center flex-col text-center space-y-4">
+                    <div className="space-y-2">
+                        <Heading>Set to document storage?</Heading>
+                        <p className="text-xs">You can always go back to remote storage.</p>
+                    </div>
+                    <div className="space-x-4">
+                        <Button variant="secondary" size="large" onClick={() => showConfirmModal(false)}>
+                            Cancel
+                        </Button>
+                        <Button
+                            variant="primary"
+                            size="large"
+                            onClick={() => {
+                                setLocalApiState({provider: StorageProviderType.LOCAL});
+                                setStorageType({provider: StorageProviderType.LOCAL}, true);
+                                showConfirmModal(false);
+                            }}
+                        >
+                            Yes, set to local.
+                        </Button>
+                    </div>
+                </div>
+            </Modal>
             <div className="p-4 space-y-4 border-b">
                 <div className="space-y-4">
                     <Heading>Token Storage</Heading>
                     <div className="flex flex-row gap-2">
                         <ProviderButton
                             isActive={localApiState?.provider === StorageProviderType.LOCAL}
-                            onClick={() => {
-                                setLocalApiState({provider: StorageProviderType.LOCAL});
-                                setStorageType({provider: StorageProviderType.LOCAL}, true);
-                            }}
+                            isStored={storageType?.provider === StorageProviderType.LOCAL}
+                            onClick={() => showConfirmModal(true)}
                             text="Local document"
                         />
                         <ProviderButton
                             isActive={localApiState?.provider === StorageProviderType.JSONBIN}
+                            isStored={storageType?.provider === StorageProviderType.JSONBIN}
                             onClick={() => {
                                 setLocalApiState({provider: StorageProviderType.JSONBIN});
                             }}
@@ -147,10 +165,19 @@ const Settings = () => {
                         />
                         <ProviderButton
                             isActive={localApiState?.provider === StorageProviderType.ARCADE}
+                            isStored={storageType?.provider === StorageProviderType.ARCADE}
                             onClick={() => {
                                 setLocalApiState({provider: StorageProviderType.ARCADE});
                             }}
                             text="Arcade"
+                        />
+                        <ProviderButton
+                            isActive={localApiState?.provider === StorageProviderType.GITHUB}
+                            isStored={storageType?.provider === StorageProviderType.GITHUB}
+                            onClick={() => {
+                                setLocalApiState({provider: StorageProviderType.GITHUB});
+                            }}
+                            text="GitHub"
                         />
                     </div>
                 </div>

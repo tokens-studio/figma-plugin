@@ -26,11 +26,6 @@ const JSONEditor = () => {
         showConfirmModal('');
     };
 
-    React.useEffect(() => {
-        console.log('tokens', tokenData.tokens);
-        console.log('mergedTokens', tokenData.getMergedTokens());
-    }, [tokenData]);
-
     return (
         <div className="flex flex-col flex-grow">
             <ThemeSelector />
