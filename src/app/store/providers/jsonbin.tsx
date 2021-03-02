@@ -17,7 +17,7 @@ export async function readTokensFromJSONBin({secret, id}): Promise<TokenProps> |
         },
     });
 
-    if (response) {
+    if (response.ok) {
         return response.json();
     }
     notifyToUI('There was an error connecting, check your sync settings');
@@ -37,9 +37,8 @@ export async function writeTokensToJSONBin({secret, id, tokenObj}): Promise<Toke
         },
     });
 
-    const res = await response.json();
-
     if (response.ok) {
+        const res = await response.json();
         notifyToUI('Updated Remote');
         return res;
     }
@@ -76,7 +75,15 @@ export async function updateJSONBinTokens({tokens, id, secret, updatedAt, oldUpd
     }
 }
 
-export async function createNewJSONBin({provider, secret, tokens, name, updatedAt, setApiData, setStorageType}) {
+export async function createNewJSONBin({
+    provider,
+    secret,
+    tokens,
+    name,
+    updatedAt,
+    setApiData,
+    setStorageType,
+}): Promise<TokenProps> {
     const response = await fetch(`https://api.jsonbin.io/b`, {
         method: 'POST',
         mode: 'cors',
@@ -112,7 +119,10 @@ export async function createNewJSONBin({provider, secret, tokens, name, updatedA
             secret,
             provider,
         });
+        return tokens;
     }
+    notifyToUI('Something went wrong. See console for details');
+    return null;
 }
 
 // Read tokens from JSONBin
@@ -122,30 +132,34 @@ export async function fetchDataFromJSONBin(id, secret, name): Promise<TokenProps
 
     if (!id && !secret) return;
 
-    const jsonBinData = await readTokensFromJSONBin({id, secret});
+    try {
+        const jsonBinData = await readTokensFromJSONBin({id, secret});
 
-    if (jsonBinData) {
-        postToFigma({
-            type: MessageToPluginTypes.CREDENTIALS,
-            id,
-            name,
-            secret,
-            provider: StorageProviderType.JSONBIN,
-        });
-        if (jsonBinData?.values) {
-            const obj = {
-                version: jsonBinData.version,
-                updatedAt: jsonBinData.updatedAt,
-                values: {
-                    options: JSON.stringify(jsonBinData.values.options, null, 2),
-                },
-            };
+        if (jsonBinData) {
+            postToFigma({
+                type: MessageToPluginTypes.CREDENTIALS,
+                id,
+                name,
+                secret,
+                provider: StorageProviderType.JSONBIN,
+            });
+            if (jsonBinData?.values) {
+                const obj = {
+                    version: jsonBinData.version,
+                    updatedAt: jsonBinData.updatedAt,
+                    values: {
+                        options: JSON.stringify(jsonBinData.values.options, null, 2),
+                    },
+                };
 
-            tokenValues = obj;
-        } else {
-            notifyToUI('No tokens stored on remote');
+                tokenValues = obj;
+            } else {
+                notifyToUI('No tokens stored on remote');
+            }
         }
-    }
 
-    return tokenValues;
+        return tokenValues;
+    } catch (e) {
+        console.log('got error', e);
+    }
 }

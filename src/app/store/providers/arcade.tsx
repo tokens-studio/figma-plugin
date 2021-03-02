@@ -24,26 +24,23 @@ export async function readTokensFromArcade({secret, id}): Promise<TokenProps> | 
         const {exports} = res;
         return exports;
     } catch (err) {
-        console.log(err);
+        console.log('got error while fetching from arcade', err);
     }
 
     notifyToUI('There was an error connecting, check your sync settings');
     return null;
 }
 
-export async function writeTokensToArcade({secret, id, tokenObj}): Promise<TokenProps> | null {
-    console.log({secret, id, tokenObj});
+export async function writeTokensToArcade(): Promise<TokenProps> | null {
     throw new Error('Not implemented');
 }
 
-export async function updateArcadeTokens({tokens, id, secret, updatedAt, oldUpdatedAt = null}) {
-    console.log({tokens, id, secret, updatedAt, oldUpdatedAt});
+export async function updateArcadeTokens() {
     throw new Error('Not implemented');
 }
 
-export async function createNewArcade({provider, secret, tokens, name, updatedAt, setApiData, setStorageType}) {
-    console.log({provider, secret, tokens, name, updatedAt, setApiData, setStorageType});
-    throw new Error('Not implemented');
+export async function createNewArcade() {
+    return null;
 }
 
 // Read tokens from Arcade
@@ -79,7 +76,7 @@ export async function fetchDataFromArcade(id, secret, name): Promise<TokenProps>
         } else {
             notifyToUI('No tokens stored on remote');
         }
-    }
 
-    return tokenValues;
+        return tokenValues;
+    }
 }

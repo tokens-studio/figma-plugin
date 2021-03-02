@@ -11,7 +11,7 @@ export function postToFigma(props) {
     );
 }
 
-export function notifyUI(msg, opts = {}) {
+export function notifyUI(msg, opts?) {
     figma.notify(msg, opts);
 }
 

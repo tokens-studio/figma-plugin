@@ -103,7 +103,15 @@ export async function updateTokensOnSources(state: StateType, updatedAt: string,
     });
 }
 
-export async function createNewBin({provider, secret, tokens, name, updatedAt, setApiData, setStorageType}) {
+export async function createNewBin({
+    provider,
+    secret,
+    tokens,
+    name,
+    updatedAt,
+    setApiData,
+    setStorageType,
+}): Promise<TokenProps | null> {
     notifyToUI('Creating new bin...');
 
     switch (provider) {
@@ -111,7 +119,7 @@ export async function createNewBin({provider, secret, tokens, name, updatedAt, s
             return createNewJSONBin({provider, secret, tokens, name, updatedAt, setApiData, setStorageType});
         }
         case StorageProviderType.ARCADE: {
-            return createNewArcade({provider, secret, tokens, name, updatedAt, setApiData, setStorageType});
+            return createNewArcade();
         }
         default:
             throw new Error('Not implemented');
@@ -119,6 +127,8 @@ export async function createNewBin({provider, secret, tokens, name, updatedAt, s
 }
 
 export async function fetchDataFromRemote(id, secret, name, provider): Promise<TokenProps> {
+    notifyToUI('Fetching remote tokens...');
+
     switch (provider) {
         case StorageProviderType.JSONBIN: {
             return fetchDataFromJSONBin(id, secret, name);

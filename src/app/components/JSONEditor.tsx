@@ -7,7 +7,7 @@ import Modal from './Modal';
 import ThemeSelector from './ThemeSelector';
 
 const JSONEditor = () => {
-    const {tokenData, activeTokenSet} = useTokenState();
+    const {tokenData, activeTokenSet, editProhibited} = useTokenState();
     const {setStringTokens, setEmptyTokens, setDefaultTokens, updateTokens, setLoading} = useTokenDispatch();
     const [confirmModalVisible, showConfirmModal] = React.useState('');
 
@@ -70,6 +70,7 @@ const JSONEditor = () => {
             <div className="flex flex-col justify-between items-center flex-grow">
                 <div className="flex flex-col p-4 pt-2 w-full items-center flex-grow">
                     <Textarea
+                        isDisabled={editProhibited}
                         className="flex-grow"
                         placeholder="Enter JSON"
                         rows={23}
@@ -82,14 +83,24 @@ const JSONEditor = () => {
 
             <div className="flex justify-between w-full px-4 bg-white">
                 <div className="space-x-2 flex mr-2">
-                    <Button variant="secondary" size="large" onClick={() => showConfirmModal('reset')}>
+                    <Button
+                        disabled={editProhibited}
+                        variant="secondary"
+                        size="large"
+                        onClick={() => showConfirmModal('reset')}
+                    >
                         Fill with example data
                     </Button>
-                    <Button variant="secondary" size="large" onClick={() => showConfirmModal('delete')}>
+                    <Button
+                        disabled={editProhibited}
+                        variant="secondary"
+                        size="large"
+                        onClick={() => showConfirmModal('delete')}
+                    >
                         Clear
                     </Button>
                 </div>
-                <Button variant="primary" size="large" onClick={handleUpdate}>
+                <Button disabled={editProhibited} variant="primary" size="large" onClick={handleUpdate}>
                     Save & update
                 </Button>
             </div>

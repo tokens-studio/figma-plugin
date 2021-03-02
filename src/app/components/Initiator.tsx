@@ -2,7 +2,7 @@ import React from 'react';
 import {postToFigma} from '../../plugin/notifiers';
 import {MessageFromPluginTypes, MessageToPluginTypes} from '../../types/messages';
 import {fetchDataFromRemote} from '../store/remoteTokens';
-import {useTokenDispatch, useTokenState} from '../store/TokenContext';
+import {useTokenDispatch} from '../store/TokenContext';
 import TokenData from './TokenData';
 
 export default function Initiator({setActive, setRemoteComponents}) {
@@ -24,10 +24,11 @@ export default function Initiator({setActive, setRemoteComponents}) {
     };
 
     React.useEffect(() => {
-        console.log('effect triggered');
         onInitiate();
         window.onmessage = async (event) => {
             if (event.data.pluginMessage) {
+                console.log('got a message!', event.data.pluginMessage);
+
                 const {type, values, credentials, status, storageType, providers} = event.data.pluginMessage;
                 switch (type) {
                     case MessageFromPluginTypes.SELECTION:
@@ -65,13 +66,13 @@ export default function Initiator({setActive, setRemoteComponents}) {
                         setStorageType(storageType);
                         break;
                     case MessageFromPluginTypes.API_CREDENTIALS: {
+                        console.log('got api credentials!', credentials);
                         if (status === false) {
                             console.log('falsy api credentials');
                         } else {
                             const {id, secret, name, provider} = credentials;
                             setApiData({id, secret, name, provider});
                             setLocalApiState({id, secret, name, provider});
-                            // setTokenData(new TokenData(values));
                             const remoteValues = await fetchDataFromRemote(id, secret, name, provider);
                             if (remoteValues) {
                                 setTokenData(new TokenData(remoteValues));

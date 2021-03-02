@@ -1,7 +1,6 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import * as React from 'react';
 import {useTokenDispatch, useTokenState} from '../store/TokenContext';
-
 import {postToFigma} from '../../plugin/notifiers';
 import {MessageToPluginTypes} from '../../types/messages';
 import Button from './Button';

@@ -30,7 +30,7 @@ const Tokens = () => {
     const {updateTokens, toggleUpdatePageOnly} = useTokenDispatch();
 
     const handleUpdate = async () => {
-        updateTokens();
+        updateTokens(false);
     };
 
     if (tokenData.tokens[activeTokenSet].hasErrored) return <div>JSON malformed, check in Editor</div>;
