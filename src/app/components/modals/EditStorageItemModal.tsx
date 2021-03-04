@@ -1,43 +1,37 @@
 import React from 'react';
 import Modal from '../Modal';
 import Heading from '../Heading';
-import {StorageProviderType} from '../../../types/api';
-import {useTokenDispatch} from '../../store/TokenContext';
-import EditStorageItemForm from '../EditStorageItemForm';
+import StorageItemForm from '../StorageItemForm';
+import {useRemoteTokens} from '../../store/remoteTokens';
 
-export default function EditStorageItemModal({
-    isOpen,
-    initialValue = {id: '', name: '', secret: ''},
-    onClose,
-    hasErrored = false,
-    onSuccess,
-}) {
-    const {setLocalApiState, setApiData} = useTokenDispatch();
+export default function EditStorageItemModal({isOpen, initialValue, onClose, onSuccess}) {
     const [formFields, setFormFields] = React.useState(initialValue);
+    const [hasErrored, setHasErrored] = React.useState(false);
+    const {syncTokens} = useRemoteTokens();
 
     const handleChange = (e) => {
-        console.log('changed', e);
         setFormFields({...formFields, [e.target.name]: e.target.value});
     };
 
-    const onSubmit = () => {
-        // Should behave differently when currently active
-        setApiData(formFields);
-        setLocalApiState({provider: StorageProviderType.LOCAL});
-        onSuccess();
-    };
-
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log('submitted', e);
-        onSubmit();
+        const response = await syncTokens({
+            id: formFields.id,
+            name: formFields.name,
+            secret: formFields.secret,
+        });
+        if (!response) {
+            setHasErrored(true);
+        } else {
+            onSuccess();
+        }
     };
 
     return (
         <Modal isOpen={isOpen} close={() => onClose(false)}>
             <div className="space-y-4">
                 <Heading>Edit storage item</Heading>
-                <EditStorageItemForm
+                <StorageItemForm
                     handleChange={handleChange}
                     handleSubmit={handleSubmit}
                     handleCancel={() => onClose(false)}

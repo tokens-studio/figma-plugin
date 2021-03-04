@@ -117,7 +117,7 @@ function stateReducer(state, action) {
                 tokenData: action.data,
             };
         case ActionType.SetTokensFromStyles:
-            state.tokenData.injectTokens(action.data);
+            state.tokenData.injectTokens(action.data, state.activeTokenSet);
             updateTokensOnSources(state, action.updatedAt);
             return {
                 ...state,
@@ -196,6 +196,7 @@ function stateReducer(state, action) {
                     : [...new Set([...state.usedTokenSet, action.data])],
             };
             state.tokenData.setUsedTokenSet(newState.usedTokenSet);
+            updateTokensOnSources(state, action.updatedAt, false);
             return newState;
         }
         case ActionType.ResetSelectionValues:
@@ -277,7 +278,10 @@ function stateReducer(state, action) {
             state.tokenData.deleteTokenSet(action.data, action.updatedAt);
             return {
                 ...state,
-                tokenData: state.tokenData,
+                activeTokenSet:
+                    state.activeTokenSet === action.data
+                        ? Object.keys(state.tokenData.tokens)[0]
+                        : state.activeTokenSet,
             };
         }
         case ActionType.RenameTokenSet: {
@@ -288,7 +292,7 @@ function stateReducer(state, action) {
             });
             return {
                 ...state,
-                tokenData: state.tokenData,
+                activeTokenSet: state.activeTokenSet === action.oldName ? action.newName : state.activeTokenSet,
             };
         }
         case ActionType.SetStorageType:
@@ -394,7 +398,7 @@ function TokenProvider({children}) {
                 dispatch({type: ActionType.ToggleUpdateAfterApply, bool});
             },
             toggleUsedTokenSet: (data: string) => {
-                dispatch({type: ActionType.ToggleUsedTokenSet, data});
+                dispatch({type: ActionType.ToggleUsedTokenSet, data, updatedAt});
             },
             setStorageType: (data: StorageType, bool = false) => {
                 dispatch({type: ActionType.SetStorageType, data, bool});

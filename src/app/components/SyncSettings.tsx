@@ -3,32 +3,20 @@ import * as React from 'react';
 import {useTokenDispatch, useTokenState} from '../store/TokenContext';
 import {StorageProviderType} from '../../types/api';
 import Button from './Button';
-import {createNewBin, fetchDataFromRemote} from '../store/remoteTokens';
 import Heading from './Heading';
-import TokenData from './TokenData';
-import {compareUpdatedAt} from './utils';
 import ConfirmLocalStorageModal from './modals/ConfirmLocalStorageModal';
 import StorageItem from './StorageItem';
 import ProviderSelector from './StorageProviderSelector';
 import EditStorageItemModal from './modals/EditStorageItemModal';
-import EditStorageItemForm from './EditStorageItemForm';
+import CreateStorageItemModal from './modals/CreateStorageItemModal';
 
 const SyncSettings = () => {
-    const {tokenData, api, storageType, localApiState, apiProviders, updateAfterApply} = useTokenState();
-    const {
-        setLocalApiState,
-        setApiData,
-        setStorageType,
-        toggleUpdateAfterApply,
-        setLoading,
-        updateTokens,
-        setTokenData,
-    } = useTokenDispatch();
+    const {api, storageType, localApiState, apiProviders, updateAfterApply} = useTokenState();
+    const {setLocalApiState, setStorageType, toggleUpdateAfterApply} = useTokenDispatch();
 
     const [confirmModalVisible, showConfirmModal] = React.useState(false);
     const [editStorageItemModalVisible, setShowEditStorageModalVisible] = React.useState(false);
     const [createStorageItemModalVisible, setShowCreateStorageModalVisible] = React.useState(false);
-    const [hasErrored, setHasErrored] = React.useState(false);
 
     const handleEditClick = (provider) => {
         console.log('clicked edit', provider);
@@ -39,69 +27,6 @@ const SyncSettings = () => {
             secret: provider.secret,
         });
         setShowEditStorageModalVisible(true);
-    };
-
-    const handleSyncClick = async ({
-        id = localApiState.id,
-        secret = localApiState.secret,
-        name = localApiState.name,
-        provider,
-    }) => {
-        console.log('clicked sync', id, secret, name, provider);
-        setLoading(true);
-        setHasErrored(false);
-        const remoteTokens = await fetchDataFromRemote(id, secret, name, provider as StorageProviderType);
-        if (remoteTokens) {
-            setStorageType({provider, id, name}, true);
-            setApiData({id, secret, name, provider});
-            setShowEditStorageModalVisible(false);
-            const comparison = await compareUpdatedAt(tokenData.getUpdatedAt(), remoteTokens);
-            if (comparison === 'remote_older') {
-                setTokenData(new TokenData(remoteTokens));
-                if (updateAfterApply) {
-                    updateTokens(false);
-                }
-            } else {
-                setTokenData(new TokenData(remoteTokens));
-                if (updateAfterApply) {
-                    updateTokens(false);
-                }
-            }
-        } else {
-            setHasErrored(true);
-        }
-        setLoading(false);
-    };
-
-    const handleCreateNewClick = async (provider) => {
-        setLoading(true);
-        setHasErrored(false);
-        const response = await createNewBin({
-            provider,
-            secret: localApiState.secret,
-            tokens: tokenData.reduceToValues(),
-            name: localApiState.name,
-            updatedAt: tokenData.getUpdatedAt(),
-            setApiData,
-            setStorageType,
-        });
-        if (response) {
-            setShowEditStorageModalVisible(false);
-        } else {
-            setHasErrored(true);
-        }
-        setLoading(false);
-    };
-
-    const handleSubmit = (e) => {
-        console.log('handling submit');
-        e.preventDefault();
-
-        if (localApiState.id) {
-            handleSyncClick({provider: localApiState.provider});
-        } else {
-            handleCreateNewClick(localApiState.provider);
-        }
     };
 
     const selectedRemoteProvider = () => {
@@ -158,7 +83,7 @@ const SyncSettings = () => {
             {editStorageItemModalVisible && (
                 <EditStorageItemModal
                     isOpen={editStorageItemModalVisible}
-                    onClose={setShowEditStorageModalVisible}
+                    onClose={() => setShowEditStorageModalVisible(false)}
                     initialValue={localApiState}
                     onSuccess={() => {
                         setShowEditStorageModalVisible(false);
@@ -166,11 +91,10 @@ const SyncSettings = () => {
                 />
             )}
             {createStorageItemModalVisible && (
-                <EditStorageItemModal
+                <CreateStorageItemModal
                     isOpen={createStorageItemModalVisible}
-                    onClose={setShowCreateStorageModalVisible}
-                    hasErrored={hasErrored}
-                    onSuccess={handleSubmit}
+                    onClose={() => setShowCreateStorageModalVisible(false)}
+                    onSuccess={() => setShowCreateStorageModalVisible(false)}
                 />
             )}
             <div className="p-4 space-y-4 border-b">
@@ -211,7 +135,6 @@ const SyncSettings = () => {
                             <div className="space-y-4">
                                 {api.provider === localApiState.provider && (
                                     <StorageItem
-                                        handleSync={handleSyncClick}
                                         provider={api.provider}
                                         id={api.id}
                                         name={api.name}
@@ -244,7 +167,6 @@ const SyncSettings = () => {
                                             {storedApiProviders().map((item) => (
                                                 <StorageItem
                                                     key={`${item.provider}-${item.id}-${item.secret}`}
-                                                    handleSync={handleSyncClick}
                                                     onEdit={() => handleEditClick(item)}
                                                     provider={item.provider}
                                                     id={item.id}

@@ -4,15 +4,17 @@ import {useTokenDispatch, useTokenState} from '../store/TokenContext';
 import {postToFigma} from '../../plugin/notifiers';
 import {MessageToPluginTypes} from '../../types/messages';
 import Button from './Button';
+import {useRemoteTokens} from '../store/remoteTokens';
 
-const StorageItem = ({provider, id, secret, name, handleSync, onEdit = null}) => {
+const StorageItem = ({provider, id, secret, name, onEdit = null}) => {
     const {storageType} = useTokenState();
     const {setLocalApiState} = useTokenDispatch();
+    const {syncTokens} = useRemoteTokens();
 
     const restoreStoredProvider = () => {
         console.log('restoring stored provider', provider, id, secret, name);
         setLocalApiState({provider, id, secret, name});
-        handleSync({provider, id, secret, name});
+        syncTokens({provider, id, secret, name});
     };
 
     const deleteProvider = () => {
@@ -53,9 +55,11 @@ const StorageItem = ({provider, id, secret, name, handleSync, onEdit = null}) =>
                         Edit
                     </Button>
                 )}
-                <Button variant="secondary" disabled={isActive()} onClick={() => restoreStoredProvider()}>
-                    Apply
-                </Button>
+                {!isActive() && (
+                    <Button variant="secondary" onClick={() => restoreStoredProvider()}>
+                        Apply
+                    </Button>
+                )}
             </div>
         </div>
     );

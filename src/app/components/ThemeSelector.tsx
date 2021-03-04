@@ -139,7 +139,7 @@ export default function ThemeSelector() {
                     />
                 </form>
             ) : (
-                <Tooltip label="Add a new token in group">
+                <Tooltip label="Add new token set">
                     <button
                         className="button button-ghost"
                         type="button"

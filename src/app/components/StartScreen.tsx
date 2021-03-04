@@ -1,5 +1,4 @@
 import * as React from 'react';
-import ReactPlayer from 'react-player';
 import Heading from './Heading';
 import Button from './Button';
 import Callout from './Callout';
@@ -26,15 +25,7 @@ const StartScreen = ({setActive}) => {
     return (
         <div className="my-auto h-auto space-y-4 p-4">
             <a href="https://jansix.at/resources/figma-tokens?ref=figma-tokens-plugin" target="_blank" rel="noreferrer">
-                <ReactPlayer
-                    className="w-full rounded overflow-hidden"
-                    muted
-                    width="100%"
-                    height="auto"
-                    loop
-                    playing
-                    url="https://jansix.at/videos/tokens/E7b7fKEjyi.mp4"
-                />
+                <img alt="Figma Tokens Splashscreen" src={require('../assets/tokens-intro.jpg')} />
             </a>
             <Heading>Welcome to Figma Tokens.</Heading>
             <div className="text-xs">

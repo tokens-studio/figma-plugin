@@ -61,13 +61,14 @@ export default class TokenData {
     }
 
     injectTokens(tokens, activeTokenSet): void {
+        console.log('Pulling styles', this.tokens, activeTokenSet, this.tokens[activeTokenSet]);
         const receivedStyles = {};
         Object.entries(tokens).map(([parent, values]: [string, SingleToken[]]) => {
             values.map((token: TokenGroup) => {
                 mergeDeep(receivedStyles, {[parent]: this.convertDotPathToNestedObject(token[0], token[1])});
             });
         });
-        const newTokens = mergeDeep(JSON5.parse(this.tokens.options.values), receivedStyles);
+        const newTokens = mergeDeep(JSON5.parse(this.tokens[activeTokenSet].values), receivedStyles);
         this.tokens[activeTokenSet].values = JSON.stringify(newTokens, null, 2);
         this.setMergedTokens();
     }
@@ -77,14 +78,21 @@ export default class TokenData {
             console.log('key already exists');
             return false;
         }
-        this.updateTokenValues(tokenSet, JSON.stringify({}), updatedAt);
+        this.tokens = {
+            ...this.tokens,
+            [tokenSet]: {
+                values: JSON.stringify({}),
+            },
+        };
+        this.setUpdatedAt(updatedAt);
         return true;
     }
 
     deleteTokenSet(tokenSet: string, updatedAt): void {
         if (tokenSet in this.tokens) {
             console.log('deleting token set');
-            this.updateTokenValues(tokenSet, null, updatedAt);
+            delete this.tokens[tokenSet];
+            this.setUpdatedAt(updatedAt);
         }
     }
 
@@ -93,10 +101,13 @@ export default class TokenData {
             console.log('Key already exists');
             return false;
         }
-        const newObj = this.tokens[oldName];
-        console.log('new obj', newObj);
-        this.updateTokenValues(newName, JSON.stringify(newObj, null, 2), updatedAt);
-        this.updateTokenValues(oldName, null, updatedAt);
+        this.tokens = {
+            ...this.tokens,
+            [newName]: this.tokens[oldName],
+        };
+        delete this.tokens[oldName];
+        this.setUpdatedAt(updatedAt);
+
         return true;
     }
 
@@ -121,7 +132,7 @@ export default class TokenData {
 
     updateTokenValues(parent: string, tokens: string, updatedAt: string): void {
         if (tokens) {
-            console.log('got tokens');
+            console.log('got tokens', parent, tokens, this.tokens);
             const hasErrored: boolean = this.checkTokenValidity(tokens);
             const newTokens = {
                 ...this.tokens,
@@ -136,6 +147,7 @@ export default class TokenData {
                 this.setMergedTokens();
             }
         } else {
+            console.log('removing', parent);
             const oldTokens = this.tokens;
             delete oldTokens[parent];
         }
