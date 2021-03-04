@@ -3,7 +3,6 @@ import * as React from 'react';
 import {useTokenDispatch, useTokenState} from '../store/TokenContext';
 import {StorageProviderType} from '../../types/api';
 import Button from './Button';
-import Input from './Input';
 import {createNewBin, fetchDataFromRemote} from '../store/remoteTokens';
 import Heading from './Heading';
 import TokenData from './TokenData';
@@ -11,8 +10,10 @@ import {compareUpdatedAt} from './utils';
 import ConfirmLocalStorageModal from './modals/ConfirmLocalStorageModal';
 import StorageItem from './StorageItem';
 import ProviderSelector from './StorageProviderSelector';
+import EditStorageItemModal from './modals/EditStorageItemModal';
+import EditStorageItemForm from './EditStorageItemForm';
 
-const Settings = () => {
+const SyncSettings = () => {
     const {tokenData, api, storageType, localApiState, apiProviders, updateAfterApply} = useTokenState();
     const {
         setLocalApiState,
@@ -25,11 +26,19 @@ const Settings = () => {
     } = useTokenDispatch();
 
     const [confirmModalVisible, showConfirmModal] = React.useState(false);
-    const [showEditFields, setShowEditFields] = React.useState(false);
+    const [editStorageItemModalVisible, setShowEditStorageModalVisible] = React.useState(false);
+    const [createStorageItemModalVisible, setShowCreateStorageModalVisible] = React.useState(false);
     const [hasErrored, setHasErrored] = React.useState(false);
 
-    const handleChange = (e) => {
-        setLocalApiState({...localApiState, [e.target.name]: e.target.value});
+    const handleEditClick = (provider) => {
+        console.log('clicked edit', provider);
+        setLocalApiState({
+            id: provider.id,
+            name: provider.name,
+            provider: provider.provider,
+            secret: provider.secret,
+        });
+        setShowEditStorageModalVisible(true);
     };
 
     const handleSyncClick = async ({
@@ -38,13 +47,14 @@ const Settings = () => {
         name = localApiState.name,
         provider,
     }) => {
+        console.log('clicked sync', id, secret, name, provider);
         setLoading(true);
         setHasErrored(false);
-        const remoteTokens = await fetchDataFromRemote(id, secret, name, provider);
+        const remoteTokens = await fetchDataFromRemote(id, secret, name, provider as StorageProviderType);
         if (remoteTokens) {
             setStorageType({provider, id, name}, true);
             setApiData({id, secret, name, provider});
-            setShowEditFields(false);
+            setShowEditStorageModalVisible(false);
             const comparison = await compareUpdatedAt(tokenData.getUpdatedAt(), remoteTokens);
             if (comparison === 'remote_older') {
                 setTokenData(new TokenData(remoteTokens));
@@ -76,7 +86,7 @@ const Settings = () => {
             setStorageType,
         });
         if (response) {
-            setShowEditFields(false);
+            setShowEditStorageModalVisible(false);
         } else {
             setHasErrored(true);
         }
@@ -84,6 +94,7 @@ const Settings = () => {
     };
 
     const handleSubmit = (e) => {
+        console.log('handling submit');
         e.preventDefault();
 
         if (localApiState.id) {
@@ -133,15 +144,35 @@ const Settings = () => {
 
     return (
         <div className="flex flex-col flex-grow">
-            <ConfirmLocalStorageModal
-                isOpen={confirmModalVisible}
-                onClose={showConfirmModal}
-                onSuccess={() => {
-                    setLocalApiState({provider: StorageProviderType.LOCAL});
-                    setStorageType({provider: StorageProviderType.LOCAL}, true);
-                    showConfirmModal(false);
-                }}
-            />
+            {confirmModalVisible && (
+                <ConfirmLocalStorageModal
+                    isOpen={confirmModalVisible}
+                    onClose={showConfirmModal}
+                    onSuccess={() => {
+                        setLocalApiState({provider: StorageProviderType.LOCAL});
+                        setStorageType({provider: StorageProviderType.LOCAL}, true);
+                        showConfirmModal(false);
+                    }}
+                />
+            )}
+            {editStorageItemModalVisible && (
+                <EditStorageItemModal
+                    isOpen={editStorageItemModalVisible}
+                    onClose={setShowEditStorageModalVisible}
+                    initialValue={localApiState}
+                    onSuccess={() => {
+                        setShowEditStorageModalVisible(false);
+                    }}
+                />
+            )}
+            {createStorageItemModalVisible && (
+                <EditStorageItemModal
+                    isOpen={createStorageItemModalVisible}
+                    onClose={setShowCreateStorageModalVisible}
+                    hasErrored={hasErrored}
+                    onSuccess={handleSubmit}
+                />
+            )}
             <div className="p-4 space-y-4 border-b">
                 <div className="space-y-4">
                     <Heading>Token Storage</Heading>
@@ -173,57 +204,9 @@ const Settings = () => {
                 {selectedRemoteProvider() && (
                     <>
                         <div className="text-gray-600 text-xxs">{storageProviderText()}</div>
-                        {showEditFields ? (
-                            <form onSubmit={handleSubmit} className="space-y-4">
-                                <Input
-                                    full
-                                    label="Name"
-                                    value={localApiState.name}
-                                    onChange={handleChange}
-                                    type="text"
-                                    name="name"
-                                    required
-                                />
-                                <div className="flex items-end justify-between gap-2">
-                                    <Input
-                                        full
-                                        label="Secret"
-                                        value={localApiState.secret}
-                                        onChange={handleChange}
-                                        type="text"
-                                        name="secret"
-                                        required
-                                    />
-                                    <Input
-                                        full
-                                        label={`ID${
-                                            localApiState.provider === StorageProviderType.JSONBIN ? ' (optional)' : ''
-                                        }`}
-                                        value={localApiState.id}
-                                        onChange={handleChange}
-                                        type="text"
-                                        name="id"
-                                        required={localApiState.provider !== StorageProviderType.JSONBIN}
-                                    />
-                                    <Button
-                                        variant="primary"
-                                        type="submit"
-                                        disabled={!localApiState.secret && !localApiState.name}
-                                    >
-                                        Save
-                                    </Button>
-                                </div>
-                                {hasErrored && (
-                                    <div className="bg-red-200 text-red-700 rounded p-4 text-xs font-bold">
-                                        There was an error connecting. Check your credentials.
-                                    </div>
-                                )}
-                            </form>
-                        ) : (
-                            <Button variant="secondary" onClick={() => setShowEditFields(true)}>
-                                Add new credentials
-                            </Button>
-                        )}
+                        <Button variant="secondary" onClick={() => setShowCreateStorageModalVisible(true)}>
+                            Add new credentials
+                        </Button>
                         {storedApiProviders().length > 0 && (
                             <div className="space-y-4">
                                 {api.provider === localApiState.provider && (
@@ -258,14 +241,15 @@ const Settings = () => {
                                             </div>
                                         </div>
                                         <div className="flex flex-col gap-2">
-                                            {storedApiProviders().map(({provider, id, name, secret}) => (
+                                            {storedApiProviders().map((item) => (
                                                 <StorageItem
-                                                    key={`${provider}-${id}-${secret}`}
+                                                    key={`${item.provider}-${item.id}-${item.secret}`}
                                                     handleSync={handleSyncClick}
-                                                    provider={provider}
-                                                    id={id}
-                                                    name={name}
-                                                    secret={secret}
+                                                    onEdit={() => handleEditClick(item)}
+                                                    provider={item.provider}
+                                                    id={item.id}
+                                                    name={item.name}
+                                                    secret={item.secret}
                                                 />
                                             ))}
                                         </div>
@@ -279,4 +263,5 @@ const Settings = () => {
         </div>
     );
 };
-export default Settings;
+
+export default SyncSettings;

@@ -29,7 +29,7 @@ const Navbar = ({active, setActive}) => {
                 <TabButton first name="tokens" label="Tokens" active={active} setActive={setActive} />
                 <TabButton name="json" label="JSON" active={active} setActive={setActive} />
                 <TabButton name="inspector" label="Inspect" active={active} setActive={setActive} />
-                <TabButton name="settings" label="Settings" active={active} setActive={setActive} />
+                <TabButton name="syncsettings" label="Sync" active={active} setActive={setActive} />
             </div>
             <div>
                 {storageType.provider !== StorageProviderType.LOCAL && (

@@ -60,7 +60,7 @@ export default class TokenData {
         return paths.reduce((acc, el) => ({[el]: acc}), {[last]: value});
     }
 
-    injectTokens(tokens): void {
+    injectTokens(tokens, activeTokenSet): void {
         const receivedStyles = {};
         Object.entries(tokens).map(([parent, values]: [string, SingleToken[]]) => {
             values.map((token: TokenGroup) => {
@@ -68,8 +68,36 @@ export default class TokenData {
             });
         });
         const newTokens = mergeDeep(JSON5.parse(this.tokens.options.values), receivedStyles);
-        this.tokens.options.values = JSON.stringify(newTokens, null, 2);
+        this.tokens[activeTokenSet].values = JSON.stringify(newTokens, null, 2);
         this.setMergedTokens();
+    }
+
+    addTokenSet(tokenSet: string, updatedAt): boolean {
+        if (tokenSet in this.tokens) {
+            console.log('key already exists');
+            return false;
+        }
+        this.updateTokenValues(tokenSet, JSON.stringify({}), updatedAt);
+        return true;
+    }
+
+    deleteTokenSet(tokenSet: string, updatedAt): void {
+        if (tokenSet in this.tokens) {
+            console.log('deleting token set');
+            this.updateTokenValues(tokenSet, null, updatedAt);
+        }
+    }
+
+    renameTokenSet({oldName, newName, updatedAt}): boolean {
+        if (newName in this.tokens) {
+            console.log('Key already exists');
+            return false;
+        }
+        const newObj = this.tokens[oldName];
+        console.log('new obj', newObj);
+        this.updateTokenValues(newName, JSON.stringify(newObj, null, 2), updatedAt);
+        this.updateTokenValues(oldName, null, updatedAt);
+        return true;
     }
 
     setUsedTokenSet(usedTokenSet: string[]): void {
@@ -92,18 +120,24 @@ export default class TokenData {
     }
 
     updateTokenValues(parent: string, tokens: string, updatedAt: string): void {
-        const hasErrored: boolean = this.checkTokenValidity(tokens);
-        const newTokens = {
-            ...this.tokens,
-            [parent]: {
-                hasErrored,
-                values: tokens,
-            },
-        };
-        this.setUpdatedAt(updatedAt);
-        this.tokens = newTokens;
-        if (!hasErrored) {
-            this.setMergedTokens();
+        if (tokens) {
+            console.log('got tokens');
+            const hasErrored: boolean = this.checkTokenValidity(tokens);
+            const newTokens = {
+                ...this.tokens,
+                [parent]: {
+                    hasErrored,
+                    values: tokens,
+                },
+            };
+            this.setUpdatedAt(updatedAt);
+            this.tokens = newTokens;
+            if (!hasErrored) {
+                this.setMergedTokens();
+            }
+        } else {
+            const oldTokens = this.tokens;
+            delete oldTokens[parent];
         }
     }
 

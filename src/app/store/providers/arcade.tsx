@@ -8,7 +8,7 @@ import {TokenProps} from '../../../types/tokens';
 export async function readTokensFromArcade({secret, id}): Promise<TokenProps> | null {
     try {
         const res = await fetch(
-            `https://api.usearcade.com/api/projects/${id}/tokens/live/export/json-tokens-nested/raw`,
+            `https://api.usearcade.com/api/projects/${id}/tokens/live/export/figma-tokens-plugin/raw`,
             {
                 headers: {
                     authorization: `Bearer ${secret}`,
@@ -20,6 +20,8 @@ export async function readTokensFromArcade({secret, id}): Promise<TokenProps> | 
             }
             return r.json();
         });
+
+        console.log({res});
 
         const {exports} = res;
         return exports;
@@ -60,9 +62,10 @@ export async function fetchDataFromArcade(id, secret, name): Promise<TokenProps>
             secret,
             provider: StorageProviderType.ARCADE,
         });
-        const tokens = data['json-tokens-nested'];
+        const tokens = data['figma-tokens-plugin'];
         if (tokens?.output) {
             const parsedTokens = JSON.parse(tokens.output);
+            console.log({parsedTokens});
             const groups = Object.entries(parsedTokens).map((group) => [group[0], JSON.stringify(group[1], null, 2)]);
             const groupedValues = Object.fromEntries(groups);
 

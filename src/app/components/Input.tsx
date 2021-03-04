@@ -1,9 +1,9 @@
 import * as React from 'react';
 
-const Input = ({name, required = false, tabindex = null, label, full, onChange, value, type, custom = ''}) => {
+const Input = ({name, required = false, tabindex = null, label = null, full, onChange, value, type, custom = ''}) => {
     return (
         <label htmlFor={name} className="text-xxs font-medium block">
-            <div>{label}</div>
+            {label ? <div>{label}</div> : null}
             <input
                 tabIndex={tabindex}
                 type={type}

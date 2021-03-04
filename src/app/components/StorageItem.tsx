@@ -5,11 +5,12 @@ import {postToFigma} from '../../plugin/notifiers';
 import {MessageToPluginTypes} from '../../types/messages';
 import Button from './Button';
 
-const ProviderItem = ({provider, id, secret, name, handleSync}) => {
+const StorageItem = ({provider, id, secret, name, handleSync, onEdit = null}) => {
     const {storageType} = useTokenState();
     const {setLocalApiState} = useTokenDispatch();
 
     const restoreStoredProvider = () => {
+        console.log('restoring stored provider', provider, id, secret, name);
         setLocalApiState({provider, id, secret, name});
         handleSync({provider, id, secret, name});
     };
@@ -46,11 +47,18 @@ const ProviderItem = ({provider, id, secret, name, handleSync}) => {
                     </button>
                 )}
             </div>
-            <Button variant="secondary" disabled={isActive()} onClick={() => restoreStoredProvider()}>
-                Apply
-            </Button>
+            <div className="space-x-2">
+                {onEdit && (
+                    <Button variant="secondary" onClick={onEdit}>
+                        Edit
+                    </Button>
+                )}
+                <Button variant="secondary" disabled={isActive()} onClick={() => restoreStoredProvider()}>
+                    Apply
+                </Button>
+            </div>
         </div>
     );
 };
 
-export default ProviderItem;
+export default StorageItem;

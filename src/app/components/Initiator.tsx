@@ -27,8 +27,6 @@ export default function Initiator({setActive, setRemoteComponents}) {
         onInitiate();
         window.onmessage = async (event) => {
             if (event.data.pluginMessage) {
-                console.log('got a message!', event.data.pluginMessage);
-
                 const {type, values, credentials, status, storageType, providers} = event.data.pluginMessage;
                 switch (type) {
                     case MessageFromPluginTypes.SELECTION:
@@ -66,7 +64,6 @@ export default function Initiator({setActive, setRemoteComponents}) {
                         setStorageType(storageType);
                         break;
                     case MessageFromPluginTypes.API_CREDENTIALS: {
-                        console.log('got api credentials!', credentials);
                         if (status === false) {
                             console.log('falsy api credentials');
                         } else {

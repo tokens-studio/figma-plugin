@@ -1,7 +1,7 @@
 import * as React from 'react';
 import '../styles/main.css';
 import JSONEditor from './JSONEditor';
-import Settings from './Settings';
+import SyncSettings from './SyncSettings';
 import Inspector from './Inspector';
 import Tokens from './Tokens';
 import StartScreen from './StartScreen';
@@ -40,8 +40,8 @@ const App = () => {
                     {active === 'start' && <StartScreen setActive={setActive} />}
                     {active === 'tokens' && <Tokens />}
                     {active === 'json' && <JSONEditor />}
-                    {active === 'settings' && <Settings />}
                     {active === 'inspector' && <Inspector />}
+                    {active === 'syncsettings' && <SyncSettings />}
                 </div>
                 <Footer active={active} />
             </div>

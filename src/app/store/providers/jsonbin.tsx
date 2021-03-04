@@ -25,6 +25,7 @@ export async function readTokensFromJSONBin({secret, id}): Promise<TokenProps> |
 }
 
 export async function writeTokensToJSONBin({secret, id, tokenObj}): Promise<TokenProps> | null {
+    console.log('writing token object', tokenObj);
     const response = await fetch(`https://api.jsonbin.io/b/${id}`, {
         method: 'PUT',
         mode: 'cors',
@@ -47,17 +48,20 @@ export async function writeTokensToJSONBin({secret, id, tokenObj}): Promise<Toke
 }
 
 export async function updateJSONBinTokens({tokens, id, secret, updatedAt, oldUpdatedAt = null}) {
+    const values = Object.entries(tokens).reduce((acc, [key, val]) => {
+        acc[key] = JSON.parse(val as string);
+        return acc;
+    }, {});
     const tokenObj = JSON.stringify(
         {
             version: pjs.version,
             updatedAt,
-            values: {
-                options: JSON.parse(tokens.options),
-            },
+            values,
         },
         null,
         2
     );
+    console.log('tokenObj', tokenObj);
 
     if (oldUpdatedAt) {
         const remoteTokens = await readTokensFromJSONBin({secret, id});
@@ -144,12 +148,15 @@ export async function fetchDataFromJSONBin(id, secret, name): Promise<TokenProps
                 provider: StorageProviderType.JSONBIN,
             });
             if (jsonBinData?.values) {
+                const values = Object.entries(jsonBinData.values).reduce((acc, [key, val]) => {
+                    acc[key] = JSON.stringify(val, null, 2);
+                    return acc;
+                }, {});
+
                 const obj = {
                     version: jsonBinData.version,
                     updatedAt: jsonBinData.updatedAt,
-                    values: {
-                        options: JSON.stringify(jsonBinData.values.options, null, 2),
-                    },
+                    values,
                 };
 
                 tokenValues = obj;

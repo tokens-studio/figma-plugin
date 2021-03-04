@@ -46,6 +46,9 @@ export enum ActionType {
     SetLocalApiState = 'SET_LOCAL_API_STATE',
     SetActiveTokenSet = 'SET_ACTIVE_TOKEN_SET',
     ToggleUsedTokenSet = 'TOGGLE_USED_TOKEN_SET',
+    AddTokenSet = 'ADD_TOKEN_SET',
+    DeleteTokenSet = 'DELETE_TOKEN_SET',
+    RenameTokenSet = 'RENAME_TOKEN_SET',
 }
 
 const defaultTokens: TokenProps = {
@@ -134,13 +137,7 @@ function stateReducer(state, action) {
             state.tokenData.updateTokenValues(action.data.parent, action.data.tokens, action.updatedAt);
             return {
                 ...state,
-                tokens: {
-                    ...state.tokens,
-                    [action.data.parent]: {
-                        hasErrored: state.tokenData.checkTokenValidity(action.data.tokens),
-                        values: action.data.tokens,
-                    },
-                },
+                tokenData: state.tokenData,
             };
         case ActionType.UpdateTokens:
             updateTokensOnSources(state, action.updatedAt, action.shouldUpdate);
@@ -150,18 +147,11 @@ function stateReducer(state, action) {
             objectPath.del(obj, [action.data.path, action.data.name].join('.'));
             const tokens = JSON.stringify(obj, null, 2);
             state.tokenData.updateTokenValues(action.data.parent, tokens, action.updatedAt);
-            const newState = {
+            updateTokensOnSources(state, action.updatedAt);
+            return {
                 ...state,
-                tokens: {
-                    ...state.tokens,
-                    [action.data.parent]: {
-                        hasErrored: state.tokenData.checkTokenValidity(tokens),
-                        values: tokens,
-                    },
-                },
+                tokenData: state.tokenData,
             };
-            updateTokensOnSources(newState, action.updatedAt);
-            return newState;
         }
         case ActionType.CreateStyles:
             postToFigma({
@@ -276,6 +266,31 @@ function stateReducer(state, action) {
                 ...state,
                 activeTokenSet: action.data,
             };
+        case ActionType.AddTokenSet: {
+            state.tokenData.addTokenSet(action.data, action.updatedAt);
+            return {
+                ...state,
+                tokenData: state.tokenData,
+            };
+        }
+        case ActionType.DeleteTokenSet: {
+            state.tokenData.deleteTokenSet(action.data, action.updatedAt);
+            return {
+                ...state,
+                tokenData: state.tokenData,
+            };
+        }
+        case ActionType.RenameTokenSet: {
+            state.tokenData.renameTokenSet({
+                oldName: action.oldName,
+                newName: action.newName,
+                updatedAt: action.updatedAt,
+            });
+            return {
+                ...state,
+                tokenData: state.tokenData,
+            };
+        }
         case ActionType.SetStorageType:
             if (action.bool) {
                 postToFigma({
@@ -389,6 +404,15 @@ function TokenProvider({children}) {
             },
             setActiveTokenSet: (data: string) => {
                 dispatch({type: ActionType.SetActiveTokenSet, data});
+            },
+            addTokenSet: (data: string) => {
+                dispatch({type: ActionType.AddTokenSet, data, updatedAt});
+            },
+            deleteTokenSet: (data: string) => {
+                dispatch({type: ActionType.DeleteTokenSet, data, updatedAt});
+            },
+            renameTokenSet: (oldName: string, newName: string) => {
+                dispatch({type: ActionType.RenameTokenSet, oldName, newName, updatedAt});
             },
         }),
         [dispatch, updatedAt]

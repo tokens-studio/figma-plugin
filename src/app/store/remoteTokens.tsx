@@ -79,10 +79,12 @@ export function useRemoteTokens() {
 }
 
 export async function updateTokensOnSources(state: StateType, updatedAt: string, shouldUpdate = true) {
-    const isNotRemoteOrArcade = ![StorageProviderType.LOCAL, StorageProviderType.ARCADE].includes(
+    const isNotLocalOrArcade = ![StorageProviderType.LOCAL, StorageProviderType.ARCADE].includes(
         state.storageType.provider
     );
-    if (isNotRemoteOrArcade && shouldUpdate)
+    console.log('updating on sources', isNotLocalOrArcade, state, shouldUpdate);
+    console.log('Sending tokens', state.tokenData.reduceToValues());
+    if (isNotLocalOrArcade && shouldUpdate)
         updateRemoteTokens({
             provider: state.storageType.provider,
             tokens: state.tokenData.reduceToValues(),
@@ -128,15 +130,25 @@ export async function createNewBin({
 
 export async function fetchDataFromRemote(id, secret, name, provider): Promise<TokenProps> {
     notifyToUI('Fetching remote tokens...');
+    console.log(
+        'fetching',
+        id,
+        secret,
+        name,
+        provider,
+        StorageProviderType.JSONBIN,
+        provider === StorageProviderType.JSONBIN
+    );
 
     switch (provider) {
         case StorageProviderType.JSONBIN: {
+            console.log('fetching from jsonbin');
             return fetchDataFromJSONBin(id, secret, name);
         }
         case StorageProviderType.ARCADE: {
             return fetchDataFromArcade(id, secret, name);
         }
         default:
-            throw new Error('Not implemented');
+            throw new Error('Streatgy not implemented');
     }
 }
