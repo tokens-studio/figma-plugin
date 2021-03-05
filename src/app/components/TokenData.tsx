@@ -111,6 +111,15 @@ export default class TokenData {
         return true;
     }
 
+    reorderTokenSets(tokenSets: string[]): void {
+        const newTokens = {};
+        tokenSets.map((set) => {
+            Object.assign(newTokens, {[set]: this.tokens[set]});
+        });
+        this.tokens = newTokens;
+        this.setMergedTokens();
+    }
+
     setUsedTokenSet(usedTokenSet: string[]): void {
         this.usedTokenSet = usedTokenSet;
         this.setMergedTokens();

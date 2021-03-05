@@ -4,7 +4,7 @@ import Heading from './Heading';
 import {useTokenState, useTokenDispatch} from '../store/TokenContext';
 import Button from './Button';
 import Modal from './Modal';
-import ThemeSelector from './ThemeSelector';
+import TokenSetSelector from './TokenSetSelector';
 
 const JSONEditor = () => {
     const {tokenData, activeTokenSet, editProhibited} = useTokenState();
@@ -28,7 +28,7 @@ const JSONEditor = () => {
 
     return (
         <div className="flex flex-col flex-grow">
-            <ThemeSelector />
+            <TokenSetSelector />
             <Modal isOpen={confirmModalVisible === 'reset'} close={() => showConfirmModal('')}>
                 <div className="flex justify-center flex-col text-center space-y-4">
                     <div className="space-y-2">

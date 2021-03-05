@@ -1,26 +1,43 @@
 import React from 'react';
-import {ContextMenu, ContextMenuTrigger, MenuItem} from 'react-contextmenu';
+import {DndProvider} from 'react-dnd';
+import {HTML5Backend} from 'react-dnd-html5-backend';
 import {useTokenDispatch, useTokenState} from '../store/TokenContext';
 import Button from './Button';
 import Heading from './Heading';
 import Icon from './Icon';
 import Input from './Input';
 import Modal from './Modal';
+import TokenSetItem from './TokenSetItem';
 import Tooltip from './Tooltip';
 
-export default function ThemeSelector() {
-    const {tokenData, editProhibited, activeTokenSet, usedTokenSet} = useTokenState();
-    const {setActiveTokenSet, toggleUsedTokenSet, addTokenSet, renameTokenSet, deleteTokenSet} = useTokenDispatch();
+export default function TokenSetSelector() {
+    const {tokenData, editProhibited} = useTokenState();
+    const {addTokenSet, renameTokenSet, deleteTokenSet, setTokenSetOrder} = useTokenDispatch();
     const [showNewTokenSetFields, setShowNewTokenSetFields] = React.useState(false);
     const [showDeleteTokenSetModal, setShowDeleteTokenSetModal] = React.useState(false);
     const [showRenameTokenSetFields, setShowRenameTokenSetFields] = React.useState(false);
     const [newTokenSetName, handleNewTokenSetNameChange] = React.useState('');
     const [tokenSetMarkedForChange, setTokenSetMarkedForChange] = React.useState('');
+    const [totalTokenSetArray, setTotalTokenSetArray] = React.useState(Object.keys(tokenData.tokens));
 
-    const totalTokenSets = Object.keys(tokenData.tokens);
+    React.useEffect(() => {
+        setTotalTokenSetArray(Object.keys(tokenData.tokens));
+    }, [tokenData.tokens]);
 
-    const isUsedTokenSet = (set) => {
-        return usedTokenSet.includes(set);
+    const stringOrder = JSON.stringify(totalTokenSetArray);
+
+    React.useEffect(() => {
+        setTotalTokenSetArray(totalTokenSetArray);
+    }, [stringOrder, totalTokenSetArray]);
+
+    const orderPositions = (array, from, to) => {
+        const newArray = [...array];
+        newArray.splice(to, 0, newArray.splice(from, 1)[0]);
+        setTotalTokenSetArray(newArray);
+    };
+
+    const reorderSets = (from, to) => {
+        orderPositions(totalTokenSetArray, from, to);
     };
 
     const handleNewTokenSetSubmit = (e) => {
@@ -58,38 +75,19 @@ export default function ThemeSelector() {
 
     return (
         <div className="flex flex-row gap-2 px-4 pt-2 pb-0">
-            {totalTokenSets.map((tokenSet) => (
-                <div key={tokenSet}>
-                    <ContextMenuTrigger id={`${tokenSet}-trigger`}>
-                        <button
-                            key={tokenSet}
-                            className={`font-bold items-center gap-2 focus:outline-none text-xs flex p-2 rounded border ${
-                                activeTokenSet === tokenSet && 'border-blue-500 bg-blue-100'
-                            }`}
-                            type="button"
-                            onClick={() => setActiveTokenSet(tokenSet)}
-                        >
-                            <input
-                                type="checkbox"
-                                className="py-2 pl-2"
-                                id={`toggle-${tokenSet}`}
-                                checked={isUsedTokenSet(tokenSet)}
-                                onChange={() => toggleUsedTokenSet(tokenSet)}
-                            />
-                            {tokenSet}
-                        </button>
-                    </ContextMenuTrigger>
-                    <ContextMenu id={`${tokenSet}-trigger`} className="text-xs">
-                        <MenuItem disabled={editProhibited} onClick={() => handleRenameTokenSet(tokenSet)}>
-                            Rename
-                        </MenuItem>
-                        <MenuItem disabled={editProhibited} onClick={() => handleDeleteTokenSet(tokenSet)}>
-                            Delete
-                        </MenuItem>
-                    </ContextMenu>
-                </div>
-            ))}
-
+            <DndProvider backend={HTML5Backend}>
+                {totalTokenSetArray.map((tokenSet, index) => (
+                    <TokenSetItem
+                        onDrop={() => setTokenSetOrder(totalTokenSetArray)}
+                        onMove={reorderSets}
+                        tokenSet={tokenSet}
+                        index={index}
+                        key={tokenSet}
+                        onRename={handleRenameTokenSet}
+                        onDelete={handleDeleteTokenSet}
+                    />
+                ))}
+            </DndProvider>
             <Modal isOpen={showDeleteTokenSetModal} close={() => setShowDeleteTokenSetModal(false)}>
                 <div className="flex justify-center flex-col text-center space-y-4">
                     <Heading>Are you sure?</Heading>

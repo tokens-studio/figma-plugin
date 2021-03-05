@@ -49,6 +49,7 @@ export enum ActionType {
     AddTokenSet = 'ADD_TOKEN_SET',
     DeleteTokenSet = 'DELETE_TOKEN_SET',
     RenameTokenSet = 'RENAME_TOKEN_SET',
+    SetTokenSetOrder = 'SET_TOKEN_SET_ORDER',
 }
 
 const defaultTokens: TokenProps = {
@@ -295,6 +296,13 @@ function stateReducer(state, action) {
                 activeTokenSet: state.activeTokenSet === action.oldName ? action.newName : state.activeTokenSet,
             };
         }
+        case ActionType.SetTokenSetOrder: {
+            state.tokenData.reorderTokenSets(action.data);
+            return {
+                ...state,
+                tokenData: state.tokenData,
+            };
+        }
         case ActionType.SetStorageType:
             if (action.bool) {
                 postToFigma({
@@ -417,6 +425,9 @@ function TokenProvider({children}) {
             },
             renameTokenSet: (oldName: string, newName: string) => {
                 dispatch({type: ActionType.RenameTokenSet, oldName, newName, updatedAt});
+            },
+            setTokenSetOrder: (data: string[]) => {
+                dispatch({type: ActionType.SetTokenSetOrder, data, updatedAt});
             },
         }),
         [dispatch, updatedAt]

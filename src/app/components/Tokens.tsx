@@ -4,7 +4,7 @@ import JSON5 from 'json5';
 import {useTokenDispatch, useTokenState} from '../store/TokenContext';
 import TokenListing from './TokenListing';
 import Button from './Button';
-import ThemeSelector from './ThemeSelector';
+import TokenSetSelector from './TokenSetSelector';
 
 const mappedTokens = (tokens) => {
     const properties = {
@@ -37,7 +37,7 @@ const Tokens = () => {
 
     return (
         <div>
-            <ThemeSelector />
+            <TokenSetSelector />
             {mappedTokens(JSON5.parse(tokenData.tokens[activeTokenSet].values)).map((tokenValues) => {
                 switch (tokenValues[0]) {
                     case 'borderRadius':
