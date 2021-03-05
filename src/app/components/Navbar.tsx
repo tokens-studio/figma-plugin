@@ -19,7 +19,7 @@ const TabButton = ({name, label, active, setActive, first = false}) => (
 );
 
 const Navbar = ({active, setActive}) => {
-    const {storageType} = useTokenState();
+    const {storageType, editProhibited} = useTokenState();
     const {pullStyles} = useTokenDispatch();
     const {pullTokens} = useRemoteTokens();
 
@@ -40,7 +40,12 @@ const Navbar = ({active, setActive}) => {
                     </Tooltip>
                 )}
                 <Tooltip variant="right" label="Import Styles">
-                    <button className="button button-ghost" type="button" onClick={pullStyles}>
+                    <button
+                        disabled={editProhibited}
+                        className="button button-ghost"
+                        type="button"
+                        onClick={pullStyles}
+                    >
                         <Icon name="import" />
                     </button>
                 </Tooltip>

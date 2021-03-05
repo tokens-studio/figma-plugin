@@ -15,10 +15,6 @@ enum ItemTypes {
     CARD = 'card',
 }
 
-const style = {
-    cursor: 'move',
-};
-
 export default function TokenSetItem({tokenSet, onMove, index, onRename, onDelete, onDrop}) {
     const {activeTokenSet, editProhibited, usedTokenSet} = useTokenState();
     const {toggleUsedTokenSet, setActiveTokenSet} = useTokenDispatch();
@@ -33,7 +29,7 @@ export default function TokenSetItem({tokenSet, onMove, index, onRename, onDelet
             };
         },
         hover(item: DragItem, monitor: DropTargetMonitor) {
-            if (!ref.current) {
+            if (!ref.current || editProhibited) {
                 return;
             }
             const dragIndex = item.index;
@@ -80,10 +76,9 @@ export default function TokenSetItem({tokenSet, onMove, index, onRename, onDelet
             // eslint-disable-next-line no-param-reassign
             item.index = hoverIndex;
         },
-        drop(item) {
-            console.log('dropped!', item);
+        drop() {
+            if (editProhibited) return;
             onDrop();
-            return undefined;
         },
     });
 
@@ -98,6 +93,11 @@ export default function TokenSetItem({tokenSet, onMove, index, onRename, onDelet
         preview(getEmptyImage(), {captureDraggingState: true});
     });
 
+    const style = editProhibited
+        ? {}
+        : {
+              cursor: 'move',
+          };
     const opacity = isDragging ? 1 : 1;
     drag(drop(ref));
 

@@ -48,8 +48,6 @@ export async function updateTokensOnSources(state: StateType, updatedAt: string,
     const isNotLocalOrArcade = ![StorageProviderType.LOCAL, StorageProviderType.ARCADE].includes(
         state.storageType.provider
     );
-    console.log('updating on sources', isNotLocalOrArcade, state, shouldUpdate);
-    console.log('Sending tokens', state.tokenData.reduceToValues());
     if (isNotLocalOrArcade && shouldUpdate)
         updateRemoteTokens({
             provider: state.storageType.provider,

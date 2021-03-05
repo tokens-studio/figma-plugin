@@ -90,8 +90,11 @@ export default class TokenData {
 
     deleteTokenSet(tokenSet: string, updatedAt): void {
         if (tokenSet in this.tokens) {
-            console.log('deleting token set');
-            delete this.tokens[tokenSet];
+            const oldTokens = this.tokens;
+            delete oldTokens[tokenSet];
+            this.tokens = {
+                ...oldTokens,
+            };
             this.setUpdatedAt(updatedAt);
         }
     }
