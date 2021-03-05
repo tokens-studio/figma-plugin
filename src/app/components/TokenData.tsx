@@ -2,6 +2,7 @@
 import JSON5 from 'json5';
 import objectPath from 'object-path';
 import {mergeDeep} from '../../plugin/helpers';
+import {notifyToUI} from '../../plugin/notifiers';
 import {SingleToken, TokenGroup, TokenObject, TokenProps, Tokens} from '../../types/tokens';
 import {convertToRgb, checkAndEvaluateMath} from './utils';
 
@@ -48,6 +49,7 @@ export default class TokenData {
 
             return assigned;
         } catch (e) {
+            notifyToUI('Error reading tokens, check console (F12)');
             console.error('Error reading tokens', e);
             console.log("Here's the tokens");
             console.log(tokens);
@@ -61,7 +63,6 @@ export default class TokenData {
     }
 
     injectTokens(tokens, activeTokenSet): void {
-        console.log('Pulling styles', this.tokens, activeTokenSet, this.tokens[activeTokenSet]);
         const receivedStyles = {};
         Object.entries(tokens).map(([parent, values]: [string, SingleToken[]]) => {
             values.map((token: TokenGroup) => {
@@ -75,7 +76,7 @@ export default class TokenData {
 
     addTokenSet(tokenSet: string, updatedAt): boolean {
         if (tokenSet in this.tokens) {
-            console.log('key already exists');
+            notifyToUI('Token set already exists');
             return false;
         }
         this.tokens = {
@@ -101,7 +102,7 @@ export default class TokenData {
 
     renameTokenSet({oldName, newName, updatedAt}): boolean {
         if (newName in this.tokens) {
-            console.log('Key already exists');
+            notifyToUI('Token set already exists');
             return false;
         }
         this.tokens = {
@@ -144,7 +145,6 @@ export default class TokenData {
 
     updateTokenValues(parent: string, tokens: string, updatedAt: string): void {
         if (tokens) {
-            console.log('got tokens', parent, tokens, this.tokens);
             const hasErrored: boolean = this.checkTokenValidity(tokens);
             const newTokens = {
                 ...this.tokens,

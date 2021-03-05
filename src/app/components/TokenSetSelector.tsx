@@ -125,7 +125,7 @@ export default function TokenSetSelector() {
                 </div>
             </Modal>
 
-            {!editProhibited && showNewTokenSetFields ? (
+            {showNewTokenSetFields ? (
                 <form onSubmit={handleNewTokenSetSubmit}>
                     <Input
                         full
@@ -141,6 +141,7 @@ export default function TokenSetSelector() {
                     <button
                         className="button button-ghost"
                         type="button"
+                        disabled={editProhibited}
                         onClick={() => setShowNewTokenSetFields(true)}
                     >
                         <Icon name="add" />

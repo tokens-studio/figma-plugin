@@ -7,8 +7,8 @@ import * as pjs from '../../../package.json';
 import {TokenProps} from '../../types/tokens';
 import {StorageProviderType, ApiDataType, StorageType} from '../../types/api';
 import {postToFigma} from '../../plugin/notifiers';
-import {updateTokensOnSources} from './remoteTokens';
 import {MessageToPluginTypes} from '../../types/messages';
+import updateTokensOnSources from './updateSources';
 
 export interface SelectionValue {
     borderRadius: string | undefined;
@@ -50,6 +50,7 @@ export enum ActionType {
     DeleteTokenSet = 'DELETE_TOKEN_SET',
     RenameTokenSet = 'RENAME_TOKEN_SET',
     SetTokenSetOrder = 'SET_TOKEN_SET_ORDER',
+    SetProjectURL = 'SET_PROJECT_URL',
 }
 
 const defaultTokens: TokenProps = {
@@ -100,6 +101,7 @@ const emptyState = {
         provider: '',
     },
     apiProviders: [],
+    projectURL: '',
     updatePageOnly: true,
     updateAfterApply: true,
     editProhibited: true,
@@ -303,6 +305,13 @@ function stateReducer(state, action) {
                 tokenData: state.tokenData,
             };
         }
+        case ActionType.SetProjectURL: {
+            console.log('setting project url', action.data);
+            return {
+                ...state,
+                projectURL: action.data,
+            };
+        }
         case ActionType.SetStorageType:
             if (action.bool) {
                 postToFigma({
@@ -398,6 +407,9 @@ function TokenProvider({children}) {
             },
             setLocalApiState: (data: ApiDataType) => {
                 dispatch({type: ActionType.SetLocalApiState, data});
+            },
+            setProjectURL: (data: string) => {
+                dispatch({type: ActionType.SetProjectURL, data});
             },
             toggleUpdatePageOnly: (bool: boolean) => {
                 dispatch({type: ActionType.ToggleUpdatePageOnly, bool});

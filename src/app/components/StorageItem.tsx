@@ -4,7 +4,7 @@ import {useTokenDispatch, useTokenState} from '../store/TokenContext';
 import {postToFigma} from '../../plugin/notifiers';
 import {MessageToPluginTypes} from '../../types/messages';
 import Button from './Button';
-import {useRemoteTokens} from '../store/remoteTokens';
+import useRemoteTokens from '../store/remoteTokens';
 
 const StorageItem = ({provider, id, secret, name, onEdit = null}) => {
     const {storageType} = useTokenState();
@@ -12,7 +12,6 @@ const StorageItem = ({provider, id, secret, name, onEdit = null}) => {
     const {syncTokens} = useRemoteTokens();
 
     const restoreStoredProvider = () => {
-        console.log('restoring stored provider', provider, id, secret, name);
         setLocalApiState({provider, id, secret, name});
         syncTokens({provider, id, secret, name});
     };

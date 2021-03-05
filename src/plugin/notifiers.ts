@@ -12,10 +12,13 @@ export function postToFigma(props) {
 }
 
 export function notifyUI(msg, opts?) {
+    console.log('notify', msg, opts);
     figma.notify(msg, opts);
 }
 
 export function notifyToUI(msg, opts = {}) {
+    console.log('notifyToUI', msg, opts);
+
     postToFigma({
         type: MessageToPluginTypes.NOTIFY,
         msg,

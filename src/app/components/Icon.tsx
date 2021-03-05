@@ -19,6 +19,7 @@ import IconFolder from './icons/IconFolder';
 import IconRefresh from './icons/IconRefresh';
 import IconTrash from './icons/IconTrash';
 import IconBell from './icons/IconBell';
+import IconLibrary from './icons/IconLibrary';
 
 const icons = {
     edit: IconEdit,
@@ -40,6 +41,7 @@ const icons = {
     refresh: IconRefresh,
     trash: IconTrash,
     bell: IconBell,
+    library: IconLibrary,
 };
 
 const Icon = ({name}) => {

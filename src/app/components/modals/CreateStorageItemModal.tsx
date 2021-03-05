@@ -3,27 +3,25 @@ import Modal from '../Modal';
 import Heading from '../Heading';
 import StorageItemForm from '../StorageItemForm';
 import {useTokenDispatch, useTokenState} from '../../store/TokenContext';
+import useRemoteTokens from '../../store/remoteTokens';
 
-import {createNewBin} from '../../store/remoteTokens';
-
-export default function EditStorageItemModal({isOpen, onClose, onSuccess}) {
+export default function CreateStorageItemModal({isOpen, onClose, onSuccess}) {
     const {tokenData, localApiState} = useTokenState();
-    const {setApiData, setStorageType, setLoading} = useTokenDispatch();
-
+    const {setLoading} = useTokenDispatch();
+    const {addNewProviderItem} = useRemoteTokens();
     const [hasErrored, setHasErrored] = React.useState(false);
     const [formFields, setFormFields] = React.useState({id: '', name: '', secret: ''});
 
     const handleCreateNewClick = async () => {
         setLoading(true);
         setHasErrored(false);
-        const response = await createNewBin({
+        const response = await addNewProviderItem({
+            id: formFields.id,
             provider: localApiState.provider,
             secret: formFields.secret,
             tokens: tokenData.reduceToValues(),
             name: formFields.name,
             updatedAt: tokenData.getUpdatedAt(),
-            setApiData,
-            setStorageType,
         });
         if (response) {
             onSuccess();

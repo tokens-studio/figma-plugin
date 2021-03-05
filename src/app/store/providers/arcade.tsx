@@ -1,11 +1,10 @@
-// import * as pjs from '../../../../package.json';
 import {notifyToUI, postToFigma} from '../../../plugin/notifiers';
 import {StorageProviderType} from '../../../types/api';
 import {MessageToPluginTypes} from '../../../types/messages';
 import {TokenProps} from '../../../types/tokens';
-// import {compareUpdatedAt} from '../../components/utils';
+import {useTokenDispatch} from '../TokenContext';
 
-export async function readTokensFromArcade({secret, id}): Promise<TokenProps> | null {
+async function readTokensFromArcade({secret, id}): Promise<{exports: TokenProps; project: string}> | null {
     try {
         const res = await fetch(
             `https://api.usearcade.com/api/projects/${id}/tokens/live/export/figma-tokens-plugin/raw`,
@@ -21,65 +20,79 @@ export async function readTokensFromArcade({secret, id}): Promise<TokenProps> | 
             return r.json();
         });
 
-        console.log({res});
+        console.log('RES IS', res);
 
-        const {exports} = res;
-        return exports;
+        return {
+            exports: res.exports,
+            project: res.project,
+        };
     } catch (err) {
-        console.log('got error while fetching from arcade', err);
+        notifyToUI('Error fetching from Arcade, check console (F12)');
+        console.log('Error fetching from Arcade: ', err);
     }
 
-    notifyToUI('There was an error connecting, check your sync settings');
     return null;
 }
 
-export async function writeTokensToArcade(): Promise<TokenProps> | null {
+async function writeTokensToArcade(): Promise<TokenProps> | null {
     throw new Error('Not implemented');
 }
 
-export async function updateArcadeTokens() {
-    throw new Error('Not implemented');
-}
+export default function useArcade() {
+    const {setProjectURL} = useTokenDispatch();
 
-export async function createNewArcade() {
-    return null;
-}
+    async function updateArcadeTokens() {
+        throw new Error('Not implemented');
+    }
 
-// Read tokens from Arcade
+    async function createNewArcade() {
+        return null;
+    }
+    // Read tokens from Arcade
+    async function fetchDataFromArcade(id, secret, name): Promise<TokenProps> {
+        let tokenValues;
 
-export async function fetchDataFromArcade(id, secret, name): Promise<TokenProps> {
-    let tokenValues;
+        if (!id && !secret) return;
 
-    if (!id && !secret) return;
+        const {exports, project} = await readTokensFromArcade({id, secret});
+        console.log('exports,proj', exports, project);
 
-    const data = await readTokensFromArcade({id, secret});
+        if (exports) {
+            setProjectURL(`https://app.usearcade.com/projects/${id}/${project}`);
+            postToFigma({
+                type: MessageToPluginTypes.CREDENTIALS,
+                id,
+                name,
+                secret,
+                provider: StorageProviderType.ARCADE,
+            });
+            const tokens = exports['figma-tokens-plugin'];
+            if (tokens?.output) {
+                const parsedTokens = JSON.parse(tokens.output);
+                const groups = Object.entries(parsedTokens).map((group) => [
+                    group[0],
+                    JSON.stringify(group[1], null, 2),
+                ]);
+                const groupedValues = Object.fromEntries(groups);
 
-    if (data) {
-        postToFigma({
-            type: MessageToPluginTypes.CREDENTIALS,
-            id,
-            name,
-            secret,
-            provider: StorageProviderType.ARCADE,
-        });
-        const tokens = data['figma-tokens-plugin'];
-        if (tokens?.output) {
-            const parsedTokens = JSON.parse(tokens.output);
-            console.log({parsedTokens});
-            const groups = Object.entries(parsedTokens).map((group) => [group[0], JSON.stringify(group[1], null, 2)]);
-            const groupedValues = Object.fromEntries(groups);
+                const obj = {
+                    version: exports.version,
+                    updatedAt: exports.updatedAt,
+                    values: groupedValues,
+                };
 
-            const obj = {
-                version: data.version,
-                updatedAt: data.updatedAt,
-                values: groupedValues,
-            };
+                tokenValues = obj;
+            } else {
+                notifyToUI('No tokens stored on remote');
+            }
 
-            tokenValues = obj;
-        } else {
-            notifyToUI('No tokens stored on remote');
+            return tokenValues;
         }
-
-        return tokenValues;
     }
+
+    return {
+        fetchDataFromArcade,
+        updateArcadeTokens,
+        createNewArcade,
+    };
 }

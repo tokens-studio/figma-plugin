@@ -2,7 +2,7 @@ import React from 'react';
 import Modal from '../Modal';
 import Heading from '../Heading';
 import StorageItemForm from '../StorageItemForm';
-import {useRemoteTokens} from '../../store/remoteTokens';
+import useRemoteTokens from '../../store/remoteTokens';
 
 export default function EditStorageItemModal({isOpen, initialValue, onClose, onSuccess}) {
     const [formFields, setFormFields] = React.useState(initialValue);

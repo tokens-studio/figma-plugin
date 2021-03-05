@@ -1,7 +1,7 @@
 import React from 'react';
 import {postToFigma} from '../../plugin/notifiers';
 import {MessageFromPluginTypes, MessageToPluginTypes} from '../../types/messages';
-import {fetchDataFromRemote} from '../store/remoteTokens';
+import useRemoteTokens from '../store/remoteTokens';
 import {useTokenDispatch} from '../store/TokenContext';
 import TokenData from './TokenData';
 
@@ -18,6 +18,7 @@ export default function Initiator({setActive, setRemoteComponents}) {
         setStorageType,
         setAPIProviders,
     } = useTokenDispatch();
+    const {fetchDataFromRemote} = useRemoteTokens();
 
     const onInitiate = () => {
         postToFigma({type: MessageToPluginTypes.INITIATE});

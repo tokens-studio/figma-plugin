@@ -2,7 +2,7 @@ import * as React from 'react';
 import {useTokenState, useTokenDispatch} from '../store/TokenContext';
 import Icon from './Icon';
 import Tooltip from './Tooltip';
-import {useRemoteTokens} from '../store/remoteTokens';
+import useRemoteTokens from '../store/remoteTokens';
 import {StorageProviderType} from '../../types/api';
 
 const TabButton = ({name, label, active, setActive, first = false}) => (
@@ -19,7 +19,7 @@ const TabButton = ({name, label, active, setActive, first = false}) => (
 );
 
 const Navbar = ({active, setActive}) => {
-    const {storageType, editProhibited} = useTokenState();
+    const {storageType, editProhibited, projectURL} = useTokenState();
     const {pullStyles} = useTokenDispatch();
     const {pullTokens} = useRemoteTokens();
 
@@ -31,13 +31,22 @@ const Navbar = ({active, setActive}) => {
                 <TabButton name="inspector" label="Inspect" active={active} setActive={setActive} />
                 <TabButton name="syncsettings" label="Sync" active={active} setActive={setActive} />
             </div>
-            <div>
+            <div className="flex flex-row items-center">
                 {storageType.provider !== StorageProviderType.LOCAL && (
-                    <Tooltip variant="right" label={`Pull from ${storageType.provider}`}>
-                        <button onClick={pullTokens} type="button" className="button button-ghost">
-                            <Icon name="refresh" />
-                        </button>
-                    </Tooltip>
+                    <>
+                        {projectURL && (
+                            <Tooltip variant="right" label={`Go to ${storageType.provider}`}>
+                                <a href={projectURL} target="_blank" rel="noreferrer" className="button button-ghost">
+                                    <Icon name="library" />
+                                </a>
+                            </Tooltip>
+                        )}
+                        <Tooltip variant="right" label={`Pull from ${storageType.provider}`}>
+                            <button onClick={pullTokens} type="button" className="button button-ghost">
+                                <Icon name="refresh" />
+                            </button>
+                        </Tooltip>
+                    </>
                 )}
                 <Tooltip variant="right" label="Import Styles">
                     <button

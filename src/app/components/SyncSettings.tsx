@@ -19,7 +19,6 @@ const SyncSettings = () => {
     const [createStorageItemModalVisible, setShowCreateStorageModalVisible] = React.useState(false);
 
     const handleEditClick = (provider) => {
-        console.log('clicked edit', provider);
         setLocalApiState({
             id: provider.id,
             name: provider.name,
