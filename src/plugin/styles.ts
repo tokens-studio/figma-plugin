@@ -1,34 +1,20 @@
 /* eslint-disable no-param-reassign */
 import {figmaRGBToHex} from '@figma-plugin/helpers';
 import Dot from 'dot-object';
+import {ColorToken, TypographyToken} from '../../types/propertyTypes';
 import {isSingleToken, slugify} from '../app/components/utils';
 import {
+    convertFigmaGradientToString,
     convertFigmaToLetterSpacing,
     convertFigmaToLineHeight,
     convertLetterSpacingToFigma,
     convertLineHeightToFigma,
+    convertStringToFigmaGradient,
     convertToFigmaColor,
 } from './helpers';
 import {notifyStyleValues} from './notifiers';
 
 const dot = new Dot('/');
-
-interface TypographyToken {
-    value: {
-        fontFamily?: string;
-        fontWeight?: string;
-        fontSize?: string;
-        lineHeight?: string | number;
-        letterSpacing?: string;
-        paragraphSpacing?: string;
-    };
-    description?: string;
-}
-
-interface ColorToken {
-    value: string;
-    description?: string;
-}
 
 export const setTextValuesOnTarget = async (target, token) => {
     const {fontFamily, fontWeight, fontSize, lineHeight, letterSpacing, paragraphSpacing, description} = token;
@@ -62,9 +48,20 @@ export const setTextValuesOnTarget = async (target, token) => {
 
 const setColorValuesOnTarget = (target, token) => {
     const {description, value} = token;
-    const {color, opacity} = convertToFigmaColor(value);
+    if (value.startsWith('linear-gradient')) {
+        const gradientStops = convertStringToFigmaGradient(value);
+        const oldPaint = target.paints[0];
+        const newPaint = {
+            type: oldPaint.type,
+            gradientTransform: oldPaint.gradientTransform,
+            gradientStops,
+        };
+        target.paints = [newPaint];
+    } else {
+        const {color, opacity} = convertToFigmaColor(value);
+        target.paints = [{color, opacity, type: 'SOLID'}];
+    }
 
-    target.paints = [{color, opacity, type: 'SOLID'}];
     if (description) {
         target.description = description;
     }
@@ -168,21 +165,25 @@ export function pullStyles(styleTypes): void {
     if (styleTypes.colorStyles) {
         colors = figma
             .getLocalPaintStyles()
-            .filter((style) => style.paints.length === 1 && style.paints[0].type === 'SOLID')
+            .filter((style) => style.paints.length === 1)
             .map((style) => {
                 const paint = style.paints[0];
+                let styleObject: ColorToken = {};
+                if (style.description) {
+                    styleObject.description = style.description;
+                }
                 if (paint.type === 'SOLID') {
                     const {r, g, b} = paint.color;
                     const a = paint.opacity;
-                    const styleObject: ColorToken = {value: figmaRGBToHex({r, g, b, a})};
-
-                    if (style.description) {
-                        styleObject.description = style.description;
-                    }
-                    return [style.name, styleObject];
+                    styleObject.value = figmaRGBToHex({r, g, b, a});
+                } else if (paint.type === 'GRADIENT_LINEAR') {
+                    styleObject.value = convertFigmaGradientToString(paint);
+                } else {
+                    styleObject = null;
                 }
-                return null;
-            });
+                return styleObject ? [style.name, styleObject] : null;
+            })
+            .filter(Boolean);
     }
     if (styleTypes.textStyles) {
         const rawFontSizes = [];
