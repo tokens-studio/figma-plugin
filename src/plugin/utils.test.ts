@@ -1,4 +1,4 @@
-import {convertToRgb, isTypographyToken, lightOrDark} from '../app/components/utils';
+import {convertToRgb, isTypographyToken, lightOrDark, slugify} from '../app/components/utils';
 
 describe('isTypographyToken', () => {
     it('returns truthiness of a typography token', () => {
@@ -52,15 +52,21 @@ describe('lightToDark', () => {
         expect(lightOrDark(light)).toBe('light');
         expect(lightOrDark(lightRgb)).toBe('light');
         expect(lightOrDark(lightRgba)).toBe('light');
-
-        expect(lightOrDark(light)).toBe('light');
     });
     it('knows when a color is dark', () => {
-        const dark = '#000';
+        const black = '#000';
+        const darkEnough = '#F3F3F3';
         const darkRgb = 'rgb(0,0,0)';
         const darkRgba = 'rgba(0,0,0,1)';
-        expect(lightOrDark(dark)).toBe('dark');
+        expect(lightOrDark(black)).toBe('dark');
+        expect(lightOrDark(darkEnough)).toBe('dark');
         expect(lightOrDark(darkRgb)).toBe('dark');
         expect(lightOrDark(darkRgba)).toBe('dark');
+    });
+});
+describe('slugfy', () => {
+    it('converts a string to a slug', () => {
+        const string = 'Neue Montreal';
+        expect(slugify(string)).toBe('neue-montreal');
     });
 });
