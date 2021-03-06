@@ -43,9 +43,7 @@ const App = () => {
 
     React.useEffect(() => {
         onInitiate();
-        console.log('initiating');
         window.onmessage = (event) => {
-            console.log('got onmessage', event);
             const {type, values} = event.data.pluginMessage;
             switch (type) {
                 case 'selection':
@@ -65,7 +63,6 @@ const App = () => {
                     setRemoteComponents(values.remotes);
                     break;
                 case 'tokenvalues': {
-                    console.log('got token values', values);
                     setLoading(false);
                     if (values) {
                         setTokenData(new TokenData(values));
@@ -85,8 +82,6 @@ const App = () => {
             }
         };
     }, []);
-
-    console.log('am loading', loading);
 
     return (
         <>

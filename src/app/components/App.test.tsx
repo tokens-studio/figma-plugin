@@ -33,4 +33,21 @@ describe('App', () => {
 
         expect(TokensText).toBeInTheDocument();
     });
+
+    it('shows welcome screen when no tokens are found', () => {
+        const {getByText} = render(<App />);
+        fireEvent(
+            window,
+            new MessageEvent('message', {
+                data: {
+                    pluginMessage: {
+                        type: 'tokenvalues',
+                    },
+                },
+            })
+        );
+        const WelcomeText = getByText('Welcome to Figma Tokens.');
+
+        expect(WelcomeText).toBeInTheDocument();
+    });
 });
