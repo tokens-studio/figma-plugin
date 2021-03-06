@@ -1,4 +1,4 @@
-import {convertToRgb, isTypographyToken, lightOrDark, slugify} from '../app/components/utils';
+import {convertToRgb, isTypographyToken, lightOrDark, slugify} from './utils';
 
 describe('isTypographyToken', () => {
     it('returns truthiness of a typography token', () => {
