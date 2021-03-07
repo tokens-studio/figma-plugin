@@ -49,7 +49,6 @@ export function updateNodes(nodes, tokens) {
         const node = nodes[i];
         const data = fetchAllPluginData(node);
         if (data) {
-            console.log('Mapvalues', tokens, data);
             const mappedValues = mapValuesToTokens(tokens, data);
             setValuesOnNode(node, mappedValues, data);
             store.successfulNodes.push(node);

@@ -9,7 +9,6 @@ import Icon from './Icon';
 import * as pjs from '../../../package.json';
 import {useTokenState, useTokenDispatch} from '../store/TokenContext';
 import TokenData from './TokenData';
-import Add from '../../icons/add.svg';
 
 const goToNodeId = (id) => {
     parent.postMessage(
@@ -62,14 +61,13 @@ const App = () => {
                     setLoading(false);
                     setRemoteComponents(values.remotes);
                     break;
-                case 'tokenvalues': {
+                case 'tokenvalues':
                     setLoading(false);
                     if (values) {
                         setTokenData(new TokenData(values));
                         setActive('tokens');
                     }
                     break;
-                }
                 case 'styles':
                     setLoading(false);
                     if (values) {
@@ -91,12 +89,10 @@ const App = () => {
                         <div className="inline-flex rotate">
                             <Icon name="loading" />
                         </div>
-                        <div className="font-medium text-xxs">Hold on, updating...</div>
+                        <div className="font-medium text-xxs loadingBar">Hold on, updating...</div>
                     </div>
                 </div>
             )}
-            | Add
-            <Add />
             <div className="h-full flex flex-col">
                 <div className="flex-grow flex flex-col">
                     {active !== 'start' && <Navbar active={active} setActive={setActive} />}

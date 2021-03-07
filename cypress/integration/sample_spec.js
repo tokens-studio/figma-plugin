@@ -6,19 +6,17 @@ describe('My First Test', () => {
     it('successfully loads', () => {
         cy.visit('/');
 
-        cy.get('.text-xxs').should('include', 'Hold on');
+        cy.get('.loadingBar').contains('Hold on, updating...');
         cy.window() // get a reference to application's `window`
             .then(($window) => {
                 const message = {
-                    data: {
-                        pluginMessage: {
-                            type: 'tokenvalues',
-                            values: {version: '5', values: {options: JSON.stringify({sizing: {xs: 4}}, null, 2)}},
-                        },
+                    pluginMessage: {
+                        type: 'tokenvalues',
+                        values: {version: '5', values: {options: JSON.stringify({sizing: {xs: 4}}, null, 2)}},
                     },
                 };
                 $window.postMessage(message, '*');
             });
-        cy.get('.text-xxs').should('not.include', 'Hold on');
+        cy.get('.loadingBar').should('not.exist');
     });
 });
