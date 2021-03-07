@@ -44,6 +44,8 @@ const App = () => {
     React.useEffect(() => {
         onInitiate();
         window.onmessage = (event) => {
+            console.log('event received', event.data.pluginMessage);
+            console.log('event received: values', event.data.pluginMessage.values);
             const {type, values} = event.data.pluginMessage;
             switch (type) {
                 case 'selection':

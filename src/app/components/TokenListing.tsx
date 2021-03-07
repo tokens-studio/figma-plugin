@@ -126,7 +126,7 @@ const TokenListing = ({
     };
 
     return (
-        <div className="border-b border-gray-200">
+        <div className="border-b border-gray-200" data-cy="token-listing">
             <div className="flex justify-between space-x-8 items-center relative">
                 <button
                     className={`flex items-center w-full h-full p-4 space-x-2 hover:bg-gray-100 focus:outline-none ${
@@ -148,7 +148,9 @@ const TokenListing = ({
                             )}
                         </div>
                     </Tooltip>
-                    <Heading size="small">{label}</Heading>
+                    <Heading size="small" dataCy="listing-headline">
+                        {label}
+                    </Heading>
                 </button>
                 <div className="absolute right-0 mr-2">
                     {help && (
@@ -187,6 +189,7 @@ const TokenListing = ({
                     </Tooltip>
                     <Tooltip label="Add a new token" variant="right">
                         <button
+                            data-cy="add-button"
                             className="button button-ghost"
                             type="button"
                             onClick={() => {

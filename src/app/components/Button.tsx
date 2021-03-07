@@ -6,6 +6,7 @@ type ButtonProps = {
     onClick?: any;
     size?: 'large' | 'small';
     href?: string;
+    dataCy?: string;
 };
 
 const Button: React.FunctionComponent<ButtonProps> = ({
@@ -15,6 +16,7 @@ const Button: React.FunctionComponent<ButtonProps> = ({
     variant,
     children,
     href,
+    dataCy,
 }) => {
     let variantClass;
     switch (variant) {
@@ -38,7 +40,13 @@ const Button: React.FunctionComponent<ButtonProps> = ({
     }
     if (href) {
         return (
-            <a target="_blank" rel="noreferrer" className={`button ${[variantClass, sizeClass].join(' ')}`} href={href}>
+            <a
+                target="_blank"
+                rel="noreferrer"
+                className={`button ${[variantClass, sizeClass].join(' ')}`}
+                href={href}
+                data-cy={dataCy}
+            >
                 {children}
             </a>
         );
@@ -46,7 +54,12 @@ const Button: React.FunctionComponent<ButtonProps> = ({
 
     return (
         // eslint-disable-next-line react/button-has-type
-        <button type={type} className={`button ${[variantClass, sizeClass].join(' ')}`} onClick={onClick}>
+        <button
+            type={type}
+            className={`button ${[variantClass, sizeClass].join(' ')}`}
+            onClick={onClick}
+            data-cy={dataCy}
+        >
             {children}
         </button>
     );
