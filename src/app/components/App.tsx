@@ -1,5 +1,4 @@
 import * as React from 'react';
-import '../styles/main.css';
 import JSONEditor from './JSONEditor';
 import Inspector from './Inspector';
 import Tokens from './Tokens';
@@ -90,7 +89,7 @@ const App = () => {
                         <div className="inline-flex rotate">
                             <Icon name="loading" />
                         </div>
-                        <div className="font-medium text-xxs">Hold on, updating...</div>
+                        <div className="font-medium text-xxs loadingBar">Hold on, updating...</div>
                     </div>
                 </div>
             )}

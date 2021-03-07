@@ -16,7 +16,15 @@ module.exports = (env, argv) => ({
     module: {
         rules: [
             // Converts TypeScript code to JavaScript
-            {test: /\.tsx?$/, use: 'ts-loader', exclude: /node_modules/},
+            {
+                test: /\.tsx?$/,
+                use: [
+                    {
+                        loader: 'babel-loader',
+                    },
+                ],
+                exclude: /node_modules/,
+            },
 
             // Enables including CSS by doing "import './file.css'" in your TypeScript code
             {test: /\.css$/, loader: [{loader: 'style-loader'}, {loader: 'css-loader'}]},
@@ -30,21 +38,10 @@ module.exports = (env, argv) => ({
                     },
                 },
             },
-            // Allows you to use "<%= require('./file.svg') %>" in your HTML code to get a data URI
             {test: /\.(png|jpg|gif|webp)$/, loader: [{loader: 'url-loader'}]},
             {
                 test: /\.svg$/,
-                use: [
-                    {
-                        loader: 'babel-loader',
-                    },
-                    {
-                        loader: 'react-svg-loader',
-                        options: {
-                            jsx: true, // true outputs JSX tags
-                        },
-                    },
-                ],
+                use: ['@svgr/webpack'],
             },
         ],
     },
