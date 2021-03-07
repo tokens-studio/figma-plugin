@@ -1,10 +1,3 @@
-let loadEvent = 'not fired';
-
-window.addEventListener('load', function (event) {
-    console.log('load event fired!');
-    loadEvent = 'fired';
-});
-
 describe('Loads application', () => {
     it('displays loading bar on startup', () => {
         cy.visit('/');
