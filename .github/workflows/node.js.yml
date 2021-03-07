@@ -12,23 +12,32 @@ on:
 jobs:
   # install dependencies and run test command
   test:
-    name: Test
+    name: Tests
     runs-on: ubuntu-latest
     steps:
-
-      # 1: setup node
+      # 1: Setup node
       - name: Setup Node.js
         uses: actions/setup-node@v1
         with:
           node-version: '12.x'
-      # 2: Checkout repository in the CWD
+      # 2: Checkout repository
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      # 3: install NPM dependencies
+      # 3: Install dependencies
       - name: Install dependencies
         run: yarn --frozen-lockfile
       
-      # 4: run test command
+      # 4: Run tests
       - name: Run test command
         run: yarn test
+  cypress-run:
+    runs-on: ubuntu-latest
+    steps:
+      # 1: Checkout repository
+      - name: Checkout
+        uses: actions/checkout@v2
+      # 2: Install NPM dependencies, cache them correctly
+      # and run all Cypress tests
+      - name: Cypress run
+        uses: cypress-io/github-action@v2
