@@ -13,7 +13,8 @@
 		"prettier:format": "prettier --write 'src/**/*.{js,jsx,ts,tsx,css,json}' ",
 		"test": "jest",
 		"svgr": "svgr -d src/icons/ assets/",
-		"cy:open": "cypress open"
+		"cy:open": "cypress open",
+		"serve": "yarn run serve dist"
 	},
 	"dependencies": {
 		"@figma-plugin/helpers": "^0.13.2",

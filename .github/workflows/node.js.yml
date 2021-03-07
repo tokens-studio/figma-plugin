@@ -32,6 +32,7 @@ jobs:
       - name: Run test command
         run: yarn test
   cypress-run:
+    name: Cypress
     runs-on: ubuntu-latest
     steps:
       # 1: Checkout repository
@@ -41,3 +42,6 @@ jobs:
       # and run all Cypress tests
       - name: Cypress run
         uses: cypress-io/github-action@v2
+        with:
+          build: yarn build
+          start: yarn serve
