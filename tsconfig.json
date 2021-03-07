@@ -11,9 +11,10 @@
     "noImplicitAny": false,
     "moduleResolution": "node",
     "resolveJsonModule": true,
+    "baseUrl": "./",
     "typeRoots": [
       "./node_modules/@types",
       "./node_modules/@figma"
-    ]
+    ],
   }
 }

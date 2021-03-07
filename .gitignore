@@ -3,3 +3,5 @@ settings.json
 yarn-error.log
 main.css
 dist
+cypress/screenshots
+cypress/videos
