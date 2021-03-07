@@ -158,10 +158,10 @@ export default class TokenData {
         } else {
             aliasToken = this.checkIfValueTokenAlias(token);
         }
+        // Check if alias is found
         if (aliasToken) {
             const tokenToCheck = this.checkIfValueToken(token) ? token.value : token;
-            const resolvedAlias = this.getResolvedAlias(this.mergedTokens, tokenToCheck.toString().substring(1));
-            return typeof resolvedAlias !== 'undefined';
+            return Boolean(this.getAliasValue(tokenToCheck, this.mergedTokens));
         }
         return false;
     }
@@ -198,19 +198,23 @@ export default class TokenData {
     }
 
     getAliasValue(token: SingleToken, tokens = this.mergedTokens): string | null {
-        if (this.checkIfAlias(token)) {
-            let returnedValue = this.checkIfValueToken(token) ? (token.value as string) : (token as string);
-            const tokenRegex = /(\$[^\s,]+)/g;
-            const tokenReferences = returnedValue.toString().match(tokenRegex);
-            if (tokenReferences.length > 0) {
-                const resolvedReferences = tokenReferences.map((ref) => objectPath.get(tokens, ref.substring(1)));
-                tokenReferences.forEach((reference, index) => {
-                    returnedValue = returnedValue.replace(
-                        reference,
-                        resolvedReferences[index].value ?? resolvedReferences[index]
-                    );
-                });
-            }
+        let returnedValue = this.checkIfValueToken(token) ? (token.value as string) : (token as string);
+        const tokenRegex = /(\$[^\s,]+)/g;
+        const tokenReferences = returnedValue.toString().match(tokenRegex);
+        if (tokenReferences.length > 0) {
+            const resolvedReferences = tokenReferences.map((ref) => {
+                const value = objectPath.get(tokens, ref.substring(1));
+                if (value) return value;
+                return null;
+            });
+            tokenReferences.forEach((reference, index) => {
+                returnedValue = returnedValue.replace(
+                    reference,
+                    resolvedReferences[index]?.value ?? resolvedReferences[index]
+                );
+            });
+        }
+        if (returnedValue) {
             return convertToRgb(checkAndEvaluateMath(returnedValue));
         }
         return null;
