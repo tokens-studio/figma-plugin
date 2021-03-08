@@ -83,7 +83,7 @@ export default function useRemoteTokens() {
     };
 
     async function addNewProviderItem({id, provider, secret, tokens, name, updatedAt}): Promise<TokenProps | null> {
-        notifyToUI('Creating new bin...');
+        notifyToUI('Checking credentials...');
 
         switch (provider) {
             case StorageProviderType.JSONBIN: {

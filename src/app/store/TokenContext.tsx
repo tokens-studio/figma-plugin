@@ -306,7 +306,6 @@ function stateReducer(state, action) {
             };
         }
         case ActionType.SetProjectURL: {
-            console.log('setting project url', action.data);
             return {
                 ...state,
                 projectURL: action.data,

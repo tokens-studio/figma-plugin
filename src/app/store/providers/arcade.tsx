@@ -4,7 +4,7 @@ import {MessageToPluginTypes} from '../../../types/messages';
 import {TokenProps} from '../../../types/tokens';
 import {useTokenDispatch} from '../TokenContext';
 
-async function readTokensFromArcade({secret, id}): Promise<{exports: TokenProps; project: string}> | null {
+async function readTokensFromArcade({secret, id}): Promise<TokenProps> | null {
     try {
         const res = await fetch(
             `https://api.usearcade.com/api/projects/${id}/tokens/live/export/figma-tokens-plugin/raw`,
@@ -22,10 +22,7 @@ async function readTokensFromArcade({secret, id}): Promise<{exports: TokenProps;
 
         console.log('RES IS', res);
 
-        return {
-            exports: res.exports,
-            project: res.project,
-        };
+        return res.exports;
     } catch (err) {
         notifyToUI('Error fetching from Arcade, check console (F12)');
         console.log('Error fetching from Arcade: ', err);
@@ -50,43 +47,46 @@ export default function useArcade() {
     }
     // Read tokens from Arcade
     async function fetchDataFromArcade(id, secret, name): Promise<TokenProps> {
-        let tokenValues;
+        try {
+            let tokenValues;
 
-        if (!id && !secret) return;
+            if (!id && !secret) return;
 
-        const {exports, project} = await readTokensFromArcade({id, secret});
-        console.log('exports,proj', exports, project);
+            const exports = await readTokensFromArcade({id, secret});
 
-        if (exports) {
-            setProjectURL(`https://app.usearcade.com/projects/${id}/${project}`);
-            postToFigma({
-                type: MessageToPluginTypes.CREDENTIALS,
-                id,
-                name,
-                secret,
-                provider: StorageProviderType.ARCADE,
-            });
-            const tokens = exports['figma-tokens-plugin'];
-            if (tokens?.output) {
-                const parsedTokens = JSON.parse(tokens.output);
-                const groups = Object.entries(parsedTokens).map((group) => [
-                    group[0],
-                    JSON.stringify(group[1], null, 2),
-                ]);
-                const groupedValues = Object.fromEntries(groups);
+            if (exports) {
+                setProjectURL(`https://app.usearcade.com/projects/${id}`);
+                postToFigma({
+                    type: MessageToPluginTypes.CREDENTIALS,
+                    id,
+                    name,
+                    secret,
+                    provider: StorageProviderType.ARCADE,
+                });
+                const tokens = exports['figma-tokens-plugin'];
+                if (tokens?.output) {
+                    const parsedTokens = JSON.parse(tokens.output);
+                    const groups = Object.entries(parsedTokens).map((group) => [
+                        group[0],
+                        JSON.stringify(group[1], null, 2),
+                    ]);
+                    const groupedValues = Object.fromEntries(groups);
 
-                const obj = {
-                    version: exports.version,
-                    updatedAt: exports.updatedAt,
-                    values: groupedValues,
-                };
+                    const obj = {
+                        version: exports.version,
+                        updatedAt: exports.updatedAt,
+                        values: groupedValues,
+                    };
 
-                tokenValues = obj;
-            } else {
-                notifyToUI('No tokens stored on remote');
+                    tokenValues = obj;
+                } else {
+                    notifyToUI('No tokens stored on remote');
+                }
+
+                return tokenValues;
             }
-
-            return tokenValues;
+        } catch (e) {
+            return null;
         }
     }
 

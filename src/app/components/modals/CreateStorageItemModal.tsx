@@ -13,7 +13,6 @@ export default function CreateStorageItemModal({isOpen, onClose, onSuccess}) {
     const [formFields, setFormFields] = React.useState({id: '', name: '', secret: ''});
 
     const handleCreateNewClick = async () => {
-        setLoading(true);
         setHasErrored(false);
         const response = await addNewProviderItem({
             id: formFields.id,
@@ -28,7 +27,6 @@ export default function CreateStorageItemModal({isOpen, onClose, onSuccess}) {
         } else {
             setHasErrored(true);
         }
-        setLoading(false);
     };
 
     const handleChange = (e) => {
