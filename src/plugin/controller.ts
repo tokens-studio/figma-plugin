@@ -1,4 +1,7 @@
 /* eslint-disable no-param-reassign */
+import 'core-js/stable';
+import 'regenerator-runtime/runtime';
+
 import {pullStyles, updateStyles} from './styles';
 import store from './store';
 import {

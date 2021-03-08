@@ -1,5 +1,4 @@
 import * as React from 'react';
-import '../styles/main.css';
 import JSONEditor from './JSONEditor';
 import SyncSettings from './SyncSettings';
 import Inspector from './Inspector';
