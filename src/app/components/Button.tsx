@@ -1,4 +1,5 @@
 import * as React from 'react';
+import mixpanel from '../mixpanel';
 
 type ButtonProps = {
     type?: 'button' | 'submit';
@@ -44,9 +45,15 @@ const Button: React.FunctionComponent<ButtonProps> = ({
         );
     }
 
+    const handleClick = (e) => {
+        e.preventDefault();
+        mixpanel.track('Button click', {genre: 'hip-hop', 'duration in seconds': 42});
+        onClick();
+    };
+
     return (
         // eslint-disable-next-line react/button-has-type
-        <button type={type} className={`button ${[variantClass, sizeClass].join(' ')}`} onClick={onClick}>
+        <button type={type} className={`button ${[variantClass, sizeClass].join(' ')}`} onClick={handleClick}>
             {children}
         </button>
     );
