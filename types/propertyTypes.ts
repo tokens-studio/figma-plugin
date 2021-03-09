@@ -20,6 +20,10 @@ export type propertyObject = {
 
 export type fillValuesType = ColorRgba | ColorHsla;
 
+export enum GradientType {
+    GRADIENT_LINEAR = 'GRADIENT_LINEAR',
+}
+
 export type gradientStopType = {
     color: fillValuesType;
     position: number;
