@@ -7186,6 +7186,11 @@ mixin-deep@^1.2.0:
     for-in "^1.0.2"
     is-extendable "^1.0.1"
 
+mixpanel-figma@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/mixpanel-figma/-/mixpanel-figma-2.0.1.tgz#3936f6fc133b848e22235f2275c341a73eb905fb"
+  integrity sha512-p+xWU/dA04IqpjEOzdf3eZGCh3yWCZSc5SsmW2WZU4zTFh4p2h6OJmt7pqozYlXjY4p3+7BXmRFdoAand3uArw==
+
 mkdirp@^0.5.1:
   version "0.5.1"
   resolved "https://registry.yarnpkg.com/mkdirp/-/mkdirp-0.5.1.tgz#30057438eac6cf7f8c4767f38648d6697d75c903"

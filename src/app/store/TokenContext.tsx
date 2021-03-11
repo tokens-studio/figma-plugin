@@ -90,13 +90,14 @@ function stateReducer(state, action) {
                 ...state,
                 tokenData: action.data,
             };
-        case ActionType.SetTokensFromStyles:
+        case ActionType.SetTokensFromStyles: {
             state.tokenData.injectTokens(action.data);
             updateTokens(state);
             return {
                 ...state,
                 tokens: state.tokenData.tokens,
             };
+        }
         case ActionType.SetEmptyTokens:
             return {
                 ...state,

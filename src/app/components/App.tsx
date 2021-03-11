@@ -9,6 +9,7 @@ import Icon from './Icon';
 import * as pjs from '../../../package.json';
 import {useTokenState, useTokenDispatch} from '../store/TokenContext';
 import TokenData from './TokenData';
+import mixpanel from '../mixpanel';
 
 const goToNodeId = (id) => {
     parent.postMessage(
@@ -43,7 +44,7 @@ const App = () => {
     React.useEffect(() => {
         onInitiate();
         window.onmessage = (event) => {
-            const {type, values} = event.data.pluginMessage;
+            const {type, values, userId} = event.data.pluginMessage;
             switch (type) {
                 case 'selection':
                     setDisabled(false);
@@ -68,6 +69,11 @@ const App = () => {
                         setActive('tokens');
                     }
                     break;
+                case 'userid': {
+                    mixpanel.identify(userId);
+                    mixpanel.track('Launched');
+                    break;
+                }
                 case 'styles':
                     setLoading(false);
                     if (values) {
