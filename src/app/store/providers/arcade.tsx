@@ -1,7 +1,7 @@
 import {notifyToUI, postToFigma} from '../../../plugin/notifiers';
-import {StorageProviderType} from '../../../types/api';
-import {MessageToPluginTypes} from '../../../types/messages';
-import {TokenProps} from '../../../types/tokens';
+import {StorageProviderType} from '../../../../types/api';
+import {MessageToPluginTypes} from '../../../../types/messages';
+import {TokenProps} from '../../../../types/tokens';
 import {useTokenDispatch} from '../TokenContext';
 
 async function readTokensFromArcade({secret, id}): Promise<TokenProps> | null {
@@ -19,8 +19,6 @@ async function readTokensFromArcade({secret, id}): Promise<TokenProps> | null {
             }
             return r.json();
         });
-
-        console.log('RES IS', res);
 
         return res.exports;
     } catch (err) {

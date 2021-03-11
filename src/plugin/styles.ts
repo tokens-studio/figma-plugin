@@ -1,7 +1,8 @@
 /* eslint-disable no-param-reassign */
 import {figmaRGBToHex} from '@figma-plugin/helpers';
+import {convertToTokenArray} from '../utils/convertTokens';
 import {ColorToken, TypographyToken} from '../../types/propertyTypes';
-import {isTypographyToken, isValueToken, slugify} from '../app/components/utils';
+import {slugify} from '../app/components/utils';
 import {
     convertFigmaGradientToString,
     convertFigmaToLetterSpacing,
@@ -67,35 +68,9 @@ const setColorValuesOnTarget = (target, token) => {
     }
 };
 
-const checkForTokens = (obj, token, root = null) => {
-    let returnValue;
-    if (isValueToken(token) || isTypographyToken(token)) {
-        returnValue = token;
-    } else if (typeof token === 'object') {
-        Object.entries(token).map(([key, value]) => {
-            const [, result] = checkForTokens(obj, value, [root, key].filter((n) => n).join('/'));
-            if (root && result) {
-                obj[[root, key].join('/')] = result;
-            } else if (result) {
-                obj[key] = result;
-            }
-        });
-    } else {
-        returnValue = {
-            value: token,
-        };
-    }
-    return [obj, returnValue];
-};
-
-const convertToTokenArray = (tokens) => {
-    const [result] = checkForTokens({}, tokens);
-    return Object.entries(result);
-};
-
 const updateColorStyles = (colorTokens, shouldCreate = false) => {
     // Iterate over colorTokens to create objects that match figma styles
-    const colorTokenArray = convertToTokenArray(colorTokens);
+    const colorTokenArray = convertToTokenArray(colorTokens, true);
     const paints = figma.getLocalPaintStyles();
 
     colorTokenArray.map(([key, value]: [string, ColorToken]) => {
@@ -115,7 +90,7 @@ const updateColorStyles = (colorTokens, shouldCreate = false) => {
 
 const updateTextStyles = (textTokens, shouldCreate = false) => {
     // Iterate over textTokens to create objects that match figma styles
-    const textTokenArray = convertToTokenArray(textTokens);
+    const textTokenArray = convertToTokenArray(textTokens, true);
     const textStyles = figma.getLocalTextStyles();
 
     textTokenArray.map(([key, value]: [string, TypographyToken]) => {

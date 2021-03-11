@@ -3,7 +3,7 @@ import {useTokenState, useTokenDispatch} from '../store/TokenContext';
 import Icon from './Icon';
 import Tooltip from './Tooltip';
 import useRemoteTokens from '../store/remoteTokens';
-import {StorageProviderType} from '../../types/api';
+import {StorageProviderType} from '../../../types/api';
 
 const TabButton = ({name, label, active, setActive, first = false}) => (
     <button

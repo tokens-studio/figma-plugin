@@ -3,7 +3,7 @@ import JSON5 from 'json5';
 import objectPath from 'object-path';
 import {mergeDeep} from '../../plugin/helpers';
 import {notifyToUI} from '../../plugin/notifiers';
-import {SingleToken, TokenGroup, TokenObject, TokenProps, Tokens} from '../../types/tokens';
+import {SingleToken, TokenGroup, TokenObject, TokenProps, Tokens} from '../../../types/tokens';
 import {convertToRgb, checkAndEvaluateMath} from './utils';
 
 const aliasRegex = /(\$[^\s,]+)/;
@@ -206,15 +206,16 @@ export default class TokenData {
 
     private checkIfAlias(token: SingleToken): boolean {
         let aliasToken = false;
-        if (typeof token === 'string') {
-            aliasToken = Boolean(token.match(aliasRegex));
+        if (typeof token === 'string' || typeof token === 'number') {
+            aliasToken = Boolean(token.toString().match(aliasRegex));
         } else {
             aliasToken = this.checkIfValueTokenAlias(token);
         }
         // Check if alias is found
         if (aliasToken) {
             const tokenToCheck = this.checkIfValueToken(token) ? token.value : token;
-            return Boolean(this.getAliasValue(tokenToCheck, this.mergedTokens));
+            const aliasValue = this.getAliasValue(tokenToCheck, this.mergedTokens);
+            return aliasValue != null;
         }
         return false;
     }

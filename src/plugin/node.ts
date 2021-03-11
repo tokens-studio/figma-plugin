@@ -4,8 +4,8 @@ import {fetchAllPluginData} from './pluginData';
 import store from './store';
 import * as pjs from '../../package.json';
 import {setValuesOnNode} from './updateNode';
-import {TokenProps} from '../types/tokens';
-import {StorageProviderType, StorageType} from '../types/api';
+import {TokenProps} from '../../types/tokens';
+import {StorageProviderType, StorageType} from '../../types/api';
 import {isSingleToken} from '../app/components/utils';
 
 export function mapValuesToTokens(object, values) {

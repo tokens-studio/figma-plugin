@@ -1,7 +1,7 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import * as React from 'react';
 import {useTokenDispatch, useTokenState} from '../store/TokenContext';
-import {StorageProviderType} from '../../types/api';
+import {StorageProviderType} from '../../../types/api';
 import Button from './Button';
 import Heading from './Heading';
 import ConfirmLocalStorageModal from './modals/ConfirmLocalStorageModal';
@@ -13,10 +13,6 @@ import CreateStorageItemModal from './modals/CreateStorageItemModal';
 const SyncSettings = () => {
     const {api, storageType, localApiState, apiProviders, updateAfterApply} = useTokenState();
     const {setLocalApiState, setStorageType, toggleUpdateAfterApply} = useTokenDispatch();
-
-    React.useEffect(() => {
-        console.log('Mounted', {storageType, localApiState});
-    }, []);
 
     const [confirmModalVisible, showConfirmModal] = React.useState(false);
     const [editStorageItemModalVisible, setShowEditStorageModalVisible] = React.useState(Boolean(localApiState.new));

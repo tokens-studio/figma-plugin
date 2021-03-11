@@ -1,8 +1,8 @@
 import * as pjs from '../../../../package.json';
 import {notifyToUI, postToFigma} from '../../../plugin/notifiers';
-import {StorageProviderType} from '../../../types/api';
-import {MessageToPluginTypes} from '../../../types/messages';
-import {TokenProps} from '../../../types/tokens';
+import {StorageProviderType} from '../../../../types/api';
+import {MessageToPluginTypes} from '../../../../types/messages';
+import {TokenProps} from '../../../../types/tokens';
 import {compareUpdatedAt} from '../../components/utils';
 import {useTokenDispatch} from '../TokenContext';
 

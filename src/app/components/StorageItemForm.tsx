@@ -1,5 +1,5 @@
 import React from 'react';
-import {StorageProviderType} from '../../types/api';
+import {StorageProviderType} from '../../../types/api';
 import Button from './Button';
 import Input from './Input';
 import {useTokenState} from '../store/TokenContext';
@@ -13,9 +13,6 @@ export default function EditStorageItemForm({
     hasErrored,
 }) {
     const {localApiState} = useTokenState();
-    React.useEffect(() => {
-        console.log('Got values', values);
-    }, []);
 
     return (
         <form onSubmit={handleSubmit} className="space-y-4">

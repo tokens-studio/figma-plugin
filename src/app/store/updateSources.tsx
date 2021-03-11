@@ -1,8 +1,8 @@
-import {TokenProps} from '../../types/tokens';
-import {StorageProviderType} from '../../types/api';
+import {TokenProps} from '../../../types/tokens';
+import {StorageProviderType} from '../../../types/api';
 import {postToFigma, notifyToUI} from '../../plugin/notifiers';
-import {StateType} from '../../types/state';
-import {MessageToPluginTypes} from '../../types/messages';
+import {StateType} from '../../../types/state';
+import {MessageToPluginTypes} from '../../../types/messages';
 import {updateJSONBinTokens} from './providers/jsonbin';
 
 async function updateRemoteTokens({
@@ -41,7 +41,6 @@ async function updateRemoteTokens({
 }
 
 export default async function updateTokensOnSources(state: StateType, updatedAt: string, shouldUpdate = true) {
-    console.log('Updating on sources', state, updatedAt, shouldUpdate);
     const isNotLocalOrArcade = ![StorageProviderType.LOCAL, StorageProviderType.ARCADE].includes(
         state.storageType.provider
     );

@@ -1,5 +1,5 @@
-import {ApiDataType, StorageType} from '../types/api';
-import {MessageFromPluginTypes, MessageToPluginTypes} from '../types/messages';
+import {ApiDataType, StorageType} from '../../types/api';
+import {MessageFromPluginTypes, MessageToPluginTypes} from '../../types/messages';
 import store from './store';
 
 export function postToFigma(props) {
@@ -12,13 +12,10 @@ export function postToFigma(props) {
 }
 
 export function notifyUI(msg, opts?) {
-    console.log('notify', msg, opts);
     figma.notify(msg, opts);
 }
 
 export function notifyToUI(msg, opts = {}) {
-    console.log('notifyToUI', msg, opts);
-
     postToFigma({
         type: MessageToPluginTypes.NOTIFY,
         msg,

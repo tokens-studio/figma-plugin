@@ -4,10 +4,10 @@ import objectPath from 'object-path';
 import defaultJSON from '../../config/default.json';
 import TokenData from '../components/TokenData';
 import * as pjs from '../../../package.json';
-import {TokenProps} from '../../types/tokens';
-import {StorageProviderType, ApiDataType, StorageType} from '../../types/api';
+import {TokenProps} from '../../../types/tokens';
+import {StorageProviderType, ApiDataType, StorageType} from '../../../types/api';
 import {postToFigma} from '../../plugin/notifiers';
-import {MessageToPluginTypes} from '../../types/messages';
+import {MessageToPluginTypes} from '../../../types/messages';
 import updateTokensOnSources from './updateSources';
 
 export interface SelectionValue {

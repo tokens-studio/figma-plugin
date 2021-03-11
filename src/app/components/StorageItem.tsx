@@ -2,7 +2,7 @@
 import * as React from 'react';
 import {useTokenDispatch, useTokenState} from '../store/TokenContext';
 import {postToFigma} from '../../plugin/notifiers';
-import {MessageToPluginTypes} from '../../types/messages';
+import {MessageToPluginTypes} from '../../../types/messages';
 import Button from './Button';
 import useRemoteTokens from '../store/remoteTokens';
 

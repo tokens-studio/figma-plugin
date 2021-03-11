@@ -1,7 +1,7 @@
 import {Parser} from 'expr-eval';
 import XRegExp from 'xregexp';
 import {postToFigma} from '../../plugin/notifiers';
-import {MessageToPluginTypes} from '../../types/messages';
+import {MessageToPluginTypes} from '../../../types/messages';
 import {hexToRgb, RGBAToHexA} from '../../plugin/helpers';
 
 const parser = new Parser();
@@ -58,14 +58,12 @@ export function convertToRgb(color: string) {
                     let b;
                     let a = 1;
                     let alpha;
-                    console.log('Matches regex', matchesHex);
                     if (matchesHex) {
                         ({r, g, b} = hexToRgb(matchesHex[0]));
                     } else {
                         [r, g, b, alpha = '1'] = matchedColor.split(',').map((n) => n.trim());
                         a = Number(alpha);
                     }
-                    console.log('Matched, Returned', matchedColor, r, g, b, a);
                     const rgbaString = `rgba(${matchedColor.replace(hexRegex, [r, g, b].join(', '))}`;
 
                     returnedColor = color.split(matchedString).join(RGBAToHexA(rgbaString));

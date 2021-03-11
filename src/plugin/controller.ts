@@ -15,8 +15,8 @@ import {
 import {findAllWithData, removePluginData, sendPluginValues, updatePluginData} from './pluginData';
 import {getTokenData, updateNodes, setTokensOnDocument, goToNode, saveStorageType, getSavedStorageType} from './node';
 import {removeSingleCredential, updateCredentials} from './helpers';
-import {MessageFromPluginTypes, MessageToPluginTypes} from '../types/messages';
-import {StorageProviderType} from '../types/api';
+import {MessageFromPluginTypes, MessageToPluginTypes} from '../../types/messages';
+import {StorageProviderType} from '../../types/api';
 
 figma.showUI(__html__, {
     width: 400,

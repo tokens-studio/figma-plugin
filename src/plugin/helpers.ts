@@ -249,7 +249,6 @@ export function hslaToRgba(hslaValues) {
 export function convertToFigmaColor(input) {
     let color;
     let opacity;
-    console.log('converttoFigmaColor', input);
     if (input.startsWith('rgb')) {
         const rgbValues = input.replace(/^rgba?\(|\s+|\)$/g, '').split(',');
         const {r, g, b, a = 1} = webRGBToFigmaRGB(rgbValues);
@@ -266,7 +265,6 @@ export function convertToFigmaColor(input) {
         color = {r, g, b};
         opacity = Number(a);
     }
-    console.log('returning', color, opacity);
 
     return {
         color,

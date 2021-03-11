@@ -1,5 +1,5 @@
-import {TokenProps} from '../../types/tokens';
-import {StorageProviderType} from '../../types/api';
+import {TokenProps} from '../../../types/tokens';
+import {StorageProviderType} from '../../../types/api';
 import {notifyToUI} from '../../plugin/notifiers';
 import {useJSONbin} from './providers/jsonbin';
 import useArcade from './providers/arcade';
@@ -57,7 +57,6 @@ export default function useRemoteTokens() {
     }
 
     const syncTokens = async ({id, secret, provider = localApiState.provider, name}) => {
-        console.log('syncing tokens');
         setLoading(true);
         const remoteTokens = await fetchDataFromRemote(id, secret, name, provider as StorageProviderType);
         if (remoteTokens) {

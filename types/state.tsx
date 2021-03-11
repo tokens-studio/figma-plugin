@@ -1,4 +1,4 @@
-import TokenData from '../app/components/TokenData';
+import TokenData from '../src/app/components/TokenData';
 import {ApiDataType, StorageType} from './api';
 import {Tokens} from './tokens';
 

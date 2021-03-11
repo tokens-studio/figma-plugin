@@ -1,6 +1,6 @@
 import React from 'react';
 import {postToFigma} from '../../plugin/notifiers';
-import {MessageFromPluginTypes, MessageToPluginTypes} from '../../types/messages';
+import {MessageFromPluginTypes, MessageToPluginTypes} from '../../../types/messages';
 import useRemoteTokens from '../store/remoteTokens';
 import {useTokenDispatch} from '../store/TokenContext';
 import TokenData from './TokenData';

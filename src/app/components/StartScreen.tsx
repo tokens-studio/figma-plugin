@@ -3,7 +3,7 @@ import Heading from './Heading';
 import Button from './Button';
 import Callout from './Callout';
 import {useTokenDispatch, useTokenState} from '../store/TokenContext';
-import {StorageProviderType} from '../../types/api';
+import {StorageProviderType} from '../../../types/api';
 
 const StartScreen = ({setActive}) => {
     const {storageType} = useTokenState();
