@@ -34,46 +34,51 @@ export function isSingleToken(token): token is {value: string} {
     return typeof token === 'object' && 'value' in token;
 }
 
+// Convert color to RGB value that can be used throughout the plugin
 export function convertToRgb(color: string) {
-    if (typeof color !== 'string') {
-        return color;
-    }
-    const hexRegex = /#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})/g;
-    const matchedDelimiter = XRegExp.matchRecursive(color, '\\(', '\\)', 'g');
-    let returnedColor = color;
+    try {
+        if (typeof color !== 'string') {
+            return color;
+        }
+        const hexRegex = /#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})/g;
+        const matchedDelimiter = XRegExp.matchRecursive(color, '\\(', '\\)', 'g');
+        let returnedColor = color;
 
-    if (matchedDelimiter) {
-        // If rgb contains hex value, extract rgb values from there
-        matchedDelimiter.map((matched) => {
-            try {
-                const matchesRgba = XRegExp.matchRecursive(matched, 'rgba?\\(', '\\)', 'g', {
-                    valueNames: [null, 'left', 'match', 'right'],
-                });
-                if (matchesRgba.length > 0) {
-                    const matchedString = matchesRgba.map((n) => n.value).join('');
-                    const matchedColor = matchesRgba[1].value;
-                    const matchesHex = matchedColor.match(hexRegex);
-                    let r;
-                    let g;
-                    let b;
-                    let a = 1;
-                    let alpha;
-                    if (matchesHex) {
-                        ({r, g, b} = hexToRgb(matchesHex[0]));
-                    } else {
-                        [r, g, b, alpha = '1'] = matchedColor.split(',').map((n) => n.trim());
-                        a = Number(alpha);
+        if (matchedDelimiter) {
+            // If rgb contains hex value, extract rgb values from there
+            matchedDelimiter.map((matched) => {
+                try {
+                    const matchesRgba = XRegExp.matchRecursive(matched, 'rgba?\\(', '\\)', 'g', {
+                        valueNames: [null, 'left', 'match', 'right'],
+                    });
+                    if (matchesRgba.length > 0) {
+                        const matchedString = matchesRgba.map((n) => n.value).join('');
+                        const matchedColor = matchesRgba[1].value;
+                        const matchesHex = matchedColor.match(hexRegex);
+                        let r;
+                        let g;
+                        let b;
+                        let a = 1;
+                        let alpha;
+                        if (matchesHex) {
+                            ({r, g, b} = hexToRgb(matchesHex[0]));
+                        } else {
+                            [r, g, b, alpha = '1'] = matchedColor.split(',').map((n) => n.trim());
+                            a = Number(alpha);
+                        }
+                        const rgbaString = `rgba(${matchedColor.replace(hexRegex, [r, g, b].join(', '))}`;
+
+                        returnedColor = color.split(matchedString).join(RGBAToHexA(rgbaString));
                     }
-                    const rgbaString = `rgba(${matchedColor.replace(hexRegex, [r, g, b].join(', '))}`;
-
-                    returnedColor = color.split(matchedString).join(RGBAToHexA(rgbaString));
+                } catch (e) {
+                    console.log('error', e);
                 }
-            } catch (e) {
-                console.log('error', e);
-            }
-        });
+            });
+        }
+        return returnedColor;
+    } catch (e) {
+        console.error(e);
     }
-    return returnedColor;
 }
 
 // Light or dark check for Token Buttons: If color is very bright e.g. white we show a different style

@@ -147,6 +147,7 @@ export default class TokenData {
     updateTokenValues(parent: string, tokens: string, updatedAt: string): void {
         if (tokens) {
             const hasErrored: boolean = this.checkTokenValidity(tokens);
+
             const newTokens = {
                 ...this.tokens,
                 [parent]: {
@@ -160,7 +161,6 @@ export default class TokenData {
                 this.setMergedTokens();
             }
         } else {
-            console.log('removing', parent);
             const oldTokens = this.tokens;
             delete oldTokens[parent];
         }

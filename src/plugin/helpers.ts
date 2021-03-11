@@ -282,7 +282,7 @@ export function convertFigmaGradientToString(paint: GradientPaint) {
 
 export function convertStringToFigmaGradient(value: string) {
     const values = value.substring(value.indexOf('(') + 1, value.lastIndexOf(')')).split(', ');
-    const gradientObject = values.map((stop) => {
+    const gradientStops = values.map((stop) => {
         const seperatedStop = stop.split(' ');
         const {color, opacity} = convertToFigmaColor(seperatedStop[0]);
         const gradientColor = color;
@@ -292,5 +292,5 @@ export function convertStringToFigmaGradient(value: string) {
             position: parseFloat(seperatedStop[1]) / 100,
         };
     });
-    return gradientObject;
+    return {gradientStops};
 }

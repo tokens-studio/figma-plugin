@@ -45,26 +45,31 @@ export const setTextValuesOnTarget = async (target, token) => {
 };
 
 const setColorValuesOnTarget = (target, token) => {
-    const {description, value} = token;
-    if (value.startsWith('linear-gradient')) {
-        const gradientStops = convertStringToFigmaGradient(value);
-        const oldPaint = target.paints[0];
-        const newPaint = {
-            type: 'GRADIENT_LINEAR',
-            gradientTransform: oldPaint?.gradientTransform || [
+    try {
+        const {description, value} = token;
+        if (value.startsWith('linear-gradient')) {
+            const {gradientStops} = convertStringToFigmaGradient(value);
+            const oldPaint = target.paints[0];
+            const defaultTransform = [
                 [1, 0, 0],
                 [0, 1, 0],
-            ],
-            gradientStops,
-        };
-        target.paints = [newPaint];
-    } else {
-        const {color, opacity} = convertToFigmaColor(value);
-        target.paints = [{color, opacity, type: 'SOLID'}];
-    }
+            ];
+            const newPaint = {
+                type: 'GRADIENT_LINEAR',
+                gradientTransform: oldPaint?.gradientTransform || defaultTransform,
+                gradientStops,
+            };
+            target.paints = [newPaint];
+        } else {
+            const {color, opacity} = convertToFigmaColor(value);
+            target.paints = [{color, opacity, type: 'SOLID'}];
+        }
 
-    if (description) {
-        target.description = description;
+        if (description) {
+            target.description = description;
+        }
+    } catch (e) {
+        console.error('Error setting color', e);
     }
 };
 
