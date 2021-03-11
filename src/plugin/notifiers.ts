@@ -50,3 +50,10 @@ export function notifyStyleValues(values = undefined) {
         values,
     });
 }
+
+export function notifyUserId(userId: string) {
+    figma.ui.postMessage({
+        type: 'userid',
+        userId,
+    });
+}

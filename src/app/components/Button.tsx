@@ -47,7 +47,6 @@ const Button: React.FunctionComponent<ButtonProps> = ({
 
     const handleClick = (e) => {
         e.preventDefault();
-        mixpanel.track('Button click', {genre: 'hip-hop', 'duration in seconds': 42});
         onClick();
     };
 

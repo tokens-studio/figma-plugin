@@ -2,9 +2,10 @@
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 
+import {getUserId} from './helpers';
 import {pullStyles, updateStyles} from './styles';
 import store from './store';
-import {notifyNoSelection, notifyTokenValues, notifyRemoteComponents} from './notifiers';
+import {notifyNoSelection, notifyTokenValues, notifyRemoteComponents, notifyUserId} from './notifiers';
 import {findAllWithData, removePluginData, sendPluginValues, updatePluginData} from './pluginData';
 import {getTokenData, updateNodes, setTokenData, goToNode} from './node';
 
@@ -24,7 +25,9 @@ figma.on('selectionchange', () => {
 
 figma.ui.onmessage = async (msg) => {
     switch (msg.type) {
-        case 'initiate':
+        case 'initiate': {
+            const userId = await getUserId();
+            notifyUserId(userId);
             notifyTokenValues(getTokenData());
 
             if (!figma.currentPage.selection.length) {
@@ -33,6 +36,7 @@ figma.ui.onmessage = async (msg) => {
             }
             sendPluginValues(figma.currentPage.selection);
             return;
+        }
         case 'set-node-data':
             try {
                 updatePluginData(figma.currentPage.selection, msg.values);
