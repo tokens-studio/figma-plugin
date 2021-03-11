@@ -6,7 +6,7 @@ import {notifyToUI} from '../../plugin/notifiers';
 import {SingleToken, TokenGroup, TokenObject, TokenProps, Tokens} from '../../../types/tokens';
 import {convertToRgb, checkAndEvaluateMath} from './utils';
 
-const aliasRegex = /(\$[^\s,]+)/;
+const aliasRegex = /(\$[^\s]+)/g;
 export default class TokenData {
     mergedTokens: TokenGroup;
 
