@@ -99,6 +99,7 @@ const emptyState = {
         secret: '',
         name: '',
         provider: '',
+        new: false,
     },
     apiProviders: [],
     projectURL: '',

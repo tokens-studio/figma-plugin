@@ -9,6 +9,7 @@ export type ApiDataType = {
     secret: string;
     provider: StorageProviderType;
     name: string;
+    new?: boolean;
 };
 
 export enum StorageProviderType {

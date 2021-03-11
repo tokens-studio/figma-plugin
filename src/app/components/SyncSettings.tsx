@@ -14,8 +14,12 @@ const SyncSettings = () => {
     const {api, storageType, localApiState, apiProviders, updateAfterApply} = useTokenState();
     const {setLocalApiState, setStorageType, toggleUpdateAfterApply} = useTokenDispatch();
 
+    React.useEffect(() => {
+        console.log('Mounted', {storageType, localApiState});
+    }, []);
+
     const [confirmModalVisible, showConfirmModal] = React.useState(false);
-    const [editStorageItemModalVisible, setShowEditStorageModalVisible] = React.useState(false);
+    const [editStorageItemModalVisible, setShowEditStorageModalVisible] = React.useState(Boolean(localApiState.new));
     const [createStorageItemModalVisible, setShowCreateStorageModalVisible] = React.useState(false);
 
     const handleEditClick = (provider) => {
@@ -130,6 +134,7 @@ const SyncSettings = () => {
                         <Button variant="secondary" onClick={() => setShowCreateStorageModalVisible(true)}>
                             Add new credentials
                         </Button>
+
                         {storedApiProviders().length > 0 && (
                             <div className="space-y-4">
                                 {api.provider === localApiState.provider && (

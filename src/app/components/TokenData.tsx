@@ -6,6 +6,7 @@ import {notifyToUI} from '../../plugin/notifiers';
 import {SingleToken, TokenGroup, TokenObject, TokenProps, Tokens} from '../../types/tokens';
 import {convertToRgb, checkAndEvaluateMath} from './utils';
 
+const aliasRegex = /(\$[^\s,]+)/;
 export default class TokenData {
     mergedTokens: TokenGroup;
 
@@ -206,7 +207,7 @@ export default class TokenData {
     private checkIfAlias(token: SingleToken): boolean {
         let aliasToken = false;
         if (typeof token === 'string') {
-            aliasToken = token.includes('$') && token.length > 1;
+            aliasToken = Boolean(token.match(aliasRegex));
         } else {
             aliasToken = this.checkIfValueTokenAlias(token);
         }
@@ -251,12 +252,13 @@ export default class TokenData {
 
     getAliasValue(token: SingleToken, tokens = this.mergedTokens): string | null {
         let returnedValue = this.checkIfValueToken(token) ? (token.value as string) : (token as string);
-        const tokenRegex = /(\$[^\s,]+)/g;
-        const tokenReferences = returnedValue.toString().match(tokenRegex);
+        const tokenReferences = returnedValue.toString().match(aliasRegex);
         if (tokenReferences.length > 0) {
             const resolvedReferences = tokenReferences.map((ref) => {
-                const value = objectPath.get(tokens, ref.substring(1));
-                if (value) return value;
+                if (ref.length > 1) {
+                    const value = objectPath.get(tokens, ref.substring(1));
+                    if (value) return value;
+                }
                 return null;
             });
             tokenReferences.forEach((reference, index) => {

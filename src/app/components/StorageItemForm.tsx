@@ -13,6 +13,9 @@ export default function EditStorageItemForm({
     hasErrored,
 }) {
     const {localApiState} = useTokenState();
+    React.useEffect(() => {
+        console.log('Got values', values);
+    }, []);
 
     return (
         <form onSubmit={handleSubmit} className="space-y-4">

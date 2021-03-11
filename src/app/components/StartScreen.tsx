@@ -19,6 +19,8 @@ const StartScreen = ({setActive}) => {
             id: storageType.id,
             name: storageType.name,
             provider: storageType.provider,
+            secret: '',
+            new: true,
         });
     };
 

@@ -235,7 +235,7 @@ textarea::-webkit-scrollbar-thumb {
     border: 1px solid white;
     content: '';
     border-radius: 100%;
-    background-color: var(--backgroundColor);
+    background: var(--backgroundColor);
     border-color: var(--borderColor);
 }
 

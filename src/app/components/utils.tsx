@@ -1,7 +1,8 @@
 import {Parser} from 'expr-eval';
-import {hexToRgb} from '../../plugin/helpers';
+import XRegExp from 'xregexp';
 import {postToFigma} from '../../plugin/notifiers';
 import {MessageToPluginTypes} from '../../types/messages';
+import {hexToRgb, RGBAToHexA} from '../../plugin/helpers';
 
 const parser = new Parser();
 
@@ -14,9 +15,19 @@ export function checkAndEvaluateMath(expr) {
     }
 }
 
+export function isValueToken(token): token is {value: string | number} {
+    return typeof token === 'object' && (typeof token?.value === 'string' || typeof token?.value === 'number');
+}
+
 export function isTypographyToken(token) {
     if (typeof token !== 'object') return false;
-    return 'fontFamily' in token || 'fontWeight' in token || 'fontSize' in token || 'lineHeight' in token;
+    return (
+        'fontFamily' in token ||
+        'fontWeight' in token ||
+        'fontSize' in token ||
+        'lineHeight' in token ||
+        'paragraphSpacing' in token
+    );
 }
 
 export function isSingleToken(token): token is {value: string} {
@@ -28,16 +39,43 @@ export function convertToRgb(color: string) {
         return color;
     }
     const hexRegex = /#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})/g;
-    if (color.match(/^rgb/)) {
-        // If rgb contains hex value, extract rgb values from there
-        if (color.match(hexRegex)) {
-            const {r, g, b} = hexToRgb(color.match(hexRegex)[0]);
+    const matchedDelimiter = XRegExp.matchRecursive(color, '\\(', '\\)', 'g');
+    let returnedColor = color;
 
-            return color.replace(hexRegex, [r, g, b].join(', '));
-        }
-        return color;
+    if (matchedDelimiter) {
+        // If rgb contains hex value, extract rgb values from there
+        matchedDelimiter.map((matched) => {
+            try {
+                const matchesRgba = XRegExp.matchRecursive(matched, 'rgba?\\(', '\\)', 'g', {
+                    valueNames: [null, 'left', 'match', 'right'],
+                });
+                if (matchesRgba.length > 0) {
+                    const matchedString = matchesRgba.map((n) => n.value).join('');
+                    const matchedColor = matchesRgba[1].value;
+                    const matchesHex = matchedColor.match(hexRegex);
+                    let r;
+                    let g;
+                    let b;
+                    let a = 1;
+                    let alpha;
+                    console.log('Matches regex', matchesHex);
+                    if (matchesHex) {
+                        ({r, g, b} = hexToRgb(matchesHex[0]));
+                    } else {
+                        [r, g, b, alpha = '1'] = matchedColor.split(',').map((n) => n.trim());
+                        a = Number(alpha);
+                    }
+                    console.log('Matched, Returned', matchedColor, r, g, b, a);
+                    const rgbaString = `rgba(${matchedColor.replace(hexRegex, [r, g, b].join(', '))}`;
+
+                    returnedColor = color.split(matchedString).join(RGBAToHexA(rgbaString));
+                }
+            } catch (e) {
+                console.log('error', e);
+            }
+        });
     }
-    return color;
+    return returnedColor;
 }
 
 // Light or dark check for Token Buttons: If color is very bright e.g. white we show a different style
