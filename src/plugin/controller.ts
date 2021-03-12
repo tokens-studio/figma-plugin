@@ -2,6 +2,7 @@
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 
+import {getUserId, removeSingleCredential, updateCredentials} from './helpers';
 import {pullStyles, updateStyles} from './styles';
 import store from './store';
 import {
@@ -11,10 +12,11 @@ import {
     notifyStorageType,
     notifyAPIProviders,
     notifyUI,
+    notifyUserId,
 } from './notifiers';
 import {findAllWithData, removePluginData, sendPluginValues, updatePluginData} from './pluginData';
 import {getTokenData, updateNodes, setTokensOnDocument, goToNode, saveStorageType, getSavedStorageType} from './node';
-import {removeSingleCredential, updateCredentials} from './helpers';
+
 import {MessageFromPluginTypes, MessageToPluginTypes} from '../../types/messages';
 import {StorageProviderType} from '../../types/api';
 
@@ -59,6 +61,8 @@ figma.ui.onmessage = async (msg) => {
     switch (msg.type) {
         case MessageToPluginTypes.INITIATE:
             try {
+                const userId = await getUserId();
+                notifyUserId(userId);
                 const apiProviders = await figma.clientStorage.getAsync('apiProviders');
                 const storageType = await getSavedStorageType();
 

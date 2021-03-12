@@ -29,6 +29,7 @@
 		"file-loader": "^6.2.0",
 		"ignore-styles": "^5.0.1",
 		"json5": "^2.1.3",
+		"mixpanel-figma": "^2.0.1",
 		"object-path": "^0.11.5",
 		"postcss": "^8.2.8",
 		"react": "17.0.0",

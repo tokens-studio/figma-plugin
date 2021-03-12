@@ -294,3 +294,30 @@ export function convertStringToFigmaGradient(value: string) {
     });
     return {gradientStops};
 }
+
+export function generateId(len, charSet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789') {
+    let randomString = '';
+    for (let i = 0; i < len; i++) {
+        const randomPoz = Math.floor(Math.random() * charSet.length);
+        randomString += charSet.substring(randomPoz, randomPoz + 1);
+    }
+    return randomString;
+}
+
+export async function getUserId() {
+    let userId = generateId(24);
+
+    try {
+        const id = await figma.clientStorage.getAsync('userId');
+        if (typeof id === 'undefined') {
+            figma.clientStorage.setAsync('userId', userId);
+        } else {
+            userId = id;
+        }
+    } catch (e) {
+        console.error('error retrieving userId', e);
+        figma.clientStorage.setAsync('userId', userId);
+    }
+
+    return userId;
+}

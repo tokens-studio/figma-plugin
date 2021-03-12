@@ -79,3 +79,10 @@ export function notifyAPIProviders(providers: ApiDataType[]) {
 export function notifyStyleValues(values = undefined) {
     postToUI({type: MessageFromPluginTypes.STYLES, values});
 }
+
+export function notifyUserId(userId: string) {
+    figma.ui.postMessage({
+        type: 'userid',
+        userId,
+    });
+}

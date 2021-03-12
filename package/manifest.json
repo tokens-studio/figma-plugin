@@ -1,0 +1,10 @@
+{
+  "name": "Figma Tokens (Dev)",
+  "id": "843461159747178978",
+  "api": "1.0.0",
+  "main": "dist/code.js",
+  "ui": "dist/ui.html",
+  "relaunchButtons": [
+    {"command": "edit", "name": "Tokens"}
+  ]
+}

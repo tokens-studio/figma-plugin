@@ -46,13 +46,18 @@ const Button: React.FunctionComponent<ButtonProps> = ({
         );
     }
 
+    const handleClick = (e) => {
+        e.preventDefault();
+        onClick();
+    };
+
     return (
         // eslint-disable-next-line react/button-has-type
         <button
             disabled={disabled}
             type={type}
             className={`button ${[variantClass, sizeClass].join(' ')}`}
-            onClick={onClick}
+            onClick={handleClick}
         >
             {children}
         </button>
