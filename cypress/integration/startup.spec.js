@@ -1,22 +1,10 @@
-let loadEvent = 'not fired';
-
-window.addEventListener('load', function (event) {
-    console.log('load event fired!');
-    loadEvent = 'fired';
-});
-
 describe('Loads application', () => {
-    it('displays loading bar on startup', () => {
-        cy.visit('/');
-
-        cy.get('.loadingBar').contains('Hold on, updating...');
-    });
-
     it('successfully loads when tokens are given', () => {
         cy.visit('/');
 
+        cy.get('[data-cy=loadingBar]').should('exist');
+
         cy.window().then(($window) => {
-            console.log('Window is', $window);
             const message = {
                 pluginMessage: {
                     type: 'tokenvalues',
@@ -24,9 +12,8 @@ describe('Loads application', () => {
                 },
             };
             $window.postMessage(message, '*');
-            console.log('done sending postmessage');
         });
-        cy.get('.loadingBar').should('not.exist');
+        cy.get('[data-cy=loadingBar]').should('not.exist');
     });
 
     it('shows welcome page when no token values are given', () => {

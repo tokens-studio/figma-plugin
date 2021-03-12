@@ -8,7 +8,7 @@ export default function LoadingBar() {
     if (!loading) return null;
 
     return (
-        <div className="fixed w-full z-20">
+        <div className="fixed w-full z-20" data-cy="loadingBar">
             <div className="flex items-center space-x-2 bg-gray-300 p-2 rounded m-2">
                 <div className="inline-flex rotate">
                     <Icon name="loading" />
