@@ -47,17 +47,12 @@ const Button: React.FunctionComponent<ButtonProps> = ({
                 rel="noreferrer"
                 className={`button ${[variantClass, sizeClass].join(' ')}`}
                 href={href}
-                data-cy={dataCy}
+                data-cy={id}
             >
                 {children}
             </a>
         );
     }
-
-    const handleClick = (e) => {
-        e.preventDefault();
-        onClick();
-    };
 
     return (
         // eslint-disable-next-line react/button-has-type
@@ -66,7 +61,7 @@ const Button: React.FunctionComponent<ButtonProps> = ({
             disabled={disabled}
             type={type}
             className={`button ${[variantClass, sizeClass].join(' ')}`}
-            onClick={handleClick}
+            onClick={onClick}
         >
             {children}
         </button>

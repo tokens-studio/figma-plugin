@@ -1,5 +1,11 @@
+const fillProviderForm = ({name, id, secret}) => {
+    cy.get('input[name=name]').type(name);
+    cy.get('input[name=secret]').type(secret);
+    cy.get('input[name=id]').type(id).type('{enter}');
+};
+
 describe('Arcade', () => {
-    it('lets user choose arcade as a remote storage', () => {
+    it('returns error when wrong api data is entered', () => {
         cy.visit('/');
 
         cy.window().then(($window) => {
@@ -14,5 +20,11 @@ describe('Arcade', () => {
         cy.get('[data-cy=navitem-syncsettings]').click();
         cy.get('[data-cy=provider-arcade]').click();
         cy.get('[data-cy=button-add-new-credentials]').click();
+        fillProviderForm({
+            name: 'dummy',
+            id: 'some_arcade_id',
+            secret: 'some_arcade_secret',
+        });
+        cy.get('[data-cy=provider-modal-error]').should('exist');
     });
 });

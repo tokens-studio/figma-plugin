@@ -45,7 +45,7 @@ export default function EditStorageItemForm({
                 </Button>
             </div>
             {hasErrored && (
-                <div className="bg-red-200 text-red-700 rounded p-4 text-xs font-bold">
+                <div className="bg-red-200 text-red-700 rounded p-4 text-xs font-bold" data-cy="provider-modal-error">
                     There was an error connecting. Check your credentials.
                 </div>
             )}

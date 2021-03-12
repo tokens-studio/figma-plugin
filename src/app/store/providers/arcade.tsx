@@ -45,6 +45,7 @@ export default function useArcade() {
     }
     // Read tokens from Arcade
     async function fetchDataFromArcade(id, secret, name): Promise<TokenProps> {
+        console.log('Fetching from arcade', id, secret, name);
         try {
             let tokenValues;
 
