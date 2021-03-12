@@ -1,3 +1,6 @@
+import {MessageFromPluginTypes} from '../../types/messages';
+import {StorageProviderType} from '../../types/api';
+
 function receiveRemoteComponents() {
     cy.window().then(($window) => {
         const message = {
@@ -36,12 +39,21 @@ describe('TokenListing', () => {
             };
             $window.postMessage(message, '*');
         });
+        cy.window().then(($window) => {
+            const message = {
+                pluginMessage: {
+                    type: MessageFromPluginTypes.RECEIVED_STORAGE_TYPE,
+                    storageType: {provider: StorageProviderType.LOCAL},
+                },
+            };
+            $window.postMessage(message, '*');
+        });
         cy.get('[data-cy=tokenlisting-sizing] [data-cy=button-add-new-token]').click({timeout: 1000});
         fillTokenForm({
             name: 'xs',
             value: '4',
         });
-        cy.get('@postMessage').should('be.calledOnce');
+        cy.get('@postMessage').should('be.calledTwice');
         receiveRemoteComponents();
         cy.get('[data-cy=button-modal-add]').click();
         fillTokenForm({
