@@ -14,5 +14,5 @@ ReactDOM.render(
     <TokenProvider>
         <App />
     </TokenProvider>,
-    document.getElementById('react-page')
+    document.getElementById('app')
 );

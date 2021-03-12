@@ -1,5 +1,11 @@
 {
     "baseUrl": "http://localhost:5000/ui",
-    "chromeWebSecurity": false
+    "chromeWebSecurity": false,
+    "experimentalComponentTesting": true,
+    "env": {
+        "cypress-react-selector": {
+          "root": "#app"
+        }
+      }
 
 }

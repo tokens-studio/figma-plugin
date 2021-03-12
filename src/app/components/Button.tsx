@@ -42,7 +42,13 @@ const Button: React.FunctionComponent<ButtonProps> = ({
     }
     if (href) {
         return (
-            <a target="_blank" rel="noreferrer" className={`button ${[variantClass, sizeClass].join(' ')}`} href={href}>
+            <a
+                target="_blank"
+                rel="noreferrer"
+                className={`button ${[variantClass, sizeClass].join(' ')}`}
+                href={href}
+                data-cy={dataCy}
+            >
                 {children}
             </a>
         );

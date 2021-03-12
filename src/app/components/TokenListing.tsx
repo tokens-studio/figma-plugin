@@ -135,8 +135,8 @@ const TokenListing = ({
     // if (!Object.entries(values[1]).length > 0) return null;
 
     return (
-        <div className="border-b border-gray-200">
-            <div className="relative flex items-center justify-between space-x-8">
+        <div className="border-b border-gray-200" data-cy={`tokenlisting-${type}`}>
+            <div className="flex justify-between space-x-8 items-center relative">
                 <button
                     className={`flex items-center w-full h-full p-4 space-x-2 hover:bg-gray-100 focus:outline-none ${
                         isIntCollapsed ? 'opacity-50' : null
@@ -202,6 +202,7 @@ const TokenListing = ({
                     <Tooltip label="Add a new token" variant="right">
                         <button
                             disabled={editProhibited}
+                            data-cy="button-add-new-token"
                             className="button button-ghost"
                             type="button"
                             onClick={() => {
@@ -263,6 +264,7 @@ const TokenListing = ({
                                         <button
                                             disabled={editProhibited}
                                             type="button"
+                                            data-cy="button-modal-add"
                                             className="button button-ghost"
                                             onClick={() => showNewForm(values[0])}
                                         >

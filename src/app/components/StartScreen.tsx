@@ -43,7 +43,7 @@ const StartScreen = ({setActive}) => {
                 >
                     Learn more
                 </Button>
-                <Button size="large" variant="primary" onClick={onSetDefaultTokens}>
+                <Button id="configure" size="large" variant="primary" onClick={onSetDefaultTokens}>
                     Get started
                 </Button>
             </div>

@@ -2,7 +2,7 @@ import * as React from 'react';
 import ReactModal from 'react-modal';
 import Heading from './Heading';
 
-if (process.env.NODE_ENV !== 'test') ReactModal.setAppElement('#react-page');
+if (process.env.NODE_ENV !== 'test') ReactModal.setAppElement('#app');
 
 const customStyles = {
     overlay: {
