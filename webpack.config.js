@@ -1,6 +1,7 @@
 const HtmlWebpackInlineSourcePlugin = require('html-webpack-inline-source-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const path = require('path');
+const Dotenv = require('dotenv-webpack');
 
 module.exports = (env, argv) => ({
     mode: argv.mode === 'production' ? 'production' : 'development',
@@ -56,6 +57,9 @@ module.exports = (env, argv) => ({
 
     // Tells Webpack to generate "ui.html" and to inline "ui.ts" into it
     plugins: [
+        new Dotenv({
+            path: argv.mode === 'production' ? '.env.production' : '.env',
+        }),
         new HtmlWebpackPlugin({
             template: './src/app/index.html',
             filename: 'ui.html',

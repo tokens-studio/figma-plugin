@@ -7,6 +7,7 @@ export enum MessageFromPluginTypes {
     RECEIVED_STORAGE_TYPE = 'receivedStorageType',
     API_CREDENTIALS = 'apiCredentials',
     API_PROVIDERS = 'apiProviders',
+    USER_ID = 'userId',
 }
 
 export enum MessageToPluginTypes {

@@ -4,6 +4,7 @@ import {MessageFromPluginTypes, MessageToPluginTypes} from '../../../types/messa
 import useRemoteTokens from '../store/remoteTokens';
 import {useTokenDispatch} from '../store/TokenContext';
 import TokenData from './TokenData';
+import mixpanel from '../../utils/mixpanel';
 
 export default function Initiator({setActive, setRemoteComponents}) {
     const {
@@ -28,7 +29,7 @@ export default function Initiator({setActive, setRemoteComponents}) {
         onInitiate();
         window.onmessage = async (event) => {
             if (event.data.pluginMessage) {
-                const {type, values, credentials, status, storageType, providers} = event.data.pluginMessage;
+                const {type, values, credentials, status, storageType, providers, userId} = event.data.pluginMessage;
                 switch (type) {
                     case MessageFromPluginTypes.SELECTION:
                         setDisabled(false);
@@ -82,6 +83,11 @@ export default function Initiator({setActive, setRemoteComponents}) {
                     }
                     case MessageFromPluginTypes.API_PROVIDERS: {
                         setAPIProviders(providers);
+                        break;
+                    }
+                    case MessageFromPluginTypes.USER_ID: {
+                        identify(userId);
+                        track('Launched');
                         break;
                     }
                     default:
