@@ -84,7 +84,7 @@
 }
 
 body {
-    @apply font-body text-sm;
+    @apply font-body text-sm leading-normal;
 }
 
 body::-webkit-scrollbar,
@@ -452,7 +452,7 @@ form {
     display: flex;
     height: 100%;
     margin-left: -16px;
-    padding: 0 var(--size-xsmall) 0 calc(var(--size-xlarge) - 2px);
+    padding: 0 0 0 calc(var(--size-xlarge) - 2px);
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;

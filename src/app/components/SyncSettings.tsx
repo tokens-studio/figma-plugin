@@ -103,7 +103,9 @@ const SyncSettings = () => {
                         <ProviderSelector
                             isActive={localApiState?.provider === StorageProviderType.LOCAL}
                             isStored={storageType?.provider === StorageProviderType.LOCAL}
-                            onClick={() => showConfirmModal(true)}
+                            onClick={() =>
+                                storageType?.provider === StorageProviderType.LOCAL ? null : showConfirmModal(true)
+                            }
                             text="Local document"
                         />
                         <ProviderSelector
