@@ -16,6 +16,7 @@ describe('Loads application', () => {
         cy.visit('/');
 
         cy.window().then(($window) => {
+            console.log('Window is', $window);
             const message = {
                 pluginMessage: {
                     type: 'tokenvalues',
@@ -23,6 +24,7 @@ describe('Loads application', () => {
                 },
             };
             $window.postMessage(message, '*');
+            console.log('done sending postmessage');
         });
         cy.get('.loadingBar').should('not.exist');
     });

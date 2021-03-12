@@ -28,6 +28,7 @@ export default function Initiator({setActive, setRemoteComponents}) {
     React.useEffect(() => {
         onInitiate();
         window.onmessage = async (event) => {
+            console.log('Got message', event);
             if (event.data.pluginMessage) {
                 const {type, values, credentials, status, storageType, providers, userId} = event.data.pluginMessage;
                 switch (type) {
