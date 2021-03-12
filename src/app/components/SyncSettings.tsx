@@ -132,7 +132,11 @@ const SyncSettings = () => {
                 {selectedRemoteProvider() && (
                     <>
                         <div className="text-gray-600 text-xxs">{storageProviderText()}</div>
-                        <Button variant="secondary" onClick={() => setShowCreateStorageModalVisible(true)}>
+                        <Button
+                            id="button-add-new-credentials"
+                            variant="secondary"
+                            onClick={() => setShowCreateStorageModalVisible(true)}
+                        >
                             Add new credentials
                         </Button>
 
