@@ -43,12 +43,13 @@ const StartScreen = ({setActive}) => {
                 >
                     Learn more
                 </Button>
-                <Button id="configure" size="large" variant="primary" onClick={onSetDefaultTokens}>
+                <Button id="button-configure" size="large" variant="primary" onClick={onSetDefaultTokens}>
                     Get started
                 </Button>
             </div>
             {storageType?.provider !== StorageProviderType.LOCAL && (
                 <Callout
+                    id="callout-action-setupsync"
                     heading="Remote storage detected"
                     description={`This document is setup with a remote token source on ${storageType.provider}. Ask your team for the credentials, then enter them in the Sync dialog.`}
                     action={{

@@ -51,12 +51,12 @@ const StorageItem = ({provider, id, secret, name, onEdit = null}) => {
             </div>
             <div className="space-x-2">
                 {onEdit && (
-                    <Button variant="secondary" onClick={onEdit}>
+                    <Button id="button-storageitem-edit" variant="secondary" onClick={onEdit}>
                         Edit
                     </Button>
                 )}
                 {!isActive() && (
-                    <Button variant="secondary" onClick={() => restoreStoredProvider()}>
+                    <Button id="button-storageitem-apply" variant="secondary" onClick={() => restoreStoredProvider()}>
                         Apply
                     </Button>
                 )}

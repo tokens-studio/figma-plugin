@@ -150,9 +150,12 @@ const SyncSettings = () => {
                                         secret={api.secret}
                                     />
                                 )}
-                                {storedApiProviders().length > 1 && (
+                                {storedApiProviders().length > 0 && (
                                     <details>
-                                        <summary className="p-2 rounded bg-gray-100 cursor-pointer text-xs focus:outline-none hover:bg-gray-200 focus:bg-gray-200">
+                                        <summary
+                                            data-cy={`summary-${localApiState.provider}`}
+                                            className="p-2 rounded bg-gray-100 cursor-pointer text-xs focus:outline-none hover:bg-gray-200 focus:bg-gray-200"
+                                        >
                                             {storedApiProviders().length} providers stored on this device
                                         </summary>
                                         <div className="flex flex-row items-center justify-between">

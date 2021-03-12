@@ -82,6 +82,7 @@ export default function Initiator({setActive, setRemoteComponents}) {
                         break;
                     }
                     case MessageFromPluginTypes.API_PROVIDERS: {
+                        console.log('got api providers', providers);
                         setAPIProviders(providers);
                         break;
                     }

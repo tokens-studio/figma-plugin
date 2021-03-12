@@ -27,12 +27,14 @@ const customStyles = {
 };
 
 const Modal = ({
+    id,
     title,
     full,
     isOpen,
     close,
     children,
 }: {
+    id?: string;
     title?: string;
     full?: boolean;
     isOpen: boolean;
@@ -40,7 +42,7 @@ const Modal = ({
     children: React.ReactNode;
 }) => (
     <ReactModal isOpen={isOpen} onRequestClose={close} style={customStyles} contentLabel={title || null}>
-        <div className={full ? 'p-0' : 'p-8'}>
+        <div data-cy={id} className={full ? 'p-0' : 'p-8'}>
             {title && (
                 <div className="mb-4">
                     <Heading size="small">{title}</Heading>
