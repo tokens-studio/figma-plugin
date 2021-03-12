@@ -41,8 +41,7 @@
 		"react-modal": "^3.11.2",
 		"react-svg-loader": "^3.0.3",
 		"regenerator-runtime": "^0.13.7",
-		"tailwindcss": "^2.0.3",
-		"xregexp": "^5.0.1"
+		"tailwindcss": "^2.0.3"
 	},
 	"devDependencies": {
 		"@babel/core": "^7.12.16",

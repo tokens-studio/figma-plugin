@@ -38,9 +38,27 @@ describe('isTypographyToken', () => {
 
 describe('convertToRgb', () => {
     it('transforms a color string to rgb values', () => {
-        const hex = 'rgb(#ff0000, 0.5)';
+        const rgbhex = 'rgb(#ff0000, 0.5)';
+        const hex = '#ff0000';
 
-        expect(convertToRgb(hex)).toBe('rgb(255, 0, 0, 0.5)');
+        expect(convertToRgb(rgbhex)).toBe('#ff000080');
+        expect(convertToRgb(hex)).toBe('#ff0000');
+    });
+
+    it('transforms a gradient string to rgb values', () => {
+        const gradient1 = 'linear-gradient(rgb(#ff0000, 0.5) 0%, #ffffff 100%)';
+        const gradient2 = 'linear-gradient(rgb(#ff0000, 0.5) 0%, rgba(#ffffff, 1) 100%)';
+        const gradient3 = 'linear-gradient(rgba(255, 255, 0, 0.5) 0%, rgba(#000000, 0) 100%)';
+
+        expect(convertToRgb(gradient1)).toBe('linear-gradient(#ff000080 0%, #ffffff 100%)');
+        expect(convertToRgb(gradient2)).toBe('linear-gradient(#ff000080 0%, #ffffffff 100%)');
+        expect(convertToRgb(gradient3)).toBe('linear-gradient(#ffff0080 0%, #00000000 100%)');
+    });
+
+    it('transforms multiple color stops to rgb values', () => {
+        const gradient1 = 'linear-gradient(#ff0000 0%, rgb(#ff0000, 0.3) 50%, rgb(255, 0, 0, 1) 100%)';
+
+        expect(convertToRgb(gradient1)).toBe('linear-gradient(#ff0000 0%, #ff00004d 50%, #ff0000ff 100%)');
     });
 });
 

@@ -107,6 +107,7 @@ const SyncSettings = () => {
                                 storageType?.provider === StorageProviderType.LOCAL ? null : showConfirmModal(true)
                             }
                             text="Local document"
+                            id={StorageProviderType.LOCAL}
                         />
                         <ProviderSelector
                             isActive={localApiState?.provider === StorageProviderType.JSONBIN}
@@ -115,6 +116,7 @@ const SyncSettings = () => {
                                 setLocalApiState({name: '', secret: '', id: '', provider: StorageProviderType.JSONBIN});
                             }}
                             text="JSONbin"
+                            id={StorageProviderType.JSONBIN}
                         />
                         <ProviderSelector
                             isActive={localApiState?.provider === StorageProviderType.ARCADE}
@@ -123,6 +125,7 @@ const SyncSettings = () => {
                                 setLocalApiState({name: '', secret: '', id: '', provider: StorageProviderType.ARCADE});
                             }}
                             text="Arcade"
+                            id={StorageProviderType.ARCADE}
                         />
                     </div>
                 </div>
