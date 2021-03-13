@@ -1,6 +1,7 @@
 import * as React from 'react';
 import JSON5 from 'json5';
 import objectPath from 'object-path';
+import SbFetchChangelog from '@/utils/storyblok';
 import defaultJSON from '../../config/default.json';
 import TokenData from '../components/TokenData';
 import * as pjs from '../../../package.json';
@@ -328,9 +329,8 @@ function stateReducer(state, action) {
                 storageType: action.data,
             };
         case ActionType.SetShowUpdates: {
-            const sbDate = new Date('2021-03-13T15:15:13.242Z').getTime();
-            const receivedDate = new Date(action.data).getTime();
-            console.log('sbDate larger?', sbDate > receivedDate);
+            const receivedDate = action.data;
+            const stories = SbFetchChangelog(receivedDate);
             // Add logic to fetch updates since date X
             return {
                 ...state,

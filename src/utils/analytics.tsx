@@ -1,11 +1,15 @@
 import mixpanel from './mixpanel';
 
 export function track(name: string, opts = {}) {
-    mixpanel.track(name, opts);
+    if (process.env.MIXPANEL_ACCESS_TOKEN) {
+        mixpanel.track(name, opts);
+    }
 }
 
 export function identify(data: string) {
-    mixpanel.identify(data);
+    if (process.env.MIXPANEL_ACCESS_TOKEN) {
+        mixpanel.identify(data);
+    }
 }
 
 export function initializeAnalytics() {
