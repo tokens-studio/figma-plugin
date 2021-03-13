@@ -1,3 +1,4 @@
+import {StorageProviderType} from '../../types/api';
 import {isObject, mergeDeep, convertFigmaToLineHeight, hslaToRgba, convertToFigmaColor, hexToRgb} from './helpers';
 
 describe('isObject', () => {

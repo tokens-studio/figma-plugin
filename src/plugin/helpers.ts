@@ -1,6 +1,5 @@
 /* eslint-disable no-param-reassign */
 import {webRGBToFigmaRGB, hexToFigmaRGB, figmaRGBToHex} from '@figma-plugin/helpers';
-import {notifyAPIProviders, notifyUI} from './notifiers';
 
 interface RGBA {
     r: number;
@@ -9,20 +8,10 @@ interface RGBA {
     a?: number;
 }
 
-/**
- * Simple object check.
- * @param item
- * @returns {boolean}
- */
 export function isObject(item) {
     return item && typeof item === 'object' && !Array.isArray(item);
 }
 
-/**
- * Deep merge two objects.
- * @param target
- * @param ...sources
- */
 export function mergeDeep(target, ...sources) {
     if (!sources.length) return target;
     const source = sources.shift();
@@ -39,59 +28,6 @@ export function mergeDeep(target, ...sources) {
     }
 
     return mergeDeep(target, ...sources);
-}
-
-// update credentials
-export async function updateCredentials({secret, id, name, provider}) {
-    try {
-        const data = await figma.clientStorage.getAsync('apiProviders');
-        let existingProviders = [];
-        if (data) {
-            const parsedData = await JSON.parse(data);
-
-            existingProviders = parsedData;
-
-            const matchingProvider = existingProviders.find(
-                (i) => i.secret === secret && i.id === id && i.provider === provider
-            );
-
-            if (matchingProvider) {
-                matchingProvider.name = name;
-            }
-
-            if (!parsedData || !matchingProvider) {
-                existingProviders.push({secret, id, name, provider});
-            }
-        } else {
-            existingProviders.push({secret, id, name, provider});
-        }
-        await figma.clientStorage.setAsync('apiProviders', JSON.stringify(existingProviders));
-        const newProviders = await figma.clientStorage.getAsync('apiProviders');
-        notifyAPIProviders(JSON.parse(newProviders));
-    } catch (err) {
-        notifyUI('There was an issue saving your credentials. Please try again.');
-    }
-}
-
-export async function removeSingleCredential({secret, id}) {
-    try {
-        const data = await figma.clientStorage.getAsync('apiProviders');
-        let existingProviders = [];
-        if (data) {
-            const parsedData = await JSON.parse(data);
-
-            existingProviders = parsedData
-                .map((i) => {
-                    return i.secret === secret && i.id === id ? null : i;
-                })
-                .filter((i) => i);
-        }
-        await figma.clientStorage.setAsync('apiProviders', JSON.stringify(existingProviders));
-        const newProviders = await figma.clientStorage.getAsync('apiProviders');
-        notifyAPIProviders(JSON.parse(newProviders));
-    } catch (err) {
-        notifyUI('There was an issue saving your credentials. Please try again.');
-    }
 }
 
 export function convertLineHeightToFigma(inputValue) {

@@ -1,7 +1,7 @@
 import {SingleToken} from '../../types/tokens';
 import {isTypographyToken, isValueToken} from '../app/components/utils';
 
-export function checkForTokens({obj, token, root = null, returnValuesOnly = false}): [object, SingleToken] {
+function checkForTokens({obj, token, root = null, returnValuesOnly = false}): [object, SingleToken] {
     let returnValue;
     if (isValueToken(token)) {
         returnValue = token;

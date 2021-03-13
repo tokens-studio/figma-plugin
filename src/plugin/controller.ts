@@ -2,7 +2,8 @@
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 
-import {getUserId, removeSingleCredential, updateCredentials} from './helpers';
+import {removeSingleCredential, updateCredentials} from '@/utils/credentials';
+import {getUserId} from './helpers';
 import {pullStyles, updateStyles} from './styles';
 import store from './store';
 import {
