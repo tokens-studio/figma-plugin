@@ -51,6 +51,7 @@ export enum ActionType {
     RenameTokenSet = 'RENAME_TOKEN_SET',
     SetTokenSetOrder = 'SET_TOKEN_SET_ORDER',
     SetProjectURL = 'SET_PROJECT_URL',
+    SetShowUpdates = 'SET_SHOW_UPDATES',
 }
 
 const defaultTokens: TokenProps = {
@@ -106,6 +107,7 @@ const emptyState = {
     updatePageOnly: true,
     updateAfterApply: true,
     editProhibited: true,
+    lastUpdates: [],
 };
 
 const TokenStateContext = React.createContext(emptyState);
@@ -325,6 +327,16 @@ function stateReducer(state, action) {
                 editProhibited: action.data.provider === StorageProviderType.ARCADE,
                 storageType: action.data,
             };
+        case ActionType.SetShowUpdates: {
+            const sbDate = new Date('2021-03-13T15:15:13.242Z').getTime();
+            const receivedDate = new Date(action.data).getTime();
+            console.log('sbDate larger?', sbDate > receivedDate);
+            // Add logic to fetch updates since date X
+            return {
+                ...state,
+                lastUpdates: [],
+            };
+        }
         default:
             throw new Error('Context not implemented');
     }
@@ -440,6 +452,9 @@ function TokenProvider({children}) {
             },
             setTokenSetOrder: (data: string[]) => {
                 dispatch({type: ActionType.SetTokenSetOrder, data, updatedAt});
+            },
+            setShowUpdates: (data: Date) => {
+                dispatch({type: ActionType.SetShowUpdates, data});
             },
         }),
         [dispatch, updatedAt]

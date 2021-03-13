@@ -3,6 +3,7 @@ import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 
 import {removeSingleCredential, updateCredentials} from '@/utils/credentials';
+import getLastOpened from '@/utils/getLastOpened';
 import {getUserId} from './helpers';
 import {pullStyles, updateStyles} from './styles';
 import store from './store';
@@ -14,6 +15,7 @@ import {
     notifyAPIProviders,
     notifyUI,
     notifyUserId,
+    notifyLastOpened,
 } from './notifiers';
 import {findAllWithData, removePluginData, sendPluginValues, updatePluginData} from './pluginData';
 import {getTokenData, updateNodes, setTokensOnDocument, goToNode, saveStorageType, getSavedStorageType} from './node';
@@ -40,7 +42,7 @@ const compareProvidersWithStored = (providers, storageType) => {
         const parsedProviders = JSON.parse(providers);
         const matchingSet = parsedProviders.find((i) => i.provider === storageType.provider && i.id === storageType.id);
         if (matchingSet) {
-            //    send a message to the UI with the credentials stored in the client
+            // send a message to the UI with the credentials stored in the client
             figma.ui.postMessage({
                 type: MessageFromPluginTypes.API_CREDENTIALS,
                 status: true,
@@ -63,11 +65,14 @@ figma.ui.onmessage = async (msg) => {
         case MessageToPluginTypes.INITIATE:
             try {
                 const userId = await getUserId();
-                notifyUserId(userId);
-                const apiProviders = await figma.clientStorage.getAsync('apiProviders');
+                const lastOpened = await getLastOpened();
                 const storageType = await getSavedStorageType();
-
+                notifyUserId(userId);
+                notifyLastOpened(lastOpened);
                 notifyStorageType(storageType);
+
+                const apiProviders = await figma.clientStorage.getAsync('apiProviders');
+
                 if (apiProviders) notifyAPIProviders(JSON.parse(apiProviders));
                 switch (storageType.provider) {
                     //   Somehow setting this to an ENUM doesn't work :-|

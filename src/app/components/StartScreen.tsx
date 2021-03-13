@@ -7,14 +7,14 @@ import {StorageProviderType} from '../../../types/api';
 
 const StartScreen = ({setActive}) => {
     const {storageType} = useTokenState();
-    const {setEmptyTokens, setLoading, setLocalApiState} = useTokenDispatch();
+    const {setEmptyTokens, setLocalApiState} = useTokenDispatch();
     const onSetDefaultTokens = () => {
         setActive('tokens');
         setEmptyTokens();
-        setLoading(false);
     };
     const onSetSyncClick = () => {
         setActive('syncsettings');
+        setEmptyTokens();
         setLocalApiState({
             id: storageType.id,
             name: storageType.name,
@@ -27,7 +27,7 @@ const StartScreen = ({setActive}) => {
     return (
         <div className="my-auto h-auto space-y-4 p-4">
             <a href="https://jansix.at/resources/figma-tokens?ref=figma-tokens-plugin" target="_blank" rel="noreferrer">
-                <img alt="Figma Tokens Splashscreen" src={require('../assets/tokens-intro.jpg')} />
+                <img alt="Figma Tokens Splashscreen" src={require('../assets/tokens-intro.jpg')} className="rounded" />
             </a>
             <Heading>Welcome to Figma Tokens.</Heading>
             <div className="text-xs">

@@ -1,10 +1,10 @@
 import React from 'react';
+import {identify, track} from '@/utils/analytics';
 import {postToFigma} from '../../plugin/notifiers';
 import {MessageFromPluginTypes, MessageToPluginTypes} from '../../../types/messages';
 import useRemoteTokens from '../store/remoteTokens';
 import {useTokenDispatch} from '../store/TokenContext';
 import TokenData from './TokenData';
-import mixpanel from '../../utils/mixpanel';
 
 export default function Initiator({setActive, setRemoteComponents}) {
     const {
@@ -18,6 +18,7 @@ export default function Initiator({setActive, setRemoteComponents}) {
         setLocalApiState,
         setStorageType,
         setAPIProviders,
+        setShowUpdates,
     } = useTokenDispatch();
     const {fetchDataFromRemote} = useRemoteTokens();
 
@@ -29,7 +30,16 @@ export default function Initiator({setActive, setRemoteComponents}) {
         onInitiate();
         window.onmessage = async (event) => {
             if (event.data.pluginMessage) {
-                const {type, values, credentials, status, storageType, providers, userId} = event.data.pluginMessage;
+                const {
+                    type,
+                    values,
+                    credentials,
+                    status,
+                    storageType,
+                    lastOpened,
+                    providers,
+                    userId,
+                } = event.data.pluginMessage;
                 switch (type) {
                     case MessageFromPluginTypes.SELECTION:
                         setDisabled(false);
@@ -66,9 +76,7 @@ export default function Initiator({setActive, setRemoteComponents}) {
                         setStorageType(storageType);
                         break;
                     case MessageFromPluginTypes.API_CREDENTIALS: {
-                        if (status === false) {
-                            console.log('falsy api credentials');
-                        } else {
+                        if (status === true) {
                             const {id, secret, name, provider} = credentials;
                             setApiData({id, secret, name, provider});
                             setLocalApiState({id, secret, name, provider});
@@ -82,13 +90,16 @@ export default function Initiator({setActive, setRemoteComponents}) {
                         break;
                     }
                     case MessageFromPluginTypes.API_PROVIDERS: {
-                        console.log('got api providers', providers);
                         setAPIProviders(providers);
                         break;
                     }
                     case MessageFromPluginTypes.USER_ID: {
                         identify(userId);
                         track('Launched');
+                        break;
+                    }
+                    case MessageFromPluginTypes.RECEIVED_LAST_OPENED: {
+                        setShowUpdates(lastOpened);
                         break;
                     }
                     default:

@@ -81,8 +81,15 @@ export function notifyStyleValues(values = undefined) {
 }
 
 export function notifyUserId(userId: string) {
-    figma.ui.postMessage({
-        type: 'userid',
+    postToUI({
+        type: MessageFromPluginTypes.USER_ID,
         userId,
+    });
+}
+
+export function notifyLastOpened(lastOpened: Date) {
+    postToUI({
+        type: MessageFromPluginTypes.RECEIVED_LAST_OPENED,
+        lastOpened,
     });
 }
