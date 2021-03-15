@@ -1,7 +1,7 @@
 import * as React from 'react';
 import JSON5 from 'json5';
 import objectPath from 'object-path';
-import SbFetchChangelog from '@/utils/storyblok';
+import fetchChangelog from '@/utils/storyblok';
 import defaultJSON from '../../config/default.json';
 import TokenData from '../components/TokenData';
 import * as pjs from '../../../package.json';
@@ -52,7 +52,8 @@ export enum ActionType {
     RenameTokenSet = 'RENAME_TOKEN_SET',
     SetTokenSetOrder = 'SET_TOKEN_SET_ORDER',
     SetProjectURL = 'SET_PROJECT_URL',
-    SetShowUpdates = 'SET_SHOW_UPDATES',
+    SetChangelog = 'SET_CHANGELOG',
+    SetLastOpened = 'SET_LAST_OPENED',
 }
 
 const defaultTokens: TokenProps = {
@@ -108,7 +109,8 @@ const emptyState = {
     updatePageOnly: true,
     updateAfterApply: true,
     editProhibited: true,
-    lastUpdates: [],
+    changelog: [],
+    lastOpened: '',
 };
 
 const TokenStateContext = React.createContext(emptyState);
@@ -328,15 +330,20 @@ function stateReducer(state, action) {
                 editProhibited: action.data.provider === StorageProviderType.ARCADE,
                 storageType: action.data,
             };
-        case ActionType.SetShowUpdates: {
-            const receivedDate = action.data;
-            const stories = SbFetchChangelog(receivedDate);
-            // Add logic to fetch updates since date X
+        case ActionType.SetChangelog:
             return {
                 ...state,
-                lastUpdates: [],
+                changelog: action.data,
             };
-        }
+        case ActionType.SetLastOpened:
+            fetchChangelog(action.data, (result) => {
+                action.dispatch({type: ActionType.SetChangelog, data: result});
+            });
+
+            return {
+                ...state,
+                lastOpened: action.data,
+            };
         default:
             throw new Error('Context not implemented');
     }
@@ -453,8 +460,11 @@ function TokenProvider({children}) {
             setTokenSetOrder: (data: string[]) => {
                 dispatch({type: ActionType.SetTokenSetOrder, data, updatedAt});
             },
-            setShowUpdates: (data: Date) => {
-                dispatch({type: ActionType.SetShowUpdates, data});
+            setChangelog: (data: object[]) => {
+                dispatch({type: ActionType.SetChangelog, data});
+            },
+            setLastOpened: (data: Date) => {
+                dispatch({type: ActionType.SetLastOpened, data, dispatch});
             },
         }),
         [dispatch, updatedAt]

@@ -9,7 +9,6 @@ export enum MessageFromPluginTypes {
     API_PROVIDERS = 'apiProviders',
     USER_ID = 'userId',
     RECEIVED_LAST_OPENED = 'receivedLastOpened',
-    LAST_OPENED = 'lastOpened',
 }
 
 export enum MessageToPluginTypes {

@@ -10,6 +10,7 @@ import {goToNodeId} from './utils';
 import LoadingBar from './LoadingBar';
 import Footer from './Footer';
 import Initiator from './Initiator';
+import Changelog from './Changelog';
 
 const App = () => {
     const [active, setActive] = React.useState('start');
@@ -43,6 +44,7 @@ const App = () => {
                     {active === 'syncsettings' && <SyncSettings />}
                 </div>
                 <Footer active={active} />
+                <Changelog />
             </div>
         </>
     );

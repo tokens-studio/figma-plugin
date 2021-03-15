@@ -18,7 +18,7 @@ export default function Initiator({setActive, setRemoteComponents}) {
         setLocalApiState,
         setStorageType,
         setAPIProviders,
-        setShowUpdates,
+        setLastOpened,
     } = useTokenDispatch();
     const {fetchDataFromRemote} = useRemoteTokens();
 
@@ -99,7 +99,7 @@ export default function Initiator({setActive, setRemoteComponents}) {
                         break;
                     }
                     case MessageFromPluginTypes.RECEIVED_LAST_OPENED: {
-                        setShowUpdates(lastOpened);
+                        setLastOpened(lastOpened);
                         break;
                     }
                     default:

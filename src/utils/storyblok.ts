@@ -1,36 +1,39 @@
-import StoryblokClient from 'storyblok-js-client';
-
-const Storyblok = new StoryblokClient({
-    cache: {
-        clear: 'auto',
-        type: 'memory',
-    },
-});
-
 function formatDate(date) {
-    const s = date.getMinutes();
-    const t = date.getMinutes();
-    const d = date.getDate();
-    const m = date.getMonth() + 1; // Month from 0 to 11
-    const y = date.getFullYear();
-    return `${y}-${m}-${d} ${t}:${s}}`;
+    const formatter = new Intl.DateTimeFormat('en', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+        timeZone: 'UTC',
+    });
+    const [month, , day, , year, , hour, , minute] = formatter.formatToParts(date);
+    return `${year.value}-${month.value}-${day.value} ${hour.value}:${minute.value}`;
 }
 
-export default function SbFetchChangelog(lastOnline: Date) {
+export default async function fetchChangelog(lastOnline: Date, setChangelog): Promise<void> {
     if (process.env.STORYBLOK_ACCESS_TOKEN) {
-        console.log('Last online was', lastOnline);
+        const token = process.env.STORYBLOK_ACCESS_TOKEN;
         const formattedDate = formatDate(new Date(lastOnline));
-        console.log('Last online was', formattedDate);
-        Storyblok.get('cdn/stories', {
-            token: process.env.STORYBLOK_ACCESS_TOKEN,
-            starts_with: 'changelog/',
-            // published_at_gt: formattedDate,
-        })
-            .then((response) => {
-                console.log(response);
-            })
-            .catch((error) => {
-                console.log(error);
-            });
+        const response = await fetch(
+            `https://api.storyblok.com/v1/cdn/stories?version=published&token=${token}&first_published_at_gt=${formattedDate}&startsWith=changelog/&sort_by=first_published_at`,
+            {
+                method: 'GET',
+                mode: 'cors',
+                cache: 'no-cache',
+                credentials: 'same-origin',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            }
+        );
+
+        const res = await response.json();
+        if (res.stories) {
+            const stories = res.stories.map((story) => ({...story.content}));
+            setChangelog(stories);
+        }
     }
+    return null;
 }
