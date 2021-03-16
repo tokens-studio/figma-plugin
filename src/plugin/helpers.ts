@@ -1,4 +1,5 @@
 /* eslint-disable no-param-reassign */
+import {getDegreesForMatrix, getMatrixForDegrees} from '@/utils/matrix';
 import {webRGBToFigmaRGB, hexToFigmaRGB, figmaRGBToHex} from '@figma-plugin/helpers';
 
 interface RGBA {
@@ -209,16 +210,26 @@ export function convertToFigmaColor(input) {
 }
 
 export function convertFigmaGradientToString(paint: GradientPaint) {
-    const {gradientStops} = paint;
+    const {gradientTransform, gradientStops} = paint;
     const gradientStopsString = gradientStops
         .map((stop) => `${figmaRGBToHex(stop.color)} ${stop.position * 100}%`)
         .join(', ');
-    return `linear-gradient(${gradientStopsString})`;
+    const gradientTransformString = getDegreesForMatrix(gradientTransform);
+    return `linear-gradient(${gradientTransformString}, ${gradientStopsString})`;
+}
+
+function convertDegreeToNumber(degreeString) {
+    return degreeString.split('deg').join('');
 }
 
 export function convertStringToFigmaGradient(value: string) {
-    const values = value.substring(value.indexOf('(') + 1, value.lastIndexOf(')')).split(', ');
-    const gradientStops = values.map((stop) => {
+    const [gradientDegrees, ...colorStops] = value
+        .substring(value.indexOf('(') + 1, value.lastIndexOf(')'))
+        .split(', ');
+    const degrees = convertDegreeToNumber(gradientDegrees);
+    const gradientTransform = getMatrixForDegrees(degrees);
+
+    const gradientStops = colorStops.map((stop) => {
         const seperatedStop = stop.split(' ');
         const {color, opacity} = convertToFigmaColor(seperatedStop[0]);
         const gradientColor = color;
@@ -228,7 +239,8 @@ export function convertStringToFigmaGradient(value: string) {
             position: parseFloat(seperatedStop[1]) / 100,
         };
     });
-    return {gradientStops};
+
+    return {gradientStops, gradientTransform};
 }
 
 export function generateId(len, charSet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789') {

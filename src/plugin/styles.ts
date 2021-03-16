@@ -48,15 +48,10 @@ const setColorValuesOnTarget = (target, token) => {
     try {
         const {description, value} = token;
         if (value.startsWith('linear-gradient')) {
-            const {gradientStops} = convertStringToFigmaGradient(value);
-            const oldPaint = target.paints[0];
-            const defaultTransform = [
-                [1, 0, 0],
-                [0, 1, 0],
-            ];
+            const {gradientStops, gradientTransform} = convertStringToFigmaGradient(value);
             const newPaint = {
                 type: 'GRADIENT_LINEAR',
-                gradientTransform: oldPaint?.gradientTransform || defaultTransform,
+                gradientTransform,
                 gradientStops,
             };
             target.paints = [newPaint];
