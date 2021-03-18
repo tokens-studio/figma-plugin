@@ -212,7 +212,7 @@ export function convertToFigmaColor(input) {
 export function convertFigmaGradientToString(paint: GradientPaint) {
     const {gradientTransform, gradientStops} = paint;
     const gradientStopsString = gradientStops
-        .map((stop) => `${figmaRGBToHex(stop.color)} ${stop.position * 100}%`)
+        .map((stop) => `${figmaRGBToHex(stop.color)} ${Math.round(stop.position * 100 * 100) / 100}%`)
         .join(', ');
     const gradientTransformString = getDegreesForMatrix(gradientTransform);
     return `linear-gradient(${gradientTransformString}, ${gradientStopsString})`;

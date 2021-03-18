@@ -255,5 +255,49 @@ describe('convertFigmaGradientToString', () => {
         output: 'linear-gradient(45deg, #ffffff 0%, #000000 100%)',
     };
 
+    const test2: {
+        input: GradientPaint;
+        output: string;
+    } = {
+        input: {
+            type: 'GRADIENT_LINEAR',
+            gradientStops: [
+                {
+                    color: {
+                        a: 1,
+                        b: 1,
+                        g: 1,
+                        r: 1,
+                    },
+                    position: 0,
+                },
+                {
+                    color: {
+                        a: 1,
+                        b: 0,
+                        g: 0,
+                        r: 1,
+                    },
+                    position: 0.535,
+                },
+                {
+                    color: {
+                        a: 1,
+                        b: 0,
+                        g: 0,
+                        r: 0,
+                    },
+                    position: 1,
+                },
+            ],
+            gradientTransform: [
+                [0.71, 0.71, 0],
+                [0.71, 0.71, 0],
+            ],
+        },
+        output: 'linear-gradient(45deg, #ffffff 0%, #ff0000 53.5%, #000000 100%)',
+    };
+
     expect(convertFigmaGradientToString(test1.input)).toEqual(test1.output);
+    expect(convertFigmaGradientToString(test2.input)).toEqual(test2.output);
 });
