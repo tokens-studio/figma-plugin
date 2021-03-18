@@ -153,7 +153,7 @@ function stateReducer(state, action) {
             return state;
         case ActionType.DeleteToken: {
             const obj = JSON5.parse(state.tokenData.tokens[action.data.parent].values);
-            objectPath.del(obj, [action.data.path, action.data.name].join('.'));
+            objectPath.del(obj, action.data.path);
             const tokens = JSON.stringify(obj, null, 2);
             state.tokenData.updateTokenValues(action.data.parent, tokens, action.updatedAt);
             updateTokensOnSources(state, action.updatedAt);

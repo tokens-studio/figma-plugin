@@ -21,7 +21,7 @@ const TokenButton = ({type, property, name, path, token, editMode, showForm}) =>
     };
 
     const handleDeleteClick = () => {
-        deleteToken({parent: activeTokenSet, path, name});
+        deleteToken({parent: activeTokenSet, path: [path, name].join('.')});
     };
 
     function setPluginValue(value) {

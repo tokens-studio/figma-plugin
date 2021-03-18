@@ -132,8 +132,6 @@ const TokenListing = ({
         }
     };
 
-    // if (!Object.entries(values[1]).length > 0) return null;
-
     return (
         <div className="border-b border-gray-200" data-cy={`tokenlisting-${type}`}>
             <div className="flex justify-between space-x-8 items-center relative">
