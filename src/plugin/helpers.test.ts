@@ -131,13 +131,93 @@ describe('convertStringtoFigmaGradient', () => {
                 },
             ],
             gradientTransform: [
-                [0.71, 0.71, -0.71],
-                [0.71, 0, 0],
+                [0.71, 0.71, 0],
+                [-0.71, 0.71, 0],
+            ],
+        },
+    };
+
+    const test2 = {
+        input: 'linear-gradient(45deg, #ffffff 0%, rgba(255,0,0,0.5) 50%, #000000 100%)',
+        output: {
+            gradientStops: [
+                {
+                    color: {
+                        a: 1,
+                        b: 1,
+                        g: 1,
+                        r: 1,
+                    },
+                    position: 0,
+                },
+                {
+                    color: {
+                        a: 0.5,
+                        b: 0,
+                        g: 0,
+                        r: 1,
+                    },
+                    position: 0.5,
+                },
+                {
+                    color: {
+                        a: 1,
+                        b: 0,
+                        g: 0,
+                        r: 0,
+                    },
+                    position: 1,
+                },
+            ],
+            gradientTransform: [
+                [0.71, 0.71, 0],
+                [-0.71, 0.71, 0],
+            ],
+        },
+    };
+
+    const test3 = {
+        input: 'linear-gradient(45deg, #ffffff 0%, rgba(255,0,0,0.5) 50%, #000000 100%)',
+        output: {
+            gradientStops: [
+                {
+                    color: {
+                        a: 1,
+                        b: 1,
+                        g: 1,
+                        r: 1,
+                    },
+                    position: 0,
+                },
+                {
+                    color: {
+                        a: 0.5,
+                        b: 0,
+                        g: 0,
+                        r: 1,
+                    },
+                    position: 0.5,
+                },
+                {
+                    color: {
+                        a: 1,
+                        b: 0,
+                        g: 0,
+                        r: 0,
+                    },
+                    position: 1,
+                },
+            ],
+            gradientTransform: [
+                [0.71, 0.71, 0],
+                [-0.71, 0.71, 0],
             ],
         },
     };
 
     expect(convertStringToFigmaGradient(test1.input)).toEqual(test1.output);
+    expect(convertStringToFigmaGradient(test2.input)).toEqual(test2.output);
+    expect(convertStringToFigmaGradient(test3.input)).toEqual(test3.output);
 });
 
 describe('convertFigmaGradientToString', () => {
@@ -168,8 +248,8 @@ describe('convertFigmaGradientToString', () => {
                 },
             ],
             gradientTransform: [
-                [0.71, 0.71, -0.71],
-                [0.71, 0, 0],
+                [0.71, 0.71, 0],
+                [0.71, 0.71, 0],
             ],
         },
         output: 'linear-gradient(45deg, #ffffff 0%, #000000 100%)',
