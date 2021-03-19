@@ -18,18 +18,20 @@ export default function Changelog() {
     };
 
     return (
-        <Modal isOpen={changelog.length > 0 && changelogOpen} close={() => setChangelogOpen(false)}>
-            <div className="space-y-4">
+        <Modal showClose isOpen={changelog.length > 0 && changelogOpen} close={() => setChangelogOpen(false)}>
+            <div className="space-y-8">
                 <div>
                     {changelog.map((item, index) => {
                         return (
                             <div
                                 // eslint-disable-next-line no-underscore-dangle
                                 key={item._uid}
-                                className={`space-y-2 ${index === activeIndex ? 'visible' : 'hidden'}`}
+                                className={`space-y-2 flex flex-col items-center text-center ${
+                                    index === activeIndex ? 'visible' : 'hidden'
+                                }`}
                             >
                                 {item.image && (
-                                    <img src={item.image.filename} alt={item.image.alt} className="rounded mb-4" />
+                                    <img src={item.image.filename} alt={item.image.alt} className="rounded mb-8" />
                                 )}
                                 <Heading>{item.title}</Heading>
                                 <p className="text-xs">{item.excerpt}</p>
@@ -47,11 +49,11 @@ export default function Changelog() {
                         );
                     })}
                 </div>
-                <div className="flex justify-between">
+                <div className="flex flex-row justify-between gap-2">
                     <Button id="button-changelog-close" onClick={() => setChangelogOpen(false)} variant="secondary">
                         Close
                     </Button>
-                    <div className="space-x-2">
+                    <div className="flex flex-row justify-between gap-2">
                         {activeIndex !== 0 && (
                             <Button id="button-changelog-prev" onClick={handlePrev} variant="secondary">
                                 Previous
