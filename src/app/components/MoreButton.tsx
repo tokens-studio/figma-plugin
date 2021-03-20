@@ -4,7 +4,7 @@ import Icon from './Icon';
 import {useTokenState} from '../store/TokenContext';
 
 const MoreButton = ({properties, children, path, value, onClick, onEdit, onDelete, mode}) => {
-    const {selectionValues} = useTokenState();
+    const {selectionValues, editProhibited} = useTokenState();
     const visibleProperties = properties.filter((p) => p.label);
 
     return (
@@ -29,8 +29,12 @@ const MoreButton = ({properties, children, path, value, onClick, onEdit, onDelet
                     );
                 })}
                 {visibleProperties?.length > 1 && <MenuItem divider />}
-                <MenuItem onClick={onEdit}>Edit Token</MenuItem>
-                <MenuItem onClick={onDelete}>Delete Token</MenuItem>
+                <MenuItem onClick={onEdit} disabled={editProhibited}>
+                    Edit Token
+                </MenuItem>
+                <MenuItem onClick={onDelete} disabled={editProhibited}>
+                    Delete Token
+                </MenuItem>
             </ContextMenu>
         </div>
     );

@@ -4,11 +4,11 @@ import Heading from './Heading';
 import {useTokenState, useTokenDispatch} from '../store/TokenContext';
 import Button from './Button';
 import Modal from './Modal';
+import TokenSetSelector from './TokenSetSelector';
 
 const JSONEditor = () => {
-    const {tokenData} = useTokenState();
+    const {tokenData, activeTokenSet, editProhibited} = useTokenState();
     const {setStringTokens, setEmptyTokens, setDefaultTokens, updateTokens, setLoading} = useTokenDispatch();
-    const [activeToken] = React.useState('options');
     const [confirmModalVisible, showConfirmModal] = React.useState('');
 
     const handleUpdate = async () => {
@@ -28,6 +28,7 @@ const JSONEditor = () => {
 
     return (
         <div className="flex flex-col flex-grow">
+            <TokenSetSelector />
             <Modal isOpen={confirmModalVisible === 'reset'} close={() => showConfirmModal('')}>
                 <div className="flex justify-center flex-col text-center space-y-4">
                     <div className="space-y-2">
@@ -67,28 +68,39 @@ const JSONEditor = () => {
                 </div>
             </Modal>
             <div className="flex flex-col justify-between items-center flex-grow">
-                <div className="flex flex-col p-4 w-full items-center flex-grow">
+                <div className="flex flex-col p-4 pt-2 w-full items-center flex-grow">
                     <Textarea
+                        isDisabled={editProhibited}
                         className="flex-grow"
                         placeholder="Enter JSON"
                         rows={23}
-                        hasErrored={tokenData.tokens[activeToken].hasErrored}
-                        onChange={(val) => setStringTokens({parent: activeToken, tokens: val})}
-                        value={tokenData.tokens[activeToken].values}
+                        hasErrored={tokenData.tokens[activeTokenSet].hasErrored}
+                        onChange={(val) => setStringTokens({parent: activeTokenSet, tokens: val})}
+                        value={tokenData.tokens[activeTokenSet].values}
                     />
                 </div>
             </div>
 
             <div className="flex justify-between w-full px-4 bg-white">
                 <div className="space-x-2 flex mr-2">
-                    <Button variant="secondary" size="large" onClick={() => showConfirmModal('reset')}>
+                    <Button
+                        disabled={editProhibited}
+                        variant="secondary"
+                        size="large"
+                        onClick={() => showConfirmModal('reset')}
+                    >
                         Fill with example data
                     </Button>
-                    <Button variant="secondary" size="large" onClick={() => showConfirmModal('delete')}>
+                    <Button
+                        disabled={editProhibited}
+                        variant="secondary"
+                        size="large"
+                        onClick={() => showConfirmModal('delete')}
+                    >
                         Clear
                     </Button>
                 </div>
-                <Button variant="primary" size="large" onClick={handleUpdate}>
+                <Button disabled={editProhibited} variant="primary" size="large" onClick={handleUpdate}>
                     Save & update
                 </Button>
             </div>

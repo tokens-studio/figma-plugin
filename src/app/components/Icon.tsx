@@ -16,7 +16,10 @@ import IconBlend from './icons/IconBlend';
 import IconBlendEmpty from './icons/IconBlendEmpty';
 import IconImport from './icons/IconImport';
 import IconFolder from './icons/IconFolder';
+import IconRefresh from './icons/IconRefresh';
 import IconTrash from './icons/IconTrash';
+import IconBell from './icons/IconBell';
+import IconLibrary from './icons/IconLibrary';
 
 const icons = {
     edit: IconEdit,
@@ -35,7 +38,10 @@ const icons = {
     blendempty: IconBlendEmpty,
     import: IconImport,
     folder: IconFolder,
+    refresh: IconRefresh,
     trash: IconTrash,
+    bell: IconBell,
+    library: IconLibrary,
 };
 
 const Icon = ({name}) => {

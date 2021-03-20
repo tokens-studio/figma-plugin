@@ -34,7 +34,16 @@ const TokenListing = ({
     type?: string;
     values?: string | object;
 }) => {
-    const {collapsed, showEditForm, showNewGroupForm, showOptions, tokenData, displayType} = useTokenState();
+    const {
+        collapsed,
+        showEditForm,
+        showNewGroupForm,
+        showOptions,
+        tokenData,
+        displayType,
+        activeTokenSet,
+        editProhibited,
+    } = useTokenState();
     const {
         setStringTokens,
         setCollapsed,
@@ -47,8 +56,6 @@ const TokenListing = ({
         setDisplayType,
     } = useTokenDispatch();
 
-    const [activeToken] = React.useState('options');
-
     const [showHelp, setShowHelp] = React.useState(false);
     const [isIntCollapsed, setIntCollapsed] = React.useState(false);
 
@@ -57,6 +64,7 @@ const TokenListing = ({
         name: '',
         path: '',
     });
+
     function setSingleTokenValue({parent, name, value, options, oldName, newGroup = false}) {
         const obj = JSON5.parse(tokenData.tokens[parent].values);
         let newValue;
@@ -102,7 +110,7 @@ const TokenListing = ({
     const submitTokenValue = async ({value, name, path, options}) => {
         setEditToken({value, name, path});
         setSingleTokenValue({
-            parent: activeToken,
+            parent: activeTokenSet,
             name: [path, name].join('.'),
             value,
             options,
@@ -126,7 +134,7 @@ const TokenListing = ({
     };
 
     return (
-        <div className="border-b border-gray-200">
+        <div className="border-b border-gray-200" data-cy={`tokenlisting-${type}`}>
             <div className="flex justify-between space-x-8 items-center relative">
                 <button
                     className={`flex items-center w-full h-full p-4 space-x-2 hover:bg-gray-100 focus:outline-none ${
@@ -181,12 +189,19 @@ const TokenListing = ({
                         </Tooltip>
                     )}
                     <Tooltip label="Edit token values" variant="right">
-                        <button className="button button-ghost" type="button" onClick={() => setShowOptions(values[0])}>
+                        <button
+                            disabled={editProhibited}
+                            className="button button-ghost"
+                            type="button"
+                            onClick={() => setShowOptions(values[0])}
+                        >
                             <Icon name="edit" />
                         </button>
                     </Tooltip>
                     <Tooltip label="Add a new token" variant="right">
                         <button
+                            disabled={editProhibited}
+                            data-cy="button-add-new-token"
                             className="button button-ghost"
                             type="button"
                             onClick={() => {
@@ -246,7 +261,9 @@ const TokenListing = ({
                                     )}
                                     <Tooltip label="Add a new token">
                                         <button
+                                            disabled={editProhibited}
                                             type="button"
+                                            data-cy="button-modal-add"
                                             className="button button-ghost"
                                             onClick={() => showNewForm(values[0])}
                                         >
@@ -255,6 +272,7 @@ const TokenListing = ({
                                     </Tooltip>
                                     <Tooltip label="Add a new group" variant="right">
                                         <button
+                                            disabled={editProhibited}
                                             className="button button-ghost"
                                             type="button"
                                             onClick={() => {
@@ -270,7 +288,7 @@ const TokenListing = ({
                     </Modal>
                 )}
             </div>
-            {showHelp && <div className="px-4 pb-4 text-xxs text-gray-600">{help}</div>}
+            {showHelp && <div className="px-4 pb-4 text-gray-600 text-xxs">{help}</div>}
             {Object.entries(values[1]).length > 0 && (
                 <div className={`px-4 pb-4 ${isIntCollapsed ? 'hidden' : null}`}>
                     {renderKeyValue({

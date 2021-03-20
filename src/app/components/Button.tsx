@@ -1,5 +1,4 @@
 import * as React from 'react';
-import mixpanel from '../mixpanel';
 
 type ButtonProps = {
     type?: 'button' | 'submit';
@@ -7,6 +6,8 @@ type ButtonProps = {
     onClick?: any;
     size?: 'large' | 'small';
     href?: string;
+    disabled?: boolean;
+    id?: string;
 };
 
 const Button: React.FunctionComponent<ButtonProps> = ({
@@ -16,6 +17,8 @@ const Button: React.FunctionComponent<ButtonProps> = ({
     variant,
     children,
     href,
+    disabled = false,
+    id,
 }) => {
     let variantClass;
     switch (variant) {
@@ -39,20 +42,27 @@ const Button: React.FunctionComponent<ButtonProps> = ({
     }
     if (href) {
         return (
-            <a target="_blank" rel="noreferrer" className={`button ${[variantClass, sizeClass].join(' ')}`} href={href}>
+            <a
+                target="_blank"
+                rel="noreferrer"
+                className={`button ${[variantClass, sizeClass].join(' ')}`}
+                href={href}
+                data-cy={id}
+            >
                 {children}
             </a>
         );
     }
 
-    const handleClick = (e) => {
-        e.preventDefault();
-        onClick();
-    };
-
     return (
         // eslint-disable-next-line react/button-has-type
-        <button type={type} className={`button ${[variantClass, sizeClass].join(' ')}`} onClick={handleClick}>
+        <button
+            data-cy={id}
+            disabled={disabled}
+            type={type}
+            className={`button ${[variantClass, sizeClass].join(' ')}`}
+            onClick={onClick}
+        >
             {children}
         </button>
     );

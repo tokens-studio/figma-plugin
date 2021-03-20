@@ -1,5 +1,6 @@
 /* eslint-disable no-param-reassign */
-import {webRGBToFigmaRGB, hexToFigmaRGB} from '@figma-plugin/helpers';
+import {getDegreesForMatrix, getMatrixForDegrees} from '@/utils/matrix';
+import {webRGBToFigmaRGB, hexToFigmaRGB, figmaRGBToHex} from '@figma-plugin/helpers';
 
 interface RGBA {
     r: number;
@@ -8,20 +9,10 @@ interface RGBA {
     a?: number;
 }
 
-/**
- * Simple object check.
- * @param item
- * @returns {boolean}
- */
 export function isObject(item) {
     return item && typeof item === 'object' && !Array.isArray(item);
 }
 
-/**
- * Deep merge two objects.
- * @param target
- * @param ...sources
- */
 export function mergeDeep(target, ...sources) {
     if (!sources.length) return target;
     const source = sources.shift();
@@ -110,6 +101,35 @@ export function hexToRgb(hex) {
         : null;
 }
 
+function trim(str) {
+    return str.replace(/^\s+|\s+$/gm, '');
+}
+
+export function RGBAToHexA(rgba) {
+    const inParts = rgba.substring(rgba.indexOf('(')).split(', ');
+    const r = parseInt(trim(inParts[0].substring(1)), 10);
+    const g = parseInt(trim(inParts[1]), 10);
+    const b = parseInt(trim(inParts[2]), 10);
+    const a = parseFloat(trim(inParts[3].substring(0, inParts[3].length - 1))).toFixed(2);
+    const outParts = [
+        r.toString(16),
+        g.toString(16),
+        b.toString(16),
+        Math.round(a * 255)
+            .toString(16)
+            .substring(0, 2),
+    ];
+
+    // Pad single-digit output values
+    outParts.forEach((part, i) => {
+        if (part.length === 1) {
+            outParts[i] = `0${part}`;
+        }
+    });
+
+    return `#${outParts.join('')}`;
+}
+
 export function hslaToRgba(hslaValues) {
     const h = hslaValues[0];
     let s = hslaValues[1];
@@ -182,10 +202,45 @@ export function convertToFigmaColor(input) {
         color = {r, g, b};
         opacity = Number(a);
     }
+
     return {
         color,
         opacity,
     };
+}
+
+export function convertFigmaGradientToString(paint: GradientPaint) {
+    const {gradientTransform, gradientStops} = paint;
+    const gradientStopsString = gradientStops
+        .map((stop) => `${figmaRGBToHex(stop.color)} ${Math.round(stop.position * 100 * 100) / 100}%`)
+        .join(', ');
+    const gradientTransformString = getDegreesForMatrix(gradientTransform);
+    return `linear-gradient(${gradientTransformString}, ${gradientStopsString})`;
+}
+
+function convertDegreeToNumber(degreeString) {
+    return degreeString.split('deg').join('');
+}
+
+export function convertStringToFigmaGradient(value: string) {
+    const [gradientDegrees, ...colorStops] = value
+        .substring(value.indexOf('(') + 1, value.lastIndexOf(')'))
+        .split(', ');
+    const degrees = convertDegreeToNumber(gradientDegrees);
+    const gradientTransform = getMatrixForDegrees(degrees);
+
+    const gradientStops = colorStops.map((stop) => {
+        const seperatedStop = stop.split(' ');
+        const {color, opacity} = convertToFigmaColor(seperatedStop[0]);
+        const gradientColor = color;
+        gradientColor.a = opacity;
+        return {
+            color: gradientColor,
+            position: parseFloat(seperatedStop[1]) / 100,
+        };
+    });
+
+    return {gradientStops, gradientTransform};
 }
 
 export function generateId(len, charSet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789') {

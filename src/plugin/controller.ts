@@ -2,12 +2,27 @@
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 
+import {removeSingleCredential, updateCredentials} from '@/utils/credentials';
+import getLastOpened from '@/utils/getLastOpened';
 import {getUserId} from './helpers';
 import {pullStyles, updateStyles} from './styles';
 import store from './store';
-import {notifyNoSelection, notifyTokenValues, notifyRemoteComponents, notifyUserId} from './notifiers';
+import {
+    notifyNoSelection,
+    notifyTokenValues,
+    notifyRemoteComponents,
+    notifyStorageType,
+    notifyAPIProviders,
+    notifyUI,
+    notifyUserId,
+    notifyLastOpened,
+} from './notifiers';
 import {findAllWithData, removePluginData, sendPluginValues, updatePluginData} from './pluginData';
-import {getTokenData, updateNodes, setTokenData, goToNode} from './node';
+import {getTokenData, updateNodes, setTokensOnDocument, goToNode, saveStorageType, getSavedStorageType} from './node';
+
+import {MessageToPluginTypes} from '../../types/messages';
+import {StorageProviderType} from '../../types/api';
+import compareProvidersWithStored from './compareProviders';
 
 figma.showUI(__html__, {
     width: 400,
@@ -25,10 +40,38 @@ figma.on('selectionchange', () => {
 
 figma.ui.onmessage = async (msg) => {
     switch (msg.type) {
-        case 'initiate': {
-            const userId = await getUserId();
-            notifyUserId(userId);
-            notifyTokenValues(getTokenData());
+        case MessageToPluginTypes.INITIATE:
+            try {
+                const userId = await getUserId();
+                const lastOpened = await getLastOpened();
+                const storageType = await getSavedStorageType();
+                notifyUserId(userId);
+                notifyLastOpened(lastOpened);
+                notifyStorageType(storageType);
+
+                const apiProviders = await figma.clientStorage.getAsync('apiProviders');
+
+                if (apiProviders) notifyAPIProviders(JSON.parse(apiProviders));
+                switch (storageType.provider) {
+                    //   Somehow setting this to an ENUM doesn't work :-|
+                    case StorageProviderType.JSONBIN:
+                    case StorageProviderType.ARCADE: {
+                        compareProvidersWithStored(apiProviders, storageType);
+
+                        break;
+                    }
+                    default: {
+                        const oldTokens = getTokenData();
+                        if (oldTokens) {
+                            notifyTokenValues(oldTokens);
+                        }
+                    }
+                }
+            } catch (err) {
+                figma.closePlugin('There was an error, check console (F12)');
+                console.error(err);
+                return;
+            }
 
             if (!figma.currentPage.selection.length) {
                 notifyNoSelection();
@@ -36,8 +79,20 @@ figma.ui.onmessage = async (msg) => {
             }
             sendPluginValues(figma.currentPage.selection);
             return;
+        case MessageToPluginTypes.CREDENTIALS: {
+            const {secret, id, provider, name} = msg;
+            updateCredentials({secret, id, name, provider});
+            break;
         }
-        case 'set-node-data':
+        case MessageToPluginTypes.REMOVE_SINGLE_CREDENTIAL: {
+            const {secret, id} = msg;
+            removeSingleCredential({secret, id});
+            break;
+        }
+        case MessageToPluginTypes.SET_STORAGE_TYPE:
+            saveStorageType(msg.storageType);
+            break;
+        case MessageToPluginTypes.SET_NODE_DATA:
             try {
                 updatePluginData(figma.currentPage.selection, msg.values);
                 sendPluginValues(figma.currentPage.selection, updateNodes(figma.currentPage.selection, msg.tokens));
@@ -47,7 +102,7 @@ figma.ui.onmessage = async (msg) => {
             notifyRemoteComponents({nodes: store.successfulNodes.length, remotes: store.remoteComponents});
             return;
 
-        case 'remove-node-data':
+        case MessageToPluginTypes.REMOVE_NODE_DATA:
             try {
                 removePluginData(figma.currentPage.selection, msg.key);
                 sendPluginValues(figma.currentPage.selection);
@@ -56,29 +111,31 @@ figma.ui.onmessage = async (msg) => {
             }
             notifyRemoteComponents({nodes: store.successfulNodes.length, remotes: store.remoteComponents});
             return;
-        case 'create-styles':
+        case MessageToPluginTypes.CREATE_STYLES:
             try {
                 updateStyles(msg.tokens, true);
             } catch (e) {
                 console.error(e);
             }
             return;
-        case 'update': {
+        case MessageToPluginTypes.UPDATE: {
             const allWithData = findAllWithData({pageOnly: msg.updatePageOnly});
-            setTokenData(msg.tokenValues);
+            setTokensOnDocument(msg.tokenValues, msg.updatedAt);
             updateStyles(msg.tokens, false);
             updateNodes(allWithData, msg.tokens);
             updatePluginData(allWithData, {});
             notifyRemoteComponents({nodes: store.successfulNodes.length, remotes: store.remoteComponents});
             return;
         }
-        case 'gotonode':
+        case MessageToPluginTypes.GO_TO_NODE:
             goToNode(msg.id);
             break;
-        case 'pull-styles':
+        case MessageToPluginTypes.PULL_STYLES:
             pullStyles(msg.styleTypes);
             break;
-
+        case MessageToPluginTypes.NOTIFY:
+            notifyUI(msg.msg, msg.opts);
+            break;
         default:
     }
 };

@@ -4,6 +4,7 @@ import JSON5 from 'json5';
 import {useTokenDispatch, useTokenState} from '../store/TokenContext';
 import TokenListing from './TokenListing';
 import Button from './Button';
+import TokenSetSelector from './TokenSetSelector';
 
 const mappedTokens = (tokens) => {
     const properties = {
@@ -25,20 +26,19 @@ const mappedTokens = (tokens) => {
 };
 
 const Tokens = () => {
-    const {tokenData, updatePageOnly} = useTokenState();
-    const [activeToken] = React.useState('options');
-    const {updateTokens, setLoading, toggleUpdatePageOnly} = useTokenDispatch();
+    const {tokenData, updatePageOnly, activeTokenSet} = useTokenState();
+    const {updateTokens, toggleUpdatePageOnly} = useTokenDispatch();
 
     const handleUpdate = async () => {
-        await setLoading(true);
-        updateTokens();
+        updateTokens(false);
     };
 
-    if (tokenData.tokens[activeToken].hasErrored) return <div>JSON malformed, check in Editor</div>;
+    if (tokenData.tokens[activeTokenSet].hasErrored) return <div>JSON malformed, check in Editor</div>;
 
     return (
         <div>
-            {mappedTokens(JSON5.parse(tokenData.tokens[activeToken].values)).map((tokenValues) => {
+            <TokenSetSelector />
+            {mappedTokens(JSON5.parse(tokenData.tokens[activeTokenSet].values)).map((tokenValues) => {
                 switch (tokenValues[0]) {
                     case 'borderRadius':
                         return (
@@ -73,6 +73,7 @@ const Tokens = () => {
                             />
                         );
                     case 'colors':
+                    case 'color':
                         return (
                             <div key={tokenValues[0]}>
                                 <TokenListing
@@ -165,6 +166,7 @@ const Tokens = () => {
                             </div>
                         );
                     case 'fontSizes':
+                    case 'fontSize':
                         return (
                             <div key={tokenValues[0]}>
                                 <TokenListing
@@ -223,7 +225,7 @@ const Tokens = () => {
                     </label>
                 </div>
                 <Button variant="primary" size="large" onClick={handleUpdate}>
-                    Update
+                    Update {updatePageOnly ? 'page' : 'document'}
                 </Button>
             </div>
         </div>

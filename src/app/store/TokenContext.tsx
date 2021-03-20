@@ -1,9 +1,15 @@
 import * as React from 'react';
 import JSON5 from 'json5';
 import objectPath from 'object-path';
+import fetchChangelog from '@/utils/storyblok';
 import defaultJSON from '../../config/default.json';
-import TokenData, {TokenProps} from '../components/TokenData';
+import TokenData from '../components/TokenData';
 import * as pjs from '../../../package.json';
+import {TokenProps} from '../../../types/tokens';
+import {StorageProviderType, ApiDataType, StorageType} from '../../../types/api';
+import {postToFigma} from '../../plugin/notifiers';
+import {MessageToPluginTypes} from '../../../types/messages';
+import updateTokensOnSources from './updateSources';
 
 export interface SelectionValue {
     borderRadius: string | undefined;
@@ -16,7 +22,6 @@ export enum ActionType {
     SetTokenData = 'SET_TOKEN_DATA',
     SetTokensFromStyles = 'SET_TOKENS_FROM_STYLES',
     SetDefaultTokens = 'SET_DEFAULT_TOKENS',
-    SetEmptyTokens = 'SET_EMPTY_TOKENS',
     SetLoading = 'SET_LOADING',
     SetDisabled = 'SET_DISABLED',
     SetStringTokens = 'SET_STRING_TOKENS',
@@ -34,74 +39,99 @@ export enum ActionType {
     SetDisplayType = 'SET_DISPLAY_TYPE',
     ToggleColorMode = 'TOGGLE_COLOR_MODE',
     SetCollapsed = 'SET_COLLAPSED',
+    SetApiData = 'SET_API_DATA',
     ToggleUpdatePageOnly = 'TOGGLE_UPDATE_PAGE_ONLY',
+    ToggleUpdateAfterApply = 'TOGGLE_UPDATE_AFTER_APPLY',
+    SetStorageType = 'SET_STORAGE_TYPE',
+    SetAPIProviders = 'SET_API_PROVIDERS',
+    SetLocalApiState = 'SET_LOCAL_API_STATE',
+    SetActiveTokenSet = 'SET_ACTIVE_TOKEN_SET',
+    ToggleUsedTokenSet = 'TOGGLE_USED_TOKEN_SET',
+    AddTokenSet = 'ADD_TOKEN_SET',
+    DeleteTokenSet = 'DELETE_TOKEN_SET',
+    RenameTokenSet = 'RENAME_TOKEN_SET',
+    SetTokenSetOrder = 'SET_TOKEN_SET_ORDER',
+    SetProjectURL = 'SET_PROJECT_URL',
+    SetChangelog = 'SET_CHANGELOG',
+    SetLastOpened = 'SET_LAST_OPENED',
 }
 
 const defaultTokens: TokenProps = {
     version: pjs.version,
+    updatedAt: new Date().toString(),
     values: {
         options: JSON.stringify(defaultJSON, null, 2),
     },
 };
 
-const emptyTokens: TokenProps = {
+export const emptyTokens: TokenProps = {
     version: pjs.version,
+    updatedAt: new Date().toString(),
     values: {
         options: '{ }',
     },
 };
 
 const emptyState = {
+    activeTokenSet: 'options',
+    usedTokenSet: ['options'],
     tokens: defaultTokens,
     loading: true,
     disabled: false,
     collapsed: false,
-    tokenData: new TokenData(emptyTokens),
+    tokenData: null,
     selectionValues: {},
     displayType: 'GRID',
     colorMode: false,
     showEditForm: false,
     showNewGroupForm: false,
     showOptions: false,
+    storageType: {
+        provider: StorageProviderType.LOCAL,
+        id: '',
+        name: '',
+    },
+    api: {
+        id: '',
+        secret: '',
+        provider: '',
+        name: '',
+    },
+    localApiState: {
+        id: '',
+        secret: '',
+        name: '',
+        provider: '',
+        new: false,
+    },
+    apiProviders: [],
+    projectURL: '',
     updatePageOnly: true,
+    updateAfterApply: true,
+    editProhibited: true,
+    changelog: [],
+    lastOpened: '',
+    syncEnabled: false,
 };
 
 const TokenStateContext = React.createContext(emptyState);
 const TokenDispatchContext = React.createContext(null);
-
-function updateTokens(state: any) {
-    parent.postMessage(
-        {
-            pluginMessage: {
-                type: 'update',
-                tokenValues: state.tokenData.reduceToValues(),
-                tokens: state.tokenData.getMergedTokens(),
-                updatePageOnly: state.updatePageOnly,
-            },
-        },
-        '*'
-    );
-}
 
 function stateReducer(state, action) {
     switch (action.type) {
         case ActionType.SetTokenData:
             return {
                 ...state,
+                activeTokenSet: Object.keys(action.data.tokens)[0],
+                usedTokenSet: [Object.keys(action.data.tokens)[0]],
                 tokenData: action.data,
             };
-        case ActionType.SetTokensFromStyles: {
-            state.tokenData.injectTokens(action.data);
-            updateTokens(state);
+        case ActionType.SetTokensFromStyles:
+            state.tokenData.injectTokens(action.data, state.activeTokenSet);
+            updateTokensOnSources(state, action.updatedAt);
             return {
                 ...state,
                 tokens: state.tokenData.tokens,
-            };
-        }
-        case ActionType.SetEmptyTokens:
-            return {
-                ...state,
-                ...emptyState,
             };
         case ActionType.SetLoading:
             return {
@@ -114,85 +144,52 @@ function stateReducer(state, action) {
                 disabled: action.state,
             };
         case ActionType.SetStringTokens:
-            state.tokenData.updateTokenValues(action.data.parent, action.data.tokens);
+            state.tokenData.updateTokenValues(action.data.parent, action.data.tokens, action.updatedAt);
             return {
                 ...state,
-                tokens: {
-                    ...state.tokens,
-                    [action.data.parent]: {
-                        hasErrored: state.tokenData.checkTokenValidity(action.data.tokens),
-                        values: action.data.tokens,
-                    },
-                },
+                tokenData: state.tokenData,
             };
         case ActionType.UpdateTokens:
-            updateTokens(state);
+            updateTokensOnSources(state, action.updatedAt, action.shouldUpdate);
             return state;
         case ActionType.DeleteToken: {
             const obj = JSON5.parse(state.tokenData.tokens[action.data.parent].values);
-            objectPath.del(obj, [action.data.path, action.data.name].join('.'));
+            objectPath.del(obj, action.data.path);
             const tokens = JSON.stringify(obj, null, 2);
-            state.tokenData.updateTokenValues(action.data.parent, tokens);
-            const newState = {
+            state.tokenData.updateTokenValues(action.data.parent, tokens, action.updatedAt);
+            updateTokensOnSources(state, action.updatedAt);
+            return {
                 ...state,
-                tokens: {
-                    ...state.tokens,
-                    [action.data.parent]: {
-                        hasErrored: state.tokenData.checkTokenValidity(tokens),
-                        values: tokens,
-                    },
-                },
+                tokenData: state.tokenData,
             };
-            updateTokens(newState);
-            return newState;
         }
         case ActionType.CreateStyles:
-            parent.postMessage(
-                {
-                    pluginMessage: {
-                        type: 'create-styles',
-                        tokens: state.tokenData.getMergedTokens(),
-                    },
-                },
-                '*'
-            );
+            postToFigma({
+                type: MessageToPluginTypes.CREATE_STYLES,
+                tokens: state.tokenData.getMergedTokens(),
+            });
             return state;
         case ActionType.SetNodeData:
-            parent.postMessage(
-                {
-                    pluginMessage: {
-                        type: 'set-node-data',
-                        values: action.data,
-                        tokens: state.tokenData.getMergedTokens(),
-                    },
-                },
-                '*'
-            );
+            postToFigma({
+                type: MessageToPluginTypes.SET_NODE_DATA,
+                values: action.data,
+                tokens: state.tokenData.getMergedTokens(),
+            });
             return state;
         case ActionType.RemoveNodeData:
-            parent.postMessage(
-                {
-                    pluginMessage: {
-                        type: 'remove-node-data',
-                        key: action.data,
-                    },
-                },
-                '*'
-            );
+            postToFigma({
+                type: MessageToPluginTypes.REMOVE_NODE_DATA,
+                key: action.data,
+            });
             return state;
         case ActionType.PullStyles:
-            parent.postMessage(
-                {
-                    pluginMessage: {
-                        type: 'pull-styles',
-                        styleTypes: {
-                            textStyles: true,
-                            colorStyles: true,
-                        },
-                    },
+            postToFigma({
+                type: MessageToPluginTypes.PULL_STYLES,
+                styleTypes: {
+                    textStyles: true,
+                    colorStyles: true,
                 },
-                '*'
-            );
+            });
             return state;
 
         case ActionType.SetSelectionValues:
@@ -201,6 +198,17 @@ function stateReducer(state, action) {
                 loading: false,
                 selectionValues: action.data,
             };
+        case ActionType.ToggleUsedTokenSet: {
+            const newState = {
+                ...state,
+                usedTokenSet: state.usedTokenSet.includes(action.data)
+                    ? state.usedTokenSet.filter((n) => n !== action.data)
+                    : [...new Set([...state.usedTokenSet, action.data])],
+            };
+            state.tokenData.setUsedTokenSet(newState.usedTokenSet);
+            updateTokensOnSources(state, action.updatedAt, false);
+            return newState;
+        }
         case ActionType.ResetSelectionValues:
             return {
                 ...state,
@@ -237,46 +245,141 @@ function stateReducer(state, action) {
                 ...state,
                 collapsed: !state.collapsed,
             };
+        case ActionType.SetApiData:
+            return {
+                ...state,
+                syncEnabled: true,
+                api: action.data,
+            };
+        case ActionType.SetLocalApiState: {
+            return {
+                ...state,
+                localApiState: action.data,
+            };
+        }
+        case ActionType.SetAPIProviders: {
+            return {
+                ...state,
+                apiProviders: action.data,
+            };
+        }
         case ActionType.ToggleUpdatePageOnly:
             return {
                 ...state,
                 updatePageOnly: action.bool,
             };
+        case ActionType.ToggleUpdateAfterApply:
+            return {
+                ...state,
+                updateAfterApply: action.bool,
+            };
+        case ActionType.SetActiveTokenSet:
+            return {
+                ...state,
+                activeTokenSet: action.data,
+            };
+        case ActionType.AddTokenSet: {
+            state.tokenData.addTokenSet(action.data, action.updatedAt);
+            return {
+                ...state,
+                tokenData: state.tokenData,
+            };
+        }
+        case ActionType.DeleteTokenSet: {
+            state.tokenData.deleteTokenSet(action.data, action.updatedAt);
+            return {
+                ...state,
+                activeTokenSet:
+                    state.activeTokenSet === action.data
+                        ? Object.keys(state.tokenData.tokens)[0]
+                        : state.activeTokenSet,
+            };
+        }
+        case ActionType.RenameTokenSet: {
+            state.tokenData.renameTokenSet({
+                oldName: action.oldName,
+                newName: action.newName,
+                updatedAt: action.updatedAt,
+            });
+            return {
+                ...state,
+                activeTokenSet: state.activeTokenSet === action.oldName ? action.newName : state.activeTokenSet,
+            };
+        }
+        case ActionType.SetTokenSetOrder: {
+            state.tokenData.reorderTokenSets(action.data);
+            return {
+                ...state,
+                tokenData: state.tokenData,
+            };
+        }
+        case ActionType.SetProjectURL: {
+            return {
+                ...state,
+                projectURL: action.data,
+            };
+        }
+        case ActionType.SetStorageType:
+            if (action.bool) {
+                postToFigma({
+                    type: MessageToPluginTypes.SET_STORAGE_TYPE,
+                    storageType: action.data,
+                    tokens: state.tokenData.getMergedTokens(),
+                });
+            }
+            return {
+                ...state,
+                editProhibited: action.data.provider === StorageProviderType.ARCADE,
+                storageType: action.data,
+            };
+        case ActionType.SetChangelog:
+            return {
+                ...state,
+                changelog: action.data,
+            };
+        case ActionType.SetLastOpened:
+            fetchChangelog(action.data, (result) => {
+                action.dispatch({type: ActionType.SetChangelog, data: result});
+            });
+
+            return {
+                ...state,
+                lastOpened: action.data,
+            };
         default:
-            throw new Error('Not implemented');
+            throw new Error('Context not implemented');
     }
 }
 
 function TokenProvider({children}) {
     const [state, dispatch] = React.useReducer(stateReducer, emptyState);
 
+    const updatedAt = new Date().toString();
+
     const tokenContext = React.useMemo(
         () => ({
-            setTokens: (tokens) => {
-                dispatch({type: 'SET_TOKENS', tokens});
-            },
             setTokensFromStyles: (data) => {
-                dispatch({type: ActionType.SetTokensFromStyles, data});
+                dispatch({type: ActionType.SetTokensFromStyles, data, updatedAt});
             },
             setTokenData: (data: TokenData) => {
-                dispatch({type: ActionType.SetTokenData, data});
+                dispatch({type: ActionType.SetTokenData, data, updatedAt});
             },
             setStringTokens: (data: {parent: string; tokens: string}) => {
-                dispatch({type: ActionType.SetStringTokens, data});
+                dispatch({type: ActionType.SetStringTokens, data, updatedAt});
             },
             setDefaultTokens: () => {
                 dispatch({type: ActionType.SetTokenData, data: new TokenData(defaultTokens)});
                 dispatch({type: ActionType.SetLoading, state: false});
             },
             setEmptyTokens: () => {
-                dispatch({type: ActionType.SetEmptyTokens});
+                dispatch({type: ActionType.SetTokenData, data: new TokenData(emptyTokens)});
                 dispatch({type: ActionType.SetLoading, state: false});
             },
-            updateTokens: () => {
-                dispatch({type: ActionType.UpdateTokens});
+            updateTokens: (shouldUpdate = true) => {
+                dispatch({type: ActionType.UpdateTokens, updatedAt, shouldUpdate});
             },
             deleteToken: (data) => {
-                dispatch({type: ActionType.DeleteToken, data});
+                dispatch({type: ActionType.DeleteToken, data, updatedAt});
             },
             createStyles: () => {
                 dispatch({type: ActionType.CreateStyles});
@@ -315,16 +418,58 @@ function TokenProvider({children}) {
                 dispatch({type: ActionType.ToggleColorMode});
             },
             pullStyles: () => {
-                dispatch({type: ActionType.PullStyles});
+                dispatch({type: ActionType.PullStyles, updatedAt});
             },
             setCollapsed: () => {
                 dispatch({type: ActionType.SetCollapsed});
             },
+            setApiData: (data: ApiDataType) => {
+                dispatch({type: ActionType.SetApiData, data});
+            },
+            setLocalApiState: (data: ApiDataType) => {
+                dispatch({type: ActionType.SetLocalApiState, data});
+            },
+            setProjectURL: (data: string) => {
+                dispatch({type: ActionType.SetProjectURL, data});
+            },
             toggleUpdatePageOnly: (bool: boolean) => {
                 dispatch({type: ActionType.ToggleUpdatePageOnly, bool});
             },
+            toggleUpdateAfterApply: (bool: boolean) => {
+                dispatch({type: ActionType.ToggleUpdateAfterApply, bool});
+            },
+            toggleUsedTokenSet: (data: string) => {
+                dispatch({type: ActionType.ToggleUsedTokenSet, data, updatedAt});
+            },
+            setStorageType: (data: StorageType, bool = false) => {
+                dispatch({type: ActionType.SetStorageType, data, bool});
+            },
+            setAPIProviders: (data: ApiDataType[]) => {
+                dispatch({type: ActionType.SetAPIProviders, data});
+            },
+            setActiveTokenSet: (data: string) => {
+                dispatch({type: ActionType.SetActiveTokenSet, data});
+            },
+            addTokenSet: (data: string) => {
+                dispatch({type: ActionType.AddTokenSet, data, updatedAt});
+            },
+            deleteTokenSet: (data: string) => {
+                dispatch({type: ActionType.DeleteTokenSet, data, updatedAt});
+            },
+            renameTokenSet: (oldName: string, newName: string) => {
+                dispatch({type: ActionType.RenameTokenSet, oldName, newName, updatedAt});
+            },
+            setTokenSetOrder: (data: string[]) => {
+                dispatch({type: ActionType.SetTokenSetOrder, data, updatedAt});
+            },
+            setChangelog: (data: object[]) => {
+                dispatch({type: ActionType.SetChangelog, data});
+            },
+            setLastOpened: (data: Date) => {
+                dispatch({type: ActionType.SetLastOpened, data, dispatch});
+            },
         }),
-        [dispatch]
+        [dispatch, updatedAt]
     );
 
     return (

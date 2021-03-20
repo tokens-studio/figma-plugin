@@ -5,3 +5,5 @@ main.css
 dist
 cypress/screenshots
 cypress/videos
+.env
+.env.production

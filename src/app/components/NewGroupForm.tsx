@@ -1,13 +1,13 @@
 import * as React from 'react';
-import {useTokenDispatch} from '../store/TokenContext';
+import {useTokenDispatch, useTokenState} from '../store/TokenContext';
 import Input from './Input';
 import Modal from './Modal';
 
 const NewGroupForm = ({path, setSingleTokenValue}) => {
     const title = 'Create new group';
-    const [activeToken] = React.useState('options');
     const [name, setName] = React.useState('');
     const {setShowNewGroupForm, setLoading, updateTokens} = useTokenDispatch();
+    const {activeTokenSet} = useTokenState();
 
     const handleChange = (e) => {
         e.persist();
@@ -19,7 +19,7 @@ const NewGroupForm = ({path, setSingleTokenValue}) => {
         await setLoading(true);
 
         setSingleTokenValue({
-            parent: activeToken,
+            parent: activeTokenSet,
             name: [path, name].join('.'),
             value: {},
             newGroup: true,

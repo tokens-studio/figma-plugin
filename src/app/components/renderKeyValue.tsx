@@ -1,7 +1,7 @@
 import * as React from 'react';
-import Heading from './Heading';
 import Icon from './Icon';
 import TokenButton from './TokenButton';
+import TokenGroupHeading from './TokenGroupHeading';
 import Tooltip from './Tooltip';
 import {isSingleToken, isTypographyToken} from './utils';
 
@@ -24,7 +24,7 @@ const renderKeyValue = ({
                     {typeof value === 'object' && !isTypographyToken(value) && !isSingleToken(value) ? (
                         <div className="property-wrapper w-full">
                             <div className="flex items-center justify-between">
-                                <Heading size="small">{key}</Heading>
+                                <TokenGroupHeading label={key} path={stringPath} id={editMode ? 'edit' : 'listing'} />
                                 {editMode && (
                                     <Tooltip label="Add a new token in group" variant="right">
                                         <button
