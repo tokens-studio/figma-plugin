@@ -64,6 +64,7 @@ const TokenListing = ({
         name: '',
         path: '',
     });
+
     function setSingleTokenValue({parent, name, value, options, oldName, newGroup = false}) {
         const obj = JSON5.parse(tokenData.tokens[parent].values);
         let newValue;

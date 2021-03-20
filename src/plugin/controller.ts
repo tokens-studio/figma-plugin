@@ -20,8 +20,9 @@ import {
 import {findAllWithData, removePluginData, sendPluginValues, updatePluginData} from './pluginData';
 import {getTokenData, updateNodes, setTokensOnDocument, goToNode, saveStorageType, getSavedStorageType} from './node';
 
-import {MessageFromPluginTypes, MessageToPluginTypes} from '../../types/messages';
+import {MessageToPluginTypes} from '../../types/messages';
 import {StorageProviderType} from '../../types/api';
+import compareProvidersWithStored from './compareProviders';
 
 figma.showUI(__html__, {
     width: 400,
@@ -36,29 +37,6 @@ figma.on('selectionchange', () => {
     }
     sendPluginValues(nodes);
 });
-
-const compareProvidersWithStored = (providers, storageType) => {
-    if (providers) {
-        const parsedProviders = JSON.parse(providers);
-        const matchingSet = parsedProviders.find((i) => i.provider === storageType.provider && i.id === storageType.id);
-        if (matchingSet) {
-            // send a message to the UI with the credentials stored in the client
-            figma.ui.postMessage({
-                type: MessageFromPluginTypes.API_CREDENTIALS,
-                status: true,
-                credentials: matchingSet,
-            });
-        }
-    } else {
-        // send a message to the UI that says there are no credentials stored in the client
-        figma.ui.postMessage({
-            type: MessageFromPluginTypes.API_CREDENTIALS,
-            status: false,
-        });
-        // Read no values from storage
-        notifyTokenValues();
-    }
-};
 
 figma.ui.onmessage = async (msg) => {
     switch (msg.type) {
@@ -90,7 +68,8 @@ figma.ui.onmessage = async (msg) => {
                     }
                 }
             } catch (err) {
-                figma.closePlugin('There was an error.');
+                figma.closePlugin('There was an error, check console (F12)');
+                console.error(err);
                 return;
             }
 

@@ -9,6 +9,10 @@ export function track(name: string, opts = {}) {
 export function identify(data: string) {
     if (process.env.MIXPANEL_ACCESS_TOKEN) {
         mixpanel.identify(data);
+
+        mixpanel.people.set({
+            USER_ID: data,
+        });
     }
 }
 

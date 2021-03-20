@@ -88,12 +88,14 @@ body {
 }
 
 body::-webkit-scrollbar,
+.overflow-x-auto::-webkit-scrollbar,
 .ReactModal__Content::-webkit-scrollbar,
 textarea::-webkit-scrollbar {
     width: 9px;
 }
 
 body::-webkit-scrollbar-thumb,
+.auto::-webkit-scrollbar-thumb,
 .ReactModal__Content::-webkit-scrollbar-thumb,
 textarea::-webkit-scrollbar-thumb {
     @apply bg-gray-400;

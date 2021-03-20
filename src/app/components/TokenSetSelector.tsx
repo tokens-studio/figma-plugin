@@ -74,7 +74,7 @@ export default function TokenSetSelector() {
     }, [tokenData.tokens]);
 
     return (
-        <div className="flex flex-row gap-2 px-4 pt-2 pb-0">
+        <div className="flex flex-row gap-2 px-4 pt-2 pb-0 overflow-x-auto">
             <DndProvider backend={HTML5Backend}>
                 {totalTokenSetArray.map((tokenSet, index) => (
                     <TokenSetItem

@@ -14,9 +14,7 @@ export default function TokenGroupHeading({label, path, id}) {
     return (
         <div>
             <ContextMenuTrigger id={`group-heading-${path}-${label}-${id}`}>
-                <Heading size="small">
-                    {label} {path}
-                </Heading>
+                <Heading size="small">{label}</Heading>
             </ContextMenuTrigger>
             <ContextMenu id={`group-heading-${path}-${label}-${id}`} className="text-xs">
                 <MenuItem disabled={editProhibited} onClick={onDelete}>
