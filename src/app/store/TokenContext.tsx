@@ -111,6 +111,7 @@ const emptyState = {
     editProhibited: true,
     changelog: [],
     lastOpened: '',
+    syncEnabled: false,
 };
 
 const TokenStateContext = React.createContext(emptyState);
@@ -247,6 +248,7 @@ function stateReducer(state, action) {
         case ActionType.SetApiData:
             return {
                 ...state,
+                syncEnabled: true,
                 api: action.data,
             };
         case ActionType.SetLocalApiState: {
