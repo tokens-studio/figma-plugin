@@ -14,6 +14,7 @@
 		"test": "jest",
 		"svgr": "svgr -d src/icons/ assets/",
 		"cy:open": "cypress open",
+		"cy:run": "cypress run",
 		"serve": "serve dist"
 	},
 	"dependencies": {
