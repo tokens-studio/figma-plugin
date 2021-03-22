@@ -96,7 +96,18 @@ const updateTextStyles = (textTokens, shouldCreate = false) => {
     textTokenArray.map(([key, value]: [string, TypographyToken]) => {
         let matchingStyles = [];
         if (textStyles.length > 0) {
-            matchingStyles = textStyles.filter((n) => n.name === key);
+            matchingStyles = textStyles.filter((n) => {
+                const splitName = n.name.split('/').map((name) => name.trim());
+                const splitKey = key.split('/').map((name) => name.trim());
+
+                if (splitKey[splitKey.length - 1] === 'value') {
+                    splitKey.pop();
+                }
+                const trimmedName = splitName.join('/');
+                const trimmedKey = splitKey.join('/');
+
+                return trimmedName === trimmedKey;
+            });
         }
 
         if (matchingStyles.length) {
@@ -147,7 +158,12 @@ export function pullStyles(styleTypes): void {
                 } else {
                     styleObject = null;
                 }
-                return styleObject ? [style.name, styleObject] : null;
+                const normalizedName = style.name
+                    .split('/')
+                    .map((section) => section.trim())
+                    .join('/');
+
+                return styleObject ? [normalizedName, styleObject] : null;
             })
             .filter(Boolean);
     }
@@ -218,7 +234,13 @@ export function pullStyles(styleTypes): void {
             if (style.description) {
                 styleObject.description = style.description;
             }
-            return [style.name, styleObject];
+
+            const normalizedName = style.name
+                .split('/')
+                .map((section) => section.trim())
+                .join('/');
+
+            return [normalizedName, styleObject];
         });
     }
     notifyStyleValues({

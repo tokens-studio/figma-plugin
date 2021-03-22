@@ -258,7 +258,7 @@ export default class TokenData {
             const resolvedReferences = tokenReferences.map((ref) => {
                 if (ref.length > 1) {
                     const value = objectPath.get(tokens, ref.substring(1));
-                    if (value) return value;
+                    if (typeof value !== 'undefined') return value;
                 }
                 return null;
             });
