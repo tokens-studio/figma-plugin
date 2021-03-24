@@ -74,9 +74,9 @@ const JSONEditor = () => {
                         className="flex-grow"
                         placeholder="Enter JSON"
                         rows={23}
-                        hasErrored={tokenData.tokens[activeTokenSet].hasErrored}
+                        hasErrored={tokenData.tokens[activeTokenSet]?.hasErrored}
                         onChange={(val) => setStringTokens({parent: activeTokenSet, tokens: val})}
-                        value={tokenData.tokens[activeTokenSet].values}
+                        value={tokenData.tokens[activeTokenSet]?.values}
                     />
                 </div>
             </div>

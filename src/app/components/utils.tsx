@@ -15,7 +15,10 @@ export function checkAndEvaluateMath(expr) {
 }
 
 export function isValueToken(token): token is {value: string | number} {
-    return typeof token === 'object' && (typeof token?.value === 'string' || typeof token?.value === 'number');
+    return (
+        typeof token === 'object' &&
+        (typeof token?.value === 'string' || typeof token?.value === 'number' || typeof token?.value === 'object')
+    );
 }
 
 export function isTypographyToken(token) {
