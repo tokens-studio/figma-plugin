@@ -12,14 +12,14 @@ export default function compareProvidersWithStored(providers, storageType) {
                 status: true,
                 credentials: matchingSet,
             });
+            return;
         }
-    } else {
-        // send a message to the UI that says there are no credentials stored in the client
-        figma.ui.postMessage({
-            type: MessageFromPluginTypes.API_CREDENTIALS,
-            status: false,
-        });
-        // Read no values from storage
-        notifyTokenValues();
     }
+    // send a message to the UI that says there are no credentials stored in the client
+    figma.ui.postMessage({
+        type: MessageFromPluginTypes.API_CREDENTIALS,
+        status: false,
+    });
+    // Read no values from storage
+    notifyTokenValues();
 }

@@ -53,7 +53,6 @@ figma.ui.onmessage = async (msg) => {
 
                 if (apiProviders) notifyAPIProviders(JSON.parse(apiProviders));
                 switch (storageType.provider) {
-                    //   Somehow setting this to an ENUM doesn't work :-|
                     case StorageProviderType.JSONBIN:
                     case StorageProviderType.ARCADE: {
                         compareProvidersWithStored(apiProviders, storageType);
