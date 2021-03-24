@@ -6,6 +6,7 @@ describe('checkIfAlias', () => {
             value: '$colors.foo',
         },
         string: '$colors.foo',
+        zero: '$colors.zero',
     };
     const incorrectToken = {
         nonexistant: '$colors.nonexistant',
@@ -15,22 +16,25 @@ describe('checkIfAlias', () => {
         array: [0, 1, 2, 3],
     };
     const allTokens = {
-        global: {
-            colors: {
-                foo: 'red',
-            },
+        colors: {
+            foo: 'red',
+            zero: 0,
         },
     };
 
-    it('correctly asserts if it is a value token', () => {
+    describe('correct tokens', () => {
         Object.entries(correctToken).map((token) => {
-            expect(checkIfAlias(token[1], allTokens)).toBe(true);
+            it(`token ${token[0]}`, () => {
+                expect(checkIfAlias(token[1], allTokens)).toBe(true);
+            });
         });
     });
 
-    it.only('correctly asserts if it is not a value token', () => {
+    describe('incorrect tokens', () => {
         Object.entries(incorrectToken).map((token) => {
-            expect(checkIfAlias(token[1], allTokens)).toBe(false);
+            it(`token ${token[0]}`, () => {
+                expect(checkIfAlias(token[1], allTokens)).toBe(false);
+            });
         });
     });
 });

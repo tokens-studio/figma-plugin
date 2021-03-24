@@ -7,7 +7,7 @@ export default function checkIfAlias(token: SingleToken, allTokens = {}): boolea
     if (typeof token === 'string') {
         aliasToken = Boolean(token.toString().match(aliasRegex));
     } else if (checkIfValueToken(token)) {
-        aliasToken = checkIfAlias(token.value.toString());
+        aliasToken = checkIfAlias(token.value.toString(), allTokens);
     }
     // Check if alias is found
     if (aliasToken) {
