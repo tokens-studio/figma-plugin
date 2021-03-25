@@ -240,14 +240,19 @@ export default class TokenData {
         }, []);
     }
 
-    setAllAliases(aliasArray = Object.entries(this.mergedTokens)): void {
+    setAllAliases(round = 0, aliasArray = Object.entries(this.mergedTokens)): void {
         const aliases = this.findAllAliases({arr: aliasArray});
 
         if (aliases.length > 0) {
             aliases.forEach((alias) => {
                 this.setResolvedAlias(this.mergedTokens, alias[0], this.getAliasValue(alias[1], this.mergedTokens));
             });
-            this.setAllAliases();
+            // We might need to find out what a good number of nesting would be like.
+            if (round < 50) {
+                this.setAllAliases(round + 1);
+            } else {
+                console.log("Unable to resolve some aliases, these wont' resolve:", aliases);
+            }
         }
     }
 
