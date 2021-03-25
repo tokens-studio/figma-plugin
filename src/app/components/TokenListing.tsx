@@ -20,12 +20,12 @@ const TokenListing = ({
     values,
 }: {
     label: string;
-    schema?: {
+    schema: {
         value: object | string;
         options: object | string;
     };
-    explainer?: string;
-    help?: string;
+    explainer: string;
+    help: string;
     property: string;
     tokenType: string;
     values: object;
@@ -145,7 +145,7 @@ const TokenListing = ({
     if (!values && !showEmptyGroups) return null;
 
     return (
-        <div className="border-b border-gray-200" data-cy={`tokenlisting-${type}`}>
+        <div className="border-b border-gray-200" data-cy={`tokenlisting-${tokenType}`}>
             <div className="flex justify-between space-x-8 items-center relative">
                 <button
                     className={`flex items-center w-full h-full p-4 space-x-2 hover:bg-gray-100 focus:outline-none ${

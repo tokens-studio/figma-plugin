@@ -2,6 +2,7 @@
 import JSON5 from 'json5';
 import objectPath from 'object-path';
 import set from 'set-value';
+import {convertToTokenArray} from '@/utils/convertTokens';
 import {mergeDeep} from '../../plugin/helpers';
 import {notifyToUI} from '../../plugin/notifiers';
 import {SingleToken, TokenGroup, TokenObject, TokenProps, Tokens} from '../../../types/tokens';
@@ -195,43 +196,12 @@ export default class TokenData {
         return this.mergedTokens;
     }
 
-    createTokenObj(dotTokens) {
-        // dotToken is e.g. as "H1/Regular/value/fontFamilies
-        return Object.entries(dotTokens).reduce((acc, [key, token]) => {
-            // Split token object by `/`
-            const splitParent: string | string[] = key.split('/');
-            // parentKey is now ["H1", "Regular", "fontFamilies"]
-            const value = isSingleToken(token) ? token.value : token;
-
-            // Store current key for future reference, e.g. fontFamily, lineHeight and remove it from key
-            let curKey = splitParent[splitParent.length - 1];
-            if (typographyProps.includes(curKey)) curKey = splitParent.pop();
-            if (tokenProps.includes(splitParent[splitParent.length - 1])) splitParent.pop();
-
-            // Merge object again, now that we have the parent reference
-            const newParentKey = splitParent.join('/');
-
-            // Set key to 'value' if parent and key match
-            let objToSet = {
-                [curKey]: value,
-            };
-            if (splitParent[splitParent.length - 1] === curKey) {
-                objToSet = {value};
-            }
-
-            acc[newParentKey] = acc[newParentKey] || {};
-            Object.assign(acc[newParentKey], objToSet);
-            return acc;
-        }, {});
-    }
-
     getFormattedTokens() {
-        const cols = dot.dot(this.mergedTokens);
-
-        const tokens = this.createTokenObj(cols);
+        const tokens = convertToTokenArray(this.mergedTokens);
+        console.log('Tokens Merged', this.mergedTokens);
         const tokenObj = {};
         console.log({tokens});
-        Object.entries(tokens).forEach(([key, value]) => {
+        tokens.forEach(([key, value]) => {
             set(tokenObj, key.split('/').join('.').toString(), value);
         });
 

@@ -49,7 +49,7 @@ const JSONEditor = () => {
                         className="flex-grow"
                         rows={10}
                         isDisabled
-                        hasErrored={tokenData.tokens[activeToken].hasErrored}
+                        hasErrored={tokenData.tokens[activeTokenSet].hasErrored}
                         value={tokenData.getFormattedTokens()}
                     />
                     <div className="space-x-4 flex justify-between">
