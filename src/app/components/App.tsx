@@ -1,99 +1,25 @@
 import * as React from 'react';
-import '../styles/main.css';
 import JSONEditor from './JSONEditor';
+import SyncSettings from './SyncSettings';
 import Inspector from './Inspector';
 import Tokens from './Tokens';
 import StartScreen from './StartScreen';
 import Heading from './Heading';
 import Navbar from './Navbar';
-import Icon from './Icon';
-import * as pjs from '../../../package.json';
-import {useTokenState, useTokenDispatch} from '../store/TokenContext';
-import TokenData from './TokenData';
-
-const goToNodeId = (id) => {
-    parent.postMessage(
-        {
-            pluginMessage: {
-                type: 'gotonode',
-                id,
-            },
-        },
-        '*'
-    );
-};
+import {goToNodeId} from './utils';
+import LoadingBar from './LoadingBar';
+import Footer from './Footer';
+import Initiator from './Initiator';
+import Changelog from './Changelog';
 
 const App = () => {
     const [active, setActive] = React.useState('start');
     const [remoteComponents, setRemoteComponents] = React.useState([]);
 
-    const {loading} = useTokenState();
-    const {
-        setTokenData,
-        setLoading,
-        setDisabled,
-        setSelectionValues,
-        resetSelectionValues,
-        setTokensFromStyles,
-    } = useTokenDispatch();
-
-    const onInitiate = () => {
-        parent.postMessage({pluginMessage: {type: 'initiate'}}, '*');
-    };
-
-    React.useEffect(() => {
-        onInitiate();
-        window.onmessage = (event) => {
-            const {type, values} = event.data.pluginMessage;
-            switch (type) {
-                case 'selection':
-                    setDisabled(false);
-                    if (values) {
-                        setSelectionValues(values);
-                    } else {
-                        resetSelectionValues();
-                    }
-                    break;
-                case 'noselection':
-                    setDisabled(true);
-                    resetSelectionValues();
-                    break;
-                case 'remotecomponents':
-                    setLoading(false);
-                    setRemoteComponents(values.remotes);
-                    break;
-                case 'tokenvalues':
-                    setLoading(false);
-                    if (values) {
-                        setTokenData(new TokenData(values));
-                        setActive('tokens');
-                    }
-                    break;
-                case 'styles':
-                    setLoading(false);
-                    if (values) {
-                        setTokensFromStyles(values);
-                        setActive('tokens');
-                    }
-                    break;
-                default:
-                    break;
-            }
-        };
-    }, []);
-
     return (
         <>
-            {loading && (
-                <div className="fixed w-full z-20">
-                    <div className="flex items-center space-x-2 bg-gray-300 p-2 rounded m-2">
-                        <div className="inline-flex rotate">
-                            <Icon name="loading" />
-                        </div>
-                        <div className="font-medium text-xxs">Hold on, updating...</div>
-                    </div>
-                </div>
-            )}
+            <Initiator setActive={setActive} setRemoteComponents={setRemoteComponents} />
+            <LoadingBar />
             <div className="h-full flex flex-col">
                 <div className="flex-grow flex flex-col">
                     {active !== 'start' && <Navbar active={active} setActive={setActive} />}
@@ -111,27 +37,14 @@ const App = () => {
                             ))}
                         </div>
                     )}
-                    {active === 'start' && !loading && <StartScreen setActive={setActive} />}
+                    {active === 'start' && <StartScreen setActive={setActive} />}
                     {active === 'tokens' && <Tokens />}
                     {active === 'json' && <JSONEditor />}
                     {active === 'inspector' && <Inspector />}
+                    {active === 'syncsettings' && <SyncSettings />}
                 </div>
-                <div
-                    className={`p-4 flex-shrink-0 flex items-center justify-between ${active === 'tokens' && 'mb-16'}`}
-                >
-                    <div className="text-gray-600 text-xxs">Figma Tokens Version {pjs.version}</div>
-                    <div className="text-gray-600 text-xxs">
-                        <a
-                            className="flex items-center"
-                            href="https://github.com/six7/figma-tokens"
-                            target="_blank"
-                            rel="noreferrer"
-                        >
-                            <span className="mr-1">Feedback / Issues</span>
-                            <Icon name="github" />
-                        </a>
-                    </div>
-                </div>
+                <Footer active={active} />
+                <Changelog />
             </div>
         </>
     );

@@ -1,12 +1,9 @@
 import {Parser} from 'expr-eval';
-
-import {hexToRgb} from '../../plugin/helpers';
+import {postToFigma} from '../../plugin/notifiers';
+import {MessageToPluginTypes} from '../../../types/messages';
+import {hexToRgb, RGBAToHexA} from '../../plugin/helpers';
 
 const parser = new Parser();
-
-export function isObject(item) {
-    return item && typeof item === 'object' && !Array.isArray(item);
-}
 
 export function checkAndEvaluateMath(expr) {
     try {
@@ -17,48 +14,69 @@ export function checkAndEvaluateMath(expr) {
     }
 }
 
-export function mergeDeep(target, ...sources) {
-    if (!sources.length) return target;
-    const source = sources.shift();
-
-    if (isObject(target) && isObject(source)) {
-        Object.keys(source).forEach((key) => {
-            if (isObject(source[key])) {
-                if (!target[key]) Object.assign(target, {[key]: {}});
-                mergeDeep(target[key], source[key]);
-            } else {
-                Object.assign(target, {[key]: source[key]});
-            }
-        });
-    }
-
-    return mergeDeep(target, ...sources);
+export function isValueToken(token): token is {value: string | number} {
+    return (
+        typeof token === 'object' &&
+        (typeof token?.value === 'string' || typeof token?.value === 'number' || typeof token?.value === 'object')
+    );
 }
 
 export function isTypographyToken(token) {
     if (typeof token !== 'object') return false;
-    return 'fontFamily' in token || 'fontWeight' in token || 'fontSize' in token || 'lineHeight' in token;
+    return (
+        'fontFamily' in token ||
+        'fontWeight' in token ||
+        'fontSize' in token ||
+        'lineHeight' in token ||
+        'paragraphSpacing' in token
+    );
 }
 
 export function isSingleToken(token): token is {value: string} {
     return typeof token === 'object' && 'value' in token;
 }
 
+// Convert non-conform colors to RGB value that can be used throughout the plugin
 export function convertToRgb(color: string) {
-    if (typeof color !== 'string') {
-        return color;
-    }
-    const hexRegex = /#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})/g;
-    if (color.match(/^rgb/)) {
-        // If rgb contains hex value, extract rgb values from there
-        if (color.match(hexRegex)) {
-            const {r, g, b} = hexToRgb(color.match(hexRegex)[0]);
-
-            return color.replace(hexRegex, [r, g, b].join(', '));
+    try {
+        if (typeof color !== 'string') {
+            return color;
         }
-        return color;
+        const hexRegex = /#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})/g;
+        const rgbaRegex = /(rgba?\(.*?\))/g;
+        let returnedColor = color;
+
+        try {
+            const matchesRgba = Array.from(color.matchAll(rgbaRegex), (m) => m[0]);
+            if (matchesRgba.length > 0) {
+                matchesRgba.map((match) => {
+                    const matchedString = match;
+                    const matchedColor = match.replace(/rgba?\(/g, '').replace(')', '');
+
+                    const matchesHex = matchedString.match(hexRegex);
+                    let r;
+                    let g;
+                    let b;
+                    let a = 1;
+                    let alpha;
+                    if (matchesHex) {
+                        ({r, g, b} = hexToRgb(matchesHex[0]));
+                    } else {
+                        [r, g, b, alpha = '1'] = color.split(',').map((n) => n.trim());
+                        a = Number(alpha);
+                    }
+                    const rgbaString = `rgba(${matchedColor.replace(hexRegex, [r, g, b].join(', '))})`;
+
+                    returnedColor = returnedColor.split(matchedString).join(RGBAToHexA(rgbaString));
+                });
+            }
+        } catch (e) {
+            console.log('error', e);
+        }
+        return returnedColor;
+    } catch (e) {
+        console.error(e);
     }
-    return color;
 }
 
 // Light or dark check for Token Buttons: If color is very bright e.g. white we show a different style
@@ -128,4 +146,21 @@ export function slugify(text: string) {
         .replace(/\s+/g, '-') // Replace spaces with -
         .replace(/[^\w-]+/g, '') // Remove all non-word chars
         .replace(/--+/g, '-'); // Replace multiple - with single -
+}
+
+export function goToNodeId(id) {
+    postToFigma({
+        type: MessageToPluginTypes.GO_TO_NODE,
+        id,
+    });
+}
+
+export async function compareUpdatedAt(oldUpdatedAt, newUpdatedAt) {
+    if (newUpdatedAt > oldUpdatedAt) {
+        return 'remote_newer';
+    }
+    if (newUpdatedAt === oldUpdatedAt) {
+        return 'same';
+    }
+    return 'remote_older';
 }

@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es2019",
+    "target": "es2020",
     "outDir": "dist",
     "jsx": "react",
     "allowSyntheticDefaultImports": true,
@@ -11,9 +11,13 @@
     "noImplicitAny": false,
     "moduleResolution": "node",
     "resolveJsonModule": true,
+    "baseUrl": "./",
     "typeRoots": [
       "./node_modules/@types",
       "./node_modules/@figma"
-    ]
+    ],
+    "paths": {
+      "@/*": ["src/*"],
+    },
   }
 }

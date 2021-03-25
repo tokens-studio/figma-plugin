@@ -6,7 +6,7 @@ import Icon from './Icon';
 import {lightOrDark, colorByHashCode, isTypographyToken} from './utils';
 
 const TokenButton = ({type, property, name, path, token, editMode, showForm}) => {
-    const {colorMode, displayType, selectionValues, tokenData, disabled} = useTokenState();
+    const {colorMode, displayType, selectionValues, tokenData, disabled, activeTokenSet} = useTokenState();
     const {setNodeData, setShowOptions, setLoading, deleteToken} = useTokenDispatch();
     const displayValue = tokenData.getTokenValue(token);
     let style;
@@ -21,7 +21,7 @@ const TokenButton = ({type, property, name, path, token, editMode, showForm}) =>
     };
 
     const handleDeleteClick = () => {
-        deleteToken({parent: 'options', path, name});
+        deleteToken({parent: activeTokenSet, path: [path, name].join('.')});
     };
 
     function setPluginValue(value) {

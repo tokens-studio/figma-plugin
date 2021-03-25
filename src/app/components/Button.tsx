@@ -7,6 +7,8 @@ type ButtonProps = {
     size?: 'large' | 'small';
     href?: string;
     download?: string;
+    disabled?: boolean;
+    id?: string;
 };
 
 const Button: React.FunctionComponent<ButtonProps> = ({
@@ -17,6 +19,8 @@ const Button: React.FunctionComponent<ButtonProps> = ({
     variant,
     children,
     href,
+    disabled = false,
+    id,
 }) => {
     let variantClass;
     switch (variant) {
@@ -42,10 +46,11 @@ const Button: React.FunctionComponent<ButtonProps> = ({
         return (
             <a
                 target="_blank"
-                download={download}
                 rel="noreferrer"
+                download={download}
                 className={`button ${[variantClass, sizeClass].join(' ')}`}
                 href={href}
+                data-cy={id}
             >
                 {children}
             </a>
@@ -54,7 +59,13 @@ const Button: React.FunctionComponent<ButtonProps> = ({
 
     return (
         // eslint-disable-next-line react/button-has-type
-        <button type={type} className={`button ${[variantClass, sizeClass].join(' ')}`} onClick={onClick}>
+        <button
+            data-cy={id}
+            disabled={disabled}
+            type={type}
+            className={`button ${[variantClass, sizeClass].join(' ')}`}
+            onClick={onClick}
+        >
             {children}
         </button>
     );

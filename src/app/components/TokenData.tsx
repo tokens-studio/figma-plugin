@@ -1,42 +1,21 @@
 /* eslint-disable class-methods-use-this */
 import JSON5 from 'json5';
 import objectPath from 'object-path';
-import Dot from 'dot-object';
 import set from 'set-value';
 import {mergeDeep} from '../../plugin/helpers';
-import {convertToRgb, checkAndEvaluateMath, isSingleToken} from './utils';
+import {notifyToUI} from '../../plugin/notifiers';
+import {SingleToken, TokenGroup, TokenObject, TokenProps, Tokens} from '../../../types/tokens';
+import {convertToRgb, checkAndEvaluateMath} from './utils';
 
-const dot = new Dot('/');
-
-const tokenProps = ['description', 'value'];
-const typographyProps = ['fontSize', 'lineHeight', 'fontFamily', 'fontWeight', 'letterSpacing', 'paragraphSpacing'];
-
-export interface TokenProps {
-    values: {
-        [key: string]: string;
-    };
-    version: string;
-}
-
-type SingleToken = string | number | TokenGroup;
-
-interface TokenGroup {
-    [key: string]: SingleToken;
-}
-
-interface Tokens {
-    [key: string]: TokenObject;
-}
-
-interface TokenObject {
-    hasErrored?: boolean;
-    values: string;
-}
-
+const aliasRegex = /(\$[^\s]+\w)/g;
 export default class TokenData {
     mergedTokens: TokenGroup;
 
     tokens: Tokens;
+
+    usedTokenSet: string[];
+
+    updatedAt: string;
 
     constructor(data: TokenProps) {
         this.setTokens(data);
@@ -45,8 +24,11 @@ export default class TokenData {
 
     setTokens(tokens: TokenProps): void {
         const parsed = this.parseTokenValues(tokens);
+        this.setUpdatedAt(tokens.updatedAt || new Date().toString());
         if (!parsed) return;
+
         this.tokens = parsed;
+        this.setUsedTokenSet([Object.keys(parsed)[0]]);
     }
 
     private checkTokenValidity(tokens: string): boolean {
@@ -59,28 +41,21 @@ export default class TokenData {
     }
 
     private parseTokenValues(tokens: TokenProps): Tokens | null {
-        if (tokens.version !== '') {
-            try {
-                const reducedTokens = Object.entries(tokens.values).reduce((prev, group) => {
-                    prev.push({[group[0]]: {values: group[1]}});
-                    return prev;
-                }, []);
+        try {
+            const reducedTokens = Object.entries(tokens.values).reduce((prev, group) => {
+                prev.push({[group[0]]: {values: group[1]}});
+                return prev;
+            }, []);
 
-                const assigned = Object.assign({}, ...reducedTokens);
+            const assigned = Object.assign({}, ...reducedTokens);
 
-                return assigned;
-            } catch (e) {
-                console.error('Error reading tokens', e);
-                console.log("Here's the tokens");
-                console.log(tokens);
-                return null;
-            }
-        } else {
-            return {
-                options: {
-                    values: JSON.stringify(tokens.values, null, 2),
-                },
-            };
+            return assigned;
+        } catch (e) {
+            notifyToUI('Error reading tokens, check console (F12)');
+            console.error('Error reading tokens', e);
+            console.log("Here's the tokens");
+            console.log(tokens);
+            return null;
         }
     }
 
@@ -89,47 +64,119 @@ export default class TokenData {
         return paths.reduce((acc, el) => ({[el]: acc}), {[last]: value});
     }
 
-    injectTokens(tokens): void {
+    injectTokens(tokens, activeTokenSet): void {
         const receivedStyles = {};
         Object.entries(tokens).map(([parent, values]: [string, SingleToken[]]) => {
             values.map((token: TokenGroup) => {
                 mergeDeep(receivedStyles, {[parent]: this.convertDotPathToNestedObject(token[0], token[1])});
             });
         });
-        const newTokens = mergeDeep(JSON5.parse(this.tokens.options.values), receivedStyles);
-        this.tokens.options.values = JSON.stringify(newTokens, null, 2);
+        const newTokens = mergeDeep(JSON5.parse(this.tokens[activeTokenSet].values), receivedStyles);
+        this.tokens[activeTokenSet].values = JSON.stringify(newTokens, null, 2);
+        this.setMergedTokens();
+    }
+
+    addTokenSet(tokenSet: string, updatedAt): boolean {
+        if (tokenSet in this.tokens) {
+            notifyToUI('Token set already exists');
+            return false;
+        }
+        this.tokens = {
+            ...this.tokens,
+            [tokenSet]: {
+                values: JSON.stringify({}),
+            },
+        };
+        this.setUpdatedAt(updatedAt);
+        return true;
+    }
+
+    deleteTokenSet(tokenSet: string, updatedAt): void {
+        if (tokenSet in this.tokens) {
+            const oldTokens = this.tokens;
+            delete oldTokens[tokenSet];
+            this.tokens = {
+                ...oldTokens,
+            };
+            this.setUpdatedAt(updatedAt);
+        }
+    }
+
+    renameTokenSet({oldName, newName, updatedAt}): boolean {
+        if (newName in this.tokens) {
+            notifyToUI('Token set already exists');
+            return false;
+        }
+        this.tokens = {
+            ...this.tokens,
+            [newName]: this.tokens[oldName],
+        };
+        delete this.tokens[oldName];
+        this.setUpdatedAt(updatedAt);
+
+        return true;
+    }
+
+    reorderTokenSets(tokenSets: string[]): void {
+        const newTokens = {};
+        tokenSets.map((set) => {
+            Object.assign(newTokens, {[set]: this.tokens[set]});
+        });
+        this.tokens = newTokens;
+        this.setMergedTokens();
+    }
+
+    setUsedTokenSet(usedTokenSet: string[]): void {
+        this.usedTokenSet = usedTokenSet;
         this.setMergedTokens();
     }
 
     setMergedTokens(): void {
-        this.mergedTokens = mergeDeep(
-            {},
-            ...Object.entries(this.tokens).reduce((acc, cur) => {
-                acc.push(JSON5.parse(cur[1].values));
-                return acc;
-            }, [])
-        );
+        if (Object.entries(this.tokens)) {
+            this.mergedTokens = mergeDeep(
+                {},
+                ...Object.entries(this.tokens).reduce((acc, cur) => {
+                    if (this.usedTokenSet.includes(cur[0])) acc.push(JSON5.parse(cur[1].values));
+                    return acc;
+                }, [])
+            );
 
-        this.setAllAliases();
+            this.setAllAliases();
+        }
     }
 
-    updateTokenValues(parent: string, tokens: string): void {
-        const hasErrored: boolean = this.checkTokenValidity(tokens);
-        const newTokens = {
-            ...this.tokens,
-            [parent]: {
-                hasErrored,
-                values: tokens,
-            },
-        };
-        this.tokens = newTokens;
-        if (!hasErrored) {
-            this.setMergedTokens();
+    updateTokenValues(parent: string, tokens: string, updatedAt: string): void {
+        if (tokens) {
+            const hasErrored: boolean = this.checkTokenValidity(tokens);
+
+            const newTokens = {
+                ...this.tokens,
+                [parent]: {
+                    hasErrored,
+                    values: tokens,
+                },
+            };
+            this.setUpdatedAt(updatedAt);
+            this.tokens = newTokens;
+            if (!hasErrored) {
+                this.setMergedTokens();
+            }
+        } else {
+            const oldTokens = this.tokens;
+            delete oldTokens[parent];
         }
     }
 
     getTokens() {
         return this.tokens;
+    }
+
+    getUpdatedAt() {
+        return this.updatedAt;
+    }
+
+    setUpdatedAt(value: string) {
+        this.updatedAt = value;
     }
 
     reduceToValues() {
@@ -207,18 +254,16 @@ export default class TokenData {
 
     private checkIfAlias(token: SingleToken): boolean {
         let aliasToken = false;
-        if (typeof token === 'string') {
-            aliasToken = (token.includes('$') || token.includes('{')) && token.length > 1;
+        if (typeof token === 'string' || typeof token === 'number') {
+            aliasToken = Boolean(token.toString().match(aliasRegex));
         } else {
             aliasToken = this.checkIfValueTokenAlias(token);
         }
+        // Check if alias is found
         if (aliasToken) {
             const tokenToCheck = this.checkIfValueToken(token) ? token.value : token;
-            const tokenReference = tokenToCheck.toString().startsWith('$')
-                ? tokenToCheck.toString().substring(1)
-                : tokenToCheck.toString().slice(1, -1);
-            const resolvedAlias = this.getResolvedAlias(this.mergedTokens, tokenReference);
-            return typeof resolvedAlias !== 'undefined';
+            const aliasValue = this.getAliasValue(tokenToCheck, this.mergedTokens);
+            return aliasValue != null;
         }
         return false;
     }
@@ -243,33 +288,40 @@ export default class TokenData {
         }, []);
     }
 
-    setAllAliases(aliasArray = Object.entries(this.mergedTokens)): void {
+    setAllAliases(previousCount = undefined, aliasArray = Object.entries(this.mergedTokens)): void {
         const aliases = this.findAllAliases({arr: aliasArray});
 
         if (aliases.length > 0) {
             aliases.forEach((alias) => {
                 this.setResolvedAlias(this.mergedTokens, alias[0], this.getAliasValue(alias[1], this.mergedTokens));
             });
-            this.setAllAliases();
+            if (previousCount > aliases.length || !previousCount) {
+                this.setAllAliases(aliases.length);
+            } else {
+                console.log("Unable to resolve some aliases, these wont' resolve:", aliases);
+            }
         }
     }
 
     getAliasValue(token: SingleToken, tokens = this.mergedTokens): string | null {
-        if (this.checkIfAlias(token)) {
-            let returnedValue = this.checkIfValueToken(token) ? (token.value as string) : (token as string);
-            const tokenRegex = /(\$[^\s,]+)|(\{[^\s,]+\})/g;
-            const tokenReferences = returnedValue.toString().match(tokenRegex);
-            if (tokenReferences.length > 0) {
-                const resolvedReferences = tokenReferences.map((ref) => {
-                    return objectPath.get(tokens, ref.startsWith('$') ? ref.substring(1) : ref.slice(1, -1));
-                });
-                tokenReferences.forEach((reference, index) => {
-                    returnedValue = returnedValue.replace(
-                        reference,
-                        resolvedReferences[index].value ?? resolvedReferences[index]
-                    );
-                });
-            }
+        let returnedValue = this.checkIfValueToken(token) ? (token.value as string) : (token as string);
+        const tokenReferences = returnedValue.toString().match(aliasRegex);
+        if (tokenReferences.length > 0) {
+            const resolvedReferences = tokenReferences.map((ref) => {
+                if (ref.length > 1) {
+                    const value = objectPath.get(tokens, ref.substring(1));
+                    if (typeof value !== 'undefined') return value;
+                }
+                return null;
+            });
+            tokenReferences.forEach((reference, index) => {
+                returnedValue = returnedValue.replace(
+                    reference,
+                    resolvedReferences[index]?.value ?? resolvedReferences[index]
+                );
+            });
+        }
+        if (returnedValue) {
             return convertToRgb(checkAndEvaluateMath(returnedValue));
         }
         return null;

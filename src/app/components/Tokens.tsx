@@ -4,6 +4,7 @@ import JSON5 from 'json5';
 import {useTokenDispatch, useTokenState} from '../store/TokenContext';
 import TokenListing from './TokenListing';
 import Button from './Button';
+import TokenSetSelector from './TokenSetSelector';
 
 interface TokenListingType {
     label: string;
@@ -125,21 +126,20 @@ const mappedTokens = (tokens) => {
 };
 
 const Tokens = () => {
-    const {tokenData, updatePageOnly} = useTokenState();
-    const [activeToken] = React.useState('options');
-    const {updateTokens, setLoading, toggleUpdatePageOnly, toggleShowEmptyGroups} = useTokenDispatch();
+    const {tokenData, updatePageOnly, activeTokenSet} = useTokenState();
+    const {updateTokens, toggleUpdatePageOnly, toggleShowEmptyGroups} = useTokenDispatch();
 
     const handleUpdate = async () => {
-        await setLoading(true);
-        updateTokens();
+        updateTokens(false);
     };
 
-    const tokenValues = JSON5.parse(tokenData.tokens[activeToken].values);
+    const tokenValues = JSON5.parse(tokenData.tokens[activeTokenSet].values);
 
-    if (tokenData.tokens[activeToken].hasErrored) return <div>JSON malformed, check in Editor</div>;
+    if (tokenData.tokens[activeTokenSet].hasErrored) return <div>JSON malformed, check in Editor</div>;
 
     return (
         <div>
+            <TokenSetSelector />
             {mappedTokens(tokenValues).map(([key, group]: [string, TokenListingType]) => {
                 return (
                     <div key={key}>
@@ -172,7 +172,7 @@ const Tokens = () => {
                     </label>
                 </div>
                 <Button variant="primary" size="large" onClick={handleUpdate}>
-                    Update
+                    Update {updatePageOnly ? 'page' : 'document'}
                 </Button>
             </div>
         </div>

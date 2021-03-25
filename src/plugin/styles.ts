@@ -1,34 +1,18 @@
 /* eslint-disable no-param-reassign */
 import {figmaRGBToHex} from '@figma-plugin/helpers';
-import Dot from 'dot-object';
-import {isSingleToken, slugify} from '../app/components/utils';
+import {convertToTokenArray} from '../utils/convertTokens';
+import {ColorToken, TypographyToken} from '../../types/propertyTypes';
+import {slugify} from '../app/components/utils';
 import {
+    convertFigmaGradientToString,
     convertFigmaToLetterSpacing,
     convertFigmaToLineHeight,
     convertLetterSpacingToFigma,
     convertLineHeightToFigma,
+    convertStringToFigmaGradient,
     convertToFigmaColor,
 } from './helpers';
 import {notifyStyleValues} from './notifiers';
-
-const dot = new Dot('/');
-
-interface TypographyToken {
-    value: {
-        fontFamily?: string;
-        fontWeight?: string;
-        fontSize?: string;
-        lineHeight?: string | number;
-        letterSpacing?: string;
-        paragraphSpacing?: string;
-    };
-    description?: string;
-}
-
-interface ColorToken {
-    value: string;
-    description?: string;
-}
 
 export const setTextValuesOnTarget = async (target, token) => {
     const {fontFamily, fontWeight, fontSize, lineHeight, letterSpacing, paragraphSpacing, description} = token;
@@ -61,55 +45,35 @@ export const setTextValuesOnTarget = async (target, token) => {
 };
 
 const setColorValuesOnTarget = (target, token) => {
-    const {description, value} = token;
-    const {color, opacity} = convertToFigmaColor(value);
-
-    target.paints = [{color, opacity, type: 'SOLID'}];
-    if (description) {
-        target.description = description;
-    }
-};
-
-const tokenProps = ['description', 'value'];
-const typographyProps = ['fontSize', 'lineHeight', 'fontFamily', 'fontWeight', 'letterSpacing', 'paragraphSpacing'];
-
-const createTokenObj = (dotTokens) => {
-    // dotToken is e.g. as "H1/Regular/value/fontFamilies
-    return Object.entries(dotTokens).reduce((acc, [key, token]) => {
-        // Split token object by `/`
-        const splitParent: string | string[] = key.split('/');
-        // parentKey is now ["H1", "Regular", "fontFamilies"]
-        const value = isSingleToken(token) ? token.value : token;
-
-        // Store current key for future reference, e.g. fontFamily, lineHeight and remove it from key
-        let curKey = splitParent[splitParent.length - 1];
-        if (typographyProps.includes(curKey)) curKey = splitParent.pop();
-        if (tokenProps.includes(splitParent[splitParent.length - 1])) splitParent.pop();
-
-        // Merge object again, now that we have the parent reference
-        const newParentKey = splitParent.join('/');
-
-        // Set key to 'value' if parent and key match
-        let objToSet = {
-            [curKey]: value,
-        };
-        if (splitParent[splitParent.length - 1] === curKey) {
-            objToSet = {value};
+    try {
+        const {description, value} = token;
+        if (value.startsWith('linear-gradient')) {
+            const {gradientStops, gradientTransform} = convertStringToFigmaGradient(value);
+            const newPaint = {
+                type: 'GRADIENT_LINEAR',
+                gradientTransform,
+                gradientStops,
+            };
+            target.paints = [newPaint];
+        } else {
+            const {color, opacity} = convertToFigmaColor(value);
+            target.paints = [{color, opacity, type: 'SOLID'}];
         }
 
-        acc[newParentKey] = acc[newParentKey] || {};
-        Object.assign(acc[newParentKey], objToSet);
-        return acc;
-    }, {});
+        if (description) {
+            target.description = description;
+        }
+    } catch (e) {
+        console.error('Error setting color', e);
+    }
 };
 
 const updateColorStyles = (colorTokens, shouldCreate = false) => {
     // Iterate over colorTokens to create objects that match figma styles
-    const cols = dot.dot(colorTokens);
-    const tokenObj = createTokenObj(cols);
+    const colorTokenArray = convertToTokenArray(colorTokens, true);
     const paints = figma.getLocalPaintStyles();
 
-    Object.entries(tokenObj).map(([key, value]: [string, ColorToken]) => {
+    colorTokenArray.map(([key, value]: [string, ColorToken]) => {
         let matchingStyles = [];
         if (paints.length > 0) {
             matchingStyles = paints.filter((n) => n.name === key);
@@ -126,14 +90,24 @@ const updateColorStyles = (colorTokens, shouldCreate = false) => {
 
 const updateTextStyles = (textTokens, shouldCreate = false) => {
     // Iterate over textTokens to create objects that match figma styles
-    const cols = dot.dot(textTokens);
-    const tokenObj = createTokenObj(cols);
+    const textTokenArray = convertToTokenArray(textTokens, true);
     const textStyles = figma.getLocalTextStyles();
 
-    Object.entries(tokenObj).map(([key, value]: [string, TypographyToken]) => {
+    textTokenArray.map(([key, value]: [string, TypographyToken]) => {
         let matchingStyles = [];
         if (textStyles.length > 0) {
-            matchingStyles = textStyles.filter((n) => n.name === key);
+            matchingStyles = textStyles.filter((n) => {
+                const splitName = n.name.split('/').map((name) => name.trim());
+                const splitKey = key.split('/').map((name) => name.trim());
+
+                if (splitKey[splitKey.length - 1] === 'value') {
+                    splitKey.pop();
+                }
+                const trimmedName = splitName.join('/');
+                const trimmedKey = splitKey.join('/');
+
+                return trimmedName === trimmedKey;
+            });
         }
 
         if (matchingStyles.length) {
@@ -169,21 +143,30 @@ export function pullStyles(styleTypes): void {
     if (styleTypes.colorStyles) {
         colors = figma
             .getLocalPaintStyles()
-            .filter((style) => style.paints.length === 1 && style.paints[0].type === 'SOLID')
+            .filter((style) => style.paints.length === 1)
             .map((style) => {
                 const paint = style.paints[0];
+                let styleObject: ColorToken = {};
+                if (style.description) {
+                    styleObject.description = style.description;
+                }
                 if (paint.type === 'SOLID') {
                     const {r, g, b} = paint.color;
                     const a = paint.opacity;
-                    const styleObject: ColorToken = {value: figmaRGBToHex({r, g, b, a})};
-
-                    if (style.description) {
-                        styleObject.description = style.description;
-                    }
-                    return [style.name, styleObject];
+                    styleObject.value = figmaRGBToHex({r, g, b, a});
+                } else if (paint.type === 'GRADIENT_LINEAR') {
+                    styleObject.value = convertFigmaGradientToString(paint);
+                } else {
+                    styleObject = null;
                 }
-                return null;
-            });
+                const normalizedName = style.name
+                    .split('/')
+                    .map((section) => section.trim())
+                    .join('/');
+
+                return styleObject ? [normalizedName, styleObject] : null;
+            })
+            .filter(Boolean);
     }
     if (styleTypes.textStyles) {
         const rawFontSizes = [];
@@ -252,7 +235,13 @@ export function pullStyles(styleTypes): void {
             if (style.description) {
                 styleObject.description = style.description;
             }
-            return [style.name, styleObject];
+
+            const normalizedName = style.name
+                .split('/')
+                .map((section) => section.trim())
+                .join('/');
+
+            return [normalizedName, styleObject];
         });
     }
     notifyStyleValues({

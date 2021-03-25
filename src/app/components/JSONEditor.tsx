@@ -4,11 +4,11 @@ import Heading from './Heading';
 import {useTokenState, useTokenDispatch} from '../store/TokenContext';
 import Button from './Button';
 import Modal from './Modal';
+import TokenSetSelector from './TokenSetSelector';
 
 const JSONEditor = () => {
-    const {tokenData} = useTokenState();
+    const {tokenData, activeTokenSet, editProhibited} = useTokenState();
     const {setStringTokens, setEmptyTokens, setDefaultTokens, updateTokens, setLoading} = useTokenDispatch();
-    const [activeToken] = React.useState('options');
     const [confirmModalVisible, showConfirmModal] = React.useState('');
     const [exportModalVisible, showExportModal] = React.useState(false);
 
@@ -105,25 +105,27 @@ const JSONEditor = () => {
                     </div>
                 </div>
             </Modal>
+            <TokenSetSelector />
             <div className="flex flex-col justify-between items-center flex-grow">
-                <div className="flex flex-col p-4 w-full items-center flex-grow">
+                <div className="flex flex-col p-4 pt-2 w-full items-center flex-grow">
                     <Textarea
+                        isDisabled={editProhibited}
                         className="flex-grow"
                         placeholder="Enter JSON"
                         rows={23}
-                        hasErrored={tokenData.tokens[activeToken].hasErrored}
-                        onChange={(val) => setStringTokens({parent: activeToken, tokens: val})}
-                        value={tokenData.tokens[activeToken].values}
+                        hasErrored={tokenData.tokens[activeTokenSet]?.hasErrored}
+                        onChange={(val) => setStringTokens({parent: activeTokenSet, tokens: val})}
+                        value={tokenData.tokens[activeTokenSet]?.values}
                     />
                 </div>
             </div>
 
             <div className="flex justify-between w-full px-4 bg-white">
                 <div className="space-x-2 flex mr-2">
-                    <Button variant="secondary" onClick={() => showConfirmModal('reset')}>
+                    <Button disabled={editProhibited} variant="secondary" onClick={() => showConfirmModal('reset')}>
                         Load preset
                     </Button>
-                    <Button variant="secondary" onClick={() => showConfirmModal('delete')}>
+                    <Button disabled={editProhibited} variant="secondary" onClick={() => showConfirmModal('delete')}>
                         Clear
                     </Button>
                 </div>
@@ -131,7 +133,7 @@ const JSONEditor = () => {
                     <Button variant="secondary" onClick={() => showExportModal(true)}>
                         Export
                     </Button>
-                    <Button variant="primary" onClick={handleUpdate}>
+                    <Button disabled={editProhibited} variant="primary" onClick={handleUpdate}>
                         Save & update
                     </Button>
                 </div>

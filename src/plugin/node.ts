@@ -4,6 +4,8 @@ import {fetchAllPluginData} from './pluginData';
 import store from './store';
 import * as pjs from '../../package.json';
 import {setValuesOnNode} from './updateNode';
+import {TokenProps} from '../../types/tokens';
+import {StorageProviderType, StorageType} from '../../types/api';
 import {isSingleToken} from '../app/components/utils';
 
 export function mapValuesToTokens(object, values) {
@@ -19,18 +21,36 @@ export function mapValuesToTokens(object, values) {
     return Object.assign({}, ...array);
 }
 
-export function setTokenData(tokens) {
+export function setTokensOnDocument(tokens, updatedAt: string) {
     figma.root.setSharedPluginData('tokens', 'version', pjs.version);
     figma.root.setSharedPluginData('tokens', 'values', JSON.stringify(tokens));
+    figma.root.setSharedPluginData('tokens', 'updatedAt', updatedAt);
 }
 
-export function getTokenData() {
+export function getTokenData(): {values: TokenProps; updatedAt: string; version: string} {
     const values = figma.root.getSharedPluginData('tokens', 'values');
     const version = figma.root.getSharedPluginData('tokens', 'version');
+    const updatedAt = figma.root.getSharedPluginData('tokens', 'updatedAt');
     if (values) {
         const parsedValues = JSON.parse(values);
-        return {values: parsedValues, version};
+        return {values: parsedValues, updatedAt, version};
     }
+    return null;
+}
+
+// set storage type (i.e. local or some remote provider)
+export function saveStorageType({provider, id, name}: StorageType) {
+    figma.root.setSharedPluginData('tokens', 'storageType', JSON.stringify({provider, id, name}));
+}
+
+export function getSavedStorageType(): StorageType {
+    const values = figma.root.getSharedPluginData('tokens', 'storageType');
+
+    if (values) {
+        const {provider, name, id} = JSON.parse(values);
+        return {provider, name, id};
+    }
+    return {provider: StorageProviderType.LOCAL};
 }
 
 export function goToNode(id) {
