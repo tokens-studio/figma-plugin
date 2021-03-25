@@ -31,7 +31,7 @@ const mappedTokens = (tokens) => {
             property: 'Spacing',
             type: 'spacing',
         },
-        color: {
+        colors: {
             label: 'Colors',
             property: 'Color',
             type: 'color',

@@ -53,7 +53,7 @@ const TokenListing = ({
         setDisplayType,
     } = useTokenDispatch();
 
-    const createButton = tokenType === 'color';
+    const createButton = ['color', 'typography'].includes(tokenType);
     const showDisplayToggle = tokenType === 'color';
 
     const [showHelp, setShowHelp] = React.useState(false);
