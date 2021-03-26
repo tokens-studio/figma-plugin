@@ -126,7 +126,7 @@ export default function TokenSetSelector() {
             </Modal>
 
             {showNewTokenSetFields ? (
-                <form onSubmit={handleNewTokenSetSubmit}>
+                <form onSubmit={handleNewTokenSetSubmit} className="flex-shrink-0">
                     <Input
                         full
                         value={newTokenSetName}
@@ -139,7 +139,7 @@ export default function TokenSetSelector() {
             ) : (
                 <Tooltip label="Add new token set">
                     <button
-                        className="button button-ghost"
+                        className="button button-ghost flex-shrink-0"
                         type="button"
                         disabled={editProhibited}
                         onClick={() => setShowNewTokenSetFields(true)}
