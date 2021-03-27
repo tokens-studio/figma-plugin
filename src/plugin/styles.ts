@@ -15,7 +15,8 @@ import {
 import {notifyStyleValues} from './notifiers';
 
 export const setTextValuesOnTarget = async (target, token) => {
-    const {fontFamily, fontWeight, fontSize, lineHeight, letterSpacing, paragraphSpacing, description} = token;
+    const {value, description} = token;
+    const {fontFamily, fontWeight, fontSize, lineHeight, letterSpacing, paragraphSpacing} = value;
     const family = fontFamily || target.fontName.family;
     const style = fontWeight || target.fontName.style;
     await figma.loadFontAsync({family, style});

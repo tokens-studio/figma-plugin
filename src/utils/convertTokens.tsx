@@ -6,10 +6,16 @@ function checkForTokens({obj, token, root = null, returnValuesOnly = false}): [o
     if (isValueToken(token)) {
         returnValue = token;
     } else if (isTypographyToken(token)) {
-        returnValue = Object.entries(token).reduce((acc, [key, val]) => {
-            acc[key] = isValueToken(val) && returnValuesOnly ? val.value : val;
-            return acc;
-        }, {});
+        returnValue = {
+            value: Object.entries(token).reduce((acc, [key, val]) => {
+                acc[key] = isValueToken(val) && returnValuesOnly ? val.value : val;
+                return acc;
+            }, {}),
+        };
+        if (token.description) {
+            delete returnValue.value.description;
+            returnValue.description = token.description;
+        }
     } else if (typeof token === 'object') {
         Object.entries(token).map(([key, value]) => {
             const [, result] = checkForTokens({
