@@ -7,6 +7,8 @@ global.figma = {
     ui: {
         postMessage: jest.fn(() => Promise.resolve({})),
     },
-    getLocalPaintStyles: jest.fn(() => Promise.resolve()),
-    getLocalTextStyles: jest.fn(() => Promise.resolve()),
+    getLocalPaintStyles: jest.fn(() => []),
+    getLocalTextStyles: jest.fn(() => []),
+    loadFontAsync: jest.fn(() => Promise.resolve()),
+    createTextStyle: jest.fn(),
 };
