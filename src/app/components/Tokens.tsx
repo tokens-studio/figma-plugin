@@ -120,6 +120,8 @@ const Tokens = () => {
                                             fontWeight: '',
                                             lineHeight: '',
                                             fontSize: '',
+                                            letterSpacing: '',
+                                            paragraphSpacing: '',
                                         },
                                         options: {
                                             description: '',

@@ -214,14 +214,18 @@ export default class TokenData {
         }, []);
     }
 
-    setAllAliases(aliasArray = Object.entries(this.mergedTokens)): void {
+    setAllAliases(previousCount = undefined, aliasArray = Object.entries(this.mergedTokens)): void {
         const aliases = this.findAllAliases({arr: aliasArray});
 
         if (aliases.length > 0) {
             aliases.forEach((alias) => {
                 this.setResolvedAlias(this.mergedTokens, alias[0], getAliasValue(alias[1], this.mergedTokens));
             });
-            this.setAllAliases();
+            if (previousCount > aliases.length || !previousCount) {
+                this.setAllAliases(aliases.length);
+            } else {
+                console.log("Unable to resolve some aliases, these wont' resolve:", aliases);
+            }
         }
     }
 
