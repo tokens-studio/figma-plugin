@@ -4,10 +4,13 @@ import MoreButton from './MoreButton';
 import {useTokenState, useTokenDispatch} from '../store/TokenContext';
 import Icon from './Icon';
 import {lightOrDark, colorByHashCode, isTypographyToken} from './utils';
+import useRemoteTokens from '../store/remoteTokens';
 
 const TokenButton = ({type, property, name, path, token, editMode, showForm}) => {
     const {colorMode, displayType, selectionValues, tokenData, disabled, activeTokenSet} = useTokenState();
-    const {setNodeData, setShowOptions, setLoading, deleteToken} = useTokenDispatch();
+    const {setNodeData, setShowOptions, setLoading} = useTokenDispatch();
+    const {deleteSingleToken} = useRemoteTokens();
+
     const displayValue = tokenData.getTokenValue(token);
     let style;
     let showValue = true;
@@ -20,8 +23,10 @@ const TokenButton = ({type, property, name, path, token, editMode, showForm}) =>
         showForm({name, value: token, path});
     };
 
+    // TODO: Move to hook
     const handleDeleteClick = () => {
-        deleteToken({parent: activeTokenSet, path: [path, name].join('.')});
+        deleteSingleToken({parent: activeTokenSet, path: [path, name].join('.')});
+        // deleteToken({parent: activeTokenSet, path: [path, name].join('.')});
     };
 
     function setPluginValue(value) {
@@ -166,8 +171,8 @@ const TokenButton = ({type, property, name, path, token, editMode, showForm}) =>
             <MoreButton
                 properties={properties}
                 onClick={onClick}
-                onEdit={handleEditClick}
                 onDelete={handleDeleteClick}
+                onEdit={handleEditClick}
                 value={name}
                 path={path}
                 mode={editMode ? 'edit' : 'list'}

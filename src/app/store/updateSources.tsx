@@ -45,10 +45,8 @@ async function updateRemoteTokens({
 }
 
 export default async function updateTokensOnSources(state: StateType, updatedAt: string, shouldUpdate = true) {
-    const isNotLocalOrArcade = ![StorageProviderType.LOCAL, StorageProviderType.ARCADE].includes(
-        state.storageType.provider
-    );
-    if (isNotLocalOrArcade && shouldUpdate) {
+    const isLocal = state.storageType.provider === StorageProviderType.LOCAL;
+    if (!isLocal && shouldUpdate && !state.editProhibited) {
         updateRemoteTokens({
             provider: state.storageType.provider,
             tokens: state.tokenData.reduceToValues(),

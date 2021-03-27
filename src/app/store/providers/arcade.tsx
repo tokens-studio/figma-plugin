@@ -43,6 +43,64 @@ export default function useArcade() {
     async function createNewArcade() {
         return null;
     }
+
+    async function editArcadeToken({id, secret, data}) {
+        console.log('Calling edit arcade token', data);
+        const {name, parent, value} = data;
+        const tokenName = [parent, name].join('.');
+        try {
+            const res = await fetch(`https://api.usearcade.com/api/projects/${id}/tokens/${tokenName}`, {
+                method: 'PATCH',
+                body: JSON.stringify({
+                    newToken: {
+                        name: tokenName,
+                        value,
+                    },
+                    from: 'figma',
+                    changeComment: 'Need this to be a shorter name',
+                }),
+                headers: {
+                    'Content-Type': 'application/json',
+                    authorization: `Bearer ${secret}`,
+                },
+            }).then(async (r) => {
+                if (!r.ok) {
+                    throw await r.json();
+                }
+                return r.json();
+            });
+
+            return res.exports;
+        } catch (err) {
+            notifyToUI('Error editing token on Arcade, check console (F12)');
+            console.log('Error editing token on Arcade: ', err);
+        }
+    }
+
+    async function deleteArcadeToken({id, secret, data}) {
+        console.log('Calling delete arcade token', data);
+        const {parent, path} = data;
+        const tokenName = [parent, path].join('.');
+        try {
+            const res = await fetch(`https://api.usearcade.com/api/projects/${id}/tokens/${tokenName}`, {
+                method: 'DELETE',
+                headers: {
+                    authorization: `Bearer ${secret}`,
+                },
+            }).then(async (r) => {
+                if (!r.ok) {
+                    throw await r.json();
+                }
+                return r.json();
+            });
+
+            return res.exports;
+        } catch (err) {
+            notifyToUI('Error editing token on Arcade, check console (F12)');
+            console.log('Error editing token on Arcade: ', err);
+        }
+    }
+
     // Read tokens from Arcade
     async function fetchDataFromArcade(id, secret, name): Promise<TokenProps> {
         console.log('Fetching from arcade', id, secret, name);
@@ -92,6 +150,8 @@ export default function useArcade() {
     return {
         fetchDataFromArcade,
         updateArcadeTokens,
+        editArcadeToken,
+        deleteArcadeToken,
         createNewArcade,
     };
 }

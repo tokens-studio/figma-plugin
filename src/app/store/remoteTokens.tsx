@@ -10,7 +10,7 @@ import {compareUpdatedAt} from '../components/utils';
 export default function useRemoteTokens() {
     const {api, updateAfterApply, tokenData, localApiState} = useTokenState();
     const {setLoading, setTokenData, updateTokens, setApiData, setStorageType} = useTokenDispatch();
-    const {fetchDataFromArcade} = useArcade();
+    const {fetchDataFromArcade, editArcadeToken, deleteArcadeToken} = useArcade();
     const {fetchDataFromJSONBin, createNewJSONBin} = useJSONbin();
 
     const pullTokens = async () => {
@@ -40,6 +40,16 @@ export default function useRemoteTokens() {
         updateTokens(false);
         setLoading(false);
     };
+
+    async function editSingleToken(data) {
+        const {id, secret} = api;
+        editArcadeToken({id, secret, data});
+    }
+
+    async function deleteSingleToken(data) {
+        const {id, secret} = api;
+        deleteArcadeToken({id, secret, data});
+    }
 
     async function fetchDataFromRemote(id, secret, name, provider): Promise<TokenProps> {
         notifyToUI('Fetching remote tokens...');
@@ -99,5 +109,5 @@ export default function useRemoteTokens() {
         }
     }
 
-    return {pullTokens, syncTokens, fetchDataFromRemote, addNewProviderItem};
+    return {pullTokens, editSingleToken, deleteSingleToken, syncTokens, fetchDataFromRemote, addNewProviderItem};
 }

@@ -120,7 +120,7 @@ figma.ui.onmessage = async (msg) => {
             return;
         case MessageToPluginTypes.UPDATE: {
             const allWithData = findAllWithData({pageOnly: msg.updatePageOnly});
-            setTokensOnDocument(msg.tokenValues, msg.updatedAt);
+            if (msg.tokenValues && msg.updatedAt) setTokensOnDocument(msg.tokenValues, msg.updatedAt);
             updateStyles(msg.tokens, false);
             updateNodes(allWithData, msg.tokens);
             updatePluginData(allWithData, {});

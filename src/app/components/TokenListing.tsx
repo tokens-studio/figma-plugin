@@ -41,15 +41,12 @@ const TokenListing = ({
         showOptions,
         tokenData,
         displayType,
-        activeTokenSet,
         editProhibited,
     } = useTokenState();
     const {
         setStringTokens,
         setCollapsed,
         createStyles,
-        updateTokens,
-        setLoading,
         setShowEditForm,
         setShowNewGroupForm,
         setShowOptions,
@@ -105,19 +102,6 @@ const TokenListing = ({
 
     const showNewForm = (path) => {
         showForm({value: '', name: '', path});
-    };
-
-    const submitTokenValue = async ({value, name, path, options}) => {
-        setEditToken({value, name, path});
-        setSingleTokenValue({
-            parent: activeTokenSet,
-            name: [path, name].join('.'),
-            value,
-            options,
-            oldName: editToken.name ? [path, editToken.name].join('.') : null,
-        });
-        await setLoading(true);
-        updateTokens();
     };
 
     React.useEffect(() => {
@@ -219,7 +203,6 @@ const TokenListing = ({
                             {showEditForm && (
                                 <EditTokenForm
                                     explainer={explainer}
-                                    submitTokenValue={submitTokenValue}
                                     initialName={editToken.name}
                                     path={editToken.path}
                                     property={property}

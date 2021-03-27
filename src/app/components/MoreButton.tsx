@@ -5,6 +5,7 @@ import {useTokenState} from '../store/TokenContext';
 
 const MoreButton = ({properties, children, path, value, onClick, onEdit, onDelete, mode}) => {
     const {selectionValues, editProhibited} = useTokenState();
+
     const visibleProperties = properties.filter((p) => p.label);
 
     return (
