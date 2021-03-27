@@ -35,6 +35,10 @@ async function updateRemoteTokens({
             });
             break;
         }
+        case StorageProviderType.ARCADE: {
+            console.log('Updating tokens', tokens);
+            break;
+        }
         default:
             throw new Error('Not implemented');
     }

@@ -111,7 +111,7 @@ const emptyState = {
     editProhibited: true,
     changelog: [],
     lastOpened: '',
-    syncEnabled: false,
+    syncEnabled: true,
 };
 
 const TokenStateContext = React.createContext(emptyState);
@@ -329,7 +329,7 @@ function stateReducer(state, action) {
             }
             return {
                 ...state,
-                editProhibited: action.data.provider === StorageProviderType.ARCADE,
+                editProhibited: false,
                 storageType: action.data,
             };
         case ActionType.SetChangelog:
