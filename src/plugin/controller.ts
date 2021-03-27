@@ -5,7 +5,8 @@ import 'regenerator-runtime/runtime';
 import {removeSingleCredential, updateCredentials} from '@/utils/credentials';
 import getLastOpened from '@/utils/getLastOpened';
 import {getUserId} from './helpers';
-import {pullStyles, updateStyles} from './styles';
+import pullStyles from './pullStyles';
+import updateStyles from './updateStyles';
 import store from './store';
 import {
     notifyNoSelection,
