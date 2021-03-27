@@ -5,7 +5,8 @@ import 'regenerator-runtime/runtime';
 import {removeSingleCredential, updateCredentials} from '@/utils/credentials';
 import getLastOpened from '@/utils/getLastOpened';
 import {getUserId} from './helpers';
-import {pullStyles, updateStyles} from './styles';
+import pullStyles from './pullStyles';
+import updateStyles from './updateStyles';
 import store from './store';
 import {
     notifyNoSelection,
@@ -53,7 +54,6 @@ figma.ui.onmessage = async (msg) => {
 
                 if (apiProviders) notifyAPIProviders(JSON.parse(apiProviders));
                 switch (storageType.provider) {
-                    //   Somehow setting this to an ENUM doesn't work :-|
                     case StorageProviderType.JSONBIN:
                     case StorageProviderType.ARCADE: {
                         compareProvidersWithStored(apiProviders, storageType);

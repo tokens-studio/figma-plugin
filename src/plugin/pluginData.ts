@@ -1,4 +1,4 @@
-import {removeValuesFromNode} from './updateNode';
+import removeValuesFromNode from './removeValuesFromNode';
 import {notifySelection} from './notifiers';
 import store from './store';
 import properties from '../config/properties';
