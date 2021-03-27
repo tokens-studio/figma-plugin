@@ -7,7 +7,7 @@ import {useTokenDispatch} from '../TokenContext';
 async function readTokensFromArcade({secret, id}): Promise<TokenProps> | null {
     try {
         const res = await fetch(
-            `https://api.usearcade.com/api/projects/${id}/tokens/live/export/figma-tokens-plugin/raw`,
+            `https://api.usearcade.com/api/projects/${id}/tokens/draft/export/figma-tokens-plugin/raw`,
             {
                 headers: {
                     authorization: `Bearer ${secret}`,
@@ -17,8 +17,11 @@ async function readTokensFromArcade({secret, id}): Promise<TokenProps> | null {
             if (!r.ok) {
                 throw await r.json();
             }
+            console.log('r', r);
             return r.json();
         });
+
+        console.log('RES IS', res);
 
         return res.exports;
     } catch (err) {
@@ -61,30 +64,6 @@ export default function useArcade() {
                 }),
                 headers: {
                     'Content-Type': 'application/json',
-                    authorization: `Bearer ${secret}`,
-                },
-            }).then(async (r) => {
-                if (!r.ok) {
-                    throw await r.json();
-                }
-                return r.json();
-            });
-
-            return res.exports;
-        } catch (err) {
-            notifyToUI('Error editing token on Arcade, check console (F12)');
-            console.log('Error editing token on Arcade: ', err);
-        }
-    }
-
-    async function deleteArcadeToken({id, secret, data}) {
-        console.log('Calling delete arcade token', data);
-        const {parent, path} = data;
-        const tokenName = [parent, path].join('.');
-        try {
-            const res = await fetch(`https://api.usearcade.com/api/projects/${id}/tokens/${tokenName}`, {
-                method: 'DELETE',
-                headers: {
                     authorization: `Bearer ${secret}`,
                 },
             }).then(async (r) => {
@@ -144,6 +123,31 @@ export default function useArcade() {
             }
         } catch (e) {
             return null;
+        }
+    }
+
+    async function deleteArcadeToken({id, secret, data}) {
+        console.log('Calling delete arcade token', data);
+        const {parent, path} = data;
+        const tokenName = [parent, path].join('.');
+        try {
+            const res = await fetch(`https://api.usearcade.com/api/projects/${id}/tokens/${tokenName}`, {
+                method: 'DELETE',
+                headers: {
+                    authorization: `Bearer ${secret}`,
+                },
+            }).then(async (r) => {
+                if (!r.ok) {
+                    throw await r.json();
+                }
+                return r.json();
+            });
+            if (res) {
+                console.log('Success');
+            }
+        } catch (err) {
+            notifyToUI('Error editing token on Arcade, check console (F12)');
+            console.log('Error editing token on Arcade: ', err);
         }
     }
 
