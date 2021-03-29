@@ -1,6 +1,7 @@
 /* eslint-disable class-methods-use-this */
 import JSON5 from 'json5';
 import objectPath from 'object-path';
+import set from 'set-value';
 import checkIfValueToken from '@/utils/checkIfValueToken';
 import {getAliasValue} from '@/utils/aliases';
 import checkIfAlias from '@/utils/checkIfAlias';
@@ -66,12 +67,19 @@ export default class TokenData {
 
     injectTokens(tokens, activeTokenSet): void {
         const receivedStyles = {};
+        const oldValues = JSON5.parse(this.tokens[activeTokenSet].values);
+
+        // Iterate over received styles to set a value if no value existed before.
         Object.entries(tokens).map(([parent, values]: [string, SingleToken[]]) => {
             values.map((token: TokenGroup) => {
-                mergeDeep(receivedStyles, {[parent]: this.convertDotPathToNestedObject(token[0], token[1])});
+                const key = `${parent}/${token[0]}`.split('/').join('.');
+                const oldValue = objectPath.get(oldValues, key);
+                set(receivedStyles, key, oldValue || token[1]);
             });
         });
-        const newTokens = mergeDeep(JSON5.parse(this.tokens[activeTokenSet].values), receivedStyles);
+
+        // Merge again with old tokens object to preserve tokens that don't exist as styles
+        const newTokens = mergeDeep(oldValues, receivedStyles);
         this.tokens[activeTokenSet].values = JSON.stringify(newTokens, null, 2);
         this.setMergedTokens();
     }
