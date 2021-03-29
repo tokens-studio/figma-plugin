@@ -9,7 +9,7 @@ import {compareUpdatedAt} from '../components/utils';
 
 export default function useRemoteTokens() {
     const {api, updateAfterApply, tokenData, localApiState} = useTokenState();
-    const {setLoading, setTokenData, updateTokens, setApiData, setStorageType} = useTokenDispatch();
+    const {setLoading, setTokenData, updateTokens, setApiData, setStorageType, updateSingleToken} = useTokenDispatch();
     const {fetchDataFromArcade, editArcadeToken, deleteArcadeToken} = useArcade();
     const {fetchDataFromJSONBin, createNewJSONBin} = useJSONbin();
 
@@ -41,11 +41,27 @@ export default function useRemoteTokens() {
         setLoading(false);
     };
 
-    async function editSingleToken(data) {
+    async function editSingleToken(data: {
+        parent: string;
+        name: string;
+        value: string;
+        options?: object;
+        oldName?: string;
+    }) {
+        const {parent, name, value, options, oldName} = data;
         setLoading(true);
         const {id, secret} = api;
         const response = await editArcadeToken({id, secret, data});
         console.log('done editing', response);
+        updateSingleToken({
+            parent,
+            name,
+            value,
+            options,
+            oldName,
+        });
+        await setLoading(true);
+        updateTokens();
         setLoading(false);
     }
 

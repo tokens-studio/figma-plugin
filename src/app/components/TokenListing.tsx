@@ -1,6 +1,4 @@
 import * as React from 'react';
-import objectPath from 'object-path';
-import JSON5 from 'json5';
 import {useTokenDispatch, useTokenState} from '../store/TokenContext';
 import EditTokenForm from './EditTokenForm';
 import Heading from './Heading';
@@ -34,23 +32,15 @@ const TokenListing = ({
     type?: string;
     values?: string | object;
 }) => {
+    const {collapsed, showEditForm, showNewGroupForm, showOptions, displayType, editProhibited} = useTokenState();
     const {
-        collapsed,
-        showEditForm,
-        showNewGroupForm,
-        showOptions,
-        tokenData,
-        displayType,
-        editProhibited,
-    } = useTokenState();
-    const {
-        setStringTokens,
         setCollapsed,
         createStyles,
         setShowEditForm,
         setShowNewGroupForm,
         setShowOptions,
         setDisplayType,
+        updateSingleToken,
     } = useTokenDispatch();
 
     const [showHelp, setShowHelp] = React.useState(false);
@@ -61,34 +51,6 @@ const TokenListing = ({
         name: '',
         path: '',
     });
-
-    function setSingleTokenValue({parent, name, value, options, oldName, newGroup = false}) {
-        const obj = JSON5.parse(tokenData.tokens[parent].values);
-        let newValue;
-        if (newGroup) {
-            newValue = {};
-        } else {
-            newValue = options
-                ? {
-                      value,
-                      ...options,
-                  }
-                : {
-                      value,
-                  };
-        }
-        const newName = name.toString();
-        objectPath.set(obj, newName, newValue);
-        if (oldName === newName || !oldName) {
-            setStringTokens({parent, tokens: JSON.stringify(obj, null, 2)});
-        } else {
-            objectPath.del(obj, oldName);
-            setStringTokens({
-                parent,
-                tokens: JSON.stringify(obj, null, 2).split(`$${oldName}`).join(`$${name}`),
-            });
-        }
-    }
 
     const closeForm = () => {
         setShowOptions('');
@@ -213,7 +175,7 @@ const TokenListing = ({
                                 />
                             )}
                             {showNewGroupForm && (
-                                <NewGroupForm path={values[0]} setSingleTokenValue={setSingleTokenValue} />
+                                <NewGroupForm path={values[0]} setSingleTokenValue={updateSingleToken} />
                             )}
 
                             <div className="px-4 pb-4">

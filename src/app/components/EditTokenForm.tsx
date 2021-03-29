@@ -16,7 +16,7 @@ const EditTokenForm = ({
 }) => {
     const title = isPristine ? `New Token in ${path}` : `${path}.${initialName}`;
     const {activeTokenSet} = useTokenState();
-    const {setLoading, setShowEditForm} = useTokenDispatch();
+    const {setShowEditForm} = useTokenDispatch();
     const {editSingleToken} = useRemoteTokens();
 
     const defaultValue = {
@@ -50,6 +50,7 @@ const EditTokenForm = ({
         editSingleToken({
             parent: activeTokenSet,
             name: [path, name].join('.'),
+            oldName: initialName,
             value,
             options,
         });

@@ -54,6 +54,7 @@ export enum ActionType {
     SetProjectURL = 'SET_PROJECT_URL',
     SetChangelog = 'SET_CHANGELOG',
     SetLastOpened = 'SET_LAST_OPENED',
+    UpdateSingleToken = 'UPDATE_SINGLE_TOKEN',
 }
 
 const defaultTokens: TokenProps = {
@@ -198,6 +199,40 @@ function stateReducer(state, action) {
                 loading: false,
                 selectionValues: action.data,
             };
+        case ActionType.UpdateSingleToken: {
+            const {parent, value, newGroup, options, name, oldName, updatedAt} = action.data;
+            const obj = JSON.parse(state.tokenData.tokens[parent].values);
+            let newValue;
+            if (newGroup) {
+                newValue = {};
+            } else {
+                newValue = options
+                    ? {
+                          value,
+                          ...options,
+                      }
+                    : {
+                          value,
+                      };
+            }
+            const newName = name.toString();
+            objectPath.set(obj, newName, newValue);
+            if (oldName === newName || !oldName) {
+                state.tokenData.updateTokenValues(parent, JSON.stringify(obj, null, 2), updatedAt);
+            } else {
+                objectPath.del(obj, oldName);
+                state.tokenData.updateTokenValues(
+                    parent,
+                    JSON.stringify(obj, null, 2).split(`$${oldName}`).join(`$${name}`),
+                    updatedAt
+                );
+            }
+
+            return {
+                ...state,
+                tokenData: state.tokenData,
+            };
+        }
         case ActionType.ToggleUsedTokenSet: {
             const newState = {
                 ...state,
@@ -467,6 +502,17 @@ function TokenProvider({children}) {
             },
             setLastOpened: (data: Date) => {
                 dispatch({type: ActionType.SetLastOpened, data, dispatch});
+            },
+            updateSingleToken: (data: {
+                parent: string;
+                value: string;
+                newGroup?: boolean;
+                options?: object;
+                name: string;
+                oldName?: string;
+                updatedAt: Date;
+            }) => {
+                dispatch({type: ActionType.UpdateSingleToken, data});
             },
         }),
         [dispatch, updatedAt]
