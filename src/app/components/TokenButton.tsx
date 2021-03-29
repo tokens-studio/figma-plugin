@@ -4,12 +4,12 @@ import MoreButton from './MoreButton';
 import {useTokenState, useTokenDispatch} from '../store/TokenContext';
 import Icon from './Icon';
 import {lightOrDark, colorByHashCode, isTypographyToken} from './utils';
-import useRemoteTokens from '../store/remoteTokens';
+import useManageTokens from '../store/useManageTokens';
 
 const TokenButton = ({type, property, name, path, token, editMode, showForm}) => {
     const {colorMode, displayType, selectionValues, tokenData, disabled, activeTokenSet} = useTokenState();
     const {setNodeData, setShowOptions, setLoading} = useTokenDispatch();
-    const {deleteSingleToken} = useRemoteTokens();
+    const {deleteSingleToken} = useManageTokens();
 
     const displayValue = tokenData.getTokenValue(token);
     let style;

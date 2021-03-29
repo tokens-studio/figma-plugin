@@ -90,6 +90,49 @@ export default function useArcade() {
         }
     }
 
+    async function createArcadeToken({id, secret, data}): Promise<boolean> {
+        console.log('Calling create arcade token', data);
+        const {name, parent, value, options} = data;
+        const {description} = options;
+        const tokenName = [parent, name].join('.');
+        const tokenObj: {
+            name: string;
+            value: string;
+            description?: string;
+        } = {
+            name: tokenName,
+            value,
+        };
+        if (description) {
+            tokenObj.description = description;
+        }
+        try {
+            await fetch(`https://api.usearcade.com/api/projects/${id}/tokens`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    ...tokenObj,
+                    from: 'figma',
+                    changeComment: 'Need this to be a shorter name',
+                }),
+                headers: {
+                    'Content-Type': 'application/json',
+                    authorization: `Bearer ${secret}`,
+                },
+            }).then(async (r) => {
+                if (!r.ok) {
+                    throw await r.json();
+                }
+                return r.json();
+            });
+
+            return true;
+        } catch (err) {
+            notifyToUI('Error creating token on Arcade, check console (F12)');
+            console.log('Error creating token on Arcade: ', err);
+            return false;
+        }
+    }
+
     // Read tokens from Arcade
     async function fetchDataFromArcade(id, secret, name): Promise<TokenProps> {
         console.log('Fetching from arcade', id, secret, name);
@@ -164,6 +207,7 @@ export default function useArcade() {
     return {
         fetchDataFromArcade,
         updateArcadeTokens,
+        createArcadeToken,
         editArcadeToken,
         deleteArcadeToken,
         createNewArcade,

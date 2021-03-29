@@ -1,13 +1,15 @@
 import * as React from 'react';
 import {useTokenDispatch, useTokenState} from '../store/TokenContext';
+import useManageTokens from '../store/useManageTokens';
 import Input from './Input';
 import Modal from './Modal';
 
-const NewGroupForm = ({path, setSingleTokenValue}) => {
+const NewGroupForm = ({path}) => {
     const title = 'Create new group';
     const [name, setName] = React.useState('');
-    const {setShowNewGroupForm, setLoading, updateTokens} = useTokenDispatch();
+    const {setShowNewGroupForm} = useTokenDispatch();
     const {activeTokenSet} = useTokenState();
+    const {editSingleToken} = useManageTokens();
 
     const handleChange = (e) => {
         e.persist();
@@ -16,16 +18,13 @@ const NewGroupForm = ({path, setSingleTokenValue}) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        await setLoading(true);
-
-        setSingleTokenValue({
+        editSingleToken({
             parent: activeTokenSet,
             name: [path, name].join('.'),
             value: {},
             newGroup: true,
         });
 
-        updateTokens();
         setShowNewGroupForm(false);
     };
 

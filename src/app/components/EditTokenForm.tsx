@@ -1,6 +1,6 @@
 import * as React from 'react';
-import useRemoteTokens from '../store/remoteTokens';
 import {useTokenDispatch, useTokenState} from '../store/TokenContext';
+import useManageTokens from '../store/useManageTokens';
 import Input from './Input';
 import Modal from './Modal';
 
@@ -17,7 +17,7 @@ const EditTokenForm = ({
     const title = isPristine ? `New Token in ${path}` : `${path}.${initialName}`;
     const {activeTokenSet} = useTokenState();
     const {setShowEditForm} = useTokenDispatch();
-    const {editSingleToken} = useRemoteTokens();
+    const {editSingleToken, createSingleToken} = useManageTokens();
 
     const defaultValue = {
         value: initialValue.value ?? initialValue,
@@ -47,13 +47,26 @@ const EditTokenForm = ({
     };
 
     const submitTokenValue = async ({value, name, options}) => {
-        editSingleToken({
-            parent: activeTokenSet,
-            name: [path, name].join('.'),
-            oldName: initialName,
-            value,
-            options,
-        });
+        let oldName;
+        if (initialName !== name && initialName) {
+            oldName = [path, initialName].join('.');
+        }
+        if (initialName) {
+            editSingleToken({
+                parent: activeTokenSet,
+                name: [path, name].join('.'),
+                oldName,
+                value,
+                options,
+            });
+        } else {
+            createSingleToken({
+                parent: activeTokenSet,
+                name: [path, name].join('.'),
+                value,
+                options,
+            });
+        }
     };
 
     const handleSubmit = (e) => {

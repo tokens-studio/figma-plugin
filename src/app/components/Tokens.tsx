@@ -7,10 +7,14 @@ import Button from './Button';
 import TokenSetSelector from './TokenSetSelector';
 
 const mappedTokens = (tokens) => {
+    const tokenObj = {};
+    Object.assign(tokenObj, tokens);
+    if (!tokens.color) {
+        Object.assign(tokenObj, {colors: {}});
+    }
     const properties = {
         sizing: {},
         spacing: {},
-        colors: {},
         borderRadius: {},
         borderWidth: {},
         opacity: {},
@@ -22,7 +26,8 @@ const mappedTokens = (tokens) => {
         paragraphSpacing: {},
         typography: {},
     };
-    return Object.entries(Object.assign(properties, tokens));
+    Object.assign(tokenObj, properties);
+    return Object.entries(tokenObj);
 };
 
 const Tokens = () => {

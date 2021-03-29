@@ -1,4 +1,4 @@
-import {TokenProps} from '../../../types/tokens';
+import {SingleToken, TokenProps} from '../../../types/tokens';
 import {StorageProviderType} from '../../../types/api';
 import {notifyToUI} from '../../plugin/notifiers';
 import {useJSONbin} from './providers/jsonbin';
@@ -10,7 +10,7 @@ import {compareUpdatedAt} from '../components/utils';
 export default function useRemoteTokens() {
     const {api, updateAfterApply, tokenData, localApiState} = useTokenState();
     const {setLoading, setTokenData, updateTokens, setApiData, setStorageType, updateSingleToken} = useTokenDispatch();
-    const {fetchDataFromArcade, editArcadeToken, deleteArcadeToken} = useArcade();
+    const {fetchDataFromArcade, editArcadeToken, createArcadeToken, deleteArcadeToken} = useArcade();
     const {fetchDataFromJSONBin, createNewJSONBin} = useJSONbin();
 
     const pullTokens = async () => {
@@ -41,10 +41,10 @@ export default function useRemoteTokens() {
         setLoading(false);
     };
 
-    async function editSingleToken(data: {
+    async function editRemoteToken(data: {
         parent: string;
         name: string;
-        value: string;
+        value: SingleToken;
         options?: object;
         oldName?: string;
     }) {
@@ -52,20 +52,30 @@ export default function useRemoteTokens() {
         setLoading(true);
         const {id, secret} = api;
         const response = await editArcadeToken({id, secret, data});
-        console.log('done editing', response);
-        updateSingleToken({
-            parent,
-            name,
-            value,
-            options,
-            oldName,
-        });
-        await setLoading(true);
-        updateTokens();
+        if (response) {
+            updateSingleToken({
+                parent,
+                name,
+                value,
+                options,
+                oldName,
+            });
+            updateTokens();
+        }
         setLoading(false);
     }
 
-    async function deleteSingleToken(data) {
+    async function createRemoteToken(data: {parent: string; name: string; value: SingleToken; options?: object}) {
+        setLoading(true);
+        const {id, secret} = api;
+        const response = await createArcadeToken({id, secret, data});
+        if (response) {
+            console.log('response', response);
+        }
+        setLoading(false);
+    }
+
+    async function deleteRemoteToken(data) {
         const {id, secret} = api;
         deleteArcadeToken({id, secret, data});
     }
@@ -128,5 +138,13 @@ export default function useRemoteTokens() {
         }
     }
 
-    return {pullTokens, editSingleToken, deleteSingleToken, syncTokens, fetchDataFromRemote, addNewProviderItem};
+    return {
+        pullTokens,
+        editRemoteToken,
+        createRemoteToken,
+        deleteRemoteToken,
+        syncTokens,
+        fetchDataFromRemote,
+        addNewProviderItem,
+    };
 }

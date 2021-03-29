@@ -5,7 +5,7 @@ import fetchChangelog from '@/utils/storyblok';
 import defaultJSON from '../../config/default.json';
 import TokenData from '../components/TokenData';
 import * as pjs from '../../../package.json';
-import {TokenProps} from '../../../types/tokens';
+import {SingleToken, TokenProps} from '../../../types/tokens';
 import {StorageProviderType, ApiDataType, StorageType} from '../../../types/api';
 import {postToFigma} from '../../plugin/notifiers';
 import {MessageToPluginTypes} from '../../../types/messages';
@@ -505,7 +505,7 @@ function TokenProvider({children}) {
             },
             updateSingleToken: (data: {
                 parent: string;
-                value: string;
+                value: SingleToken;
                 newGroup?: boolean;
                 options?: object;
                 name: string;
