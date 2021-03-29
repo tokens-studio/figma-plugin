@@ -47,18 +47,27 @@ export default function useArcade() {
         return null;
     }
 
-    async function editArcadeToken({id, secret, data}) {
+    async function editArcadeToken({id, secret, data}): Promise<boolean> {
         console.log('Calling edit arcade token', data);
-        const {name, parent, value} = data;
+        const {name, parent, value, options} = data;
+        const {description} = options;
         const tokenName = [parent, name].join('.');
+        const newToken: {
+            name: string;
+            value: string;
+            description?: string;
+        } = {
+            name: tokenName,
+            value,
+        };
+        if (description) {
+            newToken.description = description;
+        }
         try {
-            const res = await fetch(`https://api.usearcade.com/api/projects/${id}/tokens/${tokenName}`, {
+            await fetch(`https://api.usearcade.com/api/projects/${id}/tokens/${tokenName}`, {
                 method: 'PATCH',
                 body: JSON.stringify({
-                    newToken: {
-                        name: tokenName,
-                        value,
-                    },
+                    newToken,
                     from: 'figma',
                     changeComment: 'Need this to be a shorter name',
                 }),
@@ -73,10 +82,11 @@ export default function useArcade() {
                 return r.json();
             });
 
-            return res.exports;
+            return true;
         } catch (err) {
             notifyToUI('Error editing token on Arcade, check console (F12)');
             console.log('Error editing token on Arcade: ', err);
+            return false;
         }
     }
 

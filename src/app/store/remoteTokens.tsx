@@ -42,8 +42,11 @@ export default function useRemoteTokens() {
     };
 
     async function editSingleToken(data) {
+        setLoading(true);
         const {id, secret} = api;
-        editArcadeToken({id, secret, data});
+        const response = await editArcadeToken({id, secret, data});
+        console.log('done editing', response);
+        setLoading(false);
     }
 
     async function deleteSingleToken(data) {

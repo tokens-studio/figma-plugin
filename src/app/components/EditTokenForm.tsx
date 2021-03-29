@@ -47,7 +47,6 @@ const EditTokenForm = ({
     };
 
     const submitTokenValue = async ({value, name, options}) => {
-        await setLoading(true);
         editSingleToken({
             parent: activeTokenSet,
             name: [path, name].join('.'),
