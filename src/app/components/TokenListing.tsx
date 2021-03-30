@@ -7,6 +7,7 @@ import Modal from './Modal';
 import renderKeyValue from './renderKeyValue';
 import Tooltip from './Tooltip';
 import NewGroupForm from './NewGroupForm';
+import {TokenType} from '../../../types/tokens';
 
 const TokenListing = ({
     label,
@@ -16,7 +17,7 @@ const TokenListing = ({
     createButton = false,
     showDisplayToggle = false,
     property,
-    type = '',
+    type = 'implicit',
     values,
 }: {
     label: string;
@@ -29,7 +30,7 @@ const TokenListing = ({
     createButton?: boolean;
     showDisplayToggle?: boolean;
     property: string;
-    type?: string;
+    type?: TokenType;
     values?: string | object;
 }) => {
     const {collapsed, showEditForm, showNewGroupForm, showOptions, displayType, editProhibited} = useTokenState();
@@ -40,7 +41,6 @@ const TokenListing = ({
         setShowNewGroupForm,
         setShowOptions,
         setDisplayType,
-        updateSingleToken,
     } = useTokenDispatch();
 
     const [showHelp, setShowHelp] = React.useState(false);
@@ -172,11 +172,10 @@ const TokenListing = ({
                                     initialValue={editToken.value}
                                     schema={schema?.value}
                                     optionsSchema={schema?.options}
+                                    type={type}
                                 />
                             )}
-                            {showNewGroupForm && (
-                                <NewGroupForm path={values[0]} setSingleTokenValue={updateSingleToken} />
-                            )}
+                            {showNewGroupForm && <NewGroupForm path={values[0]} />}
 
                             <div className="px-4 pb-4">
                                 {renderKeyValue({

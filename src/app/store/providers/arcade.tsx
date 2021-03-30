@@ -1,7 +1,7 @@
 import {notifyToUI, postToFigma} from '../../../plugin/notifiers';
 import {StorageProviderType} from '../../../../types/api';
 import {MessageToPluginTypes} from '../../../../types/messages';
-import {TokenProps} from '../../../../types/tokens';
+import {TokenProps, TokenType} from '../../../../types/tokens';
 import {useTokenDispatch} from '../TokenContext';
 
 async function readTokensFromArcade({secret, id}): Promise<TokenProps> | null {
@@ -50,18 +50,22 @@ export default function useArcade() {
     async function editArcadeToken({id, secret, data}): Promise<boolean> {
         console.log('Calling edit arcade token', data);
         const {name, parent, value, options} = data;
-        const {description} = options;
+        const {description, type} = options;
         const tokenName = [parent, name].join('.');
         const newToken: {
             name: string;
             value: string;
             description?: string;
+            type?: string;
         } = {
             name: tokenName,
             value,
         };
         if (description) {
             newToken.description = description;
+        }
+        if (type) {
+            newToken.type = type;
         }
         try {
             await fetch(`https://api.usearcade.com/api/projects/${id}/tokens/${tokenName}`, {
@@ -92,19 +96,23 @@ export default function useArcade() {
 
     async function createArcadeToken({id, secret, data}): Promise<boolean> {
         console.log('Calling create arcade token', data);
-        const {name, parent, value, options} = data;
-        const {description} = options;
+        const {name, parent, value, options = {}} = data;
+        const {description, type} = options;
         const tokenName = [parent, name].join('.');
         const tokenObj: {
             name: string;
             value: string;
             description?: string;
+            type?: TokenType;
         } = {
             name: tokenName,
             value,
         };
         if (description) {
             tokenObj.description = description;
+        }
+        if (type) {
+            tokenObj.type = type;
         }
         try {
             await fetch(`https://api.usearcade.com/api/projects/${id}/tokens`, {

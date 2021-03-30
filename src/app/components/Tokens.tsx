@@ -1,6 +1,7 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import * as React from 'react';
 import JSON5 from 'json5';
+import {mergeDeep} from '@/plugin/helpers';
 import {useTokenDispatch, useTokenState} from '../store/TokenContext';
 import TokenListing from './TokenListing';
 import Button from './Button';
@@ -26,7 +27,7 @@ const mappedTokens = (tokens) => {
         paragraphSpacing: {},
         typography: {},
     };
-    Object.assign(tokenObj, properties);
+    mergeDeep(tokenObj, properties);
     return Object.entries(tokenObj);
 };
 
@@ -87,7 +88,7 @@ const Tokens = () => {
                                     help="If a (local) style is found with the same name it will match to that, if not, will use hex value. Use 'Create Style' to batch-create styles from your tokens (e.g. in your design library). In the future we'll load all 'remote' styles and reference them inside the JSON."
                                     label="Colors"
                                     property="Color"
-                                    type="fill"
+                                    type="color"
                                     schema={{
                                         value: 'color',
                                         options: {
@@ -101,13 +102,13 @@ const Tokens = () => {
                     case 'sizing':
                         return (
                             <div key={tokenValues[0]}>
-                                <TokenListing label="Sizing" property="Sizing" type="sizing" values={tokenValues} />
+                                <TokenListing label="Sizing" property="Sizing" type="size" values={tokenValues} />
                             </div>
                         );
                     case 'spacing':
                         return (
                             <React.Fragment key={tokenValues[0]}>
-                                <TokenListing property="Spacing" label="Spacing" type="spacing" values={tokenValues} />
+                                <TokenListing property="Spacing" label="Spacing" type="space" values={tokenValues} />
                             </React.Fragment>
                         );
                     case 'typography':
@@ -213,7 +214,7 @@ const Tokens = () => {
                                 property={tokenValues[0]}
                                 label={tokenValues[0]}
                                 values={tokenValues}
-                                type={tokenValues[0]}
+                                type="implicit"
                             />
                         );
                 }

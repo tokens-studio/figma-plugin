@@ -9,7 +9,7 @@ const NewGroupForm = ({path}) => {
     const [name, setName] = React.useState('');
     const {setShowNewGroupForm} = useTokenDispatch();
     const {activeTokenSet} = useTokenState();
-    const {editSingleToken} = useManageTokens();
+    const {createSingleToken} = useManageTokens();
 
     const handleChange = (e) => {
         e.persist();
@@ -18,7 +18,7 @@ const NewGroupForm = ({path}) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        editSingleToken({
+        createSingleToken({
             parent: activeTokenSet,
             name: [path, name].join('.'),
             value: {},

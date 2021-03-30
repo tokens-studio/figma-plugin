@@ -13,6 +13,7 @@ const EditTokenForm = ({
     path,
     schema,
     optionsSchema,
+    type,
 }) => {
     const title = isPristine ? `New Token in ${path}` : `${path}.${initialName}`;
     const {activeTokenSet} = useTokenState();
@@ -23,6 +24,7 @@ const EditTokenForm = ({
         value: initialValue.value ?? initialValue,
         options: {
             description: initialValue.description,
+            type,
         },
         name: initialName,
     };
@@ -51,18 +53,18 @@ const EditTokenForm = ({
         if (initialName !== name && initialName) {
             oldName = [path, initialName].join('.');
         }
-        if (initialName) {
-            editSingleToken({
+        if (isPristine) {
+            createSingleToken({
                 parent: activeTokenSet,
                 name: [path, name].join('.'),
-                oldName,
                 value,
                 options,
             });
         } else {
-            createSingleToken({
+            editSingleToken({
                 parent: activeTokenSet,
                 name: [path, name].join('.'),
+                oldName,
                 value,
                 options,
             });

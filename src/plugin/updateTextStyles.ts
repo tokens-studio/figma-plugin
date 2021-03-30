@@ -1,13 +1,11 @@
-import {convertToTokenArray} from '../utils/convertTokens';
 import {TypographyToken} from '../../types/propertyTypes';
 import setTextValuesOnTarget from './setTextValuesOnTarget';
 
 export default function updateTextStyles(textTokens, shouldCreate = false) {
     // Iterate over textTokens to create objects that match figma styles
-    const textTokenArray = convertToTokenArray(textTokens, true);
     const textStyles = figma.getLocalTextStyles();
 
-    textTokenArray.map(([key, value]: [string, TypographyToken]) => {
+    textTokens.map(([key, value]: [string, TypographyToken]) => {
         let matchingStyles = [];
         if (textStyles.length > 0) {
             matchingStyles = textStyles.filter((n) => {

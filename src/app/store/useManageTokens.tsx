@@ -1,4 +1,4 @@
-import {SingleToken} from '../../../types/tokens';
+import {SingleToken, TokenType} from '../../../types/tokens';
 import {StorageProviderType} from '../../../types/api';
 import useRemoteTokens from './remoteTokens';
 import {useTokenDispatch, useTokenState} from './TokenContext';
@@ -12,7 +12,7 @@ export default function useManageTokens() {
         parent: string;
         name: string;
         value: SingleToken;
-        options?: object;
+        options?: {description?: string; type: TokenType};
         oldName?: string;
     }) {
         const {parent, name, value, options, oldName} = data;
@@ -20,9 +20,7 @@ export default function useManageTokens() {
         const isLocal = storageType.provider === StorageProviderType.LOCAL;
         if (!isLocal) {
             const response = await editRemoteToken(data);
-            console.log('done editing', response);
         }
-        console.log('Old name was', oldName, typeof oldName);
         updateSingleToken({
             parent,
             name,
@@ -38,7 +36,7 @@ export default function useManageTokens() {
         parent: string;
         name: string;
         value: SingleToken;
-        options?: object;
+        options?: {description?: string; type: TokenType};
         newGroup?: boolean;
     }) {
         const {parent, name, value, options, newGroup = false} = data;
@@ -46,7 +44,6 @@ export default function useManageTokens() {
         const isLocal = storageType.provider === StorageProviderType.LOCAL;
         if (!isLocal) {
             const response = await createRemoteToken(data);
-            console.log('done editing', response);
         }
         updateSingleToken({
             parent,
@@ -64,7 +61,6 @@ export default function useManageTokens() {
         const isLocal = storageType.provider === StorageProviderType.LOCAL;
         if (!isLocal) {
             const response = await deleteRemoteToken(data);
-            console.log('done editing', response);
         }
         deleteToken(data);
         setLoading(false);

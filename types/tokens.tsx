@@ -20,3 +20,21 @@ export interface TokenObject {
     hasErrored?: boolean;
     values: string;
 }
+
+export type TokenType =
+    | 'color'
+    | 'implicit'
+    | 'borderRadius'
+    | 'size'
+    | 'space'
+    | 'text'
+    | 'typography'
+    | 'opacity'
+    | 'borderWidth'
+    | 'shadow'
+    | 'fontFamilies'
+    | 'fontWeights'
+    | 'lineHeights'
+    | 'fontSizes'
+    | 'letterSpacing'
+    | 'paragraphSpacing';

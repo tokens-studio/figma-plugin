@@ -6,7 +6,7 @@ import fetchChangelog from '@/utils/storyblok';
 import defaultJSON from '../../config/default.json';
 import TokenData from '../components/TokenData';
 import * as pjs from '../../../package.json';
-import {SingleToken, TokenProps} from '../../../types/tokens';
+import {SingleToken, TokenProps, TokenType} from '../../../types/tokens';
 import {StorageProviderType, ApiDataType, StorageType} from '../../../types/api';
 import {postToFigma} from '../../plugin/notifiers';
 import {MessageToPluginTypes} from '../../../types/messages';

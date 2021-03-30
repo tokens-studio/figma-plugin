@@ -113,6 +113,7 @@ figma.ui.onmessage = async (msg) => {
             return;
         case MessageToPluginTypes.CREATE_STYLES:
             try {
+                console.log('Updating styles', msg.tokens);
                 updateStyles(msg.tokens, true);
             } catch (e) {
                 console.error(e);
