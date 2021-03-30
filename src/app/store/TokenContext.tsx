@@ -1,6 +1,7 @@
 import * as React from 'react';
 import JSON5 from 'json5';
 import objectPath from 'object-path';
+import set from 'set-value';
 import fetchChangelog from '@/utils/storyblok';
 import defaultJSON from '../../config/default.json';
 import TokenData from '../components/TokenData';
@@ -216,7 +217,7 @@ function stateReducer(state, action) {
                       };
             }
             const newName = name.toString();
-            objectPath.set(obj, newName, newValue);
+            set(obj, newName, newValue);
             if (oldName === newName || !oldName) {
                 state.tokenData.updateTokenValues(parent, JSON.stringify(obj, null, 2), updatedAt);
             } else {
