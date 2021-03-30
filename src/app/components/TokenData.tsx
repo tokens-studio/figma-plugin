@@ -1,6 +1,7 @@
 /* eslint-disable class-methods-use-this */
 import JSON5 from 'json5';
 import objectPath from 'object-path';
+import set from 'set-value';
 import checkIfValueToken from '@/utils/checkIfValueToken';
 import {getAliasValue} from '@/utils/aliases';
 import checkIfAlias from '@/utils/checkIfAlias';
@@ -237,7 +238,7 @@ export default class TokenData {
     }
 
     setResolvedAlias(tokens: TokenGroup, target: string, source: string): void {
-        objectPath.set(tokens, target, source);
+        set(tokens, target, source);
     }
 
     getResolvedAlias(tokens: TokenGroup, token: string): string {
