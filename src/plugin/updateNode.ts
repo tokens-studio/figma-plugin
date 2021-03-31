@@ -100,7 +100,7 @@ export default async function setValuesOnNode(node, values, data) {
             if (matchingStyles.length) {
                 node.textStyleId = matchingStyles[0].id;
             } else {
-                setTextValuesOnTarget(node, values.typography);
+                setTextValuesOnTarget(node, {value: values.typography});
             }
         }
     } else if (
@@ -113,12 +113,14 @@ export default async function setValuesOnNode(node, values, data) {
     ) {
         if (node.type === 'TEXT') {
             setTextValuesOnTarget(node, {
-                fontFamily: values.fontFamilies,
-                fontWeight: values.fontWeights,
-                lineHeight: values.lineHeights,
-                fontSize: values.fontSizes,
-                letterSpacing: values.letterSpacing,
-                paragraphSpacing: values.paragraphSpacing,
+                value: {
+                    fontFamily: values.fontFamilies,
+                    fontWeight: values.fontWeights,
+                    lineHeight: values.lineHeights,
+                    fontSize: values.fontSizes,
+                    letterSpacing: values.letterSpacing,
+                    paragraphSpacing: values.paragraphSpacing,
+                },
             });
         }
     }
