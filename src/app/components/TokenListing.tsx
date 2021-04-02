@@ -123,12 +123,7 @@ const TokenListing = ({
     };
 
     React.useEffect(() => {
-        console.log('is int collapsed', isIntCollapsed, collapsed);
-    }, []);
-
-    React.useEffect(() => {
         if (values) {
-            console.log('updating collapsed');
             setIntCollapsed(collapsed);
         }
     }, [collapsed, values]);
@@ -141,8 +136,6 @@ const TokenListing = ({
             setIntCollapsed(!isIntCollapsed);
         }
     };
-
-    console.log('values', tokenType, Boolean(values), values);
 
     if (!values && !showEmptyGroups) return null;
 

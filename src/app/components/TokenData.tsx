@@ -200,15 +200,12 @@ export default class TokenData {
     }
 
     getMergedTokens(): TokenGroup {
-        console.log('merged', this.mergedTokens);
         return this.mergedTokens;
     }
 
-    getFormattedTokens() {
-        const tokens = convertToTokenArray(this.mergedTokens);
-        console.log('Tokens Merged', this.mergedTokens);
+    getFormattedTokens(activeTokenSet) {
+        const tokens = convertToTokenArray(JSON.parse(this.tokens[activeTokenSet].values));
         const tokenObj = {};
-        console.log({tokens});
         tokens.forEach(([key, value]) => {
             set(tokenObj, key.split('/').join('.').toString(), value);
         });

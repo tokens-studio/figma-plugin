@@ -4,8 +4,6 @@ import {isTypographyToken, isValueToken} from '../app/components/utils';
 function checkForTokens({obj, token, root = null, returnValuesOnly = false}): [object, SingleToken] {
     let returnValue;
     if (isValueToken(token)) {
-        console.log('Is value token', token);
-
         returnValue = token;
     } else if (isTypographyToken(token)) {
         returnValue = {
@@ -33,18 +31,15 @@ function checkForTokens({obj, token, root = null, returnValuesOnly = false}): [o
             }
         });
     } else {
-        console.log('ELSE', token);
         returnValue = {
             value: token,
         };
     }
-    console.log('obj, return', obj, returnValue);
 
     return [obj, returnValue];
 }
 
 export function convertToTokenArray(tokens, returnValuesOnly = false) {
     const [result] = checkForTokens({obj: {}, token: tokens, returnValuesOnly});
-    console.log('Result', result);
     return Object.entries(result);
 }
