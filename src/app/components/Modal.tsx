@@ -4,7 +4,7 @@ import Heading from './Heading';
 
 if (process.env.NODE_ENV !== 'test') ReactModal.setAppElement('#app');
 
-const customStyles = {
+const customStyles = (large) => ({
     overlay: {
         backgroundColor: 'rgba(0,0,0,0.2)',
         display: 'flex',
@@ -23,13 +23,15 @@ const customStyles = {
         overflow: 'auto',
         maxHeight: '100%',
         border: 'none',
+        width: large ? '100%' : 'auto',
     },
-};
+});
 
 const Modal = ({
     id,
     title,
     full,
+    large,
     isOpen,
     close,
     children,
@@ -38,12 +40,13 @@ const Modal = ({
     id?: string;
     title?: string;
     full?: boolean;
+    large?: boolean;
     isOpen: boolean;
     close: Function;
     children: React.ReactNode;
     showClose?: boolean;
 }) => (
-    <ReactModal isOpen={isOpen} onRequestClose={close} style={customStyles} contentLabel={title || null}>
+    <ReactModal isOpen={isOpen} onRequestClose={close} style={customStyles(large)} contentLabel={title || null}>
         {showClose && (
             <div className="flex flex-col items-end h-0">
                 <button

@@ -41,6 +41,7 @@ export enum ActionType {
     SetCollapsed = 'SET_COLLAPSED',
     SetApiData = 'SET_API_DATA',
     ToggleUpdatePageOnly = 'TOGGLE_UPDATE_PAGE_ONLY',
+    ToggleShowEmptyGroups = 'TOGGLE_SHOW_EMPTY_GROUPS',
     ToggleUpdateAfterApply = 'TOGGLE_UPDATE_AFTER_APPLY',
     SetStorageType = 'SET_STORAGE_TYPE',
     SetAPIProviders = 'SET_API_PROVIDERS',
@@ -85,7 +86,8 @@ const emptyState = {
     colorMode: false,
     showEditForm: false,
     showNewGroupForm: false,
-    showOptions: false,
+    showEmptyGroups: true,
+    showOptions: '',
     storageType: {
         provider: StorageProviderType.LOCAL,
         id: '',
@@ -268,6 +270,11 @@ function stateReducer(state, action) {
                 ...state,
                 updatePageOnly: action.bool,
             };
+        case ActionType.ToggleShowEmptyGroups:
+            return {
+                ...state,
+                showEmptyGroups: !state.showEmptyGroups,
+            };
         case ActionType.ToggleUpdateAfterApply:
             return {
                 ...state,
@@ -434,6 +441,9 @@ function TokenProvider({children}) {
             },
             toggleUpdatePageOnly: (bool: boolean) => {
                 dispatch({type: ActionType.ToggleUpdatePageOnly, bool});
+            },
+            toggleShowEmptyGroups: () => {
+                dispatch({type: ActionType.ToggleShowEmptyGroups});
             },
             toggleUpdateAfterApply: (bool: boolean) => {
                 dispatch({type: ActionType.ToggleUpdateAfterApply, bool});

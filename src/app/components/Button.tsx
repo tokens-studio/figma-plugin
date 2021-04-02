@@ -6,6 +6,7 @@ type ButtonProps = {
     onClick?: any;
     size?: 'large' | 'small';
     href?: string;
+    download?: string;
     disabled?: boolean;
     id?: string;
 };
@@ -14,6 +15,7 @@ const Button: React.FunctionComponent<ButtonProps> = ({
     size = 'small',
     type = 'button',
     onClick,
+    download,
     variant,
     children,
     href,
@@ -45,6 +47,7 @@ const Button: React.FunctionComponent<ButtonProps> = ({
             <a
                 target="_blank"
                 rel="noreferrer"
+                download={download}
                 className={`button ${[variantClass, sizeClass].join(' ')}`}
                 href={href}
                 data-cy={id}

@@ -1,7 +1,7 @@
 import {convertToRgb, isTypographyToken, lightOrDark, slugify} from './utils';
 
 describe('isTypographyToken', () => {
-    it('returns truthiness of a typography token', () => {
+    it('returns truthiness of a typography token and only accepts tokens that feature required values', () => {
         const token = {
             fontFamily: 'foo',
         };
@@ -15,12 +15,11 @@ describe('isTypographyToken', () => {
             fontFamily: 'foo',
             fontWeight: 'normal',
             fontSize: '32',
-            lineHeight: 'AUTO',
         };
-        expect(isTypographyToken(token)).toBe(true);
+        expect(isTypographyToken(token)).toBe(false);
         expect(isTypographyToken(fullToken)).toBe(true);
-        expect(isTypographyToken(weight)).toBe(true);
-        expect(isTypographyToken(height)).toBe(true);
+        expect(isTypographyToken(weight)).toBe(false);
+        expect(isTypographyToken(height)).toBe(false);
     });
     it('rejects non-typography tokens', () => {
         const wrongToken = {

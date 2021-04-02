@@ -1,6 +1,6 @@
 {
 	"name": "figma-tokens",
-	"version": "45",
+	"version": "46",
 	"description": "Figma Design Tokens",
 	"license": "ISC",
 	"scripts": {
@@ -41,9 +41,11 @@
 		"react-dnd": "^13.1.1",
 		"react-dnd-html5-backend": "^12.1.1",
 		"react-dom": "17.0.0",
+		"react-error-boundary": "^3.1.1",
 		"react-modal": "^3.11.2",
 		"react-svg-loader": "^3.0.3",
 		"regenerator-runtime": "^0.13.7",
+		"set-value": "^3.0.2",
 		"storyblok-js-client": "^3.3.1",
 		"tailwindcss": "^2.0.3"
 	},
