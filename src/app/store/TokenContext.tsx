@@ -86,7 +86,7 @@ const emptyState = {
     colorMode: false,
     showEditForm: false,
     showNewGroupForm: false,
-    showEmptyGroups: false,
+    showEmptyGroups: true,
     showOptions: '',
     storageType: {
         provider: StorageProviderType.LOCAL,

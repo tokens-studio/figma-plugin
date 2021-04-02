@@ -326,6 +326,10 @@ textarea:focus {
     @apply border border-gray-600 outline-none;
 }
 
+button:focus {
+    outline: 2px auto var(--blue, -webkit-focus-ring-color);
+}
+
 form {
     margin-block-end: 0;
 }
