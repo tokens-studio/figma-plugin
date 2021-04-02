@@ -1,28 +1,41 @@
 import {SingleToken} from '../../types/tokens';
 import {isTypographyToken, isValueToken} from '../app/components/utils';
 
-function checkForTokens({obj, token, root = null, returnValuesOnly = false}): [object, SingleToken] {
+function checkForTokens({
+    obj,
+    token,
+    root = null,
+    returnValuesOnly = false,
+    expandTypography = false,
+}): [object, SingleToken] {
     let returnValue;
-    if (isValueToken(token)) {
+    const shouldExpandTypography = expandTypography ? isTypographyToken(token.value) : false;
+    if (isValueToken(token) && !shouldExpandTypography) {
         returnValue = token;
-    } else if (isTypographyToken(token)) {
+    } else if (isTypographyToken(token) && !expandTypography) {
         returnValue = {
             value: Object.entries(token).reduce((acc, [key, val]) => {
                 acc[key] = isValueToken(val) && returnValuesOnly ? val.value : val;
                 return acc;
             }, {}),
         };
+
         if (token.description) {
             delete returnValue.value.description;
             returnValue.description = token.description;
         }
     } else if (typeof token === 'object') {
-        Object.entries(token).map(([key, value]) => {
+        let tokenToCheck = token;
+        if (isValueToken(token)) {
+            tokenToCheck = token.value;
+        }
+        Object.entries(tokenToCheck).map(([key, value]) => {
             const [, result] = checkForTokens({
                 obj,
                 token: value,
                 root: [root, key].filter((n) => n).join('/'),
                 returnValuesOnly,
+                expandTypography,
             });
             if (root && result) {
                 obj[[root, key].join('/')] = result;
@@ -39,7 +52,7 @@ function checkForTokens({obj, token, root = null, returnValuesOnly = false}): [o
     return [obj, returnValue];
 }
 
-export function convertToTokenArray(tokens, returnValuesOnly = false) {
-    const [result] = checkForTokens({obj: {}, token: tokens, returnValuesOnly});
+export default function convertToTokenArray({tokens, returnValuesOnly = false, expandTypography = false}) {
+    const [result] = checkForTokens({obj: {}, token: tokens, returnValuesOnly, expandTypography});
     return Object.entries(result);
 }

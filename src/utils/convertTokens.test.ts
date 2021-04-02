@@ -1,18 +1,18 @@
-import {convertToTokenArray} from './convertTokens';
+import convertToTokenArray from './convertTokens';
 
 describe('convertToTokenArray', () => {
     it('converts given tokens to an array', () => {
         const typographyTokens = {
             basic: {
                 input: {
-                    fontfamily: 'Inter',
+                    fontFamily: 'Inter',
                     fontWeight: 'Bold',
                     fontSize: 36,
                     description: 'Use for bold headings',
                 },
                 output: {
                     value: {
-                        fontfamily: 'Inter',
+                        fontFamily: 'Inter',
                         fontWeight: 'Bold',
                         fontSize: 36,
                     },
@@ -22,7 +22,7 @@ describe('convertToTokenArray', () => {
             withValue: {
                 input: {
                     value: {
-                        fontfamily: 'Inter',
+                        fontFamily: 'Inter',
                         fontWeight: 'Regular',
                         fontSize: 24,
                     },
@@ -30,7 +30,7 @@ describe('convertToTokenArray', () => {
                 },
                 output: {
                     value: {
-                        fontfamily: 'Inter',
+                        fontFamily: 'Inter',
                         fontWeight: 'Regular',
                         fontSize: 24,
                     },
@@ -53,7 +53,7 @@ describe('convertToTokenArray', () => {
             },
         };
 
-        expect(convertToTokenArray(basicTokens)).toEqual([
+        expect(convertToTokenArray({tokens: basicTokens})).toEqual([
             ['global/withValue', {value: 'bar'}],
             ['global/basic', {value: '#ff0000'}],
             ['global/typography/heading/h1', typographyTokens.basic.output],

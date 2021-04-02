@@ -2,7 +2,7 @@
 import JSON5 from 'json5';
 import objectPath from 'object-path';
 import set from 'set-value';
-import {convertToTokenArray} from '@/utils/convertTokens';
+import convertToTokenArray from '@/utils/convertTokens';
 import checkIfValueToken from '@/utils/checkIfValueToken';
 import {getAliasValue} from '@/utils/aliases';
 import checkIfAlias from '@/utils/checkIfAlias';
@@ -203,8 +203,9 @@ export default class TokenData {
         return this.mergedTokens;
     }
 
-    getFormattedTokens(activeTokenSet) {
-        const tokens = convertToTokenArray(JSON.parse(this.tokens[activeTokenSet].values));
+    getFormattedTokens() {
+        const tokens = convertToTokenArray({tokens: this.getMergedTokens(), expandTypography: true});
+        console.log('Tokens are', tokens);
         const tokenObj = {};
         tokens.forEach(([key, value]) => {
             set(tokenObj, key.split('/').join('.').toString(), value);

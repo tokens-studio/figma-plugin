@@ -6,21 +6,18 @@ import Button from './Button';
 import Modal from './Modal';
 import TokenSetSelector from './TokenSetSelector';
 import ExportModal from './modals/ExportModal';
+import PresetModal from './modals/PresetModal';
 
 const JSONEditor = () => {
     const {tokenData, activeTokenSet, editProhibited} = useTokenState();
     const {setStringTokens, setEmptyTokens, setDefaultTokens, updateTokens, setLoading} = useTokenDispatch();
     const [confirmModalVisible, showConfirmModal] = React.useState('');
     const [exportModalVisible, showExportModal] = React.useState(false);
+    const [presetModalVisible, showPresetModal] = React.useState(false);
 
     const handleUpdate = async () => {
         await setLoading(true);
         updateTokens();
-    };
-
-    const handleSetDefault = () => {
-        setDefaultTokens();
-        showConfirmModal('');
     };
 
     const handleSetEmpty = () => {
@@ -31,25 +28,7 @@ const JSONEditor = () => {
     return (
         <div className="flex flex-col flex-grow">
             {exportModalVisible && <ExportModal onClose={() => showExportModal(false)} />}
-            <Modal isOpen={confirmModalVisible === 'reset'} close={() => showConfirmModal('')}>
-                <div className="flex justify-center flex-col text-center space-y-4">
-                    <div className="space-y-2">
-                        <Heading>Are you sure?</Heading>
-                        <p className="text-xs">
-                            You can undo this action by <br />
-                            performing Undo in Figma itself.
-                        </p>
-                    </div>
-                    <div className="space-x-4">
-                        <Button variant="secondary" onClick={() => showConfirmModal('')}>
-                            Cancel
-                        </Button>
-                        <Button variant="primary" onClick={handleSetDefault}>
-                            Yes, set to default.
-                        </Button>
-                    </div>
-                </div>
-            </Modal>
+            {presetModalVisible && <PresetModal onClose={() => showPresetModal(false)} />}
             <Modal isOpen={confirmModalVisible === 'delete'} close={() => showConfirmModal('')}>
                 <div className="flex justify-center flex-col text-center space-y-4">
                     <div className="space-y-2">
@@ -86,7 +65,7 @@ const JSONEditor = () => {
 
             <div className="flex justify-between w-full px-4 bg-white">
                 <div className="space-x-2 flex mr-2">
-                    <Button disabled={editProhibited} variant="secondary" onClick={() => showConfirmModal('reset')}>
+                    <Button disabled={editProhibited} variant="secondary" onClick={() => showPresetModal(true)}>
                         Load preset
                     </Button>
                     <Button disabled={editProhibited} variant="secondary" onClick={() => showConfirmModal('delete')}>

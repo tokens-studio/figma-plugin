@@ -30,16 +30,14 @@ export default function ExportModal({onClose}) {
                     rows={10}
                     isDisabled
                     hasErrored={tokenData.tokens[activeTokenSet]?.hasErrored}
-                    value={tokenData.getFormattedTokens(activeTokenSet)}
+                    value={tokenData.getFormattedTokens()}
                 />
                 <div className="space-x-4 flex justify-between">
                     <Button variant="secondary" onClick={onClose}>
                         Cancel
                     </Button>
                     <Button
-                        href={`data:text/json;charset=utf-8,${encodeURIComponent(
-                            tokenData.getFormattedTokens(activeTokenSet)
-                        )}`}
+                        href={`data:text/json;charset=utf-8,${encodeURIComponent(tokenData.getFormattedTokens())}`}
                         download="tokens.json"
                         variant="primary"
                         size="large"

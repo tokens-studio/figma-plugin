@@ -126,7 +126,7 @@ const mappedTokens = (tokens) => {
 };
 
 const Tokens = () => {
-    const {tokenData, updatePageOnly, activeTokenSet} = useTokenState();
+    const {tokenData, updatePageOnly, activeTokenSet, showEmptyGroups} = useTokenState();
     const {updateTokens, toggleUpdatePageOnly, toggleShowEmptyGroups} = useTokenDispatch();
 
     const handleUpdate = async () => {
@@ -157,7 +157,7 @@ const Tokens = () => {
             })}
             <div className="flex items-center justify-center mt-4">
                 <Button variant="secondary" size="small" onClick={toggleShowEmptyGroups}>
-                    Toggle empty groups
+                    {showEmptyGroups ? 'Hide' : 'Show'} empty groups
                 </Button>
             </div>
             <div className="fixed bottom-0 left-0 w-full bg-white flex justify-between items-center p-2 border-t border-gray-200">
