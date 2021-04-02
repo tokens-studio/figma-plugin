@@ -1,6 +1,7 @@
 import * as React from 'react';
 import objectPath from 'object-path';
 import JSON5 from 'json5';
+import set from 'set-value';
 import {useTokenDispatch, useTokenState} from '../store/TokenContext';
 import EditTokenForm from './EditTokenForm';
 import Heading from './Heading';
@@ -9,7 +10,6 @@ import Modal from './Modal';
 import renderKeyValue from './renderKeyValue';
 import Tooltip from './Tooltip';
 import NewGroupForm from './NewGroupForm';
-import set from 'set-value';
 
 const TokenListing = ({
     label,
@@ -58,7 +58,7 @@ const TokenListing = ({
     const showDisplayToggle = tokenType === 'color';
 
     const [showHelp, setShowHelp] = React.useState(false);
-    const [isIntCollapsed, setIntCollapsed] = React.useState(!values);
+    const [isIntCollapsed, setIntCollapsed] = React.useState(false);
 
     const [editToken, setEditToken] = React.useState({
         value: '',
