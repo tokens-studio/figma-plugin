@@ -23,13 +23,7 @@ export function isValueToken(token): token is {value: string | number} {
 
 export function isTypographyToken(token) {
     if (typeof token !== 'object') return false;
-    return (
-        'fontFamily' in token ||
-        'fontWeight' in token ||
-        'fontSize' in token ||
-        'lineHeight' in token ||
-        'paragraphSpacing' in token
-    );
+    return 'fontFamily' in token && 'fontWeight' in token && 'fontSize' in token;
 }
 
 export function isSingleToken(token): token is {value: string} {

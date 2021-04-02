@@ -7,33 +7,36 @@ import Modal from './Modal';
 import renderKeyValue from './renderKeyValue';
 import Tooltip from './Tooltip';
 import NewGroupForm from './NewGroupForm';
-import {TokenType} from '../../../types/tokens';
 
 const TokenListing = ({
     label,
     schema,
     explainer = '',
     help = '',
-    createButton = false,
-    showDisplayToggle = false,
     property,
-    type = 'implicit',
+    tokenType = 'implicit',
     values,
 }: {
     label: string;
-    schema?: {
+    schema: {
         value: object | string;
         options: object | string;
     };
-    explainer?: string;
-    help?: string;
-    createButton?: boolean;
-    showDisplayToggle?: boolean;
+    explainer: string;
+    help: string;
     property: string;
-    type?: TokenType;
-    values?: string | object;
+    tokenType: string;
+    values: object;
 }) => {
-    const {collapsed, showEditForm, showNewGroupForm, showOptions, displayType, editProhibited} = useTokenState();
+    const {
+        collapsed,
+        showEmptyGroups,
+        showEditForm,
+        showNewGroupForm,
+        showOptions,
+        displayType,
+        editProhibited,
+    } = useTokenState();
     const {
         setCollapsed,
         createStyles,
@@ -42,6 +45,9 @@ const TokenListing = ({
         setShowOptions,
         setDisplayType,
     } = useTokenDispatch();
+
+    const createButton = ['color', 'typography'].includes(tokenType);
+    const showDisplayToggle = tokenType === 'color';
 
     const [showHelp, setShowHelp] = React.useState(false);
     const [isIntCollapsed, setIntCollapsed] = React.useState(false);
@@ -67,8 +73,10 @@ const TokenListing = ({
     };
 
     React.useEffect(() => {
-        setIntCollapsed(collapsed);
-    }, [collapsed]);
+        if (values) {
+            setIntCollapsed(collapsed);
+        }
+    }, [collapsed, values]);
 
     const handleSetIntCollapsed = (e) => {
         e.stopPropagation();
@@ -79,8 +87,10 @@ const TokenListing = ({
         }
     };
 
+    if (!values && !showEmptyGroups) return null;
+
     return (
-        <div className="border-b border-gray-200" data-cy={`tokenlisting-${type}`}>
+        <div className="border-b border-gray-200" data-cy={`tokenlisting-${tokenType}`}>
             <div className="flex justify-between space-x-8 items-center relative">
                 <button
                     className={`flex items-center w-full h-full p-4 space-x-2 hover:bg-gray-100 focus:outline-none ${
@@ -139,7 +149,7 @@ const TokenListing = ({
                             disabled={editProhibited}
                             className="button button-ghost"
                             type="button"
-                            onClick={() => setShowOptions(values[0])}
+                            onClick={() => setShowOptions(tokenType)}
                         >
                             <Icon name="edit" />
                         </button>
@@ -151,16 +161,16 @@ const TokenListing = ({
                             className="button button-ghost"
                             type="button"
                             onClick={() => {
-                                setShowOptions(values[0]);
-                                showNewForm(values[0]);
+                                setShowOptions(tokenType);
+                                showNewForm(tokenType);
                             }}
                         >
                             <Icon name="add" />
                         </button>
                     </Tooltip>
                 </div>
-                {showOptions === values[0] && (
-                    <Modal full isOpen={showOptions === values[0]} close={closeForm}>
+                {showOptions === tokenType && (
+                    <Modal large full isOpen={showOptions === tokenType} close={closeForm}>
                         <div className="flex flex-col-reverse">
                             {showEditForm && (
                                 <EditTokenForm
@@ -175,19 +185,20 @@ const TokenListing = ({
                                     type={type}
                                 />
                             )}
-                            {showNewGroupForm && <NewGroupForm path={values[0]} />}
+                            {showNewGroupForm && <NewGroupForm path={tokenType} />}
 
                             <div className="px-4 pb-4">
-                                {renderKeyValue({
-                                    tokenValues: Object.entries(values[1]),
-                                    showNewForm,
-                                    showForm,
-                                    property: values[0],
-                                    schema,
-                                    path: values[0],
-                                    type,
-                                    editMode: true,
-                                })}
+                                {values &&
+                                    renderKeyValue({
+                                        tokenValues: Object.entries(values),
+                                        showNewForm,
+                                        showForm,
+                                        property: tokenType,
+                                        schema,
+                                        path: tokenType,
+                                        type: tokenType,
+                                        editMode: true,
+                                    })}
                             </div>
                             <div className="flex items-center justify-between p-4">
                                 <Heading size="small">{property}</Heading>
@@ -209,7 +220,7 @@ const TokenListing = ({
                                             type="button"
                                             data-cy="button-modal-add"
                                             className="button button-ghost"
-                                            onClick={() => showNewForm(values[0])}
+                                            onClick={() => showNewForm(tokenType)}
                                         >
                                             <Icon name="add" />
                                         </button>
@@ -233,16 +244,16 @@ const TokenListing = ({
                 )}
             </div>
             {showHelp && <div className="px-4 pb-4 text-gray-600 text-xxs">{help}</div>}
-            {Object.entries(values[1]).length > 0 && (
+            {values && Object.entries(values).length > 0 && (
                 <div className={`px-4 pb-4 ${isIntCollapsed ? 'hidden' : null}`}>
                     {renderKeyValue({
-                        tokenValues: Object.entries(values[1]),
+                        tokenValues: Object.entries(values),
                         showNewForm,
                         showForm,
-                        property: values[0],
+                        property: tokenType,
                         schema,
-                        path: values[0],
-                        type,
+                        path: tokenType,
+                        type: tokenType,
                     })}
                 </div>
             )}

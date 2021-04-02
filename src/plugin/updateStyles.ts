@@ -1,9 +1,9 @@
-import {convertToTokenArray} from '@/utils/convertTokens';
+import convertToTokenArray from '@/utils/convertTokens';
 import updateColorStyles from './updateColorStyles';
 import updateTextStyles from './updateTextStyles';
 
 export default function updateStyles(tokens, shouldCreate = false): void {
-    const tokenArray = convertToTokenArray(tokens, true);
+    const tokenArray = convertToTokenArray({tokens, returnValuesOnly: true});
 
     const colorTokens = tokenArray
         .filter((n) => ['color', 'colors'].includes(n[0].split('/')[0]))
