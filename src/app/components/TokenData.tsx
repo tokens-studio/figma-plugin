@@ -3,12 +3,13 @@ import JSON5 from 'json5';
 import objectPath from 'object-path';
 import set from 'set-value';
 import {convertToTokenArray} from '@/utils/convertTokens';
+import checkIfValueToken from '@/utils/checkIfValueToken';
+import {getAliasValue} from '@/utils/aliases';
+import checkIfAlias from '@/utils/checkIfAlias';
 import {mergeDeep} from '../../plugin/helpers';
 import {notifyToUI} from '../../plugin/notifiers';
 import {SingleToken, TokenGroup, TokenObject, TokenProps, Tokens} from '../../../types/tokens';
-import {convertToRgb, checkAndEvaluateMath} from './utils';
 
-const aliasRegex = /(\$[^\s]+\w)/g;
 export default class TokenData {
     mergedTokens: TokenGroup;
 
@@ -67,12 +68,19 @@ export default class TokenData {
 
     injectTokens(tokens, activeTokenSet): void {
         const receivedStyles = {};
+        const oldValues = JSON5.parse(this.tokens[activeTokenSet].values);
+
+        // Iterate over received styles to set a value if no value existed before.
         Object.entries(tokens).map(([parent, values]: [string, SingleToken[]]) => {
             values.map((token: TokenGroup) => {
-                mergeDeep(receivedStyles, {[parent]: this.convertDotPathToNestedObject(token[0], token[1])});
+                const key = `${parent}/${token[0]}`.split('/').join('.');
+                const oldValue = objectPath.get(oldValues, key);
+                set(receivedStyles, key, oldValue || token[1]);
             });
         });
-        const newTokens = mergeDeep(JSON5.parse(this.tokens[activeTokenSet].values), receivedStyles);
+
+        // Merge again with old tokens object to preserve tokens that don't exist as styles
+        const newTokens = mergeDeep(oldValues, receivedStyles);
         this.tokens[activeTokenSet].values = JSON.stringify(newTokens, null, 2);
         this.setMergedTokens();
     }
@@ -208,36 +216,6 @@ export default class TokenData {
         return JSON.stringify(tokenObj, null, 2);
     }
 
-    private checkIfValueToken(token: SingleToken): token is {value: string | number} {
-        return typeof token === 'object' && (typeof token?.value === 'string' || typeof token?.value === 'number');
-    }
-
-    private checkIfValueTokenAlias(token: SingleToken): boolean {
-        if (this.checkIfValueToken(token)) {
-            return (
-                (token.value.toString().includes('$') || token.value.toString().includes('{')) &&
-                token.value.toString().length > 1
-            );
-        }
-        return false;
-    }
-
-    private checkIfAlias(token: SingleToken): boolean {
-        let aliasToken = false;
-        if (typeof token === 'string' || typeof token === 'number') {
-            aliasToken = Boolean(token.toString().match(aliasRegex));
-        } else {
-            aliasToken = this.checkIfValueTokenAlias(token);
-        }
-        // Check if alias is found
-        if (aliasToken) {
-            const tokenToCheck = this.checkIfValueToken(token) ? token.value : token;
-            const aliasValue = this.getAliasValue(tokenToCheck, this.mergedTokens);
-            return aliasValue != null;
-        }
-        return false;
-    }
-
     private findAllAliases({
         key = null,
         arr = Object.entries(this.tokens),
@@ -249,7 +227,7 @@ export default class TokenData {
             if (typeof el[1] === 'object') {
                 const newKey = key ? [key, el[0]].join('.') : el[0];
                 prev.push(...this.findAllAliases({key: newKey, arr: Object.entries(el[1])}));
-            } else if (this.checkIfAlias(el[1])) {
+            } else if (checkIfAlias(el[1], this.mergedTokens)) {
                 const obj = [`${key}.${el[0]}`, el[1]];
                 prev.push(obj);
                 return prev;
@@ -263,7 +241,7 @@ export default class TokenData {
 
         if (aliases.length > 0) {
             aliases.forEach((alias) => {
-                this.setResolvedAlias(this.mergedTokens, alias[0], this.getAliasValue(alias[1], this.mergedTokens));
+                this.setResolvedAlias(this.mergedTokens, alias[0], getAliasValue(alias[1], this.mergedTokens));
             });
             if (previousCount > aliases.length || !previousCount) {
                 this.setAllAliases(aliases.length);
@@ -273,39 +251,15 @@ export default class TokenData {
         }
     }
 
-    getAliasValue(token: SingleToken, tokens = this.mergedTokens): string | null {
-        let returnedValue = this.checkIfValueToken(token) ? (token.value as string) : (token as string);
-        const tokenReferences = returnedValue.toString().match(aliasRegex);
-        if (tokenReferences.length > 0) {
-            const resolvedReferences = tokenReferences.map((ref) => {
-                if (ref.length > 1) {
-                    const value = objectPath.get(tokens, ref.substring(1));
-                    if (typeof value !== 'undefined') return value;
-                }
-                return null;
-            });
-            tokenReferences.forEach((reference, index) => {
-                returnedValue = returnedValue.replace(
-                    reference,
-                    resolvedReferences[index]?.value ?? resolvedReferences[index]
-                );
-            });
-        }
-        if (returnedValue) {
-            return convertToRgb(checkAndEvaluateMath(returnedValue));
-        }
-        return null;
-    }
-
     getTokenValue(token: SingleToken): string | null {
-        if (this.checkIfAlias(token)) {
-            return this.getAliasValue(token);
+        if (checkIfAlias(token, this.mergedTokens)) {
+            return getAliasValue(token, this.mergedTokens);
         }
-        return String(this.checkIfValueToken(token) ? token.value : token);
+        return String(checkIfValueToken(token) ? token.value : token);
     }
 
     setResolvedAlias(tokens: TokenGroup, target: string, source: string): void {
-        objectPath.set(tokens, target, source);
+        set(tokens, target, source);
     }
 
     getResolvedAlias(tokens: TokenGroup, token: string): string {

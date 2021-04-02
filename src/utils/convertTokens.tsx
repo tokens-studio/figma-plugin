@@ -8,14 +8,17 @@ function checkForTokens({obj, token, root = null, returnValuesOnly = false}): [o
 
         returnValue = token;
     } else if (isTypographyToken(token)) {
-        console.log('Is typo token', token);
-        returnValue = Object.entries(token).reduce((acc, [key, val]) => {
-            acc[key] = isValueToken(val) && returnValuesOnly ? val.value : val;
-            return acc;
-        }, {});
+        returnValue = {
+            value: Object.entries(token).reduce((acc, [key, val]) => {
+                acc[key] = isValueToken(val) && returnValuesOnly ? val.value : val;
+                return acc;
+            }, {}),
+        };
+        if (token.description) {
+            delete returnValue.value.description;
+            returnValue.description = token.description;
+        }
     } else if (typeof token === 'object') {
-        console.log('Is object token', token);
-
         Object.entries(token).map(([key, value]) => {
             const [, result] = checkForTokens({
                 obj,

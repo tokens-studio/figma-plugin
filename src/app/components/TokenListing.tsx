@@ -9,6 +9,7 @@ import Modal from './Modal';
 import renderKeyValue from './renderKeyValue';
 import Tooltip from './Tooltip';
 import NewGroupForm from './NewGroupForm';
+import set from 'set-value';
 
 const TokenListing = ({
     label,
@@ -81,7 +82,8 @@ const TokenListing = ({
                   };
         }
         const newName = name.toString();
-        objectPath.set(obj, newName, newValue);
+        set(obj, newName, newValue);
+
         if (oldName === newName || !oldName) {
             setStringTokens({parent, tokens: JSON.stringify(obj, null, 2)});
         } else {

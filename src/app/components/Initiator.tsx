@@ -68,6 +68,7 @@ export default function Initiator({setActive, setRemoteComponents}) {
                     case MessageFromPluginTypes.STYLES:
                         setLoading(false);
                         if (values) {
+                            track('Import styles');
                             setTokensFromStyles(values);
                             setActive('tokens');
                         }
