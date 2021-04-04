@@ -3,6 +3,7 @@ import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 
 import {removeSingleCredential, updateCredentials} from '@/utils/credentials';
+import {updateUISettings, getUISettings} from '@/utils/uiSettings';
 import getLastOpened from '@/utils/getLastOpened';
 import {getUserId} from './helpers';
 import pullStyles from './pullStyles';
@@ -43,6 +44,7 @@ figma.ui.onmessage = async (msg) => {
     switch (msg.type) {
         case MessageToPluginTypes.INITIATE:
             try {
+                getUISettings();
                 const userId = await getUserId();
                 const lastOpened = await getLastOpened();
                 const storageType = await getSavedStorageType();
@@ -136,6 +138,11 @@ figma.ui.onmessage = async (msg) => {
         case MessageToPluginTypes.NOTIFY:
             notifyUI(msg.msg, msg.opts);
             break;
+        case MessageToPluginTypes.SET_UI: {
+            updateUISettings({width: msg.width, height: msg.height});
+            figma.ui.resize(msg.width, msg.height);
+            break;
+        }
         default:
     }
 };

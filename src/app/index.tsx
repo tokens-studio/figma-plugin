@@ -5,10 +5,12 @@ import * as ReactDOM from 'react-dom';
 import './assets/fonts/jetbrainsmono.css';
 import './styles/main.css';
 import {ErrorBoundary} from 'react-error-boundary';
+import {Provider} from 'react-redux';
 import {initializeAnalytics} from '../utils/analytics';
 import App from './components/App';
 import {TokenProvider} from './store/TokenContext';
 import Heading from './components/Heading';
+import {store} from './store';
 
 initializeAnalytics();
 
@@ -25,9 +27,11 @@ function ErrorFallback({error}) {
 }
 ReactDOM.render(
     <ErrorBoundary FallbackComponent={ErrorFallback}>
-        <TokenProvider>
-            <App />
-        </TokenProvider>
+        <Provider store={store}>
+            <TokenProvider>
+                <App />
+            </TokenProvider>
+        </Provider>
     </ErrorBoundary>,
     document.getElementById('app')
 );
