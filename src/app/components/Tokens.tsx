@@ -1,6 +1,5 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import * as React from 'react';
-import JSON5 from 'json5';
 import {useTokenDispatch, useTokenState} from '../store/TokenContext';
 import TokenListing from './TokenListing';
 import Button from './Button';
@@ -133,7 +132,7 @@ const Tokens = () => {
         updateTokens(false);
     };
 
-    const tokenValues = JSON5.parse(tokenData.tokens[activeTokenSet].values);
+    const tokenValues = JSON.parse(tokenData.tokens[activeTokenSet].values);
 
     if (tokenData.tokens[activeTokenSet].hasErrored) return <div>JSON malformed, check in Editor</div>;
 
