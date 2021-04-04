@@ -118,8 +118,8 @@ const TokenButton = ({type, property, name, path, token, editMode, showForm}) =>
             break;
     }
 
-    const active = selectionValues[type] === [path, name].join('.');
-    const semiActive = properties.some((prop) => selectionValues[prop.name] === [path, name].join('.'));
+    const active = selectionValues[type] === name;
+    const semiActive = properties.some((prop) => selectionValues[prop.name] === name);
 
     if (editMode) {
         buttonClass.push('button-edit');
@@ -131,11 +131,12 @@ const TokenButton = ({type, property, name, path, token, editMode, showForm}) =>
     }
 
     const onClick = (givenProperties, isActive = active) => {
+        console.log('Clicked', path, name);
         const propsToSet = Array.isArray(givenProperties) ? givenProperties : new Array(givenProperties);
         if (editMode) {
             showForm({name, value: token, path});
         } else {
-            const tokenValue = [path, name].join('.');
+            const tokenValue = name;
             let value = isActive ? 'delete' : tokenValue;
             if (propsToSet[0].clear && !active) {
                 value = 'delete';
@@ -145,6 +146,8 @@ const TokenButton = ({type, property, name, path, token, editMode, showForm}) =>
                 [propsToSet[0].name || propsToSet[0]]: propsToSet[0].forcedValue || value,
             };
             if (propsToSet[0].clear) propsToSet[0].clear.map((item) => Object.assign(newProps, {[item]: 'delete'}));
+            console.log('setting plugval', newProps);
+
             setPluginValue(newProps);
         }
     };

@@ -1,5 +1,4 @@
 /* eslint-disable default-case */
-import objectPath from 'object-path';
 import {fetchAllPluginData} from './pluginData';
 import store from './store';
 import * as pjs from '../../package.json';
@@ -8,9 +7,11 @@ import {TokenProps} from '../../types/tokens';
 import {StorageProviderType, StorageType} from '../../types/api';
 import {isSingleToken} from '../app/components/utils';
 
-export function mapValuesToTokens(object, values) {
-    const array = Object.entries(values).map(([key, token]) => {
-        const resolvedValue = objectPath.get(object, token);
+export function mapValuesToTokens(tokens, values): object {
+    const array = Object.entries(values).map(([key, tokenOnNode]) => {
+        const resolvedToken = tokens.find((token) => token.name === tokenOnNode);
+        if (!resolvedToken) return;
+        const resolvedValue = resolvedToken.value;
         const value = isSingleToken(resolvedValue) ? resolvedValue.value : resolvedValue;
 
         return {

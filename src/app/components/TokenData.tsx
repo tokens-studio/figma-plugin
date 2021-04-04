@@ -8,10 +8,24 @@ import {getAliasValue} from '@/utils/aliases';
 import checkIfAlias from '@/utils/checkIfAlias';
 import {mergeDeep} from '../../plugin/helpers';
 import {notifyToUI} from '../../plugin/notifiers';
-import {SingleToken, TokenGroup, TokenObject, TokenProps, Tokens} from '../../../types/tokens';
+import {SingleToken, TokenGroup, TokenObject, TokenProps, SingleTokenObject, Tokens} from '../../../types/tokens';
+
+function createTokensObject(tokens: SingleTokenObject[]) {
+    return tokens.reduce((acc, cur) => {
+        if (cur.type && cur.type !== '' && cur.type !== 'undefined') {
+            acc[cur.type] = acc[cur.type] || {values: []};
+            acc[cur.type].values.push(cur);
+        } else {
+            const groupName = cur.name.split('.').slice(1, 2).toString();
+            acc[groupName] = acc[groupName] || {values: []};
+            acc[groupName].values.push(cur);
+        }
+        return acc;
+    }, {});
+}
 
 export default class TokenData {
-    mergedTokens: TokenGroup;
+    mergedTokens: SingleTokenObject[];
 
     tokens: Tokens;
 
@@ -25,12 +39,24 @@ export default class TokenData {
     }
 
     setTokens(tokens: TokenProps): void {
-        const parsed = this.parseTokenValues(tokens);
+        console.log('Got tokens', tokens);
+        // const setNames = [...new Set(tokens.map((token) => token.name.split('.')[0])
+        const setNames = ['mainTokens'];
         this.setUpdatedAt(tokens.updatedAt || new Date().toString());
-        if (!parsed) return;
-
-        this.tokens = parsed;
-        this.setUsedTokenSet([Object.keys(parsed)[0]]);
+        if (Array.isArray(tokens.values)) {
+            console.log('Tokenobj', createTokensObject(tokens.values));
+            this.tokens = {
+                mainTokens: {
+                    type: 'array',
+                    values: createTokensObject(tokens.values),
+                },
+            };
+        } else {
+            const parsed = this.parseTokenValues(tokens);
+            if (!parsed) return;
+            this.tokens = this.parseTokenValues(tokens);
+        }
+        this.setUsedTokenSet(setNames);
     }
 
     private checkTokenValidity(tokens: string): boolean {
@@ -141,14 +167,16 @@ export default class TokenData {
     }
 
     setMergedTokens(): void {
+        const mergedTokens = [];
         if (Object.entries(this.tokens)) {
-            this.mergedTokens = mergeDeep(
-                {},
-                ...Object.entries(this.tokens).reduce((acc, cur) => {
-                    if (this.usedTokenSet.includes(cur[0])) acc.push(JSON5.parse(cur[1].values));
-                    return acc;
-                }, [])
-            );
+            Object.entries(this.tokens).forEach((cur) => {
+                if (this.usedTokenSet.includes(cur[0])) {
+                    Object.entries(cur[1].values).map((group) => {
+                        mergedTokens.push(...group[1].values);
+                    });
+                }
+            });
+            this.mergedTokens = mergedTokens;
 
             this.setAllAliases();
         }
@@ -199,7 +227,8 @@ export default class TokenData {
         return assigned;
     }
 
-    getMergedTokens(): TokenGroup {
+    getMergedTokens(): SingleTokenObject[] {
+        console.log('Merged are', this.mergedTokens);
         return this.mergedTokens;
     }
 

@@ -2,10 +2,13 @@
 import * as React from 'react';
 import JSON5 from 'json5';
 import {mergeDeep} from '@/plugin/helpers';
+import convertToTokenArray from '@/utils/convertTokens';
+import {SingleTokenObject, TokenType} from '../../../types/tokens';
 import {useTokenDispatch, useTokenState} from '../store/TokenContext';
 import TokenListing from './TokenListing';
 import Button from './Button';
 import TokenSetSelector from './TokenSetSelector';
+import tokenTypes from '../../config/tokenTypes';
 
 interface TokenListingType {
     label: string;
@@ -22,122 +25,14 @@ interface TokenListingType {
 
 const mappedTokens = (tokens) => {
     const tokenObj = {};
-    Object.entries(tokens).forEach(([key, values]: [string, object]) => {
-        properties[values['type'] || key] = {
-            ...properties[key],
-            label: properties[key]?.label ?? key,
-            type: properties[key]?.type ?? key,
-            property: properties[key]?.property ?? key,
-            values,
+    console.log('Tokens are', tokens);
+    Object.entries(tokens).forEach(([key, group]: [string, {values: SingleTokenObject[]; type?: TokenType}]) => {
+        tokenObj[key] = {
+            values: group.values,
         };
     });
-    Object.assign(tokenObj, tokens);
-    if (!tokens.color) {
-        Object.assign(tokenObj, {colors: {}});
-    }
-    const properties = {
-        sizing: {
-            label: 'Sizing',
-            property: 'Sizing',
-            type: 'sizing',
-        },
-        spacing: {
-            label: 'Spacing',
-            property: 'Spacing',
-            type: 'spacing',
-        },
-        colors: {
-            label: 'Colors',
-            property: 'Color',
-            type: 'color',
-            schema: {
-                value: 'color',
-                options: {
-                    description: '',
-                },
-            },
-            help:
-                "If a (local) style is found with the same name it will match to that, if not, will use hex value. Use 'Create Style' to batch-create styles from your tokens (e.g. in your design library). In the future we'll load all 'remote' styles and reference them inside the JSON.",
-        },
-        borderRadius: {
-            label: 'Border Radius',
-            property: 'Border Radius',
-            type: 'borderRadius',
-        },
-        borderWidth: {
-            label: 'Border Width',
-            property: 'Border Width',
-            type: 'borderWidth',
-            explainer: 'Enter as a number, e.g. 4',
-        },
-        opacity: {
-            label: 'Opacity',
-            property: 'Opacity',
-            type: 'opacity',
-            explainer: 'Set as 50%',
-        },
-        typography: {
-            label: 'Typography',
-            property: 'Typography',
-            type: 'typography',
-            schema: {
-                value: {
-                    fontFamily: '',
-                    fontWeight: '',
-                    lineHeight: '',
-                    fontSize: '',
-                },
-                options: {
-                    description: '',
-                },
-            },
-            help:
-                "If a (local) style is found with the same name it will match to that, if not, will use raw font values. Use 'Create Style' to batch-create styles from your tokens (e.g. in your design library). In the future we'll load all 'remote' styles and reference them inside the JSON.",
-        },
-        fontFamilies: {
-            help: 'Only works in combination with a Font Weight',
-            label: 'Font Families',
-            property: 'Font Family',
-            type: 'fontFamilies',
-        },
-        fontWeights: {
-            help: 'Only works in combination with a Font Family',
-            label: 'Font Weights',
-            property: 'Font Weight',
-            type: 'fontWeights',
-        },
-        lineHeights: {
-            label: 'Line Heights',
-            explainer: 'e.g. 100% or 14',
-            property: 'Line Height',
-            type: 'lineHeights',
-        },
-        fontSizes: {
-            label: 'Font Sizes',
-            property: 'Font Size',
-            type: 'fontSizes',
-        },
-        letterSpacing: {
-            label: 'Letter Spacing',
-            property: 'Letter Spacing',
-            type: 'letterSpacing',
-        },
-        paragraphSpacing: {
-            label: 'Paragraph Spacing',
-            property: 'ParagraphSpacing',
-            type: 'paragraphSpacing',
-        },
-    };
-    mergeDeep(tokenObj, properties);
-    Object.entries(tokenObj).forEach(([key, values]: [string, object]) => {
-        properties[key] = {
-            ...properties[key],
-            label: properties[key]?.label ?? key,
-            type: properties[key]?.type ?? key,
-            property: properties[key]?.property ?? key,
-            values,
-        };
-    });
+
+    mergeDeep(tokenObj, tokenTypes);
     return Object.entries(tokenObj);
 };
 
@@ -149,7 +44,12 @@ const Tokens = () => {
         updateTokens(false);
     };
 
-    const tokenValues = JSON5.parse(tokenData.tokens[activeTokenSet].values);
+    let tokenValues;
+    if (tokenData.tokens[activeTokenSet].type === 'array') {
+        tokenValues = tokenData.tokens[activeTokenSet].values;
+    } else {
+        tokenValues = JSON5.parse(tokenData.tokens[activeTokenSet].values);
+    }
 
     if (tokenData.tokens[activeTokenSet].hasErrored) return <div>JSON malformed, check in Editor</div>;
 

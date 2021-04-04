@@ -94,6 +94,8 @@ figma.ui.onmessage = async (msg) => {
             break;
         case MessageToPluginTypes.SET_NODE_DATA:
             try {
+                console.log('values', msg.values);
+                console.log('tokens', msg.tokens);
                 updatePluginData(figma.currentPage.selection, msg.values);
                 sendPluginValues(figma.currentPage.selection, updateNodes(figma.currentPage.selection, msg.tokens));
             } catch (e) {

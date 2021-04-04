@@ -14,6 +14,7 @@ function checkForTokens({
         returnValue = token;
     } else if (isTypographyToken(token) && !expandTypography) {
         returnValue = {
+            type: 'typography',
             value: Object.entries(token).reduce((acc, [key, val]) => {
                 acc[key] = isValueToken(val) && returnValuesOnly ? val.value : val;
                 return acc;

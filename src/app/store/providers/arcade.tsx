@@ -4,7 +4,12 @@ import {MessageToPluginTypes} from '../../../../types/messages';
 import {TokenProps, TokenType} from '../../../../types/tokens';
 import {useTokenDispatch} from '../TokenContext';
 
-async function readTokensFromArcade({secret, id}): Promise<TokenProps> | null {
+type ArcadeResponse = {
+    exports: object;
+    version: string;
+};
+
+async function readTokensFromArcade({secret, id}): Promise<ArcadeResponse> | null {
     try {
         const res = await fetch(
             `https://api.usearcade.com/api/projects/${id}/tokens/draft/export/figma-tokens-plugin/raw`,
@@ -23,7 +28,7 @@ async function readTokensFromArcade({secret, id}): Promise<TokenProps> | null {
 
         console.log('RES IS', res);
 
-        return res.exports;
+        return res;
     } catch (err) {
         notifyToUI('Error fetching from Arcade, check console (F12)');
         console.log('Error fetching from Arcade: ', err);
@@ -149,9 +154,9 @@ export default function useArcade() {
 
             if (!id && !secret) return;
 
-            const exports = await readTokensFromArcade({id, secret});
+            const res = await readTokensFromArcade({id, secret});
 
-            if (exports) {
+            if (res.exports) {
                 setProjectURL(`https://app.usearcade.com/projects/${id}`);
                 postToFigma({
                     type: MessageToPluginTypes.CREDENTIALS,
@@ -160,19 +165,14 @@ export default function useArcade() {
                     secret,
                     provider: StorageProviderType.ARCADE,
                 });
-                const tokens = exports['figma-tokens-plugin'];
+                const tokens = res.exports['figma-tokens-plugin'];
                 if (tokens?.output) {
                     const parsedTokens = JSON.parse(tokens.output);
-                    const groups = Object.entries(parsedTokens).map((group) => [
-                        group[0],
-                        JSON.stringify(group[1], null, 2),
-                    ]);
-                    const groupedValues = Object.fromEntries(groups);
+                    console.log('Parsed tokens', parsedTokens);
 
                     const obj = {
-                        version: exports.version,
-                        updatedAt: exports.updatedAt,
-                        values: groupedValues,
+                        version: res.version,
+                        values: parsedTokens.tokens,
                     };
 
                     tokenValues = obj;

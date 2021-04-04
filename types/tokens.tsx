@@ -8,8 +8,20 @@ export interface TokenProps {
 
 export type SingleToken = string | number | TokenGroup;
 
+export type SingleTokenObject = {
+    id: string;
+    name: string;
+    value: string;
+    type: TokenType | string | 'undefined';
+    description: string;
+};
+
 export interface TokenGroup {
     [key: string]: SingleToken;
+}
+
+export interface TokenArrayGroup {
+    [key: string]: SingleTokenObject;
 }
 
 export interface Tokens {
@@ -18,7 +30,8 @@ export interface Tokens {
 
 export interface TokenObject {
     hasErrored?: boolean;
-    values: string;
+    values: string | TokenArrayGroup;
+    type: 'array' | 'object';
 }
 
 export type TokenType =
