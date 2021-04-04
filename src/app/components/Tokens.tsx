@@ -1,8 +1,6 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import * as React from 'react';
-import JSON5 from 'json5';
 import {mergeDeep} from '@/plugin/helpers';
-import convertToTokenArray from '@/utils/convertTokens';
 import {SingleTokenObject, TokenType} from '../../../types/tokens';
 import {useTokenDispatch, useTokenState} from '../store/TokenContext';
 import TokenListing from './TokenListing';
@@ -48,7 +46,7 @@ const Tokens = () => {
     if (tokenData.tokens[activeTokenSet].type === 'array') {
         tokenValues = tokenData.tokens[activeTokenSet].values;
     } else {
-        tokenValues = JSON5.parse(tokenData.tokens[activeTokenSet].values);
+        tokenValues = JSON.parse(tokenData.tokens[activeTokenSet].values);
     }
 
     if (tokenData.tokens[activeTokenSet].hasErrored) return <div>JSON malformed, check in Editor</div>;

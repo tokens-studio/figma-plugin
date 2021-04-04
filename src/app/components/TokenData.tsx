@@ -1,5 +1,4 @@
 /* eslint-disable class-methods-use-this */
-import JSON5 from 'json5';
 import objectPath from 'object-path';
 import set from 'set-value';
 import convertToTokenArray from '@/utils/convertTokens';
@@ -61,7 +60,7 @@ export default class TokenData {
 
     private checkTokenValidity(tokens: string): boolean {
         try {
-            JSON5.parse(tokens);
+            JSON.parse(tokens);
             return false;
         } catch (e) {
             return true;
@@ -94,7 +93,7 @@ export default class TokenData {
 
     injectTokens(tokens, activeTokenSet): void {
         const receivedStyles = {};
-        const oldValues = JSON5.parse(this.tokens[activeTokenSet].values);
+        const oldValues = JSON.parse(this.tokens[activeTokenSet].values);
 
         // Iterate over received styles to set a value if no value existed before.
         Object.entries(tokens).map(([parent, values]: [string, SingleToken[]]) => {

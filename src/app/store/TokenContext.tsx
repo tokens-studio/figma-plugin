@@ -1,5 +1,4 @@
 import * as React from 'react';
-import JSON5 from 'json5';
 import objectPath from 'object-path';
 import set from 'set-value';
 import fetchChangelog from '@/utils/storyblok';
@@ -157,7 +156,7 @@ function stateReducer(state, action) {
             updateTokensOnSources(state, action.updatedAt, action.shouldUpdate);
             return state;
         case ActionType.DeleteToken: {
-            const obj = JSON5.parse(state.tokenData.tokens[action.data.parent].values);
+            const obj = JSON.parse(state.tokenData.tokens[action.data.parent].values);
             objectPath.del(obj, action.data.path);
             const tokens = JSON.stringify(obj, null, 2);
             state.tokenData.updateTokenValues(action.data.parent, tokens, action.updatedAt);
