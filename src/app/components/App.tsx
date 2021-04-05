@@ -2,6 +2,7 @@ import * as React from 'react';
 import {useSelector} from 'react-redux';
 import JSONEditor from './JSONEditor';
 import SyncSettings from './SyncSettings';
+import Settings from './Settings';
 import Inspector from './Inspector';
 import Tokens from './Tokens';
 import StartScreen from './StartScreen';
@@ -44,6 +45,7 @@ const App = () => {
                     {activeTab === 'json' && <JSONEditor />}
                     {activeTab === 'inspector' && <Inspector />}
                     {activeTab === 'syncsettings' && <SyncSettings />}
+                    {activeTab === 'settings' && <Settings />}
                 </div>
                 <Footer />
                 <Changelog />

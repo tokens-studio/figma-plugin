@@ -49,7 +49,8 @@
 		"regenerator-runtime": "^0.13.7",
 		"set-value": "^3.0.2",
 		"storyblok-js-client": "^3.3.1",
-		"tailwindcss": "^2.0.3"
+		"tailwindcss": "^2.0.3",
+		"use-debounce": "^6.0.1"
 	},
 	"devDependencies": {
 		"@babel/core": "^7.12.16",

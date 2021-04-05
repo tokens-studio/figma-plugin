@@ -30,7 +30,6 @@ export const settings = createModel<RootModel>()({
     } as SettingsState,
     reducers: {
         setWindowSize(state, payload: {width: number; height: number}) {
-            resizeWindow(payload, state.uiWindow.height);
             return {
                 ...state,
                 uiWindow: {
@@ -38,6 +37,10 @@ export const settings = createModel<RootModel>()({
                     height: payload.height,
                 },
             };
+        },
+        triggerWindowChange(state) {
+            resizeWindow(state.uiWindow.width, state.uiWindow.height);
+            return state;
         },
     },
 });

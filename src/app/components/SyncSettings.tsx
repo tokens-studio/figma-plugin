@@ -1,6 +1,5 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import * as React from 'react';
-import {useDispatch, useSelector} from 'react-redux';
 import {useTokenDispatch, useTokenState} from '../store/TokenContext';
 import {StorageProviderType} from '../../../types/api';
 import Button from './Button';
@@ -10,14 +9,10 @@ import StorageItem from './StorageItem';
 import ProviderSelector from './StorageProviderSelector';
 import EditStorageItemModal from './modals/EditStorageItemModal';
 import CreateStorageItemModal from './modals/CreateStorageItemModal';
-import {RootState, Dispatch} from '../store';
 
 const SyncSettings = () => {
     const {api, storageType, localApiState, apiProviders, updateAfterApply} = useTokenState();
     const {setLocalApiState, setStorageType, toggleUpdateAfterApply} = useTokenDispatch();
-    const settings = useSelector((state: RootState) => state.settings);
-    const loading = useSelector((state: RootState) => state.base.loading);
-    const dispatch = useDispatch<Dispatch>();
 
     const [confirmModalVisible, showConfirmModal] = React.useState(false);
     const [editStorageItemModalVisible, setShowEditStorageModalVisible] = React.useState(Boolean(localApiState.new));
@@ -104,31 +99,6 @@ const SyncSettings = () => {
             <div className="p-4 space-y-4 border-b">
                 <div className="space-y-4">
                     <Heading>Token Storage</Heading>
-                    Width: {settings.uiWindow.width}
-                    Height: {settings.uiWindow.height}
-                    Loading: {loading ? 'TRUE' : 'FALSE'}
-                    <button
-                        type="button"
-                        onClick={() =>
-                            dispatch.settings.setWindowSize({
-                                width: settings.uiWindow.width + 50,
-                                height: settings.uiWindow.height,
-                            })
-                        }
-                    >
-                        +50 W
-                    </button>
-                    <button
-                        type="button"
-                        onClick={() =>
-                            dispatch.settings.setWindowSize({
-                                width: settings.uiWindow.width,
-                                height: settings.uiWindow.height + 50,
-                            })
-                        }
-                    >
-                        +50 H
-                    </button>
                     <div className="flex flex-row gap-2">
                         <ProviderSelector
                             isActive={localApiState?.provider === StorageProviderType.LOCAL}

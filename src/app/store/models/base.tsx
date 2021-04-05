@@ -2,7 +2,7 @@
 import {createModel} from '@rematch/core';
 import {RootModel} from '.';
 
-type TabNames = 'start' | 'tokens' | 'json' | 'inspector' | 'syncsettings';
+type TabNames = 'start' | 'tokens' | 'json' | 'inspector' | 'syncsettings' | 'settings';
 
 interface BaseState {
     loading: boolean;
