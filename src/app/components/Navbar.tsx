@@ -1,5 +1,6 @@
 import * as React from 'react';
 import {useDispatch, useSelector} from 'react-redux';
+import {track} from '@/utils/analytics';
 import {useTokenState, useTokenDispatch} from '../store/TokenContext';
 import Icon from './Icon';
 import Tooltip from './Tooltip';
@@ -11,6 +12,11 @@ const TabButton = ({name, label, first = false}) => {
     const activeTab = useSelector((state: RootState) => state.base.activeTab);
     const dispatch = useDispatch<Dispatch>();
 
+    const onClick = () => {
+        track('Switched tab', {from: activeTab, to: name});
+        dispatch.base.setActiveTab(name);
+    };
+
     return (
         <button
             data-cy={`navitem-${name}`}
@@ -19,7 +25,7 @@ const TabButton = ({name, label, first = false}) => {
         ${activeTab === name ? 'text-black' : 'text-gray-500'}
         ${first ? 'pl-4' : ''}`}
             name="text"
-            onClick={() => dispatch.base.setActiveTab(name)}
+            onClick={onClick}
         >
             {label}
         </button>

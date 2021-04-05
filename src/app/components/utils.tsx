@@ -150,10 +150,12 @@ export function goToNodeId(id) {
 }
 
 export async function compareUpdatedAt(oldUpdatedAt, newUpdatedAt) {
-    if (newUpdatedAt > oldUpdatedAt) {
+    const newDate = new Date(newUpdatedAt).getTime();
+    const oldDate = new Date(oldUpdatedAt).getTime();
+    if (newDate > oldDate) {
         return 'remote_newer';
     }
-    if (newUpdatedAt === oldUpdatedAt) {
+    if (newDate === oldDate) {
         return 'same';
     }
     return 'remote_older';

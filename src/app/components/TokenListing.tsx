@@ -1,6 +1,5 @@
 import * as React from 'react';
 import objectPath from 'object-path';
-import JSON5 from 'json5';
 import set from 'set-value';
 import {useTokenDispatch, useTokenState} from '../store/TokenContext';
 import EditTokenForm from './EditTokenForm';
@@ -67,7 +66,7 @@ const TokenListing = ({
     });
 
     function setSingleTokenValue({parent, name, value, options, oldName, newGroup = false}) {
-        const obj = JSON5.parse(tokenData.tokens[parent].values);
+        const obj = JSON.parse(tokenData.tokens[parent].values);
         let newValue;
         if (newGroup) {
             newValue = {};
