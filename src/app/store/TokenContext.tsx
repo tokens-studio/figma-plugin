@@ -1,6 +1,7 @@
 import * as React from 'react';
 import objectPath from 'object-path';
 import fetchChangelog from '@/utils/storyblok';
+import {track} from '@/utils/analytics';
 import defaultJSON from '../../config/default.json';
 import TokenData from '../components/TokenData';
 import * as pjs from '../../../package.json';
@@ -54,6 +55,7 @@ export enum ActionType {
     SetProjectURL = 'SET_PROJECT_URL',
     SetChangelog = 'SET_CHANGELOG',
     SetLastOpened = 'SET_LAST_OPENED',
+    SetSyncEnabled = 'SET_SYNC_ENABLED',
 }
 
 const defaultTokens: TokenProps = {
@@ -265,6 +267,7 @@ function stateReducer(state, action) {
             };
         }
         case ActionType.ToggleUpdatePageOnly:
+            track('Toggle Update Page Only', {state: action.bool});
             return {
                 ...state,
                 updatePageOnly: action.bool,
@@ -323,6 +326,12 @@ function stateReducer(state, action) {
             return {
                 ...state,
                 projectURL: action.data,
+            };
+        }
+        case ActionType.SetSyncEnabled: {
+            return {
+                ...state,
+                syncEnabled: action.data,
             };
         }
         case ActionType.SetStorageType:
@@ -476,6 +485,9 @@ function TokenProvider({children}) {
             },
             setLastOpened: (data: Date) => {
                 dispatch({type: ActionType.SetLastOpened, data, dispatch});
+            },
+            setSyncEnabled: (data: boolean) => {
+                dispatch({type: ActionType.SetSyncEnabled, data});
             },
         }),
         [dispatch, updatedAt]

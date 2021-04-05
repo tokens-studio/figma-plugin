@@ -65,18 +65,28 @@ const JSONEditor = () => {
 
             <div className="flex justify-between w-full px-4 bg-white">
                 <div className="space-x-2 flex mr-2">
-                    <Button disabled={editProhibited} variant="secondary" onClick={() => showPresetModal(true)}>
+                    <Button
+                        id="load-preset"
+                        disabled={editProhibited}
+                        variant="secondary"
+                        onClick={() => showPresetModal(true)}
+                    >
                         Load preset
                     </Button>
-                    <Button disabled={editProhibited} variant="secondary" onClick={() => showConfirmModal('delete')}>
+                    <Button
+                        id="clear-tokens"
+                        disabled={editProhibited}
+                        variant="secondary"
+                        onClick={() => showConfirmModal('delete')}
+                    >
                         Clear
                     </Button>
                 </div>
                 <div className="space-x-2 flex">
-                    <Button variant="secondary" onClick={() => showExportModal(true)}>
+                    <Button id="export" variant="secondary" onClick={() => showExportModal(true)}>
                         Export
                     </Button>
-                    <Button disabled={editProhibited} variant="primary" onClick={handleUpdate}>
+                    <Button id="save-update-json" disabled={editProhibited} variant="primary" onClick={handleUpdate}>
                         Save & update
                     </Button>
                 </div>
