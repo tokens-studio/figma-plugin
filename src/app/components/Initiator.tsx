@@ -19,6 +19,7 @@ export default function Initiator({setActive, setRemoteComponents}) {
         setStorageType,
         setAPIProviders,
         setLastOpened,
+        setSyncEnabled,
     } = useTokenDispatch();
     const {fetchDataFromRemote} = useRemoteTokens();
 
@@ -87,6 +88,9 @@ export default function Initiator({setActive, setRemoteComponents}) {
                                 setActive('tokens');
                             }
                             setLoading(false);
+                        } else {
+                            // Enable sync for beta
+                            setSyncEnabled(true);
                         }
                         break;
                     }
