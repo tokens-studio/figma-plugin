@@ -1,4 +1,3 @@
-import * as pjs from '../../../../package.json';
 import {notifyToUI, postToFigma} from '../../../plugin/notifiers';
 import {StorageProviderType} from '../../../../types/api';
 import {MessageToPluginTypes} from '../../../../types/messages';
@@ -54,7 +53,7 @@ export async function updateJSONBinTokens({tokens, id, secret, updatedAt, oldUpd
     }, {});
     const tokenObj = JSON.stringify(
         {
-            version: pjs.version,
+            version: process.env.PLUGIN_VERSION,
             updatedAt,
             values,
         },
@@ -88,7 +87,7 @@ export function useJSONbin() {
             cache: 'no-cache',
             credentials: 'same-origin',
             body: JSON.stringify({
-                version: pjs.version,
+                version: process.env.PLUGIN_VERSION,
                 updatedAt,
                 values: {
                     options: {},

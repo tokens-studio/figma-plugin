@@ -1,7 +1,6 @@
 import * as React from 'react';
 import {useSelector} from 'react-redux';
 import Icon from './Icon';
-import * as pjs from '../../../package.json';
 import {RootState} from '../store';
 
 export default function Footer() {
@@ -9,7 +8,7 @@ export default function Footer() {
 
     return (
         <div className={`p-4 flex-shrink-0 flex items-center justify-between ${activeTab === 'tokens' && 'mb-16'}`}>
-            <div className="text-gray-600 text-xxs">Figma Tokens Version {pjs.version}</div>
+            <div className="text-gray-600 text-xxs">Figma Tokens Version {process.env.PLUGIN_VERSION}</div>
             <div className="text-gray-600 text-xxs">
                 <a
                     className="flex items-center"

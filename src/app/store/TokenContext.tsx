@@ -4,7 +4,6 @@ import objectPath from 'object-path';
 import fetchChangelog from '@/utils/storyblok';
 import defaultJSON from '../../config/default.json';
 import TokenData from '../components/TokenData';
-import * as pjs from '../../../package.json';
 import {TokenProps} from '../../../types/tokens';
 import {StorageProviderType, ApiDataType, StorageType} from '../../../types/api';
 import {postToFigma} from '../../plugin/notifiers';
@@ -58,7 +57,7 @@ export enum ActionType {
 }
 
 const defaultTokens: TokenProps = {
-    version: pjs.version,
+    version: process.env.PLUGIN_VERSION,
     updatedAt: new Date().toString(),
     values: {
         options: JSON.stringify(defaultJSON, null, 2),
@@ -66,7 +65,7 @@ const defaultTokens: TokenProps = {
 };
 
 export const emptyTokens: TokenProps = {
-    version: pjs.version,
+    version: process.env.PLUGIN_VERSION,
     updatedAt: new Date().toString(),
     values: {
         options: '{ }',

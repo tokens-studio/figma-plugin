@@ -2,7 +2,6 @@
 import objectPath from 'object-path';
 import {fetchAllPluginData} from './pluginData';
 import store from './store';
-import * as pjs from '../../package.json';
 import setValuesOnNode from './updateNode';
 import {TokenProps} from '../../types/tokens';
 import {StorageProviderType, StorageType} from '../../types/api';
@@ -22,7 +21,7 @@ export function mapValuesToTokens(object, values) {
 }
 
 export function setTokensOnDocument(tokens, updatedAt: string) {
-    figma.root.setSharedPluginData('tokens', 'version', pjs.version);
+    figma.root.setSharedPluginData('tokens', 'version', process.env.PLUGIN_VERSION);
     figma.root.setSharedPluginData('tokens', 'values', JSON.stringify(tokens));
     figma.root.setSharedPluginData('tokens', 'updatedAt', updatedAt);
 }
