@@ -22,8 +22,8 @@ interface TokenListingType {
 }
 
 const mappedTokens = (tokens) => {
+    console.log('Trying to render tokens', tokens);
     const tokenObj = {};
-    console.log('Tokens are', tokens);
     Object.entries(tokens).forEach(([key, group]: [string, {values: SingleTokenObject[]; type?: TokenType}]) => {
         tokenObj[key] = {
             values: group.values,
@@ -31,6 +31,8 @@ const mappedTokens = (tokens) => {
     });
 
     mergeDeep(tokenObj, tokenTypes);
+
+    console.log('rendering tokens', tokenObj);
     return Object.entries(tokenObj);
 };
 
@@ -42,12 +44,7 @@ const Tokens = () => {
         updateTokens(false);
     };
 
-    let tokenValues;
-    if (tokenData.tokens[activeTokenSet].type === 'array') {
-        tokenValues = tokenData.tokens[activeTokenSet].values;
-    } else {
-        tokenValues = JSON.parse(tokenData.tokens[activeTokenSet].values);
-    }
+    const tokenValues = tokenData.tokens[activeTokenSet].values;
 
     if (tokenData.tokens[activeTokenSet].hasErrored) return <div>JSON malformed, check in Editor</div>;
 

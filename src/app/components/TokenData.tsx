@@ -39,23 +39,12 @@ export default class TokenData {
 
     setTokens(tokens: TokenProps): void {
         console.log('Got tokens', tokens);
-        // const setNames = [...new Set(tokens.map((token) => token.name.split('.')[0])
-        const setNames = ['mainTokens'];
-        this.setUpdatedAt(tokens.updatedAt || new Date().toString());
-        if (Array.isArray(tokens.values)) {
-            console.log('Tokenobj', createTokensObject(tokens.values));
-            this.tokens = {
-                mainTokens: {
-                    type: 'array',
-                    values: createTokensObject(tokens.values),
-                },
-            };
-        } else {
-            const parsed = this.parseTokenValues(tokens);
-            if (!parsed) return;
-            this.tokens = this.parseTokenValues(tokens);
-        }
-        this.setUsedTokenSet(setNames);
+        const parsed = this.parseTokenValues(tokens);
+        if (!parsed) return;
+        this.tokens = parsed;
+
+        console.log('Initialized tokens', this.tokens);
+        this.usedTokenSet = [Object.keys(parsed)[0]];
     }
 
     private checkTokenValidity(tokens: string): boolean {
@@ -69,14 +58,34 @@ export default class TokenData {
 
     private parseTokenValues(tokens: TokenProps): Tokens | null {
         try {
+            this.setUpdatedAt(tokens.updatedAt || new Date().toString());
+            // Arcade has one token array
+            if (Array.isArray(tokens.values)) {
+                return {
+                    mainTokens: {
+                        type: 'array',
+                        values: createTokensObject(tokens.values),
+                    },
+                };
+            }
             const reducedTokens = Object.entries(tokens.values).reduce((prev, group) => {
-                prev.push({[group[0]]: {values: group[1]}});
-                return prev;
+                const parsedGroup = JSON.parse(group[1]);
+                if (typeof parsedGroup === 'object') {
+                    const groupValues = [];
+                    const convertedToArray = convertToTokenArray({tokens: parsedGroup});
+                    convertedToArray.forEach(([key, value]) => {
+                        groupValues.push({name: key, ...value});
+                    });
+                    const convertedGroup = createTokensObject(groupValues);
+                    console.log('Converted Group', convertedGroup);
+                    prev.push({[group[0]]: {values: convertedGroup}});
+                    return prev;
+                }
             }, []);
 
-            const assigned = Object.assign({}, ...reducedTokens);
+            console.log('reduced tokens is', reducedTokens);
 
-            return assigned;
+            return Object.assign({}, ...reducedTokens);
         } catch (e) {
             notifyToUI('Error reading tokens, check console (F12)');
             console.error('Error reading tokens', e);
@@ -152,6 +161,7 @@ export default class TokenData {
     }
 
     reorderTokenSets(tokenSets: string[]): void {
+        console.log('reordering');
         const newTokens = {};
         tokenSets.map((set) => {
             Object.assign(newTokens, {[set]: this.tokens[set]});
@@ -167,21 +177,30 @@ export default class TokenData {
 
     setMergedTokens(): void {
         const mergedTokens = [];
-        if (Object.entries(this.tokens)) {
-            Object.entries(this.tokens).forEach((cur) => {
-                if (this.usedTokenSet.includes(cur[0])) {
-                    Object.entries(cur[1].values).map((group) => {
-                        mergedTokens.push(...group[1].values);
-                    });
+        console.log('Tokens are', this.tokens);
+        Object.entries(this.tokens).forEach((tokenGroup) => {
+            console.log('Cur is', tokenGroup, this.usedTokenSet);
+            if (this.usedTokenSet.includes(tokenGroup[0])) {
+                if (Array.isArray(tokenGroup[1].values)) {
+                    console.log('Is array, pushing all', tokenGroup[1].values);
+                    mergedTokens.push(...tokenGroup[1].values);
                 }
-            });
-            this.mergedTokens = mergedTokens;
+                console.log('Parsed is', tokenGroup[1].values);
+                const convertedToArray = convertToTokenArray({tokens: tokenGroup[1].values});
+                convertedToArray.forEach(([key, value]) => {
+                    mergedTokens.push({name: key, ...value});
+                });
+            }
+        });
+        console.log('Merged Tokens are', mergedTokens);
 
-            this.setAllAliases();
-        }
+        this.mergedTokens = mergedTokens;
+
+        this.setAllAliases();
     }
 
     updateTokenValues(parent: string, tokens: string, updatedAt: string): void {
+        console.log('Updat token val');
         if (tokens) {
             const hasErrored: boolean = this.checkTokenValidity(tokens);
 
@@ -201,10 +220,6 @@ export default class TokenData {
             const oldTokens = this.tokens;
             delete oldTokens[parent];
         }
-    }
-
-    getTokens() {
-        return this.tokens;
     }
 
     getUpdatedAt() {
@@ -233,7 +248,6 @@ export default class TokenData {
 
     getFormattedTokens() {
         const tokens = convertToTokenArray({tokens: this.getMergedTokens(), expandTypography: true});
-        console.log('Tokens are', tokens);
         const tokenObj = {};
         tokens.forEach(([key, value]) => {
             set(tokenObj, key.split('/').join('.').toString(), value);

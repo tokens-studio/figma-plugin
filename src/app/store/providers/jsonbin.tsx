@@ -143,15 +143,10 @@ export function useJSONbin() {
                     provider: StorageProviderType.JSONBIN,
                 });
                 if (jsonBinData?.values) {
-                    const values = Object.entries(jsonBinData.values).reduce((acc, [key, val]) => {
-                        acc[key] = JSON.stringify(val, null, 2);
-                        return acc;
-                    }, {});
-
                     const obj = {
                         version: jsonBinData.version,
                         updatedAt: jsonBinData.updatedAt,
-                        values,
+                        values: jsonBinData.values,
                     };
 
                     tokenValues = obj;

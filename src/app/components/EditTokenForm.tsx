@@ -54,6 +54,7 @@ const EditTokenForm = ({
             oldName = [path, initialName].join('.');
         }
         if (isPristine) {
+            console.log('Creating token', path, name, activeTokenSet, value, options);
             createSingleToken({
                 parent: activeTokenSet,
                 name: [path, name].join('.'),
@@ -61,6 +62,7 @@ const EditTokenForm = ({
                 options,
             });
         } else {
+            console.log('Editing token', path, name, activeTokenSet, value, options, oldName);
             editSingleToken({
                 parent: activeTokenSet,
                 name: [path, name].join('.'),

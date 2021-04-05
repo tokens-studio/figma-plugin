@@ -131,7 +131,6 @@ const TokenButton = ({type, property, name, path, token, editMode, showForm}) =>
     }
 
     const onClick = (givenProperties, isActive = active) => {
-        console.log('Clicked', path, name);
         const propsToSet = Array.isArray(givenProperties) ? givenProperties : new Array(givenProperties);
         if (editMode) {
             showForm({name, value: token, path});
@@ -146,7 +145,6 @@ const TokenButton = ({type, property, name, path, token, editMode, showForm}) =>
                 [propsToSet[0].name || propsToSet[0]]: propsToSet[0].forcedValue || value,
             };
             if (propsToSet[0].clear) propsToSet[0].clear.map((item) => Object.assign(newProps, {[item]: 'delete'}));
-            console.log('setting plugval', newProps);
 
             setPluginValue(newProps);
         }
