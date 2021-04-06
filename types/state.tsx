@@ -18,4 +18,5 @@ export type StateType = {
     apiProviders: ApiDataType[];
     updatePageOnly: boolean;
     editProhibited: boolean;
+    usedTokenSet: string[];
 };

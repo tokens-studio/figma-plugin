@@ -12,18 +12,18 @@ import TokenSetItem from './TokenSetItem';
 import Tooltip from './Tooltip';
 
 export default function TokenSetSelector() {
-    const {tokenData, editProhibited} = useTokenState();
+    const {tokens, editProhibited} = useTokenState();
     const {addTokenSet, renameTokenSet, deleteTokenSet, setTokenSetOrder} = useTokenDispatch();
     const [showNewTokenSetFields, setShowNewTokenSetFields] = React.useState(false);
     const [showDeleteTokenSetModal, setShowDeleteTokenSetModal] = React.useState(false);
     const [showRenameTokenSetFields, setShowRenameTokenSetFields] = React.useState(false);
     const [newTokenSetName, handleNewTokenSetNameChange] = React.useState('');
     const [tokenSetMarkedForChange, setTokenSetMarkedForChange] = React.useState('');
-    const [totalTokenSetArray, setTotalTokenSetArray] = React.useState(Object.keys(tokenData.tokens));
+    const [totalTokenSetArray, setTotalTokenSetArray] = React.useState(Object.keys(tokens));
 
     React.useEffect(() => {
-        setTotalTokenSetArray(Object.keys(tokenData.tokens));
-    }, [tokenData.tokens]);
+        setTotalTokenSetArray(Object.keys(tokens));
+    }, [tokens]);
 
     const stringOrder = JSON.stringify(totalTokenSetArray);
 
@@ -76,7 +76,7 @@ export default function TokenSetSelector() {
     React.useEffect(() => {
         setShowNewTokenSetFields(false);
         handleNewTokenSetNameChange('');
-    }, [tokenData.tokens]);
+    }, [tokens]);
 
     return (
         <div className="flex flex-row gap-2 px-4 pt-2 pb-0 overflow-x-auto">

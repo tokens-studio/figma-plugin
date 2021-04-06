@@ -1,24 +1,13 @@
-import convertToTokenArray from '@/utils/convertTokens';
 import updateColorStyles from './updateColorStyles';
 import updateTextStyles from './updateTextStyles';
 
 export default function updateStyles(tokens, shouldCreate = false): void {
-    const tokenArray = convertToTokenArray({tokens, returnValuesOnly: true});
+    console.log('Updating styles', tokens);
+    const colorTokens = tokens.filter((n) => ['color', 'colors'].includes(n.type));
+    const textTokens = tokens.filter((n) => ['typography'].includes(n.type));
 
-    const colorTokens = tokenArray
-        .filter((n) => ['color', 'colors'].includes(n[0].split('/')[0]))
-        .map(([key, value]) => {
-            const arr = key.split('/');
-            arr.shift();
-            return [arr.join('/'), value];
-        });
-    const textTokens = tokenArray
-        .filter((n) => ['typography'].includes(n[0].split('/')[0]))
-        .map(([key, value]) => {
-            const arr = key.split('/');
-            arr.shift();
-            return [arr.join('/'), value];
-        });
+    console.log('Styles are', colorTokens, textTokens);
+
     if (!colorTokens && !textTokens) return;
     if (colorTokens) {
         updateColorStyles(colorTokens, shouldCreate);

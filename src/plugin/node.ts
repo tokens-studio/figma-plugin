@@ -38,7 +38,6 @@ export function getTokenData(): {values: TokenProps; updatedAt: string; version:
     const updatedAt = figma.root.getSharedPluginData('tokens', 'updatedAt');
     if (values) {
         const parsedValues = JSON.parse(values);
-        console.log('Parsed values', parsedValues);
         return {values: parsedValues, updatedAt, version};
     }
     return null;

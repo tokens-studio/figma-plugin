@@ -1,6 +1,7 @@
 import {convertStringToFigmaGradient, convertToFigmaColor} from './helpers';
 
 export default function setColorValuesOnTarget(target, token) {
+    console.log('Setting color on target', target, token);
     try {
         const {description, value} = token;
         if (value.startsWith('linear-gradient')) {

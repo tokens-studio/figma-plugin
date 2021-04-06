@@ -1,18 +1,21 @@
 import {checkAndEvaluateMath, convertToRgb} from '@/app/components/utils';
 import {SingleToken} from '@types/tokens';
-import objectPath from 'object-path';
 import checkIfValueToken from './checkIfValueToken';
 
 export const aliasRegex = /(\$[^\s]+\w)/g;
 
-export function getAliasValue(token: SingleToken, tokens = {}): string | null {
+export function getAliasValue(token: SingleToken, tokens = []): string | null {
     let returnedValue = checkIfValueToken(token) ? (token.value as string) : (token as string);
+    console.log('RETURNED VALIUE', token, returnedValue, tokens);
+
     const tokenReferences = returnedValue.toString().match(aliasRegex);
-    if (tokenReferences.length > 0) {
+    console.log('REFERENCES ARE', tokenReferences);
+    if (tokenReferences?.length > 0) {
         const resolvedReferences = tokenReferences.map((ref) => {
             if (ref.length > 1) {
-                const value = objectPath.get(tokens, ref.substring(1));
-                if (typeof value !== 'undefined') return value;
+                const value = tokens.find((t) => t.name === ref.substring(1));
+                console.log('Value is', value);
+                if (typeof value !== 'undefined') return value.value;
             }
             return null;
         });

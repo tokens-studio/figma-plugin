@@ -3,12 +3,11 @@ import {StorageProviderType} from '../../../types/api';
 import {notifyToUI} from '../../plugin/notifiers';
 import {useJSONbin} from './providers/jsonbin';
 import useArcade from './providers/arcade';
-import TokenData from '../components/TokenData';
 import {useTokenDispatch, useTokenState} from './TokenContext';
 import {compareUpdatedAt} from '../components/utils';
 
 export default function useRemoteTokens() {
-    const {api, updateAfterApply, tokenData, localApiState} = useTokenState();
+    const {api, updateAfterApply, lastUpdatedAt, localApiState} = useTokenState();
     const {setLoading, setTokenData, updateTokens, setApiData, setStorageType, updateSingleToken} = useTokenDispatch();
     const {fetchDataFromArcade, editArcadeToken, createArcadeToken, deleteArcadeToken} = useArcade();
     const {fetchDataFromJSONBin, createNewJSONBin} = useJSONbin();
@@ -36,7 +35,9 @@ export default function useRemoteTokens() {
             default:
                 throw new Error('Not implemented');
         }
-        setTokenData(new TokenData(tokenValues));
+        console.log('Got Pull values', tokenValues);
+
+        setTokenData(tokenValues);
         updateTokens(false);
         setLoading(false);
     };
@@ -101,14 +102,18 @@ export default function useRemoteTokens() {
         if (remoteTokens) {
             setStorageType({provider, id, name}, true);
             setApiData({id, secret, name, provider});
-            const comparison = await compareUpdatedAt(tokenData.getUpdatedAt(), remoteTokens);
+            const comparison = await compareUpdatedAt(lastUpdatedAt, remoteTokens);
             if (comparison === 'remote_older') {
-                setTokenData(new TokenData(remoteTokens));
+                console.log('Got remote older values', remoteTokens);
+
+                setTokenData(remoteTokens);
                 if (updateAfterApply) {
                     updateTokens(false);
                 }
             } else {
-                setTokenData(new TokenData(remoteTokens));
+                console.log('Got sync values', remoteTokens);
+
+                setTokenData(remoteTokens);
                 if (updateAfterApply) {
                     updateTokens(false);
                 }

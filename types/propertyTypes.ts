@@ -9,13 +9,15 @@ export type TypographyToken = {
         letterSpacing?: string;
         paragraphSpacing?: string;
     };
+    name: string;
     description?: string;
 };
 
 export type propertyObject = {
     description?: string;
     data?: MetaDataObject;
-    value?: any;
+    value: string | number;
+    name: string;
 };
 
 export type fillValuesType = ColorRgba | ColorHsla;

@@ -4,7 +4,6 @@ import {postToFigma} from '../../plugin/notifiers';
 import {MessageFromPluginTypes, MessageToPluginTypes} from '../../../types/messages';
 import useRemoteTokens from '../store/remoteTokens';
 import {useTokenDispatch} from '../store/TokenContext';
-import TokenData from './TokenData';
 
 export default function Initiator({setActive, setRemoteComponents}) {
     const {
@@ -61,7 +60,9 @@ export default function Initiator({setActive, setRemoteComponents}) {
                     case MessageFromPluginTypes.TOKEN_VALUES: {
                         setLoading(false);
                         if (values) {
-                            setTokenData(new TokenData(values));
+                            console.log('Got token values', values);
+
+                            setTokenData(values);
                             setActive('tokens');
                         }
                         break;
@@ -84,7 +85,8 @@ export default function Initiator({setActive, setRemoteComponents}) {
                             setLocalApiState({id, secret, name, provider});
                             const remoteValues = await fetchDataFromRemote(id, secret, name, provider);
                             if (remoteValues) {
-                                setTokenData(new TokenData(remoteValues));
+                                console.log('Got remote values', remoteValues);
+                                setTokenData(remoteValues);
                                 setActive('tokens');
                             }
                             setLoading(false);

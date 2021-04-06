@@ -51,14 +51,13 @@ const EditTokenForm = ({
     const submitTokenValue = async ({value, name, options}) => {
         let oldName;
         if (initialName !== name && initialName) {
-            oldName = [path, initialName].join('.');
+            oldName = initialName;
         }
         if (isPristine) {
             console.log('Creating token', path, name, activeTokenSet, value, options);
             createSingleToken({
                 parent: activeTokenSet,
                 name,
-                // name: [path, name].join('.'), <-- use for anything other than arcade
                 value,
                 options,
             });

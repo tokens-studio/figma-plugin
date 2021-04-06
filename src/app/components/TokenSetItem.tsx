@@ -16,7 +16,7 @@ enum ItemTypes {
 }
 
 export default function TokenSetItem({tokenSet, onMove, index, onRename, onDelete, onDrop}) {
-    const {tokenData, activeTokenSet, editProhibited, usedTokenSet} = useTokenState();
+    const {tokens, activeTokenSet, editProhibited, usedTokenSet} = useTokenState();
     const {toggleUsedTokenSet, setActiveTokenSet} = useTokenDispatch();
 
     const ref = React.useRef<HTMLDivElement>(null);
@@ -127,7 +127,7 @@ export default function TokenSetItem({tokenSet, onMove, index, onRename, onDelet
                     Rename
                 </MenuItem>
                 <MenuItem
-                    disabled={editProhibited || Object.keys(tokenData.tokens).length < 2}
+                    disabled={editProhibited || Object.keys(tokens).length < 2}
                     onClick={() => onDelete(tokenSet)}
                 >
                     Delete

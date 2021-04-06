@@ -2,11 +2,11 @@ import React from 'react';
 import Modal from '../Modal';
 import Heading from '../Heading';
 import StorageItemForm from '../StorageItemForm';
-import {useTokenState} from '../../store/TokenContext';
+import {reduceToValues, useTokenState} from '../../store/TokenContext';
 import useRemoteTokens from '../../store/remoteTokens';
 
 export default function CreateStorageItemModal({isOpen, onClose, onSuccess}) {
-    const {tokenData, localApiState} = useTokenState();
+    const {tokens, localApiState, updatedAt} = useTokenState();
     const {addNewProviderItem} = useRemoteTokens();
     const [hasErrored, setHasErrored] = React.useState(false);
     const [formFields, setFormFields] = React.useState({id: '', name: '', secret: ''});
@@ -17,9 +17,9 @@ export default function CreateStorageItemModal({isOpen, onClose, onSuccess}) {
             id: formFields.id,
             provider: localApiState.provider,
             secret: formFields.secret,
-            tokens: tokenData.reduceToValues(),
+            tokens: reduceToValues(tokens),
             name: formFields.name,
-            updatedAt: tokenData.getUpdatedAt(),
+            updatedAt,
         });
         if (response) {
             onSuccess();

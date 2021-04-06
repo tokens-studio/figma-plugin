@@ -2,6 +2,7 @@ import {StorageProviderType} from '../../../types/api';
 import {postToFigma, notifyToUI} from '../../plugin/notifiers';
 import {StateType} from '../../../types/state';
 import {MessageToPluginTypes} from '../../../types/messages';
+import {getMergedTokens} from './TokenContext';
 
 async function updateSingleRemoteToken({
     provider,
@@ -40,7 +41,7 @@ export default async function editRemoteToken(state: StateType, data: {values: o
 
     postToFigma({
         type: MessageToPluginTypes.UPDATE,
-        tokens: state.tokenData.getMergedTokens(),
+        tokens: getMergedTokens(state.tokens, state.usedTokenSet),
         updatePageOnly: state.updatePageOnly,
     });
 }

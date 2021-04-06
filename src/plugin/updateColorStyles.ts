@@ -5,17 +5,19 @@ export default function updateColorStyles(colorTokens, shouldCreate = false) {
     // Iterate over colorTokens to create objects that match figma styles
     const paints = figma.getLocalPaintStyles();
 
-    colorTokens.map(([key, value]: [string, ColorToken]) => {
+    console.log('Color tokens', colorTokens);
+
+    colorTokens.map((token: ColorToken) => {
         let matchingStyles = [];
         if (paints.length > 0) {
-            matchingStyles = paints.filter((n) => n.name === key);
+            matchingStyles = paints.filter((n) => n.name === token.name);
         }
         if (matchingStyles.length) {
-            setColorValuesOnTarget(matchingStyles[0], value);
+            setColorValuesOnTarget(matchingStyles[0], token);
         } else if (shouldCreate) {
             const style = figma.createPaintStyle();
-            style.name = key;
-            setColorValuesOnTarget(style, value);
+            style.name = token.name;
+            setColorValuesOnTarget(style, token);
         }
     });
 }

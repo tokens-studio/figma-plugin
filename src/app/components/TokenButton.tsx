@@ -5,13 +5,15 @@ import {useTokenState, useTokenDispatch} from '../store/TokenContext';
 import Icon from './Icon';
 import {lightOrDark, colorByHashCode, isTypographyToken} from './utils';
 import useManageTokens from '../store/useManageTokens';
+import useReadTokens from '../store/useReadTokens';
 
 const TokenButton = ({type, property, name, path, token, editMode, showForm}) => {
-    const {colorMode, displayType, selectionValues, tokenData, disabled, activeTokenSet} = useTokenState();
+    const {colorMode, displayType, selectionValues, disabled, activeTokenSet} = useTokenState();
     const {setNodeData, setShowOptions, setLoading} = useTokenDispatch();
     const {deleteSingleToken} = useManageTokens();
+    const {getTokenValue} = useReadTokens();
 
-    const displayValue = tokenData.getTokenValue(token);
+    const displayValue = getTokenValue(token);
     let style;
     let showValue = true;
     let showEditButton = false;
@@ -146,7 +148,7 @@ const TokenButton = ({type, property, name, path, token, editMode, showForm}) =>
                 [propsToSet[0].name || propsToSet[0]]: propsToSet[0].forcedValue || value,
             };
             if (propsToSet[0].clear) propsToSet[0].clear.map((item) => Object.assign(newProps, {[item]: 'delete'}));
-
+            console.log('Setting plugin value', newProps);
             setPluginValue(newProps);
         }
     };

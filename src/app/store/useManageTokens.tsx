@@ -5,7 +5,7 @@ import {useTokenDispatch, useTokenState} from './TokenContext';
 
 export default function useManageTokens() {
     const {storageType} = useTokenState();
-    const {setLoading, updateTokens, updateSingleToken, deleteToken} = useTokenDispatch();
+    const {setLoading, updateTokens, editToken, deleteToken, createToken} = useTokenDispatch();
     const {editRemoteToken, createRemoteToken, deleteRemoteToken} = useRemoteTokens();
 
     async function editSingleToken(data: {
@@ -20,15 +20,15 @@ export default function useManageTokens() {
         const isLocal = storageType.provider === StorageProviderType.LOCAL;
         if (!isLocal) {
             const response = await editRemoteToken(data);
+            console.log('REsponse is', response);
         }
-        updateSingleToken({
+        editToken({
             parent,
             name,
             value,
             options,
             oldName,
         });
-        updateTokens();
         setLoading(false);
     }
 
@@ -45,7 +45,7 @@ export default function useManageTokens() {
         if (!isLocal) {
             const response = await createRemoteToken(data);
         }
-        updateSingleToken({
+        createToken({
             parent,
             name,
             value,

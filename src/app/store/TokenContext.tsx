@@ -3,10 +3,13 @@ import objectPath from 'object-path';
 import set from 'set-value';
 import fetchChangelog from '@/utils/storyblok';
 import {track} from '@/utils/analytics';
+import convertToTokenArray from '@/utils/convertTokens';
+import {mergeDeep} from '@/plugin/helpers';
+import {getAliasValue} from '@/utils/aliases';
 import defaultJSON from '../../config/default.json';
 import TokenData from '../components/TokenData';
 import * as pjs from '../../../package.json';
-import {SingleToken, TokenProps, TokenType} from '../../../types/tokens';
+import {SingleToken, TokenProps} from '../../../types/tokens';
 import {StorageProviderType, ApiDataType, StorageType} from '../../../types/api';
 import {postToFigma} from '../../plugin/notifiers';
 import {MessageToPluginTypes} from '../../../types/messages';
@@ -17,6 +20,39 @@ export interface SelectionValue {
     horizontalPadding: string | undefined;
     verticalPadding: string | undefined;
     itemSpacing: string | undefined;
+}
+
+export function getMergedTokens(tokens, usedTokenSet, shouldResolve = false) {
+    const mergedTokens = [];
+    Object.entries(tokens).forEach((tokenGroup) => {
+        if (usedTokenSet.includes(tokenGroup[0])) {
+            mergedTokens.push(...tokenGroup[1].values);
+        }
+    });
+    let returnedTokens = mergedTokens;
+
+    if (shouldResolve) {
+        returnedTokens = mergedTokens.map((t) => {
+            console.log('t is', t);
+            return {
+                ...t,
+                value: getAliasValue(t, mergedTokens),
+            };
+        });
+    }
+
+    return returnedTokens;
+}
+
+export function reduceToValues(tokens) {
+    const reducedTokens = Object.entries(tokens).reduce((prev, group) => {
+        prev.push({[group[0]]: group[1].values});
+        return prev;
+    }, []);
+
+    const assigned = mergeDeep({}, ...reducedTokens);
+
+    return assigned;
 }
 
 export enum ActionType {
@@ -57,6 +93,9 @@ export enum ActionType {
     SetChangelog = 'SET_CHANGELOG',
     SetLastOpened = 'SET_LAST_OPENED',
     UpdateSingleToken = 'UPDATE_SINGLE_TOKEN',
+    CreateToken = 'CREATE_TOKEN',
+    EditToken = 'EDIT_TOKEN',
+    CreateTokenGroup = 'CREATE_TOKEN_GROUP',
     SetSyncEnabled = 'SET_SYNC_ENABLED',
 }
 
@@ -117,6 +156,37 @@ const emptyState = {
     changelog: [],
     lastOpened: '',
     syncEnabled: true,
+    lastUpdatedAt: null,
+};
+
+const parseTokenValues = (tokens) => {
+    console.log('Parsing values', tokens);
+    if (Array.isArray(tokens)) {
+        return {
+            global: {
+                type: 'array',
+                values: tokens,
+            },
+        };
+    }
+    const reducedTokens = Object.entries(tokens).reduce((prev, group) => {
+        const parsedGroup = group[1];
+        if (typeof parsedGroup === 'object') {
+            const groupValues = [];
+            const convertedToArray = convertToTokenArray({tokens: parsedGroup});
+            convertedToArray.forEach(([key, value]) => {
+                groupValues.push({name: key, ...value});
+            });
+            const convertedGroup = groupValues;
+            console.log('Converted Group', convertedGroup);
+            prev.push({[group[0]]: {type: 'array', values: convertedGroup}});
+            return prev;
+        }
+    }, []);
+
+    console.log('reduced tokens is', Object.assign({}, ...reducedTokens));
+
+    return Object.assign({}, ...reducedTokens);
 };
 
 const TokenStateContext = React.createContext(emptyState);
@@ -124,13 +194,15 @@ const TokenDispatchContext = React.createContext(null);
 
 function stateReducer(state, action) {
     switch (action.type) {
-        case ActionType.SetTokenData:
+        case ActionType.SetTokenData: {
+            console.log('Setting token data', action);
             return {
                 ...state,
-                activeTokenSet: Object.keys(action.data.tokens)[0],
-                usedTokenSet: [Object.keys(action.data.tokens)[0]],
-                tokenData: action.data,
+                tokens: parseTokenValues(action.data.values),
+                activeTokenSet: Array.isArray(action.data.values) ? 'global' : Object.keys(action.data.values)[0],
+                usedTokenSet: Array.isArray(action.data.values) ? 'global' : Object.keys(action.data.values)[0],
             };
+        }
         case ActionType.SetTokensFromStyles:
             state.tokenData.injectTokens(action.data, state.activeTokenSet);
             updateTokensOnSources(state, action.updatedAt);
@@ -157,28 +229,17 @@ function stateReducer(state, action) {
         case ActionType.UpdateTokens:
             updateTokensOnSources(state, action.updatedAt, action.shouldUpdate);
             return state;
-        case ActionType.DeleteToken: {
-            const obj = JSON.parse(state.tokenData.tokens[action.data.parent].values);
-            objectPath.del(obj, action.data.path);
-            const tokens = JSON.stringify(obj, null, 2);
-            state.tokenData.updateTokenValues(action.data.parent, tokens, action.updatedAt);
-            updateTokensOnSources(state, action.updatedAt);
-            return {
-                ...state,
-                tokenData: state.tokenData,
-            };
-        }
         case ActionType.CreateStyles:
             postToFigma({
                 type: MessageToPluginTypes.CREATE_STYLES,
-                tokens: state.tokenData.getMergedTokens(),
+                tokens: getMergedTokens(state.tokens, state.usedTokenSet),
             });
             return state;
         case ActionType.SetNodeData:
             postToFigma({
                 type: MessageToPluginTypes.SET_NODE_DATA,
                 values: action.data,
-                tokens: state.tokenData.getMergedTokens(),
+                tokens: getMergedTokens(state.tokens, state.usedTokenSet, true),
             });
             return state;
         case ActionType.RemoveNodeData:
@@ -205,7 +266,7 @@ function stateReducer(state, action) {
             };
         case ActionType.UpdateSingleToken: {
             const {parent, value, newGroup, options, name, oldName, updatedAt} = action.data;
-            const obj = JSON.parse(state.tokenData.tokens[parent].values);
+            const obj = state.tokenData.tokens[parent].values;
             let newValue;
             if (newGroup) {
                 newValue = {};
@@ -222,8 +283,11 @@ function stateReducer(state, action) {
             const newName = name.toString();
             set(obj, newName, newValue);
             if (oldName === newName || !oldName) {
+                console.log('DELETING', state.tokenData.tokens[parent].values);
+
                 state.tokenData.updateTokenValues(parent, JSON.stringify(obj, null, 2), updatedAt);
             } else {
+                console.log('DELETING', state.tokenData.tokens[parent].values);
                 objectPath.del(obj, oldName);
                 state.tokenData.updateTokenValues(
                     parent,
@@ -335,9 +399,7 @@ function stateReducer(state, action) {
             return {
                 ...state,
                 activeTokenSet:
-                    state.activeTokenSet === action.data
-                        ? Object.keys(state.tokenData.tokens)[0]
-                        : state.activeTokenSet,
+                    state.activeTokenSet === action.data ? Object.keys(state.tokens)[0] : state.activeTokenSet,
             };
         }
         case ActionType.RenameTokenSet: {
@@ -375,7 +437,7 @@ function stateReducer(state, action) {
                 postToFigma({
                     type: MessageToPluginTypes.SET_STORAGE_TYPE,
                     storageType: action.data,
-                    tokens: state.tokenData.getMergedTokens(),
+                    tokens: getMergedTokens(state.tokens, state.usedTokenSet),
                 });
             }
             return {
@@ -397,6 +459,98 @@ function stateReducer(state, action) {
                 ...state,
                 lastOpened: action.data,
             };
+        case ActionType.CreateToken: {
+            console.log('Creating Token', state.tokens, action);
+            let newTokens = {};
+            const existingToken = state.tokens[action.data.parent].values.find((n) => n.name === action.data.name);
+            if (!existingToken) {
+                newTokens = {
+                    [action.data.parent]: {
+                        values: [
+                            ...state.tokens[action.data.parent].values,
+                            {
+                                name: action.data.name,
+                                value: action.data.value,
+                                ...action.data.options,
+                            },
+                        ],
+                    },
+                };
+            }
+            return {
+                ...state,
+                tokens: {
+                    ...state.tokens,
+                    ...newTokens,
+                },
+            };
+        }
+        case ActionType.EditToken: {
+            console.log('Editing Token', state.tokens, action);
+            const nameToFind = action.data.oldName ? action.data.oldName : action.data.name;
+            const index = state.tokens[action.data.parent].values.findIndex((token) => token.name === nameToFind);
+            console.log('INDEX IS', index, state.tokens[action.data.parent].values);
+            const newArray = [...state.tokens[action.data.parent].values];
+            newArray[index] = {
+                ...newArray[index],
+                name: action.data.name,
+                value: action.data.value,
+                ...action.data.options,
+            };
+
+            console.log('NEw array is', newArray);
+            console.log('NEw State is', {
+                ...state,
+                tokens: {
+                    ...state.tokens,
+                    [action.data.parent]: {
+                        ...state.tokens[action.data.parent],
+                        values: newArray,
+                    },
+                },
+            });
+
+            return {
+                ...state,
+                tokens: {
+                    ...state.tokens,
+                    [action.data.parent]: {
+                        ...state.tokens[action.data.parent],
+                        values: newArray,
+                    },
+                },
+            };
+        }
+        case ActionType.DeleteToken: {
+            const newState = {
+                ...state,
+                tokens: {
+                    ...state.tokens,
+                    [action.data.parent]: {
+                        ...state.tokens[action.data.parent],
+                        values: state.tokens[action.data.parent].values.filter(
+                            (token) => token.name !== action.data.path
+                        ),
+                    },
+                },
+            };
+            updateTokensOnSources(newState, action.updatedAt);
+
+            return newState;
+        }
+        case ActionType.CreateTokenGroup: {
+            console.log('Not implemented');
+
+            // state.tokenData.createTokenGroup({
+            //     parent: action.data.parent,
+            //     name: action.data.name,
+            // });
+
+            return {
+                ...state,
+                tokenData: state.tokenData,
+            };
+        }
         default:
             throw new Error('Context not implemented');
     }
@@ -419,11 +573,11 @@ function TokenProvider({children}) {
                 dispatch({type: ActionType.SetStringTokens, data, updatedAt});
             },
             setDefaultTokens: () => {
-                dispatch({type: ActionType.SetTokenData, data: new TokenData(defaultTokens)});
+                dispatch({type: ActionType.SetTokenData, data: defaultTokens});
                 dispatch({type: ActionType.SetLoading, state: false});
             },
             setEmptyTokens: () => {
-                dispatch({type: ActionType.SetTokenData, data: new TokenData(emptyTokens)});
+                dispatch({type: ActionType.SetTokenData, data: emptyTokens});
                 dispatch({type: ActionType.SetLoading, state: false});
             },
             updateTokens: (shouldUpdate = true) => {
@@ -525,13 +679,33 @@ function TokenProvider({children}) {
             updateSingleToken: (data: {
                 parent: string;
                 value: SingleToken;
-                newGroup?: boolean;
                 options?: object;
                 name: string;
                 oldName?: string;
                 updatedAt: Date;
             }) => {
                 dispatch({type: ActionType.UpdateSingleToken, data});
+            },
+            createToken: (data: {
+                parent: string;
+                value: SingleToken;
+                options?: object;
+                name: string;
+                updatedAt: Date;
+            }) => {
+                dispatch({type: ActionType.CreateToken, data});
+            },
+            editToken: (data: {
+                parent: string;
+                value: SingleToken;
+                options?: object;
+                name: string;
+                oldName?: string;
+            }) => {
+                dispatch({type: ActionType.EditToken, data});
+            },
+            createTokenGroup: (data: {parent: string; name: string; updatedAt: Date}) => {
+                dispatch({type: ActionType.CreateTokenGroup, data});
             },
             setSyncEnabled: (data: boolean) => {
                 dispatch({type: ActionType.SetSyncEnabled, data});

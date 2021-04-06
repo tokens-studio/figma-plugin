@@ -30,7 +30,7 @@ export interface Tokens {
 
 export interface TokenObject {
     hasErrored?: boolean;
-    values: string | TokenArrayGroup;
+    values: TokenArrayGroup;
     type: 'array' | 'object';
 }
 

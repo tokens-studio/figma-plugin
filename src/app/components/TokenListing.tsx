@@ -133,12 +133,22 @@ const TokenListing = ({
                     {help && (
                         <Tooltip label={showHelp ? 'Hide help' : 'Show help'}>
                             <button
-                                disabled={editProhibited}
                                 className="button button-ghost"
                                 type="button"
-                                onClick={() => setShowOptions(tokenType)}
+                                onClick={() => setShowHelp(!showHelp)}
                             >
-                                <Icon name="edit" />
+                                <Icon name="help" />
+                            </button>
+                        </Tooltip>
+                    )}
+                    {showDisplayToggle && (
+                        <Tooltip label={displayType === 'GRID' ? 'Show as List' : 'Show as Grid'}>
+                            <button
+                                onClick={() => setDisplayType(displayType === 'GRID' ? 'LIST' : 'GRID')}
+                                type="button"
+                                className="button button-ghost"
+                            >
+                                <Icon name={displayType === 'GRID' ? 'list' : 'grid'} />
                             </button>
                         </Tooltip>
                     )}
@@ -210,7 +220,7 @@ const TokenListing = ({
                             <div className="px-4 pb-4">
                                 {values?.length > 0 &&
                                     renderKeyValue({
-                                        tokenValues: Object.entries(values),
+                                        tokenValues: values,
                                         showNewForm,
                                         showForm,
                                         property: tokenKey,
@@ -223,6 +233,17 @@ const TokenListing = ({
                             <div className="flex items-center justify-between p-4">
                                 <Heading size="small">{property}</Heading>
                                 <div>
+                                    {showDisplayToggle && (
+                                        <Tooltip label={displayType === 'GRID' ? 'Show as List' : 'Show as Grid'}>
+                                            <button
+                                                onClick={() => setDisplayType(displayType === 'GRID' ? 'LIST' : 'GRID')}
+                                                type="button"
+                                                className="button button-ghost"
+                                            >
+                                                <Icon name={displayType === 'GRID' ? 'list' : 'grid'} />
+                                            </button>
+                                        </Tooltip>
+                                    )}
                                     <Tooltip label="Add a new token">
                                         <button
                                             disabled={editProhibited}
@@ -251,21 +272,21 @@ const TokenListing = ({
                         </div>
                     </Modal>
                 )}
-                {showHelp && <div className="px-4 pb-4 text-gray-600 text-xxs">{help}</div>}
-                {values?.length > 0 && (
-                    <div className={`px-4 pb-4 ${isIntCollapsed ? 'hidden' : null}`}>
-                        {renderKeyValue({
-                            tokenValues: values,
-                            showNewForm,
-                            showForm,
-                            property: tokenKey,
-                            schema,
-                            path: tokenKey,
-                            type: tokenType,
-                        })}
-                    </div>
-                )}
             </div>
+            {showHelp && <div className="px-4 pb-4 text-gray-600 text-xxs">{help}</div>}
+            {values?.length > 0 && (
+                <div className={`px-4 pb-4 ${isIntCollapsed ? 'hidden' : null}`}>
+                    {renderKeyValue({
+                        tokenValues: values,
+                        showNewForm,
+                        showForm,
+                        property: tokenKey,
+                        schema,
+                        path: tokenKey,
+                        type: tokenType,
+                    })}
+                </div>
+            )}
         </div>
     );
 };

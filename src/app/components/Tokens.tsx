@@ -22,8 +22,21 @@ interface TokenListingType {
     };
 }
 
+function createTokensObject(tokens: SingleTokenObject[]) {
+    return tokens.reduce((acc, cur) => {
+        if (cur.type && cur.type !== '' && cur.type !== 'undefined') {
+            acc[cur.type] = acc[cur.type] || {values: []};
+            acc[cur.type].values.push(cur);
+        } else {
+            const groupName = cur.name.split('.').slice(1, 2).toString();
+            acc[groupName] = acc[groupName] || {values: []};
+            acc[groupName].values.push(cur);
+        }
+        return acc;
+    }, {});
+}
+
 const mappedTokens = (tokens) => {
-    console.log('Trying to render tokens', tokens);
     const tokenObj = {};
     Object.entries(tokens).forEach(([key, group]: [string, {values: SingleTokenObject[]; type?: TokenType}]) => {
         tokenObj[key] = {
@@ -33,27 +46,34 @@ const mappedTokens = (tokens) => {
 
     mergeDeep(tokenObj, tokenTypes);
 
-    console.log('rendering tokens', tokenObj);
     return Object.entries(tokenObj);
 };
 
 const Tokens = () => {
-    const {tokenData, updatePageOnly, activeTokenSet, showEmptyGroups} = useTokenState();
+    const {tokens, updatePageOnly, activeTokenSet, showEmptyGroups} = useTokenState();
     const {updateTokens, toggleUpdatePageOnly, toggleShowEmptyGroups} = useTokenDispatch();
+    const [tokenValues, setTokenValues] = React.useState([]);
 
     const handleUpdate = async () => {
         track('Update Tokens');
         updateTokens(false);
     };
 
-    const tokenValues = tokenData.tokens[activeTokenSet].values;
+    const currentValues = tokens[activeTokenSet].values;
 
-    if (tokenData.tokens[activeTokenSet].hasErrored) return <div>JSON malformed, check in Editor</div>;
+    console.log('Values', currentValues);
+
+    React.useEffect(() => {
+        console.log('Tokens updated', currentValues);
+        setTokenValues(mappedTokens(createTokensObject(currentValues)));
+    }, [currentValues, activeTokenSet]);
+
+    if (tokens[activeTokenSet].hasErrored) return <div>JSON malformed, check in Editor</div>;
 
     return (
         <div>
             <TokenSetSelector />
-            {mappedTokens(tokenValues).map(([key, group]: [string, TokenListingType]) => {
+            {tokenValues.map(([key, group]: [string, TokenListingType]) => {
                 return (
                     <div key={key}>
                         <TokenListing
