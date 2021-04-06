@@ -1,4 +1,5 @@
 import * as React from 'react';
+import {track} from '../../utils/analytics';
 
 type ButtonProps = {
     type?: 'button' | 'submit';
@@ -22,6 +23,14 @@ const Button: React.FunctionComponent<ButtonProps> = ({
     disabled = false,
     id,
 }) => {
+    const handleClick = () => {
+        if (id) {
+            track(`Clicked ${id}`);
+        }
+        if (onClick) {
+            onClick();
+        }
+    };
     let variantClass;
     switch (variant) {
         case 'secondary':
@@ -64,7 +73,7 @@ const Button: React.FunctionComponent<ButtonProps> = ({
             disabled={disabled}
             type={type}
             className={`button ${[variantClass, sizeClass].join(' ')}`}
-            onClick={onClick}
+            onClick={handleClick}
         >
             {children}
         </button>

@@ -1,7 +1,8 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import * as React from 'react';
 import {mergeDeep} from '@/plugin/helpers';
-import {SingleTokenObject, TokenType} from '../../../types/tokens';
+import {SingleTokenObject, TokenType} from '@types/tokens';
+import {track} from '@/utils/analytics';
 import {useTokenDispatch, useTokenState} from '../store/TokenContext';
 import TokenListing from './TokenListing';
 import Button from './Button';
@@ -41,6 +42,7 @@ const Tokens = () => {
     const {updateTokens, toggleUpdatePageOnly, toggleShowEmptyGroups} = useTokenDispatch();
 
     const handleUpdate = async () => {
+        track('Update Tokens');
         updateTokens(false);
     };
 

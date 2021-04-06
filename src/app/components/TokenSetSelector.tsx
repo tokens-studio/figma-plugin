@@ -1,3 +1,4 @@
+import {track} from '@/utils/analytics';
 import React from 'react';
 import {DndProvider} from 'react-dnd';
 import {HTML5Backend} from 'react-dnd-html5-backend';
@@ -37,20 +38,24 @@ export default function TokenSetSelector() {
     };
 
     const reorderSets = (from, to) => {
+        track('Reordered token set');
         orderPositions(totalTokenSetArray, from, to);
     };
 
     const handleNewTokenSetSubmit = (e) => {
         e.preventDefault();
+        track('Created token set', {name: newTokenSetName});
         addTokenSet(newTokenSetName.trim());
     };
 
     const handleDeleteTokenSet = (tokenSet) => {
+        track('Deleted token set');
         setTokenSetMarkedForChange(tokenSet);
         setShowDeleteTokenSetModal(true);
     };
 
     const handleRenameTokenSet = (tokenSet) => {
+        track('Renamed token set');
         setTokenSetMarkedForChange(tokenSet);
         setShowRenameTokenSetFields(true);
     };
