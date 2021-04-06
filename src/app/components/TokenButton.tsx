@@ -25,7 +25,8 @@ const TokenButton = ({type, property, name, path, token, editMode, showForm}) =>
 
     // TODO: Move to hook
     const handleDeleteClick = () => {
-        deleteSingleToken({parent: activeTokenSet, path: [path, name].join('.')});
+        deleteSingleToken({parent: activeTokenSet, path: name});
+        // deleteSingleToken({parent: activeTokenSet, path: [path, name].join('.')});
         // deleteToken({parent: activeTokenSet, path: [path, name].join('.')});
     };
 

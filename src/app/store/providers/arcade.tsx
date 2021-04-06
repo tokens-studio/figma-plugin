@@ -54,9 +54,9 @@ export default function useArcade() {
 
     async function editArcadeToken({id, secret, data}): Promise<boolean> {
         console.log('Calling edit arcade token', data);
-        const {name, parent, value, options} = data;
+        const {name, value, options} = data;
         const {description, type} = options;
-        const tokenName = [parent, name].join('.');
+        const tokenName = name;
         const newToken: {
             name: string;
             value: string;
@@ -101,9 +101,9 @@ export default function useArcade() {
 
     async function createArcadeToken({id, secret, data}): Promise<boolean> {
         console.log('Calling create arcade token', data);
-        const {name, parent, value, options = {}} = data;
+        const {name, value, options = {}} = data;
         const {description, type} = options;
-        const tokenName = [parent, name].join('.');
+        const tokenName = name;
         const tokenObj: {
             name: string;
             value: string;
@@ -189,8 +189,8 @@ export default function useArcade() {
 
     async function deleteArcadeToken({id, secret, data}) {
         console.log('Calling delete arcade token', data);
-        const {parent, path} = data;
-        const tokenName = [parent, path].join('.');
+        const {path} = data;
+        const tokenName = path;
         try {
             const res = await fetch(`https://api.usearcade.com/api/projects/${id}/tokens/${tokenName}`, {
                 method: 'DELETE',
@@ -207,8 +207,8 @@ export default function useArcade() {
                 console.log('Success');
             }
         } catch (err) {
-            notifyToUI('Error editing token on Arcade, check console (F12)');
-            console.log('Error editing token on Arcade: ', err);
+            notifyToUI('Error deleting token on Arcade, check console (F12)');
+            console.log('Error deleting token on Arcade: ', err);
         }
     }
 

@@ -57,7 +57,8 @@ const EditTokenForm = ({
             console.log('Creating token', path, name, activeTokenSet, value, options);
             createSingleToken({
                 parent: activeTokenSet,
-                name: [path, name].join('.'),
+                name,
+                // name: [path, name].join('.'), <-- use for anything other than arcade
                 value,
                 options,
             });
@@ -65,7 +66,7 @@ const EditTokenForm = ({
             console.log('Editing token', path, name, activeTokenSet, value, options, oldName);
             editSingleToken({
                 parent: activeTokenSet,
-                name: [path, name].join('.'),
+                name,
                 oldName,
                 value,
                 options,

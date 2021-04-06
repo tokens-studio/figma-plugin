@@ -8,18 +8,22 @@ import {StorageProviderType, StorageType} from '../../types/api';
 import {isSingleToken} from '../app/components/utils';
 
 export function mapValuesToTokens(tokens, values): object {
-    const array = Object.entries(values).map(([key, tokenOnNode]) => {
+    console.log('Values are', values, tokens);
+    const mappedValues = Object.entries(values).reduce((acc, [key, tokenOnNode]) => {
+        console.log('Finding', key, tokenOnNode);
         const resolvedToken = tokens.find((token) => token.name === tokenOnNode);
-        if (!resolvedToken) return;
+        if (!resolvedToken) return acc;
         const resolvedValue = resolvedToken.value;
         const value = isSingleToken(resolvedValue) ? resolvedValue.value : resolvedValue;
 
-        return {
+        console.log('returning', {
             [key]: value,
-        };
-    });
-    array.map((item) => ({[item.key]: item.value}));
-    return Object.assign({}, ...array);
+        });
+        acc[key] = value;
+        return acc;
+    }, {});
+    console.log('mappedValues', mappedValues);
+    return mappedValues;
 }
 
 export function setTokensOnDocument(tokens, updatedAt: string) {
@@ -72,6 +76,7 @@ export function updateNodes(nodes, tokens) {
         const data = fetchAllPluginData(node);
         if (data) {
             const mappedValues = mapValuesToTokens(tokens, data);
+            console.log('Mapped values', mappedValues);
             setValuesOnNode(node, mappedValues, data);
             store.successfulNodes.push(node);
             returnedValues.push(data);
