@@ -11,6 +11,7 @@ import Tooltip from './Tooltip';
 import NewGroupForm from './NewGroupForm';
 
 const TokenListing = ({
+    tokenKey,
     label,
     schema,
     explainer = '',
@@ -19,6 +20,7 @@ const TokenListing = ({
     tokenType = '',
     values,
 }: {
+    tokenKey: string;
     label: string;
     schema: {
         value: object | string;
@@ -139,7 +141,7 @@ const TokenListing = ({
     if (!values && !showEmptyGroups) return null;
 
     return (
-        <div className="border-b border-gray-200" data-cy={`tokenlisting-${tokenType}`}>
+        <div className="border-b border-gray-200" data-cy={`tokenlisting-${tokenKey}`}>
             <div className="flex justify-between space-x-8 items-center relative">
                 <button
                     className={`flex items-center w-full h-full p-4 space-x-2 hover:bg-gray-100 focus:outline-none ${
@@ -198,7 +200,7 @@ const TokenListing = ({
                             disabled={editProhibited}
                             className="button button-ghost"
                             type="button"
-                            onClick={() => setShowOptions(tokenType)}
+                            onClick={() => setShowOptions(tokenKey)}
                         >
                             <Icon name="edit" />
                         </button>
@@ -210,16 +212,16 @@ const TokenListing = ({
                             className="button button-ghost"
                             type="button"
                             onClick={() => {
-                                setShowOptions(tokenType);
-                                showNewForm(tokenType);
+                                setShowOptions(tokenKey);
+                                showNewForm(tokenKey);
                             }}
                         >
                             <Icon name="add" />
                         </button>
                     </Tooltip>
                 </div>
-                {showOptions === tokenType && (
-                    <Modal large full isOpen={showOptions === tokenType} close={closeForm}>
+                {showOptions === tokenKey && (
+                    <Modal large full isOpen={showOptions === tokenKey} close={closeForm}>
                         <div className="flex flex-col-reverse">
                             {showEditForm && (
                                 <EditTokenForm
@@ -235,7 +237,7 @@ const TokenListing = ({
                                 />
                             )}
                             {showNewGroupForm && (
-                                <NewGroupForm path={tokenType} setSingleTokenValue={setSingleTokenValue} />
+                                <NewGroupForm path={tokenKey} setSingleTokenValue={setSingleTokenValue} />
                             )}
 
                             <div className="px-4 pb-4">
@@ -244,9 +246,9 @@ const TokenListing = ({
                                         tokenValues: Object.entries(values),
                                         showNewForm,
                                         showForm,
-                                        property: tokenType,
+                                        property: tokenKey,
                                         schema,
-                                        path: tokenType,
+                                        path: tokenKey,
                                         type: tokenType,
                                         editMode: true,
                                     })}
@@ -271,7 +273,7 @@ const TokenListing = ({
                                             type="button"
                                             data-cy="button-modal-add"
                                             className="button button-ghost"
-                                            onClick={() => showNewForm(tokenType)}
+                                            onClick={() => showNewForm(tokenKey)}
                                         >
                                             <Icon name="add" />
                                         </button>
@@ -301,9 +303,9 @@ const TokenListing = ({
                         tokenValues: Object.entries(values),
                         showNewForm,
                         showForm,
-                        property: tokenType,
+                        property: tokenKey,
                         schema,
-                        path: tokenType,
+                        path: tokenKey,
                         type: tokenType,
                     })}
                 </div>
