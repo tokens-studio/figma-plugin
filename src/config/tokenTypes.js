@@ -49,6 +49,8 @@ export default {
                 fontWeight: '',
                 lineHeight: '',
                 fontSize: '',
+                letterSpacing: '',
+                paragraphSpacing: '',
             },
             options: {
                 description: '',

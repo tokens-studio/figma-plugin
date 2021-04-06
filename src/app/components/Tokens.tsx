@@ -57,6 +57,7 @@ const Tokens = () => {
                 return (
                     <div key={key}>
                         <TokenListing
+                            tokenKey={key}
                             label={group.label}
                             explainer={group.explainer}
                             schema={group.schema}
