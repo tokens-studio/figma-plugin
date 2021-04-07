@@ -97,7 +97,7 @@ const TokenListing = ({
     }
 
     const closeForm = () => {
-        setShowOptions('');
+        setShowOptions(false);
         setShowEditForm(false);
     };
 

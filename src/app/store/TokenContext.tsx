@@ -88,7 +88,7 @@ const emptyState = {
     showEditForm: false,
     showNewGroupForm: false,
     showEmptyGroups: true,
-    showOptions: '',
+    showOptions: false,
     storageType: {
         provider: StorageProviderType.LOCAL,
         id: '',
@@ -423,7 +423,7 @@ function TokenProvider({children}) {
             setShowNewGroupForm: (bool: boolean) => {
                 dispatch({type: ActionType.SetShowNewGroupForm, bool});
             },
-            setShowOptions: (data: string) => {
+            setShowOptions: (data: string | boolean) => {
                 dispatch({type: ActionType.SetShowOptions, data});
             },
             setDisplayType: (data: string) => {
