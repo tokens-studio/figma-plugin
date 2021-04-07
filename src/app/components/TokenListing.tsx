@@ -1,5 +1,4 @@
 import * as React from 'react';
-import {ErrorBoundary} from 'react-error-boundary';
 import {useTokenDispatch, useTokenState} from '../store/TokenContext';
 import EditTokenForm from './EditTokenForm';
 import Heading from './Heading';
@@ -8,18 +7,6 @@ import Modal from './Modal';
 import renderKeyValue from './renderKeyValue';
 import Tooltip from './Tooltip';
 import NewGroupForm from './NewGroupForm';
-
-function ErrorFallback({error}) {
-    return (
-        <div className="flex items-center flex-col text-center justify-center space-y-4 h-full">
-            <Heading>Having trouble reading tokens :-/</Heading>
-            <div>
-                <div className="text-xs text-gray-600">{error.message}</div>
-                <div className="text-xs text-gray-600">Restart the plugin and try again.</div>
-            </div>
-        </div>
-    );
-}
 
 const TokenListing = ({
     tokenKey,
@@ -153,20 +140,6 @@ const TokenListing = ({
                         </Tooltip>
                     )}
 
-                    <Tooltip label="Add a new token" variant="right">
-                        <button
-                            disabled={editProhibited}
-                            data-cy="button-add-new-token"
-                            className="button button-ghost"
-                            type="button"
-                            onClick={() => {
-                                setShowOptions(tokenType);
-                                showNewForm(tokenType);
-                            }}
-                        >
-                            <Icon name="add" />
-                        </button>
-                    </Tooltip>
                     {createButton && (
                         <Tooltip label="Create Styles">
                             <button onClick={createStyles} type="button" className="button button-ghost">

@@ -8,7 +8,7 @@ import {compareUpdatedAt} from '../components/utils';
 
 export default function useRemoteTokens() {
     const {api, updateAfterApply, lastUpdatedAt, localApiState} = useTokenState();
-    const {setLoading, setTokenData, updateTokens, setApiData, setStorageType, updateSingleToken} = useTokenDispatch();
+    const {setLoading, setTokenData, updateTokens, setApiData, setStorageType} = useTokenDispatch();
     const {fetchDataFromArcade, editArcadeToken, createArcadeToken, deleteArcadeToken} = useArcade();
     const {fetchDataFromJSONBin, createNewJSONBin} = useJSONbin();
 
@@ -35,7 +35,6 @@ export default function useRemoteTokens() {
             default:
                 throw new Error('Not implemented');
         }
-        console.log('Got Pull values', tokenValues);
 
         setTokenData(tokenValues);
         updateTokens(false);
@@ -54,26 +53,28 @@ export default function useRemoteTokens() {
         const {id, secret} = api;
         const response = await editArcadeToken({id, secret, data});
         if (response) {
-            updateSingleToken({
-                parent,
-                name,
-                value,
-                options,
-                oldName,
-            });
-            updateTokens();
+            setLoading(false);
+            return true;
         }
         setLoading(false);
+        return false;
     }
 
-    async function createRemoteToken(data: {parent: string; name: string; value: SingleToken; options?: object}) {
+    async function createRemoteToken(data: {
+        parent: string;
+        name: string;
+        value: SingleToken;
+        options?: object;
+    }): Promise<boolean> {
         setLoading(true);
         const {id, secret} = api;
         const response = await createArcadeToken({id, secret, data});
         if (response) {
-            console.log('response', response);
+            setLoading(false);
+            return true;
         }
         setLoading(false);
+        return false;
     }
 
     async function deleteRemoteToken(data) {
@@ -104,15 +105,11 @@ export default function useRemoteTokens() {
             setApiData({id, secret, name, provider});
             const comparison = await compareUpdatedAt(lastUpdatedAt, remoteTokens);
             if (comparison === 'remote_older') {
-                console.log('Got remote older values', remoteTokens);
-
                 setTokenData(remoteTokens);
                 if (updateAfterApply) {
                     updateTokens(false);
                 }
             } else {
-                console.log('Got sync values', remoteTokens);
-
                 setTokenData(remoteTokens);
                 if (updateAfterApply) {
                     updateTokens(false);

@@ -18,17 +18,21 @@ export default function useManageTokens() {
         const {parent, name, value, options, oldName} = data;
         setLoading(true);
         const isLocal = storageType.provider === StorageProviderType.LOCAL;
+        let shouldUpdate = true;
         if (!isLocal) {
-            const response = await editRemoteToken(data);
-            console.log('REsponse is', response);
+            shouldUpdate = await editRemoteToken(data);
         }
-        editToken({
-            parent,
-            name,
-            value,
-            options,
-            oldName,
-        });
+        if (shouldUpdate) {
+            editToken({
+                parent,
+                name,
+                value,
+                options,
+                oldName,
+            });
+        }
+
+        updateTokens(isLocal);
         setLoading(false);
     }
 
@@ -42,17 +46,21 @@ export default function useManageTokens() {
         const {parent, name, value, options, newGroup = false} = data;
         setLoading(true);
         const isLocal = storageType.provider === StorageProviderType.LOCAL;
+        let shouldUpdate = true;
         if (!isLocal) {
-            const response = await createRemoteToken(data);
+            shouldUpdate = await createRemoteToken(data);
         }
-        createToken({
-            parent,
-            name,
-            value,
-            options,
-            newGroup,
-        });
-        updateTokens();
+        if (shouldUpdate) {
+            createToken({
+                parent,
+                name,
+                value,
+                options,
+                newGroup,
+            });
+        }
+
+        updateTokens(isLocal);
         setLoading(false);
     }
 

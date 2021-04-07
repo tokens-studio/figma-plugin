@@ -6,7 +6,6 @@ import {track} from '@/utils/analytics';
 import {useTokenDispatch, useTokenState} from '../store/TokenContext';
 import TokenListing from './TokenListing';
 import Button from './Button';
-import TokenSetSelector from './TokenSetSelector';
 import tokenTypes from '../../config/tokenTypes';
 
 interface TokenListingType {
@@ -61,10 +60,7 @@ const Tokens = () => {
 
     const currentValues = tokens[activeTokenSet].values;
 
-    console.log('Values', currentValues);
-
     React.useEffect(() => {
-        console.log('Tokens updated', currentValues);
         setTokenValues(mappedTokens(createTokensObject(currentValues)));
     }, [currentValues, activeTokenSet]);
 
@@ -72,7 +68,6 @@ const Tokens = () => {
 
     return (
         <div>
-            <TokenSetSelector />
             {tokenValues.map(([key, group]: [string, TokenListingType]) => {
                 return (
                     <div key={key}>

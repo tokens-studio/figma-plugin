@@ -37,7 +37,6 @@ async function updateRemoteTokens({
             break;
         }
         case StorageProviderType.ARCADE: {
-            console.log('Updating tokens', tokens);
             break;
         }
         default:
@@ -45,16 +44,16 @@ async function updateRemoteTokens({
     }
 }
 
-export default async function updateTokensOnSources(state: StateType, updatedAt: string, shouldUpdate = true) {
+export default async function updateTokensOnSources(state: StateType, updatedAt: string, shouldUpdateRemote = true) {
     const isLocal = state.storageType.provider === StorageProviderType.LOCAL;
-    if (!isLocal && shouldUpdate && !state.editProhibited) {
+    if (!isLocal && shouldUpdateRemote && !state.editProhibited) {
         updateRemoteTokens({
             provider: state.storageType.provider,
             tokens: reduceToValues(state.tokens),
             id: state.api.id,
             secret: state.api.secret,
             updatedAt,
-            oldUpdatedAt: state.updatedAt,
+            oldUpdatedAt: state.lastUpdatedAt,
         }).then(() => {
             state.tokenData.setUpdatedAt(updatedAt);
         });

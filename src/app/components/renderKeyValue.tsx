@@ -26,7 +26,7 @@ const renderKeyValue = ({
                     stringPath = [path, key].filter((n) => n).join('.');
                 } else {
                     key = tokenValue.name;
-                    value = tokenValue.value;
+                    value = tokenValue;
                     stringPath = tokenValue.name;
                 }
 

@@ -13,7 +13,7 @@ const MoreButton = ({properties, children, path, value, onClick, onEdit, onDelet
             <ContextMenuTrigger id={`${path}-${value}-${mode}`}>{children}</ContextMenuTrigger>
             <ContextMenu id={`${path}-${value}-${mode}`} className="text-xs">
                 {visibleProperties.map((property) => {
-                    const isActive = selectionValues[property.name] === `${path}.${value}`;
+                    const isActive = selectionValues[property.name] === value;
 
                     return (
                         <MenuItem key={property.label} onClick={() => onClick([property.name], isActive)}>

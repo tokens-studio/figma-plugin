@@ -1,15 +1,14 @@
 import * as React from 'react';
-import objectPath from 'object-path';
-import {useTokenState, useTokenDispatch} from '../store/TokenContext';
+import {useTokenState, useTokenDispatch, getMergedTokens} from '../store/TokenContext';
 import Button from './Button';
 import Icon from './Icon';
 import Tooltip from './Tooltip';
 
 const Inspector = () => {
-    const {selectionValues, tokenData} = useTokenState();
+    const {selectionValues, tokens, usedTokenSet} = useTokenState();
     const {removeNodeData} = useTokenDispatch();
     const getValue = (value) => {
-        return objectPath.get(tokenData.getMergedTokens(), value);
+        return getMergedTokens(tokens, usedTokenSet).find((n) => n.name === value);
     };
     return (
         <div className="space-y-2 p-4">

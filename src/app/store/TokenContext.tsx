@@ -33,7 +33,6 @@ export function getMergedTokens(tokens, usedTokenSet, shouldResolve = false) {
 
     if (shouldResolve) {
         returnedTokens = mergedTokens.map((t) => {
-            console.log('t is', t);
             return {
                 ...t,
                 value: getAliasValue(t, mergedTokens),
@@ -111,7 +110,7 @@ export const emptyTokens: TokenProps = {
     version: pjs.version,
     updatedAt: new Date().toString(),
     values: {
-        options: '{ }',
+        options: [],
     },
 };
 
@@ -160,7 +159,6 @@ const emptyState = {
 };
 
 const parseTokenValues = (tokens) => {
-    console.log('Parsing values', tokens);
     if (Array.isArray(tokens)) {
         return {
             global: {
@@ -178,13 +176,10 @@ const parseTokenValues = (tokens) => {
                 groupValues.push({name: key, ...value});
             });
             const convertedGroup = groupValues;
-            console.log('Converted Group', convertedGroup);
             prev.push({[group[0]]: {type: 'array', values: convertedGroup}});
             return prev;
         }
     }, []);
-
-    console.log('reduced tokens is', Object.assign({}, ...reducedTokens));
 
     return Object.assign({}, ...reducedTokens);
 };
@@ -195,7 +190,6 @@ const TokenDispatchContext = React.createContext(null);
 function stateReducer(state, action) {
     switch (action.type) {
         case ActionType.SetTokenData: {
-            console.log('Setting token data', action);
             return {
                 ...state,
                 tokens: parseTokenValues(action.data.values),
@@ -283,11 +277,8 @@ function stateReducer(state, action) {
             const newName = name.toString();
             set(obj, newName, newValue);
             if (oldName === newName || !oldName) {
-                console.log('DELETING', state.tokenData.tokens[parent].values);
-
                 state.tokenData.updateTokenValues(parent, JSON.stringify(obj, null, 2), updatedAt);
             } else {
-                console.log('DELETING', state.tokenData.tokens[parent].values);
                 objectPath.del(obj, oldName);
                 state.tokenData.updateTokenValues(
                     parent,
@@ -486,10 +477,8 @@ function stateReducer(state, action) {
             };
         }
         case ActionType.EditToken: {
-            console.log('Editing Token', state.tokens, action);
             const nameToFind = action.data.oldName ? action.data.oldName : action.data.name;
             const index = state.tokens[action.data.parent].values.findIndex((token) => token.name === nameToFind);
-            console.log('INDEX IS', index, state.tokens[action.data.parent].values);
             const newArray = [...state.tokens[action.data.parent].values];
             newArray[index] = {
                 ...newArray[index],
@@ -497,18 +486,6 @@ function stateReducer(state, action) {
                 value: action.data.value,
                 ...action.data.options,
             };
-
-            console.log('NEw array is', newArray);
-            console.log('NEw State is', {
-                ...state,
-                tokens: {
-                    ...state.tokens,
-                    [action.data.parent]: {
-                        ...state.tokens[action.data.parent],
-                        values: newArray,
-                    },
-                },
-            });
 
             return {
                 ...state,

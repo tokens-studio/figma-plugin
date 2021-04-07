@@ -1,11 +1,9 @@
 import {ColorToken} from '../../types/propertyTypes';
 import setColorValuesOnTarget from './setColorValuesOnTarget';
 
+// Iterate over colorTokens to create objects that match figma styles
 export default function updateColorStyles(colorTokens, shouldCreate = false) {
-    // Iterate over colorTokens to create objects that match figma styles
     const paints = figma.getLocalPaintStyles();
-
-    console.log('Color tokens', colorTokens);
 
     colorTokens.map((token: ColorToken) => {
         let matchingStyles = [];

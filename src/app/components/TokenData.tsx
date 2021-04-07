@@ -147,7 +147,6 @@ export default class TokenData {
     }
 
     reorderTokenSets(tokenSets: string[]): void {
-        console.log('reordering');
         const newTokens = {};
         tokenSets.map((set) => {
             Object.assign(newTokens, {[set]: this.tokens[set]});
@@ -169,7 +168,6 @@ export default class TokenData {
     }
 
     updateTokenValues(parent: string, tokens: string, updatedAt: string): void {
-        console.log('Updat token val');
         if (tokens) {
             const hasErrored: boolean = this.checkTokenValidity(tokens);
 

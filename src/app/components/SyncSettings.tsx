@@ -110,15 +110,6 @@ const SyncSettings = () => {
                             id={StorageProviderType.LOCAL}
                         />
                         <ProviderSelector
-                            isActive={localApiState?.provider === StorageProviderType.JSONBIN}
-                            isStored={storageType?.provider === StorageProviderType.JSONBIN}
-                            onClick={() => {
-                                setLocalApiState({name: '', secret: '', id: '', provider: StorageProviderType.JSONBIN});
-                            }}
-                            text="JSONbin"
-                            id={StorageProviderType.JSONBIN}
-                        />
-                        <ProviderSelector
                             isActive={localApiState?.provider === StorageProviderType.ARCADE}
                             isStored={storageType?.provider === StorageProviderType.ARCADE}
                             onClick={() => {

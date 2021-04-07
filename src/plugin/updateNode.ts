@@ -1,8 +1,8 @@
 import {convertToFigmaColor} from './helpers';
+import setColorValuesOnTarget from './setColorValuesOnTarget';
 import setTextValuesOnTarget from './setTextValuesOnTarget';
 
 export default async function setValuesOnNode(node, values, data) {
-    console.log('setting values on node', node, values, data);
     // BORDER RADIUS
     if (values.borderRadius) {
         if (typeof node.cornerRadius !== 'undefined') {
@@ -79,12 +79,11 @@ export default async function setValuesOnNode(node, values, data) {
             const path = data.fill.split('.');
             const pathname = path.slice(1, path.length).join('/');
             const matchingStyles = paints.filter((n) => n.name === pathname);
-            const {color, opacity} = convertToFigmaColor(values.fill);
             if (matchingStyles.length) {
                 // matchingStyles[0].paints = [{color, opacity, type: 'SOLID'}];
                 node.fillStyleId = matchingStyles[0].id;
             } else {
-                node.fills = [{type: 'SOLID', color, opacity}];
+                setColorValuesOnTarget(node, {value: values.fill}, 'fills');
             }
         }
     }
@@ -169,6 +168,30 @@ export default async function setValuesOnNode(node, values, data) {
     if (values.itemSpacing) {
         if (typeof node.itemSpacing !== 'undefined') {
             node.itemSpacing = Number(values.itemSpacing);
+        }
+    }
+
+    // Raw value for text layers
+    if (values.tokenValue) {
+        if (typeof node.characters !== 'undefined') {
+            await figma.loadFontAsync(node.fontName);
+            node.characters = String(values.tokenValue);
+        }
+    }
+
+    // Name value for text layers
+    if (values.tokenName) {
+        if (typeof node.characters !== 'undefined') {
+            await figma.loadFontAsync(node.fontName);
+            node.characters = String(values.tokenName);
+        }
+    }
+
+    // Name value for text layers
+    if (values.description) {
+        if (typeof node.characters !== 'undefined') {
+            await figma.loadFontAsync(node.fontName);
+            node.characters = String(values.description);
         }
     }
 }

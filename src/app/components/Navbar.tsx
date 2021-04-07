@@ -35,7 +35,6 @@ const Navbar = ({active, setActive}) => {
         <div className="sticky top-0 navbar bg-white flex items-center justify-between z-1 border-b border-gray-200">
             <div>
                 <TabButton first name="tokens" label="Tokens" active={active} setActive={setActive} />
-                <TabButton name="json" label="JSON" active={active} setActive={setActive} />
                 <TabButton name="inspector" label="Inspect" active={active} setActive={setActive} />
                 {syncEnabled && <TabButton name="syncsettings" label="Sync" active={active} setActive={setActive} />}
             </div>
@@ -56,7 +55,7 @@ const Navbar = ({active, setActive}) => {
                         </Tooltip>
                     </>
                 )}
-                <Tooltip variant="right" label="Import Styles">
+                {/* <Tooltip variant="right" label="Import Styles">
                     <button
                         disabled={editProhibited}
                         className="button button-ghost"
@@ -65,7 +64,7 @@ const Navbar = ({active, setActive}) => {
                     >
                         <Icon name="import" />
                     </button>
-                </Tooltip>
+                </Tooltip> */}
             </div>
         </div>
     );

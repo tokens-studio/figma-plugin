@@ -60,8 +60,6 @@ export default function Initiator({setActive, setRemoteComponents}) {
                     case MessageFromPluginTypes.TOKEN_VALUES: {
                         setLoading(false);
                         if (values) {
-                            console.log('Got token values', values);
-
                             setTokenData(values);
                             setActive('tokens');
                         }
@@ -85,7 +83,6 @@ export default function Initiator({setActive, setRemoteComponents}) {
                             setLocalApiState({id, secret, name, provider});
                             const remoteValues = await fetchDataFromRemote(id, secret, name, provider);
                             if (remoteValues) {
-                                console.log('Got remote values', remoteValues);
                                 setTokenData(remoteValues);
                                 setActive('tokens');
                             }

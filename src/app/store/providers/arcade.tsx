@@ -1,13 +1,66 @@
 import {notifyToUI, postToFigma} from '../../../plugin/notifiers';
 import {StorageProviderType} from '../../../../types/api';
 import {MessageToPluginTypes} from '../../../../types/messages';
-import {TokenProps, TokenType} from '../../../../types/tokens';
+import {ArcadeTokenType, TokenProps, TokenType} from '../../../../types/tokens';
 import {useTokenDispatch} from '../TokenContext';
 
 type ArcadeResponse = {
     exports: object;
     version: string;
 };
+
+function mapTypeToArcade(type: TokenType): ArcadeTokenType {
+    switch (type) {
+        case 'borderRadius':
+            return 'border-radius';
+        case 'borderWidth':
+            return 'border-width';
+        case 'sizing':
+            return 'size';
+        case 'spacing':
+            return 'space';
+        case 'fontWeights':
+            return 'font-weight';
+        case 'lineHeights':
+            return 'line-height';
+        case 'letterSpacing':
+            return 'letter-spacing';
+        case 'paragraphSpacing':
+            return 'paragraph-spacing';
+        case 'fontFamilies':
+            return 'font-family';
+        case 'fontSizes':
+            return 'font-size';
+        default:
+            return type;
+    }
+}
+function mapTypeFromArcade(type: ArcadeTokenType): TokenType {
+    switch (type) {
+        case 'border-radius':
+            return 'borderRadius';
+        case 'border-width':
+            return 'borderWidth';
+        case 'font-weight':
+            return 'fontWeights';
+        case 'line-height':
+            return 'lineHeights';
+        case 'letter-spacing':
+            return 'letterSpacing';
+        case 'paragraph-spacing':
+            return 'paragraphSpacing';
+        case 'font-family':
+            return 'fontFamilies';
+        case 'font-size':
+            return 'fontSizes';
+        case 'size':
+            return 'sizing';
+        case 'space':
+            return 'spacing';
+        default:
+            return type;
+    }
+}
 
 async function readTokensFromArcade({secret, id}): Promise<ArcadeResponse> | null {
     try {
@@ -22,11 +75,8 @@ async function readTokensFromArcade({secret, id}): Promise<ArcadeResponse> | nul
             if (!r.ok) {
                 throw await r.json();
             }
-            console.log('r', r);
             return r.json();
         });
-
-        console.log('RES IS', res);
 
         return res;
     } catch (err) {
@@ -56,21 +106,21 @@ export default function useArcade() {
         console.log('Calling edit arcade token', data);
         const {name, value, options} = data;
         const {description, type} = options;
-        const tokenName = name;
+        const tokenName = data.oldName || name;
         const newToken: {
             name: string;
             value: string;
             description?: string;
             type?: string;
         } = {
-            name: tokenName,
+            name,
             value,
         };
         if (description) {
             newToken.description = description;
         }
         if (type) {
-            newToken.type = type;
+            newToken.type = mapTypeToArcade(type);
         }
         try {
             await fetch(`https://api.usearcade.com/api/projects/${id}/tokens/${tokenName}`, {
@@ -78,7 +128,7 @@ export default function useArcade() {
                 body: JSON.stringify({
                     newToken,
                     from: 'figma',
-                    changeComment: 'Need this to be a shorter name',
+                    changeComment: 'Edited by Figma Plugin',
                 }),
                 headers: {
                     'Content-Type': 'application/json',
@@ -108,7 +158,7 @@ export default function useArcade() {
             name: string;
             value: string;
             description?: string;
-            type?: TokenType;
+            type?: ArcadeTokenType;
         } = {
             name: tokenName,
             value,
@@ -117,7 +167,7 @@ export default function useArcade() {
             tokenObj.description = description;
         }
         if (type) {
-            tokenObj.type = type;
+            tokenObj.type = mapTypeToArcade(type);
         }
         try {
             await fetch(`https://api.usearcade.com/api/projects/${id}/tokens`, {
@@ -125,7 +175,7 @@ export default function useArcade() {
                 body: JSON.stringify({
                     ...tokenObj,
                     from: 'figma',
-                    changeComment: 'Need this to be a shorter name',
+                    changeComment: 'Created by Figma Plugin',
                 }),
                 headers: {
                     'Content-Type': 'application/json',
@@ -167,12 +217,17 @@ export default function useArcade() {
                 });
                 const tokens = res.exports['figma-tokens-plugin'];
                 if (tokens?.output) {
+                    console.log('before parse', JSON.parse(tokens.output));
                     const parsedTokens = JSON.parse(tokens.output);
-                    console.log('Parsed tokens', parsedTokens);
+                    const mappedTokens = parsedTokens.tokens.map((token) => ({
+                        ...token,
+                        type: mapTypeFromArcade(token.type),
+                    }));
+                    console.log('Parsed tokensAfter ', mappedTokens);
 
                     const obj = {
                         version: res.version,
-                        values: parsedTokens.tokens,
+                        values: mappedTokens,
                     };
 
                     tokenValues = obj;

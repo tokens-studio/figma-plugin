@@ -21,8 +21,6 @@ async function updateSingleRemoteToken({
 
     switch (provider) {
         case StorageProviderType.ARCADE: {
-            console.log('Updating tokens', values);
-
             break;
         }
         default:

@@ -1,6 +1,6 @@
 export interface TokenProps {
     values: {
-        [key: string]: string;
+        [key: string]: SingleTokenObject[];
     };
     updatedAt: string;
     version: string;
@@ -38,8 +38,8 @@ export type TokenType =
     | 'color'
     | 'implicit'
     | 'borderRadius'
-    | 'size'
-    | 'space'
+    | 'sizing'
+    | 'spacing'
     | 'text'
     | 'typography'
     | 'opacity'
@@ -51,3 +51,21 @@ export type TokenType =
     | 'fontSizes'
     | 'letterSpacing'
     | 'paragraphSpacing';
+
+export type ArcadeTokenType =
+    | 'color'
+    | 'implicit'
+    | 'border-radius'
+    | 'size'
+    | 'space'
+    | 'text'
+    | 'typography'
+    | 'opacity'
+    | 'border-width'
+    | 'shadow'
+    | 'font-family'
+    | 'font-weight'
+    | 'line-height'
+    | 'font-size'
+    | 'letter-spacing'
+    | 'paragraph-spacing';

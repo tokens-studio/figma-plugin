@@ -2,11 +2,9 @@ import updateColorStyles from './updateColorStyles';
 import updateTextStyles from './updateTextStyles';
 
 export default function updateStyles(tokens, shouldCreate = false): void {
-    console.log('Updating styles', tokens);
-    const colorTokens = tokens.filter((n) => ['color', 'colors'].includes(n.type));
-    const textTokens = tokens.filter((n) => ['typography'].includes(n.type));
-
-    console.log('Styles are', colorTokens, textTokens);
+    const styleTokens = tokens.map((token) => ({...token, name: token.name.split('.').join('/')}));
+    const colorTokens = styleTokens.filter((n) => ['color', 'colors'].includes(n.type));
+    const textTokens = styleTokens.filter((n) => ['typography'].includes(n.type));
 
     if (!colorTokens && !textTokens) return;
     if (colorTokens) {

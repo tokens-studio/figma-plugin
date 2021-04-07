@@ -1,12 +1,12 @@
 export default {
     sizing: {
-        label: 'Sizing',
-        property: 'Sizing',
+        label: 'Size',
+        property: 'Size',
         type: 'sizing',
     },
     spacing: {
-        label: 'Spacing',
-        property: 'Spacing',
+        label: 'Space',
+        property: 'Space',
         type: 'spacing',
     },
     color: {
