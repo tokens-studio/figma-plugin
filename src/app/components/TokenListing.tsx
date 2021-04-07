@@ -1,6 +1,7 @@
 import * as React from 'react';
 import objectPath from 'object-path';
 import set from 'set-value';
+import {track} from '@/utils/analytics';
 import {useTokenDispatch, useTokenState} from '../store/TokenContext';
 import EditTokenForm from './EditTokenForm';
 import Heading from './Heading';
@@ -111,6 +112,7 @@ const TokenListing = ({
     };
 
     const submitTokenValue = async ({value, name, path, options}) => {
+        track('Edit Token', {value, name});
         setEditToken({value, name, path});
         setSingleTokenValue({
             parent: activeTokenSet,
