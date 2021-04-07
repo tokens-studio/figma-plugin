@@ -9,6 +9,7 @@ import {StorageProviderType, ApiDataType, StorageType} from '../../../types/api'
 import {postToFigma} from '../../plugin/notifiers';
 import {MessageToPluginTypes} from '../../../types/messages';
 import updateTokensOnSources from './updateSources';
+import * as pjs from '../../../package.json';
 
 export interface SelectionValue {
     borderRadius: string | undefined;
@@ -58,7 +59,7 @@ export enum ActionType {
 }
 
 const defaultTokens: TokenProps = {
-    version: process.env.PLUGIN_VERSION,
+    version: pjs.plugin_version,
     updatedAt: new Date().toString(),
     values: {
         options: JSON.stringify(defaultJSON, null, 2),
@@ -66,7 +67,7 @@ const defaultTokens: TokenProps = {
 };
 
 export const emptyTokens: TokenProps = {
-    version: process.env.PLUGIN_VERSION,
+    version: pjs.plugin_version,
     updatedAt: new Date().toString(),
     values: {
         options: '{ }',

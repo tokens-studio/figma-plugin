@@ -11,12 +11,13 @@ import App from './components/App';
 import {TokenProvider} from './store/TokenContext';
 import Heading from './components/Heading';
 import {store} from './store';
+import * as pjs from '../../package.json';
 
 initializeAnalytics();
 
 Sentry.init({
     dsn: 'https://26bac1a4b1ba4d91bc9420d10d95bb3e@o386310.ingest.sentry.io/5220409',
-    release: `figma-tokens@${process.env.PLUGIN_VERSION}`,
+    release: `figma-tokens@${pjs.plugin_version}`,
     environment: process.env.ENVIRONMENT,
 });
 
