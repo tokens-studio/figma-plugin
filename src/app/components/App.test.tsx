@@ -1,8 +1,12 @@
 import React from 'react';
-import {render, fireEvent} from '../../../tests/config/setupTest';
+import {render, fireEvent, resetStore} from '../../../tests/config/setupTest';
 import App from './App';
 
 describe('App', () => {
+    beforeEach(() => {
+        resetStore();
+    });
+
     it('displays loading indicator on startup', () => {
         const {getByText} = render(<App />);
         const LoadingText = getByText('Hold on, updating...');
@@ -34,7 +38,7 @@ describe('App', () => {
         expect(TokensText).toBeInTheDocument();
     });
 
-    it('shows welcome screen when no tokens are found', () => {
+    it('shows welcome screen when no tokeeens are found', () => {
         const {getByText} = render(<App />);
         fireEvent(
             window,

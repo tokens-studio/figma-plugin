@@ -8,10 +8,14 @@ import {store} from '../../src/app/store';
 
 const AllTheProviders: FC = ({children, options}) => {
     return (
-        <Provider store={store}>
+        <Provider store={store} {...options}>
             <TokenProvider {...options}>{children}</TokenProvider>
         </Provider>
     );
+};
+
+const resetStore = () => {
+    store.dispatch({type: 'RESET_APP'});
 };
 
 const customRender = (ui: ReactElement, options?: Omit<RenderOptions, 'queries', 'providerProps'>) =>
@@ -19,4 +23,4 @@ const customRender = (ui: ReactElement, options?: Omit<RenderOptions, 'queries',
 
 export * from '@testing-library/react';
 
-export {customRender as render};
+export {customRender as render, resetStore};
