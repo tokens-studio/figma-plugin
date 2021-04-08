@@ -2,7 +2,7 @@ import {SingleToken} from '@types/tokens';
 import {aliasRegex, getAliasValue} from './aliases';
 import checkIfValueToken from './checkIfValueToken';
 
-export default function checkIfAlias(token: SingleToken, allTokens = {}): boolean {
+export default function checkIfAlias(token: SingleToken, allTokens = []): boolean {
     let aliasToken = false;
     if (typeof token === 'string') {
         aliasToken = Boolean(token.toString().match(aliasRegex));

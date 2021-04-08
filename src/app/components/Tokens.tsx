@@ -29,7 +29,6 @@ function convertDotPathToNestedObject(path, value) {
 function createTokensObject(tokens: SingleTokenObject[]) {
     return tokens.reduce((acc, cur) => {
         if (cur.type && cur.type !== '' && cur.type !== 'undefined') {
-            console.log('Got a typed one!', cur);
             acc[cur.type] = acc[cur.type] || {values: []};
             acc[cur.type].values.push(cur);
         } else {

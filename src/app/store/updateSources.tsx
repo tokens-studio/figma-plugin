@@ -62,7 +62,7 @@ export default async function updateTokensOnSources(state: StateType, updatedAt:
     postToFigma({
         type: MessageToPluginTypes.UPDATE,
         tokenValues: reduceToValues(state.tokens),
-        tokens: getMergedTokens(state.tokens, state.usedTokenSet),
+        tokens: getMergedTokens(state.tokens, state.usedTokenSet, true),
         updatePageOnly: state.updatePageOnly,
         updatedAt,
     });
