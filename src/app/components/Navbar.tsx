@@ -1,32 +1,38 @@
 import * as React from 'react';
+import {useDispatch, useSelector} from 'react-redux';
 import {track} from '@/utils/analytics';
 import {useTokenState, useTokenDispatch} from '../store/TokenContext';
 import Icon from './Icon';
 import Tooltip from './Tooltip';
 import useRemoteTokens from '../store/remoteTokens';
 import {StorageProviderType} from '../../../types/api';
+import {RootState, Dispatch} from '../store';
 
-const TabButton = ({name, label, active, setActive, first = false}) => {
+const TabButton = ({name, label, first = false}) => {
+    const activeTab = useSelector((state: RootState) => state.base.activeTab);
+    const dispatch = useDispatch<Dispatch>();
+
     const onClick = () => {
-        track('Switched tab', {from: active, to: name});
-        setActive(name);
+        track('Switched tab', {from: activeTab, to: name});
+        dispatch.base.setActiveTab(name);
     };
+
     return (
         <button
             data-cy={`navitem-${name}`}
             type="button"
             className={`px-2 py-4 text-xxs focus:outline-none focus:shadow-none font-medium cursor-pointer hover:text-black
-        ${active === name ? 'text-black' : 'text-gray-500'}
+        ${activeTab === name ? 'text-black' : 'text-gray-500'}
         ${first ? 'pl-4' : ''}`}
             name="text"
-            onClick={() => onClick()}
+            onClick={onClick}
         >
             {label}
         </button>
     );
 };
 
-const Navbar = ({active, setActive}) => {
+const Navbar = () => {
     const {storageType, editProhibited, projectURL, syncEnabled} = useTokenState();
     const {pullStyles} = useTokenDispatch();
     const {pullTokens} = useRemoteTokens();
@@ -34,10 +40,11 @@ const Navbar = ({active, setActive}) => {
     return (
         <div className="sticky top-0 navbar bg-white flex items-center justify-between z-1 border-b border-gray-200">
             <div>
-                <TabButton first name="tokens" label="Tokens" active={active} setActive={setActive} />
-                <TabButton name="json" label="JSON" active={active} setActive={setActive} />
-                <TabButton name="inspector" label="Inspect" active={active} setActive={setActive} />
-                {syncEnabled && <TabButton name="syncsettings" label="Sync" active={active} setActive={setActive} />}
+                <TabButton first name="tokens" label="Tokens" />
+                <TabButton name="json" label="JSON" />
+                <TabButton name="inspector" label="Inspect" />
+                {syncEnabled && <TabButton name="syncsettings" label="Sync" />}
+                <TabButton name="settings" label="Settings" />
             </div>
             <div className="flex flex-row items-center">
                 {storageType.provider !== StorageProviderType.LOCAL && (

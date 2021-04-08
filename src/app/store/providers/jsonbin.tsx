@@ -1,10 +1,10 @@
-import * as pjs from '../../../../package.json';
 import {notifyToUI, postToFigma} from '../../../plugin/notifiers';
 import {StorageProviderType} from '../../../../types/api';
 import {MessageToPluginTypes} from '../../../../types/messages';
 import {TokenProps} from '../../../../types/tokens';
 import {compareUpdatedAt} from '../../components/utils';
 import {useTokenDispatch} from '../TokenContext';
+import * as pjs from '../../../../package.json';
 
 async function readTokensFromJSONBin({secret, id}): Promise<TokenProps> | null {
     const response = await fetch(`https://api.jsonbin.io/b/${id}/latest`, {
@@ -54,7 +54,7 @@ export async function updateJSONBinTokens({tokens, id, secret, updatedAt, oldUpd
     }, {});
     const tokenObj = JSON.stringify(
         {
-            version: pjs.version,
+            version: pjs.plugin_version,
             updatedAt,
             values,
         },
@@ -88,7 +88,7 @@ export function useJSONbin() {
             cache: 'no-cache',
             credentials: 'same-origin',
             body: JSON.stringify({
-                version: pjs.version,
+                version: pjs.plugin_version,
                 updatedAt,
                 values: {
                     options: {},

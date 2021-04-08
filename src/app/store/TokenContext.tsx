@@ -4,12 +4,12 @@ import fetchChangelog from '@/utils/storyblok';
 import {track} from '@/utils/analytics';
 import defaultJSON from '../../config/default.json';
 import TokenData from '../components/TokenData';
-import * as pjs from '../../../package.json';
 import {TokenProps} from '../../../types/tokens';
 import {StorageProviderType, ApiDataType, StorageType} from '../../../types/api';
 import {postToFigma} from '../../plugin/notifiers';
 import {MessageToPluginTypes} from '../../../types/messages';
 import updateTokensOnSources from './updateSources';
+import * as pjs from '../../../package.json';
 
 export interface SelectionValue {
     borderRadius: string | undefined;
@@ -59,7 +59,7 @@ export enum ActionType {
 }
 
 const defaultTokens: TokenProps = {
-    version: pjs.version,
+    version: pjs.plugin_version,
     updatedAt: new Date().toString(),
     values: {
         options: JSON.stringify(defaultJSON, null, 2),
@@ -67,7 +67,7 @@ const defaultTokens: TokenProps = {
 };
 
 export const emptyTokens: TokenProps = {
-    version: pjs.version,
+    version: pjs.plugin_version,
     updatedAt: new Date().toString(),
     values: {
         options: '{ }',

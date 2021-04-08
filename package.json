@@ -1,6 +1,7 @@
 {
 	"name": "figma-tokens",
-	"version": "48",
+	"version": "1.0.0",
+	"plugin_version": "48",
 	"description": "Figma Design Tokens",
 	"license": "ISC",
 	"scripts": {
@@ -21,6 +22,7 @@
 		"@figma-plugin/helpers": "^0.13.2",
 		"@reach/portal": "^0.10.5",
 		"@reach/tooltip": "^0.10.3",
+		"@rematch/core": "^2.0.1",
 		"@sentry/react": "^6.2.5",
 		"autoprefixer": "^10.2.5",
 		"axios": "^0.21.1",
@@ -43,11 +45,13 @@
 		"react-dom": "17.0.0",
 		"react-error-boundary": "^3.1.1",
 		"react-modal": "^3.11.2",
+		"react-redux": "^7.2.3",
 		"react-svg-loader": "^3.0.3",
 		"regenerator-runtime": "^0.13.7",
 		"set-value": "^3.0.2",
 		"storyblok-js-client": "^3.3.1",
-		"tailwindcss": "^2.0.3"
+		"tailwindcss": "^2.0.3",
+		"use-debounce": "^6.0.1"
 	},
 	"devDependencies": {
 		"@babel/core": "^7.12.16",

@@ -9,6 +9,7 @@ export enum MessageFromPluginTypes {
     API_PROVIDERS = 'apiProviders',
     USER_ID = 'userId',
     RECEIVED_LAST_OPENED = 'receivedLastOpened',
+    UI_SETTINGS = 'uiSettings',
 }
 
 export enum MessageToPluginTypes {
@@ -23,4 +24,5 @@ export enum MessageToPluginTypes {
     PULL_STYLES = 'pull-styles',
     SET_STORAGE_TYPE = 'set-storage-type',
     NOTIFY = 'notify',
+    SET_UI = 'set_ui',
 }

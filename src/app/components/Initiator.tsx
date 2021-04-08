@@ -1,12 +1,16 @@
 import React from 'react';
 import {identify, track} from '@/utils/analytics';
+import {useDispatch} from 'react-redux';
 import {postToFigma} from '../../plugin/notifiers';
 import {MessageFromPluginTypes, MessageToPluginTypes} from '../../../types/messages';
 import useRemoteTokens from '../store/remoteTokens';
 import {useTokenDispatch} from '../store/TokenContext';
 import TokenData from './TokenData';
+import {Dispatch} from '../store';
 
-export default function Initiator({setActive, setRemoteComponents}) {
+export default function Initiator({setRemoteComponents}) {
+    const dispatch = useDispatch<Dispatch>();
+
     const {
         setTokenData,
         setLoading,
@@ -40,6 +44,8 @@ export default function Initiator({setActive, setRemoteComponents}) {
                     lastOpened,
                     providers,
                     userId,
+                    width,
+                    height,
                 } = event.data.pluginMessage;
                 switch (type) {
                     case MessageFromPluginTypes.SELECTION:
@@ -62,7 +68,7 @@ export default function Initiator({setActive, setRemoteComponents}) {
                         setLoading(false);
                         if (values) {
                             setTokenData(new TokenData(values));
-                            setActive('tokens');
+                            dispatch.base.setActiveTab('tokens');
                         }
                         break;
                     }
@@ -71,7 +77,7 @@ export default function Initiator({setActive, setRemoteComponents}) {
                         if (values) {
                             track('Import styles');
                             setTokensFromStyles(values);
-                            setActive('tokens');
+                            dispatch.base.setActiveTab('tokens');
                         }
                         break;
                     case MessageFromPluginTypes.RECEIVED_STORAGE_TYPE:
@@ -85,7 +91,7 @@ export default function Initiator({setActive, setRemoteComponents}) {
                             const remoteValues = await fetchDataFromRemote(id, secret, name, provider);
                             if (remoteValues) {
                                 setTokenData(new TokenData(remoteValues));
-                                setActive('tokens');
+                                dispatch.base.setActiveTab('tokens');
                             }
                             setLoading(false);
                         } else {
@@ -96,6 +102,10 @@ export default function Initiator({setActive, setRemoteComponents}) {
                     }
                     case MessageFromPluginTypes.API_PROVIDERS: {
                         setAPIProviders(providers);
+                        break;
+                    }
+                    case MessageFromPluginTypes.UI_SETTINGS: {
+                        dispatch.settings.setWindowSize({width, height});
                         break;
                     }
                     case MessageFromPluginTypes.USER_ID: {

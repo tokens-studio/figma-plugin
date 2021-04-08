@@ -2,11 +2,11 @@
 import objectPath from 'object-path';
 import {fetchAllPluginData} from './pluginData';
 import store from './store';
-import * as pjs from '../../package.json';
 import setValuesOnNode from './updateNode';
 import {TokenProps} from '../../types/tokens';
 import {StorageProviderType, StorageType} from '../../types/api';
 import {isSingleToken} from '../app/components/utils';
+import * as pjs from '../../package.json';
 
 export function mapValuesToTokens(object, values) {
     const array = Object.entries(values).map(([key, token]) => {
@@ -22,7 +22,7 @@ export function mapValuesToTokens(object, values) {
 }
 
 export function setTokensOnDocument(tokens, updatedAt: string) {
-    figma.root.setSharedPluginData('tokens', 'version', pjs.version);
+    figma.root.setSharedPluginData('tokens', 'version', pjs.plugin_version);
     figma.root.setSharedPluginData('tokens', 'values', JSON.stringify(tokens));
     figma.root.setSharedPluginData('tokens', 'updatedAt', updatedAt);
 }
