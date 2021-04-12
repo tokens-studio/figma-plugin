@@ -6,6 +6,7 @@ import setValuesOnNode from './updateNode';
 import {TokenProps} from '../../types/tokens';
 import {StorageProviderType, StorageType} from '../../types/api';
 import {isSingleToken} from '../app/components/utils';
+import {transformValue} from './helpers';
 
 function returnValueToLookFor(key) {
     switch (key) {
@@ -24,8 +25,7 @@ export function mapValuesToTokens(tokens, values): object {
         if (!resolvedToken) return acc;
 
         const value = isSingleToken(resolvedToken) ? resolvedToken[returnValueToLookFor(key)] : resolvedToken;
-
-        acc[key] = value;
+        acc[key] = transformValue(value, resolvedToken.type);
         return acc;
     }, {});
     return mappedValues;

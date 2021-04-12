@@ -33,6 +33,17 @@ export function getMergedTokens(tokens, usedTokenSet, shouldResolve = false) {
 
     if (shouldResolve) {
         returnedTokens = mergedTokens.map((t) => {
+            let returnValue;
+            // Iterate over Typography Object to get resolved values
+            if (t.type === 'typography') {
+                returnValue = Object.entries(t.value).reduce((acc, [key, value]) => {
+                    acc[key] = getAliasValue(value, mergedTokens);
+                    return acc;
+                }, {});
+            } else {
+                // If we're not dealing with typography tokens, just return resolved value
+                returnValue = getAliasValue(t, mergedTokens);
+            }
             return {
                 ...t,
                 value: getAliasValue(t, mergedTokens),
@@ -229,13 +240,16 @@ function stateReducer(state, action) {
                 tokens: getMergedTokens(state.tokens, state.usedTokenSet),
             });
             return state;
-        case ActionType.SetNodeData:
+        case ActionType.SetNodeData: {
+            console.log('setting node data', getMergedTokens(state.tokens, state.usedTokenSet, true));
             postToFigma({
                 type: MessageToPluginTypes.SET_NODE_DATA,
                 values: action.data,
                 tokens: getMergedTokens(state.tokens, state.usedTokenSet, true),
             });
             return state;
+        }
+
         case ActionType.RemoveNodeData:
             postToFigma({
                 type: MessageToPluginTypes.REMOVE_NODE_DATA,

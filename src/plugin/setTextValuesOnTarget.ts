@@ -1,9 +1,9 @@
-import {convertLetterSpacingToFigma, convertLineHeightToFigma} from './helpers';
+import {transformValue} from './helpers';
 
 export default async function setTextValuesOnTarget(target, token) {
     try {
         const {value, description} = token;
-        const {fontFamily, fontWeight, fontSize, lineHeight, letterSpacing, paragraphSpacing} = value;
+        const {fontFamily, fontWeight, fontSize, lineHeight, letterSpacing, paragraphSpacing} = value.value || value;
         const family = fontFamily || target.fontName.family;
         const style = fontWeight || target.fontName.style;
         await figma.loadFontAsync({family, style});
@@ -16,16 +16,16 @@ export default async function setTextValuesOnTarget(target, token) {
         }
 
         if (fontSize) {
-            target.fontSize = Number(fontSize);
+            target.fontSize = transformValue(fontSize, 'fontSizes');
         }
         if (lineHeight) {
-            target.lineHeight = convertLineHeightToFigma(lineHeight);
+            target.lineHeight = transformValue(lineHeight, 'lineHeights');
         }
         if (letterSpacing) {
-            target.letterSpacing = convertLetterSpacingToFigma(letterSpacing);
+            target.letterSpacing = transformValue(letterSpacing, 'letterSpacing');
         }
         if (paragraphSpacing) {
-            target.paragraphSpacing = Number(paragraphSpacing);
+            target.paragraphSpacing = transformValue(paragraphSpacing, 'paragraphSpacing');
         }
         if (description) {
             target.description = description;

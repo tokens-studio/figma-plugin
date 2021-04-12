@@ -217,13 +217,11 @@ export default function useArcade() {
                 });
                 const tokens = res.exports['figma-tokens-plugin'];
                 if (tokens?.output) {
-                    console.log('before parse', JSON.parse(tokens.output));
                     const parsedTokens = JSON.parse(tokens.output);
                     const mappedTokens = parsedTokens.tokens.map((token) => ({
                         ...token,
                         type: mapTypeFromArcade(token.type),
                     }));
-                    console.log('Parsed tokensAfter ', mappedTokens);
 
                     const obj = {
                         version: res.version,
@@ -238,6 +236,7 @@ export default function useArcade() {
                 return tokenValues;
             }
         } catch (e) {
+            console.error('Error parsing tokens', e);
             return null;
         }
     }

@@ -228,18 +228,6 @@ const TokenListing = ({
                                             <Icon name="add" />
                                         </button>
                                     </Tooltip>
-                                    <Tooltip label="Add a new group" variant="right">
-                                        <button
-                                            disabled={editProhibited}
-                                            className="button button-ghost"
-                                            type="button"
-                                            onClick={() => {
-                                                setShowNewGroupForm(true);
-                                            }}
-                                        >
-                                            <Icon name="folder" />
-                                        </button>
-                                    </Tooltip>
                                 </div>
                             </div>
                         </div>
