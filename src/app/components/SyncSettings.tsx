@@ -48,7 +48,7 @@ const SyncSettings = () => {
                             JSONbin.io
                         </a>
                         , copy the Secret Key into the field, and click on save. If you or your team already have a
-                        version stored, add the secret and the corresponding ID.
+                        version stored, add the secret and the corresponding ID.{' '}
                         <a
                             href="https://docs.tokens.studio/sync"
                             target="_blank"
