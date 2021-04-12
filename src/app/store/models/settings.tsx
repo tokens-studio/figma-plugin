@@ -1,5 +1,6 @@
 /* eslint-disable import/prefer-default-export */
 import {postToFigma} from '@/plugin/notifiers';
+import {track} from '@/utils/analytics';
 import {createModel} from '@rematch/core';
 import {MessageToPluginTypes} from '@types/messages';
 import {RootModel} from '.';
@@ -30,6 +31,7 @@ export const settings = createModel<RootModel>()({
     } as SettingsState,
     reducers: {
         setWindowSize(state, payload: {width: number; height: number}) {
+            track('Set Window Size', {width: payload.width, height: payload.height});
             return {
                 ...state,
                 uiWindow: {

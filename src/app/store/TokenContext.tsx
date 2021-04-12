@@ -55,7 +55,6 @@ export enum ActionType {
     SetProjectURL = 'SET_PROJECT_URL',
     SetChangelog = 'SET_CHANGELOG',
     SetLastOpened = 'SET_LAST_OPENED',
-    SetSyncEnabled = 'SET_SYNC_ENABLED',
 }
 
 const defaultTokens: TokenProps = {
@@ -114,7 +113,6 @@ const emptyState = {
     editProhibited: true,
     changelog: [],
     lastOpened: '',
-    syncEnabled: false,
 };
 
 const TokenStateContext = React.createContext(emptyState);
@@ -251,7 +249,6 @@ function stateReducer(state, action) {
         case ActionType.SetApiData:
             return {
                 ...state,
-                syncEnabled: true,
                 api: action.data,
             };
         case ActionType.SetLocalApiState: {
@@ -326,12 +323,6 @@ function stateReducer(state, action) {
             return {
                 ...state,
                 projectURL: action.data,
-            };
-        }
-        case ActionType.SetSyncEnabled: {
-            return {
-                ...state,
-                syncEnabled: action.data,
             };
         }
         case ActionType.SetStorageType:
@@ -485,9 +476,6 @@ function TokenProvider({children}) {
             },
             setLastOpened: (data: Date) => {
                 dispatch({type: ActionType.SetLastOpened, data, dispatch});
-            },
-            setSyncEnabled: (data: boolean) => {
-                dispatch({type: ActionType.SetSyncEnabled, data});
             },
         }),
         [dispatch, updatedAt]

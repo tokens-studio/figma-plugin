@@ -33,7 +33,7 @@ const TabButton = ({name, label, first = false}) => {
 };
 
 const Navbar = () => {
-    const {storageType, editProhibited, projectURL, syncEnabled} = useTokenState();
+    const {storageType, editProhibited, projectURL} = useTokenState();
     const {pullStyles} = useTokenDispatch();
     const {pullTokens} = useRemoteTokens();
 
@@ -43,7 +43,7 @@ const Navbar = () => {
                 <TabButton first name="tokens" label="Tokens" />
                 <TabButton name="json" label="JSON" />
                 <TabButton name="inspector" label="Inspect" />
-                {syncEnabled && <TabButton name="syncsettings" label="Sync" />}
+                {<TabButton name="syncsettings" label="Sync" />}
                 <TabButton name="settings" label="Settings" />
             </div>
             <div className="flex flex-row items-center">

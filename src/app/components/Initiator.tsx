@@ -23,7 +23,6 @@ export default function Initiator({setRemoteComponents}) {
         setStorageType,
         setAPIProviders,
         setLastOpened,
-        setSyncEnabled,
     } = useTokenDispatch();
     const {fetchDataFromRemote} = useRemoteTokens();
 
@@ -94,9 +93,6 @@ export default function Initiator({setRemoteComponents}) {
                                 dispatch.base.setActiveTab('tokens');
                             }
                             setLoading(false);
-                        } else {
-                            // Enable sync for beta
-                            setSyncEnabled(true);
                         }
                         break;
                     }
@@ -106,6 +102,7 @@ export default function Initiator({setRemoteComponents}) {
                     }
                     case MessageFromPluginTypes.UI_SETTINGS: {
                         dispatch.settings.setWindowSize({width, height});
+                        dispatch.settings.triggerWindowChange();
                         break;
                     }
                     case MessageFromPluginTypes.USER_ID: {
