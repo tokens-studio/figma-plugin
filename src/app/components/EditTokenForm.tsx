@@ -1,3 +1,4 @@
+import {track} from '@/utils/analytics';
 import * as React from 'react';
 import {useTokenDispatch, useTokenState} from '../store/TokenContext';
 import useManageTokens from '../store/useManageTokens';
@@ -49,6 +50,8 @@ const EditTokenForm = ({
     };
 
     const submitTokenValue = async ({value, name, options}) => {
+        track('Edit Token');
+
         let oldName;
         if (initialName !== name && initialName) {
             oldName = initialName;
