@@ -76,6 +76,7 @@ export default {
             '<rootDir>/tests/__mocks__/fileMock.js',
         '\\.(css)$': '<rootDir>/tests/__mocks__/styleMock.js',
         '^@/(.*)$': '<rootDir>/src/$1',
+        '^@types/(.*)$': '<rootDir>/types/$1',
     },
 
     // An array of regexp pattern strings, matched against all module paths before considered 'visible' to the module loader

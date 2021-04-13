@@ -1,12 +1,12 @@
 /* eslint-disable default-case */
 import {fetchAllPluginData} from './pluginData';
 import store from './store';
-import * as pjs from '../../package.json';
 import setValuesOnNode from './updateNode';
 import {TokenProps} from '../../types/tokens';
 import {StorageProviderType, StorageType} from '../../types/api';
 import {isSingleToken} from '../app/components/utils';
 import {transformValue} from './helpers';
+import * as pjs from '../../package.json';
 
 function returnValueToLookFor(key) {
     switch (key) {
@@ -32,7 +32,7 @@ export function mapValuesToTokens(tokens, values): object {
 }
 
 export function setTokensOnDocument(tokens, updatedAt: string) {
-    figma.root.setSharedPluginData('tokens', 'version', pjs.version);
+    figma.root.setSharedPluginData('tokens', 'version', pjs.plugin_version);
     figma.root.setSharedPluginData('tokens', 'values', JSON.stringify(tokens));
     figma.root.setSharedPluginData('tokens', 'updatedAt', updatedAt);
 }

@@ -1,4 +1,5 @@
 import * as React from 'react';
+import {track} from '@/utils/analytics';
 import Tooltip from './Tooltip';
 import MoreButton from './MoreButton';
 import {useTokenState, useTokenDispatch} from '../store/TokenContext';
@@ -150,6 +151,7 @@ const TokenButton = ({type, property, name, path, token, editMode, showForm}) =>
             showForm({name, value: token, path});
         } else {
             const tokenValue = name;
+            track('Apply Token', {givenProperties});
             let value = isActive ? 'delete' : tokenValue;
             if (propsToSet[0].clear && !active) {
                 value = 'delete';

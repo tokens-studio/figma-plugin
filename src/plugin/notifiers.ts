@@ -41,6 +41,14 @@ export function notifySelection(nodes = undefined, values = undefined) {
     });
 }
 
+export function notifyUISettings({width, height}: {width: number; height: number}) {
+    postToUI({
+        type: MessageFromPluginTypes.UI_SETTINGS,
+        width,
+        height,
+    });
+}
+
 export function notifyRemoteComponents({nodes, remotes}) {
     const opts = {timeout: 600};
     if (nodes > 0 && remotes.length > 0) {

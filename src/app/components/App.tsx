@@ -1,6 +1,8 @@
 import * as React from 'react';
+import {useSelector} from 'react-redux';
 import JSONEditor from './JSONEditor';
 import SyncSettings from './SyncSettings';
+import Settings from './Settings';
 import Inspector from './Inspector';
 import Tokens from './Tokens';
 import StartScreen from './StartScreen';
@@ -11,18 +13,19 @@ import LoadingBar from './LoadingBar';
 import Footer from './Footer';
 import Initiator from './Initiator';
 import Changelog from './Changelog';
+import {RootState} from '../store';
 
 const App = () => {
-    const [active, setActive] = React.useState('start');
     const [remoteComponents, setRemoteComponents] = React.useState([]);
+    const activeTab = useSelector((state: RootState) => state.base.activeTab);
 
     return (
         <>
-            <Initiator setActive={setActive} setRemoteComponents={setRemoteComponents} />
+            <Initiator setRemoteComponents={setRemoteComponents} />
             <LoadingBar />
             <div className="h-full flex flex-col">
                 <div className="flex-grow flex flex-col">
-                    {active !== 'start' && <Navbar active={active} setActive={setActive} />}
+                    {activeTab !== 'start' && <Navbar />}
                     {remoteComponents.length > 0 && (
                         <div className="p-4">
                             <Heading size="small">Unable to update remote components</Heading>
@@ -37,13 +40,14 @@ const App = () => {
                             ))}
                         </div>
                     )}
-                    {active === 'start' && <StartScreen setActive={setActive} />}
-                    {active === 'tokens' && <Tokens />}
-                    {active === 'json' && <JSONEditor />}
-                    {active === 'inspector' && <Inspector />}
-                    {active === 'syncsettings' && <SyncSettings />}
+                    {activeTab === 'start' && <StartScreen />}
+                    {activeTab === 'tokens' && <Tokens />}
+                    {activeTab === 'json' && <JSONEditor />}
+                    {activeTab === 'inspector' && <Inspector />}
+                    {activeTab === 'syncsettings' && <SyncSettings />}
+                    {activeTab === 'settings' && <Settings />}
                 </div>
-                <Footer active={active} />
+                <Footer />
                 <Changelog />
             </div>
         </>

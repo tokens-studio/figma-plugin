@@ -1,11 +1,21 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import React, {FC, ReactElement} from 'react';
 import {render, RenderOptions} from '@testing-library/react';
-import {TokenProvider} from '../../src/app/store/TokenContext';
+import {Provider} from 'react-redux';
 import '@testing-library/jest-dom/extend-expect';
+import {TokenProvider} from '../../src/app/store/TokenContext';
+import {store} from '../../src/app/store';
 
 const AllTheProviders: FC = ({children, options}) => {
-    return <TokenProvider {...options}>{children}</TokenProvider>;
+    return (
+        <Provider store={store} {...options}>
+            <TokenProvider {...options}>{children}</TokenProvider>
+        </Provider>
+    );
+};
+
+const resetStore = () => {
+    store.dispatch({type: 'RESET_APP'});
 };
 
 const customRender = (ui: ReactElement, options?: Omit<RenderOptions, 'queries', 'providerProps'>) =>
@@ -13,4 +23,4 @@ const customRender = (ui: ReactElement, options?: Omit<RenderOptions, 'queries',
 
 export * from '@testing-library/react';
 
-export {customRender as render};
+export {customRender as render, resetStore};

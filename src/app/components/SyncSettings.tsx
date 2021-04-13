@@ -9,6 +9,7 @@ import StorageItem from './StorageItem';
 import ProviderSelector from './StorageProviderSelector';
 import EditStorageItemModal from './modals/EditStorageItemModal';
 import CreateStorageItemModal from './modals/CreateStorageItemModal';
+import {track} from '@/utils/analytics';
 
 const SyncSettings = () => {
     const {api, storageType, localApiState, apiProviders, updateAfterApply} = useTokenState();
@@ -19,6 +20,7 @@ const SyncSettings = () => {
     const [createStorageItemModalVisible, setShowCreateStorageModalVisible] = React.useState(false);
 
     const handleEditClick = (provider) => {
+        track('Edit Credentials');
         setLocalApiState({
             id: provider.id,
             name: provider.name,
@@ -29,9 +31,7 @@ const SyncSettings = () => {
     };
 
     const selectedRemoteProvider = () => {
-        return [StorageProviderType.JSONBIN, StorageProviderType.ARCADE].includes(
-            localApiState?.provider as StorageProviderType
-        );
+        return [StorageProviderType.JSONBIN].includes(localApiState?.provider as StorageProviderType);
     };
 
     const storedApiProviders = () => {
@@ -48,17 +48,15 @@ const SyncSettings = () => {
                             JSONbin.io
                         </a>
                         , copy the Secret Key into the field, and click on save. If you or your team already have a
-                        version stored, add the secret and the corresponding ID.
-                    </div>
-                );
-            case StorageProviderType.ARCADE:
-                return (
-                    <div>
-                        <a href="https://usearcade.com" target="_blank" className="underline" rel="noreferrer">
-                            Arcade
-                        </a>{' '}
-                        is currently in Early Access. If you have an Arcade account, use your project ID and your API
-                        key to gain access. For now, just the Read-Only mode is supported.
+                        version stored, add the secret and the corresponding ID.{' '}
+                        <a
+                            href="https://docs.tokens.studio/sync"
+                            target="_blank"
+                            rel="noreferrer"
+                            className="underline"
+                        >
+                            Read more on docs.tokens.studio
+                        </a>
                     </div>
                 );
             default:
@@ -126,7 +124,10 @@ const SyncSettings = () => {
                         <Button
                             id="button-add-new-credentials"
                             variant="secondary"
-                            onClick={() => setShowCreateStorageModalVisible(true)}
+                            onClick={() => {
+                                track('Add Credentials', {provider: localApiState.provider});
+                                setShowCreateStorageModalVisible(true);
+                            }}
                         >
                             Add new credentials
                         </Button>

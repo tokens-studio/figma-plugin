@@ -39,14 +39,7 @@ const TokenListing = ({
         displayType,
         editProhibited,
     } = useTokenState();
-    const {
-        setCollapsed,
-        createStyles,
-        setShowEditForm,
-        setShowNewGroupForm,
-        setShowOptions,
-        setDisplayType,
-    } = useTokenDispatch();
+    const {setCollapsed, createStyles, setShowEditForm, setShowOptions, setDisplayType} = useTokenDispatch();
 
     const createButton = ['color', 'typography'].includes(tokenType);
     const showDisplayToggle = tokenType === 'color';
@@ -61,7 +54,7 @@ const TokenListing = ({
     });
 
     const closeForm = () => {
-        setShowOptions('');
+        setShowOptions(false);
         setShowEditForm(false);
     };
 

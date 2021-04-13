@@ -14,6 +14,7 @@ import {StorageProviderType, ApiDataType, StorageType} from '../../../types/api'
 import {postToFigma} from '../../plugin/notifiers';
 import {MessageToPluginTypes} from '../../../types/messages';
 import updateTokensOnSources from './updateSources';
+import * as pjs from '../../../package.json';
 
 export interface SelectionValue {
     borderRadius: string | undefined;
@@ -110,7 +111,7 @@ export enum ActionType {
 }
 
 const defaultTokens: TokenProps = {
-    version: pjs.version,
+    version: pjs.plugin_version,
     updatedAt: new Date().toString(),
     values: {
         options: JSON.stringify(defaultJSON, null, 2),
@@ -118,7 +119,7 @@ const defaultTokens: TokenProps = {
 };
 
 export const emptyTokens: TokenProps = {
-    version: pjs.version,
+    version: pjs.plugin_version,
     updatedAt: new Date().toString(),
     values: {
         options: [],
@@ -139,7 +140,7 @@ const emptyState = {
     showEditForm: false,
     showNewGroupForm: false,
     showEmptyGroups: true,
-    showOptions: '',
+    showOptions: false,
     storageType: {
         provider: StorageProviderType.LOCAL,
         id: '',
@@ -165,7 +166,6 @@ const emptyState = {
     editProhibited: true,
     changelog: [],
     lastOpened: '',
-    syncEnabled: true,
     lastUpdatedAt: null,
 };
 
@@ -356,7 +356,6 @@ function stateReducer(state, action) {
         case ActionType.SetApiData:
             return {
                 ...state,
-                syncEnabled: true,
                 api: action.data,
             };
         case ActionType.SetLocalApiState: {
@@ -429,12 +428,6 @@ function stateReducer(state, action) {
             return {
                 ...state,
                 projectURL: action.data,
-            };
-        }
-        case ActionType.SetSyncEnabled: {
-            return {
-                ...state,
-                syncEnabled: action.data,
             };
         }
         case ActionType.SetStorageType:
@@ -604,7 +597,7 @@ function TokenProvider({children}) {
             setShowNewGroupForm: (bool: boolean) => {
                 dispatch({type: ActionType.SetShowNewGroupForm, bool});
             },
-            setShowOptions: (data: string) => {
+            setShowOptions: (data: string | boolean) => {
                 dispatch({type: ActionType.SetShowOptions, data});
             },
             setDisplayType: (data: string) => {
