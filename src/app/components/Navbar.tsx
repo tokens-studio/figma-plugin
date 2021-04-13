@@ -1,6 +1,6 @@
 import * as React from 'react';
 import {track} from '@/utils/analytics';
-import {useTokenState, useTokenDispatch} from '../store/TokenContext';
+import {useTokenState} from '../store/TokenContext';
 import Icon from './Icon';
 import Tooltip from './Tooltip';
 import useRemoteTokens from '../store/remoteTokens';
@@ -26,9 +26,19 @@ const TabButton = ({name, label, active, setActive, first = false}) => {
     );
 };
 
+const transformProviderName = (provider) => {
+    switch (provider) {
+        case StorageProviderType.JSONBIN:
+            return 'JSONBin.io';
+        case StorageProviderType.ARCADE:
+            return 'Arcade';
+        default:
+            return provider;
+    }
+};
+
 const Navbar = ({active, setActive}) => {
-    const {storageType, editProhibited, projectURL, syncEnabled} = useTokenState();
-    const {pullStyles} = useTokenDispatch();
+    const {storageType, projectURL, syncEnabled} = useTokenState();
     const {pullTokens} = useRemoteTokens();
 
     return (
@@ -42,29 +52,19 @@ const Navbar = ({active, setActive}) => {
                 {storageType.provider !== StorageProviderType.LOCAL && (
                     <>
                         {projectURL && (
-                            <Tooltip variant="right" label={`Go to ${storageType.provider}`}>
+                            <Tooltip variant="right" label={`Go to ${transformProviderName(storageType.provider)}`}>
                                 <a href={projectURL} target="_blank" rel="noreferrer" className="button button-ghost">
                                     <Icon name="library" />
                                 </a>
                             </Tooltip>
                         )}
-                        <Tooltip variant="right" label={`Pull from ${storageType.provider}`}>
+                        <Tooltip variant="right" label={`Pull from ${transformProviderName(storageType.provider)}`}>
                             <button onClick={pullTokens} type="button" className="button button-ghost">
                                 <Icon name="refresh" />
                             </button>
                         </Tooltip>
                     </>
                 )}
-                {/* <Tooltip variant="right" label="Import Styles">
-                    <button
-                        disabled={editProhibited}
-                        className="button button-ghost"
-                        type="button"
-                        onClick={pullStyles}
-                    >
-                        <Icon name="import" />
-                    </button>
-                </Tooltip> */}
             </div>
         </div>
     );

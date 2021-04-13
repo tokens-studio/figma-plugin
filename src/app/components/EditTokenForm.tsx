@@ -15,7 +15,7 @@ const EditTokenForm = ({
     optionsSchema,
     type,
 }) => {
-    const title = isPristine ? `New Token in ${path}` : `${path}.${initialName}`;
+    const title = isPristine ? `New Token` : initialName;
     const {activeTokenSet} = useTokenState();
     const {setShowEditForm} = useTokenDispatch();
     const {editSingleToken, createSingleToken} = useManageTokens();
