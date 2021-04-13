@@ -23,4 +23,7 @@ export default {
     typography: {},
     letterSpacing: {},
     paragraphSpacing: {},
+    tokenValue: {},
+    tokenName: {},
+    description: {},
 };

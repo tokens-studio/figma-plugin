@@ -56,12 +56,6 @@ const TokenButton = ({type, property, name, path, token, editMode, showForm}) =>
                 {label: 'Bottom Left', name: 'borderRadiusBottomLeft'},
             ];
             break;
-        case 'opacity':
-            style = {
-                ...style,
-                backgroundColor: `rgba(0,0,0, ${Number(displayValue.slice(0, displayValue.length - 1)) / 100})`,
-            };
-            break;
         case 'spacing':
             properties = [
                 {
@@ -113,6 +107,22 @@ const TokenButton = ({type, property, name, path, token, editMode, showForm}) =>
         default:
             break;
     }
+
+    properties = [
+        ...properties,
+        {
+            label: 'Insert name (text)',
+            name: 'tokenName',
+        },
+        {
+            label: 'Insert raw value (text)',
+            name: 'tokenValue',
+        },
+        {
+            label: 'Insert description (text)',
+            name: 'description',
+        },
+    ];
 
     const active = selectionValues[type] === [path, name].join('.');
     const semiActive = properties.some((prop) => selectionValues[prop.name] === [path, name].join('.'));

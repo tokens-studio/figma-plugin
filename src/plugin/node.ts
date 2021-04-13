@@ -7,18 +7,35 @@ import {TokenProps} from '../../types/tokens';
 import {StorageProviderType, StorageType} from '../../types/api';
 import {isSingleToken} from '../app/components/utils';
 import * as pjs from '../../package.json';
+import {transformValue} from './helpers';
+
+function returnValueToLookFor(resolvedValue, key, token) {
+    switch (key) {
+        case 'tokenName':
+            return token;
+        case 'description':
+            return resolvedValue.description;
+        default:
+            return resolvedValue.value;
+    }
+}
+
+function mapType(token, value) {
+    if (value.type) return value.type;
+    return token.split('.')[0];
+}
 
 export function mapValuesToTokens(object, values) {
-    const array = Object.entries(values).map(([key, token]) => {
-        const resolvedValue = objectPath.get(object, token);
-        const value = isSingleToken(resolvedValue) ? resolvedValue.value : resolvedValue;
+    return Object.entries(values).reduce((acc, [key, tokenOnNode]) => {
+        const resolvedToken = objectPath.get(object, tokenOnNode);
+        if (!resolvedToken) return acc;
 
-        return {
-            [key]: value,
-        };
-    });
-    array.map((item) => ({[item.key]: item.value}));
-    return Object.assign({}, ...array);
+        const value = isSingleToken(resolvedToken)
+            ? returnValueToLookFor(resolvedToken, key, tokenOnNode)
+            : resolvedToken;
+        acc[key] = transformValue(value, mapType(tokenOnNode, resolvedToken));
+        return acc;
+    }, {});
 }
 
 export function setTokensOnDocument(tokens, updatedAt: string) {
@@ -62,6 +79,7 @@ export function goToNode(id) {
 }
 
 export function updateNodes(nodes, tokens) {
+    console.log('Updating node', nodes, tokens);
     let i = 0;
     const len = nodes.length;
     const returnedValues = [];
