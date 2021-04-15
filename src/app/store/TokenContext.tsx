@@ -8,7 +8,6 @@ import {mergeDeep} from '@/plugin/helpers';
 import {getAliasValue} from '@/utils/aliases';
 import defaultJSON from '../../config/default.json';
 import TokenData from '../components/TokenData';
-import * as pjs from '../../../package.json';
 import {SingleToken, TokenProps} from '../../../types/tokens';
 import {StorageProviderType, ApiDataType, StorageType} from '../../../types/api';
 import {postToFigma} from '../../plugin/notifiers';
@@ -47,7 +46,8 @@ export function getMergedTokens(tokens, usedTokenSet, shouldResolve = false) {
             }
             return {
                 ...t,
-                value: getAliasValue(t, mergedTokens),
+                value: returnValue,
+                rawValue: t.value,
             };
         });
     }
@@ -237,11 +237,10 @@ function stateReducer(state, action) {
         case ActionType.CreateStyles:
             postToFigma({
                 type: MessageToPluginTypes.CREATE_STYLES,
-                tokens: getMergedTokens(state.tokens, state.usedTokenSet),
+                tokens: getMergedTokens(state.tokens, state.usedTokenSet, true),
             });
             return state;
         case ActionType.SetNodeData: {
-            console.log('setting node data', getMergedTokens(state.tokens, state.usedTokenSet, true));
             postToFigma({
                 type: MessageToPluginTypes.SET_NODE_DATA,
                 values: action.data,

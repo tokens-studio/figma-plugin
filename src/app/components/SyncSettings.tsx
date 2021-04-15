@@ -31,7 +31,9 @@ const SyncSettings = () => {
     };
 
     const selectedRemoteProvider = () => {
-        return [StorageProviderType.JSONBIN].includes(localApiState?.provider as StorageProviderType);
+        return [StorageProviderType.JSONBIN, StorageProviderType.ARCADE].includes(
+            localApiState?.provider as StorageProviderType
+        );
     };
 
     const storedApiProviders = () => {
@@ -57,6 +59,16 @@ const SyncSettings = () => {
                         >
                             Read more on docs.tokens.studio
                         </a>
+                    </div>
+                );
+            case StorageProviderType.ARCADE:
+                return (
+                    <div>
+                        <a href="https://usearcade.com" target="_blank" className="underline" rel="noreferrer">
+                            Arcade
+                        </a>{' '}
+                        is currently in Early Access. If you have an Arcade account, use your project ID and your API
+                        key to gain access. For now, just the Read-Only mode is supported.
                     </div>
                 );
             default:

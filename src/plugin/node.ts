@@ -14,6 +14,8 @@ function returnValueToLookFor(key) {
             return 'name';
         case 'description':
             return 'description';
+        case 'tokenValue':
+            return 'rawValue';
         default:
             return 'value';
     }
@@ -25,7 +27,7 @@ export function mapValuesToTokens(tokens, values): object {
         if (!resolvedToken) return acc;
 
         const value = isSingleToken(resolvedToken) ? resolvedToken[returnValueToLookFor(key)] : resolvedToken;
-        acc[key] = transformValue(value, resolvedToken.type);
+        acc[key] = transformValue(value, key);
         return acc;
     }, {});
     return mappedValues;
@@ -72,20 +74,24 @@ export function goToNode(id) {
 }
 
 export function updateNodes(nodes, tokens) {
-    let i = 0;
-    const len = nodes.length;
-    const returnedValues = [];
-    while (i < len) {
-        const node = nodes[i];
-        const data = fetchAllPluginData(node);
-        if (data) {
-            const mappedValues = mapValuesToTokens(tokens, data);
-            setValuesOnNode(node, mappedValues, data);
-            store.successfulNodes.push(node);
-            returnedValues.push(data);
-        }
+    try {
+        let i = 0;
+        const len = nodes.length;
+        const returnedValues = [];
+        while (i < len) {
+            const node = nodes[i];
+            const data = fetchAllPluginData(node);
+            if (data) {
+                const mappedValues = mapValuesToTokens(tokens, data);
+                setValuesOnNode(node, mappedValues, data);
+                store.successfulNodes.push(node);
+                returnedValues.push(data);
+            }
 
-        i += 1;
+            i += 1;
+        }
+        return returnedValues[0];
+    } catch (e) {
+        console.log('got error', e);
     }
-    return returnedValues[0];
 }

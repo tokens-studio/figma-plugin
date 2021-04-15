@@ -9,15 +9,16 @@ import ExportModal from './modals/ExportModal';
 import PresetModal from './modals/PresetModal';
 
 const JSONEditor = () => {
-    const {tokenData, activeTokenSet, editProhibited} = useTokenState();
-    const {setStringTokens, setEmptyTokens, updateTokens, setLoading} = useTokenDispatch();
+    const {tokens, activeTokenSet, editProhibited} = useTokenState();
+    const {setEmptyTokens, updateTokens, setLoading} = useTokenDispatch();
     const [confirmModalVisible, showConfirmModal] = React.useState('');
     const [exportModalVisible, showExportModal] = React.useState(false);
     const [presetModalVisible, showPresetModal] = React.useState(false);
+    const [stringTokens, setStringTokens] = React.useState(JSON.stringify(tokens[activeTokenSet]?.values, null, 2));
 
     const handleUpdate = async () => {
         await setLoading(true);
-        updateTokens();
+        console.log('Setting tokens', stringTokens);
     };
 
     const handleSetEmpty = () => {
@@ -56,9 +57,9 @@ const JSONEditor = () => {
                         className="flex-grow"
                         placeholder="Enter JSON"
                         rows={23}
-                        hasErrored={tokenData.tokens[activeTokenSet]?.hasErrored}
-                        onChange={(val) => setStringTokens({parent: activeTokenSet, tokens: val})}
-                        value={tokenData.tokens[activeTokenSet]?.values}
+                        hasErrored={tokens[activeTokenSet]?.hasErrored}
+                        onChange={(val) => setStringTokens(val)}
+                        value={stringTokens}
                     />
                 </div>
             </div>

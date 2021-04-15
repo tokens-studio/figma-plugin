@@ -275,20 +275,28 @@ export function convertNumberToFigma(value) {
 }
 
 export function convertTypographyNumberToFigma(value) {
-    console.log('Converting to number', value);
     const baseFontSize = 16;
     if (typeof value === 'string' && (value.endsWith('em') || value.endsWith('rem'))) {
         return parseFloat(value) * baseFontSize;
-    } else {
-        return parseFloat(value);
     }
+    return parseFloat(value);
 }
 
 export function transformValue(value, type) {
     switch (type) {
         case 'borderRadius':
+        case 'borderRadiusTopLeft':
+        case 'borderRadiusTopRight':
+        case 'borderRadiusBottomRight':
+        case 'borderRadiusBottomLeft':
+        case 'width':
+        case 'height':
         case 'sizing':
         case 'spacing':
+        case 'horizontalPadding':
+        case 'verticalPadding':
+        case 'itemSpacing':
+        case 'borderWidth':
             return convertNumberToFigma(value);
         case 'letterSpacing':
             return convertLetterSpacingToFigma(value);

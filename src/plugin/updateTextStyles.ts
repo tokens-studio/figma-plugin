@@ -5,8 +5,6 @@ export default function updateTextStyles(textTokens, shouldCreate = false) {
     // Iterate over textTokens to create objects that match figma styles
     const textStyles = figma.getLocalTextStyles();
 
-    console.log('Creating Text style', textTokens);
-
     textTokens.map((token: TypographyToken) => {
         let matchingStyles = [];
         if (textStyles.length > 0) {
