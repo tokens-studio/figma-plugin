@@ -269,3 +269,43 @@ export async function getUserId() {
 
     return userId;
 }
+
+export function convertNumberToFigma(value) {
+    return parseInt(value, 10);
+}
+
+export function convertTypographyNumberToFigma(value) {
+    const baseFontSize = 16;
+    if (typeof value === 'string' && (value.endsWith('em') || value.endsWith('rem'))) {
+        return parseFloat(value) * baseFontSize;
+    }
+    return parseFloat(value);
+}
+
+export function transformValue(value, type) {
+    switch (type) {
+        case 'borderRadius':
+        case 'borderRadiusTopLeft':
+        case 'borderRadiusTopRight':
+        case 'borderRadiusBottomRight':
+        case 'borderRadiusBottomLeft':
+        case 'width':
+        case 'height':
+        case 'sizing':
+        case 'spacing':
+        case 'horizontalPadding':
+        case 'verticalPadding':
+        case 'itemSpacing':
+        case 'borderWidth':
+            return convertNumberToFigma(value);
+        case 'letterSpacing':
+            return convertLetterSpacingToFigma(value);
+        case 'lineHeights':
+            return convertLineHeightToFigma(value);
+        case 'paragraphSpacing':
+        case 'fontSizes':
+            return convertTypographyNumberToFigma(value);
+        default:
+            return value;
+    }
+}

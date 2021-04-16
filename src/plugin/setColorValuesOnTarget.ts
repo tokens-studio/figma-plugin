@@ -1,6 +1,6 @@
 import {convertStringToFigmaGradient, convertToFigmaColor} from './helpers';
 
-export default function setColorValuesOnTarget(target, token) {
+export default function setColorValuesOnTarget(target, token, key = 'paints') {
     try {
         const {description, value} = token;
         if (value.startsWith('linear-gradient')) {
@@ -10,10 +10,10 @@ export default function setColorValuesOnTarget(target, token) {
                 gradientTransform,
                 gradientStops,
             };
-            target.paints = [newPaint];
+            target[key] = [newPaint];
         } else {
             const {color, opacity} = convertToFigmaColor(value);
-            target.paints = [{color, opacity, type: 'SOLID'}];
+            target[key] = [{color, opacity, type: 'SOLID'}];
         }
 
         if (description) {

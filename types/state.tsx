@@ -13,8 +13,10 @@ export type StateType = {
     displayType: 'GRID' | 'LIST';
     colorMode: boolean;
     showEditForm: boolean;
-    showOptions: boolean;
+    showOptions: boolean | string;
     api: ApiDataType;
     apiProviders: ApiDataType[];
     updatePageOnly: boolean;
+    editProhibited: boolean;
+    usedTokenSet: string[];
 };
