@@ -3,7 +3,6 @@ import setColorValuesOnTarget from './setColorValuesOnTarget';
 import setTextValuesOnTarget from './setTextValuesOnTarget';
 
 export default async function setValuesOnNode(node, values, data) {
-    console.log('Setting values on node', node, values, data);
     // BORDER RADIUS
     if (values.borderRadius) {
         if (typeof node.cornerRadius !== 'undefined') {
