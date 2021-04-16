@@ -11,6 +11,7 @@ export default {
     colors: ['fill', 'border'],
     opacity: ['opacity'],
     borderWidth: ['borderWidth'],
+    boxShadow: ['boxShadow'],
     typography: ['typography'],
     lineHeights: ['lineHeights'],
     fontSizes: ['fontSizes'],

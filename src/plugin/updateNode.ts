@@ -30,6 +30,13 @@ export default async function setValuesOnNode(node, values, data) {
         }
     }
 
+    // BOX SHADOW
+    if (values.boxShadow) {
+        if (typeof node.boxShadow !== 'undefined') {
+            node.boxShadow = values.boxShadow
+        }
+    }
+
     // BORDER WIDTH
     if (values.borderWidth) {
         // Has to be larger than 0

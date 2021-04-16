@@ -25,6 +25,9 @@
         "md": 4,
         "lg": 8
     },
+    "boxShadow": {
+        "none": "none"
+    },
     "colors": {
         "gray": {
             "100": "#f7fafc",
