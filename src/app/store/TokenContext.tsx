@@ -13,20 +13,13 @@ import {postToFigma} from '../../plugin/notifiers';
 import {MessageToPluginTypes} from '../../../types/messages';
 import updateTokensOnSources from './updateSources';
 import * as pjs from '../../../package.json';
-
-export interface SelectionValue {
-    borderRadius: string | undefined;
-    horizontalPadding: string | undefined;
-    verticalPadding: string | undefined;
-    itemSpacing: string | undefined;
-}
+import {SelectionValue} from './models/uiState';
 
 export enum ActionType {
     SetTokenData = 'SET_TOKEN_DATA',
     SetTokensFromStyles = 'SET_TOKENS_FROM_STYLES',
     SetDefaultTokens = 'SET_DEFAULT_TOKENS',
     SetLoading = 'SET_LOADING',
-    SetDisabled = 'SET_DISABLED',
     SetStringTokens = 'SET_STRING_TOKENS',
     UpdateTokens = 'UPDATE_TOKENS',
     DeleteToken = 'DELETE_TOKEN',
@@ -34,8 +27,6 @@ export enum ActionType {
     SetNodeData = 'SET_NODE_DATA',
     RemoveNodeData = 'REMOVE_NODE_DATA',
     PullStyles = 'PULL_STYLES',
-    SetSelectionValues = 'SET_SELECTION_VALUES',
-    ResetSelectionValues = 'RESET_SELECTION_VALUES',
     SetShowEditForm = 'SET_SHOW_EDIT_FORM',
     SetShowNewGroupForm = 'SET_SHOW_NEW_GROUP_FORM',
     SetShowOptions = 'SET_SHOW_OPTIONS',
@@ -58,7 +49,6 @@ export enum ActionType {
     SetProjectURL = 'SET_PROJECT_URL',
     SetChangelog = 'SET_CHANGELOG',
     SetLastOpened = 'SET_LAST_OPENED',
-    UpdateSingleToken = 'UPDATE_SINGLE_TOKEN',
     CreateToken = 'CREATE_TOKEN',
     EditToken = 'EDIT_TOKEN',
     CreateTokenGroup = 'CREATE_TOKEN_GROUP',
@@ -86,10 +76,8 @@ const emptyState = {
     usedTokenSet: ['options'],
     tokens: defaultTokens,
     loading: true,
-    disabled: false,
     collapsed: false,
     tokenData: null,
-    selectionValues: {},
     displayType: 'GRID',
     colorMode: false,
     showEditForm: false,
@@ -175,17 +163,6 @@ function stateReducer(state, action) {
                 ...state,
                 loading: action.state,
             };
-        case ActionType.SetDisabled:
-            return {
-                ...state,
-                disabled: action.state,
-            };
-        case ActionType.SetStringTokens:
-            state.tokenData.updateTokenValues(action.data.parent, action.data.tokens, action.updatedAt);
-            return {
-                ...state,
-                tokenData: state.tokenData,
-            };
         case ActionType.UpdateTokens:
             updateTokensOnSources(state, action.updatedAt, action.shouldUpdate);
             return state;
@@ -220,46 +197,6 @@ function stateReducer(state, action) {
             });
             return state;
 
-        case ActionType.SetSelectionValues:
-            return {
-                ...state,
-                loading: false,
-                selectionValues: action.data,
-            };
-        case ActionType.UpdateSingleToken: {
-            const {parent, value, newGroup, options, name, oldName, updatedAt} = action.data;
-            const obj = state.tokenData.tokens[parent].values;
-            let newValue;
-            if (newGroup) {
-                newValue = {};
-            } else {
-                newValue = options
-                    ? {
-                          value,
-                          ...options,
-                      }
-                    : {
-                          value,
-                      };
-            }
-            const newName = name.toString();
-            set(obj, newName, newValue);
-            if (oldName === newName || !oldName) {
-                state.tokenData.updateTokenValues(parent, JSON.stringify(obj, null, 2), updatedAt);
-            } else {
-                objectPath.del(obj, oldName);
-                state.tokenData.updateTokenValues(
-                    parent,
-                    JSON.stringify(obj, null, 2).split(`$${oldName}`).join(`$${name}`),
-                    updatedAt
-                );
-            }
-
-            return {
-                ...state,
-                tokenData: state.tokenData,
-            };
-        }
         case ActionType.ToggleUsedTokenSet: {
             const newState = {
                 ...state,
@@ -271,12 +208,6 @@ function stateReducer(state, action) {
             updateTokensOnSources(state, action.updatedAt, false);
             return newState;
         }
-        case ActionType.ResetSelectionValues:
-            return {
-                ...state,
-                loading: false,
-                selectionValues: {},
-            };
         case ActionType.SetShowEditForm:
             return {
                 ...state,
@@ -530,20 +461,11 @@ function TokenProvider({children}) {
             setLoading: (boolean) => {
                 dispatch({type: ActionType.SetLoading, state: boolean});
             },
-            setDisabled: (boolean) => {
-                dispatch({type: ActionType.SetDisabled, state: boolean});
-            },
             setNodeData: (data: SelectionValue) => {
                 dispatch({type: ActionType.SetNodeData, data});
             },
             removeNodeData: (data?: string) => {
                 dispatch({type: ActionType.RemoveNodeData, data});
-            },
-            setSelectionValues: (data: SelectionValue) => {
-                dispatch({type: ActionType.SetSelectionValues, data});
-            },
-            resetSelectionValues: () => {
-                dispatch({type: ActionType.ResetSelectionValues});
             },
             setShowEditForm: (bool: boolean) => {
                 dispatch({type: ActionType.SetShowEditForm, bool});
@@ -613,16 +535,6 @@ function TokenProvider({children}) {
             },
             setLastOpened: (data: Date) => {
                 dispatch({type: ActionType.SetLastOpened, data, dispatch});
-            },
-            updateSingleToken: (data: {
-                parent: string;
-                value: SingleToken;
-                options?: object;
-                name: string;
-                oldName?: string;
-                updatedAt: Date;
-            }) => {
-                dispatch({type: ActionType.UpdateSingleToken, data});
             },
             createToken: (data: {
                 parent: string;

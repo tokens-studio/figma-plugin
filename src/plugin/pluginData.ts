@@ -65,11 +65,13 @@ export function removePluginData(nodes, key?) {
         } finally {
             if (key) {
                 node.setPluginData(key, '');
-                removeValuesFromNode(node, key);
+                // TODO: Introduce setting asking user if values should be removed?
+                // removeValuesFromNode(node, key);
             } else {
                 Object.keys(properties).forEach((prop) => {
                     node.setPluginData(prop, '');
-                    removeValuesFromNode(node, prop);
+                    // TODO: Introduce setting asking user if values should be removed?
+                    // removeValuesFromNode(node, prop);
                 });
             }
             node.setPluginData('values', '');

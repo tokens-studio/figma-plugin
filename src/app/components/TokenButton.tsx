@@ -1,5 +1,6 @@
 import * as React from 'react';
 import {track} from '@/utils/analytics';
+import {useSelector} from 'react-redux';
 import Tooltip from './Tooltip';
 import MoreButton from './MoreButton';
 import {useTokenState, useTokenDispatch} from '../store/TokenContext';
@@ -7,9 +8,11 @@ import Icon from './Icon';
 import {lightOrDark, colorByHashCode, isTypographyToken} from './utils';
 import useManageTokens from '../store/useManageTokens';
 import useReadTokens from '../store/useReadTokens';
+import {RootState} from '../store';
 
 const TokenButton = ({type, property, name, path, token, editMode, showForm}) => {
-    const {colorMode, displayType, selectionValues, disabled, activeTokenSet} = useTokenState();
+    const uiState = useSelector((state: RootState) => state.uiState);
+    const {colorMode, displayType, activeTokenSet} = useTokenState();
     const {setNodeData, setShowOptions, setLoading} = useTokenDispatch();
     const {deleteSingleToken} = useManageTokens();
     const {getTokenValue} = useReadTokens();
@@ -144,9 +147,9 @@ const TokenButton = ({type, property, name, path, token, editMode, showForm}) =>
         },
     ];
 
-    const active = selectionValues[type] === name;
+    const active = uiState.selectionValues[type] === name;
 
-    const semiActive = properties.some((prop) => selectionValues[prop.name] === name);
+    const semiActive = properties.some((prop) => uiState.selectionValues[prop.name] === name);
 
     if (editMode) {
         buttonClass.push('button-edit');
@@ -192,7 +195,7 @@ const TokenButton = ({type, property, name, path, token, editMode, showForm}) =>
     return (
         <div
             className={`relative mb-1 mr-1 flex button button-property ${buttonClass.join(' ')} ${
-                disabled && 'button-disabled'
+                uiState.disabled && 'button-disabled'
             } `}
             style={style}
         >

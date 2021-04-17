@@ -2,9 +2,13 @@ import * as React from 'react';
 import {ContextMenu, MenuItem, ContextMenuTrigger} from 'react-contextmenu';
 import Icon from './Icon';
 import {useTokenState} from '../store/TokenContext';
+import {RootState} from '../store';
+import {useSelector} from 'react-redux';
 
 const MoreButton = ({properties, children, path, value, onClick, onEdit, onDelete, mode}) => {
-    const {selectionValues, editProhibited} = useTokenState();
+    const uiState = useSelector((state: RootState) => state.uiState);
+
+    const {editProhibited} = useTokenState();
 
     const visibleProperties = properties.filter((p) => p.label);
 
@@ -13,7 +17,7 @@ const MoreButton = ({properties, children, path, value, onClick, onEdit, onDelet
             <ContextMenuTrigger id={`${path}-${value}-${mode}`}>{children}</ContextMenuTrigger>
             <ContextMenu id={`${path}-${value}-${mode}`} className="text-xs">
                 {visibleProperties.map((property) => {
-                    const isActive = selectionValues[property.name] === value;
+                    const isActive = uiState.selectionValues[property.name] === value;
 
                     return (
                         <MenuItem key={property.label} onClick={() => onClick([property.name], isActive)}>

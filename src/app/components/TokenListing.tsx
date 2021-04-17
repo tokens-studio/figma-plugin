@@ -30,6 +30,7 @@ const TokenListing = ({
     tokenType: string;
     values: object;
 }) => {
+    console.log('rerendered token listing');
     const {
         collapsed,
         showEmptyGroups,

@@ -1,8 +1,9 @@
 import React from 'react';
+import {reduceToValues} from '@/plugin/tokenHelpers';
 import Modal from '../Modal';
 import Heading from '../Heading';
 import StorageItemForm from '../StorageItemForm';
-import {reduceToValues, useTokenState} from '../../store/TokenContext';
+import {useTokenState} from '../../store/TokenContext';
 import useRemoteTokens from '../../store/remoteTokens';
 
 export default function CreateStorageItemModal({isOpen, onClose, onSuccess}) {

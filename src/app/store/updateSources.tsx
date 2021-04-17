@@ -54,8 +54,6 @@ export default async function updateTokensOnSources(state: StateType, updatedAt:
             secret: state.api.secret,
             updatedAt,
             oldUpdatedAt: state.lastUpdatedAt,
-        }).then(() => {
-            state.tokenData.setUpdatedAt(updatedAt);
         });
     }
 

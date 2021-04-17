@@ -1,20 +1,25 @@
 import {getMergedTokens} from '@/plugin/tokenHelpers';
 import * as React from 'react';
+import {useSelector} from 'react-redux';
+import {RootState} from '../store';
 import {useTokenState, useTokenDispatch} from '../store/TokenContext';
 import Button from './Button';
 import Icon from './Icon';
 import Tooltip from './Tooltip';
 
 const Inspector = () => {
-    const {selectionValues, tokens, usedTokenSet} = useTokenState();
+    const uiState = useSelector((state: RootState) => state.uiState);
+
+    const {tokens, usedTokenSet} = useTokenState();
     const {removeNodeData} = useTokenDispatch();
     const getValue = (value) => {
         return getMergedTokens(tokens, usedTokenSet).find((n) => n.name === value);
     };
+
     return (
         <div className="space-y-2 p-4">
             <div className="space-y-1">
-                {Object.entries(selectionValues)
+                {Object.entries(uiState.selectionValues)
                     .filter(([, value]) => value !== 'delete')
                     .map(([key, value]) => (
                         <div key={key} className="flex flex-row justify-between items-start">
@@ -39,7 +44,7 @@ const Inspector = () => {
                         </div>
                     ))}
             </div>
-            {Object.entries(selectionValues).length > 0 ? (
+            {Object.entries(uiState.selectionValues).length > 0 ? (
                 <Button variant="secondary" onClick={() => removeNodeData()}>
                     Remove all tokens from layer
                 </Button>

@@ -2,11 +2,13 @@
 import * as React from 'react';
 import {mergeDeep} from '@/plugin/helpers';
 import {SingleTokenObject, TokenType} from '@types/tokens';
-import {track} from '@/utils/analytics';
-import {useTokenDispatch, useTokenState} from '../store/TokenContext';
+import {useTokenState} from '../store/TokenContext';
 import TokenListing from './TokenListing';
-import Button from './Button';
 import tokenTypes from '../../config/tokenTypes';
+import TokensBottomBar from './TokensBottomBar';
+import ToggleEmptyButton from './ToggleEmptyButton';
+import {useSelector} from 'react-redux';
+import {RootState} from '../store';
 
 interface TokenListingType {
     label: string;
@@ -27,6 +29,7 @@ function convertDotPathToNestedObject(path, value) {
 }
 
 function createTokensObject(tokens: SingleTokenObject[]) {
+    console.log('Creating tokens obj');
     return tokens.reduce((acc, cur) => {
         if (cur.type && cur.type !== '' && cur.type !== 'undefined') {
             acc[cur.type] = acc[cur.type] || {values: []};
@@ -41,6 +44,8 @@ function createTokensObject(tokens: SingleTokenObject[]) {
 }
 
 const mappedTokens = (tokens) => {
+    console.log('Maptoks');
+
     const tokenObj = {};
     Object.entries(tokens).forEach(([key, group]: [string, {values: SingleTokenObject[]; type?: TokenType}]) => {
         tokenObj[key] = {
@@ -54,22 +59,23 @@ const mappedTokens = (tokens) => {
 };
 
 const Tokens = () => {
-    const {tokens, updatePageOnly, activeTokenSet, showEmptyGroups} = useTokenState();
-    const {updateTokens, toggleUpdatePageOnly, toggleShowEmptyGroups} = useTokenDispatch();
+    const {tokens, activeTokenSet} = useTokenState();
+
     const [tokenValues, setTokenValues] = React.useState([]);
 
-    const handleUpdate = async () => {
-        track('Update Tokens');
-        updateTokens(false);
-    };
-
-    const currentValues = tokens[activeTokenSet].values;
+    React.useEffect(() => {
+        console.log('Something changed');
+    }, [tokens, activeTokenSet]);
+    React.useEffect(() => {
+        console.log('Something setState changed');
+    }, [tokenValues, setTokenValues]);
 
     React.useEffect(() => {
-        setTokenValues(mappedTokens(createTokensObject(currentValues)));
-    }, [currentValues, activeTokenSet]);
+        console.log('use effect triggered');
+        setTokenValues(mappedTokens(createTokensObject(tokens[activeTokenSet].values)));
+    }, [tokens, activeTokenSet]);
 
-    if (tokens[activeTokenSet].hasErrored) return <div>JSON malformed, check in Editor</div>;
+    console.log('RERENDERED TOP TOKENS');
 
     return (
         <div>
@@ -89,28 +95,8 @@ const Tokens = () => {
                     </div>
                 );
             })}
-            <div className="flex items-center justify-center mt-4">
-                <Button variant="secondary" size="small" onClick={toggleShowEmptyGroups}>
-                    {showEmptyGroups ? 'Hide' : 'Show'} empty groups
-                </Button>
-            </div>
-            <div className="fixed bottom-0 left-0 w-full bg-white flex justify-between items-center p-2 border-t border-gray-200">
-                <div className="switch flex items-center">
-                    <input
-                        className="switch__toggle"
-                        type="checkbox"
-                        id="updatemode"
-                        checked={updatePageOnly}
-                        onChange={() => toggleUpdatePageOnly(!updatePageOnly)}
-                    />
-                    <label className="switch__label text-xs" htmlFor="updatemode">
-                        Update this page only
-                    </label>
-                </div>
-                <Button variant="primary" size="large" onClick={handleUpdate}>
-                    Update {updatePageOnly ? 'page' : 'document'}
-                </Button>
-            </div>
+            <ToggleEmptyButton />
+            <TokensBottomBar />
         </div>
     );
 };

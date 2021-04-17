@@ -10,7 +10,7 @@ import PresetModal from './modals/PresetModal';
 
 const JSONEditor = () => {
     const {tokens, activeTokenSet, editProhibited} = useTokenState();
-    const {setEmptyTokens, updateTokens, setLoading} = useTokenDispatch();
+    const {setEmptyTokens, setLoading} = useTokenDispatch();
     const [confirmModalVisible, showConfirmModal] = React.useState('');
     const [exportModalVisible, showExportModal] = React.useState(false);
     const [presetModalVisible, showPresetModal] = React.useState(false);
@@ -18,7 +18,6 @@ const JSONEditor = () => {
 
     const handleUpdate = async () => {
         await setLoading(true);
-        console.log('Setting tokens', stringTokens);
     };
 
     const handleSetEmpty = () => {

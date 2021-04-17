@@ -7,15 +7,12 @@ import useRemoteTokens from '../store/remoteTokens';
 import {useTokenDispatch} from '../store/TokenContext';
 import {Dispatch} from '../store';
 
-export default function Initiator({setRemoteComponents}) {
+export default function Initiator() {
     const dispatch = useDispatch<Dispatch>();
 
     const {
         setTokenData,
         setLoading,
-        setDisabled,
-        setSelectionValues,
-        resetSelectionValues,
         setTokensFromStyles,
         setApiData,
         setLocalApiState,
@@ -46,21 +43,22 @@ export default function Initiator({setRemoteComponents}) {
                     height,
                 } = event.data.pluginMessage;
                 switch (type) {
-                    case MessageFromPluginTypes.SELECTION:
-                        setDisabled(false);
+                    case MessageFromPluginTypes.SELECTION: {
+                        dispatch.uiState.setDisabled(false);
                         if (values) {
-                            setSelectionValues(values);
+                            dispatch.uiState.setSelectionValues(values);
                         } else {
-                            resetSelectionValues();
+                            dispatch.uiState.resetSelectionValues();
                         }
                         break;
-                    case MessageFromPluginTypes.NO_SELECTION:
-                        setDisabled(true);
-                        resetSelectionValues();
+                    }
+                    case MessageFromPluginTypes.NO_SELECTION: {
+                        dispatch.uiState.setDisabled(true);
+                        dispatch.uiState.resetSelectionValues();
                         break;
+                    }
                     case MessageFromPluginTypes.REMOTE_COMPONENTS:
                         setLoading(false);
-                        setRemoteComponents(values.remotes);
                         break;
                     case MessageFromPluginTypes.TOKEN_VALUES: {
                         setLoading(false);
