@@ -295,6 +295,10 @@ export function transformValue(value, type) {
         case 'spacing':
         case 'horizontalPadding':
         case 'verticalPadding':
+        case 'paddingTop':
+        case 'paddingRight':
+        case 'paddingBottom':
+        case 'paddingLeft':
         case 'itemSpacing':
         case 'borderWidth':
             return convertNumberToFigma(value);

@@ -70,8 +70,20 @@ const TokenButton = ({type, property, name, path, token, editMode, showForm}) =>
                     label: 'All',
                     icon: 'Spacing',
                     name: 'spacing',
-                    clear: ['horizontalPadding', 'verticalPadding', 'itemSpacing'],
+                    clear: [
+                        'horizontalPadding',
+                        'verticalPadding',
+                        'itemSpacing',
+                        'paddingLeft',
+                        'paddingRight',
+                        'paddingTop',
+                        'paddingBottom',
+                    ],
                 },
+                {label: 'Top', name: 'paddingTop'},
+                {label: 'Right', name: 'paddingRight'},
+                {label: 'Bottom', name: 'paddingBottom'},
+                {label: 'Left', name: 'paddingLeft'},
                 {label: 'Horizontal', name: 'horizontalPadding', icon: 'HorizontalPadding'},
                 {label: 'Vertical', name: 'verticalPadding', icon: 'VerticalPadding'},
                 {label: 'Gap', name: 'itemSpacing', icon: 'Gap'},
@@ -196,7 +208,8 @@ const TokenButton = ({type, property, name, path, token, editMode, showForm}) =>
                 <Tooltip label={`${name}: ${getTokenDisplay(token)}`}>
                     <button
                         className="w-full h-full"
-                        disabled={editMode ? false : disabled}
+                        // TODO: Allow tooltips in disabled mode
+                        // disabled={editMode ? false : disabled}
                         type="button"
                         onClick={() => onClick(properties[0])}
                     >

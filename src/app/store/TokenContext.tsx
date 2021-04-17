@@ -4,8 +4,7 @@ import set from 'set-value';
 import fetchChangelog from '@/utils/storyblok';
 import {track} from '@/utils/analytics';
 import convertToTokenArray from '@/utils/convertTokens';
-import {mergeDeep} from '@/plugin/helpers';
-import {getAliasValue} from '@/utils/aliases';
+import {getMergedTokens} from '@/plugin/tokenHelpers';
 import defaultJSON from '../../config/default.json';
 import TokenData from '../components/TokenData';
 import {SingleToken, TokenProps} from '../../../types/tokens';
@@ -20,50 +19,6 @@ export interface SelectionValue {
     horizontalPadding: string | undefined;
     verticalPadding: string | undefined;
     itemSpacing: string | undefined;
-}
-
-export function getMergedTokens(tokens, usedTokenSet, shouldResolve = false) {
-    const mergedTokens = [];
-    Object.entries(tokens).forEach((tokenGroup) => {
-        if (usedTokenSet.includes(tokenGroup[0])) {
-            mergedTokens.push(...tokenGroup[1].values);
-        }
-    });
-    let returnedTokens = mergedTokens;
-
-    if (shouldResolve) {
-        returnedTokens = mergedTokens.map((t) => {
-            let returnValue;
-            // Iterate over Typography Object to get resolved values
-            if (t.type === 'typography') {
-                returnValue = Object.entries(t.value).reduce((acc, [key, value]) => {
-                    acc[key] = getAliasValue(value, mergedTokens);
-                    return acc;
-                }, {});
-            } else {
-                // If we're not dealing with typography tokens, just return resolved value
-                returnValue = getAliasValue(t, mergedTokens);
-            }
-            return {
-                ...t,
-                value: returnValue,
-                rawValue: t.value,
-            };
-        });
-    }
-
-    return returnedTokens;
-}
-
-export function reduceToValues(tokens) {
-    const reducedTokens = Object.entries(tokens).reduce((prev, group) => {
-        prev.push({[group[0]]: group[1].values});
-        return prev;
-    }, []);
-
-    const assigned = mergeDeep({}, ...reducedTokens);
-
-    return assigned;
 }
 
 export enum ActionType {

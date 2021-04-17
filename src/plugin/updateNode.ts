@@ -166,6 +166,26 @@ export default async function setValuesOnNode(node, values, data) {
                 node.paddingBottom = Number(values.verticalPadding);
             }
         }
+        if (values.paddingTop) {
+            if (typeof node.paddingTop !== 'undefined') {
+                node.paddingTop = Number(values.paddingTop);
+            }
+        }
+        if (values.paddingRight) {
+            if (typeof node.paddingRight !== 'undefined') {
+                node.paddingRight = Number(values.paddingRight);
+            }
+        }
+        if (values.paddingBottom) {
+            if (typeof node.paddingBottom !== 'undefined') {
+                node.paddingBottom = Number(values.paddingBottom);
+            }
+        }
+        if (values.paddingLeft) {
+            if (typeof node.paddingLeft !== 'undefined') {
+                node.paddingLeft = Number(values.paddingLeft);
+            }
+        }
         if (values.itemSpacing) {
             if (typeof node.itemSpacing !== 'undefined') {
                 node.itemSpacing = Number(values.itemSpacing);

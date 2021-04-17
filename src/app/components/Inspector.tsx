@@ -1,5 +1,6 @@
+import {getMergedTokens} from '@/plugin/tokenHelpers';
 import * as React from 'react';
-import {useTokenState, useTokenDispatch, getMergedTokens} from '../store/TokenContext';
+import {useTokenState, useTokenDispatch} from '../store/TokenContext';
 import Button from './Button';
 import Icon from './Icon';
 import Tooltip from './Tooltip';

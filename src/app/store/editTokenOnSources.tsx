@@ -1,8 +1,8 @@
+import {getMergedTokens} from '@/plugin/tokenHelpers';
 import {StorageProviderType} from '../../../types/api';
 import {postToFigma, notifyToUI} from '../../plugin/notifiers';
 import {StateType} from '../../../types/state';
 import {MessageToPluginTypes} from '../../../types/messages';
-import {getMergedTokens} from './TokenContext';
 
 async function updateSingleRemoteToken({
     provider,

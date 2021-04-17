@@ -1,10 +1,10 @@
+import {getMergedTokens, reduceToValues} from '@/plugin/tokenHelpers';
 import {TokenProps} from '../../../types/tokens';
 import {StorageProviderType} from '../../../types/api';
 import {postToFigma, notifyToUI} from '../../plugin/notifiers';
 import {StateType} from '../../../types/state';
 import {MessageToPluginTypes} from '../../../types/messages';
 import {updateJSONBinTokens} from './providers/jsonbin';
-import {getMergedTokens, reduceToValues} from './TokenContext';
 
 async function updateRemoteTokens({
     provider,
