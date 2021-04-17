@@ -32,8 +32,26 @@ export default async function setValuesOnNode(node, values, data) {
 
     // BOX SHADOW
     if (values.boxShadow) {
-        if (typeof node.boxShadow !== 'undefined') {
-            node.boxShadow = values.boxShadow
+        if (typeof node.effects !== 'undefined') {
+            const effects = node.effects.slice();
+            const {x, y, spread, color, blur} = values.boxShadow;
+            const {
+                color: {r, g, b},
+                opacity,
+            } = convertToFigmaColor(color);
+
+            const effect: ShadowEffect = {
+                type: 'DROP_SHADOW',
+                visible: true,
+                blendMode: 'NORMAL',
+                color: {r, g, b, a: opacity},
+                offset: {x: Number(x), y: Number(y)},
+                radius: Number(blur),
+                spread: Number(spread),
+            };
+
+            effects.push(effect);
+            node.effects = effects;
         }
     }
 

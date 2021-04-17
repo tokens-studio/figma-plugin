@@ -55,6 +55,20 @@ const mappedTokens = (tokens) => {
             type: 'borderWidth',
             explainer: 'Enter as a number, e.g. 4',
         },
+        boxShadow: {
+            label: 'Box Shadow',
+            property: 'Box Shadow',
+            type: 'boxShadow',
+            schema: {
+                value: {
+                    x: '',
+                    y: '',
+                    spread: '',
+                    color: '',
+                    blur: '',
+                },
+            },
+        },
         opacity: {
             label: 'Opacity',
             property: 'Opacity',
