@@ -36,7 +36,7 @@ const renderKeyValue = ({
                                                 className="button button-ghost"
                                                 type="button"
                                                 onClick={() => {
-                                                    showNewForm(stringPath);
+                                                    showNewForm({path: stringPath, name: key});
                                                 }}
                                             >
                                                 <Icon name="add" />

@@ -51,6 +51,7 @@ const TokenListing = ({
         value: '',
         name: '',
         path: '',
+        isPristine: false,
     });
 
     const closeForm = () => {
@@ -58,13 +59,13 @@ const TokenListing = ({
         setShowEditForm(false);
     };
 
-    const showForm = ({value, name, path}) => {
+    const showForm = ({value, name, path, isPristine = false}) => {
         setShowEditForm(true);
-        setEditToken({value, name, path});
+        setEditToken({value, name, path, isPristine});
     };
 
-    const showNewForm = (path) => {
-        showForm({value: '', name: '', path});
+    const showNewForm = ({path, name = ''}) => {
+        showForm({value: '', name, path, isPristine: true});
     };
 
     React.useEffect(() => {
@@ -158,7 +159,7 @@ const TokenListing = ({
                             type="button"
                             onClick={() => {
                                 setShowOptions(tokenKey);
-                                showNewForm(tokenKey);
+                                showNewForm({path: tokenKey});
                             }}
                         >
                             <Icon name="add" />
@@ -174,7 +175,7 @@ const TokenListing = ({
                                     initialName={editToken.name}
                                     path={editToken.path}
                                     property={property}
-                                    isPristine={editToken.name === ''}
+                                    isPristine={editToken.isPristine}
                                     initialValue={editToken.value}
                                     schema={schema?.value}
                                     optionsSchema={schema?.options}
@@ -216,7 +217,7 @@ const TokenListing = ({
                                             type="button"
                                             data-cy="button-modal-add"
                                             className="button button-ghost"
-                                            onClick={() => showNewForm(tokenKey)}
+                                            onClick={() => showNewForm({path: tokenKey})}
                                         >
                                             <Icon name="add" />
                                         </button>
