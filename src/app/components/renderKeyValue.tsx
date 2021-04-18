@@ -17,21 +17,11 @@ const renderKeyValue = ({
 }) => {
     return (
         <div className="flex justify-start flex-row flex-wrap">
-            {tokenValues.map((tokenValue) => {
-                let key;
-                let value;
-                let stringPath;
-                if (Array.isArray(tokenValue)) {
-                    [key, value] = tokenValue;
-                    stringPath = [path, key].filter((n) => n).join('.');
-                } else {
-                    key = tokenValue.name;
-                    value = tokenValue;
-                    stringPath = tokenValue.name;
-                }
+            {Object.entries(tokenValues).map(([key, value]) => {
+                const stringPath = [path, key].join('.');
 
                 return (
-                    <React.Fragment key={stringPath}>
+                    <React.Fragment key={[path, key].join('.')}>
                         {typeof value === 'object' && !isTypographyToken(value) && !isSingleToken(value) ? (
                             <div className="property-wrapper w-full">
                                 <div className="flex items-center justify-between">
@@ -46,7 +36,7 @@ const renderKeyValue = ({
                                                 className="button button-ghost"
                                                 type="button"
                                                 onClick={() => {
-                                                    showNewForm([path, key].join('.'));
+                                                    showNewForm(stringPath);
                                                 }}
                                             >
                                                 <Icon name="add" />
@@ -56,7 +46,7 @@ const renderKeyValue = ({
                                 </div>
 
                                 {renderKeyValue({
-                                    tokenValues: Object.entries(value),
+                                    tokenValues: value,
                                     showNewForm,
                                     showForm,
                                     property,
@@ -71,8 +61,7 @@ const renderKeyValue = ({
                                 property={property}
                                 type={type}
                                 editMode={editMode}
-                                name={key}
-                                path={path}
+                                path={stringPath}
                                 token={value}
                                 showForm={showForm}
                             />

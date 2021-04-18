@@ -30,7 +30,7 @@ const TokenListing = ({
     tokenType: string;
     values: object;
 }) => {
-    console.log('rerendered token listing');
+    console.log('rerendered token listing', values);
     const {
         collapsed,
         showEmptyGroups,
@@ -185,7 +185,7 @@ const TokenListing = ({
                             {showNewGroupForm && <NewGroupForm path={tokenKey} />}
 
                             <div className="px-4 pb-4">
-                                {values?.length > 0 &&
+                                {values &&
                                     renderKeyValue({
                                         tokenValues: values,
                                         showNewForm,
@@ -229,7 +229,7 @@ const TokenListing = ({
                 )}
             </div>
             {showHelp && <div className="px-4 pb-4 text-gray-600 text-xxs">{help}</div>}
-            {values?.length > 0 && (
+            {values && (
                 <div className={`px-4 pb-4 ${isIntCollapsed ? 'hidden' : null}`}>
                     {renderKeyValue({
                         tokenValues: values,

@@ -134,10 +134,6 @@ textarea::-webkit-scrollbar-thumb {
     @apply mb-0 rounded-none pl-2 pb-2 border-l border-gray-300;
 }
 
-.property-wrapper .property-wrapper .heading {
-    @apply text-xxs uppercase;
-}
-
 .property-wrapper:last-of-type {
     @apply mb-0;
 }

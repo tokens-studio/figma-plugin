@@ -30,17 +30,20 @@ function convertDotPathToNestedObject(path, value) {
 
 function createTokensObject(tokens: SingleTokenObject[]) {
     console.log('Creating tokens obj');
-    return tokens.reduce((acc, cur) => {
+    const obj = tokens.reduce((acc, cur) => {
+        const objectPath = convertDotPathToNestedObject(cur.name, cur);
         if (cur.type && cur.type !== '' && cur.type !== 'undefined') {
-            acc[cur.type] = acc[cur.type] || {values: []};
-            acc[cur.type].values.push(cur);
+            acc[cur.type] = acc[cur.type] || {values: {}};
+            mergeDeep(acc[cur.type].values, objectPath);
         } else {
             const groupName = cur.name.split('.').slice(1, 2).toString();
             acc[groupName] = acc[groupName] || {values: []};
-            acc[groupName].values.push(cur);
+            mergeDeep(acc[groupName].values, objectPath);
         }
         return acc;
     }, {});
+    console.log('OBJ is', obj);
+    return obj;
 }
 
 const mappedTokens = (tokens) => {
@@ -75,7 +78,7 @@ const Tokens = () => {
         setTokenValues(mappedTokens(createTokensObject(tokens[activeTokenSet].values)));
     }, [tokens, activeTokenSet]);
 
-    console.log('RERENDERED TOP TOKENS');
+    console.log('RERENDERED TOP TOKENS', tokenValues);
 
     return (
         <div>

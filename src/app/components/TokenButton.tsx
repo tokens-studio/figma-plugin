@@ -10,7 +10,7 @@ import useManageTokens from '../store/useManageTokens';
 import useReadTokens from '../store/useReadTokens';
 import {RootState} from '../store';
 
-const TokenButton = ({type, property, name, path, token, editMode, showForm}) => {
+const TokenButton = ({type, property, path, token, editMode, showForm}) => {
     const uiState = useSelector((state: RootState) => state.uiState);
     const {colorMode, displayType, activeTokenSet} = useTokenState();
     const {setNodeData, setShowOptions, setLoading} = useTokenDispatch();
@@ -22,18 +22,16 @@ const TokenButton = ({type, property, name, path, token, editMode, showForm}) =>
     let showValue = true;
     let showEditButton = false;
     let properties = [type];
+    const {name} = token;
     const buttonClass = [];
 
     const handleEditClick = () => {
         setShowOptions(property);
-        showForm({name, value: token, path});
+        showForm({name, value: token, path: name});
     };
 
-    // TODO: Move to hook
     const handleDeleteClick = () => {
         deleteSingleToken({parent: activeTokenSet, path: name});
-        // deleteSingleToken({parent: activeTokenSet, path: [path, name].join('.')});
-        // deleteToken({parent: activeTokenSet, path: [path, name].join('.')});
     };
 
     function setPluginValue(value) {
@@ -163,7 +161,7 @@ const TokenButton = ({type, property, name, path, token, editMode, showForm}) =>
     const onClick = (givenProperties, isActive = active) => {
         const propsToSet = Array.isArray(givenProperties) ? givenProperties : new Array(givenProperties);
         if (editMode) {
-            showForm({name, value: token, path});
+            showForm({name, value: token, path: name});
         } else {
             const tokenValue = name;
             track('Apply Token', {givenProperties});
@@ -176,6 +174,7 @@ const TokenButton = ({type, property, name, path, token, editMode, showForm}) =>
                 [propsToSet[0].name || propsToSet[0]]: propsToSet[0].forcedValue || value,
             };
             if (propsToSet[0].clear) propsToSet[0].clear.map((item) => Object.assign(newProps, {[item]: 'delete'}));
+            console.log('clicking', newProps);
             setPluginValue(newProps);
         }
     };
@@ -205,7 +204,7 @@ const TokenButton = ({type, property, name, path, token, editMode, showForm}) =>
                 onDelete={handleDeleteClick}
                 onEdit={handleEditClick}
                 value={name}
-                path={path}
+                path={name}
                 mode={editMode ? 'edit' : 'list'}
             >
                 <Tooltip label={`${name}: ${getTokenDisplay(token)}`}>
