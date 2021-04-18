@@ -21,7 +21,7 @@ module.exports = {
                 primary: {
                     100: '#E1F3FF',
                     400: '#3CB1FF',
-                    500: '#18A0FB',
+                    500: 'var(--theme-colors-interaction-default, #18A0FB)',
                 },
             },
             fontSize: {
