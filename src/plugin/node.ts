@@ -43,12 +43,18 @@ export function setTokensOnDocument(tokens, updatedAt: string) {
 }
 
 export function getTokenData(): {values: TokenProps; updatedAt: string; version: string} {
-    const values = figma.root.getSharedPluginData('tokens', 'values');
-    const version = figma.root.getSharedPluginData('tokens', 'version');
-    const updatedAt = figma.root.getSharedPluginData('tokens', 'updatedAt');
-    if (values) {
-        const parsedValues = JSON.parse(values);
-        return {values: parsedValues, updatedAt, version};
+    try {
+        const values = figma.root.getSharedPluginData('tokens', 'values');
+        const version = figma.root.getSharedPluginData('tokens', 'version');
+        const updatedAt = figma.root.getSharedPluginData('tokens', 'updatedAt');
+        if (values) {
+            const parsedValues = JSON.parse(values);
+            if (Object.keys(parsedValues).length > 0) {
+                return {values: parsedValues, updatedAt, version};
+            }
+        }
+    } catch (e) {
+        console.log('Error reading tokens', e);
     }
     return null;
 }
