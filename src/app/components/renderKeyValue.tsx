@@ -61,7 +61,6 @@ const renderKeyValue = ({
                                 property={property}
                                 type={type}
                                 editMode={editMode}
-                                path={stringPath}
                                 token={value}
                                 showForm={showForm}
                             />

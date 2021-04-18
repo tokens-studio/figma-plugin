@@ -9,8 +9,9 @@ import {lightOrDark, colorByHashCode, isTypographyToken} from './utils';
 import useManageTokens from '../store/useManageTokens';
 import useReadTokens from '../store/useReadTokens';
 import {RootState} from '../store';
+import {DEFAULT_DEPTH_LEVEL} from './constants';
 
-const TokenButton = ({type, property, path, token, editMode, showForm}) => {
+const TokenButton = ({type, property, token, editMode, showForm}) => {
     const uiState = useSelector((state: RootState) => state.uiState);
     const {colorMode, displayType, activeTokenSet} = useTokenState();
     const {setNodeData, setShowOptions, setLoading} = useTokenDispatch();
@@ -23,6 +24,10 @@ const TokenButton = ({type, property, path, token, editMode, showForm}) => {
     let showEditButton = false;
     let properties = [type];
     const {name} = token;
+    // Only show the last part of a token in a group
+    const visibleDepth =
+        name.split('.').length === DEFAULT_DEPTH_LEVEL ? 1 : name.split('.').length - DEFAULT_DEPTH_LEVEL;
+    const visibleName = name.split('.').slice(-visibleDepth).join('.');
     const buttonClass = [];
 
     const handleEditClick = () => {
@@ -39,12 +44,6 @@ const TokenButton = ({type, property, path, token, editMode, showForm}) => {
         setNodeData(value);
     }
 
-    if (colorMode) {
-        style = {
-            '--bgColor': colorByHashCode(name.toString()),
-            backgroundColor: 'hsl(var(--bgColor))',
-        };
-    }
     switch (type) {
         case 'borderRadius':
             style = {...style, borderRadius: `${displayValue}px`};
@@ -146,7 +145,6 @@ const TokenButton = ({type, property, path, token, editMode, showForm}) => {
     ];
 
     const active = uiState.selectionValues[type] === name;
-
     const semiActive = properties.some((prop) => uiState.selectionValues[prop.name] === name);
 
     if (editMode) {
@@ -215,7 +213,7 @@ const TokenButton = ({type, property, path, token, editMode, showForm}) => {
                         type="button"
                         onClick={() => onClick(properties[0])}
                     >
-                        <div className="button-text">{showValue && <span>{name}</span>}</div>
+                        <div className="button-text">{showValue && <span>{visibleName}</span>}</div>
                         {editMode && <div className="button-edit-overlay">Edit</div>}
                     </button>
                 </Tooltip>

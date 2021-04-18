@@ -28,12 +28,25 @@ describe('App', () => {
                 data: {
                     pluginMessage: {
                         type: 'tokenvalues',
-                        values: {version: '5', values: {options: JSON.stringify({sizing: {xs: 4}}, null, 2)}},
+                        values: {
+                            version: '5',
+                            values: {
+                                options: [
+                                    {
+                                        id: '123',
+                                        type: 'sizing',
+                                        description: 'some size',
+                                        name: 'global.size.xs',
+                                        value: '4',
+                                    },
+                                ],
+                            },
+                        },
                     },
                 },
             })
         );
-        const TokensText = getByText('Sizing');
+        const TokensText = getByText('Size');
 
         expect(TokensText).toBeInTheDocument();
     });

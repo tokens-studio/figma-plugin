@@ -1,14 +1,10 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import * as React from 'react';
-import {mergeDeep} from '@/plugin/helpers';
-import {SingleTokenObject, TokenType} from '@types/tokens';
 import {useTokenState} from '../store/TokenContext';
 import TokenListing from './TokenListing';
-import tokenTypes from '../../config/tokenTypes';
 import TokensBottomBar from './TokensBottomBar';
 import ToggleEmptyButton from './ToggleEmptyButton';
-import {useSelector} from 'react-redux';
-import {RootState} from '../store';
+import {mappedTokens} from './createTokenObj';
 
 interface TokenListingType {
     label: string;
@@ -23,62 +19,14 @@ interface TokenListingType {
     };
 }
 
-function convertDotPathToNestedObject(path, value) {
-    const [last, ...paths] = path.toString().split('.').reverse();
-    return paths.reduce((acc, el) => ({[el]: acc}), {[last]: value});
-}
-
-function createTokensObject(tokens: SingleTokenObject[]) {
-    console.log('Creating tokens obj');
-    const obj = tokens.reduce((acc, cur) => {
-        const objectPath = convertDotPathToNestedObject(cur.name, cur);
-        if (cur.type && cur.type !== '' && cur.type !== 'undefined') {
-            acc[cur.type] = acc[cur.type] || {values: {}};
-            mergeDeep(acc[cur.type].values, objectPath);
-        } else {
-            const groupName = cur.name.split('.').slice(1, 2).toString();
-            acc[groupName] = acc[groupName] || {values: []};
-            mergeDeep(acc[groupName].values, objectPath);
-        }
-        return acc;
-    }, {});
-    console.log('OBJ is', obj);
-    return obj;
-}
-
-const mappedTokens = (tokens) => {
-    console.log('Maptoks');
-
-    const tokenObj = {};
-    Object.entries(tokens).forEach(([key, group]: [string, {values: SingleTokenObject[]; type?: TokenType}]) => {
-        tokenObj[key] = {
-            values: group.values,
-        };
-    });
-
-    mergeDeep(tokenObj, tokenTypes);
-
-    return Object.entries(tokenObj);
-};
-
 const Tokens = () => {
     const {tokens, activeTokenSet} = useTokenState();
 
     const [tokenValues, setTokenValues] = React.useState([]);
 
     React.useEffect(() => {
-        console.log('Something changed');
+        setTokenValues(mappedTokens(tokens[activeTokenSet].values));
     }, [tokens, activeTokenSet]);
-    React.useEffect(() => {
-        console.log('Something setState changed');
-    }, [tokenValues, setTokenValues]);
-
-    React.useEffect(() => {
-        console.log('use effect triggered');
-        setTokenValues(mappedTokens(createTokensObject(tokens[activeTokenSet].values)));
-    }, [tokens, activeTokenSet]);
-
-    console.log('RERENDERED TOP TOKENS', tokenValues);
 
     return (
         <div>
