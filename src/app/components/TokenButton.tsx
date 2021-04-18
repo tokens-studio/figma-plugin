@@ -5,7 +5,7 @@ import Tooltip from './Tooltip';
 import MoreButton from './MoreButton';
 import {useTokenState, useTokenDispatch} from '../store/TokenContext';
 import Icon from './Icon';
-import {lightOrDark, colorByHashCode, isTypographyToken} from './utils';
+import {lightOrDark, isTypographyToken} from './utils';
 import useManageTokens from '../store/useManageTokens';
 import useReadTokens from '../store/useReadTokens';
 import {RootState} from '../store';
@@ -13,7 +13,7 @@ import {DEFAULT_DEPTH_LEVEL} from './constants';
 
 const TokenButton = ({type, property, token, editMode, showForm}) => {
     const uiState = useSelector((state: RootState) => state.uiState);
-    const {colorMode, displayType, activeTokenSet} = useTokenState();
+    const {displayType, activeTokenSet} = useTokenState();
     const {setNodeData, setShowOptions, setLoading} = useTokenDispatch();
     const {deleteSingleToken} = useManageTokens();
     const {getTokenValue} = useReadTokens();
@@ -205,7 +205,7 @@ const TokenButton = ({type, property, token, editMode, showForm}) => {
                 path={name}
                 mode={editMode ? 'edit' : 'list'}
             >
-                <Tooltip label={`${name}: ${getTokenDisplay(token)}`}>
+                <Tooltip label={`${getTokenDisplay(token)}`}>
                     <button
                         className="w-full h-full"
                         // TODO: Allow tooltips in disabled mode
