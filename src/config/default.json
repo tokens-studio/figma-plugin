@@ -27,11 +27,13 @@
     },
     "boxShadow": {
         "dark": {
-            "x": 5,
-            "y": 5,
-            "spread": 3,
-            "color": "rgba(0, 0, 0, 0.5)",
-            "blur": 5
+            "value": {
+                "x": 5,
+                "y": 5,
+                "spread": 3,
+                "color": "rgba(0, 0, 0, 0.5)",
+                "blur": 5
+            }
         }
     },
     "colors": {
