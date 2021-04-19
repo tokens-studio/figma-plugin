@@ -184,10 +184,6 @@ textarea::-webkit-scrollbar-thumb {
     @apply border-gray-500;
 }
 
-.button:hover {
-    @apply bg-gray-100;
-}
-
 .button-ghost {
     @apply border-transparent bg-transparent px-2 py-1;
 }
@@ -294,16 +290,8 @@ textarea::-webkit-scrollbar-thumb {
     @apply bg-white text-black border border-gray-200;
 }
 
-.button-secondary:hover {
-    @apply bg-gray-100;
-}
-
 .button-primary {
     @apply bg-primary-500 text-white border-transparent;
-}
-
-.button-primary:hover {
-    @apply bg-primary-400;
 }
 
 .button-large {

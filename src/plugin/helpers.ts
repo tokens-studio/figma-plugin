@@ -301,7 +301,7 @@ export function transformValue(value, type) {
         case 'paddingLeft':
         case 'itemSpacing':
         case 'borderWidth':
-            return convertNumberToFigma(value);
+            return convertTypographyNumberToFigma(value);
         case 'letterSpacing':
             return convertLetterSpacingToFigma(value);
         case 'lineHeights':

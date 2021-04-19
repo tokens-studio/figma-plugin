@@ -27,7 +27,7 @@ export function getAliasValue(token: SingleToken, tokens = []): string | null {
             returnedValue = null;
         }
     }
-    if (returnedValue) {
+    if (typeof returnedValue !== 'undefined') {
         return convertToRgb(checkAndEvaluateMath(returnedValue));
     }
     return null;

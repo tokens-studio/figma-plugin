@@ -5,27 +5,27 @@ import setTextValuesOnTarget from './setTextValuesOnTarget';
 export default async function setValuesOnNode(node, values, data) {
     try {
         // BORDER RADIUS
-        if (values.borderRadius) {
+        if (typeof values.borderRadius !== 'undefined') {
             if (typeof node.cornerRadius !== 'undefined') {
-                node.cornerRadius = Number(values.borderRadius || values.borderRadiusTopLeft);
+                node.cornerRadius = Number(values.borderRadius);
             }
         }
-        if (values.borderRadiusTopLeft) {
+        if (typeof values.borderRadiusTopLeft !== 'undefined') {
             if (typeof node.topLeftRadius !== 'undefined') {
                 node.topLeftRadius = Number(values.borderRadiusTopLeft);
             }
         }
-        if (values.borderRadiusTopRight) {
+        if (typeof values.borderRadiusTopRight !== 'undefined') {
             if (typeof node.topRightRadius !== 'undefined') {
                 node.topRightRadius = Number(values.borderRadiusTopRight);
             }
         }
-        if (values.borderRadiusBottomRight) {
+        if (typeof values.borderRadiusBottomRight !== 'undefined') {
             if (typeof node.bottomRightRadius !== 'undefined') {
                 node.bottomRightRadius = Number(values.borderRadiusBottomRight);
             }
         }
-        if (values.borderRadiusBottomLeft) {
+        if (typeof values.borderRadiusBottomLeft !== 'undefined') {
             if (typeof node.bottomLeftRadius !== 'undefined') {
                 node.bottomLeftRadius = Number(values.borderRadiusBottomLeft);
             }

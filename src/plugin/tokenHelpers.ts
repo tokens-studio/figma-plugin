@@ -25,7 +25,7 @@ function resolveTokenValues(tokens, previousCount = undefined) {
             return {
                 ...t,
                 value: returnValue,
-                rawValue: t.value,
+                rawValue: t.rawValue || t.value,
             };
         });
         if (previousCount > aliases.length || !previousCount) {
