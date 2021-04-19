@@ -33,7 +33,8 @@ export default async function setValuesOnNode(node, values, data) {
     // BOX SHADOW
     if (values.boxShadow) {
         if (typeof node.effects !== 'undefined') {
-            const effects = node.effects.slice();
+            // get all effects, but remove DROP_SHADOW, since we're about to add it
+            const effects = node.effects.filter((effect) => effect.type !== 'DROP_SHADOW');
             const {x, y, spread, color, blur} = values.boxShadow;
             const {
                 color: {r, g, b},
