@@ -30,6 +30,32 @@ export default async function setValuesOnNode(node, values, data) {
         }
     }
 
+    // BOX SHADOW
+    if (values.boxShadow) {
+        if (typeof node.effects !== 'undefined') {
+            // get all effects, but remove DROP_SHADOW, since we're about to add it
+            const effects = node.effects.filter((effect) => effect.type !== 'DROP_SHADOW');
+            const {x, y, spread, color, blur} = values.boxShadow;
+            const {
+                color: {r, g, b},
+                opacity,
+            } = convertToFigmaColor(color);
+
+            const effect: ShadowEffect = {
+                type: 'DROP_SHADOW',
+                visible: true,
+                blendMode: 'NORMAL',
+                color: {r, g, b, a: opacity},
+                offset: {x: Number(x), y: Number(y)},
+                radius: Number(blur),
+                spread: Number(spread),
+            };
+
+            effects.push(effect);
+            node.effects = effects;
+        }
+    }
+
     // BORDER WIDTH
     if (values.borderWidth) {
         // Has to be larger than 0

@@ -15,6 +15,7 @@ export default {
     borderRadiusBottomRight: {},
     borderRadiusBottomLeft: {},
     borderWidth: {},
+    boxShadow: {},
     opacity: {},
     fontFamilies: {},
     fontWeights: {},

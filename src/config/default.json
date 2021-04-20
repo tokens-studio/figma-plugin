@@ -25,6 +25,17 @@
         "md": 4,
         "lg": 8
     },
+    "boxShadow": {
+        "dark": {
+            "value": {
+                "x": 5,
+                "y": 5,
+                "spread": 3,
+                "color": "rgba(0, 0, 0, 0.5)",
+                "blur": 5
+            }
+        }
+    },
     "colors": {
         "gray": {
             "100": "#f7fafc",
