@@ -1,6 +1,4 @@
 import * as React from 'react';
-import objectPath from 'object-path';
-import set from 'set-value';
 import fetchChangelog from '@/utils/storyblok';
 import {track} from '@/utils/analytics';
 import convertToTokenArray from '@/utils/convertTokens';

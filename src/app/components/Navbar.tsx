@@ -21,7 +21,7 @@ const TabButton = ({name, label, first = false}) => {
         <button
             data-cy={`navitem-${name}`}
             type="button"
-            className={`px-2 py-4 text-xxs focus:outline-none focus:shadow-none font-medium cursor-pointer hover:text-black
+            className={`px-2 py-4 text-xxs focus:outline-none focus:shadow-none font-medium cursor-pointer focus:text-black hover:text-black
         ${activeTab === name ? 'text-black' : 'text-gray-500'}
         ${first ? 'pl-4' : ''}`}
             name="text"

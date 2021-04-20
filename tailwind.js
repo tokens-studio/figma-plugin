@@ -28,11 +28,6 @@ module.exports = {
                     500: 'var(--theme-colors-brand-500, #18A0FB)',
                 },
             },
-            spacing: {
-                1: 'var(--theme-itemSpacing-xs, 0.25rem)',
-                2: 'var(--theme-itemSpacing-sm, 0.5rem)',
-                4: 'var(--theme-itemSpacing-md, 1rem)',
-            },
             fontSize: {
                 xxs: '0.7rem',
             },

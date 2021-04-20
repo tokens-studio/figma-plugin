@@ -1,5 +1,6 @@
 import {getAliasValue} from '@/utils/aliases';
 import checkIfAlias from '@/utils/checkIfAlias';
+import {SingleTokenObject} from 'types/tokens';
 import {mergeDeep} from './helpers';
 
 function findAllAliases(tokens) {
@@ -38,20 +39,20 @@ function resolveTokenValues(tokens, previousCount = undefined) {
     return returnedTokens;
 }
 
-export function getMergedTokens(tokens, usedTokenSet, shouldResolve = false) {
+// Return tokens that are included in currently active token set and optionally resolve all aliases
+export function getMergedTokens(tokens, usedTokenSet, shouldResolve = false): SingleTokenObject[] {
     const mergedTokens = [];
     Object.entries(tokens).forEach((tokenGroup) => {
         if (usedTokenSet.includes(tokenGroup[0])) {
             mergedTokens.push(...tokenGroup[1].values);
         }
     });
-    let returnedTokens = mergedTokens;
 
     if (shouldResolve) {
-        returnedTokens = resolveTokenValues(mergedTokens);
+        return resolveTokenValues(mergedTokens);
     }
 
-    return returnedTokens;
+    return mergedTokens;
 }
 
 export function reduceToValues(tokens) {
