@@ -82,7 +82,7 @@ export async function updateJSONBinTokens({tokens, id, secret, updatedAt, oldUpd
 
 export function useJSONbin() {
     const dispatch = useDispatch<Dispatch>();
-    const {setApiData, setStorageType} = useTokenDispatch();
+    const {setApiData} = useTokenDispatch();
 
     async function createNewJSONBin({provider, secret, tokens, name, updatedAt}): Promise<TokenProps> {
         const response = await fetch(`https://api.jsonbin.io/b`, {
@@ -106,7 +106,7 @@ export function useJSONbin() {
         const jsonBinData = await response.json();
         if (jsonBinData.success) {
             setApiData({id: jsonBinData.id, name, secret, provider});
-            setStorageType({id: jsonBinData.id, name, provider}, true);
+            dispatch.tokenState.setStorageType({provider: {id: jsonBinData.id, name, provider}, bool: true});
             updateJSONBinTokens({
                 tokens,
                 id: jsonBinData.id,

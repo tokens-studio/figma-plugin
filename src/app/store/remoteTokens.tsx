@@ -1,3 +1,4 @@
+import {useDispatch} from 'react-redux';
 import {SingleToken, TokenProps} from '../../../types/tokens';
 import {StorageProviderType} from '../../../types/api';
 import {notifyToUI} from '../../plugin/notifiers';
@@ -5,10 +6,15 @@ import {useJSONbin} from './providers/jsonbin';
 import useArcade from './providers/arcade';
 import {useTokenDispatch, useTokenState} from './TokenContext';
 import {compareUpdatedAt} from '../components/utils';
+import {Dispatch} from '../store';
+import useReadTokens from './useReadTokens';
 
 export default function useRemoteTokens() {
+    const dispatch = useDispatch<Dispatch>();
+
     const {api, updateAfterApply, lastUpdatedAt, localApiState} = useTokenState();
-    const {setLoading, setTokenData, updateTokens, setApiData, setStorageType} = useTokenDispatch();
+    const {setLoading, setApiData} = useTokenDispatch();
+    const {updateTokens} = useReadTokens();
     const {fetchDataFromArcade, editArcadeToken, createArcadeToken, deleteArcadeToken} = useArcade();
     const {fetchDataFromJSONBin, createNewJSONBin} = useJSONbin();
 
@@ -36,7 +42,7 @@ export default function useRemoteTokens() {
                 throw new Error('Not implemented');
         }
 
-        setTokenData(tokenValues);
+        dispatch.tokenState.setTokenData(tokenValues);
         updateTokens(false);
         setLoading(false);
     };
@@ -101,16 +107,16 @@ export default function useRemoteTokens() {
         setLoading(true);
         const remoteTokens = await fetchDataFromRemote(id, secret, name, provider as StorageProviderType);
         if (remoteTokens) {
-            setStorageType({provider, id, name}, true);
+            dispatch.tokenState.setStorageType({provider: {provider, id, name}, bool: true});
             setApiData({id, secret, name, provider});
             const comparison = await compareUpdatedAt(lastUpdatedAt, remoteTokens);
             if (comparison === 'remote_older') {
-                setTokenData(remoteTokens);
+                dispatch.tokenState.setTokenData(remoteTokens);
                 if (updateAfterApply) {
                     updateTokens(false);
                 }
             } else {
-                setTokenData(remoteTokens);
+                dispatch.tokenState.setTokenData(remoteTokens);
                 if (updateAfterApply) {
                     updateTokens(false);
                 }

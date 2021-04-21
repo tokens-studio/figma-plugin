@@ -1,16 +1,20 @@
 import {track} from '@/utils/analytics';
 import * as React from 'react';
+import {useDispatch, useSelector} from 'react-redux';
+import {Dispatch, RootState} from '../store';
 
-import {useTokenDispatch, useTokenState} from '../store/TokenContext';
+import useReadTokens from '../store/useReadTokens';
 import Button from './Button';
 
 export default function TokensBottomBar() {
-    const {updatePageOnly} = useTokenState();
-    const {updateTokens, toggleUpdatePageOnly} = useTokenDispatch();
+    const {updatePageOnly} = useSelector((state: RootState) => state.settings);
+    const {setUpdatePageOnly} = useDispatch<Dispatch>().settings;
+
+    const {updateTokens} = useReadTokens();
 
     const handleUpdate = async () => {
         track('Update Tokens');
-        updateTokens(false);
+        updateTokens();
     };
 
     return (
@@ -21,7 +25,7 @@ export default function TokensBottomBar() {
                     type="checkbox"
                     id="updatemode"
                     checked={updatePageOnly}
-                    onChange={() => toggleUpdatePageOnly(!updatePageOnly)}
+                    onChange={() => setUpdatePageOnly(!updatePageOnly)}
                 />
                 <label className="switch__label text-xs" htmlFor="updatemode">
                     Update this page only

@@ -14,6 +14,7 @@ type WindowSettingsType = {
 interface SettingsState {
     uiWindow: WindowSettingsType;
     depth: number;
+    updatePageOnly: boolean;
 }
 
 const resizeWindow = (width, height) => {
@@ -31,6 +32,7 @@ export const settings = createModel<RootModel>()({
             height: 600,
         },
         depth: DEFAULT_DEPTH_LEVEL,
+        updatePageOnly: true,
     } as SettingsState,
     reducers: {
         setWindowSize(state, payload: {width: number; height: number}) {
@@ -51,6 +53,12 @@ export const settings = createModel<RootModel>()({
             return {
                 ...state,
                 depth: payload,
+            };
+        },
+        setUpdatePageOnly(state, payload: boolean) {
+            return {
+                ...state,
+                updatePageOnly: payload,
             };
         },
     },

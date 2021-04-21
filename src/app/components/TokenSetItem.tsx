@@ -3,7 +3,9 @@ import {useDrop, useDrag, DropTargetMonitor} from 'react-dnd';
 import {getEmptyImage} from 'react-dnd-html5-backend';
 import {XYCoord} from 'dnd-core';
 import {ContextMenu, ContextMenuTrigger, MenuItem} from 'react-contextmenu';
+import {useSelector} from 'react-redux';
 import {useTokenDispatch, useTokenState} from '../store/TokenContext';
+import {RootState} from '../store';
 
 interface DragItem {
     index: number;
@@ -16,7 +18,7 @@ enum ItemTypes {
 }
 
 export default function TokenSetItem({tokenSet, onMove, index, onRename, onDelete, onDrop}) {
-    const {tokens, activeTokenSet, editProhibited, usedTokenSet} = useTokenState();
+    const {tokens, activeTokenSet, usedTokenSet, editProhibited} = useSelector((state: RootState) => state.tokenState);
     const {toggleUsedTokenSet, setActiveTokenSet} = useTokenDispatch();
 
     const ref = React.useRef<HTMLDivElement>(null);

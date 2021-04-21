@@ -1,15 +1,18 @@
 import * as React from 'react';
+import {useSelector} from 'react-redux';
 import Textarea from './Textarea';
 import Heading from './Heading';
-import {useTokenState, useTokenDispatch} from '../store/TokenContext';
+import {useTokenDispatch} from '../store/TokenContext';
 import Button from './Button';
 import Modal from './Modal';
 import TokenSetSelector from './TokenSetSelector';
 import ExportModal from './modals/ExportModal';
 import PresetModal from './modals/PresetModal';
+import {RootState} from '../store';
 
 const JSONEditor = () => {
-    const {tokens, activeTokenSet, editProhibited} = useTokenState();
+    const {tokens, activeTokenSet, editProhibited} = useSelector((state: RootState) => state.tokenState);
+
     const {setEmptyTokens, setLoading} = useTokenDispatch();
     const [confirmModalVisible, showConfirmModal] = React.useState('');
     const [exportModalVisible, showExportModal] = React.useState(false);

@@ -64,9 +64,7 @@ figma.ui.onmessage = async (msg) => {
                     }
                     default: {
                         const oldTokens = getTokenData();
-                        if (oldTokens) {
-                            notifyTokenValues(oldTokens);
-                        }
+                        notifyTokenValues(oldTokens);
                     }
                 }
             } catch (err) {

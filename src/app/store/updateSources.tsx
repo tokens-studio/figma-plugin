@@ -44,7 +44,7 @@ async function updateRemoteTokens({
     }
 }
 
-export default async function updateTokensOnSources(state: StateType, updatedAt: string, shouldUpdateRemote = true) {
+export default async function updateTokensOnSources({tokens, updatedAt, shouldUpdateRemote = true}) {
     const isLocal = state.storageType.provider === StorageProviderType.LOCAL;
     if (!isLocal && shouldUpdateRemote && !state.editProhibited) {
         updateRemoteTokens({
@@ -56,12 +56,4 @@ export default async function updateTokensOnSources(state: StateType, updatedAt:
             oldUpdatedAt: state.lastUpdatedAt,
         });
     }
-
-    postToFigma({
-        type: MessageToPluginTypes.UPDATE,
-        tokenValues: reduceToValues(state.tokens),
-        tokens: getMergedTokens(state.tokens, state.usedTokenSet, true),
-        updatePageOnly: state.updatePageOnly,
-        updatedAt,
-    });
 }

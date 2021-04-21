@@ -1,4 +1,6 @@
 import * as React from 'react';
+import {useSelector} from 'react-redux';
+import {RootState} from '../store';
 import {useTokenDispatch, useTokenState} from '../store/TokenContext';
 import useManageTokens from '../store/useManageTokens';
 import Input from './Input';
@@ -8,7 +10,7 @@ const NewGroupForm = ({path}) => {
     const title = 'Create new group';
     const [name, setName] = React.useState('');
     const {setShowNewGroupForm} = useTokenDispatch();
-    const {activeTokenSet} = useTokenState();
+    const {activeTokenSet} = useSelector((state: RootState) => state.tokenState);
     const {createSingleToken} = useManageTokens();
 
     const handleChange = (e) => {

@@ -11,12 +11,10 @@ export default function Initiator() {
     const dispatch = useDispatch<Dispatch>();
 
     const {
-        setTokenData,
         setLoading,
         setTokensFromStyles,
         setApiData,
         setLocalApiState,
-        setStorageType,
         setAPIProviders,
         setLastOpened,
     } = useTokenDispatch();
@@ -63,7 +61,7 @@ export default function Initiator() {
                     case MessageFromPluginTypes.TOKEN_VALUES: {
                         setLoading(false);
                         if (values) {
-                            setTokenData(values);
+                            dispatch.tokenState.setTokenData(values);
                             dispatch.uiState.setActiveTab('tokens');
                         }
                         break;
@@ -77,7 +75,7 @@ export default function Initiator() {
                         }
                         break;
                     case MessageFromPluginTypes.RECEIVED_STORAGE_TYPE:
-                        setStorageType(storageType);
+                        dispatch.tokenState.setStorageType({provider: storageType});
                         break;
                     case MessageFromPluginTypes.API_CREDENTIALS: {
                         if (status === true) {
@@ -86,7 +84,7 @@ export default function Initiator() {
                             setLocalApiState({id, secret, name, provider});
                             const remoteValues = await fetchDataFromRemote(id, secret, name, provider);
                             if (remoteValues) {
-                                setTokenData(remoteValues);
+                                dispatch.tokenState.setTokenData(remoteValues);
                                 dispatch.uiState.setActiveTab('tokens');
                             }
                             setLoading(false);

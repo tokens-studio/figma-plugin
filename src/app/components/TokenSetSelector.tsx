@@ -2,6 +2,8 @@ import {track} from '@/utils/analytics';
 import React from 'react';
 import {DndProvider} from 'react-dnd';
 import {HTML5Backend} from 'react-dnd-html5-backend';
+import {useSelector} from 'react-redux';
+import {RootState} from '../store';
 import {useTokenDispatch, useTokenState} from '../store/TokenContext';
 import Button from './Button';
 import Heading from './Heading';
@@ -12,7 +14,7 @@ import TokenSetItem from './TokenSetItem';
 import Tooltip from './Tooltip';
 
 export default function TokenSetSelector() {
-    const {tokens, editProhibited} = useTokenState();
+    const {tokens, editProhibited} = useSelector((state: RootState) => state.tokenState);
     const {addTokenSet, renameTokenSet, deleteTokenSet, setTokenSetOrder} = useTokenDispatch();
     const [showNewTokenSetFields, setShowNewTokenSetFields] = React.useState(false);
     const [showDeleteTokenSetModal, setShowDeleteTokenSetModal] = React.useState(false);

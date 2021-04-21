@@ -17,6 +17,7 @@ interface UIState {
     loading: boolean;
     activeTab: TabNames;
     projectURL: string;
+    editProhibited: boolean;
 }
 
 export const uiState = createModel<RootModel>()({
@@ -26,6 +27,7 @@ export const uiState = createModel<RootModel>()({
         loading: false,
         activeTab: 'start',
         projectURL: '',
+        editProhibited: false,
     } as UIState,
     reducers: {
         setDisabled: (state, data: boolean) => {
@@ -62,6 +64,12 @@ export const uiState = createModel<RootModel>()({
             return {
                 ...state,
                 projectURL: payload,
+            };
+        },
+        setEditProhibited(state, payload: boolean) {
+            return {
+                ...state,
+                editProhibited: payload,
             };
         },
     },

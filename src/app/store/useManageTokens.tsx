@@ -1,11 +1,16 @@
+import {useDispatch} from 'react-redux';
 import {SingleToken, TokenType} from '../../../types/tokens';
 import {StorageProviderType} from '../../../types/api';
 import useRemoteTokens from './remoteTokens';
 import {useTokenDispatch, useTokenState} from './TokenContext';
+import useReadTokens from './useReadTokens';
+import {Dispatch} from '../store';
 
 export default function useManageTokens() {
+    const {editToken, createToken, deleteToken} = useDispatch<Dispatch>().tokenState;
     const {storageType} = useTokenState();
-    const {setLoading, updateTokens, editToken, deleteToken, createToken} = useTokenDispatch();
+    const {updateTokens} = useReadTokens();
+    const {setLoading} = useTokenDispatch();
     const {editRemoteToken, createRemoteToken, deleteRemoteToken} = useRemoteTokens();
 
     async function editSingleToken(data: {

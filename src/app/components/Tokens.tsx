@@ -22,8 +22,8 @@ interface TokenListingType {
 }
 
 const Tokens = () => {
-    const {tokens, activeTokenSet} = useTokenState();
     const settings = useSelector((state: RootState) => state.settings);
+    const {tokens, activeTokenSet} = useSelector((state: RootState) => state.tokenState);
 
     const [tokenValues, setTokenValues] = React.useState([]);
 

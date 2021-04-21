@@ -1,4 +1,5 @@
 import * as React from 'react';
+import {useSelector} from 'react-redux';
 import {useTokenDispatch, useTokenState} from '../store/TokenContext';
 import EditTokenForm from './EditTokenForm';
 import Heading from './Heading';
@@ -7,6 +8,7 @@ import Modal from './Modal';
 import renderKeyValue from './renderKeyValue';
 import Tooltip from './Tooltip';
 import NewGroupForm from './NewGroupForm';
+import {RootState} from '../store';
 
 const TokenListing = ({
     tokenKey,
@@ -30,15 +32,9 @@ const TokenListing = ({
     tokenType: string;
     values: object;
 }) => {
-    const {
-        collapsed,
-        showEmptyGroups,
-        showEditForm,
-        showNewGroupForm,
-        showOptions,
-        displayType,
-        editProhibited,
-    } = useTokenState();
+    const {editProhibited} = useSelector((state: RootState) => state.tokenState);
+
+    const {collapsed, showEmptyGroups, showEditForm, showNewGroupForm, showOptions, displayType} = useTokenState();
     const {setCollapsed, createStyles, setShowEditForm, setShowOptions, setDisplayType} = useTokenDispatch();
 
     const createButton = ['color', 'typography'].includes(tokenType);

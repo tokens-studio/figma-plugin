@@ -1,5 +1,7 @@
 import {track} from '@/utils/analytics';
 import * as React from 'react';
+import {useSelector} from 'react-redux';
+import {RootState} from '../store';
 import {useTokenDispatch, useTokenState} from '../store/TokenContext';
 import useManageTokens from '../store/useManageTokens';
 import Input from './Input';
@@ -17,7 +19,7 @@ const EditTokenForm = ({
     type,
 }) => {
     const title = isPristine ? `New Token` : initialName;
-    const {activeTokenSet} = useTokenState();
+    const {activeTokenSet} = useSelector((state: RootState) => state.tokenState);
     const {setShowEditForm} = useTokenDispatch();
     const {editSingleToken, createSingleToken} = useManageTokens();
 
