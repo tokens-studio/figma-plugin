@@ -6,32 +6,31 @@ import setValuesOnNode from './updateNode';
 import {TokenProps} from '../../types/tokens';
 import {StorageProviderType, StorageType} from '../../types/api';
 import * as pjs from '../../package.json';
-import {transformValue} from './helpers';
 
-function mapType(token, value) {
+export function mapType(token, value) {
     if (value.type) return value.type;
     return token.split('.')[0];
 }
 
-function returnValueToLookFor(resolvedValue, key, token) {
+export function returnValueToLookFor(resolvedValue, key, tokenName) {
     switch (key) {
         case 'tokenName':
-            return token;
+            return tokenName;
         case 'description':
             return resolvedValue?.description;
         case 'tokenValue':
             return resolvedValue.value || resolvedValue;
         default:
-            return transformValue(resolvedValue?.value || resolvedValue, mapType(token, resolvedValue));
+            return resolvedValue?.value || resolvedValue;
     }
 }
 
 export function mapValuesToTokens(object, values) {
-    return Object.entries(values).reduce((acc, [key, tokenOnNode]) => {
-        const resolvedToken = objectPath.get(object, tokenOnNode);
+    return Object.entries(values).reduce((acc, [key, tokenName]) => {
+        const resolvedToken = objectPath.get(object, tokenName);
         if (!resolvedToken) return acc;
 
-        acc[key] = returnValueToLookFor(resolvedToken, key, tokenOnNode);
+        acc[key] = returnValueToLookFor(resolvedToken, key, tokenName);
         return acc;
     }, {});
 }

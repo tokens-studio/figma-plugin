@@ -2,7 +2,9 @@
 import {figmaRGBToHex} from '@figma-plugin/helpers';
 import {ColorToken, TypographyToken} from '../../types/propertyTypes';
 import {slugify} from '../app/components/utils';
-import {convertFigmaGradientToString, convertFigmaToLetterSpacing, convertFigmaToLineHeight} from './helpers';
+import {convertFigmaGradientToString} from './figmaTransforms/gradients';
+import {convertFigmaToLetterSpacing} from './figmaTransforms/letterSpacing';
+import {convertFigmaToLineHeight} from './figmaTransforms/lineHeight';
 import {notifyStyleValues} from './notifiers';
 
 export default function pullStyles(styleTypes): void {

@@ -1,4 +1,5 @@
-import {convertToFigmaColor} from './helpers';
+import {convertToFigmaColor} from './figmaTransforms/colors';
+import {transformValue} from './helpers';
 import setColorValuesOnTarget from './setColorValuesOnTarget';
 import setTextValuesOnTarget from './setTextValuesOnTarget';
 
@@ -6,27 +7,27 @@ export default async function setValuesOnNode(node, values, data) {
     // BORDER RADIUS
     if (values.borderRadius) {
         if (typeof node.cornerRadius !== 'undefined') {
-            node.cornerRadius = Number(values.borderRadius || values.borderRadiusTopLeft);
+            node.cornerRadius = transformValue(values.borderRadius || values.borderRadiusTopLeft, 'borderRadius');
         }
     }
     if (values.borderRadiusTopLeft) {
         if (typeof node.topLeftRadius !== 'undefined') {
-            node.topLeftRadius = Number(values.borderRadiusTopLeft);
+            node.topLeftRadius = transformValue(values.borderRadiusTopLeft, 'borderRadius');
         }
     }
     if (values.borderRadiusTopRight) {
         if (typeof node.topRightRadius !== 'undefined') {
-            node.topRightRadius = Number(values.borderRadiusTopRight);
+            node.topRightRadius = transformValue(values.borderRadiusTopRight, 'borderRadius');
         }
     }
     if (values.borderRadiusBottomRight) {
         if (typeof node.bottomRightRadius !== 'undefined') {
-            node.bottomRightRadius = Number(values.borderRadiusBottomRight);
+            node.bottomRightRadius = transformValue(values.borderRadiusBottomRight, 'borderRadius');
         }
     }
     if (values.borderRadiusBottomLeft) {
         if (typeof node.bottomLeftRadius !== 'undefined') {
-            node.bottomLeftRadius = Number(values.borderRadiusBottomLeft);
+            node.bottomLeftRadius = transformValue(values.borderRadiusBottomLeft, 'borderRadius');
         }
     }
 
@@ -46,9 +47,9 @@ export default async function setValuesOnNode(node, values, data) {
                 visible: true,
                 blendMode: 'NORMAL',
                 color: {r, g, b, a: opacity},
-                offset: {x: Number(x), y: Number(y)},
-                radius: Number(blur),
-                spread: Number(spread),
+                offset: {x: transformValue(x, 'boxShadow'), y: transformValue(y, 'boxShadow')},
+                radius: transformValue(blur, 'boxShadow'),
+                spread: transformValue(spread, 'boxShadow'),
             };
 
             effects.push(effect);
@@ -59,42 +60,36 @@ export default async function setValuesOnNode(node, values, data) {
     // BORDER WIDTH
     if (values.borderWidth) {
         // Has to be larger than 0
-        if (typeof node.strokeWeight !== 'undefined' && Number(values.borderWidth) >= 0) {
-            node.strokeWeight = Number(values.borderWidth);
+        if (typeof node.strokeWeight !== 'undefined' && transformValue(values.borderWidth, 'borderWidth') >= 0) {
+            node.strokeWeight = transformValue(values.borderWidth, 'borderWidth');
         }
     }
 
     // OPACITY
     if (values.opacity) {
         if (typeof node.opacity !== 'undefined') {
-            let num;
-            if (values.opacity.match(/(\d+%)/)) {
-                num = values.opacity.match(/(\d+%)/)[0].slice(0, -1) / 100;
-            } else {
-                num = Number(values.opacity);
-            }
-            node.opacity = num;
+            node.opacity = transformValue(values.opacity, 'opacity');
         }
     }
 
     // SIZING: BOTH
     if (values.sizing) {
         if (typeof node.resize !== 'undefined') {
-            node.resize(Number(values.sizing), Number(values.sizing));
+            node.resize(transformValue(values.sizing, 'sizing'), transformValue(values.sizing, 'sizing'));
         }
     }
 
     // SIZING: WIDTH
     if (values.width) {
         if (typeof node.resize !== 'undefined') {
-            node.resize(Number(values.width), node.height);
+            node.resize(transformValue(values.width, 'sizing'), node.height);
         }
     }
 
     // SIZING: HEIGHT
     if (values.height) {
         if (typeof node.resize !== 'undefined') {
-            node.resize(node.width, Number(values.height));
+            node.resize(node.width, transformValue(values.height, 'sizing'));
         }
     }
 
@@ -172,28 +167,28 @@ export default async function setValuesOnNode(node, values, data) {
     // SPACING
     if (values.spacing) {
         if (typeof node.paddingLeft !== 'undefined') {
-            node.paddingLeft = Number(values.spacing);
-            node.paddingRight = Number(values.spacing);
-            node.paddingTop = Number(values.spacing);
-            node.paddingBottom = Number(values.spacing);
-            node.itemSpacing = Number(values.spacing);
+            node.paddingLeft = transformValue(values.spacing, 'spacing');
+            node.paddingRight = transformValue(values.spacing, 'spacing');
+            node.paddingTop = transformValue(values.spacing, 'spacing');
+            node.paddingBottom = transformValue(values.spacing, 'spacing');
+            node.itemSpacing = transformValue(values.spacing, 'spacing');
         }
     }
     if (values.horizontalPadding) {
         if (typeof node.paddingLeft !== 'undefined') {
-            node.paddingLeft = Number(values.horizontalPadding);
-            node.paddingRight = Number(values.horizontalPadding);
+            node.paddingLeft = transformValue(values.horizontalPadding, 'spacing');
+            node.paddingRight = transformValue(values.horizontalPadding, 'spacing');
         }
     }
     if (values.verticalPadding) {
         if (typeof node.paddingTop !== 'undefined') {
-            node.paddingTop = Number(values.verticalPadding);
-            node.paddingBottom = Number(values.verticalPadding);
+            node.paddingTop = transformValue(values.verticalPadding, 'spacing');
+            node.paddingBottom = transformValue(values.verticalPadding, 'spacing');
         }
     }
     if (values.itemSpacing) {
         if (typeof node.itemSpacing !== 'undefined') {
-            node.itemSpacing = Number(values.itemSpacing);
+            node.itemSpacing = transformValue(values.itemSpacing, 'spacing');
         }
     }
 

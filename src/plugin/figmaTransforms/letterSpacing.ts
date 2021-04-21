@@ -1,0 +1,27 @@
+import {convertTypographyNumberToFigma} from './generic';
+
+export function convertLetterSpacingToFigma(inputValue) {
+    let letterSpacing;
+    const value = inputValue.toString();
+    const numbers = /^-?\d+(\.\d+)?$/;
+    if (value.trim().slice(-1) === '%' && value.trim().slice(0, -1).match(numbers)) {
+        letterSpacing = {
+            unit: 'PERCENT',
+            value: Number(value.slice(0, -1)),
+        };
+    } else if (value.match(numbers) || value.endsWith('px')) {
+        letterSpacing = {
+            unit: 'PIXELS',
+            value: convertTypographyNumberToFigma(value),
+        };
+    }
+    return letterSpacing;
+}
+
+export function convertFigmaToLetterSpacing(inputValue) {
+    const {unit, value} = inputValue;
+    if (unit === 'PERCENT') {
+        return `${+value.toFixed(2)}%`;
+    }
+    return +value.toFixed(2);
+}
