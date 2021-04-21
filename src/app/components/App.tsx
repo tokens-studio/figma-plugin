@@ -14,7 +14,7 @@ import Changelog from './Changelog';
 import {RootState} from '../store';
 
 const App = () => {
-    const activeTab = useSelector((state: RootState) => state.base.activeTab);
+    const activeTab = useSelector((state: RootState) => state.uiState.activeTab);
 
     return (
         <>

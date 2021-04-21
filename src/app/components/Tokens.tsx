@@ -1,10 +1,12 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import * as React from 'react';
+import {useSelector} from 'react-redux';
 import {useTokenState} from '../store/TokenContext';
 import TokenListing from './TokenListing';
 import TokensBottomBar from './TokensBottomBar';
 import ToggleEmptyButton from './ToggleEmptyButton';
 import {mappedTokens} from './createTokenObj';
+import {RootState} from '../store';
 
 interface TokenListingType {
     label: string;
@@ -21,12 +23,13 @@ interface TokenListingType {
 
 const Tokens = () => {
     const {tokens, activeTokenSet} = useTokenState();
+    const settings = useSelector((state: RootState) => state.settings);
 
     const [tokenValues, setTokenValues] = React.useState([]);
 
     React.useEffect(() => {
-        setTokenValues(mappedTokens(tokens[activeTokenSet].values));
-    }, [tokens, activeTokenSet]);
+        setTokenValues(mappedTokens(tokens[activeTokenSet].values, settings.depth));
+    }, [tokens, activeTokenSet, settings.depth]);
 
     return (
         <div>

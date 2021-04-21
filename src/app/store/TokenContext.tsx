@@ -44,7 +44,6 @@ export enum ActionType {
     DeleteTokenSet = 'DELETE_TOKEN_SET',
     RenameTokenSet = 'RENAME_TOKEN_SET',
     SetTokenSetOrder = 'SET_TOKEN_SET_ORDER',
-    SetProjectURL = 'SET_PROJECT_URL',
     SetChangelog = 'SET_CHANGELOG',
     SetLastOpened = 'SET_LAST_OPENED',
     CreateToken = 'CREATE_TOKEN',
@@ -101,7 +100,6 @@ const emptyState = {
         new: false,
     },
     apiProviders: [],
-    projectURL: '',
     updatePageOnly: true,
     updateAfterApply: true,
     editProhibited: true,
@@ -307,12 +305,6 @@ function stateReducer(state, action) {
                 tokenData: state.tokenData,
             };
         }
-        case ActionType.SetProjectURL: {
-            return {
-                ...state,
-                projectURL: action.data,
-            };
-        }
         case ActionType.SetStorageType:
             if (action.bool) {
                 postToFigma({
@@ -491,9 +483,6 @@ function TokenProvider({children}) {
             },
             setLocalApiState: (data: ApiDataType) => {
                 dispatch({type: ActionType.SetLocalApiState, data});
-            },
-            setProjectURL: (data: string) => {
-                dispatch({type: ActionType.SetProjectURL, data});
             },
             toggleUpdatePageOnly: (bool: boolean) => {
                 dispatch({type: ActionType.ToggleUpdatePageOnly, bool});

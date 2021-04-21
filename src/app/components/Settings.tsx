@@ -24,6 +24,12 @@ const SyncSettings = () => {
             debouncedChange();
         }
     };
+    const handleDepthChange = (e) => {
+        const value = Number(e.target.value.trim());
+        if (!Number.isNaN(value)) {
+            dispatch.settings.setDepth(value);
+        }
+    };
 
     return (
         <div className="flex flex-col flex-grow">
@@ -47,6 +53,20 @@ const SyncSettings = () => {
                             onChange={handleSizeChange}
                             type="text"
                             name="height"
+                            required
+                        />
+                    </div>
+                </div>
+                <div className="space-y-4">
+                    <Heading>Token Depth</Heading>
+                    <div className="flex flex-row space-x-2">
+                        <Input
+                            full
+                            label="Depth"
+                            value={settings.depth}
+                            onChange={handleDepthChange}
+                            type="text"
+                            name="depth"
                             required
                         />
                     </div>

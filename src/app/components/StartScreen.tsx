@@ -13,11 +13,11 @@ const StartScreen = () => {
     const {storageType} = useTokenState();
     const {setEmptyTokens, setLocalApiState} = useTokenDispatch();
     const onSetDefaultTokens = () => {
-        dispatch.base.setActiveTab('tokens');
+        dispatch.uiState.setActiveTab('tokens');
         setEmptyTokens();
     };
     const onSetSyncClick = () => {
-        dispatch.base.setActiveTab('syncsettings');
+        dispatch.uiState.setActiveTab('syncsettings');
         setEmptyTokens();
         setLocalApiState({
             id: storageType.id,

@@ -2,6 +2,8 @@
 import {createModel} from '@rematch/core';
 import {RootModel} from '.';
 
+type TabNames = 'start' | 'tokens' | 'json' | 'inspector' | 'syncsettings' | 'settings';
+
 export interface SelectionValue {
     borderRadius: string | undefined;
     horizontalPadding: string | undefined;
@@ -12,12 +14,18 @@ export interface SelectionValue {
 interface UIState {
     selectionValues: object;
     disabled: boolean;
+    loading: boolean;
+    activeTab: TabNames;
+    projectURL: string;
 }
 
 export const uiState = createModel<RootModel>()({
     state: {
         selectionValues: {},
         disabled: false,
+        loading: false,
+        activeTab: 'start',
+        projectURL: '',
     } as UIState,
     reducers: {
         setDisabled: (state, data: boolean) => {
@@ -36,6 +44,24 @@ export const uiState = createModel<RootModel>()({
             return {
                 ...state,
                 selectionValues: {},
+            };
+        },
+        setLoading(state, payload: boolean) {
+            return {
+                ...state,
+                loading: payload,
+            };
+        },
+        setActiveTab(state, payload: TabNames) {
+            return {
+                ...state,
+                activeTab: payload,
+            };
+        },
+        setProjectURL(state, payload: string) {
+            return {
+                ...state,
+                projectURL: payload,
             };
         },
     },

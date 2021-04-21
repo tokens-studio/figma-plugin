@@ -1,8 +1,9 @@
+import {useDispatch} from 'react-redux';
+import {Dispatch} from '@/app/store';
 import {notifyToUI, postToFigma} from '../../../plugin/notifiers';
 import {StorageProviderType} from '../../../../types/api';
 import {MessageToPluginTypes} from '../../../../types/messages';
 import {ArcadeTokenType, TokenProps, TokenType} from '../../../../types/tokens';
-import {useTokenDispatch} from '../TokenContext';
 
 type ArcadeResponse = {
     exports: object;
@@ -92,7 +93,7 @@ async function writeTokensToArcade(): Promise<TokenProps> | null {
 }
 
 export default function useArcade() {
-    const {setProjectURL} = useTokenDispatch();
+    const dispatch = useDispatch<Dispatch>();
 
     async function updateArcadeTokens() {
         throw new Error('Not implemented');
@@ -207,7 +208,7 @@ export default function useArcade() {
             const res = await readTokensFromArcade({id, secret});
 
             if (res.exports) {
-                setProjectURL(`https://app.usearcade.com/projects/${id}`);
+                dispatch.uiState.setProjectURL(`https://app.usearcade.com/projects/${id}`);
                 postToFigma({
                     type: MessageToPluginTypes.CREDENTIALS,
                     id,

@@ -9,12 +9,12 @@ import {StorageProviderType} from '../../../types/api';
 import {RootState, Dispatch} from '../store';
 
 const TabButton = ({name, label, first = false}) => {
-    const activeTab = useSelector((state: RootState) => state.base.activeTab);
+    const activeTab = useSelector((state: RootState) => state.uiState.activeTab);
     const dispatch = useDispatch<Dispatch>();
 
     const onClick = () => {
         track('Switched tab', {from: activeTab, to: name});
-        dispatch.base.setActiveTab(name);
+        dispatch.uiState.setActiveTab(name);
     };
 
     return (
@@ -44,7 +44,8 @@ const transformProviderName = (provider) => {
 };
 
 const Navbar = () => {
-    const {storageType, projectURL} = useTokenState();
+    const {projectURL} = useSelector((state: RootState) => state.uiState);
+    const {storageType} = useTokenState();
     const {pullTokens} = useRemoteTokens();
 
     return (

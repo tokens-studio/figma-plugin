@@ -64,7 +64,7 @@ export default function Initiator() {
                         setLoading(false);
                         if (values) {
                             setTokenData(values);
-                            dispatch.base.setActiveTab('tokens');
+                            dispatch.uiState.setActiveTab('tokens');
                         }
                         break;
                     }
@@ -73,7 +73,7 @@ export default function Initiator() {
                         if (values) {
                             track('Import styles');
                             setTokensFromStyles(values);
-                            dispatch.base.setActiveTab('tokens');
+                            dispatch.uiState.setActiveTab('tokens');
                         }
                         break;
                     case MessageFromPluginTypes.RECEIVED_STORAGE_TYPE:
@@ -87,7 +87,7 @@ export default function Initiator() {
                             const remoteValues = await fetchDataFromRemote(id, secret, name, provider);
                             if (remoteValues) {
                                 setTokenData(remoteValues);
-                                dispatch.base.setActiveTab('tokens');
+                                dispatch.uiState.setActiveTab('tokens');
                             }
                             setLoading(false);
                         }

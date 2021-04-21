@@ -1,4 +1,5 @@
 /* eslint-disable import/prefer-default-export */
+import {DEFAULT_DEPTH_LEVEL} from '@/app/components/constants';
 import {postToFigma} from '@/plugin/notifiers';
 import {track} from '@/utils/analytics';
 import {createModel} from '@rematch/core';
@@ -12,6 +13,7 @@ type WindowSettingsType = {
 
 interface SettingsState {
     uiWindow: WindowSettingsType;
+    depth: number;
 }
 
 const resizeWindow = (width, height) => {
@@ -28,6 +30,7 @@ export const settings = createModel<RootModel>()({
             width: 400,
             height: 600,
         },
+        depth: DEFAULT_DEPTH_LEVEL,
     } as SettingsState,
     reducers: {
         setWindowSize(state, payload: {width: number; height: number}) {
@@ -43,6 +46,12 @@ export const settings = createModel<RootModel>()({
         triggerWindowChange(state) {
             resizeWindow(state.uiWindow.width, state.uiWindow.height);
             return state;
+        },
+        setDepth(state, payload: number) {
+            return {
+                ...state,
+                depth: payload,
+            };
         },
     },
 });

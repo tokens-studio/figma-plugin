@@ -1,3 +1,5 @@
+import {useDispatch} from 'react-redux';
+import {Dispatch} from '@/app/store';
 import {notifyToUI, postToFigma} from '../../../plugin/notifiers';
 import {StorageProviderType} from '../../../../types/api';
 import {MessageToPluginTypes} from '../../../../types/messages';
@@ -79,7 +81,8 @@ export async function updateJSONBinTokens({tokens, id, secret, updatedAt, oldUpd
 }
 
 export function useJSONbin() {
-    const {setProjectURL, setApiData, setStorageType} = useTokenDispatch();
+    const dispatch = useDispatch<Dispatch>();
+    const {setApiData, setStorageType} = useTokenDispatch();
 
     async function createNewJSONBin({provider, secret, tokens, name, updatedAt}): Promise<TokenProps> {
         const response = await fetch(`https://api.jsonbin.io/b`, {
@@ -132,7 +135,7 @@ export function useJSONbin() {
 
         try {
             const jsonBinData = await readTokensFromJSONBin({id, secret});
-            setProjectURL(`https://jsonbin.io/${id}`);
+            dispatch.uiState.setProjectURL(`https://jsonbin.io/${id}`);
 
             if (jsonBinData) {
                 postToFigma({
