@@ -5,7 +5,6 @@ import setValuesOnNode from './updateNode';
 import {TokenProps} from '../../types/tokens';
 import {StorageProviderType, StorageType} from '../../types/api';
 import {isSingleToken} from '../app/components/utils';
-import {transformValue} from './helpers';
 import * as pjs from '../../package.json';
 
 function returnValueToLookFor(key) {
@@ -26,8 +25,7 @@ export function mapValuesToTokens(tokens, values): object {
         const resolvedToken = tokens.find((token) => token.name === tokenOnNode);
         if (!resolvedToken) return acc;
 
-        const value = isSingleToken(resolvedToken) ? resolvedToken[returnValueToLookFor(key)] : resolvedToken;
-        acc[key] = transformValue(value, key);
+        acc[key] = isSingleToken(resolvedToken) ? resolvedToken[returnValueToLookFor(key)] : resolvedToken;
         return acc;
     }, {});
     return mappedValues;
@@ -40,12 +38,18 @@ export function setTokensOnDocument(tokens, updatedAt: string) {
 }
 
 export function getTokenData(): {values: TokenProps; updatedAt: string; version: string} {
-    const values = figma.root.getSharedPluginData('tokens', 'values');
-    const version = figma.root.getSharedPluginData('tokens', 'version');
-    const updatedAt = figma.root.getSharedPluginData('tokens', 'updatedAt');
-    if (values) {
-        const parsedValues = JSON.parse(values);
-        return {values: parsedValues, updatedAt, version};
+    try {
+        const values = figma.root.getSharedPluginData('tokens', 'values');
+        const version = figma.root.getSharedPluginData('tokens', 'version');
+        const updatedAt = figma.root.getSharedPluginData('tokens', 'updatedAt');
+        if (values) {
+            const parsedValues = JSON.parse(values);
+            if (Object.keys(parsedValues).length > 0) {
+                return {values: parsedValues, updatedAt, version};
+            }
+        }
+    } catch (e) {
+        console.log('Error reading tokens', e);
     }
     return null;
 }

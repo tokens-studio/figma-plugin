@@ -1,7 +1,7 @@
 import {Parser} from 'expr-eval';
 import {postToFigma} from '../../plugin/notifiers';
 import {MessageToPluginTypes} from '../../../types/messages';
-import {hexToRgb, RGBAToHexA} from '../../plugin/helpers';
+import {hexToRgb, RGBAToHexA} from '../../plugin/figmaTransforms/colors';
 
 const parser = new Parser();
 

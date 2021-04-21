@@ -1,3 +1,5 @@
+import {transformValue} from './helpers';
+
 export default async function setTextValuesOnTarget(target, token) {
     try {
         const {value, description} = token;
@@ -14,17 +16,16 @@ export default async function setTextValuesOnTarget(target, token) {
         }
 
         if (fontSize) {
-            target.fontSize = fontSize;
+            target.fontSize = transformValue(fontSize, 'fontSizes');
         }
         if (lineHeight) {
-            target.lineHeight = lineHeight;
+            target.lineHeight = transformValue(lineHeight, 'lineHeights');
         }
-
         if (letterSpacing) {
-            target.letterSpacing = letterSpacing;
+            target.letterSpacing = transformValue(letterSpacing, 'letterSpacing');
         }
         if (paragraphSpacing) {
-            target.paragraphSpacing = paragraphSpacing;
+            target.paragraphSpacing = transformValue(paragraphSpacing, 'paragraphSpacing');
         }
         if (description) {
             target.description = description;

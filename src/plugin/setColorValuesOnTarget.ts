@@ -1,4 +1,5 @@
-import {convertStringToFigmaGradient, convertToFigmaColor} from './helpers';
+import {convertToFigmaColor} from './figmaTransforms/colors';
+import {convertStringToFigmaGradient} from './figmaTransforms/gradients';
 
 export default function setColorValuesOnTarget(target, token, key = 'paints') {
     try {

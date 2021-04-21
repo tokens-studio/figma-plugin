@@ -31,6 +31,11 @@ export default async function removeValuesFromNode(node, prop) {
                 node.strokeWeight = 0;
             }
             break;
+        case 'boxShadow':
+            if (typeof node.effects !== 'undefined') {
+                node.effects = node.effects.filter((effect) => effect.type !== 'DROP_SHADOW');
+            }
+            break;
         case 'opacity':
             if (typeof node.opacity !== 'undefined') {
                 node.opacity = 1;
