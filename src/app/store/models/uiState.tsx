@@ -1,6 +1,8 @@
 /* eslint-disable import/prefer-default-export */
+import fetchChangelog from '@/utils/storyblok';
 import {createModel} from '@rematch/core';
-import {StorageType} from '@types/api';
+import {StorageType, StorageProviderType, ApiDataType} from '@types/api';
+
 import {RootModel} from '.';
 
 type TabNames = 'start' | 'tokens' | 'json' | 'inspector' | 'syncsettings' | 'settings';
@@ -20,6 +22,12 @@ interface UIState {
     projectURL: string;
     editProhibited: boolean;
     storageType: StorageType;
+    api: ApiDataType;
+    apiProviders: ApiDataType[];
+    localApiState: ApiDataType;
+    lastUpdatedAt: Date | null;
+    changelog: object[];
+    lastOpened: string | null;
 }
 
 export const uiState = createModel<RootModel>()({
@@ -30,7 +38,28 @@ export const uiState = createModel<RootModel>()({
         activeTab: 'start',
         projectURL: '',
         editProhibited: false,
-        storageType: null,
+        storageType: {
+            provider: StorageProviderType.LOCAL,
+            id: '',
+            name: '',
+        },
+        api: {
+            id: '',
+            secret: '',
+            provider: '',
+            name: '',
+        },
+        apiProviders: [],
+        localApiState: {
+            id: '',
+            secret: '',
+            name: '',
+            provider: '',
+            new: false,
+        },
+        lastUpdatedAt: null,
+        changelog: [],
+        lastOpened: '',
     } as UIState,
     reducers: {
         setDisabled: (state, data: boolean) => {
@@ -83,5 +112,42 @@ export const uiState = createModel<RootModel>()({
                 editProhibited: false,
             };
         },
+        setApiData(state, payload: ApiDataType) {
+            return {
+                ...state,
+                api: payload,
+            };
+        },
+        setLocalApiState(state, payload: ApiDataType) {
+            return {
+                ...state,
+                localApiState: payload,
+            };
+        },
+        setAPIProviders(state, payload: ApiDataType[]) {
+            return {
+                ...state,
+                apiProviders: payload,
+            };
+        },
+        setChangelog(state, payload: object[]) {
+            return {
+                ...state,
+                changelog: payload,
+            };
+        },
+        setLastOpened(state, payload: Date) {
+            return {
+                ...state,
+                lastOpened: payload,
+            };
+        },
     },
+    effects: (dispatch) => ({
+        setLastOpened: (payload) => {
+            fetchChangelog(payload, (result) => {
+                dispatch.uiState.setChangelog(result);
+            });
+        },
+    }),
 });

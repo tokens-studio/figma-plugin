@@ -1,21 +1,19 @@
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {SingleToken, TokenProps} from '@types/tokens';
 import {StorageProviderType} from '@types/api';
 import {notifyToUI} from '../../plugin/notifiers';
 import {useJSONbin} from './providers/jsonbin';
 import useArcade from './providers/arcade';
-import {useTokenDispatch, useTokenState} from './TokenContext';
+import {useTokenDispatch} from './TokenContext';
 import {compareUpdatedAt} from '../components/utils';
-import {Dispatch} from '../store';
-import useTokens from './useTokens';
+import {Dispatch, RootState} from '../store';
 import useStorage from './useStorage';
 
 export default function useRemoteTokens() {
     const dispatch = useDispatch<Dispatch>();
+    const {api, lastUpdatedAt, localApiState} = useSelector((state: RootState) => state.uiState);
 
-    const {api, updateAfterApply, lastUpdatedAt, localApiState} = useTokenState();
-    const {setLoading, setApiData} = useTokenDispatch();
-    const {updateTokens} = useTokens();
+    const {setLoading} = useTokenDispatch();
     const {setStorageType} = useStorage();
     const {fetchDataFromArcade, editArcadeToken, createArcadeToken, deleteArcadeToken} = useArcade();
     const {fetchDataFromJSONBin, createNewJSONBin} = useJSONbin();
@@ -112,7 +110,7 @@ export default function useRemoteTokens() {
         const remoteTokens = await fetchDataFromRemote(id, secret, name, provider as StorageProviderType);
         if (remoteTokens) {
             setStorageType({provider: {provider, id, name}, bool: true});
-            setApiData({id, secret, name, provider});
+            dispatch.uiState.setApiData({id, secret, name, provider});
             const comparison = await compareUpdatedAt(lastUpdatedAt, remoteTokens);
             if (comparison === 'remote_older') {
                 dispatch.tokenState.setTokenData(remoteTokens);

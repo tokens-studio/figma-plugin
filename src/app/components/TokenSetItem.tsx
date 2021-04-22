@@ -4,7 +4,7 @@ import {getEmptyImage} from 'react-dnd-html5-backend';
 import {XYCoord} from 'dnd-core';
 import {ContextMenu, ContextMenuTrigger, MenuItem} from 'react-contextmenu';
 import {useSelector} from 'react-redux';
-import {useTokenDispatch, useTokenState} from '../store/TokenContext';
+import {useTokenDispatch} from '../store/TokenContext';
 import {RootState} from '../store';
 
 interface DragItem {

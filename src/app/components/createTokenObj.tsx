@@ -11,12 +11,28 @@ function sortTokens(tokens) {
     });
 }
 
+function transformName(name) {
+    switch (name) {
+        case 'color':
+        case 'colors':
+            return 'color';
+        case 'space':
+        case 'spacing':
+            return 'spacing';
+        case 'size':
+        case 'sizing':
+            return 'sizing';
+        default:
+            return name;
+    }
+}
+
 // Creates a tokens object so that tokens are displayed in groups in the UI. Respects the default depth level we set in our constants
 export function createTokensObject(tokens: SingleTokenObject[], uiDepth) {
     const tokensSorted = sortTokens(tokens);
     const obj = tokensSorted.reduce((acc, cur) => {
         const hasTypeProp = cur.type && cur.type !== '' && cur.type !== 'undefined';
-        const propToSet = hasTypeProp ? cur.type : cur.name.split('.').slice(1, 2).toString();
+        const propToSet = hasTypeProp ? cur.type : transformName(cur.name.split('.').slice(0, 1).toString());
         acc[propToSet] = acc[propToSet] || {values: {}};
         const depth = uiDepth === cur.name.split('.').length ? uiDepth - 1 : uiDepth;
         const groupName = cur.name.split('.').slice(0, depth).join('.');

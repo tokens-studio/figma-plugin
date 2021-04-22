@@ -4,7 +4,7 @@ import {DndProvider} from 'react-dnd';
 import {HTML5Backend} from 'react-dnd-html5-backend';
 import {useSelector} from 'react-redux';
 import {RootState} from '../store';
-import {useTokenDispatch, useTokenState} from '../store/TokenContext';
+import {useTokenDispatch} from '../store/TokenContext';
 import Button from './Button';
 import Heading from './Heading';
 import Icon from './Icon';

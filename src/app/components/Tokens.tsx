@@ -1,7 +1,6 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import * as React from 'react';
 import {useSelector} from 'react-redux';
-import {useTokenState} from '../store/TokenContext';
 import TokenListing from './TokenListing';
 import TokensBottomBar from './TokensBottomBar';
 import ToggleEmptyButton from './ToggleEmptyButton';
@@ -22,14 +21,20 @@ interface TokenListingType {
 }
 
 const Tokens = () => {
-    const settings = useSelector((state: RootState) => state.settings);
+    const {depth} = useSelector((state: RootState) => state.settings);
     const {tokens, activeTokenSet} = useSelector((state: RootState) => state.tokenState);
 
     const [tokenValues, setTokenValues] = React.useState([]);
 
+    const memoizedTokens = React.useMemo(() => {
+        console.log('Memo changed');
+        return mappedTokens(tokens[activeTokenSet].values, depth);
+    }, [depth, tokens, activeTokenSet]);
+
     React.useEffect(() => {
-        setTokenValues(mappedTokens(tokens[activeTokenSet].values, settings.depth));
-    }, [tokens, activeTokenSet, settings.depth]);
+        console.log('effect changed', memoizedTokens);
+        setTokenValues(memoizedTokens);
+    }, [memoizedTokens]);
 
     return (
         <div>

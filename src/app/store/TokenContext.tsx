@@ -1,13 +1,10 @@
 import * as React from 'react';
-import fetchChangelog from '@/utils/storyblok';
-import {StorageProviderType, ApiDataType} from '../../../types/api';
 import {postToFigma} from '../../plugin/notifiers';
 import {MessageToPluginTypes} from '../../../types/messages';
 
 export enum ActionType {
     SetTokensFromStyles = 'SET_TOKENS_FROM_STYLES',
     SetLoading = 'SET_LOADING',
-    SetStringTokens = 'SET_STRING_TOKENS',
     PullStyles = 'PULL_STYLES',
     SetShowEditForm = 'SET_SHOW_EDIT_FORM',
     SetShowNewGroupForm = 'SET_SHOW_NEW_GROUP_FORM',
@@ -15,19 +12,14 @@ export enum ActionType {
     SetDisplayType = 'SET_DISPLAY_TYPE',
     ToggleColorMode = 'TOGGLE_COLOR_MODE',
     SetCollapsed = 'SET_COLLAPSED',
-    SetApiData = 'SET_API_DATA',
     ToggleShowEmptyGroups = 'TOGGLE_SHOW_EMPTY_GROUPS',
     ToggleUpdateAfterApply = 'TOGGLE_UPDATE_AFTER_APPLY',
-    SetAPIProviders = 'SET_API_PROVIDERS',
-    SetLocalApiState = 'SET_LOCAL_API_STATE',
     SetActiveTokenSet = 'SET_ACTIVE_TOKEN_SET',
     ToggleUsedTokenSet = 'TOGGLE_USED_TOKEN_SET',
     AddTokenSet = 'ADD_TOKEN_SET',
     DeleteTokenSet = 'DELETE_TOKEN_SET',
     RenameTokenSet = 'RENAME_TOKEN_SET',
     SetTokenSetOrder = 'SET_TOKEN_SET_ORDER',
-    SetChangelog = 'SET_CHANGELOG',
-    SetLastOpened = 'SET_LAST_OPENED',
     CreateTokenGroup = 'CREATE_TOKEN_GROUP',
     SetSyncEnabled = 'SET_SYNC_ENABLED',
 }
@@ -41,29 +33,7 @@ const emptyState = {
     showNewGroupForm: false,
     showEmptyGroups: true,
     showOptions: false,
-    storageType: {
-        provider: StorageProviderType.LOCAL,
-        id: '',
-        name: '',
-    },
-    api: {
-        id: '',
-        secret: '',
-        provider: '',
-        name: '',
-    },
-    localApiState: {
-        id: '',
-        secret: '',
-        name: '',
-        provider: '',
-        new: false,
-    },
-    apiProviders: [],
     updateAfterApply: true,
-    changelog: [],
-    lastOpened: '',
-    lastUpdatedAt: null,
 };
 
 const TokenStateContext = React.createContext(emptyState);
@@ -134,23 +104,7 @@ function stateReducer(state, action) {
                 ...state,
                 collapsed: !state.collapsed,
             };
-        case ActionType.SetApiData:
-            return {
-                ...state,
-                api: action.data,
-            };
-        case ActionType.SetLocalApiState: {
-            return {
-                ...state,
-                localApiState: action.data,
-            };
-        }
-        case ActionType.SetAPIProviders: {
-            return {
-                ...state,
-                apiProviders: action.data,
-            };
-        }
+
         case ActionType.ToggleShowEmptyGroups:
             return {
                 ...state,
@@ -199,21 +153,6 @@ function stateReducer(state, action) {
                 tokenData: state.tokenData,
             };
         }
-
-        case ActionType.SetChangelog:
-            return {
-                ...state,
-                changelog: action.data,
-            };
-        case ActionType.SetLastOpened:
-            fetchChangelog(action.data, (result) => {
-                action.dispatch({type: ActionType.SetChangelog, data: result});
-            });
-
-            return {
-                ...state,
-                lastOpened: action.data,
-            };
 
         case ActionType.CreateTokenGroup: {
             console.log('Not implemented');
@@ -270,12 +209,6 @@ function TokenProvider({children}) {
             setCollapsed: () => {
                 dispatch({type: ActionType.SetCollapsed});
             },
-            setApiData: (data: ApiDataType) => {
-                dispatch({type: ActionType.SetApiData, data});
-            },
-            setLocalApiState: (data: ApiDataType) => {
-                dispatch({type: ActionType.SetLocalApiState, data});
-            },
             toggleShowEmptyGroups: () => {
                 dispatch({type: ActionType.ToggleShowEmptyGroups});
             },
@@ -285,9 +218,7 @@ function TokenProvider({children}) {
             toggleUsedTokenSet: (data: string) => {
                 dispatch({type: ActionType.ToggleUsedTokenSet, data, updatedAt});
             },
-            setAPIProviders: (data: ApiDataType[]) => {
-                dispatch({type: ActionType.SetAPIProviders, data});
-            },
+
             setActiveTokenSet: (data: string) => {
                 dispatch({type: ActionType.SetActiveTokenSet, data});
             },
@@ -303,18 +234,9 @@ function TokenProvider({children}) {
             setTokenSetOrder: (data: string[]) => {
                 dispatch({type: ActionType.SetTokenSetOrder, data, updatedAt});
             },
-            setChangelog: (data: object[]) => {
-                dispatch({type: ActionType.SetChangelog, data});
-            },
-            setLastOpened: (data: Date) => {
-                dispatch({type: ActionType.SetLastOpened, data, dispatch});
-            },
 
             createTokenGroup: (data: {parent: string; name: string; updatedAt: Date}) => {
                 dispatch({type: ActionType.CreateTokenGroup, data});
-            },
-            setSyncEnabled: (data: boolean) => {
-                dispatch({type: ActionType.SetSyncEnabled, data});
             },
         }),
         [dispatch, updatedAt]

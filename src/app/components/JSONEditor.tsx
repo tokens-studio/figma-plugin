@@ -25,6 +25,7 @@ const JSONEditor = () => {
     }, [tokens, activeTokenSet]);
 
     const handleUpdate = async () => {
+        dispatch.tokenState.setJSONData(stringTokens);
         await setLoading(true);
     };
 

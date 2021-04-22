@@ -1,7 +1,6 @@
 import * as React from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {track} from '@/utils/analytics';
-import {useTokenState} from '../store/TokenContext';
 import Icon from './Icon';
 import Tooltip from './Tooltip';
 import useRemoteTokens from '../store/remoteTokens';
@@ -44,8 +43,7 @@ const transformProviderName = (provider) => {
 };
 
 const Navbar = () => {
-    const {projectURL} = useSelector((state: RootState) => state.uiState);
-    const {storageType} = useTokenState();
+    const {projectURL, storageType} = useSelector((state: RootState) => state.uiState);
     const {pullTokens} = useRemoteTokens();
 
     return (

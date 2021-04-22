@@ -1,16 +1,15 @@
 import * as React from 'react';
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import Heading from './Heading';
 import Button from './Button';
 import Callout from './Callout';
-import {useTokenState} from '../store/TokenContext';
 import {StorageProviderType} from '../../../types/api';
-import {Dispatch} from '../store';
+import {Dispatch, RootState} from '../store';
 
 const StartScreen = () => {
     const dispatch = useDispatch<Dispatch>();
 
-    const {storageType} = useTokenState();
+    const {storageType} = useSelector((state: RootState) => state.uiState);
     const onSetDefaultTokens = () => {
         dispatch.uiState.setActiveTab('tokens');
         dispatch.tokenState.setEmptyTokens();

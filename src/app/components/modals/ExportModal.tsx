@@ -1,12 +1,14 @@
 import React from 'react';
+import {useSelector} from 'react-redux';
+import {RootState} from '@/app/store';
 import Heading from '../Heading';
 import Textarea from '../Textarea';
-import {useTokenState} from '../../store/TokenContext';
 import Button from '../Button';
 import Modal from '../Modal';
 
 export default function ExportModal({onClose}) {
-    const {tokenData, activeTokenSet} = useTokenState();
+    // TODO: FIX ME
+    const {tokens, activeTokenSet} = useSelector((state: RootState) => state.tokenState);
 
     return (
         <Modal large isOpen close={onClose}>

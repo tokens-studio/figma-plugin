@@ -1,6 +1,7 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import * as React from 'react';
 import {track} from '@/utils/analytics';
+import {useDispatch, useSelector} from 'react-redux';
 import {useTokenDispatch, useTokenState} from '../store/TokenContext';
 import {StorageProviderType} from '../../../types/api';
 import Button from './Button';
@@ -10,12 +11,16 @@ import StorageItem from './StorageItem';
 import ProviderSelector from './StorageProviderSelector';
 import EditStorageItemModal from './modals/EditStorageItemModal';
 import CreateStorageItemModal from './modals/CreateStorageItemModal';
-import useRemoteTokens from '../store/remoteTokens';
+import useStorage from '../store/useStorage';
+import {Dispatch, RootState} from '../store';
 
 const SyncSettings = () => {
-    const {api, storageType, localApiState, apiProviders, updateAfterApply} = useTokenState();
-    const {setLocalApiState, toggleUpdateAfterApply} = useTokenDispatch();
-    const {setStorageType} = useRemoteTokens();
+    const {api, localApiState, apiProviders, storageType} = useSelector((state: RootState) => state.uiState);
+    const dispatch = useDispatch<Dispatch>();
+
+    const {updateAfterApply} = useTokenState();
+    const {toggleUpdateAfterApply} = useTokenDispatch();
+    const {setStorageType} = useStorage();
 
     const [confirmModalVisible, showConfirmModal] = React.useState(false);
     const [editStorageItemModalVisible, setShowEditStorageModalVisible] = React.useState(Boolean(localApiState.new));
@@ -23,7 +28,7 @@ const SyncSettings = () => {
 
     const handleEditClick = (provider) => {
         track('Edit Credentials');
-        setLocalApiState({
+        dispatch.uiState.setLocalApiState({
             id: provider.id,
             name: provider.name,
             provider: provider.provider,

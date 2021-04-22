@@ -11,14 +11,7 @@ import useStorage from '../store/useStorage';
 export default function Initiator() {
     const dispatch = useDispatch<Dispatch>();
 
-    const {
-        setLoading,
-        setTokensFromStyles,
-        setApiData,
-        setLocalApiState,
-        setAPIProviders,
-        setLastOpened,
-    } = useTokenDispatch();
+    const {setLoading, setTokensFromStyles} = useTokenDispatch();
     const {fetchDataFromRemote} = useRemoteTokens();
     const {setStorageType} = useStorage();
 
@@ -82,8 +75,8 @@ export default function Initiator() {
                     case MessageFromPluginTypes.API_CREDENTIALS: {
                         if (status === true) {
                             const {id, secret, name, provider} = credentials;
-                            setApiData({id, secret, name, provider});
-                            setLocalApiState({id, secret, name, provider});
+                            dispatch.uiState.setApiData({id, secret, name, provider});
+                            dispatch.uiState.setLocalApiState({id, secret, name, provider});
                             const remoteValues = await fetchDataFromRemote(id, secret, name, provider);
                             if (remoteValues) {
                                 dispatch.tokenState.setTokenData(remoteValues);
@@ -94,7 +87,7 @@ export default function Initiator() {
                         break;
                     }
                     case MessageFromPluginTypes.API_PROVIDERS: {
-                        setAPIProviders(providers);
+                        dispatch.uiState.setAPIProviders(providers);
                         break;
                     }
                     case MessageFromPluginTypes.UI_SETTINGS: {
@@ -108,7 +101,7 @@ export default function Initiator() {
                         break;
                     }
                     case MessageFromPluginTypes.RECEIVED_LAST_OPENED: {
-                        setLastOpened(lastOpened);
+                        dispatch.uiState.setLastOpened(lastOpened);
                         break;
                     }
                     default:

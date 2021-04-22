@@ -50,17 +50,21 @@ export default async function updateTokensOnSources({
     updatedAt,
     shouldUpdateRemote = true,
     isLocal,
+    editProhibited,
+    storageType,
+    api,
+    lastUpdatedAt,
 }) {
     console.log('update on sources', tokens, usedTokenSet);
     // TODO: FIX THIS
-    if (!isLocal && shouldUpdateRemote && !state.editProhibited) {
+    if (!isLocal && shouldUpdateRemote && !editProhibited) {
         updateRemoteTokens({
-            provider: state.storageType.provider,
+            provider: storageType.provider,
             tokens: reduceToValues(tokens),
-            id: state.api.id,
-            secret: state.api.secret,
+            id: api.id,
+            secret: api.secret,
             updatedAt,
-            oldUpdatedAt: state.lastUpdatedAt,
+            oldUpdatedAt: lastUpdatedAt,
         });
     }
     postToFigma({
