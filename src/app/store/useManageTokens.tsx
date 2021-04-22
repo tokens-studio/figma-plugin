@@ -10,7 +10,6 @@ export default function useManageTokens() {
     const {editToken, createToken, deleteToken} = useDispatch<Dispatch>().tokenState;
     const {storageType} = useSelector((state: RootState) => state.uiState);
 
-    const {updateTokens} = useTokens();
     const {setLoading} = useTokenDispatch();
     const {editRemoteToken, createRemoteToken, deleteRemoteToken} = useRemoteTokens();
 
@@ -29,7 +28,6 @@ export default function useManageTokens() {
             shouldUpdate = await editRemoteToken(data);
         }
         if (shouldUpdate) {
-            console.log('Updating edit token');
             editToken({
                 parent,
                 name,

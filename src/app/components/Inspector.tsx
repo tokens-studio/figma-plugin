@@ -8,7 +8,7 @@ import Tooltip from './Tooltip';
 
 const Inspector = () => {
     const uiState = useSelector((state: RootState) => state.uiState);
-    const {getTokenValue, removeNodeData} = useTokens();
+    const {findToken, removeNodeData} = useTokens();
 
     return (
         <div className="space-y-2 p-4">
@@ -23,7 +23,7 @@ const Inspector = () => {
                                     ${typeof value === 'string' && value.split('.').join('-')}
                                 </div>
                                 <div className="text-gray-500 break-all">
-                                    {`/* ${JSON.stringify(getTokenValue(value))} */`}
+                                    {`/* ${JSON.stringify(findToken(value))} */`}
                                 </div>
                             </code>
                             <Tooltip label="Remove token from layer" variant="right">

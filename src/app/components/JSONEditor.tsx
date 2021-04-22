@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import Textarea from './Textarea';
 import Heading from './Heading';
 import {useTokenDispatch} from '../store/TokenContext';
@@ -8,23 +8,28 @@ import Modal from './Modal';
 import TokenSetSelector from './TokenSetSelector';
 import ExportModal from './modals/ExportModal';
 import PresetModal from './modals/PresetModal';
-import {RootState} from '../store';
+import {Dispatch, RootState} from '../store';
 
 const JSONEditor = () => {
     const {tokens, activeTokenSet, editProhibited} = useSelector((state: RootState) => state.tokenState);
+    const dispatch = useDispatch<Dispatch>();
 
-    const {setEmptyTokens, setLoading} = useTokenDispatch();
+    const {setLoading} = useTokenDispatch();
     const [confirmModalVisible, showConfirmModal] = React.useState('');
     const [exportModalVisible, showExportModal] = React.useState(false);
     const [presetModalVisible, showPresetModal] = React.useState(false);
     const [stringTokens, setStringTokens] = React.useState(JSON.stringify(tokens[activeTokenSet]?.values, null, 2));
+
+    React.useEffect(() => {
+        setStringTokens(JSON.stringify(tokens[activeTokenSet]?.values, null, 2));
+    }, [tokens, activeTokenSet]);
 
     const handleUpdate = async () => {
         await setLoading(true);
     };
 
     const handleSetEmpty = () => {
-        setEmptyTokens();
+        dispatch.tokenState.setEmptyTokens();
         showConfirmModal('');
     };
 

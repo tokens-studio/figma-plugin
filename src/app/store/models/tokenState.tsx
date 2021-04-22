@@ -1,10 +1,20 @@
 /* eslint-disable import/prefer-default-export */
 import convertToTokenArray from '@/utils/convertTokens';
 import {createModel} from '@rematch/core';
-import {SingleTokenObject, TokenGroup, SingleToken} from '@types/tokens';
+import {SingleTokenObject, TokenGroup, SingleToken, TokenProps} from '@types/tokens';
 import {StorageProviderType} from '@types/api';
+import defaultJSON from '@/config/default.json';
 import {RootModel} from '.';
 import updateTokensOnSources from '../updateSources';
+import * as pjs from '../../../../package.json';
+
+const defaultTokens: TokenProps = {
+    version: pjs.plugin_version,
+    updatedAt: new Date().toString(),
+    values: {
+        options: defaultJSON,
+    },
+};
 
 type TokenInput = {
     name: string;
@@ -20,6 +30,7 @@ type EditTokenInput = TokenInput & {
 type DeleteTokenInput = {parent: string; path: string};
 
 const parseTokenValues = (tokens) => {
+    console.log('Parsing token values', tokens);
     if (Array.isArray(tokens)) {
         return {
             global: {
@@ -31,11 +42,14 @@ const parseTokenValues = (tokens) => {
     const reducedTokens = Object.entries(tokens).reduce((prev, group) => {
         const parsedGroup = group[1];
         if (typeof parsedGroup === 'object') {
+            console.log('Parsing group', parsedGroup);
             const groupValues = [];
             const convertedToArray = convertToTokenArray({tokens: parsedGroup});
+            console.log('after', convertedToArray);
             convertedToArray.forEach(([key, value]) => {
                 groupValues.push({name: key, ...value});
             });
+            console.log('after after', convertedToArray);
             const convertedGroup = groupValues;
             prev.push({[group[0]]: {type: 'array', values: convertedGroup}});
             return prev;
@@ -73,6 +87,14 @@ export const tokenState = createModel<RootModel>()({
                 tokens: parseTokenValues(data.values),
                 activeTokenSet: Array.isArray(data.values) ? 'global' : Object.keys(data.values)[0],
                 usedTokenSet: Array.isArray(data.values) ? ['global'] : [Object.keys(data.values)[0]],
+            };
+        },
+        setDefaultTokens: (state) => {
+            return {
+                ...state,
+                tokens: parseTokenValues(defaultTokens.values),
+                activeTokenSet: Object.keys(defaultTokens.values)[0],
+                usedTokenSet: [Object.keys(defaultTokens.values)[0]],
             };
         },
         setEmptyTokens: (state) => {
@@ -147,16 +169,13 @@ export const tokenState = createModel<RootModel>()({
         },
     },
     effects: (dispatch) => ({
-        editToken(payload, rootState) {
-            console.log('edit token done', rootState.tokenState); // log current state of example model
+        editToken() {
             dispatch.tokenState.updateDocument();
         },
-        setTokenData(payload, rootState) {
-            console.log('set token done', rootState.tokenState); // log current state of example model
+        setTokenData() {
             dispatch.tokenState.updateDocument();
         },
-        createToken(payload, rootState) {
-            console.log('create token done', rootState.tokenState); // log current state of example model
+        createToken() {
             dispatch.tokenState.updateDocument();
         },
         updateDocument(payload, rootState) {
@@ -164,7 +183,7 @@ export const tokenState = createModel<RootModel>()({
                 tokens: rootState.tokenState.tokens,
                 usedTokenSet: rootState.tokenState.usedTokenSet,
                 updatePageOnly: rootState.settings.updatePageOnly,
-                updatedAt: Date.now(),
+                updatedAt: new Date().toString(),
                 isLocal: rootState.uiState.storageType.provider === StorageProviderType.LOCAL,
             });
         },

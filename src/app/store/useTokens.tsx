@@ -15,8 +15,11 @@ export default function useTokens() {
     // Return tokens that are included in currently active token set and optionally resolve all aliases
     const resolvedTokens = React.useMemo(() => computeMergedTokens(tokens, usedTokenSet, true), [tokens, usedTokenSet]);
 
+    function findToken(token: string) {
+        return resolvedTokens.find((n) => n.name === token);
+    }
+
     function getTokenValue(token: string) {
-        console.log('getting token value', token, resolvedTokens);
         if (checkIfAlias(token, resolvedTokens)) {
             return getAliasValue(token, resolvedTokens);
         }
@@ -49,6 +52,7 @@ export default function useTokens() {
     }
 
     return {
+        findToken,
         setNodeData,
         removeNodeData,
         getTokenValue,

@@ -2,6 +2,7 @@ import {SingleToken} from '@types/tokens';
 import {aliasRegex, getAliasValue} from './aliases';
 import checkIfValueToken from './checkIfValueToken';
 
+// Checks if token is an alias token and if it has a valid reference
 export default function checkIfAlias(token: SingleToken, allTokens = []): boolean {
     let aliasToken = false;
     if (typeof token === 'string') {

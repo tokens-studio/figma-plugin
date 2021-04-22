@@ -68,5 +68,6 @@ export default async function updateTokensOnSources({
         tokenValues: reduceToValues(tokens),
         tokens: computeMergedTokens(tokens, usedTokenSet, true),
         updatePageOnly,
+        updatedAt,
     });
 }

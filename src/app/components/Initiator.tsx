@@ -23,15 +23,12 @@ export default function Initiator() {
     const {setStorageType} = useStorage();
 
     const onInitiate = () => {
-        console.log('Before initiate');
         postToFigma({type: MessageToPluginTypes.INITIATE});
     };
 
     React.useEffect(() => {
         onInitiate();
-        console.log('initiated');
         window.onmessage = async (event) => {
-            console.log('got message');
             if (event.data.pluginMessage) {
                 const {
                     type,
