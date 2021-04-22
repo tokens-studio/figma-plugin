@@ -1,24 +1,23 @@
 import * as React from 'react';
 import {track} from '@/utils/analytics';
-import {useDispatch, useSelector} from 'react-redux';
+import {useSelector} from 'react-redux';
 import Tooltip from './Tooltip';
 import MoreButton from './MoreButton';
 import {useTokenState, useTokenDispatch} from '../store/TokenContext';
 import Icon from './Icon';
 import {lightOrDark, isTypographyToken} from './utils';
 import useManageTokens from '../store/useManageTokens';
-import useReadTokens from '../store/useReadTokens';
-import {Dispatch, RootState} from '../store';
+import {RootState} from '../store';
 import {DEFAULT_DEPTH_LEVEL} from './constants';
+import useTokens from '../store/useTokens';
 
 const TokenButton = ({type, property, token, editMode, showForm}) => {
     const uiState = useSelector((state: RootState) => state.uiState);
     const {activeTokenSet} = useSelector((state: RootState) => state.tokenState);
-    const {setNodeData} = useFigma();
+    const {setNodeData, getTokenValue} = useTokens();
     const {displayType} = useTokenState();
     const {setShowOptions, setLoading} = useTokenDispatch();
     const {deleteSingleToken} = useManageTokens();
-    const {getTokenValue} = useReadTokens();
 
     const displayValue = getTokenValue(token);
     let style;

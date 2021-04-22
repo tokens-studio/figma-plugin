@@ -3,18 +3,16 @@ import * as React from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {Dispatch, RootState} from '../store';
 
-import useReadTokens from '../store/useReadTokens';
 import Button from './Button';
 
 export default function TokensBottomBar() {
     const {updatePageOnly} = useSelector((state: RootState) => state.settings);
     const {setUpdatePageOnly} = useDispatch<Dispatch>().settings;
-
-    const {updateTokens} = useReadTokens();
+    const {updateDocument} = useDispatch<Dispatch>().tokenState;
 
     const handleUpdate = async () => {
         track('Update Tokens');
-        updateTokens();
+        updateDocument();
     };
 
     return (

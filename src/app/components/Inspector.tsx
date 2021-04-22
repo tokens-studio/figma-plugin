@@ -1,20 +1,14 @@
-import {getMergedTokens} from '@/plugin/tokenHelpers';
 import * as React from 'react';
 import {useSelector} from 'react-redux';
 import {RootState} from '../store';
-import {useTokenState, useTokenDispatch} from '../store/TokenContext';
+import useTokens from '../store/useTokens';
 import Button from './Button';
 import Icon from './Icon';
 import Tooltip from './Tooltip';
 
 const Inspector = () => {
     const uiState = useSelector((state: RootState) => state.uiState);
-
-    const {tokens, usedTokenSet} = useTokenState();
-    const {removeNodeData} = useTokenDispatch();
-    const getValue = (value) => {
-        return getMergedTokens(tokens, usedTokenSet).find((n) => n.name === value);
-    };
+    const {getTokenValue, removeNodeData} = useTokens();
 
     return (
         <div className="space-y-2 p-4">
@@ -29,7 +23,7 @@ const Inspector = () => {
                                     ${typeof value === 'string' && value.split('.').join('-')}
                                 </div>
                                 <div className="text-gray-500 break-all">
-                                    {`/* ${JSON.stringify(getValue(value))} */`}
+                                    {`/* ${JSON.stringify(getTokenValue(value))} */`}
                                 </div>
                             </code>
                             <Tooltip label="Remove token from layer" variant="right">

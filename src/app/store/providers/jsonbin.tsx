@@ -7,6 +7,7 @@ import {TokenProps} from '../../../../types/tokens';
 import {compareUpdatedAt} from '../../components/utils';
 import {useTokenDispatch} from '../TokenContext';
 import * as pjs from '../../../../package.json';
+import useStorage from '../useStorage';
 
 async function readTokensFromJSONBin({secret, id}): Promise<TokenProps> | null {
     const response = await fetch(`https://api.jsonbin.io/b/${id}/latest`, {
@@ -83,6 +84,7 @@ export async function updateJSONBinTokens({tokens, id, secret, updatedAt, oldUpd
 export function useJSONbin() {
     const dispatch = useDispatch<Dispatch>();
     const {setApiData} = useTokenDispatch();
+    const {setStorageType} = useStorage();
 
     async function createNewJSONBin({provider, secret, tokens, name, updatedAt}): Promise<TokenProps> {
         const response = await fetch(`https://api.jsonbin.io/b`, {
@@ -106,7 +108,7 @@ export function useJSONbin() {
         const jsonBinData = await response.json();
         if (jsonBinData.success) {
             setApiData({id: jsonBinData.id, name, secret, provider});
-            dispatch.tokenState.setStorageType({provider: {id: jsonBinData.id, name, provider}, bool: true});
+            setStorageType({provider: {id: jsonBinData.id, name, provider}, bool: true});
             updateJSONBinTokens({
                 tokens,
                 id: jsonBinData.id,

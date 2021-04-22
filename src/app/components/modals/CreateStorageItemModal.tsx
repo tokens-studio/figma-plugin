@@ -7,7 +7,7 @@ import {useTokenState} from '../../store/TokenContext';
 import useRemoteTokens from '../../store/remoteTokens';
 
 export default function CreateStorageItemModal({isOpen, onClose, onSuccess}) {
-    const {tokens, localApiState, updatedAt} = useTokenState();
+    const {localApiState} = useTokenState();
     const {addNewProviderItem} = useRemoteTokens();
     const [hasErrored, setHasErrored] = React.useState(false);
     const [formFields, setFormFields] = React.useState({id: '', name: '', secret: ''});
@@ -18,7 +18,7 @@ export default function CreateStorageItemModal({isOpen, onClose, onSuccess}) {
             id: formFields.id,
             provider: localApiState.provider,
             secret: formFields.secret,
-            tokens: reduceToValues(tokens),
+            tokens: reduceToValues(),
             name: formFields.name,
             updatedAt,
         });

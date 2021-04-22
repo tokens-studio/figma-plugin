@@ -2,12 +2,9 @@
 import convertToTokenArray from '@/utils/convertTokens';
 import {createModel} from '@rematch/core';
 import {SingleTokenObject, TokenGroup, SingleToken} from '@types/tokens';
-import {getMergedTokens} from '@/plugin/tokenHelpers';
-import {postToFigma} from '@/plugin/notifiers';
-import {MessageToPluginTypes} from '@types/messages';
 import {StorageProviderType} from '@types/api';
-
 import {RootModel} from '.';
+import updateTokensOnSources from '../updateSources';
 
 type TokenInput = {
     name: string;
@@ -78,6 +75,14 @@ export const tokenState = createModel<RootModel>()({
                 usedTokenSet: Array.isArray(data.values) ? ['global'] : [Object.keys(data.values)[0]],
             };
         },
+        setEmptyTokens: (state) => {
+            return {
+                ...state,
+                tokens: parseTokenValues([]),
+                activeTokenSet: 'global',
+                usedTokenSet: ['global'],
+            };
+        },
         createToken: (state, data: TokenInput) => {
             let newTokens = {};
             const existingToken = state.tokens[data.parent].values.find((n) => n.name === data.name);
@@ -104,6 +109,7 @@ export const tokenState = createModel<RootModel>()({
             };
         },
         editToken: (state, data: EditTokenInput) => {
+            console.log('editing token in state', data);
             const nameToFind = data.oldName ? data.oldName : data.name;
             const index = state.tokens[data.parent].values.findIndex((token) => token.name === nameToFind);
             const newArray = [...state.tokens[data.parent].values];
@@ -139,42 +145,28 @@ export const tokenState = createModel<RootModel>()({
 
             return newState;
         },
-        // This shouldnt be in state
-        createStylesFromTokens: (state) => {
-            postToFigma({
-                type: MessageToPluginTypes.CREATE_STYLES,
-                tokens: getMergedTokens(state.tokens, state.usedTokenSet, true),
-            });
-            return state;
-        },
-        // Again, this shouldnt live in state
-        removeNodeData: (state, data?: string) => {
-            postToFigma({
-                type: MessageToPluginTypes.REMOVE_NODE_DATA,
-                key: data,
-            });
-            return state;
-        },
-        // This should probably live in its own state
-        setStorageType: (state, {provider, bool = false}: {provider: StorageProviderType; bool?: boolean}) => {
-            console.log('Setting storage type', provider);
-            if (bool) {
-                postToFigma({
-                    type: MessageToPluginTypes.SET_STORAGE_TYPE,
-                    storageType: provider,
-                    tokens: getMergedTokens(state.tokens, state.usedTokenSet),
-                });
-            }
-            return {
-                ...state,
-                storageType: provider,
-            };
-        },
     },
     effects: (dispatch) => ({
-        setStorageType(payload, rootState) {
-            console.log('effect called', rootState);
-            dispatch.uiState.setEditProhibited(payload);
+        editToken(payload, rootState) {
+            console.log('edit token done', rootState.tokenState); // log current state of example model
+            dispatch.tokenState.updateDocument();
+        },
+        setTokenData(payload, rootState) {
+            console.log('set token done', rootState.tokenState); // log current state of example model
+            dispatch.tokenState.updateDocument();
+        },
+        createToken(payload, rootState) {
+            console.log('create token done', rootState.tokenState); // log current state of example model
+            dispatch.tokenState.updateDocument();
+        },
+        updateDocument(payload, rootState) {
+            updateTokensOnSources({
+                tokens: rootState.tokenState.tokens,
+                usedTokenSet: rootState.tokenState.usedTokenSet,
+                updatePageOnly: rootState.settings.updatePageOnly,
+                updatedAt: Date.now(),
+                isLocal: rootState.uiState.storageType.provider === StorageProviderType.LOCAL,
+            });
         },
     }),
 });

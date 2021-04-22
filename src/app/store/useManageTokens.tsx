@@ -1,15 +1,16 @@
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {SingleToken, TokenType} from '../../../types/tokens';
 import {StorageProviderType} from '../../../types/api';
 import useRemoteTokens from './remoteTokens';
-import {useTokenDispatch, useTokenState} from './TokenContext';
-import useReadTokens from './useReadTokens';
-import {Dispatch} from '../store';
+import {useTokenDispatch} from './TokenContext';
+import {Dispatch, RootState} from '../store';
+import useTokens from './useTokens';
 
 export default function useManageTokens() {
     const {editToken, createToken, deleteToken} = useDispatch<Dispatch>().tokenState;
-    const {storageType} = useTokenState();
-    const {updateTokens} = useReadTokens();
+    const {storageType} = useSelector((state: RootState) => state.uiState);
+
+    const {updateTokens} = useTokens();
     const {setLoading} = useTokenDispatch();
     const {editRemoteToken, createRemoteToken, deleteRemoteToken} = useRemoteTokens();
 
@@ -28,6 +29,7 @@ export default function useManageTokens() {
             shouldUpdate = await editRemoteToken(data);
         }
         if (shouldUpdate) {
+            console.log('Updating edit token');
             editToken({
                 parent,
                 name,
@@ -36,8 +38,6 @@ export default function useManageTokens() {
                 oldName,
             });
         }
-
-        updateTokens(isLocal);
         setLoading(false);
     }
 
@@ -64,8 +64,6 @@ export default function useManageTokens() {
                 newGroup,
             });
         }
-
-        updateTokens(isLocal);
         setLoading(false);
     }
 

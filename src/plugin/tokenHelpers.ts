@@ -1,13 +1,26 @@
 import {getAliasValue} from '@/utils/aliases';
 import checkIfAlias from '@/utils/checkIfAlias';
-import {SingleTokenObject} from 'types/tokens';
+import {SingleTokenObject} from '@types/tokens';
 import {mergeDeep} from './helpers';
 
-function findAllAliases(tokens) {
+export function findAllAliases(tokens) {
     return tokens.filter((token) => checkIfAlias(token, tokens));
 }
 
-function resolveTokenValues(tokens, previousCount = undefined) {
+export function reduceToValues(tokens) {
+    console.log('reduce to val', tokens);
+
+    const reducedTokens = Object.entries(tokens).reduce((prev, group) => {
+        prev.push({[group[0]]: group[1].values});
+        return prev;
+    }, []);
+
+    const assigned = mergeDeep({}, ...reducedTokens);
+
+    return assigned;
+}
+
+export function resolveTokenValues(tokens, previousCount = undefined) {
     const aliases = findAllAliases(tokens);
     let returnedTokens = tokens;
     if (aliases.length > 0) {
@@ -39,8 +52,7 @@ function resolveTokenValues(tokens, previousCount = undefined) {
     return returnedTokens;
 }
 
-// Return tokens that are included in currently active token set and optionally resolve all aliases
-export function getMergedTokens(tokens, usedTokenSet, shouldResolve = false): SingleTokenObject[] {
+export function computeMergedTokens(tokens, usedTokenSet, shouldResolve = false): SingleTokenObject[] {
     const mergedTokens = [];
     Object.entries(tokens).forEach((tokenGroup) => {
         if (usedTokenSet.includes(tokenGroup[0])) {
@@ -48,20 +60,9 @@ export function getMergedTokens(tokens, usedTokenSet, shouldResolve = false): Si
         }
     });
 
-    if (shouldResolve) {
+    if (shouldResolve && Object.entries(tokens).length > 0) {
         return resolveTokenValues(mergedTokens);
     }
 
     return mergedTokens;
-}
-
-export function reduceToValues(tokens) {
-    const reducedTokens = Object.entries(tokens).reduce((prev, group) => {
-        prev.push({[group[0]]: group[1].values});
-        return prev;
-    }, []);
-
-    const assigned = mergeDeep({}, ...reducedTokens);
-
-    return assigned;
 }

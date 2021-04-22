@@ -1,24 +1,27 @@
 import {useDispatch} from 'react-redux';
-import {SingleToken, TokenProps} from '../../../types/tokens';
-import {StorageProviderType} from '../../../types/api';
+import {SingleToken, TokenProps} from '@types/tokens';
+import {StorageProviderType} from '@types/api';
 import {notifyToUI} from '../../plugin/notifiers';
 import {useJSONbin} from './providers/jsonbin';
 import useArcade from './providers/arcade';
 import {useTokenDispatch, useTokenState} from './TokenContext';
 import {compareUpdatedAt} from '../components/utils';
 import {Dispatch} from '../store';
-import useReadTokens from './useReadTokens';
+import useTokens from './useTokens';
+import useStorage from './useStorage';
 
 export default function useRemoteTokens() {
     const dispatch = useDispatch<Dispatch>();
 
     const {api, updateAfterApply, lastUpdatedAt, localApiState} = useTokenState();
     const {setLoading, setApiData} = useTokenDispatch();
-    const {updateTokens} = useReadTokens();
+    const {updateTokens} = useTokens();
+    const {setStorageType} = useStorage();
     const {fetchDataFromArcade, editArcadeToken, createArcadeToken, deleteArcadeToken} = useArcade();
     const {fetchDataFromJSONBin, createNewJSONBin} = useJSONbin();
 
     const pullTokens = async () => {
+        console.log('Pull tokens');
         const {id, secret, provider, name} = api;
         if (!id && !secret) return;
 
@@ -43,7 +46,6 @@ export default function useRemoteTokens() {
         }
 
         dispatch.tokenState.setTokenData(tokenValues);
-        updateTokens(false);
         setLoading(false);
     };
 
@@ -54,7 +56,6 @@ export default function useRemoteTokens() {
         options?: object;
         oldName?: string;
     }) {
-        const {parent, name, value, options, oldName} = data;
         setLoading(true);
         const {id, secret} = api;
         const response = await editArcadeToken({id, secret, data});
@@ -89,6 +90,8 @@ export default function useRemoteTokens() {
     }
 
     async function fetchDataFromRemote(id, secret, name, provider): Promise<TokenProps> {
+        console.log('fetch tokens');
+
         notifyToUI('Fetching remote tokens...');
 
         switch (provider) {
@@ -104,22 +107,17 @@ export default function useRemoteTokens() {
     }
 
     const syncTokens = async ({id, secret, provider = localApiState.provider, name}) => {
+        console.log('Sync tokens');
         setLoading(true);
         const remoteTokens = await fetchDataFromRemote(id, secret, name, provider as StorageProviderType);
         if (remoteTokens) {
-            dispatch.tokenState.setStorageType({provider: {provider, id, name}, bool: true});
+            setStorageType({provider: {provider, id, name}, bool: true});
             setApiData({id, secret, name, provider});
             const comparison = await compareUpdatedAt(lastUpdatedAt, remoteTokens);
             if (comparison === 'remote_older') {
                 dispatch.tokenState.setTokenData(remoteTokens);
-                if (updateAfterApply) {
-                    updateTokens(false);
-                }
             } else {
                 dispatch.tokenState.setTokenData(remoteTokens);
-                if (updateAfterApply) {
-                    updateTokens(false);
-                }
             }
             setLoading(false);
             return remoteTokens;

@@ -1,7 +1,6 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import * as React from 'react';
 import {track} from '@/utils/analytics';
-import {useDispatch} from 'react-redux';
 import {useTokenDispatch, useTokenState} from '../store/TokenContext';
 import {StorageProviderType} from '../../../types/api';
 import Button from './Button';
@@ -11,12 +10,12 @@ import StorageItem from './StorageItem';
 import ProviderSelector from './StorageProviderSelector';
 import EditStorageItemModal from './modals/EditStorageItemModal';
 import CreateStorageItemModal from './modals/CreateStorageItemModal';
-import {Dispatch} from '../store';
+import useRemoteTokens from '../store/remoteTokens';
 
 const SyncSettings = () => {
     const {api, storageType, localApiState, apiProviders, updateAfterApply} = useTokenState();
     const {setLocalApiState, toggleUpdateAfterApply} = useTokenDispatch();
-    const dispatch = useDispatch<Dispatch>();
+    const {setStorageType} = useRemoteTokens();
 
     const [confirmModalVisible, showConfirmModal] = React.useState(false);
     const [editStorageItemModalVisible, setShowEditStorageModalVisible] = React.useState(Boolean(localApiState.new));
@@ -87,7 +86,7 @@ const SyncSettings = () => {
                     onClose={showConfirmModal}
                     onSuccess={() => {
                         setLocalApiState({provider: StorageProviderType.LOCAL});
-                        dispatch.tokenState.setStorageType({
+                        setStorageType({
                             provider: {provider: StorageProviderType.LOCAL},
                             bool: true,
                         });

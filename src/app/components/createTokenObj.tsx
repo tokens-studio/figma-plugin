@@ -1,5 +1,5 @@
 import {mergeDeep} from '@/plugin/helpers';
-import {SingleTokenObject, TokenType} from 'types/tokens';
+import {SingleTokenObject, TokenType} from '@types/tokens';
 
 import tokenTypes from '../../config/tokenTypes';
 import {DEFAULT_DEPTH_LEVEL} from './constants';

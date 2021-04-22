@@ -1,9 +1,8 @@
-import {getMergedTokens, reduceToValues} from '@/plugin/tokenHelpers';
+import {MessageToPluginTypes} from '@types/messages';
+import {computeMergedTokens, reduceToValues} from '@/plugin/tokenHelpers';
 import {TokenProps} from '../../../types/tokens';
 import {StorageProviderType} from '../../../types/api';
-import {postToFigma, notifyToUI} from '../../plugin/notifiers';
-import {StateType} from '../../../types/state';
-import {MessageToPluginTypes} from '../../../types/messages';
+import {notifyToUI, postToFigma} from '../../plugin/notifiers';
 import {updateJSONBinTokens} from './providers/jsonbin';
 
 async function updateRemoteTokens({
@@ -44,16 +43,30 @@ async function updateRemoteTokens({
     }
 }
 
-export default async function updateTokensOnSources({tokens, updatedAt, shouldUpdateRemote = true}) {
-    const isLocal = state.storageType.provider === StorageProviderType.LOCAL;
+export default async function updateTokensOnSources({
+    tokens,
+    usedTokenSet,
+    updatePageOnly,
+    updatedAt,
+    shouldUpdateRemote = true,
+    isLocal,
+}) {
+    console.log('update on sources', tokens, usedTokenSet);
+    // TODO: FIX THIS
     if (!isLocal && shouldUpdateRemote && !state.editProhibited) {
         updateRemoteTokens({
             provider: state.storageType.provider,
-            tokens: reduceToValues(state.tokens),
+            tokens: reduceToValues(tokens),
             id: state.api.id,
             secret: state.api.secret,
             updatedAt,
             oldUpdatedAt: state.lastUpdatedAt,
         });
     }
+    postToFigma({
+        type: MessageToPluginTypes.UPDATE,
+        tokenValues: reduceToValues(tokens),
+        tokens: computeMergedTokens(tokens, usedTokenSet, true),
+        updatePageOnly,
+    });
 }

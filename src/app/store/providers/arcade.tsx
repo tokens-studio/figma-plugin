@@ -1,9 +1,9 @@
 import {useDispatch} from 'react-redux';
 import {Dispatch} from '@/app/store';
-import {notifyToUI, postToFigma} from '../../../plugin/notifiers';
-import {StorageProviderType} from '../../../../types/api';
-import {MessageToPluginTypes} from '../../../../types/messages';
-import {ArcadeTokenType, TokenProps, TokenType} from '../../../../types/tokens';
+import {StorageProviderType} from '@types/api';
+import {MessageToPluginTypes} from '@types/messages';
+import {ArcadeTokenType, TokenProps, TokenType} from '@types/tokens';
+import {notifyToUI, postToFigma} from '@/plugin/notifiers';
 
 type ArcadeResponse = {
     exports: object;

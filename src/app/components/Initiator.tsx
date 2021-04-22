@@ -6,6 +6,7 @@ import {MessageFromPluginTypes, MessageToPluginTypes} from '../../../types/messa
 import useRemoteTokens from '../store/remoteTokens';
 import {useTokenDispatch} from '../store/TokenContext';
 import {Dispatch} from '../store';
+import useStorage from '../store/useStorage';
 
 export default function Initiator() {
     const dispatch = useDispatch<Dispatch>();
@@ -19,14 +20,18 @@ export default function Initiator() {
         setLastOpened,
     } = useTokenDispatch();
     const {fetchDataFromRemote} = useRemoteTokens();
+    const {setStorageType} = useStorage();
 
     const onInitiate = () => {
+        console.log('Before initiate');
         postToFigma({type: MessageToPluginTypes.INITIATE});
     };
 
     React.useEffect(() => {
         onInitiate();
+        console.log('initiated');
         window.onmessage = async (event) => {
+            console.log('got message');
             if (event.data.pluginMessage) {
                 const {
                     type,
@@ -75,7 +80,7 @@ export default function Initiator() {
                         }
                         break;
                     case MessageFromPluginTypes.RECEIVED_STORAGE_TYPE:
-                        dispatch.tokenState.setStorageType({provider: storageType});
+                        setStorageType({provider: storageType});
                         break;
                     case MessageFromPluginTypes.API_CREDENTIALS: {
                         if (status === true) {

@@ -41,6 +41,7 @@ figma.on('selectionchange', () => {
 });
 
 figma.ui.onmessage = async (msg) => {
+    console.log('received message', msg);
     switch (msg.type) {
         case MessageToPluginTypes.INITIATE:
             try {

@@ -3,7 +3,7 @@ import {useDispatch} from 'react-redux';
 import Heading from './Heading';
 import Button from './Button';
 import Callout from './Callout';
-import {useTokenDispatch, useTokenState} from '../store/TokenContext';
+import {useTokenState} from '../store/TokenContext';
 import {StorageProviderType} from '../../../types/api';
 import {Dispatch} from '../store';
 
@@ -11,21 +11,21 @@ const StartScreen = () => {
     const dispatch = useDispatch<Dispatch>();
 
     const {storageType} = useTokenState();
-    const {setEmptyTokens, setLocalApiState} = useTokenDispatch();
     const onSetDefaultTokens = () => {
         dispatch.uiState.setActiveTab('tokens');
-        setEmptyTokens();
+        dispatch.tokenState.setEmptyTokens();
     };
     const onSetSyncClick = () => {
         dispatch.uiState.setActiveTab('syncsettings');
-        setEmptyTokens();
-        setLocalApiState({
+        dispatch.tokenState.setEmptyTokens();
+        /*  setLocalApiState({
             id: storageType.id,
             name: storageType.name,
             provider: storageType.provider,
             secret: '',
             new: true,
         });
+         */
     };
 
     return (

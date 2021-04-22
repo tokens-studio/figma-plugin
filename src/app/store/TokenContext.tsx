@@ -1,14 +1,8 @@
 import * as React from 'react';
 import fetchChangelog from '@/utils/storyblok';
-import {track} from '@/utils/analytics';
-import defaultJSON from '../../config/default.json';
-import {TokenProps} from '../../../types/tokens';
-import {StorageProviderType, ApiDataType, StorageType} from '../../../types/api';
+import {StorageProviderType, ApiDataType} from '../../../types/api';
 import {postToFigma} from '../../plugin/notifiers';
 import {MessageToPluginTypes} from '../../../types/messages';
-import updateTokensOnSources from './updateSources';
-import * as pjs from '../../../package.json';
-import {SelectionValue} from './models/uiState';
 
 export enum ActionType {
     SetTokensFromStyles = 'SET_TOKENS_FROM_STYLES',
@@ -39,22 +33,6 @@ export enum ActionType {
     CreateTokenGroup = 'CREATE_TOKEN_GROUP',
     SetSyncEnabled = 'SET_SYNC_ENABLED',
 }
-
-const defaultTokens: TokenProps = {
-    version: pjs.plugin_version,
-    updatedAt: new Date().toString(),
-    values: {
-        options: JSON.stringify(defaultJSON, null, 2),
-    },
-};
-
-export const emptyTokens: TokenProps = {
-    version: pjs.plugin_version,
-    updatedAt: new Date().toString(),
-    values: {
-        options: [],
-    },
-};
 
 const emptyState = {
     loading: true,
@@ -94,10 +72,11 @@ const TokenStateContext = React.createContext(emptyState);
 const TokenDispatchContext = React.createContext(null);
 
 function stateReducer(state, action) {
+    console.log('Performing action', action);
     switch (action.type) {
         case ActionType.SetTokensFromStyles:
             state.tokenData.injectTokens(action.data, state.activeTokenSet);
-            updateTokensOnSources(state, action.updatedAt);
+            // updateTokensOnSources(state, action.updatedAt);
             return {
                 ...state,
                 tokens: state.tokenData.tokens,
@@ -108,7 +87,7 @@ function stateReducer(state, action) {
                 loading: action.state,
             };
         case ActionType.UpdateTokens:
-            updateTokensOnSources(state, action.updatedAt, action.shouldUpdate);
+            // updateTokensOnSources(state, action.updatedAt, action.shouldUpdate);
             return state;
         case ActionType.PullStyles:
             postToFigma({
@@ -128,7 +107,7 @@ function stateReducer(state, action) {
                     : [...new Set([...state.usedTokenSet, action.data])],
             };
             state.tokenData.setUsedTokenSet(newState.usedTokenSet);
-            updateTokensOnSources(state, action.updatedAt, false);
+            // updateTokensOnSources(state, action.updatedAt, false);
             return newState;
         }
         case ActionType.SetShowEditForm:
@@ -274,11 +253,11 @@ function TokenProvider({children}) {
                 dispatch({type: ActionType.SetStringTokens, data, updatedAt});
             },
             setDefaultTokens: () => {
-                dispatch({type: ActionType.SetTokenData, data: defaultTokens});
+                // dispatch({type: ActionType.SetTokenData, data: defaultTokens});
                 dispatch({type: ActionType.SetLoading, state: false});
             },
             setEmptyTokens: () => {
-                dispatch({type: ActionType.SetTokenData, data: emptyTokens});
+                // dispatch({type: ActionType.SetTokenData, data: emptyTokens});
                 dispatch({type: ActionType.SetLoading, state: false});
             },
             updateTokens: (shouldUpdate = true) => {
