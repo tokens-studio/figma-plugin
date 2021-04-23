@@ -20,21 +20,26 @@ interface TokenListingType {
     };
 }
 
-const Tokens = () => {
+const Tokens = ({isActive}) => {
     const {depth} = useSelector((state: RootState) => state.settings);
     const {tokens, activeTokenSet} = useSelector((state: RootState) => state.tokenState);
 
     const [tokenValues, setTokenValues] = React.useState([]);
 
     const memoizedTokens = React.useMemo(() => {
-        console.log('Memo changed');
-        return mappedTokens(tokens[activeTokenSet].values, depth);
+        console.log('Memo changed', tokens);
+        if (tokens[activeTokenSet]?.values) {
+            return mappedTokens(tokens[activeTokenSet]?.values, depth);
+        }
+        return null;
     }, [depth, tokens, activeTokenSet]);
 
     React.useEffect(() => {
         console.log('effect changed', memoizedTokens);
         setTokenValues(memoizedTokens);
     }, [memoizedTokens]);
+
+    if (!isActive) return null;
 
     return (
         <div>

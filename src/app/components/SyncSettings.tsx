@@ -90,7 +90,7 @@ const SyncSettings = () => {
                     isOpen={confirmModalVisible}
                     onClose={showConfirmModal}
                     onSuccess={() => {
-                        setLocalApiState({provider: StorageProviderType.LOCAL});
+                        dispatch.uiState.setLocalApiState({provider: StorageProviderType.LOCAL});
                         setStorageType({
                             provider: {provider: StorageProviderType.LOCAL},
                             bool: true,
@@ -133,7 +133,12 @@ const SyncSettings = () => {
                             isActive={localApiState?.provider === StorageProviderType.ARCADE}
                             isStored={storageType?.provider === StorageProviderType.ARCADE}
                             onClick={() => {
-                                setLocalApiState({name: '', secret: '', id: '', provider: StorageProviderType.ARCADE});
+                                dispatch.uiState.setLocalApiState({
+                                    name: '',
+                                    secret: '',
+                                    id: '',
+                                    provider: StorageProviderType.ARCADE,
+                                });
                             }}
                             text="Arcade"
                             id={StorageProviderType.ARCADE}

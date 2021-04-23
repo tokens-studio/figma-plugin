@@ -17,14 +17,13 @@ const StartScreen = () => {
     const onSetSyncClick = () => {
         dispatch.uiState.setActiveTab('syncsettings');
         dispatch.tokenState.setEmptyTokens();
-        /*  setLocalApiState({
+        dispatch.uiState.setLocalApiState({
             id: storageType.id,
             name: storageType.name,
             provider: storageType.provider,
             secret: '',
             new: true,
         });
-         */
     };
 
     return (

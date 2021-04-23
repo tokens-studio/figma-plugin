@@ -24,7 +24,7 @@ const App = () => {
                 <div className="flex-grow flex flex-col">
                     {activeTab !== 'start' && <Navbar />}
                     {activeTab === 'start' && <StartScreen />}
-                    {activeTab === 'tokens' && <Tokens />}
+                    <Tokens isActive={activeTab === 'tokens'} />
                     {activeTab === 'json' && <JSONEditor />}
                     {activeTab === 'inspector' && <Inspector />}
                     {activeTab === 'syncsettings' && <SyncSettings />}

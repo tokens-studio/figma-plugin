@@ -1,6 +1,7 @@
 import React from 'react';
 import {useSelector} from 'react-redux';
 import {RootState} from '@/app/store';
+import useTokens from '@/app/store/useTokens';
 import Heading from '../Heading';
 import Textarea from '../Textarea';
 import Button from '../Button';
@@ -9,6 +10,7 @@ import Modal from '../Modal';
 export default function ExportModal({onClose}) {
     // TODO: FIX ME
     const {tokens, activeTokenSet} = useSelector((state: RootState) => state.tokenState);
+    const {getFormattedTokens} = useTokens();
 
     return (
         <Modal large isOpen close={onClose}>
@@ -31,15 +33,15 @@ export default function ExportModal({onClose}) {
                     className="flex-grow"
                     rows={10}
                     isDisabled
-                    hasErrored={tokenData.tokens[activeTokenSet]?.hasErrored}
-                    value={tokenData.getFormattedTokens()}
+                    hasErrored={tokens[activeTokenSet]?.hasErrored}
+                    value={getFormattedTokens()}
                 />
                 <div className="space-x-4 flex justify-between">
                     <Button variant="secondary" onClick={onClose}>
                         Cancel
                     </Button>
                     <Button
-                        href={`data:text/json;charset=utf-8,${encodeURIComponent(tokenData.getFormattedTokens())}`}
+                        href={`data:text/json;charset=utf-8,${encodeURIComponent(getFormattedTokens())}`}
                         download="tokens.json"
                         variant="primary"
                         size="large"

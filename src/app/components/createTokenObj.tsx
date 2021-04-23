@@ -46,6 +46,7 @@ export function createTokensObject(tokens: SingleTokenObject[], uiDepth) {
 
 // Takes an array of tokens, transforms them into an object and merges that with values we require for the UI
 export function mappedTokens(tokens: SingleTokenObject[], depth = DEFAULT_DEPTH_LEVEL) {
+    if (Object.entries(tokens).length < 1) return null;
     const tokenObj = {};
     Object.entries(createTokensObject(tokens, depth)).forEach(
         ([key, group]: [string, {values: SingleTokenObject[]; type?: TokenType}]) => {
