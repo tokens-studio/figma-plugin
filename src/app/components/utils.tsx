@@ -45,6 +45,7 @@ export function convertToRgb(color: string) {
             if (matchesRgba.length > 0) {
                 matchesRgba.map((match) => {
                     const matchedString = match;
+                    console.log('Match', match);
                     const matchedColor = match.replace(/rgba?\(/g, '').replace(')', '');
 
                     const matchesHex = matchedString.match(hexRegex);
@@ -59,13 +60,14 @@ export function convertToRgb(color: string) {
                         [r, g, b, alpha = '1'] = color.split(',').map((n) => n.trim());
                         a = Number(alpha);
                     }
-                    const rgbaString = `rgba(${matchedColor.replace(hexRegex, [r, g, b].join(', '))})`;
+                    console.log('Replacing', matchedColor);
+                    const rgbaString = [r, g, b, a].join(', ');
 
                     returnedColor = returnedColor.split(matchedString).join(RGBAToHexA(rgbaString));
                 });
             }
         } catch (e) {
-            console.log('error', e);
+            console.log('error', e, color);
         }
         return returnedColor;
     } catch (e) {

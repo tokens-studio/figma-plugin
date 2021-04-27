@@ -1,6 +1,6 @@
 export interface TokenProps {
     values: {
-        [key: string]: SingleTokenObject[];
+        [key: string]: SingleTokenObject[] | TokenObject;
     };
     updatedAt: string;
     version: string;

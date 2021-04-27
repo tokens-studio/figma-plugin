@@ -2,7 +2,7 @@ import {track} from '@/utils/analytics';
 import * as React from 'react';
 import {useSelector} from 'react-redux';
 import {RootState} from '../store';
-import {useTokenDispatch, useTokenState} from '../store/TokenContext';
+import {useTokenDispatch} from '../store/TokenContext';
 import useManageTokens from '../store/useManageTokens';
 import Input from './Input';
 import Modal from './Modal';

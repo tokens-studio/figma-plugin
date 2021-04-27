@@ -41,12 +41,13 @@ export function createTokensObject(tokens: SingleTokenObject[], uiDepth) {
         mergeDeep(acc[propToSet].values, {[groupName]: cur});
         return acc;
     }, {});
+    console.log('Tokens obj', obj);
     return obj;
 }
 
 // Takes an array of tokens, transforms them into an object and merges that with values we require for the UI
 export function mappedTokens(tokens: SingleTokenObject[], depth = DEFAULT_DEPTH_LEVEL) {
-    if (Object.entries(tokens).length < 1) return null;
+    console.log('Maps tokens');
     const tokenObj = {};
     Object.entries(createTokensObject(tokens, depth)).forEach(
         ([key, group]: [string, {values: SingleTokenObject[]; type?: TokenType}]) => {
@@ -57,6 +58,8 @@ export function mappedTokens(tokens: SingleTokenObject[], depth = DEFAULT_DEPTH_
     );
 
     mergeDeep(tokenObj, tokenTypes);
+
+    console.log('returning', Object.entries(tokenObj));
 
     return Object.entries(tokenObj);
 }

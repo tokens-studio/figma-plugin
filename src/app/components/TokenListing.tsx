@@ -9,6 +9,7 @@ import renderKeyValue from './renderKeyValue';
 import Tooltip from './Tooltip';
 import NewGroupForm from './NewGroupForm';
 import {RootState} from '../store';
+import useTokens from '../store/useTokens';
 
 const TokenListing = ({
     tokenKey,
@@ -33,9 +34,10 @@ const TokenListing = ({
     values: object;
 }) => {
     const {editProhibited} = useSelector((state: RootState) => state.tokenState);
+    const {createStylesFromTokens} = useTokens();
 
     const {collapsed, showEmptyGroups, showEditForm, showNewGroupForm, showOptions, displayType} = useTokenState();
-    const {setCollapsed, createStyles, setShowEditForm, setShowOptions, setDisplayType} = useTokenDispatch();
+    const {setCollapsed, setShowEditForm, setShowOptions, setDisplayType} = useTokenDispatch();
 
     const createButton = ['color', 'typography'].includes(tokenType);
     const showDisplayToggle = tokenType === 'color';
@@ -132,7 +134,7 @@ const TokenListing = ({
 
                     {createButton && (
                         <Tooltip label="Create Styles">
-                            <button onClick={createStyles} type="button" className="button button-ghost">
+                            <button onClick={createStylesFromTokens} type="button" className="button button-ghost">
                                 <Icon name="style" />
                             </button>
                         </Tooltip>

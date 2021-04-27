@@ -50,7 +50,7 @@ const Navbar = () => {
         <div className="sticky top-0 navbar bg-white flex items-center justify-between z-1 border-b border-gray-200">
             <div>
                 <TabButton first name="tokens" label="Tokens" />
-                {/* <TabButton name="json" label="JSON" /> */}
+                <TabButton name="json" label="JSON" />
                 <TabButton name="inspector" label="Inspect" />
                 <TabButton name="syncsettings" label="Sync" />
                 <TabButton name="settings" label="Settings" />

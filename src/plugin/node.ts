@@ -45,8 +45,19 @@ export function getTokenData(): {values: TokenProps; updatedAt: string; version:
         const updatedAt = figma.root.getSharedPluginData('tokens', 'updatedAt');
         if (values) {
             const parsedValues = JSON.parse(values);
+            console.log('got values', parsedValues);
             if (Object.keys(parsedValues).length > 0) {
-                return {values: parsedValues, updatedAt, version};
+                const tokenObject = Object.entries(parsedValues).reduce((acc, [key, groupValues]) => {
+                    console.log('trying to parse', groupValues, key);
+                    acc[key] = typeof groupValues === 'string' ? JSON.parse(groupValues) : groupValues;
+                    return acc;
+                }, {});
+                console.log('token obj is', tokenObject);
+                return {
+                    values: tokenObject as TokenProps,
+                    updatedAt,
+                    version,
+                };
             }
         }
     } catch (e) {

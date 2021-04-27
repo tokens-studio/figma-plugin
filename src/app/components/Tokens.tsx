@@ -24,26 +24,20 @@ const Tokens = ({isActive}) => {
     const {depth} = useSelector((state: RootState) => state.settings);
     const {tokens, activeTokenSet} = useSelector((state: RootState) => state.tokenState);
 
-    const [tokenValues, setTokenValues] = React.useState([]);
-
     const memoizedTokens = React.useMemo(() => {
         console.log('Memo changed', tokens);
         if (tokens[activeTokenSet]?.values) {
+            console.log('Has values', tokens[activeTokenSet]?.values, depth);
             return mappedTokens(tokens[activeTokenSet]?.values, depth);
         }
-        return null;
+        return [];
     }, [depth, tokens, activeTokenSet]);
-
-    React.useEffect(() => {
-        console.log('effect changed', memoizedTokens);
-        setTokenValues(memoizedTokens);
-    }, [memoizedTokens]);
 
     if (!isActive) return null;
 
     return (
         <div>
-            {tokenValues.map(([key, group]: [string, TokenListingType]) => {
+            {memoizedTokens.map(([key, group]: [string, TokenListingType]) => {
                 return (
                     <div key={key}>
                         <TokenListing

@@ -28,6 +28,7 @@ type EditTokenInput = TokenInput & {
 type DeleteTokenInput = {parent: string; path: string};
 
 const parseTokenValues = (tokens) => {
+    console.log('Parsing', tokens);
     if (Array.isArray(tokens)) {
         return {
             global: {

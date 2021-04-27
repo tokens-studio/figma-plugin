@@ -9,20 +9,25 @@ import TokenSetSelector from './TokenSetSelector';
 import ExportModal from './modals/ExportModal';
 import PresetModal from './modals/PresetModal';
 import {Dispatch, RootState} from '../store';
+import useTokens from '../store/useTokens';
 
 const JSONEditor = () => {
     const {tokens, activeTokenSet, editProhibited} = useSelector((state: RootState) => state.tokenState);
     const dispatch = useDispatch<Dispatch>();
+    const {getFormattedTokens} = useTokens();
 
     const {setLoading} = useTokenDispatch();
     const [confirmModalVisible, showConfirmModal] = React.useState('');
     const [exportModalVisible, showExportModal] = React.useState(false);
     const [presetModalVisible, showPresetModal] = React.useState(false);
     const [stringTokens, setStringTokens] = React.useState(JSON.stringify(tokens[activeTokenSet]?.values, null, 2));
+    const [tokenType, setTokenType] = React.useState('array');
 
     React.useEffect(() => {
-        setStringTokens(JSON.stringify(tokens[activeTokenSet]?.values, null, 2));
-    }, [tokens, activeTokenSet]);
+        setStringTokens(
+            tokenType === 'array' ? JSON.stringify(tokens[activeTokenSet]?.values, null, 2) : getFormattedTokens()
+        );
+    }, [tokens, activeTokenSet, getFormattedTokens, tokenType]);
 
     const handleUpdate = async () => {
         dispatch.tokenState.setJSONData(stringTokens);
