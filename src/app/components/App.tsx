@@ -11,6 +11,7 @@ import LoadingBar from './LoadingBar';
 import Footer from './Footer';
 import Initiator from './Initiator';
 import Changelog from './Changelog';
+import ImportedTokensDialog from './ImportedTokensDialog';
 import {RootState} from '../store';
 
 const App = () => {
@@ -32,6 +33,7 @@ const App = () => {
                 </div>
                 <Footer />
                 <Changelog />
+                <ImportedTokensDialog />
             </div>
         </>
     );

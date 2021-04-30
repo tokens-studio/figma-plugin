@@ -8,7 +8,6 @@ import Button from '../Button';
 import Modal from '../Modal';
 
 export default function ExportModal({onClose}) {
-    // TODO: FIX ME
     const {tokens, activeTokenSet} = useSelector((state: RootState) => state.tokenState);
     const {getFormattedTokens} = useTokens();
 

@@ -1,17 +1,15 @@
 import React from 'react';
 import {identify, track} from '@/utils/analytics';
 import {useDispatch} from 'react-redux';
+import {MessageFromPluginTypes, MessageToPluginTypes} from '@types/messages';
 import {postToFigma} from '../../plugin/notifiers';
-import {MessageFromPluginTypes, MessageToPluginTypes} from '../../../types/messages';
 import useRemoteTokens from '../store/remoteTokens';
-import {useTokenDispatch} from '../store/TokenContext';
 import {Dispatch} from '../store';
 import useStorage from '../store/useStorage';
 
 export default function Initiator() {
     const dispatch = useDispatch<Dispatch>();
 
-    const {setLoading, setTokensFromStyles} = useTokenDispatch();
     const {fetchDataFromRemote} = useRemoteTokens();
     const {setStorageType} = useStorage();
 
@@ -51,10 +49,10 @@ export default function Initiator() {
                         break;
                     }
                     case MessageFromPluginTypes.REMOTE_COMPONENTS:
-                        setLoading(false);
+                        dispatch.uiState.setLoading(false);
                         break;
                     case MessageFromPluginTypes.TOKEN_VALUES: {
-                        setLoading(false);
+                        dispatch.uiState.setLoading(false);
                         if (values) {
                             dispatch.tokenState.setTokenData(values);
                             dispatch.uiState.setActiveTab('tokens');
@@ -62,10 +60,10 @@ export default function Initiator() {
                         break;
                     }
                     case MessageFromPluginTypes.STYLES:
-                        setLoading(false);
+                        dispatch.uiState.setLoading(false);
                         if (values) {
                             track('Import styles');
-                            setTokensFromStyles(values);
+                            dispatch.tokenState.setTokensFromStyles(values);
                             dispatch.uiState.setActiveTab('tokens');
                         }
                         break;
@@ -82,7 +80,7 @@ export default function Initiator() {
                                 dispatch.tokenState.setTokenData(remoteValues);
                                 dispatch.uiState.setActiveTab('tokens');
                             }
-                            setLoading(false);
+                            dispatch.uiState.setLoading(false);
                         }
                         break;
                     }

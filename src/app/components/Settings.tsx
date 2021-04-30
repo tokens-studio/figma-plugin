@@ -5,9 +5,10 @@ import {useDebouncedCallback} from 'use-debounce';
 import Heading from './Heading';
 import {RootState, Dispatch} from '../store';
 import Input from './Input';
+import RadioButton from './RadioButton';
 
 const SyncSettings = () => {
-    const settings = useSelector((state: RootState) => state.settings);
+    const {uiWindow, depth, tokenType} = useSelector((state: RootState) => state.settings);
     const dispatch = useDispatch<Dispatch>();
 
     const debouncedChange = useDebouncedCallback(() => {
@@ -18,7 +19,7 @@ const SyncSettings = () => {
         const value = Number(e.target.value.trim());
         if (!Number.isNaN(value)) {
             dispatch.settings.setWindowSize({
-                ...settings.uiWindow,
+                ...uiWindow,
                 [e.target.name]: value,
             });
             debouncedChange();
@@ -30,6 +31,9 @@ const SyncSettings = () => {
             dispatch.settings.setDepth(value);
         }
     };
+    const handleTypeChange = (e) => {
+        dispatch.settings.setTokenType(e.target.value);
+    };
 
     return (
         <div className="flex flex-col flex-grow">
@@ -40,7 +44,7 @@ const SyncSettings = () => {
                         <Input
                             full
                             label="Width"
-                            value={settings.uiWindow.width}
+                            value={uiWindow.width}
                             onChange={handleSizeChange}
                             type="text"
                             name="width"
@@ -49,7 +53,7 @@ const SyncSettings = () => {
                         <Input
                             full
                             label="Height"
-                            value={settings.uiWindow.height}
+                            value={uiWindow.height}
                             onChange={handleSizeChange}
                             type="text"
                             name="height"
@@ -63,12 +67,35 @@ const SyncSettings = () => {
                         <Input
                             full
                             label="Depth"
-                            value={settings.depth}
+                            value={depth}
                             onChange={handleDepthChange}
                             type="text"
                             name="depth"
                             required
                         />
+                    </div>
+                </div>
+                <div className="space-y-4">
+                    <Heading>Token Type</Heading>
+                    <div className="flex flex-row space-x-2">
+                        <RadioButton
+                            name="object"
+                            value="object"
+                            checked={tokenType === 'object'}
+                            group="tokenType"
+                            onChange={handleTypeChange}
+                        >
+                            Object
+                        </RadioButton>
+                        <RadioButton
+                            name="array"
+                            value="array"
+                            checked={tokenType === 'array'}
+                            group="tokenType"
+                            onChange={handleTypeChange}
+                        >
+                            array
+                        </RadioButton>
                     </div>
                 </div>
             </div>

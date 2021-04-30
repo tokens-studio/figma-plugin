@@ -6,9 +6,10 @@ import Tooltip from './Tooltip';
 import useRemoteTokens from '../store/remoteTokens';
 import {StorageProviderType} from '../../../types/api';
 import {RootState, Dispatch} from '../store';
+import useTokens from '../store/useTokens';
 
 const TabButton = ({name, label, first = false}) => {
-    const activeTab = useSelector((state: RootState) => state.uiState.activeTab);
+    const {activeTab} = useSelector((state: RootState) => state.uiState);
     const dispatch = useDispatch<Dispatch>();
 
     const onClick = () => {
@@ -44,7 +45,9 @@ const transformProviderName = (provider) => {
 
 const Navbar = () => {
     const {projectURL, storageType} = useSelector((state: RootState) => state.uiState);
+    const {editProhibited} = useSelector((state: RootState) => state.tokenState);
     const {pullTokens} = useRemoteTokens();
+    const {pullStyles} = useTokens();
 
     return (
         <div className="sticky top-0 navbar bg-white flex items-center justify-between z-1 border-b border-gray-200">
@@ -72,6 +75,16 @@ const Navbar = () => {
                         </Tooltip>
                     </>
                 )}
+                <Tooltip variant="right" label="Import Styles">
+                    <button
+                        disabled={editProhibited}
+                        className="button button-ghost"
+                        type="button"
+                        onClick={pullStyles}
+                    >
+                        <Icon name="import" />
+                    </button>
+                </Tooltip>
             </div>
         </div>
     );

@@ -4,6 +4,7 @@ import {createModel} from '@rematch/core';
 import {SingleTokenObject, TokenGroup, SingleToken, TokenProps} from '@types/tokens';
 import {StorageProviderType} from '@types/api';
 import defaultJSON from '@/config/default.json';
+
 import {RootModel} from '.';
 import updateTokensOnSources from '../updateSources';
 import * as pjs from '../../../../package.json';
@@ -28,7 +29,6 @@ type EditTokenInput = TokenInput & {
 type DeleteTokenInput = {parent: string; path: string};
 
 const parseTokenValues = (tokens) => {
-    console.log('Parsing', tokens);
     if (Array.isArray(tokens)) {
         return {
             global: {
@@ -63,6 +63,10 @@ export interface SelectionValue {
 
 interface TokenState {
     tokens: TokenGroup;
+    importedTokens: {
+        newTokens: SingleTokenObject[];
+        updatedTokens: SingleTokenObject[];
+    };
     activeTokenSet: string;
     usedTokenSet: string[];
     editProhibited: boolean;
@@ -71,15 +75,30 @@ interface TokenState {
 export const tokenState = createModel<RootModel>()({
     state: {
         tokens: {},
+        importedTokens: {
+            newTokens: [],
+            updatedTokens: [],
+        },
         activeTokenSet: 'global',
         usedTokenSet: ['global'],
         editProhibited: false,
     } as TokenState,
     reducers: {
-        setTokenData: (state, data: {values: SingleTokenObject[]}) => {
+        resetImportedTokens: (state) => {
             return {
                 ...state,
-                tokens: parseTokenValues(data.values),
+                importedTokens: {
+                    newTokens: [],
+                    updatedTokens: [],
+                },
+            };
+        },
+        setTokenData: (state, data: {values: SingleTokenObject[]; shouldUpdate: boolean}) => {
+            const values = parseTokenValues(data.values);
+            console.log('setting token data', values);
+            return {
+                ...state,
+                tokens: values,
                 activeTokenSet: Array.isArray(data.values) ? 'global' : Object.keys(data.values)[0],
                 usedTokenSet: Array.isArray(data.values) ? ['global'] : [Object.keys(data.values)[0]],
             };
@@ -106,6 +125,54 @@ export const tokenState = createModel<RootModel>()({
                 tokens: {
                     ...state.tokens,
                     ...newTokens,
+                },
+            };
+        },
+        // Imports received styles as tokens, if needed
+        setTokensFromStyles: (state, receivedStyles) => {
+            console.log('Set tokens from styles', receivedStyles);
+            console.log('TOKENS ARE', state.tokens);
+            const newTokens = [];
+            const existingTokens = [];
+            const updatedTokens = [];
+
+            // Iterate over received styles and check if they existed before or need updating
+            Object.entries(receivedStyles).map(([_parent, values]: [string, SingleTokenObject[]]) => {
+                values.map((token: TokenGroup) => {
+                    console.log('TOKEN', token);
+
+                    const oldValue = state.tokens[state.activeTokenSet].values.find((t) => t.name === token.name);
+                    if (oldValue) {
+                        console.log('got old value', oldValue, token);
+                        if (oldValue.value === token.value) {
+                            console.log('Is same value!', token.value);
+                            if (oldValue.description === token.description) {
+                                console.log('Is also same description');
+                                existingTokens.push(token);
+                            } else {
+                                console.log('Is another description');
+                                updatedTokens.push({
+                                    ...token,
+                                    oldDescription: oldValue.description,
+                                });
+                            }
+                        } else {
+                            updatedTokens.push({
+                                ...token,
+                                oldValue: oldValue.value,
+                            });
+                        }
+                    } else {
+                        newTokens.push(token);
+                    }
+                });
+            });
+
+            return {
+                ...state,
+                importedTokens: {
+                    newTokens,
+                    updatedTokens,
                 },
             };
         },
@@ -148,19 +215,24 @@ export const tokenState = createModel<RootModel>()({
         },
     },
     effects: (dispatch) => ({
-        // TODO: Call setTokenData here with these values
         setDefaultTokens: (payload) => {
+            console.log('setting default effect');
             dispatch.tokenState.setTokenData({values: defaultTokens.values});
         },
         setEmptyTokens: (payload) => {
+            console.log('setting empty effect');
             dispatch.tokenState.setTokenData({values: []});
         },
         setJSONData: (payload: string, rootState) => {
+            console.log('setting jsondata effect');
             console.log('Got a payload', payload, rootState.tokenState.activeTokenSet);
             const parsedTokens = JSON.parse(payload);
             try {
                 parseTokenValues(parsedTokens);
-                dispatch.tokenState.setTokenData({values: {[rootState.tokenState.activeTokenSet]: parsedTokens}});
+                dispatch.tokenState.setTokenData({
+                    values: {[rootState.tokenState.activeTokenSet]: parsedTokens},
+                    shouldUpdate: true,
+                });
             } catch (e) {
                 console.log('Error parsing tokens', e);
             }
@@ -168,8 +240,12 @@ export const tokenState = createModel<RootModel>()({
         editToken() {
             dispatch.tokenState.updateDocument();
         },
-        setTokenData() {
-            dispatch.tokenState.updateDocument();
+        setTokenData(payload, rootState) {
+            console.log('setting tokendate effect');
+
+            if (payload.shouldUpdate) {
+                dispatch.tokenState.updateDocument();
+            }
         },
         createToken() {
             dispatch.tokenState.updateDocument();

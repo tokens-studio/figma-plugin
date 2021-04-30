@@ -16,10 +16,12 @@ export default function useTokens() {
     // Return tokens that are included in currently active token set and optionally resolve all aliases
     const resolvedTokens = React.useMemo(() => computeMergedTokens(tokens, usedTokenSet, true), [tokens, usedTokenSet]);
 
+    // Finds token that matches name
     function findToken(token: string) {
         return resolvedTokens.find((n) => n.name === token);
     }
 
+    // Returns resolved value of a specific token
     function getTokenValue(token: string) {
         if (checkIfAlias(token, resolvedTokens)) {
             return getAliasValue(token, resolvedTokens);
@@ -47,6 +49,17 @@ export default function useTokens() {
         return JSON.stringify(tokenObj, null, 2);
     }
 
+    // Calls Figma asking for all local text- and color styles
+    function pullStyles() {
+        postToFigma({
+            type: MessageToPluginTypes.PULL_STYLES,
+            styleTypes: {
+                textStyles: true,
+                colorStyles: true,
+            },
+        });
+    }
+
     // Calls Figma with a specific node to remove node data
     function removeNodeData(data?: string) {
         postToFigma({
@@ -70,5 +83,6 @@ export default function useTokens() {
         removeNodeData,
         getTokenValue,
         createStylesFromTokens,
+        pullStyles,
     };
 }

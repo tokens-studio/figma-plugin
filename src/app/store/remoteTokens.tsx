@@ -4,7 +4,6 @@ import {StorageProviderType} from '@types/api';
 import {notifyToUI} from '../../plugin/notifiers';
 import {useJSONbin} from './providers/jsonbin';
 import useArcade from './providers/arcade';
-import {useTokenDispatch} from './TokenContext';
 import {compareUpdatedAt} from '../components/utils';
 import {Dispatch, RootState} from '../store';
 import useStorage from './useStorage';
@@ -13,7 +12,6 @@ export default function useRemoteTokens() {
     const dispatch = useDispatch<Dispatch>();
     const {api, lastUpdatedAt, localApiState} = useSelector((state: RootState) => state.uiState);
 
-    const {setLoading} = useTokenDispatch();
     const {setStorageType} = useStorage();
     const {fetchDataFromArcade, editArcadeToken, createArcadeToken, deleteArcadeToken} = useArcade();
     const {fetchDataFromJSONBin, createNewJSONBin} = useJSONbin();
@@ -23,7 +21,7 @@ export default function useRemoteTokens() {
         const {id, secret, provider, name} = api;
         if (!id && !secret) return;
 
-        setLoading(true);
+        dispatch.uiState.setLoading(true);
 
         notifyToUI('Fetching from remote...');
         let tokenValues;
@@ -44,7 +42,7 @@ export default function useRemoteTokens() {
         }
 
         dispatch.tokenState.setTokenData(tokenValues);
-        setLoading(false);
+        dispatch.uiState.setLoading(false);
     };
 
     async function editRemoteToken(data: {
@@ -54,14 +52,14 @@ export default function useRemoteTokens() {
         options?: object;
         oldName?: string;
     }) {
-        setLoading(true);
+        dispatch.uiState.setLoading(true);
         const {id, secret} = api;
         const response = await editArcadeToken({id, secret, data});
         if (response) {
-            setLoading(false);
+            dispatch.uiState.setLoading(false);
             return true;
         }
-        setLoading(false);
+        dispatch.uiState.setLoading(false);
         return false;
     }
 
@@ -71,14 +69,14 @@ export default function useRemoteTokens() {
         value: SingleToken;
         options?: object;
     }): Promise<boolean> {
-        setLoading(true);
+        dispatch.uiState.setLoading(true);
         const {id, secret} = api;
         const response = await createArcadeToken({id, secret, data});
         if (response) {
-            setLoading(false);
+            dispatch.uiState.setLoading(false);
             return true;
         }
-        setLoading(false);
+        dispatch.uiState.setLoading(false);
         return false;
     }
 
@@ -106,7 +104,7 @@ export default function useRemoteTokens() {
 
     const syncTokens = async ({id, secret, provider = localApiState.provider, name}) => {
         console.log('Sync tokens');
-        setLoading(true);
+        dispatch.uiState.setLoading(true);
         const remoteTokens = await fetchDataFromRemote(id, secret, name, provider as StorageProviderType);
         if (remoteTokens) {
             setStorageType({provider: {provider, id, name}, bool: true});
@@ -117,10 +115,10 @@ export default function useRemoteTokens() {
             } else {
                 dispatch.tokenState.setTokenData(remoteTokens);
             }
-            setLoading(false);
+            dispatch.uiState.setLoading(false);
             return remoteTokens;
         }
-        setLoading(false);
+        dispatch.uiState.setLoading(false);
         return null;
     };
 

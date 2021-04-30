@@ -1,16 +1,17 @@
 import {useDispatch, useSelector} from 'react-redux';
-import {SingleToken, TokenType} from '../../../types/tokens';
-import {StorageProviderType} from '../../../types/api';
+import {SingleToken, SingleTokenObject, TokenGroup, TokenType} from '@types/tokens';
+import {StorageProviderType} from '@types/api';
+import React from 'react';
 import useRemoteTokens from './remoteTokens';
-import {useTokenDispatch} from './TokenContext';
 import {Dispatch, RootState} from '../store';
-import useTokens from './useTokens';
 
 export default function useManageTokens() {
     const {editToken, createToken, deleteToken} = useDispatch<Dispatch>().tokenState;
     const {storageType} = useSelector((state: RootState) => state.uiState);
+    const {uiWindow} = useSelector((state: RootState) => state.settings);
+    const {activeTokenSet, tokens} = useSelector((state: RootState) => state.tokenState);
+    const dispatch = useDispatch<Dispatch>();
 
-    const {setLoading} = useTokenDispatch();
     const {editRemoteToken, createRemoteToken, deleteRemoteToken} = useRemoteTokens();
 
     async function editSingleToken(data: {
@@ -21,7 +22,7 @@ export default function useManageTokens() {
         oldName?: string;
     }) {
         const {parent, name, value, options, oldName} = data;
-        setLoading(true);
+        dispatch.uiState.setLoading(true);
         const isLocal = storageType.provider === StorageProviderType.LOCAL;
         let shouldUpdate = true;
         if (!isLocal) {
@@ -36,7 +37,7 @@ export default function useManageTokens() {
                 oldName,
             });
         }
-        setLoading(false);
+        dispatch.uiState.setLoading(false);
     }
 
     async function createSingleToken(data: {
@@ -47,7 +48,7 @@ export default function useManageTokens() {
         newGroup?: boolean;
     }) {
         const {parent, name, value, options, newGroup = false} = data;
-        setLoading(true);
+        dispatch.uiState.setLoading(true);
         const isLocal = storageType.provider === StorageProviderType.LOCAL;
         let shouldUpdate = true;
         if (!isLocal) {
@@ -62,17 +63,18 @@ export default function useManageTokens() {
                 newGroup,
             });
         }
-        setLoading(false);
+        dispatch.uiState.setLoading(false);
     }
 
     async function deleteSingleToken(data) {
-        setLoading(true);
+        console.log('storage type is', storageType);
+        dispatch.uiState.setLoading(true);
         const isLocal = storageType.provider === StorageProviderType.LOCAL;
         if (!isLocal) {
             const response = await deleteRemoteToken(data);
         }
         deleteToken(data);
-        setLoading(false);
+        dispatch.uiState.setLoading(false);
     }
 
     return {editSingleToken, createSingleToken, deleteSingleToken};

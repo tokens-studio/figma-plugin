@@ -1,11 +1,6 @@
 import * as React from 'react';
-import {postToFigma} from '../../plugin/notifiers';
-import {MessageToPluginTypes} from '../../../types/messages';
 
 export enum ActionType {
-    SetTokensFromStyles = 'SET_TOKENS_FROM_STYLES',
-    SetLoading = 'SET_LOADING',
-    PullStyles = 'PULL_STYLES',
     SetShowEditForm = 'SET_SHOW_EDIT_FORM',
     SetShowNewGroupForm = 'SET_SHOW_NEW_GROUP_FORM',
     SetShowOptions = 'SET_SHOW_OPTIONS',
@@ -25,7 +20,6 @@ export enum ActionType {
 }
 
 const emptyState = {
-    loading: true,
     collapsed: false,
     displayType: 'GRID',
     colorMode: false,
@@ -41,28 +35,6 @@ const TokenDispatchContext = React.createContext(null);
 
 function stateReducer(state, action) {
     switch (action.type) {
-        case ActionType.SetTokensFromStyles:
-            state.tokenData.injectTokens(action.data, state.activeTokenSet);
-            // updateTokensOnSources(state, action.updatedAt);
-            return {
-                ...state,
-                tokens: state.tokenData.tokens,
-            };
-        case ActionType.SetLoading:
-            return {
-                ...state,
-                loading: action.state,
-            };
-        case ActionType.PullStyles:
-            postToFigma({
-                type: MessageToPluginTypes.PULL_STYLES,
-                styleTypes: {
-                    textStyles: true,
-                    colorStyles: true,
-                },
-            });
-            return state;
-
         case ActionType.ToggleUsedTokenSet: {
             const newState = {
                 ...state,
@@ -179,14 +151,8 @@ function TokenProvider({children}) {
 
     const tokenContext = React.useMemo(
         () => ({
-            setTokensFromStyles: (data) => {
-                dispatch({type: ActionType.SetTokensFromStyles, data, updatedAt});
-            },
             setStringTokens: (data: {parent: string; tokens: string}) => {
                 dispatch({type: ActionType.SetStringTokens, data, updatedAt});
-            },
-            setLoading: (boolean) => {
-                dispatch({type: ActionType.SetLoading, state: boolean});
             },
             setShowEditForm: (bool: boolean) => {
                 dispatch({type: ActionType.SetShowEditForm, bool});
@@ -202,9 +168,6 @@ function TokenProvider({children}) {
             },
             toggleColorMode: () => {
                 dispatch({type: ActionType.ToggleColorMode});
-            },
-            pullStyles: () => {
-                dispatch({type: ActionType.PullStyles, updatedAt});
             },
             setCollapsed: () => {
                 dispatch({type: ActionType.SetCollapsed});

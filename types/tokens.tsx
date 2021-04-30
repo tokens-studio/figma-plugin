@@ -1,3 +1,5 @@
+import {TypographyObject} from './propertyTypes';
+
 export interface TokenProps {
     values: {
         [key: string]: SingleTokenObject[] | TokenObject;
@@ -7,6 +9,13 @@ export interface TokenProps {
 }
 
 export type SingleToken = string | number | TokenGroup;
+
+export type NewTokenObject = {
+    name: string;
+    value: string | TypographyObject | number;
+    type: TokenType | string | 'undefined';
+    description?: string;
+};
 
 export type SingleTokenObject = {
     id: string;

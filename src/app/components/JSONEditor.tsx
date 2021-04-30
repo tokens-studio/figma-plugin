@@ -2,7 +2,6 @@ import * as React from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import Textarea from './Textarea';
 import Heading from './Heading';
-import {useTokenDispatch} from '../store/TokenContext';
 import Button from './Button';
 import Modal from './Modal';
 import TokenSetSelector from './TokenSetSelector';
@@ -13,25 +12,25 @@ import useTokens from '../store/useTokens';
 
 const JSONEditor = () => {
     const {tokens, activeTokenSet, editProhibited} = useSelector((state: RootState) => state.tokenState);
+    const {tokenType} = useSelector((state: RootState) => state.settings);
     const dispatch = useDispatch<Dispatch>();
     const {getFormattedTokens} = useTokens();
 
-    const {setLoading} = useTokenDispatch();
     const [confirmModalVisible, showConfirmModal] = React.useState('');
     const [exportModalVisible, showExportModal] = React.useState(false);
     const [presetModalVisible, showPresetModal] = React.useState(false);
     const [stringTokens, setStringTokens] = React.useState(JSON.stringify(tokens[activeTokenSet]?.values, null, 2));
-    const [tokenType, setTokenType] = React.useState('array');
 
     React.useEffect(() => {
+        console.log('effect triggered');
         setStringTokens(
             tokenType === 'array' ? JSON.stringify(tokens[activeTokenSet]?.values, null, 2) : getFormattedTokens()
         );
-    }, [tokens, activeTokenSet, getFormattedTokens, tokenType]);
+    }, [tokens, activeTokenSet, tokenType]);
 
     const handleUpdate = async () => {
         dispatch.tokenState.setJSONData(stringTokens);
-        await setLoading(true);
+        await dispatch.uiState.setLoading(true);
     };
 
     const handleSetEmpty = () => {
