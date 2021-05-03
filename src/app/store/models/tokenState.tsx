@@ -1,10 +1,10 @@
 /* eslint-disable import/prefer-default-export */
-import convertToTokenArray from '@/utils/convertTokens';
 import {createModel} from '@rematch/core';
 import {SingleTokenObject, TokenGroup, SingleToken, TokenProps} from '@types/tokens';
 import {StorageProviderType} from '@types/api';
 import defaultJSON from '@/config/default.json';
 
+import parseTokenValues from '@/utils/parseTokenValues';
 import {RootModel} from '.';
 import updateTokensOnSources from '../updateSources';
 import * as pjs from '../../../../package.json';
@@ -27,32 +27,6 @@ type EditTokenInput = TokenInput & {
 };
 
 type DeleteTokenInput = {parent: string; path: string};
-
-const parseTokenValues = (tokens) => {
-    if (Array.isArray(tokens)) {
-        return {
-            global: {
-                type: 'array',
-                values: tokens,
-            },
-        };
-    }
-    const reducedTokens = Object.entries(tokens).reduce((prev, group) => {
-        const parsedGroup = group[1];
-        if (typeof parsedGroup === 'object') {
-            const groupValues = [];
-            const convertedToArray = convertToTokenArray({tokens: parsedGroup});
-            convertedToArray.forEach(([key, value]) => {
-                groupValues.push({name: key, ...value});
-            });
-            const convertedGroup = groupValues;
-            prev.push({[group[0]]: {type: 'array', values: convertedGroup}});
-            return prev;
-        }
-    }, []);
-
-    return Object.assign({}, ...reducedTokens);
-};
 
 export interface SelectionValue {
     borderRadius: string | undefined;

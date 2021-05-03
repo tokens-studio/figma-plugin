@@ -28,11 +28,14 @@ function ImportToken({
     updateToken: any;
 }) {
     return (
-        <div className="flex justify-between">
-            <div>
-                <div className="font-semibold text-sm">{name}</div>
-                <div className="text-xs text-gray-600">
-                    {value} {oldValue ? ` (before: ${oldValue})` : ''}
+        <div className="flex justify-between px-4 py-2">
+            <div className="space-y-1">
+                <div className="font-semibold text-xs">{name}</div>
+                <div className="flex space-x-1 items-center">
+                    <div className="font-bold text-xxs bg-green-100 text-green-800 p-1 rounded">{value} </div>
+                    {oldValue ? (
+                        <div className="font-bold text-xxs bg-red-100 text-red-800 p-1 rounded">{oldValue}</div>
+                    ) : null}
                 </div>
                 {(description || oldDescription) && (
                     <div className="text-xxs">
@@ -65,6 +68,7 @@ export default function ImportedTokensDialog() {
 
     const handleCreateNewClick = () => {
         // Create new tokens according to styles
+        // TODO: This should probably be a batch operation
         newTokens.forEach((token) => {
             createSingleToken({
                 parent: activeTokenSet,
@@ -81,6 +85,7 @@ export default function ImportedTokensDialog() {
 
     const handleUpdateClick = () => {
         // Go through each token that needs to be updated
+        // TODO: This should probably be a batch operation
         importedTokens.updatedTokens.forEach((token) => {
             editSingleToken({
                 parent: activeTokenSet,
@@ -93,6 +98,13 @@ export default function ImportedTokensDialog() {
             });
             setUpdatedTokens(updatedTokens.filter((t) => t.name !== token.name));
         });
+    };
+
+    const handleImportAllClick = () => {
+        // Perform both actions for all the tokens
+        // TODO: This should probably be a batch operation
+        handleUpdateClick();
+        handleCreateNewClick();
     };
 
     const handleCreateSingleClick = (token) => {
@@ -136,17 +148,24 @@ export default function ImportedTokensDialog() {
     if (!newTokens.length && !updatedTokens.length) return null;
 
     return (
-        <Modal large showClose isOpen={newTokens.length > 0 || updatedTokens.length > 0} close={handleClose}>
+        <Modal
+            full
+            title="Import Styles"
+            large
+            showClose
+            isOpen={newTokens.length > 0 || updatedTokens.length > 0}
+            close={handleClose}
+        >
             <div className="space-y-8">
                 {newTokens.length > 0 && (
                     <div>
-                        <div className="flex justify-between items-center">
+                        <div className="flex justify-between items-center px-4 pb-2">
                             <Heading>New Tokens</Heading>
                             <Button variant="secondary" id="button-import-create-all" onClick={handleCreateNewClick}>
                                 Create all
                             </Button>
                         </div>
-                        <div className="space-y-2">
+                        <div className="space-y-2 border-t border-gray-300">
                             {newTokens.map((token) => {
                                 return (
                                     <ImportToken
@@ -165,13 +184,13 @@ export default function ImportedTokensDialog() {
                 )}
                 {updatedTokens.length > 0 && (
                     <div>
-                        <div className="flex justify-between">
-                            <Heading>Existing tokens</Heading>
+                        <div className="flex justify-between items-center px-4 pb-2">
+                            <Heading>Existing Tokens</Heading>
                             <Button variant="secondary" id="button-import-update-all" onClick={handleUpdateClick}>
                                 Update all
                             </Button>
                         </div>
-                        <div className="space-y-2">
+                        <div className="space-y-2 border-t border-gray-300">
                             {updatedTokens.map((token) => {
                                 return (
                                     <ImportToken
@@ -192,9 +211,14 @@ export default function ImportedTokensDialog() {
                         </div>
                     </div>
                 )}
-                <Button variant="secondary" id="button-import-close" onClick={handleClose}>
-                    Cancel
-                </Button>
+                <div className="flex justify-between border-t border-gray-300 p-4 ">
+                    <Button variant="secondary" id="button-import-close" onClick={handleClose}>
+                        Cancel
+                    </Button>
+                    <Button variant="primary" id="button-import-all" onClick={handleImportAllClick}>
+                        Import all
+                    </Button>
+                </div>
             </div>
         </Modal>
     );
