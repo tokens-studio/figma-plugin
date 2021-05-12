@@ -37,7 +37,7 @@
 		"ignore-styles": "^5.0.1",
 		"mixpanel-figma": "^2.0.1",
 		"object-path": "^0.11.5",
-		"postcss": "^8.2.8",
+		"postcss": "^8.2.10",
 		"react": "17.0.0",
 		"react-contextmenu": "^2.14.0",
 		"react-dnd": "^13.1.1",
