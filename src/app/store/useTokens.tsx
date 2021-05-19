@@ -49,6 +49,18 @@ export default function useTokens() {
         return JSON.stringify(tokenObj, null, 2);
     }
 
+    // Calls Figma with all tokens and nodes to set data on
+    function getStringTokens() {
+        console.log('Tokens are', tokens);
+        const tokenObj = {};
+        tokens[activeTokenSet].values.forEach((token) => {
+            const {name, ...tokenWithoutName} = token;
+            set(tokenObj, token.name, tokenWithoutName);
+        });
+
+        return JSON.stringify(tokenObj, null, 2);
+    }
+
     // Calls Figma asking for all local text- and color styles
     function pullStyles() {
         postToFigma({
@@ -79,6 +91,7 @@ export default function useTokens() {
     return {
         findToken,
         getFormattedTokens,
+        getStringTokens,
         setNodeData,
         removeNodeData,
         getTokenValue,

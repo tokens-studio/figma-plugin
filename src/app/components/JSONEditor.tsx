@@ -14,7 +14,7 @@ const JSONEditor = () => {
     const {tokens, activeTokenSet, editProhibited} = useSelector((state: RootState) => state.tokenState);
     const {tokenType} = useSelector((state: RootState) => state.settings);
     const dispatch = useDispatch<Dispatch>();
-    const {getFormattedTokens} = useTokens();
+    const {getStringTokens} = useTokens();
 
     const [confirmModalVisible, showConfirmModal] = React.useState('');
     const [exportModalVisible, showExportModal] = React.useState(false);
@@ -24,7 +24,7 @@ const JSONEditor = () => {
     React.useEffect(() => {
         console.log('effect triggered');
         setStringTokens(
-            tokenType === 'array' ? JSON.stringify(tokens[activeTokenSet]?.values, null, 2) : getFormattedTokens()
+            tokenType === 'array' ? JSON.stringify(tokens[activeTokenSet]?.values, null, 2) : getStringTokens()
         );
     }, [tokens, activeTokenSet, tokenType]);
 
