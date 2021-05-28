@@ -108,42 +108,42 @@ export default async function setValuesOnNode(node, values, data) {
                     setColorValuesOnTarget(node, {value: values.fill}, 'fills');
                 }
             }
+        }
 
-            // TYPOGRAPHY
-            // Either set typography or individual values, if typography is present we prefer that.
-            if (values.typography) {
-                if (node.type === 'TEXT') {
-                    const styles = figma.getLocalTextStyles();
-                    const path = data.typography.split('.'); // extract to helper fn
-                    const pathname = path.slice(1, path.length).join('/');
-                    const matchingStyles = styles.filter((n) => n.name === pathname);
+        // TYPOGRAPHY
+        // Either set typography or individual values, if typography is present we prefer that.
+        if (values.typography) {
+            if (node.type === 'TEXT') {
+                const styles = figma.getLocalTextStyles();
+                const path = data.typography.split('.'); // extract to helper fn
+                const pathname = path.slice(1, path.length).join('/');
+                const matchingStyles = styles.filter((n) => n.name === pathname);
 
-                    if (matchingStyles.length) {
-                        node.textStyleId = matchingStyles[0].id;
-                    } else {
-                        setTextValuesOnTarget(node, {value: values.typography});
-                    }
+                if (matchingStyles.length) {
+                    node.textStyleId = matchingStyles[0].id;
+                } else {
+                    setTextValuesOnTarget(node, {value: values.typography});
                 }
-            } else if (
-                values.fontFamilies ||
-                values.fontWeights ||
-                values.lineHeights ||
-                values.fontSizes ||
-                values.letterSpacing ||
-                values.paragraphSpacing
-            ) {
-                if (node.type === 'TEXT') {
-                    setTextValuesOnTarget(node, {
-                        value: {
-                            fontFamily: values.fontFamilies,
-                            fontWeight: values.fontWeights,
-                            lineHeight: values.lineHeights,
-                            fontSize: values.fontSizes,
-                            letterSpacing: values.letterSpacing,
-                            paragraphSpacing: values.paragraphSpacing,
-                        },
-                    });
-                }
+            }
+        } else if (
+            values.fontFamilies ||
+            values.fontWeights ||
+            values.lineHeights ||
+            values.fontSizes ||
+            values.letterSpacing ||
+            values.paragraphSpacing
+        ) {
+            if (node.type === 'TEXT') {
+                setTextValuesOnTarget(node, {
+                    value: {
+                        fontFamily: values.fontFamilies,
+                        fontWeight: values.fontWeights,
+                        lineHeight: values.lineHeights,
+                        fontSize: values.fontSizes,
+                        letterSpacing: values.letterSpacing,
+                        paragraphSpacing: values.paragraphSpacing,
+                    },
+                });
             }
         }
 
