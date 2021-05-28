@@ -116,21 +116,21 @@ export default function pullStyles(styleTypes): void {
 
         typography = figmaTextStyles.map((style) => {
             const obj = {
-                fontFamily: fontFamilies.find((el: SingleTokenObject) => el.value === style.fontName.family)[0]?.name,
+                fontFamily: fontFamilies.find((el: SingleTokenObject) => el.value === style.fontName.family)?.name,
                 fontWeight: fontWeights.find(
                     (el: SingleTokenObject) =>
                         el.name.includes(slugify(style.fontName.family)) && el.value === style.fontName?.style
-                )[0]?.name,
+                )?.name,
                 lineHeight: lineHeights.find(
                     (el: SingleTokenObject) => el.value === convertFigmaToLineHeight(style.lineHeight).toString()
-                )[0]?.name,
-                fontSize: fontSizes.find((el: SingleTokenObject) => el.value === style.fontSize.toString())[0]?.name,
+                )?.name,
+                fontSize: fontSizes.find((el: SingleTokenObject) => el.value === style.fontSize.toString())?.name,
                 letterSpacing: letterSpacing.find(
                     (el: SingleTokenObject) => el.value === convertFigmaToLetterSpacing(style.letterSpacing).toString()
-                )[0]?.name,
+                )?.name,
                 paragraphSpacing: paragraphSpacing.find(
                     (el: SingleTokenObject) => el.value === style.paragraphSpacing.toString()
-                )[0]?.name,
+                )?.name,
             };
 
             const normalizedName = style.name
@@ -156,6 +156,6 @@ export default function pullStyles(styleTypes): void {
         fontSizes,
         letterSpacing,
         paragraphSpacing,
-        // typography, -> Deactivated until we know how to treat these tokens
+        typography,
     });
 }
