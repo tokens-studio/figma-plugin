@@ -10,7 +10,13 @@ export default function updateColorStyles(colorTokens, shouldCreate = false) {
     colorTokenArray.map(([key, value]: [string, ColorToken]) => {
         let matchingStyles = [];
         if (paints.length > 0) {
-            matchingStyles = paints.filter((n) => n.name === key);
+            matchingStyles = paints.filter(
+                (n) =>
+                    n.name
+                        .split('/')
+                        .map((i) => i.trim())
+                        .join('/') === key
+            );
         }
         if (matchingStyles.length) {
             setColorValuesOnTarget(matchingStyles[0], value);
