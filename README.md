@@ -5,28 +5,13 @@
 
 <a href="https://www.producthunt.com/posts/figma-design-tokens?utm_source=badge-featured&utm_medium=badge&utm_souce=badge-figma-design-tokens" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=217712&theme=light" alt="Figma Design Tokens - Making design tokens a single source of truth for Figma. | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
 
-# How to use
+Figma Tokens is a Figma plugin allowing you to define and use design tokens in Figma. It allows you to set and create color or typography styles in a granular way by extracting atomic decisions to tokens. Also, it allows you to define reusable values for spacing which you can apply on Auto Layout layers, or set border radious tokens on rectangles that update whenever your tokens change. Think of it like Styles for everything.
 
-I'm currently in the process of building a dedicated Documentation page. Visit it by going to http://docs.tokens.studio/ — it's still very early, but will hopefully provide some useful information.
+# Documentation
+https://docs.tokens.studio/
 
-## Get started
-When you first open the plugin we give you a set of pre-defined tokens that can be used as-is to show you what is possible. You can delete these tokens by going to the `JSON` tab and hitting the `Clear` button to remove all tokens.
-
-## Creating Tokens
-Create new tokens by hitting the `+` button in the token group that you wish to add a token.
-
-## Creating a new Token Group
-if you want to nest your tokens you can do that. Go to the Edit Tokens dialog o the property you want to create a group for and then hit the `Add a new group` button.
-
-## Applying Tokens
-There are two ways how you can apply tokens to your selection:
-
-### Default behaviour (left-click)
-When you left-click a token this token is being put on your selection (multiple layers selected are possible!). For certain tokens we assume defaults, such as for `Colors` we assume you want to apply `Fill`.
-
-### Specifying what to apply (right-click)
-You can right-click tokens to specify what property should be set, such as in `Spacing` the `Horizontal Spacing`, `Vertical Spacing` or `Gap` properties individually
-
+# How does it work?
+Whenever you apply a token to a layer, the plugin will store hidden information on that layer containing information about what token to apply for what property. Whenever your tokens change, we scan the document for any layers containing these hidden information, and update layers accordingly. For Styles, the plugin checks if there is any local style with the same name of your color or typography tokens and updates these.
 
 # More information
 I will provide more information and some Getting Started videos on my personal website: [jansix.at/resources/figma-tokens](https://jansix.at/resources/figma-tokens)

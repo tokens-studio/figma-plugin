@@ -8,7 +8,13 @@ export default function updateColorStyles(colorTokens, shouldCreate = false) {
     colorTokens.map((token: ColorToken) => {
         let matchingStyles = [];
         if (paints.length > 0) {
-            matchingStyles = paints.filter((n) => n.name === token.name);
+            matchingStyles = paints.filter(
+                (n) =>
+                    n.name
+                        .split('/')
+                        .map((i) => i.trim())
+                        .join('/') === token.name
+            );
         }
         if (matchingStyles.length) {
             setColorValuesOnTarget(matchingStyles[0], token);
