@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {useTokenDispatch, useTokenState} from '../store/TokenContext';
 import EditTokenForm from './EditTokenForm';
 import Heading from './Heading';
@@ -8,7 +8,7 @@ import Modal from './Modal';
 import renderKeyValue from './renderKeyValue';
 import Tooltip from './Tooltip';
 import NewGroupForm from './NewGroupForm';
-import {RootState} from '../store';
+import {Dispatch, RootState} from '../store';
 import useTokens from '../store/useTokens';
 
 const TokenListing = ({
@@ -34,7 +34,9 @@ const TokenListing = ({
     values: object;
 }) => {
     const {editProhibited} = useSelector((state: RootState) => state.tokenState);
+    const {displayType} = useSelector((state: RootState) => state.uiState);
     const {createStylesFromTokens} = useTokens();
+    const dispatch = useDispatch<Dispatch>();
 
     const {collapsed, showEmptyGroups, showEditForm, showNewGroupForm, showOptions} = useTokenState();
     const {setCollapsed, setShowEditForm, setShowOptions} = useTokenDispatch();
@@ -201,7 +203,11 @@ const TokenListing = ({
                                     {showDisplayToggle && (
                                         <Tooltip label={displayType === 'GRID' ? 'Show as List' : 'Show as Grid'}>
                                             <button
-                                                onClick={() => setDisplayType(displayType === 'GRID' ? 'LIST' : 'GRID')}
+                                                onClick={() =>
+                                                    dispatch.uiState.setDisplayType(
+                                                        displayType === 'GRID' ? 'LIST' : 'GRID'
+                                                    )
+                                                }
                                                 type="button"
                                                 className="button button-ghost"
                                             >
