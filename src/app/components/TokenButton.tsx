@@ -14,7 +14,6 @@ const TokenButton = ({type, property, token, editMode, showForm}) => {
     const uiState = useSelector((state: RootState) => state.uiState);
     const {activeTokenSet} = useSelector((state: RootState) => state.tokenState);
     const {setNodeData, getTokenValue} = useTokens();
-    const {setShowOptions} = useTokenDispatch();
     const {deleteSingleToken} = useManageTokens();
     const dispatch = useDispatch<Dispatch>();
     const {isAlias} = useTokens();
@@ -31,8 +30,7 @@ const TokenButton = ({type, property, token, editMode, showForm}) => {
     const buttonClass = [];
 
     const handleEditClick = () => {
-        setShowOptions(property);
-        showForm({name, value: token, path: name});
+        showForm({name, value: token.value, path: name});
     };
 
     const handleDeleteClick = () => {
@@ -156,22 +154,19 @@ const TokenButton = ({type, property, token, editMode, showForm}) => {
 
     const onClick = (givenProperties, isActive = active) => {
         const propsToSet = Array.isArray(givenProperties) ? givenProperties : new Array(givenProperties);
-        if (editMode) {
-            showForm({name, value: token, path: name});
-        } else {
-            const tokenValue = name;
-            track('Apply Token', {givenProperties});
-            let value = isActive ? 'delete' : tokenValue;
-            if (propsToSet[0].clear && !active) {
-                value = 'delete';
-                propsToSet[0].forcedValue = tokenValue;
-            }
-            const newProps = {
-                [propsToSet[0].name || propsToSet[0]]: propsToSet[0].forcedValue || value,
-            };
-            if (propsToSet[0].clear) propsToSet[0].clear.map((item) => Object.assign(newProps, {[item]: 'delete'}));
-            setPluginValue(newProps);
+
+        const tokenValue = name;
+        track('Apply Token', {givenProperties});
+        let value = isActive ? 'delete' : tokenValue;
+        if (propsToSet[0].clear && !active) {
+            value = 'delete';
+            propsToSet[0].forcedValue = tokenValue;
         }
+        const newProps = {
+            [propsToSet[0].name || propsToSet[0]]: propsToSet[0].forcedValue || value,
+        };
+        if (propsToSet[0].clear) propsToSet[0].clear.map((item) => Object.assign(newProps, {[item]: 'delete'}));
+        setPluginValue(newProps);
     };
 
     const getTokenDisplay = (tokenVal) => {

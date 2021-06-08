@@ -1,65 +1,45 @@
 import {track} from '@/utils/analytics';
 import * as React from 'react';
-import {useSelector} from 'react-redux';
-import {RootState} from '../store';
-import {useTokenDispatch} from '../store/TokenContext';
+import {useDispatch, useSelector} from 'react-redux';
+import {Dispatch, RootState} from '../store';
 import useManageTokens from '../store/useManageTokens';
 import Input from './Input';
-import Modal from './Modal';
 
-const EditTokenForm = ({
-    explainer = '',
-    property,
-    isPristine,
-    initialValue,
-    initialName,
-    path,
-    schema,
-    optionsSchema,
-    type,
-}) => {
-    const title = isPristine ? `New Token` : initialName;
+const EditTokenForm = () => {
     const {activeTokenSet} = useSelector((state: RootState) => state.tokenState);
-    const {setShowEditForm} = useTokenDispatch();
     const {editSingleToken, createSingleToken} = useManageTokens();
-
-    const defaultValue = {
-        value: initialValue.value ?? initialValue,
-        options: {
-            description: initialValue.description,
-            type,
-        },
-        name: initialName,
-    };
-    const [tokenValue, setTokenValue] = React.useState(defaultValue);
+    const {editToken} = useSelector((state: RootState) => state.uiState);
+    const dispatch = useDispatch<Dispatch>();
 
     const handleChange = (e) => {
         e.persist();
-        setTokenValue((prevState) => ({...prevState, [e.target.name]: e.target.value}));
+        dispatch.uiState.setEditToken({...editToken, [e.target.name]: e.target.value});
     };
 
     const handleObjectChange = (e) => {
         e.persist();
-        setTokenValue((prevState) => ({...prevState, value: {...prevState.value, [e.target.name]: e.target.value}}));
+        dispatch.uiState.setEditToken({
+            ...editToken,
+            value: {...editToken.value, [e.target.name]: e.target.value},
+        });
     };
 
     const handleOptionsChange = (e) => {
         e.persist();
-        setTokenValue((prevState) => ({
-            ...prevState,
-            options: {...prevState.options, [e.target.name]: e.target.value},
-        }));
+        dispatch.uiState.setEditToken({
+            ...editToken,
+            options: {...editToken.options, [e.target.name]: e.target.value},
+        });
     };
 
     const submitTokenValue = async ({value, name, options}) => {
         track('Edit Token');
 
         let oldName;
-        if (initialName !== name && initialName) {
-            oldName = initialName;
+        if (editToken.initialName !== name && editToken.initialName) {
+            oldName = editToken.initialName;
         }
-        if (isPristine) {
-            console.log('Creating token', path, name, activeTokenSet, value, options);
+        if (editToken.isPristine) {
             createSingleToken({
                 parent: activeTokenSet,
                 name,
@@ -67,7 +47,6 @@ const EditTokenForm = ({
                 options,
             });
         } else {
-            console.log('Editing token', path, name, activeTokenSet, value, options, oldName);
             editSingleToken({
                 parent: activeTokenSet,
                 name,
@@ -80,79 +59,84 @@ const EditTokenForm = ({
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        submitTokenValue(tokenValue);
-        setShowEditForm(false);
+        submitTokenValue(editToken);
+        dispatch.uiState.setShowEditForm(false);
     };
 
     const handleReset = () => {
-        setShowEditForm(false);
+        dispatch.uiState.setShowEditForm(false);
     };
 
+    const firstInput: React.RefObject<HTMLInputElement> = React.useRef(null);
+
+    React.useEffect(() => {
+        setTimeout(() => {
+            firstInput.current.focus();
+        }, 50);
+    }, []);
+
     return (
-        <Modal isOpen close={handleReset} title={title}>
-            <form onSubmit={handleSubmit} className="space-y-4 flex flex-col justify-start">
+        <form onSubmit={handleSubmit} className="space-y-4 flex flex-col justify-start">
+            <Input
+                required
+                full
+                label="Name"
+                value={editToken.name}
+                onChange={handleChange}
+                type="text"
+                name="name"
+                inputRef={firstInput}
+            />
+            {typeof editToken.schema === 'object' ? (
+                Object.entries(editToken.schema).map(([key, schemaValue]: [string, string]) => (
+                    <Input
+                        key={key}
+                        full
+                        label={key}
+                        value={editToken.value[key]}
+                        onChange={handleObjectChange}
+                        type="text"
+                        name={key}
+                        custom={schemaValue}
+                        required
+                    />
+                ))
+            ) : (
                 <Input
-                    required
                     full
-                    label="Name"
-                    value={tokenValue.name}
+                    label={editToken.property}
+                    value={editToken.value}
                     onChange={handleChange}
                     type="text"
-                    name="name"
+                    name="value"
+                    required
+                    custom={editToken.schema}
                 />
-                {typeof schema === 'object' ? (
-                    Object.entries(schema).map(([key, schemaValue]: [string, string]) => (
-                        <Input
-                            key={key}
-                            full
-                            label={key}
-                            value={tokenValue.value ? tokenValue.value[key] : tokenValue[key]}
-                            onChange={handleObjectChange}
-                            type="text"
-                            name={key}
-                            custom={schemaValue}
-                            required
-                        />
-                    ))
-                ) : (
-                    <Input
-                        full
-                        label={property}
-                        value={tokenValue.value}
-                        onChange={handleChange}
-                        type="text"
-                        name="value"
-                        required
-                        custom={schema}
-                    />
-                )}
-
-                {optionsSchema
-                    ? Object.entries(optionsSchema).map(([key, schemaValue]: [string, string]) => (
-                          <Input
-                              key={key}
-                              full
-                              label={key}
-                              value={tokenValue.options[key]}
-                              onChange={handleOptionsChange}
-                              type="text"
-                              name={key}
-                              custom={schemaValue}
-                          />
-                      ))
-                    : null}
-
-                {explainer && <div className="mt-1 text-xxs text-gray-600">{explainer}</div>}
-                <div className="flex space-x-2 justify-end">
-                    <button className="button button-link" type="button" onClick={handleReset}>
-                        Cancel
-                    </button>
-                    <button className="button button-primary" type="submit">
-                        {isPristine ? 'Create' : 'Update'}
-                    </button>
-                </div>
-            </form>
-        </Modal>
+            )}
+            {editToken.optionsSchema
+                ? Object.entries(editToken.optionsSchema).map(([key, schemaValue]: [string, string]) => (
+                      <Input
+                          key={key}
+                          full
+                          label={key}
+                          value={editToken.options[key]}
+                          onChange={handleOptionsChange}
+                          type="text"
+                          name={key}
+                          custom={schemaValue}
+                      />
+                  ))
+                : null}
+            {editToken.explainer && <div className="mt-1 text-xxs text-gray-600">{editToken.explainer}</div>}
+            <div className="flex space-x-2 justify-end">
+                <button className="button button-link" type="button" onClick={handleReset}>
+                    Cancel
+                </button>
+                <button disabled={!editToken.value} className="button button-primary" type="submit">
+                    {editToken.isPristine ? 'Create' : 'Update'}
+                </button>
+            </div>
+        </form>
     );
 };
 

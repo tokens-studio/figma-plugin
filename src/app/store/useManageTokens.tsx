@@ -22,7 +22,7 @@ export default function useManageTokens() {
         const {parent, name, value, options, oldName, shouldUpdateDocument = true} = data;
         dispatch.uiState.setLoading(true);
         const isLocal = storageType.provider === StorageProviderType.LOCAL;
-        let shouldUpdate = shouldUpdateDocument;
+        let shouldUpdate = true;
         if (!isLocal) {
             shouldUpdate = await editRemoteToken(data);
         }
@@ -33,6 +33,7 @@ export default function useManageTokens() {
                 value,
                 options,
                 oldName,
+                shouldUpdate: shouldUpdateDocument,
             });
         }
         dispatch.uiState.setLoading(false);
@@ -50,7 +51,7 @@ export default function useManageTokens() {
         const {parent, name, value, options, newGroup = false, shouldUpdateDocument = true} = data;
         dispatch.uiState.setLoading(true);
         const isLocal = storageType.provider === StorageProviderType.LOCAL;
-        let shouldUpdate = shouldUpdateDocument;
+        let shouldUpdate = true;
         if (!isLocal) {
             shouldUpdate = await createRemoteToken(data);
         }
@@ -62,7 +63,7 @@ export default function useManageTokens() {
                 value,
                 options,
                 newGroup,
-                shouldUpdate,
+                shouldUpdate: shouldUpdateDocument,
             });
         }
         dispatch.uiState.setLoading(false);

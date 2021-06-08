@@ -6,6 +6,7 @@ import TokensBottomBar from './TokensBottomBar';
 import ToggleEmptyButton from './ToggleEmptyButton';
 import {mappedTokens} from './createTokenObj';
 import {RootState} from '../store';
+import EditTokenFormModal from './EditTokenFormModal';
 
 interface TokenListingType {
     label: string;
@@ -22,6 +23,7 @@ interface TokenListingType {
 
 const Tokens = ({isActive}) => {
     const {tokens, activeTokenSet} = useSelector((state: RootState) => state.tokenState);
+    const {showEditForm} = useSelector((state: RootState) => state.uiState);
 
     const memoizedTokens = React.useMemo(() => {
         if (tokens[activeTokenSet]?.values) {
@@ -42,7 +44,6 @@ const Tokens = ({isActive}) => {
                             label={group.label}
                             explainer={group.explainer}
                             schema={group.schema}
-                            help={group.help}
                             property={group.property}
                             tokenType={group.type}
                             values={group.values}
@@ -50,6 +51,7 @@ const Tokens = ({isActive}) => {
                     </div>
                 );
             })}
+            {showEditForm && <EditTokenFormModal />}
             <ToggleEmptyButton />
             <TokensBottomBar />
         </div>

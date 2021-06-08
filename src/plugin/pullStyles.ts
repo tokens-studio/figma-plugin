@@ -73,7 +73,7 @@ export default function pullStyles(styleTypes): void {
             .map((size, idx) => ({
                 name: `global.fontSize.${idx}`,
                 value: size.toString(),
-                type: 'fontSize',
+                type: 'fontSizes',
             }));
         const uniqueFontCombinations = fontCombinations.filter(
             (v, i, a) => a.findIndex((t) => t.family === v.family && t.style === v.style) === i
@@ -83,19 +83,19 @@ export default function pullStyles(styleTypes): void {
             .map((lh, idx) => ({
                 name: `global.lineHeights.${idx}`,
                 value: convertFigmaToLineHeight(lh).toString(),
-                type: 'lineHeight',
+                type: 'lineHeights',
             }));
 
         fontFamilies = [...new Set(uniqueFontCombinations.map((font) => font.family))].map((fontFamily) => ({
             name: `global.fontFamilies.${slugify(fontFamily)}`,
             value: fontFamily,
-            type: 'fontFamily',
+            type: 'fontFamilies',
         }));
 
         fontWeights = uniqueFontCombinations.map((font, idx) => ({
             name: `global.fontWeights.${slugify(font.family)}-${idx}`,
             value: font.style,
-            type: 'fontWeight',
+            type: 'fontWeights',
         }));
 
         paragraphSpacing = rawParagraphSpacing

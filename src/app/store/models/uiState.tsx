@@ -16,6 +16,19 @@ export interface SelectionValue {
 
 type DisplayType = 'GRID' | 'LIST';
 
+interface EditToken {
+    value: string | object;
+    name: string;
+    initialName: string;
+    path: string;
+    isPristine: boolean;
+    explainer?: string;
+    property: string;
+    schema: object;
+    optionsSchema: object;
+    options: object;
+}
+
 interface UIState {
     selectionValues: object;
     displayType: DisplayType;
@@ -31,6 +44,8 @@ interface UIState {
     lastUpdatedAt: Date | null;
     changelog: object[];
     lastOpened: string | null;
+    editToken: EditToken | null;
+    showEditForm: boolean;
 }
 
 export const uiState = createModel<RootModel>()({
@@ -47,12 +62,7 @@ export const uiState = createModel<RootModel>()({
             id: '',
             name: '',
         },
-        api: {
-            id: '',
-            secret: '',
-            provider: '',
-            name: '',
-        },
+        api: null,
         apiProviders: [],
         localApiState: {
             id: '',
@@ -64,12 +74,26 @@ export const uiState = createModel<RootModel>()({
         lastUpdatedAt: null,
         changelog: [],
         lastOpened: '',
+        editToken: null,
+        showEditForm: false,
     } as UIState,
     reducers: {
         setDisabled: (state, data: boolean) => {
             return {
                 ...state,
                 disabled: data,
+            };
+        },
+        setEditToken: (state, data: EditToken) => {
+            return {
+                ...state,
+                editToken: data,
+            };
+        },
+        setShowEditForm: (state, data: boolean) => {
+            return {
+                ...state,
+                showEditForm: data,
             };
         },
         setDisplayType: (state, data: DisplayType) => {
