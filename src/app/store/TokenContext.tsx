@@ -7,12 +7,6 @@ export enum ActionType {
     SetCollapsed = 'SET_COLLAPSED',
     ToggleShowEmptyGroups = 'TOGGLE_SHOW_EMPTY_GROUPS',
     ToggleUpdateAfterApply = 'TOGGLE_UPDATE_AFTER_APPLY',
-    SetActiveTokenSet = 'SET_ACTIVE_TOKEN_SET',
-    ToggleUsedTokenSet = 'TOGGLE_USED_TOKEN_SET',
-    AddTokenSet = 'ADD_TOKEN_SET',
-    DeleteTokenSet = 'DELETE_TOKEN_SET',
-    RenameTokenSet = 'RENAME_TOKEN_SET',
-    SetTokenSetOrder = 'SET_TOKEN_SET_ORDER',
     CreateTokenGroup = 'CREATE_TOKEN_GROUP',
     SetSyncEnabled = 'SET_SYNC_ENABLED',
 }
@@ -31,33 +25,6 @@ const TokenDispatchContext = React.createContext(null);
 
 function stateReducer(state, action) {
     switch (action.type) {
-        case ActionType.ToggleUsedTokenSet: {
-            const newState = {
-                ...state,
-                usedTokenSet: state.usedTokenSet.includes(action.data)
-                    ? state.usedTokenSet.filter((n) => n !== action.data)
-                    : [...new Set([...state.usedTokenSet, action.data])],
-            };
-            state.tokenData.setUsedTokenSet(newState.usedTokenSet);
-            // updateTokensOnSources(state, action.updatedAt, false);
-            return newState;
-        }
-        case ActionType.SetShowEditForm:
-            return {
-                ...state,
-                showEditForm: action.bool,
-            };
-        case ActionType.SetShowNewGroupForm:
-            return {
-                ...state,
-                showNewGroupForm: action.bool,
-            };
-        case ActionType.SetShowOptions:
-            return {
-                ...state,
-                showOptions: action.data,
-            };
-
         case ActionType.SetCollapsed:
             return {
                 ...state,
@@ -74,44 +41,6 @@ function stateReducer(state, action) {
                 ...state,
                 updateAfterApply: action.bool,
             };
-        case ActionType.SetActiveTokenSet:
-            return {
-                ...state,
-                activeTokenSet: action.data,
-            };
-        case ActionType.AddTokenSet: {
-            state.tokenData.addTokenSet(action.data, action.updatedAt);
-            return {
-                ...state,
-                tokenData: state.tokenData,
-            };
-        }
-        case ActionType.DeleteTokenSet: {
-            state.tokenData.deleteTokenSet(action.data, action.updatedAt);
-            return {
-                ...state,
-                activeTokenSet:
-                    state.activeTokenSet === action.data ? Object.keys(state.tokens)[0] : state.activeTokenSet,
-            };
-        }
-        case ActionType.RenameTokenSet: {
-            state.tokenData.renameTokenSet({
-                oldName: action.oldName,
-                newName: action.newName,
-                updatedAt: action.updatedAt,
-            });
-            return {
-                ...state,
-                activeTokenSet: state.activeTokenSet === action.oldName ? action.newName : state.activeTokenSet,
-            };
-        }
-        case ActionType.SetTokenSetOrder: {
-            state.tokenData.reorderTokenSets(action.data);
-            return {
-                ...state,
-                tokenData: state.tokenData,
-            };
-        }
 
         case ActionType.CreateTokenGroup: {
             console.log('Not implemented');
@@ -138,17 +67,8 @@ function TokenProvider({children}) {
 
     const tokenContext = React.useMemo(
         () => ({
-            setStringTokens: (data: {parent: string; tokens: string}) => {
-                dispatch({type: ActionType.SetStringTokens, data, updatedAt});
-            },
-            setShowEditForm: (bool: boolean) => {
-                dispatch({type: ActionType.SetShowEditForm, bool});
-            },
             setShowNewGroupForm: (bool: boolean) => {
                 dispatch({type: ActionType.SetShowNewGroupForm, bool});
-            },
-            setShowOptions: (data: string | boolean) => {
-                dispatch({type: ActionType.SetShowOptions, data});
             },
 
             setCollapsed: () => {
@@ -159,25 +79,6 @@ function TokenProvider({children}) {
             },
             toggleUpdateAfterApply: (bool: boolean) => {
                 dispatch({type: ActionType.ToggleUpdateAfterApply, bool});
-            },
-            toggleUsedTokenSet: (data: string) => {
-                dispatch({type: ActionType.ToggleUsedTokenSet, data, updatedAt});
-            },
-
-            setActiveTokenSet: (data: string) => {
-                dispatch({type: ActionType.SetActiveTokenSet, data});
-            },
-            addTokenSet: (data: string) => {
-                dispatch({type: ActionType.AddTokenSet, data, updatedAt});
-            },
-            deleteTokenSet: (data: string) => {
-                dispatch({type: ActionType.DeleteTokenSet, data, updatedAt});
-            },
-            renameTokenSet: (oldName: string, newName: string) => {
-                dispatch({type: ActionType.RenameTokenSet, oldName, newName, updatedAt});
-            },
-            setTokenSetOrder: (data: string[]) => {
-                dispatch({type: ActionType.SetTokenSetOrder, data, updatedAt});
             },
 
             createTokenGroup: (data: {parent: string; name: string; updatedAt: Date}) => {

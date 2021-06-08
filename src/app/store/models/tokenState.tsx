@@ -58,6 +58,59 @@ export const tokenState = createModel<RootModel>()({
         editProhibited: false,
     } as TokenState,
     reducers: {
+        toggleUsedTokenSet: (state, data: string) => {
+            return {
+                ...state,
+                usedTokenSet: state.usedTokenSet.includes(data)
+                    ? state.usedTokenSet.filter((n) => n !== data)
+                    : [...new Set([...state.usedTokenSet, data])],
+            };
+        },
+        setActiveTokenSet: (state, data: string) => {
+            return {
+                ...state,
+                activeTokenSet: data,
+            };
+        },
+        addTokenSet: (state, data: string) => {
+            // Handle add new token set
+            if (state.tokens[data]) return state;
+            return {
+                ...state,
+                tokens: {
+                    ...state.tokens,
+                    [data]: {
+                        values: [],
+                    },
+                },
+            };
+        },
+        deleteTokenSet: (state, data: string) => {
+            const oldTokens = state.tokens;
+            delete oldTokens[data];
+            return {
+                ...state,
+                tokens: oldTokens,
+                activeTokenSet: state.activeTokenSet === data ? Object.keys(state.tokens)[0] : state.activeTokenSet,
+            };
+        },
+        renameTokenSet: (state, data: {oldName: string; newName: string}) => {
+            console.log('Renaming token set', data.oldName, data.newName, state.tokens);
+            // Handle add new token set
+            const oldTokens = state.tokens;
+            oldTokens[data.newName] = oldTokens[data.oldName];
+            delete oldTokens[data.oldName];
+            console.log('after delete', oldTokens);
+            return {
+                ...state,
+                tokens: oldTokens,
+                activeTokenSet: state.activeTokenSet === data.oldName ? data.newName : state.activeTokenSet,
+            };
+        },
+        setTokenSetOrder: (state, data: string[]) => {
+            // Handle reorder token set
+            return state;
+        },
         resetImportedTokens: (state) => {
             return {
                 ...state,
@@ -68,6 +121,7 @@ export const tokenState = createModel<RootModel>()({
             };
         },
         setTokenData: (state, data: {values: SingleTokenObject[]; shouldUpdate: boolean}) => {
+            console.log('Before setting data', data.values);
             const values = parseTokenValues(data.values);
             console.log('setting token data', values);
             return {
@@ -204,7 +258,7 @@ export const tokenState = createModel<RootModel>()({
             try {
                 parseTokenValues(parsedTokens);
                 dispatch.tokenState.setTokenData({
-                    values: {[rootState.tokenState.activeTokenSet]: parsedTokens},
+                    values: {...rootState.tokenState.tokens, [rootState.tokenState.activeTokenSet]: parsedTokens},
                     shouldUpdate: true,
                 });
             } catch (e) {

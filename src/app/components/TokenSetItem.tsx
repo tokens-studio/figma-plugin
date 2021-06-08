@@ -3,9 +3,8 @@ import {useDrop, useDrag, DropTargetMonitor} from 'react-dnd';
 import {getEmptyImage} from 'react-dnd-html5-backend';
 import {XYCoord} from 'dnd-core';
 import {ContextMenu, ContextMenuTrigger, MenuItem} from 'react-contextmenu';
-import {useSelector} from 'react-redux';
-import {useTokenDispatch} from '../store/TokenContext';
-import {RootState} from '../store';
+import {useDispatch, useSelector} from 'react-redux';
+import {Dispatch, RootState} from '../store';
 
 interface DragItem {
     index: number;
@@ -19,7 +18,7 @@ enum ItemTypes {
 
 export default function TokenSetItem({tokenSet, onMove, index, onRename, onDelete, onDrop}) {
     const {tokens, activeTokenSet, usedTokenSet, editProhibited} = useSelector((state: RootState) => state.tokenState);
-    const {toggleUsedTokenSet, setActiveTokenSet} = useTokenDispatch();
+    const dispatch = useDispatch<Dispatch>();
 
     const ref = React.useRef<HTMLDivElement>(null);
 
@@ -112,14 +111,14 @@ export default function TokenSetItem({tokenSet, onMove, index, onRename, onDelet
                         activeTokenSet === tokenSet && 'border-blue-500 bg-blue-100'
                     }`}
                     type="button"
-                    onClick={() => setActiveTokenSet(tokenSet)}
+                    onClick={() => dispatch.tokenState.setActiveTokenSet(tokenSet)}
                 >
                     <input
                         type="checkbox"
                         className="py-2 pl-2"
                         id={`toggle-${tokenSet}`}
                         checked={usedTokenSet.includes(tokenSet)}
-                        onChange={() => toggleUsedTokenSet(tokenSet)}
+                        onChange={() => dispatch.tokenState.toggleUsedTokenSet(tokenSet)}
                     />
                     {tokenSet}
                 </button>

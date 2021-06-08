@@ -2,9 +2,8 @@ import {track} from '@/utils/analytics';
 import React from 'react';
 import {DndProvider} from 'react-dnd';
 import {HTML5Backend} from 'react-dnd-html5-backend';
-import {useSelector} from 'react-redux';
-import {RootState} from '../store';
-import {useTokenDispatch} from '../store/TokenContext';
+import {useDispatch, useSelector} from 'react-redux';
+import {Dispatch, RootState} from '../store';
 import Button from './Button';
 import Heading from './Heading';
 import Icon from './Icon';
@@ -15,7 +14,8 @@ import Tooltip from './Tooltip';
 
 export default function TokenSetSelector() {
     const {tokens, editProhibited} = useSelector((state: RootState) => state.tokenState);
-    const {addTokenSet, renameTokenSet, deleteTokenSet, setTokenSetOrder} = useTokenDispatch();
+    const dispatch = useDispatch<Dispatch>();
+
     const [showNewTokenSetFields, setShowNewTokenSetFields] = React.useState(false);
     const [showDeleteTokenSetModal, setShowDeleteTokenSetModal] = React.useState(false);
     const [showRenameTokenSetFields, setShowRenameTokenSetFields] = React.useState(false);
@@ -23,9 +23,11 @@ export default function TokenSetSelector() {
     const [tokenSetMarkedForChange, setTokenSetMarkedForChange] = React.useState('');
     const [totalTokenSetArray, setTotalTokenSetArray] = React.useState(Object.keys(tokens));
 
+    const tokenKeys = Object.keys(tokens);
+
     React.useEffect(() => {
-        setTotalTokenSetArray(Object.keys(tokens));
-    }, [tokens]);
+        setTotalTokenSetArray(tokenKeys);
+    }, [tokenKeys]);
 
     const stringOrder = JSON.stringify(totalTokenSetArray);
 
@@ -47,7 +49,7 @@ export default function TokenSetSelector() {
     const handleNewTokenSetSubmit = (e) => {
         e.preventDefault();
         track('Created token set', {name: newTokenSetName});
-        addTokenSet(newTokenSetName.trim());
+        dispatch.tokenState.addTokenSet(newTokenSetName.trim());
     };
 
     const handleDeleteTokenSet = (tokenSet) => {
@@ -63,14 +65,14 @@ export default function TokenSetSelector() {
     };
 
     const handleConfirmDeleteTokenSet = () => {
-        deleteTokenSet(tokenSetMarkedForChange);
+        dispatch.tokenState.deleteTokenSet(tokenSetMarkedForChange);
         setTokenSetMarkedForChange('');
         setShowDeleteTokenSetModal(false);
     };
 
     const handleRenameTokenSetSubmit = (e) => {
         e.preventDefault();
-        renameTokenSet(tokenSetMarkedForChange, newTokenSetName.trim());
+        dispatch.tokenState.renameTokenSet({oldName: tokenSetMarkedForChange, newName: newTokenSetName.trim()});
         setTokenSetMarkedForChange('');
         setShowRenameTokenSetFields(false);
     };
@@ -85,7 +87,7 @@ export default function TokenSetSelector() {
             <DndProvider backend={HTML5Backend}>
                 {totalTokenSetArray.map((tokenSet, index) => (
                     <TokenSetItem
-                        onDrop={() => setTokenSetOrder(totalTokenSetArray)}
+                        onDrop={() => dispatch.tokenState.setTokenSetOrder(totalTokenSetArray)}
                         onMove={reorderSets}
                         tokenSet={tokenSet}
                         index={index}
