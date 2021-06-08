@@ -14,8 +14,11 @@ export interface SelectionValue {
     itemSpacing: string | undefined;
 }
 
+type DisplayType = 'GRID' | 'LIST';
+
 interface UIState {
     selectionValues: object;
+    displayType: DisplayType;
     disabled: boolean;
     loading: boolean;
     activeTab: TabNames;
@@ -34,6 +37,7 @@ export const uiState = createModel<RootModel>()({
     state: {
         selectionValues: {},
         disabled: false,
+        displayType: 'GRID',
         loading: false,
         activeTab: 'start',
         projectURL: '',
@@ -66,6 +70,12 @@ export const uiState = createModel<RootModel>()({
             return {
                 ...state,
                 disabled: data,
+            };
+        },
+        setDisplayType: (state, data: DisplayType) => {
+            return {
+                ...state,
+                displayType: data,
             };
         },
         setSelectionValues: (state, data: SelectionValue) => {

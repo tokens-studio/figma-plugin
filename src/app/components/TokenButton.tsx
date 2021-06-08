@@ -3,7 +3,7 @@ import {track} from '@/utils/analytics';
 import {useDispatch, useSelector} from 'react-redux';
 import Tooltip from './Tooltip';
 import MoreButton from './MoreButton';
-import {useTokenState, useTokenDispatch} from '../store/TokenContext';
+import {useTokenDispatch} from '../store/TokenContext';
 import Icon from './Icon';
 import {lightOrDark, isTypographyToken} from './utils';
 import useManageTokens from '../store/useManageTokens';
@@ -15,7 +15,6 @@ const TokenButton = ({type, property, token, editMode, showForm}) => {
     const uiState = useSelector((state: RootState) => state.uiState);
     const {activeTokenSet} = useSelector((state: RootState) => state.tokenState);
     const {setNodeData, getTokenValue} = useTokens();
-    const {displayType} = useTokenState();
     const {setShowOptions} = useTokenDispatch();
     const {deleteSingleToken} = useManageTokens();
     const dispatch = useDispatch<Dispatch>();
@@ -120,7 +119,7 @@ const TokenButton = ({type, property, token, editMode, showForm}) => {
                 '--borderColor': lightOrDark(displayValue) === 'light' ? '#f5f5f5' : 'white',
             };
             buttonClass.push('button-property-color');
-            if (displayType === 'LIST') {
+            if (uiState.displayType === 'LIST') {
                 buttonClass.push('button-property-color-listing');
                 showValue = true;
                 if (!editMode) showEditButton = true;

@@ -36,8 +36,8 @@ const TokenListing = ({
     const {editProhibited} = useSelector((state: RootState) => state.tokenState);
     const {createStylesFromTokens} = useTokens();
 
-    const {collapsed, showEmptyGroups, showEditForm, showNewGroupForm, showOptions, displayType} = useTokenState();
-    const {setCollapsed, setShowEditForm, setShowOptions, setDisplayType} = useTokenDispatch();
+    const {collapsed, showEmptyGroups, showEditForm, showNewGroupForm, showOptions} = useTokenState();
+    const {setCollapsed, setShowEditForm, setShowOptions} = useTokenDispatch();
 
     const createButton = ['color', 'typography'].includes(tokenType);
     const showDisplayToggle = tokenType === 'color';

@@ -4,8 +4,6 @@ export enum ActionType {
     SetShowEditForm = 'SET_SHOW_EDIT_FORM',
     SetShowNewGroupForm = 'SET_SHOW_NEW_GROUP_FORM',
     SetShowOptions = 'SET_SHOW_OPTIONS',
-    SetDisplayType = 'SET_DISPLAY_TYPE',
-    ToggleColorMode = 'TOGGLE_COLOR_MODE',
     SetCollapsed = 'SET_COLLAPSED',
     ToggleShowEmptyGroups = 'TOGGLE_SHOW_EMPTY_GROUPS',
     ToggleUpdateAfterApply = 'TOGGLE_UPDATE_AFTER_APPLY',
@@ -21,8 +19,6 @@ export enum ActionType {
 
 const emptyState = {
     collapsed: false,
-    displayType: 'GRID',
-    colorMode: false,
     showEditForm: false,
     showNewGroupForm: false,
     showEmptyGroups: true,
@@ -61,16 +57,7 @@ function stateReducer(state, action) {
                 ...state,
                 showOptions: action.data,
             };
-        case ActionType.SetDisplayType:
-            return {
-                ...state,
-                displayType: action.data,
-            };
-        case ActionType.ToggleColorMode:
-            return {
-                ...state,
-                colorMode: !state.colorMode,
-            };
+
         case ActionType.SetCollapsed:
             return {
                 ...state,
@@ -163,12 +150,7 @@ function TokenProvider({children}) {
             setShowOptions: (data: string | boolean) => {
                 dispatch({type: ActionType.SetShowOptions, data});
             },
-            setDisplayType: (data: string) => {
-                dispatch({type: ActionType.SetDisplayType, data});
-            },
-            toggleColorMode: () => {
-                dispatch({type: ActionType.ToggleColorMode});
-            },
+
             setCollapsed: () => {
                 dispatch({type: ActionType.SetCollapsed});
             },

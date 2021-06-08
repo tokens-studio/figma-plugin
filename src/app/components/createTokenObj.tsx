@@ -1,5 +1,6 @@
 import {mergeDeep} from '@/plugin/helpers';
 import {SingleTokenObject, TokenType} from '@types/tokens';
+import set from 'set-value';
 
 import tokenTypes from '../../config/tokenTypes';
 import {DEFAULT_DEPTH_LEVEL} from './constants';
@@ -34,20 +35,18 @@ export function createTokensObject(tokens: SingleTokenObject[], uiDepth) {
         const hasTypeProp = cur.type && cur.type !== '' && cur.type !== 'undefined';
         const propToSet = hasTypeProp ? cur.type : transformName(cur.name.split('.').slice(0, 1).toString());
         acc[propToSet] = acc[propToSet] || {values: {}};
-        const depth = uiDepth === cur.name.split('.').length ? uiDepth - 1 : uiDepth;
+        const depth = uiDepth === cur.name.split('.').length ? cur.name.split('.').length - 1 : uiDepth;
         const groupName = cur.name.split('.').slice(0, depth).join('.');
-        acc[propToSet].values[groupName] = acc[propToSet].values[groupName] || [];
-        acc[propToSet].values[groupName].push(cur);
-        mergeDeep(acc[propToSet].values, {[groupName]: cur});
+        console.log('Setting group', groupName, cur, acc[propToSet].values);
+        acc[propToSet].values = acc[propToSet].values || {};
+        set(acc[propToSet].values, cur.name, cur);
         return acc;
     }, {});
-    console.log('Tokens obj', obj);
     return obj;
 }
 
 // Takes an array of tokens, transforms them into an object and merges that with values we require for the UI
 export function mappedTokens(tokens: SingleTokenObject[], depth = DEFAULT_DEPTH_LEVEL) {
-    console.log('Maps tokens');
     const tokenObj = {};
     Object.entries(createTokensObject(tokens, depth)).forEach(
         ([key, group]: [string, {values: SingleTokenObject[]; type?: TokenType}]) => {
@@ -58,8 +57,6 @@ export function mappedTokens(tokens: SingleTokenObject[], depth = DEFAULT_DEPTH_
     );
 
     mergeDeep(tokenObj, tokenTypes);
-
-    console.log('returning', Object.entries(tokenObj));
 
     return Object.entries(tokenObj);
 }

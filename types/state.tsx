@@ -10,8 +10,6 @@ export type StateType = {
     collapsed: boolean;
     tokenData: TokenData;
     selectionValues: object;
-    displayType: 'GRID' | 'LIST';
-    colorMode: boolean;
     showEditForm: boolean;
     showOptions: boolean | string;
     api: ApiDataType;
