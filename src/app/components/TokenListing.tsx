@@ -35,7 +35,7 @@ const TokenListing = ({
     const {createStylesFromTokens} = useTokens();
 
     const {collapsed, showEmptyGroups} = useTokenState();
-    const {setCollapsed, setDisplayType} = useTokenDispatch();
+    const {setCollapsed} = useTokenDispatch();
 
     const createButton = ['color', 'typography'].includes(tokenType);
     const showDisplayToggle = tokenType === 'color';
@@ -112,7 +112,9 @@ const TokenListing = ({
                     {showDisplayToggle && (
                         <Tooltip label={displayType === 'GRID' ? 'Show as List' : 'Show as Grid'}>
                             <button
-                                onClick={() => setDisplayType(displayType === 'GRID' ? 'LIST' : 'GRID')}
+                                onClick={() =>
+                                    dispatch.uiState.setDisplayType(displayType === 'GRID' ? 'LIST' : 'GRID')
+                                }
                                 type="button"
                                 className="button button-ghost"
                             >

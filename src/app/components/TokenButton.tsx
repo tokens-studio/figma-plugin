@@ -3,11 +3,9 @@ import {track} from '@/utils/analytics';
 import {useDispatch, useSelector} from 'react-redux';
 import Tooltip from './Tooltip';
 import MoreButton from './MoreButton';
-import {useTokenDispatch} from '../store/TokenContext';
 import {lightOrDark, isTypographyToken} from './utils';
 import useManageTokens from '../store/useManageTokens';
 import {Dispatch, RootState} from '../store';
-import {DEFAULT_DEPTH_LEVEL} from './constants';
 import useTokens from '../store/useTokens';
 
 const TokenButton = ({type, property, token, editMode, showForm}) => {
@@ -21,7 +19,6 @@ const TokenButton = ({type, property, token, editMode, showForm}) => {
     const displayValue = getTokenValue(token);
     let style;
     let showValue = true;
-    let showEditButton = false;
     let properties = [type];
     const {name} = token;
     // Only show the last part of a token in a group
@@ -117,7 +114,6 @@ const TokenButton = ({type, property, token, editMode, showForm}) => {
             if (uiState.displayType === 'LIST') {
                 buttonClass.push('button-property-color-listing');
                 showValue = true;
-                if (!editMode) showEditButton = true;
             }
             break;
         default:
@@ -215,17 +211,6 @@ const TokenButton = ({type, property, token, editMode, showForm}) => {
                     </button>
                 </Tooltip>
             </MoreButton>
-            {showEditButton && (
-                <Tooltip label="Edit Token">
-                    <button
-                        className="ml-auto button button-ghost button-property-edit"
-                        type="button"
-                        onClick={handleEditClick}
-                    >
-                        <Icon name="edit" />
-                    </button>
-                </Tooltip>
-            )}
         </div>
     );
 };
