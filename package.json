@@ -20,10 +20,12 @@
 	},
 	"dependencies": {
 		"@figma-plugin/helpers": "^0.13.2",
+		"@radix-ui/react-tooltip": "^0.0.18",
 		"@reach/portal": "^0.10.5",
 		"@reach/tooltip": "^0.10.3",
 		"@rematch/core": "^2.0.1",
 		"@sentry/react": "^6.2.5",
+		"@stitches/react": "^0.1.9",
 		"autoprefixer": "^10.2.5",
 		"axios": "^0.21.1",
 		"core-js": "^3.9.1",

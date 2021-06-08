@@ -32,11 +32,11 @@ function ImportToken({
             <div className="space-y-1">
                 <div className="font-semibold text-xs">{name}</div>
                 <div className="flex space-x-1 items-center">
-                    <div className="font-bold text-xxs bg-green-100 text-green-800 p-1 rounded">
+                    <div className="font-bold text-xxs bg-green-100 text-green-800 p-1 rounded break-all">
                         {typeof value === 'object' ? JSON.stringify(value) : value}
                     </div>
                     {oldValue ? (
-                        <div className="font-bold text-xxs bg-red-100 text-red-800 p-1 rounded">
+                        <div className="font-bold text-xxs bg-red-100 text-red-800 p-1 rounded break-all">
                             {typeof oldValue === 'object' ? JSON.stringify(oldValue) : oldValue}
                         </div>
                     ) : null}
@@ -82,15 +82,16 @@ export default function ImportedTokensDialog() {
                     type: token.type,
                     description: token.description,
                 },
+                shouldUpdateDocument: false,
             });
-            setNewTokens(newTokens.filter((t) => t.name !== token.name));
         });
+        setNewTokens([]);
     };
 
     const handleUpdateClick = () => {
         // Go through each token that needs to be updated
         // TODO: This should probably be a batch operation
-        importedTokens.updatedTokens.forEach((token) => {
+        updatedTokens.forEach((token) => {
             editSingleToken({
                 parent: activeTokenSet,
                 name: token.name,
@@ -99,9 +100,11 @@ export default function ImportedTokensDialog() {
                     type: token.type,
                     description: token.description,
                 },
+                shouldUpdateDocument: false,
             });
-            setUpdatedTokens(updatedTokens.filter((t) => t.name !== token.name));
+            console.log('Removing updated from list', updatedTokens, token.name);
         });
+        setUpdatedTokens([]);
     };
 
     const handleImportAllClick = () => {
@@ -121,6 +124,7 @@ export default function ImportedTokensDialog() {
                 type: token.type,
                 description: token.description,
             },
+            shouldUpdateDocument: false,
         });
         setNewTokens(newTokens.filter((t) => t.name !== token.name));
     };
@@ -135,7 +139,9 @@ export default function ImportedTokensDialog() {
                 type: token.type,
                 description: token.description,
             },
+            shouldUpdateDocument: false,
         });
+        console.log('Removing updated from list', updatedTokens, token.name);
         setUpdatedTokens(updatedTokens.filter((t) => t.name !== token.name));
     };
 

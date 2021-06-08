@@ -221,8 +221,10 @@ export const tokenState = createModel<RootModel>()({
                 dispatch.tokenState.updateDocument();
             }
         },
-        createToken() {
-            dispatch.tokenState.updateDocument();
+        createToken(payload) {
+            if (payload.shouldUpdate) {
+                dispatch.tokenState.updateDocument();
+            }
         },
         updateDocument(payload, rootState) {
             updateTokensOnSources({

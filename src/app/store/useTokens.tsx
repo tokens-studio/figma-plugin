@@ -4,9 +4,9 @@ import {MessageToPluginTypes} from '@types/messages';
 import React from 'react';
 import checkIfAlias from '@/utils/checkIfAlias';
 import {getAliasValue} from '@/utils/aliases';
-import checkIfValueToken from '@/utils/checkIfValueToken';
 import {computeMergedTokens} from '@/plugin/tokenHelpers';
 import set from 'set-value';
+import {SingleToken} from '@types/tokens';
 import {SelectionValue} from './models/tokenState';
 import {RootState} from '../store';
 
@@ -22,11 +22,16 @@ export default function useTokens() {
     }
 
     // Returns resolved value of a specific token
-    function getTokenValue(token: string) {
+    function getTokenValue(token: SingleToken) {
         if (checkIfAlias(token, resolvedTokens)) {
             return getAliasValue(token, resolvedTokens);
         }
-        return String(checkIfValueToken(token) ? token.value : token);
+        return String(token.value);
+    }
+
+    // Returns resolved value of a specific token
+    function isAlias(token: SingleToken) {
+        return checkIfAlias(token, resolvedTokens);
     }
 
     // Calls Figma with all tokens and nodes to set data on
@@ -40,7 +45,6 @@ export default function useTokens() {
 
     // Calls Figma with all tokens and nodes to set data on
     function getFormattedTokens() {
-        console.log('Tokens are', tokens);
         const tokenObj = {};
         tokens[activeTokenSet].values.forEach((token) => {
             set(tokenObj, token.name, token);
@@ -89,6 +93,7 @@ export default function useTokens() {
     }
 
     return {
+        isAlias,
         findToken,
         getFormattedTokens,
         getStringTokens,

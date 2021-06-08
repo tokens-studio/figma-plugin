@@ -4,7 +4,6 @@ import {useDispatch, useSelector} from 'react-redux';
 import Tooltip from './Tooltip';
 import MoreButton from './MoreButton';
 import {useTokenDispatch} from '../store/TokenContext';
-import Icon from './Icon';
 import {lightOrDark, isTypographyToken} from './utils';
 import useManageTokens from '../store/useManageTokens';
 import {Dispatch, RootState} from '../store';
@@ -18,6 +17,7 @@ const TokenButton = ({type, property, token, editMode, showForm}) => {
     const {setShowOptions} = useTokenDispatch();
     const {deleteSingleToken} = useManageTokens();
     const dispatch = useDispatch<Dispatch>();
+    const {isAlias} = useTokens();
 
     const displayValue = getTokenValue(token);
     let style;
@@ -26,8 +26,7 @@ const TokenButton = ({type, property, token, editMode, showForm}) => {
     let properties = [type];
     const {name} = token;
     // Only show the last part of a token in a group
-    const visibleDepth =
-        name.split('.').length === DEFAULT_DEPTH_LEVEL ? 1 : name.split('.').length - DEFAULT_DEPTH_LEVEL;
+    const visibleDepth = 1;
     const visibleName = name.split('.').slice(-visibleDepth).join('.');
     const buttonClass = [];
 
@@ -85,8 +84,6 @@ const TokenButton = ({type, property, token, editMode, showForm}) => {
                 {label: 'Right', name: 'paddingRight'},
                 {label: 'Bottom', name: 'paddingBottom'},
                 {label: 'Left', name: 'paddingLeft'},
-                {label: 'Horizontal', name: 'horizontalPadding', icon: 'HorizontalPadding'},
-                {label: 'Vertical', name: 'verticalPadding', icon: 'VerticalPadding'},
                 {label: 'Gap', name: 'itemSpacing', icon: 'Gap'},
             ];
             break;
@@ -173,7 +170,6 @@ const TokenButton = ({type, property, token, editMode, showForm}) => {
                 [propsToSet[0].name || propsToSet[0]]: propsToSet[0].forcedValue || value,
             };
             if (propsToSet[0].clear) propsToSet[0].clear.map((item) => Object.assign(newProps, {[item]: 'delete'}));
-            console.log('clicking', newProps);
             setPluginValue(newProps);
         }
     };
@@ -206,14 +202,19 @@ const TokenButton = ({type, property, token, editMode, showForm}) => {
                 path={name}
                 mode={editMode ? 'edit' : 'list'}
             >
-                <Tooltip label={`${getTokenDisplay(token)}`}>
-                    <button
-                        className="w-full h-full"
-                        // TODO: Allow tooltips in disabled mode
-                        // disabled={editMode ? false : disabled}
-                        type="button"
-                        onClick={() => onClick(properties[0])}
-                    >
+                <Tooltip
+                    label={
+                        <div>
+                            <div className="text-gray-500 uppercase font-bold text-xs">
+                                {token.name.split('.')[token.name.split('.').length - 1]}
+                            </div>
+                            <div className="text-white">{getTokenDisplay(token)}</div>
+                            {isAlias(token) && <div className="text-gray-600">{getTokenValue(token)}</div>}
+                            {token.description && <div className="text-gray-500">{token.description}</div>}
+                        </div>
+                    }
+                >
+                    <button className="w-full h-full" type="button" onClick={() => onClick(properties[0])}>
                         <div className="button-text">{showValue && <span>{visibleName}</span>}</div>
                         {editMode && <div className="button-edit-overlay">Edit</div>}
                     </button>

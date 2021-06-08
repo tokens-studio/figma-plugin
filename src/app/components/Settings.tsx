@@ -8,7 +8,7 @@ import Input from './Input';
 import RadioButton from './RadioButton';
 
 const SyncSettings = () => {
-    const {uiWindow, depth, tokenType} = useSelector((state: RootState) => state.settings);
+    const {uiWindow, tokenType} = useSelector((state: RootState) => state.settings);
     const dispatch = useDispatch<Dispatch>();
 
     const debouncedChange = useDebouncedCallback(() => {
@@ -25,12 +25,7 @@ const SyncSettings = () => {
             debouncedChange();
         }
     };
-    const handleDepthChange = (e) => {
-        const value = Number(e.target.value.trim());
-        if (!Number.isNaN(value)) {
-            dispatch.settings.setDepth(value);
-        }
-    };
+
     const handleTypeChange = (e) => {
         dispatch.settings.setTokenType(e.target.value);
     };
@@ -57,20 +52,6 @@ const SyncSettings = () => {
                             onChange={handleSizeChange}
                             type="text"
                             name="height"
-                            required
-                        />
-                    </div>
-                </div>
-                <div className="space-y-4">
-                    <Heading>Token Depth</Heading>
-                    <div className="flex flex-row space-x-2">
-                        <Input
-                            full
-                            label="Depth"
-                            value={depth}
-                            onChange={handleDepthChange}
-                            type="text"
-                            name="depth"
                             required
                         />
                     </div>

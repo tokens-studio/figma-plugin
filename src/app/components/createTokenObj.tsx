@@ -3,7 +3,6 @@ import {SingleTokenObject, TokenType} from '@types/tokens';
 import set from 'set-value';
 
 import tokenTypes from '../../config/tokenTypes';
-import {DEFAULT_DEPTH_LEVEL} from './constants';
 
 // Sort tokens by the last part of their name, e.g. global.colors.gray.50 comes before global.colors.gray.100
 function sortTokens(tokens) {
@@ -28,16 +27,13 @@ function transformName(name) {
     }
 }
 
-// Creates a tokens object so that tokens are displayed in groups in the UI. Respects the default depth level we set in our constants
-export function createTokensObject(tokens: SingleTokenObject[], uiDepth) {
+// Creates a tokens object so that tokens are displayed in groups in the UI.
+export function createTokensObject(tokens: SingleTokenObject[]) {
     const tokensSorted = sortTokens(tokens);
     const obj = tokensSorted.reduce((acc, cur) => {
         const hasTypeProp = cur.type && cur.type !== '' && cur.type !== 'undefined';
         const propToSet = hasTypeProp ? cur.type : transformName(cur.name.split('.').slice(0, 1).toString());
         acc[propToSet] = acc[propToSet] || {values: {}};
-        const depth = uiDepth === cur.name.split('.').length ? cur.name.split('.').length - 1 : uiDepth;
-        const groupName = cur.name.split('.').slice(0, depth).join('.');
-        console.log('Setting group', groupName, cur, acc[propToSet].values);
         acc[propToSet].values = acc[propToSet].values || {};
         set(acc[propToSet].values, cur.name, cur);
         return acc;
@@ -46,9 +42,9 @@ export function createTokensObject(tokens: SingleTokenObject[], uiDepth) {
 }
 
 // Takes an array of tokens, transforms them into an object and merges that with values we require for the UI
-export function mappedTokens(tokens: SingleTokenObject[], depth = DEFAULT_DEPTH_LEVEL) {
+export function mappedTokens(tokens: SingleTokenObject[]) {
     const tokenObj = {};
-    Object.entries(createTokensObject(tokens, depth)).forEach(
+    Object.entries(createTokensObject(tokens)).forEach(
         ([key, group]: [string, {values: SingleTokenObject[]; type?: TokenType}]) => {
             tokenObj[key] = {
                 values: group.values,
