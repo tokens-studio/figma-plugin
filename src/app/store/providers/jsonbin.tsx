@@ -51,33 +51,37 @@ async function writeTokensToJSONBin({secret, id, tokenObj}): Promise<TokenProps>
 }
 
 export async function updateJSONBinTokens({tokens, id, secret, updatedAt, oldUpdatedAt = null}) {
-    const values = Object.entries(tokens).reduce((acc, [key, val]) => {
-        acc[key] = JSON.parse(val as string);
-        return acc;
-    }, {});
-    const tokenObj = JSON.stringify(
-        {
-            version: pjs.plugin_version,
-            updatedAt,
-            values,
-        },
-        null,
-        2
-    );
+    try {
+        const values = Object.entries(tokens).reduce((acc, [key, val]) => {
+            acc[key] = val;
+            return acc;
+        }, {});
+        const tokenObj = JSON.stringify(
+            {
+                version: pjs.plugin_version,
+                updatedAt,
+                values,
+            },
+            null,
+            2
+        );
 
-    if (oldUpdatedAt) {
-        const remoteTokens = await readTokensFromJSONBin({secret, id});
-        const comparison = await compareUpdatedAt(oldUpdatedAt, remoteTokens.updatedAt);
-        if (comparison === 'remote_older') {
-            writeTokensToJSONBin({secret, id, tokenObj});
+        if (oldUpdatedAt) {
+            const remoteTokens = await readTokensFromJSONBin({secret, id});
+            const comparison = await compareUpdatedAt(oldUpdatedAt, remoteTokens.updatedAt);
+            if (comparison === 'remote_older') {
+                writeTokensToJSONBin({secret, id, tokenObj});
+            } else {
+                // Tell the user to choose between:
+                // A) Pull Remote values and replace local changes
+                // B) Overwrite Remote changes
+                notifyToUI('Error updating tokens as remote is newer, please update first');
+            }
         } else {
-            // Tell the user to choose between:
-            // A) Pull Remote values and replace local changes
-            // B) Overwrite Remote changes
-            notifyToUI('Error updating tokens as remote is newer, please update first');
+            writeTokensToJSONBin({secret, id, tokenObj});
         }
-    } else {
-        writeTokensToJSONBin({secret, id, tokenObj});
+    } catch (e) {
+        console.log('Error updating jsonbin', e);
     }
 }
 

@@ -1,16 +1,7 @@
 import {UpdateMode} from 'Types/state';
-import removeValuesFromNode from './removeValuesFromNode';
 import {notifySelection} from './notifiers';
 import store from './store';
 import properties from '../config/properties';
-
-export function fetchOldPluginData(node) {
-    const previousValues = node.getPluginData('values');
-    if (!previousValues) {
-        return;
-    }
-    return JSON.parse(previousValues);
-}
 
 export function fetchPluginData(node, value: string) {
     return node.getPluginData(value);
@@ -23,7 +14,9 @@ export function fetchAllPluginData(node) {
     while (i < len) {
         const prop = Object.keys(properties)[i];
         const data = fetchPluginData(node, prop);
-        if (data) pluginData.push([prop, JSON.parse(data)]);
+        if (data) {
+            pluginData.push([prop, JSON.parse(data)]);
+        }
 
         i += 1;
     }

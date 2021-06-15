@@ -19,6 +19,7 @@ export default function useTokens() {
 
         return resolved.find((n) => n.name === token);
     }
+
     // Finds token that matches name
     function getTokenValue(token: SingleTokenObject, resolved) {
         return getAliasValue(token, resolved);

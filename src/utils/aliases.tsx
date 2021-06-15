@@ -34,5 +34,5 @@ export function getAliasValue(token: SingleTokenObject, tokens = []): string | n
     } catch (e) {
         console.log('Error getting alias value', token, tokens);
     }
-    return String(token.value);
+    return null;
 }

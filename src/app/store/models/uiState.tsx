@@ -147,7 +147,6 @@ export const uiState = createModel<RootModel>()({
             };
         },
         setLocalApiState(state, payload: ApiDataType) {
-            console.log('setting api state', payload);
             return {
                 ...state,
                 localApiState: payload,
