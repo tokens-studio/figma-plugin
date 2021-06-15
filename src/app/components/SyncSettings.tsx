@@ -44,7 +44,7 @@ const SyncSettings = () => {
     };
 
     const storedApiProviders = () => {
-        return apiProviders.filter((item) => item.provider === localApiState.provider);
+        return apiProviders.filter((item) => item.provider === localApiState?.provider);
     };
 
     const storageProviderText = () => {
@@ -161,7 +161,7 @@ const SyncSettings = () => {
 
                         {storedApiProviders().length > 0 && (
                             <div className="space-y-4">
-                                {api.provider === localApiState.provider && (
+                                {api?.provider === localApiState.provider && (
                                     <StorageItem
                                         provider={api.provider}
                                         id={api.id}

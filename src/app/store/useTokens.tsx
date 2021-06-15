@@ -14,7 +14,9 @@ export default function useTokens() {
     const {tokens, usedTokenSet, activeTokenSet} = useSelector((state: RootState) => state.tokenState);
 
     // Finds token that matches name
-    function findToken(token: string, resolved) {
+    function findToken(token: string) {
+        const resolved = resolveTokenValues(computeMergedTokens(tokens, usedTokenSet));
+
         return resolved.find((n) => n.name === token);
     }
     // Finds token that matches name
@@ -23,7 +25,7 @@ export default function useTokens() {
     }
 
     function getTokenDisplay(token: SingleTokenObject, resolvedTokens, shouldResolve = false) {
-        const valueToCheck = shouldResolve ? findToken(token.name, resolvedTokens).value : token.value;
+        const valueToCheck = shouldResolve ? resolvedTokens.find(token.name).value : token.value;
 
         if (token.type === 'typography') {
             return `${valueToCheck.fontFamily} / ${valueToCheck.fontWeight}`;
