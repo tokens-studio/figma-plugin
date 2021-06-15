@@ -130,18 +130,18 @@ const SyncSettings = () => {
                             id={StorageProviderType.LOCAL}
                         />
                         <ProviderSelector
-                            isActive={localApiState?.provider === StorageProviderType.ARCADE}
-                            isStored={storageType?.provider === StorageProviderType.ARCADE}
+                            isActive={localApiState?.provider === StorageProviderType.JSONBIN}
+                            isStored={storageType?.provider === StorageProviderType.JSONBIN}
                             onClick={() => {
                                 dispatch.uiState.setLocalApiState({
                                     name: '',
                                     secret: '',
                                     id: '',
-                                    provider: StorageProviderType.ARCADE,
+                                    provider: StorageProviderType.JSONBIN,
                                 });
                             }}
-                            text="Arcade"
-                            id={StorageProviderType.ARCADE}
+                            text="JSONbin"
+                            id={StorageProviderType.JSONBIN}
                         />
                     </div>
                 </div>

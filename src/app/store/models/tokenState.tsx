@@ -7,6 +7,7 @@ import defaultJSON from '@/config/default.json';
 import parseTokenValues from '@/utils/parseTokenValues';
 import {notifyToUI} from '@/plugin/notifiers';
 import {reduceToValues} from '@/plugin/tokenHelpers';
+import convertToTokenArray from '@/utils/convertTokens';
 import {RootModel} from '.';
 import updateTokensOnSources from '../updateSources';
 import * as pjs from '../../../../package.json';
@@ -131,6 +132,23 @@ export const tokenState = createModel<RootModel>()({
                 activeTokenSet: Array.isArray(data.values) ? 'global' : Object.keys(data.values)[0],
                 usedTokenSet: Array.isArray(data.values) ? ['global'] : [Object.keys(data.values)[0]],
             };
+        },
+        setJSONData(state, payload) {
+            const parsedTokens = JSON.parse(payload);
+            try {
+                parseTokenValues(parsedTokens);
+                const values = parseTokenValues({[state.activeTokenSet]: parsedTokens});
+                return {
+                    ...state,
+                    tokens: {
+                        ...state.tokens,
+                        ...values,
+                    },
+                };
+            } catch (e) {
+                console.log('Error parsing tokens', e);
+            }
+            return state;
         },
         createToken: (state, data: TokenInput) => {
             let newTokens = {};
@@ -264,24 +282,13 @@ export const tokenState = createModel<RootModel>()({
         setTokenSetOrder() {
             dispatch.tokenState.updateDocument(false);
         },
+        setJSONData() {
+            dispatch.tokenState.updateDocument(true);
+        },
         setTokenData(payload, rootState) {
             if (payload.shouldUpdate) {
                 dispatch.tokenState.updateDocument();
             }
-        },
-        setJSONData(payload, rootState) {
-            const parsedTokens = JSON.parse(payload);
-            try {
-                parseTokenValues(parsedTokens);
-                dispatch.tokenState.setTokenData({
-                    values: {...rootState.tokenState.tokens, [rootState.tokenState.activeTokenSet]: parsedTokens},
-                    shouldUpdate: true,
-                });
-            } catch (e) {
-                console.log('Error parsing tokens', e);
-            }
-
-            dispatch.tokenState.updateDocument();
         },
         createToken(payload, rootState) {
             if (payload.shouldUpdate && rootState.settings.updateOnChange) {

@@ -86,7 +86,6 @@ export function goToNode(id) {
 }
 
 export function updateNodes(nodes, tokens) {
-    console.log('Updating nodes', tokens, nodes);
     try {
         let i = 0;
         const len = nodes.length;

@@ -36,7 +36,6 @@ const TokenButton = ({type, token, editMode, showForm, resolvedTokens}) => {
     };
 
     function setPluginValue(value) {
-        console.log('setting plugin data', value, resolvedTokens);
         dispatch.uiState.setLoading(true);
         setNodeData(value, resolvedTokens);
     }

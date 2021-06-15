@@ -81,9 +81,10 @@ export default function useTokens() {
 
     // Calls Figma with all tokens to create styles
     function createStylesFromTokens() {
+        const resolved = resolveTokenValues(computeMergedTokens(tokens, usedTokenSet));
         postToFigma({
             type: MessageToPluginTypes.CREATE_STYLES,
-            tokens: resolveTokenValues(computeMergedTokens(tokens, usedTokenSet)),
+            tokens: resolved,
         });
     }
 

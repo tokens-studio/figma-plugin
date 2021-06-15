@@ -7,6 +7,7 @@ import useRemoteTokens from '../store/remoteTokens';
 import {StorageProviderType} from '../../../types/api';
 import {RootState, Dispatch} from '../store';
 import useTokens from '../store/useTokens';
+import Button from './Button';
 
 const TabButton = ({name, label, first = false}) => {
     const {activeTab} = useSelector((state: RootState) => state.uiState);
@@ -48,6 +49,8 @@ const Navbar = () => {
     const {editProhibited} = useSelector((state: RootState) => state.tokenState);
     const {pullTokens} = useRemoteTokens();
 
+    const {pullStyles} = useTokens();
+
     return (
         <div className="sticky top-0 navbar bg-white flex items-center justify-between z-1 border-b border-gray-200">
             <div>
@@ -74,6 +77,9 @@ const Navbar = () => {
                         </Tooltip>
                     </>
                 )}
+                <Button variant="secondary" onClick={pullStyles} disabled={editProhibited}>
+                    Import
+                </Button>
             </div>
         </div>
     );

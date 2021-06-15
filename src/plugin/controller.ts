@@ -119,7 +119,6 @@ figma.ui.onmessage = async (msg) => {
             }
             return;
         case MessageToPluginTypes.UPDATE: {
-            console.log('UPDATE', msg.tokens);
             if (msg.updateStyles && msg.tokens) updateStyles(msg.tokens, false);
             if (msg.tokenValues && msg.updatedAt) setTokensOnDocument(msg.tokenValues, msg.updatedAt);
             if (msg.tokens) {

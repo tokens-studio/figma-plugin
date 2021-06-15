@@ -15,20 +15,19 @@ export default function TokensBottomBar() {
         updateDocument();
     };
 
-    const {createStylesFromTokens, pullStyles} = useTokens();
+    const {createStylesFromTokens} = useTokens();
 
     return (
         <div className="fixed bottom-0 left-0 w-full bg-white flex justify-between items-center p-2 border-t border-gray-200">
             <ApplySelector />
-            <Button variant="secondary" onClick={pullStyles}>
-                Import
-            </Button>
-            <Button variant="secondary" onClick={createStylesFromTokens}>
-                Create Styles
-            </Button>
-            <Button variant="primary" onClick={handleUpdate}>
-                Update
-            </Button>
+            <div className="space-x-2">
+                <Button variant="secondary" onClick={createStylesFromTokens}>
+                    Create Styles
+                </Button>
+                <Button variant="primary" onClick={handleUpdate}>
+                    Update
+                </Button>
+            </div>
         </div>
     );
 }

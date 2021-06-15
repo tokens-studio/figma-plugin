@@ -28,7 +28,6 @@ const Tokens = ({isActive}) => {
     const {showEditForm} = useSelector((state: RootState) => state.uiState);
 
     const resolvedTokens = React.useMemo(() => {
-        console.log('tokens changed, recalculating...');
         return resolveTokenValues(computeMergedTokens(tokens, usedTokenSet));
     }, [tokens, usedTokenSet]);
 
