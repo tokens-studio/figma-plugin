@@ -1,5 +1,6 @@
 import * as React from 'react';
 import {useDispatch, useSelector} from 'react-redux';
+import {SingleTokenObject} from 'Types/tokens';
 import {useTokenDispatch, useTokenState} from '../store/TokenContext';
 import Heading from './Heading';
 import Icon from './Icon';
@@ -16,6 +17,7 @@ const TokenListing = ({
     property,
     tokenType = 'implicit',
     values,
+    resolvedTokens,
 }: {
     tokenKey: string;
     label: string;
@@ -27,22 +29,20 @@ const TokenListing = ({
     property: string;
     tokenType: string;
     values: object;
+    resolvedTokens: SingleTokenObject[];
 }) => {
     const {editProhibited} = useSelector((state: RootState) => state.tokenState);
     const {displayType} = useSelector((state: RootState) => state.uiState);
     const dispatch = useDispatch<Dispatch>();
 
-    const {createStylesFromTokens} = useTokens();
     const {collapsed, showEmptyGroups} = useTokenState();
     const {setCollapsed} = useTokenDispatch();
 
-    const createButton = ['color', 'typography'].includes(tokenType);
     const showDisplayToggle = tokenType === 'color';
 
     const [isIntCollapsed, setIntCollapsed] = React.useState(false);
 
     const showForm = ({value, name, path, isPristine = false}) => {
-        console.log('Showing form', name, value);
         dispatch.uiState.setShowEditForm(true);
         dispatch.uiState.setEditToken({
             value,
@@ -122,13 +122,6 @@ const TokenListing = ({
                         </Tooltip>
                     )}
 
-                    {createButton && (
-                        <Tooltip label="Create Styles">
-                            <button onClick={createStylesFromTokens} type="button" className="button button-ghost">
-                                <Icon name="style" />
-                            </button>
-                        </Tooltip>
-                    )}
                     <Tooltip label="Add a new token" variant="right">
                         <button
                             disabled={editProhibited}
@@ -153,6 +146,7 @@ const TokenListing = ({
                         schema,
                         path: tokenKey,
                         type: tokenType,
+                        resolvedTokens,
                     })}
                 </div>
             )}

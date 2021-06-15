@@ -8,7 +8,6 @@ export default function useStorage() {
     const dispatch = useDispatch<Dispatch>();
 
     function setStorageType({provider, bool = false}: {provider: StorageProviderType; bool?: boolean}) {
-        console.log('Setting storage type', provider);
         if (bool) {
             postToFigma({
                 type: MessageToPluginTypes.SET_STORAGE_TYPE,

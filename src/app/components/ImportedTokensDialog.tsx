@@ -102,7 +102,6 @@ export default function ImportedTokensDialog() {
                 },
                 shouldUpdateDocument: false,
             });
-            console.log('Removing updated from list', updatedTokens, token.name);
         });
         setUpdatedTokens([]);
     };
@@ -141,7 +140,6 @@ export default function ImportedTokensDialog() {
             },
             shouldUpdateDocument: false,
         });
-        console.log('Removing updated from list', updatedTokens, token.name);
         setUpdatedTokens(updatedTokens.filter((t) => t.name !== token.name));
     };
 

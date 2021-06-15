@@ -100,12 +100,10 @@ export const tokenState = createModel<RootModel>()({
             };
         },
         renameTokenSet: (state, data: {oldName: string; newName: string}) => {
-            console.log('Renaming token set', data.oldName, data.newName, state.tokens);
             // Handle add new token set
             const oldTokens = state.tokens;
             oldTokens[data.newName] = oldTokens[data.oldName];
             delete oldTokens[data.oldName];
-            console.log('after delete', oldTokens);
             return {
                 ...state,
                 tokens: oldTokens,
@@ -134,23 +132,6 @@ export const tokenState = createModel<RootModel>()({
                 usedTokenSet: Array.isArray(data.values) ? ['global'] : [Object.keys(data.values)[0]],
             };
         },
-        setJSONData: (state, payload: string) => {
-            try {
-                const parsedTokens = JSON.parse(payload);
-                const parsed = parseTokenValues({
-                    ...state.tokens,
-                    [state.activeTokenSet]: parsedTokens,
-                });
-                return {
-                    ...state,
-                    tokens: parsed,
-                };
-            } catch (e) {
-                console.log('Error parsing tokens', e);
-                notifyToUI('Error parsing JSON. Check console (F12)');
-                return state;
-            }
-        },
         createToken: (state, data: TokenInput) => {
             let newTokens = {};
             const existingToken = state.tokens[data.parent].values.find((n) => n.name === data.name);
@@ -178,7 +159,6 @@ export const tokenState = createModel<RootModel>()({
         },
         // Imports received styles as tokens, if needed
         setTokensFromStyles: (state, receivedStyles) => {
-            console.log('Set tokens from styles', receivedStyles);
             const newTokens = [];
             const existingTokens = [];
             const updatedTokens = [];
@@ -265,7 +245,6 @@ export const tokenState = createModel<RootModel>()({
             dispatch.tokenState.setTokenData({values: []});
         },
         editToken(payload, rootState) {
-            console.log('Editing token', payload, rootState.settings.updateOnChange);
             if (payload.shouldUpdate && rootState.settings.updateOnChange) {
                 dispatch.tokenState.updateDocument();
             }
@@ -286,15 +265,11 @@ export const tokenState = createModel<RootModel>()({
             dispatch.tokenState.updateDocument(false);
         },
         setTokenData(payload, rootState) {
-            console.log('setting tokendate effect');
-
             if (payload.shouldUpdate) {
                 dispatch.tokenState.updateDocument();
             }
         },
         setJSONData(payload, rootState) {
-            console.log('setting jsondata effect');
-            console.log('Got a payload', payload, rootState.tokenState.activeTokenSet);
             const parsedTokens = JSON.parse(payload);
             try {
                 parseTokenValues(parsedTokens);

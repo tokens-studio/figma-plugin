@@ -134,7 +134,6 @@ export const uiState = createModel<RootModel>()({
             };
         },
         setStorage(state, payload: StorageType) {
-            console.log('setting storage', payload);
             return {
                 ...state,
                 storageType: payload,

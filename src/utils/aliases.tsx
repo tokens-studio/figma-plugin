@@ -1,10 +1,10 @@
 import {checkAndEvaluateMath, convertToRgb} from '@/app/components/utils';
-import {SingleToken} from 'Types/tokens';
+import {SingleTokenObject} from 'Types/tokens';
 import checkIfValueToken from './checkIfValueToken';
 
 export const aliasRegex = /(\$[^\s]+\w)|({[^\s]+})/g;
 
-export function getAliasValue(token: SingleToken, tokens = []): string | null {
+export function getAliasValue(token: SingleTokenObject, tokens = []): string | null {
     try {
         let returnedValue = checkIfValueToken(token) ? (token.value as string) : (token as string);
 
@@ -32,7 +32,7 @@ export function getAliasValue(token: SingleToken, tokens = []): string | null {
             return convertToRgb(checkAndEvaluateMath(returnedValue));
         }
     } catch (e) {
-        console.log('Error getting alias value', token);
+        console.log('Error getting alias value', token, tokens);
     }
-    return null;
+    return String(token.value);
 }

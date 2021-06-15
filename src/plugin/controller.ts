@@ -41,7 +41,6 @@ figma.on('selectionchange', () => {
 });
 
 figma.ui.onmessage = async (msg) => {
-    console.log('received message', msg);
     switch (msg.type) {
         case MessageToPluginTypes.INITIATE:
             try {
@@ -120,6 +119,7 @@ figma.ui.onmessage = async (msg) => {
             }
             return;
         case MessageToPluginTypes.UPDATE: {
+            console.log('UPDATE', msg.tokens);
             if (msg.updateStyles && msg.tokens) updateStyles(msg.tokens, false);
             if (msg.tokenValues && msg.updatedAt) setTokensOnDocument(msg.tokenValues, msg.updatedAt);
             if (msg.tokens) {
@@ -147,7 +147,7 @@ figma.ui.onmessage = async (msg) => {
                 updateOnChange: msg.updateOnChange,
                 updateStyles: msg.updateStyles,
             });
-            figma.ui.resize(msg.width, msg.height);
+            figma.ui.resize(msg.uiWindow.width, msg.uiWindow.height);
             break;
         }
         default:

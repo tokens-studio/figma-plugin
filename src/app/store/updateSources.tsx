@@ -1,5 +1,5 @@
 import {MessageToPluginTypes} from '@types/messages';
-import {computeMergedTokens} from '@/plugin/tokenHelpers';
+import {computeMergedTokens, resolveTokenValues} from '@/plugin/tokenHelpers';
 import {TokenProps} from '../../../types/tokens';
 import {StorageProviderType} from '../../../types/api';
 import {notifyToUI, postToFigma} from '../../plugin/notifiers';
@@ -67,10 +67,12 @@ export default async function updateTokensOnSources({
             oldUpdatedAt: lastUpdatedAt,
         });
     }
+    const mergedTokens = resolveTokenValues(computeMergedTokens(tokens, usedTokenSet));
+
     postToFigma({
         type: MessageToPluginTypes.UPDATE,
         tokenValues,
-        tokens: tokens ? computeMergedTokens(tokens, usedTokenSet, true) : null,
+        tokens: tokens ? mergedTokens : null,
         updateMode,
         updateStyles,
         updatedAt,

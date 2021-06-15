@@ -3,20 +3,21 @@ import {track} from '@/utils/analytics';
 import {useDispatch, useSelector} from 'react-redux';
 import Tooltip from './Tooltip';
 import MoreButton from './MoreButton';
-import {lightOrDark, isTypographyToken} from './utils';
+import {lightOrDark} from './utils';
 import useManageTokens from '../store/useManageTokens';
 import {Dispatch, RootState} from '../store';
 import useTokens from '../store/useTokens';
 
-const TokenButton = ({type, token, editMode, showForm}) => {
+const TokenButton = ({type, token, editMode, showForm, resolvedTokens}) => {
     const uiState = useSelector((state: RootState) => state.uiState);
     const {activeTokenSet} = useSelector((state: RootState) => state.tokenState);
-    const {setNodeData, getTokenValue} = useTokens();
+    const {setNodeData, getTokenValue, getTokenDisplay} = useTokens();
     const {deleteSingleToken} = useManageTokens();
     const dispatch = useDispatch<Dispatch>();
     const {isAlias} = useTokens();
 
-    const displayValue = getTokenValue(token);
+    const displayValue = getTokenValue(token, resolvedTokens);
+
     let style;
     let showValue = true;
     let properties = [type];
@@ -35,8 +36,9 @@ const TokenButton = ({type, token, editMode, showForm}) => {
     };
 
     function setPluginValue(value) {
+        console.log('setting plugin data', value, resolvedTokens);
         dispatch.uiState.setLoading(true);
-        setNodeData(value);
+        setNodeData(value, resolvedTokens);
     }
 
     switch (type) {
@@ -165,18 +167,6 @@ const TokenButton = ({type, token, editMode, showForm}) => {
         setPluginValue(newProps);
     };
 
-    const getTokenDisplay = (tokenVal) => {
-        const valueToCheck = tokenVal.value ?? tokenVal;
-        if (isTypographyToken(valueToCheck)) {
-            return `${valueToCheck.fontFamily} / ${valueToCheck.fontWeight}`;
-        }
-        if (typeof valueToCheck !== 'string' && typeof valueToCheck !== 'number') {
-            return JSON.stringify(valueToCheck, null, 2);
-        }
-
-        return valueToCheck;
-    };
-
     return (
         <div
             className={`relative mb-1 mr-1 flex button button-property ${buttonClass.join(' ')} ${
@@ -199,8 +189,10 @@ const TokenButton = ({type, token, editMode, showForm}) => {
                             <div className="text-gray-500 uppercase font-bold text-xs">
                                 {token.name.split('.')[token.name.split('.').length - 1]}
                             </div>
-                            <div className="text-white">{getTokenDisplay(token)}</div>
-                            {isAlias(token) && <div className="text-gray-600">{getTokenValue(token)}</div>}
+                            <div className="text-white">{getTokenDisplay(token, resolvedTokens)}</div>
+                            {isAlias(token, resolvedTokens) && (
+                                <div className="text-gray-600">{getTokenValue(token, resolvedTokens)}</div>
+                            )}
                             {token.description && <div className="text-gray-500">{token.description}</div>}
                         </div>
                     }

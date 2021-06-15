@@ -49,7 +49,7 @@ export function resolveTokenValues(tokens, previousCount = undefined) {
     return returnedTokens;
 }
 
-export function computeMergedTokens(tokens, usedTokenSet, shouldResolve = false): SingleTokenObject[] {
+export function computeMergedTokens(tokens, usedTokenSet): SingleTokenObject[] {
     const mergedTokens = [];
     // Reverse token set order (right-most win) and check for duplicates
     Object.entries(tokens)
@@ -61,11 +61,5 @@ export function computeMergedTokens(tokens, usedTokenSet, shouldResolve = false)
                 });
             }
         });
-
-    if (shouldResolve && Object.entries(tokens).length > 0) {
-        const resolved = resolveTokenValues(mergedTokens);
-        return resolved;
-    }
-
     return mergedTokens;
 }

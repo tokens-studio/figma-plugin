@@ -47,7 +47,6 @@ export default function useManageTokens() {
         newGroup?: boolean;
         shouldUpdateDocument?: boolean;
     }) {
-        console.log('Creatin single token', data.name);
         const {parent, name, value, options, newGroup = false, shouldUpdateDocument = true} = data;
         dispatch.uiState.setLoading(true);
         const isLocal = storageType.provider === StorageProviderType.LOCAL;
@@ -56,7 +55,6 @@ export default function useManageTokens() {
             shouldUpdate = await createRemoteToken(data);
         }
         if (shouldUpdate) {
-            console.log('UPDATING DOCUMENT', shouldUpdateDocument);
             createToken({
                 parent,
                 name,
@@ -70,7 +68,6 @@ export default function useManageTokens() {
     }
 
     async function deleteSingleToken(data) {
-        console.log('storage type is', storageType);
         dispatch.uiState.setLoading(true);
         const isLocal = storageType.provider === StorageProviderType.LOCAL;
         if (!isLocal) {

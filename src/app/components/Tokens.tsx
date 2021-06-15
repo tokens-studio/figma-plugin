@@ -1,6 +1,7 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import * as React from 'react';
 import {useSelector} from 'react-redux';
+import {computeMergedTokens, resolveTokenValues} from '@/plugin/tokenHelpers';
 import TokenListing from './TokenListing';
 import TokensBottomBar from './TokensBottomBar';
 import ToggleEmptyButton from './ToggleEmptyButton';
@@ -23,8 +24,13 @@ interface TokenListingType {
 }
 
 const Tokens = ({isActive}) => {
-    const {tokens, activeTokenSet} = useSelector((state: RootState) => state.tokenState);
+    const {tokens, usedTokenSet, activeTokenSet} = useSelector((state: RootState) => state.tokenState);
     const {showEditForm} = useSelector((state: RootState) => state.uiState);
+
+    const resolvedTokens = React.useMemo(() => {
+        console.log('tokens changed, recalculating...');
+        return resolveTokenValues(computeMergedTokens(tokens, usedTokenSet));
+    }, [tokens, usedTokenSet]);
 
     const memoizedTokens = React.useMemo(() => {
         if (tokens[activeTokenSet]?.values) {
@@ -49,6 +55,7 @@ const Tokens = ({isActive}) => {
                             property={group.property}
                             tokenType={group.type}
                             values={group.values}
+                            resolvedTokens={resolvedTokens}
                         />
                     </div>
                 );

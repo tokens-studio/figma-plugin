@@ -85,8 +85,6 @@ export default function useRemoteTokens() {
     }
 
     async function fetchDataFromRemote(id, secret, name, provider): Promise<TokenProps> {
-        console.log('fetch tokens');
-
         notifyToUI('Fetching remote tokens...');
 
         switch (provider) {
@@ -102,7 +100,6 @@ export default function useRemoteTokens() {
     }
 
     const syncTokens = async ({id, secret, provider = localApiState.provider, name}) => {
-        console.log('Sync tokens');
         dispatch.uiState.setLoading(true);
         const remoteTokens = await fetchDataFromRemote(id, secret, name, provider as StorageProviderType);
         if (remoteTokens) {

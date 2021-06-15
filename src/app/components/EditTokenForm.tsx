@@ -10,25 +10,26 @@ const EditTokenForm = () => {
     const {editSingleToken, createSingleToken} = useManageTokens();
     const {editToken} = useSelector((state: RootState) => state.uiState);
     const dispatch = useDispatch<Dispatch>();
+    const [currentEditToken, setCurrentEditToken] = React.useState(editToken);
 
     const handleChange = (e) => {
         e.persist();
-        dispatch.uiState.setEditToken({...editToken, [e.target.name]: e.target.value});
+        setCurrentEditToken({...currentEditToken, [e.target.name]: e.target.value});
     };
 
     const handleObjectChange = (e) => {
         e.persist();
-        dispatch.uiState.setEditToken({
+        setCurrentEditToken({
             ...editToken,
-            value: {...editToken.value, [e.target.name]: e.target.value},
+            value: {...currentEditToken.value, [e.target.name]: e.target.value},
         });
     };
 
     const handleOptionsChange = (e) => {
         e.persist();
-        dispatch.uiState.setEditToken({
+        setCurrentEditToken({
             ...editToken,
-            options: {...editToken.options, [e.target.name]: e.target.value},
+            options: {...currentEditToken.options, [e.target.name]: e.target.value},
         });
     };
 
@@ -36,10 +37,10 @@ const EditTokenForm = () => {
         track('Edit Token');
 
         let oldName;
-        if (editToken.initialName !== name && editToken.initialName) {
-            oldName = editToken.initialName;
+        if (currentEditToken.initialName !== name && currentEditToken.initialName) {
+            oldName = currentEditToken.initialName;
         }
-        if (editToken.isPristine) {
+        if (currentEditToken.isPristine) {
             createSingleToken({
                 parent: activeTokenSet,
                 name,
@@ -59,7 +60,7 @@ const EditTokenForm = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        submitTokenValue(editToken);
+        submitTokenValue(currentEditToken);
         dispatch.uiState.setShowEditForm(false);
     };
 
@@ -81,19 +82,19 @@ const EditTokenForm = () => {
                 required
                 full
                 label="Name"
-                value={editToken.name}
+                value={currentEditToken.name}
                 onChange={handleChange}
                 type="text"
                 name="name"
                 inputRef={firstInput}
             />
-            {typeof editToken.schema === 'object' ? (
-                Object.entries(editToken.schema).map(([key, schemaValue]: [string, string]) => (
+            {typeof currentEditToken.schema === 'object' ? (
+                Object.entries(currentEditToken.schema).map(([key, schemaValue]: [string, string]) => (
                     <Input
                         key={key}
                         full
                         label={key}
-                        value={editToken.value[key]}
+                        value={currentEditToken.value[key]}
                         onChange={handleObjectChange}
                         type="text"
                         name={key}
@@ -104,22 +105,22 @@ const EditTokenForm = () => {
             ) : (
                 <Input
                     full
-                    label={editToken.property}
-                    value={editToken.value}
+                    label={currentEditToken.property}
+                    value={currentEditToken.value}
                     onChange={handleChange}
                     type="text"
                     name="value"
                     required
-                    custom={editToken.schema}
+                    custom={currentEditToken.schema}
                 />
             )}
-            {editToken.optionsSchema
-                ? Object.entries(editToken.optionsSchema).map(([key, schemaValue]: [string, string]) => (
+            {currentEditToken.optionsSchema
+                ? Object.entries(currentEditToken.optionsSchema).map(([key, schemaValue]: [string, string]) => (
                       <Input
                           key={key}
                           full
                           label={key}
-                          value={editToken.options[key]}
+                          value={currentEditToken.options[key]}
                           onChange={handleOptionsChange}
                           type="text"
                           name={key}
@@ -127,13 +128,15 @@ const EditTokenForm = () => {
                       />
                   ))
                 : null}
-            {editToken.explainer && <div className="mt-1 text-xxs text-gray-600">{editToken.explainer}</div>}
+            {currentEditToken.explainer && (
+                <div className="mt-1 text-xxs text-gray-600">{currentEditToken.explainer}</div>
+            )}
             <div className="flex space-x-2 justify-end">
                 <button className="button button-link" type="button" onClick={handleReset}>
                     Cancel
                 </button>
-                <button disabled={!editToken.value} className="button button-primary" type="submit">
-                    {editToken.isPristine ? 'Create' : 'Update'}
+                <button disabled={!currentEditToken.value} className="button button-primary" type="submit">
+                    {currentEditToken.isPristine ? 'Create' : 'Update'}
                 </button>
             </div>
         </form>

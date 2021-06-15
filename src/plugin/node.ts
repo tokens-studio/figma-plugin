@@ -32,7 +32,6 @@ export function mapValuesToTokens(tokens, values): object {
 }
 
 export function setTokensOnDocument(tokens, updatedAt: string) {
-    console.log('Updating tokens on doc', tokens, updatedAt);
     figma.root.setSharedPluginData('tokens', 'version', pjs.plugin_version);
     figma.root.setSharedPluginData('tokens', 'values', JSON.stringify(tokens));
     figma.root.setSharedPluginData('tokens', 'updatedAt', updatedAt);
@@ -45,14 +44,11 @@ export function getTokenData(): {values: TokenProps; updatedAt: string; version:
         const updatedAt = figma.root.getSharedPluginData('tokens', 'updatedAt');
         if (values) {
             const parsedValues = JSON.parse(values);
-            console.log('got values', parsedValues);
             if (Object.keys(parsedValues).length > 0) {
                 const tokenObject = Object.entries(parsedValues).reduce((acc, [key, groupValues]) => {
-                    console.log('trying to parse', groupValues, key);
                     acc[key] = typeof groupValues === 'string' ? JSON.parse(groupValues) : groupValues;
                     return acc;
                 }, {});
-                console.log('token obj is', tokenObject);
                 return {
                     values: tokenObject as TokenProps,
                     updatedAt,
@@ -90,6 +86,7 @@ export function goToNode(id) {
 }
 
 export function updateNodes(nodes, tokens) {
+    console.log('Updating nodes', tokens, nodes);
     try {
         let i = 0;
         const len = nodes.length;

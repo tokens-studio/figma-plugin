@@ -21,11 +21,10 @@ interface SettingsState {
     tokenType: TokenModeType;
 }
 
-const resizeWindow = (width, height) => {
+const setUI = (state) => {
     postToFigma({
         type: MessageToPluginTypes.SET_UI,
-        width,
-        height,
+        ...state,
     });
 };
 
@@ -51,8 +50,14 @@ export const settings = createModel<RootModel>()({
                 },
             };
         },
+        setUISettings(state, payload: SettingsState) {
+            return {
+                ...state,
+                ...payload,
+            };
+        },
         triggerWindowChange(state) {
-            resizeWindow(state.uiWindow.width, state.uiWindow.height);
+            setUI(state);
             return state;
         },
         setUpdateMode(state, payload: UpdateMode) {
@@ -80,4 +85,15 @@ export const settings = createModel<RootModel>()({
             };
         },
     },
+    effects: (dispatch) => ({
+        setUpdateStyles: (payload, rootState) => {
+            setUI(rootState.settings);
+        },
+        setUpdateMode: (payload, rootState) => {
+            setUI(rootState.settings);
+        },
+        setUpdateOnChange: (payload, rootState) => {
+            setUI(rootState.settings);
+        },
+    }),
 });

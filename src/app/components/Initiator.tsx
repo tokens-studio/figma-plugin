@@ -30,8 +30,7 @@ export default function Initiator() {
                     lastOpened,
                     providers,
                     userId,
-                    width,
-                    height,
+                    settings,
                 } = event.data.pluginMessage;
                 switch (type) {
                     case MessageFromPluginTypes.SELECTION: {
@@ -89,7 +88,7 @@ export default function Initiator() {
                         break;
                     }
                     case MessageFromPluginTypes.UI_SETTINGS: {
-                        dispatch.settings.setWindowSize({width, height});
+                        dispatch.settings.setUISettings(settings);
                         dispatch.settings.triggerWindowChange();
                         break;
                     }

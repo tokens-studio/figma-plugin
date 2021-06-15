@@ -1,38 +1,29 @@
 import {postToFigma} from '@/plugin/notifiers';
 import {useSelector} from 'react-redux';
 import {MessageToPluginTypes} from 'Types/messages';
-import React from 'react';
 import checkIfAlias from '@/utils/checkIfAlias';
 import {getAliasValue} from '@/utils/aliases';
-import {computeMergedTokens} from '@/plugin/tokenHelpers';
-import {SingleToken} from '@types/tokens';
-import {SingleTokenObject} from 'Types/tokens';
+import {SingleToken, SingleTokenObject} from 'Types/tokens';
 import stringifyTokens from '@/utils/stringifyTokens';
 import formatTokens from '@/utils/formatTokens';
+import {computeMergedTokens, resolveTokenValues} from '@/plugin/tokenHelpers';
 import {SelectionValue} from './models/tokenState';
 import {RootState} from '../store';
 
 export default function useTokens() {
     const {tokens, usedTokenSet, activeTokenSet} = useSelector((state: RootState) => state.tokenState);
 
-    // Return tokens that are included in currently active token set and optionally resolve all aliases
-    const resolvedTokens = React.useMemo(() => computeMergedTokens(tokens, usedTokenSet, true), [tokens, usedTokenSet]);
-
     // Finds token that matches name
-    function findToken(token: string) {
-        return resolvedTokens.find((n) => n.name === token);
+    function findToken(token: string, resolved) {
+        return resolved.find((n) => n.name === token);
+    }
+    // Finds token that matches name
+    function getTokenValue(token: SingleTokenObject, resolved) {
+        return getAliasValue(token, resolved);
     }
 
-    // Returns resolved value of a specific token
-    function getTokenValue(token: SingleTokenObject) {
-        if (checkIfAlias(token, resolvedTokens)) {
-            return getAliasValue(token, resolvedTokens);
-        }
-        return String(token.value);
-    }
-
-    function getTokenDisplay(token: SingleTokenObject, shouldResolve = false) {
-        const valueToCheck = shouldResolve ? findToken(token.name).value : token.value;
+    function getTokenDisplay(token: SingleTokenObject, resolvedTokens, shouldResolve = false) {
+        const valueToCheck = shouldResolve ? findToken(token.name, resolvedTokens).value : token.value;
 
         if (token.type === 'typography') {
             return `${valueToCheck.fontFamily} / ${valueToCheck.fontWeight}`;
@@ -45,12 +36,13 @@ export default function useTokens() {
     }
 
     // Returns resolved value of a specific token
-    function isAlias(token: SingleToken) {
+    function isAlias(token: SingleToken, resolvedTokens) {
         return checkIfAlias(token, resolvedTokens);
     }
 
     // Calls Figma with all tokens and nodes to set data on
-    function setNodeData(data: SelectionValue) {
+    function setNodeData(data: SelectionValue, resolvedTokens) {
+        console.group('Posting to figma', data, resolvedTokens);
         postToFigma({
             type: MessageToPluginTypes.SET_NODE_DATA,
             values: data,
@@ -91,19 +83,19 @@ export default function useTokens() {
     function createStylesFromTokens() {
         postToFigma({
             type: MessageToPluginTypes.CREATE_STYLES,
-            tokens: resolvedTokens,
+            tokens: resolveTokenValues(computeMergedTokens(tokens, usedTokenSet)),
         });
     }
 
     return {
         isAlias,
+        getTokenValue,
         findToken,
         getTokenDisplay,
         getFormattedTokens,
         getStringTokens,
         setNodeData,
         removeNodeData,
-        getTokenValue,
         createStylesFromTokens,
         pullStyles,
     };
