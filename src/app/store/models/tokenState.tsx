@@ -5,6 +5,8 @@ import {StorageProviderType} from '@types/api';
 import defaultJSON from '@/config/default.json';
 
 import parseTokenValues from '@/utils/parseTokenValues';
+import {notifyToUI} from '@/plugin/notifiers';
+import {reduceToValues} from '@/plugin/tokenHelpers';
 import {RootModel} from '.';
 import updateTokensOnSources from '../updateSources';
 import * as pjs from '../../../../package.json';
@@ -72,14 +74,17 @@ export const tokenState = createModel<RootModel>()({
                 activeTokenSet: data,
             };
         },
-        addTokenSet: (state, data: string) => {
-            // Handle add new token set
-            if (state.tokens[data]) return state;
+        addTokenSet: (state, name: string) => {
+            if (name in state.tokens) {
+                notifyToUI('Token set already exists');
+                return state;
+            }
             return {
                 ...state,
                 tokens: {
                     ...state.tokens,
-                    [data]: {
+                    [name]: {
+                        type: 'array',
                         values: [],
                     },
                 },
@@ -121,15 +126,30 @@ export const tokenState = createModel<RootModel>()({
             };
         },
         setTokenData: (state, data: {values: SingleTokenObject[]; shouldUpdate: boolean}) => {
-            console.log('Before setting data', data.values);
             const values = parseTokenValues(data.values);
-            console.log('setting token data', values);
             return {
                 ...state,
                 tokens: values,
                 activeTokenSet: Array.isArray(data.values) ? 'global' : Object.keys(data.values)[0],
                 usedTokenSet: Array.isArray(data.values) ? ['global'] : [Object.keys(data.values)[0]],
             };
+        },
+        setJSONData: (state, payload: string) => {
+            try {
+                const parsedTokens = JSON.parse(payload);
+                const parsed = parseTokenValues({
+                    ...state.tokens,
+                    [state.activeTokenSet]: parsedTokens,
+                });
+                return {
+                    ...state,
+                    tokens: parsed,
+                };
+            } catch (e) {
+                console.log('Error parsing tokens', e);
+                notifyToUI('Error parsing JSON. Check console (F12)');
+                return state;
+            }
         },
         createToken: (state, data: TokenInput) => {
             let newTokens = {};
@@ -159,7 +179,6 @@ export const tokenState = createModel<RootModel>()({
         // Imports received styles as tokens, if needed
         setTokensFromStyles: (state, receivedStyles) => {
             console.log('Set tokens from styles', receivedStyles);
-            console.log('TOKENS ARE', state.tokens);
             const newTokens = [];
             const existingTokens = [];
             const updatedTokens = [];
@@ -167,18 +186,15 @@ export const tokenState = createModel<RootModel>()({
             // Iterate over received styles and check if they existed before or need updating
             Object.entries(receivedStyles).map(([_parent, values]: [string, SingleTokenObject[]]) => {
                 values.map((token: TokenGroup) => {
-                    console.log('TOKEN', token);
-
                     const oldValue = state.tokens[state.activeTokenSet].values.find((t) => t.name === token.name);
                     if (oldValue) {
-                        console.log('got old value', oldValue, token);
-                        if (oldValue.value === token.value) {
-                            console.log('Is same value!', token.value);
-                            if (oldValue.description === token.description) {
-                                console.log('Is also same description');
+                        if (oldValue.value.toUpperCase() === token.value.toUpperCase()) {
+                            if (
+                                oldValue.description === token.description ||
+                                (typeof token.description === 'undefined' && oldValue.description === '')
+                            ) {
                                 existingTokens.push(token);
                             } else {
-                                console.log('Is another description');
                                 updatedTokens.push({
                                     ...token,
                                     oldDescription: oldValue.description,
@@ -205,7 +221,6 @@ export const tokenState = createModel<RootModel>()({
             };
         },
         editToken: (state, data: EditTokenInput) => {
-            console.log('editing token in state', data);
             const nameToFind = data.oldName ? data.oldName : data.name;
             const index = state.tokens[data.parent].values.findIndex((token) => token.name === nameToFind);
             const newArray = [...state.tokens[data.parent].values];
@@ -244,14 +259,40 @@ export const tokenState = createModel<RootModel>()({
     },
     effects: (dispatch) => ({
         setDefaultTokens: (payload) => {
-            console.log('setting default effect');
             dispatch.tokenState.setTokenData({values: defaultTokens.values});
         },
         setEmptyTokens: (payload) => {
-            console.log('setting empty effect');
             dispatch.tokenState.setTokenData({values: []});
         },
-        setJSONData: (payload: string, rootState) => {
+        editToken(payload, rootState) {
+            console.log('Editing token', payload, rootState.settings.updateOnChange);
+            if (payload.shouldUpdate && rootState.settings.updateOnChange) {
+                dispatch.tokenState.updateDocument();
+            }
+        },
+        deleteToken() {
+            dispatch.tokenState.updateDocument(false);
+        },
+        addTokenSet() {
+            dispatch.tokenState.updateDocument(false);
+        },
+        renameTokenSet() {
+            dispatch.tokenState.updateDocument(false);
+        },
+        deleteTokenSet() {
+            dispatch.tokenState.updateDocument(false);
+        },
+        setTokenSetOrder() {
+            dispatch.tokenState.updateDocument(false);
+        },
+        setTokenData(payload, rootState) {
+            console.log('setting tokendate effect');
+
+            if (payload.shouldUpdate) {
+                dispatch.tokenState.updateDocument();
+            }
+        },
+        setJSONData(payload, rootState) {
             console.log('setting jsondata effect');
             console.log('Got a payload', payload, rootState.tokenState.activeTokenSet);
             const parsedTokens = JSON.parse(payload);
@@ -264,27 +305,21 @@ export const tokenState = createModel<RootModel>()({
             } catch (e) {
                 console.log('Error parsing tokens', e);
             }
-        },
-        editToken() {
+
             dispatch.tokenState.updateDocument();
         },
-        setTokenData(payload, rootState) {
-            console.log('setting tokendate effect');
-
-            if (payload.shouldUpdate) {
+        createToken(payload, rootState) {
+            if (payload.shouldUpdate && rootState.settings.updateOnChange) {
                 dispatch.tokenState.updateDocument();
             }
         },
-        createToken(payload) {
-            if (payload.shouldUpdate) {
-                dispatch.tokenState.updateDocument();
-            }
-        },
-        updateDocument(payload, rootState) {
+        updateDocument(shouldUpdateNodes = true, rootState) {
             updateTokensOnSources({
-                tokens: rootState.tokenState.tokens,
+                tokens: shouldUpdateNodes ? rootState.tokenState.tokens : null,
+                tokenValues: reduceToValues(rootState.tokenState.tokens),
                 usedTokenSet: rootState.tokenState.usedTokenSet,
-                updatePageOnly: rootState.settings.updatePageOnly,
+                updateMode: rootState.settings.updateMode,
+                updateStyles: rootState.settings.updateStyles,
                 updatedAt: new Date().toString(),
                 lastUpdatedAt: rootState.uiState.lastUpdatedAt,
                 isLocal: rootState.uiState.storageType.provider === StorageProviderType.LOCAL,

@@ -1,12 +1,14 @@
 import {postToFigma} from '@/plugin/notifiers';
 import {useSelector} from 'react-redux';
-import {MessageToPluginTypes} from '@types/messages';
+import {MessageToPluginTypes} from 'Types/messages';
 import React from 'react';
 import checkIfAlias from '@/utils/checkIfAlias';
 import {getAliasValue} from '@/utils/aliases';
 import {computeMergedTokens} from '@/plugin/tokenHelpers';
-import set from 'set-value';
 import {SingleToken} from '@types/tokens';
+import {SingleTokenObject} from 'Types/tokens';
+import stringifyTokens from '@/utils/stringifyTokens';
+import formatTokens from '@/utils/formatTokens';
 import {SelectionValue} from './models/tokenState';
 import {RootState} from '../store';
 
@@ -22,11 +24,24 @@ export default function useTokens() {
     }
 
     // Returns resolved value of a specific token
-    function getTokenValue(token: SingleToken) {
+    function getTokenValue(token: SingleTokenObject) {
         if (checkIfAlias(token, resolvedTokens)) {
             return getAliasValue(token, resolvedTokens);
         }
         return String(token.value);
+    }
+
+    function getTokenDisplay(token: SingleTokenObject, shouldResolve = false) {
+        const valueToCheck = shouldResolve ? findToken(token.name).value : token.value;
+
+        if (token.type === 'typography') {
+            return `${valueToCheck.fontFamily} / ${valueToCheck.fontWeight}`;
+        }
+        if (typeof valueToCheck !== 'string' && typeof valueToCheck !== 'number') {
+            return JSON.stringify(valueToCheck, null, 2);
+        }
+
+        return valueToCheck;
     }
 
     // Returns resolved value of a specific token
@@ -43,26 +58,14 @@ export default function useTokens() {
         });
     }
 
-    // Calls Figma with all tokens and nodes to set data on
+    // Returns formatted tokens for style dictionary
     function getFormattedTokens() {
-        const tokenObj = {};
-        tokens[activeTokenSet].values.forEach((token) => {
-            set(tokenObj, token.name, token);
-        });
-
-        return JSON.stringify(tokenObj, null, 2);
+        return formatTokens(tokens, activeTokenSet);
     }
 
-    // Calls Figma with all tokens and nodes to set data on
+    // Returns stringified tokens for the JSON editor
     function getStringTokens() {
-        console.log('Tokens are', tokens);
-        const tokenObj = {};
-        tokens[activeTokenSet].values.forEach((token) => {
-            const {name, ...tokenWithoutName} = token;
-            set(tokenObj, token.name, tokenWithoutName);
-        });
-
-        return JSON.stringify(tokenObj, null, 2);
+        return stringifyTokens(tokens, activeTokenSet);
     }
 
     // Calls Figma asking for all local text- and color styles
@@ -95,6 +98,7 @@ export default function useTokens() {
     return {
         isAlias,
         findToken,
+        getTokenDisplay,
         getFormattedTokens,
         getStringTokens,
         setNodeData,

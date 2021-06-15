@@ -8,7 +8,7 @@ export interface TokenProps {
     version: string;
 }
 
-export type SingleToken = string | number | TokenGroup;
+export type SingleToken = TokenGroup;
 
 export type NewTokenObject = {
     name: string;

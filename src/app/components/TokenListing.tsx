@@ -33,7 +33,6 @@ const TokenListing = ({
     const dispatch = useDispatch<Dispatch>();
 
     const {createStylesFromTokens} = useTokens();
-
     const {collapsed, showEmptyGroups} = useTokenState();
     const {setCollapsed} = useTokenDispatch();
 
@@ -130,7 +129,6 @@ const TokenListing = ({
                             </button>
                         </Tooltip>
                     )}
-
                     <Tooltip label="Add a new token" variant="right">
                         <button
                             disabled={editProhibited}
@@ -152,7 +150,6 @@ const TokenListing = ({
                         tokenValues: values,
                         showNewForm,
                         showForm,
-                        property: tokenKey,
                         schema,
                         path: tokenKey,
                         type: tokenType,

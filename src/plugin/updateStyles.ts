@@ -12,10 +12,10 @@ export default function updateStyles(tokens, shouldCreate = false): void {
     const textTokens = styleTokens.filter((n) => ['typography'].includes(n.type));
 
     if (!colorTokens && !textTokens) return;
-    if (colorTokens) {
+    if (colorTokens.length > 0) {
         updateColorStyles(colorTokens, shouldCreate);
     }
-    if (textTokens) {
+    if (textTokens.length > 0) {
         updateTextStyles(textTokens, shouldCreate);
     }
 }

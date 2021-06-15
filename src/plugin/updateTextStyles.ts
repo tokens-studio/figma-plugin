@@ -10,7 +10,7 @@ export default function updateTextStyles(textTokens, shouldCreate = false) {
         if (textStyles.length > 0) {
             matchingStyles = textStyles.filter((n) => {
                 const splitName = n.name.split('/').map((name) => name.trim());
-                const splitKey = token.name.split('/').map((name) => name.trim());
+                const splitKey = token.name.split('.').map((name) => name.trim());
 
                 if (splitKey[splitKey.length - 1] === 'value') {
                     splitKey.pop();

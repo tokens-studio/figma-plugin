@@ -8,8 +8,6 @@ export function findAllAliases(tokens) {
 }
 
 export function reduceToValues(tokens) {
-    console.log('reduce to val', tokens);
-
     const reducedTokens = Object.entries(tokens).reduce((prev, group) => {
         prev.push({[group[0]]: group[1].values});
         return prev;
@@ -43,9 +41,8 @@ export function resolveTokenValues(tokens, previousCount = undefined) {
             };
         });
         if (previousCount > aliases.length || !previousCount) {
-            return resolveTokenValues(returnedTokens);
+            return resolveTokenValues(returnedTokens, aliases.length);
         }
-        console.log("Unable to resolve some aliases, these wont' resolve:", aliases);
 
         return returnedTokens;
     }
@@ -54,14 +51,20 @@ export function resolveTokenValues(tokens, previousCount = undefined) {
 
 export function computeMergedTokens(tokens, usedTokenSet, shouldResolve = false): SingleTokenObject[] {
     const mergedTokens = [];
-    Object.entries(tokens).forEach((tokenGroup) => {
-        if (usedTokenSet.includes(tokenGroup[0])) {
-            mergedTokens.push(...tokenGroup[1].values);
-        }
-    });
+    // Reverse token set order (right-most win) and check for duplicates
+    Object.entries(tokens)
+        .reverse()
+        .forEach((tokenGroup) => {
+            if (usedTokenSet.includes(tokenGroup[0])) {
+                tokenGroup[1].values.forEach((token) => {
+                    if (!mergedTokens.some((t) => t.name === token.name)) mergedTokens.push(token);
+                });
+            }
+        });
 
     if (shouldResolve && Object.entries(tokens).length > 0) {
-        return resolveTokenValues(mergedTokens);
+        const resolved = resolveTokenValues(mergedTokens);
+        return resolved;
     }
 
     return mergedTokens;

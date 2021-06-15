@@ -20,6 +20,8 @@
 	},
 	"dependencies": {
 		"@figma-plugin/helpers": "^0.13.2",
+		"@radix-ui/react-dropdown-menu": "^0.0.19",
+		"@radix-ui/react-icons": "^1.0.3",
 		"@radix-ui/react-tooltip": "^0.0.18",
 		"@reach/portal": "^0.10.5",
 		"@reach/tooltip": "^0.10.3",

@@ -120,12 +120,14 @@ figma.ui.onmessage = async (msg) => {
             }
             return;
         case MessageToPluginTypes.UPDATE: {
-            const allWithData = findAllWithData({pageOnly: msg.updatePageOnly});
+            if (msg.updateStyles && msg.tokens) updateStyles(msg.tokens, false);
             if (msg.tokenValues && msg.updatedAt) setTokensOnDocument(msg.tokenValues, msg.updatedAt);
-            updateStyles(msg.tokens, false);
-            updateNodes(allWithData, msg.tokens);
-            updatePluginData(allWithData, {});
-            notifyRemoteComponents({nodes: store.successfulNodes.length, remotes: store.remoteComponents});
+            if (msg.tokens) {
+                const allWithData = findAllWithData({updateMode: msg.updateMode});
+                updateNodes(allWithData, msg.tokens);
+                updatePluginData(allWithData, {});
+                notifyRemoteComponents({nodes: store.successfulNodes.length, remotes: store.remoteComponents});
+            }
             return;
         }
         case MessageToPluginTypes.GO_TO_NODE:
@@ -138,7 +140,13 @@ figma.ui.onmessage = async (msg) => {
             notifyUI(msg.msg, msg.opts);
             break;
         case MessageToPluginTypes.SET_UI: {
-            updateUISettings({width: msg.width, height: msg.height});
+            updateUISettings({
+                width: msg.uiWindow.width,
+                height: msg.uiWindow.height,
+                updateMode: msg.updateMode,
+                updateOnChange: msg.updateOnChange,
+                updateStyles: msg.updateStyles,
+            });
             figma.ui.resize(msg.width, msg.height);
             break;
         }

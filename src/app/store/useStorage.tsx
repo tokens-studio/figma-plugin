@@ -1,7 +1,7 @@
 import {postToFigma} from '@/plugin/notifiers';
 import {useDispatch} from 'react-redux';
-import {StorageProviderType} from '@types/api';
-import {MessageToPluginTypes} from '@types/messages';
+import {StorageProviderType} from 'Types/api';
+import {MessageToPluginTypes} from 'Types/messages';
 import {Dispatch} from '../store';
 
 export default function useStorage() {

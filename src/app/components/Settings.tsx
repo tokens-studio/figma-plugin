@@ -56,29 +56,6 @@ const SyncSettings = () => {
                         />
                     </div>
                 </div>
-                <div className="space-y-4">
-                    <Heading>Token Type</Heading>
-                    <div className="flex flex-row space-x-2">
-                        <RadioButton
-                            name="object"
-                            value="object"
-                            checked={tokenType === 'object'}
-                            group="tokenType"
-                            onChange={handleTypeChange}
-                        >
-                            Object
-                        </RadioButton>
-                        <RadioButton
-                            name="array"
-                            value="array"
-                            checked={tokenType === 'array'}
-                            group="tokenType"
-                            onChange={handleTypeChange}
-                        >
-                            array
-                        </RadioButton>
-                    </div>
-                </div>
             </div>
         </div>
     );

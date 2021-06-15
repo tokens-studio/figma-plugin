@@ -152,7 +152,6 @@ export default function ImportedTokensDialog() {
     React.useEffect(() => {
         setNewTokens(importedTokens.newTokens);
         setUpdatedTokens(importedTokens.updatedTokens);
-        console.log('Updated!', importedTokens.newTokens, importedTokens.newTokens.length);
     }, [importedTokens.newTokens, importedTokens.updatedTokens]);
 
     if (!newTokens.length && !updatedTokens.length) return null;

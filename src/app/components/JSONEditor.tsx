@@ -22,7 +22,6 @@ const JSONEditor = () => {
     const [stringTokens, setStringTokens] = React.useState(JSON.stringify(tokens[activeTokenSet]?.values, null, 2));
 
     React.useEffect(() => {
-        console.log('effect triggered');
         setStringTokens(
             tokenType === 'array' ? JSON.stringify(tokens[activeTokenSet]?.values, null, 2) : getStringTokens()
         );
@@ -30,7 +29,6 @@ const JSONEditor = () => {
 
     const handleUpdate = async () => {
         dispatch.tokenState.setJSONData(stringTokens);
-        await dispatch.uiState.setLoading(true);
     };
 
     const handleSetEmpty = () => {

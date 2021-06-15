@@ -1,6 +1,6 @@
 import {useDispatch, useSelector} from 'react-redux';
-import {SingleToken, TokenProps} from '@types/tokens';
-import {StorageProviderType} from '@types/api';
+import {SingleToken, TokenProps} from 'Types/tokens';
+import {StorageProviderType} from 'Types/api';
 import {notifyToUI} from '../../plugin/notifiers';
 import {useJSONbin} from './providers/jsonbin';
 import useArcade from './providers/arcade';
@@ -17,7 +17,6 @@ export default function useRemoteTokens() {
     const {fetchDataFromJSONBin, createNewJSONBin} = useJSONbin();
 
     const pullTokens = async () => {
-        console.log('Pull tokens');
         const {id, secret, provider, name} = api;
         if (!id && !secret) return;
 

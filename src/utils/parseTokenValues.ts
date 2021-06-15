@@ -1,6 +1,7 @@
 import convertToTokenArray from './convertTokens';
 
 export default function parseTokenValues(tokens) {
+    // If we receive an array of tokens, move them all to the global set
     if (Array.isArray(tokens)) {
         return {
             global: {
@@ -9,6 +10,8 @@ export default function parseTokenValues(tokens) {
             },
         };
     }
+
+    // For a regular token-schema go through each and convert their values to a token array
     const reducedTokens = Object.entries(tokens).reduce((prev, group) => {
         const parsedGroup = group[1];
         if (typeof parsedGroup === 'object') {

@@ -41,11 +41,30 @@ export function notifySelection(nodes = undefined, values = undefined) {
     });
 }
 
-export function notifyUISettings({width, height}: {width: number; height: number}) {
+export function notifyUISettings({
+    width,
+    height,
+    updateMode,
+    updateOnChange,
+    updateStyles,
+}: {
+    width: number;
+    height: number;
+    updateMode: UpdateMode;
+    updateOnChange: boolean;
+    updateStyles: boolean;
+}) {
     postToUI({
         type: MessageFromPluginTypes.UI_SETTINGS,
-        width,
-        height,
+        settings: {
+            uiWindow: {
+                width,
+                height,
+            },
+            updateMode,
+            updateOnChange,
+            updateStyles,
+        },
     });
 }
 

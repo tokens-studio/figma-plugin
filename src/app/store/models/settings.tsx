@@ -2,7 +2,8 @@
 import {postToFigma} from '@/plugin/notifiers';
 import {track} from '@/utils/analytics';
 import {createModel} from '@rematch/core';
-import {MessageToPluginTypes} from '@types/messages';
+import {MessageToPluginTypes} from 'Types/messages';
+import {UpdateMode} from 'Types/state';
 import {RootModel} from '.';
 
 type WindowSettingsType = {
@@ -10,10 +11,14 @@ type WindowSettingsType = {
     height: number;
 };
 
+type TokenModeType = 'object' | 'array';
+
 interface SettingsState {
     uiWindow: WindowSettingsType;
-    updatePageOnly: boolean;
-    tokenType: 'object' | 'array';
+    updateMode: UpdateMode;
+    updateOnChange: boolean;
+    updateStyles: boolean;
+    tokenType: TokenModeType;
 }
 
 const resizeWindow = (width, height) => {
@@ -30,7 +35,9 @@ export const settings = createModel<RootModel>()({
             width: 400,
             height: 600,
         },
-        updatePageOnly: true,
+        updateMode: UpdateMode.PAGE,
+        updateOnChange: true,
+        updateStyles: true,
         tokenType: 'object',
     } as SettingsState,
     reducers: {
@@ -48,13 +55,25 @@ export const settings = createModel<RootModel>()({
             resizeWindow(state.uiWindow.width, state.uiWindow.height);
             return state;
         },
-        setUpdatePageOnly(state, payload: boolean) {
+        setUpdateMode(state, payload: UpdateMode) {
             return {
                 ...state,
-                updatePageOnly: payload,
+                updateMode: payload,
             };
         },
-        setTokenType(state, payload: 'object' | 'array') {
+        setUpdateOnChange(state, payload: boolean) {
+            return {
+                ...state,
+                updateOnChange: payload,
+            };
+        },
+        setUpdateStyles(state, payload: boolean) {
+            return {
+                ...state,
+                updateStyles: payload,
+            };
+        },
+        setTokenType(state, payload: TokenModeType) {
             return {
                 ...state,
                 tokenType: payload,

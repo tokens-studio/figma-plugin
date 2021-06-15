@@ -59,16 +59,11 @@ export const uiState = createModel<RootModel>()({
         editProhibited: false,
         storageType: {
             provider: StorageProviderType.LOCAL,
-            id: '',
-            name: '',
         },
         api: null,
         apiProviders: [],
         localApiState: {
-            id: '',
-            secret: '',
-            name: '',
-            provider: '',
+            provider: StorageProviderType.LOCAL,
             new: false,
         },
         lastUpdatedAt: null,

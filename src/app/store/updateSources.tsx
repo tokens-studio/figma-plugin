@@ -1,5 +1,5 @@
 import {MessageToPluginTypes} from '@types/messages';
-import {computeMergedTokens, reduceToValues} from '@/plugin/tokenHelpers';
+import {computeMergedTokens} from '@/plugin/tokenHelpers';
 import {TokenProps} from '../../../types/tokens';
 import {StorageProviderType} from '../../../types/api';
 import {notifyToUI, postToFigma} from '../../plugin/notifiers';
@@ -45,8 +45,10 @@ async function updateRemoteTokens({
 
 export default async function updateTokensOnSources({
     tokens,
+    tokenValues,
     usedTokenSet,
-    updatePageOnly,
+    updateMode,
+    updateStyles,
     updatedAt,
     shouldUpdateRemote = true,
     isLocal,
@@ -55,12 +57,10 @@ export default async function updateTokensOnSources({
     api,
     lastUpdatedAt,
 }) {
-    console.log('update on sources', tokens, usedTokenSet);
-    // TODO: FIX THIS
     if (!isLocal && shouldUpdateRemote && !editProhibited) {
         updateRemoteTokens({
             provider: storageType.provider,
-            tokens: reduceToValues(tokens),
+            tokens,
             id: api.id,
             secret: api.secret,
             updatedAt,
@@ -69,9 +69,10 @@ export default async function updateTokensOnSources({
     }
     postToFigma({
         type: MessageToPluginTypes.UPDATE,
-        tokenValues: reduceToValues(tokens),
-        tokens: computeMergedTokens(tokens, usedTokenSet, true),
-        updatePageOnly,
+        tokenValues,
+        tokens: tokens ? computeMergedTokens(tokens, usedTokenSet, true) : null,
+        updateMode,
+        updateStyles,
         updatedAt,
     });
 }

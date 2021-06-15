@@ -5,16 +5,7 @@ import TokenGroupHeading from './TokenGroupHeading';
 import Tooltip from './Tooltip';
 import {isSingleToken, isTypographyToken} from './utils';
 
-const renderKeyValue = ({
-    tokenValues,
-    showNewForm,
-    showForm,
-    property,
-    schema,
-    path = '',
-    type = '',
-    editMode = false,
-}) => {
+const renderKeyValue = ({tokenValues, showNewForm, showForm, schema, path = '', type = '', editMode = false}) => {
     return (
         <div className="flex justify-start flex-row flex-wrap">
             {Object.entries(tokenValues).map(([key, value]) => {
@@ -49,7 +40,6 @@ const renderKeyValue = ({
                                     tokenValues: value,
                                     showNewForm,
                                     showForm,
-                                    property,
                                     schema,
                                     path: stringPath,
                                     type,
@@ -57,13 +47,7 @@ const renderKeyValue = ({
                                 })}
                             </div>
                         ) : (
-                            <TokenButton
-                                property={property}
-                                type={type}
-                                editMode={editMode}
-                                token={value}
-                                showForm={showForm}
-                            />
+                            <TokenButton type={type} editMode={editMode} token={value} showForm={showForm} />
                         )}
                     </React.Fragment>
                 );

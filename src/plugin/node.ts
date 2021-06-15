@@ -7,7 +7,7 @@ import {StorageProviderType, StorageType} from '../../types/api';
 import {isSingleToken} from '../app/components/utils';
 import * as pjs from '../../package.json';
 
-function returnValueToLookFor(key) {
+export function returnValueToLookFor(key) {
     switch (key) {
         case 'tokenName':
             return 'name';

@@ -1,7 +1,7 @@
 // stitches.config.ts
 import {createCss} from '@stitches/react';
 
-const global = {
+const globalTokens = {
     colors: {
         white: '#FFFFFF',
         gray50: 'var(--theme-colors-gray-50, #FAFAFA)',
@@ -30,19 +30,19 @@ const global = {
 export const {styled, css, global: globalCSS, keyframes, getCssString, theme} = createCss({
     theme: {
         colors: {
-            contextMenuBackground: global.colors.gray950,
-            contextMenuForeground: global.colors.white,
-            contextMenuSeperator: global.colors.gray700,
-            text: global.colors.gray900,
-            textMuted: global.colors.gray700,
-            interaction: global.colors.primary500,
-            onInteraction: global.colors.white,
+            contextMenuBackground: globalTokens.colors.gray950,
+            contextMenuForeground: globalTokens.colors.white,
+            contextMenuSeperator: globalTokens.colors.gray700,
+            text: globalTokens.colors.gray900,
+            textMuted: globalTokens.colors.gray700,
+            interaction: globalTokens.colors.primary500,
+            onInteraction: globalTokens.colors.white,
         },
         radii: {
-            default: global.radii.sm,
-            button: global.radii.sm,
-            contextMenu: global.radii.lg,
-            contextMenuItem: global.radii.sm,
+            default: globalTokens.radii.sm,
+            button: globalTokens.radii.sm,
+            contextMenu: globalTokens.radii.lg,
+            contextMenuItem: globalTokens.radii.sm,
         },
     },
 });

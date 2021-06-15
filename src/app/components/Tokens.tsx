@@ -6,6 +6,7 @@ import TokensBottomBar from './TokensBottomBar';
 import ToggleEmptyButton from './ToggleEmptyButton';
 import {mappedTokens} from './createTokenObj';
 import {RootState} from '../store';
+import TokenSetSelector from './TokenSetSelector';
 import EditTokenFormModal from './EditTokenFormModal';
 
 interface TokenListingType {
@@ -36,6 +37,7 @@ const Tokens = ({isActive}) => {
 
     return (
         <div>
+            <TokenSetSelector />
             {memoizedTokens.map(([key, group]: [string, TokenListingType]) => {
                 return (
                     <div key={key}>

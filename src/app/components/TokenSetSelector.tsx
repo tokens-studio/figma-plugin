@@ -134,29 +134,40 @@ export default function TokenSetSelector() {
                 </div>
             </Modal>
 
-            {showNewTokenSetFields ? (
-                <form onSubmit={handleNewTokenSetSubmit} className="flex-shrink-0">
-                    <Input
-                        full
-                        value={newTokenSetName}
-                        onChange={(e) => handleNewTokenSetNameChange(e.target.value)}
-                        type="text"
-                        name="tokensetname"
-                        required
-                    />
-                </form>
-            ) : (
-                <Tooltip label="Add new token set">
-                    <button
-                        className="button button-ghost flex-shrink-0"
-                        type="button"
-                        disabled={editProhibited}
-                        onClick={() => setShowNewTokenSetFields(true)}
-                    >
-                        <Icon name="add" />
-                    </button>
-                </Tooltip>
-            )}
+            <Modal isOpen={showNewTokenSetFields} close={() => setShowNewTokenSetFields(false)}>
+                <div className="flex justify-center flex-col text-center space-y-4">
+                    <Heading>New set</Heading>
+                    <form onSubmit={handleNewTokenSetSubmit} className="space-y-4">
+                        <Input
+                            full
+                            value={newTokenSetName}
+                            onChange={(e) => handleNewTokenSetNameChange(e.target.value)}
+                            type="text"
+                            name="tokensetname"
+                            required
+                        />
+                        <div className="space-x-4">
+                            <Button variant="secondary" size="large" onClick={() => setShowNewTokenSetFields(false)}>
+                                Cancel
+                            </Button>
+                            <Button type="submit" variant="primary" size="large">
+                                Create
+                            </Button>
+                        </div>
+                    </form>
+                </div>
+            </Modal>
+
+            <Tooltip label="Add new token set">
+                <button
+                    className="button button-ghost flex-shrink-0"
+                    type="button"
+                    disabled={editProhibited}
+                    onClick={() => setShowNewTokenSetFields(true)}
+                >
+                    <Icon name="add" />
+                </button>
+            </Tooltip>
         </div>
     );
 }

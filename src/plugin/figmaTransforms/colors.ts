@@ -23,17 +23,11 @@ function trim(str) {
 }
 
 export function RGBAToHexA(rgba) {
-    console.log('RGBA to HEXA', rgba);
     const inParts = rgba.substring(rgba.indexOf('(')).split(', ');
-    console.log('Inparts', inParts);
     const r = parseInt(trim(inParts[0].substring(1)), 10);
-    console.log('r', r);
     const g = parseInt(trim(inParts[1]), 10);
-    console.log('g', g);
     const b = parseInt(trim(inParts[2]), 10);
-    console.log('b', b);
     const a = parseFloat(trim(inParts[3].substring(0, inParts[3].length - 1))).toFixed(2);
-    console.log('a', a);
 
     const outParts = [
         r.toString(16),
@@ -43,7 +37,6 @@ export function RGBAToHexA(rgba) {
             .toString(16)
             .substring(0, 2),
     ];
-    console.log('Outparts 1', outParts);
 
     // Pad single-digit output values
     outParts.forEach((part, i) => {
@@ -52,7 +45,6 @@ export function RGBAToHexA(rgba) {
         }
     });
 
-    console.log('Outparts 2', outParts);
     return `#${outParts.join('')}`;
 }
 

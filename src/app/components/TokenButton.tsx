@@ -8,7 +8,7 @@ import useManageTokens from '../store/useManageTokens';
 import {Dispatch, RootState} from '../store';
 import useTokens from '../store/useTokens';
 
-const TokenButton = ({type, property, token, editMode, showForm}) => {
+const TokenButton = ({type, token, editMode, showForm}) => {
     const uiState = useSelector((state: RootState) => state.uiState);
     const {activeTokenSet} = useSelector((state: RootState) => state.tokenState);
     const {setNodeData, getTokenValue} = useTokens();

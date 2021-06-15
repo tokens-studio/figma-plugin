@@ -1,7 +1,6 @@
 import * as React from 'react';
 
 export enum ActionType {
-    SetShowEditForm = 'SET_SHOW_EDIT_FORM',
     SetShowNewGroupForm = 'SET_SHOW_NEW_GROUP_FORM',
     SetShowOptions = 'SET_SHOW_OPTIONS',
     SetCollapsed = 'SET_COLLAPSED',
@@ -80,7 +79,6 @@ function TokenProvider({children}) {
             toggleUpdateAfterApply: (bool: boolean) => {
                 dispatch({type: ActionType.ToggleUpdateAfterApply, bool});
             },
-
             createTokenGroup: (data: {parent: string; name: string; updatedAt: Date}) => {
                 dispatch({type: ActionType.CreateTokenGroup, data});
             },
