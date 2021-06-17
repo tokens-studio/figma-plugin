@@ -85,6 +85,8 @@
 
 body {
     @apply font-body text-sm leading-normal;
+
+    overflow-y: scroll;
 }
 
 body::-webkit-scrollbar,

@@ -190,7 +190,7 @@ const TokenButton = ({type, token, editMode, showForm, resolvedTokens}) => {
                             </div>
                             <div className="text-white">{getTokenDisplay(token, resolvedTokens)}</div>
                             {isAlias(token, resolvedTokens) && (
-                                <div className="text-gray-600">{getTokenValue(token, resolvedTokens)}</div>
+                                <div className="text-gray-600">{getTokenDisplay(token, resolvedTokens, true)}</div>
                             )}
                             {token.description && <div className="text-gray-500">{token.description}</div>}
                         </div>

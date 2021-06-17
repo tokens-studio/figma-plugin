@@ -71,7 +71,7 @@ export default function pullStyles(styleTypes): void {
         fontSizes = rawFontSizes
             .sort((a, b) => a - b)
             .map((size, idx) => ({
-                name: `global.fontSize.${idx}`,
+                name: `fontSize.${idx}`,
                 value: size.toString(),
                 type: 'fontSizes',
             }));
@@ -81,19 +81,19 @@ export default function pullStyles(styleTypes): void {
         lineHeights = rawLineHeights
             .filter((v, i, a) => a.findIndex((t) => t.unit === v.unit && t.value === v.value) === i)
             .map((lh, idx) => ({
-                name: `global.lineHeights.${idx}`,
+                name: `lineHeights.${idx}`,
                 value: convertFigmaToLineHeight(lh).toString(),
                 type: 'lineHeights',
             }));
 
         fontFamilies = [...new Set(uniqueFontCombinations.map((font) => font.family))].map((fontFamily) => ({
-            name: `global.fontFamilies.${slugify(fontFamily)}`,
+            name: `fontFamilies.${slugify(fontFamily)}`,
             value: fontFamily,
             type: 'fontFamilies',
         }));
 
         fontWeights = uniqueFontCombinations.map((font, idx) => ({
-            name: `global.fontWeights.${slugify(font.family)}-${idx}`,
+            name: `fontWeights.${slugify(font.family)}-${idx}`,
             value: font.style,
             type: 'fontWeights',
         }));
@@ -101,7 +101,7 @@ export default function pullStyles(styleTypes): void {
         paragraphSpacing = rawParagraphSpacing
             .sort((a, b) => a - b)
             .map((size, idx) => ({
-                name: `global.paragraphSpacing.${idx}`,
+                name: `paragraphSpacing.${idx}`,
                 value: size.toString(),
                 type: 'paragraphSpacing',
             }));
@@ -109,28 +109,37 @@ export default function pullStyles(styleTypes): void {
         letterSpacing = rawLetterSpacing
             .filter((v, i, a) => a.findIndex((t) => t.unit === v.unit && t.value === v.value) === i)
             .map((lh, idx) => ({
-                name: `global.letterSpacing.${idx}`,
+                name: `letterSpacing.${idx}`,
                 value: convertFigmaToLetterSpacing(lh).toString(),
                 type: 'letterSpacing',
             }));
 
         typography = figmaTextStyles.map((style) => {
+            const foundFamily = fontFamilies.find((el: SingleTokenObject) => el.value === style.fontName.family);
+            const foundFontWeight = fontWeights.find(
+                (el: SingleTokenObject) =>
+                    el.name.includes(slugify(style.fontName.family)) && el.value === style.fontName?.style
+            );
+            const foundLineHeight = lineHeights.find(
+                (el: SingleTokenObject) => el.value === convertFigmaToLineHeight(style.lineHeight).toString()
+            );
+            const foundFontSize = fontSizes.find((el: SingleTokenObject) => el.value === style.fontSize.toString());
+            const foundLetterSpacing = letterSpacing.find(
+                (el: SingleTokenObject) => el.value === convertFigmaToLetterSpacing(style.letterSpacing).toString()
+            );
+            const foundParagraphSpacing = paragraphSpacing.find(
+                (el: SingleTokenObject) => el.value === style.paragraphSpacing.toString()
+            );
+
+            console.log('found', fontFamilies, figmaTextStyles, foundFamily);
+
             const obj = {
-                fontFamily: fontFamilies.find((el: SingleTokenObject) => el.value === style.fontName.family)?.name,
-                fontWeight: fontWeights.find(
-                    (el: SingleTokenObject) =>
-                        el.name.includes(slugify(style.fontName.family)) && el.value === style.fontName?.style
-                )?.name,
-                lineHeight: lineHeights.find(
-                    (el: SingleTokenObject) => el.value === convertFigmaToLineHeight(style.lineHeight).toString()
-                )?.name,
-                fontSize: fontSizes.find((el: SingleTokenObject) => el.value === style.fontSize.toString())?.name,
-                letterSpacing: letterSpacing.find(
-                    (el: SingleTokenObject) => el.value === convertFigmaToLetterSpacing(style.letterSpacing).toString()
-                )?.name,
-                paragraphSpacing: paragraphSpacing.find(
-                    (el: SingleTokenObject) => el.value === style.paragraphSpacing.toString()
-                )?.name,
+                fontFamily: `$${foundFamily?.name}`,
+                fontWeight: `$${foundFontWeight?.name}`,
+                lineHeight: `$${foundLineHeight?.name}`,
+                fontSize: `$${foundFontSize?.name}`,
+                letterSpacing: `$${foundLetterSpacing?.name}`,
+                paragraphSpacing: `$${foundParagraphSpacing?.name}`,
             };
 
             const normalizedName = style.name

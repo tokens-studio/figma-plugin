@@ -15,7 +15,7 @@ import * as pjs from '../../package.json';
 
 initializeAnalytics();
 
-if (process.env.ENVIRONMENT === 'production') {
+if (process.env.ENVIRONMENT === 'production' || process.env.ENVIRONMENT === 'beta') {
     Sentry.init({
         dsn: 'https://26bac1a4b1ba4d91bc9420d10d95bb3e@o386310.ingest.sentry.io/5220409',
         release: `figma-tokens@${pjs.plugin_version}`,

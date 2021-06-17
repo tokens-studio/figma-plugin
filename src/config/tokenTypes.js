@@ -39,6 +39,20 @@ export default {
         type: 'opacity',
         explainer: 'Set as 50%',
     },
+    boxShadow: {
+        label: 'Box Shadow',
+        property: 'Box Shadow',
+        type: 'boxShadow',
+        schema: {
+            value: {
+                x: '',
+                y: '',
+                spread: '',
+                color: '',
+                blur: '',
+            },
+        },
+    },
     typography: {
         label: 'Typography',
         property: 'Typography',

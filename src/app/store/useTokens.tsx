@@ -20,13 +20,14 @@ export default function useTokens() {
         return resolved.find((n) => n.name === token);
     }
 
-    // Finds token that matches name
+    // Gets value of token
     function getTokenValue(token: SingleTokenObject, resolved) {
         return getAliasValue(token, resolved);
     }
 
+    // Returns token value in display format
     function getTokenDisplay(token: SingleTokenObject, resolvedTokens, shouldResolve = false) {
-        const valueToCheck = shouldResolve ? resolvedTokens.find(token.name).value : token.value;
+        const valueToCheck = shouldResolve ? resolvedTokens.find((t) => t.name === token.name).value : token.value;
 
         if (token.type === 'typography') {
             return `${valueToCheck.fontFamily} / ${valueToCheck.fontWeight}`;

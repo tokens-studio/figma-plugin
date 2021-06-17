@@ -40,17 +40,21 @@ const EditTokenForm = () => {
         if (currentEditToken.initialName !== name && currentEditToken.initialName) {
             oldName = currentEditToken.initialName;
         }
+        const newName = name
+            .split('/')
+            .map((n) => n.trim())
+            .join('.');
         if (currentEditToken.isPristine) {
             createSingleToken({
                 parent: activeTokenSet,
-                name,
+                name: newName,
                 value,
                 options,
             });
         } else {
             editSingleToken({
                 parent: activeTokenSet,
-                name,
+                name: newName,
                 oldName,
                 value,
                 options,

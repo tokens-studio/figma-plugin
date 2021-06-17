@@ -46,10 +46,7 @@ const transformProviderName = (provider) => {
 
 const Navbar = () => {
     const {projectURL, storageType} = useSelector((state: RootState) => state.uiState);
-    const {editProhibited} = useSelector((state: RootState) => state.tokenState);
     const {pullTokens} = useRemoteTokens();
-
-    const {pullStyles} = useTokens();
 
     return (
         <div className="sticky top-0 navbar bg-white flex items-center justify-between z-1 border-b border-gray-200">
@@ -65,7 +62,12 @@ const Navbar = () => {
                     <>
                         {projectURL && (
                             <Tooltip variant="right" label={`Go to ${transformProviderName(storageType.provider)}`}>
-                                <a href={projectURL} target="_blank" rel="noreferrer" className="button button-ghost">
+                                <a
+                                    href={projectURL}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="block button button-ghost"
+                                >
                                     <Icon name="library" />
                                 </a>
                             </Tooltip>
@@ -77,9 +79,6 @@ const Navbar = () => {
                         </Tooltip>
                     </>
                 )}
-                <Button variant="secondary" onClick={pullStyles} disabled={editProhibited}>
-                    Import
-                </Button>
             </div>
         </div>
     );
