@@ -25,20 +25,6 @@ export default function useTokens() {
         return getAliasValue(token, resolved);
     }
 
-    // Returns token value in display format
-    function getTokenDisplay(token: SingleTokenObject, resolvedTokens, shouldResolve = false) {
-        const valueToCheck = shouldResolve ? resolvedTokens.find((t) => t.name === token.name).value : token.value;
-
-        if (token.type === 'typography') {
-            return `${valueToCheck.fontFamily} / ${valueToCheck.fontWeight}`;
-        }
-        if (typeof valueToCheck !== 'string' && typeof valueToCheck !== 'number') {
-            return JSON.stringify(valueToCheck, null, 2);
-        }
-
-        return valueToCheck;
-    }
-
     // Returns resolved value of a specific token
     function isAlias(token: SingleToken, resolvedTokens) {
         return checkIfAlias(token, resolvedTokens);
@@ -96,7 +82,6 @@ export default function useTokens() {
         isAlias,
         getTokenValue,
         findToken,
-        getTokenDisplay,
         getFormattedTokens,
         getStringTokens,
         setNodeData,

@@ -7,7 +7,6 @@ import Icon from './Icon';
 import renderKeyValue from './renderKeyValue';
 import Tooltip from './Tooltip';
 import {Dispatch, RootState} from '../store';
-import useTokens from '../store/useTokens';
 
 const TokenListing = ({
     tokenKey,

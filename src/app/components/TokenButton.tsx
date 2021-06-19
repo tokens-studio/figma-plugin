@@ -1,17 +1,31 @@
 import * as React from 'react';
 import {track} from '@/utils/analytics';
 import {useDispatch, useSelector} from 'react-redux';
+import {SingleTokenObject} from 'Types/tokens';
 import Tooltip from './Tooltip';
 import MoreButton from './MoreButton';
 import {lightOrDark} from './utils';
 import useManageTokens from '../store/useManageTokens';
 import {Dispatch, RootState} from '../store';
 import useTokens from '../store/useTokens';
+import TokenTooltip from './TokenTooltip';
 
-const TokenButton = ({type, token, editMode, showForm, resolvedTokens}) => {
+const TokenButton = ({
+    type,
+    token,
+    editMode,
+    showForm,
+    resolvedTokens,
+}: {
+    type: string | object;
+    token: SingleTokenObject;
+    editMode: boolean;
+    showForm: boolean;
+    resolvedTokens: SingleTokenObject[];
+}) => {
     const uiState = useSelector((state: RootState) => state.uiState);
     const {activeTokenSet} = useSelector((state: RootState) => state.tokenState);
-    const {setNodeData, getTokenValue, getTokenDisplay} = useTokens();
+    const {setNodeData, getTokenValue} = useTokens();
     const {deleteSingleToken} = useManageTokens();
     const dispatch = useDispatch<Dispatch>();
     const {isAlias} = useTokens();
@@ -183,14 +197,17 @@ const TokenButton = ({type, token, editMode, showForm, resolvedTokens}) => {
                 mode={editMode ? 'edit' : 'list'}
             >
                 <Tooltip
+                    side="bottom"
                     label={
                         <div>
-                            <div className="text-gray-500 uppercase font-bold text-xs">
+                            <div className="text-gray-500 font-bold text-xs">
                                 {token.name.split('.')[token.name.split('.').length - 1]}
                             </div>
-                            <div className="text-white">{getTokenDisplay(token, resolvedTokens)}</div>
+                            <TokenTooltip token={token} resolvedTokens={resolvedTokens} />
                             {isAlias(token, resolvedTokens) && (
-                                <div className="text-gray-600">{getTokenDisplay(token, resolvedTokens, true)}</div>
+                                <div className="text-gray-400">
+                                    <TokenTooltip token={token} resolvedTokens={resolvedTokens} shouldResolve />
+                                </div>
                             )}
                             {token.description && <div className="text-gray-500">{token.description}</div>}
                         </div>
