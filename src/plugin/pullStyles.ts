@@ -131,8 +131,6 @@ export default function pullStyles(styleTypes): void {
                 (el: SingleTokenObject) => el.value === style.paragraphSpacing.toString()
             );
 
-            console.log('found', fontFamilies, figmaTextStyles, foundFamily);
-
             const obj = {
                 fontFamily: `$${foundFamily?.name}`,
                 fontWeight: `$${foundFontWeight?.name}`,

@@ -17,7 +17,7 @@ export default function checkIfAlias(token: SingleTokenObject, allTokens = []): 
 
         // Check if alias is found
         if (aliasToken) {
-            const aliasValue = getAliasValue(token.value, allTokens);
+            const aliasValue = getAliasValue(token, allTokens);
             return aliasValue != null;
         }
     } catch (e) {

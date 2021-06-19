@@ -1,3 +1,4 @@
+import {appendTypeToToken} from '@/app/components/createTokenObj';
 import {getAliasValue} from '@/utils/aliases';
 import checkIfAlias from '@/utils/checkIfAlias';
 import {SingleTokenObject} from '@types/tokens';
@@ -57,7 +58,7 @@ export function computeMergedTokens(tokens, usedTokenSet): SingleTokenObject[] {
         .forEach((tokenGroup) => {
             if (usedTokenSet.includes(tokenGroup[0])) {
                 tokenGroup[1].values.forEach((token) => {
-                    if (!mergedTokens.some((t) => t.name === token.name)) mergedTokens.push(token);
+                    if (!mergedTokens.some((t) => t.name === token.name)) mergedTokens.push(appendTypeToToken(token));
                 });
             }
         });

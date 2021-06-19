@@ -32,7 +32,6 @@ export default function useTokens() {
 
     // Calls Figma with all tokens and nodes to set data on
     function setNodeData(data: SelectionValue, resolvedTokens) {
-        console.group('Posting to figma', data, resolvedTokens);
         postToFigma({
             type: MessageToPluginTypes.SET_NODE_DATA,
             values: data,
