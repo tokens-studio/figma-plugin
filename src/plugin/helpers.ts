@@ -1,7 +1,7 @@
 import {convertTypographyNumberToFigma} from './figmaTransforms/generic';
 import {convertLetterSpacingToFigma} from './figmaTransforms/letterSpacing';
 import {convertLineHeightToFigma} from './figmaTransforms/lineHeight';
-import {convertOpacityToFigma} from './figmaTransforms/opacity';
+import convertOpacityToFigma from './figmaTransforms/opacity';
 
 export function isObject(item) {
     return item && typeof item === 'object' && !Array.isArray(item);
@@ -80,7 +80,7 @@ export function transformValue(value, type) {
         case 'lineHeights':
             return convertLineHeightToFigma(value);
         case 'opacity':
-            return convertOpacityToFigma(value);
+            return convertOpacityToFigma(value.toString());
         default:
             return value;
     }
