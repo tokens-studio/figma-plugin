@@ -29,10 +29,13 @@ export function getAliasValue(token: SingleTokenObject, tokens = []): string | n
             }
         }
         if (typeof returnedValue !== 'undefined') {
-            return convertToRgb(checkAndEvaluateMath(returnedValue));
+            if (!returnedValue.toString().match(aliasRegex)) {
+                return convertToRgb(checkAndEvaluateMath(returnedValue));
+            }
+            return returnedValue;
         }
     } catch (e) {
-        console.log('Error getting alias value', token, tokens);
+        console.log(`Error getting alias value of ${token}`, tokens);
     }
     return null;
 }

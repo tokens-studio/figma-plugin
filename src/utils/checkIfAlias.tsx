@@ -21,7 +21,7 @@ export default function checkIfAlias(token: SingleTokenObject, allTokens = []): 
             return aliasValue != null;
         }
     } catch (e) {
-        console.log('Error checking alias', e, token, allTokens);
+        console.log(`Error checking alias of token ${token.name}`, token, allTokens, e);
     }
     return false;
 }
