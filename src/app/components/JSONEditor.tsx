@@ -1,5 +1,6 @@
 import * as React from 'react';
 import {useDispatch, useSelector} from 'react-redux';
+import parseTokenValues from '@/utils/parseTokenValues';
 import Textarea from './Textarea';
 import Heading from './Heading';
 import Button from './Button';
@@ -19,9 +20,11 @@ const JSONEditor = () => {
     const [confirmModalVisible, showConfirmModal] = React.useState('');
     const [exportModalVisible, showExportModal] = React.useState(false);
     const [presetModalVisible, showPresetModal] = React.useState(false);
+    const [error, setError] = React.useState(null);
     const [stringTokens, setStringTokens] = React.useState(JSON.stringify(tokens[activeTokenSet]?.values, null, 2));
 
     React.useEffect(() => {
+        setError(null);
         setStringTokens(
             tokenType === 'array' ? JSON.stringify(tokens[activeTokenSet]?.values, null, 2) : getStringTokens()
         );
@@ -34,6 +37,18 @@ const JSONEditor = () => {
     const handleSetEmpty = () => {
         dispatch.tokenState.setEmptyTokens();
         showConfirmModal('');
+    };
+
+    const changeTokens = (val) => {
+        setError(null);
+        try {
+            const parsedTokens = JSON.parse(val);
+            parseTokenValues(parsedTokens);
+        } catch (e) {
+            console.log('Error parsing tokens', e);
+            setError('Unable to read JSON');
+        }
+        setStringTokens(val);
     };
 
     return (
@@ -66,11 +81,14 @@ const JSONEditor = () => {
                         isDisabled={editProhibited}
                         className="flex-grow"
                         placeholder="Enter JSON"
-                        rows={23}
+                        rows={21}
                         hasErrored={tokens[activeTokenSet]?.hasErrored}
-                        onChange={(val) => setStringTokens(val)}
+                        onChange={changeTokens}
                         value={stringTokens}
                     />
+                    {error && (
+                        <div className="w-full font-bold p-2 text-xs rounded mt-2 bg-red-100 text-red-700">{error}</div>
+                    )}
                 </div>
             </div>
 

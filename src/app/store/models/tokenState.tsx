@@ -7,7 +7,6 @@ import defaultJSON from '@/config/default.json';
 import parseTokenValues from '@/utils/parseTokenValues';
 import {notifyToUI} from '@/plugin/notifiers';
 import {reduceToValues} from '@/plugin/tokenHelpers';
-import convertToTokenArray from '@/utils/convertTokens';
 import {RootModel} from '.';
 import updateTokensOnSources from '../updateSources';
 import * as pjs from '../../../../package.json';
