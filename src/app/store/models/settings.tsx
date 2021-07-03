@@ -19,6 +19,7 @@ interface SettingsState {
     updateOnChange: boolean;
     updateStyles: boolean;
     tokenType: TokenModeType;
+    ignoreFirstPartForStyles: boolean;
 }
 
 const setUI = (state) => {
@@ -38,6 +39,7 @@ export const settings = createModel<RootModel>()({
         updateOnChange: true,
         updateStyles: true,
         tokenType: 'object',
+        ignoreFirstPartForStyles: true,
     } as SettingsState,
     reducers: {
         setWindowSize(state, payload: {width: number; height: number}) {
@@ -84,6 +86,12 @@ export const settings = createModel<RootModel>()({
                 tokenType: payload,
             };
         },
+        setIgnoreFirstPartForStyles(state, payload: boolean) {
+            return {
+                ...state,
+                ignoreFirstPartForStyles: payload,
+            };
+        },
     },
     effects: (dispatch) => ({
         setUpdateStyles: (payload, rootState) => {
@@ -93,6 +101,9 @@ export const settings = createModel<RootModel>()({
             setUI(rootState.settings);
         },
         setUpdateOnChange: (payload, rootState) => {
+            setUI(rootState.settings);
+        },
+        setIgnoreFirstPartForStyles: (payload, rootState) => {
             setUI(rootState.settings);
         },
     }),

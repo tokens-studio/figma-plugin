@@ -47,8 +47,7 @@ export default async function updateTokensOnSources({
     tokens,
     tokenValues,
     usedTokenSet,
-    updateMode,
-    updateStyles,
+    settings,
     updatedAt,
     shouldUpdateRemote = true,
     isLocal,
@@ -73,8 +72,7 @@ export default async function updateTokensOnSources({
         type: MessageToPluginTypes.UPDATE,
         tokenValues,
         tokens: tokens ? mergedTokens : null,
-        updateMode,
-        updateStyles,
         updatedAt,
+        settings,
     });
 }

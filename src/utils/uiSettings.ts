@@ -18,6 +18,7 @@ export async function getUISettings() {
         let updateMode;
         let updateOnChange;
         let updateStyles;
+        let ignoreFirstPartForStyles;
         if (data) {
             const parsedData = await JSON.parse(data);
             width = parsedData.width || 400;
@@ -25,7 +26,8 @@ export async function getUISettings() {
             updateMode = parsedData.updateMode;
             updateOnChange = parsedData.updateOnChange;
             updateStyles = parsedData.updateStyles;
-            notifyUISettings({width, height, updateMode, updateOnChange, updateStyles});
+            ignoreFirstPartForStyles = parsedData.ignoreFirstPartForStyles;
+            notifyUISettings({width, height, updateMode, updateOnChange, updateStyles, ignoreFirstPartForStyles});
         }
     } catch (err) {
         notifyUI('There was an issue saving your credentials. Please try again.');

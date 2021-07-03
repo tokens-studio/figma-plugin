@@ -2,12 +2,16 @@ import {transformValue} from './helpers';
 import updateColorStyles from './updateColorStyles';
 import updateTextStyles from './updateTextStyles';
 
-export default function updateStyles(tokens, shouldCreate = false): void {
-    const styleTokens = tokens.map((token) => ({
-        ...token,
-        name: token.name.split('.').join('/'),
-        value: transformValue(token.value, token.type),
-    }));
+export default function updateStyles(tokens, shouldCreate = false, settings): void {
+    const styleTokens = tokens.map((token) => {
+        const slice = settings.ignoreFirstPartForStyles ? 1 : 0;
+        const name = token.name.split('.').slice(slice).join('/');
+        return {
+            ...token,
+            name,
+            value: transformValue(token.value, token.type),
+        };
+    });
     const colorTokens = styleTokens.filter((n) => ['color', 'colors'].includes(n.type));
     const textTokens = styleTokens.filter((n) => ['typography'].includes(n.type));
 

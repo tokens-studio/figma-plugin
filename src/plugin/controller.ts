@@ -113,16 +113,16 @@ figma.ui.onmessage = async (msg) => {
             return;
         case MessageToPluginTypes.CREATE_STYLES:
             try {
-                updateStyles(msg.tokens, true);
+                updateStyles(msg.tokens, true, msg.settings);
             } catch (e) {
                 console.error(e);
             }
             return;
         case MessageToPluginTypes.UPDATE: {
-            if (msg.updateStyles && msg.tokens) updateStyles(msg.tokens, false);
+            if (msg.settings.updateStyles && msg.tokens) updateStyles(msg.tokens, false, msg.settings);
             if (msg.tokenValues && msg.updatedAt) setTokensOnDocument(msg.tokenValues, msg.updatedAt);
             if (msg.tokens) {
-                const allWithData = findAllWithData({updateMode: msg.updateMode});
+                const allWithData = findAllWithData({updateMode: msg.settings.updateMode});
                 updateNodes(allWithData, msg.tokens);
                 updatePluginData(allWithData, {});
                 notifyRemoteComponents({nodes: store.successfulNodes.length, remotes: store.remoteComponents});
@@ -145,6 +145,7 @@ figma.ui.onmessage = async (msg) => {
                 updateMode: msg.updateMode,
                 updateOnChange: msg.updateOnChange,
                 updateStyles: msg.updateStyles,
+                ignoreFirstPartForStyles: msg.ignoreFirstPartForStyles,
             });
             figma.ui.resize(msg.uiWindow.width, msg.uiWindow.height);
             break;

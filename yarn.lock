@@ -1276,6 +1276,23 @@
     "@radix-ui/react-polymorphic" "0.0.12"
     "@radix-ui/react-primitive" "0.0.14"
 
+"@radix-ui/react-checkbox@^0.0.16":
+  version "0.0.16"
+  resolved "https://registry.yarnpkg.com/@radix-ui/react-checkbox/-/react-checkbox-0.0.16.tgz#503a934f73745e9c3831a5fd39d3b06062813f0e"
+  integrity sha512-2RJep0OB4FZvGk/PTou8BEt/cISA/i88iiloZuAxlOjYgF90W4xfrQqgczLCC64t0ee3DtUkSOJyjO45M95hVg==
+  dependencies:
+    "@babel/runtime" "^7.13.10"
+    "@radix-ui/primitive" "0.0.5"
+    "@radix-ui/react-compose-refs" "0.0.5"
+    "@radix-ui/react-context" "0.0.5"
+    "@radix-ui/react-label" "0.0.14"
+    "@radix-ui/react-polymorphic" "0.0.12"
+    "@radix-ui/react-presence" "0.0.14"
+    "@radix-ui/react-primitive" "0.0.14"
+    "@radix-ui/react-use-controllable-state" "0.0.6"
+    "@radix-ui/react-use-previous" "0.0.5"
+    "@radix-ui/react-use-size" "0.0.6"
+
 "@radix-ui/react-collection@0.0.12":
   version "0.0.12"
   resolved "https://registry.yarnpkg.com/@radix-ui/react-collection/-/react-collection-0.0.12.tgz#5cd09312cdec34fdbbe1d31affaba69eb768e342"
@@ -1350,6 +1367,17 @@
   integrity sha512-PzmraF34fYggsYvTIZVJ5S68WMp3aKUN3HkSmGnz4zn9zpRjkAbbg7Xn3ueQI3FQsLWKgyUfnpsmWFDndpcqYg==
   dependencies:
     "@babel/runtime" "^7.13.10"
+
+"@radix-ui/react-label@0.0.14", "@radix-ui/react-label@^0.0.14":
+  version "0.0.14"
+  resolved "https://registry.yarnpkg.com/@radix-ui/react-label/-/react-label-0.0.14.tgz#32928a0f5d72e3a24b99021f5c6805e96f3d9395"
+  integrity sha512-gtrEpON6Ye8OBYtOEJBEuB/n/h6x07VPs7JR/1t34LaB74GJ+gACcafLcg5gMGWku3Gbc3eaDwfhOkxhTuJdYQ==
+  dependencies:
+    "@babel/runtime" "^7.13.10"
+    "@radix-ui/react-compose-refs" "0.0.5"
+    "@radix-ui/react-id" "0.0.6"
+    "@radix-ui/react-polymorphic" "0.0.12"
+    "@radix-ui/react-primitive" "0.0.14"
 
 "@radix-ui/react-menu@0.0.18":
   version "0.0.18"

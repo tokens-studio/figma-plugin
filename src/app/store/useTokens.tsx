@@ -12,6 +12,7 @@ import {RootState} from '../store';
 
 export default function useTokens() {
     const {tokens, usedTokenSet, activeTokenSet} = useSelector((state: RootState) => state.tokenState);
+    const settings = useSelector((state: RootState) => state.settings);
 
     // Finds token that matches name
     function findToken(token: string) {
@@ -74,6 +75,7 @@ export default function useTokens() {
         postToFigma({
             type: MessageToPluginTypes.CREATE_STYLES,
             tokens: resolved,
+            settings,
         });
     }
 
