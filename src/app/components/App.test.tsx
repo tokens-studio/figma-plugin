@@ -7,19 +7,6 @@ describe('App', () => {
         resetStore();
     });
 
-    it('displays loading indicator on startup', () => {
-        const {getByText} = render(<App />);
-        const LoadingText = getByText('Hold on, updating...');
-        expect(LoadingText).toBeInTheDocument();
-    });
-
-    it('doesnt display loading indicator when values received', () => {
-        const {getByText} = render(<App />);
-        const LoadingText = getByText('Hold on, updating...');
-        fireEvent(window, new MessageEvent('message', {data: {pluginMessage: {type: 'tokenvalues'}}}));
-        expect(LoadingText).not.toBeInTheDocument();
-    });
-
     it('calls setTokenData when received values', () => {
         const {getByText} = render(<App />);
         fireEvent(
