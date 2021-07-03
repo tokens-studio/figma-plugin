@@ -13,13 +13,13 @@ type WindowSettingsType = {
 
 type TokenModeType = 'object' | 'array';
 
-interface SettingsState {
-    uiWindow: WindowSettingsType;
-    updateMode: UpdateMode;
-    updateOnChange: boolean;
-    updateStyles: boolean;
-    tokenType: TokenModeType;
-    ignoreFirstPartForStyles: boolean;
+export interface SettingsState {
+    uiWindow?: WindowSettingsType;
+    updateMode?: UpdateMode;
+    updateOnChange?: boolean;
+    updateStyles?: boolean;
+    tokenType?: TokenModeType;
+    ignoreFirstPartForStyles?: boolean;
 }
 
 const setUI = (state) => {
