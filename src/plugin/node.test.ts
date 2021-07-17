@@ -47,6 +47,11 @@ describe('returnValueToLookFor', () => {
                 output: 'rawValue',
             },
             {
+                key: 'value',
+                input: '$colors.blue.500',
+                output: 'value',
+            },
+            {
                 key: 'size',
                 input: {
                     description: 'my description',

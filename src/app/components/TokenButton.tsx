@@ -146,6 +146,10 @@ const TokenButton = ({
             name: 'tokenValue',
         },
         {
+            label: 'Insert value (text)',
+            name: 'value',
+        },
+        {
             label: 'Insert description (text)',
             name: 'description',
         },

@@ -15,6 +15,8 @@ export function returnValueToLookFor(key) {
             return 'description';
         case 'tokenValue':
             return 'rawValue';
+        case 'value':
+            return 'value';
         default:
             return 'value';
     }

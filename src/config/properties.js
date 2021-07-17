@@ -29,6 +29,7 @@ export default {
     letterSpacing: {},
     paragraphSpacing: {},
     tokenValue: {},
+    value: {},
     tokenName: {},
     description: {},
 };

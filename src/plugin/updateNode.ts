@@ -222,6 +222,14 @@ export default async function setValuesOnNode(node, values, data) {
             }
         }
 
+        // Real value for text layers
+        if (values.value) {
+            if (typeof node.characters !== 'undefined') {
+                await figma.loadFontAsync(node.fontName);
+                node.characters = String(values.value);
+            }
+        }
+
         // Name value for text layers
         if (values.tokenName) {
             if (typeof node.characters !== 'undefined') {
