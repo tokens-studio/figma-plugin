@@ -181,11 +181,11 @@ export const tokenState = createModel<RootModel>()({
             const updatedTokens = [];
 
             // Iterate over received styles and check if they existed before or need updating
-            Object.entries(receivedStyles).map(([_parent, values]: [string, SingleTokenObject[]]) => {
+            Object.values(receivedStyles).map((values: [string, SingleTokenObject[]]) => {
                 values.map((token: TokenGroup) => {
                     const oldValue = state.tokens[state.activeTokenSet].values.find((t) => t.name === token.name);
                     if (oldValue) {
-                        if (oldValue.value.toUpperCase() === token.value.toUpperCase()) {
+                        if (oldValue.value?.toUpperCase() === token.value.toUpperCase()) {
                             if (
                                 oldValue.description === token.description ||
                                 (typeof token.description === 'undefined' && oldValue.description === '')
