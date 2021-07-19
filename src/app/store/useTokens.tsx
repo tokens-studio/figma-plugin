@@ -27,7 +27,7 @@ export default function useTokens() {
     }
 
     // Returns resolved value of a specific token
-    function isAlias(token: SingleToken, resolvedTokens) {
+    function isAlias(token: SingleTokenObject, resolvedTokens) {
         return checkIfAlias(token, resolvedTokens);
     }
 

@@ -8,7 +8,7 @@ const parser = new Parser();
 export function checkAndEvaluateMath(expr) {
     try {
         parser.evaluate(expr);
-        return parser.evaluate(expr);
+        return +parser.evaluate(expr).toFixed(3);
     } catch (ex) {
         return expr;
     }
