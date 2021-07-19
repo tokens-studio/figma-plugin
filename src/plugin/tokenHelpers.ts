@@ -1,7 +1,7 @@
 import {appendTypeToToken} from '@/app/components/createTokenObj';
 import {getAliasValue} from '@/utils/aliases';
 import checkIfAlias from '@/utils/checkIfAlias';
-import {SingleTokenObject} from '@types/tokens';
+import {SingleTokenObject} from 'Types/tokens';
 import {mergeDeep} from './helpers';
 
 export function findAllAliases(tokens) {
@@ -55,9 +55,9 @@ export function computeMergedTokens(tokens, usedTokenSet): SingleTokenObject[] {
     // Reverse token set order (right-most win) and check for duplicates
     Object.entries(tokens)
         .reverse()
-        .forEach((tokenGroup) => {
+        .forEach((tokenGroup: SingleTokenObject[]) => {
             if (usedTokenSet.includes(tokenGroup[0])) {
-                tokenGroup[1].values.forEach((token) => {
+                tokenGroup[1].forEach((token) => {
                     if (!mergedTokens.some((t) => t.name === token.name)) mergedTokens.push(appendTypeToToken(token));
                 });
             }
