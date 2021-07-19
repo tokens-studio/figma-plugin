@@ -83,10 +83,7 @@ export const tokenState = createModel<RootModel>()({
                 ...state,
                 tokens: {
                     ...state.tokens,
-                    [name]: {
-                        type: 'array',
-                        values: [],
-                    },
+                    [name]: [],
                 },
             };
         },
@@ -124,6 +121,7 @@ export const tokenState = createModel<RootModel>()({
             };
         },
         setTokenData: (state, data: {values: SingleTokenObject[]; shouldUpdate: boolean}) => {
+            console.log('Received tokens', data);
             const values = parseTokenValues(data.values);
             return {
                 ...state,

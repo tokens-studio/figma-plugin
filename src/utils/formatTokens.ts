@@ -2,7 +2,7 @@ import set from 'set-value';
 
 export default function formatTokens(tokens, activeTokenSet) {
     const tokenObj = {};
-    tokens[activeTokenSet].values.forEach((token) => {
+    tokens[activeTokenSet].forEach((token) => {
         set(tokenObj, token.name, token);
     });
 
