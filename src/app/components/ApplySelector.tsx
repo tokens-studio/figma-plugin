@@ -48,21 +48,28 @@ const StyledRadioGroup = styled(DropdownMenu.RadioGroup, {});
 const StyledRadioItem = styled(DropdownMenu.RadioItem, itemStyles);
 
 export default function ApplySelector() {
-    const {updateMode, updateOnChange, updateStyles} = useSelector((state: RootState) => state.settings);
+    const {updateMode, updateRemote, updateOnChange, updateStyles} = useSelector((state: RootState) => state.settings);
 
-    const {setUpdateMode, setUpdateOnChange, setUpdateStyles} = useDispatch<Dispatch>().settings;
+    const {setUpdateMode, setUpdateOnChange, setUpdateRemote, setUpdateStyles} = useDispatch<Dispatch>().settings;
 
     const handleApplySelection = () => {
         setUpdateMode(UpdateMode.SELECTION);
     };
+
     const handleApplyPage = () => {
         setUpdateMode(UpdateMode.PAGE);
     };
+
     const handleApplyDocument = () => {
         setUpdateMode(UpdateMode.DOCUMENT);
     };
+
     const handleUpdateOnChange = () => {
         setUpdateOnChange(!updateOnChange);
+    };
+
+    const handleUpdateRemote = () => {
+        setUpdateRemote(!updateRemote);
     };
 
     const handleUpdateStyles = () => {
@@ -105,6 +112,12 @@ export default function ApplySelector() {
                         <CheckIcon />
                     </StyledItemIndicator>
                     Update on change
+                </StyledCheckboxItem>
+                <StyledCheckboxItem checked={updateRemote} onCheckedChange={handleUpdateRemote}>
+                    <StyledItemIndicator>
+                        <CheckIcon />
+                    </StyledItemIndicator>
+                    Update remote
                 </StyledCheckboxItem>
                 <StyledCheckboxItem checked={updateStyles} onCheckedChange={handleUpdateStyles}>
                     <StyledItemIndicator>

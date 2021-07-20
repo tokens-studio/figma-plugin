@@ -149,19 +149,17 @@ export const tokenState = createModel<RootModel>()({
         },
         createToken: (state, data: TokenInput) => {
             let newTokens = {};
-            const existingToken = state.tokens[data.parent].values.find((n) => n.name === data.name);
+            const existingToken = state.tokens[data.parent].find((n) => n.name === data.name);
             if (!existingToken) {
                 newTokens = {
-                    [data.parent]: {
-                        values: [
-                            ...state.tokens[data.parent].values,
-                            {
-                                name: data.name,
-                                value: data.value,
-                                ...data.options,
-                            },
-                        ],
-                    },
+                    [data.parent]: [
+                        ...state.tokens[data.parent],
+                        {
+                            name: data.name,
+                            value: data.value,
+                            ...data.options,
+                        },
+                    ],
                 };
             }
             return {
@@ -181,7 +179,7 @@ export const tokenState = createModel<RootModel>()({
             // Iterate over received styles and check if they existed before or need updating
             Object.values(receivedStyles).map((values: [string, SingleTokenObject[]]) => {
                 values.map((token: TokenGroup) => {
-                    const oldValue = state.tokens[state.activeTokenSet].values.find((t) => t.name === token.name);
+                    const oldValue = state.tokens[state.activeTokenSet].find((t) => t.name === token.name);
                     if (oldValue) {
                         if (oldValue.value?.toUpperCase() === token.value.toUpperCase()) {
                             if (
@@ -217,8 +215,8 @@ export const tokenState = createModel<RootModel>()({
         },
         editToken: (state, data: EditTokenInput) => {
             const nameToFind = data.oldName ? data.oldName : data.name;
-            const index = state.tokens[data.parent].values.findIndex((token) => token.name === nameToFind);
-            const newArray = [...state.tokens[data.parent].values];
+            const index = state.tokens[data.parent].findIndex((token) => token.name === nameToFind);
+            const newArray = state.tokens[data.parent];
             newArray[index] = {
                 ...newArray[index],
                 name: data.name,
@@ -230,10 +228,7 @@ export const tokenState = createModel<RootModel>()({
                 ...state,
                 tokens: {
                     ...state.tokens,
-                    [data.parent]: {
-                        ...state.tokens[data.parent],
-                        values: newArray,
-                    },
+                    [data.parent]: newArray,
                 },
             };
         },
@@ -242,10 +237,7 @@ export const tokenState = createModel<RootModel>()({
                 ...state,
                 tokens: {
                     ...state.tokens,
-                    [data.parent]: {
-                        ...state.tokens[data.parent],
-                        values: state.tokens[data.parent].values.filter((token) => token.name !== data.path),
-                    },
+                    [data.parent]: state.tokens[data.parent].filter((token) => token.name !== data.path),
                 },
             };
 
@@ -304,6 +296,7 @@ export const tokenState = createModel<RootModel>()({
                 editProhibited: rootState.uiState.editProhibited,
                 api: rootState.uiState.api,
                 storageType: rootState.uiState.storageType,
+                shouldUpdateRemote: rootState.settings.updateRemote,
             });
         },
     }),

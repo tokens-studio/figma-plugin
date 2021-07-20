@@ -55,7 +55,7 @@ export function computeMergedTokens(tokens, usedTokenSet): SingleTokenObject[] {
     // Reverse token set order (right-most win) and check for duplicates
     Object.entries(tokens)
         .reverse()
-        .forEach((tokenGroup: SingleTokenObject[]) => {
+        .forEach((tokenGroup: [string, SingleTokenObject[]]) => {
             if (usedTokenSet.includes(tokenGroup[0])) {
                 tokenGroup[1].forEach((token) => {
                     if (!mergedTokens.some((t) => t.name === token.name)) mergedTokens.push(appendTypeToToken(token));

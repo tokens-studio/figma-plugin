@@ -16,6 +16,7 @@ type TokenModeType = 'object' | 'array';
 export interface SettingsState {
     uiWindow?: WindowSettingsType;
     updateMode?: UpdateMode;
+    updateRemote: boolean;
     updateOnChange?: boolean;
     updateStyles?: boolean;
     tokenType?: TokenModeType;
@@ -36,6 +37,7 @@ export const settings = createModel<RootModel>()({
             height: 600,
         },
         updateMode: UpdateMode.PAGE,
+        updateRemote: true,
         updateOnChange: true,
         updateStyles: true,
         tokenType: 'object',
@@ -68,6 +70,12 @@ export const settings = createModel<RootModel>()({
                 updateMode: payload,
             };
         },
+        setUpdateRemote(state, payload: boolean) {
+            return {
+                ...state,
+                updateRemote: payload,
+            };
+        },
         setUpdateOnChange(state, payload: boolean) {
             return {
                 ...state,
@@ -98,6 +106,9 @@ export const settings = createModel<RootModel>()({
             setUI(rootState.settings);
         },
         setUpdateMode: (payload, rootState) => {
+            setUI(rootState.settings);
+        },
+        setUpdateRemote: (payload, rootState) => {
             setUI(rootState.settings);
         },
         setUpdateOnChange: (payload, rootState) => {

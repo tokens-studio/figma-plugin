@@ -16,6 +16,7 @@ export async function getUISettings() {
         let width;
         let height;
         let updateMode;
+        let updateRemote;
         let updateOnChange;
         let updateStyles;
         let ignoreFirstPartForStyles;
@@ -24,10 +25,19 @@ export async function getUISettings() {
             width = parsedData.width || 400;
             height = parsedData.height || 600;
             updateMode = parsedData.updateMode;
+            updateRemote = parsedData.updateRemote;
             updateOnChange = parsedData.updateOnChange;
             updateStyles = parsedData.updateStyles;
             ignoreFirstPartForStyles = parsedData.ignoreFirstPartForStyles;
-            notifyUISettings({width, height, updateMode, updateOnChange, updateStyles, ignoreFirstPartForStyles});
+            notifyUISettings({
+                width,
+                height,
+                updateMode,
+                updateOnChange,
+                updateRemote,
+                updateStyles,
+                ignoreFirstPartForStyles,
+            });
         }
     } catch (err) {
         notifyUI('There was an issue saving your credentials. Please try again.');

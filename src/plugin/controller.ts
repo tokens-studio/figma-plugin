@@ -143,6 +143,7 @@ figma.ui.onmessage = async (msg) => {
                 width: msg.uiWindow.width,
                 height: msg.uiWindow.height,
                 updateMode: msg.updateMode,
+                updateRemote: msg.updateRemote,
                 updateOnChange: msg.updateOnChange,
                 updateStyles: msg.updateStyles,
                 ignoreFirstPartForStyles: msg.ignoreFirstPartForStyles,

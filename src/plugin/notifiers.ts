@@ -46,6 +46,7 @@ export function notifyUISettings({
     width,
     height,
     updateMode,
+    updateRemote = true,
     updateOnChange,
     updateStyles,
     ignoreFirstPartForStyles,
@@ -53,6 +54,7 @@ export function notifyUISettings({
     width: number;
     height: number;
     updateMode: UpdateMode;
+    updateRemote: boolean;
     updateOnChange: boolean;
     updateStyles: boolean;
     ignoreFirstPartForStyles: boolean;
@@ -65,6 +67,7 @@ export function notifyUISettings({
                 height,
             },
             updateMode,
+            updateRemote,
             updateOnChange,
             updateStyles,
             ignoreFirstPartForStyles,
