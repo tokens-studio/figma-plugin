@@ -52,7 +52,6 @@ async function writeTokensToJSONBin({secret, id, tokenObj}): Promise<TokenProps>
 
 export async function updateJSONBinTokens({tokens, id, secret, updatedAt, oldUpdatedAt = null}) {
     try {
-        console.log('Submitting tokens', convertTokensToObject(tokens));
         const tokenObj = JSON.stringify(
             {
                 version: pjs.plugin_version,

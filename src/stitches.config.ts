@@ -37,6 +37,7 @@ export const {styled, css, global: globalCSS, keyframes, getCssString, theme} = 
             textMuted: globalTokens.colors.gray700,
             interaction: globalTokens.colors.primary500,
             onInteraction: globalTokens.colors.white,
+            interactionDisabled: globalTokens.colors.gray600,
         },
         radii: {
             default: globalTokens.radii.sm,

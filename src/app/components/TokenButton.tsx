@@ -135,26 +135,6 @@ const TokenButton = ({
             break;
     }
 
-    properties = [
-        ...properties,
-        {
-            label: 'Insert name (text)',
-            name: 'tokenName',
-        },
-        {
-            label: 'Insert raw value (text)',
-            name: 'tokenValue',
-        },
-        {
-            label: 'Insert value (text)',
-            name: 'value',
-        },
-        {
-            label: 'Insert description (text)',
-            name: 'description',
-        },
-    ];
-
     const active = uiState.selectionValues[type] === name;
     const semiActive = properties.some((prop) => uiState.selectionValues[prop.name] === name);
 
