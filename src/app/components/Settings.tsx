@@ -67,7 +67,7 @@ const SyncSettings = () => {
                         />
                         <div className="text-xs">
                             If active a token named <code className="p-1 -m-1 font-bold">colors.primary.500</code> will
-                            become a color style of name <code className="p-1 -m-1 font-bold">primary/500</code>). Since
+                            become a color style of name <code className="p-1 -m-1 font-bold">primary/500</code>. Since
                             Version 53 you no longer need to prepend type to token names.
                         </div>
                     </div>

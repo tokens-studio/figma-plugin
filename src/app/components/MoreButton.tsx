@@ -31,18 +31,22 @@ const MoreButton = ({properties, children, path, value, onClick, onEdit, onDelet
         {
             label: 'Name',
             name: 'tokenName',
+            clear: ['tokenValue', 'value', 'description'],
         },
         {
             label: 'Raw value',
             name: 'tokenValue',
+            clear: ['tokenName', 'value', 'description'],
         },
         {
             label: 'Value',
             name: 'value',
+            clear: ['tokenName', 'tokenValue', 'description'],
         },
         {
             label: 'Description',
             name: 'description',
+            clear: ['tokenName', 'tokenValue', 'value'],
         },
     ];
 
@@ -60,7 +64,7 @@ const MoreButton = ({properties, children, path, value, onClick, onEdit, onDelet
                             <ContextMenuCheckboxItem
                                 key={property.label}
                                 checked={isActive}
-                                onCheckedChange={() => onClick([property.name], isActive)}
+                                onCheckedChange={() => onClick(property, isActive)}
                             >
                                 <ContextMenuItemIndicator>
                                     <CheckIcon />
@@ -81,16 +85,8 @@ const MoreButton = ({properties, children, path, value, onClick, onEdit, onDelet
                                 const isActive = selectionValues[property.name] === value;
 
                                 return (
-                                    <ContextMenuItem
-                                        key={property.label}
-                                        onSelect={() => onClick([property.name], isActive)}
-                                    >
+                                    <ContextMenuItem key={property.label} onSelect={() => onClick(property, isActive)}>
                                         <div className="flex items-center">
-                                            {property.icon && (
-                                                <div className="mr-2 text-white">
-                                                    <Icon name={property.icon} />
-                                                </div>
-                                            )}
                                             {isActive && <CheckIcon />}
                                             {property.label}
                                         </div>

@@ -78,7 +78,7 @@ export default function ApplySelector() {
 
     return (
         <DropdownMenu.Root>
-            <DropdownMenu.Trigger className="flex p-2 bg-white border text-xs items-center space-x-2">
+            <DropdownMenu.Trigger className="flex p-2 bg-white border rounded text-xs items-center space-x-2">
                 <span>Apply to {updateMode}</span>
                 <IconChevronDown />
             </DropdownMenu.Trigger>

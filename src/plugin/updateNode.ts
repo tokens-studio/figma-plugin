@@ -218,7 +218,11 @@ export default async function setValuesOnNode(node, values, data) {
         if (values.tokenValue) {
             if (typeof node.characters !== 'undefined') {
                 await figma.loadFontAsync(node.fontName);
-                node.characters = String(values.tokenValue);
+
+                // If we're inserting an object, stringify that
+                const value =
+                    typeof values.tokenValue === 'object' ? JSON.stringify(values.tokenValue) : values.tokenValue;
+                node.characters = String(value);
             }
         }
 
@@ -226,7 +230,10 @@ export default async function setValuesOnNode(node, values, data) {
         if (values.value) {
             if (typeof node.characters !== 'undefined') {
                 await figma.loadFontAsync(node.fontName);
-                node.characters = String(values.value);
+                // If we're inserting an object, stringify that
+                const value =
+                    typeof values.tokenValue === 'object' ? JSON.stringify(values.tokenValue) : values.tokenValue;
+                node.characters = String(value);
             }
         }
 
