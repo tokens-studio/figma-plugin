@@ -1,11 +1,11 @@
 import {useDispatch} from 'react-redux';
 import {Dispatch} from '@/app/store';
+import {StorageProviderType} from 'Types/api';
+import {MessageToPluginTypes} from 'Types/messages';
+import {TokenProps} from 'Types/tokens';
+import convertTokensToObject from '@/utils/convertTokensToObject';
 import {notifyToUI, postToFigma} from '../../../plugin/notifiers';
-import {StorageProviderType} from '../../../../types/api';
-import {MessageToPluginTypes} from '../../../../types/messages';
-import {TokenProps} from '../../../../types/tokens';
 import {compareUpdatedAt} from '../../components/utils';
-import {useTokenDispatch} from '../TokenContext';
 import * as pjs from '../../../../package.json';
 import useStorage from '../useStorage';
 
@@ -52,15 +52,12 @@ async function writeTokensToJSONBin({secret, id, tokenObj}): Promise<TokenProps>
 
 export async function updateJSONBinTokens({tokens, id, secret, updatedAt, oldUpdatedAt = null}) {
     try {
-        const values = Object.entries(tokens).reduce((acc, [key, val]) => {
-            acc[key] = val;
-            return acc;
-        }, {});
+        console.log('Submitting tokens', convertTokensToObject(tokens));
         const tokenObj = JSON.stringify(
             {
                 version: pjs.plugin_version,
                 updatedAt,
-                values,
+                values: convertTokensToObject(tokens),
             },
             null,
             2

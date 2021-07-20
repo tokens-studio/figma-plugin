@@ -21,13 +21,11 @@ const JSONEditor = () => {
     const [exportModalVisible, showExportModal] = React.useState(false);
     const [presetModalVisible, showPresetModal] = React.useState(false);
     const [error, setError] = React.useState(null);
-    const [stringTokens, setStringTokens] = React.useState(JSON.stringify(tokens[activeTokenSet]?.values, null, 2));
+    const [stringTokens, setStringTokens] = React.useState(JSON.stringify(tokens[activeTokenSet], null, 2));
 
     React.useEffect(() => {
         setError(null);
-        setStringTokens(
-            tokenType === 'array' ? JSON.stringify(tokens[activeTokenSet]?.values, null, 2) : getStringTokens()
-        );
+        setStringTokens(tokenType === 'array' ? JSON.stringify(tokens[activeTokenSet], null, 2) : getStringTokens());
     }, [tokens, activeTokenSet, tokenType]);
 
     const handleUpdate = async () => {

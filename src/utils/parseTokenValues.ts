@@ -14,8 +14,6 @@ export default function parseTokenValues(tokens) {
         const parsedGroup = group[1];
 
         if (typeof parsedGroup === 'object') {
-            console.log('is obj', parsedGroup);
-
             const groupValues = [];
             const convertedToArray = convertToTokenArray({tokens: parsedGroup});
             convertedToArray.forEach(([key, value]) => {

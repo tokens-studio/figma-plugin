@@ -32,8 +32,8 @@ const Tokens = ({isActive}) => {
     }, [tokens, usedTokenSet, activeTokenSet]);
 
     const memoizedTokens = React.useMemo(() => {
-        if (tokens[activeTokenSet]?.values) {
-            return mappedTokens(tokens[activeTokenSet]?.values);
+        if (tokens[activeTokenSet]) {
+            return mappedTokens(tokens[activeTokenSet]);
         }
         return [];
     }, [tokens, activeTokenSet]);
