@@ -10,7 +10,7 @@ export function findAllAliases(tokens) {
 
 export function reduceToValues(tokens) {
     const reducedTokens = Object.entries(tokens).reduce((prev, group) => {
-        prev.push({[group[0]]: group[1].values});
+        prev.push({[group[0]]: group[1]});
         return prev;
     }, []);
 
