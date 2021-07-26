@@ -25,14 +25,14 @@ export function resolveTokenValues(tokens, previousCount = undefined) {
     if (aliases.length > 0) {
         returnedTokens = tokens.map((t) => {
             let returnValue;
-            // Iterate over Typography Object to get resolved values
-            if (t.type === 'typography') {
+            // Iterate over Typography and boxShadow Object to get resolved values
+            if (['typography', 'boxShadow'].includes(t.type)) {
                 returnValue = Object.entries(t.value).reduce((acc, [key, value]) => {
                     acc[key] = getAliasValue(value, tokens);
                     return acc;
                 }, {});
             } else {
-                // If we're not dealing with typography tokens, just return resolved value
+                // If we're not dealing with special tokens, just return resolved value
                 returnValue = getAliasValue(t, tokens);
             }
             return {
