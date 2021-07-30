@@ -2,7 +2,6 @@ import * as React from 'react';
 import {styled} from '@/stitches.config';
 import {useSelector} from 'react-redux';
 import {CheckIcon, ChevronRightIcon} from '@radix-ui/react-icons';
-import Icon from './Icon';
 import {RootState} from '../store';
 import {
     ContextMenu,

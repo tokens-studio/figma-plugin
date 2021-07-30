@@ -1,4 +1,5 @@
 /* eslint-disable import/prefer-default-export */
+import {track} from '@/utils/analytics';
 import fetchChangelog from '@/utils/storyblok';
 import {createModel} from '@rematch/core';
 import {StorageType, StorageProviderType, ApiDataType} from '@types/api';
@@ -92,6 +93,8 @@ export const uiState = createModel<RootModel>()({
             };
         },
         setDisplayType: (state, data: DisplayType) => {
+            track('setDisplayType', {type: data});
+
             return {
                 ...state,
                 displayType: data,

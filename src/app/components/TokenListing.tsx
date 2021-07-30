@@ -59,7 +59,7 @@ const TokenListing = ({
         });
     };
 
-    const showNewForm = ({name = ''}) => {
+    const showNewForm = ({name = ''}: {name?: string}) => {
         showForm({value: '', name, isPristine: true});
     };
 
@@ -127,7 +127,7 @@ const TokenListing = ({
                             className="button button-ghost"
                             type="button"
                             onClick={() => {
-                                showNewForm({path: tokenKey});
+                                showNewForm({});
                             }}
                         >
                             <Icon name="add" />

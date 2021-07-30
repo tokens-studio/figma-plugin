@@ -15,7 +15,20 @@ export function fetchAllPluginData(node) {
         const prop = Object.keys(properties)[i];
         const data = fetchPluginData(node, prop);
         if (data) {
-            pluginData.push([prop, JSON.parse(data)]);
+            switch (prop) {
+                // Pre-Version 53 had horizontalPadding and verticalPadding.
+                case 'horizontalPadding':
+                    pluginData.push(['paddingLeft', JSON.parse(data)]);
+                    pluginData.push(['paddingRight', JSON.parse(data)]);
+                    break;
+                case 'verticalPadding':
+                    pluginData.push(['paddingTop', JSON.parse(data)]);
+                    pluginData.push(['paddingBottom', JSON.parse(data)]);
+                    break;
+                default:
+                    pluginData.push([prop, JSON.parse(data)]);
+                    break;
+            }
         }
 
         i += 1;
@@ -107,11 +120,23 @@ export function updatePluginData(nodes, values) {
         const currentValuesOnNode = fetchAllPluginData(node);
         const newValuesOnNode = Object.assign(currentValuesOnNode || {}, values);
         Object.entries(newValuesOnNode).forEach(([key, value]) => {
-            if (value === 'delete') {
-                delete newValuesOnNode[key];
-                removePluginData([node], key);
-            } else {
-                node.setPluginData(key, JSON.stringify(value));
+            switch (value) {
+                case 'delete':
+                    delete newValuesOnNode[key];
+                    removePluginData([node], key);
+                    break;
+                // Pre-Version 53 had horizontalPadding and verticalPadding.
+                case 'horizontalPadding':
+                    node.setPluginData('paddingLeft', JSON.stringify(value));
+                    node.setPluginData('paddingRight', JSON.stringify(value));
+                    break;
+                case 'verticalPadding':
+                    node.setPluginData('paddingTop', JSON.stringify(value));
+                    node.setPluginData('paddingBottom', JSON.stringify(value));
+                    break;
+                default:
+                    node.setPluginData(key, JSON.stringify(value));
+                    break;
             }
         });
         try {

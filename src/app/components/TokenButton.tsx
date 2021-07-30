@@ -10,6 +10,17 @@ import {Dispatch, RootState} from '../store';
 import useTokens from '../store/useTokens';
 import TokenTooltip from './TokenTooltip';
 
+export function useGetActiveState(properties, type, name) {
+    const uiState = useSelector((state: RootState) => state.uiState);
+
+    const active = uiState.selectionValues[type] === name;
+    const semiActive = properties.some((prop) => {
+        return uiState.selectionValues[prop.name] === name;
+    });
+
+    return {active, semiActive};
+}
+
 const TokenButton = ({
     type,
     token,
@@ -18,7 +29,7 @@ const TokenButton = ({
 }: {
     type: string | object;
     token: SingleTokenObject;
-    showForm: boolean;
+    showForm: Function;
     resolvedTokens: SingleTokenObject[];
 }) => {
     const uiState = useSelector((state: RootState) => state.uiState);
@@ -40,7 +51,7 @@ const TokenButton = ({
     const buttonClass = [];
 
     const handleEditClick = () => {
-        showForm({name, value: token.value, path: name});
+        showForm({name, value: token.value});
     };
 
     const handleDeleteClick = () => {
@@ -133,8 +144,7 @@ const TokenButton = ({
             break;
     }
 
-    const active = uiState.selectionValues[type] === name;
-    const semiActive = properties.some((prop) => uiState.selectionValues[prop.name] === name);
+    const {active, semiActive} = useGetActiveState(properties, type, name);
 
     if (active) {
         buttonClass.push('button-active');
