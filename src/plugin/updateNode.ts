@@ -231,8 +231,7 @@ export default async function setValuesOnNode(node, values, data) {
             if (typeof node.characters !== 'undefined') {
                 await figma.loadFontAsync(node.fontName);
                 // If we're inserting an object, stringify that
-                const value =
-                    typeof values.tokenValue === 'object' ? JSON.stringify(values.tokenValue) : values.tokenValue;
+                const value = typeof values.value === 'object' ? JSON.stringify(values.value) : values.value;
                 node.characters = String(value);
             }
         }

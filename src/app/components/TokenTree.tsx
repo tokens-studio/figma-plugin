@@ -18,14 +18,14 @@ const TokenTree = ({tokenValues, showNewForm, showForm, schema, path = null, typ
                 return (
                     <React.Fragment key={stringPath}>
                         {typeof value === 'object' && !isTypographyToken(value) && !isSingleToken(value) ? (
-                            <div className="property-wrapper w-full">
+                            <div className="property-wrapper w-full" data-cy={`token-group-${stringPath}`}>
                                 <div className="flex items-center justify-between group">
                                     <TokenGroupHeading label={name} path={stringPath} id="listing" />
                                     <div className="opacity-0 group-hover:opacity-100">
                                         <Tooltip label="Add a new token" variant="right">
                                             <button
                                                 disabled={editProhibited}
-                                                data-cy="button-add-new-token"
+                                                data-cy="button-add-new-token-in-group"
                                                 className="button button-ghost"
                                                 type="button"
                                                 onClick={() => {
