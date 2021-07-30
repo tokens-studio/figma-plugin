@@ -10,14 +10,15 @@ import * as pjs from '../../../../package.json';
 import useStorage from '../useStorage';
 
 async function readTokensFromJSONBin({secret, id}): Promise<TokenProps> | null {
-    const response = await fetch(`https://api.jsonbin.io/b/${id}/latest`, {
+    const response = await fetch(`https://api.jsonbin.io/v3/b/${id}/latest`, {
         method: 'GET',
         mode: 'cors',
         cache: 'no-cache',
         credentials: 'same-origin',
         headers: {
             'Content-Type': 'application/json',
-            'secret-key': secret,
+            'X-Master-Key': secret,
+            'X-Bin-Meta': false,
         },
     });
 
@@ -29,7 +30,7 @@ async function readTokensFromJSONBin({secret, id}): Promise<TokenProps> | null {
 }
 
 async function writeTokensToJSONBin({secret, id, tokenObj}): Promise<TokenProps> | null {
-    const response = await fetch(`https://api.jsonbin.io/b/${id}`, {
+    const response = await fetch(`https://api.jsonbin.io/v3/b/${id}`, {
         method: 'PUT',
         mode: 'cors',
         cache: 'no-cache',
@@ -37,7 +38,7 @@ async function writeTokensToJSONBin({secret, id, tokenObj}): Promise<TokenProps>
         body: tokenObj,
         headers: {
             'Content-Type': 'application/json',
-            'secret-key': secret,
+            'X-Master-Key': secret,
         },
     });
 
@@ -86,7 +87,7 @@ export function useJSONbin() {
     const {setStorageType} = useStorage();
 
     async function createNewJSONBin({provider, secret, tokens, name, updatedAt}): Promise<TokenProps> {
-        const response = await fetch(`https://api.jsonbin.io/b`, {
+        const response = await fetch(`https://api.jsonbin.io/v3/b`, {
             method: 'POST',
             mode: 'cors',
             cache: 'no-cache',
@@ -100,23 +101,24 @@ export function useJSONbin() {
             }),
             headers: {
                 'Content-Type': 'application/json',
-                'secret-key': secret,
+                'X-Master-Key': secret,
+                'X-Bin-Name': name,
                 versioning: 'false',
             },
         });
-        const jsonBinData = await response.json();
-        if (jsonBinData.success) {
-            dispatch.uiState.setApiData({id: jsonBinData.id, name, secret, provider});
-            setStorageType({provider: {id: jsonBinData.id, name, provider}, bool: true});
+        if (response.ok) {
+            const jsonBinData = await response.json();
+            dispatch.uiState.setApiData({id: jsonBinData.metadata.id, name, secret, provider});
+            setStorageType({provider: {id: jsonBinData.metadata.id, name, provider}, bool: true});
             updateJSONBinTokens({
                 tokens,
-                id: jsonBinData.id,
+                id: jsonBinData.metadata.id,
                 secret,
                 updatedAt,
             });
             postToFigma({
                 type: MessageToPluginTypes.CREDENTIALS,
-                id: jsonBinData.id,
+                id: jsonBinData.metadata.id,
                 name,
                 secret,
                 provider,

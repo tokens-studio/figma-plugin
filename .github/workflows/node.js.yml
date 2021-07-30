@@ -31,6 +31,19 @@ jobs:
       # 4: Run tests
       - name: Run test command
         run: yarn test
+
+      # 5: Build package
+      - name: Build Package
+        run: yarn build
+
+      # 6: Store artifact
+      - name: Store Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: package
+          path: |
+            dist
+            manifest.json
   cypress-run:
     name: Cypress
     runs-on: ubuntu-latest
