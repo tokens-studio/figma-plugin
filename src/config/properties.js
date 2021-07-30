@@ -6,6 +6,10 @@ export default {
     spacing: {},
     verticalPadding: {},
     horizontalPadding: {},
+    paddingTop: {},
+    paddingRight: {},
+    paddingBottom: {},
+    paddingLeft: {},
     itemSpacing: {},
     fill: {},
     border: {},
@@ -25,6 +29,7 @@ export default {
     letterSpacing: {},
     paragraphSpacing: {},
     tokenValue: {},
+    value: {},
     tokenName: {},
     description: {},
 };

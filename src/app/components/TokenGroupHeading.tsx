@@ -1,14 +1,15 @@
 import React from 'react';
 import {ContextMenu, ContextMenuTrigger, MenuItem} from 'react-contextmenu';
+import {useDispatch, useSelector} from 'react-redux';
 import Heading from './Heading';
-import {useTokenDispatch, useTokenState} from '../store/TokenContext';
+import {Dispatch, RootState} from '../store';
 
 export default function TokenGroupHeading({label, path, id}) {
-    const {editProhibited, activeTokenSet} = useTokenState();
-    const {deleteToken} = useTokenDispatch();
+    const {activeTokenSet, editProhibited} = useSelector((state: RootState) => state.tokenState);
+    const {deleteTokenGroup} = useDispatch<Dispatch>().tokenState;
 
     const onDelete = () => {
-        deleteToken({parent: activeTokenSet, path});
+        deleteTokenGroup({parent: activeTokenSet, path});
     };
 
     return (

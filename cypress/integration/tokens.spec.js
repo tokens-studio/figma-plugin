@@ -30,28 +30,50 @@ describe('TokenListing', () => {
         cy.receiveTokenValues({
             version: '5',
             values: {
-                options: JSON.stringify({sizing: {xs: 4}}, null, 2),
+                options: [
+                    {
+                        name: 'sizing.xs',
+                        value: 4,
+                    },
+                ],
             },
         });
         cy.receiveStorageTypeLocal();
         cy.get('[data-cy=tokenlisting-sizing] [data-cy=button-add-new-token]').click({timeout: 1000});
         fillTokenForm({
-            name: 'xs',
+            name: 'sizing.xs',
             value: '4',
         });
         cy.get('@postMessage').should('be.calledTwice');
         receiveRemoteComponents();
-        cy.get('[data-cy=button-modal-add]').click();
+        cy.get('[data-cy=tokenlisting-sizing] [data-cy=button-add-new-token]').click({timeout: 1000});
         fillTokenForm({
-            name: 'sm',
+            name: 'sizing.sm',
             value: '$sizing.xs * 2',
         });
-        cy.get('@postMessage').should('be.calledWith', {
-            pluginMessage: {
-                type: 'tokenvalues',
-                values: {version: '5', values: {options: JSON.stringify({sizing: {xs: 4}}, null, 2)}},
+    });
+
+    it('can add a new token in group', () => {
+        cy.receiveTokenValues({
+            version: '5',
+            values: {
+                options: [
+                    {
+                        name: 'sizing.xs',
+                        value: 4,
+                    },
+                ],
             },
         });
+        cy.receiveStorageTypeLocal();
+        cy.get(
+            '[data-cy=tokenlisting-sizing] [data-cy=token-group-sizing] [data-cy=button-add-new-token-in-group]'
+        ).click({timeout: 1000});
+        fillTokenForm({
+            name: 'lg',
+            value: '8',
+        });
+        cy.get('@postMessage').should('be.calledTwice');
         receiveRemoteComponents();
     });
 });

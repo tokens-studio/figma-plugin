@@ -1,20 +1,24 @@
+import {useDispatch} from 'react-redux';
+import {Dispatch} from '@/app/store';
+import {StorageProviderType} from 'Types/api';
+import {MessageToPluginTypes} from 'Types/messages';
+import {TokenProps} from 'Types/tokens';
+import convertTokensToObject from '@/utils/convertTokensToObject';
 import {notifyToUI, postToFigma} from '../../../plugin/notifiers';
-import {StorageProviderType} from '../../../../types/api';
-import {MessageToPluginTypes} from '../../../../types/messages';
-import {TokenProps} from '../../../../types/tokens';
 import {compareUpdatedAt} from '../../components/utils';
-import {useTokenDispatch} from '../TokenContext';
 import * as pjs from '../../../../package.json';
+import useStorage from '../useStorage';
 
 async function readTokensFromJSONBin({secret, id}): Promise<TokenProps> | null {
-    const response = await fetch(`https://api.jsonbin.io/b/${id}/latest`, {
+    const response = await fetch(`https://api.jsonbin.io/v3/b/${id}/latest`, {
         method: 'GET',
         mode: 'cors',
         cache: 'no-cache',
         credentials: 'same-origin',
         headers: {
             'Content-Type': 'application/json',
-            'secret-key': secret,
+            'X-Master-Key': secret,
+            'X-Bin-Meta': false,
         },
     });
 
@@ -26,7 +30,7 @@ async function readTokensFromJSONBin({secret, id}): Promise<TokenProps> | null {
 }
 
 async function writeTokensToJSONBin({secret, id, tokenObj}): Promise<TokenProps> | null {
-    const response = await fetch(`https://api.jsonbin.io/b/${id}`, {
+    const response = await fetch(`https://api.jsonbin.io/v3/b/${id}`, {
         method: 'PUT',
         mode: 'cors',
         cache: 'no-cache',
@@ -34,7 +38,7 @@ async function writeTokensToJSONBin({secret, id, tokenObj}): Promise<TokenProps>
         body: tokenObj,
         headers: {
             'Content-Type': 'application/json',
-            'secret-key': secret,
+            'X-Master-Key': secret,
         },
     });
 
@@ -48,41 +52,42 @@ async function writeTokensToJSONBin({secret, id, tokenObj}): Promise<TokenProps>
 }
 
 export async function updateJSONBinTokens({tokens, id, secret, updatedAt, oldUpdatedAt = null}) {
-    const values = Object.entries(tokens).reduce((acc, [key, val]) => {
-        acc[key] = JSON.parse(val as string);
-        return acc;
-    }, {});
-    const tokenObj = JSON.stringify(
-        {
-            version: pjs.plugin_version,
-            updatedAt,
-            values,
-        },
-        null,
-        2
-    );
+    try {
+        const tokenObj = JSON.stringify(
+            {
+                version: pjs.plugin_version,
+                updatedAt,
+                values: convertTokensToObject(tokens),
+            },
+            null,
+            2
+        );
 
-    if (oldUpdatedAt) {
-        const remoteTokens = await readTokensFromJSONBin({secret, id});
-        const comparison = await compareUpdatedAt(oldUpdatedAt, remoteTokens.updatedAt);
-        if (comparison === 'remote_older') {
-            writeTokensToJSONBin({secret, id, tokenObj});
+        if (oldUpdatedAt) {
+            const remoteTokens = await readTokensFromJSONBin({secret, id});
+            const comparison = await compareUpdatedAt(oldUpdatedAt, remoteTokens.updatedAt);
+            if (comparison === 'remote_older') {
+                writeTokensToJSONBin({secret, id, tokenObj});
+            } else {
+                // Tell the user to choose between:
+                // A) Pull Remote values and replace local changes
+                // B) Overwrite Remote changes
+                notifyToUI('Error updating tokens as remote is newer, please update first');
+            }
         } else {
-            // Tell the user to choose between:
-            // A) Pull Remote values and replace local changes
-            // B) Overwrite Remote changes
-            notifyToUI('Error updating tokens as remote is newer, please update first');
+            writeTokensToJSONBin({secret, id, tokenObj});
         }
-    } else {
-        writeTokensToJSONBin({secret, id, tokenObj});
+    } catch (e) {
+        console.log('Error updating jsonbin', e);
     }
 }
 
 export function useJSONbin() {
-    const {setProjectURL, setApiData, setStorageType} = useTokenDispatch();
+    const dispatch = useDispatch<Dispatch>();
+    const {setStorageType} = useStorage();
 
     async function createNewJSONBin({provider, secret, tokens, name, updatedAt}): Promise<TokenProps> {
-        const response = await fetch(`https://api.jsonbin.io/b`, {
+        const response = await fetch(`https://api.jsonbin.io/v3/b`, {
             method: 'POST',
             mode: 'cors',
             cache: 'no-cache',
@@ -96,23 +101,24 @@ export function useJSONbin() {
             }),
             headers: {
                 'Content-Type': 'application/json',
-                'secret-key': secret,
+                'X-Master-Key': secret,
+                'X-Bin-Name': name,
                 versioning: 'false',
             },
         });
-        const jsonBinData = await response.json();
-        if (jsonBinData.success) {
-            setApiData({id: jsonBinData.id, name, secret, provider});
-            setStorageType({id: jsonBinData.id, name, provider}, true);
+        if (response.ok) {
+            const jsonBinData = await response.json();
+            dispatch.uiState.setApiData({id: jsonBinData.metadata.id, name, secret, provider});
+            setStorageType({provider: {id: jsonBinData.metadata.id, name, provider}, bool: true});
             updateJSONBinTokens({
                 tokens,
-                id: jsonBinData.id,
+                id: jsonBinData.metadata.id,
                 secret,
                 updatedAt,
             });
             postToFigma({
                 type: MessageToPluginTypes.CREDENTIALS,
-                id: jsonBinData.id,
+                id: jsonBinData.metadata.id,
                 name,
                 secret,
                 provider,
@@ -132,7 +138,7 @@ export function useJSONbin() {
 
         try {
             const jsonBinData = await readTokensFromJSONBin({id, secret});
-            setProjectURL(`https://jsonbin.io/${id}`);
+            dispatch.uiState.setProjectURL(`https://jsonbin.io/${id}`);
 
             if (jsonBinData) {
                 postToFigma({
@@ -143,15 +149,10 @@ export function useJSONbin() {
                     provider: StorageProviderType.JSONBIN,
                 });
                 if (jsonBinData?.values) {
-                    const values = Object.entries(jsonBinData.values).reduce((acc, [key, val]) => {
-                        acc[key] = JSON.stringify(val, null, 2);
-                        return acc;
-                    }, {});
-
                     const obj = {
                         version: jsonBinData.version,
                         updatedAt: jsonBinData.updatedAt,
-                        values,
+                        values: jsonBinData.values,
                     };
 
                     tokenValues = obj;
