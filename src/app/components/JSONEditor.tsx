@@ -80,7 +80,6 @@ const JSONEditor = () => {
                         className="flex-grow"
                         placeholder="Enter JSON"
                         rows={21}
-                        hasErrored={tokens[activeTokenSet]?.hasErrored}
                         onChange={changeTokens}
                         value={stringTokens}
                     />
@@ -113,7 +112,12 @@ const JSONEditor = () => {
                     <Button id="export" variant="secondary" onClick={() => showExportModal(true)}>
                         Export
                     </Button>
-                    <Button id="save-update-json" disabled={editProhibited} variant="primary" onClick={handleUpdate}>
+                    <Button
+                        id="save-update-json"
+                        disabled={editProhibited || error}
+                        variant="primary"
+                        onClick={handleUpdate}
+                    >
                         Save & update
                     </Button>
                 </div>

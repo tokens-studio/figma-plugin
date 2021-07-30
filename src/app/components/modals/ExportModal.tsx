@@ -1,6 +1,4 @@
 import React from 'react';
-import {useSelector} from 'react-redux';
-import {RootState} from '@/app/store';
 import useTokens from '@/app/store/useTokens';
 import Heading from '../Heading';
 import Textarea from '../Textarea';
@@ -8,7 +6,6 @@ import Button from '../Button';
 import Modal from '../Modal';
 
 export default function ExportModal({onClose}) {
-    const {tokens, activeTokenSet} = useSelector((state: RootState) => state.tokenState);
     const {getFormattedTokens} = useTokens();
 
     return (
@@ -28,13 +25,7 @@ export default function ExportModal({onClose}) {
                     .
                 </p>
                 <Heading size="small">Output example</Heading>
-                <Textarea
-                    className="flex-grow"
-                    rows={10}
-                    isDisabled
-                    hasErrored={tokens[activeTokenSet]?.hasErrored}
-                    value={getFormattedTokens()}
-                />
+                <Textarea className="flex-grow" rows={10} isDisabled value={getFormattedTokens()} />
                 <div className="space-x-4 flex justify-between">
                     <Button variant="secondary" onClick={onClose}>
                         Cancel

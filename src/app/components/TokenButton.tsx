@@ -13,13 +13,11 @@ import TokenTooltip from './TokenTooltip';
 const TokenButton = ({
     type,
     token,
-    editMode,
     showForm,
     resolvedTokens,
 }: {
     type: string | object;
     token: SingleTokenObject;
-    editMode: boolean;
     showForm: boolean;
     resolvedTokens: SingleTokenObject[];
 }) => {
@@ -138,9 +136,6 @@ const TokenButton = ({
     const active = uiState.selectionValues[type] === name;
     const semiActive = properties.some((prop) => uiState.selectionValues[prop.name] === name);
 
-    if (editMode) {
-        buttonClass.push('button-edit');
-    }
     if (active) {
         buttonClass.push('button-active');
     } else if (semiActive) {
@@ -178,7 +173,6 @@ const TokenButton = ({
                 onEdit={handleEditClick}
                 value={name}
                 path={name}
-                mode={editMode ? 'edit' : 'list'}
             >
                 <Tooltip
                     side="bottom"
@@ -199,7 +193,6 @@ const TokenButton = ({
                 >
                     <button className="w-full h-full" type="button" onClick={() => onClick(properties[0])}>
                         <div className="button-text">{showValue && <span>{visibleName}</span>}</div>
-                        {editMode && <div className="button-edit-overlay">Edit</div>}
                     </button>
                 </Tooltip>
             </MoreButton>

@@ -38,7 +38,6 @@ export interface Tokens {
 }
 
 export interface TokenObject {
-    hasErrored?: boolean;
     values: TokenArrayGroup;
     type: 'array' | 'object';
 }

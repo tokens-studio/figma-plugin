@@ -4,7 +4,7 @@ import {SingleTokenObject} from 'Types/tokens';
 import {useTokenDispatch, useTokenState} from '../store/TokenContext';
 import Heading from './Heading';
 import Icon from './Icon';
-import renderKeyValue from './renderKeyValue';
+import TokenTree from './TokenTree';
 import Tooltip from './Tooltip';
 import {Dispatch, RootState} from '../store';
 
@@ -41,13 +41,12 @@ const TokenListing = ({
 
     const [isIntCollapsed, setIntCollapsed] = React.useState(false);
 
-    const showForm = ({value, name, path, isPristine = false}) => {
+    const showForm = ({value, name, isPristine = false}) => {
         dispatch.uiState.setShowEditForm(true);
         dispatch.uiState.setEditToken({
             value,
             name,
             initialName: name,
-            path,
             isPristine,
             explainer,
             property,
@@ -60,8 +59,8 @@ const TokenListing = ({
         });
     };
 
-    const showNewForm = ({path, name = ''}) => {
-        showForm({value: '', name, path, isPristine: true});
+    const showNewForm = ({name = ''}) => {
+        showForm({value: '', name, isPristine: true});
     };
 
     React.useEffect(() => {
@@ -138,15 +137,14 @@ const TokenListing = ({
             </div>
             {values && (
                 <div className={`px-4 pb-4 ${isIntCollapsed ? 'hidden' : null}`}>
-                    {renderKeyValue({
-                        tokenValues: values,
-                        showNewForm,
-                        showForm,
-                        schema,
-                        path: tokenKey,
-                        type: tokenType,
-                        resolvedTokens,
-                    })}
+                    <TokenTree
+                        tokenValues={values}
+                        showNewForm={showNewForm}
+                        showForm={showForm}
+                        schema={schema}
+                        type={tokenType}
+                        resolvedTokens={resolvedTokens}
+                    />
                 </div>
             )}
         </div>

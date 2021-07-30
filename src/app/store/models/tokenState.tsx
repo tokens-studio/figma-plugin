@@ -243,6 +243,17 @@ export const tokenState = createModel<RootModel>()({
 
             return newState;
         },
+        deleteTokenGroup: (state, data: DeleteTokenInput) => {
+            const newState = {
+                ...state,
+                tokens: {
+                    ...state.tokens,
+                    [data.parent]: state.tokens[data.parent].filter((token) => !token.name.includes(data.path)),
+                },
+            };
+
+            return newState;
+        },
     },
     effects: (dispatch) => ({
         setDefaultTokens: (payload) => {
@@ -257,6 +268,9 @@ export const tokenState = createModel<RootModel>()({
             }
         },
         deleteToken() {
+            dispatch.tokenState.updateDocument(false);
+        },
+        deleteTokenGroup() {
             dispatch.tokenState.updateDocument(false);
         },
         addTokenSet() {
@@ -285,19 +299,23 @@ export const tokenState = createModel<RootModel>()({
             }
         },
         updateDocument(shouldUpdateNodes = true, rootState) {
-            updateTokensOnSources({
-                tokens: shouldUpdateNodes ? rootState.tokenState.tokens : null,
-                tokenValues: reduceToValues(rootState.tokenState.tokens),
-                usedTokenSet: rootState.tokenState.usedTokenSet,
-                settings: rootState.settings,
-                updatedAt: new Date().toString(),
-                lastUpdatedAt: rootState.uiState.lastUpdatedAt,
-                isLocal: rootState.uiState.storageType.provider === StorageProviderType.LOCAL,
-                editProhibited: rootState.uiState.editProhibited,
-                api: rootState.uiState.api,
-                storageType: rootState.uiState.storageType,
-                shouldUpdateRemote: rootState.settings.updateRemote,
-            });
+            try {
+                updateTokensOnSources({
+                    tokens: shouldUpdateNodes ? rootState.tokenState.tokens : null,
+                    tokenValues: reduceToValues(rootState.tokenState.tokens),
+                    usedTokenSet: rootState.tokenState.usedTokenSet,
+                    settings: rootState.settings,
+                    updatedAt: new Date().toString(),
+                    lastUpdatedAt: rootState.uiState.lastUpdatedAt,
+                    isLocal: rootState.uiState.storageType.provider === StorageProviderType.LOCAL,
+                    editProhibited: rootState.uiState.editProhibited,
+                    api: rootState.uiState.api,
+                    storageType: rootState.uiState.storageType,
+                    shouldUpdateRemote: rootState.settings.updateRemote,
+                });
+            } catch (e) {
+                console.error('Error updating document', e);
+            }
         },
     }),
 });

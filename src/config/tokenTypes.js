@@ -106,4 +106,9 @@ export default {
         property: 'ParagraphSpacing',
         type: 'paragraphSpacing',
     },
+    other: {
+        label: 'Other',
+        property: 'other',
+        type: 'other',
+    },
 };

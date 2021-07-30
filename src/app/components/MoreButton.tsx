@@ -23,7 +23,7 @@ const RightSlot = styled('div', {
     '[data-disabled] &': {color: '$disabled'},
 });
 
-const MoreButton = ({properties, children, path, value, onClick, onEdit, onDelete, mode}) => {
+const MoreButton = ({properties, children, path, value, onClick, onEdit, onDelete}) => {
     const {selectionValues} = useSelector((state: RootState) => state.uiState);
     const {editProhibited} = useSelector((state: RootState) => state.tokenState);
 
@@ -55,7 +55,7 @@ const MoreButton = ({properties, children, path, value, onClick, onEdit, onDelet
     return (
         <div className="w-full">
             <ContextMenu>
-                <ContextMenuTrigger id={`${path}-${value}-${mode}`}>{children}</ContextMenuTrigger>
+                <ContextMenuTrigger id={`${path}-${value}`}>{children}</ContextMenuTrigger>
                 <ContextMenuContent sideOffset={5} align="end" collisionTolerance={30}>
                     {visibleProperties.map((property) => {
                         const isActive = selectionValues[property.name] === value;

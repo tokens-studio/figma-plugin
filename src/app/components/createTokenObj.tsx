@@ -22,8 +22,32 @@ function transformName(name) {
         case 'size':
         case 'sizing':
             return 'sizing';
+        case 'boxShadow':
+            return 'boxShadow';
+        case 'border':
+            return 'border';
+        case 'borderRadius':
+            return 'borderRadius';
+        case 'borderWidth':
+            return 'borderWidth';
+        case 'opacity':
+            return 'opacity';
+        case 'fontFamilies':
+            return 'fontFamilies';
+        case 'fontWeights':
+            return 'fontWeights';
+        case 'fontSizes':
+            return 'fontSizes';
+        case 'lineHeights':
+            return 'lineHeights';
+        case 'typography':
+            return 'typography';
+        case 'letterSpacing':
+            return 'letterSpacing';
+        case 'paragraphSpacing':
+            return 'paragraphSpacing';
         default:
-            return name;
+            return 'other';
     }
 }
 

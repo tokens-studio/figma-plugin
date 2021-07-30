@@ -66,7 +66,7 @@ export default async function updateTokensOnSources({
             oldUpdatedAt: lastUpdatedAt,
         });
     }
-    const mergedTokens = resolveTokenValues(computeMergedTokens(tokens, usedTokenSet));
+    const mergedTokens = tokens ? resolveTokenValues(computeMergedTokens(tokens, usedTokenSet)) : null;
 
     postToFigma({
         type: MessageToPluginTypes.UPDATE,

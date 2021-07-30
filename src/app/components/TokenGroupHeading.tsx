@@ -6,10 +6,10 @@ import {Dispatch, RootState} from '../store';
 
 export default function TokenGroupHeading({label, path, id}) {
     const {activeTokenSet, editProhibited} = useSelector((state: RootState) => state.tokenState);
-    const {deleteToken} = useDispatch<Dispatch>().tokenState;
+    const {deleteTokenGroup} = useDispatch<Dispatch>().tokenState;
 
     const onDelete = () => {
-        deleteToken({parent: activeTokenSet, path});
+        deleteTokenGroup({parent: activeTokenSet, path});
     };
 
     return (
