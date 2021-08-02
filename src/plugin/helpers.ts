@@ -55,21 +55,10 @@ export async function getUserId() {
 export function transformValue(value, type) {
     switch (type) {
         case 'borderWidth':
-            return fakeZeroForFigma(value);
         case 'width':
-            return fakeZeroForFigma(value);
         case 'height':
-            return fakeZeroForFigma(value);
         case 'sizing':
-            return fakeZeroForFigma(value);
-        case 'fontSizes':
-            return convertTypographyNumberToFigma(value);
-        case 'letterSpacing':
-            return convertLetterSpacingToFigma(value);
-        case 'lineHeights':
-            return convertLineHeightToFigma(value);
-        case 'opacity':
-            return convertOpacityToFigma(value.toString());
+            return fakeZeroForFigma(convertTypographyNumberToFigma(value));
         case 'borderRadius':
         case 'borderRadiusTopLeft':
         case 'borderRadiusTopRight':
@@ -85,6 +74,14 @@ export function transformValue(value, type) {
         case 'itemSpacing':
         case 'boxShadow':
         case 'paragraphSpacing':
+        case 'fontSizes':
+            return convertTypographyNumberToFigma(value);
+        case 'letterSpacing':
+            return convertLetterSpacingToFigma(value);
+        case 'lineHeights':
+            return convertLineHeightToFigma(value);
+        case 'opacity':
+            return convertOpacityToFigma(value.toString());
         default:
             return value;
     }
