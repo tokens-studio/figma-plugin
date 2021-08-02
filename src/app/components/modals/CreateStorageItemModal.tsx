@@ -41,7 +41,7 @@ export default function CreateStorageItemModal({isOpen, onClose, onSuccess}) {
     };
 
     return (
-        <Modal isOpen={isOpen} close={() => onClose(false)}>
+        <Modal large isOpen={isOpen} close={() => onClose(false)}>
             <div className="space-y-4">
                 <Heading>Add new credentials</Heading>
                 <StorageItemForm

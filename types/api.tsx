@@ -16,4 +16,5 @@ export enum StorageProviderType {
     LOCAL = 'local',
     ARCADE = 'arcade',
     JSONBIN = 'jsonbin',
+    URL = 'url',
 }

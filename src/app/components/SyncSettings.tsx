@@ -38,7 +38,7 @@ const SyncSettings = () => {
     };
 
     const selectedRemoteProvider = () => {
-        return [StorageProviderType.JSONBIN, StorageProviderType.ARCADE].includes(
+        return [StorageProviderType.JSONBIN, StorageProviderType.ARCADE, StorageProviderType.URL].includes(
             localApiState?.provider as StorageProviderType
         );
     };
@@ -142,6 +142,20 @@ const SyncSettings = () => {
                             }}
                             text="JSONbin"
                             id={StorageProviderType.JSONBIN}
+                        />
+                        <ProviderSelector
+                            isActive={localApiState?.provider === StorageProviderType.URL}
+                            isStored={storageType?.provider === StorageProviderType.URL}
+                            onClick={() => {
+                                dispatch.uiState.setLocalApiState({
+                                    name: '',
+                                    secret: '',
+                                    id: '',
+                                    provider: StorageProviderType.URL,
+                                });
+                            }}
+                            text="URL"
+                            id={StorageProviderType.URL}
                         />
                     </div>
                 </div>

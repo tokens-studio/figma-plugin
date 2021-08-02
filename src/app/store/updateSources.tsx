@@ -4,6 +4,7 @@ import {TokenProps} from '../../../types/tokens';
 import {StorageProviderType} from '../../../types/api';
 import {notifyToUI, postToFigma} from '../../plugin/notifiers';
 import {updateJSONBinTokens} from './providers/jsonbin';
+import {updateURLTokens} from './providers/url';
 
 async function updateRemoteTokens({
     provider,
@@ -27,6 +28,16 @@ async function updateRemoteTokens({
     switch (provider) {
         case StorageProviderType.JSONBIN: {
             updateJSONBinTokens({
+                tokens,
+                id,
+                secret,
+                updatedAt,
+                oldUpdatedAt,
+            });
+            break;
+        }
+        case StorageProviderType.URL: {
+            updateURLTokens({
                 tokens,
                 id,
                 secret,

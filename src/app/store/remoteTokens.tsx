@@ -7,6 +7,7 @@ import useArcade from './providers/arcade';
 import {compareUpdatedAt} from '../components/utils';
 import {Dispatch, RootState} from '../store';
 import useStorage from './useStorage';
+import {useURL} from './providers/url';
 
 export default function useRemoteTokens() {
     const dispatch = useDispatch<Dispatch>();
@@ -15,6 +16,7 @@ export default function useRemoteTokens() {
     const {setStorageType} = useStorage();
     const {fetchDataFromArcade, editArcadeToken, createArcadeToken, deleteArcadeToken} = useArcade();
     const {fetchDataFromJSONBin, createNewJSONBin} = useJSONbin();
+    const {fetchDataFromURL, createNewURL} = useURL();
 
     const pullTokens = async () => {
         const {id, secret, provider, name} = api;
@@ -28,6 +30,11 @@ export default function useRemoteTokens() {
         switch (provider) {
             case StorageProviderType.JSONBIN: {
                 tokenValues = await fetchDataFromJSONBin(id, secret, name);
+                notifyToUI('Updated!');
+                break;
+            }
+            case StorageProviderType.URL: {
+                tokenValues = await fetchDataFromURL(id, secret, name);
                 notifyToUI('Updated!');
                 break;
             }
@@ -91,6 +98,9 @@ export default function useRemoteTokens() {
             case StorageProviderType.JSONBIN: {
                 return fetchDataFromJSONBin(id, secret, name);
             }
+            case StorageProviderType.URL: {
+                return fetchDataFromURL(id, secret, name);
+            }
             case StorageProviderType.ARCADE: {
                 return fetchDataFromArcade(id, secret, name);
             }
@@ -127,6 +137,9 @@ export default function useRemoteTokens() {
                     return syncTokens({id, secret, provider: StorageProviderType.JSONBIN, name});
                 }
                 return createNewJSONBin({provider, secret, tokens, name, updatedAt});
+            }
+            case StorageProviderType.URL: {
+                return syncTokens({id, secret, provider: StorageProviderType.URL, name});
             }
             case StorageProviderType.ARCADE: {
                 return syncTokens({id, secret, provider: StorageProviderType.ARCADE, name});

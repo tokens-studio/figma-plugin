@@ -28,7 +28,7 @@ export default function EditStorageItemModal({isOpen, initialValue, onClose, onS
     };
 
     return (
-        <Modal id="modal-edit-storage-item" isOpen={isOpen} close={() => onClose(false)}>
+        <Modal large id="modal-edit-storage-item" isOpen={isOpen} close={() => onClose(false)}>
             <div className="space-y-4">
                 <Heading>Edit storage item</Heading>
                 <StorageItemForm
