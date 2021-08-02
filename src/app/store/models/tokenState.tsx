@@ -181,7 +181,11 @@ export const tokenState = createModel<RootModel>()({
                 values.map((token: TokenGroup) => {
                     const oldValue = state.tokens[state.activeTokenSet].find((t) => t.name === token.name);
                     if (oldValue) {
-                        if (oldValue.value?.toUpperCase() === token.value.toUpperCase()) {
+                        if (
+                            typeof oldValue.value === 'string' &&
+                            typeof token.value === 'string' &&
+                            oldValue.value?.toUpperCase() === token.value.toUpperCase()
+                        ) {
                             if (
                                 oldValue.description === token.description ||
                                 (typeof token.description === 'undefined' && oldValue.description === '')

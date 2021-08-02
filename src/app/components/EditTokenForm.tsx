@@ -20,7 +20,7 @@ const EditTokenForm = () => {
     const handleObjectChange = (e) => {
         e.persist();
         setCurrentEditToken({
-            ...editToken,
+            ...currentEditToken,
             value: {...currentEditToken.value, [e.target.name]: e.target.value},
         });
     };
@@ -28,7 +28,7 @@ const EditTokenForm = () => {
     const handleOptionsChange = (e) => {
         e.persist();
         setCurrentEditToken({
-            ...editToken,
+            ...currentEditToken,
             options: {...currentEditToken.options, [e.target.name]: e.target.value},
         });
     };

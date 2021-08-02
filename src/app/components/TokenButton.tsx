@@ -51,7 +51,7 @@ const TokenButton = ({
     const buttonClass = [];
 
     const handleEditClick = () => {
-        showForm({name, value: token.value});
+        showForm({name, token});
     };
 
     const handleDeleteClick = () => {
