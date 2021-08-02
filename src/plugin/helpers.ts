@@ -1,4 +1,4 @@
-import {convertTypographyNumberToFigma} from './figmaTransforms/generic';
+import {convertTypographyNumberToFigma, fakeZeroForFigma} from './figmaTransforms/generic';
 import {convertLetterSpacingToFigma} from './figmaTransforms/letterSpacing';
 import {convertLineHeightToFigma} from './figmaTransforms/lineHeight';
 import convertOpacityToFigma from './figmaTransforms/opacity';
@@ -54,25 +54,14 @@ export async function getUserId() {
 
 export function transformValue(value, type) {
     switch (type) {
-        case 'borderRadius':
-        case 'borderRadiusTopLeft':
-        case 'borderRadiusTopRight':
-        case 'borderRadiusBottomRight':
-        case 'borderRadiusBottomLeft':
-        case 'width':
-        case 'height':
-        case 'sizing':
-        case 'spacing':
-        case 'horizontalPadding':
-        case 'verticalPadding':
-        case 'paddingTop':
-        case 'paddingRight':
-        case 'paddingBottom':
-        case 'paddingLeft':
-        case 'itemSpacing':
         case 'borderWidth':
-        case 'boxShadow':
-        case 'paragraphSpacing':
+            return fakeZeroForFigma(value);
+        case 'width':
+            return fakeZeroForFigma(value);
+        case 'height':
+            return fakeZeroForFigma(value);
+        case 'sizing':
+            return fakeZeroForFigma(value);
         case 'fontSizes':
             return convertTypographyNumberToFigma(value);
         case 'letterSpacing':
@@ -81,6 +70,21 @@ export function transformValue(value, type) {
             return convertLineHeightToFigma(value);
         case 'opacity':
             return convertOpacityToFigma(value.toString());
+        case 'borderRadius':
+        case 'borderRadiusTopLeft':
+        case 'borderRadiusTopRight':
+        case 'borderRadiusBottomRight':
+        case 'borderRadiusBottomLeft':
+        case 'spacing':
+        case 'horizontalPadding':
+        case 'verticalPadding':
+        case 'paddingTop':
+        case 'paddingRight':
+        case 'paddingBottom':
+        case 'paddingLeft':
+        case 'itemSpacing':
+        case 'boxShadow':
+        case 'paragraphSpacing':
         default:
             return value;
     }
