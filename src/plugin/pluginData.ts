@@ -2,6 +2,7 @@ import {UpdateMode} from 'Types/state';
 import {notifySelection} from './notifiers';
 import store from './store';
 import properties from '../config/properties';
+import removeValuesFromNode from './removeValuesFromNode';
 
 export function fetchPluginData(node, value: string) {
     return node.getPluginData(value);
@@ -101,12 +102,12 @@ export function removePluginData(nodes, key?) {
             if (key) {
                 node.setPluginData(key, '');
                 // TODO: Introduce setting asking user if values should be removed?
-                // removeValuesFromNode(node, key);
+                removeValuesFromNode(node, key);
             } else {
                 Object.keys(properties).forEach((prop) => {
                     node.setPluginData(prop, '');
                     // TODO: Introduce setting asking user if values should be removed?
-                    // removeValuesFromNode(node, prop);
+                    removeValuesFromNode(node, prop);
                 });
             }
             node.setPluginData('values', '');
