@@ -16,7 +16,7 @@ describe('convertTypographyNumberToFigma', () => {
 });
 
 describe('fakeZeroForFigma', () => {
-    it('should return 0.01 for certain 0 values', () => {
+    it('should return 0.001 for certain 0 values', () => {
         const zeroNumber = fakeZeroForFigma(0);
         expect(zeroNumber).toBe(0.001);
         const zeroString = fakeZeroForFigma('0');
