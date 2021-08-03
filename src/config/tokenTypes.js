@@ -37,7 +37,7 @@ export default {
         label: 'Opacity',
         property: 'Opacity',
         type: 'opacity',
-        explainer: 'Set as 50%',
+        explainer: 'Set as 50% or 0.5',
     },
     boxShadow: {
         label: 'Box Shadow',

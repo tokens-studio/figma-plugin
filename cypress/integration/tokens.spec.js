@@ -16,6 +16,14 @@ const fillTokenForm = ({name, value}) => {
     cy.get('input[name=value]').type('{enter}');
 };
 
+const fillInput = ({submit = false, input, value}) => {
+    cy.get(`input[name=${input}]`).type(value);
+
+    if (submit) {
+        cy.get(`input[name=${input}]`).type('{enter}');
+    }
+};
+
 describe('TokenListing', () => {
     beforeEach(() => {
         cy.visit('/', {
@@ -51,6 +59,86 @@ describe('TokenListing', () => {
             name: 'sizing.sm',
             value: '$sizing.xs * 2',
         });
+    });
+
+    it('can add a new box shadowtoken', () => {
+        cy.receiveTokenValues({
+            version: '5',
+            values: {
+                options: [],
+            },
+        });
+        cy.receiveStorageTypeLocal();
+        cy.get('[data-cy=tokenlisting-boxShadow] [data-cy=button-add-new-token]').click({timeout: 1000});
+        fillInput({
+            input: 'name',
+            value: 'boxshadow.regular',
+        });
+        fillInput({
+            input: 'x',
+            value: '4',
+        });
+        fillInput({
+            input: 'y',
+            value: '4',
+        });
+        fillInput({
+            input: 'spread',
+            value: '0',
+        });
+        fillInput({
+            input: 'color',
+            value: '#ff0000',
+        });
+        fillInput({
+            input: 'blur',
+            value: '0',
+            submit: true,
+        });
+        cy.get('@postMessage').should('be.calledTwice');
+        receiveRemoteComponents();
+    });
+
+    it('can add a new typography token', () => {
+        cy.receiveTokenValues({
+            version: '5',
+            values: {
+                options: [],
+            },
+        });
+        cy.receiveStorageTypeLocal();
+        cy.get('[data-cy=tokenlisting-typography] [data-cy=button-add-new-token]').click({timeout: 1000});
+        fillInput({
+            input: 'name',
+            value: 'typography.regular',
+        });
+        fillInput({
+            input: 'fontFamily',
+            value: 'Inter',
+        });
+        fillInput({
+            input: 'fontWeight',
+            value: 'Bold',
+        });
+        fillInput({
+            input: 'lineHeight',
+            value: '100%',
+        });
+        fillInput({
+            input: 'fontSize',
+            value: '14',
+        });
+        fillInput({
+            input: 'letterSpacing',
+            value: '0',
+        });
+        fillInput({
+            input: 'paragraphSpacing',
+            value: '0',
+            submit: true,
+        });
+        cy.get('@postMessage').should('be.calledTwice');
+        receiveRemoteComponents();
     });
 
     it('can add a new token in group', () => {
