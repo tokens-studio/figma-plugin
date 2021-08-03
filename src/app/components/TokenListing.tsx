@@ -44,7 +44,7 @@ const TokenListing = ({
     const showForm = ({token, name, isPristine = false}) => {
         dispatch.uiState.setShowEditForm(true);
         dispatch.uiState.setEditToken({
-            value: token.value,
+            value: token.value ? token.value : typeof schema?.value === 'object' ? {} : '',
             name,
             initialName: name,
             isPristine,

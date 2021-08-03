@@ -1,4 +1,5 @@
 import {Parser} from 'expr-eval';
+import convertOpacityToFigma from '@/plugin/figmaTransforms/opacity';
 import {postToFigma} from '../../plugin/notifiers';
 import {MessageToPluginTypes} from '../../../types/messages';
 import {hexToRgb, RGBAToHexA} from '../../plugin/figmaTransforms/colors';
@@ -57,7 +58,7 @@ export function convertToRgb(color: string) {
                     } else {
                         [r, g, b, alpha = '1'] = matchedColor.split(',').map((n) => n.trim());
                     }
-                    const a = Number(alpha);
+                    const a = convertOpacityToFigma(alpha);
                     returnedColor = returnedColor.split(matchedString).join(RGBAToHexA(r, g, b, a));
                 });
             }
