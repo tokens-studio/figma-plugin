@@ -47,6 +47,7 @@ interface UIState {
     lastOpened: string | null;
     editToken: EditToken | null;
     showEditForm: boolean;
+    tokenFilter: string;
 }
 
 export const uiState = createModel<RootModel>()({
@@ -72,6 +73,7 @@ export const uiState = createModel<RootModel>()({
         lastOpened: '',
         editToken: null,
         showEditForm: false,
+        tokenFilter: '',
     } as UIState,
     reducers: {
         setDisabled: (state, data: boolean) => {
@@ -171,6 +173,12 @@ export const uiState = createModel<RootModel>()({
             return {
                 ...state,
                 lastOpened: payload,
+            };
+        },
+        setTokenFilter(state, payload: string) {
+            return {
+                ...state,
+                tokenFilter: payload,
             };
         },
     },

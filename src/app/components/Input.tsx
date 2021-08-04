@@ -12,6 +12,7 @@ const Input = ({
     type,
     custom = '',
     inputRef = null,
+    placeholder = '',
 }) => {
     return (
         <label htmlFor={name} className="text-xxs font-medium block">
@@ -29,6 +30,7 @@ const Input = ({
                 required={required}
                 data-custom={custom}
                 ref={inputRef}
+                placeholder={placeholder}
             />
         </label>
     );
