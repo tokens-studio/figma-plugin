@@ -61,11 +61,11 @@ export function appendTypeToToken(token) {
 }
 
 // Creates a tokens object so that tokens are displayed in groups in the UI.
-export function createTokensObject(tokens: SingleTokenObject[], tokenFilter: string) {
+export function createTokensObject(tokens: SingleTokenObject[], tokenFilter = '') {
     if (tokens.length > 0) {
         const tokensSorted = sortTokens(tokens);
         const obj = tokensSorted.reduce((acc, cur) => {
-            if (tokenFilter === '' || (cur.name && cur.name.toLowerCase().search(tokenFilter.toLowerCase()) >= 0)) {
+            if (tokenFilter === '' || cur.name?.toLowerCase().search(tokenFilter?.toLowerCase()) >= 0) {
                 const hasTypeProp = cur.type && cur.type !== '' && cur.type !== 'undefined';
                 const propToSet = hasTypeProp ? cur.type : transformName(cur.name.split('.').slice(0, 1).toString());
                 acc[propToSet] = acc[propToSet] || {values: {}};
