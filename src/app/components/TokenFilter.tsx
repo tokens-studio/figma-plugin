@@ -18,8 +18,16 @@ const TokenFilter = () => {
         debounced(value);
     };
 
+    const searchInput: React.RefObject<HTMLInputElement> = React.useRef(null);
+
+    React.useEffect(() => {
+        setTimeout(() => {
+            searchInput.current.focus();
+        }, 50);
+    }, []);
+
     return (
-        <div className="flex flex-col flex-grow p-4">
+        <div className="flex flex-col flex-grow p-4 pb-0">
             <Input
                 full
                 label="Filter tokens"
@@ -28,6 +36,7 @@ const TokenFilter = () => {
                 onChange={(e) => handleChange(e.target.value)}
                 type="search"
                 name="filter"
+                inputRef={searchInput}
             />
         </div>
     );

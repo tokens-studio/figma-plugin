@@ -26,7 +26,7 @@ interface TokenListingType {
 
 const Tokens = ({isActive}) => {
     const {tokens, usedTokenSet, activeTokenSet} = useSelector((state: RootState) => state.tokenState);
-    const {showEditForm, tokenFilter} = useSelector((state: RootState) => state.uiState);
+    const {showEditForm, tokenFilter, tokenFilterVisible} = useSelector((state: RootState) => state.uiState);
 
     const resolvedTokens = React.useMemo(() => {
         return resolveTokenValues(computeMergedTokens(tokens, [...usedTokenSet, activeTokenSet]));
@@ -44,7 +44,7 @@ const Tokens = ({isActive}) => {
     return (
         <div>
             <TokenSetSelector />
-            <TokenFilter />
+            {tokenFilterVisible && <TokenFilter />}
             {memoizedTokens.map(([key, group]: [string, TokenListingType]) => {
                 return (
                     <div key={key}>
