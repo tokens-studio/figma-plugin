@@ -61,15 +61,17 @@ export function appendTypeToToken(token) {
 }
 
 // Creates a tokens object so that tokens are displayed in groups in the UI.
-export function createTokensObject(tokens: SingleTokenObject[]) {
+export function createTokensObject(tokens: SingleTokenObject[], tokenFilter: string) {
     if (tokens.length > 0) {
         const tokensSorted = sortTokens(tokens);
         const obj = tokensSorted.reduce((acc, cur) => {
-            const hasTypeProp = cur.type && cur.type !== '' && cur.type !== 'undefined';
-            const propToSet = hasTypeProp ? cur.type : transformName(cur.name.split('.').slice(0, 1).toString());
-            acc[propToSet] = acc[propToSet] || {values: {}};
-            acc[propToSet].values = acc[propToSet].values || {};
-            set(acc[propToSet].values, cur.name, {...cur, type: hasTypeProp ? cur.type : propToSet});
+            if (tokenFilter === '' || (cur.name && cur.name.search(tokenFilter) >= 0)) {
+                const hasTypeProp = cur.type && cur.type !== '' && cur.type !== 'undefined';
+                const propToSet = hasTypeProp ? cur.type : transformName(cur.name.split('.').slice(0, 1).toString());
+                acc[propToSet] = acc[propToSet] || {values: {}};
+                acc[propToSet].values = acc[propToSet].values || {};
+                set(acc[propToSet].values, cur.name, {...cur, type: hasTypeProp ? cur.type : propToSet});
+            }
             return acc;
         }, {});
         return obj;
@@ -78,9 +80,9 @@ export function createTokensObject(tokens: SingleTokenObject[]) {
 }
 
 // Takes an array of tokens, transforms them into an object and merges that with values we require for the UI
-export function mappedTokens(tokens: SingleTokenObject[]) {
+export function mappedTokens(tokens: SingleTokenObject[], tokenFilter: string) {
     const tokenObj = {};
-    Object.entries(createTokensObject(tokens)).forEach(
+    Object.entries(createTokensObject(tokens, tokenFilter)).forEach(
         ([key, group]: [string, {values: SingleTokenObject[]; type?: TokenType}]) => {
             tokenObj[key] = {
                 values: group.values,

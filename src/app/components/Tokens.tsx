@@ -8,6 +8,7 @@ import ToggleEmptyButton from './ToggleEmptyButton';
 import {mappedTokens} from './createTokenObj';
 import {RootState} from '../store';
 import TokenSetSelector from './TokenSetSelector';
+import TokenFilter from './TokenFilter';
 import EditTokenFormModal from './EditTokenFormModal';
 
 interface TokenListingType {
@@ -25,7 +26,7 @@ interface TokenListingType {
 
 const Tokens = ({isActive}) => {
     const {tokens, usedTokenSet, activeTokenSet} = useSelector((state: RootState) => state.tokenState);
-    const {showEditForm} = useSelector((state: RootState) => state.uiState);
+    const {showEditForm, tokenFilter, tokenFilterVisible} = useSelector((state: RootState) => state.uiState);
 
     const resolvedTokens = React.useMemo(() => {
         return resolveTokenValues(computeMergedTokens(tokens, [...usedTokenSet, activeTokenSet]));
@@ -33,16 +34,17 @@ const Tokens = ({isActive}) => {
 
     const memoizedTokens = React.useMemo(() => {
         if (tokens[activeTokenSet]) {
-            return mappedTokens(tokens[activeTokenSet]);
+            return mappedTokens(tokens[activeTokenSet], tokenFilter);
         }
         return [];
-    }, [tokens, activeTokenSet]);
+    }, [tokens, activeTokenSet, tokenFilter]);
 
     if (!isActive) return null;
 
     return (
         <div>
             <TokenSetSelector />
+            {tokenFilterVisible && <TokenFilter />}
             {memoizedTokens.map(([key, group]: [string, TokenListingType]) => {
                 return (
                     <div key={key}>

@@ -1,13 +1,12 @@
 import * as React from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {track} from '@/utils/analytics';
+import {MagnifyingGlassIcon} from '@radix-ui/react-icons';
 import Icon from './Icon';
 import Tooltip from './Tooltip';
 import useRemoteTokens from '../store/remoteTokens';
 import {StorageProviderType} from '../../../types/api';
 import {RootState, Dispatch} from '../store';
-import useTokens from '../store/useTokens';
-import Button from './Button';
 
 const TabButton = ({name, label, first = false}) => {
     const {activeTab} = useSelector((state: RootState) => state.uiState);
@@ -46,6 +45,7 @@ const transformProviderName = (provider) => {
 
 const Navbar = () => {
     const {projectURL, storageType} = useSelector((state: RootState) => state.uiState);
+    const {toggleFilterVisibility} = useDispatch<Dispatch>().uiState;
     const {pullTokens} = useRemoteTokens();
 
     return (
@@ -58,6 +58,11 @@ const Navbar = () => {
                 <TabButton name="settings" label="Settings" />
             </div>
             <div className="flex flex-row items-center">
+                <Tooltip variant="right" label="Filter tokens">
+                    <button onClick={toggleFilterVisibility} type="button" className="button button-ghost">
+                        <MagnifyingGlassIcon />
+                    </button>
+                </Tooltip>
                 {storageType.provider !== StorageProviderType.LOCAL && (
                     <>
                         {projectURL && (
