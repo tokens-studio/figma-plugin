@@ -297,6 +297,9 @@ export const tokenState = createModel<RootModel>()({
                 dispatch.tokenState.updateDocument();
             }
         },
+        toggleUsedTokenSet(payload, rootState) {
+            dispatch.tokenState.updateDocument(true);
+        },
         createToken(payload, rootState) {
             if (payload.shouldUpdate && rootState.settings.updateOnChange) {
                 dispatch.tokenState.updateDocument();
