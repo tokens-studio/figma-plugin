@@ -26,10 +26,11 @@ export async function getUISettings() {
             width = parsedData.width || 400;
             height = parsedData.height || 600;
             updateMode = parsedData.updateMode || UpdateMode.PAGE;
-            updateRemote = parsedData.updateRemote || true;
-            updateOnChange = parsedData.updateOnChange || true;
-            updateStyles = parsedData.updateStyles || true;
-            ignoreFirstPartForStyles = parsedData.ignoreFirstPartForStyles || true;
+            updateRemote = typeof parsedData.updateRemote === 'undefined' ? true : parsedData.updateRemote;
+            updateOnChange = typeof parsedData.updateOnChange === 'undefined' ? true : parsedData.updateOnChange;
+            updateStyles = typeof parsedData.updateStyles === 'undefined' ? true : parsedData.updateStyles;
+            ignoreFirstPartForStyles =
+                typeof parsedData.ignoreFirstPartForStyles === 'undefined' ? true : parsedData.ignoreFirstPartForStyles;
             notifyUISettings({
                 width,
                 height,
