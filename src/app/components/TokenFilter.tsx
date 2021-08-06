@@ -30,7 +30,6 @@ const TokenFilter = () => {
         <div className="flex flex-col flex-grow p-4 pb-0">
             <Input
                 full
-                label="Filter tokens"
                 placeholder="Filter on name"
                 value={tokenString}
                 onChange={(e) => handleChange(e.target.value)}
