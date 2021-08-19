@@ -118,6 +118,9 @@ const EditTokenForm = () => {
                     custom={currentEditToken.schema}
                 />
             )}
+            {currentEditToken.explainer && (
+                <div className="mt-1 text-xxs text-gray-600">{currentEditToken.explainer}</div>
+            )}
             {currentEditToken.optionsSchema
                 ? Object.entries(currentEditToken.optionsSchema).map(([key, schemaValue]: [string, string]) => (
                       <Input
@@ -132,9 +135,6 @@ const EditTokenForm = () => {
                       />
                   ))
                 : null}
-            {currentEditToken.explainer && (
-                <div className="mt-1 text-xxs text-gray-600">{currentEditToken.explainer}</div>
-            )}
             <div className="flex space-x-2 justify-end">
                 <button className="button button-link" type="button" onClick={handleReset}>
                     Cancel
