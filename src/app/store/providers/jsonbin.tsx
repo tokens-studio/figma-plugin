@@ -51,7 +51,9 @@ async function writeTokensToJSONBin({secret, id, tokenObj}): Promise<TokenProps>
     return null;
 }
 
-export async function updateJSONBinTokens({tokens, id, secret, updatedAt, oldUpdatedAt = null}) {
+export async function updateJSONBinTokens({tokens, context, updatedAt, oldUpdatedAt = null}) {
+    const {id, secret} = context;
+
     try {
         const tokenObj = JSON.stringify(
             {
@@ -86,7 +88,8 @@ export function useJSONbin() {
     const dispatch = useDispatch<Dispatch>();
     const {setStorageType} = useStorage();
 
-    async function createNewJSONBin({provider, secret, tokens, name, updatedAt}): Promise<TokenProps> {
+    async function createNewJSONBin(context): Promise<TokenProps> {
+        const {secret, tokens, name, updatedAt} = context;
         const response = await fetch(`https://api.jsonbin.io/v3/b`, {
             method: 'POST',
             mode: 'cors',
@@ -108,8 +111,16 @@ export function useJSONbin() {
         });
         if (response.ok) {
             const jsonBinData = await response.json();
-            dispatch.uiState.setApiData({id: jsonBinData.metadata.id, name, secret, provider});
-            setStorageType({provider: {id: jsonBinData.metadata.id, name, provider}, bool: true});
+            dispatch.uiState.setApiData({
+                id: jsonBinData.metadata.id,
+                name,
+                secret,
+                provider: StorageProviderType.JSONBIN,
+            });
+            setStorageType({
+                provider: {id: jsonBinData.metadata.id, name, provider: StorageProviderType.JSONBIN},
+                bool: true,
+            });
             updateJSONBinTokens({
                 tokens,
                 id: jsonBinData.metadata.id,
@@ -121,7 +132,7 @@ export function useJSONbin() {
                 id: jsonBinData.metadata.id,
                 name,
                 secret,
-                provider,
+                provider: StorageProviderType.JSONBIN,
             });
             return tokens;
         }
@@ -131,8 +142,9 @@ export function useJSONbin() {
 
     // Read tokens from JSONBin
 
-    async function fetchDataFromJSONBin(id, secret, name): Promise<TokenProps> {
+    async function fetchDataFromJSONBin(context): Promise<TokenProps> {
         let tokenValues;
+        const {id, secret, name} = context;
 
         if (!id && !secret) return;
 

@@ -5,32 +5,35 @@ import {StorageProviderType} from '../../../types/api';
 import {notifyToUI, postToFigma} from '../../plugin/notifiers';
 import {updateJSONBinTokens} from './providers/jsonbin';
 import {updateURLTokens} from './providers/url';
+import {updateGitHubTokens} from './providers/github';
+
+type ContextObject = {
+    id: string;
+    secret: string;
+};
 
 async function updateRemoteTokens({
     provider,
     tokens,
-    id,
-    secret,
+    context,
     updatedAt,
     oldUpdatedAt,
 }: {
     provider: StorageProviderType;
     tokens: TokenProps;
-    id: string;
-    secret: string;
+    context: ContextObject;
     updatedAt: string;
     oldUpdatedAt?: string;
 }) {
     notifyToUI('Updating remote...');
 
-    if (!id && !secret) return;
+    if (!context) return;
 
     switch (provider) {
         case StorageProviderType.JSONBIN: {
             updateJSONBinTokens({
                 tokens,
-                id,
-                secret,
+                context,
                 updatedAt,
                 oldUpdatedAt,
             });
@@ -39,8 +42,16 @@ async function updateRemoteTokens({
         case StorageProviderType.URL: {
             updateURLTokens({
                 tokens,
-                id,
-                secret,
+                context,
+                updatedAt,
+                oldUpdatedAt,
+            });
+            break;
+        }
+        case StorageProviderType.GITHUB: {
+            updateGitHubTokens({
+                tokens,
+                context,
                 updatedAt,
                 oldUpdatedAt,
             });
@@ -71,8 +82,7 @@ export default async function updateTokensOnSources({
         updateRemoteTokens({
             provider: storageType.provider,
             tokens,
-            id: api.id,
-            secret: api.secret,
+            context: api,
             updatedAt,
             oldUpdatedAt: lastUpdatedAt,
         });

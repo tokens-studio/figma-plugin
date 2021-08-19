@@ -8,38 +8,37 @@ import {compareUpdatedAt} from '../components/utils';
 import {Dispatch, RootState} from '../store';
 import useStorage from './useStorage';
 import {useURL} from './providers/url';
+import {useGitHub} from './providers/github';
 
 export default function useRemoteTokens() {
     const dispatch = useDispatch<Dispatch>();
     const {api, lastUpdatedAt, localApiState} = useSelector((state: RootState) => state.uiState);
 
     const {setStorageType} = useStorage();
-    const {fetchDataFromArcade, editArcadeToken, createArcadeToken, deleteArcadeToken} = useArcade();
+    const {editArcadeToken, createArcadeToken, deleteArcadeToken} = useArcade();
     const {fetchDataFromJSONBin, createNewJSONBin} = useJSONbin();
     const {fetchDataFromURL, createNewURL} = useURL();
+    const {fetchDataFromGitHub, createNewGitHub} = useGitHub();
 
     const pullTokens = async () => {
-        const {id, secret, provider, name} = api;
-        if (!id && !secret) return;
-
         dispatch.uiState.setLoading(true);
 
         notifyToUI('Fetching from remote...');
         let tokenValues;
 
-        switch (provider) {
+        switch (api.provider) {
             case StorageProviderType.JSONBIN: {
-                tokenValues = await fetchDataFromJSONBin(id, secret, name);
+                tokenValues = await fetchDataFromJSONBin(api);
                 notifyToUI('Updated!');
                 break;
             }
             case StorageProviderType.URL: {
-                tokenValues = await fetchDataFromURL(id, secret, name);
+                tokenValues = await fetchDataFromURL(api);
                 notifyToUI('Updated!');
                 break;
             }
-            case StorageProviderType.ARCADE: {
-                tokenValues = await fetchDataFromArcade(id, secret, name);
+            case StorageProviderType.GITHUB: {
+                tokenValues = await fetchDataFromGitHub(api);
                 notifyToUI('Updated!');
                 break;
             }
@@ -91,30 +90,30 @@ export default function useRemoteTokens() {
         deleteArcadeToken({id, secret, data});
     }
 
-    async function fetchDataFromRemote(id, secret, name, provider): Promise<TokenProps> {
+    async function fetchDataFromRemote(context): Promise<TokenProps> {
         notifyToUI('Fetching remote tokens...');
 
-        switch (provider) {
+        switch (context.provider) {
             case StorageProviderType.JSONBIN: {
-                return fetchDataFromJSONBin(id, secret, name);
+                return fetchDataFromJSONBin(context);
             }
             case StorageProviderType.URL: {
-                return fetchDataFromURL(id, secret, name);
+                return fetchDataFromURL(context);
             }
-            case StorageProviderType.ARCADE: {
-                return fetchDataFromArcade(id, secret, name);
+            case StorageProviderType.GITHUB: {
+                return fetchDataFromGitHub(context);
             }
             default:
                 throw new Error('Strategy not implemented');
         }
     }
 
-    const syncTokens = async ({id, secret, provider = localApiState.provider, name}) => {
+    const syncTokens = async (context) => {
         dispatch.uiState.setLoading(true);
-        const remoteTokens = await fetchDataFromRemote(id, secret, name, provider as StorageProviderType);
+        const remoteTokens = await fetchDataFromRemote(context);
         if (remoteTokens) {
-            setStorageType({provider: {provider, id, name}, bool: true});
-            dispatch.uiState.setApiData({id, secret, name, provider});
+            setStorageType({provider: context, bool: true});
+            dispatch.uiState.setApiData(context);
             const comparison = await compareUpdatedAt(lastUpdatedAt, remoteTokens);
             if (comparison === 'remote_older') {
                 dispatch.tokenState.setTokenData(remoteTokens);
@@ -128,21 +127,20 @@ export default function useRemoteTokens() {
         return null;
     };
 
-    async function addNewProviderItem({id, provider, secret, tokens, name, updatedAt}): Promise<TokenProps | null> {
+    async function addNewProviderItem(context): Promise<TokenProps | null> {
         notifyToUI('Checking credentials...');
 
-        switch (provider) {
+        switch (context.provider) {
             case StorageProviderType.JSONBIN: {
-                if (id) {
-                    return syncTokens({id, secret, provider: StorageProviderType.JSONBIN, name});
+                if (context.id) {
+                    return syncTokens(context);
                 }
-                return createNewJSONBin({provider, secret, tokens, name, updatedAt});
+                return createNewJSONBin(context);
             }
-            case StorageProviderType.URL: {
-                return syncTokens({id, secret, provider: StorageProviderType.URL, name});
-            }
+            case StorageProviderType.URL:
+            case StorageProviderType.GITHUB:
             case StorageProviderType.ARCADE: {
-                return syncTokens({id, secret, provider: StorageProviderType.ARCADE, name});
+                return syncTokens(context);
             }
             default:
                 throw new Error('Not implemented');

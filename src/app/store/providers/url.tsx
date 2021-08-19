@@ -49,7 +49,9 @@ async function writeTokensToURL({secret, id, tokenObj}): Promise<TokenProps> | n
     return null;
 }
 
-export async function updateURLTokens({tokens, id, secret, updatedAt, oldUpdatedAt = null}) {
+export async function updateURLTokens({tokens, context, updatedAt, oldUpdatedAt = null}) {
+    const {id, secret} = context;
+
     try {
         const tokenObj = JSON.stringify(
             {
@@ -89,8 +91,10 @@ export function useURL() {
 
     // Read tokens from JSONBin
 
-    async function fetchDataFromURL(id, secret, name): Promise<TokenProps> {
+    async function fetchDataFromURL(context): Promise<TokenProps> {
         let tokenValues;
+
+        const {id, secret, name} = context;
 
         if (!id && !secret) return;
 

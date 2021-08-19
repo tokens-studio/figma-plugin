@@ -17,4 +17,5 @@ export enum StorageProviderType {
     ARCADE = 'arcade',
     JSONBIN = 'jsonbin',
     URL = 'url',
+    GITHUB = 'github',
 }
