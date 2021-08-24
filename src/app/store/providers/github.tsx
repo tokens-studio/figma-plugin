@@ -1,6 +1,5 @@
 import {useDispatch} from 'react-redux';
 import {Dispatch} from '@/app/store';
-import {StorageProviderType} from 'Types/api';
 import {MessageToPluginTypes} from 'Types/messages';
 import {TokenProps} from 'Types/tokens';
 import convertTokensToObject from '@/utils/convertTokensToObject';
@@ -22,76 +21,97 @@ const fetchUsername = async (context) => {
 
 const fetchBranches = async (context) => {
     const octokit = new Octokit({auth: context.accessToken});
-    const branches = await octokit.repos.listBranches({owner, repo}).then((response) => response.data);
+    const branches = await octokit.repos
+        .listBranches({owner: context.owner, repo: context.repo})
+        .then((response) => response.data);
     return branches.map((branch) => branch.name);
 };
-const commitToNewBranch = async (context) => {
+
+const readContents = async (context) => {
+    console.log('reading', context);
     const octokit = new Octokit({auth: context.accessToken});
-    await octokit.repos.createOrUpdateFile({
-        owner,
-        repo,
-        branch: context.newBranchName,
+    let response;
+    try {
+        response = await octokit.rest.repos.getContent({
+            owner: context.owner,
+            repo: context.repo,
+            path: context.filePath,
+            ref: context.branch,
+        });
+        console.log('response status is', response.status);
+        return response;
+    } catch (e) {
+        if (e === 'HttpError: Bad credentials') {
+            throw new Error('UNAUTHORIZED');
+        }
+        return null;
+    }
+};
+
+const commitToNewBranch = async (context, tokenObj) => {
+    console.log('Committing to existinewng', context);
+
+    const octokit = new Octokit({auth: context.accessToken});
+    return octokit.repos.createOrUpdateFileContents({
+        owner: context.owner,
+        repo: context.repo,
+        branch: context.branch,
         createBranch: true,
-        message: context.commitMessage || context.defaultCommitMessage,
-        content: 'My new content',
+        message: context.commitMessage || 'Test commit',
+        content: btoa(tokenObj),
+        path: context.filePath,
     });
 };
 
-const commitToExistingBranch = async (context) => {
+const commitToExistingBranch = async (context, tokenObj) => {
+    console.log('Committing to existing', context);
     const octokit = new Octokit({auth: context.accessToken});
-    await octokit.repos.createOrUpdateFile({
-        owner,
-        repo,
-        branch: context.existingBranchName,
+    return octokit.repos.createOrUpdateFileContents({
+        owner: context.owner,
+        repo: context.repo,
+        branch: context.branch,
         createBranch: false,
-        message: context.commitMessage || context.defaultCommitMessage,
-        content: 'My new content',
+        message: context.commitMessage || 'Test commit',
+        content: btoa(tokenObj),
+        path: context.filePath,
     });
 };
 
 async function readTokensFromGitHub(context): Promise<TokenProps> | null {
-    const user = await fetchUsername(context);
-    const branches = await fetchBranches(context);
-    console.log('user, branches', user, branches);
-
-    // const response = await fetch(`https://api.github.com/${id}/git/contents/${filename}`, {
-    //     method: 'GET',
-    //     headers: {
-    //         Authorization: secret,
-    //         Accept: 'application/vnd.github.v3+json',
-    //     },
-    // });
-
-    // if (response.ok) {
-    //     const data = await response.json();
-    //     const decoded = atob(data.content);
-    //     const parsed = JSON.parse(decoded);
-    //     return parsed;
-    // }
-    notifyToUI('There was an error connecting, check your sync settings');
-    return null;
+    try {
+        const response = await readContents(context);
+        console.log('RESPONSE IS', response);
+        if (response) {
+            if (response.data.content) {
+                const data = atob(response.data.content);
+                const parsed = JSON.parse(data);
+                return parsed;
+            } else {
+            }
+        }
+    } catch (e) {
+        notifyToUI('There was an error connecting, check your sync settings');
+        return null;
+    }
 }
 
 async function writeTokensToGitHub({context, tokenObj}): Promise<TokenProps> | null {
-    const commitResponse = await commitToNewBranch(context);
-    console.log('Commitresponse', commitResponse);
-    // const response = await fetch(`https://api.github.com/${id}/git/dispatches`, {
-    //     method: 'POST',
-    //     body: {
-    //         message: 'Commit from Figma Tokens',
-    //         content: tokenObj,
-    //     },
-    //     headers: {
-    //         Authorization: secret,
-    //         Accept: 'application/vnd.github.v3+json',
-    //     },
-    // });
+    const user = await fetchUsername(context);
+    const branches = await fetchBranches(context);
+    console.log('user, branches', user, branches);
+    let result;
+    if (branches.includes(context.branch)) {
+        console.log('Branch exists, read file from this branch');
+        // If File exists read from that file
 
-    // if (response.ok) {
-    //     const res = await response.json();
-    //     notifyToUI('Updated Remote');
-    //     return res;
-    // }
+        // Else commit to this existing branch
+        result = await commitToExistingBranch(context, tokenObj);
+    } else {
+        console.log('Branch does not exist, read file from this branch');
+
+        result = await commitToNewBranch(context, tokenObj);
+    }
+    console.log('Result is', result);
     notifyToUI('Error updating remote');
     return null;
 }
@@ -120,7 +140,7 @@ export async function updateGitHubTokens(context) {
                 notifyToUI('Error updating tokens as remote is newer, please update first');
             }
         } else {
-            writeTokensToGitHub({secret, id, tokenObj});
+            writeTokensToGitHub({context, tokenObj});
         }
     } catch (e) {
         console.log('Error updating jsonbin', e);
@@ -130,10 +150,6 @@ export async function updateGitHubTokens(context) {
 export function useGitHub() {
     const dispatch = useDispatch<Dispatch>();
 
-    async function createNewGitHub({provider, secret, tokens, name, updatedAt}): Promise<TokenProps> {
-        return null;
-    }
-
     // Read tokens from JSONBin
 
     async function fetchDataFromGitHub(context): Promise<TokenProps> {
@@ -141,7 +157,7 @@ export function useGitHub() {
 
         try {
             const data = await readTokensFromGitHub(context);
-            dispatch.uiState.setProjectURL(context.id);
+            console.log('DATA IS', data);
 
             if (data) {
                 postToFigma({
@@ -160,6 +176,9 @@ export function useGitHub() {
                 } else {
                     notifyToUI('No tokens stored on remote');
                 }
+            } else {
+                // No data on GitHub yet, commit it
+                writeTokensToGitHub({context, tokenObj});
             }
 
             return tokenValues;
@@ -170,6 +189,5 @@ export function useGitHub() {
     }
     return {
         fetchDataFromGitHub,
-        createNewGitHub,
     };
 }

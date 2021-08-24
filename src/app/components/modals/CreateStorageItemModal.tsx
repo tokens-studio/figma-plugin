@@ -2,6 +2,7 @@ import React from 'react';
 import {reduceToValues} from '@/plugin/tokenHelpers';
 import {useSelector} from 'react-redux';
 import {RootState} from '@/app/store';
+import {StorageProviderType} from 'Types/api';
 import Modal from '../Modal';
 import Heading from '../Heading';
 import StorageItemForm from '../StorageItemForm';
@@ -12,17 +13,35 @@ export default function CreateStorageItemModal({isOpen, onClose, onSuccess}) {
     const {localApiState} = useSelector((state: RootState) => state.uiState);
     const {addNewProviderItem} = useRemoteTokens();
     const [hasErrored, setHasErrored] = React.useState(false);
-    const [formFields, setFormFields] = React.useState({id: '', name: '', secret: ''});
+    let defaultFields;
+    switch (localApiState.provider) {
+        case StorageProviderType.GITHUB: {
+            defaultFields = {
+                accessToken: '',
+                repo: '',
+                owner: '',
+                branch: '',
+                filePath: '',
+            };
+            break;
+        }
+        default:
+            defaultFields = {id: '', name: '', secret: ''};
+            break;
+    }
+    const [formFields, setFormFields] = React.useState(defaultFields);
+
+    React.useEffect(() => {
+        console.log('FF changed', formFields);
+    }, [formFields]);
 
     const handleCreateNewClick = async () => {
         setHasErrored(false);
         const response = await addNewProviderItem({
-            id: formFields.id,
             provider: localApiState.provider,
-            secret: formFields.secret,
             tokens: reduceToValues(tokens),
-            name: formFields.name,
             updatedAt: Date.now(),
+            ...formFields,
         });
         if (response) {
             onSuccess();
