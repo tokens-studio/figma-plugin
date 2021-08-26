@@ -30,7 +30,9 @@ export async function getUISettings() {
             updateOnChange = typeof parsedData.updateOnChange === 'undefined' ? true : parsedData.updateOnChange;
             updateStyles = typeof parsedData.updateStyles === 'undefined' ? true : parsedData.updateStyles;
             ignoreFirstPartForStyles =
-                typeof parsedData.ignoreFirstPartForStyles === 'undefined' ? true : parsedData.ignoreFirstPartForStyles;
+                typeof parsedData.ignoreFirstPartForStyles === 'undefined'
+                    ? false
+                    : parsedData.ignoreFirstPartForStyles;
             notifyUISettings({
                 width,
                 height,
