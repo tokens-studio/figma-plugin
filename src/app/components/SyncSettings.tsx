@@ -38,9 +38,12 @@ const SyncSettings = () => {
     };
 
     const selectedRemoteProvider = () => {
-        return [StorageProviderType.JSONBIN, StorageProviderType.ARCADE, StorageProviderType.URL].includes(
-            localApiState?.provider as StorageProviderType
-        );
+        return [
+            StorageProviderType.JSONBIN,
+            StorageProviderType.ARCADE,
+            StorageProviderType.URL,
+            StorageProviderType.GITHUB,
+        ].includes(localApiState?.provider as StorageProviderType);
     };
 
     const storedApiProviders = () => {
@@ -142,6 +145,22 @@ const SyncSettings = () => {
                             }}
                             text="JSONbin"
                             id={StorageProviderType.JSONBIN}
+                        />
+                        <ProviderSelector
+                            isActive={localApiState?.provider === StorageProviderType.GITHUB}
+                            isStored={storageType?.provider === StorageProviderType.GITHUB}
+                            onClick={() => {
+                                dispatch.uiState.setLocalApiState({
+                                    name: '',
+                                    accessToken: '',
+                                    repo: '',
+                                    owner: '',
+                                    branch: '',
+                                    provider: StorageProviderType.GITHUB,
+                                });
+                            }}
+                            text="GitHub"
+                            id={StorageProviderType.GITHUB}
                         />
                         <ProviderSelector
                             isActive={localApiState?.provider === StorageProviderType.URL}
