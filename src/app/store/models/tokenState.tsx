@@ -97,7 +97,6 @@ export const tokenState = createModel<RootModel>()({
             };
         },
         renameTokenSet: (state, data: {oldName: string; newName: string}) => {
-            // Handle add new token set
             const oldTokens = state.tokens;
             oldTokens[data.newName] = oldTokens[data.oldName];
             delete oldTokens[data.oldName];
@@ -108,8 +107,14 @@ export const tokenState = createModel<RootModel>()({
             };
         },
         setTokenSetOrder: (state, data: string[]) => {
-            // Handle reorder token set
-            return state;
+            const newTokens = {};
+            data.map((set) => {
+                Object.assign(newTokens, {[set]: state.tokens[set]});
+            });
+            return {
+                ...state,
+                tokens: newTokens,
+            };
         },
         resetImportedTokens: (state) => {
             return {
@@ -181,7 +186,11 @@ export const tokenState = createModel<RootModel>()({
                 values.map((token: TokenGroup) => {
                     const oldValue = state.tokens[state.activeTokenSet].find((t) => t.name === token.name);
                     if (oldValue) {
-                        if (oldValue.value?.toUpperCase() === token.value.toUpperCase()) {
+                        if (
+                            typeof oldValue.value === 'string' &&
+                            typeof token.value === 'string' &&
+                            oldValue.value?.toUpperCase() === token.value.toUpperCase()
+                        ) {
                             if (
                                 oldValue.description === token.description ||
                                 (typeof token.description === 'undefined' && oldValue.description === '')
@@ -292,6 +301,9 @@ export const tokenState = createModel<RootModel>()({
             if (payload.shouldUpdate) {
                 dispatch.tokenState.updateDocument();
             }
+        },
+        toggleUsedTokenSet(payload, rootState) {
+            dispatch.tokenState.updateDocument(true);
         },
         createToken(payload, rootState) {
             if (payload.shouldUpdate && rootState.settings.updateOnChange) {

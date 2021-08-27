@@ -41,10 +41,10 @@ const TokenListing = ({
 
     const [isIntCollapsed, setIntCollapsed] = React.useState(false);
 
-    const showForm = ({value, name, isPristine = false}) => {
+    const showForm = ({token, name, isPristine = false}) => {
         dispatch.uiState.setShowEditForm(true);
         dispatch.uiState.setEditToken({
-            value,
+            value: token.value ? token.value : typeof schema?.value === 'object' ? {} : '',
             name,
             initialName: name,
             isPristine,
@@ -53,14 +53,14 @@ const TokenListing = ({
             schema: schema?.value,
             optionsSchema: schema?.options,
             options: {
-                description: value.description,
+                description: token.description,
                 type: tokenType,
             },
         });
     };
 
     const showNewForm = ({name = ''}: {name?: string}) => {
-        showForm({value: '', name, isPristine: true});
+        showForm({token: '', name, isPristine: true});
     };
 
     React.useEffect(() => {

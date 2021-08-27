@@ -1,4 +1,5 @@
 import {Parser} from 'expr-eval';
+import convertOpacityToFigma from '@/plugin/figmaTransforms/opacity';
 import {postToFigma} from '../../plugin/notifiers';
 import {MessageToPluginTypes} from '../../../types/messages';
 import {hexToRgb, RGBAToHexA} from '../../plugin/figmaTransforms/colors';
@@ -27,7 +28,7 @@ export function isTypographyToken(token) {
 }
 
 export function isSingleToken(token): token is {value: string} {
-    return typeof token === 'object' && 'value' in token;
+    return typeof token === 'object' && 'value' in token && 'type' in token && 'name' in token;
 }
 
 // Convert non-conform colors to RGB value that can be used throughout the plugin
@@ -53,11 +54,11 @@ export function convertToRgb(color: string) {
                     let alpha = '1';
                     if (matchesHex) {
                         ({r, g, b} = hexToRgb(matchesHex[0]));
-                        alpha = matchedColor.split(', ').pop();
+                        alpha = matchedColor.split(',').pop().trim();
                     } else {
                         [r, g, b, alpha = '1'] = matchedColor.split(',').map((n) => n.trim());
                     }
-                    const a = Number(alpha);
+                    const a = convertOpacityToFigma(alpha);
                     returnedColor = returnedColor.split(matchedString).join(RGBAToHexA(r, g, b, a));
                 });
             }
@@ -106,25 +107,6 @@ export function lightOrDark(color: string) {
         console.error(e);
     }
     return 'light';
-}
-
-// Sets random color depending on Hash for use in colorful UI
-export function colorByHashCode(value) {
-    let hash = 0;
-    if (value.length === 0) return hash;
-    for (let i = 0; i < value.length; i += 1) {
-        hash = value.charCodeAt(i) * 30 + hash;
-    }
-    const shortened = Math.abs(hash % 360);
-    return `${shortened},100%,85%`;
-}
-
-// Not in use for now, converts string to hashCode
-export function hashCode(s) {
-    return s.split('').reduce(function (a, b) {
-        a = (a << 5) - a + b.charCodeAt(0);
-        return a & a;
-    }, 0);
 }
 
 // Converts string to slug

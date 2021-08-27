@@ -41,7 +41,7 @@ export const settings = createModel<RootModel>()({
         updateOnChange: true,
         updateStyles: true,
         tokenType: 'object',
-        ignoreFirstPartForStyles: true,
+        ignoreFirstPartForStyles: false,
     } as SettingsState,
     reducers: {
         setWindowSize(state, payload: {width: number; height: number}) {

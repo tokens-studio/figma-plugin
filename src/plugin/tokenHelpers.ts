@@ -22,31 +22,28 @@ export function reduceToValues(tokens) {
 export function resolveTokenValues(tokens, previousCount = undefined) {
     const aliases = findAllAliases(tokens);
     let returnedTokens = tokens;
-    if (aliases.length > 0) {
-        returnedTokens = tokens.map((t) => {
-            let returnValue;
-            // Iterate over Typography and boxShadow Object to get resolved values
-            if (['typography', 'boxShadow'].includes(t.type)) {
-                returnValue = Object.entries(t.value).reduce((acc, [key, value]) => {
-                    acc[key] = getAliasValue(value, tokens);
-                    return acc;
-                }, {});
-            } else {
-                // If we're not dealing with special tokens, just return resolved value
-                returnValue = getAliasValue(t, tokens);
-            }
-            return {
-                ...t,
-                value: returnValue,
-                rawValue: t.rawValue || t.value,
-            };
-        });
-        if (previousCount > aliases.length || !previousCount) {
-            return resolveTokenValues(returnedTokens, aliases.length);
+    returnedTokens = tokens.map((t) => {
+        let returnValue;
+        // Iterate over Typography and boxShadow Object to get resolved values
+        if (['typography', 'boxShadow'].includes(t.type)) {
+            returnValue = Object.entries(t.value).reduce((acc, [key, value]) => {
+                acc[key] = getAliasValue(value, tokens);
+                return acc;
+            }, {});
+        } else {
+            // If we're not dealing with special tokens, just return resolved value
+            returnValue = getAliasValue(t, tokens);
         }
-
-        return returnedTokens;
+        return {
+            ...t,
+            value: returnValue,
+            rawValue: t.rawValue || t.value,
+        };
+    });
+    if (aliases.length > 0 && (previousCount > aliases.length || !previousCount)) {
+        return resolveTokenValues(returnedTokens, aliases.length);
     }
+
     return returnedTokens;
 }
 

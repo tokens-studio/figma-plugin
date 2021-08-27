@@ -3,7 +3,7 @@ import {useSelector} from 'react-redux';
 import {MessageToPluginTypes} from 'Types/messages';
 import checkIfAlias from '@/utils/checkIfAlias';
 import {getAliasValue} from '@/utils/aliases';
-import {SingleToken, SingleTokenObject} from 'Types/tokens';
+import {SingleTokenObject} from 'Types/tokens';
 import stringifyTokens from '@/utils/stringifyTokens';
 import formatTokens from '@/utils/formatTokens';
 import {computeMergedTokens, resolveTokenValues} from '@/plugin/tokenHelpers';
@@ -15,10 +15,10 @@ export default function useTokens() {
     const settings = useSelector((state: RootState) => state.settings);
 
     // Finds token that matches name
-    function findToken(token: string) {
-        const resolved = resolveTokenValues(computeMergedTokens(tokens, usedTokenSet));
+    function findToken(name: string) {
+        const resolved = resolveTokenValues(computeMergedTokens(tokens, [...usedTokenSet, activeTokenSet]));
 
-        return resolved.find((n) => n.name === token);
+        return resolved.find((n) => n.name === name);
     }
 
     // Gets value of token

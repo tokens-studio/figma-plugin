@@ -6,92 +6,69 @@ import setTextValuesOnTarget from './setTextValuesOnTarget';
 export default async function setValuesOnNode(node, values, data) {
     try {
         // BORDER RADIUS
-        if (values.borderRadius) {
-            if (typeof node.cornerRadius !== 'undefined') {
-                node.cornerRadius = transformValue(values.borderRadius || values.borderRadiusTopLeft, 'borderRadius');
-            }
+        if (typeof values.borderRadius !== 'undefined' && typeof node.cornerRadius !== 'undefined') {
+            node.cornerRadius = transformValue(values.borderRadius, 'borderRadius');
         }
-        if (values.borderRadiusTopLeft) {
-            if (typeof node.topLeftRadius !== 'undefined') {
-                node.topLeftRadius = transformValue(values.borderRadiusTopLeft, 'borderRadius');
-            }
+        if (typeof values.borderRadiusTopLeft !== 'undefined' && typeof node.topLeftRadius !== 'undefined') {
+            node.topLeftRadius = transformValue(values.borderRadiusTopLeft, 'borderRadius');
         }
-        if (values.borderRadiusTopRight) {
-            if (typeof node.topRightRadius !== 'undefined') {
-                node.topRightRadius = transformValue(values.borderRadiusTopRight, 'borderRadius');
-            }
+        if (typeof values.borderRadiusTopRight !== 'undefined' && typeof node.topRightRadius !== 'undefined') {
+            node.topRightRadius = transformValue(values.borderRadiusTopRight, 'borderRadius');
         }
-        if (values.borderRadiusBottomRight) {
-            if (typeof node.bottomRightRadius !== 'undefined') {
-                node.bottomRightRadius = transformValue(values.borderRadiusBottomRight, 'borderRadius');
-            }
+        if (typeof values.borderRadiusBottomRight !== 'undefined' && typeof node.bottomRightRadius !== 'undefined') {
+            node.bottomRightRadius = transformValue(values.borderRadiusBottomRight, 'borderRadius');
         }
-        if (values.borderRadiusBottomLeft) {
-            if (typeof node.bottomLeftRadius !== 'undefined') {
-                node.bottomLeftRadius = transformValue(values.borderRadiusBottomLeft, 'borderRadius');
-            }
+        if (typeof values.borderRadiusBottomLeft !== 'undefined' && typeof node.bottomLeftRadius !== 'undefined') {
+            node.bottomLeftRadius = transformValue(values.borderRadiusBottomLeft, 'borderRadius');
         }
 
         // BOX SHADOW
-        if (values.boxShadow) {
-            if (typeof node.effects !== 'undefined') {
-                // get all effects, but remove DROP_SHADOW, since we're about to add it
-                const effects = node.effects.filter((effect) => effect.type !== 'DROP_SHADOW');
-                const {x, y, spread, color, blur} = values.boxShadow;
-                const {
-                    color: {r, g, b},
-                    opacity,
-                } = convertToFigmaColor(color);
+        if (typeof values.boxShadow !== 'undefined' && typeof node.effects !== 'undefined') {
+            // get all effects, but remove DROP_SHADOW, since we're about to add it
+            const effects = node.effects.filter((effect) => effect.type !== 'DROP_SHADOW');
+            const {x, y, spread, color, blur} = values.boxShadow;
+            const {
+                color: {r, g, b},
+                opacity,
+            } = convertToFigmaColor(color);
 
-                const effect: ShadowEffect = {
-                    type: 'DROP_SHADOW',
-                    visible: true,
-                    blendMode: 'NORMAL',
-                    color: {r, g, b, a: opacity},
-                    offset: {x: transformValue(x, 'boxShadow'), y: transformValue(y, 'boxShadow')},
-                    radius: transformValue(blur, 'boxShadow'),
-                    spread: transformValue(spread, 'boxShadow'),
-                };
+            const effect: ShadowEffect = {
+                type: 'DROP_SHADOW',
+                visible: true,
+                blendMode: 'NORMAL',
+                color: {r, g, b, a: opacity},
+                offset: {x: transformValue(x, 'boxShadow'), y: transformValue(y, 'boxShadow')},
+                radius: transformValue(blur, 'boxShadow'),
+                spread: transformValue(spread, 'boxShadow'),
+            };
 
-                effects.push(effect);
-                node.effects = effects;
-            }
+            effects.push(effect);
+            node.effects = effects;
         }
 
         // BORDER WIDTH
-        if (values.borderWidth) {
-            // Has to be larger than 0
-            if (typeof node.strokeWeight !== 'undefined' && transformValue(values.borderWidth, 'borderWidth') >= 0) {
-                node.strokeWeight = transformValue(values.borderWidth, 'borderWidth');
-            }
+        if (typeof values.borderWidth !== 'undefined' && typeof node.strokeWeight !== 'undefined') {
+            node.strokeWeight = transformValue(values.borderWidth, 'borderWidth');
         }
 
         // OPACITY
-        if (values.opacity) {
-            if (typeof node.opacity !== 'undefined') {
-                node.opacity = transformValue(values.opacity, 'opacity');
-            }
+        if (typeof values.opacity !== 'undefined' && typeof node.opacity !== 'undefined') {
+            node.opacity = transformValue(values.opacity, 'opacity');
         }
 
         // SIZING: BOTH
-        if (values.sizing) {
-            if (typeof node.resize !== 'undefined') {
-                node.resize(transformValue(values.sizing, 'sizing'), transformValue(values.sizing, 'sizing'));
-            }
+        if (typeof values.sizing !== 'undefined' && typeof node.resize !== 'undefined') {
+            node.resize(transformValue(values.sizing, 'sizing'), transformValue(values.sizing, 'sizing'));
         }
 
         // SIZING: WIDTH
-        if (values.width) {
-            if (typeof node.resize !== 'undefined') {
-                node.resize(transformValue(values.width, 'sizing'), node.height);
-            }
+        if (typeof values.width !== 'undefined' && typeof node.resize !== 'undefined') {
+            node.resize(transformValue(values.width, 'sizing'), node.height);
         }
 
         // SIZING: HEIGHT
-        if (values.height) {
-            if (typeof node.resize !== 'undefined') {
-                node.resize(node.width, transformValue(values.height, 'sizing'));
-            }
+        if (typeof values.height !== 'undefined' && typeof node.resize !== 'undefined') {
+            node.resize(node.width, transformValue(values.height, 'sizing'));
         }
 
         // FILL
@@ -147,8 +124,8 @@ export default async function setValuesOnNode(node, values, data) {
             }
         }
 
-        // BORDER WIDTH
-        if (values.border) {
+        // BORDER COLOR
+        if (typeof values.border !== 'undefined') {
             if (typeof node.strokes !== 'undefined') {
                 const paints = figma.getLocalPaintStyles();
                 const path = data.border.split('.');
@@ -166,52 +143,36 @@ export default async function setValuesOnNode(node, values, data) {
         }
 
         // SPACING
-        if (values.spacing) {
-            if (typeof node.paddingLeft !== 'undefined') {
-                node.paddingLeft = transformValue(values.spacing, 'spacing');
-                node.paddingRight = transformValue(values.spacing, 'spacing');
-                node.paddingTop = transformValue(values.spacing, 'spacing');
-                node.paddingBottom = transformValue(values.spacing, 'spacing');
-                node.itemSpacing = transformValue(values.spacing, 'spacing');
-            }
+        if (typeof values.spacing !== 'undefined' && typeof node.paddingLeft !== 'undefined') {
+            node.paddingLeft = transformValue(values.spacing, 'spacing');
+            node.paddingRight = transformValue(values.spacing, 'spacing');
+            node.paddingTop = transformValue(values.spacing, 'spacing');
+            node.paddingBottom = transformValue(values.spacing, 'spacing');
+            node.itemSpacing = transformValue(values.spacing, 'spacing');
         }
-        if (values.horizontalPadding) {
-            if (typeof node.paddingLeft !== 'undefined') {
-                node.paddingLeft = transformValue(values.horizontalPadding, 'spacing');
-                node.paddingRight = transformValue(values.horizontalPadding, 'spacing');
-            }
+        if (typeof values.horizontalPadding !== 'undefined' && typeof node.paddingLeft !== 'undefined') {
+            node.paddingLeft = transformValue(values.horizontalPadding, 'spacing');
+            node.paddingRight = transformValue(values.horizontalPadding, 'spacing');
         }
-        if (values.verticalPadding) {
-            if (typeof node.paddingTop !== 'undefined') {
-                node.paddingTop = transformValue(values.verticalPadding, 'spacing');
-                node.paddingBottom = transformValue(values.verticalPadding, 'spacing');
-            }
+        if (typeof values.verticalPadding !== 'undefined' && typeof node.paddingTop !== 'undefined') {
+            node.paddingTop = transformValue(values.verticalPadding, 'spacing');
+            node.paddingBottom = transformValue(values.verticalPadding, 'spacing');
         }
-        if (values.itemSpacing) {
-            if (typeof node.itemSpacing !== 'undefined') {
-                node.itemSpacing = transformValue(values.itemSpacing, 'spacing');
-            }
+        if (typeof values.itemSpacing !== 'undefined' && typeof node.itemSpacing !== 'undefined') {
+            node.itemSpacing = transformValue(values.itemSpacing, 'spacing');
         }
 
-        if (values.paddingTop) {
-            if (typeof node.paddingTop !== 'undefined') {
-                node.paddingTop = transformValue(values.paddingTop, 'spacing');
-            }
+        if (typeof values.paddingTop !== 'undefined' && typeof node.paddingTop !== 'undefined') {
+            node.paddingTop = transformValue(values.paddingTop, 'spacing');
         }
-        if (values.paddingRight) {
-            if (typeof node.paddingRight !== 'undefined') {
-                node.paddingRight = transformValue(values.paddingRight, 'spacing');
-            }
+        if (typeof values.paddingRight !== 'undefined' && typeof node.paddingRight !== 'undefined') {
+            node.paddingRight = transformValue(values.paddingRight, 'spacing');
         }
-        if (values.paddingBottom) {
-            if (typeof node.paddingBottom !== 'undefined') {
-                node.paddingBottom = transformValue(values.paddingBottom, 'spacing');
-            }
+        if (typeof values.paddingBottom !== 'undefined' && typeof node.paddingBottom !== 'undefined') {
+            node.paddingBottom = transformValue(values.paddingBottom, 'spacing');
         }
-        if (values.paddingLeft) {
-            if (typeof node.paddingLeft !== 'undefined') {
-                node.paddingLeft = transformValue(values.paddingLeft, 'spacing');
-            }
+        if (typeof values.paddingLeft !== 'undefined' && typeof node.paddingLeft !== 'undefined') {
+            node.paddingLeft = transformValue(values.paddingLeft, 'spacing');
         }
 
         // Raw value for text layers

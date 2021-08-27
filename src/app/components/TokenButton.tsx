@@ -13,12 +13,12 @@ import TokenTooltip from './TokenTooltip';
 export function useGetActiveState(properties, type, name) {
     const uiState = useSelector((state: RootState) => state.uiState);
 
-    const active = uiState.selectionValues[type] === name;
-    const semiActive = properties.some((prop) => {
-        return uiState.selectionValues[prop.name] === name;
-    });
-
-    return {active, semiActive};
+    return (
+        uiState.selectionValues[type] === name ||
+        properties.some((prop) => {
+            return uiState.selectionValues[prop.name] === name;
+        })
+    );
 }
 
 const TokenButton = ({
@@ -51,7 +51,7 @@ const TokenButton = ({
     const buttonClass = [];
 
     const handleEditClick = () => {
-        showForm({name, value: token.value});
+        showForm({name, token});
     };
 
     const handleDeleteClick = () => {
@@ -85,6 +85,7 @@ const TokenButton = ({
             break;
         case 'spacing':
             properties = [
+                {label: 'Gap', name: 'itemSpacing', icon: 'Gap'},
                 {
                     label: 'All',
                     icon: 'Spacing',
@@ -103,7 +104,6 @@ const TokenButton = ({
                 {label: 'Right', name: 'paddingRight'},
                 {label: 'Bottom', name: 'paddingBottom'},
                 {label: 'Left', name: 'paddingLeft'},
-                {label: 'Gap', name: 'itemSpacing', icon: 'Gap'},
             ];
             break;
         case 'sizing':
@@ -144,12 +144,10 @@ const TokenButton = ({
             break;
     }
 
-    const {active, semiActive} = useGetActiveState(properties, type, name);
+    const active = useGetActiveState(properties, type, name);
 
     if (active) {
         buttonClass.push('button-active');
-    } else if (semiActive) {
-        buttonClass.push('button-semi-active');
     }
 
     const onClick = (givenProperties, isActive = active) => {

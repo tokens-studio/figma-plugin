@@ -1,4 +1,46 @@
-import {convertToRgb, isTypographyToken, lightOrDark, slugify} from './utils';
+import {convertToRgb, isTypographyToken, lightOrDark, slugify, checkAndEvaluateMath, isSingleToken} from './utils';
+
+describe('checkmath', () => {
+    it('calculates math', () => {
+        const input = '25 * 4.5 + 0.175';
+        const output = 112.675;
+        expect(checkAndEvaluateMath(input)).toEqual(output);
+    });
+});
+
+describe('isSingleToken', () => {
+    it('correctly asserts a single token', () => {
+        const basic = {
+            type: 'color',
+            name: 'colors.blue',
+            value: '#0000ff',
+        };
+        const extraData = {
+            type: 'color',
+            name: 'colors.blue',
+            value: '#0000ff',
+            description: 'Such wow.',
+        };
+        expect(isSingleToken(basic)).toBe(true);
+        expect(isSingleToken(extraData)).toBe(true);
+    });
+    it('rejects token groups', () => {
+        const wrongToken = {
+            label: {
+                type: 'color',
+                name: 'colors.blue',
+                value: '#0000ff',
+            },
+            value: {
+                type: 'color',
+                name: 'colors.blue',
+                value: '#0000ff',
+            },
+        };
+
+        expect(isSingleToken(wrongToken)).toBe(false);
+    });
+});
 
 describe('isTypographyToken', () => {
     it('returns truthiness of a typography token and only accepts tokens that feature required values', () => {
@@ -37,10 +79,12 @@ describe('isTypographyToken', () => {
 
 describe('convertToRgb', () => {
     it('transforms a color string to rgb values', () => {
-        const rgbhex = 'rgb(#ff0000, 0.5)';
+        const rgbhexWithSpace = 'rgb(#ff0000, 0.5)';
+        const rgbahexWithOutSpace = 'rgba(#ff0000,0.5)';
         const hex = '#ff0000';
 
-        expect(convertToRgb(rgbhex)).toBe('#ff000080');
+        expect(convertToRgb(rgbhexWithSpace)).toBe('#ff000080');
+        expect(convertToRgb(rgbahexWithOutSpace)).toBe('#ff000080');
         expect(convertToRgb(hex)).toBe('#ff0000');
     });
 

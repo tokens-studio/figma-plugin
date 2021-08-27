@@ -60,6 +60,26 @@ export default async function removeValuesFromNode(node, prop) {
                 node.itemSpacing = 0;
             }
             break;
+        case 'paddingTop':
+            if (typeof node.paddingTop !== 'undefined') {
+                node.paddingTop = 0;
+            }
+            break;
+        case 'paddingRight':
+            if (typeof node.paddingRight !== 'undefined') {
+                node.paddingRight = 0;
+            }
+            break;
+        case 'paddingBottom':
+            if (typeof node.paddingBottom !== 'undefined') {
+                node.paddingBottom = 0;
+            }
+            break;
+        case 'paddingLeft':
+            if (typeof node.paddingLeft !== 'undefined') {
+                node.paddingLeft = 0;
+            }
+            break;
         case 'horizontalPadding':
             if (typeof node.paddingLeft !== 'undefined') {
                 node.paddingLeft = 0;

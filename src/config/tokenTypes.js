@@ -3,11 +3,21 @@ export default {
         label: 'Size',
         property: 'Size',
         type: 'sizing',
+        schema: {
+            options: {
+                description: '',
+            },
+        },
     },
     spacing: {
         label: 'Space',
-        property: 'Space',
+        property: 'Value',
         type: 'spacing',
+        schema: {
+            options: {
+                description: '',
+            },
+        },
     },
     color: {
         label: 'Colors',
@@ -26,18 +36,33 @@ export default {
         label: 'Border Radius',
         property: 'Border Radius',
         type: 'borderRadius',
+        schema: {
+            options: {
+                description: '',
+            },
+        },
     },
     borderWidth: {
         label: 'Border Width',
         property: 'Border Width',
         type: 'borderWidth',
         explainer: 'Enter as a number, e.g. 4',
+        schema: {
+            options: {
+                description: '',
+            },
+        },
     },
     opacity: {
         label: 'Opacity',
         property: 'Opacity',
         type: 'opacity',
-        explainer: 'Set as 50%',
+        explainer: 'Set as 50% or 0.5',
+        schema: {
+            options: {
+                description: '',
+            },
+        },
     },
     boxShadow: {
         label: 'Box Shadow',
@@ -78,37 +103,72 @@ export default {
         label: 'Font Families',
         property: 'Font Family',
         type: 'fontFamilies',
+        schema: {
+            options: {
+                description: '',
+            },
+        },
     },
     fontWeights: {
         help: 'Only works in combination with a Font Family',
         label: 'Font Weights',
         property: 'Font Weight',
         type: 'fontWeights',
+        schema: {
+            options: {
+                description: '',
+            },
+        },
     },
     lineHeights: {
         label: 'Line Heights',
         explainer: 'e.g. 100% or 14',
         property: 'Line Height',
         type: 'lineHeights',
+        schema: {
+            options: {
+                description: '',
+            },
+        },
     },
     fontSizes: {
         label: 'Font Sizes',
         property: 'Font Size',
         type: 'fontSizes',
+        schema: {
+            options: {
+                description: '',
+            },
+        },
     },
     letterSpacing: {
         label: 'Letter Spacing',
         property: 'Letter Spacing',
         type: 'letterSpacing',
+        schema: {
+            options: {
+                description: '',
+            },
+        },
     },
     paragraphSpacing: {
         label: 'Paragraph Spacing',
         property: 'ParagraphSpacing',
         type: 'paragraphSpacing',
+        schema: {
+            options: {
+                description: '',
+            },
+        },
     },
     other: {
         label: 'Other',
         property: 'other',
         type: 'other',
+        schema: {
+            options: {
+                description: '',
+            },
+        },
     },
 };

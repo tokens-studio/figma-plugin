@@ -1,4 +1,4 @@
-import {convertTypographyNumberToFigma} from './figmaTransforms/generic';
+import {convertTypographyNumberToFigma, fakeZeroForFigma} from './figmaTransforms/generic';
 import {convertLetterSpacingToFigma} from './figmaTransforms/letterSpacing';
 import {convertLineHeightToFigma} from './figmaTransforms/lineHeight';
 import convertOpacityToFigma from './figmaTransforms/opacity';
@@ -54,14 +54,16 @@ export async function getUserId() {
 
 export function transformValue(value, type) {
     switch (type) {
+        case 'borderWidth':
+        case 'width':
+        case 'height':
+        case 'sizing':
+            return fakeZeroForFigma(convertTypographyNumberToFigma(value));
         case 'borderRadius':
         case 'borderRadiusTopLeft':
         case 'borderRadiusTopRight':
         case 'borderRadiusBottomRight':
         case 'borderRadiusBottomLeft':
-        case 'width':
-        case 'height':
-        case 'sizing':
         case 'spacing':
         case 'horizontalPadding':
         case 'verticalPadding':
@@ -70,7 +72,6 @@ export function transformValue(value, type) {
         case 'paddingBottom':
         case 'paddingLeft':
         case 'itemSpacing':
-        case 'borderWidth':
         case 'boxShadow':
         case 'paragraphSpacing':
         case 'fontSizes':
