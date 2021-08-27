@@ -85,6 +85,7 @@ const TokenButton = ({
             break;
         case 'spacing':
             properties = [
+                {label: 'Gap', name: 'itemSpacing', icon: 'Gap'},
                 {
                     label: 'All',
                     icon: 'Spacing',
@@ -103,7 +104,6 @@ const TokenButton = ({
                 {label: 'Right', name: 'paddingRight'},
                 {label: 'Bottom', name: 'paddingBottom'},
                 {label: 'Left', name: 'paddingLeft'},
-                {label: 'Gap', name: 'itemSpacing', icon: 'Gap'},
             ];
             break;
         case 'sizing':
