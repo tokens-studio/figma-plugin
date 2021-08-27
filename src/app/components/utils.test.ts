@@ -79,10 +79,12 @@ describe('isTypographyToken', () => {
 
 describe('convertToRgb', () => {
     it('transforms a color string to rgb values', () => {
-        const rgbhex = 'rgb(#ff0000, 0.5)';
+        const rgbhexWithSpace = 'rgb(#ff0000, 0.5)';
+        const rgbahexWithOutSpace = 'rgba(#ff0000,0.5)';
         const hex = '#ff0000';
 
-        expect(convertToRgb(rgbhex)).toBe('#ff000080');
+        expect(convertToRgb(rgbhexWithSpace)).toBe('#ff000080');
+        expect(convertToRgb(rgbahexWithOutSpace)).toBe('#ff000080');
         expect(convertToRgb(hex)).toBe('#ff0000');
     });
 

@@ -2,7 +2,7 @@ import {checkAndEvaluateMath, convertToRgb} from '@/app/components/utils';
 import {SingleTokenObject} from 'Types/tokens';
 import checkIfValueToken from './checkIfValueToken';
 
-export const aliasRegex = /(\$[^\s]+\w)|({[^\s]+})/g;
+export const aliasRegex = /(\$[^\s,]+\w)|({[^\s]+})/g;
 
 export function getAliasValue(token: SingleTokenObject, tokens = []): string | null {
     try {

@@ -54,7 +54,7 @@ export function convertToRgb(color: string) {
                     let alpha = '1';
                     if (matchesHex) {
                         ({r, g, b} = hexToRgb(matchesHex[0]));
-                        alpha = matchedColor.split(', ').pop();
+                        alpha = matchedColor.split(',').pop().trim();
                     } else {
                         [r, g, b, alpha = '1'] = matchedColor.split(',').map((n) => n.trim());
                     }
