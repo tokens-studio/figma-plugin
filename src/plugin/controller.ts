@@ -80,8 +80,8 @@ figma.ui.onmessage = async (msg) => {
             sendPluginValues(figma.currentPage.selection);
             return;
         case MessageToPluginTypes.CREDENTIALS: {
-            const {secret, id, provider, name} = msg;
-            updateCredentials({secret, id, name, provider});
+            const {type, ...context} = msg;
+            updateCredentials(context);
             break;
         }
         case MessageToPluginTypes.REMOVE_SINGLE_CREDENTIAL: {

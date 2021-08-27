@@ -31,28 +31,19 @@ export default function EditStorageItemForm({
                     <Input
                         full
                         label="Personal Access Token"
-                        value={values.accessToken}
+                        value={values.secret}
                         onChange={handleChange}
                         type="text"
-                        name="accessToken"
+                        name="secret"
                         required
                     />
                     <Input
                         full
-                        label="Repository"
-                        value={values.repo}
+                        label="Repository (:username/:repo)"
+                        value={values.id}
                         onChange={handleChange}
                         type="text"
-                        name="repo"
-                        required
-                    />
-                    <Input
-                        full
-                        label="Owner"
-                        value={values.owner}
-                        onChange={handleChange}
-                        type="text"
-                        name="owner"
+                        name="id"
                         required
                     />
                     <Input

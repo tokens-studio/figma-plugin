@@ -17,9 +17,8 @@ export default function CreateStorageItemModal({isOpen, onClose, onSuccess}) {
     switch (localApiState.provider) {
         case StorageProviderType.GITHUB: {
             defaultFields = {
-                accessToken: '',
-                repo: '',
-                owner: '',
+                secret: '',
+                id: '',
                 branch: '',
                 filePath: '',
             };

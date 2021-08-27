@@ -71,10 +71,9 @@ export default function Initiator() {
                         break;
                     case MessageFromPluginTypes.API_CREDENTIALS: {
                         if (status === true) {
-                            const {id, secret, name, provider} = credentials;
-                            dispatch.uiState.setApiData({id, secret, name, provider});
-                            dispatch.uiState.setLocalApiState({id, secret, name, provider});
-                            const remoteValues = await fetchDataFromRemote(id, secret, name, provider);
+                            dispatch.uiState.setApiData(credentials);
+                            dispatch.uiState.setLocalApiState(credentials);
+                            const remoteValues = await fetchDataFromRemote(credentials);
                             if (remoteValues) {
                                 dispatch.tokenState.setTokenData(remoteValues);
                                 dispatch.uiState.setActiveTab('tokens');

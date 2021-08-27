@@ -152,9 +152,8 @@ const SyncSettings = () => {
                             onClick={() => {
                                 dispatch.uiState.setLocalApiState({
                                     name: '',
-                                    accessToken: '',
-                                    repo: '',
-                                    owner: '',
+                                    secret: '',
+                                    id: '',
                                     branch: '',
                                     provider: StorageProviderType.GITHUB,
                                 });
