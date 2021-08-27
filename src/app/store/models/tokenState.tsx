@@ -97,7 +97,6 @@ export const tokenState = createModel<RootModel>()({
             };
         },
         renameTokenSet: (state, data: {oldName: string; newName: string}) => {
-            // Handle add new token set
             const oldTokens = state.tokens;
             oldTokens[data.newName] = oldTokens[data.oldName];
             delete oldTokens[data.oldName];
@@ -108,8 +107,14 @@ export const tokenState = createModel<RootModel>()({
             };
         },
         setTokenSetOrder: (state, data: string[]) => {
-            // Handle reorder token set
-            return state;
+            const newTokens = {};
+            data.map((set) => {
+                Object.assign(newTokens, {[set]: state.tokens[set]});
+            });
+            return {
+                ...state,
+                tokens: newTokens,
+            };
         },
         resetImportedTokens: (state) => {
             return {
