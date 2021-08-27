@@ -15,11 +15,7 @@ export default function EditStorageItemModal({isOpen, initialValue, onClose, onS
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const response = await syncTokens({
-            id: formFields.id,
-            name: formFields.name,
-            secret: formFields.secret,
-        });
+        const response = await syncTokens(formFields);
         if (!response) {
             setHasErrored(true);
         } else {

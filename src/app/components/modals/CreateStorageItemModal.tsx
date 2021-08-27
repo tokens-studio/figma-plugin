@@ -1,5 +1,4 @@
 import React from 'react';
-import {reduceToValues} from '@/plugin/tokenHelpers';
 import {useSelector} from 'react-redux';
 import {RootState} from '@/app/store';
 import {StorageProviderType} from 'Types/api';
@@ -9,7 +8,6 @@ import StorageItemForm from '../StorageItemForm';
 import useRemoteTokens from '../../store/remoteTokens';
 
 export default function CreateStorageItemModal({isOpen, onClose, onSuccess}) {
-    const {tokens} = useSelector((state: RootState) => state.tokenState);
     const {localApiState} = useSelector((state: RootState) => state.uiState);
     const {addNewProviderItem} = useRemoteTokens();
     const [hasErrored, setHasErrored] = React.useState(false);
@@ -30,16 +28,10 @@ export default function CreateStorageItemModal({isOpen, onClose, onSuccess}) {
     }
     const [formFields, setFormFields] = React.useState(defaultFields);
 
-    React.useEffect(() => {
-        console.log('FF changed', formFields);
-    }, [formFields]);
-
     const handleCreateNewClick = async () => {
         setHasErrored(false);
         const response = await addNewProviderItem({
             provider: localApiState.provider,
-            tokens: reduceToValues(tokens),
-            updatedAt: Date.now(),
             ...formFields,
         });
         if (response) {

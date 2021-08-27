@@ -28,12 +28,7 @@ const SyncSettings = () => {
 
     const handleEditClick = (provider) => {
         track('Edit Credentials');
-        dispatch.uiState.setLocalApiState({
-            id: provider.id,
-            name: provider.name,
-            provider: provider.provider,
-            secret: provider.secret,
-        });
+        dispatch.uiState.setLocalApiState(provider);
         setShowEditStorageModalVisible(true);
     };
 

@@ -128,9 +128,9 @@ async function writeTokensToGitHub({
     return null;
 }
 
-function askUserIfPushOrPull() {
+function askUserIfPushLocal() {
     // Todo: Implement logic
-    return true;
+    return false;
 }
 
 export async function syncTokensWithGitHub({context, tokens}) {
@@ -152,7 +152,7 @@ export async function syncTokensWithGitHub({context, tokens}) {
         }
         // Is not the same, ask user if we should push changes or pull from repo
         console.log('IS not same!');
-        const userWantsToPush = await askUserIfPushOrPull();
+        const userWantsToPush = await askUserIfPushLocal();
         if (userWantsToPush) {
             // User wants to push
             await writeTokensToGitHub({context, tokenObj, owner, repo});
