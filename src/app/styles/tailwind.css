@@ -207,26 +207,22 @@ textarea::-webkit-scrollbar-thumb {
 
 .button-active {
     @apply bg-primary-100;
+    box-shadow: 0 0 0 2px theme('colors.primary.300');
 }
 
 .button-active:hover {
-    @apply bg-primary-100 bg-opacity-75;
-}
-
-.button-semi-active {
-    @apply bg-primary-100 bg-opacity-50;
-}
-
-.button-semi-active:hover {
-    @apply bg-primary-100 bg-opacity-25;
+    @apply bg-opacity-75 outline-none;
+    box-shadow: 0 0 0 2px theme('colors.primary.400');
 }
 
 .button-property-color {
     @apply rounded-full bg-transparent;
 }
 
-.button-property-color .button-active {
-    box-shadow: none;
+.button-property-color button:focus {
+    @apply rounded-full bg-transparent;
+    outline: none;
+    box-shadow: 0 0 0 2px theme('colors.primary.500');
 }
 
 .button-property-color .button-text::before {
@@ -241,23 +237,6 @@ textarea::-webkit-scrollbar-thumb {
 .button-property-color-listing {
     @apply rounded w-full p-1 -mb-1;
 }
-
-.button-property-color.button-active .button-text::before {
-    box-shadow: 0 0 0 1px black;
-}
-
-/* .button-active-fill::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    border-radius: 100%;
-    width: 100%;
-    height: 100%;
-    transform: scale(0.9);
-    border: 2px solid white;
-    pointer-events: none;
-} */
 
 .button-text {
     @apply px-2 py-1 flex items-center justify-start flex-shrink-0;
