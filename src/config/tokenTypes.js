@@ -72,9 +72,9 @@ export default {
             value: {
                 x: '',
                 y: '',
+                blur: '',
                 spread: '',
                 color: '',
-                blur: '',
             },
         },
     },
