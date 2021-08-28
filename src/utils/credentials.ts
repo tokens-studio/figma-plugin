@@ -4,6 +4,7 @@ import {notifyAPIProviders, notifyUI} from '@/plugin/notifiers';
 // update credentials
 export async function updateCredentials(context) {
     try {
+        delete context.new;
         const data = await figma.clientStorage.getAsync('apiProviders');
         let existingProviders = [];
         if (data) {
@@ -22,7 +23,6 @@ export async function updateCredentials(context) {
         } else {
             existingProviders.push({...context, internalId: generateId(24)});
         }
-
         await figma.clientStorage.setAsync('apiProviders', JSON.stringify(existingProviders));
         const newProviders = await figma.clientStorage.getAsync('apiProviders');
         notifyAPIProviders(JSON.parse(newProviders));

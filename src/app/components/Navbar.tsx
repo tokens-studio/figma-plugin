@@ -1,7 +1,7 @@
 import * as React from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {track} from '@/utils/analytics';
-import {MagnifyingGlassIcon} from '@radix-ui/react-icons';
+import {MagnifyingGlassIcon, DoubleArrowUpIcon} from '@radix-ui/react-icons';
 import Icon from './Icon';
 import Tooltip from './Tooltip';
 import useRemoteTokens from '../store/remoteTokens';
@@ -38,6 +38,8 @@ const transformProviderName = (provider) => {
             return 'JSONBin.io';
         case StorageProviderType.ARCADE:
             return 'Arcade';
+        case StorageProviderType.GITHUB:
+            return 'GitHub';
         default:
             return provider;
     }
@@ -46,7 +48,7 @@ const transformProviderName = (provider) => {
 const Navbar = () => {
     const {projectURL, storageType} = useSelector((state: RootState) => state.uiState);
     const {toggleFilterVisibility} = useDispatch<Dispatch>().uiState;
-    const {pullTokens} = useRemoteTokens();
+    const {pullTokens, pushTokens} = useRemoteTokens();
 
     return (
         <div className="sticky top-0 navbar bg-white flex items-center justify-between z-1 border-b border-gray-200">
@@ -77,6 +79,14 @@ const Navbar = () => {
                                 </a>
                             </Tooltip>
                         )}
+                        {storageType.provider === StorageProviderType.GITHUB && (
+                            <Tooltip variant="right" label={`Push to ${transformProviderName(storageType.provider)}`}>
+                                <button onClick={pushTokens} type="button" className="button button-ghost">
+                                    <DoubleArrowUpIcon />
+                                </button>
+                            </Tooltip>
+                        )}
+
                         <Tooltip variant="right" label={`Pull from ${transformProviderName(storageType.provider)}`}>
                             <button onClick={pullTokens} type="button" className="button button-ghost">
                                 <Icon name="refresh" />

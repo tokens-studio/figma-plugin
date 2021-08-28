@@ -4,6 +4,8 @@ import {MessageToPluginTypes} from 'Types/messages';
 import {TokenProps} from 'Types/tokens';
 import convertTokensToObject from '@/utils/convertTokensToObject';
 import {Octokit} from '@octokit/rest';
+import useConfirm from '@/app/hooks/useConfirm';
+import usePushDialog from '@/app/hooks/usePushDialog';
 import {notifyToUI, postToFigma} from '../../../plugin/notifiers';
 import * as pjs from '../../../../package.json';
 
@@ -42,7 +44,6 @@ function IsJsonString(str) {
 }
 
 export const readContents = async ({context, owner, repo}) => {
-    console.log('reading', context);
     const octokit = new Octokit({auth: context.secret});
     let response;
 
@@ -53,7 +54,6 @@ export const readContents = async ({context, owner, repo}) => {
             path: context.filePath,
             ref: context.branch,
         });
-        console.log('Response from file is', response);
         if (response.data.content) {
             const data = atob(response.data.content);
             // If content of file is parseable JSON, parse it
@@ -67,14 +67,12 @@ export const readContents = async ({context, owner, repo}) => {
         return null;
     } catch (e) {
         // Raise error (usually this is an auth error)
-        console.log('some error', e);
+        console.log('Error', e);
         return null;
     }
 };
 
-const commitToNewBranch = async ({context, tokenObj, owner, repo}) => {
-    console.log('Committing to new', context);
-
+const commitToNewBranch = async ({context, tokenObj, owner, repo, commitMessage}) => {
     const OctokitWithPlugin = Octokit.plugin(require('octokit-commit-multiple-files'));
     const octokit = new OctokitWithPlugin({auth: context.secret});
 
@@ -83,12 +81,11 @@ const commitToNewBranch = async ({context, tokenObj, owner, repo}) => {
         repo,
         branch: context.branch,
         createBranch: true,
-        changes: [{message: context.commitMessage || 'Test commit', files: {[context.filePath]: tokenObj}}],
+        changes: [{message: commitMessage || 'Commit from Figma', files: {[context.filePath]: tokenObj}}],
     });
 };
 
-const commitToExistingBranch = async ({context, tokenObj, owner, repo}) => {
-    console.log('Committing to existing', context);
+const commitToExistingBranch = async ({context, tokenObj, owner, repo, commitMessage}) => {
     const OctokitWithPlugin = Octokit.plugin(require('octokit-commit-multiple-files'));
     const octokit = new OctokitWithPlugin({auth: context.secret});
     return octokit.repos.createOrUpdateFiles({
@@ -96,7 +93,7 @@ const commitToExistingBranch = async ({context, tokenObj, owner, repo}) => {
         repo,
         branch: context.branch,
         createBranch: false,
-        changes: [{message: context.commitMessage || 'Test commit', files: {[context.filePath]: tokenObj}}],
+        changes: [{message: commitMessage || 'Commit from Figmaƒ', files: {[context.filePath]: tokenObj}}],
     });
 };
 
@@ -105,72 +102,78 @@ async function writeTokensToGitHub({
     tokenObj,
     owner,
     repo,
+    commitMessage,
 }: {
     context: ContextObject;
     tokenObj: string;
     owner: string;
     repo: string;
+    commitMessage?: string;
 }): Promise<TokenProps> | null {
     const branches = await fetchBranches({context, owner, repo});
-    console.log('Branches are', branches, context);
     if (!branches) return null;
     let result;
     if (branches.includes(context.branch)) {
-        console.log('Branch exists, read file from this branch');
-        result = await commitToExistingBranch({context, tokenObj, owner, repo});
+        result = await commitToExistingBranch({context, tokenObj, owner, repo, commitMessage});
     } else {
-        console.log('Branch does not exist, commit to new branch');
-
-        result = await commitToNewBranch({context, tokenObj, owner, repo});
+        result = await commitToNewBranch({context, tokenObj, owner, repo, commitMessage});
     }
-    console.log('Result is', result);
     notifyToUI('Error updating remote');
     return null;
 }
 
-function askUserIfPushLocal() {
-    // Todo: Implement logic
-    return false;
-}
-
-export async function syncTokensWithGitHub({context, tokens}) {
-    const rawTokenObj = {
-        version: pjs.plugin_version,
-        updatedAt: context.updatedAt,
-        values: convertTokensToObject(tokens),
-    };
-    const [owner, repo] = context.id.split('/');
-
-    const tokenObj = JSON.stringify(rawTokenObj, null, 2);
-    const content = await readContents({context, owner, repo});
-    if (content) {
-        console.log('Response is', content);
-        console.log('old tokens are', tokenObj);
-        if (content === tokenObj) {
-            console.log('Both are equal, do nothing');
-            return rawTokenObj;
-        }
-        // Is not the same, ask user if we should push changes or pull from repo
-        console.log('IS not same!');
-        const userWantsToPush = await askUserIfPushLocal();
-        if (userWantsToPush) {
-            // User wants to push
-            await writeTokensToGitHub({context, tokenObj, owner, repo});
-            return rawTokenObj;
-        }
-        return content;
-    }
-    // File does not exist, write it!
-    await writeTokensToGitHub({context, tokenObj, owner, repo});
-    return rawTokenObj;
+export async function pushTokensToGitHub({context}) {
+    return useGitHub().syncTokensWithGitHub({context});
 }
 
 export function useGitHub() {
     const {tokens} = useSelector((state: RootState) => state.tokenState);
+    const {confirm} = useConfirm();
+    const {pushDialog} = usePushDialog();
 
-    async function readTokensFromGitHub(context): Promise<TokenProps> | null {
+    async function askUserIfPull(): Promise<boolean> {
+        const isConfirmed = await confirm('Pull from GitHub?');
+        return isConfirmed;
+    }
+
+    async function syncTokensWithGitHub({context, shouldPush = false}) {
+        const rawTokenObj = {
+            version: pjs.plugin_version,
+            updatedAt: context.updatedAt,
+            values: convertTokensToObject(tokens),
+        };
+        const [owner, repo] = context.id.split('/');
+
+        const tokenObj = JSON.stringify(rawTokenObj, null, 2);
+        const content = await readContents({context, owner, repo});
+        if (content) {
+            if (content === tokenObj) {
+                return rawTokenObj;
+            }
+            // Is not the same, ask user if we should push changes or pull from repo
+            let userWantsToPull = true;
+            if (!shouldPush) {
+                userWantsToPull = await askUserIfPull();
+            }
+            if (shouldPush) {
+                const commitMessage = await pushDialog();
+                if (commitMessage) {
+                    await writeTokensToGitHub({context, tokenObj, owner, repo, commitMessage});
+                }
+            }
+            if (userWantsToPull) {
+                return content;
+            }
+            return rawTokenObj;
+        }
+        // File does not exist, write it!
+        await writeTokensToGitHub({context, tokenObj, owner, repo});
+        return rawTokenObj;
+    }
+
+    async function readTokensFromGitHub(context, shouldPush = false): Promise<TokenProps> | null {
         try {
-            return syncTokensWithGitHub({context, tokens});
+            return syncTokensWithGitHub({context, shouldPush});
         } catch (e) {
             notifyToUI('There was an error connecting, check your sync settings');
             return null;
@@ -182,15 +185,12 @@ export function useGitHub() {
 
         try {
             const data = await readTokensFromGitHub(context);
-            console.log('DATA IS', data);
 
             if (data) {
-                console.log('Giving Figma Credentials', context);
                 postToFigma({
                     type: MessageToPluginTypes.CREDENTIALS,
                     ...context,
                 });
-                console.log('Data values', data.values);
                 if (data?.values) {
                     const obj = {
                         version: data.version,
@@ -213,5 +213,6 @@ export function useGitHub() {
     return {
         fetchDataFromGitHub,
         readTokensFromGitHub,
+        syncTokensWithGitHub,
     };
 }

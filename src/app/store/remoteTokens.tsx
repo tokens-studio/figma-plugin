@@ -18,7 +18,7 @@ export default function useRemoteTokens() {
     const {editArcadeToken, createArcadeToken, deleteArcadeToken} = useArcade();
     const {fetchDataFromJSONBin, createNewJSONBin} = useJSONbin();
     const {fetchDataFromURL, createNewURL} = useURL();
-    const {fetchDataFromGitHub, createNewGitHub} = useGitHub();
+    const {fetchDataFromGitHub, readTokensFromGitHub} = useGitHub();
 
     const pullTokens = async () => {
         dispatch.uiState.setLoading(true);
@@ -47,6 +47,24 @@ export default function useRemoteTokens() {
         }
 
         dispatch.tokenState.setTokenData(tokenValues);
+        dispatch.uiState.setLoading(false);
+    };
+
+    const pushTokens = async () => {
+        dispatch.uiState.setLoading(true);
+
+        notifyToUI('Pushing to remote...');
+
+        switch (api.provider) {
+            case StorageProviderType.GITHUB: {
+                await readTokensFromGitHub(api, true);
+                notifyToUI('Updated!');
+                break;
+            }
+            default:
+                throw new Error('Not implemented');
+        }
+
         dispatch.uiState.setLoading(false);
     };
 
@@ -149,6 +167,7 @@ export default function useRemoteTokens() {
 
     return {
         pullTokens,
+        pushTokens,
         editRemoteToken,
         createRemoteToken,
         deleteRemoteToken,

@@ -5,7 +5,7 @@ import {StorageProviderType} from '../../../types/api';
 import {notifyToUI, postToFigma} from '../../plugin/notifiers';
 import {updateJSONBinTokens} from './providers/jsonbin';
 import {updateURLTokens} from './providers/url';
-import {syncTokensWithGitHub} from './providers/github';
+import {pushTokensToGitHub} from './providers/github';
 
 type ContextObject = {
     id: string;
@@ -49,7 +49,7 @@ async function updateRemoteTokens({
             break;
         }
         case StorageProviderType.GITHUB: {
-            syncTokensWithGitHub({context, tokens});
+            pushTokensToGitHub({context});
             break;
         }
         case StorageProviderType.ARCADE: {

@@ -49,6 +49,11 @@ interface UIState {
     showEditForm: boolean;
     tokenFilter: string;
     tokenFilterVisible: boolean;
+    confirmState: {
+        show: boolean;
+        text?: string;
+    };
+    showPushDialog: boolean;
 }
 
 export const uiState = createModel<RootModel>()({
@@ -76,8 +81,37 @@ export const uiState = createModel<RootModel>()({
         showEditForm: false,
         tokenFilter: '',
         tokenFilterVisible: false,
+        confirmState: {
+            show: false,
+            text: '',
+        },
+        showPushDialog: false,
     } as UIState,
     reducers: {
+        setShowPushDialog: (state, data: boolean) => {
+            return {
+                ...state,
+                showPushDialog: data,
+            };
+        },
+        setShowConfirm: (state, data: string) => {
+            return {
+                ...state,
+                confirmState: {
+                    show: true,
+                    text: data,
+                },
+            };
+        },
+        setHideConfirm: (state) => {
+            return {
+                ...state,
+                confirmState: {
+                    show: false,
+                    text: '',
+                },
+            };
+        },
         setDisabled: (state, data: boolean) => {
             return {
                 ...state,
