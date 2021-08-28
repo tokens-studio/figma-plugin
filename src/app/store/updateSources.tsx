@@ -37,16 +37,7 @@ async function updateRemoteTokens({
             });
             break;
         }
-        case StorageProviderType.URL: {
-            notifyToUI('Updating URL...');
-            updateURLTokens({
-                tokens,
-                context,
-                updatedAt,
-                oldUpdatedAt,
-            });
-            break;
-        }
+
         case StorageProviderType.GITHUB:
         case StorageProviderType.ARCADE: {
             break;

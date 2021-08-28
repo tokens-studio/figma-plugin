@@ -1,5 +1,5 @@
-import {useDispatch} from 'react-redux';
-import {Dispatch} from '@/app/store';
+import {useDispatch, useSelector} from 'react-redux';
+import {Dispatch, RootState} from '@/app/store';
 import {StorageProviderType} from 'Types/api';
 import {MessageToPluginTypes} from 'Types/messages';
 import {TokenProps} from 'Types/tokens';
@@ -52,6 +52,7 @@ async function writeTokensToJSONBin({secret, id, tokenObj}): Promise<TokenProps>
 }
 
 export async function updateJSONBinTokens({tokens, context, updatedAt, oldUpdatedAt = null}) {
+    console.log('Context is', context, tokens, updatedAt);
     const {id, secret} = context;
 
     try {
@@ -87,9 +88,11 @@ export async function updateJSONBinTokens({tokens, context, updatedAt, oldUpdate
 export function useJSONbin() {
     const dispatch = useDispatch<Dispatch>();
     const {setStorageType} = useStorage();
+    const {tokens} = useSelector((state: RootState) => state.tokenState);
 
     async function createNewJSONBin(context): Promise<TokenProps> {
-        const {secret, tokens, name, updatedAt} = context;
+        const {secret, name, updatedAt} = context;
+        console.log('Context', context);
         const response = await fetch(`https://api.jsonbin.io/v3/b`, {
             method: 'POST',
             mode: 'cors',
@@ -121,10 +124,13 @@ export function useJSONbin() {
                 provider: {id: jsonBinData.metadata.id, name, provider: StorageProviderType.JSONBIN},
                 bool: true,
             });
+            console.log('jsonbindata', jsonBinData);
             updateJSONBinTokens({
                 tokens,
-                id: jsonBinData.metadata.id,
-                secret,
+                context: {
+                    id: jsonBinData.metadata.id,
+                    secret,
+                },
                 updatedAt,
             });
             postToFigma({
@@ -142,7 +148,7 @@ export function useJSONbin() {
 
     // Read tokens from JSONBin
 
-    async function fetchDataFromJSONBin(context): Promise<TokenProps> {
+    async function pullTokensFromJSONBin(context): Promise<TokenProps> {
         const {id, secret, name} = context;
 
         if (!id && !secret) return;
@@ -175,8 +181,24 @@ export function useJSONbin() {
             console.log('Error:', e);
         }
     }
+
+    async function addJSONBinCredentials(context): Promise<TokenProps> {
+        const tokenValues = await pullTokensFromJSONBin(context);
+
+        dispatch.uiState.setApiData(context);
+        setStorageType({
+            provider: context,
+            bool: true,
+        });
+
+        dispatch.tokenState.setLastSyncedState(JSON.stringify(tokenValues.values, null, 2));
+        dispatch.tokenState.setTokenData(tokenValues);
+        return tokenValues;
+    }
+
     return {
-        fetchDataFromJSONBin,
+        addJSONBinCredentials,
+        pullTokensFromJSONBin,
         createNewJSONBin,
     };
 }

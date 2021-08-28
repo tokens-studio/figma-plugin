@@ -31,7 +31,6 @@
 		"@rematch/core": "^2.0.1",
 		"@sentry/react": "^6.2.5",
 		"@stitches/react": "^0.1.9",
-		"@testing-library/react-hooks": "^7.0.1",
 		"autoprefixer": "^10.2.5",
 		"axios": "^0.21.1",
 		"core-js": "^3.9.1",

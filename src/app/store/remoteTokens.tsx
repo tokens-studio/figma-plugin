@@ -2,10 +2,9 @@ import {useDispatch, useSelector} from 'react-redux';
 import {SingleToken, TokenProps} from 'Types/tokens';
 import {StorageProviderType} from 'Types/api';
 import {MessageToPluginTypes} from 'Types/messages';
-import {notifyToUI, postToFigma} from '../../plugin/notifiers';
+import {postToFigma} from '../../plugin/notifiers';
 import {useJSONbin} from './providers/jsonbin';
 import useArcade from './providers/arcade';
-import {compareUpdatedAt} from '../components/utils';
 import {Dispatch, RootState} from '../store';
 import useStorage from './useStorage';
 import {useURL} from './providers/url';
@@ -13,13 +12,11 @@ import {useGitHub} from './providers/github';
 
 export default function useRemoteTokens() {
     const dispatch = useDispatch<Dispatch>();
-    const {api, lastUpdatedAt} = useSelector((state: RootState) => state.uiState);
-    const {tokens} = useSelector((state: RootState) => state.tokenState);
+    const {api} = useSelector((state: RootState) => state.uiState);
 
     const {setStorageType} = useStorage();
     const {editArcadeToken, createArcadeToken, deleteArcadeToken} = useArcade();
-    const {fetchDataFromJSONBin, createNewJSONBin} = useJSONbin();
-    const {fetchDataFromURL} = useURL();
+    const {pullTokensFromJSONBin, addJSONBinCredentials, createNewJSONBin} = useJSONbin();
     const {addNewGitHubCredentials, pullTokensFromGitHub, pushTokensToGitHub} = useGitHub();
 
     const pullTokens = async (context = api) => {
@@ -29,11 +26,7 @@ export default function useRemoteTokens() {
 
         switch (context.provider) {
             case StorageProviderType.JSONBIN: {
-                tokenValues = await fetchDataFromJSONBin(context);
-                break;
-            }
-            case StorageProviderType.URL: {
-                tokenValues = await fetchDataFromURL(context);
+                tokenValues = await pullTokensFromJSONBin(context);
                 break;
             }
             case StorageProviderType.GITHUB: {
@@ -118,27 +111,13 @@ export default function useRemoteTokens() {
         deleteArcadeToken({id, secret, data});
     }
 
-    const syncTokens = async (context) => {
-        dispatch.uiState.setLoading(true);
-        await pullTokens(context);
-        setStorageType({provider: context, bool: true});
-        dispatch.uiState.setApiData(context);
-        dispatch.uiState.setLoading(false);
-        return null;
-    };
-
     async function addNewProviderItem(context): Promise<TokenProps | null> {
         switch (context.provider) {
             case StorageProviderType.JSONBIN: {
                 if (context.id) {
-                    // TODO: Rework this to addNewJSONBinCredentials
-                    return syncTokens(context);
+                    return addJSONBinCredentials(context);
                 }
                 return createNewJSONBin(context);
-            }
-            case StorageProviderType.URL: {
-                // TODO: Rework this to addNewJSONBinCredentials
-                return syncTokens(context);
             }
             case StorageProviderType.GITHUB: {
                 return addNewGitHubCredentials(context);
@@ -164,7 +143,6 @@ export default function useRemoteTokens() {
         editRemoteToken,
         createRemoteToken,
         deleteRemoteToken,
-        syncTokens,
         addNewProviderItem,
     };
 }

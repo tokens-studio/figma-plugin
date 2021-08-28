@@ -19,3 +19,11 @@ export enum StorageProviderType {
     URL = 'url',
     GITHUB = 'github',
 }
+
+export interface ContextObject extends ApiDataType {
+    secret: string;
+    id: string;
+    branch: string;
+    filePath: string;
+    tokens: string;
+}

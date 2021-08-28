@@ -6,6 +6,8 @@ import convertTokensToObject from '@/utils/convertTokensToObject';
 import {Octokit} from '@octokit/rest';
 import useConfirm from '@/app/hooks/useConfirm';
 import usePushDialog from '@/app/hooks/usePushDialog';
+import IsJSONString from '@/utils/isJSONString';
+import {ContextObject} from 'Types/api';
 import {notifyToUI, postToFigma} from '../../../plugin/notifiers';
 import * as pjs from '../../../../package.json';
 import useStorage from '../useStorage';
@@ -15,34 +17,11 @@ function getCreatePullRequestUrl(owner: string, repo: string, branchName: string
     return `https://github.com/${owner}/${repo}/compare/${branchName}?expand=1`;
 }
 
-export const fetchUsername = async (context) => {
-    const octokit = new Octokit({auth: context.secret});
-    const user = await octokit.users.getAuthenticated().then((response) => response.data);
-    return user.login;
-};
-
 export const fetchBranches = async ({context, owner, repo}) => {
     const octokit = new Octokit({auth: context.secret});
     const branches = await octokit.repos.listBranches({owner, repo}).then((response) => response.data);
     return branches.map((branch) => branch.name);
 };
-
-type ContextObject = {
-    secret: string;
-    id: string;
-    branch: string;
-    filePath: string;
-    tokens: string;
-};
-
-function IsJsonString(str) {
-    try {
-        JSON.parse(str);
-    } catch (e) {
-        return false;
-    }
-    return true;
-}
 
 export const readContents = async ({context, owner, repo}) => {
     const octokit = new Octokit({auth: context.secret});
@@ -58,7 +37,7 @@ export const readContents = async ({context, owner, repo}) => {
         if (response.data.content) {
             const data = atob(response.data.content);
             // If content of file is parseable JSON, parse it
-            if (IsJsonString(data)) {
+            if (IsJSONString(data)) {
                 const parsed = JSON.parse(data);
                 return parsed;
             }
@@ -101,7 +80,6 @@ const commitToExistingBranch = async ({context, tokenObj, owner, repo, commitMes
 export function useGitHub() {
     const {tokens} = useSelector((state: RootState) => state.tokenState);
     const dispatch = useDispatch<Dispatch>();
-    const {setStorageType} = useStorage();
 
     const {confirm} = useConfirm();
     const {pushDialog} = usePushDialog();
@@ -236,11 +214,7 @@ export function useGitHub() {
                         values: data.values,
                     };
 
-                    dispatch.uiState.setApiData(context);
-                    setStorageType({
-                        provider: context,
-                        bool: true,
-                    });
+                    dispatch.tokenState.setLastSyncedState(JSON.stringify(obj.values, null, 2));
                     dispatch.tokenState.setTokenData(obj);
                     tokenObj = obj;
                 } else {
