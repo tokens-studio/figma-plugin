@@ -48,6 +48,23 @@ describe('updateCredentials', () => {
         await updateCredentials(newObject);
         expect(figma.clientStorage.setAsync).toHaveBeenCalledWith('apiProviders', JSON.stringify(newArray));
     });
+
+    it('merges credentials when there have been existing that match internalId', async () => {
+        const apiArray = [
+            {id: '123', internalId: 'abc', secret: 'abc', name: 'mytokens', provider: StorageProviderType.ARCADE},
+        ];
+        const newObject = {
+            id: '456',
+            internalId: 'abc',
+            secret: 'abc',
+            name: 'my new name',
+            provider: StorageProviderType.ARCADE,
+        };
+        const newArray = [newObject];
+        figma.clientStorage.getAsync.mockResolvedValue(JSON.stringify(apiArray));
+        await updateCredentials(newObject);
+        expect(figma.clientStorage.setAsync).toHaveBeenCalledWith('apiProviders', JSON.stringify(newArray));
+    });
 });
 
 describe('removeSingleCredential', () => {
