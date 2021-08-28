@@ -2,6 +2,7 @@ import * as React from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {track} from '@/utils/analytics';
 import {MagnifyingGlassIcon, DoubleArrowUpIcon} from '@radix-ui/react-icons';
+import convertTokensToObject from '@/utils/convertTokensToObject';
 import Icon from './Icon';
 import Tooltip from './Tooltip';
 import useRemoteTokens from '../store/remoteTokens';
@@ -47,6 +48,7 @@ const transformProviderName = (provider) => {
 
 const Navbar = () => {
     const {projectURL, storageType} = useSelector((state: RootState) => state.uiState);
+    const {lastSyncedState, tokens} = useSelector((state: RootState) => state.tokenState);
     const {toggleFilterVisibility} = useDispatch<Dispatch>().uiState;
     const {pullTokens, pushTokens} = useRemoteTokens();
 
@@ -81,8 +83,16 @@ const Navbar = () => {
                         )}
                         {storageType.provider === StorageProviderType.GITHUB && (
                             <Tooltip variant="right" label={`Push to ${transformProviderName(storageType.provider)}`}>
-                                <button onClick={() => pushTokens()} type="button" className="button button-ghost">
-                                    <DoubleArrowUpIcon />
+                                <button
+                                    onClick={() => pushTokens()}
+                                    type="button"
+                                    className="button button-ghost relative"
+                                >
+                                    {lastSyncedState !== JSON.stringify(convertTokensToObject(tokens), null, 2) && (
+                                        <div className="rounded-full w-2 h-2 bg-primary-500 absolute right-0 top-0" />
+                                    )}
+
+                                    <Icon name="library" />
                                 </button>
                             </Tooltip>
                         )}

@@ -39,6 +39,7 @@ export interface SelectionValue {
 
 interface TokenState {
     tokens: TokenGroup;
+    lastSyncedState: string;
     importedTokens: {
         newTokens: SingleTokenObject[];
         updatedTokens: SingleTokenObject[];
@@ -53,6 +54,7 @@ export const tokenState = createModel<RootModel>()({
         tokens: {
             global: [],
         },
+        lastSyncedState: '',
         importedTokens: {
             newTokens: [],
             updatedTokens: [],
@@ -108,6 +110,12 @@ export const tokenState = createModel<RootModel>()({
                 activeTokenSet: state.activeTokenSet === data.oldName ? data.newName : state.activeTokenSet,
             };
         },
+        setLastSyncedState: (state, data: string) => {
+            return {
+                ...state,
+                lastSyncedState: data,
+            };
+        },
         setTokenSetOrder: (state, data: string[]) => {
             const newTokens = {};
             data.map((set) => {
@@ -128,15 +136,6 @@ export const tokenState = createModel<RootModel>()({
             };
         },
         setTokenData: (state, data: {values: SingleTokenObject[]; shouldUpdate: boolean}) => {
-            const values = parseTokenValues(data.values);
-            return {
-                ...state,
-                tokens: values,
-                activeTokenSet: Array.isArray(data.values) ? 'global' : Object.keys(data.values)[0],
-                usedTokenSet: Array.isArray(data.values) ? ['global'] : [Object.keys(data.values)[0]],
-            };
-        },
-        pullTokens: (state, data: {values: SingleTokenObject[]; shouldUpdate: boolean}) => {
             const values = parseTokenValues(data.values);
             return {
                 ...state,

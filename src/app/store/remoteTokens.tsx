@@ -45,6 +45,7 @@ export default function useRemoteTokens() {
         }
 
         if (tokenValues) {
+            dispatch.tokenState.setLastSyncedState(JSON.stringify(tokenValues.values, null, 2));
             dispatch.tokenState.setTokenData(tokenValues);
         }
 
