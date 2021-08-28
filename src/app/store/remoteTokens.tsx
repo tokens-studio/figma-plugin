@@ -18,33 +18,31 @@ export default function useRemoteTokens() {
     const {editArcadeToken, createArcadeToken, deleteArcadeToken} = useArcade();
     const {fetchDataFromJSONBin, createNewJSONBin} = useJSONbin();
     const {fetchDataFromURL, createNewURL} = useURL();
-    const {fetchDataFromGitHub, readTokensFromGitHub} = useGitHub();
+    const {addNewGitHubCredentials, pullTokensFromGitHub, pushTokensToGitHub} = useGitHub();
 
     const pullTokens = async () => {
         dispatch.uiState.setLoading(true);
 
-        notifyToUI('Fetching from remote...');
         let tokenValues;
 
         switch (api.provider) {
             case StorageProviderType.JSONBIN: {
                 tokenValues = await fetchDataFromJSONBin(api);
-                notifyToUI('Updated!');
                 break;
             }
             case StorageProviderType.URL: {
                 tokenValues = await fetchDataFromURL(api);
-                notifyToUI('Updated!');
                 break;
             }
             case StorageProviderType.GITHUB: {
-                tokenValues = await fetchDataFromGitHub(api);
-                notifyToUI('Updated!');
+                tokenValues = await pullTokensFromGitHub(api);
                 break;
             }
             default:
                 throw new Error('Not implemented');
         }
+
+        console.log('RReceived new tokens', tokenValues);
 
         dispatch.tokenState.setTokenData(tokenValues);
         dispatch.uiState.setLoading(false);
@@ -53,12 +51,9 @@ export default function useRemoteTokens() {
     const pushTokens = async () => {
         dispatch.uiState.setLoading(true);
 
-        notifyToUI('Pushing to remote...');
-
         switch (api.provider) {
             case StorageProviderType.GITHUB: {
-                await readTokensFromGitHub(api, true);
-                notifyToUI('Updated!');
+                await pushTokensToGitHub(api);
                 break;
             }
             default:
@@ -109,8 +104,6 @@ export default function useRemoteTokens() {
     }
 
     async function fetchDataFromRemote(context): Promise<TokenProps> {
-        notifyToUI('Fetching remote tokens...');
-
         switch (context.provider) {
             case StorageProviderType.JSONBIN: {
                 return fetchDataFromJSONBin(context);
@@ -119,7 +112,7 @@ export default function useRemoteTokens() {
                 return fetchDataFromURL(context);
             }
             case StorageProviderType.GITHUB: {
-                return fetchDataFromGitHub(context);
+                return pullTokensFromGitHub(context);
             }
             default:
                 throw new Error('Strategy not implemented');
@@ -147,6 +140,7 @@ export default function useRemoteTokens() {
 
     async function addNewProviderItem(context): Promise<TokenProps | null> {
         notifyToUI('Checking credentials...');
+        console.log('checking', context);
 
         switch (context.provider) {
             case StorageProviderType.JSONBIN: {
@@ -155,10 +149,12 @@ export default function useRemoteTokens() {
                 }
                 return createNewJSONBin(context);
             }
-            case StorageProviderType.URL:
-            case StorageProviderType.GITHUB:
-            case StorageProviderType.ARCADE: {
+            case StorageProviderType.URL: {
                 return syncTokens(context);
+            }
+            case StorageProviderType.GITHUB: {
+                console.log('Going to GH');
+                return addNewGitHubCredentials(context);
             }
             default:
                 throw new Error('Not implemented');

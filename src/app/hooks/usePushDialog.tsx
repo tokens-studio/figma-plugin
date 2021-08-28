@@ -6,7 +6,7 @@ function usePushDialog() {
     const {showPushDialog} = useSelector((state: RootState) => state.uiState);
     const dispatch = useDispatch<Dispatch>();
 
-    const pushDialog = (): Promise<boolean> => {
+    const pushDialog = (): Promise<string> => {
         dispatch.uiState.setShowPushDialog(true);
 
         return new Promise((res, rej) => {
@@ -20,7 +20,7 @@ function usePushDialog() {
 
     const onCancel = () => {
         closeDialog();
-        resolveCallback(false);
+        resolveCallback(null);
     };
 
     const onConfirm = (message) => {

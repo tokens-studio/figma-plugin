@@ -3,6 +3,7 @@ import {notifyAPIProviders, notifyUI} from '@/plugin/notifiers';
 
 // update credentials
 export async function updateCredentials(context) {
+    console.log('UPDATING CREDS', context);
     try {
         delete context.new;
         const data = await figma.clientStorage.getAsync('apiProviders');
@@ -14,6 +15,7 @@ export async function updateCredentials(context) {
 
             const matchingProvider = existingProviders.findIndex((i) => i.internalId === context.internalId);
             if (typeof matchingProvider !== 'undefined') {
+                console.log('Found a match, updating');
                 existingProviders.splice(matchingProvider, 1, context);
             }
 
@@ -23,6 +25,7 @@ export async function updateCredentials(context) {
         } else {
             existingProviders.push({...context, internalId: generateId(24)});
         }
+        console.log('New providers', existingProviders);
         await figma.clientStorage.setAsync('apiProviders', JSON.stringify(existingProviders));
         const newProviders = await figma.clientStorage.getAsync('apiProviders');
         notifyAPIProviders(JSON.parse(newProviders));

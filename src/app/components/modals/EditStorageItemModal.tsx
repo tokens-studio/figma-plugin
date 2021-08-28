@@ -7,7 +7,7 @@ import useRemoteTokens from '../../store/remoteTokens';
 export default function EditStorageItemModal({isOpen, initialValue, onClose, onSuccess}) {
     const [formFields, setFormFields] = React.useState(initialValue);
     const [hasErrored, setHasErrored] = React.useState(false);
-    const {syncTokens} = useRemoteTokens();
+    const {addNewProviderItem} = useRemoteTokens();
 
     const handleChange = (e) => {
         setFormFields({...formFields, [e.target.name]: e.target.value});
@@ -15,7 +15,7 @@ export default function EditStorageItemModal({isOpen, initialValue, onClose, onS
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const response = await syncTokens(formFields);
+        const response = await addNewProviderItem(formFields);
         if (!response) {
             setHasErrored(true);
         } else {
