@@ -9,13 +9,14 @@ const ConfirmDialog = () => {
     const {onConfirm, onCancel, showPushDialog} = usePushDialog();
     const [commitMessage, setCommitMessage] = React.useState('');
 
+    React.useEffect(() => {
+        setCommitMessage('');
+    }, [showPushDialog]);
+
     return showPushDialog ? (
-        <Modal isOpen close={onCancel}>
-            <form
-                onSubmit={() => onConfirm(commitMessage)}
-                className="flex justify-center flex-col text-center space-y-4"
-            >
-                <div className="space-y-2">
+        <Modal large isOpen close={onCancel}>
+            <form onSubmit={() => onConfirm(commitMessage)} className="flex flex-col text-center space-y-4">
+                <div className="space-y-2 text-left flex flex-col">
                     <Heading>Push changes</Heading>
                     <Input
                         full
@@ -27,7 +28,7 @@ const ConfirmDialog = () => {
                         required
                     />
                 </div>
-                <div className="space-x-4">
+                <div className="space-x-4 flex flex-row justify-between">
                     <Button variant="secondary" onClick={onCancel}>
                         Cancel
                     </Button>

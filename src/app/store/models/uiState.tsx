@@ -84,6 +84,7 @@ export const uiState = createModel<RootModel>()({
         confirmState: {
             show: false,
             text: '',
+            description: '',
         },
         showPushDialog: false,
     } as UIState,
@@ -94,12 +95,13 @@ export const uiState = createModel<RootModel>()({
                 showPushDialog: data,
             };
         },
-        setShowConfirm: (state, data: string) => {
+        setShowConfirm: (state, data: {text: string; description?: string}) => {
             return {
                 ...state,
                 confirmState: {
                     show: true,
-                    text: data,
+                    text: data.text,
+                    description: data.description,
                 },
             };
         },
@@ -109,6 +111,7 @@ export const uiState = createModel<RootModel>()({
                 confirmState: {
                     show: false,
                     text: '',
+                    description: '',
                 },
             };
         },

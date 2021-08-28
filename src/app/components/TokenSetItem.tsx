@@ -107,7 +107,7 @@ export default function TokenSetItem({tokenSet, onMove, index, onRename, onDelet
             <ContextMenuTrigger id={`${tokenSet}-trigger`}>
                 <button
                     key={tokenSet}
-                    className={`font-bold items-center gap-2 focus:outline-none text-xs flex p-2 rounded border ${
+                    className={`font-bold items-center gap-1 focus:outline-none text-xxs flex py-1 px-2 rounded border ${
                         activeTokenSet === tokenSet && 'border-blue-500 bg-blue-100'
                     }`}
                     type="button"

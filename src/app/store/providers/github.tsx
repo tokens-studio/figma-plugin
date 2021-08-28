@@ -107,7 +107,10 @@ export function useGitHub() {
     const {pushDialog} = usePushDialog();
 
     async function askUserIfPull(): Promise<boolean> {
-        const isConfirmed = await confirm('Pull from GitHub?');
+        const isConfirmed = await confirm({
+            text: 'Pull from GitHub?',
+            description: 'Your repo already contains tokens, do you want to pull these now?',
+        });
         return isConfirmed;
     }
 
