@@ -50,7 +50,9 @@ interface TokenState {
 
 export const tokenState = createModel<RootModel>()({
     state: {
-        tokens: {},
+        tokens: {
+            global: [],
+        },
         importedTokens: {
             newTokens: [],
             updatedTokens: [],
@@ -126,7 +128,15 @@ export const tokenState = createModel<RootModel>()({
             };
         },
         setTokenData: (state, data: {values: SingleTokenObject[]; shouldUpdate: boolean}) => {
-            console.log('Received tokens', data);
+            const values = parseTokenValues(data.values);
+            return {
+                ...state,
+                tokens: values,
+                activeTokenSet: Array.isArray(data.values) ? 'global' : Object.keys(data.values)[0],
+                usedTokenSet: Array.isArray(data.values) ? ['global'] : [Object.keys(data.values)[0]],
+            };
+        },
+        pullTokens: (state, data: {values: SingleTokenObject[]; shouldUpdate: boolean}) => {
             const values = parseTokenValues(data.values);
             return {
                 ...state,

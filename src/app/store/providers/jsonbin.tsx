@@ -143,7 +143,6 @@ export function useJSONbin() {
     // Read tokens from JSONBin
 
     async function fetchDataFromJSONBin(context): Promise<TokenProps> {
-        let tokenValues;
         const {id, secret, name} = context;
 
         if (!id && !secret) return;
@@ -161,19 +160,16 @@ export function useJSONbin() {
                     provider: StorageProviderType.JSONBIN,
                 });
                 if (jsonBinData?.values) {
-                    const obj = {
+                    return {
                         version: jsonBinData.version,
                         updatedAt: jsonBinData.updatedAt,
                         values: jsonBinData.values,
                     };
-
-                    tokenValues = obj;
-                } else {
-                    notifyToUI('No tokens stored on remote');
                 }
+                notifyToUI('No tokens stored on remote');
             }
 
-            return tokenValues;
+            return null;
         } catch (e) {
             notifyToUI('Error fetching from JSONbin, check console (F12)');
             console.log('Error:', e);

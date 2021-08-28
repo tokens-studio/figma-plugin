@@ -10,7 +10,7 @@ import useStorage from '../store/useStorage';
 export default function Initiator() {
     const dispatch = useDispatch<Dispatch>();
 
-    const {fetchDataFromRemote} = useRemoteTokens();
+    const {pullTokens} = useRemoteTokens();
     const {setStorageType} = useStorage();
 
     const onInitiate = () => {
@@ -73,11 +73,8 @@ export default function Initiator() {
                         if (status === true) {
                             dispatch.uiState.setApiData(credentials);
                             dispatch.uiState.setLocalApiState(credentials);
-                            const remoteValues = await fetchDataFromRemote(credentials);
-                            if (remoteValues) {
-                                dispatch.tokenState.setTokenData(remoteValues);
-                                dispatch.uiState.setActiveTab('tokens');
-                            }
+                            await pullTokens(credentials);
+                            dispatch.uiState.setActiveTab('tokens');
                             dispatch.uiState.setLoading(false);
                         }
                         break;

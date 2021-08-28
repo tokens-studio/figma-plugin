@@ -81,14 +81,14 @@ const Navbar = () => {
                         )}
                         {storageType.provider === StorageProviderType.GITHUB && (
                             <Tooltip variant="right" label={`Push to ${transformProviderName(storageType.provider)}`}>
-                                <button onClick={pushTokens} type="button" className="button button-ghost">
+                                <button onClick={() => pushTokens()} type="button" className="button button-ghost">
                                     <DoubleArrowUpIcon />
                                 </button>
                             </Tooltip>
                         )}
 
                         <Tooltip variant="right" label={`Pull from ${transformProviderName(storageType.provider)}`}>
-                            <button onClick={pullTokens} type="button" className="button button-ghost">
+                            <button onClick={() => pullTokens()} type="button" className="button button-ghost">
                                 <Icon name="refresh" />
                             </button>
                         </Tooltip>

@@ -1,3 +1,4 @@
+import * as helpers from '@/plugin/helpers';
 import {StorageProviderType} from '../../types/api';
 import {removeSingleCredential, updateCredentials} from './credentials';
 
@@ -5,6 +6,10 @@ describe('updateCredentials', () => {
     afterEach(() => {
         jest.clearAllMocks();
     });
+    const generateIdSpy = jest.spyOn(helpers, 'generateId').mockImplementation(() => 'idMock');
+
+    // Mock id for test
+
     it('sets credentials when no credentials existed before', async () => {
         const apiObject = {id: '123', secret: 'foo', name: 'mytokens', provider: StorageProviderType.ARCADE};
         figma.clientStorage.getAsync
@@ -12,16 +17,27 @@ describe('updateCredentials', () => {
             .mockResolvedValueOnce(JSON.stringify([apiObject]));
         await updateCredentials(apiObject);
 
-        expect(figma.clientStorage.setAsync).toHaveBeenCalledWith('apiProviders', JSON.stringify([apiObject]));
+        expect(figma.clientStorage.setAsync).toHaveBeenCalledWith(
+            'apiProviders',
+            JSON.stringify([{...apiObject, internalId: 'idMock'}])
+        );
+        expect(generateIdSpy).toHaveBeenCalled();
     });
 
     it('updates credentials when there have been existing', async () => {
         const apiArray = [{id: '123', secret: 'abc', name: 'mytokens', provider: StorageProviderType.ARCADE}];
         const newObject = {id: '456', secret: 'foo', name: 'mytokens', provider: StorageProviderType.ARCADE};
-        const newArray = [...apiArray, newObject];
+        const newArray = [
+            ...apiArray,
+            {
+                ...newObject,
+                internalId: 'idMock',
+            },
+        ];
         figma.clientStorage.getAsync.mockResolvedValue(JSON.stringify(apiArray));
         await updateCredentials(newObject);
         expect(figma.clientStorage.setAsync).toHaveBeenCalledWith('apiProviders', JSON.stringify(newArray));
+        expect(generateIdSpy).toHaveBeenCalled();
     });
 
     it('merges credentials when there have been existing that match', async () => {

@@ -45,7 +45,6 @@ function IsJsonString(str) {
 }
 
 export const readContents = async ({context, owner, repo}) => {
-    console.log('Reading content of', context);
     const octokit = new Octokit({auth: context.secret});
     let response;
 
@@ -56,10 +55,8 @@ export const readContents = async ({context, owner, repo}) => {
             path: context.filePath,
             ref: context.branch,
         });
-        console.log('Response', response);
         if (response.data.content) {
             const data = atob(response.data.content);
-            console.log('data is', data);
             // If content of file is parseable JSON, parse it
             if (IsJsonString(data)) {
                 const parsed = JSON.parse(data);
@@ -101,35 +98,6 @@ const commitToExistingBranch = async ({context, tokenObj, owner, repo, commitMes
     });
 };
 
-async function writeTokensToGitHub({
-    context,
-    tokenObj,
-    owner,
-    repo,
-    commitMessage,
-}: {
-    context: ContextObject;
-    tokenObj: string;
-    owner: string;
-    repo: string;
-    commitMessage?: string;
-}): Promise<TokenProps> | null {
-    try {
-        const branches = await fetchBranches({context, owner, repo});
-        if (!branches) return null;
-        if (branches.includes(context.branch)) {
-            await commitToExistingBranch({context, tokenObj, owner, repo, commitMessage});
-        } else {
-            await commitToNewBranch({context, tokenObj, owner, repo, commitMessage});
-        }
-        notifyToUI('Pushed changes to GitHub');
-    } catch (e) {
-        notifyToUI('Error pushing to GitHub');
-        console.log('Error pushing to GitHub', e);
-        return null;
-    }
-}
-
 export function useGitHub() {
     const {tokens} = useSelector((state: RootState) => state.tokenState);
     const dispatch = useDispatch<Dispatch>();
@@ -152,11 +120,37 @@ export function useGitHub() {
         return {raw, string};
     }
 
+    async function writeTokensToGitHub({
+        context,
+        tokenObj,
+        owner,
+        repo,
+        commitMessage,
+    }: {
+        context: ContextObject;
+        tokenObj: string;
+        owner: string;
+        repo: string;
+        commitMessage?: string;
+    }): Promise<TokenProps | null> {
+        try {
+            const branches = await fetchBranches({context, owner, repo});
+            if (!branches) return null;
+            if (branches.includes(context.branch)) {
+                await commitToExistingBranch({context, tokenObj, owner, repo, commitMessage});
+            } else {
+                await commitToNewBranch({context, tokenObj, owner, repo, commitMessage});
+            }
+            notifyToUI('Pushed changes to GitHub');
+        } catch (e) {
+            notifyToUI('Error pushing to GitHub');
+            console.log('Error pushing to GitHub', e);
+            return null;
+        }
+    }
+
     async function pushTokensToGitHub(context) {
-        console.log('Conext is', context);
-
         const {raw: rawTokenObj, string: tokenObj} = getTokenObj();
-
         const [owner, repo] = context.id.split('/');
 
         const content = await readContents({context, owner, repo});
@@ -178,46 +172,46 @@ export function useGitHub() {
     }
 
     async function pullTokensFromGitHub(context) {
-        console.log('Conext is', context);
-        const {raw: rawTokenObj, string: tokenObj} = getTokenObj();
-
         const [owner, repo] = context.id.split('/');
 
-        const content = await readContents({context, owner, repo});
+        try {
+            const content = await readContents({context, owner, repo});
 
-        if (content) {
-            const stringifiedContent = JSON.stringify(content, null, 2);
-
-            if (stringifiedContent !== tokenObj) {
+            if (content) {
                 return content;
             }
-            notifyToUI('Nothing to pull');
-            console.log('Was the same');
+        } catch (e) {
+            console.log('Error', e);
         }
-
-        return rawTokenObj;
+        return null;
     }
 
     async function syncTokensWithGitHub(context) {
-        console.log('Syncing with gh', context);
-        const {raw: rawTokenObj, string: tokenObj} = getTokenObj();
-        const [owner, repo] = context.id.split('/');
+        try {
+            const [owner, repo] = context.id.split('/');
+            const isAuthed = await fetchBranches({context, owner, repo});
 
-        const content = await readContents({context, owner, repo});
+            if (!isAuthed) {
+                return null;
+            }
+            const content = await readContents({context, owner, repo});
+            const {raw: rawTokenObj, string: tokenObj} = getTokenObj();
 
-        console.log('Content from sync', content);
+            if (content) {
+                const stringifiedContent = JSON.stringify(content, null, 2);
 
-        if (content) {
-            const stringifiedContent = JSON.stringify(content, null, 2);
-
-            if (stringifiedContent !== tokenObj) {
-                const userDecision = await askUserIfPull();
-                console.log('USer decision is', userDecision);
-                if (userDecision) {
-                    return content;
+                if (stringifiedContent !== tokenObj) {
+                    const userDecision = await askUserIfPull();
+                    if (userDecision) {
+                        return content;
+                    }
                 }
+            } else {
+                await pushTokensToGitHub(context);
             }
             return rawTokenObj;
+        } catch (e) {
+            console.log('Error', e);
         }
     }
 
@@ -225,9 +219,7 @@ export function useGitHub() {
         let tokenObj;
 
         try {
-            console.log('adding gh', context);
             const data = await syncTokensWithGitHub(context);
-            console.log('data gh', data);
 
             if (data) {
                 postToFigma({
@@ -252,8 +244,6 @@ export function useGitHub() {
                     notifyToUI('No tokens stored on remote');
                 }
             }
-
-            console.log('RETURNING', tokenObj);
 
             return tokenObj;
         } catch (e) {

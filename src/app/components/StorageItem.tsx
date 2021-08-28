@@ -1,30 +1,15 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import * as React from 'react';
-import {useDispatch, useSelector} from 'react-redux';
-import {postToFigma} from '../../plugin/notifiers';
-import {MessageToPluginTypes} from '../../../types/messages';
+import {useSelector} from 'react-redux';
 import Button from './Button';
 import useRemoteTokens from '../store/remoteTokens';
-import {Dispatch, RootState} from '../store';
+import {RootState} from '../store';
 
-const StorageItem = ({provider, id, secret, name, onEdit = null}) => {
+const StorageItem = ({item, onEdit = null}) => {
     const {storageType} = useSelector((state: RootState) => state.uiState);
-    const dispatch = useDispatch<Dispatch>();
+    const {provider, id, branch, name} = item;
 
-    const {syncTokens} = useRemoteTokens();
-
-    const restoreStoredProvider = () => {
-        dispatch.uiState.setLocalApiState({provider, id, secret, name});
-        syncTokens({provider, id, secret, name});
-    };
-
-    const deleteProvider = () => {
-        postToFigma({
-            type: MessageToPluginTypes.REMOVE_SINGLE_CREDENTIAL,
-            id,
-            secret,
-        });
-    };
+    const {restoreStoredProvider, deleteProvider} = useRemoteTokens();
 
     const isActive = () => {
         return storageType.id === id && storageType.provider === provider;
@@ -40,12 +25,14 @@ const StorageItem = ({provider, id, secret, name, onEdit = null}) => {
         >
             <div className="flex flex-col flex-grow items-start">
                 <div className="text-xs font-bold">{name}</div>
-                <div className="opacity-75 text-xxs">{id}</div>
+                <div className="opacity-75 text-xxs">
+                    {id} {branch && ` (${branch})`}
+                </div>
                 {!isActive() && (
                     <button
                         type="button"
                         className="inline-flex text-left text-red-600 underline text-xxs"
-                        onClick={() => deleteProvider()}
+                        onClick={() => deleteProvider(item)}
                     >
                         Delete local credentials
                     </button>
@@ -58,7 +45,11 @@ const StorageItem = ({provider, id, secret, name, onEdit = null}) => {
                     </Button>
                 )}
                 {!isActive() && (
-                    <Button id="button-storageitem-apply" variant="secondary" onClick={() => restoreStoredProvider()}>
+                    <Button
+                        id="button-storageitem-apply"
+                        variant="secondary"
+                        onClick={() => restoreStoredProvider(item)}
+                    >
                         Apply
                     </Button>
                 )}

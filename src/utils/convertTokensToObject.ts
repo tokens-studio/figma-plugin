@@ -2,6 +2,7 @@ import {appendTypeToToken} from '@/app/components/createTokenObj';
 import set from 'set-value';
 
 export default function convertTokensToObject(tokens) {
+    console.log('CONVERTING', tokens);
     const tokenObj = Object.entries(tokens).reduce((acc, [key, val]) => {
         const tokenGroupObj = {};
         val.forEach((token) => {
