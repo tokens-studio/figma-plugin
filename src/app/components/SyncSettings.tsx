@@ -33,12 +33,9 @@ const SyncSettings = () => {
     };
 
     const selectedRemoteProvider = () => {
-        return [
-            StorageProviderType.JSONBIN,
-            StorageProviderType.ARCADE,
-            StorageProviderType.URL,
-            StorageProviderType.GITHUB,
-        ].includes(localApiState?.provider as StorageProviderType);
+        return [StorageProviderType.JSONBIN, StorageProviderType.GITHUB].includes(
+            localApiState?.provider as StorageProviderType
+        );
     };
 
     const storedApiProviders = () => {
@@ -64,16 +61,6 @@ const SyncSettings = () => {
                         >
                             Read more on docs.tokens.studio
                         </a>
-                    </div>
-                );
-            case StorageProviderType.ARCADE:
-                return (
-                    <div>
-                        <a href="https://usearcade.com" target="_blank" className="underline" rel="noreferrer">
-                            Arcade
-                        </a>{' '}
-                        is currently in Early Access. If you have an Arcade account, use your project ID and your API
-                        key to gain access. For now, just the Read-Only mode is supported.
                     </div>
                 );
             default:
@@ -155,20 +142,6 @@ const SyncSettings = () => {
                             }}
                             text="GitHub"
                             id={StorageProviderType.GITHUB}
-                        />
-                        <ProviderSelector
-                            isActive={localApiState?.provider === StorageProviderType.URL}
-                            isStored={storageType?.provider === StorageProviderType.URL}
-                            onClick={() => {
-                                dispatch.uiState.setLocalApiState({
-                                    name: '',
-                                    secret: '',
-                                    id: '',
-                                    provider: StorageProviderType.URL,
-                                });
-                            }}
-                            text="URL"
-                            id={StorageProviderType.URL}
                         />
                     </div>
                 </div>

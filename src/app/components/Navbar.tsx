@@ -37,8 +37,6 @@ const transformProviderName = (provider) => {
     switch (provider) {
         case StorageProviderType.JSONBIN:
             return 'JSONBin.io';
-        case StorageProviderType.ARCADE:
-            return 'Arcade';
         case StorageProviderType.GITHUB:
             return 'GitHub';
         default:

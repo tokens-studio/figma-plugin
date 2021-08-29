@@ -11,7 +11,7 @@ describe('updateCredentials', () => {
     // Mock id for test
 
     it('sets credentials when no credentials existed before', async () => {
-        const apiObject = {id: '123', secret: 'foo', name: 'mytokens', provider: StorageProviderType.ARCADE};
+        const apiObject = {id: '123', secret: 'foo', name: 'mytokens', provider: StorageProviderType.JSONBIN};
         figma.clientStorage.getAsync
             .mockResolvedValueOnce(undefined)
             .mockResolvedValueOnce(JSON.stringify([apiObject]));
@@ -25,8 +25,8 @@ describe('updateCredentials', () => {
     });
 
     it('updates credentials when there have been existing', async () => {
-        const apiArray = [{id: '123', secret: 'abc', name: 'mytokens', provider: StorageProviderType.ARCADE}];
-        const newObject = {id: '456', secret: 'foo', name: 'mytokens', provider: StorageProviderType.ARCADE};
+        const apiArray = [{id: '123', secret: 'abc', name: 'mytokens', provider: StorageProviderType.JSONBIN}];
+        const newObject = {id: '456', secret: 'foo', name: 'mytokens', provider: StorageProviderType.JSONBIN};
         const newArray = [
             ...apiArray,
             {
@@ -41,8 +41,8 @@ describe('updateCredentials', () => {
     });
 
     it('merges credentials when there have been existing that match', async () => {
-        const apiArray = [{id: '123', secret: 'abc', name: 'mytokens', provider: StorageProviderType.ARCADE}];
-        const newObject = {id: '123', secret: 'abc', name: 'my new name', provider: StorageProviderType.ARCADE};
+        const apiArray = [{id: '123', secret: 'abc', name: 'mytokens', provider: StorageProviderType.JSONBIN}];
+        const newObject = {id: '123', secret: 'abc', name: 'my new name', provider: StorageProviderType.JSONBIN};
         const newArray = [newObject];
         figma.clientStorage.getAsync.mockResolvedValue(JSON.stringify(apiArray));
         await updateCredentials(newObject);
@@ -51,14 +51,14 @@ describe('updateCredentials', () => {
 
     it('merges credentials when there have been existing that match internalId', async () => {
         const apiArray = [
-            {id: '123', internalId: 'abc', secret: 'abc', name: 'mytokens', provider: StorageProviderType.ARCADE},
+            {id: '123', internalId: 'abc', secret: 'abc', name: 'mytokens', provider: StorageProviderType.JSONBIN},
         ];
         const newObject = {
             id: '456',
             internalId: 'abc',
             secret: 'abc',
             name: 'my new name',
-            provider: StorageProviderType.ARCADE,
+            provider: StorageProviderType.JSONBIN,
         };
         const newArray = [newObject];
         figma.clientStorage.getAsync.mockResolvedValue(JSON.stringify(apiArray));
@@ -72,7 +72,7 @@ describe('removeSingleCredential', () => {
         jest.clearAllMocks();
     });
     it('removes credential if found and only one entry existed', async () => {
-        const apiObject = {id: '123', secret: 'foo', name: 'mytokens', provider: StorageProviderType.ARCADE};
+        const apiObject = {id: '123', secret: 'foo', name: 'mytokens', provider: StorageProviderType.JSONBIN};
         const oldArray = [apiObject];
         figma.clientStorage.getAsync.mockResolvedValue(JSON.stringify(oldArray));
         await removeSingleCredential({secret: apiObject.secret, id: apiObject.id});
@@ -81,8 +81,8 @@ describe('removeSingleCredential', () => {
     });
 
     it('removes credential if found and multiple existed', async () => {
-        const apiObject = {id: '123', secret: 'foo', name: 'mytokens', provider: StorageProviderType.ARCADE};
-        const otherObject = {id: '456', secret: 'bar', name: 'mytokens', provider: StorageProviderType.ARCADE};
+        const apiObject = {id: '123', secret: 'foo', name: 'mytokens', provider: StorageProviderType.JSONBIN};
+        const otherObject = {id: '456', secret: 'bar', name: 'mytokens', provider: StorageProviderType.JSONBIN};
         const oldArray = [apiObject, otherObject];
         figma.clientStorage.getAsync.mockResolvedValueOnce(JSON.stringify(oldArray));
         await removeSingleCredential({id: otherObject.id, secret: otherObject.secret});

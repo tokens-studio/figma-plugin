@@ -56,8 +56,7 @@ figma.ui.onmessage = async (msg) => {
                 if (apiProviders) notifyAPIProviders(JSON.parse(apiProviders));
                 switch (storageType.provider) {
                     case StorageProviderType.JSONBIN:
-                    case StorageProviderType.GITHUB:
-                    case StorageProviderType.ARCADE: {
+                    case StorageProviderType.GITHUB: {
                         compareProvidersWithStored(apiProviders, storageType);
 
                         break;

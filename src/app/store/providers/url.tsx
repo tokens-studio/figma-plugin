@@ -89,7 +89,7 @@ export function useURL() {
         return null;
     }
 
-    // Read tokens from JSONBin
+    // Read tokens from URL
 
     async function fetchDataFromURL(context): Promise<TokenProps> {
         let tokenValues;

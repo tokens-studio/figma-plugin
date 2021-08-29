@@ -38,8 +38,7 @@ async function updateRemoteTokens({
             break;
         }
 
-        case StorageProviderType.GITHUB:
-        case StorageProviderType.ARCADE: {
+        case StorageProviderType.GITHUB: {
             break;
         }
         default:

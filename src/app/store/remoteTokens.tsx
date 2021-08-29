@@ -1,13 +1,11 @@
 import {useDispatch, useSelector} from 'react-redux';
-import {SingleToken, TokenProps} from 'Types/tokens';
+import {TokenProps} from 'Types/tokens';
 import {StorageProviderType} from 'Types/api';
 import {MessageToPluginTypes} from 'Types/messages';
 import {postToFigma} from '../../plugin/notifiers';
 import {useJSONbin} from './providers/jsonbin';
-import useArcade from './providers/arcade';
 import {Dispatch, RootState} from '../store';
 import useStorage from './useStorage';
-import {useURL} from './providers/url';
 import {useGitHub} from './providers/github';
 
 export default function useRemoteTokens() {
@@ -15,7 +13,6 @@ export default function useRemoteTokens() {
     const {api} = useSelector((state: RootState) => state.uiState);
 
     const {setStorageType} = useStorage();
-    const {editArcadeToken, createArcadeToken, deleteArcadeToken} = useArcade();
     const {pullTokensFromJSONBin, addJSONBinCredentials, createNewJSONBin} = useJSONbin();
     const {addNewGitHubCredentials, pullTokensFromGitHub, pushTokensToGitHub} = useGitHub();
 
@@ -71,46 +68,6 @@ export default function useRemoteTokens() {
         dispatch.uiState.setLoading(false);
     };
 
-    async function editRemoteToken(data: {
-        parent: string;
-        name: string;
-        value: SingleToken;
-        options?: object;
-        oldName?: string;
-    }) {
-        dispatch.uiState.setLoading(true);
-        const {id, secret} = api;
-        const response = await editArcadeToken({id, secret, data});
-        if (response) {
-            dispatch.uiState.setLoading(false);
-            return true;
-        }
-        dispatch.uiState.setLoading(false);
-        return false;
-    }
-
-    async function createRemoteToken(data: {
-        parent: string;
-        name: string;
-        value: SingleToken;
-        options?: object;
-    }): Promise<boolean> {
-        dispatch.uiState.setLoading(true);
-        const {id, secret} = api;
-        const response = await createArcadeToken({id, secret, data});
-        if (response) {
-            dispatch.uiState.setLoading(false);
-            return true;
-        }
-        dispatch.uiState.setLoading(false);
-        return false;
-    }
-
-    async function deleteRemoteToken(data) {
-        const {id, secret} = api;
-        deleteArcadeToken({id, secret, data});
-    }
-
     async function addNewProviderItem(context): Promise<TokenProps | null> {
         switch (context.provider) {
             case StorageProviderType.JSONBIN: {
@@ -140,9 +97,6 @@ export default function useRemoteTokens() {
         deleteProvider,
         pullTokens,
         pushTokens,
-        editRemoteToken,
-        createRemoteToken,
-        deleteRemoteToken,
         addNewProviderItem,
     };
 }
