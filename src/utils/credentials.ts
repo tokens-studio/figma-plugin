@@ -13,10 +13,11 @@ export async function updateCredentials(context) {
             existingProviders = parsedData;
 
             let matchingProvider;
+            console.log('Existing', existingProviders);
             if (context.internalId) {
                 matchingProvider = existingProviders.findIndex((i) => i.internalId === context.internalId);
             } else {
-                matchingProvider = existingProviders.find(
+                matchingProvider = existingProviders.findIndex(
                     (i) => i.secret === context.secret && i.id === context.id && i.provider === context.provider
                 );
             }

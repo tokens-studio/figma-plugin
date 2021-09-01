@@ -16,18 +16,19 @@ export default function useRemoteTokens() {
     const {pullTokensFromJSONBin, addJSONBinCredentials, createNewJSONBin} = useJSONbin();
     const {addNewGitHubCredentials, pullTokensFromGitHub, pushTokensToGitHub} = useGitHub();
 
-    const pullTokens = async (context = api) => {
+    const pullTokens = async () => {
         dispatch.uiState.setLoading(true);
+        console.log('Api is', api);
 
         let tokenValues;
 
-        switch (context.provider) {
+        switch (api.provider) {
             case StorageProviderType.JSONBIN: {
-                tokenValues = await pullTokensFromJSONBin(context);
+                tokenValues = await pullTokensFromJSONBin(api);
                 break;
             }
             case StorageProviderType.GITHUB: {
-                tokenValues = await pullTokensFromGitHub(context);
+                tokenValues = await pullTokensFromGitHub(api);
                 break;
             }
             default:
@@ -48,7 +49,7 @@ export default function useRemoteTokens() {
         dispatch.uiState.setLocalApiState(context);
         dispatch.uiState.setApiData(context);
         setStorageType({provider: context, bool: true});
-        await pullTokens(context, true);
+        await pullTokens();
         dispatch.uiState.setLoading(false);
         return null;
     };
@@ -68,20 +69,28 @@ export default function useRemoteTokens() {
         dispatch.uiState.setLoading(false);
     };
 
-    async function addNewProviderItem(context): Promise<TokenProps | null> {
+    async function addNewProviderItem(context): Promise<boolean> {
+        let data;
         switch (context.provider) {
             case StorageProviderType.JSONBIN: {
                 if (context.id) {
-                    return addJSONBinCredentials(context);
+                    data = addJSONBinCredentials(context);
                 }
-                return createNewJSONBin(context);
+                data = createNewJSONBin(context);
+                break;
             }
             case StorageProviderType.GITHUB: {
-                return addNewGitHubCredentials(context);
+                data = addNewGitHubCredentials(context);
+                break;
             }
             default:
                 throw new Error('Not implemented');
         }
+        if (data) {
+            setStorageType({provider: context, bool: true});
+            return true;
+        }
+        return false;
     }
 
     const deleteProvider = (provider) => {

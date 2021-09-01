@@ -70,10 +70,11 @@ export default function Initiator() {
                         setStorageType({provider: storageType});
                         break;
                     case MessageFromPluginTypes.API_CREDENTIALS: {
+                        console.log('Got api creds', credentials);
                         if (status === true) {
                             dispatch.uiState.setApiData(credentials);
                             dispatch.uiState.setLocalApiState(credentials);
-                            await pullTokens(credentials);
+                            await pullTokens();
                             dispatch.uiState.setActiveTab('tokens');
                             dispatch.uiState.setLoading(false);
                         }
