@@ -74,7 +74,7 @@ export default function Initiator() {
                         if (status === true) {
                             dispatch.uiState.setApiData(credentials);
                             dispatch.uiState.setLocalApiState(credentials);
-                            await pullTokens();
+                            await pullTokens(credentials);
                             dispatch.uiState.setActiveTab('tokens');
                             dispatch.uiState.setLoading(false);
                         }

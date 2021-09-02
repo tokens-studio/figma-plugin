@@ -16,19 +16,19 @@ export default function useRemoteTokens() {
     const {pullTokensFromJSONBin, addJSONBinCredentials, createNewJSONBin} = useJSONbin();
     const {addNewGitHubCredentials, pullTokensFromGitHub, pushTokensToGitHub} = useGitHub();
 
-    const pullTokens = async () => {
+    const pullTokens = async (context = api) => {
         dispatch.uiState.setLoading(true);
-        console.log('Api is', api);
+        console.log('Api is', context);
 
         let tokenValues;
 
-        switch (api.provider) {
+        switch (context.provider) {
             case StorageProviderType.JSONBIN: {
-                tokenValues = await pullTokensFromJSONBin(api);
+                tokenValues = await pullTokensFromJSONBin(context);
                 break;
             }
             case StorageProviderType.GITHUB: {
-                tokenValues = await pullTokensFromGitHub(api);
+                tokenValues = await pullTokensFromGitHub(context);
                 break;
             }
             default:
