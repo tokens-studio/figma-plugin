@@ -76,6 +76,9 @@ export default {
                 spread: '',
                 color: '',
             },
+            options: {
+                description: '',
+            },
         },
     },
     typography: {
