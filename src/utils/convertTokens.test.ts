@@ -55,10 +55,10 @@ describe('convertToTokenArray', () => {
         };
 
         expect(convertToTokenArray({tokens: basicTokens})).toEqual([
-            ['global.withValue', {value: 'bar'}],
-            ['global.basic', {value: '#ff0000'}],
-            ['global.typography.heading.h1', typographyTokens.basic.output],
-            ['global.typography.heading.h2', typographyTokens.withValue.output],
+            {name: 'global.withValue', value: 'bar'},
+            {name: 'global.basic', value: '#ff0000'},
+            {...typographyTokens.basic.output, name: 'global.typography.heading.h1'},
+            {...typographyTokens.withValue.output, name: 'global.typography.heading.h2'},
         ]);
     });
 });

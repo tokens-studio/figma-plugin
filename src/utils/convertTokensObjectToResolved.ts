@@ -8,12 +8,9 @@ export default function convertTokensObjectToResolved(tokens, usedSets = []) {
     const parsed = parseTokenValues(tokens.values);
     // Merge to one giant array
     const merged = mergeTokenGroups(parsed, usedSets);
-    console.log('MErged is', merged);
     // Resolve aliases
     const resolved = resolveTokenValues(merged);
-    console.log('resolved is', resolved);
     // Group back into one object
     const object = convertTokensToGroupedObject(resolved);
-    console.log('object is', object);
     return object;
 }

@@ -13,7 +13,6 @@ export async function updateCredentials(context) {
             existingProviders = parsedData;
 
             let matchingProvider;
-            console.log('Existing', existingProviders);
             if (context.internalId) {
                 matchingProvider = existingProviders.findIndex((i) => i.internalId === context.internalId);
             } else {
@@ -22,11 +21,11 @@ export async function updateCredentials(context) {
                 );
             }
             // Handle case for old credentials where  we had no internalId. Check id and secret and provider then
-            if (typeof matchingProvider !== 'undefined') {
+            if (matchingProvider !== -1) {
                 existingProviders.splice(matchingProvider, 1, context);
             }
 
-            if (!parsedData || typeof matchingProvider === 'undefined') {
+            if (!parsedData || matchingProvider === -1) {
                 existingProviders.push({...context, internalId: generateId(24)});
             }
         } else {

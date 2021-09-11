@@ -1,5 +1,4 @@
 import {useDispatch, useSelector} from 'react-redux';
-import {TokenProps} from 'Types/tokens';
 import {StorageProviderType} from 'Types/api';
 import {MessageToPluginTypes} from 'Types/messages';
 import {postToFigma} from '../../plugin/notifiers';
@@ -49,7 +48,7 @@ export default function useRemoteTokens() {
         dispatch.uiState.setLocalApiState(context);
         dispatch.uiState.setApiData(context);
         setStorageType({provider: context, bool: true});
-        await pullTokens();
+        await pullTokens(context);
         dispatch.uiState.setLoading(false);
         return null;
     };

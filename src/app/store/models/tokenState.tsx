@@ -7,6 +7,7 @@ import defaultJSON from '@/config/default.json';
 import parseTokenValues from '@/utils/parseTokenValues';
 import {notifyToUI} from '@/plugin/notifiers';
 import {reduceToValues} from '@/plugin/tokenHelpers';
+import convertTokensToObject from '@/utils/convertTokensToObject';
 import {RootModel} from '.';
 import updateTokensOnSources from '../updateSources';
 import * as pjs from '../../../../package.json';
@@ -111,6 +112,7 @@ export const tokenState = createModel<RootModel>()({
             };
         },
         setLastSyncedState: (state, data: string) => {
+            console.log('Setting last synced to', data);
             return {
                 ...state,
                 lastSyncedState: data,
@@ -307,6 +309,11 @@ export const tokenState = createModel<RootModel>()({
             dispatch.tokenState.updateDocument(true);
         },
         setTokenData(payload, rootState) {
+            // const newStrings = JSON.stringify(convertTokensToObject(rootState.tokenState.tokens), null, 2);
+            // if (newStrings !== rootState.tokenState.lastSyncedState) {
+            //     console.log('NEW TOKENS DO NOT MATCH OLD TOKENS', newStrings);
+            //     console.log('OLD TOKENS', rootState.tokenState.lastSyncedState);
+            // }
             if (payload.shouldUpdate) {
                 dispatch.tokenState.updateDocument();
             }

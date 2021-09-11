@@ -4,8 +4,8 @@ export interface TokenProps {
     values: {
         [key: string]: SingleTokenObject[] | TokenObject;
     };
-    updatedAt: string;
-    version: string;
+    updatedAt?: string;
+    version?: string;
 }
 
 export type SingleToken = TokenGroup;

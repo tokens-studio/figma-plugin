@@ -9,8 +9,6 @@ import usePushDialog from '@/app/hooks/usePushDialog';
 import IsJSONString from '@/utils/isJSONString';
 import {ContextObject} from 'Types/api';
 import {notifyToUI, postToFigma} from '../../../plugin/notifiers';
-import * as pjs from '../../../../package.json';
-import useStorage from '../useStorage';
 
 /** Returns a URL to a page where the user can create a pull request with a given branch */
 function getCreatePullRequestUrl(owner: string, repo: string, branchName: string) {
@@ -39,11 +37,13 @@ export const readContents = async ({context, owner, repo}) => {
             // If content of file is parseable JSON, parse it
             if (IsJSONString(data)) {
                 const parsed = JSON.parse(data);
-                return parsed;
+                return {
+                    values: parsed,
+                };
             }
-            // If not, return string only as we can't process that file. We should probably not return a string though.
-            return data;
+            return null;
         }
+        // If not, return null as we can't process that file. We should let the user know, though.
         return null;
     } catch (e) {
         // Raise error (usually this is an auth error)
@@ -93,10 +93,7 @@ export function useGitHub() {
     }
 
     function getTokenObj() {
-        const raw = {
-            version: pjs.plugin_version,
-            values: convertTokensToObject(tokens),
-        };
+        const raw = convertTokensToObject(tokens);
         const string = JSON.stringify(raw, null, 2);
         return {raw, string};
     }
@@ -122,6 +119,7 @@ export function useGitHub() {
             } else {
                 await commitToNewBranch({context, tokenObj, owner, repo, commitMessage});
             }
+            dispatch.tokenState.setLastSyncedState(tokenObj);
             notifyToUI('Pushed changes to GitHub');
         } catch (e) {
             notifyToUI('Error pushing to GitHub');
@@ -147,7 +145,6 @@ export function useGitHub() {
         const commitMessage = await pushDialog();
         if (commitMessage) {
             await writeTokensToGitHub({context, tokenObj, owner, repo, commitMessage});
-            notifyToUI('Updated!');
         }
         return rawTokenObj;
     }
@@ -167,6 +164,7 @@ export function useGitHub() {
         return null;
     }
 
+    // Function to initially check auth and sync tokens with GitHub
     async function syncTokensWithGitHub(context) {
         try {
             const [owner, repo] = context.id.split('/');
@@ -190,7 +188,8 @@ export function useGitHub() {
             } else {
                 await pushTokensToGitHub(context);
             }
-            return rawTokenObj;
+            // If repo contains no tokens, return null
+            return null;
         } catch (e) {
             console.log('Error', e);
         }
@@ -210,11 +209,7 @@ export function useGitHub() {
                     ...context,
                 });
                 if (data?.values) {
-                    const obj = {
-                        version: data.version,
-                        updatedAt: data.updatedAt,
-                        values: data.values,
-                    };
+                    const obj = data;
 
                     dispatch.tokenState.setLastSyncedState(JSON.stringify(obj.values, null, 2));
                     dispatch.tokenState.setTokenData(obj);

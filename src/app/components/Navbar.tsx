@@ -1,7 +1,7 @@
 import * as React from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {track} from '@/utils/analytics';
-import {MagnifyingGlassIcon, DoubleArrowUpIcon} from '@radix-ui/react-icons';
+import {MagnifyingGlassIcon} from '@radix-ui/react-icons';
 import convertTokensToObject from '@/utils/convertTokensToObject';
 import Icon from './Icon';
 import Tooltip from './Tooltip';
@@ -50,6 +50,12 @@ const Navbar = () => {
     const {toggleFilterVisibility} = useDispatch<Dispatch>().uiState;
     const {pullTokens, pushTokens} = useRemoteTokens();
 
+    const checkForChanges = () => {
+        if (lastSyncedState !== JSON.stringify(convertTokensToObject(tokens), null, 2)) {
+            return true;
+        }
+    };
+
     return (
         <div className="sticky top-0 navbar bg-white flex items-center justify-between z-1 border-b border-gray-200">
             <div>
@@ -86,7 +92,7 @@ const Navbar = () => {
                                     type="button"
                                     className="button button-ghost relative"
                                 >
-                                    {lastSyncedState !== JSON.stringify(convertTokensToObject(tokens), null, 2) && (
+                                    {checkForChanges() && (
                                         <div className="rounded-full w-2 h-2 bg-primary-500 absolute right-0 top-0" />
                                     )}
 
