@@ -34,8 +34,8 @@ module.exports = (env, argv) => ({
 
     output: {
         filename: '[name].js',
-        path: path.resolve(__dirname, 'dist'), // Compile into a folder called "dist"
-        library: 'webpackNumbers',
+        path: path.resolve(__dirname, 'token-transformer/dist'), // Compile into a folder called "dist"
+        library: 'tokenTransformer',
         libraryTarget: 'commonjs2',
     },
 });
