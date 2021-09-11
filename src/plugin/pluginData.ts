@@ -101,16 +101,19 @@ export function removePluginData(nodes, key?) {
         } finally {
             if (key) {
                 node.setPluginData(key, '');
+                node.setSharedPluginData('tokens', key, '');
                 // TODO: Introduce setting asking user if values should be removed?
                 removeValuesFromNode(node, key);
             } else {
                 Object.keys(properties).forEach((prop) => {
                     node.setPluginData(prop, '');
+                    node.setSharedPluginData('tokens', prop, '');
                     // TODO: Introduce setting asking user if values should be removed?
                     removeValuesFromNode(node, prop);
                 });
             }
             node.setPluginData('values', '');
+            node.setSharedPluginData('tokens', 'values', '');
             store.successfulNodes.push(node);
         }
     });
@@ -129,14 +132,19 @@ export function updatePluginData(nodes, values) {
                 // Pre-Version 53 had horizontalPadding and verticalPadding.
                 case 'horizontalPadding':
                     node.setPluginData('paddingLeft', JSON.stringify(value));
+                    node.setSharedPluginData('tokens', 'paddingLeft', JSON.stringify(value));
                     node.setPluginData('paddingRight', JSON.stringify(value));
+                    node.setSharedPluginData('tokens', 'paddingRight', JSON.stringify(value));
                     break;
                 case 'verticalPadding':
                     node.setPluginData('paddingTop', JSON.stringify(value));
+                    node.setSharedPluginData('tokens', 'paddingTop', JSON.stringify(value));
                     node.setPluginData('paddingBottom', JSON.stringify(value));
+                    node.setSharedPluginData('tokens', 'paddingBottom', JSON.stringify(value));
                     break;
                 default:
                     node.setPluginData(key, JSON.stringify(value));
+                    node.setSharedPluginData('tokens', key, JSON.stringify(value));
                     break;
             }
         });
@@ -160,6 +168,7 @@ export function updatePluginData(nodes, values) {
             }
         } finally {
             node.setPluginData('values', '');
+            node.setSharedPluginData('tokens', 'values', '');
         }
     });
 }
