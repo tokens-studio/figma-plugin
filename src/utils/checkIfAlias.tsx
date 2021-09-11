@@ -1,5 +1,6 @@
 import {SingleTokenObject} from '@types/tokens';
-import {aliasRegex, getAliasValue} from './aliases';
+import getAliasValue from './aliases';
+import {aliasRegex} from './findReferences';
 
 // Checks if token is an alias token and if it has a valid reference
 export default function checkIfAlias(token: SingleTokenObject, allTokens = []): boolean {

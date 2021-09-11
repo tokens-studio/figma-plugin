@@ -1,14 +1,13 @@
 import {checkAndEvaluateMath, convertToRgb} from '@/app/components/utils';
 import {SingleTokenObject} from 'Types/tokens';
 import checkIfValueToken from './checkIfValueToken';
+import {findReferences} from './findReferences';
 
-export const aliasRegex = /(\$[^\s,]+\w)|({[^\s]+})/g;
-
-export function getAliasValue(token: SingleTokenObject, tokens = []): string | null {
+export default function getAliasValue(token: SingleTokenObject, tokens = []): string | null {
     try {
         let returnedValue = checkIfValueToken(token) ? (token.value as string) : (token as string);
 
-        const tokenReferences = returnedValue?.toString().match(aliasRegex);
+        const tokenReferences = findReferences(returnedValue);
         if (tokenReferences?.length > 0) {
             const resolvedReferences = tokenReferences.map((ref) => {
                 if (ref.length > 1) {
@@ -29,7 +28,7 @@ export function getAliasValue(token: SingleTokenObject, tokens = []): string | n
             }
         }
         if (typeof returnedValue !== 'undefined') {
-            if (!returnedValue.toString().match(aliasRegex)) {
+            if (!tokenReferences) {
                 return convertToRgb(checkAndEvaluateMath(returnedValue));
             }
             return returnedValue;
