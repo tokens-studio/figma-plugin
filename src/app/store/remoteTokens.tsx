@@ -86,6 +86,8 @@ export default function useRemoteTokens() {
                 throw new Error('Not implemented');
         }
         if (data) {
+            dispatch.uiState.setLocalApiState(context);
+            dispatch.uiState.setApiData(context);
             setStorageType({provider: context, bool: true});
             return true;
         }
