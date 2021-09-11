@@ -1,7 +1,7 @@
 {
 	"name": "figma-tokens",
 	"version": "1.0.0",
-	"plugin_version": "61",
+	"plugin_version": "62",
 	"description": "Figma Tokens",
 	"license": "ISC",
 	"scripts": {
@@ -45,7 +45,7 @@
 		"file-loader": "^6.2.0",
 		"ignore-styles": "^5.0.1",
 		"mixpanel-figma": "^2.0.1",
-		"object-path": "^0.11.5",
+		"object-path": "^0.11.6",
 		"octokit-commit-multiple-files": "^3.2.1",
 		"postcss": "^8.2.10",
 		"react": "17.0.0",

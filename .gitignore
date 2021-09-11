@@ -8,3 +8,4 @@ cypress/videos
 .env
 .env.production
 package
+.idea
