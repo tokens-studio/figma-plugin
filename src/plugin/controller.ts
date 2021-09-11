@@ -54,7 +54,6 @@ figma.ui.onmessage = async (msg) => {
 
                 const apiProviders = await figma.clientStorage.getAsync('apiProviders');
                 if (apiProviders) notifyAPIProviders(JSON.parse(apiProviders));
-                console.log('Storage', storageType, apiProviders);
                 switch (storageType.provider) {
                     case StorageProviderType.JSONBIN:
                     case StorageProviderType.GITHUB: {
@@ -81,7 +80,6 @@ figma.ui.onmessage = async (msg) => {
             return;
         case MessageToPluginTypes.CREDENTIALS: {
             const {type, ...context} = msg;
-            console.log('Setting creds', msg, context);
             updateCredentials(context);
             break;
         }

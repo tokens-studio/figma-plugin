@@ -17,7 +17,6 @@ export default function useRemoteTokens() {
 
     const pullTokens = async (context = api) => {
         dispatch.uiState.setLoading(true);
-        console.log('Api is', context);
 
         let tokenValues;
 

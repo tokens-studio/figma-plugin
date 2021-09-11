@@ -110,7 +110,6 @@ export function useURL() {
                     secret,
                     provider: StorageProviderType.URL,
                 });
-                console.log('Data values', data.values);
                 if (data?.values) {
                     const obj = {
                         version: data.version,

@@ -52,7 +52,6 @@ async function writeTokensToJSONBin({secret, id, tokenObj}): Promise<TokenProps>
 }
 
 export async function updateJSONBinTokens({tokens, context, updatedAt, oldUpdatedAt = null}) {
-    console.log('Context is', context, tokens, updatedAt);
     const {id, secret} = context;
 
     try {
@@ -92,7 +91,6 @@ export function useJSONbin() {
 
     async function createNewJSONBin(context): Promise<TokenProps> {
         const {secret, name, updatedAt} = context;
-        console.log('Context', context);
         const response = await fetch(`https://api.jsonbin.io/v3/b`, {
             method: 'POST',
             mode: 'cors',
@@ -124,7 +122,6 @@ export function useJSONbin() {
                 provider: {id: jsonBinData.metadata.id, name, provider: StorageProviderType.JSONBIN},
                 bool: true,
             });
-            console.log('jsonbindata', jsonBinData);
             updateJSONBinTokens({
                 tokens,
                 context: {

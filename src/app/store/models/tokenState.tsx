@@ -112,7 +112,6 @@ export const tokenState = createModel<RootModel>()({
             };
         },
         setLastSyncedState: (state, data: string) => {
-            console.log('Setting last synced to', data);
             return {
                 ...state,
                 lastSyncedState: data,
@@ -309,11 +308,6 @@ export const tokenState = createModel<RootModel>()({
             dispatch.tokenState.updateDocument(true);
         },
         setTokenData(payload, rootState) {
-            // const newStrings = JSON.stringify(convertTokensToObject(rootState.tokenState.tokens), null, 2);
-            // if (newStrings !== rootState.tokenState.lastSyncedState) {
-            //     console.log('NEW TOKENS DO NOT MATCH OLD TOKENS', newStrings);
-            //     console.log('OLD TOKENS', rootState.tokenState.lastSyncedState);
-            // }
             if (payload.shouldUpdate) {
                 dispatch.tokenState.updateDocument();
             }
