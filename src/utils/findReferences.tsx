@@ -13,6 +13,7 @@ export const findMatchingReferences = (tokenValue: string, valueToLookFor: strin
             if (name === valueToLookFor) return ref;
         });
     }
+    return [];
 };
 
 export const replaceReferences = (tokenValue: string, oldName: string, newName: string) => {
