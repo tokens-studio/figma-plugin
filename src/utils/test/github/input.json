@@ -1,5 +1,45 @@
 {
+    "light": {
+        "colors": {
+            "Background": {
+                "value": "{Light-Theme-Colorscale.Gray.00}",
+                "description": "Alias value",
+                "type": "color"
+            },
+            "Background50": {
+                "value": "rgba({Light-Theme-Colorscale.Gray.00}, 0.5)",
+                "description": "Nested color value",
+                "type": "color"
+            }
+        }
+    },
+    "dark": {
+        "colors": {
+            "Background": {
+                "value": "{Light-Theme-Colorscale.Gray.Black}",
+                "description": "Alias value",
+                "type": "color"
+            },
+            "Background50": {
+                "value": "rgba({Light-Theme-Colorscale.Gray.Black}, 0.5)",
+                "description": "Nested color value",
+                "type": "color"
+            }
+        }
+    },
     "options": {
+        "sizing": {
+            "base": {
+                "value": "4",
+                "description": "Alias value",
+                "type": "sizing"
+            },
+            "default": {
+                "value": "$sizing.base * 2",
+                "description": "Math value",
+                "type": "sizing"
+            }
+        },
         "Light-Theme-Colorscale": {
             "Gray": {
                 "00": {
