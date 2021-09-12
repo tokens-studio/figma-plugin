@@ -12,7 +12,7 @@ const ConfirmDialog = () => {
             <div className="flex justify-center flex-col text-center space-y-4">
                 <div className="space-y-2">
                     <Heading>{confirmState?.text && confirmState.text}</Heading>
-                    {confirmState?.description && <p> {confirmState.description}</p>}
+                    {confirmState?.description && <p className="text-xs"> {confirmState.description}</p>}
                 </div>
                 <div className="space-x-4">
                     <Button variant="secondary" onClick={onCancel}>
