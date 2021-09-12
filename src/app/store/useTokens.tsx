@@ -2,7 +2,7 @@ import {postToFigma} from '@/plugin/notifiers';
 import {useSelector} from 'react-redux';
 import {MessageToPluginTypes} from 'Types/messages';
 import checkIfAlias from '@/utils/checkIfAlias';
-import {getAliasValue} from '@/utils/aliases';
+import getAliasValue from '@/utils/aliases';
 import {SingleTokenObject} from 'Types/tokens';
 import stringifyTokens from '@/utils/stringifyTokens';
 import formatTokens from '@/utils/formatTokens';

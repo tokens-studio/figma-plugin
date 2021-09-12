@@ -7,7 +7,7 @@ import defaultJSON from '@/config/default.json';
 import parseTokenValues from '@/utils/parseTokenValues';
 import {notifyToUI} from '@/plugin/notifiers';
 import {reduceToValues} from '@/plugin/tokenHelpers';
-import convertTokensToObject from '@/utils/convertTokensToObject';
+import {replaceReferences} from '@/utils/findReferences';
 import {RootModel} from '.';
 import updateTokensOnSources from '../updateSources';
 import * as pjs from '../../../../package.json';
@@ -273,6 +273,37 @@ export const tokenState = createModel<RootModel>()({
 
             return newState;
         },
+        updateAliases: (state, data: {oldName: string; newName: string}) => {
+            const newTokens = Object.entries(state.tokens).reduce(
+                (acc, [key, values]: [string, SingleTokenObject[]]) => {
+                    const newValues = values.map((token) => {
+                        if (typeof token.value === 'object') {
+                            return {
+                                ...token,
+                                value: Object.entries(token.value).reduce((a, [k, v]: [string, string]) => {
+                                    a[k] = replaceReferences(v, data.oldName, data.newName);
+                                    return a;
+                                }, {}),
+                            };
+                        }
+
+                        return {
+                            ...token,
+                            value: replaceReferences(token.value, data.oldName, data.newName),
+                        };
+                    });
+
+                    acc[key] = newValues;
+                    return acc;
+                },
+                {}
+            );
+
+            return {
+                ...state,
+                tokens: newTokens,
+            };
+        },
     },
     effects: (dispatch) => ({
         setDefaultTokens: (payload) => {
@@ -282,6 +313,10 @@ export const tokenState = createModel<RootModel>()({
             dispatch.tokenState.setTokenData({values: []});
         },
         editToken(payload, rootState) {
+            if (payload.oldName && payload.oldName !== payload.name) {
+                dispatch.tokenState.updateAliases({oldName: payload.oldName, newName: payload.name});
+            }
+
             if (payload.shouldUpdate && rootState.settings.updateOnChange) {
                 dispatch.tokenState.updateDocument();
             }

@@ -1,5 +1,5 @@
 import {appendTypeToToken} from '@/app/components/createTokenObj';
-import {getAliasValue} from '@/utils/aliases';
+import getAliasValue from '@/utils/aliases';
 import checkIfAlias from '@/utils/checkIfAlias';
 import {SingleTokenObject} from 'Types/tokens';
 import {mergeDeep} from './helpers';

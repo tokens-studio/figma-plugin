@@ -12,6 +12,8 @@ const EditTokenForm = () => {
     const dispatch = useDispatch<Dispatch>();
     const [currentEditToken, setCurrentEditToken] = React.useState(editToken);
 
+    const isValid = currentEditToken.value && currentEditToken.name.match(/^\S*$/);
+
     const handleChange = (e) => {
         e.persist();
         setCurrentEditToken({...currentEditToken, [e.target.name]: e.target.value});
@@ -64,8 +66,10 @@ const EditTokenForm = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        submitTokenValue(currentEditToken);
-        dispatch.uiState.setShowEditForm(false);
+        if (isValid) {
+            submitTokenValue(currentEditToken);
+            dispatch.uiState.setShowEditForm(false);
+        }
     };
 
     const handleReset = () => {
@@ -139,7 +143,7 @@ const EditTokenForm = () => {
                 <button className="button button-link" type="button" onClick={handleReset}>
                     Cancel
                 </button>
-                <button disabled={!currentEditToken.value} className="button button-primary" type="submit">
+                <button disabled={!isValid} className="button button-primary" type="submit">
                     {currentEditToken.isPristine ? 'Create' : 'Update'}
                 </button>
             </div>
