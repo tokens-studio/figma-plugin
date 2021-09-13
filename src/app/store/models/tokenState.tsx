@@ -272,7 +272,7 @@ export const tokenState = createModel<RootModel>()({
                             return {
                                 ...token,
                                 value: Object.entries(token.value).reduce((a, [k, v]: [string, string]) => {
-                                    a[k] = replaceReferences(v, data.oldName, data.newName);
+                                    a[k] = replaceReferences(v.toString(), data.oldName, data.newName);
                                     return a;
                                 }, {}),
                             };
@@ -280,7 +280,7 @@ export const tokenState = createModel<RootModel>()({
 
                         return {
                             ...token,
-                            value: replaceReferences(token.value, data.oldName, data.newName),
+                            value: replaceReferences(token.value.toString(), data.oldName, data.newName),
                         };
                     });
 

@@ -17,13 +17,18 @@ export const findMatchingReferences = (tokenValue: string, valueToLookFor: strin
 };
 
 export const replaceReferences = (tokenValue: string, oldName: string, newName: string) => {
-    if (tokenValue.includes(oldName)) {
-        const references = findMatchingReferences(tokenValue, oldName);
-        let newValue = tokenValue;
-        references.forEach((reference) => {
-            newValue = newValue.replace(reference, `{${newName}}`);
-        });
-        return newValue;
+    try {
+        if (tokenValue.includes(oldName)) {
+            const references = findMatchingReferences(tokenValue, oldName);
+            let newValue = tokenValue;
+            references.forEach((reference) => {
+                newValue = newValue.replace(reference, `{${newName}}`);
+            });
+            return newValue;
+        }
+    } catch (e) {
+        console.log('Error replacing reference', tokenValue, oldName, newName, e);
     }
+
     return tokenValue;
 };
