@@ -1,10 +1,12 @@
 import {useDispatch} from 'react-redux';
 import {SingleToken, TokenType} from '@types/tokens';
 import {Dispatch} from '../store';
+import useConfirm from '../hooks/useConfirm';
 
 export default function useManageTokens() {
     const {editToken, createToken, deleteToken} = useDispatch<Dispatch>().tokenState;
     const dispatch = useDispatch<Dispatch>();
+    const {confirm} = useConfirm();
 
     async function editSingleToken(data: {
         parent: string;
@@ -60,9 +62,15 @@ export default function useManageTokens() {
     }
 
     async function deleteSingleToken(data) {
-        dispatch.uiState.setLoading(true);
-        deleteToken(data);
-        dispatch.uiState.setLoading(false);
+        const userConfirmation = await confirm({
+            text: 'Delete token?',
+            description: 'Are you sure you want to delete this token?',
+        });
+        if (userConfirmation) {
+            dispatch.uiState.setLoading(true);
+            deleteToken(data);
+            dispatch.uiState.setLoading(false);
+        }
     }
 
     return {editSingleToken, createSingleToken, deleteSingleToken};

@@ -13,6 +13,7 @@ import Initiator from './Initiator';
 import Changelog from './Changelog';
 import ImportedTokensDialog from './ImportedTokensDialog';
 import {RootState} from '../store';
+import ConfirmDialog from './ConfirmDialog';
 
 const App = () => {
     const activeTab = useSelector((state: RootState) => state.uiState.activeTab);
@@ -34,6 +35,7 @@ const App = () => {
                 <Footer />
                 <Changelog />
                 <ImportedTokensDialog />
+                <ConfirmDialog />
             </div>
         </>
     );
