@@ -11,7 +11,11 @@ const ConfirmDialog = () => {
 
     React.useEffect(() => {
         setTimeout(() => {
-            confirmButton.current.focus();
+            try {
+                confirmButton.current.focus();
+            } catch (e) {
+                console.log(e);
+            }
         }, 50);
     }, [confirmState.show]);
 
