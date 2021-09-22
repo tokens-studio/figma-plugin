@@ -3,6 +3,7 @@ import React from 'react';
 import {DndProvider} from 'react-dnd';
 import {HTML5Backend} from 'react-dnd-html5-backend';
 import {useDispatch, useSelector} from 'react-redux';
+import useConfirm from '../hooks/useConfirm';
 import {Dispatch, RootState} from '../store';
 import Button from './Button';
 import Heading from './Heading';
@@ -15,9 +16,9 @@ import Tooltip from './Tooltip';
 export default function TokenSetSelector() {
     const {tokens, editProhibited} = useSelector((state: RootState) => state.tokenState);
     const dispatch = useDispatch<Dispatch>();
+    const {confirm} = useConfirm();
 
     const [showNewTokenSetFields, setShowNewTokenSetFields] = React.useState(false);
-    const [showDeleteTokenSetModal, setShowDeleteTokenSetModal] = React.useState(false);
     const [showRenameTokenSetFields, setShowRenameTokenSetFields] = React.useState(false);
     const [newTokenSetName, handleNewTokenSetNameChange] = React.useState('');
     const [tokenSetMarkedForChange, setTokenSetMarkedForChange] = React.useState('');
@@ -52,22 +53,22 @@ export default function TokenSetSelector() {
         dispatch.tokenState.addTokenSet(newTokenSetName.trim());
     };
 
-    const handleDeleteTokenSet = (tokenSet) => {
+    const handleDeleteTokenSet = async (tokenSet) => {
         track('Deleted token set');
-        setTokenSetMarkedForChange(tokenSet);
-        setShowDeleteTokenSetModal(true);
+
+        const userConfirmation = await confirm({
+            text: 'Delete token set?',
+            description: 'Are you sure you want to delete this set?',
+        });
+        if (userConfirmation) {
+            dispatch.tokenState.deleteTokenSet(tokenSet);
+        }
     };
 
     const handleRenameTokenSet = (tokenSet) => {
         track('Renamed token set');
         setTokenSetMarkedForChange(tokenSet);
         setShowRenameTokenSetFields(true);
-    };
-
-    const handleConfirmDeleteTokenSet = () => {
-        dispatch.tokenState.deleteTokenSet(tokenSetMarkedForChange);
-        setTokenSetMarkedForChange('');
-        setShowDeleteTokenSetModal(false);
     };
 
     const handleRenameTokenSetSubmit = (e) => {
@@ -93,23 +94,10 @@ export default function TokenSetSelector() {
                         index={index}
                         key={tokenSet}
                         onRename={handleRenameTokenSet}
-                        onDelete={handleDeleteTokenSet}
+                        onDelete={() => handleDeleteTokenSet(tokenSet)}
                     />
                 ))}
             </DndProvider>
-            <Modal isOpen={showDeleteTokenSetModal} close={() => setShowDeleteTokenSetModal(false)}>
-                <div className="flex justify-center flex-col text-center space-y-4">
-                    <Heading>Are you sure?</Heading>
-                    <div className="space-x-4">
-                        <Button variant="secondary" size="large" onClick={() => setShowDeleteTokenSetModal(false)}>
-                            Cancel
-                        </Button>
-                        <Button variant="primary" size="large" onClick={handleConfirmDeleteTokenSet}>
-                            Yes, delete it.
-                        </Button>
-                    </div>
-                </div>
-            </Modal>
             <Modal isOpen={showRenameTokenSetFields} close={() => setShowRenameTokenSetFields(false)}>
                 <div className="flex justify-center flex-col text-center space-y-4">
                     <Heading>Rename {tokenSetMarkedForChange}</Heading>
