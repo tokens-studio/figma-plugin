@@ -7,17 +7,15 @@ import Modal from './Modal';
 const ConfirmDialog = () => {
     const {onConfirm, onCancel, confirmState} = useConfirm();
 
-    const confirmButton: React.RefObject<typeof Button> = React.useRef(null);
+    const confirmButton = React.useRef(null);
 
     React.useEffect(() => {
         setTimeout(() => {
-            try {
+            if (confirmButton.current) {
                 confirmButton.current.focus();
-            } catch (e) {
-                console.log(e);
             }
         }, 50);
-    }, [confirmState.show]);
+    }, [confirmState.show, confirmButton]);
 
     return confirmState.show ? (
         <Modal isOpen close={onCancel}>

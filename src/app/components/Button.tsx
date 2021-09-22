@@ -24,7 +24,7 @@ const Button: React.FunctionComponent<ButtonProps> = ({
     disabled = false,
     id,
     buttonRef = null,
-}) => {
+}): HTMLButtonElement => {
     const handleClick = () => {
         if (id) {
             track(`Clicked ${id}`);
