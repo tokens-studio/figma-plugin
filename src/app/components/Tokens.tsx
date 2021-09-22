@@ -34,7 +34,15 @@ const Tokens = ({isActive}) => {
 
     const memoizedTokens = React.useMemo(() => {
         if (tokens[activeTokenSet]) {
-            return mappedTokens(tokens[activeTokenSet], tokenFilter);
+            return mappedTokens(tokens[activeTokenSet], tokenFilter).sort((a, b) => {
+                if (b[1].values) {
+                    return 1;
+                }
+                if (a[1].values) {
+                    return -1;
+                }
+                return 0;
+            });
         }
         return [];
     }, [tokens, activeTokenSet, tokenFilter]);

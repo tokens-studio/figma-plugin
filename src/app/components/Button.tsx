@@ -10,6 +10,7 @@ type ButtonProps = {
     download?: string;
     disabled?: boolean;
     id?: string;
+    buttonRef?: any;
 };
 
 const Button: React.FunctionComponent<ButtonProps> = ({
@@ -22,7 +23,8 @@ const Button: React.FunctionComponent<ButtonProps> = ({
     href,
     disabled = false,
     id,
-}) => {
+    buttonRef = null,
+}): HTMLButtonElement => {
     const handleClick = () => {
         if (id) {
             track(`Clicked ${id}`);
@@ -60,6 +62,7 @@ const Button: React.FunctionComponent<ButtonProps> = ({
                 className={`button ${[variantClass, sizeClass].join(' ')}`}
                 href={href}
                 data-cy={id}
+                ref={buttonRef}
             >
                 {children}
             </a>
@@ -74,6 +77,7 @@ const Button: React.FunctionComponent<ButtonProps> = ({
             type={type}
             className={`button ${[variantClass, sizeClass].join(' ')}`}
             onClick={handleClick}
+            ref={buttonRef}
         >
             {children}
         </button>
