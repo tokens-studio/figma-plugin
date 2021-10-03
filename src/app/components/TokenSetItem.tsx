@@ -2,9 +2,9 @@ import React from 'react';
 import {useDrop, useDrag, DropTargetMonitor} from 'react-dnd';
 import {getEmptyImage} from 'react-dnd-html5-backend';
 import {XYCoord} from 'dnd-core';
-import {ContextMenu, ContextMenuTrigger, MenuItem} from 'react-contextmenu';
 import {useDispatch, useSelector} from 'react-redux';
 import {Dispatch, RootState} from '../store';
+import {ContextMenu, ContextMenuItem, ContextMenuContent, ContextMenuTrigger} from './ContextMenu';
 
 interface DragItem {
     index: number;
@@ -104,35 +104,37 @@ export default function TokenSetItem({tokenSet, onMove, index, onRename, onDelet
 
     return (
         <div className="flex-shrink-0" ref={ref} style={{...style, opacity}} data-handler-id={handlerId}>
-            <ContextMenuTrigger id={`${tokenSet}-trigger`}>
-                <button
-                    key={tokenSet}
-                    className={`font-bold items-center gap-2 focus:outline-none text-xs flex p-2 rounded border ${
-                        activeTokenSet === tokenSet && 'border-blue-500 bg-blue-100'
-                    }`}
-                    type="button"
-                    onClick={() => dispatch.tokenState.setActiveTokenSet(tokenSet)}
-                >
-                    <input
-                        type="checkbox"
-                        className="py-2 pl-2"
-                        id={`toggle-${tokenSet}`}
-                        checked={usedTokenSet.includes(tokenSet)}
-                        onChange={() => dispatch.tokenState.toggleUsedTokenSet(tokenSet)}
-                    />
-                    {tokenSet}
-                </button>
-            </ContextMenuTrigger>
-            <ContextMenu id={`${tokenSet}-trigger`} className="text-xs">
-                <MenuItem disabled={editProhibited} onClick={() => onRename(tokenSet)}>
-                    Rename
-                </MenuItem>
-                <MenuItem
-                    disabled={editProhibited || Object.keys(tokens).length < 2}
-                    onClick={() => onDelete(tokenSet)}
-                >
-                    Delete
-                </MenuItem>
+            <ContextMenu>
+                <ContextMenuTrigger id={`${tokenSet}-trigger`}>
+                    <button
+                        key={tokenSet}
+                        className={`font-bold items-center gap-2 focus:outline-none text-xs flex p-2 rounded border ${
+                            activeTokenSet === tokenSet && 'border-blue-500 bg-blue-100'
+                        }`}
+                        type="button"
+                        onClick={() => dispatch.tokenState.setActiveTokenSet(tokenSet)}
+                    >
+                        <input
+                            type="checkbox"
+                            className="py-2 pl-2"
+                            id={`toggle-${tokenSet}`}
+                            checked={usedTokenSet.includes(tokenSet)}
+                            onChange={() => dispatch.tokenState.toggleUsedTokenSet(tokenSet)}
+                        />
+                        {tokenSet}
+                    </button>
+                </ContextMenuTrigger>
+                <ContextMenuContent className="text-xs">
+                    <ContextMenuItem disabled={editProhibited} onSelect={() => onRename(tokenSet)}>
+                        Rename
+                    </ContextMenuItem>
+                    <ContextMenuItem
+                        disabled={editProhibited || Object.keys(tokens).length < 2}
+                        onSelect={() => onDelete(tokenSet)}
+                    >
+                        Delete
+                    </ContextMenuItem>
+                </ContextMenuContent>
             </ContextMenu>
         </div>
     );

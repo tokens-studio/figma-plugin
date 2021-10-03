@@ -1,6 +1,6 @@
 import React from 'react';
-import {ContextMenu, ContextMenuTrigger, MenuItem} from 'react-contextmenu';
 import {useDispatch, useSelector} from 'react-redux';
+import {ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger} from './ContextMenu';
 import Heading from './Heading';
 import {Dispatch, RootState} from '../store';
 import useConfirm from '../hooks/useConfirm';
@@ -21,15 +21,15 @@ export default function TokenGroupHeading({label, path, id}) {
     };
 
     return (
-        <div>
+        <ContextMenu>
             <ContextMenuTrigger id={`group-heading-${path}-${label}-${id}`}>
                 <Heading size="small">{label}</Heading>
             </ContextMenuTrigger>
-            <ContextMenu id={`group-heading-${path}-${label}-${id}`} className="text-xs">
-                <MenuItem disabled={editProhibited} onClick={onDelete}>
+            <ContextMenuContent className="text-xs">
+                <ContextMenuItem disabled={editProhibited} onClick={onDelete}>
                     Delete
-                </MenuItem>
-            </ContextMenu>
-        </div>
+                </ContextMenuItem>
+            </ContextMenuContent>
+        </ContextMenu>
     );
 }
