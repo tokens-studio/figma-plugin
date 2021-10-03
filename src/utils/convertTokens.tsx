@@ -1,4 +1,4 @@
-import {SingleToken} from '../../types/tokens';
+import {SingleToken, SingleTokenObject} from 'Types/tokens';
 import {isTypographyToken, isValueToken} from '../app/components/utils';
 
 function checkForTokens({
@@ -7,7 +7,7 @@ function checkForTokens({
     root = null,
     returnValuesOnly = false,
     expandTypography = false,
-}): [object, SingleToken] {
+}): [SingleTokenObject[], SingleToken] {
     let returnValue;
     const shouldExpandTypography = expandTypography ? isTypographyToken(token.value) : false;
     if (isValueToken(token) && !shouldExpandTypography) {
@@ -39,9 +39,9 @@ function checkForTokens({
                 expandTypography,
             });
             if (root && result) {
-                obj[[root, key].join('.')] = result;
+                obj.push({name: [root, key].join('.'), ...result});
             } else if (result) {
-                obj[key] = result;
+                obj.push({name: key, ...result});
             }
         });
     } else {
@@ -54,6 +54,6 @@ function checkForTokens({
 }
 
 export default function convertToTokenArray({tokens, returnValuesOnly = false, expandTypography = false}) {
-    const [result] = checkForTokens({obj: {}, token: tokens, returnValuesOnly, expandTypography});
-    return Object.entries(result);
+    const [result] = checkForTokens({obj: [], token: tokens, returnValuesOnly, expandTypography});
+    return Object.values(result);
 }

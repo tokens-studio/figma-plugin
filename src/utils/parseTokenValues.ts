@@ -13,14 +13,15 @@ export default function parseTokenValues(tokens) {
     const reducedTokens = Object.entries(tokens).reduce((prev, group) => {
         const parsedGroup = group[1];
 
+        if (Array.isArray(parsedGroup)) {
+            prev.push({[group[0]]: parsedGroup});
+
+            return prev;
+        }
+
         if (typeof parsedGroup === 'object') {
-            const groupValues = [];
             const convertedToArray = convertToTokenArray({tokens: parsedGroup});
-            convertedToArray.forEach(([key, value]) => {
-                groupValues.push({name: key, ...value});
-            });
-            const convertedGroup = groupValues;
-            prev.push({[group[0]]: convertedGroup});
+            prev.push({[group[0]]: convertedToArray});
             return prev;
         }
         if (Array.isArray(parsedGroup)) {

@@ -1,4 +1,6 @@
 import convertTokensToObject from './convertTokensToObject';
+import input from './test/github/input.json';
+import output from './test/github/output.json';
 
 describe('convertTokensToObject', () => {
     it('converts array-like tokens to nested object', () => {
@@ -44,5 +46,9 @@ describe('convertTokensToObject', () => {
                 },
             },
         });
+    });
+
+    it('keeps input the same', () => {
+        expect(convertTokensToObject(output)).toEqual(input);
     });
 });
