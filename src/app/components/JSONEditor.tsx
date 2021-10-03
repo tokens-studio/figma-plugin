@@ -1,21 +1,22 @@
 import * as React from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import parseTokenValues from '@/utils/parseTokenValues';
+import {track} from '@/utils/analytics';
 import Textarea from './Textarea';
-import Heading from './Heading';
 import Button from './Button';
-import Modal from './Modal';
 import TokenSetSelector from './TokenSetSelector';
 import ExportModal from './modals/ExportModal';
 import PresetModal from './modals/PresetModal';
 import {Dispatch, RootState} from '../store';
 import useTokens from '../store/useTokens';
+import useConfirm from '../hooks/useConfirm';
 
 const JSONEditor = () => {
     const {tokens, activeTokenSet, editProhibited} = useSelector((state: RootState) => state.tokenState);
     const {tokenType} = useSelector((state: RootState) => state.settings);
     const dispatch = useDispatch<Dispatch>();
     const {getStringTokens} = useTokens();
+    const {confirm} = useConfirm();
 
     const [confirmModalVisible, showConfirmModal] = React.useState('');
     const [exportModalVisible, showExportModal] = React.useState(false);
@@ -32,9 +33,16 @@ const JSONEditor = () => {
         dispatch.tokenState.setJSONData(stringTokens);
     };
 
-    const handleSetEmpty = () => {
-        dispatch.tokenState.setEmptyTokens();
-        showConfirmModal('');
+    const handleClearTokens = async () => {
+        track('Clear Tokens');
+
+        const userConfirmation = await confirm({
+            text: 'Delete all tokens',
+            description: 'Are you sure you want to delete all tokens?',
+        });
+        if (userConfirmation) {
+            dispatch.tokenState.setEmptyTokens();
+        }
     };
 
     const changeTokens = (val) => {
@@ -53,25 +61,6 @@ const JSONEditor = () => {
         <div className="flex flex-col flex-grow">
             {exportModalVisible && <ExportModal onClose={() => showExportModal(false)} />}
             {presetModalVisible && <PresetModal onClose={() => showPresetModal(false)} />}
-            <Modal isOpen={confirmModalVisible === 'delete'} close={() => showConfirmModal('')}>
-                <div className="flex justify-center flex-col text-center space-y-4">
-                    <div className="space-y-2">
-                        <Heading>Are you sure?</Heading>
-                        <p className="text-xs">
-                            You can undo this action by <br />
-                            performing Undo in Figma itself.
-                        </p>
-                    </div>
-                    <div className="space-x-4">
-                        <Button variant="secondary" onClick={() => showConfirmModal('')}>
-                            Cancel
-                        </Button>
-                        <Button variant="primary" onClick={handleSetEmpty}>
-                            Yes, clear all tokens.
-                        </Button>
-                    </div>
-                </div>
-            </Modal>
             <TokenSetSelector />
             <div className="flex flex-col justify-between items-center flex-grow">
                 <div className="flex flex-col p-4 pt-2 w-full items-center flex-grow">
@@ -99,12 +88,7 @@ const JSONEditor = () => {
                     >
                         Load preset
                     </Button>
-                    <Button
-                        id="clear-tokens"
-                        disabled={editProhibited}
-                        variant="secondary"
-                        onClick={() => showConfirmModal('delete')}
-                    >
+                    <Button id="clear-tokens" disabled={editProhibited} variant="secondary" onClick={handleClearTokens}>
                         Clear
                     </Button>
                 </div>

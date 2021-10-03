@@ -52,6 +52,7 @@ interface UIState {
     confirmState: {
         show: boolean;
         text?: string;
+        description?: string;
     };
     showPushDialog: boolean;
 }

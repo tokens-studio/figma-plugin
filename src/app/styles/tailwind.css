@@ -292,7 +292,8 @@ textarea:focus {
 }
 
 button:focus {
-    outline: 2px auto var(--blue, -webkit-focus-ring-color);
+    outline: none;
+    box-shadow: 0 0 0 4px theme('colors.primary.100');
 }
 
 form {

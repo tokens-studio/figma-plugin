@@ -4,13 +4,6 @@ import set from 'set-value';
 
 import tokenTypes from '../../config/tokenTypes';
 
-// Sort tokens by the last part of their name, e.g. global.colors.gray.50 comes before global.colors.gray.100
-function sortTokens(tokens) {
-    return tokens.sort((a, b) => {
-        return a.name.split('.').pop() - b.name.split('.').pop();
-    });
-}
-
 function transformName(name) {
     switch (name) {
         case 'color':
@@ -63,8 +56,7 @@ export function appendTypeToToken(token) {
 // Creates a tokens object so that tokens are displayed in groups in the UI.
 export function createTokensObject(tokens: SingleTokenObject[], tokenFilter = '') {
     if (tokens.length > 0) {
-        const tokensSorted = sortTokens(tokens);
-        const obj = tokensSorted.reduce((acc, cur) => {
+        const obj = tokens.reduce((acc, cur) => {
             if (tokenFilter === '' || cur.name?.toLowerCase().search(tokenFilter?.toLowerCase()) >= 0) {
                 const hasTypeProp = cur.type && cur.type !== '' && cur.type !== 'undefined';
                 const propToSet = hasTypeProp ? cur.type : transformName(cur.name.split('.').slice(0, 1).toString());
@@ -82,6 +74,9 @@ export function createTokensObject(tokens: SingleTokenObject[], tokenFilter = ''
 // Takes an array of tokens, transforms them into an object and merges that with values we require for the UI
 export function mappedTokens(tokens: SingleTokenObject[], tokenFilter: string) {
     const tokenObj = {};
+
+    mergeDeep(tokenObj, tokenTypes);
+
     Object.entries(createTokensObject(tokens, tokenFilter)).forEach(
         ([key, group]: [string, {values: SingleTokenObject[]; type?: TokenType}]) => {
             tokenObj[key] = {

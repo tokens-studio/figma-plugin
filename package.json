@@ -1,7 +1,7 @@
 {
 	"name": "figma-tokens",
 	"version": "1.0.0",
-	"plugin_version": "63.1",
+	"plugin_version": "65.1",
 	"description": "Figma Tokens",
 	"license": "ISC",
 	"scripts": {
@@ -34,7 +34,7 @@
 		"@sentry/react": "^6.2.5",
 		"@stitches/react": "^0.1.9",
 		"autoprefixer": "^10.2.5",
-		"axios": "^0.21.1",
+		"axios": "^0.21.2",
 		"core-js": "^3.9.1",
 		"cypress-react-selector": "^2.3.6",
 		"dnd-core": "^12.0.1",
@@ -45,8 +45,8 @@
 		"file-loader": "^6.2.0",
 		"ignore-styles": "^5.0.1",
 		"mixpanel-figma": "^2.0.1",
-		"object-path": "^0.11.6",
 		"octokit-commit-multiple-files": "^3.2.1",
+		"object-path": "^0.11.8",
 		"postcss": "^8.2.10",
 		"react": "17.0.0",
 		"react-contextmenu": "^2.14.0",
