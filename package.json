@@ -1,7 +1,7 @@
 {
 	"name": "figma-tokens",
 	"version": "1.0.0",
-	"plugin_version": "65.1",
+	"plugin_version": "66.1",
 	"description": "Figma Tokens",
 	"license": "ISC",
 	"scripts": {
@@ -10,9 +10,9 @@
 		"watch-js": "webpack --mode=development --watch",
 		"watch-transform": "webpack --mode=development --watch --config webpack-transform.config.js",
 		"build-js": "webpack --mode=production",
-		"build-transform": "webpack --mode=production --config webpack-transform.config.js",
 		"build": "yarn build-css && yarn build-js",
 		"build:watch": "concurrently 'yarn watch-css' 'yarn watch-js'",
+		"build-transform": "webpack --mode=production --config webpack-transform.config.js",
 		"prettier:format": "prettier --write 'src/**/*.{js,jsx,ts,tsx,css,json}' ",
 		"test": "jest",
 		"svgr": "svgr -d src/icons/ assets/",
