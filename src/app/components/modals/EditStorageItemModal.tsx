@@ -7,7 +7,7 @@ import useRemoteTokens from '../../store/remoteTokens';
 export default function EditStorageItemModal({isOpen, initialValue, onClose, onSuccess}) {
     const [formFields, setFormFields] = React.useState(initialValue);
     const [hasErrored, setHasErrored] = React.useState(false);
-    const {syncTokens} = useRemoteTokens();
+    const {addNewProviderItem} = useRemoteTokens();
 
     const handleChange = (e) => {
         setFormFields({...formFields, [e.target.name]: e.target.value});
@@ -15,11 +15,7 @@ export default function EditStorageItemModal({isOpen, initialValue, onClose, onS
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const response = await syncTokens({
-            id: formFields.id,
-            name: formFields.name,
-            secret: formFields.secret,
-        });
+        const response = await addNewProviderItem(formFields);
         if (!response) {
             setHasErrored(true);
         } else {
@@ -28,7 +24,7 @@ export default function EditStorageItemModal({isOpen, initialValue, onClose, onS
     };
 
     return (
-        <Modal id="modal-edit-storage-item" isOpen={isOpen} close={() => onClose(false)}>
+        <Modal large id="modal-edit-storage-item" isOpen={isOpen} close={() => onClose(false)}>
             <div className="space-y-4">
                 <Heading>Edit storage item</Heading>
                 <StorageItemForm

@@ -1,4 +1,4 @@
-onst path = require('path');
+const path = require('path');
 
 module.exports = (env, argv) => ({
     mode: argv.mode === 'production' ? 'production' : 'development',

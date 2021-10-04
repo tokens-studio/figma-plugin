@@ -51,7 +51,9 @@ interface TokenState {
 
 export const tokenState = createModel<RootModel>()({
     state: {
-        tokens: {},
+        tokens: {
+            global: [],
+        },
         importedTokens: {
             newTokens: [],
             updatedTokens: [],
@@ -258,7 +260,7 @@ export const tokenState = createModel<RootModel>()({
                 ...state,
                 tokens: {
                     ...state.tokens,
-                    [data.parent]: state.tokens[data.parent].filter((token) => !token.name.includes(data.path)),
+                    [data.parent]: state.tokens[data.parent].filter((token) => !token.name.startsWith(data.path)),
                 },
             };
 
@@ -313,25 +315,25 @@ export const tokenState = createModel<RootModel>()({
             }
         },
         deleteToken() {
-            dispatch.tokenState.updateDocument(false);
+            dispatch.tokenState.updateDocument({shouldUpdateNodes: false});
         },
         deleteTokenGroup() {
-            dispatch.tokenState.updateDocument(false);
+            dispatch.tokenState.updateDocument({shouldUpdateNodes: false});
         },
         addTokenSet() {
-            dispatch.tokenState.updateDocument(false);
+            dispatch.tokenState.updateDocument({shouldUpdateNodes: false});
         },
         renameTokenSet() {
-            dispatch.tokenState.updateDocument(false);
+            dispatch.tokenState.updateDocument({shouldUpdateNodes: false});
         },
         deleteTokenSet() {
-            dispatch.tokenState.updateDocument(false);
+            dispatch.tokenState.updateDocument({shouldUpdateNodes: false});
         },
         setTokenSetOrder() {
-            dispatch.tokenState.updateDocument(false);
+            dispatch.tokenState.updateDocument({shouldUpdateNodes: false});
         },
         setJSONData() {
-            dispatch.tokenState.updateDocument(true);
+            dispatch.tokenState.updateDocument();
         },
         setTokenData(payload, rootState) {
             if (payload.shouldUpdate) {
@@ -339,17 +341,19 @@ export const tokenState = createModel<RootModel>()({
             }
         },
         toggleUsedTokenSet(payload, rootState) {
-            dispatch.tokenState.updateDocument(true);
+            dispatch.tokenState.updateDocument({updateRemote: false});
         },
         createToken(payload, rootState) {
             if (payload.shouldUpdate && rootState.settings.updateOnChange) {
                 dispatch.tokenState.updateDocument();
             }
         },
-        updateDocument(shouldUpdateNodes = true, rootState) {
+        updateDocument(options, rootState) {
+            const defaults = {shouldUpdateNodes: true, updateRemote: true};
+            const params = {...defaults, ...options};
             try {
                 updateTokensOnSources({
-                    tokens: shouldUpdateNodes ? rootState.tokenState.tokens : null,
+                    tokens: params.shouldUpdateNodes ? rootState.tokenState.tokens : null,
                     tokenValues: reduceToValues(rootState.tokenState.tokens),
                     usedTokenSet: rootState.tokenState.usedTokenSet,
                     settings: rootState.settings,
@@ -359,7 +363,7 @@ export const tokenState = createModel<RootModel>()({
                     editProhibited: rootState.uiState.editProhibited,
                     api: rootState.uiState.api,
                     storageType: rootState.uiState.storageType,
-                    shouldUpdateRemote: rootState.settings.updateRemote,
+                    shouldUpdateRemote: params.updateRemote && rootState.settings.updateRemote,
                 });
             } catch (e) {
                 console.error('Error updating document', e);

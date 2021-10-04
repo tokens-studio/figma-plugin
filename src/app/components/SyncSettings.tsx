@@ -28,12 +28,7 @@ const SyncSettings = () => {
 
     const handleEditClick = (provider) => {
         track('Edit Credentials');
-        dispatch.uiState.setLocalApiState({
-            id: provider.id,
-            name: provider.name,
-            provider: provider.provider,
-            secret: provider.secret,
-        });
+        dispatch.uiState.setLocalApiState(provider);
         setShowEditStorageModalVisible(true);
     };
 
@@ -161,14 +156,7 @@ const SyncSettings = () => {
 
                         {storedApiProviders().length > 0 && (
                             <div className="space-y-4">
-                                {api?.provider === localApiState.provider && (
-                                    <StorageItem
-                                        provider={api.provider}
-                                        id={api.id}
-                                        name={api.name}
-                                        secret={api.secret}
-                                    />
-                                )}
+                                {api?.provider === localApiState.provider && <StorageItem item={api} />}
                                 {storedApiProviders().length > 0 && (
                                     <details>
                                         <summary
@@ -199,10 +187,7 @@ const SyncSettings = () => {
                                                 <StorageItem
                                                     key={`${item.provider}-${item.id}-${item.secret}`}
                                                     onEdit={() => handleEditClick(item)}
-                                                    provider={item.provider}
-                                                    id={item.id}
-                                                    name={item.name}
-                                                    secret={item.secret}
+                                                    item={item}
                                                 />
                                             ))}
                                         </div>

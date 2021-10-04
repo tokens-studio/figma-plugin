@@ -81,10 +81,6 @@ export function notifyRemoteComponents({nodes, remotes}) {
         notifyUI(`Updated ${nodes} nodes, unable to update ${remotes.length} remote components`, opts);
     } else if (nodes > 0 && remotes.length === 0) {
         notifyUI(`Success! Updated ${nodes} nodes`, opts);
-    } else if (nodes === 0) {
-        notifyUI(`No nodes updated`, opts);
-    } else {
-        notifyUI(`No nodes with connected tokens found`, opts);
     }
     postToUI({
         type: MessageFromPluginTypes.REMOTE_COMPONENTS,

@@ -78,7 +78,7 @@ const Navbar = () => {
                             </Tooltip>
                         )}
                         <Tooltip variant="right" label={`Pull from ${transformProviderName(storageType.provider)}`}>
-                            <button onClick={pullTokens} type="button" className="button button-ghost">
+                            <button onClick={() => pullTokens()} type="button" className="button button-ghost">
                                 <Icon name="refresh" />
                             </button>
                         </Tooltip>

@@ -1,5 +1,4 @@
 import React from 'react';
-import {reduceToValues} from '@/plugin/tokenHelpers';
 import {useSelector} from 'react-redux';
 import {RootState} from '@/app/store';
 import Modal from '../Modal';
@@ -8,21 +7,21 @@ import StorageItemForm from '../StorageItemForm';
 import useRemoteTokens from '../../store/remoteTokens';
 
 export default function CreateStorageItemModal({isOpen, onClose, onSuccess}) {
-    const {tokens} = useSelector((state: RootState) => state.tokenState);
     const {localApiState} = useSelector((state: RootState) => state.uiState);
     const {addNewProviderItem} = useRemoteTokens();
     const [hasErrored, setHasErrored] = React.useState(false);
-    const [formFields, setFormFields] = React.useState({id: '', name: '', secret: ''});
-
+    let defaultFields;
+    switch (localApiState.provider) {
+        default:
+            defaultFields = {id: '', name: '', secret: ''};
+            break;
+    }
+    const [formFields, setFormFields] = React.useState(defaultFields);
     const handleCreateNewClick = async () => {
         setHasErrored(false);
         const response = await addNewProviderItem({
-            id: formFields.id,
             provider: localApiState.provider,
-            secret: formFields.secret,
-            tokens: reduceToValues(tokens),
-            name: formFields.name,
-            updatedAt: Date.now(),
+            ...formFields,
         });
         if (response) {
             onSuccess();
@@ -41,7 +40,7 @@ export default function CreateStorageItemModal({isOpen, onClose, onSuccess}) {
     };
 
     return (
-        <Modal isOpen={isOpen} close={() => onClose(false)}>
+        <Modal large isOpen={isOpen} close={() => onClose(false)}>
             <div className="space-y-4">
                 <Heading>Add new credentials</Heading>
                 <StorageItemForm
