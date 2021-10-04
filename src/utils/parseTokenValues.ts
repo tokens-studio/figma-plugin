@@ -17,9 +17,9 @@ export default function parseTokenValues(tokens) {
 
             return prev;
         }
+
         if (typeof parsedGroup === 'object') {
             const convertedToArray = convertToTokenArray({tokens: parsedGroup});
-
             prev.push({[group[0]]: convertedToArray});
             return prev;
         }

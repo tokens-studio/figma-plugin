@@ -1,4 +1,4 @@
-import {SingleToken, SingleTokenObject} from '../../types/tokens';
+import {SingleToken, SingleTokenObject} from 'Types/tokens';
 import {isTypographyToken, isValueToken} from '../app/components/utils';
 
 function checkForTokens({
