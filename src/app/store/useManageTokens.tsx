@@ -1,10 +1,12 @@
-import {useDispatch} from 'react-redux';
-import {SingleToken, TokenType} from '@types/tokens';
-import {Dispatch} from '../store';
+import {useDispatch, useSelector} from 'react-redux';
+import {SingleToken, TokenType} from 'Types/tokens';
+import {Dispatch, RootState} from '../store';
 import useConfirm from '../hooks/useConfirm';
 
 export default function useManageTokens() {
-    const {editToken, createToken, deleteToken} = useDispatch<Dispatch>().tokenState;
+    const {activeTokenSet} = useSelector((state: RootState) => state.tokenState);
+    const {editToken, createToken, deleteToken, deleteTokenGroup} = useDispatch<Dispatch>().tokenState;
+
     const dispatch = useDispatch<Dispatch>();
     const {confirm} = useConfirm();
 
@@ -73,5 +75,17 @@ export default function useManageTokens() {
         }
     }
 
-    return {editSingleToken, createSingleToken, deleteSingleToken};
+    async function deleteGroup(path) {
+        const userConfirmation = await confirm({
+            text: 'Delete group?',
+            description: 'Are you sure you want to delete this group?',
+        });
+        if (userConfirmation) {
+            dispatch.uiState.setLoading(true);
+            deleteTokenGroup({parent: activeTokenSet, path});
+            dispatch.uiState.setLoading(false);
+        }
+    }
+
+    return {editSingleToken, createSingleToken, deleteSingleToken, deleteGroup};
 }

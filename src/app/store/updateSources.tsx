@@ -56,7 +56,7 @@ export default async function updateTokensOnSources({
     api,
     lastUpdatedAt,
 }) {
-    if (!isLocal && shouldUpdateRemote && !editProhibited) {
+    if (tokens && !isLocal && shouldUpdateRemote && !editProhibited) {
         updateRemoteTokens({
             provider: storageType.provider,
             tokens,
