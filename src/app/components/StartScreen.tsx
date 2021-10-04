@@ -18,9 +18,7 @@ const StartScreen = () => {
         dispatch.uiState.setActiveTab('syncsettings');
         dispatch.tokenState.setEmptyTokens();
         dispatch.uiState.setLocalApiState({
-            id: storageType.id,
-            name: storageType.name,
-            provider: storageType.provider,
+            ...storageType,
             secret: '',
             new: true,
         });

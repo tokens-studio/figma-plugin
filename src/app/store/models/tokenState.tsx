@@ -51,7 +51,9 @@ interface TokenState {
 
 export const tokenState = createModel<RootModel>()({
     state: {
-        tokens: {},
+        tokens: {
+            global: [],
+        },
         importedTokens: {
             newTokens: [],
             updatedTokens: [],

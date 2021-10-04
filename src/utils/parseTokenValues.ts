@@ -24,9 +24,6 @@ export default function parseTokenValues(tokens) {
             prev.push({[group[0]]: convertedToArray});
             return prev;
         }
-        if (Array.isArray(parsedGroup)) {
-            console.log('Is an array', parsedGroup);
-        }
     }, []);
 
     return Object.assign({}, ...reducedTokens);

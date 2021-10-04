@@ -17,3 +17,9 @@ export enum StorageProviderType {
     ARCADE = 'arcade',
     JSONBIN = 'jsonbin',
 }
+
+export interface ContextObject extends ApiDataType {
+    secret: string;
+    id: string;
+    tokens: string;
+}
