@@ -53,7 +53,6 @@ async function writeTokensToJSONBin({secret, id, tokenObj}): Promise<TokenProps>
 
 export async function updateJSONBinTokens({tokens, context, updatedAt, oldUpdatedAt = null}) {
     const {id, secret} = context;
-
     try {
         const tokenObj = JSON.stringify(
             {
@@ -182,14 +181,16 @@ export function useJSONbin() {
     async function addJSONBinCredentials(context): Promise<TokenProps> {
         const tokenValues = await pullTokensFromJSONBin(context);
 
-        dispatch.uiState.setApiData(context);
-        setStorageType({
-            provider: context,
-            bool: true,
-        });
+        if (tokenValues) {
+            dispatch.uiState.setApiData(context);
+            setStorageType({
+                provider: context,
+                bool: true,
+            });
+            dispatch.tokenState.setLastSyncedState(JSON.stringify(tokenValues.values, null, 2));
+            dispatch.tokenState.setTokenData(tokenValues);
+        }
 
-        dispatch.tokenState.setLastSyncedState(JSON.stringify(tokenValues.values, null, 2));
-        dispatch.tokenState.setTokenData(tokenValues);
         return tokenValues;
     }
 

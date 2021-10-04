@@ -42,13 +42,11 @@ export default function useRemoteTokens() {
     };
 
     const restoreStoredProvider = async (context) => {
-        dispatch.uiState.setLoading(true);
         dispatch.tokenState.setEmptyTokens();
         dispatch.uiState.setLocalApiState(context);
         dispatch.uiState.setApiData(context);
         setStorageType({provider: context, bool: true});
         await pullTokens(context);
-        dispatch.uiState.setLoading(false);
         return null;
     };
 
@@ -72,9 +70,10 @@ export default function useRemoteTokens() {
         switch (context.provider) {
             case StorageProviderType.JSONBIN: {
                 if (context.id) {
-                    data = addJSONBinCredentials(context);
+                    data = await addJSONBinCredentials(context);
+                } else {
+                    data = await createNewJSONBin(context);
                 }
-                data = createNewJSONBin(context);
                 break;
             }
             case StorageProviderType.GITHUB: {

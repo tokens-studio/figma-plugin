@@ -121,7 +121,6 @@ export default function TokenSetSelector() {
                     </form>
                 </div>
             </Modal>
-
             <Modal isOpen={showNewTokenSetFields} close={() => setShowNewTokenSetFields(false)}>
                 <div className="flex justify-center flex-col text-center space-y-4">
                     <Heading>New set</Heading>
@@ -145,7 +144,6 @@ export default function TokenSetSelector() {
                     </form>
                 </div>
             </Modal>
-
             <Tooltip label="Add new token set">
                 <button
                     className="button button-ghost flex-shrink-0"

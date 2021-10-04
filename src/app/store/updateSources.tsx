@@ -4,7 +4,6 @@ import {TokenProps} from '../../../types/tokens';
 import {StorageProviderType} from '../../../types/api';
 import {notifyToUI, postToFigma} from '../../plugin/notifiers';
 import {updateJSONBinTokens} from './providers/jsonbin';
-import {updateURLTokens} from './providers/url';
 
 type ContextObject = {
     id: string;
@@ -25,7 +24,6 @@ async function updateRemoteTokens({
     oldUpdatedAt?: string;
 }) {
     if (!context) return;
-
     switch (provider) {
         case StorageProviderType.JSONBIN: {
             notifyToUI('Updating JSONBin...');
@@ -59,7 +57,7 @@ export default async function updateTokensOnSources({
     api,
     lastUpdatedAt,
 }) {
-    if (!isLocal && shouldUpdateRemote && !editProhibited) {
+    if (tokens && !isLocal && shouldUpdateRemote && !editProhibited) {
         updateRemoteTokens({
             provider: storageType.provider,
             tokens,
