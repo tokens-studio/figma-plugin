@@ -51,9 +51,9 @@ export default function useRemoteTokens() {
         switch (context.provider) {
             case StorageProviderType.JSONBIN: {
                 if (context.id) {
-                    data = addJSONBinCredentials(context);
+                    data = await addJSONBinCredentials(context);
                 } else {
-                    data = createNewJSONBin(context);
+                    data = await createNewJSONBin(context);
                 }
                 break;
             }

@@ -181,13 +181,12 @@ export function useJSONbin() {
     async function addJSONBinCredentials(context): Promise<TokenProps> {
         const tokenValues = await pullTokensFromJSONBin(context);
 
-        dispatch.uiState.setApiData(context);
-        setStorageType({
-            provider: context,
-            bool: true,
-        });
-
         if (tokenValues) {
+            dispatch.uiState.setApiData(context);
+            setStorageType({
+                provider: context,
+                bool: true,
+            });
             dispatch.tokenState.setTokenData(tokenValues);
         }
 
