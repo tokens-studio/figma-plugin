@@ -16,8 +16,6 @@ export default function useRemoteTokens() {
     const pullTokens = async (context = api) => {
         dispatch.uiState.setLoading(true);
 
-        console.log('Pull Tokens', context);
-
         let tokenValues;
 
         switch (context.provider) {
@@ -36,13 +34,11 @@ export default function useRemoteTokens() {
     };
 
     const restoreStoredProvider = async (context) => {
-        dispatch.uiState.setLoading(true);
         dispatch.tokenState.setEmptyTokens();
         dispatch.uiState.setLocalApiState(context);
         dispatch.uiState.setApiData(context);
         setStorageType({provider: context, bool: true});
         await pullTokens(context);
-        dispatch.uiState.setLoading(false);
         return null;
     };
 
