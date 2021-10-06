@@ -6,7 +6,7 @@ function usePushDialog() {
     const {showPushDialog} = useSelector((state: RootState) => state.uiState);
     const dispatch = useDispatch<Dispatch>();
 
-    const pushDialog = (): Promise<string> => {
+    const pushDialog = (): Promise<{commitMessage: string; customBranch: string}> => {
         dispatch.uiState.setShowPushDialog(true);
 
         return new Promise((res, rej) => {
@@ -23,9 +23,9 @@ function usePushDialog() {
         resolveCallback(null);
     };
 
-    const onConfirm = (message) => {
+    const onConfirm = (commitMessage, customBranch) => {
         closeDialog();
-        resolveCallback(message);
+        resolveCallback({commitMessage, customBranch});
     };
 
     return {pushDialog, onConfirm, onCancel, showPushDialog};

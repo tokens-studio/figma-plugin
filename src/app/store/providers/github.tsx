@@ -52,26 +52,26 @@ export const readContents = async ({context, owner, repo}) => {
     }
 };
 
-const commitToNewBranch = async ({context, tokenObj, owner, repo, commitMessage}) => {
+const commitToNewBranch = async ({context, tokenObj, owner, repo, commitMessage, branch}) => {
     const OctokitWithPlugin = Octokit.plugin(require('octokit-commit-multiple-files'));
     const octokit = new OctokitWithPlugin({auth: context.secret});
 
     return octokit.repos.createOrUpdateFiles({
         owner,
         repo,
-        branch: context.branch,
+        branch,
         createBranch: true,
         changes: [{message: commitMessage || 'Commit from Figma', files: {[context.filePath]: tokenObj}}],
     });
 };
 
-const commitToExistingBranch = async ({context, tokenObj, owner, repo, commitMessage}) => {
+const commitToExistingBranch = async ({context, tokenObj, owner, repo, commitMessage, branch}) => {
     const OctokitWithPlugin = Octokit.plugin(require('octokit-commit-multiple-files'));
     const octokit = new OctokitWithPlugin({auth: context.secret});
     return octokit.repos.createOrUpdateFiles({
         owner,
         repo,
-        branch: context.branch,
+        branch,
         createBranch: false,
         changes: [{message: commitMessage || 'Commit from Figma', files: {[context.filePath]: tokenObj}}],
     });
@@ -104,20 +104,23 @@ export function useGitHub() {
         owner,
         repo,
         commitMessage,
+        customBranch,
     }: {
         context: ContextObject;
         tokenObj: string;
         owner: string;
         repo: string;
         commitMessage?: string;
+        customBranch?: string;
     }): Promise<TokenProps | null> {
         try {
             const branches = await fetchBranches({context, owner, repo});
+            const branch = customBranch || context.branch;
             if (!branches) return null;
-            if (branches.includes(context.branch)) {
-                await commitToExistingBranch({context, tokenObj, owner, repo, commitMessage});
+            if (branches.includes(branch)) {
+                await commitToExistingBranch({context, tokenObj, owner, repo, commitMessage, branch});
             } else {
-                await commitToNewBranch({context, tokenObj, owner, repo, commitMessage});
+                await commitToNewBranch({context, tokenObj, owner, repo, commitMessage, branch});
             }
             dispatch.tokenState.setLastSyncedState(tokenObj);
             notifyToUI('Pushed changes to GitHub');
@@ -142,9 +145,10 @@ export function useGitHub() {
             }
         }
 
-        const commitMessage = await pushDialog();
-        if (commitMessage) {
-            await writeTokensToGitHub({context, tokenObj, owner, repo, commitMessage});
+        const pushSettings = await pushDialog();
+        if (pushSettings) {
+            const {commitMessage, customBranch} = pushSettings;
+            await writeTokensToGitHub({context, tokenObj, owner, repo, commitMessage, customBranch});
         }
         return rawTokenObj;
     }
