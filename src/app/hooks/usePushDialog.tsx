@@ -6,12 +6,16 @@ function usePushDialog() {
     const {showPushDialog} = useSelector((state: RootState) => state.uiState);
     const dispatch = useDispatch<Dispatch>();
 
-    const pushDialog = (): Promise<{commitMessage: string; customBranch: string}> => {
-        dispatch.uiState.setShowPushDialog(true);
+    const pushDialog = (initialState): Promise<{commitMessage: string; customBranch: string}> => {
+        if (initialState) {
+            dispatch.uiState.setShowPushDialog('success');
+        } else {
+            dispatch.uiState.setShowPushDialog('initial');
 
-        return new Promise((res, rej) => {
-            resolveCallback = res;
-        });
+            return new Promise((res, rej) => {
+                resolveCallback = res;
+            });
+        }
     };
 
     const closeDialog = () => {
@@ -24,7 +28,7 @@ function usePushDialog() {
     };
 
     const onConfirm = (commitMessage, customBranch) => {
-        closeDialog();
+        dispatch.uiState.setShowPushDialog('loading');
         resolveCallback({commitMessage, customBranch});
     };
 

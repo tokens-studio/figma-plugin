@@ -11,8 +11,8 @@ import {ContextObject} from 'Types/api';
 import {notifyToUI, postToFigma} from '../../../plugin/notifiers';
 
 /** Returns a URL to a page where the user can create a pull request with a given branch */
-function getCreatePullRequestUrl(owner: string, repo: string, branchName: string) {
-    return `https://github.com/${owner}/${repo}/compare/${branchName}?expand=1`;
+export function getCreatePullRequestUrl(id: string, branchName: string) {
+    return `https://github.com/${id}/compare/${branchName}?expand=1`;
 }
 
 export const fetchBranches = async ({context, owner, repo}) => {
@@ -149,6 +149,7 @@ export function useGitHub() {
         if (pushSettings) {
             const {commitMessage, customBranch} = pushSettings;
             await writeTokensToGitHub({context, tokenObj, owner, repo, commitMessage, customBranch});
+            pushDialog('success', getCreatePullRequestUrl(owner, repo, customBranch));
         }
         return rawTokenObj;
     }

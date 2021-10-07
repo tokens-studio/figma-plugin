@@ -51,8 +51,6 @@ export default function useRemoteTokens() {
     };
 
     const pushTokens = async () => {
-        dispatch.uiState.setLoading(true);
-
         switch (api.provider) {
             case StorageProviderType.GITHUB: {
                 await pushTokensToGitHub(api);
@@ -61,32 +59,33 @@ export default function useRemoteTokens() {
             default:
                 throw new Error('Not implemented');
         }
-
-        dispatch.uiState.setLoading(false);
     };
 
     async function addNewProviderItem(context): Promise<boolean> {
+        const credentials = context;
         let data;
         switch (context.provider) {
             case StorageProviderType.JSONBIN: {
                 if (context.id) {
                     data = await addJSONBinCredentials(context);
                 } else {
-                    data = await createNewJSONBin(context);
+                    const id = await createNewJSONBin(context);
+                    credentials.id = id;
+                    data = true;
                 }
                 break;
             }
             case StorageProviderType.GITHUB: {
-                data = addNewGitHubCredentials(context);
+                data = addNewGitHubCredentials(credentials);
                 break;
             }
             default:
                 throw new Error('Not implemented');
         }
         if (data) {
-            dispatch.uiState.setLocalApiState(context);
-            dispatch.uiState.setApiData(context);
-            setStorageType({provider: context, bool: true});
+            dispatch.uiState.setLocalApiState(credentials);
+            dispatch.uiState.setApiData(credentials);
+            setStorageType({provider: credentials, bool: true});
             return true;
         }
         return false;

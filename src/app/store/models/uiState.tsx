@@ -54,7 +54,7 @@ interface UIState {
         text?: string;
         description?: string;
     };
-    showPushDialog: boolean;
+    showPushDialog: string | false;
 }
 
 export const uiState = createModel<RootModel>()({
@@ -90,7 +90,7 @@ export const uiState = createModel<RootModel>()({
         showPushDialog: false,
     } as UIState,
     reducers: {
-        setShowPushDialog: (state, data: boolean) => {
+        setShowPushDialog: (state, data: string | false) => {
             return {
                 ...state,
                 showPushDialog: data,

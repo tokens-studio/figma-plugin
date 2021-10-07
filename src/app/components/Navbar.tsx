@@ -73,7 +73,7 @@ const Navbar = () => {
                 </Tooltip>
                 {storageType.provider !== StorageProviderType.LOCAL && (
                     <>
-                        {projectURL && (
+                        {storageType.provider === StorageProviderType.JSONBIN && (
                             <Tooltip variant="right" label={`Go to ${transformProviderName(storageType.provider)}`}>
                                 <a
                                     href={projectURL}
