@@ -1,7 +1,7 @@
 import convertTokensObjectToResolved from './convertTokensObjectToResolved';
 
-function transform(input, sets) {
-    return convertTokensObjectToResolved(input, sets);
+function transform(input, sets, excludes) {
+    return convertTokensObjectToResolved(input, sets, excludes);
 }
 
 export default transform;
