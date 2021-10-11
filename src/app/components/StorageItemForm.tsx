@@ -1,9 +1,9 @@
 import React from 'react';
 import {useSelector} from 'react-redux';
 import {StorageProviderType} from '../../../types/api';
-import Button from './Button';
-import Input from './Input';
 import {RootState} from '../store';
+import GitHubForm from './StorageItemForm/GitHubForm';
+import JSONBinForm from './StorageItemForm/JSONBinForm';
 
 export default function EditStorageItemForm({
     isNew = false,
@@ -18,120 +18,25 @@ export default function EditStorageItemForm({
     switch (localApiState.provider) {
         case StorageProviderType.GITHUB: {
             return (
-                <form onSubmit={handleSubmit} className="space-y-4">
-                    <Input
-                        full
-                        label="Name"
-                        value={values.name}
-                        onChange={handleChange}
-                        type="text"
-                        name="name"
-                        required
-                    />
-                    <Input
-                        full
-                        label="Personal Access Token"
-                        value={values.secret}
-                        onChange={handleChange}
-                        type="text"
-                        name="secret"
-                        required
-                    />
-                    <Input
-                        full
-                        label="Repository (:username/:repo)"
-                        value={values.id}
-                        onChange={handleChange}
-                        type="text"
-                        name="id"
-                        required
-                    />
-                    <Input
-                        full
-                        label="Branch"
-                        value={values.branch}
-                        onChange={handleChange}
-                        type="text"
-                        name="branch"
-                        required
-                    />
-                    <Input
-                        full
-                        label="File Path (e.g. data/tokens.json)"
-                        value={values.filePath}
-                        onChange={handleChange}
-                        type="text"
-                        name="filePath"
-                        required
-                    />
-                    <div className="space-x-4">
-                        <Button variant="secondary" size="large" onClick={handleCancel}>
-                            Cancel
-                        </Button>
-
-                        <Button variant="primary" type="submit" disabled={!values.secret && !values.name}>
-                            Save
-                        </Button>
-                    </div>
-                    {hasErrored && (
-                        <div
-                            className="bg-red-200 text-red-700 rounded p-4 text-xs font-bold"
-                            data-cy="provider-modal-error"
-                        >
-                            There was an error connecting. Check your credentials.
-                        </div>
-                    )}
-                </form>
+                <GitHubForm
+                    handleChange={handleChange}
+                    handleSubmit={handleSubmit}
+                    handleCancel={handleCancel}
+                    values={values}
+                    hasErrored={hasErrored}
+                />
             );
         }
         default: {
             return (
-                <form onSubmit={handleSubmit} className="space-y-4">
-                    <Input
-                        full
-                        label="Name"
-                        value={values.name}
-                        onChange={handleChange}
-                        type="text"
-                        name="name"
-                        required
-                    />
-                    <Input
-                        full
-                        label="Secret"
-                        value={values.secret}
-                        onChange={handleChange}
-                        type="text"
-                        name="secret"
-                        required
-                    />
-                    <Input
-                        full
-                        label={`ID${localApiState.provider === StorageProviderType.JSONBIN ? ' (optional)' : ''}`}
-                        value={values.id}
-                        onChange={handleChange}
-                        type="text"
-                        name="id"
-                        required={isNew ? localApiState.provider !== StorageProviderType.JSONBIN : true}
-                    />
-                    <div className="space-x-4">
-                        <Button variant="secondary" size="large" onClick={handleCancel}>
-                            Cancel
-                        </Button>
-
-                        <Button variant="primary" type="submit" disabled={!values.secret && !values.name}>
-                            Save
-                        </Button>
-                    </div>
-                    {hasErrored && (
-                        <div
-                            className="bg-red-200 text-red-700 rounded p-4 text-xs font-bold"
-                            data-cy="provider-modal-error"
-                        >
-                            There was an error connecting. Check your credentials.
-                        </div>
-                    )}
-                </form>
+                <JSONBinForm
+                    isNew={isNew}
+                    handleChange={handleChange}
+                    handleSubmit={handleSubmit}
+                    handleCancel={handleCancel}
+                    values={values}
+                    hasErrored={hasErrored}
+                />
             );
         }
     }

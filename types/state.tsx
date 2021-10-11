@@ -8,8 +8,6 @@ export type StateType = {
     disabled: boolean;
     collapsed: boolean;
     selectionValues: object;
-    showEditForm: boolean;
-    showOptions: boolean | string;
     api: ApiDataType;
     apiProviders: ApiDataType[];
     updatePageOnly: boolean;

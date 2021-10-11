@@ -132,6 +132,8 @@ export function useJSONbin() {
                 secret,
                 provider: StorageProviderType.JSONBIN,
             });
+            dispatch.uiState.setProjectURL(`https://jsonbin.io/${jsonBinData.metadata.id}`);
+
             return jsonBinData.metadata.id;
         }
         notifyToUI('Something went wrong. See console for details');

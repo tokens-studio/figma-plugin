@@ -79,7 +79,7 @@ const commitToExistingBranch = async ({context, tokenObj, owner, repo, commitMes
 
 export function useGitHub() {
     const {tokens} = useSelector((state: RootState) => state.tokenState);
-    const {localApiState} = useSelector((state: RootState) => state.uiState);
+    const {localApiState, api} = useSelector((state: RootState) => state.uiState);
     const dispatch = useDispatch<Dispatch>();
 
     const {confirm} = useConfirm();
@@ -151,6 +151,8 @@ export function useGitHub() {
             const {commitMessage, customBranch} = pushSettings;
             await writeTokensToGitHub({context, tokenObj, owner, repo, commitMessage, customBranch});
             dispatch.uiState.setLocalApiState({...localApiState, branch: customBranch});
+            dispatch.uiState.setApiData({...api, branch: customBranch});
+
             pushDialog('success');
         }
         return rawTokenObj;

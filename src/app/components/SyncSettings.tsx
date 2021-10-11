@@ -2,7 +2,6 @@
 import * as React from 'react';
 import {track} from '@/utils/analytics';
 import {useDispatch, useSelector} from 'react-redux';
-import {useTokenDispatch, useTokenState} from '../store/TokenContext';
 import {StorageProviderType} from '../../../types/api';
 import Button from './Button';
 import Heading from './Heading';
@@ -18,8 +17,6 @@ const SyncSettings = () => {
     const {api, localApiState, apiProviders, storageType} = useSelector((state: RootState) => state.uiState);
     const dispatch = useDispatch<Dispatch>();
 
-    const {updateAfterApply} = useTokenState();
-    const {toggleUpdateAfterApply} = useTokenDispatch();
     const {setStorageType} = useStorage();
 
     const [confirmModalVisible, showConfirmModal] = React.useState(false);
@@ -174,18 +171,6 @@ const SyncSettings = () => {
                                             <Heading size="small">
                                                 Stored providers for {localApiState.provider}
                                             </Heading>
-                                            <div className="flex items-center switch">
-                                                <input
-                                                    className="switch__toggle"
-                                                    type="checkbox"
-                                                    id="updatemode"
-                                                    checked={updateAfterApply}
-                                                    onChange={() => toggleUpdateAfterApply(!updateAfterApply)}
-                                                />
-                                                <label className="text-xs switch__label" htmlFor="updatemode">
-                                                    Update on apply
-                                                </label>
-                                            </div>
                                         </div>
                                         <div className="flex flex-col gap-2">
                                             {storedApiProviders().map((item) => (

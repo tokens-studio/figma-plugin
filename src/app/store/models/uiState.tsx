@@ -55,6 +55,8 @@ interface UIState {
         description?: string;
     };
     showPushDialog: string | false;
+    showEmptyGroups: boolean;
+    collapsed: boolean;
 }
 
 export const uiState = createModel<RootModel>()({
@@ -88,6 +90,8 @@ export const uiState = createModel<RootModel>()({
             description: '',
         },
         showPushDialog: false,
+        showEmptyGroups: true,
+        collapsed: false,
     } as UIState,
     reducers: {
         setShowPushDialog: (state, data: string | false) => {
@@ -225,6 +229,18 @@ export const uiState = createModel<RootModel>()({
             return {
                 ...state,
                 tokenFilter: payload,
+            };
+        },
+        toggleShowEmptyGroups(state) {
+            return {
+                ...state,
+                showEmptyGroups: !state.showEmptyGroups,
+            };
+        },
+        toggleCollapsed(state) {
+            return {
+                ...state,
+                collapsed: !state.collapsed,
             };
         },
     },

@@ -8,7 +8,6 @@ import {Provider} from 'react-redux';
 import * as Sentry from '@sentry/react';
 import {initializeAnalytics} from '../utils/analytics';
 import App from './components/App';
-import {TokenProvider} from './store/TokenContext';
 import Heading from './components/Heading';
 import {store} from './store';
 import * as pjs from '../../package.json';
@@ -38,9 +37,7 @@ function ErrorFallback({error}) {
 ReactDOM.render(
     <Sentry.ErrorBoundary fallback={ErrorFallback}>
         <Provider store={store}>
-            <TokenProvider>
-                <App />
-            </TokenProvider>
+            <App />
         </Provider>
     </Sentry.ErrorBoundary>,
     document.getElementById('app')
