@@ -72,9 +72,13 @@ export default function useTokens() {
     // Calls Figma with all tokens to create styles
     function createStylesFromTokens() {
         const resolved = resolveTokenValues(computeMergedTokens(tokens, usedTokenSet));
+        const withoutIgnored = resolved.filter((token) => {
+            return !token.name.split('.').some((part) => part.startsWith('_'));
+        });
+
         postToFigma({
             type: MessageToPluginTypes.CREATE_STYLES,
-            tokens: resolved,
+            tokens: withoutIgnored,
             settings,
         });
     }
