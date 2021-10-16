@@ -3,6 +3,7 @@ import {StorageProviderType} from 'Types/api';
 import {MessageToPluginTypes} from 'Types/messages';
 import {postToFigma} from '../../plugin/notifiers';
 import {useJSONbin} from './providers/jsonbin';
+import useURL from './providers/url';
 import {Dispatch, RootState} from '../store';
 import useStorage from './useStorage';
 
@@ -12,6 +13,7 @@ export default function useRemoteTokens() {
 
     const {setStorageType} = useStorage();
     const {pullTokensFromJSONBin, addJSONBinCredentials, createNewJSONBin} = useJSONbin();
+    const {pullTokensFromURL} = useURL();
 
     const pullTokens = async (context = api) => {
         dispatch.uiState.setLoading(true);
@@ -21,6 +23,10 @@ export default function useRemoteTokens() {
         switch (context.provider) {
             case StorageProviderType.JSONBIN: {
                 tokenValues = await pullTokensFromJSONBin(context);
+                break;
+            }
+            case StorageProviderType.URL: {
+                tokenValues = await pullTokensFromURL(context);
                 break;
             }
             default:
@@ -51,6 +57,10 @@ export default function useRemoteTokens() {
                 } else {
                     data = await createNewJSONBin(context);
                 }
+                break;
+            }
+            case StorageProviderType.URL: {
+                data = await pullTokensFromURL(context);
                 break;
             }
             default:

@@ -16,8 +16,8 @@ export enum StorageProviderType {
     LOCAL = 'local',
     ARCADE = 'arcade',
     JSONBIN = 'jsonbin',
+    URL = 'url',
 }
-
 export interface ContextObject extends ApiDataType {
     secret: string;
     id: string;

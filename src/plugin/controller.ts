@@ -57,6 +57,7 @@ figma.ui.onmessage = async (msg) => {
                 if (apiProviders) notifyAPIProviders(JSON.parse(apiProviders));
                 switch (storageType.provider) {
                     case StorageProviderType.JSONBIN:
+                    case StorageProviderType.URL:
                     case StorageProviderType.ARCADE: {
                         compareProvidersWithStored(apiProviders, storageType);
 
@@ -80,8 +81,8 @@ figma.ui.onmessage = async (msg) => {
             sendPluginValues(figma.currentPage.selection);
             return;
         case MessageToPluginTypes.CREDENTIALS: {
-            const {secret, id, provider, name} = msg;
-            updateCredentials({secret, id, name, provider});
+            const {type, ...context} = msg;
+            updateCredentials(context);
             break;
         }
         case MessageToPluginTypes.REMOVE_SINGLE_CREDENTIAL: {

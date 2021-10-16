@@ -63,6 +63,12 @@ export const tokenState = createModel<RootModel>()({
         editProhibited: false,
     } as TokenState,
     reducers: {
+        setEditProhibited(state, payload: boolean) {
+            return {
+                ...state,
+                editProhibited: payload,
+            };
+        },
         toggleUsedTokenSet: (state, data: string) => {
             return {
                 ...state,
@@ -340,6 +346,7 @@ export const tokenState = createModel<RootModel>()({
                 dispatch.tokenState.updateDocument();
             }
         },
+
         toggleUsedTokenSet(payload, rootState) {
             dispatch.tokenState.updateDocument({updateRemote: false});
         },
@@ -360,7 +367,7 @@ export const tokenState = createModel<RootModel>()({
                     updatedAt: new Date().toString(),
                     lastUpdatedAt: rootState.uiState.lastUpdatedAt,
                     isLocal: rootState.uiState.storageType.provider === StorageProviderType.LOCAL,
-                    editProhibited: rootState.uiState.editProhibited,
+                    editProhibited: rootState.tokenState.editProhibited,
                     api: rootState.uiState.api,
                     storageType: rootState.uiState.storageType,
                     shouldUpdateRemote: params.updateRemote && rootState.settings.updateRemote,

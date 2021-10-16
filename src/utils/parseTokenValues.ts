@@ -1,7 +1,6 @@
 import convertToTokenArray from './convertTokens';
 
 export default function parseTokenValues(tokens) {
-    console.log('Parsing token values', tokens);
     // If we receive an array of tokens, move them all to the global set
     if (Array.isArray(tokens)) {
         return {
