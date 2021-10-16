@@ -6,20 +6,29 @@ import {TokenProps} from 'Types/tokens';
 import {notifyToUI, postToFigma} from '../../../plugin/notifiers';
 
 async function readTokensFromURL({secret, id}): Promise<TokenProps> | null {
-    const response = await fetch(id, {
-        method: 'GET',
-        headers: {
-            Authorization: secret,
-            Accept: 'application/json',
-        },
-    });
+    let customHeaders = secret;
+    const defaultHeaders = {
+        Accept: 'application/json',
+    };
+    try {
+        customHeaders = JSON.parse(secret);
+    } finally {
+        const headers = {
+            ...defaultHeaders,
+            ...customHeaders,
+        };
+        const response = await fetch(id, {
+            method: 'GET',
+            headers,
+        });
 
-    if (response.ok) {
-        const data = await response.json();
-        return data;
+        if (response.ok) {
+            const data = await response.json();
+            return data;
+        }
+        notifyToUI('There was an error connecting, check your sync settings');
+        return null;
     }
-    notifyToUI('There was an error connecting, check your sync settings');
-    return null;
 }
 
 export default function useURL() {
@@ -43,9 +52,9 @@ export default function useURL() {
                     secret,
                     provider: StorageProviderType.URL,
                 });
-                if (data) {
+                if (data?.values) {
                     const tokenObj = {
-                        values: data,
+                        values: data.values,
                     };
                     dispatch.tokenState.setTokenData(tokenObj);
                     dispatch.tokenState.setEditProhibited(true);
