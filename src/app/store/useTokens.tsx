@@ -23,7 +23,7 @@ export default function useTokens() {
 
     // Gets value of token
     function getTokenValue(token: SingleTokenObject, resolved) {
-        return getAliasValue(token, resolved);
+        return resolved.find((t) => t.name === token.name).value;
     }
 
     // Returns resolved value of a specific token
