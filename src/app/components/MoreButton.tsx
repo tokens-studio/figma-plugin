@@ -52,9 +52,11 @@ const MoreButton = ({properties, children, path, value, onClick, onEdit, onDelet
     const visibleProperties = properties.filter((p) => p.label);
 
     return (
-        <div className="w-full">
+        <>
             <ContextMenu>
-                <ContextMenuTrigger id={`${path}-${value}`}>{children}</ContextMenuTrigger>
+                <ContextMenuTrigger as="div" id={`${path}-${value}`}>
+                    {children}
+                </ContextMenuTrigger>
                 <ContextMenuContent sideOffset={5} align="end" collisionTolerance={30}>
                     {visibleProperties.map((property) => {
                         const isActive = selectionValues[property.name] === value;
@@ -104,7 +106,7 @@ const MoreButton = ({properties, children, path, value, onClick, onEdit, onDelet
                     </ContextMenuItem>
                 </ContextMenuContent>
             </ContextMenu>
-        </div>
+        </>
     );
 };
 

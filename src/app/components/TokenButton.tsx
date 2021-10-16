@@ -169,7 +169,7 @@ const TokenButton = ({
 
     return (
         <div
-            className={`relative mb-1 mr-1 flex button button-property ${buttonClass.join(' ')} ${
+            className={`relative mb-1 mr-1 button button-property ${buttonClass.join(' ')} ${
                 uiState.disabled && 'button-disabled'
             } `}
             style={style}
