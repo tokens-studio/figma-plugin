@@ -14,6 +14,7 @@ import Changelog from './Changelog';
 import ImportedTokensDialog from './ImportedTokensDialog';
 import {RootState} from '../store';
 import ConfirmDialog from './ConfirmDialog';
+import WindowResizer from './WindowResizer';
 
 const App = () => {
     const activeTab = useSelector((state: RootState) => state.uiState.activeTab);
@@ -36,6 +37,7 @@ const App = () => {
                 <Changelog />
                 <ImportedTokensDialog />
                 <ConfirmDialog />
+                <WindowResizer />
             </div>
         </>
     );

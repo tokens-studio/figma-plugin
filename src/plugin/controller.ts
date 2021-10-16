@@ -139,6 +139,9 @@ figma.ui.onmessage = async (msg) => {
         case MessageToPluginTypes.NOTIFY:
             notifyUI(msg.msg, msg.opts);
             break;
+        case MessageToPluginTypes.RESIZE_WINDOW:
+            figma.ui.resize(msg.width, msg.height);
+            break;
         case MessageToPluginTypes.SET_UI: {
             updateUISettings({
                 width: msg.uiWindow.width,

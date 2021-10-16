@@ -473,4 +473,11 @@ form {
     border-radius: 50%;
 }
 
+#corner {
+    position: absolute;
+    right: 1px;
+    bottom: 2px;
+    cursor: nwse-resize;
+}
+
 @tailwind utilities;
