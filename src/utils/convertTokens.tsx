@@ -3,11 +3,13 @@ import {isTypographyToken, isValueToken} from '../app/components/utils';
 
 function checkForTokens({
     obj,
-    token,
+    originalToken,
     root = null,
     returnValuesOnly = false,
     expandTypography = false,
 }): [SingleTokenObject[], SingleToken] {
+    // replaces / in token name
+    const token = originalToken.name.split('/').join('.');
     let returnValue;
     const shouldExpandTypography = expandTypography ? isTypographyToken(token.value) : false;
     if (isValueToken(token) && !shouldExpandTypography) {
@@ -54,6 +56,6 @@ function checkForTokens({
 }
 
 export default function convertToTokenArray({tokens, returnValuesOnly = false, expandTypography = false}) {
-    const [result] = checkForTokens({obj: [], token: tokens, returnValuesOnly, expandTypography});
+    const [result] = checkForTokens({obj: [], originalToken: tokens, returnValuesOnly, expandTypography});
     return Object.values(result);
 }
