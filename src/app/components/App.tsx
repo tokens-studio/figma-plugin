@@ -20,7 +20,7 @@ const App = () => {
     const activeTab = useSelector((state: RootState) => state.uiState.activeTab);
 
     return (
-        <>
+        <div className="content">
             <Initiator />
             <LoadingBar />
             <div className="h-full flex flex-col">
@@ -39,7 +39,7 @@ const App = () => {
                 <ConfirmDialog />
                 <WindowResizer />
             </div>
-        </>
+        </div>
     );
 };
 

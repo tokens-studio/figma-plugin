@@ -85,11 +85,13 @@
 
 body {
     @apply font-body text-sm leading-normal;
+}
 
+.content {
     overflow-y: scroll;
 }
 
-body::-webkit-scrollbar,
+.content::-webkit-scrollbar,
 .ReactModal__Content::-webkit-scrollbar,
 textarea::-webkit-scrollbar {
     width: 9px;
@@ -99,7 +101,7 @@ textarea::-webkit-scrollbar {
     height: 9px;
 }
 
-body::-webkit-scrollbar-thumb,
+.content::-webkit-scrollbar-thumb,
 .overflow-x-auto::-webkit-scrollbar-thumb,
 .ReactModal__Content::-webkit-scrollbar-thumb,
 textarea::-webkit-scrollbar-thumb {
@@ -474,7 +476,7 @@ form {
 }
 
 #corner {
-    position: absolute;
+    position: fixed;
     right: 1px;
     bottom: 2px;
     cursor: nwse-resize;
