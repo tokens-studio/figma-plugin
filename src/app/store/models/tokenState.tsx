@@ -178,6 +178,30 @@ export const tokenState = createModel<RootModel>()({
                 },
             };
         },
+        duplicateToken: (state, data: TokenInput) => {
+            let newTokens = {};
+            const existingToken = state.tokens[data.parent].find((n) => n.name === data.name);
+            if (existingToken) {
+                const newName = `${data.name}-copy`;
+
+                newTokens = {
+                    [data.parent]: [
+                        ...state.tokens[data.parent],
+                        {
+                            ...existingToken,
+                            name: newName,
+                        },
+                    ],
+                };
+            }
+            return {
+                ...state,
+                tokens: {
+                    ...state.tokens,
+                    ...newTokens,
+                },
+            };
+        },
         // Imports received styles as tokens, if needed
         setTokensFromStyles: (state, receivedStyles) => {
             const newTokens = [];
@@ -342,6 +366,11 @@ export const tokenState = createModel<RootModel>()({
         },
         toggleUsedTokenSet(payload, rootState) {
             dispatch.tokenState.updateDocument({updateRemote: false});
+        },
+        duplicateToken(payload, rootState) {
+            if (payload.shouldUpdate && rootState.settings.updateOnChange) {
+                dispatch.tokenState.updateDocument();
+            }
         },
         createToken(payload, rootState) {
             if (payload.shouldUpdate && rootState.settings.updateOnChange) {
