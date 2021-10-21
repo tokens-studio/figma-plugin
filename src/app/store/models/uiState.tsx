@@ -28,6 +28,7 @@ interface EditToken {
     schema: object;
     optionsSchema: object;
     options: object;
+    type: string;
 }
 
 interface UIState {

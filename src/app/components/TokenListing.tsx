@@ -48,6 +48,7 @@ const TokenListing = ({
             name,
             initialName: name,
             isPristine,
+            type: token.type,
             explainer,
             property,
             schema: schema?.value,

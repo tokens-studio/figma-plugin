@@ -131,7 +131,13 @@ const EditTokenForm = ({resolvedTokens}) => {
                         custom={currentEditToken.schema}
                     />
                     {checkIfContainsAlias(currentEditToken.value) && (
-                        <div className="p-2 rounded bg-gray-100 border-gray-300 font-mono text-xxs mt-2 text-gray-700">
+                        <div className="p-2 rounded bg-gray-100 border-gray-300 font-mono text-xxs mt-2 text-gray-700 flex itms-center">
+                            {currentEditToken.type === 'color' ? (
+                                <div
+                                    className="w-4 h-4 rounded border border-gray-200 mr-1"
+                                    style={{backgroundColor: resolvedValue}}
+                                />
+                            ) : null}
                             {resolvedValue}
                         </div>
                     )}
