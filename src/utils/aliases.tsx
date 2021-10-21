@@ -3,10 +3,10 @@ import {SingleTokenObject} from 'Types/tokens';
 import checkIfValueToken from './checkIfValueToken';
 import {findReferences} from './findReferences';
 
-export default function getAliasValue(token: SingleTokenObject, tokens = []): string | null {
-    try {
-        let returnedValue = checkIfValueToken(token) ? (token.value as string) : (token as string);
+export default function getAliasValue(token: SingleTokenObject | string, tokens = []): string | null {
+    let returnedValue = checkIfValueToken(token) ? (token.value as string) : (token as string);
 
+    try {
         const tokenReferences = findReferences(returnedValue);
         if (tokenReferences?.length > 0) {
             const resolvedReferences = tokenReferences.map((ref) => {
@@ -15,7 +15,7 @@ export default function getAliasValue(token: SingleTokenObject, tokens = []): st
                     const foundToken = tokens.find((t) => t.name === nameToLookFor);
                     if (typeof foundToken !== 'undefined') return foundToken.value;
                 }
-                return null;
+                return ref;
             });
             tokenReferences.forEach((reference, index) => {
                 returnedValue = returnedValue.replace(
@@ -31,10 +31,9 @@ export default function getAliasValue(token: SingleTokenObject, tokens = []): st
             if (!tokenReferences) {
                 return convertToRgb(checkAndEvaluateMath(returnedValue));
             }
-            return returnedValue;
         }
     } catch (e) {
         console.log(`Error getting alias value of ${token}`, tokens);
     }
-    return null;
+    return returnedValue;
 }

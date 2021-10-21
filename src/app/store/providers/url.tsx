@@ -52,9 +52,9 @@ export default function useURL() {
                     secret,
                     provider: StorageProviderType.URL,
                 });
-                if (data?.values) {
+                if (data) {
                     const tokenObj = {
-                        values: data.values,
+                        values: data,
                     };
                     dispatch.tokenState.setTokenData(tokenObj);
                     dispatch.tokenState.setEditProhibited(true);

@@ -199,6 +199,10 @@ textarea::-webkit-scrollbar-thumb {
     @apply border-none rounded bg-gray-100 px-0 py-0;
 }
 
+.button-property button {
+    @apply rounded;
+}
+
 .button-property:hover {
     @apply bg-gray-100 bg-opacity-50;
 }
@@ -208,13 +212,11 @@ textarea::-webkit-scrollbar-thumb {
 }
 
 .button-active {
-    @apply bg-primary-100;
-    box-shadow: 0 0 0 2px theme('colors.primary.300');
+    @apply bg-primary-100 shadow-focus-muted;
 }
 
-.button-active:hover {
-    @apply bg-opacity-75 outline-none;
-    box-shadow: 0 0 0 2px theme('colors.primary.400');
+.button-property button:focus {
+    @apply bg-opacity-75 outline-none shadow-focus-subtle;
 }
 
 .button-property-color {
@@ -334,7 +336,12 @@ form {
 }
 
 .input {
-    @apply bg-white border border-gray-300 text-xs p-2 rounded shadow-sm w-24;
+    @apply bg-white border border-gray-300 text-xxs p-2 rounded-sm w-24 font-mono;
+}
+
+.input:focus {
+    outline: none;
+    @apply shadow-focus;
 }
 
 /* switch */
@@ -477,8 +484,8 @@ form {
 
 #corner {
     position: fixed;
-    right: 1px;
-    bottom: 2px;
+    right: 0px;
+    bottom: 0px;
     cursor: nwse-resize;
 }
 

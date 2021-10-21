@@ -14,12 +14,12 @@ describe('checkIfAlias', () => {
             name: 'zero',
             value: '$colors.zero',
         },
-    ];
-    const incorrectTokens = [
         {
             name: 'nonexistant',
             value: '$colors.nonexistant',
         },
+    ];
+    const incorrectTokens = [
         {name: 'string', value: 'foo'},
         {
             name: 'number',

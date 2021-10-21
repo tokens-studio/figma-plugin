@@ -16,7 +16,7 @@ const Input = ({
 }) => {
     return (
         <label htmlFor={name} className="text-xxs font-medium block">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between mb-1">
                 {label ? <div>{label}</div> : null}
                 {error ? <div className="text-red-500 font-bold">{error}</div> : null}
             </div>
