@@ -21,6 +21,22 @@ export const fetchBranches = async ({context, owner, repo}) => {
     return branches.map((branch) => branch.name);
 };
 
+export const checkPermissions = async ({context, owner, repo}) => {
+    const octokit = new Octokit({auth: context.secret});
+
+    const currentUser = await octokit.rest.users.getAuthenticated();
+
+    if (!currentUser.data.login) return null;
+
+    const permissions = await octokit.rest.repos.getCollaboratorPermissionLevel({
+        owner,
+        repo,
+        username: currentUser.data.login,
+    });
+
+    return permissions;
+};
+
 export const readContents = async ({context, owner, repo}) => {
     const octokit = new Octokit({auth: context.secret});
     let response;
@@ -162,6 +178,14 @@ export function useGitHub() {
         const [owner, repo] = context.id.split('/');
 
         try {
+            const currentPermissions = await checkPermissions({context, owner, repo});
+            if (currentPermissions) {
+                dispatch.uiState.setEditProhibited(false);
+            }
+        } catch (e) {
+            dispatch.uiState.setEditProhibited(true);
+        }
+        try {
             const content = await readContents({context, owner, repo});
 
             if (content) {
@@ -183,7 +207,7 @@ export function useGitHub() {
                 return null;
             }
             const content = await readContents({context, owner, repo});
-            const {raw: rawTokenObj, string: tokenObj} = getTokenObj();
+            const {string: tokenObj} = getTokenObj();
 
             if (content) {
                 const stringifiedContent = JSON.stringify(content, null, 2);

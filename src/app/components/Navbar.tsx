@@ -45,7 +45,7 @@ const transformProviderName = (provider) => {
 };
 
 const Navbar = () => {
-    const {projectURL, storageType} = useSelector((state: RootState) => state.uiState);
+    const {projectURL, storageType, editProhibited} = useSelector((state: RootState) => state.uiState);
     const {lastSyncedState, tokens} = useSelector((state: RootState) => state.tokenState);
     const {toggleFilterVisibility} = useDispatch<Dispatch>().uiState;
     const {pullTokens, pushTokens} = useRemoteTokens();
@@ -91,6 +91,7 @@ const Navbar = () => {
                                     onClick={() => pushTokens()}
                                     type="button"
                                     className="button button-ghost relative"
+                                    disabled={editProhibited}
                                 >
                                     {checkForChanges() && (
                                         <div className="rounded-full w-2 h-2 bg-primary-500 absolute right-0 top-0" />
