@@ -36,14 +36,7 @@ export function resolveTokenValues(tokens, previousCount = undefined) {
             // If we're not dealing with special tokens, just return resolved value
             returnValue = getAliasValue(t, tokens);
 
-            console.log(
-                'Checking if contains alias',
-                t.name,
-                returnValue,
-                !returnValue || checkIfContainsAlias(returnValue)
-            );
-
-            failedToResolve = !returnValue || checkIfContainsAlias(returnValue);
+            failedToResolve = returnValue === null || checkIfContainsAlias(returnValue);
         }
 
         const returnObject = {
