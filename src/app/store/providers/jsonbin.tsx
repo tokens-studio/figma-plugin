@@ -160,6 +160,8 @@ export function useJSONbin() {
                     provider: StorageProviderType.JSONBIN,
                 });
                 if (jsonBinData?.values) {
+                    dispatch.tokenState.setEditProhibited(false);
+
                     return {
                         version: jsonBinData.version,
                         updatedAt: jsonBinData.updatedAt,

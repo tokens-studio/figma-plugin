@@ -60,6 +60,21 @@ const SyncSettings = () => {
                         </a>
                     </div>
                 );
+            case StorageProviderType.GITHUB:
+                return (
+                    <div>
+                        Sync your tokens with a GitHub repository so your design decisions are up to date with code.{' '}
+                        <a
+                            href="https://docs.tokens.studio/sync/github"
+                            target="_blank"
+                            rel="noreferrer"
+                            className="underline"
+                        >
+                            Read the guide
+                        </a>
+                        .
+                    </div>
+                );
             case StorageProviderType.URL:
                 return <div>Sync with a JSON stored on an external URL. This mode only allows Read Only.</div>;
             default:
@@ -174,31 +189,15 @@ const SyncSettings = () => {
 
                         {storedApiProviders().length > 0 && (
                             <div className="space-y-4">
-                                {api?.provider === localApiState.provider && <StorageItem item={api} />}
-                                {storedApiProviders().length > 0 && (
-                                    <details>
-                                        <summary
-                                            data-cy={`summary-${localApiState.provider}`}
-                                            className="p-2 rounded bg-gray-100 cursor-pointer text-xs focus:outline-none hover:bg-gray-200 focus:bg-gray-200"
-                                        >
-                                            {storedApiProviders().length} providers stored on this device
-                                        </summary>
-                                        <div className="flex flex-row items-center justify-between">
-                                            <Heading size="small">
-                                                Stored providers for {localApiState.provider}
-                                            </Heading>
-                                        </div>
-                                        <div className="flex flex-col gap-2">
-                                            {storedApiProviders().map((item) => (
-                                                <StorageItem
-                                                    key={`${item.provider}-${item.id}-${item.secret}`}
-                                                    onEdit={() => handleEditClick(item)}
-                                                    item={item}
-                                                />
-                                            ))}
-                                        </div>
-                                    </details>
-                                )}
+                                <div className="flex flex-col gap-2">
+                                    {storedApiProviders().map((item) => (
+                                        <StorageItem
+                                            key={`${item.provider}-${item.id}-${item.secret}`}
+                                            onEdit={() => handleEditClick(item)}
+                                            item={item}
+                                        />
+                                    ))}
+                                </div>
                             </div>
                         )}
                     </>

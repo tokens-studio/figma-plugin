@@ -180,10 +180,10 @@ export function useGitHub() {
         try {
             const currentPermissions = await checkPermissions({context, owner, repo});
             if (currentPermissions) {
-                dispatch.uiState.setEditProhibited(false);
+                dispatch.tokenState.setEditProhibited(false);
             }
         } catch (e) {
-            dispatch.uiState.setEditProhibited(true);
+            dispatch.tokenState.setEditProhibited(true);
         }
         try {
             const content = await readContents({context, owner, repo});
@@ -201,9 +201,9 @@ export function useGitHub() {
     async function syncTokensWithGitHub(context) {
         try {
             const [owner, repo] = context.id.split('/');
-            const isAuthed = await fetchBranches({context, owner, repo});
+            const hasBranches = await fetchBranches({context, owner, repo});
 
-            if (!isAuthed) {
+            if (!hasBranches) {
                 return null;
             }
             const content = await readContents({context, owner, repo});

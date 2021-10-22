@@ -47,8 +47,8 @@ const transformProviderName = (provider) => {
 };
 
 const Navbar = () => {
-    const {projectURL, storageType, editProhibited} = useSelector((state: RootState) => state.uiState);
-    const {lastSyncedState, tokens} = useSelector((state: RootState) => state.tokenState);
+    const {projectURL, storageType} = useSelector((state: RootState) => state.uiState);
+    const {lastSyncedState, tokens, editProhibited} = useSelector((state: RootState) => state.tokenState);
     const {toggleFilterVisibility} = useDispatch<Dispatch>().uiState;
     const {pullTokens, pushTokens} = useRemoteTokens();
 

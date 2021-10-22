@@ -51,6 +51,7 @@ export default function useRemoteTokens() {
         dispatch.tokenState.setEmptyTokens();
         dispatch.uiState.setLocalApiState(context);
         dispatch.uiState.setApiData(context);
+        dispatch.tokenState.setEditProhibited(false);
         setStorageType({provider: context, bool: true});
         await pullTokens(context);
         return null;
