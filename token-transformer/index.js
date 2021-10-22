@@ -15,7 +15,7 @@ function writeFile(path, contents, cb) {
 function transform() {
     const [input, output, rawSets, rawExcludes] = process.argv.slice(2);
     const sets = rawSets.split(',');
-    const excludes = rawExcludes ? rawExcludes.split(',') : []
+    const excludes = rawExcludes ? rawExcludes.split(',') : [];
     if (!input) {
         process.stdout.write(`ERROR: Specify an input first (e.g. tokens.json)`);
 
@@ -34,7 +34,10 @@ function transform() {
         const transformed = transformTokens(parsed, sets, excludes);
         writeFile(output, JSON.stringify(transformed, null, 2), () => {
             process.stdout.write(
-                `Transformed tokens from ${input} to ${output}, using sets ${sets.join(', ')}${excludes.length > 0 ? `excluding ${excludes.join(', ')}` : ''}`);
+                `Transformed tokens from ${input} to ${output}, using sets ${sets.join(', ')}${
+                    excludes.length > 0 ? `excluding ${excludes.join(', ')}` : ''
+                }`
+            );
         });
     } else {
         process.stdout.write(`ERROR: Input not found at ${input}`);

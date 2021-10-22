@@ -56,7 +56,8 @@ figma.ui.onmessage = async (msg) => {
                 if (apiProviders) notifyAPIProviders(JSON.parse(apiProviders));
                 switch (storageType.provider) {
                     case StorageProviderType.JSONBIN:
-                    case StorageProviderType.GITHUB: {
+                    case StorageProviderType.GITHUB:
+                    case StorageProviderType.URL: {
                         compareProvidersWithStored(apiProviders, storageType);
 
                         break;
@@ -136,6 +137,9 @@ figma.ui.onmessage = async (msg) => {
             break;
         case MessageToPluginTypes.NOTIFY:
             notifyUI(msg.msg, msg.opts);
+            break;
+        case MessageToPluginTypes.RESIZE_WINDOW:
+            figma.ui.resize(msg.width, msg.height);
             break;
         case MessageToPluginTypes.SET_UI: {
             updateUISettings({

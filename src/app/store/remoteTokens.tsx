@@ -3,6 +3,7 @@ import {StorageProviderType} from 'Types/api';
 import {MessageToPluginTypes} from 'Types/messages';
 import {postToFigma} from '../../plugin/notifiers';
 import {useJSONbin} from './providers/jsonbin';
+import useURL from './providers/url';
 import {Dispatch, RootState} from '../store';
 import useStorage from './useStorage';
 import {useGitHub} from './providers/github';
@@ -14,6 +15,7 @@ export default function useRemoteTokens() {
     const {setStorageType} = useStorage();
     const {pullTokensFromJSONBin, addJSONBinCredentials, createNewJSONBin} = useJSONbin();
     const {addNewGitHubCredentials, pullTokensFromGitHub, pushTokensToGitHub} = useGitHub();
+    const {pullTokensFromURL} = useURL();
 
     const pullTokens = async (context = api) => {
         dispatch.uiState.setLoading(true);
@@ -27,6 +29,10 @@ export default function useRemoteTokens() {
             }
             case StorageProviderType.GITHUB: {
                 tokenValues = await pullTokensFromGitHub(context);
+                break;
+            }
+            case StorageProviderType.URL: {
+                tokenValues = await pullTokensFromURL(context);
                 break;
             }
             default:
@@ -77,6 +83,10 @@ export default function useRemoteTokens() {
             }
             case StorageProviderType.GITHUB: {
                 data = addNewGitHubCredentials(credentials);
+                break;
+            }
+            case StorageProviderType.URL: {
+                data = await pullTokensFromURL(context);
                 break;
             }
             default:

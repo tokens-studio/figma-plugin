@@ -44,6 +44,7 @@ const TokenListing = ({
             name,
             initialName: name,
             isPristine,
+            type: token.type,
             explainer,
             property,
             schema: schema?.value,
@@ -101,7 +102,7 @@ const TokenListing = ({
                     </Tooltip>
                     <Heading size="small">{label}</Heading>
                 </button>
-                <div className="absolute right-0 mr-2">
+                <div className="flex absolute right-0 mr-2">
                     {showDisplayToggle && (
                         <Tooltip label={displayType === 'GRID' ? 'Show as List' : 'Show as Grid'}>
                             <button

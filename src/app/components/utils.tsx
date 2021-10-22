@@ -104,7 +104,7 @@ export function lightOrDark(color: string) {
             return 'dark';
         }
     } catch (e) {
-        console.error(e);
+        console.error(color, e);
     }
     return 'light';
 }

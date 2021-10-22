@@ -28,6 +28,7 @@ interface EditToken {
     schema: object;
     optionsSchema: object;
     options: object;
+    type: string;
 }
 
 interface UIState {
@@ -37,7 +38,6 @@ interface UIState {
     loading: boolean;
     activeTab: TabNames;
     projectURL: string;
-    editProhibited: boolean;
     storageType: StorageType;
     api: ApiDataType;
     apiProviders: ApiDataType[];
@@ -67,7 +67,6 @@ export const uiState = createModel<RootModel>()({
         loading: false,
         activeTab: 'start',
         projectURL: '',
-        editProhibited: false,
         storageType: {
             provider: StorageProviderType.LOCAL,
         },
@@ -176,17 +175,10 @@ export const uiState = createModel<RootModel>()({
                 projectURL: payload,
             };
         },
-        setEditProhibited(state, payload: boolean) {
-            return {
-                ...state,
-                editProhibited: payload,
-            };
-        },
         setStorage(state, payload: StorageType) {
             return {
                 ...state,
                 storageType: payload,
-                editProhibited: false,
             };
         },
         setApiData(state, payload: ApiDataType) {

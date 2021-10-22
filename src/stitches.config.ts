@@ -20,6 +20,7 @@ const globalTokens = {
         primary300: 'var(--theme-colors-brand-300, #90CDF4)',
         primary400: 'var(--theme-colors-brand-300, #3CB1FF)',
         primary500: 'var(--theme-colors-brand-500, #18A0FB)',
+        red500: 'var(--red, #f24822)',
     },
     radii: {
         sm: '2px',
@@ -38,6 +39,7 @@ export const {styled, css, global: globalCSS, keyframes, getCssString, theme} = 
             interaction: globalTokens.colors.primary500,
             onInteraction: globalTokens.colors.white,
             interactionDisabled: globalTokens.colors.gray600,
+            dangerFg: globalTokens.colors.red500,
         },
         radii: {
             default: globalTokens.radii.sm,

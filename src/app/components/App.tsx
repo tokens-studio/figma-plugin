@@ -15,12 +15,13 @@ import ImportedTokensDialog from './ImportedTokensDialog';
 import {RootState} from '../store';
 import ConfirmDialog from './ConfirmDialog';
 import PushDialog from './PushDialog';
+import WindowResizer from './WindowResizer';
 
 const App = () => {
     const activeTab = useSelector((state: RootState) => state.uiState.activeTab);
 
     return (
-        <>
+        <div className="content">
             <Initiator />
             <LoadingBar />
             <div className="h-full flex flex-col">
@@ -38,8 +39,9 @@ const App = () => {
                 <ImportedTokensDialog />
                 <ConfirmDialog />
                 <PushDialog />
+                <WindowResizer />
             </div>
-        </>
+        </div>
     );
 };
 

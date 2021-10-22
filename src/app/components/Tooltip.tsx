@@ -33,7 +33,7 @@ export default ({
     side?: 'left' | 'bottom';
 }) => (
     <Tooltip.Root delayDuration={0}>
-        <Tooltip.Trigger as="span">{children}</Tooltip.Trigger>
+        <Tooltip.Trigger as="div">{children}</Tooltip.Trigger>
         <StyledContent side={side}>
             <StyledArrow offset={10} />
             {label}

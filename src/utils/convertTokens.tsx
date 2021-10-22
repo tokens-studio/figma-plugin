@@ -8,6 +8,7 @@ function checkForTokens({
     returnValuesOnly = false,
     expandTypography = false,
 }): [SingleTokenObject[], SingleToken] {
+    // replaces / in token name
     let returnValue;
     const shouldExpandTypography = expandTypography ? isTypographyToken(token.value) : false;
     if (isValueToken(token) && !shouldExpandTypography) {
@@ -48,6 +49,10 @@ function checkForTokens({
         returnValue = {
             value: token,
         };
+    }
+
+    if (returnValue?.name) {
+        returnValue.name = returnValue.name.split('/').join('.');
     }
 
     return [obj, returnValue];

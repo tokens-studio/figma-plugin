@@ -38,7 +38,7 @@ const StorageItem = ({item, onEdit = null}) => {
                     </button>
                 )}
             </div>
-            <div className="space-x-2">
+            <div className="space-x-2 flex-nowrap">
                 {onEdit && (
                     <Button id="button-storageitem-edit" variant="secondary" onClick={onEdit}>
                         Edit

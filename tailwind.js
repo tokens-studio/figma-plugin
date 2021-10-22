@@ -38,6 +38,11 @@ module.exports = {
             zIndex: {
                 1: '1',
             },
+            boxShadow: (theme) => ({
+                focus: `0 0 0 2px ${theme('colors.primary.500')}`,
+                'focus-subtle': `0 0 0 2px ${theme('colors.primary.300')}`,
+                'focus-muted': `0 0 0 2px ${theme('colors.primary.400')}`,
+            }),
         },
     },
 };

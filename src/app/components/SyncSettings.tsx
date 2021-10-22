@@ -30,7 +30,7 @@ const SyncSettings = () => {
     };
 
     const selectedRemoteProvider = () => {
-        return [StorageProviderType.JSONBIN, StorageProviderType.GITHUB].includes(
+        return [StorageProviderType.JSONBIN, StorageProviderType.GITHUB, StorageProviderType.URL].includes(
             localApiState?.provider as StorageProviderType
         );
     };
@@ -60,6 +60,8 @@ const SyncSettings = () => {
                         </a>
                     </div>
                 );
+            case StorageProviderType.URL:
+                return <div>Sync with a JSON stored on an external URL. This mode only allows Read Only.</div>;
             default:
                 return null;
         }
@@ -110,6 +112,20 @@ const SyncSettings = () => {
                             }
                             text="Local document"
                             id={StorageProviderType.LOCAL}
+                        />
+                        <ProviderSelector
+                            isActive={localApiState?.provider === StorageProviderType.URL}
+                            isStored={storageType?.provider === StorageProviderType.URL}
+                            onClick={() => {
+                                dispatch.uiState.setLocalApiState({
+                                    name: '',
+                                    secret: '',
+                                    id: '',
+                                    provider: StorageProviderType.URL,
+                                });
+                            }}
+                            text="URL"
+                            id={StorageProviderType.URL}
                         />
                         <ProviderSelector
                             isActive={localApiState?.provider === StorageProviderType.JSONBIN}

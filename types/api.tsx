@@ -25,9 +25,3 @@ export interface ContextObject extends ApiDataType {
     filePath: string;
     tokens: string;
 }
-
-export interface ContextObject extends ApiDataType {
-    secret: string;
-    id: string;
-    tokens: string;
-}

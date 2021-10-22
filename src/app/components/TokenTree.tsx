@@ -21,21 +21,19 @@ const TokenTree = ({tokenValues, showNewForm, showForm, schema, path = null, typ
                             <div className="property-wrapper w-full" data-cy={`token-group-${stringPath}`}>
                                 <div className="flex items-center justify-between group">
                                     <TokenGroupHeading label={name} path={stringPath} id="listing" />
-                                    <div className="opacity-0 group-hover:opacity-100">
-                                        <Tooltip label="Add a new token" variant="right">
-                                            <button
-                                                disabled={editProhibited}
-                                                data-cy="button-add-new-token-in-group"
-                                                className="button button-ghost"
-                                                type="button"
-                                                onClick={() => {
-                                                    showNewForm({name: `${stringPath}.`});
-                                                }}
-                                            >
-                                                <Icon name="add" />
-                                            </button>
-                                        </Tooltip>
-                                    </div>
+                                    <Tooltip label="Add a new token" variant="right">
+                                        <button
+                                            disabled={editProhibited}
+                                            data-cy="button-add-new-token-in-group"
+                                            className="button button-ghost opacity-0 group-hover:opacity-100 focus:opacity-100"
+                                            type="button"
+                                            onClick={() => {
+                                                showNewForm({name: `${stringPath}.`});
+                                            }}
+                                        >
+                                            <Icon name="add" />
+                                        </button>
+                                    </Tooltip>
                                 </div>
 
                                 <TokenTree

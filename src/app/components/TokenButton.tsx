@@ -9,6 +9,7 @@ import useManageTokens from '../store/useManageTokens';
 import {Dispatch, RootState} from '../store';
 import useTokens from '../store/useTokens';
 import TokenTooltip from './TokenTooltip';
+import BrokenReferenceIndicator from './BrokenReferenceIndicator';
 
 export function useGetActiveState(properties, type, name) {
     const uiState = useSelector((state: RootState) => state.uiState);
@@ -169,7 +170,7 @@ const TokenButton = ({
 
     return (
         <div
-            className={`relative mb-1 mr-1 flex button button-property ${buttonClass.join(' ')} ${
+            className={`relative mb-1 mr-1 button button-property ${buttonClass.join(' ')} ${
                 uiState.disabled && 'button-disabled'
             } `}
             style={style}
@@ -199,7 +200,14 @@ const TokenButton = ({
                         </div>
                     }
                 >
-                    <button className="w-full h-full" type="button" onClick={() => onClick(properties[0])}>
+                    <button
+                        style={style}
+                        className="w-full h-full relativeƒ"
+                        type="button"
+                        onClick={() => onClick(properties[0])}
+                    >
+                        <BrokenReferenceIndicator token={token} resolvedTokens={resolvedTokens} />
+
                         <div className="button-text">{showValue && <span>{visibleName}</span>}</div>
                     </button>
                 </Tooltip>

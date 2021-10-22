@@ -69,7 +69,7 @@ const Tokens = ({isActive}) => {
                     </div>
                 );
             })}
-            {showEditForm && <EditTokenFormModal />}
+            {showEditForm && <EditTokenFormModal resolvedTokens={resolvedTokens} />}
             <ToggleEmptyButton />
             <TokensBottomBar />
         </div>

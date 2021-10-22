@@ -34,8 +34,8 @@ export async function getUISettings() {
                     ? false
                     : parsedData.ignoreFirstPartForStyles;
             notifyUISettings({
-                width,
-                height,
+                width: Math.max(300, width),
+                height: Math.max(200, height),
                 updateMode,
                 updateOnChange,
                 updateRemote,

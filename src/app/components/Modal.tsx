@@ -10,7 +10,7 @@ const customStyles = (large) => ({
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '2rem',
+        padding: '1rem',
         zIndex: '1',
     },
     content: {
@@ -71,7 +71,7 @@ const Modal = ({
                 </button>
             </div>
         )}
-        <div data-cy={id} className={`relative ${full ? 'p-0' : 'p-8'}`}>
+        <div data-cy={id} className={`relative ${full ? 'p-0' : 'p-4'}`}>
             {children}
         </div>
     </ReactModal>

@@ -18,7 +18,6 @@ const JSONEditor = () => {
     const {getStringTokens} = useTokens();
     const {confirm} = useConfirm();
 
-    const [confirmModalVisible, showConfirmModal] = React.useState('');
     const [exportModalVisible, showExportModal] = React.useState(false);
     const [presetModalVisible, showPresetModal] = React.useState(false);
     const [error, setError] = React.useState(null);

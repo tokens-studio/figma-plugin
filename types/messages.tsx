@@ -25,4 +25,5 @@ export enum MessageToPluginTypes {
     SET_STORAGE_TYPE = 'set-storage-type',
     NOTIFY = 'notify',
     SET_UI = 'set_ui',
+    RESIZE_WINDOW = 'resize_window',
 }

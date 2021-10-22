@@ -39,6 +39,8 @@ const transformProviderName = (provider) => {
             return 'JSONBin.io';
         case StorageProviderType.GITHUB:
             return 'GitHub';
+        case StorageProviderType.URL:
+            return 'URL';
         default:
             return provider;
     }

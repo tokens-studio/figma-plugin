@@ -3,97 +3,39 @@ import {Dispatch} from '@/app/store';
 import {StorageProviderType} from 'Types/api';
 import {MessageToPluginTypes} from 'Types/messages';
 import {TokenProps} from 'Types/tokens';
-import convertTokensToObject from '@/utils/convertTokensToObject';
 import {notifyToUI, postToFigma} from '../../../plugin/notifiers';
-import {compareUpdatedAt} from '../../components/utils';
-import * as pjs from '../../../../package.json';
 
 async function readTokensFromURL({secret, id}): Promise<TokenProps> | null {
-    const response = await fetch(`https://api.github.com/${id}/git/contents/${filename}`, {
-        method: 'GET',
-        headers: {
-            Authorization: secret,
-            Accept: 'application/vnd.github.v3+json',
-        },
-    });
-
-    if (response.ok) {
-        const data = await response.json();
-        const decoded = atob(data.content);
-        const parsed = JSON.parse(decoded);
-        return parsed;
-    }
-    notifyToUI('There was an error connecting, check your sync settings');
-    return null;
-}
-
-async function writeTokensToURL({secret, id, tokenObj}): Promise<TokenProps> | null {
-    const response = await fetch(`https://api.github.com/${id}/git/dispatches`, {
-        method: 'POST',
-        body: {
-            message: 'Commit from Figma Tokens',
-            content: tokenObj,
-        },
-        headers: {
-            Authorization: secret,
-            Accept: 'application/vnd.github.v3+json',
-        },
-    });
-
-    if (response.ok) {
-        const res = await response.json();
-        notifyToUI('Updated Remote');
-        return res;
-    }
-    notifyToUI('Error updating remote');
-    return null;
-}
-
-export async function updateURLTokens({tokens, context, updatedAt, oldUpdatedAt = null}) {
-    const {id, secret} = context;
-
+    let customHeaders = secret;
+    const defaultHeaders = {
+        Accept: 'application/json',
+    };
     try {
-        const tokenObj = JSON.stringify(
-            {
-                version: pjs.plugin_version,
-                updatedAt,
-                values: convertTokensToObject(tokens),
-            },
-            null,
-            2
-        );
+        customHeaders = JSON.parse(secret);
+    } finally {
+        const headers = {
+            ...defaultHeaders,
+            ...customHeaders,
+        };
+        const response = await fetch(id, {
+            method: 'GET',
+            headers,
+        });
 
-        if (oldUpdatedAt) {
-            const remoteTokens = await readTokensFromURL({secret, id});
-            const comparison = await compareUpdatedAt(oldUpdatedAt, remoteTokens.updatedAt);
-            if (comparison === 'remote_older') {
-                writeTokensToURL({secret, id, tokenObj});
-            } else {
-                // Tell the user to choose between:
-                // A) Pull Remote values and replace local changes
-                // B) Overwrite Remote changes
-                notifyToUI('Error updating tokens as remote is newer, please update first');
-            }
-        } else {
-            writeTokensToURL({secret, id, tokenObj});
+        if (response.ok) {
+            const data = await response.json();
+            return data;
         }
-    } catch (e) {
-        console.log('Error updating jsonbin', e);
-    }
-}
-
-export function useURL() {
-    const dispatch = useDispatch<Dispatch>();
-
-    async function createNewURL({provider, secret, tokens, name, updatedAt}): Promise<TokenProps> {
+        notifyToUI('There was an error connecting, check your sync settings');
         return null;
     }
+}
+
+export default function useURL() {
+    const dispatch = useDispatch<Dispatch>();
 
     // Read tokens from URL
-
-    async function fetchDataFromURL(context): Promise<TokenProps> {
-        let tokenValues;
-
+    async function pullTokensFromURL(context): Promise<TokenProps> | null {
         const {id, secret, name} = context;
 
         if (!id && !secret) return;
@@ -110,27 +52,23 @@ export function useURL() {
                     secret,
                     provider: StorageProviderType.URL,
                 });
-                if (data?.values) {
-                    const obj = {
-                        version: data.version,
-                        updatedAt: data.updatedAt,
-                        values: data.values,
+                if (data) {
+                    const tokenObj = {
+                        values: data,
                     };
-
-                    tokenValues = obj;
-                } else {
-                    notifyToUI('No tokens stored on remote');
+                    dispatch.tokenState.setTokenData(tokenObj);
+                    dispatch.tokenState.setEditProhibited(true);
+                    return tokenObj;
                 }
-            }
 
-            return tokenValues;
+                notifyToUI('No tokens stored on remote');
+            }
         } catch (e) {
             notifyToUI('Error fetching from URL, check console (F12)');
             console.log('Error:', e);
         }
     }
     return {
-        fetchDataFromURL,
-        createNewURL,
+        pullTokensFromURL,
     };
 }
