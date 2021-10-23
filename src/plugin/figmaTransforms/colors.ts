@@ -96,6 +96,10 @@ export function hslaToRgba(hslaValues) {
     return [r, g, b, a];
 }
 
+function roundToTwo(num) {
+    return +`${Math.round(Number(`${num}e+2`))}e-2`;
+}
+
 export function convertToFigmaColor(input) {
     let color;
     let opacity;
@@ -113,7 +117,7 @@ export function convertToFigmaColor(input) {
     } else {
         const {r, g, b, a = 1}: RGBA = hexToFigmaRGB(input);
         color = {r, g, b};
-        opacity = Number(a);
+        opacity = roundToTwo(a);
     }
 
     return {
