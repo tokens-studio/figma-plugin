@@ -3,6 +3,7 @@ import {track} from '@/utils/analytics';
 import fetchChangelog from '@/utils/storyblok';
 import {createModel} from '@rematch/core';
 import {StorageType, StorageProviderType, ApiDataType} from '@types/api';
+import {TokenType} from 'Types/tokens';
 
 import {RootModel} from '.';
 
@@ -28,7 +29,7 @@ interface EditToken {
     schema: object;
     optionsSchema: object;
     options: object;
-    type: string;
+    type: TokenType;
 }
 
 interface UIState {
