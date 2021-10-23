@@ -13,10 +13,22 @@ const EditTokenForm = ({resolvedTokens}) => {
     const {editToken} = useSelector((state: RootState) => state.uiState);
     const dispatch = useDispatch<Dispatch>();
     const [currentEditToken, setCurrentEditToken] = React.useState(editToken);
+    const [error, setError] = React.useState(null);
 
-    const isValid = currentEditToken.value && currentEditToken.name.match(/^\S*$/);
+    const isValid = currentEditToken.value && currentEditToken.name.match(/^\S*$/) && !error;
+
+    const {isPristine} = currentEditToken;
+    const hasNameThatExistsAlready = resolvedTokens.find((t) => t.name === currentEditToken.name);
+    const nameWasChanged = currentEditToken?.initialName !== currentEditToken.name;
+
+    React.useEffect(() => {
+        if ((isPristine || nameWasChanged) && hasNameThatExistsAlready) {
+            setError('Token names must be unique');
+        }
+    }, [isPristine, hasNameThatExistsAlready, nameWasChanged]);
 
     const handleChange = (e) => {
+        setError(null);
         e.persist();
         setCurrentEditToken({...currentEditToken, [e.target.name]: e.target.value});
     };
@@ -103,6 +115,7 @@ const EditTokenForm = ({resolvedTokens}) => {
                 type="text"
                 name="name"
                 inputRef={firstInput}
+                error={error}
             />
             {typeof currentEditToken.schema === 'object' ? (
                 Object.entries(currentEditToken.schema).map(([key, schemaValue]: [string, string]) => (
