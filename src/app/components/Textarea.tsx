@@ -19,6 +19,7 @@ const Textarea = ({
     return (
         <>
             <textarea
+                spellCheck={false}
                 rows={rows}
                 className={`textarea ${customClass}`}
                 placeholder={placeholder}

@@ -21,6 +21,7 @@ const Input = ({
                 {error ? <div className="text-red-500 font-bold">{error}</div> : null}
             </div>
             <input
+                spellCheck={false}
                 tabIndex={tabindex}
                 type={type}
                 value={value}
