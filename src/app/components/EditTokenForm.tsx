@@ -17,15 +17,14 @@ const EditTokenForm = ({resolvedTokens}) => {
 
     const isValid = currentEditToken.value && currentEditToken.name.match(/^\S*$/) && !error;
 
-    const {isPristine} = currentEditToken;
     const hasNameThatExistsAlready = resolvedTokens.find((t) => t.name === currentEditToken.name);
     const nameWasChanged = currentEditToken?.initialName !== currentEditToken.name;
 
     React.useEffect(() => {
-        if ((isPristine || nameWasChanged) && hasNameThatExistsAlready) {
+        if ((currentEditToken.isPristine || nameWasChanged) && hasNameThatExistsAlready) {
             setError('Token names must be unique');
         }
-    }, [isPristine, hasNameThatExistsAlready, nameWasChanged]);
+    }, [currentEditToken, hasNameThatExistsAlready, nameWasChanged]);
 
     const handleChange = (e) => {
         setError(null);

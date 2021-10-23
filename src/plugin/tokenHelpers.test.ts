@@ -38,7 +38,7 @@ const output = [
     },
 ];
 describe('resolveTokenValues', () => {
-    it.only('resolves all values it can resolve', () => {
+    it('resolves all values it can resolve', () => {
         expect(resolveTokenValues(tokens)).toEqual(output);
     });
 });
