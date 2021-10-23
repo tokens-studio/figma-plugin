@@ -1,4 +1,5 @@
 import {hexToFigmaRGB, webRGBToFigmaRGB} from '@figma-plugin/helpers';
+import {toHex} from 'color2k';
 
 interface RGBA {
     r: number;
@@ -115,7 +116,7 @@ export function convertToFigmaColor(input) {
         color = {r, g, b};
         opacity = Number(a);
     } else {
-        const {r, g, b, a = 1}: RGBA = hexToFigmaRGB(input);
+        const {r, g, b, a = 1}: RGBA = hexToFigmaRGB(toHex(input));
         color = {r, g, b};
         opacity = roundToTwo(a);
     }

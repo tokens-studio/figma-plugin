@@ -63,6 +63,19 @@ describe('convertToFigmaColor', () => {
             opacity: 0.8,
         });
     });
+
+    it('converts named colors to figma readable', () => {
+        const color = 'red';
+
+        expect(convertToFigmaColor(color)).toEqual({
+            color: {
+                r: 1,
+                g: 0,
+                b: 0,
+            },
+            opacity: 1,
+        });
+    });
 });
 
 describe('round-trip from plugin to figma', () => {
