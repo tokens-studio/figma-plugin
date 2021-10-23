@@ -1,9 +1,15 @@
 import {convertToRgb, isTypographyToken, lightOrDark, slugify, checkAndEvaluateMath, isSingleToken} from './utils';
 
-describe('checkmath', () => {
+describe('checkAndEvaluateMath', () => {
     it('calculates math', () => {
         const input = '25 * 4.5 + 0.175';
         const output = 112.675;
+        expect(checkAndEvaluateMath(input)).toEqual(output);
+    });
+
+    it('doesnt break if it cannot calculate', () => {
+        const input = '$foobar * 4.5';
+        const output = '$foobar * 4.5';
         expect(checkAndEvaluateMath(input)).toEqual(output);
     });
 });
