@@ -1015,10 +1015,10 @@
     minimatch "^3.0.4"
     strip-json-comments "^3.1.1"
 
-"@figma-plugin/helpers@^0.13.2":
-  version "0.13.3"
-  resolved "https://registry.yarnpkg.com/@figma-plugin/helpers/-/helpers-0.13.3.tgz#9bf9c94f8f1ff6965dfc59d13f6c668eb08167db"
-  integrity sha512-p4jsNuNKEzQ39dtOOg7e/HbD402crVwdeB11tCmY/wztyKh31vZA/31eqko6/Iw4gY1Tj2UVG92Z6mKx4GhKKQ==
+"@figma-plugin/helpers@^0.15.2":
+  version "0.15.2"
+  resolved "https://registry.yarnpkg.com/@figma-plugin/helpers/-/helpers-0.15.2.tgz#0941089e7451fd2764843d763042728579dd54bf"
+  integrity sha512-ggFxoefZKc0D/HJXFHqliLWCLQG3QTbByHqgiSpTK0D76qTDv2fpcF9bytjSMVnc4flD7Rq17tLNP/WmaJt3dA==
   dependencies:
     lodash "^4.17.15"
     matrix-inverse "^1.0.1"
@@ -6879,7 +6879,7 @@ json5@^1.0.1:
   dependencies:
     minimist "^1.2.0"
 
-json5@^2.1.2:
+json5@^2.1.2, json5@^2.2.0:
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/json5/-/json5-2.2.0.tgz#2dfefe720c6ba525d9ebd909950f0515316c89a3"
   integrity sha512-f+8cldu7X/y7RAJurMEJmdoKXGB/X550w2Nr3tTbezL6RwEE/iMcm+tZnXeoZtKuOq6ft8+CqzEkrIgx1fPoQA==

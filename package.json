@@ -21,7 +21,7 @@
 		"serve": "serve dist"
 	},
 	"dependencies": {
-		"@figma-plugin/helpers": "^0.13.2",
+		"@figma-plugin/helpers": "^0.15.2",
 		"@octokit/rest": "^18.9.0",
 		"@radix-ui/react-checkbox": "^0.0.16",
 		"@radix-ui/react-context-menu": "^0.0.23",
@@ -44,9 +44,10 @@
 		"figma-plugin-ds": "^0.1.8",
 		"file-loader": "^6.2.0",
 		"ignore-styles": "^5.0.1",
+		"json5": "^2.2.0",
 		"mixpanel-figma": "^2.0.1",
-		"octokit-commit-multiple-files": "^3.2.1",
 		"object-path": "^0.11.8",
+		"octokit-commit-multiple-files": "^3.2.1",
 		"postcss": "^8.2.10",
 		"react": "17.0.0",
 		"react-dnd": "^13.1.1",

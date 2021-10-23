@@ -2,6 +2,7 @@ import * as React from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import parseTokenValues from '@/utils/parseTokenValues';
 import {track} from '@/utils/analytics';
+import parseJson from '@/utils/parseJson';
 import Textarea from './Textarea';
 import Button from './Button';
 import TokenSetSelector from './TokenSetSelector';
@@ -47,11 +48,10 @@ const JSONEditor = () => {
     const changeTokens = (val) => {
         setError(null);
         try {
-            const parsedTokens = JSON.parse(val);
+            const parsedTokens = parseJson(val);
             parseTokenValues(parsedTokens);
         } catch (e) {
-            console.log('Error parsing tokens', e);
-            setError('Unable to read JSON');
+            setError(`Unable to read JSON: ${JSON.stringify(e)}`);
         }
         setStringTokens(val);
     };

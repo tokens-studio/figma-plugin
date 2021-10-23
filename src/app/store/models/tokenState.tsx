@@ -8,6 +8,7 @@ import parseTokenValues from '@/utils/parseTokenValues';
 import {notifyToUI} from '@/plugin/notifiers';
 import {reduceToValues} from '@/plugin/tokenHelpers';
 import {replaceReferences} from '@/utils/findReferences';
+import parseJson from '@/utils/parseJson';
 import {RootModel} from '.';
 import updateTokensOnSources from '../updateSources';
 import * as pjs from '../../../../package.json';
@@ -152,21 +153,16 @@ export const tokenState = createModel<RootModel>()({
             };
         },
         setJSONData(state, payload) {
-            const parsedTokens = JSON.parse(payload);
-            try {
-                parseTokenValues(parsedTokens);
-                const values = parseTokenValues({[state.activeTokenSet]: parsedTokens});
-                return {
-                    ...state,
-                    tokens: {
-                        ...state.tokens,
-                        ...values,
-                    },
-                };
-            } catch (e) {
-                console.log('Error parsing tokens', e);
-            }
-            return state;
+            const parsedTokens = parseJson(payload);
+            parseTokenValues(parsedTokens);
+            const values = parseTokenValues({[state.activeTokenSet]: parsedTokens});
+            return {
+                ...state,
+                tokens: {
+                    ...state.tokens,
+                    ...values,
+                },
+            };
         },
         createToken: (state, data: TokenInput) => {
             let newTokens = {};
