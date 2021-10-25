@@ -38,26 +38,21 @@ describe('TokenListing', () => {
         cy.receiveTokenValues({
             version: '5',
             values: {
-                options: [
-                    {
-                        name: 'sizing.xs',
-                        value: 4,
-                    },
-                ],
+                options: [],
             },
         });
         cy.receiveStorageTypeLocal();
         cy.get('[data-cy=tokenlisting-sizing] [data-cy=button-add-new-token]').click({timeout: 1000});
         fillTokenForm({
-            name: 'sizing.xs',
+            name: 'sizing.sm',
             value: '4',
         });
         cy.get('@postMessage').should('be.calledTwice');
         receiveRemoteComponents();
         cy.get('[data-cy=tokenlisting-sizing] [data-cy=button-add-new-token]').click({timeout: 1000});
         fillTokenForm({
-            name: 'sizing.sm',
-            value: '$sizing.xs * 2',
+            name: 'sizing.md',
+            value: '$sizing.sm * 2',
         });
     });
 
