@@ -17,7 +17,9 @@ const EditTokenForm = ({resolvedTokens}) => {
 
     const isValid = currentEditToken.value && currentEditToken.name.match(/^\S*$/) && !error;
 
-    const hasNameThatExistsAlready = resolvedTokens.find((t) => t.name === currentEditToken.name);
+    const hasNameThatExistsAlready = resolvedTokens
+        .filter((t) => t.internal__Parent === activeTokenSet)
+        .find((t) => t.name === currentEditToken.name);
     const nameWasChanged = currentEditToken?.initialName !== currentEditToken.name;
 
     React.useEffect(() => {
@@ -147,7 +149,7 @@ const EditTokenForm = ({resolvedTokens}) => {
                             {currentEditToken.type === 'color' ? (
                                 <div
                                     className="w-4 h-4 rounded border border-gray-200 mr-1"
-                                    style={{backgroundColor: resolvedValue}}
+                                    style={{background: resolvedValue}}
                                 />
                             ) : null}
                             {resolvedValue}
