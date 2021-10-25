@@ -6,14 +6,7 @@ import GitHubForm from './StorageItemForm/GitHubForm';
 import JSONBinForm from './StorageItemForm/JSONBinForm';
 import URLForm from './StorageItemForm/URLForm';
 
-export default function EditStorageItemForm({
-    isNew = false,
-    handleChange,
-    handleSubmit,
-    handleCancel,
-    values,
-    hasErrored,
-}) {
+export default function StorageItemForm({isNew = false, handleChange, handleSubmit, handleCancel, values, hasErrored}) {
     const {localApiState} = useSelector((state: RootState) => state.uiState);
 
     switch (localApiState.provider) {
