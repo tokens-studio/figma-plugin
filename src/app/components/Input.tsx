@@ -13,11 +13,12 @@ const Input = ({
     custom = '',
     inputRef = null,
     placeholder = '',
+    capitalize = false,
 }) => {
     return (
         <label htmlFor={name} className="text-xxs font-medium block">
             <div className="flex items-center justify-between mb-1">
-                {label ? <div className="capitalize">{label}</div> : null}
+                {label ? <div className={capitalize ? 'capitalize' : null}>{label}</div> : null}
                 {error ? <div className="text-red-500 font-bold">{error}</div> : null}
             </div>
             <input

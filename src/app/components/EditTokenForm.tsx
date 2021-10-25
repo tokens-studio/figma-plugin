@@ -171,6 +171,7 @@ const EditTokenForm = ({resolvedTokens}) => {
                           type="text"
                           name={key}
                           custom={schemaValue}
+                          capitalize
                       />
                   ))
                 : null}
