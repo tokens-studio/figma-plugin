@@ -83,7 +83,7 @@ export default function useRemoteTokens() {
                 break;
             }
             case StorageProviderType.GITHUB: {
-                data = addNewGitHubCredentials(credentials);
+                data = await addNewGitHubCredentials(credentials);
                 break;
             }
             case StorageProviderType.URL: {
