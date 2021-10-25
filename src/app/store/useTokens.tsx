@@ -5,7 +5,7 @@ import checkIfAlias from '@/utils/checkIfAlias';
 import {SingleTokenObject} from 'Types/tokens';
 import stringifyTokens from '@/utils/stringifyTokens';
 import formatTokens from '@/utils/formatTokens';
-import {computeMergedTokens, resolveTokenValues} from '@/plugin/tokenHelpers';
+import {mergeTokenGroups, resolveTokenValues} from '@/plugin/tokenHelpers';
 import {SelectionValue} from './models/tokenState';
 import {RootState} from '../store';
 
@@ -15,7 +15,7 @@ export default function useTokens() {
 
     // Finds token that matches name
     function findToken(name: string) {
-        const resolved = resolveTokenValues(computeMergedTokens(tokens, [...usedTokenSet, activeTokenSet]));
+        const resolved = resolveTokenValues(mergeTokenGroups(tokens, [...usedTokenSet, activeTokenSet]));
 
         return resolved.find((n) => n.name === name);
     }
@@ -70,7 +70,7 @@ export default function useTokens() {
 
     // Calls Figma with all tokens to create styles
     function createStylesFromTokens() {
-        const resolved = resolveTokenValues(computeMergedTokens(tokens, usedTokenSet));
+        const resolved = resolveTokenValues(mergeTokenGroups(tokens, usedTokenSet));
         const withoutIgnored = resolved.filter((token) => {
             return !token.name.split('.').some((part) => part.startsWith('_'));
         });
