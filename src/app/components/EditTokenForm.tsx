@@ -117,6 +117,7 @@ const EditTokenForm = ({resolvedTokens}) => {
                 name="name"
                 inputRef={firstInput}
                 error={error}
+                placeholder="Unique name"
             />
             {typeof currentEditToken.schema === 'object' ? (
                 Object.entries(currentEditToken.schema).map(([key, schemaValue]: [string, string]) => (
@@ -143,6 +144,11 @@ const EditTokenForm = ({resolvedTokens}) => {
                         name="value"
                         required
                         custom={currentEditToken.schema}
+                        placeholder={
+                            currentEditToken.type === 'color'
+                                ? '#000000, hsla(), rgba() or {alias}'
+                                : 'Value or {alias}'
+                        }
                     />
                     {checkIfContainsAlias(currentEditToken.value) && (
                         <div className="p-2 rounded bg-gray-100 border-gray-300 font-mono text-xxs mt-2 text-gray-700 flex itms-center">
