@@ -22,7 +22,7 @@ export enum StorageProviderType {
 export interface ContextObject extends ApiDataType {
     secret: string;
     id: string;
-    branch: string;
-    filePath: string;
+    branch?: string;
+    filePath?: string;
     tokens: string;
 }
