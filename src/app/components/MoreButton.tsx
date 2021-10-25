@@ -22,7 +22,7 @@ const RightSlot = styled('div', {
     '[data-disabled] &': {color: '$disabled'},
 });
 
-const MoreButton = ({properties, children, path, value, onClick, onEdit, onDelete}) => {
+const MoreButton = ({properties, children, path, value, onClick, onEdit, onDelete, onDuplicate}) => {
     const {selectionValues} = useSelector((state: RootState) => state.uiState);
     const {editProhibited} = useSelector((state: RootState) => state.tokenState);
 
@@ -100,6 +100,9 @@ const MoreButton = ({properties, children, path, value, onClick, onEdit, onDelet
 
                     <ContextMenuItem onSelect={onEdit} disabled={editProhibited}>
                         Edit Token
+                    </ContextMenuItem>
+                    <ContextMenuItem onSelect={onDuplicate} disabled={editProhibited}>
+                        Duplicate Token
                     </ContextMenuItem>
                     <ContextMenuItem onSelect={onDelete} disabled={editProhibited}>
                         Delete Token

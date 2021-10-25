@@ -5,7 +5,7 @@ import useConfirm from '../hooks/useConfirm';
 
 export default function useManageTokens() {
     const {activeTokenSet} = useSelector((state: RootState) => state.tokenState);
-    const {editToken, createToken, deleteToken, deleteTokenGroup} = useDispatch<Dispatch>().tokenState;
+    const {editToken, createToken, deleteToken, duplicateToken, deleteTokenGroup} = useDispatch<Dispatch>().tokenState;
 
     const dispatch = useDispatch<Dispatch>();
     const {confirm} = useConfirm();
@@ -63,6 +63,12 @@ export default function useManageTokens() {
         dispatch.uiState.setLoading(false);
     }
 
+    async function duplicateSingleToken(data) {
+        dispatch.uiState.setLoading(true);
+        duplicateToken(data);
+        dispatch.uiState.setLoading(false);
+    }
+
     async function deleteSingleToken(data) {
         const userConfirmation = await confirm({
             text: 'Delete token?',
@@ -87,5 +93,5 @@ export default function useManageTokens() {
         }
     }
 
-    return {editSingleToken, createSingleToken, deleteSingleToken, deleteGroup};
+    return {editSingleToken, createSingleToken, deleteSingleToken, deleteGroup, duplicateSingleToken};
 }

@@ -36,7 +36,7 @@ const TokenButton = ({
     const uiState = useSelector((state: RootState) => state.uiState);
     const {activeTokenSet} = useSelector((state: RootState) => state.tokenState);
     const {setNodeData, getTokenValue} = useTokens();
-    const {deleteSingleToken} = useManageTokens();
+    const {deleteSingleToken, duplicateSingleToken} = useManageTokens();
     const dispatch = useDispatch<Dispatch>();
     const {isAlias} = useTokens();
 
@@ -57,6 +57,9 @@ const TokenButton = ({
 
     const handleDeleteClick = () => {
         deleteSingleToken({parent: activeTokenSet, path: name});
+    };
+    const handleDuplicateClick = () => {
+        duplicateSingleToken({parent: activeTokenSet, name});
     };
 
     function setPluginValue(value) {
@@ -179,6 +182,7 @@ const TokenButton = ({
                 properties={properties}
                 onClick={onClick}
                 onDelete={handleDeleteClick}
+                onDuplicate={handleDuplicateClick}
                 onEdit={handleEditClick}
                 value={name}
                 path={name}
