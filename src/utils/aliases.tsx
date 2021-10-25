@@ -36,5 +36,5 @@ export default function getAliasValue(token: SingleTokenObject | string, tokens 
     } catch (e) {
         console.log(`Error getting alias value of ${token}`, tokens);
     }
-    return convertToRgb(checkAndEvaluateMath(returnedValue));
+    return checkAndEvaluateMath(returnedValue);
 }
