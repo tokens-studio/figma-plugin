@@ -234,8 +234,6 @@ export function useGitHub() {
         try {
             const data = await syncTokensWithGitHub(context);
 
-            console.log('Adding new', context, data);
-
             if (data) {
                 postToFigma({
                     type: MessageToPluginTypes.CREDENTIALS,
