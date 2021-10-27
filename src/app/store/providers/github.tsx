@@ -15,6 +15,12 @@ export function getCreatePullRequestUrl(id: string, branchName: string) {
     return `https://github.com/${id}/compare/${branchName}?expand=1`;
 }
 
+function hasSameContent(content, storedContent) {
+    const stringifiedContent = JSON.stringify(content.values, null, 2);
+
+    return stringifiedContent === storedContent;
+}
+
 export const fetchBranches = async ({context, owner, repo}) => {
     const octokit = new Octokit({auth: context.secret});
     const branches = await octokit.repos.listBranches({owner, repo}).then((response) => response.data);
@@ -154,13 +160,13 @@ export function useGitHub() {
 
         const content = await readContents({context, owner, repo});
         if (content) {
-            const stringifiedContent = JSON.stringify(content, null, 2);
-
-            if (content && stringifiedContent === tokenObj) {
+            if (content && hasSameContent(content, tokenObj)) {
                 notifyToUI('Nothing to commit');
                 return rawTokenObj;
             }
         }
+
+        dispatch.uiState.setLocalApiState({...context});
 
         const pushSettings = await pushDialog();
         if (pushSettings) {
@@ -198,7 +204,7 @@ export function useGitHub() {
     }
 
     // Function to initially check auth and sync tokens with GitHub
-    async function syncTokensWithGitHub(context) {
+    async function syncTokensWithGitHub(context): Promise<TokenProps> {
         try {
             const [owner, repo] = context.id.split('/');
             const hasBranches = await fetchBranches({context, owner, repo});
@@ -210,9 +216,7 @@ export function useGitHub() {
             const {string: tokenObj} = getTokenObj();
 
             if (content) {
-                const stringifiedContent = JSON.stringify(content, null, 2);
-
-                if (stringifiedContent !== tokenObj) {
+                if (!hasSameContent(content, tokenObj)) {
                     const userDecision = await askUserIfPull();
                     if (userDecision) {
                         return content;
@@ -229,7 +233,7 @@ export function useGitHub() {
     }
 
     async function addNewGitHubCredentials(context): Promise<TokenProps> {
-        let tokenObj;
+        let {raw: rawTokenObj} = getTokenObj();
 
         try {
             const data = await syncTokensWithGitHub(context);
@@ -240,17 +244,17 @@ export function useGitHub() {
                     ...context,
                 });
                 if (data?.values) {
-                    const obj = data;
-
-                    dispatch.tokenState.setLastSyncedState(JSON.stringify(obj.values, null, 2));
-                    dispatch.tokenState.setTokenData(obj);
-                    tokenObj = obj;
+                    dispatch.tokenState.setLastSyncedState(JSON.stringify(data.values, null, 2));
+                    dispatch.tokenState.setTokenData(data);
+                    rawTokenObj = data.values;
                 } else {
                     notifyToUI('No tokens stored on remote');
                 }
             }
 
-            return tokenObj;
+            return {
+                values: rawTokenObj,
+            };
         } catch (e) {
             notifyToUI('Error fetching from URL, check console (F12)');
             console.log('Error:', e);

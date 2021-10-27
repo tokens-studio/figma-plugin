@@ -33,7 +33,9 @@ const ConfirmDialog = () => {
                         <div className="space-y-2 text-left flex flex-col">
                             <Heading>Push changes</Heading>
                             <p className="text-xs">Push your local changes to your repository.</p>
-                            <div className="text-xxs font-mono bg-gray-100 rounded p-2 text-gray-600">{api.id}</div>
+                            <div className="text-xxs font-mono bg-gray-100 rounded p-2 text-gray-600">
+                                {localApiState.id}
+                            </div>
                             <Input
                                 full
                                 label="Commit message"
@@ -85,7 +87,7 @@ const ConfirmDialog = () => {
                             <Heading size="large">All done!</Heading>
                             <div className="text-xs">Changes pushed to GitHub.</div>
                         </div>
-                        <Button variant="primary" href={getCreatePullRequestUrl(api.id, branch)}>
+                        <Button variant="primary" href={getCreatePullRequestUrl(localApiState.id, branch)}>
                             Create Pull Request
                         </Button>
                     </div>
