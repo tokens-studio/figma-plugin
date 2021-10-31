@@ -95,7 +95,10 @@ figma.ui.onmessage = async (msg) => {
         case MessageToPluginTypes.SET_NODE_DATA:
             try {
                 updatePluginData(figma.currentPage.selection, msg.values);
-                sendPluginValues(figma.currentPage.selection, updateNodes(figma.currentPage.selection, msg.tokens));
+                sendPluginValues(
+                    figma.currentPage.selection,
+                    updateNodes(figma.currentPage.selection, msg.tokens, msg.settings)
+                );
             } catch (e) {
                 console.error(e);
             }
@@ -123,7 +126,7 @@ figma.ui.onmessage = async (msg) => {
             if (msg.tokenValues && msg.updatedAt) setTokensOnDocument(msg.tokenValues, msg.updatedAt);
             if (msg.tokens) {
                 const allWithData = findAllWithData({updateMode: msg.settings.updateMode});
-                updateNodes(allWithData, msg.tokens);
+                updateNodes(allWithData, msg.tokens, msg.settings);
                 updatePluginData(allWithData, {});
                 notifyRemoteComponents({nodes: store.successfulNodes.length, remotes: store.remoteComponents});
             }

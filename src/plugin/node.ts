@@ -90,7 +90,8 @@ export function goToNode(id) {
     }
 }
 
-export function updateNodes(nodes, tokens) {
+export function updateNodes(nodes, tokens, settings) {
+    const {ignoreFirstPartForStyles} = settings;
     try {
         let i = 0;
         const len = nodes.length;
@@ -100,7 +101,7 @@ export function updateNodes(nodes, tokens) {
             const data = fetchAllPluginData(node);
             if (data) {
                 const mappedValues = mapValuesToTokens(tokens, data);
-                setValuesOnNode(node, mappedValues, data);
+                setValuesOnNode(node, mappedValues, data, ignoreFirstPartForStyles);
                 store.successfulNodes.push(node);
                 returnedValues.push(data);
             }
