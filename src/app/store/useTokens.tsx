@@ -36,6 +36,7 @@ export default function useTokens() {
             type: MessageToPluginTypes.SET_NODE_DATA,
             values: data,
             tokens: resolvedTokens,
+            settings,
         });
     }
 
