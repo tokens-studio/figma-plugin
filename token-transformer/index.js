@@ -14,7 +14,7 @@ function writeFile(path, contents, cb) {
 
 function transform() {
     const [input, output, rawSets, rawExcludes] = process.argv.slice(2);
-    const sets = rawSets.split(',');
+    const sets = rawSets ? rawSets.split(',') : [];
     const excludes = rawExcludes ? rawExcludes.split(',') : [];
     if (!input) {
         process.stdout.write(`ERROR: Specify an input first (e.g. tokens.json)`);
