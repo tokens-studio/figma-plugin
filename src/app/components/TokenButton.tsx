@@ -9,6 +9,7 @@ import useManageTokens from '../store/useManageTokens';
 import {Dispatch, RootState} from '../store';
 import useTokens from '../store/useTokens';
 import TokenTooltip from './TokenTooltip';
+import BrokenReferenceIndicator from './BrokenReferenceIndicator';
 
 export function useGetActiveState(properties, type, name) {
     const uiState = useSelector((state: RootState) => state.uiState);
@@ -35,7 +36,7 @@ const TokenButton = ({
     const uiState = useSelector((state: RootState) => state.uiState);
     const {activeTokenSet} = useSelector((state: RootState) => state.tokenState);
     const {setNodeData, getTokenValue} = useTokens();
-    const {deleteSingleToken} = useManageTokens();
+    const {deleteSingleToken, duplicateSingleToken} = useManageTokens();
     const dispatch = useDispatch<Dispatch>();
     const {isAlias} = useTokens();
 
@@ -56,6 +57,9 @@ const TokenButton = ({
 
     const handleDeleteClick = () => {
         deleteSingleToken({parent: activeTokenSet, path: name});
+    };
+    const handleDuplicateClick = () => {
+        duplicateSingleToken({parent: activeTokenSet, name});
     };
 
     function setPluginValue(value) {
@@ -169,7 +173,7 @@ const TokenButton = ({
 
     return (
         <div
-            className={`relative mb-1 mr-1 flex button button-property ${buttonClass.join(' ')} ${
+            className={`relative mb-1 mr-1 button button-property ${buttonClass.join(' ')} ${
                 uiState.disabled && 'button-disabled'
             } `}
             style={style}
@@ -178,6 +182,7 @@ const TokenButton = ({
                 properties={properties}
                 onClick={onClick}
                 onDelete={handleDeleteClick}
+                onDuplicate={handleDuplicateClick}
                 onEdit={handleEditClick}
                 value={name}
                 path={name}
@@ -199,7 +204,14 @@ const TokenButton = ({
                         </div>
                     }
                 >
-                    <button className="w-full h-full" type="button" onClick={() => onClick(properties[0])}>
+                    <button
+                        style={style}
+                        className="w-full h-full relativeƒ"
+                        type="button"
+                        onClick={() => onClick(properties[0])}
+                    >
+                        <BrokenReferenceIndicator token={token} resolvedTokens={resolvedTokens} />
+
                         <div className="button-text">{showValue && <span>{visibleName}</span>}</div>
                     </button>
                 </Tooltip>

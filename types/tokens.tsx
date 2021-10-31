@@ -4,8 +4,8 @@ export interface TokenProps {
     values: {
         [key: string]: SingleTokenObject[] | TokenObject;
     };
-    updatedAt: string;
-    version: string;
+    updatedAt?: string;
+    version?: string;
 }
 
 export type SingleToken = TokenGroup;
@@ -59,21 +59,3 @@ export type TokenType =
     | 'fontSizes'
     | 'letterSpacing'
     | 'paragraphSpacing';
-
-export type ArcadeTokenType =
-    | 'color'
-    | 'implicit'
-    | 'border-radius'
-    | 'size'
-    | 'space'
-    | 'text'
-    | 'typography'
-    | 'opacity'
-    | 'border-width'
-    | 'shadow'
-    | 'font-family'
-    | 'font-weight'
-    | 'line-height'
-    | 'font-size'
-    | 'letter-spacing'
-    | 'paragraph-spacing';

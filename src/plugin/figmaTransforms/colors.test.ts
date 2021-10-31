@@ -1,3 +1,4 @@
+import {convertToRgb} from '@/app/components/utils';
 import {convertToFigmaColor, hexToRgb, hslaToRgba} from './colors';
 
 describe('hslaToRgba', () => {
@@ -8,6 +9,7 @@ describe('hslaToRgba', () => {
         expect(hsla).toEqual([64, 128, 191, 0.5]);
     });
 });
+
 describe('hexToRgb', () => {
     it('converts hex to rgb', () => {
         const color = '#ff0000';
@@ -59,6 +61,36 @@ describe('convertToFigmaColor', () => {
                 b: 0,
             },
             opacity: 0.8,
+        });
+    });
+
+    it('converts named colors to figma readable', () => {
+        const color = 'red';
+
+        expect(convertToFigmaColor(color)).toEqual({
+            color: {
+                r: 1,
+                g: 0,
+                b: 0,
+            },
+            opacity: 1,
+        });
+    });
+});
+
+describe('round-trip from plugin to figma', () => {
+    it('converts rgba to figma', () => {
+        const color = 'rgba(255, 255, 0, 0.5)';
+        const converted = convertToRgb(color);
+
+        expect(converted).toEqual('#ffff0080');
+        expect(convertToFigmaColor(converted)).toEqual({
+            color: {
+                r: 1,
+                g: 1,
+                b: 0,
+            },
+            opacity: 0.5,
         });
     });
 });

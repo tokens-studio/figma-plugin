@@ -117,10 +117,6 @@ export function useJSONbin() {
                 secret,
                 provider: StorageProviderType.JSONBIN,
             });
-            setStorageType({
-                provider: {id: jsonBinData.metadata.id, name, provider: StorageProviderType.JSONBIN},
-                bool: true,
-            });
             updateJSONBinTokens({
                 tokens,
                 context: {
@@ -136,7 +132,9 @@ export function useJSONbin() {
                 secret,
                 provider: StorageProviderType.JSONBIN,
             });
-            return tokens;
+            dispatch.uiState.setProjectURL(`https://jsonbin.io/${jsonBinData.metadata.id}`);
+
+            return jsonBinData.metadata.id;
         }
         notifyToUI('Something went wrong. See console for details');
         return null;
@@ -162,6 +160,8 @@ export function useJSONbin() {
                     provider: StorageProviderType.JSONBIN,
                 });
                 if (jsonBinData?.values) {
+                    dispatch.tokenState.setEditProhibited(false);
+
                     return {
                         version: jsonBinData.version,
                         updatedAt: jsonBinData.updatedAt,
@@ -187,6 +187,7 @@ export function useJSONbin() {
                 provider: context,
                 bool: true,
             });
+            dispatch.tokenState.setLastSyncedState(JSON.stringify(tokenValues.values, null, 2));
             dispatch.tokenState.setTokenData(tokenValues);
         }
 

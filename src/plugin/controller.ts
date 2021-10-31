@@ -53,11 +53,11 @@ figma.ui.onmessage = async (msg) => {
                 notifyStorageType(storageType);
 
                 const apiProviders = await figma.clientStorage.getAsync('apiProviders');
-
                 if (apiProviders) notifyAPIProviders(JSON.parse(apiProviders));
                 switch (storageType.provider) {
                     case StorageProviderType.JSONBIN:
-                    case StorageProviderType.ARCADE: {
+                    case StorageProviderType.GITHUB:
+                    case StorageProviderType.URL: {
                         compareProvidersWithStored(apiProviders, storageType);
 
                         break;
@@ -80,8 +80,8 @@ figma.ui.onmessage = async (msg) => {
             sendPluginValues(figma.currentPage.selection);
             return;
         case MessageToPluginTypes.CREDENTIALS: {
-            const {secret, id, provider, name} = msg;
-            updateCredentials({secret, id, name, provider});
+            const {type, ...context} = msg;
+            updateCredentials(context);
             break;
         }
         case MessageToPluginTypes.REMOVE_SINGLE_CREDENTIAL: {
@@ -95,7 +95,10 @@ figma.ui.onmessage = async (msg) => {
         case MessageToPluginTypes.SET_NODE_DATA:
             try {
                 updatePluginData(figma.currentPage.selection, msg.values);
-                sendPluginValues(figma.currentPage.selection, updateNodes(figma.currentPage.selection, msg.tokens));
+                sendPluginValues(
+                    figma.currentPage.selection,
+                    updateNodes(figma.currentPage.selection, msg.tokens, msg.settings)
+                );
             } catch (e) {
                 console.error(e);
             }
@@ -123,7 +126,7 @@ figma.ui.onmessage = async (msg) => {
             if (msg.tokenValues && msg.updatedAt) setTokensOnDocument(msg.tokenValues, msg.updatedAt);
             if (msg.tokens) {
                 const allWithData = findAllWithData({updateMode: msg.settings.updateMode});
-                updateNodes(allWithData, msg.tokens);
+                updateNodes(allWithData, msg.tokens, msg.settings);
                 updatePluginData(allWithData, {});
                 notifyRemoteComponents({nodes: store.successfulNodes.length, remotes: store.remoteComponents});
             }
@@ -137,6 +140,9 @@ figma.ui.onmessage = async (msg) => {
             break;
         case MessageToPluginTypes.NOTIFY:
             notifyUI(msg.msg, msg.opts);
+            break;
+        case MessageToPluginTypes.RESIZE_WINDOW:
+            figma.ui.resize(msg.width, msg.height);
             break;
         case MessageToPluginTypes.SET_UI: {
             updateUISettings({

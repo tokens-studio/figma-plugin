@@ -22,7 +22,7 @@ const RightSlot = styled('div', {
     '[data-disabled] &': {color: '$disabled'},
 });
 
-const MoreButton = ({properties, children, path, value, onClick, onEdit, onDelete}) => {
+const MoreButton = ({properties, children, path, value, onClick, onEdit, onDelete, onDuplicate}) => {
     const {selectionValues} = useSelector((state: RootState) => state.uiState);
     const {editProhibited} = useSelector((state: RootState) => state.tokenState);
 
@@ -52,9 +52,11 @@ const MoreButton = ({properties, children, path, value, onClick, onEdit, onDelet
     const visibleProperties = properties.filter((p) => p.label);
 
     return (
-        <div className="w-full">
+        <>
             <ContextMenu>
-                <ContextMenuTrigger id={`${path}-${value}`}>{children}</ContextMenuTrigger>
+                <ContextMenuTrigger as="div" id={`${path}-${value}`}>
+                    {children}
+                </ContextMenuTrigger>
                 <ContextMenuContent sideOffset={5} align="end" collisionTolerance={30}>
                     {visibleProperties.map((property) => {
                         const isActive = selectionValues[property.name] === value;
@@ -99,12 +101,15 @@ const MoreButton = ({properties, children, path, value, onClick, onEdit, onDelet
                     <ContextMenuItem onSelect={onEdit} disabled={editProhibited}>
                         Edit Token
                     </ContextMenuItem>
+                    <ContextMenuItem onSelect={onDuplicate} disabled={editProhibited}>
+                        Duplicate Token
+                    </ContextMenuItem>
                     <ContextMenuItem onSelect={onDelete} disabled={editProhibited}>
                         Delete Token
                     </ContextMenuItem>
                 </ContextMenuContent>
             </ContextMenu>
-        </div>
+        </>
     );
 };
 

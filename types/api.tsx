@@ -14,12 +14,15 @@ export type ApiDataType = {
 
 export enum StorageProviderType {
     LOCAL = 'local',
-    ARCADE = 'arcade',
     JSONBIN = 'jsonbin',
+    GITHUB = 'github',
+    URL = 'url',
 }
 
 export interface ContextObject extends ApiDataType {
     secret: string;
     id: string;
+    branch?: string;
+    filePath?: string;
     tokens: string;
 }

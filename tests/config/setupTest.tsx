@@ -3,13 +3,12 @@ import React, {FC, ReactElement} from 'react';
 import {render, RenderOptions} from '@testing-library/react';
 import {Provider} from 'react-redux';
 import '@testing-library/jest-dom/extend-expect';
-import {TokenProvider} from '../../src/app/store/TokenContext';
 import {store} from '../../src/app/store';
 
 const AllTheProviders: FC = ({children, options}) => {
     return (
         <Provider store={store} {...options}>
-            <TokenProvider {...options}>{children}</TokenProvider>
+            {children}
         </Provider>
     );
 };

@@ -15,10 +15,10 @@ export default function TokenTooltip({token, resolvedTokens, shouldResolve = fal
             }
             return (
                 <div>
-                    <div>Font: {valueToCheck.fontFamily}</div>
-                    <div>Weight: {valueToCheck.fontWeight}</div>
-                    <div>Leading: {valueToCheck.lineHeight}</div>
-                    <div>Tracking: {valueToCheck.lineHeight}</div>
+                    <div>Font: {valueToCheck.fontFamily?.value || valueToCheck.fontFamily}</div>
+                    <div>Weight: {valueToCheck.fontWeight?.value || valueToCheck.fontWeight}</div>
+                    <div>Leading: {valueToCheck.lineHeight?.value || valueToCheck.lineHeight}</div>
+                    <div>Tracking: {valueToCheck.lineHeight?.value || valueToCheck.lineHeight}</div>
                 </div>
             );
         }

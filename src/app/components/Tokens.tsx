@@ -1,7 +1,7 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import * as React from 'react';
 import {useSelector} from 'react-redux';
-import {computeMergedTokens, resolveTokenValues} from '@/plugin/tokenHelpers';
+import {mergeTokenGroups, resolveTokenValues} from '@/plugin/tokenHelpers';
 import TokenListing from './TokenListing';
 import TokensBottomBar from './TokensBottomBar';
 import ToggleEmptyButton from './ToggleEmptyButton';
@@ -29,7 +29,7 @@ const Tokens = ({isActive}) => {
     const {showEditForm, tokenFilter, tokenFilterVisible} = useSelector((state: RootState) => state.uiState);
 
     const resolvedTokens = React.useMemo(() => {
-        return resolveTokenValues(computeMergedTokens(tokens, [...usedTokenSet, activeTokenSet]));
+        return resolveTokenValues(mergeTokenGroups(tokens, [...usedTokenSet, activeTokenSet]));
     }, [tokens, usedTokenSet, activeTokenSet]);
 
     const memoizedTokens = React.useMemo(() => {
@@ -69,7 +69,7 @@ const Tokens = ({isActive}) => {
                     </div>
                 );
             })}
-            {showEditForm && <EditTokenFormModal />}
+            {showEditForm && <EditTokenFormModal resolvedTokens={resolvedTokens} />}
             <ToggleEmptyButton />
             <TokensBottomBar />
         </div>

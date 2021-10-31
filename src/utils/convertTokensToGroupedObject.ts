@@ -1,9 +1,12 @@
 import {appendTypeToToken} from '@/app/components/createTokenObj';
 import set from 'set-value';
 
-export default function convertTokensToGroupedObject(tokens) {
+export default function convertTokensToGroupedObject(tokens, excludedSets) {
     let tokenObj = {};
     tokenObj = tokens.reduce((acc, token) => {
+        if (excludedSets.includes(token.internal__Parent)) {
+            return acc;
+        }
         const obj = acc || {};
         const tokenWithType = appendTypeToToken(token);
         delete tokenWithType.name;

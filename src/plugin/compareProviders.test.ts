@@ -7,7 +7,7 @@ describe('compareProvidersWithStored', () => {
         jest.clearAllMocks();
     });
     const firstProvider = {provider: StorageProviderType.JSONBIN, id: '123', secret: '456', name: 'dummy'};
-    const otherProvider = {provider: StorageProviderType.ARCADE, id: '122', secret: '456', name: 'dummy 2'};
+    const otherProvider = {provider: StorageProviderType.GITHUB, id: '122', secret: '456', name: 'dummy 2'};
 
     it('calls postMessage with true if one matches', () => {
         compareProvidersWithStored(JSON.stringify([firstProvider, otherProvider]), firstProvider);

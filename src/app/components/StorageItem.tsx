@@ -7,7 +7,7 @@ import {RootState} from '../store';
 
 const StorageItem = ({item, onEdit = null}) => {
     const {storageType} = useSelector((state: RootState) => state.uiState);
-    const {provider, id, name} = item;
+    const {provider, id, branch, name} = item;
 
     const {restoreStoredProvider, deleteProvider} = useRemoteTokens();
 
@@ -25,7 +25,9 @@ const StorageItem = ({item, onEdit = null}) => {
         >
             <div className="flex flex-col flex-grow items-start">
                 <div className="text-xs font-bold">{name}</div>
-                <div className="opacity-75 text-xxs">{id}</div>
+                <div className="opacity-75 text-xxs">
+                    {id} {branch && ` (${branch})`}
+                </div>
                 {!isActive() && (
                     <button
                         type="button"
@@ -36,7 +38,7 @@ const StorageItem = ({item, onEdit = null}) => {
                     </button>
                 )}
             </div>
-            <div className="space-x-2">
+            <div className="space-x-2 flex-nowrap">
                 {onEdit && (
                     <Button id="button-storageitem-edit" variant="secondary" onClick={onEdit}>
                         Edit

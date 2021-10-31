@@ -2,7 +2,6 @@
 import * as React from 'react';
 import {track} from '@/utils/analytics';
 import {useDispatch, useSelector} from 'react-redux';
-import {useTokenDispatch, useTokenState} from '../store/TokenContext';
 import {StorageProviderType} from '../../../types/api';
 import Button from './Button';
 import Heading from './Heading';
@@ -18,8 +17,6 @@ const SyncSettings = () => {
     const {api, localApiState, apiProviders, storageType} = useSelector((state: RootState) => state.uiState);
     const dispatch = useDispatch<Dispatch>();
 
-    const {updateAfterApply} = useTokenState();
-    const {toggleUpdateAfterApply} = useTokenDispatch();
     const {setStorageType} = useStorage();
 
     const [confirmModalVisible, showConfirmModal] = React.useState(false);
@@ -33,7 +30,7 @@ const SyncSettings = () => {
     };
 
     const selectedRemoteProvider = () => {
-        return [StorageProviderType.JSONBIN, StorageProviderType.ARCADE].includes(
+        return [StorageProviderType.JSONBIN, StorageProviderType.GITHUB, StorageProviderType.URL].includes(
             localApiState?.provider as StorageProviderType
         );
     };
@@ -63,16 +60,23 @@ const SyncSettings = () => {
                         </a>
                     </div>
                 );
-            case StorageProviderType.ARCADE:
+            case StorageProviderType.GITHUB:
                 return (
                     <div>
-                        <a href="https://usearcade.com" target="_blank" className="underline" rel="noreferrer">
-                            Arcade
-                        </a>{' '}
-                        is currently in Early Access. If you have an Arcade account, use your project ID and your API
-                        key to gain access. For now, just the Read-Only mode is supported.
+                        Sync your tokens with a GitHub repository so your design decisions are up to date with code.{' '}
+                        <a
+                            href="https://docs.tokens.studio/sync/github"
+                            target="_blank"
+                            rel="noreferrer"
+                            className="underline"
+                        >
+                            Read the guide
+                        </a>
+                        .
                     </div>
                 );
+            case StorageProviderType.URL:
+                return <div>Sync with a JSON stored on an external URL. This mode only allows Read Only.</div>;
             default:
                 return null;
         }
@@ -125,6 +129,20 @@ const SyncSettings = () => {
                             id={StorageProviderType.LOCAL}
                         />
                         <ProviderSelector
+                            isActive={localApiState?.provider === StorageProviderType.URL}
+                            isStored={storageType?.provider === StorageProviderType.URL}
+                            onClick={() => {
+                                dispatch.uiState.setLocalApiState({
+                                    name: '',
+                                    secret: '',
+                                    id: '',
+                                    provider: StorageProviderType.URL,
+                                });
+                            }}
+                            text="URL"
+                            id={StorageProviderType.URL}
+                        />
+                        <ProviderSelector
                             isActive={localApiState?.provider === StorageProviderType.JSONBIN}
                             isStored={storageType?.provider === StorageProviderType.JSONBIN}
                             onClick={() => {
@@ -137,6 +155,21 @@ const SyncSettings = () => {
                             }}
                             text="JSONbin"
                             id={StorageProviderType.JSONBIN}
+                        />
+                        <ProviderSelector
+                            isActive={localApiState?.provider === StorageProviderType.GITHUB}
+                            isStored={storageType?.provider === StorageProviderType.GITHUB}
+                            onClick={() => {
+                                dispatch.uiState.setLocalApiState({
+                                    name: '',
+                                    secret: '',
+                                    id: '',
+                                    branch: '',
+                                    provider: StorageProviderType.GITHUB,
+                                });
+                            }}
+                            text="GitHub"
+                            id={StorageProviderType.GITHUB}
                         />
                     </div>
                 </div>
@@ -156,43 +189,15 @@ const SyncSettings = () => {
 
                         {storedApiProviders().length > 0 && (
                             <div className="space-y-4">
-                                {api?.provider === localApiState.provider && <StorageItem item={api} />}
-                                {storedApiProviders().length > 0 && (
-                                    <details>
-                                        <summary
-                                            data-cy={`summary-${localApiState.provider}`}
-                                            className="p-2 rounded bg-gray-100 cursor-pointer text-xs focus:outline-none hover:bg-gray-200 focus:bg-gray-200"
-                                        >
-                                            {storedApiProviders().length} providers stored on this device
-                                        </summary>
-                                        <div className="flex flex-row items-center justify-between">
-                                            <Heading size="small">
-                                                Stored providers for {localApiState.provider}
-                                            </Heading>
-                                            <div className="flex items-center switch">
-                                                <input
-                                                    className="switch__toggle"
-                                                    type="checkbox"
-                                                    id="updatemode"
-                                                    checked={updateAfterApply}
-                                                    onChange={() => toggleUpdateAfterApply(!updateAfterApply)}
-                                                />
-                                                <label className="text-xs switch__label" htmlFor="updatemode">
-                                                    Update on apply
-                                                </label>
-                                            </div>
-                                        </div>
-                                        <div className="flex flex-col gap-2">
-                                            {storedApiProviders().map((item) => (
-                                                <StorageItem
-                                                    key={`${item.provider}-${item.id}-${item.secret}`}
-                                                    onEdit={() => handleEditClick(item)}
-                                                    item={item}
-                                                />
-                                            ))}
-                                        </div>
-                                    </details>
-                                )}
+                                <div className="flex flex-col gap-2">
+                                    {storedApiProviders().map((item) => (
+                                        <StorageItem
+                                            key={`${item.provider}-${item.id}-${item.secret}`}
+                                            onEdit={() => handleEditClick(item)}
+                                            item={item}
+                                        />
+                                    ))}
+                                </div>
                             </div>
                         )}
                     </>

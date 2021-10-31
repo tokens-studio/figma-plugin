@@ -1,20 +1,35 @@
+import getAliasValue from '@/utils/aliases';
 import {track} from '@/utils/analytics';
+import checkIfContainsAlias from '@/utils/checkIfContainsAlias';
 import * as React from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {Dispatch, RootState} from '../store';
 import useManageTokens from '../store/useManageTokens';
 import Input from './Input';
 
-const EditTokenForm = () => {
+const EditTokenForm = ({resolvedTokens}) => {
     const {activeTokenSet} = useSelector((state: RootState) => state.tokenState);
     const {editSingleToken, createSingleToken} = useManageTokens();
     const {editToken} = useSelector((state: RootState) => state.uiState);
     const dispatch = useDispatch<Dispatch>();
     const [currentEditToken, setCurrentEditToken] = React.useState(editToken);
+    const [error, setError] = React.useState(null);
 
-    const isValid = currentEditToken.value && currentEditToken.name.match(/^\S*$/);
+    const isValid = currentEditToken.value && currentEditToken.name.match(/^\S*$/) && !error;
+
+    const hasNameThatExistsAlready = resolvedTokens
+        .filter((t) => t.internal__Parent === activeTokenSet)
+        .find((t) => t.name === currentEditToken.name);
+    const nameWasChanged = currentEditToken?.initialName !== currentEditToken.name;
+
+    React.useEffect(() => {
+        if ((currentEditToken.isPristine || nameWasChanged) && hasNameThatExistsAlready) {
+            setError('Token names must be unique');
+        }
+    }, [currentEditToken, hasNameThatExistsAlready, nameWasChanged]);
 
     const handleChange = (e) => {
+        setError(null);
         e.persist();
         setCurrentEditToken({...currentEditToken, [e.target.name]: e.target.value});
     };
@@ -84,6 +99,12 @@ const EditTokenForm = () => {
         }, 50);
     }, []);
 
+    const resolvedValue = React.useMemo(() => {
+        return typeof currentEditToken.value === 'object'
+            ? null
+            : getAliasValue(currentEditToken.value, resolvedTokens);
+    }, [currentEditToken, resolvedTokens]);
+
     return (
         <form onSubmit={handleSubmit} className="space-y-4 flex flex-col justify-start">
             <Input
@@ -95,6 +116,8 @@ const EditTokenForm = () => {
                 type="text"
                 name="name"
                 inputRef={firstInput}
+                error={error}
+                placeholder="Unique name"
             />
             {typeof currentEditToken.schema === 'object' ? (
                 Object.entries(currentEditToken.schema).map(([key, schemaValue]: [string, string]) => (
@@ -111,16 +134,34 @@ const EditTokenForm = () => {
                     />
                 ))
             ) : (
-                <Input
-                    full
-                    label={currentEditToken.property}
-                    value={currentEditToken.value}
-                    onChange={handleChange}
-                    type="text"
-                    name="value"
-                    required
-                    custom={currentEditToken.schema}
-                />
+                <div>
+                    <Input
+                        full
+                        label={currentEditToken.property}
+                        value={currentEditToken.value}
+                        onChange={handleChange}
+                        type="text"
+                        name="value"
+                        required
+                        custom={currentEditToken.schema}
+                        placeholder={
+                            currentEditToken.type === 'color'
+                                ? '#000000, hsla(), rgba() or {alias}'
+                                : 'Value or {alias}'
+                        }
+                    />
+                    {checkIfContainsAlias(currentEditToken.value) && (
+                        <div className="p-2 rounded bg-gray-100 border-gray-300 font-mono text-xxs mt-2 text-gray-700 flex itms-center">
+                            {currentEditToken.type === 'color' ? (
+                                <div
+                                    className="w-4 h-4 rounded border border-gray-200 mr-1"
+                                    style={{background: resolvedValue}}
+                                />
+                            ) : null}
+                            {resolvedValue}
+                        </div>
+                    )}
+                </div>
             )}
             {currentEditToken.explainer && (
                 <div className="mt-1 text-xxs text-gray-600">{currentEditToken.explainer}</div>
@@ -136,6 +177,7 @@ const EditTokenForm = () => {
                           type="text"
                           name={key}
                           custom={schemaValue}
+                          capitalize
                       />
                   ))
                 : null}

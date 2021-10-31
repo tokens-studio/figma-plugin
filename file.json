@@ -1,0 +1,709 @@
+{
+  "sizing": {
+    "base": {
+      "value": 4,
+      "description": "Alias value",
+      "type": "sizing"
+    },
+    "default": {
+      "value": 8,
+      "description": "Math value",
+      "type": "sizing"
+    }
+  },
+  "Light-Theme-Colorscale": {
+    "Gray": {
+      "00": {
+        "value": "#FAFBFC",
+        "description": "Gray 00",
+        "type": "color"
+      },
+      "01": {
+        "value": "#EAEEF2",
+        "description": "Gray 01",
+        "type": "color"
+      },
+      "02": {
+        "value": "#D4DAE0",
+        "description": "Gray 02",
+        "type": "color"
+      },
+      "03": {
+        "value": "#B7BFC7",
+        "description": "Gray 03",
+        "type": "color"
+      },
+      "04": {
+        "value": "#949DA7",
+        "description": "Gray 04",
+        "type": "color"
+      },
+      "05": {
+        "value": "#707A84",
+        "description": "Gray 05",
+        "type": "color"
+      },
+      "06": {
+        "value": "#57606A",
+        "description": "Gray 06",
+        "type": "color"
+      },
+      "07": {
+        "value": "#424A53",
+        "description": "Gray 07",
+        "type": "color"
+      },
+      "08": {
+        "value": "#32383F",
+        "description": "Gray 08",
+        "type": "color"
+      },
+      "09": {
+        "value": "#24292F",
+        "description": "Gray 09",
+        "type": "color"
+      },
+      "Black": {
+        "value": "#1B1F24",
+        "description": "Gray 10 or Black",
+        "type": "color"
+      }
+    },
+    "Coral": {
+      "00": {
+        "value": "#FFF0EB",
+        "description": "Coral 00",
+        "type": "color"
+      },
+      "01": {
+        "value": "#FFD6CC",
+        "description": "Coral 01",
+        "type": "color"
+      },
+      "02": {
+        "value": "#FFB4A1",
+        "description": "Coral 02",
+        "type": "color"
+      },
+      "03": {
+        "value": "#FD8C73",
+        "description": "Coral 03",
+        "type": "color"
+      },
+      "04": {
+        "value": "#EC6547",
+        "description": "Coral 04",
+        "type": "color"
+      },
+      "05": {
+        "value": "#C4432B",
+        "description": "Coral 05",
+        "type": "color"
+      },
+      "06": {
+        "value": "#9E2F1C",
+        "description": "Coral 06",
+        "type": "color"
+      },
+      "07": {
+        "value": "#801F0F",
+        "description": "Coral 07",
+        "type": "color"
+      },
+      "08": {
+        "value": "#691105",
+        "description": "Coral 08",
+        "type": "color"
+      },
+      "09": {
+        "value": "#510901",
+        "description": "Coral 09",
+        "type": "color"
+      }
+    },
+    "Blue": {
+      "00": {
+        "value": "#E4F6FF",
+        "description": "Blue 00",
+        "type": "color"
+      },
+      "01": {
+        "value": "#BCE5FF",
+        "description": "Blue 01",
+        "type": "color"
+      },
+      "02": {
+        "value": "#89CDFF",
+        "description": "Blue 02",
+        "type": "color"
+      },
+      "03": {
+        "value": "#58B1FF",
+        "description": "Blue 03",
+        "type": "color"
+      },
+      "04": {
+        "value": "#298FFF",
+        "description": "Blue 04",
+        "type": "color"
+      },
+      "05": {
+        "value": "#096BDE",
+        "description": "Blue 05",
+        "type": "color"
+      },
+      "06": {
+        "value": "#0552B2",
+        "description": "Blue 06",
+        "type": "color"
+      },
+      "07": {
+        "value": "#033F8F",
+        "description": "Blue 07",
+        "type": "color"
+      },
+      "08": {
+        "value": "#0B326D",
+        "description": "Blue 08",
+        "type": "color"
+      },
+      "09": {
+        "value": "#052455",
+        "description": "Blue 09",
+        "type": "color"
+      }
+    },
+    "Pink": {
+      "00": {
+        "value": "#FFEFF7",
+        "description": "Pink 00",
+        "type": "color"
+      },
+      "01": {
+        "value": "#FFD3EB",
+        "description": "Pink 01",
+        "type": "color"
+      },
+      "02": {
+        "value": "#FFADDA",
+        "description": "Pink 02",
+        "type": "color"
+      },
+      "03": {
+        "value": "#FF80C8",
+        "description": "Pink 03",
+        "type": "color"
+      },
+      "04": {
+        "value": "#E85AAD",
+        "description": "Pink 04",
+        "type": "color"
+      },
+      "05": {
+        "value": "#BF3989",
+        "description": "Pink 05",
+        "type": "color"
+      },
+      "06": {
+        "value": "#99286E",
+        "description": "Pink 06",
+        "type": "color"
+      },
+      "07": {
+        "value": "#772057",
+        "description": "Pink 07",
+        "type": "color"
+      },
+      "08": {
+        "value": "#611347",
+        "description": "Pink 08",
+        "type": "color"
+      },
+      "09": {
+        "value": "#4D0336",
+        "description": "Pink 09",
+        "type": "color"
+      }
+    },
+    "Orange": {
+      "00": {
+        "value": "#FFF1E5",
+        "description": "Orange 00",
+        "type": "color"
+      },
+      "01": {
+        "value": "#FFD8B5",
+        "description": "Orange 01",
+        "type": "color"
+      },
+      "02": {
+        "value": "#FFB77C",
+        "description": "Orange 2",
+        "type": "color"
+      },
+      "03": {
+        "value": "#FB8F44",
+        "description": "Orange 03",
+        "type": "color"
+      },
+      "04": {
+        "value": "#E16F24",
+        "description": "Orange 04",
+        "type": "color"
+      },
+      "05": {
+        "value": "#BC4C00",
+        "description": "Orange 05",
+        "type": "color"
+      },
+      "06": {
+        "value": "#953800",
+        "description": "Orange 06",
+        "type": "color"
+      },
+      "07": {
+        "value": "#762C00",
+        "description": "Orange 07",
+        "type": "color"
+      },
+      "08": {
+        "value": "#5C2200",
+        "description": "Orange 08",
+        "type": "color"
+      },
+      "09": {
+        "value": "#471700",
+        "description": "Orange 09",
+        "type": "color"
+      }
+    },
+    "Red": {
+      "00": {
+        "value": "#FFEFEE",
+        "description": "Red 00",
+        "type": "color"
+      },
+      "01": {
+        "value": "#FFD5D3",
+        "description": "Red 01",
+        "type": "color"
+      },
+      "02": {
+        "value": "#FFB2B0",
+        "description": "Red 02",
+        "type": "color"
+      },
+      "03": {
+        "value": "#FF8987",
+        "description": "Red 03",
+        "type": "color"
+      },
+      "04": {
+        "value": "#FB5254",
+        "description": "Red 04",
+        "type": "color"
+      },
+      "05": {
+        "value": "#D42A32",
+        "description": "Red 05",
+        "type": "color"
+      },
+      "06": {
+        "value": "#A81C26",
+        "description": "Red 06",
+        "type": "color"
+      },
+      "07": {
+        "value": "#84161F",
+        "description": "Red 07",
+        "type": "color"
+      },
+      "08": {
+        "value": "#691019",
+        "description": "Red 08",
+        "type": "color"
+      },
+      "09": {
+        "value": "#52040F",
+        "description": "Red 09",
+        "type": "color"
+      }
+    },
+    "Indigo": {
+      "00": {
+        "value": "#EFF2FF",
+        "description": "Indigo 00",
+        "type": "color"
+      },
+      "01": {
+        "value": "#D7DDFF",
+        "description": "Indigo 01",
+        "type": "color"
+      },
+      "02": {
+        "value": "#B9C2FF",
+        "description": "Indigo 02",
+        "type": "color"
+      },
+      "03": {
+        "value": "#9AA4FF",
+        "description": "Indigo 03",
+        "type": "color"
+      },
+      "04": {
+        "value": "#7683FF",
+        "description": "Indigo 04",
+        "type": "color"
+      },
+      "05": {
+        "value": "#545DF0",
+        "description": "Indigo 05",
+        "type": "color"
+      },
+      "06": {
+        "value": "#3C42D0",
+        "description": "Indigo 06",
+        "type": "color"
+      },
+      "07": {
+        "value": "#2C33A5",
+        "description": "Indigo 07",
+        "type": "color"
+      },
+      "08": {
+        "value": "#22297F",
+        "description": "Indigo 08",
+        "type": "color"
+      },
+      "09": {
+        "value": "#191F5C",
+        "description": "Indigo 09",
+        "type": "color"
+      }
+    },
+    "Purple": {
+      "00": {
+        "value": "#FBEFFF",
+        "description": "Purple 00",
+        "type": "color"
+      },
+      "01": {
+        "value": "#ECD8FF",
+        "description": "Purple 01",
+        "type": "color"
+      },
+      "02": {
+        "value": "#D8B9FF",
+        "description": "Purple 02",
+        "type": "color"
+      },
+      "03": {
+        "value": "#C297FF",
+        "description": "Purple 03",
+        "type": "color"
+      },
+      "04": {
+        "value": "#A475F9",
+        "description": "Purple 04",
+        "type": "color"
+      },
+      "05": {
+        "value": "#8250DF",
+        "description": "Purple 05",
+        "type": "color"
+      },
+      "06": {
+        "value": "#6639BA",
+        "description": "Purple 06",
+        "type": "color"
+      },
+      "07": {
+        "value": "#512A97",
+        "description": "Purple 07",
+        "type": "color"
+      },
+      "08": {
+        "value": "#3E1F79",
+        "description": "Purple 08",
+        "type": "color"
+      },
+      "09": {
+        "value": "#2E1461",
+        "description": "Purple 09",
+        "type": "color"
+      }
+    },
+    "Green": {
+      "00": {
+        "value": "#DAFBE1",
+        "description": "Green 00",
+        "type": "color"
+      },
+      "01": {
+        "value": "#ACEEBB",
+        "description": "Green 01",
+        "type": "color"
+      },
+      "02": {
+        "value": "#6FDD8B",
+        "description": "Green 02",
+        "type": "color"
+      },
+      "03": {
+        "value": "#4AC26B",
+        "description": "Green 03",
+        "type": "color"
+      },
+      "04": {
+        "value": "#2DA44E",
+        "description": "Green 04",
+        "type": "color"
+      },
+      "05": {
+        "value": "#1A7F37",
+        "description": "Green 05",
+        "type": "color"
+      },
+      "06": {
+        "value": "#116329",
+        "description": "Green 06",
+        "type": "color"
+      },
+      "07": {
+        "value": "#044F1E",
+        "description": "Green 07",
+        "type": "color"
+      },
+      "08": {
+        "value": "#003D16",
+        "description": "Green 08",
+        "type": "color"
+      },
+      "09": {
+        "value": "#002D11",
+        "description": "Green 09",
+        "type": "color"
+      }
+    },
+    "Yellow": {
+      "00": {
+        "value": "#FCF4CA",
+        "description": "Yellow 00",
+        "type": "color"
+      },
+      "01": {
+        "value": "#F6DE7C",
+        "description": "Yellow 01",
+        "type": "color"
+      },
+      "02": {
+        "value": "#E6C24A",
+        "description": "Yellow 02",
+        "type": "color"
+      },
+      "03": {
+        "value": "#D2A52D",
+        "description": "Yellow 03",
+        "type": "color"
+      },
+      "04": {
+        "value": "#BB8400",
+        "description": "Yellow 04",
+        "type": "color"
+      },
+      "05": {
+        "value": "#976500",
+        "description": "Yellow 05",
+        "type": "color"
+      },
+      "06": {
+        "value": "#7A4C00",
+        "description": "Yellow 06",
+        "type": "color"
+      },
+      "07": {
+        "value": "#613B01",
+        "description": "Yellow 07",
+        "type": "color"
+      },
+      "08": {
+        "value": "#4D2D00",
+        "description": "Yellow 08",
+        "type": "color"
+      },
+      "09": {
+        "value": "#382103",
+        "description": "Yellow 09",
+        "type": "color"
+      }
+    },
+    "Lemon": {
+      "00": {
+        "value": "#FDF5B3",
+        "description": "Lemon 00",
+        "type": "color"
+      },
+      "01": {
+        "value": "#F4E162",
+        "description": "Lemon 01",
+        "type": "color"
+      },
+      "02": {
+        "value": "#DEC741",
+        "description": "Lemon 02",
+        "type": "color"
+      },
+      "03": {
+        "value": "#C5AA20",
+        "description": "Lemon 03",
+        "type": "color"
+      },
+      "04": {
+        "value": "#A88D02",
+        "description": "Lemon 04",
+        "type": "color"
+      },
+      "05": {
+        "value": "#866D00",
+        "description": "Lemon 05",
+        "type": "color"
+      },
+      "06": {
+        "value": "#685400",
+        "description": "Lemon 06",
+        "type": "color"
+      },
+      "07": {
+        "value": "#534100",
+        "description": "Lemon 07",
+        "type": "color"
+      },
+      "08": {
+        "value": "#413200",
+        "description": "Lemon 08",
+        "type": "color"
+      },
+      "09": {
+        "value": "#322400",
+        "description": "Lemon 09",
+        "type": "color"
+      }
+    },
+    "Lime": {
+      "00": {
+        "value": "#EAFABA",
+        "description": "Lime 00",
+        "type": "color"
+      },
+      "01": {
+        "value": "#CDEC78",
+        "description": "Lime 01",
+        "type": "color"
+      },
+      "02": {
+        "value": "#B1D353",
+        "description": "Lime 02",
+        "type": "color"
+      },
+      "03": {
+        "value": "#94B83B",
+        "description": "Lime 03",
+        "type": "color"
+      },
+      "04": {
+        "value": "#799A2A",
+        "description": "Lime 04",
+        "type": "color"
+      },
+      "05": {
+        "value": "#5A791B",
+        "description": "Lime 05",
+        "type": "color"
+      },
+      "06": {
+        "value": "#425E13",
+        "description": "Lime 06",
+        "type": "color"
+      },
+      "07": {
+        "value": "#2F4A06",
+        "description": "Lime 07",
+        "type": "color"
+      },
+      "08": {
+        "value": "#233B03",
+        "description": "Lime 08",
+        "type": "color"
+      },
+      "09": {
+        "value": "#182C01",
+        "description": "Lime 09",
+        "type": "color"
+      }
+    },
+    "Teal": {
+      "00": {
+        "value": "#DAF9F5",
+        "description": "Teal 00",
+        "type": "color"
+      },
+      "01": {
+        "value": "#B0EAE3",
+        "description": "Teal 01",
+        "type": "color"
+      },
+      "02": {
+        "value": "#6BD6D0",
+        "description": "Teal 02",
+        "type": "color"
+      },
+      "03": {
+        "value": "#49BCB7",
+        "description": "Teal 03",
+        "type": "color"
+      },
+      "04": {
+        "value": "#339D9B",
+        "description": "Teal 04",
+        "type": "color"
+      },
+      "05": {
+        "value": "#197B7B",
+        "description": "Teal 05",
+        "type": "color"
+      },
+      "06": {
+        "value": "#136061",
+        "description": "Teal 06",
+        "type": "color"
+      },
+      "07": {
+        "value": "#024B4D",
+        "description": "Teal 07",
+        "type": "color"
+      },
+      "08": {
+        "value": "#063A3C",
+        "description": "Teal 08",
+        "type": "color"
+      },
+      "09": {
+        "value": "#052B2C",
+        "description": "Teal 09",
+        "type": "color"
+      }
+    }
+  },
+  "colors": {
+    "Background": {
+      "value": "#FAFBFC",
+      "description": "Alias value",
+      "type": "color"
+    },
+    "Background50": {
+      "value": "#fafbfc80",
+      "description": "Nested color value",
+      "type": "color"
+    }
+  }
+}

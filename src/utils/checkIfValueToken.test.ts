@@ -11,6 +11,9 @@ describe('checkIfValueToken', () => {
         objectZero: {
             value: 0,
         },
+        objectNull: {
+            value: null,
+        },
     };
     const incorrectToken = {
         string: 'foo',

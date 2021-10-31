@@ -1,6 +1,7 @@
 import React from 'react';
 import {useSelector} from 'react-redux';
 import {RootState} from '@/app/store';
+import {StorageProviderType} from 'Types/api';
 import Modal from '../Modal';
 import Heading from '../Heading';
 import StorageItemForm from '../StorageItemForm';
@@ -12,6 +13,15 @@ export default function CreateStorageItemModal({isOpen, onClose, onSuccess}) {
     const [hasErrored, setHasErrored] = React.useState(false);
     let defaultFields;
     switch (localApiState.provider) {
+        case StorageProviderType.GITHUB: {
+            defaultFields = {
+                secret: '',
+                id: '',
+                branch: '',
+                filePath: '',
+            };
+            break;
+        }
         default:
             defaultFields = {id: '', name: '', secret: ''};
             break;

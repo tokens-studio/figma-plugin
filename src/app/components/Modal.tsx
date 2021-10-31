@@ -10,7 +10,7 @@ const customStyles = (large) => ({
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '2rem',
+        padding: '1rem',
         zIndex: '1',
     },
     content: {
@@ -36,45 +36,65 @@ const Modal = ({
     close,
     children,
     showClose = false,
+    compact = false,
 }: {
     id?: string;
     title?: string;
     full?: boolean;
     large?: boolean;
+    compact?: boolean;
     isOpen: boolean;
     close: Function;
     children: React.ReactNode;
     showClose?: boolean;
-}) => (
-    <ReactModal isOpen={isOpen} onRequestClose={close} style={customStyles(large)} contentLabel={title || null}>
-        {(showClose || title) && (
-            <div className="flex flex-row justify-between items-center">
-                {title && (
-                    <div className="pl-4">
-                        <Heading size="small">{title}</Heading>
-                    </div>
-                )}
-                <button
-                    type="button"
-                    onClick={() => close()}
-                    className="p-4 hover:bg-gray-100 rounded focus:outline-none"
-                >
-                    <svg className="svg" width="12" height="12" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg">
-                        <path
-                            d="M6 5.293l4.789-4.79.707.708-4.79 4.79 4.79 4.789-.707.707-4.79-4.79-4.789 4.79-.707-.707L5.293 6 .502 1.211 1.21.504 6 5.294z"
-                            fillRule="nonzero"
-                            fillOpacity="1"
-                            fill="#000"
-                            stroke="none"
-                        />
-                    </svg>
-                </button>
+}) => {
+    const paddingClass = () => {
+        if (compact) {
+            return 'p-4';
+        }
+        if (full) {
+            return 'p-0';
+        }
+        return 'p-8';
+    };
+
+    return (
+        <ReactModal isOpen={isOpen} onRequestClose={close} style={customStyles(large)} contentLabel={title || null}>
+            {(showClose || title) && (
+                <div className="flex flex-row justify-between items-center">
+                    {title && (
+                        <div className="pl-4">
+                            <Heading size="small">{title}</Heading>
+                        </div>
+                    )}
+                    <button
+                        type="button"
+                        onClick={() => close()}
+                        className="p-4 hover:bg-gray-100 rounded focus:outline-none"
+                    >
+                        <svg
+                            className="svg"
+                            width="12"
+                            height="12"
+                            viewBox="0 0 12 12"
+                            xmlns="http://www.w3.org/2000/svg"
+                        >
+                            <path
+                                d="M6 5.293l4.789-4.79.707.708-4.79 4.79 4.79 4.789-.707.707-4.79-4.79-4.789 4.79-.707-.707L5.293 6 .502 1.211 1.21.504 6 5.294z"
+                                fillRule="nonzero"
+                                fillOpacity="1"
+                                fill="#000"
+                                stroke="none"
+                            />
+                        </svg>
+                    </button>
+                </div>
+            )}
+            <div data-cy={id} className={`relative ${paddingClass()}`}>
+                {children}
             </div>
-        )}
-        <div data-cy={id} className={`relative ${full ? 'p-0' : 'p-8'}`}>
-            {children}
-        </div>
-    </ReactModal>
-);
+        </ReactModal>
+    );
+};
 
 export default Modal;

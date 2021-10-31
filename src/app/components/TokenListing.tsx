@@ -1,7 +1,6 @@
 import * as React from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {SingleTokenObject} from 'Types/tokens';
-import {useTokenDispatch, useTokenState} from '../store/TokenContext';
 import Heading from './Heading';
 import Icon from './Icon';
 import TokenTree from './TokenTree';
@@ -31,11 +30,8 @@ const TokenListing = ({
     resolvedTokens: SingleTokenObject[];
 }) => {
     const {editProhibited} = useSelector((state: RootState) => state.tokenState);
-    const {displayType} = useSelector((state: RootState) => state.uiState);
+    const {displayType, showEmptyGroups, collapsed} = useSelector((state: RootState) => state.uiState);
     const dispatch = useDispatch<Dispatch>();
-
-    const {collapsed, showEmptyGroups} = useTokenState();
-    const {setCollapsed} = useTokenDispatch();
 
     const showDisplayToggle = tokenType === 'color';
 
@@ -48,6 +44,7 @@ const TokenListing = ({
             name,
             initialName: name,
             isPristine,
+            type: tokenType,
             explainer,
             property,
             schema: schema?.value,
@@ -72,7 +69,7 @@ const TokenListing = ({
     const handleSetIntCollapsed = (e) => {
         e.stopPropagation();
         if (e.altKey) {
-            setCollapsed(!collapsed);
+            dispatch.uiState.toggleCollapsed();
         } else {
             setIntCollapsed(!isIntCollapsed);
         }
@@ -105,7 +102,7 @@ const TokenListing = ({
                     </Tooltip>
                     <Heading size="small">{label}</Heading>
                 </button>
-                <div className="absolute right-0 mr-2">
+                <div className="flex absolute right-0 mr-2">
                     {showDisplayToggle && (
                         <Tooltip label={displayType === 'GRID' ? 'Show as List' : 'Show as Grid'}>
                             <button

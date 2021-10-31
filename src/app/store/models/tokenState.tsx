@@ -9,6 +9,7 @@ import parseTokenValues from '@/utils/parseTokenValues';
 import {notifyToUI} from '@/plugin/notifiers';
 import {reduceToValues} from '@/plugin/tokenHelpers';
 import {replaceReferences} from '@/utils/findReferences';
+import parseJson from '@/utils/parseJson';
 import {RootModel} from '.';
 import updateTokensOnSources from '../updateSources';
 import * as pjs from '../../../../package.json';
@@ -41,6 +42,7 @@ export interface SelectionValue {
 
 interface TokenState {
     tokens: TokenGroup;
+    lastSyncedState: string;
     importedTokens: {
         newTokens: SingleTokenObject[];
         updatedTokens: SingleTokenObject[];
@@ -55,6 +57,7 @@ export const tokenState = createModel<RootModel>()({
         tokens: {
             global: [],
         },
+        lastSyncedState: '',
         importedTokens: {
             newTokens: [],
             updatedTokens: [],
@@ -64,6 +67,12 @@ export const tokenState = createModel<RootModel>()({
         editProhibited: false,
     } as TokenState,
     reducers: {
+        setEditProhibited(state, payload: boolean) {
+            return {
+                ...state,
+                editProhibited: payload,
+            };
+        },
         toggleUsedTokenSet: (state, data: string) => {
             return {
                 ...state,
@@ -110,6 +119,12 @@ export const tokenState = createModel<RootModel>()({
                 activeTokenSet: state.activeTokenSet === data.oldName ? data.newName : state.activeTokenSet,
             };
         },
+        setLastSyncedState: (state, data: string) => {
+            return {
+                ...state,
+                lastSyncedState: data,
+            };
+        },
         setTokenSetOrder: (state, data: string[]) => {
             const newTokens = {};
             data.map((set) => {
@@ -130,7 +145,6 @@ export const tokenState = createModel<RootModel>()({
             };
         },
         setTokenData: (state, data: {values: SingleTokenObject[]; shouldUpdate: boolean}) => {
-            console.log('Received tokens', data);
             const values = parseTokenValues(data.values);
             return {
                 ...state,
@@ -140,21 +154,16 @@ export const tokenState = createModel<RootModel>()({
             };
         },
         setJSONData(state, payload) {
-            const parsedTokens = JSON.parse(payload);
-            try {
-                parseTokenValues(parsedTokens);
-                const values = parseTokenValues({[state.activeTokenSet]: parsedTokens});
-                return {
-                    ...state,
-                    tokens: {
-                        ...state.tokens,
-                        ...values,
-                    },
-                };
-            } catch (e) {
-                console.log('Error parsing tokens', e);
-            }
-            return state;
+            const parsedTokens = parseJson(payload);
+            parseTokenValues(parsedTokens);
+            const values = parseTokenValues({[state.activeTokenSet]: parsedTokens});
+            return {
+                ...state,
+                tokens: {
+                    ...state.tokens,
+                    ...values,
+                },
+            };
         },
         createToken: (state, data: TokenInput) => {
             let newTokens = {};
@@ -167,6 +176,30 @@ export const tokenState = createModel<RootModel>()({
                             name: data.name,
                             value: data.value,
                             ...data.options,
+                        },
+                    ],
+                };
+            }
+            return {
+                ...state,
+                tokens: {
+                    ...state.tokens,
+                    ...newTokens,
+                },
+            };
+        },
+        duplicateToken: (state, data: TokenInput) => {
+            let newTokens = {};
+            const existingToken = state.tokens[data.parent].find((n) => n.name === data.name);
+            if (existingToken) {
+                const newName = `${data.name}-copy`;
+
+                newTokens = {
+                    [data.parent]: [
+                        ...state.tokens[data.parent],
+                        {
+                            ...existingToken,
+                            name: newName,
                         },
                     ],
                 };
@@ -337,8 +370,14 @@ export const tokenState = createModel<RootModel>()({
                 dispatch.tokenState.updateDocument();
             }
         },
+
         toggleUsedTokenSet(payload, rootState) {
             dispatch.tokenState.updateDocument({updateRemote: false});
+        },
+        duplicateToken(payload, rootState) {
+            if (payload.shouldUpdate && rootState.settings.updateOnChange) {
+                dispatch.tokenState.updateDocument();
+            }
         },
         createToken(payload, rootState) {
             if (payload.shouldUpdate && rootState.settings.updateOnChange) {
@@ -357,7 +396,7 @@ export const tokenState = createModel<RootModel>()({
                     updatedAt: new Date().toString(),
                     lastUpdatedAt: rootState.uiState.lastUpdatedAt,
                     isLocal: rootState.uiState.storageType.provider === StorageProviderType.LOCAL,
-                    editProhibited: rootState.uiState.editProhibited,
+                    editProhibited: rootState.tokenState.editProhibited,
                     api: rootState.uiState.api,
                     storageType: rootState.uiState.storageType,
                     shouldUpdateRemote: params.updateRemote && rootState.settings.updateRemote,

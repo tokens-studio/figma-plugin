@@ -1,8 +1,8 @@
 /* eslint-disable import/prefer-default-export */
-import {postToFigma} from '@/plugin/notifiers';
+import {postToFigma, postToUI} from '@/plugin/notifiers';
 import {track} from '@/utils/analytics';
 import {createModel} from '@rematch/core';
-import {MessageToPluginTypes} from 'Types/messages';
+import {MessageFromPluginTypes, MessageToPluginTypes} from 'Types/messages';
 import {UpdateMode} from 'Types/state';
 import {RootModel} from '.';
 
@@ -102,6 +102,13 @@ export const settings = createModel<RootModel>()({
         },
     },
     effects: (dispatch) => ({
+        setWindowSize: (payload, rootState) => {
+            postToFigma({
+                type: MessageToPluginTypes.RESIZE_WINDOW,
+                width: payload.width,
+                height: payload.height,
+            });
+        },
         setUpdateStyles: (payload, rootState) => {
             setUI(rootState.settings);
         },

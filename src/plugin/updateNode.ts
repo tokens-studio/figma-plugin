@@ -3,7 +3,7 @@ import {transformValue} from './helpers';
 import setColorValuesOnTarget from './setColorValuesOnTarget';
 import setTextValuesOnTarget from './setTextValuesOnTarget';
 
-export default async function setValuesOnNode(node, values, data) {
+export default async function setValuesOnNode(node, values, data, ignoreFirstPartForStyles = false) {
     try {
         // BORDER RADIUS
         if (typeof values.borderRadius !== 'undefined' && typeof node.cornerRadius !== 'undefined') {
@@ -76,7 +76,7 @@ export default async function setValuesOnNode(node, values, data) {
             if (typeof node.fills !== 'undefined') {
                 const paints = figma.getLocalPaintStyles();
                 const path = data.fill.split('.');
-                const pathname = path.slice(1, path.length).join('/');
+                const pathname = path.slice(ignoreFirstPartForStyles ? 1 : 0, path.length).join('/');
                 const matchingStyles = paints.filter((n) => n.name === pathname);
                 if (matchingStyles.length) {
                     // matchingStyles[0].paints = [{color, opacity, type: 'SOLID'}];

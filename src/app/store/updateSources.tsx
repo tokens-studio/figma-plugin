@@ -1,5 +1,5 @@
 import {MessageToPluginTypes} from '@types/messages';
-import {computeMergedTokens, resolveTokenValues} from '@/plugin/tokenHelpers';
+import {mergeTokenGroups, resolveTokenValues} from '@/plugin/tokenHelpers';
 import {TokenProps} from '../../../types/tokens';
 import {StorageProviderType} from '../../../types/api';
 import {notifyToUI, postToFigma} from '../../plugin/notifiers';
@@ -35,7 +35,8 @@ async function updateRemoteTokens({
             });
             break;
         }
-        case StorageProviderType.ARCADE: {
+
+        case StorageProviderType.GITHUB: {
             break;
         }
         default:
@@ -65,7 +66,7 @@ export default async function updateTokensOnSources({
             oldUpdatedAt: lastUpdatedAt,
         });
     }
-    const mergedTokens = tokens ? resolveTokenValues(computeMergedTokens(tokens, usedTokenSet)) : null;
+    const mergedTokens = tokens ? resolveTokenValues(mergeTokenGroups(tokens, usedTokenSet)) : null;
 
     postToFigma({
         type: MessageToPluginTypes.UPDATE,

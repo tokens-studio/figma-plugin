@@ -3,6 +3,7 @@ import {track} from '@/utils/analytics';
 import fetchChangelog from '@/utils/storyblok';
 import {createModel} from '@rematch/core';
 import {StorageType, StorageProviderType, ApiDataType} from '@types/api';
+import {TokenType} from 'Types/tokens';
 
 import {RootModel} from '.';
 
@@ -28,6 +29,7 @@ interface EditToken {
     schema: object;
     optionsSchema: object;
     options: object;
+    type: TokenType;
 }
 
 interface UIState {
@@ -37,7 +39,6 @@ interface UIState {
     loading: boolean;
     activeTab: TabNames;
     projectURL: string;
-    editProhibited: boolean;
     storageType: StorageType;
     api: ApiDataType;
     apiProviders: ApiDataType[];
@@ -54,6 +55,9 @@ interface UIState {
         text?: string;
         description?: string;
     };
+    showPushDialog: string | false;
+    showEmptyGroups: boolean;
+    collapsed: boolean;
 }
 
 export const uiState = createModel<RootModel>()({
@@ -64,7 +68,6 @@ export const uiState = createModel<RootModel>()({
         loading: false,
         activeTab: 'start',
         projectURL: '',
-        editProhibited: false,
         storageType: {
             provider: StorageProviderType.LOCAL,
         },
@@ -86,8 +89,17 @@ export const uiState = createModel<RootModel>()({
             text: '',
             description: '',
         },
+        showPushDialog: false,
+        showEmptyGroups: true,
+        collapsed: false,
     } as UIState,
     reducers: {
+        setShowPushDialog: (state, data: string | false) => {
+            return {
+                ...state,
+                showPushDialog: data,
+            };
+        },
         setShowConfirm: (state, data: {text: string; description?: string}) => {
             return {
                 ...state,
@@ -164,17 +176,10 @@ export const uiState = createModel<RootModel>()({
                 projectURL: payload,
             };
         },
-        setEditProhibited(state, payload: boolean) {
-            return {
-                ...state,
-                editProhibited: payload,
-            };
-        },
         setStorage(state, payload: StorageType) {
             return {
                 ...state,
                 storageType: payload,
-                editProhibited: false,
             };
         },
         setApiData(state, payload: ApiDataType) {
@@ -217,6 +222,18 @@ export const uiState = createModel<RootModel>()({
             return {
                 ...state,
                 tokenFilter: payload,
+            };
+        },
+        toggleShowEmptyGroups(state) {
+            return {
+                ...state,
+                showEmptyGroups: !state.showEmptyGroups,
+            };
+        },
+        toggleCollapsed(state) {
+            return {
+                ...state,
+                collapsed: !state.collapsed,
             };
         },
     },

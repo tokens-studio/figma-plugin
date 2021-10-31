@@ -3,7 +3,7 @@ import {fetchAllPluginData} from './pluginData';
 import store from './store';
 import setValuesOnNode from './updateNode';
 import {TokenProps} from '../../types/tokens';
-import {StorageProviderType, StorageType} from '../../types/api';
+import {ContextObject, StorageProviderType, StorageType} from '../../types/api';
 import {isSingleToken} from '../app/components/utils';
 import * as pjs from '../../package.json';
 
@@ -65,16 +65,19 @@ export function getTokenData(): {values: TokenProps; updatedAt: string; version:
 }
 
 // set storage type (i.e. local or some remote provider)
-export function saveStorageType({provider, id, name}: StorageType) {
-    figma.root.setSharedPluginData('tokens', 'storageType', JSON.stringify({provider, id, name}));
+export function saveStorageType(context: ContextObject) {
+    // remove secret
+    const storageToSave = context;
+    delete storageToSave.secret;
+    figma.root.setSharedPluginData('tokens', 'storageType', JSON.stringify(storageToSave));
 }
 
 export function getSavedStorageType(): StorageType {
     const values = figma.root.getSharedPluginData('tokens', 'storageType');
 
     if (values) {
-        const {provider, name, id} = JSON.parse(values);
-        return {provider, name, id};
+        const context = JSON.parse(values);
+        return context;
     }
     return {provider: StorageProviderType.LOCAL};
 }
@@ -87,7 +90,8 @@ export function goToNode(id) {
     }
 }
 
-export function updateNodes(nodes, tokens) {
+export function updateNodes(nodes, tokens, settings) {
+    const {ignoreFirstPartForStyles} = settings;
     try {
         let i = 0;
         const len = nodes.length;
@@ -97,7 +101,7 @@ export function updateNodes(nodes, tokens) {
             const data = fetchAllPluginData(node);
             if (data) {
                 const mappedValues = mapValuesToTokens(tokens, data);
-                setValuesOnNode(node, mappedValues, data);
+                setValuesOnNode(node, mappedValues, data, ignoreFirstPartForStyles);
                 store.successfulNodes.push(node);
                 returnedValues.push(data);
             }
