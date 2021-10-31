@@ -13,7 +13,13 @@ const EditTokenFormModal = ({resolvedTokens}) => {
     };
 
     return (
-        <Modal large isOpen close={handleReset} title={editToken.isPristine ? `New Token` : editToken.initialName}>
+        <Modal
+            compact
+            large
+            isOpen
+            close={handleReset}
+            title={editToken.isPristine ? `New Token` : editToken.initialName}
+        >
             <EditTokenForm resolvedTokens={resolvedTokens} />
         </Modal>
     );
