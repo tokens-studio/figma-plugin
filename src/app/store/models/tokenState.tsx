@@ -3,6 +3,7 @@ import {createModel} from '@rematch/core';
 import {SingleTokenObject, TokenGroup, SingleToken, TokenProps} from '@types/tokens';
 import {StorageProviderType} from '@types/api';
 import defaultJSON from '@/config/default.json';
+import isEqual from 'lodash.isequal';
 
 import parseTokenValues from '@/utils/parseTokenValues';
 import {notifyToUI} from '@/plugin/notifiers';
@@ -222,11 +223,7 @@ export const tokenState = createModel<RootModel>()({
                 values.map((token: TokenGroup) => {
                     const oldValue = state.tokens[state.activeTokenSet].find((t) => t.name === token.name);
                     if (oldValue) {
-                        if (
-                            typeof oldValue.value === 'string' &&
-                            typeof token.value === 'string' &&
-                            oldValue.value?.toUpperCase() === token.value.toUpperCase()
-                        ) {
+                        if (isEqual(oldValue.value, token.value)) {
                             if (
                                 oldValue.description === token.description ||
                                 (typeof token.description === 'undefined' && oldValue.description === '')
