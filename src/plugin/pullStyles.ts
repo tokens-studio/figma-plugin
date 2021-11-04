@@ -17,6 +17,8 @@ export default function pullStyles(styleTypes): void {
     let fontSizes: NewTokenObject[] = [];
     let letterSpacing: NewTokenObject[] = [];
     let paragraphSpacing: NewTokenObject[] = [];
+    let textCase: NewTokenObject[] = [];
+    let textDecoration: NewTokenObject[] = [];
     if (styleTypes.colorStyles) {
         colors = figma
             .getLocalPaintStyles()
@@ -58,6 +60,8 @@ export default function pullStyles(styleTypes): void {
         const rawLineHeights = [];
         const rawParagraphSpacing = [];
         const rawLetterSpacing = [];
+        const rawTextCase = [];
+        const rawTextDecoration = [];
 
         const figmaTextStyles = figma.getLocalTextStyles();
         figmaTextStyles.map((style) => {
@@ -66,6 +70,8 @@ export default function pullStyles(styleTypes): void {
             rawLineHeights.push(style.lineHeight);
             if (!rawParagraphSpacing.includes(style.paragraphSpacing)) rawParagraphSpacing.push(style.paragraphSpacing);
             rawLetterSpacing.push(style.letterSpacing);
+            if (!rawTextCase.includes(style.textCase)) rawTextCase.push(style.textCase);
+            if (!rawTextDecoration.includes(style.textDecoration)) rawTextDecoration.push(style.textDecoration);
         });
 
         fontSizes = rawFontSizes
@@ -75,6 +81,7 @@ export default function pullStyles(styleTypes): void {
                 value: size.toString(),
                 type: 'fontSizes',
             }));
+
         const uniqueFontCombinations = fontCombinations.filter(
             (v, i, a) => a.findIndex((t) => t.family === v.family && t.style === v.style) === i
         );
@@ -114,6 +121,18 @@ export default function pullStyles(styleTypes): void {
                 type: 'letterSpacing',
             }));
 
+        textCase = rawTextCase.map((value) => ({
+            name: `textCase.${value}`,
+            value: value.toString(),
+            type: 'textCase',
+        }));
+
+        textDecoration = rawTextDecoration.map((value) => ({
+            name: `textDecoration.${value}`,
+            value: value.toString(),
+            type: 'textDecoration',
+        }));
+
         typography = figmaTextStyles.map((style) => {
             const foundFamily = fontFamilies.find((el: SingleTokenObject) => el.value === style.fontName.family);
             const foundFontWeight = fontWeights.find(
@@ -130,6 +149,10 @@ export default function pullStyles(styleTypes): void {
             const foundParagraphSpacing = paragraphSpacing.find(
                 (el: SingleTokenObject) => el.value === style.paragraphSpacing.toString()
             );
+            const foundTextCase = textCase.find((el: SingleTokenObject) => el.value === style.textCase.toString());
+            const foundTextDecoration = textDecoration.find(
+                (el: SingleTokenObject) => el.value === style.textDecoration.toString()
+            );
 
             const obj = {
                 fontFamily: `$${foundFamily?.name}`,
@@ -138,6 +161,8 @@ export default function pullStyles(styleTypes): void {
                 fontSize: `$${foundFontSize?.name}`,
                 letterSpacing: `$${foundLetterSpacing?.name}`,
                 paragraphSpacing: `$${foundParagraphSpacing?.name}`,
+                textCase: `$${foundTextCase?.name}`,
+                textDecoration: `$${foundTextDecoration?.name}`,
             };
 
             const normalizedName = style.name
@@ -164,5 +189,7 @@ export default function pullStyles(styleTypes): void {
         letterSpacing,
         paragraphSpacing,
         typography,
+        textCase,
+        textDecoration,
     });
 }

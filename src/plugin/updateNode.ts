@@ -119,6 +119,8 @@ export default async function setValuesOnNode(node, values, data, ignoreFirstPar
                         fontSize: values.fontSizes,
                         letterSpacing: values.letterSpacing,
                         paragraphSpacing: values.paragraphSpacing,
+                        textCase: values.textCase,
+                        textDecoration: values.textDecoration,
                     },
                 });
             }
