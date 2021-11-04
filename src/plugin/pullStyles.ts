@@ -170,7 +170,7 @@ export default function pullStyles(styleTypes): void {
                 .map((section) => section.trim())
                 .join('.');
 
-            const styleObject = {name: normalizedName, value: obj, type: 'typography'};
+            const styleObject: TypographyToken = {name: normalizedName, value: obj, type: 'typography'};
 
             if (style.description) {
                 styleObject.description = style.description;
