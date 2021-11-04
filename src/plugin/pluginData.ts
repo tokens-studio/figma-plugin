@@ -81,7 +81,10 @@ export function findAllWithData({updateMode}: {updateMode: UpdateMode}) {
     }
 }
 
-export function sendPluginValues(nodes, values?) {
+export async function sendPluginValues(nodes, values?) {
+    const styles = await figma.getLocalPaintStyles();
+    console.log('Nodes', nodes);
+    console.log('styles', styles);
     let pluginValues = values;
 
     if (nodes.length > 1) {
