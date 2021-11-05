@@ -65,7 +65,6 @@ const TokenButton = ({
 
     function setPluginValue(value) {
         dispatch.uiState.setLoading(true);
-        console.log('RESOLVED ARE', resolvedTokens);
 
         setNodeData(value, resolvedTokens);
     }
