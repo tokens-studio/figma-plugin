@@ -102,6 +102,8 @@ function roundToTwo(num) {
 }
 
 export function convertToFigmaColor(input) {
+    console.log('Input is', input);
+
     let color;
     let opacity;
     if (input.startsWith('rgb')) {

@@ -28,13 +28,25 @@ export function resolveTokenValues(tokens, previousCount = undefined) {
         let failedToResolve;
         // Iterate over Typography and boxShadow Object to get resolved values
         if (['typography', 'boxShadow'].includes(t.type)) {
-            returnValue = Object.entries(t.value).reduce((acc, [key, value]: [string, SingleTokenObject]) => {
-                acc[key] = getAliasValue(value, tokens);
-                return acc;
-            }, {});
+            if (Array.isArray(t.value)) {
+                // If we're dealing with an array, iterate over each item and then key
+                returnValue = t.value.map((item) => {
+                    return Object.entries(item).reduce((acc, [key, value]: [string, SingleTokenObject]) => {
+                        acc[key] = getAliasValue(value, tokens);
+                        return acc;
+                    }, {});
+                });
+                // If not, iterate over each key
+            } else {
+                returnValue = Object.entries(t.value).reduce((acc, [key, value]: [string, SingleTokenObject]) => {
+                    acc[key] = getAliasValue(value, tokens);
+                    return acc;
+                }, {});
+            }
         } else {
             // If we're not dealing with special tokens, just return resolved value
             returnValue = getAliasValue(t, tokens);
+            console.log('returnvalue in FN is', returnValue);
 
             failedToResolve = returnValue === null || checkIfContainsAlias(returnValue);
         }
@@ -50,6 +62,8 @@ export function resolveTokenValues(tokens, previousCount = undefined) {
         }
         return returnObject;
     });
+    console.log('ALIASES', aliases, previousCount);
+
     if (aliases.length > 0 && (previousCount > aliases.length || !previousCount)) {
         return resolveTokenValues(returnedTokens, aliases.length);
     }

@@ -25,24 +25,31 @@ export default async function setValuesOnNode(node, values, data, ignoreFirstPar
         // BOX SHADOW
         if (typeof values.boxShadow !== 'undefined' && typeof node.effects !== 'undefined') {
             // get all effects, but remove DROP_SHADOW, since we're about to add it
-            const effects = node.effects.filter((effect) => effect.type !== 'DROP_SHADOW');
-            const {x, y, spread, color, blur} = values.boxShadow;
-            const {
-                color: {r, g, b},
-                opacity,
-            } = convertToFigmaColor(color);
+            console.log('Updating node', values.boxShadow);
 
-            const effect: ShadowEffect = {
-                type: 'DROP_SHADOW',
-                visible: true,
-                blendMode: 'NORMAL',
-                color: {r, g, b, a: opacity},
-                offset: {x: transformValue(x, 'boxShadow'), y: transformValue(y, 'boxShadow')},
-                radius: transformValue(blur, 'boxShadow'),
-                spread: transformValue(spread, 'boxShadow'),
-            };
+            const effects = [];
+            console.log('IS array', Array.isArray(values.boxShadow));
 
-            effects.push(effect);
+            const receivedEffects = Array.isArray(values.boxShadow) ? values.boxShadow : [values.boxShadow];
+            receivedEffects.map((effect) => {
+                console.log('effect', effect);
+
+                const {x, y, spread, color, blur, type} = effect;
+                const {
+                    color: {r, g, b},
+                    opacity,
+                } = convertToFigmaColor(color);
+                effects.push({
+                    type: transformValue(type, 'boxShadowType'),
+                    visible: true,
+                    blendMode: 'NORMAL',
+                    color: {r, g, b, a: opacity},
+                    offset: {x: transformValue(x, 'boxShadow'), y: transformValue(y, 'boxShadow')},
+                    radius: transformValue(blur, 'boxShadow'),
+                    spread: transformValue(spread, 'boxShadow'),
+                });
+            });
+
             node.effects = effects;
         }
 

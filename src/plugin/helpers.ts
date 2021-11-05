@@ -2,6 +2,7 @@ import {convertTypographyNumberToFigma, fakeZeroForFigma} from './figmaTransform
 import {convertLetterSpacingToFigma} from './figmaTransforms/letterSpacing';
 import {convertLineHeightToFigma} from './figmaTransforms/lineHeight';
 import convertOpacityToFigma from './figmaTransforms/opacity';
+import convertBoxShadowTypeToFigma from './figmaTransforms/boxShadow';
 
 export function isObject(item) {
     return item && typeof item === 'object' && !Array.isArray(item);
@@ -82,6 +83,9 @@ export function transformValue(value, type) {
             return convertLineHeightToFigma(value);
         case 'opacity':
             return convertOpacityToFigma(value.toString());
+        case 'boxShadowType':
+            return convertBoxShadowTypeToFigma(value);
+
         default:
             return value;
     }
