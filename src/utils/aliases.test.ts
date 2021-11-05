@@ -15,7 +15,7 @@ describe('getAliasValue', () => {
         {
             name: 'colors.rgbaalias',
             input: 'rgba($colors.hex, 0.5)',
-            value: 'rgba(#ff0000, 0.5)',
+            value: '#ff000080',
         },
         {
             name: 'colors.lightness_base',

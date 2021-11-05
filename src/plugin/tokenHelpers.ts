@@ -23,18 +23,18 @@ export function reduceToValues(tokens) {
 export function resolveTokenValues(tokens, previousCount = undefined) {
     const aliases = findAllAliases(tokens);
     let returnedTokens = tokens;
-    returnedTokens = tokens.map((t) => {
+    returnedTokens = tokens.map((t, _, tokensInProgress) => {
         let returnValue;
         let failedToResolve;
         // Iterate over Typography and boxShadow Object to get resolved values
         if (['typography', 'boxShadow'].includes(t.type)) {
             returnValue = Object.entries(t.value).reduce((acc, [key, value]: [string, SingleTokenObject]) => {
-                acc[key] = getAliasValue(value, tokens);
+                acc[key] = getAliasValue(value, tokensInProgress);
                 return acc;
             }, {});
         } else {
             // If we're not dealing with special tokens, just return resolved value
-            returnValue = getAliasValue(t, tokens);
+            returnValue = getAliasValue(t, tokensInProgress);
 
             failedToResolve = returnValue === null || checkIfContainsAlias(returnValue);
         }
@@ -50,6 +50,7 @@ export function resolveTokenValues(tokens, previousCount = undefined) {
         }
         return returnObject;
     });
+
     if (aliases.length > 0 && (previousCount > aliases.length || !previousCount)) {
         return resolveTokenValues(returnedTokens, aliases.length);
     }
