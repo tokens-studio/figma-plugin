@@ -65,7 +65,6 @@ const TokenButton = ({
 
     function setPluginValue(value) {
         dispatch.uiState.setLoading(true);
-
         setNodeData(value, resolvedTokens);
     }
 
