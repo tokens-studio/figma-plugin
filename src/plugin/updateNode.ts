@@ -25,15 +25,11 @@ export default async function setValuesOnNode(node, values, data, ignoreFirstPar
         // BOX SHADOW
         if (typeof values.boxShadow !== 'undefined' && typeof node.effects !== 'undefined') {
             // get all effects, but remove DROP_SHADOW, since we're about to add it
-            console.log('Updating node', values.boxShadow);
 
             const effects = [];
-            console.log('IS array', Array.isArray(values.boxShadow));
 
             const receivedEffects = Array.isArray(values.boxShadow) ? values.boxShadow : [values.boxShadow];
             receivedEffects.map((effect) => {
-                console.log('effect', effect);
-
                 const {x, y, spread, color, blur, type} = effect;
                 const {
                     color: {r, g, b},
