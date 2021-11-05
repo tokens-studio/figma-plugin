@@ -8,30 +8,28 @@ export default function getAliasValue(token: SingleTokenObject | string, tokens 
 
     try {
         const tokenReferences = findReferences(returnedValue);
-
         if (tokenReferences?.length > 0) {
             const resolvedReferences = tokenReferences.map((ref) => {
                 if (ref.length > 1) {
                     const nameToLookFor = ref.startsWith('{') ? ref.slice(1, ref.length - 1) : ref.substring(1);
 
                     const foundToken = tokens.find((t) => t.name === nameToLookFor);
-                    if (typeof foundToken !== 'undefined') return getAliasValue(foundToken, tokens);
+                    if (typeof foundToken !== 'undefined') return foundToken.value;
                 }
                 return ref;
             });
             tokenReferences.forEach((reference, index) => {
-                const resolved = checkAndEvaluateMath(resolvedReferences[index]?.value ?? resolvedReferences[index]);
-                returnedValue = returnedValue.replace(reference, resolved);
+                returnedValue = returnedValue.replace(
+                    reference,
+                    resolvedReferences[index]?.value ?? resolvedReferences[index]
+                );
             });
-
             if (returnedValue === 'null') {
                 returnedValue = null;
             }
         }
         if (typeof returnedValue !== 'undefined') {
-            const remainingReferences = findReferences(returnedValue);
-
-            if (!remainingReferences) {
+            if (!tokenReferences) {
                 return convertToRgb(checkAndEvaluateMath(returnedValue));
             }
         }

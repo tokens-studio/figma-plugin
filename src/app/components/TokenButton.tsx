@@ -2,7 +2,6 @@ import * as React from 'react';
 import {track} from '@/utils/analytics';
 import {useDispatch, useSelector} from 'react-redux';
 import {SingleTokenObject} from 'Types/tokens';
-import getAliasValue from '@/utils/aliases';
 import Tooltip from './Tooltip';
 import MoreButton from './MoreButton';
 import {lightOrDark} from './utils';
@@ -36,12 +35,12 @@ const TokenButton = ({
 }) => {
     const uiState = useSelector((state: RootState) => state.uiState);
     const {activeTokenSet} = useSelector((state: RootState) => state.tokenState);
-    const {setNodeData} = useTokens();
+    const {setNodeData, getTokenValue} = useTokens();
     const {deleteSingleToken, duplicateSingleToken} = useManageTokens();
     const dispatch = useDispatch<Dispatch>();
     const {isAlias} = useTokens();
 
-    const displayValue = getAliasValue(token, resolvedTokens);
+    const displayValue = getTokenValue(token, resolvedTokens);
 
     let style;
     let showValue = true;

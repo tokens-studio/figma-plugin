@@ -1,10 +1,9 @@
-import getAliasValue from '@/utils/aliases';
 import React from 'react';
 
 // Returns token value in display format
 export default function TokenTooltip({token, resolvedTokens, shouldResolve = false}) {
     try {
-        const valueToCheck = shouldResolve ? getAliasValue(token, resolvedTokens) : token.value;
+        const valueToCheck = shouldResolve ? resolvedTokens.find((t) => t.name === token.name).value : token.value;
 
         if (token.type === 'typography') {
             if (shouldResolve) {
