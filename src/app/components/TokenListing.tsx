@@ -82,6 +82,7 @@ const TokenListing = ({
                     className={`flex items-center w-full h-full p-4 space-x-2 hover:bg-gray-100 focus:outline-none ${
                         isIntCollapsed ? 'opacity-50' : null
                     }`}
+                    data-cy={`tokenlisting-header-${tokenKey}`}
                     type="button"
                     onClick={handleSetIntCollapsed}
                 >
@@ -131,7 +132,10 @@ const TokenListing = ({
                 </div>
             </div>
             {values && (
-                <div className={`px-4 pb-4 ${isIntCollapsed ? 'hidden' : null}`}>
+                <div
+                    className={`px-4 pb-4 ${isIntCollapsed ? 'hidden' : null}`}
+                    data-cy={`tokenlisting-${tokenKey}-content`}
+                >
                     <TokenTree
                         tokenValues={values}
                         showNewForm={showNewForm}
