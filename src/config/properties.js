@@ -28,6 +28,8 @@ export default {
     typography: {},
     letterSpacing: {},
     paragraphSpacing: {},
+    textCase: {},
+    textDecoration: {},
     tokenValue: {},
     value: {},
     tokenName: {},

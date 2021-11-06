@@ -93,6 +93,8 @@ export default {
                 fontSize: '',
                 letterSpacing: '',
                 paragraphSpacing: '',
+                textDecoration: '',
+                textCase: '',
             },
             options: {
                 description: '',
@@ -163,6 +165,28 @@ export default {
                 description: '',
             },
         },
+    },
+    textCase: {
+        label: 'Text Case',
+        property: 'TextCase',
+        type: 'textCase',
+        schema: {
+            options: {
+                description: '',
+            },
+        },
+        explainer: 'none | uppercase | lowercase | capitalize',
+    },
+    textDecoration: {
+        label: 'Text Decoration',
+        property: 'TextDecoration',
+        type: 'textDecoration',
+        schema: {
+            options: {
+                description: '',
+            },
+        },
+        explainer: 'none | underline | line-through',
     },
     other: {
         label: 'Other',

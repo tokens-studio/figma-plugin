@@ -8,6 +8,8 @@ export type TypographyObject = {
     lineHeight?: string | number;
     letterSpacing?: string;
     paragraphSpacing?: string;
+    textCase?: string;
+    textDecoration?: string;
 };
 
 export type TypographyToken = {
