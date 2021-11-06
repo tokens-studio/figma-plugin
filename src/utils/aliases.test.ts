@@ -24,18 +24,23 @@ describe('getAliasValue', () => {
         },
         {
             name: 'colors.lightness',
-            input: '$colors.lightness_base * 4 + 0.175',
-            value: 100.175,
+            input: '$colors.lightness_base * 3.5 + 0.175',
+            value: 87.675,
         },
         {
             name: 'colors.hsla_1',
-            input: 'hsl(172,50,$colors.lightness_base)',
-            value: 'hsl(172,50,25)',
+            input: 'hsl(172,50%,{colors.lightness_base}%)',
+            value: '#206057',
         },
         {
             name: 'colors.hsla_2',
-            input: 'hsl(172,50,$colors.lightness)',
-            value: 'hsl(172,50,100.175)',
+            input: 'hsl(172,50%,{colors.lightness}%)',
+            value: '#d0efeb',
+        },
+        {
+            name: 'colors.hsla_3',
+            input: 'hsla(172,50%,{colors.lightness}%, 0.5)',
+            value: '#d0efeb80',
         },
         {
             name: 'alias.complex',
@@ -71,6 +76,16 @@ describe('getAliasValue', () => {
             name: 'base.index',
             input: '400',
             value: 400,
+        },
+        {
+            name: 'alias.cantresolve',
+            input: 'rgba({notexisting}, 1)',
+            value: 'rgba({notexisting}, 1)',
+        },
+        {
+            name: 'alias.cantresolveopacity',
+            input: 'rgba(255, 255, 0, {notexisting})',
+            value: 'rgba(255, 255, 0, {notexisting})',
         },
     ];
 
