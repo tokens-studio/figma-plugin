@@ -88,26 +88,28 @@ describe('convertToRgb', () => {
         const rgbhexWithSpace = 'rgb(#ff0000, 0.5)';
         const rgbahexWithOutSpace = 'rgba(#ff0000,0.5)';
         const hex = '#ff0000';
+        const hsla = 'hsla(210, 50%, 100%, 1)';
 
         expect(convertToRgb(rgbhexWithSpace)).toBe('#ff000080');
         expect(convertToRgb(rgbahexWithOutSpace)).toBe('#ff000080');
         expect(convertToRgb(hex)).toBe('#ff0000');
+        expect(convertToRgb(hsla)).toBe('#ffffff');
     });
 
     it('transforms a gradient string to rgb values', () => {
         const gradient1 = 'linear-gradient(rgb(#ff0000, 0.5) 0%, #ffffff 100%)';
-        const gradient2 = 'linear-gradient(rgb(#ff0000, 0.5) 0%, rgba(#ffffff, 1) 100%)';
+        const gradient2 = 'linear-gradient(rgb(#ff0000, 0.5) 0%, rgba(#ffffff, 0.25) 100%)';
         const gradient3 = 'linear-gradient(rgba(255, 255, 0, 0.5) 0%, rgba(#000000, 0) 100%)';
 
         expect(convertToRgb(gradient1)).toBe('linear-gradient(#ff000080 0%, #ffffff 100%)');
-        expect(convertToRgb(gradient2)).toBe('linear-gradient(#ff000080 0%, #ffffffff 100%)');
+        expect(convertToRgb(gradient2)).toBe('linear-gradient(#ff000080 0%, #ffffff40 100%)');
         expect(convertToRgb(gradient3)).toBe('linear-gradient(#ffff0080 0%, #00000000 100%)');
     });
 
     it('transforms multiple color stops to rgb values', () => {
-        const gradient1 = 'linear-gradient(#ff0000 0%, rgb(#ff0000, 0.3) 50%, rgb(255, 0, 0, 1) 100%)';
+        const gradient1 = 'linear-gradient(#ff0000 0%, rgb(#ff0000, 0.3) 50%, rgb(255, 0, 0, 0.25) 100%)';
 
-        expect(convertToRgb(gradient1)).toBe('linear-gradient(#ff0000 0%, #ff00004d 50%, #ff0000ff 100%)');
+        expect(convertToRgb(gradient1)).toBe('linear-gradient(#ff0000 0%, #ff00004d 50%, #ff000040 100%)');
     });
 });
 
@@ -122,11 +124,9 @@ describe('lightToDark', () => {
     });
     it('knows when a color is dark', () => {
         const black = '#000';
-        const darkEnough = '#F3F3F3';
         const darkRgb = 'rgb(0,0,0)';
         const darkRgba = 'rgba(0,0,0,1)';
         expect(lightOrDark(black)).toBe('dark');
-        expect(lightOrDark(darkEnough)).toBe('dark');
         expect(lightOrDark(darkRgb)).toBe('dark');
         expect(lightOrDark(darkRgba)).toBe('dark');
     });
