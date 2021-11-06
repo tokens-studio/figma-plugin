@@ -66,6 +66,8 @@ export default function pullStyles(styleTypes): void {
         const rawTextDecoration = [];
 
         const figmaTextStyles = figma.getLocalTextStyles();
+        console.log('Text Styles', figmaTextStyles);
+
         figmaTextStyles.map((style) => {
             if (!rawFontSizes.includes(style.fontSize)) rawFontSizes.push(style.fontSize);
             fontCombinations.push(style.fontName);

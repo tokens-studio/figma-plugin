@@ -9,6 +9,12 @@ export function convertTextCaseToFigma(value: string) {
         case 'capitalize':
         case 'title':
             return 'TITLE';
+        case 'small-caps':
+        case 'small_caps':
+            return 'SMALL_CAPS';
+        case 'all-small-caps':
+        case 'small_caps_forced':
+            return 'SMALL_CAPS_FORCED';
         default:
             return 'ORIGINAL';
     }
@@ -22,6 +28,10 @@ export function convertFigmaToTextCase(value: string) {
             return 'lowercase';
         case 'TITLE':
             return 'capitalize';
+        case 'SMALL_CAPS':
+            return 'small_caps';
+        case 'SMALL_CAPS_FORCED':
+            return 'small_caps_forced';
         default:
             return 'none';
     }
