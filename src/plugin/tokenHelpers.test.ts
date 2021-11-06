@@ -70,7 +70,7 @@ const output = [
     {
         name: 'theme.accent.deep',
         rawValue: 'rgba({theme.accent.default}, {opacity.full})',
-        value: '#ff0000ff',
+        value: '#ff0000',
     },
 ];
 describe('resolveTokenValues', () => {
