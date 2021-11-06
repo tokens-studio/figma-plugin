@@ -6,11 +6,13 @@ import {slugify} from '../app/components/utils';
 import {convertFigmaGradientToString} from './figmaTransforms/gradients';
 import {convertFigmaToLetterSpacing} from './figmaTransforms/letterSpacing';
 import {convertFigmaToLineHeight} from './figmaTransforms/lineHeight';
+import {convertFigmaToTextCase} from './figmaTransforms/textCase';
+import {convertFigmaToTextDecoration} from './figmaTransforms/textDecoration';
 import {notifyStyleValues} from './notifiers';
 
 export default function pullStyles(styleTypes): void {
-    let colors: NewTokenObject[] = [];
-    let typography: NewTokenObject[] = [];
+    let colors: ColorToken[] = [];
+    let typography: TypographyToken[] = [];
     let fontFamilies: NewTokenObject[] = [];
     let lineHeights: NewTokenObject[] = [];
     let fontWeights: NewTokenObject[] = [];
@@ -122,14 +124,14 @@ export default function pullStyles(styleTypes): void {
             }));
 
         textCase = rawTextCase.map((value) => ({
-            name: `textCase.${value}`,
-            value: value.toString(),
+            name: `textCase.${convertFigmaToTextCase(value)}`,
+            value: convertFigmaToTextCase(value),
             type: 'textCase',
         }));
 
         textDecoration = rawTextDecoration.map((value) => ({
-            name: `textDecoration.${value}`,
-            value: value.toString(),
+            name: `textDecoration.${convertFigmaToTextDecoration(value)}`,
+            value: convertFigmaToTextDecoration(value),
             type: 'textDecoration',
         }));
 
@@ -149,9 +151,11 @@ export default function pullStyles(styleTypes): void {
             const foundParagraphSpacing = paragraphSpacing.find(
                 (el: SingleTokenObject) => el.value === style.paragraphSpacing.toString()
             );
-            const foundTextCase = textCase.find((el: SingleTokenObject) => el.value === style.textCase.toString());
+            const foundTextCase = textCase.find(
+                (el: SingleTokenObject) => el.value === convertFigmaToTextCase(style.textCase.toString())
+            );
             const foundTextDecoration = textDecoration.find(
-                (el: SingleTokenObject) => el.value === style.textDecoration.toString()
+                (el: SingleTokenObject) => el.value === convertFigmaToTextDecoration(style.textDecoration.toString())
             );
 
             const obj = {

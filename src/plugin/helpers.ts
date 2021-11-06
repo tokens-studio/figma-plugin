@@ -2,8 +2,8 @@ import {convertTypographyNumberToFigma, fakeZeroForFigma} from './figmaTransform
 import {convertLetterSpacingToFigma} from './figmaTransforms/letterSpacing';
 import {convertLineHeightToFigma} from './figmaTransforms/lineHeight';
 import convertOpacityToFigma from './figmaTransforms/opacity';
-import convertTextCaseToFigma from './figmaTransforms/textCase';
-import convertTextDecorationToFigma from './figmaTransforms/textDecoration';
+import {convertTextCaseToFigma} from './figmaTransforms/textCase';
+import {convertTextDecorationToFigma} from './figmaTransforms/textDecoration';
 
 export function isObject(item) {
     return item && typeof item === 'object' && !Array.isArray(item);

@@ -175,7 +175,7 @@ export default {
                 description: '',
             },
         },
-        explainer: 'ORIGINAL | UPPER | LOWER | TITLE',
+        explainer: 'none | uppercase | lowercase | capitalize',
     },
     textDecoration: {
         label: 'Text Decoration',
@@ -186,7 +186,7 @@ export default {
                 description: '',
             },
         },
-        explainer: 'NONE | UNDERLINE | STRIKETHROUGH',
+        explainer: 'none | underline | line-through',
     },
     other: {
         label: 'Other',

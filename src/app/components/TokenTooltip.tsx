@@ -9,7 +9,7 @@ export default function TokenTooltip({token, resolvedTokens, shouldResolve = fal
             if (shouldResolve) {
                 return (
                     <div>
-                        {valueToCheck.fontFamily} / {valueToCheck.fontWeight}
+                        {valueToCheck.fontFamily} {valueToCheck.fontWeight} / {valueToCheck.fontSize}
                     </div>
                 );
             }
@@ -19,6 +19,11 @@ export default function TokenTooltip({token, resolvedTokens, shouldResolve = fal
                     <div>Weight: {valueToCheck.fontWeight?.value || valueToCheck.fontWeight}</div>
                     <div>Leading: {valueToCheck.lineHeight?.value || valueToCheck.lineHeight}</div>
                     <div>Tracking: {valueToCheck.lineHeight?.value || valueToCheck.lineHeight}</div>
+                    <div>
+                        Paragraph Spacing: {valueToCheck.paragraphSpacing?.value || valueToCheck.paragraphSpacing}
+                    </div>
+                    <div>Text Case: {valueToCheck.textCase?.value || valueToCheck.textCase}</div>
+                    <div>Text Decoration: {valueToCheck.textDecoration?.value || valueToCheck.textDecoration}</div>
                 </div>
             );
         }
