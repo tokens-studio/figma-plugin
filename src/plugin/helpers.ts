@@ -2,7 +2,7 @@ import {convertTypographyNumberToFigma, fakeZeroForFigma} from './figmaTransform
 import {convertLetterSpacingToFigma} from './figmaTransforms/letterSpacing';
 import {convertLineHeightToFigma} from './figmaTransforms/lineHeight';
 import convertOpacityToFigma from './figmaTransforms/opacity';
-import convertBoxShadowTypeToFigma from './figmaTransforms/boxShadow';
+import {convertBoxShadowTypeToFigma} from './figmaTransforms/boxShadow';
 
 export function isObject(item) {
     return item && typeof item === 'object' && !Array.isArray(item);

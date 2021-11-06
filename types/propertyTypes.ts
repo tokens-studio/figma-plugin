@@ -17,10 +17,20 @@ export type TypographyToken = {
     type?: TokenType;
 };
 
+export type ShadowTokenSingleValue = {
+    color: string;
+    type: 'dropShadow' | 'innerShadow';
+    x: string | number;
+    y: string | number;
+    radius: string | number;
+    spread: string | number;
+};
+
 export type propertyObject = {
     description?: string;
     data?: MetaDataObject;
     value: string | number;
+    type?: TokenType;
     name: string;
 };
 
@@ -40,3 +50,6 @@ export type MetaDataObject = {
 };
 
 export type ColorToken = propertyObject;
+export type EffectToken = Omit<propertyObject, 'value'> & {
+    value: ShadowTokenSingleValue[] | ShadowTokenSingleValue;
+};

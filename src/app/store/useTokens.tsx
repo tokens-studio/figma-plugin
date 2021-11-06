@@ -57,6 +57,7 @@ export default function useTokens() {
             styleTypes: {
                 textStyles: true,
                 colorStyles: true,
+                effectStyles: true,
             },
         });
     }

@@ -3,18 +3,11 @@ import {track} from '@/utils/analytics';
 import fetchChangelog from '@/utils/storyblok';
 import {createModel} from '@rematch/core';
 import {StorageType, StorageProviderType, ApiDataType} from '@types/api';
-import {TokenType} from 'Types/tokens';
+import {SelectionValue, TokenType} from 'Types/tokens';
 
 import {RootModel} from '.';
 
 type TabNames = 'start' | 'tokens' | 'json' | 'inspector' | 'syncsettings' | 'settings';
-
-export interface SelectionValue {
-    borderRadius: string | undefined;
-    horizontalPadding: string | undefined;
-    verticalPadding: string | undefined;
-    itemSpacing: string | undefined;
-}
 
 type DisplayType = 'GRID' | 'LIST';
 
@@ -33,7 +26,7 @@ interface EditToken {
 }
 
 interface UIState {
-    selectionValues: object;
+    selectionValues: SelectionValue;
     displayType: DisplayType;
     disabled: boolean;
     loading: boolean;

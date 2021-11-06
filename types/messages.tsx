@@ -1,3 +1,7 @@
+import {SettingsState} from '@/app/store/models/settings';
+import {ContextObject, StorageProviderType, StorageType} from './api';
+import {SelectionValue, TokenArrayGroup, TokenGroup} from './tokens';
+
 export enum MessageFromPluginTypes {
     SELECTION = 'selection',
     NO_SELECTION = 'noselection',
@@ -27,3 +31,74 @@ export enum MessageToPluginTypes {
     SET_UI = 'set_ui',
     RESIZE_WINDOW = 'resize_window',
 }
+
+export type PostToFigmaProps =
+    | {
+          type: MessageToPluginTypes.INITIATE;
+      }
+    | {
+          type: MessageToPluginTypes.REMOVE_SINGLE_CREDENTIAL;
+          id: string;
+          secret: string;
+      }
+    | {
+          type: MessageToPluginTypes.GO_TO_NODE;
+          id: string;
+      }
+    | {
+          type: MessageToPluginTypes.CREDENTIALS;
+          id: string;
+          name: string;
+          secret: string;
+          provider: StorageProviderType;
+      }
+    | {
+          type: MessageToPluginTypes.UPDATE;
+          tokenValues: TokenGroup;
+          tokens: TokenArrayGroup;
+          updatedAt: string;
+          settings: SettingsState;
+      }
+    | {
+          type: MessageToPluginTypes.CREATE_STYLES;
+          tokens: TokenArrayGroup;
+          settings: SettingsState;
+      }
+    | {
+          type: MessageToPluginTypes.SET_NODE_DATA;
+          values: SelectionValue[];
+          tokens: TokenArrayGroup;
+          settings: SettingsState;
+      }
+    | {
+          type: MessageToPluginTypes.REMOVE_NODE_DATA;
+          key: string;
+      }
+    | {
+          type: MessageToPluginTypes.PULL_STYLES;
+          styleTypes: {
+              textStyles: boolean;
+              colorStyles: boolean;
+              effectStyles: boolean;
+          };
+      }
+    | {
+          type: MessageToPluginTypes.SET_STORAGE_TYPE;
+          provider: StorageType;
+      }
+    | {
+          type: MessageToPluginTypes.NOTIFY;
+          msg: string;
+          opts: {
+              timeout?: number;
+          };
+      }
+    | {
+          type: MessageToPluginTypes.SET_UI;
+          state: SettingsState;
+      }
+    | {
+          type: MessageToPluginTypes.RESIZE_WINDOW;
+          width: number;
+          height: number;
+      };

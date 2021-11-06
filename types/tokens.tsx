@@ -1,4 +1,4 @@
-import {TypographyObject} from './propertyTypes';
+import {ShadowTokenSingleValue, TypographyObject} from './propertyTypes';
 
 export interface TokenProps {
     values: {
@@ -12,7 +12,7 @@ export type SingleToken = TokenGroup;
 
 export type NewTokenObject = {
     name: string;
-    value: string | TypographyObject | number;
+    value: string | TypographyObject | ShadowTokenSingleValue[] | ShadowTokenSingleValue | number;
     type: TokenType | string | 'undefined';
     description?: string;
 };
@@ -52,10 +52,17 @@ export type TokenType =
     | 'typography'
     | 'opacity'
     | 'borderWidth'
-    | 'shadow'
+    | 'boxShadow'
     | 'fontFamilies'
     | 'fontWeights'
     | 'lineHeights'
     | 'fontSizes'
     | 'letterSpacing'
     | 'paragraphSpacing';
+
+export interface SelectionValue {
+    borderRadius?: string | undefined;
+    horizontalPadding?: string | undefined;
+    verticalPadding?: string | undefined;
+    itemSpacing?: string | undefined;
+}

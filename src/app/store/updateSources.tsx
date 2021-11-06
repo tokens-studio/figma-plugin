@@ -1,14 +1,9 @@
 import {MessageToPluginTypes} from '@types/messages';
 import {mergeTokenGroups, resolveTokenValues} from '@/plugin/tokenHelpers';
 import {TokenProps} from '../../../types/tokens';
-import {StorageProviderType} from '../../../types/api';
+import {ContextObject, StorageProviderType} from '../../../types/api';
 import {notifyToUI, postToFigma} from '../../plugin/notifiers';
 import {updateJSONBinTokens} from './providers/jsonbin';
-
-type ContextObject = {
-    id: string;
-    secret: string;
-};
 
 async function updateRemoteTokens({
     provider,

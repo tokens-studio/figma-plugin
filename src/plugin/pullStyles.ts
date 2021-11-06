@@ -1,8 +1,9 @@
 /* eslint-disable no-param-reassign */
 import {figmaRGBToHex} from '@figma-plugin/helpers';
-import {NewTokenObject, SingleTokenObject} from 'types/tokens';
-import {ColorToken} from '../../types/propertyTypes';
+import {NewTokenObject, SingleTokenObject} from 'Types/tokens';
+import {ColorToken, ShadowTokenSingleValue} from '../../types/propertyTypes';
 import {slugify} from '../app/components/utils';
+import {convertBoxShadowTypeFromFigma} from './figmaTransforms/boxShadow';
 import {convertFigmaGradientToString} from './figmaTransforms/gradients';
 import {convertFigmaToLetterSpacing} from './figmaTransforms/letterSpacing';
 import {convertFigmaToLineHeight} from './figmaTransforms/lineHeight';
@@ -11,6 +12,7 @@ import {notifyStyleValues} from './notifiers';
 export default function pullStyles(styleTypes): void {
     let colors: NewTokenObject[] = [];
     let typography: NewTokenObject[] = [];
+    let effects: NewTokenObject[] = [];
     let fontFamilies: NewTokenObject[] = [];
     let lineHeights: NewTokenObject[] = [];
     let fontWeights: NewTokenObject[] = [];
@@ -155,8 +157,49 @@ export default function pullStyles(styleTypes): void {
         });
     }
 
+    if (styleTypes.effectStyles) {
+        effects = figma
+            .getLocalEffectStyles()
+            .filter((style) => style.effects.every((effect) => ['DROP_SHADOW', 'INNER_SHADOW'].includes(effect.type)))
+            .map((style) => {
+                // convert paint to object containg x, y, spread, color
+                const shadows: ShadowTokenSingleValue[] = style.effects.map((effect) => {
+                    let effectObject: ShadowTokenSingleValue;
+                    const {r, g, b, a} = figmaRGBToHex(effect.color);
+                    effectObject.color = figmaRGBToHex({r, g, b, a});
+                    effectObject.type = convertBoxShadowTypeFromFigma(effect.type);
+                    effectObject.x = effect.offset.x;
+                    effectObject.y = effect.offset.y;
+                    effectObject.radius = effect.radius;
+                    effectObject.spread = effect.spread;
+
+                    return effectObject;
+                });
+
+                if (!shadows) return null;
+
+                const normalizedName = style.name
+                    .split('/')
+                    .map((section) => section.trim())
+                    .join('.');
+
+                const styleObject: ShadowTokenSingleValue = {
+                    value: shadows.length > 1 ? shadows : shadows[0],
+                    type: 'boxShadow',
+                    name: normalizedName,
+                };
+                if (style.description) {
+                    styleObject.description = style.description;
+                }
+
+                return styleObject;
+            })
+            .filter(Boolean);
+    }
+
     notifyStyleValues({
         colors,
+        effects,
         fontFamilies,
         lineHeights,
         fontWeights,
