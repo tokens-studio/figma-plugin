@@ -1,7 +1,7 @@
 /* eslint-disable no-param-reassign */
 import {figmaRGBToHex} from '@figma-plugin/helpers';
 import {NewTokenObject, SingleTokenObject} from 'types/tokens';
-import {ColorToken} from '../../types/propertyTypes';
+import {ColorToken, TypographyToken} from '../../types/propertyTypes';
 import {slugify} from '../app/components/utils';
 import {convertFigmaGradientToString} from './figmaTransforms/gradients';
 import {convertFigmaToLetterSpacing} from './figmaTransforms/letterSpacing';

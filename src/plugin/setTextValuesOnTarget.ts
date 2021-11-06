@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 import {transformValue} from './helpers';
 
 export default async function setTextValuesOnTarget(target, token) {
