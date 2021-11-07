@@ -137,7 +137,7 @@ const TokenButton = ({
 
             style = {
                 '--backgroundColor': displayValue,
-                '--borderColor': lightOrDark(displayValue) === 'light' ? '#f5f5f5' : 'white',
+                '--borderColor': lightOrDark(displayValue) === 'light' ? '#e7e7e7' : 'white',
             };
             buttonClass.push('button-property-color');
             if (uiState.displayType === 'LIST') {

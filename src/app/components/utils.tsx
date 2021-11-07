@@ -83,7 +83,11 @@ export function lightOrDark(color: string) {
     if (typeof color !== 'string') {
         return 'light';
     }
-    return readableColorIsBlack(color) ? 'light' : 'dark';
+    try {
+        return readableColorIsBlack(color) ? 'light' : 'dark';
+    } catch (e) {
+        return 'light';
+    }
 }
 
 // Converts string to slug
