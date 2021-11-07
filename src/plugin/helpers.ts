@@ -73,7 +73,6 @@ export function transformValue(value, type) {
         case 'paddingBottom':
         case 'paddingLeft':
         case 'itemSpacing':
-        case 'boxShadow':
         case 'paragraphSpacing':
         case 'fontSizes':
             return convertTypographyNumberToFigma(value);

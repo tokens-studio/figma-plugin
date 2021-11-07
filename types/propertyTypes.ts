@@ -1,4 +1,4 @@
-import {TokenType} from './tokens';
+import {SingleTokenObject, TokenType} from './tokens';
 import {ColorRgba, ColorHsla} from './valueTypes';
 
 export type TypographyObject = {
@@ -10,20 +10,16 @@ export type TypographyObject = {
     paragraphSpacing?: string;
 };
 
-export type TypographyToken = {
-    value: TypographyObject;
-    name: string;
-    description?: string;
-    type?: TokenType;
-};
+type ShadowType = 'dropShadow' | 'innerShadow';
 
 export type ShadowTokenSingleValue = {
     color: string;
-    type: 'dropShadow' | 'innerShadow';
+    type: ShadowType;
     x: string | number;
     y: string | number;
-    radius: string | number;
+    blur: string | number;
     spread: string | number;
+    blendMode?: string;
 };
 
 export type propertyObject = {
@@ -49,7 +45,4 @@ export type MetaDataObject = {
     figmaStyleId?: string;
 };
 
-export type ColorToken = propertyObject;
-export type EffectToken = Omit<propertyObject, 'value'> & {
-    value: ShadowTokenSingleValue[] | ShadowTokenSingleValue;
-};
+export type ColorToken = SingleTokenObject;

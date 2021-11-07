@@ -17,13 +17,24 @@ export type NewTokenObject = {
     description?: string;
 };
 
-export type SingleTokenObject = {
-    id: string;
+type SingleTokenObjectCommonProperties = {
     name: string;
-    value: string;
-    type: TokenType | string | 'undefined';
     description: string;
 };
+
+export type SingleTokenObject =
+    | (SingleTokenObjectCommonProperties & {
+          type: 'boxShadow';
+          value: ShadowTokenSingleValue[] | ShadowTokenSingleValue;
+      })
+    | (SingleTokenObjectCommonProperties & {
+          type: 'typography';
+          value: TypographyObject;
+      })
+    | (SingleTokenObjectCommonProperties & {
+          type: TokenType;
+          value: string | number;
+      });
 
 export interface TokenGroup {
     [key: string]: SingleToken;
@@ -61,8 +72,43 @@ export type TokenType =
     | 'paragraphSpacing';
 
 export interface SelectionValue {
-    borderRadius?: string | undefined;
-    horizontalPadding?: string | undefined;
-    verticalPadding?: string | undefined;
-    itemSpacing?: string | undefined;
+    values?: string;
+    sizing?: string;
+    height?: string;
+    width?: string;
+    spacing?: string;
+    verticalPadding?: string;
+    horizontalPadding?: string;
+    paddingTop?: string;
+    paddingRight?: string;
+    paddingBottom?: string;
+    paddingLeft?: string;
+    itemSpacing?: string;
+    fill?: string;
+    border?: string;
+    borderRadius?: string;
+    borderRadiusTopLeft?: string;
+    borderRadiusTopRight?: string;
+    borderRadiusBottomRight?: string;
+    borderRadiusBottomLeft?: string;
+    borderWidth?: string;
+    boxShadow?: string;
+    opacity?: string;
+    fontFamilies?: string;
+    fontWeights?: string;
+    fontSizes?: string;
+    lineHeights?: string;
+    typography?: string;
+    letterSpacing?: string;
+    paragraphSpacing?: string;
+    tokenValue?: string;
+    value?: string;
+    tokenName?: string;
+    description?: string;
 }
+
+export type PullStyleTypes = {
+    textStyles: boolean;
+    colorStyles: boolean;
+    effectStyles: boolean;
+};

@@ -1,6 +1,6 @@
 import {SettingsState} from '@/app/store/models/settings';
-import {ContextObject, StorageProviderType, StorageType} from './api';
-import {SelectionValue, TokenArrayGroup, TokenGroup} from './tokens';
+import {StorageProviderType, StorageType} from './api';
+import {PullStyleTypes, SelectionValue, TokenArrayGroup, TokenGroup} from './tokens';
 
 export enum MessageFromPluginTypes {
     SELECTION = 'selection',
@@ -76,11 +76,7 @@ export type PostToFigmaProps =
       }
     | {
           type: MessageToPluginTypes.PULL_STYLES;
-          styleTypes: {
-              textStyles: boolean;
-              colorStyles: boolean;
-              effectStyles: boolean;
-          };
+          styleTypes: PullStyleTypes;
       }
     | {
           type: MessageToPluginTypes.SET_STORAGE_TYPE;
