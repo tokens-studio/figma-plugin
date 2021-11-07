@@ -10,6 +10,9 @@ Figma Tokens is a Figma plugin allowing you to define and use design tokens in F
 # Documentation
 https://docs.tokens.studio/
 
+# Roadmap
+https://github.com/users/six7/projects/4
+
 # Slack Channel
 I'm currently setting up a Figma Tokens Slack channel so the community can exchange ideas, best practices or simply ask a question. Want to join? Let me know by sending me a [DM on twitter](https://www.twitter.com/six7) and I'll send you the invite.
 
