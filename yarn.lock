@@ -1023,10 +1023,10 @@
     lodash "^4.17.15"
     matrix-inverse "^1.0.1"
 
-"@figma/plugin-typings@^1.15.0":
-  version "1.19.2"
-  resolved "https://registry.yarnpkg.com/@figma/plugin-typings/-/plugin-typings-1.19.2.tgz#afdcc62bae1779aff7198c1edd3497d992bfab48"
-  integrity sha512-FjZpc2dA4kRsnmgABcniXyRosQFS6uOqi/WhTyuc/Fm08lV5eE1aP0OwkTNCJY3DA5qXkYGBrjzyXS+OwRI3aw==
+"@figma/plugin-typings@^1.39.0":
+  version "1.39.0"
+  resolved "https://registry.yarnpkg.com/@figma/plugin-typings/-/plugin-typings-1.39.0.tgz#e5fb95a3a8ec0521825b47840d86f616a775be6b"
+  integrity sha512-BFYUA8Dn3JGVYsWeQ87MWwArSH76l2SYLohnrzWWyBoxIq2sHhFpYZIOOdd3lFMf8T/Bq3gbeHJGQfcnUL627w==
 
 "@fullhuman/postcss-purgecss@^3.1.3":
   version "3.1.3"

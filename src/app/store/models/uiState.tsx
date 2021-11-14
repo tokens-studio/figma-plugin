@@ -9,14 +9,12 @@ import {RootModel} from '.';
 
 type TabNames = 'start' | 'tokens' | 'json' | 'inspector' | 'syncsettings' | 'settings';
 
-export interface SelectionValue {
-    borderRadius: string | undefined;
-    horizontalPadding: string | undefined;
-    verticalPadding: string | undefined;
-    itemSpacing: string | undefined;
-}
-
 type DisplayType = 'GRID' | 'LIST';
+
+type SelectionValue = {
+    [key: string]: string;
+    nodes: string[];
+};
 
 interface EditToken {
     value: string | object;
@@ -33,7 +31,7 @@ interface EditToken {
 }
 
 interface UIState {
-    selectionValues: object;
+    selectionValues: SelectionValue[];
     displayType: DisplayType;
     disabled: boolean;
     loading: boolean;
@@ -62,7 +60,7 @@ interface UIState {
 
 export const uiState = createModel<RootModel>()({
     state: {
-        selectionValues: {},
+        selectionValues: [] as SelectionValue[],
         disabled: false,
         displayType: 'GRID',
         loading: false,
@@ -146,7 +144,7 @@ export const uiState = createModel<RootModel>()({
                 displayType: data,
             };
         },
-        setSelectionValues: (state, data: SelectionValue) => {
+        setSelectionValues: (state, data: SelectionValue[]) => {
             return {
                 ...state,
                 selectionValues: data,
@@ -155,7 +153,7 @@ export const uiState = createModel<RootModel>()({
         resetSelectionValues: (state) => {
             return {
                 ...state,
-                selectionValues: {},
+                selectionValues: [] as SelectionValue[],
             };
         },
         setLoading(state, payload: boolean) {

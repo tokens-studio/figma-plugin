@@ -62,10 +62,18 @@ export default function useTokens() {
     }
 
     // Calls Figma with a specific node to remove node data
-    function removeNodeData(data?: string) {
+    function removeNodeData(data?: {key: string; nodes: string[]}) {
         postToFigma({
             type: MessageToPluginTypes.REMOVE_NODE_DATA,
-            key: data,
+            key: data.key,
+            nodes: data.nodes,
+        });
+    }
+
+    // Calls Figma to remove all tokns from selected nodes
+    function removeAllTokensFromNodes() {
+        postToFigma({
+            type: MessageToPluginTypes.REMOVE_PLUGIN_DATA,
         });
     }
 
@@ -91,6 +99,7 @@ export default function useTokens() {
         getStringTokens,
         setNodeData,
         removeNodeData,
+        removeAllTokensFromNodes,
         createStylesFromTokens,
         pullStyles,
     };

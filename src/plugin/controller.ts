@@ -5,6 +5,7 @@ import 'regenerator-runtime/runtime';
 import {removeSingleCredential, updateCredentials} from '@/utils/credentials';
 import {updateUISettings, getUISettings} from '@/utils/uiSettings';
 import getLastOpened from '@/utils/getLastOpened';
+import {UpdateMode} from 'Types/state';
 import {getUserId} from './helpers';
 import pullStyles from './pullStyles';
 import updateStyles from './updateStyles';
@@ -105,15 +106,19 @@ figma.ui.onmessage = async (msg) => {
             notifyRemoteComponents({nodes: store.successfulNodes.length, remotes: store.remoteComponents});
             return;
 
-        case MessageToPluginTypes.REMOVE_NODE_DATA:
+        case MessageToPluginTypes.REMOVE_NODE_DATA: {
             try {
-                removePluginData(figma.currentPage.selection, msg.key);
+                const selection = msg.nodes
+                    ? figma.currentPage.selection.filter((node) => msg.nodes.includes(node.id))
+                    : figma.currentPage.selection;
+                removePluginData({nodes: selection, key: msg.key});
                 sendPluginValues(figma.currentPage.selection);
             } catch (e) {
                 console.error(e);
             }
             notifyRemoteComponents({nodes: store.successfulNodes.length, remotes: store.remoteComponents});
             return;
+        }
         case MessageToPluginTypes.CREATE_STYLES:
             try {
                 updateStyles(msg.tokens, true, msg.settings);
@@ -144,6 +149,11 @@ figma.ui.onmessage = async (msg) => {
         case MessageToPluginTypes.RESIZE_WINDOW:
             figma.ui.resize(msg.width, msg.height);
             break;
+        case MessageToPluginTypes.REMOVE_PLUGIN_DATA: {
+            removePluginData({nodes: findAllWithData({updateMode: UpdateMode.SELECTION}), shouldRemoveValues: false});
+            sendPluginValues(figma.currentPage.selection);
+            break;
+        }
         case MessageToPluginTypes.SET_UI: {
             updateUISettings({
                 width: msg.uiWindow.width,

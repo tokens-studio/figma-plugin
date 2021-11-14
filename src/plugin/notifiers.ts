@@ -34,10 +34,9 @@ export function notifyNoSelection() {
     });
 }
 
-export function notifySelection(nodes = undefined, values = undefined) {
+export function notifySelection(values) {
     postToUI({
         type: MessageFromPluginTypes.SELECTION,
-        nodes,
         values,
     });
 }

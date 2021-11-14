@@ -8,6 +8,14 @@ export function fetchPluginData(node, value: string) {
     return node.getPluginData(value);
 }
 
+// {
+//     fill: colors.blue.500
+//     nodes: [1,2,3]
+// },
+// {
+//     fill: colors.blue.300
+//     nodes: [4,5,6]
+// }
 export function fetchAllPluginData(node) {
     const pluginData = [];
     let i = 0;
@@ -15,6 +23,7 @@ export function fetchAllPluginData(node) {
     while (i < len) {
         const prop = Object.keys(properties)[i];
         const data = fetchPluginData(node, prop);
+
         if (data) {
             switch (prop) {
                 // Pre-Version 53 had horizontalPadding and verticalPadding.
@@ -42,6 +51,48 @@ export function fetchAllPluginData(node) {
         return Object.fromEntries(pluginData);
     }
     return null;
+}
+
+export function fetchSelectionPluginData(nodes) {
+    const pluginData = nodes.map((node) => {
+        return {node: node.id, values: fetchAllPluginData(node)};
+    });
+
+    // turn this
+
+    // [
+    //     {node: 1, values: {fill: 'colors.blue.500'}},
+    //     {node: 2, values: {fill: 'colors.blue.500'}},
+    //     {node: 3, values: {fill: 'colors.red.500'}},
+    // ]
+
+    // into this
+
+    // [
+    //     { fill: 'colors.blue.500', nodes: [1, 2, 3] },
+    //     { fill: 'colors.red.500', nodes: [1, 2, 3] },
+    // ]
+
+    const grouped = pluginData.reduce((acc, curr) => {
+        const {node, values} = curr;
+
+        if (values) {
+            Object.entries(values).forEach(([key, value]) => {
+                const existing = acc.find((item) => item[key] === value);
+
+                if (existing) {
+                    existing.nodes.push(node);
+                } else {
+                    acc.push({[key]: value, type: key, nodes: [node]});
+                }
+            });
+        }
+
+        return acc;
+    }, []);
+
+    console.log('grouped', grouped);
+    return grouped;
 }
 
 function findPluginDataTraversal(node) {
@@ -84,32 +135,42 @@ export function findAllWithData({updateMode}: {updateMode: UpdateMode}) {
 export function sendPluginValues(nodes, values?) {
     let pluginValues = values;
 
-    if (nodes.length > 1) {
-        notifySelection(nodes[0].id);
-    } else {
-        if (!pluginValues) {
-            pluginValues = fetchAllPluginData(nodes[0]);
-        }
-        notifySelection(nodes[0].id, pluginValues);
+    if (!pluginValues) {
+        pluginValues = fetchSelectionPluginData(nodes);
     }
+    console.log('pluginValues', nodes, pluginValues);
+
+    notifySelection(pluginValues);
 }
 
-export function removePluginData(nodes, key?) {
-    nodes.map((node) => {
+export function removePluginData({
+    nodes,
+    key,
+    shouldRemoveValues = true,
+}: {
+    nodes: any[];
+    key?: string;
+    shouldRemoveValues?: boolean;
+}) {
+    console.log('removePluginData', nodes, key, shouldRemoveValues);
+
+    nodes.forEach((node) => {
         try {
             node.setRelaunchData({});
         } finally {
             if (key) {
                 node.setPluginData(key, '');
                 node.setSharedPluginData('tokens', key, '');
-                // TODO: Introduce setting asking user if values should be removed?
-                removeValuesFromNode(node, key);
+                if (shouldRemoveValues) {
+                    removeValuesFromNode(node, key);
+                }
             } else {
                 Object.keys(properties).forEach((prop) => {
                     node.setPluginData(prop, '');
                     node.setSharedPluginData('tokens', prop, '');
-                    // TODO: Introduce setting asking user if values should be removed?
-                    removeValuesFromNode(node, prop);
+                    if (shouldRemoveValues) {
+                        removeValuesFromNode(node, prop);
+                    }
                 });
             }
             node.setPluginData('values', '');
@@ -127,7 +188,7 @@ export function updatePluginData(nodes, values) {
             switch (value) {
                 case 'delete':
                     delete newValuesOnNode[key];
-                    removePluginData([node], key);
+                    removePluginData({nodes: [node], key});
                     break;
                 // Pre-Version 53 had horizontalPadding and verticalPadding.
                 case 'horizontalPadding':

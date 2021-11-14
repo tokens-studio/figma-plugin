@@ -26,4 +26,5 @@ export enum MessageToPluginTypes {
     NOTIFY = 'notify',
     SET_UI = 'set_ui',
     RESIZE_WINDOW = 'resize_window',
+    REMOVE_PLUGIN_DATA = 'remove_plugin_data',
 }
