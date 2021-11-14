@@ -161,7 +161,7 @@ const TokenButton = ({
         const tokenValue = name;
         track('Apply Token', {givenProperties});
         let value = isActive ? 'delete' : tokenValue;
-        if (propsToSet[0].clear && !active) {
+        if (propsToSet[0].clear && !isActive) {
             value = 'delete';
             propsToSet[0].forcedValue = tokenValue;
         }

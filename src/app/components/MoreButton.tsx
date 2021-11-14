@@ -57,7 +57,7 @@ const MoreButton = ({properties, children, path, value, onClick, onEdit, onDelet
                 <ContextMenuTrigger as="div" id={`${path}-${value}`}>
                     {children}
                 </ContextMenuTrigger>
-                <ContextMenuContent sideOffset={5} align="end" collisionTolerance={30}>
+                <ContextMenuContent sideOffset={5} collisionTolerance={30}>
                     {visibleProperties.map((property) => {
                         const isActive = selectionValues[property.name] === value;
 
@@ -86,12 +86,16 @@ const MoreButton = ({properties, children, path, value, onClick, onEdit, onDelet
                                 const isActive = selectionValues[property.name] === value;
 
                                 return (
-                                    <ContextMenuItem key={property.label} onSelect={() => onClick(property, isActive)}>
-                                        <div className="flex items-center">
-                                            {isActive && <CheckIcon />}
-                                            {property.label}
-                                        </div>
-                                    </ContextMenuItem>
+                                    <ContextMenuCheckboxItem
+                                        key={property.label}
+                                        checked={isActive}
+                                        onCheckedChange={() => onClick(property, isActive)}
+                                    >
+                                        <ContextMenuItemIndicator>
+                                            <CheckIcon />
+                                        </ContextMenuItemIndicator>
+                                        {property.label}
+                                    </ContextMenuCheckboxItem>
                                 );
                             })}
                         </ContextMenuContent>
