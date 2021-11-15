@@ -3,6 +3,8 @@ import {convertLetterSpacingToFigma} from './figmaTransforms/letterSpacing';
 import {convertLineHeightToFigma} from './figmaTransforms/lineHeight';
 import convertOpacityToFigma from './figmaTransforms/opacity';
 import {convertBoxShadowTypeToFigma} from './figmaTransforms/boxShadow';
+import {convertTextCaseToFigma} from './figmaTransforms/textCase';
+import {convertTextDecorationToFigma} from './figmaTransforms/textDecoration';
 
 export function isObject(item) {
     return item && typeof item === 'object' && !Array.isArray(item);
@@ -84,7 +86,10 @@ export function transformValue(value, type) {
             return convertOpacityToFigma(value.toString());
         case 'boxShadowType':
             return convertBoxShadowTypeToFigma(value);
-
+        case 'textCase':
+            return convertTextCaseToFigma(value.toString());
+        case 'textDecoration':
+            return convertTextDecorationToFigma(value.toString());
         default:
             return value;
     }

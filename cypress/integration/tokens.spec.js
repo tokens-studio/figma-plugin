@@ -159,4 +159,26 @@ describe('TokenListing', () => {
         cy.get('@postMessage').should('be.calledTwice');
         receiveRemoteComponents();
     });
+
+    it('token listing stays collapsed after creating a new token', () => {
+        cy.receiveTokenValues({
+            version: '5',
+            values: {
+                options: [
+                    {
+                        name: 'sizing.xs',
+                        value: 4,
+                    },
+                ],
+            },
+        });
+        cy.receiveStorageTypeLocal();
+        cy.get('[data-cy=tokenlisting-header-sizing]').click({timeout: 1000});
+        cy.get('[data-cy=tokenlisting-opacity] [data-cy=button-add-new-token]').click({timeout: 1000});
+        fillTokenForm({
+            name: 'sizing.sm',
+            value: '4',
+        });
+        cy.get('[data-cy=tokenlisting-sizing-content]').should('have.class', 'hidden');
+    });
 });

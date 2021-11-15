@@ -1,17 +1,19 @@
 /* eslint-disable no-param-reassign */
 import {figmaRGBToHex} from '@figma-plugin/helpers';
 import {NewTokenObject, PullStyleTypes, SingleTokenObject} from 'Types/tokens';
-import {ColorToken, ShadowTokenSingleValue} from '../../types/propertyTypes';
+import {ColorToken, TypographyToken, ShadowTokenSingleValue} from 'Types/propertyTypes';
 import {slugify} from '../app/components/utils';
 import {convertBoxShadowTypeFromFigma} from './figmaTransforms/boxShadow';
 import {convertFigmaGradientToString} from './figmaTransforms/gradients';
 import {convertFigmaToLetterSpacing} from './figmaTransforms/letterSpacing';
 import {convertFigmaToLineHeight} from './figmaTransforms/lineHeight';
+import {convertFigmaToTextCase} from './figmaTransforms/textCase';
+import {convertFigmaToTextDecoration} from './figmaTransforms/textDecoration';
 import {notifyStyleValues} from './notifiers';
 
 export default function pullStyles(styleTypes: PullStyleTypes): void {
-    let colors: NewTokenObject[] = [];
-    let typography: NewTokenObject[] = [];
+    let colors: ColorToken[] = [];
+    let typography: TypographyToken[] = [];
     let effects: ShadowTokenSingleValue[] = [];
     let fontFamilies: NewTokenObject[] = [];
     let lineHeights: NewTokenObject[] = [];
@@ -19,6 +21,8 @@ export default function pullStyles(styleTypes: PullStyleTypes): void {
     let fontSizes: NewTokenObject[] = [];
     let letterSpacing: NewTokenObject[] = [];
     let paragraphSpacing: NewTokenObject[] = [];
+    let textCase: NewTokenObject[] = [];
+    let textDecoration: NewTokenObject[] = [];
     if (styleTypes.colorStyles) {
         colors = figma
             .getLocalPaintStyles()
@@ -60,14 +64,19 @@ export default function pullStyles(styleTypes: PullStyleTypes): void {
         const rawLineHeights = [];
         const rawParagraphSpacing = [];
         const rawLetterSpacing = [];
+        const rawTextCase = [];
+        const rawTextDecoration = [];
 
         const figmaTextStyles = figma.getLocalTextStyles();
+
         figmaTextStyles.map((style) => {
             if (!rawFontSizes.includes(style.fontSize)) rawFontSizes.push(style.fontSize);
             fontCombinations.push(style.fontName);
             rawLineHeights.push(style.lineHeight);
             if (!rawParagraphSpacing.includes(style.paragraphSpacing)) rawParagraphSpacing.push(style.paragraphSpacing);
             rawLetterSpacing.push(style.letterSpacing);
+            if (!rawTextCase.includes(style.textCase)) rawTextCase.push(style.textCase);
+            if (!rawTextDecoration.includes(style.textDecoration)) rawTextDecoration.push(style.textDecoration);
         });
 
         fontSizes = rawFontSizes
@@ -77,6 +86,7 @@ export default function pullStyles(styleTypes: PullStyleTypes): void {
                 value: size.toString(),
                 type: 'fontSizes',
             }));
+
         const uniqueFontCombinations = fontCombinations.filter(
             (v, i, a) => a.findIndex((t) => t.family === v.family && t.style === v.style) === i
         );
@@ -116,6 +126,18 @@ export default function pullStyles(styleTypes: PullStyleTypes): void {
                 type: 'letterSpacing',
             }));
 
+        textCase = rawTextCase.map((value) => ({
+            name: `textCase.${convertFigmaToTextCase(value)}`,
+            value: convertFigmaToTextCase(value),
+            type: 'textCase',
+        }));
+
+        textDecoration = rawTextDecoration.map((value) => ({
+            name: `textDecoration.${convertFigmaToTextDecoration(value)}`,
+            value: convertFigmaToTextDecoration(value),
+            type: 'textDecoration',
+        }));
+
         typography = figmaTextStyles.map((style) => {
             const foundFamily = fontFamilies.find((el: SingleTokenObject) => el.value === style.fontName.family);
             const foundFontWeight = fontWeights.find(
@@ -132,6 +154,12 @@ export default function pullStyles(styleTypes: PullStyleTypes): void {
             const foundParagraphSpacing = paragraphSpacing.find(
                 (el: SingleTokenObject) => el.value === style.paragraphSpacing.toString()
             );
+            const foundTextCase = textCase.find(
+                (el: SingleTokenObject) => el.value === convertFigmaToTextCase(style.textCase.toString())
+            );
+            const foundTextDecoration = textDecoration.find(
+                (el: SingleTokenObject) => el.value === convertFigmaToTextDecoration(style.textDecoration.toString())
+            );
 
             const obj = {
                 fontFamily: `$${foundFamily?.name}`,
@@ -140,6 +168,8 @@ export default function pullStyles(styleTypes: PullStyleTypes): void {
                 fontSize: `$${foundFontSize?.name}`,
                 letterSpacing: `$${foundLetterSpacing?.name}`,
                 paragraphSpacing: `$${foundParagraphSpacing?.name}`,
+                textCase: `$${foundTextCase?.name}`,
+                textDecoration: `$${foundTextDecoration?.name}`,
             };
 
             const normalizedName = style.name
@@ -147,7 +177,7 @@ export default function pullStyles(styleTypes: PullStyleTypes): void {
                 .map((section) => section.trim())
                 .join('.');
 
-            const styleObject = {name: normalizedName, value: obj, type: 'typography'};
+            const styleObject: TypographyToken = {name: normalizedName, value: obj, type: 'typography'};
 
             if (style.description) {
                 styleObject.description = style.description;
@@ -207,5 +237,7 @@ export default function pullStyles(styleTypes: PullStyleTypes): void {
         letterSpacing,
         paragraphSpacing,
         typography,
+        textCase,
+        textDecoration,
     });
 }

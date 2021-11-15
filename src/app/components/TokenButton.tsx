@@ -137,7 +137,7 @@ const TokenButton = ({
 
             style = {
                 '--backgroundColor': displayValue,
-                '--borderColor': lightOrDark(displayValue) === 'light' ? '#f5f5f5' : 'white',
+                '--borderColor': lightOrDark(displayValue) === 'light' ? '#e7e7e7' : 'white',
             };
             buttonClass.push('button-property-color');
             if (uiState.displayType === 'LIST') {
@@ -149,7 +149,30 @@ const TokenButton = ({
             break;
     }
 
-    const active = useGetActiveState(properties, type, name);
+    const documentationProperties = [
+        {
+            label: 'Name',
+            name: 'tokenName',
+            clear: ['tokenValue', 'value', 'description'],
+        },
+        {
+            label: 'Raw value',
+            name: 'tokenValue',
+            clear: ['tokenName', 'value', 'description'],
+        },
+        {
+            label: 'Value',
+            name: 'value',
+            clear: ['tokenName', 'tokenValue', 'description'],
+        },
+        {
+            label: 'Description',
+            name: 'description',
+            clear: ['tokenName', 'tokenValue', 'value'],
+        },
+    ];
+
+    const active = useGetActiveState([...properties, ...documentationProperties], type, name);
 
     if (active) {
         buttonClass.push('button-active');
@@ -161,7 +184,7 @@ const TokenButton = ({
         const tokenValue = name;
         track('Apply Token', {givenProperties});
         let value = isActive ? 'delete' : tokenValue;
-        if (propsToSet[0].clear && !active) {
+        if (propsToSet[0].clear && !isActive) {
             value = 'delete';
             propsToSet[0].forcedValue = tokenValue;
         }
@@ -181,6 +204,7 @@ const TokenButton = ({
         >
             <MoreButton
                 properties={properties}
+                documentationProperties={documentationProperties}
                 onClick={onClick}
                 onDelete={handleDeleteClick}
                 onDuplicate={handleDuplicateClick}

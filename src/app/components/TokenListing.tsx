@@ -61,10 +61,8 @@ const TokenListing = ({
     };
 
     React.useEffect(() => {
-        if (values) {
-            setIntCollapsed(collapsed);
-        }
-    }, [collapsed, values]);
+        setIntCollapsed(collapsed);
+    }, [collapsed]);
 
     const handleSetIntCollapsed = (e) => {
         e.stopPropagation();
@@ -84,10 +82,11 @@ const TokenListing = ({
                     className={`flex items-center w-full h-full p-4 space-x-2 hover:bg-gray-100 focus:outline-none ${
                         isIntCollapsed ? 'opacity-50' : null
                     }`}
+                    data-cy={`tokenlisting-header-${tokenKey}`}
                     type="button"
                     onClick={handleSetIntCollapsed}
                 >
-                    <Tooltip label="Alt + Click to collapse all">
+                    <Tooltip label={`Alt + Click to ${collapsed ? 'expand' : 'collapse'} all`}>
                         <div className="p-2 -m-2">
                             {isIntCollapsed ? (
                                 <svg width="6" height="6" viewBox="0 0 6 6" xmlns="http://www.w3.org/2000/svg">
@@ -133,7 +132,10 @@ const TokenListing = ({
                 </div>
             </div>
             {values && (
-                <div className={`px-4 pb-4 ${isIntCollapsed ? 'hidden' : null}`}>
+                <div
+                    className={`px-4 pb-4 ${isIntCollapsed ? 'hidden' : null}`}
+                    data-cy={`tokenlisting-${tokenKey}-content`}
+                >
                     <TokenTree
                         tokenValues={values}
                         showNewForm={showNewForm}

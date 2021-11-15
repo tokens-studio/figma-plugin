@@ -1,7 +1,7 @@
 /* eslint-disable default-case */
 import {fetchAllPluginData} from './pluginData';
 import store from './store';
-import setValuesOnNode from './updateNode';
+import setValuesOnNode from './setValuesOnNode';
 import {TokenProps} from '../../types/tokens';
 import {ContextObject, StorageProviderType, StorageType} from '../../types/api';
 import {isSingleToken} from '../app/components/utils';
