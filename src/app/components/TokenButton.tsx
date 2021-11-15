@@ -149,7 +149,30 @@ const TokenButton = ({
             break;
     }
 
-    const active = useGetActiveState(properties, type, name);
+    const documentationProperties = [
+        {
+            label: 'Name',
+            name: 'tokenName',
+            clear: ['tokenValue', 'value', 'description'],
+        },
+        {
+            label: 'Raw value',
+            name: 'tokenValue',
+            clear: ['tokenName', 'value', 'description'],
+        },
+        {
+            label: 'Value',
+            name: 'value',
+            clear: ['tokenName', 'tokenValue', 'description'],
+        },
+        {
+            label: 'Description',
+            name: 'description',
+            clear: ['tokenName', 'tokenValue', 'value'],
+        },
+    ];
+
+    const active = useGetActiveState([...properties, ...documentationProperties], type, name);
 
     if (active) {
         buttonClass.push('button-active');
@@ -181,6 +204,7 @@ const TokenButton = ({
         >
             <MoreButton
                 properties={properties}
+                documentationProperties={documentationProperties}
                 onClick={onClick}
                 onDelete={handleDeleteClick}
                 onDuplicate={handleDuplicateClick}
