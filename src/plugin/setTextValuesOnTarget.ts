@@ -1,14 +1,24 @@
+/* eslint-disable no-param-reassign */
 import {transformValue} from './helpers';
 
 export default async function setTextValuesOnTarget(target, token) {
     try {
         const {value, description} = token;
-        const {fontFamily, fontWeight, fontSize, lineHeight, letterSpacing, paragraphSpacing} = value.value || value;
+        const {
+            fontFamily,
+            fontWeight,
+            fontSize,
+            lineHeight,
+            letterSpacing,
+            paragraphSpacing,
+            textCase,
+            textDecoration,
+        } = value.value || value;
         const family = fontFamily || target.fontName.family;
         const style = fontWeight || target.fontName.style;
         await figma.loadFontAsync({family, style});
 
-        if (fontFamily && fontWeight) {
+        if (fontFamily || fontWeight) {
             target.fontName = {
                 family,
                 style,
@@ -26,6 +36,12 @@ export default async function setTextValuesOnTarget(target, token) {
         }
         if (paragraphSpacing) {
             target.paragraphSpacing = transformValue(paragraphSpacing, 'paragraphSpacing');
+        }
+        if (textCase) {
+            target.textCase = transformValue(textCase, 'textCase');
+        }
+        if (textDecoration) {
+            target.textDecoration = transformValue(textDecoration, 'textDecoration');
         }
         if (description) {
             target.description = description;

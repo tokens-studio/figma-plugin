@@ -93,7 +93,8 @@ export default async function setValuesOnNode(node, values, data, ignoreFirstPar
             if (node.type === 'TEXT') {
                 const styles = figma.getLocalTextStyles();
                 const path = data.typography.split('.'); // extract to helper fn
-                const pathname = path.slice(1, path.length).join('/');
+                const pathname = path.slice(ignoreFirstPartForStyles ? 1 : 0, path.length).join('/');
+
                 const matchingStyles = styles.filter((n) => n.name === pathname);
 
                 if (matchingStyles.length) {
@@ -108,7 +109,9 @@ export default async function setValuesOnNode(node, values, data, ignoreFirstPar
             values.lineHeights ||
             values.fontSizes ||
             values.letterSpacing ||
-            values.paragraphSpacing
+            values.paragraphSpacing ||
+            values.textCase ||
+            values.textDecoration
         ) {
             if (node.type === 'TEXT') {
                 setTextValuesOnTarget(node, {
@@ -119,6 +122,8 @@ export default async function setValuesOnNode(node, values, data, ignoreFirstPar
                         fontSize: values.fontSizes,
                         letterSpacing: values.letterSpacing,
                         paragraphSpacing: values.paragraphSpacing,
+                        textCase: values.textCase,
+                        textDecoration: values.textDecoration,
                     },
                 });
             }

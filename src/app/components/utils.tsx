@@ -1,8 +1,8 @@
 import {Parser} from 'expr-eval';
 import convertOpacityToFigma from '@/plugin/figmaTransforms/opacity';
+import {parseToRgba, readableColorIsBlack, toHex} from 'color2k';
 import {postToFigma} from '../../plugin/notifiers';
 import {MessageToPluginTypes} from '../../../types/messages';
-import {hexToRgb, RGBAToHexA} from '../../plugin/figmaTransforms/colors';
 
 const parser = new Parser();
 
@@ -38,28 +38,35 @@ export function convertToRgb(color: string) {
             return color;
         }
         const hexRegex = /#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})/g;
+        const hslaRegex = /(hsla?\(.*?\))/g;
         const rgbaRegex = /(rgba?\(.*?\))/g;
         let returnedColor = color;
 
         try {
-            const matchesRgba = Array.from(color.matchAll(rgbaRegex), (m) => m[0]);
+            const matchesRgba = Array.from(returnedColor.matchAll(rgbaRegex), (m) => m[0]);
+            const matchesHsla = Array.from(returnedColor.matchAll(hslaRegex), (m) => m[0]);
+            if (matchesHsla.length > 0) {
+                matchesHsla.map((match) => {
+                    returnedColor = returnedColor.replace(match, toHex(match));
+                });
+            }
             if (matchesRgba.length > 0) {
                 matchesRgba.map((match) => {
                     const matchedString = match;
                     const matchedColor = match.replace(/rgba?\(/g, '').replace(')', '');
-                    const matchesHex = matchedColor.match(hexRegex);
+                    const matchesHexInsideRgba = matchedColor.match(hexRegex);
                     let r;
                     let g;
                     let b;
                     let alpha = '1';
-                    if (matchesHex) {
-                        ({r, g, b} = hexToRgb(matchesHex[0]));
+                    if (matchesHexInsideRgba) {
+                        [r, g, b] = parseToRgba(matchesHexInsideRgba[0]);
                         alpha = matchedColor.split(',').pop().trim();
                     } else {
                         [r, g, b, alpha = '1'] = matchedColor.split(',').map((n) => n.trim());
                     }
                     const a = convertOpacityToFigma(alpha);
-                    returnedColor = returnedColor.split(matchedString).join(RGBAToHexA(r, g, b, a));
+                    returnedColor = returnedColor.split(matchedString).join(toHex(`rgba(${r}, ${g}, ${b}, ${a})`));
                 });
             }
         } catch (e) {
@@ -77,36 +84,10 @@ export function lightOrDark(color: string) {
         return 'light';
     }
     try {
-        let r: number | string;
-        let g: number | string;
-        let b: number | string;
-
-        // Check the format of the color, HEX or RGB?
-        if (color.match(/^rgb/)) {
-            // If RGB --> store the red, green, blue values in separate variables
-            [, r, g, b] = color.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d+(?:\.\d+)?))?\)$/);
-        } else {
-            // If hex --> Convert it to RGB: http://gist.github.com/983661
-            const baseColor = color.slice(0, 7);
-            const extractedColor = +`0x${baseColor.slice(1).replace(baseColor.length < 5 && /./g, '$&$&')}`;
-
-            r = extractedColor >> 16;
-            g = (extractedColor >> 8) & 255;
-            b = extractedColor & 255;
-        }
-        // HSP (Highly Sensitive Poo) equation from http://alienryderflex.com/hsp.html
-        const hsp = Math.sqrt(
-            0.299 * (Number(r) * Number(r)) + 0.587 * (Number(g) * Number(g)) + 0.114 * (Number(b) * Number(b))
-        );
-
-        // Using the HSP value, determine whether the color is light or dark
-        if (hsp < 245.5) {
-            return 'dark';
-        }
+        return readableColorIsBlack(color) ? 'light' : 'dark';
     } catch (e) {
-        console.error(color, e);
+        return 'light';
     }
-    return 'light';
 }
 
 // Converts string to slug
