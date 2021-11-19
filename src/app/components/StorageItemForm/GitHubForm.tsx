@@ -42,6 +42,15 @@ export default function GitHubForm({handleChange, handleSubmit, handleCancel, va
                 name="filePath"
                 required
             />
+            <Input
+                full
+                label="baseUrl (optional)"
+                value={values.baseUrl}
+                placeholder="https://github.acme-inc.com/api/v3"
+                onChange={handleChange}
+                type="text"
+                name="baseUrl"
+            />
             <div className="space-x-4">
                 <Button variant="secondary" size="large" onClick={handleCancel}>
                     Cancel

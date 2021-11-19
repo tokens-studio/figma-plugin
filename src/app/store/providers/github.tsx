@@ -22,7 +22,7 @@ function hasSameContent(content, storedContent) {
 }
 
 export const fetchBranches = async ({context, owner, repo}) => {
-    const octokit = new Octokit({auth: context.secret});
+    const octokit = new Octokit({auth: context.secret, baseUrl: context.baseUrl});
     const branches = await octokit.repos.listBranches({owner, repo}).then((response) => response.data);
     return branches.map((branch) => branch.name);
 };
@@ -44,7 +44,7 @@ export const checkPermissions = async ({context, owner, repo}) => {
 };
 
 export const readContents = async ({context, owner, repo}) => {
-    const octokit = new Octokit({auth: context.secret});
+    const octokit = new Octokit({auth: context.secret, baseUrl: context.baseUrl});
     let response;
 
     try {
@@ -76,7 +76,7 @@ export const readContents = async ({context, owner, repo}) => {
 
 const commitToNewBranch = async ({context, tokenObj, owner, repo, commitMessage, branch}) => {
     const OctokitWithPlugin = Octokit.plugin(require('octokit-commit-multiple-files'));
-    const octokit = new OctokitWithPlugin({auth: context.secret});
+    const octokit = new OctokitWithPlugin({auth: context.secret, baseUrl: context.baseUrl});
 
     return octokit.repos.createOrUpdateFiles({
         owner,
@@ -89,7 +89,7 @@ const commitToNewBranch = async ({context, tokenObj, owner, repo, commitMessage,
 
 const commitToExistingBranch = async ({context, tokenObj, owner, repo, commitMessage, branch}) => {
     const OctokitWithPlugin = Octokit.plugin(require('octokit-commit-multiple-files'));
-    const octokit = new OctokitWithPlugin({auth: context.secret});
+    const octokit = new OctokitWithPlugin({auth: context.secret, baseUrl: context.baseUrl});
     return octokit.repos.createOrUpdateFiles({
         owner,
         repo,
@@ -171,11 +171,22 @@ export function useGitHub() {
         const pushSettings = await pushDialog();
         if (pushSettings) {
             const {commitMessage, customBranch} = pushSettings;
-            await writeTokensToGitHub({context, tokenObj, owner, repo, commitMessage, customBranch});
-            dispatch.uiState.setLocalApiState({...localApiState, branch: customBranch});
-            dispatch.uiState.setApiData({...context, branch: customBranch});
+            try {
+                await writeTokensToGitHub({
+                    context,
+                    tokenObj,
+                    owner,
+                    repo,
+                    commitMessage,
+                    customBranch,
+                });
+                dispatch.uiState.setLocalApiState({...localApiState, branch: customBranch});
+                dispatch.uiState.setApiData({...context, branch: customBranch});
 
-            pushDialog('success');
+                pushDialog('success');
+            } catch (e) {
+                console.log('Error pushing to GitHub', e);
+            }
         }
         return rawTokenObj;
     }
@@ -210,8 +221,12 @@ export function useGitHub() {
             const hasBranches = await fetchBranches({context, owner, repo});
 
             if (!hasBranches) {
+                console.log('Theres no branches');
+
                 return null;
             }
+            console.log('Theres branches', hasBranches);
+
             const content = await readContents({context, owner, repo});
             const {string: tokenObj} = getTokenObj();
 
@@ -250,6 +265,8 @@ export function useGitHub() {
                 } else {
                     notifyToUI('No tokens stored on remote');
                 }
+            } else {
+                return null;
             }
 
             return {

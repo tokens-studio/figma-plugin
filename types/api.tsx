@@ -25,4 +25,5 @@ export interface ContextObject extends ApiDataType {
     branch?: string;
     filePath?: string;
     tokens: string;
+    baseUrl?: string;
 }
