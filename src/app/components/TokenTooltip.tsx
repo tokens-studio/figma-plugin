@@ -1,5 +1,6 @@
 import getAliasValue from '@/utils/aliases';
 import React from 'react';
+import Box from './Box';
 
 // Returns token value in display format
 export default function TokenTooltip({token, resolvedTokens, shouldResolve = false}) {
@@ -25,6 +26,31 @@ export default function TokenTooltip({token, resolvedTokens, shouldResolve = fal
                     </div>
                     <div>Text Case: {valueToCheck.textCase?.value || valueToCheck.textCase}</div>
                     <div>Text Decoration: {valueToCheck.textDecoration?.value || valueToCheck.textDecoration}</div>
+                </div>
+            );
+        }
+
+        if (token.type === 'boxShadow') {
+            return Array.isArray(valueToCheck) ? (
+                <div>
+                    <div>
+                        {valueToCheck.map((t) => (
+                            <Box css={{marginBottom: '$2'}}>
+                                <Box css={{color: '$contextMenuForegroundMuted'}}>{t.type}</Box>
+                                <Box>
+                                    {t.x} {t.y} {t.blur} {t.spread} {t.color}
+                                </Box>
+                            </Box>
+                        ))}
+                    </div>
+                </div>
+            ) : (
+                <div>
+                    <div>Type: {valueToCheck.type?.value || valueToCheck.type}</div>
+                    <div>X: {valueToCheck.x?.value || valueToCheck.x}</div>
+                    <div>Y: {valueToCheck.y?.value || valueToCheck.y}</div>
+                    <div>Blur: {valueToCheck.blur?.value || valueToCheck.blur}</div>
+                    <div>Spread: {valueToCheck.spread?.value || valueToCheck.spread}</div>
                 </div>
             );
         }

@@ -3,6 +3,7 @@ import {track} from '@/utils/analytics';
 import fetchChangelog from '@/utils/storyblok';
 import {createModel} from '@rematch/core';
 import {StorageType, StorageProviderType, ApiDataType} from '@types/api';
+import {ShadowTokenSingleValue, TypographyObject} from 'Types/propertyTypes';
 import {SelectionValue, TokenType} from 'Types/tokens';
 
 import {RootModel} from '.';
@@ -11,8 +12,7 @@ type TabNames = 'start' | 'tokens' | 'json' | 'inspector' | 'syncsettings' | 'se
 
 type DisplayType = 'GRID' | 'LIST';
 
-interface EditToken {
-    value: string | object;
+interface EditTokenObjectCommonProperties {
     name: string;
     initialName: string;
     path: string;
@@ -24,6 +24,20 @@ interface EditToken {
     options: object;
     type: TokenType;
 }
+
+export type EditTokenObject =
+    | (EditTokenObjectCommonProperties & {
+          type: 'boxShadow';
+          value: ShadowTokenSingleValue[] | ShadowTokenSingleValue;
+      })
+    | (EditTokenObjectCommonProperties & {
+          type: 'typography';
+          value: TypographyObject;
+      })
+    | (EditTokenObjectCommonProperties & {
+          type: TokenType;
+          value: string | number;
+      });
 
 interface UIState {
     selectionValues: SelectionValue;
