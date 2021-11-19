@@ -1,7 +1,7 @@
 /* eslint-disable no-param-reassign */
 import {figmaRGBToHex} from '@figma-plugin/helpers';
 import {NewTokenObject, PullStyleTypes, SingleTokenObject} from 'Types/tokens';
-import {ColorToken, TypographyToken, ShadowTokenSingleValue} from 'Types/propertyTypes';
+import {ColorToken, ShadowTokenSingleValue} from 'Types/propertyTypes';
 import {slugify} from '../app/components/utils';
 import {convertBoxShadowTypeFromFigma} from './figmaTransforms/boxShadow';
 import {convertFigmaGradientToString} from './figmaTransforms/gradients';
@@ -12,9 +12,9 @@ import {convertFigmaToTextDecoration} from './figmaTransforms/textDecoration';
 import {notifyStyleValues} from './notifiers';
 
 export default function pullStyles(styleTypes: PullStyleTypes): void {
-    let colors: ColorToken[] = [];
-    let typography: TypographyToken[] = [];
-    let effects: ShadowTokenSingleValue[] = [];
+    let colors: SingleTokenObject[] = [];
+    let typography: SingleTokenObject[] = [];
+    let effects: SingleTokenObject[] = [];
     let fontFamilies: NewTokenObject[] = [];
     let lineHeights: NewTokenObject[] = [];
     let fontWeights: NewTokenObject[] = [];
@@ -177,7 +177,7 @@ export default function pullStyles(styleTypes: PullStyleTypes): void {
                 .map((section) => section.trim())
                 .join('.');
 
-            const styleObject: TypographyToken = {name: normalizedName, value: obj, type: 'typography'};
+            const styleObject: SingleTokenObject = {name: normalizedName, value: obj, type: 'typography'};
 
             if (style.description) {
                 styleObject.description = style.description;
@@ -213,7 +213,7 @@ export default function pullStyles(styleTypes: PullStyleTypes): void {
                     .map((section) => section.trim())
                     .join('.');
 
-                const styleObject: ShadowToken = {
+                const styleObject: SingleTokenObject = {
                     value: shadows.length > 1 ? shadows : shadows[0],
                     type: 'boxShadow',
                     name: normalizedName,

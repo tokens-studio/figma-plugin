@@ -19,7 +19,7 @@ export type NewTokenObject = {
 
 type SingleTokenObjectCommonProperties = {
     name: string;
-    description: string;
+    description?: string;
 };
 
 export type SingleTokenObject =
