@@ -221,11 +221,8 @@ export function useGitHub() {
             const hasBranches = await fetchBranches({context, owner, repo});
 
             if (!hasBranches) {
-                console.log('Theres no branches');
-
                 return null;
             }
-            console.log('Theres branches', hasBranches);
 
             const content = await readContents({context, owner, repo});
             const {string: tokenObj} = getTokenObj();
