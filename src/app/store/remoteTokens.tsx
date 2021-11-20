@@ -1,6 +1,7 @@
 import {useDispatch, useSelector} from 'react-redux';
 import {StorageProviderType} from 'Types/api';
 import {MessageToPluginTypes} from 'Types/messages';
+import {track} from '@/utils/analytics';
 import {postToFigma} from '../../plugin/notifiers';
 import {useJSONbin} from './providers/jsonbin';
 import useURL from './providers/url';
@@ -42,6 +43,10 @@ export default function useRemoteTokens() {
         if (tokenValues) {
             dispatch.tokenState.setLastSyncedState(JSON.stringify(tokenValues.values, null, 2));
             dispatch.tokenState.setTokenData(tokenValues);
+            track('Launched with token sets', {
+                count: Object.keys(tokenValues.values).length,
+                setNames: Object.keys(tokenValues.values),
+            });
         }
 
         dispatch.uiState.setLoading(false);

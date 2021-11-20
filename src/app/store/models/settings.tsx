@@ -55,6 +55,9 @@ export const settings = createModel<RootModel>()({
             };
         },
         setUISettings(state, payload: SettingsState) {
+            // track ui setting to see usage
+            track('ignoreFirstPart', {isSet: payload.ignoreFirstPartForStyles});
+
             return {
                 ...state,
                 ...payload,
