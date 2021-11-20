@@ -28,7 +28,7 @@ export const fetchBranches = async ({context, owner, repo}) => {
 };
 
 export const checkPermissions = async ({context, owner, repo}) => {
-    const octokit = new Octokit({auth: context.secret});
+    const octokit = new Octokit({auth: context.secret, baseUrl: context.baseUrl});
 
     const currentUser = await octokit.rest.users.getAuthenticated();
 
