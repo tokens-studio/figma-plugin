@@ -14,7 +14,7 @@ export default function useRemoteTokens() {
 
     const {setStorageType} = useStorage();
     const {pullTokensFromJSONBin, addJSONBinCredentials, createNewJSONBin} = useJSONbin();
-    const {addNewGitHubCredentials, pullTokensFromGitHub, pushTokensToGitHub} = useGitHub();
+    const {addNewGitHubCredentials, syncTokensWithGitHub, pullTokensFromGitHub, pushTokensToGitHub} = useGitHub();
     const {pullTokensFromURL} = useURL();
 
     const pullTokens = async (context = api) => {
@@ -48,12 +48,18 @@ export default function useRemoteTokens() {
     };
 
     const restoreStoredProvider = async (context) => {
-        dispatch.tokenState.setEmptyTokens();
         dispatch.uiState.setLocalApiState(context);
         dispatch.uiState.setApiData(context);
         dispatch.tokenState.setEditProhibited(false);
-        setStorageType({provider: context, bool: true});
-        await pullTokens(context);
+        setStorageType({provider: context, shouldSetInDocument: true});
+        switch (context.provider) {
+            case StorageProviderType.GITHUB: {
+                await syncTokensWithGitHub(context);
+                break;
+            }
+            default:
+                await pullTokens(context);
+        }
         return null;
     };
 
@@ -96,7 +102,7 @@ export default function useRemoteTokens() {
         if (data) {
             dispatch.uiState.setLocalApiState(credentials);
             dispatch.uiState.setApiData(credentials);
-            setStorageType({provider: credentials, bool: true});
+            setStorageType({provider: credentials, shouldSetInDocument: true});
             return true;
         }
         return false;

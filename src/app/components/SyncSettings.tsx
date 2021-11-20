@@ -14,7 +14,7 @@ import useStorage from '../store/useStorage';
 import {Dispatch, RootState} from '../store';
 
 const SyncSettings = () => {
-    const {api, localApiState, apiProviders, storageType} = useSelector((state: RootState) => state.uiState);
+    const {localApiState, apiProviders, storageType} = useSelector((state: RootState) => state.uiState);
     const dispatch = useDispatch<Dispatch>();
 
     const {setStorageType} = useStorage();
@@ -92,7 +92,7 @@ const SyncSettings = () => {
                         dispatch.uiState.setLocalApiState({provider: StorageProviderType.LOCAL});
                         setStorageType({
                             provider: {provider: StorageProviderType.LOCAL},
-                            bool: true,
+                            shouldSetInDocument: true,
                         });
                         showConfirmModal(false);
                     }}
