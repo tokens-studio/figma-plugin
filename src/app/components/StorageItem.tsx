@@ -1,6 +1,7 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import * as React from 'react';
 import {useSelector} from 'react-redux';
+import isSameCredentials from '@/utils/isSameCredentials';
 import Button from './Button';
 import useRemoteTokens from '../store/remoteTokens';
 import {RootState} from '../store';
@@ -12,7 +13,7 @@ const StorageItem = ({item, onEdit = null}) => {
     const {restoreStoredProvider, deleteProvider} = useRemoteTokens();
 
     const isActive = () => {
-        return storageType.id === id && storageType.provider === provider;
+        return isSameCredentials(item, storageType);
     };
 
     return (

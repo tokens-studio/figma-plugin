@@ -2,6 +2,8 @@ export type StorageType = {
     provider: StorageProviderType;
     id?: string;
     name?: string;
+    filePath?: string;
+    branch?: string;
 };
 
 export type ApiDataType = {
@@ -20,10 +22,17 @@ export enum StorageProviderType {
 }
 
 export interface ContextObject extends ApiDataType {
-    secret: string;
-    id: string;
     branch?: string;
     filePath?: string;
-    tokens: string;
+    tokens?: string;
     baseUrl?: string;
+    internalId?: string;
+}
+
+export interface StoredCredentials {
+    id: string;
+    provider: StorageProviderType;
+    filePath?: string;
+    branch?: string;
+    name?: string;
 }

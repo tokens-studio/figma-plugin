@@ -1,10 +1,12 @@
+import isSameCredentials from '@/utils/isSameCredentials';
 import {MessageFromPluginTypes} from '../../types/messages';
 import {notifyTokenValues} from './notifiers';
 
 export default function compareProvidersWithStored(providers, storageType) {
     if (providers) {
         const parsedProviders = JSON.parse(providers);
-        const matchingSet = parsedProviders.find((i) => i.provider === storageType.provider && i.id === storageType.id);
+
+        const matchingSet = parsedProviders.find((i) => isSameCredentials(i, storageType));
         if (matchingSet) {
             // send a message to the UI with the credentials stored in the client
             figma.ui.postMessage({

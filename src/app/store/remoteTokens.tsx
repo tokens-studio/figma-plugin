@@ -116,8 +116,7 @@ export default function useRemoteTokens() {
     const deleteProvider = (provider) => {
         postToFigma({
             type: MessageToPluginTypes.REMOVE_SINGLE_CREDENTIAL,
-            id: provider.id,
-            secret: provider.secret,
+            context: provider,
         });
     };
 
