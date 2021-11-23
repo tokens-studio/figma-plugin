@@ -69,7 +69,9 @@ export type TokenType =
     | 'lineHeights'
     | 'fontSizes'
     | 'letterSpacing'
-    | 'paragraphSpacing';
+    | 'paragraphSpacing'
+    | 'textDecoration'
+    | 'textCase';
 
 export interface SelectionValue {
     values?: string;
@@ -108,7 +110,7 @@ export interface SelectionValue {
 }
 
 export type PullStyleTypes = {
-    textStyles: boolean;
-    colorStyles: boolean;
-    effectStyles: boolean;
+    textStyles?: boolean;
+    colorStyles?: boolean;
+    effectStyles?: boolean;
 };

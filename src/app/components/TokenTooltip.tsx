@@ -2,6 +2,17 @@ import getAliasValue from '@/utils/aliases';
 import React from 'react';
 import Box from './Box';
 
+const SingleShadow = ({shadow}) => {
+    return (
+        <Box css={{flexDirection: 'column', marginBottom: '$2'}}>
+            <Box css={{color: '$contextMenuForegroundMuted'}}>{shadow.type}</Box>
+            <Box>
+                {shadow.x} {shadow.y} {shadow.blur} {shadow.spread} {shadow.color}
+            </Box>
+        </Box>
+    );
+};
+
 // Returns token value in display format
 export default function TokenTooltip({token, resolvedTokens, shouldResolve = false}) {
     try {
@@ -33,25 +44,12 @@ export default function TokenTooltip({token, resolvedTokens, shouldResolve = fal
         if (token.type === 'boxShadow') {
             return Array.isArray(valueToCheck) ? (
                 <div>
-                    <div>
-                        {valueToCheck.map((t) => (
-                            <Box css={{marginBottom: '$2'}}>
-                                <Box css={{color: '$contextMenuForegroundMuted'}}>{t.type}</Box>
-                                <Box>
-                                    {t.x} {t.y} {t.blur} {t.spread} {t.color}
-                                </Box>
-                            </Box>
-                        ))}
-                    </div>
+                    {valueToCheck.map((t) => (
+                        <SingleShadow shadow={t} />
+                    ))}
                 </div>
             ) : (
-                <div>
-                    <div>Type: {valueToCheck.type?.value || valueToCheck.type}</div>
-                    <div>X: {valueToCheck.x?.value || valueToCheck.x}</div>
-                    <div>Y: {valueToCheck.y?.value || valueToCheck.y}</div>
-                    <div>Blur: {valueToCheck.blur?.value || valueToCheck.blur}</div>
-                    <div>Spread: {valueToCheck.spread?.value || valueToCheck.spread}</div>
-                </div>
+                <SingleShadow shadow={valueToCheck} />
             );
         }
         if (typeof valueToCheck !== 'string' && typeof valueToCheck !== 'number') {

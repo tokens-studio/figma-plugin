@@ -9,6 +9,7 @@ global.figma = {
     },
     getLocalPaintStyles: jest.fn(() => []),
     getLocalTextStyles: jest.fn(() => []),
+    getLocalEffectStyles: jest.fn(() => []),
     loadFontAsync: jest.fn(() => Promise.resolve()),
     createTextStyle: jest.fn(),
 };

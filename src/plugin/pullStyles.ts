@@ -1,6 +1,6 @@
 /* eslint-disable no-param-reassign */
 import {figmaRGBToHex} from '@figma-plugin/helpers';
-import {NewTokenObject, PullStyleTypes, SingleTokenObject} from 'Types/tokens';
+import {PullStyleTypes, SingleTokenObject} from 'Types/tokens';
 import {ColorToken, ShadowTokenSingleValue} from 'Types/propertyTypes';
 import {slugify} from '../app/components/utils';
 import {convertBoxShadowTypeFromFigma} from './figmaTransforms/boxShadow';
@@ -15,14 +15,14 @@ export default function pullStyles(styleTypes: PullStyleTypes): void {
     let colors: SingleTokenObject[] = [];
     let typography: SingleTokenObject[] = [];
     let effects: SingleTokenObject[] = [];
-    let fontFamilies: NewTokenObject[] = [];
-    let lineHeights: NewTokenObject[] = [];
-    let fontWeights: NewTokenObject[] = [];
-    let fontSizes: NewTokenObject[] = [];
-    let letterSpacing: NewTokenObject[] = [];
-    let paragraphSpacing: NewTokenObject[] = [];
-    let textCase: NewTokenObject[] = [];
-    let textDecoration: NewTokenObject[] = [];
+    let fontFamilies: SingleTokenObject[] = [];
+    let lineHeights: SingleTokenObject[] = [];
+    let fontWeights: SingleTokenObject[] = [];
+    let fontSizes: SingleTokenObject[] = [];
+    let letterSpacing: SingleTokenObject[] = [];
+    let paragraphSpacing: SingleTokenObject[] = [];
+    let textCase: SingleTokenObject[] = [];
+    let textDecoration: SingleTokenObject[] = [];
     if (styleTypes.colorStyles) {
         colors = figma
             .getLocalPaintStyles()
@@ -193,7 +193,7 @@ export default function pullStyles(styleTypes: PullStyleTypes): void {
             .filter((style) => style.effects.every((effect) => ['DROP_SHADOW', 'INNER_SHADOW'].includes(effect.type)))
             .map((style) => {
                 // convert paint to object containg x, y, spread, color
-                const shadows: ShadowTokenSingleValue[] = style.effects.map((effect: ShadowEffect) => {
+                const shadows: ShadowTokenSingleValue[] = style.effects.map((effect) => {
                     const effectObject: ShadowTokenSingleValue = {} as ShadowTokenSingleValue;
 
                     effectObject.color = figmaRGBToHex(effect.color);
@@ -227,7 +227,7 @@ export default function pullStyles(styleTypes: PullStyleTypes): void {
             .filter(Boolean);
     }
 
-    notifyStyleValues({
+    const stylesObject = {
         colors,
         effects,
         fontFamilies,
@@ -239,5 +239,14 @@ export default function pullStyles(styleTypes: PullStyleTypes): void {
         typography,
         textCase,
         textDecoration,
-    });
+    };
+
+    const returnedObject = Object.entries(stylesObject).reduce((acc, [key, value]) => {
+        if (value.length > 0) {
+            acc[key] = value;
+        }
+        return acc;
+    }, {});
+
+    notifyStyleValues(returnedObject);
 }

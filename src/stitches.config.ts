@@ -31,6 +31,7 @@ const globalTokens = {
 export const {styled, css, global: globalCSS, keyframes, getCssString, theme} = createCss({
     theme: {
         colors: {
+            bgDefault: globalTokens.colors.white,
             contextMenuBackground: globalTokens.colors.gray950,
             contextMenuForeground: globalTokens.colors.white,
             contextMenuForegroundMuted: globalTokens.colors.gray400,

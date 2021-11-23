@@ -61,11 +61,21 @@ interface UIState {
         show: boolean;
         text?: string;
         description?: string;
+        choices?: {key: string; label: string; enabled?: boolean}[];
+        confirmAction?: string;
     };
     showPushDialog: string | false;
     showEmptyGroups: boolean;
     collapsed: boolean;
 }
+
+const defaultConfirmState = {
+    show: false,
+    text: '',
+    description: '',
+    choices: null,
+    confirmAction: 'Yes',
+};
 
 export const uiState = createModel<RootModel>()({
     state: {
@@ -91,11 +101,7 @@ export const uiState = createModel<RootModel>()({
         showEditForm: false,
         tokenFilter: '',
         tokenFilterVisible: false,
-        confirmState: {
-            show: false,
-            text: '',
-            description: '',
-        },
+        confirmState: defaultConfirmState,
         showPushDialog: false,
         showEmptyGroups: true,
         collapsed: false,
@@ -107,24 +113,30 @@ export const uiState = createModel<RootModel>()({
                 showPushDialog: data,
             };
         },
-        setShowConfirm: (state, data: {text: string; description?: string}) => {
+        setShowConfirm: (
+            state,
+            data: {
+                text: string;
+                description?: string;
+                choices: {key: string; label: string; enabled?: boolean}[];
+                confirmAction?: string;
+            }
+        ) => {
             return {
                 ...state,
                 confirmState: {
                     show: true,
                     text: data.text,
                     description: data.description,
+                    choices: data.choices,
+                    confirmAction: data.confirmAction || defaultConfirmState.confirmAction,
                 },
             };
         },
         setHideConfirm: (state) => {
             return {
                 ...state,
-                confirmState: {
-                    show: false,
-                    text: '',
-                    description: '',
-                },
+                confirmState: defaultConfirmState,
             };
         },
         setDisabled: (state, data: boolean) => {
