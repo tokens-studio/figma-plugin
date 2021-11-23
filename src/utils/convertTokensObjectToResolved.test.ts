@@ -44,36 +44,42 @@ describe('convertTokensObjectToResolved', () => {
         };
 
         expect(convertTokensObjectToResolved(tokens)).toEqual({
-            colors: {
-                red: {
-                    value: '#ff0000',
-                    type: 'color',
-                },
-                blue: {
-                    value: '#0000ff',
-                    type: 'color',
-                },
-                primary: {
-                    value: '#ff0000',
-                    type: 'color',
+            theme: {
+                colors: {
+                    primary: {
+                        value: '#ff0000',
+                        type: 'color',
+                    },
                 },
             },
-            sizing: {
-                base: {
-                    value: 2,
-                    type: 'sizing',
+            options: {
+                colors: {
+                    red: {
+                        value: '#ff0000',
+                        type: 'color',
+                    },
+                    blue: {
+                        value: '#0000ff',
+                        type: 'color',
+                    },
                 },
-                scale: {
-                    value: 1.5,
-                    type: 'sizing',
-                },
-                small: {
-                    value: 2,
-                    type: 'sizing',
-                },
-                medium: {
-                    value: 3,
-                    type: 'sizing',
+                sizing: {
+                    base: {
+                        value: 2,
+                        type: 'sizing',
+                    },
+                    scale: {
+                        value: 1.5,
+                        type: 'sizing',
+                    },
+                    small: {
+                        value: 2,
+                        type: 'sizing',
+                    },
+                    medium: {
+                        value: 3,
+                        type: 'sizing',
+                    },
                 },
             },
         });
@@ -112,18 +118,24 @@ describe('convertTokensObjectToResolved', () => {
         };
 
         expect(convertTokensObjectToResolved(tokens, ['global', 'light'])).toEqual({
-            colors: {
-                white: {
-                    value: '#ffffff',
-                    type: 'color',
+            light: {
+                colors: {
+                    background: {
+                        value: '#ffffff',
+                        type: 'color',
+                    },
                 },
-                black: {
-                    value: '#000000',
-                    type: 'color',
-                },
-                background: {
-                    value: '#ffffff',
-                    type: 'color',
+            },
+            global: {
+                colors: {
+                    white: {
+                        value: '#ffffff',
+                        type: 'color',
+                    },
+                    black: {
+                        value: '#000000',
+                        type: 'color',
+                    },
                 },
             },
         });
