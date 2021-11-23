@@ -9,6 +9,7 @@ export default function convertTokensToGroupedObject(tokens, excludedSets) {
         }
         const obj = acc || {};
         const tokenWithType = appendTypeToToken(token);
+        const path = `${tokenWithType.internal__Parent}.${token.name}`;
         delete tokenWithType.name;
         delete tokenWithType.rawValue;
         delete tokenWithType.internal__Parent;
@@ -19,9 +20,9 @@ export default function convertTokensToGroupedObject(tokens, excludedSets) {
                 };
                 return acc;
             }, {});
-            set(obj, token.name, {...expandedTypography});
+            set(obj, path, {...expandedTypography});
         } else {
-            set(obj, token.name, tokenWithType);
+            set(obj, path, tokenWithType);
         }
         return acc;
     }, {});
