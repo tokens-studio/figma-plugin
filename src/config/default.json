@@ -692,6 +692,12 @@
                 "value": "{colors.indigo.400}",
                 "type": "color"
             }
+        },
+        "shadows": {
+            "default": {
+                "value": "{colors.gray.900}",
+                "type": "color"
+            }
         }
     },
     "dark": {
@@ -726,6 +732,12 @@
         "accent": {
             "default": {
                 "value": "{colors.indigo.600}",
+                "type": "color"
+            }
+        },
+        "shadows": {
+            "default": {
+                "value": "{colors.gray.100}",
                 "type": "color"
             }
         }
@@ -788,7 +800,7 @@
                         "x": 5,
                         "y": 5,
                         "spread": 3,
-                        "color": "rgba({fg.default}, 0.15)",
+                        "color": "rgba({shadows.default}, 0.15)",
                         "blur": 5,
                         "type": "dropShadow"
                     },

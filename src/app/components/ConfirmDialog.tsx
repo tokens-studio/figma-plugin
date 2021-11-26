@@ -1,42 +1,12 @@
 import React from 'react';
-import {CheckIcon} from '@radix-ui/react-icons';
-import * as CheckboxPrimitive from '@radix-ui/react-checkbox';
-import {styled} from '@/stitches.config';
 import useConfirm from '../hooks/useConfirm';
 import Button from './Button';
 import Heading from './Heading';
 import Modal from './Modal';
 import Box from './Box';
 import Text from './Text';
-
-const StyledCheckbox = styled(CheckboxPrimitive.Root, {
-    all: 'unset',
-    backgroundColor: '$bgDefault',
-    width: 25,
-    height: 25,
-    borderRadius: '$input',
-    border: '1px solid $border',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    '&:focus': {boxShadow: `0 0 0 2px black`},
-});
-
-const StyledIndicator = styled(CheckboxPrimitive.Indicator, {
-    color: '$interaction',
-});
-
-// Exports
-const Checkbox = StyledCheckbox;
-const CheckboxIndicator = StyledIndicator;
-
-// Your app...
-const Label = styled('label', {
-    color: '$text',
-    fontSize: 12,
-    lineHeight: 1,
-    userSelect: 'none',
-});
+import Checkbox from './Checkbox';
+import Label from './Label';
 
 const ConfirmDialog = () => {
     const {onConfirm, onCancel, confirmState} = useConfirm();
@@ -78,13 +48,10 @@ const ConfirmDialog = () => {
                                 <Box css={{alignItems: 'center', flexDirection: 'row'}} key={choice.key}>
                                     <Checkbox
                                         checked={chosen.includes(choice.key)}
+                                        defaultChecked={choice.enabled}
                                         id={choice.key}
                                         onCheckedChange={() => toggleChosen(choice.key)}
-                                    >
-                                        <CheckboxIndicator>
-                                            <CheckIcon />
-                                        </CheckboxIndicator>
-                                    </Checkbox>
+                                    />
                                     <Label css={{paddingLeft: '$3'}} htmlFor={choice.key}>
                                         {choice.label}
                                     </Label>

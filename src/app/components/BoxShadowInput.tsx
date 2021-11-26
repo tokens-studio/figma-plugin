@@ -5,17 +5,16 @@ import {ShadowTokenSingleValue} from 'Types/propertyTypes';
 import IconMinus from '@/icons/minus.svg';
 import IconPlus from '@/icons/plus.svg';
 import IconGrabber from '@/icons/grabber.svg';
-import IconCaretDown from '@/icons/caretdown.svg';
 import {DndProvider, useDrop, useDrag, DropTargetMonitor} from 'react-dnd';
-import {HTML5Backend, getEmptyImage} from 'react-dnd-html5-backend';
+import {HTML5Backend} from 'react-dnd-html5-backend';
 
 import {XYCoord} from 'dnd-core';
-import {generateId} from '@/plugin/helpers';
 import {debounce} from 'lodash';
 import {Dispatch, RootState} from '../store';
 import Heading from './Heading';
 import IconButton from './IconButton';
 import TokenInput from './TokenInput';
+import Select from './Select';
 
 const Flex = styled('div', {
     display: 'flex',
@@ -30,17 +29,6 @@ interface DragItem {
 enum ItemTypes {
     CARD = 'card',
 }
-
-const Select = styled('select', {
-    all: 'unset',
-    borderRadius: '$input',
-    padding: '$4 $3',
-    fontSize: 12,
-    lineHeight: 1,
-    color: '$text',
-    border: '1px solid $border',
-    '&:focus': {boxShadow: `$focus`},
-});
 
 function SingleShadowInput({
     isMultiple = false,
@@ -203,14 +191,13 @@ export default function BoxShadowInput() {
                 <DndProvider backend={HTML5Backend}>
                     {Array.isArray(editToken.value) ? (
                         editToken.value.map((token, index) => {
-                            const id = generateId(4);
                             return (
                                 <SingleShadowInput
                                     isMultiple
                                     shadowItem={token}
                                     index={index}
-                                    id={id}
-                                    key={id}
+                                    id={index}
+                                    key={`single-shadow-${index}`}
                                     onRemove={removeShadow}
                                 />
                             );
