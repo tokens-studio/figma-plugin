@@ -4,9 +4,9 @@ import Box from './Box';
 
 const SingleShadow = ({shadow}) => {
     return (
-        <Box css={{flexDirection: 'column', marginBottom: '$2'}}>
-            <Box css={{color: '$contextMenuForegroundMuted'}}>{shadow.type}</Box>
-            <Box>
+        <Box css={{display: 'flex', flexDirection: 'column', marginBottom: '$2'}}>
+            <Box css={{display: 'flex', color: '$contextMenuForegroundMuted'}}>{shadow.type}</Box>
+            <Box css={{display: 'flex'}}>
                 {shadow.x} {shadow.y} {shadow.blur} {shadow.spread} {shadow.color}
             </Box>
         </Box>

@@ -14,7 +14,7 @@ const StyledSelect = styled('select', {
 
 export default function Select({css, value, id, onChange, children}) {
     return (
-        <StyledSelect css={css} value={value} name={id} id={id} onChange={onChange}>
+        <StyledSelect css={css} value={value} name={id} data-cy={id} id={id} onChange={onChange}>
             {children}
         </StyledSelect>
     );

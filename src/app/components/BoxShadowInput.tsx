@@ -1,4 +1,3 @@
-import {styled} from '@/stitches.config';
 import React, {useCallback} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {ShadowTokenSingleValue} from 'Types/propertyTypes';
@@ -15,10 +14,7 @@ import Heading from './Heading';
 import IconButton from './IconButton';
 import TokenInput from './TokenInput';
 import Select from './Select';
-
-const Flex = styled('div', {
-    display: 'flex',
-});
+import Box from './Box';
 
 interface DragItem {
     index: number;
@@ -125,22 +121,27 @@ function SingleShadowInput({
     drag(drop(ref));
 
     return (
-        <Flex css={{flexDirection: 'column', gap: '$2', opacity: isDragging ? 0 : 1}}>
-            <Flex css={{justifyContent: 'space-between', alignItems: 'center'}} ref={ref}>
+        <Box css={{display: 'flex', flexDirection: 'column', gap: '$2', opacity: isDragging ? 0 : 1}}>
+            <Box css={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}} ref={ref}>
                 {isMultiple && (
-                    <Flex css={{marginRight: '$3'}}>
+                    <Box css={{display: 'flex', marginRight: '$3'}}>
                         <IconButton tooltip="Click to drag" icon={<IconGrabber />} data-handler-id={handlerId} />
-                    </Flex>
+                    </Box>
                 )}
-                <Select css={{flexGrow: 1}} value={shadowItem.type} name="type" id="type" onChange={onChange}>
+                <Select css={{flexGrow: 1}} value={shadowItem.type} id="type" onChange={onChange}>
                     <option value="innerShadow">Inner Shadow</option>
                     <option value="dropShadow">Drop Shadow</option>
                 </Select>
                 {isMultiple && (
-                    <IconButton tooltip="Remove this shadow" onClick={() => onRemove(index)} icon={<IconMinus />} />
+                    <IconButton
+                        tooltip="Remove this shadow"
+                        dataCy="button-shadow-remove-multiple"
+                        onClick={() => onRemove(index)}
+                        icon={<IconMinus />}
+                    />
                 )}
-            </Flex>
-            <Flex css={{flexDirection: 'column', gap: '$2', paddingLeft: isMultiple ? '$8' : '0'}}>
+            </Box>
+            <Box css={{display: 'flex', flexDirection: 'column', gap: '$2', paddingLeft: isMultiple ? '$8' : '0'}}>
                 <TokenInput label="X" value={shadowItem.x} onChange={onChange} type="text" name="x" required />
                 <TokenInput label="Y" value={shadowItem.y} onChange={onChange} type="text" name="y" required />
                 <TokenInput label="Blur" value={shadowItem.blur} onChange={onChange} type="text" name="blur" required />
@@ -160,8 +161,8 @@ function SingleShadowInput({
                     name="color"
                     required
                 />
-            </Flex>
-        </Flex>
+            </Box>
+        </Box>
     );
 }
 
@@ -183,11 +184,16 @@ export default function BoxShadowInput() {
 
     return (
         <div>
-            <Flex css={{justifyContent: 'space-between', alignItems: 'center'}}>
+            <Box css={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
                 <Heading size="small">Shadow</Heading>
-                <IconButton tooltip="Add another shadow" onClick={addShadow} icon={<IconPlus />} />
-            </Flex>
-            <Flex css={{flexDirection: 'column', gap: '$4'}}>
+                <IconButton
+                    tooltip="Add another shadow"
+                    dataCy="button-shadow-add-multiple"
+                    onClick={addShadow}
+                    icon={<IconPlus />}
+                />
+            </Box>
+            <Box css={{display: 'flex', flexDirection: 'column', gap: '$4'}}>
                 <DndProvider backend={HTML5Backend}>
                     {Array.isArray(editToken.value) ? (
                         editToken.value.map((token, index) => {
@@ -206,7 +212,7 @@ export default function BoxShadowInput() {
                         <SingleShadowInput index={0} shadowItem={editToken.value} />
                     )}
                 </DndProvider>
-            </Flex>
+            </Box>
         </div>
     );
 }

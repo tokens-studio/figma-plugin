@@ -35,17 +35,20 @@ const ConfirmDialog = () => {
     return confirmState.show ? (
         <Modal isOpen close={onCancel}>
             <form onSubmit={() => onConfirm(chosen)} className="flex justify-center flex-col text-center space-y-4">
-                <Box css={{gap: '$4', flexDirection: 'column'}}>
-                    <Box css={{gap: '$2', flexDirection: 'column'}}>
+                <Box css={{display: 'flex', gap: '$4', flexDirection: 'column'}}>
+                    <Box css={{display: 'flex', gap: '$2', flexDirection: 'column'}}>
                         <Heading>{confirmState?.text && confirmState.text}</Heading>
                         {confirmState?.description && (
                             <Text css={{color: '$textMuted'}}>{confirmState.description}</Text>
                         )}
                     </Box>
                     {confirmState?.choices && (
-                        <Box css={{flexDirection: 'column', alignItems: 'start', gap: '$2'}}>
+                        <Box css={{display: 'flex', flexDirection: 'column', alignItems: 'start', gap: '$2'}}>
                             {confirmState.choices.map((choice) => (
-                                <Box css={{alignItems: 'center', flexDirection: 'row'}} key={choice.key}>
+                                <Box
+                                    css={{display: 'flex', alignItems: 'center', flexDirection: 'row'}}
+                                    key={choice.key}
+                                >
                                     <Checkbox
                                         checked={chosen.includes(choice.key)}
                                         defaultChecked={choice.enabled}
@@ -60,7 +63,7 @@ const ConfirmDialog = () => {
                         </Box>
                     )}
                 </Box>
-                <Box css={{gap: '$3', justifyContent: 'space-between'}}>
+                <Box css={{display: 'flex', gap: '$3', justifyContent: 'space-between'}}>
                     <Button variant="secondary" onClick={onCancel}>
                         Cancel
                     </Button>

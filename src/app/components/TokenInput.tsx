@@ -8,6 +8,7 @@ const StyledLabel = styled(LabelPrimitive.Root, {
     fontWeight: 500,
     color: '$textMuted',
     userSelect: 'none',
+    pointerEvents: 'none',
     padding: '$3',
     borderRight: '1px solid $border',
     position: 'absolute',

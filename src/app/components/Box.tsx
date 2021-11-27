@@ -1,9 +1,7 @@
 import {styled} from '@/stitches.config';
 import React from 'react';
 
-const StyledBox = styled('div', {
-    display: 'flex',
-});
+const StyledBox = styled('div', {});
 
 type BoxProps = {
     css?: object;
