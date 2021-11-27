@@ -1,5 +1,5 @@
 {
-    "baseUrl": "http://localhost:5000/ui",
+    "baseUrl": "http://localhost:5000",
     "chromeWebSecurity": false,
     "experimentalComponentTesting": true,
     "env": {

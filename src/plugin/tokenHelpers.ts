@@ -28,10 +28,21 @@ export function resolveTokenValues(tokens, previousCount = undefined) {
         let failedToResolve;
         // Iterate over Typography and boxShadow Object to get resolved values
         if (['typography', 'boxShadow'].includes(t.type)) {
-            returnValue = Object.entries(t.value).reduce((acc, [key, value]: [string, SingleTokenObject]) => {
-                acc[key] = getAliasValue(value, tokensInProgress);
-                return acc;
-            }, {});
+            if (Array.isArray(t.value)) {
+                // If we're dealing with an array, iterate over each item and then key
+                returnValue = t.value.map((item) => {
+                    return Object.entries(item).reduce((acc, [key, value]: [string, SingleTokenObject]) => {
+                        acc[key] = getAliasValue(value, tokensInProgress);
+                        return acc;
+                    }, {});
+                });
+                // If not, iterate over each key
+            } else {
+                returnValue = Object.entries(t.value).reduce((acc, [key, value]: [string, SingleTokenObject]) => {
+                    acc[key] = getAliasValue(value, tokensInProgress);
+                    return acc;
+                }, {});
+            }
         } else {
             // If we're not dealing with special tokens, just return resolved value
             returnValue = getAliasValue(t, tokensInProgress);

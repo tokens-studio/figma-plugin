@@ -6,8 +6,8 @@ function useConfirm() {
     const {confirmState} = useSelector((state: RootState) => state.uiState);
     const dispatch = useDispatch<Dispatch>();
 
-    const confirm = ({text, description}): Promise<boolean> => {
-        dispatch.uiState.setShowConfirm({text, description});
+    const confirm = ({text, description, confirmAction, choices}): Promise<{result: boolean; data?: any}> => {
+        dispatch.uiState.setShowConfirm({text, description, confirmAction, choices});
 
         return new Promise((res, rej) => {
             resolveCallback = res;
@@ -23,9 +23,9 @@ function useConfirm() {
         resolveCallback(false);
     };
 
-    const onConfirm = () => {
+    const onConfirm = (data) => {
         closeConfirm();
-        resolveCallback(true);
+        resolveCallback({result: true, data});
     };
 
     return {confirm, onConfirm, onCancel, confirmState};

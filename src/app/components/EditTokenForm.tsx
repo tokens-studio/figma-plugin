@@ -5,6 +5,7 @@ import * as React from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {Dispatch, RootState} from '../store';
 import useManageTokens from '../store/useManageTokens';
+import BoxShadowInput from './BoxShadowInput';
 import Input from './Input';
 
 const EditTokenForm = ({resolvedTokens}) => {
@@ -12,41 +13,37 @@ const EditTokenForm = ({resolvedTokens}) => {
     const {editSingleToken, createSingleToken} = useManageTokens();
     const {editToken} = useSelector((state: RootState) => state.uiState);
     const dispatch = useDispatch<Dispatch>();
-    const [currentEditToken, setCurrentEditToken] = React.useState(editToken);
     const [error, setError] = React.useState(null);
 
-    const isValid = currentEditToken.value && currentEditToken.name.match(/^\S*$/) && !error;
+    const isValid = editToken.value && editToken.name.match(/^\S*$/) && !error;
 
     const hasNameThatExistsAlready = resolvedTokens
         .filter((t) => t.internal__Parent === activeTokenSet)
-        .find((t) => t.name === currentEditToken.name);
-    const nameWasChanged = currentEditToken?.initialName !== currentEditToken.name;
+        .find((t) => t.name === editToken.name);
+    const nameWasChanged = editToken?.initialName !== editToken.name;
 
     React.useEffect(() => {
-        if ((currentEditToken.isPristine || nameWasChanged) && hasNameThatExistsAlready) {
+        if ((editToken.isPristine || nameWasChanged) && hasNameThatExistsAlready) {
             setError('Token names must be unique');
         }
-    }, [currentEditToken, hasNameThatExistsAlready, nameWasChanged]);
+    }, [editToken, hasNameThatExistsAlready, nameWasChanged]);
 
     const handleChange = (e) => {
         setError(null);
         e.persist();
-        setCurrentEditToken({...currentEditToken, [e.target.name]: e.target.value});
+        dispatch.uiState.setEditToken({...editToken, [e.target.name]: e.target.value});
     };
 
     const handleObjectChange = (e) => {
         e.persist();
-        setCurrentEditToken({
-            ...currentEditToken,
-            value: {...currentEditToken.value, [e.target.name]: e.target.value},
-        });
+        dispatch.uiState.setEditToken({...editToken, value: {...editToken.value, [e.target.name]: e.target.value}});
     };
 
     const handleOptionsChange = (e) => {
         e.persist();
-        setCurrentEditToken({
-            ...currentEditToken,
-            options: {...currentEditToken.options, [e.target.name]: e.target.value},
+        setEditToken({
+            ...editToken,
+            options: {...editToken.options, [e.target.name]: e.target.value},
         });
     };
 
@@ -54,14 +51,14 @@ const EditTokenForm = ({resolvedTokens}) => {
         track('Edit Token');
 
         let oldName;
-        if (currentEditToken.initialName !== name && currentEditToken.initialName) {
-            oldName = currentEditToken.initialName;
+        if (editToken.initialName !== name && editToken.initialName) {
+            oldName = editToken.initialName;
         }
         const newName = name
             .split('/')
             .map((n) => n.trim())
             .join('.');
-        if (currentEditToken.isPristine) {
+        if (editToken.isPristine) {
             createSingleToken({
                 parent: activeTokenSet,
                 name: newName,
@@ -82,7 +79,7 @@ const EditTokenForm = ({resolvedTokens}) => {
     const handleSubmit = (e) => {
         e.preventDefault();
         if (isValid) {
-            submitTokenValue(currentEditToken);
+            submitTokenValue(editToken);
             dispatch.uiState.setShowEditForm(false);
         }
     };
@@ -100,10 +97,61 @@ const EditTokenForm = ({resolvedTokens}) => {
     }, []);
 
     const resolvedValue = React.useMemo(() => {
-        return typeof currentEditToken.value === 'object'
-            ? null
-            : getAliasValue(currentEditToken.value, resolvedTokens);
-    }, [currentEditToken, resolvedTokens]);
+        return typeof editToken.value === 'object' ? null : getAliasValue(editToken.value, resolvedTokens);
+    }, [editToken, resolvedTokens]);
+
+    const renderTokenForm = () => {
+        switch (editToken.type) {
+            case 'boxShadow': {
+                return <BoxShadowInput />;
+            }
+            case 'typography': {
+                return Object.entries(editToken.schema).map(([key, schemaValue]: [string, string]) => (
+                    <Input
+                        key={key}
+                        full
+                        label={key}
+                        value={editToken.value[key]}
+                        onChange={handleObjectChange}
+                        type="text"
+                        name={key}
+                        custom={schemaValue}
+                        required
+                    />
+                ));
+            }
+            default: {
+                return (
+                    <div>
+                        <Input
+                            full
+                            label={editToken.property}
+                            value={editToken.value}
+                            onChange={handleChange}
+                            type="text"
+                            name="value"
+                            required
+                            custom={editToken.schema}
+                            placeholder={
+                                editToken.type === 'color' ? '#000000, hsla(), rgba() or {alias}' : 'Value or {alias}'
+                            }
+                        />
+                        {checkIfContainsAlias(editToken.value) && (
+                            <div className="p-2 rounded bg-gray-100 border-gray-300 font-mono text-xxs mt-2 text-gray-700 flex itms-center">
+                                {editToken.type === 'color' ? (
+                                    <div
+                                        className="w-4 h-4 rounded border border-gray-200 mr-1"
+                                        style={{background: resolvedValue}}
+                                    />
+                                ) : null}
+                                {resolvedValue}
+                            </div>
+                        )}
+                    </div>
+                );
+            }
+        }
+    };
 
     return (
         <form onSubmit={handleSubmit} className="space-y-4 flex flex-col justify-start">
@@ -111,7 +159,7 @@ const EditTokenForm = ({resolvedTokens}) => {
                 required
                 full
                 label="Name"
-                value={currentEditToken.name}
+                value={editToken.name}
                 onChange={handleChange}
                 type="text"
                 name="name"
@@ -119,60 +167,16 @@ const EditTokenForm = ({resolvedTokens}) => {
                 error={error}
                 placeholder="Unique name"
             />
-            {typeof currentEditToken.schema === 'object' ? (
-                Object.entries(currentEditToken.schema).map(([key, schemaValue]: [string, string]) => (
-                    <Input
-                        key={key}
-                        full
-                        label={key}
-                        value={currentEditToken.value[key]}
-                        onChange={handleObjectChange}
-                        type="text"
-                        name={key}
-                        custom={schemaValue}
-                        required
-                    />
-                ))
-            ) : (
-                <div>
-                    <Input
-                        full
-                        label={currentEditToken.property}
-                        value={currentEditToken.value}
-                        onChange={handleChange}
-                        type="text"
-                        name="value"
-                        required
-                        custom={currentEditToken.schema}
-                        placeholder={
-                            currentEditToken.type === 'color'
-                                ? '#000000, hsla(), rgba() or {alias}'
-                                : 'Value or {alias}'
-                        }
-                    />
-                    {checkIfContainsAlias(currentEditToken.value) && (
-                        <div className="p-2 rounded bg-gray-100 border-gray-300 font-mono text-xxs mt-2 text-gray-700 flex itms-center">
-                            {currentEditToken.type === 'color' ? (
-                                <div
-                                    className="w-4 h-4 rounded border border-gray-200 mr-1"
-                                    style={{background: resolvedValue}}
-                                />
-                            ) : null}
-                            {resolvedValue}
-                        </div>
-                    )}
-                </div>
-            )}
-            {currentEditToken.explainer && (
-                <div className="mt-1 text-xxs text-gray-600">{currentEditToken.explainer}</div>
-            )}
-            {currentEditToken.optionsSchema
-                ? Object.entries(currentEditToken.optionsSchema).map(([key, schemaValue]: [string, string]) => (
+            {renderTokenForm()}
+
+            {editToken.explainer && <div className="mt-1 text-xxs text-gray-600">{editToken.explainer}</div>}
+            {editToken.optionsSchema
+                ? Object.entries(editToken.optionsSchema).map(([key, schemaValue]: [string, string]) => (
                       <Input
                           key={key}
                           full
                           label={key}
-                          value={currentEditToken.options[key]}
+                          value={editToken.options[key]}
                           onChange={handleOptionsChange}
                           type="text"
                           name={key}
@@ -186,7 +190,7 @@ const EditTokenForm = ({resolvedTokens}) => {
                     Cancel
                 </button>
                 <button disabled={!isValid} className="button button-primary" type="submit">
-                    {currentEditToken.isPristine ? 'Create' : 'Update'}
+                    {editToken.isPristine ? 'Create' : 'Update'}
                 </button>
             </div>
         </form>
