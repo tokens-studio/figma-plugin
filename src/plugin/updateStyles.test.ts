@@ -1,15 +1,18 @@
 import updateStyles from './updateStyles';
 import * as updateColorStyles from './updateColorStyles';
 import * as updateTextStyles from './updateTextStyles';
+import * as updateEffectStyles from './updateEffectStyles';
 
 describe('updateStyles', () => {
     const colorSpy = jest.spyOn(updateColorStyles, 'default');
     const textSpy = jest.spyOn(updateTextStyles, 'default');
+    const effectSpy = jest.spyOn(updateEffectStyles, 'default');
 
     it('returns if no values are given', () => {
         updateStyles([{name: 'borderRadius.small', value: '3', type: 'borderRadius'}]);
         expect(colorSpy).not.toHaveBeenCalled();
         expect(textSpy).not.toHaveBeenCalled();
+        expect(effectSpy).not.toHaveBeenCalled();
     });
 
     it('calls update functions with correct tokens when all tokens are given', () => {
@@ -33,7 +36,23 @@ describe('updateStyles', () => {
             },
         ];
 
-        updateStyles([...typographyTokens, ...colorTokens]);
+        const effectTokens = [
+            {
+                name: 'shadow.large',
+                type: 'boxShadow',
+                description: 'the one with one shadow',
+                value: {
+                    type: 'dropShadow',
+                    color: '#00000080',
+                    x: 0,
+                    y: 0,
+                    blur: 10,
+                    spread: 0,
+                },
+            },
+        ];
+
+        updateStyles([...typographyTokens, ...colorTokens, ...effectTokens]);
         expect(colorSpy).toHaveBeenCalledWith(
             colorTokens.map((t) => ({
                 ...t,
@@ -43,6 +62,13 @@ describe('updateStyles', () => {
         );
         expect(textSpy).toHaveBeenCalledWith(
             typographyTokens.map((t) => ({
+                ...t,
+                name: t.name.replace('.', '/'),
+            })),
+            false
+        );
+        expect(effectSpy).toHaveBeenCalledWith(
+            effectTokens.map((t) => ({
                 ...t,
                 name: t.name.replace('.', '/'),
             })),
@@ -68,9 +94,10 @@ describe('updateStyles', () => {
             false
         );
         expect(textSpy).not.toHaveBeenCalled();
+        expect(effectSpy).not.toHaveBeenCalled();
     });
 
-    it('calls update functions with correct tokens for coltextor tokens', () => {
+    it('calls update functions with correct tokens for text tokens', () => {
         const typographyTokens = [
             {
                 name: 'heading.h1',
@@ -92,5 +119,35 @@ describe('updateStyles', () => {
             false
         );
         expect(colorSpy).not.toHaveBeenCalled();
+        expect(effectSpy).not.toHaveBeenCalled();
+    });
+
+    it('calls update functions with correct tokens for effect tokens', () => {
+        const effectTokens = [
+            {
+                name: 'shadow.large',
+                type: 'boxShadow',
+                description: 'the one with one shadow',
+                value: {
+                    type: 'dropShadow',
+                    color: '#00000080',
+                    x: 0,
+                    y: 0,
+                    blur: 10,
+                    spread: 0,
+                },
+            },
+        ];
+
+        updateStyles(effectTokens);
+        expect(effectSpy).toHaveBeenCalledWith(
+            effectTokens.map((t) => ({
+                ...t,
+                name: t.name.replace('.', '/'),
+            })),
+            false
+        );
+        expect(colorSpy).not.toHaveBeenCalled();
+        expect(textSpy).not.toHaveBeenCalled();
     });
 });
