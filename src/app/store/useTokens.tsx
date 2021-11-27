@@ -65,8 +65,6 @@ export default function useTokens() {
             ],
         });
 
-        console.log('USer', userDecision);
-
         postToFigma({
             type: MessageToPluginTypes.PULL_STYLES,
             styleTypes: {
