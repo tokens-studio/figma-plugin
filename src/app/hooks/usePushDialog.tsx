@@ -6,9 +6,9 @@ function usePushDialog() {
     const {showPushDialog} = useSelector((state: RootState) => state.uiState);
     const dispatch = useDispatch<Dispatch>();
 
-    const pushDialog = (initialState): Promise<{commitMessage: string; customBranch: string}> => {
-        if (initialState) {
-            dispatch.uiState.setShowPushDialog('success');
+    const pushDialog = (givenState): Promise<{commitMessage: string; customBranch: string}> => {
+        if (givenState) {
+            dispatch.uiState.setShowPushDialog(givenState);
         } else {
             dispatch.uiState.setShowPushDialog('initial');
 

@@ -71,6 +71,9 @@ export default function Initiator() {
                         break;
                     case MessageFromPluginTypes.API_CREDENTIALS: {
                         if (status === true) {
+                            track('Fetched from remote', {provider: credentials.provider});
+                            if (!credentials.internalId) track('missingInternalId', {provider: credentials.provider});
+
                             dispatch.uiState.setApiData(credentials);
                             dispatch.uiState.setLocalApiState(credentials);
                             await pullTokens(credentials);

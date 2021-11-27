@@ -1,7 +1,7 @@
 import {MessageToPluginTypes} from '@types/messages';
 import {mergeTokenGroups, resolveTokenValues} from '@/plugin/tokenHelpers';
-import {TokenProps} from '../../../types/tokens';
-import {ContextObject, StorageProviderType} from '../../../types/api';
+import {TokenProps} from 'Types/tokens';
+import {ContextObject, StorageProviderType} from 'Types/api';
 import {notifyToUI, postToFigma} from '../../plugin/notifiers';
 import {updateJSONBinTokens} from './providers/jsonbin';
 
