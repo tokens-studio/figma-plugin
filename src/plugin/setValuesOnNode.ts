@@ -116,7 +116,7 @@ export default async function setValuesOnNode(node, values, data, ignoreFirstPar
             if (typeof node.strokes !== 'undefined') {
                 const paints = figma.getLocalPaintStyles();
                 const path = data.border.split('.');
-                const pathname = path.slice(1, path.length).join('/');
+                const pathname = path.slice(ignoreFirstPartForStyles ? 1 : 0, path.length).join('/');
                 const matchingStyles = paints.filter((n) => n.name === pathname);
                 const {color, opacity} = convertToFigmaColor(values.border);
 
