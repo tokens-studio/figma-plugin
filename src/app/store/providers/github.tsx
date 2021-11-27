@@ -28,19 +28,25 @@ export const fetchBranches = async ({context, owner, repo}) => {
 };
 
 export const checkPermissions = async ({context, owner, repo}) => {
-    const octokit = new Octokit({auth: context.secret, baseUrl: context.baseUrl});
+    try {
+        const octokit = new Octokit({auth: context.secret, baseUrl: context.baseUrl});
 
-    const currentUser = await octokit.rest.users.getAuthenticated();
+        const currentUser = await octokit.rest.users.getAuthenticated();
 
-    if (!currentUser.data.login) return null;
+        if (!currentUser.data.login) return null;
 
-    const permissions = await octokit.rest.repos.getCollaboratorPermissionLevel({
-        owner,
-        repo,
-        username: currentUser.data.login,
-    });
+        const permissions = await octokit.rest.repos.getCollaboratorPermissionLevel({
+            owner,
+            repo,
+            username: currentUser.data.login,
+        });
 
-    return permissions;
+        return permissions;
+    } catch (e) {
+        console.log(e);
+
+        return null;
+    }
 };
 
 export const readContents = async ({context, owner, repo}) => {
@@ -108,11 +114,11 @@ export function useGitHub() {
     const {pushDialog} = usePushDialog();
 
     async function askUserIfPull(): Promise<boolean> {
-        const isConfirmed = await confirm({
+        const {result} = await confirm({
             text: 'Pull from GitHub?',
             description: 'Your repo already contains tokens, do you want to pull these now?',
         });
-        return isConfirmed;
+        return result;
     }
 
     function getTokenObj() {
@@ -192,14 +198,8 @@ export function useGitHub() {
     }
 
     async function checkAndSetAccess({context, owner, repo}) {
-        try {
-            const currentPermissions = await checkPermissions({context, owner, repo});
-            if (currentPermissions) {
-                dispatch.tokenState.setEditProhibited(false);
-            }
-        } catch (e) {
-            dispatch.tokenState.setEditProhibited(true);
-        }
+        const hasWriteAccess = await checkPermissions({context, owner, repo});
+        dispatch.tokenState.setEditProhibited(!hasWriteAccess);
     }
 
     async function pullTokensFromGitHub(context) {
@@ -229,9 +229,8 @@ export function useGitHub() {
                 return null;
             }
 
-            await checkAndSetAccess({context, owner, repo});
+            const content = await pullTokensFromGitHub(context);
 
-            const content = await readContents({context, owner, repo});
             const {string: tokenObj} = getTokenObj();
 
             if (content) {
@@ -243,12 +242,11 @@ export function useGitHub() {
                         notifyToUI('Pulled tokens from GitHub');
                         return content;
                     }
+                    return {values: tokenObj};
                 }
-            } else {
-                return pushTokensToGitHub(context);
+                return content;
             }
-            // If repo contains no tokens, return null
-            return null;
+            return pushTokensToGitHub(context);
         } catch (e) {
             console.log('Error', e);
         }
@@ -257,32 +255,27 @@ export function useGitHub() {
     async function addNewGitHubCredentials(context): Promise<TokenProps> {
         let {raw: rawTokenObj} = getTokenObj();
 
-        try {
-            const data = await syncTokensWithGitHub(context);
+        const data = await syncTokensWithGitHub(context);
 
-            if (data) {
-                postToFigma({
-                    type: MessageToPluginTypes.CREDENTIALS,
-                    ...context,
-                });
-                if (data?.values) {
-                    dispatch.tokenState.setLastSyncedState(JSON.stringify(data.values, null, 2));
-                    dispatch.tokenState.setTokenData(data);
-                    rawTokenObj = data.values;
-                } else {
-                    notifyToUI('No tokens stored on remote');
-                }
+        if (data) {
+            postToFigma({
+                type: MessageToPluginTypes.CREDENTIALS,
+                ...context,
+            });
+            if (data?.values) {
+                dispatch.tokenState.setLastSyncedState(JSON.stringify(data.values, null, 2));
+                dispatch.tokenState.setTokenData(data);
+                rawTokenObj = data.values;
             } else {
-                return null;
+                notifyToUI('No tokens stored on remote');
             }
-
-            return {
-                values: rawTokenObj,
-            };
-        } catch (e) {
-            notifyToUI('Error fetching from URL, check console (F12)');
-            console.log('Error:', e);
+        } else {
+            return null;
         }
+
+        return {
+            values: rawTokenObj,
+        };
     }
     return {
         addNewGitHubCredentials,

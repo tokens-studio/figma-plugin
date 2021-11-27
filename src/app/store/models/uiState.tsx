@@ -39,6 +39,13 @@ export type EditTokenObject =
           value: string | number;
       });
 
+export type ConfirmProps = {
+    show?: boolean;
+    text?: string;
+    description?: string;
+    choices?: {key: string; label: string; enabled?: boolean}[];
+    confirmAction?: string;
+};
 interface UIState {
     selectionValues: SelectionValue;
     displayType: DisplayType;
@@ -57,13 +64,7 @@ interface UIState {
     showEditForm: boolean;
     tokenFilter: string;
     tokenFilterVisible: boolean;
-    confirmState: {
-        show: boolean;
-        text?: string;
-        description?: string;
-        choices?: {key: string; label: string; enabled?: boolean}[];
-        confirmAction?: string;
-    };
+    confirmState: ConfirmProps;
     showPushDialog: string | false;
     showEmptyGroups: boolean;
     collapsed: boolean;
