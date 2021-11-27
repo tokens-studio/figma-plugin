@@ -1,6 +1,7 @@
 import {convertToFigmaColor} from './figmaTransforms/colors';
 import {transformValue} from './helpers';
 import setColorValuesOnTarget from './setColorValuesOnTarget';
+import setEffectValuesOnTarget from './setEffectValuesOnTarget';
 import setTextValuesOnTarget from './setTextValuesOnTarget';
 
 export default async function setValuesOnNode(node, values, data, ignoreFirstPartForStyles = false) {
@@ -24,29 +25,7 @@ export default async function setValuesOnNode(node, values, data, ignoreFirstPar
 
         // BOX SHADOW
         if (typeof values.boxShadow !== 'undefined' && typeof node.effects !== 'undefined') {
-            // get all effects, but remove DROP_SHADOW, since we're about to add it
-
-            const effects = [];
-
-            const receivedEffects = Array.isArray(values.boxShadow) ? values.boxShadow : [values.boxShadow];
-            receivedEffects.map((effect) => {
-                const {x, y, spread, color, blur, type} = effect;
-                const {
-                    color: {r, g, b},
-                    opacity,
-                } = convertToFigmaColor(color);
-                effects.push({
-                    type: transformValue(type, 'boxShadowType'),
-                    visible: true,
-                    blendMode: 'NORMAL',
-                    color: {r, g, b, a: opacity},
-                    offset: {x: transformValue(x, 'boxShadow'), y: transformValue(y, 'boxShadow')},
-                    radius: transformValue(blur, 'boxShadow'),
-                    spread: transformValue(spread, 'boxShadow'),
-                });
-            });
-
-            node.effects = effects;
+            setEffectValuesOnTarget(node, values.boxShadow);
         }
 
         // BORDER WIDTH

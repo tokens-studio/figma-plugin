@@ -7,8 +7,6 @@ export default function updateEffectStyles(effectTokens, shouldCreate = false) {
     const effectStyles = figma.getLocalEffectStyles();
 
     effectTokens.map((token: SingleTokenObject) => {
-        console.log('Updatinge effect style', token);
-
         let matchingStyles = [];
         if (effectStyles.length > 0) {
             matchingStyles = filterMatchingStyles(token, effectStyles);

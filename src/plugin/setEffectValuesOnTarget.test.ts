@@ -14,6 +14,7 @@ const singleShadowToken: SingleTokenObject = {
         spread: 0,
     },
 };
+
 const multipleShadowToken: SingleTokenObject = {
     name: 'shadow.xlarge',
     type: 'boxShadow',
