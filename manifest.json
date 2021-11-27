@@ -3,7 +3,7 @@
   "id": "843461159747178978",
   "api": "1.0.0",
   "main": "dist/code.js",
-  "ui": "dist/ui.html",
+  "ui": "dist/index.html",
   "editorType": ["figma"],
   "relaunchButtons": [
     {"command": "edit", "name": "Tokens"}

@@ -1,5 +1,17 @@
 import getAliasValue from '@/utils/aliases';
 import React from 'react';
+import Box from './Box';
+
+const SingleShadow = ({shadow}) => {
+    return (
+        <Box css={{display: 'flex', flexDirection: 'column', marginBottom: '$2'}}>
+            <Box css={{display: 'flex', color: '$contextMenuForegroundMuted'}}>{shadow.type}</Box>
+            <Box css={{display: 'flex'}}>
+                {shadow.x} {shadow.y} {shadow.blur} {shadow.spread} {shadow.color}
+            </Box>
+        </Box>
+    );
+};
 
 // Returns token value in display format
 export default function TokenTooltip({token, resolvedTokens, shouldResolve = false}) {
@@ -26,6 +38,18 @@ export default function TokenTooltip({token, resolvedTokens, shouldResolve = fal
                     <div>Text Case: {valueToCheck.textCase?.value || valueToCheck.textCase}</div>
                     <div>Text Decoration: {valueToCheck.textDecoration?.value || valueToCheck.textDecoration}</div>
                 </div>
+            );
+        }
+
+        if (token.type === 'boxShadow') {
+            return Array.isArray(valueToCheck) ? (
+                <div>
+                    {valueToCheck.map((t, index) => (
+                        <SingleShadow key={`shadow-${t.name}-${index}`} shadow={t} />
+                    ))}
+                </div>
+            ) : (
+                <SingleShadow shadow={valueToCheck} />
             );
         }
         if (typeof valueToCheck !== 'string' && typeof valueToCheck !== 'number') {

@@ -17,10 +17,18 @@ const fillTokenForm = ({name, value}) => {
 };
 
 const fillInput = ({submit = false, input, value}) => {
-    cy.get(`input[name=${input}]`).type(value);
+    cy.get(`input[name=${input}]`).type(`{selectall} ${value}`);
 
     if (submit) {
         cy.get(`input[name=${input}]`).type('{enter}');
+    }
+};
+
+const fillInputNth = ({submit = false, input, value, nth}) => {
+    cy.get(`input[name=${input}]`).eq(nth).type(`{selectall} ${value}`);
+
+    if (submit) {
+        cy.get(`input[name=${input}]`).eq(nth).type('{enter}');
     }
 };
 
@@ -56,7 +64,7 @@ describe('TokenListing', () => {
         });
     });
 
-    it('can add a new box shadowtoken', () => {
+    it('can add a new shadow token', () => {
         cy.receiveTokenValues({
             version: '5',
             values: {
@@ -88,6 +96,56 @@ describe('TokenListing', () => {
         fillInput({
             input: 'blur',
             value: '0',
+            submit: true,
+        });
+        cy.get('@postMessage').should('be.calledTwice');
+        receiveRemoteComponents();
+    });
+
+    it('can add multiple shadow tokens', () => {
+        cy.receiveTokenValues({
+            version: '5',
+            values: {
+                options: [],
+            },
+        });
+        cy.receiveStorageTypeLocal();
+        cy.get('[data-cy=tokenlisting-boxShadow] [data-cy=button-add-new-token]').click({timeout: 1000});
+        fillInput({
+            input: 'name',
+            value: 'boxshadow.large',
+        });
+        fillInput({
+            input: 'x',
+            value: '4',
+        });
+        fillInput({
+            input: 'y',
+            value: '4',
+        });
+        fillInput({
+            input: 'spread',
+            value: '0',
+        });
+        fillInput({
+            input: 'color',
+            value: '#ff0000',
+        });
+        fillInput({
+            input: 'blur',
+            value: '0',
+            submit: true,
+        });
+        cy.get('[data-cy=button-shadow-add-multiple]').click({timeout: 1000});
+        fillInputNth({
+            input: 'x',
+            value: '4',
+            nth: 1,
+        });
+        fillInputNth({
+            input: 'y',
+            value: '8',
+            nth: 1,
             submit: true,
         });
         cy.get('@postMessage').should('be.calledTwice');

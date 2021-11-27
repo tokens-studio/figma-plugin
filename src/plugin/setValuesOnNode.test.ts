@@ -1,9 +1,11 @@
 import setValuesOnNode from './setValuesOnNode';
 
 import * as setTextValuesOnTarget from './setTextValuesOnTarget';
+import * as setEffectValuesOnTarget from './setEffectValuesOnTarget';
 
 describe('updateNode', () => {
     const setTextValuesOnTargetSpy = jest.spyOn(setTextValuesOnTarget, 'default');
+    const setEffectValuesOnTargetSpy = jest.spyOn(setEffectValuesOnTarget, 'default');
 
     const atomicValues = {
         textCase: 'TITLE',
@@ -15,6 +17,17 @@ describe('updateNode', () => {
             fontFamily: 'Inter',
             fontWeight: 'Bold',
             fontSize: '24',
+        },
+    };
+
+    const boxShadowValues = {
+        boxShadow: {
+            type: 'dropShadow',
+            color: '#00000080',
+            x: 0,
+            y: 0,
+            blur: 10,
+            spread: 0,
         },
     };
 
@@ -36,6 +49,7 @@ describe('updateNode', () => {
 
         solidNodeMock = {
             type: 'SOLID',
+            effects: [],
         };
     });
 
@@ -67,5 +81,10 @@ describe('updateNode', () => {
         await setValuesOnNode(textNodeMock, typographyValues, dataOnNode, true);
         expect(setTextValuesOnTargetSpy).not.toHaveBeenCalled();
         expect(textNodeMock).toEqual({...textNodeMock, textStyleId: '456'});
+    });
+
+    it('calls setEffectValuesOnTarget if effect node and effects are given', () => {
+        setValuesOnNode(solidNodeMock, boxShadowValues, {});
+        expect(setEffectValuesOnTargetSpy).toHaveBeenCalled();
     });
 });
