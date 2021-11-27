@@ -16,11 +16,19 @@ const fillTokenForm = ({name, value}) => {
     cy.get('input[name=value]').type('{enter}');
 };
 
-const fillInput = ({submit = false, input, value, number = 0}) => {
-    cy.get(`input[name=${input}]`).type(value);
+const fillInput = ({submit = false, input, value}) => {
+    cy.get(`input[name=${input}]`).type(`{selectall} ${value}`);
 
     if (submit) {
-        cy.get(`input[name=${input}]`)[number].type('{enter}');
+        cy.get(`input[name=${input}]`).type('{enter}');
+    }
+};
+
+const fillInputNth = ({submit = false, input, value, nth}) => {
+    cy.get(`input[name=${input}]`).eq(nth).type(`{selectall} ${value}`);
+
+    if (submit) {
+        cy.get(`input[name=${input}]`).eq(nth).type('{enter}');
     }
 };
 
@@ -129,15 +137,15 @@ describe('TokenListing', () => {
             submit: true,
         });
         cy.get('[data-cy=button-shadow-add-multiple]').click({timeout: 1000});
-        fillInput({
+        fillInputNth({
             input: 'x',
             value: '4',
-            number: 1,
+            nth: 1,
         });
-        fillInput({
+        fillInputNth({
             input: 'y',
             value: '8',
-            number: 1,
+            nth: 1,
             submit: true,
         });
         cy.get('@postMessage').should('be.calledTwice');
