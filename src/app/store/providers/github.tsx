@@ -191,9 +191,7 @@ export function useGitHub() {
         return rawTokenObj;
     }
 
-    async function pullTokensFromGitHub(context) {
-        const [owner, repo] = context.id.split('/');
-
+    async function checkAndSetAccess({context, owner, repo}) {
         try {
             const currentPermissions = await checkPermissions({context, owner, repo});
             if (currentPermissions) {
@@ -202,6 +200,13 @@ export function useGitHub() {
         } catch (e) {
             dispatch.tokenState.setEditProhibited(true);
         }
+    }
+
+    async function pullTokensFromGitHub(context) {
+        const [owner, repo] = context.id.split('/');
+
+        await checkAndSetAccess({context, owner, repo});
+
         try {
             const content = await readContents({context, owner, repo});
 
@@ -224,6 +229,8 @@ export function useGitHub() {
                 return null;
             }
 
+            await checkAndSetAccess({context, owner, repo});
+
             const content = await readContents({context, owner, repo});
             const {string: tokenObj} = getTokenObj();
 
@@ -231,6 +238,9 @@ export function useGitHub() {
                 if (!hasSameContent(content, tokenObj)) {
                     const userDecision = await askUserIfPull();
                     if (userDecision) {
+                        dispatch.tokenState.setLastSyncedState(JSON.stringify(content.values, null, 2));
+                        dispatch.tokenState.setTokenData(content);
+                        notifyToUI('Pulled tokens from GitHub');
                         return content;
                     }
                 }
