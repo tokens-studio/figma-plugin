@@ -25,7 +25,7 @@ export default async function setValuesOnNode(node, values, data, ignoreFirstPar
 
         // BOX SHADOW
         if (typeof values.boxShadow !== 'undefined' && typeof node.effects !== 'undefined') {
-            setEffectValuesOnTarget(node, values.boxShadow);
+            setEffectValuesOnTarget(node, {value: values.boxShadow});
         }
 
         // BORDER WIDTH

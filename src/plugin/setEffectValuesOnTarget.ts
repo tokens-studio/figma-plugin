@@ -5,7 +5,11 @@ import {convertBoxShadowTypeToFigma} from './figmaTransforms/boxShadow';
 import {convertToFigmaColor} from './figmaTransforms/colors';
 import convertOffsetToFigma from './figmaTransforms/offset';
 
-export default function setEffectValuesOnTarget(target, token: SingleTokenObject, key = 'effects') {
+export default function setEffectValuesOnTarget(
+    target,
+    token: SingleTokenObject | {value: ShadowTokenSingleValue[] | ShadowTokenSingleValue},
+    key = 'effects'
+) {
     try {
         const {description, value} = token;
 

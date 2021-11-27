@@ -44,8 +44,8 @@ export default function TokenTooltip({token, resolvedTokens, shouldResolve = fal
         if (token.type === 'boxShadow') {
             return Array.isArray(valueToCheck) ? (
                 <div>
-                    {valueToCheck.map((t) => (
-                        <SingleShadow shadow={t} />
+                    {valueToCheck.map((t, index) => (
+                        <SingleShadow key={`shadow-${t.name}-${index}`} shadow={t} />
                     ))}
                 </div>
             ) : (
