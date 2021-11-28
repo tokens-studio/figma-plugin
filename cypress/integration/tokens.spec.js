@@ -64,7 +64,7 @@ describe('TokenListing', () => {
         });
     });
 
-    it('can add a new shadow token', () => {
+    it.only('can add a new shadow token', () => {
         cy.receiveTokenValues({
             version: '5',
             values: {
@@ -98,7 +98,22 @@ describe('TokenListing', () => {
             value: '0',
             submit: true,
         });
-        cy.get('@postMessage').should('be.calledTwice');
+
+        cy.get('@postMessage')
+            .its('firstCall.args.0')
+            .should('deep.equal', {
+                pluginMessage: {
+                    type: 'token',
+                    values: {
+                        name: 'boxshadow.regular',
+                        x: '4',
+                        y: '4',
+                        spread: '0',
+                        color: '#ff0000',
+                        blur: '0',
+                    },
+                },
+            });
         receiveRemoteComponents();
     });
 
@@ -134,7 +149,6 @@ describe('TokenListing', () => {
         fillInput({
             input: 'blur',
             value: '0',
-            submit: true,
         });
         cy.get('[data-cy=button-shadow-add-multiple]').click({timeout: 1000});
         fillInputNth({
