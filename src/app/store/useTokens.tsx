@@ -65,14 +65,16 @@ export default function useTokens() {
             ],
         });
 
-        postToFigma({
-            type: MessageToPluginTypes.PULL_STYLES,
-            styleTypes: {
-                textStyles: userDecision.data.includes('textStyles'),
-                colorStyles: userDecision.data.includes('colorStyles'),
-                effectStyles: userDecision.data.includes('effectStyles'),
-            },
-        });
+        if (userDecision && userDecision.data.length) {
+            postToFigma({
+                type: MessageToPluginTypes.PULL_STYLES,
+                styleTypes: {
+                    textStyles: userDecision.data.includes('textStyles'),
+                    colorStyles: userDecision.data.includes('colorStyles'),
+                    effectStyles: userDecision.data.includes('effectStyles'),
+                },
+            });
+        }
     }
 
     // Calls Figma with a specific node to remove node data
