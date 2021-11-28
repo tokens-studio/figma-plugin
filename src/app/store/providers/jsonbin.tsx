@@ -185,7 +185,7 @@ export function useJSONbin() {
             dispatch.uiState.setApiData(context);
             setStorageType({
                 provider: context,
-                bool: true,
+                shouldSetInDocument: true,
             });
             dispatch.tokenState.setLastSyncedState(JSON.stringify(tokenValues.values, null, 2));
             dispatch.tokenState.setTokenData(tokenValues);

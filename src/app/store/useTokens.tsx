@@ -8,10 +8,12 @@ import formatTokens from '@/utils/formatTokens';
 import {mergeTokenGroups, resolveTokenValues} from '@/plugin/tokenHelpers';
 import {SelectionValue} from './models/tokenState';
 import {RootState} from '../store';
+import useConfirm from '../hooks/useConfirm';
 
 export default function useTokens() {
     const {tokens, usedTokenSet, activeTokenSet} = useSelector((state: RootState) => state.tokenState);
     const settings = useSelector((state: RootState) => state.settings);
+    const {confirm} = useConfirm();
 
     // Finds token that matches name
     function findToken(name: string) {
@@ -51,14 +53,28 @@ export default function useTokens() {
     }
 
     // Calls Figma asking for all local text- and color styles
-    function pullStyles() {
-        postToFigma({
-            type: MessageToPluginTypes.PULL_STYLES,
-            styleTypes: {
-                textStyles: true,
-                colorStyles: true,
-            },
+    async function pullStyles() {
+        const userDecision = await confirm({
+            text: 'Import styles',
+            description: 'What styles should be imported?',
+            confirmAction: 'Import',
+            choices: [
+                {key: 'colorStyles', label: 'Color', enabled: true},
+                {key: 'textStyles', label: 'Text', enabled: true},
+                {key: 'effectStyles', label: 'Shadows', enabled: true},
+            ],
         });
+
+        if (userDecision && userDecision.data.length) {
+            postToFigma({
+                type: MessageToPluginTypes.PULL_STYLES,
+                styleTypes: {
+                    textStyles: userDecision.data.includes('textStyles'),
+                    colorStyles: userDecision.data.includes('colorStyles'),
+                    effectStyles: userDecision.data.includes('effectStyles'),
+                },
+            });
+        }
     }
 
     // Calls Figma with a specific node to remove node data

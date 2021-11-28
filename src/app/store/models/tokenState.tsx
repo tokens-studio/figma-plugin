@@ -33,13 +33,6 @@ type EditTokenInput = TokenInput & {
 
 type DeleteTokenInput = {parent: string; path: string};
 
-export interface SelectionValue {
-    borderRadius: string | undefined;
-    horizontalPadding: string | undefined;
-    verticalPadding: string | undefined;
-    itemSpacing: string | undefined;
-}
-
 interface TokenState {
     tokens: TokenGroup;
     lastSyncedState: string;

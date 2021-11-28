@@ -19,6 +19,7 @@ export default function CreateStorageItemModal({isOpen, onClose, onSuccess}) {
                 id: '',
                 branch: '',
                 filePath: '',
+                baseUrl: '',
             };
             break;
         }
