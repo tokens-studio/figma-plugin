@@ -1,15 +1,5 @@
 import {styled} from '@/stitches.config';
-import React from 'react';
 
-const StyledBox = styled('div', {});
-
-type BoxProps = {
-    css?: object;
-    children?: React.ReactNode;
-};
-
-const Box: React.FC<BoxProps> = ({css, children}) => {
-    return <StyledBox css={css}>{children}</StyledBox>;
-};
+const Box = styled('div', {});
 
 export default Box;
