@@ -99,21 +99,7 @@ describe('TokenListing', () => {
             submit: true,
         });
 
-        cy.get('@postMessage')
-            .its('firstCall.args.0')
-            .should('deep.equal', {
-                pluginMessage: {
-                    type: 'token',
-                    values: {
-                        name: 'boxshadow.regular',
-                        x: '4',
-                        y: '4',
-                        spread: '0',
-                        color: '#ff0000',
-                        blur: '0',
-                    },
-                },
-            });
+        cy.get('@postMessage').should('be.calledTwice');
         receiveRemoteComponents();
     });
 
