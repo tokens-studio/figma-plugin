@@ -1,8 +1,10 @@
 import {generateId} from '@/plugin/helpers';
 import {notifyAPIProviders, notifyUI} from '@/plugin/notifiers';
+import {ContextObject} from 'Types/api';
+import isSameCredentials from './isSameCredentials';
 
 // update credentials
-export async function updateCredentials(context) {
+export async function updateCredentials(context: ContextObject) {
     try {
         delete context.new;
         const data = await figma.clientStorage.getAsync('apiProviders');
@@ -16,9 +18,7 @@ export async function updateCredentials(context) {
             if (context.internalId) {
                 matchingProvider = existingProviders.findIndex((i) => i.internalId === context.internalId);
             } else {
-                matchingProvider = existingProviders.findIndex(
-                    (i) => i.secret === context.secret && i.id === context.id && i.provider === context.provider
-                );
+                matchingProvider = existingProviders.findIndex((i) => isSameCredentials(i, context));
             }
             // Handle case for old credentials where  we had no internalId. Check id and secret and provider then
             if (matchingProvider !== -1) {
@@ -39,7 +39,7 @@ export async function updateCredentials(context) {
     }
 }
 
-export async function removeSingleCredential({secret, id}) {
+export async function removeSingleCredential(context: ContextObject) {
     try {
         const data = await figma.clientStorage.getAsync('apiProviders');
         let existingProviders = [];
@@ -48,7 +48,7 @@ export async function removeSingleCredential({secret, id}) {
 
             existingProviders = parsedData
                 .map((i) => {
-                    return i.secret === secret && i.id === id ? null : i;
+                    return isSameCredentials(i, context) ? null : i;
                 })
                 .filter((i) => i);
         }

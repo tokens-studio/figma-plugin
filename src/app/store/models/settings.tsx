@@ -1,8 +1,8 @@
 /* eslint-disable import/prefer-default-export */
-import {postToFigma, postToUI} from '@/plugin/notifiers';
+import {postToFigma} from '@/plugin/notifiers';
 import {track} from '@/utils/analytics';
 import {createModel} from '@rematch/core';
-import {MessageFromPluginTypes, MessageToPluginTypes} from 'Types/messages';
+import {MessageToPluginTypes} from 'Types/messages';
 import {UpdateMode} from 'Types/state';
 import {RootModel} from '.';
 
@@ -55,6 +55,9 @@ export const settings = createModel<RootModel>()({
             };
         },
         setUISettings(state, payload: SettingsState) {
+            // track ui setting to see usage
+            track('ignoreFirstPart', {isSet: payload.ignoreFirstPartForStyles});
+
             return {
                 ...state,
                 ...payload,

@@ -1,9 +1,9 @@
 import {UpdateMode} from 'Types/state';
-import {ApiDataType, StorageType} from '../../types/api';
-import {MessageFromPluginTypes, MessageToPluginTypes} from '../../types/messages';
+import {ApiDataType, StorageType} from 'Types/api';
+import {PostToFigmaProps, MessageFromPluginTypes, MessageToPluginTypes} from 'Types/messages';
 import store from './store';
 
-export function postToFigma(props) {
+export function postToFigma(props: PostToFigmaProps) {
     parent.postMessage(
         {
             pluginMessage: props,

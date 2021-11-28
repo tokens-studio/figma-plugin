@@ -7,8 +7,14 @@ import {Dispatch} from '../store';
 export default function useStorage() {
     const dispatch = useDispatch<Dispatch>();
 
-    function setStorageType({provider, bool = false}: {provider: StorageType; bool?: boolean}) {
-        if (bool) {
+    function setStorageType({
+        provider,
+        shouldSetInDocument = false,
+    }: {
+        provider: StorageType;
+        shouldSetInDocument?: boolean;
+    }) {
+        if (shouldSetInDocument) {
             postToFigma({
                 type: MessageToPluginTypes.SET_STORAGE_TYPE,
                 storageType: provider,

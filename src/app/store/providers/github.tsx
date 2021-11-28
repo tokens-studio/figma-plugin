@@ -22,29 +22,35 @@ function hasSameContent(content, storedContent) {
 }
 
 export const fetchBranches = async ({context, owner, repo}) => {
-    const octokit = new Octokit({auth: context.secret});
+    const octokit = new Octokit({auth: context.secret, baseUrl: context.baseUrl});
     const branches = await octokit.repos.listBranches({owner, repo}).then((response) => response.data);
     return branches.map((branch) => branch.name);
 };
 
 export const checkPermissions = async ({context, owner, repo}) => {
-    const octokit = new Octokit({auth: context.secret});
+    try {
+        const octokit = new Octokit({auth: context.secret, baseUrl: context.baseUrl});
 
-    const currentUser = await octokit.rest.users.getAuthenticated();
+        const currentUser = await octokit.rest.users.getAuthenticated();
 
-    if (!currentUser.data.login) return null;
+        if (!currentUser.data.login) return null;
 
-    const permissions = await octokit.rest.repos.getCollaboratorPermissionLevel({
-        owner,
-        repo,
-        username: currentUser.data.login,
-    });
+        const permissions = await octokit.rest.repos.getCollaboratorPermissionLevel({
+            owner,
+            repo,
+            username: currentUser.data.login,
+        });
 
-    return permissions;
+        return permissions;
+    } catch (e) {
+        console.log(e);
+
+        return null;
+    }
 };
 
 export const readContents = async ({context, owner, repo}) => {
-    const octokit = new Octokit({auth: context.secret});
+    const octokit = new Octokit({auth: context.secret, baseUrl: context.baseUrl});
     let response;
 
     try {
@@ -76,7 +82,7 @@ export const readContents = async ({context, owner, repo}) => {
 
 const commitToNewBranch = async ({context, tokenObj, owner, repo, commitMessage, branch}) => {
     const OctokitWithPlugin = Octokit.plugin(require('octokit-commit-multiple-files'));
-    const octokit = new OctokitWithPlugin({auth: context.secret});
+    const octokit = new OctokitWithPlugin({auth: context.secret, baseUrl: context.baseUrl});
 
     return octokit.repos.createOrUpdateFiles({
         owner,
@@ -89,7 +95,7 @@ const commitToNewBranch = async ({context, tokenObj, owner, repo, commitMessage,
 
 const commitToExistingBranch = async ({context, tokenObj, owner, repo, commitMessage, branch}) => {
     const OctokitWithPlugin = Octokit.plugin(require('octokit-commit-multiple-files'));
-    const octokit = new OctokitWithPlugin({auth: context.secret});
+    const octokit = new OctokitWithPlugin({auth: context.secret, baseUrl: context.baseUrl});
     return octokit.repos.createOrUpdateFiles({
         owner,
         repo,
@@ -108,11 +114,11 @@ export function useGitHub() {
     const {pushDialog} = usePushDialog();
 
     async function askUserIfPull(): Promise<boolean> {
-        const isConfirmed = await confirm({
+        const {result} = await confirm({
             text: 'Pull from GitHub?',
             description: 'Your repo already contains tokens, do you want to pull these now?',
         });
-        return isConfirmed;
+        return result;
     }
 
     function getTokenObj() {
@@ -171,26 +177,36 @@ export function useGitHub() {
         const pushSettings = await pushDialog();
         if (pushSettings) {
             const {commitMessage, customBranch} = pushSettings;
-            await writeTokensToGitHub({context, tokenObj, owner, repo, commitMessage, customBranch});
-            dispatch.uiState.setLocalApiState({...localApiState, branch: customBranch});
-            dispatch.uiState.setApiData({...context, branch: customBranch});
+            try {
+                await writeTokensToGitHub({
+                    context,
+                    tokenObj,
+                    owner,
+                    repo,
+                    commitMessage,
+                    customBranch,
+                });
+                dispatch.uiState.setLocalApiState({...localApiState, branch: customBranch});
+                dispatch.uiState.setApiData({...context, branch: customBranch});
 
-            pushDialog('success');
+                pushDialog('success');
+            } catch (e) {
+                console.log('Error pushing to GitHub', e);
+            }
         }
         return rawTokenObj;
+    }
+
+    async function checkAndSetAccess({context, owner, repo}) {
+        const hasWriteAccess = await checkPermissions({context, owner, repo});
+        dispatch.tokenState.setEditProhibited(!hasWriteAccess);
     }
 
     async function pullTokensFromGitHub(context) {
         const [owner, repo] = context.id.split('/');
 
-        try {
-            const currentPermissions = await checkPermissions({context, owner, repo});
-            if (currentPermissions) {
-                dispatch.tokenState.setEditProhibited(false);
-            }
-        } catch (e) {
-            dispatch.tokenState.setEditProhibited(true);
-        }
+        await checkAndSetAccess({context, owner, repo});
+
         try {
             const content = await readContents({context, owner, repo});
 
@@ -212,21 +228,25 @@ export function useGitHub() {
             if (!hasBranches) {
                 return null;
             }
-            const content = await readContents({context, owner, repo});
+
+            const content = await pullTokensFromGitHub(context);
+
             const {string: tokenObj} = getTokenObj();
 
             if (content) {
                 if (!hasSameContent(content, tokenObj)) {
                     const userDecision = await askUserIfPull();
                     if (userDecision) {
+                        dispatch.tokenState.setLastSyncedState(JSON.stringify(content.values, null, 2));
+                        dispatch.tokenState.setTokenData(content);
+                        notifyToUI('Pulled tokens from GitHub');
                         return content;
                     }
+                    return {values: tokenObj};
                 }
-            } else {
-                return pushTokensToGitHub(context);
+                return content;
             }
-            // If repo contains no tokens, return null
-            return null;
+            return pushTokensToGitHub(context);
         } catch (e) {
             console.log('Error', e);
         }
@@ -235,30 +255,27 @@ export function useGitHub() {
     async function addNewGitHubCredentials(context): Promise<TokenProps> {
         let {raw: rawTokenObj} = getTokenObj();
 
-        try {
-            const data = await syncTokensWithGitHub(context);
+        const data = await syncTokensWithGitHub(context);
 
-            if (data) {
-                postToFigma({
-                    type: MessageToPluginTypes.CREDENTIALS,
-                    ...context,
-                });
-                if (data?.values) {
-                    dispatch.tokenState.setLastSyncedState(JSON.stringify(data.values, null, 2));
-                    dispatch.tokenState.setTokenData(data);
-                    rawTokenObj = data.values;
-                } else {
-                    notifyToUI('No tokens stored on remote');
-                }
+        if (data) {
+            postToFigma({
+                type: MessageToPluginTypes.CREDENTIALS,
+                ...context,
+            });
+            if (data?.values) {
+                dispatch.tokenState.setLastSyncedState(JSON.stringify(data.values, null, 2));
+                dispatch.tokenState.setTokenData(data);
+                rawTokenObj = data.values;
+            } else {
+                notifyToUI('No tokens stored on remote');
             }
-
-            return {
-                values: rawTokenObj,
-            };
-        } catch (e) {
-            notifyToUI('Error fetching from URL, check console (F12)');
-            console.log('Error:', e);
+        } else {
+            return null;
         }
+
+        return {
+            values: rawTokenObj,
+        };
     }
     return {
         addNewGitHubCredentials,

@@ -75,7 +75,7 @@ describe('removeSingleCredential', () => {
         const apiObject = {id: '123', secret: 'foo', name: 'mytokens', provider: StorageProviderType.JSONBIN};
         const oldArray = [apiObject];
         figma.clientStorage.getAsync.mockResolvedValue(JSON.stringify(oldArray));
-        await removeSingleCredential({secret: apiObject.secret, id: apiObject.id});
+        await removeSingleCredential(apiObject);
 
         expect(figma.clientStorage.setAsync).toHaveBeenCalledWith('apiProviders', JSON.stringify([]));
     });
@@ -85,7 +85,7 @@ describe('removeSingleCredential', () => {
         const otherObject = {id: '456', secret: 'bar', name: 'mytokens', provider: StorageProviderType.JSONBIN};
         const oldArray = [apiObject, otherObject];
         figma.clientStorage.getAsync.mockResolvedValueOnce(JSON.stringify(oldArray));
-        await removeSingleCredential({id: otherObject.id, secret: otherObject.secret});
+        await removeSingleCredential(otherObject);
 
         expect(figma.clientStorage.setAsync).toHaveBeenCalledWith('apiProviders', JSON.stringify([apiObject]));
     });
