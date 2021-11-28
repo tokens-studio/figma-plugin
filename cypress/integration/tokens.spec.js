@@ -64,7 +64,7 @@ describe('TokenListing', () => {
         });
     });
 
-    it.only('can add a new shadow token', () => {
+    it('can add a new shadow token', () => {
         cy.receiveTokenValues({
             version: '5',
             values: {
