@@ -87,6 +87,16 @@ describe('getAliasValue', () => {
             input: 'rgba(255, 255, 0, {notexisting})',
             value: 'rgba(255, 255, 0, {notexisting})',
         },
+        {
+            name: 'colors.the one with spaces',
+            input: '#ff0000',
+            value: '#ff0000',
+        },
+        {
+            name: 'colors.aliasspaces',
+            input: '{colors.the one with spaces}',
+            value: '#ff0000',
+        },
     ];
 
     allTokens.forEach((token) => {

@@ -1,4 +1,4 @@
-export const aliasRegex = /(\$[^\s,]+\w)|({[^\s]+})/g;
+export const aliasRegex = /(\$[^\s,]+\w)|({([^}]*)})/g;
 
 export const findReferences = (tokenValue: string) => {
     return tokenValue?.toString().match(aliasRegex);

@@ -15,7 +15,7 @@ const EditTokenForm = ({resolvedTokens}) => {
     const dispatch = useDispatch<Dispatch>();
     const [error, setError] = React.useState(null);
 
-    const isValid = editToken.value && editToken.name.match(/^\S*$/) && !error;
+    const isValid = editToken.value && !error;
 
     const hasNameThatExistsAlready = resolvedTokens
         .filter((t) => t.internal__Parent === activeTokenSet)
