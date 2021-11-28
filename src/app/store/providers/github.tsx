@@ -248,6 +248,7 @@ export function useGitHub() {
             }
             return pushTokensToGitHub(context);
         } catch (e) {
+            notifyToUI('Error syncing with GitHub, check credentials');
             console.log('Error', e);
         }
     }
