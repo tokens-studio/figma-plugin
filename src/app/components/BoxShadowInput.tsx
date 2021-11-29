@@ -146,7 +146,7 @@ function SingleShadowInput({
                 <TokenInput label="Y" value={shadowItem.y} onChange={onChange} type="text" name="y" required />
                 <TokenInput label="Blur" value={shadowItem.blur} onChange={onChange} type="text" name="blur" required />
                 <TokenInput
-                    label="x"
+                    label="Spread"
                     value={shadowItem.spread}
                     onChange={onChange}
                     type="text"
