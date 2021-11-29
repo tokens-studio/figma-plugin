@@ -124,7 +124,7 @@ function SingleShadowInput({
         <Box css={{display: 'flex', flexDirection: 'column', gap: '$2', opacity: isDragging ? 0 : 1}}>
             <Box css={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}} ref={ref}>
                 {isMultiple && (
-                    <Box css={{display: 'flex', marginRight: '$3'}}>
+                    <Box css={{display: 'flex', width: '$space$8'}}>
                         <IconButton tooltip="Click to drag" icon={<IconGrabber />} data-handler-id={handlerId} />
                     </Box>
                 )}
@@ -166,7 +166,7 @@ function SingleShadowInput({
     );
 }
 
-const newToken = {x: '0', y: '0', blur: '0', spread: '0', color: '#000', type: 'dropShadow'};
+const newToken = {x: '0', y: '0', blur: '0', spread: '0', color: '#000000', type: 'dropShadow'};
 
 export default function BoxShadowInput() {
     const {editToken} = useSelector((state: RootState) => state.uiState);
