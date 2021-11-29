@@ -3,9 +3,12 @@
 Converts tokens from Figma Tokens to something Style Dictionary can read, removing any math operations or aliases, only resulting in raw values.
 
 ## How to use
-`npm run token-transformer input output sets excludes`
+Install (either globally or local)
+`npm install token-transformer -g`
 
-`npm run token-transformer input.json output.json global,dark,components global`
+`node token-transformer input output sets excludes`
+
+`node token-transformer input.json output.json global,dark,components global`
 
 ## Parameters
 Input: Filename of input
