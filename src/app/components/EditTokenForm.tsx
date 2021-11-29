@@ -41,7 +41,7 @@ const EditTokenForm = ({resolvedTokens}) => {
 
     const handleOptionsChange = (e) => {
         e.persist();
-        setEditToken({
+        dispatch.uiState.setEditToken({
             ...editToken,
             options: {...editToken.options, [e.target.name]: e.target.value},
         });
