@@ -33,34 +33,36 @@ describe('formatTokens', () => {
             JSON.stringify(
                 {
                     global: {
-                        withValue: {
-                            value: 'bar',
-                        },
-                        basic: {
-                            value: '#ff0000',
-                        },
-                        typography: {
-                            heading: {
-                                h1: {
-                                    fontFamily: {
-                                        value: 'Inter',
+                        global: {
+                            withValue: {
+                                value: 'bar',
+                            },
+                            basic: {
+                                value: '#ff0000',
+                            },
+                            typography: {
+                                heading: {
+                                    h1: {
+                                        fontFamily: {
+                                            value: 'Inter',
+                                        },
+                                        fontWeight: {
+                                            value: 'Bold',
+                                        },
+                                        fontSize: {
+                                            value: 36,
+                                        },
                                     },
-                                    fontWeight: {
-                                        value: 'Bold',
-                                    },
-                                    fontSize: {
-                                        value: 36,
-                                    },
-                                },
-                                h2: {
-                                    fontFamily: {
-                                        value: 'Inter',
-                                    },
-                                    fontWeight: {
-                                        value: 'Regular',
-                                    },
-                                    fontSize: {
-                                        value: 24,
+                                    h2: {
+                                        fontFamily: {
+                                            value: 'Inter',
+                                        },
+                                        fontWeight: {
+                                            value: 'Regular',
+                                        },
+                                        fontSize: {
+                                            value: 24,
+                                        },
                                     },
                                 },
                             },
