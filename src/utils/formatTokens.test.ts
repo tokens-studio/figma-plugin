@@ -4,10 +4,10 @@ describe('formatTokens', () => {
     it('converts given tokens to an array', () => {
         const typographyTokens = {
             global: [
-                {name: 'global.withValue', value: 'bar'},
-                {name: 'global.basic', value: '#ff0000'},
+                {name: 'withValue', value: 'bar'},
+                {name: 'basic', value: '#ff0000'},
                 {
-                    name: 'global.typography.heading.h1',
+                    name: 'typography.heading.h1',
                     value: {
                         fontFamily: 'Inter',
                         fontWeight: 'Bold',
@@ -17,7 +17,7 @@ describe('formatTokens', () => {
                     type: 'typography',
                 },
                 {
-                    name: 'global.typography.heading.h2',
+                    name: 'typography.heading.h2',
                     value: {
                         fontFamily: 'Inter',
                         fontWeight: 'Regular',
@@ -33,36 +33,34 @@ describe('formatTokens', () => {
             JSON.stringify(
                 {
                     global: {
-                        global: {
-                            withValue: {
-                                value: 'bar',
-                            },
-                            basic: {
-                                value: '#ff0000',
-                            },
-                            typography: {
-                                heading: {
-                                    h1: {
-                                        fontFamily: {
-                                            value: 'Inter',
-                                        },
-                                        fontWeight: {
-                                            value: 'Bold',
-                                        },
-                                        fontSize: {
-                                            value: 36,
-                                        },
+                        withValue: {
+                            value: 'bar',
+                        },
+                        basic: {
+                            value: '#ff0000',
+                        },
+                        typography: {
+                            heading: {
+                                h1: {
+                                    fontFamily: {
+                                        value: 'Inter',
                                     },
-                                    h2: {
-                                        fontFamily: {
-                                            value: 'Inter',
-                                        },
-                                        fontWeight: {
-                                            value: 'Regular',
-                                        },
-                                        fontSize: {
-                                            value: 24,
-                                        },
+                                    fontWeight: {
+                                        value: 'Bold',
+                                    },
+                                    fontSize: {
+                                        value: 36,
+                                    },
+                                },
+                                h2: {
+                                    fontFamily: {
+                                        value: 'Inter',
+                                    },
+                                    fontWeight: {
+                                        value: 'Regular',
+                                    },
+                                    fontSize: {
+                                        value: 24,
                                     },
                                 },
                             },
