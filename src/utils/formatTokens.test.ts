@@ -4,10 +4,10 @@ describe('formatTokens', () => {
     it('converts given tokens to an array', () => {
         const typographyTokens = {
             global: [
-                {name: 'global.withValue', value: 'bar'},
-                {name: 'global.basic', value: '#ff0000'},
+                {name: 'withValue', value: 'bar'},
+                {name: 'basic', value: '#ff0000'},
                 {
-                    name: 'global.typography.heading.h1',
+                    name: 'typography.heading.h1',
                     value: {
                         fontFamily: 'Inter',
                         fontWeight: 'Bold',
@@ -17,7 +17,7 @@ describe('formatTokens', () => {
                     type: 'typography',
                 },
                 {
-                    name: 'global.typography.heading.h2',
+                    name: 'typography.heading.h2',
                     value: {
                         fontFamily: 'Inter',
                         fontWeight: 'Regular',

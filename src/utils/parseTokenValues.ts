@@ -23,6 +23,8 @@ export default function parseTokenValues(tokens) {
             prev.push({[group[0]]: convertedToArray});
             return prev;
         }
+
+        return prev;
     }, []);
 
     return Object.assign({}, ...reducedTokens);
