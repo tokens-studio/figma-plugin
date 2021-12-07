@@ -1,8 +1,8 @@
 /* eslint-disable import/prefer-default-export */
-import {postToFigma, postToUI} from '@/plugin/notifiers';
+import {postToFigma} from '@/plugin/notifiers';
 import {track} from '@/utils/analytics';
 import {createModel} from '@rematch/core';
-import {MessageFromPluginTypes, MessageToPluginTypes} from 'Types/messages';
+import {MessageToPluginTypes} from 'Types/messages';
 import {UpdateMode} from 'Types/state';
 import {RootModel} from '.';
 
@@ -21,6 +21,7 @@ export interface SettingsState {
     updateStyles?: boolean;
     tokenType?: TokenModeType;
     ignoreFirstPartForStyles?: boolean;
+    useAbsoluteAliases?: boolean;
 }
 
 const setUI = (state) => {
@@ -42,6 +43,7 @@ export const settings = createModel<RootModel>()({
         updateStyles: true,
         tokenType: 'object',
         ignoreFirstPartForStyles: false,
+        useAbsoluteAliases: false,
     } as SettingsState,
     reducers: {
         setWindowSize(state, payload: {width: number; height: number}) {
@@ -100,9 +102,15 @@ export const settings = createModel<RootModel>()({
                 ignoreFirstPartForStyles: payload,
             };
         },
+        setUseAbsoluteAliases(state, payload: boolean) {
+            return {
+                ...state,
+                useAbsoluteAliases: payload,
+            };
+        },
     },
-    effects: (dispatch) => ({
-        setWindowSize: (payload, rootState) => {
+    effects: () => ({
+        setWindowSize: (payload) => {
             postToFigma({
                 type: MessageToPluginTypes.RESIZE_WINDOW,
                 width: payload.width,
