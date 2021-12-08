@@ -20,7 +20,7 @@ import {
     notifyUserId,
     notifyLastOpened,
 } from './notifiers';
-import {findAllWithData, removePluginData, sendPluginValues, updatePluginData} from './pluginData';
+import {findAllWithData, findAllChildren, removePluginData, sendPluginValues, updatePluginData} from './pluginData';
 import {getTokenData, updateNodes, setTokensOnDocument, goToNode, saveStorageType, getSavedStorageType} from './node';
 
 import {MessageToPluginTypes} from '../../types/messages';
@@ -32,20 +32,31 @@ figma.showUI(__html__, {
     height: 600,
 });
 
-figma.on('selectionchange', () => {
-    const nodes = figma.currentPage.selection;
+let inspectDeep = false;
+
+function sendSelectionChange() {
+    console.log('Selection changed', inspectDeep, figma.currentPage.selection);
+    const nodes = inspectDeep ? findAllChildren(figma.currentPage.selection) : figma.currentPage.selection;
+    console.log('Nodes', nodes);
+
     if (!nodes.length) {
         notifyNoSelection();
         return;
     }
     sendPluginValues(nodes);
+}
+
+figma.on('selectionchange', () => {
+    sendSelectionChange();
 });
 
 figma.ui.onmessage = async (msg) => {
     switch (msg.type) {
         case MessageToPluginTypes.INITIATE:
             try {
-                getUISettings();
+                const settings = await getUISettings();
+                inspectDeep = settings.inspectDeep;
+
                 const userId = await getUserId();
                 const lastOpened = await getLastOpened();
                 const storageType = await getSavedStorageType();
@@ -78,7 +89,7 @@ figma.ui.onmessage = async (msg) => {
                 notifyNoSelection();
                 return;
             }
-            sendPluginValues(figma.currentPage.selection);
+            sendSelectionChange();
             return;
         case MessageToPluginTypes.CREDENTIALS: {
             const {type, ...context} = msg;
@@ -96,10 +107,8 @@ figma.ui.onmessage = async (msg) => {
         case MessageToPluginTypes.SET_NODE_DATA:
             try {
                 updatePluginData(figma.currentPage.selection, msg.values);
-                sendPluginValues(
-                    figma.currentPage.selection,
-                    updateNodes(figma.currentPage.selection, msg.tokens, msg.settings)
-                );
+                updateNodes(figma.currentPage.selection, msg.tokens, msg.settings);
+                sendSelectionChange();
             } catch (e) {
                 console.error(e);
             }
@@ -108,11 +117,10 @@ figma.ui.onmessage = async (msg) => {
 
         case MessageToPluginTypes.REMOVE_NODE_DATA: {
             try {
-                const selection = msg.nodes
-                    ? figma.currentPage.selection.filter((node) => msg.nodes.includes(node.id))
-                    : figma.currentPage.selection;
-                removePluginData({nodes: selection, key: msg.key});
-                sendPluginValues(figma.currentPage.selection);
+                const nodes = findAllChildren(figma.currentPage.selection);
+
+                removePluginData({nodes, key: msg.key, shouldRemoveValues: false});
+                sendSelectionChange();
             } catch (e) {
                 console.error(e);
             }
@@ -163,8 +171,13 @@ figma.ui.onmessage = async (msg) => {
                 updateOnChange: msg.updateOnChange,
                 updateStyles: msg.updateStyles,
                 ignoreFirstPartForStyles: msg.ignoreFirstPartForStyles,
+                inspectDeep: msg.inspectDeep,
             });
             figma.ui.resize(msg.uiWindow.width, msg.uiWindow.height);
+            if (inspectDeep !== msg.inspectDeep) {
+                inspectDeep = msg.inspectDeep;
+                sendSelectionChange();
+            }
             break;
         }
         default:

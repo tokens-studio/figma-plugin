@@ -49,6 +49,7 @@ export function notifyUISettings({
     updateOnChange,
     updateStyles,
     ignoreFirstPartForStyles,
+    inspectDeep,
 }: {
     width: number;
     height: number;
@@ -57,6 +58,7 @@ export function notifyUISettings({
     updateOnChange: boolean;
     updateStyles: boolean;
     ignoreFirstPartForStyles: boolean;
+    inspectDeep: boolean;
 }) {
     postToUI({
         type: MessageFromPluginTypes.UI_SETTINGS,
@@ -70,6 +72,7 @@ export function notifyUISettings({
             updateOnChange,
             updateStyles,
             ignoreFirstPartForStyles,
+            inspectDeep,
         },
     });
 }

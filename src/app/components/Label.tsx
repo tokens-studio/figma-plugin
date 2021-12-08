@@ -4,7 +4,7 @@ import React, {ReactNode} from 'react';
 export default function Label({htmlFor, children, css}: {htmlFor: string; children: ReactNode; css?: object}) {
     const StyledLabel = styled('label', {
         color: '$text',
-        fontSize: 12,
+        fontSize: 14,
         lineHeight: 1,
         userSelect: 'none',
     });

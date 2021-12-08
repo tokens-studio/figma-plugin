@@ -74,6 +74,7 @@ export type PostToFigmaProps =
     | {
           type: MessageToPluginTypes.REMOVE_NODE_DATA;
           key: string;
+          nodes: string[];
       }
     | {
           type: MessageToPluginTypes.PULL_STYLES;

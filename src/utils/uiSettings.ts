@@ -21,6 +21,7 @@ export async function getUISettings() {
         let updateOnChange;
         let updateStyles;
         let ignoreFirstPartForStyles;
+        let inspectDeep;
         if (data) {
             const parsedData = await JSON.parse(data);
             width = parsedData.width || 400;
@@ -33,7 +34,8 @@ export async function getUISettings() {
                 typeof parsedData.ignoreFirstPartForStyles === 'undefined'
                     ? false
                     : parsedData.ignoreFirstPartForStyles;
-            notifyUISettings({
+            inspectDeep = typeof parsedData.inspectDeep === 'undefined' ? false : parsedData.inspectDeep;
+            const settings = {
                 width: Math.max(300, width),
                 height: Math.max(200, height),
                 updateMode,
@@ -41,7 +43,10 @@ export async function getUISettings() {
                 updateRemote,
                 updateStyles,
                 ignoreFirstPartForStyles,
-            });
+                inspectDeep,
+            };
+            notifyUISettings(settings);
+            return settings;
         }
     } catch (err) {
         notifyUI('There was an issue saving your credentials. Please try again.');

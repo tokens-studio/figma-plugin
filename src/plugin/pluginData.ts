@@ -8,14 +8,6 @@ export function fetchPluginData(node, value: string) {
     return node.getPluginData(value);
 }
 
-// {
-//     fill: colors.blue.500
-//     nodes: [1,2,3]
-// },
-// {
-//     fill: colors.blue.300
-//     nodes: [4,5,6]
-// }
 export function fetchAllPluginData(node) {
     const pluginData = [];
     let i = 0;
@@ -43,6 +35,7 @@ export function fetchAllPluginData(node) {
 
         i += 1;
     }
+    console.log('GOT DATA', pluginData);
 
     if (pluginData.length === 1 && pluginData[0][0] === 'values') {
         return node ? pluginData[0][1] : pluginData[0][1];
@@ -50,6 +43,8 @@ export function fetchAllPluginData(node) {
     if (pluginData.length > 0) {
         return Object.fromEntries(pluginData);
     }
+    console.log('got no data');
+
     return null;
 }
 
@@ -57,6 +52,7 @@ export function fetchSelectionPluginData(nodes) {
     const pluginData = nodes.map((node) => {
         return {node: node.id, values: fetchAllPluginData(node)};
     });
+    console.log('fetchSelectionPluginData', pluginData);
 
     // turn this
 
@@ -91,11 +87,23 @@ export function fetchSelectionPluginData(nodes) {
         return acc;
     }, []);
 
-    console.log('grouped', grouped);
     return grouped;
 }
 
-function findPluginDataTraversal(node) {
+export function findAllChildren(nodes): SceneNode[] {
+    const nodesAndChildren = [];
+
+    nodes.forEach((node) => {
+        nodesAndChildren.push(node);
+        if (node.children) {
+            nodesAndChildren.push(...findAllChildren(node.children));
+        }
+    });
+
+    return nodesAndChildren;
+}
+
+export function findPluginDataTraversal(node) {
     const data = fetchAllPluginData(node);
     const nodes = [];
     if (data) nodes.push(node);
@@ -138,7 +146,6 @@ export function sendPluginValues(nodes, values?) {
     if (!pluginValues) {
         pluginValues = fetchSelectionPluginData(nodes);
     }
-    console.log('pluginValues', nodes, pluginValues);
 
     notifySelection(pluginValues);
 }

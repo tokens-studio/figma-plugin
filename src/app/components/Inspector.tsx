@@ -1,14 +1,19 @@
 import * as React from 'react';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import useConfirm from '../hooks/useConfirm';
-import {RootState} from '../store';
+import {Dispatch, RootState} from '../store';
 import useTokens from '../store/useTokens';
 import Button from './Button';
+import Checkbox from './Checkbox';
 import Icon from './Icon';
+import Label from './Label';
 import Tooltip from './Tooltip';
 
 const Inspector = () => {
     const uiState = useSelector((state: RootState) => state.uiState);
+    const {inspectDeep} = useSelector((state: RootState) => state.settings);
+    const dispatch = useDispatch<Dispatch>();
+
     const {removeNodeData, removeAllTokensFromNodes} = useTokens();
 
     const {confirm} = useConfirm();
@@ -30,6 +35,15 @@ const Inspector = () => {
 
     return (
         <div className="space-y-2 p-4">
+            <div className="flex items-center space-x-2">
+                <Checkbox
+                    checked={inspectDeep}
+                    defaultChecked={inspectDeep}
+                    id="inspectDeep"
+                    onCheckedChange={() => dispatch.settings.setInspectDeep(!inspectDeep)}
+                />
+                <Label htmlFor="inspectDeep">Deep inspect</Label>
+            </div>
             <div className="space-y-1">
                 {uiState.selectionValues.length > 0 ? (
                     <>
