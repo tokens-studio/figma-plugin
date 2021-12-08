@@ -1,5 +1,49 @@
 import {resolveTokenValues} from './tokenHelpers';
 
+const singleShadowToken = {
+    type: 'boxShadow',
+    description: 'the one with one shadow',
+    value: {
+        type: 'dropShadow',
+        color: '{colors.red.500}',
+        x: 0,
+        y: 0,
+        blur: 10,
+        spread: 0,
+    },
+};
+
+const multipleShadowToken = {
+    type: 'boxShadow',
+    description: 'the one with multiple shadow',
+    value: [
+        {
+            type: 'dropShadow',
+            color: 'rgba({colors.red.500}, 0.5)',
+            x: 0,
+            y: 0,
+            blur: 2,
+            spread: 4,
+        },
+        {
+            type: 'dropShadow',
+            color: '{theme.accent.subtle}',
+            x: 0,
+            y: 4,
+            blur: 4,
+            spread: 4,
+        },
+        {
+            type: 'dropShadow',
+            color: '#000000',
+            x: 0,
+            y: 8,
+            blur: 16,
+            spread: 4,
+        },
+    ],
+};
+
 const tokens = [
     {name: 'foo', value: 3},
     {name: 'bar', value: '{foo}'},
@@ -12,6 +56,8 @@ const tokens = [
     {name: 'theme.accent.default', value: 'rgba({colors.red.500}, 0.5)'},
     {name: 'theme.accent.subtle', value: 'rgba({colors.red.500}, {opacity.default})'},
     {name: 'theme.accent.deep', value: 'rgba({theme.accent.default}, {opacity.full})'},
+    {name: 'shadow.single', ...singleShadowToken},
+    {name: 'shadow.multiple', ...multipleShadowToken},
 ];
 
 const output = [
@@ -71,6 +117,34 @@ const output = [
         name: 'theme.accent.deep',
         rawValue: 'rgba({theme.accent.default}, {opacity.full})',
         value: '#ff0000',
+    },
+    {
+        ...singleShadowToken,
+        name: 'shadow.single',
+        rawValue: singleShadowToken.value,
+        value: {
+            ...singleShadowToken.value,
+            color: '#ff0000',
+        },
+    },
+    {
+        ...multipleShadowToken,
+        name: 'shadow.multiple',
+        rawValue: multipleShadowToken.value,
+        value: [
+            {
+                ...multipleShadowToken.value[0],
+                color: '#ff000080',
+            },
+            {
+                ...multipleShadowToken.value[1],
+                color: '#ff000066',
+            },
+            {
+                ...multipleShadowToken.value[2],
+                color: '#000000',
+            },
+        ],
     },
 ];
 describe('resolveTokenValues', () => {

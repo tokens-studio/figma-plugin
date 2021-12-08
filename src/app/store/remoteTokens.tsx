@@ -1,6 +1,7 @@
 import {useDispatch, useSelector} from 'react-redux';
 import {StorageProviderType} from 'Types/api';
 import {MessageToPluginTypes} from 'Types/messages';
+import {track} from '@/utils/analytics';
 import {postToFigma} from '../../plugin/notifiers';
 import {useJSONbin} from './providers/jsonbin';
 import useURL from './providers/url';
@@ -14,7 +15,7 @@ export default function useRemoteTokens() {
 
     const {setStorageType} = useStorage();
     const {pullTokensFromJSONBin, addJSONBinCredentials, createNewJSONBin} = useJSONbin();
-    const {addNewGitHubCredentials, pullTokensFromGitHub, pushTokensToGitHub} = useGitHub();
+    const {addNewGitHubCredentials, syncTokensWithGitHub, pullTokensFromGitHub, pushTokensToGitHub} = useGitHub();
     const {pullTokensFromURL} = useURL();
 
     const pullTokens = async (context = api) => {
@@ -42,18 +43,28 @@ export default function useRemoteTokens() {
         if (tokenValues) {
             dispatch.tokenState.setLastSyncedState(JSON.stringify(tokenValues.values, null, 2));
             dispatch.tokenState.setTokenData(tokenValues);
+            track('Launched with token sets', {
+                count: Object.keys(tokenValues.values).length,
+                setNames: Object.keys(tokenValues.values),
+            });
         }
 
         dispatch.uiState.setLoading(false);
     };
 
     const restoreStoredProvider = async (context) => {
-        dispatch.tokenState.setEmptyTokens();
         dispatch.uiState.setLocalApiState(context);
         dispatch.uiState.setApiData(context);
         dispatch.tokenState.setEditProhibited(false);
-        setStorageType({provider: context, bool: true});
-        await pullTokens(context);
+        setStorageType({provider: context, shouldSetInDocument: true});
+        switch (context.provider) {
+            case StorageProviderType.GITHUB: {
+                await syncTokensWithGitHub(context);
+                break;
+            }
+            default:
+                await pullTokens(context);
+        }
         return null;
     };
 
@@ -96,7 +107,7 @@ export default function useRemoteTokens() {
         if (data) {
             dispatch.uiState.setLocalApiState(credentials);
             dispatch.uiState.setApiData(credentials);
-            setStorageType({provider: credentials, bool: true});
+            setStorageType({provider: credentials, shouldSetInDocument: true});
             return true;
         }
         return false;
@@ -105,8 +116,7 @@ export default function useRemoteTokens() {
     const deleteProvider = (provider) => {
         postToFigma({
             type: MessageToPluginTypes.REMOVE_SINGLE_CREDENTIAL,
-            id: provider.id,
-            secret: provider.secret,
+            context: provider,
         });
     };
 

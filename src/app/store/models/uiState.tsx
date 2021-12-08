@@ -3,7 +3,8 @@ import {track} from '@/utils/analytics';
 import fetchChangelog from '@/utils/storyblok';
 import {createModel} from '@rematch/core';
 import {StorageType, StorageProviderType, ApiDataType} from '@types/api';
-import {TokenType} from 'Types/tokens';
+import {ShadowTokenSingleValue, TypographyObject} from 'Types/propertyTypes';
+import {SelectionValue, TokenType} from 'Types/tokens';
 
 import {RootModel} from '.';
 
@@ -16,8 +17,7 @@ type SelectionValue = {
     nodes: string[];
 };
 
-interface EditToken {
-    value: string | object;
+interface EditTokenObjectCommonProperties {
     name: string;
     initialName: string;
     path: string;
@@ -30,6 +30,27 @@ interface EditToken {
     type: TokenType;
 }
 
+export type EditTokenObject =
+    | (EditTokenObjectCommonProperties & {
+          type: 'boxShadow';
+          value: ShadowTokenSingleValue[] | ShadowTokenSingleValue;
+      })
+    | (EditTokenObjectCommonProperties & {
+          type: 'typography';
+          value: TypographyObject;
+      })
+    | (EditTokenObjectCommonProperties & {
+          type: TokenType;
+          value: string | number;
+      });
+
+export type ConfirmProps = {
+    show?: boolean;
+    text?: string;
+    description?: string;
+    choices?: {key: string; label: string; enabled?: boolean}[];
+    confirmAction?: string;
+};
 interface UIState {
     selectionValues: SelectionValue[];
     displayType: DisplayType;
@@ -44,19 +65,23 @@ interface UIState {
     lastUpdatedAt: Date | null;
     changelog: object[];
     lastOpened: string | null;
-    editToken: EditToken | null;
+    editToken: EditTokenObject | null;
     showEditForm: boolean;
     tokenFilter: string;
     tokenFilterVisible: boolean;
-    confirmState: {
-        show: boolean;
-        text?: string;
-        description?: string;
-    };
+    confirmState: ConfirmProps;
     showPushDialog: string | false;
     showEmptyGroups: boolean;
     collapsed: boolean;
 }
+
+const defaultConfirmState = {
+    show: false,
+    text: '',
+    description: '',
+    choices: null,
+    confirmAction: 'Yes',
+};
 
 export const uiState = createModel<RootModel>()({
     state: {
@@ -82,11 +107,7 @@ export const uiState = createModel<RootModel>()({
         showEditForm: false,
         tokenFilter: '',
         tokenFilterVisible: false,
-        confirmState: {
-            show: false,
-            text: '',
-            description: '',
-        },
+        confirmState: defaultConfirmState,
         showPushDialog: false,
         showEmptyGroups: true,
         collapsed: false,
@@ -98,24 +119,30 @@ export const uiState = createModel<RootModel>()({
                 showPushDialog: data,
             };
         },
-        setShowConfirm: (state, data: {text: string; description?: string}) => {
+        setShowConfirm: (
+            state,
+            data: {
+                text: string;
+                description?: string;
+                choices: {key: string; label: string; enabled?: boolean}[];
+                confirmAction?: string;
+            }
+        ) => {
             return {
                 ...state,
                 confirmState: {
                     show: true,
                     text: data.text,
                     description: data.description,
+                    choices: data.choices,
+                    confirmAction: data.confirmAction || defaultConfirmState.confirmAction,
                 },
             };
         },
         setHideConfirm: (state) => {
             return {
                 ...state,
-                confirmState: {
-                    show: false,
-                    text: '',
-                    description: '',
-                },
+                confirmState: defaultConfirmState,
             };
         },
         setDisabled: (state, data: boolean) => {

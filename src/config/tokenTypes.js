@@ -70,11 +70,12 @@ export default {
         type: 'boxShadow',
         schema: {
             value: {
-                x: '',
-                y: '',
-                blur: '',
-                spread: '',
-                color: '',
+                x: '0',
+                y: '0',
+                blur: '0',
+                spread: '0',
+                color: '#000000',
+                type: 'dropShadow',
             },
             options: {
                 description: '',
@@ -87,14 +88,14 @@ export default {
         type: 'typography',
         schema: {
             value: {
-                fontFamily: '',
-                fontWeight: '',
-                lineHeight: '',
-                fontSize: '',
-                letterSpacing: '',
-                paragraphSpacing: '',
-                textDecoration: '',
-                textCase: '',
+                fontFamily: 'Inter',
+                fontWeight: 'Regular',
+                lineHeight: 'AUTO',
+                fontSize: '18',
+                letterSpacing: '0%',
+                paragraphSpacing: '0',
+                textDecoration: 'none',
+                textCase: 'none',
             },
             options: {
                 description: '',

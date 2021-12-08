@@ -1,20 +1,16 @@
+import {SingleTokenObject} from 'Types/tokens';
 import {ColorToken} from '../../types/propertyTypes';
+import filterMatchingStyles from './figmaUtils/filterMatchingStyles';
 import setColorValuesOnTarget from './setColorValuesOnTarget';
 
 // Iterate over colorTokens to create objects that match figma styles
-export default function updateColorStyles(colorTokens, shouldCreate = false) {
+export default function updateColorStyles(colorTokens: SingleTokenObject[], shouldCreate = false) {
     const paints = figma.getLocalPaintStyles();
 
     colorTokens.map((token: ColorToken) => {
         let matchingStyles = [];
         if (paints.length > 0) {
-            matchingStyles = paints.filter(
-                (n) =>
-                    n.name
-                        .split('/')
-                        .map((i) => i.trim())
-                        .join('/') === token.name
-            );
+            matchingStyles = filterMatchingStyles(token, paints);
         }
         if (matchingStyles.length) {
             setColorValuesOnTarget(matchingStyles[0], token);

@@ -86,8 +86,8 @@ figma.ui.onmessage = async (msg) => {
             break;
         }
         case MessageToPluginTypes.REMOVE_SINGLE_CREDENTIAL: {
-            const {secret, id} = msg;
-            removeSingleCredential({secret, id});
+            const {context} = msg;
+            removeSingleCredential(context);
             break;
         }
         case MessageToPluginTypes.SET_STORAGE_TYPE:

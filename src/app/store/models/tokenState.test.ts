@@ -1,6 +1,25 @@
 import {init} from '@rematch/core';
 import {models, RootModel} from './index';
 
+const shadowArray = [
+    {
+        type: 'innerShadow',
+        color: '#00000080',
+        x: '0',
+        y: '0',
+        blur: '2',
+        spread: '4',
+    },
+    {
+        type: 'dropShadow',
+        color: '#000000',
+        x: '0',
+        y: '4',
+        blur: '4',
+        spread: '4',
+    },
+];
+
 describe('editToken', () => {
     let store;
     beforeEach(() => {
@@ -33,6 +52,20 @@ describe('editToken', () => {
                                         fontWeight: '400',
                                         fontSize: '16',
                                     },
+                                },
+                                {
+                                    name: 'header 1',
+                                    type: 'typography',
+                                    value: {
+                                        fontWeight: '400',
+                                        fontSize: '16',
+                                    },
+                                },
+                                {
+                                    name: 'shadow.mixed',
+                                    type: 'boxShadow',
+                                    description: 'the one with mixed shadows',
+                                    value: shadowArray,
                                 },
                             ],
                             options: [
@@ -78,6 +111,19 @@ describe('editToken', () => {
         const {tokens} = store.getState().tokenState;
         expect(tokens.global[1].value).toEqual('{secondary}');
         expect(tokens.global[3].value).toEqual('$primary50');
+        expect(tokens.global[3].value).toEqual('$primary50');
+    });
+
+    it('doesnt interfere with other tokens', async () => {
+        await store.dispatch.tokenState.editToken({
+            parent: 'global',
+            oldName: 'primary',
+            name: 'secondary',
+            value: '1',
+        });
+
+        const {tokens} = store.getState().tokenState;
+        expect(tokens.global[6].value).toEqual(shadowArray);
     });
 
     it('also updates tokens from other sets', async () => {

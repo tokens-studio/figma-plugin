@@ -33,13 +33,6 @@ type EditTokenInput = TokenInput & {
 
 type DeleteTokenInput = {parent: string; path: string};
 
-export interface SelectionValue {
-    borderRadius: string | undefined;
-    horizontalPadding: string | undefined;
-    verticalPadding: string | undefined;
-    itemSpacing: string | undefined;
-}
-
 interface TokenState {
     tokens: TokenGroup;
     lastSyncedState: string;
@@ -300,6 +293,17 @@ export const tokenState = createModel<RootModel>()({
             const newTokens = Object.entries(state.tokens).reduce(
                 (acc, [key, values]: [string, SingleTokenObject[]]) => {
                     const newValues = values.map((token) => {
+                        if (Array.isArray(token.value)) {
+                            return {
+                                ...token,
+                                value: token.value.map((t) =>
+                                    Object.entries(t).reduce((a, [k, v]: [string, string]) => {
+                                        a[k] = replaceReferences(v.toString(), data.oldName, data.newName);
+                                        return a;
+                                    }, {})
+                                ),
+                            };
+                        }
                         if (typeof token.value === 'object') {
                             return {
                                 ...token,

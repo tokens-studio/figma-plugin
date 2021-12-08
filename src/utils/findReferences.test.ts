@@ -7,6 +7,10 @@ describe('findReferences', () => {
         expect(findReferences('rgba({colors.blue})')).toEqual(['{colors.blue}']);
         expect(findReferences('{colors.blue} * 2')).toEqual(['{colors.blue}']);
         expect(findReferences('{colors.blue} * {colors.red}')).toEqual(['{colors.blue}', '{colors.red}']);
+        expect(findReferences('{colors.the one with spacing} * {colors.red}')).toEqual([
+            '{colors.the one with spacing}',
+            '{colors.red}',
+        ]);
     });
 });
 

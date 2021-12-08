@@ -1,6 +1,7 @@
 import {convertToFigmaColor} from './figmaTransforms/colors';
 import {transformValue} from './helpers';
 import setColorValuesOnTarget from './setColorValuesOnTarget';
+import setEffectValuesOnTarget from './setEffectValuesOnTarget';
 import setTextValuesOnTarget from './setTextValuesOnTarget';
 
 export default async function setValuesOnNode(node, values, data, ignoreFirstPartForStyles = false) {
@@ -24,26 +25,7 @@ export default async function setValuesOnNode(node, values, data, ignoreFirstPar
 
         // BOX SHADOW
         if (typeof values.boxShadow !== 'undefined' && typeof node.effects !== 'undefined') {
-            // get all effects, but remove DROP_SHADOW, since we're about to add it
-            const effects = node.effects.filter((effect) => effect.type !== 'DROP_SHADOW');
-            const {x, y, spread, color, blur} = values.boxShadow;
-            const {
-                color: {r, g, b},
-                opacity,
-            } = convertToFigmaColor(color);
-
-            const effect: ShadowEffect = {
-                type: 'DROP_SHADOW',
-                visible: true,
-                blendMode: 'NORMAL',
-                color: {r, g, b, a: opacity},
-                offset: {x: transformValue(x, 'boxShadow'), y: transformValue(y, 'boxShadow')},
-                radius: transformValue(blur, 'boxShadow'),
-                spread: transformValue(spread, 'boxShadow'),
-            };
-
-            effects.push(effect);
-            node.effects = effects;
+            setEffectValuesOnTarget(node, {value: values.boxShadow});
         }
 
         // BORDER WIDTH
@@ -134,7 +116,7 @@ export default async function setValuesOnNode(node, values, data, ignoreFirstPar
             if (typeof node.strokes !== 'undefined') {
                 const paints = figma.getLocalPaintStyles();
                 const path = data.border.split('.');
-                const pathname = path.slice(1, path.length).join('/');
+                const pathname = path.slice(ignoreFirstPartForStyles ? 1 : 0, path.length).join('/');
                 const matchingStyles = paints.filter((n) => n.name === pathname);
                 const {color, opacity} = convertToFigmaColor(values.border);
 

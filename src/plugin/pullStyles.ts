@@ -1,8 +1,9 @@
 /* eslint-disable no-param-reassign */
 import {figmaRGBToHex} from '@figma-plugin/helpers';
-import {NewTokenObject, SingleTokenObject} from 'types/tokens';
-import {ColorToken, TypographyToken} from '../../types/propertyTypes';
+import {PullStyleTypes, SingleTokenObject} from 'Types/tokens';
+import {ColorToken, ShadowTokenSingleValue} from 'Types/propertyTypes';
 import {slugify} from '../app/components/utils';
+import {convertBoxShadowTypeFromFigma} from './figmaTransforms/boxShadow';
 import {convertFigmaGradientToString} from './figmaTransforms/gradients';
 import {convertFigmaToLetterSpacing} from './figmaTransforms/letterSpacing';
 import {convertFigmaToLineHeight} from './figmaTransforms/lineHeight';
@@ -10,24 +11,25 @@ import {convertFigmaToTextCase} from './figmaTransforms/textCase';
 import {convertFigmaToTextDecoration} from './figmaTransforms/textDecoration';
 import {notifyStyleValues} from './notifiers';
 
-export default function pullStyles(styleTypes): void {
-    let colors: ColorToken[] = [];
-    let typography: TypographyToken[] = [];
-    let fontFamilies: NewTokenObject[] = [];
-    let lineHeights: NewTokenObject[] = [];
-    let fontWeights: NewTokenObject[] = [];
-    let fontSizes: NewTokenObject[] = [];
-    let letterSpacing: NewTokenObject[] = [];
-    let paragraphSpacing: NewTokenObject[] = [];
-    let textCase: NewTokenObject[] = [];
-    let textDecoration: NewTokenObject[] = [];
+export default function pullStyles(styleTypes: PullStyleTypes): void {
+    let colors: SingleTokenObject[] = [];
+    let typography: SingleTokenObject[] = [];
+    let effects: SingleTokenObject[] = [];
+    let fontFamilies: SingleTokenObject[] = [];
+    let lineHeights: SingleTokenObject[] = [];
+    let fontWeights: SingleTokenObject[] = [];
+    let fontSizes: SingleTokenObject[] = [];
+    let letterSpacing: SingleTokenObject[] = [];
+    let paragraphSpacing: SingleTokenObject[] = [];
+    let textCase: SingleTokenObject[] = [];
+    let textDecoration: SingleTokenObject[] = [];
     if (styleTypes.colorStyles) {
         colors = figma
             .getLocalPaintStyles()
             .filter((style) => style.paints.length === 1)
             .map((style) => {
                 const paint = style.paints[0];
-                let styleObject: ColorToken = {};
+                let styleObject: ColorToken = {} as ColorToken;
                 if (style.description) {
                     styleObject.description = style.description;
                 }
@@ -175,7 +177,7 @@ export default function pullStyles(styleTypes): void {
                 .map((section) => section.trim())
                 .join('.');
 
-            const styleObject: TypographyToken = {name: normalizedName, value: obj, type: 'typography'};
+            const styleObject: SingleTokenObject = {name: normalizedName, value: obj, type: 'typography'};
 
             if (style.description) {
                 styleObject.description = style.description;
@@ -185,8 +187,49 @@ export default function pullStyles(styleTypes): void {
         });
     }
 
-    notifyStyleValues({
+    if (styleTypes.effectStyles) {
+        effects = figma
+            .getLocalEffectStyles()
+            .filter((style) => style.effects.every((effect) => ['DROP_SHADOW', 'INNER_SHADOW'].includes(effect.type)))
+            .map((style) => {
+                // convert paint to object containg x, y, spread, color
+                const shadows: ShadowTokenSingleValue[] = style.effects.map((effect) => {
+                    const effectObject: ShadowTokenSingleValue = {} as ShadowTokenSingleValue;
+
+                    effectObject.color = figmaRGBToHex(effect.color);
+                    effectObject.type = convertBoxShadowTypeFromFigma(effect.type);
+                    effectObject.x = effect.offset.x;
+                    effectObject.y = effect.offset.y;
+                    effectObject.blur = effect.radius;
+                    effectObject.spread = effect.spread;
+
+                    return effectObject;
+                });
+
+                if (!shadows) return null;
+
+                const normalizedName = style.name
+                    .split('/')
+                    .map((section) => section.trim())
+                    .join('.');
+
+                const styleObject: SingleTokenObject = {
+                    value: shadows.length > 1 ? shadows : shadows[0],
+                    type: 'boxShadow',
+                    name: normalizedName,
+                };
+                if (style.description) {
+                    styleObject.description = style.description;
+                }
+
+                return styleObject;
+            })
+            .filter(Boolean);
+    }
+
+    const stylesObject = {
         colors,
+        effects,
         fontFamilies,
         lineHeights,
         fontWeights,
@@ -196,5 +239,14 @@ export default function pullStyles(styleTypes): void {
         typography,
         textCase,
         textDecoration,
-    });
+    };
+
+    const returnedObject = Object.entries(stylesObject).reduce((acc, [key, value]) => {
+        if (value.length > 0) {
+            acc[key] = value;
+        }
+        return acc;
+    }, {});
+
+    notifyStyleValues(returnedObject);
 }
