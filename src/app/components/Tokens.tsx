@@ -1,7 +1,8 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import * as React from 'react';
 import {useSelector} from 'react-redux';
-import {mergeTokenGroups, resolveTokenValues} from '@/plugin/tokenHelpers';
+import {differenceWith, isEqual} from 'lodash';
+import {mergeTokenGroups, resolveAbsoluteTokenValues, resolveTokenValues} from '@/plugin/tokenHelpers';
 import TokenListing from './TokenListing';
 import TokensBottomBar from './TokensBottomBar';
 import ToggleEmptyButton from './ToggleEmptyButton';
@@ -25,12 +26,18 @@ interface TokenListingType {
 }
 
 const Tokens = ({isActive}) => {
-    const {tokens, usedTokenSet, activeTokenSet} = useSelector((state: RootState) => state.tokenState);
+    const {tokens, rawTokens, usedTokenSet, activeTokenSet} = useSelector((state: RootState) => state.tokenState);
     const {showEditForm, tokenFilter, tokenFilterVisible} = useSelector((state: RootState) => state.uiState);
+    const {useAbsoluteAliases} = useSelector((state: RootState) => state.settings);
 
     const resolvedTokens = React.useMemo(() => {
-        return resolveTokenValues(mergeTokenGroups(tokens, [...usedTokenSet, activeTokenSet]));
-    }, [tokens, usedTokenSet, activeTokenSet]);
+        const mergedTokens = mergeTokenGroups(tokens, [...usedTokenSet, activeTokenSet]);
+        return useAbsoluteAliases
+            ? resolveAbsoluteTokenValues(mergedTokens, rawTokens)
+            : resolveTokenValues(mergedTokens);
+    }, [tokens, usedTokenSet, activeTokenSet, useAbsoluteAliases, rawTokens]);
+
+    console.log({resolvedTokens});
 
     const memoizedTokens = React.useMemo(() => {
         if (tokens[activeTokenSet]) {

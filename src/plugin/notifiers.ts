@@ -50,6 +50,7 @@ export function notifyUISettings({
     updateOnChange,
     updateStyles,
     ignoreFirstPartForStyles,
+    useAbsoluteAliases,
 }: {
     width: number;
     height: number;
@@ -58,6 +59,7 @@ export function notifyUISettings({
     updateOnChange: boolean;
     updateStyles: boolean;
     ignoreFirstPartForStyles: boolean;
+    useAbsoluteAliases: boolean;
 }) {
     postToUI({
         type: MessageFromPluginTypes.UI_SETTINGS,
@@ -71,6 +73,7 @@ export function notifyUISettings({
             updateOnChange,
             updateStyles,
             ignoreFirstPartForStyles,
+            useAbsoluteAliases,
         },
     });
 }

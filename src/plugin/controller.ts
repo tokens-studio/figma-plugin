@@ -153,6 +153,7 @@ figma.ui.onmessage = async (msg) => {
                 updateOnChange: msg.updateOnChange,
                 updateStyles: msg.updateStyles,
                 ignoreFirstPartForStyles: msg.ignoreFirstPartForStyles,
+                useAbsoluteAliases: msg.useAbsoluteAliases,
             });
             figma.ui.resize(msg.uiWindow.width, msg.uiWindow.height);
             break;

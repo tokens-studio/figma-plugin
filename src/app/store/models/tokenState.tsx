@@ -148,6 +148,7 @@ export const tokenState = createModel<RootModel>()({
             const values = parseTokenValues(data.values);
             return {
                 ...state,
+                rawTokens: data.values,
                 tokens: values,
                 activeTokenSet: Array.isArray(data.values) ? 'global' : Object.keys(data.values)[0],
                 usedTokenSet: Array.isArray(data.values) ? ['global'] : [Object.keys(data.values)[0]],

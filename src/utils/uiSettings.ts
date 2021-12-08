@@ -33,6 +33,7 @@ export async function getUISettings() {
                 typeof parsedData.ignoreFirstPartForStyles === 'undefined'
                     ? false
                     : parsedData.ignoreFirstPartForStyles;
+            const useAbsoluteAliases = parsedData.ignoreFirstPartForStyles || false;
             notifyUISettings({
                 width: Math.max(300, width),
                 height: Math.max(200, height),
@@ -41,6 +42,7 @@ export async function getUISettings() {
                 updateRemote,
                 updateStyles,
                 ignoreFirstPartForStyles,
+                useAbsoluteAliases,
             });
         }
     } catch (err) {
