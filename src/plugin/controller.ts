@@ -44,11 +44,12 @@ figma.ui.onmessage = async (msg) => {
     switch (msg.type) {
         case MessageToPluginTypes.INITIATE:
             try {
+                const {currentUser} = figma;
                 getUISettings();
                 const userId = await getUserId();
                 const lastOpened = await getLastOpened();
                 const storageType = await getSavedStorageType();
-                notifyUserId(userId);
+                notifyUserId({userId, figmaId: currentUser.id, name: currentUser.name});
                 notifyLastOpened(lastOpened);
                 notifyStorageType(storageType);
 
@@ -64,6 +65,8 @@ figma.ui.onmessage = async (msg) => {
                     }
                     default: {
                         const oldTokens = getTokenData();
+                        console.log('oldTokens', oldTokens);
+
                         notifyTokenValues(oldTokens);
                     }
                 }
@@ -95,6 +98,8 @@ figma.ui.onmessage = async (msg) => {
         case MessageToPluginTypes.SET_NODE_DATA:
             try {
                 updatePluginData(figma.currentPage.selection, msg.values);
+                console.log('set node data', msg.values, msg.tokens);
+
                 sendPluginValues(
                     figma.currentPage.selection,
                     updateNodes(figma.currentPage.selection, msg.tokens, msg.settings)
@@ -126,6 +131,8 @@ figma.ui.onmessage = async (msg) => {
             if (msg.tokenValues && msg.updatedAt) setTokensOnDocument(msg.tokenValues, msg.updatedAt);
             if (msg.tokens) {
                 const allWithData = findAllWithData({updateMode: msg.settings.updateMode});
+                console.log('allWithData', allWithData, msg.tokens);
+
                 updateNodes(allWithData, msg.tokens, msg.settings);
                 updatePluginData(allWithData, {});
                 notifyRemoteComponents({nodes: store.successfulNodes.length, remotes: store.remoteComponents});

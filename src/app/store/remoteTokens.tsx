@@ -69,6 +69,7 @@ export default function useRemoteTokens() {
     };
 
     const pushTokens = async () => {
+        track('pushTokens', {provider: api.provider});
         switch (api.provider) {
             case StorageProviderType.GITHUB: {
                 await pushTokensToGitHub(api);

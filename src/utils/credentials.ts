@@ -5,6 +5,8 @@ import isSameCredentials from './isSameCredentials';
 
 // update credentials
 export async function updateCredentials(context: ContextObject) {
+    console.log('Updating cred', context);
+
     try {
         delete context.new;
         const data = await figma.clientStorage.getAsync('apiProviders');
@@ -15,6 +17,9 @@ export async function updateCredentials(context: ContextObject) {
             existingProviders = parsedData;
 
             let matchingProvider;
+            console.log('Context: ', context);
+            console.log('existing: ', existingProviders);
+
             if (context.internalId) {
                 matchingProvider = existingProviders.findIndex((i) => i.internalId === context.internalId);
             } else {
