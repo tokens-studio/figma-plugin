@@ -20,7 +20,14 @@ import {
     notifyUserId,
     notifyLastOpened,
 } from './notifiers';
-import {findAllWithData, findAllChildren, removePluginData, sendPluginValues, updatePluginData} from './pluginData';
+import {
+    findAllWithData,
+    findAllChildren,
+    removePluginData,
+    sendPluginValues,
+    updatePluginData,
+    findNodesById,
+} from './pluginData';
 import {getTokenData, updateNodes, setTokensOnDocument, goToNode, saveStorageType, getSavedStorageType} from './node';
 
 import {MessageToPluginTypes} from '../../types/messages';
@@ -37,7 +44,6 @@ let inspectDeep = false;
 function sendSelectionChange() {
     console.log('Selection changed', inspectDeep, figma.currentPage.selection);
     const nodes = inspectDeep ? findAllChildren(figma.currentPage.selection) : figma.currentPage.selection;
-    console.log('Nodes', nodes);
 
     if (!nodes.length) {
         notifyNoSelection();
@@ -162,6 +168,16 @@ figma.ui.onmessage = async (msg) => {
             sendPluginValues(figma.currentPage.selection);
             break;
         }
+        case MessageToPluginTypes.REMOVE_TOKENS_BY_VALUE: {
+            msg.tokensToRemove.forEach((token) => {
+                const nodes = findNodesById(figma.currentPage.selection, token.nodes);
+
+                removePluginData({nodes, key: token.property, shouldRemoveValues: false});
+            });
+            sendSelectionChange();
+            break;
+        }
+
         case MessageToPluginTypes.SET_UI: {
             updateUISettings({
                 width: msg.uiWindow.width,

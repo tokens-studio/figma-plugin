@@ -31,6 +31,7 @@ export enum MessageToPluginTypes {
     SET_UI = 'set_ui',
     RESIZE_WINDOW = 'resize_window',
     REMOVE_PLUGIN_DATA = 'remove_plugin_data',
+    REMOVE_TOKENS_BY_VALUE = 'remove-tokens-by-value',
 }
 
 export type PostToFigmaProps =

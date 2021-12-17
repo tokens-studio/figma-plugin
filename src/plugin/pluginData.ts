@@ -35,7 +35,6 @@ export function fetchAllPluginData(node) {
 
         i += 1;
     }
-    console.log('GOT DATA', pluginData);
 
     if (pluginData.length === 1 && pluginData[0][0] === 'values') {
         return node ? pluginData[0][1] : pluginData[0][1];
@@ -43,51 +42,50 @@ export function fetchAllPluginData(node) {
     if (pluginData.length > 0) {
         return Object.fromEntries(pluginData);
     }
-    console.log('got no data');
 
     return null;
 }
 
+function mapPropertyToCategory(key): string {
+    if (properties[key]) return properties[key];
+    return null;
+}
+
 export function fetchSelectionPluginData(nodes) {
-    const pluginData = nodes.map((node) => {
-        return {node: node.id, values: fetchAllPluginData(node)};
-    });
-    console.log('fetchSelectionPluginData', pluginData);
-
-    // turn this
-
-    // [
-    //     {node: 1, values: {fill: 'colors.blue.500'}},
-    //     {node: 2, values: {fill: 'colors.blue.500'}},
-    //     {node: 3, values: {fill: 'colors.red.500'}},
-    // ]
-
-    // into this
-
-    // [
-    //     { fill: 'colors.blue.500', nodes: [1, 2, 3] },
-    //     { fill: 'colors.red.500', nodes: [1, 2, 3] },
-    // ]
-
-    const grouped = pluginData.reduce((acc, curr) => {
-        const {node, values} = curr;
-
+    const pluginData = nodes.reduce((acc, node) => {
+        const values = fetchAllPluginData(node);
         if (values) {
             Object.entries(values).forEach(([key, value]) => {
-                const existing = acc.find((item) => item[key] === value);
+                const existing = acc.find((item) => item.type === key && item.value === value);
 
                 if (existing) {
-                    existing.nodes.push(node);
+                    existing.nodes.push(node.id);
                 } else {
-                    acc.push({[key]: value, type: key, nodes: [node]});
+                    const category = mapPropertyToCategory(key);
+
+                    acc.push({value, type: key, category, nodes: [node.id]});
                 }
             });
         }
-
         return acc;
     }, []);
 
-    return grouped;
+    return pluginData;
+}
+
+export function findNodesById(nodes, ids): SceneNode[] {
+    const nodesAndChildren = [];
+
+    nodes.forEach((node) => {
+        if (ids.includes(node.id)) {
+            nodesAndChildren.push(node);
+        }
+        if (node.children) {
+            nodesAndChildren.push(...findNodesById(node.children, ids));
+        }
+    });
+
+    return nodesAndChildren;
 }
 
 export function findAllChildren(nodes): SceneNode[] {
@@ -159,8 +157,6 @@ export function removePluginData({
     key?: string;
     shouldRemoveValues?: boolean;
 }) {
-    console.log('removePluginData', nodes, key, shouldRemoveValues);
-
     nodes.forEach((node) => {
         try {
             node.setRelaunchData({});
