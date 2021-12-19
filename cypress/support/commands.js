@@ -1,5 +1,5 @@
-import {MessageFromPluginTypes} from '../../types/messages';
-import {StorageProviderType} from '../../types/api';
+import { MessageFromPluginTypes } from '../../types/messages';
+import { StorageProviderType } from '../../types/api';
 
 // ***********************************************
 // This example commands.js shows you how to
@@ -27,51 +27,50 @@ import {StorageProviderType} from '../../types/api';
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
 
+Cypress.Commands.add('receiveStorageTypeLocal', () => {
+  cy.window().then(($window) => {
+    const message = {
+      pluginMessage: {
+        type: MessageFromPluginTypes.RECEIVED_STORAGE_TYPE,
+        storageType: { provider: StorageProviderType.LOCAL },
+      },
+    };
+    $window.postMessage(message, '*');
+  });
+});
 
-Cypress.Commands.add("receiveStorageTypeLocal", () => {
-    cy.window().then(($window) => {
-        const message = {
-            pluginMessage: {
-                type: MessageFromPluginTypes.RECEIVED_STORAGE_TYPE,
-                storageType: {provider: StorageProviderType.LOCAL},
-            },
-        };
-        $window.postMessage(message, '*');
-    });
-})
+Cypress.Commands.add('receiveStorageType', (storageType) => {
+  cy.window().then(($window) => {
+    const message = {
+      pluginMessage: {
+        type: MessageFromPluginTypes.RECEIVED_STORAGE_TYPE,
+        storageType,
+      },
+    };
+    $window.postMessage(message, '*');
+  });
+});
 
-Cypress.Commands.add("receiveStorageType", (storageType) => {
-    cy.window().then(($window) => {
-        const message = {
-            pluginMessage: {
-                type: MessageFromPluginTypes.RECEIVED_STORAGE_TYPE,
-                storageType,
-            },
-        };
-        $window.postMessage(message, '*');
-    });
-})
+Cypress.Commands.add('receiveApiProviders', (providers) => {
+  cy.window().then(($window) => {
+    const message = {
+      pluginMessage: {
+        type: MessageFromPluginTypes.API_PROVIDERS,
+        providers,
+      },
+    };
+    $window.postMessage(message, '*');
+  });
+});
 
-Cypress.Commands.add("receiveApiProviders", (providers) => {
-    cy.window().then(($window) => {
-        const message = {
-            pluginMessage: {
-                type: MessageFromPluginTypes.API_PROVIDERS,
-                providers,
-            },
-        };
-        $window.postMessage(message, '*');
-    });
-})
-
-Cypress.Commands.add("receiveTokenValues", (values) => {
-    cy.window().then(($window) => {
-        const message = {
-            pluginMessage: {
-                type: MessageFromPluginTypes.TOKEN_VALUES,
-                values,
-            },
-        };
-        $window.postMessage(message, '*');
-    });
-})
+Cypress.Commands.add('receiveTokenValues', (values) => {
+  cy.window().then(($window) => {
+    const message = {
+      pluginMessage: {
+        type: MessageFromPluginTypes.TOKEN_VALUES,
+        values,
+      },
+    };
+    $window.postMessage(message, '*');
+  });
+});

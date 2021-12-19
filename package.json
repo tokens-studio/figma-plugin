@@ -124,9 +124,7 @@
         }
     },
     "lint-staged": {
-        "src/**/*.{js,jsx,ts,tsx,css,json}": [
-            "prettier --write",
-            "git add"
-        ]
+        "src/**/*.{ts,tsx}": ["./eslint-non-blocking.sh", "git add"],
+        "src/**/*.{js,jsx,css,json}": ["prettier --write", "git add"]
     }
 }

@@ -9,6 +9,8 @@ module.exports = {
     describe: 'readable',
     it: 'readable',
     expect: 'readable',
+    cy: 'readable',
+    jest: 'readable',
   },
   "rules": {
     "import/prefer-default-export": 0,

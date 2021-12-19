@@ -1,38 +1,38 @@
 // write a test for isSameCredentials function
 
-import {StorageProviderType} from '@/types/api';
+import { StorageProviderType } from '@/types/api';
 import isSameCredentials from './isSameCredentials';
 
 describe('isSameCredentials', () => {
-    it('should return true if the credentials are the same', () => {
-        const storedJSONBin = {
-            id: '123',
-            provider: StorageProviderType.JSONBIN,
-        };
-        const storedGitHub = {
-            id: 'six7/figma-tokens',
-            provider: StorageProviderType.GITHUB,
-            filePath: 'tokens.json',
-            branch: 'main',
-        };
-        const correctCredentials = {
-            id: '123',
-            provider: StorageProviderType.JSONBIN,
-            secret: 'abc',
-            name: 'foo',
-        };
-        const correctGitHubCredentials = {
-            id: 'six7/figma-tokens',
-            provider: StorageProviderType.GITHUB,
-            secret: 'abc',
-            name: 'figmatokens',
-            filePath: 'tokens.json',
-            branch: 'main',
-        };
-        expect(isSameCredentials(correctCredentials, storedJSONBin)).toBe(true);
-        expect(isSameCredentials({...correctCredentials, id: '456'}, storedJSONBin)).toBe(false);
-        expect(isSameCredentials(correctGitHubCredentials, storedGitHub)).toBe(true);
-        expect(isSameCredentials({...correctGitHubCredentials, filePath: 'tokens2.json'}, storedGitHub)).toBe(false);
-        expect(isSameCredentials({...correctGitHubCredentials, branch: 'next'}, storedGitHub)).toBe(false);
-    });
+  it('should return true if the credentials are the same', () => {
+    const storedJSONBin = {
+      id: '123',
+      provider: StorageProviderType.JSONBIN,
+    };
+    const storedGitHub = {
+      id: 'six7/figma-tokens',
+      provider: StorageProviderType.GITHUB,
+      filePath: 'tokens.json',
+      branch: 'main',
+    };
+    const correctCredentials = {
+      id: '123',
+      provider: StorageProviderType.JSONBIN,
+      secret: 'abc',
+      name: 'foo',
+    };
+    const correctGitHubCredentials = {
+      id: 'six7/figma-tokens',
+      provider: StorageProviderType.GITHUB,
+      secret: 'abc',
+      name: 'figmatokens',
+      filePath: 'tokens.json',
+      branch: 'main',
+    };
+    expect(isSameCredentials(correctCredentials, storedJSONBin)).toBe(true);
+    expect(isSameCredentials({ ...correctCredentials, id: '456' }, storedJSONBin)).toBe(false);
+    expect(isSameCredentials(correctGitHubCredentials, storedGitHub)).toBe(true);
+    expect(isSameCredentials({ ...correctGitHubCredentials, filePath: 'tokens2.json' }, storedGitHub)).toBe(false);
+    expect(isSameCredentials({ ...correctGitHubCredentials, branch: 'next' }, storedGitHub)).toBe(false);
+  });
 });

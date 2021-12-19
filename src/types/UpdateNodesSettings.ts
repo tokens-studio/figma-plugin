@@ -1,3 +1,3 @@
 export type UpdateNodesSettings = {
-    ignoreFirstPartForStyles?: boolean;
+  ignoreFirstPartForStyles?: boolean;
 };

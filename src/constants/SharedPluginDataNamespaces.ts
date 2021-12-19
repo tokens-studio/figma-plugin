@@ -1,3 +1,3 @@
 export enum SharedPluginDataNamespaces {
-    TOKENS = 'tokens',
+  TOKENS = 'tokens',
 }

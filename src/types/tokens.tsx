@@ -1,54 +1,54 @@
-import type {ShadowTokenSingleValue, TypographyObject} from './propertyTypes';
+import type { ShadowTokenSingleValue, TypographyObject } from './propertyTypes';
 
 export interface TokenProps {
-    values: {
-        [key: string]: SingleTokenObject[] | TokenObject;
-    };
-    updatedAt?: string;
-    version?: string;
+  values: {
+    [key: string]: SingleTokenObject[] | TokenObject;
+  };
+  updatedAt?: string;
+  version?: string;
 }
 
 export type SingleToken = TokenGroup;
 
 export type NewTokenObject = {
-    name: string;
-    value: string | TypographyObject | ShadowTokenSingleValue[] | ShadowTokenSingleValue | number;
-    type: TokenType | string | 'undefined';
-    description?: string;
+  name: string;
+  value: string | TypographyObject | ShadowTokenSingleValue[] | ShadowTokenSingleValue | number;
+  type: TokenType | string | 'undefined';
+  description?: string;
 };
 
 type SingleTokenObjectCommonProperties = {
-    name: string;
-    description?: string;
+  name: string;
+  description?: string;
 };
 
 export type SingleTokenObject =
     | (SingleTokenObjectCommonProperties & {
-          type: 'boxShadow';
-          value: ShadowTokenSingleValue[] | ShadowTokenSingleValue;
-      })
+      type: 'boxShadow';
+      value: ShadowTokenSingleValue[] | ShadowTokenSingleValue;
+    })
     | (SingleTokenObjectCommonProperties & {
-          type: 'typography';
-          value: TypographyObject;
-      })
+      type: 'typography';
+      value: TypographyObject;
+    })
     | (SingleTokenObjectCommonProperties & {
-          type: TokenType;
-          value: string | number;
-      });
+      type: TokenType;
+      value: string | number;
+    });
 
 export interface TokenGroup {
-    [key: string]: SingleToken;
+  [key: string]: SingleToken;
 }
 
 export type TokenArrayGroup = SingleTokenObject[];
 
 export interface Tokens {
-    [key: string]: TokenObject;
+  [key: string]: TokenObject;
 }
 
 export interface TokenObject {
-    values: TokenArrayGroup;
-    type: 'array' | 'object';
+  values: TokenArrayGroup;
+  type: 'array' | 'object';
 }
 
 export type TokenType =
@@ -72,43 +72,43 @@ export type TokenType =
     | 'textCase';
 
 export interface SelectionValue {
-    values?: string;
-    sizing?: string;
-    height?: string;
-    width?: string;
-    spacing?: string;
-    verticalPadding?: string;
-    horizontalPadding?: string;
-    paddingTop?: string;
-    paddingRight?: string;
-    paddingBottom?: string;
-    paddingLeft?: string;
-    itemSpacing?: string;
-    fill?: string;
-    border?: string;
-    borderRadius?: string;
-    borderRadiusTopLeft?: string;
-    borderRadiusTopRight?: string;
-    borderRadiusBottomRight?: string;
-    borderRadiusBottomLeft?: string;
-    borderWidth?: string;
-    boxShadow?: string;
-    opacity?: string;
-    fontFamilies?: string;
-    fontWeights?: string;
-    fontSizes?: string;
-    lineHeights?: string;
-    typography?: string;
-    letterSpacing?: string;
-    paragraphSpacing?: string;
-    tokenValue?: string;
-    value?: string;
-    tokenName?: string;
-    description?: string;
+  values?: string;
+  sizing?: string;
+  height?: string;
+  width?: string;
+  spacing?: string;
+  verticalPadding?: string;
+  horizontalPadding?: string;
+  paddingTop?: string;
+  paddingRight?: string;
+  paddingBottom?: string;
+  paddingLeft?: string;
+  itemSpacing?: string;
+  fill?: string;
+  border?: string;
+  borderRadius?: string;
+  borderRadiusTopLeft?: string;
+  borderRadiusTopRight?: string;
+  borderRadiusBottomRight?: string;
+  borderRadiusBottomLeft?: string;
+  borderWidth?: string;
+  boxShadow?: string;
+  opacity?: string;
+  fontFamilies?: string;
+  fontWeights?: string;
+  fontSizes?: string;
+  lineHeights?: string;
+  typography?: string;
+  letterSpacing?: string;
+  paragraphSpacing?: string;
+  tokenValue?: string;
+  value?: string;
+  tokenName?: string;
+  description?: string;
 }
 
 export type PullStyleTypes = {
-    textStyles?: boolean;
-    colorStyles?: boolean;
-    effectStyles?: boolean;
+  textStyles?: boolean;
+  colorStyles?: boolean;
+  effectStyles?: boolean;
 };
