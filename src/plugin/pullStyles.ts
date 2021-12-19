@@ -1,7 +1,7 @@
 /* eslint-disable no-param-reassign */
 import {figmaRGBToHex} from '@figma-plugin/helpers';
-import {PullStyleTypes, SingleTokenObject} from 'Types/tokens';
-import {ColorToken, ShadowTokenSingleValue} from 'Types/propertyTypes';
+import {PullStyleTypes, SingleTokenObject} from '@/types/tokens';
+import {ColorToken, ShadowTokenSingleValue} from '@/types/propertyTypes';
 import {slugify} from '../app/components/utils';
 import {convertBoxShadowTypeFromFigma} from './figmaTransforms/boxShadow';
 import {convertFigmaGradientToString} from './figmaTransforms/gradients';

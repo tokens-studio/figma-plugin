@@ -1,13 +1,13 @@
 import React from 'react';
-import {identify, track} from '@/utils/analytics';
 import {useDispatch} from 'react-redux';
-import {MessageFromPluginTypes, MessageToPluginTypes} from '@types/messages';
+import {identify, track} from '@/utils/analytics';
+import {MessageFromPluginTypes, MessageToPluginTypes} from '@/types/messages';
 import {postToFigma} from '../../plugin/notifiers';
 import useRemoteTokens from '../store/remoteTokens';
 import {Dispatch} from '../store';
 import useStorage from '../store/useStorage';
 
-export default function Initiator() {
+export function Initiator() {
     const dispatch = useDispatch<Dispatch>();
 
     const {pullTokens} = useRemoteTokens();
@@ -20,6 +20,7 @@ export default function Initiator() {
     React.useEffect(() => {
         onInitiate();
         window.onmessage = async (event) => {
+            console.log('ui', event.data.pluginMessage);
             if (event.data.pluginMessage) {
                 const {
                     type,

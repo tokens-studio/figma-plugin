@@ -1,8 +1,8 @@
 import {Parser} from 'expr-eval';
-import convertOpacityToFigma from '@/plugin/figmaTransforms/opacity';
 import {parseToRgba, readableColorIsBlack, toHex} from 'color2k';
+import convertOpacityToFigma from '@/plugin/figmaTransforms/opacity';
 import {postToFigma} from '../../plugin/notifiers';
-import {MessageToPluginTypes} from '../../../types/messages';
+import {MessageToPluginTypes} from '../../types/messages';
 
 const parser = new Parser();
 

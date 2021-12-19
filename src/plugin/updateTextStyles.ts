@@ -1,4 +1,4 @@
-import {TypographyToken} from '../../types/propertyTypes';
+import {TypographyToken} from '../types/propertyTypes';
 import filterMatchingStyles from './figmaUtils/filterMatchingStyles';
 import setTextValuesOnTarget from './setTextValuesOnTarget';
 

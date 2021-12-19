@@ -3,7 +3,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import Heading from './Heading';
 import Button from './Button';
 import Callout from './Callout';
-import {StorageProviderType} from '../../../types/api';
+import {StorageProviderType} from '../../types/api';
 import {Dispatch, RootState} from '../store';
 
 const StartScreen = () => {

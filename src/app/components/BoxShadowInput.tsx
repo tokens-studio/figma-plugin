@@ -1,6 +1,6 @@
 import React, {useCallback} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import {ShadowTokenSingleValue} from 'Types/propertyTypes';
+import {ShadowTokenSingleValue} from '@/types/propertyTypes';
 import IconMinus from '@/icons/minus.svg';
 import IconPlus from '@/icons/plus.svg';
 import IconGrabber from '@/icons/grabber.svg';

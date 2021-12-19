@@ -2,7 +2,7 @@
 import * as React from 'react';
 import {track} from '@/utils/analytics';
 import {useDispatch, useSelector} from 'react-redux';
-import {StorageProviderType} from '../../../types/api';
+import {StorageProviderType} from '../../types/api';
 import Button from './Button';
 import Heading from './Heading';
 import ConfirmLocalStorageModal from './modals/ConfirmLocalStorageModal';

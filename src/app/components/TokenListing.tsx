@@ -1,6 +1,6 @@
 import * as React from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import {SingleTokenObject} from 'Types/tokens';
+import {SingleTokenObject} from '@/types/tokens';
 import Heading from './Heading';
 import Icon from './Icon';
 import TokenTree from './TokenTree';

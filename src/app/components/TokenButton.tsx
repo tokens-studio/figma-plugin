@@ -1,7 +1,7 @@
 import * as React from 'react';
-import {track} from '@/utils/analytics';
 import {useDispatch, useSelector} from 'react-redux';
-import {SingleTokenObject} from 'Types/tokens';
+import {track} from '@/utils/analytics';
+import {SingleTokenObject} from '@/types/tokens';
 import getAliasValue from '@/utils/aliases';
 import Tooltip from './Tooltip';
 import MoreButton from './MoreButton';
@@ -16,14 +16,11 @@ export function useGetActiveState(properties, type, name) {
     const uiState = useSelector((state: RootState) => state.uiState);
 
     return (
-        uiState.selectionValues[type] === name ||
-        properties.some((prop) => {
-            return uiState.selectionValues[prop.name] === name;
-        })
+        uiState.selectionValues[type] === name || properties.some((prop) => uiState.selectionValues[prop.name] === name)
     );
 }
 
-const TokenButton = ({
+const TokenButton = function ({
     type,
     token,
     showForm,
@@ -33,7 +30,7 @@ const TokenButton = ({
     token: SingleTokenObject;
     showForm: Function;
     resolvedTokens: SingleTokenObject[];
-}) => {
+}) {
     const uiState = useSelector((state: RootState) => state.uiState);
     const {activeTokenSet} = useSelector((state: RootState) => state.tokenState);
     const {setNodeData} = useTokens();

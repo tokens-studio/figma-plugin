@@ -1,4 +1,4 @@
-import {SingleTokenObject} from 'Types/tokens';
+import {SingleTokenObject} from '@/types/tokens';
 import setEffectValuesOnTarget from './setEffectValuesOnTarget';
 
 const singleShadowToken: SingleTokenObject = {

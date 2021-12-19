@@ -1,6 +1,6 @@
 import React from 'react';
 import {useSelector} from 'react-redux';
-import {StorageProviderType} from 'Types/api';
+import {StorageProviderType} from '@/types/api';
 import {RootState} from '../store';
 import GitHubForm from './StorageItemForm/GitHubForm';
 import JSONBinForm from './StorageItemForm/JSONBinForm';

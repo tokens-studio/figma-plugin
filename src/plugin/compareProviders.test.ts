@@ -1,5 +1,5 @@
-import {StorageProviderType} from '../../types/api';
-import {MessageFromPluginTypes} from '../../types/messages';
+import {StorageProviderType} from '../types/api';
+import {MessageFromPluginTypes} from '../types/messages';
 import compareProvidersWithStored from './compareProviders';
 
 describe('compareProvidersWithStored', () => {

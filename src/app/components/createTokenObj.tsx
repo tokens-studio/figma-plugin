@@ -1,6 +1,6 @@
-import {mergeDeep} from '@/plugin/helpers';
-import {SingleTokenObject, TokenType} from '@types/tokens';
 import set from 'set-value';
+import extend from 'just-extend';
+import {SingleTokenObject, TokenType} from '@/types/tokens';
 
 import tokenTypes from '../../config/tokenTypes';
 
@@ -71,11 +71,12 @@ export function createTokensObject(tokens: SingleTokenObject[], tokenFilter = ''
     return {};
 }
 
-// Takes an array of tokens, transforms them into an object and merges that with values we require for the UI
+// Takes an array of tokens, transforms them into
+// san object and merges that with values we require for the UI
 export function mappedTokens(tokens: SingleTokenObject[], tokenFilter: string) {
     const tokenObj = {};
 
-    mergeDeep(tokenObj, tokenTypes);
+    extend(true, tokenObj, tokenTypes);
 
     Object.entries(createTokensObject(tokens, tokenFilter)).forEach(
         ([key, group]: [string, {values: SingleTokenObject[]; type?: TokenType}]) => {
@@ -85,7 +86,7 @@ export function mappedTokens(tokens: SingleTokenObject[], tokenFilter: string) {
         }
     );
 
-    mergeDeep(tokenObj, tokenTypes);
+    extend(true, tokenObj, tokenTypes);
 
     return Object.entries(tokenObj);
 }

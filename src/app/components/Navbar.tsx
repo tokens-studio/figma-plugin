@@ -6,7 +6,7 @@ import convertTokensToObject from '@/utils/convertTokensToObject';
 import Icon from './Icon';
 import Tooltip from './Tooltip';
 import useRemoteTokens from '../store/remoteTokens';
-import {StorageProviderType} from '../../../types/api';
+import {StorageProviderType} from '../../types/api';
 import {RootState, Dispatch} from '../store';
 
 const TabButton = ({name, label, first = false}) => {

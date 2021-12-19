@@ -7,7 +7,7 @@ import TokenGroupHeading from './TokenGroupHeading';
 import Tooltip from './Tooltip';
 import {isSingleToken, isTypographyToken} from './utils';
 
-const TokenTree = ({tokenValues, showNewForm, showForm, schema, path = null, type = '', resolvedTokens}) => {
+var TokenTree = function ({tokenValues, showNewForm, showForm, schema, path = null, type = '', resolvedTokens}) {
     const {editProhibited} = useSelector((state: RootState) => state.tokenState);
 
     return (

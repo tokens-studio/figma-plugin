@@ -1,6 +1,6 @@
 import {useDispatch, useSelector} from 'react-redux';
-import {StorageProviderType} from 'Types/api';
-import {MessageToPluginTypes} from 'Types/messages';
+import {StorageProviderType} from '@/types/api';
+import {MessageToPluginTypes} from '@/types/messages';
 import {track} from '@/utils/analytics';
 import {postToFigma} from '../../plugin/notifiers';
 import {useJSONbin} from './providers/jsonbin';

@@ -1,12 +1,11 @@
 /* eslint-disable import/prefer-default-export */
+import {createModel} from '@rematch/core';
+import {StorageType, StorageProviderType, ApiDataType} from '@/types/api';
 import {track} from '@/utils/analytics';
 import fetchChangelog from '@/utils/storyblok';
-import {createModel} from '@rematch/core';
-import {StorageType, StorageProviderType, ApiDataType} from '@types/api';
-import {ShadowTokenSingleValue, TypographyObject} from 'Types/propertyTypes';
-import {SelectionValue, TokenType} from 'Types/tokens';
-
-import {RootModel} from '.';
+import {ShadowTokenSingleValue, TypographyObject} from '@/types/propertyTypes';
+import {SelectionValue, TokenType} from '@/types/tokens';
+import type {RootModel} from '.';
 
 type TabNames = 'start' | 'tokens' | 'json' | 'inspector' | 'syncsettings' | 'settings';
 
@@ -108,12 +107,10 @@ export const uiState = createModel<RootModel>()({
         collapsed: false,
     } as UIState,
     reducers: {
-        setShowPushDialog: (state, data: string | false) => {
-            return {
-                ...state,
-                showPushDialog: data,
-            };
-        },
+        setShowPushDialog: (state, data: string | false) => ({
+            ...state,
+            showPushDialog: data,
+        }),
         setShowConfirm: (
             state,
             data: {
@@ -122,42 +119,32 @@ export const uiState = createModel<RootModel>()({
                 choices: {key: string; label: string; enabled?: boolean}[];
                 confirmAction?: string;
             }
-        ) => {
-            return {
-                ...state,
-                confirmState: {
-                    show: true,
-                    text: data.text,
-                    description: data.description,
-                    choices: data.choices,
-                    confirmAction: data.confirmAction || defaultConfirmState.confirmAction,
-                },
-            };
-        },
-        setHideConfirm: (state) => {
-            return {
-                ...state,
-                confirmState: defaultConfirmState,
-            };
-        },
-        setDisabled: (state, data: boolean) => {
-            return {
-                ...state,
-                disabled: data,
-            };
-        },
-        setEditToken: (state, data: EditToken) => {
-            return {
-                ...state,
-                editToken: data,
-            };
-        },
-        setShowEditForm: (state, data: boolean) => {
-            return {
-                ...state,
-                showEditForm: data,
-            };
-        },
+        ) => ({
+            ...state,
+            confirmState: {
+                show: true,
+                text: data.text,
+                description: data.description,
+                choices: data.choices,
+                confirmAction: data.confirmAction || defaultConfirmState.confirmAction,
+            },
+        }),
+        setHideConfirm: (state) => ({
+            ...state,
+            confirmState: defaultConfirmState,
+        }),
+        setDisabled: (state, data: boolean) => ({
+            ...state,
+            disabled: data,
+        }),
+        setEditToken: (state, data: EditToken) => ({
+            ...state,
+            editToken: data,
+        }),
+        setShowEditForm: (state, data: boolean) => ({
+            ...state,
+            showEditForm: data,
+        }),
         setDisplayType: (state, data: DisplayType) => {
             track('setDisplayType', {type: data});
 
@@ -166,18 +153,14 @@ export const uiState = createModel<RootModel>()({
                 displayType: data,
             };
         },
-        setSelectionValues: (state, data: SelectionValue) => {
-            return {
-                ...state,
-                selectionValues: data,
-            };
-        },
-        resetSelectionValues: (state) => {
-            return {
-                ...state,
-                selectionValues: {},
-            };
-        },
+        setSelectionValues: (state, data: SelectionValue) => ({
+            ...state,
+            selectionValues: data,
+        }),
+        resetSelectionValues: (state) => ({
+            ...state,
+            selectionValues: {},
+        }),
         setLoading(state, payload: boolean) {
             return {
                 ...state,

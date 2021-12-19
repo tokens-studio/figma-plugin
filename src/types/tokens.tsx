@@ -1,4 +1,4 @@
-import {ShadowTokenSingleValue, TypographyObject} from './propertyTypes';
+import type {ShadowTokenSingleValue, TypographyObject} from './propertyTypes';
 
 export interface TokenProps {
     values: {
@@ -40,9 +40,7 @@ export interface TokenGroup {
     [key: string]: SingleToken;
 }
 
-export interface TokenArrayGroup {
-    [key: string]: SingleTokenObject;
-}
+export type TokenArrayGroup = SingleTokenObject[];
 
 export interface Tokens {
     [key: string]: TokenObject;

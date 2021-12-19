@@ -1,13 +1,13 @@
 import {useDispatch, useSelector} from 'react-redux';
-import {Dispatch, RootState} from '@/app/store';
-import {MessageToPluginTypes} from 'Types/messages';
-import {TokenProps} from 'Types/tokens';
-import convertTokensToObject from '@/utils/convertTokensToObject';
 import {Octokit} from '@octokit/rest';
+import {Dispatch, RootState} from '@/app/store';
+import {MessageToPluginTypes} from '@/types/messages';
+import {TokenProps} from '@/types/tokens';
+import convertTokensToObject from '@/utils/convertTokensToObject';
 import useConfirm from '@/app/hooks/useConfirm';
 import usePushDialog from '@/app/hooks/usePushDialog';
 import IsJSONString from '@/utils/isJSONString';
-import {ContextObject} from 'Types/api';
+import {ContextObject} from '@/types/api';
 import {notifyToUI, postToFigma} from '../../../plugin/notifiers';
 
 /** Returns a URL to a page where the user can create a pull request with a given branch */
@@ -147,9 +147,23 @@ export function useGitHub() {
             const branch = customBranch || context.branch;
             if (!branches) return null;
             if (branches.includes(branch)) {
-                await commitToExistingBranch({context, tokenObj, owner, repo, commitMessage, branch});
+                await commitToExistingBranch({
+                    context,
+                    tokenObj,
+                    owner,
+                    repo,
+                    commitMessage,
+                    branch,
+                });
             } else {
-                await commitToNewBranch({context, tokenObj, owner, repo, commitMessage, branch});
+                await commitToNewBranch({
+                    context,
+                    tokenObj,
+                    owner,
+                    repo,
+                    commitMessage,
+                    branch,
+                });
             }
             dispatch.tokenState.setLastSyncedState(tokenObj);
             notifyToUI('Pushed changes to GitHub');
@@ -246,7 +260,7 @@ export function useGitHub() {
                 }
                 return content;
             }
-            return pushTokensToGitHub(context);
+            return await pushTokensToGitHub(context);
         } catch (e) {
             notifyToUI('Error syncing with GitHub, check credentials');
             console.log('Error', e);

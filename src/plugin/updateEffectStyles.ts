@@ -1,4 +1,4 @@
-import {SingleTokenObject} from 'Types/tokens';
+import {SingleTokenObject} from '@/types/tokens';
 import filterMatchingStyles from './figmaUtils/filterMatchingStyles';
 import setEffectValuesOnTarget from './setEffectValuesOnTarget';
 

@@ -1,4 +1,4 @@
-import {SingleTokenObject} from 'Types/tokens';
+import {SingleTokenObject} from '@/types/tokens';
 
 export default function filterMatchingStyles(
     token: SingleTokenObject,

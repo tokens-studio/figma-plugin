@@ -1,36 +1,14 @@
+import convertOpacityToFigma from './figmaTransforms/opacity';
 import {convertTypographyNumberToFigma, fakeZeroForFigma} from './figmaTransforms/generic';
 import {convertLetterSpacingToFigma} from './figmaTransforms/letterSpacing';
 import {convertLineHeightToFigma} from './figmaTransforms/lineHeight';
-import convertOpacityToFigma from './figmaTransforms/opacity';
 import {convertBoxShadowTypeToFigma} from './figmaTransforms/boxShadow';
 import {convertTextCaseToFigma} from './figmaTransforms/textCase';
 import {convertTextDecorationToFigma} from './figmaTransforms/textDecoration';
 
-export function isObject(item) {
-    return item && typeof item === 'object' && !Array.isArray(item);
-}
-
-export function mergeDeep(target, ...sources) {
-    if (!sources.length) return target;
-    const source = sources.shift();
-
-    if (isObject(target) && isObject(source)) {
-        Object.keys(source).forEach((key) => {
-            if (isObject(source[key])) {
-                if (!target[key]) Object.assign(target, {[key]: {}});
-                mergeDeep(target[key], source[key]);
-            } else {
-                Object.assign(target, {[key]: source[key]});
-            }
-        });
-    }
-
-    return mergeDeep(target, ...sources);
-}
-
-export function generateId(len, charSet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789') {
+export function generateId(len: number, charSet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789') {
     let randomString = '';
-    for (let i = 0; i < len; i++) {
+    for (let i = 0; i < len; i += 1) {
         const randomPoz = Math.floor(Math.random() * charSet.length);
         randomString += charSet.substring(randomPoz, randomPoz + 1);
     }
@@ -55,7 +33,7 @@ export async function getUserId() {
     return userId;
 }
 
-export function transformValue(value, type) {
+export function transformValue(value: string, type: string) {
     switch (type) {
         case 'borderWidth':
         case 'width':

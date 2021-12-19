@@ -1,5 +1,5 @@
 import {useDispatch, useSelector} from 'react-redux';
-import {SingleToken, TokenType} from 'Types/tokens';
+import {SingleToken, TokenType} from '@/types/tokens';
 import {Dispatch, RootState} from '../store';
 import useConfirm from '../hooks/useConfirm';
 

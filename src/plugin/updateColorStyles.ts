@@ -1,5 +1,5 @@
-import {SingleTokenObject} from 'Types/tokens';
-import {ColorToken} from '../../types/propertyTypes';
+import {SingleTokenObject} from '@/types/tokens';
+import {ColorToken} from '../types/propertyTypes';
 import filterMatchingStyles from './figmaUtils/filterMatchingStyles';
 import setColorValuesOnTarget from './setColorValuesOnTarget';
 

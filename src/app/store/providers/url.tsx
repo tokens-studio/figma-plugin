@@ -1,8 +1,8 @@
 import {useDispatch} from 'react-redux';
 import {Dispatch} from '@/app/store';
-import {StorageProviderType} from 'Types/api';
-import {MessageToPluginTypes} from 'Types/messages';
-import {TokenProps} from 'Types/tokens';
+import {StorageProviderType} from '@/types/api';
+import {MessageToPluginTypes} from '@/types/messages';
+import {TokenProps} from '@/types/tokens';
 import {notifyToUI, postToFigma} from '../../../plugin/notifiers';
 
 async function readTokensFromURL({secret, id}): Promise<TokenProps> | null {

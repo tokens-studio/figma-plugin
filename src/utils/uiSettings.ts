@@ -1,5 +1,5 @@
+import {UpdateMode} from '@/types/state';
 import {notifyUISettings, notifyUI} from '@/plugin/notifiers';
-import {UpdateMode} from 'Types/state';
 
 // update credentials
 export async function updateUISettings(uiSettings) {

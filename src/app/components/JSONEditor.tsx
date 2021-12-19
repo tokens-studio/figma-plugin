@@ -12,7 +12,7 @@ import {Dispatch, RootState} from '../store';
 import useTokens from '../store/useTokens';
 import useConfirm from '../hooks/useConfirm';
 
-const JSONEditor = () => {
+const JSONEditor = function () {
     const {tokens, activeTokenSet, editProhibited} = useSelector((state: RootState) => state.tokenState);
     const {tokenType} = useSelector((state: RootState) => state.settings);
     const dispatch = useDispatch<Dispatch>();

@@ -1,8 +1,8 @@
-import {postToFigma} from '@/plugin/notifiers';
 import {useSelector} from 'react-redux';
-import {MessageToPluginTypes} from 'Types/messages';
+import {postToFigma} from '@/plugin/notifiers';
+import {MessageToPluginTypes} from '@/types/messages';
 import checkIfAlias from '@/utils/checkIfAlias';
-import {SingleTokenObject} from 'Types/tokens';
+import {SingleTokenObject, TokenArrayGroup} from '@/types/tokens';
 import stringifyTokens from '@/utils/stringifyTokens';
 import formatTokens from '@/utils/formatTokens';
 import {mergeTokenGroups, resolveTokenValues} from '@/plugin/tokenHelpers';
@@ -33,7 +33,7 @@ export default function useTokens() {
     }
 
     // Calls Figma with all tokens and nodes to set data on
-    function setNodeData(data: SelectionValue, resolvedTokens) {
+    function setNodeData(data: SelectionValue, resolvedTokens: TokenArrayGroup) {
         postToFigma({
             type: MessageToPluginTypes.SET_NODE_DATA,
             values: data,
@@ -88,9 +88,7 @@ export default function useTokens() {
     // Calls Figma with all tokens to create styles
     function createStylesFromTokens() {
         const resolved = resolveTokenValues(mergeTokenGroups(tokens, usedTokenSet));
-        const withoutIgnored = resolved.filter((token) => {
-            return !token.name.split('.').some((part) => part.startsWith('_'));
-        });
+        const withoutIgnored = resolved.filter((token) => !token.name.split('.').some((part) => part.startsWith('_')));
 
         postToFigma({
             type: MessageToPluginTypes.CREATE_STYLES,

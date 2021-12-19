@@ -1,6 +1,6 @@
 /* eslint-disable no-param-reassign */
-import {ShadowTokenSingleValue} from 'Types/propertyTypes';
-import {SingleTokenObject} from 'Types/tokens';
+import {ShadowTokenSingleValue} from '@/types/propertyTypes';
+import {SingleTokenObject} from '@/types/tokens';
 import {convertBoxShadowTypeToFigma} from './figmaTransforms/boxShadow';
 import {convertToFigmaColor} from './figmaTransforms/colors';
 import convertOffsetToFigma from './figmaTransforms/offset';
@@ -18,7 +18,12 @@ export default function setEffectValuesOnTarget(
                 const {color, opacity: a} = convertToFigmaColor(v.color);
                 const {r, g, b} = color;
                 return {
-                    color: {r, g, b, a},
+                    color: {
+                        r,
+                        g,
+                        b,
+                        a,
+                    },
                     type: convertBoxShadowTypeToFigma(v.type),
                     spread: v.spread,
                     radius: v.blur,
@@ -33,7 +38,12 @@ export default function setEffectValuesOnTarget(
             const {r, g, b} = color;
             target[key] = [
                 {
-                    color: {r, g, b, a},
+                    color: {
+                        r,
+                        g,
+                        b,
+                        a,
+                    },
                     type: convertBoxShadowTypeToFigma(tokenValue.type),
                     spread: tokenValue.spread,
                     radius: tokenValue.blur,

@@ -1,4 +1,4 @@
-import {UpdateMode} from 'Types/state';
+import {UpdateMode} from '@/types/state';
 import {useDispatch, useSelector} from 'react-redux';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import * as React from 'react';

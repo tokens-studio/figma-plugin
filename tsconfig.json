@@ -11,14 +11,14 @@
     "noImplicitAny": false,
     "moduleResolution": "node",
     "resolveJsonModule": true,
+    "strictNullChecks": true,
     "baseUrl": "./",
     "typeRoots": [
       "./node_modules/@types",
       "./node_modules/@figma"
     ],
     "paths": {
-      "@/*": ["src/*"],
-      "Types/*": ["types/*"],
+      "@/*": ["src/*"]
     },
   }
 }

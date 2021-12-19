@@ -1,10 +1,10 @@
 /* eslint-disable import/prefer-default-export */
+import {createModel} from '@rematch/core';
 import {postToFigma} from '@/plugin/notifiers';
 import {track} from '@/utils/analytics';
-import {createModel} from '@rematch/core';
-import {MessageToPluginTypes} from 'Types/messages';
-import {UpdateMode} from 'Types/state';
-import {RootModel} from '.';
+import {MessageToPluginTypes} from '@/types/messages';
+import {UpdateMode} from '@/types/state';
+import type {RootModel} from '.';
 
 type WindowSettingsType = {
     width: number;

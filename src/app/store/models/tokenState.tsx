@@ -1,16 +1,16 @@
 /* eslint-disable import/prefer-default-export */
 import {createModel} from '@rematch/core';
-import {SingleTokenObject, TokenGroup, SingleToken, TokenProps} from '@types/tokens';
-import {StorageProviderType} from '@types/api';
-import defaultJSON from '@/config/default.json';
 import isEqual from 'lodash.isequal';
+import {SingleTokenObject, TokenGroup, SingleToken, TokenProps} from '@/types/tokens';
+import {StorageProviderType} from '@/types/api';
+import defaultJSON from '@/config/default.json';
 
 import parseTokenValues from '@/utils/parseTokenValues';
 import {notifyToUI} from '@/plugin/notifiers';
 import {reduceToValues} from '@/plugin/tokenHelpers';
 import {replaceReferences} from '@/utils/findReferences';
 import parseJson from '@/utils/parseJson';
-import {RootModel} from '.';
+import type {RootModel} from '.';
 import updateTokensOnSources from '../updateSources';
 import * as pjs from '../../../../package.json';
 
@@ -66,20 +66,16 @@ export const tokenState = createModel<RootModel>()({
                 editProhibited: payload,
             };
         },
-        toggleUsedTokenSet: (state, data: string) => {
-            return {
-                ...state,
-                usedTokenSet: state.usedTokenSet.includes(data)
-                    ? state.usedTokenSet.filter((n) => n !== data)
-                    : [...new Set([...state.usedTokenSet, data])],
-            };
-        },
-        setActiveTokenSet: (state, data: string) => {
-            return {
-                ...state,
-                activeTokenSet: data,
-            };
-        },
+        toggleUsedTokenSet: (state, data: string) => ({
+            ...state,
+            usedTokenSet: state.usedTokenSet.includes(data)
+                ? state.usedTokenSet.filter((n) => n !== data)
+                : [...new Set([...state.usedTokenSet, data])],
+        }),
+        setActiveTokenSet: (state, data: string) => ({
+            ...state,
+            activeTokenSet: data,
+        }),
         addTokenSet: (state, name: string) => {
             if (name in state.tokens) {
                 notifyToUI('Token set already exists');
@@ -112,12 +108,10 @@ export const tokenState = createModel<RootModel>()({
                 activeTokenSet: state.activeTokenSet === data.oldName ? data.newName : state.activeTokenSet,
             };
         },
-        setLastSyncedState: (state, data: string) => {
-            return {
-                ...state,
-                lastSyncedState: data,
-            };
-        },
+        setLastSyncedState: (state, data: string) => ({
+            ...state,
+            lastSyncedState: data,
+        }),
         setTokenSetOrder: (state, data: string[]) => {
             const newTokens = {};
             data.map((set) => {
@@ -128,15 +122,13 @@ export const tokenState = createModel<RootModel>()({
                 tokens: newTokens,
             };
         },
-        resetImportedTokens: (state) => {
-            return {
-                ...state,
-                importedTokens: {
-                    newTokens: [],
-                    updatedTokens: [],
-                },
-            };
-        },
+        resetImportedTokens: (state) => ({
+            ...state,
+            importedTokens: {
+                newTokens: [],
+                updatedTokens: [],
+            },
+        }),
         setTokenData: (state, data: {values: SingleTokenObject[]; shouldUpdate: boolean}) => {
             const values = parseTokenValues(data.values);
             return {

@@ -9,15 +9,15 @@ import StartScreen from './StartScreen';
 import Navbar from './Navbar';
 import LoadingBar from './LoadingBar';
 import Footer from './Footer';
-import Initiator from './Initiator';
 import Changelog from './Changelog';
 import ImportedTokensDialog from './ImportedTokensDialog';
+import {Initiator} from './Initiator';
 import {RootState} from '../store';
 import ConfirmDialog from './ConfirmDialog';
 import PushDialog from './PushDialog';
 import WindowResizer from './WindowResizer';
 
-const App = () => {
+const App = function () {
     const activeTab = useSelector((state: RootState) => state.uiState.activeTab);
 
     return (

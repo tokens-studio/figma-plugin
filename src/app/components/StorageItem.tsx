@@ -6,15 +6,13 @@ import Button from './Button';
 import useRemoteTokens from '../store/remoteTokens';
 import {RootState} from '../store';
 
-const StorageItem = ({item, onEdit = null}) => {
+const StorageItem = function ({item, onEdit = null}) {
     const {storageType} = useSelector((state: RootState) => state.uiState);
     const {provider, id, branch, name} = item;
 
     const {restoreStoredProvider, deleteProvider} = useRemoteTokens();
 
-    const isActive = () => {
-        return isSameCredentials(item, storageType);
-    };
+    const isActive = () => isSameCredentials(item, storageType);
 
     return (
         <div

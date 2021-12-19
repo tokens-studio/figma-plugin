@@ -1,5 +1,5 @@
 import isSameCredentials from '@/utils/isSameCredentials';
-import {MessageFromPluginTypes} from '../../types/messages';
+import {MessageFromPluginTypes} from '../types/messages';
 import {notifyTokenValues} from './notifiers';
 
 export default function compareProvidersWithStored(providers, storageType) {

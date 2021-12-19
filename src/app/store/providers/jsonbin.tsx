@@ -1,8 +1,8 @@
 import {useDispatch, useSelector} from 'react-redux';
 import {Dispatch, RootState} from '@/app/store';
-import {StorageProviderType} from 'Types/api';
-import {MessageToPluginTypes} from 'Types/messages';
-import {TokenProps} from 'Types/tokens';
+import {StorageProviderType} from '@/types/api';
+import {MessageToPluginTypes} from '@/types/messages';
+import {TokenProps} from '@/types/tokens';
 import convertTokensToObject from '@/utils/convertTokensToObject';
 import {notifyToUI, postToFigma} from '../../../plugin/notifiers';
 import {compareUpdatedAt} from '../../components/utils';

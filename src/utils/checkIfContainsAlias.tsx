@@ -1,4 +1,4 @@
-import {SingleToken} from 'Types/tokens';
+import {SingleToken} from '@/types/tokens';
 import {aliasRegex} from './findReferences';
 
 export default function checkIfContainsAlias(token: SingleToken) {

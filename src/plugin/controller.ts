@@ -19,20 +19,26 @@ import {
     notifyUserId,
     notifyLastOpened,
 } from './notifiers';
-import {findAllWithData, removePluginData, sendPluginValues, updatePluginData} from './pluginData';
+import {removePluginData, sendPluginValues, updatePluginData} from './pluginData';
 import {getTokenData, updateNodes, setTokensOnDocument, goToNode, saveStorageType, getSavedStorageType} from './node';
 
-import {MessageToPluginTypes} from '../../types/messages';
-import {StorageProviderType} from '../../types/api';
+import {MessageToPluginTypes, PostToFigmaMessage} from '../types/messages';
+import {StorageProviderType} from '../types/api';
 import compareProvidersWithStored from './compareProviders';
+import {defaultNodeManager} from './NodeManager';
+import {DefaultWindowSize} from '@/constants/DefaultWindowSize';
 
 figma.showUI(__html__, {
-    width: 400,
-    height: 600,
+    width: DefaultWindowSize.width,
+    height: DefaultWindowSize.height,
+});
+
+defaultNodeManager.update().then(() => {
+    defaultNodeManager.startUpdateInterval();
 });
 
 figma.on('selectionchange', () => {
-    const nodes = figma.currentPage.selection;
+    const nodes = Array.from(figma.currentPage.selection);
     if (!nodes.length) {
         notifyNoSelection();
         return;
@@ -40,14 +46,15 @@ figma.on('selectionchange', () => {
     sendPluginValues(nodes);
 });
 
-figma.ui.onmessage = async (msg) => {
+figma.ui.on('message', async (msg: PostToFigmaMessage) => {
+    console.log('plugin', msg);
     switch (msg.type) {
         case MessageToPluginTypes.INITIATE:
             try {
                 getUISettings();
                 const userId = await getUserId();
                 const lastOpened = await getLastOpened();
-                const storageType = await getSavedStorageType();
+                const storageType = getSavedStorageType();
                 notifyUserId(userId);
                 notifyLastOpened(lastOpened);
                 notifyStorageType(storageType);
@@ -59,7 +66,6 @@ figma.ui.onmessage = async (msg) => {
                     case StorageProviderType.GITHUB:
                     case StorageProviderType.URL: {
                         compareProvidersWithStored(apiProviders, storageType);
-
                         break;
                     }
                     default: {
@@ -94,15 +100,20 @@ figma.ui.onmessage = async (msg) => {
             break;
         case MessageToPluginTypes.SET_NODE_DATA:
             try {
-                updatePluginData(figma.currentPage.selection, msg.values);
-                sendPluginValues(
-                    figma.currentPage.selection,
-                    updateNodes(figma.currentPage.selection, msg.tokens, msg.settings)
-                );
+                if (figma.currentPage.selection.length) {
+                    updatePluginData(figma.currentPage.selection, msg.values);
+                    sendPluginValues(
+                        figma.currentPage.selection,
+                        await updateNodes(figma.currentPage.selection, msg.tokens, msg.settings)
+                    );
+                }
             } catch (e) {
                 console.error(e);
             }
-            notifyRemoteComponents({nodes: store.successfulNodes.length, remotes: store.remoteComponents});
+            notifyRemoteComponents({
+                nodes: store.successfulNodes.length,
+                remotes: store.remoteComponents,
+            });
             return;
 
         case MessageToPluginTypes.REMOVE_NODE_DATA:
@@ -112,7 +123,10 @@ figma.ui.onmessage = async (msg) => {
             } catch (e) {
                 console.error(e);
             }
-            notifyRemoteComponents({nodes: store.successfulNodes.length, remotes: store.remoteComponents});
+            notifyRemoteComponents({
+                nodes: store.successfulNodes.length,
+                remotes: store.remoteComponents,
+            });
             return;
         case MessageToPluginTypes.CREATE_STYLES:
             try {
@@ -125,10 +139,16 @@ figma.ui.onmessage = async (msg) => {
             if (msg.settings.updateStyles && msg.tokens) updateStyles(msg.tokens, false, msg.settings);
             if (msg.tokenValues && msg.updatedAt) setTokensOnDocument(msg.tokenValues, msg.updatedAt);
             if (msg.tokens) {
-                const allWithData = findAllWithData({updateMode: msg.settings.updateMode});
-                updateNodes(allWithData, msg.tokens, msg.settings);
-                updatePluginData(allWithData, {});
-                notifyRemoteComponents({nodes: store.successfulNodes.length, remotes: store.remoteComponents});
+                const allWithData = await defaultNodeManager.findNodesWithData({
+                    updateMode: msg.settings.updateMode,
+                });
+                const nodes = allWithData.map(({node}) => node);
+                await updateNodes(nodes, msg.tokens, msg.settings);
+                updatePluginData(nodes, {});
+                notifyRemoteComponents({
+                    nodes: store.successfulNodes.length,
+                    remotes: store.remoteComponents,
+                });
             }
             return;
         }
@@ -145,18 +165,24 @@ figma.ui.onmessage = async (msg) => {
             figma.ui.resize(msg.width, msg.height);
             break;
         case MessageToPluginTypes.SET_UI: {
+            const width = msg.uiWindow?.width ?? DefaultWindowSize.width;
+            const height = msg.uiWindow?.height ?? DefaultWindowSize.height;
             updateUISettings({
-                width: msg.uiWindow.width,
-                height: msg.uiWindow.height,
+                width,
+                height,
                 updateMode: msg.updateMode,
                 updateRemote: msg.updateRemote,
                 updateOnChange: msg.updateOnChange,
                 updateStyles: msg.updateStyles,
                 ignoreFirstPartForStyles: msg.ignoreFirstPartForStyles,
             });
-            figma.ui.resize(msg.uiWindow.width, msg.uiWindow.height);
+            figma.ui.resize(width, height);
             break;
         }
         default:
     }
-};
+});
+
+figma.on('close', () => {
+    defaultNodeManager.stopUpdateInterval();
+});

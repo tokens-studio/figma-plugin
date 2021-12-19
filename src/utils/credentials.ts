@@ -1,6 +1,6 @@
+import {ContextObject} from '@/types/api';
 import {generateId} from '@/plugin/helpers';
 import {notifyAPIProviders, notifyUI} from '@/plugin/notifiers';
-import {ContextObject} from 'Types/api';
 import isSameCredentials from './isSameCredentials';
 
 // update credentials
@@ -46,11 +46,7 @@ export async function removeSingleCredential(context: ContextObject) {
         if (data) {
             const parsedData = await JSON.parse(data);
 
-            existingProviders = parsedData
-                .map((i) => {
-                    return isSameCredentials(i, context) ? null : i;
-                })
-                .filter((i) => i);
+            existingProviders = parsedData.map((i) => (isSameCredentials(i, context) ? null : i)).filter((i) => i);
         }
         await figma.clientStorage.setAsync('apiProviders', JSON.stringify(existingProviders));
         const newProviders = await figma.clientStorage.getAsync('apiProviders');

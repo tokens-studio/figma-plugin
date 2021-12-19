@@ -1,9 +1,16 @@
-import {UpdateMode} from 'Types/state';
-import {ApiDataType, StorageType} from 'Types/api';
-import {PostToFigmaProps, MessageFromPluginTypes, MessageToPluginTypes} from 'Types/messages';
+import {UpdateMode} from '@/types/state';
+import {ApiDataType, StorageType} from '@/types/api';
+import {
+    PostToFigmaMessage,
+    MessageFromPluginTypes,
+    MessageToPluginTypes,
+    PostToUIMessage,
+    NotifyToPluginMessage,
+} from '@/types/messages';
 import store from './store';
+import {NodeTokenRefMap} from '@/types/NodeTokenRefMap';
 
-export function postToFigma(props: PostToFigmaProps) {
+export function postToFigma(props: PostToFigmaMessage) {
     parent.postMessage(
         {
             pluginMessage: props,
@@ -12,11 +19,11 @@ export function postToFigma(props: PostToFigmaProps) {
     );
 }
 
-export function notifyUI(msg, opts?) {
+export function notifyUI(msg: string, opts?: NotificationOptions) {
     figma.notify(msg, opts);
 }
 
-export function notifyToUI(msg, opts = {}) {
+export function notifyToUI(msg: string, opts: NotifyToPluginMessage['opts'] = {}) {
     postToFigma({
         type: MessageToPluginTypes.NOTIFY,
         msg,
@@ -24,7 +31,7 @@ export function notifyToUI(msg, opts = {}) {
     });
 }
 
-export function postToUI(props) {
+export function postToUI(props: PostToUIMessage) {
     figma.ui.postMessage(props);
 }
 
@@ -34,7 +41,7 @@ export function notifyNoSelection() {
     });
 }
 
-export function notifySelection(nodes = undefined, values = undefined) {
+export function notifySelection(nodes?: string, values?: NodeTokenRefMap) {
     postToUI({
         type: MessageFromPluginTypes.SELECTION,
         nodes,
@@ -46,10 +53,10 @@ export function notifyUISettings({
     width,
     height,
     updateMode,
-    updateRemote = true,
     updateOnChange,
     updateStyles,
     ignoreFirstPartForStyles,
+    updateRemote = true,
 }: {
     width: number;
     height: number;
@@ -117,7 +124,7 @@ export function notifyUserId(userId: string) {
     });
 }
 
-export function notifyLastOpened(lastOpened: Date) {
+export function notifyLastOpened(lastOpened: number) {
     postToUI({
         type: MessageFromPluginTypes.RECEIVED_LAST_OPENED,
         lastOpened,

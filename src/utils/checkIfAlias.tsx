@@ -1,4 +1,4 @@
-import {SingleTokenObject} from '@types/tokens';
+import {SingleTokenObject} from '@/types/tokens';
 import getAliasValue from './aliases';
 import {aliasRegex} from './findReferences';
 
@@ -9,9 +9,9 @@ export default function checkIfAlias(token: SingleTokenObject, allTokens = []): 
         if (typeof token === 'string') {
             aliasToken = Boolean(token.toString().match(aliasRegex));
         } else if (token.type === 'typography') {
-            aliasToken = Object.values(token.value).some((typographyToken) => {
-                return Boolean(typographyToken?.toString().match(aliasRegex));
-            });
+            aliasToken = Object.values(token.value).some((typographyToken) =>
+                Boolean(typographyToken?.toString().match(aliasRegex))
+            );
         } else {
             aliasToken = checkIfAlias(token.value.toString(), allTokens);
         }
