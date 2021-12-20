@@ -45,11 +45,16 @@ export type ConfirmProps = {
   choices?: { key: string; label: string; enabled?: boolean }[];
   confirmAction?: string;
 };
-interface UIState {
+export interface UIState {
   selectionValues: SelectionValue;
   displayType: DisplayType;
   disabled: boolean;
   loading: boolean;
+  nodemanagerCache: {
+    building: boolean;
+    cachedCount: number;
+    totalCount: number;
+  };
   activeTab: TabNames;
   projectURL: string;
   storageType: StorageType;
@@ -83,6 +88,11 @@ export const uiState = createModel<RootModel>()({
     disabled: false,
     displayType: 'GRID',
     loading: false,
+    nodemanagerCache: {
+      building: false,
+      cachedCount: 0,
+      totalCount: 0,
+    },
     activeTab: 'start',
     projectURL: '',
     storageType: {
@@ -105,7 +115,7 @@ export const uiState = createModel<RootModel>()({
     showPushDialog: false,
     showEmptyGroups: true,
     collapsed: false,
-  } as UIState,
+  } as unknown as UIState,
   reducers: {
     setShowPushDialog: (state, data: string | false) => ({
       ...state,
@@ -237,6 +247,12 @@ export const uiState = createModel<RootModel>()({
       return {
         ...state,
         collapsed: !state.collapsed,
+      };
+    },
+    setNodeManagerCacheState(state, cacheState: UIState['nodemanagerCache']): UIState {
+      return {
+        ...state,
+        nodemanagerCache: cacheState,
       };
     },
   },

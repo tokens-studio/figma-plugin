@@ -30,6 +30,15 @@ const setUI = (state) => {
   });
 };
 
+export const count = createModel<RootModel>()({
+  state: 0,
+  reducers: {
+    increment(state, payload: number) {
+      return state + payload;
+    },
+  },
+});
+
 export const settings = createModel<RootModel>()({
   state: {
     uiWindow: {

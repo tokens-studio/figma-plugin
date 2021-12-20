@@ -5,10 +5,11 @@ import { TokenArrayGroup, TokenProps } from '../types/tokens';
 import { ContextObject, StorageProviderType, StorageType } from '../types/api';
 import { isSingleToken } from '../app/components/utils';
 import * as pjs from '../../package.json';
-import { SharedPluginDataNamespaces } from '@/constants/SharedPluginDataNamespaces';
 import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 import { defaultNodeManager } from './NodeManager';
 import { UpdateNodesSettings } from '@/types/UpdateNodesSettings';
+import { SharedPluginDataKeys } from '@/constants/SharedPluginDataKeys';
+import { tokensSharedDataHandler } from './SharedDataHandler';
 
 export function returnValueToLookFor(key) {
   switch (key) {
@@ -37,16 +38,16 @@ export function mapValuesToTokens(tokens: TokenArrayGroup, values: NodeTokenRefM
 }
 
 export function setTokensOnDocument(tokens, updatedAt: string) {
-  figma.root.setSharedPluginData(SharedPluginDataNamespaces.TOKENS, 'version', pjs.plugin_version);
-  figma.root.setSharedPluginData(SharedPluginDataNamespaces.TOKENS, 'values', JSON.stringify(tokens));
-  figma.root.setSharedPluginData(SharedPluginDataNamespaces.TOKENS, 'updatedAt', updatedAt);
+  tokensSharedDataHandler.set(figma.root, SharedPluginDataKeys.tokens.version, pjs.plugin_version);
+  tokensSharedDataHandler.set(figma.root, SharedPluginDataKeys.tokens.values, JSON.stringify(tokens));
+  tokensSharedDataHandler.set(figma.root, SharedPluginDataKeys.tokens.updatedAt, updatedAt);
 }
 
 export function getTokenData(): { values: TokenProps; updatedAt: string; version: string } | null {
   try {
-    const values = figma.root.getSharedPluginData('tokens', 'values');
-    const version = figma.root.getSharedPluginData('tokens', 'version');
-    const updatedAt = figma.root.getSharedPluginData('tokens', 'updatedAt');
+    const values = tokensSharedDataHandler.get(figma.root, SharedPluginDataKeys.tokens.values);
+    const version = tokensSharedDataHandler.get(figma.root, SharedPluginDataKeys.tokens.version);
+    const updatedAt = tokensSharedDataHandler.get(figma.root, SharedPluginDataKeys.tokens.updatedAt);
     if (values) {
       const parsedValues = JSON.parse(values);
       if (Object.keys(parsedValues).length > 0) {
@@ -71,11 +72,11 @@ export function getTokenData(): { values: TokenProps; updatedAt: string; version
 export function saveStorageType(context: ContextObject) {
   // remove secret
   const storageToSave = omit(context, ['secret']);
-  figma.root.setSharedPluginData('tokens', 'storageType', JSON.stringify(storageToSave));
+  tokensSharedDataHandler.set(figma.root, SharedPluginDataKeys.tokens.storageType, JSON.stringify(storageToSave));
 }
 
 export function getSavedStorageType(): StorageType {
-  const values = figma.root.getSharedPluginData('tokens', 'storageType');
+  const values = tokensSharedDataHandler.get(figma.root, SharedPluginDataKeys.tokens.storageType);
 
   if (values) {
     const context = JSON.parse(values);

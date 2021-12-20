@@ -2,6 +2,7 @@
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 
+import hash from 'object-hash';
 import { removeSingleCredential, updateCredentials } from '@/utils/credentials';
 import { updateUISettings, getUISettings } from '@/utils/uiSettings';
 import getLastOpened from '@/utils/getLastOpened';
@@ -35,16 +36,25 @@ figma.showUI(__html__, {
   height: DefaultWindowSize.height,
 });
 
-defaultNodeManager.update().then(() => {
-  defaultNodeManager.startUpdateInterval();
+const cache: any[] = [];
+const allNodes = figma.root.findAll();
+allNodes.forEach((node, index) => {
+  const checksum = hash({});
+  node.setSharedPluginData('tokens', 'hash', checksum);
+  cache.push({ id: node.id, hash: checksum, tokens: {} });
+  console.log(index);
 });
+figma.root.setSharedPluginData('tokens', 'nodemanagerCache', JSON.stringify(cache));
+console.log('done');
 
 figma.on('selectionchange', () => {
   const nodes = Array.from(figma.currentPage.selection);
+
   if (!nodes.length) {
     notifyNoSelection();
     return;
   }
+
   sendPluginValues(nodes);
 });
 
@@ -183,8 +193,4 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
     }
     default:
   }
-});
-
-figma.on('close', () => {
-  defaultNodeManager.stopUpdateInterval();
 });

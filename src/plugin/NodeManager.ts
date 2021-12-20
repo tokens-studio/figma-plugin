@@ -1,25 +1,38 @@
+import hash from 'object-hash';
 import split from 'just-split';
 import compact from 'just-compact';
 import { Properties } from '@/constants/Properties';
-import { SharedPluginDataNamespaces } from '@/constants/SharedPluginDataNamespaces';
 import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 import { NodeTokenRefValue } from '@/types/NodeTokenRefValue';
 import { runOnNextFrame } from '@/utils/runOnNextFrame';
 import { UpdateMode } from '@/types/state';
 import { hasTokens } from '@/utils/hasTokens';
+import { tokensSharedDataHandler } from './SharedDataHandler';
+import { SharedPluginDataKeys } from '@/constants/SharedPluginDataKeys';
+import { MessageFromPluginTypes } from '@/types/messages';
+import { postToUI } from './notifiers';
 
-type NodeManageNode = {
+type NodeManagerNode = {
   id: string;
-  node: BaseNode;
+  hash: string;
   tokens: NodeTokenRefMap;
 };
 
 export class NodeManager {
-  private nodes: NodeManageNode[] = [];
+  private nodes: NodeManagerNode[];
 
   private updating: Promise<void> | null = null;
 
-  private updateInterval: ReturnType<typeof setInterval> | null = null;
+  constructor() {
+    let defaultNodes: NodeManagerNode[] = [];
+    const cache = tokensSharedDataHandler.get(figma.root, SharedPluginDataKeys.tokens.nodemanagerCache);
+    if (cache) {
+      defaultNodes = JSON.parse(cache);
+    }
+
+    this.nodes = defaultNodes;
+    console.log(`Cache size ${defaultNodes.length}`);
+  }
 
   private normalizePluginTokenRef(map: NodeTokenRefMap) {
     const next = { ...map };
@@ -35,66 +48,91 @@ export class NodeManager {
     return next;
   }
 
-  private async getNodePluginData(node: PageNode | SceneNode) {
+  private async getNodePluginData(node: BaseNode) {
+    let checksum = tokensSharedDataHandler.get(node, SharedPluginDataKeys.tokens.hash);
+    const registeredEntry = this.nodes.find(({ id }) => node.id === id);
+
+    if (registeredEntry && registeredEntry.hash === checksum) {
+      return registeredEntry;
+    }
+
+    let tokens: NodeTokenRefMap | null = null;
+
     // @deprecated - moved to separated token values
     const deprecatedValuesProp = node.getPluginData('values');
     if (deprecatedValuesProp) {
-      const tokens = JSON.parse(deprecatedValuesProp) as NodeTokenRefMap;
+      tokens = JSON.parse(deprecatedValuesProp) as NodeTokenRefMap;
       // migrate values to new format
       // there's no need to keep supporting deprecated data structures
       // this will take more time on startup but only once
       await Promise.all(
         Object.keys(tokens).map(async (property) => {
-          node.setSharedPluginData(SharedPluginDataNamespaces.TOKENS, property, tokens[property]);
+          tokensSharedDataHandler.set(node, property, tokens?.[property]);
         }),
       );
-
-      return {
-        node,
-        id: node.id,
-        tokens: this.normalizePluginTokenRef(tokens),
-      };
     }
 
-    const tokens = Object.fromEntries(
-      compact(
-        await Promise.all(
-          Object.values(Properties).map(async (property) => {
-            let fromShared = true;
-            let value = node.getSharedPluginData(SharedPluginDataNamespaces.TOKENS, property);
+    if (!tokens) {
+      tokens = Object.fromEntries(
+        compact(
+          await Promise.all(
+            Object.values(Properties).map(async (property) => {
+              let fromShared = true;
+              let value = tokensSharedDataHandler.get(node, property);
 
-            if (!value) {
-              value = node.getPluginData(property);
-              fromShared = false;
-            }
-
-            if (value) {
-              // migrate from private to shared data if the data is coming from private
-              if (!fromShared) {
-                node.setSharedPluginData(SharedPluginDataNamespaces.TOKENS, property, value);
+              if (!value) {
+                value = node.getPluginData(property);
+                fromShared = false;
               }
 
-              return [property, JSON.parse(value)] as [Properties, NodeTokenRefValue];
-            }
+              if (value) {
+                // migrate from private to shared data if the data is coming from private
+                if (!fromShared) {
+                  tokensSharedDataHandler.set(node, property, value);
+                }
 
-            return null;
-          }),
+                return [property, JSON.parse(value)] as [Properties, NodeTokenRefValue];
+              }
+
+              return null;
+            }),
+          ),
         ),
-      ),
-    ) as NodeTokenRefMap;
+      ) as NodeTokenRefMap;
+    }
+
+    checksum = hash(tokens);
+    tokensSharedDataHandler.set(node, SharedPluginDataKeys.tokens.hash, checksum);
 
     return {
-      node,
       id: node.id,
+      hash: checksum,
       tokens: this.normalizePluginTokenRef(tokens),
     };
   }
 
-  public async update(nodeCallback?: (node: PageNode | SceneNode) => boolean) {
+  public async update(nodes: BaseNode[]) {
+    const start = Date.now();
+
+    postToUI({
+      type: MessageFromPluginTypes.UPDATE_NODEMANAGER_CACHE_STATE,
+      nodemanagerCacheState: {
+        building: true,
+        cachedCount: 0,
+        totalCount: nodes.length,
+      },
+    });
+
+    // wait for previous update
+    if (this.updating) {
+      await this.updating;
+    }
+
     this.updating = (async () => {
-      const allNodes = split(figma.root.findAll(nodeCallback), 5);
-      for (let chunkIndex = 0; chunkIndex < allNodes.length; chunkIndex += 1) {
-        const chunk = allNodes[chunkIndex];
+      const allNodes = nodes;
+      const nodeChunks = split(allNodes, 100);
+      for (let chunkIndex = 0; chunkIndex < nodeChunks.length; chunkIndex += 1) {
+        const chunk = nodeChunks[chunkIndex];
         await runOnNextFrame(async () => {
           await Promise.all(
             chunk.map(async (node) => {
@@ -107,23 +145,46 @@ export class NodeManager {
               }
             }),
           );
+
+          tokensSharedDataHandler.set(figma.root, SharedPluginDataKeys.tokens.nodemanagerCache, JSON.stringify(this.nodes));
+          postToUI({
+            type: MessageFromPluginTypes.UPDATE_NODEMANAGER_CACHE_STATE,
+            nodemanagerCacheState: {
+              building: true,
+              cachedCount: chunkIndex * 100,
+              totalCount: nodes.length,
+            },
+          });
         });
       }
+      console.log(`Cached ${allNodes.length} chunks in ${Date.now() - start}ms`);
     })();
     await this.updating;
+
+    postToUI({
+      type: MessageFromPluginTypes.UPDATE_NODEMANAGER_CACHE_STATE,
+      nodemanagerCacheState: {
+        building: false,
+        cachedCount: nodes.length,
+        totalCount: nodes.length,
+      },
+    });
   }
 
-  public async findNodesWithData(opts: { updateMode?: UpdateMode; nodes?: readonly BaseNode[]; nodeIds?: string[] }) {
-    // wait for previous update function
-    await this.updating;
+  public async findNodesWithData(opts: {
+    updateMode?: UpdateMode;
+    nodes?: readonly BaseNode[];
+  }) {
+    // wait for previous update
+    if (this.updating) {
+      await this.updating;
+    }
 
-    const { updateMode, nodes, nodeIds } = opts;
+    const { updateMode, nodes } = opts;
 
     let relevantNodes: BaseNode[] = [];
     if (nodes) {
       relevantNodes = Array.from(nodes);
-    } else if (nodeIds) {
-      relevantNodes = figma.root.findAll((node) => nodeIds.includes(node.id));
     } else if (updateMode === UpdateMode.PAGE) {
       relevantNodes = figma.currentPage.findAll();
     } else if (updateMode === UpdateMode.SELECTION) {
@@ -132,10 +193,9 @@ export class NodeManager {
       relevantNodes = figma.root.findAll();
     }
 
-    const unrgisteredNodeIds = relevantNodes
-      .filter((node) => !this.nodes.find((n) => n.id === node.id))
-      .map((node) => node.id);
-    await this.update((node) => unrgisteredNodeIds.includes(node.id));
+    const unregisteredNodes = relevantNodes
+      .filter((node) => !this.nodes.find((n) => n.id === node.id));
+    await this.update(unregisteredNodes);
 
     const relevantNodeIds = relevantNodes.map((node) => node.id);
     return this.nodes.filter((node) => relevantNodeIds.includes(node.id) && hasTokens(node.tokens));
@@ -144,25 +204,13 @@ export class NodeManager {
   public async updateNode(node: BaseNode, tokens: NodeTokenRefMap) {
     let registeredIndex = this.nodes.findIndex((entry) => entry.id === node.id);
     if (registeredIndex === -1) {
-      await this.update((n) => n.id === node.id);
+      await this.update([node]);
       registeredIndex = this.nodes.findIndex((entry) => entry.id === node.id);
     }
 
     if (registeredIndex > -1) {
       this.nodes[registeredIndex].tokens = tokens;
-    }
-  }
-
-  public startUpdateInterval() {
-    this.updateInterval = setInterval(() => {
-      this.update((node) => !this.nodes.find((existingNode) => existingNode.id === node.id));
-    }, 5000);
-  }
-
-  public stopUpdateInterval() {
-    if (this.updateInterval) {
-      clearInterval(this.updateInterval);
-      this.updateInterval = null;
+      tokensSharedDataHandler.set(node, SharedPluginDataKeys.tokens.hash, hash(tokens));
     }
   }
 }

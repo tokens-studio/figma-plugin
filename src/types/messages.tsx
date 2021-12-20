@@ -1,4 +1,5 @@
 import { SettingsState } from '@/app/store/models/settings';
+import { UIState } from '@/app/store/models/uiState';
 import {
   ApiDataType, ContextObject, StorageProviderType, StorageType,
 } from './api';
@@ -18,6 +19,7 @@ export enum MessageFromPluginTypes {
   USER_ID = 'userId',
   RECEIVED_LAST_OPENED = 'receivedLastOpened',
   UI_SETTINGS = 'uiSettings',
+  UPDATE_NODEMANAGER_CACHE_STATE = 'updateNodemanagerCacheState',
 }
 
 export enum MessageToPluginTypes {
@@ -88,6 +90,10 @@ export type ReceivedLastOpenedFromPluginMessage = {
   type: MessageFromPluginTypes.RECEIVED_LAST_OPENED;
   lastOpened: number;
 };
+export type UpdateNodemanagerCacheStateFromPluginMessage = {
+  type: MessageFromPluginTypes.UPDATE_NODEMANAGER_CACHE_STATE;
+  nodemanagerCacheState: UIState['nodemanagerCache']
+};
 export type PostToUIMessage =
     | NoSelectionFromPluginMessage
     | SelectionFromPluginMessage
@@ -98,7 +104,8 @@ export type PostToUIMessage =
     | ApiProvidersFromPluginMessage
     | StylesFromPluginMessage
     | UserIdFromPluginMessage
-    | ReceivedLastOpenedFromPluginMessage;
+    | ReceivedLastOpenedFromPluginMessage
+    | UpdateNodemanagerCacheStateFromPluginMessage;
 
 export type InitiateToPluginMessage = { type: MessageToPluginTypes.INITIATE };
 export type RemoveSingleCredentialToPluginMessage = {

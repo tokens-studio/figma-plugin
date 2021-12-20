@@ -32,6 +32,7 @@ export function Initiator() {
           providers,
           userId,
           settings,
+          nodemanagerCacheState,
         } = event.data.pluginMessage;
         switch (type) {
           case MessageFromPluginTypes.SELECTION: {
@@ -99,6 +100,10 @@ export function Initiator() {
           }
           case MessageFromPluginTypes.RECEIVED_LAST_OPENED: {
             dispatch.uiState.setLastOpened(lastOpened);
+            break;
+          }
+          case MessageFromPluginTypes.UPDATE_NODEMANAGER_CACHE_STATE: {
+            dispatch.uiState.setNodeManagerCacheState(nodemanagerCacheState);
             break;
           }
           default:

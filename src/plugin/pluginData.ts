@@ -5,6 +5,8 @@ import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 import { defaultNodeManager } from './NodeManager';
 import { SharedPluginDataNamespaces } from '@/constants/SharedPluginDataNamespaces';
 import { Properties } from '@/constants/Properties';
+import { tokensSharedDataHandler } from './SharedDataHandler';
+import { SharedPluginDataKeys } from '@/constants/SharedPluginDataKeys';
 
 export async function sendPluginValues(nodes: readonly BaseNode[], values?: NodeTokenRefMap) {
   let pluginValues = values;
@@ -13,10 +15,8 @@ export async function sendPluginValues(nodes: readonly BaseNode[], values?: Node
     notifySelection(nodes[0].id);
   } else {
     if (!pluginValues) {
-      const data = await defaultNodeManager.findNodesWithData({
-        nodeIds: nodes.map((node) => node.id),
-      });
-      pluginValues = data?.[0].tokens;
+      const data = await defaultNodeManager.findNodesWithData({ nodes });
+      pluginValues = data?.[0]?.tokens;
     }
 
     notifySelection(nodes[0].id, pluginValues);
@@ -30,19 +30,19 @@ export function removePluginData(nodes: readonly (BaseNode | SceneNode)[], key?:
     } finally {
       if (key) {
         node.setPluginData(key, '');
-        node.setSharedPluginData('tokens', key, '');
+        tokensSharedDataHandler.set(node, key, '');
         // TODO: Introduce setting asking user if values should be removed?
         removeValuesFromNode(node, key);
       } else {
         Object.values(Properties).forEach((prop) => {
           node.setPluginData(prop, '');
-          node.setSharedPluginData('tokens', prop, '');
+          tokensSharedDataHandler.set(node, prop, '');
           // TODO: Introduce setting asking user if values should be removed?
           removeValuesFromNode(node, prop);
         });
       }
       node.setPluginData('values', '');
-      node.setSharedPluginData('tokens', 'values', '');
+      tokensSharedDataHandler.set(node, SharedPluginDataKeys.tokens.values, '');
       store.successfulNodes.push(node);
     }
   });
@@ -50,9 +50,7 @@ export function removePluginData(nodes: readonly (BaseNode | SceneNode)[], key?:
 
 export async function updatePluginData(nodes: readonly BaseNode[], values: NodeTokenRefMap) {
   const namespace = SharedPluginDataNamespaces.TOKENS;
-  const nodesData = await defaultNodeManager.findNodesWithData({
-    nodeIds: nodes.map((node) => node.id),
-  });
+  const nodesData = await defaultNodeManager.findNodesWithData({ nodes });
 
   nodes.reduce<Promise<void>>(
     (previous, node) => previous.then(async () => {
