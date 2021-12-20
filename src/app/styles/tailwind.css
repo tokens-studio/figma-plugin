@@ -482,6 +482,15 @@ form {
     border-radius: 50%;
 }
 
+.color-picker .react-colorful {
+    width: 100%;
+}
+
+.color-picker .react-colorful__alpha,
+.color-picker .react-colorful__saturation {
+    border-radius: 0;
+}
+
 #corner {
     position: fixed;
     right: 0px;

@@ -7,7 +7,7 @@ import {Dispatch, RootState} from '../store';
 import useManageTokens from '../store/useManageTokens';
 import BoxShadowInput from './BoxShadowInput';
 import Input from './Input';
-import {ChromePicker, ColorChangeHandler} from 'react-color';
+import ColorPicker from './ColorPicker';
 
 const EditTokenForm = ({resolvedTokens}) => {
     const {activeTokenSet} = useSelector((state: RootState) => state.tokenState);
@@ -40,12 +40,12 @@ const EditTokenForm = ({resolvedTokens}) => {
         [dispatch, editToken]
     );
 
-    const handleColorValueChange = React.useCallback<ColorChangeHandler>(
-        (color, e) => {
+    const handleColorValueChange = React.useCallback(
+        (color: string) => {
             setError(null);
-            dispatch.uiState.setEditToken({...editToken, value: color.hex});
+            dispatch.uiState.setEditToken({...editToken, value: color});
         },
-        [dispatch.editToken]
+        [dispatch, editToken]
     );
 
     const handleObjectChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>(
@@ -158,23 +158,7 @@ const EditTokenForm = ({resolvedTokens}) => {
                         />
                         {editToken.type === 'color' && (
                             <div className="mt-2 rounded-sm border border-gray-300 font-sans">
-                                <ChromePicker
-                                    styles={{
-                                        default: {
-                                            picker: {
-                                                width: '100%',
-                                                boxShadow: 'none',
-                                                borderRadius: 0,
-                                                fontFamily: 'inherit',
-                                            },
-                                            saturation: {
-                                                borderRadius: 0,
-                                            },
-                                        },
-                                    }}
-                                    color={editToken.value}
-                                    onChange={handleColorValueChange}
-                                />
+                                <ColorPicker value={editToken.value} onChange={handleColorValueChange} />
                             </div>
                         )}
                         {checkIfContainsAlias(editToken.value) && (
