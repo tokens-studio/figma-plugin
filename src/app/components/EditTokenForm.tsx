@@ -7,6 +7,7 @@ import {Dispatch, RootState} from '../store';
 import useManageTokens from '../store/useManageTokens';
 import BoxShadowInput from './BoxShadowInput';
 import Input from './Input';
+import {ChromePicker, ColorChangeHandler} from 'react-color';
 
 const EditTokenForm = ({resolvedTokens}) => {
     const {activeTokenSet} = useSelector((state: RootState) => state.tokenState);
@@ -15,12 +16,14 @@ const EditTokenForm = ({resolvedTokens}) => {
     const dispatch = useDispatch<Dispatch>();
     const [error, setError] = React.useState(null);
 
-    const isValid = editToken.value && !error;
+    const isValid = React.useMemo(() => editToken.value && !error, [editToken, error]);
 
-    const hasNameThatExistsAlready = resolvedTokens
-        .filter((t) => t.internal__Parent === activeTokenSet)
-        .find((t) => t.name === editToken.name);
-    const nameWasChanged = editToken?.initialName !== editToken.name;
+    const hasNameThatExistsAlready = React.useMemo(
+        () =>
+            resolvedTokens.filter((t) => t.internal__Parent === activeTokenSet).find((t) => t.name === editToken.name),
+        [resolvedTokens, activeTokenSet]
+    );
+    const nameWasChanged = React.useMemo(() => editToken?.initialName !== editToken.name, [editToken]);
 
     React.useEffect(() => {
         if ((editToken.isPristine || nameWasChanged) && hasNameThatExistsAlready) {
@@ -28,24 +31,41 @@ const EditTokenForm = ({resolvedTokens}) => {
         }
     }, [editToken, hasNameThatExistsAlready, nameWasChanged]);
 
-    const handleChange = (e) => {
-        setError(null);
-        e.persist();
-        dispatch.uiState.setEditToken({...editToken, [e.target.name]: e.target.value});
-    };
+    const handleChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>(
+        (e) => {
+            setError(null);
+            e.persist();
+            dispatch.uiState.setEditToken({...editToken, [e.target.name]: e.target.value});
+        },
+        [dispatch, editToken]
+    );
 
-    const handleObjectChange = (e) => {
-        e.persist();
-        dispatch.uiState.setEditToken({...editToken, value: {...editToken.value, [e.target.name]: e.target.value}});
-    };
+    const handleColorValueChange = React.useCallback<ColorChangeHandler>(
+        (color, e) => {
+            setError(null);
+            dispatch.uiState.setEditToken({...editToken, value: color.hex});
+        },
+        [dispatch.editToken]
+    );
 
-    const handleOptionsChange = (e) => {
-        e.persist();
-        dispatch.uiState.setEditToken({
-            ...editToken,
-            options: {...editToken.options, [e.target.name]: e.target.value},
-        });
-    };
+    const handleObjectChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>(
+        (e) => {
+            e.persist();
+            dispatch.uiState.setEditToken({...editToken, value: {...editToken.value, [e.target.name]: e.target.value}});
+        },
+        [dispatch, editToken]
+    );
+
+    const handleOptionsChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>(
+        (e) => {
+            e.persist();
+            dispatch.uiState.setEditToken({
+                ...editToken,
+                options: {...editToken.options, [e.target.name]: e.target.value},
+            });
+        },
+        [dispatch, editToken]
+    );
 
     const submitTokenValue = async ({value, name, options}) => {
         track('Edit Token');
@@ -136,6 +156,27 @@ const EditTokenForm = ({resolvedTokens}) => {
                                 editToken.type === 'color' ? '#000000, hsla(), rgba() or {alias}' : 'Value or {alias}'
                             }
                         />
+                        {editToken.type === 'color' && (
+                            <div className="mt-2 rounded-sm border border-gray-300 font-sans">
+                                <ChromePicker
+                                    styles={{
+                                        default: {
+                                            picker: {
+                                                width: '100%',
+                                                boxShadow: 'none',
+                                                borderRadius: 0,
+                                                fontFamily: 'inherit',
+                                            },
+                                            saturation: {
+                                                borderRadius: 0,
+                                            },
+                                        },
+                                    }}
+                                    color={editToken.value}
+                                    onChange={handleColorValueChange}
+                                />
+                            </div>
+                        )}
                         {checkIfContainsAlias(editToken.value) && (
                             <div className="p-2 rounded bg-gray-100 border-gray-300 font-mono text-xxs mt-2 text-gray-700 flex itms-center">
                                 {editToken.type === 'color' ? (

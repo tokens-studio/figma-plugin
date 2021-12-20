@@ -1,6 +1,22 @@
 import * as React from 'react';
 
-const Input = ({
+type Props = {
+    name: string;
+    inputRef?: React.MutableRefObject<HTMLInputElement>;
+    error?: string;
+    required?: boolean;
+    tabindex?: number | null;
+    label?: string | null;
+    full?: boolean;
+    value?: string;
+    type?: string;
+    custom?: string;
+    placeholder?: string;
+    capitalize?: boolean;
+    onChange?: React.ChangeEventHandler<HTMLInputElement>;
+};
+
+const Input: React.FC<Props> = ({
     name,
     error = '',
     required = false,
