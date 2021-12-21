@@ -25,7 +25,7 @@ export default function ExportModal({onClose}) {
                     .
                 </p>
                 <Heading size="small">Output example</Heading>
-                <Textarea className="flex-grow" rows={10} isDisabled value={getFormattedTokens()} />
+                <Textarea className="grow" rows={10} isDisabled value={getFormattedTokens()} />
                 <div className="space-x-4 flex justify-between">
                     <Button variant="secondary" onClick={onClose}>
                         Cancel

@@ -27,7 +27,7 @@ const TokenFilter = () => {
     }, []);
 
     return (
-        <div className="flex flex-col flex-grow p-4 pb-0">
+        <div className="flex flex-col grow p-4 pb-0">
             <Input
                 full
                 placeholder="Filter on name"

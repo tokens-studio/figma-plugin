@@ -25,7 +25,7 @@ const App = () => {
             <Initiator />
             <LoadingBar />
             <div className="h-full flex flex-col">
-                <div className="flex-grow flex flex-col">
+                <div className="grow flex flex-col">
                     {activeTab !== 'start' && <Navbar />}
                     {activeTab === 'start' && <StartScreen />}
                     <Tokens isActive={activeTab === 'tokens'} />

@@ -336,7 +336,13 @@ form {
 }
 
 .input {
-    @apply bg-white border border-gray-300 text-xxs p-2 rounded-sm w-24 font-mono;
+    @apply bg-white border border-gray-300 text-xxs rounded-sm w-24 font-mono;
+}
+
+textarea.input,
+select.input,
+input.input {
+    @apply p-2;
 }
 
 .input:focus {

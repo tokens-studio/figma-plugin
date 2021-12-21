@@ -15,7 +15,7 @@ const SyncSettings = () => {
     };
 
     return (
-        <div className="flex flex-col flex-grow">
+        <div className="flex flex-col grow">
             <div className="p-4 space-y-4 border-b">
                 <div className="space-y-4">
                     <Heading>Styles</Heading>

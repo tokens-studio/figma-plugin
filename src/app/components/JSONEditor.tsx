@@ -57,15 +57,15 @@ const JSONEditor = () => {
     };
 
     return (
-        <div className="flex flex-col flex-grow">
+        <div className="flex flex-col grow">
             {exportModalVisible && <ExportModal onClose={() => showExportModal(false)} />}
             {presetModalVisible && <PresetModal onClose={() => showPresetModal(false)} />}
             <TokenSetSelector />
-            <div className="flex flex-col justify-between items-center flex-grow">
-                <div className="flex flex-col p-4 pt-2 w-full items-center flex-grow">
+            <div className="flex flex-col justify-between items-center grow">
+                <div className="flex flex-col p-4 pt-2 w-full items-center grow">
                     <Textarea
                         isDisabled={editProhibited}
-                        className="flex-grow"
+                        className="grow"
                         placeholder="Enter JSON"
                         rows={21}
                         onChange={changeTokens}

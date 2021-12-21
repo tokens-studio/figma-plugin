@@ -1,8 +1,5 @@
 module.exports = {
-    purge: {
-        enabled: true,
-        content: ['./app/src/**/*.html', './src/app/**/*.tsx', './src/app/**/*.jsx'],
-    },
+    content: ['./app/src/**/*.html', './src/app/**/*.tsx', './src/app/**/*.jsx'],
     important: true,
     theme: {
         extend: {
@@ -42,6 +39,7 @@ module.exports = {
                 focus: `0 0 0 2px ${theme('colors.primary.500')}`,
                 'focus-subtle': `0 0 0 2px ${theme('colors.primary.300')}`,
                 'focus-muted': `0 0 0 2px ${theme('colors.primary.400')}`,
+                border: '0 0 0 1px',
             }),
         },
     },

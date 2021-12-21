@@ -24,7 +24,7 @@ const StorageItem = ({item, onEdit = null}) => {
                 isActive() ? 'bg-blue-100 bg-opacity-50 border-blue-400' : 'hover:border-blue-300 border-gray-300'
             }`}
         >
-            <div className="flex flex-col flex-grow items-start">
+            <div className="flex flex-col grow items-start">
                 <div className="text-xs font-bold">{name}</div>
                 <div className="opacity-75 text-xxs">
                     {id} {branch && ` (${branch})`}

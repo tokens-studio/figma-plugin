@@ -14,6 +14,7 @@ const EditTokenForm = ({resolvedTokens}) => {
     const {editSingleToken, createSingleToken} = useManageTokens();
     const {editToken} = useSelector((state: RootState) => state.uiState);
     const dispatch = useDispatch<Dispatch>();
+    const [inputHelperOpen, setInputHelperOpen] = React.useState(false);
     const [error, setError] = React.useState(null);
 
     const isValid = React.useMemo(() => editToken.value && !error, [editToken, error]);
@@ -30,6 +31,10 @@ const EditTokenForm = ({resolvedTokens}) => {
             setError('Token names must be unique');
         }
     }, [editToken, hasNameThatExistsAlready, nameWasChanged]);
+
+    const handleToggleInputHelper = React.useCallback(() => {
+        setInputHelperOpen(!inputHelperOpen);
+    }, [inputHelperOpen]);
 
     const handleChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>(
         (e) => {
@@ -155,11 +160,21 @@ const EditTokenForm = ({resolvedTokens}) => {
                             placeholder={
                                 editToken.type === 'color' ? '#000000, hsla(), rgba() or {alias}' : 'Value or {alias}'
                             }
+                            prefix={
+                                editToken.type === 'color' && (
+                                    <button
+                                        type="button"
+                                        className="block w-4 h-4 rounded-sm shadow-border shadow-gray-300 cursor-pointer"
+                                        style={{background: editToken.value, fontSize: 0}}
+                                        onClick={handleToggleInputHelper}
+                                    >
+                                        {editToken.value}
+                                    </button>
+                                )
+                            }
                         />
-                        {editToken.type === 'color' && (
-                            <div className="mt-2 rounded-sm border border-gray-300 font-sans">
-                                <ColorPicker value={editToken.value} onChange={handleColorValueChange} />
-                            </div>
+                        {inputHelperOpen && editToken.type === 'color' && (
+                            <ColorPicker value={editToken.value} onChange={handleColorValueChange} />
                         )}
                         {checkIfContainsAlias(editToken.value) && (
                             <div className="p-2 rounded bg-gray-100 border-gray-300 font-mono text-xxs mt-2 text-gray-700 flex itms-center">
