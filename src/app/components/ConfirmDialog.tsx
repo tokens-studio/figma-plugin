@@ -9,19 +9,21 @@ import Checkbox from './Checkbox';
 import Label from './Label';
 
 const ConfirmDialog = () => {
-    const {onConfirm, onCancel, confirmState} = useConfirm();
-    const [chosen, setChosen] = React.useState([]);
-
-    const toggleChosen = (id) => {
-        const index = chosen.indexOf(id);
-        if (index === -1) {
-            setChosen([...chosen, id]);
-        } else {
-            setChosen(chosen.filter((item) => item !== id));
-        }
-    };
-
     const confirmButton = React.useRef(null);
+    const {onConfirm, onCancel, confirmState} = useConfirm();
+    const [chosen, setChosen] = React.useState<string[]>([]);
+
+    const toggleChosen = React.useCallback(
+        (id: string) => {
+            const index = chosen.indexOf(id);
+            if (index === -1) {
+                setChosen([...chosen, id]);
+            } else {
+                setChosen(chosen.filter((item) => item !== id));
+            }
+        },
+        [chosen]
+    );
 
     React.useEffect(() => {
         setTimeout(() => {
