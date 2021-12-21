@@ -13,7 +13,8 @@ export function convertFigmaGradientToString(paint: GradientPaint) {
         .join(', ');
     const {start, end} = extractLinearGradientParamsFromTransform(1, 1, gradientTransform);
     const angleInRad = Math.atan2(end[1] - start[1], end[0] - start[0]);
-    return `linear-gradient(${(angleInRad * 180) / Math.PI}deg, ${gradientStopsString})`;
+    const angleInDeg = Math.round((angleInRad * 180) / Math.PI);
+    return `linear-gradient(${angleInDeg + 90}deg, ${gradientStopsString})`;
 }
 
 export function convertStringToFigmaGradient(value: string) {
