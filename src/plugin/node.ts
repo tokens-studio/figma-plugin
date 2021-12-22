@@ -100,8 +100,6 @@ export function updateNodes(nodes, tokens, settings) {
             const node = nodes[i];
             const data = fetchAllPluginData(node);
             if (data) {
-                console.log('updating node', node.id, data);
-
                 const mappedValues = mapValuesToTokens(tokens, data);
                 setValuesOnNode(node, mappedValues, data, ignoreFirstPartForStyles);
                 store.successfulNodes.push(node);

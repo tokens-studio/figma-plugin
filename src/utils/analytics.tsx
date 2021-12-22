@@ -12,7 +12,7 @@ export function identify({userId, figmaId, name}: {userId: string; figmaId: stri
 
         mixpanel.people.set({
             USER_ID: userId,
-            FIGMA_ID: figmaId,
+            FIGMA_USER_ID: figmaId,
             NAME: name,
         });
     }

@@ -3,8 +3,6 @@ import {MessageFromPluginTypes} from '../../types/messages';
 import {notifyTokenValues} from './notifiers';
 
 export default function compareProvidersWithStored(providers, storageType) {
-    console.log('compareProvidersWithStored', providers, storageType);
-
     if (providers) {
         const parsedProviders = JSON.parse(providers);
 
