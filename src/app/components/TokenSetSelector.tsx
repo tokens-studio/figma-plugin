@@ -57,7 +57,7 @@ export default function TokenSetSelector() {
         track('Deleted token set');
 
         const userConfirmation = await confirm({
-            text: 'Delete token set?',
+            text: `Delete token set "${tokenSet}"?`,
             description: 'Are you sure you want to delete this set?',
         });
         if (userConfirmation) {
