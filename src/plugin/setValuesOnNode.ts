@@ -25,7 +25,15 @@ export default async function setValuesOnNode(node, values, data, ignoreFirstPar
 
         // BOX SHADOW
         if (typeof values.boxShadow !== 'undefined' && typeof node.effects !== 'undefined') {
-            setEffectValuesOnTarget(node, {value: values.boxShadow});
+            const effects = figma.getLocalEffectStyles();
+            const path = data.boxShadow.split('.');
+            const pathname = path.slice(ignoreFirstPartForStyles ? 1 : 0, path.length).join('/');
+            const matchingStyles = effects.filter((n) => n.name === pathname);
+            if (matchingStyles.length) {
+                node.effectStyleId = matchingStyles[0].id;
+            } else {
+                setEffectValuesOnTarget(node, {value: values.boxShadow});
+            }
         }
 
         // BORDER WIDTH
