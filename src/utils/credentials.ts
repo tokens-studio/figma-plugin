@@ -15,6 +15,7 @@ export async function updateCredentials(context: ContextObject) {
             existingProviders = parsedData;
 
             let matchingProvider;
+
             if (context.internalId) {
                 matchingProvider = existingProviders.findIndex((i) => i.internalId === context.internalId);
             } else {

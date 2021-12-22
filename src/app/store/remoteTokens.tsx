@@ -19,6 +19,8 @@ export default function useRemoteTokens() {
     const {pullTokensFromURL} = useURL();
 
     const pullTokens = async (context = api) => {
+        track('pullTokens', {provider: context.provider});
+
         dispatch.uiState.setLoading(true);
 
         let tokenValues;
@@ -53,6 +55,8 @@ export default function useRemoteTokens() {
     };
 
     const restoreStoredProvider = async (context) => {
+        track('restoreStoredProvider', {provider: context.provider});
+
         dispatch.uiState.setLocalApiState(context);
         dispatch.uiState.setApiData(context);
         dispatch.tokenState.setEditProhibited(false);
@@ -69,6 +73,7 @@ export default function useRemoteTokens() {
     };
 
     const pushTokens = async () => {
+        track('pushTokens', {provider: api.provider});
         switch (api.provider) {
             case StorageProviderType.GITHUB: {
                 await pushTokensToGitHub(api);

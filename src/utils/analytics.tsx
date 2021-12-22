@@ -6,12 +6,14 @@ export function track(name: string, opts = {}) {
     }
 }
 
-export function identify(data: string) {
+export function identify({userId, figmaId, name}: {userId: string; figmaId: string; name: string}) {
     if (process.env.MIXPANEL_ACCESS_TOKEN) {
-        mixpanel.identify(data);
+        mixpanel.identify(userId);
 
         mixpanel.people.set({
-            USER_ID: data,
+            USER_ID: userId,
+            FIGMA_USER_ID: figmaId,
+            NAME: name,
         });
     }
 }

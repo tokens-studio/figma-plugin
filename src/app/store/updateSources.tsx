@@ -4,6 +4,7 @@ import {TokenProps} from 'Types/tokens';
 import {ContextObject, StorageProviderType} from 'Types/api';
 import {notifyToUI, postToFigma} from '../../plugin/notifiers';
 import {updateJSONBinTokens} from './providers/jsonbin';
+import {track} from '@/utils/analytics';
 
 async function updateRemoteTokens({
     provider,
@@ -21,6 +22,8 @@ async function updateRemoteTokens({
     if (!context) return;
     switch (provider) {
         case StorageProviderType.JSONBIN: {
+            track('pushTokens', {provider: StorageProviderType.JSONBIN});
+
             notifyToUI('Updating JSONBin...');
             updateJSONBinTokens({
                 tokens,

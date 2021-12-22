@@ -110,10 +110,10 @@ export function notifyStyleValues(values = undefined) {
     postToUI({type: MessageFromPluginTypes.STYLES, values});
 }
 
-export function notifyUserId(userId: string) {
+export function notifyUserId(user: {userId: string; figmaId: string; name: string}) {
     postToUI({
         type: MessageFromPluginTypes.USER_ID,
-        userId,
+        user,
     });
 }
 

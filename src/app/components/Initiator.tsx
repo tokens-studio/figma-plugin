@@ -29,7 +29,7 @@ export default function Initiator() {
                     storageType,
                     lastOpened,
                     providers,
-                    userId,
+                    user,
                     settings,
                 } = event.data.pluginMessage;
                 switch (type) {
@@ -92,7 +92,7 @@ export default function Initiator() {
                         break;
                     }
                     case MessageFromPluginTypes.USER_ID: {
-                        identify(userId);
+                        identify(user);
                         track('Launched');
                         break;
                     }

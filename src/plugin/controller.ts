@@ -44,11 +44,12 @@ figma.ui.onmessage = async (msg) => {
     switch (msg.type) {
         case MessageToPluginTypes.INITIATE:
             try {
+                const {currentUser} = figma;
                 getUISettings();
                 const userId = await getUserId();
                 const lastOpened = await getLastOpened();
                 const storageType = await getSavedStorageType();
-                notifyUserId(userId);
+                notifyUserId({userId, figmaId: currentUser.id, name: currentUser.name});
                 notifyLastOpened(lastOpened);
                 notifyStorageType(storageType);
 

@@ -33,6 +33,7 @@ describe('updateNode', () => {
 
     const dataOnNode = {
         typography: 'type.heading.h1',
+        boxShadow: 'shadows.default',
     };
 
     let textNodeMock;
@@ -83,8 +84,16 @@ describe('updateNode', () => {
         expect(textNodeMock).toEqual({...textNodeMock, textStyleId: '456'});
     });
 
-    it('calls setEffectValuesOnTarget if effect node and effects are given', () => {
-        setValuesOnNode(solidNodeMock, boxShadowValues, {});
+    it('sets effectStyle if matching Style is found', async () => {
+        figma.getLocalEffectStyles.mockReturnValue([{name: 'shadows/default', id: '123'}]);
+        await setValuesOnNode(solidNodeMock, boxShadowValues, dataOnNode);
+        expect(setEffectValuesOnTargetSpy).not.toHaveBeenCalled();
+        expect(solidNodeMock).toEqual({...solidNodeMock, effectStyleId: '123'});
+    });
+
+    it('calls setEffectValuesOnTarget if effect node and effects are given', async () => {
+        figma.getLocalEffectStyles.mockReturnValue([{name: 'shadows/other', id: '123'}]);
+        await setValuesOnNode(solidNodeMock, boxShadowValues, dataOnNode);
         expect(setEffectValuesOnTargetSpy).toHaveBeenCalled();
     });
 });
