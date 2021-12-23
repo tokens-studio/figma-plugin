@@ -30,6 +30,12 @@ const globalTokens = {
 
 export const {styled, css, global: globalCSS, keyframes, getCssString, theme} = createCss({
     theme: {
+        fontSizes: {
+            small: '12px',
+        },
+        fontWeights: {
+            bold: 500,
+        },
         colors: {
             bgDefault: globalTokens.colors.white,
             contextMenuBackground: globalTokens.colors.gray950,
@@ -38,6 +44,8 @@ export const {styled, css, global: globalCSS, keyframes, getCssString, theme} = 
             contextMenuSeperator: globalTokens.colors.gray700,
             text: globalTokens.colors.gray900,
             textMuted: globalTokens.colors.gray500,
+            fgSubtle: globalTokens.colors.gray300,
+            bgSubtle: globalTokens.colors.gray100,
             interaction: globalTokens.colors.primary500,
             onInteraction: globalTokens.colors.white,
             interactionDisabled: globalTokens.colors.gray600,
@@ -61,6 +69,7 @@ export const {styled, css, global: globalCSS, keyframes, getCssString, theme} = 
             input: globalTokens.radii.sm,
             contextMenu: globalTokens.radii.lg,
             contextMenuItem: globalTokens.radii.sm,
+            card: globalTokens.radii.lg,
         },
         shadows: {
             default: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',

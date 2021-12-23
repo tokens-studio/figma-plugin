@@ -1,34 +1,39 @@
 import * as React from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {SelectionGroup, SelectionValue} from 'Types/tokens';
-import useConfirm from '../hooks/useConfirm';
+import IconLayers from '@/icons/layers.svg';
 import {Dispatch, RootState} from '../store';
 import useTokens from '../store/useTokens';
 import Box from './Box';
 import Button from './Button';
 import Checkbox from './Checkbox';
 import Heading from './Heading';
-import Icon from './Icon';
 import Label from './Label';
-import Tooltip from './Tooltip';
 
 const Inspector = () => {
     const uiState = useSelector((state: RootState) => state.uiState);
     const {inspectDeep} = useSelector((state: RootState) => state.settings);
     const dispatch = useDispatch<Dispatch>();
+    const [selectedTokens, setSelectedTokens] = React.useState([]);
 
-    const {removeTokensByValue, removeAllTokensFromNodes} = useTokens();
+    const toggleSelectedTokens = (token: SelectionValue) => {
+        if (selectedTokens.includes(token)) {
+            setSelectedTokens(selectedTokens.filter((t) => t !== token));
+        } else {
+            setSelectedTokens([...selectedTokens, token]);
+        }
+    };
 
-    function removeSingleToken({key, selectionValues}) {
-        const valuesToRemove = selectionValues
-            .filter((v) => v.value === key)
+    const {removeTokensByValue, findToken} = useTokens();
+
+    function removeTokens() {
+        const valuesToRemove = uiState.selectionValues
+            .filter((v) => selectedTokens.includes(v.value))
             .map((v) => {
                 return {nodes: v.nodes, property: v.type};
             });
         removeTokensByValue(valuesToRemove);
     }
-
-    const {confirm} = useConfirm();
 
     function groupAndRenderSelectionValues(selectionValues: SelectionGroup[]) {
         const grouped = selectionValues.reduce((acc, curr) => {
@@ -49,78 +54,138 @@ const Inspector = () => {
         return Object.entries(grouped).map(([groupKey, groupValue]) => {
             return (
                 <Box
-                    css={{display: 'flex', flexDirection: 'column', justifyContent: 'space-between'}}
+                    css={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'space-between',
+                        marginBottom: '$3',
+                    }}
                     key={`${groupKey}`}
                 >
-                    <Heading>{groupKey}</Heading>
-                    {groupValue.map((uniqueToken) => (
-                        <Box
-                            css={{display: 'flex', flexDirection: 'column', justifyContent: 'space-between'}}
-                            key={`${uniqueToken.value}`}
-                        >
-                            {uniqueToken.value} ({uniqueToken.nodes.length})
-                            <Tooltip label="Remove token from layer" side="bottom">
-                                <button
-                                    className="button button-ghost"
-                                    type="button"
-                                    onClick={() =>
-                                        removeSingleToken({
-                                            key: uniqueToken.value,
-                                            selectionValues,
-                                        })
-                                    }
+                    <Heading size="small">{groupKey}</Heading>
+                    {groupValue.map((uniqueToken) => {
+                        const resolvedToken = findToken(uniqueToken.value);
+                        return (
+                            <Box
+                                css={{
+                                    display: 'flex',
+                                    flexDirection: 'row',
+                                    justifyContent: 'space-between',
+                                    width: '100%',
+                                    paddingTop: '$2',
+                                    paddingBottom: '$2',
+                                }}
+                                key={`${uniqueToken.value}`}
+                            >
+                                <Box
+                                    css={{
+                                        display: 'flex',
+                                        flexDirection: 'row',
+                                        alignItems: 'center',
+                                        gap: '$4',
+                                    }}
                                 >
-                                    <Icon name="trash" />
-                                </button>
-                            </Tooltip>
-                        </Box>
-                    ))}
+                                    <Checkbox
+                                        defaultChecked={selectedTokens.includes(uniqueToken.value)}
+                                        checked={selectedTokens.includes(uniqueToken.value)}
+                                        id={uniqueToken.value}
+                                        onCheckedChange={() => toggleSelectedTokens(uniqueToken.value)}
+                                    />
+
+                                    {resolvedToken ? (
+                                        <Box
+                                            css={{
+                                                background: '$bgSubtle',
+                                                fontSize: '$small',
+                                                padding: '$2 $3',
+                                                borderRadius: '$default',
+                                                width: '40px',
+                                            }}
+                                        >
+                                            {resolvedToken.value}
+                                        </Box>
+                                    ) : null}
+                                    <Box css={{fontSize: '$small'}}>{uniqueToken.value}</Box>
+                                </Box>
+                                <Box
+                                    css={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '$3',
+                                        fontWeight: '$bold',
+                                        fontSize: '$small',
+                                    }}
+                                >
+                                    <Box css={{color: '$fgSubtle'}}>
+                                        <IconLayers />
+                                    </Box>
+                                    {uniqueToken.nodes.length}
+                                </Box>
+                            </Box>
+                        );
+                    })}
                 </Box>
             );
         });
     }
 
-    async function askIfRemoveAll(): Promise<boolean> {
-        const isConfirmed = await confirm({
-            text: 'Remove all tokens?',
-            description: 'This will remove all applied tokens including tokens stored on children',
-        });
-        return isConfirmed;
-    }
-
-    const removeAll = async () => {
-        const userDecision = await askIfRemoveAll();
-        if (userDecision) {
-            removeAllTokensFromNodes();
-        }
-    };
-
     return (
-        <div className="space-y-2 p-4">
-            <div className="flex items-center space-x-2">
+        <Box css={{gap: '$2', padding: '$4'}}>
+            <Box
+                css={{
+                    display: 'flex',
+                    border: '1px solid $border',
+                    borderRadius: '$card',
+                    marginBottom: '$4',
+                    padding: '$4',
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    gap: '$3',
+                }}
+            >
                 <Checkbox
                     checked={inspectDeep}
                     defaultChecked={inspectDeep}
                     id="inspectDeep"
                     onCheckedChange={() => dispatch.settings.setInspectDeep(!inspectDeep)}
                 />
-                <Label htmlFor="inspectDeep">Deep inspect</Label>
-            </div>
-            <div className="space-y-1">
+                <Label htmlFor="inspectDeep">
+                    <Box css={{fontWeight: '$bold', fontSize: '$small', marginBottom: '$1'}}>Deep inspect</Box>
+                    <Box css={{fontSize: '$small'}}>Scans the selected layer and all of its children</Box>
+                </Label>
+            </Box>
+            <Box css={{display: 'flex', flexDirection: 'column', gap: '$1'}}>
                 {uiState.selectionValues.length > 0 ? (
                     <>
-                        {groupAndRenderSelectionValues(uiState.selectionValues)}
-                        <div className="border-top border-gray-300">
-                            <Button variant="destructive" onClick={() => removeAll()}>
-                                Remove all tokens
+                        <Box css={{display: 'flex', alignItems: 'center', gap: '$3', justifyContent: 'space-between'}}>
+                            <Box css={{display: 'flex', alignItems: 'center', gap: '$3', fontSize: '$small'}}>
+                                <Checkbox
+                                    checked={selectedTokens.length === uiState.selectionValues.length}
+                                    defaultChecked={false}
+                                    id="selectAll"
+                                    onCheckedChange={() => {
+                                        if (selectedTokens.length > 0) {
+                                            setSelectedTokens([]);
+                                        } else {
+                                            setSelectedTokens(uiState.selectionValues.map((v) => v.value));
+                                        }
+                                    }}
+                                />
+                                <Label htmlFor="selectAll" css={{fontSize: '$small', fontWeight: '$bold'}}>
+                                    Select all
+                                </Label>
+                            </Box>
+                            <Button onClick={removeTokens} disabled={selectedTokens.length === 0} variant="secondary">
+                                Remove selected
                             </Button>
-                        </div>
+                        </Box>
+                        {groupAndRenderSelectionValues(uiState.selectionValues)}
                     </>
                 ) : (
                     <div>No selection</div>
                 )}
-            </div>
-        </div>
+            </Box>
+        </Box>
     );
 };
 
