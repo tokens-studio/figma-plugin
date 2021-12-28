@@ -1,5 +1,6 @@
 import { SettingsState } from '@/app/store/models/settings';
 import { UIState } from '@/app/store/models/uiState';
+import { Properties } from '@/constants/Properties';
 import {
   ApiDataType, ContextObject, StorageProviderType, StorageType,
 } from './api';
@@ -143,7 +144,7 @@ export type SetNodeDataToPluginMessage = {
 };
 export type RemoveDataToPluginMessage = {
   type: MessageToPluginTypes.REMOVE_NODE_DATA;
-  key: string;
+  key: Properties;
 };
 export type PullStylesToPluginMessage = {
   type: MessageToPluginTypes.PULL_STYLES;

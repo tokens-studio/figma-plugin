@@ -7,9 +7,9 @@ import { NodeTokenRefValue } from '@/types/NodeTokenRefValue';
 import { runOnNextFrame } from '@/utils/runOnNextFrame';
 import { UpdateMode } from '@/types/state';
 import { hasTokens } from '@/utils/hasTokens';
-import { tokensSharedDataHandler } from './SharedDataHandler';
 import { SharedPluginDataKeys } from '@/constants/SharedPluginDataKeys';
 import { MessageFromPluginTypes } from '@/types/messages';
+import { tokensSharedDataHandler } from './SharedDataHandler';
 import { postToUI } from './notifiers';
 
 type NodeManagerNode = {
@@ -17,6 +17,8 @@ type NodeManagerNode = {
   hash: string;
   tokens: NodeTokenRefMap;
 };
+
+const CHUNK_SIZE = 10;
 
 export class NodeManager {
   private nodes: NodeManagerNode[];
@@ -112,8 +114,6 @@ export class NodeManager {
   }
 
   public async update(nodes: BaseNode[]) {
-    const start = Date.now();
-
     postToUI({
       type: MessageFromPluginTypes.UPDATE_NODEMANAGER_CACHE_STATE,
       nodemanagerCacheState: {
@@ -130,7 +130,7 @@ export class NodeManager {
 
     this.updating = (async () => {
       const allNodes = nodes;
-      const nodeChunks = split(allNodes, 100);
+      const nodeChunks = split(allNodes, CHUNK_SIZE);
       for (let chunkIndex = 0; chunkIndex < nodeChunks.length; chunkIndex += 1) {
         const chunk = nodeChunks[chunkIndex];
         await runOnNextFrame(async () => {
@@ -151,13 +151,12 @@ export class NodeManager {
             type: MessageFromPluginTypes.UPDATE_NODEMANAGER_CACHE_STATE,
             nodemanagerCacheState: {
               building: true,
-              cachedCount: chunkIndex * 100,
+              cachedCount: chunkIndex * CHUNK_SIZE,
               totalCount: nodes.length,
             },
           });
         });
       }
-      console.log(`Cached ${allNodes.length} chunks in ${Date.now() - start}ms`);
     })();
     await this.updating;
 
@@ -201,7 +200,7 @@ export class NodeManager {
     return this.nodes.filter((node) => relevantNodeIds.includes(node.id) && hasTokens(node.tokens));
   }
 
-  public async updateNode(node: BaseNode, tokens: NodeTokenRefMap) {
+  public async updateNode(node: BaseNode, tokensOrCallback: NodeTokenRefMap | ((tokens: NodeTokenRefMap) => NodeTokenRefMap)) {
     let registeredIndex = this.nodes.findIndex((entry) => entry.id === node.id);
     if (registeredIndex === -1) {
       await this.update([node]);
@@ -209,6 +208,10 @@ export class NodeManager {
     }
 
     if (registeredIndex > -1) {
+      const tokens = typeof tokensOrCallback === 'function'
+        ? tokensOrCallback({ ...this.nodes[registeredIndex].tokens })
+        : tokensOrCallback;
+
       this.nodes[registeredIndex].tokens = tokens;
       tokensSharedDataHandler.set(node, SharedPluginDataKeys.tokens.hash, hash(tokens));
     }

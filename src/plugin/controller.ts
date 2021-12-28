@@ -2,10 +2,11 @@
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 
-import hash from 'object-hash';
 import { removeSingleCredential, updateCredentials } from '@/utils/credentials';
 import { updateUISettings, getUISettings } from '@/utils/uiSettings';
 import getLastOpened from '@/utils/getLastOpened';
+import { DefaultWindowSize } from '@/constants/DefaultWindowSize';
+import { findAll } from '@/utils/findAll';
 import { getUserId } from './helpers';
 import pullStyles from './pullStyles';
 import updateStyles from './updateStyles';
@@ -29,26 +30,16 @@ import { MessageToPluginTypes, PostToFigmaMessage } from '../types/messages';
 import { StorageProviderType } from '../types/api';
 import compareProvidersWithStored from './compareProviders';
 import { defaultNodeManager } from './NodeManager';
-import { DefaultWindowSize } from '@/constants/DefaultWindowSize';
 
 figma.showUI(__html__, {
   width: DefaultWindowSize.width,
   height: DefaultWindowSize.height,
 });
 
-const cache: any[] = [];
-const allNodes = figma.root.findAll();
-allNodes.forEach((node, index) => {
-  const checksum = hash({});
-  node.setSharedPluginData('tokens', 'hash', checksum);
-  cache.push({ id: node.id, hash: checksum, tokens: {} });
-  console.log(index);
-});
-figma.root.setSharedPluginData('tokens', 'nodemanagerCache', JSON.stringify(cache));
-console.log('done');
-
-figma.on('selectionchange', () => {
+defaultNodeManager.update(findAll(Array.from(figma.currentPage.selection), 3));
+figma.on('selectionchange', async () => {
   const nodes = Array.from(figma.currentPage.selection);
+  await defaultNodeManager.update(findAll(nodes, 3));
 
   if (!nodes.length) {
     notifyNoSelection();
@@ -95,16 +86,16 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
         notifyNoSelection();
         return;
       }
-      sendPluginValues(figma.currentPage.selection);
+      await sendPluginValues(figma.currentPage.selection);
       return;
     case MessageToPluginTypes.CREDENTIALS: {
       const { type, ...context } = msg;
-      updateCredentials(context);
+      await updateCredentials(context);
       break;
     }
     case MessageToPluginTypes.REMOVE_SINGLE_CREDENTIAL: {
       const { context } = msg;
-      removeSingleCredential(context);
+      await removeSingleCredential(context);
       break;
     }
     case MessageToPluginTypes.SET_STORAGE_TYPE:
@@ -113,8 +104,8 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
     case MessageToPluginTypes.SET_NODE_DATA:
       try {
         if (figma.currentPage.selection.length) {
-          updatePluginData(figma.currentPage.selection, msg.values);
-          sendPluginValues(
+          await updatePluginData(figma.currentPage.selection, msg.values);
+          await sendPluginValues(
             figma.currentPage.selection,
             await updateNodes(figma.currentPage.selection, msg.tokens, msg.settings),
           );
@@ -130,8 +121,8 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
 
     case MessageToPluginTypes.REMOVE_NODE_DATA:
       try {
-        removePluginData(figma.currentPage.selection, msg.key);
-        sendPluginValues(figma.currentPage.selection);
+        await removePluginData(figma.currentPage.selection, msg.key);
+        await sendPluginValues(figma.currentPage.selection);
       } catch (e) {
         console.error(e);
       }
@@ -156,7 +147,7 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
         });
         const nodes = allWithData.map(({ node }) => node);
         await updateNodes(nodes, msg.tokens, msg.settings);
-        updatePluginData(nodes, {});
+        await updatePluginData(nodes, {});
         notifyRemoteComponents({
           nodes: store.successfulNodes.length,
           remotes: store.remoteComponents,

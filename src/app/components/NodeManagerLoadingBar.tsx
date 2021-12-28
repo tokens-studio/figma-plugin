@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 import Icon from './Icon';
 import { RootState } from '../store';
 
-export default function CacheBuilderLoadingBar() {
+export default function NodeManagerLoadingBar() {
   const { nodemanagerCache } = useSelector((state: RootState) => state.uiState);
 
   if (!nodemanagerCache.building) return null;
@@ -15,7 +15,7 @@ export default function CacheBuilderLoadingBar() {
           <Icon name="loading" />
         </div>
         <div className="font-medium text-xxs">
-          Building node cache (
+          Refreshing data (
           {nodemanagerCache.cachedCount}
           /
           {nodemanagerCache.totalCount}

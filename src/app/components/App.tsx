@@ -11,7 +11,7 @@ import LoadingBar from './LoadingBar';
 import Footer from './Footer';
 import Changelog from './Changelog';
 import ImportedTokensDialog from './ImportedTokensDialog';
-import CacheBuilderLoadingBar from './CacheBuilderLoadingBar';
+import NodeManagerLoadingBar from './NodeManagerLoadingBar';
 import { Initiator } from './Initiator';
 import { RootState } from '../store';
 import ConfirmDialog from './ConfirmDialog';
@@ -25,7 +25,7 @@ function App() {
     <div className="content">
       <Initiator />
       <LoadingBar />
-      <CacheBuilderLoadingBar />
+      <NodeManagerLoadingBar />
       <div className="h-full flex flex-col">
         <div className="flex-grow flex flex-col">
           {activeTab !== 'start' && <Navbar />}

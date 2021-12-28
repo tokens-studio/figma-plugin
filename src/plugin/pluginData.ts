@@ -1,12 +1,12 @@
+import omit from 'just-omit';
+import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
+import { SharedPluginDataNamespaces } from '@/constants/SharedPluginDataNamespaces';
+import { Properties } from '@/constants/Properties';
 import store from './store';
 import { notifySelection } from './notifiers';
 import removeValuesFromNode from './removeValuesFromNode';
-import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 import { defaultNodeManager } from './NodeManager';
-import { SharedPluginDataNamespaces } from '@/constants/SharedPluginDataNamespaces';
-import { Properties } from '@/constants/Properties';
 import { tokensSharedDataHandler } from './SharedDataHandler';
-import { SharedPluginDataKeys } from '@/constants/SharedPluginDataKeys';
 
 export async function sendPluginValues(nodes: readonly BaseNode[], values?: NodeTokenRefMap) {
   let pluginValues = values;
@@ -23,17 +23,23 @@ export async function sendPluginValues(nodes: readonly BaseNode[], values?: Node
   }
 }
 
-export function removePluginData(nodes: readonly (BaseNode | SceneNode)[], key?: string) {
-  nodes.forEach((node) => {
+export async function removePluginData(nodes: readonly (BaseNode | SceneNode)[], key?: Properties) {
+  return Promise.all(nodes.map(async (node) => {
     try {
       node.setRelaunchData({});
     } finally {
       if (key) {
         node.setPluginData(key, '');
         tokensSharedDataHandler.set(node, key, '');
+        await defaultNodeManager.updateNode(node, (tokens) => (
+          omit(tokens, key)
+        ));
         // TODO: Introduce setting asking user if values should be removed?
         removeValuesFromNode(node, key);
       } else {
+        await defaultNodeManager.updateNode(node, (tokens) => (
+          omit(tokens, Object.values(Properties))
+        ));
         Object.values(Properties).forEach((prop) => {
           node.setPluginData(prop, '');
           tokensSharedDataHandler.set(node, prop, '');
@@ -41,11 +47,11 @@ export function removePluginData(nodes: readonly (BaseNode | SceneNode)[], key?:
           removeValuesFromNode(node, prop);
         });
       }
+      // @deprecated remove deprecated values key
       node.setPluginData('values', '');
-      tokensSharedDataHandler.set(node, SharedPluginDataKeys.tokens.values, '');
       store.successfulNodes.push(node);
     }
-  });
+  }));
 }
 
 export async function updatePluginData(nodes: readonly BaseNode[], values: NodeTokenRefMap) {
@@ -56,13 +62,13 @@ export async function updatePluginData(nodes: readonly BaseNode[], values: NodeT
     (previous, node) => previous.then(async () => {
       const currentValuesOnNode = nodesData.find((info) => info.id === node.id)?.tokens;
       const newValuesOnNode = Object.assign(currentValuesOnNode || {}, values);
-      Object.entries(newValuesOnNode).forEach(([key, value]) => {
+      await Promise.all(Object.entries(newValuesOnNode).map(async ([key, value]) => {
         const jsonValue = JSON.stringify(value);
 
         switch (value) {
           case 'delete':
             delete newValuesOnNode[key];
-            removePluginData([node], key);
+            await removePluginData([node], key as Properties);
             break;
             // Pre-Version 53 had horizontalPadding and verticalPadding.
           case 'horizontalPadding':
@@ -81,7 +87,7 @@ export async function updatePluginData(nodes: readonly BaseNode[], values: NodeT
             node.setSharedPluginData(namespace, key, jsonValue);
             break;
         }
-      });
+      }));
       await defaultNodeManager.updateNode(node, newValuesOnNode);
 
       try {
