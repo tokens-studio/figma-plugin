@@ -10,6 +10,68 @@ import Checkbox from './Checkbox';
 import Heading from './Heading';
 import Label from './Label';
 
+function renderResolvedtoken(token) {
+    switch (token.type) {
+        case 'color': {
+            return (
+                <Box
+                    css={{
+                        background: token.value,
+                        width: '24px',
+                        height: '24px',
+                        borderRadius: '100%',
+                    }}
+                />
+            );
+        }
+        case 'typography': {
+            return (
+                <Box
+                    css={{
+                        background: '$bgSubtle',
+                        fontSize: '$small',
+                        padding: '$2 $3',
+                        borderRadius: '$default',
+                        width: '40px',
+                    }}
+                >
+                    aA
+                </Box>
+            );
+        }
+        case 'boxShadow': {
+            return (
+                <Box
+                    css={{
+                        background: '$bgSubtle',
+                        fontSize: '$small',
+                        padding: '$2 $3',
+                        borderRadius: '$default',
+                        width: '40px',
+                    }}
+                >
+                    shd
+                </Box>
+            );
+        }
+        default: {
+            return (
+                <Box
+                    css={{
+                        background: '$bgSubtle',
+                        fontSize: '$small',
+                        padding: '$2 $3',
+                        borderRadius: '$default',
+                        width: '40px',
+                    }}
+                >
+                    {token.value}
+                </Box>
+            );
+        }
+    }
+}
+
 const Inspector = () => {
     const uiState = useSelector((state: RootState) => state.uiState);
     const {inspectDeep} = useSelector((state: RootState) => state.settings);
@@ -91,20 +153,8 @@ const Inspector = () => {
                                         id={uniqueToken.value}
                                         onCheckedChange={() => toggleSelectedTokens(uniqueToken.value)}
                                     />
+                                    {renderResolvedtoken(resolvedToken)}
 
-                                    {resolvedToken ? (
-                                        <Box
-                                            css={{
-                                                background: '$bgSubtle',
-                                                fontSize: '$small',
-                                                padding: '$2 $3',
-                                                borderRadius: '$default',
-                                                width: '40px',
-                                            }}
-                                        >
-                                            {resolvedToken.value}
-                                        </Box>
-                                    ) : null}
                                     <Box css={{fontSize: '$small'}}>{uniqueToken.value}</Box>
                                 </Box>
                                 <Box
