@@ -9,11 +9,13 @@ type Props = {
     label?: string | null;
     full?: boolean;
     value?: string | number;
+    defaultValue?: string | number;
     type?: string;
     custom?: string;
     placeholder?: string;
     capitalize?: boolean;
     prefix?: React.ReactNode;
+    step?: string;
     min?: number;
     max?: number;
     onChange?: React.ChangeEventHandler<HTMLInputElement>;
@@ -28,10 +30,12 @@ const Input: React.FC<Props> = ({
     full,
     onChange,
     value,
+    defaultValue,
     type,
     prefix,
     min,
     max,
+    step,
     custom = '',
     inputRef = null,
     placeholder = '',
@@ -53,11 +57,13 @@ const Input: React.FC<Props> = ({
                     tabIndex={tabindex}
                     type={type}
                     value={value}
+                    defaultValue={defaultValue}
                     name={name}
                     onChange={onChange}
                     required={required}
                     min={min}
                     max={max}
+                    step={step}
                     data-custom={custom}
                     ref={inputRef}
                     placeholder={placeholder}

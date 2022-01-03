@@ -1,4 +1,5 @@
 import * as React from 'react';
+import {roundTo} from 'round-to';
 import {RgbaColorPicker, RgbaColor} from 'react-colorful';
 import {parseToRgb, parseToHsl, toColorString} from 'polished';
 import Input from './Input';
@@ -8,6 +9,20 @@ enum InputMode {
     RGBA = 'rgba',
     HSLA = 'hsla',
 }
+
+type Rgba = {
+    r: number;
+    g: number;
+    b: number;
+    a: number;
+};
+
+type Hsla = {
+    h: number;
+    s: number;
+    l: number;
+    a: number;
+};
 
 type Props = {
     value: string;
@@ -21,51 +36,54 @@ const PROPS: Omit<React.ComponentProps<typeof Input>, 'name'> = {
     type: 'number',
 };
 
+const hexToRgbaColor = (value: string) => {
+    try {
+        const parsed = parseToRgb(value || '#000000');
+        return {
+            r: Math.round(parsed.red),
+            g: Math.round(parsed.green),
+            b: Math.round(parsed.blue),
+            a: 'alpha' in parsed ? roundTo(parsed.alpha, 2) : 1,
+        };
+    } catch (err) {
+        console.error(err);
+        return {...DEFAULT_RGBA};
+    }
+};
+
+const hexToHslaColor = (value: string) => {
+    try {
+        const parsed = parseToHsl(value || '#000000');
+        return {
+            h: Math.round(parsed.hue),
+            s: Math.round(parsed.saturation * 100),
+            l: Math.round(parsed.lightness * 100),
+            a: 'alpha' in parsed ? roundTo(parsed.alpha, 2) : 1,
+        };
+    } catch (err) {
+        console.error(err);
+        return {...DEFAULT_HSLA};
+    }
+};
+
 const ColorPicker: React.FC<Props> = ({value, onChange}) => {
     const [inputMode, setInputMode] = React.useState(InputMode.RGBA);
-
-    const rgba = React.useMemo(() => {
-        try {
-            const parsed = parseToRgb(value || '#000000');
-            return {
-                r: parsed.red,
-                g: parsed.green,
-                b: parsed.blue,
-                a: 'alpha' in parsed ? parsed.alpha : 1,
-            };
-        } catch (err) {
-            console.error(err);
-            return {...DEFAULT_RGBA};
-        }
-    }, [value]);
-
-    const hsla = React.useMemo(() => {
-        try {
-            const parsed = parseToHsl(value || '#000000');
-            return {
-                h: parsed.hue * 100,
-                s: parsed.saturation * 100,
-                l: parsed.lightness * 100,
-                a: 'alpha' in parsed ? parsed.alpha : 1,
-            };
-        } catch (err) {
-            console.error(err);
-            return {...DEFAULT_HSLA};
-        }
-    }, [value]);
-
-    console.log(hsla);
+    const [internalValue, setInternalValue] = React.useState(value);
+    const [rgba, setRgba] = React.useState<Rgba>(hexToRgbaColor(value));
+    const [hsla, setHsla] = React.useState<Hsla>(hexToHslaColor(value));
 
     const handlePickerChange = React.useCallback(
         (inputValue: RgbaColor) => {
-            onChange(
-                toColorString({
-                    red: inputValue.r,
-                    green: inputValue.g,
-                    blue: inputValue.b,
-                    alpha: inputValue.a,
-                })
-            );
+            const hex = toColorString({
+                red: inputValue.r,
+                green: inputValue.g,
+                blue: inputValue.b,
+                alpha: inputValue.a,
+            });
+            setHsla(hexToHslaColor(hex));
+            setRgba(hexToRgbaColor(hex));
+            setInternalValue(hex);
+            onChange(hex);
         },
         [onChange]
     );
@@ -73,23 +91,27 @@ const ColorPicker: React.FC<Props> = ({value, onChange}) => {
     const handleColorPartValueChange = React.useCallback(
         (part: keyof typeof rgba | keyof typeof hsla, val: number) => {
             if (part === 'r' || part === 'g' || part === 'b' || (part === 'a' && inputMode === InputMode.RGBA)) {
-                onChange(
-                    toColorString({
-                        red: part === 'r' ? val : rgba.r,
-                        green: part === 'g' ? val : rgba.g,
-                        blue: part === 'b' ? val : rgba.b,
-                        alpha: part === 'a' ? val : rgba.a,
-                    })
-                );
+                const hex = toColorString({
+                    red: part === 'r' ? val : rgba.r,
+                    green: part === 'g' ? val : rgba.g,
+                    blue: part === 'b' ? val : rgba.b,
+                    alpha: part === 'a' ? val : rgba.a,
+                });
+                setRgba({...rgba, [part]: val});
+                setHsla(hexToHslaColor(hex));
+                setInternalValue(hex);
+                onChange(hex);
             } else if (part === 'h' || part === 's' || part === 'l' || (part === 'a' && inputMode === InputMode.HSLA)) {
-                onChange(
-                    toColorString({
-                        hue: part === 'h' ? val / 100 : hsla.h,
-                        saturation: part === 's' ? val / 100 : hsla.s,
-                        lightness: part === 'l' ? val / 100 : hsla.l,
-                        alpha: part === 'a' ? val : hsla.a,
-                    })
-                );
+                const hex = toColorString({
+                    hue: part === 'h' ? val : hsla.h,
+                    saturation: (part === 's' ? val : hsla.s) / 100,
+                    lightness: (part === 'l' ? val : hsla.l) / 100,
+                    alpha: part === 'a' ? val : hsla.a,
+                });
+                setHsla({...hsla, [part]: val});
+                setRgba(hexToRgbaColor(hex));
+                setInternalValue(hex);
+                onChange(hex);
             }
         },
         [rgba, hsla, inputMode, onChange]
@@ -141,6 +163,14 @@ const ColorPicker: React.FC<Props> = ({value, onChange}) => {
         setInputMode(inputMode === InputMode.RGBA ? InputMode.HSLA : InputMode.RGBA);
     }, [inputMode]);
 
+    React.useEffect(() => {
+        if (value !== internalValue) {
+            setInternalValue(value);
+            setRgba(hexToRgbaColor(value));
+            setHsla(hexToHslaColor(value));
+        }
+    }, [value, internalValue]);
+
     return (
         <div className="mt-2">
             <div className="color-picker rounded-sm border border-gray-300 font-sans mb-1">
@@ -152,15 +182,31 @@ const ColorPicker: React.FC<Props> = ({value, onChange}) => {
                         <Input {...PROPS} min={0} max={255} name="r" value={rgba.r} onChange={handleRedChange} />
                         <Input {...PROPS} min={0} max={255} name="g" value={rgba.g} onChange={handleGreenChange} />
                         <Input {...PROPS} min={0} max={255} name="b" value={rgba.b} onChange={handleBlueChange} />
-                        <Input {...PROPS} min={0} max={1} name="a" value={rgba.a} onChange={handleAlphaChange} />
+                        <Input
+                            {...PROPS}
+                            min={0}
+                            max={1}
+                            step="0.01"
+                            name="a"
+                            value={rgba.a}
+                            onChange={handleAlphaChange}
+                        />
                     </div>
                 )}
                 {inputMode === InputMode.HSLA && (
                     <div className="grid gap-1 grid-cols-4 mr-1">
-                        <Input {...PROPS} min={0} max={100} name="h" value={hsla.h} onChange={handleHueChange} />
+                        <Input {...PROPS} min={0} max={360} name="h" value={hsla.h} onChange={handleHueChange} />
                         <Input {...PROPS} min={0} max={100} name="s" value={hsla.s} onChange={handleSaturationChange} />
                         <Input {...PROPS} min={0} max={100} name="l" value={hsla.l} onChange={handleLightnessChange} />
-                        <Input {...PROPS} min={0} max={1} name="a" value={hsla.a} onChange={handleAlphaChange} />
+                        <Input
+                            {...PROPS}
+                            step="0.01"
+                            min={0}
+                            max={1}
+                            name="a"
+                            value={hsla.a}
+                            onChange={handleAlphaChange}
+                        />
                     </div>
                 )}
                 <Button variant="secondary" size="small" onClick={handleInputModeToggle}>
