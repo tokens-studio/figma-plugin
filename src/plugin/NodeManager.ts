@@ -16,6 +16,7 @@ type NodeManagerNode = {
   id: string;
   hash: string;
   tokens: NodeTokenRefMap;
+  node: BaseNode;
 };
 
 const CHUNK_SIZE = 10;
@@ -107,6 +108,7 @@ export class NodeManager {
     tokensSharedDataHandler.set(node, SharedPluginDataKeys.tokens.hash, checksum);
 
     return {
+      node,
       id: node.id,
       hash: checksum,
       tokens: this.normalizePluginTokenRef(tokens),
@@ -174,6 +176,8 @@ export class NodeManager {
     updateMode?: UpdateMode;
     nodes?: readonly BaseNode[];
   }) {
+    console.log('wait');
+
     // wait for previous update
     if (this.updating) {
       await this.updating;
