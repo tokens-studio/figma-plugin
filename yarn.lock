@@ -9334,11 +9334,6 @@ ripemd160@^2.0.0, ripemd160@^2.0.1:
     hash-base "^3.0.0"
     inherits "^2.0.1"
 
-round-to@^6.0.0:
-  version "6.0.0"
-  resolved "https://registry.yarnpkg.com/round-to/-/round-to-6.0.0.tgz#c12a8dee3c78cbc981d161ba8ff0214abd6cae53"
-  integrity sha512-jFvBgyRueGU0QVa7EqXZOkarkzrqEnF3VTCzATRcBkzxXJ4/+pzDf1iouqOqGsx6ZpnIIu5gvFDGnyzoX58ldQ==
-
 rsvp@^4.8.4:
   version "4.8.5"
   resolved "https://registry.yarnpkg.com/rsvp/-/rsvp-4.8.5.tgz#c8f155311d167f68f21e168df71ec5b083113734"

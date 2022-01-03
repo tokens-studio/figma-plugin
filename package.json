@@ -63,7 +63,6 @@
 		"react-redux": "^7.2.3",
 		"react-svg-loader": "^3.0.3",
 		"regenerator-runtime": "^0.13.7",
-		"round-to": "^6.0.0",
 		"set-value": "^3.0.2",
 		"storyblok-js-client": "^3.3.1",
 		"tailwindcss": "^3.0.0",

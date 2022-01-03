@@ -1,5 +1,4 @@
 import * as React from 'react';
-import {roundTo} from 'round-to';
 import {RgbaColorPicker, RgbaColor} from 'react-colorful';
 import {parseToRgb, parseToHsl, toColorString} from 'polished';
 import Input from './Input';
@@ -34,6 +33,11 @@ const DEFAULT_HSLA = Object.freeze({h: 0, s: 0, l: 0, a: 1});
 const PROPS: Omit<React.ComponentProps<typeof Input>, 'name'> = {
     full: true,
     type: 'number',
+};
+
+const roundTo = (input: number, precision: number) => {
+    const factor = Math.pow(10, precision);
+    return Math.round((input + Number.EPSILON) * factor) / factor;
 };
 
 const hexToRgbaColor = (value: string) => {

@@ -25,8 +25,8 @@ describe('convertStringtoFigmaGradient', () => {
                 },
             ],
             gradientTransform: [
-                [0.71, 0.71, 0],
-                [-0.71, 0.71, 0],
+                [0.7071067811865476, -0.7071067811865475, 0.4999999999999999],
+                [0.7071067811865475, 0.7071067811865476, -0.2071067811865476],
             ],
         },
     };
@@ -64,8 +64,8 @@ describe('convertStringtoFigmaGradient', () => {
                 },
             ],
             gradientTransform: [
-                [0.71, 0.71, 0],
-                [-0.71, 0.71, 0],
+                [0.7071067811865476, -0.7071067811865475, 0.4999999999999999],
+                [0.7071067811865475, 0.7071067811865476, -0.2071067811865476],
             ],
         },
     };
@@ -103,8 +103,8 @@ describe('convertStringtoFigmaGradient', () => {
                 },
             ],
             gradientTransform: [
-                [0.71, 0.71, 0],
-                [-0.71, 0.71, 0],
+                [0.7071067811865476, -0.7071067811865475, 0.4999999999999999],
+                [0.7071067811865475, 0.7071067811865476, -0.2071067811865476],
             ],
         },
     };
@@ -142,8 +142,8 @@ describe('convertFigmaGradientToString', () => {
                 },
             ],
             gradientTransform: [
-                [0.71, 0.71, 0],
-                [0.71, 0.71, 0],
+                [0.7071067811865476, -0.7071067811865475, 0.4999999999999999],
+                [0.7071067811865475, 0.7071067811865476, -0.2071067811865476],
             ],
         },
         output: 'linear-gradient(45deg, #ffffff 0%, #000000 100%)',
@@ -185,8 +185,8 @@ describe('convertFigmaGradientToString', () => {
                 },
             ],
             gradientTransform: [
-                [0.71, 0.71, 0],
-                [0.71, 0.71, 0],
+                [0.7071067811865476, -0.7071067811865475, 0.4999999999999999],
+                [0.7071067811865475, 0.7071067811865476, -0.2071067811865476],
             ],
         },
         output: 'linear-gradient(45deg, #ffffff 0%, #ff0000 53.5%, #000000 100%)',
@@ -198,6 +198,6 @@ describe('convertFigmaGradientToString', () => {
 
 describe('convertDegreeToNumber', () => {
     it('should convert degree to number', () => {
-        expect(convertDegreeToNumber('90deg')).toEqual('90');
+        expect(convertDegreeToNumber('90deg')).toEqual(90);
     });
 });
