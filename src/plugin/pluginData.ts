@@ -3,6 +3,7 @@ import {notifySelection} from './notifiers';
 import store from './store';
 import properties from '../config/properties';
 import removeValuesFromNode from './removeValuesFromNode';
+var now = require('performance-now');
 
 export function fetchPluginData(node, value: string) {
     return node.getPluginData(value);
@@ -10,10 +11,8 @@ export function fetchPluginData(node, value: string) {
 
 export function fetchAllPluginData(node) {
     const pluginData = [];
-    let i = 0;
-    const len = Object.keys(properties).length;
-    while (i < len) {
-        const prop = Object.keys(properties)[i];
+    const pluginDataKeys = node.getPluginDataKeys();
+    pluginDataKeys.forEach((prop) => {
         const data = fetchPluginData(node, prop);
 
         if (data) {
@@ -32,9 +31,7 @@ export function fetchAllPluginData(node) {
                     break;
             }
         }
-
-        i += 1;
-    }
+    });
 
     if (pluginData.length === 1 && pluginData[0][0] === 'values') {
         return node ? pluginData[0][1] : pluginData[0][1];
@@ -140,10 +137,14 @@ export function findAllWithData({updateMode}: {updateMode: UpdateMode}) {
 
 export function sendPluginValues(nodes, values?) {
     let pluginValues = values;
+    var start = now();
 
     if (!pluginValues) {
         pluginValues = fetchSelectionPluginData(nodes);
     }
+    var end = now();
+    console.log(start.toFixed(3)); // the number of milliseconds the current node process is running
+    console.log((start - end).toFixed(3)); // ~ 0.002 on my system
 
     notifySelection(pluginValues);
 }

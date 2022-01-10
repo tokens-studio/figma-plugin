@@ -11,7 +11,8 @@ import Heading from './Heading';
 import Label from './Label';
 
 function renderResolvedtoken(token) {
-    switch (token.type) {
+    if (!token) return null;
+    switch (token?.type) {
         case 'color': {
             return (
                 <Box
