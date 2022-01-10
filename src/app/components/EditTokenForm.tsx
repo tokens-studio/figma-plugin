@@ -164,7 +164,7 @@ const EditTokenForm = ({resolvedTokens}) => {
                                 editToken.type === 'color' && (
                                     <button
                                         type="button"
-                                        className="block w-4 h-4 rounded-sm shadow-border shadow-gray-300 cursor-pointer"
+                                        className="block w-4 h-4 rounded-sm shadow-border shadow-gray-300 cursor-pointer focus:shadow-focus focus:shadow-primary-400"
                                         style={{background: editToken.value, fontSize: 0}}
                                         onClick={handleToggleInputHelper}
                                     >

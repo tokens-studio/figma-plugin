@@ -1,8 +1,8 @@
 import * as React from 'react';
 import {RgbaColorPicker, RgbaColor} from 'react-colorful';
 import {parseToRgb, parseToHsl, toColorString} from 'polished';
-import Input from './Input';
-import Button from './Button';
+import Input from '../Input';
+import Button from '../Button';
 
 enum InputMode {
     RGBA = 'rgba',
@@ -36,7 +36,7 @@ const PROPS: Omit<React.ComponentProps<typeof Input>, 'name'> = {
 };
 
 const roundTo = (input: number, precision: number) => {
-    const factor = Math.pow(10, precision);
+    const factor = 10 ** precision;
     return Math.round((input + Number.EPSILON) * factor) / factor;
 };
 
@@ -177,7 +177,7 @@ const ColorPicker: React.FC<Props> = ({value, onChange}) => {
 
     return (
         <div className="mt-2">
-            <div className="color-picker rounded-sm border border-gray-300 font-sans mb-1">
+            <div className="color-picker mb-1">
                 <RgbaColorPicker color={rgba} onChange={handlePickerChange} />
             </div>
             <div className="flex">

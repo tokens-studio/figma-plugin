@@ -492,9 +492,30 @@ input.input {
     width: 100%;
 }
 
-.color-picker .react-colorful__alpha,
 .color-picker .react-colorful__saturation {
-    border-radius: 0;
+    @apply rounded-sm;
+}
+
+.color-picker .react-colorful__hue,
+.color-picker .react-colorful__alpha {
+    @apply h-4;
+    @apply rounded-lg;
+}
+
+.color-picker .react-colorful__hue-pointer,
+.color-picker .react-colorful__alpha-pointer {
+    @apply h-4;
+    @apply w-4;
+}
+
+.color-picker .react-colorful__hue {
+    @apply mt-2;
+    @apply mb-1;
+}
+
+.color-picker .react-colorful__alpha {
+    @apply mt-1;
+    @apply mb-2;
 }
 
 #corner {
