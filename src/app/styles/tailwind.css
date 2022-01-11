@@ -339,15 +339,21 @@ form {
     @apply bg-white border border-gray-300 text-xxs rounded-sm w-24 font-mono;
 }
 
+.input:focus-within {
+    @apply shadow-focus;
+}
+
 textarea.input,
 select.input,
 input.input {
+    @apply outline-none;
     @apply p-2;
 }
 
-.input:focus {
-    outline: none;
-    @apply shadow-focus;
+.input textarea:focus,
+.input select:focus,
+.input input:focus {
+    @apply outline-none;
 }
 
 /* switch */
