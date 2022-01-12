@@ -23,4 +23,4 @@ Sets: Sets to be used, comma-seperated
 
 Excludes: Sets that should not be part of the export (e.g. a global color scale)
 
---expandTypography: true|false in order to opt-out of automatic expansion of typography types
+--expandTypography: true|false in order to opt-out of automatic expansion of typography types (default: true)
