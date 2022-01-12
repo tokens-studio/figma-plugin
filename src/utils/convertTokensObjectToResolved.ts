@@ -8,7 +8,9 @@ export default function convertTokensObjectToResolved(
     tokens,
     usedSets = [],
     excludedSets = [],
-    options: TransformerOptions
+    options: TransformerOptions = {
+        expandTypography: true,
+    }
 ) {
     // Parse tokens into array structure
     const parsed = parseTokenValues(tokens);
