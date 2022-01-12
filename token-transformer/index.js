@@ -30,15 +30,17 @@ const argv = yargs(hideBin(process.argv))
             .positional('sets', {
                 description: 'Sets to be used, comma separated',
                 type: 'string',
+                default: [],
             })
             .positional('excludes', {
                 description: 'Sets that should not be part of the export (e.g. a global color scale)',
                 type: 'string',
+                default: [],
             })
             .option('expandTypography', {
                 type: 'boolean',
                 describe: 'Expands typography in the output tokens',
-                default: false,
+                default: true,
             });
     })
 
@@ -46,15 +48,17 @@ const argv = yargs(hideBin(process.argv))
     .version()
     .parse();
 
-function writeFile(path, contents, cb) {
-    fs.mkdir(getDirName(path), {recursive: true}, function (err) {
+const writeFile = (path, contents, cb) => {
+    fs.mkdir(getDirName(path), {recursive: true}, (err) => {
         if (err) return cb(err);
 
-        fs.writeFile(path, contents, cb);
+        return fs.writeFile(path, contents, cb);
     });
-}
+};
 
-function transform() {
+const log = (message) => process.stdout.write(`[token-transformer] ${message}`);
+
+const transform = () => {
     const {input, output, sets, excludes, expandTypography} = argv;
 
     if (fs.existsSync(argv.input)) {
@@ -63,18 +67,21 @@ function transform() {
         const options = {
             expandTypography,
         };
+
+        log(`transforming tokens from input: ${input}\n`);
+        log(`using sets: ${sets.length > 0 ? sets : '[]'}\n`);
+        log(`using excludes: ${excludes.length > 0 ? excludes : '[]'}\n`);
+
         const transformed = transformTokens(parsed, sets, excludes, options);
 
+        log(`writing tokens to output: ${output}\n`);
+
         writeFile(output, JSON.stringify(transformed, null, 2), () => {
-            process.stdout.write(
-                `Transformed tokens from ${input} to ${output}, using sets ${sets.join(', ')}${
-                    excludes.length > 0 ? `excluding ${excludes.join(', ')}` : ''
-                }`
-            );
+            log('done transforming\n');
         });
     } else {
-        process.stdout.write(`ERROR: Input not found at ${input}`);
+        log(`ERROR: Input not found at ${input}`);
     }
-}
+};
 
 transform();
