@@ -47,6 +47,7 @@ function transformName(name) {
 export function appendTypeToToken(token) {
     const hasTypeProp = token.type && token.type !== '' && token.type !== 'undefined';
     const typeToSet = hasTypeProp ? token.type : transformName(token.name.split('.').slice(0, 1).toString());
+
     return {
         ...token,
         type: typeToSet,
