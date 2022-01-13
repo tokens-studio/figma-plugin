@@ -60,5 +60,6 @@ function checkForTokens({
 
 export default function convertToTokenArray({tokens, returnValuesOnly = false, expandTypography = false}) {
     const [result] = checkForTokens({obj: [], token: tokens, returnValuesOnly, expandTypography});
+
     return Object.values(result);
 }

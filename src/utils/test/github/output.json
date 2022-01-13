@@ -29,6 +29,33 @@
     ],
     "options": [
         {
+            "name": "typography.h1",
+            "type": "typography",
+            "value": {
+                "fontFamily": "Roboto",
+                "fontSize": "96",
+                "fontWeight": "Light"
+            }
+        },
+        {
+            "name": "typography.h2",
+            "type": "typography",
+            "value": {
+                "fontFamily": "Roboto",
+                "fontSize": "60",
+                "fontWeight": "Light"
+            }
+        },
+        {
+            "name": "typography.h3",
+            "type": "typography",
+            "value": {
+                "fontFamily": "Roboto",
+                "fontSize": "48",
+                "fontWeight": "Light"
+            }
+        },
+        {
             "name": "sizing.base",
             "value": "4",
             "description": "Alias value",

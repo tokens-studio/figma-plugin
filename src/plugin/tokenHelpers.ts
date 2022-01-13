@@ -56,6 +56,7 @@ export function resolveTokenValues(tokens, previousCount = undefined) {
             rawValue: t.rawValue || t.value,
             failedToResolve,
         };
+
         if (!failedToResolve) {
             delete returnObject.failedToResolve;
         }
@@ -82,5 +83,6 @@ export function mergeTokenGroups(tokens, usedSets = []): SingleTokenObject[] {
                 });
             }
         });
+
     return mergedTokens;
 }

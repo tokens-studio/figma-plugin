@@ -33,6 +33,7 @@
 		"@rematch/core": "^2.0.1",
 		"@sentry/react": "^6.2.5",
 		"@stitches/react": "^0.1.9",
+		"assert": "^2.0.0",
 		"autoprefixer": "^10.2.5",
 		"axios": "^0.21.2",
 		"color2k": "^1.2.4",
@@ -50,6 +51,7 @@
 		"mixpanel-figma": "^2.0.1",
 		"object-path": "^0.11.8",
 		"octokit-commit-multiple-files": "^3.2.1",
+		"path-browserify": "^1.0.1",
 		"postcss": "^8.2.10",
 		"react": "17.0.0",
 		"react-dnd": "^13.1.1",
@@ -63,7 +65,8 @@
 		"set-value": "^3.0.2",
 		"storyblok-js-client": "^3.3.1",
 		"tailwindcss": "^2.0.3",
-		"use-debounce": "^6.0.1"
+		"use-debounce": "^6.0.1",
+		"yargs": "^17.3.1"
 	},
 	"devDependencies": {
 		"@babel/core": "^7.12.16",
@@ -79,6 +82,7 @@
 		"@types/lodash.isequal": "^4.5.5",
 		"@types/react": "^16.8.24",
 		"@types/react-dom": "^16.8.5",
+		"@types/yargs": "^17.0.8",
 		"babel-jest": "^26.6.3",
 		"babel-loader": "^8.2.2",
 		"concurrently": "^5.2.0",
