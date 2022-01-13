@@ -1,9 +1,9 @@
-import {getDegreesForMatrix, getMatrixForDegrees} from '@/utils/matrix';
-import {figmaRGBToHex} from '@figma-plugin/helpers';
+import {figmaRGBToHex, extractLinearGradientParamsFromTransform} from '@figma-plugin/helpers';
+import {matrix, multiply, inv} from 'mathjs';
 import {convertToFigmaColor} from './colors';
 
-export function convertDegreeToNumber(degreeString) {
-    return degreeString.split('deg').join('');
+export function convertDegreeToNumber(degreeString: string): number {
+    return parseFloat(degreeString.split('deg').join(''));
 }
 
 export function convertFigmaGradientToString(paint: GradientPaint) {
@@ -11,16 +11,49 @@ export function convertFigmaGradientToString(paint: GradientPaint) {
     const gradientStopsString = gradientStops
         .map((stop) => `${figmaRGBToHex(stop.color)} ${Math.round(stop.position * 100 * 100) / 100}%`)
         .join(', ');
-    const gradientTransformString = getDegreesForMatrix(gradientTransform);
-    return `linear-gradient(${gradientTransformString}, ${gradientStopsString})`;
+    const {start, end} = extractLinearGradientParamsFromTransform(1, 1, gradientTransform);
+    const angleInRad = Math.atan2(end[1] - start[1], end[0] - start[0]);
+    const angleInDeg = Math.round((angleInRad * 180) / Math.PI);
+    return `linear-gradient(${angleInDeg + 90}deg, ${gradientStopsString})`;
 }
 
 export function convertStringToFigmaGradient(value: string) {
     const [gradientDegrees, ...colorStops] = value
         .substring(value.indexOf('(') + 1, value.lastIndexOf(')'))
         .split(', ');
-    const degrees = convertDegreeToNumber(gradientDegrees);
-    const gradientTransform = getMatrixForDegrees(degrees);
+    // subtract 90 and negate it -- figma's roation goes anti-clockwise and 0deg
+    // is left-right as opposed to bottom-top in css
+    const degrees = -(convertDegreeToNumber(gradientDegrees) - 90);
+    const rad = degrees * (Math.PI / 180);
+    const gradientTransformMatrix = inv(
+        // we need to inverse our final matrix because
+        // figma's transformation matrices are inverted
+        multiply(
+            multiply(
+                // start by transforming to the gradient center
+                // which for figma is .5 .5 as it is a relative transform
+                matrix([
+                    [1, 0, 0.5],
+                    [0, 1, 0.5],
+                    [0, 0, 1],
+                ]),
+                // we can then multiply this with the rotation matrix
+                matrix([
+                    [Math.cos(rad), Math.sin(rad), 0],
+                    [-Math.sin(rad), Math.cos(rad), 0],
+                    [0, 0, 1],
+                ])
+            ),
+            // lastly we need to translate it back to the 0,0 origin
+            // by negating the center transform
+            matrix([
+                [1, 0, -0.5],
+                [0, 1, -0.5],
+                [0, 0, 1],
+            ])
+        )
+    ).toArray();
+    console.log(gradientTransformMatrix);
 
     const gradientStops = colorStops.map((stop) => {
         const seperatedStop = stop.split(' ');
@@ -33,5 +66,8 @@ export function convertStringToFigmaGradient(value: string) {
         };
     });
 
-    return {gradientStops, gradientTransform};
+    return {
+        gradientStops,
+        gradientTransform: [gradientTransformMatrix[0], gradientTransformMatrix[1]],
+    };
 }

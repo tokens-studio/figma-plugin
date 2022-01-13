@@ -7,58 +7,91 @@ import {Dispatch, RootState} from '../store';
 import useManageTokens from '../store/useManageTokens';
 import BoxShadowInput from './BoxShadowInput';
 import Input from './Input';
+import ColorPicker from './ColorPicker';
 
 const EditTokenForm = ({resolvedTokens}) => {
     const {activeTokenSet} = useSelector((state: RootState) => state.tokenState);
     const {editSingleToken, createSingleToken} = useManageTokens();
     const {editToken} = useSelector((state: RootState) => state.uiState);
     const dispatch = useDispatch<Dispatch>();
+    const [inputHelperOpen, setInputHelperOpen] = React.useState(false);
     const [error, setError] = React.useState(null);
+    const [internalEditToken, setInternalEditToken] = React.useState<typeof editToken>(editToken);
 
-    const isValid = editToken.value && !error;
+    const isValid = React.useMemo(() => internalEditToken.value && !error, [internalEditToken, error]);
 
-    const hasNameThatExistsAlready = resolvedTokens
-        .filter((t) => t.internal__Parent === activeTokenSet)
-        .find((t) => t.name === editToken.name);
-    const nameWasChanged = editToken?.initialName !== editToken.name;
+    const hasNameThatExistsAlready = React.useMemo(
+        () =>
+            resolvedTokens
+                .filter((t) => t.internal__Parent === activeTokenSet)
+                .find((t) => t.name === internalEditToken.name),
+        [internalEditToken, resolvedTokens, activeTokenSet]
+    );
+    const nameWasChanged = React.useMemo(() => internalEditToken?.initialName !== internalEditToken.name, [
+        internalEditToken,
+    ]);
 
     React.useEffect(() => {
-        if ((editToken.isPristine || nameWasChanged) && hasNameThatExistsAlready) {
+        if ((internalEditToken.isPristine || nameWasChanged) && hasNameThatExistsAlready) {
             setError('Token names must be unique');
         }
-    }, [editToken, hasNameThatExistsAlready, nameWasChanged]);
+    }, [internalEditToken, hasNameThatExistsAlready, nameWasChanged]);
 
-    const handleChange = (e) => {
-        setError(null);
-        e.persist();
-        dispatch.uiState.setEditToken({...editToken, [e.target.name]: e.target.value});
-    };
+    const handleToggleInputHelper = React.useCallback(() => {
+        setInputHelperOpen(!inputHelperOpen);
+    }, [inputHelperOpen]);
 
-    const handleObjectChange = (e) => {
-        e.persist();
-        dispatch.uiState.setEditToken({...editToken, value: {...editToken.value, [e.target.name]: e.target.value}});
-    };
+    const handleChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>(
+        (e) => {
+            setError(null);
+            e.persist();
+            setInternalEditToken({...internalEditToken, [e.target.name]: e.target.value});
+        },
+        [internalEditToken]
+    );
 
-    const handleOptionsChange = (e) => {
-        e.persist();
-        dispatch.uiState.setEditToken({
-            ...editToken,
-            options: {...editToken.options, [e.target.name]: e.target.value},
-        });
-    };
+    const handleColorValueChange = React.useCallback(
+        (color: string) => {
+            setError(null);
+            setInternalEditToken({...internalEditToken, value: color});
+        },
+        [internalEditToken]
+    );
+
+    const handleObjectChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>(
+        (e) => {
+            e.persist();
+            setInternalEditToken({
+                ...internalEditToken,
+                value: {...internalEditToken.value, [e.target.name]: e.target.value},
+            });
+        },
+        [internalEditToken]
+    );
+
+    const handleOptionsChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>(
+        (e) => {
+            e.persist();
+            setInternalEditToken({
+                ...internalEditToken,
+                options: {...internalEditToken.options, [e.target.name]: e.target.value},
+            });
+        },
+        [internalEditToken]
+    );
 
     const submitTokenValue = async ({value, name, options}) => {
         track('Edit Token');
 
         let oldName;
-        if (editToken.initialName !== name && editToken.initialName) {
-            oldName = editToken.initialName;
+        if (internalEditToken.initialName !== name && internalEditToken.initialName) {
+            oldName = internalEditToken.initialName;
         }
         const newName = name
             .split('/')
             .map((n) => n.trim())
             .join('.');
-        if (editToken.isPristine) {
+        if (internalEditToken.isPristine) {
             createSingleToken({
                 parent: activeTokenSet,
                 name: newName,
@@ -79,7 +112,7 @@ const EditTokenForm = ({resolvedTokens}) => {
     const handleSubmit = (e) => {
         e.preventDefault();
         if (isValid) {
-            submitTokenValue(editToken);
+            submitTokenValue(internalEditToken);
             dispatch.uiState.setShowEditForm(false);
         }
     };
@@ -97,21 +130,23 @@ const EditTokenForm = ({resolvedTokens}) => {
     }, []);
 
     const resolvedValue = React.useMemo(() => {
-        return typeof editToken.value === 'object' ? null : getAliasValue(editToken.value, resolvedTokens);
-    }, [editToken, resolvedTokens]);
+        return typeof internalEditToken.value === 'object'
+            ? null
+            : getAliasValue(internalEditToken.value, resolvedTokens);
+    }, [internalEditToken, resolvedTokens]);
 
     const renderTokenForm = () => {
-        switch (editToken.type) {
+        switch (internalEditToken.type) {
             case 'boxShadow': {
                 return <BoxShadowInput />;
             }
             case 'typography': {
-                return Object.entries(editToken.schema).map(([key, schemaValue]: [string, string]) => (
+                return Object.entries(internalEditToken.schema).map(([key, schemaValue]: [string, string]) => (
                     <Input
                         key={key}
                         full
                         label={key}
-                        value={editToken.value[key]}
+                        value={internalEditToken.value[key]}
                         onChange={handleObjectChange}
                         type="text"
                         name={key}
@@ -125,20 +160,37 @@ const EditTokenForm = ({resolvedTokens}) => {
                     <div>
                         <Input
                             full
-                            label={editToken.property}
-                            value={editToken.value}
+                            label={internalEditToken.property}
+                            value={internalEditToken.value}
                             onChange={handleChange}
                             type="text"
                             name="value"
                             required
-                            custom={editToken.schema}
+                            custom={internalEditToken.schema}
                             placeholder={
-                                editToken.type === 'color' ? '#000000, hsla(), rgba() or {alias}' : 'Value or {alias}'
+                                internalEditToken.type === 'color'
+                                    ? '#000000, hsla(), rgba() or {alias}'
+                                    : 'Value or {alias}'
+                            }
+                            prefix={
+                                internalEditToken.type === 'color' && (
+                                    <button
+                                        type="button"
+                                        className="block w-4 h-4 rounded-sm shadow-border shadow-gray-300 cursor-pointer focus:shadow-focus focus:shadow-primary-400"
+                                        style={{background: internalEditToken.value, fontSize: 0}}
+                                        onClick={handleToggleInputHelper}
+                                    >
+                                        {internalEditToken.value}
+                                    </button>
+                                )
                             }
                         />
-                        {checkIfContainsAlias(editToken.value) && (
+                        {inputHelperOpen && internalEditToken.type === 'color' && (
+                            <ColorPicker value={internalEditToken.value} onChange={handleColorValueChange} />
+                        )}
+                        {checkIfContainsAlias(internalEditToken.value) && (
                             <div className="p-2 rounded bg-gray-100 border-gray-300 font-mono text-xxs mt-2 text-gray-700 flex itms-center">
-                                {editToken.type === 'color' ? (
+                                {internalEditToken.type === 'color' ? (
                                     <div
                                         className="w-4 h-4 rounded border border-gray-200 mr-1"
                                         style={{background: resolvedValue}}
@@ -159,7 +211,7 @@ const EditTokenForm = ({resolvedTokens}) => {
                 required
                 full
                 label="Name"
-                value={editToken.name}
+                value={internalEditToken.name}
                 onChange={handleChange}
                 type="text"
                 name="name"
@@ -169,14 +221,16 @@ const EditTokenForm = ({resolvedTokens}) => {
             />
             {renderTokenForm()}
 
-            {editToken.explainer && <div className="mt-1 text-xxs text-gray-600">{editToken.explainer}</div>}
-            {editToken.optionsSchema
-                ? Object.entries(editToken.optionsSchema).map(([key, schemaValue]: [string, string]) => (
+            {internalEditToken.explainer && (
+                <div className="mt-1 text-xxs text-gray-600">{internalEditToken.explainer}</div>
+            )}
+            {internalEditToken.optionsSchema
+                ? Object.entries(internalEditToken.optionsSchema).map(([key, schemaValue]: [string, string]) => (
                       <Input
                           key={key}
                           full
                           label={key}
-                          value={editToken.options[key]}
+                          value={internalEditToken.options[key]}
                           onChange={handleOptionsChange}
                           type="text"
                           name={key}
@@ -190,7 +244,7 @@ const EditTokenForm = ({resolvedTokens}) => {
                     Cancel
                 </button>
                 <button disabled={!isValid} className="button button-primary" type="submit">
-                    {editToken.isPristine ? 'Create' : 'Update'}
+                    {internalEditToken.isPristine ? 'Create' : 'Update'}
                 </button>
             </div>
         </form>
