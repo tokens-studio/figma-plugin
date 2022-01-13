@@ -52,7 +52,7 @@
 		"object-path": "^0.11.8",
 		"octokit-commit-multiple-files": "^3.2.1",
 		"path-browserify": "^1.0.1",
-		"postcss": "^8.2.10",
+		"postcss": "^8.2.13",
 		"react": "17.0.0",
 		"react-dnd": "^13.1.1",
 		"react-dnd-html5-backend": "^12.1.1",
