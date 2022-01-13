@@ -1,10 +1,28 @@
 module.exports = {
-    extends: ['airbnb-typescript-prettier'],
-    "globals": {
-        "figma": "readable",
-        "__html__": "readable",
-        "describe": "readable",
-        "it": "readable",
-        "expect": "readable",
-    }
+    extends: ['airbnb', 'airbnb-typescript'],
+  parserOptions: {
+    project: './tsconfig.json'
+  },
+  globals: {
+    figma: 'readable',
+    __html__: 'readable',
+    describe: 'readable',
+    it: 'readable',
+    expect: 'readable',
+    cy: 'readable',
+    jest: 'readable',
+  },
+  "rules": {
+    "import/prefer-default-export": 0,
+    "import/extensions": 0,
+    "no-await-in-loop": 0,
+    "no-param-reassign": 0,
+    "class-methods-use-this": 0,
+    "no-restricted-globals": 0,
+    "max-len": 0,
+    "react/function-component-definition": [2, {
+      "namedComponents": "function-declaration",
+      "unnamedComponents": "arrow-function"
+    }]
+  }
 };

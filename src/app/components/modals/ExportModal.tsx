@@ -30,36 +30,39 @@ export default function ExportModal({onClose}) {
                     </a>
                     .
                 </p>
-                <Box css={{display: 'flex', alignItems: 'center', gap: 2}}>
-                    <Checkbox
-                        id="includeAllTokens"
-                        checked={includeAllTokens}
-                        defaultChecked={includeAllTokens}
-                        onCheckedChange={() => setIncludeAllTokens(!includeAllTokens)}
-                    />
-                    <Label htmlFor="includeAllTokens">Include all token sets</Label>
+                <Box css={{display: 'flex', flexDirection: 'column', gap: 5}}>
+                    <Box css={{display: 'flex', alignItems: 'center', gap: 4}}>
+                        <Checkbox
+                            id="includeAllTokens"
+                            checked={includeAllTokens}
+                            defaultChecked={includeAllTokens}
+                            onCheckedChange={() => setIncludeAllTokens(!includeAllTokens)}
+                        />
+                        <Label htmlFor="includeAllTokens">All token sets</Label>
+                    </Box>
+                    <Box css={{display: 'flex', alignItems: 'center', gap: 4}}>
+                        <Checkbox
+                            disabled={includeAllTokens}
+                            id="includeParent"
+                            checked={includeParent}
+                            defaultChecked={includeParent}
+                            onCheckedChange={() => setIncludeParent(!includeParent)}
+                        />
+                        <Label disabled={includeAllTokens} htmlFor="includeParent">
+                            Include parent key
+                        </Label>
+                    </Box>
+                    <Box css={{display: 'flex', alignItems: 'center', gap: 4}}>
+                        <Checkbox
+                            id="expandTypography"
+                            checked={expandTypography}
+                            defaultChecked={expandTypography}
+                            onCheckedChange={() => setExpandTypography(!expandTypography)}
+                        />
+                        <Label htmlFor="expandTypography">Expand Typography</Label>
+                    </Box>
                 </Box>
 
-                <Box css={{display: 'flex', alignItems: 'center', gap: 2}}>
-                    <Checkbox
-                        disabled={includeAllTokens}
-                        id="includeParent"
-                        checked={includeParent}
-                        defaultChecked={includeParent}
-                        onCheckedChange={() => setIncludeParent(!includeParent)}
-                    />
-                    <Label htmlFor="includeParent">Include parent key</Label>
-                </Box>
-
-                <Box css={{display: 'flex', alignItems: 'center', gap: 2}}>
-                    <Checkbox
-                        id="expandTypography"
-                        checked={expandTypography}
-                        defaultChecked={expandTypography}
-                        onCheckedChange={() => setExpandTypography(!expandTypography)}
-                    />
-                    <Label htmlFor="expandTypography">Expand Typography</Label>
-                </Box>
                 <Heading size="small">Output example</Heading>
                 <Textarea
                     className="flex-grow"
