@@ -40,7 +40,7 @@ const argv = yargs(hideBin(process.argv))
             .option('expandTypography', {
                 type: 'boolean',
                 describe: 'Expands typography in the output tokens',
-                default: true,
+                default: false,
             });
     })
 
@@ -48,6 +48,9 @@ const argv = yargs(hideBin(process.argv))
     .version()
     .parse();
 
+/**
+ * Utility functions
+ */
 const writeFile = (path, contents, cb) => {
     fs.mkdir(getDirName(path), {recursive: true}, (err) => {
         if (err) return cb(err);
@@ -58,6 +61,11 @@ const writeFile = (path, contents, cb) => {
 
 const log = (message) => process.stdout.write(`[token-transformer] ${message}`);
 
+/**
+ * Transformation
+ *
+ * Reads the given input file, transforms all tokens and writes them to the output file
+ */
 const transform = () => {
     const {input, output, sets, excludes, expandTypography} = argv;
 

@@ -29,11 +29,6 @@ module.exports = (env, argv) => ({
             '@types': path.resolve(__dirname, 'types'),
             '@': path.resolve(__dirname, 'src'),
         },
-        fallback: {
-            assert: require.resolve('assert'),
-            fs: false,
-            path: require.resolve('path-browserify'),
-        },
         extensions: ['.tsx', '.ts', '.jsx', '.js'],
     },
 
