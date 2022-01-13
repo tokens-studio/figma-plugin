@@ -3,23 +3,6 @@ import convertToTokenArray from './convertTokens';
 describe('convertToTokenArray', () => {
     it('converts given tokens to an array', () => {
         const typographyTokens = {
-            basic: {
-                input: {
-                    fontFamily: 'Inter',
-                    fontWeight: 'Bold',
-                    fontSize: 36,
-                    description: 'Use for bold headings',
-                },
-                output: {
-                    value: {
-                        fontFamily: 'Inter',
-                        fontWeight: 'Bold',
-                        fontSize: 36,
-                    },
-                    description: 'Use for bold headings',
-                    type: 'typography',
-                },
-            },
             withValue: {
                 input: {
                     value: {
@@ -27,6 +10,7 @@ describe('convertToTokenArray', () => {
                         fontWeight: 'Regular',
                         fontSize: 24,
                     },
+                    type: 'typography',
                     description: 'Use for headings',
                 },
                 output: {
@@ -35,6 +19,7 @@ describe('convertToTokenArray', () => {
                         fontWeight: 'Regular',
                         fontSize: 24,
                     },
+                    type: 'typography',
                     description: 'Use for headings',
                 },
             },
@@ -47,7 +32,6 @@ describe('convertToTokenArray', () => {
                 basic: '#ff0000',
                 typography: {
                     heading: {
-                        h1: typographyTokens.basic.input,
                         h2: typographyTokens.withValue.input,
                     },
                 },
@@ -57,7 +41,6 @@ describe('convertToTokenArray', () => {
         expect(convertToTokenArray({tokens: basicTokens})).toEqual([
             {name: 'global.withValue', value: 'bar'},
             {name: 'global.basic', value: '#ff0000'},
-            {...typographyTokens.basic.output, name: 'global.typography.heading.h1'},
             {...typographyTokens.withValue.output, name: 'global.typography.heading.h2'},
         ]);
     });
