@@ -1,3 +1,7 @@
+## v0.0.16 (2022-01-13)
+
+Hotfix for v0.0.15
+
 ## v0.0.15 (2022-01-13)
 
 This version makes the behavior that expands typography optional and actually treats expanding as an opt-in choice. Thanks @jeffreydelooff!
