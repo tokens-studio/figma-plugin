@@ -43,8 +43,9 @@ export default function useTokens() {
     }
 
     // Returns formatted tokens for style dictionary
-    function getFormattedTokens() {
-        return formatTokens(tokens, activeTokenSet);
+    function getFormattedTokens({includeAllTokens = false, includeParent = true, expandTypography = false}) {
+        const tokenSets = includeAllTokens ? Object.keys(tokens) : [activeTokenSet];
+        return formatTokens({tokens, tokenSets, includeAllTokens, includeParent, expandTypography});
     }
 
     // Returns stringified tokens for the JSON editor

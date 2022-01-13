@@ -38,6 +38,7 @@ export const {styled, css, global: globalCSS, keyframes, getCssString, theme} = 
             contextMenuSeperator: globalTokens.colors.gray700,
             text: globalTokens.colors.gray900,
             textMuted: globalTokens.colors.gray500,
+            textDisabled: globalTokens.colors.gray400,
             interaction: globalTokens.colors.primary500,
             onInteraction: globalTokens.colors.white,
             interactionDisabled: globalTokens.colors.gray600,
