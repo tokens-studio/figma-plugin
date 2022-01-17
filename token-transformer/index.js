@@ -59,7 +59,7 @@ const writeFile = (path, contents, cb) => {
     });
 };
 
-const log = (message) => process.stdout.write(`[token-transformer] ${message}`);
+const log = (message) => process.stdout.write(`[token-transformer] ${message}\n`);
 
 /**
  * Transformation
@@ -76,16 +76,17 @@ const transform = () => {
             expandTypography,
         };
 
-        log(`transforming tokens from input: ${input}\n`);
-        log(`using sets: ${sets.length > 0 ? sets : '[]'}\n`);
-        log(`using excludes: ${excludes.length > 0 ? excludes : '[]'}\n`);
+        log(`transforming tokens from input: ${input}`);
+        log(`using sets: ${sets.length > 0 ? sets : '[]'}`);
+        log(`using excludes: ${excludes.length > 0 ? excludes : '[]'}`);
+        log(`using options: { expandTypography: ${expandTypography}}`);
 
         const transformed = transformTokens(parsed, sets, excludes, options);
 
-        log(`writing tokens to output: ${output}\n`);
+        log(`writing tokens to output: ${output}`);
 
         writeFile(output, JSON.stringify(transformed, null, 2), () => {
-            log('done transforming\n');
+            log('done transforming');
         });
     } else {
         log(`ERROR: Input not found at ${input}`);

@@ -9,7 +9,7 @@ export default function convertTokensObjectToResolved(
     usedSets = [],
     excludedSets = [],
     options: TransformerOptions = {
-        expandTypography: true,
+        expandTypography: false,
     }
 ) {
     // Parse tokens into array structure
