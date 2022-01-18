@@ -11,5 +11,9 @@
   "bin": "index.js",
   "dependencies": {
     "yargs": "^17.3.1"
-  }
+  },
+  "files": [
+    "index.js",
+    "dist"
+  ]
 }
