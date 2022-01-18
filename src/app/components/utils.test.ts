@@ -49,37 +49,22 @@ describe('isSingleToken', () => {
 });
 
 describe('isTypographyToken', () => {
-    it('returns truthiness of a typography token and only accepts tokens that feature required values', () => {
-        const token = {
-            fontFamily: 'foo',
+    it('checks if type is typography', () => {
+        const correctToken = {
+            type: 'typography',
+            value: {
+                fontFamily: 'foo',
+                fontWeight: 'normal',
+                fontSize: '32',
+            },
         };
-        const weight = {
-            fontWeight: 'foo',
-        };
-        const height = {
-            lineHeight: 'foo',
-        };
-        const fullToken = {
+        const incorrectToken = {
             fontFamily: 'foo',
             fontWeight: 'normal',
             fontSize: '32',
         };
-        expect(isTypographyToken(token)).toBe(false);
-        expect(isTypographyToken(fullToken)).toBe(true);
-        expect(isTypographyToken(weight)).toBe(false);
-        expect(isTypographyToken(height)).toBe(false);
-    });
-    it('rejects non-typography tokens', () => {
-        const wrongToken = {
-            value: {
-                fontFamily: 'foo',
-            },
-        };
-
-        const stringToken = 'string';
-
-        expect(isTypographyToken(wrongToken)).toBe(false);
-        expect(isTypographyToken(stringToken)).toBe(false);
+        expect(isTypographyToken(correctToken)).toBe(true);
+        expect(isTypographyToken(incorrectToken)).toBe(false);
     });
 });
 

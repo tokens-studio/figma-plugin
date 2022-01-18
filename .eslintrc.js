@@ -1,5 +1,5 @@
 module.exports = {
-    extends: ['airbnb-typescript-prettier'],
+extends: ['airbnb-typescript-prettier'],
     globals: {
         "figma": "readable",
         "__html__": "readable",
