@@ -65,7 +65,7 @@ export default function ExportModal({onClose}) {
 
                 <Heading size="small">Output example</Heading>
                 <Textarea
-                    className="flex-grow"
+                    className="grow"
                     rows={10}
                     isDisabled
                     value={getFormattedTokens({includeAllTokens, includeParent, expandTypography})}

@@ -83,7 +83,7 @@ const SyncSettings = () => {
     };
 
     return (
-        <div className="flex flex-col flex-grow">
+        <div className="flex flex-col grow">
             {confirmModalVisible && (
                 <ConfirmLocalStorageModal
                     isOpen={confirmModalVisible}
