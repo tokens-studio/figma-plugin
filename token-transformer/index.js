@@ -79,7 +79,7 @@ const transform = () => {
         log(`transforming tokens from input: ${input}`);
         log(`using sets: ${sets.length > 0 ? sets : '[]'}`);
         log(`using excludes: ${excludes.length > 0 ? excludes : '[]'}`);
-        log(`using options: { expandTypography: ${expandTypography}}`);
+        log(`using options: { expandTypography: ${expandTypography} }`);
 
         const transformed = transformTokens(parsed, sets, excludes, options);
 
