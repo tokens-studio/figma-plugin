@@ -53,7 +53,6 @@ export function convertStringToFigmaGradient(value: string) {
             ])
         )
     ).toArray();
-    console.log(gradientTransformMatrix);
 
     const gradientStops = colorStops.map((stop) => {
         const seperatedStop = stop.split(' ');
