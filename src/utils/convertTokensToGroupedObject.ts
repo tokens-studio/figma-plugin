@@ -12,7 +12,7 @@ export default function convertTokensToGroupedObject(tokens, excludedSets, expan
         delete tokenWithType.name;
         delete tokenWithType.rawValue;
         delete tokenWithType.internal__Parent;
-        if (expandTypography && tokenWithType.type === 'typography') {
+        if (!!expandTypography && tokenWithType.type === 'typography') {
             const expandedTypography = Object.entries(tokenWithType.value).reduce((acc, [key, val]) => {
                 acc[key] = {
                     value: val,
