@@ -138,7 +138,7 @@ const EditTokenForm = ({resolvedTokens}) => {
     const renderTokenForm = () => {
         switch (internalEditToken.type) {
             case 'boxShadow': {
-                return <BoxShadowInput />;
+                return <BoxShadowInput setValue={setInternalEditToken} value={internalEditToken} />;
             }
             case 'typography': {
                 return Object.entries(internalEditToken.schema).map(([key, schemaValue]: [string, string]) => (
