@@ -33,11 +33,11 @@ function SingleShadowInput({
     onRemove,
     id,
 }: {
-    value: ShadowTokenSingleValue | ShadowTokenSingleValue[],
+    value: ShadowTokenSingleValue | ShadowTokenSingleValue[];
     isMultiple?: boolean;
     shadowItem: ShadowTokenSingleValue;
     index: number;
-    setValue: (shadow: ShadowTokenSingleValue) => void;
+    setValue: (shadow: ShadowTokenSingleValue | ShadowTokenSingleValue[]) => void;
     onRemove: (index: number) => void;
     id: string;
 }) {
@@ -49,7 +49,7 @@ function SingleShadowInput({
 
             setValue(values);
         } else {
-           setValue({...value, [e.target.name]: e.target.value});
+            setValue({...value, [e.target.name]: e.target.value});
         }
     };
 
@@ -165,20 +165,27 @@ function SingleShadowInput({
     );
 }
 
-const newToken = {x: '0', y: '0', blur: '0', spread: '0', color: '#000000', type: 'dropShadow'};
+const newToken: ShadowTokenSingleValue = {x: '0', y: '0', blur: '0', spread: '0', color: '#000000', type: 'dropShadow'};
 
-export default function BoxShadowInput() {
-    const {editToken} = useSelector((state: RootState) => state.uiState);
-    const dispatch = useDispatch<Dispatch>();
+export default function BoxShadowInput({
+    value,
+    setValue,
+}: {
+    value: ShadowTokenSingleValue | ShadowTokenSingleValue[];
+    setValue: (shadow: ShadowTokenSingleValue | ShadowTokenSingleValue[]) => void;
+}) {
     const addShadow = () => {
-        if (Array.isArray(editToken.value)) {
-            dispatch.uiState.setEditToken({...editToken, value: [...editToken.value, newToken]});
+        if (Array.isArray(value)) {
+            setValue([...value, newToken]);
         } else {
-            dispatch.uiState.setEditToken({...editToken, value: [editToken.value, newToken]});
+            setValue([value, newToken]);
         }
     };
+
     const removeShadow = (index) => {
-        dispatch.uiState.setEditToken({...editToken, value: editToken.value.filter((_, i) => i !== index)});
+        if (Array.isArray(value)) {
+            setValue(value.filter((_, i) => i !== index));
+        }
     };
 
     return (
@@ -194,11 +201,13 @@ export default function BoxShadowInput() {
             </Box>
             <Box css={{display: 'flex', flexDirection: 'column', gap: '$4'}}>
                 <DndProvider backend={HTML5Backend}>
-                    {Array.isArray(editToken.value) ? (
-                        editToken.value.map((token, index) => {
+                    {Array.isArray(value) ? (
+                        value.map((token, index) => {
                             return (
                                 <SingleShadowInput
                                     isMultiple
+                                    value={value}
+                                    setValue={setValue}
                                     shadowItem={token}
                                     index={index}
                                     id={index}
@@ -208,7 +217,7 @@ export default function BoxShadowInput() {
                             );
                         })
                     ) : (
-                        <SingleShadowInput index={0} shadowItem={editToken.value} />
+                        <SingleShadowInput setValue={setValue} index={0} value={value} shadowItem={value} />
                     )}
                 </DndProvider>
             </Box>
