@@ -30,6 +30,7 @@ export enum MessageToPluginTypes {
     NOTIFY = 'notify',
     SET_UI = 'set_ui',
     RESIZE_WINDOW = 'resize_window',
+    CREATE_ANNOTATION = 'create-annotation',
 }
 
 export type PostToFigmaProps =
@@ -97,4 +98,9 @@ export type PostToFigmaProps =
           type: MessageToPluginTypes.RESIZE_WINDOW;
           width: number;
           height: number;
+      }
+    | {
+          type: MessageToPluginTypes.CREATE_ANNOTATION;
+          tokens: object;
+          direction: string;
       };

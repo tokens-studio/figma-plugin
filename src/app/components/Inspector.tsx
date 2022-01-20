@@ -5,6 +5,7 @@ import useTokens from '../store/useTokens';
 import Button from './Button';
 import Icon from './Icon';
 import Tooltip from './Tooltip';
+import createAnnotation from './createAnnotation';
 
 const Inspector = () => {
     const uiState = useSelector((state: RootState) => state.uiState);
@@ -12,6 +13,25 @@ const Inspector = () => {
 
     return (
         <div className="space-y-2 p-4">
+            {Object.entries(uiState.selectionValues).length > 0 && (
+                <div className="pb-4 flex flex-row justify-between items-center">
+                    Add annotation
+                    <div>
+                        <Button variant="secondary" onClick={() => createAnnotation(uiState.selectionValues, 'top')}>
+                            ↑
+                        </Button>
+                        <Button variant="secondary" onClick={() => createAnnotation(uiState.selectionValues, 'right')}>
+                            →
+                        </Button>
+                        <Button variant="secondary" onClick={() => createAnnotation(uiState.selectionValues, 'bottom')}>
+                            ↓
+                        </Button>
+                        <Button variant="secondary" onClick={() => createAnnotation(uiState.selectionValues, 'left')}>
+                            ←
+                        </Button>
+                    </div>
+                </div>
+            )}
             <div className="space-y-1">
                 {Object.entries(uiState.selectionValues)
                     .filter(([, value]) => value !== 'delete')

@@ -25,6 +25,7 @@ import {getTokenData, updateNodes, setTokensOnDocument, goToNode, saveStorageTyp
 import {MessageToPluginTypes} from '../../types/messages';
 import {StorageProviderType} from '../../types/api';
 import compareProvidersWithStored from './compareProviders';
+import {createAnnotation} from '@/utils/annotations';
 
 figma.showUI(__html__, {
     width: 400,
@@ -156,6 +157,10 @@ figma.ui.onmessage = async (msg) => {
                 ignoreFirstPartForStyles: msg.ignoreFirstPartForStyles,
             });
             figma.ui.resize(msg.uiWindow.width, msg.uiWindow.height);
+            break;
+        }
+        case MessageToPluginTypes.CREATE_ANNOTATION: {
+            createAnnotation(msg.tokens, msg.direction);
             break;
         }
         default:
