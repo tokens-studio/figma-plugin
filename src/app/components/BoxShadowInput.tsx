@@ -1,5 +1,4 @@
 import React, {useCallback} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
 import {ShadowTokenSingleValue} from 'Types/propertyTypes';
 import IconMinus from '@/icons/minus.svg';
 import IconPlus from '@/icons/plus.svg';
@@ -9,7 +8,6 @@ import {HTML5Backend} from 'react-dnd-html5-backend';
 
 import {XYCoord} from 'dnd-core';
 import {debounce} from 'lodash';
-import {Dispatch, RootState} from '../store';
 import Heading from './Heading';
 import IconButton from './IconButton';
 import TokenInput from './TokenInput';
@@ -27,41 +25,42 @@ enum ItemTypes {
 }
 
 function SingleShadowInput({
+    value,
     isMultiple = false,
     shadowItem,
     index,
+    setValue,
     onRemove,
     id,
 }: {
+    value: ShadowTokenSingleValue | ShadowTokenSingleValue[];
     isMultiple?: boolean;
     shadowItem: ShadowTokenSingleValue;
     index: number;
+    setValue: (shadow: ShadowTokenSingleValue | ShadowTokenSingleValue[]) => void;
     onRemove: (index: number) => void;
     id: string;
 }) {
-    const {editToken} = useSelector((state: RootState) => state.uiState);
-    const dispatch = useDispatch<Dispatch>();
-
     const onChange = (e) => {
-        if (Array.isArray(editToken.value)) {
-            const values = editToken.value;
-            const newShadow = {...editToken.value[index], [e.target.name]: e.target.value};
+        if (Array.isArray(value)) {
+            const values = value;
+            const newShadow = {...value[index], [e.target.name]: e.target.value};
             values.splice(index, 1, newShadow);
 
-            dispatch.uiState.setEditToken({...editToken, value: values});
+            setValue(values);
         } else {
-            dispatch.uiState.setEditToken({...editToken, value: {...editToken.value, [e.target.name]: e.target.value}});
+            setValue({...value, [e.target.name]: e.target.value});
         }
     };
 
     const onMoveDebounce = (dragIndex, hoverIndex) => {
-        const values = editToken.value;
+        const values = value;
         const dragItem = values[dragIndex];
         values.splice(dragIndex, 1);
         values.splice(hoverIndex, 0, dragItem);
-        dispatch.uiState.setEditToken({...editToken, value: values});
+        onChange({...value, value: values});
     };
-    const onMove = useCallback(debounce(onMoveDebounce, 300), [editToken.value]);
+    const onMove = useCallback(debounce(onMoveDebounce, 300), [value]);
 
     const ref = React.useRef<HTMLDivElement>(null);
 
@@ -166,20 +165,27 @@ function SingleShadowInput({
     );
 }
 
-const newToken = {x: '0', y: '0', blur: '0', spread: '0', color: '#000000', type: 'dropShadow'};
+const newToken: ShadowTokenSingleValue = {x: '0', y: '0', blur: '0', spread: '0', color: '#000000', type: 'dropShadow'};
 
-export default function BoxShadowInput() {
-    const {editToken} = useSelector((state: RootState) => state.uiState);
-    const dispatch = useDispatch<Dispatch>();
+export default function BoxShadowInput({
+    value,
+    setValue,
+}: {
+    value: ShadowTokenSingleValue | ShadowTokenSingleValue[];
+    setValue: (shadow: ShadowTokenSingleValue | ShadowTokenSingleValue[]) => void;
+}) {
     const addShadow = () => {
-        if (Array.isArray(editToken.value)) {
-            dispatch.uiState.setEditToken({...editToken, value: [...editToken.value, newToken]});
+        if (Array.isArray(value)) {
+            setValue([...value, newToken]);
         } else {
-            dispatch.uiState.setEditToken({...editToken, value: [editToken.value, newToken]});
+            setValue([value, newToken]);
         }
     };
+
     const removeShadow = (index) => {
-        dispatch.uiState.setEditToken({...editToken, value: editToken.value.filter((_, i) => i !== index)});
+        if (Array.isArray(value)) {
+            setValue(value.filter((_, i) => i !== index));
+        }
     };
 
     return (
@@ -195,11 +201,13 @@ export default function BoxShadowInput() {
             </Box>
             <Box css={{display: 'flex', flexDirection: 'column', gap: '$4'}}>
                 <DndProvider backend={HTML5Backend}>
-                    {Array.isArray(editToken.value) ? (
-                        editToken.value.map((token, index) => {
+                    {Array.isArray(value) ? (
+                        value.map((token, index) => {
                             return (
                                 <SingleShadowInput
                                     isMultiple
+                                    value={value}
+                                    setValue={setValue}
                                     shadowItem={token}
                                     index={index}
                                     id={index}
@@ -209,7 +217,7 @@ export default function BoxShadowInput() {
                             );
                         })
                     ) : (
-                        <SingleShadowInput index={0} shadowItem={editToken.value} />
+                        <SingleShadowInput setValue={setValue} index={0} value={value} shadowItem={value} />
                     )}
                 </DndProvider>
             </Box>
