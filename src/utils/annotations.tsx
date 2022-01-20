@@ -1,6 +1,6 @@
 import {notifyUI} from '@/plugin/notifiers';
 
-const DIST = 50;
+const DIST = 80;
 const BG_COLOR = {r: 0.1, g: 0.1, b: 0.1};
 const STROKE_COLOR = {r: 0.482, g: 0.38, b: 1};
 const PROP_COLOR = {r: 1, g: 1, b: 1};
@@ -115,7 +115,13 @@ function createAnno(tokens, direction) {
     arrowAnchor.clipsContent = false;
     arrowAnchor.name = 'arrow-anchor';
 
-    const arrow = figma.createLine();
+    const arrow = figma.createVector();
+    arrow.vectorPaths = [
+        {
+            windingRule: 'NONE',
+            data: `M 0 0 L ${position.distance} 0`,
+        },
+    ];
     arrow.strokes = [{type: 'SOLID', color: STROKE_COLOR}];
     arrow.strokeWeight = 2;
     arrow.strokeCap = 'ARROW_EQUILATERAL';
@@ -132,7 +138,15 @@ function createAnno(tokens, direction) {
         default:
             break;
     }
-    arrow.resize(position.distance, 0);
+    /* make a copy of the original node */
+    let arrowCopy = JSON.parse(JSON.stringify(arrow.vectorNetwork));
+
+    /* if it has a strokeCap property, change */
+    if ('strokeCap' in arrowCopy.vertices[arrowCopy.vertices.length - 1]) {
+        arrowCopy.vertices[arrowCopy.vertices.length - 1].strokeCap = 'ARROW_EQUILATERAL';
+        arrowCopy.vertices[0].strokeCap = 'ROUND';
+    }
+    arrow.vectorNetwork = arrowCopy;
     arrowAnchor.appendChild(arrow);
 
     // Add the child frames
