@@ -6,47 +6,62 @@ const STROKE_COLOR = {r: 0.482, g: 0.38, b: 1};
 const PROP_COLOR = {r: 1, g: 1, b: 1};
 const VALUE_COLOR = {r: 1, g: 0.839, b: 0.078};
 
-function getParentSelection(sel, distance, dir) {
-    const selection = sel;
-    if (sel.parent.type !== 'PAGE') {
-        distance += sel[dir];
-        return getParentSelection(sel.parent, distance, dir);
+function getParentSelection(sel, distance, direction, position = {x: 0, y: 0, width: 0}) {
+    if (position.width === 0) position.width = sel.width - DIST; // save original width
+
+    if (sel.parent.type !== 'DOCUMENT') {
+        if (sel.parent.type !== 'PAGE') {
+            switch (direction) {
+                case 'top':
+                case 'bottom':
+                    distance += sel.y;
+                    break;
+                case 'right':
+                    distance = sel.parent.width - sel.x - position.x - position.width;
+                    break;
+                default:
+                    distance += sel.x;
+                    break;
+            }
+        }
+        position.x += sel.x;
+        position.y += sel.y;
+        return getParentSelection(sel.parent, distance, direction, position);
     }
     return {
-        selection,
         distance,
+        position,
     };
 }
 
-function calcPosition(sel, anno, direction) {
+function calcPosition(selection, anno, direction) {
     let x = 0;
     let y = 0;
 
     // Loop through the parent nodes to get a correct X & Y position
-    const updatedSelection = getParentSelection(sel, DIST, ['top', 'bottom'].includes(direction) ? 'y' : 'x');
-    sel = updatedSelection.selection;
+    const {distance, position} = getParentSelection(selection, DIST, direction);
 
     switch (direction) {
         case 'top':
-            x = sel.x + sel.width / 2 - anno.width / 2;
-            y = sel.y - DIST - anno.height;
+            x = position.x + selection.width / 2 - anno.width / 2;
+            y = position.y - Math.abs(distance) - anno.height;
             break;
         case 'right':
-            x = sel.x + sel.width + DIST;
-            y = sel.y + sel.height / 2 - anno.height / 2;
+            x = position.x + selection.width + Math.abs(distance);
+            y = position.y + selection.height / 2 - anno.height / 2;
             break;
         case 'bottom':
-            x = sel.x + sel.width / 2 - anno.width / 2;
-            y = sel.y + sel.height + DIST;
+            x = position.x + selection.width / 2 - anno.width / 2;
+            y = position.y + selection.height + Math.abs(distance);
             break;
         default:
             // left
-            x = sel.x - DIST - anno.width;
-            y = sel.y + sel.height / 2 - anno.height / 2;
+            x = position.x - Math.abs(distance) - anno.width;
+            y = position.y + selection.height / 2 - anno.height / 2;
             break;
     }
 
-    return {x, y, distance: updatedSelection.distance};
+    return {x, y, distance};
 }
 
 function createProperties(anno, tokens) {
