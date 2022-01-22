@@ -14,8 +14,8 @@ const Inspector = () => {
     return (
         <div className="space-y-2 p-4">
             {Object.entries(uiState.selectionValues).length > 0 && (
-                <div className="pb-4 flex flex-row justify-between items-center">
-                    Add annotation
+                <div className="pb-4 mb-4 flex flex-row items-center text-xxs justify-between z-1 border-b border-gray-200">
+                    <div className="font-bold">Add as annotation</div>
                     <div>
                         <Button variant="secondary" onClick={() => createAnnotation(uiState.selectionValues, 'top')}>
                             ↑
