@@ -1,11 +1,10 @@
 {
-    "baseUrl": "http://localhost:5000",
-    "chromeWebSecurity": false,
-    "experimentalComponentTesting": true,
-    "env": {
-        "cypress-react-selector": {
-          "root": "#app"
-        }
+  "baseUrl": "http://localhost:5000",
+  "chromeWebSecurity": false,
+  "experimentalComponentTesting": true,
+  "env": {
+      "cypress-react-selector": {
+        "root": "#app"
       }
-
+    }
 }

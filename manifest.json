@@ -1,12 +1,10 @@
 {
-  "name": "Tokens",
-  "id": "843461159747178978",
+  "name": "Tokens Studio",
+  "id": "8434611597474178978",
   "api": "1.0.0",
   "main": "dist/code.js",
   "ui": "dist/index.html",
   "editorType": ["figma"],
   "permissions": ["currentuser"],
-  "relaunchButtons": [
-    {"command": "edit", "name": "Tokens"}
-  ]
+  "relaunchButtons": [{ "command": "edit", "name": "Tokens" }]
 }
