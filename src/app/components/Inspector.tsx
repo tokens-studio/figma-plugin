@@ -16,19 +16,37 @@ const Inspector = () => {
             {Object.entries(uiState.selectionValues).length > 0 && (
                 <div className="pb-4 mb-4 flex flex-row items-center text-xxs justify-between z-1 border-b border-gray-200">
                     <div className="font-bold">Add as annotation</div>
-                    <div>
-                        <Button variant="secondary" onClick={() => createAnnotation(uiState.selectionValues, 'top')}>
-                            ↑
-                        </Button>
-                        <Button variant="secondary" onClick={() => createAnnotation(uiState.selectionValues, 'right')}>
-                            →
-                        </Button>
-                        <Button variant="secondary" onClick={() => createAnnotation(uiState.selectionValues, 'bottom')}>
-                            ↓
-                        </Button>
-                        <Button variant="secondary" onClick={() => createAnnotation(uiState.selectionValues, 'left')}>
+                    <div className="flex flex-row">
+                        <button
+                            className="button button-secondary p-1"
+                            type="button"
+                            onClick={() => createAnnotation(uiState.selectionValues, 'left')}
+                        >
                             ←
-                        </Button>
+                        </button>
+                        <div className="flex flex-col">
+                            <button
+                                className="button button-secondary p-1"
+                                type="button"
+                                onClick={() => createAnnotation(uiState.selectionValues, 'top')}
+                            >
+                                ↑
+                            </button>
+                            <button
+                                className="button button-secondary p-1"
+                                type="button"
+                                onClick={() => createAnnotation(uiState.selectionValues, 'bottom')}
+                            >
+                                ↓
+                            </button>
+                        </div>
+                        <button
+                            className="button button-secondary p-1"
+                            type="button"
+                            onClick={() => createAnnotation(uiState.selectionValues, 'right')}
+                        >
+                            →
+                        </button>
                     </div>
                 </div>
             )}
