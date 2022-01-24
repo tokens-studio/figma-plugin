@@ -1,18 +1,17 @@
 import { SingleTokenObject } from '@/types/tokens';
-import filterMatchingStyles from './figmaUtils/filterMatchingStyles';
+import { getEffectStylesKeyMap } from '@/utils/getEffectStylesKeyMap';
+import { normalizeTokenName } from '@/utils/normalizeTokenName';
 import setEffectValuesOnTarget from './setEffectValuesOnTarget';
 
 // Iterate over effectTokens to create objects that match figma styles
-export default function updateEffectStyles(effectTokens, shouldCreate = false) {
-  const effectStyles = figma.getLocalEffectStyles();
+export default function updateEffectStyles(effectTokens: SingleTokenObject[], shouldCreate = false) {
+  const effectStylesToKeyMap = getEffectStylesKeyMap();
 
-  effectTokens.map((token: SingleTokenObject) => {
-    let matchingStyles = [];
-    if (effectStyles.length > 0) {
-      matchingStyles = filterMatchingStyles(token, effectStyles);
-    }
-    if (matchingStyles.length) {
-      setEffectValuesOnTarget(matchingStyles[0], token);
+  effectTokens.forEach((token) => {
+    const trimmedKey = normalizeTokenName(token.name);
+
+    if (effectStylesToKeyMap.has(trimmedKey)) {
+      setEffectValuesOnTarget(effectStylesToKeyMap.get(trimmedKey)!, token);
     } else if (shouldCreate) {
       const style = figma.createEffectStyle();
       style.name = token.name;

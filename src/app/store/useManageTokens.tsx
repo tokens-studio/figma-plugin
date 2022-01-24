@@ -2,6 +2,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { SingleToken, TokenType } from '@/types/tokens';
 import { Dispatch, RootState } from '../store';
 import useConfirm from '../hooks/useConfirm';
+import { BackgroundJobs } from '@/constants/BackgroundJobs';
 
 export default function useManageTokens() {
   const { activeTokenSet } = useSelector((state: RootState) => state.tokenState);
@@ -23,7 +24,10 @@ export default function useManageTokens() {
     const {
       parent, name, value, options, oldName, shouldUpdateDocument = true,
     } = data;
-    dispatch.uiState.setLoading(true);
+    dispatch.uiState.startJob({
+      name: BackgroundJobs.UI_EDITSINGLETOKEN,
+      isInfinite: true,
+    });
 
     // should be a setting which users can toggle on / off to disable auto-sync after each token change
     const shouldUpdate = true;
@@ -38,7 +42,7 @@ export default function useManageTokens() {
         shouldUpdate: shouldUpdateDocument,
       });
     }
-    dispatch.uiState.setLoading(false);
+    dispatch.uiState.completeJob(BackgroundJobs.UI_EDITSINGLETOKEN);
   }
 
   async function createSingleToken(data: {
@@ -52,7 +56,10 @@ export default function useManageTokens() {
     const {
       parent, name, value, options, newGroup = false, shouldUpdateDocument = true,
     } = data;
-    dispatch.uiState.setLoading(true);
+    dispatch.uiState.startJob({
+      name: BackgroundJobs.UI_CREATESINGLETOKEN,
+      isInfinite: true,
+    });
     // should be a setting which users can toggle on / off to disable auto-sync after each token change
     const shouldUpdate = true;
 
@@ -66,13 +73,16 @@ export default function useManageTokens() {
         shouldUpdate: shouldUpdateDocument,
       });
     }
-    dispatch.uiState.setLoading(false);
+    dispatch.uiState.completeJob(BackgroundJobs.UI_CREATESINGLETOKEN);
   }
 
   async function duplicateSingleToken(data) {
-    dispatch.uiState.setLoading(true);
+    dispatch.uiState.startJob({
+      name: BackgroundJobs.UI_DUPLICATETOKEN,
+      isInfinite: true,
+    });
     duplicateToken(data);
-    dispatch.uiState.setLoading(false);
+    dispatch.uiState.completeJob(BackgroundJobs.UI_DUPLICATETOKEN);
   }
 
   async function deleteSingleToken(data) {
@@ -81,9 +91,12 @@ export default function useManageTokens() {
       description: 'Are you sure you want to delete this token?',
     });
     if (userConfirmation) {
-      dispatch.uiState.setLoading(true);
+      dispatch.uiState.startJob({
+        name: BackgroundJobs.UI_DELETETOKEN,
+        isInfinite: true,
+      });
       deleteToken(data);
-      dispatch.uiState.setLoading(false);
+      dispatch.uiState.completeJob(BackgroundJobs.UI_DELETETOKEN);
     }
   }
 
@@ -93,9 +106,12 @@ export default function useManageTokens() {
       description: 'Are you sure you want to delete this group?',
     });
     if (userConfirmation) {
-      dispatch.uiState.setLoading(true);
+      dispatch.uiState.startJob({
+        name: BackgroundJobs.UI_DELETETOKENGROUP,
+        isInfinite: true,
+      });
       deleteTokenGroup({ parent: activeTokenSet, path });
-      dispatch.uiState.setLoading(false);
+      dispatch.uiState.completeJob(BackgroundJobs.UI_DELETETOKENGROUP);
     }
   }
 

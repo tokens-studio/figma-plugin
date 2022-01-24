@@ -1,19 +1,17 @@
-import { TypographyToken } from '../types/propertyTypes';
-import filterMatchingStyles from './figmaUtils/filterMatchingStyles';
+import { SingleTokenObject } from '@/types/tokens';
+import { getTextStylesKeyMap } from '@/utils/getTextStylesKeyMap';
+import { normalizeTokenName } from '@/utils/normalizeTokenName';
 import setTextValuesOnTarget from './setTextValuesOnTarget';
 
-export default function updateTextStyles(textTokens, shouldCreate = false) {
+export default function updateTextStyles(textTokens: SingleTokenObject[], shouldCreate = false) {
   // Iterate over textTokens to create objects that match figma styles
-  const textStyles = figma.getLocalTextStyles();
+  const textStylesToKeyMap = getTextStylesKeyMap();
 
-  textTokens.map((token: TypographyToken) => {
-    let matchingStyles = [];
-    if (textStyles.length > 0) {
-      matchingStyles = filterMatchingStyles(token, textStyles);
-    }
+  textTokens.forEach((token) => {
+    const trimmedKey = normalizeTokenName(token.name);
 
-    if (matchingStyles.length) {
-      setTextValuesOnTarget(matchingStyles[0], token);
+    if (textStylesToKeyMap.has(trimmedKey)) {
+      setTextValuesOnTarget(textStylesToKeyMap.get(trimmedKey)!, token);
     } else if (shouldCreate) {
       const style = figma.createTextStyle();
       style.name = token.name;

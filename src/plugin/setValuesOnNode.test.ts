@@ -4,6 +4,12 @@ import * as setTextValuesOnTarget from './setTextValuesOnTarget';
 import * as setEffectValuesOnTarget from './setEffectValuesOnTarget';
 
 describe('updateNode', () => {
+  const emptyFigmaStylesMap = {
+    effectStyles: new Map(),
+    paintStyles: new Map(),
+    textStyles: new Map(),
+  };
+
   const setTextValuesOnTargetSpy = jest.spyOn(setTextValuesOnTarget, 'default');
   const setEffectValuesOnTargetSpy = jest.spyOn(setEffectValuesOnTarget, 'default');
 
@@ -55,45 +61,60 @@ describe('updateNode', () => {
   });
 
   it('calls setTextValuesOnTarget if text node and atomic typography tokens are given', () => {
-    setValuesOnNode(textNodeMock, atomicValues, dataOnNode);
+    setValuesOnNode(textNodeMock, atomicValues, dataOnNode, emptyFigmaStylesMap);
     expect(setTextValuesOnTargetSpy).toHaveBeenCalled();
   });
 
   it('doesnt call setTextValuesOnTarget if no text node', () => {
-    setValuesOnNode(solidNodeMock, atomicValues, dataOnNode);
+    setValuesOnNode(solidNodeMock, atomicValues, dataOnNode, emptyFigmaStylesMap);
     expect(setTextValuesOnTargetSpy).not.toHaveBeenCalled();
   });
 
   it('calls setTextValuesOnTarget if text node and composite typography tokens are given', () => {
-    setValuesOnNode(textNodeMock, typographyValues, dataOnNode);
-    figma.getLocalTextStyles.mockReturnValue([]);
+    setValuesOnNode(textNodeMock, typographyValues, dataOnNode, emptyFigmaStylesMap);
     expect(setTextValuesOnTargetSpy).toHaveBeenCalled();
   });
 
   it('sets textstyle if matching Style is found', async () => {
-    figma.getLocalTextStyles.mockReturnValue([{ name: 'type/heading/h1', id: '123' }]);
-    await setValuesOnNode(textNodeMock, typographyValues, dataOnNode);
+    await setValuesOnNode(textNodeMock, typographyValues, dataOnNode, {
+      ...emptyFigmaStylesMap,
+      textStyles: new Map([
+        ['type/heading/h1', { name: 'type/heading/h1', id: '123' }],
+      ]),
+    });
     expect(setTextValuesOnTargetSpy).not.toHaveBeenCalled();
     expect(textNodeMock).toEqual({ ...textNodeMock, textStyleId: '123' });
   });
 
   it('sets textstyle if matching Style is found and first part is ignored', async () => {
-    figma.getLocalTextStyles.mockReturnValue([{ name: 'heading/h1', id: '456' }]);
-    await setValuesOnNode(textNodeMock, typographyValues, dataOnNode, true);
+    await setValuesOnNode(textNodeMock, typographyValues, dataOnNode, {
+      ...emptyFigmaStylesMap,
+      textStyles: new Map([
+        ['heading/h1', { name: 'heading/h1', id: '456' }],
+      ]),
+    }, true);
     expect(setTextValuesOnTargetSpy).not.toHaveBeenCalled();
     expect(textNodeMock).toEqual({ ...textNodeMock, textStyleId: '456' });
   });
 
   it('sets effectStyle if matching Style is found', async () => {
-    figma.getLocalEffectStyles.mockReturnValue([{ name: 'shadows/default', id: '123' }]);
-    await setValuesOnNode(solidNodeMock, boxShadowValues, dataOnNode);
+    await setValuesOnNode(solidNodeMock, boxShadowValues, dataOnNode, {
+      ...emptyFigmaStylesMap,
+      effectStyles: new Map([
+        ['shadows/default', { name: 'shadows/default', id: '123' }],
+      ]),
+    });
     expect(setEffectValuesOnTargetSpy).not.toHaveBeenCalled();
     expect(solidNodeMock).toEqual({ ...solidNodeMock, effectStyleId: '123' });
   });
 
   it('calls setEffectValuesOnTarget if effect node and effects are given', async () => {
-    figma.getLocalEffectStyles.mockReturnValue([{ name: 'shadows/other', id: '123' }]);
-    await setValuesOnNode(solidNodeMock, boxShadowValues, dataOnNode);
+    await setValuesOnNode(solidNodeMock, boxShadowValues, dataOnNode, {
+      ...emptyFigmaStylesMap,
+      effectStyles: new Map([
+        ['shadows/other', { name: 'shadows/other', id: '123' }],
+      ]),
+    });
     expect(setEffectValuesOnTargetSpy).toHaveBeenCalled();
   });
 });

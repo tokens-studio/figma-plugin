@@ -213,7 +213,7 @@ export const tokenState = createModel<RootModel>()({
             if (isEqual(oldValue.value, token.value)) {
               if (
                 oldValue.description === token.description
-                || (typeof token.description === 'undefined' && oldValue.description === '')
+                                || (typeof token.description === 'undefined' && oldValue.description === '')
               ) {
                 existingTokens.push(token);
               } else {
@@ -333,10 +333,7 @@ export const tokenState = createModel<RootModel>()({
     },
     editToken(payload, rootState) {
       if (payload.oldName && payload.oldName !== payload.name) {
-        dispatch.tokenState.updateAliases({
-          oldName: payload.oldName,
-          newName: payload.name,
-        });
+        dispatch.tokenState.updateAliases({ oldName: payload.oldName, newName: payload.name });
       }
 
       if (payload.shouldUpdate && rootState.settings.updateOnChange) {

@@ -8,6 +8,7 @@ import useURL from './providers/url';
 import { Dispatch, RootState } from '../store';
 import useStorage from './useStorage';
 import { useGitHub } from './providers/github';
+import { BackgroundJobs } from '@/constants/BackgroundJobs';
 
 export default function useRemoteTokens() {
   const dispatch = useDispatch<Dispatch>();
@@ -23,7 +24,10 @@ export default function useRemoteTokens() {
   const pullTokens = async (context = api) => {
     track('pullTokens', { provider: context.provider });
 
-    dispatch.uiState.setLoading(true);
+    dispatch.uiState.startJob({
+      name: BackgroundJobs.UI_PULLTOKENS,
+      isInfinite: true,
+    });
 
     let tokenValues;
 
@@ -53,7 +57,7 @@ export default function useRemoteTokens() {
       });
     }
 
-    dispatch.uiState.setLoading(false);
+    dispatch.uiState.completeJob(BackgroundJobs.UI_PULLTOKENS);
   };
 
   const restoreStoredProvider = async (context) => {

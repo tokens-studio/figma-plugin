@@ -1,9 +1,17 @@
 import { UpdateMode } from '@/types/state';
 import { ApiDataType, StorageType } from '@/types/api';
-import { PostToFigmaProps, MessageFromPluginTypes, MessageToPluginTypes } from '@/types/messages';
+import {
+  PostToFigmaMessage,
+  MessageFromPluginTypes,
+  MessageToPluginTypes,
+  PostToUIMessage,
+  NotifyToPluginMessage,
+  UserIdFromPluginMessage,
+} from '@/types/messages';
 import store from './store';
+import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 
-export function postToFigma(props: PostToFigmaProps) {
+export function postToFigma(props: PostToFigmaMessage) {
   parent.postMessage(
     {
       pluginMessage: props,
@@ -12,11 +20,11 @@ export function postToFigma(props: PostToFigmaProps) {
   );
 }
 
-export function notifyUI(msg, opts?) {
+export function notifyUI(msg: string, opts?: NotificationOptions) {
   figma.notify(msg, opts);
 }
 
-export function notifyToUI(msg, opts = {}) {
+export function notifyToUI(msg: string, opts: NotifyToPluginMessage['opts'] = {}) {
   postToFigma({
     type: MessageToPluginTypes.NOTIFY,
     msg,
@@ -24,7 +32,7 @@ export function notifyToUI(msg, opts = {}) {
   });
 }
 
-export function postToUI(props) {
+export function postToUI(props: PostToUIMessage) {
   figma.ui.postMessage(props);
 }
 
@@ -34,7 +42,7 @@ export function notifyNoSelection() {
   });
 }
 
-export function notifySelection(nodes = undefined, values = undefined) {
+export function notifySelection(nodes?: string, values?: NodeTokenRefMap) {
   postToUI({
     type: MessageFromPluginTypes.SELECTION,
     nodes,
@@ -75,23 +83,24 @@ export function notifyUISettings({
   });
 }
 
-export function notifyRemoteComponents({ nodes, remotes }) {
+type Data = {
+  nodes: number
+  remotes: Set<BaseNode>
+};
+
+export function notifyRemoteComponents({ nodes, remotes }: Data) {
   const opts = { timeout: 600 };
-  if (nodes > 0 && remotes.length > 0) {
-    notifyUI(`Updated ${nodes} nodes, unable to update ${remotes.length} remote components`, opts);
-  } else if (nodes > 0 && remotes.length === 0) {
+  if (nodes > 0 && remotes.size > 0) {
+    notifyUI(`Updated ${nodes} nodes, unable to update ${remotes.size} remote components`, opts);
+  } else if (nodes > 0 && remotes.size === 0) {
     notifyUI(`Success! Updated ${nodes} nodes`, opts);
   }
   postToUI({
     type: MessageFromPluginTypes.REMOTE_COMPONENTS,
-    values: {
-      nodes,
-      remotes,
-    },
   });
 
-  store.successfulNodes = [];
-  store.remoteComponents = [];
+  store.successfulNodes.clear();
+  store.remoteComponents.clear();
 }
 
 export function notifyTokenValues(values = undefined) {
@@ -110,7 +119,7 @@ export function notifyStyleValues(values = undefined) {
   postToUI({ type: MessageFromPluginTypes.STYLES, values });
 }
 
-export function notifyUserId(user: { userId: string; figmaId: string; name: string }) {
+export function notifyUserId(user: UserIdFromPluginMessage['user']) {
   postToUI({
     type: MessageFromPluginTypes.USER_ID,
     user,

@@ -11,6 +11,9 @@ import { Dispatch, RootState } from '../store';
 import useTokens from '../store/useTokens';
 import TokenTooltip from './TokenTooltip';
 import BrokenReferenceIndicator from './BrokenReferenceIndicator';
+import { waitForMessage } from '@/utils/waitForMessage';
+import { MessageFromPluginTypes } from '@/types/messages';
+import { BackgroundJobs } from '@/constants/BackgroundJobs';
 
 export function useGetActiveState(properties, type, name) {
   const uiState = useSelector((state: RootState) => state.uiState);
@@ -47,7 +50,8 @@ function TokenButton({
   // Only show the last part of a token in a group
   const visibleDepth = 1;
   const visibleName = name.split('.').slice(-visibleDepth).join('.');
-  const buttonClass = [];
+  // @warning anti pattern - pushing into this array
+  const buttonClass: string[] = [];
 
   const handleEditClick = () => {
     showForm({ name, token });
@@ -61,8 +65,11 @@ function TokenButton({
   };
 
   function setPluginValue(value) {
-    dispatch.uiState.setLoading(true);
+    dispatch.uiState.startJob({ name: BackgroundJobs.UI_APPLYNODEVALUE });
     setNodeData(value, resolvedTokens);
+    waitForMessage(MessageFromPluginTypes.REMOTE_COMPONENTS).then(() => {
+      dispatch.uiState.completeJob(BackgroundJobs.UI_APPLYNODEVALUE);
+    });
   }
 
   switch (type) {
@@ -218,13 +225,13 @@ function TokenButton({
               </div>
               <TokenTooltip token={token} resolvedTokens={resolvedTokens} />
               {isAlias(token, resolvedTokens) && (
-                <div className="text-gray-400">
-                  <TokenTooltip token={token} resolvedTokens={resolvedTokens} shouldResolve />
-                </div>
+              <div className="text-gray-400">
+                <TokenTooltip token={token} resolvedTokens={resolvedTokens} shouldResolve />
+              </div>
               )}
               {token.description && <div className="text-gray-500">{token.description}</div>}
             </div>
-          )}
+                      )}
         >
           <button
             style={style}

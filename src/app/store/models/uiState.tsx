@@ -25,18 +25,18 @@ interface EditTokenObjectCommonProperties {
 }
 
 export type EditTokenObject =
-  | (EditTokenObjectCommonProperties & {
-    type: 'boxShadow';
-    value: ShadowTokenSingleValue[] | ShadowTokenSingleValue;
-  })
-  | (EditTokenObjectCommonProperties & {
-    type: 'typography';
-    value: TypographyObject;
-  })
-  | (EditTokenObjectCommonProperties & {
-    type: TokenType;
-    value: string | number;
-  });
+    | (EditTokenObjectCommonProperties & {
+      type: 'boxShadow';
+      value: ShadowTokenSingleValue[] | ShadowTokenSingleValue;
+    })
+    | (EditTokenObjectCommonProperties & {
+      type: 'typography';
+      value: TypographyObject;
+    })
+    | (EditTokenObjectCommonProperties & {
+      type: TokenType;
+      value: string | number;
+    });
 
 export type ConfirmProps = {
   show?: boolean;
@@ -46,11 +46,30 @@ export type ConfirmProps = {
   confirmAction?: string;
 };
 
+export type AddJobTasksPayload = {
+  name: string;
+  count: number;
+  expectedTimePerTask?: number;
+};
+
+export type CompleteJobTasksPayload = {
+  name: string;
+  count: number;
+  timePerTask?: number;
+};
+
+export type BackgroundJob = {
+  name: string;
+  isInfinite?: boolean;
+  timePerTask?: number;
+  completedTasks?: number;
+  totalTasks?: number;
+};
 export interface UIState {
+  backgroundJobs: BackgroundJob[]
   selectionValues: SelectionValue;
   displayType: DisplayType;
   disabled: boolean;
-  loading: boolean;
   activeTab: TabNames;
   projectURL: string;
   storageType: StorageType;
@@ -70,11 +89,11 @@ export interface UIState {
   collapsed: boolean;
 }
 
-const defaultConfirmState = {
+const defaultConfirmState: ConfirmProps = {
   show: false,
   text: '',
   description: '',
-  choices: null,
+  choices: undefined,
   confirmAction: 'Yes',
 };
 
@@ -83,7 +102,7 @@ export const uiState = createModel<RootModel>()({
     selectionValues: {},
     disabled: false,
     displayType: 'GRID',
-    loading: false,
+    backgroundJobs: [],
     activeTab: 'start',
     projectURL: '',
     storageType: {
@@ -162,10 +181,24 @@ export const uiState = createModel<RootModel>()({
       ...state,
       selectionValues: {},
     }),
-    setLoading(state, payload: boolean) {
+    startJob(state, job: BackgroundJob) {
       return {
         ...state,
-        loading: payload,
+        backgroundJobs: [...state.backgroundJobs, { ...job }],
+      };
+    },
+    completeJob(state, name: string) {
+      return {
+        ...state,
+        backgroundJobs: state.backgroundJobs.filter((job) => (
+          job.name !== name
+        )),
+      };
+    },
+    clearJobs(state) {
+      return {
+        ...state,
+        backgroundJobs: [],
       };
     },
     setActiveTab(state, payload: TabNames) {
@@ -238,6 +271,41 @@ export const uiState = createModel<RootModel>()({
       return {
         ...state,
         collapsed: !state.collapsed,
+      };
+    },
+    addJobTasks(state, payload: AddJobTasksPayload) {
+      return {
+        ...state,
+        backgroundJobs: state.backgroundJobs.map((job) => {
+          if (job.name === payload.name) {
+            return {
+              ...job,
+              ...(payload.expectedTimePerTask ? {
+                timePerTask: payload.expectedTimePerTask,
+              } : {}),
+              completedTasks: job.completedTasks ?? 0,
+              totalTasks: (job.totalTasks ?? 0) + payload.count,
+            };
+          }
+          return job;
+        }),
+      };
+    },
+    completeJobTasks(state, payload: CompleteJobTasksPayload) {
+      return {
+        ...state,
+        backgroundJobs: state.backgroundJobs.map((job) => {
+          if (job.name === payload.name) {
+            const totalCompletedTasks = (job.completedTasks ?? 0) + payload.count;
+            return {
+              ...job,
+              timePerTask: payload.timePerTask ?? job.timePerTask,
+              completedTasks: totalCompletedTasks,
+              totalTasks: (job.totalTasks ?? totalCompletedTasks),
+            };
+          }
+          return job;
+        }),
       };
     },
   },

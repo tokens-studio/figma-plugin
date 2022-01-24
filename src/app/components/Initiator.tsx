@@ -1,13 +1,13 @@
 import React from 'react';
 import { useDispatch } from 'react-redux';
-import { MessageFromPluginTypes, MessageToPluginTypes } from '@/types/messages';
 import { identify, track } from '@/utils/analytics';
+import { MessageFromPluginTypes, MessageToPluginTypes, PostToUIMessage } from '@/types/messages';
 import { postToFigma } from '../../plugin/notifiers';
 import useRemoteTokens from '../store/remoteTokens';
 import { Dispatch } from '../store';
 import useStorage from '../store/useStorage';
 
-export default function Initiator() {
+export function Initiator() {
   const dispatch = useDispatch<Dispatch>();
 
   const { pullTokens } = useRemoteTokens();
@@ -19,13 +19,16 @@ export default function Initiator() {
 
   React.useEffect(() => {
     onInitiate();
-    window.onmessage = async (event) => {
+    window.onmessage = async (event: {
+      data: {
+        pluginMessage: PostToUIMessage
+      }
+    }) => {
       if (event.data.pluginMessage) {
-        const {
-          type, values, credentials, status, storageType, lastOpened, providers, user, settings,
-        } = event.data.pluginMessage;
-        switch (type) {
+        const { pluginMessage } = event.data;
+        switch (pluginMessage.type) {
           case MessageFromPluginTypes.SELECTION: {
+            const { values } = pluginMessage;
             dispatch.uiState.setDisabled(false);
             if (values) {
               dispatch.uiState.setSelectionValues(values);
@@ -40,28 +43,29 @@ export default function Initiator() {
             break;
           }
           case MessageFromPluginTypes.REMOTE_COMPONENTS:
-            dispatch.uiState.setLoading(false);
             break;
           case MessageFromPluginTypes.TOKEN_VALUES: {
-            dispatch.uiState.setLoading(false);
+            const { values } = pluginMessage;
             if (values) {
               dispatch.tokenState.setTokenData(values);
               dispatch.uiState.setActiveTab('tokens');
             }
             break;
           }
-          case MessageFromPluginTypes.STYLES:
-            dispatch.uiState.setLoading(false);
+          case MessageFromPluginTypes.STYLES: {
+            const { values } = pluginMessage;
             if (values) {
               track('Import styles');
               dispatch.tokenState.setTokensFromStyles(values);
               dispatch.uiState.setActiveTab('tokens');
             }
             break;
+          }
           case MessageFromPluginTypes.RECEIVED_STORAGE_TYPE:
-            setStorageType({ provider: storageType });
+            setStorageType({ provider: pluginMessage.storageType });
             break;
           case MessageFromPluginTypes.API_CREDENTIALS: {
+            const { status, credentials } = pluginMessage;
             if (status === true) {
               track('Fetched from remote', { provider: credentials.provider });
               if (!credentials.internalId) track('missingInternalId', { provider: credentials.provider });
@@ -70,26 +74,53 @@ export default function Initiator() {
               dispatch.uiState.setLocalApiState(credentials);
               await pullTokens(credentials);
               dispatch.uiState.setActiveTab('tokens');
-              dispatch.uiState.setLoading(false);
             }
             break;
           }
           case MessageFromPluginTypes.API_PROVIDERS: {
-            dispatch.uiState.setAPIProviders(providers);
+            dispatch.uiState.setAPIProviders(pluginMessage.providers);
             break;
           }
           case MessageFromPluginTypes.UI_SETTINGS: {
-            dispatch.settings.setUISettings(settings);
+            dispatch.settings.setUISettings(pluginMessage.settings);
             dispatch.settings.triggerWindowChange();
             break;
           }
           case MessageFromPluginTypes.USER_ID: {
-            identify(user);
+            identify(pluginMessage.user);
             track('Launched');
             break;
           }
           case MessageFromPluginTypes.RECEIVED_LAST_OPENED: {
-            dispatch.uiState.setLastOpened(lastOpened);
+            dispatch.uiState.setLastOpened(pluginMessage.lastOpened);
+            break;
+          }
+          case MessageFromPluginTypes.START_JOB: {
+            dispatch.uiState.startJob(pluginMessage.job);
+            break;
+          }
+          case MessageFromPluginTypes.COMPLETE_JOB: {
+            dispatch.uiState.completeJob(pluginMessage.name);
+            break;
+          }
+          case MessageFromPluginTypes.CLEAR_JOBS: {
+            dispatch.uiState.clearJobs();
+            break;
+          }
+          case MessageFromPluginTypes.ADD_JOB_TASKS: {
+            dispatch.uiState.addJobTasks({
+              name: pluginMessage.name,
+              count: pluginMessage.count,
+              expectedTimePerTask: pluginMessage.expectedTimePerTask,
+            });
+            break;
+          }
+          case MessageFromPluginTypes.COMPLETE_JOB_TASKS: {
+            dispatch.uiState.completeJobTasks({
+              name: pluginMessage.name,
+              count: pluginMessage.count,
+              timePerTask: pluginMessage.timePerTask,
+            });
             break;
           }
           default:

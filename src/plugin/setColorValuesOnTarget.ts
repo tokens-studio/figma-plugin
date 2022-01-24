@@ -1,3 +1,4 @@
+import { isPaintEqual } from '@/utils/isPaintEqual';
 import { convertToFigmaColor } from './figmaTransforms/colors';
 import { convertStringToFigmaGradient } from './figmaTransforms/gradients';
 
@@ -6,15 +7,20 @@ export default function setColorValuesOnTarget(target, token, key = 'paints') {
     const { description, value } = token;
     if (value.startsWith('linear-gradient')) {
       const { gradientStops, gradientTransform } = convertStringToFigmaGradient(value);
-      const newPaint = {
+      const newPaint: GradientPaint = {
         type: 'GRADIENT_LINEAR',
         gradientTransform,
         gradientStops,
       };
-      target[key] = [newPaint];
+      if (!isPaintEqual(newPaint, target[key][0])) {
+        target[key] = [newPaint];
+      }
     } else {
       const { color, opacity } = convertToFigmaColor(value);
-      target[key] = [{ color, opacity, type: 'SOLID' }];
+      const newPaint: SolidPaint = { color, opacity, type: 'SOLID' };
+      if (!isPaintEqual(newPaint, target[key][0])) {
+        target[key] = [newPaint];
+      }
     }
 
     if (description) {

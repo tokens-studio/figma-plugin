@@ -33,7 +33,13 @@ export async function getUserId() {
   return userId;
 }
 
-export function transformValue(value, type) {
+export function transformValue(value: string, type: 'letterSpacing'): LetterSpacing | null;
+export function transformValue(value: string, type: 'lineHeights'): LineHeight | null;
+export function transformValue(value: string, type: 'boxShadowType'): ReturnType<typeof convertBoxShadowTypeToFigma>;
+export function transformValue(value: string, type: 'textCase'): ReturnType<typeof convertTextCaseToFigma>;
+export function transformValue(value: string, type: 'textDecoration'): ReturnType<typeof convertTextDecorationToFigma>;
+export function transformValue(value: string, type: string): number;
+export function transformValue(value: string, type: string) {
   switch (type) {
     case 'borderWidth':
     case 'width':

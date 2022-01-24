@@ -1,58 +1,60 @@
-export default async function removeValuesFromNode(node, prop) {
+import { Properties } from '@/constants/Properties';
+
+export default function removeValuesFromNode(node: BaseNode, prop: Properties) {
   // BORDER RADIUS
   switch (prop) {
     case 'borderRadius':
-      if (typeof node.cornerRadius !== 'undefined') {
+      if ('cornerRadius' in node && typeof node.cornerRadius !== 'undefined') {
         node.cornerRadius = 0;
       }
       break;
     case 'borderRadiusTopLeft':
-      if (typeof node.cornerRadius !== 'undefined') {
+      if ('topLeftRadius' in node && typeof node.topLeftRadius !== 'undefined') {
         node.topLeftRadius = 0;
       }
       break;
     case 'borderRadiusTopRight':
-      if (typeof node.cornerRadius !== 'undefined') {
+      if ('topRightRadius' in node && typeof node.topRightRadius !== 'undefined') {
         node.topRightRadius = 0;
       }
       break;
     case 'borderRadiusBottomRight':
-      if (typeof node.cornerRadius !== 'undefined') {
+      if ('bottomRightRadius' in node && typeof node.bottomRightRadius !== 'undefined') {
         node.bottomRightRadius = 0;
       }
       break;
     case 'borderRadiusBottomLeft':
-      if (typeof node.cornerRadius !== 'undefined') {
+      if ('bottomLeftRadius' in node && typeof node.bottomLeftRadius !== 'undefined') {
         node.bottomLeftRadius = 0;
       }
       break;
     case 'borderWidth':
-      if (typeof node.strokeWeight !== 'undefined') {
+      if ('strokeWeight' in node && typeof node.strokeWeight !== 'undefined') {
         node.strokeWeight = 0;
       }
       break;
     case 'boxShadow':
-      if (typeof node.effects !== 'undefined') {
+      if ('effects' in node && typeof node.effects !== 'undefined') {
         node.effects = node.effects.filter((effect) => effect.type !== 'DROP_SHADOW');
       }
       break;
     case 'opacity':
-      if (typeof node.opacity !== 'undefined') {
+      if ('opacity' in node && typeof node.opacity !== 'undefined') {
         node.opacity = 1;
       }
       break;
     case 'fill':
-      if (typeof node.fills !== 'undefined') {
+      if ('fills' in node && typeof node.fills !== 'undefined') {
         node.fills = [];
       }
       break;
     case 'border':
-      if (typeof node.strokes !== 'undefined') {
+      if ('strokes' in node && typeof node.strokes !== 'undefined') {
         node.strokes = [];
       }
       break;
     case 'spacing':
-      if (typeof node.paddingLeft !== 'undefined') {
+      if ('paddingLeft' in node && typeof node.paddingLeft !== 'undefined') {
         node.paddingLeft = 0;
         node.paddingRight = 0;
         node.paddingTop = 0;
@@ -61,39 +63,39 @@ export default async function removeValuesFromNode(node, prop) {
       }
       break;
     case 'paddingTop':
-      if (typeof node.paddingTop !== 'undefined') {
+      if ('paddingTop' in node && typeof node.paddingTop !== 'undefined') {
         node.paddingTop = 0;
       }
       break;
     case 'paddingRight':
-      if (typeof node.paddingRight !== 'undefined') {
+      if ('paddingRight' in node && typeof node.paddingRight !== 'undefined') {
         node.paddingRight = 0;
       }
       break;
     case 'paddingBottom':
-      if (typeof node.paddingBottom !== 'undefined') {
+      if ('paddingBottom' in node && typeof node.paddingBottom !== 'undefined') {
         node.paddingBottom = 0;
       }
       break;
     case 'paddingLeft':
-      if (typeof node.paddingLeft !== 'undefined') {
+      if ('paddingLeft' in node && typeof node.paddingLeft !== 'undefined') {
         node.paddingLeft = 0;
       }
       break;
     case 'horizontalPadding':
-      if (typeof node.paddingLeft !== 'undefined') {
+      if ('paddingLeft' in node && typeof node.paddingLeft !== 'undefined') {
         node.paddingLeft = 0;
         node.paddingRight = 0;
       }
       break;
     case 'verticalPadding':
-      if (typeof node.paddingTop !== 'undefined') {
+      if ('paddingTop' in node && typeof node.paddingTop !== 'undefined') {
         node.paddingTop = 0;
         node.paddingBottom = 0;
       }
       break;
     case 'itemSpacing':
-      if (typeof node.itemSpacing !== 'undefined') {
+      if ('itemSpacing' in node && typeof node.itemSpacing !== 'undefined') {
         node.itemSpacing = 0;
       }
       break;

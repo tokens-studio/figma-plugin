@@ -1,11 +1,11 @@
 type State = {
-  remoteComponents: (BaseNode | SceneNode)[];
-  successfulNodes: (BaseNode | SceneNode)[];
+  remoteComponents: Set<BaseNode | SceneNode>;
+  successfulNodes: Set<BaseNode | SceneNode>;
 };
 
 const store: State = {
-  remoteComponents: [],
-  successfulNodes: [],
+  remoteComponents: new Set(),
+  successfulNodes: new Set(),
 };
 
 export default store;

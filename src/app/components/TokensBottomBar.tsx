@@ -4,19 +4,35 @@ import { track } from '@/utils/analytics';
 import { Dispatch, RootState } from '../store';
 import useTokens from '../store/useTokens';
 import ApplySelector from './ApplySelector';
-
+import { UpdateMode } from '@/types/state';
 import Button from './Button';
+import useConfirm from '../hooks/useConfirm';
 
 export default function TokensBottomBar() {
   const { updateDocument } = useDispatch<Dispatch>().tokenState;
   const { editProhibited } = useSelector((state: RootState) => state.tokenState);
+  const { updateMode = UpdateMode.PAGE } = useSelector((state: RootState) => state.settings);
+  const {
+    confirm,
+  } = useConfirm();
+  const shouldConfirm = React.useMemo(() => updateMode === UpdateMode.DOCUMENT, [updateMode]);
 
-  const handleUpdate = async () => {
+  const handleUpdate = React.useCallback(async () => {
     track('Update Tokens');
-    updateDocument();
-  };
+    if (shouldConfirm) {
+      confirm({
+        text: 'Are you sure?',
+        description: 'You are about to run a document wide update. This operation can take more than 30 minutes on very large documents.',
+      }).then(({ result }) => {
+        if (result) {
+          updateDocument();
+        }
+      });
+    } else {
+      updateDocument();
+    }
+  }, [confirm, shouldConfirm]);
   const { pullStyles } = useTokens();
-
   const { createStylesFromTokens } = useTokens();
 
   return (

@@ -2,7 +2,9 @@ import { mapValuesToTokens, returnValueToLookFor } from './node';
 
 describe('mapValuesToTokens', () => {
   it('maps values to tokens', () => {
-    const tokens = [{ name: 'global.colors.blue', type: 'color', value: '#0000ff' }];
+    const tokens = new Map([
+      ['global.colors.blue', { name: 'global.colors.blue', type: 'color' as const, value: '#0000ff' }],
+    ]);
 
     const values = { fill: 'global.colors.blue' };
     expect(mapValuesToTokens(tokens, values)).toEqual({

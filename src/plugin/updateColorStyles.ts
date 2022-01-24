@@ -1,19 +1,18 @@
 import { SingleTokenObject } from '@/types/tokens';
 import { ColorToken } from '../types/propertyTypes';
-import filterMatchingStyles from './figmaUtils/filterMatchingStyles';
 import setColorValuesOnTarget from './setColorValuesOnTarget';
+import { normalizeTokenName } from '@/utils/normalizeTokenName';
+import { getPaintStylesKeyMap } from '@/utils/getPaintStylesKeyMap';
 
 // Iterate over colorTokens to create objects that match figma styles
 export default function updateColorStyles(colorTokens: SingleTokenObject[], shouldCreate = false) {
-  const paints = figma.getLocalPaintStyles();
+  const paintToKeyMap = getPaintStylesKeyMap();
 
-  colorTokens.map((token: ColorToken) => {
-    let matchingStyles = [];
-    if (paints.length > 0) {
-      matchingStyles = filterMatchingStyles(token, paints);
-    }
-    if (matchingStyles.length) {
-      setColorValuesOnTarget(matchingStyles[0], token);
+  colorTokens.forEach((token: ColorToken) => {
+    const trimmedKey = normalizeTokenName(token.name);
+
+    if (paintToKeyMap.has(trimmedKey)) {
+      setColorValuesOnTarget(paintToKeyMap.get(trimmedKey)!, token);
     } else if (shouldCreate) {
       const style = figma.createPaintStyle();
       style.name = token.name;
