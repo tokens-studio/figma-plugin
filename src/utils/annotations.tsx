@@ -1,9 +1,13 @@
 import {notifyUI} from '@/plugin/notifiers';
 
 const DIST = 80;
+const BASE_SIZE = 12;
+const FONT_CODE = {family: 'Roboto Mono', style: 'Regular'};
+const FONT_TITLE = {family: 'Roboto Mono', style: 'Bold'};
 const BG_COLOR = {r: 0.1, g: 0.1, b: 0.1};
 const STROKE_COLOR = {r: 0.482, g: 0.38, b: 1};
-const PROP_COLOR = {r: 1, g: 1, b: 1};
+const TITLE_COLOR = {r: 1, g: 1, b: 1};
+const PROP_COLOR = {r: 0.9, g: 0.9, b: 0.9};
 const VALUE_COLOR = {r: 1, g: 0.839, b: 0.078};
 
 function getParentSelection(sel, distance, direction, position = {x: 0, y: 0, width: 0}) {
@@ -68,29 +72,40 @@ function createProperties(anno, tokens) {
     for (const [key, value] of Object.entries(tokens)) {
         const prop = figma.createFrame();
         prop.layoutMode = 'HORIZONTAL';
-        prop.itemSpacing = 8;
+        prop.counterAxisAlignItems = 'CENTER';
+        prop.itemSpacing = BASE_SIZE / 2;
         prop.fills = [{visible: false, type: 'SOLID', color: BG_COLOR}];
         prop.primaryAxisSizingMode = 'AUTO';
         prop.counterAxisSizingMode = 'AUTO';
-        prop.name = 'annotation-prop';
 
         const propText = figma.createText();
         const propValue = figma.createText();
-        propText.fontName = propValue.fontName = {family: 'Roboto Mono', style: 'Regular'};
-        propText.fontSize = propValue.fontSize = 14;
-        propText.fills = [{type: 'SOLID', color: PROP_COLOR}];
+        propText.fontName = propValue.fontName = FONT_CODE;
+        propText.fontSize = propValue.fontSize = BASE_SIZE;
         propValue.fills = [{type: 'SOLID', color: VALUE_COLOR}];
 
-        propText.characters = `${key}:`;
-        propValue.characters = value as string;
+        if (key === 'annoTitle') {
+            prop.name = 'annotation-title';
+            propText.fontName = FONT_TITLE;
+            propText.characters = value as string;
+            propText.fills = [{type: 'SOLID', color: TITLE_COLOR}];
+            prop.appendChild(propText);
+        } else {
+            prop.name = 'annotation-prop';
+            propText.characters = `${key}:`;
+            propText.fills = [{type: 'SOLID', color: PROP_COLOR}];
+            propValue.characters = value as string;
+            prop.appendChild(propText);
+            prop.appendChild(propValue);
+        }
 
-        prop.appendChild(propText);
-        prop.appendChild(propValue);
         anno.appendChild(prop);
     }
 }
 
 function createAnno(tokens, direction) {
+    const selection = figma.currentPage.selection[0];
+
     /* Create the alignment container */
     const cont = figma.createFrame();
     cont.layoutMode = ['top', 'bottom'].includes(direction) ? 'VERTICAL' : 'HORIZONTAL';
@@ -102,26 +117,25 @@ function createAnno(tokens, direction) {
     /* Create the annotation card */
     const anno = figma.createFrame();
     anno.layoutMode = 'VERTICAL';
-    anno.paddingTop = anno.paddingLeft = anno.paddingBottom = anno.paddingRight = 16;
-    anno.itemSpacing = 8;
+    anno.paddingTop = anno.paddingLeft = anno.paddingBottom = anno.paddingRight = BASE_SIZE;
+    anno.itemSpacing = BASE_SIZE / 2;
     anno.fills = [{type: 'SOLID', color: BG_COLOR}];
     anno.strokes = [{type: 'SOLID', color: STROKE_COLOR}];
     anno.strokeWeight = 1;
-    anno.cornerRadius = 8;
+    anno.cornerRadius = BASE_SIZE / 2;
     anno.primaryAxisSizingMode = anno.counterAxisSizingMode = 'AUTO';
     anno.name = 'annotation-card';
 
     /* Add the tokens */
-    createProperties(anno, tokens);
+    createProperties(anno, Object.assign({annoTitle: selection.name}, tokens));
 
     /* Position the container */
-    const selection = figma.currentPage.selection[0];
     const position = calcPosition(selection, anno, direction);
     cont.x = position.x;
     cont.y = position.y;
 
     /* Rename the annotation based on selection */
-    cont.name = `${selection.name}_annotation`;
+    cont.name = `__[annotation]_${selection.name}`;
 
     /* Add the arrow */
     const arrowAnchor = figma.createFrame();
@@ -179,9 +193,15 @@ function createAnno(tokens, direction) {
 
 // update credentials
 export async function createAnnotation(tokens, direction) {
-    await figma.loadFontAsync({family: 'Roboto Mono', style: 'Regular'});
+    const loadFonts = async () => {
+        await figma.loadFontAsync(FONT_CODE);
+        await figma.loadFontAsync(FONT_TITLE);
+
+        console.log('Awaiting the fonts.');
+    };
+
     try {
-        await createAnno(tokens, direction);
+        loadFonts().then(() => createAnno(tokens, direction));
     } catch (err) {
         console.log(err);
         notifyUI('There was an issue creating the annotation. Please try again.');
