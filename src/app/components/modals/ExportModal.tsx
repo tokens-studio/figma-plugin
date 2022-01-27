@@ -4,9 +4,15 @@ import Heading from '../Heading';
 import Textarea from '../Textarea';
 import Button from '../Button';
 import Modal from '../Modal';
+import Checkbox from '../Checkbox';
+import Label from '../Label';
+import Box from '../Box';
 
 export default function ExportModal({ onClose }) {
   const { getFormattedTokens } = useTokens();
+  const [includeAllTokens, setIncludeAllTokens] = React.useState(false);
+  const [includeParent, setIncludeParent] = React.useState(true);
+  const [expandTypography, setExpandTypography] = React.useState(false);
 
   return (
     <Modal large isOpen close={onClose}>
@@ -25,14 +31,54 @@ export default function ExportModal({ onClose }) {
           </a>
           .
         </p>
+        <Box css={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+          <Box css={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+            <Checkbox
+              id="includeAllTokens"
+              checked={includeAllTokens}
+              defaultChecked={includeAllTokens}
+              onCheckedChange={() => setIncludeAllTokens(!includeAllTokens)}
+            />
+            <Label htmlFor="includeAllTokens">All token sets</Label>
+          </Box>
+          <Box css={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+            <Checkbox
+              disabled={includeAllTokens}
+              id="includeParent"
+              checked={includeParent}
+              defaultChecked={includeParent}
+              onCheckedChange={() => setIncludeParent(!includeParent)}
+            />
+            <Label disabled={includeAllTokens} htmlFor="includeParent">
+              Include parent key
+            </Label>
+          </Box>
+          <Box css={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+            <Checkbox
+              id="expandTypography"
+              checked={expandTypography}
+              defaultChecked={expandTypography}
+              onCheckedChange={() => setExpandTypography(!expandTypography)}
+            />
+            <Label htmlFor="expandTypography">Expand Typography</Label>
+          </Box>
+        </Box>
+
         <Heading size="small">Output example</Heading>
-        <Textarea className="grow" rows={10} isDisabled value={getFormattedTokens()} />
+        <Textarea
+          className="grow"
+          rows={10}
+          isDisabled
+          value={getFormattedTokens({ includeAllTokens, includeParent, expandTypography })}
+        />
         <div className="space-x-4 flex justify-between">
           <Button variant="secondary" onClick={onClose}>
             Cancel
           </Button>
           <Button
-            href={`data:text/json;charset=utf-8,${encodeURIComponent(getFormattedTokens())}`}
+            href={`data:text/json;charset=utf-8,${encodeURIComponent(
+              getFormattedTokens({ includeAllTokens, includeParent, expandTypography }),
+            )}`}
             download="tokens.json"
             variant="primary"
             size="large"

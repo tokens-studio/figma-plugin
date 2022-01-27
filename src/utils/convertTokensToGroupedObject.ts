@@ -1,7 +1,7 @@
 import set from 'set-value';
 import { appendTypeToToken } from '@/app/components/createTokenObj';
 
-export default function convertTokensToGroupedObject(tokens, excludedSets) {
+export default function convertTokensToGroupedObject(tokens, excludedSets, expandTypography = false) {
   let tokenObj = {};
   tokenObj = tokens.reduce((acc, token) => {
     if (excludedSets.includes(token.internal__Parent)) {
@@ -12,7 +12,7 @@ export default function convertTokensToGroupedObject(tokens, excludedSets) {
     delete tokenWithType.name;
     delete tokenWithType.rawValue;
     delete tokenWithType.internal__Parent;
-    if (tokenWithType.type === 'typography') {
+    if (!!expandTypography && tokenWithType.type === 'typography') {
       const expandedTypography = Object.entries(tokenWithType.value).reduce((acc, [key, val]) => {
         acc[key] = {
           value: val,
@@ -25,5 +25,6 @@ export default function convertTokensToGroupedObject(tokens, excludedSets) {
     }
     return acc;
   }, {});
+
   return tokenObj;
 }

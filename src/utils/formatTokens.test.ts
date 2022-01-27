@@ -29,7 +29,7 @@ describe('formatTokens', () => {
       ],
     };
 
-    expect(formatTokens(typographyTokens, 'global')).toEqual(
+    expect(formatTokens({ tokens: typographyTokens, tokenSets: ['global'], expandTypography: true })).toEqual(
       JSON.stringify(
         {
           global: {

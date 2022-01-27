@@ -1,9 +1,17 @@
 import { mergeTokenGroups, resolveTokenValues } from '@/plugin/tokenHelpers';
+import { TransformerOptions } from './types';
 import convertTokensToGroupedObject from './convertTokensToGroupedObject';
 import parseTokenValues from './parseTokenValues';
 
 // Takes Figma Tokens input, resolves all aliases while respecting user's theme choice and outputs an object with resolved tokens, ready to be consumed by style dictionary.
-export default function convertTokensObjectToResolved(tokens, usedSets = [], excludedSets = []) {
+export default function convertTokensObjectToResolved(
+  tokens,
+  usedSets = [],
+  excludedSets = [],
+  options: TransformerOptions = {
+    expandTypography: false,
+  },
+) {
   // Parse tokens into array structure
   const parsed = parseTokenValues(tokens);
   // Merge to one giant array
@@ -11,6 +19,6 @@ export default function convertTokensObjectToResolved(tokens, usedSets = [], exc
   // Resolve aliases
   const resolved = resolveTokenValues(merged);
   // Group back into one object
-  const object = convertTokensToGroupedObject(resolved, excludedSets);
+  const object = convertTokensToGroupedObject(resolved, excludedSets, options.expandTypography);
   return object;
 }

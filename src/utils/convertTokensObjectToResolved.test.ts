@@ -43,40 +43,7 @@ describe('convertTokensObjectToResolved', () => {
       },
     };
 
-    expect(convertTokensObjectToResolved(tokens)).toEqual({
-      colors: {
-        red: {
-          value: '#ff0000',
-          type: 'color',
-        },
-        blue: {
-          value: '#0000ff',
-          type: 'color',
-        },
-        primary: {
-          value: '#ff0000',
-          type: 'color',
-        },
-      },
-      sizing: {
-        base: {
-          value: 2,
-          type: 'sizing',
-        },
-        scale: {
-          value: 1.5,
-          type: 'sizing',
-        },
-        small: {
-          value: 2,
-          type: 'sizing',
-        },
-        medium: {
-          value: 3,
-          type: 'sizing',
-        },
-      },
-    });
+    expect(convertTokensObjectToResolved(tokens)).toMatchSnapshot();
   });
 
   it('respects used sets', () => {
@@ -111,21 +78,42 @@ describe('convertTokensObjectToResolved', () => {
       },
     };
 
-    expect(convertTokensObjectToResolved(tokens, ['global', 'light'])).toEqual({
-      colors: {
-        white: {
-          value: '#ffffff',
-          type: 'color',
+    expect(convertTokensObjectToResolved(tokens, ['global', 'light'])).toMatchSnapshot();
+  });
+
+  it('does not expand typography when not needed', () => {
+    const tokens = {
+      options: [
+        {
+          name: 'typography.h1',
+          type: 'typography',
+          value: {
+            fontFamily: 'Roboto',
+            fontSize: '96',
+            fontWeight: 'Light',
+          },
         },
-        black: {
-          value: '#000000',
-          type: 'color',
+        {
+          name: 'typography.h2',
+          type: 'typography',
+          value: {
+            fontFamily: 'Roboto',
+            fontSize: '60',
+            fontWeight: 'Light',
+          },
         },
-        background: {
-          value: '#ffffff',
-          type: 'color',
+        {
+          name: 'typography.h3',
+          type: 'typography',
+          value: {
+            fontFamily: 'Roboto',
+            fontSize: '48',
+            fontWeight: 'Light',
+          },
         },
-      },
-    });
+      ],
+    };
+
+    expect(convertTokensObjectToResolved(tokens, [], [], { expandTypography: false })).toMatchSnapshot();
   });
 });

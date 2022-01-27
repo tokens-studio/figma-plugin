@@ -34,14 +34,22 @@ function Checkbox({
   id = null,
   onCheckedChange,
   defaultChecked = false,
+  disabled = false,
 }: {
   checked: boolean;
   id: string;
   onCheckedChange: any;
   defaultChecked: boolean;
+  disabled?: boolean;
 }) {
   return (
-    <StyledCheckbox id={id} checked={checked} onCheckedChange={onCheckedChange} defaultChecked={defaultChecked}>
+    <StyledCheckbox
+      id={id}
+      disabled={disabled}
+      checked={checked}
+      onCheckedChange={onCheckedChange}
+      defaultChecked={defaultChecked}
+    >
       <StyledIndicator>
         <CheckIcon />
       </StyledIndicator>

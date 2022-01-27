@@ -1,5 +1,8 @@
 import * as React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import {
+  useDispatch, useSelector,
+} from 'react-redux';
+import { ShadowTokenSingleValue } from '@types/propertyTypes';
 import getAliasValue from '@/utils/aliases';
 import { track } from '@/utils/analytics';
 import checkIfContainsAlias from '@/utils/checkIfContainsAlias';
@@ -46,6 +49,16 @@ function EditTokenForm({ resolvedTokens }) {
       e.persist();
       if (internalEditToken) {
         setInternalEditToken({ ...internalEditToken, [e.target.name]: e.target.value });
+      }
+    },
+    [internalEditToken],
+  );
+
+  const handleShadowChange = React.useCallback(
+    (shadow: ShadowTokenSingleValue | ShadowTokenSingleValue[]) => {
+      setError(null);
+      if (internalEditToken) {
+        setInternalEditToken({ ...internalEditToken, value: shadow });
       }
     },
     [internalEditToken],
@@ -154,7 +167,7 @@ function EditTokenForm({ resolvedTokens }) {
 
     switch (internalEditToken.type) {
       case 'boxShadow': {
-        return <BoxShadowInput />;
+        return <BoxShadowInput setValue={handleShadowChange} value={internalEditToken.value} />;
       }
       case 'typography': {
         return Object.entries(internalEditToken.schema).map(([key, schemaValue]: [string, string]) => (
@@ -205,10 +218,10 @@ function EditTokenForm({ resolvedTokens }) {
               <ColorPicker value={internalEditToken.value} onChange={handleColorValueChange} />
             )}
             {checkIfContainsAlias(internalEditToken.value) && (
-              <div className="p-2 rounded bg-gray-100 border-gray-300 font-mono text-xxs mt-2 text-gray-700 flex itms-center">
+              <div className="flex p-2 mt-2 font-mono text-gray-700 bg-gray-100 border-gray-300 rounded text-xxs itms-center">
                 {internalEditToken.type === 'color' ? (
                   <div
-                    className="w-4 h-4 rounded border border-gray-200 mr-1"
+                    className="w-4 h-4 mr-1 border border-gray-200 rounded"
                     style={{ background: resolvedValue }}
                   />
                 ) : null}
@@ -222,7 +235,7 @@ function EditTokenForm({ resolvedTokens }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 flex flex-col justify-start">
+    <form onSubmit={handleSubmit} className="flex flex-col justify-start space-y-4">
       <Input
         required
         full
@@ -238,7 +251,7 @@ function EditTokenForm({ resolvedTokens }) {
       {renderTokenForm()}
 
       {internalEditToken?.explainer && (
-        <div className="mt-1 text-xxs text-gray-600">{internalEditToken?.explainer}</div>
+        <div className="mt-1 text-gray-600 text-xxs">{internalEditToken.explainer}</div>
       )}
       {internalEditToken?.optionsSchema
         ? Object.entries(internalEditToken?.optionsSchema).map(([key, schemaValue]: [string, string]) => (
@@ -255,7 +268,7 @@ function EditTokenForm({ resolvedTokens }) {
           />
         ))
         : null}
-      <div className="flex space-x-2 justify-end">
+      <div className="flex justify-end space-x-2">
         <button className="button button-link" type="button" onClick={handleReset}>
           Cancel
         </button>
