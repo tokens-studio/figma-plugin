@@ -1,3 +1,3 @@
 export interface TransformerOptions {
-    expandTypography: boolean;
+  expandTypography: boolean;
 }

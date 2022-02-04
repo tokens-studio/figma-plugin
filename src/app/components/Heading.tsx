@@ -1,9 +1,13 @@
 import * as React from 'react';
 
-const Heading = ({size = '', children, keepCase = true, id = null}) => (
+function Heading({
+  size = '', children, keepCase = true, id = null,
+}) {
+  return (
     <p data-cy={id} className={`heading ${keepCase ? '' : 'capitalize'} ${size === 'small' ? 'heading-small' : ''}`}>
-        {children}
+      {children}
     </p>
-);
+  );
+}
 
 export default Heading;

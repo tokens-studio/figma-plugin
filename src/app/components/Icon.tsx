@@ -22,31 +22,31 @@ import IconBell from './icons/IconBell';
 import IconLibrary from './icons/IconLibrary';
 
 const icons = {
-    edit: IconEdit,
-    add: IconAdd,
-    loading: IconLoading,
-    style: IconStyle,
-    help: IconHelp,
-    github: IconGithub,
-    HorizontalPadding: IconHorizontalPadding,
-    VerticalPadding: IconVerticalPadding,
-    Gap: IconGap,
-    Spacing: IconSpacing,
-    list: IconList,
-    grid: IconGrid,
-    blend: IconBlend,
-    blendempty: IconBlendEmpty,
-    import: IconImport,
-    folder: IconFolder,
-    refresh: IconRefresh,
-    trash: IconTrash,
-    bell: IconBell,
-    library: IconLibrary,
+  edit: IconEdit,
+  add: IconAdd,
+  loading: IconLoading,
+  style: IconStyle,
+  help: IconHelp,
+  github: IconGithub,
+  HorizontalPadding: IconHorizontalPadding,
+  VerticalPadding: IconVerticalPadding,
+  Gap: IconGap,
+  Spacing: IconSpacing,
+  list: IconList,
+  grid: IconGrid,
+  blend: IconBlend,
+  blendempty: IconBlendEmpty,
+  import: IconImport,
+  folder: IconFolder,
+  refresh: IconRefresh,
+  trash: IconTrash,
+  bell: IconBell,
+  library: IconLibrary,
 };
 
-const Icon = ({name}) => {
-    const IconName = icons[name];
-    return <IconName />;
-};
+function Icon({ name }) {
+  const IconName = icons[name];
+  return <IconName />;
+}
 
 export default Icon;

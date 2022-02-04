@@ -1,12 +1,12 @@
-import {init, RematchDispatch, RematchRootState} from '@rematch/core';
-import {models, RootModel} from './store/models';
+import { init, RematchDispatch, RematchRootState } from '@rematch/core';
+import { models, RootModel } from './store/models';
 
 export const store = init({
-    models,
-    redux: {
-        devtoolOptions: {},
-        rootReducers: {RESET_APP: () => undefined},
-    },
+  models,
+  redux: {
+    devtoolOptions: {},
+    rootReducers: { RESET_APP: () => undefined },
+  },
 });
 
 export type Store = typeof store;

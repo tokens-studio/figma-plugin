@@ -1,6 +1,6 @@
 {
   "name": "token-transformer",
-  "version": "0.0.16",
+  "version": "0.0.17",
   "description": "A utility that transforms tokens from Figma Tokens to a format that is readable by Style Dictionary.",
   "main": "index.js",
   "scripts": {
@@ -11,5 +11,9 @@
   "bin": "index.js",
   "dependencies": {
     "yargs": "^17.3.1"
-  }
+  },
+  "files": [
+    "index.js",
+    "dist"
+  ]
 }
