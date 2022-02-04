@@ -102,6 +102,7 @@ export default function TokenSetSelector() {
         <div className="flex justify-center flex-col text-center space-y-4">
           <Heading>
             Rename
+            {' '}
             {tokenSetMarkedForChange}
           </Heading>
           <form onSubmit={handleRenameTokenSetSubmit} className="space-y-4">

@@ -36,6 +36,7 @@ function SyncSettings() {
               {' '}
               will
               become a color style of name
+              {' '}
               <code className="p-1 -m-1 font-bold">primary/500</code>
               . Since
               Version 53 you no longer need to prepend type to token names.
