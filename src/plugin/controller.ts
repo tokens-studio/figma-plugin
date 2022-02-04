@@ -56,7 +56,6 @@ figma.on('selectionchange', async () => {
 });
 
 figma.ui.on('message', async (msg: PostToFigmaMessage) => {
-  console.log('plugin', msg);
   switch (msg.type) {
     case MessageToPluginTypes.INITIATE:
       try {
