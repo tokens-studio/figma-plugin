@@ -1,27 +1,27 @@
-import {postToFigma} from '@/plugin/notifiers';
-import {useDispatch} from 'react-redux';
-import {StorageType} from 'Types/api';
-import {MessageToPluginTypes} from 'Types/messages';
-import {Dispatch} from '../store';
+import { useDispatch } from 'react-redux';
+import { postToFigma } from '@/plugin/notifiers';
+import { StorageType } from '@/types/api';
+import { MessageToPluginTypes } from '@/types/messages';
+import type { Dispatch } from '../store';
 
 export default function useStorage() {
-    const dispatch = useDispatch<Dispatch>();
+  const dispatch = useDispatch<Dispatch>();
 
-    function setStorageType({
-        provider,
-        shouldSetInDocument = false,
-    }: {
-        provider: StorageType;
-        shouldSetInDocument?: boolean;
-    }) {
-        if (shouldSetInDocument) {
-            postToFigma({
-                type: MessageToPluginTypes.SET_STORAGE_TYPE,
-                storageType: provider,
-            });
-        }
-        dispatch.uiState.setStorage(provider);
+  function setStorageType({
+    provider,
+    shouldSetInDocument = false,
+  }: {
+    provider: StorageType;
+    shouldSetInDocument?: boolean;
+  }) {
+    if (shouldSetInDocument) {
+      postToFigma({
+        type: MessageToPluginTypes.SET_STORAGE_TYPE,
+        storageType: provider,
+      });
     }
+    dispatch.uiState.setStorage(provider);
+  }
 
-    return {setStorageType};
+  return { setStorageType };
 }
