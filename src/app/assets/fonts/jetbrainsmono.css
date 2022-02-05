@@ -1,11 +1,11 @@
 @font-face {
-    font-family: 'JetBrainsMono';
-    font-weight: 400;
-    src: url('JetBrainsMono-Regular.woff2') format('woff2'), url('JetBrainsMono-Regular.woff') format('woff');
+  font-family: 'JetBrainsMono';
+  font-weight: 400;
+  src: url('JetBrainsMono-Regular.woff2') format('woff2'), url('JetBrainsMono-Regular.woff') format('woff');
 }
 
 @font-face {
-    font-family: 'JetBrainsMono';
-    font-weight: 700;
-    src: url('JetBrainsMono-Bold.woff2') format('woff2'), url('JetBrainsMono-Bold.woff') format('woff');
+  font-family: 'JetBrainsMono';
+  font-weight: 700;
+  src: url('JetBrainsMono-Bold.woff2') format('woff2'), url('JetBrainsMono-Bold.woff') format('woff');
 }

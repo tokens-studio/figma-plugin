@@ -1,0 +1,26 @@
+name: Move to Project
+
+on:
+  issues:
+    types:
+      - opened
+
+jobs:
+  add_to_project:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Add to project
+        uses: actions/github-script@v5
+        env:
+          ISSUE_ID: ${{ github.event.issue.node_id }}
+        with:
+          github-token: ${{ secrets.PAT }}
+          script: |
+            await github.graphql(`mutation($project:ID!,$issue:ID!) {
+                addProjectNextItem(input: {projectId: $project, contentId: $issue}) {
+                  projectNextItem {
+                    id
+                  }
+                }
+              }`, { project: "PN_kwHOAEVm1c0Z8A", issue: process.env.ISSUE_ID })
