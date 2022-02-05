@@ -14,6 +14,8 @@ export default function getAliasValue(token: SingleTokenObject | string | number
         if (ref.length > 1) {
           const nameToLookFor = ref.startsWith('{') ? ref.slice(1, ref.length - 1) : ref.substring(1);
 
+          if ((typeof token === 'object' && nameToLookFor === token.name) || nameToLookFor === token) return null;
+
           const foundToken = tokens.find((t) => t.name === nameToLookFor);
           if (typeof foundToken !== 'undefined') return getAliasValue(foundToken, tokens);
         }
@@ -37,6 +39,7 @@ export default function getAliasValue(token: SingleTokenObject | string | number
     }
   } catch (e) {
     console.log(`Error getting alias value of ${token}`, tokens);
+    return null;
   }
   return checkAndEvaluateMath(returnedValue);
 }
