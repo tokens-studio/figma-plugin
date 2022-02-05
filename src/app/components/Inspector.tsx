@@ -1,6 +1,6 @@
 import * as React from 'react';
-import {useSelector} from 'react-redux';
-import {RootState} from '../store';
+import { useSelector } from 'react-redux';
+import { RootState } from '../store';
 import useTokens from '../store/useTokens';
 import Button from './Button';
 import Icon from './Icon';
@@ -9,7 +9,7 @@ import createAnnotation from './createAnnotation';
 
 function Inspector() {
   const uiState = useSelector((state: RootState) => state.uiState);
-  const {findToken, removeNodeData} = useTokens();
+  const { findToken, removeNodeData } = useTokens();
 
   return (
     <div className="space-y-2 p-4">
@@ -56,9 +56,12 @@ function Inspector() {
           .map(([key, value]) => (
             <div key={key} className="flex flex-row justify-between items-start">
               <code className="flex space-x-2 flex-wrap">
-                <div className="font-bold">{key}</div>:{' '}
+                <div className="font-bold">{key}</div>
+                :
+                {' '}
                 <div className="p-1 bg-gray-700 rounded text-white text-xxs">
-                  ${typeof value === 'string' && value.split('.').join('-')}
+                  $
+                  {typeof value === 'string' && value.split('.').join('-')}
                 </div>
                 <div className="text-gray-500 break-all">{`/* ${JSON.stringify(findToken(value))} */`}</div>
               </code>
