@@ -42,6 +42,7 @@ export enum MessageToPluginTypes {
   SET_UI = 'set_ui',
   RESIZE_WINDOW = 'resize_window',
   CANCEL_OPERATION = 'cancel_operation',
+  CREATE_ANNOTATION = 'create-annotation',
 }
 
 export type NoSelectionFromPluginMessage = { type: MessageFromPluginTypes.NO_SELECTION };
@@ -203,6 +204,12 @@ export type ResizeWindowToPluginMessage = {
 export type CancelOperationToPluginMessage = {
   type: MessageToPluginTypes.CANCEL_OPERATION
 };
+export type CreateAnnotationToPluginMessage = {
+  type: MessageToPluginTypes.CREATE_ANNOTATION;
+  tokens: object;
+  direction: string;
+};
+
 export type PostToFigmaMessage =
     | InitiateToPluginMessage
     | RemoveSingleCredentialToPluginMessage
@@ -217,4 +224,5 @@ export type PostToFigmaMessage =
     | NotifyToPluginMessage
     | SetUiToPluginMessage
     | ResizeWindowToPluginMessage
-    | CancelOperationToPluginMessage;
+    | CancelOperationToPluginMessage
+    | CreateAnnotationToPluginMessage;

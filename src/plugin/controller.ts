@@ -29,6 +29,7 @@ import {
 import { MessageFromPluginTypes, MessageToPluginTypes, PostToFigmaMessage } from '../types/messages';
 import { StorageProviderType } from '../types/api';
 import compareProvidersWithStored from './compareProviders';
+import { createAnnotation } from '@/utils/annotations';
 import { defaultNodeManager } from './NodeManager';
 import { defaultWorker } from './Worker';
 import { tokenArrayGroupToMap } from '@/utils/tokenArrayGroupToMap';
@@ -204,6 +205,10 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
         ignoreFirstPartForStyles: msg.ignoreFirstPartForStyles,
       });
       figma.ui.resize(width, height);
+      break;
+    }
+    case MessageToPluginTypes.CREATE_ANNOTATION: {
+      createAnnotation(msg.tokens, msg.direction);
       break;
     }
     default:
