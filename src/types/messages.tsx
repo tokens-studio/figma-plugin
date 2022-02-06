@@ -46,7 +46,6 @@ export enum MessageToPluginTypes {
   CANCEL_OPERATION = 'cancel_operation',
   CREATE_ANNOTATION = 'create-annotation',
   REMAP_TOKENS = 'remap-tokens',
-  REMOVE_PLUGIN_DATA = 'remove_plugin_data',
   REMOVE_TOKENS_BY_VALUE = 'remove-tokens-by-value',
 }
 
@@ -181,8 +180,7 @@ export type SetNodeDataToPluginMessage = {
 };
 export type RemoveDataToPluginMessage = {
   type: MessageToPluginTypes.REMOVE_NODE_DATA;
-  key: Properties;
-  nodes: string[];
+  key?: Properties;
 };
 export type PullStylesToPluginMessage = {
   type: MessageToPluginTypes.PULL_STYLES;
@@ -221,10 +219,6 @@ export type RemapTokensToPluginMessage = {
   newName: string;
   updateMode: UpdateMode;
 };
-
-export type RemovePluginDataToPluginMessage = {
-  type: MessageToPluginTypes.REMOVE_PLUGIN_DATA;
-};
 export type RemoveTokensByValueToPluginMessage = {
   type: MessageToPluginTypes.REMOVE_TOKENS_BY_VALUE;
   tokensToRemove: { nodes: string[]; property: Properties }[];
@@ -247,5 +241,4 @@ export type PostToFigmaMessage =
     | CancelOperationToPluginMessage
     | CreateAnnotationToPluginMessage
     | RemapTokensToPluginMessage
-    | RemovePluginDataToPluginMessage
     | RemoveTokensByValueToPluginMessage;

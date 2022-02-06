@@ -19,7 +19,6 @@ export default function RemapHelper() {
 
   function handleSubmit() {
     remapToken(formData.oldName, formData.newName);
-    console.log('SUBMITTED');
     handleClose();
   }
 
@@ -36,7 +35,7 @@ export default function RemapHelper() {
       <Button
         type="button"
         size="small"
-        variant="ghost"
+        variant="secondary"
         onClick={() => setOpen(true)}
       >
         Remap tokens

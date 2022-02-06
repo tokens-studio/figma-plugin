@@ -147,7 +147,7 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
 
     case MessageToPluginTypes.REMOVE_NODE_DATA: {
       try {
-        const nodes = (await defaultNodeManager.findNodesWithData({ nodes: figma.currentPage.selection })).map((node) => node.node);
+        const nodes = (await defaultNodeManager.findNodesWithData({ nodes: figma.currentPage.selection })).filter((node) => node.id === msg.node).map((node) => node.node);
 
         await removePluginData({ nodes, key: msg.key, shouldRemoveValues: false });
         await sendPluginValues(figma.currentPage.selection);
@@ -159,18 +159,6 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
         remotes: store.remoteComponents,
       });
       return;
-    }
-    case MessageToPluginTypes.REMOVE_PLUGIN_DATA: {
-      const nodes = defaultNodeManager.findNodesWithData({
-        updateMode: UpdateMode.SELECTION,
-      });
-      const baseNodes = (await nodes).map((node) => node.node);
-      removePluginData({
-        nodes: baseNodes,
-        shouldRemoveValues: false,
-      });
-      sendPluginValues(figma.currentPage.selection);
-      break;
     }
     case MessageToPluginTypes.REMOVE_TOKENS_BY_VALUE: {
       msg.tokensToRemove.forEach((token) => {

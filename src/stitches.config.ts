@@ -50,10 +50,12 @@ export const {
       fgSubtle: globalTokens.colors.gray300,
       bgSubtle: globalTokens.colors.gray100,
       interaction: globalTokens.colors.primary500,
+      interactionSubtle: globalTokens.colors.primary400,
       onInteraction: globalTokens.colors.white,
       interactionDisabled: globalTokens.colors.gray600,
       dangerFg: globalTokens.colors.red500,
       border: globalTokens.colors.gray300,
+      borderMuted: globalTokens.colors.gray200,
       focus: globalTokens.colors.primary300,
     },
     space: {

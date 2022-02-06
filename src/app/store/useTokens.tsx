@@ -81,17 +81,18 @@ export default function useTokens() {
     }
   }
 
-  function removeTokensByValue(data?: { property: Properties; nodes: string }[]) {
+  function removeTokensByValue(data: { property: Properties; nodes: string[] }[]) {
     postToFigma({
       type: MessageToPluginTypes.REMOVE_TOKENS_BY_VALUE,
       tokensToRemove: data,
     });
   }
 
-  // Calls Figma to remove all tokns from selected nodes
-  function removeAllTokensFromNodes() {
+  // Calls Figma with a specific node to remove node data
+  function removeNodeData(property?: Properties) {
     postToFigma({
-      type: MessageToPluginTypes.REMOVE_PLUGIN_DATA,
+      type: MessageToPluginTypes.REMOVE_NODE_DATA,
+      key: property,
     });
   }
 
@@ -128,6 +129,6 @@ export default function useTokens() {
     pullStyles,
     remapToken,
     removeTokensByValue,
-    removeAllTokensFromNodes,
+    removeNodeData,
   };
 }

@@ -21,7 +21,6 @@ module.exports = {
     "no-restricted-globals": 0,
     "max-len": 0,
     "react/function-component-definition": 0,
-    "react/require-default-props": 1,
-    "require-default-props": 0,
+    "react/require-default-props": 0,
   }
 };

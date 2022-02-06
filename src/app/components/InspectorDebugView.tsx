@@ -7,23 +7,29 @@ import Box from './Box';
 import Blankslate from './Blankslate';
 import Tooltip from './Tooltip';
 import Icon from './Icon';
+import AnnotationBuilder from './AnnotationBuilder';
 
 export default function InspectorDebugView() {
   const uiState = useSelector((state: RootState) => state.uiState);
   const { findToken, removeNodeData } = useTokens();
 
   return (
-    <Box>
+    <Box css={{
+      display: 'flex', flexDirection: 'column', flexGrow: 1, padding: '$4',
+    }}
+    >
+      <AnnotationBuilder />
+
       {Object.entries(uiState.mainNodeSelectionValues).length > 0
         ? (
           <>
             <div className="space-y-1">
               {Object.entries(uiState.mainNodeSelectionValues)
                 .filter(([, value]) => value !== 'delete')
-                .map(([key, value]) => (
-                  <div key={key} className="flex flex-row items-start justify-between">
+                .map(([property, value]) => (
+                  <div key={property} className="flex flex-row items-start justify-between">
                     <code className="flex flex-wrap space-x-2">
-                      <div className="font-bold">{key}</div>
+                      <div className="font-bold">{property}</div>
                       :
                       {' '}
                       <div className="p-1 text-white bg-gray-700 rounded text-xxs">
@@ -32,8 +38,8 @@ export default function InspectorDebugView() {
                       </div>
                       <div className="text-gray-500 break-all">{`/* ${JSON.stringify(findToken(value))} */`}</div>
                     </code>
-                    <Tooltip label="Remove token from layer" variant="right">
-                      <button className="button button-ghost" type="button" onClick={() => removeNodeData(key)}>
+                    <Tooltip label="Remove token from layer">
+                      <button className="button button-ghost" type="button" onClick={() => removeNodeData({ property })}>
                         <Icon name="trash" />
                       </button>
                     </Tooltip>

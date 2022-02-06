@@ -10,9 +10,31 @@ import Checkbox from './Checkbox';
 import Heading from './Heading';
 import Label from './Label';
 import Blankslate from './Blankslate';
+import IconBrokenLink from './icons/IconBrokenLink';
+import Tooltip from './Tooltip';
 
 function renderResolvedtoken(token) {
-  if (!token) return null;
+  // TODO: Introduce shared component for token tooltips
+  if (!token) {
+    return (
+      <Tooltip label="Token not found" side="bottom">
+        <Box
+          css={{
+            width: '24px',
+            height: '24px',
+            borderRadius: '100%',
+            border: '1px solid $borderMuted',
+            backgroundColor: '$bgSubtle',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <IconBrokenLink />
+        </Box>
+      </Tooltip>
+    );
+  }
   switch (token?.type) {
     case 'color': {
       return (
@@ -22,6 +44,7 @@ function renderResolvedtoken(token) {
             width: '24px',
             height: '24px',
             borderRadius: '100%',
+            border: '1px solid $borderMuted',
           }}
         />
       );
@@ -41,6 +64,7 @@ function renderResolvedtoken(token) {
         </Box>
       );
     }
+    // TODO: Show shadow preview
     case 'boxShadow': {
       return (
         <Box
@@ -65,6 +89,8 @@ function renderResolvedtoken(token) {
             padding: '$2 $3',
             borderRadius: '$default',
             width: '40px',
+            fontFamily: '$mono',
+            overflow: 'hidden',
           }}
         >
           {token.value}
@@ -151,7 +177,6 @@ export default function InspectorMultiView() {
                 }}
               >
                 <Checkbox
-                  defaultChecked={selectedTokens.includes(uniqueToken.value)}
                   checked={selectedTokens.includes(uniqueToken.value)}
                   id={uniqueToken.value}
                   onCheckedChange={() => toggleSelectedTokens(uniqueToken.value)}
@@ -181,7 +206,10 @@ export default function InspectorMultiView() {
     ));
   }
   return (
-    <div>
+    <Box css={{
+      display: 'flex', flexDirection: 'column', flexGrow: 1, padding: '$4',
+    }}
+    >
       <Box
         css={{
           display: 'flex',
@@ -196,7 +224,6 @@ export default function InspectorMultiView() {
       >
         <Checkbox
           checked={inspectDeep}
-          defaultChecked={inspectDeep}
           id="inspectDeep"
           onCheckedChange={() => dispatch.settings.setInspectDeep(!inspectDeep)}
         />
@@ -217,7 +244,6 @@ export default function InspectorMultiView() {
             >
               <Checkbox
                 checked={selectedTokens.length === uiState.selectionValues.length}
-                defaultChecked={false}
                 id="selectAll"
                 onCheckedChange={() => {
                   if (selectedTokens.length > 0) {
@@ -240,6 +266,6 @@ export default function InspectorMultiView() {
       ) : (
         <Blankslate title={uiState.selectedLayers ? 'No tokens found' : 'No layers selected'} text={uiState.selectedLayers ? 'None of the selected layers contain any tokens' : 'Select a layer to see applied tokens'} />
       )}
-    </div>
+    </Box>
   );
 }
