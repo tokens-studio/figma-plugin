@@ -71,6 +71,13 @@ export type TokenType =
     | 'textDecoration'
     | 'textCase';
 
+export interface SelectionGroup {
+  category: TokenType;
+  type: SelectionValue;
+  value: string;
+  nodes: string[];
+}
+
 export interface SelectionValue {
   values?: string;
   sizing?: string;

@@ -2,7 +2,6 @@ import hash from 'object-hash';
 import compact from 'just-compact';
 import debounce from 'just-debounce-it';
 import { EventEmitter } from 'eventemitter3';
-import pkg from '../../package.json';
 import { Properties } from '@/constants/Properties';
 import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 import { NodeTokenRefValue } from '@/types/NodeTokenRefValue';
@@ -10,12 +9,13 @@ import { UpdateMode } from '@/types/state';
 import { hasTokens } from '@/utils/hasTokens';
 import { SharedPluginDataKeys } from '@/constants/SharedPluginDataKeys';
 import { MessageFromPluginTypes } from '@/types/messages';
-import { tokensSharedDataHandler } from './SharedDataHandler';
-import { postToUI } from './notifiers';
-import { defaultWorker } from './Worker';
 import { parseIntOrDefault } from '@/utils/parseIntOrDefault';
 import { findAll } from '@/utils/findAll';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
+import { tokensSharedDataHandler } from './SharedDataHandler';
+import { postToUI } from './notifiers';
+import { defaultWorker } from './Worker';
+import pkg from '../../package.json';
 import { ProgressTracker } from './ProgressTracker';
 
 type NodemanagerCacheNode = {
@@ -43,6 +43,7 @@ export class NodeManager {
   constructor() {
     if (typeof figma.root !== 'undefined') {
       const cacheJson = tokensSharedDataHandler.get(figma.root, SharedPluginDataKeys.tokens.persistentNodesCache);
+      console.log('CAcheJSON', cacheJson);
       if (cacheJson) {
         const parsedCache = JSON.parse(cacheJson) as [string, NodemanagerCacheNode][];
         this.persistentNodesCache = new Map(parsedCache);
@@ -70,7 +71,9 @@ export class NodeManager {
   }
 
   private async getNodePluginData(node: BaseNode) {
+    console.log('getting plugin data', node);
     const checksum = tokensSharedDataHandler.get(node, SharedPluginDataKeys.tokens.hash);
+    console.log('checksum', checksum);
 
     const registeredPersistentEntry = this.persistentNodesCache.get(node.id);
     if (
@@ -174,12 +177,16 @@ export class NodeManager {
       hash: hash(tokens),
       tokens: this.normalizePluginTokenRef(tokens),
     };
+    console.log('Before got tokens', entry);
 
     if (Object.keys(entry.tokens).length) {
+      console.log('Got tokens', entry.tokens);
       if (entry.hash !== checksum) {
+        console.log('Is not checksum, setting');
         tokensSharedDataHandler.set(node, SharedPluginDataKeys.tokens.hash, checksum);
       }
       if (version !== currentPluginVersion) {
+        console.log('Is not current plugin version, setting');
         tokensSharedDataHandler.set(node, SharedPluginDataKeys.tokens.version, String(currentPluginVersion));
       }
 
@@ -212,6 +219,8 @@ export class NodeManager {
     // wait for previous update
     await this.waitForUpdating();
 
+    console.log('Updating cache...', nodes);
+
     postToUI({
       type: MessageFromPluginTypes.START_JOB,
       job: {
@@ -231,8 +240,11 @@ export class NodeManager {
         promises.add(defaultWorker.schedule(async () => {
           const node = nodes[nodeIndex];
 
+          console.log('before getting data', node.id);
+
           await this.getNodePluginData(node);
 
+          console.log('after getting data', node.id);
           tracker.next();
           tracker.reportIfNecessary();
         }));
@@ -269,10 +281,16 @@ export class NodeManager {
     if (nodes) {
       relevantNodes = Array.from(nodes);
     } else if (updateMode === UpdateMode.PAGE) {
+      console.log('Update mode is page');
+
       relevantNodes = findAll([figma.currentPage], false);
     } else if (updateMode === UpdateMode.SELECTION) {
+      console.log('Update mode is select');
+
       relevantNodes = findAll(figma.currentPage.selection, true);
     } else {
+      console.log('Update mode is all');
+
       relevantNodes = findAll([figma.root], false);
     }
     const unregisteredNodes = relevantNodes

@@ -3,13 +3,16 @@ import { createModel } from '@rematch/core';
 import { StorageType, StorageProviderType, ApiDataType } from '@/types/api';
 import { track } from '@/utils/analytics';
 import { ShadowTokenSingleValue, TypographyObject } from '@/types/propertyTypes';
-import { SelectionValue, TokenType } from '@/types/tokens';
+import { SelectionGroup, TokenType } from '@/types/tokens';
 import type { RootModel } from '.';
 import fetchChangelog from '@/utils/storyblok';
+import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 
 type TabNames = 'start' | 'tokens' | 'json' | 'inspector' | 'syncsettings' | 'settings';
 
 type DisplayType = 'GRID' | 'LIST';
+
+type SelectionValue = NodeTokenRefMap;
 
 interface EditTokenObjectCommonProperties {
   name: string;
@@ -42,7 +45,7 @@ export type ConfirmProps = {
   show?: boolean;
   text?: string;
   description?: string;
-  choices?: { key: string; label: string; enabled?: boolean }[];
+  choices?: { key: string; label: string; enabled?: boolean, unique?: boolean }[];
   confirmAction?: string;
 };
 
@@ -67,7 +70,8 @@ export type BackgroundJob = {
 };
 export interface UIState {
   backgroundJobs: BackgroundJob[]
-  selectionValues: SelectionValue;
+  selectionValues: SelectionGroup[];
+  mainNodeSelectionValues: SelectionValue
   displayType: DisplayType;
   disabled: boolean;
   activeTab: TabNames;
@@ -87,6 +91,7 @@ export interface UIState {
   showPushDialog: string | false;
   showEmptyGroups: boolean;
   collapsed: boolean;
+  selectedLayers: boolean;
 }
 
 const defaultConfirmState: ConfirmProps = {
@@ -99,7 +104,8 @@ const defaultConfirmState: ConfirmProps = {
 
 export const uiState = createModel<RootModel>()({
   state: {
-    selectionValues: {},
+    selectionValues: [] as SelectionGroup[],
+    mainNodeSelectionValues: {} as SelectionValue,
     disabled: false,
     displayType: 'GRID',
     backgroundJobs: [],
@@ -125,6 +131,7 @@ export const uiState = createModel<RootModel>()({
     showPushDialog: false,
     showEmptyGroups: true,
     collapsed: false,
+    selectedLayers: false,
   } as unknown as UIState,
   reducers: {
     setShowPushDialog: (state, data: string | false) => ({
@@ -136,7 +143,7 @@ export const uiState = createModel<RootModel>()({
       data: {
         text: string;
         description?: string;
-        choices: { key: string; label: string; enabled?: boolean }[];
+        choices: { key: string; label: string; enabled?: boolean; unique?: boolean }[];
         confirmAction?: string;
       },
     ) => ({
@@ -148,6 +155,10 @@ export const uiState = createModel<RootModel>()({
         choices: data.choices,
         confirmAction: data.confirmAction || defaultConfirmState.confirmAction,
       },
+    }),
+    setSelectedLayers: (state, data: boolean) => ({
+      ...state,
+      selectedLayers: data,
     }),
     setHideConfirm: (state) => ({
       ...state,
@@ -173,13 +184,17 @@ export const uiState = createModel<RootModel>()({
         displayType: data,
       };
     },
-    setSelectionValues: (state, data: SelectionValue) => ({
+    setSelectionValues: (state, data: SelectionGroup[]) => ({
       ...state,
       selectionValues: data,
     }),
+    setMainNodeSelectionValues: (state, data: SelectionValue) => ({
+      ...state,
+      mainNodeSelectionValues: data,
+    }),
     resetSelectionValues: (state) => ({
       ...state,
-      selectionValues: {},
+      selectionValues: [] as SelectionGroup[],
     }),
     startJob(state, job: BackgroundJob) {
       return {

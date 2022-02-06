@@ -9,7 +9,7 @@ import {
   UserIdFromPluginMessage,
 } from '@/types/messages';
 import store from './store';
-import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
+import { SelectionGroup, SelectionValue } from '@/types/tokens';
 
 export function postToFigma(props: PostToFigmaMessage) {
   parent.postMessage(
@@ -42,11 +42,11 @@ export function notifyNoSelection() {
   });
 }
 
-export function notifySelection(nodes?: string, values?: NodeTokenRefMap) {
+export function notifySelection({ selectionValues, mainNodeSelectionValues }: { selectionValues: SelectionGroup[], mainNodeSelectionValues: SelectionValue[] }) {
   postToUI({
     type: MessageFromPluginTypes.SELECTION,
-    nodes,
-    values,
+    selectionValues,
+    mainNodeSelectionValues,
   });
 }
 
@@ -58,6 +58,7 @@ export function notifyUISettings({
   updateStyles,
   ignoreFirstPartForStyles,
   updateRemote = true,
+  inspectDeep,
 }: {
   width: number;
   height: number;
@@ -66,6 +67,7 @@ export function notifyUISettings({
   updateOnChange: boolean;
   updateStyles: boolean;
   ignoreFirstPartForStyles: boolean;
+  inspectDeep: boolean;
 }) {
   postToUI({
     type: MessageFromPluginTypes.UI_SETTINGS,
@@ -79,6 +81,7 @@ export function notifyUISettings({
       updateOnChange,
       updateStyles,
       ignoreFirstPartForStyles,
+      inspectDeep,
     },
   });
 }

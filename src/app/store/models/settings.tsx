@@ -15,12 +15,13 @@ type TokenModeType = 'object' | 'array';
 
 export interface SettingsState {
   uiWindow?: WindowSettingsType;
-  updateMode?: UpdateMode;
+  updateMode: UpdateMode;
   updateRemote: boolean;
   updateOnChange?: boolean;
   updateStyles?: boolean;
   tokenType?: TokenModeType;
   ignoreFirstPartForStyles?: boolean;
+  inspectDeep: boolean;
 }
 
 const setUI = (state: SettingsState) => {
@@ -42,8 +43,15 @@ export const settings = createModel<RootModel>()({
     updateStyles: true,
     tokenType: 'object',
     ignoreFirstPartForStyles: false,
+    inspectDeep: false,
   } as SettingsState,
   reducers: {
+    setInspectDeep(state, payload: boolean) {
+      return {
+        ...state,
+        inspectDeep: payload,
+      };
+    },
     setWindowSize(state, payload: { width: number; height: number }) {
       track('Set Window Size', { width: payload.width, height: payload.height });
       return {
@@ -125,6 +133,9 @@ export const settings = createModel<RootModel>()({
       setUI(rootState.settings);
     },
     setIgnoreFirstPartForStyles: (payload, rootState) => {
+      setUI(rootState.settings);
+    },
+    setInspectDeep: (payload, rootState) => {
       setUI(rootState.settings);
     },
   }),

@@ -19,7 +19,7 @@ export function useGetActiveState(properties, type, name) {
   const uiState = useSelector((state: RootState) => state.uiState);
 
   return (
-    uiState.selectionValues[type] === name || properties.some((prop) => uiState.selectionValues[prop.name] === name)
+    uiState.mainNodeSelectionValues[type] === name || properties.some((prop) => uiState.mainNodeSelectionValues[prop.name] === name)
   );
 }
 
@@ -220,7 +220,7 @@ function TokenButton({
           side="bottom"
           label={(
             <div>
-              <div className="text-gray-500 font-bold text-xs">
+              <div className="text-xs font-bold text-gray-500">
                 {token.name.split('.')[token.name.split('.').length - 1]}
               </div>
               <TokenTooltip token={token} resolvedTokens={resolvedTokens} />

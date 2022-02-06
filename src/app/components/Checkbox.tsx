@@ -53,6 +53,8 @@ function Checkbox({
       <StyledIndicator>
         <CheckIcon />
       </StyledIndicator>
+      {checked ? 'CHECK' : 'UNCHECK'}
+      {defaultChecked ? 'defCHECK' : 'defUNCHECK'}
     </StyledCheckbox>
   );
 }

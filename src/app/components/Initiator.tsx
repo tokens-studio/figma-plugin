@@ -24,22 +24,40 @@ export function Initiator() {
         pluginMessage: PostToUIMessage
       }
     }) => {
+      // TODO: Removing a token throws an error
       if (event.data.pluginMessage) {
         const { pluginMessage } = event.data;
         switch (pluginMessage.type) {
           case MessageFromPluginTypes.SELECTION: {
-            const { values } = pluginMessage;
+            const { selectionValues, mainNodeSelectionValues } = pluginMessage;
+            console.log('GOT NEW SELECTION', selectionValues, mainNodeSelectionValues);
+            dispatch.uiState.setSelectedLayers(true);
             dispatch.uiState.setDisabled(false);
-            if (values) {
-              dispatch.uiState.setSelectionValues(values);
+            if (mainNodeSelectionValues.length > 1) {
+              // TODO: Handle state where many layers are selected. Could be they're mixed, could be they all share the same prop.
+              dispatch.uiState.setMainNodeSelectionValues({});
+            } else if (mainNodeSelectionValues.length > 0) {
+              // When only one node is selected, we can set the state
+              dispatch.uiState.setMainNodeSelectionValues(mainNodeSelectionValues[0]);
+            } else {
+              // When only one is selected and it doesn't contain any tokens, reset.
+              dispatch.uiState.setMainNodeSelectionValues({});
+            }
+
+            // Selection values are all tokens across all layers, used in Multi Inspector.
+            if (selectionValues) {
+              dispatch.uiState.setSelectionValues(selectionValues);
             } else {
               dispatch.uiState.resetSelectionValues();
             }
             break;
           }
           case MessageFromPluginTypes.NO_SELECTION: {
+            console.log('GOT NO SELECTION');
             dispatch.uiState.setDisabled(true);
+            dispatch.uiState.setSelectedLayers(false);
             dispatch.uiState.resetSelectionValues();
+            dispatch.uiState.setMainNodeSelectionValues({});
             break;
           }
           case MessageFromPluginTypes.REMOTE_COMPONENTS:

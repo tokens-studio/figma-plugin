@@ -6,6 +6,9 @@ import { removeSingleCredential, updateCredentials } from '@/utils/credentials';
 import { updateUISettings, getUISettings } from '@/utils/uiSettings';
 import getLastOpened from '@/utils/getLastOpened';
 import { DefaultWindowSize } from '@/constants/DefaultWindowSize';
+import { createAnnotation } from '@/utils/annotations';
+import { tokenArrayGroupToMap } from '@/utils/tokenArrayGroupToMap';
+import { UpdateMode } from '@/types/state';
 import { getUserId } from './helpers';
 import pullStyles from './pullStyles';
 import updateStyles from './updateStyles';
@@ -21,7 +24,9 @@ import {
   notifyLastOpened,
   postToUI,
 } from './notifiers';
-import { removePluginData, sendPluginValues, updatePluginData } from './pluginData';
+import {
+  removePluginData, sendPluginValues, updatePluginData, findNodesById,
+} from './pluginData';
 import {
   getTokenData, updateNodes, setTokensOnDocument, goToNode, saveStorageType, getSavedStorageType,
 } from './node';
@@ -29,10 +34,11 @@ import {
 import { MessageFromPluginTypes, MessageToPluginTypes, PostToFigmaMessage } from '../types/messages';
 import { StorageProviderType } from '../types/api';
 import compareProvidersWithStored from './compareProviders';
-import { createAnnotation } from '@/utils/annotations';
 import { defaultNodeManager } from './NodeManager';
 import { defaultWorker } from './Worker';
-import { tokenArrayGroupToMap } from '@/utils/tokenArrayGroupToMap';
+import { SelectionValue } from '@/types/tokens';
+
+let inspectDeep = false;
 
 figma.skipInvisibleInstanceChildren = true;
 
@@ -45,15 +51,19 @@ figma.on('close', () => {
   defaultWorker.stop();
 });
 
-figma.on('selectionchange', async () => {
-  const nodes = Array.from(figma.currentPage.selection);
-
+async function sendSelectionChange(): Promise<SelectionValue> {
+  console.log('Selection changed', inspectDeep, figma.currentPage.selection);
+  const nodes = inspectDeep ? (await defaultNodeManager.findNodesWithData({ updateMode: UpdateMode.SELECTION })).map((node) => node.node) : Array.from(figma.currentPage.selection);
+  console.log('Nodes', nodes);
   if (!nodes.length) {
     notifyNoSelection();
-    return;
+    return [];
   }
+  return sendPluginValues(nodes);
+}
 
-  sendPluginValues(nodes);
+figma.on('selectionchange', () => {
+  sendSelectionChange();
 });
 
 figma.ui.on('message', async (msg: PostToFigmaMessage) => {
@@ -61,7 +71,8 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
     case MessageToPluginTypes.INITIATE:
       try {
         const { currentUser } = figma;
-        getUISettings();
+        const settings = await getUISettings();
+        inspectDeep = settings.inspectDeep;
         const userId = await getUserId();
         const lastOpened = await getLastOpened();
         const storageType = getSavedStorageType();
@@ -99,7 +110,7 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
         notifyNoSelection();
         return;
       }
-      await sendPluginValues(figma.currentPage.selection);
+      await sendSelectionChange();
       return;
     case MessageToPluginTypes.CREDENTIALS: {
       const { type, ...context } = msg;
@@ -134,9 +145,11 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
       });
       return;
 
-    case MessageToPluginTypes.REMOVE_NODE_DATA:
+    case MessageToPluginTypes.REMOVE_NODE_DATA: {
       try {
-        await removePluginData(figma.currentPage.selection, msg.key);
+        const nodes = (await defaultNodeManager.findNodesWithData({ nodes: figma.currentPage.selection })).map((node) => node.node);
+
+        await removePluginData({ nodes, key: msg.key, shouldRemoveValues: false });
         await sendPluginValues(figma.currentPage.selection);
       } catch (e) {
         console.error(e);
@@ -146,6 +159,28 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
         remotes: store.remoteComponents,
       });
       return;
+    }
+    case MessageToPluginTypes.REMOVE_PLUGIN_DATA: {
+      const nodes = defaultNodeManager.findNodesWithData({
+        updateMode: UpdateMode.SELECTION,
+      });
+      const baseNodes = (await nodes).map((node) => node.node);
+      removePluginData({
+        nodes: baseNodes,
+        shouldRemoveValues: false,
+      });
+      sendPluginValues(figma.currentPage.selection);
+      break;
+    }
+    case MessageToPluginTypes.REMOVE_TOKENS_BY_VALUE: {
+      msg.tokensToRemove.forEach((token) => {
+        const nodes = findNodesById(figma.currentPage.selection, token.nodes);
+
+        removePluginData({ nodes, key: token.property, shouldRemoveValues: false });
+      });
+      sendSelectionChange();
+      break;
+    }
     case MessageToPluginTypes.CREATE_STYLES:
       try {
         updateStyles(msg.tokens, true, msg.settings);
@@ -174,6 +209,54 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
       }
       return;
     }
+    case MessageToPluginTypes.REMAP_TOKENS:
+      try {
+        const { oldName, newName, updateMode } = msg;
+        console.log('Iterating over all layers to change old to new', oldName, newName, updateMode);
+        const allWithData = await defaultNodeManager.findNodesWithData({
+          updateMode,
+        });
+
+        console.log('Found all nodes with data', allWithData);
+        // Go through allWithData and update all appearances of oldName to newName
+        const updatedNodes = allWithData.reduce((all, node) => {
+          const { tokens } = node;
+          let shouldBeRemapped = false;
+          console.log('Old entries', tokens);
+          const updatedTokens = Object.entries(tokens).reduce((acc, [key, val]) => {
+            if (val === oldName) {
+              acc[key] = newName;
+              shouldBeRemapped = true;
+            } else {
+              acc[key] = val;
+            }
+            return acc;
+          }, {});
+          console.log('Updated tokens', updatedTokens);
+          if (shouldBeRemapped) {
+            all.push({
+              ...node,
+              tokens: updatedTokens,
+            });
+          }
+          return all;
+        }, []);
+        console.log('Updated nodes', updatedNodes);
+        await updatePluginData(updatedNodes, {}, true);
+
+        await sendPluginValues(figma.currentPage.selection);
+        notifyRemoteComponents({
+          nodes: store.successfulNodes.size,
+          remotes: store.remoteComponents,
+        });
+      } catch (e) {
+        console.error(e);
+      }
+      notifyRemoteComponents({
+        nodes: store.successfulNodes.size,
+        remotes: store.remoteComponents,
+      });
+      return;
     case MessageToPluginTypes.GO_TO_NODE:
       goToNode(msg.id);
       break;
@@ -203,8 +286,13 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
         updateOnChange: msg.updateOnChange,
         updateStyles: msg.updateStyles,
         ignoreFirstPartForStyles: msg.ignoreFirstPartForStyles,
+        inspectDeep: msg.inspectDeep,
       });
       figma.ui.resize(width, height);
+      if (inspectDeep !== msg.inspectDeep) {
+        inspectDeep = msg.inspectDeep;
+        sendSelectionChange();
+      }
       break;
     }
     case MessageToPluginTypes.CREATE_ANNOTATION: {
