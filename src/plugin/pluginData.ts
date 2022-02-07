@@ -2,32 +2,70 @@ import omit from 'just-omit';
 import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 import { SharedPluginDataNamespaces } from '@/constants/SharedPluginDataNamespaces';
 import { Properties } from '@/constants/Properties';
+import { MessageFromPluginTypes } from '@/types/messages';
+import { BackgroundJobs } from '@/constants/BackgroundJobs';
 import store from './store';
 import { notifySelection, postToUI } from './notifiers';
 import removeValuesFromNode from './removeValuesFromNode';
 import { defaultNodeManager, NodeManagerNode } from './NodeManager';
 import { tokensSharedDataHandler } from './SharedDataHandler';
 import { defaultWorker } from './Worker';
-import { MessageFromPluginTypes } from '@/types/messages';
-import { BackgroundJobs } from '@/constants/BackgroundJobs';
 import { ProgressTracker } from './ProgressTracker';
+import { SelectionGroup, SelectionValue } from '@/types/tokens';
 
-export async function sendPluginValues(nodes: readonly BaseNode[], values?: NodeTokenRefMap) {
-  let pluginValues = values;
-
-  if (nodes.length > 1) {
-    notifySelection(nodes[0].id);
-  } else {
-    if (!pluginValues) {
-      const data = await defaultNodeManager.findNodesWithData({ nodes });
-      pluginValues = data?.[0]?.tokens;
-    }
-
-    notifySelection(nodes[0].id, pluginValues);
-  }
+function mapPropertyToCategory(key): string | null {
+  if (Properties[key]) return Properties[key];
+  return null;
 }
 
-export async function removePluginData(nodes: readonly (BaseNode | SceneNode)[], key?: Properties) {
+export function transformPluginDataToSelectionValues(pluginData): SelectionGroup {
+  const selectionValues = pluginData.reduce((acc, curr) => {
+    const { tokens, id } = curr;
+    Object.entries(tokens).forEach(([key, value]) => {
+      const existing = acc.find((item) => item.type === key && item.value === value);
+
+      if (existing) {
+        existing.nodes.push(id);
+      } else {
+        const category = mapPropertyToCategory(key);
+
+        acc.push({
+          value, type: key, category, nodes: [id],
+        });
+      }
+    });
+    return acc;
+  }, []);
+
+  return selectionValues;
+}
+
+type SelectionContent = {
+  selectionValues: SelectionGroup[]
+  mainNodeSelectionValues: SelectionValue[]
+};
+
+export async function sendPluginValues(nodes: readonly BaseNode[], values?: NodeTokenRefMap): Promise<SelectionContent> {
+  let pluginValues = values;
+  let mainNodeSelectionValues = [];
+  let selectionValues;
+
+  if (!pluginValues) {
+    pluginValues = await defaultNodeManager.findNodesWithData({ nodes });
+  }
+
+  // TODO: Handle all selected nodes share the same properties
+  // TODO: Handle many selected and mixed (for Tokens tab)
+  if (pluginValues?.length > 0) {
+    selectionValues = transformPluginDataToSelectionValues(pluginValues);
+    mainNodeSelectionValues = pluginValues.map((value) => value.tokens);
+  }
+
+  notifySelection({ selectionValues, mainNodeSelectionValues });
+  return { selectionValues, mainNodeSelectionValues };
+}
+
+export async function removePluginData({ nodes, key, shouldRemoveValues = true }: { nodes: readonly (BaseNode | SceneNode)[], key?: Properties, shouldRemoveValues?: boolean }) {
   return Promise.all(nodes.map(async (node) => {
     try {
       node.setRelaunchData({});
@@ -38,8 +76,9 @@ export async function removePluginData(nodes: readonly (BaseNode | SceneNode)[],
         await defaultNodeManager.updateNode(node, (tokens) => (
           omit(tokens, key)
         ));
-        // TODO: Introduce setting asking user if values should be removed?
-        removeValuesFromNode(node, key);
+        if (shouldRemoveValues) {
+          removeValuesFromNode(node, key);
+        }
       } else {
         await defaultNodeManager.updateNode(node, (tokens) => (
           omit(tokens, Object.values(Properties))
@@ -47,8 +86,9 @@ export async function removePluginData(nodes: readonly (BaseNode | SceneNode)[],
         Object.values(Properties).forEach((prop) => {
           node.setPluginData(prop, '');
           tokensSharedDataHandler.set(node, prop, '');
-          // TODO: Introduce setting asking user if values should be removed?
-          removeValuesFromNode(node, prop);
+          if (shouldRemoveValues) {
+            removeValuesFromNode(node, prop);
+          }
         });
       }
       // @deprecated remove deprecated values key
@@ -58,7 +98,22 @@ export async function removePluginData(nodes: readonly (BaseNode | SceneNode)[],
   }));
 }
 
-export async function updatePluginData(entries: readonly NodeManagerNode[], values: NodeTokenRefMap) {
+export function findNodesById(nodes, ids): SceneNode[] {
+  const nodesAndChildren = [];
+
+  nodes.forEach((node) => {
+    if (ids.includes(node.id)) {
+      nodesAndChildren.push(node);
+    }
+    if (node.children) {
+      nodesAndChildren.push(...findNodesById(node.children, ids));
+    }
+  });
+
+  return nodesAndChildren;
+}
+
+export async function updatePluginData(entries: readonly NodeManagerNode[], values: NodeTokenRefMap, shouldOverride = false) {
   const namespace = SharedPluginDataNamespaces.TOKENS;
 
   postToUI({
@@ -79,7 +134,7 @@ export async function updatePluginData(entries: readonly NodeManagerNode[], valu
       const newValuesOnNode = { ...currentValuesOnNode, ...values };
 
       await Promise.all(Object.entries(newValuesOnNode).map(async ([key, value]) => {
-        if (value === currentValuesOnNode[key]) {
+        if (value === currentValuesOnNode[key] && !shouldOverride) {
           return;
         }
 
@@ -87,7 +142,7 @@ export async function updatePluginData(entries: readonly NodeManagerNode[], valu
         switch (value) {
           case 'delete':
             delete newValuesOnNode[key];
-            await removePluginData([node], key as Properties);
+            await removePluginData({ nodes: [node], key: key as Properties });
             break;
             // Pre-Version 53 had horizontalPadding and verticalPadding.
           case 'horizontalPadding':

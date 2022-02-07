@@ -1,14 +1,16 @@
 import { useSelector } from 'react-redux';
+import React from 'react';
 import { postToFigma } from '@/plugin/notifiers';
 import { MessageToPluginTypes } from '@/types/messages';
 import checkIfAlias from '@/utils/checkIfAlias';
-import { SingleTokenObject, TokenArrayGroup } from '@/types/tokens';
+import { SelectionValue, SingleTokenObject, TokenArrayGroup } from '@/types/tokens';
 import stringifyTokens from '@/utils/stringifyTokens';
 import formatTokens from '@/utils/formatTokens';
 import { mergeTokenGroups, resolveTokenValues } from '@/plugin/tokenHelpers';
-import { SelectionValue } from './models/tokenState';
+import { UpdateMode } from '@/types/state';
 import { RootState } from '../store';
 import useConfirm from '../hooks/useConfirm';
+import { Properties } from '@/constants/Properties';
 
 export default function useTokens() {
   const { tokens, usedTokenSet, activeTokenSet } = useSelector((state: RootState) => state.tokenState);
@@ -16,11 +18,11 @@ export default function useTokens() {
   const { confirm } = useConfirm();
 
   // Finds token that matches name
-  function findToken(name: string) {
+  const findToken = React.useCallback((name: string) => {
     const resolved = resolveTokenValues(mergeTokenGroups(tokens, [...usedTokenSet, activeTokenSet]));
 
     return resolved.find((n) => n.name === name);
-  }
+  }, [name, tokens, usedTokenSet, activeTokenSet]);
 
   // Gets value of token
   function getTokenValue(token: SingleTokenObject, resolved) {
@@ -80,11 +82,20 @@ export default function useTokens() {
     }
   }
 
-  // Calls Figma with a specific node to remove node data
-  function removeNodeData(data?: string) {
+  function removeTokensByValue(data: { property: Properties; nodes: string[] }[]) {
     postToFigma({
-      type: MessageToPluginTypes.REMOVE_NODE_DATA,
-      key: data,
+      type: MessageToPluginTypes.REMOVE_TOKENS_BY_VALUE,
+      tokensToRemove: data,
+    });
+  }
+
+  // Calls Figma with an old name and new name and asks it to update all tokens that use the old name
+  async function remapToken(oldName: string, newName: string, updateMode?: UpdateMode) {
+    postToFigma({
+      type: MessageToPluginTypes.REMAP_TOKENS,
+      oldName,
+      newName,
+      updateMode: updateMode || settings.updateMode,
     });
   }
 
@@ -107,8 +118,9 @@ export default function useTokens() {
     getFormattedTokens,
     getStringTokens,
     setNodeData,
-    removeNodeData,
     createStylesFromTokens,
     pullStyles,
+    remapToken,
+    removeTokensByValue,
   };
 }

@@ -1,10 +1,12 @@
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Heading from './Heading';
+import Text from './Text';
 import Button from './Button';
 import Callout from './Callout';
 import { StorageProviderType } from '../../types/api';
 import { Dispatch, RootState } from '../store';
+import Box from './Box';
 
 function StartScreen() {
   const dispatch = useDispatch<Dispatch>();
@@ -29,15 +31,20 @@ function StartScreen() {
       <a href="https://jansix.at/resources/figma-tokens?ref=figma-tokens-plugin" target="_blank" rel="noreferrer">
         <img alt="Figma Tokens Splashscreen" src={require('../assets/tokens-intro.jpg')} className="rounded" />
       </a>
-      <Heading>Welcome to Figma Tokens.</Heading>
-      <div className="text-xs">
-        With Figma Tokens you&apos;re able to design with a single source of truth. Be it border radii, colors
-        that are able to reference one another or spacing units — use dynamic values instead of manually
-        updating your designs.
-      </div>
+      <Box css={{
+        display: 'flex', flexDirection: 'column', gap: '$2',
+      }}
+      >
+        <Heading>Welcome to Figma Tokens.</Heading>
+        <Text muted>
+          With Figma Tokens you&apos;re able to design with a single source of truth. Be it border radii, colors
+          that are able to reference one another or spacing units — use dynamic values instead of manually
+          updating your designs.
+        </Text>
+      </Box>
       <div className="space-x-2 flex justify-between">
         <Button
-          href="https://jansix.at/resources/figma-tokens?ref=figma-tokens-plugin"
+          href="https://docs.tokens.studio?ref=plugin"
           size="large"
           variant="secondary"
         >

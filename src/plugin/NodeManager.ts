@@ -2,7 +2,6 @@ import hash from 'object-hash';
 import compact from 'just-compact';
 import debounce from 'just-debounce-it';
 import { EventEmitter } from 'eventemitter3';
-import pkg from '../../package.json';
 import { Properties } from '@/constants/Properties';
 import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 import { NodeTokenRefValue } from '@/types/NodeTokenRefValue';
@@ -10,12 +9,13 @@ import { UpdateMode } from '@/types/state';
 import { hasTokens } from '@/utils/hasTokens';
 import { SharedPluginDataKeys } from '@/constants/SharedPluginDataKeys';
 import { MessageFromPluginTypes } from '@/types/messages';
-import { tokensSharedDataHandler } from './SharedDataHandler';
-import { postToUI } from './notifiers';
-import { defaultWorker } from './Worker';
 import { parseIntOrDefault } from '@/utils/parseIntOrDefault';
 import { findAll } from '@/utils/findAll';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
+import { tokensSharedDataHandler } from './SharedDataHandler';
+import { postToUI } from './notifiers';
+import { defaultWorker } from './Worker';
+import pkg from '../../package.json';
 import { ProgressTracker } from './ProgressTracker';
 
 type NodemanagerCacheNode = {

@@ -32,6 +32,12 @@ export const {
   styled, css, global: globalCSS, keyframes, getCssString, theme,
 } = createCss({
   theme: {
+    fontSizes: {
+      small: '12px',
+    },
+    fontWeights: {
+      bold: 500,
+    },
     colors: {
       bgDefault: globalTokens.colors.white,
       contextMenuBackground: globalTokens.colors.gray950,
@@ -41,11 +47,15 @@ export const {
       text: globalTokens.colors.gray900,
       textMuted: globalTokens.colors.gray500,
       textDisabled: globalTokens.colors.gray400,
+      fgSubtle: globalTokens.colors.gray300,
+      bgSubtle: globalTokens.colors.gray100,
       interaction: globalTokens.colors.primary500,
+      interactionSubtle: globalTokens.colors.primary400,
       onInteraction: globalTokens.colors.white,
       interactionDisabled: globalTokens.colors.gray600,
       dangerFg: globalTokens.colors.red500,
       border: globalTokens.colors.gray300,
+      borderMuted: globalTokens.colors.gray200,
       focus: globalTokens.colors.primary300,
     },
     space: {
@@ -64,6 +74,7 @@ export const {
       input: globalTokens.radii.sm,
       contextMenu: globalTokens.radii.lg,
       contextMenuItem: globalTokens.radii.sm,
+      card: globalTokens.radii.lg,
     },
     shadows: {
       default: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',

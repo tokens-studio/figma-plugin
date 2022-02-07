@@ -24,7 +24,7 @@ interface TokenListingType {
   };
 }
 
-function Tokens({ isActive }) {
+function Tokens({ isActive }: { isActive: boolean }) {
   const { tokens, usedTokenSet, activeTokenSet } = useSelector((state: RootState) => state.tokenState);
   const { showEditForm, tokenFilter, tokenFilterVisible } = useSelector((state: RootState) => state.uiState);
 

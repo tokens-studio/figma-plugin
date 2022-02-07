@@ -1,12 +1,14 @@
 import { SettingsState } from '@/app/store/models/settings';
 import { Properties } from '@/constants/Properties';
+import type { BackgroundJob } from '@/app/store/models/uiState';
 import {
   ApiDataType, ContextObject, StorageProviderType, StorageType,
 } from './api';
 import { NodeTokenRefMap } from './NodeTokenRefMap';
 import { UpdateMode } from './state';
-import { PullStyleTypes, TokenArrayGroup, TokenGroup } from './tokens';
-import type { BackgroundJob } from '@/app/store/models/uiState';
+import {
+  PullStyleTypes, SelectionGroup, SelectionValue, TokenArrayGroup, TokenGroup,
+} from './tokens';
 
 export enum MessageFromPluginTypes {
   SELECTION = 'selection',
@@ -35,7 +37,6 @@ export enum MessageToPluginTypes {
   UPDATE = 'update',
   CREATE_STYLES = 'create-styles',
   SET_NODE_DATA = 'set-node-data',
-  REMOVE_NODE_DATA = 'remove-node-data',
   PULL_STYLES = 'pull-styles',
   SET_STORAGE_TYPE = 'set-storage-type',
   NOTIFY = 'notify',
@@ -43,13 +44,15 @@ export enum MessageToPluginTypes {
   RESIZE_WINDOW = 'resize_window',
   CANCEL_OPERATION = 'cancel_operation',
   CREATE_ANNOTATION = 'create-annotation',
+  REMAP_TOKENS = 'remap-tokens',
+  REMOVE_TOKENS_BY_VALUE = 'remove-tokens-by-value',
 }
 
 export type NoSelectionFromPluginMessage = { type: MessageFromPluginTypes.NO_SELECTION };
 export type SelectionFromPluginMessage = {
   type: MessageFromPluginTypes.SELECTION;
-  nodes?: string;
-  values?: NodeTokenRefMap;
+  selectionValues: SelectionGroup[];
+  mainNodeSelectionValues: SelectionValue[];
 };
 export type UiSettingsFromPluginMessage = {
   type: MessageFromPluginTypes.UI_SETTINGS;
@@ -174,10 +177,6 @@ export type SetNodeDataToPluginMessage = {
   tokens: TokenArrayGroup;
   settings: SettingsState;
 };
-export type RemoveDataToPluginMessage = {
-  type: MessageToPluginTypes.REMOVE_NODE_DATA;
-  key: Properties;
-};
 export type PullStylesToPluginMessage = {
   type: MessageToPluginTypes.PULL_STYLES;
   styleTypes: PullStyleTypes;
@@ -209,6 +208,16 @@ export type CreateAnnotationToPluginMessage = {
   tokens: object;
   direction: string;
 };
+export type RemapTokensToPluginMessage = {
+  type: MessageToPluginTypes.REMAP_TOKENS;
+  oldName: string;
+  newName: string;
+  updateMode: UpdateMode;
+};
+export type RemoveTokensByValueToPluginMessage = {
+  type: MessageToPluginTypes.REMOVE_TOKENS_BY_VALUE;
+  tokensToRemove: { nodes: string[]; property: Properties }[];
+};
 
 export type PostToFigmaMessage =
     | InitiateToPluginMessage
@@ -225,4 +234,6 @@ export type PostToFigmaMessage =
     | SetUiToPluginMessage
     | ResizeWindowToPluginMessage
     | CancelOperationToPluginMessage
-    | CreateAnnotationToPluginMessage;
+    | CreateAnnotationToPluginMessage
+    | RemapTokensToPluginMessage
+    | RemoveTokensByValueToPluginMessage;

@@ -14,7 +14,10 @@ function ConfirmDialog() {
   const [chosen, setChosen] = React.useState<string[]>([]);
 
   const toggleChosen = React.useCallback(
-    (id: string) => {
+    (id: string, unique?: boolean) => {
+      if (unique) {
+        return setChosen([id]);
+      }
       const index = chosen.indexOf(id);
       if (index === -1) {
         setChosen([...chosen, id]);
@@ -36,7 +39,7 @@ function ConfirmDialog() {
 
   return confirmState.show ? (
     <Modal isOpen close={onCancel}>
-      <form onSubmit={() => onConfirm(chosen)} className="flex justify-center flex-col text-center space-y-4">
+      <form onSubmit={() => onConfirm(chosen)} className="flex flex-col justify-center space-y-4 text-center">
         <Box css={{ display: 'flex', gap: '$4', flexDirection: 'column' }}>
           <Box css={{ display: 'flex', gap: '$2', flexDirection: 'column' }}>
             <Heading>{confirmState?.text && confirmState.text}</Heading>
@@ -58,7 +61,7 @@ function ConfirmDialog() {
                     checked={chosen.includes(choice.key)}
                     defaultChecked={choice.enabled}
                     id={choice.key}
-                    onCheckedChange={() => toggleChosen(choice.key)}
+                    onCheckedChange={() => toggleChosen(choice.key, choice.unique)}
                   />
                   <Label css={{ paddingLeft: '$3' }} htmlFor={choice.key}>
                     {choice.label}

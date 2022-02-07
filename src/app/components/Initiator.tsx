@@ -28,10 +28,22 @@ export function Initiator() {
         const { pluginMessage } = event.data;
         switch (pluginMessage.type) {
           case MessageFromPluginTypes.SELECTION: {
-            const { values } = pluginMessage;
+            const { selectionValues, mainNodeSelectionValues } = pluginMessage;
+            dispatch.uiState.setSelectedLayers(true);
             dispatch.uiState.setDisabled(false);
-            if (values) {
-              dispatch.uiState.setSelectionValues(values);
+            if (mainNodeSelectionValues.length > 1) {
+              dispatch.uiState.setMainNodeSelectionValues({});
+            } else if (mainNodeSelectionValues.length > 0) {
+              // When only one node is selected, we can set the state
+              dispatch.uiState.setMainNodeSelectionValues(mainNodeSelectionValues[0]);
+            } else {
+              // When only one is selected and it doesn't contain any tokens, reset.
+              dispatch.uiState.setMainNodeSelectionValues({});
+            }
+
+            // Selection values are all tokens across all layers, used in Multi Inspector.
+            if (selectionValues) {
+              dispatch.uiState.setSelectionValues(selectionValues);
             } else {
               dispatch.uiState.resetSelectionValues();
             }
@@ -39,7 +51,9 @@ export function Initiator() {
           }
           case MessageFromPluginTypes.NO_SELECTION: {
             dispatch.uiState.setDisabled(true);
+            dispatch.uiState.setSelectedLayers(false);
             dispatch.uiState.resetSelectionValues();
+            dispatch.uiState.setMainNodeSelectionValues({});
             break;
           }
           case MessageFromPluginTypes.REMOTE_COMPONENTS:

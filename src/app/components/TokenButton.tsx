@@ -3,23 +3,22 @@ import { useDispatch, useSelector } from 'react-redux';
 import { track } from '@/utils/analytics';
 import { SingleTokenObject } from '@/types/tokens';
 import getAliasValue from '@/utils/aliases';
-import Tooltip from './Tooltip';
 import MoreButton from './MoreButton';
 import { lightOrDark } from './utils';
 import useManageTokens from '../store/useManageTokens';
 import { Dispatch, RootState } from '../store';
 import useTokens from '../store/useTokens';
-import TokenTooltip from './TokenTooltip';
 import BrokenReferenceIndicator from './BrokenReferenceIndicator';
 import { waitForMessage } from '@/utils/waitForMessage';
 import { MessageFromPluginTypes } from '@/types/messages';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
+import TokenTooltipWrapper from './TokenTooltipWrapper';
 
 export function useGetActiveState(properties, type, name) {
   const uiState = useSelector((state: RootState) => state.uiState);
 
   return (
-    uiState.selectionValues[type] === name || properties.some((prop) => uiState.selectionValues[prop.name] === name)
+    uiState.mainNodeSelectionValues[type] === name || properties.some((prop) => uiState.mainNodeSelectionValues[prop.name] === name)
   );
 }
 
@@ -39,7 +38,6 @@ function TokenButton({
   const { setNodeData } = useTokens();
   const { deleteSingleToken, duplicateSingleToken } = useManageTokens();
   const dispatch = useDispatch<Dispatch>();
-  const { isAlias } = useTokens();
 
   const displayValue = getAliasValue(token, resolvedTokens);
 
@@ -216,23 +214,7 @@ function TokenButton({
         value={name}
         path={name}
       >
-        <Tooltip
-          side="bottom"
-          label={(
-            <div>
-              <div className="text-gray-500 font-bold text-xs">
-                {token.name.split('.')[token.name.split('.').length - 1]}
-              </div>
-              <TokenTooltip token={token} resolvedTokens={resolvedTokens} />
-              {isAlias(token, resolvedTokens) && (
-              <div className="text-gray-400">
-                <TokenTooltip token={token} resolvedTokens={resolvedTokens} shouldResolve />
-              </div>
-              )}
-              {token.description && <div className="text-gray-500">{token.description}</div>}
-            </div>
-                      )}
-        >
+        <TokenTooltipWrapper token={token} resolvedTokens={resolvedTokens}>
           <button
             style={style}
             className="w-full h-full relativeƒ"
@@ -243,7 +225,7 @@ function TokenButton({
 
             <div className="button-text">{showValue && <span>{visibleName}</span>}</div>
           </button>
-        </Tooltip>
+        </TokenTooltipWrapper>
       </MoreButton>
     </div>
   );
