@@ -55,7 +55,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
         <div key={key}>
           <TokenListing
             tokenKey={key}
-            label={group.label}
+            label={group.label || key}
             explainer={group.explainer}
             schema={group.schema}
             property={group.property}
