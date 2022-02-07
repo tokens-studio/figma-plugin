@@ -65,7 +65,6 @@ function ConfirmDialog() {
                   />
                   <Label css={{ paddingLeft: '$3' }} htmlFor={choice.key}>
                     {choice.label}
-                    {choice.unique ? 'U' : ''}
                   </Label>
                 </Box>
               ))}

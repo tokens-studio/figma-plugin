@@ -24,7 +24,6 @@ export function Initiator() {
         pluginMessage: PostToUIMessage
       }
     }) => {
-      // TODO: Removing a token throws an error
       if (event.data.pluginMessage) {
         const { pluginMessage } = event.data;
         switch (pluginMessage.type) {
@@ -33,7 +32,6 @@ export function Initiator() {
             dispatch.uiState.setSelectedLayers(true);
             dispatch.uiState.setDisabled(false);
             if (mainNodeSelectionValues.length > 1) {
-              // TODO: Handle state where many layers are selected. Could be they're mixed, could be they all share the same prop.
               dispatch.uiState.setMainNodeSelectionValues({});
             } else if (mainNodeSelectionValues.length > 0) {
               // When only one node is selected, we can set the state

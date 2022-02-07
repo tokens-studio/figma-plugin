@@ -89,14 +89,6 @@ export default function useTokens() {
     });
   }
 
-  // Calls Figma with a specific node to remove node data
-  function removeNodeData(property?: Properties) {
-    postToFigma({
-      type: MessageToPluginTypes.REMOVE_NODE_DATA,
-      key: property,
-    });
-  }
-
   // Calls Figma with an old name and new name and asks it to update all tokens that use the old name
   async function remapToken(oldName: string, newName: string, updateMode?: UpdateMode) {
     postToFigma({
@@ -130,6 +122,5 @@ export default function useTokens() {
     pullStyles,
     remapToken,
     removeTokensByValue,
-    removeNodeData,
   };
 }

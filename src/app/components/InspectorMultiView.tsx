@@ -42,7 +42,6 @@ export default function InspectorMultiView() {
       .filter((v) => inspectState.selectedTokens.includes(`${v.category}-${v.value}`))
       .map((v) => ({ nodes: v.nodes, property: v.type }));
 
-    console.log('REMOVNG', valuesToRemove, uiState.selectionValues, inspectState.selectedTokens);
     removeTokensByValue(valuesToRemove);
   }, [inspectState.selectedTokens, removeTokensByValue, uiState.selectionValues]);
 

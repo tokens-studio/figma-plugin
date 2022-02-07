@@ -136,7 +136,7 @@ function EditTokenForm({ resolvedTokens }) {
         if (oldName !== newName) {
           const shouldRemap = await confirm({
             text: `Remap all tokens that use ${oldName} to ${newName}?`,
-            description: 'This will change all tokens that use this token name across your document. This could take a while.',
+            description: 'This will change all layers that used the old token name. This could take a while.',
             choices: [{ key: UpdateMode.SELECTION, label: 'Selection', unique: true }, {
               key: UpdateMode.PAGE, label: 'Page', enabled: true, unique: true,
             }, { key: UpdateMode.DOCUMENT, label: 'Document', unique: true }],

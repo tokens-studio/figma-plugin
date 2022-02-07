@@ -143,21 +143,6 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
       });
       return;
 
-    case MessageToPluginTypes.REMOVE_NODE_DATA: {
-      try {
-        const nodes = (await defaultNodeManager.findNodesWithData({ nodes: figma.currentPage.selection })).filter((node) => node.id === msg.node).map((node) => node.node);
-
-        await removePluginData({ nodes, key: msg.key, shouldRemoveValues: false });
-        await sendPluginValues(figma.currentPage.selection);
-      } catch (e) {
-        console.error(e);
-      }
-      notifyRemoteComponents({
-        nodes: store.successfulNodes.size,
-        remotes: store.remoteComponents,
-      });
-      return;
-    }
     case MessageToPluginTypes.REMOVE_TOKENS_BY_VALUE: {
       msg.tokensToRemove.forEach((token) => {
         const nodes = findNodesById(figma.currentPage.selection, token.nodes);
