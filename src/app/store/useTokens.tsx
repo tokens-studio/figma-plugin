@@ -1,4 +1,5 @@
 import { useSelector } from 'react-redux';
+import React from 'react';
 import { postToFigma } from '@/plugin/notifiers';
 import { MessageToPluginTypes } from '@/types/messages';
 import checkIfAlias from '@/utils/checkIfAlias';
@@ -17,11 +18,11 @@ export default function useTokens() {
   const { confirm } = useConfirm();
 
   // Finds token that matches name
-  function findToken(name: string) {
+  const findToken = React.useCallback((name: string) => {
     const resolved = resolveTokenValues(mergeTokenGroups(tokens, [...usedTokenSet, activeTokenSet]));
 
     return resolved.find((n) => n.name === name);
-  }
+  }, [name, tokens, usedTokenSet, activeTokenSet]);
 
   // Gets value of token
   function getTokenValue(token: SingleTokenObject, resolved) {
