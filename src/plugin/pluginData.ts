@@ -53,7 +53,6 @@ export async function sendPluginValues(nodes: readonly BaseNode[], values?: Node
   if (!pluginValues) {
     pluginValues = await defaultNodeManager.findNodesWithData({ nodes });
   }
-  console.log('Pluginvalues', pluginValues);
 
   // TODO: Handle all selected nodes share the same properties
   // TODO: Handle many selected and mixed (for Tokens tab)
@@ -62,7 +61,6 @@ export async function sendPluginValues(nodes: readonly BaseNode[], values?: Node
     mainNodeSelectionValues = pluginValues.map((value) => value.tokens);
   }
 
-  console.log('Transformed', selectionValues);
   notifySelection({ selectionValues, mainNodeSelectionValues });
   return { selectionValues, mainNodeSelectionValues };
 }
@@ -135,16 +133,12 @@ export async function updatePluginData(entries: readonly NodeManagerNode[], valu
       const currentValuesOnNode = tokens ?? {};
       const newValuesOnNode = { ...currentValuesOnNode, ...values };
 
-      console.log('Setting new values in node', node, newValuesOnNode);
-
       await Promise.all(Object.entries(newValuesOnNode).map(async ([key, value]) => {
-        console.log('Current Value', value, currentValuesOnNode[key]);
         if (value === currentValuesOnNode[key] && !shouldOverride) {
           return;
         }
 
         const jsonValue = JSON.stringify(value);
-        console.log('SETTING', key, jsonValue);
         switch (value) {
           case 'delete':
             delete newValuesOnNode[key];
@@ -168,7 +162,6 @@ export async function updatePluginData(entries: readonly NodeManagerNode[], valu
             break;
         }
       }));
-      console.log('Updating cache', node, newValuesOnNode);
       await defaultNodeManager.updateNode(node, newValuesOnNode);
 
       if (node.type !== 'INSTANCE') {

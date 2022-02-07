@@ -52,9 +52,7 @@ figma.on('close', () => {
 });
 
 async function sendSelectionChange(): Promise<SelectionValue> {
-  console.log('Selection changed', inspectDeep, figma.currentPage.selection);
   const nodes = inspectDeep ? (await defaultNodeManager.findNodesWithData({ updateMode: UpdateMode.SELECTION })).map((node) => node.node) : Array.from(figma.currentPage.selection);
-  console.log('Nodes', nodes);
   if (!nodes.length) {
     notifyNoSelection();
     return [];
@@ -200,17 +198,14 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
     case MessageToPluginTypes.REMAP_TOKENS:
       try {
         const { oldName, newName, updateMode } = msg;
-        console.log('Iterating over all layers to change old to new', oldName, newName, updateMode);
         const allWithData = await defaultNodeManager.findNodesWithData({
           updateMode,
         });
 
-        console.log('Found all nodes with data', allWithData);
         // Go through allWithData and update all appearances of oldName to newName
         const updatedNodes = allWithData.reduce((all, node) => {
           const { tokens } = node;
           let shouldBeRemapped = false;
-          console.log('Old entries', tokens);
           const updatedTokens = Object.entries(tokens).reduce((acc, [key, val]) => {
             if (val === oldName) {
               acc[key] = newName;
@@ -220,7 +215,6 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
             }
             return acc;
           }, {});
-          console.log('Updated tokens', updatedTokens);
           if (shouldBeRemapped) {
             all.push({
               ...node,
@@ -229,7 +223,6 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
           }
           return all;
         }, []);
-        console.log('Updated nodes', updatedNodes);
         await updatePluginData(updatedNodes, {}, true);
 
         await sendPluginValues(figma.currentPage.selection);

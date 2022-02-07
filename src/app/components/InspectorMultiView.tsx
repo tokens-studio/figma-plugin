@@ -125,7 +125,6 @@ export default function InspectorMultiView() {
 
   function groupAndRenderSelectionValues(selectionValues: SelectionGroup[]) {
     // TODO: Make this performant
-    console.log('selectionValues', selectionValues);
     const grouped = selectionValues.reduce((acc, curr) => {
       if (acc[curr.category]) {
         const sameValueIndex = acc[curr.category].findIndex((v) => v.value === curr.value);
@@ -138,7 +137,6 @@ export default function InspectorMultiView() {
       } else {
         acc[curr.category] = [curr];
       }
-      console.log('to this', acc);
 
       return acc;
     }, {});
