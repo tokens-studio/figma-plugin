@@ -3,6 +3,7 @@ import Box from './Box';
 import Tooltip from './Tooltip';
 import IconBrokenLink from './icons/IconBrokenLink';
 import { SingleTokenObject } from '@/types/tokens';
+import IconShadow from '@/icons/shadow.svg';
 
 export default function InspectorResolvedToken({ token }: { token: SingleTokenObject }) {
   // TODO: Introduce shared component for token tooltips
@@ -67,7 +68,7 @@ export default function InspectorResolvedToken({ token }: { token: SingleTokenOb
             width: '40px',
           }}
         >
-          shd
+          <IconShadow />
         </Box>
       );
     }
