@@ -20,6 +20,7 @@ import { ProgressTracker } from './ProgressTracker';
 
 type NodemanagerCacheNode = {
   hash: string;
+  mainKey?: string;
   tokens: NodeTokenRefMap;
   createdAt: number
 };
@@ -28,8 +29,13 @@ export type NodeManagerNode = {
   id: string;
   node: BaseNode
   hash: string;
+  mainKey?: string;
   tokens: NodeTokenRefMap;
 };
+
+function getMainKey(node): string | undefined {
+  return node.type === 'INSTANCE' ? node.mainComponent?.key : undefined;
+}
 
 export class NodeManager {
   private emitter = new EventEmitter();
@@ -171,6 +177,7 @@ export class NodeManager {
     const entry = {
       node,
       id: node.id,
+      mainKey: getMainKey(node),
       hash: hash(tokens),
       tokens: this.normalizePluginTokenRef(tokens),
     };
@@ -186,6 +193,7 @@ export class NodeManager {
       this.persistentNodesCache.set(entry.id, {
         hash: entry.hash,
         tokens: entry.tokens,
+        mainKey: entry.mainKey,
         createdAt: Date.now(),
       });
       this.emitter.emit('cache-update');
@@ -276,7 +284,11 @@ export class NodeManager {
       relevantNodes = findAll([figma.root], false);
     }
     const unregisteredNodes = relevantNodes
-      .filter((node) => !this.nodes.has(node.id));
+      .filter((node) => {
+        const mainKey = getMainKey(node);
+        return !this.nodes.has(node.id) || (node.type === 'INSTANCE' && mainKey !== this.nodes.get(node.id)?.mainKey);
+      });
+
     await this.update(unregisteredNodes);
 
     const relevantNodeIds = relevantNodes.map((node) => node.id);
