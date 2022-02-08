@@ -133,7 +133,7 @@ function EditTokenForm({ resolvedTokens }) {
           options,
         });
         // When users change token names references are still pointing to the old name, ask user to remap
-        if (oldName !== newName) {
+        if (oldName && oldName !== newName) {
           const shouldRemap = await confirm({
             text: `Remap all tokens that use ${oldName} to ${newName}?`,
             description: 'This will change all layers that used the old token name. This could take a while.',
