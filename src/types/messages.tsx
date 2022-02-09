@@ -213,6 +213,7 @@ export type RemapTokensToPluginMessage = {
   oldName: string;
   newName: string;
   updateMode: UpdateMode;
+  category?: Properties
 };
 export type RemoveTokensByValueToPluginMessage = {
   type: MessageToPluginTypes.REMOVE_TOKENS_BY_VALUE;

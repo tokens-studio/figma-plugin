@@ -3,13 +3,15 @@ import { useDispatch, useSelector } from 'react-redux';
 import { SelectionGroup } from '@/types/tokens';
 import Box from './Box';
 import Checkbox from './Checkbox';
+import IconButton from './IconButton';
 import useTokens from '../store/useTokens';
 import IconLayers from '@/icons/layers.svg';
+import IconDisclosure from '@/icons/disclosure.svg';
 import InspectorResolvedToken from './InspectorResolvedToken';
 import { Dispatch, RootState } from '../store';
 
 export default function InspectorTokenSingle({ token }: { token: SelectionGroup }) {
-  const { findToken } = useTokens();
+  const { findToken, handleRemap } = useTokens();
   const inspectState = useSelector((state: RootState) => state.inspectState);
   const dispatch = useDispatch<Dispatch>();
 
@@ -41,6 +43,12 @@ export default function InspectorTokenSingle({ token }: { token: SelectionGroup 
         <InspectorResolvedToken token={resolvedToken} />
 
         <Box css={{ fontSize: '$small' }}>{token.value}</Box>
+        <IconButton
+          tooltip="Change to another token"
+          dataCy="button-token-remap"
+          onClick={() => handleRemap(token.category, token.value)}
+          icon={<IconDisclosure />}
+        />
       </Box>
       <Box
         css={{

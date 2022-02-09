@@ -23,7 +23,7 @@ function TokenTree({
               <div className="property-wrapper w-full" data-cy={`token-group-${stringPath}`}>
                 <div className="flex items-center justify-between group">
                   <TokenGroupHeading label={name} path={stringPath} id="listing" />
-                  <Tooltip label="Add a new token" variant="right">
+                  <Tooltip label="Add a new token" side="left">
                     <button
                       disabled={editProhibited}
                       data-cy="button-add-new-token-in-group"

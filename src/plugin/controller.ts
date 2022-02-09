@@ -182,7 +182,9 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
     }
     case MessageToPluginTypes.REMAP_TOKENS:
       try {
-        const { oldName, newName, updateMode } = msg;
+        const {
+          oldName, newName, updateMode, category,
+        } = msg;
         const allWithData = await defaultNodeManager.findNodesWithData({
           updateMode,
         });
@@ -192,6 +194,10 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
           const { tokens } = node;
           let shouldBeRemapped = false;
           const updatedTokens = Object.entries(tokens).reduce((acc, [key, val]) => {
+            if (typeof category !== 'undefined' && key !== category) {
+              acc[key] = val;
+              return acc;
+            }
             if (val === oldName) {
               acc[key] = newName;
               shouldBeRemapped = true;
