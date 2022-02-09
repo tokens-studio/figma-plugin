@@ -67,19 +67,21 @@ const log = (message) => process.stdout.write(`[token-transformer] ${message}\n`
  * Reads the given input file, transforms all tokens and writes them to the output file
  */
 const transform = () => {
-    const {input, output, sets, excludes, expandTypography} = argv;
+    const {input, output, sets, excludes, expandTypography, resolveValues} = argv;
 
     if (fs.existsSync(argv.input)) {
         const tokens = fs.readFileSync(input, {encoding: 'utf8', flag: 'r'});
         const parsed = JSON.parse(tokens);
         const options = {
             expandTypography,
+            resolveValues
         };
+
 
         log(`transforming tokens from input: ${input}`);
         log(`using sets: ${sets.length > 0 ? sets : '[]'}`);
         log(`using excludes: ${excludes.length > 0 ? excludes : '[]'}`);
-        log(`using options: { expandTypography: ${expandTypography} }`);
+        log(`using options: { expandTypography: ${options.expandTypography}, resolveValues: ${options.resolveValues} }`);
 
         const transformed = transformTokens(parsed, sets, excludes, options);
 

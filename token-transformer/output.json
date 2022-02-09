@@ -1,28 +1,37 @@
 {
   "typography": {
     "h1": {
-      "value": {
-        "fontFamily": "Roboto",
-        "fontSize": 96,
-        "fontWeight": "Light"
+      "fontFamily": {
+        "value": "Roboto"
       },
-      "type": "typography"
+      "fontSize": {
+        "value": 96
+      },
+      "fontWeight": {
+        "value": "Light"
+      }
     },
     "h2": {
-      "value": {
-        "fontFamily": "Roboto",
-        "fontSize": 60,
-        "fontWeight": "Light"
+      "fontFamily": {
+        "value": "Roboto"
       },
-      "type": "typography"
+      "fontSize": {
+        "value": 60
+      },
+      "fontWeight": {
+        "value": "Light"
+      }
     },
     "h3": {
-      "value": {
-        "fontFamily": "Roboto",
-        "fontSize": 48,
-        "fontWeight": "Light"
+      "fontFamily": {
+        "value": "Roboto"
       },
-      "type": "typography"
+      "fontSize": {
+        "value": 48
+      },
+      "fontWeight": {
+        "value": "Light"
+      }
     }
   },
   "sizing": {
@@ -722,12 +731,12 @@
   },
   "colors": {
     "Background": {
-      "value": "#1B1F24",
+      "value": "#FAFBFC",
       "description": "Alias value",
       "type": "color"
     },
     "Background50": {
-      "value": "#1b1f2480",
+      "value": "#fafbfc80",
       "description": "Nested color value",
       "type": "color"
     }
