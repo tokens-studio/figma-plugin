@@ -28,8 +28,8 @@ export function Initiator() {
         const { pluginMessage } = event.data;
         switch (pluginMessage.type) {
           case MessageFromPluginTypes.SELECTION: {
-            const { selectionValues, mainNodeSelectionValues } = pluginMessage;
-            dispatch.uiState.setSelectedLayers(true);
+            const { selectionValues, mainNodeSelectionValues, selectedNodes } = pluginMessage;
+            dispatch.uiState.setSelectedLayers(selectedNodes);
             dispatch.uiState.setDisabled(false);
             if (mainNodeSelectionValues.length > 1) {
               dispatch.uiState.setMainNodeSelectionValues({});
@@ -51,7 +51,7 @@ export function Initiator() {
           }
           case MessageFromPluginTypes.NO_SELECTION: {
             dispatch.uiState.setDisabled(true);
-            dispatch.uiState.setSelectedLayers(false);
+            dispatch.uiState.setSelectedLayers(0);
             dispatch.uiState.resetSelectionValues();
             dispatch.uiState.setMainNodeSelectionValues({});
             break;

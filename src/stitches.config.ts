@@ -33,6 +33,7 @@ export const {
 } = createCss({
   theme: {
     fontSizes: {
+      xsmall: '11px',
       small: '12px',
     },
     fontWeights: {
@@ -45,7 +46,7 @@ export const {
       contextMenuForegroundMuted: globalTokens.colors.gray400,
       contextMenuSeperator: globalTokens.colors.gray700,
       text: globalTokens.colors.gray900,
-      textMuted: globalTokens.colors.gray500,
+      textMuted: globalTokens.colors.gray600,
       textDisabled: globalTokens.colors.gray400,
       fgSubtle: globalTokens.colors.gray300,
       bgSubtle: globalTokens.colors.gray100,

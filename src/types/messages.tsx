@@ -53,6 +53,7 @@ export type SelectionFromPluginMessage = {
   type: MessageFromPluginTypes.SELECTION;
   selectionValues: SelectionGroup[];
   mainNodeSelectionValues: SelectionValue[];
+  selectedNodes: number
 };
 export type UiSettingsFromPluginMessage = {
   type: MessageFromPluginTypes.UI_SETTINGS;
@@ -213,6 +214,7 @@ export type RemapTokensToPluginMessage = {
   oldName: string;
   newName: string;
   updateMode: UpdateMode;
+  category?: Properties
 };
 export type RemoveTokensByValueToPluginMessage = {
   type: MessageToPluginTypes.REMOVE_TOKENS_BY_VALUE;

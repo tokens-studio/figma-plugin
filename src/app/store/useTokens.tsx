@@ -3,7 +3,9 @@ import React from 'react';
 import { postToFigma } from '@/plugin/notifiers';
 import { MessageToPluginTypes } from '@/types/messages';
 import checkIfAlias from '@/utils/checkIfAlias';
-import { SelectionValue, SingleTokenObject, TokenArrayGroup } from '@/types/tokens';
+import {
+  SelectionValue, SingleTokenObject, TokenArrayGroup, TokenType,
+} from '@/types/tokens';
 import stringifyTokens from '@/utils/stringifyTokens';
 import formatTokens from '@/utils/formatTokens';
 import { mergeTokenGroups, resolveTokenValues } from '@/plugin/tokenHelpers';
@@ -89,6 +91,26 @@ export default function useTokens() {
     });
   }
 
+  async function handleRemap(type: TokenType, name: string) {
+    const userDecision = await confirm({
+      text: `Choose a new token for ${name}`,
+      input: {
+        type: 'text',
+        placeholder: 'New token name',
+      },
+      confirmAction: 'Remap',
+    });
+
+    if (userDecision) {
+      postToFigma({
+        type: MessageToPluginTypes.REMAP_TOKENS,
+        category: type,
+        oldName: name,
+        newName: userDecision.data,
+      });
+    }
+  }
+
   // Calls Figma with an old name and new name and asks it to update all tokens that use the old name
   async function remapToken(oldName: string, newName: string, updateMode?: UpdateMode) {
     postToFigma({
@@ -122,5 +144,6 @@ export default function useTokens() {
     pullStyles,
     remapToken,
     removeTokensByValue,
+    handleRemap,
   };
 }

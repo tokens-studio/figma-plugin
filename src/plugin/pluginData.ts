@@ -43,6 +43,7 @@ export function transformPluginDataToSelectionValues(pluginData): SelectionGroup
 type SelectionContent = {
   selectionValues: SelectionGroup[]
   mainNodeSelectionValues: SelectionValue[]
+  selectedNodes: number
 };
 
 export async function sendPluginValues(nodes: readonly BaseNode[], values?: NodeTokenRefMap): Promise<SelectionContent> {
@@ -61,8 +62,10 @@ export async function sendPluginValues(nodes: readonly BaseNode[], values?: Node
     mainNodeSelectionValues = pluginValues.map((value) => value.tokens);
   }
 
-  notifySelection({ selectionValues, mainNodeSelectionValues });
-  return { selectionValues, mainNodeSelectionValues };
+  const selectedNodes = figma.currentPage.selection.length;
+
+  notifySelection({ selectionValues, mainNodeSelectionValues, selectedNodes });
+  return { selectionValues, mainNodeSelectionValues, selectedNodes };
 }
 
 export async function removePluginData({ nodes, key, shouldRemoveValues = true }: { nodes: readonly (BaseNode | SceneNode)[], key?: Properties, shouldRemoveValues?: boolean }) {

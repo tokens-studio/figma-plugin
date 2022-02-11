@@ -105,7 +105,6 @@ export async function updateNodes(
 ) {
   const { ignoreFirstPartForStyles } = settings ?? {};
   const figmaStyleMaps = getAllFigmaStyleMaps();
-
   postToUI({
     type: MessageFromPluginTypes.START_JOB,
     job: {
@@ -124,6 +123,7 @@ export async function updateNodes(
       try {
         if (entry.tokens) {
           const mappedValues = mapValuesToTokens(tokens, entry.tokens);
+
           setValuesOnNode(entry.node, mappedValues, entry.tokens, figmaStyleMaps, ignoreFirstPartForStyles);
           store.successfulNodes.add(entry.node);
           returnedValues.add(entry.tokens);

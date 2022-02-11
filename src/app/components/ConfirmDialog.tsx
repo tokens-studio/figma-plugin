@@ -7,11 +7,18 @@ import Box from './Box';
 import Text from './Text';
 import Checkbox from './Checkbox';
 import Label from './Label';
+import Input from './Input';
 
 function ConfirmDialog() {
   const confirmButton = React.useRef(null);
+  const firstInput = React.useRef(null);
   const { onConfirm, onCancel, confirmState } = useConfirm();
   const [chosen, setChosen] = React.useState<string[]>([]);
+  const [inputValue, setInputValue] = React.useState('');
+
+  React.useEffect(() => {
+    setInputValue('');
+  }, [confirmState.show]);
 
   const toggleChosen = React.useCallback(
     (id: string, unique?: boolean) => {
@@ -28,10 +35,20 @@ function ConfirmDialog() {
     [chosen],
   );
 
+  function handleConfirm() {
+    if (confirmState.input) {
+      onConfirm(inputValue);
+    } else {
+      onConfirm(chosen);
+    }
+  }
+
   React.useEffect(() => {
     setTimeout(() => {
       if (confirmState.choices) setChosen(confirmState.choices.filter((c) => c.enabled).map((c) => c.key));
-      if (confirmButton.current) {
+      if (firstInput.current) {
+        firstInput.current.focus();
+      } else if (confirmButton.current) {
         confirmButton.current.focus();
       }
     }, 50);
@@ -39,7 +56,7 @@ function ConfirmDialog() {
 
   return confirmState.show ? (
     <Modal isOpen close={onCancel}>
-      <form onSubmit={() => onConfirm(chosen)} className="flex flex-col justify-center space-y-4 text-center">
+      <form onSubmit={handleConfirm} className="flex flex-col justify-center space-y-4 text-center">
         <Box css={{ display: 'flex', gap: '$4', flexDirection: 'column' }}>
           <Box css={{ display: 'flex', gap: '$2', flexDirection: 'column' }}>
             <Heading>{confirmState?.text && confirmState.text}</Heading>
@@ -47,6 +64,20 @@ function ConfirmDialog() {
             <Text css={{ color: '$textMuted' }}>{confirmState.description}</Text>
             )}
           </Box>
+          {confirmState?.input && (
+          <Box css={{ display: 'flex', gap: '$2', flexDirection: 'column' }}>
+            <Input
+              id="input"
+              type={confirmState.input.type}
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              className="w-full"
+              inputRef={firstInput}
+              full
+              required
+            />
+          </Box>
+          )}
           {confirmState?.choices && (
             <Box css={{
               display: 'flex', flexDirection: 'column', alignItems: 'start', gap: '$2',

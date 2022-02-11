@@ -27,7 +27,7 @@ function StartScreen() {
   };
 
   return (
-    <div className="my-auto h-auto space-y-4 p-4">
+    <div className="h-auto p-4 my-auto space-y-4">
       <a href="https://jansix.at/resources/figma-tokens?ref=figma-tokens-plugin" target="_blank" rel="noreferrer">
         <img alt="Figma Tokens Splashscreen" src={require('../assets/tokens-intro.jpg')} className="rounded" />
       </a>
@@ -37,14 +37,12 @@ function StartScreen() {
       >
         <Heading>Welcome to Figma Tokens.</Heading>
         <Text muted>
-          With Figma Tokens you&apos;re able to design with a single source of truth. Be it border radii, colors
-          that are able to reference one another or spacing units — use dynamic values instead of manually
-          updating your designs.
+          Design with tokens to apply design decisions to border radii, spacing or many others. Use smart references or math features to change values dynamically or use token sets to quickly create themes. Work across documents by utilizing the Sync feature and store your design tokens on a single source of truth such as GitHub.
         </Text>
       </Box>
-      <div className="space-x-2 flex justify-between">
+      <div className="flex justify-between space-x-2">
         <Button
-          href="https://docs.tokens.studio?ref=plugin"
+          href="https://docs.tokens.studio/?ref=pgs"
           size="large"
           variant="secondary"
         >
