@@ -47,6 +47,10 @@ export type ConfirmProps = {
   description?: string;
   choices?: { key: string; label: string; enabled?: boolean, unique?: boolean }[];
   confirmAction?: string;
+  input?: {
+    type: 'text';
+    placeholder: string;
+  };
 };
 
 export type AddJobTasksPayload = {
@@ -91,7 +95,7 @@ export interface UIState {
   showPushDialog: string | false;
   showEmptyGroups: boolean;
   collapsed: boolean;
-  selectedLayers: boolean;
+  selectedLayers: number;
 }
 
 const defaultConfirmState: ConfirmProps = {
@@ -100,6 +104,7 @@ const defaultConfirmState: ConfirmProps = {
   description: '',
   choices: undefined,
   confirmAction: 'Yes',
+  input: undefined,
 };
 
 export const uiState = createModel<RootModel>()({
@@ -131,7 +136,7 @@ export const uiState = createModel<RootModel>()({
     showPushDialog: false,
     showEmptyGroups: true,
     collapsed: false,
-    selectedLayers: false,
+    selectedLayers: 0,
   } as unknown as UIState,
   reducers: {
     setShowPushDialog: (state, data: string | false) => ({
@@ -145,6 +150,10 @@ export const uiState = createModel<RootModel>()({
         description?: string;
         choices: { key: string; label: string; enabled?: boolean; unique?: boolean }[];
         confirmAction?: string;
+        input?: {
+          type: 'text';
+          placeholder: string;
+        };
       },
     ) => ({
       ...state,
@@ -154,9 +163,10 @@ export const uiState = createModel<RootModel>()({
         description: data.description,
         choices: data.choices,
         confirmAction: data.confirmAction || defaultConfirmState.confirmAction,
+        input: data.input,
       },
     }),
-    setSelectedLayers: (state, data: boolean) => ({
+    setSelectedLayers: (state, data: number) => ({
       ...state,
       selectedLayers: data,
     }),

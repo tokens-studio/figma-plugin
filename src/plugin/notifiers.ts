@@ -42,11 +42,12 @@ export function notifyNoSelection() {
   });
 }
 
-export function notifySelection({ selectionValues, mainNodeSelectionValues }: { selectionValues: SelectionGroup[], mainNodeSelectionValues: SelectionValue[] }) {
+export function notifySelection({ selectionValues, mainNodeSelectionValues, selectedNodes }: { selectionValues: SelectionGroup[], mainNodeSelectionValues: SelectionValue[], selectedNodes: number }) {
   postToUI({
     type: MessageFromPluginTypes.SELECTION,
     selectionValues,
     mainNodeSelectionValues,
+    selectedNodes,
   });
 }
 

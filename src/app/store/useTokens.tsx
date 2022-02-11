@@ -92,9 +92,13 @@ export default function useTokens() {
   }
 
   async function handleRemap(type: TokenType, name: string) {
-    // TODO: Make this get an input the user can fill out
     const userDecision = await confirm({
-      text: 'Choose a new token',
+      text: `Choose a new token for ${name}`,
+      input: {
+        type: 'text',
+        placeholder: 'New token name',
+      },
+      confirmAction: 'Remap',
     });
 
     if (userDecision) {
@@ -102,7 +106,7 @@ export default function useTokens() {
         type: MessageToPluginTypes.REMAP_TOKENS,
         category: type,
         oldName: name,
-        newName: 'my_test_token',
+        newName: userDecision.data,
       });
     }
   }

@@ -33,19 +33,19 @@ function MoreButton({
   onDelete,
   onDuplicate,
 }) {
-  const { selectionValues } = useSelector((state: RootState) => state.uiState);
+  const { mainNodeSelectionValues } = useSelector((state: RootState) => state.uiState);
   const { editProhibited } = useSelector((state: RootState) => state.tokenState);
 
   const visibleProperties = properties.filter((p) => p.label);
 
   return (
     <ContextMenu>
-      <ContextMenuTrigger as="div" id={`${path}-${value}`}>
+      <ContextMenuTrigger id={`${path}-${value}`}>
         {children}
       </ContextMenuTrigger>
       <ContextMenuContent sideOffset={5} collisionTolerance={30}>
         {visibleProperties.map((property) => {
-          const isActive = selectionValues[property.name] === value;
+          const isActive = mainNodeSelectionValues[property.name] === value;
 
           return (
             <ContextMenuCheckboxItem
@@ -69,7 +69,7 @@ function MoreButton({
           </ContextMenuTriggerItem>
           <ContextMenuContent sideOffset={2} alignOffset={-5} collisionTolerance={30}>
             {documentationProperties.map((property) => {
-              const isActive = selectionValues[property.name] === value;
+              const isActive = mainNodeSelectionValues[property.name] === value;
 
               return (
                 <ContextMenuCheckboxItem

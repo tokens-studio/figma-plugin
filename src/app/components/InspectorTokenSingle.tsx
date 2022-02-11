@@ -14,6 +14,11 @@ export default function InspectorTokenSingle({ token }: { token: SelectionGroup 
   const { findToken, handleRemap } = useTokens();
   const inspectState = useSelector((state: RootState) => state.inspectState);
   const dispatch = useDispatch<Dispatch>();
+  const [isChecked, setChecked] = React.useState(false);
+
+  React.useEffect(() => {
+    setChecked(inspectState.selectedTokens.includes(`${token.category}-${token.value}`));
+  }, [inspectState.selectedTokens, token]);
 
   const resolvedToken = findToken(token.value);
   return (
@@ -36,19 +41,27 @@ export default function InspectorTokenSingle({ token }: { token: SelectionGroup 
         }}
       >
         <Checkbox
-          checked={inspectState.selectedTokens.includes(`${token.category}-${token.value}`)}
+          checked={isChecked}
           id={`${token.category}-${token.value}`}
           onCheckedChange={() => dispatch.inspectState.toggleSelectedTokens(`${token.category}-${token.value}`)}
         />
         <InspectorResolvedToken token={resolvedToken} />
 
-        <Box css={{ fontSize: '$small' }}>{token.value}</Box>
-        <IconButton
-          tooltip="Change to another token"
-          dataCy="button-token-remap"
-          onClick={() => handleRemap(token.category, token.value)}
-          icon={<IconDisclosure />}
-        />
+        <Box css={{
+          display: 'flex',
+          flexDirection: 'row',
+          alignItems: 'center',
+          gap: '$1',
+        }}
+        >
+          <Box css={{ fontSize: '$small' }}>{token.value}</Box>
+          <IconButton
+            tooltip="Change to another token"
+            dataCy="button-token-remap"
+            onClick={() => handleRemap(token.category, token.value)}
+            icon={<IconDisclosure />}
+          />
+        </Box>
       </Box>
       <Box
         css={{

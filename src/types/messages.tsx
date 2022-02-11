@@ -53,6 +53,7 @@ export type SelectionFromPluginMessage = {
   type: MessageFromPluginTypes.SELECTION;
   selectionValues: SelectionGroup[];
   mainNodeSelectionValues: SelectionValue[];
+  selectedNodes: number
 };
 export type UiSettingsFromPluginMessage = {
   type: MessageFromPluginTypes.UI_SETTINGS;

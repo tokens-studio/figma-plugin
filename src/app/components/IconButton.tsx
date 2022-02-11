@@ -9,6 +9,7 @@ const StyledButton = styled('button', {
   border: 'none',
   padding: '$2 $3',
   borderRadius: '$button',
+  cursor: 'pointer',
   variants: {
     buttonVariant: {
       primary: {

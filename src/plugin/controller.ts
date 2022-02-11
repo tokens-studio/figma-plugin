@@ -53,7 +53,9 @@ figma.on('close', () => {
 
 async function sendSelectionChange(): Promise<SelectionValue> {
   const nodes = inspectDeep ? (await defaultNodeManager.findNodesWithData({ updateMode: UpdateMode.SELECTION })).map((node) => node.node) : Array.from(figma.currentPage.selection);
-  if (!nodes.length) {
+  const currentSelectionLength = figma.currentPage.selection.length;
+
+  if (!currentSelectionLength) {
     notifyNoSelection();
     return [];
   }
@@ -127,6 +129,7 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
       try {
         if (figma.currentPage.selection.length) {
           const tokensMap = tokenArrayGroupToMap(msg.tokens);
+
           const nodes = await defaultNodeManager.update(figma.currentPage.selection);
           await updatePluginData(nodes, msg.values);
           await sendPluginValues(
@@ -215,8 +218,9 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
           return all;
         }, []);
         await updatePluginData(updatedNodes, {}, true);
+        await updateNodes(updatedNodes, tokensMap, msg.settings);
 
-        await sendPluginValues(figma.currentPage.selection);
+        await sendSelectionChange();
         notifyRemoteComponents({
           nodes: store.successfulNodes.size,
           remotes: store.remoteComponents,

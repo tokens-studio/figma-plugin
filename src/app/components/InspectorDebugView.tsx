@@ -10,6 +10,11 @@ export default function InspectorDebugView() {
   const uiState = useSelector((state: RootState) => state.uiState);
   const { findToken } = useTokens();
 
+  function renderBlankslate() {
+    if (uiState.selectedLayers > 1) return <Blankslate title="More than 1 layer selected" text="Select a single layer to see applied tokens" />;
+    return <Blankslate title={uiState.selectedLayers === 1 ? 'No tokens found' : 'No layer selected'} text={uiState.selectedLayers === 1 ? 'Selected layer contains no tokens' : 'Select a layer to see applied tokens'} />;
+  }
+
   return (
     <Box css={{
       display: 'flex', flexDirection: 'column', flexGrow: 1, padding: '$4',
@@ -17,7 +22,7 @@ export default function InspectorDebugView() {
     >
       <AnnotationBuilder />
 
-      {Object.entries(uiState.mainNodeSelectionValues).length > 0
+      {uiState.selectedLayers === 1 && Object.entries(uiState.mainNodeSelectionValues).length > 0
         ? (
           <div className="space-y-1">
             {Object.entries(uiState.mainNodeSelectionValues)
@@ -38,7 +43,7 @@ export default function InspectorDebugView() {
               ))}
           </div>
         )
-        : <Blankslate title={uiState.selectedLayers ? 'No tokens found' : 'No layers selected'} text={uiState.selectedLayers ? 'None of the selected layers contain any tokens' : 'Select a layer to see applied tokens'} />}
+        : renderBlankslate()}
     </Box>
   );
 }
