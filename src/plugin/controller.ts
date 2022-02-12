@@ -110,11 +110,16 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
         notifyNoSelection();
         return;
       }
-      await sendSelectionChange();
       return;
     case MessageToPluginTypes.CREDENTIALS: {
       const { type, ...context } = msg;
       await updateCredentials(context);
+      break;
+    }
+    case MessageToPluginTypes.CHANGED_TABS: {
+      const { tabBasedInspectDeep } = msg;
+      inspectDeep = tabBasedInspectDeep;
+      await sendSelectionChange();
       break;
     }
     case MessageToPluginTypes.REMOVE_SINGLE_CREDENTIAL: {
