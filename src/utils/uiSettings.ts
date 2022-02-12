@@ -1,5 +1,5 @@
 import { UpdateMode } from '@/types/state';
-import { notifyUISettings, notifyUI } from '@/plugin/notifiers';
+import { notifyUISettings, notifyUI, SavedSettings } from '@/plugin/notifiers';
 
 // update credentials
 export async function updateUISettings(uiSettings) {
@@ -10,7 +10,8 @@ export async function updateUISettings(uiSettings) {
   }
 }
 
-export async function getUISettings() {
+export async function getUISettings(): Promise<SavedSettings> {
+  let settings: SavedSettings = {} as SavedSettings;
   try {
     const data = await figma.clientStorage.getAsync('uiSettings');
 
@@ -34,7 +35,7 @@ export async function getUISettings() {
         ? false
         : parsedData.ignoreFirstPartForStyles;
       inspectDeep = typeof parsedData.inspectDeep === 'undefined' ? false : parsedData.inspectDeep;
-      const settings = {
+      settings = {
         width: Math.max(300, width),
         height: Math.max(200, height),
         updateMode,
@@ -45,9 +46,9 @@ export async function getUISettings() {
         inspectDeep,
       };
       notifyUISettings(settings);
-      return settings;
     }
   } catch (err) {
     notifyUI('There was an issue saving your credentials. Please try again.');
   }
+  return settings;
 }

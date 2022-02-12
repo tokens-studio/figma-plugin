@@ -51,6 +51,17 @@ export function notifySelection({ selectionValues, mainNodeSelectionValues, sele
   });
 }
 
+export type SavedSettings = {
+  width: number;
+  height: number;
+  updateMode: UpdateMode;
+  updateRemote: boolean;
+  updateOnChange: boolean;
+  updateStyles: boolean;
+  ignoreFirstPartForStyles: boolean;
+  inspectDeep: boolean;
+};
+
 export function notifyUISettings({
   width,
   height,
@@ -60,16 +71,7 @@ export function notifyUISettings({
   ignoreFirstPartForStyles,
   updateRemote = true,
   inspectDeep,
-}: {
-  width: number;
-  height: number;
-  updateMode: UpdateMode;
-  updateRemote: boolean;
-  updateOnChange: boolean;
-  updateStyles: boolean;
-  ignoreFirstPartForStyles: boolean;
-  inspectDeep: boolean;
-}) {
+}: SavedSettings) {
   postToUI({
     type: MessageFromPluginTypes.UI_SETTINGS,
     settings: {

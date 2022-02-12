@@ -46,6 +46,7 @@ export enum MessageToPluginTypes {
   CREATE_ANNOTATION = 'create-annotation',
   REMAP_TOKENS = 'remap-tokens',
   REMOVE_TOKENS_BY_VALUE = 'remove-tokens-by-value',
+  CHANGED_TABS = 'changed-tabs',
 }
 
 export type NoSelectionFromPluginMessage = { type: MessageFromPluginTypes.NO_SELECTION };
@@ -220,6 +221,10 @@ export type RemoveTokensByValueToPluginMessage = {
   type: MessageToPluginTypes.REMOVE_TOKENS_BY_VALUE;
   tokensToRemove: { nodes: string[]; property: Properties }[];
 };
+export type ChangedTabsToPluginMessage = {
+  type: MessageToPluginTypes.CHANGED_TABS;
+  tabBasedInspectDeep: boolean;
+};
 
 export type PostToFigmaMessage =
     | InitiateToPluginMessage
@@ -229,7 +234,6 @@ export type PostToFigmaMessage =
     | UpdateToPluginMessage
     | CreateStylesToPluginMessage
     | SetNodeDataToPluginMessage
-    | RemoveDataToPluginMessage
     | PullStylesToPluginMessage
     | SetStorageTypeToPluginMessage
     | NotifyToPluginMessage
@@ -238,4 +242,5 @@ export type PostToFigmaMessage =
     | CancelOperationToPluginMessage
     | CreateAnnotationToPluginMessage
     | RemapTokensToPluginMessage
-    | RemoveTokensByValueToPluginMessage;
+    | RemoveTokensByValueToPluginMessage
+    | ChangedTabsToPluginMessage;

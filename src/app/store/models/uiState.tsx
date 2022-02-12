@@ -7,6 +7,8 @@ import { SelectionGroup, TokenType } from '@/types/tokens';
 import type { RootModel } from '.';
 import fetchChangelog from '@/utils/storyblok';
 import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
+import { postToFigma } from '@/plugin/notifiers';
+import { MessageToPluginTypes } from '@/types/messages';
 
 type TabNames = 'start' | 'tokens' | 'json' | 'inspector' | 'syncsettings' | 'settings';
 
@@ -338,6 +340,13 @@ export const uiState = createModel<RootModel>()({
     setLastOpened: (payload) => {
       fetchChangelog(payload, (result) => {
         dispatch.uiState.setChangelog(result);
+      });
+    },
+    setActiveTab: (payload, rootState) => {
+      const tabBasedInspectDeep = payload === 'inspector' ? rootState.settings.inspectDeep : false;
+      postToFigma({
+        type: MessageToPluginTypes.CHANGED_TABS,
+        tabBasedInspectDeep,
       });
     },
   }),
