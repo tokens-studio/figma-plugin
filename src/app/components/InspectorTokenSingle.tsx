@@ -1,6 +1,6 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { SelectionGroup } from '@/types/tokens';
+import { SelectionGroup, SingleTokenObject } from '@/types/tokens';
 import Box from './Box';
 import Checkbox from './Checkbox';
 import IconButton from './IconButton';
@@ -10,8 +10,8 @@ import IconDisclosure from '@/icons/disclosure.svg';
 import InspectorResolvedToken from './InspectorResolvedToken';
 import { Dispatch, RootState } from '../store';
 
-export default function InspectorTokenSingle({ token }: { token: SelectionGroup }) {
-  const { findToken, handleRemap } = useTokens();
+export default function InspectorTokenSingle({ token, mappedToken }: { token: SelectionGroup, mappedToken: SingleTokenObject | undefined }) {
+  const { handleRemap } = useTokens();
   const inspectState = useSelector((state: RootState) => state.inspectState);
   const dispatch = useDispatch<Dispatch>();
   const [isChecked, setChecked] = React.useState(false);
@@ -20,7 +20,6 @@ export default function InspectorTokenSingle({ token }: { token: SelectionGroup 
     setChecked(inspectState.selectedTokens.includes(`${token.category}-${token.value}`));
   }, [inspectState.selectedTokens, token]);
 
-  const resolvedToken = findToken(token.value);
   return (
     <Box
       css={{
@@ -45,7 +44,7 @@ export default function InspectorTokenSingle({ token }: { token: SelectionGroup 
           id={`${token.category}-${token.value}`}
           onCheckedChange={() => dispatch.inspectState.toggleSelectedTokens(`${token.category}-${token.value}`)}
         />
-        <InspectorResolvedToken token={resolvedToken} />
+        <InspectorResolvedToken token={mappedToken} />
 
         <Box css={{
           display: 'flex',

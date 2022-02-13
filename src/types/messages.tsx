@@ -223,7 +223,7 @@ export type RemoveTokensByValueToPluginMessage = {
 };
 export type ChangedTabsToPluginMessage = {
   type: MessageToPluginTypes.CHANGED_TABS;
-  tabBasedInspectDeep: boolean;
+  requiresSelectionValues: boolean;
 };
 
 export type PostToFigmaMessage =

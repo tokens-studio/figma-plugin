@@ -10,17 +10,21 @@ import { Dispatch, RootState } from '../store';
 import Checkbox from './Checkbox';
 import Label from './Label';
 import Tooltip from './Tooltip';
+import { resolveTokenValues, mergeTokenGroups } from '@/plugin/tokenHelpers';
 
 function Inspector() {
   const [inspectView, setInspectView] = React.useState('multi');
 
   const { inspectDeep } = useSelector((state: RootState) => state.settings);
   const dispatch = useDispatch<Dispatch>();
+  const { tokens, activeTokenSet, usedTokenSet } = useSelector((state: RootState) => state.tokenState);
+  // TODO: Put this into state in a performant way
+  const resolvedTokens = React.useMemo(() => resolveTokenValues(mergeTokenGroups(tokens, [...usedTokenSet, activeTokenSet])), [tokens, usedTokenSet, activeTokenSet]);
 
   function renderInspectView() {
     switch (inspectView) {
-      case 'debug': return <InspectorDebugView />;
-      case 'multi': return <InspectorMultiView />;
+      case 'debug': return <InspectorDebugView resolvedTokens={resolvedTokens} />;
+      case 'multi': return <InspectorMultiView resolvedTokens={resolvedTokens} />;
       default: return null;
     }
   }

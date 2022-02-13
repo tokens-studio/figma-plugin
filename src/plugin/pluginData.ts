@@ -27,7 +27,7 @@ export function transformPluginDataToSelectionValues(pluginData): SelectionGroup
       if (existing) {
         existing.nodes.push(id);
       } else {
-        const category = mapPropertyToCategory(key);
+        const category = Properties[key];
 
         acc.push({
           value, type: key, category, nodes: [id],
@@ -40,13 +40,13 @@ export function transformPluginDataToSelectionValues(pluginData): SelectionGroup
   return selectionValues;
 }
 
-type SelectionContent = {
-  selectionValues: SelectionGroup[]
+export type SelectionContent = {
+  selectionValues?: SelectionGroup[]
   mainNodeSelectionValues: SelectionValue[]
   selectedNodes: number
 };
 
-export async function sendPluginValues(nodes: readonly BaseNode[], values?: NodeTokenRefMap): Promise<SelectionContent> {
+export async function sendPluginValues({ nodes, values, shouldSendSelectionValues }: { nodes: readonly BaseNode[], values?: NodeTokenRefMap, shouldSendSelectionValues: boolean }): Promise<SelectionContent> {
   let pluginValues = values;
   let mainNodeSelectionValues = [];
   let selectionValues;
@@ -58,7 +58,7 @@ export async function sendPluginValues(nodes: readonly BaseNode[], values?: Node
   // TODO: Handle all selected nodes share the same properties
   // TODO: Handle many selected and mixed (for Tokens tab)
   if (pluginValues?.length > 0) {
-    selectionValues = transformPluginDataToSelectionValues(pluginValues);
+    if (shouldSendSelectionValues) selectionValues = transformPluginDataToSelectionValues(pluginValues);
     mainNodeSelectionValues = pluginValues.map((value) => value.tokens);
   }
 

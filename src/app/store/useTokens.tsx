@@ -19,16 +19,9 @@ export default function useTokens() {
   const settings = useSelector((state: RootState) => state.settings);
   const { confirm } = useConfirm();
 
-  // Finds token that matches name
-  const findToken = React.useCallback((name: string) => {
-    const resolved = resolveTokenValues(mergeTokenGroups(tokens, [...usedTokenSet, activeTokenSet]));
-
-    return resolved.find((n) => n.name === name);
-  }, [name, tokens, usedTokenSet, activeTokenSet]);
-
   // Gets value of token
-  function getTokenValue(token: SingleTokenObject, resolved) {
-    return resolved.find((t) => t.name === token.name).value;
+  function getTokenValue(name: string, resolved) {
+    return resolved.find((t) => t.name === name).value;
   }
 
   // Returns resolved value of a specific token
@@ -136,7 +129,6 @@ export default function useTokens() {
   return {
     isAlias,
     getTokenValue,
-    findToken,
     getFormattedTokens,
     getStringTokens,
     setNodeData,

@@ -343,10 +343,10 @@ export const uiState = createModel<RootModel>()({
       });
     },
     setActiveTab: (payload, rootState) => {
-      const tabBasedInspectDeep = payload === 'inspector' ? rootState.settings.inspectDeep : false;
+      const requiresSelectionValues = payload === 'inspector' ? rootState.settings.inspectDeep : false;
       postToFigma({
         type: MessageToPluginTypes.CHANGED_TABS,
-        tabBasedInspectDeep,
+        requiresSelectionValues,
       });
     },
   }),

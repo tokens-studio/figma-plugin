@@ -25,10 +25,12 @@ interface TokenListingType {
 }
 
 function Tokens({ isActive }: { isActive: boolean }) {
-  const { tokens, usedTokenSet, activeTokenSet } = useSelector((state: RootState) => state.tokenState);
+  const { tokens, activeTokenSet, usedTokenSet } = useSelector((state: RootState) => state.tokenState);
   const { showEditForm, tokenFilter, tokenFilterVisible } = useSelector((state: RootState) => state.uiState);
-
-  const resolvedTokens = React.useMemo(() => resolveTokenValues(mergeTokenGroups(tokens, [...usedTokenSet, activeTokenSet])), [tokens, usedTokenSet, activeTokenSet]);
+  const resolvedTokens = React.useMemo(
+    () => resolveTokenValues(mergeTokenGroups(tokens, [...usedTokenSet, activeTokenSet])),
+    [tokens, usedTokenSet, activeTokenSet],
+  );
 
   const memoizedTokens = React.useMemo(() => {
     if (tokens[activeTokenSet]) {
