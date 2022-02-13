@@ -15,7 +15,6 @@ export default function InspectorTokenSingle({ token, resolvedTokens }: { token:
   const inspectState = useSelector((state: RootState) => state.inspectState);
   const dispatch = useDispatch<Dispatch>();
   const [isChecked, setChecked] = React.useState(false);
-  const { getTokenValue } = useTokens();
 
   React.useEffect(() => {
     setChecked(inspectState.selectedTokens.includes(`${token.category}-${token.value}`));
