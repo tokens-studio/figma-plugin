@@ -20,7 +20,6 @@ export default function InspectorTokenSingle({ token, resolvedTokens }: { token:
     setChecked(inspectState.selectedTokens.includes(`${token.category}-${token.value}`));
   }, [inspectState.selectedTokens, token]);
 
-  // TODO: can this even be undefned?
   const mappedToken = getTokenValue(token.value, resolvedTokens);
 
   return (
