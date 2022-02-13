@@ -11,7 +11,7 @@ import InspectorResolvedToken from './InspectorResolvedToken';
 import { Dispatch, RootState } from '../store';
 
 export default function InspectorTokenSingle({ token, resolvedTokens }: { token: SelectionGroup, resolvedTokens: SingleTokenObject[] }) {
-  const { handleRemap } = useTokens();
+  const { handleRemap, getTokenValue } = useTokens();
   const inspectState = useSelector((state: RootState) => state.inspectState);
   const dispatch = useDispatch<Dispatch>();
   const [isChecked, setChecked] = React.useState(false);
