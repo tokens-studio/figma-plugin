@@ -21,7 +21,7 @@ export default function useTokens() {
 
   // Gets value of token
   function getTokenValue(name: string, resolved) {
-    return resolved.find((t) => t.name === name).value;
+    return resolved.find((t) => t.name === name);
   }
 
   // Returns resolved value of a specific token

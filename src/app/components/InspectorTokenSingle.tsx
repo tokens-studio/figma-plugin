@@ -10,15 +10,19 @@ import IconDisclosure from '@/icons/disclosure.svg';
 import InspectorResolvedToken from './InspectorResolvedToken';
 import { Dispatch, RootState } from '../store';
 
-export default function InspectorTokenSingle({ token, mappedToken }: { token: SelectionGroup, mappedToken: SingleTokenObject | undefined }) {
+export default function InspectorTokenSingle({ token, resolvedTokens }: { token: SelectionGroup, resolvedTokens: SingleTokenObject[] }) {
   const { handleRemap } = useTokens();
   const inspectState = useSelector((state: RootState) => state.inspectState);
   const dispatch = useDispatch<Dispatch>();
   const [isChecked, setChecked] = React.useState(false);
+  const { getTokenValue } = useTokens();
 
   React.useEffect(() => {
     setChecked(inspectState.selectedTokens.includes(`${token.category}-${token.value}`));
   }, [inspectState.selectedTokens, token]);
+
+  // TODO: can this even be undefned?
+  const mappedToken = getTokenValue(token.value, resolvedTokens);
 
   return (
     <Box

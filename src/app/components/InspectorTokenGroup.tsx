@@ -4,11 +4,8 @@ import Box from './Box';
 import Heading from './Heading';
 import InspectorTokenSingle from './InspectorTokenSingle';
 import { Properties } from '@/constants/Properties';
-import useTokens from '../store/useTokens';
 
 export default function InspectorTokenGroup({ group, resolvedTokens }: { group: [Properties, SelectionGroup[]], resolvedTokens: SingleTokenObject[] }) {
-  const { getTokenValue } = useTokens();
-
   const [groupKey, groupValue] = group;
   return (
     <Box
@@ -21,7 +18,7 @@ export default function InspectorTokenGroup({ group, resolvedTokens }: { group: 
       key={`${groupKey}`}
     >
       <Heading size="small">{groupKey}</Heading>
-      {groupValue.map((uniqueToken) => <InspectorTokenSingle key={`${uniqueToken.category}-${uniqueToken.value}`} token={uniqueToken} mappedToken={getTokenValue(uniqueToken.value, resolvedTokens)} />)}
+      {groupValue.map((uniqueToken) => <InspectorTokenSingle key={`${uniqueToken.category}-${uniqueToken.value}`} token={uniqueToken} resolvedTokens={resolvedTokens} />)}
     </Box>
   );
 }

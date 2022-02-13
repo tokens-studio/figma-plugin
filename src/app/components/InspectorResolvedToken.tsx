@@ -5,7 +5,7 @@ import IconBrokenLink from './icons/IconBrokenLink';
 import { SingleTokenObject } from '@/types/tokens';
 import IconShadow from '@/icons/shadow.svg';
 
-export default function InspectorResolvedToken({ token }: { token: SingleTokenObject | undefined }) {
+export default function InspectorResolvedToken({ token }: { token: SingleTokenObject }) {
   // TODO: Introduce shared component for token tooltips
   if (!token) {
     return (
