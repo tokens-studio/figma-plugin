@@ -1,14 +1,15 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store';
-import useTokens from '../store/useTokens';
 import Box from './Box';
 import Blankslate from './Blankslate';
 import AnnotationBuilder from './AnnotationBuilder';
+import { SingleTokenObject } from '@/types/tokens';
+import useTokens from '../store/useTokens';
 
-export default function InspectorDebugView() {
+export default function InspectorDebugView({ resolvedTokens }: { resolvedTokens: SingleTokenObject[] }) {
   const uiState = useSelector((state: RootState) => state.uiState);
-  const { findToken } = useTokens();
+  const { getTokenValue } = useTokens();
 
   function renderBlankslate() {
     if (uiState.selectedLayers > 1) return <Blankslate title="More than 1 layer selected" text="Select a single layer to see applied tokens" />;
@@ -37,7 +38,7 @@ export default function InspectorDebugView() {
                       $
                       {typeof value === 'string' && value.split('.').join('-')}
                     </div>
-                    <div className="text-gray-500 break-all">{`/* ${JSON.stringify(findToken(value))} */`}</div>
+                    <div className="text-gray-500 break-all">{`/* ${JSON.stringify(getTokenValue(value, resolvedTokens))} */`}</div>
                   </code>
                 </div>
               ))}

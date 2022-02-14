@@ -8,8 +8,9 @@ import Checkbox from './Checkbox';
 import Label from './Label';
 import Blankslate from './Blankslate';
 import InspectorTokenGroup from './InspectorTokenGroup';
+import { SingleTokenObject } from '@/types/tokens';
 
-export default function InspectorMultiView() {
+export default function InspectorMultiView({ resolvedTokens }: { resolvedTokens: SingleTokenObject[] }) {
   const inspectState = useSelector((state: RootState) => state.inspectState);
   const uiState = useSelector((state: RootState) => state.uiState);
   const { removeTokensByValue } = useTokens();
@@ -78,7 +79,7 @@ export default function InspectorMultiView() {
               Remove selected
             </Button>
           </Box>
-          {Object.entries(groupedSelectionValues).map((group) => <InspectorTokenGroup key={`inspect-group-${group[0]}`} group={group} />)}
+          {Object.entries(groupedSelectionValues).map((group) => <InspectorTokenGroup key={`inspect-group-${group[0]}`} group={group} resolvedTokens={resolvedTokens} />)}
         </Box>
       ) : (
         <Blankslate title={uiState.selectedLayers > 0 ? 'No tokens found' : 'No layers selected'} text={uiState.selectedLayers > 0 ? 'None of the selected layers contain any tokens' : 'Select a layer to see applied tokens'} />

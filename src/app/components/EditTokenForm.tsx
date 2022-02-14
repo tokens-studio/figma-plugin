@@ -106,8 +106,6 @@ function EditTokenForm({ resolvedTokens }) {
   );
 
   const submitTokenValue = async ({ value, name, options }) => {
-    track('Edit Token');
-
     if (internalEditToken) {
       let oldName;
       if (internalEditToken.initialName !== name && internalEditToken.initialName) {
@@ -118,6 +116,8 @@ function EditTokenForm({ resolvedTokens }) {
         .map((n) => n.trim())
         .join('.');
       if (internalEditToken.isPristine) {
+        track('Create token');
+
         createSingleToken({
           parent: activeTokenSet,
           name: newName,
@@ -134,6 +134,8 @@ function EditTokenForm({ resolvedTokens }) {
         });
         // When users change token names references are still pointing to the old name, ask user to remap
         if (oldName && oldName !== newName) {
+          track('Edit token', { renamed: true });
+
           const shouldRemap = await confirm({
             text: `Remap all tokens that use ${oldName} to ${newName}?`,
             description: 'This will change all layers that used the old token name. This could take a while.',
@@ -144,6 +146,8 @@ function EditTokenForm({ resolvedTokens }) {
           if (shouldRemap) {
             remapToken(oldName, newName, shouldRemap.data[0]);
           }
+        } else {
+          track('Edit token', { renamed: false });
         }
       }
     }

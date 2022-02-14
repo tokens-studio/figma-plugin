@@ -1,10 +1,9 @@
 import { useSelector } from 'react-redux';
-import React from 'react';
 import { postToFigma } from '@/plugin/notifiers';
 import { MessageToPluginTypes } from '@/types/messages';
 import checkIfAlias from '@/utils/checkIfAlias';
 import {
-  SelectionValue, SingleTokenObject, TokenArrayGroup, TokenType,
+  SelectionValue, SingleTokenObject, TokenArrayGroup,
 } from '@/types/tokens';
 import stringifyTokens from '@/utils/stringifyTokens';
 import formatTokens from '@/utils/formatTokens';
@@ -13,22 +12,16 @@ import { UpdateMode } from '@/types/state';
 import { RootState } from '../store';
 import useConfirm from '../hooks/useConfirm';
 import { Properties } from '@/constants/Properties';
+import { track } from '@/utils/analytics';
 
 export default function useTokens() {
   const { tokens, usedTokenSet, activeTokenSet } = useSelector((state: RootState) => state.tokenState);
   const settings = useSelector((state: RootState) => state.settings);
   const { confirm } = useConfirm();
 
-  // Finds token that matches name
-  const findToken = React.useCallback((name: string) => {
-    const resolved = resolveTokenValues(mergeTokenGroups(tokens, [...usedTokenSet, activeTokenSet]));
-
-    return resolved.find((n) => n.name === name);
-  }, [name, tokens, usedTokenSet, activeTokenSet]);
-
   // Gets value of token
-  function getTokenValue(token: SingleTokenObject, resolved) {
-    return resolved.find((t) => t.name === token.name).value;
+  function getTokenValue(name: string, resolved) {
+    return resolved.find((t) => t.name === name);
   }
 
   // Returns resolved value of a specific token
@@ -73,6 +66,12 @@ export default function useTokens() {
     });
 
     if (userDecision && userDecision.data.length) {
+      track('Import styles', {
+        textStyles: userDecision.data.includes('textStyles'),
+        colorStyles: userDecision.data.includes('colorStyles'),
+        effectStyles: userDecision.data.includes('effectStyles'),
+      });
+
       postToFigma({
         type: MessageToPluginTypes.PULL_STYLES,
         styleTypes: {
@@ -85,13 +84,15 @@ export default function useTokens() {
   }
 
   function removeTokensByValue(data: { property: Properties; nodes: string[] }[]) {
+    track('removeTokensByValue', { count: data.length });
+
     postToFigma({
       type: MessageToPluginTypes.REMOVE_TOKENS_BY_VALUE,
       tokensToRemove: data,
     });
   }
 
-  async function handleRemap(type: TokenType, name: string) {
+  async function handleRemap(type: Properties, name: string) {
     const userDecision = await confirm({
       text: `Choose a new token for ${name}`,
       input: {
@@ -102,17 +103,22 @@ export default function useTokens() {
     });
 
     if (userDecision) {
+      track('remapToken', { fromInspect: true });
+
       postToFigma({
         type: MessageToPluginTypes.REMAP_TOKENS,
         category: type,
         oldName: name,
         newName: userDecision.data,
+        updateMode: UpdateMode.SELECTION,
       });
     }
   }
 
   // Calls Figma with an old name and new name and asks it to update all tokens that use the old name
   async function remapToken(oldName: string, newName: string, updateMode?: UpdateMode) {
+    track('remapToken', { fromRename: true });
+
     postToFigma({
       type: MessageToPluginTypes.REMAP_TOKENS,
       oldName,
@@ -123,6 +129,8 @@ export default function useTokens() {
 
   // Calls Figma with all tokens to create styles
   function createStylesFromTokens() {
+    track('createStyles');
+
     const resolved = resolveTokenValues(mergeTokenGroups(tokens, usedTokenSet));
     const withoutIgnored = resolved.filter((token) => !token.name.split('.').some((part) => part.startsWith('_')));
 
@@ -136,7 +144,6 @@ export default function useTokens() {
   return {
     isAlias,
     getTokenValue,
-    findToken,
     getFormattedTokens,
     getStringTokens,
     setNodeData,

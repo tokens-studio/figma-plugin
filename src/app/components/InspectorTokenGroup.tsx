@@ -1,11 +1,11 @@
 import React from 'react';
-import { SelectionGroup } from '@/types/tokens';
+import { SelectionGroup, SingleTokenObject } from '@/types/tokens';
 import Box from './Box';
 import Heading from './Heading';
 import InspectorTokenSingle from './InspectorTokenSingle';
 import { Properties } from '@/constants/Properties';
 
-export default function InspectorTokenGroup({ group }: { group: [Properties, SelectionGroup[]] }) {
+export default function InspectorTokenGroup({ group, resolvedTokens }: { group: [Properties, SelectionGroup[]], resolvedTokens: SingleTokenObject[] }) {
   const [groupKey, groupValue] = group;
   return (
     <Box
@@ -18,7 +18,7 @@ export default function InspectorTokenGroup({ group }: { group: [Properties, Sel
       key={`${groupKey}`}
     >
       <Heading size="small">{groupKey}</Heading>
-      {groupValue.map((uniqueToken) => <InspectorTokenSingle key={`${uniqueToken.category}-${uniqueToken.value}`} token={uniqueToken} />)}
+      {groupValue.map((uniqueToken) => <InspectorTokenSingle key={`${uniqueToken.category}-${uniqueToken.value}`} token={uniqueToken} resolvedTokens={resolvedTokens} />)}
     </Box>
   );
 }

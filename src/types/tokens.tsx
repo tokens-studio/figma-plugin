@@ -40,6 +40,10 @@ export interface TokenGroup {
   [key: string]: SingleToken;
 }
 
+export interface TokenSet {
+  [key: string]: SingleTokenObject[];
+}
+
 export type TokenArrayGroup = SingleTokenObject[];
 
 export interface Tokens {

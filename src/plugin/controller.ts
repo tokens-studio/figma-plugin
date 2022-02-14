@@ -25,7 +25,7 @@ import {
   postToUI,
 } from './notifiers';
 import {
-  removePluginData, sendPluginValues, updatePluginData, findNodesById,
+  removePluginData, sendPluginValues, updatePluginData, findNodesById, SelectionContent,
 } from './pluginData';
 import {
   getTokenData, updateNodes, setTokensOnDocument, goToNode, saveStorageType, getSavedStorageType,
@@ -36,9 +36,9 @@ import { StorageProviderType } from '../types/api';
 import compareProvidersWithStored from './compareProviders';
 import { defaultNodeManager } from './NodeManager';
 import { defaultWorker } from './Worker';
-import { SelectionValue } from '@/types/tokens';
 
 let inspectDeep = false;
+let shouldSendSelectionValues = false;
 
 figma.skipInvisibleInstanceChildren = true;
 
@@ -51,15 +51,15 @@ figma.on('close', () => {
   defaultWorker.stop();
 });
 
-async function sendSelectionChange(): Promise<SelectionValue> {
+async function sendSelectionChange(): Promise<SelectionContent | null> {
   const nodes = inspectDeep ? (await defaultNodeManager.findNodesWithData({ updateMode: UpdateMode.SELECTION })).map((node) => node.node) : Array.from(figma.currentPage.selection);
   const currentSelectionLength = figma.currentPage.selection.length;
 
   if (!currentSelectionLength) {
     notifyNoSelection();
-    return [];
+    return null;
   }
-  return sendPluginValues(nodes);
+  return sendPluginValues({ nodes, shouldSendSelectionValues });
 }
 
 figma.on('selectionchange', () => {
@@ -117,8 +117,8 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
       break;
     }
     case MessageToPluginTypes.CHANGED_TABS: {
-      const { tabBasedInspectDeep } = msg;
-      inspectDeep = tabBasedInspectDeep;
+      const { requiresSelectionValues } = msg;
+      shouldSendSelectionValues = requiresSelectionValues;
       await sendSelectionChange();
       break;
     }
@@ -138,8 +138,11 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
           const nodes = await defaultNodeManager.update(figma.currentPage.selection);
           await updatePluginData(nodes, msg.values);
           await sendPluginValues(
-            figma.currentPage.selection,
-            await updateNodes(nodes, tokensMap, msg.settings),
+            {
+              nodes: figma.currentPage.selection,
+              values: await updateNodes(nodes, tokensMap, msg.settings),
+              shouldSendSelectionValues: false,
+            },
           );
         }
       } catch (e) {
