@@ -342,8 +342,9 @@ export const uiState = createModel<RootModel>()({
         dispatch.uiState.setChangelog(result);
       });
     },
-    setActiveTab: (payload, rootState) => {
-      const requiresSelectionValues = payload === 'inspector' ? rootState.settings.inspectDeep : false;
+    setActiveTab: (payload) => {
+      const requiresSelectionValues = payload === 'inspector';
+
       postToFigma({
         type: MessageToPluginTypes.CHANGED_TABS,
         requiresSelectionValues,
