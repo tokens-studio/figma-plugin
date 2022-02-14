@@ -11,15 +11,23 @@ import Checkbox from './Checkbox';
 import Label from './Label';
 import Tooltip from './Tooltip';
 import { resolveTokenValues, mergeTokenGroups } from '@/plugin/tokenHelpers';
+import { track } from '@/utils/analytics';
 
 function Inspector() {
   const [inspectView, setInspectView] = React.useState('multi');
-
   const { inspectDeep } = useSelector((state: RootState) => state.settings);
   const dispatch = useDispatch<Dispatch>();
   const { tokens, activeTokenSet, usedTokenSet } = useSelector((state: RootState) => state.tokenState);
+
   // TODO: Put this into state in a performant way
   const resolvedTokens = React.useMemo(() => resolveTokenValues(mergeTokenGroups(tokens, [...usedTokenSet, activeTokenSet])), [tokens, usedTokenSet, activeTokenSet]);
+
+  function handleSetInspectView(view: string) {
+    setInspectView(view);
+    track('setInspectView', {
+      view,
+    });
+  }
 
   function renderInspectView() {
     switch (inspectView) {
@@ -64,7 +72,7 @@ function Inspector() {
           <IconButton
             variant={inspectView === 'multi' ? 'primary' : 'default'}
             dataCy="inspector-multi"
-            onClick={() => setInspectView('multi')}
+            onClick={() => handleSetInspectView('multi')}
             icon={<IconInspect />}
             tooltipSide="bottom"
             tooltip="Inspect layers"
@@ -72,7 +80,7 @@ function Inspector() {
           <IconButton
             variant={inspectView === 'debug' ? 'primary' : 'default'}
             dataCy="inspector-debug"
-            onClick={() => setInspectView('debug')}
+            onClick={() => handleSetInspectView('debug')}
             icon={<IconDebug />}
             tooltipSide="bottom"
             tooltip="Debug & Annotate"
