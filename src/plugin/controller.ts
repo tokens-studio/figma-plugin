@@ -52,7 +52,7 @@ figma.on('close', () => {
 });
 
 async function sendSelectionChange(): Promise<SelectionContent | null> {
-  const nodes = inspectDeep ? (await defaultNodeManager.findNodesWithData({ updateMode: UpdateMode.SELECTION })).map((node) => node.node) : Array.from(figma.currentPage.selection);
+  const nodes = inspectDeep && shouldSendSelectionValues ? (await defaultNodeManager.findNodesWithData({ updateMode: UpdateMode.SELECTION })).map((node) => node.node) : Array.from(figma.currentPage.selection);
   const currentSelectionLength = figma.currentPage.selection.length;
 
   if (!currentSelectionLength) {
