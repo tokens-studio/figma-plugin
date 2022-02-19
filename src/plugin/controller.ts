@@ -25,7 +25,7 @@ import {
   postToUI,
 } from './notifiers';
 import {
-  removePluginData, sendPluginValues, updatePluginData, findNodesById, SelectionContent,
+  sendPluginValues, updatePluginData, SelectionContent,
 } from './pluginData';
 import {
   getTokenData, updateNodes, setTokensOnDocument, goToNode, saveStorageType, getSavedStorageType,
@@ -136,7 +136,7 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
           const tokensMap = tokenArrayGroupToMap(msg.tokens);
 
           const nodes = await defaultNodeManager.update(figma.currentPage.selection);
-          await updatePluginData(nodes, msg.values);
+          await updatePluginData({ entries: nodes, values: msg.values });
           await sendPluginValues(
             {
               nodes: figma.currentPage.selection,
@@ -155,11 +155,24 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
       return;
 
     case MessageToPluginTypes.REMOVE_TOKENS_BY_VALUE: {
-      msg.tokensToRemove.forEach((token) => {
-        const nodes = findNodesById(figma.currentPage.selection, token.nodes);
+      const nodesToRemove: { [key: string]: string[] } = {};
 
-        removePluginData({ nodes, key: token.property, shouldRemoveValues: false });
+      msg.tokensToRemove.forEach((token) => {
+        token.nodes.forEach((node) => { nodesToRemove[node] = nodesToRemove[node] ? [...nodesToRemove[node], token.property] : [token.property]; });
+        // const nodes = findNodesById(figma.currentPage.selection, token.nodes);
       });
+
+      await Promise.all(Object.entries(nodesToRemove).map(async (node) => {
+        const newEntries = node[1].reduce((acc, curr) => {
+          acc[curr] = 'delete';
+          return acc;
+        }, {});
+
+        const nodeToUpdate = await defaultNodeManager.getNode(node[0]);
+        if (nodeToUpdate) {
+          await updatePluginData({ entries: [nodeToUpdate], values: newEntries, shouldRemove: false });
+        }
+      }));
       sendSelectionChange();
       break;
     }
@@ -183,7 +196,7 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
           updateMode: msg.settings.updateMode,
         });
         await updateNodes(allWithData, tokensMap, msg.settings);
-        await updatePluginData(allWithData, {});
+        await updatePluginData({ entries: allWithData, values: {} });
         notifyRemoteComponents({
           nodes: store.successfulNodes.size,
           remotes: store.remoteComponents,
@@ -225,7 +238,7 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
           }
           return all;
         }, []);
-        await updatePluginData(updatedNodes, {}, true);
+        await updatePluginData({ entries: updatedNodes, values: {}, shouldOverride: true });
 
         await sendSelectionChange();
         notifyRemoteComponents({
