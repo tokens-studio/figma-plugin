@@ -257,6 +257,11 @@ export class NodeManager {
     return compact(nodes.map((node) => this.nodes.get(node.id)));
   }
 
+  public async getNode(id: string) {
+    await this.waitForUpdating();
+    return this.nodes.get(id);
+  }
+
   public async findNodesWithData(opts: {
     updateMode?: UpdateMode;
     nodes?: readonly BaseNode[];
