@@ -321,6 +321,13 @@ export class NodeManager {
 
       const checksum = hash(tokens);
       if (checksum !== entry.hash) {
+        // If another node uses this node (e.g. component instances) we need to invalidate their cache by either looking at naming or main key
+        const hasSameMainKey = (n) => (node.type === 'COMPONENT' ? n.mainKey === node.key : false);
+        const nodesRequiringInvalidation = [...this.nodes.values()].filter((n) => (n.id.includes(`;${node.id}`) || hasSameMainKey(n)));
+
+        nodesRequiringInvalidation.forEach((n) => {
+          this.nodes.delete(n.id);
+        });
         entry.tokens = tokens;
         entry.hash = checksum;
         tokensSharedDataHandler.set(node, SharedPluginDataKeys.tokens.hash, hash(tokens));
