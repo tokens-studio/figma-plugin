@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "six7",
-  "license": "ISC",
+  "license": "MIT",
   "bin": "index.js",
   "dependencies": {
     "yargs": "^17.3.1"
