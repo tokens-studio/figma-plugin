@@ -159,7 +159,6 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
 
       msg.tokensToRemove.forEach((token) => {
         token.nodes.forEach((node) => { nodesToRemove[node] = nodesToRemove[node] ? [...nodesToRemove[node], token.property] : [token.property]; });
-        // const nodes = findNodesById(figma.currentPage.selection, token.nodes);
       });
 
       await Promise.all(Object.entries(nodesToRemove).map(async (node) => {

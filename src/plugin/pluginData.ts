@@ -97,21 +97,6 @@ export async function removePluginData({ nodes, key, shouldRemoveValues = true }
   }));
 }
 
-export function findNodesById(nodes, ids): SceneNode[] {
-  const nodesAndChildren = [];
-
-  nodes.forEach((node) => {
-    if (ids.includes(node.id)) {
-      nodesAndChildren.push(node);
-    }
-    if (node.children) {
-      nodesAndChildren.push(...findNodesById(node.children, ids));
-    }
-  });
-
-  return nodesAndChildren;
-}
-
 export async function updatePluginData({
   entries, values, shouldOverride = false, shouldRemove = true,
 }: { entries: readonly NodeManagerNode[], values: NodeTokenRefMap, shouldOverride?: boolean, shouldRemove?: boolean }) {
