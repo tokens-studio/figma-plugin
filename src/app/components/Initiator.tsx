@@ -103,7 +103,7 @@ export function Initiator() {
           }
           case MessageFromPluginTypes.USER_ID: {
             identify(pluginMessage.user);
-            track('Launched', { version: pjs.version });
+            track('Launched', { version: pjs.plugin_version });
             break;
           }
           case MessageFromPluginTypes.RECEIVED_LAST_OPENED: {
