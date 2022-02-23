@@ -5,6 +5,9 @@ import { TransformerOptions } from './types';
 export default function convertTokensToGroupedObject(tokens, excludedSets, options: TransformerOptions) {
   let tokenObj = {};
   tokenObj = tokens.reduce((acc, token) => {
+    if (options.throwErrorWhenNotResolved && token.failedToResolve) {
+      throw new Error(`ERROR: failed to resolve token "${token.name}"`);
+    }
     if (excludedSets.includes(token.internal__Parent)) {
       return acc;
     }
