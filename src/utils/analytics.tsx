@@ -1,4 +1,5 @@
 import mixpanel from './mixpanel';
+import * as pjs from '../../package.json';
 
 export function track(name: string, opts = {}) {
   if (process.env.MIXPANEL_ACCESS_TOKEN) {
@@ -14,6 +15,7 @@ export function identify({ userId, figmaId, name }: { userId: string; figmaId?: 
       USER_ID: userId,
       FIGMA_USER_ID: figmaId,
       NAME: name,
+      version: pjs.plugin_version,
     });
   }
 }
