@@ -1,3 +1,7 @@
+## v0.0.19 (2022-02-24)
+
+Changed expandTypography to include the key as a token type so users could transform these accordingly with style dictionary.
+
 ## v0.0.18 (2022-02-20)
 
 Adds --preserveRawValue: true|false which allows you to add a `rawValue` prop on each token containing the unresolved value. Thanks @zephraph!

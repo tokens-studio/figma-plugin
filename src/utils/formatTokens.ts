@@ -17,6 +17,7 @@ export default function formatTokens({
         const expandedTypography = Object.entries(tokenWithoutName.value).reduce((acc, [key, val]) => {
           acc[key] = {
             value: val,
+            type: key,
           };
           return acc;
         }, {});
