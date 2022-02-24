@@ -19,6 +19,7 @@ export default function convertTokensToGroupedObject(tokens, excludedSets, optio
       const expandedTypography = Object.entries(tokenWithType.value).reduce((acc, [key, val]) => {
         acc[key] = {
           value: val,
+          type: key,
         };
         return acc;
       }, {});
