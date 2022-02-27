@@ -114,6 +114,41 @@ describe('convertTokensObjectToResolved', () => {
       ],
     };
 
-    expect(convertTokensObjectToResolved(tokens, [], [], { expandTypography: false })).toMatchSnapshot();
+    expect(convertTokensObjectToResolved(tokens, [], [], { expandTypography: false, preserveRawValue: false })).toMatchSnapshot();
+  });
+
+  it('preserves rawValue when requested', () => {
+    const tokens = {
+      global: {
+        colors: {
+          white: {
+            value: '#ffffff',
+            type: 'color',
+          },
+          black: {
+            value: '#000000',
+            type: 'color',
+          },
+        },
+      },
+      light: {
+        colors: {
+          background: {
+            value: '$colors.white',
+            type: 'color',
+          },
+        },
+      },
+      dark: {
+        colors: {
+          background: {
+            value: '$colors.black',
+            type: 'color',
+          },
+        },
+      },
+    };
+
+    expect(convertTokensObjectToResolved(tokens, [], [], { expandTypography: false, preserveRawValue: true })).toMatchSnapshot();
   });
 });
