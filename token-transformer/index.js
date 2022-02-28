@@ -46,6 +46,11 @@ const argv = yargs(hideBin(process.argv))
                 type: 'boolean',
                 describe: 'Preserve the raw, unprocessed value in the output tokens',
                 default: false
+            })
+            .option('resolveValues', {
+                type: 'boolean',
+                describe: 'Resolves values, removing any aliases',
+                default: true
             });
     })
 
