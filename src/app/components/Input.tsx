@@ -28,7 +28,8 @@ type Props = {
 const StyledIcon = styled('div', {
   width: '20px',
   height: '20px',
-  marginRight: '10px',
+  marginRight: '4px',
+  marginLeft: '4px',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
@@ -59,7 +60,8 @@ const Input: React.FC<Props> = ({
   // if isMasked is true, then we need to handle toggle visibility
   const [show, setShow] = React.useState(false);
 
-  const handleVisibility = () => {
+  const handleVisibility = (e) => {
+    e.preventDefault();
     setShow(!show);
     if (inputRef?.current?.type) {
       inputRef.current.type = inputRef?.current?.type === 'password' ? 'text' : 'password';
@@ -95,7 +97,9 @@ const Input: React.FC<Props> = ({
         />
 
         {isMasked && (
-          <StyledIcon onClick={handleVisibility}>{show ? <IconVisibility /> : <IconVisibilityOff />}</StyledIcon>
+          <button className="py-1 mr-2 rounded-full" onClick={handleVisibility}>
+            <StyledIcon>{show ? <IconVisibility /> : <IconVisibilityOff />}</StyledIcon>
+          </button>
         )}
       </span>
     </label>
