@@ -1,9 +1,9 @@
 {
     "name": "figma-tokens",
     "version": "1.0.0",
-    "plugin_version": "80",
+    "plugin_version": "85",
     "description": "Figma Tokens",
-    "license": "ISC",
+    "license": "MIT",
     "scripts": {
         "build-css": "postcss src/app/styles/tailwind.css -o src/app/styles/main.css",
         "watch-css": "postcss src/app/styles/tailwind.css -o src/app/styles/main.css -w",
@@ -24,7 +24,7 @@
         "@figma-plugin/helpers": "^0.15.2",
         "@octokit/rest": "^18.9.0",
         "@radix-ui/react-checkbox": "^0.1.4",
-        "@radix-ui/react-context-menu": "^0.0.23",
+        "@radix-ui/react-context-menu": "^0.1.4",
         "@radix-ui/react-dropdown-menu": "^0.0.19",
         "@radix-ui/react-icons": "^1.0.3",
         "@radix-ui/react-label": "^0.0.14",

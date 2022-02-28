@@ -41,6 +41,11 @@ const argv = yargs(hideBin(process.argv))
                 type: 'boolean',
                 describe: 'Expands typography in the output tokens',
                 default: false,
+            })
+            .option('preserveRawValue', {
+                type: 'boolean',
+                describe: 'Preserve the raw, unprocessed value in the output tokens',
+                default: false
             });
     })
 
@@ -67,21 +72,22 @@ const log = (message) => process.stdout.write(`[token-transformer] ${message}\n`
  * Reads the given input file, transforms all tokens and writes them to the output file
  */
 const transform = () => {
-    const {input, output, sets, excludes, expandTypography, resolveValues} = argv;
+    const {input, output, sets, excludes, expandTypography, preserveRawValue, resolveValues} = argv;
 
     if (fs.existsSync(argv.input)) {
         const tokens = fs.readFileSync(input, {encoding: 'utf8', flag: 'r'});
         const parsed = JSON.parse(tokens);
         const options = {
             expandTypography,
-            resolveValues
+            resolveValues,
+            preserveRawValue
         };
 
 
         log(`transforming tokens from input: ${input}`);
         log(`using sets: ${sets.length > 0 ? sets : '[]'}`);
         log(`using excludes: ${excludes.length > 0 ? excludes : '[]'}`);
-        log(`using options: { expandTypography: ${options.expandTypography}, resolveValues: ${options.resolveValues} }`);
+        log(`using options: { expandTypography: ${expandTypography}, preserveRawValue: ${preserveRawValue}, resolveValues: ${resolveValues} }`);
 
         const transformed = transformTokens(parsed, sets, excludes, options);
 

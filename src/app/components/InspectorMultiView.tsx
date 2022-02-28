@@ -8,13 +8,13 @@ import Checkbox from './Checkbox';
 import Label from './Label';
 import Blankslate from './Blankslate';
 import InspectorTokenGroup from './InspectorTokenGroup';
+import { SingleTokenObject } from '@/types/tokens';
 
-export default function InspectorMultiView() {
+export default function InspectorMultiView({ resolvedTokens }: { resolvedTokens: SingleTokenObject[] }) {
   const inspectState = useSelector((state: RootState) => state.inspectState);
   const uiState = useSelector((state: RootState) => state.uiState);
   const { removeTokensByValue } = useTokens();
 
-  const { inspectDeep } = useSelector((state: RootState) => state.settings);
   const dispatch = useDispatch<Dispatch>();
 
   React.useEffect(() => {
@@ -50,28 +50,6 @@ export default function InspectorMultiView() {
       display: 'flex', flexDirection: 'column', flexGrow: 1, padding: '$4',
     }}
     >
-      <Box
-        css={{
-          display: 'flex',
-          border: '1px solid $border',
-          borderRadius: '$card',
-          marginBottom: '$4',
-          padding: '$4',
-          flexDirection: 'row',
-          alignItems: 'center',
-          gap: '$3',
-        }}
-      >
-        <Checkbox
-          checked={inspectDeep}
-          id="inspectDeep"
-          onCheckedChange={() => dispatch.settings.setInspectDeep(!inspectDeep)}
-        />
-        <Label htmlFor="inspectDeep">
-          <Box css={{ fontWeight: '$bold', fontSize: '$small', marginBottom: '$1' }}>Deep inspect</Box>
-          <Box css={{ fontSize: '$small' }}>Scans the selected layer and all of its children</Box>
-        </Label>
-      </Box>
       {uiState.selectionValues.length > 0 ? (
         <Box css={{ display: 'flex', flexDirection: 'column', gap: '$1' }}>
           <Box css={{
@@ -97,14 +75,14 @@ export default function InspectorMultiView() {
                 Select all
               </Label>
             </Box>
-            <Button onClick={removeTokens} disabled={inspectState.selectedTokens.length === 0} variant="secondary">
+            <Button onClick={() => removeTokens()} disabled={inspectState.selectedTokens.length === 0} variant="secondary">
               Remove selected
             </Button>
           </Box>
-          {Object.entries(groupedSelectionValues).map((group) => <InspectorTokenGroup key={`inspect-group-${group[0]}`} group={group} />)}
+          {Object.entries(groupedSelectionValues).map((group) => <InspectorTokenGroup key={`inspect-group-${group[0]}`} group={group} resolvedTokens={resolvedTokens} />)}
         </Box>
       ) : (
-        <Blankslate title={uiState.selectedLayers ? 'No tokens found' : 'No layers selected'} text={uiState.selectedLayers ? 'None of the selected layers contain any tokens' : 'Select a layer to see applied tokens'} />
+        <Blankslate title={uiState.selectedLayers > 0 ? 'No tokens found' : 'No layers selected'} text={uiState.selectedLayers > 0 ? 'None of the selected layers contain any tokens' : 'Select a layer to see applied tokens'} />
       )}
     </Box>
   );

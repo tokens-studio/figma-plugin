@@ -12,9 +12,10 @@ function useConfirm() {
     description,
     confirmAction,
     choices,
+    input,
   }: ConfirmProps): Promise<{ result: boolean; data?: any }> => {
     dispatch.uiState.setShowConfirm({
-      text, description, confirmAction, choices,
+      text, description, confirmAction, choices, input,
     });
 
     return new Promise((res, rej) => {

@@ -44,23 +44,29 @@ describe('formatTokens', () => {
                 h1: {
                   fontFamily: {
                     value: 'Inter',
+                    type: 'fontFamily',
                   },
                   fontWeight: {
                     value: 'Bold',
+                    type: 'fontWeight',
                   },
                   fontSize: {
                     value: 36,
+                    type: 'fontSize',
                   },
                 },
                 h2: {
                   fontFamily: {
                     value: 'Inter',
+                    type: 'fontFamily',
                   },
                   fontWeight: {
                     value: 'Regular',
+                    type: 'fontWeight',
                   },
                   fontSize: {
                     value: 24,
+                    type: 'fontSize',
                   },
                 },
               },

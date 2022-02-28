@@ -42,13 +42,25 @@ export function notifyNoSelection() {
   });
 }
 
-export function notifySelection({ selectionValues, mainNodeSelectionValues }: { selectionValues: SelectionGroup[], mainNodeSelectionValues: SelectionValue[] }) {
+export function notifySelection({ selectionValues, mainNodeSelectionValues, selectedNodes }: { selectionValues: SelectionGroup[], mainNodeSelectionValues: SelectionValue[], selectedNodes: number }) {
   postToUI({
     type: MessageFromPluginTypes.SELECTION,
     selectionValues,
     mainNodeSelectionValues,
+    selectedNodes,
   });
 }
+
+export type SavedSettings = {
+  width: number;
+  height: number;
+  updateMode: UpdateMode;
+  updateRemote: boolean;
+  updateOnChange: boolean;
+  updateStyles: boolean;
+  ignoreFirstPartForStyles: boolean;
+  inspectDeep: boolean;
+};
 
 export function notifyUISettings({
   width,
@@ -59,16 +71,7 @@ export function notifyUISettings({
   ignoreFirstPartForStyles,
   updateRemote = true,
   inspectDeep,
-}: {
-  width: number;
-  height: number;
-  updateMode: UpdateMode;
-  updateRemote: boolean;
-  updateOnChange: boolean;
-  updateStyles: boolean;
-  ignoreFirstPartForStyles: boolean;
-  inspectDeep: boolean;
-}) {
+}: SavedSettings) {
   postToUI({
     type: MessageFromPluginTypes.UI_SETTINGS,
     settings: {

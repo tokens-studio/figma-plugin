@@ -27,7 +27,7 @@ export function transformPluginDataToSelectionValues(pluginData): SelectionGroup
       if (existing) {
         existing.nodes.push(id);
       } else {
-        const category = mapPropertyToCategory(key);
+        const category = Properties[key];
 
         acc.push({
           value, type: key, category, nodes: [id],
@@ -40,12 +40,13 @@ export function transformPluginDataToSelectionValues(pluginData): SelectionGroup
   return selectionValues;
 }
 
-type SelectionContent = {
-  selectionValues: SelectionGroup[]
+export type SelectionContent = {
+  selectionValues?: SelectionGroup[]
   mainNodeSelectionValues: SelectionValue[]
+  selectedNodes: number
 };
 
-export async function sendPluginValues(nodes: readonly BaseNode[], values?: NodeTokenRefMap): Promise<SelectionContent> {
+export async function sendPluginValues({ nodes, values, shouldSendSelectionValues }: { nodes: readonly BaseNode[], values?: NodeTokenRefMap, shouldSendSelectionValues: boolean }): Promise<SelectionContent> {
   let pluginValues = values;
   let mainNodeSelectionValues = [];
   let selectionValues;
@@ -57,63 +58,48 @@ export async function sendPluginValues(nodes: readonly BaseNode[], values?: Node
   // TODO: Handle all selected nodes share the same properties
   // TODO: Handle many selected and mixed (for Tokens tab)
   if (pluginValues?.length > 0) {
-    selectionValues = transformPluginDataToSelectionValues(pluginValues);
+    if (shouldSendSelectionValues) selectionValues = transformPluginDataToSelectionValues(pluginValues);
     mainNodeSelectionValues = pluginValues.map((value) => value.tokens);
   }
 
-  notifySelection({ selectionValues, mainNodeSelectionValues });
-  return { selectionValues, mainNodeSelectionValues };
+  const selectedNodes = figma.currentPage.selection.length;
+
+  notifySelection({ selectionValues, mainNodeSelectionValues, selectedNodes });
+  return { selectionValues, mainNodeSelectionValues, selectedNodes };
 }
 
 export async function removePluginData({ nodes, key, shouldRemoveValues = true }: { nodes: readonly (BaseNode | SceneNode)[], key?: Properties, shouldRemoveValues?: boolean }) {
   return Promise.all(nodes.map(async (node) => {
-    try {
-      node.setRelaunchData({});
-    } finally {
-      if (key) {
-        node.setPluginData(key, '');
-        tokensSharedDataHandler.set(node, key, '');
-        await defaultNodeManager.updateNode(node, (tokens) => (
-          omit(tokens, key)
-        ));
-        if (shouldRemoveValues) {
-          removeValuesFromNode(node, key);
-        }
-      } else {
-        await defaultNodeManager.updateNode(node, (tokens) => (
-          omit(tokens, Object.values(Properties))
-        ));
-        Object.values(Properties).forEach((prop) => {
-          node.setPluginData(prop, '');
-          tokensSharedDataHandler.set(node, prop, '');
-          if (shouldRemoveValues) {
-            removeValuesFromNode(node, prop);
-          }
-        });
+    if (key) {
+      node.setPluginData(key, '');
+      tokensSharedDataHandler.set(node, key, '');
+      await defaultNodeManager.updateNode(node, (tokens) => (
+        omit(tokens, key)
+      ));
+      if (shouldRemoveValues) {
+        removeValuesFromNode(node, key);
       }
-      // @deprecated remove deprecated values key
-      node.setPluginData('values', '');
-      store.successfulNodes.add(node);
+    } else {
+      await defaultNodeManager.updateNode(node, (tokens) => (
+        omit(tokens, Object.values(Properties))
+      ));
+      Object.values(Properties).forEach((prop) => {
+        node.setPluginData(prop, '');
+        tokensSharedDataHandler.set(node, prop, '');
+        if (shouldRemoveValues) {
+          removeValuesFromNode(node, prop);
+        }
+      });
     }
+    // @deprecated remove deprecated values key
+    node.setPluginData('values', '');
+    store.successfulNodes.add(node);
   }));
 }
 
-export function findNodesById(nodes, ids): SceneNode[] {
-  const nodesAndChildren = [];
-
-  nodes.forEach((node) => {
-    if (ids.includes(node.id)) {
-      nodesAndChildren.push(node);
-    }
-    if (node.children) {
-      nodesAndChildren.push(...findNodesById(node.children, ids));
-    }
-  });
-
-  return nodesAndChildren;
-}
-
-export async function updatePluginData(entries: readonly NodeManagerNode[], values: NodeTokenRefMap, shouldOverride = false) {
+export async function updatePluginData({
+  entries, values, shouldOverride = false, shouldRemove = true,
+}: { entries: readonly NodeManagerNode[], values: NodeTokenRefMap, shouldOverride?: boolean, shouldRemove?: boolean }) {
   const namespace = SharedPluginDataNamespaces.TOKENS;
 
   postToUI({
@@ -142,7 +128,7 @@ export async function updatePluginData(entries: readonly NodeManagerNode[], valu
         switch (value) {
           case 'delete':
             delete newValuesOnNode[key];
-            await removePluginData({ nodes: [node], key: key as Properties });
+            await removePluginData({ nodes: [node], key: key as Properties, shouldRemoveValues: shouldRemove });
             break;
             // Pre-Version 53 had horizontalPadding and verticalPadding.
           case 'horizontalPadding':
@@ -164,30 +150,20 @@ export async function updatePluginData(entries: readonly NodeManagerNode[], valu
       }));
       await defaultNodeManager.updateNode(node, newValuesOnNode);
 
-      if (node.type !== 'INSTANCE') {
-        const nodeHasNoValues = Object.keys(newValuesOnNode).length === 0 && newValuesOnNode.constructor === Object;
-        const editRelaunchData = node.getRelaunchData() as {
-          edit?: string
-        };
+      const nodeHasNoValues = Object.keys(newValuesOnNode).length === 0 && newValuesOnNode.constructor === Object;
+      const editRelaunchData = node.getRelaunchData() as {
+        edit?: string
+      };
 
-        if (nodeHasNoValues && editRelaunchData.edit) {
-          try {
-            node.setRelaunchData({});
-          } catch (e) {
-            console.error('Updating relaunchData on instance children not supported.');
-          }
-        } else if (!nodeHasNoValues) {
-          const updatedRelaunchData = Object.keys(newValuesOnNode).join(', ');
-          if (updatedRelaunchData !== editRelaunchData.edit) {
-            try {
-              node.setRelaunchData({
-                edit: updatedRelaunchData,
-              });
-            } catch (e) {
-              console.error('Updating relaunchData on instance children not supported.');
-            }
-          }
+      if (!nodeHasNoValues) {
+        const updatedRelaunchData = Object.keys(newValuesOnNode).join(', ');
+        if (updatedRelaunchData !== editRelaunchData.edit) {
+          node.setRelaunchData({
+            edit: updatedRelaunchData,
+          });
         }
+      } else {
+        node.setRelaunchData({});
       }
 
       tracker.next();

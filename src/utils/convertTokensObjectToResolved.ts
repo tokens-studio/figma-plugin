@@ -11,6 +11,7 @@ export default function convertTokensObjectToResolved(
   options: TransformerOptions = {
     expandTypography: false,
     resolveValues: true,
+    preserveRawValue: false,
   },
 ) {
   // Parse tokens into array structure
@@ -20,6 +21,6 @@ export default function convertTokensObjectToResolved(
   // Resolve aliases
   const resolved = options.resolveValues ? resolveTokenValues(merged) : merged;
   // Group back into one object
-  const object = convertTokensToGroupedObject(resolved, excludedSets, options.expandTypography);
+  const object = convertTokensToGroupedObject(resolved, excludedSets, options);
   return object;
 }

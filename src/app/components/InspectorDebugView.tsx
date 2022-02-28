@@ -1,14 +1,20 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store';
-import useTokens from '../store/useTokens';
 import Box from './Box';
 import Blankslate from './Blankslate';
 import AnnotationBuilder from './AnnotationBuilder';
+import { SingleTokenObject } from '@/types/tokens';
+import useTokens from '../store/useTokens';
 
-export default function InspectorDebugView() {
+export default function InspectorDebugView({ resolvedTokens }: { resolvedTokens: SingleTokenObject[] }) {
   const uiState = useSelector((state: RootState) => state.uiState);
-  const { findToken } = useTokens();
+  const { getTokenValue } = useTokens();
+
+  function renderBlankslate() {
+    if (uiState.selectedLayers > 1) return <Blankslate title="More than 1 layer selected" text="Select a single layer to see applied tokens" />;
+    return <Blankslate title={uiState.selectedLayers === 1 ? 'No tokens found' : 'No layer selected'} text={uiState.selectedLayers === 1 ? 'Selected layer contains no tokens' : 'Select a layer to see applied tokens'} />;
+  }
 
   return (
     <Box css={{
@@ -17,7 +23,7 @@ export default function InspectorDebugView() {
     >
       <AnnotationBuilder />
 
-      {Object.entries(uiState.mainNodeSelectionValues).length > 0
+      {uiState.selectedLayers === 1 && Object.entries(uiState.mainNodeSelectionValues).length > 0
         ? (
           <div className="space-y-1">
             {Object.entries(uiState.mainNodeSelectionValues)
@@ -32,13 +38,13 @@ export default function InspectorDebugView() {
                       $
                       {typeof value === 'string' && value.split('.').join('-')}
                     </div>
-                    <div className="text-gray-500 break-all">{`/* ${JSON.stringify(findToken(value))} */`}</div>
+                    <div className="text-gray-500 break-all">{`/* ${JSON.stringify(getTokenValue(value, resolvedTokens))} */`}</div>
                   </code>
                 </div>
               ))}
           </div>
         )
-        : <Blankslate title={uiState.selectedLayers ? 'No tokens found' : 'No layers selected'} text={uiState.selectedLayers ? 'None of the selected layers contain any tokens' : 'Select a layer to see applied tokens'} />}
+        : renderBlankslate()}
     </Box>
   );
 }

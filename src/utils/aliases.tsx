@@ -3,7 +3,7 @@ import { SingleTokenObject } from '@/types/tokens';
 import checkIfValueToken from './checkIfValueToken';
 import { findReferences } from './findReferences';
 
-export default function getAliasValue(token: SingleTokenObject | string | number, tokens = []): string | null {
+export default function getAliasValue(token: SingleTokenObject | string | number, tokens: SingleTokenObject[] = []): string | null {
   let returnedValue = checkIfValueToken(token) ? (token.value as string) : (token as string);
 
   try {

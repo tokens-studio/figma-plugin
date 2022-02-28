@@ -6,6 +6,7 @@ import { postToFigma } from '../../plugin/notifiers';
 import useRemoteTokens from '../store/remoteTokens';
 import { Dispatch } from '../store';
 import useStorage from '../store/useStorage';
+import * as pjs from '../../../package.json';
 
 export function Initiator() {
   const dispatch = useDispatch<Dispatch>();
@@ -28,8 +29,8 @@ export function Initiator() {
         const { pluginMessage } = event.data;
         switch (pluginMessage.type) {
           case MessageFromPluginTypes.SELECTION: {
-            const { selectionValues, mainNodeSelectionValues } = pluginMessage;
-            dispatch.uiState.setSelectedLayers(true);
+            const { selectionValues, mainNodeSelectionValues, selectedNodes } = pluginMessage;
+            dispatch.uiState.setSelectedLayers(selectedNodes);
             dispatch.uiState.setDisabled(false);
             if (mainNodeSelectionValues.length > 1) {
               dispatch.uiState.setMainNodeSelectionValues({});
@@ -51,7 +52,7 @@ export function Initiator() {
           }
           case MessageFromPluginTypes.NO_SELECTION: {
             dispatch.uiState.setDisabled(true);
-            dispatch.uiState.setSelectedLayers(false);
+            dispatch.uiState.setSelectedLayers(0);
             dispatch.uiState.resetSelectionValues();
             dispatch.uiState.setMainNodeSelectionValues({});
             break;
@@ -102,7 +103,7 @@ export function Initiator() {
           }
           case MessageFromPluginTypes.USER_ID: {
             identify(pluginMessage.user);
-            track('Launched');
+            track('Launched', { version: pjs.plugin_version });
             break;
           }
           case MessageFromPluginTypes.RECEIVED_LAST_OPENED: {

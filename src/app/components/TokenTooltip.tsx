@@ -1,6 +1,7 @@
 import React from 'react';
-import getAliasValue from '@/utils/aliases';
 import Box from './Box';
+import useTokens from '../store/useTokens';
+import { SingleTokenObject } from '@/types/tokens';
 
 function SingleShadow({ shadow }) {
   return (
@@ -22,9 +23,11 @@ function SingleShadow({ shadow }) {
 }
 
 // Returns token value in display format
-export default function TokenTooltip({ token, resolvedTokens, shouldResolve = false }) {
+export default function TokenTooltip({ token, resolvedTokens, shouldResolve = false }: { token: SingleTokenObject, resolvedTokens: SingleTokenObject[], shouldResolve?: boolean }) {
+  const { getTokenValue } = useTokens();
+
   try {
-    const valueToCheck = shouldResolve ? getAliasValue(token, resolvedTokens) : token.value;
+    const valueToCheck = shouldResolve ? getTokenValue(token.name, resolvedTokens)?.value : token.value;
 
     if (token.type === 'typography') {
       if (shouldResolve) {
@@ -44,19 +47,23 @@ export default function TokenTooltip({ token, resolvedTokens, shouldResolve = fa
         <div>
           <div>
             Font:
+            {' '}
             {valueToCheck.fontFamily?.value || valueToCheck.fontFamily}
           </div>
           <div>
             Weight:
+            {' '}
             {valueToCheck.fontWeight?.value || valueToCheck.fontWeight}
           </div>
           <div>
             Leading:
+            {' '}
             {valueToCheck.lineHeight?.value || valueToCheck.lineHeight}
           </div>
           <div>
             Tracking:
-            {valueToCheck.lineHeight?.value || valueToCheck.lineHeight}
+            {' '}
+            {valueToCheck.letterSpacing?.value || valueToCheck.letterSpacing}
           </div>
           <div>
             Paragraph Spacing:
@@ -65,10 +72,12 @@ export default function TokenTooltip({ token, resolvedTokens, shouldResolve = fa
           </div>
           <div>
             Text Case:
+            {' '}
             {valueToCheck.textCase?.value || valueToCheck.textCase}
           </div>
           <div>
             Text Decoration:
+            {' '}
             {valueToCheck.textDecoration?.value || valueToCheck.textDecoration}
           </div>
         </div>
