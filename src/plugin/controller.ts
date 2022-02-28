@@ -187,7 +187,7 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
         updateStyles(msg.tokens, false, msg.settings);
       }
       if (msg.tokenValues && msg.updatedAt) {
-        setTokensOnDocument(msg.tokenValues, msg.updatedAt);
+        setTokensOnDocument(msg.tokenValues, msg.updatedAt, msg.usedTokenSet);
       }
       if (msg.tokens) {
         const tokensMap = tokenArrayGroupToMap(msg.tokens);
