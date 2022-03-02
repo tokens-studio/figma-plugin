@@ -109,6 +109,10 @@ const defaultConfirmState: ConfirmProps = {
   input: undefined,
 };
 
+export interface ClientStorageUiState {
+  showEmptyGroups: boolean;
+}
+
 export const uiState = createModel<RootModel>()({
   state: {
     selectionValues: [] as SelectionGroup[],
@@ -288,10 +292,10 @@ export const uiState = createModel<RootModel>()({
         tokenFilter: payload,
       };
     },
-    toggleShowEmptyGroups(state) {
+    toggleShowEmptyGroups(state, payload?: boolean) {
       return {
         ...state,
-        showEmptyGroups: !state.showEmptyGroups,
+        showEmptyGroups: payload == null ? !state.showEmptyGroups : payload,
       };
     },
     toggleCollapsed(state) {
@@ -348,6 +352,14 @@ export const uiState = createModel<RootModel>()({
       postToFigma({
         type: MessageToPluginTypes.CHANGED_TABS,
         requiresSelectionValues,
+      });
+    },
+    toggleShowEmptyGroups(payload, rootState) {
+      postToFigma({
+        type: MessageToPluginTypes.SET_UI_STATE,
+        uiState: {
+          showEmptyGroups: payload == null ? rootState.uiState.showEmptyGroups : payload,
+        },
       });
     },
   }),

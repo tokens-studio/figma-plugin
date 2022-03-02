@@ -1,4 +1,5 @@
 import { SettingsState } from '@/app/store/models/settings';
+import { ClientStorageUiState } from '@/app/store/models/uiState';
 import { Properties } from '@/constants/Properties';
 import type { BackgroundJob } from '@/app/store/models/uiState';
 import {
@@ -22,6 +23,7 @@ export enum MessageFromPluginTypes {
   USER_ID = 'userId',
   RECEIVED_LAST_OPENED = 'receivedLastOpened',
   UI_SETTINGS = 'uiSettings',
+  UI_STATE = 'ui_state',
   START_JOB = 'start_job',
   COMPLETE_JOB = 'complete_job',
   CLEAR_JOBS = 'clear_jobs',
@@ -41,6 +43,7 @@ export enum MessageToPluginTypes {
   SET_STORAGE_TYPE = 'set-storage-type',
   NOTIFY = 'notify',
   SET_UI = 'set_ui',
+  SET_UI_STATE = 'set_UI_state',
   RESIZE_WINDOW = 'resize_window',
   CANCEL_OPERATION = 'cancel_operation',
   CREATE_ANNOTATION = 'create-annotation',
@@ -55,6 +58,12 @@ export type SelectionFromPluginMessage = {
   selectionValues: SelectionGroup[];
   mainNodeSelectionValues: SelectionValue[];
   selectedNodes: number
+};
+export type UiStateFromPluginMessage = {
+  type: MessageFromPluginTypes.UI_STATE;
+  uiState: {
+    showEmptyGroups: boolean;
+  };
 };
 export type UiSettingsFromPluginMessage = {
   type: MessageFromPluginTypes.UI_SETTINGS;
@@ -131,6 +140,7 @@ export type PostToUIMessage =
     | NoSelectionFromPluginMessage
     | SelectionFromPluginMessage
     | UiSettingsFromPluginMessage
+    | UiStateFromPluginMessage
     | RemoteCommentsFromPluginMessage
     | TokenValuesFromPluginMessage
     | ReceivedStorageTypeFromPluginMessage
@@ -197,6 +207,10 @@ export type NotifyToPluginMessage = {
 export type SetUiToPluginMessage = SettingsState & {
   type: MessageToPluginTypes.SET_UI;
 };
+export type SetUiStatePluginMessage = {
+  type: MessageToPluginTypes.SET_UI_STATE;
+  uiState: ClientStorageUiState
+};
 export type ResizeWindowToPluginMessage = {
   type: MessageToPluginTypes.RESIZE_WINDOW;
   width: number;
@@ -238,6 +252,7 @@ export type PostToFigmaMessage =
     | SetStorageTypeToPluginMessage
     | NotifyToPluginMessage
     | SetUiToPluginMessage
+    | SetUiStatePluginMessage
     | ResizeWindowToPluginMessage
     | CancelOperationToPluginMessage
     | CreateAnnotationToPluginMessage

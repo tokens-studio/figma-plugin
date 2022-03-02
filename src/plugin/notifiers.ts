@@ -62,6 +62,15 @@ export type SavedSettings = {
   inspectDeep: boolean;
 };
 
+export function notifyUiState(showEmptyGroups) {
+  postToUI({
+    type: MessageFromPluginTypes.UI_STATE,
+    uiState: {
+      showEmptyGroups,
+    },
+  });
+}
+
 export function notifyUISettings({
   width,
   height,

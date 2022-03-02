@@ -100,6 +100,10 @@ export function Initiator() {
             dispatch.settings.triggerWindowChange();
             break;
           }
+          case MessageFromPluginTypes.UI_STATE: {
+            dispatch.uiState.toggleShowEmptyGroups(pluginMessage.uiState.showEmptyGroups);
+            break;
+          }
           case MessageFromPluginTypes.USER_ID: {
             identify(pluginMessage.user);
             track('Launched');

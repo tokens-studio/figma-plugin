@@ -4,6 +4,7 @@ import 'regenerator-runtime/runtime';
 
 import { removeSingleCredential, updateCredentials } from '@/utils/credentials';
 import { updateUISettings, getUISettings } from '@/utils/uiSettings';
+import { updateUiState, getUiState } from '@/utils/uiState';
 import getLastOpened from '@/utils/getLastOpened';
 import { DefaultWindowSize } from '@/constants/DefaultWindowSize';
 import { createAnnotation } from '@/utils/annotations';
@@ -72,6 +73,7 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
       try {
         const { currentUser } = figma;
         const settings = await getUISettings();
+        const uiState = await getUiState();
         inspectDeep = settings.inspectDeep;
         const userId = await getUserId();
         const lastOpened = await getLastOpened();
@@ -258,6 +260,12 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
         type: MessageFromPluginTypes.CLEAR_JOBS,
       });
       break;
+    case MessageToPluginTypes.SET_UI_STATE: {
+      const { showEmptyGroups } = msg.uiState;
+      updateUiState({
+        showEmptyGroups,
+      });
+    }
     case MessageToPluginTypes.SET_UI: {
       const width = msg.uiWindow?.width ?? DefaultWindowSize.width;
       const height = msg.uiWindow?.height ?? DefaultWindowSize.height;
