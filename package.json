@@ -1,9 +1,9 @@
 {
     "name": "figma-tokens",
     "version": "1.0.0",
-    "plugin_version": "83",
+    "plugin_version": "85",
     "description": "Figma Tokens",
-    "license": "ISC",
+    "license": "MIT",
     "scripts": {
         "build-css": "postcss src/app/styles/tailwind.css -o src/app/styles/main.css",
         "watch-css": "postcss src/app/styles/tailwind.css -o src/app/styles/main.css -w",
