@@ -13,6 +13,8 @@ Install (either globally or local)
 
 `node token-transformer input.json output.json --expandTypography=false`
 
+`node token-transformer input.json output.json --expandTypography=false --preserveRawValue=true`
+
 ## Parameters
 
 Input: Filename of input
@@ -24,3 +26,5 @@ Sets: Sets to be used, comma-seperated
 Excludes: Sets that should not be part of the export (e.g. a global color scale)
 
 --expandTypography: true|false to enable/disable automatic expansion of typography types (default: false)
+
+--preserveRawValue: true|false to enable/disable addition of a rawValue key containing the unresolved value (default: false)

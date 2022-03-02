@@ -116,7 +116,7 @@ function EditTokenForm({ resolvedTokens }) {
         .map((n) => n.trim())
         .join('.');
       if (internalEditToken.isPristine) {
-        track('Create token');
+        track('Create token', { type: internalEditToken.type });
 
         createSingleToken({
           parent: activeTokenSet,
@@ -134,7 +134,7 @@ function EditTokenForm({ resolvedTokens }) {
         });
         // When users change token names references are still pointing to the old name, ask user to remap
         if (oldName && oldName !== newName) {
-          track('Edit token', { renamed: true });
+          track('Edit token', { renamed: true, type: internalEditToken.type });
 
           const shouldRemap = await confirm({
             text: `Remap all tokens that use ${oldName} to ${newName}?`,
