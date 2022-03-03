@@ -68,6 +68,28 @@ Object {
 }
 `;
 
+exports[`convertTokensObjectToResolved preserves rawValue when requested 1`] = `
+Object {
+  "colors": Object {
+    "background": Object {
+      "rawValue": "$colors.black",
+      "type": "color",
+      "value": "#000000",
+    },
+    "black": Object {
+      "rawValue": "#000000",
+      "type": "color",
+      "value": "#000000",
+    },
+    "white": Object {
+      "rawValue": "#ffffff",
+      "type": "color",
+      "value": "#ffffff",
+    },
+  },
+}
+`;
+
 exports[`convertTokensObjectToResolved respects used sets 1`] = `
 Object {
   "colors": Object {
