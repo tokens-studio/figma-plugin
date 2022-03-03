@@ -24,6 +24,15 @@ export default function convertTokensToGroupedObject(tokens, excludedSets, optio
         return acc;
       }, {});
       set(obj, token.name, { ...expandedTypography });
+    } else if (!!options.expandShadow && tokenWithType.type === 'boxShadow') {
+      const expandedShadow = Object.entries(tokenWithType.value).reduce((acc, [key, val]) => {
+        acc[key] = {
+          value: val,
+          type: key,
+        };
+        return acc;
+      }, {});
+      set(obj, token.name, { ...expandedShadow });
     } else {
       set(obj, token.name, tokenWithType);
     }

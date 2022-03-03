@@ -13,7 +13,9 @@ Install (either globally or local)
 
 `node token-transformer input.json output.json --expandTypography=false`
 
-`node token-transformer input.json output.json --expandTypography=false --preserveRawValue=true`
+`node token-transformer input.json output.json --expandTypography=false --expandShadow=false`
+
+`node token-transformer input.json output.json --expandTypography=false --expandShadow=false --preserveRawValue=true`
 
 ## Parameters
 
@@ -26,5 +28,7 @@ Sets: Sets to be used, comma-seperated
 Excludes: Sets that should not be part of the export (e.g. a global color scale)
 
 --expandTypography: true|false to enable/disable automatic expansion of typography types (default: false)
+
+--expandShadow: true|false to enable/disable automatic expansion of boxShadow types (default: false)
 
 --preserveRawValue: true|false to enable/disable addition of a rawValue key containing the unresolved value (default: false)

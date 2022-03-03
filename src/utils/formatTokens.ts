@@ -6,6 +6,7 @@ export default function formatTokens({
   includeAllTokens = false,
   includeParent = true,
   expandTypography = false,
+  expandShadow = false,
 }) {
   const nestUnderParent = includeAllTokens ? true : includeParent;
   const tokenObj = {};
@@ -22,6 +23,15 @@ export default function formatTokens({
           return acc;
         }, {});
         set(tokenObj, nestUnderParent ? [tokenSet, token.name].join('.') : token.name, { ...expandedTypography });
+      } else if (token.type === 'boxShadow' && expandShadow) {
+        const expandedShadow = Object.entries(tokenWithoutName.value).reduce((acc, [key, val]) => {
+          acc[key] = {
+            value: val,
+            type: key,
+          };
+          return acc;
+        }, {});
+        set(tokenObj, nestUnderParent ? [tokenSet, token.name].join('.') : token.name, { ...expandedShadow });
       } else {
         set(tokenObj, nestUnderParent ? [tokenSet, token.name].join('.') : token.name, tokenWithoutName);
       }

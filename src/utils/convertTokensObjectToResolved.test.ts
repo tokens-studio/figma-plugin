@@ -114,7 +114,7 @@ describe('convertTokensObjectToResolved', () => {
       ],
     };
 
-    expect(convertTokensObjectToResolved(tokens, [], [], { expandTypography: false, preserveRawValue: false })).toMatchSnapshot();
+    expect(convertTokensObjectToResolved(tokens, [], [], { expandTypography: false, expandShadow: false, preserveRawValue: false })).toMatchSnapshot();
   });
 
   it('preserves rawValue when requested', () => {
@@ -149,6 +149,6 @@ describe('convertTokensObjectToResolved', () => {
       },
     };
 
-    expect(convertTokensObjectToResolved(tokens, [], [], { expandTypography: false, preserveRawValue: true })).toMatchSnapshot();
+    expect(convertTokensObjectToResolved(tokens, [], [], { expandTypography: false, expandShadow: false, preserveRawValue: true })).toMatchSnapshot();
   });
 });

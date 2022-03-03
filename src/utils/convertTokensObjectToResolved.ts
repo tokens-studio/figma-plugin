@@ -10,6 +10,7 @@ export default function convertTokensObjectToResolved(
   excludedSets = [],
   options: TransformerOptions = {
     expandTypography: false,
+    expandShadow: false,
     preserveRawValue: false,
   },
 ) {

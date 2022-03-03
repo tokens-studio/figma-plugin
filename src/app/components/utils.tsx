@@ -27,6 +27,11 @@ export function isTypographyToken(token) {
   return token.type === 'typography';
 }
 
+export function isShadowToken(token) {
+  if (typeof token !== 'object') return false;
+  return token.type === 'boxShadow';
+}
+
 export function isSingleToken(token): token is { value: string } {
   return typeof token === 'object' && 'value' in token && 'type' in token && 'name' in token;
 }
