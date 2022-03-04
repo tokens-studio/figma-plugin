@@ -76,6 +76,7 @@ export type RemoteCommentsFromPluginMessage = {
 export type TokenValuesFromPluginMessage = {
   type: MessageFromPluginTypes.TOKEN_VALUES;
   values?: any;
+  usedTokenSet?: string[];
 };
 export type ReceivedStorageTypeFromPluginMessage = {
   type: MessageFromPluginTypes.RECEIVED_STORAGE_TYPE;
@@ -167,6 +168,7 @@ export type UpdateToPluginMessage = {
   tokens: TokenArrayGroup;
   updatedAt: string;
   settings: SettingsState;
+  usedTokenSet: string[];
 };
 export type CreateStylesToPluginMessage = {
   type: MessageToPluginTypes.CREATE_STYLES;
