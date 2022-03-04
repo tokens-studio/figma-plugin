@@ -135,13 +135,10 @@ export default async function setValuesOnNode(
           const path = data.border.split('.');
           const pathname = path.slice(ignoreFirstPartForStyles ? 1 : 0, path.length).join('/');
           const matchingStyle = figmaStyleMaps.paintStyles.get(pathname);
-          const { color, opacity } = convertToFigmaColor(values.border);
-
           if (matchingStyle) {
-            matchingStyle.paints = [{ color, opacity, type: 'SOLID' }];
             node.strokeStyleId = matchingStyle.id;
           } else {
-            node.strokes = [{ type: 'SOLID', color, opacity }];
+            setColorValuesOnTarget(node, { value: values.border }, 'strokes');
           }
         }
       }
