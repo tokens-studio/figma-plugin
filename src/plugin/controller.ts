@@ -39,6 +39,7 @@ import { defaultWorker } from './Worker';
 
 let inspectDeep = false;
 let shouldSendSelectionValues = false;
+let shouldIgnoreInstances = false;
 
 figma.skipInvisibleInstanceChildren = true;
 
@@ -52,7 +53,7 @@ figma.on('close', () => {
 });
 
 async function sendSelectionChange(): Promise<SelectionContent | null> {
-  const nodes = inspectDeep && shouldSendSelectionValues ? (await defaultNodeManager.findNodesWithData({ updateMode: UpdateMode.SELECTION })).map((node) => node.node) : Array.from(figma.currentPage.selection);
+  const nodes = inspectDeep && shouldSendSelectionValues ? (await defaultNodeManager.findNodesWithData({ updateMode: UpdateMode.SELECTION, ignoreInstances: shouldIgnoreInstances })).map((node) => node.node) : Array.from(figma.currentPage.selection);
   const currentSelectionLength = figma.currentPage.selection.length;
 
   if (!currentSelectionLength) {
@@ -73,6 +74,7 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
         const { currentUser } = figma;
         const settings = await getUISettings();
         inspectDeep = settings.inspectDeep;
+        shouldIgnoreInstances = settings.ignoreInstances;
         const userId = await getUserId();
         const lastOpened = await getLastOpened();
         const storageType = getSavedStorageType();
@@ -288,10 +290,15 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
         updateStyles: msg.updateStyles,
         ignoreFirstPartForStyles: msg.ignoreFirstPartForStyles,
         inspectDeep: msg.inspectDeep,
+        ignoreInstances: msg.ignoreInstances,
       });
       figma.ui.resize(width, height);
       if (inspectDeep !== msg.inspectDeep) {
         inspectDeep = msg.inspectDeep;
+        sendSelectionChange();
+      }
+      if (shouldIgnoreInstances !== msg.ignoreInstances) {
+        shouldIgnoreInstances = msg.ignoreInstances;
         sendSelectionChange();
       }
       break;

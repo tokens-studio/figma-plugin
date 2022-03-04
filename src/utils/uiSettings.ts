@@ -27,6 +27,7 @@ export async function getUISettings(): Promise<SavedSettings> {
     let updateStyles;
     let ignoreFirstPartForStyles;
     let inspectDeep;
+    let ignoreInstances;
     if (data) {
       const parsedData = await JSON.parse(data);
       width = parsedData.width || 400;
@@ -38,6 +39,7 @@ export async function getUISettings(): Promise<SavedSettings> {
       updateStyles = typeof parsedData.updateStyles === 'undefined' ? true : parsedData.updateStyles;
       ignoreFirstPartForStyles = typeof parsedData.ignoreFirstPartForStyles === 'undefined' ? false : parsedData.ignoreFirstPartForStyles;
       inspectDeep = typeof parsedData.inspectDeep === 'undefined' ? false : parsedData.inspectDeep;
+      ignoreInstances = typeof parsedData.ignoreInstances === 'undefined' ? false : parsedData.ignoreInstances;
       settings = {
         width: Math.max(300, width),
         height: Math.max(200, height),
@@ -47,6 +49,7 @@ export async function getUISettings(): Promise<SavedSettings> {
         updateStyles,
         ignoreFirstPartForStyles,
         inspectDeep,
+        ignoreInstances,
       };
 
       notifyUISettings(settings, showEmptyGroups);

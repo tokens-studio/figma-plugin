@@ -22,6 +22,7 @@ export interface SettingsState {
   tokenType?: TokenModeType;
   ignoreFirstPartForStyles?: boolean;
   inspectDeep: boolean;
+  ignoreInstances: boolean;
 }
 
 const setUI = (state: SettingsState) => {
@@ -44,6 +45,7 @@ export const settings = createModel<RootModel>()({
     tokenType: 'object',
     ignoreFirstPartForStyles: false,
     inspectDeep: false,
+    ignoreInstances: false,
   } as SettingsState,
   reducers: {
     setInspectDeep(state, payload: boolean) {
@@ -111,6 +113,12 @@ export const settings = createModel<RootModel>()({
         ignoreFirstPartForStyles: payload,
       };
     },
+    setIgnoreInstances(state, payload: boolean) {
+      return {
+        ...state,
+        ignoreInstances: payload,
+      };
+    },
   },
   effects: (dispatch) => ({
     setWindowSize: (payload, rootState) => {
@@ -136,6 +144,9 @@ export const settings = createModel<RootModel>()({
       setUI(rootState.settings);
     },
     setInspectDeep: (payload, rootState) => {
+      setUI(rootState.settings);
+    },
+    setIgnoreInstances: (payload, rootState) => {
       setUI(rootState.settings);
     },
   }),

@@ -7,11 +7,15 @@ import { RootState, Dispatch } from '../store';
 import Label from './Label';
 
 function SyncSettings() {
-  const { ignoreFirstPartForStyles } = useSelector((state: RootState) => state.settings);
+  const { ignoreFirstPartForStyles, ignoreInstances } = useSelector((state: RootState) => state.settings);
   const dispatch = useDispatch<Dispatch>();
 
   const handleIgnoreChange = (bool) => {
     dispatch.settings.setIgnoreFirstPartForStyles(bool);
+  };
+
+  const handleIgnoreInstances = (bool) => {
+    dispatch.settings.setIgnoreInstances(bool);
   };
 
   return (
@@ -40,6 +44,20 @@ function SyncSettings() {
               <code className="p-1 -m-1 font-bold">primary/500</code>
               . Since
               Version 53 you no longer need to prepend type to token names.
+            </div>
+          </div>
+        </div>
+        <div className="space-y-4">
+          <Heading>Config</Heading>
+          <div className="space-y-2">
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="ignoreInstances"
+                checked={ignoreInstances}
+                defaultChecked={ignoreInstances}
+                onCheckedChange={handleIgnoreInstances}
+              />
+              <Label htmlFor="ignoreInstances">Skips layers that are instances or part of instances</Label>
             </div>
           </div>
         </div>

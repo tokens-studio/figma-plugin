@@ -60,6 +60,7 @@ export type SavedSettings = {
   updateStyles: boolean;
   ignoreFirstPartForStyles: boolean;
   inspectDeep: boolean;
+  ignoreInstances: boolean;
 };
 
 export function notifyUISettings(
@@ -72,6 +73,7 @@ export function notifyUISettings(
     ignoreFirstPartForStyles,
     updateRemote = true,
     inspectDeep,
+    ignoreInstances,
   }: SavedSettings,
   showEmptyGroups: boolean,
 ) {
@@ -88,6 +90,7 @@ export function notifyUISettings(
       updateStyles,
       ignoreFirstPartForStyles,
       inspectDeep,
+      ignoreInstances,
     },
   });
   postToUI({
