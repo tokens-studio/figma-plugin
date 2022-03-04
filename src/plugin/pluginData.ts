@@ -46,13 +46,15 @@ export type SelectionContent = {
   selectedNodes: number
 };
 
-export async function sendPluginValues({ nodes, values, shouldSendSelectionValues }: { nodes: readonly BaseNode[], values?: NodeTokenRefMap, shouldSendSelectionValues: boolean }): Promise<SelectionContent> {
+export async function sendPluginValues({
+  nodes, values, shouldSendSelectionValues, ignoreInstances,
+}: { nodes: readonly BaseNode[], values?: NodeTokenRefMap, shouldSendSelectionValues: boolean, ignoreInstances: boolean }): Promise<SelectionContent> {
   let pluginValues = values;
   let mainNodeSelectionValues = [];
   let selectionValues;
 
   if (!pluginValues) {
-    pluginValues = await defaultNodeManager.findNodesWithData({ nodes });
+    pluginValues = await defaultNodeManager.findNodesWithData({ nodes, ignoreInstances });
   }
 
   // TODO: Handle all selected nodes share the same properties

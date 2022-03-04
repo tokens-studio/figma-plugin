@@ -55,12 +55,13 @@ figma.on('close', () => {
 async function sendSelectionChange(): Promise<SelectionContent | null> {
   const nodes = inspectDeep && shouldSendSelectionValues ? (await defaultNodeManager.findNodesWithData({ updateMode: UpdateMode.SELECTION, ignoreInstances: shouldIgnoreInstances })).map((node) => node.node) : Array.from(figma.currentPage.selection);
   const currentSelectionLength = figma.currentPage.selection.length;
+  console.log('sendSelectionChange', shouldIgnoreInstances, nodes);
 
   if (!currentSelectionLength) {
     notifyNoSelection();
     return null;
   }
-  return sendPluginValues({ nodes, shouldSendSelectionValues });
+  return sendPluginValues({ nodes, shouldSendSelectionValues, ignoreInstances: shouldIgnoreInstances });
 }
 
 figma.on('selectionchange', () => {
@@ -144,6 +145,7 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
               nodes: figma.currentPage.selection,
               values: await updateNodes(nodes, tokensMap, msg.settings),
               shouldSendSelectionValues: false,
+              ignoreInstances: shouldIgnoreInstances,
             },
           );
         }
@@ -195,6 +197,7 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
         const tokensMap = tokenArrayGroupToMap(msg.tokens);
         const allWithData = await defaultNodeManager.findNodesWithData({
           updateMode: msg.settings.updateMode,
+          ignoreInstances: shouldIgnoreInstances,
         });
         await updateNodes(allWithData, tokensMap, msg.settings);
         await updatePluginData({ entries: allWithData, values: {} });
@@ -212,6 +215,7 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
         } = msg;
         const allWithData = await defaultNodeManager.findNodesWithData({
           updateMode,
+          ignoreInstances: shouldIgnoreInstances,
         });
 
         // Go through allWithData and update all appearances of oldName to newName
