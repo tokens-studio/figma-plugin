@@ -133,12 +133,12 @@ export const tokenState = createModel<RootModel>()({
     }),
     setTokenData: (state, data: { values: SingleTokenObject[]; shouldUpdate: boolean, usedTokenSet?: string[] }) => {
       const values = parseTokenValues(data.values);
-      const tokenSets = Object.keys(data.values).filter((set) => data.usedTokenSet?.includes(set));
+      const tokenSets = data.usedTokenSet ? Object.keys(data.values).filter((set) => data.usedTokenSet?.includes(set)) : [Object.keys(values)[0]];
       return {
         ...state,
         tokens: values,
-        activeTokenSet: Array.isArray(data.values) ? 'global' : Object.keys(data.values)[0],
-        usedTokenSet: Array.isArray(data.values) ? ['global'] : tokenSets,
+        activeTokenSet: Object.keys(data.values)[0],
+        usedTokenSet: tokenSets,
       };
     },
     setJSONData(state, payload) {
