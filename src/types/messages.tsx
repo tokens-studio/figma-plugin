@@ -22,6 +22,7 @@ export enum MessageFromPluginTypes {
   USER_ID = 'userId',
   RECEIVED_LAST_OPENED = 'receivedLastOpened',
   UI_SETTINGS = 'uiSettings',
+  SHOW_EMPTY_GROUPS = 'show_empty_groups',
   START_JOB = 'start_job',
   COMPLETE_JOB = 'complete_job',
   CLEAR_JOBS = 'clear_jobs',
@@ -41,6 +42,7 @@ export enum MessageToPluginTypes {
   SET_STORAGE_TYPE = 'set-storage-type',
   NOTIFY = 'notify',
   SET_UI = 'set_ui',
+  SET_SHOW_EMPTY_GROUPS = 'set_show_empty_groups',
   RESIZE_WINDOW = 'resize_window',
   CANCEL_OPERATION = 'cancel_operation',
   CREATE_ANNOTATION = 'create-annotation',
@@ -69,6 +71,10 @@ export type UiSettingsFromPluginMessage = {
     updateStyles: boolean;
     ignoreFirstPartForStyles: boolean;
   };
+};
+export type showEmptyGroupsFromPluginMessage = {
+  type: MessageFromPluginTypes.SHOW_EMPTY_GROUPS;
+  showEmptyGroups: boolean;
 };
 export type RemoteCommentsFromPluginMessage = {
   type: MessageFromPluginTypes.REMOTE_COMPONENTS;
@@ -132,6 +138,7 @@ export type PostToUIMessage =
     | NoSelectionFromPluginMessage
     | SelectionFromPluginMessage
     | UiSettingsFromPluginMessage
+    | showEmptyGroupsFromPluginMessage
     | RemoteCommentsFromPluginMessage
     | TokenValuesFromPluginMessage
     | ReceivedStorageTypeFromPluginMessage
@@ -199,6 +206,10 @@ export type NotifyToPluginMessage = {
 export type SetUiToPluginMessage = SettingsState & {
   type: MessageToPluginTypes.SET_UI;
 };
+export type SetShowEmptyGroupsPluginMessage = {
+  type: MessageToPluginTypes.SET_SHOW_EMPTY_GROUPS;
+  showEmptyGroups: boolean;
+};
 export type ResizeWindowToPluginMessage = {
   type: MessageToPluginTypes.RESIZE_WINDOW;
   width: number;
@@ -240,6 +251,7 @@ export type PostToFigmaMessage =
     | SetStorageTypeToPluginMessage
     | NotifyToPluginMessage
     | SetUiToPluginMessage
+    | SetShowEmptyGroupsPluginMessage
     | ResizeWindowToPluginMessage
     | CancelOperationToPluginMessage
     | CreateAnnotationToPluginMessage

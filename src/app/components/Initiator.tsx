@@ -101,6 +101,10 @@ export function Initiator() {
             dispatch.settings.triggerWindowChange();
             break;
           }
+          case MessageFromPluginTypes.SHOW_EMPTY_GROUPS: {
+            dispatch.uiState.toggleShowEmptyGroups(pluginMessage.showEmptyGroups);
+            break;
+          }
           case MessageFromPluginTypes.USER_ID: {
             identify(pluginMessage.user);
             track('Launched', { version: pjs.plugin_version });

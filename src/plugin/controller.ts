@@ -270,6 +270,12 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
         type: MessageFromPluginTypes.CLEAR_JOBS,
       });
       break;
+    case MessageToPluginTypes.SET_SHOW_EMPTY_GROUPS: {
+      updateUISettings({
+        showEmptyGroups: msg.showEmptyGroups,
+      });
+      break;
+    }
     case MessageToPluginTypes.SET_UI: {
       const width = msg.uiWindow?.width ?? DefaultWindowSize.width;
       const height = msg.uiWindow?.height ?? DefaultWindowSize.height;
