@@ -43,7 +43,7 @@ describe('convertTokensObjectToResolved', () => {
       },
     };
 
-    expect(convertTokensObjectToResolved(tokens)).toMatchSnapshot();
+    expect(convertTokensObjectToResolved({ tokens })).toMatchSnapshot();
   });
 
   it('respects used sets', () => {
@@ -78,7 +78,7 @@ describe('convertTokensObjectToResolved', () => {
       },
     };
 
-    expect(convertTokensObjectToResolved(tokens, ['global', 'light'])).toMatchSnapshot();
+    expect(convertTokensObjectToResolved({ tokens, usedSets: ['global', 'light'] })).toMatchSnapshot();
   });
 
   it('does not expand typography when not needed', () => {
@@ -114,7 +114,7 @@ describe('convertTokensObjectToResolved', () => {
       ],
     };
 
-    expect(convertTokensObjectToResolved(tokens, [], [], { expandTypography: false, preserveRawValue: false })).toMatchSnapshot();
+    expect(convertTokensObjectToResolved({ tokens, options: { expandTypography: false, preserveRawValue: false } })).toMatchSnapshot();
   });
 
   it('preserves rawValue when requested', () => {
@@ -134,7 +134,7 @@ describe('convertTokensObjectToResolved', () => {
       light: {
         colors: {
           background: {
-            value: '$colors.white',
+            value: '{colors.white}',
             type: 'color',
           },
         },
@@ -142,13 +142,58 @@ describe('convertTokensObjectToResolved', () => {
       dark: {
         colors: {
           background: {
-            value: '$colors.black',
+            value: '{colors.black}',
             type: 'color',
           },
         },
       },
     };
 
-    expect(convertTokensObjectToResolved(tokens, [], [], { expandTypography: false, preserveRawValue: true })).toMatchSnapshot();
+    expect(convertTokensObjectToResolved({ tokens, options: { expandTypography: false, preserveRawValue: true } })).toMatchSnapshot();
+  });
+
+  it('doesnt resolve values if resolveValues is false', () => {
+    const tokens = {
+      global: {
+        colors: {
+          white: {
+            value: '#ffffff',
+            type: 'color',
+          },
+          black: {
+            value: '#000000',
+            type: 'color',
+          },
+        },
+        space: {
+          base: {
+            value: '2',
+            type: 'color',
+          },
+          scaled: {
+            value: '{global.base} * 2',
+            type: 'color',
+          },
+        },
+      },
+      light: {
+        colors: {
+          background: {
+            value: '{colors.white}',
+            type: 'color',
+          },
+        },
+      },
+      dark: {
+        colors: {
+          background: {
+            value: '{colors.black}',
+            type: 'color',
+          },
+        },
+      },
+    };
+
+    expect(convertTokensObjectToResolved({ tokens, options: { resolveValues: false } })).toMatchSnapshot();
   });
 });

@@ -1,8 +1,10 @@
 import convertTokensObjectToResolved from './convertTokensObjectToResolved';
 import { TransformerOptions } from './types';
 
-function transform(input, sets, excludes, options: TransformerOptions) {
-  return convertTokensObjectToResolved(input, sets, excludes, options);
+function transform(tokens, usedSets, excludedSets, options: TransformerOptions) {
+  return convertTokensObjectToResolved({
+    tokens, usedSets, excludedSets, options,
+  });
 }
 
 export default transform;

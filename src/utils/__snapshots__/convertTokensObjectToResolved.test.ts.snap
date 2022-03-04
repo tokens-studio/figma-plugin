@@ -68,11 +68,30 @@ Object {
 }
 `;
 
+exports[`convertTokensObjectToResolved doesnt resolve values if resolveValues is false 1`] = `
+Object {
+  "colors": Object {
+    "background": Object {
+      "type": "color",
+      "value": "$colors.black",
+    },
+    "black": Object {
+      "type": "color",
+      "value": "#000000",
+    },
+    "white": Object {
+      "type": "color",
+      "value": "#ffffff",
+    },
+  },
+}
+`;
+
 exports[`convertTokensObjectToResolved preserves rawValue when requested 1`] = `
 Object {
   "colors": Object {
     "background": Object {
-      "rawValue": "$colors.black",
+      "rawValue": "{colors.black}",
       "type": "color",
       "value": "#000000",
     },
@@ -85,6 +104,35 @@ Object {
       "rawValue": "#ffffff",
       "type": "color",
       "value": "#ffffff",
+    },
+  },
+}
+`;
+
+exports[`convertTokensObjectToResolved doesnt resolve values if resolveValues is false 1`] = `
+Object {
+  "colors": Object {
+    "background": Object {
+      "type": "color",
+      "value": "{colors.black}",
+    },
+    "black": Object {
+      "type": "color",
+      "value": "#000000",
+    },
+    "white": Object {
+      "type": "color",
+      "value": "#ffffff",
+    },
+  },
+  "space": Object {
+    "base": Object {
+      "type": "color",
+      "value": "2",
+    },
+    "scaled": Object {
+      "type": "color",
+      "value": "{global.base} * 2",
     },
   },
 }
