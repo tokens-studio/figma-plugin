@@ -137,8 +137,8 @@ export const tokenState = createModel<RootModel>()({
       return {
         ...state,
         tokens: values,
-        activeTokenSet: Object.keys(data.values)[0],
-        usedTokenSet: tokenSets,
+        activeTokenSet: Array.isArray(data.values) ? 'global' : Object.keys(data.values)[0],
+        usedTokenSet: Array.isArray(data.values) ? ['global'] : tokenSets,
       };
     },
     setJSONData(state, payload) {
