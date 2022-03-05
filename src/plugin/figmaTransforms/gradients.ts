@@ -1,5 +1,6 @@
 import { figmaRGBToHex, extractLinearGradientParamsFromTransform } from '@figma-plugin/helpers';
-import { matrix, multiply, inv } from 'mathjs';
+// import { matrix, multiply, inv } from 'mathjs';
+import { Matrix, inverse } from 'ml-matrix';
 import { convertToFigmaColor } from './colors';
 
 export function convertDegreeToNumber(degreeString: string): number {
@@ -25,34 +26,31 @@ export function convertStringToFigmaGradient(value: string) {
     // is left-right as opposed to bottom-top in css
   const degrees = -(convertDegreeToNumber(gradientDegrees) - 90);
   const rad = degrees * (Math.PI / 180);
-  const gradientTransformMatrix = inv(
-    // we need to inverse our final matrix because
-    // figma's transformation matrices are inverted
-    multiply(
-      multiply(
-        // start by transforming to the gradient center
-        // which for figma is .5 .5 as it is a relative transform
-        matrix([
-          [1, 0, 0.5],
-          [0, 1, 0.5],
-          [0, 0, 1],
-        ]),
-        // we can then multiply this with the rotation matrix
-        matrix([
-          [Math.cos(rad), Math.sin(rad), 0],
-          [-Math.sin(rad), Math.cos(rad), 0],
-          [0, 0, 1],
-        ]),
-      ),
-      // lastly we need to translate it back to the 0,0 origin
-      // by negating the center transform
-      matrix([
-        [1, 0, -0.5],
-        [0, 1, -0.5],
-        [0, 0, 1],
-      ]),
-    ),
-  ).toArray();
+
+  // start by transforming to the gradient center
+  // which for figma is .5 .5 as it is a relative transform
+  const transformationMatrix = new Matrix([
+    [1, 0, 0.5],
+    [0, 1, 0.5],
+    [0, 0, 1],
+  ]).mmul(
+    // we can then multiply this with the rotation matrix
+    new Matrix([
+      [Math.cos(rad), Math.sin(rad), 0],
+      [-Math.sin(rad), Math.cos(rad), 0],
+      [0, 0, 1],
+    ]),
+  ).mmul(
+    // lastly we need to translate it back to the 0,0 origin
+    // by negating the center transform
+    new Matrix([
+      [1, 0, -0.5],
+      [0, 1, -0.5],
+      [0, 0, 1],
+    ]),
+  );
+
+  const gradientTransformMatrix = inverse(transformationMatrix).to2DArray();
 
   const gradientStops = colorStops.map((stop) => {
     const seperatedStop = stop.split(' ');
