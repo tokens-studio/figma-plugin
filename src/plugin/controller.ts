@@ -31,8 +31,8 @@ import {
   getTokenData, updateNodes, setTokensOnDocument, goToNode, saveStorageType, getSavedStorageType,
 } from './node';
 
-import { MessageFromPluginTypes, MessageToPluginTypes, PostToFigmaMessage } from '../types/messages';
-import { StorageProviderType } from '../types/api';
+import { MessageFromPluginTypes, MessageToPluginTypes, PostToFigmaMessage } from '@/types/messages';
+import { StorageProviderType } from '@/types/api';
 import compareProvidersWithStored from './compareProviders';
 import { defaultNodeManager } from './NodeManager';
 import { defaultWorker } from './Worker';

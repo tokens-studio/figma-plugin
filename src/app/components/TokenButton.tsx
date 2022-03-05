@@ -217,7 +217,7 @@ function TokenButton({
         <TokenTooltipWrapper token={token} resolvedTokens={resolvedTokens}>
           <button
             style={style}
-            className="w-full h-full relativeƒ"
+            className="relative w-full h-full"
             type="button"
             onClick={() => onClick(properties[0])}
           >

@@ -1,6 +1,10 @@
 import { ValidNodeTypes } from '@/constants/ValidNodeTypes';
 
-export function findAll(nodes: readonly BaseNode[], includeSelf = false): BaseNode[] {
+function isPartOfInstanceOrIsInstance(node: BaseNode): boolean {
+  return node.type === 'INSTANCE' || node.id.startsWith('I');
+}
+
+export function findAll(nodes: readonly BaseNode[], includeSelf = false, ignoreInstances = false): BaseNode[] {
   let allNodes = includeSelf ? [...nodes] : [];
   nodes.forEach((node) => {
     if ('children' in node) {
@@ -9,5 +13,7 @@ export function findAll(nodes: readonly BaseNode[], includeSelf = false): BaseNo
       }));
     }
   });
-  return allNodes;
+
+  const filteredNodes = ignoreInstances ? allNodes.filter((node) => !isPartOfInstanceOrIsInstance(node)) : allNodes;
+  return filteredNodes;
 }
