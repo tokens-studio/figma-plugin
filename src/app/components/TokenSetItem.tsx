@@ -7,6 +7,9 @@ import { Dispatch, RootState } from '../store';
 import {
   ContextMenu, ContextMenuItem, ContextMenuContent, ContextMenuTrigger,
 } from './ContextMenu';
+import Box from './Box';
+import { styled } from '@/stitches.config';
+import Checkbox from './Checkbox';
 
 interface DragItem {
   index: number;
@@ -17,6 +20,33 @@ interface DragItem {
 enum ItemTypes {
   CARD = 'card',
 }
+
+const StyledButton = styled('button', {
+  width: '100%',
+  alignItems: 'center',
+  fontSize: '$small',
+  justifyContent: 'space-between',
+  display: 'flex',
+  padding: '$3 $5',
+  gap: '$2',
+
+  '&:focus, &:hover': {
+    outline: 'none',
+    boxShadow: 'none',
+    backgroundColor: '$bgSubtle',
+  },
+
+  variants: {
+    selected: {
+      true: {
+        backgroundColor: '$bgAccent',
+        '&:focus, &:hover': {
+          backgroundColor: '$bgAccent',
+        },
+      },
+    },
+  },
+});
 
 export default function TokenSetItem({
   tokenSet, onMove, index, onRename, onDelete, onDrop,
@@ -109,26 +139,23 @@ export default function TokenSetItem({
   drag(drop(ref));
 
   return (
-    <div className="flex-shrink-0" ref={ref} style={{ ...style, opacity }} data-handler-id={handlerId}>
+    <Box css={{ display: 'flex', width: '100%' }} ref={ref} style={{ ...style, opacity }} data-handler-id={handlerId}>
       <ContextMenu>
-        <ContextMenuTrigger id={`${tokenSet}-trigger`}>
-          <button
+        <ContextMenuTrigger asChild id={`${tokenSet}-trigger`}>
+          <StyledButton
             key={tokenSet}
-            className={`font-bold items-center gap-2 focus:outline-none text-xs flex p-2 rounded border ${
-              activeTokenSet === tokenSet && 'border-blue-500 bg-blue-100'
-            }`}
             type="button"
             onClick={() => dispatch.tokenState.setActiveTokenSet(tokenSet)}
+            selected={activeTokenSet === tokenSet}
           >
-            <input
-              type="checkbox"
-              className="py-2 pl-2"
+
+            {tokenSet}
+            <Checkbox
               id={`toggle-${tokenSet}`}
               checked={usedTokenSet.includes(tokenSet)}
-              onChange={() => dispatch.tokenState.toggleUsedTokenSet(tokenSet)}
+              onCheckedChange={() => dispatch.tokenState.toggleUsedTokenSet(tokenSet)}
             />
-            {tokenSet}
-          </button>
+          </StyledButton>
         </ContextMenuTrigger>
         <ContextMenuContent className="text-xs">
           <ContextMenuItem disabled={editProhibited} onSelect={() => onRename(tokenSet)}>
@@ -142,6 +169,6 @@ export default function TokenSetItem({
           </ContextMenuItem>
         </ContextMenuContent>
       </ContextMenu>
-    </div>
+    </Box>
   );
 }

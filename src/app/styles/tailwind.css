@@ -89,6 +89,7 @@ body {
 
 .content {
   overflow-y: scroll;
+  cursor: pointer;
 }
 
 .content::-webkit-scrollbar,

@@ -12,6 +12,24 @@ import Input from './Input';
 import Modal from './Modal';
 import TokenSetItem from './TokenSetItem';
 import Tooltip from './Tooltip';
+import Box from './Box';
+import { styled } from '@/stitches.config';
+
+const StyledButton = styled('button', {
+  flexShrink: 0,
+  width: '100%',
+  fontSize: '$small',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  padding: '$3 $5',
+  gap: '$2',
+  '&:focus, &:hover': {
+    outline: 'none',
+    boxShadow: 'none',
+    backgroundColor: '$bgSubtle',
+  },
+});
 
 export default function TokenSetSelector() {
   const { tokens, editProhibited } = useSelector((state: RootState) => state.tokenState);
@@ -84,7 +102,10 @@ export default function TokenSetSelector() {
   }, [tokens]);
 
   return (
-    <div className="flex flex-row items-center gap-1 px-4 pt-2 pb-0 overflow-x-auto">
+    <Box css={{
+      display: 'flex', height: '100%', flexDirection: 'column', width: '150px', borderRight: '1px solid', borderColor: '$borderMuted',
+    }}
+    >
       <DndProvider backend={HTML5Backend}>
         {totalTokenSetArray.map((tokenSet, index) => (
           <TokenSetItem
@@ -99,7 +120,7 @@ export default function TokenSetSelector() {
         ))}
       </DndProvider>
       <Modal isOpen={showRenameTokenSetFields} close={() => setShowRenameTokenSetFields(false)}>
-        <div className="flex justify-center flex-col text-center space-y-4">
+        <div className="flex flex-col justify-center space-y-4 text-center">
           <Heading>
             Rename
             {' '}
@@ -126,7 +147,7 @@ export default function TokenSetSelector() {
         </div>
       </Modal>
       <Modal isOpen={showNewTokenSetFields} close={() => setShowNewTokenSetFields(false)}>
-        <div className="flex justify-center flex-col text-center space-y-4">
+        <div className="flex flex-col justify-center space-y-4 text-center">
           <Heading>New set</Heading>
           <form onSubmit={handleNewTokenSetSubmit} className="space-y-4">
             <Input
@@ -148,16 +169,14 @@ export default function TokenSetSelector() {
           </form>
         </div>
       </Modal>
-      <Tooltip label="Add new token set">
-        <button
-          className="button button-ghost flex-shrink-0"
-          type="button"
-          disabled={editProhibited}
-          onClick={() => setShowNewTokenSetFields(true)}
-        >
-          <Icon name="add" />
-        </button>
-      </Tooltip>
-    </div>
+      <StyledButton
+        type="button"
+        disabled={editProhibited}
+        onClick={() => setShowNewTokenSetFields(true)}
+      >
+        New set
+        <Icon name="add" />
+      </StyledButton>
+    </Box>
   );
 }

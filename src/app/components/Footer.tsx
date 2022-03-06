@@ -1,6 +1,4 @@
 import * as React from 'react';
-import { useSelector } from 'react-redux';
-import { RootState } from '../store';
 import * as pjs from '../../../package.json';
 import Box from './Box';
 import DocsIcon from '@/icons/docs.svg';
@@ -8,10 +6,8 @@ import FeedbackIcon from '@/icons/feedback.svg';
 import Text from '@/app/components/Text';
 
 export default function Footer() {
-  const activeTab = useSelector((state: RootState) => state.uiState.activeTab);
-
   return (
-    <div className={`p-4 flex-shrink-0 flex items-center justify-between ${activeTab === 'tokens' && 'mb-16'}`}>
+    <div className="flex items-center justify-between flex-shrink-0 p-4">
       <div className="text-gray-600 text-xxs">
         Version
         {' '}

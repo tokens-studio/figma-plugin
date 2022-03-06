@@ -16,7 +16,7 @@ export default function ExportModal({ onClose }) {
 
   return (
     <Modal large isOpen close={onClose}>
-      <div className="flex flex-col space-y-4 w-full">
+      <div className="flex flex-col w-full space-y-4">
         <Heading>Export</Heading>
         <p className="text-xs">
           This is an early version of a tokens export, if you encounter any issues please raise an
@@ -66,12 +66,11 @@ export default function ExportModal({ onClose }) {
 
         <Heading size="small">Output example</Heading>
         <Textarea
-          className="grow"
           rows={10}
           isDisabled
           value={getFormattedTokens({ includeAllTokens, includeParent, expandTypography })}
         />
-        <div className="space-x-4 flex justify-between">
+        <div className="flex justify-between space-x-4">
           <Button variant="secondary" onClick={onClose}>
             Cancel
           </Button>

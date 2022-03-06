@@ -17,9 +17,11 @@ export default function InspectorDebugView({ resolvedTokens }: { resolvedTokens:
   }
 
   return (
-    <Box css={{
-      display: 'flex', flexDirection: 'column', flexGrow: 1, padding: '$4',
-    }}
+    <Box
+      css={{
+        display: 'flex', flexDirection: 'column', flexGrow: 1, padding: '$4',
+      }}
+      className="content"
     >
       <AnnotationBuilder />
 

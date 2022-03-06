@@ -7,6 +7,9 @@ import ApplySelector from './ApplySelector';
 import { UpdateMode } from '@/types/state';
 import Button from './Button';
 import useConfirm from '../hooks/useConfirm';
+import ExportModal from './modals/ExportModal';
+import PresetModal from './modals/PresetModal';
+import Box from './Box';
 
 export default function TokensBottomBar() {
   const { updateDocument } = useDispatch<Dispatch>().tokenState;
@@ -16,6 +19,18 @@ export default function TokensBottomBar() {
     confirm,
   } = useConfirm();
   const shouldConfirm = React.useMemo(() => updateMode === UpdateMode.DOCUMENT, [updateMode]);
+
+  const handleClearTokens = async () => {
+    track('Clear Tokens');
+
+    const userConfirmation = await confirm({
+      text: 'Delete all tokens',
+      description: 'Are you sure you want to delete all tokens?',
+    });
+    if (userConfirmation) {
+      dispatch.tokenState.setEmptyTokens();
+    }
+  };
 
   const handleUpdate = React.useCallback(async () => {
     track('Update Tokens');
@@ -34,10 +49,15 @@ export default function TokensBottomBar() {
   }, [confirm, shouldConfirm]);
   const { pullStyles } = useTokens();
   const { createStylesFromTokens } = useTokens();
+  const [exportModalVisible, showExportModal] = React.useState(false);
+  const [presetModalVisible, showPresetModal] = React.useState(false);
 
   return (
-    <div className="fixed bottom-0 left-0 w-full bg-white border-t border-gray-200">
-      <div className="flex justify-between items-center p-2">
+    <Box css={{
+      width: '100%', backgroundColor: '$bgDefault', borderBottom: '1px solid', borderColor: '$borderMuted',
+    }}
+    >
+      <div className="flex items-center justify-between p-2">
         <ApplySelector />
         <div className="space-x-2">
           <Button variant="secondary" onClick={pullStyles} disabled={editProhibited}>
@@ -51,6 +71,9 @@ export default function TokensBottomBar() {
           </Button>
         </div>
       </div>
-    </div>
+      {exportModalVisible && <ExportModal onClose={() => showExportModal(false)} />}
+      {presetModalVisible && <PresetModal onClose={() => showPresetModal(false)} />}
+
+    </Box>
   );
 }

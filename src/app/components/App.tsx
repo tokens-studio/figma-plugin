@@ -16,32 +16,38 @@ import { RootState } from '../store';
 import ConfirmDialog from './ConfirmDialog';
 import PushDialog from './PushDialog';
 import WindowResizer from './WindowResizer';
+import Box from './Box';
 
 function App() {
   const activeTab = useSelector((state: RootState) => state.uiState.activeTab);
 
   return (
-    <div className="content">
+    <Box>
       <Initiator />
       <LoadingBar />
-      <div className="h-full flex flex-col">
-        <div className="grow flex flex-col">
+      <Box css={{
+        display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden',
+      }}
+      >
+        <Box css={{
+          display: 'flex', flexDirection: 'column', flexGrow: 1, height: '100%', overflow: 'hidden',
+        }}
+        >
           {activeTab !== 'start' && <Navbar />}
           {activeTab === 'start' && <StartScreen />}
           <Tokens isActive={activeTab === 'tokens'} />
-          {activeTab === 'json' && <JSONEditor />}
           {activeTab === 'inspector' && <Inspector />}
           {activeTab === 'syncsettings' && <SyncSettings />}
           {activeTab === 'settings' && <Settings />}
-        </div>
+        </Box>
         <Footer />
         <Changelog />
         <ImportedTokensDialog />
         <ConfirmDialog />
         <PushDialog />
         <WindowResizer />
-      </div>
-    </div>
+      </Box>
+    </Box>
   );
 }
 

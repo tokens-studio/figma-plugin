@@ -10,6 +10,13 @@ import { RootState } from '../store';
 import TokenSetSelector from './TokenSetSelector';
 import TokenFilter from './TokenFilter';
 import EditTokenFormModal from './EditTokenFormModal';
+import JSONEditor from './JSONEditor';
+import Box from './Box';
+import IconButton from './IconButton';
+import IconListing from '@/icons/listing.svg';
+import IconCode from '@/icons/code.svg';
+import IconDisclosure from '@/icons/disclosure.svg';
+import Text from './Text';
 
 interface TokenListingType {
   label: string;
@@ -26,7 +33,9 @@ interface TokenListingType {
 
 function Tokens({ isActive }: { isActive: boolean }) {
   const { tokens, activeTokenSet, usedTokenSet } = useSelector((state: RootState) => state.tokenState);
-  const { showEditForm, tokenFilter, tokenFilterVisible } = useSelector((state: RootState) => state.uiState);
+  const { showEditForm, tokenFilter } = useSelector((state: RootState) => state.uiState);
+  const [activeTokensTab, setActiveTokensTab] = React.useState('list');
+  const [tokenSetsVisible, setTokenSetsVisible] = React.useState(true);
   const resolvedTokens = React.useMemo(
     () => resolveTokenValues(mergeTokenGroups(tokens, [...usedTokenSet, activeTokenSet])),
     [tokens, usedTokenSet, activeTokenSet],
@@ -50,27 +59,87 @@ function Tokens({ isActive }: { isActive: boolean }) {
   if (!isActive) return null;
 
   return (
-    <div>
-      <TokenSetSelector />
-      {tokenFilterVisible && <TokenFilter />}
-      {memoizedTokens.map(([key, group]: [string, TokenListingType]) => (
-        <div key={key}>
-          <TokenListing
-            tokenKey={key}
-            label={group.label || key}
-            explainer={group.explainer}
-            schema={group.schema}
-            property={group.property}
-            tokenType={group.type}
-            values={group.values}
-            resolvedTokens={resolvedTokens}
+    <Box css={{
+      flexGrow: 1, display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden',
+    }}
+    >
+      <Box css={{
+        display: 'flex', flexDirection: 'row', gap: '$2', borderBottom: '1px solid', borderColor: '$borderMuted',
+      }}
+      >
+        <Box>
+          <button style={{ height: '100%' }} type="button" onClick={() => setTokenSetsVisible(!tokenSetsVisible)}>
+            <Box css={{
+              fontWeight: '$bold', height: '100%', fontSize: '$small', gap: '$1', padding: '$3 $5', display: 'flex', alignItems: 'center',
+            }}
+            >
+              {activeTokenSet}
+              <IconDisclosure />
+            </Box>
+          </button>
+        </Box>
+        <TokenFilter />
+        <Box css={{
+          display: 'flex', gap: '$2', flexDirection: 'row', alignItems: 'center', padding: '$4',
+        }}
+        >
+          <IconButton
+            variant={activeTokensTab === 'list' ? 'primary' : 'default'}
+            dataCy="tokensTabList"
+            onClick={() => setActiveTokensTab('list')}
+            icon={<IconListing />}
+            tooltipSide="bottom"
+            tooltip="Listing"
           />
-        </div>
-      ))}
-      {showEditForm && <EditTokenFormModal resolvedTokens={resolvedTokens} />}
-      <ToggleEmptyButton />
+          <IconButton
+            variant={activeTokensTab === 'json' ? 'primary' : 'default'}
+            dataCy="tokensTabJSON"
+            onClick={() => setActiveTokensTab('json')}
+            icon={<IconCode />}
+            tooltipSide="bottom"
+            tooltip="JSON"
+          />
+        </Box>
+      </Box>
+      <Box css={{
+        display: 'flex', flexDirection: 'row', flexGrow: 1, borderBottom: '1px solid', borderColor: '$borderMuted', height: '100%', overflow: 'hidden',
+      }}
+      >
+        {tokenSetsVisible && (
+        <Box>
+          <TokenSetSelector />
+        </Box>
+        )}
+        <Box css={{
+          flexGrow: 1, display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden',
+        }}
+        >
+          {activeTokensTab === 'json' ? <JSONEditor />
+            : (
+              <Box css={{ width: '100%', paddingBottom: '$6' }} className="content">
+                {memoizedTokens.map(([key, group]: [string, TokenListingType]) => (
+                  <div key={key}>
+                    <TokenListing
+                      tokenKey={key}
+                      label={group.label || key}
+                      explainer={group.explainer}
+                      schema={group.schema}
+                      property={group.property}
+                      tokenType={group.type}
+                      values={group.values}
+                      resolvedTokens={resolvedTokens}
+                    />
+                  </div>
+                ))}
+                <ToggleEmptyButton />
+                {showEditForm && <EditTokenFormModal resolvedTokens={resolvedTokens} />}
+              </Box>
+            )}
+        </Box>
+      </Box>
       <TokensBottomBar />
-    </div>
+
+    </Box>
   );
 }
 

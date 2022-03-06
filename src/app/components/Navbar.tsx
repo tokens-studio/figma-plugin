@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { MagnifyingGlassIcon } from '@radix-ui/react-icons';
 import { track } from '@/utils/analytics';
 import convertTokensToObject from '@/utils/convertTokensToObject';
 import Icon from './Icon';
@@ -49,7 +48,6 @@ const transformProviderName = (provider) => {
 function Navbar() {
   const { projectURL, storageType } = useSelector((state: RootState) => state.uiState);
   const { lastSyncedState, tokens, editProhibited } = useSelector((state: RootState) => state.tokenState);
-  const { toggleFilterVisibility } = useDispatch<Dispatch>().uiState;
   const { pullTokens, pushTokens } = useRemoteTokens();
 
   const checkForChanges = () => {
@@ -59,20 +57,14 @@ function Navbar() {
   };
 
   return (
-    <div className="sticky top-0 navbar bg-white flex items-center justify-between z-1 border-b border-gray-200">
+    <div className="sticky top-0 flex items-center justify-between bg-white border-b border-gray-200 navbar z-1">
       <div>
         <TabButton first name="tokens" label="Tokens" />
-        <TabButton name="json" label="JSON" />
         <TabButton name="inspector" label="Inspect" />
         <TabButton name="syncsettings" label="Sync" />
         <TabButton name="settings" label="Settings" />
       </div>
       <div className="flex flex-row items-center">
-        <Tooltip variant="right" label="Filter tokens">
-          <button onClick={toggleFilterVisibility} type="button" className="button button-ghost">
-            <MagnifyingGlassIcon />
-          </button>
-        </Tooltip>
         {storageType.provider !== StorageProviderType.LOCAL && (
         <>
           {storageType.provider === StorageProviderType.JSONBIN && (
@@ -92,11 +84,11 @@ function Navbar() {
             <button
               onClick={() => pushTokens()}
               type="button"
-              className="button button-ghost relative"
+              className="relative button button-ghost"
               disabled={editProhibited}
             >
               {checkForChanges() && (
-              <div className="rounded-full w-2 h-2 bg-primary-500 absolute right-0 top-0" />
+              <div className="absolute top-0 right-0 w-2 h-2 rounded-full bg-primary-500" />
               )}
 
               <Icon name="library" />

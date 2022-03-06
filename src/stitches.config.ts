@@ -50,6 +50,7 @@ export const {
       textDisabled: globalTokens.colors.gray400,
       fgSubtle: globalTokens.colors.gray300,
       bgSubtle: globalTokens.colors.gray100,
+      bgAccent: globalTokens.colors.primary100,
       interaction: globalTokens.colors.primary500,
       interactionSubtle: globalTokens.colors.primary400,
       onInteraction: globalTokens.colors.white,
