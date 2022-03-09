@@ -36,6 +36,21 @@ export function isSingleToken(token): token is { value: string } {
   return typeof token === 'object' && 'value' in token && 'type' in token && 'name' in token;
 }
 
+export function expand(token) {
+  return Object.entries(token).reduce((acc, [key, val]) => {
+    if (typeof val === 'string' || typeof val === 'number') {
+      acc[key] = {
+        value: val,
+        type: key,
+      };
+    } else {
+      acc[key] = expand(val);
+    }
+
+    return acc;
+  }, {});
+}
+
 // Convert non-conform colors to RGB value that can be used throughout the plugin
 export function convertToRgb(color: string) {
   try {

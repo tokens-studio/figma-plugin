@@ -15,22 +15,12 @@ function checkForTokens({
   const shouldExpandShadow = expandShadow ? isShadowToken(token.value) : false;
   if (isValueToken(token) && !shouldExpandTypography && !shouldExpandShadow) {
     returnValue = token;
-  } else if (isTypographyToken(token) && !expandTypography) {
+  } else if (
+    (isTypographyToken(token) && !expandTypography)
+    || (isShadowToken(token) && !expandShadow)
+  ) {
     returnValue = {
-      type: 'typography',
-      value: Object.entries(token).reduce((acc, [key, val]) => {
-        acc[key] = isValueToken(val) && returnValuesOnly ? val.value : val;
-        return acc;
-      }, {}),
-    };
-
-    if (token.description) {
-      delete returnValue.value.description;
-      returnValue.description = token.description;
-    }
-  } else if (isShadowToken(token) && !expandShadow) {
-    returnValue = {
-      type: 'boxShadow',
+      type: token.type,
       value: Object.entries(token).reduce((acc, [key, val]) => {
         acc[key] = isValueToken(val) && returnValuesOnly ? val.value : val;
         return acc;
