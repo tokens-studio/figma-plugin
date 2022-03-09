@@ -49,6 +49,15 @@ export const checkPermissions = async ({ context, owner, repo }) => {
   }
 };
 
+function getTreeMode(type) {
+  switch (type) {
+    case 'dir':
+      return '040000';
+    default:
+      return '100644';
+  }
+}
+
 export const readContents = async ({ context, owner, repo }) => {
   const octokit = new Octokit({ auth: context.secret, baseUrl: context.baseUrl });
   let response;
@@ -60,15 +69,57 @@ export const readContents = async ({ context, owner, repo }) => {
       path: context.filePath,
       ref: context.branch,
     });
-    if (response.data.content) {
-      const data = atob(response.data.content);
-      // If content of file is parseable JSON, parse it
-      if (IsJSONString(data)) {
-        const parsed = JSON.parse(data);
-        return {
-          values: parsed,
-        };
+    const fileContents: Array<{ name: string, data: string }> = [];
+    if (Array.isArray(response.data)) {
+      console.log('Resposne data', response.data);
+      const folderResponse = await octokit.rest.git.createTree({ owner, repo, tree: response.data.map((item) => ({ path: item.path, sha: item.sha, mode: getTreeMode(item.type) })) });
+      console.log('Folder response', folderResponse);
+      if (folderResponse.data.tree[0].sha) {
+        const treeResponse = await octokit.rest.git.getTree({
+          owner, repo, tree_sha: folderResponse.data.tree[0].sha, recursive: 'true',
+        });
+        console.log('Tree response', treeResponse);
+        if (treeResponse.data.tree.length > 0) {
+          await Promise.all(
+            treeResponse.data.tree.filter((i) => i.path?.endsWith('.json')).map((treeItem) => {
+              console.log('Got tree item', treeItem);
+              if (treeItem.path) {
+                return octokit.rest.repos.getContent({
+                  owner,
+                  repo,
+                  path: `${context.filePath}/${treeItem.path}`,
+                  ref: context.branch,
+                }).then((res) => {
+                  console.log('Res', res.data);
+                  if (res.data.content) {
+                    fileContents.push({ name: treeItem.path.replace('.json', ''), data: atob(res.data.content) });
+                  }
+                });
+              }
+              return null;
+            }),
+          );
+        }
       }
+    } else if (response.data.content) {
+      fileContents.push({ name: response.data.name, data: atob(response.data.content) });
+    }
+    console.log('file contents', fileContents);
+    if (fileContents.length > 0) {
+      console.log('file cont', fileContents);
+      const allContents = fileContents.reduce((acc, curr) => {
+        if (IsJSONString(curr.data)) {
+          const parsed = JSON.parse(curr.data);
+          console.log('parsed', curr.name, parsed);
+
+          acc[curr.name] = parsed;
+        }
+        return acc;
+      }, {});
+      console.log('All contents', allContents);
+      return { values: allContents };
+      // If content of file is parseable JSON, parse it
+
       return null;
     }
     // If not, return null as we can't process that file. We should let the user know, though.
