@@ -114,7 +114,56 @@ describe('convertTokensObjectToResolved', () => {
       ],
     };
 
-    expect(convertTokensObjectToResolved(tokens, [], [], { expandTypography: false, expandShadow: false, preserveRawValue: false })).toMatchSnapshot();
+    expect(
+      convertTokensObjectToResolved(tokens, [], [], {
+        expandTypography: false,
+        expandShadow: false,
+        preserveRawValue: false,
+      }),
+    ).toMatchSnapshot();
+  });
+
+  it('does not expand shadows when not needed', () => {
+    const tokens = {
+      options: [
+        {
+          name: 'shadow.1',
+          type: 'boxShadow',
+          value: {
+            x: '2',
+            y: '3',
+            blur: '4',
+            spread: '5',
+            color: '#000000',
+            type: 'dropShadow',
+          },
+        },
+        {
+          name: 'shadow.2',
+          type: 'boxShadow',
+          value: [
+            {
+              x: '2',
+              y: '3',
+              blur: '4',
+              spread: '5',
+              color: '#000000',
+              type: 'dropShadow',
+            },
+            {
+              x: '3',
+              y: '4',
+              blur: '5',
+              spread: '6',
+              color: '#000000',
+              type: 'dropShadow',
+            },
+          ],
+        },
+      ],
+    };
+
+    expect(convertTokensObjectToResolved(tokens, [], [], { expandTypography: false, expandShadow: false, preserveRawValue: true })).toMatchSnapshot();
   });
 
   it('preserves rawValue when requested', () => {
