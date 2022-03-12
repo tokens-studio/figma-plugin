@@ -2,7 +2,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Octokit } from '@octokit/rest';
 import { Dispatch, RootState } from '@/app/store';
 import { MessageToPluginTypes } from '@/types/messages';
-import { TokenProps } from '@/types/tokens';
+import { TokenGroup, TokenProps } from '@/types/tokens';
 import convertTokensToObject from '@/utils/convertTokensToObject';
 import useConfirm from '@/app/hooks/useConfirm';
 import usePushDialog from '@/app/hooks/usePushDialog';
@@ -23,7 +23,7 @@ function hasSameContent(content, storedContent) {
 
 export const fetchBranches = async ({ context, owner, repo }) => {
   const octokit = new Octokit({ auth: context.secret, baseUrl: context.baseUrl });
-  const branches = await octokit.repos.listBranches({ owner, repo }).then((response) => response.data);
+  const branches = await octokit.repos.listBranches({ owner, repo }).then((response: GetBranchesResponse) => response.data);
   return branches.map((branch) => branch.name);
 };
 
@@ -69,6 +69,8 @@ export const readContents = async ({ context, owner, repo }) => {
       path: context.filePath,
       ref: context.branch,
     });
+    console.log('RES', response);
+
     const fileContents: Array<{ name: string, data: string }> = [];
     if (Array.isArray(response.data)) {
       const folderResponse = await octokit.rest.git.createTree({ owner, repo, tree: response.data.map((item) => ({ path: item.path, sha: item.sha, mode: getTreeMode(item.type) })) });
@@ -86,7 +88,7 @@ export const readContents = async ({ context, owner, repo }) => {
                   path: `${context.filePath}/${treeItem.path}`,
                   ref: context.branch,
                 }).then((res) => {
-                  if (res.data.content) {
+                  if (!Array.isArray(res.data) && 'content' in res.data && treeItem.path) {
                     fileContents.push({ name: treeItem.path.replace('.json', ''), data: atob(res.data.content) });
                   }
                 });
@@ -96,23 +98,34 @@ export const readContents = async ({ context, owner, repo }) => {
           );
         }
       }
-    } else if (response.data.content) {
-      // TODO: Make work for 1 file again
-      fileContents.push({ name: response.data.name, data: atob(response.data.content) });
-    }
-    if (fileContents.length > 0) {
-      const allContents = fileContents.reduce((acc, curr) => {
-        if (IsJSONString(curr.data)) {
-          const parsed = JSON.parse(curr.data);
+      console.log('File contents', fileContents);
 
-          acc[curr.name] = parsed;
-        }
-        return acc;
-      }, {});
-      return { values: allContents };
+      if (fileContents.length > 0) {
+        // If we receive multiple files, parse each
+        // sort by name (as we can't guarantee order)
+        const allContents = fileContents
+          .sort((a, b) => a.name.localeCompare(b.name))
+          .reduce((acc, curr) => {
+            if (IsJSONString(curr.data)) {
+              const parsed = JSON.parse(curr.data);
+
+              acc[curr.name] = parsed;
+            }
+            return acc;
+          }, {});
+        return allContents ? { values: allContents } : null;
+      }
+    } else if ('content' in response.data) {
+      console.log('Single file', response.data);
+
+      const data = atob(response.data.content);
       // If content of file is parseable JSON, parse it
-
-      return null;
+      if (IsJSONString(data)) {
+        const parsed = JSON.parse(data);
+        return {
+          values: parsed,
+        };
+      }
     }
     // If not, return null as we can't process that file. We should let the user know, though.
     return null;
@@ -123,32 +136,28 @@ export const readContents = async ({ context, owner, repo }) => {
   }
 };
 
-const commitToNewBranch = async ({
-  context, tokenObj, owner, repo, commitMessage, branch,
-}) => {
-  const OctokitWithPlugin = Octokit.plugin(require('octokit-commit-multiple-files'));
-  const octokit = new OctokitWithPlugin({ auth: context.secret, baseUrl: context.baseUrl });
+const extractFiles = (filePath, tokenObj) => {
+  const files = {};
+  if (filePath.endsWith('.json')) {
+    files[filePath] = JSON.stringify(tokenObj, null, 2);
+  } else {
+    Object.keys(tokenObj).forEach((key) => {
+      files[`${filePath}/${key}.json`] = JSON.stringify(tokenObj[key], null, 2);
+    });
+  }
 
-  return octokit.repos.createOrUpdateFiles({
-    owner,
-    repo,
-    branch,
-    createBranch: true,
-    changes: [{ message: commitMessage || 'Commit from Figma', files: { [context.filePath]: tokenObj } }],
-  });
+  return files;
 };
 
-const commitToExistingBranch = async ({
-  context, tokenObj, owner, repo, commitMessage, branch,
-}) => {
-  const OctokitWithPlugin = Octokit.plugin(require('octokit-commit-multiple-files'));
-  const octokit = new OctokitWithPlugin({ auth: context.secret, baseUrl: context.baseUrl });
+const createOrUpdateFiles = (octokit, context) => {
+  const files = extractFiles(context.filePath, context.tokenObj);
+
   return octokit.repos.createOrUpdateFiles({
-    owner,
-    repo,
-    branch,
-    createBranch: false,
-    changes: [{ message: commitMessage || 'Commit from Figma', files: { [context.filePath]: tokenObj } }],
+    owner: context.owner,
+    repo: context.repo,
+    branch: context.branch,
+    createBranch: context.createNewBranch,
+    changes: [{ message: context.commitMessage || 'Commit from Figma', files }],
   });
 };
 
@@ -183,42 +192,50 @@ export function useGitHub() {
     customBranch,
   }: {
     context: ContextObject;
-    tokenObj: string;
+    tokenObj: TokenGroup;
     owner: string;
     repo: string;
     commitMessage?: string;
     customBranch?: string;
   }): Promise<TokenProps | null> {
     try {
+      const OctokitWithPlugin = Octokit.plugin(require('octokit-commit-multiple-files'));
+      const octokit = new OctokitWithPlugin({ auth: context.secret, baseUrl: context.baseUrl });
+
       const branches = await fetchBranches({ context, owner, repo });
       const branch = customBranch || context.branch;
       if (!branches) return null;
+      let response;
+
       if (branches.includes(branch)) {
-        await commitToExistingBranch({
-          context,
-          tokenObj,
+        response = await createOrUpdateFiles(octokit, {
           owner,
           repo,
-          commitMessage,
           branch,
+          filePath: context.filePath,
+          tokenObj,
+          createNewBranch: false,
+          commitMessage: commitMessage || 'Commit from Figma',
         });
       } else {
-        await commitToNewBranch({
-          context,
-          tokenObj,
+        response = await createOrUpdateFiles(octokit, {
           owner,
           repo,
-          commitMessage,
           branch,
+          filePath: context.filePath,
+          tokenObj,
+          createNewBranch: true,
+          commitMessage: commitMessage || 'Commit from Figma',
         });
       }
       dispatch.tokenState.setLastSyncedState(tokenObj);
       notifyToUI('Pushed changes to GitHub');
+      return response;
     } catch (e) {
       notifyToUI('Error pushing to GitHub');
       console.log('Error pushing to GitHub', e);
-      return null;
     }
+    return null;
   }
 
   async function pushTokensToGitHub(context) {
@@ -241,7 +258,7 @@ export function useGitHub() {
       try {
         await writeTokensToGitHub({
           context,
-          tokenObj,
+          tokenObj: rawTokenObj,
           owner,
           repo,
           commitMessage,
