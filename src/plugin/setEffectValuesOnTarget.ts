@@ -3,6 +3,7 @@ import { ShadowTokenSingleValue } from '@/types/propertyTypes';
 import { SingleTokenObject } from '@/types/tokens';
 import { convertBoxShadowTypeToFigma } from './figmaTransforms/boxShadow';
 import { convertToFigmaColor } from './figmaTransforms/colors';
+import { convertTypographyNumberToFigma } from './figmaTransforms/generic';
 import convertOffsetToFigma from './figmaTransforms/offset';
 
 export default function setEffectValuesOnTarget(
@@ -25,9 +26,9 @@ export default function setEffectValuesOnTarget(
             a,
           },
           type: convertBoxShadowTypeToFigma(v.type),
-          spread: v.spread,
-          radius: v.blur,
-          offset: convertOffsetToFigma(Number(v.x), Number(v.y)),
+          spread: convertTypographyNumberToFigma(v.spread.toString()),
+          radius: convertTypographyNumberToFigma(v.blur.toString()),
+          offset: convertOffsetToFigma(convertTypographyNumberToFigma(v.x.toString()), convertTypographyNumberToFigma(v.y.toString())),
           blendMode: v.blendMode || 'NORMAL',
           visible: true,
         };
@@ -45,9 +46,9 @@ export default function setEffectValuesOnTarget(
             a,
           },
           type: convertBoxShadowTypeToFigma(tokenValue.type),
-          spread: tokenValue.spread,
-          radius: tokenValue.blur,
-          offset: convertOffsetToFigma(Number(tokenValue.x), Number(tokenValue.y)),
+          spread: convertTypographyNumberToFigma(tokenValue.spread.toString()),
+          radius: convertTypographyNumberToFigma(tokenValue.blur.toString()),
+          offset: convertOffsetToFigma(convertTypographyNumberToFigma(tokenValue.x.toString()), convertTypographyNumberToFigma(tokenValue.y.toString())),
           blendMode: tokenValue.blendMode || 'NORMAL',
           visible: true,
         },

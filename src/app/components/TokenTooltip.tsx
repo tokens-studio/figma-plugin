@@ -56,6 +56,11 @@ export default function TokenTooltip({ token, resolvedTokens, shouldResolve = fa
             {valueToCheck.fontWeight?.value || valueToCheck.fontWeight}
           </div>
           <div>
+            Size:
+            {' '}
+            {valueToCheck.fontSize?.value || valueToCheck.fontSize}
+          </div>
+          <div>
             Leading:
             {' '}
             {valueToCheck.lineHeight?.value || valueToCheck.lineHeight}
