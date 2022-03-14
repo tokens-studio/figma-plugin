@@ -114,13 +114,7 @@ describe('convertTokensObjectToResolved', () => {
       ],
     };
 
-    expect(
-      convertTokensObjectToResolved(tokens, [], [], {
-        expandTypography: false,
-        expandShadow: false,
-        preserveRawValue: false,
-      }),
-    ).toMatchSnapshot();
+    expect(convertTokensObjectToResolved(tokens, [], [], { expandTypography: false, expandShadow: false, preserveRawValue: false })).toMatchSnapshot();
   });
 
   it('does not expand shadows when not needed', () => {
