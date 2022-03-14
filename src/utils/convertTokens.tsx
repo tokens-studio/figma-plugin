@@ -1,5 +1,5 @@
 import { SingleToken, SingleTokenObject } from '@/types/tokens';
-import { isTypographyToken, isValueToken } from '../app/components/utils';
+import { isTypographyToken, isShadowToken, isValueToken } from '../app/components/utils';
 
 function checkForTokens({
   obj,
@@ -7,15 +7,20 @@ function checkForTokens({
   root = null,
   returnValuesOnly = false,
   expandTypography = false,
+  expandShadow = false,
 }): [SingleTokenObject[], SingleToken] {
   // replaces / in token name
   let returnValue;
   const shouldExpandTypography = expandTypography ? isTypographyToken(token.value) : false;
-  if (isValueToken(token) && !shouldExpandTypography) {
+  const shouldExpandShadow = expandShadow ? isShadowToken(token.value) : false;
+  if (isValueToken(token) && !shouldExpandTypography && !shouldExpandShadow) {
     returnValue = token;
-  } else if (isTypographyToken(token) && !expandTypography) {
+  } else if (
+    (isTypographyToken(token) && !expandTypography)
+    || (isShadowToken(token) && !expandShadow)
+  ) {
     returnValue = {
-      type: 'typography',
+      type: token.type,
       value: Object.entries(token).reduce((acc, [key, val]) => {
         acc[key] = isValueToken(val) && returnValuesOnly ? val.value : val;
         return acc;
@@ -38,6 +43,7 @@ function checkForTokens({
         root: [root, key].filter((n) => n).join('.'),
         returnValuesOnly,
         expandTypography,
+        expandShadow,
       });
       if (root && result) {
         obj.push({ name: [root, key].join('.'), ...result });
@@ -58,9 +64,11 @@ function checkForTokens({
   return [obj, returnValue];
 }
 
-export default function convertToTokenArray({ tokens, returnValuesOnly = false, expandTypography = false }) {
+export default function convertToTokenArray({
+  tokens, returnValuesOnly = false, expandTypography = false, expandShadow = false,
+}) {
   const [result] = checkForTokens({
-    obj: [], token: tokens, returnValuesOnly, expandTypography,
+    obj: [], token: tokens, returnValuesOnly, expandTypography, expandShadow,
   });
   return Object.values(result);
 }

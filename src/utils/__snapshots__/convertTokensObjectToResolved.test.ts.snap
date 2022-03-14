@@ -37,6 +37,71 @@ Object {
 }
 `;
 
+exports[`convertTokensObjectToResolved does not expand shadows when not needed 1`] = `
+Object {
+  "shadow": Object {
+    "1": Object {
+      "rawValue": Object {
+        "blur": "4",
+        "color": "#000000",
+        "spread": "5",
+        "type": "dropShadow",
+        "x": "2",
+        "y": "3",
+      },
+      "type": "boxShadow",
+      "value": Object {
+        "blur": 4,
+        "color": "#000000",
+        "spread": 5,
+        "type": "dropShadow",
+        "x": 2,
+        "y": 3,
+      },
+    },
+    "2": Object {
+      "rawValue": Array [
+        Object {
+          "blur": "4",
+          "color": "#000000",
+          "spread": "5",
+          "type": "dropShadow",
+          "x": "2",
+          "y": "3",
+        },
+        Object {
+          "blur": "5",
+          "color": "#000000",
+          "spread": "6",
+          "type": "dropShadow",
+          "x": "3",
+          "y": "4",
+        },
+      ],
+      "type": "boxShadow",
+      "value": Array [
+        Object {
+          "blur": 4,
+          "color": "#000000",
+          "spread": 5,
+          "type": "dropShadow",
+          "x": 2,
+          "y": 3,
+        },
+        Object {
+          "blur": 5,
+          "color": "#000000",
+          "spread": 6,
+          "type": "dropShadow",
+          "x": 3,
+          "y": 4,
+        },
+      ],
+    },
+  },
+}
+`;
+
 exports[`convertTokensObjectToResolved does not expand typography when not needed 1`] = `
 Object {
   "typography": Object {

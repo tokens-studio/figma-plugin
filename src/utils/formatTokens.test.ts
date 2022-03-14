@@ -29,7 +29,9 @@ describe('formatTokens', () => {
       ],
     };
 
-    expect(formatTokens({ tokens: typographyTokens, tokenSets: ['global'], expandTypography: true })).toEqual(
+    expect(formatTokens({
+      tokens: typographyTokens, tokenSets: ['global'], expandTypography: true, expandShadow: false,
+    })).toEqual(
       JSON.stringify(
         {
           global: {
