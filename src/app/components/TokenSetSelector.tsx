@@ -11,7 +11,7 @@ import Icon from './Icon';
 import Input from './Input';
 import Modal from './Modal';
 import TokenSetItem from './TokenSetItem';
-import Tooltip from './Tooltip';
+import TokenSetTree from './TokenSetTree';
 import Box from './Box';
 import { styled } from '@/stitches.config';
 
@@ -101,24 +101,28 @@ export default function TokenSetSelector() {
     handleNewTokenSetNameChange('');
   }, [tokens]);
 
+  const isMultifile = true;
+
   return (
     <Box css={{
       display: 'flex', height: '100%', flexDirection: 'column', width: '150px', borderRight: '1px solid', borderColor: '$borderMuted',
     }}
     >
-      <DndProvider backend={HTML5Backend}>
-        {totalTokenSetArray.map((tokenSet, index) => (
-          <TokenSetItem
-            onDrop={() => dispatch.tokenState.setTokenSetOrder(totalTokenSetArray)}
-            onMove={reorderSets}
-            tokenSet={tokenSet}
-            index={index}
-            key={tokenSet}
-            onRename={handleRenameTokenSet}
-            onDelete={() => handleDeleteTokenSet(tokenSet)}
-          />
-        ))}
-      </DndProvider>
+      {isMultifile ? (<Box><TokenSetTree tokenSets={totalTokenSetArray} /></Box>) : (
+        <DndProvider backend={HTML5Backend}>
+          {totalTokenSetArray.map((tokenSet, index) => (
+            <TokenSetItem
+              onDrop={() => dispatch.tokenState.setTokenSetOrder(totalTokenSetArray)}
+              onMove={reorderSets}
+              tokenSet={tokenSet}
+              index={index}
+              key={tokenSet}
+              onRename={handleRenameTokenSet}
+              onDelete={() => handleDeleteTokenSet(tokenSet)}
+            />
+          ))}
+        </DndProvider>
+      )}
       <Modal isOpen={showRenameTokenSetFields} close={() => setShowRenameTokenSetFields(false)}>
         <div className="flex flex-col justify-center space-y-4 text-center">
           <Heading>

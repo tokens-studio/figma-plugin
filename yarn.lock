@@ -9311,6 +9311,11 @@ react-colorful@^5.5.1:
   resolved "https://registry.yarnpkg.com/react-colorful/-/react-colorful-5.5.1.tgz#29d9c4e496f2ca784dd2bb5053a3a4340cfaf784"
   integrity sha512-M1TJH2X3RXEt12sWkpa6hLc/bbYS0H6F4rIqjQZ+RxNBstpY67d9TrFXtqdZwhpmBXcCwEi7stKqFue3ZRkiOg==
 
+react-complex-tree@^1.1.4:
+  version "1.1.4"
+  resolved "https://registry.yarnpkg.com/react-complex-tree/-/react-complex-tree-1.1.4.tgz#307a6f081104eba77a23334da13672835b1037b8"
+  integrity sha512-lGqUVmfwpXL9Uqr3NmNA8SOovz08H0sG1ZQDr9P95t2SEEjzPjQKpeMqfXgrqjlRUS/VkpPjmjlrubEFZRy3nA==
+
 react-dnd-html5-backend@^12.1.1:
   version "12.1.1"
   resolved "https://registry.yarnpkg.com/react-dnd-html5-backend/-/react-dnd-html5-backend-12.1.1.tgz#73aa9043f5a2da5b192503593d620d30c0bd7348"
