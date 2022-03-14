@@ -1,5 +1,4 @@
 import { figmaRGBToHex, extractLinearGradientParamsFromTransform } from '@figma-plugin/helpers';
-// import { matrix, multiply, inv } from 'mathjs';
 import { Matrix, inverse } from 'ml-matrix';
 import { convertToFigmaColor } from './colors';
 
