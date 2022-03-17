@@ -1,63 +1,54 @@
 import React from 'react';
-import { UncontrolledTreeEnvironment, Tree, StaticTreeDataProvider } from 'react-complex-tree';
-import 'react-complex-tree/lib/style.css';
+import { styled } from '@/stitches.config';
+import Box from './Box';
+import Checkbox from './Checkbox';
+import IconChevronDown from './icons/IconChevronDown';
+import { getTree } from './utils/getTree';
+
+type TreeItem = {
+  path: string;
+  parent: string;
+  type: 'folder' | 'set';
+  level: number
+};
+
+const ChevronButton = styled('button', {
+  padding: 2,
+});
 
 export default function TokenSetTree({ tokenSets }: { tokenSets: string[] }) {
   console.log('Token sets', tokenSets);
-  const [items, setItems] = React.useState({});
+  const [items, setItems] = React.useState<TreeItem[]>([]);
+  const [collapsed, setCollapsed] = React.useState<string[]>([]);
 
   React.useEffect(() => {
-    setItems({
-      root: {
-        index: 'root',
-        canMove: true,
-        hasChildren: true,
-        children: ['child1', 'child2'],
-        data: 'Root item',
-        canRename: true,
-      },
-      child1: {
-        index: 'child1',
-        canMove: true,
-        hasChildren: false,
-        children: [],
-        data: 'Child item 1',
-        canRename: true,
-      },
-      child2: {
-        index: 'child2',
-        canMove: true,
-        hasChildren: false,
-        children: ['child3', 'child4'],
-        data: 'Child item 2',
-        canRename: true,
-      },
-      child3: {
-        index: 'child3',
-        canMove: true,
-        hasChildren: false,
-        children: [],
-        data: 'Child item 3',
-        canRename: true,
-      },
-      child4: {
-        index: 'child4',
-        canMove: true,
-        hasChildren: false,
-        children: [],
-        data: 'Child item 3',
-        canRename: true,
-      },
-    });
+    setItems(getTree(tokenSets));
   }, [tokenSets]);
 
+  function toggleCollapsed(set) {
+    setCollapsed(collapsed.includes(set) ? collapsed.filter((s) => s !== set) : [...collapsed, set]);
+  }
+
   return (
-    <UncontrolledTreeEnvironment
-      dataProvider={new StaticTreeDataProvider(items, (item, data) => ({ ...item, data }))}
-      getItemTitle={(item) => item.data}
-      viewState={{}}
-    >
-      <Tree treeId="tree-1" rootItem="root" treeLabel="Tree Example" />
-    </UncontrolledTreeEnvironment>
+    <Box>
+      {items.map((item) => (collapsed.some((i) => item.parent.startsWith(i)) ? null
+        : (
+          <Box key={item.path} css={{ padding: '$1' }}>
+            <Box css={{
+              display: 'flex', alignItems: 'center', gap: '$1', fontSize: '$small', paddingLeft: `${3 * item.level}px`,
+            }}
+            >
+              <ChevronButton onClick={() => toggleCollapsed(item.path)} type="button">{item.type === 'folder' ? <IconChevronDown /> : null}</ChevronButton>
+              <Checkbox
+                size="small"
+                checked={false}
+                id={item.path}
+                onCheckedChange={() => {}}
+              />
+              <button>{item.path}
+            </Box>
+          </Box>
+        )))}
+    </Box>
   );
 }

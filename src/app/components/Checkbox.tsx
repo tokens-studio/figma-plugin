@@ -10,8 +10,6 @@ const StyledIndicator = styled(CheckboxPrimitive.Indicator, {
 const StyledCheckbox = styled(CheckboxPrimitive.Root, {
   all: 'unset',
   backgroundColor: '$bgDefault',
-  width: 16,
-  height: 16,
   borderRadius: '$input',
   border: '1px solid $interaction',
   display: 'flex',
@@ -26,6 +24,16 @@ const StyledCheckbox = styled(CheckboxPrimitive.Root, {
         borderColor: '$interaction',
       },
     },
+    size: {
+      small: {
+        width: 12,
+        height: 12,
+      },
+      default: {
+        width: 16,
+        height: 16,
+      },
+    },
   },
 });
 
@@ -35,12 +43,14 @@ function Checkbox({
   onCheckedChange,
   defaultChecked = false,
   disabled = false,
+  size = 'default',
 }: {
   checked: boolean;
   id: string;
   onCheckedChange: any;
   defaultChecked?: boolean;
   disabled?: boolean;
+  size?: 'default' | 'small';
 }) {
   return (
     <StyledCheckbox
@@ -50,6 +60,7 @@ function Checkbox({
       checked={checked}
       onCheckedChange={onCheckedChange}
       defaultChecked={defaultChecked}
+      size={size}
     >
       <StyledIndicator>
         <CheckIcon />
