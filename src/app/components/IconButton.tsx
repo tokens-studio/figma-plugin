@@ -7,9 +7,12 @@ const StyledButton = styled('button', {
   all: 'unset',
   backgroundColor: 'red',
   border: 'none',
-  padding: '$2 $3',
+  padding: '$2 $2',
   borderRadius: '$button',
   cursor: 'pointer',
+  '&:hover, &:focus': {
+    boxShadow: 'none',
+  },
   variants: {
     buttonVariant: {
       primary: {

@@ -7,7 +7,10 @@ import Text from '@/app/components/Text';
 
 export default function Footer() {
   return (
-    <div className="flex items-center justify-between flex-shrink-0 p-4">
+    <Box css={{
+      display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0, padding: '$3',
+    }}
+    >
       <div className="text-gray-600 text-xxs">
         Version
         {' '}
@@ -37,6 +40,6 @@ export default function Footer() {
           </a>
         </Text>
       </Box>
-    </div>
+    </Box>
   );
 }
