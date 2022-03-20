@@ -87,7 +87,7 @@ body {
   @apply font-body text-sm leading-normal;
 }
 
-.content {
+.scroll-container {
   overflow-y: scroll;
   cursor: pointer;
 }

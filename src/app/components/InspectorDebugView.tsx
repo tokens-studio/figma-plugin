@@ -21,7 +21,7 @@ export default function InspectorDebugView({ resolvedTokens }: { resolvedTokens:
       css={{
         display: 'flex', flexDirection: 'column', flexGrow: 1, padding: '$4',
       }}
-      className="content"
+      className="content scroll-container"
     >
       <AnnotationBuilder />
 

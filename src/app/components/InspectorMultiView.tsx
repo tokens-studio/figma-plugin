@@ -50,7 +50,7 @@ export default function InspectorMultiView({ resolvedTokens }: { resolvedTokens:
       css={{
         display: 'flex', flexDirection: 'column', flexGrow: 1, padding: '$4',
       }}
-      className="content"
+      className="content scroll-container"
     >
       {uiState.selectionValues.length > 0 ? (
         <Box css={{ display: 'flex', flexDirection: 'column', gap: '$1' }}>

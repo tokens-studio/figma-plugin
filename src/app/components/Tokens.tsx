@@ -141,7 +141,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
         >
           {activeTokensTab === 'json' ? <JSONEditor />
             : (
-              <Box css={{ width: '100%', paddingBottom: '$6' }} className="content">
+              <Box css={{ width: '100%', paddingBottom: '$6' }} className="content scroll-container">
                 {memoizedTokens.map(([key, group]: [string, TokenListingType]) => (
                   <div key={key}>
                     <TokenListing

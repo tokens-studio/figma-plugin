@@ -99,6 +99,7 @@ export default function TokenSetSelector() {
         width: '150px',
         borderRight: '1px solid',
         borderColor: '$borderMuted',
+        overflowY: 'auto',
       }}
       className="content"
     >
