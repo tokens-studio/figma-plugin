@@ -6,6 +6,7 @@ describe('getTree', () => {
     const output = [
       {
         path: 'global',
+        key: 'global/set',
         parent: '',
         type: 'set',
         level: 0,
@@ -13,6 +14,7 @@ describe('getTree', () => {
       },
       {
         path: 'semantic/typography/headings',
+        key: 'semantic/typography/headings/set',
         parent: 'semantic/typography',
         type: 'folder',
         level: 0,
@@ -20,6 +22,7 @@ describe('getTree', () => {
       },
       {
         path: 'semantic/typography/headings/default',
+        key: 'semantic/typography/headings/default/set',
         parent: 'semantic/typography/headings',
         type: 'set',
         level: 1,
@@ -27,6 +30,7 @@ describe('getTree', () => {
       },
       {
         path: 'theme',
+        key: 'theme/folder',
         parent: '',
         type: 'folder',
         level: 0,
@@ -34,6 +38,7 @@ describe('getTree', () => {
       },
       {
         path: 'theme/colors',
+        key: 'theme/colors/folder',
         parent: 'theme',
         type: 'folder',
         level: 1,
@@ -41,6 +46,7 @@ describe('getTree', () => {
       },
       {
         path: 'theme/colors/blue',
+        key: 'theme/colors/blue/set',
         parent: 'theme/colors',
         type: 'set',
         level: 2,
@@ -48,6 +54,7 @@ describe('getTree', () => {
       },
       {
         path: 'theme/colors/red',
+        key: 'theme/colors/red/set',
         parent: 'theme/colors',
         type: 'set',
         level: 2,
@@ -55,6 +62,7 @@ describe('getTree', () => {
       },
       {
         path: 'theme/type',
+        key: 'theme/type/set',
         parent: 'theme',
         type: 'set',
         level: 1,

@@ -14,11 +14,11 @@ export function getTree(items) {
     if (parentName !== '' && !acc.find((item) => item.path === parentName)) {
       const label = items.some((item) => item.startsWith(path.slice(0, -2).join('/'))) ? path[path.length - 2] : path.join('/');
       acc.push({
-        path: parentName, key: `${path}-folder`, parent: path.slice(0, -2).join('/'), type: 'folder', level: path.length - 2, label,
+        path: parentName, key: `${path.join('/')}/folder`, parent: path.slice(0, -2).join('/'), type: 'folder', level: path.length - 2, label,
       });
     }
     acc.push({
-      path: curr, key: `${path}-set`, parent: parentName, type: 'set', level: path.length - 1, label: path[path.length - 1],
+      path: curr, key: `${path.join('/')}/set`, parent: parentName, type: 'set', level: path.length - 1, label: path[path.length - 1],
     });
     return acc;
   }, []);
