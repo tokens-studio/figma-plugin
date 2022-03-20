@@ -7,6 +7,28 @@ import Tooltip from './Tooltip';
 import useRemoteTokens from '../store/remoteTokens';
 import { StorageProviderType } from '../../types/api';
 import { RootState, Dispatch } from '../store';
+import Box from './Box';
+import { styled } from '@/stitches.config';
+
+const StyledButton = styled('button', {
+  padding: '$5 $4',
+  fontSize: '$xsmall',
+  fontWeight: '$bold',
+  cursor: 'pointer',
+  color: '$textMuted',
+  '&:focus, &:hover': {
+    outline: 'none',
+    boxShadow: 'none',
+    color: '$text',
+  },
+  variants: {
+    isActive: {
+      true: {
+        color: '$text',
+      },
+    },
+  },
+});
 
 function TabButton({ name, label, first = false }) {
   const { activeTab } = useSelector((state: RootState) => state.uiState);
@@ -18,17 +40,15 @@ function TabButton({ name, label, first = false }) {
   };
 
   return (
-    <button
+    <StyledButton
       data-cy={`navitem-${name}`}
       type="button"
-      className={`px-2 py-4 text-xxs focus:outline-none focus:shadow-none font-medium cursor-pointer focus:text-black hover:text-black
-        ${activeTab === name ? 'text-black' : 'text-gray-500'}
-        ${first ? 'pl-4' : ''}`}
+      isActive={activeTab === name}
       name="text"
       onClick={onClick}
     >
       {label}
-    </button>
+    </StyledButton>
   );
 }
 
@@ -57,7 +77,19 @@ function Navbar() {
   };
 
   return (
-    <div className="sticky top-0 flex items-center justify-between bg-white border-b border-gray-200 navbar z-1">
+    <Box
+      css={{
+        position: 'sticky',
+        top: 0,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        background: '$bgDefault',
+        borderBottom: '1px solid $borderMuted',
+        zIndex: 1,
+        transform: 'translateY(-1px)',
+      }}
+    >
       <div>
         <TabButton first name="tokens" label="Tokens" />
         <TabButton name="inspector" label="Inspect" />
@@ -66,45 +98,38 @@ function Navbar() {
       </div>
       <div className="flex flex-row items-center">
         {storageType.provider !== StorageProviderType.LOCAL && (
-        <>
-          {storageType.provider === StorageProviderType.JSONBIN && (
-          <Tooltip variant="right" label={`Go to ${transformProviderName(storageType.provider)}`}>
-            <a
-              href={projectURL}
-              target="_blank"
-              rel="noreferrer"
-              className="block button button-ghost"
-            >
-              <Icon name="library" />
-            </a>
-          </Tooltip>
-          )}
-          {storageType.provider === StorageProviderType.GITHUB && (
-          <Tooltip variant="right" label={`Push to ${transformProviderName(storageType.provider)}`}>
-            <button
-              onClick={() => pushTokens()}
-              type="button"
-              className="relative button button-ghost"
-              disabled={editProhibited}
-            >
-              {checkForChanges() && (
-              <div className="absolute top-0 right-0 w-2 h-2 rounded-full bg-primary-500" />
-              )}
+          <>
+            {storageType.provider === StorageProviderType.JSONBIN && (
+              <Tooltip variant="right" label={`Go to ${transformProviderName(storageType.provider)}`}>
+                <a href={projectURL} target="_blank" rel="noreferrer" className="block button button-ghost">
+                  <Icon name="library" />
+                </a>
+              </Tooltip>
+            )}
+            {storageType.provider === StorageProviderType.GITHUB && (
+              <Tooltip variant="right" label={`Push to ${transformProviderName(storageType.provider)}`}>
+                <button
+                  onClick={() => pushTokens()}
+                  type="button"
+                  className="relative button button-ghost"
+                  disabled={editProhibited}
+                >
+                  {checkForChanges() && <div className="absolute top-0 right-0 w-2 h-2 rounded-full bg-primary-500" />}
 
-              <Icon name="library" />
-            </button>
-          </Tooltip>
-          )}
+                  <Icon name="library" />
+                </button>
+              </Tooltip>
+            )}
 
-          <Tooltip variant="right" label={`Pull from ${transformProviderName(storageType.provider)}`}>
-            <button onClick={() => pullTokens()} type="button" className="button button-ghost">
-              <Icon name="refresh" />
-            </button>
-          </Tooltip>
-        </>
+            <Tooltip variant="right" label={`Pull from ${transformProviderName(storageType.provider)}`}>
+              <button onClick={() => pullTokens()} type="button" className="button button-ghost">
+                <Icon name="refresh" />
+              </button>
+            </Tooltip>
+          </>
         )}
       </div>
-    </div>
+    </Box>
   );
 }
 

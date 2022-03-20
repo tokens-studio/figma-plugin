@@ -10,6 +10,7 @@ import useConfirm from '../hooks/useConfirm';
 import ExportModal from './modals/ExportModal';
 import PresetModal from './modals/PresetModal';
 import Box from './Box';
+import ActionButton from './ActionButton';
 
 export default function TokensBottomBar() {
   const { updateDocument } = useDispatch<Dispatch>().tokenState;
@@ -57,20 +58,19 @@ export default function TokensBottomBar() {
       width: '100%', backgroundColor: '$bgDefault', borderBottom: '1px solid', borderColor: '$borderMuted',
     }}
     >
-      <div className="flex items-center justify-between p-2">
+      <Box css={{
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexDirection: 'row', gap: '$2', padding: '$3 $4',
+      }}
+      >
         <ApplySelector />
-        <div className="space-x-2">
-          <Button variant="secondary" onClick={pullStyles} disabled={editProhibited}>
-            Import
-          </Button>
-          <Button variant="secondary" onClick={createStylesFromTokens}>
-            Create Styles
-          </Button>
-          <Button variant="primary" onClick={handleUpdate}>
-            Update
-          </Button>
-        </div>
-      </div>
+        <Box css={{ display: 'flex', flexDirection: 'row', gap: '$1' }}>
+          <ActionButton text="Load" disabled={editProhibited} onClick={() => showPresetModal(true)} />
+          <ActionButton text="Export" onClick={() => showExportModal(true)} />
+          <ActionButton text="Import styles" disabled={editProhibited} onClick={pullStyles} />
+          <ActionButton text="Create styles" onClick={createStylesFromTokens} />
+          <ActionButton text="Update" variant="primary" onClick={handleUpdate} />
+        </Box>
+      </Box>
       {exportModalVisible && <ExportModal onClose={() => showExportModal(false)} />}
       {presetModalVisible && <PresetModal onClose={() => showPresetModal(false)} />}
 

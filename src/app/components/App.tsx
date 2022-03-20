@@ -22,7 +22,7 @@ function App() {
   const activeTab = useSelector((state: RootState) => state.uiState.activeTab);
 
   return (
-    <Box>
+    <Box css={{ backgroundColor: '$bgDefault' }}>
       <Initiator />
       <LoadingBar />
       <Box css={{

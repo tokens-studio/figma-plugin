@@ -18,6 +18,9 @@ import IconCode from '@/icons/code.svg';
 import IconDisclosure from '@/icons/disclosure.svg';
 import { styled } from '@/stitches.config';
 
+import ExportModal from './modals/ExportModal';
+import PresetModal from './modals/PresetModal';
+
 interface TokenListingType {
   label: string;
   property: string;
@@ -119,6 +122,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
             icon={<IconCode />}
             tooltipSide="bottom"
             tooltip="JSON"
+
           />
         </Box>
       </Box>
@@ -159,7 +163,6 @@ function Tokens({ isActive }: { isActive: boolean }) {
         </Box>
       </Box>
       <TokensBottomBar />
-
     </Box>
   );
 }

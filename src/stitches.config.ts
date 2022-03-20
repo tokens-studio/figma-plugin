@@ -3,7 +3,7 @@ import { createCss } from '@stitches/react';
 
 const globalTokens = {
   colors: {
-    white: '#FFFFFF',
+    background: '#FFFFFF',
     gray50: 'var(--theme-colors-gray-50, #FAFAFA)',
     gray100: 'var(--theme-colors-gray-100, #f5f5f5)',
     gray200: 'var(--theme-colors-gray-200, #eeeeee)',
@@ -41,9 +41,9 @@ export const {
       bold: 500,
     },
     colors: {
-      bgDefault: globalTokens.colors.white,
+      bgDefault: globalTokens.colors.background,
       contextMenuBackground: globalTokens.colors.gray950,
-      contextMenuForeground: globalTokens.colors.white,
+      contextMenuForeground: globalTokens.colors.background,
       contextMenuForegroundMuted: globalTokens.colors.gray400,
       contextMenuSeperator: globalTokens.colors.gray700,
       text: globalTokens.colors.gray900,
@@ -56,7 +56,7 @@ export const {
       bgAccentHover: globalTokens.colors.primary300,
       interaction: globalTokens.colors.primary500,
       interactionSubtle: globalTokens.colors.primary400,
-      onInteraction: globalTokens.colors.white,
+      onInteraction: globalTokens.colors.background,
       interactionDisabled: globalTokens.colors.gray600,
       dangerFg: globalTokens.colors.red500,
       border: globalTokens.colors.gray300,

@@ -119,10 +119,6 @@ textarea::-webkit-scrollbar-thumb {
   @apply text-xs font-medium;
 }
 
-.navbar {
-  transform: translateY(-1px);
-}
-
 .button-property + .property-wrapper {
   @apply mt-4;
 }

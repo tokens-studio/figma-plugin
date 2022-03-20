@@ -98,6 +98,7 @@ const StyledButton = styled('button', {
   padding: '$3 $4',
   display: 'flex',
   width: '100%',
+  textAlign: 'left',
   '&:hover, &:focus': {
     boxShadow: 'none',
     [`+ ${StyledCheckbox}`]: {

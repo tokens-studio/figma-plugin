@@ -17,7 +17,7 @@ const StyledContent = styled(DropdownMenu.Content, {
 });
 
 const itemStyles = {
-  fontSize: 13,
+  fontSize: '$xsmall',
   padding: '5px 10px 5px 25px',
   borderRadius: '$contextMenuItem',
   cursor: 'default',
@@ -41,6 +41,17 @@ const StyledSeparator = styled(DropdownMenu.Separator, {
   height: 1,
   backgroundColor: '$contextMenuSeperator',
   margin: 5,
+});
+const StyledDropdownMenuTrigger = styled(DropdownMenu.Trigger, {
+  display: 'flex',
+  alignItems: 'center',
+  padding: '$3',
+  gap: '$1',
+  borderRadius: '$button',
+  backgroundColor: '$bgDefault',
+  color: '$text',
+  border: '1px solid $borderMuted',
+  fontSize: '$xsmall',
 });
 
 const StyledRadioGroup = styled(DropdownMenu.RadioGroup, {});
@@ -82,14 +93,14 @@ export default function ApplySelector() {
 
   return (
     <DropdownMenu.Root>
-      <DropdownMenu.Trigger className="flex p-2 bg-white border rounded text-xs items-center space-x-2">
+      <StyledDropdownMenuTrigger>
         <span>
           Apply to
           {' '}
           {updateMode}
         </span>
         <IconChevronDown />
-      </DropdownMenu.Trigger>
+      </StyledDropdownMenuTrigger>
 
       <StyledContent side="top">
         <StyledRadioGroup value={updateMode}>

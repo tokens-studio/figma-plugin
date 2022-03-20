@@ -100,6 +100,7 @@ export default function TokenSetSelector() {
         borderRight: '1px solid',
         borderColor: '$borderMuted',
       }}
+      className="content"
     >
       {isMultifile ? (
         <Box>
