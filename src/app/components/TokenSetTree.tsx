@@ -1,27 +1,19 @@
 import React from 'react';
-import { styled } from '@/stitches.config';
+import { useDispatch, useSelector } from 'react-redux';
 import Box from './Box';
-import Checkbox from './Checkbox';
-import IconChevronDown from './icons/IconChevronDown';
-import { getTree } from './utils/getTree';
+import { TokenSetItem2 } from './TokenSetItem2';
+import { Dispatch, RootState } from '../store';
+import { getTree, TreeItem } from './utils/getTree';
 
-type TreeItem = {
-  path: string;
-  parent: string;
-  type: 'folder' | 'set';
-  level: number
-};
-
-const ChevronButton = styled('button', {
-  padding: 2,
-});
-
-export default function TokenSetTree({ tokenSets }: { tokenSets: string[] }) {
-  console.log('Token sets', tokenSets);
-  const [items, setItems] = React.useState<TreeItem[]>([]);
+export default function TokenSetTree({ tokenSets, onRename, onDelete }: { tokenSets: string[], onRename: (tokenSet: string) => void, onDelete: (tokenSet: string) => void }) {
+  const { activeTokenSet, usedTokenSet, editProhibited } = useSelector((state: RootState) => state.tokenState);
+  const dispatch = useDispatch<Dispatch>();
+  const [items, setItems] = React.useState<TreeItem[]>(getTree(tokenSets));
   const [collapsed, setCollapsed] = React.useState<string[]>([]);
 
   React.useEffect(() => {
+    console.log('Sets changed', tokenSets);
+
     setItems(getTree(tokenSets));
   }, [tokenSets]);
 
@@ -29,26 +21,56 @@ export default function TokenSetTree({ tokenSets }: { tokenSets: string[] }) {
     setCollapsed(collapsed.includes(set) ? collapsed.filter((s) => s !== set) : [...collapsed, set]);
   }
 
+  function handleCheckedChange(set, shouldCheck) {
+    console.log('Checked', set);
+    if (set.type === 'set') {
+      dispatch.tokenState.toggleUsedTokenSet(set.path);
+    } else {
+      const itemPaths = items.filter((i) => i.path.startsWith(set.path) && i.path !== set.path).map((i) => i.path);
+      console.log('Toggling folder', shouldCheck, itemPaths);
+      dispatch.tokenState.toggleManyTokenSets({ shouldCheck, sets: itemPaths });
+    }
+  }
+
+  function handleClick(set) {
+    console.log('activate', set);
+    if (set.type === 'set') {
+      dispatch.tokenState.setActiveTokenSet(set.path);
+    }
+  }
+
+  const determineCheckedState = React.useCallback((item) => {
+    if (item.type === 'set') {
+      return usedTokenSet.includes(item.path);
+    }
+    const itemPaths = items.filter((i) => i.path.startsWith(item.path) && i.path !== item.path).map((i) => i.path);
+    if (itemPaths.every((i) => usedTokenSet.includes(i))) {
+      return true;
+    } if (itemPaths.some((i) => usedTokenSet.includes(i))) {
+      return 'indeterminate';
+    }
+    return false;
+  }, [items, usedTokenSet]);
+
   return (
     <Box>
-      {items.map((item) => (collapsed.some((i) => item.parent.startsWith(i)) ? null
-        : (
-          <Box key={item.path} css={{ padding: '$1' }}>
-            <Box css={{
-              display: 'flex', alignItems: 'center', gap: '$1', fontSize: '$small', paddingLeft: `${3 * item.level}px`,
-            }}
-            >
-              <ChevronButton onClick={() => toggleCollapsed(item.path)} type="button">{item.type === 'folder' ? <IconChevronDown /> : null}</ChevronButton>
-              <Checkbox
-                size="small"
-                checked={false}
-                id={item.path}
-                onCheckedChange={() => {}}
-              />
-              <button>{item.path}
-            </Box>
-          </Box>
-        )))}
+      {items.map((item) => (collapsed.some((i) => item.parent.startsWith(i)) ? null : (
+        <TokenSetItem2
+          key={item.key}
+          isCollapsed={collapsed.includes(item.path)}
+          isActive={activeTokenSet === item.path}
+          onClick={() => handleClick(item)}
+          isChecked={determineCheckedState(item)}
+          item={item}
+          onCheck={(shouldCheck) => handleCheckedChange(item, shouldCheck)}
+          onCollapse={() => toggleCollapsed(item.path)}
+          canEdit={!editProhibited}
+          canDelete={!editProhibited || Object.keys(tokenSets).length > 1}
+          onRename={onRename}
+          onDelete={onDelete}
+          type={item.type}
+        />
+      )))}
     </Box>
   );
 }

@@ -37,6 +37,7 @@ export const {
       small: '12px',
     },
     fontWeights: {
+      normal: 300,
       bold: 500,
     },
     colors: {
@@ -47,10 +48,12 @@ export const {
       contextMenuSeperator: globalTokens.colors.gray700,
       text: globalTokens.colors.gray900,
       textMuted: globalTokens.colors.gray600,
+      textSubtle: globalTokens.colors.gray400,
       textDisabled: globalTokens.colors.gray400,
       fgSubtle: globalTokens.colors.gray300,
       bgSubtle: globalTokens.colors.gray100,
       bgAccent: globalTokens.colors.primary100,
+      bgAccentHover: globalTokens.colors.primary300,
       interaction: globalTokens.colors.primary500,
       interactionSubtle: globalTokens.colors.primary400,
       onInteraction: globalTokens.colors.white,
@@ -61,6 +64,16 @@ export const {
       focus: globalTokens.colors.primary300,
     },
     space: {
+      1: '2px',
+      2: '4px',
+      3: '8px',
+      4: '12px',
+      5: '16px',
+      6: '24px',
+      7: '32px',
+      8: '48px',
+    },
+    sizes: {
       1: '2px',
       2: '4px',
       3: '8px',

@@ -16,7 +16,7 @@ import IconButton from './IconButton';
 import IconListing from '@/icons/listing.svg';
 import IconCode from '@/icons/code.svg';
 import IconDisclosure from '@/icons/disclosure.svg';
-import Text from './Text';
+import { styled } from '@/stitches.config';
 
 interface TokenListingType {
   label: string;
@@ -30,6 +30,27 @@ interface TokenListingType {
     options: object | string;
   };
 }
+
+const StyledButton = styled('button', {
+  '&:focus, &:hover': {
+    boxShadow: 'none',
+    background: '$bgSubtle',
+  },
+});
+
+const StyledIconDisclosure = styled(IconDisclosure, {
+  transition: 'transform 0.2s ease-in-out',
+  variants: {
+    open: {
+      true: {
+        transform: 'rotate(0deg)',
+      },
+      false: {
+        transform: 'rotate(180deg)',
+      },
+    },
+  },
+});
 
 function Tokens({ isActive }: { isActive: boolean }) {
   const { tokens, activeTokenSet, usedTokenSet } = useSelector((state: RootState) => state.tokenState);
@@ -68,15 +89,15 @@ function Tokens({ isActive }: { isActive: boolean }) {
       }}
       >
         <Box>
-          <button style={{ height: '100%' }} type="button" onClick={() => setTokenSetsVisible(!tokenSetsVisible)}>
+          <StyledButton style={{ height: '100%' }} type="button" onClick={() => setTokenSetsVisible(!tokenSetsVisible)}>
             <Box css={{
-              fontWeight: '$bold', height: '100%', fontSize: '$small', gap: '$1', padding: '$3 $5', display: 'flex', alignItems: 'center',
+              fontWeight: '$bold', height: '100%', fontSize: '$xsmall', gap: '$1', padding: '$3 $4', display: 'flex', alignItems: 'center',
             }}
             >
               {activeTokenSet}
-              <IconDisclosure />
+              <StyledIconDisclosure open={tokenSetsVisible} />
             </Box>
-          </button>
+          </StyledButton>
         </Box>
         <TokenFilter />
         <Box css={{
