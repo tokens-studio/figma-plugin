@@ -74,6 +74,19 @@ export const tokenState = createModel<RootModel>()({
         ? state.usedTokenSet.filter((n) => n !== data)
         : [...new Set([...state.usedTokenSet, data])],
     }),
+    toggleManyTokenSets: (state, data: { shouldCheck: boolean, sets: string[] }) => {
+      if (data.shouldCheck) {
+        const oldSetsWithoutCurrent = state.usedTokenSet.filter((n) => !data.sets.includes(n));
+        return {
+          ...state,
+          usedTokenSet: [...oldSetsWithoutCurrent, ...data.sets],
+        };
+      }
+      return {
+        ...state,
+        usedTokenSet: state.usedTokenSet.filter((n) => !data.sets.includes(n)),
+      };
+    },
     setActiveTokenSet: (state, data: string) => ({
       ...state,
       activeTokenSet: data,
@@ -102,6 +115,10 @@ export const tokenState = createModel<RootModel>()({
     },
     renameTokenSet: (state, data: { oldName: string; newName: string }) => {
       const oldTokens = state.tokens;
+      if (Object.keys(oldTokens).includes(data.newName) && data.oldName !== data.newName) {
+        notifyToUI('Token set already exists');
+        return state;
+      }
       oldTokens[data.newName] = oldTokens[data.oldName];
       delete oldTokens[data.oldName];
       return {
@@ -366,8 +383,10 @@ export const tokenState = createModel<RootModel>()({
         dispatch.tokenState.updateDocument();
       }
     },
-
     toggleUsedTokenSet(payload, rootState) {
+      dispatch.tokenState.updateDocument({ updateRemote: false });
+    },
+    toggleManyTokenSets(payload, rootState) {
       dispatch.tokenState.updateDocument({ updateRemote: false });
     },
     duplicateToken(payload, rootState) {
