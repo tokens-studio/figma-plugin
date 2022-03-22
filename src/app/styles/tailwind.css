@@ -465,6 +465,11 @@ input.input {
   border: 1px solid var(--black);
 }
 
+.drag-over-item {
+  padding-left: 30px;
+  transition: padding-left 0.5s;
+}
+
 .radio__label {
   align-items: center;
   color: var(--black8);

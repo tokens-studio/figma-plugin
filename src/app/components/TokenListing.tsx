@@ -1,5 +1,7 @@
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { HTML5Backend } from 'react-dnd-html5-backend';
+import { DndProvider } from 'react-dnd';
 import { SingleTokenObject } from '@/types/tokens';
 import Heading from './Heading';
 import Icon from './Icon';
@@ -130,19 +132,21 @@ function TokenListing({
         </div>
       </div>
       {values && (
-        <div
-          className={`px-4 pb-4 ${isIntCollapsed ? 'hidden' : null}`}
-          data-cy={`tokenlisting-${tokenKey}-content`}
-        >
-          <TokenTree
-            tokenValues={values}
-            showNewForm={showNewForm}
-            showForm={showForm}
-            schema={schema}
-            type={tokenType}
-            resolvedTokens={resolvedTokens}
-          />
-        </div>
+        <DndProvider backend={HTML5Backend}>
+          <div
+            className={`px-4 pb-4 ${isIntCollapsed ? 'hidden' : null}`}
+            data-cy={`tokenlisting-${tokenKey}-content`}
+          >
+            <TokenTree
+              tokenValues={values}
+              showNewForm={showNewForm}
+              showForm={showForm}
+              schema={schema}
+              type={tokenType}
+              resolvedTokens={resolvedTokens}
+            />
+          </div>
+        </DndProvider>
       )}
     </div>
   );
