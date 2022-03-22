@@ -1,4 +1,4 @@
-import { createTree } from './createTree';
+import { getTree } from './getTree';
 
 describe('getTree', () => {
   it('returns a tree', () => {
@@ -85,6 +85,6 @@ describe('getTree', () => {
         label: 'type',
       },
     ];
-    expect(createTree(input)).toEqual(output);
+    expect(getTree(input)).toEqual(output);
   });
 });
