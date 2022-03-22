@@ -9,6 +9,7 @@ export const SharedPluginDataKeys = Object.freeze({
     storageType: 'storageType',
     hash: 'hash',
     persistentNodesCache: 'persistentNodesCache',
+    usedTokenSet: 'usedTokenSet',
     ...Properties,
   },
 });

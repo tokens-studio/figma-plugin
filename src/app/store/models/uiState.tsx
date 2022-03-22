@@ -288,10 +288,10 @@ export const uiState = createModel<RootModel>()({
         tokenFilter: payload,
       };
     },
-    toggleShowEmptyGroups(state) {
+    toggleShowEmptyGroups(state, payload?: boolean) {
       return {
         ...state,
-        showEmptyGroups: !state.showEmptyGroups,
+        showEmptyGroups: payload == null ? !state.showEmptyGroups : payload,
       };
     },
     toggleCollapsed(state) {
@@ -348,6 +348,12 @@ export const uiState = createModel<RootModel>()({
       postToFigma({
         type: MessageToPluginTypes.CHANGED_TABS,
         requiresSelectionValues,
+      });
+    },
+    toggleShowEmptyGroups(payload, rootState) {
+      postToFigma({
+        type: MessageToPluginTypes.SET_SHOW_EMPTY_GROUPS,
+        showEmptyGroups: payload == null ? rootState.uiState.showEmptyGroups : payload,
       });
     },
   }),

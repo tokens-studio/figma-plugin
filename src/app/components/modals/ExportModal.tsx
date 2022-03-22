@@ -13,6 +13,7 @@ export default function ExportModal({ onClose }) {
   const [includeAllTokens, setIncludeAllTokens] = React.useState(false);
   const [includeParent, setIncludeParent] = React.useState(true);
   const [expandTypography, setExpandTypography] = React.useState(false);
+  const [expandShadow, setExpandShadow] = React.useState(false);
 
   return (
     <Modal large isOpen close={onClose}>
@@ -62,6 +63,15 @@ export default function ExportModal({ onClose }) {
             />
             <Label htmlFor="expandTypography">Expand Typography</Label>
           </Box>
+          <Box css={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+            <Checkbox
+              id="expandShadow"
+              checked={expandShadow}
+              defaultChecked={expandShadow}
+              onCheckedChange={() => setExpandShadow(!expandShadow)}
+            />
+            <Label htmlFor="expandShadow">Expand Shadows</Label>
+          </Box>
         </Box>
 
         <Heading size="small">Output example</Heading>
@@ -69,7 +79,9 @@ export default function ExportModal({ onClose }) {
           className="grow"
           rows={10}
           isDisabled
-          value={getFormattedTokens({ includeAllTokens, includeParent, expandTypography })}
+          value={getFormattedTokens({
+            includeAllTokens, includeParent, expandTypography, expandShadow,
+          })}
         />
         <div className="space-x-4 flex justify-between">
           <Button variant="secondary" onClick={onClose}>
@@ -77,7 +89,9 @@ export default function ExportModal({ onClose }) {
           </Button>
           <Button
             href={`data:text/json;charset=utf-8,${encodeURIComponent(
-              getFormattedTokens({ includeAllTokens, includeParent, expandTypography }),
+              getFormattedTokens({
+                includeAllTokens, includeParent, expandTypography, expandShadow,
+              }),
             )}`}
             download="tokens.json"
             variant="primary"

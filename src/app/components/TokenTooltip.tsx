@@ -47,19 +47,28 @@ export default function TokenTooltip({ token, resolvedTokens, shouldResolve = fa
         <div>
           <div>
             Font:
+            {' '}
             {valueToCheck.fontFamily?.value || valueToCheck.fontFamily}
           </div>
           <div>
             Weight:
+            {' '}
             {valueToCheck.fontWeight?.value || valueToCheck.fontWeight}
           </div>
           <div>
+            Size:
+            {' '}
+            {valueToCheck.fontSize?.value || valueToCheck.fontSize}
+          </div>
+          <div>
             Leading:
+            {' '}
             {valueToCheck.lineHeight?.value || valueToCheck.lineHeight}
           </div>
           <div>
             Tracking:
-            {valueToCheck.lineHeight?.value || valueToCheck.lineHeight}
+            {' '}
+            {valueToCheck.letterSpacing?.value || valueToCheck.letterSpacing}
           </div>
           <div>
             Paragraph Spacing:
@@ -68,10 +77,12 @@ export default function TokenTooltip({ token, resolvedTokens, shouldResolve = fa
           </div>
           <div>
             Text Case:
+            {' '}
             {valueToCheck.textCase?.value || valueToCheck.textCase}
           </div>
           <div>
             Text Decoration:
+            {' '}
             {valueToCheck.textDecoration?.value || valueToCheck.textDecoration}
           </div>
         </div>

@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import Button from '../Button';
 import Input from '../Input';
 
 export default function GitHubForm({
   handleChange, handleSubmit, handleCancel, values, hasErrored,
 }) {
+  const inputEl = useRef(null);
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <Input full label="Name" value={values.name} onChange={handleChange} type="text" name="name" required />
@@ -13,7 +14,9 @@ export default function GitHubForm({
         label="Personal Access Token"
         value={values.secret}
         onChange={handleChange}
-        type="text"
+        inputRef={inputEl}
+        isMasked
+        type="password"
         name="secret"
         required
       />

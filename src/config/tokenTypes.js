@@ -20,7 +20,7 @@ export default {
     },
   },
   color: {
-    label: 'Colors',
+    label: 'Color',
     property: 'Color',
     type: 'color',
     schema: {
@@ -106,7 +106,7 @@ export default {
   },
   fontFamilies: {
     help: 'Only works in combination with a Font Weight',
-    label: 'Font Families',
+    label: 'Font Family',
     property: 'Font Family',
     type: 'fontFamilies',
     schema: {
@@ -117,7 +117,7 @@ export default {
   },
   fontWeights: {
     help: 'Only works in combination with a Font Family',
-    label: 'Font Weights',
+    label: 'Font Weight',
     property: 'Font Weight',
     type: 'fontWeights',
     schema: {
@@ -127,7 +127,7 @@ export default {
     },
   },
   lineHeights: {
-    label: 'Line Heights',
+    label: 'Line Height',
     explainer: 'e.g. 100% or 14',
     property: 'Line Height',
     type: 'lineHeights',
@@ -138,7 +138,7 @@ export default {
     },
   },
   fontSizes: {
-    label: 'Font Sizes',
+    label: 'Font Size',
     property: 'Font Size',
     type: 'fontSizes',
     schema: {

@@ -6,6 +6,7 @@ import { postToFigma } from '../../plugin/notifiers';
 import useRemoteTokens from '../store/remoteTokens';
 import { Dispatch } from '../store';
 import useStorage from '../store/useStorage';
+import * as pjs from '../../../package.json';
 
 export function Initiator() {
   const dispatch = useDispatch<Dispatch>();
@@ -100,9 +101,13 @@ export function Initiator() {
             dispatch.settings.triggerWindowChange();
             break;
           }
+          case MessageFromPluginTypes.SHOW_EMPTY_GROUPS: {
+            dispatch.uiState.toggleShowEmptyGroups(pluginMessage.showEmptyGroups);
+            break;
+          }
           case MessageFromPluginTypes.USER_ID: {
             identify(pluginMessage.user);
-            track('Launched');
+            track('Launched', { version: pjs.plugin_version });
             break;
           }
           case MessageFromPluginTypes.RECEIVED_LAST_OPENED: {

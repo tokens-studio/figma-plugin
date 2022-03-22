@@ -11,4 +11,5 @@ export const ValidNodeTypes: NodeType[] = [
   'RECTANGLE',
   'TEXT',
   'VECTOR',
+  'STAR',
 ];

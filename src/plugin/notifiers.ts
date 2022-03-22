@@ -62,16 +62,19 @@ export type SavedSettings = {
   inspectDeep: boolean;
 };
 
-export function notifyUISettings({
-  width,
-  height,
-  updateMode,
-  updateOnChange,
-  updateStyles,
-  ignoreFirstPartForStyles,
-  updateRemote = true,
-  inspectDeep,
-}: SavedSettings) {
+export function notifyUISettings(
+  {
+    width,
+    height,
+    updateMode,
+    updateOnChange,
+    updateStyles,
+    ignoreFirstPartForStyles,
+    updateRemote = true,
+    inspectDeep,
+  }: SavedSettings,
+  showEmptyGroups: boolean,
+) {
   postToUI({
     type: MessageFromPluginTypes.UI_SETTINGS,
     settings: {
@@ -86,6 +89,10 @@ export function notifyUISettings({
       ignoreFirstPartForStyles,
       inspectDeep,
     },
+  });
+  postToUI({
+    type: MessageFromPluginTypes.SHOW_EMPTY_GROUPS,
+    showEmptyGroups,
   });
 }
 
