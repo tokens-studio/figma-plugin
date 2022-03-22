@@ -1,7 +1,8 @@
 import * as CheckboxPrimitive from '@radix-ui/react-checkbox';
-import { CheckIcon, DividerHorizontalIcon } from '@radix-ui/react-icons';
 import React from 'react';
 import { styled } from '@/stitches.config';
+import IconCheck from '@/icons/check.svg';
+import IconIndeterminate from '@/icons/indeterminate.svg';
 
 const StyledIndicator = styled(CheckboxPrimitive.Indicator, {
   color: '$onInteraction',
@@ -29,13 +30,9 @@ const StyledCheckbox = styled(CheckboxPrimitive.Root, {
       },
     },
     size: {
-      small: {
+      default: {
         width: 12,
         height: 12,
-      },
-      default: {
-        width: 16,
-        height: 16,
       },
     },
   },
@@ -67,8 +64,8 @@ function Checkbox({
       size={size}
     >
       <StyledIndicator>
-        {checked === 'indeterminate' && <DividerHorizontalIcon />}
-        {checked === true && <CheckIcon />}
+        {checked === 'indeterminate' && <IconIndeterminate />}
+        {checked === true && <IconCheck />}
       </StyledIndicator>
     </StyledCheckbox>
   );

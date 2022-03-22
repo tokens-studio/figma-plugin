@@ -1,32 +1,23 @@
 import * as React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import parseTokenValues from '@/utils/parseTokenValues';
-import { track } from '@/utils/analytics';
 import parseJson from '@/utils/parseJson';
 import Textarea from './Textarea';
-import { Dispatch, RootState } from '../store';
+import { RootState } from '../store';
 import useTokens from '../store/useTokens';
-import useConfirm from '../hooks/useConfirm';
 import Box from './Box';
 
-function JSONEditor() {
+function JSONEditor({ stringTokens, setStringTokens }: { stringTokens: string, setStringTokens: (tokens: string) => void }) {
   const { tokens, activeTokenSet, editProhibited } = useSelector((state: RootState) => state.tokenState);
   const { tokenType } = useSelector((state: RootState) => state.settings);
-  const dispatch = useDispatch<Dispatch>();
   const { getStringTokens } = useTokens();
-  const { confirm } = useConfirm();
 
   const [error, setError] = React.useState(null);
-  const [stringTokens, setStringTokens] = React.useState(JSON.stringify(tokens[activeTokenSet], null, 2));
 
   React.useEffect(() => {
     setError(null);
     setStringTokens(tokenType === 'array' ? JSON.stringify(tokens[activeTokenSet], null, 2) : getStringTokens());
   }, [tokens, activeTokenSet, tokenType]);
-
-  const handleUpdate = async () => {
-    dispatch.tokenState.setJSONData(stringTokens);
-  };
 
   const changeTokens = (val) => {
     setError(null);

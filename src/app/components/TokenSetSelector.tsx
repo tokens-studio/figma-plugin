@@ -86,7 +86,6 @@ export default function TokenSetSelector() {
   }, [tokens]);
 
   function handleReorder(values: string[]) {
-    console.log('Reorder', values);
     dispatch.tokenState.setTokenSetOrder(values);
   }
 

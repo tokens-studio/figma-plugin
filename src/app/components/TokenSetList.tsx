@@ -34,12 +34,10 @@ export default function TokenSetList({
   const [items, setItems] = React.useState(getList(tokenSets));
 
   React.useEffect(() => {
-    console.log('TokenSetList', tokenSets);
     setItems(getList(tokenSets));
   }, [tokenSets]);
 
   function handleClick(set) {
-    console.log('activate', set);
     if (set.type === 'set') {
       dispatch.tokenState.setActiveTokenSet(set.path);
     }

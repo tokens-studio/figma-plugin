@@ -12,8 +12,6 @@ export default function TokenSetTree({ tokenSets, onRename, onDelete }: { tokenS
   const [collapsed, setCollapsed] = React.useState<string[]>([]);
 
   React.useEffect(() => {
-    console.log('Sets changed', tokenSets);
-
     setItems(getTree(tokenSets));
   }, [tokenSets]);
 
@@ -22,18 +20,15 @@ export default function TokenSetTree({ tokenSets, onRename, onDelete }: { tokenS
   }
 
   function handleCheckedChange(set, shouldCheck) {
-    console.log('Checked', set);
     if (set.type === 'set') {
       dispatch.tokenState.toggleUsedTokenSet(set.path);
     } else {
       const itemPaths = items.filter((i) => i.path.startsWith(set.path) && i.path !== set.path).map((i) => i.path);
-      console.log('Toggling folder', shouldCheck, itemPaths);
       dispatch.tokenState.toggleManyTokenSets({ shouldCheck, sets: itemPaths });
     }
   }
 
   function handleClick(set) {
-    console.log('activate', set);
     if (set.type === 'set') {
       dispatch.tokenState.setActiveTokenSet(set.path);
     }

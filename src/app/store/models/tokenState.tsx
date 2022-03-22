@@ -132,14 +132,10 @@ export const tokenState = createModel<RootModel>()({
       lastSyncedState: data,
     }),
     setTokenSetOrder: (state, data: string[]) => {
-      console.log('reordering', data);
-
       const newTokens = {};
       data.map((set) => {
         Object.assign(newTokens, { [set]: state.tokens[set] });
       });
-      console.log('New keys are', Object.keys(newTokens));
-
       return {
         ...state,
         tokens: newTokens,

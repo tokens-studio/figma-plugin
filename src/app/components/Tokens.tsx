@@ -1,12 +1,12 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import * as React from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { mergeTokenGroups, resolveTokenValues } from '@/plugin/tokenHelpers';
 import TokenListing from './TokenListing';
 import TokensBottomBar from './TokensBottomBar';
 import ToggleEmptyButton from './ToggleEmptyButton';
 import { mappedTokens } from './createTokenObj';
-import { RootState } from '../store';
+import { Dispatch, RootState } from '../store';
 import TokenSetSelector from './TokenSetSelector';
 import TokenFilter from './TokenFilter';
 import EditTokenFormModal from './EditTokenFormModal';
@@ -14,12 +14,12 @@ import JSONEditor from './JSONEditor';
 import Box from './Box';
 import IconButton from './IconButton';
 import IconListing from '@/icons/listing.svg';
-import IconCode from '@/icons/code.svg';
+import IconJSON from '@/icons/json.svg';
 import IconDisclosure from '@/icons/disclosure.svg';
 import { styled } from '@/stitches.config';
-
-import ExportModal from './modals/ExportModal';
-import PresetModal from './modals/PresetModal';
+import useConfirm from '../hooks/useConfirm';
+import { track } from '@/utils/analytics';
+import { UpdateMode } from '@/types/state';
 
 interface TokenListingType {
   label: string;
@@ -58,12 +58,20 @@ const StyledIconDisclosure = styled(IconDisclosure, {
 function Tokens({ isActive }: { isActive: boolean }) {
   const { tokens, activeTokenSet, usedTokenSet } = useSelector((state: RootState) => state.tokenState);
   const { showEditForm, tokenFilter } = useSelector((state: RootState) => state.uiState);
+  const dispatch = useDispatch<Dispatch>();
   const [activeTokensTab, setActiveTokensTab] = React.useState('list');
   const [tokenSetsVisible, setTokenSetsVisible] = React.useState(true);
+  const { updateMode = UpdateMode.PAGE } = useSelector((state: RootState) => state.settings);
+  const {
+    confirm,
+  } = useConfirm();
+  const shouldConfirm = React.useMemo(() => updateMode === UpdateMode.DOCUMENT, [updateMode]);
+
   const resolvedTokens = React.useMemo(
     () => resolveTokenValues(mergeTokenGroups(tokens, [...usedTokenSet, activeTokenSet])),
     [tokens, usedTokenSet, activeTokenSet],
   );
+  const [stringTokens, setStringTokens] = React.useState(JSON.stringify(tokens[activeTokenSet], null, 2));
 
   const memoizedTokens = React.useMemo(() => {
     if (tokens[activeTokenSet]) {
@@ -79,6 +87,28 @@ function Tokens({ isActive }: { isActive: boolean }) {
     }
     return [];
   }, [tokens, activeTokenSet, tokenFilter]);
+
+  const handleUpdate = React.useCallback(async () => {
+    if (activeTokensTab === 'list') {
+      track('Update Tokens');
+      if (shouldConfirm) {
+        confirm({
+          text: 'Are you sure?',
+          description: 'You are about to run a document wide update. This operation can take more than 30 minutes on very large documents.',
+        }).then(({ result }) => {
+          if (result) {
+            dispatch.tokenState.updateDocument();
+          }
+        });
+      } else {
+        dispatch.tokenState.updateDocument();
+      }
+    } else {
+      track('Update JSON');
+
+      dispatch.tokenState.setJSONData(stringTokens);
+    }
+  }, [confirm, shouldConfirm]);
 
   if (!isActive) return null;
 
@@ -119,7 +149,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
             variant={activeTokensTab === 'json' ? 'primary' : 'default'}
             dataCy="tokensTabJSON"
             onClick={() => setActiveTokensTab('json')}
-            icon={<IconCode />}
+            icon={<IconJSON />}
             tooltipSide="bottom"
             tooltip="JSON"
 
@@ -139,7 +169,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
           flexGrow: 1, display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden',
         }}
         >
-          {activeTokensTab === 'json' ? <JSONEditor />
+          {activeTokensTab === 'json' ? <JSONEditor stringTokens={stringTokens} setStringTokens={setStringTokens} />
             : (
               <Box css={{ width: '100%', paddingBottom: '$6' }} className="content scroll-container">
                 {memoizedTokens.map(([key, group]: [string, TokenListingType]) => (
@@ -162,7 +192,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
             )}
         </Box>
       </Box>
-      <TokensBottomBar />
+      <TokensBottomBar handleUpdate={handleUpdate} />
     </Box>
   );
 }

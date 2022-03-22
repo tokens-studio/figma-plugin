@@ -234,7 +234,7 @@ export function TokenSetItem2({
         )}
 
         <StyledCheckbox checked={isChecked}>
-          <Checkbox size="small" checked={isChecked} id={item.path} onCheckedChange={() => onCheck(!isChecked)} />
+          <Checkbox checked={isChecked} id={item.path} onCheckedChange={() => onCheck(!isChecked)} />
         </StyledCheckbox>
         {canReorder ? (
           <StyledGrabber onPointerDown={(e) => controls.start(e)}>

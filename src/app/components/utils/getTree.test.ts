@@ -1,8 +1,8 @@
-import { getTree } from './getTree';
+import { createTree } from './createTree';
 
 describe('getTree', () => {
   it('returns a tree', () => {
-    const input = ['global', 'theme/type', 'theme/colors/blue', 'theme/colors/red', 'semantic/typography/headings/default'];
+    const input = ['global', 'theme/type', 'theme/colors/blue', 'theme/colors/red', 'semantic/typography/default', 'semantic/typography/headings/large/default'];
     const output = [
       {
         path: 'global',
@@ -13,19 +13,35 @@ describe('getTree', () => {
         label: 'global',
       },
       {
-        path: 'semantic/typography/headings',
-        key: 'semantic/typography/headings/set',
-        parent: 'semantic/typography',
+        path: 'semantic/typography',
+        key: 'semantic/typography/folder',
+        parent: 'semantic',
         type: 'folder',
         level: 0,
-        label: 'semantic/typography/headings',
+        label: 'semantic/typography',
       },
       {
-        path: 'semantic/typography/headings/default',
-        key: 'semantic/typography/headings/default/set',
-        parent: 'semantic/typography/headings',
-        type: 'set',
+        path: 'semantic/typography/default',
+        key: 'semantic/typography/default/set',
+        parent: 'semantic',
+        type: 'folder',
         level: 1,
+        label: 'default',
+      },
+      {
+        path: 'semantic/typography/headings/large',
+        key: 'semantic/typography/headings/large/folder',
+        parent: 'semantic',
+        type: 'folder',
+        level: 1,
+        label: 'headings/large',
+      },
+      {
+        path: 'semantic/typography/headings/large/default',
+        key: 'semantic/typography/headings/large/default/set',
+        parent: 'semantic/typography/headings/large',
+        type: 'set',
+        level: 2,
         label: 'default',
       },
       {
@@ -69,6 +85,6 @@ describe('getTree', () => {
         label: 'type',
       },
     ];
-    expect(getTree(input)).toEqual(output);
+    expect(createTree(input)).toEqual(output);
   });
 });
