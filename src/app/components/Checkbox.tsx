@@ -16,6 +16,8 @@ const StyledCheckbox = styled(CheckboxPrimitive.Root, {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
+  width: 12,
+  height: 12,
   '&:focus': { boxShadow: '0 0 0 2px black' },
 
   variants: {
@@ -29,12 +31,7 @@ const StyledCheckbox = styled(CheckboxPrimitive.Root, {
         borderColor: '$interactionSubtle',
       },
     },
-    size: {
-      default: {
-        width: 12,
-        height: 12,
-      },
-    },
+
   },
 });
 
@@ -44,14 +41,12 @@ function Checkbox({
   onCheckedChange,
   defaultChecked = false,
   disabled = false,
-  size = 'default',
 }: {
   checked: boolean | 'indeterminate';
   id: string;
   onCheckedChange: any;
   defaultChecked?: boolean;
   disabled?: boolean;
-  size?: 'default' | 'small';
 }) {
   return (
     <StyledCheckbox

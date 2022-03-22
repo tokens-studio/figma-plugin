@@ -1,7 +1,7 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Box from './Box';
-import { TokenSetItem2 } from './TokenSetItem2';
+import { TokenSetItem2 } from './TokenSetItem';
 import { Dispatch, RootState } from '../store';
 import { getTree, TreeItem } from './utils/getTree';
 

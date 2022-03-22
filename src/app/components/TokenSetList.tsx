@@ -5,7 +5,7 @@ import { debounce } from 'lodash';
 import Box from './Box';
 import { Dispatch, RootState } from '../store';
 import { TreeItem } from './utils/getTree';
-import { TokenSetItem2 } from './TokenSetItem2';
+import { TokenSetItem2 } from './TokenSetItem';
 
 function getList(items) {
   return items.map((item) => ({

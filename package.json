@@ -63,7 +63,6 @@
         "postcss": "^8.2.13",
         "react": "17.0.0",
         "react-colorful": "^5.5.1",
-        "react-complex-tree": "^1.1.4",
         "react-dnd": "^13.1.1",
         "react-dnd-html5-backend": "^12.1.1",
         "react-dom": "17.0.0",
