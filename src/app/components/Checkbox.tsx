@@ -56,7 +56,6 @@ function Checkbox({
       checked={checked}
       onCheckedChange={onCheckedChange}
       defaultChecked={defaultChecked}
-      size={size}
     >
       <StyledIndicator>
         {checked === 'indeterminate' && <IconIndeterminate />}
