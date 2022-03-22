@@ -2,7 +2,7 @@ import { getTree } from './getTree';
 
 describe('getTree', () => {
   it('returns a tree', () => {
-    const input = ['global', 'theme/type', 'theme/colors/blue', 'theme/colors/red', 'semantic/typography/default', 'semantic/typography/headings/large/default'];
+    const input = ['global', 'theme/type', 'theme/colors/blue', 'theme/colors/red'];
     const output = [
       {
         path: 'global',
@@ -11,38 +11,6 @@ describe('getTree', () => {
         type: 'set',
         level: 0,
         label: 'global',
-      },
-      {
-        path: 'semantic/typography',
-        key: 'semantic/typography/folder',
-        parent: 'semantic',
-        type: 'folder',
-        level: 0,
-        label: 'semantic/typography',
-      },
-      {
-        path: 'semantic/typography/default',
-        key: 'semantic/typography/default/set',
-        parent: 'semantic',
-        type: 'folder',
-        level: 1,
-        label: 'default',
-      },
-      {
-        path: 'semantic/typography/headings/large',
-        key: 'semantic/typography/headings/large/folder',
-        parent: 'semantic',
-        type: 'folder',
-        level: 1,
-        label: 'headings/large',
-      },
-      {
-        path: 'semantic/typography/headings/large/default',
-        key: 'semantic/typography/headings/large/default/set',
-        parent: 'semantic/typography/headings/large',
-        type: 'set',
-        level: 2,
-        label: 'default',
       },
       {
         path: 'theme',
