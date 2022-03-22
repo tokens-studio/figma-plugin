@@ -208,9 +208,15 @@ export function TokenSetItem2({
         ) : null}
         {item.type === 'folder' ? (
           <StyledButton itemType={item.type} type="button" isActive={isActive} onClick={() => onClick()}>
-            <Box css={{
-              paddingLeft: `${5 * item.level}px`, color: '$textMuted', fontWeight: '$normal', userSelect: 'none',
-            }}
+            <Box
+              css={{
+                paddingLeft: `${5 * item.level}px`,
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                color: '$textMuted',
+                fontWeight: '$normal',
+                userSelect: 'none',
+              }}
             >
               {item.label}
             </Box>
@@ -219,7 +225,16 @@ export function TokenSetItem2({
           <ContextMenu>
             <ContextMenuTrigger asChild id={`${item.path}-trigger`}>
               <StyledButton itemType={item.type} type="button" isActive={isActive} onClick={() => onClick()}>
-                <Box css={{ paddingLeft: `${5 * item.level}px`, userSelect: 'none' }}>{item.label}</Box>
+                <Box
+                  css={{
+                    paddingLeft: `${5 * item.level}px`,
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    userSelect: 'none',
+                  }}
+                >
+                  {item.label}
+                </Box>
               </StyledButton>
             </ContextMenuTrigger>
             {canEdit ? (
