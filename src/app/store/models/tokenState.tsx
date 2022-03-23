@@ -93,7 +93,7 @@ export const tokenState = createModel<RootModel>()({
     }),
     addTokenSet: (state, name: string) => {
       if (name in state.tokens) {
-        notifyToUI('Token set already exists');
+        notifyToUI('Token set already exists', { error: true });
         return state;
       }
       return {
@@ -116,7 +116,7 @@ export const tokenState = createModel<RootModel>()({
     renameTokenSet: (state, data: { oldName: string; newName: string }) => {
       const oldTokens = state.tokens;
       if (Object.keys(oldTokens).includes(data.newName) && data.oldName !== data.newName) {
-        notifyToUI('Token set already exists');
+        notifyToUI('Token set already exists', { error: true });
         return state;
       }
       oldTokens[data.newName] = oldTokens[data.oldName];
