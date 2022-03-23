@@ -1,14 +1,14 @@
 import React from 'react';
 import { styled } from '@/stitches.config';
-import Tooltip from './Tooltip';
 
 const Box = styled('div', {});
 const StyledButton = styled('button', {
   all: 'unset',
   backgroundColor: 'red',
   border: 'none',
-  padding: '$2',
+  padding: '$3 $3',
   borderRadius: '$button',
+  fontSize: '$xsmall',
   cursor: 'pointer',
   '&:hover, &:focus': {
     boxShadow: 'none',
@@ -33,24 +33,22 @@ const StyledButton = styled('button', {
   },
 });
 
-export default function IconButton({
+export default function ActionButton({
   disabled = false,
-  tooltip,
   dataCy = null,
   onClick,
   icon,
   css,
   variant = 'default',
-  tooltipSide = 'left',
+  text,
 }: {
   disabled?: boolean;
-  tooltip?: string;
   dataCy?: string;
   onClick: any;
-  icon: any;
+  icon?: any;
   css?: any;
   variant?: string;
-  tooltipSide?: 'bottom' | 'left' | undefined;
+  text: string;
 }) {
   const handleClick = React.useCallback(() => {
     if (onClick) {
@@ -60,11 +58,10 @@ export default function IconButton({
 
   return (
     <Box css={css}>
-      <Tooltip side={tooltipSide} label={tooltip}>
-        <StyledButton disabled={disabled} data-cy={dataCy} type="button" onClick={handleClick} buttonVariant={variant}>
-          <Box css={{ transition: 'transform 200ms ease-in-out', transform: 'var(--transform)' }}>{icon}</Box>
-        </StyledButton>
-      </Tooltip>
+      <StyledButton disabled={disabled} data-cy={dataCy} type="button" onClick={handleClick} buttonVariant={variant}>
+        {icon ? <Box css={{ transition: 'transform 200ms ease-in-out', transform: 'var(--transform)' }}>{icon}</Box> : null}
+        {text}
+      </StyledButton>
     </Box>
   );
 }

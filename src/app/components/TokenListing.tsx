@@ -79,7 +79,7 @@ function TokenListing({
 
   return (
     <div className="border-b border-gray-200" data-cy={`tokenlisting-${tokenKey}`}>
-      <div className="flex justify-between space-x-8 items-center relative">
+      <div className="relative flex items-center justify-between space-x-8">
         <button
           className={`flex items-center w-full h-full p-4 space-x-2 hover:bg-gray-100 focus:outline-none ${
             isIntCollapsed ? 'opacity-50' : null
@@ -103,7 +103,7 @@ function TokenListing({
           </Tooltip>
           <Heading size="small">{label}</Heading>
         </button>
-        <div className="flex absolute right-0 mr-2">
+        <div className="absolute right-0 flex mr-2">
           {showDisplayToggle && (
             <Tooltip label={displayType === 'GRID' ? 'Show as List' : 'Show as Grid'}>
               <button

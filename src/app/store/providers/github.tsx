@@ -172,7 +172,7 @@ export function useGitHub() {
       dispatch.tokenState.setLastSyncedState(tokenObj);
       notifyToUI('Pushed changes to GitHub');
     } catch (e) {
-      notifyToUI('Error pushing to GitHub');
+      notifyToUI('Error pushing to GitHub', { error: true });
       console.log('Error pushing to GitHub', e);
       return null;
     }
@@ -266,7 +266,7 @@ export function useGitHub() {
       }
       return await pushTokensToGitHub(context);
     } catch (e) {
-      notifyToUI('Error syncing with GitHub, check credentials');
+      notifyToUI('Error syncing with GitHub, check credentials', { error: true });
       console.log('Error', e);
     }
   }

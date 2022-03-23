@@ -87,8 +87,9 @@ body {
   @apply font-body text-sm leading-normal;
 }
 
-.content {
+.scroll-container {
   overflow-y: scroll;
+  cursor: pointer;
 }
 
 .content::-webkit-scrollbar,
@@ -116,10 +117,6 @@ textarea::-webkit-scrollbar-thumb {
 
 .heading-small {
   @apply text-xs font-medium;
-}
-
-.navbar {
-  transform: translateY(-1px);
 }
 
 .button-property + .property-wrapper {

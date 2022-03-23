@@ -25,7 +25,7 @@ async function readTokensFromJSONBin({ secret, id }): Promise<TokenProps> | null
   if (response.ok) {
     return response.json();
   }
-  notifyToUI('There was an error connecting, check your sync settings');
+  notifyToUI('There was an error connecting, check your sync settings', { error: true });
   return null;
 }
 
@@ -47,7 +47,7 @@ async function writeTokensToJSONBin({ secret, id, tokenObj }): Promise<TokenProp
     notifyToUI('Updated Remote');
     return res;
   }
-  notifyToUI('Error updating remote');
+  notifyToUI('Error updating remote', { error: true });
   return null;
 }
 
@@ -75,7 +75,7 @@ export async function updateJSONBinTokens({
         // Tell the user to choose between:
         // A) Pull Remote values and replace local changes
         // B) Overwrite Remote changes
-        notifyToUI('Error updating tokens as remote is newer, please update first');
+        notifyToUI('Error updating tokens as remote is newer, please update first', { error: true });
       }
     } else {
       writeTokensToJSONBin({ secret, id, tokenObj });
@@ -138,7 +138,7 @@ export function useJSONbin() {
 
       return jsonBinData.metadata.id;
     }
-    notifyToUI('Something went wrong. See console for details');
+    notifyToUI('Something went wrong. See console for details', { error: true });
     return null;
   }
 
@@ -170,12 +170,12 @@ export function useJSONbin() {
             values: jsonBinData.values,
           };
         }
-        notifyToUI('No tokens stored on remote');
+        notifyToUI('No tokens stored on remote', { error: true });
       }
 
       return null;
     } catch (e) {
-      notifyToUI('Error fetching from JSONbin, check console (F12)');
+      notifyToUI('Error fetching from JSONbin, check console (F12)', { error: true });
       console.log('Error:', e);
     }
   }

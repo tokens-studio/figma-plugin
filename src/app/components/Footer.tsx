@@ -1,6 +1,4 @@
 import * as React from 'react';
-import { useSelector } from 'react-redux';
-import { RootState } from '../store';
 import * as pjs from '../../../package.json';
 import Box from './Box';
 import DocsIcon from '@/icons/docs.svg';
@@ -8,15 +6,16 @@ import FeedbackIcon from '@/icons/feedback.svg';
 import Text from '@/app/components/Text';
 
 export default function Footer() {
-  const activeTab = useSelector((state: RootState) => state.uiState.activeTab);
-
   return (
-    <div className={`p-4 flex-shrink-0 flex items-center justify-between ${activeTab === 'tokens' && 'mb-16'}`}>
-      <div className="text-gray-600 text-xxs">
+    <Box css={{
+      display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0, padding: '$4',
+    }}
+    >
+      <Box css={{ color: '$textMuted', fontSize: '$xsmall' }}>
         Version
         {' '}
         {pjs.plugin_version}
-      </div>
+      </Box>
       <Box css={{ display: 'flex', gap: '$4' }}>
         <Text size="xsmall">
           <a
@@ -25,7 +24,7 @@ export default function Footer() {
             target="_blank"
             rel="noreferrer"
           >
-            <span className="mr-1 text-gray-600">Docs</span>
+            <Box as="span" css={{ marginRight: '$1', color: '$textMuted' }}>Docs</Box>
             <DocsIcon />
           </a>
         </Text>
@@ -36,11 +35,11 @@ export default function Footer() {
             target="_blank"
             rel="noreferrer"
           >
-            <span className="mr-1 text-gray-600">Feedback</span>
+            <Box as="span" css={{ marginRight: '$1', color: '$textMuted' }}>Feedback</Box>
             <FeedbackIcon />
           </a>
         </Text>
       </Box>
-    </div>
+    </Box>
   );
 }
