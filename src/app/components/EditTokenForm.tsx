@@ -34,6 +34,14 @@ function EditTokenForm({ resolvedTokens }) {
       .find((t) => t.name === internalEditToken?.name),
     [internalEditToken, resolvedTokens, activeTokenSet],
   );
+
+  const hasAnotherTokenThatStartsWithName = React.useMemo(
+    () => resolvedTokens
+      .filter((t) => t.internal__Parent === activeTokenSet)
+      .find((t) => t.name.startsWith(`${internalEditToken?.name}.`)),
+    [internalEditToken, resolvedTokens, activeTokenSet],
+  );
+
   const nameWasChanged = React.useMemo(() => internalEditToken?.initialName !== internalEditToken?.name, [
     internalEditToken,
   ]);
@@ -41,6 +49,9 @@ function EditTokenForm({ resolvedTokens }) {
   React.useEffect(() => {
     if ((internalEditToken?.isPristine || nameWasChanged) && hasNameThatExistsAlready) {
       setError('Token names must be unique');
+    }
+    if ((internalEditToken?.isPristine || nameWasChanged) && hasAnotherTokenThatStartsWithName) {
+      setError('Must not use name of another group');
     }
   }, [internalEditToken, hasNameThatExistsAlready, nameWasChanged]);
 
