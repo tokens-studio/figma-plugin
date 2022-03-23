@@ -139,7 +139,7 @@ function TokenButton({
 
       style = {
         '--backgroundColor': displayValue,
-        '--borderColor': lightOrDark(displayValue) === 'light' ? '#e7e7e7' : 'white',
+        '--borderColor': lightOrDark(displayValue) === 'light' ? 'var(--color-border, #e7e7e7)' : 'var(--color-border-toolbar-disabled, #ffffff)',
       };
       buttonClass.push('button-property-color');
       if (uiState.displayType === 'LIST') {

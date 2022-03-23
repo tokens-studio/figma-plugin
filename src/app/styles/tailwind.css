@@ -81,10 +81,483 @@
   --size-xlarge: 48px;
   --size-xxlarge: 64px;
   --size-xxxlarge: 80px;
+
+  /* FIGMA DARK MODE COLORS */
+  --color-bg: #2c2c2c;
+  --color-bg-assistive: #f316b0;
+  --color-bg-assistive-hover: #d01b9c;
+  --color-bg-assistive-pressed: #d01b9c;
+  --color-bg-assistive-secondary: #96207a;
+  --color-bg-assistive-tertiary: #46253e;
+  --color-bg-brand: #0c8ce9;
+  --color-bg-brand-hover: #0a6dc2;
+  --color-bg-brand-pressed: #0a6dc2;
+  --color-bg-brand-secondary: #105cad;
+  --color-bg-brand-tertiary: #394360;
+  --color-bg-component: #8a38f5;
+  --color-bg-component-hover: #7a2ed6;
+  --color-bg-component-pressed: #7a2ed6;
+  --color-bg-component-secondary: #652ca8;
+  --color-bg-component-tertiary: #3e2654;
+  --color-bg-danger: #e03e1a;
+  --color-bg-danger-hover: #c4381c;
+  --color-bg-danger-pressed: #c4381c;
+  --color-bg-danger-secondary: #963323;
+  --color-bg-danger-tertiary: #54211c;
+  --color-bg-design: #0c8ce9;
+  --color-bg-design-hover: #0a6dc2;
+  --color-bg-design-pressed: #0a6dc2;
+  --color-bg-design-secondary: #105cad;
+  --color-bg-design-tertiary: #394360;
+  --color-bg-disabled: #757575;
+  --color-bg-disabled-secondary: #b3b3b3;
+  --color-bg-figjam: #8a38f5;
+  --color-bg-figjam-hover: #7a2ed6;
+  --color-bg-figjam-pressed: #7a2ed6;
+  --color-bg-figjam-secondary: #652ca8;
+  --color-bg-figjam-tertiary: #3e2654;
+  --color-bg-fs: #2c2c2c;
+  --color-bg-fs-assistive: #f316b0;
+  --color-bg-fs-assistive-secondary: #96207a;
+  --color-bg-fs-assistive-tertiary: #46253e;
+  --color-bg-fs-component: #8a38f5;
+  --color-bg-fs-component-secondary: #652ca8;
+  --color-bg-fs-component-tertiary: #d6b6fb;
+  --color-bg-fs-design: #0c8ce9;
+  --color-bg-fs-design-secondary: #105cad;
+  --color-bg-fs-design-tertiary: #a8d7fa;
+  --color-bg-fs-measure: #e03e1a;
+  --color-bg-fs-measure-secondary: #963323;
+  --color-bg-fs-measure-tertiary: #54211c;
+  --color-bg-fs-selected: #4a5878;
+  --color-bg-fs-selected-secondary: #394360;
+  --color-bg-hover: #383838;
+  --color-bg-info: #394360;
+  --color-bg-inverse: rgba(255, 255, 255, 1);
+  --color-bg-measure: #e03e1a;
+  --color-bg-measure-hover: #c4381c;
+  --color-bg-measure-pressed: #c4381c;
+  --color-bg-measure-secondary: #963323;
+  --color-bg-measure-tertiary: #54211c;
+  --color-bg-menu: #1e1e1e;
+  --color-bg-menu-disabled: #757575;
+  --color-bg-menu-hover: #2c2c2c;
+  --color-bg-menu-pressed: #2c2c2c;
+  --color-bg-menu-secondary: #383838;
+  --color-bg-menu-selected: #0c8ce9;
+  --color-bg-menu-selected-hover: #0a6dc2;
+  --color-bg-menu-selected-pressed: #0a6dc2;
+  --color-bg-menu-selected-secondary: #394360;
+  --color-bg-menu-selected-tertiary: #394360;
+  --color-bg-menu-tertiary: #444444;
+  --color-bg-onselected: #667799;
+  --color-bg-onselected-hover: #667799;
+  --color-bg-onselected-pressed: #667799;
+  --color-bg-pressed: #383838;
+  --color-bg-secondary: #383838;
+  --color-bg-selected: #4a5878;
+  --color-bg-selected-hover: #536383;
+  --color-bg-selected-pressed: #536383;
+  --color-bg-selected-secondary: #394360;
+  --color-bg-selected-strong: #0c8ce9;
+  --color-bg-selected-tertiary: #394360;
+  --color-bg-success: #198f51;
+  --color-bg-success-hover: #078348;
+  --color-bg-success-pressed: #078348;
+  --color-bg-success-secondary: #0a5c35;
+  --color-bg-success-tertiary: #082618;
+  --color-bg-tertiary: #444444;
+  --color-bg-toolbar: #2c2c2c;
+  --color-bg-toolbar-disabled: #757575;
+  --color-bg-toolbar-hover: #111111;
+  --color-bg-toolbar-pressed: #111111;
+  --color-bg-toolbar-secondary: #383838;
+  --color-bg-toolbar-selected: #0c8ce9;
+  --color-bg-toolbar-selected-hover: #0a6dc2;
+  --color-bg-toolbar-selected-pressed: #0a6dc2;
+  --color-bg-toolbar-selected-secondary: #105cad;
+  --color-bg-toolbar-selected-tertiary: #0c8ce9;
+  --color-bg-toolbar-tertiary: #444444;
+  --color-bg-tooltip: #1e1e1e;
+  --color-bg-tooltip-disabled: #757575;
+  --color-bg-tooltip-hover: #2c2c2c;
+  --color-bg-tooltip-pressed: #2c2c2c;
+  --color-bg-tooltip-secondary: #383838;
+  --color-bg-tooltip-selected: #0c8ce9;
+  --color-bg-tooltip-selected-hover: #0a6dc2;
+  --color-bg-tooltip-selected-pressed: #0a6dc2;
+  --color-bg-tooltip-selected-secondary: #394360;
+  --color-bg-tooltip-selected-tertiary: #394360;
+  --color-bg-tooltip-tertiary: #444444;
+  --color-bg-warning: #f3c11b;
+  --color-bg-warning-hover: #f2b50d;
+  --color-bg-warning-pressed: #f2b50d;
+  --color-bg-warning-secondary: #e4a711;
+  --color-bg-warning-tertiary: #925711;
+  --color-border: #444444;
+  --color-border-assistive: #96207a;
+  --color-border-assistive-strong: #fc9ce0;
+  --color-border-brand: #105cad;
+  --color-border-brand-strong: #7cc4f8;
+  --color-border-component: #652ca8;
+  --color-border-component-hover: #8a38f5;
+  --color-border-component-strong: #d6b6fb;
+  --color-border-danger: #963323;
+  --color-border-danger-strong: #fca397;
+  --color-border-design: #105cad;
+  --color-border-design-strong: #7cc4f8;
+  --color-border-disabled: #444444;
+  --color-border-disabled-strong: rgba(255, 255, 255, 0.4);
+  --color-border-figjam: #652ca8;
+  --color-border-figjam-strong: #d1a8ff;
+  --color-border-fs: #444444;
+  --color-border-fs-assistive: #96207a;
+  --color-border-fs-assistive-strong: #f316b0;
+  --color-border-fs-component: #d6b6fb;
+  --color-border-fs-component-strong: #8a38f5;
+  --color-border-fs-design: #a8d7fa;
+  --color-border-fs-design-strong: #0c8ce9;
+  --color-border-fs-measure: initial;
+  --color-border-fs-measure-strong: #e03e1a;
+  --color-border-fs-onassistive: #d01b9c;
+  --color-border-fs-onassistive-strong: rgba(255, 255, 255, 1);
+  --color-border-fs-oncomponent: #7a2ed6;
+  --color-border-fs-oncomponent-strong: rgba(255, 255, 255, 1);
+  --color-border-fs-ondesign: #0a6dc2;
+  --color-border-fs-ondesign-strong: rgba(255, 255, 255, 1);
+  --color-border-fs-onmeasure: #c4381c;
+  --color-border-fs-onmeasure-strong: rgba(255, 255, 255, 1);
+  --color-border-fs-onselected: #667799;
+  --color-border-fs-onselected-strong: rgba(255, 255, 255, 0.9);
+  --color-border-fs-selected: initial;
+  --color-border-fs-selected-strong: #0c8ce9;
+  --color-border-fs-strong: rgba(255, 255, 255, 0.9);
+  --color-border-measure: #963323;
+  --color-border-measure-strong: #fca397;
+  --color-border-menu: #383838;
+  --color-border-menu-disabled: #383838;
+  --color-border-menu-disabled-strong: #383838;
+  --color-border-menu-onselected: #0a6dc2;
+  --color-border-menu-onselected-strong: rgba(255, 255, 255, 1);
+  --color-border-menu-selected: #0c8ce9;
+  --color-border-menu-selected-strong: #7cc4f8;
+  --color-border-menu-strong: rgba(255, 255, 255, 1);
+  --color-border-onassistive: #d01b9c;
+  --color-border-onassistive-strong: rgba(255, 255, 255, 1);
+  --color-border-onbrand: #0a6dc2;
+  --color-border-onbrand-strong: rgba(255, 255, 255, 1);
+  --color-border-oncomponent: #7a2ed6;
+  --color-border-oncomponent-strong: rgba(255, 255, 255, 1);
+  --color-border-ondanger: #c4381c;
+  --color-border-ondanger-strong: rgba(255, 255, 255, 1);
+  --color-border-ondesign: #0a6dc2;
+  --color-border-ondesign-strong: rgba(255, 255, 255, 1);
+  --color-border-onfigjam: #7a2ed6;
+  --color-border-onfigjam-strong: #7a2ed6;
+  --color-border-onmeasure: #c4381c;
+  --color-border-onmeasure-strong: rgba(255, 255, 255, 1);
+  --color-border-onselected: #667799;
+  --color-border-onselected-strong: rgba(255, 255, 255, 0.9);
+  --color-border-onsuccess: #078348;
+  --color-border-onsuccess-strong: rgba(255, 255, 255, 1);
+  --color-border-onwarning: #e4a711;
+  --color-border-onwarning-strong: rgba(0, 0, 0, 0.9);
+  --color-border-selected: #0c8ce9;
+  --color-border-selected-strong: #7cc4f8;
+  --color-border-strong: rgba(255, 255, 255, 0.9);
+  --color-border-success: #0a5c35;
+  --color-border-success-strong: #79d297;
+  --color-border-toolbar: #444444;
+  --color-border-toolbar-disabled: rgba(255, 255, 255, 0.4);
+  --color-border-toolbar-onselected: rgba(255, 255, 255, 1);
+  --color-border-toolbar-selected: #0c8ce9;
+  --color-border-toolbar-selected-strong: #7cc4f8;
+  --color-border-toolbar-strong: rgba(255, 255, 255, 1);
+  --color-border-tooltip: #383838;
+  --color-border-tooltip-disabled: #383838;
+  --color-border-tooltip-disabled-strong: #383838;
+  --color-border-tooltip-onselected: #0a6dc2;
+  --color-border-tooltip-onselected-strong: rgba(255, 255, 255, 1);
+  --color-border-tooltip-selected: #0c8ce9;
+  --color-border-tooltip-selected-strong: #7cc4f8;
+  --color-border-tooltip-strong: rgba(255, 255, 255, 1);
+  --color-border-warning: #925711;
+  --color-border-warning-strong: #f7d15f;
+  --color-icon: rgba(255, 255, 255, 1);
+  --color-icon-assistive: #fc9ce0;
+  --color-icon-assistive-pressed: #fbb1ed;
+  --color-icon-assistive-secondary: #fc9ce0;
+  --color-icon-assistive-tertiary: #fc9ce0;
+  --color-icon-brand: #7cc4f8;
+  --color-icon-brand-pressed: #0c8ce9;
+  --color-icon-brand-secondary: #536383;
+  --color-icon-brand-tertiary: #394360;
+  --color-icon-component: #d1a8ff;
+  --color-icon-component-pressed: #d6b6fb;
+  --color-icon-component-secondary: #6b5884;
+  --color-icon-component-tertiary: #6b5884;
+  --color-icon-danger: #e03e1a;
+  --color-icon-danger-hover: #fbbcb6;
+  --color-icon-danger-pressed: #fbbcb6;
+  --color-icon-danger-secondary: #e03e1a;
+  --color-icon-danger-secondary-hover: #e03e1a;
+  --color-icon-danger-tertiary: #e03e1a;
+  --color-icon-design: #7cc4f8;
+  --color-icon-design-pressed: #a8d7fa;
+  --color-icon-design-secondary: #7cc4f8;
+  --color-icon-design-tertiary: #7cc4f8;
+  --color-icon-disabled: rgba(255, 255, 255, 0.4);
+  --color-icon-figjam: #d1a8ff;
+  --color-icon-figjam-pressed: #d6b6fb;
+  --color-icon-figjam-secondary: #c5b2dc;
+  --color-icon-figjam-tertiary: #c5b2dc;
+  --color-icon-fs: rgba(255, 255, 255, 1);
+  --color-icon-fs-assistive: #fc9ce0;
+  --color-icon-fs-component: #d1a8ff;
+  --color-icon-fs-design: #7cc4f8;
+  --color-icon-fs-measure: #e03e1a;
+  --color-icon-fs-onassistive: rgba(255, 255, 255, 1);
+  --color-icon-fs-oncomponent: rgba(255, 255, 255, 1);
+  --color-icon-fs-ondesign: rgba(255, 255, 255, 1);
+  --color-icon-fs-onmeasure: rgba(255, 255, 255, 1);
+  --color-icon-fs-onselected: rgba(255, 255, 255, 1);
+  --color-icon-fs-secondary: rgba(255, 255, 255, 0.7);
+  --color-icon-fs-selected: #7cc4f8;
+  --color-icon-fs-tertiary: rgba(255, 255, 255, 0.4);
+  --color-icon-hover: rgba(255, 255, 255, 1);
+  --color-icon-measure: #e03e1a;
+  --color-icon-measure-hover: #fbbcb6;
+  --color-icon-measure-pressed: #fbbcb6;
+  --color-icon-measure-secondary: #e03e1a;
+  --color-icon-measure-secondary-hover: #e03e1a;
+  --color-icon-measure-tertiary: #e03e1a;
+  --color-icon-menu: rgba(255, 255, 255, 1);
+  --color-icon-menu-danger: #e03e1a;
+  --color-icon-menu-disabled: rgba(255, 255, 255, 0.4);
+  --color-icon-menu-hover: rgba(255, 255, 255, 1);
+  --color-icon-menu-ondisabled: #1e1e1e;
+  --color-icon-menu-onselected: rgba(255, 255, 255, 1);
+  --color-icon-menu-pressed: #0c8ce9;
+  --color-icon-menu-secondary: rgba(255, 255, 255, 0.7);
+  --color-icon-menu-secondary-hover: rgba(255, 255, 255, 1);
+  --color-icon-menu-selected: #7cc4f8;
+  --color-icon-menu-selected-secondary: #7cc4f8;
+  --color-icon-menu-selected-tertiary: #7cc4f8;
+  --color-icon-menu-tertiary: rgba(255, 255, 255, 0.4);
+  --color-icon-menu-tertiary-hover: rgba(255, 255, 255, 1);
+  --color-icon-menu-warning: #f3c11b;
+  --color-icon-onassistive: rgba(255, 255, 255, 1);
+  --color-icon-onassistive-secondary: rgba(255, 255, 255, 0.8);
+  --color-icon-onassistive-tertiary: rgba(255, 255, 255, 0.4);
+  --color-icon-onbrand: rgba(255, 255, 255, 1);
+  --color-icon-onbrand-secondary: rgba(255, 255, 255, 0.8);
+  --color-icon-onbrand-tertiary: rgba(255, 255, 255, 0.4);
+  --color-icon-oncomponent: rgba(255, 255, 255, 1);
+  --color-icon-oncomponent-secondary: rgba(255, 255, 255, 0.8);
+  --color-icon-oncomponent-tertiary: rgba(255, 255, 255, 0.4);
+  --color-icon-ondanger: rgba(255, 255, 255, 1);
+  --color-icon-ondanger-secondary: rgba(255, 255, 255, 0.8);
+  --color-icon-ondanger-tertiary: rgba(255, 255, 255, 0.4);
+  --color-icon-ondesign: rgba(255, 255, 255, 1);
+  --color-icon-ondesign-secondary: rgba(255, 255, 255, 0.8);
+  --color-icon-ondesign-tertiary: rgba(255, 255, 255, 0.4);
+  --color-icon-ondisabled: #2c2c2c;
+  --color-icon-onfigjam: rgba(255, 255, 255, 1);
+  --color-icon-onfigjam-secondary: rgba(255, 255, 255, 0.8);
+  --color-icon-onfigjam-tertiary: rgba(255, 255, 255, 0.4);
+  --color-icon-oninverse: rgba(0, 0, 0, 0.9);
+  --color-icon-onmeasure: rgba(255, 255, 255, 1);
+  --color-icon-onmeasure-secondary: rgba(255, 255, 255, 0.8);
+  --color-icon-onmeasure-tertiary: rgba(255, 255, 255, 0.4);
+  --color-icon-onselected: rgba(255, 255, 255, 1);
+  --color-icon-onselected-secondary: rgba(255, 255, 255, 0.7);
+  --color-icon-onselected-strong: rgba(255, 255, 255, 1);
+  --color-icon-onselected-tertiary: rgba(255, 255, 255, 0.4);
+  --color-icon-onsuccess: rgba(255, 255, 255, 1);
+  --color-icon-onsuccess-secondary: rgba(255, 255, 255, 0.8);
+  --color-icon-onsuccess-tertiary: rgba(255, 255, 255, 0.4);
+  --color-icon-onwarning: rgba(0, 0, 0, 0.9);
+  --color-icon-onwarning-secondary: rgba(0, 0, 0, 0.5);
+  --color-icon-onwarning-tertiary: rgba(0, 0, 0, 0.3);
+  --color-icon-pressed: #0a6dc2;
+  --color-icon-secondary: rgba(255, 255, 255, 0.7);
+  --color-icon-secondary-hover: rgba(255, 255, 255, 1);
+  --color-icon-selected: #7cc4f8;
+  --color-icon-selected-secondary: #7cc4f8;
+  --color-icon-selected-tertiary: #7cc4f8;
+  --color-icon-success: #79d297;
+  --color-icon-success-pressed: #a1e8b9;
+  --color-icon-success-secondary: #79d297;
+  --color-icon-success-tertiary: #79d297;
+  --color-icon-tertiary: rgba(255, 255, 255, 0.4);
+  --color-icon-tertiary-hover: rgba(255, 255, 255, 1);
+  --color-icon-toolbar: rgba(255, 255, 255, 1);
+  --color-icon-toolbar-danger: #e03e1a;
+  --color-icon-toolbar-disabled: rgba(255, 255, 255, 0.4);
+  --color-icon-toolbar-hover: rgba(255, 255, 255, 1);
+  --color-icon-toolbar-ondisabled: #2c2c2c;
+  --color-icon-toolbar-onselected: rgba(255, 255, 255, 1);
+  --color-icon-toolbar-pressed: #0c8ce9;
+  --color-icon-toolbar-secondary: rgba(255, 255, 255, 0.7);
+  --color-icon-toolbar-secondary-hover: rgba(255, 255, 255, 1);
+  --color-icon-toolbar-selected: #7cc4f8;
+  --color-icon-toolbar-selected-secondary: #7cc4f8;
+  --color-icon-toolbar-selected-tertiary: #7cc4f8;
+  --color-icon-toolbar-tertiary: rgba(255, 255, 255, 0.4);
+  --color-icon-toolbar-tertiary-hover: rgba(255, 255, 255, 1);
+  --color-icon-toolbar-warning: #f3c11b;
+  --color-icon-tooltip: rgba(255, 255, 255, 1);
+  --color-icon-tooltip-danger: #e03e1a;
+  --color-icon-tooltip-disabled: rgba(255, 255, 255, 0.4);
+  --color-icon-tooltip-hover: rgba(255, 255, 255, 1);
+  --color-icon-tooltip-ondisabled: #1e1e1e;
+  --color-icon-tooltip-onselected: rgba(255, 255, 255, 1);
+  --color-icon-tooltip-pressed: #0c8ce9;
+  --color-icon-tooltip-secondary: rgba(255, 255, 255, 0.7);
+  --color-icon-tooltip-secondary-hover: rgba(255, 255, 255, 1);
+  --color-icon-tooltip-selected: #7cc4f8;
+  --color-icon-tooltip-selected-secondary: #7cc4f8;
+  --color-icon-tooltip-selected-tertiary: #7cc4f8;
+  --color-icon-tooltip-tertiary: rgba(255, 255, 255, 0.4);
+  --color-icon-tooltip-tertiary-hover: rgba(255, 255, 255, 1);
+  --color-icon-tooltip-warning: #f3c11b;
+  --color-icon-warning: #f3c11b;
+  --color-icon-warning-pressed: #f7d15f;
+  --color-icon-warning-secondary: #f3c11b;
+  --color-icon-warning-tertiary: #f3c11b;
+  --color-text: rgba(255, 255, 255, 1);
+  --color-text-assistive: #fc9ce0;
+  --color-text-assistive-pressed: #fbb1ed;
+  --color-text-assistive-secondary: #fc9ce0;
+  --color-text-assistive-tertiary: #fc9ce0;
+  --color-text-brand: #7cc4f8;
+  --color-text-brand-secondary: #7cc4f8;
+  --color-text-brand-tertiary: #7cc4f8;
+  --color-text-component: #d1a8ff;
+  --color-text-component-pressed: #d6b6fb;
+  --color-text-component-secondary: #6b5884;
+  --color-text-component-tertiary: #6b5884;
+  --color-text-danger: #fca397;
+  --color-text-danger-secondary: #fca397;
+  --color-text-danger-tertiary: #fca397;
+  --color-text-design: #7cc4f8;
+  --color-text-design-pressed: #a8d7fa;
+  --color-text-design-secondary: #7cc4f8;
+  --color-text-design-tertiary: #7cc4f8;
+  --color-text-disabled: rgba(255, 255, 255, 0.4);
+  --color-text-figjam: #d1a8ff;
+  --color-text-figjam-pressed: #d6b6fb;
+  --color-text-figjam-secondary: #c5b2dc;
+  --color-text-figjam-tertiary: #c5b2dc;
+  --color-text-fs: rgba(255, 255, 255, 1);
+  --color-text-fs-assistive: #fc9ce0;
+  --color-text-fs-component: #d1a8ff;
+  --color-text-fs-design: #7cc4f8;
+  --color-text-fs-measure: #fca397;
+  --color-text-fs-onassistive: rgba(255, 255, 255, 1);
+  --color-text-fs-oncomponent: rgba(255, 255, 255, 1);
+  --color-text-fs-ondesign: rgba(255, 255, 255, 1);
+  --color-text-fs-onmeasure: rgba(255, 255, 255, 1);
+  --color-text-fs-onselected: rgba(255, 255, 255, 0.9);
+  --color-text-fs-secondary: rgba(255, 255, 255, 0.7);
+  --color-text-fs-selected: #7cc4f8;
+  --color-text-fs-tertiary: rgba(255, 255, 255, 0.4);
+  --color-text-hover: rgba(255, 255, 255, 1);
+  --color-text-measure: #fca397;
+  --color-text-measure-secondary: #fca397;
+  --color-text-measure-tertiary: #fca397;
+  --color-text-menu: rgba(255, 255, 255, 1);
+  --color-text-menu-danger: #fca397;
+  --color-text-menu-disabled: rgba(255, 255, 255, 0.4);
+  --color-text-menu-hover: rgba(255, 255, 255, 1);
+  --color-text-menu-ondisabled: #1e1e1e;
+  --color-text-menu-onselected: rgba(255, 255, 255, 1);
+  --color-text-menu-secondary: rgba(255, 255, 255, 0.7);
+  --color-text-menu-secondary-hover: rgba(255, 255, 255, 1);
+  --color-text-menu-selected: #7cc4f8;
+  --color-text-menu-selected-secondary: #7cc4f8;
+  --color-text-menu-selected-tertiary: #7cc4f8;
+  --color-text-menu-tertiary: rgba(255, 255, 255, 0.4);
+  --color-text-menu-tertiary-hover: rgba(255, 255, 255, 1);
+  --color-text-menu-warning: #f7d15f;
+  --color-text-onassistive: rgba(255, 255, 255, 1);
+  --color-text-onassistive-secondary: rgba(255, 255, 255, 0.8);
+  --color-text-onassistive-tertiary: rgba(255, 255, 255, 0.4);
+  --color-text-onbrand: rgba(255, 255, 255, 1);
+  --color-text-onbrand-secondary: rgba(255, 255, 255, 0.8);
+  --color-text-onbrand-tertiary: rgba(255, 255, 255, 0.4);
+  --color-text-oncomponent: rgba(255, 255, 255, 1);
+  --color-text-oncomponent-secondary: rgba(255, 255, 255, 0.8);
+  --color-text-oncomponent-tertiary: rgba(255, 255, 255, 0.4);
+  --color-text-ondanger: rgba(255, 255, 255, 1);
+  --color-text-ondanger-secondary: rgba(255, 255, 255, 0.8);
+  --color-text-ondanger-tertiary: rgba(255, 255, 255, 0.4);
+  --color-text-ondesign: rgba(255, 255, 255, 1);
+  --color-text-ondesign-secondary: rgba(255, 255, 255, 0.8);
+  --color-text-ondesign-tertiary: rgba(255, 255, 255, 0.4);
+  --color-text-ondisabled: #2c2c2c;
+  --color-text-onfigjam: rgba(255, 255, 255, 1);
+  --color-text-onfigjam-secondary: rgba(255, 255, 255, 0.8);
+  --color-text-onfigjam-tertiary: rgba(255, 255, 255, 0.4);
+  --color-text-oninverse: rgba(0, 0, 0, 0.9);
+  --color-text-onmeasure: rgba(255, 255, 255, 1);
+  --color-text-onmeasure-secondary: rgba(255, 255, 255, 0.8);
+  --color-text-onmeasure-tertiary: rgba(255, 255, 255, 0.4);
+  --color-text-onselected: rgba(255, 255, 255, 0.9);
+  --color-text-onselected-secondary: rgba(255, 255, 255, 0.7);
+  --color-text-onselected-strong: rgba(255, 255, 255, 1);
+  --color-text-onselected-tertiary: rgba(255, 255, 255, 0.4);
+  --color-text-onsuccess: rgba(255, 255, 255, 1);
+  --color-text-onsuccess-secondary: rgba(255, 255, 255, 0.8);
+  --color-text-onsuccess-tertiary: rgba(255, 255, 255, 0.4);
+  --color-text-onwarning: rgba(0, 0, 0, 0.9);
+  --color-text-onwarning-secondary: rgba(0, 0, 0, 0.5);
+  --color-text-onwarning-tertiary: rgba(0, 0, 0, 0.3);
+  --color-text-secondary: rgba(255, 255, 255, 0.7);
+  --color-text-secondary-hover: rgba(255, 255, 255, 1);
+  --color-text-selected: #7cc4f8;
+  --color-text-selected-secondary: #7cc4f8;
+  --color-text-selected-tertiary: #7cc4f8;
+  --color-text-success: #79d297;
+  --color-text-success-secondary: #79d297;
+  --color-text-success-tertiary: #79d297;
+  --color-text-tertiary: rgba(255, 255, 255, 0.4);
+  --color-text-tertiary-hover: rgba(255, 255, 255, 1);
+  --color-text-toolbar: rgba(255, 255, 255, 1);
+  --color-text-toolbar-danger: #fca397;
+  --color-text-toolbar-disabled: rgba(255, 255, 255, 0.4);
+  --color-text-toolbar-hover: rgba(255, 255, 255, 1);
+  --color-text-toolbar-ondisabled: #2c2c2c;
+  --color-text-toolbar-onselected: rgba(255, 255, 255, 1);
+  --color-text-toolbar-secondary: rgba(255, 255, 255, 0.7);
+  --color-text-toolbar-secondary-hover: rgba(255, 255, 255, 1);
+  --color-text-toolbar-selected: #7cc4f8;
+  --color-text-toolbar-selected-secondary: #7cc4f8;
+  --color-text-toolbar-selected-tertiary: #7cc4f8;
+  --color-text-toolbar-tertiary: rgba(255, 255, 255, 0.4);
+  --color-text-toolbar-tertiary-hover: rgba(255, 255, 255, 1);
+  --color-text-toolbar-warning: #f7d15f;
+  --color-text-tooltip: rgba(255, 255, 255, 1);
+  --color-text-tooltip-danger: #fca397;
+  --color-text-tooltip-disabled: rgba(255, 255, 255, 0.4);
+  --color-text-tooltip-hover: rgba(255, 255, 255, 1);
+  --color-text-tooltip-ondisabled: #1e1e1e;
+  --color-text-tooltip-onselected: rgba(255, 255, 255, 1);
+  --color-text-tooltip-secondary: rgba(255, 255, 255, 0.7);
+  --color-text-tooltip-secondary-hover: rgba(255, 255, 255, 1);
+  --color-text-tooltip-selected: #7cc4f8;
+  --color-text-tooltip-selected-secondary: #7cc4f8;
+  --color-text-tooltip-selected-tertiary: #7cc4f8;
+  --color-text-tooltip-tertiary: rgba(255, 255, 255, 0.4);
+  --color-text-tooltip-tertiary-hover: rgba(255, 255, 255, 1);
+  --color-text-tooltip-warning: #f7d15f;
+  --color-text-warning: #f7d15f;
+  --color-text-warning-secondary: #f7d15f;
+  --color-text-warning-tertiary: #f7d15f;
 }
 
 body {
-  @apply font-body text-sm leading-normal;
+  @apply font-body text-sm leading-normal text-foreground;
 }
 
 .scroll-container {
@@ -112,7 +585,7 @@ textarea::-webkit-scrollbar-thumb {
 }
 
 .heading {
-  @apply font-semibold text-gray-900 leading-none;
+  @apply font-semibold text-foreground leading-none;
 }
 
 .heading-small {
@@ -128,11 +601,11 @@ textarea::-webkit-scrollbar-thumb {
 }
 
 .property-wrapper .heading {
-  @apply text-xs text-gray-500 mb-2;
+  @apply text-xs text-foreground-muted mb-2;
 }
 
 .property-wrapper .property-wrapper {
-  @apply mb-0 rounded-none pl-2 pb-2 border-l border-gray-300;
+  @apply mb-0 rounded-none pl-2 pb-2 border-l border-border-muted;
 }
 
 .property-wrapper:last-of-type {
@@ -140,23 +613,23 @@ textarea::-webkit-scrollbar-thumb {
 }
 
 .property-value {
-  @apply text-gray-500 text-xs font-normal;
+  @apply text-foreground-muted text-xs font-normal;
 }
 
 .button-group {
-  @apply rounded inline-flex border border-gray-400 overflow-hidden;
+  @apply rounded inline-flex border border-border-muted overflow-hidden;
 }
 
 .button-value {
-  @apply text-gray-600 text-xs font-medium;
+  @apply text-foreground-muted text-xs font-medium;
 }
 
 .button-extra {
-  @apply border-l border-black px-2 py-1;
+  @apply border-l border-border-strong px-2 py-1;
 }
 
 .button-disabled .button-extra {
-  @apply border-gray-500;
+  @apply border-border-muted;
 }
 
 .rotate {
@@ -177,11 +650,11 @@ textarea::-webkit-scrollbar-thumb {
 }
 
 .button {
-  @apply border border-gray-400 rounded text-gray-800 font-medium text-xs p-2;
+  @apply border border-border-muted rounded text-foreground-muted font-medium text-xs p-2;
 }
 
 .button-disabled {
-  @apply border-gray-500;
+  @apply border-border-muted;
 }
 
 .button-ghost {
@@ -193,7 +666,7 @@ textarea::-webkit-scrollbar-thumb {
 }
 
 .button-property {
-  @apply border-none rounded bg-gray-100 px-0 py-0;
+  @apply border-none rounded bg-background-subtle px-0 py-0;
 }
 
 .button-property button {
@@ -201,7 +674,7 @@ textarea::-webkit-scrollbar-thumb {
 }
 
 .button-property:hover {
-  @apply bg-gray-100 bg-opacity-50;
+  @apply bg-background-subtle bg-opacity-50;
 }
 
 .button-property-edit {
@@ -240,7 +713,7 @@ textarea::-webkit-scrollbar-thumb {
 }
 
 .button-text {
-  @apply px-2 py-1 flex items-center justify-start flex-shrink-0;
+  @apply text-foreground px-2 py-1 flex items-center justify-start flex-shrink-0;
 }
 
 .button-property-color .button-text span {
@@ -268,7 +741,7 @@ textarea::-webkit-scrollbar-thumb {
 }
 
 .button-secondary {
-  @apply bg-white text-black border border-gray-200;
+  @apply bg-background text-foreground border border-border-muted;
 }
 
 .button-primary {

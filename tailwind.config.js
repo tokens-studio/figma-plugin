@@ -17,6 +17,17 @@ module.exports = {
           900: 'var(--theme-colors-gray-900, #212121)',
           950: 'var(--theme-colors-gray-950, #212121)',
         },
+        foreground: {
+          DEFAULT: 'var(--color-text, #ffffff)',
+          muted: 'var(--color-text-secondary, #9e9e9e)',
+        },
+        background: {
+          DEFAULT: 'var(--color-bg, #ffffff)',
+          subtle: 'var(--color-bg-secondary, #f5f5f5)',
+        },
+        border: {
+          muted: 'var(--color-border-secondary, #e0e0e0)',
+        },
         primary: {
           50: 'var(--theme-colors-brand-50, #F5FBFF)',
           100: 'var(--theme-colors-brand-100, #E1F3FF)',
