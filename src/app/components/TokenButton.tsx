@@ -18,7 +18,8 @@ export function useGetActiveState(properties, type, name) {
   const uiState = useSelector((state: RootState) => state.uiState);
 
   return (
-    uiState.mainNodeSelectionValues[type] === name || properties.some((prop) => uiState.mainNodeSelectionValues[prop.name] === name)
+    uiState.mainNodeSelectionValues[type] === name
+    || properties.some((prop) => uiState.mainNodeSelectionValues[prop.name] === name)
   );
 }
 
@@ -27,14 +28,23 @@ function TokenButton({
   token,
   showForm,
   resolvedTokens,
+  draggedToken,
+  dragOverToken,
+  setDraggedToken,
+  setDragOverToken,
 }: {
   type: string | object;
   token: SingleTokenObject;
   showForm: Function;
   resolvedTokens: SingleTokenObject[];
+  draggedToken: SingleTokenObject | null;
+  dragOverToken: SingleTokenObject | null;
+  setDraggedToken: Function;
+  setDragOverToken: Function;
 }) {
   const uiState = useSelector((state: RootState) => state.uiState);
   const { activeTokenSet } = useSelector((state: RootState) => state.tokenState);
+  const tokenState = useSelector((state: RootState) => state.tokenState);
   const { setNodeData } = useTokens();
   const { deleteSingleToken, duplicateSingleToken } = useManageTokens();
   const dispatch = useDispatch<Dispatch>();
@@ -77,12 +87,7 @@ function TokenButton({
         {
           label: 'All',
           name: 'borderRadius',
-          clear: [
-            'borderRadiusTopLeft',
-            'borderRadiusTopRight',
-            'borderRadiusBottomRight',
-            'borderRadiusBottomLeft',
-          ],
+          clear: ['borderRadiusTopLeft', 'borderRadiusTopRight', 'borderRadiusBottomRight', 'borderRadiusBottomLeft'],
         },
         { label: 'Top Left', name: 'borderRadiusTopLeft' },
         { label: 'Top Right', name: 'borderRadiusTopRight' },
@@ -197,11 +202,83 @@ function TokenButton({
     setPluginValue(newProps);
   };
 
+  const onDragStart = (e) => {
+    e.stopPropagation();
+    setDraggedToken(token);
+    setTimeout(() => {
+      e.target.classList.add('drag-item');
+    }, 0);
+  };
+  const onDragEnd = (e) => {
+    e.stopPropagation();
+    setDragOverToken(null);
+    e.target.classList.remove('drag-item');
+  };
+  const onDrag = (e) => e.stopPropagation();
+  const onDragEnter = (e) => e.stopPropagation();
+  const onDragLeave = (e) => e.stopPropagation();
+
+  const onDragOver = (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    setDragOverToken(token);
+  };
+
+  const onDrop = (e) => {
+    e.stopPropagation();
+    let draggedTokenIndex = null;
+    let dropTokenIndex = null;
+
+    if (draggedToken && token) {
+      tokenState.tokens[tokenState.activeTokenSet].forEach((element, index) => {
+        if (element.name === draggedToken.name) draggedTokenIndex = index;
+        if (element.name === token.name) dropTokenIndex = index;
+      });
+      if (draggedTokenIndex !== null && dropTokenIndex !== null) {
+        const insertTokensIndex = draggedTokenIndex > dropTokenIndex ? dropTokenIndex : dropTokenIndex - 1;
+        const set = tokenState.tokens[tokenState.activeTokenSet];
+        set.splice(insertTokensIndex, 0, set.splice(draggedTokenIndex, 1)[0]);
+        const newTokens = {
+          ...tokenState.tokens,
+          [tokenState.activeTokenSet]: set,
+        };
+
+        dispatch.tokenState.setTokens(newTokens);
+      }
+    }
+  };
+
+  const checkDragOverToken = () => {
+    // this method is to understand dragItem and dropItem are at the same level in the hierarchy and are of same type
+    if (draggedToken && dragOverToken === token && isNaN(token.name) && draggedToken.type === dragOverToken.type) {
+      const draggedItemName = draggedToken?.name.split('.');
+      const dragOverName = dragOverToken?.name.split('.');
+      const draggedItemNameArray = draggedItemName.slice(0, draggedItemName.length - 1);
+      const dragOverNameArray = dragOverName.slice(0, dragOverName.length - 1);
+
+      if (draggedItemNameArray.toString() === dragOverNameArray.toString()) {
+        return true;
+      }
+    }
+  };
+
+  const draggerProps = {
+    draggable: true,
+    onDrag,
+    onDrop,
+    onDragEnd,
+    onDragEnter,
+    onDragLeave,
+    onDragStart,
+    onDragOver,
+  };
+
   return (
     <div
+      {...draggerProps}
       className={`relative mb-1 mr-1 button button-property ${buttonClass.join(' ')} ${
         uiState.disabled && 'button-disabled'
-      } `}
+      } ${checkDragOverToken() ? 'drag-over-item' : ''} `}
       style={style}
     >
       <MoreButton

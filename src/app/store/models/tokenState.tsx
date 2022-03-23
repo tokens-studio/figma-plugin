@@ -152,6 +152,10 @@ export const tokenState = createModel<RootModel>()({
         },
       };
     },
+    setTokens: (state, newTokens) => ({
+      ...state,
+      tokens: newTokens,
+    }),
     createToken: (state, data: TokenInput) => {
       let newTokens = {};
       const existingToken = state.tokens[data.parent].find((n) => n.name === data.name);

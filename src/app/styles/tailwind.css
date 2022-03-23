@@ -465,9 +465,20 @@ input.input {
   border: 1px solid var(--black);
 }
 
+.drag-item {
+  display: none;
+}
+
 .drag-over-item {
-  padding-left: 30px;
-  transition: padding-left 0.5s;
+  padding-left: 5px;
+}
+
+.drag-over-item:after {
+  background-color: var(--blue);
+  content: '';
+  height: 16px;
+  position: absolute;
+  width: 6px;
 }
 
 .radio__label {
