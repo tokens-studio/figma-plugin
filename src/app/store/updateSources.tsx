@@ -72,5 +72,6 @@ export default async function updateTokensOnSources({
     tokens: tokens ? mergedTokens : null,
     updatedAt,
     settings,
+    usedTokenSet,
   });
 }

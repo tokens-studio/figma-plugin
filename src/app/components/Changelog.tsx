@@ -5,6 +5,18 @@ import Button from './Button';
 import Modal from './Modal';
 import { RootState } from '../store';
 
+type ChangelogItem = {
+  _uid: string;
+  image?: {
+    alt: string;
+    filename: string;
+  }
+  title: string;
+  excerpt: string;
+  read_more_link?: string;
+  read_more_text?: string;
+};
+
 export default function Changelog() {
   const [changelogOpen, setChangelogOpen] = React.useState(true);
   const { changelog } = useSelector((state: RootState) => state.uiState);
@@ -23,7 +35,7 @@ export default function Changelog() {
     <Modal showClose isOpen={changelog.length > 0 && changelogOpen} close={() => setChangelogOpen(false)}>
       <div className="space-y-8">
         <div>
-          {changelog.map((item, index) => (
+          {changelog.map((item: ChangelogItem, index) => (
             <div
                                 // eslint-disable-next-line no-underscore-dangle
               key={item._uid}
@@ -43,7 +55,7 @@ export default function Changelog() {
                 href={item.read_more_link}
                 className="inline-flex text-primary-500 text-xs"
               >
-                Read more
+                {item.read_more_text ? item.read_more_text : 'Read more'}
               </a>
               )}
             </div>

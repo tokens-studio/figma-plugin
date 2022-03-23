@@ -1,4 +1,5 @@
 import set from 'set-value';
+import { expand } from '../app/components/utils';
 
 export default function formatTokens({
   tokens,
@@ -6,6 +7,7 @@ export default function formatTokens({
   includeAllTokens = false,
   includeParent = true,
   expandTypography = false,
+  expandShadow = false,
 }) {
   const nestUnderParent = includeAllTokens ? true : includeParent;
   const tokenObj = {};
@@ -13,14 +15,12 @@ export default function formatTokens({
   tokenSets.forEach((tokenSet) => {
     tokens[tokenSet].forEach((token) => {
       const { name, ...tokenWithoutName } = token;
-      if (token.type === 'typography' && expandTypography) {
-        const expandedTypography = Object.entries(tokenWithoutName.value).reduce((acc, [key, val]) => {
-          acc[key] = {
-            value: val,
-          };
-          return acc;
-        }, {});
-        set(tokenObj, nestUnderParent ? [tokenSet, token.name].join('.') : token.name, { ...expandedTypography });
+      if (
+        (token.type === 'typography' && expandTypography)
+        || (token.type === 'boxShadow' && expandShadow)
+      ) {
+        const expanded = expand(tokenWithoutName.value);
+        set(tokenObj, nestUnderParent ? [tokenSet, token.name].join('.') : token.name, { ...expanded });
       } else {
         set(tokenObj, nestUnderParent ? [tokenSet, token.name].join('.') : token.name, tokenWithoutName);
       }
