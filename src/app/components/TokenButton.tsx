@@ -304,6 +304,7 @@ function TokenButton({
           </button>
         </TokenTooltipWrapper>
       </MoreButton>
+      <div className={checkDragOverToken() ? 'drag-over-item-absolute' : ''} />
     </div>
   );
 }
