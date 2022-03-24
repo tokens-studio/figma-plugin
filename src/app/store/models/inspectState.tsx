@@ -1,5 +1,5 @@
 import { createModel } from '@rematch/core';
-import type { RootModel } from '.';
+import { RootModel } from '@/types/RootModel';
 
 export interface InspectState {
   selectedTokens: string[]
@@ -8,7 +8,7 @@ export interface InspectState {
 export const inspectState = createModel<RootModel>()({
   state: {
     selectedTokens: [],
-  } as unknown as InspectState,
+  } as InspectState,
   reducers: {
     setSelectedTokens: (state, data: string[]) => ({
       ...state,

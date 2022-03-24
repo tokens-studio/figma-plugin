@@ -16,7 +16,7 @@ const StyledContent = styled(DropdownMenu.Content, {
   boxShadow: '0px 5px 15px -5px hsla(206,22%,7%,.15)',
 });
 
-const itemStyles = {
+const itemStyles: Parameters<typeof styled>[1] = {
   fontSize: 13,
   padding: '5px 10px 5px 25px',
   borderRadius: '$contextMenuItem',

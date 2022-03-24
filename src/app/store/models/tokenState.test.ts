@@ -1,5 +1,7 @@
-import { init } from '@rematch/core';
-import { models, RootModel } from './index';
+import { init, RematchStore } from '@rematch/core';
+import { RootModel } from '@/types/RootModel';
+import { models } from './index';
+import { TokenTypes } from '@/constants/TokenTypes';
 
 const shadowArray = [
   {
@@ -20,8 +22,10 @@ const shadowArray = [
   },
 ];
 
+type Store = RematchStore<RootModel, Record<string, never>>;
+
 describe('editToken', () => {
-  let store;
+  let store: Store;
   beforeEach(() => {
     store = init<RootModel>({
       redux: {
@@ -94,6 +98,9 @@ describe('editToken', () => {
       oldName: 'primary',
       name: 'brand.primary',
       value: '1',
+      options: {
+        type: TokenTypes.COLOR,
+      },
     });
 
     const { tokens } = store.getState().tokenState;
@@ -106,6 +113,9 @@ describe('editToken', () => {
       oldName: 'primary',
       name: 'secondary',
       value: '1',
+      options: {
+        type: TokenTypes.COLOR,
+      },
     });
 
     const { tokens } = store.getState().tokenState;
@@ -120,6 +130,9 @@ describe('editToken', () => {
       oldName: 'primary',
       name: 'secondary',
       value: '1',
+      options: {
+        type: TokenTypes.COLOR,
+      },
     });
 
     const { tokens } = store.getState().tokenState;
@@ -132,6 +145,9 @@ describe('editToken', () => {
       oldName: 'primary',
       name: 'secondary',
       value: '1',
+      options: {
+        type: TokenTypes.COLOR,
+      },
     });
 
     const { tokens } = store.getState().tokenState;
@@ -142,10 +158,12 @@ describe('editToken', () => {
     await store.dispatch.tokenState.setTokensFromStyles({
       colors: [
         {
+          type: TokenTypes.COLOR,
           name: 'primary',
           value: '2',
         },
         {
+          type: TokenTypes.COLOR,
           name: 'secondary',
           value: '3',
         },
@@ -153,7 +171,7 @@ describe('editToken', () => {
       typography: [
         {
           name: 'header 1',
-          type: 'typography',
+          type: TokenTypes.TYPOGRAPHY,
           value: {
             fontWeight: '400',
             fontSize: '16',
@@ -161,7 +179,7 @@ describe('editToken', () => {
         },
         {
           name: 'header 2',
-          type: 'typography',
+          type: TokenTypes.TYPOGRAPHY,
           value: {
             fontWeight: '400',
             fontSize: '14',

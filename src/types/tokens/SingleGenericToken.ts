@@ -1,6 +1,6 @@
 import { TokenTypes } from '@/constants/TokenTypes';
 
-export type SingleGenericToken<T extends TokenTypes, V = string, Named extends boolean = true> = {
+export type SingleGenericToken<T extends TokenTypes, V = string, Named extends boolean = true, P = unknown> = {
   type: T;
   value: V;
   description?: string;
@@ -10,4 +10,4 @@ export type SingleGenericToken<T extends TokenTypes, V = string, Named extends b
   name: string;
 } : {
   name?: string;
-});
+}) & P;

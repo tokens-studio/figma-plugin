@@ -8,7 +8,7 @@ export default function ToggleEmptyButton() {
   const dispatch = useDispatch<Dispatch>();
   return (
     <div className="flex items-center justify-center mt-4 mb-4">
-      <Button variant="secondary" size="small" onClick={() => dispatch.uiState.toggleShowEmptyGroups()}>
+      <Button variant="secondary" size="small" onClick={() => dispatch.uiState.toggleShowEmptyGroups(null)}>
         {showEmptyGroups ? 'Hide' : 'Show'}
         {' '}
         empty groups

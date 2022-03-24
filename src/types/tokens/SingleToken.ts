@@ -17,22 +17,22 @@ import { SingleTextDecorationToken } from './SingleTextDecorationToken';
 import { SingleTextCaseToken } from './SingleTextCaseToken';
 import { SingleOtherToken } from './SingleOtherToken';
 
-export type SingleToken<Named extends boolean = true> =
-  SingleColorToken<Named>
-  | SingleImplicitToken<Named>
-  | SingleBorderRadiusToken<Named>
-  | SingleTextToken<Named>
-  | SingleTypographyToken<Named>
-  | SingleOpacityToken<Named>
-  | SingleBorderWidthToken<Named>
-  | SingleBoxShadowToken<Named>
-  | SingleFontFamiliesToken<Named>
-  | SingleFontWeightsToken<Named>
-  | SingleLineHeightsToken<Named>
-  | SingleLetterSpacingToken<Named>
-  | SingleFontSizesToken<Named>
-  | SingleParagraphSpacingToken<Named>
-  | SingleTextDecorationToken<Named>
-  | SingleTextCaseToken<Named>
-  | SingleSpacingToken<Named>
-  | SingleOtherToken<Named>;
+export type SingleToken<Named extends boolean = true, P = unknown> =
+  SingleColorToken<Named, P>
+  | SingleImplicitToken<Named, P>
+  | SingleBorderRadiusToken<Named, P>
+  | SingleTextToken<Named, P>
+  | SingleTypographyToken<Named, P>
+  | SingleOpacityToken<Named, P>
+  | SingleBorderWidthToken<Named, P>
+  | SingleBoxShadowToken<Named, P>
+  | SingleFontFamiliesToken<Named, P>
+  | SingleFontWeightsToken<Named, P>
+  | SingleLineHeightsToken<Named, P>
+  | SingleLetterSpacingToken<Named, P>
+  | SingleFontSizesToken<Named, P>
+  | SingleParagraphSpacingToken<Named, P>
+  | SingleTextDecorationToken<Named, P>
+  | SingleTextCaseToken<Named, P>
+  | SingleSpacingToken<Named, P>
+  | SingleOtherToken<Named, P>;

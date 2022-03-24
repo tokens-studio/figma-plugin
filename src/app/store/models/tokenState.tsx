@@ -9,8 +9,6 @@ import { notifyToUI } from '@/plugin/notifiers';
 import { reduceToValues } from '@/plugin/tokenHelpers';
 import { replaceReferences } from '@/utils/findReferences';
 import parseJson from '@/utils/parseJson';
-// @TODO update
-import type { RootModel } from '.';
 import updateTokensOnSources from '../updateSources';
 import * as pjs from '../../../../package.json';
 import { AnyTokenList, SingleToken, TokenStore } from '@/types/tokens';
@@ -22,6 +20,7 @@ import {
   UpdateTokenPayload,
 } from '@/types/payloads';
 import { updateTokenPayloadToSingleToken } from '@/utils/updateTokenPayloadToSingleToken';
+import { RootModel } from '@/types/RootModel';
 
 const defaultTokens: TokenStore = {
   version: pjs.plugin_version,
