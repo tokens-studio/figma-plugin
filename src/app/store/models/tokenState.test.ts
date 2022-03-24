@@ -191,12 +191,13 @@ describe('editToken', () => {
     const { importedTokens } = store.getState().tokenState;
     expect(importedTokens.newTokens).toEqual([
       {
+        type: TokenTypes.COLOR,
         name: 'secondary',
         value: '3',
       },
       {
         name: 'header 2',
-        type: 'typography',
+        type: TokenTypes.TYPOGRAPHY,
         value: {
           fontWeight: '400',
           fontSize: '14',
@@ -205,6 +206,7 @@ describe('editToken', () => {
     ]);
     expect(importedTokens.updatedTokens).toEqual([
       {
+        type: TokenTypes.COLOR,
         name: 'primary',
         oldValue: '1',
         value: '2',
