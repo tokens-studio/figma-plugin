@@ -8,9 +8,10 @@
     "noUnusedParameters": true,
     "experimentalDecorators": true,
     "removeComments": true,
-    "noImplicitAny": false,
+    "noImplicitAny": true,
     "moduleResolution": "node",
     "resolveJsonModule": true,
+    "strict": true,
     "strictNullChecks": true,
     "baseUrl": "./",
     "typeRoots": [

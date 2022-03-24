@@ -271,32 +271,32 @@ export const tokenState = createModel<RootModel>()({
       return newState;
     },
     updateAliases: (state, data: { oldName: string; newName: string }) => {
-      const newTokens = Object.entries(state.tokens).reduce(
-        (acc, [key, values]: [string, SingleToken[]]) => {
-          const newValues = values.map((token) => {
+      const newTokens = Object.entries(state.tokens).reduce<TokenState['tokens']>(
+        (acc, [key, values]) => {
+          const newValues = values.map<SingleToken>((token) => {
             if (Array.isArray(token.value)) {
               return {
                 ...token,
-                value: token.value.map((t) => Object.entries(t).reduce((a, [k, v]: [string, string]) => {
+                value: token.value.map((t) => Object.entries(t).reduce<Record<string, string | number>>((a, [k, v]) => {
                   a[k] = replaceReferences(v.toString(), data.oldName, data.newName);
                   return a;
                 }, {})),
-              };
+              } as SingleToken;
             }
             if (typeof token.value === 'object') {
               return {
                 ...token,
-                value: Object.entries(token.value).reduce((a, [k, v]: [string, string]) => {
+                value: Object.entries(token.value).reduce<Record<string, string | number>>((a, [k, v]) => {
                   a[k] = replaceReferences(v.toString(), data.oldName, data.newName);
                   return a;
                 }, {}),
-              };
+              } as SingleToken;
             }
 
             return {
               ...token,
               value: replaceReferences(token.value.toString(), data.oldName, data.newName),
-            };
+            } as SingleToken;
           });
 
           acc[key] = newValues;
