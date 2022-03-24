@@ -1,28 +1,5 @@
 import { SingleTokenObject, TokenType } from './tokens';
-import { ColorRgba, ColorHsla } from './valueTypes';
-
-export type TypographyObject = {
-  fontFamily?: string;
-  fontWeight?: string;
-  fontSize?: string;
-  lineHeight?: string | number;
-  letterSpacing?: string;
-  paragraphSpacing?: string;
-  textCase?: string;
-  textDecoration?: string;
-};
-
-type ShadowType = 'dropShadow' | 'innerShadow';
-
-export type ShadowTokenSingleValue = {
-  color: string;
-  type: ShadowType;
-  x: string | number;
-  y: string | number;
-  blur: string | number;
-  spread: string | number;
-  blendMode?: string;
-};
+import { ColorRgba, ColorHsla } from './valueTypes'x
 
 export type propertyObject = {
   description?: string;

@@ -2,13 +2,14 @@
 import { createModel } from '@rematch/core';
 import { StorageType, StorageProviderType, ApiDataType } from '@/types/api';
 import { track } from '@/utils/analytics';
-import { ShadowTokenSingleValue, TypographyObject } from '@/types/propertyTypes';
+import { ShadowTokenSingleValue } from '@/types/propertyTypes';
 import { SelectionGroup, TokenType } from '@/types/tokens';
 import type { RootModel } from '.';
 import fetchChangelog from '@/utils/storyblok';
 import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 import { postToFigma } from '@/plugin/notifiers';
 import { MessageToPluginTypes } from '@/types/messages';
+import { TokenTypograpyObject } from '@/types';
 
 type TabNames = 'start' | 'tokens' | 'json' | 'inspector' | 'syncsettings' | 'settings';
 
@@ -36,7 +37,7 @@ export type EditTokenObject =
     })
     | (EditTokenObjectCommonProperties & {
       type: 'typography';
-      value: TypographyObject;
+      value: TokenTypograpyObject;
     })
     | (EditTokenObjectCommonProperties & {
       type: TokenType;

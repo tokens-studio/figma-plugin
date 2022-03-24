@@ -21,7 +21,7 @@ function JSONEditor() {
 
   const [exportModalVisible, showExportModal] = React.useState(false);
   const [presetModalVisible, showPresetModal] = React.useState(false);
-  const [error, setError] = React.useState(null);
+  const [error, setError] = React.useState<string | null>(null);
   const [stringTokens, setStringTokens] = React.useState(JSON.stringify(tokens[activeTokenSet], null, 2));
 
   React.useEffect(() => {
@@ -29,11 +29,11 @@ function JSONEditor() {
     setStringTokens(tokenType === 'array' ? JSON.stringify(tokens[activeTokenSet], null, 2) : getStringTokens());
   }, [tokens, activeTokenSet, tokenType]);
 
-  const handleUpdate = async () => {
+  const handleUpdate = React.useCallback(async () => {
     dispatch.tokenState.setJSONData(stringTokens);
-  };
+  }, [stringTokens]);
 
-  const handleClearTokens = async () => {
+  const handleClearTokens = React.useCallback(async () => {
     track('Clear Tokens');
 
     const userConfirmation = await confirm({
@@ -43,9 +43,9 @@ function JSONEditor() {
     if (userConfirmation) {
       dispatch.tokenState.setEmptyTokens();
     }
-  };
+  }, []);
 
-  const changeTokens = (val) => {
+  const handleChangeToken = React.useCallback((val: string) => {
     setError(null);
     try {
       const parsedTokens = parseJson(val);
@@ -54,7 +54,7 @@ function JSONEditor() {
       setError(`Unable to read JSON: ${JSON.stringify(e)}`);
     }
     setStringTokens(val);
-  };
+  }, []);
 
   return (
     <div className="flex flex-col grow">
@@ -68,7 +68,7 @@ function JSONEditor() {
             className="grow"
             placeholder="Enter JSON"
             rows={21}
-            onChange={changeTokens}
+            onChange={handleChangeToken}
             value={stringTokens}
           />
           {error && (
@@ -97,7 +97,7 @@ function JSONEditor() {
           </Button>
           <Button
             id="save-update-json"
-            disabled={editProhibited || error}
+            disabled={!!(editProhibited || error)}
             variant="primary"
             onClick={handleUpdate}
           >

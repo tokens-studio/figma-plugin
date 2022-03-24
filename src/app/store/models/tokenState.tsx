@@ -1,9 +1,6 @@
 /* eslint-disable import/prefer-default-export */
 import { createModel } from '@rematch/core';
 import isEqual from 'lodash.isequal';
-import {
-  SingleTokenObject, TokenGroup, SingleToken, TokenProps,
-} from '@/types/tokens';
 import { StorageProviderType } from '@/types/api';
 import defaultJSON from '@/config/default.json';
 
@@ -12,35 +9,32 @@ import { notifyToUI } from '@/plugin/notifiers';
 import { reduceToValues } from '@/plugin/tokenHelpers';
 import { replaceReferences } from '@/utils/findReferences';
 import parseJson from '@/utils/parseJson';
+// @TODO update
 import type { RootModel } from '.';
 import updateTokensOnSources from '../updateSources';
 import * as pjs from '../../../../package.json';
+import { AnyTokenList, SingleToken, TokenStore } from '@/types/tokens';
+import {
+  DeleteTokenPayload,
+  SetTokenDataPayload,
+  SetTokensFromStylesPayload,
+  UpdateDocumentPayload,
+  UpdateTokenPayload,
+} from '@/types/payloads';
+import { updateTokenPayloadToSingleToken } from '@/utils/updateTokenPayloadToSingleToken';
 
-const defaultTokens: TokenProps = {
+const defaultTokens: TokenStore = {
   version: pjs.plugin_version,
   updatedAt: new Date().toString(),
-  values: defaultJSON,
+  // @TODO this may not be correct
+  values: parseTokenValues(defaultJSON as unknown as SetTokenDataPayload['values']),
 };
-
-type TokenInput = {
-  name: string;
-  parent: string;
-  value: SingleToken;
-  options: object;
-};
-
-type EditTokenInput = TokenInput & {
-  oldName?: string;
-};
-
-type DeleteTokenInput = { parent: string; path: string };
-
 interface TokenState {
-  tokens: TokenGroup;
+  tokens: Record<string, AnyTokenList>;
   lastSyncedState: string;
   importedTokens: {
-    newTokens: SingleTokenObject[];
-    updatedTokens: SingleTokenObject[];
+    newTokens: SingleToken[];
+    updatedTokens: SingleToken[];
   };
   activeTokenSet: string;
   usedTokenSet: string[];
@@ -78,7 +72,7 @@ export const tokenState = createModel<RootModel>()({
       ...state,
       activeTokenSet: data,
     }),
-    addTokenSet: (state, name: string) => {
+    addTokenSet: (state, name: string): TokenState => {
       if (name in state.tokens) {
         notifyToUI('Token set already exists');
         return state;
@@ -116,7 +110,7 @@ export const tokenState = createModel<RootModel>()({
     }),
     setTokenSetOrder: (state, data: string[]) => {
       const newTokens = {};
-      data.map((set) => {
+      data.forEach((set) => {
         Object.assign(newTokens, { [set]: state.tokens[set] });
       });
       return {
@@ -131,7 +125,7 @@ export const tokenState = createModel<RootModel>()({
         updatedTokens: [],
       },
     }),
-    setTokenData: (state, data: { values: SingleTokenObject[]; shouldUpdate: boolean, usedTokenSet?: string[] }) => {
+    setTokenData: (state, data: SetTokenDataPayload) => {
       const values = parseTokenValues(data.values);
       const tokenSets = data.usedTokenSet ? Object.keys(data.values).filter((set) => data.usedTokenSet?.includes(set)) : [Object.keys(values)[0]];
       return {
@@ -153,18 +147,14 @@ export const tokenState = createModel<RootModel>()({
         },
       };
     },
-    createToken: (state, data: TokenInput) => {
-      let newTokens = {};
+    createToken: (state, data: UpdateTokenPayload) => {
+      let newTokens: TokenStore['values'] = {};
       const existingToken = state.tokens[data.parent].find((n) => n.name === data.name);
       if (!existingToken) {
         newTokens = {
           [data.parent]: [
             ...state.tokens[data.parent],
-            {
-              name: data.name,
-              value: data.value,
-              ...data.options,
-            },
+            updateTokenPayloadToSingleToken(data),
           ],
         };
       }
@@ -176,8 +166,8 @@ export const tokenState = createModel<RootModel>()({
         },
       };
     },
-    duplicateToken: (state, data: TokenInput) => {
-      let newTokens = {};
+    duplicateToken: (state, data: UpdateTokenPayload) => {
+      let newTokens: TokenStore['values'] = {};
       const existingTokenIndex = state.tokens[data.parent].findIndex((n) => n.name === data.name);
       if (existingTokenIndex > -1) {
         const newName = `${data.name}-copy`;
@@ -200,20 +190,20 @@ export const tokenState = createModel<RootModel>()({
       };
     },
     // Imports received styles as tokens, if needed
-    setTokensFromStyles: (state, receivedStyles) => {
-      const newTokens = [];
-      const existingTokens = [];
-      const updatedTokens = [];
+    setTokensFromStyles: (state, receivedStyles: SetTokensFromStylesPayload) => {
+      const newTokens: SingleToken[] = [];
+      const existingTokens: SingleToken[] = [];
+      const updatedTokens: SingleToken[] = [];
 
       // Iterate over received styles and check if they existed before or need updating
-      Object.values(receivedStyles).map((values: [string, SingleTokenObject[]]) => {
-        values.map((token: TokenGroup) => {
+      Object.values(receivedStyles).forEach((values) => {
+        values.forEach((token) => {
           const oldValue = state.tokens[state.activeTokenSet].find((t) => t.name === token.name);
           if (oldValue) {
             if (isEqual(oldValue.value, token.value)) {
               if (
                 oldValue.description === token.description
-                                || (typeof token.description === 'undefined' && oldValue.description === '')
+                || (typeof token.description === 'undefined' && oldValue.description === '')
               ) {
                 existingTokens.push(token);
               } else {
@@ -223,10 +213,9 @@ export const tokenState = createModel<RootModel>()({
                 });
               }
             } else {
-              updatedTokens.push({
-                ...token,
-                oldValue: oldValue.value,
-              });
+              const updatedToken = { ...token };
+              updatedToken.oldValue = oldValue.value;
+              updatedTokens.push(updatedToken);
             }
           } else {
             newTokens.push(token);
@@ -242,16 +231,14 @@ export const tokenState = createModel<RootModel>()({
         },
       };
     },
-    editToken: (state, data: EditTokenInput) => {
+    editToken: (state, data: UpdateTokenPayload) => {
       const nameToFind = data.oldName ? data.oldName : data.name;
       const index = state.tokens[data.parent].findIndex((token) => token.name === nameToFind);
-      const newArray = state.tokens[data.parent];
+      const newArray = [...state.tokens[data.parent]];
       newArray[index] = {
         ...newArray[index],
-        name: data.name,
-        value: data.value,
-        ...data.options,
-      };
+        ...updateTokenPayloadToSingleToken(data),
+      } as SingleToken;
 
       return {
         ...state,
@@ -261,7 +248,7 @@ export const tokenState = createModel<RootModel>()({
         },
       };
     },
-    deleteToken: (state, data: DeleteTokenInput) => {
+    deleteToken: (state, data: DeleteTokenPayload) => {
       const newState = {
         ...state,
         tokens: {
@@ -272,7 +259,7 @@ export const tokenState = createModel<RootModel>()({
 
       return newState;
     },
-    deleteTokenGroup: (state, data: DeleteTokenInput) => {
+    deleteTokenGroup: (state, data: DeleteTokenPayload) => {
       const newState = {
         ...state,
         tokens: {
@@ -285,7 +272,7 @@ export const tokenState = createModel<RootModel>()({
     },
     updateAliases: (state, data: { oldName: string; newName: string }) => {
       const newTokens = Object.entries(state.tokens).reduce(
-        (acc, [key, values]: [string, SingleTokenObject[]]) => {
+        (acc, [key, values]: [string, SingleToken[]]) => {
           const newValues = values.map((token) => {
             if (Array.isArray(token.value)) {
               return {
@@ -325,13 +312,13 @@ export const tokenState = createModel<RootModel>()({
     },
   },
   effects: (dispatch) => ({
-    setDefaultTokens: (payload) => {
+    setDefaultTokens: () => {
       dispatch.tokenState.setTokenData({ values: defaultTokens.values });
     },
-    setEmptyTokens: (payload) => {
+    setEmptyTokens: () => {
       dispatch.tokenState.setTokenData({ values: [] });
     },
-    editToken(payload, rootState) {
+    editToken(payload: UpdateTokenPayload, rootState) {
       if (payload.oldName && payload.oldName !== payload.name) {
         dispatch.tokenState.updateAliases({ oldName: payload.oldName, newName: payload.name });
       }
@@ -361,26 +348,25 @@ export const tokenState = createModel<RootModel>()({
     setJSONData() {
       dispatch.tokenState.updateDocument();
     },
-    setTokenData(payload, rootState) {
+    setTokenData(payload: SetTokenDataPayload) {
       if (payload.shouldUpdate) {
         dispatch.tokenState.updateDocument();
       }
     },
-
-    toggleUsedTokenSet(payload, rootState) {
+    toggleUsedTokenSet() {
       dispatch.tokenState.updateDocument({ updateRemote: false });
     },
-    duplicateToken(payload, rootState) {
+    duplicateToken(payload: UpdateTokenPayload, rootState) {
       if (payload.shouldUpdate && rootState.settings.updateOnChange) {
         dispatch.tokenState.updateDocument();
       }
     },
-    createToken(payload, rootState) {
+    createToken(payload: UpdateTokenPayload, rootState) {
       if (payload.shouldUpdate && rootState.settings.updateOnChange) {
         dispatch.tokenState.updateDocument();
       }
     },
-    updateDocument(options, rootState) {
+    updateDocument(options?: UpdateDocumentPayload, rootState?) {
       const defaults = { shouldUpdateNodes: true, updateRemote: true };
       const params = { ...defaults, ...options };
       try {

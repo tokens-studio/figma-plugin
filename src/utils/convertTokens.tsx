@@ -1,4 +1,4 @@
-import { SingleToken, SingleTokenObject } from '@/types/tokens';
+import { SingleToken } from '@/types/tokens';
 import { isTypographyToken, isValueToken } from '../app/components/utils';
 
 function checkForTokens({
@@ -7,7 +7,7 @@ function checkForTokens({
   root = null,
   returnValuesOnly = false,
   expandTypography = false,
-}): [SingleTokenObject[], SingleToken] {
+}): [SingleToken[], SingleToken] {
   // replaces / in token name
   let returnValue;
   const shouldExpandTypography = expandTypography ? isTypographyToken(token.value) : false;
