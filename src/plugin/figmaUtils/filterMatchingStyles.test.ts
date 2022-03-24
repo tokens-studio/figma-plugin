@@ -1,10 +1,11 @@
-import { SingleTokenObject } from '@/types/tokens';
+import { TokenTypes } from '@/constants/TokenTypes';
+import { SingleToken } from '@/types/tokens';
 import filterMatchingStyles from './filterMatchingStyles';
 
 describe('filterMatchingStyles', () => {
-  const token: SingleTokenObject = {
+  const token: SingleToken = {
     name: 'colors.blue.500',
-    type: 'color',
+    type: TokenTypes.COLOR,
     value: '#00f',
   };
   const styles: PaintStyle[] = [

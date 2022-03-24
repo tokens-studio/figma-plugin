@@ -8,9 +8,9 @@ import Checkbox from './Checkbox';
 import Label from './Label';
 import Blankslate from './Blankslate';
 import InspectorTokenGroup from './InspectorTokenGroup';
-import { SingleTokenObject } from '@/types/tokens';
+import { SingleToken } from '@/types/tokens';
 
-export default function InspectorMultiView({ resolvedTokens }: { resolvedTokens: SingleTokenObject[] }) {
+export default function InspectorMultiView({ resolvedTokens }: { resolvedTokens: SingleToken[] }) {
   const inspectState = useSelector((state: RootState) => state.inspectState);
   const uiState = useSelector((state: RootState) => state.uiState);
   const { removeTokensByValue } = useTokens();

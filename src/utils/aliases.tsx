@@ -1,9 +1,9 @@
 import { checkAndEvaluateMath, convertToRgb } from '@/app/components/utils';
-import { SingleTokenObject } from '@/types/tokens';
+import { SingleToken } from '@/types/tokens';
 import checkIfValueToken from './checkIfValueToken';
 import { findReferences } from './findReferences';
 
-export default function getAliasValue(token: SingleTokenObject | string | number, tokens: SingleTokenObject[] = []): string | null {
+export default function getAliasValue(token: SingleToken | string | number, tokens: SingleToken[] = []): string | null {
   let returnedValue = checkIfValueToken(token) ? (token.value as string) : (token as string);
 
   try {

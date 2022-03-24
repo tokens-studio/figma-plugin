@@ -1,3 +1,4 @@
+export * from './TokenTypeSchema';
 export * from './SingleGenericToken';
 export * from './SingleColorToken';
 export * from './SingleImplicitToken';

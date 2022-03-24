@@ -3,7 +3,8 @@ import { postToFigma } from '@/plugin/notifiers';
 import { MessageToPluginTypes } from '@/types/messages';
 import checkIfAlias from '@/utils/checkIfAlias';
 import {
-  SelectionValue, SingleTokenObject, TokenArrayGroup,
+  AnyTokenList,
+  SingleToken,
 } from '@/types/tokens';
 import stringifyTokens from '@/utils/stringifyTokens';
 import formatTokens from '@/utils/formatTokens';
@@ -13,6 +14,7 @@ import { RootState } from '../store';
 import useConfirm from '../hooks/useConfirm';
 import { Properties } from '@/constants/Properties';
 import { track } from '@/utils/analytics';
+import { SelectionValue } from '@/types';
 
 export default function useTokens() {
   const { tokens, usedTokenSet, activeTokenSet } = useSelector((state: RootState) => state.tokenState);
@@ -25,12 +27,12 @@ export default function useTokens() {
   }
 
   // Returns resolved value of a specific token
-  function isAlias(token: SingleTokenObject, resolvedTokens) {
+  function isAlias(token: SingleToken, resolvedTokens) {
     return checkIfAlias(token, resolvedTokens);
   }
 
   // Calls Figma with all tokens and nodes to set data on
-  function setNodeData(data: SelectionValue, resolvedTokens: TokenArrayGroup) {
+  function setNodeData(data: SelectionValue, resolvedTokens: AnyTokenList) {
     postToFigma({
       type: MessageToPluginTypes.SET_NODE_DATA,
       values: data,

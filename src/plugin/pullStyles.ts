@@ -1,6 +1,6 @@
 /* eslint-disable no-param-reassign */
 import { figmaRGBToHex } from '@figma-plugin/helpers';
-import { PullStyleTypes, SingleTokenObject } from '@/types/tokens';
+import { SingleToken } from '@/types/tokens';
 import { ColorToken, ShadowTokenSingleValue } from '@/types/propertyTypes';
 import { slugify } from '../app/components/utils';
 import { convertBoxShadowTypeFromFigma } from './figmaTransforms/boxShadow';
@@ -10,19 +10,21 @@ import { convertFigmaToLineHeight } from './figmaTransforms/lineHeight';
 import { convertFigmaToTextCase } from './figmaTransforms/textCase';
 import { convertFigmaToTextDecoration } from './figmaTransforms/textDecoration';
 import { notifyStyleValues } from './notifiers';
+import { PullStyleOptions } from '@/types';
 
-export default function pullStyles(styleTypes: PullStyleTypes): void {
-  let colors: SingleTokenObject[] = [];
-  let typography: SingleTokenObject[] = [];
-  let effects: SingleTokenObject[] = [];
-  let fontFamilies: SingleTokenObject[] = [];
-  let lineHeights: SingleTokenObject[] = [];
-  let fontWeights: SingleTokenObject[] = [];
-  let fontSizes: SingleTokenObject[] = [];
-  let letterSpacing: SingleTokenObject[] = [];
-  let paragraphSpacing: SingleTokenObject[] = [];
-  let textCase: SingleTokenObject[] = [];
-  let textDecoration: SingleTokenObject[] = [];
+export default function pullStyles(styleTypes: PullStyleOptions): void {
+  // @TODO should be specifically typed according to their type
+  let colors: SingleToken[] = [];
+  let typography: SingleToken[] = [];
+  let effects: SingleToken[] = [];
+  let fontFamilies: SingleToken[] = [];
+  let lineHeights: SingleToken[] = [];
+  let fontWeights: SingleToken[] = [];
+  let fontSizes: SingleToken[] = [];
+  let letterSpacing: SingleToken[] = [];
+  let paragraphSpacing: SingleToken[] = [];
+  let textCase: SingleToken[] = [];
+  let textDecoration: SingleToken[] = [];
   if (styleTypes.colorStyles) {
     colors = figma
       .getLocalPaintStyles()
@@ -141,25 +143,25 @@ export default function pullStyles(styleTypes: PullStyleTypes): void {
     }));
 
     typography = figmaTextStyles.map((style) => {
-      const foundFamily = fontFamilies.find((el: SingleTokenObject) => el.value === style.fontName.family);
+      const foundFamily = fontFamilies.find((el: SingleToken) => el.value === style.fontName.family);
       const foundFontWeight = fontWeights.find(
-        (el: SingleTokenObject) => el.name.includes(slugify(style.fontName.family)) && el.value === style.fontName?.style,
+        (el: SingleToken) => el.name.includes(slugify(style.fontName.family)) && el.value === style.fontName?.style,
       );
       const foundLineHeight = lineHeights.find(
-        (el: SingleTokenObject) => el.value === convertFigmaToLineHeight(style.lineHeight).toString(),
+        (el: SingleToken) => el.value === convertFigmaToLineHeight(style.lineHeight).toString(),
       );
-      const foundFontSize = fontSizes.find((el: SingleTokenObject) => el.value === style.fontSize.toString());
+      const foundFontSize = fontSizes.find((el: SingleToken) => el.value === style.fontSize.toString());
       const foundLetterSpacing = letterSpacing.find(
-        (el: SingleTokenObject) => el.value === convertFigmaToLetterSpacing(style.letterSpacing).toString(),
+        (el: SingleToken) => el.value === convertFigmaToLetterSpacing(style.letterSpacing).toString(),
       );
       const foundParagraphSpacing = paragraphSpacing.find(
-        (el: SingleTokenObject) => el.value === style.paragraphSpacing.toString(),
+        (el: SingleToken) => el.value === style.paragraphSpacing.toString(),
       );
       const foundTextCase = textCase.find(
-        (el: SingleTokenObject) => el.value === convertFigmaToTextCase(style.textCase.toString()),
+        (el: SingleToken) => el.value === convertFigmaToTextCase(style.textCase.toString()),
       );
       const foundTextDecoration = textDecoration.find(
-        (el: SingleTokenObject) => el.value === convertFigmaToTextDecoration(style.textDecoration.toString()),
+        (el: SingleToken) => el.value === convertFigmaToTextDecoration(style.textDecoration.toString()),
       );
 
       const obj = {
@@ -178,7 +180,7 @@ export default function pullStyles(styleTypes: PullStyleTypes): void {
         .map((section) => section.trim())
         .join('.');
 
-      const styleObject: SingleTokenObject = { name: normalizedName, value: obj, type: 'typography' };
+      const styleObject: SingleToken = { name: normalizedName, value: obj, type: 'typography' };
 
       if (style.description) {
         styleObject.description = style.description;
@@ -214,7 +216,7 @@ export default function pullStyles(styleTypes: PullStyleTypes): void {
           .map((section) => section.trim())
           .join('.');
 
-        const styleObject: SingleTokenObject = {
+        const styleObject: SingleToken = {
           value: shadows.length > 1 ? shadows : shadows[0],
           type: 'boxShadow',
           name: normalizedName,
