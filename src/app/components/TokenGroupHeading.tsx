@@ -7,7 +7,13 @@ import Heading from './Heading';
 import { RootState } from '../store';
 import useManageTokens from '../store/useManageTokens';
 
-export default function TokenGroupHeading({ label, path, id }) {
+type Props = {
+  id: string
+  label: string
+  path: string
+};
+
+export default function TokenGroupHeading({ label, path, id }: Props) {
   const { editProhibited } = useSelector((state: RootState) => state.tokenState);
   const { deleteGroup } = useManageTokens();
 

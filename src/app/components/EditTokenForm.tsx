@@ -17,7 +17,6 @@ import useTokens from '../store/useTokens';
 
 function EditTokenForm({ resolvedTokens }) {
   const { activeTokenSet } = useSelector((state: RootState) => state.tokenState);
-  console.log('ts', useSelector((state: RootState) => state.tokenState));
   const { editSingleToken, createSingleToken } = useManageTokens();
   const { remapToken } = useTokens();
   const { editToken } = useSelector((state: RootState) => state.uiState);

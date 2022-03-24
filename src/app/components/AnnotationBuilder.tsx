@@ -5,6 +5,7 @@ import createAnnotation from './createAnnotation';
 
 export default function AnnotationBuilder() {
   const uiState = useSelector((state: RootState) => state.uiState);
+
   return (
     <div>
       {Object.entries(uiState.mainNodeSelectionValues).length > 0 && (
