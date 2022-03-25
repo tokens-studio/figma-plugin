@@ -205,14 +205,10 @@ function TokenButton({
   const onDragStart = (e) => {
     e.stopPropagation();
     setDraggedToken(token);
-    setTimeout(() => {
-      e.target.classList.add('drag-item');
-    }, 0);
   };
   const onDragEnd = (e) => {
     e.stopPropagation();
     setDragOverToken(null);
-    e.target.classList.remove('drag-item');
   };
   const onDrag = (e) => e.stopPropagation();
   const onDragEnter = (e) => e.stopPropagation();
@@ -229,7 +225,7 @@ function TokenButton({
     let draggedTokenIndex = null;
     let dropTokenIndex = null;
 
-    if (draggedToken && token) {
+    if (draggedToken && token && draggedToken.type === token.type) {
       tokenState.tokens[tokenState.activeTokenSet].forEach((element, index) => {
         if (element.name === draggedToken.name) draggedTokenIndex = index;
         if (element.name === token.name) dropTokenIndex = index;
@@ -250,7 +246,7 @@ function TokenButton({
 
   const checkDragOverToken = () => {
     // this method is to understand dragItem and dropItem are at the same level in the hierarchy and are of same type
-    if (draggedToken && dragOverToken === token && isNaN(token.name) && draggedToken.type === dragOverToken.type) {
+    if (draggedToken && dragOverToken === token && checkIfDraggable() && draggedToken.type === dragOverToken.type) {
       const draggedItemName = draggedToken?.name.split('.');
       const dragOverName = dragOverToken?.name.split('.');
       const draggedItemNameArray = draggedItemName.slice(0, draggedItemName.length - 1);
@@ -262,8 +258,10 @@ function TokenButton({
     }
   };
 
+  const checkIfDraggable = () => isNaN(token?.name.split('.')[token?.name.split('.').length - 1]);
+
   const draggerProps = {
-    draggable: true,
+    draggable: !!checkIfDraggable(),
     onDrag,
     onDrop,
     onDragEnd,

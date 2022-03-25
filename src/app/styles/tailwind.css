@@ -462,21 +462,13 @@ input.input {
   border: 1px solid var(--black);
 }
 
-.drag-item {
-  display: none;
-}
-
-.drag-over-item {
-  margin-left: 8px;
-}
-
 .drag-over-item-absolute {
   position: absolute;
   content: '';
-  width: 4px;
+  width: 5px;
   height: 24px;
   top: 0px;
-  left: -8px;
+  left: -4px;
   background-color: var(--blue);
 }
 
