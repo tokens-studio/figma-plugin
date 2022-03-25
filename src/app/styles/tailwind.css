@@ -462,6 +462,16 @@ input.input {
   border: 1px solid var(--black);
 }
 
+.drag-over-item-absolute {
+  position: absolute;
+  content: '';
+  width: 5px;
+  height: 24px;
+  top: 0px;
+  left: -4px;
+  background-color: var(--blue);
+}
+
 .radio__label {
   align-items: center;
   color: var(--black8);

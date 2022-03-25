@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store';
 import Icon from './Icon';
@@ -11,6 +12,8 @@ function TokenTree({
   tokenValues, showNewForm, showForm, schema, path = null, type = '', resolvedTokens,
 }) {
   const { editProhibited } = useSelector((state: RootState) => state.tokenState);
+  const [draggedToken, setDraggedToken] = useState(null);
+  const [dragOverToken, setDragOverToken] = useState(null);
 
   return (
     <div className="flex justify-start flex-row flex-wrap">
@@ -54,6 +57,10 @@ function TokenTree({
                 token={value}
                 showForm={showForm}
                 resolvedTokens={resolvedTokens}
+                draggedToken={draggedToken}
+                dragOverToken={dragOverToken}
+                setDraggedToken={setDraggedToken}
+                setDragOverToken={setDragOverToken}
               />
             )}
           </React.Fragment>
