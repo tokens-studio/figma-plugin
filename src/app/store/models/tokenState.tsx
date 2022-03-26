@@ -45,6 +45,7 @@ interface TokenState {
   activeTokenSet: string;
   usedTokenSet: string[];
   editProhibited: boolean;
+  hasUnsavedChanges: boolean;
 }
 
 export const tokenState = createModel<RootModel>()({
@@ -60,6 +61,7 @@ export const tokenState = createModel<RootModel>()({
     activeTokenSet: 'global',
     usedTokenSet: ['global'],
     editProhibited: false,
+    hasUnsavedChanges: false,
   } as unknown as TokenState,
   reducers: {
     setEditProhibited(state, payload: boolean) {
@@ -168,6 +170,12 @@ export const tokenState = createModel<RootModel>()({
           ...state.tokens,
           ...values,
         },
+      };
+    },
+    setHasUnsavedChanges(state, payload: boolean) {
+      return {
+        ...state,
+        hasUnsavedChanges: payload,
       };
     },
     setTokens: (state, newTokens) => ({

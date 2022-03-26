@@ -1,11 +1,11 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Reorder } from 'framer-motion';
-import { debounce } from 'lodash';
 import Box from './Box';
 import { Dispatch, RootState } from '../store';
 import { TreeItem } from './utils/getTree';
 import { TokenSetItem2 } from './TokenSetItem';
+import useConfirm from '../hooks/useConfirm';
 
 function getList(items) {
   return items.map((item) => ({
@@ -29,7 +29,10 @@ export default function TokenSetList({
   onDelete: (tokenSet: string) => void;
   onReorder: (tokenSets: string[]) => void;
 }) {
-  const { activeTokenSet, usedTokenSet, editProhibited } = useSelector((state: RootState) => state.tokenState);
+  const { confirm } = useConfirm();
+  const {
+    activeTokenSet, usedTokenSet, editProhibited, hasUnsavedChanges,
+  } = useSelector((state: RootState) => state.tokenState);
   const dispatch = useDispatch<Dispatch>();
   const [items, setItems] = React.useState(getList(tokenSets));
 
@@ -37,9 +40,16 @@ export default function TokenSetList({
     setItems(getList(tokenSets));
   }, [tokenSets]);
 
-  function handleClick(set) {
+  async function handleClick(set) {
     if (set.type === 'set') {
-      dispatch.tokenState.setActiveTokenSet(set.path);
+      if (hasUnsavedChanges) {
+        const userChoice = await confirm({ text: 'You have unsaved changes.', description: 'Your changes will be discarded.' });
+        if (userChoice) {
+          dispatch.tokenState.setActiveTokenSet(set.path);
+        }
+      } else {
+        dispatch.tokenState.setActiveTokenSet(set.path);
+      }
     }
   }
 
