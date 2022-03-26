@@ -9,6 +9,7 @@ import { Dispatch, RootState } from '../store';
 import useStorage from './useStorage';
 import { useGitHub } from './providers/github';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
+import { FeatureFlags } from '@/utils/featureFlags';
 
 export default function useRemoteTokens() {
   const dispatch = useDispatch<Dispatch>();
@@ -21,7 +22,7 @@ export default function useRemoteTokens() {
   } = useGitHub();
   const { pullTokensFromURL } = useURL();
 
-  const pullTokens = async (context = api) => {
+  const pullTokens = async (context = api, featureFlags?: FeatureFlags) => {
     track('pullTokens', { provider: context.provider });
 
     dispatch.uiState.startJob({
@@ -37,7 +38,7 @@ export default function useRemoteTokens() {
         break;
       }
       case StorageProviderType.GITHUB: {
-        tokenValues = await pullTokensFromGitHub(context);
+        tokenValues = await pullTokensFromGitHub(context, featureFlags);
         break;
       }
       case StorageProviderType.URL: {

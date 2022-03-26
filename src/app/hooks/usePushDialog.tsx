@@ -6,16 +6,15 @@ function usePushDialog() {
   const { showPushDialog } = useSelector((state: RootState) => state.uiState);
   const dispatch = useDispatch<Dispatch>();
 
-  const pushDialog = (givenState): Promise<{ commitMessage: string; customBranch: string }> => {
+  const pushDialog = (givenState?: string): Promise<{ commitMessage: string; customBranch: string }> => {
     if (givenState) {
       dispatch.uiState.setShowPushDialog(givenState);
     } else {
       dispatch.uiState.setShowPushDialog('initial');
-
-      return new Promise((res, rej) => {
-        resolveCallback = res;
-      });
     }
+    return new Promise((res) => {
+      resolveCallback = res;
+    });
   };
 
   const closeDialog = () => {

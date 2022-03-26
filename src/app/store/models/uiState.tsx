@@ -9,6 +9,7 @@ import fetchChangelog from '@/utils/storyblok';
 import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 import { postToFigma } from '@/plugin/notifiers';
 import { MessageToPluginTypes } from '@/types/messages';
+import { FeatureFlags } from '@/utils/featureFlags';
 
 type TabNames = 'start' | 'tokens' | 'json' | 'inspector' | 'syncsettings' | 'settings';
 
@@ -97,6 +98,7 @@ export interface UIState {
   showEmptyGroups: boolean;
   collapsed: boolean;
   selectedLayers: number;
+  featureFlags: FeatureFlags
 }
 
 const defaultConfirmState: ConfirmProps = {
@@ -138,6 +140,7 @@ export const uiState = createModel<RootModel>()({
     showEmptyGroups: true,
     collapsed: false,
     selectedLayers: 0,
+    featureFlags: {},
   } as unknown as UIState,
   reducers: {
     setShowPushDialog: (state, data: string | false) => ({
@@ -291,6 +294,12 @@ export const uiState = createModel<RootModel>()({
       return {
         ...state,
         collapsed: !state.collapsed,
+      };
+    },
+    setFeatureFlags(state, payload: FeatureFlags) {
+      return {
+        ...state,
+        featureFlags: payload,
       };
     },
     addJobTasks(state, payload: AddJobTasksPayload) {

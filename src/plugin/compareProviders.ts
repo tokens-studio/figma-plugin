@@ -2,7 +2,7 @@ import isSameCredentials from '@/utils/isSameCredentials';
 import { MessageFromPluginTypes } from '../types/messages';
 import { notifyTokenValues } from './notifiers';
 
-export default function compareProvidersWithStored(providers, storageType) {
+export default function compareProvidersWithStored(providers, storageType, featureFlagId = null) {
   if (providers) {
     const parsedProviders = JSON.parse(providers);
 
@@ -13,6 +13,7 @@ export default function compareProvidersWithStored(providers, storageType) {
         type: MessageFromPluginTypes.API_CREDENTIALS,
         status: true,
         credentials: matchingSet,
+        featureFlagId,
       });
       return;
     }
