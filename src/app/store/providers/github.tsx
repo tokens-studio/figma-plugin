@@ -58,7 +58,9 @@ function getTreeMode(type) {
   }
 }
 
-export const readContents = async ({ context, owner, repo }) => {
+export const readContents = async ({
+  context, owner, repo, opts,
+}) => {
   const octokit = new Octokit({ auth: context.secret, baseUrl: context.baseUrl });
   let response;
 
@@ -69,10 +71,9 @@ export const readContents = async ({ context, owner, repo }) => {
       path: context.filePath,
       ref: context.branch,
     });
-    console.log('RES', response);
 
     const fileContents: Array<{ name: string, data: string }> = [];
-    if (Array.isArray(response.data)) {
+    if (Array.isArray(response.data) && opts.multiFile) {
       const folderResponse = await octokit.rest.git.createTree({ owner, repo, tree: response.data.map((item) => ({ path: item.path, sha: item.sha, mode: getTreeMode(item.type) })) });
       if (folderResponse.data.tree[0].sha) {
         const treeResponse = await octokit.rest.git.getTree({
@@ -98,7 +99,6 @@ export const readContents = async ({ context, owner, repo }) => {
           );
         }
       }
-      console.log('File contents', fileContents);
 
       if (fileContents.length > 0) {
         // If we receive multiple files, parse each
@@ -116,8 +116,6 @@ export const readContents = async ({ context, owner, repo }) => {
         return allContents ? { values: allContents } : null;
       }
     } else if ('content' in response.data) {
-      console.log('Single file', response.data);
-
       const data = atob(response.data.content);
       // If content of file is parseable JSON, parse it
       if (IsJSONString(data)) {
@@ -136,11 +134,11 @@ export const readContents = async ({ context, owner, repo }) => {
   }
 };
 
-const extractFiles = (filePath, tokenObj) => {
+const extractFiles = (filePath, tokenObj, opts) => {
   const files = {};
   if (filePath.endsWith('.json')) {
     files[filePath] = JSON.stringify(tokenObj, null, 2);
-  } else {
+  } else if (opts.multiFile) {
     Object.keys(tokenObj).forEach((key) => {
       files[`${filePath}/${key}.json`] = JSON.stringify(tokenObj[key], null, 2);
     });
@@ -149,8 +147,8 @@ const extractFiles = (filePath, tokenObj) => {
   return files;
 };
 
-const createOrUpdateFiles = (octokit, context) => {
-  const files = extractFiles(context.filePath, context.tokenObj);
+const createOrUpdateFiles = (octokit, context, opts) => {
+  const files = extractFiles(context.filePath, context.tokenObj, opts);
 
   return octokit.repos.createOrUpdateFiles({
     owner: context.owner,
@@ -163,7 +161,7 @@ const createOrUpdateFiles = (octokit, context) => {
 
 export function useGitHub() {
   const { tokens } = useSelector((state: RootState) => state.tokenState);
-  const { localApiState } = useSelector((state: RootState) => state.uiState);
+  const { localApiState, featureFlags } = useSelector((state: RootState) => state.uiState);
   const dispatch = useDispatch<Dispatch>();
 
   const { confirm } = useConfirm();
@@ -216,7 +214,7 @@ export function useGitHub() {
           tokenObj,
           createNewBranch: false,
           commitMessage: commitMessage || 'Commit from Figma',
-        });
+        }, { multiFile: featureFlags.gh_mfs_enabled });
       } else {
         response = await createOrUpdateFiles(octokit, {
           owner,
@@ -226,9 +224,9 @@ export function useGitHub() {
           tokenObj,
           createNewBranch: true,
           commitMessage: commitMessage || 'Commit from Figma',
-        });
+        }, { multiFile: featureFlags.gh_mfs_enabled });
       }
-      dispatch.tokenState.setLastSyncedState(tokenObj);
+      dispatch.tokenState.setLastSyncedState(JSON.stringify(tokenObj, null, 2));
       notifyToUI('Pushed changes to GitHub');
       return response;
     } catch (e) {
@@ -242,7 +240,10 @@ export function useGitHub() {
     const { raw: rawTokenObj, string: tokenObj } = getTokenObj();
     const [owner, repo] = context.id.split('/');
 
-    const content = await readContents({ context, owner, repo });
+    const content = await readContents({
+      context, owner, repo, opts: { multiFile: featureFlags.gh_mfs_enabled },
+    });
+
     if (content) {
       if (content && hasSameContent(content, tokenObj)) {
         notifyToUI('Nothing to commit');
@@ -280,13 +281,17 @@ export function useGitHub() {
     dispatch.tokenState.setEditProhibited(!hasWriteAccess);
   }
 
-  async function pullTokensFromGitHub(context) {
+  async function pullTokensFromGitHub(context, receivedFeatureFlags) {
+    const multiFile = receivedFeatureFlags ? receivedFeatureFlags.gh_mfs_enabled : featureFlags.gh_mfs_enabled;
+
     const [owner, repo] = context.id.split('/');
 
     await checkAndSetAccess({ context, owner, repo });
 
     try {
-      const content = await readContents({ context, owner, repo });
+      const content = await readContents({
+        context, owner, repo, opts: { multiFile },
+      });
 
       if (content) {
         return content;

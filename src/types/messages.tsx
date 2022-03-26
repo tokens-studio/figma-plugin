@@ -133,6 +133,7 @@ export type ApiCredentialsFromPluginMessage = {
   credentials: ApiDataType & {
     internalId?: string
   }
+  featureFlagId: string
 };
 export type PostToUIMessage =
     | NoSelectionFromPluginMessage
