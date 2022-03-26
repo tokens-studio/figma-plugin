@@ -45,6 +45,11 @@ module.exports = (env, argv) => ({
         test: /\.svg$/,
         use: ['@svgr/webpack'],
       },
+      {
+        type: 'javascript/auto',
+        test: /\.mjs$/,
+        include: /node_modules/,
+      },
     ],
   },
 

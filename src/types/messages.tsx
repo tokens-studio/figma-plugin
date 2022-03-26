@@ -199,9 +199,7 @@ export type SetStorageTypeToPluginMessage = {
 export type NotifyToPluginMessage = {
   type: MessageToPluginTypes.NOTIFY;
   msg: string;
-  opts: {
-    timeout?: number;
-  };
+  opts: NotificationOptions;
 };
 export type SetUiToPluginMessage = SettingsState & {
   type: MessageToPluginTypes.SET_UI;

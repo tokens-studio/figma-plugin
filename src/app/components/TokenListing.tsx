@@ -1,5 +1,7 @@
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { HTML5Backend } from 'react-dnd-html5-backend';
+import { DndProvider } from 'react-dnd';
 import { SingleTokenObject } from '@/types/tokens';
 import Heading from './Heading';
 import Icon from './Icon';
@@ -77,7 +79,7 @@ function TokenListing({
 
   return (
     <div className="border-b border-gray-200" data-cy={`tokenlisting-${tokenKey}`}>
-      <div className="flex justify-between space-x-8 items-center relative">
+      <div className="relative flex items-center justify-between space-x-8">
         <button
           className={`flex items-center w-full h-full p-4 space-x-2 hover:bg-gray-100 focus:outline-none ${
             isIntCollapsed ? 'opacity-50' : null
@@ -101,7 +103,7 @@ function TokenListing({
           </Tooltip>
           <Heading size="small">{label}</Heading>
         </button>
-        <div className="flex absolute right-0 mr-2">
+        <div className="absolute right-0 flex mr-2">
           {showDisplayToggle && (
             <Tooltip label={displayType === 'GRID' ? 'Show as List' : 'Show as Grid'}>
               <button
@@ -130,19 +132,22 @@ function TokenListing({
         </div>
       </div>
       {values && (
-        <div
-          className={`px-4 pb-4 ${isIntCollapsed ? 'hidden' : null}`}
-          data-cy={`tokenlisting-${tokenKey}-content`}
-        >
-          <TokenTree
-            tokenValues={values}
-            showNewForm={showNewForm}
-            showForm={showForm}
-            schema={schema}
-            type={tokenType}
-            resolvedTokens={resolvedTokens}
-          />
-        </div>
+        <DndProvider backend={HTML5Backend}>
+          <div
+            className={`px-4 pb-4 ${isIntCollapsed ? 'hidden' : null}`}
+            data-cy={`tokenlisting-${tokenKey}-content`}
+          >
+            <TokenTree
+              tokenValues={values}
+              showNewForm={showNewForm}
+              showForm={showForm}
+              schema={schema}
+              type={tokenType}
+              displayType={displayType}
+              resolvedTokens={resolvedTokens}
+            />
+          </div>
+        </DndProvider>
       )}
     </div>
   );

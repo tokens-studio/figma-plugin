@@ -92,7 +92,6 @@ export interface UIState {
   editToken: EditTokenObject | null;
   showEditForm: boolean;
   tokenFilter: string;
-  tokenFilterVisible: boolean;
   confirmState: ConfirmProps;
   showPushDialog: string | false;
   showEmptyGroups: boolean;
@@ -274,12 +273,6 @@ export const uiState = createModel<RootModel>()({
       return {
         ...state,
         lastOpened: payload,
-      };
-    },
-    toggleFilterVisibility(state) {
-      return {
-        ...state,
-        tokenFilterVisible: !state.tokenFilterVisible,
       };
     },
     setTokenFilter(state, payload: string) {

@@ -8,7 +8,7 @@ const StyledIndicator = styled('div', {
   top: '3px',
   right: '3px',
   borderRadius: '100%',
-  border: '1px solid $white',
+  border: '1px solid $bgDefault',
   background: '$dangerFg',
   width: '6px',
   height: '6px',
