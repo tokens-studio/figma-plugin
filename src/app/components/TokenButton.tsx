@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { track } from '@/utils/analytics';
-import { SingleTokenObject } from '@/types/tokens';
+import { SingleToken } from '@/types/tokens';
 import getAliasValue from '@/utils/aliases';
 import MoreButton from './MoreButton';
 import { lightOrDark } from './utils';
@@ -35,11 +35,11 @@ function TokenButton({
   setDragOverToken,
 }: {
   type: string | object;
-  token: SingleTokenObject;
+  token: SingleToken;
   showForm: Function;
-  resolvedTokens: SingleTokenObject[];
-  draggedToken: SingleTokenObject | null;
-  dragOverToken: SingleTokenObject | null;
+  resolvedTokens: SingleToken[];
+  draggedToken: SingleToken | null;
+  dragOverToken: SingleToken | null;
   setDraggedToken: Function;
   setDragOverToken: Function;
 }) {

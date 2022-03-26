@@ -1,7 +1,7 @@
 import React from 'react';
 import Box from './Box';
 import useTokens from '../store/useTokens';
-import { SingleTokenObject } from '@/types/tokens';
+import { SingleToken } from '@/types/tokens';
 
 function SingleShadow({ shadow }) {
   return (
@@ -23,7 +23,7 @@ function SingleShadow({ shadow }) {
 }
 
 // Returns token value in display format
-export default function TokenTooltip({ token, resolvedTokens, shouldResolve = false }: { token: SingleTokenObject, resolvedTokens: SingleTokenObject[], shouldResolve?: boolean }) {
+export default function TokenTooltip({ token, resolvedTokens, shouldResolve = false }: { token: SingleToken, resolvedTokens: SingleToken[], shouldResolve?: boolean }) {
   const { getTokenValue } = useTokens();
 
   try {

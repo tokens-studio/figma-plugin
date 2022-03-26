@@ -1,4 +1,6 @@
-function formatDate(date) {
+import { StoryblokStory } from '@/types';
+
+function formatDate(date?: number | Date) {
   const formatter = new Intl.DateTimeFormat('en', {
     year: 'numeric',
     month: '2-digit',
@@ -12,7 +14,7 @@ function formatDate(date) {
   return `${year.value}-${month.value}-${day.value} ${hour.value}:${minute.value}`;
 }
 
-export default async function fetchChangelog(lastOnline: Date, setChangelog): Promise<void> {
+export default async function fetchChangelog(lastOnline: Date, setChangelog: (stories: StoryblokStory['content'][]) => void): Promise<void> {
   if (process.env.STORYBLOK_ACCESS_TOKEN) {
     const token = process.env.STORYBLOK_ACCESS_TOKEN;
     const formattedDate = formatDate(new Date(lastOnline));
@@ -29,11 +31,12 @@ export default async function fetchChangelog(lastOnline: Date, setChangelog): Pr
       },
     );
 
-    const res = await response.json();
+    const res = await response.json() as {
+      stories: StoryblokStory[];
+    };
     if (res.stories) {
       const stories = res.stories.map((story) => ({ ...story.content }));
       setChangelog(stories);
     }
   }
-  return null;
 }

@@ -2,47 +2,33 @@
 import { createModel } from '@rematch/core';
 import { StorageType, StorageProviderType, ApiDataType } from '@/types/api';
 import { track } from '@/utils/analytics';
-import { ShadowTokenSingleValue, TypographyObject } from '@/types/propertyTypes';
-import { SelectionGroup, TokenType } from '@/types/tokens';
-import type { RootModel } from '.';
+import type { RootModel } from '@/types/RootModel';
 import fetchChangelog from '@/utils/storyblok';
 import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 import { postToFigma } from '@/plugin/notifiers';
 import { MessageToPluginTypes } from '@/types/messages';
+import { TokenTypes } from '@/constants/TokenTypes';
+import { SingleToken } from '@/types/tokens';
+import { SelectionGroup, StoryblokStory } from '@/types';
+import { Tabs } from '@/constants/Tabs';
 import { FeatureFlags } from '@/utils/featureFlags';
-
-type TabNames = 'start' | 'tokens' | 'json' | 'inspector' | 'syncsettings' | 'settings';
 
 type DisplayType = 'GRID' | 'LIST';
 
 type SelectionValue = NodeTokenRefMap;
 
-interface EditTokenObjectCommonProperties {
-  name: string;
+export type EditTokenObject = SingleToken<true, {
   initialName: string;
   path: string;
   isPristine: boolean;
   explainer?: string;
   property: string;
+  // @TODO get rid of thse object types
   schema: object;
   optionsSchema: object;
   options: object;
-  type: TokenType;
-}
-
-export type EditTokenObject =
-    | (EditTokenObjectCommonProperties & {
-      type: 'boxShadow';
-      value: ShadowTokenSingleValue[] | ShadowTokenSingleValue;
-    })
-    | (EditTokenObjectCommonProperties & {
-      type: 'typography';
-      value: TypographyObject;
-    })
-    | (EditTokenObjectCommonProperties & {
-      type: TokenType;
-      value: string | number;
-    });
+  type: TokenTypes;
+}>;
 
 export type ConfirmProps = {
   show?: boolean;
@@ -81,14 +67,14 @@ export interface UIState {
   mainNodeSelectionValues: SelectionValue
   displayType: DisplayType;
   disabled: boolean;
-  activeTab: TabNames;
+  activeTab: Tabs;
   projectURL: string;
   storageType: StorageType;
   api: ApiDataType;
   apiProviders: ApiDataType[];
   localApiState: ApiDataType;
   lastUpdatedAt: Date | null;
-  changelog: object[];
+  changelog: StoryblokStory['content'][];
   lastOpened: number | null;
   editToken: EditTokenObject | null;
   showEditForm: boolean;
@@ -117,7 +103,7 @@ export const uiState = createModel<RootModel>()({
     disabled: false,
     displayType: 'GRID',
     backgroundJobs: [],
-    activeTab: 'start',
+    activeTab: Tabs.START,
     projectURL: '',
     storageType: {
       provider: StorageProviderType.LOCAL,
@@ -230,7 +216,7 @@ export const uiState = createModel<RootModel>()({
         backgroundJobs: [],
       };
     },
-    setActiveTab(state, payload: TabNames) {
+    setActiveTab(state, payload: Tabs) {
       return {
         ...state,
         activeTab: payload,
@@ -266,7 +252,7 @@ export const uiState = createModel<RootModel>()({
         apiProviders: payload,
       };
     },
-    setChangelog(state, payload: object[]) {
+    setChangelog(state, payload: StoryblokStory['content'][]) {
       return {
         ...state,
         changelog: payload,
@@ -284,7 +270,7 @@ export const uiState = createModel<RootModel>()({
         tokenFilter: payload,
       };
     },
-    toggleShowEmptyGroups(state, payload?: boolean) {
+    toggleShowEmptyGroups(state, payload: boolean | null) {
       return {
         ...state,
         showEmptyGroups: payload == null ? !state.showEmptyGroups : payload,
@@ -344,15 +330,15 @@ export const uiState = createModel<RootModel>()({
         dispatch.uiState.setChangelog(result);
       });
     },
-    setActiveTab: (payload) => {
-      const requiresSelectionValues = payload === 'inspector';
+    setActiveTab: (payload: Tabs) => {
+      const requiresSelectionValues = payload === Tabs.INSPECTOR;
 
       postToFigma({
         type: MessageToPluginTypes.CHANGED_TABS,
         requiresSelectionValues,
       });
     },
-    toggleShowEmptyGroups(payload, rootState) {
+    toggleShowEmptyGroups(payload: null | boolean, rootState) {
       postToFigma({
         type: MessageToPluginTypes.SET_SHOW_EMPTY_GROUPS,
         showEmptyGroups: payload == null ? rootState.uiState.showEmptyGroups : payload,

@@ -1,6 +1,6 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { SelectionGroup, SingleTokenObject } from '@/types/tokens';
+import { SingleToken } from '@/types/tokens';
 import Box from './Box';
 import Checkbox from './Checkbox';
 import IconButton from './IconButton';
@@ -9,8 +9,9 @@ import IconLayers from '@/icons/layers.svg';
 import IconDisclosure from '@/icons/disclosure.svg';
 import InspectorResolvedToken from './InspectorResolvedToken';
 import { Dispatch, RootState } from '../store';
+import { SelectionGroup } from '@/types';
 
-export default function InspectorTokenSingle({ token, resolvedTokens }: { token: SelectionGroup, resolvedTokens: SingleTokenObject[] }) {
+export default function InspectorTokenSingle({ token, resolvedTokens }: { token: SelectionGroup, resolvedTokens: SingleToken[] }) {
   const { handleRemap, getTokenValue } = useTokens();
   const inspectState = useSelector((state: RootState) => state.inspectState);
   const dispatch = useDispatch<Dispatch>();

@@ -4,10 +4,10 @@ import { RootState } from '../store';
 import Box from './Box';
 import Blankslate from './Blankslate';
 import AnnotationBuilder from './AnnotationBuilder';
-import { SingleTokenObject } from '@/types/tokens';
+import { SingleToken } from '@/types/tokens';
 import useTokens from '../store/useTokens';
 
-export default function InspectorDebugView({ resolvedTokens }: { resolvedTokens: SingleTokenObject[] }) {
+export default function InspectorDebugView({ resolvedTokens }: { resolvedTokens: SingleToken[] }) {
   const uiState = useSelector((state: RootState) => state.uiState);
   const { getTokenValue } = useTokens();
 

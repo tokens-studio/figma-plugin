@@ -2,7 +2,7 @@ import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { DndProvider } from 'react-dnd';
-import { SingleTokenObject } from '@/types/tokens';
+import { SingleToken } from '@/types/tokens';
 import Heading from './Heading';
 import Icon from './Icon';
 import TokenTree from './TokenTree';
@@ -29,7 +29,7 @@ function TokenListing({
   property: string;
   tokenType: string;
   values: object;
-  resolvedTokens: SingleTokenObject[];
+  resolvedTokens: SingleToken[];
 }) {
   const { editProhibited } = useSelector((state: RootState) => state.tokenState);
   const { displayType, showEmptyGroups, collapsed } = useSelector((state: RootState) => state.uiState);

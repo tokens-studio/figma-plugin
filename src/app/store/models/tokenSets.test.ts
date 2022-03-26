@@ -1,8 +1,11 @@
-import { init } from '@rematch/core';
-import { models, RootModel } from './index';
+import { init, RematchStore } from '@rematch/core';
+import { RootModel } from '@/types/RootModel';
+import { models } from './index';
+
+type Store = RematchStore<RootModel, Record<string, never>>;
 
 describe('toggleUsedTokenSet', () => {
-  let store;
+  let store: Store;
   beforeEach(() => {
     store = init<RootModel>({
       redux: {
@@ -38,7 +41,7 @@ describe('toggleUsedTokenSet', () => {
 });
 
 describe('setActiveTokenSet', () => {
-  let store;
+  let store: Store;
   beforeEach(() => {
     store = init<RootModel>({
       redux: {
@@ -66,7 +69,7 @@ describe('setActiveTokenSet', () => {
 });
 
 describe('deleteTokenSet', () => {
-  let store;
+  let store: Store;
   beforeEach(() => {
     store = init<RootModel>({
       redux: {
@@ -108,7 +111,7 @@ describe('deleteTokenSet', () => {
 });
 
 describe('renameTokenSet', () => {
-  let store;
+  let store: Store;
   beforeEach(() => {
     store = init<RootModel>({
       redux: {
@@ -155,7 +158,7 @@ describe('renameTokenSet', () => {
 });
 
 describe('addTokenSet', () => {
-  let store;
+  let store: Store;
   beforeEach(() => {
     store = init<RootModel>({
       redux: {

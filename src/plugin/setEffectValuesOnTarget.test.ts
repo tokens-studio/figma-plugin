@@ -1,12 +1,14 @@
-import { SingleTokenObject } from '@/types/tokens';
+import { BoxShadowTypes } from '@/constants/BoxShadowTypes';
+import { TokenTypes } from '@/constants/TokenTypes';
+import { SingleToken } from '@/types/tokens';
 import setEffectValuesOnTarget from './setEffectValuesOnTarget';
 
-const singleShadowToken: SingleTokenObject = {
+const singleShadowToken: SingleToken = {
   name: 'shadow.large',
-  type: 'boxShadow',
+  type: TokenTypes.BOX_SHADOW,
   description: 'the one with one shadow',
   value: {
-    type: 'dropShadow',
+    type: BoxShadowTypes.DROP_SHADOW,
     color: '#00000080',
     x: 0,
     y: 0,
@@ -15,13 +17,13 @@ const singleShadowToken: SingleTokenObject = {
   },
 };
 
-const multipleShadowToken: SingleTokenObject = {
+const multipleShadowToken: SingleToken = {
   name: 'shadow.xlarge',
-  type: 'boxShadow',
+  type: TokenTypes.BOX_SHADOW,
   description: 'the one with multiple shadow',
   value: [
     {
-      type: 'dropShadow',
+      type: BoxShadowTypes.DROP_SHADOW,
       color: '#00000080',
       x: 0,
       y: 0,
@@ -29,7 +31,7 @@ const multipleShadowToken: SingleTokenObject = {
       spread: 4,
     },
     {
-      type: 'dropShadow',
+      type: BoxShadowTypes.DROP_SHADOW,
       color: '#000000',
       x: 0,
       y: '4px',
@@ -37,7 +39,7 @@ const multipleShadowToken: SingleTokenObject = {
       spread: 4,
     },
     {
-      type: 'dropShadow',
+      type: BoxShadowTypes.DROP_SHADOW,
       color: '#000000',
       x: '0px',
       y: 8,
@@ -46,13 +48,13 @@ const multipleShadowToken: SingleTokenObject = {
     },
   ],
 };
-const mixedShadowToken: SingleTokenObject = {
+const mixedShadowToken: SingleToken = {
   name: 'shadow.mixed',
-  type: 'boxShadow',
+  type: TokenTypes.BOX_SHADOW,
   description: 'the one with mixed shadows',
   value: [
     {
-      type: 'innerShadow',
+      type: BoxShadowTypes.INNER_SHADOW,
       color: '#00000080',
       x: 0,
       y: 0,
@@ -60,7 +62,7 @@ const mixedShadowToken: SingleTokenObject = {
       spread: 4,
     },
     {
-      type: 'dropShadow',
+      type: BoxShadowTypes.DROP_SHADOW,
       color: '#000000',
       x: 0,
       y: 4,
@@ -68,7 +70,7 @@ const mixedShadowToken: SingleTokenObject = {
       spread: 4,
     },
     {
-      type: 'dropShadow',
+      type: BoxShadowTypes.DROP_SHADOW,
       color: '#000000',
       x: 0,
       y: 8,
@@ -86,7 +88,7 @@ describe('setEffectValuesOnTarget', () => {
       type: 'RECTANGLE',
       fills: [],
       effects: [],
-    };
+    } as unknown as RectangleNode;
   });
 
   it('sets single shadow token', async () => {
