@@ -143,6 +143,7 @@ function TokenListing({
               showForm={showForm}
               schema={schema}
               type={tokenType}
+              displayType={displayType}
               resolvedTokens={resolvedTokens}
             />
           </div>

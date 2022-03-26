@@ -9,7 +9,7 @@ import Tooltip from './Tooltip';
 import { isSingleToken, isTypographyToken } from './utils';
 
 function TokenTree({
-  tokenValues, showNewForm, showForm, schema, path = null, type = '', resolvedTokens,
+  tokenValues, showNewForm, showForm, schema, path = null, type = '', resolvedTokens, displayType,
 }) {
   const { editProhibited } = useSelector((state: RootState) => state.tokenState);
   const [draggedToken, setDraggedToken] = useState(null);
@@ -48,6 +48,7 @@ function TokenTree({
                   schema={schema}
                   path={stringPath}
                   type={type}
+                  displayType={displayType}
                   resolvedTokens={resolvedTokens}
                 />
               </div>
@@ -59,6 +60,7 @@ function TokenTree({
                 resolvedTokens={resolvedTokens}
                 draggedToken={draggedToken}
                 dragOverToken={dragOverToken}
+                displayType={displayType}
                 setDraggedToken={setDraggedToken}
                 setDragOverToken={setDragOverToken}
               />
