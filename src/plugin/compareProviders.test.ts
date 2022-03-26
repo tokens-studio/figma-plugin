@@ -18,6 +18,7 @@ describe('compareProvidersWithStored', () => {
 
     expect(figma.ui.postMessage).toHaveBeenCalledWith({
       type: MessageFromPluginTypes.API_CREDENTIALS,
+      featureFlagId: null,
       status: true,
       credentials: firstProvider,
     });

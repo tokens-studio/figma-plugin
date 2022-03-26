@@ -42,10 +42,12 @@ export default function useTokens() {
   }
 
   // Returns formatted tokens for style dictionary
-  function getFormattedTokens({ includeAllTokens = false, includeParent = true, expandTypography = false }) {
+  function getFormattedTokens({
+    includeAllTokens = false, includeParent = true, expandTypography = false, expandShadow = false,
+  }) {
     const tokenSets = includeAllTokens ? Object.keys(tokens) : [activeTokenSet];
     return formatTokens({
-      tokens, tokenSets, includeAllTokens, includeParent, expandTypography,
+      tokens, tokenSets, includeAllTokens, includeParent, expandTypography, expandShadow,
     });
   }
 

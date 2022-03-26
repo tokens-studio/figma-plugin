@@ -59,7 +59,7 @@ function ConfirmDialog() {
       <form onSubmit={handleConfirm} className="flex flex-col justify-center space-y-4 text-center">
         <Box css={{ display: 'flex', gap: '$4', flexDirection: 'column' }}>
           <Box css={{ display: 'flex', gap: '$2', flexDirection: 'column' }}>
-            <Heading>{confirmState?.text && confirmState.text}</Heading>
+            <Heading size="small">{confirmState?.text && confirmState.text}</Heading>
             {confirmState?.description && (
             <Text css={{ color: '$textMuted' }}>{confirmState.description}</Text>
             )}

@@ -26,7 +26,7 @@ async function readTokensFromURL({ secret, id }): Promise<TokenProps> | null {
       const data = await response.json();
       return data;
     }
-    notifyToUI('There was an error connecting, check your sync settings');
+    notifyToUI('There was an error connecting, check your sync settings', { error: true });
     return null;
   }
 }
@@ -61,10 +61,10 @@ export default function useURL() {
           return tokenObj;
         }
 
-        notifyToUI('No tokens stored on remote');
+        notifyToUI('No tokens stored on remote', { error: true });
       }
     } catch (e) {
-      notifyToUI('Error fetching from URL, check console (F12)');
+      notifyToUI('Error fetching from URL, check console (F12)', { error: true });
       console.log('Error:', e);
     }
   }

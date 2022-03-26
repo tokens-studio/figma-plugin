@@ -11,6 +11,7 @@ import { TokenTypes } from '@/constants/TokenTypes';
 import { SingleToken } from '@/types/tokens';
 import { SelectionGroup, StoryblokStory } from '@/types';
 import { Tabs } from '@/constants/Tabs';
+import { FeatureFlags } from '@/utils/featureFlags';
 
 type DisplayType = 'GRID' | 'LIST';
 
@@ -78,12 +79,12 @@ export interface UIState {
   editToken: EditTokenObject | null;
   showEditForm: boolean;
   tokenFilter: string;
-  tokenFilterVisible: boolean;
   confirmState: ConfirmProps;
   showPushDialog: string | false;
   showEmptyGroups: boolean;
   collapsed: boolean;
   selectedLayers: number;
+  featureFlags: FeatureFlags
 }
 
 const defaultConfirmState: ConfirmProps = {
@@ -125,6 +126,7 @@ export const uiState = createModel<RootModel>()({
     showEmptyGroups: true,
     collapsed: false,
     selectedLayers: 0,
+    featureFlags: {},
   } as unknown as UIState,
   reducers: {
     setShowPushDialog: (state, data: string | false) => ({
@@ -262,12 +264,6 @@ export const uiState = createModel<RootModel>()({
         lastOpened: payload,
       };
     },
-    toggleFilterVisibility(state) {
-      return {
-        ...state,
-        tokenFilterVisible: !state.tokenFilterVisible,
-      };
-    },
     setTokenFilter(state, payload: string) {
       return {
         ...state,
@@ -284,6 +280,12 @@ export const uiState = createModel<RootModel>()({
       return {
         ...state,
         collapsed: !state.collapsed,
+      };
+    },
+    setFeatureFlags(state, payload: FeatureFlags) {
+      return {
+        ...state,
+        featureFlags: payload,
       };
     },
     addJobTasks(state, payload: AddJobTasksPayload) {

@@ -1,7 +1,8 @@
 import * as CheckboxPrimitive from '@radix-ui/react-checkbox';
-import { CheckIcon } from '@radix-ui/react-icons';
 import React from 'react';
 import { styled } from '@/stitches.config';
+import IconCheck from '@/icons/check.svg';
+import IconIndeterminate from '@/icons/indeterminate.svg';
 
 const StyledIndicator = styled(CheckboxPrimitive.Indicator, {
   color: '$onInteraction',
@@ -10,13 +11,13 @@ const StyledIndicator = styled(CheckboxPrimitive.Indicator, {
 const StyledCheckbox = styled(CheckboxPrimitive.Root, {
   all: 'unset',
   backgroundColor: '$bgDefault',
-  width: 16,
-  height: 16,
   borderRadius: '$input',
   border: '1px solid $interaction',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
+  width: 12,
+  height: 12,
   '&:focus': { boxShadow: '0 0 0 2px black' },
 
   variants: {
@@ -25,7 +26,12 @@ const StyledCheckbox = styled(CheckboxPrimitive.Root, {
         backgroundColor: '$interaction',
         borderColor: '$interaction',
       },
+      indeterminate: {
+        backgroundColor: '$interactionSubtle',
+        borderColor: '$interactionSubtle',
+      },
     },
+
   },
 });
 
@@ -36,7 +42,7 @@ function Checkbox({
   defaultChecked = false,
   disabled = false,
 }: {
-  checked: boolean;
+  checked: boolean | 'indeterminate';
   id: string;
   onCheckedChange: any;
   defaultChecked?: boolean;
@@ -52,7 +58,8 @@ function Checkbox({
       defaultChecked={defaultChecked}
     >
       <StyledIndicator>
-        <CheckIcon />
+        {checked === 'indeterminate' && <IconIndeterminate />}
+        {checked === true && <IconCheck />}
       </StyledIndicator>
     </StyledCheckbox>
   );

@@ -39,7 +39,7 @@ function Inspector() {
 
   return (
     <Box css={{
-      gap: '$2', flexGrow: 1, display: 'flex', flexDirection: 'column',
+      gap: '$2', flexGrow: 1, display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden',
     }}
     >
       <Box css={{
@@ -65,9 +65,10 @@ function Inspector() {
             </Label>
           </Tooltip>
         </Box>
-        <Box css={{
-          display: 'flex', gap: '$2', flexDirection: 'row', alignItems: 'center',
-        }}
+        <Box
+          css={{
+            display: 'flex', gap: '$2', flexDirection: 'row', alignItems: 'center',
+          }}
         >
           <IconButton
             variant={inspectView === 'multi' ? 'primary' : 'default'}

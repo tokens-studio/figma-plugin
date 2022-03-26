@@ -38,6 +38,7 @@ interface TokenState {
   activeTokenSet: string;
   usedTokenSet: string[];
   editProhibited: boolean;
+  hasUnsavedChanges: boolean;
 }
 
 export const tokenState = createModel<RootModel>()({
@@ -45,7 +46,7 @@ export const tokenState = createModel<RootModel>()({
     tokens: {
       global: [],
     },
-    lastSyncedState: '',
+    lastSyncedState: JSON.stringify({ global: {} }, null, 2),
     importedTokens: {
       newTokens: [],
       updatedTokens: [],
@@ -53,6 +54,7 @@ export const tokenState = createModel<RootModel>()({
     activeTokenSet: 'global',
     usedTokenSet: ['global'],
     editProhibited: false,
+    hasUnsavedChanges: false,
   } as unknown as TokenState,
   reducers: {
     setEditProhibited(state, payload: boolean) {
@@ -67,13 +69,26 @@ export const tokenState = createModel<RootModel>()({
         ? state.usedTokenSet.filter((n) => n !== data)
         : [...new Set([...state.usedTokenSet, data])],
     }),
+    toggleManyTokenSets: (state, data: { shouldCheck: boolean, sets: string[] }) => {
+      if (data.shouldCheck) {
+        const oldSetsWithoutCurrent = state.usedTokenSet.filter((n) => !data.sets.includes(n));
+        return {
+          ...state,
+          usedTokenSet: [...oldSetsWithoutCurrent, ...data.sets],
+        };
+      }
+      return {
+        ...state,
+        usedTokenSet: state.usedTokenSet.filter((n) => !data.sets.includes(n)),
+      };
+    },
     setActiveTokenSet: (state, data: string) => ({
       ...state,
       activeTokenSet: data,
     }),
     addTokenSet: (state, name: string): TokenState => {
       if (name in state.tokens) {
-        notifyToUI('Token set already exists');
+        notifyToUI('Token set already exists', { error: true });
         return state;
       }
       return {
@@ -95,6 +110,10 @@ export const tokenState = createModel<RootModel>()({
     },
     renameTokenSet: (state, data: { oldName: string; newName: string }) => {
       const oldTokens = state.tokens;
+      if (Object.keys(oldTokens).includes(data.newName) && data.oldName !== data.newName) {
+        notifyToUI('Token set already exists', { error: true });
+        return state;
+      }
       oldTokens[data.newName] = oldTokens[data.oldName];
       delete oldTokens[data.oldName];
       return {
@@ -146,6 +165,16 @@ export const tokenState = createModel<RootModel>()({
         },
       };
     },
+    setHasUnsavedChanges(state, payload: boolean) {
+      return {
+        ...state,
+        hasUnsavedChanges: payload,
+      };
+    },
+    setTokens: (state, newTokens) => ({
+      ...state,
+      tokens: newTokens,
+    }),
     createToken: (state, data: UpdateTokenPayload) => {
       let newTokens: TokenStore['values'] = {};
       const existingToken = state.tokens[data.parent].find((n) => n.name === data.name);
@@ -353,6 +382,9 @@ export const tokenState = createModel<RootModel>()({
       }
     },
     toggleUsedTokenSet() {
+      dispatch.tokenState.updateDocument({ updateRemote: false });
+    },
+    toggleManyTokenSets() {
       dispatch.tokenState.updateDocument({ updateRemote: false });
     },
     duplicateToken(payload: UpdateTokenPayload, rootState) {
