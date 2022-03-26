@@ -27,6 +27,7 @@ function TokenButton({
   type,
   token,
   showForm,
+  displayType,
   resolvedTokens,
   draggedToken,
   dragOverToken,
@@ -246,7 +247,13 @@ function TokenButton({
 
   const checkDragOverToken = () => {
     // this method is to understand dragItem and dropItem are at the same level in the hierarchy and are of same type
-    if (draggedToken && dragOverToken === token && checkIfDraggable() && draggedToken.type === dragOverToken.type) {
+    if (
+      draggedToken
+      && draggedToken !== token
+      && dragOverToken === token
+      && checkIfDraggable()
+      && draggedToken.type === dragOverToken.type
+    ) {
       const draggedItemName = draggedToken?.name.split('.');
       const dragOverName = dragOverToken?.name.split('.');
       const draggedItemNameArray = draggedItemName.slice(0, draggedItemName.length - 1);
@@ -259,6 +266,8 @@ function TokenButton({
   };
 
   const checkIfDraggable = () => isNaN(token?.name.split('.')[token?.name.split('.').length - 1]);
+
+  const checkDisplayType = () => token.type === 'color' && displayType === 'LIST';
 
   const draggerProps = {
     draggable: !!checkIfDraggable(),
@@ -276,7 +285,7 @@ function TokenButton({
       {...draggerProps}
       className={`relative mb-1 mr-1 button button-property ${buttonClass.join(' ')} ${
         uiState.disabled && 'button-disabled'
-      } ${checkDragOverToken() ? 'drag-over-item' : ''} `}
+      }`}
       style={style}
     >
       <MoreButton
@@ -302,7 +311,15 @@ function TokenButton({
           </button>
         </TokenTooltipWrapper>
       </MoreButton>
-      <div className={checkDragOverToken() ? 'drag-over-item-absolute' : ''} />
+      <div
+        className={
+          checkDragOverToken()
+            ? checkDisplayType()
+              ? 'drag-over-item-list-absolute'
+              : 'drag-over-item-grid-absolute'
+            : ''
+        }
+      />
     </div>
   );
 }
