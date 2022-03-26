@@ -3,6 +3,7 @@ import { createCss } from '@stitches/react';
 
 const globalTokens = {
   colors: {
+    white: '#FFFFFF',
     background: '#FFFFFF',
     gray50: 'var(--theme-colors-gray-50, #FAFAFA)',
     gray100: 'var(--theme-colors-gray-100, #f5f5f5)',
@@ -21,6 +22,7 @@ const globalTokens = {
     primary400: 'var(--theme-colors-brand-300, #3CB1FF)',
     primary500: 'var(--theme-colors-brand-500, #18A0FB)',
     red500: 'var(--red, #f24822)',
+    red100: 'var(--red-100, #fff5f5)',
     shadow: 'hsla(206,22%,7%,.15)',
   },
   radii: {
@@ -42,15 +44,16 @@ export const {
       bold: 500,
     },
     colors: {
-      bgDefault: globalTokens.colors.background,
+      bgDefault: globalTokens.colors.white,
       contextMenuBackground: globalTokens.colors.gray950,
-      contextMenuForeground: globalTokens.colors.background,
+      contextMenuForeground: globalTokens.colors.white,
       contextMenuForegroundMuted: globalTokens.colors.gray400,
       contextMenuSeperator: globalTokens.colors.gray700,
       text: globalTokens.colors.gray900,
       textMuted: globalTokens.colors.gray600,
       textSubtle: globalTokens.colors.gray400,
       textDisabled: globalTokens.colors.gray400,
+      textOnEmphasis: globalTokens.colors.white,
       fgSubtle: globalTokens.colors.gray300,
       bgSubtle: globalTokens.colors.gray100,
       bgAccent: globalTokens.colors.primary100,
@@ -60,6 +63,7 @@ export const {
       onInteraction: globalTokens.colors.background,
       interactionDisabled: globalTokens.colors.gray600,
       dangerFg: globalTokens.colors.red500,
+      dangerBgEmphasis: globalTokens.colors.red500,
       border: globalTokens.colors.gray300,
       borderMuted: globalTokens.colors.gray200,
       focus: globalTokens.colors.primary300,
@@ -73,6 +77,7 @@ export const {
       6: '24px',
       7: '32px',
       8: '48px',
+      9: '64px',
     },
     sizes: {
       1: '2px',
