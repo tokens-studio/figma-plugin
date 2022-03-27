@@ -1,5 +1,5 @@
 import React from 'react';
-import { SingleTokenObject } from '@/types/tokens';
+import { SingleToken } from '@/types/tokens';
 import useTokens from '../store/useTokens';
 import TokenTooltip from './TokenTooltip';
 import Tooltip from './Tooltip';
@@ -9,8 +9,8 @@ export default function TokenTooltipWrapper({
   token,
   resolvedTokens,
 }: {
-  token: SingleTokenObject;
-  resolvedTokens: SingleTokenObject[];
+  token: SingleToken;
+  resolvedTokens: SingleToken[];
   children: React.ReactNode;
 }) {
   const { isAlias } = useTokens();

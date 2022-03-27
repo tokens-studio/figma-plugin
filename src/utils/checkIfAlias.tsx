@@ -1,9 +1,10 @@
-import { SingleTokenObject } from '@/types/tokens';
+import { SingleToken } from '@/types/tokens';
 import getAliasValue from './aliases';
 import { aliasRegex } from './findReferences';
 
+// @TODO fix this typing
 // Checks if token is an alias token and if it has a valid reference
-export default function checkIfAlias(token: SingleTokenObject, allTokens = []): boolean {
+export default function checkIfAlias(token: SingleToken, allTokens = []): boolean {
   try {
     let aliasToken = false;
     if (typeof token === 'string') {

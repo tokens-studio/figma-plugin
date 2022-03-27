@@ -1,0 +1,35 @@
+export interface SelectionValue {
+  values?: string;
+  sizing?: string;
+  height?: string;
+  width?: string;
+  spacing?: string;
+  verticalPadding?: string;
+  horizontalPadding?: string;
+  paddingTop?: string;
+  paddingRight?: string;
+  paddingBottom?: string;
+  paddingLeft?: string;
+  itemSpacing?: string;
+  fill?: string;
+  border?: string;
+  borderRadius?: string;
+  borderRadiusTopLeft?: string;
+  borderRadiusTopRight?: string;
+  borderRadiusBottomRight?: string;
+  borderRadiusBottomLeft?: string;
+  borderWidth?: string;
+  boxShadow?: string;
+  opacity?: string;
+  fontFamilies?: string;
+  fontWeights?: string;
+  fontSizes?: string;
+  lineHeights?: string;
+  typography?: string;
+  letterSpacing?: string;
+  paragraphSpacing?: string;
+  tokenValue?: string;
+  value?: string;
+  tokenName?: string;
+  description?: string;
+}

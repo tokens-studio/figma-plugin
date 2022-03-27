@@ -36,6 +36,7 @@ import { StorageProviderType } from '../types/api';
 import compareProvidersWithStored from './compareProviders';
 import { defaultNodeManager } from './NodeManager';
 import { defaultWorker } from './Worker';
+import { getFeatureFlags } from '@/utils/featureFlags';
 
 let inspectDeep = false;
 let shouldSendSelectionValues = false;
@@ -72,6 +73,7 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
       try {
         const { currentUser } = figma;
         const settings = await getUISettings();
+        const featureFlagId = await getFeatureFlags();
         inspectDeep = settings.inspectDeep;
         const userId = await getUserId();
         const lastOpened = await getLastOpened();
@@ -92,7 +94,7 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
           case StorageProviderType.JSONBIN:
           case StorageProviderType.GITHUB:
           case StorageProviderType.URL: {
-            compareProvidersWithStored(apiProviders, storageType);
+            compareProvidersWithStored(apiProviders, storageType, featureFlagId);
             break;
           }
           default: {

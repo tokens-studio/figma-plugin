@@ -2,7 +2,6 @@ import * as React from 'react';
 import {
   useDispatch, useSelector,
 } from 'react-redux';
-import { ShadowTokenSingleValue } from '@types/propertyTypes';
 import getAliasValue from '@/utils/aliases';
 import { track } from '@/utils/analytics';
 import checkIfContainsAlias from '@/utils/checkIfContainsAlias';
@@ -14,7 +13,9 @@ import Input from './Input';
 import ColorPicker from './ColorPicker';
 import useConfirm from '../hooks/useConfirm';
 import useTokens from '../store/useTokens';
+import { SingleBoxShadowToken } from '@/types/tokens';
 
+// @TODO this needs to be reviewed from a typings perspective + performance
 function EditTokenForm({ resolvedTokens }) {
   const { activeTokenSet } = useSelector((state: RootState) => state.tokenState);
   const { editSingleToken, createSingleToken } = useManageTokens();
@@ -71,7 +72,7 @@ function EditTokenForm({ resolvedTokens }) {
   );
 
   const handleShadowChange = React.useCallback(
-    (shadow: ShadowTokenSingleValue | ShadowTokenSingleValue[]) => {
+    (shadow: SingleBoxShadowToken['value'] | SingleBoxShadowToken['value'][]) => {
       setError(null);
       if (internalEditToken) {
         setInternalEditToken({ ...internalEditToken, value: shadow });

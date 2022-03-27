@@ -1,4 +1,4 @@
-export default {
+const tokenTypes = {
   sizing: {
     label: 'Size',
     property: 'Size',
@@ -200,3 +200,4 @@ export default {
     },
   },
 };
+export default tokenTypes;

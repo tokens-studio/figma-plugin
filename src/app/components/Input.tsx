@@ -97,7 +97,7 @@ const Input: React.FC<Props> = ({
         />
 
         {isMasked && (
-          <button className="py-1 mr-2 rounded-full" onClick={handleVisibility}>
+          <button type="button" className="py-1 mr-2 rounded-full" onClick={handleVisibility}>
             <StyledIcon>{show ? <IconVisibility /> : <IconVisibilityOff />}</StyledIcon>
           </button>
         )}

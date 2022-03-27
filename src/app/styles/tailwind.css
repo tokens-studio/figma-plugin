@@ -89,7 +89,6 @@ body {
 
 .scroll-container {
   overflow-y: scroll;
-  cursor: pointer;
 }
 
 .content::-webkit-scrollbar,
@@ -112,7 +111,7 @@ textarea::-webkit-scrollbar-thumb {
 }
 
 .heading {
-  @apply font-semibold text-gray-900 leading-none;
+  @apply font-semibold text-xs text-gray-900 leading-none;
 }
 
 .heading-small {

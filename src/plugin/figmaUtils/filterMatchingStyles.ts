@@ -1,7 +1,7 @@
-import { SingleTokenObject } from '@/types/tokens';
+import { SingleToken } from '@/types/tokens';
 
 export default function filterMatchingStyles(
-  token: SingleTokenObject,
+  token: SingleToken,
   styles: Array<EffectStyle | PaintStyle | TextStyle>,
 ): Array<EffectStyle | PaintStyle | TextStyle> {
   return styles.filter((style) => {
