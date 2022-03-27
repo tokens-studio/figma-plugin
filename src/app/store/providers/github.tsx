@@ -90,7 +90,7 @@ export const readContents = async ({
                   ref: context.branch,
                 }).then((res) => {
                   if (!Array.isArray(res.data) && 'content' in res.data && treeItem.path) {
-                    fileContents.push({ name: treeItem.path.replace('.json', ''), data: atob(res.data.content) });
+                    fileContents.push({ name: treeItem.path.replace('.json', ''), data: decodeBase64(res.data.content) });
                   }
                 });
               }
@@ -116,7 +116,7 @@ export const readContents = async ({
         return allContents ? { values: allContents } : null;
       }
     } else if ('content' in response.data) {
-      const data = atob(response.data.content);
+      const data = decodeBase64(response.data.content);
       // If content of file is parseable JSON, parse it
       if (IsJSONString(data)) {
         const parsed = JSON.parse(data);
@@ -367,4 +367,15 @@ export function useGitHub() {
     pullTokensFromGitHub,
     pushTokensToGitHub,
   };
+}
+
+function decodeBase64(base64: string) {
+  const text = atob(base64);
+  const { length } = text;
+  const bytes = new Uint8Array(length);
+  for (let i = 0; i < length; i++) {
+    bytes[i] = text.charCodeAt(i);
+  }
+  const decoder = new TextDecoder();
+  return decoder.decode(bytes);
 }
