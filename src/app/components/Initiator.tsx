@@ -84,11 +84,15 @@ export function Initiator() {
           case MessageFromPluginTypes.API_CREDENTIALS: {
             const { status, credentials, featureFlagId } = pluginMessage;
             if (status === true) {
-              const receivedFlags = await fetchFeatureFlags(featureFlagId);
+              let receivedFlags;
 
-              if (receivedFlags) {
-                dispatch.uiState.setFeatureFlags(receivedFlags);
+              if (featureFlagId) {
+                receivedFlags = await fetchFeatureFlags(featureFlagId);
+                if (receivedFlags) {
+                  dispatch.uiState.setFeatureFlags(receivedFlags);
+                }
               }
+
               track('Fetched from remote', { provider: credentials.provider });
               if (!credentials.internalId) track('missingInternalId', { provider: credentials.provider });
 

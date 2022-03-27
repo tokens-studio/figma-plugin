@@ -12,6 +12,7 @@ import TokenSetTree from './TokenSetTree';
 import Box from './Box';
 import { styled } from '@/stitches.config';
 import TokenSetList from './TokenSetList';
+import { StorageProviderType } from '@/types/api';
 
 const StyledButton = styled('button', {
   flexShrink: 0,
@@ -101,7 +102,7 @@ export default function TokenSetSelector() {
       }}
       className="content"
     >
-      {featureFlags.gh_mfs_enabled && !api?.filePath.endsWith('.json') ? (
+      {featureFlags?.gh_mfs_enabled && api.provider === StorageProviderType.GITHUB && !api?.filePath?.endsWith('.json') ? (
         <Box>
           <TokenSetTree
             tokenSets={allTokenSets}
