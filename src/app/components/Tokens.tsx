@@ -84,7 +84,7 @@ const StatusToast = ({ open, error }: { open: boolean; error: string | null }) =
               css={{
                 background: '$dangerBgEmphasis',
                 color: '$textOnEmphasis',
-                fontSize: '$small',
+                fontSize: '$xsmall',
                 fontWeight: '$bold',
                 padding: '$3 $4',
                 paddingLeft: 0,
@@ -95,6 +95,7 @@ const StatusToast = ({ open, error }: { open: boolean; error: string | null }) =
                 width: '100%',
                 alignItems: 'flex-start',
                 justifyContent: 'space-between',
+                wordBreak: 'break-word',
               }}
             >
               <Box css={{ flexShrink: 0 }}>

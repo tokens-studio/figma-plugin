@@ -23,3 +23,4 @@ export * from './AnyTokenSet';
 export * from './AnyTokenList';
 export * from './TokensStoreValuesSet';
 export * from './TokensStore';
+export * from './TokenValues';
