@@ -10,6 +10,7 @@ import { ContextObject } from '@/types/api';
 import { notifyToUI, postToFigma } from '../../../plugin/notifiers';
 import { FeatureFlags } from '@/utils/featureFlags';
 import { AnyTokenSet, TokenValues } from '@/types/tokens';
+import { decodeBase64 } from '@/app/components/utils';
 
 type TokenSets = {
   [key: string]: AnyTokenSet;
@@ -108,7 +109,7 @@ export const readContents = async ({
                     })
                     .then((res) => {
                       if (!Array.isArray(res.data) && 'content' in res.data && treeItem.path) {
-                        fileContents.push({ name: treeItem.path.replace('.json', ''), data: atob(res.data.content) });
+                        fileContents.push({ name: treeItem.path.replace('.json', ''), data: decodeBase64(res.data.content) });
                       }
                     });
                 }
@@ -134,7 +135,7 @@ export const readContents = async ({
         return allContents ? { values: allContents } : null;
       }
     } else if ('content' in response.data) {
-      const data = atob(response.data.content);
+      const data = decodeBase64(response.data.content);
       // If content of file is parseable JSON, parse it
       if (IsJSONString(data)) {
         const parsed = JSON.parse(data);
