@@ -2,10 +2,10 @@ import { useDispatch } from 'react-redux';
 import { Dispatch } from '@/app/store';
 import { StorageProviderType } from '@/types/api';
 import { MessageToPluginTypes } from '@/types/messages';
-import { TokenProps } from '@/types/tokens';
+import { TokenValues } from '@/types/tokens';
 import { notifyToUI, postToFigma } from '../../../plugin/notifiers';
 
-async function readTokensFromURL({ secret, id }): Promise<TokenProps> | null {
+async function readTokensFromURL({ secret, id }): Promise<TokenValues | null> {
   let customHeaders = secret;
   const defaultHeaders = {
     Accept: 'application/json',
@@ -35,10 +35,10 @@ export default function useURL() {
   const dispatch = useDispatch<Dispatch>();
 
   // Read tokens from URL
-  async function pullTokensFromURL(context): Promise<TokenProps> | null {
+  async function pullTokensFromURL(context): Promise<TokenValues | null> {
     const { id, secret, name } = context;
 
-    if (!id && !secret) return;
+    if (!id && !secret) return null;
 
     try {
       const data = await readTokensFromURL({ id, secret });
@@ -67,6 +67,7 @@ export default function useURL() {
       notifyToUI('Error fetching from URL, check console (F12)', { error: true });
       console.log('Error:', e);
     }
+    return null;
   }
   return {
     pullTokensFromURL,

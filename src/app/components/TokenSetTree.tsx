@@ -1,7 +1,7 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Box from './Box';
-import { TokenSetItem2 } from './TokenSetItem';
+import { TokenSetItem } from './TokenSetItem';
 import { Dispatch, RootState } from '../store';
 import { getTree, TreeItem } from './utils/getTree';
 
@@ -50,7 +50,7 @@ export default function TokenSetTree({ tokenSets, onRename, onDelete }: { tokenS
   return (
     <Box>
       {items.map((item) => (collapsed.some((i) => item.parent.startsWith(i)) ? null : (
-        <TokenSetItem2
+        <TokenSetItem
           key={item.key}
           isCollapsed={collapsed.includes(item.path)}
           isActive={activeTokenSet === item.path}
