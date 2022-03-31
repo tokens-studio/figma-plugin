@@ -1,4 +1,5 @@
-import getAliasValue from './aliases';
+import { getAliasValue } from '../getAliasValue';
+import { SingleToken } from '@/types/tokens';
 
 describe('getAliasValue', () => {
   const allTokens = [
@@ -101,7 +102,8 @@ describe('getAliasValue', () => {
 
   allTokens.forEach((token) => {
     it(`alias ${token.name}`, () => {
-      expect(getAliasValue({ value: token.input }, allTokens)).toEqual(token.value);
+      // @TODO check this test typing
+      expect(getAliasValue({ value: token.input } as SingleToken, allTokens as unknown as SingleToken[])).toEqual(token.value);
     });
   });
 });

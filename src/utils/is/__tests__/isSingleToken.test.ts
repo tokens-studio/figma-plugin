@@ -1,6 +1,6 @@
-import checkIfValueToken from './checkIfValueToken';
+import { isSingleTokenValueObject } from '../isSingleTokenValueObject';
 
-describe('checkIfValueToken', () => {
+describe('isSingleTokenValueObject', () => {
   const correctToken = {
     objectString: {
       value: 'foo',
@@ -23,14 +23,14 @@ describe('checkIfValueToken', () => {
   };
 
   it('correctly asserts if it is a value token', () => {
-    Object.entries(correctToken).map((token) => {
-      expect(checkIfValueToken(token[1])).toBe(true);
+    Object.entries(correctToken).forEach((token) => {
+      expect(isSingleTokenValueObject(token[1])).toBe(true);
     });
   });
 
   it('correctly asserts if it is not a value token', () => {
-    Object.entries(incorrectToken).map((token) => {
-      expect(checkIfValueToken(token[1])).toBe(false);
+    Object.entries(incorrectToken).forEach((token) => {
+      expect(isSingleTokenValueObject(token[1])).toBe(false);
     });
   });
 });

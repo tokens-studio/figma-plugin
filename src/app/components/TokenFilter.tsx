@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { useDebouncedCallback } from 'use-debounce';
 import { useDispatch, useSelector } from 'react-redux';
 import { MagnifyingGlassIcon } from '@radix-ui/react-icons';

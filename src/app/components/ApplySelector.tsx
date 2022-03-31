@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux';
-import * as React from 'react';
+import React from 'react';
 import { CheckIcon } from '@radix-ui/react-icons';
 import {
   DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuItemIndicator, DropdownMenuSeparator, DropdownMenuCheckboxItem,

@@ -1,41 +1,43 @@
 import { useDispatch } from 'react-redux';
 import { Dispatch } from '@/app/store';
-import { StorageProviderType } from '@/types/api';
+import { ContextObject, StorageProviderType } from '@/types/api';
 import { MessageToPluginTypes } from '@/types/messages';
 import { TokenValues } from '@/types/tokens';
 import { notifyToUI, postToFigma } from '../../../plugin/notifiers';
 
-async function readTokensFromURL({ secret, id }): Promise<TokenValues | null> {
-  let customHeaders = secret;
+async function readTokensFromURL({ secret, id }: ContextObject): Promise<TokenValues | null> {
+  let customHeaders: Record<string, string> = {};
   const defaultHeaders = {
     Accept: 'application/json',
   };
   try {
-    customHeaders = JSON.parse(secret);
-  } finally {
-    const headers = {
-      ...defaultHeaders,
-      ...customHeaders,
-    };
-    const response = await fetch(id, {
-      method: 'GET',
-      headers,
-    });
-
-    if (response.ok) {
-      const data = await response.json();
-      return data;
-    }
-    notifyToUI('There was an error connecting, check your sync settings', { error: true });
-    return null;
+    customHeaders = JSON.parse(secret) as typeof customHeaders;
+  } catch (err) {
+    // @RAEDME ignore error
   }
+
+  const headers = {
+    ...defaultHeaders,
+    ...customHeaders,
+  };
+  const response = await fetch(id, {
+    method: 'GET',
+    headers,
+  });
+
+  if (response.ok) {
+    const data = await response.json();
+    return data;
+  }
+  notifyToUI('There was an error connecting, check your sync settings', { error: true });
+  return null;
 }
 
 export default function useURL() {
   const dispatch = useDispatch<Dispatch>();
 
   // Read tokens from URL
-  async function pullTokensFromURL(context): Promise<TokenValues | null> {
+  async function pullTokensFromURL(context: ContextObject): Promise<TokenValues | null> {
     const { id, secret, name } = context;
 
     if (!id && !secret) return null;

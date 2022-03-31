@@ -6,7 +6,6 @@ import defaultJSON from '@/config/default.json';
 
 import parseTokenValues from '@/utils/parseTokenValues';
 import { notifyToUI } from '@/plugin/notifiers';
-import { reduceToValues } from '@/plugin/tokenHelpers';
 import { replaceReferences } from '@/utils/findReferences';
 import parseJson from '@/utils/parseJson';
 import updateTokensOnSources from '../updateSources';
@@ -403,7 +402,7 @@ export const tokenState = createModel<RootModel>()({
       try {
         updateTokensOnSources({
           tokens: params.shouldUpdateNodes ? rootState.tokenState.tokens : null,
-          tokenValues: reduceToValues(rootState.tokenState.tokens),
+          tokenValues: rootState.tokenState.tokens,
           usedTokenSet: rootState.tokenState.usedTokenSet,
           settings: rootState.settings,
           updatedAt: new Date().toString(),

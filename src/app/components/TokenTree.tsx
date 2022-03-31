@@ -1,28 +1,51 @@
-import * as React from 'react';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
-import { RootState } from '../store';
 import Icon from './Icon';
 import TokenButton from './TokenButton';
 import TokenGroupHeading from './TokenGroupHeading';
 import Tooltip from './Tooltip';
-import { isSingleToken, isTypographyToken } from './utils';
+import { TokenTypes } from '@/constants/TokenTypes';
+import { tokenStateSelector } from '@/selectors';
+import { SingleToken, TokenTypeSchema } from '@/types/tokens';
+import { isSingleToken, isSingleTypographyToken } from '@/utils/is';
+
+// @TODO fix typings
+
+export type ShowFormOptions = {
+  name: string;
+  isPristine?: boolean;
+  token: SingleToken | null;
+};
+
+export type ShowNewFormOptions = {
+  name?: string;
+};
+
+type Props = {
+  type: TokenTypes;
+  schema: TokenTypeSchema['schema']
+  tokenValues: Record<string, SingleToken[]>
+  path?: string | null
+  showNewForm: (opts: ShowNewFormOptions) => void
+  showForm: (opts: ShowFormOptions) => void
+};
 
 function TokenTree({
-  tokenValues, showNewForm, showForm, schema, path = null, type = '', resolvedTokens, displayType,
-}) {
-  const { editProhibited } = useSelector((state: RootState) => state.tokenState);
+  tokenValues, showNewForm, showForm, schema, path = null, type,
+}: Props) {
+  const { editProhibited } = useSelector(tokenStateSelector);
+  const tokenValuesEntries = React.useMemo(() => Object.entries(tokenValues), [tokenValues]);
   const [draggedToken, setDraggedToken] = useState(null);
   const [dragOverToken, setDragOverToken] = useState(null);
 
   return (
     <div className="flex justify-start flex-row flex-wrap">
-      {Object.entries(tokenValues).map(([name, value]) => {
+      {tokenValuesEntries.map(([name, value]) => {
         const stringPath = [path, name].filter((n) => n).join('.');
 
         return (
           <React.Fragment key={stringPath}>
-            {typeof value === 'object' && !isTypographyToken(value) && !isSingleToken(value) ? (
+            {typeof value === 'object' && !isSingleTypographyToken(value) && !isSingleToken(value) ? (
               <div className="property-wrapper w-full" data-cy={`token-group-${stringPath}`}>
                 <div className="flex items-center justify-between group">
                   <TokenGroupHeading label={name} path={stringPath} id="listing" />
@@ -49,7 +72,6 @@ function TokenTree({
                   path={stringPath}
                   type={type}
                   displayType={displayType}
-                  resolvedTokens={resolvedTokens}
                 />
               </div>
             ) : (

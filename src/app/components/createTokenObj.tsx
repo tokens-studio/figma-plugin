@@ -4,6 +4,10 @@ import tokenTypes from '../../config/tokenTypes';
 import { SingleToken } from '@/types/tokens';
 import { TokenTypes } from '@/constants/TokenTypes';
 
+type CreateTokensObjectResult = Partial<Record<TokenTypes, {
+  values: Record<string, SingleToken[]>
+}>>;
+
 function transformName(name: string): TokenTypes {
   switch (name) {
     case 'color':
@@ -44,8 +48,8 @@ function transformName(name: string): TokenTypes {
   }
 }
 
-export function appendTypeToToken(token) {
-  const hasTypeProp = token.type && token.type !== '' && token.type !== 'undefined';
+export function appendTypeToToken(token: SingleToken) {
+  const hasTypeProp = !!token.type && token.type !== TokenTypes.UNDEFINED;
   const typeToSet = hasTypeProp ? token.type : transformName(token.name.split('.').slice(0, 1).toString());
   return {
     ...token,
@@ -56,13 +60,20 @@ export function appendTypeToToken(token) {
 // Creates a tokens object so that tokens are displayed in groups in the UI.
 export function createTokensObject(tokens: SingleToken[], tokenFilter = '') {
   if (tokens.length > 0) {
-    const obj = tokens.reduce((acc, cur) => {
+    const obj = tokens.reduce<CreateTokensObjectResult>((acc, cur) => {
       if (tokenFilter === '' || cur.name?.toLowerCase().search(tokenFilter?.toLowerCase()) >= 0) {
-        const hasTypeProp = cur.type && cur.type !== '' && cur.type !== 'undefined';
+        // @TODO check if we need to do a "type" check.
+        // Why is this here? Will there be instances where tokens don't have a type?
+        const hasTypeProp = !!cur.type && cur.type !== TokenTypes.UNDEFINED;
         const propToSet = hasTypeProp ? cur.type : transformName(cur.name.split('.').slice(0, 1).toString());
-        acc[propToSet] = acc[propToSet] || { values: {} };
-        acc[propToSet].values = acc[propToSet].values || {};
-        set(acc[propToSet].values, cur.name, { ...cur, type: hasTypeProp ? cur.type : propToSet });
+
+        if (!acc[propToSet]?.values) {
+          acc[propToSet] = { values: {} };
+        }
+
+        // we can use ! here because in the previous block we are ensuring
+        // the values object exists
+        set(acc[propToSet]!.values, cur.name, extend(true, {}, cur) as typeof cur);
       }
       return acc;
     }, {});
@@ -74,19 +85,12 @@ export function createTokensObject(tokens: SingleToken[], tokenFilter = '') {
 // Takes an array of tokens, transforms them into
 // san object and merges that with values we require for the UI
 export function mappedTokens(tokens: SingleToken[], tokenFilter: string) {
-  const tokenObj = {};
+  const tokenObj = extend(true, {}, tokenTypes) as typeof tokenTypes;
+  const tokenObjects = createTokensObject(tokens, tokenFilter);
 
-  extend(true, tokenObj, tokenTypes);
-
-  Object.entries(createTokensObject(tokens, tokenFilter)).forEach(
-    ([key, group]: [string, { values: SingleToken[]; type?: TokenType }]) => {
-      tokenObj[key] = {
-        values: group.values,
-      };
-    },
-  );
-
-  extend(true, tokenObj, tokenTypes);
+  Object.entries(tokenObjects).forEach(([key, group]) => {
+    tokenObj[key as TokenTypes].values = group.values;
+  });
 
   return Object.entries(tokenObj);
 }

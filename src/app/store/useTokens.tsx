@@ -1,7 +1,6 @@
 import { useSelector } from 'react-redux';
 import { postToFigma } from '@/plugin/notifiers';
 import { MessageToPluginTypes } from '@/types/messages';
-import checkIfAlias from '@/utils/checkIfAlias';
 import {
   AnyTokenList,
   SingleToken,
@@ -15,6 +14,9 @@ import useConfirm from '../hooks/useConfirm';
 import { Properties } from '@/constants/Properties';
 import { track } from '@/utils/analytics';
 import { SelectionValue } from '@/types';
+import { checkIfAlias } from '@/utils/alias';
+
+// @TODO fix typings
 
 export default function useTokens() {
   const { tokens, usedTokenSet, activeTokenSet } = useSelector((state: RootState) => state.tokenState);

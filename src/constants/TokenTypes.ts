@@ -21,4 +21,6 @@ export enum TokenTypes {
 
   // @deprecated ?
   BORDER = 'border',
+  // @deprecated - should not be used
+  UNDEFINED = 'undefined',
 }

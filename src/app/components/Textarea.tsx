@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { styled } from '@/stitches.config';
 
 const StyledTextarea = styled('textarea', {

@@ -18,6 +18,7 @@ export * from './SingleParagraphSpacingToken';
 export * from './SingleTextDecorationToken';
 export * from './SingleTextCaseToken';
 export * from './SingleOtherToken';
+export * from './SingleUndefinedToken';
 export * from './SingleToken';
 export * from './AnyTokenSet';
 export * from './AnyTokenList';

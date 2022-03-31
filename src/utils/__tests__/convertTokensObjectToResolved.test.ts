@@ -1,4 +1,4 @@
-import convertTokensObjectToResolved from './convertTokensObjectToResolved';
+import convertTokensObjectToResolved from '../convertTokensObjectToResolved';
 
 describe('convertTokensObjectToResolved', () => {
   it('converts object-like unresolved tokens to resolved object', () => {

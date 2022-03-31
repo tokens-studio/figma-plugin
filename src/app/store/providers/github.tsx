@@ -10,7 +10,7 @@ import { ContextObject } from '@/types/api';
 import { notifyToUI, postToFigma } from '../../../plugin/notifiers';
 import { FeatureFlags } from '@/utils/featureFlags';
 import { AnyTokenSet, TokenValues } from '@/types/tokens';
-import { decodeBase64 } from '@/app/components/utils';
+import { decodeBase64 } from '@/utils/string';
 
 type TokenSets = {
   [key: string]: AnyTokenSet;

@@ -13,4 +13,5 @@ export type TokenTypeSchema = {
       description?: string;
     }
   }
+  values?: Record<string, SingleToken[]>
 };

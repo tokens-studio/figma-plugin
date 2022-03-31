@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { useSelector } from 'react-redux';
 import { CheckIcon, ChevronRightIcon } from '@radix-ui/react-icons';
 import { styled } from '@/stitches.config';

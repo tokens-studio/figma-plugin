@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import * as pjs from '../../../package.json';
 import Box from './Box';
 import DocsIcon from '@/icons/docs.svg';

@@ -1,4 +1,4 @@
-import checkIfAlias from './checkIfAlias';
+import { checkIfAlias } from '../checkIfAlias';
 
 describe('checkIfAlias', () => {
   const correctTokens = [
@@ -45,6 +45,7 @@ describe('checkIfAlias', () => {
     },
   ];
 
+  // @TODO check typing
   describe('correct tokens', () => {
     correctTokens.forEach((token) => {
       it(`token ${token.name}`, () => {

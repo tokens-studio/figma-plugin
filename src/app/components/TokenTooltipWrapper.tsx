@@ -3,17 +3,23 @@ import { SingleToken } from '@/types/tokens';
 import useTokens from '../store/useTokens';
 import TokenTooltip from './TokenTooltip';
 import Tooltip from './Tooltip';
+import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
 
-export default function TokenTooltipWrapper({
+type Props = {
+  token: SingleToken;
+  resolvedTokens: ResolveTokenValuesResult[];
+};
+
+const TokenTooltipWrapper: React.FC<Props> = ({
   children,
   token,
   resolvedTokens,
-}: {
-  token: SingleToken;
-  resolvedTokens: SingleToken[];
-  children: React.ReactNode;
-}) {
+}) => {
   const { isAlias } = useTokens();
+
+  if (!children || !React.isValidElement(children)) {
+    return null;
+  }
 
   return (
     <Tooltip
@@ -36,4 +42,6 @@ export default function TokenTooltipWrapper({
       {children}
     </Tooltip>
   );
-}
+};
+
+export default TokenTooltipWrapper;

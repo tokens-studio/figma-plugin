@@ -2,12 +2,13 @@ import { mergeTokenGroups, resolveTokenValues } from '@/plugin/tokenHelpers';
 import { TransformerOptions } from './types';
 import convertTokensToGroupedObject from './convertTokensToGroupedObject';
 import parseTokenValues from './parseTokenValues';
+import { SetTokenDataPayload } from '@/types/payloads';
 
 // Takes Figma Tokens input, resolves all aliases while respecting user's theme choice and outputs an object with resolved tokens, ready to be consumed by style dictionary.
 export default function convertTokensObjectToResolved(
-  tokens,
-  usedSets = [],
-  excludedSets = [],
+  tokens: SetTokenDataPayload['values'],
+  usedSets: string[] = [],
+  excludedSets: string[] = [],
   options: TransformerOptions = {
     expandTypography: false,
     expandShadow: false,
