@@ -4,7 +4,7 @@ import { track } from '@/utils/analytics';
 import { SingleToken } from '@/types/tokens';
 import MoreButton from './MoreButton';
 import useManageTokens from '../store/useManageTokens';
-import { Dispatch, RootState } from '../store';
+import { Dispatch } from '../store';
 import useTokens from '../store/useTokens';
 import BrokenReferenceIndicator from './BrokenReferenceIndicator';
 import { waitForMessage } from '@/utils/waitForMessage';
@@ -12,7 +12,6 @@ import { MessageFromPluginTypes } from '@/types/messages';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
 import TokenTooltipWrapper from './TokenTooltipWrapper';
 import { lightOrDark } from '@/utils/color';
-import { getAliasValue } from '@/utils/alias';
 import { TokensContext } from '@/context';
 import { SelectionValue } from '@/types';
 import { DocumentationProperties } from '@/constants/DocumentationProperties';
@@ -20,29 +19,44 @@ import { useGetActiveState } from '@/hooks';
 import { usePropertiesForTokenType } from '../hooks/usePropertiesForType';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { PropertyObject } from '@/types/properties';
+import { getAliasValue } from '@/utils/alias';
+import type { ShowFormOptions } from './TokenTree';
+import { tokenStateSelector, uiStateSelector } from '@/selectors';
 
 // @TODO fix typings
+
+type Props = {
+  type: TokenTypes;
+  displayType: 'GRID' | 'LIST'; // @TODO enum
+  token: SingleToken;
+  showForm: (options: ShowFormOptions) => void;
+  draggedToken: SingleToken | null;
+  dragOverToken: SingleToken | null;
+  setDraggedToken: (token: SingleToken | null) => void;
+  setDragOverToken: (token: SingleToken | null) => void;
+};
 
 function TokenButton({
   type,
   token,
   showForm,
-}: {
-  type: TokenTypes;
-  token: SingleToken;
-  showForm: Function;
-}) {
+  displayType,
+  draggedToken,
+  dragOverToken,
+  setDraggedToken,
+  setDragOverToken,
+}: Props) {
   const tokensContext = React.useContext(TokensContext);
-  const uiState = useSelector((state: RootState) => state.uiState);
-  const activeTokenSet = useSelector((state: RootState) => state.tokenState.activeTokenSet);
+  const uiState = useSelector(uiStateSelector);
+  const tokenState = useSelector(tokenStateSelector);
   const { setNodeData } = useTokens();
   const { deleteSingleToken, duplicateSingleToken } = useManageTokens();
   const dispatch = useDispatch<Dispatch>();
+  const { activeTokenSet } = tokenState;
 
-  const displayValue = React.useMemo(() => 'test', []);
-  // const displayValue = React.useMemo(() => (
-  //   getAliasValue(token, tokensContext.resolvedTokens)
-  // ), [token, tokensContext.resolvedTokens]);
+  const displayValue = React.useMemo(() => (
+    getAliasValue(token, tokensContext.resolvedTokens)
+  ), [token, tokensContext.resolvedTokens]);
 
   const { name } = token;
   // Only show the last part of a token in a group
@@ -82,15 +96,89 @@ function TokenButton({
 
   const handleEditClick = React.useCallback(() => {
     showForm({ name, token });
-  }, [name, token]);
+  }, [name, token, showForm]);
 
   const handleDeleteClick = React.useCallback(() => {
     deleteSingleToken({ parent: activeTokenSet, path: name });
-  }, [activeTokenSet, name]);
+  }, [activeTokenSet, name, deleteSingleToken]);
 
   const handleDuplicateClick = React.useCallback(() => {
     duplicateSingleToken({ parent: activeTokenSet, name });
-  }, [activeTokenSet, name]);
+  }, [activeTokenSet, name, duplicateSingleToken]);
+
+  const handleDrag = React.useCallback((e: React.DragEvent<HTMLDivElement>) => e.stopPropagation(), []);
+  const handleDragEnter = React.useCallback((e: React.DragEvent<HTMLDivElement>) => e.stopPropagation(), []);
+  const handleDragLeave = React.useCallback((e: React.DragEvent<HTMLDivElement>) => e.stopPropagation(), []);
+
+  const handleDragStart = React.useCallback((e: React.DragEvent<HTMLDivElement>) => {
+    e.stopPropagation();
+    setDraggedToken(token);
+  }, [token, setDraggedToken]);
+
+  const handleDragEnd = React.useCallback((e: React.DragEvent<HTMLDivElement>) => {
+    e.stopPropagation();
+    setDragOverToken(null);
+  }, [setDragOverToken]);
+
+  const handleDragOver = React.useCallback((e: React.DragEvent<HTMLDivElement>) => {
+    e.stopPropagation();
+    e.preventDefault();
+    setDragOverToken(token);
+  }, [token, setDragOverToken]);
+
+  const handleDrop = React.useCallback((e: React.DragEvent<HTMLDivElement>) => {
+    e.stopPropagation();
+    let draggedTokenIndex: number | null = null;
+    let dropTokenIndex: number | null = null;
+
+    if (draggedToken && token && draggedToken.type === token.type) {
+      tokenState.tokens[tokenState.activeTokenSet].forEach((element, index) => {
+        if (element.name === draggedToken.name) draggedTokenIndex = index;
+        if (element.name === token.name) dropTokenIndex = index;
+      });
+      if (draggedTokenIndex !== null && dropTokenIndex !== null) {
+        const insertTokensIndex = draggedTokenIndex > dropTokenIndex ? dropTokenIndex : dropTokenIndex - 1;
+        const set = tokenState.tokens[tokenState.activeTokenSet];
+        set.splice(insertTokensIndex, 0, set.splice(draggedTokenIndex, 1)[0]);
+        const newTokens = {
+          ...tokenState.tokens,
+          [tokenState.activeTokenSet]: set,
+        };
+
+        dispatch.tokenState.setTokens(newTokens);
+      }
+    }
+  }, [token, draggedToken, dispatch, tokenState]);
+
+  const checkIfDraggable = React.useCallback(() => (
+    isNaN(Number(token.name.split('.')[token.name.split('.').length - 1]))
+  ), [token]);
+
+  const checkDisplayType = React.useCallback(() => (
+    token.type === TokenTypes.COLOR && displayType === 'LIST'
+  ), [token, displayType]);
+
+  // @TODO this should be useMemo for perf reasons
+  const checkDragOverToken = React.useCallback(() => {
+    if (
+      draggedToken
+      && draggedToken !== token
+      && dragOverToken === token
+      && checkIfDraggable()
+      && draggedToken.type === dragOverToken.type
+    ) {
+      const draggedItemName = draggedToken?.name.split('.');
+      const dragOverName = dragOverToken?.name.split('.');
+      const draggedItemNameArray = draggedItemName.slice(0, draggedItemName.length - 1);
+      const dragOverNameArray = dragOverName.slice(0, dragOverName.length - 1);
+
+      if (draggedItemNameArray.toString() === dragOverNameArray.toString()) {
+        return true;
+      }
+    }
+
+    return false;
+  }, [token, draggedToken, dragOverToken, checkIfDraggable]);
 
   const setPluginValue = React.useCallback((value: SelectionValue) => {
     dispatch.uiState.startJob({ name: BackgroundJobs.UI_APPLYNODEVALUE });
@@ -98,9 +186,9 @@ function TokenButton({
     waitForMessage(MessageFromPluginTypes.REMOTE_COMPONENTS).then(() => {
       dispatch.uiState.completeJob(BackgroundJobs.UI_APPLYNODEVALUE);
     });
-  }, [dispatch, tokensContext.resolvedTokens]);
+  }, [dispatch, tokensContext.resolvedTokens, setNodeData]);
 
-  const onClick = React.useCallback((givenProperties: PropertyObject | PropertyObject[], isActive = active) => {
+  const handleClick = React.useCallback((givenProperties: PropertyObject | PropertyObject[], isActive = active) => {
     const propsToSet = Array.isArray(givenProperties) ? givenProperties : [givenProperties];
 
     const tokenValue = name;
@@ -115,10 +203,31 @@ function TokenButton({
     };
     if (propsToSet[0].clear) propsToSet[0].clear.map((item) => Object.assign(newProps, { [item]: 'delete' }));
     setPluginValue(newProps);
-  }, [name, setPluginValue]);
+  }, [name, active, setPluginValue]);
+
+  const draggerProps = React.useMemo(() => ({
+    draggable: !!checkIfDraggable(),
+    onDrag: handleDrag,
+    onDrop: handleDrop,
+    onDragEnd: handleDragEnd,
+    onDragEnter: handleDragEnter,
+    onDragLeave: handleDragLeave,
+    onDragStart: handleDragStart,
+    onDragOver: handleDragOver,
+  }), [
+    checkIfDraggable,
+    handleDrag,
+    handleDrop,
+    handleDragEnd,
+    handleDragEnter,
+    handleDragLeave,
+    handleDragStart,
+    handleDragOver,
+  ]);
 
   return (
     <div
+      {...draggerProps}
       className={`relative mb-1 mr-1 button button-property ${buttonClass.join(' ')} ${
         uiState.disabled && 'button-disabled'
       } `}
@@ -127,7 +236,7 @@ function TokenButton({
       <MoreButton
         properties={properties}
         documentationProperties={DocumentationProperties}
-        onClick={onClick}
+        onClick={handleClick}
         onDelete={handleDeleteClick}
         onDuplicate={handleDuplicateClick}
         onEdit={handleEditClick}
@@ -139,7 +248,7 @@ function TokenButton({
             style={style}
             className="w-full h-full relativeƒ"
             type="button"
-            onClick={() => onClick(properties[0])}
+            onClick={() => handleClick(properties[0])}
           >
             <BrokenReferenceIndicator token={token} resolvedTokens={tokensContext.resolvedTokens} />
 
@@ -147,6 +256,16 @@ function TokenButton({
           </button>
         </TokenTooltipWrapper>
       </MoreButton>
+      {/* @TODO fix this */}
+      <div
+        className={
+          checkDragOverToken()
+            ? checkDisplayType()
+              ? 'drag-over-item-list-absolute'
+              : 'drag-over-item-grid-absolute'
+            : ''
+        }
+      />
     </div>
   );
 }

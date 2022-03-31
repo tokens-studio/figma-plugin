@@ -1,8 +1,9 @@
 module.exports = {
-  extends: ['airbnb', 'airbnb-typescript'],
+  extends: ['airbnb', 'airbnb-typescript', 'plugin:react-hooks/recommended'],
   parserOptions: {
     project: './tsconfig.json'
   },
+  ignorePatterns: ['**/*.js'],
   globals: {
     figma: 'readable',
     __html__: 'readable',
@@ -22,6 +23,8 @@ module.exports = {
     "max-len": 0,
     "react/function-component-definition": 0,
     "react/require-default-props": 0,
+    "react/jsx-props-no-spreading": 0,
+    "react/jsx-no-bind": 2,
     "@typescript-eslint/no-shadow": 1
   }
 };

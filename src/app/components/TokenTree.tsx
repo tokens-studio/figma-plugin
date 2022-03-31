@@ -22,6 +22,7 @@ export type ShowNewFormOptions = {
 };
 
 type Props = {
+  displayType: 'GRID' | 'LIST';
   type: TokenTypes;
   schema: TokenTypeSchema['schema']
   tokenValues: Record<string, SingleToken[]>
@@ -31,12 +32,12 @@ type Props = {
 };
 
 function TokenTree({
-  tokenValues, showNewForm, showForm, schema, path = null, type,
+  displayType, tokenValues, showNewForm, showForm, schema, path = null, type,
 }: Props) {
   const { editProhibited } = useSelector(tokenStateSelector);
   const tokenValuesEntries = React.useMemo(() => Object.entries(tokenValues), [tokenValues]);
-  const [draggedToken, setDraggedToken] = useState(null);
-  const [dragOverToken, setDragOverToken] = useState(null);
+  const [draggedToken, setDraggedToken] = useState<SingleToken | null>(null);
+  const [dragOverToken, setDragOverToken] = useState<SingleToken | null>(null);
 
   return (
     <div className="flex justify-start flex-row flex-wrap">
@@ -79,7 +80,6 @@ function TokenTree({
                 type={type}
                 token={value}
                 showForm={showForm}
-                resolvedTokens={resolvedTokens}
                 draggedToken={draggedToken}
                 dragOverToken={dragOverToken}
                 displayType={displayType}

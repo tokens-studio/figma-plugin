@@ -5,7 +5,7 @@ import { DndProvider } from 'react-dnd';
 import { TokenTypeSchema } from '@/types/tokens';
 import Heading from './Heading';
 import Icon from './Icon';
-import TokenTree from './TokenTree';
+import TokenTree, { ShowFormOptions, ShowNewFormOptions } from './TokenTree';
 import Tooltip from './Tooltip';
 import { Dispatch } from '../store';
 import { TokenTypes } from '@/constants/TokenTypes';
