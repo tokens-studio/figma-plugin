@@ -6,10 +6,8 @@ import TokenGroupHeading from './TokenGroupHeading';
 import Tooltip from './Tooltip';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { tokenStateSelector } from '@/selectors';
-import { SingleToken, TokenTypeSchema } from '@/types/tokens';
-import { isSingleToken, isSingleTypographyToken } from '@/utils/is';
-
-// @TODO fix typings
+import { DeepKeyTokenMap, SingleToken, TokenTypeSchema } from '@/types/tokens';
+import { isSingleToken } from '@/utils/is';
 
 export type ShowFormOptions = {
   name: string;
@@ -25,7 +23,7 @@ type Props = {
   displayType: 'GRID' | 'LIST';
   type: TokenTypes;
   schema: TokenTypeSchema['schema']
-  tokenValues: Record<string, SingleToken[]>
+  tokenValues: DeepKeyTokenMap
   path?: string | null
   showNewForm: (opts: ShowNewFormOptions) => void
   showForm: (opts: ShowFormOptions) => void
@@ -46,7 +44,7 @@ function TokenTree({
 
         return (
           <React.Fragment key={stringPath}>
-            {typeof value === 'object' && !isSingleTypographyToken(value) && !isSingleToken(value) ? (
+            {typeof value === 'object' && !isSingleToken(value) ? (
               <div className="property-wrapper w-full" data-cy={`token-group-${stringPath}`}>
                 <div className="flex items-center justify-between group">
                   <TokenGroupHeading label={name} path={stringPath} id="listing" />

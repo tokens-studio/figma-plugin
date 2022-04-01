@@ -25,3 +25,4 @@ export * from './AnyTokenList';
 export * from './TokensStoreValuesSet';
 export * from './TokensStore';
 export * from './TokenValues';
+export * from './DeepKeyTokenMap';

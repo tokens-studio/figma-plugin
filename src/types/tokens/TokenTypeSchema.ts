@@ -1,4 +1,5 @@
 import { TokenTypes } from '@/constants/TokenTypes';
+import { DeepKeyTokenMap } from './DeepKeyTokenMap';
 import { SingleToken } from './SingleToken';
 
 export type TokenTypeSchema = {
@@ -13,5 +14,5 @@ export type TokenTypeSchema = {
       description?: string;
     }
   }
-  values?: Record<string, SingleToken[]>
+  values?: DeepKeyTokenMap,
 };

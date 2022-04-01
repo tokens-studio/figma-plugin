@@ -53,7 +53,7 @@ function TokenListing({
         type: tokenType,
       },
     });
-  }, []);
+  }, [schema, tokenType, dispatch, explainer, property]);
 
   const showNewForm = React.useCallback(({ name = '' }: ShowNewFormOptions) => {
     showForm({ token: null, name, isPristine: true });

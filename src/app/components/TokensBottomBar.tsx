@@ -8,9 +8,14 @@ import Box from './Box';
 import ActionButton from './ActionButton';
 import StylesDropdown from './StylesDropdown';
 
-export default function TokensBottomBar({ handleUpdate, handleSaveJSON, hasJSONError }: { handleUpdate: () => void; handleSaveJSON: () => void; hasJSONError: boolean }) {
+type Props = {
+  handleUpdate: () => void;
+  handleSaveJSON: () => void;
+  hasJSONError: boolean;
+};
+
+export default function TokensBottomBar({ handleUpdate, handleSaveJSON, hasJSONError }: Props) {
   const { editProhibited, hasUnsavedChanges } = useSelector((state: RootState) => state.tokenState);
-  const { updateMode } = useSelector((state: RootState) => state.settings);
 
   const [exportModalVisible, showExportModal] = React.useState(false);
   const [presetModalVisible, showPresetModal] = React.useState(false);

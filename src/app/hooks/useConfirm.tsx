@@ -1,41 +1,54 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { Dispatch, RootState } from '../store';
+import { useCallback, useRef } from 'react';
+import { uiStateSelector } from '@/selectors';
+import { Dispatch } from '../store';
 import { ConfirmProps } from '../store/models/uiState';
 
-let resolveCallback;
-function useConfirm() {
-  const { confirmState } = useSelector((state: RootState) => state.uiState);
+type ResolveCallbackPayload<C = any> = false | {
+  result: true;
+  data: C;
+};
+
+function useConfirm<C = any>() {
+  const { confirmState } = useSelector(uiStateSelector);
+  const resolveCallbackRef = useRef<(payload: ResolveCallbackPayload<C>) => void>(() => {});
   const dispatch = useDispatch<Dispatch>();
 
-  const confirm = ({
-    text,
-    description,
-    confirmAction,
-    choices,
-    input,
-  }: ConfirmProps): Promise<{ result: boolean; data?: any }> => {
+  const confirm = useCallback((opts: ConfirmProps) => {
+    const {
+      text,
+      description,
+      confirmAction,
+      choices,
+      input,
+    } = opts;
+
     dispatch.uiState.setShowConfirm({
-      text, description, confirmAction, choices, input,
+      input,
+      description,
+      confirmAction,
+      text: text ?? '',
+      choices: choices ?? [],
     });
 
-    return new Promise((res, rej) => {
-      resolveCallback = res;
+    return new Promise<ResolveCallbackPayload<C>>((res) => {
+      resolveCallbackRef.current = res;
     });
-  };
+  }, [dispatch.uiState]);
 
-  const closeConfirm = () => {
+  const closeConfirm = useCallback(() => {
     dispatch.uiState.setHideConfirm();
-  };
+  }, [dispatch.uiState]);
 
-  const onCancel = () => {
+  const onCancel = useCallback(() => {
     closeConfirm();
-    resolveCallback(false);
-  };
+    resolveCallbackRef.current(false);
+  }, [closeConfirm]);
 
-  const onConfirm = (data) => {
+  const onConfirm = useCallback((data: C) => {
     closeConfirm();
-    resolveCallback({ result: true, data });
-  };
+    resolveCallbackRef.current({ result: true, data });
+  }, [closeConfirm]);
 
   return {
     confirm, onConfirm, onCancel, confirmState,

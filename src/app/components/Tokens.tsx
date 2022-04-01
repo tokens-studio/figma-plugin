@@ -116,17 +116,14 @@ function Tokens({ isActive }: { isActive: boolean }) {
     () => resolveTokenValues(mergeTokenGroups(tokens, [...usedTokenSet, activeTokenSet])),
     [tokens, usedTokenSet, activeTokenSet],
   );
-  const [stringTokens, setStringTokens] = React.useState(JSON.stringify(tokens[activeTokenSet], null, 2));
+  const [stringTokens, setStringTokens] = React.useState(
+    JSON.stringify(tokens[activeTokenSet], null, 2),
+  );
   const { tokenType } = useSelector((state: RootState) => state.settings);
 
-  const [error, setError] = React.useState(null);
+  const [error, setError] = React.useState<string | null>(null);
 
-  React.useEffect(() => {
-    setError(null);
-    setStringTokens(getStringTokens());
-  }, [tokens, activeTokenSet, tokenType]);
-
-  const handleChangeJSON = (val) => {
+  const handleChangeJSON = React.useCallback((val: string) => {
     setError(null);
     try {
       const parsedTokens = parseJson(val);
@@ -135,15 +132,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
       setError(`Unable to read JSON: ${JSON.stringify(e)}`);
     }
     setStringTokens(val);
-  };
-
-  React.useEffect(() => {
-    if (getStringTokens() !== stringTokens) {
-      dispatch.tokenState.setHasUnsavedChanges(true);
-    } else {
-      dispatch.tokenState.setHasUnsavedChanges(false);
-    }
-  }, [tokens, stringTokens, activeTokenSet]);
+  }, []);
 
   const memoizedTokens = React.useMemo(() => {
     if (tokens[activeTokenSet]) {
@@ -160,9 +149,9 @@ function Tokens({ isActive }: { isActive: boolean }) {
     return [];
   }, [tokens, activeTokenSet, tokenFilter]);
 
-  const handleSaveJSON = () => {
+  const handleSaveJSON = React.useCallback(() => {
     dispatch.tokenState.setJSONData(stringTokens);
-  };
+  }, [dispatch.tokenState, stringTokens]);
 
   const handleUpdate = React.useCallback(async () => {
     if (activeTokensTab === 'list') {
@@ -172,8 +161,8 @@ function Tokens({ isActive }: { isActive: boolean }) {
           text: 'Are you sure?',
           description:
             'You are about to run a document wide update. This operation can take more than 30 minutes on very large documents.',
-        }).then(({ result }) => {
-          if (result) {
+        }).then((result) => {
+          if (result && result.result) {
             dispatch.tokenState.updateDocument();
           }
         });
@@ -185,11 +174,28 @@ function Tokens({ isActive }: { isActive: boolean }) {
 
       dispatch.tokenState.setJSONData(stringTokens);
     }
-  }, [confirm, shouldConfirm]);
+  }, [confirm, shouldConfirm, dispatch.tokenState, activeTokensTab, stringTokens]);
 
   const tokensContextValue = React.useMemo(() => ({
     resolvedTokens,
   }), [resolvedTokens]);
+
+  React.useEffect(() => {
+    // @README these dependencies aren't exhaustive
+    // because of specific logic requirements
+    setError(null);
+    setStringTokens(getStringTokens());
+  }, [tokens, activeTokenSet, tokenType]);
+
+  React.useEffect(() => {
+    // @README these dependencies aren't exhaustive
+    // because of specific logic requirements
+    if (getStringTokens() !== stringTokens) {
+      dispatch.tokenState.setHasUnsavedChanges(true);
+    } else {
+      dispatch.tokenState.setHasUnsavedChanges(false);
+    }
+  }, [tokens, stringTokens, activeTokenSet]);
 
   if (!isActive) return null;
 
@@ -313,7 +319,11 @@ function Tokens({ isActive }: { isActive: boolean }) {
             )}
           </Box>
         </Box>
-        <TokensBottomBar handleUpdate={handleUpdate} handleSaveJSON={handleSaveJSON} hasJSONError={error} />
+        <TokensBottomBar
+          handleUpdate={handleUpdate}
+          handleSaveJSON={handleSaveJSON}
+          hasJSONError={!!error}
+        />
       </Box>
     </TokensContext.Provider>
   );
