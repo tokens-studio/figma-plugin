@@ -9,7 +9,9 @@ import TokenTree, { ShowFormOptions, ShowNewFormOptions } from './TokenTree';
 import Tooltip from './Tooltip';
 import { Dispatch } from '../store';
 import { TokenTypes } from '@/constants/TokenTypes';
-import { tokenStateSelector, uiStateSelector } from '@/selectors';
+import {
+  collapsedSelector, displayTypeSelector, editProhibitedSelector, showEmptyGroupsSelector,
+} from '@/selectors';
 
 type Props = Omit<TokenTypeSchema, 'type'> & {
   tokenKey: string;
@@ -25,8 +27,10 @@ const TokenListing: React.FC<Props> = ({
   tokenType = TokenTypes.IMPLICIT,
   values,
 }) => {
-  const { editProhibited } = useSelector(tokenStateSelector);
-  const { displayType, showEmptyGroups, collapsed } = useSelector(uiStateSelector);
+  const editProhibited = useSelector(editProhibitedSelector);
+  const displayType = useSelector(displayTypeSelector);
+  const showEmptyGroups = useSelector(showEmptyGroupsSelector);
+  const collapsed = useSelector(collapsedSelector);
   const dispatch = useDispatch<Dispatch>();
 
   const showDisplayToggle = React.useMemo(() => tokenType === TokenTypes.COLOR, [tokenType]);

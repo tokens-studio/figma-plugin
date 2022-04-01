@@ -1,5 +1,6 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import isEqual from 'lodash.isequal';
 import { track } from '@/utils/analytics';
 import { SingleToken } from '@/types/tokens';
 import MoreButton from './MoreButton';
@@ -21,7 +22,7 @@ import { TokenTypes } from '@/constants/TokenTypes';
 import { PropertyObject } from '@/types/properties';
 import { getAliasValue } from '@/utils/alias';
 import type { ShowFormOptions } from './TokenTree';
-import { tokenStateSelector, uiStateSelector } from '@/selectors';
+import { uiStateSelector, activeTokenSetSelector, tokensSelector } from '@/selectors';
 
 // @TODO fix typings
 
@@ -36,7 +37,7 @@ type Props = {
   setDragOverToken: (token: SingleToken | null) => void;
 };
 
-function TokenButton({
+const TokenButton: React.FC<Props> = ({
   type,
   token,
   showForm,
@@ -45,14 +46,14 @@ function TokenButton({
   dragOverToken,
   setDraggedToken,
   setDragOverToken,
-}: Props) {
+}) => {
   const tokensContext = React.useContext(TokensContext);
-  const uiState = useSelector(uiStateSelector);
-  const tokenState = useSelector(tokenStateSelector);
+  const uiState = useSelector(uiStateSelector, isEqual);
+  const activeTokenSet = useSelector(activeTokenSetSelector);
+  const tokens = useSelector(tokensSelector);
   const { setNodeData } = useTokens();
   const { deleteSingleToken, duplicateSingleToken } = useManageTokens();
   const dispatch = useDispatch<Dispatch>();
-  const { activeTokenSet } = tokenState;
 
   const displayValue = React.useMemo(() => (
     getAliasValue(token, tokensContext.resolvedTokens)
@@ -67,7 +68,10 @@ function TokenButton({
 
   const properties = usePropertiesForTokenType(type);
   // @TODO check type property typing
-  const active = useGetActiveState([...properties, ...DocumentationProperties], type, name);
+  const activeStateProperties = React.useMemo(() => (
+    [...properties, ...DocumentationProperties]
+  ), [properties]);
+  const active = useGetActiveState(activeStateProperties, type, name);
   const [style, showValue, buttonClass] = React.useMemo(() => {
     const style: React.CSSProperties = {};
     let showValue = true;
@@ -132,23 +136,23 @@ function TokenButton({
     let dropTokenIndex: number | null = null;
 
     if (draggedToken && token && draggedToken.type === token.type) {
-      tokenState.tokens[tokenState.activeTokenSet].forEach((element, index) => {
+      tokens[activeTokenSet].forEach((element, index) => {
         if (element.name === draggedToken.name) draggedTokenIndex = index;
         if (element.name === token.name) dropTokenIndex = index;
       });
       if (draggedTokenIndex !== null && dropTokenIndex !== null) {
         const insertTokensIndex = draggedTokenIndex > dropTokenIndex ? dropTokenIndex : dropTokenIndex - 1;
-        const set = tokenState.tokens[tokenState.activeTokenSet];
+        const set = tokens[activeTokenSet];
         set.splice(insertTokensIndex, 0, set.splice(draggedTokenIndex, 1)[0]);
         const newTokens = {
-          ...tokenState.tokens,
-          [tokenState.activeTokenSet]: set,
+          ...tokens,
+          [activeTokenSet]: set,
         };
 
         dispatch.tokenState.setTokens(newTokens);
       }
     }
-  }, [token, draggedToken, dispatch, tokenState]);
+  }, [token, draggedToken, dispatch, tokens, activeTokenSet]);
 
   const checkIfDraggable = React.useCallback(() => (
     isNaN(Number(token.name.split('.')[token.name.split('.').length - 1]))
@@ -268,6 +272,6 @@ function TokenButton({
       />
     </div>
   );
-}
+};
 
 export default TokenButton;

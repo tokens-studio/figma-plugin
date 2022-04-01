@@ -14,7 +14,9 @@ import useTokens from '../store/useTokens';
 import { SingleBoxShadowToken } from '@/types/tokens';
 import { checkIfContainsAlias, getAliasValue } from '@/utils/alias';
 import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
-import { tokenStateSelector, uiStateSelector } from '@/selectors';
+import {
+  activeTokenSetSelector, editTokenSelector, tokenStateSelector, uiStateSelector,
+} from '@/selectors';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { EditTokenObject } from '../store/models/uiState';
 
@@ -25,8 +27,8 @@ type Props = {
 // @TODO this needs to be reviewed from a typings perspective + performance
 function EditTokenForm({ resolvedTokens }: Props) {
   const firstInput = React.useRef<HTMLInputElement | null>(null);
-  const { activeTokenSet } = useSelector(tokenStateSelector);
-  const { editToken } = useSelector(uiStateSelector);
+  const activeTokenSet = useSelector(activeTokenSetSelector);
+  const editToken = useSelector(editTokenSelector);
   const { editSingleToken, createSingleToken } = useManageTokens();
   const { remapToken } = useTokens();
   const dispatch = useDispatch<Dispatch>();

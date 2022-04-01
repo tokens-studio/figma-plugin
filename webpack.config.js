@@ -59,6 +59,7 @@ module.exports = (env, argv) => ({
       Types: path.resolve(__dirname, 'types'),
       '@types': path.resolve(__dirname, 'types'),
       '@': path.resolve(__dirname, 'src'),
+      'react-redux': 'react-redux/dist/react-redux.js',
     },
     extensions: ['.tsx', '.ts', '.jsx', '.js'],
   },

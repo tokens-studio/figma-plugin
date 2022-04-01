@@ -1,5 +1,6 @@
 import React from 'react';
-import { shallowEqual, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
+import isEqual from 'lodash.isequal';
 import Box from './Box';
 import Blankslate from './Blankslate';
 import AnnotationBuilder from './AnnotationBuilder';
@@ -8,7 +9,7 @@ import useTokens from '../store/useTokens';
 import { uiStateSelector } from '@/selectors';
 
 export default function InspectorDebugView({ resolvedTokens }: { resolvedTokens: SingleToken[] }) {
-  const uiState = useSelector(uiStateSelector, shallowEqual);
+  const uiState = useSelector(uiStateSelector, isEqual);
   const { getTokenValue } = useTokens();
 
   function renderBlankslate() {

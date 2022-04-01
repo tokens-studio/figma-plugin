@@ -10,7 +10,7 @@ type Props = {
   resolvedTokens: ResolveTokenValuesResult[];
 };
 
-function EditTokenFormModal({ resolvedTokens }: Props) {
+const EditTokenFormModal: React.FC<Props> = ({ resolvedTokens }) => {
   const editToken = useSelector(editTokenSelector);
   const dispatch = useDispatch<Dispatch>();
 
@@ -33,6 +33,6 @@ function EditTokenFormModal({ resolvedTokens }: Props) {
       <EditTokenForm resolvedTokens={resolvedTokens} />
     </Modal>
   );
-}
+};
 
 export default EditTokenFormModal;

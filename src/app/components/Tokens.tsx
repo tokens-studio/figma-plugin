@@ -7,7 +7,7 @@ import TokenListing from './TokenListing';
 import TokensBottomBar from './TokensBottomBar';
 import ToggleEmptyButton from './ToggleEmptyButton';
 import { mappedTokens } from './createTokenObj';
-import { Dispatch, RootState } from '../store';
+import { Dispatch } from '../store';
 import TokenSetSelector from './TokenSetSelector';
 import TokenFilter from './TokenFilter';
 import EditTokenFormModal from './EditTokenFormModal';
@@ -281,9 +281,9 @@ function Tokens({ isActive }: { isActive: boolean }) {
           }}
         >
           {tokenSetsVisible && (
-          <Box>
-            <TokenSetSelector />
-          </Box>
+            <Box>
+              <TokenSetSelector />
+            </Box>
           )}
           <Box
             css={{

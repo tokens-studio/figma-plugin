@@ -1,5 +1,6 @@
-import { shallowEqual, useSelector } from 'react-redux';
-import { useCallback } from 'react';
+import { useSelector } from 'react-redux';
+import { useCallback, useMemo } from 'react';
+import isEqual from 'lodash.isequal';
 import { postToFigma } from '@/plugin/notifiers';
 import { MessageToPluginTypes } from '@/types/messages';
 import {
@@ -41,7 +42,7 @@ export default function useTokens() {
   const usedTokenSet = useSelector(usedTokenSetSelector);
   const activeTokenSet = useSelector(activeTokenSetSelector);
   const tokens = useSelector(tokensSelector);
-  const settings = useSelector(settingsStateSelector, shallowEqual);
+  const settings = useSelector(settingsStateSelector, isEqual);
   const { confirm } = useConfirm<ConfirmResult>();
 
   // Gets value of token
@@ -169,7 +170,7 @@ export default function useTokens() {
     });
   }, [settings, tokens, usedTokenSet]);
 
-  return {
+  return useMemo(() => ({
     isAlias,
     getTokenValue,
     getFormattedTokens,
@@ -180,5 +181,16 @@ export default function useTokens() {
     remapToken,
     removeTokensByValue,
     handleRemap,
-  };
+  }), [
+    isAlias,
+    getTokenValue,
+    getFormattedTokens,
+    getStringTokens,
+    setNodeData,
+    createStylesFromTokens,
+    pullStyles,
+    remapToken,
+    removeTokensByValue,
+    handleRemap,
+  ]);
 }
