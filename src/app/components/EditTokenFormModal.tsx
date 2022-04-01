@@ -1,16 +1,17 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
-import { Dispatch, RootState } from '../store';
+import { Dispatch } from '../store';
 import EditTokenForm from './EditTokenForm';
 import Modal from './Modal';
+import { editTokenSelector } from '@/selectors';
 
 type Props = {
   resolvedTokens: ResolveTokenValuesResult[];
 };
 
 function EditTokenFormModal({ resolvedTokens }: Props) {
-  const { editToken } = useSelector((state: RootState) => state.uiState);
+  const editToken = useSelector(editTokenSelector);
   const dispatch = useDispatch<Dispatch>();
 
   const handleReset = React.useCallback(() => {

@@ -5,13 +5,14 @@ import Text from './Text';
 import Button from './Button';
 import Callout from './Callout';
 import { StorageProviderType } from '../../types/api';
-import { Dispatch, RootState } from '../store';
+import { Dispatch } from '../store';
 import Box from './Box';
+import { storageTypeSelector } from '@/selectors';
 
 function StartScreen() {
   const dispatch = useDispatch<Dispatch>();
 
-  const { storageType } = useSelector((state: RootState) => state.uiState);
+  const storageType = useSelector(storageTypeSelector);
   const onSetDefaultTokens = () => {
     dispatch.uiState.setActiveTab('tokens');
     dispatch.tokenState.setEmptyTokens();

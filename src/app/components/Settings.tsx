@@ -3,16 +3,17 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Checkbox from './Checkbox';
 import Heading from './Heading';
-import { RootState, Dispatch } from '../store';
+import { Dispatch } from '../store';
 import Label from './Label';
+import { ignoreFirstPartForStylesSelector } from '@/selectors';
 
 function SyncSettings() {
-  const { ignoreFirstPartForStyles } = useSelector((state: RootState) => state.settings);
+  const ignoreFirstPartForStyles = useSelector(ignoreFirstPartForStylesSelector);
   const dispatch = useDispatch<Dispatch>();
 
-  const handleIgnoreChange = (bool) => {
+  const handleIgnoreChange = React.useCallback((bool: boolean) => {
     dispatch.settings.setIgnoreFirstPartForStyles(bool);
-  };
+  }, [dispatch.settings]);
 
   return (
     <div className="flex flex-col grow">
@@ -23,7 +24,7 @@ function SyncSettings() {
             <div className="flex items-center space-x-2">
               <Checkbox
                 id="ignoreFirstPartForStyles"
-                checked={ignoreFirstPartForStyles}
+                checked={!!ignoreFirstPartForStyles}
                 defaultChecked={ignoreFirstPartForStyles}
                 onCheckedChange={handleIgnoreChange}
               />

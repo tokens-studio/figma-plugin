@@ -5,13 +5,14 @@ import {
   DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuItemIndicator, DropdownMenuSeparator, DropdownMenuCheckboxItem,
 } from './DropdownMenu';
 import { UpdateMode } from '@/types/state';
-import { Dispatch, RootState } from '../store';
+import { Dispatch } from '../store';
 import IconChevronDown from './icons/IconChevronDown';
+import { settingsStateSelector } from '@/selectors';
 
 export default function ApplySelector() {
   const {
     updateMode, updateRemote, updateOnChange, updateStyles,
-  } = useSelector((state: RootState) => state.settings);
+  } = useSelector(settingsStateSelector);
 
   const {
     setUpdateMode, setUpdateOnChange, setUpdateRemote, setUpdateStyles,

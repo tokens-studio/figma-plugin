@@ -1,7 +1,7 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
+import { localApiStateSelector } from '@/selectors';
 import usePushDialog from '../hooks/usePushDialog';
-import { RootState } from '../store';
 import { getCreatePullRequestUrl } from '../store/providers/github';
 import Button from './Button';
 import Heading from './Heading';
@@ -11,7 +11,7 @@ import Modal from './Modal';
 
 function ConfirmDialog() {
   const { onConfirm, onCancel, showPushDialog } = usePushDialog();
-  const { api, localApiState } = useSelector((state: RootState) => state.uiState);
+  const localApiState = useSelector(localApiStateSelector);
   const [commitMessage, setCommitMessage] = React.useState('');
   const [branch, setBranch] = React.useState(localApiState.branch);
 

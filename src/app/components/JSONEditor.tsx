@@ -1,8 +1,8 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import Textarea from './Textarea';
-import { RootState } from '../store';
 import Box from './Box';
+import { editProhibitedSelector } from '@/selectors';
 
 function JSONEditor({
   stringTokens,
@@ -13,7 +13,7 @@ function JSONEditor({
   handleChange: (tokens: string) => void;
   hasError: boolean;
 }) {
-  const { editProhibited } = useSelector((state: RootState) => state.tokenState);
+  const editProhibited = useSelector(editProhibitedSelector);
 
   return (
     <Box

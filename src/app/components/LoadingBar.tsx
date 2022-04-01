@@ -1,12 +1,12 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import Icon from './Icon';
-import { RootState } from '../store';
 import Button from './Button';
 import { postToFigma } from '@/plugin/notifiers';
 import { MessageToPluginTypes } from '@/types/messages';
 import { useDelayedFlag } from '@/hooks';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
+import { backgroundJobsSelector } from '@/selectors';
 
 const backgroundJobTitles = {
   [BackgroundJobs.NODEMANAGER_UPDATE]: 'Finding and caching tokens...',
@@ -22,7 +22,7 @@ const backgroundJobTitles = {
 };
 
 export default function LoadingBar() {
-  const { backgroundJobs } = useSelector((state: RootState) => state.uiState);
+  const backgroundJobs = useSelector(backgroundJobsSelector);
   const hasInfiniteJobs = React.useMemo(() => backgroundJobs.some((job) => job.isInfinite), [backgroundJobs]);
   const expectedWaitTime = React.useMemo(() => backgroundJobs.reduce((time, job) => (
     time + (job.totalTasks ? (

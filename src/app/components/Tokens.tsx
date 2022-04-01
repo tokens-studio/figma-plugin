@@ -26,6 +26,9 @@ import parseTokenValues from '@/utils/parseTokenValues';
 import parseJson from '@/utils/parseJson';
 import AttentionIcon from '@/icons/attention.svg';
 import { TokensContext } from '@/context';
+import {
+  activeTokenSetSelector, showEditFormSelector, tokenFilterSelector, tokensSelector, tokenTypeSelector, updateModeSelector, usedTokenSetSelector,
+} from '@/selectors';
 
 const StyledButton = styled('button', {
   '&:focus, &:hover': {
@@ -99,16 +102,17 @@ const StatusToast = ({ open, error }: { open: boolean; error: string | null }) =
 };
 
 function Tokens({ isActive }: { isActive: boolean }) {
-  const {
-    tokens, activeTokenSet, usedTokenSet,
-  } = useSelector((state: RootState) => state.tokenState);
-  const { showEditForm, tokenFilter } = useSelector((state: RootState) => state.uiState);
+  const tokens = useSelector(tokensSelector);
+  const activeTokenSet = useSelector(activeTokenSetSelector);
+  const usedTokenSet = useSelector(usedTokenSetSelector);
+  const showEditForm = useSelector(showEditFormSelector);
+  const tokenFilter = useSelector(tokenFilterSelector);
   const dispatch = useDispatch<Dispatch>();
   const [activeTokensTab, setActiveTokensTab] = React.useState('list');
   const [tokenSetsVisible, setTokenSetsVisible] = React.useState(true);
   const { getStringTokens } = useTokens();
 
-  const { updateMode = UpdateMode.PAGE } = useSelector((state: RootState) => state.settings);
+  const updateMode = useSelector(updateModeSelector);
   const { confirm } = useConfirm();
   const shouldConfirm = React.useMemo(() => updateMode === UpdateMode.DOCUMENT, [updateMode]);
 
@@ -119,7 +123,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
   const [stringTokens, setStringTokens] = React.useState(
     JSON.stringify(tokens[activeTokenSet], null, 2),
   );
-  const { tokenType } = useSelector((state: RootState) => state.settings);
+  const tokenType = useSelector(tokenTypeSelector);
 
   const [error, setError] = React.useState<string | null>(null);
 

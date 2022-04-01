@@ -1,8 +1,8 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { useCallback, useRef } from 'react';
-import { uiStateSelector } from '@/selectors';
+import { useCallback, useMemo, useRef } from 'react';
 import { Dispatch } from '../store';
 import { ConfirmProps } from '../store/models/uiState';
+import { confirmStateSelector } from '@/selectors';
 
 type ResolveCallbackPayload<C = any> = false | {
   result: true;
@@ -10,7 +10,7 @@ type ResolveCallbackPayload<C = any> = false | {
 };
 
 function useConfirm<C = any>() {
-  const { confirmState } = useSelector(uiStateSelector);
+  const confirmState = useSelector(confirmStateSelector);
   const resolveCallbackRef = useRef<(payload: ResolveCallbackPayload<C>) => void>(() => {});
   const dispatch = useDispatch<Dispatch>();
 
@@ -50,9 +50,9 @@ function useConfirm<C = any>() {
     resolveCallbackRef.current({ result: true, data });
   }, [closeConfirm]);
 
-  return {
+  return useMemo(() => ({
     confirm, onConfirm, onCancel, confirmState,
-  };
+  }), [confirm, onConfirm, onCancel, confirmState]);
 }
 
 export default useConfirm;

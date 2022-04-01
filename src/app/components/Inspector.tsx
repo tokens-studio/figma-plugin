@@ -6,18 +6,23 @@ import InspectorMultiView from './InspectorMultiView';
 import IconDebug from '@/icons/debug.svg';
 import IconInspect from '@/icons/multiinspect.svg';
 import IconButton from './IconButton';
-import { Dispatch, RootState } from '../store';
+import { Dispatch } from '../store';
 import Checkbox from './Checkbox';
 import Label from './Label';
 import Tooltip from './Tooltip';
 import { resolveTokenValues, mergeTokenGroups } from '@/plugin/tokenHelpers';
 import { track } from '@/utils/analytics';
+import {
+  activeTokenSetSelector, inspectDeepSelector, tokensSelector, usedTokenSetSelector,
+} from '@/selectors';
 
 function Inspector() {
   const [inspectView, setInspectView] = React.useState('multi');
-  const { inspectDeep } = useSelector((state: RootState) => state.settings);
   const dispatch = useDispatch<Dispatch>();
-  const { tokens, activeTokenSet, usedTokenSet } = useSelector((state: RootState) => state.tokenState);
+  const tokens = useSelector(tokensSelector);
+  const activeTokenSet = useSelector(activeTokenSetSelector);
+  const usedTokenSet = useSelector(usedTokenSetSelector);
+  const inspectDeep = useSelector(inspectDeepSelector);
 
   // TODO: Put this into state in a performant way
   const resolvedTokens = React.useMemo(() => resolveTokenValues(mergeTokenGroups(tokens, [...usedTokenSet, activeTokenSet])), [tokens, usedTokenSet, activeTokenSet]);

@@ -2,11 +2,16 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Box from './Box';
 import { TokenSetItem } from './TokenSetItem';
-import { Dispatch, RootState } from '../store';
+import { Dispatch } from '../store';
 import { getTree, TreeItem } from './utils/getTree';
+import { activeTokenSetSelector, editProhibitedSelector, usedTokenSetSelector } from '@/selectors';
+
+// @TODO use hooks
 
 export default function TokenSetTree({ tokenSets, onRename, onDelete }: { tokenSets: string[], onRename: (tokenSet: string) => void, onDelete: (tokenSet: string) => void }) {
-  const { activeTokenSet, usedTokenSet, editProhibited } = useSelector((state: RootState) => state.tokenState);
+  const activeTokenSet = useSelector(activeTokenSetSelector);
+  const usedTokenSet = useSelector(usedTokenSetSelector);
+  const editProhibited = useSelector(editProhibitedSelector);
   const dispatch = useDispatch<Dispatch>();
   const [items, setItems] = React.useState<TreeItem[]>(getTree(tokenSets));
   const [collapsed, setCollapsed] = React.useState<string[]>([]);
@@ -15,6 +20,10 @@ export default function TokenSetTree({ tokenSets, onRename, onDelete }: { tokenS
     setItems(getTree(tokenSets));
   }, [tokenSets]);
 
+  // functions should not be created inside a React component
+  // without useCallback as it can cause the creation of new references
+  // for every re-render and result in unnecessary re-renders
+  // this applies to the whole codebase
   function toggleCollapsed(set) {
     setCollapsed(collapsed.includes(set) ? collapsed.filter((s) => s !== set) : [...collapsed, set]);
   }

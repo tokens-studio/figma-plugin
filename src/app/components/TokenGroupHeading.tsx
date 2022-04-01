@@ -4,8 +4,8 @@ import {
   ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger,
 } from './ContextMenu';
 import Heading from './Heading';
-import { RootState } from '../store';
 import useManageTokens from '../store/useManageTokens';
+import { editProhibitedSelector } from '@/selectors';
 
 type Props = {
   id: string
@@ -14,7 +14,7 @@ type Props = {
 };
 
 export default function TokenGroupHeading({ label, path, id }: Props) {
-  const { editProhibited } = useSelector((state: RootState) => state.tokenState);
+  const editProhibited = useSelector(editProhibitedSelector);
   const { deleteGroup } = useManageTokens();
 
   return (

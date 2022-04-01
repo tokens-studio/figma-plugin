@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 import Heading from './Heading';
 import Button from './Button';
 import Modal from './Modal';
-import { RootState } from '../store';
+import { changelogSelector } from '@/selectors';
 
 type ChangelogItem = {
   _uid: string;
@@ -19,7 +19,7 @@ type ChangelogItem = {
 
 export default function Changelog() {
   const [changelogOpen, setChangelogOpen] = React.useState(true);
-  const { changelog } = useSelector((state: RootState) => state.uiState);
+  const changelog = useSelector(changelogSelector);
 
   const [activeIndex, setIndex] = React.useState(0);
 
@@ -37,7 +37,7 @@ export default function Changelog() {
         <div>
           {changelog.map((item: ChangelogItem, index) => (
             <div
-                                // eslint-disable-next-line no-underscore-dangle
+              // eslint-disable-next-line no-underscore-dangle
               key={item._uid}
               className={`space-y-2 flex flex-col items-center text-center ${
                 index === activeIndex ? 'visible' : 'hidden'

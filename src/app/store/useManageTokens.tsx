@@ -1,11 +1,15 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { SingleToken, TokenType } from '@/types/tokens';
-import { Dispatch, RootState } from '../store';
+import { SingleToken } from '@/types/tokens';
+import { Dispatch } from '../store';
 import useConfirm from '../hooks/useConfirm';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
+import { activeTokenSetSelector } from '@/selectors';
+import { TokenTypes } from '@/constants/TokenTypes';
+
+// @TODO use hooks
 
 export default function useManageTokens() {
-  const { activeTokenSet } = useSelector((state: RootState) => state.tokenState);
+  const activeTokenSet = useSelector(activeTokenSetSelector);
   const {
     editToken, createToken, deleteToken, duplicateToken, deleteTokenGroup,
   } = useDispatch<Dispatch>().tokenState;
@@ -17,7 +21,7 @@ export default function useManageTokens() {
     parent: string;
     name: string;
     value: SingleToken;
-    options?: { description?: string; type: TokenType };
+    options?: { description?: string; type: TokenTypes };
     oldName?: string;
     shouldUpdateDocument?: boolean;
   }) {

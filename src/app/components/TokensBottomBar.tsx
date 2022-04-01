@@ -1,12 +1,12 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
-import { RootState } from '../store';
 import ApplySelector from './ApplySelector';
 import ExportModal from './modals/ExportModal';
 import PresetModal from './modals/PresetModal';
 import Box from './Box';
 import ActionButton from './ActionButton';
 import StylesDropdown from './StylesDropdown';
+import { editProhibitedSelector, hasUnsavedChangesSelector } from '@/selectors';
 
 type Props = {
   handleUpdate: () => void;
@@ -15,7 +15,8 @@ type Props = {
 };
 
 export default function TokensBottomBar({ handleUpdate, handleSaveJSON, hasJSONError }: Props) {
-  const { editProhibited, hasUnsavedChanges } = useSelector((state: RootState) => state.tokenState);
+  const editProhibited = useSelector(editProhibitedSelector);
+  const hasUnsavedChanges = useSelector(hasUnsavedChangesSelector);
 
   const [exportModalVisible, showExportModal] = React.useState(false);
   const [presetModalVisible, showPresetModal] = React.useState(false);

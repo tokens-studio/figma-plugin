@@ -4,17 +4,21 @@ import { useSelector } from 'react-redux';
 import isSameCredentials from '@/utils/isSameCredentials';
 import Button from './Button';
 import useRemoteTokens from '../store/remoteTokens';
-import { RootState } from '../store';
+import { storageTypeSelector } from '@/selectors';
+
+// @TODO typings
 
 const StorageItem = ({ item, onEdit = null }) => {
-  const { storageType } = useSelector((state: RootState) => state.uiState);
+  const storageType = useSelector(storageTypeSelector);
   const {
     provider, id, branch, name,
   } = item;
 
   const { restoreStoredProvider, deleteProvider } = useRemoteTokens();
 
-  const isActive = () => isSameCredentials(item, storageType);
+  const isActive = React.useCallback(() => (
+    isSameCredentials(item, storageType)
+  ), [item, storageType]);
 
   return (
     <div

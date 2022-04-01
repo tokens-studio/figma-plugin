@@ -11,10 +11,13 @@ import ProviderSelector from './StorageProviderSelector';
 import EditStorageItemModal from './modals/EditStorageItemModal';
 import CreateStorageItemModal from './modals/CreateStorageItemModal';
 import useStorage from '../store/useStorage';
-import { Dispatch, RootState } from '../store';
+import { Dispatch } from '../store';
+import { apiProvidersSelector, localApiStateSelector, storageTypeSelector } from '@/selectors';
 
 const SyncSettings = () => {
-  const { localApiState, apiProviders, storageType } = useSelector((state: RootState) => state.uiState);
+  const localApiState = useSelector(localApiStateSelector);
+  const storageType = useSelector(storageTypeSelector);
+  const apiProviders = useSelector(apiProvidersSelector);
   const dispatch = useDispatch<Dispatch>();
 
   const { setStorageType } = useStorage();

@@ -1,14 +1,14 @@
 import React from 'react';
-import { useSelector } from 'react-redux';
-import { RootState } from '../store';
+import { shallowEqual, useSelector } from 'react-redux';
 import Box from './Box';
 import Blankslate from './Blankslate';
 import AnnotationBuilder from './AnnotationBuilder';
 import { SingleToken } from '@/types/tokens';
 import useTokens from '../store/useTokens';
+import { uiStateSelector } from '@/selectors';
 
 export default function InspectorDebugView({ resolvedTokens }: { resolvedTokens: SingleToken[] }) {
-  const uiState = useSelector((state: RootState) => state.uiState);
+  const uiState = useSelector(uiStateSelector, shallowEqual);
   const { getTokenValue } = useTokens();
 
   function renderBlankslate() {

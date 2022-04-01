@@ -8,6 +8,7 @@ import { notifyToUI, postToFigma } from '../../../plugin/notifiers';
 import * as pjs from '../../../../package.json';
 import useStorage from '../useStorage';
 import { compareUpdatedAt } from '@/utils/date';
+import { tokensSelector } from '@/selectors';
 
 async function readTokensFromJSONBin({ secret, id }): Promise<TokenValues | null> {
   const response = await fetch(`https://api.jsonbin.io/v3/b/${id}/latest`, {
@@ -88,7 +89,7 @@ export async function updateJSONBinTokens({
 export function useJSONbin() {
   const dispatch = useDispatch<Dispatch>();
   const { setStorageType } = useStorage();
-  const { tokens } = useSelector((state: RootState) => state.tokenState);
+  const tokens = useSelector(tokensSelector);
 
   async function createNewJSONBin(context: ContextObject): Promise<TokenValues> {
     const { secret, name, updatedAt } = context;

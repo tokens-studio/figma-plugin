@@ -5,7 +5,7 @@ import TokenButton from './TokenButton';
 import TokenGroupHeading from './TokenGroupHeading';
 import Tooltip from './Tooltip';
 import { TokenTypes } from '@/constants/TokenTypes';
-import { tokenStateSelector } from '@/selectors';
+import { editProhibitedSelector } from '@/selectors';
 import { DeepKeyTokenMap, SingleToken, TokenTypeSchema } from '@/types/tokens';
 import { isSingleToken } from '@/utils/is';
 
@@ -29,10 +29,10 @@ type Props = {
   showForm: (opts: ShowFormOptions) => void
 };
 
-function TokenTree({
+const TokenTree: React.FC<Props> = ({
   displayType, tokenValues, showNewForm, showForm, schema, path = null, type,
-}: Props) {
-  const { editProhibited } = useSelector(tokenStateSelector);
+}) => {
+  const editProhibited = useSelector(editProhibitedSelector);
   const tokenValuesEntries = React.useMemo(() => Object.entries(tokenValues), [tokenValues]);
   const [draggedToken, setDraggedToken] = useState<SingleToken | null>(null);
   const [dragOverToken, setDragOverToken] = useState<SingleToken | null>(null);
@@ -90,6 +90,8 @@ function TokenTree({
       })}
     </div>
   );
-}
+};
 
-export default TokenTree;
+TokenTree.whyDidYouRender = true;
+
+export default React.memo(TokenTree);

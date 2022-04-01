@@ -2,7 +2,6 @@ import React from 'react';
 import { useSelector } from 'react-redux';
 import { CheckIcon, ChevronRightIcon } from '@radix-ui/react-icons';
 import { styled } from '@/stitches.config';
-import { RootState } from '../store';
 import {
   ContextMenu,
   ContextMenuContent,
@@ -13,6 +12,7 @@ import {
   ContextMenuSeparator,
   ContextMenuTrigger,
 } from './ContextMenu';
+import { editProhibitedSelector, mainNodeSelectionValuesSelector } from '@/selectors';
 
 const RightSlot = styled('div', {
   marginLeft: 'auto',
@@ -22,6 +22,7 @@ const RightSlot = styled('div', {
   '[data-disabled] &': { color: '$disabled' },
 });
 
+// @TODO typing
 function MoreButton({
   properties,
   documentationProperties,
@@ -33,10 +34,12 @@ function MoreButton({
   onDelete,
   onDuplicate,
 }) {
-  const { mainNodeSelectionValues } = useSelector((state: RootState) => state.uiState);
-  const { editProhibited } = useSelector((state: RootState) => state.tokenState);
+  const mainNodeSelectionValues = useSelector(mainNodeSelectionValuesSelector);
+  const editProhibited = useSelector(editProhibitedSelector);
 
-  const visibleProperties = properties.filter((p) => p.label);
+  const visibleProperties = React.useMemo(() => (
+    properties.filter((p) => p.label)
+  ), [properties]);
 
   return (
     <ContextMenu>

@@ -1,4 +1,4 @@
-import { useSelector } from 'react-redux';
+import { shallowEqual, useSelector } from 'react-redux';
 import { useCallback } from 'react';
 import { postToFigma } from '@/plugin/notifiers';
 import { MessageToPluginTypes } from '@/types/messages';
@@ -10,13 +10,17 @@ import stringifyTokens from '@/utils/stringifyTokens';
 import formatTokens from '@/utils/formatTokens';
 import { mergeTokenGroups, resolveTokenValues } from '@/plugin/tokenHelpers';
 import { UpdateMode } from '@/types/state';
-import { RootState } from '../store';
 import useConfirm from '../hooks/useConfirm';
 import { Properties } from '@/constants/Properties';
 import { track } from '@/utils/analytics';
 import { SelectionValue } from '@/types';
 import { checkIfAlias } from '@/utils/alias';
-import { tokenStateSelector } from '@/selectors';
+import {
+  activeTokenSetSelector,
+  settingsStateSelector,
+  tokensSelector,
+  usedTokenSetSelector,
+} from '@/selectors';
 
 // @TODO fix typings
 
@@ -34,8 +38,10 @@ type GetFormattedTokensOptions = {
 type RemoveTokensByValueData = { property: Properties; nodes: string[] }[];
 
 export default function useTokens() {
-  const { tokens, usedTokenSet, activeTokenSet } = useSelector(tokenStateSelector);
-  const settings = useSelector((state: RootState) => state.settings);
+  const usedTokenSet = useSelector(usedTokenSetSelector);
+  const activeTokenSet = useSelector(activeTokenSetSelector);
+  const tokens = useSelector(tokensSelector);
+  const settings = useSelector(settingsStateSelector, shallowEqual);
   const { confirm } = useConfirm<ConfirmResult>();
 
   // Gets value of token

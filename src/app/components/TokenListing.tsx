@@ -16,7 +16,7 @@ type Props = Omit<TokenTypeSchema, 'type'> & {
   tokenType: TokenTypes;
 };
 
-function TokenListing({
+const TokenListing: React.FC<Props> = ({
   tokenKey,
   label,
   schema,
@@ -24,7 +24,7 @@ function TokenListing({
   property,
   tokenType = TokenTypes.IMPLICIT,
   values,
-}: Props) {
+}) => {
   const { editProhibited } = useSelector(tokenStateSelector);
   const { displayType, showEmptyGroups, collapsed } = useSelector(uiStateSelector);
   const dispatch = useDispatch<Dispatch>();
@@ -147,6 +147,6 @@ function TokenListing({
       )}
     </div>
   );
-}
+};
 
-export default TokenListing;
+export default React.memo(TokenListing);

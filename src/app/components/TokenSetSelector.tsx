@@ -2,7 +2,7 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { track } from '@/utils/analytics';
 import useConfirm from '../hooks/useConfirm';
-import { Dispatch, RootState } from '../store';
+import { Dispatch } from '../store';
 import Button from './Button';
 import Heading from './Heading';
 import Icon from './Icon';
@@ -13,6 +13,9 @@ import Box from './Box';
 import { styled } from '@/stitches.config';
 import TokenSetList from './TokenSetList';
 import { StorageProviderType } from '@/types/api';
+import {
+  apiSelector, editProhibitedSelector, featureFlagsSelector, tokensSelector,
+} from '@/selectors';
 
 const StyledButton = styled('button', {
   flexShrink: 0,
@@ -31,8 +34,10 @@ const StyledButton = styled('button', {
 });
 
 export default function TokenSetSelector() {
-  const { tokens, editProhibited } = useSelector((state: RootState) => state.tokenState);
-  const { featureFlags, api } = useSelector((state: RootState) => state.uiState);
+  const tokens = useSelector(tokensSelector);
+  const editProhibited = useSelector(editProhibitedSelector);
+  const featureFlags = useSelector(featureFlagsSelector);
+  const api = useSelector(apiSelector);
   const dispatch = useDispatch<Dispatch>();
   const { confirm } = useConfirm();
 

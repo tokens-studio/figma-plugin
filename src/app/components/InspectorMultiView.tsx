@@ -1,6 +1,6 @@
 import React from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { RootState, Dispatch } from '../store';
+import { useSelector, useDispatch, shallowEqual } from 'react-redux';
+import { Dispatch } from '../store';
 import useTokens from '../store/useTokens';
 import Button from './Button';
 import Box from './Box';
@@ -9,10 +9,11 @@ import Label from './Label';
 import Blankslate from './Blankslate';
 import InspectorTokenGroup from './InspectorTokenGroup';
 import { SingleToken } from '@/types/tokens';
+import { inspectStateSelector, uiStateSelector } from '@/selectors';
 
 export default function InspectorMultiView({ resolvedTokens }: { resolvedTokens: SingleToken[] }) {
-  const inspectState = useSelector((state: RootState) => state.inspectState);
-  const uiState = useSelector((state: RootState) => state.uiState);
+  const inspectState = useSelector(inspectStateSelector, shallowEqual);
+  const uiState = useSelector(uiStateSelector, shallowEqual);
   const { removeTokensByValue } = useTokens();
 
   const dispatch = useDispatch<Dispatch>();

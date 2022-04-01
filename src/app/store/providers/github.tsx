@@ -11,6 +11,7 @@ import { notifyToUI, postToFigma } from '../../../plugin/notifiers';
 import { FeatureFlags } from '@/utils/featureFlags';
 import { AnyTokenSet, TokenValues } from '@/types/tokens';
 import { decodeBase64 } from '@/utils/string';
+import { featureFlagsSelector, localApiStateSelector, tokensSelector } from '@/selectors';
 
 type TokenSets = {
   [key: string]: AnyTokenSet;
@@ -195,8 +196,9 @@ const createOrUpdateFiles = (
 };
 
 export function useGitHub() {
-  const { tokens } = useSelector((state: RootState) => state.tokenState);
-  const { localApiState, featureFlags } = useSelector((state: RootState) => state.uiState);
+  const tokens = useSelector(tokensSelector);
+  const localApiState = useSelector(localApiStateSelector);
+  const featureFlags = useSelector(featureFlagsSelector);
   const dispatch = useDispatch<Dispatch>();
 
   const { confirm } = useConfirm();
