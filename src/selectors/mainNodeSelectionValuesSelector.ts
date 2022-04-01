@@ -1,4 +1,4 @@
-import { createSelector } from '@reduxjs/toolkit';
+import { createSelector } from 'reselect';
 import { shallowEqual } from 'react-redux';
 import { uiStateSelector } from './uiStateSelector';
 

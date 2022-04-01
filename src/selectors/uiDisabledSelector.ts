@@ -1,7 +1,7 @@
 import { createSelector } from 'reselect';
 import { uiStateSelector } from './uiStateSelector';
 
-export const localApiStateSelector = createSelector(
+export const uiDisabledSelector = createSelector(
   uiStateSelector,
-  (state) => state.localApiState,
+  (state) => state.disabled,
 );

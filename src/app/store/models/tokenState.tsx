@@ -27,7 +27,7 @@ const defaultTokens: TokenStore = {
   // @TODO this may not be correct
   values: parseTokenValues(defaultJSON as unknown as SetTokenDataPayload['values']),
 };
-interface TokenState {
+export interface TokenState {
   tokens: Record<string, AnyTokenList>;
   lastSyncedState: string;
   importedTokens: {

@@ -1,18 +1,19 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
-import { CheckIcon, ChevronRightIcon } from '@radix-ui/react-icons';
+import { ChevronRightIcon } from '@radix-ui/react-icons';
 import { styled } from '@/stitches.config';
 import {
   ContextMenu,
   ContextMenuContent,
   ContextMenuItem,
-  ContextMenuCheckboxItem,
-  ContextMenuItemIndicator,
   ContextMenuTriggerItem,
   ContextMenuSeparator,
   ContextMenuTrigger,
-} from './ContextMenu';
-import { editProhibitedSelector, mainNodeSelectionValuesSelector } from '@/selectors';
+} from '../ContextMenu';
+import { editProhibitedSelector } from '@/selectors';
+import { PropertyObject } from '@/types/properties';
+import { MoreButtonProperty } from './MoreButtonProperty';
+import { DocumentationProperties } from '@/constants/DocumentationProperties';
 
 const RightSlot = styled('div', {
   marginLeft: 'auto',
@@ -23,18 +24,27 @@ const RightSlot = styled('div', {
 });
 
 // @TODO typing
-function MoreButton({
+
+type Props = {
+  properties: PropertyObject[];
+  path: string;
+  value: string;
+  onEdit: () => void;
+  onDelete: () => void;
+  onDuplicate: () => void;
+  onClick: (properties: PropertyObject | PropertyObject[], isActive: boolean) => void;
+};
+
+export const MoreButton: React.FC<Props> = ({
   properties,
-  documentationProperties,
-  children,
   path,
   value,
   onClick,
   onEdit,
   onDelete,
   onDuplicate,
-}) {
-  const mainNodeSelectionValues = useSelector(mainNodeSelectionValuesSelector);
+  children,
+}) => {
   const editProhibited = useSelector(editProhibitedSelector);
 
   const visibleProperties = React.useMemo(() => (
@@ -47,22 +57,14 @@ function MoreButton({
         {children}
       </ContextMenuTrigger>
       <ContextMenuContent sideOffset={5} collisionTolerance={30}>
-        {visibleProperties.map((property) => {
-          const isActive = mainNodeSelectionValues[property.name] === value;
-
-          return (
-            <ContextMenuCheckboxItem
-              key={property.label}
-              checked={isActive}
-              onCheckedChange={() => onClick(property, isActive)}
-            >
-              <ContextMenuItemIndicator>
-                <CheckIcon />
-              </ContextMenuItemIndicator>
-              {property.label}
-            </ContextMenuCheckboxItem>
-          );
-        })}
+        {visibleProperties.map((property) => (
+          <MoreButtonProperty
+            key={property.name}
+            value={value}
+            property={property}
+            onClick={onClick}
+          />
+        ))}
         <ContextMenu>
           <ContextMenuTriggerItem>
             Documentation Tokens
@@ -71,22 +73,14 @@ function MoreButton({
             </RightSlot>
           </ContextMenuTriggerItem>
           <ContextMenuContent sideOffset={2} alignOffset={-5} collisionTolerance={30}>
-            {documentationProperties.map((property) => {
-              const isActive = mainNodeSelectionValues[property.name] === value;
-
-              return (
-                <ContextMenuCheckboxItem
-                  key={property.label}
-                  checked={isActive}
-                  onCheckedChange={() => onClick(property, isActive)}
-                >
-                  <ContextMenuItemIndicator>
-                    <CheckIcon />
-                  </ContextMenuItemIndicator>
-                  {property.label}
-                </ContextMenuCheckboxItem>
-              );
-            })}
+            {DocumentationProperties.map((property) => (
+              <MoreButtonProperty
+                key={property.name}
+                value={value}
+                property={property}
+                onClick={onClick}
+              />
+            ))}
           </ContextMenuContent>
         </ContextMenu>
         <ContextMenuSeparator />
@@ -103,6 +97,4 @@ function MoreButton({
       </ContextMenuContent>
     </ContextMenu>
   );
-}
-
-export default MoreButton;
+};

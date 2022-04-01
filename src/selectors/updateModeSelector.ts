@@ -1,4 +1,4 @@
-import { createSelector } from '@reduxjs/toolkit';
+import { createSelector } from 'reselect';
 import { UpdateMode } from '@/types/state';
 import { settingsStateSelector } from './settingsStateSelector';
 

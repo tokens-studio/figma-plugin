@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
-import compact from 'just-compact';
 import Icon from './Icon';
-import TokenButton from './TokenButton';
 import TokenGroupHeading from './TokenGroupHeading';
 import Tooltip from './Tooltip';
+import { TokenButton } from './TokenButton';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { editProhibitedSelector } from '@/selectors';
 import { DeepKeyTokenMap, SingleToken, TokenTypeSchema } from '@/types/tokens';

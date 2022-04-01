@@ -2,7 +2,7 @@ import React from 'react';
 import { styled } from '@/stitches.config';
 import IconBrokenLink from './icons/IconBrokenLink';
 import { SingleToken } from '@/types/tokens';
-import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
+import { TokensContext } from '@/context';
 
 const StyledIndicator = styled('div', {
   position: 'absolute',
@@ -20,13 +20,14 @@ const StyledIndicator = styled('div', {
 
 type Props = {
   token: SingleToken;
-  resolvedTokens: ResolveTokenValuesResult[];
 };
 
-export default function BrokenReferenceIndicator({ token, resolvedTokens }: Props) {
+export default function BrokenReferenceIndicator({ token }: Props) {
+  const tokensContext = React.useContext(TokensContext);
+
   const failedToResolve = React.useMemo(() => (
-    resolvedTokens.find((t) => t.name === token.name)?.failedToResolve
-  ), [token, resolvedTokens]);
+    tokensContext.resolvedTokens.find((t) => t.name === token.name)?.failedToResolve
+  ), [token, tokensContext.resolvedTokens]);
 
   if (failedToResolve) {
     return (

@@ -1,7 +1,7 @@
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch, useStore } from 'react-redux';
 import { useCallback, useMemo } from 'react';
 import { SingleToken } from '@/types/tokens';
-import { Dispatch } from '../store';
+import { Dispatch, RootState } from '../store';
 import useConfirm from '../hooks/useConfirm';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
 import { activeTokenSetSelector } from '@/selectors';
@@ -27,13 +27,12 @@ type CreateSingleTokenData = {
 };
 
 export default function useManageTokens() {
-  const activeTokenSet = useSelector(activeTokenSetSelector);
-  const {
-    editToken, createToken, deleteToken, duplicateToken, deleteTokenGroup,
-  } = useDispatch<Dispatch>().tokenState;
-
+  const store = useStore<RootState>();
   const dispatch = useDispatch<Dispatch>();
   const { confirm } = useConfirm();
+  const {
+    editToken, createToken, deleteToken, duplicateToken, deleteTokenGroup,
+  } = dispatch.tokenState;
 
   const editSingleToken = useCallback(async (data: EditSingleTokenData) => {
     const {
@@ -114,6 +113,7 @@ export default function useManageTokens() {
       description: 'Are you sure you want to delete this group?',
     });
     if (userConfirmation) {
+      const activeTokenSet = activeTokenSetSelector(store.getState());
       dispatch.uiState.startJob({
         name: BackgroundJobs.UI_DELETETOKENGROUP,
         isInfinite: true,
@@ -121,7 +121,7 @@ export default function useManageTokens() {
       deleteTokenGroup({ parent: activeTokenSet, path });
       dispatch.uiState.completeJob(BackgroundJobs.UI_DELETETOKENGROUP);
     }
-  }, [activeTokenSet, confirm, deleteTokenGroup, dispatch.uiState]);
+  }, [store, confirm, deleteTokenGroup, dispatch.uiState]);
 
   return useMemo(() => ({
     editSingleToken, createSingleToken, deleteSingleToken, deleteGroup, duplicateSingleToken,

@@ -14,7 +14,6 @@ import { UpdateMode } from '@/types/state';
 import useConfirm from '../hooks/useConfirm';
 import { Properties } from '@/constants/Properties';
 import { track } from '@/utils/analytics';
-import { SelectionValue } from '@/types';
 import { checkIfAlias } from '@/utils/alias';
 import {
   activeTokenSetSelector,
@@ -54,16 +53,6 @@ export default function useTokens() {
   const isAlias = useCallback((token: SingleToken, resolvedTokens: AnyTokenList) => (
     checkIfAlias(token, resolvedTokens)
   ), []);
-
-  // Calls Figma with all tokens and nodes to set data on
-  const setNodeData = useCallback((data: SelectionValue, resolvedTokens: AnyTokenList) => {
-    postToFigma({
-      type: MessageToPluginTypes.SET_NODE_DATA,
-      values: data,
-      tokens: resolvedTokens,
-      settings,
-    });
-  }, [settings]);
 
   // Returns formatted tokens for style dictionary
   const getFormattedTokens = useCallback((opts: GetFormattedTokensOptions) => {
@@ -175,7 +164,6 @@ export default function useTokens() {
     getTokenValue,
     getFormattedTokens,
     getStringTokens,
-    setNodeData,
     createStylesFromTokens,
     pullStyles,
     remapToken,
@@ -186,7 +174,6 @@ export default function useTokens() {
     getTokenValue,
     getFormattedTokens,
     getStringTokens,
-    setNodeData,
     createStylesFromTokens,
     pullStyles,
     remapToken,

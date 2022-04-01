@@ -1,6 +1,11 @@
-import { init, RematchDispatch, RematchRootState } from '@rematch/core';
+import { init, RematchDispatch } from '@rematch/core';
 import { RootModel } from '@/types/RootModel';
 import { models } from './store/models';
+
+import type { UIState } from './store/models/uiState';
+import type { SettingsState } from './store/models/settings';
+import type { TokenState } from './store/models/tokenState';
+import type { InspectState } from './store/models/inspectState';
 
 export const store = init({
   models,
@@ -12,4 +17,9 @@ export const store = init({
 
 export type Store = typeof store;
 export type Dispatch = RematchDispatch<RootModel>;
-export type RootState = RematchRootState<RootModel>;
+export type RootState = {
+  uiState: UIState
+  settings: SettingsState
+  tokenState: TokenState
+  inspectState: InspectState;
+};
