@@ -5,7 +5,11 @@ import Heading from '../Heading';
 import Button from '../Button';
 import Modal from '../Modal';
 
-export default function ExportModal({ onClose }) {
+type Props = {
+  onClose: () => void
+};
+
+export default function ExportModal({ onClose }: Props) {
   const dispatch = useDispatch<Dispatch>();
 
   const handleSetDefault = () => {

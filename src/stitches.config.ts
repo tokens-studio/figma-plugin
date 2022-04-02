@@ -3,7 +3,8 @@ import { createCss } from '@stitches/react';
 
 const globalTokens = {
   colors: {
-    background: 'var(--color-bg)',
+    white: '#FFFFFF',
+    background: '#FFFFFF',
     gray50: 'var(--theme-colors-gray-50, #FAFAFA)',
     gray100: 'var(--theme-colors-gray-100, #f5f5f5)',
     gray200: 'var(--theme-colors-gray-200, #eeeeee)',
@@ -21,6 +22,7 @@ const globalTokens = {
     primary400: 'var(--theme-colors-brand-300, #3CB1FF)',
     primary500: 'var(--theme-colors-brand-500, #18A0FB)',
     red500: 'var(--red, #f24822)',
+    red100: 'var(--red-100, #fff5f5)',
     shadow: 'hsla(206,22%,7%,.15)',
   },
   radii: {
@@ -56,7 +58,7 @@ export const {
       bgAccent: 'var(--color-bg-selected-tertiary)',
       bgAccentHover: 'var(--color-bg-selected-hover)',
       interaction: 'var(--color-bg-brand)',
-      interactionSubtle: globalTokens.colors.primary400,
+      interactionSubtle: 'var(--color-bg-brand-secondary)',
       onInteraction: 'var(--color-text-menu-onselected)',
       interactionDisabled: 'var(--color-text-menu-disabled)',
       dangerFg: 'var(--color-text-danger)',
@@ -73,6 +75,7 @@ export const {
       6: '24px',
       7: '32px',
       8: '48px',
+      9: '64px',
     },
     sizes: {
       1: '2px',

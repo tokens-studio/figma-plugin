@@ -6,9 +6,13 @@ import {
 } from './api';
 import { NodeTokenRefMap } from './NodeTokenRefMap';
 import { UpdateMode } from './state';
-import {
-  PullStyleTypes, SelectionGroup, SelectionValue, TokenArrayGroup, TokenGroup,
-} from './tokens';
+import { SelectionGroup } from './SelectionGroup';
+import { SelectionValue } from './SelectionValue';
+import { AnyTokenList, AnyTokenSet } from './tokens';
+import { PullStyleOptions } from './PullStylesOptions';
+// import {
+//   PullStyleTypes, SelectionGroup, SelectionValue, TokenArrayGroup, TokenGroup,
+// } from './tokens';
 
 export enum MessageFromPluginTypes {
   SELECTION = 'selection',
@@ -72,6 +76,8 @@ export type UiSettingsFromPluginMessage = {
     ignoreFirstPartForStyles: boolean;
   };
 };
+
+// @TODO fix case
 export type showEmptyGroupsFromPluginMessage = {
   type: MessageFromPluginTypes.SHOW_EMPTY_GROUPS;
   showEmptyGroups: boolean;
@@ -133,6 +139,7 @@ export type ApiCredentialsFromPluginMessage = {
   credentials: ApiDataType & {
     internalId?: string
   }
+  featureFlagId: string
 };
 export type PostToUIMessage =
     | NoSelectionFromPluginMessage
@@ -171,26 +178,26 @@ export type CredentialsToPluginMessage = {
 };
 export type UpdateToPluginMessage = {
   type: MessageToPluginTypes.UPDATE;
-  tokenValues: TokenGroup;
-  tokens: TokenArrayGroup;
+  tokenValues: AnyTokenSet;
+  tokens: AnyTokenList;
   updatedAt: string;
   settings: SettingsState;
   usedTokenSet: string[];
 };
 export type CreateStylesToPluginMessage = {
   type: MessageToPluginTypes.CREATE_STYLES;
-  tokens: TokenArrayGroup;
+  tokens: AnyTokenList;
   settings: SettingsState;
 };
 export type SetNodeDataToPluginMessage = {
   type: MessageToPluginTypes.SET_NODE_DATA;
   values: NodeTokenRefMap;
-  tokens: TokenArrayGroup;
+  tokens: AnyTokenList;
   settings: SettingsState;
 };
 export type PullStylesToPluginMessage = {
   type: MessageToPluginTypes.PULL_STYLES;
-  styleTypes: PullStyleTypes;
+  styleTypes: PullStyleOptions;
 };
 export type SetStorageTypeToPluginMessage = {
   type: MessageToPluginTypes.SET_STORAGE_TYPE;
@@ -199,9 +206,7 @@ export type SetStorageTypeToPluginMessage = {
 export type NotifyToPluginMessage = {
   type: MessageToPluginTypes.NOTIFY;
   msg: string;
-  opts: {
-    timeout?: number;
-  };
+  opts: NotificationOptions;
 };
 export type SetUiToPluginMessage = SettingsState & {
   type: MessageToPluginTypes.SET_UI;

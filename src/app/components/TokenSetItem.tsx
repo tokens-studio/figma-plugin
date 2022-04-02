@@ -11,8 +11,17 @@ import { TreeItem } from './utils/getTree';
 import IconGrabber from '@/icons/grabber.svg';
 import { useRaisedShadow } from './use-raised-shadow';
 
+export type ListItem = {
+  path: string,
+  key: string,
+  parent: string | null,
+  type: 'set',
+  level: number,
+  label: string,
+};
+
 export type TokenSetItemProps = {
-  item: TreeItem;
+  item: TreeItem | ListItem;
   isCollapsed?: boolean;
   isActive?: boolean;
   onClick: () => void;
@@ -173,7 +182,7 @@ const ConditionalReorderWrapper = ({
   );
 };
 
-export function TokenSetItem2({
+export function TokenSetItem({
   item,
   isCollapsed = false,
   onCollapse,

@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store';
 import Icon from './Icon';
@@ -8,9 +9,11 @@ import Tooltip from './Tooltip';
 import { isSingleToken, isTypographyToken } from './utils';
 
 function TokenTree({
-  tokenValues, showNewForm, showForm, schema, path = null, type = '', resolvedTokens,
+  tokenValues, showNewForm, showForm, schema, path = null, type = '', resolvedTokens, displayType,
 }) {
   const { editProhibited } = useSelector((state: RootState) => state.tokenState);
+  const [draggedToken, setDraggedToken] = useState(null);
+  const [dragOverToken, setDragOverToken] = useState(null);
 
   return (
     <div className="flex justify-start flex-row flex-wrap">
@@ -45,6 +48,7 @@ function TokenTree({
                   schema={schema}
                   path={stringPath}
                   type={type}
+                  displayType={displayType}
                   resolvedTokens={resolvedTokens}
                 />
               </div>
@@ -54,6 +58,11 @@ function TokenTree({
                 token={value}
                 showForm={showForm}
                 resolvedTokens={resolvedTokens}
+                draggedToken={draggedToken}
+                dragOverToken={dragOverToken}
+                displayType={displayType}
+                setDraggedToken={setDraggedToken}
+                setDragOverToken={setDragOverToken}
               />
             )}
           </React.Fragment>

@@ -4,7 +4,7 @@ import { postToFigma } from '@/plugin/notifiers';
 import { track } from '@/utils/analytics';
 import { MessageToPluginTypes } from '@/types/messages';
 import { UpdateMode } from '@/types/state';
-import type { RootModel } from '.';
+import { RootModel } from '@/types/RootModel';
 
 type WindowSettingsType = {
   width: number;
@@ -112,8 +112,8 @@ export const settings = createModel<RootModel>()({
       };
     },
   },
-  effects: (dispatch) => ({
-    setWindowSize: (payload, rootState) => {
+  effects: () => ({
+    setWindowSize: (payload) => {
       postToFigma({
         type: MessageToPluginTypes.RESIZE_WINDOW,
         width: payload.width,

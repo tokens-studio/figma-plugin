@@ -1,13 +1,12 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Reorder } from 'framer-motion';
-import { debounce } from 'lodash';
 import Box from './Box';
 import { Dispatch, RootState } from '../store';
-import { TreeItem } from './utils/getTree';
-import { TokenSetItem2 } from './TokenSetItem';
+import { ListItem, TokenSetItem } from './TokenSetItem';
+import useConfirm from '../hooks/useConfirm';
 
-function getList(items) {
+function getList(items: string[]): ListItem[] {
   return items.map((item) => ({
     path: item,
     key: `${item}-set`,
@@ -29,7 +28,10 @@ export default function TokenSetList({
   onDelete: (tokenSet: string) => void;
   onReorder: (tokenSets: string[]) => void;
 }) {
-  const { activeTokenSet, usedTokenSet, editProhibited } = useSelector((state: RootState) => state.tokenState);
+  const { confirm } = useConfirm();
+  const {
+    activeTokenSet, usedTokenSet, editProhibited, hasUnsavedChanges,
+  } = useSelector((state: RootState) => state.tokenState);
   const dispatch = useDispatch<Dispatch>();
   const [items, setItems] = React.useState(getList(tokenSets));
 
@@ -37,9 +39,16 @@ export default function TokenSetList({
     setItems(getList(tokenSets));
   }, [tokenSets]);
 
-  function handleClick(set) {
+  async function handleClick(set: ListItem) {
     if (set.type === 'set') {
-      dispatch.tokenState.setActiveTokenSet(set.path);
+      if (hasUnsavedChanges) {
+        const userChoice = await confirm({ text: 'You have unsaved changes.', description: 'Your changes will be discarded.' });
+        if (userChoice) {
+          dispatch.tokenState.setActiveTokenSet(set.path);
+        }
+      } else {
+        dispatch.tokenState.setActiveTokenSet(set.path);
+      }
     }
   }
 
@@ -48,7 +57,7 @@ export default function TokenSetList({
     <Box>
       <Reorder.Group axis="y" layoutScroll values={items} onReorder={setItems}>
         {items.map((item) => (
-          <TokenSetItem2
+          <TokenSetItem
             key={item.key}
             isActive={activeTokenSet === item.path}
             onClick={() => handleClick(item)}
@@ -56,11 +65,11 @@ export default function TokenSetList({
             item={item}
             onCheck={() => dispatch.tokenState.toggleUsedTokenSet(item.path)}
             canEdit={!editProhibited}
-            canReorder
+            canReorder={!editProhibited}
             canDelete={!editProhibited || Object.keys(tokenSets).length > 1}
             onRename={onRename}
             onDelete={onDelete}
-            onReorder={() => onReorder(items.map((i: TreeItem) => i.path))}
+            onReorder={() => onReorder(items.map((i) => i.path))}
           />
         ))}
       </Reorder.Group>

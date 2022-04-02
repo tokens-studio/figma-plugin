@@ -1,6 +1,8 @@
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { SingleTokenObject } from '@/types/tokens';
+import { HTML5Backend } from 'react-dnd-html5-backend';
+import { DndProvider } from 'react-dnd';
+import { SingleToken } from '@/types/tokens';
 import Heading from './Heading';
 import Icon from './Icon';
 import TokenTree from './TokenTree';
@@ -27,7 +29,7 @@ function TokenListing({
   property: string;
   tokenType: string;
   values: object;
-  resolvedTokens: SingleTokenObject[];
+  resolvedTokens: SingleToken[];
 }) {
   const { editProhibited } = useSelector((state: RootState) => state.tokenState);
   const { displayType, showEmptyGroups, collapsed } = useSelector((state: RootState) => state.uiState);
@@ -130,19 +132,22 @@ function TokenListing({
         </div>
       </div>
       {values && (
-        <div
-          className={`pl-4 pb-4 ${isIntCollapsed ? 'hidden' : null}`}
-          data-cy={`tokenlisting-${tokenKey}-content`}
-        >
-          <TokenTree
-            tokenValues={values}
-            showNewForm={showNewForm}
-            showForm={showForm}
-            schema={schema}
-            type={tokenType}
-            resolvedTokens={resolvedTokens}
-          />
-        </div>
+        <DndProvider backend={HTML5Backend}>
+          <div
+            className={`px-4 pb-4 ${isIntCollapsed ? 'hidden' : null}`}
+            data-cy={`tokenlisting-${tokenKey}-content`}
+          >
+            <TokenTree
+              tokenValues={values}
+              showNewForm={showNewForm}
+              showForm={showForm}
+              schema={schema}
+              type={tokenType}
+              displayType={displayType}
+              resolvedTokens={resolvedTokens}
+            />
+          </div>
+        </DndProvider>
       )}
     </div>
   );
