@@ -133,7 +133,6 @@ export const TokenButton: React.FC<Props> = ({
     >
       <MoreButton
         properties={properties}
-        documentationProperties={DocumentationProperties}
         onClick={handleClick}
         onDelete={handleDeleteClick}
         onDuplicate={handleDuplicateClick}
