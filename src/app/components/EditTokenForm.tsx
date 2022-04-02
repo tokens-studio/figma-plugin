@@ -1,9 +1,9 @@
 import * as React from 'react';
-import {
-  useDispatch, useSelector,
-} from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { styled } from '@/stitches.config';
 import getAliasValue from '@/utils/aliases';
 import { track } from '@/utils/analytics';
+import IconDisclosure from '@/icons/disclosure.svg';
 import checkIfContainsAlias from '@/utils/checkIfContainsAlias';
 import { UpdateMode } from '@/types/state';
 import { Dispatch, RootState } from '../store';
@@ -14,6 +14,7 @@ import ColorPicker from './ColorPicker';
 import useConfirm from '../hooks/useConfirm';
 import useTokens from '../store/useTokens';
 import { SingleBoxShadowToken } from '@/types/tokens';
+import Autosuggest from './Autosuggest';
 
 // @TODO this needs to be reviewed from a typings perspective + performance
 function EditTokenForm({ resolvedTokens }) {
@@ -25,6 +26,7 @@ function EditTokenForm({ resolvedTokens }) {
   const [inputHelperOpen, setInputHelperOpen] = React.useState(false);
   const [error, setError] = React.useState(null);
   const [internalEditToken, setInternalEditToken] = React.useState<typeof editToken>(editToken);
+  const [showAutoSuggest, setShowAutoSuggest] = React.useState<boolean>(false);
   const { confirm } = useConfirm();
 
   const isValid = React.useMemo(() => internalEditToken?.value && !error, [internalEditToken, error]);
@@ -151,9 +153,16 @@ function EditTokenForm({ resolvedTokens }) {
           const shouldRemap = await confirm({
             text: `Remap all tokens that use ${oldName} to ${newName}?`,
             description: 'This will change all layers that used the old token name. This could take a while.',
-            choices: [{ key: UpdateMode.SELECTION, label: 'Selection', unique: true }, {
-              key: UpdateMode.PAGE, label: 'Page', enabled: true, unique: true,
-            }, { key: UpdateMode.DOCUMENT, label: 'Document', unique: true }],
+            choices: [
+              { key: UpdateMode.SELECTION, label: 'Selection', unique: true },
+              {
+                key: UpdateMode.PAGE,
+                label: 'Page',
+                enabled: true,
+                unique: true,
+              },
+              { key: UpdateMode.DOCUMENT, label: 'Document', unique: true },
+            ],
           });
           if (shouldRemap) {
             remapToken(oldName, newName, shouldRemap.data[0]);
@@ -184,6 +193,12 @@ function EditTokenForm({ resolvedTokens }) {
       firstInput.current?.focus();
     }, 50);
   }, []);
+
+  const StyledIconDisclosure = styled(IconDisclosure, {
+    width: '16px',
+    height: '16px',
+    transition: 'transform 0.2s ease-in-out',
+  });
 
   const resolvedValue = React.useMemo(() => {
     if (internalEditToken) {
@@ -221,43 +236,53 @@ function EditTokenForm({ resolvedTokens }) {
       default: {
         return (
           <div>
-            <Input
-              full
-              label={internalEditToken.property}
-              value={internalEditToken.value}
-              onChange={handleChange}
-              type="text"
-              name="value"
-              required
-              custom={internalEditToken.schema}
-              placeholder={
-                internalEditToken.type === 'color'
-                  ? '#000000, hsla(), rgba() or {alias}'
-                  : 'Value or {alias}'
-              }
-              prefix={
-                internalEditToken.type === 'color' && (
-                  <button
-                    type="button"
-                    className="block w-4 h-4 rounded-sm cursor-pointer shadow-border shadow-gray-300 focus:shadow-focus focus:shadow-primary-400"
-                    style={{ background: internalEditToken.value, fontSize: 0 }}
-                    onClick={handleToggleInputHelper}
-                  >
-                    {internalEditToken.value}
-                  </button>
-                )
-              }
-            />
+            <Autosuggest
+              inputValue={internalEditToken.value}
+              type={internalEditToken.type}
+              showAutoSuggest={showAutoSuggest}
+              resolvedTokens={resolvedTokens}
+              setShowAutoSuggest={setShowAutoSuggest}
+              setInputValue={(newInputValue: string) => setInternalEditToken({ ...internalEditToken, value: newInputValue })}
+            >
+              <Input
+                full
+                label={internalEditToken.property}
+                value={internalEditToken.value}
+                onChange={handleChange}
+                type="text"
+                name="value"
+                required
+                custom={internalEditToken.schema}
+                placeholder={
+                  internalEditToken.type === 'color' ? '#000000, hsla(), rgba() or {alias}' : 'Value or {alias}'
+                }
+                prefix={
+                  internalEditToken.type === 'color' && (
+                    <button
+                      type="button"
+                      className="block w-4 h-4 rounded-sm cursor-pointer shadow-border shadow-gray-300 focus:shadow-focus focus:shadow-primary-400"
+                      style={{ background: internalEditToken.value, fontSize: 0 }}
+                      onClick={handleToggleInputHelper}
+                    >
+                      {internalEditToken.value}
+                    </button>
+                  )
+                }
+                suffix={(
+                  <div onClick={() => setShowAutoSuggest(!showAutoSuggest)}>
+                    <StyledIconDisclosure />
+                  </div>
+                )}
+              />
+            </Autosuggest>
+
             {inputHelperOpen && internalEditToken.type === 'color' && (
               <ColorPicker value={internalEditToken.value} onChange={handleColorValueChange} />
             )}
             {checkIfContainsAlias(internalEditToken.value) && (
               <div className="flex p-2 mt-2 font-mono text-gray-700 bg-gray-100 border-gray-300 rounded text-xxs itms-center">
                 {internalEditToken.type === 'color' ? (
-                  <div
-                    className="w-4 h-4 mr-1 border border-gray-200 rounded"
-                    style={{ background: resolvedValue }}
-                  />
+                  <div className="w-4 h-4 mr-1 border border-gray-200 rounded" style={{ background: resolvedValue }} />
                 ) : null}
                 {resolvedValue}
               </div>
@@ -284,9 +309,7 @@ function EditTokenForm({ resolvedTokens }) {
       />
       {renderTokenForm()}
 
-      {internalEditToken?.explainer && (
-        <div className="mt-1 text-gray-600 text-xxs">{internalEditToken.explainer}</div>
-      )}
+      {internalEditToken?.explainer && <div className="mt-1 text-gray-600 text-xxs">{internalEditToken.explainer}</div>}
       {internalEditToken?.optionsSchema
         ? Object.entries(internalEditToken?.optionsSchema).map(([key, schemaValue]: [string, string]) => (
           <Input

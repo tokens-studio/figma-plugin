@@ -1,0 +1,50 @@
+@import url('./main.css');
+
+.dropdown {
+  max-height: 130px;
+  border-radius: 4px;
+  overflow-y: scroll;
+  background-color: var(--white);
+  margin-top: 4px;
+  -webkit-box-shadow: 0px 0px 20px 8px var(--black-boxshadow);
+  -moz-box-shadow: 0px 0px 20px 8px var(--black-boxshadow);
+  box-shadow: 0px 0px 20px 8px var(--black-boxshadow);
+}
+
+.autosuggest .item {
+  padding: 4px 10px;
+  font-size: 14px;
+}
+
+.autosuggest .item:focus,
+.autosuggest .item:hover {
+  background-color: var(--blue);
+}
+
+.autosuggest-item-focused {
+  background-color: var(--blue);
+}
+
+.autosuggest .item-color-div {
+  width: 10%;
+}
+.autosuggest .item-color {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+}
+.autosuggest .item-name {
+  width: 70%;
+  padding-left: 4px;
+}
+.autosuggest .item-value {
+  width: 20%;
+  color: var(--hud);
+  padding-right: 10px;
+}
+
+.input-suffix {
+  width: 32px;
+  height: 32px;
+  background-color: var(--grey);
+}

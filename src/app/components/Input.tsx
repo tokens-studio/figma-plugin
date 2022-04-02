@@ -18,6 +18,7 @@ type Props = {
   placeholder?: string;
   capitalize?: boolean;
   prefix?: React.ReactNode;
+  suffix?: React.ReactNode;
   step?: string;
   min?: number;
   max?: number;
@@ -48,6 +49,7 @@ const Input: React.FC<Props> = ({
   defaultValue,
   type,
   prefix,
+  suffix,
   min,
   max,
   step,
@@ -95,7 +97,7 @@ const Input: React.FC<Props> = ({
           ref={inputRef}
           placeholder={placeholder}
         />
-
+        {!!suffix && <span className="flex justify-center items-center cursor-pointer input-suffix">{suffix}</span>}
         {isMasked && (
           <button type="button" className="py-1 mr-2 rounded-full" onClick={handleVisibility}>
             <StyledIcon>{show ? <IconVisibility /> : <IconVisibilityOff />}</StyledIcon>
