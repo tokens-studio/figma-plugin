@@ -5,6 +5,7 @@ const {hideBin} = require('yargs/helpers');
 const fs = require('fs');
 const getDirName = require('path').dirname;
 const transformTokens = require('./dist/transform').default;
+const path = require("path")
 
 /**
  * Command line arguments
@@ -71,17 +72,48 @@ const writeFile = (path, contents, cb) => {
 
 const log = (message) => process.stdout.write(`[token-transformer] ${message}\n`);
 
+const getAllFiles = function(dirPath, arrayOfFiles) {
+  files = fs.readdirSync(dirPath)
+
+  arrayOfFiles = arrayOfFiles || []
+
+  files.forEach(function(file) {
+    if (fs.statSync(dirPath + "/" + file).isDirectory()) {
+      arrayOfFiles = getAllFiles(dirPath + "/" + file, arrayOfFiles)
+    } else {
+      arrayOfFiles.push(path.join(dirPath, "/", file))
+    }
+  })
+
+  return arrayOfFiles
+}
+
+const getTokens = async (input) => {
+    if (input.endsWith(".json")) {
+        const fileContent = fs.readFileSync(input, {encoding: 'utf8', flag: 'r'});
+        return JSON.parse(fileContent);
+    } else {
+        const files = getAllFiles(input)
+        var data = {};
+        files.forEach(file => {
+            const content = fs.readFileSync(file, {encoding: 'utf8', flag: 'r'});
+            const parsed = JSON.parse(content);
+            data[file.replace(`${input}/`, "").replace(".json", "")] = parsed;
+        })
+        return data;
+    }
+}
+
 /**
  * Transformation
  *
  * Reads the given input file, transforms all tokens and writes them to the output file
  */
-const transform = () => {
+const transform = async () => {
     const {input, output, sets, excludes, expandTypography, expandShadow, preserveRawValue} = argv;
 
     if (fs.existsSync(argv.input)) {
-        const tokens = fs.readFileSync(input, {encoding: 'utf8', flag: 'r'});
-        const parsed = JSON.parse(tokens);
+        const tokens = await getTokens(input)
         const options = {
             expandTypography,
             expandShadow,
@@ -93,7 +125,7 @@ const transform = () => {
         log(`using excludes: ${excludes.length > 0 ? excludes : '[]'}`);
         log(`using options: { expandTypography: ${expandTypography}, expandShadow: ${expandShadow}, preserveRawValue: ${preserveRawValue} }`);
 
-        const transformed = transformTokens(parsed, sets, excludes, options);
+        const transformed = transformTokens(tokens, sets, excludes, options);
 
         log(`writing tokens to output: ${output}`);
 
