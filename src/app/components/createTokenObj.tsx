@@ -1,7 +1,7 @@
 import set from 'set-value';
 import extend from 'just-extend';
 import tokenTypes from '../../config/tokenTypes';
-import { SingleToken } from '@/types/tokens';
+import { DeepKeyTokenMap, SingleToken } from '@/types/tokens';
 import { TokenTypes } from '@/constants/TokenTypes';
 
 type CreateTokensObjectResult = Partial<Record<TokenTypes, {
@@ -89,7 +89,10 @@ export function mappedTokens(tokens: SingleToken[], tokenFilter: string) {
   const tokenObjects = createTokensObject(tokens, tokenFilter);
 
   Object.entries(tokenObjects).forEach(([key, group]) => {
-    tokenObj[key as TokenTypes].values = group.values;
+    tokenObj[key as TokenTypes] = {
+      ...(tokenObj[key as TokenTypes] ?? {}),
+      values: group.values as unknown as DeepKeyTokenMap, // @TODO look at typings here
+    };
   });
 
   return Object.entries(tokenObj);
