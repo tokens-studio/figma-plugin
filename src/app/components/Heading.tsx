@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { styled } from '@/stitches.config';
 
-const StyledHeading = styled('div', {
+const StyledHeading = styled('p', {
   fontWeight: '$bold',
   color: '$text',
   letterSpacing: 0,
