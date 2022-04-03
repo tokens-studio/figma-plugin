@@ -5,7 +5,9 @@ const StyledText = styled('div', {
   lineHeight: '$default',
   variants: {
     bold: {
-      fontWeight: '$bold',
+      true: {
+        fontWeight: '$bold',
+      },
     },
     size: {
       xsmall: {
