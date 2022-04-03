@@ -4,8 +4,18 @@ import { styled } from '@/stitches.config';
 const StyledTextarea = styled('textarea', {
   border: 0,
   height: '100%',
+  width: '100%',
+  border: '1px solid $borderMuted',
+  backgroundColor: '$bgDefault',
+  fontSize: '$xsmall',
+  padding: '$3',
+  borderRadius: '$default',
+  fontFamily: '$mono',
+  resize: 'none',
   '&:focus': {
     backgroundColor: '$bgSubtle',
+    borderColor: '$border',
+    outline: 'none',
   },
 });
 
