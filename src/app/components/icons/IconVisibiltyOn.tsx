@@ -10,7 +10,7 @@ function IconVisibility() {
       viewBox="0 0 512.000000 512.000000"
       preserveAspectRatio="xMidYMid meet"
     >
-      <g transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)" fill="#000000" stroke="none">
+      <g transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)" fill="currentColor" stroke="none">
         <path
           d="M2355 4043 c-565 -69 -1112 -332 -1716 -823 -161 -130 -582 -539
 -618 -600 -44 -74 -30 -101 157 -292 673 -691 1363 -1105 2052 -1235 136 -25

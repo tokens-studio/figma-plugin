@@ -2,6 +2,7 @@ import * as React from 'react';
 import { styled } from '@/stitches.config';
 import IconVisibility from './icons/IconVisibiltyOn';
 import IconVisibilityOff from './icons/IconVisibilityOff';
+import Box from './Box';
 
 type Props = {
   name: string;
@@ -45,23 +46,30 @@ const StyledInput = styled('input', {
   border: '1px solid $borderMuted',
   fontSize: '$xsmall',
   borderRadius: '$input',
+  position: 'relative',
 
   '&:focus-within': {
     boxShadow: '$focus',
   },
 
   variants: {
-    isMasked: {
+    hasSuffix: {
       true: {
         borderTopRightRadius: 0,
         borderBottomRightRadius: 0,
+      },
+    },
+    hasPrefix: {
+      true: {
+        borderTopLeftRadius: 0,
+        borderBottomLeftRadius: 0,
       },
     },
   },
 });
 
 const StyledSuffix = styled('button', {
-  padding: '0 $3',
+  width: '28px',
   height: '28px',
   backgroundColor: '$bgDefault',
   border: '1px solid $borderMuted',
@@ -70,8 +78,25 @@ const StyledSuffix = styled('button', {
   borderLeft: 0,
   display: 'flex',
   alignItems: 'center',
-  position: 'absolute',
-  right: 0,
+
+  '&:focus': {
+    outline: 'none',
+    backgroundColor: '$interaction',
+    color: '$onInteraction',
+  },
+});
+
+const StyledPrefix = styled('div', {
+  padding: '0 $3',
+  height: '28px',
+  flexShrink: 0,
+  border: '1px solid $borderMuted',
+  borderTopRightRadius: 0,
+  borderBottomRightRadius: 0,
+  borderRight: 0,
+  backgroundColor: '$bgDefault',
+  display: 'flex',
+  alignItems: 'center',
 
   '&:focus': {
     outline: 'none',
@@ -120,8 +145,8 @@ const Input: React.FC<Props> = ({
           {error ? <div className="text-red-500 font-bold">{error}</div> : null}
         </div>
       )}
-      <span className={`flex input ${full ? 'w-full' : ''} items-center`}>
-        {!!prefix && <span className="p-2 flex-shrink-0 border-r border-gray-200">{prefix}</span>}
+      <Box css={{ display: 'flex', position: 'relative', width: full ? '100%' : 0 }} className="input">
+        {!!prefix && <StyledPrefix>{prefix}</StyledPrefix>}
         <StyledInput
           spellCheck={false}
           tabIndex={tabindex}
@@ -137,6 +162,8 @@ const Input: React.FC<Props> = ({
           data-custom={custom}
           ref={inputRef}
           placeholder={placeholder}
+          hasPrefix={!!prefix}
+          hasSuffix={!!isMasked}
         />
 
         {isMasked && (
@@ -144,7 +171,7 @@ const Input: React.FC<Props> = ({
             <StyledIcon>{show ? <IconVisibility /> : <IconVisibilityOff />}</StyledIcon>
           </StyledSuffix>
         )}
-      </span>
+      </Box>
     </label>
   );
 };

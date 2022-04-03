@@ -20,7 +20,7 @@ const StorageItem = ({ item, onEdit = null }) => {
     <div
       data-cy={`storageitem-${provider}-${id}`}
       key={`${provider}-${id}`}
-      className={`border text-left flex flex-row justify-between rounded p-2 ${
+      className={`border text-left flex w-full flex-row justify-between rounded p-2 ${
         isActive() ? 'bg-blue-100 bg-opacity-50 border-blue-400' : 'hover:border-blue-300 border-gray-300'
       }`}
     >
