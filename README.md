@@ -1,4 +1,4 @@
-****# Figma Tokens
+# Figma Tokens
 
 ![installs](https://img.shields.io/endpoint?url=https://yuanqing.github.io/figma-plugins-stats/plugin/843461159747178978/installs.json)
 ![likes](https://img.shields.io/endpoint?url=https://yuanqing.github.io/figma-plugins-stats/plugin/843461159747178978/likes.json)
