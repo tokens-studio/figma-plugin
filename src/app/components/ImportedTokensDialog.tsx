@@ -32,11 +32,11 @@ function ImportToken({
       <div className="space-y-1">
         <div className="font-semibold text-xs">{name}</div>
         <div className="flex space-x-1 items-center">
-          <div className="font-bold text-xxs bg-green-100 text-green-800 p-1 rounded break-all">
+          <div className="font-bold text-xxs border border-success-muted bg-success-subtle text-success p-1 rounded break-all">
             {typeof value === 'object' ? JSON.stringify(value) : value}
           </div>
           {oldValue ? (
-            <div className="font-bold text-xxs bg-red-100 text-red-800 p-1 rounded break-all">
+            <div className="font-bold text-xxs border border-danger-muted bg-danger-subtle text-danger p-1 rounded break-all">
               {typeof oldValue === 'object' ? JSON.stringify(oldValue) : oldValue}
             </div>
           ) : null}

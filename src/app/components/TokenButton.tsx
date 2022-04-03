@@ -145,7 +145,7 @@ function TokenButton({
 
       style = {
         '--backgroundColor': displayValue,
-        '--borderColor': lightOrDark(displayValue) === 'light' ? 'var(--color-border, #e7e7e7)' : 'var(--color-border-toolbar-disabled, #ffffff)',
+        '--borderColor': lightOrDark(displayValue) === 'light' ? 'var(--colors-border, #e7e7e7)' : 'var(--colors-borderMuted, #ffffff)',
       };
       buttonClass.push('button-property-color');
       if (uiState.displayType === 'LIST') {

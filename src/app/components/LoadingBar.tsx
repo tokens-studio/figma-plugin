@@ -52,7 +52,7 @@ export default function LoadingBar() {
   return (
     <div className="fixed w-full z-20" data-cy="loadingBar">
       <div className="flex items-center space-x-2 bg-gray-300 p-2 rounded m-2">
-        <div className="inline-flex rotate">
+        <div className="inline-flex rotate text-foreground">
           <Icon name="loading" />
         </div>
         <div className="flex flex-grow items-center justify-between">
