@@ -5,7 +5,6 @@ const StyledTextarea = styled('textarea', {
   border: 0,
   height: '100%',
   width: '100%',
-  border: '1px solid $borderMuted',
   backgroundColor: '$bgDefault',
   fontSize: '$xsmall',
   padding: '$3',
@@ -14,8 +13,14 @@ const StyledTextarea = styled('textarea', {
   resize: 'none',
   '&:focus': {
     backgroundColor: '$bgSubtle',
-    borderColor: '$border',
     outline: 'none',
+  },
+  variants: {
+    border: {
+      true: {
+        border: '1px solid $borderMuted',
+      },
+    },
   },
 });
 
@@ -26,6 +31,7 @@ function Textarea({
   isDisabled = false,
   onChange,
   css,
+  border,
 }: {
   rows?: number;
   value: string;
@@ -33,6 +39,7 @@ function Textarea({
   isDisabled?: boolean;
   onChange?: Function;
   css?: any;
+  border?: boolean
 }) {
   return (
     <StyledTextarea
@@ -42,6 +49,7 @@ function Textarea({
       css={css}
       value={value}
       disabled={isDisabled}
+      border={border}
       onChange={(event) => onChange && onChange(event.target.value, event)}
     />
   );

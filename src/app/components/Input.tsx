@@ -36,6 +36,50 @@ const StyledIcon = styled('div', {
   cursor: 'pointer',
 });
 
+const StyledInput = styled('input', {
+  padding: '0 $3',
+  height: '28px',
+  flexGrow: 1,
+  width: '100%',
+  backgroundColor: '$bgDefault',
+  border: '1px solid $borderMuted',
+  fontSize: '$xsmall',
+  borderRadius: '$input',
+
+  '&:focus-within': {
+    boxShadow: '$focus',
+  },
+
+  variants: {
+    isMasked: {
+      true: {
+        borderTopRightRadius: 0,
+        borderBottomRightRadius: 0,
+      },
+    },
+  },
+});
+
+const StyledSuffix = styled('button', {
+  padding: '0 $3',
+  height: '28px',
+  backgroundColor: '$bgDefault',
+  border: '1px solid $borderMuted',
+  borderTopLeftRadius: 0,
+  borderBottomLeftRadius: 0,
+  borderLeft: 0,
+  display: 'flex',
+  alignItems: 'center',
+  position: 'absolute',
+  right: 0,
+
+  '&:focus': {
+    outline: 'none',
+    boxShadow: 'none',
+    backgroundColor: '$bgSubtle',
+  },
+});
+
 const Input: React.FC<Props> = ({
   name,
   error = '',
@@ -78,8 +122,7 @@ const Input: React.FC<Props> = ({
       )}
       <span className={`flex input ${full ? 'w-full' : ''} items-center`}>
         {!!prefix && <span className="p-2 flex-shrink-0 border-r border-gray-200">{prefix}</span>}
-        <input
-          className="p-2 grow w-full"
+        <StyledInput
           spellCheck={false}
           tabIndex={tabindex}
           type={type}
@@ -97,9 +140,9 @@ const Input: React.FC<Props> = ({
         />
 
         {isMasked && (
-          <button type="button" className="py-1 mr-2 rounded-full" onClick={handleVisibility}>
+          <StyledSuffix type="button" onClick={handleVisibility}>
             <StyledIcon>{show ? <IconVisibility /> : <IconVisibilityOff />}</StyledIcon>
-          </button>
+          </StyledSuffix>
         )}
       </span>
     </label>

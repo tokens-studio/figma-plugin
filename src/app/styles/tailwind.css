@@ -310,14 +310,6 @@ button:focus {
   @apply bg-white h-full rounded shadow-lg p-2;
 }
 
-.input {
-  @apply bg-white border border-gray-300 text-xxs rounded-sm w-24 font-mono;
-}
-
-.input:focus-within {
-  @apply shadow-focus;
-}
-
 textarea.input,
 select.input,
 input.input {
