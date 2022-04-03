@@ -110,14 +110,6 @@ textarea::-webkit-scrollbar-thumb {
   border: 2px solid white;
 }
 
-.heading {
-  @apply font-semibold text-xs text-gray-900 leading-none;
-}
-
-.heading-small {
-  @apply text-xs font-medium;
-}
-
 .button-property + .property-wrapper {
   @apply mt-4;
 }
