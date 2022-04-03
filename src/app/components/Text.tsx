@@ -4,6 +4,9 @@ import { styled } from '@/stitches.config';
 const StyledText = styled('div', {
   lineHeight: '$default',
   variants: {
+    bold: {
+      fontWeight: '$bold',
+    },
     size: {
       xsmall: {
         fontSize: '$xsmall',
@@ -24,14 +27,18 @@ const StyledText = styled('div', {
 });
 
 type TextProps = {
-  css?: object;
-  children?: React.ReactNode;
+  children: React.ReactNode;
   muted?: boolean;
-  size?: 'xsmall' | 'small' | 'medium' | 'large';
+  bold?: boolean;
+  size?: 'xsmall' | 'small';
 };
 
 const Text: React.FC<TextProps> = ({
-  css, children, muted, size = 'small',
-}) => <StyledText css={css} muted={muted} size={size}>{children}</StyledText>;
+  children, muted, bold, size = 'small',
+}) => (
+  <StyledText muted={muted} size={size} bold={bold}>
+    {children}
+  </StyledText>
+);
 
 export default Text;
