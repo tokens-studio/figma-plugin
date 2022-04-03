@@ -35,6 +35,10 @@ export const {
   styled, css, global: globalCSS, keyframes, getCssString, theme,
 } = createCss({
   theme: {
+    fonts: {
+      sans: 'Inter, sans-serif',
+      mono: 'JetBrainsMono, monospace',
+    },
     fontSizes: {
       xsmall: '11px',
       small: '12px',

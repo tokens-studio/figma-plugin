@@ -12,6 +12,9 @@ import EditStorageItemModal from './modals/EditStorageItemModal';
 import CreateStorageItemModal from './modals/CreateStorageItemModal';
 import useStorage from '../store/useStorage';
 import { Dispatch, RootState } from '../store';
+import Stack from './Stack';
+import Box from './Box';
+import Text from './Text';
 
 const SyncSettings = () => {
   const { localApiState, apiProviders, storageType } = useSelector((state: RootState) => state.uiState);
@@ -82,7 +85,7 @@ const SyncSettings = () => {
   };
 
   return (
-    <div className="flex flex-col grow content scroll-container">
+    <Box css={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }} className="content scroll-container">
       {confirmModalVisible && (
         <ConfirmLocalStorageModal
           isOpen={confirmModalVisible}
@@ -114,93 +117,93 @@ const SyncSettings = () => {
           onSuccess={() => setShowCreateStorageModalVisible(false)}
         />
       )}
-      <div className="p-4 space-y-4 border-b">
-        <div className="space-y-4">
-          <Heading>Token Storage</Heading>
-          <div className="flex flex-row gap-2">
-            <ProviderSelector
-              isActive={localApiState?.provider === StorageProviderType.LOCAL}
-              isStored={storageType?.provider === StorageProviderType.LOCAL}
-              onClick={() => (storageType?.provider === StorageProviderType.LOCAL ? null : showConfirmModal(true))}
-              text="Local document"
-              id={StorageProviderType.LOCAL}
-            />
-            <ProviderSelector
-              isActive={localApiState?.provider === StorageProviderType.URL}
-              isStored={storageType?.provider === StorageProviderType.URL}
+      <Box css={{ padding: '$4' }}>
+        <Stack gap={4} direction="column">
+          <Stack gap={4} direction="column">
+            <Heading>Token Storage</Heading>
+            <Stack direction="row" gap={2}>
+              <ProviderSelector
+                isActive={localApiState?.provider === StorageProviderType.LOCAL}
+                isStored={storageType?.provider === StorageProviderType.LOCAL}
+                onClick={() => (storageType?.provider === StorageProviderType.LOCAL ? null : showConfirmModal(true))}
+                text="Local document"
+                id={StorageProviderType.LOCAL}
+              />
+              <ProviderSelector
+                isActive={localApiState?.provider === StorageProviderType.URL}
+                isStored={storageType?.provider === StorageProviderType.URL}
+                onClick={() => {
+                  dispatch.uiState.setLocalApiState({
+                    name: '',
+                    secret: '',
+                    id: '',
+                    provider: StorageProviderType.URL,
+                  });
+                }}
+                text="URL"
+                id={StorageProviderType.URL}
+              />
+              <ProviderSelector
+                isActive={localApiState?.provider === StorageProviderType.JSONBIN}
+                isStored={storageType?.provider === StorageProviderType.JSONBIN}
+                onClick={() => {
+                  dispatch.uiState.setLocalApiState({
+                    name: '',
+                    secret: '',
+                    id: '',
+                    provider: StorageProviderType.JSONBIN,
+                  });
+                }}
+                text="JSONbin"
+                id={StorageProviderType.JSONBIN}
+              />
+              <ProviderSelector
+                isActive={localApiState?.provider === StorageProviderType.GITHUB}
+                isStored={storageType?.provider === StorageProviderType.GITHUB}
+                onClick={() => {
+                  dispatch.uiState.setLocalApiState({
+                    name: '',
+                    secret: '',
+                    id: '',
+                    branch: '',
+                    provider: StorageProviderType.GITHUB,
+                  });
+                }}
+                text="GitHub"
+                id={StorageProviderType.GITHUB}
+              />
+            </Stack>
+          </Stack>
+          {selectedRemoteProvider() && (
+          <>
+            <Text muted size="xsmall">{storageProviderText()}</Text>
+            <Button
+              id="button-add-new-credentials"
+              variant="secondary"
               onClick={() => {
-                dispatch.uiState.setLocalApiState({
-                  name: '',
-                  secret: '',
-                  id: '',
-                  provider: StorageProviderType.URL,
-                });
+                track('Add Credentials', { provider: localApiState.provider });
+                setShowCreateStorageModalVisible(true);
               }}
-              text="URL"
-              id={StorageProviderType.URL}
-            />
-            <ProviderSelector
-              isActive={localApiState?.provider === StorageProviderType.JSONBIN}
-              isStored={storageType?.provider === StorageProviderType.JSONBIN}
-              onClick={() => {
-                dispatch.uiState.setLocalApiState({
-                  name: '',
-                  secret: '',
-                  id: '',
-                  provider: StorageProviderType.JSONBIN,
-                });
-              }}
-              text="JSONbin"
-              id={StorageProviderType.JSONBIN}
-            />
-            <ProviderSelector
-              isActive={localApiState?.provider === StorageProviderType.GITHUB}
-              isStored={storageType?.provider === StorageProviderType.GITHUB}
-              onClick={() => {
-                dispatch.uiState.setLocalApiState({
-                  name: '',
-                  secret: '',
-                  id: '',
-                  branch: '',
-                  provider: StorageProviderType.GITHUB,
-                });
-              }}
-              text="GitHub"
-              id={StorageProviderType.GITHUB}
-            />
-          </div>
-        </div>
-        {selectedRemoteProvider() && (
-        <>
-          <div className="text-gray-600 text-xxs">{storageProviderText()}</div>
-          <Button
-            id="button-add-new-credentials"
-            variant="secondary"
-            onClick={() => {
-              track('Add Credentials', { provider: localApiState.provider });
-              setShowCreateStorageModalVisible(true);
-            }}
-          >
-            Add new credentials
-          </Button>
+            >
+              Add new credentials
+            </Button>
 
-          {storedApiProviders().length > 0 && (
-          <div className="space-y-4">
-            <div className="flex flex-col gap-2">
-              {storedApiProviders().map((item) => (
-                <StorageItem
-                  key={item.internalId || `${item.provider}-${item.id}-${item.secret}`}
-                  onEdit={() => handleEditClick(item)}
-                  item={item}
-                />
-              ))}
-            </div>
-          </div>
+            {storedApiProviders().length > 0 && (
+              <Stack direction="column" gap={2} width="full">
+                {storedApiProviders().map((item) => (
+                  <StorageItem
+                    key={item.internalId || `${item.provider}-${item.id}-${item.secret}`}
+                    onEdit={() => handleEditClick(item)}
+                    item={item}
+                  />
+                ))}
+              </Stack>
+            )}
+          </>
           )}
-        </>
-        )}
-      </div>
-    </div>
+        </Stack>
+      </Box>
+    </Box>
   );
 };
 

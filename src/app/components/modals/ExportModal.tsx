@@ -7,6 +7,7 @@ import Modal from '../Modal';
 import Checkbox from '../Checkbox';
 import Label from '../Label';
 import Box from '../Box';
+import Stack from '../Stack';
 
 export default function ExportModal({ onClose }) {
   const { getFormattedTokens } = useTokens();
@@ -17,7 +18,7 @@ export default function ExportModal({ onClose }) {
 
   return (
     <Modal large isOpen close={onClose}>
-      <div className="flex flex-col w-full space-y-4">
+      <Stack gap={4} direction="column">
         <Heading>Export</Heading>
         <p className="text-xs">
           This is an early version of a tokens export, if you encounter any issues please raise an
@@ -82,7 +83,7 @@ export default function ExportModal({ onClose }) {
             includeAllTokens, includeParent, expandTypography, expandShadow,
           })}
         />
-        <div className="flex justify-between space-x-4">
+        <Stack width="full" direction="row" justify="end" gap={4}>
           <Button variant="secondary" onClick={onClose}>
             Cancel
           </Button>
@@ -94,12 +95,11 @@ export default function ExportModal({ onClose }) {
             )}`}
             download="tokens.json"
             variant="primary"
-            size="large"
           >
             Download
           </Button>
-        </div>
-      </div>
+        </Stack>
+      </Stack>
     </Modal>
   );
 }

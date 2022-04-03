@@ -2,6 +2,7 @@ import * as React from 'react';
 import { styled } from '@/stitches.config';
 import IconVisibility from './icons/IconVisibiltyOn';
 import IconVisibilityOff from './icons/IconVisibilityOff';
+import Box from './Box';
 
 type Props = {
   name: string;
@@ -34,6 +35,74 @@ const StyledIcon = styled('div', {
   alignItems: 'center',
   justifyContent: 'center',
   cursor: 'pointer',
+});
+
+const StyledInput = styled('input', {
+  padding: '0 $3',
+  height: '28px',
+  flexGrow: 1,
+  width: '100%',
+  backgroundColor: '$bgDefault',
+  border: '1px solid $borderMuted',
+  fontSize: '$xsmall',
+  borderRadius: '$input',
+  position: 'relative',
+
+  '&:focus-within': {
+    boxShadow: '$focus',
+  },
+
+  variants: {
+    hasSuffix: {
+      true: {
+        borderTopRightRadius: 0,
+        borderBottomRightRadius: 0,
+      },
+    },
+    hasPrefix: {
+      true: {
+        borderTopLeftRadius: 0,
+        borderBottomLeftRadius: 0,
+      },
+    },
+  },
+});
+
+const StyledSuffix = styled('button', {
+  width: '28px',
+  height: '28px',
+  backgroundColor: '$bgDefault',
+  border: '1px solid $borderMuted',
+  borderTopLeftRadius: 0,
+  borderBottomLeftRadius: 0,
+  borderLeft: 0,
+  display: 'flex',
+  alignItems: 'center',
+
+  '&:focus': {
+    outline: 'none',
+    backgroundColor: '$interaction',
+    color: '$onInteraction',
+  },
+});
+
+const StyledPrefix = styled('div', {
+  padding: '0 $3',
+  height: '28px',
+  flexShrink: 0,
+  border: '1px solid $borderMuted',
+  borderTopRightRadius: 0,
+  borderBottomRightRadius: 0,
+  borderRight: 0,
+  backgroundColor: '$bgDefault',
+  display: 'flex',
+  alignItems: 'center',
+
+  '&:focus': {
+    outline: 'none',
+    boxShadow: 'none',
+    backgroundColor: '$bgSubtle',
+  },
 });
 
 const Input: React.FC<Props> = ({
@@ -76,10 +145,9 @@ const Input: React.FC<Props> = ({
           {error ? <div className="text-red-500 font-bold">{error}</div> : null}
         </div>
       )}
-      <span className={`flex input ${full ? 'w-full' : ''} items-center`}>
-        {!!prefix && <span className="p-2 flex-shrink-0 border-r border-gray-200">{prefix}</span>}
-        <input
-          className="p-2 grow w-full"
+      <Box css={{ display: 'flex', position: 'relative', width: full ? '100%' : 0 }} className="input">
+        {!!prefix && <StyledPrefix>{prefix}</StyledPrefix>}
+        <StyledInput
           spellCheck={false}
           tabIndex={tabindex}
           type={type}
@@ -94,14 +162,16 @@ const Input: React.FC<Props> = ({
           data-custom={custom}
           ref={inputRef}
           placeholder={placeholder}
+          hasPrefix={!!prefix}
+          hasSuffix={!!isMasked}
         />
 
         {isMasked && (
-          <button type="button" className="py-1 mr-2 rounded-full" onClick={handleVisibility}>
+          <StyledSuffix type="button" onClick={handleVisibility}>
             <StyledIcon>{show ? <IconVisibility /> : <IconVisibilityOff />}</StyledIcon>
-          </button>
+          </StyledSuffix>
         )}
-      </span>
+      </Box>
     </label>
   );
 };
