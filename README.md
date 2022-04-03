@@ -17,9 +17,11 @@ https://github.com/users/six7/projects/4/views/4
 There's a Slack channel where the community can exchange ideas, best practices or simply ask a question. Want to join? Let me know by sending me a [DM on twitter](https://www.twitter.com/six7) and I'll send you the invite.
 
 # Sponsors
-<a href="https://zed.dev/" target="_blank"><img src="sponsors/zed_logo.png" style="width: 75px; height: auto;" alt="Zed Logo"/></a>
+| <a href="https://zed.dev/" target="_blank" style="display: block; text-align: center;"><img src="sponsors/zed_logo.png" style="display: block; width: 75px; height: auto; margin-bottom: 4px" alt="Zed Logo"/>zed.dev</a> |
+| --- |
+|     |
 
-Want to be featured as a Sponsor? Consider [sponsoring the project](https://github.com/sponsors/six7). Your sponsorship means we can spend time and resources on the project!
+Is your company using Figma Tokens? Consider [sponsoring the project](https://github.com/sponsors/six7) so we can spend time and resources on it!
 
 # How should I use this plugin?
 There's 2 ways how you could use the plugin: Only use it to create or update your Styles but not apply any tokens with it, which would allow you to use features such as atomic type decisions, aliases and theme sets for managing styles (this is really powerful in combination with Figma's Swap library feature). Or you could use the plugin to apply tokens with it, which would give you style-like functionality for things like border radius or spacings.
