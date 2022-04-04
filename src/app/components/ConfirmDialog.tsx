@@ -62,7 +62,7 @@ function ConfirmDialog() {
           <Box css={{ display: 'flex', gap: '$2', flexDirection: 'column' }}>
             <Heading size="small">{confirmState?.text && confirmState.text}</Heading>
             {confirmState?.description && (
-            <Text css={{ color: '$textMuted' }}>{confirmState.description}</Text>
+            <Text muted>{confirmState.description}</Text>
             )}
           </Box>
           {confirmState?.input && (

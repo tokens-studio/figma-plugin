@@ -1,4 +1,5 @@
 import React, { useRef } from 'react';
+import Box from '../Box';
 import Button from '../Button';
 import Input from '../Input';
 
@@ -9,17 +10,19 @@ export default function GitHubForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <Input full label="Name" value={values.name} onChange={handleChange} type="text" name="name" required />
-      <Input
-        full
-        label="Personal Access Token"
-        value={values.secret}
-        onChange={handleChange}
-        inputRef={inputEl}
-        isMasked
-        type="password"
-        name="secret"
-        required
-      />
+      <Box css={{ position: 'relative' }}>
+        <Input
+          full
+          label="Personal Access Token"
+          value={values.secret}
+          onChange={handleChange}
+          inputRef={inputEl}
+          isMasked
+          type="password"
+          name="secret"
+          required
+        />
+      </Box>
       <Input
         full
         label="Repository (username/repo)"
