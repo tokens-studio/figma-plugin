@@ -29,7 +29,7 @@ export const TokenButtonDraggable: React.FC<Props> = ({
   const activeTokenSet = useSelector(activeTokenSetSelector);
 
   const isDraggable = useMemo(() => (
-    isNaN(Number(token.name.split('.')[token.name.split('.').length - 1]))
+    token.name && isNaN(Number(token.name.split('.')[token.name.split('.').length - 1]))
   ), [token]);
 
   const displayValue = useMemo(() => (

@@ -99,7 +99,7 @@ export const tokenState = createModel<RootModel>()({
       };
     },
     deleteTokenSet: (state, data: string) => {
-      const oldTokens = state.tokens;
+      const oldTokens = { ...state.tokens };
       delete oldTokens[data];
       return {
         ...state,

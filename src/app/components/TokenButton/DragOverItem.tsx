@@ -17,7 +17,7 @@ export const DragOverItem: React.FC<Props> = ({
   dragOverToken,
 }) => {
   const isDraggable = useMemo(() => (
-    isNaN(Number(token.name.split('.')[token.name.split('.').length - 1]))
+    token.name && isNaN(Number(token.name.split('.')[token.name.split('.').length - 1]))
   ), [token]);
 
   const isColorAndListDisplayType = useMemo(() => (

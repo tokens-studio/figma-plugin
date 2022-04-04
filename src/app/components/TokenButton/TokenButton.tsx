@@ -58,7 +58,7 @@ export const TokenButton: React.FC<Props> = ({
   // Only show the last part of a token in a group
   const visibleName = React.useMemo(() => {
     const visibleDepth = 1;
-    return name.split('.').slice(-visibleDepth).join('.');
+    return (name ?? '').split('.').slice(-visibleDepth).join('.');
   }, [name]);
 
   const properties = usePropertiesForTokenType(type);
