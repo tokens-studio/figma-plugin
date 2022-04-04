@@ -20,17 +20,18 @@ function mapPropertyToCategory(key): string | null {
 
 export function transformPluginDataToSelectionValues(pluginData): SelectionGroup {
   const selectionValues = pluginData.reduce((acc, curr) => {
-    const { tokens, id } = curr;
+    const { tokens, id, node: { name, type } } = curr;
+
     Object.entries(tokens).forEach(([key, value]) => {
       const existing = acc.find((item) => item.type === key && item.value === value);
 
       if (existing) {
-        existing.nodes.push(id);
+        existing.nodes.push({ id, name, type });
       } else {
         const category = Properties[key];
 
         acc.push({
-          value, type: key, category, nodes: [id],
+          value, type: key, category, nodes: [{ id, name, type }],
         });
       }
     });

@@ -5,11 +5,11 @@ import Box from './Box';
 import Checkbox from './Checkbox';
 import IconButton from './IconButton';
 import useTokens from '../store/useTokens';
-import IconLayers from '@/icons/layers.svg';
 import IconDisclosure from '@/icons/disclosure.svg';
 import InspectorResolvedToken from './InspectorResolvedToken';
 import { Dispatch, RootState } from '../store';
 import { SelectionGroup } from '@/types';
+import TokenNodes from './inspector/TokenLayers';
 
 export default function InspectorTokenSingle({ token, resolvedTokens }: { token: SelectionGroup, resolvedTokens: SingleToken[] }) {
   const { handleRemap, getTokenValue } = useTokens();
@@ -22,7 +22,7 @@ export default function InspectorTokenSingle({ token, resolvedTokens }: { token:
   }, [inspectState.selectedTokens, token]);
 
   const mappedToken = getTokenValue(token.value, resolvedTokens);
-
+  console.log(token);
   return (
     <Box
       css={{
@@ -65,20 +65,7 @@ export default function InspectorTokenSingle({ token, resolvedTokens }: { token:
           />
         </Box>
       </Box>
-      <Box
-        css={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '$3',
-          fontWeight: '$bold',
-          fontSize: '$small',
-        }}
-      >
-        <Box css={{ color: '$fgSubtle' }}>
-          <IconLayers />
-        </Box>
-        {token.nodes.length}
-      </Box>
+      <TokenNodes nodes={token.nodes} />
     </Box>
   );
 }
