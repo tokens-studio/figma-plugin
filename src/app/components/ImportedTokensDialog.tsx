@@ -1,12 +1,13 @@
-import * as React from 'react';
+import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Heading from './Heading';
 import Button from './Button';
 import Modal from './Modal';
-import { Dispatch, RootState } from '../store';
+import { Dispatch } from '../store';
 import useManageTokens from '../store/useManageTokens';
 import Tooltip from './Tooltip';
 import Icon from './Icon';
+import { activeTokenSetSelector, importedTokensSelector } from '@/selectors';
 
 function ImportToken({
   name,
@@ -68,7 +69,8 @@ function ImportToken({
 export default function ImportedTokensDialog() {
   const dispatch = useDispatch<Dispatch>();
   const { editSingleToken, createSingleToken } = useManageTokens();
-  const { importedTokens, activeTokenSet } = useSelector((state: RootState) => state.tokenState);
+  const activeTokenSet = useSelector(activeTokenSetSelector);
+  const importedTokens = useSelector(importedTokensSelector);
   const [newTokens, setNewTokens] = React.useState(importedTokens.newTokens);
   const [updatedTokens, setUpdatedTokens] = React.useState(importedTokens.updatedTokens);
 

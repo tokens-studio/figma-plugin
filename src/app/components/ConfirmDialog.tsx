@@ -10,8 +10,8 @@ import Label from './Label';
 import Input from './Input';
 
 function ConfirmDialog() {
-  const confirmButton = React.useRef(null);
-  const firstInput = React.useRef(null);
+  const confirmButton = React.useRef<HTMLButtonElement | null>(null);
+  const firstInput = React.useRef<HTMLInputElement | null>(null);
   const { onConfirm, onCancel, confirmState } = useConfirm();
   const [chosen, setChosen] = React.useState<string[]>([]);
   const [inputValue, setInputValue] = React.useState('');
@@ -35,13 +35,14 @@ function ConfirmDialog() {
     [chosen],
   );
 
-  function handleConfirm() {
+  const handleConfirm = React.useCallback((event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
     if (confirmState.input) {
       onConfirm(inputValue);
     } else {
       onConfirm(chosen);
     }
-  }
+  }, [chosen, inputValue, confirmState, onConfirm]);
 
   React.useEffect(() => {
     setTimeout(() => {

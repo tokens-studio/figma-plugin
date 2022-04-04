@@ -11,5 +11,6 @@ export type StoryblokStory<P = unknown> = {
   first_published_at: string;
   content: {
     component: string;
+    // @TODO update to ChangelogItem
   } & P;
 };

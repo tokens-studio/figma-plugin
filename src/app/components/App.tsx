@@ -1,6 +1,5 @@
-import * as React from 'react';
+import React from 'react';
 import { useSelector } from 'react-redux';
-import JSONEditor from './JSONEditor';
 import SyncSettings from './SyncSettings';
 import Settings from './Settings';
 import Inspector from './Inspector';
@@ -12,14 +11,14 @@ import Footer from './Footer';
 import Changelog from './Changelog';
 import ImportedTokensDialog from './ImportedTokensDialog';
 import { Initiator } from './Initiator';
-import { RootState } from '../store';
 import ConfirmDialog from './ConfirmDialog';
 import PushDialog from './PushDialog';
 import WindowResizer from './WindowResizer';
 import Box from './Box';
+import { activeTabSelector } from '@/selectors';
 
 function App() {
-  const activeTab = useSelector((state: RootState) => state.uiState.activeTab);
+  const activeTab = useSelector(activeTabSelector);
 
   return (
     <Box css={{ backgroundColor: '$bgDefault' }}>

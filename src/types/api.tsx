@@ -11,6 +11,7 @@ export type ApiDataType = {
   secret: string;
   provider: StorageProviderType;
   name: string;
+  branch?: string;
   new?: boolean;
 };
 

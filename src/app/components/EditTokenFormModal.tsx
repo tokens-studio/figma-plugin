@@ -1,16 +1,26 @@
-import * as React from 'react';
+import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Dispatch, RootState } from '../store';
+import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
+import { Dispatch } from '../store';
 import EditTokenForm from './EditTokenForm';
 import Modal from './Modal';
+import { editTokenSelector } from '@/selectors';
 
-function EditTokenFormModal({ resolvedTokens }) {
-  const { editToken } = useSelector((state: RootState) => state.uiState);
+type Props = {
+  resolvedTokens: ResolveTokenValuesResult[];
+};
+
+const EditTokenFormModal: React.FC<Props> = ({ resolvedTokens }) => {
+  const editToken = useSelector(editTokenSelector);
   const dispatch = useDispatch<Dispatch>();
 
-  const handleReset = () => {
+  const handleReset = React.useCallback(() => {
     dispatch.uiState.setShowEditForm(false);
-  };
+  }, [dispatch]);
+
+  if (!editToken) {
+    return null;
+  }
 
   return (
     <Modal
@@ -23,6 +33,6 @@ function EditTokenFormModal({ resolvedTokens }) {
       <EditTokenForm resolvedTokens={resolvedTokens} />
     </Modal>
   );
-}
+};
 
 export default EditTokenFormModal;

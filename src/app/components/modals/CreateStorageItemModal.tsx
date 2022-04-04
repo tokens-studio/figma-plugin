@@ -6,9 +6,18 @@ import Modal from '../Modal';
 import Heading from '../Heading';
 import StorageItemForm from '../StorageItemForm';
 import useRemoteTokens from '../../store/remoteTokens';
+import { localApiStateSelector } from '@/selectors';
 
-export default function CreateStorageItemModal({ isOpen, onClose, onSuccess }) {
-  const { localApiState } = useSelector((state: RootState) => state.uiState);
+type Props = {
+  isOpen: boolean
+  onClose: (arg: boolean) => void
+  onSuccess: () => void
+};
+
+// @TODO use hooks
+
+export default function CreateStorageItemModal({ isOpen, onClose, onSuccess }: Props) {
+  const localApiState = useSelector(localApiStateSelector);
   const { addNewProviderItem } = useRemoteTokens();
   const [hasErrored, setHasErrored] = React.useState(false);
   let defaultFields;

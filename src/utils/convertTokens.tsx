@@ -1,6 +1,7 @@
 import { SingleToken } from '@/types/tokens';
-import { isTypographyToken, isShadowToken, isValueToken } from '../app/components/utils';
+import { isSingleBoxShadowToken, isSingleTokenValueObject, isSingleTypographyToken } from './is';
 
+// @TODO fix typings
 function checkForTokens({
   obj,
   token,
@@ -11,18 +12,18 @@ function checkForTokens({
 }): [SingleToken[], SingleToken] {
   // replaces / in token name
   let returnValue;
-  const shouldExpandTypography = expandTypography ? isTypographyToken(token.value) : false;
-  const shouldExpandShadow = expandShadow ? isShadowToken(token.value) : false;
-  if (isValueToken(token) && !shouldExpandTypography && !shouldExpandShadow) {
+  const shouldExpandTypography = expandTypography ? isSingleTypographyToken(token.value) : false;
+  const shouldExpandShadow = expandShadow ? isSingleBoxShadowToken(token.value) : false;
+  if (isSingleTokenValueObject(token) && !shouldExpandTypography && !shouldExpandShadow) {
     returnValue = token;
   } else if (
-    (isTypographyToken(token) && !expandTypography)
-    || (isShadowToken(token) && !expandShadow)
+    (isSingleTypographyToken(token) && !expandTypography)
+    || (isSingleBoxShadowToken(token) && !expandShadow)
   ) {
     returnValue = {
       type: token.type,
       value: Object.entries(token).reduce((acc, [key, val]) => {
-        acc[key] = isValueToken(val) && returnValuesOnly ? val.value : val;
+        acc[key] = isSingleTokenValueObject(val) && returnValuesOnly ? val.value : val;
         return acc;
       }, {}),
     };
@@ -33,7 +34,7 @@ function checkForTokens({
     }
   } else if (typeof token === 'object') {
     let tokenToCheck = token;
-    if (isValueToken(token)) {
+    if (isSingleTokenValueObject(token)) {
       tokenToCheck = token.value;
     }
     Object.entries(tokenToCheck).map(([key, value]) => {

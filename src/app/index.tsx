@@ -1,7 +1,7 @@
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
-import * as React from 'react';
-import * as ReactDOM from 'react-dom';
+import React from 'react';
+import ReactDOM from 'react-dom';
 import './assets/fonts/jetbrainsmono.css';
 import './styles/preflight.css';
 import './styles/main.css';
@@ -23,7 +23,7 @@ if (process.env.ENVIRONMENT === 'production' || process.env.ENVIRONMENT === 'bet
   });
 }
 
-function ErrorFallback({ error }) {
+function ErrorFallback({ error }: { error: Error }) {
   return (
     <div className="flex items-center flex-col text-center justify-center space-y-4 h-full">
       <Heading>Something went wrong!</Heading>

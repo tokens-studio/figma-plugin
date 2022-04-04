@@ -6,7 +6,6 @@ import defaultJSON from '@/config/default.json';
 
 import parseTokenValues from '@/utils/parseTokenValues';
 import { notifyToUI } from '@/plugin/notifiers';
-import { reduceToValues } from '@/plugin/tokenHelpers';
 import { replaceReferences } from '@/utils/findReferences';
 import parseJson from '@/utils/parseJson';
 import updateTokensOnSources from '../updateSources';
@@ -28,7 +27,7 @@ const defaultTokens: TokenStore = {
   // @TODO this may not be correct
   values: parseTokenValues(defaultJSON as unknown as SetTokenDataPayload['values']),
 };
-interface TokenState {
+export interface TokenState {
   tokens: Record<string, AnyTokenList>;
   lastSyncedState: string;
   importedTokens: {
@@ -100,7 +99,7 @@ export const tokenState = createModel<RootModel>()({
       };
     },
     deleteTokenSet: (state, data: string) => {
-      const oldTokens = state.tokens;
+      const oldTokens = { ...state.tokens };
       delete oldTokens[data];
       return {
         ...state,
@@ -109,7 +108,7 @@ export const tokenState = createModel<RootModel>()({
       };
     },
     renameTokenSet: (state, data: { oldName: string; newName: string }) => {
-      const oldTokens = state.tokens;
+      const oldTokens = { ...state.tokens };
       if (Object.keys(oldTokens).includes(data.newName) && data.oldName !== data.newName) {
         notifyToUI('Token set already exists', { error: true });
         return state;
@@ -403,7 +402,7 @@ export const tokenState = createModel<RootModel>()({
       try {
         updateTokensOnSources({
           tokens: params.shouldUpdateNodes ? rootState.tokenState.tokens : null,
-          tokenValues: reduceToValues(rootState.tokenState.tokens),
+          tokenValues: rootState.tokenState.tokens,
           usedTokenSet: rootState.tokenState.usedTokenSet,
           settings: rootState.settings,
           updatedAt: new Date().toString(),

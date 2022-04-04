@@ -1,10 +1,11 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
-import { RootState } from '../store';
+import isEqual from 'lodash.isequal';
+import { uiStateSelector } from '@/selectors';
 import createAnnotation from './createAnnotation';
 
 export default function AnnotationBuilder() {
-  const uiState = useSelector((state: RootState) => state.uiState);
+  const uiState = useSelector(uiStateSelector, isEqual);
 
   return (
     <div>

@@ -3,7 +3,6 @@ import store from './store';
 import setValuesOnNode from './setValuesOnNode';
 import { TokenValues } from '../types/tokens';
 import { ContextObject, StorageProviderType, StorageType } from '../types/api';
-import { isSingleToken } from '../app/components/utils';
 import * as pjs from '../../package.json';
 import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 import { NodeManagerNode } from './NodeManager';
@@ -16,6 +15,10 @@ import { BackgroundJobs } from '@/constants/BackgroundJobs';
 import { defaultWorker } from './Worker';
 import { getAllFigmaStyleMaps } from '@/utils/getAllFigmaStyleMaps';
 import { ProgressTracker } from './ProgressTracker';
+import { AnyTokenList, TokenStore } from '@/types/tokens';
+import { isSingleToken } from '@/utils/is';
+
+// @TODO fix typings
 
 export function returnValueToLookFor(key) {
   switch (key) {
@@ -32,7 +35,8 @@ export function returnValueToLookFor(key) {
   }
 }
 
-export function mapValuesToTokens(tokens: Map<string, TokenArrayGroup[number]>, values: NodeTokenRefMap): object {
+// @TOOD fix object typing
+export function mapValuesToTokens(tokens: Map<string, AnyTokenList[number]>, values: NodeTokenRefMap): object {
   const mappedValues = Object.entries(values).reduce((acc, [key, tokenOnNode]) => {
     const resolvedToken = tokens.get(tokenOnNode);
     if (!resolvedToken) return acc;
@@ -49,7 +53,7 @@ export function setTokensOnDocument(tokens, updatedAt: string, usedTokenSet: str
   tokensSharedDataHandler.set(figma.root, SharedPluginDataKeys.tokens.usedTokenSet, JSON.stringify(usedTokenSet));
 }
 
-export function getTokenData(): { values: TokenValues; updatedAt: string; version: string, usedTokenSet?: string[] } | null {
+export function getTokenData(): { values: TokenStore['values']; updatedAt: string; version: string, usedTokenSet?: string[] } | null {
   try {
     const values = tokensSharedDataHandler.get(figma.root, SharedPluginDataKeys.tokens.values);
     const version = tokensSharedDataHandler.get(figma.root, SharedPluginDataKeys.tokens.version);
@@ -67,7 +71,7 @@ export function getTokenData(): { values: TokenValues; updatedAt: string; versio
           return acc;
         }, {});
         return {
-          values: tokenObject as TokenValues,
+          values: tokenObject as TokenStore['values'],
           updatedAt,
           version,
           usedTokenSet: parsedUsedTokenSet,
