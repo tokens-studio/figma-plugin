@@ -7,7 +7,6 @@ import fetchChangelog from '@/utils/storyblok';
 import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 import { postToFigma } from '@/plugin/notifiers';
 import { MessageToPluginTypes } from '@/types/messages';
-import { TokenTypes } from '@/constants/TokenTypes';
 import { SingleToken } from '@/types/tokens';
 import { SelectionGroup, StoryblokStory } from '@/types';
 import { Tabs } from '@/constants/Tabs';
@@ -24,10 +23,9 @@ export type EditTokenObject = SingleToken<true, {
   explainer?: string;
   property: string;
   // @TODO get rid of thse object types
-  schema: object;
+  schema?: object;
   optionsSchema: object;
   options: object;
-  type: TokenTypes;
 }>;
 
 export type ConfirmProps = {

@@ -16,6 +16,7 @@ import { SingleParagraphSpacingToken } from './SingleParagraphSpacingToken';
 import { SingleTextDecorationToken } from './SingleTextDecorationToken';
 import { SingleTextCaseToken } from './SingleTextCaseToken';
 import { SingleOtherToken } from './SingleOtherToken';
+import { SingleUndefinedToken } from './SingleUndefinedToken';
 
 export type SingleToken<Named extends boolean = true, P = unknown> =
   SingleColorToken<Named, P>
@@ -35,4 +36,5 @@ export type SingleToken<Named extends boolean = true, P = unknown> =
   | SingleTextDecorationToken<Named, P>
   | SingleTextCaseToken<Named, P>
   | SingleSpacingToken<Named, P>
-  | SingleOtherToken<Named, P>;
+  | SingleOtherToken<Named, P>
+  | SingleUndefinedToken<Named, P>;

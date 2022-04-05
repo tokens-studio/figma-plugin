@@ -1,0 +1,75 @@
+{
+  "typography": {
+    "h1": {
+      "value": {
+        "fontFamily": "Roboto",
+        "fontSize": "96",
+        "fontWeight": "Light"
+      },
+      "type": "typography"
+    },
+    "h2": {
+      "value": {
+        "fontFamily": "Roboto",
+        "fontSize": "60",
+        "fontWeight": "Light"
+      },
+      "type": "typography"
+    }
+  },
+  "sizing": {
+    "base": {
+      "value": "4",
+      "description": "Alias value",
+      "type": "sizing"
+    },
+    "default": {
+      "value": "$sizing.base * 2",
+      "description": "Math value",
+      "type": "sizing"
+    }
+  },
+  "shadows": {
+    "default": {
+      "value": [
+        {
+          "color": "{colorscale.black}",
+          "type": "dropShadow",
+          "x": "0",
+          "y": "4",
+          "blur": "2",
+          "spread": "0"
+        },
+        {
+          "color": "{colorscale.black}",
+          "type": "dropShadow",
+          "x": "0",
+          "y": "0",
+          "blur": "6",
+          "spread": "0"
+        }
+      ],
+      "type": "boxShadow"
+    }
+  },
+  "colorscale": {
+    "white": {
+      "value": "#ffffff",
+      "type": "color"
+    },
+    "black": {
+      "value": "#000000",
+      "type": "color"
+    },
+    "blue": {
+      "300": {
+        "value": "#e6f7ff",
+        "type": "color"
+      },
+      "600": {
+        "value": "#00b0ff",
+        "type": "color"
+      }
+    }
+  }
+}

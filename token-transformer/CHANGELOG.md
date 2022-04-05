@@ -1,3 +1,8 @@
+## v0.0.20 (2022-04-02)
+
+Added expandShadow option (thanks @iShavgula-TacTill)
+Added option to specify a directory of .json files, simply specify the folder name, instead of e.g. input.json
+
 ## v0.0.19 (2022-02-24)
 
 Changed expandTypography to include the key as a token type so users could transform these accordingly with style dictionary.

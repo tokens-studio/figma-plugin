@@ -1,5 +1,5 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import * as React from 'react';
+import React from 'react';
 import * as Tooltip from '@radix-ui/react-tooltip';
 import { styled, keyframes } from '@/stitches.config';
 
@@ -23,14 +23,17 @@ const StyledContent = styled(Tooltip.Content, {
 const StyledArrow = styled(Tooltip.Arrow, {
   fill: '$contextMenuBackground',
 });
-export default ({
-  label,
-  children,
-  side = 'left',
-}: {
+
+type Props = {
   label: string | React.ReactElement;
   children: React.ReactElement;
   side?: 'left' | 'bottom';
+};
+
+const Toolip: React.FC<Props> = ({
+  label,
+  children,
+  side = 'left',
 }) => (
   <Tooltip.Root delayDuration={0}>
     <Tooltip.Trigger as="div">{children}</Tooltip.Trigger>
@@ -40,3 +43,5 @@ export default ({
     </StyledContent>
   </Tooltip.Root>
 );
+
+export default Toolip;

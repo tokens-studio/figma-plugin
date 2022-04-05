@@ -2,9 +2,12 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Reorder } from 'framer-motion';
 import Box from './Box';
-import { Dispatch, RootState } from '../store';
+import { Dispatch } from '../store';
 import { ListItem, TokenSetItem } from './TokenSetItem';
 import useConfirm from '../hooks/useConfirm';
+import {
+  activeTokenSetSelector, editProhibitedSelector, hasUnsavedChangesSelector, usedTokenSetSelector,
+} from '@/selectors';
 
 function getList(items: string[]): ListItem[] {
   return items.map((item) => ({
@@ -29,9 +32,10 @@ export default function TokenSetList({
   onReorder: (tokenSets: string[]) => void;
 }) {
   const { confirm } = useConfirm();
-  const {
-    activeTokenSet, usedTokenSet, editProhibited, hasUnsavedChanges,
-  } = useSelector((state: RootState) => state.tokenState);
+  const activeTokenSet = useSelector(activeTokenSetSelector);
+  const usedTokenSet = useSelector(usedTokenSetSelector);
+  const editProhibited = useSelector(editProhibitedSelector);
+  const hasUnsavedChanges = useSelector(hasUnsavedChangesSelector);
   const dispatch = useDispatch<Dispatch>();
   const [items, setItems] = React.useState(getList(tokenSets));
 
