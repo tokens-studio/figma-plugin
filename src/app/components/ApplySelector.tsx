@@ -1,56 +1,26 @@
 import { useDispatch, useSelector } from 'react-redux';
-import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
-import * as React from 'react';
+import React from 'react';
 import { CheckIcon } from '@radix-ui/react-icons';
-import { styled } from '@/stitches.config';
+import isEqual from 'lodash.isequal';
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuItemIndicator,
+  DropdownMenuSeparator,
+  DropdownMenuCheckboxItem,
+} from './DropdownMenu';
 import { UpdateMode } from '@/types/state';
-import { Dispatch, RootState } from '../store';
+import { Dispatch } from '../store';
 import IconChevronDown from './icons/IconChevronDown';
-
-const StyledContent = styled(DropdownMenu.Content, {
-  minWidth: 130,
-  backgroundColor: '$contextMenuBackground',
-  color: '$contextMenuForeground',
-  borderRadius: '$contextMenu',
-  padding: 5,
-  boxShadow: '0px 5px 15px -5px hsla(206,22%,7%,.15)',
-});
-
-const itemStyles = {
-  fontSize: 13,
-  padding: '5px 10px 5px 25px',
-  borderRadius: '$contextMenuItem',
-  cursor: 'default',
-  position: 'relative',
-
-  '&:focus': {
-    outline: 'none',
-    backgroundColor: '$interaction',
-    color: '$onInteraction',
-  },
-};
-
-const StyledCheckboxItem = styled(DropdownMenu.CheckboxItem, itemStyles);
-
-const StyledItemIndicator = styled(DropdownMenu.ItemIndicator, {
-  position: 'absolute',
-  left: 5,
-});
-
-const StyledSeparator = styled(DropdownMenu.Separator, {
-  height: 1,
-  backgroundColor: '$contextMenuSeperator',
-  margin: 5,
-});
-
-const StyledRadioGroup = styled(DropdownMenu.RadioGroup, {});
-
-const StyledRadioItem = styled(DropdownMenu.RadioItem, itemStyles);
+import { settingsStateSelector } from '@/selectors';
 
 export default function ApplySelector() {
   const {
     updateMode, updateRemote, updateOnChange, updateStyles,
-  } = useSelector((state: RootState) => state.settings);
+  } = useSelector(settingsStateSelector, isEqual);
 
   const {
     setUpdateMode, setUpdateOnChange, setUpdateRemote, setUpdateStyles,
@@ -81,59 +51,59 @@ export default function ApplySelector() {
   };
 
   return (
-    <DropdownMenu.Root>
-      <DropdownMenu.Trigger className="flex p-2 bg-white border rounded text-xs items-center space-x-2">
+    <DropdownMenu>
+      <DropdownMenuTrigger bordered>
         <span>
           Apply to
           {' '}
           {updateMode}
         </span>
         <IconChevronDown />
-      </DropdownMenu.Trigger>
+      </DropdownMenuTrigger>
 
-      <StyledContent side="top">
-        <StyledRadioGroup value={updateMode}>
-          <StyledRadioItem value={UpdateMode.PAGE} onSelect={handleApplyPage}>
-            <StyledItemIndicator>
+      <DropdownMenuContent side="top">
+        <DropdownMenuRadioGroup value={updateMode}>
+          <DropdownMenuRadioItem value={UpdateMode.PAGE} onSelect={handleApplyPage}>
+            <DropdownMenuItemIndicator>
               <CheckIcon />
-            </StyledItemIndicator>
+            </DropdownMenuItemIndicator>
             Apply to page
-          </StyledRadioItem>
-          <StyledRadioItem value={UpdateMode.DOCUMENT} onSelect={handleApplyDocument}>
-            <StyledItemIndicator>
+          </DropdownMenuRadioItem>
+          <DropdownMenuRadioItem value={UpdateMode.DOCUMENT} onSelect={handleApplyDocument}>
+            <DropdownMenuItemIndicator>
               <CheckIcon />
-            </StyledItemIndicator>
+            </DropdownMenuItemIndicator>
             Apply to document
-          </StyledRadioItem>
-          <StyledRadioItem value={UpdateMode.SELECTION} onSelect={handleApplySelection}>
-            <StyledItemIndicator>
+          </DropdownMenuRadioItem>
+          <DropdownMenuRadioItem value={UpdateMode.SELECTION} onSelect={handleApplySelection}>
+            <DropdownMenuItemIndicator>
               <CheckIcon />
-            </StyledItemIndicator>
+            </DropdownMenuItemIndicator>
             Apply to selection
-          </StyledRadioItem>
-        </StyledRadioGroup>
+          </DropdownMenuRadioItem>
+        </DropdownMenuRadioGroup>
 
-        <StyledSeparator />
+        <DropdownMenuSeparator />
 
-        <StyledCheckboxItem checked={updateOnChange} onCheckedChange={handleUpdateOnChange}>
-          <StyledItemIndicator>
+        <DropdownMenuCheckboxItem checked={updateOnChange} onCheckedChange={handleUpdateOnChange}>
+          <DropdownMenuItemIndicator>
             <CheckIcon />
-          </StyledItemIndicator>
+          </DropdownMenuItemIndicator>
           Update on change
-        </StyledCheckboxItem>
-        <StyledCheckboxItem checked={updateRemote} onCheckedChange={handleUpdateRemote}>
-          <StyledItemIndicator>
+        </DropdownMenuCheckboxItem>
+        <DropdownMenuCheckboxItem checked={updateRemote} onCheckedChange={handleUpdateRemote}>
+          <DropdownMenuItemIndicator>
             <CheckIcon />
-          </StyledItemIndicator>
+          </DropdownMenuItemIndicator>
           Update remote
-        </StyledCheckboxItem>
-        <StyledCheckboxItem checked={updateStyles} onCheckedChange={handleUpdateStyles}>
-          <StyledItemIndicator>
+        </DropdownMenuCheckboxItem>
+        <DropdownMenuCheckboxItem checked={updateStyles} onCheckedChange={handleUpdateStyles}>
+          <DropdownMenuItemIndicator>
             <CheckIcon />
-          </StyledItemIndicator>
+          </DropdownMenuItemIndicator>
           Update styles
-        </StyledCheckboxItem>
-      </StyledContent>
-    </DropdownMenu.Root>
+        </DropdownMenuCheckboxItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }

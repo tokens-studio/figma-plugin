@@ -1,6 +1,6 @@
-export const aliasRegex = /(\$[^\s,]+\w)|({([^}]*)})/g;
+import { AliasRegex } from '@/constants/AliasRegex';
 
-export const findReferences = (tokenValue: string) => tokenValue?.toString().match(aliasRegex);
+export const findReferences = (tokenValue: string) => tokenValue?.toString().match(AliasRegex);
 
 export const findMatchingReferences = (tokenValue: string, valueToLookFor: string) => {
   const references = findReferences(tokenValue);
@@ -9,6 +9,7 @@ export const findMatchingReferences = (tokenValue: string, valueToLookFor: strin
     return references.filter((ref) => {
       const name = ref.startsWith('{') ? ref.slice(1, ref.length - 1) : ref.substring(1);
       if (name === valueToLookFor) return ref;
+      return false;
     });
   }
   return [];

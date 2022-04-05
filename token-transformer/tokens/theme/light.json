@@ -1,0 +1,20 @@
+{
+  "colors": {
+    "background": {
+      "value": "{colorscale.white}",
+      "type": "color"
+    },
+    "foreground": {
+      "value": "{colorscale.black}",
+      "type": "color"
+    },
+    "accent": {
+      "value": "{colorscale.blue.600}",
+      "type": "color"
+    },
+    "on-accent": {
+      "value": "{colorscale.white}",
+      "type": "color"
+    }
+  }
+}

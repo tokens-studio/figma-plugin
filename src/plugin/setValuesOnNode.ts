@@ -1,6 +1,6 @@
 import { Properties } from '@/constants/Properties';
+import { TokenTypes } from '@/constants/TokenTypes';
 import { getAllFigmaStyleMaps } from '@/utils/getAllFigmaStyleMaps';
-import { convertToFigmaColor } from './figmaTransforms/colors';
 import { transformValue } from './helpers';
 import setColorValuesOnTarget from './setColorValuesOnTarget';
 import setEffectValuesOnTarget from './setEffectValuesOnTarget';
@@ -45,7 +45,7 @@ export default async function setValuesOnNode(
         if (matchingStyle) {
           node.effectStyleId = matchingStyle.id;
         } else {
-          setEffectValuesOnTarget(node, { value: values.boxShadow });
+          setEffectValuesOnTarget(node, { value: values.boxShadow, type: TokenTypes.BOX_SHADOW });
         }
       }
 
@@ -135,13 +135,10 @@ export default async function setValuesOnNode(
           const path = data.border.split('.');
           const pathname = path.slice(ignoreFirstPartForStyles ? 1 : 0, path.length).join('/');
           const matchingStyle = figmaStyleMaps.paintStyles.get(pathname);
-          const { color, opacity } = convertToFigmaColor(values.border);
-
           if (matchingStyle) {
-            matchingStyle.paints = [{ color, opacity, type: 'SOLID' }];
             node.strokeStyleId = matchingStyle.id;
           } else {
-            node.strokes = [{ type: 'SOLID', color, opacity }];
+            setColorValuesOnTarget(node, { value: values.border }, 'strokes');
           }
         }
       }

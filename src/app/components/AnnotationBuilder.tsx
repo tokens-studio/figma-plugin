@@ -1,49 +1,49 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
-import { RootState } from '../store';
+import isEqual from 'lodash.isequal';
+import { uiStateSelector } from '@/selectors';
 import createAnnotation from './createAnnotation';
+import Stack from './Stack';
+import Text from './Text';
 
 export default function AnnotationBuilder() {
-  const uiState = useSelector((state: RootState) => state.uiState);
-  return (
-    <div>
-      {Object.entries(uiState.mainNodeSelectionValues).length > 0 && (
-      <div className="flex flex-row items-center justify-between pb-4 mb-4 border-b border-gray-200 text-xxs z-1">
-        <div className="font-bold">Add as annotation</div>
-        <div className="flex flex-row">
+  const uiState = useSelector(uiStateSelector, isEqual);
+
+  return Object.entries(uiState.mainNodeSelectionValues).length > 0 ? (
+    <Stack direction="row" align="center" justify="between">
+      <Text bold>Add as annotation</Text>
+      <Stack direction="row" gap={0}>
+        <button
+          className="p-1 button button-secondary"
+          type="button"
+          onClick={() => createAnnotation(uiState.mainNodeSelectionValues, 'left')}
+        >
+          ←
+        </button>
+        <Stack direction="column">
           <button
             className="p-1 button button-secondary"
             type="button"
-            onClick={() => createAnnotation(uiState.mainNodeSelectionValues, 'left')}
+            onClick={() => createAnnotation(uiState.mainNodeSelectionValues, 'top')}
           >
-            ←
+            ↑
           </button>
-          <div className="flex flex-col">
-            <button
-              className="p-1 button button-secondary"
-              type="button"
-              onClick={() => createAnnotation(uiState.mainNodeSelectionValues, 'top')}
-            >
-              ↑
-            </button>
-            <button
-              className="p-1 button button-secondary"
-              type="button"
-              onClick={() => createAnnotation(uiState.mainNodeSelectionValues, 'bottom')}
-            >
-              ↓
-            </button>
-          </div>
           <button
             className="p-1 button button-secondary"
             type="button"
-            onClick={() => createAnnotation(uiState.mainNodeSelectionValues, 'right')}
+            onClick={() => createAnnotation(uiState.mainNodeSelectionValues, 'bottom')}
           >
-            →
+            ↓
           </button>
-        </div>
-      </div>
-      )}
-    </div>
-  );
+        </Stack>
+        <button
+          className="p-1 button button-secondary"
+          type="button"
+          onClick={() => createAnnotation(uiState.mainNodeSelectionValues, 'right')}
+        >
+          →
+        </button>
+      </Stack>
+    </Stack>
+  ) : null;
 }

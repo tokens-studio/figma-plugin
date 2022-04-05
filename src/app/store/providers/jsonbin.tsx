@@ -1,15 +1,16 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { Dispatch, RootState } from '@/app/store';
-import { StorageProviderType } from '@/types/api';
+import { ContextObject, StorageProviderType } from '@/types/api';
 import { MessageToPluginTypes } from '@/types/messages';
-import { TokenProps } from '@/types/tokens';
+import { TokenStore, TokenValues } from '@/types/tokens';
 import convertTokensToObject from '@/utils/convertTokensToObject';
 import { notifyToUI, postToFigma } from '../../../plugin/notifiers';
-import { compareUpdatedAt } from '../../components/utils';
 import * as pjs from '../../../../package.json';
 import useStorage from '../useStorage';
+import { compareUpdatedAt } from '@/utils/date';
+import { tokensSelector } from '@/selectors';
 
-async function readTokensFromJSONBin({ secret, id }): Promise<TokenProps> | null {
+async function readTokensFromJSONBin({ secret, id }): Promise<TokenValues | null> {
   const response = await fetch(`https://api.jsonbin.io/v3/b/${id}/latest`, {
     method: 'GET',
     mode: 'cors',
@@ -25,11 +26,11 @@ async function readTokensFromJSONBin({ secret, id }): Promise<TokenProps> | null
   if (response.ok) {
     return response.json();
   }
-  notifyToUI('There was an error connecting, check your sync settings');
+  notifyToUI('There was an error connecting, check your sync settings', { error: true });
   return null;
 }
 
-async function writeTokensToJSONBin({ secret, id, tokenObj }): Promise<TokenProps> | null {
+async function writeTokensToJSONBin({ secret, id, tokenObj }): Promise<TokenValues | null> {
   const response = await fetch(`https://api.jsonbin.io/v3/b/${id}`, {
     method: 'PUT',
     mode: 'cors',
@@ -47,7 +48,7 @@ async function writeTokensToJSONBin({ secret, id, tokenObj }): Promise<TokenProp
     notifyToUI('Updated Remote');
     return res;
   }
-  notifyToUI('Error updating remote');
+  notifyToUI('Error updating remote', { error: true });
   return null;
 }
 
@@ -75,7 +76,7 @@ export async function updateJSONBinTokens({
         // Tell the user to choose between:
         // A) Pull Remote values and replace local changes
         // B) Overwrite Remote changes
-        notifyToUI('Error updating tokens as remote is newer, please update first');
+        notifyToUI('Error updating tokens as remote is newer, please update first', { error: true });
       }
     } else {
       writeTokensToJSONBin({ secret, id, tokenObj });
@@ -88,9 +89,9 @@ export async function updateJSONBinTokens({
 export function useJSONbin() {
   const dispatch = useDispatch<Dispatch>();
   const { setStorageType } = useStorage();
-  const { tokens } = useSelector((state: RootState) => state.tokenState);
+  const tokens = useSelector(tokensSelector);
 
-  async function createNewJSONBin(context): Promise<TokenProps> {
+  async function createNewJSONBin(context: ContextObject): Promise<TokenValues> {
     const { secret, name, updatedAt } = context;
     const response = await fetch('https://api.jsonbin.io/v3/b', {
       method: 'POST',
@@ -138,16 +139,16 @@ export function useJSONbin() {
 
       return jsonBinData.metadata.id;
     }
-    notifyToUI('Something went wrong. See console for details');
+    notifyToUI('Something went wrong. See console for details', { error: true });
     return null;
   }
 
   // Read tokens from JSONBin
 
-  async function pullTokensFromJSONBin(context): Promise<TokenProps> {
+  async function pullTokensFromJSONBin(context: ContextObject): Promise<TokenStore | null> {
     const { id, secret, name } = context;
 
-    if (!id && !secret) return;
+    if (!id && !secret) return null;
 
     try {
       const jsonBinData = await readTokensFromJSONBin({ id, secret });
@@ -170,17 +171,18 @@ export function useJSONbin() {
             values: jsonBinData.values,
           };
         }
-        notifyToUI('No tokens stored on remote');
+        notifyToUI('No tokens stored on remote', { error: true });
       }
 
       return null;
     } catch (e) {
-      notifyToUI('Error fetching from JSONbin, check console (F12)');
+      notifyToUI('Error fetching from JSONbin, check console (F12)', { error: true });
       console.log('Error:', e);
+      return null;
     }
   }
 
-  async function addJSONBinCredentials(context): Promise<TokenProps> {
+  async function addJSONBinCredentials(context: ContextObject): Promise<TokenStore | null> {
     const tokenValues = await pullTokensFromJSONBin(context);
 
     if (tokenValues) {

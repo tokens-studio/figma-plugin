@@ -36,6 +36,7 @@ import { StorageProviderType } from '../types/api';
 import compareProvidersWithStored from './compareProviders';
 import { defaultNodeManager } from './NodeManager';
 import { defaultWorker } from './Worker';
+import { getFeatureFlags } from '@/utils/featureFlags';
 
 let inspectDeep = false;
 let shouldSendSelectionValues = false;
@@ -72,6 +73,7 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
       try {
         const { currentUser } = figma;
         const settings = await getUISettings();
+        const featureFlagId = await getFeatureFlags();
         inspectDeep = settings.inspectDeep;
         const userId = await getUserId();
         const lastOpened = await getLastOpened();
@@ -92,7 +94,7 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
           case StorageProviderType.JSONBIN:
           case StorageProviderType.GITHUB:
           case StorageProviderType.URL: {
-            compareProvidersWithStored(apiProviders, storageType);
+            compareProvidersWithStored(apiProviders, storageType, featureFlagId);
             break;
           }
           default: {
@@ -187,7 +189,7 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
         updateStyles(msg.tokens, false, msg.settings);
       }
       if (msg.tokenValues && msg.updatedAt) {
-        setTokensOnDocument(msg.tokenValues, msg.updatedAt);
+        setTokensOnDocument(msg.tokenValues, msg.updatedAt, msg.usedTokenSet);
       }
       if (msg.tokens) {
         const tokensMap = tokenArrayGroupToMap(msg.tokens);
@@ -270,6 +272,12 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
         type: MessageFromPluginTypes.CLEAR_JOBS,
       });
       break;
+    case MessageToPluginTypes.SET_SHOW_EMPTY_GROUPS: {
+      updateUISettings({
+        showEmptyGroups: msg.showEmptyGroups,
+      });
+      break;
+    }
     case MessageToPluginTypes.SET_UI: {
       const width = msg.uiWindow?.width ?? DefaultWindowSize.width;
       const height = msg.uiWindow?.height ?? DefaultWindowSize.height;

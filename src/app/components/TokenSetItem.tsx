@@ -1,147 +1,271 @@
 import React from 'react';
-import { useDrop, useDrag, DropTargetMonitor } from 'react-dnd';
-import { getEmptyImage } from 'react-dnd-html5-backend';
-import { XYCoord } from 'dnd-core';
-import { useDispatch, useSelector } from 'react-redux';
-import { Dispatch, RootState } from '../store';
+import { Reorder, useMotionValue, useDragControls } from 'framer-motion';
+import { styled } from '@/stitches.config';
+import Checkbox from './Checkbox';
+import IconChevronDown from './icons/IconChevronDown';
+import Box from './Box';
 import {
-  ContextMenu, ContextMenuItem, ContextMenuContent, ContextMenuTrigger,
+  ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger,
 } from './ContextMenu';
+import { TreeItem } from './utils/getTree';
+import IconGrabber from '@/icons/grabber.svg';
+import { useRaisedShadow } from './use-raised-shadow';
 
-interface DragItem {
-  index: number;
-  id: string;
-  type: string;
-}
+export type ListItem = {
+  path: string,
+  key: string,
+  parent: string | null,
+  type: 'set',
+  level: number,
+  label: string,
+};
 
-enum ItemTypes {
-  CARD = 'card',
-}
+export type TokenSetItemProps = {
+  item: TreeItem | ListItem;
+  isCollapsed?: boolean;
+  isActive?: boolean;
+  onClick: () => void;
+  isChecked: boolean | 'indeterminate';
+  onCollapse?: () => void;
+  onCheck: (checked: boolean) => void;
+  canEdit: boolean;
+  canDelete: boolean;
+  canReorder?: boolean;
+  onRename: (set: string) => void;
+  onDelete: (set: string) => void;
+  onReorder?: () => void;
+};
 
-export default function TokenSetItem({
-  tokenSet, onMove, index, onRename, onDelete, onDrop,
-}) {
-  const {
-    tokens, activeTokenSet, usedTokenSet, editProhibited,
-  } = useSelector((state: RootState) => state.tokenState);
-  const dispatch = useDispatch<Dispatch>();
-
-  const ref = React.useRef<HTMLDivElement>(null);
-
-  const [{ handlerId }, drop] = useDrop({
-    accept: ItemTypes.CARD,
-    collect(monitor) {
-      return {
-        handlerId: monitor.getHandlerId(),
-      };
+const StyledChevron = styled(Box, {
+  transition: 'transform 0.2s ease-in-out',
+  color: '$textSubtle',
+  variants: {
+    collapsed: {
+      true: {
+        transform: 'rotate(-90deg)',
+      },
+      false: {
+        transform: 'rotate(0deg)',
+      },
     },
-    hover(item: DragItem, monitor: DropTargetMonitor) {
-      if (!ref.current || editProhibited) {
-        return;
-      }
-      const dragIndex = item.index;
-      const hoverIndex = index;
+  },
+});
 
-      // Don't replace items with themselves
-      if (dragIndex === hoverIndex) {
-        return;
-      }
+const ChevronButton = styled('button', {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  position: 'absolute',
+  height: '100%',
+  width: '$4',
+  '&:focus': {
+    boxShadow: 'none',
+  },
+});
 
-      // Determine rectangle on screen
-      const hoverBoundingRect = ref.current?.getBoundingClientRect();
+const StyledGrabber = styled(Box, {
+  cursor: 'grab',
+  position: 'absolute',
+  left: 0,
+  display: 'flex',
+  alignItems: 'center',
+  width: '$4',
+  height: '100%',
+  color: '$textSubtle',
+  opacity: 0,
+  '&:hover': {
+    opacity: 1,
+  },
+});
 
-      // Get vertical middle
-      const hoverMiddleX = (hoverBoundingRect.right - hoverBoundingRect.left) / 2;
-
-      // Determine mouse position
-      const clientOffset = monitor.getClientOffset();
-
-      // Get pixels to the top
-      const hoverClientX = (clientOffset as XYCoord).x - hoverBoundingRect.left;
-
-      // Only perform the move when the mouse has crossed half of the items height
-      // When dragging downwards, only move when the cursor is below 50%
-      // When dragging upwards, only move when the cursor is above 50%
-
-      // Dragging right
-      if (dragIndex < hoverIndex && hoverClientX < hoverMiddleX) {
-        return;
-      }
-
-      // Dragging left
-      if (dragIndex > hoverIndex && hoverClientX > hoverMiddleX) {
-        return;
-      }
-
-      // Time to actually perform the action
-      onMove(dragIndex, hoverIndex);
-
-      // Note: we're mutating the monitor item here!
-      // Generally it's better to avoid mutations,
-      // but it's good here for the sake of performance
-      // to avoid expensive index searches.
-      // eslint-disable-next-line no-param-reassign
-      item.index = hoverIndex;
+const StyledCheckbox = styled(Box, {
+  position: 'absolute',
+  right: '$4',
+  height: '100%',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  variants: {
+    checked: {
+      true: {
+        opacity: 1,
+      },
+      indeterminate: {
+        opacity: 1,
+      },
+      false: {
+        opacity: 0,
+        '&:hover, &:focus': {
+          opacity: 1,
+        },
+      },
     },
-    drop() {
-      if (editProhibited) return;
-      onDrop();
+  },
+});
+
+const StyledButton = styled('button', {
+  padding: '$3 $4',
+  display: 'flex',
+  width: '100%',
+  textAlign: 'left',
+  '&:hover, &:focus': {
+    boxShadow: 'none',
+    [`+ ${StyledCheckbox}`]: {
+      opacity: 1,
     },
-  });
+    [`~ ${StyledGrabber}`]: {
+      opacity: 1,
+    },
+  },
+  variants: {
+    isActive: {
+      true: {
+        backgroundColor: '$bgAccent',
+        borderColor: '$interaction',
+      },
+      false: {
+        '&:focus, &:hover': {
+          background: '$bgSubtle',
+        },
+      },
+    },
+    itemType: {
+      folder: {
+        cursor: 'default',
+        '&:hover, &:focus': {
+          backgroundColor: 'inherit',
+        },
+      },
+    },
+  },
+});
 
-  const [{ isDragging }, drag, preview] = useDrag({
-    item: { type: ItemTypes.CARD, tokenSet, index },
-    collect: (monitor: any) => ({
-      isDragging: monitor.isDragging(),
-    }),
-  });
+const StyledWrapper = styled(Box, {
+  display: 'flex',
+  position: 'relative',
+  alignItems: 'center',
+  gap: '$1',
+  fontWeight: '$bold',
+  fontSize: '$xsmall',
+});
 
-  React.useEffect(() => {
-    preview(getEmptyImage(), { captureDraggingState: true });
-  });
+const ConditionalReorderWrapper = ({
+  canReorder,
+  controls,
+  item,
+  children,
+  onReorder,
+}: {
+  canReorder: boolean;
+  controls: any;
+  item: TreeItem;
+  children: React.ReactElement;
+  onReorder: () => void;
+}) => {
+  const y = useMotionValue(0);
+  const boxShadow = useRaisedShadow(y);
+  return canReorder ? (
+    <Reorder.Item
+      dragListener={false}
+      dragControls={controls}
+      onDragEnd={(e) => {
+        onReorder();
+        e.preventDefault();
+      }}
+      value={item}
+      style={{ boxShadow, y }}
+    >
+      {children}
+    </Reorder.Item>
+  ) : (
+    children
+  );
+};
 
-  const style = editProhibited
-    ? {}
-    : {
-      cursor: 'move',
-    };
-  const opacity = isDragging ? 1 : 1;
-  drag(drop(ref));
+export function TokenSetItem({
+  item,
+  isCollapsed = false,
+  onCollapse,
+  onClick,
+  onReorder,
+  isActive = false,
+  isChecked,
+  onCheck,
+  canEdit,
+  canDelete,
+  canReorder = false,
+  onRename,
+  onDelete,
+}: TokenSetItemProps) {
+  const controls = useDragControls();
 
   return (
-    <div className="flex-shrink-0" ref={ref} style={{ ...style, opacity }} data-handler-id={handlerId}>
-      <ContextMenu>
-        <ContextMenuTrigger id={`${tokenSet}-trigger`}>
-          <button
-            key={tokenSet}
-            className={`font-bold items-center gap-2 focus:outline-none text-xs flex p-2 rounded border ${
-              activeTokenSet === tokenSet && 'border-blue-500 bg-blue-100'
-            }`}
+    <ConditionalReorderWrapper canReorder={canReorder} item={item} controls={controls} onReorder={() => onReorder()}>
+      <StyledWrapper>
+        {item.type === 'folder' ? (
+          <ChevronButton
+            css={{
+              left: `${5 * item.level}px`,
+            }}
+            onClick={() => (onCollapse ? onCollapse() : null)}
             type="button"
-            onClick={() => dispatch.tokenState.setActiveTokenSet(tokenSet)}
           >
-            <input
-              type="checkbox"
-              className="py-2 pl-2"
-              id={`toggle-${tokenSet}`}
-              checked={usedTokenSet.includes(tokenSet)}
-              onChange={() => dispatch.tokenState.toggleUsedTokenSet(tokenSet)}
-            />
-            {tokenSet}
-          </button>
-        </ContextMenuTrigger>
-        <ContextMenuContent className="text-xs">
-          <ContextMenuItem disabled={editProhibited} onSelect={() => onRename(tokenSet)}>
-            Rename
-          </ContextMenuItem>
-          <ContextMenuItem
-            disabled={editProhibited || Object.keys(tokens).length < 2}
-            onSelect={() => onDelete(tokenSet)}
-          >
-            Delete
-          </ContextMenuItem>
-        </ContextMenuContent>
-      </ContextMenu>
-    </div>
+            <StyledChevron collapsed={isCollapsed}>
+              <IconChevronDown />
+            </StyledChevron>
+          </ChevronButton>
+        ) : null}
+        {item.type === 'folder' ? (
+          <StyledButton itemType={item.type} type="button" isActive={isActive} onClick={() => onClick()}>
+            <Box
+              css={{
+                paddingLeft: `${5 * item.level}px`,
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                color: '$textMuted',
+                fontWeight: '$normal',
+                userSelect: 'none',
+              }}
+            >
+              {item.label}
+            </Box>
+          </StyledButton>
+        ) : (
+          <ContextMenu>
+            <ContextMenuTrigger asChild id={`${item.path}-trigger`}>
+              <StyledButton itemType={item.type} type="button" isActive={isActive} onClick={() => onClick()}>
+                <Box
+                  css={{
+                    paddingLeft: `${5 * item.level}px`,
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    userSelect: 'none',
+                  }}
+                >
+                  {item.label}
+                </Box>
+              </StyledButton>
+            </ContextMenuTrigger>
+            {canEdit ? (
+              <ContextMenuContent>
+                <ContextMenuItem onSelect={() => onRename(item.path)}>Rename</ContextMenuItem>
+                <ContextMenuItem disabled={!canDelete} onSelect={() => onDelete(item.path)}>
+                  Delete
+                </ContextMenuItem>
+              </ContextMenuContent>
+            ) : null}
+          </ContextMenu>
+        )}
+
+        <StyledCheckbox checked={isChecked}>
+          <Checkbox checked={isChecked} id={item.path} onCheckedChange={() => onCheck(!isChecked)} />
+        </StyledCheckbox>
+        {canReorder ? (
+          <StyledGrabber onPointerDown={(e) => controls.start(e)}>
+            <IconGrabber />
+          </StyledGrabber>
+        ) : null}
+      </StyledWrapper>
+    </ConditionalReorderWrapper>
   );
 }

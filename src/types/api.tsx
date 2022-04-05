@@ -11,6 +11,7 @@ export type ApiDataType = {
   secret: string;
   provider: StorageProviderType;
   name: string;
+  branch?: string;
   new?: boolean;
 };
 
@@ -22,8 +23,8 @@ export enum StorageProviderType {
 }
 
 export interface ContextObject extends ApiDataType {
-  branch?: string;
-  filePath?: string;
+  branch: string;
+  filePath: string;
   tokens?: string;
   baseUrl?: string;
   internalId?: string;

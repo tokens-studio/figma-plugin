@@ -1,56 +1,63 @@
-import * as React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { track } from '@/utils/analytics';
-import { Dispatch, RootState } from '../store';
-import useTokens from '../store/useTokens';
+import React from 'react';
+import { useSelector } from 'react-redux';
 import ApplySelector from './ApplySelector';
-import { UpdateMode } from '@/types/state';
-import Button from './Button';
-import useConfirm from '../hooks/useConfirm';
+import ExportModal from './modals/ExportModal';
+import PresetModal from './modals/PresetModal';
+import Box from './Box';
+import ActionButton from './ActionButton';
+import StylesDropdown from './StylesDropdown';
+import { editProhibitedSelector, hasUnsavedChangesSelector } from '@/selectors';
 
-export default function TokensBottomBar() {
-  const { updateDocument } = useDispatch<Dispatch>().tokenState;
-  const { editProhibited } = useSelector((state: RootState) => state.tokenState);
-  const { updateMode = UpdateMode.PAGE } = useSelector((state: RootState) => state.settings);
-  const {
-    confirm,
-  } = useConfirm();
-  const shouldConfirm = React.useMemo(() => updateMode === UpdateMode.DOCUMENT, [updateMode]);
+type Props = {
+  handleUpdate: () => void;
+  handleSaveJSON: () => void;
+  hasJSONError: boolean;
+};
 
-  const handleUpdate = React.useCallback(async () => {
-    track('Update Tokens');
-    if (shouldConfirm) {
-      confirm({
-        text: 'Are you sure?',
-        description: 'You are about to run a document wide update. This operation can take more than 30 minutes on very large documents.',
-      }).then(({ result }) => {
-        if (result) {
-          updateDocument();
-        }
-      });
-    } else {
-      updateDocument();
-    }
-  }, [confirm, shouldConfirm]);
-  const { pullStyles } = useTokens();
-  const { createStylesFromTokens } = useTokens();
+export default function TokensBottomBar({ handleUpdate, handleSaveJSON, hasJSONError }: Props) {
+  const editProhibited = useSelector(editProhibitedSelector);
+  const hasUnsavedChanges = useSelector(hasUnsavedChangesSelector);
+
+  const [exportModalVisible, showExportModal] = React.useState(false);
+  const [presetModalVisible, showPresetModal] = React.useState(false);
 
   return (
-    <div className="fixed bottom-0 left-0 w-full bg-white border-t border-gray-200">
-      <div className="flex justify-between items-center p-2">
-        <ApplySelector />
-        <div className="space-x-2">
-          <Button variant="secondary" onClick={pullStyles} disabled={editProhibited}>
-            Import
-          </Button>
-          <Button variant="secondary" onClick={createStylesFromTokens}>
-            Create Styles
-          </Button>
-          <Button variant="primary" onClick={handleUpdate}>
-            Update
-          </Button>
-        </div>
-      </div>
-    </div>
+    <Box css={{
+      width: '100%', backgroundColor: '$bgDefault', borderBottom: '1px solid', borderColor: '$borderMuted',
+    }}
+    >
+      {hasUnsavedChanges ? (
+        <Box
+          css={{
+            padding: '$3 $4',
+            display: 'flex',
+            gap: '$1',
+            width: '100%',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}
+        >
+          <Box css={{ fontSize: '$xsmall' }}>Unsaved changes</Box>
+          <ActionButton variant="primary" disabled={hasJSONError} onClick={() => handleSaveJSON()} text="Save JSON" />
+        </Box>
+      )
+        : (
+          <Box css={{
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexDirection: 'row', gap: '$2', padding: '$3 $4',
+          }}
+          >
+            <ApplySelector />
+            <Box css={{ display: 'flex', flexDirection: 'row', gap: '$2' }}>
+              <ActionButton text="Load" disabled={editProhibited} onClick={() => showPresetModal(true)} />
+              <ActionButton text="Export" onClick={() => showExportModal(true)} />
+              <StylesDropdown />
+              <ActionButton text="Update" variant="primary" onClick={handleUpdate} />
+            </Box>
+          </Box>
+        )}
+      {exportModalVisible && <ExportModal onClose={() => showExportModal(false)} />}
+      {presetModalVisible && <PresetModal onClose={() => showPresetModal(false)} />}
+
+    </Box>
   );
 }

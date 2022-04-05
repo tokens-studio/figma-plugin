@@ -1,21 +1,23 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { Dispatch, RootState } from '../store';
+import { showPushDialogSelector } from '@/selectors';
+import { Dispatch } from '../store';
+
+// @TODO fix using useCallback and other memoization
 
 let resolveCallback;
 function usePushDialog() {
-  const { showPushDialog } = useSelector((state: RootState) => state.uiState);
+  const showPushDialog = useSelector(showPushDialogSelector);
   const dispatch = useDispatch<Dispatch>();
 
-  const pushDialog = (givenState): Promise<{ commitMessage: string; customBranch: string }> => {
+  const pushDialog = (givenState?: string): Promise<{ commitMessage: string; customBranch: string }> => {
     if (givenState) {
       dispatch.uiState.setShowPushDialog(givenState);
     } else {
       dispatch.uiState.setShowPushDialog('initial');
-
-      return new Promise((res, rej) => {
-        resolveCallback = res;
-      });
     }
+    return new Promise((res) => {
+      resolveCallback = res;
+    });
   };
 
   const closeDialog = () => {

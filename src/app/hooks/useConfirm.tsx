@@ -1,45 +1,61 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { Dispatch, RootState } from '../store';
+import {
+  useCallback, useMemo,
+} from 'react';
+import { Dispatch } from '../store';
 import { ConfirmProps } from '../store/models/uiState';
+import { confirmStateSelector } from '@/selectors';
 
-let resolveCallback;
-function useConfirm() {
-  const { confirmState } = useSelector((state: RootState) => state.uiState);
+type ResolveCallbackPayload<C = any> = false | {
+  result: true;
+  data: C;
+};
+
+let resolveCallback: (payload: ResolveCallbackPayload<any>) => void = () => {};
+
+function useConfirm<C = any>() {
+  const confirmState = useSelector(confirmStateSelector);
   const dispatch = useDispatch<Dispatch>();
 
-  const confirm = ({
-    text,
-    description,
-    confirmAction,
-    choices,
-    input,
-  }: ConfirmProps): Promise<{ result: boolean; data?: any }> => {
+  const confirm = useCallback((opts: ConfirmProps) => {
+    const {
+      text,
+      description,
+      confirmAction,
+      choices,
+      input,
+    } = opts;
+
     dispatch.uiState.setShowConfirm({
-      text, description, confirmAction, choices, input,
+      input,
+      description,
+      confirmAction,
+      text: text ?? '',
+      choices: choices ?? [],
     });
 
-    return new Promise((res, rej) => {
+    return new Promise<ResolveCallbackPayload<C>>((res) => {
       resolveCallback = res;
     });
-  };
+  }, [dispatch.uiState]);
 
-  const closeConfirm = () => {
+  const closeConfirm = useCallback(() => {
     dispatch.uiState.setHideConfirm();
-  };
+  }, [dispatch.uiState]);
 
-  const onCancel = () => {
-    closeConfirm();
+  const onCancel = useCallback(() => {
     resolveCallback(false);
-  };
-
-  const onConfirm = (data) => {
     closeConfirm();
-    resolveCallback({ result: true, data });
-  };
+  }, [closeConfirm]);
 
-  return {
+  const onConfirm = useCallback((data: C) => {
+    resolveCallback({ result: true, data });
+    closeConfirm();
+  }, [closeConfirm]);
+
+  return useMemo(() => ({
     confirm, onConfirm, onCancel, confirmState,
-  };
+  }), [confirm, onConfirm, onCancel, confirmState]);
 }
 
 export default useConfirm;

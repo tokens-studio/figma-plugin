@@ -1,12 +1,13 @@
-import * as React from 'react';
+import React from 'react';
 import { useSelector } from 'react-redux';
 import Icon from './Icon';
-import { RootState } from '../store';
 import Button from './Button';
 import { postToFigma } from '@/plugin/notifiers';
 import { MessageToPluginTypes } from '@/types/messages';
 import { useDelayedFlag } from '@/hooks';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
+import { backgroundJobsSelector } from '@/selectors';
+import Stack from './Stack';
 
 const backgroundJobTitles = {
   [BackgroundJobs.NODEMANAGER_UPDATE]: 'Finding and caching tokens...',
@@ -22,7 +23,7 @@ const backgroundJobTitles = {
 };
 
 export default function LoadingBar() {
-  const { backgroundJobs } = useSelector((state: RootState) => state.uiState);
+  const backgroundJobs = useSelector(backgroundJobsSelector);
   const hasInfiniteJobs = React.useMemo(() => backgroundJobs.some((job) => job.isInfinite), [backgroundJobs]);
   const expectedWaitTime = React.useMemo(() => backgroundJobs.reduce((time, job) => (
     time + (job.totalTasks ? (
@@ -51,7 +52,14 @@ export default function LoadingBar() {
 
   return (
     <div className="fixed w-full z-20" data-cy="loadingBar">
-      <div className="flex items-center space-x-2 bg-gray-300 p-2 rounded m-2">
+      <Stack
+        direction="row"
+        align="center"
+        gap={2}
+        css={{
+          backgroundColor: '$bgSubtle', padding: '$2', borderRadius: '$default', margin: '$2',
+        }}
+      >
         <div className="inline-flex rotate">
           <Icon name="loading" />
         </div>
@@ -64,7 +72,7 @@ export default function LoadingBar() {
           </div>
           <Button variant="ghost" size="small" onClick={handleCancel}>Cancel</Button>
         </div>
-      </div>
+      </Stack>
     </div>
   );
 }

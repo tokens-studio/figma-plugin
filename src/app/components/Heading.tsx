@@ -1,12 +1,35 @@
-import * as React from 'react';
+import React from 'react';
+import { styled } from '@/stitches.config';
+
+const StyledHeading = styled('p', {
+  fontWeight: '$bold',
+  color: '$text',
+  letterSpacing: 0,
+  variants: {
+    size: {
+      small: {
+        fontSize: '$small',
+      },
+      medium: {
+        fontSize: '$medium',
+      },
+    },
+  },
+});
+
+type HeadingProps = {
+  size?: 'small' | 'medium';
+  children: React.ReactNode;
+  id?: string;
+};
 
 function Heading({
-  size = '', children, keepCase = true, id = null,
-}) {
+  size = 'small', children, id,
+}: HeadingProps) {
   return (
-    <p data-cy={id} className={`heading ${keepCase ? '' : 'capitalize'} ${size === 'small' ? 'heading-small' : ''}`}>
+    <StyledHeading size={size} data-cy={id}>
       {children}
-    </p>
+    </StyledHeading>
   );
 }
 

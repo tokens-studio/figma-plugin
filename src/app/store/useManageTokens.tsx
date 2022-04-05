@@ -1,26 +1,40 @@
-import { useDispatch, useSelector } from 'react-redux';
-import { SingleToken, TokenType } from '@/types/tokens';
+import { useDispatch, useStore } from 'react-redux';
+import { useCallback, useMemo } from 'react';
+import { SingleToken } from '@/types/tokens';
 import { Dispatch, RootState } from '../store';
 import useConfirm from '../hooks/useConfirm';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
+import { activeTokenSetSelector } from '@/selectors';
+import { TokenTypes } from '@/constants/TokenTypes';
+import { DeleteTokenPayload, UpdateTokenPayload } from '@/types/payloads';
+
+type EditSingleTokenData = {
+  parent: string;
+  name: string;
+  value: SingleToken;
+  options?: { description?: string; type: TokenTypes };
+  oldName?: string;
+  shouldUpdateDocument?: boolean;
+};
+
+type CreateSingleTokenData = {
+  parent: string;
+  name: string;
+  value: SingleToken;
+  options?: { description?: string; type: TokenTypes };
+  newGroup?: boolean;
+  shouldUpdateDocument?: boolean;
+};
 
 export default function useManageTokens() {
-  const { activeTokenSet } = useSelector((state: RootState) => state.tokenState);
-  const {
-    editToken, createToken, deleteToken, duplicateToken, deleteTokenGroup,
-  } = useDispatch<Dispatch>().tokenState;
-
+  const store = useStore<RootState>();
   const dispatch = useDispatch<Dispatch>();
   const { confirm } = useConfirm();
+  const {
+    editToken, createToken, deleteToken, duplicateToken, deleteTokenGroup,
+  } = dispatch.tokenState;
 
-  async function editSingleToken(data: {
-    parent: string;
-    name: string;
-    value: SingleToken;
-    options?: { description?: string; type: TokenType };
-    oldName?: string;
-    shouldUpdateDocument?: boolean;
-  }) {
+  const editSingleToken = useCallback(async (data: EditSingleTokenData) => {
     const {
       parent, name, value, options, oldName, shouldUpdateDocument = true,
     } = data;
@@ -43,16 +57,9 @@ export default function useManageTokens() {
       });
     }
     dispatch.uiState.completeJob(BackgroundJobs.UI_EDITSINGLETOKEN);
-  }
+  }, [editToken, dispatch.uiState]);
 
-  async function createSingleToken(data: {
-    parent: string;
-    name: string;
-    value: SingleToken;
-    options?: { description?: string; type: TokenType };
-    newGroup?: boolean;
-    shouldUpdateDocument?: boolean;
-  }) {
+  const createSingleToken = useCallback(async (data: CreateSingleTokenData) => {
     const {
       parent, name, value, options, newGroup = false, shouldUpdateDocument = true,
     } = data;
@@ -74,18 +81,18 @@ export default function useManageTokens() {
       });
     }
     dispatch.uiState.completeJob(BackgroundJobs.UI_CREATESINGLETOKEN);
-  }
+  }, [createToken, dispatch.uiState]);
 
-  async function duplicateSingleToken(data) {
+  const duplicateSingleToken = useCallback(async (data: UpdateTokenPayload) => {
     dispatch.uiState.startJob({
       name: BackgroundJobs.UI_DUPLICATETOKEN,
       isInfinite: true,
     });
     duplicateToken(data);
     dispatch.uiState.completeJob(BackgroundJobs.UI_DUPLICATETOKEN);
-  }
+  }, [duplicateToken, dispatch.uiState]);
 
-  async function deleteSingleToken(data) {
+  const deleteSingleToken = useCallback(async (data: DeleteTokenPayload) => {
     const userConfirmation = await confirm({
       text: 'Delete token?',
       description: 'Are you sure you want to delete this token?',
@@ -98,14 +105,15 @@ export default function useManageTokens() {
       deleteToken(data);
       dispatch.uiState.completeJob(BackgroundJobs.UI_DELETETOKEN);
     }
-  }
+  }, [confirm, deleteToken, dispatch.uiState]);
 
-  async function deleteGroup(path) {
+  const deleteGroup = useCallback(async (path: string) => {
     const userConfirmation = await confirm({
       text: 'Delete group?',
       description: 'Are you sure you want to delete this group?',
     });
     if (userConfirmation) {
+      const activeTokenSet = activeTokenSetSelector(store.getState());
       dispatch.uiState.startJob({
         name: BackgroundJobs.UI_DELETETOKENGROUP,
         isInfinite: true,
@@ -113,9 +121,9 @@ export default function useManageTokens() {
       deleteTokenGroup({ parent: activeTokenSet, path });
       dispatch.uiState.completeJob(BackgroundJobs.UI_DELETETOKENGROUP);
     }
-  }
+  }, [store, confirm, deleteTokenGroup, dispatch.uiState]);
 
-  return {
+  return useMemo(() => ({
     editSingleToken, createSingleToken, deleteSingleToken, deleteGroup, duplicateSingleToken,
-  };
+  }), [editSingleToken, createSingleToken, deleteSingleToken, deleteGroup, duplicateSingleToken]);
 }

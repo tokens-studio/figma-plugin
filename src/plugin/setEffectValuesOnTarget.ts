@@ -1,63 +1,66 @@
 /* eslint-disable no-param-reassign */
-import { ShadowTokenSingleValue } from '@/types/propertyTypes';
-import { SingleTokenObject } from '@/types/tokens';
+import { TokenTypes } from '@/constants/TokenTypes';
+import { SingleToken } from '@/types/tokens';
 import { convertBoxShadowTypeToFigma } from './figmaTransforms/boxShadow';
 import { convertToFigmaColor } from './figmaTransforms/colors';
+import { convertTypographyNumberToFigma } from './figmaTransforms/generic';
 import convertOffsetToFigma from './figmaTransforms/offset';
 
 export default function setEffectValuesOnTarget(
+  // @TODO update this typing
   target,
-  token: SingleTokenObject | { value: ShadowTokenSingleValue[] | ShadowTokenSingleValue },
+  token: SingleToken,
   key = 'effects',
 ) {
-  try {
-    const { description, value } = token;
+  if (token.type === TokenTypes.BOX_SHADOW) {
+    try {
+      const { description, value } = token;
 
-    if (Array.isArray(value)) {
-      target[key] = value.map((v) => {
-        const { color, opacity: a } = convertToFigmaColor(v.color);
+      if (Array.isArray(value)) {
+        target[key] = value.map((v) => {
+          const { color, opacity: a } = convertToFigmaColor(v.color);
+          const { r, g, b } = color;
+          return {
+            color: {
+              r,
+              g,
+              b,
+              a,
+            },
+            type: convertBoxShadowTypeToFigma(v.type),
+            spread: convertTypographyNumberToFigma(v.spread.toString()),
+            radius: convertTypographyNumberToFigma(v.blur.toString()),
+            offset: convertOffsetToFigma(convertTypographyNumberToFigma(v.x.toString()), convertTypographyNumberToFigma(v.y.toString())),
+            blendMode: v.blendMode || 'NORMAL',
+            visible: true,
+          };
+        });
+      } else {
+        const { color, opacity: a } = convertToFigmaColor(value.color);
         const { r, g, b } = color;
-        return {
-          color: {
-            r,
-            g,
-            b,
-            a,
+        target[key] = [
+          {
+            color: {
+              r,
+              g,
+              b,
+              a,
+            },
+            type: convertBoxShadowTypeToFigma(value.type),
+            spread: convertTypographyNumberToFigma(value.spread.toString()),
+            radius: convertTypographyNumberToFigma(value.blur.toString()),
+            offset: convertOffsetToFigma(convertTypographyNumberToFigma(value.x.toString()), convertTypographyNumberToFigma(value.y.toString())),
+            blendMode: value.blendMode || 'NORMAL',
+            visible: true,
           },
-          type: convertBoxShadowTypeToFigma(v.type),
-          spread: v.spread,
-          radius: v.blur,
-          offset: convertOffsetToFigma(Number(v.x), Number(v.y)),
-          blendMode: v.blendMode || 'NORMAL',
-          visible: true,
-        };
-      });
-    } else {
-      const tokenValue = token.value as ShadowTokenSingleValue;
-      const { color, opacity: a } = convertToFigmaColor(tokenValue.color);
-      const { r, g, b } = color;
-      target[key] = [
-        {
-          color: {
-            r,
-            g,
-            b,
-            a,
-          },
-          type: convertBoxShadowTypeToFigma(tokenValue.type),
-          spread: tokenValue.spread,
-          radius: tokenValue.blur,
-          offset: convertOffsetToFigma(Number(tokenValue.x), Number(tokenValue.y)),
-          blendMode: tokenValue.blendMode || 'NORMAL',
-          visible: true,
-        },
-      ];
-    }
+        ];
+      }
 
-    if (description) {
-      target.description = description;
+      if (description) {
+        target.description = description;
+      }
+    } catch (e) {
+      console.error('Error setting color', e);
     }
-  } catch (e) {
-    console.error('Error setting color', e);
   }
 }

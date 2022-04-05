@@ -1,11 +1,12 @@
 import React from 'react';
-import { SelectionGroup, SingleTokenObject } from '@/types/tokens';
+import { SingleToken } from '@/types/tokens';
 import Box from './Box';
 import Heading from './Heading';
 import InspectorTokenSingle from './InspectorTokenSingle';
 import { Properties } from '@/constants/Properties';
+import { SelectionGroup } from '@/types';
 
-export default function InspectorTokenGroup({ group, resolvedTokens }: { group: [Properties, SelectionGroup[]], resolvedTokens: SingleTokenObject[] }) {
+export default function InspectorTokenGroup({ group, resolvedTokens }: { group: [Properties, SelectionGroup[]], resolvedTokens: SingleToken[] }) {
   const [groupKey, groupValue] = group;
   return (
     <Box

@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 
 import * as LabelPrimitive from '@radix-ui/react-label';
 import { styled } from '@/stitches.config';
