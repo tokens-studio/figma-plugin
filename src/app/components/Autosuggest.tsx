@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import '../styles/autosuggest.css';
+import * as PopoverPrimitive from '@radix-ui/react-popover';
 
 interface AutosuggestProps {
   type: string;
@@ -71,7 +72,7 @@ const Autosuggest: React.FunctionComponent<AutosuggestProps> = ({
     const filteredOnType = resolvedTokens.filter((token: any) => token?.type === type);
 
     if (filteredValue && inputValue.includes('{')) {
-      const filteredTokens = filteredOnType.filter((token: any) => `${token?.internal__Parent}.${token?.name}`.includes(filteredValue));
+      const filteredTokens = filteredOnType.filter((token: any) => token?.name.includes(filteredValue));
       setMappedValues(filteredTokens);
       setShowAutoSuggest(filteredTokens?.length > 0);
     } else if (showAutoSuggest || inputValue === '{') {
@@ -104,7 +105,7 @@ const Autosuggest: React.FunctionComponent<AutosuggestProps> = ({
               </div>
               )}
               <div className="item-name">
-                {getHighlightedText(`${token.internal__Parent}.${token.name}`, filteredValue)}
+                {getHighlightedText(token.name, filteredValue)}
               </div>
               <div className="item-value text-right uppercase">{token.value}</div>
             </div>
