@@ -1,21 +1,59 @@
 import React from 'react';
-import * as Popover from '@radix-ui/react-popover';
-import { NodeInfo } from '@/types/NodeInfo';
-import IconLayers from '@/icons/layers.svg';
+import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import Box from '../Box';
+import { styled } from '@/stitches.config';
+import IconLayers from '@/icons/layers.svg';
+import getNodeIcon from './getNodeIcon';
+import { goToNodeId } from '../utils';
+import { NodeInfo } from '@/types/NodeInfo';
 
-// export default () => (
-//   <Popover.Root>
-//     <Popover.Trigger />
-//     <Popover.Content>
-//      test
-//     </Popover.Content>
-//   </Popover.Root>
-// );
+const StyledDropdownItem = styled(DropdownMenu.Item, {
+  cursor: 'pointer',
+  borderRadius: '$contextMenuItem',
+  padding: '$2 $4',
+  '&:hover': {
+    background: '#1C99FC',
+    color: '#fff',
+  },
+});
 
 export default function TokenNodes({ nodes }: { nodes: NodeInfo[] }) {
+  function getNode({ id, name, type }: NodeInfo) {
+    return (
+      <StyledDropdownItem key={id} onClick={() => goToNodeId(id)}>
+        <Box
+          css={{
+            display: 'flex',
+          }}
+        >
+          {getNodeIcon(type)}
+          <span>{name}</span>
+        </Box>
+      </StyledDropdownItem>
+    );
+  }
+
+  const dropdownContent = (
+    <DropdownMenu.Content>
+      <DropdownMenu.Arrow offset={14} />
+      <Box
+        css={{
+          minWidth: '164px',
+          background: '#222222',
+          color: 'white',
+          borderRadius: '$contextMenu',
+          padding: '$2 0',
+          fontSize: '$small',
+        }}
+        className="content"
+      >
+        {nodes.map(getNode)}
+      </Box>
+    </DropdownMenu.Content>
+  );
+
   return (
-    <Popover.Root>
+    <DropdownMenu.Root>
       <Box
         css={{
           display: 'flex',
@@ -25,31 +63,29 @@ export default function TokenNodes({ nodes }: { nodes: NodeInfo[] }) {
           fontSize: '$small',
         }}
       >
-        <Popover.Trigger>
-          <Box css={{ color: '$fgSubtle', cursor: 'pointer' }}>
-            <IconLayers />
-          </Box>
-        </Popover.Trigger>
-        <Popover.Content>
-          <Popover.Arrow offset={4} />
+        <DropdownMenu.Trigger>
           <Box
             css={{
-              background: 'black',
-              color: 'white',
-              borderRadius: '$card',
-              padding: '$4',
-              fontSize: '$small',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '$2 $3',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              transition: 'background 200ms ease',
+              '&:hover': {
+                background: 'rgba(196, 196, 196, 0.15)',
+              },
             }}
           >
-            <ul>
-              {nodes.map((node) => (
-                <li>{node.name}</li>
-              ))}
-            </ul>
+            <Box css={{ color: '$fgSubtle', marginRight: '$3' }}>
+              <IconLayers />
+            </Box>
+            <Box css={{ color: 'black', cursor: '#545454' }}>{nodes.length}</Box>
           </Box>
-        </Popover.Content>
-        {nodes.length}
+        </DropdownMenu.Trigger>
+        {dropdownContent}
       </Box>
-    </Popover.Root>
+    </DropdownMenu.Root>
   );
 }
