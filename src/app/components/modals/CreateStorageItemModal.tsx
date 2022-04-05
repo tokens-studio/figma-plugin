@@ -7,6 +7,7 @@ import Heading from '../Heading';
 import StorageItemForm from '../StorageItemForm';
 import useRemoteTokens from '../../store/remoteTokens';
 import { localApiStateSelector } from '@/selectors';
+import Stack from '../Stack';
 
 type Props = {
   isOpen: boolean
@@ -61,7 +62,7 @@ export default function CreateStorageItemModal({ isOpen, onClose, onSuccess }: P
 
   return (
     <Modal large isOpen={isOpen} close={() => onClose(false)}>
-      <div className="space-y-4">
+      <Stack direction="column" gap={4}>
         <Heading>Add new credentials</Heading>
         <StorageItemForm
           isNew
@@ -71,7 +72,7 @@ export default function CreateStorageItemModal({ isOpen, onClose, onSuccess }: P
           values={formFields}
           hasErrored={hasErrored}
         />
-      </div>
+      </Stack>
     </Modal>
   );
 }

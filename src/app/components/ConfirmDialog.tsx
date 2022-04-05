@@ -8,6 +8,7 @@ import Text from './Text';
 import Checkbox from './Checkbox';
 import Label from './Label';
 import Input from './Input';
+import Stack from './Stack';
 
 function ConfirmDialog() {
   const confirmButton = React.useRef<HTMLButtonElement | null>(null);
@@ -57,33 +58,31 @@ function ConfirmDialog() {
 
   return confirmState.show ? (
     <Modal isOpen close={onCancel}>
-      <form onSubmit={handleConfirm} className="flex flex-col justify-center space-y-4 text-center">
-        <Box css={{ display: 'flex', gap: '$4', flexDirection: 'column' }}>
-          <Box css={{ display: 'flex', gap: '$2', flexDirection: 'column' }}>
-            <Heading size="small">{confirmState?.text && confirmState.text}</Heading>
-            {confirmState?.description && (
-            <Text muted>{confirmState.description}</Text>
+      <form onSubmit={handleConfirm}>
+        <Stack direction="column" justify="center" gap={4} css={{ textAlign: 'center' }}>
+          <Stack direction="column" gap={4}>
+            <Stack direction="column" gap={2}>
+              <Heading size="small">{confirmState?.text && confirmState.text}</Heading>
+              {confirmState?.description && (
+              <Text muted>{confirmState.description}</Text>
+              )}
+            </Stack>
+            {confirmState?.input && (
+            <Stack direction="column" gap={2}>
+              <Input
+                id="input"
+                type={confirmState.input.type}
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                className="w-full"
+                inputRef={firstInput}
+                full
+                required
+              />
+            </Stack>
             )}
-          </Box>
-          {confirmState?.input && (
-          <Box css={{ display: 'flex', gap: '$2', flexDirection: 'column' }}>
-            <Input
-              id="input"
-              type={confirmState.input.type}
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              className="w-full"
-              inputRef={firstInput}
-              full
-              required
-            />
-          </Box>
-          )}
-          {confirmState?.choices && (
-            <Box css={{
-              display: 'flex', flexDirection: 'column', alignItems: 'start', gap: '$2',
-            }}
-            >
+            {confirmState?.choices && (
+            <Stack direction="column" align="start" gap={2}>
               {confirmState.choices.map((choice) => (
                 <Box
                   css={{ display: 'flex', alignItems: 'center', flexDirection: 'row' }}
@@ -100,17 +99,18 @@ function ConfirmDialog() {
                   </Label>
                 </Box>
               ))}
-            </Box>
-          )}
-        </Box>
-        <Box css={{ display: 'flex', gap: '$3', justifyContent: 'space-between' }}>
-          <Button variant="secondary" onClick={onCancel}>
-            Cancel
-          </Button>
-          <Button type="submit" variant="primary" buttonRef={confirmButton}>
-            {confirmState?.confirmAction}
-          </Button>
-        </Box>
+            </Stack>
+            )}
+          </Stack>
+          <Stack direction="row" gap={3} justify="between">
+            <Button variant="secondary" onClick={onCancel}>
+              Cancel
+            </Button>
+            <Button type="submit" variant="primary" buttonRef={confirmButton}>
+              {confirmState?.confirmAction}
+            </Button>
+          </Stack>
+        </Stack>
       </form>
     </Modal>
   ) : null;

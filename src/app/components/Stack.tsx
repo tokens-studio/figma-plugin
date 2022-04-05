@@ -1,4 +1,5 @@
 import React from 'react';
+import type * as Stitches from '@stitches/react';
 import { styled } from '@/stitches.config';
 
 const StyledStack = styled('div', {
@@ -59,23 +60,30 @@ const StyledStack = styled('div', {
         width: '100%',
       },
     },
+    wrap: {
+      true: {
+        flexWrap: 'wrap',
+      },
+    },
   },
 });
 
 type StackProps = {
-  gap: 0 | 1 | 2 | 3 | 4;
+  gap?: 0 | 1 | 2 | 3 | 4;
   direction: 'row' | 'column';
   align?: 'center' | 'start' | 'end';
   justify?: 'center' | 'start' | 'end' | 'between';
   width?: 'full';
   children: React.ReactNode;
+  wrap?: boolean;
+  css?: Stitches.CSS;
 };
 
 export default function Stack({
-  gap, direction, align = 'start', justify = 'start', width, children,
+  gap, direction, align, justify, width, wrap, children, css,
 }: StackProps) {
   return (
-    <StyledStack gap={gap} direction={direction} align={align} justify={justify} width={width}>
+    <StyledStack gap={gap} direction={direction} align={align} justify={justify} width={width} css={css} wrap={wrap}>
       {children}
     </StyledStack>
   );

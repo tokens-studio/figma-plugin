@@ -16,6 +16,7 @@ import { StorageProviderType } from '@/types/api';
 import {
   apiSelector, editProhibitedSelector, featureFlagsSelector, tokensSelector,
 } from '@/selectors';
+import Stack from './Stack';
 
 const StyledButton = styled('button', {
   flexShrink: 0,
@@ -124,54 +125,58 @@ export default function TokenSetSelector() {
         />
       )}
       <Modal isOpen={showRenameTokenSetFields} close={() => setShowRenameTokenSetFields(false)}>
-        <div className="flex flex-col justify-center space-y-4 text-center">
+        <Stack direction="column" justify="center" gap={4} css={{ textAlign: 'center' }}>
           <Heading size="small">
             Rename
             {' '}
             {tokenSetMarkedForChange}
           </Heading>
-          <form onSubmit={handleRenameTokenSetSubmit} className="space-y-4">
-            <Input
-              full
-              value={newTokenSetName}
-              onChange={(e) => handleNewTokenSetNameChange(e.target.value)}
-              type="text"
-              name="tokensetname"
-              required
-            />
-            <div className="space-x-4">
-              <Button variant="secondary" size="large" onClick={() => setShowRenameTokenSetFields(false)}>
-                Cancel
-              </Button>
-              <Button type="submit" variant="primary" size="large" disabled={tokenSetMarkedForChange === newTokenSetName}>
-                Change
-              </Button>
-            </div>
+          <form onSubmit={handleRenameTokenSetSubmit}>
+            <Stack direction="column" gap={4}>
+              <Input
+                full
+                value={newTokenSetName}
+                onChange={(e) => handleNewTokenSetNameChange(e.target.value)}
+                type="text"
+                name="tokensetname"
+                required
+              />
+              <Stack direction="row" gap={4}>
+                <Button variant="secondary" size="large" onClick={() => setShowRenameTokenSetFields(false)}>
+                  Cancel
+                </Button>
+                <Button type="submit" variant="primary" size="large" disabled={tokenSetMarkedForChange === newTokenSetName}>
+                  Change
+                </Button>
+              </Stack>
+            </Stack>
           </form>
-        </div>
+        </Stack>
       </Modal>
       <Modal isOpen={showNewTokenSetFields} close={() => setShowNewTokenSetFields(false)}>
-        <div className="flex flex-col justify-center space-y-4 text-center">
+        <Stack direction="column" justify="center" gap={4} css={{ textAlign: 'center' }}>
           <Heading size="small">New set</Heading>
-          <form onSubmit={handleNewTokenSetSubmit} className="space-y-4">
-            <Input
-              full
-              value={newTokenSetName}
-              onChange={(e) => handleNewTokenSetNameChange(e.target.value)}
-              type="text"
-              name="tokensetname"
-              required
-            />
-            <div className="space-x-4">
-              <Button variant="secondary" size="large" onClick={() => setShowNewTokenSetFields(false)}>
-                Cancel
-              </Button>
-              <Button type="submit" variant="primary" size="large">
-                Create
-              </Button>
-            </div>
+          <form onSubmit={handleNewTokenSetSubmit}>
+            <Stack direction="column" gap={4}>
+              <Input
+                full
+                value={newTokenSetName}
+                onChange={(e) => handleNewTokenSetNameChange(e.target.value)}
+                type="text"
+                name="tokensetname"
+                required
+              />
+              <Stack direction="row" gap={4}>
+                <Button variant="secondary" size="large" onClick={() => setShowNewTokenSetFields(false)}>
+                  Cancel
+                </Button>
+                <Button type="submit" variant="primary" size="large">
+                  Create
+                </Button>
+              </Stack>
+            </Stack>
           </form>
-        </div>
+        </Stack>
       </Modal>
       <StyledButton type="button" disabled={editProhibited} onClick={() => setShowNewTokenSetFields(true)}>
         New set
