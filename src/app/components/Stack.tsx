@@ -60,6 +60,11 @@ const StyledStack = styled('div', {
         width: '100%',
       },
     },
+    wrap: {
+      true: {
+        flexWrap: 'wrap',
+      },
+    },
   },
 });
 
@@ -70,14 +75,15 @@ type StackProps = {
   justify?: 'center' | 'start' | 'end' | 'between';
   width?: 'full';
   children: React.ReactNode;
-  css?: Stitches.CSS
+  wrap?: boolean;
+  css?: Stitches.CSS;
 };
 
 export default function Stack({
-  gap, direction, align, justify, width, children, css,
+  gap, direction, align, justify, width, wrap, children, css,
 }: StackProps) {
   return (
-    <StyledStack gap={gap} direction={direction} align={align} justify={justify} width={width} css={css}>
+    <StyledStack gap={gap} direction={direction} align={align} justify={justify} width={width} css={css} wrap={wrap}>
       {children}
     </StyledStack>
   );
