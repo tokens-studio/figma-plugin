@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactModal from 'react-modal';
 import Heading from './Heading';
+import Stack from './Stack';
 
 if (process.env.NODE_ENV !== 'test') ReactModal.setAppElement('#app');
 
@@ -61,7 +62,7 @@ function Modal({
   return (
     <ReactModal isOpen={isOpen} onRequestClose={close} style={customStyles(large)} contentLabel={title || null}>
       {(showClose || title) && (
-        <div className="flex flex-row justify-between items-center">
+        <Stack direction="row" justify="between" align="center">
           {title && (
           <div className="pl-4">
             <Heading size="small">{title}</Heading>
@@ -88,7 +89,7 @@ function Modal({
               />
             </svg>
           </button>
-        </div>
+        </Stack>
       )}
       <div data-cy={id} className={`relative ${paddingClass()}`}>
         {children}

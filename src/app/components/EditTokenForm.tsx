@@ -19,6 +19,7 @@ import {
 } from '@/selectors';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { EditTokenObject } from '../store/models/uiState';
+import Stack from './Stack';
 
 type Props = {
   resolvedTokens: ResolveTokenValuesResult[];
@@ -311,14 +312,14 @@ function EditTokenForm({ resolvedTokens }: Props) {
           />
         ))
         : null}
-      <div className="flex justify-end space-x-2">
+      <Stack direction="row" justify="end" gap={2}>
         <button className="button button-link" type="button" onClick={handleReset}>
           Cancel
         </button>
         <button disabled={!isValid} className="button button-primary" type="submit">
           {internalEditToken?.isPristine ? 'Create' : 'Update'}
         </button>
-      </div>
+      </Stack>
     </form>
   );
 }

@@ -13,6 +13,7 @@ import {
   activeTabSelector, editProhibitedSelector, lastSyncedStateSelector, projectURLSelector, storageTypeSelector, tokensSelector,
 } from '@/selectors';
 import { Tabs } from '@/constants/Tabs';
+import Stack from './Stack';
 
 const StyledButton = styled('button', {
   padding: '$5 $4',
@@ -109,7 +110,7 @@ function Navbar() {
         <TabButton name="syncsettings" label="Sync" />
         <TabButton name="settings" label="Settings" />
       </div>
-      <div className="flex flex-row items-center">
+      <Stack direction="row" align="center">
         {storageType.provider !== StorageProviderType.LOCAL && (
           <>
             {storageType.provider === StorageProviderType.JSONBIN && (
@@ -141,7 +142,7 @@ function Navbar() {
             </Tooltip>
           </>
         )}
-      </div>
+      </Stack>
     </Box>
   );
 }

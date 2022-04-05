@@ -7,6 +7,7 @@ import AnnotationBuilder from './AnnotationBuilder';
 import { SingleToken } from '@/types/tokens';
 import useTokens from '../store/useTokens';
 import { uiStateSelector } from '@/selectors';
+import Stack from './Stack';
 
 export default function InspectorDebugView({ resolvedTokens }: { resolvedTokens: SingleToken[] }) {
   const uiState = useSelector(uiStateSelector, isEqual);
@@ -19,35 +20,37 @@ export default function InspectorDebugView({ resolvedTokens }: { resolvedTokens:
 
   return (
     <Box
-      css={{
-        display: 'flex', flexDirection: 'column', flexGrow: 1, padding: '$4',
-      }}
+      css={{ flexGrow: 1, padding: '$4' }}
       className="content scroll-container"
     >
-      <AnnotationBuilder />
+      <Stack direction="column">
+        <Box css={{ borderBottom: '1px solid $border', paddingBottom: '$4', marginBottom: '$4' }}>
+          <AnnotationBuilder />
+        </Box>
 
-      {uiState.selectedLayers === 1 && Object.entries(uiState.mainNodeSelectionValues).length > 0
-        ? (
-          <div className="space-y-1">
-            {Object.entries(uiState.mainNodeSelectionValues)
-              .filter(([, value]) => value !== 'delete')
-              .map(([property, value]) => (
-                <div key={property} className="flex flex-row items-start justify-between">
-                  <code className="flex flex-wrap space-x-2">
-                    <div className="font-bold">{property}</div>
-                    :
-                    {' '}
-                    <div className="p-1 text-white bg-gray-700 rounded text-xxs">
-                      $
-                      {typeof value === 'string' && value.split('.').join('-')}
-                    </div>
-                    <div className="text-gray-500 break-all">{`/* ${JSON.stringify(getTokenValue(value, resolvedTokens))} */`}</div>
-                  </code>
-                </div>
-              ))}
-          </div>
-        )
-        : renderBlankslate()}
+        {uiState.selectedLayers === 1 && Object.entries(uiState.mainNodeSelectionValues).length > 0
+          ? (
+            <Stack direction="column" gap={1}>
+              {Object.entries(uiState.mainNodeSelectionValues)
+                .filter(([, value]) => value !== 'delete')
+                .map(([property, value]) => (
+                  <Stack key={property} direction="row" align="start" justify="between">
+                    <code className="flex flex-wrap space-x-2">
+                      <div className="font-bold">{property}</div>
+                      :
+                      {' '}
+                      <div className="p-1 text-white bg-gray-700 rounded text-xxs">
+                        $
+                        {typeof value === 'string' && value.split('.').join('-')}
+                      </div>
+                      <div className="text-gray-500 break-all">{`/* ${JSON.stringify(getTokenValue(value, resolvedTokens))} */`}</div>
+                    </code>
+                  </Stack>
+                ))}
+            </Stack>
+          )
+          : renderBlankslate()}
+      </Stack>
     </Box>
   );
 }

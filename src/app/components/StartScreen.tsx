@@ -8,6 +8,7 @@ import { StorageProviderType } from '../../types/api';
 import { Dispatch } from '../store';
 import Box from './Box';
 import { storageTypeSelector } from '@/selectors';
+import Stack from './Stack';
 
 function StartScreen() {
   const dispatch = useDispatch<Dispatch>();
@@ -28,32 +29,30 @@ function StartScreen() {
   };
 
   return (
-    <div className="h-auto p-4 my-auto space-y-4">
-      <a href="https://jansix.at/resources/figma-tokens?ref=figma-tokens-plugin" target="_blank" rel="noreferrer">
-        <img alt="Figma Tokens Splashscreen" src={require('../assets/tokens-intro.jpg')} className="rounded" />
-      </a>
-      <Box css={{
-        display: 'flex', flexDirection: 'column', gap: '$2',
-      }}
-      >
-        <Heading>Welcome to Figma Tokens.</Heading>
-        <Text muted>
-          Design with tokens to apply design decisions to border radii, spacing or many others. Use smart references or math features to change values dynamically or use token sets to quickly create themes. Work across documents by utilizing the Sync feature and store your design tokens on a single source of truth such as GitHub.
-        </Text>
-      </Box>
-      <div className="flex justify-between space-x-2">
-        <Button
-          href="https://docs.tokens.studio/?ref=pgs"
-          size="large"
-          variant="secondary"
-        >
-          Learn more
-        </Button>
-        <Button id="button-configure" size="large" variant="primary" onClick={onSetDefaultTokens}>
-          Get started
-        </Button>
-      </div>
-      {storageType?.provider !== StorageProviderType.LOCAL && (
+    <div className="h-auto p-4 my-auto">
+      <Stack direction="column" gap={4}>
+        <a href="https://jansix.at/resources/figma-tokens?ref=figma-tokens-plugin" target="_blank" rel="noreferrer">
+          <img alt="Figma Tokens Splashscreen" src={require('../assets/tokens-intro.jpg')} className="rounded" />
+        </a>
+        <Stack direction="column" gap={2}>
+          <Heading>Welcome to Figma Tokens.</Heading>
+          <Text muted>
+            Design with tokens to apply design decisions to border radii, spacing or many others. Use smart references or math features to change values dynamically or use token sets to quickly create themes. Work across documents by utilizing the Sync feature and store your design tokens on a single source of truth such as GitHub.
+          </Text>
+        </Stack>
+        <Stack direction="row" gap={2} justify="between">
+          <Button
+            href="https://docs.tokens.studio/?ref=pgs"
+            size="large"
+            variant="secondary"
+          >
+            Learn more
+          </Button>
+          <Button id="button-configure" size="large" variant="primary" onClick={onSetDefaultTokens}>
+            Get started
+          </Button>
+        </Stack>
+        {storageType?.provider !== StorageProviderType.LOCAL && (
         <Callout
           id="callout-action-setupsync"
           heading="Remote storage detected"
@@ -63,7 +62,8 @@ function StartScreen() {
             text: 'Set up sync',
           }}
         />
-      )}
+        )}
+      </Stack>
     </div>
   );
 }

@@ -192,7 +192,7 @@ const SyncSettings = () => {
             </Button>
 
             {storedApiProviders().length > 0 && (
-              <Stack direction="column" gap={2} width="full">
+              <Stack direction="column" gap={2} width="full" align="start">
                 {storedApiProviders().map((item) => (
                   <StorageItem
                     key={item.internalId || `${item.provider}-${item.id}-${item.secret}`}

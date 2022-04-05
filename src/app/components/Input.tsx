@@ -3,6 +3,7 @@ import { styled } from '@/stitches.config';
 import IconVisibility from './icons/IconVisibiltyOn';
 import IconVisibilityOff from './icons/IconVisibilityOff';
 import Box from './Box';
+import Stack from './Stack';
 
 type Props = {
   name: string;
@@ -142,10 +143,10 @@ const Input: React.FC<Props> = ({
   return (
     <label htmlFor={name} className="text-xxs font-medium block">
       {(!!label || !!error) && (
-        <div className="flex items-center justify-between mb-1">
+        <Stack direction="row" justify="between" align="center" css={{ marginBottom: '$1' }}>
           {label ? <div className={capitalize ? 'capitalize' : undefined}>{label}</div> : null}
           {error ? <div className="text-red-500 font-bold">{error}</div> : null}
-        </div>
+        </Stack>
       )}
       <Box css={{ display: 'flex', position: 'relative', width: full ? '100%' : 0 }} className="input">
         {!!prefix && <StyledPrefix>{prefix}</StyledPrefix>}

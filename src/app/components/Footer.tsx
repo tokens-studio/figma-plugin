@@ -4,6 +4,7 @@ import Box from './Box';
 import DocsIcon from '@/icons/docs.svg';
 import FeedbackIcon from '@/icons/feedback.svg';
 import Text from '@/app/components/Text';
+import Stack from './Stack';
 
 export default function Footer() {
   return (
@@ -16,30 +17,32 @@ export default function Footer() {
         {' '}
         {pjs.plugin_version}
       </Box>
-      <Box css={{ display: 'flex', gap: '$4' }}>
+      <Stack direction="row" gap={4}>
         <Text size="xsmall">
           <a
-            className="flex items-center"
             href="https://docs.tokens.studio/?ref=pf"
             target="_blank"
             rel="noreferrer"
           >
-            <Box as="span" css={{ marginRight: '$1', color: '$textMuted' }}>Docs</Box>
-            <DocsIcon />
+            <Stack direction="row" gap={1}>
+              <Box as="span" css={{ color: '$textMuted' }}>Docs</Box>
+              <DocsIcon />
+            </Stack>
           </a>
         </Text>
         <Text size="xsmall">
           <a
-            className="flex items-center"
             href="https://github.com/six7/figma-tokens"
             target="_blank"
             rel="noreferrer"
           >
-            <Box as="span" css={{ marginRight: '$1', color: '$textMuted' }}>Feedback</Box>
-            <FeedbackIcon />
+            <Stack direction="row" gap={1}>
+              <Box as="span" css={{ color: '$textMuted' }}>Feedback</Box>
+              <FeedbackIcon />
+            </Stack>
           </a>
         </Text>
-      </Box>
+      </Stack>
     </Box>
   );
 }

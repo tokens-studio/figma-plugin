@@ -1,5 +1,5 @@
 // stitches.config.ts
-import { createCss } from '@stitches/react';
+import { createStitches } from '@stitches/react';
 
 const globalTokens = {
   colors: {
@@ -32,8 +32,8 @@ const globalTokens = {
 };
 
 export const {
-  styled, css, global: globalCSS, keyframes, getCssString, theme,
-} = createCss({
+  styled, css, keyframes,
+} = createStitches({
   theme: {
     fonts: {
       sans: 'Inter, sans-serif',
