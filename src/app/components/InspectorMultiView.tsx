@@ -1,6 +1,7 @@
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { RootState, Dispatch } from '../store';
+import isEqual from 'lodash.isequal';
+import { Dispatch } from '../store';
 import useTokens from '../store/useTokens';
 import Button from './Button';
 import Box from './Box';
@@ -8,11 +9,12 @@ import Checkbox from './Checkbox';
 import Label from './Label';
 import Blankslate from './Blankslate';
 import InspectorTokenGroup from './InspectorTokenGroup';
-import { SingleTokenObject } from '@/types/tokens';
+import { SingleToken } from '@/types/tokens';
+import { inspectStateSelector, uiStateSelector } from '@/selectors';
 
-export default function InspectorMultiView({ resolvedTokens }: { resolvedTokens: SingleTokenObject[] }) {
-  const inspectState = useSelector((state: RootState) => state.inspectState);
-  const uiState = useSelector((state: RootState) => state.uiState);
+export default function InspectorMultiView({ resolvedTokens }: { resolvedTokens: SingleToken[] }) {
+  const inspectState = useSelector(inspectStateSelector, isEqual);
+  const uiState = useSelector(uiStateSelector, isEqual);
   const { removeTokensByValue } = useTokens();
 
   const dispatch = useDispatch<Dispatch>();
@@ -46,9 +48,11 @@ export default function InspectorMultiView({ resolvedTokens }: { resolvedTokens:
   }, [inspectState.selectedTokens, removeTokensByValue, uiState.selectionValues]);
 
   return (
-    <Box css={{
-      display: 'flex', flexDirection: 'column', flexGrow: 1, padding: '$4',
-    }}
+    <Box
+      css={{
+        display: 'flex', flexDirection: 'column', flexGrow: 1, padding: '$4',
+      }}
+      className="content scroll-container"
     >
       {uiState.selectionValues.length > 0 ? (
         <Box css={{ display: 'flex', flexDirection: 'column', gap: '$1' }}>

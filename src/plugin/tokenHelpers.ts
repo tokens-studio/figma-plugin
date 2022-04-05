@@ -1,42 +1,42 @@
-import extend from 'just-extend';
-import getAliasValue from '@/utils/aliases';
 import { appendTypeToToken } from '@/app/components/createTokenObj';
-import checkIfAlias from '@/utils/checkIfAlias';
-import checkIfContainsAlias from '@/utils/checkIfContainsAlias';
-import { SingleTokenObject, TokenSet } from '@/types/tokens';
+import { SingleToken } from '@/types/tokens';
+import { checkIfAlias, checkIfContainsAlias, getAliasValue } from '@/utils/alias';
+import { isSingleToken } from '@/utils/is';
+import { TokenTypes } from '@/constants/TokenTypes';
 
-export function findAllAliases(tokens) {
-  return tokens.filter((token) => checkIfAlias(token, tokens));
+export type ResolveTokenValuesResult = SingleToken<true, {
+  failedToResolve?: boolean
+}>;
+
+export function findAllAliases(tokens: (SingleToken | string)[]) {
+  return tokens.filter((token) => (
+    checkIfAlias(token, tokens.filter(isSingleToken))
+  ));
 }
 
-export function reduceToValues(tokens) {
-  const reducedTokens = Object.entries(tokens).reduce((prev, group) => {
-    prev.push({ [group[0]]: group[1] });
-    return prev;
-  }, []);
-
-  const assigned = extend(true, {}, ...reducedTokens);
-
-  return assigned;
-}
-
-export function resolveTokenValues(tokens, previousCount = undefined) {
+export function resolveTokenValues(tokens: SingleToken[], previousCount: number = 0): ResolveTokenValuesResult[] {
   const aliases = findAllAliases(tokens);
-  let returnedTokens = tokens;
+  let returnedTokens: ResolveTokenValuesResult[] = tokens;
   returnedTokens = tokens.map((t, _, tokensInProgress) => {
-    let returnValue;
-    let failedToResolve;
+    let returnValue:
+    Record<string, ReturnType<typeof getAliasValue>>[] |
+    Record<string, ReturnType<typeof getAliasValue>> |
+    ReturnType<typeof getAliasValue>;
+
+    let failedToResolve = false;
     // Iterate over Typography and boxShadow Object to get resolved values
-    if (['typography', 'boxShadow'].includes(t.type)) {
+    if (t.type === TokenTypes.TYPOGRAPHY || t.type === TokenTypes.BOX_SHADOW) {
       if (Array.isArray(t.value)) {
         // If we're dealing with an array, iterate over each item and then key
-        returnValue = t.value.map((item) => Object.entries(item).reduce((acc, [key, value]: [string, SingleTokenObject]) => {
-          acc[key] = getAliasValue(value, tokensInProgress);
-          return acc;
-        }, {}));
+        returnValue = t.value.map((item) => (
+          Object.entries(item).reduce<Record<string, ReturnType<typeof getAliasValue>>>((acc, [key, value]) => {
+            acc[key] = getAliasValue(value, tokensInProgress);
+            return acc;
+          }, {})
+        ));
         // If not, iterate over each key
       } else {
-        returnValue = Object.entries(t.value).reduce((acc, [key, value]: [string, SingleTokenObject]) => {
+        returnValue = Object.entries(t.value).reduce<Record<string, ReturnType<typeof getAliasValue>>>((acc, [key, value]) => {
           acc[key] = getAliasValue(value, tokensInProgress);
           return acc;
         }, {});
@@ -52,11 +52,8 @@ export function resolveTokenValues(tokens, previousCount = undefined) {
       ...t,
       value: returnValue,
       rawValue: t.rawValue || t.value,
-      failedToResolve,
-    };
-    if (!failedToResolve) {
-      delete returnObject.failedToResolve;
-    }
+      ...(failedToResolve ? { failedToResolve } : {}),
+    } as ResolveTokenValuesResult;
     return returnObject;
   });
 
@@ -67,16 +64,19 @@ export function resolveTokenValues(tokens, previousCount = undefined) {
   return returnedTokens;
 }
 
-export function mergeTokenGroups(tokens: TokenSet, usedSets: string[] = []): SingleTokenObject[] {
-  const mergedTokens = [];
+export function mergeTokenGroups(tokens: Record<string, SingleToken[]>, usedSets: string[] = []): SingleToken[] {
+  const mergedTokens: SingleToken[] = [];
   // Reverse token set order (right-most win) and check for duplicates
   Object.entries(tokens)
     .reverse()
-    .forEach((tokenGroup: [string, SingleTokenObject[]]) => {
+    .forEach((tokenGroup: [string, SingleToken[]]) => {
       if (!usedSets || usedSets.length === 0 || usedSets.includes(tokenGroup[0])) {
         tokenGroup[1].forEach((token) => {
           if (!mergedTokens.some((t) => t.name === token.name)) {
-            mergedTokens.push({ ...appendTypeToToken(token), internal__Parent: tokenGroup[0] });
+            mergedTokens.push({
+              ...appendTypeToToken(token),
+              internal__Parent: tokenGroup[0],
+            } as SingleToken);
           }
         });
       }

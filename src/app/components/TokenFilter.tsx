@@ -1,11 +1,30 @@
-import * as React from 'react';
+import React from 'react';
 import { useDebouncedCallback } from 'use-debounce';
 import { useDispatch, useSelector } from 'react-redux';
-import { RootState, Dispatch } from '../store';
-import Input from './Input';
+import { MagnifyingGlassIcon } from '@radix-ui/react-icons';
+import { Dispatch } from '../store';
+import Box from './Box';
+import { styled } from '@/stitches.config';
+import { tokenFilterSelector } from '@/selectors';
+
+const StyledInput = styled('input', {
+  background: 'transparent',
+  border: 'none',
+  color: '$text',
+  fontSize: '$small',
+  width: '100%',
+  padding: '$3 $5',
+  paddingLeft: '$6',
+  gap: '$2',
+  '&:focus, &:hover': {
+    outline: 'none',
+    boxShadow: 'none',
+    backgroundColor: '$bgSubtle',
+  },
+});
 
 const TokenFilter = () => {
-  const { tokenFilter } = useSelector((state: RootState) => state.uiState);
+  const tokenFilter = useSelector(tokenFilterSelector);
   const [tokenString, setTokenString] = React.useState(tokenFilter);
   const dispatch = useDispatch<Dispatch>();
 
@@ -13,31 +32,26 @@ const TokenFilter = () => {
     dispatch.uiState.setTokenFilter(value);
   }, 250);
 
-  const handleChange = (value) => {
+  const handleChange = React.useCallback((value) => {
     setTokenString(value);
     debounced(value);
-  };
-
-  const searchInput: React.RefObject<HTMLInputElement> = React.useRef(null);
-
-  React.useEffect(() => {
-    setTimeout(() => {
-      searchInput.current?.focus();
-    }, 50);
-  }, []);
+  }, [debounced]);
 
   return (
-    <div className="flex flex-col grow p-4 pb-0">
-      <Input
-        full
-        placeholder="Filter on name"
+    <Box css={{
+      display: 'flex', flexGrow: 1, alignItems: 'center', gap: '$2', position: 'relative',
+
+    }}
+    >
+      <Box css={{ position: 'absolute', left: '$2' }}><MagnifyingGlassIcon /></Box>
+      <StyledInput
+        spellCheck={false}
+        type="text"
         value={tokenString}
         onChange={(e) => handleChange(e.target.value)}
-        type="search"
-        name="filter"
-        inputRef={searchInput}
+        placeholder="Search"
       />
-    </div>
+    </Box>
   );
 };
 

@@ -7,11 +7,13 @@ import useRemoteTokens from '../store/remoteTokens';
 import { Dispatch } from '../store';
 import useStorage from '../store/useStorage';
 import * as pjs from '../../../package.json';
+import { useFeatureFlags } from '../hooks/useFeatureFlags';
 
 export function Initiator() {
   const dispatch = useDispatch<Dispatch>();
 
   const { pullTokens } = useRemoteTokens();
+  const { fetchFeatureFlags } = useFeatureFlags();
   const { setStorageType } = useStorage();
 
   const onInitiate = () => {
@@ -80,14 +82,24 @@ export function Initiator() {
             setStorageType({ provider: pluginMessage.storageType });
             break;
           case MessageFromPluginTypes.API_CREDENTIALS: {
-            const { status, credentials } = pluginMessage;
+            const { status, credentials, featureFlagId } = pluginMessage;
             if (status === true) {
+              let receivedFlags;
+
+              if (featureFlagId) {
+                receivedFlags = await fetchFeatureFlags(featureFlagId);
+                if (receivedFlags) {
+                  dispatch.uiState.setFeatureFlags(receivedFlags);
+                }
+              }
+
               track('Fetched from remote', { provider: credentials.provider });
               if (!credentials.internalId) track('missingInternalId', { provider: credentials.provider });
 
               dispatch.uiState.setApiData(credentials);
               dispatch.uiState.setLocalApiState(credentials);
-              await pullTokens(credentials);
+
+              await pullTokens(credentials, receivedFlags);
               dispatch.uiState.setActiveTab('tokens');
             }
             break;
@@ -99,6 +111,10 @@ export function Initiator() {
           case MessageFromPluginTypes.UI_SETTINGS: {
             dispatch.settings.setUISettings(pluginMessage.settings);
             dispatch.settings.triggerWindowChange();
+            break;
+          }
+          case MessageFromPluginTypes.SHOW_EMPTY_GROUPS: {
+            dispatch.uiState.toggleShowEmptyGroups(pluginMessage.showEmptyGroups);
             break;
           }
           case MessageFromPluginTypes.USER_ID: {

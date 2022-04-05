@@ -6,9 +6,13 @@ import {
 } from './api';
 import { NodeTokenRefMap } from './NodeTokenRefMap';
 import { UpdateMode } from './state';
-import {
-  PullStyleTypes, SelectionGroup, SelectionValue, TokenArrayGroup, TokenGroup,
-} from './tokens';
+import { SelectionGroup } from './SelectionGroup';
+import { SelectionValue } from './SelectionValue';
+import { AnyTokenList, AnyTokenSet } from './tokens';
+import { PullStyleOptions } from './PullStylesOptions';
+// import {
+//   PullStyleTypes, SelectionGroup, SelectionValue, TokenArrayGroup, TokenGroup,
+// } from './tokens';
 
 export enum MessageFromPluginTypes {
   SELECTION = 'selection',
@@ -22,6 +26,7 @@ export enum MessageFromPluginTypes {
   USER_ID = 'userId',
   RECEIVED_LAST_OPENED = 'receivedLastOpened',
   UI_SETTINGS = 'uiSettings',
+  SHOW_EMPTY_GROUPS = 'show_empty_groups',
   START_JOB = 'start_job',
   COMPLETE_JOB = 'complete_job',
   CLEAR_JOBS = 'clear_jobs',
@@ -41,6 +46,7 @@ export enum MessageToPluginTypes {
   SET_STORAGE_TYPE = 'set-storage-type',
   NOTIFY = 'notify',
   SET_UI = 'set_ui',
+  SET_SHOW_EMPTY_GROUPS = 'set_show_empty_groups',
   RESIZE_WINDOW = 'resize_window',
   CANCEL_OPERATION = 'cancel_operation',
   CREATE_ANNOTATION = 'create-annotation',
@@ -68,7 +74,13 @@ export type UiSettingsFromPluginMessage = {
     updateOnChange: boolean;
     updateStyles: boolean;
     ignoreFirstPartForStyles: boolean;
+    inspectDeep: boolean;
   };
+};
+
+export type ShowEmptyGroupsFromPluginMessage = {
+  type: MessageFromPluginTypes.SHOW_EMPTY_GROUPS;
+  showEmptyGroups: boolean;
 };
 export type RemoteCommentsFromPluginMessage = {
   type: MessageFromPluginTypes.REMOTE_COMPONENTS;
@@ -76,6 +88,7 @@ export type RemoteCommentsFromPluginMessage = {
 export type TokenValuesFromPluginMessage = {
   type: MessageFromPluginTypes.TOKEN_VALUES;
   values?: any;
+  usedTokenSet?: string[];
 };
 export type ReceivedStorageTypeFromPluginMessage = {
   type: MessageFromPluginTypes.RECEIVED_STORAGE_TYPE;
@@ -126,11 +139,13 @@ export type ApiCredentialsFromPluginMessage = {
   credentials: ApiDataType & {
     internalId?: string
   }
+  featureFlagId: string
 };
 export type PostToUIMessage =
     | NoSelectionFromPluginMessage
     | SelectionFromPluginMessage
     | UiSettingsFromPluginMessage
+    | ShowEmptyGroupsFromPluginMessage
     | RemoteCommentsFromPluginMessage
     | TokenValuesFromPluginMessage
     | ReceivedStorageTypeFromPluginMessage
@@ -163,25 +178,26 @@ export type CredentialsToPluginMessage = {
 };
 export type UpdateToPluginMessage = {
   type: MessageToPluginTypes.UPDATE;
-  tokenValues: TokenGroup;
-  tokens: TokenArrayGroup;
+  tokenValues: AnyTokenSet;
+  tokens: AnyTokenList;
   updatedAt: string;
   settings: SettingsState;
+  usedTokenSet: string[];
 };
 export type CreateStylesToPluginMessage = {
   type: MessageToPluginTypes.CREATE_STYLES;
-  tokens: TokenArrayGroup;
+  tokens: AnyTokenList;
   settings: SettingsState;
 };
 export type SetNodeDataToPluginMessage = {
   type: MessageToPluginTypes.SET_NODE_DATA;
   values: NodeTokenRefMap;
-  tokens: TokenArrayGroup;
+  tokens: AnyTokenList;
   settings: SettingsState;
 };
 export type PullStylesToPluginMessage = {
   type: MessageToPluginTypes.PULL_STYLES;
-  styleTypes: PullStyleTypes;
+  styleTypes: PullStyleOptions;
 };
 export type SetStorageTypeToPluginMessage = {
   type: MessageToPluginTypes.SET_STORAGE_TYPE;
@@ -190,12 +206,14 @@ export type SetStorageTypeToPluginMessage = {
 export type NotifyToPluginMessage = {
   type: MessageToPluginTypes.NOTIFY;
   msg: string;
-  opts: {
-    timeout?: number;
-  };
+  opts: NotificationOptions;
 };
 export type SetUiToPluginMessage = SettingsState & {
   type: MessageToPluginTypes.SET_UI;
+};
+export type SetShowEmptyGroupsPluginMessage = {
+  type: MessageToPluginTypes.SET_SHOW_EMPTY_GROUPS;
+  showEmptyGroups: boolean;
 };
 export type ResizeWindowToPluginMessage = {
   type: MessageToPluginTypes.RESIZE_WINDOW;
@@ -238,6 +256,7 @@ export type PostToFigmaMessage =
     | SetStorageTypeToPluginMessage
     | NotifyToPluginMessage
     | SetUiToPluginMessage
+    | SetShowEmptyGroupsPluginMessage
     | ResizeWindowToPluginMessage
     | CancelOperationToPluginMessage
     | CreateAnnotationToPluginMessage

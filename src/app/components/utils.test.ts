@@ -1,6 +1,7 @@
-import {
-  convertToRgb, isTypographyToken, lightOrDark, slugify, checkAndEvaluateMath, isSingleToken,
-} from './utils';
+import { convertToRgb, lightOrDark } from '@/utils/color';
+import { isSingleToken, isSingleTypographyToken } from '@/utils/is';
+import { checkAndEvaluateMath } from '@/utils/math';
+import { slugify } from '@/utils/string';
 
 describe('checkAndEvaluateMath', () => {
   it('calculates math', () => {
@@ -50,7 +51,7 @@ describe('isSingleToken', () => {
   });
 });
 
-describe('isTypographyToken', () => {
+describe('isSingleTypographyToken', () => {
   it('checks if type is typography', () => {
     const correctToken = {
       type: 'typography',
@@ -65,8 +66,8 @@ describe('isTypographyToken', () => {
       fontWeight: 'normal',
       fontSize: '32',
     };
-    expect(isTypographyToken(correctToken)).toBe(true);
-    expect(isTypographyToken(incorrectToken)).toBe(false);
+    expect(isSingleTypographyToken(correctToken)).toBe(true);
+    expect(isSingleTypographyToken(incorrectToken)).toBe(false);
   });
 });
 

@@ -13,7 +13,7 @@ export default function Label({
   css?: object;
 }) {
   const StyledLabel = styled('label', {
-    fontSize: 14,
+    fontSize: '$small',
     lineHeight: 1,
     userSelect: 'none',
     variants: {

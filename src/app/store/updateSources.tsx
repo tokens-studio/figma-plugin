@@ -1,10 +1,10 @@
 import { MessageToPluginTypes } from '@/types/messages';
 import { mergeTokenGroups, resolveTokenValues } from '@/plugin/tokenHelpers';
-import { TokenProps } from '@/types/tokens';
 import { ContextObject, StorageProviderType } from '@/types/api';
 import { notifyToUI, postToFigma } from '../../plugin/notifiers';
 import { updateJSONBinTokens } from './providers/jsonbin';
 import { track } from '@/utils/analytics';
+import { TokenValues } from '@/types/tokens';
 
 async function updateRemoteTokens({
   provider,
@@ -14,7 +14,7 @@ async function updateRemoteTokens({
   oldUpdatedAt,
 }: {
   provider: StorageProviderType;
-  tokens: TokenProps;
+  tokens: TokenValues;
   context: ContextObject;
   updatedAt: string;
   oldUpdatedAt?: string;
@@ -72,5 +72,6 @@ export default async function updateTokensOnSources({
     tokens: tokens ? mergedTokens : null,
     updatedAt,
     settings,
+    usedTokenSet,
   });
 }

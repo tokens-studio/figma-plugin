@@ -1,6 +1,5 @@
-import * as React from 'react';
+import React from 'react';
 import { useSelector } from 'react-redux';
-import JSONEditor from './JSONEditor';
 import SyncSettings from './SyncSettings';
 import Settings from './Settings';
 import Inspector from './Inspector';
@@ -12,36 +11,42 @@ import Footer from './Footer';
 import Changelog from './Changelog';
 import ImportedTokensDialog from './ImportedTokensDialog';
 import { Initiator } from './Initiator';
-import { RootState } from '../store';
 import ConfirmDialog from './ConfirmDialog';
 import PushDialog from './PushDialog';
 import WindowResizer from './WindowResizer';
+import Box from './Box';
+import { activeTabSelector } from '@/selectors';
 
 function App() {
-  const activeTab = useSelector((state: RootState) => state.uiState.activeTab);
+  const activeTab = useSelector(activeTabSelector);
 
   return (
-    <div className="content">
+    <Box css={{ backgroundColor: '$bgDefault' }}>
       <Initiator />
       <LoadingBar />
-      <div className="h-full flex flex-col">
-        <div className="grow flex flex-col">
+      <Box css={{
+        display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden',
+      }}
+      >
+        <Box css={{
+          display: 'flex', flexDirection: 'column', flexGrow: 1, height: '100%', overflow: 'hidden',
+        }}
+        >
           {activeTab !== 'start' && <Navbar />}
           {activeTab === 'start' && <StartScreen />}
           <Tokens isActive={activeTab === 'tokens'} />
-          {activeTab === 'json' && <JSONEditor />}
           {activeTab === 'inspector' && <Inspector />}
           {activeTab === 'syncsettings' && <SyncSettings />}
           {activeTab === 'settings' && <Settings />}
-        </div>
+        </Box>
         <Footer />
         <Changelog />
         <ImportedTokensDialog />
         <ConfirmDialog />
         <PushDialog />
         <WindowResizer />
-      </div>
-    </div>
+      </Box>
+    </Box>
   );
 }
 

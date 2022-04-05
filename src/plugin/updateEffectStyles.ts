@@ -1,10 +1,10 @@
-import { SingleTokenObject } from '@/types/tokens';
+import { SingleToken } from '@/types/tokens';
 import { getEffectStylesKeyMap } from '@/utils/getEffectStylesKeyMap';
 import { normalizeTokenName } from '@/utils/normalizeTokenName';
 import setEffectValuesOnTarget from './setEffectValuesOnTarget';
 
 // Iterate over effectTokens to create objects that match figma styles
-export default function updateEffectStyles(effectTokens: SingleTokenObject[], shouldCreate = false) {
+export default function updateEffectStyles(effectTokens: SingleToken[], shouldCreate = false) {
   const effectStylesToKeyMap = getEffectStylesKeyMap();
 
   effectTokens.forEach((token) => {

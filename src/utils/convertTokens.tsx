@@ -1,23 +1,29 @@
-import { SingleToken, SingleTokenObject } from '@/types/tokens';
-import { isTypographyToken, isValueToken } from '../app/components/utils';
+import { SingleToken } from '@/types/tokens';
+import { isSingleBoxShadowToken, isSingleTokenValueObject, isSingleTypographyToken } from './is';
 
+// @TODO fix typings
 function checkForTokens({
   obj,
   token,
   root = null,
   returnValuesOnly = false,
   expandTypography = false,
-}): [SingleTokenObject[], SingleToken] {
+  expandShadow = false,
+}): [SingleToken[], SingleToken] {
   // replaces / in token name
   let returnValue;
-  const shouldExpandTypography = expandTypography ? isTypographyToken(token.value) : false;
-  if (isValueToken(token) && !shouldExpandTypography) {
+  const shouldExpandTypography = expandTypography ? isSingleTypographyToken(token.value) : false;
+  const shouldExpandShadow = expandShadow ? isSingleBoxShadowToken(token.value) : false;
+  if (isSingleTokenValueObject(token) && !shouldExpandTypography && !shouldExpandShadow) {
     returnValue = token;
-  } else if (isTypographyToken(token) && !expandTypography) {
+  } else if (
+    (isSingleTypographyToken(token) && !expandTypography)
+    || (isSingleBoxShadowToken(token) && !expandShadow)
+  ) {
     returnValue = {
-      type: 'typography',
+      type: token.type,
       value: Object.entries(token).reduce((acc, [key, val]) => {
-        acc[key] = isValueToken(val) && returnValuesOnly ? val.value : val;
+        acc[key] = isSingleTokenValueObject(val) && returnValuesOnly ? val.value : val;
         return acc;
       }, {}),
     };
@@ -28,7 +34,7 @@ function checkForTokens({
     }
   } else if (typeof token === 'object') {
     let tokenToCheck = token;
-    if (isValueToken(token)) {
+    if (isSingleTokenValueObject(token)) {
       tokenToCheck = token.value;
     }
     Object.entries(tokenToCheck).map(([key, value]) => {
@@ -38,6 +44,7 @@ function checkForTokens({
         root: [root, key].filter((n) => n).join('.'),
         returnValuesOnly,
         expandTypography,
+        expandShadow,
       });
       if (root && result) {
         obj.push({ name: [root, key].join('.'), ...result });
@@ -58,9 +65,11 @@ function checkForTokens({
   return [obj, returnValue];
 }
 
-export default function convertToTokenArray({ tokens, returnValuesOnly = false, expandTypography = false }) {
+export default function convertToTokenArray({
+  tokens, returnValuesOnly = false, expandTypography = false, expandShadow = false,
+}) {
   const [result] = checkForTokens({
-    obj: [], token: tokens, returnValuesOnly, expandTypography,
+    obj: [], token: tokens, returnValuesOnly, expandTypography, expandShadow,
   });
   return Object.values(result);
 }

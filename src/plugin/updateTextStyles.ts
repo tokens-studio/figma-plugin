@@ -1,9 +1,9 @@
-import { SingleTokenObject } from '@/types/tokens';
+import { SingleToken } from '@/types/tokens';
 import { getTextStylesKeyMap } from '@/utils/getTextStylesKeyMap';
 import { normalizeTokenName } from '@/utils/normalizeTokenName';
 import setTextValuesOnTarget from './setTextValuesOnTarget';
 
-export default function updateTextStyles(textTokens: SingleTokenObject[], shouldCreate = false) {
+export default function updateTextStyles(textTokens: SingleToken[], shouldCreate = false) {
   // Iterate over textTokens to create objects that match figma styles
   const textStylesToKeyMap = getTextStylesKeyMap();
 
