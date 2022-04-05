@@ -97,7 +97,7 @@ const Input: React.FC<Props> = ({
           ref={inputRef}
           placeholder={placeholder}
         />
-        {!!suffix && <span className="flex justify-center items-center cursor-pointer input-suffix">{suffix}</span>}
+        {!!suffix && <span>{suffix}</span>}
         {isMasked && (
           <button type="button" className="py-1 mr-2 rounded-full" onClick={handleVisibility}>
             <StyledIcon>{show ? <IconVisibility /> : <IconVisibilityOff />}</StyledIcon>

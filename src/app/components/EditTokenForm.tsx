@@ -200,6 +200,15 @@ function EditTokenForm({ resolvedTokens }) {
     transition: 'transform 0.2s ease-in-out',
   });
 
+  const StyledInputSuffix = styled('button', {
+    width: '32px',
+    height: '32px',
+    backgroundColor: '#f0f0f0',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+  });
+
   const resolvedValue = React.useMemo(() => {
     if (internalEditToken) {
       return typeof internalEditToken?.value === 'object'
@@ -269,9 +278,9 @@ function EditTokenForm({ resolvedTokens }) {
                   )
                 }
                 suffix={(
-                  <div onClick={() => setShowAutoSuggest(!showAutoSuggest)}>
+                  <StyledInputSuffix onClick={() => setShowAutoSuggest(!showAutoSuggest)}>
                     <StyledIconDisclosure />
-                  </div>
+                  </StyledInputSuffix>
                 )}
               />
             </Autosuggest>
