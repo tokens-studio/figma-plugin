@@ -23,38 +23,56 @@ export function getCreatePullRequestUrl(id: string, branchName: string) {
   return `https://github.com/${id}/compare/${branchName}?expand=1`;
 }
 
-function getGitlabOptions(context: ContextObject) {
+const getGitlabOptions = (context: ContextObject) => {
   const { secret, baseUrl } = context;
 
   if (baseUrl && baseUrl.length > 0) {
     return { token: secret, host: baseUrl };
   }
   return { token: secret };
-}
+};
 
-function hasSameContent(content: TokenValues, storedContent: string) {
+const hasSameContent = (content: TokenValues, storedContent: string) => {
   const stringifiedContent = JSON.stringify(content.values, null, 2);
-
   return stringifiedContent === storedContent;
-}
+};
 
-export const fetchBranches = async ({ context, owner, repo }: { context: ContextObject, owner: string, repo: string }) => {
-  const api = new Gitlab(getGitlabOptions(context));
+const createBranch = async ({
+  api, projectId, branch, from,
+} : { api: Resources.Gitlab, projectId: number, branch: string, from: string }) => api.Branches.create(projectId, branch, from);
+
+const getProjectId = async ({ api, owner, repo } : { api: Resources.Gitlab, owner: string, repo: string }) => {
   const projectsInGroup = await api.Groups.projects(owner);
   const project = projectsInGroup.filter((p) => p.name === repo)[0];
-  const branches = await api.Branches.all(project && project.id);
 
+  return project && project.id;
+};
+
+const getBranches = async ({ api, projectId } : { api: Resources.Gitlab, projectId: number }) => {
+  const branches = await api.Branches.all(projectId);
   return branches.map((branch) => branch.name);
 };
 
-export const checkPermissions = async ({ context, owner, repo }: { context: ContextObject, owner: string, repo: string }) => {
+export const fetchBranches = async ({ context, owner, repo }: { context: ContextObject, owner: string, repo: string }) => {
+  const api = new Gitlab(getGitlabOptions(context));
+  const projectId = await getProjectId({ api, owner, repo });
+  const branches = await getBranches({ api, projectId });
+
+  return branches;
+};
+
+export const checkPermissions = async ({ api, projectId }: { api: Resources.Gitlab, projectId: number }) => {
   try {
-    const api = new Gitlab(getGitlabOptions(context));
     const currentUser = await api.Users.current();
+
+    console.log(api);
+    console.log(currentUser);
 
     if (!currentUser || currentUser.state !== 'active') return null;
 
-    return currentUser.can_create_group && currentUser.can_create_project;
+    const permissions = await api.ProjectMembers.show(projectId, currentUser.id);
+
+    return permissions;
   } catch (e) {
     console.log(e);
 
@@ -167,6 +185,16 @@ type FeatureFlagOpts = {
   multiFile: boolean;
 };
 
+enum GitLabAccessLevel {
+  NoAccess = 0,
+  MinimalAccess = 5,
+  Guest = 10,
+  Reporter = 20,
+  Developer = 30,
+  Maintainer = 40,
+  Owner = 50,
+}
+
 const extractFiles = (filePath: string, tokenObj: TokenSets, opts: FeatureFlagOpts) => {
   const files: { [key: string]: string } = {};
   if (filePath.endsWith('.json')) {
@@ -180,7 +208,7 @@ const extractFiles = (filePath: string, tokenObj: TokenSets, opts: FeatureFlagOp
   return files;
 };
 
-const createOrUpdateFiles = (
+const createFiles = (
   api: Resources.Gitlab,
   context: {
     projectId: number;
@@ -192,11 +220,10 @@ const createOrUpdateFiles = (
   opts: FeatureFlagOpts,
 ) => {
   const files = extractFiles(context.filePath, context.tokenObj, opts);
-
   return Promise.all(
     Object.keys(files).map((path) => api.RepositoryFiles.create(
       context.projectId,
-      context.filePath,
+      path,
       context.branch,
       files[path],
       context.commitMessage || 'Commit from Figma',
@@ -244,17 +271,14 @@ export function useGitLab() {
   }): Promise<TokenValues | null> {
     try {
       const api = new Gitlab(getGitlabOptions(context));
-      const projectsInGroup = await api.Groups.projects(owner);
-      const project = projectsInGroup.filter((p) => p.name === repo)[0];
-      const projectId = project && project.id;
-      const branchesInProject = await api.Branches.all(projectId);
-      const branches = branchesInProject.map((branch) => branch.name);
+      const projectId = await getProjectId({ api, owner, repo });
+      const branches = await getBranches({ api, projectId });
       const branch = customBranch || context.branch;
 
       if (!branches) return null;
 
       if (branches.includes(branch)) {
-        await createOrUpdateFiles(
+        await createFiles(
           api,
           {
             projectId,
@@ -266,8 +290,10 @@ export function useGitLab() {
           { multiFile: Boolean(featureFlags?.gh_mfs_enabled) },
         );
       } else {
-        await api.Branches.create(projectId, branch, branches[0]);
-        await createOrUpdateFiles(
+        await createBranch({
+          api, projectId, branch, from: branches[0],
+        });
+        await createFiles(
           api,
           {
             projectId,
@@ -332,8 +358,11 @@ export function useGitLab() {
   }
 
   async function checkAndSetAccess({ context, owner, repo }: { context: ContextObject; owner: string; repo: string }) {
-    const hasWriteAccess = await checkPermissions({ context, owner, repo });
-    dispatch.tokenState.setEditProhibited(!hasWriteAccess);
+    const api = new Gitlab(getGitlabOptions(context));
+    const projectId = await getProjectId({ api, owner, repo });
+    const permission = await checkPermissions({ api, projectId });
+
+    dispatch.tokenState.setEditProhibited(!(permission?.access_level > GitLabAccessLevel.Developer));
   }
 
   async function pullTokensFromGitLab(context: ContextObject, receivedFeatureFlags?: FeatureFlags) {
