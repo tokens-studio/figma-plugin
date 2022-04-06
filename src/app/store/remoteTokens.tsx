@@ -8,6 +8,7 @@ import useURL from './providers/url';
 import { Dispatch } from '../store';
 import useStorage from './useStorage';
 import { useGitHub } from './providers/github';
+import { useGitLab } from './providers/gitlab';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
 import { FeatureFlags } from '@/utils/featureFlags';
 import { apiSelector } from '@/selectors';
@@ -21,6 +22,9 @@ export default function useRemoteTokens() {
   const {
     addNewGitHubCredentials, syncTokensWithGitHub, pullTokensFromGitHub, pushTokensToGitHub,
   } = useGitHub();
+  const {
+    addNewGitLabCredentials, syncTokensWithGitLab, pullTokensFromGitLab, pushTokensToGitLab,
+  } = useGitLab();
   const { pullTokensFromURL } = useURL();
 
   const pullTokens = async (context = api, featureFlags?: FeatureFlags) => {
@@ -40,6 +44,10 @@ export default function useRemoteTokens() {
       }
       case StorageProviderType.GITHUB: {
         tokenValues = await pullTokensFromGitHub(context, featureFlags);
+        break;
+      }
+      case StorageProviderType.GITLAB: {
+        tokenValues = await pullTokensFromGitLab(context, featureFlags);
         break;
       }
       case StorageProviderType.URL: {
@@ -73,6 +81,10 @@ export default function useRemoteTokens() {
         await syncTokensWithGitHub(context);
         break;
       }
+      case StorageProviderType.GITLAB: {
+        await syncTokensWithGitLab(context);
+        break;
+      }
       default:
         await pullTokens(context);
     }
@@ -84,6 +96,10 @@ export default function useRemoteTokens() {
     switch (api.provider) {
       case StorageProviderType.GITHUB: {
         await pushTokensToGitHub(api);
+        break;
+      }
+      case StorageProviderType.GITLAB: {
+        await pushTokensToGitLab(api);
         break;
       }
       default:
@@ -107,6 +123,10 @@ export default function useRemoteTokens() {
       }
       case StorageProviderType.GITHUB: {
         data = await addNewGitHubCredentials(credentials);
+        break;
+      }
+      case StorageProviderType.GITLAB: {
+        data = await addNewGitLabCredentials(credentials);
         break;
       }
       case StorageProviderType.URL: {

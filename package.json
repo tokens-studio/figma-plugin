@@ -22,6 +22,7 @@
     },
     "dependencies": {
         "@figma-plugin/helpers": "^0.15.2",
+        "@gitbeaker/browser": "^35.6.0",
         "@octokit/rest": "^18.9.0",
         "@radix-ui/react-checkbox": "^0.1.5",
         "@radix-ui/react-context-menu": "^0.1.6",
