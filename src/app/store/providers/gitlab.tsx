@@ -48,6 +48,19 @@ const getProjectId = async ({ api, owner, repo } : { api: Resources.Gitlab, owne
   return project && project.id;
 };
 
+const getGroupProjectId = async ({ api, owner, repo } : { api: Resources.Gitlab, owner: string, repo: string }) => {
+  const projectsInGroup = await api.Groups.projects(owner);
+  const project = projectsInGroup.filter((p) => p.name === repo)[0];
+
+  return { projectId: project && project.id, groupId: project && project.namespace.id };
+};
+
+const readFileContent = async ({
+  api, projectId, filePath, branch,
+} : { api: Resources.Gitlab, projectId: number, filePath: string, branch: string }) => api.RepositoryFiles.showRaw(projectId, filePath, { ref: branch });
+
+const checkTreeInPath = async ({ api, projectId, filePath } : { api: Resources.Gitlab, projectId: number, filePath: string }) => api.Repositories.tree(projectId, { path: filePath });
+
 const getBranches = async ({ api, projectId } : { api: Resources.Gitlab, projectId: number }) => {
   const branches = await api.Branches.all(projectId);
   return branches.map((branch) => branch.name);
@@ -61,18 +74,19 @@ export const fetchBranches = async ({ context, owner, repo }: { context: Context
   return branches;
 };
 
-export const checkPermissions = async ({ api, projectId }: { api: Resources.Gitlab, projectId: number }) => {
+export const checkPermissions = async ({ api, groupId, projectId }: { api: Resources.Gitlab, groupId: number, projectId: number }) => {
   try {
     const currentUser = await api.Users.current();
 
-    console.log(api);
-    console.log(currentUser);
-
     if (!currentUser || currentUser.state !== 'active') return null;
 
-    const permissions = await api.ProjectMembers.show(projectId, currentUser.id);
+    const groupPermission = await api.GroupMembers.show(groupId, currentUser.id);
+    if (groupPermission.access_level) {
+      return groupPermission;
+    }
 
-    return permissions;
+    const projectPermission = await api.ProjectMembers.show(projectId, currentUser.id);
+    return projectPermission;
   } catch (e) {
     console.log(e);
 
@@ -80,100 +94,63 @@ export const checkPermissions = async ({ api, projectId }: { api: Resources.Gitl
   }
 };
 
-function getTreeMode(type: 'dir' | 'file') {
-  switch (type) {
-    case 'dir':
-      return '040000';
-    default:
-      return '100644';
-  }
-}
-
 export const readContents = async ({
   context, owner, repo, opts,
 }: { context: ContextObject, owner: string, repo: string, opts: FeatureFlagOpts }) => {
   const api = new Gitlab(getGitlabOptions(context));
-  const projectsInGroup = await api.Groups.projects(owner);
-  const project = projectsInGroup.filter((p) => p.name === repo)[0];
+  const projectId = await getProjectId({ api, owner, repo });
 
   try {
-    const content = await api.RepositoryFiles.showRaw(project && project.id, context.filePath, { ref: context.branch });
-    return {
-      values: JSON.parse(content),
-    };
-    // response = await octokit.rest.repos.getContent({
-    //   owner,
-    //   repo,
-    //   path: context.filePath,
-    //   ref: context.branch,
-    // });
+    const { filePath, branch } = context;
+    const trees = await checkTreeInPath({ api, projectId, filePath });
+    const fileContents: Array<{ name: string; data: string }> = [];
+    if (trees.length > 0) {
+      await Promise.all(
+        trees
+          .filter((tree) => tree.name?.endsWith('.json'))
+          .map((tree) => {
+            if (tree.name) {
+              return readFileContent({
+                api,
+                projectId,
+                filePath: tree.path,
+                branch,
+              })
+                .then((res) => {
+                  fileContents.push({
+                    name: tree.name?.replace('.json', ''),
+                    data: res,
+                  });
+                });
+            }
+            return null;
+          }),
+      );
+      if (fileContents.length > 0) {
+        const allContents = fileContents
+          .sort((a, b) => a.name.localeCompare(b.name))
+          .reduce((acc, curr) => {
+            if (IsJSONString(curr.data)) {
+              const parsed = JSON.parse(curr.data);
 
-    // const fileContents: Array<{ name: string; data: string }> = [];
-    // if (Array.isArray(response.data) && opts.multiFile) {
-    //   const folderResponse = await octokit.rest.git.createTree({
-    //     owner,
-    //     repo,
-    //     tree: response.data.map((item) => ({ path: item.path, sha: item.sha, mode: getTreeMode(item.type) })),
-    //   });
-    //   if (folderResponse.data.tree[0].sha) {
-    //     const treeResponse = await octokit.rest.git.getTree({
-    //       owner,
-    //       repo,
-    //       tree_sha: folderResponse.data.tree[0].sha,
-    //       recursive: 'true',
-    //     });
-    //     if (treeResponse.data.tree.length > 0) {
-    //       await Promise.all(
-    //         treeResponse.data.tree
-    //           .filter((i) => i.path?.endsWith('.json'))
-    //           .map((treeItem) => {
-    //             if (treeItem.path) {
-    //               return octokit.rest.repos
-    //                 .getContent({
-    //                   owner,
-    //                   repo,
-    //                   path: `${context.filePath}/${treeItem.path}`,
-    //                   ref: context.branch,
-    //                 })
-    //                 .then((res) => {
-    //                   if (!Array.isArray(res.data) && 'content' in res.data && treeItem.path) {
-    //                     fileContents.push({ name: treeItem.path.replace('.json', ''), data: decodeBase64(res.data.content) });
-    //                   }
-    //                 });
-    //             }
-    //             return null;
-    //           }),
-    //       );
-    //     }
-    //   }
+              acc[curr.name] = parsed;
+            }
+            return acc;
+          }, {});
+        return allContents ? { values: allContents } : null;
+      }
+    } else {
+      const content = await readFileContent({
+        api, projectId, filePath, branch,
+      });
+      if (IsJSONString(content)) {
+        return {
+          values: JSON.parse(content),
+        };
+      }
+    }
 
-    //   if (fileContents.length > 0) {
-    //     // If we receive multiple files, parse each
-    //     // sort by name (as we can't guarantee order)
-    //     const allContents = fileContents
-    //       .sort((a, b) => a.name.localeCompare(b.name))
-    //       .reduce((acc, curr) => {
-    //         if (IsJSONString(curr.data)) {
-    //           const parsed = JSON.parse(curr.data);
-
-    //           acc[curr.name] = parsed;
-    //         }
-    //         return acc;
-    //       }, {});
-    //     return allContents ? { values: allContents } : null;
-    //   }
-    // } else if ('content' in response.data) {
-    //   const data = decodeBase64(response.data.content);
-    //   // If content of file is parseable JSON, parse it
-    //   if (IsJSONString(data)) {
-    //     const parsed = JSON.parse(data);
-    //     return {
-    //       values: parsed,
-    //     };
-    //   }
-    // }
-    // // If not, return null as we can't process that file. We should let the user know, though.
-    // return null;
+    return null;
   } catch (e) {
     // Raise error (usually this is an auth error)
     console.log('Error', e);
@@ -359,8 +336,8 @@ export function useGitLab() {
 
   async function checkAndSetAccess({ context, owner, repo }: { context: ContextObject; owner: string; repo: string }) {
     const api = new Gitlab(getGitlabOptions(context));
-    const projectId = await getProjectId({ api, owner, repo });
-    const permission = await checkPermissions({ api, projectId });
+    const { projectId, groupId } = await getGroupProjectId({ api, owner, repo });
+    const permission = await checkPermissions({ api, groupId, projectId });
 
     dispatch.tokenState.setEditProhibited(!(permission?.access_level > GitLabAccessLevel.Developer));
   }
