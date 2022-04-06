@@ -12,6 +12,9 @@ export default function convertTokensToGroupedObject(
 ) {
   let tokenObj = {};
   tokenObj = tokens.reduce((acc, token) => {
+    if (options.throwErrorWhenNotResolved && token.failedToResolve) {
+      throw new Error(`ERROR: failed to resolve token "${token.name}"`);
+    }
     if (token.internal__Parent && excludedSets.includes(token.internal__Parent)) {
       return acc;
     }
