@@ -3,8 +3,8 @@ import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import Box from '../Box';
 import IconLayers from '@/icons/layers.svg';
 import getNodeIcon from './getNodeIcon';
-import { goToNodeId } from '../utils';
 import { NodeInfo } from '@/types/NodeInfo';
+import { goToNodeId } from '@/utils/figma';
 
 const NODE_HEIGHT = 22;
 const VISIBLE_VIEWPORT_NODES = 10;
