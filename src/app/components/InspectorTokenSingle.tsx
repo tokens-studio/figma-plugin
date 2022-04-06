@@ -9,7 +9,7 @@ import IconDisclosure from '@/icons/disclosure.svg';
 import InspectorResolvedToken from './InspectorResolvedToken';
 import { Dispatch, RootState } from '../store';
 import { SelectionGroup } from '@/types';
-import TokenNodes from './inspector/TokenLayers';
+import TokenNodes from './inspector/TokenNodes';
 
 export default function InspectorTokenSingle({
   token,
