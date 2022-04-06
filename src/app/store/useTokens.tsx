@@ -1,7 +1,8 @@
 import { useSelector } from 'react-redux';
+import { useCallback, useMemo } from 'react';
+import isEqual from 'lodash.isequal';
 import { postToFigma } from '@/plugin/notifiers';
 import { MessageToPluginTypes } from '@/types/messages';
-import checkIfAlias from '@/utils/checkIfAlias';
 import {
   AnyTokenList,
   SingleToken,
@@ -10,54 +11,67 @@ import stringifyTokens from '@/utils/stringifyTokens';
 import formatTokens from '@/utils/formatTokens';
 import { mergeTokenGroups, resolveTokenValues } from '@/plugin/tokenHelpers';
 import { UpdateMode } from '@/types/state';
-import { RootState } from '../store';
 import useConfirm from '../hooks/useConfirm';
 import { Properties } from '@/constants/Properties';
 import { track } from '@/utils/analytics';
-import { SelectionValue } from '@/types';
+import { checkIfAlias } from '@/utils/alias';
+import {
+  activeTokenSetSelector,
+  settingsStateSelector,
+  tokensSelector,
+  usedTokenSetSelector,
+} from '@/selectors';
+
+// @TODO fix typings
+
+type ConfirmResult =
+  ('textStyles' | 'colorStyles' | 'effectStyles')[]
+  | string;
+
+type GetFormattedTokensOptions = {
+  includeAllTokens: boolean;
+  includeParent: boolean;
+  expandTypography: boolean;
+  expandShadow: boolean;
+};
+
+type RemoveTokensByValueData = { property: Properties; nodes: string[] }[];
 
 export default function useTokens() {
-  const { tokens, usedTokenSet, activeTokenSet } = useSelector((state: RootState) => state.tokenState);
-  const settings = useSelector((state: RootState) => state.settings);
-  const { confirm } = useConfirm();
+  const usedTokenSet = useSelector(usedTokenSetSelector);
+  const activeTokenSet = useSelector(activeTokenSetSelector);
+  const tokens = useSelector(tokensSelector);
+  const settings = useSelector(settingsStateSelector, isEqual);
+  const { confirm } = useConfirm<ConfirmResult>();
 
   // Gets value of token
-  function getTokenValue(name: string, resolved) {
-    return resolved.find((t) => t.name === name);
-  }
+  const getTokenValue = useCallback((name: string, resolved: AnyTokenList) => (
+    resolved.find((t) => t.name === name)
+  ), []);
 
   // Returns resolved value of a specific token
-  function isAlias(token: SingleToken, resolvedTokens) {
-    return checkIfAlias(token, resolvedTokens);
-  }
-
-  // Calls Figma with all tokens and nodes to set data on
-  function setNodeData(data: SelectionValue, resolvedTokens: AnyTokenList) {
-    postToFigma({
-      type: MessageToPluginTypes.SET_NODE_DATA,
-      values: data,
-      tokens: resolvedTokens,
-      settings,
-    });
-  }
+  const isAlias = useCallback((token: SingleToken, resolvedTokens: AnyTokenList) => (
+    checkIfAlias(token, resolvedTokens)
+  ), []);
 
   // Returns formatted tokens for style dictionary
-  function getFormattedTokens({
-    includeAllTokens = false, includeParent = true, expandTypography = false, expandShadow = false,
-  }) {
+  const getFormattedTokens = useCallback((opts: GetFormattedTokensOptions) => {
+    const {
+      includeAllTokens = false, includeParent = true, expandTypography = false, expandShadow = false,
+    } = opts;
     const tokenSets = includeAllTokens ? Object.keys(tokens) : [activeTokenSet];
     return formatTokens({
       tokens, tokenSets, includeAllTokens, includeParent, expandTypography, expandShadow,
     });
-  }
+  }, [tokens, activeTokenSet]);
 
   // Returns stringified tokens for the JSON editor
-  function getStringTokens() {
-    return stringifyTokens(tokens, activeTokenSet);
-  }
+  const getStringTokens = useCallback(() => (
+    stringifyTokens(tokens, activeTokenSet)
+  ), [tokens, activeTokenSet]);
 
   // Calls Figma asking for all local text- and color styles
-  async function pullStyles() {
+  const pullStyles = useCallback(async () => {
     const userDecision = await confirm({
       text: 'Import styles',
       description: 'What styles should be imported?',
@@ -69,7 +83,7 @@ export default function useTokens() {
       ],
     });
 
-    if (userDecision && userDecision.data.length) {
+    if (userDecision && Array.isArray(userDecision.data) && userDecision.data.length) {
       track('Import styles', {
         textStyles: userDecision.data.includes('textStyles'),
         colorStyles: userDecision.data.includes('colorStyles'),
@@ -85,18 +99,18 @@ export default function useTokens() {
         },
       });
     }
-  }
+  }, [confirm]);
 
-  function removeTokensByValue(data: { property: Properties; nodes: string[] }[]) {
+  const removeTokensByValue = useCallback((data: RemoveTokensByValueData) => {
     track('removeTokensByValue', { count: data.length });
 
     postToFigma({
       type: MessageToPluginTypes.REMOVE_TOKENS_BY_VALUE,
       tokensToRemove: data,
     });
-  }
+  }, []);
 
-  async function handleRemap(type: Properties, name: string) {
+  const handleRemap = useCallback(async (type: Properties, name: string) => {
     const userDecision = await confirm({
       text: `Choose a new token for ${name}`,
       input: {
@@ -106,7 +120,7 @@ export default function useTokens() {
       confirmAction: 'Remap',
     });
 
-    if (userDecision) {
+    if (userDecision && typeof userDecision.data === 'string') {
       track('remapToken', { fromInspect: true });
 
       postToFigma({
@@ -117,10 +131,10 @@ export default function useTokens() {
         updateMode: UpdateMode.SELECTION,
       });
     }
-  }
+  }, [confirm]);
 
   // Calls Figma with an old name and new name and asks it to update all tokens that use the old name
-  async function remapToken(oldName: string, newName: string, updateMode?: UpdateMode) {
+  const remapToken = useCallback(async (oldName: string, newName: string, updateMode?: UpdateMode) => {
     track('remapToken', { fromRename: true });
 
     postToFigma({
@@ -129,10 +143,10 @@ export default function useTokens() {
       newName,
       updateMode: updateMode || settings.updateMode,
     });
-  }
+  }, [settings.updateMode]);
 
   // Calls Figma with all tokens to create styles
-  function createStylesFromTokens() {
+  const createStylesFromTokens = useCallback(() => {
     track('createStyles');
 
     const resolved = resolveTokenValues(mergeTokenGroups(tokens, usedTokenSet));
@@ -143,18 +157,27 @@ export default function useTokens() {
       tokens: withoutIgnored,
       settings,
     });
-  }
+  }, [settings, tokens, usedTokenSet]);
 
-  return {
+  return useMemo(() => ({
     isAlias,
     getTokenValue,
     getFormattedTokens,
     getStringTokens,
-    setNodeData,
     createStylesFromTokens,
     pullStyles,
     remapToken,
     removeTokensByValue,
     handleRemap,
-  };
+  }), [
+    isAlias,
+    getTokenValue,
+    getFormattedTokens,
+    getStringTokens,
+    createStylesFromTokens,
+    pullStyles,
+    remapToken,
+    removeTokensByValue,
+    handleRemap,
+  ]);
 }

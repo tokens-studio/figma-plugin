@@ -4,8 +4,8 @@ import {
   ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger,
 } from './ContextMenu';
 import Heading from './Heading';
-import { RootState } from '../store';
 import useManageTokens from '../store/useManageTokens';
+import { editProhibitedSelector } from '@/selectors';
 
 type Props = {
   id: string
@@ -14,8 +14,12 @@ type Props = {
 };
 
 export default function TokenGroupHeading({ label, path, id }: Props) {
-  const { editProhibited } = useSelector((state: RootState) => state.tokenState);
+  const editProhibited = useSelector(editProhibitedSelector);
   const { deleteGroup } = useManageTokens();
+
+  const handleSelect = React.useCallback(() => {
+    deleteGroup(path);
+  }, [path, deleteGroup]);
 
   return (
     <ContextMenu>
@@ -23,7 +27,7 @@ export default function TokenGroupHeading({ label, path, id }: Props) {
         <Heading size="small">{label}</Heading>
       </ContextMenuTrigger>
       <ContextMenuContent>
-        <ContextMenuItem disabled={editProhibited} onSelect={() => deleteGroup(path)}>
+        <ContextMenuItem disabled={editProhibited} onSelect={handleSelect}>
           Delete
         </ContextMenuItem>
       </ContextMenuContent>

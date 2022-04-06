@@ -1,16 +1,17 @@
-import * as React from 'react';
+import React from 'react';
 import { useSelector } from 'react-redux';
 import Heading from './Heading';
 import Button from './Button';
 import Modal from './Modal';
-import { RootState } from '../store';
+import { changelogSelector } from '@/selectors';
+import Stack from './Stack';
 
 type ChangelogItem = {
   _uid: string;
   image?: {
     alt: string;
     filename: string;
-  }
+  };
   title: string;
   excerpt: string;
   read_more_link?: string;
@@ -19,7 +20,7 @@ type ChangelogItem = {
 
 export default function Changelog() {
   const [changelogOpen, setChangelogOpen] = React.useState(true);
-  const { changelog } = useSelector((state: RootState) => state.uiState);
+  const changelog = useSelector(changelogSelector);
 
   const [activeIndex, setIndex] = React.useState(0);
 
@@ -33,52 +34,51 @@ export default function Changelog() {
 
   return (
     <Modal showClose isOpen={changelog.length > 0 && changelogOpen} close={() => setChangelogOpen(false)}>
-      <div className="space-y-8">
+      <Stack direction="column" gap={4}>
         <div>
           {changelog.map((item: ChangelogItem, index) => (
-            <div
-                                // eslint-disable-next-line no-underscore-dangle
+            // eslint-disable-next-line no-underscore-dangle
+            <Stack
               key={item._uid}
-              className={`space-y-2 flex flex-col items-center text-center ${
-                index === activeIndex ? 'visible' : 'hidden'
-              }`}
+              direction="column"
+              gap={2}
+              align="center"
+              css={{ textAlign: 'center', visibility: index === activeIndex ? 'visible' : 'hidden' }}
             >
-              {item.image && (
-              <img src={item.image.filename} alt={item.image.alt} className="rounded mb-8" />
-              )}
+              {item.image && <img src={item.image.filename} alt={item.image.alt} className="rounded mb-8" />}
               <Heading>{item.title}</Heading>
               <p className="text-xs">{item.excerpt}</p>
               {item.read_more_link && (
-              <a
-                target="_blank"
-                rel="noreferrer"
-                href={item.read_more_link}
-                className="inline-flex text-primary-500 text-xs"
-              >
-                {item.read_more_text ? item.read_more_text : 'Read more'}
-              </a>
+                <a
+                  target="_blank"
+                  rel="noreferrer"
+                  href={item.read_more_link}
+                  className="inline-flex text-primary-500 text-xs"
+                >
+                  {item.read_more_text ? item.read_more_text : 'Read more'}
+                </a>
               )}
-            </div>
+            </Stack>
           ))}
         </div>
-        <div className="flex flex-row justify-between gap-2">
+        <Stack direction="row" gap={2} justify="between">
           <Button id="button-changelog-close" onClick={() => setChangelogOpen(false)} variant="secondary">
             Close
           </Button>
-          <div className="flex flex-row justify-between gap-2">
+          <Stack direction="row" justify="between" gap={2}>
             {activeIndex !== 0 && (
-            <Button id="button-changelog-prev" onClick={handlePrev} variant="secondary">
-              Previous
-            </Button>
+              <Button id="button-changelog-prev" onClick={handlePrev} variant="secondary">
+                Previous
+              </Button>
             )}
             {changelog.length > activeIndex + 1 && (
-            <Button id="button-changelog-next" variant="primary" onClick={handleNext}>
-              Next
-            </Button>
+              <Button id="button-changelog-next" variant="primary" onClick={handleNext}>
+                Next
+              </Button>
             )}
-          </div>
-        </div>
-      </div>
+          </Stack>
+        </Stack>
+      </Stack>
     </Modal>
   );
 }

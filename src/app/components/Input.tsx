@@ -1,12 +1,13 @@
-import * as React from 'react';
+import React from 'react';
 import { styled } from '@/stitches.config';
 import IconVisibility from './icons/IconVisibiltyOn';
 import IconVisibilityOff from './icons/IconVisibilityOff';
 import Box from './Box';
+import Stack from './Stack';
 
 type Props = {
   name: string;
-  inputRef?: React.MutableRefObject<HTMLInputElement>;
+  inputRef?: React.MutableRefObject<HTMLInputElement | null>;
   error?: string;
   required?: boolean;
   tabindex?: number | null;
@@ -129,7 +130,9 @@ const Input: React.FC<Props> = ({
   // if isMasked is true, then we need to handle toggle visibility
   const [show, setShow] = React.useState(false);
 
-  const handleVisibility = (e) => {
+  // @TODO this causes new function refs on each render
+  // should be a useCallback
+  const handleVisibility = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     setShow(!show);
     if (inputRef?.current?.type) {
@@ -140,16 +143,16 @@ const Input: React.FC<Props> = ({
   return (
     <label htmlFor={name} className="text-xxs font-medium block">
       {(!!label || !!error) && (
-        <div className="flex items-center justify-between mb-1">
-          {label ? <div className={capitalize ? 'capitalize' : null}>{label}</div> : null}
+        <Stack direction="row" justify="between" align="center" css={{ marginBottom: '$1' }}>
+          {label ? <div className={capitalize ? 'capitalize' : undefined}>{label}</div> : null}
           {error ? <div className="text-red-500 font-bold">{error}</div> : null}
-        </div>
+        </Stack>
       )}
       <Box css={{ display: 'flex', position: 'relative', width: full ? '100%' : 0 }} className="input">
         {!!prefix && <StyledPrefix>{prefix}</StyledPrefix>}
         <StyledInput
           spellCheck={false}
-          tabIndex={tabindex}
+          tabIndex={tabindex ?? undefined}
           type={type}
           value={value}
           defaultValue={defaultValue}

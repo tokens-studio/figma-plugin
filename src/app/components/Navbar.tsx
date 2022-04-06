@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { track } from '@/utils/analytics';
 import convertTokensToObject from '@/utils/convertTokensToObject';
@@ -6,9 +6,14 @@ import Icon from './Icon';
 import Tooltip from './Tooltip';
 import useRemoteTokens from '../store/remoteTokens';
 import { StorageProviderType } from '../../types/api';
-import { RootState, Dispatch } from '../store';
+import { Dispatch } from '../store';
 import Box from './Box';
 import { styled } from '@/stitches.config';
+import {
+  activeTabSelector, editProhibitedSelector, lastSyncedStateSelector, projectURLSelector, storageTypeSelector, tokensSelector,
+} from '@/selectors';
+import { Tabs } from '@/constants/Tabs';
+import Stack from './Stack';
 
 const StyledButton = styled('button', {
   padding: '$5 $4',
@@ -30,14 +35,19 @@ const StyledButton = styled('button', {
   },
 });
 
-function TabButton({ name, label, first = false }) {
-  const { activeTab } = useSelector((state: RootState) => state.uiState);
+type Props = {
+  name: Tabs
+  label: string
+};
+
+function TabButton({ name, label }: Props) {
+  const activeTab = useSelector(activeTabSelector);
   const dispatch = useDispatch<Dispatch>();
 
-  const onClick = () => {
+  const onClick = React.useCallback(() => {
     track('Switched tab', { from: activeTab, to: name });
     dispatch.uiState.setActiveTab(name);
-  };
+  }, [activeTab, name, dispatch.uiState]);
 
   return (
     <StyledButton
@@ -66,15 +76,19 @@ const transformProviderName = (provider) => {
 };
 
 function Navbar() {
-  const { projectURL, storageType } = useSelector((state: RootState) => state.uiState);
-  const { lastSyncedState, tokens, editProhibited } = useSelector((state: RootState) => state.tokenState);
+  const projectURL = useSelector(projectURLSelector);
+  const storageType = useSelector(storageTypeSelector);
+  const tokens = useSelector(tokensSelector);
+  const editProhibited = useSelector(editProhibitedSelector);
+  const lastSyncedState = useSelector(lastSyncedStateSelector);
   const { pullTokens, pushTokens } = useRemoteTokens();
 
-  const checkForChanges = () => {
+  const checkForChanges = React.useCallback(() => {
     if (lastSyncedState !== JSON.stringify(convertTokensToObject(tokens), null, 2)) {
       return true;
     }
-  };
+    return false;
+  }, [lastSyncedState, tokens]);
 
   return (
     <Box
@@ -96,7 +110,7 @@ function Navbar() {
         <TabButton name="syncsettings" label="Sync" />
         <TabButton name="settings" label="Settings" />
       </div>
-      <div className="flex flex-row items-center">
+      <Stack direction="row" align="center">
         {storageType.provider !== StorageProviderType.LOCAL && (
           <>
             {storageType.provider === StorageProviderType.JSONBIN && (
@@ -128,7 +142,7 @@ function Navbar() {
             </Tooltip>
           </>
         )}
-      </div>
+      </Stack>
     </Box>
   );
 }

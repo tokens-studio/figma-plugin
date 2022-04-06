@@ -1,7 +1,7 @@
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
-import * as React from 'react';
-import * as ReactDOM from 'react-dom';
+import React from 'react';
+import ReactDOM from 'react-dom';
 import './assets/fonts/jetbrainsmono.css';
 import './styles/preflight.css';
 import './styles/main.css';
@@ -12,6 +12,8 @@ import App from './components/App';
 import Heading from './components/Heading';
 import { store } from './store';
 import * as pjs from '../../package.json';
+import Stack from './components/Stack';
+import Text from './components/Text';
 
 initializeAnalytics();
 
@@ -23,15 +25,15 @@ if (process.env.ENVIRONMENT === 'production' || process.env.ENVIRONMENT === 'bet
   });
 }
 
-function ErrorFallback({ error }) {
+function ErrorFallback({ error }: { error: Error }) {
   return (
-    <div className="flex items-center flex-col text-center justify-center space-y-4 h-full">
+    <Stack direction="column" align="center" gap={4} justify="center" css={{ height: '100%', textAlign: 'center' }}>
       <Heading>Something went wrong!</Heading>
-      <div className="space-y-2">
-        <div className="text-xs text-gray-600">{error.message}</div>
-        <div className="text-xs text-gray-600">Restart the plugin and try again.</div>
-      </div>
-    </div>
+      <Stack direction="column" gap={2}>
+        <Text size="xsmall" muted>{error.message}</Text>
+        <Text size="xsmall" muted>Restart the plugin and try again.</Text>
+      </Stack>
+    </Stack>
   );
 }
 

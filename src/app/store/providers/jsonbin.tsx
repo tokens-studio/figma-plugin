@@ -1,13 +1,14 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { Dispatch, RootState } from '@/app/store';
-import { StorageProviderType } from '@/types/api';
+import { ContextObject, StorageProviderType } from '@/types/api';
 import { MessageToPluginTypes } from '@/types/messages';
 import { TokenStore, TokenValues } from '@/types/tokens';
 import convertTokensToObject from '@/utils/convertTokensToObject';
 import { notifyToUI, postToFigma } from '../../../plugin/notifiers';
-import { compareUpdatedAt } from '../../components/utils';
 import * as pjs from '../../../../package.json';
 import useStorage from '../useStorage';
+import { compareUpdatedAt } from '@/utils/date';
+import { tokensSelector } from '@/selectors';
 
 async function readTokensFromJSONBin({ secret, id }): Promise<TokenValues | null> {
   const response = await fetch(`https://api.jsonbin.io/v3/b/${id}/latest`, {
@@ -88,9 +89,9 @@ export async function updateJSONBinTokens({
 export function useJSONbin() {
   const dispatch = useDispatch<Dispatch>();
   const { setStorageType } = useStorage();
-  const { tokens } = useSelector((state: RootState) => state.tokenState);
+  const tokens = useSelector(tokensSelector);
 
-  async function createNewJSONBin(context): Promise<TokenValues> {
+  async function createNewJSONBin(context: ContextObject): Promise<TokenValues> {
     const { secret, name, updatedAt } = context;
     const response = await fetch('https://api.jsonbin.io/v3/b', {
       method: 'POST',
@@ -144,7 +145,7 @@ export function useJSONbin() {
 
   // Read tokens from JSONBin
 
-  async function pullTokensFromJSONBin(context): Promise<TokenStore | null> {
+  async function pullTokensFromJSONBin(context: ContextObject): Promise<TokenStore | null> {
     const { id, secret, name } = context;
 
     if (!id && !secret) return null;
@@ -181,7 +182,7 @@ export function useJSONbin() {
     }
   }
 
-  async function addJSONBinCredentials(context): Promise<TokenStore | null> {
+  async function addJSONBinCredentials(context: ContextObject): Promise<TokenStore | null> {
     const tokenValues = await pullTokensFromJSONBin(context);
 
     if (tokenValues) {

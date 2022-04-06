@@ -1,5 +1,5 @@
 import React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import { SingleToken } from '@/types/tokens';
 import Box from './Box';
 import Checkbox from './Checkbox';
@@ -7,9 +7,11 @@ import IconButton from './IconButton';
 import useTokens from '../store/useTokens';
 import IconDisclosure from '@/icons/disclosure.svg';
 import InspectorResolvedToken from './InspectorResolvedToken';
-import { Dispatch, RootState } from '../store';
+import { Dispatch } from '../store';
 import { SelectionGroup } from '@/types';
 import TokenNodes from './inspector/TokenNodes';
+import { inspectStateSelector } from '@/selectors';
+
 
 export default function InspectorTokenSingle({
   token,
@@ -19,7 +21,7 @@ export default function InspectorTokenSingle({
   resolvedTokens: SingleToken[];
 }) {
   const { handleRemap, getTokenValue } = useTokens();
-  const inspectState = useSelector((state: RootState) => state.inspectState);
+  const inspectState = useSelector(inspectStateSelector, shallowEqual);
   const dispatch = useDispatch<Dispatch>();
   const [isChecked, setChecked] = React.useState(false);
 
