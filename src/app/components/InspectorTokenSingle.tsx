@@ -11,7 +11,13 @@ import { Dispatch, RootState } from '../store';
 import { SelectionGroup } from '@/types';
 import TokenNodes from './inspector/TokenLayers';
 
-export default function InspectorTokenSingle({ token, resolvedTokens }: { token: SelectionGroup, resolvedTokens: SingleToken[] }) {
+export default function InspectorTokenSingle({
+  token,
+  resolvedTokens,
+}: {
+  token: SelectionGroup;
+  resolvedTokens: SingleToken[];
+}) {
   const { handleRemap, getTokenValue } = useTokens();
   const inspectState = useSelector((state: RootState) => state.inspectState);
   const dispatch = useDispatch<Dispatch>();
@@ -22,7 +28,7 @@ export default function InspectorTokenSingle({ token, resolvedTokens }: { token:
   }, [inspectState.selectedTokens, token]);
 
   const mappedToken = getTokenValue(token.value, resolvedTokens);
-  console.log(token);
+
   return (
     <Box
       css={{
@@ -49,12 +55,13 @@ export default function InspectorTokenSingle({ token, resolvedTokens }: { token:
         />
         <InspectorResolvedToken token={mappedToken} />
 
-        <Box css={{
-          display: 'flex',
-          flexDirection: 'row',
-          alignItems: 'center',
-          gap: '$1',
-        }}
+        <Box
+          css={{
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: '$1',
+          }}
         >
           <Box css={{ fontSize: '$small' }}>{token.value}</Box>
           <IconButton

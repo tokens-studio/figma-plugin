@@ -11,32 +11,35 @@ import {
 } from '@radix-ui/react-icons';
 import Box from '../Box';
 
+const SVG_WIDTH = 12;
+const SVG_HEIGHT = 12;
+
 function getNodeIcon(type: NodeType) {
   let icon;
   switch (type) {
     case 'TEXT':
-      icon = <TextIcon />;
+      icon = <TextIcon width={SVG_WIDTH} height={SVG_HEIGHT} />;
       break;
     case 'FRAME':
-      icon = <FrameIcon />;
+      icon = <FrameIcon width={SVG_WIDTH} height={SVG_HEIGHT} />;
       break;
     case 'INSTANCE':
-      icon = <ComponentInstanceIcon />;
+      icon = <ComponentInstanceIcon width={SVG_WIDTH} height={SVG_HEIGHT} />;
       break;
     case 'VECTOR':
-      icon = <MixIcon />;
+      icon = <MixIcon width={SVG_WIDTH} height={SVG_HEIGHT} />;
       break;
     case 'GROUP':
-      icon = <GroupIcon />;
+      icon = <GroupIcon width={SVG_WIDTH} height={SVG_HEIGHT} />;
       break;
     case 'RECTANGLE':
-      icon = <BoxIcon />;
+      icon = <BoxIcon width={SVG_WIDTH} height={SVG_HEIGHT} />;
       break;
     case 'LINE':
-      icon = <MinusIcon />;
+      icon = <MinusIcon width={SVG_WIDTH} height={SVG_HEIGHT} />;
       break;
     case 'ELLIPSE':
-      icon = <ValueIcon />;
+      icon = <ValueIcon width={SVG_WIDTH} height={SVG_HEIGHT} />;
       break;
     default:
       break;
@@ -45,7 +48,9 @@ function getNodeIcon(type: NodeType) {
     icon && (
       <Box
         css={{
-          marginRight: '$4',
+          marginRight: '$3',
+          display: 'flex',
+          alignItems: 'center',
           svg: {
             fill: '#fff',
           },

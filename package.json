@@ -11,7 +11,7 @@
     "watch-transform": "webpack --mode=development --watch --config webpack-transform.config.js",
     "build-js": "webpack --mode=production",
     "build": "yarn build-css && yarn build-js",
-    "build:watch": "concurrently 'node preview-server.js' 'yarn watch-css' 'yarn watch-js'",
+    "build:watch": "concurrently 'yarn watch-css' 'yarn watch-js'",
     "build-transform": "webpack --mode=production --config webpack-transform.config.js",
     "prettier:format": "prettier --write 'src/**/*.{js,jsx,ts,tsx,css,json}' ",
     "test": "jest",

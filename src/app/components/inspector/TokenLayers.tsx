@@ -1,51 +1,50 @@
 import React from 'react';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import Box from '../Box';
-import { styled } from '@/stitches.config';
 import IconLayers from '@/icons/layers.svg';
 import getNodeIcon from './getNodeIcon';
 import { goToNodeId } from '../utils';
 import { NodeInfo } from '@/types/NodeInfo';
 
-const StyledDropdownItem = styled(DropdownMenu.Item, {
-  cursor: 'pointer',
-  borderRadius: '$contextMenuItem',
-  padding: '$2 $4',
-  '&:hover': {
-    background: '#1C99FC',
-    color: '#fff',
-  },
-});
+const NODE_HEIGHT = 22;
+const VISIBLE_VIEWPORT_NODES = 10;
+const CONTAINER_PADDING = 8;
 
 export default function TokenNodes({ nodes }: { nodes: NodeInfo[] }) {
   function getNode({ id, name, type }: NodeInfo) {
     return (
-      <StyledDropdownItem key={id} onClick={() => goToNodeId(id)}>
+      <DropdownMenu.Item key={id} onClick={() => goToNodeId(id)}>
         <Box
           css={{
             display: 'flex',
+            color: '#fff',
+            cursor: 'pointer',
+            padding: '$1 $4',
+            '&:hover': {
+              backgroundColor: '$interaction',
+            },
           }}
         >
           {getNodeIcon(type)}
           <span>{name}</span>
         </Box>
-      </StyledDropdownItem>
+      </DropdownMenu.Item>
     );
   }
 
   const dropdownContent = (
-    <DropdownMenu.Content>
+    <DropdownMenu.Content sideOffset={4}>
       <DropdownMenu.Arrow offset={14} />
       <Box
         css={{
           minWidth: '164px',
-          background: '#222222',
-          color: 'white',
+          background: '$contextMenuBackground',
           borderRadius: '$contextMenu',
           padding: '$2 0',
           fontSize: '$small',
+          maxHeight: `${VISIBLE_VIEWPORT_NODES * NODE_HEIGHT + CONTAINER_PADDING}px`,
         }}
-        className="content"
+        className={`content ${nodes.length > VISIBLE_VIEWPORT_NODES ? 'scroll-container' : null}`}
       >
         {nodes.map(getNode)}
       </Box>
@@ -81,7 +80,7 @@ export default function TokenNodes({ nodes }: { nodes: NodeInfo[] }) {
             <Box css={{ color: '$fgSubtle', marginRight: '$3' }}>
               <IconLayers />
             </Box>
-            <Box css={{ color: 'black', cursor: '#545454' }}>{nodes.length}</Box>
+            <Box css={{ color: '#575757' }}>{nodes.length}</Box>
           </Box>
         </DropdownMenu.Trigger>
         {dropdownContent}
