@@ -9,7 +9,7 @@ import {
   UserIdFromPluginMessage,
 } from '@/types/messages';
 import store from './store';
-import { SelectionGroup, SelectionValue } from '@/types/tokens';
+import { SelectionGroup, SelectionValue } from '@/types';
 
 export function postToFigma(props: PostToFigmaMessage) {
   parent.postMessage(

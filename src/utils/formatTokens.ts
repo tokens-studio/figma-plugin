@@ -1,5 +1,5 @@
 import set from 'set-value';
-import { expand } from '../app/components/utils';
+import { expand } from '@/utils/expand';
 
 export default function formatTokens({
   tokens,

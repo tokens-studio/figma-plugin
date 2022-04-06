@@ -3,6 +3,7 @@ import Modal from '../Modal';
 import Heading from '../Heading';
 import StorageItemForm from '../StorageItemForm';
 import useRemoteTokens from '../../store/remoteTokens';
+import Stack from '../Stack';
 
 export default function EditStorageItemModal({
   isOpen, initialValue, onClose, onSuccess,
@@ -27,7 +28,7 @@ export default function EditStorageItemModal({
 
   return (
     <Modal large id="modal-edit-storage-item" isOpen={isOpen} close={() => onClose(false)}>
-      <div className="space-y-4">
+      <Stack direction="column" gap={4}>
         <Heading>Edit storage item</Heading>
         <StorageItemForm
           handleChange={handleChange}
@@ -36,7 +37,7 @@ export default function EditStorageItemModal({
           values={formFields}
           hasErrored={hasErrored}
         />
-      </div>
+      </Stack>
     </Modal>
   );
 }

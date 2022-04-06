@@ -1,4 +1,4 @@
-import { convertToRgb } from '@/app/components/utils';
+import { convertToRgb } from '@/utils/color';
 import { convertToFigmaColor, hslaToRgba } from './colors';
 
 describe('hslaToRgba', () => {

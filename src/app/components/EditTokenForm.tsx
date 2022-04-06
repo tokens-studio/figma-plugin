@@ -1,12 +1,10 @@
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { styled } from '@/stitches.config';
-import getAliasValue from '@/utils/aliases';
 import { track } from '@/utils/analytics';
 import IconDisclosure from '@/icons/disclosure.svg';
-import checkIfContainsAlias from '@/utils/checkIfContainsAlias';
 import { UpdateMode } from '@/types/state';
-import { Dispatch, RootState } from '../store';
+import { Dispatch } from '../store';
 import useManageTokens from '../store/useManageTokens';
 import BoxShadowInput from './BoxShadowInput';
 import Input from './Input';
@@ -15,16 +13,27 @@ import useConfirm from '../hooks/useConfirm';
 import useTokens from '../store/useTokens';
 import { SingleBoxShadowToken } from '@/types/tokens';
 import Autosuggest from './Autosuggest';
+import { checkIfContainsAlias, getAliasValue } from '@/utils/alias';
+import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
+import { activeTokenSetSelector, editTokenSelector } from '@/selectors';
+import { TokenTypes } from '@/constants/TokenTypes';
+import { EditTokenObject } from '../store/models/uiState';
+import Stack from './Stack';
+
+type Props = {
+  resolvedTokens: ResolveTokenValuesResult[];
+};
 
 // @TODO this needs to be reviewed from a typings perspective + performance
-function EditTokenForm({ resolvedTokens }) {
-  const { activeTokenSet } = useSelector((state: RootState) => state.tokenState);
+function EditTokenForm({ resolvedTokens }: Props) {
+  const firstInput = React.useRef<HTMLInputElement | null>(null);
+  const activeTokenSet = useSelector(activeTokenSetSelector);
+  const editToken = useSelector(editTokenSelector);
   const { editSingleToken, createSingleToken } = useManageTokens();
   const { remapToken } = useTokens();
-  const { editToken } = useSelector((state: RootState) => state.uiState);
   const dispatch = useDispatch<Dispatch>();
   const [inputHelperOpen, setInputHelperOpen] = React.useState(false);
-  const [error, setError] = React.useState(null);
+  const [error, setError] = React.useState<string | null>(null);
   const [internalEditToken, setInternalEditToken] = React.useState<typeof editToken>(editToken);
   const [showAutoSuggest, setShowAutoSuggest] = React.useState<boolean>(false);
   const { confirm } = useConfirm();
@@ -74,9 +83,9 @@ function EditTokenForm({ resolvedTokens }) {
   );
 
   const handleShadowChange = React.useCallback(
-    (shadow: SingleBoxShadowToken['value'] | SingleBoxShadowToken['value'][]) => {
+    (shadow: SingleBoxShadowToken['value']) => {
       setError(null);
-      if (internalEditToken) {
+      if (internalEditToken?.type === TokenTypes.BOX_SHADOW) {
         setInternalEditToken({ ...internalEditToken, value: shadow });
       }
     },
@@ -86,17 +95,17 @@ function EditTokenForm({ resolvedTokens }) {
   const handleColorValueChange = React.useCallback(
     (color: string) => {
       setError(null);
-      if (internalEditToken) {
+      if (internalEditToken?.type === TokenTypes.COLOR) {
         setInternalEditToken({ ...internalEditToken, value: color });
       }
     },
     [internalEditToken],
   );
 
-  const handleObjectChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>(
+  const handleTypographyChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>(
     (e) => {
       e.persist();
-      if (typeof internalEditToken?.value === 'object') {
+      if (internalEditToken?.type === TokenTypes.TYPOGRAPHY && typeof internalEditToken?.value === 'object') {
         setInternalEditToken({
           ...internalEditToken,
           value: { ...internalEditToken.value, [e.target.name]: e.target.value },
@@ -119,7 +128,8 @@ function EditTokenForm({ resolvedTokens }) {
     [internalEditToken],
   );
 
-  const submitTokenValue = async ({ value, name, options }) => {
+  // @TODO update to useCallback
+  const submitTokenValue = async ({ value, name, options }: EditTokenObject) => {
     if (internalEditToken) {
       let oldName;
       if (internalEditToken.initialName !== name && internalEditToken.initialName) {
@@ -174,19 +184,20 @@ function EditTokenForm({ resolvedTokens }) {
     }
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (isValid && internalEditToken) {
-      submitTokenValue(internalEditToken);
-      dispatch.uiState.setShowEditForm(false);
-    }
-  };
+  const handleSubmit = React.useCallback(
+    (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      if (isValid && internalEditToken) {
+        submitTokenValue(internalEditToken);
+        dispatch.uiState.setShowEditForm(false);
+      }
+    },
+    [dispatch, isValid, internalEditToken],
+  );
 
-  const handleReset = () => {
+  const handleReset = React.useCallback(() => {
     dispatch.uiState.setShowEditForm(false);
-  };
-
-  const firstInput: React.RefObject<HTMLInputElement> = React.useRef(null);
+  }, [dispatch]);
 
   React.useEffect(() => {
     setTimeout(() => {
@@ -228,13 +239,13 @@ function EditTokenForm({ resolvedTokens }) {
         return <BoxShadowInput setValue={handleShadowChange} value={internalEditToken.value} />;
       }
       case 'typography': {
-        return Object.entries(internalEditToken.schema).map(([key, schemaValue]: [string, string]) => (
+        return Object.entries(internalEditToken.schema ?? {}).map(([key, schemaValue]: [string, string]) => (
           <Input
             key={key}
             full
             label={key}
             value={internalEditToken.value[key]}
-            onChange={handleObjectChange}
+            onChange={handleTypographyChange}
             type="text"
             name={key}
             custom={schemaValue}
@@ -334,14 +345,14 @@ function EditTokenForm({ resolvedTokens }) {
           />
         ))
         : null}
-      <div className="flex justify-end space-x-2">
+      <Stack direction="row" justify="end" gap={2}>
         <button className="button button-link" type="button" onClick={handleReset}>
           Cancel
         </button>
         <button disabled={!isValid} className="button button-primary" type="submit">
           {internalEditToken?.isPristine ? 'Create' : 'Update'}
         </button>
-      </div>
+      </Stack>
     </form>
   );
 }

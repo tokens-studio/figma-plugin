@@ -1,10 +1,11 @@
-import * as React from 'react';
+import React from 'react';
 import { useDebouncedCallback } from 'use-debounce';
 import { useDispatch, useSelector } from 'react-redux';
 import { MagnifyingGlassIcon } from '@radix-ui/react-icons';
-import { RootState, Dispatch } from '../store';
+import { Dispatch } from '../store';
 import Box from './Box';
 import { styled } from '@/stitches.config';
+import { tokenFilterSelector } from '@/selectors';
 
 const StyledInput = styled('input', {
   background: 'transparent',
@@ -23,7 +24,7 @@ const StyledInput = styled('input', {
 });
 
 const TokenFilter = () => {
-  const { tokenFilter } = useSelector((state: RootState) => state.uiState);
+  const tokenFilter = useSelector(tokenFilterSelector);
   const [tokenString, setTokenString] = React.useState(tokenFilter);
   const dispatch = useDispatch<Dispatch>();
 
@@ -31,10 +32,10 @@ const TokenFilter = () => {
     dispatch.uiState.setTokenFilter(value);
   }, 250);
 
-  const handleChange = (value) => {
+  const handleChange = React.useCallback((value) => {
     setTokenString(value);
     debounced(value);
-  };
+  }, [debounced]);
 
   return (
     <Box css={{

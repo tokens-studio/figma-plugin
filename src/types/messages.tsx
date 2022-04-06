@@ -74,11 +74,11 @@ export type UiSettingsFromPluginMessage = {
     updateOnChange: boolean;
     updateStyles: boolean;
     ignoreFirstPartForStyles: boolean;
+    inspectDeep: boolean;
   };
 };
 
-// @TODO fix case
-export type showEmptyGroupsFromPluginMessage = {
+export type ShowEmptyGroupsFromPluginMessage = {
   type: MessageFromPluginTypes.SHOW_EMPTY_GROUPS;
   showEmptyGroups: boolean;
 };
@@ -145,7 +145,7 @@ export type PostToUIMessage =
     | NoSelectionFromPluginMessage
     | SelectionFromPluginMessage
     | UiSettingsFromPluginMessage
-    | showEmptyGroupsFromPluginMessage
+    | ShowEmptyGroupsFromPluginMessage
     | RemoteCommentsFromPluginMessage
     | TokenValuesFromPluginMessage
     | ReceivedStorageTypeFromPluginMessage
