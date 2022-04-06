@@ -35,7 +35,7 @@ const SyncSettings = () => {
     setShowEditStorageModalVisible(true);
   };
 
-  const selectedRemoteProvider = () => [StorageProviderType.JSONBIN, StorageProviderType.GITHUB, StorageProviderType.URL].includes(
+  const selectedRemoteProvider = () => [StorageProviderType.JSONBIN, StorageProviderType.GITHUB, StorageProviderType.GITLAB, StorageProviderType.URL].includes(
     localApiState?.provider as StorageProviderType,
   );
 
@@ -71,6 +71,22 @@ const SyncSettings = () => {
             {' '}
             <a
               href="https://docs.tokens.studio/sync/github"
+              target="_blank"
+              rel="noreferrer"
+              className="underline"
+            >
+              Read the guide
+            </a>
+            .
+          </div>
+        );
+      case StorageProviderType.GITLAB:
+        return (
+          <div>
+            Sync your tokens with a Gitlab repository so your design decisions are up to date with code.
+            {' '}
+            <a
+              href="https://docs.tokens.studio/sync/gitlab"
               target="_blank"
               rel="noreferrer"
               className="underline"
@@ -174,6 +190,21 @@ const SyncSettings = () => {
                 }}
                 text="GitHub"
                 id={StorageProviderType.GITHUB}
+              />
+              <ProviderSelector
+                isActive={localApiState?.provider === StorageProviderType.GITLAB}
+                isStored={storageType?.provider === StorageProviderType.GITLAB}
+                onClick={() => {
+                  dispatch.uiState.setLocalApiState({
+                    name: '',
+                    secret: '',
+                    id: '',
+                    branch: '',
+                    provider: StorageProviderType.GITLAB,
+                  });
+                }}
+                text="GitLab"
+                id={StorageProviderType.GITLAB}
               />
             </Stack>
           </Stack>

@@ -1,6 +1,7 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { localApiStateSelector } from '@/selectors';
+import { StorageProviderType } from '@/types/api';
 import usePushDialog from '../hooks/usePushDialog';
 import { getCreatePullRequestUrl } from '../store/providers/github';
 import Button from './Button';
@@ -76,7 +77,11 @@ function ConfirmDialog() {
             <div className="rotate">
               <Icon name="loading" />
             </div>
-            <Heading size="large">Pushing to GitHub</Heading>
+            <Heading size="large">
+              Pushing to
+              {localApiState.provider === StorageProviderType.GITHUB && ' GitHub'}
+              {localApiState.provider === StorageProviderType.GITLAB && ' GitLab'}
+            </Heading>
           </Stack>
         </Modal>
       );
@@ -87,7 +92,12 @@ function ConfirmDialog() {
           <div className="text-center">
             <div className="mb-8 space-y-4">
               <Heading size="large">All done!</Heading>
-              <div className="text-xs">Changes pushed to GitHub.</div>
+              <div className="text-xs">
+                Changes pushed to
+                {localApiState.provider === StorageProviderType.GITHUB && ' GitHub'}
+                {localApiState.provider === StorageProviderType.GITLAB && ' GitLab'}
+                .
+              </div>
             </div>
             <Button variant="primary" href={getCreatePullRequestUrl(localApiState.id, branch)}>
               Create Pull Request
