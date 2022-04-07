@@ -114,6 +114,11 @@ export function goToNode(id: string) {
   }
 }
 
+export function selectNodes(ids: string[]) {
+  const nodes = ids.map(figma.getNodeById);
+  figma.currentPage.selection = nodes;
+}
+
 export async function updateNodes(
   entries: readonly NodeManagerNode[],
   tokens: Map<string, TokenArrayGroup[number]>,
