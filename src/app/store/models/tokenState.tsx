@@ -20,6 +20,7 @@ import {
 } from '@/types/payloads';
 import { updateTokenPayloadToSingleToken } from '@/utils/updateTokenPayloadToSingleToken';
 import { RootModel } from '@/types/RootModel';
+import { ThemeObject } from '@/types';
 
 const defaultTokens: TokenStore = {
   version: pjs.plugin_version,
@@ -29,11 +30,13 @@ const defaultTokens: TokenStore = {
 };
 export interface TokenState {
   tokens: Record<string, AnyTokenList>;
+  themes: Record<string, ThemeObject>;
   lastSyncedState: string;
   importedTokens: {
     newTokens: SingleToken[];
     updatedTokens: SingleToken[];
   };
+  activeTheme: string | null;
   activeTokenSet: string;
   usedTokenSet: string[];
   editProhibited: boolean;
@@ -45,11 +48,13 @@ export const tokenState = createModel<RootModel>()({
     tokens: {
       global: [],
     },
+    themes: {},
     lastSyncedState: JSON.stringify({ global: {} }, null, 2),
     importedTokens: {
       newTokens: [],
       updatedTokens: [],
     },
+    activeTheme: null,
     activeTokenSet: 'global',
     usedTokenSet: ['global'],
     editProhibited: false,
@@ -81,6 +86,10 @@ export const tokenState = createModel<RootModel>()({
         usedTokenSet: state.usedTokenSet.filter((n) => !data.sets.includes(n)),
       };
     },
+    setActiveTheme: (state, themeId: string | null) => ({
+      ...state,
+      activeTheme: themeId,
+    }),
     setActiveTokenSet: (state, data: string) => ({
       ...state,
       activeTokenSet: data,

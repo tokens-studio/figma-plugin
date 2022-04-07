@@ -16,8 +16,6 @@ import Box from './Box';
 import IconButton from './IconButton';
 import IconListing from '@/icons/listing.svg';
 import IconJSON from '@/icons/json.svg';
-import IconDisclosure from '@/icons/disclosure.svg';
-import { styled } from '@/stitches.config';
 import useConfirm from '../hooks/useConfirm';
 import { track } from '@/utils/analytics';
 import { UpdateMode } from '@/types/state';
@@ -27,27 +25,17 @@ import parseJson from '@/utils/parseJson';
 import AttentionIcon from '@/icons/attention.svg';
 import { TokensContext } from '@/context';
 import {
-  activeTokenSetSelector, showEditFormSelector, tokenFilterSelector, tokensSelector, tokenTypeSelector, updateModeSelector, usedTokenSetSelector,
+  activeTokenSetSelector, manageThemesModalOpenSelector, showEditFormSelector, tokenFilterSelector, tokensSelector, tokenTypeSelector, updateModeSelector, usedTokenSetSelector,
 } from '@/selectors';
+import { ThemeSelector } from './ThemeSelector';
+import { IconToggleableDisclosure } from './icons/IconToggleableDisclosure';
+import { styled } from '@/stitches.config';
+import { ManageThemesModal } from './ManageThemesModal';
 
 const StyledButton = styled('button', {
   '&:focus, &:hover': {
     boxShadow: 'none',
     background: '$bgSubtle',
-  },
-});
-
-const StyledIconDisclosure = styled(IconDisclosure, {
-  transition: 'transform 0.2s ease-in-out',
-  variants: {
-    open: {
-      true: {
-        transform: 'rotate(0deg)',
-      },
-      false: {
-        transform: 'rotate(180deg)',
-      },
-    },
   },
 });
 
@@ -106,6 +94,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
   const activeTokenSet = useSelector(activeTokenSetSelector);
   const usedTokenSet = useSelector(usedTokenSetSelector);
   const showEditForm = useSelector(showEditFormSelector);
+  const manageThemesModalOpen = useSelector(manageThemesModalOpenSelector);
   const tokenFilter = useSelector(tokenFilterSelector);
   const dispatch = useDispatch<Dispatch>();
   const [activeTokensTab, setActiveTokensTab] = React.useState('list');
@@ -237,11 +226,12 @@ function Tokens({ isActive }: { isActive: boolean }) {
                 }}
               >
                 {activeTokenSet}
-                <StyledIconDisclosure open={tokenSetsVisible} />
+                <IconToggleableDisclosure open={tokenSetsVisible} />
               </Box>
             </StyledButton>
           </Box>
           <TokenFilter />
+          <ThemeSelector />
           <Box
             css={{
               display: 'flex',
@@ -319,6 +309,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
                 ))}
                 <ToggleEmptyButton />
                 {showEditForm && <EditTokenFormModal resolvedTokens={resolvedTokens} />}
+                {manageThemesModalOpen && <ManageThemesModal />}
               </Box>
             )}
           </Box>

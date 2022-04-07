@@ -32,3 +32,7 @@ export * from './updateModeSelector';
 export * from './displayTypeSelector';
 export * from './collapsedSelector';
 export * from './uiDisabledSelector';
+export * from './themeIdentifiersSelector';
+export * from './activeThemeSelector';
+export * from './themesListSelector';
+export * from './manageThemesModalOpenSelector';

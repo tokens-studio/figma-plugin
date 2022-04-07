@@ -1,7 +1,7 @@
 import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu';
 import { styled } from '@/stitches.config';
 
-const itemStyles: Parameters<typeof styled>[1] = {
+const itemStyles = {
   fontSize: '$xsmall',
   padding: '$2 $3 $2 $6',
   borderRadius: '$contextMenuItem',

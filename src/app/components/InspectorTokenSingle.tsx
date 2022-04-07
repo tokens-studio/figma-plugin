@@ -6,11 +6,11 @@ import Checkbox from './Checkbox';
 import IconButton from './IconButton';
 import useTokens from '../store/useTokens';
 import IconLayers from '@/icons/layers.svg';
-import IconDisclosure from '@/icons/disclosure.svg';
 import InspectorResolvedToken from './InspectorResolvedToken';
 import { Dispatch } from '../store';
 import { SelectionGroup } from '@/types';
 import { inspectStateSelector } from '@/selectors';
+import { IconToggleableDisclosure } from './icons/IconToggleableDisclosure';
 
 export default function InspectorTokenSingle({ token, resolvedTokens }: { token: SelectionGroup, resolvedTokens: SingleToken[] }) {
   const { handleRemap, getTokenValue } = useTokens();
@@ -62,7 +62,7 @@ export default function InspectorTokenSingle({ token, resolvedTokens }: { token:
             tooltip="Change to another token"
             dataCy="button-token-remap"
             onClick={() => handleRemap(token.category, token.value)}
-            icon={<IconDisclosure />}
+            icon={<IconToggleableDisclosure />}
           />
         </Box>
       </Box>
