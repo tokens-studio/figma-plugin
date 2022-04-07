@@ -1,7 +1,7 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { Resources } from '@gitbeaker/core';
 import { Gitlab } from '@gitbeaker/browser';
-import { Dispatch, RootState } from '@/app/store';
+import { Dispatch } from '@/app/store';
 import { MessageToPluginTypes } from '@/types/messages';
 import convertTokensToObject from '@/utils/convertTokensToObject';
 import useConfirm from '@/app/hooks/useConfirm';
@@ -11,7 +11,6 @@ import { ContextObject } from '@/types/api';
 import { notifyToUI, postToFigma } from '../../../plugin/notifiers';
 import { FeatureFlags } from '@/utils/featureFlags';
 import { AnyTokenSet, TokenValues } from '@/types/tokens';
-import { decodeBase64 } from '@/utils/string';
 import { featureFlagsSelector, localApiStateSelector, tokensSelector } from '@/selectors';
 
 type TokenSets = {
@@ -20,7 +19,7 @@ type TokenSets = {
 
 /** Returns a URL to a page where the user can create a pull request with a given branch */
 export function getCreatePullRequestUrl(id: string, branchName: string) {
-  return `https://github.com/${id}/compare/${branchName}?expand=1`;
+  return `https://gitlab.com/${id}/compare/${branchName}?expand=1`;
 }
 
 const getGitlabOptions = (context: ContextObject) => {
@@ -104,7 +103,7 @@ export const readContents = async ({
     const { filePath, branch } = context;
     const trees = await checkTreeInPath({ api, projectId, filePath });
     const fileContents: Array<{ name: string; data: string }> = [];
-    if (trees.length > 0) {
+    if (trees.length > 0 && opts.multiFile) {
       await Promise.all(
         trees
           .filter((tree) => tree.name?.endsWith('.json'))
@@ -406,7 +405,6 @@ export function useGitLab() {
     let { raw: rawTokenObj } = getTokenObj();
 
     const data = await syncTokensWithGitLab(context);
-
     if (data) {
       postToFigma({
         type: MessageToPluginTypes.CREDENTIALS,
