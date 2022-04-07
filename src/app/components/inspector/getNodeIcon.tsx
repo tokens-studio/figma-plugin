@@ -52,7 +52,7 @@ function getNodeIcon(type: NodeType) {
           display: 'flex',
           alignItems: 'center',
           svg: {
-            fill: '#fff',
+            fill: '$contextMenuForeground',
           },
         }}
       >

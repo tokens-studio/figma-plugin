@@ -13,15 +13,16 @@ const CONTAINER_PADDING = 8;
 export default function TokenNodes({ nodes }: { nodes: NodeInfo[] }) {
   function getNode({ id, name, type }: NodeInfo) {
     return (
-      <DropdownMenu.Item key={id} onClick={() => goToNodeId(id)}>
+      <DropdownMenu.Item key={id} onSelect={() => goToNodeId(id)}>
         <Box
           css={{
             display: 'flex',
-            color: '#fff',
+            color: '$contextMenuForeground',
             cursor: 'pointer',
             padding: '$1 $4',
             '&:hover': {
               backgroundColor: '$interaction',
+              color: '$onInteraction',
             },
           }}
         >
@@ -69,18 +70,18 @@ export default function TokenNodes({ nodes }: { nodes: NodeInfo[] }) {
               alignItems: 'center',
               justifyContent: 'center',
               padding: '$2 $3',
-              borderRadius: '6px',
+              borderRadius: '$default',
               cursor: 'pointer',
               transition: 'background 200ms ease',
               '&:hover': {
-                background: 'rgba(196, 196, 196, 0.15)',
+                background: '$bgSubtle',
               },
             }}
           >
             <Box css={{ color: '$fgSubtle', marginRight: '$3' }}>
               <IconLayers />
             </Box>
-            <Box css={{ color: '#575757' }}>{nodes.length}</Box>
+            <Box css={{ color: '$textMuted' }}>{nodes.length}</Box>
           </Box>
         </DropdownMenu.Trigger>
         {dropdownContent}
