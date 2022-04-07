@@ -41,15 +41,29 @@ const createBranch = async ({
 } : { api: Resources.Gitlab, projectId: number, branch: string, from: string }) => api.Branches.create(projectId, branch, from);
 
 const getProjectId = async ({ api, owner, repo } : { api: Resources.Gitlab, owner: string, repo: string }) => {
+  const users = await api.Users.username(owner);
+
+  if (Array.isArray(users) && users.length > 0) {
+    const projectsInPerson = await api.Users.projects(users[0].id);
+    const project = projectsInPerson.filter((p) => p.path === repo)[0];
+    return project && project.id;
+  }
   const projectsInGroup = await api.Groups.projects(owner);
   const project = projectsInGroup.filter((p) => p.path === repo)[0];
-
   return project && project.id;
 };
 
 const getGroupProjectId = async ({ api, owner, repo } : { api: Resources.Gitlab, owner: string, repo: string }) => {
-  const projectsInGroup = await api.Groups.projects(owner);
-  const project = projectsInGroup.filter((p) => p.path === repo)[0];
+  const users = await api.Users.username(owner);
+  let project;
+
+  if (Array.isArray(users) && users.length > 0) {
+    const projectsInPerson = await api.Users.projects(users[0].id);
+    project = projectsInPerson.filter((p) => p.path === repo)[0];
+  } else {
+    const projectsInGroup = await api.Groups.projects(owner);
+    project = projectsInGroup.filter((p) => p.path === repo)[0];
+  }
 
   return { projectId: project && project.id, groupId: project && project.namespace.id };
 };
