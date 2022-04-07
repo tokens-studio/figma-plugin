@@ -42,14 +42,14 @@ const createBranch = async ({
 
 const getProjectId = async ({ api, owner, repo } : { api: Resources.Gitlab, owner: string, repo: string }) => {
   const projectsInGroup = await api.Groups.projects(owner);
-  const project = projectsInGroup.filter((p) => p.name === repo)[0];
+  const project = projectsInGroup.filter((p) => p.path === repo)[0];
 
   return project && project.id;
 };
 
 const getGroupProjectId = async ({ api, owner, repo } : { api: Resources.Gitlab, owner: string, repo: string }) => {
   const projectsInGroup = await api.Groups.projects(owner);
-  const project = projectsInGroup.filter((p) => p.name === repo)[0];
+  const project = projectsInGroup.filter((p) => p.path === repo)[0];
 
   return { projectId: project && project.id, groupId: project && project.namespace.id };
 };
