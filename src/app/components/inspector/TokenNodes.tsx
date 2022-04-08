@@ -35,7 +35,15 @@ export default function TokenNodes({ nodes }: { nodes: NodeInfo[] }) {
           }}
         >
           {getNodeIcon(type)}
-          <span>{name}</span>
+          <Box
+            css={{
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+            }}
+          >
+            {name}
+          </Box>
         </Box>
       </DropdownMenu.Item>
     );
@@ -46,7 +54,7 @@ export default function TokenNodes({ nodes }: { nodes: NodeInfo[] }) {
       <DropdownMenu.Arrow offset={14} />
       <Box
         css={{
-          minWidth: '164px',
+          width: '164px',
           background: '$contextMenuBackground',
           borderRadius: '$contextMenu',
           padding: '$2 0',
