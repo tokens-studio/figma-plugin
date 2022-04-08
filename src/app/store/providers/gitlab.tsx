@@ -217,7 +217,14 @@ const createFiles = (
       context.branch,
       files[path],
       context.commitMessage || 'Commit from Figma',
-    )),
+    ))
+      .reduce((acc, cur, i) => {
+        acc.push(cur);
+        if (i !== 0) {
+          acc.push(Promise.delay(1000));
+        }
+        return acc;
+      }, []),
   );
 };
 
