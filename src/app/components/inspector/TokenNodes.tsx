@@ -41,6 +41,7 @@ export default function TokenNodes({ nodes }: { nodes: NodeInfo[] }) {
               overflow: 'hidden',
               textOverflow: 'ellipsis',
             }}
+            title={name}
           >
             {name}
           </Box>
