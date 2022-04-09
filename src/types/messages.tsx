@@ -8,7 +8,7 @@ import { NodeTokenRefMap } from './NodeTokenRefMap';
 import { UpdateMode } from './state';
 import { SelectionGroup } from './SelectionGroup';
 import { SelectionValue } from './SelectionValue';
-import { AnyTokenList, AnyTokenSet } from './tokens';
+import { AnyTokenList, AnyTokenSet, TokenStore } from './tokens';
 import { PullStyleOptions } from './PullStylesOptions';
 
 export enum MessageFromPluginTypes {
@@ -84,8 +84,7 @@ export type RemoteCommentsFromPluginMessage = {
 };
 export type TokenValuesFromPluginMessage = {
   type: MessageFromPluginTypes.TOKEN_VALUES;
-  values: Record<string, AnyTokenList>;
-  usedTokenSet?: string[] | null;
+  values: TokenStore;
 };
 export type ReceivedStorageTypeFromPluginMessage = {
   type: MessageFromPluginTypes.RECEIVED_STORAGE_TYPE;

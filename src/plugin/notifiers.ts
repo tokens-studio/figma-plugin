@@ -9,7 +9,7 @@ import {
   UserIdFromPluginMessage,
 } from '@/types/messages';
 import store from './store';
-import { AnyTokenList } from '@/types/tokens';
+import { AnyTokenList, TokenStore } from '@/types/tokens';
 import { SelectionGroup } from '@/types/SelectionGroup';
 import { SelectionValue } from '@/types/SelectionValue';
 
@@ -118,8 +118,8 @@ export function notifyRemoteComponents({ nodes, remotes }: Data) {
   store.remoteComponents.clear();
 }
 
-export function notifyTokenValues({ values, usedTokenSet }: { values: Record<string, AnyTokenList>, usedTokenSet?: string[] | null }) {
-  postToUI({ type: MessageFromPluginTypes.TOKEN_VALUES, values, usedTokenSet });
+export function notifyTokenValues(values: TokenStore) {
+  postToUI({ type: MessageFromPluginTypes.TOKEN_VALUES, values });
 }
 
 export function notifyStorageType(storageType: StorageType) {

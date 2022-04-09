@@ -62,9 +62,9 @@ export function Initiator() {
           case MessageFromPluginTypes.REMOTE_COMPONENTS:
             break;
           case MessageFromPluginTypes.TOKEN_VALUES: {
-            const { values, usedTokenSet } = pluginMessage;
+            const { values } = pluginMessage;
             if (values) {
-              dispatch.tokenState.setTokenData({ values, usedTokenSet });
+              dispatch.tokenState.setTokenData(values);
               dispatch.uiState.setActiveTab('tokens');
             }
             break;

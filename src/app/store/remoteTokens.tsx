@@ -23,7 +23,7 @@ export default function useRemoteTokens() {
   } = useGitHub();
   const { pullTokensFromURL } = useURL();
 
-  const pullTokens = async ({ context = api, featureFlags, usedTokenSet }: { context?: ContextObject, featureFlags?: FeatureFlags, usedTokenSet?: string[] }) => {
+  const pullTokens = async ({ context = api, featureFlags, usedTokenSet }: { context?: ContextObject, featureFlags?: FeatureFlags, usedTokenSet?: string[] | null }) => {
     track('pullTokens', { provider: context.provider });
 
     dispatch.uiState.startJob({
