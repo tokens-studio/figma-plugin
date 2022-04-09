@@ -142,7 +142,7 @@ export const TokenButton: React.FC<Props> = ({
       >
         <TokenTooltip token={token}>
           <button
-            className="w-full h-full relativeƒ"
+            className="w-full h-full relative"
             type="button"
             onClick={handleTokenClick}
           >
