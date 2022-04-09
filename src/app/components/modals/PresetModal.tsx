@@ -4,6 +4,7 @@ import { Dispatch } from '@/app/store';
 import Heading from '../Heading';
 import Button from '../Button';
 import Modal from '../Modal';
+import Stack from '../Stack';
 
 type Props = {
   onClose: () => void
@@ -19,8 +20,8 @@ export default function ExportModal({ onClose }: Props) {
 
   return (
     <Modal showClose isOpen close={onClose}>
-      <div className="flex justify-center flex-col text-center space-y-4">
-        <div className="space-y-2">
+      <Stack direction="column" justify="center" gap={4} css={{ textAlign: 'center' }}>
+        <Stack direction="column" gap={2}>
           <Heading>Load a preset</Heading>
           <p className="text-xs text-gray-600">
             Override your current tokens by applying a preset. Want your preset featured here? Submit it via
@@ -37,8 +38,8 @@ export default function ExportModal({ onClose }: Props) {
           <Button variant="primary" onClick={handleSetDefault}>
             Apply default preset
           </Button>
-        </div>
-      </div>
+        </Stack>
+      </Stack>
     </Modal>
   );
 }

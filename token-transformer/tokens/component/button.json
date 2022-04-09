@@ -1,0 +1,12 @@
+{
+  "button": {
+    "background": {
+      "value": "{colors.accent}",
+      "type": "color"
+    },
+    "text": {
+      "value": "{colors.on-accent}",
+      "type": "color"
+    }
+  }
+}

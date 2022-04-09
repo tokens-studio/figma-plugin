@@ -10,6 +10,8 @@ import {
 } from '@/types/messages';
 import store from './store';
 import { AnyTokenList } from '@/types/tokens';
+import { SelectionGroup } from '@/types/SelectionGroup';
+import { SelectionValue } from '@/types/SelectionValue';
 
 export function postToFigma(props: PostToFigmaMessage) {
   parent.postMessage(

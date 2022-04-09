@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { track } from '../../utils/analytics';
 
 type ButtonProps = {

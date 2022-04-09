@@ -5,7 +5,7 @@
 
 <a href="https://www.producthunt.com/posts/figma-design-tokens?utm_source=badge-featured&utm_medium=badge&utm_souce=badge-figma-design-tokens" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=217712&theme=light" alt="Figma Design Tokens - Making design tokens a single source of truth for Figma. | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
 
-Figma Tokens is a Figma plugin allowing you to define and use design tokens in Figma. It allows you to set and create color or typography styles in a granular way by extracting atomic decisions to tokens. Also, it allows you to define reusable values for spacing which you can apply on Auto Layout layers, or set border radious tokens on rectangles that update whenever your tokens change. Think of it like Styles for everything.
+Figma Tokens is a plugin for Figma allowing you to define and use design tokens in Figma. You can store your design tokens in JSON, sync them with a sync provider such as GitHub and define tokens even for properties that have no native support yet in Figma, such as borderRadius or spacing. You can create color and typography tokens in a granular way by extracting atomic decisions to tokens. You can also define aliases for every token, so that you can reuse your decisions. You can define and apply spacing tokens, allowing you to set the Auto Layout properties in Figma automatically. Think of it like Styles for everything.
 
 # Documentation
 https://docs.tokens.studio/
@@ -14,7 +14,14 @@ https://docs.tokens.studio/
 https://github.com/users/six7/projects/4/views/4
 
 # Slack Channel
-I'm currently setting up a Figma Tokens Slack channel so the community can exchange ideas, best practices or simply ask a question. Want to join? Let me know by sending me a [DM on twitter](https://www.twitter.com/six7) and I'll send you the invite.
+There's a Slack channel where the community can exchange ideas, best practices or simply ask a question. Want to join? Let me know by sending me a [DM on twitter](https://www.twitter.com/six7) and I'll send you the invite.
+
+# Sponsors
+| <a href="https://zed.dev/" target="_blank" style="display: block; text-align: center;"><img src="sponsors/zed_logo.png" style="display: block; width: 75px; height: auto; margin-bottom: 4px" alt="Zed Logo"/></a> |
+| --- |
+| <a href="https://zed.dev/" target="_blank" style="display: block; text-align: center;">zed.dev</a> |
+
+Is your company using Figma Tokens? Consider [sponsoring the project](https://github.com/sponsors/six7) so we can spend time and resources on it!
 
 # How should I use this plugin?
 There's 2 ways how you could use the plugin: Only use it to create or update your Styles but not apply any tokens with it, which would allow you to use features such as atomic type decisions, aliases and theme sets for managing styles (this is really powerful in combination with Figma's Swap library feature). Or you could use the plugin to apply tokens with it, which would give you style-like functionality for things like border radius or spacings.

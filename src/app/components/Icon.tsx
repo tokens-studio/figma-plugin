@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 
 import IconEdit from './icons/IconEdit';
 import IconAdd from './icons/IconAdd';
