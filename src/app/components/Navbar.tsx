@@ -10,7 +10,13 @@ import { Dispatch } from '../store';
 import Box from './Box';
 import { styled } from '@/stitches.config';
 import {
-  activeTabSelector, editProhibitedSelector, lastSyncedStateSelector, projectURLSelector, storageTypeSelector, tokensSelector, usedTokenSetSelector,
+  activeTabSelector,
+  editProhibitedSelector,
+  lastSyncedStateSelector,
+  projectURLSelector,
+  storageTypeSelector,
+  tokensSelector,
+  usedTokenSetSelector,
 } from '@/selectors';
 import { Tabs } from '@/constants/Tabs';
 import Stack from './Stack';
@@ -36,8 +42,8 @@ const StyledButton = styled('button', {
 });
 
 type Props = {
-  name: Tabs
-  label: string
+  name: Tabs;
+  label: string;
 };
 
 function TabButton({ name, label }: Props) {

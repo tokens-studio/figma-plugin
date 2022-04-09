@@ -200,7 +200,7 @@ export function TokenSetItem({
   const controls = useDragControls();
 
   return (
-    <ConditionalReorderWrapper dataTestId={`token-set-${item.path}`} canReorder={canReorder} item={item} controls={controls} onReorder={() => onReorder()}>
+    <ConditionalReorderWrapper canReorder={canReorder} item={item} controls={controls} onReorder={() => onReorder()}>
       <StyledWrapper>
         {item.type === 'folder' ? (
           <ChevronButton
