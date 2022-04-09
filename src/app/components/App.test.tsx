@@ -1,7 +1,5 @@
 import React from 'react';
-import {
-  render, fireEvent, resetStore, getByTestId,
-} from '../../../tests/config/setupTest';
+import { render, fireEvent, resetStore } from '../../../tests/config/setupTest';
 import App from './App';
 
 describe('App', () => {
