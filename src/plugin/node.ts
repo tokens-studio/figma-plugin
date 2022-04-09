@@ -1,7 +1,7 @@
 import omit from 'just-omit';
 import store from './store';
 import setValuesOnNode from './setValuesOnNode';
-import { TokenValues } from '../types/tokens';
+import { TokenStore, TokenValues } from '../types/tokens';
 import { ContextObject, StorageProviderType, StorageType } from '../types/api';
 import { isSingleToken } from '../app/components/utils';
 import * as pjs from '../../package.json';
@@ -49,16 +49,11 @@ export function setTokensOnDocument(tokens, updatedAt: string, usedTokenSet: str
   tokensSharedDataHandler.set(figma.root, SharedPluginDataKeys.tokens.usedTokenSet, JSON.stringify(usedTokenSet));
 }
 
-export function getTokenData(): { values: TokenValues; updatedAt: string; version: string, usedTokenSet?: string[] } | null {
+export function getTokenData(): TokenStore | null {
   try {
     const values = tokensSharedDataHandler.get(figma.root, SharedPluginDataKeys.tokens.values);
     const version = tokensSharedDataHandler.get(figma.root, SharedPluginDataKeys.tokens.version);
     const updatedAt = tokensSharedDataHandler.get(figma.root, SharedPluginDataKeys.tokens.updatedAt);
-    const usedTokenSet = tokensSharedDataHandler.get(figma.root, SharedPluginDataKeys.tokens.usedTokenSet);
-    let parsedUsedTokenSet;
-    if (usedTokenSet) {
-      parsedUsedTokenSet = JSON.parse(usedTokenSet);
-    }
     if (values) {
       const parsedValues = JSON.parse(values);
       if (Object.keys(parsedValues).length > 0) {
@@ -70,7 +65,6 @@ export function getTokenData(): { values: TokenValues; updatedAt: string; versio
           values: tokenObject as TokenValues,
           updatedAt,
           version,
-          usedTokenSet: parsedUsedTokenSet,
         };
       }
     }

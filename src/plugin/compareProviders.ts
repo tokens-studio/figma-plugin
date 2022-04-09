@@ -1,8 +1,11 @@
+import { StoredCredentials } from '@/types/api';
 import isSameCredentials from '@/utils/isSameCredentials';
 import { MessageFromPluginTypes } from '../types/messages';
 import { notifyTokenValues } from './notifiers';
 
-export default function compareProvidersWithStored(providers, storageType, featureFlagId?: string | null) {
+export default function compareProvidersWithStored({
+  providers, storageType, featureFlagId, usedTokenSet,
+}: { providers: string | null, storageType: StoredCredentials, featureFlagId: string, usedTokenSet: string[] | null }) {
   if (providers) {
     const parsedProviders = JSON.parse(providers);
 
@@ -14,6 +17,7 @@ export default function compareProvidersWithStored(providers, storageType, featu
         status: true,
         credentials: matchingSet,
         featureFlagId,
+        usedTokenSet,
       });
       return;
     }

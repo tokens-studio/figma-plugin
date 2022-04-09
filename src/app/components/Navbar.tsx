@@ -67,7 +67,9 @@ const transformProviderName = (provider) => {
 
 function Navbar() {
   const { projectURL, storageType } = useSelector((state: RootState) => state.uiState);
-  const { lastSyncedState, tokens, editProhibited } = useSelector((state: RootState) => state.tokenState);
+  const {
+    lastSyncedState, tokens, editProhibited, usedTokenSet,
+  } = useSelector((state: RootState) => state.tokenState);
   const { pullTokens, pushTokens } = useRemoteTokens();
 
   const checkForChanges = () => {
@@ -122,7 +124,7 @@ function Navbar() {
             )}
 
             <Tooltip variant="right" label={`Pull from ${transformProviderName(storageType.provider)}`}>
-              <button onClick={() => pullTokens()} type="button" className="button button-ghost">
+              <button onClick={() => pullTokens({ usedTokenSet })} type="button" className="button button-ghost">
                 <Icon name="refresh" />
               </button>
             </Tooltip>

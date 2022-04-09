@@ -87,8 +87,8 @@ export type RemoteCommentsFromPluginMessage = {
 };
 export type TokenValuesFromPluginMessage = {
   type: MessageFromPluginTypes.TOKEN_VALUES;
-  values?: any;
-  usedTokenSet?: string[];
+  values?: Record<string, AnyTokenList>;
+  usedTokenSet?: string[] | null;
 };
 export type ReceivedStorageTypeFromPluginMessage = {
   type: MessageFromPluginTypes.RECEIVED_STORAGE_TYPE;
@@ -140,6 +140,7 @@ export type ApiCredentialsFromPluginMessage = {
     internalId?: string
   }
   featureFlagId: string
+  usedTokenSet: string[] | null
 };
 export type PostToUIMessage =
     | NoSelectionFromPluginMessage

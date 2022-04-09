@@ -37,6 +37,7 @@ import compareProvidersWithStored from './compareProviders';
 import { defaultNodeManager } from './NodeManager';
 import { defaultWorker } from './Worker';
 import { getFeatureFlags } from '@/utils/featureFlags';
+import { getUsedTokenSet } from '@/utils/getUsedTokenSet';
 
 let inspectDeep = false;
 let shouldSendSelectionValues = false;
@@ -74,6 +75,7 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
         const { currentUser } = figma;
         const settings = await getUISettings();
         const featureFlagId = await getFeatureFlags();
+        const usedTokenSet = await getUsedTokenSet();
         inspectDeep = settings.inspectDeep;
         const userId = await getUserId();
         const lastOpened = await getLastOpened();
@@ -94,12 +96,12 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
           case StorageProviderType.JSONBIN:
           case StorageProviderType.GITHUB:
           case StorageProviderType.URL: {
-            compareProvidersWithStored(apiProviders, storageType, featureFlagId);
+            compareProvidersWithStored(apiProviders, storageType, featureFlagId, usedTokenSet);
             break;
           }
           default: {
             const oldTokens = getTokenData();
-            notifyTokenValues(oldTokens);
+            notifyTokenValues({ ...oldTokens, usedTokenSet });
           }
         }
       } catch (err) {

@@ -9,7 +9,7 @@ import {
   UserIdFromPluginMessage,
 } from '@/types/messages';
 import store from './store';
-import { SelectionGroup, SelectionValue } from '@/types/tokens';
+import { AnyTokenList } from '@/types/tokens';
 
 export function postToFigma(props: PostToFigmaMessage) {
   parent.postMessage(
@@ -116,8 +116,8 @@ export function notifyRemoteComponents({ nodes, remotes }: Data) {
   store.remoteComponents.clear();
 }
 
-export function notifyTokenValues(values = undefined) {
-  postToUI({ type: MessageFromPluginTypes.TOKEN_VALUES, values });
+export function notifyTokenValues({ values, usedTokenSet }: { values?: Record<string, AnyTokenList>, usedTokenSet: string[] | null }) {
+  postToUI({ type: MessageFromPluginTypes.TOKEN_VALUES, values, usedTokenSet });
 }
 
 export function notifyStorageType(storageType: StorageType) {

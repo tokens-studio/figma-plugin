@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { StorageProviderType } from '@/types/api';
+import { ContextObject, StorageProviderType } from '@/types/api';
 import { MessageToPluginTypes } from '@/types/messages';
 import { track } from '@/utils/analytics';
 import { postToFigma } from '../../plugin/notifiers';
@@ -22,7 +22,7 @@ export default function useRemoteTokens() {
   } = useGitHub();
   const { pullTokensFromURL } = useURL();
 
-  const pullTokens = async (context = api, featureFlags?: FeatureFlags) => {
+  const pullTokens = async ({ context = api, featureFlags, usedTokenSet }: { context?: ContextObject, featureFlags?: FeatureFlags, usedTokenSet?: string[] }) => {
     track('pullTokens', { provider: context.provider });
 
     dispatch.uiState.startJob({
@@ -51,7 +51,7 @@ export default function useRemoteTokens() {
 
     if (tokenValues) {
       dispatch.tokenState.setLastSyncedState(JSON.stringify(tokenValues.values, null, 2));
-      dispatch.tokenState.setTokenData(tokenValues);
+      dispatch.tokenState.setTokenData({ ...tokenValues, usedTokenSet });
       track('Launched with token sets', {
         count: Object.keys(tokenValues.values).length,
         setNames: Object.keys(tokenValues.values),
