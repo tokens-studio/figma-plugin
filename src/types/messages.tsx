@@ -84,7 +84,7 @@ export type RemoteCommentsFromPluginMessage = {
 };
 export type TokenValuesFromPluginMessage = {
   type: MessageFromPluginTypes.TOKEN_VALUES;
-  values?: Record<string, AnyTokenList>;
+  values: Record<string, AnyTokenList>;
   usedTokenSet?: string[] | null;
 };
 export type ReceivedStorageTypeFromPluginMessage = {

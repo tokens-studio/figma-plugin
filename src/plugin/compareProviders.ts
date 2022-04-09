@@ -7,12 +7,8 @@ export default function compareProvidersWithStored({
 }: { providers?: string | null, storageType: StorageType, featureFlagId?: string | null, usedTokenSet?: string[] | null }) {
   if (providers) {
     const parsedProviders = JSON.parse(providers);
-    console.log('[parsedProviders] matchingSet', parsedProviders);
-
     const matchingSet = parsedProviders.find((i) => isSameCredentials(i, storageType));
     if (matchingSet) {
-      console.log('[compareProvidersWithStored] matchingSet', matchingSet);
-
       // send a message to the UI with the credentials stored in the client
       figma.ui.postMessage({
         type: MessageFromPluginTypes.API_CREDENTIALS,

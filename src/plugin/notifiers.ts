@@ -119,8 +119,6 @@ export function notifyRemoteComponents({ nodes, remotes }: Data) {
 }
 
 export function notifyTokenValues({ values, usedTokenSet }: { values: Record<string, AnyTokenList>, usedTokenSet?: string[] | null }) {
-  console.log('values', values, usedTokenSet);
-
   postToUI({ type: MessageFromPluginTypes.TOKEN_VALUES, values, usedTokenSet });
 }
 

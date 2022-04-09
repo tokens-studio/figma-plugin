@@ -63,7 +63,6 @@ export function Initiator() {
             break;
           case MessageFromPluginTypes.TOKEN_VALUES: {
             const { values, usedTokenSet } = pluginMessage;
-            console.log('Values', values);
             if (values) {
               dispatch.tokenState.setTokenData({ values, usedTokenSet });
               dispatch.uiState.setActiveTab('tokens');

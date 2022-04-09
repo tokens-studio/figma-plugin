@@ -103,9 +103,9 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
           }
           default: {
             const oldTokens = getTokenData();
-            console.log('Old tokens', oldTokens);
-
-            notifyTokenValues({ ...oldTokens, usedTokenSet });
+            if (oldTokens) {
+              notifyTokenValues({ ...oldTokens, usedTokenSet });
+            }
           }
         }
       } catch (err) {
