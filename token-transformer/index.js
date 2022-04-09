@@ -52,6 +52,11 @@ const argv = yargs(hideBin(process.argv))
                 type: 'boolean',
                 describe: 'Preserve the raw, unprocessed value in the output tokens',
                 default: false
+            })
+            .option('throwErrorWhenNotResolved', {
+                type: 'boolean',
+                describe: 'Throw error when failed to resolve token',
+                default: false
             });
     })
 
@@ -110,14 +115,15 @@ const getTokens = async (input) => {
  * Reads the given input file, transforms all tokens and writes them to the output file
  */
 const transform = async () => {
-    const {input, output, sets, excludes, expandTypography, expandShadow, preserveRawValue} = argv;
+    const {input, output, sets, excludes, expandTypography, expandShadow, preserveRawValue, throwErrorWhenNotResolved} = argv;
 
     if (fs.existsSync(argv.input)) {
         const tokens = await getTokens(input)
         const options = {
             expandTypography,
             expandShadow,
-            preserveRawValue
+            preserveRawValue,
+            throwErrorWhenNotResolved
         };
 
         log(`transforming tokens from input: ${input}`);

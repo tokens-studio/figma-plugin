@@ -1,12 +1,21 @@
 import set from 'set-value';
 import { appendTypeToToken } from '@/app/components/createTokenObj';
 import { TransformerOptions } from './types';
-import { expand } from '../app/components/utils';
+import { expand } from '@/utils/expand';
+import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
 
-export default function convertTokensToGroupedObject(tokens, excludedSets, options: TransformerOptions) {
+// @TODO fix tokenObj
+export default function convertTokensToGroupedObject(
+  tokens: ResolveTokenValuesResult[],
+  excludedSets: string[],
+  options: TransformerOptions,
+) {
   let tokenObj = {};
   tokenObj = tokens.reduce((acc, token) => {
-    if (excludedSets.includes(token.internal__Parent)) {
+    if (options.throwErrorWhenNotResolved && token.failedToResolve) {
+      throw new Error(`ERROR: failed to resolve token "${token.name}"`);
+    }
+    if (token.internal__Parent && excludedSets.includes(token.internal__Parent)) {
       return acc;
     }
     const obj = acc || {};

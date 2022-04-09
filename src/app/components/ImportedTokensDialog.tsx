@@ -1,12 +1,14 @@
-import * as React from 'react';
+import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Heading from './Heading';
 import Button from './Button';
 import Modal from './Modal';
-import { Dispatch, RootState } from '../store';
+import { Dispatch } from '../store';
 import useManageTokens from '../store/useManageTokens';
 import Tooltip from './Tooltip';
 import Icon from './Icon';
+import { activeTokenSetSelector, importedTokensSelector } from '@/selectors';
+import Stack from './Stack';
 
 function ImportToken({
   name,
@@ -28,10 +30,10 @@ function ImportToken({
   updateToken: any;
 }) {
   return (
-    <div className="flex justify-between px-4 py-2">
-      <div className="space-y-1">
+    <Stack direction="row" justify="between" css={{ padding: '$2 $4' }}>
+      <Stack direction="column" gap={1}>
         <div className="font-semibold text-xs">{name}</div>
-        <div className="flex space-x-1 items-center">
+        <Stack direction="row" align="center" gap={1}>
           <div className="font-bold text-xxs border border-success-muted bg-success-subtle text-success p-1 rounded break-all">
             {typeof value === 'object' ? JSON.stringify(value) : value}
           </div>
@@ -40,7 +42,7 @@ function ImportToken({
               {typeof oldValue === 'object' ? JSON.stringify(oldValue) : oldValue}
             </div>
           ) : null}
-        </div>
+        </Stack>
         {(description || oldDescription) && (
         <div className="text-xxs">
           {description}
@@ -48,8 +50,8 @@ function ImportToken({
           {oldDescription ? ` (before: ${oldDescription})` : ''}
         </div>
         )}
-      </div>
-      <div className="flex flex-row items-center space-x-1">
+      </Stack>
+      <Stack direction="row" align="center" gap={1}>
         <Tooltip variant="right" label={updateAction}>
           <button className="button button-ghost" type="button" onClick={updateToken}>
             <Icon name="add" />
@@ -60,15 +62,16 @@ function ImportToken({
             <Icon name="trash" />
           </button>
         </Tooltip>
-      </div>
-    </div>
+      </Stack>
+    </Stack>
   );
 }
 
 export default function ImportedTokensDialog() {
   const dispatch = useDispatch<Dispatch>();
   const { editSingleToken, createSingleToken } = useManageTokens();
-  const { importedTokens, activeTokenSet } = useSelector((state: RootState) => state.tokenState);
+  const activeTokenSet = useSelector(activeTokenSetSelector);
+  const importedTokens = useSelector(importedTokensSelector);
   const [newTokens, setNewTokens] = React.useState(importedTokens.newTokens);
   const [updatedTokens, setUpdatedTokens] = React.useState(importedTokens.updatedTokens);
 
@@ -165,15 +168,22 @@ export default function ImportedTokensDialog() {
       isOpen={newTokens.length > 0 || updatedTokens.length > 0}
       close={handleClose}
     >
-      <div className="space-y-8">
+      <Stack direction="column" gap={4}>
         {newTokens.length > 0 && (
         <div>
-          <div className="flex justify-between items-center px-4 pb-2">
+          <Stack
+            direction="row"
+            justify="between"
+            align="center"
+            css={{
+              marginBottom: '$4', paddingLeft: '$4', paddingRight: '$4', paddingBottom: '$2',
+            }}
+          >
             <Heading>New Tokens</Heading>
             <Button variant="secondary" id="button-import-create-all" onClick={handleCreateNewClick}>
               Create all
             </Button>
-          </div>
+          </Stack>
           <div className="space-y-2 border-t border-gray-300">
             {newTokens.map((token) => (
               <ImportToken
@@ -191,12 +201,19 @@ export default function ImportedTokensDialog() {
         )}
         {updatedTokens.length > 0 && (
         <div>
-          <div className="flex justify-between items-center px-4 pb-2">
+          <Stack
+            direction="row"
+            justify="between"
+            align="center"
+            css={{
+              marginBottom: '$4', paddingLeft: '$4', paddingRight: '$4', paddingBottom: '$2',
+            }}
+          >
             <Heading>Existing Tokens</Heading>
             <Button variant="secondary" id="button-import-update-all" onClick={handleUpdateClick}>
               Update all
             </Button>
-          </div>
+          </Stack>
           <div className="space-y-2 border-t border-gray-300">
             {updatedTokens.map((token) => (
               <ImportToken
@@ -222,7 +239,7 @@ export default function ImportedTokensDialog() {
             Import all
           </Button>
         </div>
-      </div>
+      </Stack>
     </Modal>
   );
 }

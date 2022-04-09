@@ -1,17 +1,26 @@
 import { useDispatch, useSelector } from 'react-redux';
-import * as React from 'react';
+import React from 'react';
 import { CheckIcon } from '@radix-ui/react-icons';
+import isEqual from 'lodash.isequal';
 import {
-  DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuItemIndicator, DropdownMenuSeparator, DropdownMenuCheckboxItem,
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuItemIndicator,
+  DropdownMenuSeparator,
+  DropdownMenuCheckboxItem,
 } from './DropdownMenu';
 import { UpdateMode } from '@/types/state';
-import { Dispatch, RootState } from '../store';
+import { Dispatch } from '../store';
 import IconChevronDown from './icons/IconChevronDown';
+import { settingsStateSelector } from '@/selectors';
 
 export default function ApplySelector() {
   const {
     updateMode, updateRemote, updateOnChange, updateStyles,
-  } = useSelector((state: RootState) => state.settings);
+  } = useSelector(settingsStateSelector, isEqual);
 
   const {
     setUpdateMode, setUpdateOnChange, setUpdateRemote, setUpdateStyles,

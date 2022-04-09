@@ -1,26 +1,30 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
-import * as React from 'react';
+import React from 'react';
 import { useSelector } from 'react-redux';
 import isSameCredentials from '@/utils/isSameCredentials';
 import Button from './Button';
 import useRemoteTokens from '../store/remoteTokens';
-import { RootState } from '../store';
+import { storageTypeSelector } from '@/selectors';
+
+// @TODO typings
 
 const StorageItem = ({ item, onEdit = null }) => {
-  const { storageType } = useSelector((state: RootState) => state.uiState);
+  const storageType = useSelector(storageTypeSelector);
   const {
     provider, id, branch, name,
   } = item;
 
   const { restoreStoredProvider, deleteProvider } = useRemoteTokens();
 
-  const isActive = () => isSameCredentials(item, storageType);
+  const isActive = React.useCallback(() => (
+    isSameCredentials(item, storageType)
+  ), [item, storageType]);
 
   return (
     <div
       data-cy={`storageitem-${provider}-${id}`}
       key={`${provider}-${id}`}
-      className={`border text-left flex flex-row justify-between rounded p-2 ${
+      className={`border text-left flex w-full flex-row justify-between rounded p-2 ${
         isActive() ? 'bg-blue-100 bg-opacity-50 border-blue-400' : 'hover:border-blue-300 border-gray-300'
       }`}
     >

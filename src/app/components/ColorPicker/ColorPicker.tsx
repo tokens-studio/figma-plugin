@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { RgbaColorPicker, RgbaColor } from 'react-colorful';
 import { parseToRgb, parseToHsl, toColorString } from 'polished';
 import Input from '../Input';

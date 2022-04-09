@@ -1,79 +1,80 @@
-import * as React from 'react';
+import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { DndProvider } from 'react-dnd';
-import { SingleToken } from '@/types/tokens';
+import { TokenTypeSchema } from '@/types/tokens';
 import Heading from './Heading';
 import Icon from './Icon';
-import TokenTree from './TokenTree';
+import TokenTree, { ShowFormOptions, ShowNewFormOptions } from './TokenTree';
 import Tooltip from './Tooltip';
-import { Dispatch, RootState } from '../store';
+import { Dispatch } from '../store';
+import { TokenTypes } from '@/constants/TokenTypes';
+import {
+  collapsedSelector, displayTypeSelector, editProhibitedSelector, showEmptyGroupsSelector,
+} from '@/selectors';
 
-function TokenListing({
+type Props = Omit<TokenTypeSchema, 'type'> & {
+  tokenKey: string;
+  tokenType: TokenTypes;
+};
+
+const TokenListing: React.FC<Props> = ({
   tokenKey,
   label,
   schema,
   explainer = '',
   property,
-  tokenType = 'implicit',
+  tokenType = TokenTypes.IMPLICIT,
   values,
-  resolvedTokens,
-}: {
-  tokenKey: string;
-  label: string;
-  schema: {
-    value: object | string;
-    options: object | string;
-  };
-  explainer: string;
-  property: string;
-  tokenType: string;
-  values: object;
-  resolvedTokens: SingleToken[];
-}) {
-  const { editProhibited } = useSelector((state: RootState) => state.tokenState);
-  const { displayType, showEmptyGroups, collapsed } = useSelector((state: RootState) => state.uiState);
+}) => {
+  const editProhibited = useSelector(editProhibitedSelector);
+  const displayType = useSelector(displayTypeSelector);
+  const showEmptyGroups = useSelector(showEmptyGroupsSelector);
+  const collapsed = useSelector(collapsedSelector);
   const dispatch = useDispatch<Dispatch>();
 
-  const showDisplayToggle = tokenType === 'color';
+  const showDisplayToggle = React.useMemo(() => tokenType === TokenTypes.COLOR, [tokenType]);
 
   const [isIntCollapsed, setIntCollapsed] = React.useState(false);
 
-  const showForm = ({ token, name, isPristine = false }) => {
+  const showForm = React.useCallback(({ token, name, isPristine = false }: ShowFormOptions) => {
+    const tokenValue = token?.value ?? (typeof schema?.value === 'object' ? schema.value : '');
+
+    // @TODO fix these typings depending on usage
     dispatch.uiState.setShowEditForm(true);
     dispatch.uiState.setEditToken({
-      value: token.value ? token.value : typeof schema?.value === 'object' ? schema.value : '',
+      value: tokenValue,
+      type: tokenType,
       name,
       initialName: name,
       isPristine,
-      type: tokenType,
       explainer,
       property,
       schema: schema?.value,
       optionsSchema: schema?.options,
       options: {
-        description: token.description,
+        description: token?.description,
         type: tokenType,
       },
     });
-  };
+  }, [schema, tokenType, dispatch, explainer, property]);
 
-  const showNewForm = ({ name = '' }: { name?: string }) => {
-    showForm({ token: '', name, isPristine: true });
-  };
+  const showNewForm = React.useCallback(({ name = '' }: ShowNewFormOptions) => {
+    showForm({ token: null, name, isPristine: true });
+  }, [showForm]);
 
-  React.useEffect(() => {
-    setIntCollapsed(collapsed);
-  }, [collapsed]);
-
-  const handleSetIntCollapsed = (e) => {
+  const handleSetIntCollapsed = React.useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
     if (e.altKey) {
       dispatch.uiState.toggleCollapsed();
     } else {
       setIntCollapsed(!isIntCollapsed);
     }
-  };
+  }, [dispatch, isIntCollapsed]);
+
+  React.useEffect(() => {
+    setIntCollapsed(collapsed);
+  }, [collapsed]);
 
   if (!values && !showEmptyGroups) return null;
 
@@ -116,7 +117,7 @@ function TokenListing({
             </Tooltip>
           )}
 
-          <Tooltip label="Add a new token" variant="right">
+          <Tooltip label="Add a new token">
             <button
               disabled={editProhibited}
               data-cy="button-add-new-token"
@@ -144,13 +145,12 @@ function TokenListing({
               schema={schema}
               type={tokenType}
               displayType={displayType}
-              resolvedTokens={resolvedTokens}
             />
           </div>
         </DndProvider>
       )}
     </div>
   );
-}
+};
 
-export default TokenListing;
+export default React.memo(TokenListing);
