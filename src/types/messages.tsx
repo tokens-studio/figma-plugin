@@ -10,9 +10,6 @@ import { SelectionGroup } from './SelectionGroup';
 import { SelectionValue } from './SelectionValue';
 import { AnyTokenList, AnyTokenSet } from './tokens';
 import { PullStyleOptions } from './PullStylesOptions';
-// import {
-//   PullStyleTypes, SelectionGroup, SelectionValue, TokenArrayGroup, TokenGroup,
-// } from './tokens';
 
 export enum MessageFromPluginTypes {
   SELECTION = 'selection',
@@ -140,7 +137,7 @@ export type ApiCredentialsFromPluginMessage = {
     internalId?: string
   }
   featureFlagId: string
-  usedTokenSet: string[] | null
+  usedTokenSet?: string[] | null
 };
 export type PostToUIMessage =
     | NoSelectionFromPluginMessage

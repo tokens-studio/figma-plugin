@@ -10,7 +10,7 @@ import { Dispatch } from '../store';
 import Box from './Box';
 import { styled } from '@/stitches.config';
 import {
-  activeTabSelector, editProhibitedSelector, lastSyncedStateSelector, projectURLSelector, storageTypeSelector, tokensSelector,
+  activeTabSelector, editProhibitedSelector, lastSyncedStateSelector, projectURLSelector, storageTypeSelector, tokensSelector, usedTokenSetSelector,
 } from '@/selectors';
 import { Tabs } from '@/constants/Tabs';
 import Stack from './Stack';
@@ -81,6 +81,7 @@ function Navbar() {
   const tokens = useSelector(tokensSelector);
   const editProhibited = useSelector(editProhibitedSelector);
   const lastSyncedState = useSelector(lastSyncedStateSelector);
+  const usedTokenSet = useSelector(usedTokenSetSelector);
   const { pullTokens, pushTokens } = useRemoteTokens();
 
   const checkForChanges = React.useCallback(() => {

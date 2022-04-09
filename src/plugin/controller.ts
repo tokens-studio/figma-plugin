@@ -96,11 +96,15 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
           case StorageProviderType.JSONBIN:
           case StorageProviderType.GITHUB:
           case StorageProviderType.URL: {
-            compareProvidersWithStored(apiProviders, storageType, featureFlagId, usedTokenSet);
+            compareProvidersWithStored({
+              providers: apiProviders, storageType, featureFlagId, usedTokenSet,
+            });
             break;
           }
           default: {
             const oldTokens = getTokenData();
+            console.log('Old tokens', oldTokens);
+
             notifyTokenValues({ ...oldTokens, usedTokenSet });
           }
         }

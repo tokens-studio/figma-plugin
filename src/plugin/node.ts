@@ -1,7 +1,6 @@
 import omit from 'just-omit';
 import store from './store';
 import setValuesOnNode from './setValuesOnNode';
-import { TokenStore, TokenValues } from '../types/tokens';
 import { ContextObject, StorageProviderType, StorageType } from '../types/api';
 import * as pjs from '../../package.json';
 import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
