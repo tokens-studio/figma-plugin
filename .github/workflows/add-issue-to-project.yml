@@ -6,6 +6,24 @@ on:
       - opened
 
 jobs:
+  build:
+      runs-on: ubuntu-latest
+      steps:
+        - name: Login
+          uses: atlassian/gajira-login@master
+          env:
+            JIRA_BASE_URL: ${{ secrets.BASE_URL }}
+            JIRA_USER_EMAIL: ${{ secrets.USER_EMAIL }}
+            JIRA_API_TOKEN: ${{ secrets.A_ACCESS_TOKEN }}
+
+        - name: Add issue
+          uses: atlassian/gajira-create@v2.0.1
+          with:
+            project: FT
+            issuetype: Task
+            summary: "[GH]: ${{ github.event.issue.title }}"
+            description: "${{ github.event.issue.body }}\n\nReported in: ${{ github.event.issue.html_url }}"
+            fields: '{"labels": ["Triage", "from-GH"]}'
   add_to_project:
     runs-on: ubuntu-latest
 
