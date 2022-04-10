@@ -69,4 +69,24 @@ export const undoableActionDefinitions = [
   } as UndoableActionDefinition<null, AnyAction<true> & {
     type: 'tokenState/createToken'
   }>,
+  {
+    type: 'tokenState/duplicateToken',
+    getStateSnapshot: () => null,
+    redo: (dispatch, action) => {
+      dispatch({
+        type: 'tokenState/duplicateToken',
+        payload: action.payload,
+        meta: { silent: true },
+      });
+    },
+    undo: (dispatch, { payload }) => {
+      dispatch({
+        type: 'tokenState/deleteToken',
+        payload: { parent: payload.parent, path: `${payload.name}-copy` },
+        meta: { silent: true },
+      });
+    },
+  } as UndoableActionDefinition<null, AnyAction<true> & {
+    type: 'tokenState/duplicateToken'
+  }>,
 ] as UndoableActionDefinition[];
