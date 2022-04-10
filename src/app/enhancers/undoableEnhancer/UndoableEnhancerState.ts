@@ -1,15 +1,11 @@
 import EventEmitter from 'eventemitter3';
-import type { Delta } from 'jsondiffpatch';
 import type { AnyAction } from '@/types/redux';
 
 type EventTypes = 'actionsHistoryChanged' | 'actionsHistoryPointerChanged';
 
-type UndoableAction = {
+type UndoableAction<S = any> = {
   action: AnyAction<true>;
-  diff: {
-    undo: Delta;
-    redo: Delta;
-  };
+  snapshot: S;
 };
 
 type UndoableEnhancerStateType = {
