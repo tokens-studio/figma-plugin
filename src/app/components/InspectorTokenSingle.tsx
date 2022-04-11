@@ -5,14 +5,21 @@ import Box from './Box';
 import Checkbox from './Checkbox';
 import IconButton from './IconButton';
 import useTokens from '../store/useTokens';
-import IconLayers from '@/icons/layers.svg';
 import IconDisclosure from '@/icons/disclosure.svg';
 import InspectorResolvedToken from './InspectorResolvedToken';
 import { Dispatch } from '../store';
 import { SelectionGroup } from '@/types';
+import TokenNodes from './inspector/TokenNodes';
 import { inspectStateSelector } from '@/selectors';
 
-export default function InspectorTokenSingle({ token, resolvedTokens }: { token: SelectionGroup, resolvedTokens: SingleToken[] }) {
+
+export default function InspectorTokenSingle({
+  token,
+  resolvedTokens,
+}: {
+  token: SelectionGroup;
+  resolvedTokens: SingleToken[];
+}) {
   const { handleRemap, getTokenValue } = useTokens();
   const inspectState = useSelector(inspectStateSelector, shallowEqual);
   const dispatch = useDispatch<Dispatch>();
@@ -50,12 +57,13 @@ export default function InspectorTokenSingle({ token, resolvedTokens }: { token:
         />
         <InspectorResolvedToken token={mappedToken} />
 
-        <Box css={{
-          display: 'flex',
-          flexDirection: 'row',
-          alignItems: 'center',
-          gap: '$1',
-        }}
+        <Box
+          css={{
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: '$1',
+          }}
         >
           <Box css={{ fontSize: '$small' }}>{token.value}</Box>
           <IconButton
@@ -66,20 +74,7 @@ export default function InspectorTokenSingle({ token, resolvedTokens }: { token:
           />
         </Box>
       </Box>
-      <Box
-        css={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '$3',
-          fontWeight: '$bold',
-          fontSize: '$small',
-        }}
-      >
-        <Box css={{ color: '$fgSubtle' }}>
-          <IconLayers />
-        </Box>
-        {token.nodes.length}
-      </Box>
+      <TokenNodes nodes={token.nodes} />
     </Box>
   );
 }

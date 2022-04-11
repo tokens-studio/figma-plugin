@@ -1548,7 +1548,7 @@
     "@radix-ui/react-use-callback-ref" "0.1.0"
     "@radix-ui/react-use-escape-keydown" "0.1.0"
 
-"@radix-ui/react-dropdown-menu@^0.0.19":
+"@radix-ui/react-dropdown-menu@0.0.19":
   version "0.0.19"
   resolved "https://registry.yarnpkg.com/@radix-ui/react-dropdown-menu/-/react-dropdown-menu-0.0.19.tgz#fbc3106bcda65d3060b280f4af3a9c45324ab474"
   integrity sha512-7UhT6PIXl9fr8Ai9DkXMtxPNQFh8emrklgY5jcad9NHKWAztgfL6Fm+Ns0GEYUkd5OpJLEaIj/EUkwFM73SrGw==
