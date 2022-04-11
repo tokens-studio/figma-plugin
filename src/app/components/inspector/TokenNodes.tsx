@@ -3,11 +3,10 @@ import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { Crosshair2Icon } from '@radix-ui/react-icons';
 import Box from '../Box';
 import IconLayers from '@/icons/layers.svg';
-import getNodeIcon from './getNodeIcon';
-import { NodeInfo } from '@/types/NodeInfo';
-import { goToNodeId } from '@/utils/figma';
-import IconButton from '../IconButton';
 import { selectNodes } from '@/utils/figma/selectNodes';
+import { NodeInfo } from '@/types/NodeInfo';
+import TokenNode from './TokenNode';
+import IconButton from '../IconButton';
 
 const NODE_HEIGHT = 22;
 const VISIBLE_VIEWPORT_NODES = 10;
@@ -17,37 +16,6 @@ export default function TokenNodes({ nodes }: { nodes: NodeInfo[] }) {
   function selectAllNodes() {
     const nodeIds = nodes.map(({ id }) => id);
     selectNodes(nodeIds);
-  }
-
-  function getNode({ id, name, type }: NodeInfo) {
-    return (
-      <DropdownMenu.Item key={id} onSelect={() => goToNodeId(id)}>
-        <Box
-          css={{
-            display: 'flex',
-            color: '$contextMenuForeground',
-            cursor: 'pointer',
-            padding: '$1 $4',
-            '&:hover': {
-              backgroundColor: '$interaction',
-              color: '$onInteraction',
-            },
-          }}
-        >
-          {getNodeIcon(type)}
-          <Box
-            css={{
-              whiteSpace: 'nowrap',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-            }}
-            title={name}
-          >
-            {name}
-          </Box>
-        </Box>
-      </DropdownMenu.Item>
-    );
   }
 
   const dropdownContent = (
@@ -64,7 +32,9 @@ export default function TokenNodes({ nodes }: { nodes: NodeInfo[] }) {
         }}
         className={`content ${nodes.length > VISIBLE_VIEWPORT_NODES ? 'scroll-container' : null}`}
       >
-        {nodes.map(getNode)}
+        {nodes.map(({ id, name, type }) => (
+          <TokenNode key={id} id={id} name={name} type={type} />
+        ))}
       </Box>
     </DropdownMenu.Content>
   );

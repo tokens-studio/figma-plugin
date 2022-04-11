@@ -245,7 +245,7 @@ export type ChangedTabsToPluginMessage = {
   requiresSelectionValues: boolean;
 };
 
-export type SelectNodes = {
+export type SelectNodesPluginMessage = {
   type: MessageToPluginTypes.SELECT_NODES;
   ids: string[];
 };
@@ -269,4 +269,4 @@ export type PostToFigmaMessage =
   | RemapTokensToPluginMessage
   | RemoveTokensByValueToPluginMessage
   | ChangedTabsToPluginMessage
-  | SelectNodes;
+  | SelectNodesPluginMessage;
