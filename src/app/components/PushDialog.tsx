@@ -3,7 +3,8 @@ import { useSelector } from 'react-redux';
 import { localApiStateSelector } from '@/selectors';
 import { StorageProviderType } from '@/types/api';
 import usePushDialog from '../hooks/usePushDialog';
-import { getCreatePullRequestUrl } from '../store/providers/github';
+import { getGithubCreatePullRequestUrl } from '../store/providers/github';
+import { getGitlabCreatePullRequestUrl } from '../store/providers/gitlab';
 import Button from './Button';
 import Heading from './Heading';
 import Icon from './Icon';
@@ -23,6 +24,20 @@ function ConfirmDialog() {
       setBranch(localApiState.branch);
     }
   }, [showPushDialog, localApiState.branch]);
+
+  let redirectHref = '';
+  switch (localApiState.provider) {
+    case StorageProviderType.GITHUB:
+      redirectHref = getGithubCreatePullRequestUrl(localApiState.id, branch);
+      break;
+    case StorageProviderType.GITLAB:
+      const [owner, repo] = localApiState.id.split('/');
+      redirectHref = getGitlabCreatePullRequestUrl(owner, repo);
+      break;
+    default:
+      redirectHref = '';
+      break;
+  }
 
   switch (showPushDialog) {
     case 'initial': {
@@ -99,7 +114,7 @@ function ConfirmDialog() {
                 .
               </div>
             </div>
-            <Button variant="primary" href={getCreatePullRequestUrl(localApiState.id, branch)}>
+            <Button variant="primary" href={redirectHref}>
               Create Pull Request
             </Button>
           </div>

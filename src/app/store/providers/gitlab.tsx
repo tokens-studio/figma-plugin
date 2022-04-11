@@ -1,5 +1,6 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { Resources } from '@gitbeaker/core';
+import { CommitAction } from '@gitbeaker/core/dist/types/resources/Commits';
 import { Gitlab } from '@gitbeaker/browser';
 import { Dispatch } from '@/app/store';
 import { MessageToPluginTypes } from '@/types/messages';
@@ -18,8 +19,8 @@ type TokenSets = {
 };
 
 /** Returns a URL to a page where the user can create a pull request with a given branch */
-export function getCreatePullRequestUrl(id: string, branchName: string) {
-  return `https://gitlab.com/${id}/compare/${branchName}?expand=1`;
+export function getGitlabCreatePullRequestUrl(owner: string, repo: string) {
+  return `https://gitlab.com/${owner}/${repo}/-/merge_requests/new`;
 }
 
 const getGitlabOptions = (context: ContextObject) => {
@@ -35,10 +36,6 @@ const hasSameContent = (content: TokenValues, storedContent: string) => {
   const stringifiedContent = JSON.stringify(content.values, null, 2);
   return stringifiedContent === storedContent;
 };
-
-const createBranch = async ({
-  api, projectId, branch, from,
-} : { api: Resources.Gitlab, projectId: number, branch: string, from: string }) => api.Branches.create(projectId, branch, from);
 
 const getProjectId = async ({ api, owner, repo } : { api: Resources.Gitlab, owner: string, repo: string }) => {
   const users = await api.Users.username(owner);
@@ -186,12 +183,20 @@ enum GitLabAccessLevel {
 }
 
 const extractFiles = (filePath: string, tokenObj: TokenSets, opts: FeatureFlagOpts) => {
-  const files: { [key: string]: string } = {};
+  const files: CommitAction[] = [];
   if (filePath.endsWith('.json')) {
-    files[filePath] = JSON.stringify(tokenObj, null, 2);
+    files.push({
+      action: 'create',
+      filePath,
+      content: JSON.stringify(tokenObj, null, 2),
+    });
   } else if (opts.multiFile) {
     Object.keys(tokenObj).forEach((key) => {
-      files[`${filePath}/${key}.json`] = JSON.stringify(tokenObj[key], null, 2);
+      files.push({
+        action: 'create',
+        filePath: `${filePath}/${key}.json`,
+        content: JSON.stringify(tokenObj[key], null, 2),
+      });
     });
   }
 
@@ -206,25 +211,20 @@ const createFiles = (
     filePath: string;
     tokenObj: TokenSets;
     commitMessage?: string;
+    startBranch?: string | undefined;
   },
   opts: FeatureFlagOpts,
 ) => {
+  const {
+    branch, projectId, commitMessage, startBranch,
+  } = context;
   const files = extractFiles(context.filePath, context.tokenObj, opts);
-  return Promise.all(
-    Object.keys(files).map((path) => api.RepositoryFiles.create(
-      context.projectId,
-      path,
-      context.branch,
-      files[path],
-      context.commitMessage || 'Commit from Figma',
-    ))
-      .reduce((acc, cur, i) => {
-        acc.push(cur);
-        if (i !== 0) {
-          acc.push(Promise.delay(1000));
-        }
-        return acc;
-      }, []),
+  return api.Commits.create(
+    projectId,
+    branch,
+    commitMessage || 'Commit from Figma',
+    files,
+    startBranch ? { startBranch } : undefined,
   );
 };
 
@@ -274,34 +274,19 @@ export function useGitLab() {
 
       if (!branches) return null;
 
-      if (branches.includes(branch)) {
-        await createFiles(
-          api,
-          {
-            projectId,
-            branch,
-            filePath: context.filePath,
-            tokenObj,
-            commitMessage: commitMessage || 'Commit from Figma',
-          },
-          { multiFile: Boolean(featureFlags?.gh_mfs_enabled) },
-        );
-      } else {
-        await createBranch({
-          api, projectId, branch, from: branches[0],
-        });
-        await createFiles(
-          api,
-          {
-            projectId,
-            branch,
-            filePath: context.filePath,
-            tokenObj,
-            commitMessage: commitMessage || 'Commit from Figma',
-          },
-          { multiFile: Boolean(featureFlags?.gh_mfs_enabled) },
-        );
-      }
+      await createFiles(
+        api,
+        {
+          projectId,
+          branch,
+          filePath: context.filePath,
+          tokenObj,
+          commitMessage: commitMessage || 'Commit from Figma',
+          startBranch: !branches.includes(branch) && branches[0],
+        },
+        { multiFile: Boolean(featureFlags?.gh_mfs_enabled) },
+      );
+
       dispatch.tokenState.setLastSyncedState(JSON.stringify(tokenObj, null, 2));
       notifyToUI('Pushed changes to GitLab');
     } catch (e) {
