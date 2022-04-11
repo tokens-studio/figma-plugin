@@ -65,11 +65,15 @@ const getGroupProjectId = async ({ api, owner, repo } : { api: Resources.Gitlab,
   return { projectId: project && project.id, groupId: project && project.namespace.id };
 };
 
-const readFileContent = async ({
+const readFile = ({
+  api, projectId, filePath, branch,
+} : { api: Resources.Gitlab, projectId: number, filePath: string, branch: string }) => api.RepositoryFiles.show(projectId, filePath, branch);
+
+const readFileContent = ({
   api, projectId, filePath, branch,
 } : { api: Resources.Gitlab, projectId: number, filePath: string, branch: string }) => api.RepositoryFiles.showRaw(projectId, filePath, { ref: branch });
 
-const checkTreeInPath = async ({ api, projectId, filePath } : { api: Resources.Gitlab, projectId: number, filePath: string }) => api.Repositories.tree(projectId, { path: filePath });
+const checkTreeInPath = ({ api, projectId, filePath } : { api: Resources.Gitlab, projectId: number, filePath: string }) => api.Repositories.tree(projectId, { path: filePath });
 
 const getBranches = async ({ api, projectId } : { api: Resources.Gitlab, projectId: number }) => {
   const branches = await api.Branches.all(projectId);
@@ -182,19 +186,29 @@ enum GitLabAccessLevel {
   Owner = 50,
 }
 
-const extractFiles = (filePath: string, tokenObj: TokenSets, opts: FeatureFlagOpts) => {
+const extractFiles = async ({
+  api, projectId, branch, filePath, tokenObj, opts,
+} :
+{ api: Resources.Gitlab, projectId: number, branch: string, filePath: string, tokenObj: TokenSets, opts: FeatureFlagOpts }) => {
   const files: CommitAction[] = [];
   if (filePath.endsWith('.json')) {
+    const fileInTrees = await readFile({
+      api, projectId, filePath, branch,
+    });
+    console.log(fileInTrees);
     files.push({
-      action: 'create',
+      action: fileInTrees.file_path ? 'update' : 'create',
       filePath,
       content: JSON.stringify(tokenObj, null, 2),
     });
   } else if (opts.multiFile) {
+    const trees = await checkTreeInPath({ api, projectId, filePath });
+    const filesInTrees = trees.map((t) => t.path);
     Object.keys(tokenObj).forEach((key) => {
+      const path = `${filePath}/${key}.json`;
       files.push({
-        action: 'create',
-        filePath: `${filePath}/${key}.json`,
+        action: filesInTrees.includes(path) ? 'update' : 'create',
+        filePath: path,
         content: JSON.stringify(tokenObj[key], null, 2),
       });
     });
@@ -203,7 +217,7 @@ const extractFiles = (filePath: string, tokenObj: TokenSets, opts: FeatureFlagOp
   return files;
 };
 
-const createFiles = (
+const createFiles = async (
   api: Resources.Gitlab,
   context: {
     projectId: number;
@@ -216,9 +230,11 @@ const createFiles = (
   opts: FeatureFlagOpts,
 ) => {
   const {
-    branch, projectId, commitMessage, startBranch,
+    branch, projectId, commitMessage, startBranch, filePath, tokenObj,
   } = context;
-  const files = extractFiles(context.filePath, context.tokenObj, opts);
+  const files = await extractFiles({
+    api, projectId, branch, filePath, tokenObj, opts,
+  });
   return api.Commits.create(
     projectId,
     branch,
