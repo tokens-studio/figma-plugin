@@ -31,7 +31,7 @@ const globalTokens = {
 };
 
 export const {
-  styled, css, keyframes,
+  styled, theme, css, keyframes,
 } = createStitches({
   theme: {
     fonts: {

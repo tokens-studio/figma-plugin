@@ -1,5 +1,6 @@
 import React, { useCallback, useContext, useMemo } from 'react';
 import { useDispatch, useSelector, useStore } from 'react-redux';
+import { Token } from '@stitches/react/types/theme';
 import { activeTokenSetSelector, tokensSelector, uiDisabledSelector } from '@/selectors';
 import { SingleToken } from '@/types/tokens';
 import { Dispatch } from '@/app/store';
@@ -7,6 +8,7 @@ import { TokenTypes } from '@/constants/TokenTypes';
 import { lightOrDark } from '@/utils/color';
 import { TokensContext } from '@/context';
 import { getAliasValue } from '@/utils/alias';
+import { theme } from '@/stitches.config';
 
 type Props = {
   active: boolean;
@@ -37,14 +39,14 @@ export const TokenButtonDraggable: React.FC<Props> = ({
   ), [token, tokensContext.resolvedTokens]);
 
   const [style, buttonClass] = React.useMemo(() => {
-    const style: React.CSSProperties = {};
+    const style: Token | React.CSSProperties = {};
     const buttonClass: string[] = [];
 
     if (type === TokenTypes.BORDER_RADIUS) {
       style.borderRadius = `${displayValue}px`;
     } else if (type === TokenTypes.COLOR) {
       style['--backgroundColor'] = displayValue;
-      style['--borderColor'] = lightOrDark(String(displayValue)) === 'light' ? 'var(--colors-border, #e7e7e7)' : 'var(--colors-borderMuted, #ffffff)';
+      style['--borderColor'] = lightOrDark(String(displayValue)) === 'light' ? theme.colors.border : theme.colors.borderMuted;
 
       buttonClass.push('button-property-color');
       if (displayType === 'LIST') {
