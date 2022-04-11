@@ -68,6 +68,8 @@ const transformProviderName = (provider) => {
       return 'JSONBin.io';
     case StorageProviderType.GITHUB:
       return 'GitHub';
+    case StorageProviderType.GITLAB:
+      return 'GitLab';
     case StorageProviderType.URL:
       return 'URL';
     default:
@@ -120,7 +122,8 @@ function Navbar() {
                 </a>
               </Tooltip>
             )}
-            {storageType.provider === StorageProviderType.GITHUB && (
+            {(storageType.provider === StorageProviderType.GITHUB
+              || storageType.provider === StorageProviderType.GITLAB) && (
               <Tooltip variant="right" label={`Push to ${transformProviderName(storageType.provider)}`}>
                 <button
                   onClick={() => pushTokens()}
