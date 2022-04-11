@@ -44,7 +44,7 @@ export const TokenButtonDraggable: React.FC<Props> = ({
       style.borderRadius = `${displayValue}px`;
     } else if (type === TokenTypes.COLOR) {
       style['--backgroundColor'] = displayValue;
-      style['--borderColor'] = lightOrDark(String(displayValue)) === 'light' ? '#e7e7e7' : 'white';
+      style['--borderColor'] = lightOrDark(String(displayValue)) === 'light' ? 'var(--colors-border, #e7e7e7)' : 'var(--colors-borderMuted, #ffffff)';
 
       buttonClass.push('button-property-color');
       if (displayType === 'LIST') {
