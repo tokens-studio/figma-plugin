@@ -162,5 +162,3 @@ export const TokenButton: React.FC<Props> = ({
     </TokenButtonDraggable>
   );
 };
-
-TokenButton.whyDidYouRender = true;
