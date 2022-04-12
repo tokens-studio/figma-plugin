@@ -16,6 +16,7 @@ export const store = init({
   },
 });
 
+window.store = store;
 export type Store = typeof store;
 export type Dispatch = RematchDispatch<RootModel>;
 export type RootState = {

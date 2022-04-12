@@ -17,8 +17,6 @@ type TokenSets = {
   [key: string]: AnyTokenSet;
 };
 
-const dispatch = useDispatch<Dispatch>();
-
 /** Returns a URL to a page where the user can create a pull request with a given branch */
 export function getCreatePullRequestUrl(id: string, branchName: string) {
   return `https://github.com/${id}/compare/${branchName}?expand=1`;
@@ -35,7 +33,6 @@ export const fetchBranches = async ({ context, owner, repo }: { context: Context
   const branches = await octokit.repos
     .listBranches({ owner, repo })
     .then((response) => response.data);
-  dispatch.branchState.setBranches(branches);
   return branches.map((branch) => branch.name);
 };
 
@@ -360,9 +357,11 @@ export function useGitHub() {
   async function syncTokensWithGitHub(context: ContextObject): Promise<TokenValues | null> {
     try {
       const [owner, repo] = context.id.split('/');
-      const hasBranches = await fetchBranches({ context, owner, repo });
+      const branches = await fetchBranches({ context, owner, repo });
+      console.log('branches', branches);
+      dispatch.branchState.setBranches(branches);
 
-      if (!hasBranches) {
+      if (!branches) {
         return null;
       }
 

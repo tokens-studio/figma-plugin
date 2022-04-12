@@ -14,52 +14,43 @@ import {
 import IconChevronDown from './icons/IconChevronDown';
 import IconChevronRight from './icons/IconChevronRight';
 import {
-  branchSelector,
+  branchSelector, storageTypeSelector, apiSelector,
 } from '@/selectors';
+import { StorageProviderType } from '../../types/api';
+import * as GitHub from '../store/providers/github';
 
 export default function BranchSelector() {
-  const branches = useSelector(branchSelector);
+  const branchState = useSelector(branchSelector);
+  // const storageType = useSelector(storageTypeSelector);
+  // const api = useSelector(apiSelector);
   const [currentBranch, setCurrentBranch] = useState('');
 
-  const handleChangeBranch = (branch) => {
+  const handleChangeBranch = (branch: string) => {
     setCurrentBranch(branch);
   };
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger bordered>
-        <span>
-          Apply to
-          {' '}
-          {currentBranch}
-        </span>
+        <span>{currentBranch}</span>
         <IconChevronDown />
       </DropdownMenuTrigger>
-
       <DropdownMenuContent side="top">
         <DropdownMenuRadioGroup value={currentBranch}>
-          <DropdownMenuRadioItem value="master" onSelect={() => handleChangeBranch('master')}>
-            <DropdownMenuItemIndicator>
-              <CheckIcon />
-            </DropdownMenuItemIndicator>
-            Apply to page
-          </DropdownMenuRadioItem>
-          <DropdownMenuRadioItem value="sync" onSelect={() => handleChangeBranch('sync')}>
-            <DropdownMenuItemIndicator>
-              <CheckIcon />
-            </DropdownMenuItemIndicator>
-            Apply to document
-          </DropdownMenuRadioItem>
-          <DropdownMenuRadioItem value="frontend" onSelect={() => handleChangeBranch('frontend')}>
-            <DropdownMenuItemIndicator>
-              <CheckIcon />
-            </DropdownMenuItemIndicator>
-            Apply to selection
-          </DropdownMenuRadioItem>
+          {branchState.branches.length > 0 && branchState.branches.map((branch, index) => (
+            <DropdownMenuRadioItem key={index} value={branch} onSelect={() => handleChangeBranch(branch)}>
+              <DropdownMenuItemIndicator>
+                <CheckIcon />
+              </DropdownMenuItemIndicator>
+              Apply to
+              {' '}
+              {`${branch}`}
+              {' '}
+              branch
+            </DropdownMenuRadioItem>
+          ))}
         </DropdownMenuRadioGroup>
-
         <DropdownMenuSeparator />
-
         <DropdownMenu css={{ position: 'static' }}>
           <DropdownMenuTrigger css={{
             backgroundColor: '#222222',
@@ -74,11 +65,8 @@ export default function BranchSelector() {
             create new branch from
             <IconChevronRight />
           </DropdownMenuTrigger>
-          <DropdownMenuContent sideOffset={10} css={{ marginLeft: '145px' }}>
-            <DropdownMenuItem>Stitches</DropdownMenuItem>
-            <DropdownMenuItem>Radix</DropdownMenuItem>
-            <DropdownMenuItem>Modulz</DropdownMenuItem>
-            <DropdownMenuItem>Twitter</DropdownMenuItem>
+          <DropdownMenuContent css={{ marginLeft: '145px' }}>
+            {branchState.branches.length > 0 && branchState.branches.map((branch, index) => <DropdownMenuItem key={index}>{`${branch}`}</DropdownMenuItem>)}
           </DropdownMenuContent>
         </DropdownMenu>
       </DropdownMenuContent>
