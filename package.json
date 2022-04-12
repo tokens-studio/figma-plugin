@@ -95,6 +95,7 @@
         "@testing-library/react": "^11.2.5",
         "@types/jest": "^26.0.20",
         "@types/lodash.isequal": "^4.5.5",
+        "@types/object-hash": "^2.2.1",
         "@types/react": "^17.0.0",
         "@types/react-dom": "^17.0.0",
         "@types/set-value": "^4.0.1",

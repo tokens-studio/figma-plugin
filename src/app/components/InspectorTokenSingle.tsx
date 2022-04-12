@@ -12,7 +12,6 @@ import { SelectionGroup } from '@/types';
 import TokenNodes from './inspector/TokenNodes';
 import { inspectStateSelector } from '@/selectors';
 
-
 export default function InspectorTokenSingle({
   token,
   resolvedTokens,

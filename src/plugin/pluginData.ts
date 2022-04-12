@@ -11,12 +11,9 @@ import { defaultNodeManager, NodeManagerNode } from './NodeManager';
 import { tokensSharedDataHandler } from './SharedDataHandler';
 import { defaultWorker } from './Worker';
 import { ProgressTracker } from './ProgressTracker';
-import { SelectionGroup, SelectionValue } from '@/types/tokens';
+import { SelectionGroup, SelectionValue } from '@/types';
 
-function mapPropertyToCategory(key): string | null {
-  if (Properties[key]) return Properties[key];
-  return null;
-}
+// @TODO FIX TYPINGS! Missing or bad typings are very difficult for other developers to work in
 
 export function transformPluginDataToSelectionValues(pluginData): SelectionGroup {
   const selectionValues = pluginData.reduce((acc, curr) => {
