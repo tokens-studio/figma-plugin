@@ -1,6 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { Octokit } from '@octokit/rest';
-import { Dispatch, RootState } from '@/app/store';
 import { MessageToPluginTypes } from '@/types/messages';
 import convertTokensToObject from '@/utils/convertTokensToObject';
 import useConfirm from '@/app/hooks/useConfirm';
@@ -12,10 +11,13 @@ import { FeatureFlags } from '@/utils/featureFlags';
 import { AnyTokenSet, TokenValues } from '@/types/tokens';
 import { decodeBase64 } from '@/utils/string';
 import { featureFlagsSelector, localApiStateSelector, tokensSelector } from '@/selectors';
+import { Dispatch } from '../../store';
 
 type TokenSets = {
   [key: string]: AnyTokenSet;
 };
+
+const dispatch = useDispatch<Dispatch>();
 
 /** Returns a URL to a page where the user can create a pull request with a given branch */
 export function getCreatePullRequestUrl(id: string, branchName: string) {
@@ -33,6 +35,7 @@ export const fetchBranches = async ({ context, owner, repo }: { context: Context
   const branches = await octokit.repos
     .listBranches({ owner, repo })
     .then((response) => response.data);
+  dispatch.branchState.setBranches(branches);
   return branches.map((branch) => branch.name);
 };
 

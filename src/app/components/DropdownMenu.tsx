@@ -62,9 +62,18 @@ const StyledDropdownMenuTrigger = styled(DropdownMenuPrimitive.Trigger, {
   },
 });
 
+const StyledDropdownSubmenu = styled(DropdownMenuPrimitive.DropdownMenuGroup, {
+  position: 'absolute',
+  left: '$2',
+});
+
 const StyledDropdownMenuRadioGroup = styled(DropdownMenuPrimitive.RadioGroup, {});
 
 const StyledDropdownMenuRadioItem = styled(DropdownMenuPrimitive.RadioItem, itemStyles);
+
+const StyledDropdownMenuArrow = styled(DropdownMenuPrimitive.Arrow, {});
+
+const StyledDropdownMenu = styled(DropdownMenuPrimitive.Root, {});
 
 export const DropdownMenuContent = StyledDropdownMenuContent;
 export const DropdownMenuCheckboxItem = StyledDropdownMenuCheckboxItem;
@@ -75,4 +84,6 @@ export const DropdownMenuSeparator = StyledDropdownMenuSeparator;
 export const DropdownMenuItem = StyledDropdownMenuItem;
 export const DropdownMenuItemIndicator = StyledDropdownMenuItemIndicator;
 export const DropdownMenuItemIndiDropdownMenuItemcator = StyledDropdownMenuItemIndicator;
-export const DropdownMenu = DropdownMenuPrimitive.Root;
+export const DropdownMenu = StyledDropdownMenu;
+export const DropdownSubmenu = StyledDropdownSubmenu;
+export const DropdownMenuArrow = StyledDropdownMenuArrow;

@@ -1,3 +1,5 @@
+import { fromCallback } from 'cypress/types/bluebird';
+
 export * from './tokenStateSelector';
 export * from './uiStateSelector';
 export * from './settingsStateSelector';
@@ -32,3 +34,4 @@ export * from './updateModeSelector';
 export * from './displayTypeSelector';
 export * from './collapsedSelector';
 export * from './uiDisabledSelector';
+export * from './branchSelector';

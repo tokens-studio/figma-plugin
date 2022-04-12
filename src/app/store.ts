@@ -6,6 +6,7 @@ import type { UIState } from './store/models/uiState';
 import type { SettingsState } from './store/models/settings';
 import type { TokenState } from './store/models/tokenState';
 import type { InspectState } from './store/models/inspectState';
+import type { BranchState } from './store/models/branchState';
 
 export const store = init({
   models,
@@ -22,4 +23,5 @@ export type RootState = {
   settings: SettingsState
   tokenState: TokenState
   inspectState: InspectState;
+  branchState: BranchState;
 };

@@ -5,6 +5,7 @@ import DocsIcon from '@/icons/docs.svg';
 import FeedbackIcon from '@/icons/feedback.svg';
 import Text from '@/app/components/Text';
 import Stack from './Stack';
+import BranchSelector from './BranchSelector';
 
 export default function Footer() {
   return (
@@ -12,6 +13,7 @@ export default function Footer() {
       display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0, padding: '$4',
     }}
     >
+      <BranchSelector />
       <Box css={{ color: '$textMuted', fontSize: '$xsmall' }}>
         Version
         {' '}
