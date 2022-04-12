@@ -1,13 +1,18 @@
 import React from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+
 import { identify, track } from '@/utils/analytics';
 import { MessageFromPluginTypes, MessageToPluginTypes, PostToUIMessage } from '@/types/messages';
 import { postToFigma } from '../../plugin/notifiers';
 import useRemoteTokens from '../store/remoteTokens';
 import { Dispatch } from '../store';
 import useStorage from '../store/useStorage';
+import {
+  apiSelector,
+} from '@/selectors';
 import * as pjs from '../../../package.json';
 import { useFeatureFlags } from '../hooks/useFeatureFlags';
+import * as Github from '../store/providers/github';
 
 export function Initiator() {
   const dispatch = useDispatch<Dispatch>();
@@ -15,9 +20,15 @@ export function Initiator() {
   const { pullTokens } = useRemoteTokens();
   const { fetchFeatureFlags } = useFeatureFlags();
   const { setStorageType } = useStorage();
+  const api = useSelector(apiSelector);
 
-  const onInitiate = () => {
+  const onInitiate = async () => {
+    console.log('oninitiate');
     postToFigma({ type: MessageToPluginTypes.INITIATE });
+    const [owner, repo] = api.id.split('/');
+    const branches = await Github.fetchBranches({ api, owner, repo });
+    console.log('branches', branches);
+    dispatch.branchState.setBranches(branches);
   };
 
   React.useEffect(() => {

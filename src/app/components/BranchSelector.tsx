@@ -13,16 +13,10 @@ import {
 } from './DropdownMenu';
 import IconChevronDown from './icons/IconChevronDown';
 import IconChevronRight from './icons/IconChevronRight';
-import {
-  branchSelector, storageTypeSelector, apiSelector,
-} from '@/selectors';
-import { StorageProviderType } from '../../types/api';
-import * as GitHub from '../store/providers/github';
+import { branchSelector } from '@/selectors';
 
 export default function BranchSelector() {
   const branchState = useSelector(branchSelector);
-  // const storageType = useSelector(storageTypeSelector);
-  // const api = useSelector(apiSelector);
   const [currentBranch, setCurrentBranch] = useState('');
 
   const handleChangeBranch = (branch: string) => {
@@ -42,11 +36,7 @@ export default function BranchSelector() {
               <DropdownMenuItemIndicator>
                 <CheckIcon />
               </DropdownMenuItemIndicator>
-              Apply to
-              {' '}
               {`${branch}`}
-              {' '}
-              branch
             </DropdownMenuRadioItem>
           ))}
         </DropdownMenuRadioGroup>
@@ -66,6 +56,9 @@ export default function BranchSelector() {
             <IconChevronRight />
           </DropdownMenuTrigger>
           <DropdownMenuContent css={{ marginLeft: '145px' }}>
+            <DropdownMenuItem>
+              Current changes
+            </DropdownMenuItem>
             {branchState.branches.length > 0 && branchState.branches.map((branch, index) => <DropdownMenuItem key={index}>{`${branch}`}</DropdownMenuItem>)}
           </DropdownMenuContent>
         </DropdownMenu>

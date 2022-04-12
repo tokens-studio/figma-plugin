@@ -14,12 +14,13 @@ export default function Footer() {
     }}
     >
       <BranchSelector />
-      <Box css={{ color: '$textMuted', fontSize: '$xsmall' }}>
-        Version
-        {' '}
-        {pjs.plugin_version}
-      </Box>
       <Stack direction="row" gap={4}>
+        <Box css={{ color: '$textMuted', fontSize: '$xsmall' }}>
+          Version
+          {' '}
+          {pjs.plugin_version}
+        </Box>
+
         <Text size="xsmall">
           <a
             href="https://docs.tokens.studio/?ref=pf"

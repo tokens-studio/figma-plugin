@@ -358,7 +358,6 @@ export function useGitHub() {
     try {
       const [owner, repo] = context.id.split('/');
       const branches = await fetchBranches({ context, owner, repo });
-      console.log('branches', branches);
       dispatch.branchState.setBranches(branches);
 
       if (!branches) {
