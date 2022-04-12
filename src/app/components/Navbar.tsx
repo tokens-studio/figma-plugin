@@ -16,7 +16,6 @@ import {
 import { Tabs } from '@/constants/Tabs';
 import Stack from './Stack';
 import { TabButton } from './TabButton';
-import { Flex } from './Flex';
 import { NavbarUndoButton } from './NavbarUndoButton';
 
 const transformProviderName = (provider: StorageProviderType) => {
@@ -61,7 +60,7 @@ export const Navbar: React.FC = () => {
         transform: 'translateY(-1px)',
       }}
     >
-      <Flex alignItems="center" justifyContent="between" css={{ width: '100%' }}>
+      <Stack gap={0} direction="row" align="center" justify="between" css={{ width: '100%' }}>
         <div>
           <TabButton name={Tabs.TOKENS} label="Tokens" />
           <TabButton name={Tabs.INSPECTOR} label="Inspect" />
@@ -69,7 +68,7 @@ export const Navbar: React.FC = () => {
           <TabButton name={Tabs.SETTINGS} label="Settings" />
         </div>
         <NavbarUndoButton />
-      </Flex>
+      </Stack>
       <Stack direction="row" align="center">
         {storageType.provider !== StorageProviderType.LOCAL && (
           <>

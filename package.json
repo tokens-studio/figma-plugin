@@ -57,6 +57,7 @@
         "just-safe-get": "^4.0.1",
         "just-safe-set": "^4.0.2",
         "just-split": "^3.0.1",
+        "lodash": "^4.17.21",
         "lodash.isequal": "^4.5.0",
         "mixpanel-figma": "^2.0.1",
         "ml-matrix": "^6.9.0",
