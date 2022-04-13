@@ -11,26 +11,24 @@ import { defaultNodeManager, NodeManagerNode } from './NodeManager';
 import { tokensSharedDataHandler } from './SharedDataHandler';
 import { defaultWorker } from './Worker';
 import { ProgressTracker } from './ProgressTracker';
-import { SelectionGroup, SelectionValue } from '@/types/tokens';
+import { SelectionGroup, SelectionValue } from '@/types';
 
-function mapPropertyToCategory(key): string | null {
-  if (Properties[key]) return Properties[key];
-  return null;
-}
+// @TODO FIX TYPINGS! Missing or bad typings are very difficult for other developers to work in
 
 export function transformPluginDataToSelectionValues(pluginData): SelectionGroup {
   const selectionValues = pluginData.reduce((acc, curr) => {
-    const { tokens, id } = curr;
+    const { tokens, id, node: { name, type } } = curr;
+
     Object.entries(tokens).forEach(([key, value]) => {
       const existing = acc.find((item) => item.type === key && item.value === value);
 
       if (existing) {
-        existing.nodes.push(id);
+        existing.nodes.push({ id, name, type });
       } else {
         const category = Properties[key];
 
         acc.push({
-          value, type: key, category, nodes: [id],
+          value, type: key, category, nodes: [{ id, name, type }],
         });
       }
     });
