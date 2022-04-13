@@ -197,7 +197,7 @@ const extractFiles = async ({
     const fileInTrees = await readFile({
       api, projectId, filePath, branch,
     });
-    console.log(fileInTrees);
+
     files.push({
       action: fileInTrees.file_path ? 'update' : 'create',
       filePath,
@@ -361,7 +361,7 @@ export function useGitLab() {
     const api = new Gitlab(getGitlabOptions(context));
     const { projectId, groupId } = await getGroupProjectId({ api, owner, repo });
     const permission = await checkPermissions({ api, groupId, projectId });
-    console.log('@permission', permission);
+
     dispatch.tokenState.setEditProhibited(!(permission?.access_level >= GitLabAccessLevel.Developer));
   }
 
