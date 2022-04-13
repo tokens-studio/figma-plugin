@@ -89,22 +89,24 @@ export const fetchBranches = async ({ context, owner, repo }: { context: Context
 };
 
 export const checkPermissions = async ({ api, groupId, projectId }: { api: Resources.Gitlab, groupId: number, projectId: number }) => {
-  try {
-    const currentUser = await api.Users.current();
+  const currentUser = await api.Users.current();
 
+  try {
     if (!currentUser || currentUser.state !== 'active') return null;
 
     const groupPermission = await api.GroupMembers.show(groupId, currentUser.id);
     if (groupPermission.access_level) {
       return groupPermission;
     }
-
-    const projectPermission = await api.ProjectMembers.show(projectId, currentUser.id);
-    return projectPermission;
   } catch (e) {
-    console.log(e);
+    try {
+      const projectPermission = await api.ProjectMembers.show(projectId, currentUser.id);
+      return projectPermission;
+    } catch (e) {
+      console.log(e);
 
-    return null;
+      return null;
+    }
   }
 };
 
@@ -359,8 +361,8 @@ export function useGitLab() {
     const api = new Gitlab(getGitlabOptions(context));
     const { projectId, groupId } = await getGroupProjectId({ api, owner, repo });
     const permission = await checkPermissions({ api, groupId, projectId });
-
-    dispatch.tokenState.setEditProhibited(!(permission?.access_level > GitLabAccessLevel.Developer));
+    console.log('@permission', permission);
+    dispatch.tokenState.setEditProhibited(!(permission?.access_level >= GitLabAccessLevel.Developer));
   }
 
   async function pullTokensFromGitLab(context: ContextObject, receivedFeatureFlags?: FeatureFlags) {
