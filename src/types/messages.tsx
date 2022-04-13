@@ -50,6 +50,7 @@ export enum MessageToPluginTypes {
   REMAP_TOKENS = 'remap-tokens',
   REMOVE_TOKENS_BY_VALUE = 'remove-tokens-by-value',
   CHANGED_TABS = 'changed-tabs',
+  SELECT_NODES = 'select-nodes',
 }
 
 export type NoSelectionFromPluginMessage = { type: MessageFromPluginTypes.NO_SELECTION };
@@ -57,7 +58,7 @@ export type SelectionFromPluginMessage = {
   type: MessageFromPluginTypes.SELECTION;
   selectionValues: SelectionGroup[];
   mainNodeSelectionValues: SelectionValue[];
-  selectedNodes: number
+  selectedNodes: number;
 };
 export type UiSettingsFromPluginMessage = {
   type: MessageFromPluginTypes.UI_SETTINGS;
@@ -107,31 +108,31 @@ export type ReceivedLastOpenedFromPluginMessage = {
   lastOpened: number;
 };
 export type StartJobFromPluginMessage = {
-  type: MessageFromPluginTypes.START_JOB
-  job: BackgroundJob
+  type: MessageFromPluginTypes.START_JOB;
+  job: BackgroundJob;
 };
 export type CompleteJobFromPluginMessage = {
-  type: MessageFromPluginTypes.COMPLETE_JOB
-  name: string
+  type: MessageFromPluginTypes.COMPLETE_JOB;
+  name: string;
 };
 export type ClearJobsFromPluginMessage = {
-  type: MessageFromPluginTypes.CLEAR_JOBS
+  type: MessageFromPluginTypes.CLEAR_JOBS;
 };
 export type AddJobTasksFromPluginMessage = {
-  type: MessageFromPluginTypes.ADD_JOB_TASKS
-  name: string
-  count: number
-  expectedTimePerTask?: number
+  type: MessageFromPluginTypes.ADD_JOB_TASKS;
+  name: string;
+  count: number;
+  expectedTimePerTask?: number;
 };
 export type CompleteJobTasksFromPluginMessage = {
-  type: MessageFromPluginTypes.COMPLETE_JOB_TASKS
-  name: string
-  count: number
-  timePerTask?: number
+  type: MessageFromPluginTypes.COMPLETE_JOB_TASKS;
+  name: string;
+  count: number;
+  timePerTask?: number;
 };
 export type ApiCredentialsFromPluginMessage = {
-  type: MessageFromPluginTypes.API_CREDENTIALS
-  status: boolean
+  type: MessageFromPluginTypes.API_CREDENTIALS;
+  status: boolean;
   credentials: ApiDataType & {
     internalId?: string
   }
@@ -139,23 +140,23 @@ export type ApiCredentialsFromPluginMessage = {
   usedTokenSet?: string[] | null
 };
 export type PostToUIMessage =
-    | NoSelectionFromPluginMessage
-    | SelectionFromPluginMessage
-    | UiSettingsFromPluginMessage
-    | ShowEmptyGroupsFromPluginMessage
-    | RemoteCommentsFromPluginMessage
-    | TokenValuesFromPluginMessage
-    | ReceivedStorageTypeFromPluginMessage
-    | ApiProvidersFromPluginMessage
-    | StylesFromPluginMessage
-    | UserIdFromPluginMessage
-    | ReceivedLastOpenedFromPluginMessage
-    | StartJobFromPluginMessage
-    | CompleteJobFromPluginMessage
-    | ClearJobsFromPluginMessage
-    | AddJobTasksFromPluginMessage
-    | CompleteJobTasksFromPluginMessage
-    | ApiCredentialsFromPluginMessage;
+  | NoSelectionFromPluginMessage
+  | SelectionFromPluginMessage
+  | UiSettingsFromPluginMessage
+  | ShowEmptyGroupsFromPluginMessage
+  | RemoteCommentsFromPluginMessage
+  | TokenValuesFromPluginMessage
+  | ReceivedStorageTypeFromPluginMessage
+  | ApiProvidersFromPluginMessage
+  | StylesFromPluginMessage
+  | UserIdFromPluginMessage
+  | ReceivedLastOpenedFromPluginMessage
+  | StartJobFromPluginMessage
+  | CompleteJobFromPluginMessage
+  | ClearJobsFromPluginMessage
+  | AddJobTasksFromPluginMessage
+  | CompleteJobTasksFromPluginMessage
+  | ApiCredentialsFromPluginMessage;
 
 export type InitiateToPluginMessage = { type: MessageToPluginTypes.INITIATE };
 export type RemoveSingleCredentialToPluginMessage = {
@@ -218,7 +219,7 @@ export type ResizeWindowToPluginMessage = {
   height: number;
 };
 export type CancelOperationToPluginMessage = {
-  type: MessageToPluginTypes.CANCEL_OPERATION
+  type: MessageToPluginTypes.CANCEL_OPERATION;
 };
 export type CreateAnnotationToPluginMessage = {
   type: MessageToPluginTypes.CREATE_ANNOTATION;
@@ -230,7 +231,7 @@ export type RemapTokensToPluginMessage = {
   oldName: string;
   newName: string;
   updateMode: UpdateMode;
-  category?: Properties
+  category?: Properties;
 };
 export type RemoveTokensByValueToPluginMessage = {
   type: MessageToPluginTypes.REMOVE_TOKENS_BY_VALUE;
@@ -241,22 +242,28 @@ export type ChangedTabsToPluginMessage = {
   requiresSelectionValues: boolean;
 };
 
+export type SelectNodesPluginMessage = {
+  type: MessageToPluginTypes.SELECT_NODES;
+  ids: string[];
+};
+
 export type PostToFigmaMessage =
-    | InitiateToPluginMessage
-    | RemoveSingleCredentialToPluginMessage
-    | GoToNodeToPluginMessage
-    | CredentialsToPluginMessage
-    | UpdateToPluginMessage
-    | CreateStylesToPluginMessage
-    | SetNodeDataToPluginMessage
-    | PullStylesToPluginMessage
-    | SetStorageTypeToPluginMessage
-    | NotifyToPluginMessage
-    | SetUiToPluginMessage
-    | SetShowEmptyGroupsPluginMessage
-    | ResizeWindowToPluginMessage
-    | CancelOperationToPluginMessage
-    | CreateAnnotationToPluginMessage
-    | RemapTokensToPluginMessage
-    | RemoveTokensByValueToPluginMessage
-    | ChangedTabsToPluginMessage;
+  | InitiateToPluginMessage
+  | RemoveSingleCredentialToPluginMessage
+  | GoToNodeToPluginMessage
+  | CredentialsToPluginMessage
+  | UpdateToPluginMessage
+  | CreateStylesToPluginMessage
+  | SetNodeDataToPluginMessage
+  | PullStylesToPluginMessage
+  | SetStorageTypeToPluginMessage
+  | NotifyToPluginMessage
+  | SetUiToPluginMessage
+  | SetShowEmptyGroupsPluginMessage
+  | ResizeWindowToPluginMessage
+  | CancelOperationToPluginMessage
+  | CreateAnnotationToPluginMessage
+  | RemapTokensToPluginMessage
+  | RemoveTokensByValueToPluginMessage
+  | ChangedTabsToPluginMessage
+  | SelectNodesPluginMessage;

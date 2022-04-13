@@ -24,11 +24,15 @@ import {
   notifyLastOpened,
   postToUI,
 } from './notifiers';
+import { sendPluginValues, updatePluginData, SelectionContent } from './pluginData';
 import {
-  sendPluginValues, updatePluginData, SelectionContent,
-} from './pluginData';
-import {
-  getTokenData, updateNodes, setTokensOnDocument, goToNode, saveStorageType, getSavedStorageType,
+  getTokenData,
+  updateNodes,
+  setTokensOnDocument,
+  goToNode,
+  saveStorageType,
+  getSavedStorageType,
+  selectNodes,
 } from './node';
 
 import { MessageFromPluginTypes, MessageToPluginTypes, PostToFigmaMessage } from '../types/messages';
@@ -54,7 +58,9 @@ figma.on('close', () => {
 });
 
 async function sendSelectionChange(): Promise<SelectionContent | null> {
-  const nodes = inspectDeep && shouldSendSelectionValues ? (await defaultNodeManager.findNodesWithData({ updateMode: UpdateMode.SELECTION })).map((node) => node.node) : Array.from(figma.currentPage.selection);
+  const nodes = inspectDeep && shouldSendSelectionValues
+    ? (await defaultNodeManager.findNodesWithData({ updateMode: UpdateMode.SELECTION })).map((node) => node.node)
+    : Array.from(figma.currentPage.selection);
   const currentSelectionLength = figma.currentPage.selection.length;
 
   if (!currentSelectionLength) {
@@ -145,13 +151,11 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
 
           const nodes = await defaultNodeManager.update(figma.currentPage.selection);
           await updatePluginData({ entries: nodes, values: msg.values });
-          await sendPluginValues(
-            {
-              nodes: figma.currentPage.selection,
-              values: await updateNodes(nodes, tokensMap, msg.settings),
-              shouldSendSelectionValues: false,
-            },
-          );
+          await sendPluginValues({
+            nodes: figma.currentPage.selection,
+            values: await updateNodes(nodes, tokensMap, msg.settings),
+            shouldSendSelectionValues: false,
+          });
         }
       } catch (e) {
         console.error(e);
@@ -166,20 +170,24 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
       const nodesToRemove: { [key: string]: string[] } = {};
 
       msg.tokensToRemove.forEach((token) => {
-        token.nodes.forEach((node) => { nodesToRemove[node] = nodesToRemove[node] ? [...nodesToRemove[node], token.property] : [token.property]; });
+        token.nodes.forEach((node) => {
+          nodesToRemove[node] = nodesToRemove[node] ? [...nodesToRemove[node], token.property] : [token.property];
+        });
       });
 
-      await Promise.all(Object.entries(nodesToRemove).map(async (node) => {
-        const newEntries = node[1].reduce((acc, curr) => {
-          acc[curr] = 'delete';
-          return acc;
-        }, {});
+      await Promise.all(
+        Object.entries(nodesToRemove).map(async (node) => {
+          const newEntries = node[1].reduce((acc, curr) => {
+            acc[curr] = 'delete';
+            return acc;
+          }, {});
 
-        const nodeToUpdate = await defaultNodeManager.getNode(node[0]);
-        if (nodeToUpdate) {
-          await updatePluginData({ entries: [nodeToUpdate], values: newEntries, shouldRemove: false });
-        }
-      }));
+          const nodeToUpdate = await defaultNodeManager.getNode(node[0]);
+          if (nodeToUpdate) {
+            await updatePluginData({ entries: [nodeToUpdate], values: newEntries, shouldRemove: false });
+          }
+        }),
+      );
       sendSelectionChange();
       break;
     }
@@ -262,6 +270,9 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
       return;
     case MessageToPluginTypes.GO_TO_NODE:
       goToNode(msg.id);
+      break;
+    case MessageToPluginTypes.SELECT_NODES:
+      selectNodes(msg.ids);
       break;
     case MessageToPluginTypes.PULL_STYLES:
       pullStyles(msg.styleTypes);

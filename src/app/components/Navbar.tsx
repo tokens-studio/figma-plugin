@@ -1,16 +1,12 @@
 import React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { track } from '@/utils/analytics';
+import { useSelector } from 'react-redux';
 import convertTokensToObject from '@/utils/convertTokensToObject';
 import Icon from './Icon';
 import Tooltip from './Tooltip';
 import useRemoteTokens from '../store/remoteTokens';
 import { StorageProviderType } from '../../types/api';
-import { Dispatch } from '../store';
 import Box from './Box';
-import { styled } from '@/stitches.config';
 import {
-  activeTabSelector,
   editProhibitedSelector,
   lastSyncedStateSelector,
   projectURLSelector,
@@ -20,55 +16,10 @@ import {
 } from '@/selectors';
 import { Tabs } from '@/constants/Tabs';
 import Stack from './Stack';
+import { TabButton } from './TabButton';
+import { NavbarUndoButton } from './NavbarUndoButton';
 
-const StyledButton = styled('button', {
-  padding: '$5 $4',
-  fontSize: '$xsmall',
-  fontWeight: '$bold',
-  cursor: 'pointer',
-  color: '$textMuted',
-  '&:focus, &:hover': {
-    outline: 'none',
-    boxShadow: 'none',
-    color: '$text',
-  },
-  variants: {
-    isActive: {
-      true: {
-        color: '$text',
-      },
-    },
-  },
-});
-
-type Props = {
-  name: Tabs;
-  label: string;
-};
-
-function TabButton({ name, label }: Props) {
-  const activeTab = useSelector(activeTabSelector);
-  const dispatch = useDispatch<Dispatch>();
-
-  const onClick = React.useCallback(() => {
-    track('Switched tab', { from: activeTab, to: name });
-    dispatch.uiState.setActiveTab(name);
-  }, [activeTab, name, dispatch.uiState]);
-
-  return (
-    <StyledButton
-      data-cy={`navitem-${name}`}
-      type="button"
-      isActive={activeTab === name}
-      name="text"
-      onClick={onClick}
-    >
-      {label}
-    </StyledButton>
-  );
-}
-
-const transformProviderName = (provider) => {
+const transformProviderName = (provider: StorageProviderType) => {
   switch (provider) {
     case StorageProviderType.JSONBIN:
       return 'JSONBin.io';
@@ -81,7 +32,7 @@ const transformProviderName = (provider) => {
   }
 };
 
-function Navbar() {
+export const Navbar: React.FC = () => {
   const projectURL = useSelector(projectURLSelector);
   const storageType = useSelector(storageTypeSelector);
   const tokens = useSelector(tokensSelector);
@@ -111,12 +62,15 @@ function Navbar() {
         transform: 'translateY(-1px)',
       }}
     >
-      <div>
-        <TabButton first name="tokens" label="Tokens" />
-        <TabButton name="inspector" label="Inspect" />
-        <TabButton name="syncsettings" label="Sync" />
-        <TabButton name="settings" label="Settings" />
-      </div>
+      <Stack gap={0} direction="row" align="center" justify="between" css={{ width: '100%' }}>
+        <div>
+          <TabButton name={Tabs.TOKENS} label="Tokens" />
+          <TabButton name={Tabs.INSPECTOR} label="Inspect" />
+          <TabButton name={Tabs.SYNCSETTINGS} label="Sync" />
+          <TabButton name={Tabs.SETTINGS} label="Settings" />
+        </div>
+        <NavbarUndoButton />
+      </Stack>
       <Stack direction="row" align="center">
         {storageType.provider !== StorageProviderType.LOCAL && (
           <>
@@ -152,6 +106,6 @@ function Navbar() {
       </Stack>
     </Box>
   );
-}
+};
 
 export default Navbar;

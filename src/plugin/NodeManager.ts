@@ -33,7 +33,7 @@ export type NodeManagerNode = {
   tokens: NodeTokenRefMap;
 };
 
-function getMainKey(node): string | undefined {
+function getMainKey(node: BaseNode): string | undefined {
   return node.type === 'INSTANCE' ? node.mainComponent?.key : undefined;
 }
 
@@ -114,7 +114,8 @@ export class NodeManager {
         // this will take more time on startup but only once
         await Promise.all(
           Object.keys(tokens).map(async (property) => {
-            tokensSharedDataHandler.set(node, property, tokens?.[property]);
+            const token = tokens?.[(property as Properties)];
+            tokensSharedDataHandler.set(node, property, token ?? '');
           }),
         );
         node.setPluginData('values', '');
@@ -327,7 +328,7 @@ export class NodeManager {
       const checksum = hash(tokens);
       if (checksum !== entry.hash) {
         // If another node uses this node (e.g. component instances) we need to invalidate their cache by either looking at naming or main key
-        const hasSameMainKey = (n) => (node.type === 'COMPONENT' ? n.mainKey === node.key : false);
+        const hasSameMainKey = (n: typeof entry) => (node.type === 'COMPONENT' ? n.mainKey === node.key : false);
         const nodesRequiringInvalidation = [...this.nodes.values()].filter((n) => (n.id.includes(`;${node.id}`) || hasSameMainKey(n)));
 
         nodesRequiringInvalidation.forEach((n) => {

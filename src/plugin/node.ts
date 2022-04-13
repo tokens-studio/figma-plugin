@@ -52,7 +52,12 @@ export function setTokensOnDocument(tokens, updatedAt: string, usedTokenSet: str
   tokensSharedDataHandler.set(figma.root, SharedPluginDataKeys.tokens.usedTokenSet, JSON.stringify(usedTokenSet));
 }
 
-export function getTokenData(): TokenStore | null {
+export function getTokenData(): {
+  values: TokenStore['values'];
+  updatedAt: string;
+  version: string;
+  usedTokenSet?: string[];
+} | null {
   try {
     const values = tokensSharedDataHandler.get(figma.root, SharedPluginDataKeys.tokens.values);
     const version = tokensSharedDataHandler.get(figma.root, SharedPluginDataKeys.tokens.version);
@@ -96,10 +101,15 @@ export function getSavedStorageType(): StorageType {
 
 export function goToNode(id: string) {
   const node = figma.getNodeById(id);
-  if (node?.type === 'INSTANCE') {
+  if (node) {
     figma.currentPage.selection = [node];
     figma.viewport.scrollAndZoomIntoView([node]);
   }
+}
+
+export function selectNodes(ids: string[]) {
+  const nodes = ids.map(figma.getNodeById);
+  figma.currentPage.selection = nodes;
 }
 
 export async function updateNodes(
@@ -123,22 +133,24 @@ export async function updateNodes(
   const promises: Set<Promise<void>> = new Set();
   const returnedValues: Set<NodeTokenRefMap> = new Set();
   entries.forEach((entry) => {
-    promises.add(defaultWorker.schedule(async () => {
-      try {
-        if (entry.tokens) {
-          const mappedValues = mapValuesToTokens(tokens, entry.tokens);
+    promises.add(
+      defaultWorker.schedule(async () => {
+        try {
+          if (entry.tokens) {
+            const mappedValues = mapValuesToTokens(tokens, entry.tokens);
 
-          setValuesOnNode(entry.node, mappedValues, entry.tokens, figmaStyleMaps, ignoreFirstPartForStyles);
-          store.successfulNodes.add(entry.node);
-          returnedValues.add(entry.tokens);
+            setValuesOnNode(entry.node, mappedValues, entry.tokens, figmaStyleMaps, ignoreFirstPartForStyles);
+            store.successfulNodes.add(entry.node);
+            returnedValues.add(entry.tokens);
+          }
+        } catch (e) {
+          console.log('got error', e);
         }
-      } catch (e) {
-        console.log('got error', e);
-      }
 
-      tracker.next();
-      tracker.reportIfNecessary();
-    }));
+        tracker.next();
+        tracker.reportIfNecessary();
+      }),
+    );
   });
   await Promise.all(promises);
 
