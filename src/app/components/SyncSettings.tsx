@@ -35,9 +35,9 @@ const SyncSettings = () => {
     setShowEditStorageModalVisible(true);
   };
 
-  const selectedRemoteProvider = () => [StorageProviderType.JSONBIN, StorageProviderType.GITHUB, StorageProviderType.GITLAB, StorageProviderType.URL].includes(
+  const selectedRemoteProvider = React.useMemo(() => [StorageProviderType.JSONBIN, StorageProviderType.GITHUB, StorageProviderType.GITLAB, StorageProviderType.URL].includes(
     localApiState?.provider as StorageProviderType,
-  );
+  ), [localApiState?.provider]);
 
   const storedApiProviders = () => apiProviders.filter((item) => item.provider === localApiState?.provider);
 
@@ -208,7 +208,7 @@ const SyncSettings = () => {
               />
             </Stack>
           </Stack>
-          {selectedRemoteProvider() && (
+          {selectedRemoteProvider && (
           <>
             <Text muted size="xsmall">{storageProviderText()}</Text>
             <Button
