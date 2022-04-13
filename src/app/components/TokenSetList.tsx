@@ -9,8 +9,9 @@ import {
   activeTokenSetSelector,
   editProhibitedSelector,
   hasUnsavedChangesSelector,
-  usedTokenSetsAsStringArraySelector,
+  usedTokenSetSelector,
 } from '@/selectors';
+import { TokenSetStatus } from '@/constants/TokenSetStatus';
 
 function getList(items: string[]): ListItem[] {
   return items.map((item) => ({
@@ -38,7 +39,7 @@ export default function TokenSetList({
 }: Props) {
   const { confirm } = useConfirm();
   const activeTokenSet = useSelector(activeTokenSetSelector);
-  const usedTokenSet = useSelector(usedTokenSetsAsStringArraySelector);
+  const usedTokenSet = useSelector(usedTokenSetSelector);
   const editProhibited = useSelector(editProhibitedSelector);
   const hasUnsavedChanges = useSelector(hasUnsavedChangesSelector);
   const dispatch = useDispatch<Dispatch>();
@@ -82,7 +83,9 @@ export default function TokenSetList({
             key={item.key}
             isActive={activeTokenSet === item.path}
             onClick={handleClick}
-            isChecked={usedTokenSet.includes(item.path)}
+            isChecked={usedTokenSet?.[item.path] === TokenSetStatus.ENABLED || (
+              usedTokenSet?.[item.path] === TokenSetStatus.SOURCE ? 'indeterminate' : false
+            )}
             item={item}
             onCheck={handleCheckedChange}
             canEdit={!editProhibited}

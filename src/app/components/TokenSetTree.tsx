@@ -9,14 +9,15 @@ import { getTree, TreeItem } from './utils/getTree';
 import {
   activeTokenSetSelector,
   editProhibitedSelector,
-  usedTokenSetsAsStringArraySelector,
+  usedTokenSetSelector,
 } from '@/selectors';
+import { TokenSetStatus } from '@/constants/TokenSetStatus';
 
 // @TODO use hooks
 
 export default function TokenSetTree({ tokenSets, onRename, onDelete }: { tokenSets: string[], onRename: (tokenSet: string) => void, onDelete: (tokenSet: string) => void }) {
   const activeTokenSet = useSelector(activeTokenSetSelector);
-  const usedTokenSet = useSelector(usedTokenSetsAsStringArraySelector);
+  const usedTokenSet = useSelector(usedTokenSetSelector);
   const editProhibited = useSelector(editProhibitedSelector);
   const dispatch = useDispatch<Dispatch>();
   const [items, setItems] = useState<TreeItem[]>(getTree(tokenSets));
@@ -24,14 +25,32 @@ export default function TokenSetTree({ tokenSets, onRename, onDelete }: { tokenS
 
   const determineCheckedState = useCallback((item: TreeItem) => {
     if (item.type === 'set') {
-      return usedTokenSet.includes(item.path);
+      if (usedTokenSet?.[item.path] === TokenSetStatus.ENABLED) {
+        return 'indeterminate';
+      }
+      return usedTokenSet?.[item.path] === TokenSetStatus.ENABLED;
     }
+
     const itemPaths = items.filter((i) => i.path.startsWith(item.path) && i.path !== item.path).map((i) => i.path);
-    if (itemPaths.every((i) => usedTokenSet.includes(i))) {
+    const childTokenSetStatuses = Object.entries(usedTokenSet)
+      .filter(([tokenSet]) => itemPaths.includes(tokenSet))
+      .map(([,tokenSetStatus]) => tokenSetStatus);
+
+    if (childTokenSetStatuses.every((status) => (
+      status === TokenSetStatus.ENABLED
+    ))) {
+      // @README all children are ENABLED
       return true;
-    } if (itemPaths.some((i) => usedTokenSet.includes(i))) {
+    }
+
+    if (itemPaths.some((status) => (
+      status === TokenSetStatus.ENABLED
+      || status === TokenSetStatus.SOURCE
+    ))) {
+      // @README some children are ENABLED or treated as SOURCE
       return 'indeterminate';
     }
+
     return false;
   }, [items, usedTokenSet]);
 

@@ -41,7 +41,7 @@ type Props = {
   defaultChecked?: boolean;
   disabled?: boolean;
   onCheckedChange: (checked: CheckboxPrimitive.CheckedState) => void;
-  renderIcon?: (checked: boolean | 'indeterminate') => React.ReactNode;
+  renderIcon?: (checked: boolean | 'indeterminate', fallback: React.ReactNode) => React.ReactNode;
 };
 
 function Checkbox({
@@ -53,10 +53,14 @@ function Checkbox({
   renderIcon,
 }: Props) {
   const icon = useMemo(() => {
-    if (renderIcon) return renderIcon(checked);
-    if (checked === 'indeterminate') return <IconIndeterminate />;
-    if (checked === true) return <IconCheck />;
-    return null;
+    let fallbackIcon: React.ReactNode = null;
+    if (checked === 'indeterminate') {
+      fallbackIcon = <IconIndeterminate />;
+    } else if (checked === true) {
+      fallbackIcon = <IconCheck />;
+    }
+    if (renderIcon) return renderIcon(checked, fallbackIcon);
+    return fallbackIcon;
   }, [checked, renderIcon]);
 
   return (

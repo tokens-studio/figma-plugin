@@ -1,5 +1,6 @@
 import React, { useCallback } from 'react';
 import { useDragControls } from 'framer-motion';
+import { useSelector } from 'react-redux';
 import Checkbox from '../Checkbox';
 import IconChevronDown from '../icons/IconChevronDown';
 import Box from '../Box';
@@ -19,6 +20,10 @@ import { StyledGrabber } from './StyledGrabber';
 import { StyledCheckbox } from './StyledCheckbox';
 import { StyledButton } from './StyledButton';
 import { StyledWrapper } from './StyledWrapper';
+import { tokenSetStatusSelector } from '@/selectors';
+import { RootState } from '@/app/store';
+import { TokenSetStatus } from '@/constants/TokenSetStatus';
+import IconIndeterminateAlt from '@/icons/indeterminate-alt.svg';
 
 export type ListItem = {
   path: string,
@@ -63,6 +68,10 @@ export function TokenSetItem<Item extends TreeItem | ListItem = TreeItem | ListI
   onTreatAsSource,
 }: TokenSetItemProps<Item>) {
   const controls = useDragControls();
+  const statusSelector = useCallback((state: RootState) => (
+    tokenSetStatusSelector(state, item.path)
+  ), [item]);
+  const tokenSetStatus = useSelector(statusSelector);
 
   const handleClick = useCallback(() => {
     onClick(item);
@@ -91,6 +100,13 @@ export function TokenSetItem<Item extends TreeItem | ListItem = TreeItem | ListI
   const handleGrabberPointerDown = useCallback<React.PointerEventHandler<HTMLDivElement>>((event) => {
     controls.start(event);
   }, [controls]);
+
+  const renderIcon = useCallback((checked: typeof isChecked, fallbackIcon: React.ReactNode) => {
+    if (tokenSetStatus === TokenSetStatus.SOURCE) {
+      return <IconIndeterminateAlt />;
+    }
+    return fallbackIcon;
+  }, [tokenSetStatus]);
 
   return (
     <ConditionalReorderWrapper
@@ -173,6 +189,7 @@ export function TokenSetItem<Item extends TreeItem | ListItem = TreeItem | ListI
           <Checkbox
             id={item.path}
             checked={isChecked}
+            renderIcon={renderIcon}
             onCheckedChange={handleCheckedChange}
           />
         </StyledCheckbox>
