@@ -16,16 +16,16 @@ import {
   activeTokenSetSelector,
   inspectDeepSelector,
   tokensSelector,
+  usedTokenSetSelector,
 } from '@/selectors';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
-import convertTokensObjectToResolved from '@/utils/convertTokensObjectToResolved';
 
 function Inspector() {
   const [inspectView, setInspectView] = React.useState('multi');
   const dispatch = useDispatch<Dispatch>();
   const tokens = useSelector(tokensSelector);
   const activeTokenSet = useSelector(activeTokenSetSelector);
-  const usedTokenSet = useSelector(convertTokensObjectToResolved);
+  const usedTokenSet = useSelector(usedTokenSetSelector);
   const inspectDeep = useSelector(inspectDeepSelector);
 
   // TODO: Put this into state in a performant way
