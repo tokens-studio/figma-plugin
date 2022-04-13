@@ -28,8 +28,10 @@ function hasSameContent(content: TokenValues, storedContent: string) {
   return stringifiedContent === storedContent;
 }
 
-export const fetchBranches = async ({ context, owner, repo }: { context: ContextObject, owner: string, repo: string }) => {
-  const octokit = new Octokit({ auth: context.secret, baseUrl: context.baseUrl });
+export const fetchGithubBranches = async ({
+  secret, owner, repo, baseUrl,
+}: { secret: string, owner: string, repo: string, baseUrl: string | undefined }) => {
+  const octokit = new Octokit({ auth: secret, baseUrl });
   const branches = await octokit.repos
     .listBranches({ owner, repo })
     .then((response) => response.data);
@@ -237,7 +239,10 @@ export function useGitHub() {
       const OctokitWithPlugin = Octokit.plugin(require('octokit-commit-multiple-files'));
       const octokit = new OctokitWithPlugin({ auth: context.secret, baseUrl: context.baseUrl });
 
-      const branches = await fetchBranches({ context, owner, repo });
+      const { secret, baseUrl } = context;
+      const branches = await fetchGithubBranches({
+        secret, owner, repo, baseUrl,
+      });
       const branch = customBranch || context.branch;
       if (!branches) return null;
       let response;
@@ -356,8 +361,11 @@ export function useGitHub() {
   // Function to initially check auth and sync tokens with GitHub
   async function syncTokensWithGitHub(context: ContextObject): Promise<TokenValues | null> {
     try {
-      const [owner, repo] = context.id.split('/');
-      const branches = await fetchBranches({ context, owner, repo });
+      const { id, secret, baseUrl } = context;
+      const [owner, repo] = id.split('/');
+      const branches = await fetchGithubBranches({
+        secret, owner, repo, baseUrl,
+      });
       dispatch.branchState.setBranches(branches);
 
       if (!branches) {

@@ -37,6 +37,17 @@ const StyledBranchSwitchMenuSeparator = styled(BranchSwitchMenuPrimitive.Separat
   backgroundColor: '$contextMenuSeperator',
   margin: '$2',
 });
+
+const StyledBranchSwitchMenuMainTrigger = styled(BranchSwitchMenuPrimitive.Trigger, {
+  display: 'flex',
+  alignItems: 'center',
+  fontSize: '$xsmall',
+  '& > span': {
+    paddingLeft: '$2',
+    paddingRight: '$2',
+  },
+});
+
 const StyledBranchSwitchMenuTrigger = styled(BranchSwitchMenuPrimitive.Trigger, {
   display: 'flex',
   alignItems: 'center',
@@ -88,6 +99,7 @@ export const BranchSwitchMenuContent = StyledBranchSwitchMenuContent;
 export const BranchSwitchMenuCheckboxItem = StyledBranchSwitchMenuCheckboxItem;
 export const BranchSwitchMenuRadioGroup = StyledBranchSwitchMenuRadioGroup;
 export const BranchSwitchMenuRadioItem = StyledBranchSwitchMenuRadioItem;
+export const BranchSwitchMenuMainTrigger = StyledBranchSwitchMenuMainTrigger;
 export const BranchSwitchMenuTrigger = StyledBranchSwitchMenuTrigger;
 export const BranchSwitchMenuSeparator = StyledBranchSwitchMenuSeparator;
 export const BranchSwitchMenuItem = StyledBranchSwitchMenuItem;

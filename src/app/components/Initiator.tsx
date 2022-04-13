@@ -1,5 +1,5 @@
 import React from 'react';
-import { Provider, useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { identify, track } from '@/utils/analytics';
 import { MessageFromPluginTypes, MessageToPluginTypes, PostToUIMessage } from '@/types/messages';
 import { postToFigma } from '../../plugin/notifiers';
@@ -8,13 +8,11 @@ import { Dispatch } from '../store';
 import useStorage from '../store/useStorage';
 import * as pjs from '../../../package.json';
 import { useFeatureFlags } from '../hooks/useFeatureFlags';
-import { apiSelector, apiProvidersSelector } from '@/selectors';
-import * as Github from '../store/providers/github';
+import { fetchGithubBranches } from '../store/providers/github';
+import { StorageProviderType } from '@/types/api';
 
 export function Initiator() {
   const dispatch = useDispatch<Dispatch>();
-  const api = useSelector(apiSelector);
-  const apiProviders = useSelector(apiProvidersSelector);
 
   const { pullTokens } = useRemoteTokens();
   const { fetchFeatureFlags } = useFeatureFlags();
@@ -99,13 +97,18 @@ export function Initiator() {
 
               track('Fetched from remote', { provider: credentials.provider });
               if (!credentials.internalId) track('missingInternalId', { provider: credentials.provider });
-              console.log('provider, credentials', credentials);
-              const [owner, repo] = credentials.id.split('/');
-              // const branches = await Github.fetchBranches({ credentials, owner, repo });
-              // console.log('branches', branches);
-              // dispatch.branchState.setBranches(branches);
 
-              console.log('initiator setapidata');
+              const {
+                id, provider, secret, baseUrl,
+              } = credentials;
+              const [owner, repo] = id.split('/');
+              if (provider === StorageProviderType.GITHUB) {
+                const branches = await fetchGithubBranches({
+                  secret, owner, repo, baseUrl,
+                });
+                dispatch.branchState.setBranches(branches);
+              }
+
               dispatch.uiState.setApiData(credentials);
               dispatch.uiState.setLocalApiState(credentials);
 

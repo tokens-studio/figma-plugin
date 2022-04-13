@@ -9,56 +9,73 @@ import {
   BranchSwitchMenuContent,
   BranchSwitchMenuItem,
   BranchSwitchMenuItemIndicator,
-  BranchSwitchMenuSeparator,
+  BranchSwitchMenuMainTrigger,
   BranchSwitchMenuTrigger,
   BranchSwitchMenuRadioGroup,
   BranchSwitchMenuRadioItem,
   BranchSwitchMenuArrow,
 } from './BranchSwitchMenu';
-import { branchSelector } from '@/selectors';
+import { localApiStateSelector, branchSelector } from '@/selectors';
 
 export default function BranchSelector() {
   const branchState = useSelector(branchSelector);
-  const [currentBranch, setCurrentBranch] = useState('');
+  const localApiState = useSelector(localApiStateSelector);
+  const [currentBranch, setCurrentBranch] = useState(localApiState.branch);
+  const [menuOpened, setMenuOpened] = useState(false);
+
+  useEffect(() => {
+    setCurrentBranch(localApiState.branch);
+  }, [localApiState.branch, setCurrentBranch]);
 
   const handleChangeBranch = (branch: string) => {
     setCurrentBranch(branch);
   };
 
   return (
-    <BranchSwitchMenu>
-      <BranchSwitchMenuTrigger>
-        <GitBranchIcon size={16} />
-        <span>{currentBranch}</span>
-        <ChevronUpIcon />
-      </BranchSwitchMenuTrigger>
+    <>
+      {currentBranch
+        ? (
+          <BranchSwitchMenu open={menuOpened} onOpenChange={() => setMenuOpened(!menuOpened)}>
+            <BranchSwitchMenuMainTrigger>
+              <GitBranchIcon size={16} />
+              <span>{currentBranch}</span>
+              {menuOpened ? <ChevronDownIcon /> : <ChevronUpIcon />}
+            </BranchSwitchMenuMainTrigger>
 
-      <BranchSwitchMenuContent side="top" sideOffset={5}>
-        <BranchSwitchMenuRadioGroup value={currentBranch}>
-          {branchState.branches.length > 0
-          && branchState.branches.map((branch, index) => (
-            <BranchSwitchMenuRadioItem key={index} value={branch} onSelect={() => handleChangeBranch(branch)}>
-              <BranchSwitchMenuItemIndicator>
-                <CheckIcon />
-              </BranchSwitchMenuItemIndicator>
-              {`${branch}`}
-            </BranchSwitchMenuRadioItem>
-          ))}
-        </BranchSwitchMenuRadioGroup>
-        <BranchSwitchMenu>
-          <BranchSwitchMenuTrigger>
-            Create new branch from
-            <ChevronRightIcon />
-          </BranchSwitchMenuTrigger>
-          <BranchSwitchMenuContent side="left">
-            <BranchSwitchMenuItem>
-              Current changes
-            </BranchSwitchMenuItem>
-            {branchState.branches.length > 0 && branchState.branches.map((branch, index) => <BranchSwitchMenuItem key={index}>{`${branch}`}</BranchSwitchMenuItem>)}
-          </BranchSwitchMenuContent>
-        </BranchSwitchMenu>
-        <BranchSwitchMenuArrow offset={12} />
-      </BranchSwitchMenuContent>
-    </BranchSwitchMenu>
+            <BranchSwitchMenuContent side="top" sideOffset={5}>
+              <BranchSwitchMenuRadioGroup value={currentBranch}>
+                {branchState.branches.length > 0
+            && branchState.branches.map((branch, index) => (
+              <BranchSwitchMenuRadioItem key={index} value={branch} onSelect={() => handleChangeBranch(branch)}>
+                <BranchSwitchMenuItemIndicator>
+                  <CheckIcon />
+                </BranchSwitchMenuItemIndicator>
+                <GitBranchIcon size={12} />
+                {` ${branch}`}
+              </BranchSwitchMenuRadioItem>
+            ))}
+              </BranchSwitchMenuRadioGroup>
+              <BranchSwitchMenu>
+                <BranchSwitchMenuTrigger>
+                  Create new branch from
+                  <ChevronRightIcon />
+                </BranchSwitchMenuTrigger>
+                <BranchSwitchMenuContent side="left">
+                  <BranchSwitchMenuItem>
+                    Current changes
+                  </BranchSwitchMenuItem>
+                  {branchState.branches.length > 0 && branchState.branches.map((branch, index) => (
+                    <BranchSwitchMenuItem key={index}>
+                      <GitBranchIcon size={12} />
+                      {` ${branch}`}
+                    </BranchSwitchMenuItem>
+                  ))}
+                </BranchSwitchMenuContent>
+              </BranchSwitchMenu>
+              <BranchSwitchMenuArrow offset={12} />
+            </BranchSwitchMenuContent>
+          </BranchSwitchMenu>
+        ) : <div />}
+    </>
   );
 }
