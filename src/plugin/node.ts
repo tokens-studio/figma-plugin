@@ -1,7 +1,6 @@
 import omit from 'just-omit';
 import store from './store';
 import setValuesOnNode from './setValuesOnNode';
-import { TokenValues } from '../types/tokens';
 import { ContextObject, StorageProviderType, StorageType } from '../types/api';
 import * as pjs from '../../package.json';
 import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
@@ -63,11 +62,6 @@ export function getTokenData(): {
     const values = tokensSharedDataHandler.get(figma.root, SharedPluginDataKeys.tokens.values);
     const version = tokensSharedDataHandler.get(figma.root, SharedPluginDataKeys.tokens.version);
     const updatedAt = tokensSharedDataHandler.get(figma.root, SharedPluginDataKeys.tokens.updatedAt);
-    const usedTokenSet = tokensSharedDataHandler.get(figma.root, SharedPluginDataKeys.tokens.usedTokenSet);
-    let parsedUsedTokenSet;
-    if (usedTokenSet) {
-      parsedUsedTokenSet = JSON.parse(usedTokenSet);
-    }
     if (values) {
       const parsedValues = JSON.parse(values);
       if (Object.keys(parsedValues).length > 0) {
@@ -79,7 +73,6 @@ export function getTokenData(): {
           values: tokenObject as TokenStore['values'],
           updatedAt,
           version,
-          usedTokenSet: parsedUsedTokenSet,
         };
       }
     }
