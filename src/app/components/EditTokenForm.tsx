@@ -71,6 +71,8 @@ function EditTokenForm({ resolvedTokens }: Props) {
     setInputHelperOpen(!inputHelperOpen);
   }, [inputHelperOpen]);
 
+  const handleAutoSuggest = React.useCallback(() => setShowAutoSuggest(!showAutoSuggest), [showAutoSuggest]);
+
   const handleChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>(
     (e) => {
       setError(null);
@@ -282,7 +284,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
               }
               suffix={(
                 <StyledInputSuffix
-                  onClick={React.useCallback(() => setShowAutoSuggest(!showAutoSuggest), [showAutoSuggest])}
+                  onClick={handleAutoSuggest}
                 >
                   <StyledIconDisclosure />
                 </StyledInputSuffix>

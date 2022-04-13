@@ -1,6 +1,7 @@
 import React, { useCallback, useMemo } from 'react';
 import Downshift from 'downshift';
 import { styled } from '@/stitches.config';
+import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
 
 import Box from './Box';
 import Stack from './Stack';
@@ -26,7 +27,7 @@ const StyledItem = styled('div', {
   padding: '4px 10px',
   fontSize: '14px',
   ' &:focus': {
-    backgroundColor: '#18a0fb',
+    backgroundColor: '$hover',
   },
 });
 
@@ -70,10 +71,10 @@ interface DownShiftProps {
   placeholder?: string;
   prefix?: React.ReactNode;
   suffix?: React.ReactNode;
-  resolvedTokens: any;
-  setInputValue: Function;
+  resolvedTokens: ResolveTokenValuesResult[];
+  setInputValue(value: string): void;
   showAutoSuggest: boolean;
-  setShowAutoSuggest: Function;
+  setShowAutoSuggest(show: boolean): void;
   handleChange?: React.ChangeEventHandler<HTMLInputElement>;
 }
 
@@ -113,6 +114,15 @@ const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
     );
   }, []);
 
+  const filteredTokenItems = useMemo(
+    () => resolvedTokens
+      .filter(
+        (token: SingleToken) => !filteredValue || token.name.toLowerCase().includes(filteredValue.toLowerCase()),
+      )
+      .filter((token: SingleToken) => token?.type === type),
+    [resolvedTokens, filteredValue],
+  );
+
   return (
     <Downshift onChange={onSelectionChange}>
       {({
@@ -137,33 +147,30 @@ const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
             {!!suffix && <button {...getToggleButtonProps()}>{suffix}</button>}
           </Box>
 
-          {showAutoSuggest || (value.includes('{') && !value.includes('}')) ? (
+          {filteredTokenItems
+          && filteredTokenItems.length > 0
+          && (showAutoSuggest || (value.includes('{') && !value.includes('}'))) ? (
             <StyledDropdown>
-              {resolvedTokens
-                .filter(
-                  (token: SingleToken) => !filteredValue || token.name.toLowerCase().includes(filteredValue.toLowerCase()),
-                )
-                .filter((token: SingleToken) => token?.type === type)
-                .map((token: SingleToken, index: number) => (
-                  <StyledItem
-                    className="dropdown-item"
-                    {...getItemProps({ key: token.name, index, item: token })}
-                    css={{
-                      backgroundColor: highlightedIndex === index ? '#18a0fb' : 'white',
-                      fontWeight: selectedItem === token ? 'bold' : 'normal',
-                    }}
-                  >
-                    {type === 'color' && (
+              {filteredTokenItems.map((token: SingleToken, index: number) => (
+                <StyledItem
+                  className="dropdown-item"
+                  {...getItemProps({ key: token.name, index, item: token })}
+                  css={{
+                    backgroundColor: highlightedIndex === index ? '$hover' : '$bgDefault',
+                    fontWeight: selectedItem === token ? 'bold' : 'normal',
+                  }}
+                >
+                  {type === 'color' && (
                     <StyledItemColorDiv>
                       <StyledItemColor style={{ backgroundColor: token.value }} />
                     </StyledItemColorDiv>
-                    )}
-                    <StyledItemName>{getHighlightedText(token.name, filteredValue || '')}</StyledItemName>
-                    <StyledItemValue isFocused={highlightedIndex === index}>{token.value}</StyledItemValue>
-                  </StyledItem>
-                ))}
+                  )}
+                  <StyledItemName>{getHighlightedText(token.name, filteredValue || '')}</StyledItemName>
+                  <StyledItemValue isFocused={highlightedIndex === index}>{token.value}</StyledItemValue>
+                </StyledItem>
+              ))}
             </StyledDropdown>
-          ) : null}
+            ) : null}
         </div>
       )}
     </Downshift>
