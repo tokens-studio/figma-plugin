@@ -103,6 +103,15 @@ export const tokenState = createModel<RootModel>()({
         },
       };
     },
+    toggleTreatAsSource: (state, tokenSet: string) => ({
+      ...state,
+      usedTokenSet: {
+        ...state.usedTokenSet,
+        [tokenSet]: state.usedTokenSet[tokenSet] === TokenSetStatus.SOURCE
+          ? TokenSetStatus.DISABLED
+          : TokenSetStatus.SOURCE,
+      },
+    }),
     setActiveTokenSet: (state, data: string) => ({
       ...state,
       activeTokenSet: data,
