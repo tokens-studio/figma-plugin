@@ -18,8 +18,6 @@ import { ProgressTracker } from './ProgressTracker';
 import { AnyTokenList, TokenStore } from '@/types/tokens';
 import { isSingleToken } from '@/utils/is';
 import { UsedTokenSetsMap } from '@/types';
-import { TokenSetStatus } from '@/constants/TokenSetStatus';
-import { migrate } from '@/utils/migrate';
 
 // @TODO fix typings
 
@@ -60,33 +58,11 @@ export function getTokenData(): {
   values: TokenStore['values'];
   updatedAt: string;
   version: string;
-  usedTokenSet?: UsedTokenSetsMap;
 } | null {
   try {
     const values = tokensSharedDataHandler.get(figma.root, SharedPluginDataKeys.tokens.values);
     const version = tokensSharedDataHandler.get(figma.root, SharedPluginDataKeys.tokens.version);
     const updatedAt = tokensSharedDataHandler.get(figma.root, SharedPluginDataKeys.tokens.updatedAt);
-    const usedTokenSet = tokensSharedDataHandler.get(figma.root, SharedPluginDataKeys.tokens.usedTokenSet);
-    let parsedUsedTokenSet: UsedTokenSetsMap = {};
-    if (usedTokenSet) {
-      // @README in previous versions the used tokens were saved as string[]
-      // this means we will need to normalize it into the new format to support
-      // multi-state token sets (disabled,source,enabled)
-      const savedUsedTokensSet = JSON.parse(usedTokenSet) as (
-        string[] | UsedTokenSetsMap
-      );
-      parsedUsedTokenSet = migrate<typeof savedUsedTokensSet, UsedTokenSetsMap>(
-        savedUsedTokensSet,
-        (input): input is string[] => Array.isArray(input),
-        (input) => (
-          Object.fromEntries<TokenSetStatus>(
-            input.map((tokenSet) => (
-              [tokenSet, TokenSetStatus.ENABLED]
-            )),
-          )
-        ),
-      );
-    }
     if (values) {
       const parsedValues = JSON.parse(values);
       if (Object.keys(parsedValues).length > 0) {
@@ -98,7 +74,6 @@ export function getTokenData(): {
           values: tokenObject as TokenStore['values'],
           updatedAt,
           version,
-          usedTokenSet: parsedUsedTokenSet,
         };
       }
     }

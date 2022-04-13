@@ -8,12 +8,9 @@ import { NodeTokenRefMap } from './NodeTokenRefMap';
 import { UpdateMode } from './state';
 import { SelectionGroup } from './SelectionGroup';
 import { SelectionValue } from './SelectionValue';
-import { AnyTokenList, AnyTokenSet } from './tokens';
+import { AnyTokenList, AnyTokenSet, TokenStore } from './tokens';
 import { PullStyleOptions } from './PullStylesOptions';
 import { UsedTokenSetsMap } from './UsedTokenSetsMap';
-// import {
-//   PullStyleTypes, SelectionGroup, SelectionValue, TokenArrayGroup, TokenGroup,
-// } from './tokens';
 
 export enum MessageFromPluginTypes {
   SELECTION = 'selection',
@@ -89,8 +86,7 @@ export type RemoteCommentsFromPluginMessage = {
 };
 export type TokenValuesFromPluginMessage = {
   type: MessageFromPluginTypes.TOKEN_VALUES;
-  values?: any;
-  usedTokenSet?: string[];
+  values: TokenStore;
 };
 export type ReceivedStorageTypeFromPluginMessage = {
   type: MessageFromPluginTypes.RECEIVED_STORAGE_TYPE;
@@ -139,9 +135,10 @@ export type ApiCredentialsFromPluginMessage = {
   type: MessageFromPluginTypes.API_CREDENTIALS;
   status: boolean;
   credentials: ApiDataType & {
-    internalId?: string;
-  };
-  featureFlagId: string;
+    internalId?: string
+  }
+  featureFlagId: string
+  usedTokenSet?: UsedTokenSetsMap | null
 };
 export type PostToUIMessage =
   | NoSelectionFromPluginMessage
