@@ -1,7 +1,7 @@
 import { SingleToken } from '@/types/tokens';
 
 export function isSingleToken(token: SingleToken | any): token is SingleToken {
-  return (
+  return !!(
     token
     && typeof token === 'object'
     && 'value' in token
