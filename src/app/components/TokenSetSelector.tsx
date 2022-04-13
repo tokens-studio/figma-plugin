@@ -108,7 +108,7 @@ export default function TokenSetSelector() {
       }}
       className="content"
     >
-      {true && featureFlags?.gh_mfs_enabled && api.provider === StorageProviderType.GITHUB && !api?.filePath?.endsWith('.json') ? (
+      {featureFlags?.gh_mfs_enabled && api.provider === StorageProviderType.GITHUB && !api?.filePath?.endsWith('.json') ? (
         <Box>
           <TokenSetTree
             tokenSets={allTokenSets}
