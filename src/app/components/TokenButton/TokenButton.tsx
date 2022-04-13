@@ -1,4 +1,5 @@
 import React from 'react';
+import extend from 'just-extend';
 import { useDispatch, useSelector } from 'react-redux';
 import { track } from '@/utils/analytics';
 import { SingleToken } from '@/types/tokens';
@@ -17,13 +18,13 @@ import { useGetActiveState } from '@/hooks';
 import { usePropertiesForTokenType } from '../../hooks/usePropertiesForType';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { PropertyObject } from '@/types/properties';
-import type { ShowFormOptions } from '../TokenTree';
 import {
   activeTokenSetSelector,
 } from '@/selectors';
 import { useSetNodeData } from '@/hooks/useSetNodeData';
 import { DragOverItem } from './DragOverItem';
 import { TokenButtonDraggable } from './TokenButtonDraggable';
+import type { ShowFormOptions } from '../TokenTree';
 
 // @TODO fix typings
 
@@ -100,8 +101,9 @@ export const TokenButton: React.FC<Props> = ({
   }, [dispatch, tokensContext.resolvedTokens, setNodeData]);
 
   const handleClick = React.useCallback((givenProperties: PropertyObject | PropertyObject[], isActive = active) => {
-    const propsToSet = Array.isArray(givenProperties) ? givenProperties : [givenProperties];
-
+    const propsToSet = (Array.isArray(givenProperties) ? givenProperties : [givenProperties]).map((prop) => (
+      extend(true, {}, prop) as typeof prop
+    ));
     const tokenValue = name;
     track('Apply Token', { givenProperties });
     let value = isActive ? 'delete' : tokenValue;
@@ -142,7 +144,7 @@ export const TokenButton: React.FC<Props> = ({
       >
         <TokenTooltip token={token}>
           <button
-            className="w-full h-full relativeƒ"
+            className="w-full h-full relative"
             type="button"
             onClick={handleTokenClick}
           >
@@ -160,5 +162,3 @@ export const TokenButton: React.FC<Props> = ({
     </TokenButtonDraggable>
   );
 };
-
-TokenButton.whyDidYouRender = true;

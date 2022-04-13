@@ -20,7 +20,7 @@ const itemStyles = {
   alignItems: 'center',
   height: 20,
   padding: '0 $2',
-  paddingLeft: '$3',
+  paddingLeft: '$4',
   userSelect: 'none',
 
   '&[data-disabled]': {
