@@ -67,6 +67,10 @@ const StyledItemIndicator = styled(ContextMenuPrimitive.ItemIndicator, {
   justifyContent: 'center',
 });
 
+const StyledArrow = styled(ContextMenuPrimitive.Arrow, {
+  fill: 'white',
+});
+
 // Exports
 export const ContextMenu = ContextMenuPrimitive.Root;
 export const ContextMenuTrigger = ContextMenuPrimitive.Trigger;
@@ -79,3 +83,4 @@ export const ContextMenuItemIndicator = StyledItemIndicator;
 export const ContextMenuTriggerItem = StyledTriggerItem;
 export const ContextMenuLabel = StyledLabel;
 export const ContextMenuSeparator = StyledSeparator;
+export const ContextMenuArrow = StyledArrow;

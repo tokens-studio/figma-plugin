@@ -71,7 +71,7 @@ const StyledDropdownMenuRadioGroup = styled(DropdownMenuPrimitive.RadioGroup, {}
 
 const StyledDropdownMenuRadioItem = styled(DropdownMenuPrimitive.RadioItem, itemStyles);
 
-const StyledDropdownMenuArrow = styled(DropdownMenuPrimitive.Arrow, {});
+const StyledDropdownMenuArrow = styled(DropdownMenuPrimitive.Arrow, { fill: 'black' });
 
 const StyledDropdownMenu = styled(DropdownMenuPrimitive.Root, {});
 
@@ -83,7 +83,6 @@ export const DropdownMenuTrigger = StyledDropdownMenuTrigger;
 export const DropdownMenuSeparator = StyledDropdownMenuSeparator;
 export const DropdownMenuItem = StyledDropdownMenuItem;
 export const DropdownMenuItemIndicator = StyledDropdownMenuItemIndicator;
-export const DropdownMenuItemIndiDropdownMenuItemcator = StyledDropdownMenuItemIndicator;
 export const DropdownMenu = StyledDropdownMenu;
 export const DropdownSubmenu = StyledDropdownSubmenu;
 export const DropdownMenuArrow = StyledDropdownMenuArrow;
