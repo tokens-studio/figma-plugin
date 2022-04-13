@@ -1548,7 +1548,7 @@
     "@radix-ui/react-use-callback-ref" "0.1.0"
     "@radix-ui/react-use-escape-keydown" "0.1.0"
 
-"@radix-ui/react-dropdown-menu@^0.0.19":
+"@radix-ui/react-dropdown-menu@0.0.19":
   version "0.0.19"
   resolved "https://registry.yarnpkg.com/@radix-ui/react-dropdown-menu/-/react-dropdown-menu-0.0.19.tgz#fbc3106bcda65d3060b280f4af3a9c45324ab474"
   integrity sha512-7UhT6PIXl9fr8Ai9DkXMtxPNQFh8emrklgY5jcad9NHKWAztgfL6Fm+Ns0GEYUkd5OpJLEaIj/EUkwFM73SrGw==
@@ -2488,6 +2488,11 @@
   version "2.4.0"
   resolved "https://registry.yarnpkg.com/@types/normalize-package-data/-/normalize-package-data-2.4.0.tgz#e486d0d97396d79beedd0a6e33f4534ff6b4973e"
   integrity sha512-f5j5b/Gf71L+dbqxIpQ4Z2WlmI/mPJ0fOkGGmFgtb6sAu97EPczzbS3/tJKxmcYDj55OX6ssqwDAWOHIYDRDGA==
+
+"@types/object-hash@^2.2.1":
+  version "2.2.1"
+  resolved "https://registry.yarnpkg.com/@types/object-hash/-/object-hash-2.2.1.tgz#67c169f8f033e0b62abbf81df2d00f4598d540b9"
+  integrity sha512-i/rtaJFCsPljrZvP/akBqEwUP2y5cZLOmvO+JaYnz01aPknrQ+hB5MRcO7iqCUsFaYfTG8kGfKUyboA07xeDHQ==
 
 "@types/parse-json@^4.0.0":
   version "4.0.0"
@@ -7888,6 +7893,16 @@ just-omit@^2.0.1:
   resolved "https://registry.yarnpkg.com/just-omit/-/just-omit-2.0.1.tgz#25d5967424cc69a2ef4faa315ede1d5b7be3168c"
   integrity sha512-gmMf9DSGjx+PJFr7P7zcZk4hpKvb/iLTmXjArvtvr2zg8JvcXyAjPtJItX4Lx8BCUk3UAtJiacu4no9h9mv6mg==
 
+just-safe-get@^4.0.1:
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/just-safe-get/-/just-safe-get-4.0.1.tgz#b89db1d82e1df27723a4c679ba913474cfaa3cb6"
+  integrity sha512-Yet2Cf1s0h8Jh0A1CMBkR/C4nIN+pCJ4vN7aNk0Eo3d/QhnpWWPEMaxlIxAiH4bUdRCfdJonFabClf21Ls5NMA==
+
+just-safe-set@^4.0.2:
+  version "4.0.2"
+  resolved "https://registry.yarnpkg.com/just-safe-set/-/just-safe-set-4.0.2.tgz#554225c2a03785db645914d993d9de8a69f762cc"
+  integrity sha512-tAIYsHB6pC7o2/+UtquHOYT4jaboA97W+9nYij0boNnjK66G5avPZpHYIpj99dCzOSNWBO8/+k9+gdgadHF2Mw==
+
 just-split@^3.0.1:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/just-split/-/just-split-3.0.1.tgz#e9e9475afc70c72078eea5da08632e1425928467"
@@ -8179,7 +8194,7 @@ lodash.sortby@^4.7.0:
   resolved "https://registry.yarnpkg.com/lodash.sortby/-/lodash.sortby-4.7.0.tgz#edd14c824e2cc9c1e0b0a1b42bb5210516a42438"
   integrity sha1-7dFMgk4sycHgsKG0K7UhBRakJDg=
 
-lodash@^4, lodash@^4.17.10, lodash@^4.17.13, lodash@^4.17.15, lodash@^4.17.19, lodash@^4.17.20, lodash@^4.17.3:
+lodash@^4, lodash@^4.17.10, lodash@^4.17.13, lodash@^4.17.15, lodash@^4.17.19, lodash@^4.17.20, lodash@^4.17.21, lodash@^4.17.3:
   version "4.17.21"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.21.tgz#679591c564c3bffaae8454cf0b3df370c3d6911c"
   integrity sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==

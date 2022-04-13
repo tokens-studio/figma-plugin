@@ -1,4 +1,5 @@
 import React from 'react';
+import isEqual from 'lodash.isequal';
 import { useDispatch, useSelector } from 'react-redux';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { DndProvider } from 'react-dnd';
@@ -153,4 +154,4 @@ const TokenListing: React.FC<Props> = ({
   );
 };
 
-export default React.memo(TokenListing);
+export default React.memo(TokenListing, isEqual);

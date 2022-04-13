@@ -198,7 +198,7 @@ export const tokenState = createModel<RootModel>()({
       const existingTokenIndex = state.tokens[data.parent].findIndex((n) => n.name === data.name);
       if (existingTokenIndex > -1) {
         const newName = `${data.name}-copy`;
-        const existingTokens = state.tokens[data.parent];
+        const existingTokens = [...state.tokens[data.parent]];
         existingTokens.splice(existingTokenIndex + 1, 0, {
           ...state.tokens[data.parent][existingTokenIndex],
           name: newName,

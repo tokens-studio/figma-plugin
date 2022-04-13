@@ -43,7 +43,14 @@ module.exports = (env, argv) => ({
       { test: /\.(png|jpg|gif|webp)$/, loader: [{ loader: 'url-loader' }] },
       {
         test: /\.svg$/,
-        use: ['@svgr/webpack'],
+        use: [{
+          loader: '@svgr/webpack',
+          options: {
+            svgoConfig: {
+              plugins: [{ removeViewBox: false }]
+            }
+          }
+        }],
       },
       {
         type: 'javascript/auto',
