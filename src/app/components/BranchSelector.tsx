@@ -15,26 +15,52 @@ import {
   BranchSwitchMenuRadioItem,
   BranchSwitchMenuArrow,
 } from './BranchSwitchMenu';
-import { localApiStateSelector, branchSelector } from '@/selectors';
-import { StorageProviderType } from '@/types/api';
+import {
+  branchSelector, lastSyncedStateSelector, tokensSelector, localApiStateSelector,
+} from '@/selectors';
+import convertTokensToObject from '@/utils/convertTokensToObject';
+import useConfirm from '@/app/hooks/useConfirm';
+import CreateBranchModal from './modals/CreateBranchModal';
 
 export default function BranchSelector() {
+  const { confirm } = useConfirm();
   const branchState = useSelector(branchSelector);
+  const lastSyncedState = useSelector(lastSyncedStateSelector);
+  const tokens = useSelector(tokensSelector);
   const localApiState = useSelector(localApiStateSelector);
+
   const [currentBranch, setCurrentBranch] = useState(localApiState.branch);
+  const [startBranch, setStartBranch] = useState(null);
   const [menuOpened, setMenuOpened] = useState(false);
+  const [createBranchModalVisible, setCreateBranchModalVisible] = useState(false);
 
   useEffect(() => {
     setCurrentBranch(localApiState.branch);
   }, [localApiState.branch, setCurrentBranch]);
 
-  const createNewBranchFrom = (branch: string) => {
-    switch (localApiState.provider) {
-      case StorageProviderType.GITHUB:
-        break;
-      default:
-        break;
+  const checkForChanges = React.useCallback(() => {
+    if (lastSyncedState !== JSON.stringify(convertTokensToObject(tokens), null, 2)) {
+      return true;
     }
+    return false;
+  }, [lastSyncedState, tokens]);
+
+  async function askUserIfPull(): Promise<boolean> {
+    const { result } = await confirm({
+      text: 'Do you want to create new branch from curren branch?',
+      description: 'There are some changes which is unsaved. If you continue, you will lose update',
+    });
+    return result;
+  }
+
+  const createNewBranchFrom = async (branch: string) => {
+    if (checkForChanges()) {
+      const userDecision = await askUserIfPull();
+      console.log('userdecision', userDecision);
+    }
+
+    setStartBranch(branch);
+    setCreateBranchModalVisible(true);
   };
 
   return (
@@ -51,15 +77,15 @@ export default function BranchSelector() {
             <BranchSwitchMenuContent side="top" sideOffset={5}>
               <BranchSwitchMenuRadioGroup value={currentBranch}>
                 {branchState.branches.length > 0
-            && branchState.branches.map((branch, index) => (
-              <BranchSwitchMenuRadioItem key={index} value={branch} onSelect={() => setCurrentBranch(branch)}>
-                <BranchSwitchMenuItemIndicator>
-                  <CheckIcon />
-                </BranchSwitchMenuItemIndicator>
-                <GitBranchIcon size={12} />
-                {` ${branch}`}
-              </BranchSwitchMenuRadioItem>
-            ))}
+                  && branchState.branches.map((branch, index) => (
+                    <BranchSwitchMenuRadioItem key={index} value={branch} onSelect={() => setCurrentBranch(branch)}>
+                      <BranchSwitchMenuItemIndicator>
+                        <CheckIcon />
+                      </BranchSwitchMenuItemIndicator>
+                      <GitBranchIcon size={12} />
+                      {` ${branch}`}
+                    </BranchSwitchMenuRadioItem>
+                  ))}
               </BranchSwitchMenuRadioGroup>
               <BranchSwitchMenu>
                 <BranchSwitchMenuTrigger>
@@ -80,6 +106,14 @@ export default function BranchSelector() {
               </BranchSwitchMenu>
               <BranchSwitchMenuArrow offset={12} />
             </BranchSwitchMenuContent>
+            {createBranchModalVisible && (
+              <CreateBranchModal
+                isOpen={createBranchModalVisible}
+                onClose={() => setCreateBranchModalVisible(false)}
+                onSuccess={() => setCreateBranchModalVisible(false)}
+                startBranch={startBranch}
+              />
+            )}
           </BranchSwitchMenu>
         ) : <div />}
     </>

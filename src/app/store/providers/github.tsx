@@ -38,6 +38,23 @@ export const fetchGithubBranches = async ({
   return branches.map((branch) => branch.name);
 };
 
+export const createGithubBranch = async ({
+  context, branch, startBranch,
+}: { context: ContextObject, branch: string, startBranch: string }) => {
+  const { id, secret, baseUrl } = context;
+  const [owner, repo] = id.split('/');
+  const octokit = new Octokit({ auth: secret, baseUrl });
+  const originRef = `heads/${startBranch}`;
+  const newRef = `refs/heads/${branch}`;
+
+  const originBranch = await octokit.rest.git.getRef({ owner, repo, ref: originRef });
+  const newBranch = await octokit.rest.git.createRef({
+    owner, repo, ref: newRef, sha: originBranch.data.object.sha,
+  });
+  console.log('new', newBranch);
+  return newBranch;
+};
+
 export const checkPermissions = async ({ context, owner, repo }: { context: ContextObject, owner: string, repo: string }) => {
   try {
     const octokit = new Octokit({ auth: context.secret, baseUrl: context.baseUrl });

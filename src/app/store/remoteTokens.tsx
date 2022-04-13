@@ -7,7 +7,7 @@ import { useJSONbin } from './providers/jsonbin';
 import useURL from './providers/url';
 import { Dispatch } from '../store';
 import useStorage from './useStorage';
-import { useGitHub } from './providers/github';
+import { useGitHub, createGithubBranch } from './providers/github';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
 import { FeatureFlags } from '@/utils/featureFlags';
 import { apiSelector } from '@/selectors';
@@ -125,6 +125,24 @@ export default function useRemoteTokens() {
     return false;
   }
 
+  async function addNewBranch({ branch, provider, startBranch }: { branch: string, provider: StorageProviderType, startBranch: string }): Promise<boolean> {
+    switch (provider) {
+      case StorageProviderType.GITHUB: {
+        await createGithubBranch({ context: api, branch, startBranch });
+        break;
+      }
+      default:
+        throw new Error('Not implemented');
+    }
+    // if (data) {
+    //   dispatch.uiState.setLocalApiState(credentials);
+    //   dispatch.uiState.setApiData(credentials);
+    //   setStorageType({ provider: credentials, shouldSetInDocument: true });
+    //   return true;
+    // }
+    return false;
+  }
+
   const deleteProvider = (provider) => {
     postToFigma({
       type: MessageToPluginTypes.REMOVE_SINGLE_CREDENTIAL,
@@ -138,5 +156,6 @@ export default function useRemoteTokens() {
     pullTokens,
     pushTokens,
     addNewProviderItem,
+    addNewBranch,
   };
 }

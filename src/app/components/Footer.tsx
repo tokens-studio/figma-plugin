@@ -11,7 +11,7 @@ import useRemoteTokens from '../store/remoteTokens';
 import convertTokensToObject from '@/utils/convertTokensToObject';
 import { StorageProviderType } from '../../types/api';
 import {
-  activeTabSelector, editProhibitedSelector, lastSyncedStateSelector, projectURLSelector, storageTypeSelector, tokensSelector,
+  localApiStateSelector, editProhibitedSelector, lastSyncedStateSelector, storageTypeSelector, tokensSelector,
 } from '@/selectors';
 import DocsIcon from '@/icons/docs.svg';
 import FeedbackIcon from '@/icons/feedback.svg';
@@ -21,6 +21,8 @@ export default function Footer() {
   const tokens = useSelector(tokensSelector);
   const lastSyncedState = useSelector(lastSyncedStateSelector);
   const editProhibited = useSelector(editProhibitedSelector);
+  const localApiState = useSelector(localApiStateSelector);
+
   const { pullTokens, pushTokens } = useRemoteTokens();
 
   const checkForChanges = React.useCallback(() => {
@@ -49,24 +51,28 @@ export default function Footer() {
     }}
     >
       <Stack direction="row">
-        <BranchSelector />
-        <Tooltip variant="top" label={`Pull from ${transformProviderName(storageType.provider)}`}>
-          <button onClick={() => pullTokens()} type="button" className="button button-ghost">
-            <DownloadIcon />
-          </button>
-        </Tooltip>
-        <Tooltip variant="top" label={`Push to ${transformProviderName(storageType.provider)}`}>
-          <button
-            onClick={() => pushTokens()}
-            type="button"
-            className="relative button button-ghost"
-            disabled={editProhibited}
-          >
-            {checkForChanges() && <div className="absolute top-0 right-0 w-2 h-2 rounded-full bg-primary-500" />}
+        {localApiState.branch && (
+        <>
+          <BranchSelector currentBranch={localApiState.branch} />
+          <Tooltip variant="top" label={`Pull from ${transformProviderName(storageType.provider)}`}>
+            <button onClick={() => pullTokens()} type="button" className="button button-ghost">
+              <DownloadIcon />
+            </button>
+          </Tooltip>
+          <Tooltip variant="top" label={`Push to ${transformProviderName(storageType.provider)}`}>
+            <button
+              onClick={() => pushTokens()}
+              type="button"
+              className="relative button button-ghost"
+              disabled={editProhibited}
+            >
+              {checkForChanges() && <div className="absolute top-0 right-0 w-2 h-2 rounded-full bg-primary-500" />}
 
-            <UploadIcon />
-          </button>
-        </Tooltip>
+              <UploadIcon />
+            </button>
+          </Tooltip>
+        </>
+        )}
       </Stack>
       <Stack direction="row" gap={4}>
         <Box css={{ color: '$textMuted', fontSize: '$xsmall' }}>
