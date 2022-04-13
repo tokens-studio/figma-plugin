@@ -73,7 +73,9 @@ const readFileContent = ({
   api, projectId, filePath, branch,
 } : { api: Resources.Gitlab, projectId: number, filePath: string, branch: string }) => api.RepositoryFiles.showRaw(projectId, filePath, { ref: branch });
 
-const checkTreeInPath = ({ api, projectId, filePath } : { api: Resources.Gitlab, projectId: number, filePath: string }) => api.Repositories.tree(projectId, { path: filePath });
+const checkTreeInPath = ({
+  api, projectId, branch, filePath,
+} : { api: Resources.Gitlab, projectId: number, branch: string, filePath: string }) => api.Repositories.tree(projectId, { path: filePath, ref: branch });
 
 const getBranches = async ({ api, projectId } : { api: Resources.Gitlab, projectId: number }) => {
   const branches = await api.Branches.all(projectId);
@@ -118,7 +120,9 @@ export const readContents = async ({
 
   try {
     const { filePath, branch } = context;
-    const trees = await checkTreeInPath({ api, projectId, filePath });
+    const trees = await checkTreeInPath({
+      api, projectId, branch, filePath,
+    });
     const fileContents: Array<{ name: string; data: string }> = [];
     if (trees.length > 0 && opts.multiFile) {
       await Promise.all(
@@ -189,23 +193,35 @@ enum GitLabAccessLevel {
 }
 
 const extractFiles = async ({
-  api, projectId, branch, filePath, tokenObj, opts,
+  api, projectId, branch, filePath, tokenObj, startBranch, opts,
 } :
-{ api: Resources.Gitlab, projectId: number, branch: string, filePath: string, tokenObj: TokenSets, opts: FeatureFlagOpts }) => {
+{ api: Resources.Gitlab, projectId: number, branch: string, filePath: string, tokenObj: TokenSets, startBranch: string | undefined, opts: FeatureFlagOpts }) => {
   const files: CommitAction[] = [];
-  if (filePath.endsWith('.json')) {
-    const fileInTrees = await readFile({
-      api, projectId, filePath, branch,
-    });
 
-    files.push({
-      action: fileInTrees.file_path ? 'update' : 'create',
-      filePath,
-      content: JSON.stringify(tokenObj, null, 2),
-    });
+  if (filePath.endsWith('.json')) {
+    try {
+      await readFile({
+        api, projectId, filePath, branch: startBranch || branch,
+      });
+
+      files.push({
+        action: 'update',
+        filePath,
+        content: JSON.stringify(tokenObj, null, 2),
+      });
+    } catch (e) {
+      files.push({
+        action: 'create',
+        filePath,
+        content: JSON.stringify(tokenObj, null, 2),
+      });
+    }
   } else if (opts.multiFile) {
-    const trees = await checkTreeInPath({ api, projectId, filePath });
+    const trees = await checkTreeInPath({
+      api, projectId, branch: startBranch || branch, filePath,
+    });
     const filesInTrees = trees.map((t) => t.path);
+
     Object.keys(tokenObj).forEach((key) => {
       const path = `${filePath}/${key}.json`;
       files.push({
@@ -235,7 +251,7 @@ const createFiles = async (
     branch, projectId, commitMessage, startBranch, filePath, tokenObj,
   } = context;
   const files = await extractFiles({
-    api, projectId, branch, filePath, tokenObj, opts,
+    api, projectId, branch, filePath, tokenObj, opts, startBranch,
   });
   return api.Commits.create(
     projectId,
