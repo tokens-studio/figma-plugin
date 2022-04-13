@@ -149,15 +149,15 @@ const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
                     className="dropdown-item"
                     {...getItemProps({ key: token.name, index, item: token })}
                     css={{
-                backgroundColor: highlightedIndex === index ? '#18a0fb' : 'white',
-                fontWeight: selectedItem === token ? 'bold' : 'normal',
-              }}
+                      backgroundColor: highlightedIndex === index ? '#18a0fb' : 'white',
+                      fontWeight: selectedItem === token ? 'bold' : 'normal',
+                    }}
                   >
                     {type === 'color' && (
-              <StyledItemColorDiv>
-                        <StyledItemColor style={{ backgroundColor: token.value }} />
-                      </StyledItemColorDiv>
-              )}
+                    <StyledItemColorDiv>
+                      <StyledItemColor style={{ backgroundColor: token.value }} />
+                    </StyledItemColorDiv>
+                    )}
                     <StyledItemName>{getHighlightedText(token.name, filteredValue || '')}</StyledItemName>
                     <StyledItemValue isFocused={highlightedIndex === index}>{token.value}</StyledItemValue>
                   </StyledItem>
