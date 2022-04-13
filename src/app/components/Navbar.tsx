@@ -107,7 +107,6 @@ function Navbar() {
       <div>
         <TabButton first name="tokens" label="Tokens" />
         <TabButton name="inspector" label="Inspect" />
-        <TabButton name="syncsettings" label="Sync" />
         <TabButton name="settings" label="Settings" />
       </div>
       <Stack direction="row" align="center">
