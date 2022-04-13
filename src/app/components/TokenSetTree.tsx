@@ -1,16 +1,20 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Box from './Box';
 import { TokenSetItem } from './TokenSetItem';
 import { Dispatch } from '../store';
 import { getTree, TreeItem } from './utils/getTree';
-import { activeTokenSetSelector, editProhibitedSelector, usedTokenSetSelector } from '@/selectors';
+import {
+  activeTokenSetSelector,
+  editProhibitedSelector,
+  usedTokenSetsAsStringArraySelector,
+} from '@/selectors';
 
 // @TODO use hooks
 
 export default function TokenSetTree({ tokenSets, onRename, onDelete }: { tokenSets: string[], onRename: (tokenSet: string) => void, onDelete: (tokenSet: string) => void }) {
   const activeTokenSet = useSelector(activeTokenSetSelector);
-  const usedTokenSet = useSelector(usedTokenSetSelector);
+  const usedTokenSet = useSelector(usedTokenSetsAsStringArraySelector);
   const editProhibited = useSelector(editProhibitedSelector);
   const dispatch = useDispatch<Dispatch>();
   const [items, setItems] = React.useState<TreeItem[]>(getTree(tokenSets));
@@ -24,26 +28,26 @@ export default function TokenSetTree({ tokenSets, onRename, onDelete }: { tokenS
   // without useCallback as it can cause the creation of new references
   // for every re-render and result in unnecessary re-renders
   // this applies to the whole codebase
-  function toggleCollapsed(set) {
+  const toggleCollapsed = useCallback((set: string) => {
     setCollapsed(collapsed.includes(set) ? collapsed.filter((s) => s !== set) : [...collapsed, set]);
-  }
+  }, [collapsed]);
 
-  function handleCheckedChange(set, shouldCheck) {
+  const handleCheckedChange = useCallback((set: typeof items[number], shouldCheck: boolean) => {
     if (set.type === 'set') {
       dispatch.tokenState.toggleUsedTokenSet(set.path);
     } else {
       const itemPaths = items.filter((i) => i.path.startsWith(set.path) && i.path !== set.path).map((i) => i.path);
       dispatch.tokenState.toggleManyTokenSets({ shouldCheck, sets: itemPaths });
     }
-  }
+  }, [dispatch, items]);
 
-  function handleClick(set) {
+  const handleClick = useCallback((set: typeof items[number]) => {
     if (set.type === 'set') {
       dispatch.tokenState.setActiveTokenSet(set.path);
     }
-  }
+  }, [dispatch]);
 
-  const determineCheckedState = React.useCallback((item) => {
+  const determineCheckedState = useCallback((item) => {
     if (item.type === 'set') {
       return usedTokenSet.includes(item.path);
     }
@@ -60,7 +64,7 @@ export default function TokenSetTree({ tokenSets, onRename, onDelete }: { tokenS
     <Box>
       {items.map((item) => (collapsed.some((i) => item.parent.startsWith(i)) ? null : (
         <TokenSetItem
-          key={item.key}
+          key={item.path}
           isCollapsed={collapsed.includes(item.path)}
           isActive={activeTokenSet === item.path}
           onClick={() => handleClick(item)}
@@ -72,7 +76,6 @@ export default function TokenSetTree({ tokenSets, onRename, onDelete }: { tokenS
           canDelete={!editProhibited || Object.keys(tokenSets).length > 1}
           onRename={onRename}
           onDelete={onDelete}
-          type={item.type}
         />
       )))}
     </Box>

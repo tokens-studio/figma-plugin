@@ -1,7 +1,7 @@
 import omit from 'just-omit';
 import store from './store';
 import setValuesOnNode from './setValuesOnNode';
-import { TokenValues } from '../types/tokens';
+import { AnyTokenSet } from '../types/tokens';
 import { ContextObject, StorageProviderType, StorageType } from '../types/api';
 import * as pjs from '../../package.json';
 import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
@@ -17,10 +17,13 @@ import { getAllFigmaStyleMaps } from '@/utils/getAllFigmaStyleMaps';
 import { ProgressTracker } from './ProgressTracker';
 import { AnyTokenList, TokenStore } from '@/types/tokens';
 import { isSingleToken } from '@/utils/is';
+import { UsedTokenSetsMap } from '@/types';
+import { TokenSetStatus } from '@/constants/TokenSetStatus';
+import { migrate } from '@/utils/migrate';
 
 // @TODO fix typings
 
-export function returnValueToLookFor(key) {
+export function returnValueToLookFor(key: string) {
   switch (key) {
     case 'tokenName':
       return 'name';
@@ -46,7 +49,7 @@ export function mapValuesToTokens(tokens: Map<string, AnyTokenList[number]>, val
   return mappedValues;
 }
 
-export function setTokensOnDocument(tokens, updatedAt: string, usedTokenSet: string[]) {
+export function setTokensOnDocument(tokens: AnyTokenSet, updatedAt: string, usedTokenSet: string[]) {
   tokensSharedDataHandler.set(figma.root, SharedPluginDataKeys.tokens.version, pjs.plugin_version);
   tokensSharedDataHandler.set(figma.root, SharedPluginDataKeys.tokens.values, JSON.stringify(tokens));
   tokensSharedDataHandler.set(figma.root, SharedPluginDataKeys.tokens.updatedAt, updatedAt);
@@ -57,16 +60,32 @@ export function getTokenData(): {
   values: TokenStore['values'];
   updatedAt: string;
   version: string;
-  usedTokenSet?: string[];
+  usedTokenSet?: UsedTokenSetsMap;
 } | null {
   try {
     const values = tokensSharedDataHandler.get(figma.root, SharedPluginDataKeys.tokens.values);
     const version = tokensSharedDataHandler.get(figma.root, SharedPluginDataKeys.tokens.version);
     const updatedAt = tokensSharedDataHandler.get(figma.root, SharedPluginDataKeys.tokens.updatedAt);
     const usedTokenSet = tokensSharedDataHandler.get(figma.root, SharedPluginDataKeys.tokens.usedTokenSet);
-    let parsedUsedTokenSet;
+    let parsedUsedTokenSet: UsedTokenSetsMap = {};
     if (usedTokenSet) {
-      parsedUsedTokenSet = JSON.parse(usedTokenSet);
+      // @README in previous versions the used tokens were saved as string[]
+      // this means we will need to normalize it into the new format to support
+      // multi-state token sets (disabled,source,enabled)
+      const savedUsedTokensSet = JSON.parse(usedTokenSet) as (
+        string[] | UsedTokenSetsMap
+      );
+      parsedUsedTokenSet = migrate<typeof savedUsedTokensSet, UsedTokenSetsMap>(
+        savedUsedTokensSet,
+        (input): input is string[] => Array.isArray(input),
+        (input) => (
+          Object.fromEntries<TokenSetStatus>(
+            input.map((tokenSet) => (
+              [tokenSet, TokenSetStatus.ENABLED]
+            )),
+          )
+        ),
+      );
     }
     if (values) {
       const parsedValues = JSON.parse(values);

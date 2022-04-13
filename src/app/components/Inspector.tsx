@@ -13,7 +13,7 @@ import Tooltip from './Tooltip';
 import { resolveTokenValues, mergeTokenGroups } from '@/plugin/tokenHelpers';
 import { track } from '@/utils/analytics';
 import {
-  activeTokenSetSelector, inspectDeepSelector, tokensSelector, usedTokenSetSelector,
+  activeTokenSetSelector, inspectDeepSelector, tokensSelector, usedTokenSetsAsStringArraySelector,
 } from '@/selectors';
 
 function Inspector() {
@@ -21,7 +21,7 @@ function Inspector() {
   const dispatch = useDispatch<Dispatch>();
   const tokens = useSelector(tokensSelector);
   const activeTokenSet = useSelector(activeTokenSetSelector);
-  const usedTokenSet = useSelector(usedTokenSetSelector);
+  const usedTokenSet = useSelector(usedTokenSetsAsStringArraySelector);
   const inspectDeep = useSelector(inspectDeepSelector);
 
   // TODO: Put this into state in a performant way

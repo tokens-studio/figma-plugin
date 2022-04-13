@@ -27,7 +27,13 @@ import parseJson from '@/utils/parseJson';
 import AttentionIcon from '@/icons/attention.svg';
 import { TokensContext } from '@/context';
 import {
-  activeTokenSetSelector, showEditFormSelector, tokenFilterSelector, tokensSelector, tokenTypeSelector, updateModeSelector, usedTokenSetSelector,
+  activeTokenSetSelector,
+  showEditFormSelector,
+  tokenFilterSelector,
+  tokensSelector,
+  tokenTypeSelector,
+  updateModeSelector,
+  usedTokenSetsAsStringArraySelector,
 } from '@/selectors';
 
 const StyledButton = styled('button', {
@@ -104,7 +110,7 @@ const StatusToast = ({ open, error }: { open: boolean; error: string | null }) =
 function Tokens({ isActive }: { isActive: boolean }) {
   const tokens = useSelector(tokensSelector);
   const activeTokenSet = useSelector(activeTokenSetSelector);
-  const usedTokenSet = useSelector(usedTokenSetSelector);
+  const usedTokenSet = useSelector(usedTokenSetsAsStringArraySelector);
   const showEditForm = useSelector(showEditFormSelector);
   const tokenFilter = useSelector(tokenFilterSelector);
   const dispatch = useDispatch<Dispatch>();

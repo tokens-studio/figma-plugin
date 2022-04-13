@@ -5,6 +5,7 @@ import { notifyToUI, postToFigma } from '../../plugin/notifiers';
 import { updateJSONBinTokens } from './providers/jsonbin';
 import { track } from '@/utils/analytics';
 import { TokenValues } from '@/types/tokens';
+import { TokenSetStatus } from '@/constants/TokenSetStatus';
 
 async function updateRemoteTokens({
   provider,
@@ -64,7 +65,15 @@ export default async function updateTokensOnSources({
       oldUpdatedAt: lastUpdatedAt,
     });
   }
-  const mergedTokens = tokens ? resolveTokenValues(mergeTokenGroups(tokens, usedTokenSet)) : null;
+
+  // @TODO this behavior is temporary to normalize the usedTokenSet map into an array
+  // but will be changed to properly support the new data structure
+  const enabledTokenSetsArray = Array.isArray(usedTokenSet)
+    ? usedTokenSet
+    : Object.entries(usedTokenSet)
+      .filter(([,status]) => status === TokenSetStatus.ENABLED)
+      .map(([tokenSet]) => tokenSet);
+  const mergedTokens = tokens ? resolveTokenValues(mergeTokenGroups(tokens, enabledTokenSetsArray)) : null;
 
   postToFigma({
     type: MessageToPluginTypes.UPDATE,

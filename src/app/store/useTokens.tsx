@@ -19,7 +19,7 @@ import {
   activeTokenSetSelector,
   settingsStateSelector,
   tokensSelector,
-  usedTokenSetSelector,
+  usedTokenSetsAsStringArraySelector,
 } from '@/selectors';
 
 // @TODO fix typings
@@ -38,7 +38,7 @@ type GetFormattedTokensOptions = {
 type RemoveTokensByValueData = { property: Properties; nodes: string[] }[];
 
 export default function useTokens() {
-  const usedTokenSet = useSelector(usedTokenSetSelector);
+  const usedTokenSet = useSelector(usedTokenSetsAsStringArraySelector);
   const activeTokenSet = useSelector(activeTokenSetSelector);
   const tokens = useSelector(tokensSelector);
   const settings = useSelector(settingsStateSelector, isEqual);

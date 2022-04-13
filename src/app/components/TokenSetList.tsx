@@ -6,7 +6,10 @@ import { Dispatch } from '../store';
 import { ListItem, TokenSetItem } from './TokenSetItem';
 import useConfirm from '../hooks/useConfirm';
 import {
-  activeTokenSetSelector, editProhibitedSelector, hasUnsavedChangesSelector, usedTokenSetSelector,
+  activeTokenSetSelector,
+  editProhibitedSelector,
+  hasUnsavedChangesSelector,
+  usedTokenSetsAsStringArraySelector,
 } from '@/selectors';
 
 function getList(items: string[]): ListItem[] {
@@ -33,7 +36,7 @@ export default function TokenSetList({
 }) {
   const { confirm } = useConfirm();
   const activeTokenSet = useSelector(activeTokenSetSelector);
-  const usedTokenSet = useSelector(usedTokenSetSelector);
+  const usedTokenSet = useSelector(usedTokenSetsAsStringArraySelector);
   const editProhibited = useSelector(editProhibitedSelector);
   const hasUnsavedChanges = useSelector(hasUnsavedChangesSelector);
   const dispatch = useDispatch<Dispatch>();
