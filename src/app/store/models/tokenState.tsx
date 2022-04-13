@@ -183,7 +183,6 @@ export const tokenState = createModel<RootModel>()({
     setTokenData: (state, data: SetTokenDataPayload) => {
       const values = parseTokenValues(data.values);
       const allAvailableTokenSets = Object.keys(values);
-      console.log(data.usedTokenSet, allAvailableTokenSets);
       const usedTokenSets = Object.fromEntries(
         allAvailableTokenSets
           .map((tokenSet) => ([tokenSet, data.usedTokenSet?.[tokenSet] ?? TokenSetStatus.DISABLED])),
@@ -431,6 +430,9 @@ export const tokenState = createModel<RootModel>()({
       dispatch.tokenState.updateDocument({ updateRemote: false });
     },
     toggleManyTokenSets() {
+      dispatch.tokenState.updateDocument({ updateRemote: false });
+    },
+    toggleTreatAsSource() {
       dispatch.tokenState.updateDocument({ updateRemote: false });
     },
     duplicateToken(payload: UpdateTokenPayload, rootState) {

@@ -19,8 +19,9 @@ import {
   activeTokenSetSelector,
   settingsStateSelector,
   tokensSelector,
-  usedTokenSetsAsStringArraySelector,
+  usedTokenSetSelector,
 } from '@/selectors';
+import { TokenSetStatus } from '@/constants/TokenSetStatus';
 
 // @TODO fix typings
 
@@ -38,7 +39,7 @@ type GetFormattedTokensOptions = {
 type RemoveTokensByValueData = { property: Properties; nodes: string[] }[];
 
 export default function useTokens() {
-  const usedTokenSet = useSelector(usedTokenSetsAsStringArraySelector);
+  const usedTokenSet = useSelector(usedTokenSetSelector);
   const activeTokenSet = useSelector(activeTokenSetSelector);
   const tokens = useSelector(tokensSelector);
   const settings = useSelector(settingsStateSelector, isEqual);
@@ -149,12 +150,18 @@ export default function useTokens() {
   const createStylesFromTokens = useCallback(() => {
     track('createStyles');
 
+    const enabledTokenSets = Object.entries(usedTokenSet)
+      .filter(([, status]) => status === TokenSetStatus.ENABLED)
+      .map(([tokenSet]) => tokenSet);
     const resolved = resolveTokenValues(mergeTokenGroups(tokens, usedTokenSet));
-    const withoutIgnored = resolved.filter((token) => !token.name.split('.').some((part) => part.startsWith('_')));
+    const withoutIgnoredAndSourceTokens = resolved.filter((token) => (
+      !token.name.split('.').some((part) => part.startsWith('_')) // filter out ignored tokens
+      && (!token.internal__Parent || enabledTokenSets.includes(token.internal__Parent)) // filter out SOURCE tokens
+    ));
 
     postToFigma({
       type: MessageToPluginTypes.CREATE_STYLES,
-      tokens: withoutIgnored,
+      tokens: withoutIgnoredAndSourceTokens,
       settings,
     });
   }, [settings, tokens, usedTokenSet]);

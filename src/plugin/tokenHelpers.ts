@@ -3,6 +3,8 @@ import { SingleToken } from '@/types/tokens';
 import { checkIfAlias, checkIfContainsAlias, getAliasValue } from '@/utils/alias';
 import { isSingleToken } from '@/utils/is';
 import { TokenTypes } from '@/constants/TokenTypes';
+import { UsedTokenSetsMap } from '@/types';
+import { TokenSetStatus } from '@/constants/TokenSetStatus';
 
 export type ResolveTokenValuesResult = SingleToken<true, {
   failedToResolve?: boolean
@@ -64,13 +66,19 @@ export function resolveTokenValues(tokens: SingleToken[], previousCount: number 
   return returnedTokens;
 }
 
-export function mergeTokenGroups(tokens: Record<string, SingleToken[]>, usedSets: string[] = []): SingleToken[] {
+export function mergeTokenGroups(tokens: Record<string, SingleToken[]>, usedSets: UsedTokenSetsMap = {}): SingleToken[] {
   const mergedTokens: SingleToken[] = [];
+  // @README we will use both ENABLED and SOURCE sets
+  // we only need to ignore the SOURCE sets when creating styles
+  const tokenSetsToMerge = Object.entries(usedSets)
+    .filter(([,status]) => status === TokenSetStatus.ENABLED || status === TokenSetStatus.SOURCE)
+    .map(([tokenSet]) => tokenSet);
+
   // Reverse token set order (right-most win) and check for duplicates
   Object.entries(tokens)
     .reverse()
     .forEach((tokenGroup: [string, SingleToken[]]) => {
-      if (!usedSets || usedSets.length === 0 || usedSets.includes(tokenGroup[0])) {
+      if (tokenSetsToMerge.length === 0 || tokenSetsToMerge.includes(tokenGroup[0])) {
         tokenGroup[1].forEach((token) => {
           if (!mergedTokens.some((t) => t.name === token.name)) {
             mergedTokens.push({

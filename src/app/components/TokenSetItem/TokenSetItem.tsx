@@ -1,6 +1,7 @@
 import React, { useCallback } from 'react';
 import { useDragControls } from 'framer-motion';
 import { useSelector } from 'react-redux';
+import { CheckIcon } from '@radix-ui/react-icons';
 import Checkbox from '../Checkbox';
 import IconChevronDown from '../icons/IconChevronDown';
 import Box from '../Box';
@@ -10,6 +11,8 @@ import {
   ContextMenuItem,
   ContextMenuTrigger,
   ContextMenuSeparator,
+  ContextMenuItemIndicator,
+  ContextMenuCheckboxItem,
 } from '../ContextMenu';
 import { TreeItem } from '@/app/components/utils/getTree';
 import IconGrabber from '@/icons/grabber.svg';
@@ -177,9 +180,12 @@ export function TokenSetItem<Item extends TreeItem | ListItem = TreeItem | ListI
                   Delete
                 </ContextMenuItem>
                 <ContextMenuSeparator />
-                <ContextMenuItem onSelect={handleTreatAsSource}>
+                <ContextMenuCheckboxItem checked={tokenSetStatus === TokenSetStatus.SOURCE} onSelect={handleTreatAsSource}>
+                  <ContextMenuItemIndicator>
+                    <CheckIcon />
+                  </ContextMenuItemIndicator>
                   Treat as source
-                </ContextMenuItem>
+                </ContextMenuCheckboxItem>
               </ContextMenuContent>
             ) : null}
           </ContextMenu>

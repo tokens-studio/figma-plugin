@@ -13,19 +13,28 @@ import Tooltip from './Tooltip';
 import { resolveTokenValues, mergeTokenGroups } from '@/plugin/tokenHelpers';
 import { track } from '@/utils/analytics';
 import {
-  activeTokenSetSelector, inspectDeepSelector, tokensSelector, usedTokenSetsAsStringArraySelector,
+  activeTokenSetSelector,
+  inspectDeepSelector,
+  tokensSelector,
 } from '@/selectors';
+import { TokenSetStatus } from '@/constants/TokenSetStatus';
+import convertTokensObjectToResolved from '@/utils/convertTokensObjectToResolved';
 
 function Inspector() {
   const [inspectView, setInspectView] = React.useState('multi');
   const dispatch = useDispatch<Dispatch>();
   const tokens = useSelector(tokensSelector);
   const activeTokenSet = useSelector(activeTokenSetSelector);
-  const usedTokenSet = useSelector(usedTokenSetsAsStringArraySelector);
+  const usedTokenSet = useSelector(convertTokensObjectToResolved);
   const inspectDeep = useSelector(inspectDeepSelector);
 
   // TODO: Put this into state in a performant way
-  const resolvedTokens = React.useMemo(() => resolveTokenValues(mergeTokenGroups(tokens, [...usedTokenSet, activeTokenSet])), [tokens, usedTokenSet, activeTokenSet]);
+  const resolvedTokens = React.useMemo(() => (
+    resolveTokenValues(mergeTokenGroups(tokens, {
+      ...usedTokenSet,
+      [activeTokenSet]: TokenSetStatus.ENABLED,
+    }))
+  ), [tokens, usedTokenSet, activeTokenSet]);
 
   function handleSetInspectView(view: string) {
     setInspectView(view);

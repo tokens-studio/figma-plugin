@@ -49,7 +49,7 @@ export function mapValuesToTokens(tokens: Map<string, AnyTokenList[number]>, val
   return mappedValues;
 }
 
-export function setTokensOnDocument(tokens: AnyTokenSet, updatedAt: string, usedTokenSet: string[]) {
+export function setTokensOnDocument(tokens: AnyTokenSet, updatedAt: string, usedTokenSet: UsedTokenSetsMap) {
   tokensSharedDataHandler.set(figma.root, SharedPluginDataKeys.tokens.version, pjs.plugin_version);
   tokensSharedDataHandler.set(figma.root, SharedPluginDataKeys.tokens.values, JSON.stringify(tokens));
   tokensSharedDataHandler.set(figma.root, SharedPluginDataKeys.tokens.updatedAt, updatedAt);
@@ -140,7 +140,7 @@ export function selectNodes(ids: string[]) {
 
 export async function updateNodes(
   entries: readonly NodeManagerNode[],
-  tokens: Map<string, TokenArrayGroup[number]>,
+  tokens: Map<string, TokenArrayGrou[number]>,
   settings?: UpdateNodesSettings,
 ) {
   const { ignoreFirstPartForStyles } = settings ?? {};

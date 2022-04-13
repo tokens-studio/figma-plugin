@@ -33,8 +33,9 @@ import {
   tokensSelector,
   tokenTypeSelector,
   updateModeSelector,
-  usedTokenSetsAsStringArraySelector,
+  usedTokenSetSelector,
 } from '@/selectors';
+import { TokenSetStatus } from '@/constants/TokenSetStatus';
 
 const StyledButton = styled('button', {
   '&:focus, &:hover': {
@@ -110,7 +111,7 @@ const StatusToast = ({ open, error }: { open: boolean; error: string | null }) =
 function Tokens({ isActive }: { isActive: boolean }) {
   const tokens = useSelector(tokensSelector);
   const activeTokenSet = useSelector(activeTokenSetSelector);
-  const usedTokenSet = useSelector(usedTokenSetsAsStringArraySelector);
+  const usedTokenSet = useSelector(usedTokenSetSelector);
   const showEditForm = useSelector(showEditFormSelector);
   const tokenFilter = useSelector(tokenFilterSelector);
   const dispatch = useDispatch<Dispatch>();
@@ -123,7 +124,10 @@ function Tokens({ isActive }: { isActive: boolean }) {
   const shouldConfirm = React.useMemo(() => updateMode === UpdateMode.DOCUMENT, [updateMode]);
 
   const resolvedTokens = React.useMemo(
-    () => resolveTokenValues(mergeTokenGroups(tokens, [...usedTokenSet, activeTokenSet])),
+    () => resolveTokenValues(mergeTokenGroups(tokens, {
+      ...usedTokenSet,
+      [activeTokenSet]: TokenSetStatus.ENABLED,
+    })),
     [tokens, usedTokenSet, activeTokenSet],
   );
   const [stringTokens, setStringTokens] = React.useState(

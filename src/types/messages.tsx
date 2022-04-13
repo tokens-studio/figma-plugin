@@ -10,6 +10,7 @@ import { SelectionGroup } from './SelectionGroup';
 import { SelectionValue } from './SelectionValue';
 import { AnyTokenList, AnyTokenSet } from './tokens';
 import { PullStyleOptions } from './PullStylesOptions';
+import { UsedTokenSetsMap } from './UsedTokenSetsMap';
 // import {
 //   PullStyleTypes, SelectionGroup, SelectionValue, TokenArrayGroup, TokenGroup,
 // } from './tokens';
@@ -180,10 +181,10 @@ export type CredentialsToPluginMessage = {
 export type UpdateToPluginMessage = {
   type: MessageToPluginTypes.UPDATE;
   tokenValues: AnyTokenSet;
-  tokens: AnyTokenList;
+  tokens: AnyTokenList | null;
   updatedAt: string;
   settings: SettingsState;
-  usedTokenSet: string[];
+  usedTokenSet: UsedTokenSetsMap;
 };
 export type CreateStylesToPluginMessage = {
   type: MessageToPluginTypes.CREATE_STYLES;
