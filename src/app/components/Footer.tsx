@@ -1,19 +1,73 @@
 import React from 'react';
+import { useSelector } from 'react-redux';
+import { DownloadIcon, UploadIcon } from '@primer/octicons-react';
 import * as pjs from '../../../package.json';
 import Box from './Box';
-import DocsIcon from '@/icons/docs.svg';
-import FeedbackIcon from '@/icons/feedback.svg';
-import Text from '@/app/components/Text';
+import Text from './Text';
+import Tooltip from './Tooltip';
 import Stack from './Stack';
 import BranchSelector from './BranchSelector';
+import useRemoteTokens from '../store/remoteTokens';
+import convertTokensToObject from '@/utils/convertTokensToObject';
+import { StorageProviderType } from '../../types/api';
+import {
+  activeTabSelector, editProhibitedSelector, lastSyncedStateSelector, projectURLSelector, storageTypeSelector, tokensSelector,
+} from '@/selectors';
+import DocsIcon from '@/icons/docs.svg';
+import FeedbackIcon from '@/icons/feedback.svg';
 
 export default function Footer() {
+  const storageType = useSelector(storageTypeSelector);
+  const tokens = useSelector(tokensSelector);
+  const lastSyncedState = useSelector(lastSyncedStateSelector);
+  const editProhibited = useSelector(editProhibitedSelector);
+  const { pullTokens, pushTokens } = useRemoteTokens();
+
+  const checkForChanges = React.useCallback(() => {
+    if (lastSyncedState !== JSON.stringify(convertTokensToObject(tokens), null, 2)) {
+      return true;
+    }
+    return false;
+  }, [lastSyncedState, tokens]);
+
+  const transformProviderName = (provider: StorageProviderType) => {
+    switch (provider) {
+      case StorageProviderType.JSONBIN:
+        return 'JSONBin.io';
+      case StorageProviderType.GITHUB:
+        return 'GitHub';
+      case StorageProviderType.URL:
+        return 'URL';
+      default:
+        return provider;
+    }
+  };
+
   return (
     <Box css={{
       display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0, padding: '$4',
     }}
     >
-      <BranchSelector />
+      <Stack direction="row">
+        <BranchSelector />
+        <Tooltip variant="top" label={`Pull from ${transformProviderName(storageType.provider)}`}>
+          <button onClick={() => pullTokens()} type="button" className="button button-ghost">
+            <DownloadIcon />
+          </button>
+        </Tooltip>
+        <Tooltip variant="top" label={`Push to ${transformProviderName(storageType.provider)}`}>
+          <button
+            onClick={() => pushTokens()}
+            type="button"
+            className="relative button button-ghost"
+            disabled={editProhibited}
+          >
+            {checkForChanges() && <div className="absolute top-0 right-0 w-2 h-2 rounded-full bg-primary-500" />}
+
+            <UploadIcon />
+          </button>
+        </Tooltip>
+      </Stack>
       <Stack direction="row" gap={4}>
         <Box css={{ color: '$textMuted', fontSize: '$xsmall' }}>
           Version

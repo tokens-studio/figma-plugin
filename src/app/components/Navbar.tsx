@@ -111,27 +111,15 @@ function Navbar() {
         <TabButton name="settings" label="Settings" />
       </div>
       <Stack direction="row" align="center">
-        {storageType.provider !== StorageProviderType.LOCAL && (
+        {storageType.provider !== StorageProviderType.LOCAL
+        && storageType.provider !== StorageProviderType.GITHUB
+        && (
           <>
             {storageType.provider === StorageProviderType.JSONBIN && (
               <Tooltip variant="right" label={`Go to ${transformProviderName(storageType.provider)}`}>
                 <a href={projectURL} target="_blank" rel="noreferrer" className="block button button-ghost">
                   <Icon name="library" />
                 </a>
-              </Tooltip>
-            )}
-            {storageType.provider === StorageProviderType.GITHUB && (
-              <Tooltip variant="right" label={`Push to ${transformProviderName(storageType.provider)}`}>
-                <button
-                  onClick={() => pushTokens()}
-                  type="button"
-                  className="relative button button-ghost"
-                  disabled={editProhibited}
-                >
-                  {checkForChanges() && <div className="absolute top-0 right-0 w-2 h-2 rounded-full bg-primary-500" />}
-
-                  <Icon name="library" />
-                </button>
               </Tooltip>
             )}
 

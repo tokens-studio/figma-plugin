@@ -16,6 +16,7 @@ import {
   BranchSwitchMenuArrow,
 } from './BranchSwitchMenu';
 import { localApiStateSelector, branchSelector } from '@/selectors';
+import { StorageProviderType } from '@/types/api';
 
 export default function BranchSelector() {
   const branchState = useSelector(branchSelector);
@@ -27,8 +28,13 @@ export default function BranchSelector() {
     setCurrentBranch(localApiState.branch);
   }, [localApiState.branch, setCurrentBranch]);
 
-  const handleChangeBranch = (branch: string) => {
-    setCurrentBranch(branch);
+  const createNewBranchFrom = (branch: string) => {
+    switch (localApiState.provider) {
+      case StorageProviderType.GITHUB:
+        break;
+      default:
+        break;
+    }
   };
 
   return (
@@ -46,7 +52,7 @@ export default function BranchSelector() {
               <BranchSwitchMenuRadioGroup value={currentBranch}>
                 {branchState.branches.length > 0
             && branchState.branches.map((branch, index) => (
-              <BranchSwitchMenuRadioItem key={index} value={branch} onSelect={() => handleChangeBranch(branch)}>
+              <BranchSwitchMenuRadioItem key={index} value={branch} onSelect={() => setCurrentBranch(branch)}>
                 <BranchSwitchMenuItemIndicator>
                   <CheckIcon />
                 </BranchSwitchMenuItemIndicator>
@@ -65,7 +71,7 @@ export default function BranchSelector() {
                     Current changes
                   </BranchSwitchMenuItem>
                   {branchState.branches.length > 0 && branchState.branches.map((branch, index) => (
-                    <BranchSwitchMenuItem key={index}>
+                    <BranchSwitchMenuItem key={index} onSelect={() => createNewBranchFrom(branch)}>
                       <GitBranchIcon size={12} />
                       {` ${branch}`}
                     </BranchSwitchMenuItem>
