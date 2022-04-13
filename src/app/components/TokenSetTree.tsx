@@ -25,7 +25,7 @@ export default function TokenSetTree({ tokenSets, onRename, onDelete }: { tokenS
 
   const determineCheckedState = useCallback((item: TreeItem) => {
     if (item.type === 'set') {
-      if (usedTokenSet?.[item.path] === TokenSetStatus.ENABLED) {
+      if (usedTokenSet?.[item.path] === TokenSetStatus.SOURCE) {
         return 'indeterminate';
       }
       return usedTokenSet?.[item.path] === TokenSetStatus.ENABLED;
@@ -43,7 +43,7 @@ export default function TokenSetTree({ tokenSets, onRename, onDelete }: { tokenS
       return true;
     }
 
-    if (itemPaths.some((status) => (
+    if (childTokenSetStatuses.some((status) => (
       status === TokenSetStatus.ENABLED
       || status === TokenSetStatus.SOURCE
     ))) {
