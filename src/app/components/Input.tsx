@@ -182,3 +182,4 @@ const Input: React.FC<Props> = ({
 };
 
 export default Input;
+export { StyledInput, StyledPrefix, StyledSuffix };

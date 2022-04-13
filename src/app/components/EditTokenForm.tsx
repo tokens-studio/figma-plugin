@@ -12,13 +12,13 @@ import ColorPicker from './ColorPicker';
 import useConfirm from '../hooks/useConfirm';
 import useTokens from '../store/useTokens';
 import { SingleBoxShadowToken } from '@/types/tokens';
-import Autosuggest from './Autosuggest';
 import { checkIfContainsAlias, getAliasValue } from '@/utils/alias';
 import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
 import { activeTokenSetSelector, editTokenSelector } from '@/selectors';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { EditTokenObject } from '../store/models/uiState';
 import Stack from './Stack';
+import DownshiftInput from './DownshiftInput';
 
 type Props = {
   resolvedTokens: ResolveTokenValuesResult[];
@@ -212,8 +212,8 @@ function EditTokenForm({ resolvedTokens }: Props) {
   });
 
   const StyledInputSuffix = styled('button', {
-    width: '32px',
-    height: '32px',
+    width: '28px',
+    height: '28px',
     backgroundColor: '#f0f0f0',
     display: 'flex',
     justifyContent: 'center',
@@ -256,45 +256,38 @@ function EditTokenForm({ resolvedTokens }: Props) {
       default: {
         return (
           <div>
-            <Autosuggest
-              inputValue={internalEditToken.value}
+            <DownshiftInput
+              value={internalEditToken.value}
               type={internalEditToken.type}
+              label={internalEditToken.property}
               showAutoSuggest={showAutoSuggest}
               resolvedTokens={resolvedTokens}
+              handleChange={handleChange}
               setShowAutoSuggest={setShowAutoSuggest}
               setInputValue={(newInputValue: string) => setInternalEditToken({ ...internalEditToken, value: newInputValue })}
-            >
-              <Input
-                full
-                label={internalEditToken.property}
-                value={internalEditToken.value}
-                onChange={handleChange}
-                type="text"
-                name="value"
-                required
-                custom={internalEditToken.schema}
-                placeholder={
-                  internalEditToken.type === 'color' ? '#000000, hsla(), rgba() or {alias}' : 'Value or {alias}'
-                }
-                prefix={
-                  internalEditToken.type === 'color' && (
-                    <button
-                      type="button"
-                      className="block w-4 h-4 rounded-sm cursor-pointer shadow-border shadow-gray-300 focus:shadow-focus focus:shadow-primary-400"
-                      style={{ background: internalEditToken.value, fontSize: 0 }}
-                      onClick={handleToggleInputHelper}
-                    >
-                      {internalEditToken.value}
-                    </button>
-                  )
-                }
-                suffix={(
-                  <StyledInputSuffix onClick={() => setShowAutoSuggest(!showAutoSuggest)}>
-                    <StyledIconDisclosure />
-                  </StyledInputSuffix>
-                )}
-              />
-            </Autosuggest>
+              placeholder={
+                internalEditToken.type === 'color' ? '#000000, hsla(), rgba() or {alias}' : 'Value or {alias}'
+              }
+              prefix={
+                internalEditToken.type === 'color' && (
+                  <button
+                    type="button"
+                    className="block w-4 h-4 rounded-sm cursor-pointer shadow-border shadow-gray-300 focus:shadow-focus focus:shadow-primary-400"
+                    style={{ background: internalEditToken.value, fontSize: 0 }}
+                    onClick={handleToggleInputHelper}
+                  >
+                    {internalEditToken.value}
+                  </button>
+                )
+              }
+              suffix={(
+                <StyledInputSuffix
+                  onClick={React.useCallback(() => setShowAutoSuggest(!showAutoSuggest), [showAutoSuggest])}
+                >
+                  <StyledIconDisclosure />
+                </StyledInputSuffix>
+              )}
+            />
 
             {inputHelperOpen && internalEditToken.type === 'color' && (
               <ColorPicker value={internalEditToken.value} onChange={handleColorValueChange} />
