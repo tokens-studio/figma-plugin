@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { track } from '@/utils/analytics';
 import useConfirm from '../hooks/useConfirm';
@@ -47,20 +47,24 @@ export default function TokenSetSelector() {
   const [newTokenSetName, handleNewTokenSetNameChange] = React.useState('');
   const [tokenSetMarkedForChange, setTokenSetMarkedForChange] = React.useState('');
   const [allTokenSets, setAllTokenSets] = React.useState(Object.keys(tokens));
-
   const tokenKeys = Object.keys(tokens).join(',');
 
   React.useEffect(() => {
     setAllTokenSets(Object.keys(tokens));
   }, [tokenKeys]);
 
-  const handleNewTokenSetSubmit = (e) => {
+  React.useEffect(() => {
+    setShowNewTokenSetFields(false);
+    handleNewTokenSetNameChange('');
+  }, [tokens]);
+
+  const handleNewTokenSetSubmit = React.useCallback((e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     track('Created token set', { name: newTokenSetName });
     dispatch.tokenState.addTokenSet(newTokenSetName.trim());
-  };
+  }, [dispatch, newTokenSetName]);
 
-  const handleDeleteTokenSet = async (tokenSet) => {
+  const handleDeleteTokenSet = React.useCallback(async (tokenSet: string) => {
     track('Deleted token set');
 
     const userConfirmation = await confirm({
@@ -70,30 +74,25 @@ export default function TokenSetSelector() {
     if (userConfirmation) {
       dispatch.tokenState.deleteTokenSet(tokenSet);
     }
-  };
+  }, [confirm, dispatch]);
 
-  const handleRenameTokenSet = (tokenSet) => {
+  const handleRenameTokenSet = React.useCallback((tokenSet: string) => {
     track('Renamed token set');
     handleNewTokenSetNameChange(tokenSet);
     setTokenSetMarkedForChange(tokenSet);
     setShowRenameTokenSetFields(true);
-  };
+  }, []);
 
-  const handleRenameTokenSetSubmit = (e) => {
+  const handleRenameTokenSetSubmit = React.useCallback((e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     dispatch.tokenState.renameTokenSet({ oldName: tokenSetMarkedForChange, newName: newTokenSetName.trim() });
     setTokenSetMarkedForChange('');
     setShowRenameTokenSetFields(false);
-  };
+  }, [dispatch, newTokenSetName, tokenSetMarkedForChange]);
 
-  React.useEffect(() => {
-    setShowNewTokenSetFields(false);
-    handleNewTokenSetNameChange('');
-  }, [tokens]);
-
-  function handleReorder(values: string[]) {
+  const handleReorder = useCallback((values: string[]) => {
     dispatch.tokenState.setTokenSetOrder(values);
-  }
+  }, [dispatch]);
 
   return (
     <Box
@@ -113,7 +112,7 @@ export default function TokenSetSelector() {
           <TokenSetTree
             tokenSets={allTokenSets}
             onRename={handleRenameTokenSet}
-            onDelete={(set) => handleDeleteTokenSet(set)}
+            onDelete={handleDeleteTokenSet}
           />
         </Box>
       ) : (

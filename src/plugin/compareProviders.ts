@@ -1,12 +1,20 @@
+import { UsedTokenSetsMap } from '@/types';
 import { StorageType } from '@/types/api';
 import isSameCredentials from '@/utils/isSameCredentials';
 import { MessageFromPluginTypes } from '../types/messages';
 
+type Options = {
+  providers?: string | null,
+  storageType: StorageType,
+  featureFlagId?: string | null,
+  usedTokenSet?: UsedTokenSetsMap | null
+};
+
 export default function compareProvidersWithStored({
   providers, storageType, featureFlagId, usedTokenSet,
-}: { providers?: string | null, storageType: StorageType, featureFlagId?: string | null, usedTokenSet?: string[] | null }) {
+}: Options) {
   if (providers) {
-    const parsedProviders = JSON.parse(providers);
+    const parsedProviders = JSON.parse(providers) as any[]; // @TODO type properly
     const matchingSet = parsedProviders.find((i) => isSameCredentials(i, storageType));
     if (matchingSet) {
       // send a message to the UI with the credentials stored in the client
