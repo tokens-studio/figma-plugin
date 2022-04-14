@@ -79,6 +79,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
       e.persist();
       if (internalEditToken) {
         setInternalEditToken({ ...internalEditToken, [e.target.name]: e.target.value });
+        setShowAutoSuggest(false);
       }
     },
     [internalEditToken],

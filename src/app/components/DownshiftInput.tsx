@@ -92,12 +92,10 @@ const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
   setShowAutoSuggest,
   handleChange,
 }) => {
-  const filteredValue = useMemo(() => value.replace(/[^a-zA-Z0-9.]/g, ''), [value]); // removing non-alphanumberic except . from the input value
-
-  const onSelectionChange = useCallback((token: SingleToken) => {
-    setInputValue(`{${token.name}}`);
-    setShowAutoSuggest(false);
-  }, []);
+  const filteredValue = useMemo(() => (showAutoSuggest ? '' : value.replace(/[^a-zA-Z0-9.]/g, '')), [
+    showAutoSuggest,
+    value,
+  ]); // removing non-alphanumberic except . from the input value
 
   const getHighlightedText = useCallback((text: string, highlight: string) => {
     // Split on highlight term and include term into parts, ignore case
@@ -123,8 +121,13 @@ const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
     [resolvedTokens, filteredValue],
   );
 
+  const handleSelect = useCallback((selectedItem:any) => {
+    setInputValue(`{${selectedItem.name}}`);
+    setShowAutoSuggest(false);
+  }, []);
+
   return (
-    <Downshift onChange={onSelectionChange}>
+    <Downshift onSelect={handleSelect}>
       {({
         selectedItem, highlightedIndex, getItemProps, getInputProps, getToggleButtonProps,
       }) => (
@@ -157,7 +160,6 @@ const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
                   {...getItemProps({ key: token.name, index, item: token })}
                   css={{
                     backgroundColor: highlightedIndex === index ? '$hover' : '$bgDefault',
-                    fontWeight: selectedItem === token ? 'bold' : 'normal',
                   }}
                 >
                   {type === 'color' && (
