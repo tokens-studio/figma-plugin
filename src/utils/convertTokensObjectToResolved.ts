@@ -21,7 +21,7 @@ export default function convertTokensObjectToResolved(
   // Merge to one giant array
   const merged = mergeTokenGroups(
     parsed,
-    // @README as I understand this function is only used in the utils/transform file
+    // @README this function is only used in the utils/transform file
     // which in turn is only used for a local script -- in which case for now we do not
     // need to fully support the SOURCE state
     Object.fromEntries(usedSets.map((tokenSet) => ([tokenSet, TokenSetStatus.ENABLED]))),

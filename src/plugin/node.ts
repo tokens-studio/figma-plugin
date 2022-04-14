@@ -115,7 +115,7 @@ export function selectNodes(ids: string[]) {
 
 export async function updateNodes(
   entries: readonly NodeManagerNode[],
-  tokens: Map<string, TokenArrayGrou[number]>,
+  tokens: Map<string, AnyTokenList[number]>,
   settings?: UpdateNodesSettings,
 ) {
   const { ignoreFirstPartForStyles } = settings ?? {};
