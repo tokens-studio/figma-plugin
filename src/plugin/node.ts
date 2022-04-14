@@ -1,7 +1,6 @@
 import omit from 'just-omit';
 import store from './store';
 import setValuesOnNode from './setValuesOnNode';
-import { TokenValues } from '../types/tokens';
 import { ContextObject, StorageProviderType, StorageType } from '../types/api';
 import * as pjs from '../../package.json';
 import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
@@ -53,16 +52,16 @@ export function setTokensOnDocument(tokens, updatedAt: string, usedTokenSet: str
   tokensSharedDataHandler.set(figma.root, SharedPluginDataKeys.tokens.usedTokenSet, JSON.stringify(usedTokenSet));
 }
 
-export function getTokenData(): { values: TokenStore['values']; updatedAt: string; version: string, usedTokenSet?: string[] } | null {
+export function getTokenData(): {
+  values: TokenStore['values'];
+  updatedAt: string;
+  version: string;
+  usedTokenSet?: string[];
+} | null {
   try {
     const values = tokensSharedDataHandler.get(figma.root, SharedPluginDataKeys.tokens.values);
     const version = tokensSharedDataHandler.get(figma.root, SharedPluginDataKeys.tokens.version);
     const updatedAt = tokensSharedDataHandler.get(figma.root, SharedPluginDataKeys.tokens.updatedAt);
-    const usedTokenSet = tokensSharedDataHandler.get(figma.root, SharedPluginDataKeys.tokens.usedTokenSet);
-    let parsedUsedTokenSet;
-    if (usedTokenSet) {
-      parsedUsedTokenSet = JSON.parse(usedTokenSet);
-    }
     if (values) {
       const parsedValues = JSON.parse(values);
       if (Object.keys(parsedValues).length > 0) {
@@ -74,7 +73,6 @@ export function getTokenData(): { values: TokenStore['values']; updatedAt: strin
           values: tokenObject as TokenStore['values'],
           updatedAt,
           version,
-          usedTokenSet: parsedUsedTokenSet,
         };
       }
     }
@@ -103,10 +101,15 @@ export function getSavedStorageType(): StorageType {
 
 export function goToNode(id: string) {
   const node = figma.getNodeById(id);
-  if (node?.type === 'INSTANCE') {
+  if (node) {
     figma.currentPage.selection = [node];
     figma.viewport.scrollAndZoomIntoView([node]);
   }
+}
+
+export function selectNodes(ids: string[]) {
+  const nodes = ids.map(figma.getNodeById);
+  figma.currentPage.selection = nodes;
 }
 
 export async function updateNodes(
@@ -130,22 +133,24 @@ export async function updateNodes(
   const promises: Set<Promise<void>> = new Set();
   const returnedValues: Set<NodeTokenRefMap> = new Set();
   entries.forEach((entry) => {
-    promises.add(defaultWorker.schedule(async () => {
-      try {
-        if (entry.tokens) {
-          const mappedValues = mapValuesToTokens(tokens, entry.tokens);
+    promises.add(
+      defaultWorker.schedule(async () => {
+        try {
+          if (entry.tokens) {
+            const mappedValues = mapValuesToTokens(tokens, entry.tokens);
 
-          setValuesOnNode(entry.node, mappedValues, entry.tokens, figmaStyleMaps, ignoreFirstPartForStyles);
-          store.successfulNodes.add(entry.node);
-          returnedValues.add(entry.tokens);
+            setValuesOnNode(entry.node, mappedValues, entry.tokens, figmaStyleMaps, ignoreFirstPartForStyles);
+            store.successfulNodes.add(entry.node);
+            returnedValues.add(entry.tokens);
+          }
+        } catch (e) {
+          console.log('got error', e);
         }
-      } catch (e) {
-        console.log('got error', e);
-      }
 
-      tracker.next();
-      tracker.reportIfNecessary();
-    }));
+        tracker.next();
+        tracker.reportIfNecessary();
+      }),
+    );
   });
   await Promise.all(promises);
 

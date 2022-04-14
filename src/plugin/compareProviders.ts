@@ -1,11 +1,12 @@
+import { StorageType } from '@/types/api';
 import isSameCredentials from '@/utils/isSameCredentials';
 import { MessageFromPluginTypes } from '../types/messages';
-import { notifyTokenValues } from './notifiers';
 
-export default function compareProvidersWithStored(providers, storageType, featureFlagId?: string | null) {
+export default function compareProvidersWithStored({
+  providers, storageType, featureFlagId, usedTokenSet,
+}: { providers?: string | null, storageType: StorageType, featureFlagId?: string | null, usedTokenSet?: string[] | null }) {
   if (providers) {
     const parsedProviders = JSON.parse(providers);
-
     const matchingSet = parsedProviders.find((i) => isSameCredentials(i, storageType));
     if (matchingSet) {
       // send a message to the UI with the credentials stored in the client
@@ -14,6 +15,7 @@ export default function compareProvidersWithStored(providers, storageType, featu
         status: true,
         credentials: matchingSet,
         featureFlagId,
+        usedTokenSet,
       });
       return;
     }
@@ -23,6 +25,4 @@ export default function compareProvidersWithStored(providers, storageType, featu
     type: MessageFromPluginTypes.API_CREDENTIALS,
     status: false,
   });
-  // Read no values from storage
-  notifyTokenValues();
 }

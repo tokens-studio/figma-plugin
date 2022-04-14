@@ -5,4 +5,5 @@ export type TokenStore = {
   updatedAt: string;
   // @README these could be different themes or sets of tokens
   values: Record<string, AnyTokenList>
+  usedTokenSet?: string[] | null
 };

@@ -7,6 +7,13 @@ describe('App', () => {
     resetStore();
   });
 
+  it('shows welcome screen when no tokens are found', () => {
+    const { getByText } = render(<App />);
+    const WelcomeText = getByText('Welcome to Figma Tokens.');
+
+    expect(WelcomeText).toBeInTheDocument();
+  });
+
   it('calls setTokenData when received values', () => {
     const { getByText } = render(<App />);
     fireEvent(
@@ -15,18 +22,19 @@ describe('App', () => {
         data: {
           pluginMessage: {
             type: 'tokenvalues',
+            usedTokenSet: ['global'],
             values: {
               version: '5',
               values: {
-                options: [
-                  {
-                    id: '123',
-                    type: 'sizing',
-                    description: 'some size',
-                    name: 'global.size.xs',
-                    value: '4',
+                global: {
+                  size: {
+                    xs: {
+                      type: 'sizing',
+                      description: 'some size',
+                      value: '4',
+                    },
                   },
-                ],
+                },
               },
             },
           },
@@ -36,22 +44,5 @@ describe('App', () => {
     const TokensText = getByText('Size');
 
     expect(TokensText).toBeInTheDocument();
-  });
-
-  it('shows welcome screen when no tokeeens are found', () => {
-    const { getByText } = render(<App />);
-    fireEvent(
-      window,
-      new MessageEvent('message', {
-        data: {
-          pluginMessage: {
-            type: 'tokenvalues',
-          },
-        },
-      }),
-    );
-    const WelcomeText = getByText('Welcome to Figma Tokens.');
-
-    expect(WelcomeText).toBeInTheDocument();
   });
 });

@@ -7,12 +7,16 @@ import type { SettingsState } from './store/models/settings';
 import type { TokenState } from './store/models/tokenState';
 import type { InspectState } from './store/models/inspectState';
 import type { BranchState } from './store/models/branchState';
+import { undoableEnhancer } from './enhancers/undoableEnhancer';
 
 export const store = init({
   models,
   redux: {
     devtoolOptions: {},
-    rootReducers: { RESET_APP: () => undefined },
+    enhancers: [undoableEnhancer],
+    rootReducers: {
+      RESET_APP: () => undefined,
+    },
   },
 });
 
