@@ -26,6 +26,7 @@ export default function CreateBranchModal({
   const localApiState = useSelector(localApiStateSelector);
 
   const [formFields, setFormFields] = React.useState({});
+  const [hasErrored, setHasErrored] = React.useState(false);
 
   const handleCreateNewClick = async () => {
     setHasErrored(false);
@@ -81,6 +82,11 @@ export default function CreateBranchModal({
               Save
             </Button>
           </Stack>
+          {hasErrored && (
+            <div className="bg-red-200 text-red-700 rounded p-4 text-xs font-bold" data-cy="provider-modal-error">
+              There was an error connecting. Check your credentials.
+            </div>
+          )}
         </Stack>
       </form>
     </Modal>

@@ -38,20 +38,14 @@ export const fetchGithubBranches = async ({
   return branches.map((branch) => branch.name);
 };
 
-export const createGithubBranch = async ({
-  context, branch, startBranch,
-}: { context: ContextObject, branch: string, startBranch: string }) => {
-  const { id, secret, baseUrl } = context;
-  const [owner, repo] = id.split('/');
+export const createNewBranch = async (owner: string, repo: string, secret: string, baseUrl: string, startBranch: string, branch: string) => {
   const octokit = new Octokit({ auth: secret, baseUrl });
   const originRef = `heads/${startBranch}`;
   const newRef = `refs/heads/${branch}`;
-
   const originBranch = await octokit.rest.git.getRef({ owner, repo, ref: originRef });
   const newBranch = await octokit.rest.git.createRef({
     owner, repo, ref: newRef, sha: originBranch.data.object.sha,
   });
-  console.log('new', newBranch);
   return newBranch;
 };
 
@@ -414,6 +408,26 @@ export function useGitHub() {
     }
   }
 
+  async function createGithubBranch({
+    context, branch, startBranch,
+  }: { context: ContextObject, branch: string, startBranch: string }) {
+    try {
+      const { id, secret, baseUrl } = context;
+      const [owner, repo] = id.split('/');
+      const newBranch = await createNewBranch(owner, repo, secret, baseUrl, startBranch, branch);
+      const branches = await fetchGithubBranches({
+        secret, owner, repo, baseUrl,
+      });
+      const newBranchName = newBranch.data.ref.split('/')[2];
+      branches.push(newBranchName);
+      dispatch.branchState.setBranches(branches);
+      return branches;
+    } catch (e) {
+      console.log(e);
+      return null;
+    }
+  }
+
   async function addNewGitHubCredentials(context: ContextObject): Promise<TokenValues | null> {
     let { raw: rawTokenObj } = getTokenObj();
 
@@ -444,5 +458,6 @@ export function useGitHub() {
     syncTokensWithGitHub,
     pullTokensFromGitHub,
     pushTokensToGitHub,
+    createGithubBranch,
   };
 }

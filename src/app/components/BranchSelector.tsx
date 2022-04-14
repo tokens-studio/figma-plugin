@@ -60,7 +60,6 @@ export default function BranchSelector() {
   const createNewBranchFrom = async (branch: string) => {
     if (checkForChanges()) {
       const userDecision = await askUserIfPull();
-      console.log('userdecision', userDecision);
     }
 
     setStartBranch(branch);

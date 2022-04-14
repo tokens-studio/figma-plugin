@@ -19,7 +19,7 @@ export default function useRemoteTokens() {
   const { setStorageType } = useStorage();
   const { pullTokensFromJSONBin, addJSONBinCredentials, createNewJSONBin } = useJSONbin();
   const {
-    addNewGitHubCredentials, syncTokensWithGitHub, pullTokensFromGitHub, pushTokensToGitHub,
+    addNewGitHubCredentials, syncTokensWithGitHub, pullTokensFromGitHub, pushTokensToGitHub, createGithubBranch,
   } = useGitHub();
   const { pullTokensFromURL } = useURL();
 
@@ -126,9 +126,10 @@ export default function useRemoteTokens() {
   }
 
   async function addNewBranch({ branch, provider, startBranch }: { branch: string, provider: StorageProviderType, startBranch: string }): Promise<boolean> {
+    let branches;
     switch (provider) {
       case StorageProviderType.GITHUB: {
-        await createGithubBranch({ context: api, branch, startBranch });
+        branches = await createGithubBranch({ context: api, branch, startBranch });
         break;
       }
       default:
@@ -140,7 +141,7 @@ export default function useRemoteTokens() {
     //   setStorageType({ provider: credentials, shouldSetInDocument: true });
     //   return true;
     // }
-    return false;
+    return branches;
   }
 
   const deleteProvider = (provider) => {
