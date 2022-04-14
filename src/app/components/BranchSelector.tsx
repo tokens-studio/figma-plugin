@@ -37,6 +37,7 @@ export default function BranchSelector() {
   const [startBranch, setStartBranch] = useState(null);
   const [menuOpened, setMenuOpened] = useState(false);
   const [createBranchModalVisible, setCreateBranchModalVisible] = useState(false);
+  const [isCurrentChanges, setIsCurrentChanges] = useState(false);
 
   useEffect(() => {
     setCurrentBranch(localApiState.branch);
@@ -49,21 +50,37 @@ export default function BranchSelector() {
     return false;
   }, [lastSyncedState, tokens]);
 
-  async function askUserIfPull(): Promise<boolean> {
+  async function askUserIfPull(branch: string): Promise<boolean> {
     const { result } = await confirm({
-      text: 'Do you want to create new branch from curren branch?',
-      description: 'There are some changes which is unsaved. If you continue, you will lose update',
+      text: <div>
+        Do you want to create new branch from
+        <GitBranchIcon size={16} />
+        {' '}
+        {branch}
+        ?
+            </div>,
+      description: 'You have unsaved changes that will be lost. Are you sure?',
     });
     return result;
   }
 
+  const createBranchByChange = () => {
+    setMenuOpened(false);
+    setIsCurrentChanges(true);
+    setCreateBranchModalVisible(true);
+  };
+
   const createNewBranchFrom = async (branch: string) => {
+    let confirmed = true;
     if (checkForChanges()) {
-      const userDecision = await askUserIfPull();
+      confirmed = await askUserIfPull(branch);
     }
 
-    setStartBranch(branch);
-    setCreateBranchModalVisible(true);
+    if (confirmed) {
+      setMenuOpened(false);
+      setStartBranch(branch);
+      setCreateBranchModalVisible(true);
+    }
   };
 
   const onBranchSelected = (branch: string) => {
@@ -101,7 +118,7 @@ export default function BranchSelector() {
                   <ChevronRightIcon />
                 </BranchSwitchMenuTrigger>
                 <BranchSwitchMenuContent side="left">
-                  <BranchSwitchMenuItem>
+                  <BranchSwitchMenuItem onSelect={createBranchByChange}>
                     Current changes
                   </BranchSwitchMenuItem>
                   {branchState.branches.length > 0 && branchState.branches.map((branch, index) => (
@@ -120,6 +137,7 @@ export default function BranchSelector() {
                 onClose={() => setCreateBranchModalVisible(false)}
                 onSuccess={() => setCreateBranchModalVisible(false)}
                 startBranch={startBranch}
+                isCurrentChanges={isCurrentChanges}
               />
             )}
           </BranchSwitchMenu>

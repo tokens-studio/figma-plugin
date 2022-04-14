@@ -19,7 +19,7 @@ type Props = {
 // @TODO use hooks
 
 export default function CreateBranchModal({
-  isOpen, onClose, onSuccess, startBranch,
+  isOpen, onClose, onSuccess, startBranch, isCurrentChanges,
 }: Props) {
   const { addNewBranch } = useRemoteTokens();
 
@@ -60,9 +60,14 @@ export default function CreateBranchModal({
           <Heading>
             Create a new branch from
             {' '}
-            {'  '}
-            <GitBranchIcon size={12} />
-            {` ${startBranch}`}
+            {isCurrentChanges
+              ? 'current changes'
+              : (
+                <>
+                  <GitBranchIcon size={12} />
+                  {` ${startBranch}`}
+                </>
+              )}
           </Heading>
           <Input
             full
