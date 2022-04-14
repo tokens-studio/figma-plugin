@@ -55,7 +55,7 @@ export default function Footer() {
         <>
           <BranchSelector currentBranch={localApiState.branch} />
           <Tooltip variant="top" label={`Pull from ${transformProviderName(storageType.provider)}`}>
-            <button onClick={() => pullTokens()} type="button" className="button button-ghost">
+            <button onClick={() => pullTokens({})} type="button" className="button button-ghost">
               <DownloadIcon />
             </button>
           </Tooltip>

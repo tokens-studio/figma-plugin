@@ -7,7 +7,7 @@ import { useJSONbin } from './providers/jsonbin';
 import useURL from './providers/url';
 import { Dispatch } from '../store';
 import useStorage from './useStorage';
-import { useGitHub, createGithubBranch } from './providers/github';
+import { useGitHub } from './providers/github';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
 import { FeatureFlags } from '@/utils/featureFlags';
 import { apiSelector } from '@/selectors';
