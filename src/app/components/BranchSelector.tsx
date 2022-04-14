@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import {
   CheckIcon, ChevronRightIcon, ChevronUpIcon, ChevronDownIcon,
 } from '@radix-ui/react-icons';
@@ -16,18 +16,22 @@ import {
   BranchSwitchMenuArrow,
 } from './BranchSwitchMenu';
 import {
-  branchSelector, lastSyncedStateSelector, tokensSelector, localApiStateSelector,
+  branchSelector, lastSyncedStateSelector, tokensSelector, localApiStateSelector, apiSelector,
 } from '@/selectors';
 import convertTokensToObject from '@/utils/convertTokensToObject';
 import useConfirm from '@/app/hooks/useConfirm';
 import CreateBranchModal from './modals/CreateBranchModal';
+import { Dispatch } from '../store';
 
 export default function BranchSelector() {
   const { confirm } = useConfirm();
+  const dispatch = useDispatch<Dispatch>();
+
   const branchState = useSelector(branchSelector);
   const lastSyncedState = useSelector(lastSyncedStateSelector);
   const tokens = useSelector(tokensSelector);
   const localApiState = useSelector(localApiStateSelector);
+  const apiData = useSelector(apiSelector);
 
   const [currentBranch, setCurrentBranch] = useState(localApiState.branch);
   const [startBranch, setStartBranch] = useState(null);
@@ -63,6 +67,11 @@ export default function BranchSelector() {
     setCreateBranchModalVisible(true);
   };
 
+  const onBranchSelected = (branch: string) => {
+    setCurrentBranch(branch);
+    dispatch.uiState.setApiData({ ...apiData, branch });
+  };
+
   return (
     <>
       {currentBranch
@@ -78,7 +87,7 @@ export default function BranchSelector() {
               <BranchSwitchMenuRadioGroup value={currentBranch}>
                 {branchState.branches.length > 0
                   && branchState.branches.map((branch, index) => (
-                    <BranchSwitchMenuRadioItem key={index} value={branch} onSelect={() => setCurrentBranch(branch)}>
+                    <BranchSwitchMenuRadioItem key={index} value={branch} onSelect={() => onBranchSelected(branch)}>
                       <BranchSwitchMenuItemIndicator>
                         <CheckIcon />
                       </BranchSwitchMenuItemIndicator>

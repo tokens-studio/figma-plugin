@@ -24,6 +24,7 @@ export default function CreateBranchModal({
   const { addNewBranch } = useRemoteTokens();
 
   const localApiState = useSelector(localApiStateSelector);
+
   const [formFields, setFormFields] = React.useState({});
 
   const handleCreateNewClick = async () => {
