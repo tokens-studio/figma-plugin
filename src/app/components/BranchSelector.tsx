@@ -19,12 +19,14 @@ import {
   branchSelector, lastSyncedStateSelector, tokensSelector, localApiStateSelector, apiSelector,
 } from '@/selectors';
 import convertTokensToObject from '@/utils/convertTokensToObject';
+import useRemoteTokens from '../store/remoteTokens';
 import useConfirm from '@/app/hooks/useConfirm';
 import CreateBranchModal from './modals/CreateBranchModal';
 import { Dispatch } from '../store';
 
 export default function BranchSelector() {
   const { confirm } = useConfirm();
+  const { pullTokens, pushTokens } = useRemoteTokens();
   const dispatch = useDispatch<Dispatch>();
 
   const branchState = useSelector(branchSelector);
@@ -86,6 +88,7 @@ export default function BranchSelector() {
   const onBranchSelected = (branch: string) => {
     setCurrentBranch(branch);
     dispatch.uiState.setApiData({ ...apiData, branch });
+    pullTokens({});
   };
 
   return (
