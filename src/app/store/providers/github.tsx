@@ -10,7 +10,9 @@ import { notifyToUI, postToFigma } from '../../../plugin/notifiers';
 import { FeatureFlags } from '@/utils/featureFlags';
 import { AnyTokenSet, TokenValues } from '@/types/tokens';
 import { decodeBase64 } from '@/utils/string';
-import { featureFlagsSelector, localApiStateSelector, tokensSelector } from '@/selectors';
+import {
+  apiSelector, featureFlagsSelector, localApiStateSelector, tokensSelector,
+} from '@/selectors';
 import { Dispatch } from '../../store';
 
 type TokenSets = {
@@ -212,6 +214,7 @@ export function useGitHub() {
   const tokens = useSelector(tokensSelector);
   const localApiState = useSelector(localApiStateSelector);
   const featureFlags = useSelector(featureFlagsSelector);
+  const apiData = useSelector(apiSelector);
   const dispatch = useDispatch<Dispatch>();
 
   const { confirm } = useConfirm();
@@ -418,9 +421,12 @@ export function useGitHub() {
       const branches = await fetchGithubBranches({
         secret, owner, repo, baseUrl,
       });
+      console.log('context', context);
+      await pushTokensToGitHub(context);
       const newBranchName = newBranch.data.ref.split('/')[2];
       branches.push(newBranchName);
       dispatch.branchState.setBranches(branches);
+      dispatch.uiState.setApiData({ ...apiData, branch: newBranchName });
       return branches;
     } catch (e) {
       console.log(e);

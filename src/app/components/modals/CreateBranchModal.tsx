@@ -30,12 +30,21 @@ export default function CreateBranchModal({
 
   const handleCreateNewClick = async () => {
     setHasErrored(false);
+    let response;
 
-    const response = await addNewBranch({
-      provider: localApiState.provider,
-      startBranch,
-      ...formFields,
-    });
+    if (isCurrentChanges) {
+      response = await addNewBranch({
+        provider: localApiState.provider,
+        startBranch: localApiState.branch,
+        ...formFields,
+      });
+    } else {
+      response = await addNewBranch({
+        provider: localApiState.provider,
+        startBranch,
+        ...formFields,
+      });
+    }
 
     if (response) {
       onSuccess();

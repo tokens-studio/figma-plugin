@@ -52,17 +52,19 @@ export default function BranchSelector() {
     return false;
   }, [lastSyncedState, tokens]);
 
-  async function askUserIfPull(branch: string): Promise<boolean> {
-    const { result } = await confirm({
-      text: <div>
-        Do you want to create new branch from
-        <GitBranchIcon size={16} />
-        {' '}
-        {branch}
-        ?
-            </div>,
-      description: 'You have unsaved changes that will be lost. Are you sure?',
-    });
+  async function askUserIfPull(branch: string, type: string): Promise<boolean> {
+    let result;
+    if (type === 'push') {
+      result = await confirm({
+        text: 'You have unsaved changes',
+        description: 'If you switch your branch without pushing your local changes to your repository, the changes wil be lost',
+      });
+    } else {
+      result = await confirm({
+        text: 'Pull from GitHub?',
+        description: 'Your repo already contains tokens, do you want to pull these now?',
+      });
+    }
     return result;
   }
 
@@ -73,10 +75,7 @@ export default function BranchSelector() {
   };
 
   const createNewBranchFrom = async (branch: string) => {
-    let confirmed = true;
-    if (checkForChanges()) {
-      confirmed = await askUserIfPull(branch);
-    }
+    const confirmed = true;
 
     if (confirmed) {
       setMenuOpened(false);
@@ -86,9 +85,27 @@ export default function BranchSelector() {
   };
 
   const onBranchSelected = (branch: string) => {
+    // let confirmed = true;
+    // if (checkForChanges()) {
+    //   confirmed = await askUserIfPull(branch, 'push');
+    // }
+    // else {
+    //   confirmed = await askUserIfPull(branch, 'pull');
+    // }
+
+    // if (confirmed) {
+    setMenuOpened(false);
     setCurrentBranch(branch);
+
+    pullTokens({ context: { ...apiData, branch } });
+
     dispatch.uiState.setApiData({ ...apiData, branch });
-    pullTokens({});
+    dispatch.uiState.setLocalApiState({ ...localApiState, branch });
+
+    // }
+    // check unsaved?
+    // ask if user wants to pull
+    // pullTokens({ ...apiData, branch });
   };
 
   return (
