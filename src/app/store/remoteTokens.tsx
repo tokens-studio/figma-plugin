@@ -79,11 +79,11 @@ export default function useRemoteTokens() {
     return null;
   };
 
-  const pushTokens = async () => {
+  const pushTokens = async (context: ContextObject = api) => {
     track('pushTokens', { provider: api.provider });
     switch (api.provider) {
       case StorageProviderType.GITHUB: {
-        await pushTokensToGitHub(api);
+        await pushTokensToGitHub(context);
         break;
       }
       default:
@@ -135,12 +135,7 @@ export default function useRemoteTokens() {
       default:
         throw new Error('Not implemented');
     }
-    // if (data) {
-    //   dispatch.uiState.setLocalApiState(credentials);
-    //   dispatch.uiState.setApiData(credentials);
-    //   setStorageType({ provider: credentials, shouldSetInDocument: true });
-    //   return true;
-    // }
+
     return branches;
   }
 

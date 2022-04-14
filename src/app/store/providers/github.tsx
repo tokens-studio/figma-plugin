@@ -421,12 +421,11 @@ export function useGitHub() {
       const branches = await fetchGithubBranches({
         secret, owner, repo, baseUrl,
       });
-      console.log('context', context);
-      await pushTokensToGitHub(context);
+
       const newBranchName = newBranch.data.ref.split('/')[2];
       branches.push(newBranchName);
       dispatch.branchState.setBranches(branches);
-      dispatch.uiState.setApiData({ ...apiData, branch: newBranchName });
+
       return branches;
     } catch (e) {
       console.log(e);

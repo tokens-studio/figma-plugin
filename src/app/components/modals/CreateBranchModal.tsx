@@ -6,14 +6,15 @@ import Heading from '../Heading';
 import Button from '../Button';
 import Input from '../Input';
 import useRemoteTokens from '../../store/remoteTokens';
-import { localApiStateSelector } from '@/selectors';
+import { apiSelector, localApiStateSelector } from '@/selectors';
 import Stack from '../Stack';
 
 type Props = {
   isOpen: boolean
   startBranch: string
+  isCurrentChanges: boolean
   onClose: (arg: boolean) => void
-  onSuccess: () => void
+  onSuccess: (branch: string) => void
 };
 
 // @TODO use hooks
@@ -21,36 +22,32 @@ type Props = {
 export default function CreateBranchModal({
   isOpen, onClose, onSuccess, startBranch, isCurrentChanges,
 }: Props) {
-  const { addNewBranch } = useRemoteTokens();
+  const { addNewBranch, pushTokens } = useRemoteTokens();
 
   const localApiState = useSelector(localApiStateSelector);
+  const apiData = useSelector(apiSelector);
 
   const [formFields, setFormFields] = React.useState({});
   const [hasErrored, setHasErrored] = React.useState(false);
 
   const handleCreateNewClick = async () => {
-    setHasErrored(false);
-    let response;
+    const { branch } = formFields;
 
-    if (isCurrentChanges) {
-      response = await addNewBranch({
-        provider: localApiState.provider,
-        startBranch: localApiState.branch,
-        ...formFields,
-      });
-    } else {
-      response = await addNewBranch({
-        provider: localApiState.provider,
-        startBranch,
-        ...formFields,
-      });
-    }
+    setHasErrored(false);
+
+    const response = await addNewBranch({
+      provider: localApiState.provider,
+      startBranch,
+      branch,
+    });
 
     if (response) {
-      onSuccess();
+      onSuccess(branch);
     } else {
       setHasErrored(true);
     }
+
+    if (isCurrentChanges) await pushTokens({ ...apiData, branch });
   };
 
   const handleChange = (e: any) => {

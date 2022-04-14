@@ -4,6 +4,7 @@ import {
   CheckIcon, ChevronRightIcon, ChevronUpIcon, ChevronDownIcon,
 } from '@radix-ui/react-icons';
 import { GitBranchIcon } from '@primer/octicons-react';
+import { StringIterator } from 'cypress/types/lodash';
 import {
   BranchSwitchMenu,
   BranchSwitchMenuContent,
@@ -52,60 +53,66 @@ export default function BranchSelector() {
     return false;
   }, [lastSyncedState, tokens]);
 
-  async function askUserIfPull(branch: string, type: string): Promise<boolean> {
-    let result;
-    if (type === 'push') {
-      result = await confirm({
-        text: 'You have unsaved changes',
-        description: 'If you switch your branch without pushing your local changes to your repository, the changes wil be lost',
-      });
-    } else {
-      result = await confirm({
-        text: 'Pull from GitHub?',
-        description: 'Your repo already contains tokens, do you want to pull these now?',
-      });
-    }
+  async function askUserIfPull(): Promise<boolean> {
+    const { result } = await confirm({
+      text: 'Pull from GitHub?',
+      description: 'Your repo already contains tokens, do you want to pull these now?',
+    });
+    return result;
+  }
+
+  async function askUserIfPushChanges(): Promise<boolean> {
+    const { result } = await confirm({
+      text: 'You have unsaved changes',
+      description: <div>
+        If you create or switch your branch without pushing your local changes
+        <br />
+        {' '}
+        to your repository, the changes will be lost.
+      </div>,
+      confirmAction: 'Push',
+      cancelAction: 'Discard changes',
+    });
     return result;
   }
 
   const createBranchByChange = () => {
     setMenuOpened(false);
     setIsCurrentChanges(true);
+    setStartBranch(currentBranch);
     setCreateBranchModalVisible(true);
   };
 
   const createNewBranchFrom = async (branch: string) => {
-    const confirmed = true;
-
-    if (confirmed) {
-      setMenuOpened(false);
-      setStartBranch(branch);
-      setCreateBranchModalVisible(true);
+    if (checkForChanges() && await askUserIfPushChanges()) {
+      await pushTokens();
     }
+
+    setMenuOpened(false);
+    setStartBranch(branch);
+    setCreateBranchModalVisible(true);
   };
 
-  const onBranchSelected = (branch: string) => {
-    // let confirmed = true;
-    // if (checkForChanges()) {
-    //   confirmed = await askUserIfPull(branch, 'push');
-    // }
-    // else {
-    //   confirmed = await askUserIfPull(branch, 'pull');
-    // }
+  const onBranchSelected = async (branch: string) => {
+    if (checkForChanges() && await askUserIfPushChanges()) {
+      await pushTokens();
+    }
 
-    // if (confirmed) {
     setMenuOpened(false);
     setCurrentBranch(branch);
 
-    pullTokens({ context: { ...apiData, branch } });
+    if (await askUserIfPull()) await pullTokens({ context: { ...apiData, branch } });
 
     dispatch.uiState.setApiData({ ...apiData, branch });
     dispatch.uiState.setLocalApiState({ ...localApiState, branch });
+  };
 
-    // }
-    // check unsaved?
-    // ask if user wants to pull
-    // pullTokens({ ...apiData, branch });
+  const onCreateBranchModalSuccess = (branch: string) => {
+    setCreateBranchModalVisible(false);
+    setCurrentBranch(branch);
+
+    dispatch.uiState.setApiData({ ...apiData, branch });
+    dispatch.uiState.setLocalApiState({ ...localApiState, branch });
   };
 
   return (
@@ -138,9 +145,12 @@ export default function BranchSelector() {
                   <ChevronRightIcon />
                 </BranchSwitchMenuTrigger>
                 <BranchSwitchMenuContent side="left">
+                  {checkForChanges()
+                  && (
                   <BranchSwitchMenuItem onSelect={createBranchByChange}>
                     Current changes
                   </BranchSwitchMenuItem>
+                  )}
                   {branchState.branches.length > 0 && branchState.branches.map((branch, index) => (
                     <BranchSwitchMenuItem key={index} onSelect={() => createNewBranchFrom(branch)}>
                       <GitBranchIcon size={12} />
@@ -155,7 +165,7 @@ export default function BranchSelector() {
               <CreateBranchModal
                 isOpen={createBranchModalVisible}
                 onClose={() => setCreateBranchModalVisible(false)}
-                onSuccess={() => setCreateBranchModalVisible(false)}
+                onSuccess={onCreateBranchModalSuccess}
                 startBranch={startBranch}
                 isCurrentChanges={isCurrentChanges}
               />
