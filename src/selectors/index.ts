@@ -36,3 +36,5 @@ export * from './themeIdentifiersSelector';
 export * from './activeThemeSelector';
 export * from './themesListSelector';
 export * from './manageThemesModalOpenSelector';
+export * from './rootStateSelector';
+export * from './tokenSetStatusSelector';

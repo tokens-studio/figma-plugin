@@ -24,7 +24,7 @@ export default function TokenGroupHeading({ label, path, id }: Props) {
   return (
     <ContextMenu>
       <ContextMenuTrigger id={`group-heading-${path}-${label}-${id}`}>
-        <Heading size="small">{label}</Heading>
+        <Heading muted size="small">{label}</Heading>
       </ContextMenuTrigger>
       <ContextMenuContent>
         <ContextMenuItem disabled={editProhibited} onSelect={handleSelect}>

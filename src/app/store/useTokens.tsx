@@ -21,6 +21,8 @@ import {
   tokensSelector,
   usedTokenSetSelector,
 } from '@/selectors';
+import { TokenSetStatus } from '@/constants/TokenSetStatus';
+import { TokenTypes } from '@/constants/TokenTypes';
 
 // @TODO fix typings
 
@@ -110,7 +112,7 @@ export default function useTokens() {
     });
   }, []);
 
-  const handleRemap = useCallback(async (type: Properties, name: string) => {
+  const handleRemap = useCallback(async (type: Properties | TokenTypes, name: string) => {
     const userDecision = await confirm({
       text: `Choose a new token for ${name}`,
       input: {
@@ -149,12 +151,18 @@ export default function useTokens() {
   const createStylesFromTokens = useCallback(() => {
     track('createStyles');
 
+    const enabledTokenSets = Object.entries(usedTokenSet)
+      .filter(([, status]) => status === TokenSetStatus.ENABLED)
+      .map(([tokenSet]) => tokenSet);
     const resolved = resolveTokenValues(mergeTokenGroups(tokens, usedTokenSet));
-    const withoutIgnored = resolved.filter((token) => !token.name.split('.').some((part) => part.startsWith('_')));
+    const withoutIgnoredAndSourceTokens = resolved.filter((token) => (
+      !token.name.split('.').some((part) => part.startsWith('_')) // filter out ignored tokens
+      && (!token.internal__Parent || enabledTokenSets.includes(token.internal__Parent)) // filter out SOURCE tokens
+    ));
 
     postToFigma({
       type: MessageToPluginTypes.CREATE_STYLES,
-      tokens: withoutIgnored,
+      tokens: withoutIgnoredAndSourceTokens,
       settings,
     });
   }, [settings, tokens, usedTokenSet]);

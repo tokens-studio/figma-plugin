@@ -14,6 +14,11 @@ const StyledHeading = styled('p', {
         fontSize: '$medium',
       },
     },
+    muted: {
+      true: {
+        color: '$textMuted',
+      },
+    },
   },
 });
 
@@ -21,13 +26,14 @@ type HeadingProps = {
   size?: 'small' | 'medium';
   children: React.ReactNode;
   id?: string;
+  muted?: boolean;
 };
 
 function Heading({
-  size = 'small', children, id,
+  size = 'small', children, id, muted,
 }: HeadingProps) {
   return (
-    <StyledHeading size={size} data-cy={id}>
+    <StyledHeading size={size} muted={muted} data-cy={id}>
       {children}
     </StyledHeading>
   );

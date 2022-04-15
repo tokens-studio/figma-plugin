@@ -20,13 +20,13 @@ export default function InspectorDebugView({ resolvedTokens }: { resolvedTokens:
 
   return (
     <Box
-      css={{ flexGrow: 1, padding: '$4' }}
+      css={{
+        display: 'flex', flexDirection: 'column', flexGrow: 1, padding: '$4', justifyContent: 'center',
+      }}
       className="content scroll-container"
     >
-      <Stack direction="column">
-        <Box css={{ borderBottom: '1px solid $border', paddingBottom: '$4', marginBottom: '$4' }}>
-          <AnnotationBuilder />
-        </Box>
+      <Stack direction="column" css={{ flexGrow: 1 }}>
+        <AnnotationBuilder />
 
         {uiState.selectedLayers === 1 && Object.entries(uiState.mainNodeSelectionValues).length > 0
           ? (

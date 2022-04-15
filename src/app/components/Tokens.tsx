@@ -31,6 +31,7 @@ import { ThemeSelector } from './ThemeSelector';
 import { IconToggleableDisclosure } from './icons/IconToggleableDisclosure';
 import { styled } from '@/stitches.config';
 import { ManageThemesModal } from './ManageThemesModal';
+import { TokenSetStatus } from '@/constants/TokenSetStatus';
 
 const StyledButton = styled('button', {
   '&:focus, &:hover': {
@@ -106,7 +107,10 @@ function Tokens({ isActive }: { isActive: boolean }) {
   const shouldConfirm = React.useMemo(() => updateMode === UpdateMode.DOCUMENT, [updateMode]);
 
   const resolvedTokens = React.useMemo(
-    () => resolveTokenValues(mergeTokenGroups(tokens, [...usedTokenSet, activeTokenSet])),
+    () => resolveTokenValues(mergeTokenGroups(tokens, {
+      ...usedTokenSet,
+      [activeTokenSet]: TokenSetStatus.ENABLED,
+    })),
     [tokens, usedTokenSet, activeTokenSet],
   );
   const [stringTokens, setStringTokens] = React.useState(
