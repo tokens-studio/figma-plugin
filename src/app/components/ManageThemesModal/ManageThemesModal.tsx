@@ -3,6 +3,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import { activeThemeSelector, themesListSelector } from '@/selectors';
 import Modal from '../Modal';
 import { Dispatch } from '@/app/store';
+import { EmptyState } from '../EmptyState';
+import Stack from '../Stack';
+import IconPlus from '@/icons/plus.svg';
+import Button from '../Button';
 
 type Props = {
 };
@@ -20,9 +24,25 @@ export const ManageThemesModal: React.FC<Props> = () => {
     <Modal
       isOpen
       title="Themes"
+      footer={(
+        <Stack direction="row" justify="end">
+          <Button
+            data-cy="button-manage-themes-modal-new-theme"
+            variant="secondary"
+            icon={<IconPlus />}
+          >
+            New theme
+          </Button>
+        </Stack>
+      )}
       close={handleClose}
     >
-      Hello world
+      {!themes.length && (
+        <EmptyState
+          title="You don't have any themes yet"
+          subtitle="Create your first theme now"
+        />
+      )}
     </Modal>
   );
 };

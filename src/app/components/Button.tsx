@@ -1,6 +1,8 @@
 import React from 'react';
+import { styled } from '@/stitches.config';
 import { track } from '../../utils/analytics';
 
+type ClassMap<K extends string = string> = Record<K, string>;
 type ButtonProps = {
   type?: 'button' | 'submit';
   variant: 'secondary' | 'destructive' | 'primary' | 'ghost';
@@ -10,10 +12,23 @@ type ButtonProps = {
   download?: string;
   disabled?: boolean;
   id?: string;
-  buttonRef?: any;
+  icon?: React.ReactNode;
+  buttonRef?: React.MutableRefObject<HTMLAnchorElement | HTMLButtonElement | null>;
 };
 
-const Button: React.FunctionComponent<ButtonProps> = ({
+const StyledButtonIconContainer = styled('span', {
+  display: 'inline-block',
+  marginRight: '$3',
+  height: 0,
+  verticalAlign: 'middle',
+  svg: {
+    display: 'flex',
+    alignItems: 'center',
+    transform: 'translateY(-50%)',
+  },
+});
+
+const Button: React.FC<ButtonProps> = ({
   size = 'small',
   type = 'button',
   onClick,
@@ -21,64 +36,73 @@ const Button: React.FunctionComponent<ButtonProps> = ({
   variant,
   children,
   href,
-  disabled = false,
   id,
+  icon,
+  disabled = false,
   buttonRef = null,
-}): HTMLButtonElement => {
-  const handleClick = () => {
+}) => {
+  const handleClick = React.useCallback(() => {
     if (id) {
       track(`Clicked ${id}`);
     }
     if (onClick) {
       onClick();
     }
-  };
-  let variantClass;
-  switch (variant) {
-    case 'secondary':
-      variantClass = 'button-secondary';
-      break;
-    case 'ghost':
-      variantClass = 'button-ghost';
-      break;
-    default:
-      variantClass = 'button-primary';
-      break;
-  }
-  let sizeClass;
-  switch (size) {
-    case 'large':
-      sizeClass = 'button-large';
-      break;
-    default:
-      break;
-  }
+  }, [id, onClick]);
+
+  const variantClass = React.useMemo(() => (
+    ({
+      secondary: 'button-secondary',
+      ghost: 'button-ghost',
+    } as ClassMap)[variant] ?? 'button-primary'
+  ), [variant]);
+
+  const sizeClass = React.useMemo(() => (
+    ({
+      large: 'button-large',
+    } as ClassMap)[size] ?? ''
+  ), [size]);
+
+  const buttonClass = React.useMemo(() => (
+    [variantClass, sizeClass].filter(Boolean).join(' ')
+  ), [variantClass, sizeClass]);
+
   if (href) {
     return (
       <a
         target="_blank"
         rel="noreferrer"
         download={download}
-        className={`button ${[variantClass, sizeClass].join(' ')}`}
+        className={`button ${buttonClass}`}
         href={href}
         data-cy={id}
         ref={buttonRef}
       >
+        {(!!icon) && (
+          <StyledButtonIconContainer>
+            {icon}
+          </StyledButtonIconContainer>
+        )}
         {children}
       </a>
     );
   }
 
   return (
-  // eslint-disable-next-line react/button-has-type
+    // eslint-disable-next-line react/button-has-type
     <button
       data-cy={id}
       disabled={disabled}
-      type={type}
-      className={`button ${[variantClass, sizeClass].join(' ')}`}
+      type={type === 'button' ? 'button' : 'submit'}
+      className={`button ${buttonClass}}`}
       onClick={handleClick}
       ref={buttonRef}
     >
+      {(!!icon) && (
+        <StyledButtonIconContainer>
+          {icon}
+        </StyledButtonIconContainer>
+      )}
       {children}
     </button>
   );

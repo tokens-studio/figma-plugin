@@ -1,18 +1,19 @@
 import React from 'react';
-import ReactModal from 'react-modal';
-import Heading from './Heading';
-import Stack from './Stack';
+import ReactModal, { Styles as ReactModalStyles } from 'react-modal';
+import Heading from '../Heading';
+import Stack from '../Stack';
+import { ModalFooter } from './ModalFooter';
 
 if (process.env.NODE_ENV !== 'test') ReactModal.setAppElement('#app');
 
-const customStyles = (large) => ({
+const customStyles = (large = false): ReactModalStyles => ({
   overlay: {
     backgroundColor: 'rgba(0,0,0,0.2)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     padding: '1rem',
-    zIndex: '1',
+    zIndex: 1,
   },
   content: {
     padding: '0',
@@ -28,7 +29,20 @@ const customStyles = (large) => ({
   },
 });
 
-function Modal({
+type ModalProps = {
+  id?: string;
+  title?: string;
+  full?: boolean;
+  large?: boolean;
+  compact?: boolean;
+  isOpen: boolean;
+  children: React.ReactNode;
+  footer?: React.ReactNode
+  showClose?: boolean;
+  close: () => void;
+};
+
+export function Modal({
   id,
   title,
   full,
@@ -36,19 +50,10 @@ function Modal({
   isOpen,
   close,
   children,
+  footer,
   showClose = false,
   compact = false,
-}: {
-  id?: string;
-  title?: string;
-  full?: boolean;
-  large?: boolean;
-  compact?: boolean;
-  isOpen: boolean;
-  close: Function;
-  children: React.ReactNode;
-  showClose?: boolean;
-}) {
+}: ModalProps) {
   const paddingClass = () => {
     if (compact) {
       return 'p-4';
@@ -60,13 +65,18 @@ function Modal({
   };
 
   return (
-    <ReactModal isOpen={isOpen} onRequestClose={close} style={customStyles(large)} contentLabel={title || null}>
+    <ReactModal
+      isOpen={isOpen}
+      onRequestClose={close}
+      style={customStyles(large)}
+      contentLabel={title || ''}
+    >
       {(showClose || title) && (
         <Stack direction="row" justify="between" align="center">
           {title && (
-          <div className="pl-4">
-            <Heading size="small">{title}</Heading>
-          </div>
+            <div className="pl-4">
+              <Heading size="small">{title}</Heading>
+            </div>
           )}
           <button
             type="button"
@@ -94,8 +104,11 @@ function Modal({
       <div data-cy={id} className={`relative ${paddingClass()}`}>
         {children}
       </div>
+      {(!!footer) && (
+        <ModalFooter>
+          {footer}
+        </ModalFooter>
+      )}
     </ReactModal>
   );
 }
-
-export default Modal;
