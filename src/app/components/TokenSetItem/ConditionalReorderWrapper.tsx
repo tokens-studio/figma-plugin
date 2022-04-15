@@ -2,13 +2,11 @@ import React from 'react';
 import { DragControls, Reorder, useMotionValue } from 'framer-motion';
 import { useRaisedShadow } from '../use-raised-shadow';
 import type { TreeItem } from '../utils/getTree';
-import type { ListItem } from './TokenSetItem';
 
 type Props = {
   canReorder: boolean;
   controls: DragControls;
-  item: TreeItem | ListItem;
-  children: React.ReactElement;
+  item: TreeItem;
   onReorder?: () => void;
 };
 
@@ -35,6 +33,6 @@ export const ConditionalReorderWrapper: React.FC<Props> = ({
       {children}
     </Reorder.Item>
   ) : (
-    children
+    React.createElement(React.Fragment, {}, children)
   );
 };

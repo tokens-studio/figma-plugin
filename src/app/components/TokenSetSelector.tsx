@@ -7,7 +7,7 @@ import Button from './Button';
 import Heading from './Heading';
 import Icon from './Icon';
 import Input from './Input';
-import Modal from './Modal';
+import { Modal } from './Modal';
 import TokenSetTree from './TokenSetTree';
 import Box from './Box';
 import { styled } from '@/stitches.config';
@@ -107,7 +107,7 @@ export default function TokenSetSelector() {
       }}
       className="content"
     >
-      {featureFlags?.gh_mfs_enabled && api.provider === StorageProviderType.GITHUB && !api?.filePath?.endsWith('.json') ? (
+      {(featureFlags?.gh_mfs_enabled && api.provider === StorageProviderType.GITHUB && !api?.filePath?.endsWith('.json')) ? (
         <Box>
           <TokenSetTree
             tokenSets={allTokenSets}

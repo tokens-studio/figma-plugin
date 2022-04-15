@@ -1,1 +1,2 @@
-export { TokenSetItemProps, TokenSetItem, ListItem } from './TokenSetItem';
+export { ConditionalReorderWrapper } from './ConditionalReorderWrapper';
+export { TokenSetItemProps, TokenSetItem } from './TokenSetItem';

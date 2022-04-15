@@ -1,7 +1,7 @@
 import Box from '../Box';
 import { styled } from '@/stitches.config';
 
-export const StyledWrapper = styled(Box, {
+export const StyledItem = styled(Box, {
   display: 'flex',
   position: 'relative',
   alignItems: 'center',
