@@ -53,6 +53,7 @@ export const {
       contextMenuForeground: globalTokens.colors.white,
       contextMenuForegroundMuted: globalTokens.colors.gray400,
       contextMenuSeperator: globalTokens.colors.gray700,
+      branchSwitchTriggerHover: globalTokens.colors.gray200,
       text: globalTokens.colors.gray900,
       textMuted: globalTokens.colors.gray600,
       textSubtle: globalTokens.colors.gray400,

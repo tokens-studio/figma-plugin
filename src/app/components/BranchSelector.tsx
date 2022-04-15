@@ -1,10 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import {
-  CheckIcon, ChevronRightIcon, ChevronUpIcon, ChevronDownIcon,
-} from '@radix-ui/react-icons';
+import { CheckIcon, ChevronRightIcon } from '@radix-ui/react-icons';
 import { GitBranchIcon } from '@primer/octicons-react';
-import { StringIterator } from 'cypress/types/lodash';
 import {
   BranchSwitchMenu,
   BranchSwitchMenuContent,
@@ -107,10 +104,16 @@ export default function BranchSelector() {
     dispatch.uiState.setLocalApiState({ ...localApiState, branch });
   };
 
-  const onCreateBranchModalSuccess = (branch: string) => {
+  // @params
+  /*
+  ** branch: branch name which is just created.
+  ** branches: a list of branch names before new branch is created.
+  */
+  const onCreateBranchModalSuccess = (branch: string, branches: string[]) => {
     setCreateBranchModalVisible(false);
     setCurrentBranch(branch);
 
+    dispatch.branchState.setBranches(branches.includes(branch) ? branches : [...branches, branch]);
     dispatch.uiState.setApiData({ ...apiData, branch });
     dispatch.uiState.setLocalApiState({ ...localApiState, branch });
   };
@@ -123,7 +126,6 @@ export default function BranchSelector() {
             <BranchSwitchMenuMainTrigger>
               <GitBranchIcon size={16} />
               <span>{currentBranch}</span>
-              {menuOpened ? <ChevronDownIcon /> : <ChevronUpIcon />}
             </BranchSwitchMenuMainTrigger>
 
             <BranchSwitchMenuContent side="top" sideOffset={5}>

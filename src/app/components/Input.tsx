@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { styled } from '@/stitches.config';
 import IconVisibility from './icons/IconVisibiltyOn';
 import IconVisibilityOff from './icons/IconVisibilityOff';
@@ -10,6 +10,7 @@ type Props = {
   inputRef?: React.MutableRefObject<HTMLInputElement | null>;
   error?: string;
   required?: boolean;
+  autofocus?: boolean;
   tabindex?: number | null;
   label?: string | null;
   full?: boolean;
@@ -108,6 +109,7 @@ const StyledPrefix = styled('div', {
 
 const Input: React.FC<Props> = ({
   name,
+  autofocus,
   error = '',
   required = false,
   tabindex = null,
@@ -159,6 +161,7 @@ const Input: React.FC<Props> = ({
           name={name}
           onChange={onChange}
           required={required}
+          autoFocus={autofocus}
           min={min}
           max={max}
           step={step}

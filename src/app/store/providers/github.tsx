@@ -417,16 +417,8 @@ export function useGitHub() {
     try {
       const { id, secret, baseUrl } = context;
       const [owner, repo] = id.split('/');
-      const newBranch = await createNewBranch(owner, repo, secret, baseUrl, startBranch, branch);
-      const branches = await fetchGithubBranches({
-        secret, owner, repo, baseUrl,
-      });
 
-      const newBranchName = newBranch.data.ref.split('/')[2];
-      branches.push(newBranchName);
-      dispatch.branchState.setBranches(branches);
-
-      return branches;
+      return await createNewBranch(owner, repo, secret, baseUrl, startBranch, branch);
     } catch (e) {
       console.log(e);
       return null;
@@ -464,5 +456,6 @@ export function useGitHub() {
     pullTokensFromGitHub,
     pushTokensToGitHub,
     createGithubBranch,
+    fetchGithubBranches,
   };
 }

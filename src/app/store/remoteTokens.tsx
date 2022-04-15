@@ -19,7 +19,7 @@ export default function useRemoteTokens() {
   const { setStorageType } = useStorage();
   const { pullTokensFromJSONBin, addJSONBinCredentials, createNewJSONBin } = useJSONbin();
   const {
-    addNewGitHubCredentials, syncTokensWithGitHub, pullTokensFromGitHub, pushTokensToGitHub, createGithubBranch,
+    addNewGitHubCredentials, syncTokensWithGitHub, pullTokensFromGitHub, pushTokensToGitHub, createGithubBranch, fetchGithubBranches,
   } = useGitHub();
   const { pullTokensFromURL } = useURL();
 
@@ -126,17 +126,33 @@ export default function useRemoteTokens() {
   }
 
   async function addNewBranch({ branch, provider, startBranch }: { branch: string, provider: StorageProviderType, startBranch: string }): Promise<boolean> {
-    let branches;
+    let newBranch;
     switch (provider) {
       case StorageProviderType.GITHUB: {
-        branches = await createGithubBranch({ context: api, branch, startBranch });
+        newBranch = await createGithubBranch({ context: api, branch, startBranch });
         break;
       }
       default:
         throw new Error('Not implemented');
     }
 
-    return branches;
+    return newBranch;
+  }
+
+  async function fetchBranches({
+    provider, secret, id, baseUrl,
+  } : { provider: StorageProviderType, secret: string, id: string, baseUrl: string }) {
+    const [owner, repo] = id.split('/');
+    switch (provider) {
+      case StorageProviderType.GITHUB:
+        return fetchGithubBranches({
+          secret, owner, repo, baseUrl,
+        });
+        break;
+      default:
+        return null;
+        break;
+    }
   }
 
   const deleteProvider = (provider) => {
@@ -153,5 +169,6 @@ export default function useRemoteTokens() {
     pushTokens,
     addNewProviderItem,
     addNewBranch,
+    fetchBranches,
   };
 }

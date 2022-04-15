@@ -22,13 +22,22 @@ type Props = {
 export default function CreateBranchModal({
   isOpen, onClose, onSuccess, startBranch, isCurrentChanges,
 }: Props) {
-  const { addNewBranch, pushTokens } = useRemoteTokens();
+  const { addNewBranch, pushTokens, fetchBranches } = useRemoteTokens();
 
   const localApiState = useSelector(localApiStateSelector);
   const apiData = useSelector(apiSelector);
 
   const [formFields, setFormFields] = React.useState({});
   const [hasErrored, setHasErrored] = React.useState(false);
+  const inputRef = React.useRef(null);
+
+  /* @lifecycle
+  ** set focus on input
+  */
+  React.useEffect(() => {
+    console.log(inputRef);
+    inputRef.current?.focus();
+  }, [inputRef.current]);
 
   const handleCreateNewClick = async () => {
     const { branch } = formFields;
@@ -41,8 +50,10 @@ export default function CreateBranchModal({
       branch,
     });
 
+    const branches = await fetchBranches(localApiState);
+
     if (response) {
-      onSuccess(branch);
+      onSuccess(branch, branches);
     } else {
       setHasErrored(true);
     }
@@ -78,11 +89,13 @@ export default function CreateBranchModal({
           <Input
             full
             label="Branch name"
-            value={formFields.branch}
+            value={formFields.branch || ''}
             placeholder="branch"
             onChange={handleChange}
             type="text"
             name="branch"
+            inputRef={inputRef}
+            autofocus
             required
           />
           <Stack direction="row" gap={4}>

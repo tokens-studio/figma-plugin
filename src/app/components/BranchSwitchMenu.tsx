@@ -42,9 +42,17 @@ const StyledBranchSwitchMenuMainTrigger = styled(BranchSwitchMenuPrimitive.Trigg
   display: 'flex',
   alignItems: 'center',
   fontSize: '$xsmall',
+  borderRadius: '2px',
+  paddingLeft: '3px',
+  paddingRight: '3px',
+
   '& > span': {
     paddingLeft: '$2',
     paddingRight: '$2',
+  },
+
+  '&:hover': {
+    background: '$branchSwitchTriggerHover',
   },
 });
 
