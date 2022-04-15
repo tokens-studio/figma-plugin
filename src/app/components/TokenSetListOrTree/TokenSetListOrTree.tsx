@@ -14,8 +14,8 @@ type TreeOrListItem<ItemType = unknown> = {
 type SharedProps<T extends TreeOrListItem> = {
   displayType: 'tree' | 'list'
   items: T[]
-  renderItem: (props: { item: T, children: React.ReactNode }) => React.ReactNode
-  renderItemContent: (props: { item: T, children: React.ReactNode }) => React.ReactNode
+  renderItem: (props: { item: T, children: React.ReactNode }) => React.ReactElement
+  renderItemContent: (props: { item: T, children: React.ReactNode }) => React.ReactElement
 };
 
 type Props<T extends TreeOrListItem> = SharedProps<T>;
@@ -23,8 +23,8 @@ type Props<T extends TreeOrListItem> = SharedProps<T>;
 export function TokenSetListOrTree<T extends TreeOrListItem>({
   displayType,
   items,
-  renderItem,
-  renderItemContent,
+  renderItem: RenderItem,
+  renderItemContent: RenderItemContent,
 }: Props<T>) {
   const [collapsed, setCollapsed] = useState<string[]>([]);
 
@@ -32,38 +32,37 @@ export function TokenSetListOrTree<T extends TreeOrListItem>({
     setCollapsed(collapsed.includes(key) ? collapsed.filter((s) => s !== key) : [...collapsed, key]);
   }, [collapsed]);
 
-  const renderedItems = useMemo(() => (
+  const mappedItems = useMemo(() => (
     items.filter((item) => (
       // remove items which are in a collapsed parent
       !collapsed.some((parentKey) => item.parent?.startsWith(parentKey))
-    )).map((item) => {
-      const defaultContent = (!item.isLeaf && displayType === 'tree') && (
-        <StyledFolderButton
-          type="button"
-          css={{ left: `${5 * item.level}px` }}
-          onClick={() => handleToggleCollapsed(item.key)}
-        >
-          <StyledFolderButtonChevronBox collapsed={collapsed.includes(item.key)}>
-            <IconChevronDown />
-          </StyledFolderButtonChevronBox>
-        </StyledFolderButton>
-      );
+    )).map((item) => ({
+      item,
+      onToggleCollapsed: () => handleToggleCollapsed(item.key),
+    }))
+  ), [items, collapsed, handleToggleCollapsed]);
 
-      const renderedContent = renderItemContent({ item, children: defaultContent });
-      const renderedItem = renderItem({
-        item,
-        children: <StyledItem>{renderedContent}</StyledItem>,
-      });
-      return renderedItem;
-    })
-  ), [
-    displayType,
-    collapsed,
-    items,
-    renderItem,
-    renderItemContent,
-    handleToggleCollapsed,
-  ]);
-
-  return React.createElement(React.Fragment, {}, ...renderedItems);
+  return (
+    <>
+      {mappedItems.map(({ item, onToggleCollapsed }) => (
+        <RenderItem key={item.key} item={item}>
+          <StyledItem>
+            <RenderItemContent item={item}>
+              {(!item.isLeaf && displayType === 'tree') && (
+              <StyledFolderButton
+                type="button"
+                css={{ left: `${5 * item.level}px` }}
+                onClick={onToggleCollapsed}
+              >
+                <StyledFolderButtonChevronBox collapsed={collapsed.includes(item.key)}>
+                  <IconChevronDown />
+                </StyledFolderButtonChevronBox>
+              </StyledFolderButton>
+              )}
+            </RenderItemContent>
+          </StyledItem>
+        </RenderItem>
+      ))}
+    </>
+  );
 }
