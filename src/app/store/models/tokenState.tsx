@@ -1,6 +1,7 @@
 /* eslint-disable import/prefer-default-export */
 import { createModel } from '@rematch/core';
 import isEqual from 'lodash.isequal';
+import omit from 'just-omit';
 import { StorageProviderType } from '@/types/api';
 import defaultJSON from '@/config/default.json';
 
@@ -15,11 +16,14 @@ import {
   DeleteTokenPayload,
   SetTokenDataPayload,
   SetTokensFromStylesPayload,
+  ToggleManyTokenSetsPayload,
   UpdateDocumentPayload,
   UpdateTokenPayload,
 } from '@/types/payloads';
 import { updateTokenPayloadToSingleToken } from '@/utils/updateTokenPayloadToSingleToken';
 import { RootModel } from '@/types/RootModel';
+import { TokenSetStatus } from '@/constants/TokenSetStatus';
+import { UsedTokenSetsMap } from '@/types';
 
 const defaultTokens: TokenStore = {
   version: pjs.plugin_version,
@@ -35,7 +39,7 @@ export interface TokenState {
     updatedTokens: SingleToken[];
   };
   activeTokenSet: string;
-  usedTokenSet: string[];
+  usedTokenSet: UsedTokenSetsMap;
   editProhibited: boolean;
   hasUnsavedChanges: boolean;
 }
@@ -62,25 +66,52 @@ export const tokenState = createModel<RootModel>()({
         editProhibited: payload,
       };
     },
-    toggleUsedTokenSet: (state, data: string) => ({
+    toggleUsedTokenSet: (state, tokenSet: string) => ({
       ...state,
-      usedTokenSet: state.usedTokenSet.includes(data)
-        ? state.usedTokenSet.filter((n) => n !== data)
-        : [...new Set([...state.usedTokenSet, data])],
+      usedTokenSet: {
+        ...state.usedTokenSet,
+        // @README it was decided the user can not simply toggle to the intermediate SOURCE state
+        // this means for toggling we only switch between ENABLED and DISABLED
+        // setting as source is a separate action
+        [tokenSet]: state.usedTokenSet[tokenSet] === TokenSetStatus.DISABLED
+          ? TokenSetStatus.ENABLED
+          : TokenSetStatus.DISABLED,
+      },
     }),
-    toggleManyTokenSets: (state, data: { shouldCheck: boolean, sets: string[] }) => {
+    toggleManyTokenSets: (state, data: ToggleManyTokenSetsPayload) => {
+      const oldSetsWithoutInput = Object.fromEntries(
+        Object.entries(state.usedTokenSet)
+          .filter(([tokenSet]) => !data.sets.includes(tokenSet)),
+      );
+
       if (data.shouldCheck) {
-        const oldSetsWithoutCurrent = state.usedTokenSet.filter((n) => !data.sets.includes(n));
         return {
           ...state,
-          usedTokenSet: [...oldSetsWithoutCurrent, ...data.sets],
+          usedTokenSet: {
+            ...oldSetsWithoutInput,
+            ...Object.fromEntries(data.sets.map((tokenSet) => ([tokenSet, TokenSetStatus.ENABLED]))),
+          },
         };
       }
+
       return {
         ...state,
-        usedTokenSet: state.usedTokenSet.filter((n) => !data.sets.includes(n)),
+        usedTokenSet: {
+          ...oldSetsWithoutInput,
+          ...Object.fromEntries(data.sets.map((tokenSet) => ([tokenSet, TokenSetStatus.DISABLED]))),
+          // @README see comment (1) - ensure that all token sets are always available
+        },
       };
     },
+    toggleTreatAsSource: (state, tokenSet: string) => ({
+      ...state,
+      usedTokenSet: {
+        ...state.usedTokenSet,
+        [tokenSet]: state.usedTokenSet[tokenSet] === TokenSetStatus.SOURCE
+          ? TokenSetStatus.DISABLED
+          : TokenSetStatus.SOURCE,
+      },
+    }),
     setActiveTokenSet: (state, data: string) => ({
       ...state,
       activeTokenSet: data,
@@ -92,19 +123,26 @@ export const tokenState = createModel<RootModel>()({
       }
       return {
         ...state,
+        usedTokenSet: {
+          ...state.usedTokenSet,
+          [name]: TokenSetStatus.DISABLED, // @README see comment (1)
+        },
         tokens: {
           ...state.tokens,
           [name]: [],
         },
       };
     },
-    deleteTokenSet: (state, data: string) => {
+    deleteTokenSet: (state, name: string) => {
       const oldTokens = { ...state.tokens };
-      delete oldTokens[data];
+      delete oldTokens[name];
       return {
         ...state,
         tokens: oldTokens,
-        activeTokenSet: state.activeTokenSet === data ? Object.keys(state.tokens)[0] : state.activeTokenSet,
+        activeTokenSet: state.activeTokenSet === name
+          ? Object.keys(state.tokens)[0]
+          : state.activeTokenSet,
+        usedTokenSet: omit({ ...state.usedTokenSet }, name),
       };
     },
     renameTokenSet: (state, data: { oldName: string; newName: string }) => {
@@ -144,12 +182,20 @@ export const tokenState = createModel<RootModel>()({
     }),
     setTokenData: (state, data: SetTokenDataPayload) => {
       const values = parseTokenValues(data.values);
-      const tokenSets = data.usedTokenSet ? Object.keys(data.values).filter((set) => data.usedTokenSet?.includes(set)) : [Object.keys(values)[0]];
+      const allAvailableTokenSets = Object.keys(values);
+      const usedTokenSets = Object.fromEntries(
+        allAvailableTokenSets
+          .map((tokenSet) => ([tokenSet, data.usedTokenSet?.[tokenSet] ?? TokenSetStatus.DISABLED])),
+      );
+      // @README (1) for the sake of normalization we will set the DISABLED status for all available token sets
+      // this way we can always be certain the status is available. This behavior is also reflected in the createTokenSet logic
       return {
         ...state,
         tokens: values,
         activeTokenSet: Array.isArray(data.values) ? 'global' : Object.keys(data.values)[0],
-        usedTokenSet: Array.isArray(data.values) ? ['global'] : tokenSets,
+        usedTokenSet: Array.isArray(data.values)
+          ? { global: TokenSetStatus.ENABLED }
+          : usedTokenSets,
       };
     },
     setJSONData(state, payload) {
@@ -384,6 +430,9 @@ export const tokenState = createModel<RootModel>()({
       dispatch.tokenState.updateDocument({ updateRemote: false });
     },
     toggleManyTokenSets() {
+      dispatch.tokenState.updateDocument({ updateRemote: false });
+    },
+    toggleTreatAsSource() {
       dispatch.tokenState.updateDocument({ updateRemote: false });
     },
     duplicateToken(payload: UpdateTokenPayload, rootState) {
