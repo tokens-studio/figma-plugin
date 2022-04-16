@@ -13,14 +13,15 @@ describe('tokenSetListToTree', () => {
         label: 'global',
       },
       {
+        isLeaf: false,
         path: 'theme',
         key: 'theme',
         parent: '',
-        type: 'folder',
         level: 0,
         label: 'theme',
       },
       {
+        isLeaf: false,
         path: 'theme/colors',
         key: 'theme/colors',
         parent: 'theme',
