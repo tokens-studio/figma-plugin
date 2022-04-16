@@ -1,4 +1,3 @@
-import { forIn } from 'lodash';
 import { SingleToken } from '@/types/tokens';
 import { convertToRgb } from '../color';
 import { findReferences } from '../findReferences';
@@ -20,23 +19,16 @@ export function getAliasValue(token: SingleToken | string | number, tokens: Sing
           const nameToLookFor = ref.startsWith('{') ? ref.slice(1, ref.length - 1) : ref.substring(1);
           // exclude references to  self
           if ((typeof token === 'object' && nameToLookFor === token.name) || nameToLookFor === token) return null;
-          const splitedArray = nameToLookFor.split('.');
-          let candidateToken = '';
-          for (let index = 0; index < splitedArray.length - 2; index++) {
-            candidateToken += splitedArray[index];
-            candidateToken += '.';
-          }
-          candidateToken += splitedArray[splitedArray.length - 2];
-          const foundToken = tokens.find((t) => t.name === nameToLookFor || t.name === candidateToken);
-          if (foundToken?.name === nameToLookFor) {
-            return getAliasValue(foundToken, tokens);
-          }
-          if (foundToken?.name === candidateToken) {
-            const candidateProperty = splitedArray[splitedArray.length - 1];
-            if (foundToken.rawValue?.hasOwnProperty(candidateProperty)) {
-              return foundToken.rawValue[candidateProperty];
-            }
-          }
+
+          const tokenAliasSplited = nameToLookFor.split('.');
+          const tokenAliasSplitedLast = tokenAliasSplited.pop();
+          const tokenAliasLastExcluded = tokenAliasSplited.join('.');
+          const foundToken = tokens.find((t) => t.name === nameToLookFor || t.name === tokenAliasLastExcluded);
+
+          if (foundToken?.name === nameToLookFor) { return getAliasValue(foundToken, tokens); }
+
+          const candidateProperty = tokenAliasSplitedLast;
+          if (foundToken?.name === tokenAliasLastExcluded && candidateProperty && foundToken.rawValue?.hasOwnProperty(candidateProperty)) return foundToken?.rawValue[candidateProperty];
         }
         return ref;
       });
