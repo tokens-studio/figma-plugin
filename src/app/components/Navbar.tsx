@@ -89,7 +89,7 @@ export const Navbar: React.FC = () => {
                   className="relative button button-ghost"
                   disabled={editProhibited}
                 >
-                  {checkForChanges() && <div className="absolute top-0 right-0 w-2 h-2 rounded-full bg-icon-brand" />}
+                  {checkForChanges() && <div className="absolute top-0 right-0 w-2 h-2 rounded-full bg-primary-500" />}
 
                   <Icon name="library" />
                 </button>
