@@ -15,8 +15,8 @@ export function setTokenData(state: TokenState, payload: SetTokenDataPayload): T
   return {
     ...state,
     tokens: values,
-    themes: payload.themes,
-    activeTheme: payload.activeTheme,
+    themes: payload.themes ?? {},
+    activeTheme: payload.activeTheme ?? null,
     activeTokenSet: Array.isArray(payload.values) ? 'global' : Object.keys(payload.values)[0],
     usedTokenSet: Array.isArray(payload.values)
       ? { global: TokenSetStatus.ENABLED }
