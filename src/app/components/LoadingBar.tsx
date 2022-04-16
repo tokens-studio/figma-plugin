@@ -21,6 +21,8 @@ const backgroundJobTitles = {
   [BackgroundJobs.UI_CREATESINGLETOKEN]: 'Creating token...',
   [BackgroundJobs.UI_DELETETOKENGROUP]: 'Deleting token...',
   [BackgroundJobs.UI_DUPLICATETOKEN]: 'Duplicating token...',
+  [BackgroundJobs.UI_REDOING]: 'Redoing action...',
+  [BackgroundJobs.UI_UNDOING]: 'Undoing action...',
 };
 
 export default function LoadingBar() {

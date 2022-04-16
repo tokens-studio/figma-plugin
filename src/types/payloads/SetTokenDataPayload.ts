@@ -9,5 +9,5 @@ export type SetTokenDataPayload = {
   | Record<string, AnyTokenList>
   | Record<string, Partial<Record<TokenTypes, ShallowTokenMap | DeepTokenMap>>>
   shouldUpdate?: boolean;
-  usedTokenSet?: string[]
+  usedTokenSet?: string[] | null
 };

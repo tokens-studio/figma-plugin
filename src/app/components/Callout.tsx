@@ -1,8 +1,14 @@
 import React from 'react';
+import { styled } from '@/stitches.config';
 import Heading from './Heading';
 import Icon from './Icon';
 import Stack from './Stack';
 import Text from './Text';
+
+const StyledButton = styled('button', {
+  fontSize: '$xsmall',
+  color: '$interaction',
+});
 
 export default function Callout({
   heading, description, action, id,
@@ -13,12 +19,12 @@ export default function Callout({
         <div className="text-primary-500">
           <Icon name="bell" />
         </div>
-        <Stack direction="column" gap={2}>
+        <Stack align="start" direction="column" gap={2}>
           <Heading>{heading}</Heading>
           <Text size="xsmall">{description}</Text>
-          <button data-cy={id} type="button" onClick={action.onClick} className="text-primary-500">
+          <StyledButton data-cy={id} type="button" onClick={action.onClick}>
             {action.text}
-          </button>
+          </StyledButton>
         </Stack>
       </Stack>
     </div>

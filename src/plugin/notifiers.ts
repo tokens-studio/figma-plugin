@@ -9,7 +9,9 @@ import {
   UserIdFromPluginMessage,
 } from '@/types/messages';
 import store from './store';
-import { SelectionGroup, SelectionValue } from '@/types';
+import { AnyTokenList, TokenStore } from '@/types/tokens';
+import { SelectionGroup } from '@/types/SelectionGroup';
+import { SelectionValue } from '@/types/SelectionValue';
 
 export function postToFigma(props: PostToFigmaMessage) {
   parent.postMessage(
@@ -116,7 +118,7 @@ export function notifyRemoteComponents({ nodes, remotes }: Data) {
   store.remoteComponents.clear();
 }
 
-export function notifyTokenValues(values = undefined) {
+export function notifyTokenValues(values: TokenStore) {
   postToUI({ type: MessageFromPluginTypes.TOKEN_VALUES, values });
 }
 
