@@ -27,17 +27,13 @@ export function getAliasValue(token: SingleToken | string | number, tokens: Sing
             candidateToken += '.';
           }
           candidateToken += splitedArray[splitedArray.length - 2];
-          console.log('candidate', candidateToken);
           const foundToken = tokens.find((t) => t.name === nameToLookFor || t.name === candidateToken);
-          console.log(foundToken, 'foundtoken');
           if (foundToken?.name === nameToLookFor) {
             return getAliasValue(foundToken, tokens);
           }
           if (foundToken?.name === candidateToken) {
-            console.log('candidateproperty');
             const candidateProperty = splitedArray[splitedArray.length - 1];
             if (foundToken.rawValue?.hasOwnProperty(candidateProperty)) {
-              console.log('foundToken.rawValue[candidateProperty]', foundToken.rawValue[candidateProperty]);
               return foundToken.rawValue[candidateProperty];
             }
           }

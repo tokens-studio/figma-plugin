@@ -69,7 +69,7 @@ export default function BranchSelector() {
         <br />
         {' '}
         to your repository, the changes will be lost.
-      </div>,
+                   </div>,
       confirmAction: 'Push',
       cancelAction: 'Discard changes',
     });
