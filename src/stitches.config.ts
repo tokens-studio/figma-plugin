@@ -102,7 +102,7 @@ export const {
     },
     shadows: {
       default: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
-      contextMenu: '  0px 10px 38px -10px rgba(22, 23, 24, 0.35), 0px 10px 20px -15px rgba(22, 23, 24, 0.2)',
+      contextMenu: '0px 10px 38px -10px rgba(22, 23, 24, 0.35), 0px 10px 20px -15px rgba(22, 23, 24, 0.2)',
       focus: `0 0 0 2px ${globalTokens.colors.primary500}`,
       'focus-subtle': `0 0 0 2px ${globalTokens.colors.primary300}`,
       'focus-muted': `0 0 0 2px ${globalTokens.colors.primary400}`,

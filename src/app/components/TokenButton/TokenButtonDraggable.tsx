@@ -1,6 +1,5 @@
 import React, { useCallback, useContext, useMemo } from 'react';
 import { useDispatch, useSelector, useStore } from 'react-redux';
-import { Token } from '@stitches/react/types/theme';
 import { activeTokenSetSelector, tokensSelector, uiDisabledSelector } from '@/selectors';
 import { SingleToken } from '@/types/tokens';
 import { Dispatch } from '@/app/store';
@@ -39,7 +38,7 @@ export const TokenButtonDraggable: React.FC<Props> = ({
   ), [token, tokensContext.resolvedTokens]);
 
   const [style, buttonClass] = React.useMemo(() => {
-    const style: Token | React.CSSProperties = {};
+    const style: React.CSSProperties = {};
     const buttonClass: string[] = [];
 
     if (type === TokenTypes.BORDER_RADIUS) {
