@@ -27,8 +27,15 @@ import parseJson from '@/utils/parseJson';
 import AttentionIcon from '@/icons/attention.svg';
 import { TokensContext } from '@/context';
 import {
-  activeTokenSetSelector, showEditFormSelector, tokenFilterSelector, tokensSelector, tokenTypeSelector, updateModeSelector, usedTokenSetSelector,
+  activeTokenSetSelector,
+  showEditFormSelector,
+  tokenFilterSelector,
+  tokensSelector,
+  tokenTypeSelector,
+  updateModeSelector,
+  usedTokenSetSelector,
 } from '@/selectors';
+import { TokenSetStatus } from '@/constants/TokenSetStatus';
 
 const StyledButton = styled('button', {
   '&:focus, &:hover': {
@@ -117,7 +124,10 @@ function Tokens({ isActive }: { isActive: boolean }) {
   const shouldConfirm = React.useMemo(() => updateMode === UpdateMode.DOCUMENT, [updateMode]);
 
   const resolvedTokens = React.useMemo(
-    () => resolveTokenValues(mergeTokenGroups(tokens, [...usedTokenSet, activeTokenSet])),
+    () => resolveTokenValues(mergeTokenGroups(tokens, {
+      ...usedTokenSet,
+      [activeTokenSet]: TokenSetStatus.ENABLED,
+    })),
     [tokens, usedTokenSet, activeTokenSet],
   );
   const [stringTokens, setStringTokens] = React.useState(

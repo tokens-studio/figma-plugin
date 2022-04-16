@@ -1,6 +1,7 @@
 import omit from 'just-omit';
 import store from './store';
 import setValuesOnNode from './setValuesOnNode';
+import { AnyTokenSet } from '../types/tokens';
 import { ContextObject, StorageProviderType, StorageType } from '../types/api';
 import * as pjs from '../../package.json';
 import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
@@ -16,10 +17,11 @@ import { getAllFigmaStyleMaps } from '@/utils/getAllFigmaStyleMaps';
 import { ProgressTracker } from './ProgressTracker';
 import { AnyTokenList, TokenStore } from '@/types/tokens';
 import { isSingleToken } from '@/utils/is';
+import { UsedTokenSetsMap } from '@/types';
 
 // @TODO fix typings
 
-export function returnValueToLookFor(key) {
+export function returnValueToLookFor(key: string) {
   switch (key) {
     case 'tokenName':
       return 'name';
@@ -45,7 +47,7 @@ export function mapValuesToTokens(tokens: Map<string, AnyTokenList[number]>, val
   return mappedValues;
 }
 
-export function setTokensOnDocument(tokens, updatedAt: string, usedTokenSet: string[]) {
+export function setTokensOnDocument(tokens: AnyTokenSet, updatedAt: string, usedTokenSet: UsedTokenSetsMap) {
   tokensSharedDataHandler.set(figma.root, SharedPluginDataKeys.tokens.version, pjs.plugin_version);
   tokensSharedDataHandler.set(figma.root, SharedPluginDataKeys.tokens.values, JSON.stringify(tokens));
   tokensSharedDataHandler.set(figma.root, SharedPluginDataKeys.tokens.updatedAt, updatedAt);
@@ -56,7 +58,6 @@ export function getTokenData(): {
   values: TokenStore['values'];
   updatedAt: string;
   version: string;
-  usedTokenSet?: string[];
 } | null {
   try {
     const values = tokensSharedDataHandler.get(figma.root, SharedPluginDataKeys.tokens.values);
@@ -114,7 +115,7 @@ export function selectNodes(ids: string[]) {
 
 export async function updateNodes(
   entries: readonly NodeManagerNode[],
-  tokens: Map<string, TokenArrayGroup[number]>,
+  tokens: Map<string, AnyTokenList[number]>,
   settings?: UpdateNodesSettings,
 ) {
   const { ignoreFirstPartForStyles } = settings ?? {};
