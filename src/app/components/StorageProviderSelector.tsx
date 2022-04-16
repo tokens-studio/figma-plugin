@@ -5,7 +5,7 @@ const StyledButton = styled('button', {
   fontWeight: '$bold',
   fontSize: '$xsmall',
   display: 'flex',
-  padding: '$2',
+  padding: '$4',
   borderRadius: '$default',
   border: '1px solid transparent',
   '&:focus': {

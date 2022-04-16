@@ -5,7 +5,7 @@ module.exports = {
     extend: {
       colors: {
         gray: {
-          // TODO: get rid of these
+          // TODO: get rid of these as we want to remove tailwind
           100: 'var(--figma-color-bg-tertiary, #f5f5f5)',
           200: 'var(--figma-color-border, #eeeeee)',
           300: 'var(--figma-color-border, #eeeeee)',

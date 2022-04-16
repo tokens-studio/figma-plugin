@@ -77,9 +77,9 @@ textarea::-webkit-scrollbar {
 .overflow-x-auto::-webkit-scrollbar-thumb,
 .ReactModal__Content::-webkit-scrollbar-thumb,
 textarea::-webkit-scrollbar-thumb {
-  @apply bg-border-muted;
+  @apply bg-border-muted border-background;
   border-radius: 9px;
-  border: 2px solid white;
+  border: 2px solid var(--figma-color-bg);
 }
 
 .button-property + .property-wrapper {
