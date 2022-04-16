@@ -1,3 +1,4 @@
+import { forIn } from 'lodash';
 import { SingleToken } from '@/types/tokens';
 import { convertToRgb } from '../color';
 import { findReferences } from '../findReferences';
@@ -19,9 +20,27 @@ export function getAliasValue(token: SingleToken | string | number, tokens: Sing
           const nameToLookFor = ref.startsWith('{') ? ref.slice(1, ref.length - 1) : ref.substring(1);
           // exclude references to  self
           if ((typeof token === 'object' && nameToLookFor === token.name) || nameToLookFor === token) return null;
-
-          const foundToken = tokens.find((t) => t.name === nameToLookFor);
-          if (foundToken) return getAliasValue(foundToken, tokens);
+          const splitedArray = nameToLookFor.split('.');
+          let candidateToken = '';
+          for (let index = 0; index < splitedArray.length - 2; index++) {
+            candidateToken += splitedArray[index];
+            candidateToken += '.';
+          }
+          candidateToken += splitedArray[splitedArray.length - 2];
+          console.log('candidate', candidateToken);
+          const foundToken = tokens.find((t) => t.name === nameToLookFor || t.name === candidateToken);
+          console.log(foundToken, 'foundtoken');
+          if (foundToken?.name === nameToLookFor) {
+            return getAliasValue(foundToken, tokens);
+          }
+          if (foundToken?.name === candidateToken) {
+            console.log('candidateproperty');
+            const candidateProperty = splitedArray[splitedArray.length - 1];
+            if (foundToken.rawValue?.hasOwnProperty(candidateProperty)) {
+              console.log('foundToken.rawValue[candidateProperty]', foundToken.rawValue[candidateProperty]);
+              return foundToken.rawValue[candidateProperty];
+            }
+          }
         }
         return ref;
       });
@@ -39,7 +58,6 @@ export function getAliasValue(token: SingleToken | string | number, tokens: Sing
 
     if (returnedValue) {
       const remainingReferences = findReferences(returnedValue);
-
       if (!remainingReferences) {
         const couldBeNumberValue = checkAndEvaluateMath(returnedValue);
         if (typeof couldBeNumberValue === 'number') return couldBeNumberValue;
@@ -54,6 +72,5 @@ export function getAliasValue(token: SingleToken | string | number, tokens: Sing
   if (returnedValue) {
     return checkAndEvaluateMath(returnedValue);
   }
-
   return returnedValue;
 }
