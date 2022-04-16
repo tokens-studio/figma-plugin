@@ -1845,6 +1845,14 @@
     "@radix-ui/react-use-callback-ref" "0.1.0"
     "@radix-ui/react-use-controllable-state" "0.1.0"
 
+"@radix-ui/react-separator@0.1.4":
+  version "0.1.4"
+  resolved "https://registry.yarnpkg.com/@radix-ui/react-separator/-/react-separator-0.1.4.tgz#383ad0f82b364d9982a978d752084af3598e4090"
+  integrity sha512-ct2qE072ydvMyFiPwgO8xGE4iLGR9BsSk2tIan23TYSiNTeQ89anzkuax5vNGjey0el2vnwUcReFS0Gy7Lk2VQ==
+  dependencies:
+    "@babel/runtime" "^7.13.10"
+    "@radix-ui/react-primitive" "0.1.4"
+
 "@radix-ui/react-slot@0.0.10":
   version "0.0.10"
   resolved "https://registry.yarnpkg.com/@radix-ui/react-slot/-/react-slot-0.0.10.tgz#27a17cad7064872117aeb68113fa934bc5d34c37"
@@ -1869,6 +1877,57 @@
   dependencies:
     "@babel/runtime" "^7.13.10"
     "@radix-ui/react-compose-refs" "0.1.0"
+
+"@radix-ui/react-switch@^0.1.5":
+  version "0.1.5"
+  resolved "https://registry.yarnpkg.com/@radix-ui/react-switch/-/react-switch-0.1.5.tgz#071ffa19a17a47fdc5c5e6f371bd5901c9fef2f4"
+  integrity sha512-ITtslJPK+Yi34iNf7K9LtsPaLD76oRIVzn0E8JpEO5HW8gpRBGb2NNI9mxKtEB30TVqIcdjdL10AmuIfOMwjtg==
+  dependencies:
+    "@babel/runtime" "^7.13.10"
+    "@radix-ui/primitive" "0.1.0"
+    "@radix-ui/react-compose-refs" "0.1.0"
+    "@radix-ui/react-context" "0.1.1"
+    "@radix-ui/react-label" "0.1.5"
+    "@radix-ui/react-primitive" "0.1.4"
+    "@radix-ui/react-use-controllable-state" "0.1.0"
+    "@radix-ui/react-use-previous" "0.1.1"
+    "@radix-ui/react-use-size" "0.1.1"
+
+"@radix-ui/react-toggle-group@0.1.5":
+  version "0.1.5"
+  resolved "https://registry.yarnpkg.com/@radix-ui/react-toggle-group/-/react-toggle-group-0.1.5.tgz#9e4d65e22c4fc0ba3a42fbc8d5496c430e5e9852"
+  integrity sha512-Yp14wFiqe00azF+sG5CCJz4JGOP/f5Jj+CxLlZCmMpG5qhVTWeaeG4YH6pvX4KL41fS8x9FAaLb8wW9y01o67g==
+  dependencies:
+    "@babel/runtime" "^7.13.10"
+    "@radix-ui/primitive" "0.1.0"
+    "@radix-ui/react-context" "0.1.1"
+    "@radix-ui/react-primitive" "0.1.4"
+    "@radix-ui/react-roving-focus" "0.1.5"
+    "@radix-ui/react-toggle" "0.1.4"
+    "@radix-ui/react-use-controllable-state" "0.1.0"
+
+"@radix-ui/react-toggle@0.1.4":
+  version "0.1.4"
+  resolved "https://registry.yarnpkg.com/@radix-ui/react-toggle/-/react-toggle-0.1.4.tgz#c5c63f7cc5a03556bb58e0a763735b41bb0331f9"
+  integrity sha512-gxUq6NgMc4ChV8VJnwdYqueeoblspwXHAexYo+jM9N2hFLbI1C587jLjdTHzIcUa9q68Xaw4jtiImWDOokEhRw==
+  dependencies:
+    "@babel/runtime" "^7.13.10"
+    "@radix-ui/primitive" "0.1.0"
+    "@radix-ui/react-primitive" "0.1.4"
+    "@radix-ui/react-use-controllable-state" "0.1.0"
+
+"@radix-ui/react-toolbar@^0.1.5":
+  version "0.1.5"
+  resolved "https://registry.yarnpkg.com/@radix-ui/react-toolbar/-/react-toolbar-0.1.5.tgz#bbc479c8bcf94baaa84c8b4b2ea0952b27e6eb2c"
+  integrity sha512-k9ccGglui1tyR+YiYLty1oI+VOO7C4zCNAbR3sTT5FC0qflpBxaswJnOSQgapDIwl9tB/Al69mKUS3TFZ7WsQw==
+  dependencies:
+    "@babel/runtime" "^7.13.10"
+    "@radix-ui/primitive" "0.1.0"
+    "@radix-ui/react-context" "0.1.1"
+    "@radix-ui/react-primitive" "0.1.4"
+    "@radix-ui/react-roving-focus" "0.1.5"
+    "@radix-ui/react-separator" "0.1.4"
+    "@radix-ui/react-toggle-group" "0.1.5"
 
 "@radix-ui/react-tooltip@^0.0.19":
   version "0.0.19"
@@ -9836,6 +9895,11 @@ react-error-boundary@^3.1.1:
   integrity sha512-W3xCd9zXnanqrTUeViceufD3mIW8Ut29BUD+S2f0eO2XCOU8b6UrJfY46RDGe5lxCJzfe4j0yvIfh0RbTZhKJw==
   dependencies:
     "@babel/runtime" "^7.12.5"
+
+react-hook-form@^7.29.0:
+  version "7.29.0"
+  resolved "https://registry.yarnpkg.com/react-hook-form/-/react-hook-form-7.29.0.tgz#5e7e41a483b70731720966ed8be52163ea1fecf1"
+  integrity sha512-NcJqWRF6el5HMW30fqZRt27s+lorvlCCDbTpAyHoodQeYWXgQCvZJJQLC1kRMKdrJknVH0NIg3At6TUzlZJFOQ==
 
 react-is@^16.13.1, react-is@^16.7.0, react-is@^16.8.1:
   version "16.13.1"

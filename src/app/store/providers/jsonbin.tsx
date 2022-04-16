@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { Dispatch, RootState } from '@/app/store';
+import { Dispatch } from '@/app/store';
 import { ContextObject, StorageProviderType } from '@/types/api';
 import { MessageToPluginTypes } from '@/types/messages';
 import { TokenStore, TokenValues } from '@/types/tokens';
@@ -9,6 +9,7 @@ import * as pjs from '../../../../package.json';
 import useStorage from '../useStorage';
 import { compareUpdatedAt } from '@/utils/date';
 import { tokensSelector } from '@/selectors';
+import { UpdateRemoteFunctionPayload } from '@/types/UpdateRemoteFunction';
 
 async function readTokensFromJSONBin({ secret, id }): Promise<TokenValues | null> {
   const response = await fetch(`https://api.jsonbin.io/v3/b/${id}/latest`, {
@@ -53,14 +54,15 @@ async function writeTokensToJSONBin({ secret, id, tokenObj }): Promise<TokenValu
 }
 
 export async function updateJSONBinTokens({
-  tokens, context, updatedAt, oldUpdatedAt = null,
-}) {
+  tokens, themes, context, updatedAt, oldUpdatedAt = null,
+}: UpdateRemoteFunctionPayload) {
   const { id, secret } = context;
   try {
     const tokenObj = JSON.stringify(
       {
         version: pjs.plugin_version,
         updatedAt,
+        themes,
         values: convertTokensToObject(tokens),
       },
       null,

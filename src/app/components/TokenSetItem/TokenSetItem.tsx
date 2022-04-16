@@ -12,7 +12,6 @@ import {
   ContextMenuItemIndicator,
   ContextMenuCheckboxItem,
 } from '../ContextMenu';
-import { TreeItem } from '@/app/components/utils/getTree';
 import IconGrabber from '@/icons/grabber.svg';
 import { StyledGrabber } from './StyledGrabber';
 import { StyledCheckbox } from './StyledCheckbox';
@@ -22,6 +21,7 @@ import { tokenSetStatusSelector } from '@/selectors';
 import { RootState } from '@/app/store';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import IconIndeterminateAlt from '@/icons/indeterminate-alt.svg';
+import { TreeItem } from '@/utils/tokenset';
 
 export type TokenSetItemProps = {
   item: TreeItem;

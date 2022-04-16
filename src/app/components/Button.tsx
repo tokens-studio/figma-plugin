@@ -5,8 +5,9 @@ import { track } from '../../utils/analytics';
 type ClassMap<K extends string = string> = Record<K, string>;
 type ButtonProps = {
   type?: 'button' | 'submit';
+  form?: string
   variant: 'secondary' | 'destructive' | 'primary' | 'ghost';
-  onClick?: any;
+  onClick?: () => void;
   size?: 'large' | 'small';
   href?: string;
   download?: string;
@@ -34,6 +35,7 @@ const Button: React.FC<ButtonProps> = ({
   onClick,
   download,
   variant,
+  form,
   children,
   href,
   id,
@@ -94,6 +96,7 @@ const Button: React.FC<ButtonProps> = ({
       data-cy={id}
       disabled={disabled}
       type={type === 'button' ? 'button' : 'submit'}
+      form={form}
       className={`button ${buttonClass}}`}
       onClick={handleClick}
       ref={buttonRef}

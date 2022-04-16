@@ -7,7 +7,7 @@ export type TreeItem = {
   isLeaf: boolean;
 };
 
-export function getTree(items: string[]) {
+export function tokenSetListToTree(items: string[]) {
   const tree = items.reduce<TreeItem[]>((acc, curr) => {
     const path = curr.split('/');
     const parentName = path.length > 1 ? path.slice(0, -1).join('/') : '';

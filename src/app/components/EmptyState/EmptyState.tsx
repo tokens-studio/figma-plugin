@@ -1,8 +1,10 @@
 import React from 'react';
 import Stack from '../Stack';
 import Text from '../Text';
+import { StitchesCSS } from '@/types';
 
 type Props = React.HTMLAttributes<HTMLDivElement> & {
+  css?: StitchesCSS
   title: string
   subtitle?: string
 };

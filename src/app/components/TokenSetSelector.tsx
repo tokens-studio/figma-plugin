@@ -12,11 +12,11 @@ import TokenSetTree from './TokenSetTree';
 import Box from './Box';
 import { styled } from '@/stitches.config';
 import TokenSetList from './TokenSetList';
-import { StorageProviderType } from '@/types/api';
 import {
-  apiSelector, editProhibitedSelector, featureFlagsSelector, tokensSelector,
+  editProhibitedSelector, tokensSelector,
 } from '@/selectors';
 import Stack from './Stack';
+import { useIsGithubMultiFileEnabled } from '../hooks/useIsGithubMultiFileEnabled';
 
 const StyledButton = styled('button', {
   flexShrink: 0,
@@ -37,8 +37,7 @@ const StyledButton = styled('button', {
 export default function TokenSetSelector() {
   const tokens = useSelector(tokensSelector);
   const editProhibited = useSelector(editProhibitedSelector);
-  const featureFlags = useSelector(featureFlagsSelector);
-  const api = useSelector(apiSelector);
+  const mfsEnabled = useIsGithubMultiFileEnabled();
   const dispatch = useDispatch<Dispatch>();
   const { confirm } = useConfirm();
 
@@ -107,7 +106,7 @@ export default function TokenSetSelector() {
       }}
       className="content"
     >
-      {(featureFlags?.gh_mfs_enabled && api.provider === StorageProviderType.GITHUB && !api?.filePath?.endsWith('.json')) ? (
+      {mfsEnabled ? (
         <Box>
           <TokenSetTree
             tokenSets={allTokenSets}

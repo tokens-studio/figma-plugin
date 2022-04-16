@@ -25,6 +25,7 @@ export async function getUsedTokenSet(): Promise<UsedTokenSetsMap | null> {
         )
       ),
     );
+
     return parsedUsedTokenSet;
   }
   return null;

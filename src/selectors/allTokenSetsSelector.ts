@@ -1,7 +1,7 @@
 import { createSelector } from 'reselect';
 import { tokenStateSelector } from './tokenStateSelector';
 
-export const themeIdentifiersSelector = createSelector(
+export const allTokenSetsSelector = createSelector(
   tokenStateSelector,
-  (state) => Object.keys(state.themes),
+  (tokenState) => Object.keys(tokenState.tokens),
 );

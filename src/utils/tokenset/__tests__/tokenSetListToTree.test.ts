@@ -1,20 +1,20 @@
-import { getTree } from './getTree';
+import { tokenSetListToTree } from '../tokenSetListToTree';
 
-describe('getTree', () => {
+describe('tokenSetListToTree', () => {
   it('returns a tree', () => {
     const input = ['global', 'theme/type', 'theme/colors/blue', 'theme/colors/red'];
     const output = [
       {
         isLeaf: true,
         path: 'global',
-        key: 'global/set',
+        key: 'global',
         parent: '',
         level: 0,
         label: 'global',
       },
       {
         path: 'theme',
-        key: 'theme/folder',
+        key: 'theme',
         parent: '',
         type: 'folder',
         level: 0,
@@ -22,7 +22,7 @@ describe('getTree', () => {
       },
       {
         path: 'theme/colors',
-        key: 'theme/colors/folder',
+        key: 'theme/colors',
         parent: 'theme',
         level: 1,
         label: 'colors',
@@ -30,7 +30,7 @@ describe('getTree', () => {
       {
         isLeaf: true,
         path: 'theme/colors/blue',
-        key: 'theme/colors/blue/set',
+        key: 'theme/colors/blue',
         parent: 'theme/colors',
         level: 2,
         label: 'blue',
@@ -38,7 +38,7 @@ describe('getTree', () => {
       {
         isLeaf: true,
         path: 'theme/colors/red',
-        key: 'theme/colors/red/set',
+        key: 'theme/colors/red',
         parent: 'theme/colors',
         level: 2,
         label: 'red',
@@ -46,12 +46,12 @@ describe('getTree', () => {
       {
         isLeaf: true,
         path: 'theme/type',
-        key: 'theme/type/set',
+        key: 'theme/type',
         parent: 'theme',
         level: 1,
         label: 'type',
       },
     ];
-    expect(getTree(input)).toEqual(output);
+    expect(tokenSetListToTree(input)).toEqual(output);
   });
 });

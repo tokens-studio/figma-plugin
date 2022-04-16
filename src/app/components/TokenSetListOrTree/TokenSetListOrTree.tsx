@@ -14,8 +14,8 @@ type TreeOrListItem<ItemType = unknown> = {
 type SharedProps<T extends TreeOrListItem> = {
   displayType: 'tree' | 'list'
   items: T[]
-  renderItem: (props: { item: T, children: React.ReactNode }) => React.ReactElement
-  renderItemContent: (props: { item: T, children: React.ReactNode }) => React.ReactElement
+  renderItem?: (props: { item: T, children: React.ReactNode }) => React.ReactElement | null
+  renderItemContent: (props: { item: T, children: React.ReactNode }) => React.ReactElement | null
 };
 
 type Props<T extends TreeOrListItem> = SharedProps<T>;
@@ -23,7 +23,7 @@ type Props<T extends TreeOrListItem> = SharedProps<T>;
 export function TokenSetListOrTree<T extends TreeOrListItem>({
   displayType,
   items,
-  renderItem: RenderItem,
+  renderItem: RenderItem = ({ children }) => React.createElement(React.Fragment, {}, children),
   renderItemContent: RenderItemContent,
 }: Props<T>) {
   const [collapsed, setCollapsed] = useState<string[]>([]);

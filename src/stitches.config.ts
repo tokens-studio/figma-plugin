@@ -71,6 +71,8 @@ export const {
       border: globalTokens.colors.gray300,
       borderMuted: globalTokens.colors.gray200,
       focus: globalTokens.colors.primary300,
+      borderSwitch: globalTokens.colors.gray900,
+      bgSwitchChecked: globalTokens.colors.gray900,
     },
     space: {
       1: '2px',

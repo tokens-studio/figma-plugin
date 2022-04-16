@@ -3,14 +3,14 @@ import { createModel } from '@rematch/core';
 import isEqual from 'lodash.isequal';
 import omit from 'just-omit';
 import { StorageProviderType } from '@/types/api';
-import defaultJSON from '@/config/default.json';
+import * as tokenStateReducers from './reducers/tokenState';
+import * as tokenStateEffects from './effects/tokenState';
 
 import parseTokenValues from '@/utils/parseTokenValues';
 import { notifyToUI } from '@/plugin/notifiers';
 import { replaceReferences } from '@/utils/findReferences';
 import parseJson from '@/utils/parseJson';
 import updateTokensOnSources from '../updateSources';
-import * as pjs from '../../../../package.json';
 import { AnyTokenList, SingleToken, TokenStore } from '@/types/tokens';
 import {
   DeleteTokenPayload,
@@ -22,18 +22,12 @@ import {
 } from '@/types/payloads';
 import { updateTokenPayloadToSingleToken } from '@/utils/updateTokenPayloadToSingleToken';
 import { RootModel } from '@/types/RootModel';
-import { ThemeObject, UsedTokenSetsMap } from '@/types';
+import { ThemeObjectsMap, UsedTokenSetsMap } from '@/types';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 
-const defaultTokens: TokenStore = {
-  version: pjs.plugin_version,
-  updatedAt: new Date().toString(),
-  // @TODO this may not be correct
-  values: parseTokenValues(defaultJSON as unknown as SetTokenDataPayload['values']),
-};
 export interface TokenState {
   tokens: Record<string, AnyTokenList>;
-  themes: Record<string, ThemeObject>;
+  themes: ThemeObjectsMap;
   lastSyncedState: string;
   importedTokens: {
     newTokens: SingleToken[];
@@ -163,10 +157,6 @@ export const tokenState = createModel<RootModel>()({
         activeTokenSet: state.activeTokenSet === data.oldName ? data.newName : state.activeTokenSet,
       };
     },
-    setActiveTheme: (state, themeId: string | null) => ({
-      ...state,
-      activeTheme: themeId,
-    }),
     setLastSyncedState: (state, data: string) => ({
       ...state,
       lastSyncedState: data,
@@ -188,24 +178,6 @@ export const tokenState = createModel<RootModel>()({
         updatedTokens: [],
       },
     }),
-    setTokenData: (state, data: SetTokenDataPayload) => {
-      const values = parseTokenValues(data.values);
-      const allAvailableTokenSets = Object.keys(values);
-      const usedTokenSets = Object.fromEntries(
-        allAvailableTokenSets
-          .map((tokenSet) => ([tokenSet, data.usedTokenSet?.[tokenSet] ?? TokenSetStatus.DISABLED])),
-      );
-      // @README (1) for the sake of normalization we will set the DISABLED status for all available token sets
-      // this way we can always be certain the status is available. This behavior is also reflected in the createTokenSet logic
-      return {
-        ...state,
-        tokens: values,
-        activeTokenSet: Array.isArray(data.values) ? 'global' : Object.keys(data.values)[0],
-        usedTokenSet: Array.isArray(data.values)
-          ? { global: TokenSetStatus.ENABLED }
-          : usedTokenSets,
-      };
-    },
     setJSONData(state, payload) {
       const parsedTokens = parseJson(payload);
       parseTokenValues(parsedTokens);
@@ -391,14 +363,9 @@ export const tokenState = createModel<RootModel>()({
         tokens: newTokens,
       };
     },
+    ...tokenStateReducers,
   },
   effects: (dispatch) => ({
-    setDefaultTokens: () => {
-      dispatch.tokenState.setTokenData({ values: defaultTokens.values });
-    },
-    setEmptyTokens: () => {
-      dispatch.tokenState.setTokenData({ values: [] });
-    },
     editToken(payload: UpdateTokenPayload, rootState) {
       if (payload.oldName && payload.oldName !== payload.name) {
         dispatch.tokenState.updateAliases({ oldName: payload.oldName, newName: payload.name });
@@ -461,6 +428,8 @@ export const tokenState = createModel<RootModel>()({
           tokens: params.shouldUpdateNodes ? rootState.tokenState.tokens : null,
           tokenValues: rootState.tokenState.tokens,
           usedTokenSet: rootState.tokenState.usedTokenSet,
+          themes: rootState.tokenState.themes,
+          activeTheme: rootState.tokenState.activeTheme,
           settings: rootState.settings,
           updatedAt: new Date().toString(),
           lastUpdatedAt: rootState.uiState.lastUpdatedAt,
@@ -474,5 +443,10 @@ export const tokenState = createModel<RootModel>()({
         console.error('Error updating document', e);
       }
     },
+    ...Object.fromEntries(
+      (Object.entries(tokenStateEffects).map(([key, factory]) => (
+        [key, factory(dispatch)]
+      ))),
+    ),
   }),
 });

@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { CheckIcon } from '@radix-ui/react-icons';
-import { activeThemeSelector, themeIdentifiersSelector } from '@/selectors';
+import { activeThemeSelector, themeOptionsSelector } from '@/selectors';
 import {
   DropdownMenu,
   DropdownMenuItem,
@@ -28,39 +28,42 @@ type Props = {
 export const ThemeSelector: React.FC<Props> = () => {
   const dispatch = useDispatch<Dispatch>();
   const activeTheme = useSelector(activeThemeSelector);
-  const availableThemes = useSelector(themeIdentifiersSelector);
+  const availableThemes = useSelector(themeOptionsSelector);
 
   const handleClearTheme = useCallback(() => {
     dispatch.tokenState.setActiveTheme(null);
   }, [dispatch]);
 
   const handleSelectTheme = useCallback((themeId: string) => {
-    dispatch.tokenState.setActiveTheme(themeId);
-  }, [dispatch]);
+    dispatch.tokenState.setActiveTheme((activeTheme === themeId) ? null : themeId);
+  }, [dispatch, activeTheme]);
 
   const handleManageThemes = useCallback(() => {
     dispatch.uiState.setManageThemesModalOpen(true);
   }, [dispatch]);
 
   const activeThemeLabel = useMemo(() => {
-    if (activeTheme) return activeTheme;
+    if (activeTheme) {
+      const themeOption = availableThemes.find(({ value }) => value === activeTheme);
+      return themeOption ? themeOption.label : 'Unknown';
+    }
     return 'None';
-  }, [activeTheme]);
+  }, [activeTheme, availableThemes]);
 
   const availableThemeOptions = useMemo(() => (
-    availableThemes.map((themeId) => {
-      const handleSelect = () => handleSelectTheme(themeId);
+    availableThemes.map(({ label, value }) => {
+      const handleSelect = () => handleSelectTheme(value);
 
       return (
         <DropdownMenuRadioItem
-          key={themeId}
-          value={themeId}
+          key={value}
+          value={value}
           onSelect={handleSelect}
         >
           <DropdownMenuItemIndicator>
             <CheckIcon />
           </DropdownMenuItemIndicator>
-          {themeId}
+          {label}
         </DropdownMenuRadioItem>
       );
     })

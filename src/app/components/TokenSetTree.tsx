@@ -4,7 +4,6 @@ import React, {
 import { useDispatch, useSelector } from 'react-redux';
 import { TokenSetItem } from './TokenSetItem';
 import { Dispatch } from '../store';
-import { getTree, TreeItem } from './utils/getTree';
 import {
   activeTokenSetSelector,
   editProhibitedSelector,
@@ -12,13 +11,14 @@ import {
 } from '@/selectors';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { TokenSetListOrTree } from './TokenSetListOrTree';
+import { tokenSetListToTree, TreeItem } from '@/utils/tokenset';
 
 export default function TokenSetTree({ tokenSets, onRename, onDelete }: { tokenSets: string[], onRename: (tokenSet: string) => void, onDelete: (tokenSet: string) => void }) {
   const activeTokenSet = useSelector(activeTokenSetSelector);
   const usedTokenSet = useSelector(usedTokenSetSelector);
   const editProhibited = useSelector(editProhibitedSelector);
   const dispatch = useDispatch<Dispatch>();
-  const [items, setItems] = useState<TreeItem[]>(getTree(tokenSets));
+  const [items, setItems] = useState<TreeItem[]>(tokenSetListToTree(tokenSets));
 
   const determineCheckedState = useCallback((item: TreeItem) => {
     if (item.isLeaf) {
@@ -79,10 +79,10 @@ export default function TokenSetTree({ tokenSets, onRename, onDelete }: { tokenS
     dispatch.tokenState.toggleTreatAsSource(tokenSetPath);
   }, [dispatch]);
 
-  type TreeRenderFunction = (props: React.PropsWithChildren<{ item: typeof mappedItems[number] }>) => React.ReactNode;
+  type TreeRenderFunction = (props: React.PropsWithChildren<{ item: typeof mappedItems[number] }>) => React.ReactElement;
 
   const renderItem = useCallback<TreeRenderFunction>(({ children }) => (
-    children
+    React.createElement(React.Fragment, {}, children)
   ), []);
 
   const renderItemContent = useCallback<TreeRenderFunction>(({ item, children }) => (
@@ -105,7 +105,7 @@ export default function TokenSetTree({ tokenSets, onRename, onDelete }: { tokenS
   ), [editProhibited, onRename, onDelete, handleTreatAsSource, handleCheckedChange, handleClick]);
 
   useEffect(() => {
-    setItems(getTree(tokenSets));
+    setItems(tokenSetListToTree(tokenSets));
   }, [tokenSets]);
 
   return (

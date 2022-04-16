@@ -5,7 +5,7 @@ import IconVisibilityOff from './icons/IconVisibilityOff';
 import Box from './Box';
 import Stack from './Stack';
 
-type Props = {
+type Props = React.InputHTMLAttributes<HTMLInputElement> & {
   name: string;
   inputRef?: React.MutableRefObject<HTMLInputElement | null>;
   error?: string;
@@ -21,8 +21,6 @@ type Props = {
   capitalize?: boolean;
   prefix?: React.ReactNode;
   step?: string;
-  min?: number;
-  max?: number;
   isMasked?: boolean;
   onChange?: React.ChangeEventHandler<HTMLInputElement>;
 };
@@ -106,7 +104,7 @@ const StyledPrefix = styled('div', {
   },
 });
 
-const Input: React.FC<Props> = ({
+const Input = React.forwardRef<HTMLInputElement, Props>(({
   name,
   error = '',
   required = false,
@@ -118,15 +116,14 @@ const Input: React.FC<Props> = ({
   defaultValue,
   type,
   prefix,
-  min,
-  max,
   step,
   custom = '',
   inputRef = null,
   placeholder = '',
   capitalize = false,
   isMasked = false,
-}) => {
+  ...inputProps
+}, ref) => {
   // if isMasked is true, then we need to handle toggle visibility
   const [show, setShow] = React.useState(false);
 
@@ -148,9 +145,10 @@ const Input: React.FC<Props> = ({
           {error ? <div className="text-red-500 font-bold">{error}</div> : null}
         </Stack>
       )}
-      <Box css={{ display: 'flex', position: 'relative', width: full ? '100%' : 0 }} className="input">
+      <Box css={{ display: 'flex', position: 'relative', width: full ? '100%' : '' }} className="input">
         {!!prefix && <StyledPrefix>{prefix}</StyledPrefix>}
         <StyledInput
+          ref={inputRef ?? ref}
           spellCheck={false}
           tabIndex={tabindex ?? undefined}
           type={type}
@@ -159,14 +157,12 @@ const Input: React.FC<Props> = ({
           name={name}
           onChange={onChange}
           required={required}
-          min={min}
-          max={max}
           step={step}
           data-custom={custom}
-          ref={inputRef}
           placeholder={placeholder}
           hasPrefix={!!prefix}
           hasSuffix={!!isMasked}
+          {...inputProps}
         />
 
         {isMasked && (
@@ -177,6 +173,6 @@ const Input: React.FC<Props> = ({
       </Box>
     </label>
   );
-};
+});
 
 export default Input;

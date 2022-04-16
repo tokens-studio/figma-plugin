@@ -15,21 +15,10 @@ import {
   usedTokenSetSelector,
 } from '@/selectors';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
-import type { TreeItem } from './utils/getTree';
 import { TokenSetListOrTree } from './TokenSetListOrTree';
 import { useRaisedShadow } from './use-raised-shadow';
 import { DragControlsContext } from '@/context';
-
-function getList(items: string[]): TreeItem[] {
-  return items.map((item) => ({
-    isLeaf: true,
-    path: item,
-    key: `${item}-set`,
-    parent: null,
-    level: 0,
-    label: item,
-  }));
-}
+import { tokenSetListToList, TreeItem } from '@/utils/tokenset';
 
 type ExtendedTreeItem = TreeItem & {
   tokenSets: string[];
@@ -129,7 +118,7 @@ export default function TokenSetList({
   onDelete,
   onReorder,
 }: Props) {
-  const [items, setItems] = React.useState(getList(tokenSets));
+  const [items, setItems] = React.useState(tokenSetListToList(tokenSets));
 
   const mappedItems = React.useMemo(() => (
     items.map<ExtendedTreeItem>((item) => ({
@@ -151,7 +140,7 @@ export default function TokenSetList({
   }, [items, onReorder]);
 
   useEffect(() => {
-    setItems(getList(tokenSets));
+    setItems(tokenSetListToList(tokenSets));
   }, [tokenSets]);
 
   // TODO: Handle reorder at end doesnt work yet

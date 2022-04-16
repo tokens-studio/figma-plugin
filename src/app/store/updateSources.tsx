@@ -5,12 +5,13 @@ import { notifyToUI, postToFigma } from '../../plugin/notifiers';
 import { updateJSONBinTokens } from './providers/jsonbin';
 import { track } from '@/utils/analytics';
 import type { AnyTokenSet, SingleToken } from '@/types/tokens';
-import type { UsedTokenSetsMap } from '@/types';
+import type { ThemeObjectsMap, UsedTokenSetsMap } from '@/types';
 import type { SettingsState } from './models/settings';
 
 type UpdateRemoteTokensPayload = {
   provider: StorageProviderType;
   tokens: Record<string, SingleToken[]>;
+  themes: ThemeObjectsMap
   context: ContextObject;
   updatedAt: string;
   oldUpdatedAt?: string;
@@ -20,6 +21,8 @@ type UpdateTokensOnSourcesPayload = {
   tokens: Record<string, SingleToken[]>;
   tokenValues: AnyTokenSet;
   usedTokenSet: UsedTokenSetsMap;
+  themes: ThemeObjectsMap;
+  activeTheme: string | null;
   settings: SettingsState;
   updatedAt: string;
   shouldUpdateRemote: boolean;
@@ -33,6 +36,7 @@ type UpdateTokensOnSourcesPayload = {
 async function updateRemoteTokens({
   provider,
   tokens,
+  themes,
   context,
   updatedAt,
   oldUpdatedAt,
@@ -44,6 +48,7 @@ async function updateRemoteTokens({
 
       notifyToUI('Updating JSONBin...');
       updateJSONBinTokens({
+        themes,
         tokens,
         context,
         updatedAt,
@@ -64,6 +69,8 @@ export default async function updateTokensOnSources({
   tokens,
   tokenValues,
   usedTokenSet,
+  themes,
+  activeTheme,
   settings,
   updatedAt,
   shouldUpdateRemote = true,
@@ -73,10 +80,12 @@ export default async function updateTokensOnSources({
   api,
   lastUpdatedAt,
 }: UpdateTokensOnSourcesPayload) {
+  // @TODO themes
   if (tokens && !isLocal && shouldUpdateRemote && !editProhibited) {
     updateRemoteTokens({
       provider: storageType.provider,
       tokens,
+      themes,
       context: api,
       updatedAt,
       oldUpdatedAt: lastUpdatedAt,
@@ -91,8 +100,10 @@ export default async function updateTokensOnSources({
     type: MessageToPluginTypes.UPDATE,
     tokenValues,
     tokens: tokens ? mergedTokens : null,
+    themes,
     updatedAt,
     settings,
     usedTokenSet,
+    activeTheme,
   });
 }

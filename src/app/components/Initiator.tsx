@@ -8,6 +8,7 @@ import { Dispatch } from '../store';
 import useStorage from '../store/useStorage';
 import * as pjs from '../../../package.json';
 import { useFeatureFlags } from '../hooks/useFeatureFlags';
+import { Tabs } from '@/constants/Tabs';
 
 export function Initiator() {
   const dispatch = useDispatch<Dispatch>();
@@ -65,7 +66,7 @@ export function Initiator() {
             const { values } = pluginMessage;
             if (values) {
               dispatch.tokenState.setTokenData(values);
-              dispatch.uiState.setActiveTab('tokens');
+              dispatch.uiState.setActiveTab(Tabs.TOKENS);
             }
             break;
           }
