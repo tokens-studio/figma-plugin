@@ -1,19 +1,22 @@
 import { useDispatch } from 'react-redux';
+import { useCallback } from 'react';
 import { postToFigma } from '@/plugin/notifiers';
-import { StorageType } from '@/types/api';
+import { ContextObject } from '@/types/api';
 import { MessageToPluginTypes } from '@/types/messages';
 import type { Dispatch } from '../store';
+
+type SetStorageTypeOptions = {
+  provider: ContextObject;
+  shouldSetInDocument?: boolean;
+};
 
 export default function useStorage() {
   const dispatch = useDispatch<Dispatch>();
 
-  function setStorageType({
+  const setStorageType = useCallback(({
     provider,
     shouldSetInDocument = false,
-  }: {
-    provider: StorageType;
-    shouldSetInDocument?: boolean;
-  }) {
+  }: SetStorageTypeOptions) => {
     if (shouldSetInDocument) {
       postToFigma({
         type: MessageToPluginTypes.SET_STORAGE_TYPE,
@@ -21,7 +24,7 @@ export default function useStorage() {
       });
     }
     dispatch.uiState.setStorage(provider);
-  }
+  }, [dispatch]);
 
   return { setStorageType };
 }

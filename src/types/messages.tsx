@@ -10,6 +10,7 @@ import { SelectionGroup } from './SelectionGroup';
 import { SelectionValue } from './SelectionValue';
 import { AnyTokenList, AnyTokenSet, TokenStore } from './tokens';
 import { PullStyleOptions } from './PullStylesOptions';
+import { UsedTokenSetsMap } from './UsedTokenSetsMap';
 
 export enum MessageFromPluginTypes {
   SELECTION = 'selection',
@@ -137,7 +138,7 @@ export type ApiCredentialsFromPluginMessage = {
     internalId?: string
   }
   featureFlagId: string
-  usedTokenSet?: string[] | null
+  usedTokenSet?: UsedTokenSetsMap | null
 };
 export type PostToUIMessage =
   | NoSelectionFromPluginMessage
@@ -177,10 +178,10 @@ export type CredentialsToPluginMessage = {
 export type UpdateToPluginMessage = {
   type: MessageToPluginTypes.UPDATE;
   tokenValues: AnyTokenSet;
-  tokens: AnyTokenList;
+  tokens: AnyTokenList | null;
   updatedAt: string;
   settings: SettingsState;
-  usedTokenSet: string[];
+  usedTokenSet: UsedTokenSetsMap;
 };
 export type CreateStylesToPluginMessage = {
   type: MessageToPluginTypes.CREATE_STYLES;

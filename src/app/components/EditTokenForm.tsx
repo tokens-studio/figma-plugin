@@ -15,7 +15,7 @@ import { SingleBoxShadowToken } from '@/types/tokens';
 import { checkIfContainsAlias, getAliasValue } from '@/utils/alias';
 import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
 import {
-  activeTokenSetSelector, editTokenSelector, tokenStateSelector, uiStateSelector,
+  activeTokenSetSelector, editTokenSelector,
 } from '@/selectors';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { EditTokenObject } from '../store/models/uiState';
