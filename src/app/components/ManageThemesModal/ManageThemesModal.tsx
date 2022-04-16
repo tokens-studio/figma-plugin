@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { activeThemeSelector, themesListSelector } from '@/selectors';
 import { Modal } from '../Modal';
 import { Dispatch } from '@/app/store';
-import { EmptyState } from '../EmptyState';
+import Blankslate from '../Blankslate';
 import Stack from '../Stack';
 import IconPlus from '@/icons/plus.svg';
 import Button from '../Button';
@@ -114,10 +114,10 @@ export const ManageThemesModal: React.FC<Props> = () => {
       close={handleClose}
     >
       {!themes.length && !themeEditorOpen && (
-        <EmptyState
+        <Blankslate
           css={{ padding: '$8 $4' }}
           title="You don't have any themes yet"
-          subtitle="Create your first theme now"
+          text="Create your first theme now"
         />
       )}
       {!!themes.length && !themeEditorOpen && (
