@@ -7,11 +7,12 @@ import { UpdateMode } from '@/types/state';
 import { Dispatch } from '../store';
 import useManageTokens from '../store/useManageTokens';
 import BoxShadowInput from './BoxShadowInput';
+import CompositionTokenForm from './CompositionTokenForm';
 import Input from './Input';
 import ColorPicker from './ColorPicker';
 import useConfirm from '../hooks/useConfirm';
 import useTokens from '../store/useTokens';
-import { SingleBoxShadowToken } from '@/types/tokens';
+import { SingleBoxShadowToken, SingleCompositionToken } from '@/types/tokens';
 import { checkIfContainsAlias, getAliasValue } from '@/utils/alias';
 import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
 import {
@@ -92,6 +93,16 @@ function EditTokenForm({ resolvedTokens }: Props) {
     [internalEditToken],
   );
 
+  const handleCompositionChange = React.useCallback(
+    (style: SingleCompositionToken['value']) => {
+      setError(null);
+      if (internalEditToken?.type === TokenTypes.COMPOSITION) {
+        setInternalEditToken({ ...internalEditToken, value: style });
+      }
+    },
+    [internalEditToken],
+  );
+
   const handleColorValueChange = React.useCallback(
     (color: string) => {
       setError(null);
@@ -130,6 +141,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
 
   // @TODO update to useCallback
   const submitTokenValue = async ({ value, name, options }: EditTokenObject) => {
+    console.log('internal', internalEditToken);
     if (internalEditToken) {
       let oldName;
       if (internalEditToken.initialName !== name && internalEditToken.initialName) {
@@ -139,9 +151,16 @@ function EditTokenForm({ resolvedTokens }: Props) {
         .split('/')
         .map((n) => n.trim())
         .join('.');
+      console.log('internalEditToken', internalEditToken, 'old', oldName, 'new', newName);
       if (internalEditToken.isPristine) {
         track('Create token', { type: internalEditToken.type });
-
+        console.log('create');
+        console.log('444444', createSingleToken({
+          parent: activeTokenSet,
+          name: newName,
+          value,
+          options,
+        }));
         createSingleToken({
           parent: activeTokenSet,
           name: newName,
@@ -149,6 +168,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
           options,
         });
       } else {
+        console.log('edit');
         editSingleToken({
           parent: activeTokenSet,
           name: newName,
@@ -197,6 +217,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
 
   const resolvedValue = React.useMemo(() => {
     if (internalEditToken) {
+      console.log('inter', internalEditToken);
       return typeof internalEditToken?.value === 'object'
         ? null
         : getAliasValue(internalEditToken.value, resolvedTokens);
@@ -205,6 +226,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
   }, [internalEditToken, resolvedTokens]);
 
   const renderTokenForm = () => {
+    console.log('inter', internalEditToken);
     if (!internalEditToken) {
       return null;
     }
@@ -226,6 +248,17 @@ function EditTokenForm({ resolvedTokens }: Props) {
             required
           />
         ));
+      }
+      case 'composition': {
+        console.log('composition', internalEditToken);
+        return (
+          <CompositionTokenForm
+            value={internalEditToken.value}
+            setValue={handleCompositionChange}
+            resolvedTokens={resolvedTokens}
+            tokenType={internalEditToken.type}
+          />
+        );
       }
       default: {
         return (

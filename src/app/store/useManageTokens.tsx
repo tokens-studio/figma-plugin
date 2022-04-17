@@ -71,6 +71,7 @@ export default function useManageTokens() {
     const shouldUpdate = true;
 
     if (shouldUpdate) {
+      console.log('data', data);
       createToken({
         parent,
         name,

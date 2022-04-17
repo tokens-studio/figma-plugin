@@ -211,6 +211,9 @@ function Tokens({ isActive }: { isActive: boolean }) {
     }
   }, [tokens, stringTokens, activeTokenSet]);
 
+  React.useEffect(() => {
+    console.log('memo', memoizedTokens);
+  }, [memoizedTokens]);
   if (!isActive) return null;
 
   return (
