@@ -21,6 +21,8 @@ import { Tabs } from '@/constants/Tabs';
 import Stack from './Stack';
 import { TabButton } from './TabButton';
 import { NavbarUndoButton } from './NavbarUndoButton';
+import MinimiseIcon from '../assets/minimiseIcon.svg';
+import MaximiseIcon from '../assets/maximiseIcon.svg';
 
 const transformProviderName = (provider) => {
   switch (provider) {
@@ -48,32 +50,13 @@ export const Navbar: React.FC = () => {
 
   const StyledButton = styled('button', {
     all: 'unset',
-    backgroundColor: 'red',
     border: 'none',
-    padding: '$2',
+    padding: '$1',
     marginRight: '10px',
     borderRadius: '$button',
     cursor: 'pointer',
     '&:hover, &:focus': {
       boxShadow: 'none',
-    },
-    variants: {
-      buttonVariant: {
-        primary: {
-          backgroundColor: '$interaction',
-          color: '$onInteraction',
-          '&:hover, &:focus': {
-            backgroundColor: '$interactionSubtle',
-          },
-        },
-        default: {
-          backgroundColor: 'transparent',
-          color: '$text',
-          '&:hover, &:focus': {
-            backgroundColor: '$bgSubtle',
-          },
-        },
-      },
     },
   });
 
@@ -120,9 +103,7 @@ export const Navbar: React.FC = () => {
           <TabButton name={Tabs.SETTINGS} label="Settings" />
         </div>
         <StyledButton type="button" onClick={handleMinimize} buttonVariant="primary">
-          <Box css={{ transition: 'transform 200ms ease-in-out', transform: 'var(--transform)' }}>
-            {windowSize && !windowSize.isMinimized ? <MarginIcon /> : <SizeIcon />}
-          </Box>
+          {windowSize && !windowSize.isMinimized ? <MinimiseIcon /> : <MaximiseIcon />}
         </StyledButton>
         <NavbarUndoButton />
       </Stack>
