@@ -9,6 +9,9 @@ import { RootModel } from '@/types/RootModel';
 type WindowSettingsType = {
   width: number;
   height: number;
+  storedWidth: number;
+  storedHeight: number;
+  isMinimized: boolean;
 };
 
 type TokenModeType = 'object' | 'array';
@@ -36,6 +39,9 @@ export const settings = createModel<RootModel>()({
     uiWindow: {
       width: 400,
       height: 600,
+      storedWidth: 400,
+      storedHeight: 600,
+      isMinimized: false,
     },
     updateMode: UpdateMode.PAGE,
     updateRemote: true,
@@ -57,8 +63,22 @@ export const settings = createModel<RootModel>()({
       return {
         ...state,
         uiWindow: {
+          ...state.uiWindow,
           width: payload.width,
           height: payload.height,
+        },
+      };
+    },
+    setMinimizePluginWindow(state, payload: { isMinimized: boolean; width: number; height: number }) {
+      track('Stored Window Size', { width: payload.width, height: payload.height });
+      return {
+        ...state,
+        uiWindow: {
+          width: payload.isMinimized ? 400 : payload.width,
+          height: payload.isMinimized ? 50 : payload.height,
+          storedWidth: payload.width,
+          storedHeight: payload.height,
+          isMinimized: payload.isMinimized,
         },
       };
     },
@@ -119,6 +139,9 @@ export const settings = createModel<RootModel>()({
         width: payload.width,
         height: payload.height,
       });
+    },
+    setMinimizePluginWindow: (payload, rootState) => {
+      setUI(rootState.settings);
     },
     setUpdateStyles: (payload, rootState) => {
       setUI(rootState.settings);

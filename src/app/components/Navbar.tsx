@@ -1,24 +1,28 @@
 import React from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { CheckIcon, SizeIcon, MarginIcon } from '@radix-ui/react-icons';
 import convertTokensToObject from '@/utils/convertTokensToObject';
 import Icon from './Icon';
 import Tooltip from './Tooltip';
 import useRemoteTokens from '../store/remoteTokens';
 import { StorageProviderType } from '../../types/api';
 import Box from './Box';
+import { Dispatch } from '../store';
+import { styled } from '@/stitches.config';
 import {
   editProhibitedSelector,
   lastSyncedStateSelector,
   projectURLSelector,
   storageTypeSelector,
   tokensSelector,
+  windowSizeSelector,
 } from '@/selectors';
 import { Tabs } from '@/constants/Tabs';
 import Stack from './Stack';
 import { TabButton } from './TabButton';
 import { NavbarUndoButton } from './NavbarUndoButton';
 
-const transformProviderName = (provider: StorageProviderType) => {
+const transformProviderName = (provider) => {
   switch (provider) {
     case StorageProviderType.JSONBIN:
       return 'JSONBin.io';
@@ -37,7 +41,55 @@ export const Navbar: React.FC = () => {
   const tokens = useSelector(tokensSelector);
   const editProhibited = useSelector(editProhibitedSelector);
   const lastSyncedState = useSelector(lastSyncedStateSelector);
+  const windowSize = useSelector(windowSizeSelector);
   const { pullTokens, pushTokens } = useRemoteTokens();
+
+  const dispatch = useDispatch<Dispatch>();
+
+  const StyledButton = styled('button', {
+    all: 'unset',
+    backgroundColor: 'red',
+    border: 'none',
+    padding: '$2',
+    marginRight: '10px',
+    borderRadius: '$button',
+    cursor: 'pointer',
+    '&:hover, &:focus': {
+      boxShadow: 'none',
+    },
+    variants: {
+      buttonVariant: {
+        primary: {
+          backgroundColor: '$interaction',
+          color: '$onInteraction',
+          '&:hover, &:focus': {
+            backgroundColor: '$interactionSubtle',
+          },
+        },
+        default: {
+          backgroundColor: 'transparent',
+          color: '$text',
+          '&:hover, &:focus': {
+            backgroundColor: '$bgSubtle',
+          },
+        },
+      },
+    },
+  });
+
+  const handleMinimize = React.useCallback(() => {
+    if (windowSize) {
+      dispatch.settings.setMinimizePluginWindow({
+        width: windowSize.width,
+        height: windowSize.height,
+        isMinimized: !windowSize.isMinimized,
+      });
+      dispatch.settings.setWindowSize({
+        width: windowSize.isMinimized ? windowSize.storedWidth : 400,
+        height: windowSize.isMinimized ? windowSize.storedHeight : 50,
+      });
+    }
+  }, [dispatch, windowSize]);
 
   const checkForChanges = React.useCallback(() => {
     if (lastSyncedState !== JSON.stringify(convertTokensToObject(tokens), null, 2)) {
@@ -67,6 +119,11 @@ export const Navbar: React.FC = () => {
           <TabButton name={Tabs.SYNCSETTINGS} label="Sync" />
           <TabButton name={Tabs.SETTINGS} label="Settings" />
         </div>
+        <StyledButton type="button" onClick={handleMinimize} buttonVariant="primary">
+          <Box css={{ transition: 'transform 200ms ease-in-out', transform: 'var(--transform)' }}>
+            {windowSize && !windowSize.isMinimized ? <MarginIcon /> : <SizeIcon />}
+          </Box>
+        </StyledButton>
         <NavbarUndoButton />
       </Stack>
       <Stack direction="row" align="center">
