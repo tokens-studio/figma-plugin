@@ -94,13 +94,12 @@ export default function BranchSelector() {
     if (checkForChanges() && await askUserIfPushChanges()) {
       setMenuOpened(false);
       setCurrentBranch(branch);
+      dispatch.uiState.setApiData({ ...apiData, branch });
+      dispatch.uiState.setLocalApiState({ ...localApiState, branch });
       await pullTokens({ context: { ...apiData, branch } });
     }
 
     setMenuOpened(false);
-
-    dispatch.uiState.setApiData({ ...apiData, branch });
-    dispatch.uiState.setLocalApiState({ ...localApiState, branch });
   };
 
   // @params

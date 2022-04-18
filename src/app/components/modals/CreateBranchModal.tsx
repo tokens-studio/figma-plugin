@@ -35,7 +35,6 @@ export default function CreateBranchModal({
   ** set focus on input
   */
   React.useEffect(() => {
-    console.log(inputRef);
     inputRef.current?.focus();
   }, [inputRef.current]);
 
