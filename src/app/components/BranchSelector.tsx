@@ -14,7 +14,7 @@ import {
   BranchSwitchMenuArrow,
 } from './BranchSwitchMenu';
 import {
-  branchSelector, lastSyncedStateSelector, tokensSelector, localApiStateSelector, apiSelector,
+  branchSelector, lastSyncedStateSelector, tokensSelector, localApiStateSelector, apiSelector, usedTokenSetSelector,
 } from '@/selectors';
 import convertTokensToObject from '@/utils/convertTokensToObject';
 import useRemoteTokens from '../store/remoteTokens';
@@ -32,6 +32,7 @@ export default function BranchSelector() {
   const tokens = useSelector(tokensSelector);
   const localApiState = useSelector(localApiStateSelector);
   const apiData = useSelector(apiSelector);
+  const usedTokenSet = useSelector(usedTokenSetSelector);
 
   const [currentBranch, setCurrentBranch] = useState(localApiState.branch);
   const [startBranch, setStartBranch] = useState(null);
@@ -66,7 +67,7 @@ export default function BranchSelector() {
         <br />
         {' '}
         to your repository, the changes will be lost.
-                   </div>,
+      </div>,
       confirmAction: 'Discard changes',
       cancelAction: 'Cancel',
     });
@@ -90,16 +91,22 @@ export default function BranchSelector() {
     setCreateBranchModalVisible(true);
   };
 
-  const onBranchSelected = async (branch: string) => {
-    if (checkForChanges() && await askUserIfPushChanges()) {
-      setMenuOpened(false);
-      setCurrentBranch(branch);
-      dispatch.uiState.setApiData({ ...apiData, branch });
-      dispatch.uiState.setLocalApiState({ ...localApiState, branch });
-      await pullTokens({ context: { ...apiData, branch } });
-    }
-
+  const changeAndPull = async (branch: string) => {
     setMenuOpened(false);
+    setCurrentBranch(branch);
+    dispatch.uiState.setApiData({ ...apiData, branch });
+    dispatch.uiState.setLocalApiState({ ...localApiState, branch });
+    await pullTokens({ context: { ...apiData, branch }, usedTokenSet });
+  };
+
+  const onBranchSelected = async (branch: string) => {
+    if (checkForChanges()) {
+      if (await askUserIfPushChanges()) {
+        await changeAndPull(branch);
+      } else setMenuOpened(false);
+    } else {
+      await changeAndPull(branch);
+    }
   };
 
   // @params

@@ -11,7 +11,7 @@ import useRemoteTokens from '../store/remoteTokens';
 import convertTokensToObject from '@/utils/convertTokensToObject';
 import { StorageProviderType } from '../../types/api';
 import {
-  localApiStateSelector, editProhibitedSelector, lastSyncedStateSelector, storageTypeSelector, tokensSelector,
+  localApiStateSelector, editProhibitedSelector, lastSyncedStateSelector, storageTypeSelector, tokensSelector, usedTokenSetSelector,
 } from '@/selectors';
 import DocsIcon from '@/icons/docs.svg';
 import FeedbackIcon from '@/icons/feedback.svg';
@@ -22,6 +22,7 @@ export default function Footer() {
   const lastSyncedState = useSelector(lastSyncedStateSelector);
   const editProhibited = useSelector(editProhibitedSelector);
   const localApiState = useSelector(localApiStateSelector);
+  const usedTokenSet = useSelector(usedTokenSetSelector);
 
   const { pullTokens, pushTokens } = useRemoteTokens();
 
@@ -55,7 +56,7 @@ export default function Footer() {
         <>
           <BranchSelector currentBranch={localApiState.branch} />
           <Tooltip variant="top" label={`Pull from ${transformProviderName(storageType.provider)}`}>
-            <button onClick={() => pullTokens({})} type="button" className="button button-ghost">
+            <button onClick={() => pullTokens({ usedTokenSet })} type="button" className="button button-ghost">
               <DownloadIcon />
             </button>
           </Tooltip>
