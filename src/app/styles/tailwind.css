@@ -110,6 +110,12 @@ textarea::-webkit-scrollbar-thumb {
   border: 2px solid white;
 }
 
+.content-dark::-webkit-scrollbar-thumb {
+  @apply bg-gray-400 border-gray-950;
+  border-radius: 9px;
+  border: 2px solid;
+}
+
 .button-property + .property-wrapper {
   @apply mt-4;
 }
