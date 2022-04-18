@@ -141,26 +141,19 @@ function EditTokenForm({ resolvedTokens }: Props) {
 
   // @TODO update to useCallback
   const submitTokenValue = async ({ value, name, options }: EditTokenObject) => {
-    console.log('internal', internalEditToken);
     if (internalEditToken) {
       let oldName;
       if (internalEditToken.initialName !== name && internalEditToken.initialName) {
         oldName = internalEditToken.initialName;
       }
+
       const newName = name
         .split('/')
         .map((n) => n.trim())
         .join('.');
-      console.log('internalEditToken', internalEditToken, 'old', oldName, 'new', newName);
+
       if (internalEditToken.isPristine) {
         track('Create token', { type: internalEditToken.type });
-        console.log('create');
-        console.log('444444', createSingleToken({
-          parent: activeTokenSet,
-          name: newName,
-          value,
-          options,
-        }));
         createSingleToken({
           parent: activeTokenSet,
           name: newName,
@@ -168,7 +161,6 @@ function EditTokenForm({ resolvedTokens }: Props) {
           options,
         });
       } else {
-        console.log('edit');
         editSingleToken({
           parent: activeTokenSet,
           name: newName,
@@ -187,6 +179,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
               key: UpdateMode.PAGE, label: 'Page', enabled: true, unique: true,
             }, { key: UpdateMode.DOCUMENT, label: 'Document', unique: true }],
           });
+
           if (shouldRemap) {
             remapToken(oldName, newName, shouldRemap.data[0]);
           }
@@ -217,7 +210,6 @@ function EditTokenForm({ resolvedTokens }: Props) {
 
   const resolvedValue = React.useMemo(() => {
     if (internalEditToken) {
-      console.log('inter', internalEditToken);
       return typeof internalEditToken?.value === 'object'
         ? null
         : getAliasValue(internalEditToken.value, resolvedTokens);
@@ -226,7 +218,6 @@ function EditTokenForm({ resolvedTokens }: Props) {
   }, [internalEditToken, resolvedTokens]);
 
   const renderTokenForm = () => {
-    console.log('inter', internalEditToken);
     if (!internalEditToken) {
       return null;
     }
@@ -250,7 +241,6 @@ function EditTokenForm({ resolvedTokens }: Props) {
         ));
       }
       case 'composition': {
-        console.log('composition', internalEditToken);
         return (
           <CompositionTokenForm
             value={internalEditToken.value}

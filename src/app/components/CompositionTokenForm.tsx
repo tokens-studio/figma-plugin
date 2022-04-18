@@ -51,7 +51,6 @@ function SingleStyleInput({
 }) {
   const resolvedValue = React.useMemo(() => {
     if (styleItem) {
-      console.log('styleI', styleItem);
       return typeof styleItem.value === 'object'
         ? null
         : getAliasValue(styleItem.value, resolvedTokens);
