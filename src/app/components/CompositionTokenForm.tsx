@@ -15,8 +15,6 @@ import IconGrabber from '@/icons/grabber.svg';
 
 import Heading from './Heading';
 import IconButton from './IconButton';
-import TokenInput from './TokenInput';
-import Select from './Select';
 import Box from './Box';
 import Input from './Input';
 
@@ -138,35 +136,36 @@ function SingleStyleInput({
   drag(drop(ref));
 
   return (
-    <Box css={{
-      display: 'flex', flexDirection: 'column', gap: '$2',
-    }}
+    <Box
+      css={{
+        display: 'flex', justifyContent: 'space-between', alignItems: 'center', opacity: isDragging ? 0 : 1,
+      }}
+      ref={ref}
     >
-      <Box css={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        {isMultiple && (
-          <Box css={{ display: 'flex', width: '$space$8' }}>
-            <IconButton tooltip="Click to drag" icon={<IconGrabber />} data-handler-id={handlerId} />
-          </Box>
-        )}
-        <Input
-          label="property"
-          type="text"
-          name="property"
-          value={styleItem.property}
-          onChange={onChange}
-          full
-          required
-        />
-        <Input
-          label="value"
-          type="text"
-          name="value"
-          value={styleItem.value}
-          onChange={onChange}
-          full
-          required
-        />
-        {checkIfContainsAlias(styleItem.value) && (
+      {isMultiple && (
+      <Box css={{ display: 'flex', width: '$space$8' }}>
+        <IconButton tooltip="Click to drag" icon={<IconGrabber />} data-handler-id={handlerId} />
+      </Box>
+      )}
+      <Input
+        label="property"
+        type="text"
+        name="property"
+        value={styleItem.property}
+        onChange={onChange}
+        full
+        required
+      />
+      <Input
+        label="value"
+        type="text"
+        name="value"
+        value={styleItem.value}
+        onChange={onChange}
+        full
+        required
+      />
+      {checkIfContainsAlias(styleItem.value) && (
         <div className="flex p-2 mt-2 font-mono text-gray-700 bg-gray-100 border-gray-300 rounded text-xxs itms-center">
           {tokenType === 'color' ? (
             <div
@@ -176,18 +175,16 @@ function SingleStyleInput({
           ) : null}
           {resolvedValue}
         </div>
-        )}
-        {isMultiple && (
-          <IconButton
-            tooltip="Remove this style"
-            dataCy="button-style-remove-multiple"
-            onClick={() => onRemove(index)}
-            icon={<IconMinus />}
-          />
-        )}
-      </Box>
+      )}
+      {isMultiple && (
+      <IconButton
+        tooltip="Remove this style"
+        dataCy="button-style-remove-multiple"
+        onClick={() => onRemove(index)}
+        icon={<IconMinus />}
+      />
+      )}
     </Box>
-
   );
 }
 
