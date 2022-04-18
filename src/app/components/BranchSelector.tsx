@@ -66,9 +66,9 @@ export default function BranchSelector() {
         <br />
         {' '}
         to your repository, the changes will be lost.
-      </div>,
-      confirmAction: 'Push',
-      cancelAction: 'Discard changes',
+                   </div>,
+      confirmAction: 'Discard changes',
+      cancelAction: 'Cancel',
     });
     return result;
   }
@@ -92,13 +92,12 @@ export default function BranchSelector() {
 
   const onBranchSelected = async (branch: string) => {
     if (checkForChanges() && await askUserIfPushChanges()) {
-      await pushTokens();
+      setMenuOpened(false);
+      setCurrentBranch(branch);
+      await pullTokens({ context: { ...apiData, branch } });
     }
 
     setMenuOpened(false);
-    setCurrentBranch(branch);
-
-    if (await askUserIfPull()) await pullTokens({ context: { ...apiData, branch } });
 
     dispatch.uiState.setApiData({ ...apiData, branch });
     dispatch.uiState.setLocalApiState({ ...localApiState, branch });
