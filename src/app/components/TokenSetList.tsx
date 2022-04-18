@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Reorder } from 'framer-motion';
 import Box from './Box';
@@ -6,8 +6,12 @@ import { Dispatch } from '../store';
 import { ListItem, TokenSetItem } from './TokenSetItem';
 import useConfirm from '../hooks/useConfirm';
 import {
-  activeTokenSetSelector, editProhibitedSelector, hasUnsavedChangesSelector, usedTokenSetSelector,
+  activeTokenSetSelector,
+  editProhibitedSelector,
+  hasUnsavedChangesSelector,
+  usedTokenSetSelector,
 } from '@/selectors';
+import { TokenSetStatus } from '@/constants/TokenSetStatus';
 
 function getList(items: string[]): ListItem[] {
   return items.map((item) => ({
@@ -20,17 +24,19 @@ function getList(items: string[]): ListItem[] {
   }));
 }
 
+type Props = {
+  tokenSets: string[];
+  onRename: (tokenSet: string) => void;
+  onDelete: (tokenSet: string) => void;
+  onReorder: (tokenSets: string[]) => void;
+};
+
 export default function TokenSetList({
   tokenSets,
   onRename,
   onDelete,
   onReorder,
-}: {
-  tokenSets: string[];
-  onRename: (tokenSet: string) => void;
-  onDelete: (tokenSet: string) => void;
-  onReorder: (tokenSets: string[]) => void;
-}) {
+}: Props) {
   const { confirm } = useConfirm();
   const activeTokenSet = useSelector(activeTokenSetSelector);
   const usedTokenSet = useSelector(usedTokenSetSelector);
@@ -39,11 +45,11 @@ export default function TokenSetList({
   const dispatch = useDispatch<Dispatch>();
   const [items, setItems] = React.useState(getList(tokenSets));
 
-  React.useEffect(() => {
+  useEffect(() => {
     setItems(getList(tokenSets));
   }, [tokenSets]);
 
-  async function handleClick(set: ListItem) {
+  const handleClick = useCallback(async (set: ListItem) => {
     if (set.type === 'set') {
       if (hasUnsavedChanges) {
         const userChoice = await confirm({ text: 'You have unsaved changes.', description: 'Your changes will be discarded.' });
@@ -54,26 +60,41 @@ export default function TokenSetList({
         dispatch.tokenState.setActiveTokenSet(set.path);
       }
     }
-  }
+  }, [confirm, dispatch, hasUnsavedChanges]);
+
+  const handleCheckedChange = useCallback((checked: boolean, item: ListItem) => {
+    dispatch.tokenState.toggleUsedTokenSet(item.path);
+  }, [dispatch]);
+
+  const handleReorder = useCallback(() => {
+    onReorder(items.map((i) => i.path));
+  }, [items, onReorder]);
+
+  const handleTreatAsSource = useCallback((tokenSetPath: string) => {
+    dispatch.tokenState.toggleTreatAsSource(tokenSetPath);
+  }, [dispatch]);
 
   // TODO: Handle reorder at end doesnt work yet
   return (
     <Box>
       <Reorder.Group axis="y" layoutScroll values={items} onReorder={setItems}>
         {items.map((item) => (
-          <TokenSetItem
+          <TokenSetItem<typeof item>
             key={item.key}
             isActive={activeTokenSet === item.path}
-            onClick={() => handleClick(item)}
-            isChecked={usedTokenSet.includes(item.path)}
+            onClick={handleClick}
+            isChecked={usedTokenSet?.[item.path] === TokenSetStatus.ENABLED || (
+              usedTokenSet?.[item.path] === TokenSetStatus.SOURCE ? 'indeterminate' : false
+            )}
             item={item}
-            onCheck={() => dispatch.tokenState.toggleUsedTokenSet(item.path)}
+            onCheck={handleCheckedChange}
             canEdit={!editProhibited}
             canReorder={!editProhibited}
             canDelete={!editProhibited || Object.keys(tokenSets).length > 1}
             onRename={onRename}
             onDelete={onDelete}
-            onReorder={() => onReorder(items.map((i) => i.path))}
+            onReorder={handleReorder}
+            onTreatAsSource={handleTreatAsSource}
           />
         ))}
       </Reorder.Group>

@@ -9,7 +9,7 @@ import {
   UserIdFromPluginMessage,
 } from '@/types/messages';
 import store from './store';
-import { AnyTokenList, TokenStore } from '@/types/tokens';
+import { TokenStore } from '@/types/tokens';
 import { SelectionGroup } from '@/types/SelectionGroup';
 import { SelectionValue } from '@/types/SelectionValue';
 

@@ -11,6 +11,15 @@ import { useGitHub } from './providers/github';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
 import { FeatureFlags } from '@/utils/featureFlags';
 import { apiSelector } from '@/selectors';
+import { UsedTokenSetsMap } from '@/types';
+
+type PullTokensOptiosn = {
+  context?: ContextObject,
+  featureFlags?: FeatureFlags,
+  usedTokenSet?: UsedTokenSetsMap | null
+};
+
+// @TODO typings and hooks
 
 export default function useRemoteTokens() {
   const dispatch = useDispatch<Dispatch>();
@@ -23,7 +32,7 @@ export default function useRemoteTokens() {
   } = useGitHub();
   const { pullTokensFromURL } = useURL();
 
-  const pullTokens = async ({ context = api, featureFlags, usedTokenSet }: { context?: ContextObject, featureFlags?: FeatureFlags, usedTokenSet?: string[] | null }) => {
+  const pullTokens = async ({ context = api, featureFlags, usedTokenSet }: PullTokensOptiosn) => {
     track('pullTokens', { provider: context.provider });
 
     dispatch.uiState.startJob({
@@ -52,7 +61,7 @@ export default function useRemoteTokens() {
 
     if (tokenValues) {
       dispatch.tokenState.setLastSyncedState(JSON.stringify(tokenValues.values, null, 2));
-      dispatch.tokenState.setTokenData({ ...tokenValues, usedTokenSet });
+      dispatch.tokenState.setTokenData({ ...tokenValues, usedTokenSet: usedTokenSet ?? {} });
       track('Launched with token sets', {
         count: Object.keys(tokenValues.values).length,
         setNames: Object.keys(tokenValues.values),
