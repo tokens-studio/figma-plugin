@@ -8,19 +8,22 @@ import Label from './Label';
 import { ignoreFirstPartForStylesSelector } from '@/selectors';
 import Stack from './Stack';
 import Box from './Box';
+import AddLicenseKey from './AddLicenseKey/AddLicenseKey';
 
 function SyncSettings() {
   const ignoreFirstPartForStyles = useSelector(ignoreFirstPartForStylesSelector);
   const dispatch = useDispatch<Dispatch>();
 
-  const handleIgnoreChange = React.useCallback((bool: boolean) => {
-    dispatch.settings.setIgnoreFirstPartForStyles(bool);
-  }, [dispatch.settings]);
+  const handleIgnoreChange = React.useCallback(
+    (bool: boolean) => {
+      dispatch.settings.setIgnoreFirstPartForStyles(bool);
+    },
+    [dispatch.settings],
+  );
 
   return (
     <Box css={{ padding: '$4' }}>
       <Stack direction="column" gap={4}>
-
         <Heading>Styles</Heading>
         <Stack direction="column" gap={2}>
           <Stack direction="row" gap={2} align="center">
@@ -34,6 +37,7 @@ function SyncSettings() {
           </Stack>
         </Stack>
       </Stack>
+      <AddLicenseKey />
     </Box>
   );
 }

@@ -25,6 +25,7 @@ type Props = {
   max?: number;
   isMasked?: boolean;
   onChange?: React.ChangeEventHandler<HTMLInputElement>;
+  disabled?: boolean;
 };
 
 const StyledIcon = styled('div', {
@@ -126,6 +127,7 @@ const Input: React.FC<Props> = ({
   placeholder = '',
   capitalize = false,
   isMasked = false,
+  disabled = false,
 }) => {
   // if isMasked is true, then we need to handle toggle visibility
   const [show, setShow] = React.useState(false);
@@ -167,6 +169,7 @@ const Input: React.FC<Props> = ({
           placeholder={placeholder}
           hasPrefix={!!prefix}
           hasSuffix={!!isMasked}
+          disabled={disabled}
         />
 
         {isMasked && (

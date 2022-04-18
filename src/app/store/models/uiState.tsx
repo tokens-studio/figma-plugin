@@ -4,19 +4,22 @@ import { StorageType, StorageProviderType, ApiDataType } from '@/types/api';
 import { track } from '@/utils/analytics';
 import type { RootModel } from '@/types/RootModel';
 import fetchChangelog from '@/utils/storyblok';
+import fetchEntitlementsForLicense from '@/utils/fetchEntitlementsForLicense';
 import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 import { postToFigma } from '@/plugin/notifiers';
 import { MessageToPluginTypes } from '@/types/messages';
 import { SingleToken } from '@/types/tokens';
 import { SelectionGroup, StoryblokStory } from '@/types';
 import { Tabs } from '@/constants/Tabs';
-import { FeatureFlags } from '@/utils/featureFlags';
+import { FeatureFlags, FeatureKey } from '@/utils/featureFlags';
 
 type DisplayType = 'GRID' | 'LIST';
 
 type SelectionValue = NodeTokenRefMap;
 
-export type EditTokenObject = SingleToken<true, {
+export type EditTokenObject = SingleToken<
+true,
+{
   initialName: string;
   path: string;
   isPristine: boolean;
@@ -26,13 +29,14 @@ export type EditTokenObject = SingleToken<true, {
   schema?: object;
   optionsSchema: object;
   options: object;
-}>;
+}
+>;
 
 export type ConfirmProps = {
   show?: boolean;
   text?: string;
   description?: string;
-  choices?: { key: string; label: string; enabled?: boolean, unique?: boolean }[];
+  choices?: { key: string; label: string; enabled?: boolean; unique?: boolean }[];
   confirmAction?: string;
   input?: {
     type: 'text';
@@ -60,9 +64,9 @@ export type BackgroundJob = {
   totalTasks?: number;
 };
 export interface UIState {
-  backgroundJobs: BackgroundJob[]
+  backgroundJobs: BackgroundJob[];
   selectionValues: SelectionGroup[];
-  mainNodeSelectionValues: SelectionValue
+  mainNodeSelectionValues: SelectionValue;
   displayType: DisplayType;
   disabled: boolean;
   activeTab: Tabs;
@@ -82,7 +86,9 @@ export interface UIState {
   showEmptyGroups: boolean;
   collapsed: boolean;
   selectedLayers: number;
-  featureFlags: FeatureFlags
+  featureFlags: FeatureFlags;
+  userId: string | null;
+  licenseKey: string | undefined;
 }
 
 const defaultConfirmState: ConfirmProps = {
@@ -95,7 +101,7 @@ const defaultConfirmState: ConfirmProps = {
 };
 
 export const uiState = createModel<RootModel>()({
-  state: {
+  state: ({
     selectionValues: [] as SelectionGroup[],
     mainNodeSelectionValues: {} as SelectionValue,
     disabled: false,
@@ -125,7 +131,9 @@ export const uiState = createModel<RootModel>()({
     collapsed: false,
     selectedLayers: 0,
     featureFlags: {},
-  } as unknown as UIState,
+    userId: null,
+    licenseKey: null,
+  } as unknown) as UIState,
   reducers: {
     setShowPushDialog: (state, data: string | false) => ({
       ...state,
@@ -203,9 +211,7 @@ export const uiState = createModel<RootModel>()({
     completeJob(state, name: string) {
       return {
         ...state,
-        backgroundJobs: state.backgroundJobs.filter((job) => (
-          job.name !== name
-        )),
+        backgroundJobs: state.backgroundJobs.filter((job) => job.name !== name),
       };
     },
     clearJobs(state) {
@@ -281,9 +287,31 @@ export const uiState = createModel<RootModel>()({
       };
     },
     setFeatureFlags(state, payload: FeatureFlags) {
+      if (!payload) {
+        return {
+          ...state,
+          featureFlags: {} as FeatureFlags,
+        };
+      }
+      const mergedFlags = {
+        ...state.featureFlags,
+        ...payload,
+      } as FeatureFlags;
       return {
         ...state,
-        featureFlags: payload,
+        featureFlags: mergedFlags,
+      };
+    },
+    setUserId(state, payload: string) {
+      return {
+        ...state,
+        userId: payload,
+      };
+    },
+    setLicenseKey(state, payload: string) {
+      return {
+        ...state,
+        licenseKey: payload,
       };
     },
     addJobTasks(state, payload: AddJobTasksPayload) {
@@ -293,9 +321,11 @@ export const uiState = createModel<RootModel>()({
           if (job.name === payload.name) {
             return {
               ...job,
-              ...(payload.expectedTimePerTask ? {
-                timePerTask: payload.expectedTimePerTask,
-              } : {}),
+              ...(payload.expectedTimePerTask
+                ? {
+                  timePerTask: payload.expectedTimePerTask,
+                }
+                : {}),
               completedTasks: job.completedTasks ?? 0,
               totalTasks: (job.totalTasks ?? 0) + payload.count,
             };
@@ -314,7 +344,7 @@ export const uiState = createModel<RootModel>()({
               ...job,
               timePerTask: payload.timePerTask ?? job.timePerTask,
               completedTasks: totalCompletedTasks,
-              totalTasks: (job.totalTasks ?? totalCompletedTasks),
+              totalTasks: job.totalTasks ?? totalCompletedTasks,
             };
           }
           return job;
@@ -341,6 +371,19 @@ export const uiState = createModel<RootModel>()({
         type: MessageToPluginTypes.SET_SHOW_EMPTY_GROUPS,
         showEmptyGroups: payload == null ? rootState.uiState.showEmptyGroups : payload,
       });
+    },
+    setLicenseKey: async (payload) => {
+      const entitlements = await fetchEntitlementsForLicense(payload);
+      if (!entitlements) {
+        // TODO: Handle the conflict with other flags
+        dispatch.uiState.setFeatureFlags(null);
+      } else {
+        const featureFlags = entitlements.reduce((acc: FeatureFlags, curr: FeatureKey) => {
+          acc![curr] = true;
+          return acc;
+        }, {} as FeatureFlags);
+        dispatch.uiState.setFeatureFlags(featureFlags);
+      }
     },
   }),
 });

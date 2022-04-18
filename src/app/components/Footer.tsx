@@ -5,39 +5,41 @@ import DocsIcon from '@/icons/docs.svg';
 import FeedbackIcon from '@/icons/feedback.svg';
 import Text from '@/app/components/Text';
 import Stack from './Stack';
+import GoPremium from './GoPremium/GoPremium';
 
 export default function Footer() {
   return (
-    <Box css={{
-      display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0, padding: '$4',
-    }}
+    <Box
+      css={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        flexShrink: 0,
+        padding: '$4',
+      }}
     >
       <Box css={{ color: '$textMuted', fontSize: '$xsmall' }}>
         Version
-        {' '}
         {pjs.plugin_version}
       </Box>
-      <Stack direction="row" gap={4}>
+      <Stack direction="row" gap={4} align="center">
+        <GoPremium />
         <Text size="xsmall">
-          <a
-            href="https://docs.tokens.studio/?ref=pf"
-            target="_blank"
-            rel="noreferrer"
-          >
+          <a href="https://docs.tokens.studio/?ref=pf" target="_blank" rel="noreferrer">
             <Stack direction="row" gap={1}>
-              <Box as="span" css={{ color: '$textMuted' }}>Docs</Box>
+              <Box as="span" css={{ color: '$textMuted' }}>
+                Docs
+              </Box>
               <DocsIcon />
             </Stack>
           </a>
         </Text>
         <Text size="xsmall">
-          <a
-            href="https://github.com/six7/figma-tokens"
-            target="_blank"
-            rel="noreferrer"
-          >
+          <a href="https://github.com/six7/figma-tokens" target="_blank" rel="noreferrer">
             <Stack direction="row" gap={1}>
-              <Box as="span" css={{ color: '$textMuted' }}>Feedback</Box>
+              <Box as="span" css={{ color: '$textMuted' }}>
+                Feedback
+              </Box>
               <FeedbackIcon />
             </Stack>
           </a>

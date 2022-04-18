@@ -139,6 +139,13 @@ export function notifyUserId(user: UserIdFromPluginMessage['user']) {
   });
 }
 
+export function notifyLicenseKey(licenseKey: string) {
+  postToUI({
+    type: MessageFromPluginTypes.LICENSE_KEY,
+    licenseKey,
+  });
+}
+
 export function notifyLastOpened(lastOpened: number) {
   postToUI({
     type: MessageFromPluginTypes.RECEIVED_LAST_OPENED,

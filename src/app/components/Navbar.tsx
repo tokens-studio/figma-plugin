@@ -17,6 +17,7 @@ import { Tabs } from '@/constants/Tabs';
 import Stack from './Stack';
 import { TabButton } from './TabButton';
 import { NavbarUndoButton } from './NavbarUndoButton';
+import FeatureAccess from './FeatureAccess/FeatureAccess';
 
 const transformProviderName = (provider: StorageProviderType) => {
   switch (provider) {
@@ -63,7 +64,9 @@ export const Navbar: React.FC = () => {
       <Stack gap={0} direction="row" align="center" justify="between" css={{ width: '100%' }}>
         <div>
           <TabButton name={Tabs.TOKENS} label="Tokens" />
-          <TabButton name={Tabs.INSPECTOR} label="Inspect" />
+          <FeatureAccess feature="INSPECT_TOKENS">
+            <TabButton name={Tabs.INSPECTOR} label="Inspect" />
+          </FeatureAccess>
           <TabButton name={Tabs.SYNCSETTINGS} label="Sync" />
           <TabButton name={Tabs.SETTINGS} label="Settings" />
         </div>
