@@ -141,7 +141,11 @@ export const settings = createModel<RootModel>()({
       });
     },
     setMinimizePluginWindow: (payload, rootState) => {
-      setUI(rootState.settings);
+      postToFigma({
+        type: MessageToPluginTypes.RESIZE_WINDOW,
+        width: payload.isMinimized ? 400 : payload.width,
+        height: payload.isMinimized ? 50 : payload.height,
+      });
     },
     setUpdateStyles: (payload, rootState) => {
       setUI(rootState.settings);
