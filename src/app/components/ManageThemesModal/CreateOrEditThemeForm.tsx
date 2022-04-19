@@ -1,8 +1,8 @@
 import React, { useCallback, useMemo } from 'react';
 import { useForm, Controller } from 'react-hook-form';
-import { useSelector } from 'react-redux';
+import { useSelector, useStore } from 'react-redux';
 import Input from '../Input';
-import { allTokenSetsSelector } from '@/selectors';
+import { allTokenSetsSelector, usedTokenSetSelector } from '@/selectors';
 import { StyledNameInputBox } from './StyledNameInputBox';
 import { tokenSetListToTree, tokenSetListToList, TreeItem } from '@/utils/tokenset';
 import { useIsGithubMultiFileEnabled } from '@/app/hooks/useIsGithubMultiFileEnabled';
@@ -24,7 +24,11 @@ type Props = {
 };
 
 export const CreateOrEditThemeForm: React.FC<Props> = ({ defaultValues, onSubmit }) => {
+  const store = useStore();
   const githubMfsEnabled = useIsGithubMultiFileEnabled();
+  const selectedTokenSets = useMemo(() => (
+    usedTokenSetSelector(store.getState())
+  ), [store]);
   const availableTokenSets = useSelector(allTokenSetsSelector);
 
   const treeOrListItems = useMemo(() => (
@@ -35,7 +39,7 @@ export const CreateOrEditThemeForm: React.FC<Props> = ({ defaultValues, onSubmit
 
   const { register, handleSubmit, control } = useForm<FormValues>({
     defaultValues: {
-      tokenSets: {},
+      tokenSets: { ...selectedTokenSets },
       ...defaultValues,
     },
   });
