@@ -8,11 +8,10 @@ import { NodeTokenRefMap } from './NodeTokenRefMap';
 import { UpdateMode } from './state';
 import { SelectionGroup } from './SelectionGroup';
 import { SelectionValue } from './SelectionValue';
-import { AnyTokenList, AnyTokenSet } from './tokens';
+import { AnyTokenList, AnyTokenSet, TokenStore } from './tokens';
 import { PullStyleOptions } from './PullStylesOptions';
-// import {
-//   PullStyleTypes, SelectionGroup, SelectionValue, TokenArrayGroup, TokenGroup,
-// } from './tokens';
+import { UsedTokenSetsMap } from './UsedTokenSetsMap';
+import { NodeInfo } from './NodeInfo';
 
 export enum MessageFromPluginTypes {
   SELECTION = 'selection',
@@ -91,8 +90,7 @@ export type RemoteCommentsFromPluginMessage = {
 };
 export type TokenValuesFromPluginMessage = {
   type: MessageFromPluginTypes.TOKEN_VALUES;
-  values?: any;
-  usedTokenSet?: string[];
+  values: TokenStore;
 };
 export type ReceivedStorageTypeFromPluginMessage = {
   type: MessageFromPluginTypes.RECEIVED_STORAGE_TYPE;
@@ -144,6 +142,7 @@ export type ApiCredentialsFromPluginMessage = {
     internalId?: string;
   };
   featureFlagId: string;
+  usedTokenSet?: UsedTokenSetsMap | null;
 };
 export type PostToUIMessage =
   | NoSelectionFromPluginMessage
@@ -183,10 +182,10 @@ export type CredentialsToPluginMessage = {
 export type UpdateToPluginMessage = {
   type: MessageToPluginTypes.UPDATE;
   tokenValues: AnyTokenSet;
-  tokens: AnyTokenList;
+  tokens: AnyTokenList | null;
   updatedAt: string;
   settings: SettingsState;
-  usedTokenSet: string[];
+  usedTokenSet: UsedTokenSetsMap;
 };
 export type CreateStylesToPluginMessage = {
   type: MessageToPluginTypes.CREATE_STYLES;
@@ -241,7 +240,7 @@ export type RemapTokensToPluginMessage = {
 };
 export type RemoveTokensByValueToPluginMessage = {
   type: MessageToPluginTypes.REMOVE_TOKENS_BY_VALUE;
-  tokensToRemove: { nodes: string[]; property: Properties }[];
+  tokensToRemove: { nodes: NodeInfo[]; property: Properties }[];
 };
 export type ChangedTabsToPluginMessage = {
   type: MessageToPluginTypes.CHANGED_TABS;

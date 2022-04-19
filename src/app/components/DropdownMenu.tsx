@@ -74,5 +74,4 @@ export const DropdownMenuTrigger = StyledDropdownMenuTrigger;
 export const DropdownMenuSeparator = StyledDropdownMenuSeparator;
 export const DropdownMenuItem = StyledDropdownMenuItem;
 export const DropdownMenuItemIndicator = StyledDropdownMenuItemIndicator;
-export const DropdownMenuItemIndiDropdownMenuItemcator = StyledDropdownMenuItemIndicator;
 export const DropdownMenu = DropdownMenuPrimitive.Root;

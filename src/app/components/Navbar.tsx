@@ -15,6 +15,7 @@ import {
   projectURLSelector,
   storageTypeSelector,
   tokensSelector,
+  usedTokenSetSelector,
   windowSizeSelector,
 } from '@/selectors';
 import { Tabs } from '@/constants/Tabs';
@@ -44,6 +45,8 @@ export const Navbar: React.FC = () => {
   const editProhibited = useSelector(editProhibitedSelector);
   const lastSyncedState = useSelector(lastSyncedStateSelector);
   const windowSize = useSelector(windowSizeSelector);
+  const usedTokenSet = useSelector(usedTokenSetSelector);
+
   const { pullTokens, pushTokens } = useRemoteTokens();
 
   const dispatch = useDispatch<Dispatch>();
@@ -133,7 +136,7 @@ export const Navbar: React.FC = () => {
             )}
 
             <Tooltip variant="right" label={`Pull from ${transformProviderName(storageType.provider)}`}>
-              <button onClick={() => pullTokens()} type="button" className="button button-ghost">
+              <button onClick={() => pullTokens({ usedTokenSet })} type="button" className="button button-ghost">
                 <Icon name="refresh" />
               </button>
             </Tooltip>

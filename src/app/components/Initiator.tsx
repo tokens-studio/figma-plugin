@@ -82,7 +82,9 @@ export function Initiator() {
             setStorageType({ provider: pluginMessage.storageType });
             break;
           case MessageFromPluginTypes.API_CREDENTIALS: {
-            const { status, credentials, featureFlagId } = pluginMessage;
+            const {
+              status, credentials, featureFlagId, usedTokenSet,
+            } = pluginMessage;
             if (status === true) {
               let receivedFlags;
 
@@ -90,6 +92,7 @@ export function Initiator() {
                 receivedFlags = await fetchFeatureFlags(featureFlagId);
                 if (receivedFlags) {
                   dispatch.uiState.setFeatureFlags(receivedFlags);
+                  track('FeatureFlag', receivedFlags);
                 }
               }
 
@@ -99,7 +102,7 @@ export function Initiator() {
               dispatch.uiState.setApiData(credentials);
               dispatch.uiState.setLocalApiState(credentials);
 
-              await pullTokens(credentials, receivedFlags);
+              await pullTokens({ context: credentials, featureFlags: receivedFlags, usedTokenSet });
               dispatch.uiState.setActiveTab('tokens');
             }
             break;

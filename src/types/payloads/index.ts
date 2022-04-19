@@ -3,3 +3,4 @@ export * from './UpdateTokenPayload';
 export * from './DeleteTokenPayload';
 export * from './SetTokenDataPayload';
 export * from './UpdateDocumentPayload';
+export * from './ToggleManyTokenSetsPayload';
