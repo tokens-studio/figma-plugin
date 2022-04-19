@@ -1,6 +1,5 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { CheckIcon, SizeIcon, MarginIcon } from '@radix-ui/react-icons';
 import convertTokensToObject from '@/utils/convertTokensToObject';
 import Icon from './Icon';
 import Tooltip from './Tooltip';
@@ -70,10 +69,6 @@ export const Navbar: React.FC = () => {
         height: windowSize.height,
         isMinimized: !windowSize.isMinimized,
       });
-      dispatch.settings.setWindowSize({
-        width: windowSize.isMinimized ? windowSize.storedWidth : 400,
-        height: windowSize.isMinimized ? windowSize.storedHeight : 50,
-      });
     }
   }, [dispatch, windowSize]);
 
@@ -105,9 +100,6 @@ export const Navbar: React.FC = () => {
           <TabButton name={Tabs.SYNCSETTINGS} label="Sync" />
           <TabButton name={Tabs.SETTINGS} label="Settings" />
         </div>
-        <StyledButton type="button" onClick={handleMinimize} buttonVariant="primary">
-          {windowSize && !windowSize.isMinimized ? <MinimiseIcon /> : <MaximiseIcon />}
-        </StyledButton>
         <NavbarUndoButton />
       </Stack>
       <Stack direction="row" align="center">
@@ -142,6 +134,9 @@ export const Navbar: React.FC = () => {
             </Tooltip>
           </>
         )}
+        <StyledButton type="button" onClick={handleMinimize}>
+          {windowSize && !windowSize.isMinimized ? <MinimiseIcon /> : <MaximiseIcon />}
+        </StyledButton>
       </Stack>
     </Box>
   );

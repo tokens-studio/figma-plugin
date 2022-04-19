@@ -74,7 +74,7 @@ export const settings = createModel<RootModel>()({
       return {
         ...state,
         uiWindow: {
-          width: payload.isMinimized ? 400 : payload.width,
+          width: payload.isMinimized ? 50 : payload.width,
           height: payload.isMinimized ? 50 : payload.height,
           storedWidth: payload.width,
           storedHeight: payload.height,
@@ -143,7 +143,7 @@ export const settings = createModel<RootModel>()({
     setMinimizePluginWindow: (payload, rootState) => {
       postToFigma({
         type: MessageToPluginTypes.RESIZE_WINDOW,
-        width: payload.isMinimized ? 400 : payload.width,
+        width: payload.isMinimized ? 50 : payload.width,
         height: payload.isMinimized ? 50 : payload.height,
       });
     },

@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { styled } from '@/stitches.config';
+import { Dispatch } from '../store';
 import SyncSettings from './SyncSettings';
 import Settings from './Settings';
 import Inspector from './Inspector';
@@ -16,8 +18,22 @@ import PushDialog from './PushDialog';
 import WindowResizer from './WindowResizer';
 import Box from './Box';
 import { activeTabSelector, windowSizeSelector } from '@/selectors';
+import MaximiseIcon from '../assets/maximiseIcon.svg';
+
+const StyledButton = styled('button', {
+  all: 'unset',
+  border: 'none',
+  padding: '$2',
+  marginLeft: '$4',
+  borderRadius: '$button',
+  cursor: 'pointer',
+  '&:hover, &:focus': {
+    boxShadow: 'none',
+  },
+});
 
 function App() {
+  const dispatch = useDispatch<Dispatch>();
   const activeTab = useSelector(activeTabSelector);
   const windowSize = useSelector(windowSizeSelector);
   const [isPluginminimized, setIsPluginminimized] = useState(false);
@@ -26,7 +42,21 @@ function App() {
     if (windowSize) setIsPluginminimized(windowSize.isMinimized);
   }, [windowSize]);
 
-  return (
+  const handleResize = React.useCallback(() => {
+    if (windowSize) {
+      dispatch.settings.setMinimizePluginWindow({
+        width: windowSize.width,
+        height: windowSize.height,
+        isMinimized: !windowSize.isMinimized,
+      });
+    }
+  }, [dispatch, windowSize]);
+
+  return isPluginminimized ? (
+    <StyledButton type="button" onClick={handleResize}>
+      <MaximiseIcon />
+    </StyledButton>
+  ) : (
     <Box css={{ backgroundColor: '$bgDefault' }}>
       <Initiator />
       <LoadingBar />
@@ -39,28 +69,18 @@ function App() {
         }}
         >
           {activeTab !== 'start' && <Navbar />}
-          {!isPluginminimized && (
-          <>
-            {' '}
-            {activeTab === 'start' && <StartScreen />}
-            <Tokens isActive={activeTab === 'tokens'} />
-            {activeTab === 'inspector' && <Inspector />}
-            {activeTab === 'syncsettings' && <SyncSettings />}
-            {activeTab === 'settings' && <Settings />}
-          </>
-          ) }
-
+          {activeTab === 'start' && <StartScreen />}
+          <Tokens isActive={activeTab === 'tokens'} />
+          {activeTab === 'inspector' && <Inspector />}
+          {activeTab === 'syncsettings' && <SyncSettings />}
+          {activeTab === 'settings' && <Settings />}
         </Box>
-        {!isPluginminimized && (
-          <>
-            <Footer />
-            <Changelog />
-            <ImportedTokensDialog />
-            <ConfirmDialog />
-            <PushDialog />
-            <WindowResizer />
-          </>
-        )}
+        <Footer />
+        <Changelog />
+        <ImportedTokensDialog />
+        <ConfirmDialog />
+        <PushDialog />
+        <WindowResizer />
       </Box>
     </Box>
   );
