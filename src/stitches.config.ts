@@ -73,6 +73,13 @@ export const {
       focus: globalTokens.colors.primary300,
       borderSwitch: globalTokens.colors.gray900,
       bgSwitchChecked: globalTokens.colors.gray900,
+      borderBtnDisabled: globalTokens.colors.gray500,
+      bgBtnPrimary: globalTokens.colors.primary500,
+      fgBtnPrimary: globalTokens.colors.white,
+      bgBtnSecondary: globalTokens.colors.white,
+      fgBtnSecondary: globalTokens.colors.gray900,
+      bgBtnGhost: 'transparent',
+      bgHoverBtnGhost: globalTokens.colors.gray200,
     },
     space: {
       1: '2px',

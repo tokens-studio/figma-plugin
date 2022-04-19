@@ -92,7 +92,7 @@ export const ManageThemesModal: React.FC<Props> = () => {
               {typeof themeEditorOpen === 'string' && (
                 <Button
                   data-cy="button-manage-themes-modal-delete-theme"
-                  variant="destructive"
+                  variant="secondary"
                   type="submit"
                   onClick={handleDeleteTheme}
                 >
