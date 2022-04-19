@@ -9,14 +9,17 @@ export function getAliasValue(token: SingleToken | string | number, tokens: Sing
   // @TODO not sure how this will handle typography and boxShadow values. I don't believe it works.
   // The logic was copied from the original function in aliases.tsx
   let returnedValue: string | null = isSingleTokenValueObject(token) ? token.value.toString() : token.toString();
-
   try {
     const tokenReferences = findReferences(returnedValue);
 
     if (tokenReferences?.length) {
       const resolvedReferences = Array.from(tokenReferences).map((ref) => {
         if (ref.length > 1) {
-          const nameToLookFor = ref.startsWith('{') ? ref.slice(1, ref.length - 1) : ref.substring(1);
+          let nameToLookFor: string;
+          if (ref.startsWith('{')) {
+            if (ref.endsWith('}')) nameToLookFor = ref.slice(1, ref.length - 1);
+            else nameToLookFor = ref.slice(1, ref.length);
+          } else nameToLookFor = ref.substring(1);
           // exclude references to  self
           if ((typeof token === 'object' && nameToLookFor === token.name) || nameToLookFor === token) return null;
 
