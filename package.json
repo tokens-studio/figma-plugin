@@ -76,6 +76,7 @@
         "react-error-boundary": "^3.1.1",
         "react-modal": "^3.11.2",
         "react-redux": "^7.2.3",
+        "react-select": "^5.3.0",
         "react-svg-loader": "^3.0.3",
         "react-uid": "^2.3.1",
         "react-window": "^1.8.6",

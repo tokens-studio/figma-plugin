@@ -1,54 +1,47 @@
-import React, { useCallback } from 'react';
-import {
-  DndProvider, useDrop, useDrag, DropTargetMonitor,
-} from 'react-dnd';
-import { HTML5Backend } from 'react-dnd-html5-backend';
-import { XYCoord } from 'dnd-core';
-import { debounce } from 'lodash';
+import React, { useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import { CompositionTokenSingleValue } from '@/types/propertyTypes';
 import { checkIfContainsAlias, getAliasValue } from '@/utils/alias';
 import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
-
 import IconMinus from '@/icons/minus.svg';
 import IconPlus from '@/icons/plus.svg';
-import IconGrabber from '@/icons/grabber.svg';
-
+import { tokensSelector } from '@/selectors';
 import Heading from './Heading';
 import IconButton from './IconButton';
 import Box from './Box';
-import Input from './Input';
-
-interface DragItem {
-  index: number;
-  id: string;
-  type: string;
-}
-
-enum ItemTypes {
-  CARD = 'card',
-}
+import SelectableInput from './SelectableInput';
+import propertyOptions from '../../config/properties.js';
 
 function SingleStyleInput({
-  value,
-  isMultiple = false,
   index,
-  id,
   styleItem,
   resolvedTokens,
   tokenType,
   setValue,
   onRemove,
 }: {
-  value: CompositionTokenSingleValue | CompositionTokenSingleValue[];
-  isMultiple?: boolean;
   index: number;
-  id: string;
-  shadowItem: CompositionTokenSingleValue;
+  styleItem: CompositionTokenSingleValue | CompositionTokenSingleValue[];
   resolvedTokens: ResolveTokenValuesResult[];
   tokenType: string;
   setValue: (property: CompositionTokenSingleValue | CompositionTokenSingleValue[]) => void;
   onRemove: (index: number) => void;
 }) {
+  const tokens = useSelector(tokensSelector);
+  const properties: object[] = [];
+
+  useEffect(() => {
+    console.log('prope', propertyOptions);
+    for (const property in propertyOptions) {
+      const tempObject = {
+        value: property,
+        label: property,
+      };
+      properties.push(tempObject);
+    }
+    console.log('pro', properties);
+  }, []);
+
   const resolvedValue = React.useMemo(() => {
     if (styleItem) {
       return typeof styleItem.value === 'object'
@@ -58,112 +51,69 @@ function SingleStyleInput({
     return null;
   }, [styleItem, resolvedTokens]);
 
-  const onChange = (e) => {
-    if (Array.isArray(value)) {
-      const values = value;
-      const newStyle = { ...value[index], [e.target.name]: e.target.value };
+  const onPropertyChange = (e) => {
+    if (Array.isArray(styleItem)) {
+      const values = styleItem;
+      const newStyle = { ...styleItem[index], property: e.value };
       values.splice(index, 1, newStyle);
 
       setValue(values);
     } else {
-      setValue({ ...value, [e.target.name]: e.target.value });
+      setValue({ ...styleItem, property: e.value });
     }
   };
 
-  const onMoveDebounce = (dragIndex, hoverIndex) => {
-    const values = value;
-    const dragItem = values[dragIndex];
-    values.splice(dragIndex, 1);
-    values.splice(hoverIndex, 0, dragItem);
-    onChange({ ...value, value: values });
+  const onValueChange = (e) => {
+    if (Array.isArray(styleItem)) {
+      const values = styleItem;
+      const newStyle = { ...styleItem[index], value: e.value };
+      values.splice(index, 1, newStyle);
+
+      setValue(values);
+    } else {
+      setValue({ ...styleItem, value: e.value });
+    }
   };
-  const onMove = useCallback(debounce(onMoveDebounce, 300), [value]);
-
-  const ref = React.useRef<HTMLDivElement>(null);
-
-  const [{ handlerId }, drop] = useDrop({
-    accept: ItemTypes.CARD,
-    collect(monitor) {
-      return {
-        handlerId: monitor.getHandlerId(),
-      };
-    },
-    hover(item: DragItem, monitor: DropTargetMonitor) {
-      if (!ref.current) {
-        return;
-      }
-      const dragIndex = item.index;
-      const hoverIndex = index;
-
-      if (dragIndex === hoverIndex) {
-        return;
-      }
-
-      const hoverBoundingRect = ref.current?.getBoundingClientRect();
-
-      const hoverMiddleY = (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
-
-      const clientOffset = monitor.getClientOffset();
-
-      const hoverClientY = (clientOffset as XYCoord).y - hoverBoundingRect.top;
-
-      if (dragIndex < hoverIndex && hoverClientY < hoverMiddleY) {
-        return;
-      }
-
-      if (dragIndex > hoverIndex && hoverClientY > hoverMiddleY) {
-        return;
-      }
-
-      onMove(dragIndex, hoverIndex);
-
-      item.index = hoverIndex;
-    },
-  });
-
-  const [{ isDragging }, drag, preview] = useDrag({
-    item: {
-      type: ItemTypes.CARD,
-      item: () => ({ id, index }),
-      index,
-    },
-    collect: (monitor: any) => ({
-      isDragging: monitor.isDragging(),
-    }),
-  });
-
-  drag(drop(ref));
 
   return (
-    <Box
-      css={{
-        display: 'flex', justifyContent: 'space-between', alignItems: 'center', opacity: isDragging ? 0 : 1,
+    <Box>
+      <Box css={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        '& > label:nth-child(1)': {
+          flex: 1,
+          marginRight: '$5',
+        },
+        '& > label:nth-child(2)': {
+          flex: 2,
+          marginRight: '$5',
+        },
       }}
-      ref={ref}
-    >
-      {isMultiple && (
-      <Box css={{ display: 'flex', width: '$space$8' }}>
-        <IconButton tooltip="Click to drag" icon={<IconGrabber />} data-handler-id={handlerId} />
+      >
+
+        <SelectableInput
+          name="property"
+          data={properties}
+          defaultData={styleItem.property}
+          onChange={onPropertyChange}
+          required
+        />
+        <SelectableInput
+          name="value"
+          defaultData={styleItem.value}
+          onChange={onValueChange}
+          required
+        />
+
+        <Box css={{ width: '$5', marginRight: '$3' }}>
+          <IconButton
+            tooltip="Remove this style"
+            dataCy="button-style-remove-multiple"
+            onClick={() => onRemove(index)}
+            icon={<IconMinus />}
+          />
+        </Box>
       </Box>
-      )}
-      <Input
-        label="property"
-        type="text"
-        name="property"
-        value={styleItem.property}
-        onChange={onChange}
-        full
-        required
-      />
-      <Input
-        label="value"
-        type="text"
-        name="value"
-        value={styleItem.value}
-        onChange={onChange}
-        full
-        required
-      />
       {checkIfContainsAlias(styleItem.value) && (
         <div className="flex p-2 mt-2 font-mono text-gray-700 bg-gray-100 border-gray-300 rounded text-xxs itms-center">
           {tokenType === 'color' ? (
@@ -174,14 +124,6 @@ function SingleStyleInput({
           ) : null}
           {resolvedValue}
         </div>
-      )}
-      {isMultiple && (
-      <IconButton
-        tooltip="Remove this style"
-        dataCy="button-style-remove-multiple"
-        onClick={() => onRemove(index)}
-        icon={<IconMinus />}
-      />
       )}
     </Box>
   );
@@ -219,7 +161,7 @@ export default function CompositionTokenForm({
   return (
     <div>
       <Box css={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Heading size="small">Composition Tokens</Heading>
+        <Heading size="small">Tokens</Heading>
         <IconButton
           tooltip="Add another style"
           dataCy="button-style-add-multiple"
@@ -228,33 +170,26 @@ export default function CompositionTokenForm({
         />
       </Box>
       <Box css={{ display: 'flex', flexDirection: 'column', gap: '$4' }}>
-        <DndProvider backend={HTML5Backend}>
-          {Array.isArray(value) ? (
-            value.map((style, index) => (
-              <SingleStyleInput
-                value={value}
-                isMultiple
-                index={index}
-                styleItem={style}
-                id={index}
-                key={`single-style-${index}`}
-                resolvedTokens={resolvedTokens}
-                tokenType={tokenType}
-                setValue={setValue}
-                onRemove={(index) => removeStyle(index)}
-              />
-            ))
-          ) : (
+        {Array.isArray(value) ? (
+          value.map((style, index) => (
             <SingleStyleInput
-              setValue={setValue}
-              styleItem={value}
-              index={0}
-              value={value}
+              index={index}
+              styleItem={style}
+              key={`single-style-${index}`}
               resolvedTokens={resolvedTokens}
               tokenType={tokenType}
+              setValue={setValue}
+              onRemove={(index) => removeStyle(index)}
             />
-          )}
-        </DndProvider>
+          ))
+        ) : (
+          <SingleStyleInput
+            styleItem={value}
+            resolvedTokens={resolvedTokens}
+            tokenType={tokenType}
+            setValue={setValue}
+          />
+        )}
       </Box>
     </div>
   );
