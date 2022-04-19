@@ -12,7 +12,7 @@ export default function SingleSelect({
   name: string;
   onChange: React.ChangeEventHandler<HTMLSelectElement>;
   data?: object[];
-  defaultData?: string | Number;
+  defaultData?: object;
   value?: string | Number;
   required: boolean
 }) {
@@ -37,16 +37,19 @@ export default function SingleSelect({
 
   return (
     <Select
-      defaultValue={defaultData}
+      className="basic-single"
+      classNamePrefix="select"
+      // defaultValue={defaultData}
       isDisabled={false}
       isLoading={false}
-      isClearable
+      isClearable={false}
       isRtl={false}
       isSearchable
       name={name}
       options={data}
       onChange={onChange}
       styles={selectStyles}
+      value={defaultData}
     />
   );
 }

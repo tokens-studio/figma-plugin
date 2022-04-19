@@ -15,33 +15,24 @@ import propertyOptions from '../../config/properties.js';
 function SingleStyleInput({
   index,
   styleItem,
+  tokens,
   resolvedTokens,
   tokenType,
+  properties,
+  tokenValues,
   setValue,
   onRemove,
 }: {
   index: number;
-  styleItem: CompositionTokenSingleValue | CompositionTokenSingleValue[];
+  styleItem: CompositionTokenSingleValue;
+  tokens: CompositionTokenSingleValue | CompositionTokenSingleValue[];
   resolvedTokens: ResolveTokenValuesResult[];
   tokenType: string;
+  properties: object[],
+  tokenValues: object[],
   setValue: (property: CompositionTokenSingleValue | CompositionTokenSingleValue[]) => void;
   onRemove: (index: number) => void;
 }) {
-  const tokens = useSelector(tokensSelector);
-  const properties: object[] = [];
-
-  useEffect(() => {
-    console.log('prope', propertyOptions);
-    for (const property in propertyOptions) {
-      const tempObject = {
-        value: property,
-        label: property,
-      };
-      properties.push(tempObject);
-    }
-    console.log('pro', properties);
-  }, []);
-
   const resolvedValue = React.useMemo(() => {
     if (styleItem) {
       return typeof styleItem.value === 'object'
@@ -52,39 +43,46 @@ function SingleStyleInput({
   }, [styleItem, resolvedTokens]);
 
   const onPropertyChange = (e) => {
-    if (Array.isArray(styleItem)) {
-      const values = styleItem;
-      const newStyle = { ...styleItem[index], property: e.value };
+    if (Array.isArray(tokens)) {
+      const values = tokens;
+      const newStyle = { ...tokens[index], property: e.value };
       values.splice(index, 1, newStyle);
-
       setValue(values);
     } else {
-      setValue({ ...styleItem, property: e.value });
+      setValue({ ...tokens, property: e.value });
     }
   };
 
   const onValueChange = (e) => {
-    if (Array.isArray(styleItem)) {
-      const values = styleItem;
-      const newStyle = { ...styleItem[index], value: e.value };
+    if (Array.isArray(tokens)) {
+      const values = tokens;
+      const newStyle = { ...tokens[index], value: e.value };
       values.splice(index, 1, newStyle);
-
+      console.log('values', values);
       setValue(values);
     } else {
-      setValue({ ...styleItem, value: e.value });
+      console.log('styleItem', styleItem, '{ ...styleItem, value: e.value }', { ...styleItem, value: e.value });
+      setValue({ ...tokens, value: e.value });
     }
   };
-
+  const defaultProperty = {
+    value: styleItem.property,
+    label: styleItem.property,
+  };
+  const defaultValue = {
+    value: styleItem.value,
+    label: styleItem.value,
+  };
   return (
     <Box>
       <Box css={{
         display: 'flex',
         justifyContent: 'space-between',
-        '& > label:nth-child(1)': {
+        '& > div:nth-child(1)': {
           flex: 1,
           marginRight: '$5',
         },
-        '& > label:nth-child(2)': {
+        '& > div:nth-child(2)': {
           flex: 2,
           marginRight: '$5',
         },
@@ -94,13 +92,14 @@ function SingleStyleInput({
         <SelectableInput
           name="property"
           data={properties}
-          defaultData={styleItem.property}
+          defaultData={defaultProperty}
           onChange={onPropertyChange}
           required
         />
         <SelectableInput
           name="value"
-          defaultData={styleItem.value}
+          data={tokenValues}
+          defaultData={defaultValue}
           onChange={onValueChange}
           required
         />
@@ -114,17 +113,6 @@ function SingleStyleInput({
           />
         </Box>
       </Box>
-      {checkIfContainsAlias(styleItem.value) && (
-        <div className="flex p-2 mt-2 font-mono text-gray-700 bg-gray-100 border-gray-300 rounded text-xxs itms-center">
-          {tokenType === 'color' ? (
-            <div
-              className="w-4 h-4 mr-1 border border-gray-200 rounded"
-              style={{ background: resolvedValue }}
-            />
-          ) : null}
-          {resolvedValue}
-        </div>
-      )}
     </Box>
   );
 }
@@ -132,6 +120,8 @@ function SingleStyleInput({
 const newToken: CompositionTokenSingleValue = {
   property: '', value: '',
 };
+const properties: object[] = [];
+const tokenValues: object[] = [];
 
 export default function CompositionTokenForm({
   value,
@@ -144,17 +134,50 @@ export default function CompositionTokenForm({
   resolvedTokens: ResolveTokenValuesResult[];
   tokenType: string
 }) {
+  const tokens = useSelector(tokensSelector);
+
+  useEffect(() => {
+    makePropertisMenu();
+    makeTokensMenu();
+  }, []);
+
+  const makePropertisMenu = () => {
+    for (const property in propertyOptions) {
+      const tempObject = {
+        value: property,
+        label: property,
+      };
+      properties.push(tempObject);
+    }
+  };
+
+  const makeTokensMenu = () => {
+    for (const key in tokens) {
+      for (let index = 0; index < tokens[key].length; index++) {
+        const tempObject = {
+          value: tokens[key][index].name,
+          label: tokens[key][index].name,
+        };
+        tokenValues.push(tempObject);
+      }
+    }
+  };
+
   const addStyle = () => {
+    console.log('value', value);
     if (Array.isArray(value)) {
       setValue([...value, newToken]);
     } else {
+      console.log('[value, newToken]', [value, newToken]);
       setValue([value, newToken]);
     }
   };
 
   const removeStyle = (index) => {
+    console.log('value', value);
+    console.log('index', index, 'value.filter((_, i) => i !== index)', value.filter((_, i) => i !== index));
     if (Array.isArray(value)) {
-      setValue(value.filter((_, i) => i !== index));
+      setValue([...value.filter((_, i) => i !== index)]);
     }
   };
 
@@ -175,17 +198,24 @@ export default function CompositionTokenForm({
             <SingleStyleInput
               index={index}
               styleItem={style}
+              tokens={value}
               key={`single-style-${index}`}
               resolvedTokens={resolvedTokens}
               tokenType={tokenType}
+              properties={properties}
+              tokenValues={tokenValues}
               setValue={setValue}
-              onRemove={(index) => removeStyle(index)}
+              onRemove={removeStyle}
             />
           ))
         ) : (
           <SingleStyleInput
+            tokens={value}
             styleItem={value}
+            index={0}
             resolvedTokens={resolvedTokens}
+            properties={properties}
+            tokenValues={tokenValues}
             tokenType={tokenType}
             setValue={setValue}
           />

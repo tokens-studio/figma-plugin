@@ -97,6 +97,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
     (style: SingleCompositionToken['value']) => {
       setError(null);
       if (internalEditToken?.type === TokenTypes.COMPOSITION) {
+        console.log('style', style);
         setInternalEditToken({ ...internalEditToken, value: style });
       }
     },
@@ -241,9 +242,10 @@ function EditTokenForm({ resolvedTokens }: Props) {
         ));
       }
       case 'composition': {
+        const { value } = internalEditToken;
         return (
           <CompositionTokenForm
-            value={internalEditToken.value}
+            value={value}
             setValue={handleCompositionChange}
             resolvedTokens={resolvedTokens}
             tokenType={internalEditToken.type}
