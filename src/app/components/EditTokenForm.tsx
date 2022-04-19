@@ -208,7 +208,6 @@ function EditTokenForm({ resolvedTokens }: Props) {
     if (!internalEditToken) {
       return null;
     }
-
     switch (internalEditToken.type) {
       case 'boxShadow': {
         return <BoxShadowInput setValue={handleShadowChange} value={internalEditToken.value} />;

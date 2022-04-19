@@ -20,8 +20,15 @@ export function getAliasValue(token: SingleToken | string | number, tokens: Sing
           // exclude references to  self
           if ((typeof token === 'object' && nameToLookFor === token.name) || nameToLookFor === token) return null;
 
-          const foundToken = tokens.find((t) => t.name === nameToLookFor);
-          if (foundToken) return getAliasValue(foundToken, tokens);
+          const tokenAliasSplited = nameToLookFor.split('.');
+          const tokenAliasSplitedLast = tokenAliasSplited.pop();
+          const tokenAliasLastExcluded = tokenAliasSplited.join('.');
+          const foundToken = tokens.find((t) => t.name === nameToLookFor || t.name === tokenAliasLastExcluded);
+
+          if (foundToken?.name === nameToLookFor) { return getAliasValue(foundToken, tokens); }
+
+          const candidateProperty = tokenAliasSplitedLast;
+          if (foundToken?.name === tokenAliasLastExcluded && candidateProperty && foundToken.rawValue?.hasOwnProperty(candidateProperty)) return foundToken?.rawValue[candidateProperty];
         }
         return ref;
       });
@@ -39,7 +46,6 @@ export function getAliasValue(token: SingleToken | string | number, tokens: Sing
 
     if (returnedValue) {
       const remainingReferences = findReferences(returnedValue);
-
       if (!remainingReferences) {
         const couldBeNumberValue = checkAndEvaluateMath(returnedValue);
         if (typeof couldBeNumberValue === 'number') return couldBeNumberValue;
@@ -54,6 +60,5 @@ export function getAliasValue(token: SingleToken | string | number, tokens: Sing
   if (returnedValue) {
     return checkAndEvaluateMath(returnedValue);
   }
-
   return returnedValue;
 }
