@@ -97,7 +97,6 @@ function EditTokenForm({ resolvedTokens }: Props) {
     (style: SingleCompositionToken['value']) => {
       setError(null);
       if (internalEditToken?.type === TokenTypes.COMPOSITION) {
-        console.log('style', style);
         setInternalEditToken({ ...internalEditToken, value: style });
       }
     },

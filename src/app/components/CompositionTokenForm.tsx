@@ -58,10 +58,8 @@ function SingleStyleInput({
       const values = tokens;
       const newStyle = { ...tokens[index], value: e.value };
       values.splice(index, 1, newStyle);
-      console.log('values', values);
       setValue(values);
     } else {
-      console.log('styleItem', styleItem, '{ ...styleItem, value: e.value }', { ...styleItem, value: e.value });
       setValue({ ...tokens, value: e.value });
     }
   };
@@ -78,6 +76,7 @@ function SingleStyleInput({
       <Box css={{
         display: 'flex',
         justifyContent: 'space-between',
+        alignItems: 'center',
         '& > div:nth-child(1)': {
           flex: 1,
           marginRight: '$5',
@@ -164,18 +163,14 @@ export default function CompositionTokenForm({
   };
 
   const addStyle = () => {
-    console.log('value', value);
     if (Array.isArray(value)) {
       setValue([...value, newToken]);
     } else {
-      console.log('[value, newToken]', [value, newToken]);
       setValue([value, newToken]);
     }
   };
 
   const removeStyle = (index) => {
-    console.log('value', value);
-    console.log('index', index, 'value.filter((_, i) => i !== index)', value.filter((_, i) => i !== index));
     if (Array.isArray(value)) {
       setValue([...value.filter((_, i) => i !== index)]);
     }
