@@ -154,4 +154,4 @@ const TokenListing: React.FC<Props> = ({
   );
 };
 
-export default React.memo(TokenListing, isEqual);
+export default React.memo(TokenListing);
