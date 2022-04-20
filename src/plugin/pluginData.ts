@@ -52,12 +52,14 @@ export async function sendPluginValues({ nodes, values, shouldSendSelectionValue
   if (!pluginValues) {
     pluginValues = await defaultNodeManager.findNodesWithData({ nodes });
   }
-
+  console.log('pluginValues', pluginValues, 'shouldSendSelectionValues', shouldSendSelectionValues);
   // TODO: Handle all selected nodes share the same properties
   // TODO: Handle many selected and mixed (for Tokens tab)
   if (pluginValues?.length > 0) {
     if (shouldSendSelectionValues) selectionValues = transformPluginDataToSelectionValues(pluginValues);
+    console.log('selectionValues', selectionValues);
     mainNodeSelectionValues = pluginValues.map((value) => value.tokens);
+    console.log('mainNodeSelectionValues', mainNodeSelectionValues);
   }
 
   const selectedNodes = figma.currentPage.selection.length;

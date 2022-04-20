@@ -148,7 +148,6 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
       try {
         if (figma.currentPage.selection.length) {
           const tokensMap = tokenArrayGroupToMap(msg.tokens);
-
           const nodes = await defaultNodeManager.update(figma.currentPage.selection);
           await updatePluginData({ entries: nodes, values: msg.values });
           await sendPluginValues({

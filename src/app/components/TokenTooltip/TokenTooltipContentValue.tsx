@@ -1,11 +1,12 @@
 import React from 'react';
 import { useUIDSeed } from 'react-uid';
 import useTokens from '../../store/useTokens';
-import { SingleToken, SingleTypographyToken } from '@/types/tokens';
+import { SingleToken, SingleTypographyToken, SingleCompositionToken } from '@/types/tokens';
 import { SingleShadowValueDisplay } from './SingleShadowValueDisplay';
 import { TokensContext } from '@/context';
-import { isSingleBoxShadowToken, isSingleTypographyToken } from '@/utils/is';
+import { isSingleBoxShadowToken, isSingleTypographyToken, isSingleCompositionToken } from '@/utils/is';
 import { SingleTypographyValueDisplay } from './SingleTypograhpyValueDisplay';
+import { SingleCompositionValueDisplay } from './SingleCompositionValueDisplay';
 import { TokenBoxshadowValue } from '@/types/values';
 
 type Props = {
@@ -29,6 +30,16 @@ export const TokenTooltipContentValue: React.FC<Props> = ({ token, shouldResolve
       <SingleTypographyValueDisplay
         // @TODO strengthen type checking here
         value={valueToCheck as SingleTypographyToken['value']}
+        shouldResolve={shouldResolve}
+      />
+    );
+  }
+
+  if (isSingleCompositionToken(token)) {
+    return (
+      <SingleCompositionValueDisplay
+        // @TODO strengthen type checking here
+        value={valueToCheck as SingleCompositionToken['value']}
         shouldResolve={shouldResolve}
       />
     );
