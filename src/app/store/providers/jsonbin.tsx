@@ -66,7 +66,6 @@ export async function updateJSONBinTokens({
       null,
       2,
     );
-
     if (oldUpdatedAt) {
       const remoteTokens = await readTokensFromJSONBin({ secret, id });
       const comparison = await compareUpdatedAt(oldUpdatedAt, remoteTokens.updatedAt);

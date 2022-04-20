@@ -12,7 +12,6 @@ export function useSetNodeData() {
 
   const setNodeData = useCallback((data: SelectionValue, resolvedTokens: AnyTokenList) => {
     const settings = settingsStateSelector(store.getState());
-    console.log('setting', settings, 'data', data, 'resolved', resolvedTokens);
     postToFigma({
       type: MessageToPluginTypes.SET_NODE_DATA,
       values: data,

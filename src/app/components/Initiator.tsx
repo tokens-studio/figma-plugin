@@ -64,7 +64,6 @@ export function Initiator() {
           case MessageFromPluginTypes.REMOTE_COMPONENTS:
             break;
           case MessageFromPluginTypes.TOKEN_VALUES: {
-            console.log('TOKEN_VALUES');
             const { values } = pluginMessage;
             if (values) {
               dispatch.tokenState.setTokenData(values);
@@ -73,7 +72,6 @@ export function Initiator() {
             break;
           }
           case MessageFromPluginTypes.STYLES: {
-            console.log('STYLES');
             const { values } = pluginMessage;
             if (values) {
               track('Import styles');
@@ -127,7 +125,6 @@ export function Initiator() {
             break;
           }
           case MessageFromPluginTypes.UI_SETTINGS: {
-            console.log('UI_SETTINGS');
             dispatch.settings.setUISettings(pluginMessage.settings);
             dispatch.settings.triggerWindowChange();
             break;

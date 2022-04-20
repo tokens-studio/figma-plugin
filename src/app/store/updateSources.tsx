@@ -86,7 +86,6 @@ export default async function updateTokensOnSources({
   const mergedTokens = tokens
     ? resolveTokenValues(mergeTokenGroups(tokens, usedTokenSet))
     : null;
-
   postToFigma({
     type: MessageToPluginTypes.UPDATE,
     tokenValues,

@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { CompositionTokenSingleValue } from '@/types/propertyTypes';
-import { checkIfContainsAlias, getAliasValue } from '@/utils/alias';
+import { getAliasValue } from '@/utils/alias';
 import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
 import IconMinus from '@/icons/minus.svg';
 import IconPlus from '@/icons/plus.svg';

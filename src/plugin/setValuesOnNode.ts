@@ -21,6 +21,7 @@ export default async function setValuesOnNode(
       && node.type !== 'STICKY'
       && node.type !== 'CODE_BLOCK'
     ) {
+      console.log('node', node, 'values', values);
       if ('cornerRadius' in node && typeof values.borderRadius !== 'undefined') {
         node.cornerRadius = transformValue(values.borderRadius, 'borderRadius');
       }
@@ -96,10 +97,11 @@ export default async function setValuesOnNode(
           const path = data.typography.split('.'); // extract to helper fn
           const pathname = path.slice(ignoreFirstPartForStyles ? 1 : 0, path.length).join('/');
           const matchingStyle = figmaStyleMaps.textStyles.get(pathname);
-
           if (matchingStyle) {
+            console.log('textif', matchingStyle);
             node.textStyleId = matchingStyle.id;
           } else {
+            console.log('textesle', node, 'values.typ', values.typography);
             setTextValuesOnTarget(node, { value: values.typography });
           }
         }
@@ -114,6 +116,7 @@ export default async function setValuesOnNode(
               || values.textDecoration
       ) {
         if (node.type === 'TEXT') {
+          console.log('TEXT', values);
           setTextValuesOnTarget(node, {
             value: {
               fontFamily: values.fontFamilies,
@@ -126,6 +129,24 @@ export default async function setValuesOnNode(
               textDecoration: values.textDecoration,
             },
           });
+        }
+      }
+
+      // compostion
+      if (values.composition) {
+        console.log('composition', values.composition);
+        if (node.type === 'TEXT') {
+          const path = data.composition.split('.'); // extract to helper fn
+          const pathname = path.slice(ignoreFirstPartForStyles ? 1 : 0, path.length).join('/');
+          const matchingStyle = figmaStyleMaps.textStyles.get(pathname);
+
+          if (matchingStyle) {
+            console.log('composiIF');
+            node.textStyleId = matchingStyle.id;
+          } else {
+            console.log('composELSE');
+            setTextValuesOnTarget(node, { value: values.composition });
+          }
         }
       }
 

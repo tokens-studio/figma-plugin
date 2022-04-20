@@ -3,6 +3,7 @@ import { transformValue } from './helpers';
 
 export default async function setTextValuesOnTarget(target, token) {
   try {
+    console.log('target', target, 'tokens', token);
     const { value, description } = token;
     const {
       fontFamily,
@@ -17,7 +18,7 @@ export default async function setTextValuesOnTarget(target, token) {
     const family = fontFamily || target.fontName.family;
     const style = fontWeight || target.fontName.style;
     await figma.loadFontAsync({ family, style });
-
+    console.log('fontfamily', family, 'style', style);
     if (fontFamily || fontWeight) {
       target.fontName = {
         family,

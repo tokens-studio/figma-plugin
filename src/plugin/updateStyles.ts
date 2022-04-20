@@ -19,15 +19,18 @@ export default function updateStyles(
       value: transformValue(token.value, token.type),
     };
   });
+  console.log('styleTokens', styleTokens);
   const colorTokens = styleTokens.filter((n) => ['color', 'colors'].includes(n.type));
   const textTokens = styleTokens.filter((n) => ['typography'].includes(n.type));
   const effectTokens = styleTokens.filter((n) => ['boxShadow'].includes(n.type));
 
   if (!colorTokens && !textTokens && !effectTokens) return;
   if (colorTokens.length > 0) {
+    console.log('colorTokens', colorTokens, 'shouldCreate', shouldCreate);
     updateColorStyles(colorTokens, shouldCreate);
   }
   if (textTokens.length > 0) {
+    console.log('textTokens', textTokens, 'shouldCreate', shouldCreate);
     updateTextStyles(textTokens, shouldCreate);
   }
   if (effectTokens.length > 0) {

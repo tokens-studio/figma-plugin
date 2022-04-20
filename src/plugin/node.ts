@@ -1,8 +1,12 @@
+import React from 'react';
+import { useSelector } from 'react-redux';
 import omit from 'just-omit';
+import { ResolvedValues } from 'framer-motion';
 import store from './store';
 import setValuesOnNode from './setValuesOnNode';
 import { AnyTokenSet } from '../types/tokens';
 import { ContextObject, StorageProviderType, StorageType } from '../types/api';
+import { mergeTokenGroups, resolveTokenValues, ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
 import * as pjs from '../../package.json';
 import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 import { NodeManagerNode } from './NodeManager';
@@ -18,7 +22,14 @@ import { ProgressTracker } from './ProgressTracker';
 import { AnyTokenList, TokenStore } from '@/types/tokens';
 import { isSingleToken } from '@/utils/is';
 import { UsedTokenSetsMap } from '@/types';
+import { getAliasValue } from '@/utils/alias';
 
+import { TokenSetStatus } from '@/constants/TokenSetStatus';
+import {
+  activeTokenSetSelector,
+  tokensSelector,
+  usedTokenSetSelector,
+} from '@/selectors';
 // @TODO fix typings
 
 export function returnValueToLookFor(key: string) {
@@ -36,12 +47,48 @@ export function returnValueToLookFor(key: string) {
   }
 }
 
+// const activeTokenSet = useSelector(activeTokenSetSelector);
+// const usedTokenSet = useSelector(usedTokenSetSelector);
+// const allTokens = useSelector(tokensSelector);
+
+// const resolvedTokens = React.useMemo(
+//   () => resolveTokenValues(mergeTokenGroups(allTokens, {
+//     ...usedTokenSet,
+//     [activeTokenSet]: TokenSetStatus.ENABLED,
+//   })),
+//   [allTokens, usedTokenSet, activeTokenSet],
+// );
+
 // @TOOD fix object typing
-export function mapValuesToTokens(tokens: Map<string, AnyTokenList[number]>, values: NodeTokenRefMap): object {
+export function mapValuesToTokens(tokens: Map<string, AnyTokenList[number]>, values: NodeTokenRefMap, resolvedTokens: ResolveTokenValuesResult[]): object {
   const mappedValues = Object.entries(values).reduce((acc, [key, tokenOnNode]) => {
+    console.log('tokenONNOde', tokenOnNode);
     const resolvedToken = tokens.get(tokenOnNode);
     if (!resolvedToken) return acc;
-    acc[key] = isSingleToken(resolvedToken) ? resolvedToken[returnValueToLookFor(key)] : resolvedToken;
+    const styleFormated = {};
+    if (isSingleToken(resolvedToken)) {
+      if (key === 'composition') {
+        const temp = resolvedToken[returnValueToLookFor(key)];
+        if (Array.isArray(temp)) {
+          temp.map((t) => {
+            const searchAlias = `{${t.value}}`;
+            const resolvedValue = getAliasValue(searchAlias, resolvedTokens);
+            styleFormated[`${t.property}`] = resolvedValue;
+          });
+        } else {
+          const searchAlias = `{${temp.value}}`;
+          const resolvedValue = getAliasValue(searchAlias, resolvedTokens);
+          styleFormated[`${temp.property}`] = resolvedValue;
+        }
+        // for (const style: object in resolvedToken[returnValueToLookFor(key)]) {
+        //     styleFormated.`${style.property}` = style.value;
+        // }
+        // acc[key] = styleFormated;
+        acc[key] = styleFormated;
+      } else acc[key] = resolvedToken[returnValueToLookFor(key)];
+    } else acc[key] = resolvedToken;
+    // acc[key] = isSingleToken(resolvedToken) ? resolvedToken[returnValueToLookFor(key)] : resolvedToken;
+    console.log('acc[key]', acc[key]);
     return acc;
   }, {});
   return mappedValues;
@@ -117,6 +164,7 @@ export async function updateNodes(
   entries: readonly NodeManagerNode[],
   tokens: Map<string, AnyTokenList[number]>,
   settings?: UpdateNodesSettings,
+  resolvedTokens: ResolveTokenValuesResult[],
 ) {
   const { ignoreFirstPartForStyles } = settings ?? {};
   const figmaStyleMaps = getAllFigmaStyleMaps();
@@ -138,8 +186,7 @@ export async function updateNodes(
       defaultWorker.schedule(async () => {
         try {
           if (entry.tokens) {
-            const mappedValues = mapValuesToTokens(tokens, entry.tokens);
-
+            const mappedValues = mapValuesToTokens(tokens, entry.tokens, resolvedTokens);
             setValuesOnNode(entry.node, mappedValues, entry.tokens, figmaStyleMaps, ignoreFirstPartForStyles);
             store.successfulNodes.add(entry.node);
             returnedValues.add(entry.tokens);
