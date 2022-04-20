@@ -27,7 +27,6 @@ describe('mergeTokenGroups', () => {
     };
 
     const output: SingleToken[] = [
-
       {
         internal__Parent: 'v1',
         type: TokenTypes.COLOR,

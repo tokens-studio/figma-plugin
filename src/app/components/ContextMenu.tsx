@@ -20,7 +20,7 @@ const itemStyles = {
   alignItems: 'center',
   height: 20,
   padding: '0 $2',
-  paddingLeft: '$3',
+  paddingLeft: '$5',
   userSelect: 'none',
 
   '&[data-disabled]': {
@@ -60,7 +60,7 @@ const StyledSeparator = styled(ContextMenuPrimitive.Separator, {
 
 const StyledItemIndicator = styled(ContextMenuPrimitive.ItemIndicator, {
   position: 'absolute',
-  left: 0,
+  left: '$2',
   width: '$5',
   display: 'inline-flex',
   alignItems: 'center',
