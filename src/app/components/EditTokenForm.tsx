@@ -1,8 +1,8 @@
-import React from 'react';
-import {
-  useDispatch, useSelector,
-} from 'react-redux';
+import * as React from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { styled } from '@/stitches.config';
 import { track } from '@/utils/analytics';
+import IconDisclosure from '@/icons/disclosure.svg';
 import { UpdateMode } from '@/types/state';
 import { Dispatch } from '../store';
 import useManageTokens from '../store/useManageTokens';
@@ -14,12 +14,11 @@ import useTokens from '../store/useTokens';
 import { SingleBoxShadowToken } from '@/types/tokens';
 import { checkIfContainsAlias, getAliasValue } from '@/utils/alias';
 import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
-import {
-  activeTokenSetSelector, editTokenSelector,
-} from '@/selectors';
+import { activeTokenSetSelector, editTokenSelector } from '@/selectors';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { EditTokenObject } from '../store/models/uiState';
 import Stack from './Stack';
+import DownshiftInput from './DownshiftInput';
 
 type Props = {
   resolvedTokens: ResolveTokenValuesResult[];
@@ -36,6 +35,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
   const [inputHelperOpen, setInputHelperOpen] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const [internalEditToken, setInternalEditToken] = React.useState<typeof editToken>(editToken);
+  const [showAutoSuggest, setShowAutoSuggest] = React.useState<boolean>(false);
   const { confirm } = useConfirm();
 
   const isValid = React.useMemo(() => internalEditToken?.value && !error, [internalEditToken, error]);
@@ -71,12 +71,15 @@ function EditTokenForm({ resolvedTokens }: Props) {
     setInputHelperOpen(!inputHelperOpen);
   }, [inputHelperOpen]);
 
+  const handleAutoSuggest = React.useCallback(() => setShowAutoSuggest(!showAutoSuggest), [showAutoSuggest]);
+
   const handleChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>(
     (e) => {
       setError(null);
       e.persist();
       if (internalEditToken) {
         setInternalEditToken({ ...internalEditToken, [e.target.name]: e.target.value });
+        setShowAutoSuggest(false);
       }
     },
     [internalEditToken],
@@ -163,9 +166,16 @@ function EditTokenForm({ resolvedTokens }: Props) {
           const shouldRemap = await confirm({
             text: `Remap all tokens that use ${oldName} to ${newName}?`,
             description: 'This will change all layers that used the old token name. This could take a while.',
-            choices: [{ key: UpdateMode.SELECTION, label: 'Selection', unique: true }, {
-              key: UpdateMode.PAGE, label: 'Page', enabled: true, unique: true,
-            }, { key: UpdateMode.DOCUMENT, label: 'Document', unique: true }],
+            choices: [
+              { key: UpdateMode.SELECTION, label: 'Selection', unique: true },
+              {
+                key: UpdateMode.PAGE,
+                label: 'Page',
+                enabled: true,
+                unique: true,
+              },
+              { key: UpdateMode.DOCUMENT, label: 'Document', unique: true },
+            ],
           });
           if (shouldRemap) {
             remapToken(oldName, newName, shouldRemap.data[0]);
@@ -177,13 +187,16 @@ function EditTokenForm({ resolvedTokens }: Props) {
     }
   };
 
-  const handleSubmit = React.useCallback((e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (isValid && internalEditToken) {
-      submitTokenValue(internalEditToken);
-      dispatch.uiState.setShowEditForm(false);
-    }
-  }, [dispatch, isValid, internalEditToken]);
+  const handleSubmit = React.useCallback(
+    (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      if (isValid && internalEditToken) {
+        submitTokenValue(internalEditToken);
+        dispatch.uiState.setShowEditForm(false);
+      }
+    },
+    [dispatch, isValid, internalEditToken],
+  );
 
   const handleReset = React.useCallback(() => {
     dispatch.uiState.setShowEditForm(false);
@@ -194,6 +207,21 @@ function EditTokenForm({ resolvedTokens }: Props) {
       firstInput.current?.focus();
     }, 50);
   }, []);
+
+  const StyledIconDisclosure = styled(IconDisclosure, {
+    width: '16px',
+    height: '16px',
+    transition: 'transform 0.2s ease-in-out',
+  });
+
+  const StyledInputSuffix = styled('button', {
+    width: '28px',
+    height: '28px',
+    backgroundColor: '#f0f0f0',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+  });
 
   const resolvedValue = React.useMemo(() => {
     if (internalEditToken) {
@@ -231,19 +259,17 @@ function EditTokenForm({ resolvedTokens }: Props) {
       default: {
         return (
           <div>
-            <Input
-              full
-              label={internalEditToken.property}
+            <DownshiftInput
               value={internalEditToken.value}
-              onChange={handleChange}
-              type="text"
-              name="value"
-              required
-              custom={internalEditToken.schema}
+              type={internalEditToken.type}
+              label={internalEditToken.property}
+              showAutoSuggest={showAutoSuggest}
+              resolvedTokens={resolvedTokens}
+              handleChange={handleChange}
+              setShowAutoSuggest={setShowAutoSuggest}
+              setInputValue={(newInputValue: string) => setInternalEditToken({ ...internalEditToken, value: newInputValue })}
               placeholder={
-                internalEditToken.type === 'color'
-                  ? '#000000, hsla(), rgba() or {alias}'
-                  : 'Value or {alias}'
+                internalEditToken.type === 'color' ? '#000000, hsla(), rgba() or {alias}' : 'Value or {alias}'
               }
               prefix={
                 internalEditToken.type === 'color' && (
@@ -257,17 +283,20 @@ function EditTokenForm({ resolvedTokens }: Props) {
                   </button>
                 )
               }
+              suffix={(
+                <StyledInputSuffix onClick={handleAutoSuggest}>
+                  <StyledIconDisclosure />
+                </StyledInputSuffix>
+              )}
             />
+
             {inputHelperOpen && internalEditToken.type === 'color' && (
               <ColorPicker value={internalEditToken.value} onChange={handleColorValueChange} />
             )}
             {checkIfContainsAlias(internalEditToken.value) && (
               <div className="flex p-2 mt-2 font-mono text-gray-700 bg-gray-100 border-gray-300 rounded text-xxs itms-center">
                 {internalEditToken.type === 'color' ? (
-                  <div
-                    className="w-4 h-4 mr-1 border border-gray-200 rounded"
-                    style={{ background: resolvedValue }}
-                  />
+                  <div className="w-4 h-4 mr-1 border border-gray-200 rounded" style={{ background: resolvedValue }} />
                 ) : null}
                 {resolvedValue}
               </div>
@@ -294,9 +323,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
       />
       {renderTokenForm()}
 
-      {internalEditToken?.explainer && (
-        <div className="mt-1 text-gray-600 text-xxs">{internalEditToken.explainer}</div>
-      )}
+      {internalEditToken?.explainer && <div className="mt-1 text-gray-600 text-xxs">{internalEditToken.explainer}</div>}
       {internalEditToken?.optionsSchema
         ? Object.entries(internalEditToken?.optionsSchema).map(([key, schemaValue]: [string, string]) => (
           <Input
