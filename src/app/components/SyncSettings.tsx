@@ -120,7 +120,7 @@ const SyncSettings = () => {
           onSuccess={() => setShowCreateStorageModalVisible(false)}
         />
       )}
-      <Box css={{ padding: '$2' }}>
+      <Box>
         <Stack gap={4} direction="column" align="start">
           <Stack gap={4} direction="column">
             <Heading>Token Storage</Heading>

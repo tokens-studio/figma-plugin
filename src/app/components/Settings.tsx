@@ -19,7 +19,7 @@ function Settings() {
   }, [dispatch.settings]);
 
   return (
-    <Box css={{ padding: '$5', overflowY: 'scroll' }}>
+    <Box css={{ padding: '$5', overflowY: 'scroll' }} className="content scroll-container">
       <Stack direction="column" gap={4}>
 
         <Heading>Styles</Heading>
