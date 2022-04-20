@@ -68,8 +68,6 @@ export type UiSettingsFromPluginMessage = {
     uiWindow: {
       width: number;
       height: number;
-      storedWidth: number;
-      storedHeight: number;
       isMinimized: boolean;
     };
     updateMode: UpdateMode;

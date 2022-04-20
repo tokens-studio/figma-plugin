@@ -91,8 +91,6 @@ export function notifyUISettings(
       uiWindow: {
         width,
         height,
-        storedWidth: width,
-        storedHeight: height,
         isMinimized: false,
       },
       updateMode,

@@ -9,8 +9,6 @@ import { RootModel } from '@/types/RootModel';
 type WindowSettingsType = {
   width: number;
   height: number;
-  storedWidth: number;
-  storedHeight: number;
   isMinimized: boolean;
 };
 
@@ -39,8 +37,6 @@ export const settings = createModel<RootModel>()({
     uiWindow: {
       width: 400,
       height: 600,
-      storedWidth: 400,
-      storedHeight: 600,
       isMinimized: false,
     },
     updateMode: UpdateMode.PAGE,
@@ -74,10 +70,8 @@ export const settings = createModel<RootModel>()({
       return {
         ...state,
         uiWindow: {
-          width: payload.isMinimized ? 50 : payload.width,
-          height: payload.isMinimized ? 50 : payload.height,
-          storedWidth: payload.width,
-          storedHeight: payload.height,
+          width: payload.width,
+          height: payload.height,
           isMinimized: payload.isMinimized,
         },
       };

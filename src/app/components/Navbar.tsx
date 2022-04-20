@@ -1,12 +1,11 @@
 import React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import convertTokensToObject from '@/utils/convertTokensToObject';
 import Icon from './Icon';
 import Tooltip from './Tooltip';
 import useRemoteTokens from '../store/remoteTokens';
 import { StorageProviderType } from '../../types/api';
 import Box from './Box';
-import { Dispatch } from '../store';
 import { styled } from '@/stitches.config';
 import {
   editProhibitedSelector,
@@ -15,14 +14,13 @@ import {
   storageTypeSelector,
   tokensSelector,
   usedTokenSetSelector,
-  windowSizeSelector,
 } from '@/selectors';
 import { Tabs } from '@/constants/Tabs';
 import Stack from './Stack';
 import { TabButton } from './TabButton';
 import { NavbarUndoButton } from './NavbarUndoButton';
-import MinimiseIcon from '../assets/minimiseIcon.svg';
-import MaximiseIcon from '../assets/maximiseIcon.svg';
+import Minimize from '../assets/minimize.svg';
+import useMinimizeWindow from './useMinimizeWindow';
 
 const transformProviderName = (provider) => {
   switch (provider) {
@@ -43,12 +41,10 @@ export const Navbar: React.FC = () => {
   const tokens = useSelector(tokensSelector);
   const editProhibited = useSelector(editProhibitedSelector);
   const lastSyncedState = useSelector(lastSyncedStateSelector);
-  const windowSize = useSelector(windowSizeSelector);
   const usedTokenSet = useSelector(usedTokenSetSelector);
+  const { handleResize } = useMinimizeWindow();
 
   const { pullTokens, pushTokens } = useRemoteTokens();
-
-  const dispatch = useDispatch<Dispatch>();
 
   const StyledButton = styled('button', {
     all: 'unset',
@@ -61,16 +57,6 @@ export const Navbar: React.FC = () => {
       boxShadow: 'none',
     },
   });
-
-  const handleMinimize = React.useCallback(() => {
-    if (windowSize) {
-      dispatch.settings.setMinimizePluginWindow({
-        width: windowSize.width,
-        height: windowSize.height,
-        isMinimized: !windowSize.isMinimized,
-      });
-    }
-  }, [dispatch, windowSize]);
 
   const checkForChanges = React.useCallback(() => {
     if (lastSyncedState !== JSON.stringify(convertTokensToObject(tokens), null, 2)) {
@@ -134,8 +120,8 @@ export const Navbar: React.FC = () => {
             </Tooltip>
           </>
         )}
-        <StyledButton type="button" onClick={handleMinimize}>
-          {windowSize && !windowSize.isMinimized ? <MinimiseIcon /> : <MaximiseIcon />}
+        <StyledButton type="button" onClick={handleResize}>
+          <Minimize />
         </StyledButton>
       </Stack>
     </Box>
