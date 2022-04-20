@@ -83,8 +83,6 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
         const featureFlagId = await getFeatureFlags();
         inspectDeep = settings.inspectDeep;
         const userId = await getUserId();
-        const licenseKey = await figma.clientStorage.getAsync('licenseKey');
-        notifyLicenseKey(licenseKey);
         const lastOpened = await getLastOpened();
         const storageType = getSavedStorageType();
         if (currentUser) {
@@ -94,6 +92,10 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
             name: currentUser.name,
           });
         }
+
+        const licenseKey = await figma.clientStorage.getAsync('licenseKey');
+        notifyLicenseKey(licenseKey);
+
         notifyLastOpened(lastOpened);
         notifyStorageType(storageType);
 

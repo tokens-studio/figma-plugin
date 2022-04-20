@@ -5,7 +5,6 @@ import DocsIcon from '@/icons/docs.svg';
 import FeedbackIcon from '@/icons/feedback.svg';
 import Text from '@/app/components/Text';
 import Stack from './Stack';
-import GoPremium from './GoPremium/GoPremium';
 
 export default function Footer() {
   return (
@@ -23,7 +22,6 @@ export default function Footer() {
         {pjs.plugin_version}
       </Box>
       <Stack direction="row" gap={4} align="center">
-        <GoPremium />
         <Text size="xsmall">
           <a href="https://docs.tokens.studio/?ref=pf" target="_blank" rel="noreferrer">
             <Stack direction="row" gap={1}>

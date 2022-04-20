@@ -12,6 +12,7 @@ import { SingleToken } from '@/types/tokens';
 import { SelectionGroup, StoryblokStory } from '@/types';
 import { Tabs } from '@/constants/Tabs';
 import { FeatureFlags, FeatureKey } from '@/utils/featureFlags';
+import validateLicense from '@/utils/validateLicense';
 
 type DisplayType = 'GRID' | 'LIST';
 
@@ -372,17 +373,21 @@ export const uiState = createModel<RootModel>()({
         showEmptyGroups: payload == null ? rootState.uiState.showEmptyGroups : payload,
       });
     },
-    setLicenseKey: async (payload) => {
-      const entitlements = await fetchEntitlementsForLicense(payload);
-      if (!entitlements) {
-        // TODO: Handle the conflict with other flags
-        dispatch.uiState.setFeatureFlags(null);
-      } else {
-        const featureFlags = entitlements.reduce((acc: FeatureFlags, curr: FeatureKey) => {
-          acc![curr] = true;
-          return acc;
-        }, {} as FeatureFlags);
-        dispatch.uiState.setFeatureFlags(featureFlags);
+    setLicenseKey: async (payload, rootState) => {
+      const { userId } = rootState.uiState;
+
+      const licenseIsValid = await validateLicense(payload, userId);
+      if (licenseIsValid) {
+        const entitlements = await fetchEntitlementsForLicense(payload);
+        if (!entitlements) {
+          dispatch.uiState.setFeatureFlags(null);
+        } else {
+          const featureFlags = entitlements.reduce((acc: FeatureFlags, curr: FeatureKey) => {
+            acc![curr] = true;
+            return acc;
+          }, {} as FeatureFlags);
+          dispatch.uiState.setFeatureFlags(featureFlags);
+        }
       }
     },
   }),
