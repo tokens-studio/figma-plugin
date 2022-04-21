@@ -1,20 +1,25 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import {
   DndProvider, useDrop, useDrag, DropTargetMonitor,
 } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { XYCoord } from 'dnd-core';
 import { debounce } from 'lodash';
+import { TokensIcon, LinkBreak2Icon } from '@radix-ui/react-icons';
 import { ShadowTokenSingleValue } from '@/types/propertyTypes';
+import { checkIfContainsAlias, getAliasValue } from '@/utils/alias';
 import IconMinus from '@/icons/minus.svg';
 import IconPlus from '@/icons/plus.svg';
 import IconGrabber from '@/icons/grabber.svg';
-
+import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
+import { findReferences } from '../../utils/findReferences';
 import Heading from './Heading';
 import IconButton from './IconButton';
 import TokenInput from './TokenInput';
 import Select from './Select';
 import Box from './Box';
+import Input from './Input';
+import AliasBox from './AliasBox';
 
 interface DragItem {
   index: number;
@@ -126,21 +131,21 @@ function SingleShadowInput({
     >
       <Box css={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }} ref={ref}>
         {isMultiple && (
-        <Box css={{ display: 'flex', width: '$space$8' }}>
-          <IconButton tooltip="Click to drag" icon={<IconGrabber />} data-handler-id={handlerId} />
-        </Box>
+          <Box css={{ display: 'flex', width: '$space$8' }}>
+            <IconButton tooltip="Click to drag" icon={<IconGrabber />} data-handler-id={handlerId} />
+          </Box>
         )}
         <Select css={{ flexGrow: 1 }} value={shadowItem.type} id="type" onChange={onChange}>
           <option value="innerShadow">Inner Shadow</option>
           <option value="dropShadow">Drop Shadow</option>
         </Select>
         {isMultiple && (
-        <IconButton
-          tooltip="Remove this shadow"
-          dataCy="button-shadow-remove-multiple"
-          onClick={() => onRemove(index)}
-          icon={<IconMinus />}
-        />
+          <IconButton
+            tooltip="Remove this shadow"
+            dataCy="button-shadow-remove-multiple"
+            onClick={() => onRemove(index)}
+            icon={<IconMinus />}
+          />
         )}
       </Box>
       <Box css={{
@@ -179,10 +184,15 @@ const newToken: ShadowTokenSingleValue = {
 export default function BoxShadowInput({
   value,
   setValue,
+  resolvedTokens,
 }: {
   value: ShadowTokenSingleValue | ShadowTokenSingleValue[];
   setValue: (shadow: ShadowTokenSingleValue | ShadowTokenSingleValue[]) => void;
+  resolvedTokens: ResolveTokenValuesResult[]
 }) {
+  const [mode, setMode] = useState('input');
+  const [alias, setAlias] = useState('');
+
   const addShadow = () => {
     if (Array.isArray(value)) {
       setValue([...value, newToken]);
@@ -197,36 +207,138 @@ export default function BoxShadowInput({
     }
   };
 
+  const handleMode = () => {
+    const changeMode = (mode === 'input') ? 'alias' : 'input';
+    setMode(changeMode);
+  };
+
+  const handleAliasChange = (e) => {
+    setAlias(e.target.value);
+  };
+
+  const resolvedValue = React.useMemo(() => {
+    if (alias) {
+      return typeof alias === 'object'
+        ? null
+        : getAliasValue(alias, resolvedTokens);
+    }
+    return null;
+  }, [alias, resolvedTokens]);
+
+  const isJson = (str) => {
+    try {
+      JSON.parse(str);
+    } catch (e) {
+      return false;
+    }
+    return true;
+  };
   return (
     <div>
       <Box css={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Heading size="small">Shadow</Heading>
-        <IconButton
-          tooltip="Add another shadow"
-          dataCy="button-shadow-add-multiple"
-          onClick={addShadow}
-          icon={<IconPlus />}
-        />
+        <Box>
+          {
+            mode === 'input' ? (
+              <TokensIcon onClick={handleMode} style={{ cursor: 'pointer' }} />
+            ) : (
+              <LinkBreak2Icon onClick={handleMode} style={{ cursor: 'pointer' }} />
+            )
+          }
+          <IconButton
+            tooltip="Add another shadow"
+            dataCy="button-shadow-add-multiple"
+            onClick={addShadow}
+            icon={<IconPlus />}
+          />
+
+        </Box>
       </Box>
       <Box css={{ display: 'flex', flexDirection: 'column', gap: '$4' }}>
-        <DndProvider backend={HTML5Backend}>
-          {Array.isArray(value) ? (
-            value.map((token, index) => (
-              <SingleShadowInput
-                isMultiple
-                value={value}
-                setValue={setValue}
-                shadowItem={token}
-                index={index}
-                id={index}
-                key={`single-shadow-${index}`}
-                onRemove={removeShadow}
-              />
-            ))
+        {
+          mode === 'input' ? (
+            <DndProvider backend={HTML5Backend}>
+              {Array.isArray(value) ? (
+                value.map((token, index) => (
+                  <SingleShadowInput
+                    isMultiple
+                    value={value}
+                    setValue={setValue}
+                    shadowItem={token}
+                    index={index}
+                    id={index}
+                    key={`single-shadow-${index}`}
+                    onRemove={removeShadow}
+                  />
+                ))
+              ) : (
+                <SingleShadowInput setValue={setValue} index={0} value={value} shadowItem={value} />
+              )}
+            </DndProvider>
           ) : (
-            <SingleShadowInput setValue={setValue} index={0} value={value} shadowItem={value} />
-          )}
-        </DndProvider>
+            <Box css={{
+              display: 'flex', flexDirection: 'column', gap: '$2',
+            }}
+            >
+              <Input
+                required
+                full
+                label="aliasName"
+                onChange={(e) => handleAliasChange(e)}
+                type="text"
+                name="aliasName"
+                placeholder="Alias name"
+              />
+              {checkIfContainsAlias(alias) && (
+                isJson(resolvedValue) ? (
+                  (resolvedValue?.toString().charAt(0) === '[') ? (
+                    <AliasBox>
+                      <Box css={{ display: 'grid', margin: '12px', marginRight: '60px' }}>
+                        {
+                          findReferences(resolvedValue).map((value) => {
+                            for (const key in JSON.parse(value)) {
+                              if (Object.prototype.hasOwnProperty.call(JSON.parse(value), key)) {
+                                const element = JSON.parse(value)[key];
+                                return <p>{element}</p>;
+                              }
+                            }
+                          })
+                        }
+                      </Box>
+                      <Box css={{ display: 'grid', margin: '12px' }}>
+                        {
+                          resolvedValue.map((value, index) => {
+                            Object.keys(value).map((key) => <p style={{ marginLeft: '10px' }}>{value[key]}</p>);
+                          })
+                        }
+                      </Box>
+                    </AliasBox>
+
+                  ) : (
+                    <AliasBox>
+                      <Box css={{ display: 'grid', margin: '12px', marginRight: '60px' }}>
+                        {
+                          Object.keys(JSON.parse(resolvedValue)).map((key, index) => <p>{key}</p>)
+                        }
+                      </Box>
+                      <Box css={{ display: 'grid', margin: '12px' }}>
+                        {
+                          Object.keys(JSON.parse(resolvedValue)).map((key) => <p>{JSON.parse(resolvedValue)[key]}</p>)
+                        }
+                      </Box>
+                    </AliasBox>
+                  )
+                ) : (
+                  resolvedValue
+                )
+              )}
+              {
+                resolvedValue?.toString().charAt(0)
+              }
+            </Box>
+          )
+        }
+
       </Box>
     </div>
   );

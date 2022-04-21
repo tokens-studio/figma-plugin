@@ -211,7 +211,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
 
     switch (internalEditToken.type) {
       case 'boxShadow': {
-        return <BoxShadowInput setValue={handleShadowChange} value={internalEditToken.value} />;
+        return <BoxShadowInput setValue={handleShadowChange} value={internalEditToken.value} resolvedTokens={resolvedTokens} />;
       }
       case 'typography': {
         return Object.entries(internalEditToken.schema ?? {}).map(([key, schemaValue]: [string, string]) => (

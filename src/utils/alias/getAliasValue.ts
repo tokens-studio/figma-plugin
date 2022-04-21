@@ -8,42 +8,56 @@ import { checkAndEvaluateMath } from '../math';
 export function getAliasValue(token: SingleToken | string | number, tokens: SingleToken[] = []): string | number | null {
   // @TODO not sure how this will handle typography and boxShadow values. I don't believe it works.
   // The logic was copied from the original function in aliases.tsx
-  let returnedValue: string | null = isSingleTokenValueObject(token) ? token.value.toString() : token.toString();
-
+  let returnedValue = isSingleTokenValueObject(token) ? token.value : token.toString();
   try {
-    const tokenReferences = findReferences(returnedValue);
+    if (typeof returnedValue === 'string') {
+      const tokenReferences = findReferences(returnedValue);
+      if (tokenReferences?.length) {
+        const resolvedReferences = Array.from(tokenReferences).map((ref) => {
+          if (ref.length > 1) {
+            let nameToLookFor: string;
+            if (ref.startsWith('{')) {
+              if (ref.endsWith('}')) nameToLookFor = ref.slice(1, ref.length - 1);
+              else nameToLookFor = ref.slice(1, ref.length);
+            } else nameToLookFor = ref.substring(1);
+            // exclude references to  self
+            if ((typeof token === 'object' && nameToLookFor === token.name) || nameToLookFor === token) return null;
 
-    if (tokenReferences?.length) {
-      const resolvedReferences = Array.from(tokenReferences).map((ref) => {
-        if (ref.length > 1) {
-          const nameToLookFor = ref.startsWith('{') ? ref.slice(1, ref.length - 1) : ref.substring(1);
-          // exclude references to  self
-          if ((typeof token === 'object' && nameToLookFor === token.name) || nameToLookFor === token) return null;
+            const tokenAliasSplited = nameToLookFor.split('.');
+            const tokenAliasSplitedLast = tokenAliasSplited.pop();
+            const tokenAliasLastExcluded = tokenAliasSplited.join('.');
+            const foundToken = tokens.find((t) => t.name === nameToLookFor || t.name === tokenAliasLastExcluded);
+            if (foundToken?.name === nameToLookFor) { return getAliasValue(foundToken, tokens); }
 
-          const foundToken = tokens.find((t) => t.name === nameToLookFor);
-          if (foundToken) return getAliasValue(foundToken, tokens);
+            const candidateProperty = tokenAliasSplitedLast;
+            if (foundToken?.name === tokenAliasLastExcluded && candidateProperty && foundToken.rawValue?.hasOwnProperty(candidateProperty)) return foundToken?.rawValue[candidateProperty];
+          }
+          return ref;
+        });
+        tokenReferences.forEach((reference, index) => {
+          const resolvedReference = resolvedReferences[index];
+          const stringValue = String(resolvedReference);
+          const resolved = checkAndEvaluateMath(stringValue);
+          returnedValue = returnedValue ? returnedValue.replace(reference, String(resolved)) : returnedValue;
+        });
+
+        if (returnedValue === 'null') {
+          returnedValue = null;
         }
-        return ref;
-      });
-      tokenReferences.forEach((reference, index) => {
-        const resolvedReference = resolvedReferences[index];
-        const stringValue = String(resolvedReference);
-        const resolved = checkAndEvaluateMath(stringValue);
-        returnedValue = returnedValue ? returnedValue.replace(reference, String(resolved)) : returnedValue;
-      });
-
-      if (returnedValue === 'null') {
-        returnedValue = null;
       }
     }
 
     if (returnedValue) {
-      const remainingReferences = findReferences(returnedValue);
-
-      if (!remainingReferences) {
-        const couldBeNumberValue = checkAndEvaluateMath(returnedValue);
-        if (typeof couldBeNumberValue === 'number') return couldBeNumberValue;
-        return convertToRgb(couldBeNumberValue);
+      if (typeof returnedValue === 'string') {
+        const remainingReferences = findReferences(returnedValue);
+        if (!remainingReferences) {
+          const couldBeNumberValue = checkAndEvaluateMath(returnedValue);
+          if (typeof couldBeNumberValue === 'number') return couldBeNumberValue;
+          return convertToRgb(couldBeNumberValue);
+        }
+      } else {
+        if (typeof returnedValue === 'object') return JSON.stringify(returnedValue);
+        return returnedValue;
       }
     }
   } catch (err) {
