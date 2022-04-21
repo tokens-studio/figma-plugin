@@ -8,9 +8,11 @@ import AliasBox from './AliasBox';
 export default function ResolvedValueBox({
   alias,
   resolvedTokens,
+  setValue,
 }: {
   alias: string;
   resolvedTokens: ResolveTokenValuesResult[];
+  setValue: (value) => void;
 }) {
   const resolvedValue = React.useMemo(() => {
     if (alias) {

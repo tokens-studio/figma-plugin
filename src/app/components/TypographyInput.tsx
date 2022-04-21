@@ -10,11 +10,13 @@ import { EditTokenObject } from '../store/models/uiState';
 export default function TypographyInput({
   internalEditToken,
   handleTypographyChange,
+  handleTypographyChangeByAlias,
   resolvedTokens,
 }: {
   internalEditToken: EditTokenObject;
   handleTypographyChange: React.ChangeEventHandler;
-  resolvedTokens: ResolveTokenValuesResult[]
+  handleTypographyChangeByAlias: React.ChangeEventHandler;
+  resolvedTokens: ResolveTokenValuesResult[];
 }) {
   const [mode, setMode] = useState('input');
   const [alias, setAlias] = useState('');
@@ -26,6 +28,16 @@ export default function TypographyInput({
 
   const handleAliasChange = (e) => {
     setAlias(e.target.value);
+    const search = findReferences(e.target.value);
+    console.log('sera', sear);
+    let selectedToken;
+    if (search.length > 0) {
+      const nameToLookFor = search[0].slice(1, search[0].length - 1);
+      console.log('name', nameToLookFor);
+      selectedToken = resolvedTokens.find((t) => t.name === nameToLookFor);
+      console.log('sele', selectedToken);
+    }
+    handleTypographyChangeByAlias(selectedToken.value);
   };
 
   return (

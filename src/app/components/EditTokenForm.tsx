@@ -116,6 +116,16 @@ function EditTokenForm({ resolvedTokens }: Props) {
     [internalEditToken],
   );
 
+  const handleTypographyChangeByAlias = React.useCallback(
+    (typography) => {
+      setError(null);
+      if (internalEditToken?.type === TokenTypes.TYPOGRAPHY) {
+        setInternalEditToken({ ...internalEditToken, value: typography });
+      }
+    },
+    [internalEditToken],
+  );
+
   const handleOptionsChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>(
     (e) => {
       e.persist();
@@ -225,6 +235,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
         return (
           <TypographyInput
             handleTypographyChange={handleTypographyChange}
+            handleTypographyChangeByAlias={handleTypographyChangeByAlias}
             internalEditToken={internalEditToken}
             resolvedTokens={resolvedTokens}
           />

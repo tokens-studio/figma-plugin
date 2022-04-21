@@ -19,6 +19,7 @@ import Select from './Select';
 import Box from './Box';
 import Input from './Input';
 import ResolvedValueBox from './ResolvedValueBox';
+import { findReferences } from '@/utils/findReferences';
 
 interface DragItem {
   index: number;
@@ -212,6 +213,13 @@ export default function BoxShadowInput({
 
   const handleAliasChange = (e) => {
     setAlias(e.target.value);
+    const search = findReferences(e.target.value);
+    let selectedToken;
+    if (search.length > 0) {
+      const nameToLookFor = search[0].slice(1, search[0].length - 1);
+      selectedToken = resolvedTokens.find((t) => t.name === nameToLookFor);
+    }
+    setValue(selectedToken.value);
   };
 
   return (
@@ -279,6 +287,7 @@ export default function BoxShadowInput({
                 <ResolvedValueBox
                   alias={alias}
                   resolvedTokens={resolvedTokens}
+                  setValue={setValue}
                 />
                 )
               }
