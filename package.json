@@ -149,7 +149,7 @@
     },
     "lint-staged": {
         "src/**/*.{ts,tsx}": [
-            "./eslint-non-blocking.sh",
+            "eslint --fix",
             "git add"
         ],
         "src/**/*.{js,jsx,css,json}": [
