@@ -6,4 +6,4 @@ export * from './ThemeObject';
 export * from './UsedTokenSetsMap';
 export * from './StitchesCSS';
 export * from './UpdateRemoteFunction';
-export * from './ThemeObjectsMap';
+export * from './ThemeObjectsList';

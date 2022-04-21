@@ -15,7 +15,7 @@ import { getAllFigmaStyleMaps } from '@/utils/getAllFigmaStyleMaps';
 import { ProgressTracker } from './ProgressTracker';
 import { AnyTokenList, AnyTokenSet, TokenStore } from '@/types/tokens';
 import { isSingleToken } from '@/utils/is';
-import { ThemeObjectsMap } from '@/types';
+import { ThemeObjectsList, themes } from '@/types';
 import { attemptOrFallback } from '@/utils/attemptOrFallback';
 
 // @TODO fix typings
@@ -48,7 +48,7 @@ export function mapValuesToTokens(tokens: Map<string, AnyTokenList[number]>, val
 
 export function getTokenData(): {
   values: TokenStore['values'];
-  themes: ThemeObjectsMap
+  themes: ThemeObjectsList
   activeTheme: string | null
   updatedAt: string;
   version: string;
@@ -58,7 +58,10 @@ export function getTokenData(): {
       attemptOrFallback<Record<string, AnyTokenSet>>(() => (value ? JSON.parse(value) : {}), {})
     ));
     const themes = tokensSharedDataHandler.get(figma.root, SharedPluginDataKeys.tokens.themes, (value) => (
-      attemptOrFallback<ThemeObjectsMap>(() => (value ? JSON.parse(value) : {}), {})
+      attemptOrFallback<ThemeObjectsList>(() => {
+        const parsedValue = (value ? JSON.parse(value) : []);
+        return Array.isArray(parsedValue) ? parsedValue : [];
+      }, [])
     ));
     const activeTheme = tokensSharedDataHandler.get(figma.root, SharedPluginDataKeys.tokens.activeTheme, (value) => (
       value || null

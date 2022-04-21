@@ -22,12 +22,12 @@ import {
 } from '@/types/payloads';
 import { updateTokenPayloadToSingleToken } from '@/utils/updateTokenPayloadToSingleToken';
 import { RootModel } from '@/types/RootModel';
-import { ThemeObjectsMap, UsedTokenSetsMap } from '@/types';
+import { ThemeObjectsList, UsedTokenSetsMap } from '@/types';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 
 export interface TokenState {
   tokens: Record<string, AnyTokenList>;
-  themes: ThemeObjectsMap;
+  themes: ThemeObjectsList;
   lastSyncedState: string;
   importedTokens: {
     newTokens: SingleToken[];

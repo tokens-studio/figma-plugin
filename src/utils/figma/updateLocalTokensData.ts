@@ -1,12 +1,12 @@
 import * as pjs from '../../../package.json';
 import { SharedPluginDataKeys } from '@/constants/SharedPluginDataKeys';
 import { tokensSharedDataHandler } from '@/plugin/SharedDataHandler';
-import { ThemeObjectsMap, UsedTokenSetsMap } from '@/types';
+import { ThemeObjectsList, UsedTokenSetsMap } from '@/types';
 import { AnyTokenSet } from '@/types/tokens';
 
 type Payload = {
   tokens: AnyTokenSet
-  themes: ThemeObjectsMap
+  themes: ThemeObjectsList
   usedTokenSets: UsedTokenSetsMap
   activeTheme: string | null
   updatedAt: string

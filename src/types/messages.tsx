@@ -12,7 +12,7 @@ import { AnyTokenList, AnyTokenSet, TokenStore } from './tokens';
 import { PullStyleOptions } from './PullStylesOptions';
 import { UsedTokenSetsMap } from './UsedTokenSetsMap';
 import { TokenTypes } from '@/constants/TokenTypes';
-import { ThemeObjectsMap } from './ThemeObjectsMap';
+import { ThemeObjectsList } from './ThemeObjectsList';
 
 export enum MessageFromPluginTypes {
   SELECTION = 'selection',
@@ -181,7 +181,7 @@ export type UpdateToPluginMessage = {
   type: MessageToPluginTypes.UPDATE;
   tokenValues: AnyTokenSet;
   tokens: AnyTokenList | null;
-  themes: ThemeObjectsMap
+  themes: ThemeObjectsList
   updatedAt: string;
   settings: SettingsState;
   usedTokenSet: UsedTokenSetsMap;

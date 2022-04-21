@@ -4,7 +4,7 @@ import {
 } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { XYCoord } from 'dnd-core';
-import { debounce } from 'lodash';
+import debounce from 'lodash.debounce';
 import { ShadowTokenSingleValue } from '@/types/propertyTypes';
 import IconMinus from '@/icons/minus.svg';
 import IconPlus from '@/icons/plus.svg';
