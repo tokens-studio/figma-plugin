@@ -191,7 +191,6 @@ function EditTokenForm({ resolvedTokens }: Props) {
   const handleSubmit = React.useCallback((e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (isValid && internalEditToken) {
-      console.log('inter', internalEditToken);
       submitTokenValue(internalEditToken);
       dispatch.uiState.setShowEditForm(false);
     }
