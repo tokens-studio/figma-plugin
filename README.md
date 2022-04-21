@@ -17,9 +17,9 @@ https://github.com/users/six7/projects/4/views/4
 There's a Slack channel where the community can exchange ideas, best practices or simply ask a question. Want to join? Let me know by sending me a [DM on twitter](https://www.twitter.com/six7) and I'll send you the invite.
 
 # Sponsors
-| <a href="https://zed.dev/" target="_blank" style="display: block; text-align: center;"><img src="sponsors/zed_logo.png" style="display: block; width: 75px; height: auto; margin-bottom: 4px" alt="Zed Logo"/></a> |
-| --- |
-| <a href="https://zed.dev/" target="_blank" style="display: block; text-align: center;">zed.dev</a> |
+| <a href="https://zed.dev/" target="_blank" style="display: block; text-align: center;"><img src="sponsors/zed_logo.png" style="display: block; width: 75px; height: auto; margin-bottom: 4px" alt="Zed Logo"/></a> | <a href="https://mirahi.io/?ref=six7-sponsorship" target="_blank"><img src="sponsors/mirahi_logo_dark.svg" style="display: block; width: 75px; height: auto; margin-bottom: 4px" alt="Mirahi Logo"/></a> |
+| --- | --- |
+| <a href="https://zed.dev/" target="_blank" style="display: block; text-align: center;">zed.dev</a> | <a href="https://mirahi.io/?ref=six7-sponsorship" target="_blank" style="display: block; text-align: center;">Mirahi</a> |
 
 Is your company using Figma Tokens? Consider [sponsoring the project](https://github.com/sponsors/six7) so we can spend time and resources on it!
 

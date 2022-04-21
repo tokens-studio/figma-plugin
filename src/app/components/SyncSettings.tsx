@@ -35,9 +35,18 @@ const SyncSettings = () => {
     setShowEditStorageModalVisible(true);
   };
 
-  const selectedRemoteProvider = () => [StorageProviderType.JSONBIN, StorageProviderType.GITHUB, StorageProviderType.URL].includes(
+  const handleProviderClick = (provider: StorageProviderType) => React.useCallback(() => {
+    dispatch.uiState.setLocalApiState({
+      name: '',
+      secret: '',
+      id: '',
+      provider,
+    });
+  }, [provider]);
+
+  const selectedRemoteProvider = React.useMemo(() => [StorageProviderType.JSONBIN, StorageProviderType.GITHUB, StorageProviderType.GITLAB, StorageProviderType.URL].includes(
     localApiState?.provider as StorageProviderType,
-  );
+  ), [localApiState?.provider]);
 
   const storedApiProviders = () => apiProviders.filter((item) => item.provider === localApiState?.provider);
 
@@ -71,6 +80,22 @@ const SyncSettings = () => {
             {' '}
             <a
               href="https://docs.tokens.studio/sync/github"
+              target="_blank"
+              rel="noreferrer"
+              className="underline"
+            >
+              Read the guide
+            </a>
+            .
+          </div>
+        );
+      case StorageProviderType.GITLAB:
+        return (
+          <div>
+            Sync your tokens with a Gitlab repository so your design decisions are up to date with code.
+            {' '}
+            <a
+              href="https://docs.tokens.studio/sync/gitlab"
               target="_blank"
               rel="noreferrer"
               className="underline"
@@ -135,49 +160,34 @@ const SyncSettings = () => {
               <ProviderSelector
                 isActive={localApiState?.provider === StorageProviderType.URL}
                 isStored={storageType?.provider === StorageProviderType.URL}
-                onClick={() => {
-                  dispatch.uiState.setLocalApiState({
-                    name: '',
-                    secret: '',
-                    id: '',
-                    provider: StorageProviderType.URL,
-                  });
-                }}
+                onClick={handleProviderClick(StorageProviderType.URL)}
                 text="URL"
                 id={StorageProviderType.URL}
               />
               <ProviderSelector
                 isActive={localApiState?.provider === StorageProviderType.JSONBIN}
                 isStored={storageType?.provider === StorageProviderType.JSONBIN}
-                onClick={() => {
-                  dispatch.uiState.setLocalApiState({
-                    name: '',
-                    secret: '',
-                    id: '',
-                    provider: StorageProviderType.JSONBIN,
-                  });
-                }}
+                onClick={handleProviderClick(StorageProviderType.JSONBIN)}
                 text="JSONbin"
                 id={StorageProviderType.JSONBIN}
               />
               <ProviderSelector
                 isActive={localApiState?.provider === StorageProviderType.GITHUB}
                 isStored={storageType?.provider === StorageProviderType.GITHUB}
-                onClick={() => {
-                  dispatch.uiState.setLocalApiState({
-                    name: '',
-                    secret: '',
-                    id: '',
-                    branch: '',
-                    provider: StorageProviderType.GITHUB,
-                  });
-                }}
+                onClick={handleProviderClick(StorageProviderType.GITHUB)}
                 text="GitHub"
                 id={StorageProviderType.GITHUB}
               />
+              <ProviderSelector
+                isActive={localApiState?.provider === StorageProviderType.GITLAB}
+                isStored={storageType?.provider === StorageProviderType.GITLAB}
+                onClick={handleProviderClick(StorageProviderType.GITLAB)}
+                text="GitLab"
+                id={StorageProviderType.GITLAB}
+              />
             </Stack>
           </Stack>
-          {selectedRemoteProvider() && (
+          {selectedRemoteProvider && (
           <>
             <Text muted size="xsmall">{storageProviderText()}</Text>
             <Button
