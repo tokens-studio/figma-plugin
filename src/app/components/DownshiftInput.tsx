@@ -121,13 +121,13 @@ const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
     [resolvedTokens, filteredValue],
   );
 
-  const handleSelect = useCallback((selectedItem:any) => {
-    setInputValue(`{${selectedItem.name}}`);
+  const handleSelect = useCallback((selectedItem: any, value) => {
+    setInputValue(value.includes('$') ? `$${selectedItem.name}` : `{${selectedItem.name}}`);
     setShowAutoSuggest(false);
   }, []);
 
   return (
-    <Downshift onSelect={handleSelect}>
+    <Downshift onSelect={(selectedItem) => handleSelect(selectedItem, value)}>
       {({
         selectedItem, highlightedIndex, getItemProps, getInputProps, getToggleButtonProps,
       }) => (
@@ -152,7 +152,8 @@ const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
 
           {filteredTokenItems
           && filteredTokenItems.length > 0
-          && (showAutoSuggest || (value.includes('{') && !value.includes('}'))) ? (
+          && selectedItem?.name !== filteredValue
+          && (showAutoSuggest || (['{', '$'].some((c) => value.includes(c)) && !value.includes('}'))) ? (
             <StyledDropdown>
               {filteredTokenItems.map((token: SingleToken, index: number) => (
                 <StyledItem
