@@ -2,6 +2,7 @@ import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import type { TokenState } from '../../tokenState';
 
 export function setActiveTheme(state: TokenState, themeId: string | null): TokenState {
+  // @TODO update for array type
   const themeObject = themeId ? state.themes?.[themeId] : null;
   const usedTokenSetsMap = themeObject
     ? Object.fromEntries(

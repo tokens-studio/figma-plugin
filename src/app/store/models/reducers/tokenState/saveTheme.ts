@@ -11,16 +11,18 @@ export function saveTheme(state: TokenState, data: Payload): TokenState {
   const themeId = data.id || hash([Date.now(), data]);
   const isActiveTheme = state.activeTheme === themeId;
 
+  // @TODO update fo rarray type
+
   const nextState: TokenState = {
     ...state,
-    themes: {
+    themes: [
       ...state.themes,
-      [themeId]: {
+      {
         ...data,
         id: themeId,
         $figmaStyleReferences: state.themes?.[themeId]?.$figmaStyleReferences ?? {},
       },
-    },
+    ],
   };
 
   if (isActiveTheme) {

@@ -5,7 +5,7 @@ import type { SingleToken } from './tokens';
 export type UpdateRemoteFunctionPayload = {
   tokens: Record<string, SingleToken[]>
   themes: ThemeObjectsList
-  context: ContextObject
+  context: Partial<ContextObject>
   updatedAt?: string
   oldUpdatedAt?: string | null
 };

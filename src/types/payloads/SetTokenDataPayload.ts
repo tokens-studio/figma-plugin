@@ -13,5 +13,5 @@ export type SetTokenDataPayload = {
   themes?: ThemeObjectsList
   activeTheme?: string | null
   shouldUpdate?: boolean;
-  usedTokenSet?: UsedTokenSetsMap
+  usedTokenSet?: UsedTokenSetsMap | null
 };
