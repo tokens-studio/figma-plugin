@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import {
   DndProvider, useDrop, useDrag, DropTargetMonitor,
 } from 'react-dnd';
@@ -7,19 +7,18 @@ import { XYCoord } from 'dnd-core';
 import { debounce } from 'lodash';
 import { TokensIcon, LinkBreak2Icon } from '@radix-ui/react-icons';
 import { ShadowTokenSingleValue } from '@/types/propertyTypes';
-import { checkIfContainsAlias, getAliasValue } from '@/utils/alias';
+import { checkIfContainsAlias } from '@/utils/alias';
 import IconMinus from '@/icons/minus.svg';
 import IconPlus from '@/icons/plus.svg';
 import IconGrabber from '@/icons/grabber.svg';
 import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
-import { findReferences } from '../../utils/findReferences';
 import Heading from './Heading';
 import IconButton from './IconButton';
 import TokenInput from './TokenInput';
 import Select from './Select';
 import Box from './Box';
 import Input from './Input';
-import AliasBox from './AliasBox';
+import ResolvedValueBox from './ResolvedValueBox';
 
 interface DragItem {
   index: number;
@@ -173,7 +172,6 @@ function SingleShadowInput({
         />
       </Box>
     </Box>
-
   );
 }
 
@@ -216,23 +214,6 @@ export default function BoxShadowInput({
     setAlias(e.target.value);
   };
 
-  const resolvedValue = React.useMemo(() => {
-    if (alias) {
-      return typeof alias === 'object'
-        ? null
-        : getAliasValue(alias, resolvedTokens);
-    }
-    return null;
-  }, [alias, resolvedTokens]);
-
-  const isJson = (str) => {
-    try {
-      JSON.parse(str);
-    } catch (e) {
-      return false;
-    }
-    return true;
-  };
   return (
     <div>
       <Box css={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -251,7 +232,6 @@ export default function BoxShadowInput({
             onClick={addShadow}
             icon={<IconPlus />}
           />
-
         </Box>
       </Box>
       <Box css={{ display: 'flex', flexDirection: 'column', gap: '$4' }}>
@@ -272,7 +252,12 @@ export default function BoxShadowInput({
                   />
                 ))
               ) : (
-                <SingleShadowInput setValue={setValue} index={0} value={value} shadowItem={value} />
+                <SingleShadowInput
+                  setValue={setValue}
+                  index={0}
+                  value={value}
+                  shadowItem={value}
+                />
               )}
             </DndProvider>
           ) : (
@@ -289,56 +274,17 @@ export default function BoxShadowInput({
                 name="aliasName"
                 placeholder="Alias name"
               />
-              {checkIfContainsAlias(alias) && (
-                isJson(resolvedValue) ? (
-                  (resolvedValue?.toString().charAt(0) === '[') ? (
-                    <AliasBox>
-                      <Box css={{ display: 'grid', margin: '12px', marginRight: '60px' }}>
-                        {
-                          findReferences(resolvedValue).map((value) => {
-                            for (const key in JSON.parse(value)) {
-                              if (Object.prototype.hasOwnProperty.call(JSON.parse(value), key)) {
-                                const element = JSON.parse(value)[key];
-                                return <p>{element}</p>;
-                              }
-                            }
-                          })
-                        }
-                      </Box>
-                      <Box css={{ display: 'grid', margin: '12px' }}>
-                        {
-                          resolvedValue.map((value, index) => {
-                            Object.keys(value).map((key) => <p style={{ marginLeft: '10px' }}>{value[key]}</p>);
-                          })
-                        }
-                      </Box>
-                    </AliasBox>
-
-                  ) : (
-                    <AliasBox>
-                      <Box css={{ display: 'grid', margin: '12px', marginRight: '60px' }}>
-                        {
-                          Object.keys(JSON.parse(resolvedValue)).map((key, index) => <p>{key}</p>)
-                        }
-                      </Box>
-                      <Box css={{ display: 'grid', margin: '12px' }}>
-                        {
-                          Object.keys(JSON.parse(resolvedValue)).map((key) => <p>{JSON.parse(resolvedValue)[key]}</p>)
-                        }
-                      </Box>
-                    </AliasBox>
-                  )
-                ) : (
-                  resolvedValue
-                )
-              )}
               {
-                resolvedValue?.toString().charAt(0)
+                checkIfContainsAlias(alias) && (
+                <ResolvedValueBox
+                  alias={alias}
+                  resolvedTokens={resolvedTokens}
+                />
+                )
               }
             </Box>
           )
         }
-
       </Box>
     </div>
   );

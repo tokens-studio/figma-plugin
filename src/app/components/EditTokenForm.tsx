@@ -19,6 +19,7 @@ import {
 } from '@/selectors';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { EditTokenObject } from '../store/models/uiState';
+import TypographyInput from './TypographyInput';
 import Stack from './Stack';
 
 type Props = {
@@ -180,6 +181,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
   const handleSubmit = React.useCallback((e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (isValid && internalEditToken) {
+      console.log('inter', internalEditToken);
       submitTokenValue(internalEditToken);
       dispatch.uiState.setShowEditForm(false);
     }
@@ -211,22 +213,22 @@ function EditTokenForm({ resolvedTokens }: Props) {
 
     switch (internalEditToken.type) {
       case 'boxShadow': {
-        return <BoxShadowInput setValue={handleShadowChange} value={internalEditToken.value} resolvedTokens={resolvedTokens} />;
+        return (
+          <BoxShadowInput
+            setValue={handleShadowChange}
+            value={internalEditToken.value}
+            resolvedTokens={resolvedTokens}
+          />
+        );
       }
       case 'typography': {
-        return Object.entries(internalEditToken.schema ?? {}).map(([key, schemaValue]: [string, string]) => (
-          <Input
-            key={key}
-            full
-            label={key}
-            value={internalEditToken.value[key]}
-            onChange={handleTypographyChange}
-            type="text"
-            name={key}
-            custom={schemaValue}
-            required
+        return (
+          <TypographyInput
+            handleTypographyChange={handleTypographyChange}
+            internalEditToken={internalEditToken}
+            resolvedTokens={resolvedTokens}
           />
-        ));
+        );
       }
       default: {
         return (
