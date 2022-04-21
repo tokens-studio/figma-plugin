@@ -1,6 +1,5 @@
 /* eslint-disable import/prefer-default-export */
 import { createModel } from '@rematch/core';
-import isEqual from 'lodash.isequal';
 import omit from 'just-omit';
 import { StorageProviderType } from '@/types/api';
 import * as tokenStateReducers from './reducers/tokenState';
@@ -24,6 +23,7 @@ import { updateTokenPayloadToSingleToken } from '@/utils/updateTokenPayloadToSin
 import { RootModel } from '@/types/RootModel';
 import { ThemeObjectsList, UsedTokenSetsMap } from '@/types';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
+import { isEqual } from '@/utils/isEqual';
 
 export interface TokenState {
   tokens: Record<string, AnyTokenList>;

@@ -1,6 +1,5 @@
 import { useSelector } from 'react-redux';
 import { useCallback, useMemo } from 'react';
-import isEqual from 'lodash.isequal';
 import { postToFigma } from '@/plugin/notifiers';
 import { MessageToPluginTypes } from '@/types/messages';
 import {
@@ -23,6 +22,7 @@ import {
 } from '@/selectors';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { TokenTypes } from '@/constants/TokenTypes';
+import { isEqual } from '@/utils/isEqual';
 
 // @TODO fix typings
 
