@@ -1,17 +1,20 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { Octokit } from '@octokit/rest';
-import { Dispatch, RootState } from '@/app/store';
+import { Dispatch } from '@/app/store';
 import { MessageToPluginTypes } from '@/types/messages';
 import convertTokensToObject from '@/utils/convertTokensToObject';
 import useConfirm from '@/app/hooks/useConfirm';
 import usePushDialog from '@/app/hooks/usePushDialog';
 import IsJSONString from '@/utils/isJSONString';
 import { ContextObject } from '@/types/api';
+import { ThemeObject } from '@/types';
 import { notifyToUI, postToFigma } from '../../../plugin/notifiers';
 import { FeatureFlags } from '@/utils/featureFlags';
 import { AnyTokenSet, TokenValues } from '@/types/tokens';
 import { decodeBase64 } from '@/utils/string';
-import { featureFlagsSelector, localApiStateSelector, tokensSelector } from '@/selectors';
+import {
+  featureFlagsSelector, localApiStateSelector, tokensSelector, themesListSelector,
+} from '@/selectors';
 
 type TokenSets = {
   [key: string]: AnyTokenSet;
@@ -158,7 +161,7 @@ type FeatureFlagOpts = {
   multiFile: boolean;
 };
 
-const extractFiles = (filePath: string, tokenObj: TokenSets, opts: FeatureFlagOpts) => {
+const extractFiles = (filePath: string, tokenObj: TokenSets, themes: ThemeObject[], opts: FeatureFlagOpts) => {
   const files: { [key: string]: string } = {};
   if (filePath.endsWith('.json')) {
     files[filePath] = JSON.stringify(tokenObj, null, 2);
@@ -166,6 +169,15 @@ const extractFiles = (filePath: string, tokenObj: TokenSets, opts: FeatureFlagOp
     Object.keys(tokenObj).forEach((key) => {
       files[`${filePath}/${key}.json`] = JSON.stringify(tokenObj[key], null, 2);
     });
+
+    if (themes && themes.length > 0) {
+      files['themes.json'] = JSON.stringify(themes);
+      files['config.json'] = JSON.stringify({
+        tokenSetsDirPath: filePath,
+        tokenSetsPath: `${filePath}/*.json`,
+        tokenSetsThemeMetaPath: 'themes.json',
+      });
+    }
   }
 
   return files;
@@ -181,10 +193,11 @@ const createOrUpdateFiles = (
     tokenObj: TokenSets;
     createNewBranch: boolean;
     commitMessage?: string;
+    themes: ThemeObject[];
   },
   opts: FeatureFlagOpts,
 ) => {
-  const files = extractFiles(context.filePath, context.tokenObj, opts);
+  const files = extractFiles(context.filePath, context.tokenObj, context.themes, opts);
 
   return octokit.repos.createOrUpdateFiles({
     owner: context.owner,
@@ -199,6 +212,7 @@ export function useGitHub() {
   const tokens = useSelector(tokensSelector);
   const localApiState = useSelector(localApiStateSelector);
   const featureFlags = useSelector(featureFlagsSelector);
+  const themes = useSelector(themesListSelector);
   const dispatch = useDispatch<Dispatch>();
 
   const { confirm } = useConfirm();
@@ -253,6 +267,7 @@ export function useGitHub() {
             tokenObj,
             createNewBranch: false,
             commitMessage: commitMessage || 'Commit from Figma',
+            themes,
           },
           { multiFile: Boolean(featureFlags?.gh_mfs_enabled) },
         );
@@ -267,6 +282,7 @@ export function useGitHub() {
             tokenObj,
             createNewBranch: true,
             commitMessage: commitMessage || 'Commit from Figma',
+            themes,
           },
           { multiFile: Boolean(featureFlags?.gh_mfs_enabled) },
         );
