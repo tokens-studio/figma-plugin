@@ -6,6 +6,20 @@ import Box from './Box';
 import Input from './Input';
 import ResolvedValueBox from './ResolvedValueBox';
 import { EditTokenObject } from '../store/models/uiState';
+import { findReferences } from '@/utils/findReferences';
+import IconButton from './IconButton';
+import Heading from './Heading';
+
+const newToken = {
+  fontFamily: 'Inter',
+  fontSize: 18,
+  fontWeight: 'Regular',
+  letterSpacing: '0%',
+  lineHeight: 'AUTO',
+  paragraphSpacing: 0,
+  textCase: 'none',
+  textDecoration: 'none',
+};
 
 export default function TypographyInput({
   internalEditToken,
@@ -24,31 +38,45 @@ export default function TypographyInput({
   const handleMode = () => {
     const changeMode = (mode === 'input') ? 'alias' : 'input';
     setMode(changeMode);
+    setAlias('');
+    handleTypographyChangeByAlias(newToken);
   };
 
   const handleAliasChange = (e) => {
     setAlias(e.target.value);
     const search = findReferences(e.target.value);
-    console.log('sera', sear);
     let selectedToken;
     if (search.length > 0) {
       const nameToLookFor = search[0].slice(1, search[0].length - 1);
-      console.log('name', nameToLookFor);
       selectedToken = resolvedTokens.find((t) => t.name === nameToLookFor);
-      console.log('sele', selectedToken);
     }
     handleTypographyChangeByAlias(selectedToken.value);
   };
 
   return (
     <>
-      <Box>
+      <Box css={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <Heading>Typography</Heading>
         {
-          mode === 'input' ? (
-            <TokensIcon onClick={handleMode} style={{ cursor: 'pointer' }} />
-          ) : (
-            <LinkBreak2Icon onClick={handleMode} style={{ cursor: 'pointer' }} />
-          )
+            mode === 'input' ? (
+              <IconButton
+                tooltip="alias mode"
+                dataCy="button-mode-change"
+                onClick={handleMode}
+                icon={<TokensIcon />}
+              />
+
+            // <TokensIcon onClick={handleMode} style={{ cursor: 'pointer' }} />
+            ) : (
+              <IconButton
+                tooltip="input mode"
+                dataCy="button-mode-change"
+                onClick={handleMode}
+                icon={<LinkBreak2Icon />}
+              />
+
+            // <LinkBreak2Icon onClick={handleMode} style={{ cursor: 'pointer' }} />
+            )
         }
       </Box>
 

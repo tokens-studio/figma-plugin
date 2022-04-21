@@ -209,6 +209,8 @@ export default function BoxShadowInput({
   const handleMode = () => {
     const changeMode = (mode === 'input') ? 'alias' : 'input';
     setMode(changeMode);
+    setAlias('');
+    setValue(newToken);
   };
 
   const handleAliasChange = (e) => {
@@ -229,9 +231,23 @@ export default function BoxShadowInput({
         <Box>
           {
             mode === 'input' ? (
-              <TokensIcon onClick={handleMode} style={{ cursor: 'pointer' }} />
+              <IconButton
+                tooltip="alias mode"
+                dataCy="button-mode-change"
+                onClick={handleMode}
+                icon={<TokensIcon />}
+              />
+
+            // <TokensIcon onClick={handleMode} style={{ cursor: 'pointer' }} />
             ) : (
-              <LinkBreak2Icon onClick={handleMode} style={{ cursor: 'pointer' }} />
+              <IconButton
+                tooltip="input mode"
+                dataCy="button-mode-change"
+                onClick={handleMode}
+                icon={<LinkBreak2Icon />}
+              />
+
+            // <LinkBreak2Icon onClick={handleMode} style={{ cursor: 'pointer' }} />
             )
           }
           <IconButton
@@ -284,11 +300,11 @@ export default function BoxShadowInput({
               />
               {
                 checkIfContainsAlias(alias) && (
-                <ResolvedValueBox
-                  alias={alias}
-                  resolvedTokens={resolvedTokens}
-                  setValue={setValue}
-                />
+                  <ResolvedValueBox
+                    alias={alias}
+                    resolvedTokens={resolvedTokens}
+                    setValue={setValue}
+                  />
                 )
               }
             </Box>
