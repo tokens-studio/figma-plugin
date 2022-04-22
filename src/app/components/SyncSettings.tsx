@@ -113,7 +113,7 @@ const SyncSettings = () => {
   };
 
   return (
-    <Box css={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }} className="content scroll-container">
+    <Box css={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }} className="content">
       {confirmModalVisible && (
         <ConfirmLocalStorageModal
           isOpen={confirmModalVisible}
@@ -145,7 +145,7 @@ const SyncSettings = () => {
           onSuccess={() => setShowCreateStorageModalVisible(false)}
         />
       )}
-      <Box css={{ padding: '$4' }}>
+      <Box>
         <Stack gap={4} direction="column" align="start">
           <Stack gap={4} direction="column">
             <Heading>Token Storage</Heading>
