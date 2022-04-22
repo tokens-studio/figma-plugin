@@ -207,8 +207,7 @@ export default function BoxShadowInput({
   };
 
   const handleMode = () => {
-    const changeMode = (mode === 'input') ? 'alias' : 'input';
-    setMode(changeMode);
+    setMode((mode === 'input') ? 'alias' : 'input');
     setAlias('');
     setValue(newToken);
   };
@@ -229,16 +228,13 @@ export default function BoxShadowInput({
       <Box css={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Heading size="small">Shadow</Heading>
         <Box>
-          {
-            mode === 'input' ? (
+          {mode === 'input' ? (
               <IconButton
                 tooltip="alias mode"
                 dataCy="button-mode-change"
                 onClick={handleMode}
                 icon={<TokensIcon />}
               />
-
-            // <TokensIcon onClick={handleMode} style={{ cursor: 'pointer' }} />
             ) : (
               <IconButton
                 tooltip="input mode"
@@ -246,8 +242,6 @@ export default function BoxShadowInput({
                 onClick={handleMode}
                 icon={<LinkBreak2Icon />}
               />
-
-            // <LinkBreak2Icon onClick={handleMode} style={{ cursor: 'pointer' }} />
             )
           }
           <IconButton
