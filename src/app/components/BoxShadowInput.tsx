@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   DndProvider, useDrop, useDrag, DropTargetMonitor,
 } from 'react-dnd';
@@ -111,7 +111,7 @@ function SingleShadowInput({
     },
   });
 
-  const [{ isDragging }, drag, preview] = useDrag({
+  const [{ isDragging }, drag] = useDrag({
     item: {
       type: ItemTypes.CARD,
       item: () => ({ id, index }),
@@ -214,14 +214,14 @@ export default function BoxShadowInput({
   };
 
   const handleAliasChange = (e) => {
-    setAlias(e.target.value);
-    const search = findReferences(e.target.value);
-    let selectedToken;
-    if (search.length > 0) {
-      const nameToLookFor = search[0].slice(1, search[0].length - 1);
-      selectedToken = resolvedTokens.find((t) => t.name === nameToLookFor);
+    const specifiedAlias = findReferences(e.target.value);
+    if (specifiedAlias) {
+      const [search] = specifiedAlias;
+      const nameToLookFor = search.slice(1, search.length - 1);
+      const selectedToken = resolvedTokens.find((t) => t.name === nameToLookFor);
+      setValue(selectedToken ? selectedToken.value : '');
     }
-    setValue(selectedToken.value);
+    setAlias(e.target.value);
   };
 
   return (

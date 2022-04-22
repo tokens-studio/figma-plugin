@@ -54,7 +54,7 @@ export default function ResolvedValueBox({
                       const element = JSON.parse(value)[key];
                       properties += `${key}` + ':' + `${element}` + '        ';
                     }
-                    return <p>{properties}</p>;
+                    return <p key={index}>{properties}</p>;
                   })
                 }
               </Box>
