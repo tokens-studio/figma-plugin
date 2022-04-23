@@ -3,7 +3,6 @@ import { useCallback, useMemo } from 'react';
 import { Dispatch } from '@/app/store';
 import { ContextObject, StorageProviderType } from '@/types/api';
 import { MessageToPluginTypes } from '@/types/messages';
-import { TokenStore } from '@/types/tokens';
 import { notifyToUI, postToFigma } from '../../../plugin/notifiers';
 import * as pjs from '../../../../package.json';
 import useStorage from '../useStorage';
@@ -84,7 +83,7 @@ export function useJSONbin() {
   }, [dispatch, themes, tokens]);
 
   // Read tokens from JSONBin
-  const pullTokensFromJSONBin = useCallback(async (context: ContextObject): Promise<TokenStore | null> => {
+  const pullTokensFromJSONBin = useCallback(async (context: ContextObject) => {
     const { id, secret, name } = context;
     if (!id && !secret) return null;
 
@@ -104,13 +103,7 @@ export function useJSONbin() {
       if (data.metadata && data.tokens) {
         dispatch.tokenState.setEditProhibited(false);
 
-        return {
-          version: data.metadata.version,
-          updatedAt: data.metadata.updatedAt,
-          values: data.tokens,
-          themes: data.themes,
-          activeTheme: null,
-        };
+        return data;
       }
       notifyToUI('No tokens stored on remote', { error: true });
       return null;
@@ -121,19 +114,22 @@ export function useJSONbin() {
     }
   }, [dispatch]);
 
-  const addJSONBinCredentials = useCallback(async (context: ContextObject): Promise<TokenStore | null> => {
-    const tokenValues = await pullTokensFromJSONBin(context);
-    if (tokenValues) {
+  const addJSONBinCredentials = useCallback(async (context: ContextObject) => {
+    const content = await pullTokensFromJSONBin(context);
+    if (content) {
       dispatch.uiState.setApiData(context);
       setStorageType({
         provider: context,
         shouldSetInDocument: true,
       });
-      dispatch.tokenState.setLastSyncedState(JSON.stringify(tokenValues.values, null, 2));
-      dispatch.tokenState.setTokenData(tokenValues);
+      dispatch.tokenState.setLastSyncedState(JSON.stringify(content.tokens, null, 2));
+      dispatch.tokenState.setTokenData({
+        values: content.tokens,
+        themes: content.themes,
+      });
     }
 
-    return tokenValues;
+    return content;
   }, [dispatch, pullTokensFromJSONBin, setStorageType]);
 
   return useMemo(() => ({

@@ -10,8 +10,7 @@ type Payload = Omit<ThemeObject, 'id' | '$figmaStyleReferences'> & {
 export function saveTheme(state: TokenState, data: Payload): TokenState {
   const themeId = data.id || hash([Date.now(), data]);
   const isActiveTheme = state.activeTheme === themeId;
-
-  // @TODO update fo rarray type
+  const themeObject = state.themes.find((theme) => theme.id === themeId);
 
   const nextState: TokenState = {
     ...state,
@@ -20,7 +19,7 @@ export function saveTheme(state: TokenState, data: Payload): TokenState {
       {
         ...data,
         id: themeId,
-        $figmaStyleReferences: state.themes?.[themeId]?.$figmaStyleReferences ?? {},
+        $figmaStyleReferences: themeObject?.$figmaStyleReferences ?? {},
       },
     ],
   };

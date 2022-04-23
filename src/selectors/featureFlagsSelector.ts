@@ -3,5 +3,5 @@ import { uiStateSelector } from './uiStateSelector';
 
 export const featureFlagsSelector = createSelector(
   uiStateSelector,
-  (state) => state.featureFlags,
+  (state) => ({ gh_mfs_enabled: true }) || state.featureFlags,
 );

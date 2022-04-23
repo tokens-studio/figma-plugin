@@ -3,19 +3,10 @@ import * as pjs from '../../package.json';
 import { ThemeObjectsList } from '@/types';
 import { AnyTokenSet } from '@/types/tokens';
 import { RemoteTokenStorage, RemoteTokenStorageFile } from './RemoteTokenStorage';
+import { singleFileSchema } from './schemas/singleFileSchema';
 
-const jsonbinSchema = z.object({
+const jsonbinSchema = singleFileSchema.extend({
   version: z.string(),
-  values: z.record(z.record(z.object({
-    value: z.any(),
-    type: z.string(),
-  }))),
-  themes: z.array(z.object({
-    id: z.string(),
-    name: z.string(),
-    selectedTokenSets: z.record(z.string()),
-    $figmaStyleReferences: z.record(z.number()).optional(),
-  })).optional(),
 });
 
 type JsonBinMetadata = {
@@ -25,7 +16,7 @@ type JsonBinMetadata = {
 
 type JsonbinData = JsonBinMetadata & {
   values: Record<string, AnyTokenSet<false>>
-  themes?: ThemeObjectsList
+  $themes?: ThemeObjectsList
 };
 
 export class JSONBinTokenStorage extends RemoteTokenStorage<JsonBinMetadata> {
@@ -80,7 +71,7 @@ export class JSONBinTokenStorage extends RemoteTokenStorage<JsonBinMetadata> {
       {
         type: 'themes',
         path: '$themes.json',
-        data: data.themes ?? [],
+        data: data.$themes ?? [],
       },
       {
         type: 'metadata',
@@ -129,13 +120,13 @@ export class JSONBinTokenStorage extends RemoteTokenStorage<JsonBinMetadata> {
     const dataObject: JsonbinData = {
       version: pjs.plugin_version,
       updatedAt: (new Date()).toISOString(),
-      themes: [],
       values: {},
+      $themes: [],
     };
     files.forEach((file) => {
       if (file.type === 'themes') {
-        dataObject.themes = [
-          ...(dataObject.themes ?? []),
+        dataObject.$themes = [
+          ...(dataObject.$themes ?? []),
           ...file.data,
         ];
       } else if (file.type === 'tokenSet') {
