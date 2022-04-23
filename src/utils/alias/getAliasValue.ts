@@ -3,6 +3,7 @@ import { convertToRgb } from '../color';
 import { findReferences } from '../findReferences';
 import { isSingleTokenValueObject } from '../is';
 import { checkAndEvaluateMath } from '../math';
+import { theme } from '@/stitches.config';
 
 // @TODO This function logic needs to be explained to improve it. It is unclear at this time which cases it needs to handle and how
 export function getAliasValue(token: SingleToken | string | number, tokens: SingleToken[] = []): string | number | null {
@@ -38,7 +39,16 @@ export function getAliasValue(token: SingleToken | string | number, tokens: Sing
       tokenReferences.forEach((reference, index) => {
         const resolvedReference = resolvedReferences[index];
         const stringValue = String(resolvedReference);
-        const resolved = checkAndEvaluateMath(stringValue);
+        let resolved = checkAndEvaluateMath(stringValue);
+        if (String(resolved).startsWith("$")) {
+          const sizeProperty = String(resolved).slice(1, String(resolved).length);
+          if (token && token.type === 'sizing') {
+            resolved = theme.sizes[`${sizeProperty}`].value;
+          }
+          if (token && token.type === 'spacing') {
+            resolved = theme.space[`${sizeProperty}`].value;
+          }
+        }
         returnedValue = returnedValue ? returnedValue.replace(reference, String(resolved)) : returnedValue;
       });
 

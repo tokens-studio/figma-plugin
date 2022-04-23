@@ -54,7 +54,6 @@ export function resolveTokenValues(tokens: SingleToken[], previousCount: number 
       rawValue: t.rawValue || t.value,
       failedToResolve,
     } as ResolveTokenValuesResult;  
-
     return returnObject;
   });
 
