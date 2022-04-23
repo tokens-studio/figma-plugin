@@ -161,7 +161,9 @@ type FeatureFlagOpts = {
   multiFile: boolean;
 };
 
-const extractFiles = (filePath: string, tokenObj: TokenSets, themes: ThemeObject[], opts: FeatureFlagOpts) => {
+const extractFiles = ({
+  owner, repo, filePath, tokenObj, themes, opts,
+}: { owner: string, repo: string, filePath: string, tokenObj: TokenSets, themes: ThemeObject[], opts: FeatureFlagOpts }) => {
   const files: { [key: string]: string } = {};
   if (filePath.endsWith('.json')) {
     files[filePath] = JSON.stringify(tokenObj, null, 2);
@@ -176,6 +178,8 @@ const extractFiles = (filePath: string, tokenObj: TokenSets, themes: ThemeObject
         tokenSetsDirPath: filePath,
         tokenSetsPath: `${filePath}/*.json`,
         tokenSetsThemeMetaPath: 'themes.json',
+        owner,
+        repo,
       });
     }
   }
@@ -197,7 +201,12 @@ const createOrUpdateFiles = (
   },
   opts: FeatureFlagOpts,
 ) => {
-  const files = extractFiles(context.filePath, context.tokenObj, context.themes, opts);
+  const {
+    filePath, tokenObj, themes, owner, repo,
+  } = context;
+  const files = extractFiles({
+    owner, repo, filePath, tokenObj, themes, opts,
+  });
 
   return octokit.repos.createOrUpdateFiles({
     owner: context.owner,
