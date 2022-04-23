@@ -7,5 +7,5 @@ export type TokenStore = {
   // @README these could be different themes or sets of tokens
   values: Record<string, AnyTokenList>
   usedTokenSet?: UsedTokenSetsMap | null;
-  checkForChanges: string;
+  checkForChanges?: string;
 };
