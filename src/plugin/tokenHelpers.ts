@@ -46,16 +46,15 @@ export function resolveTokenValues(tokens: SingleToken[], previousCount: number 
     } else {
       // If we're not dealing with special tokens, just return resolved value
       returnValue = getAliasValue(t, tokensInProgress);
-
       failedToResolve = returnValue === null || checkIfContainsAlias(returnValue);
     }
-
     const returnObject = {
       ...t,
       value: returnValue,
       rawValue: t.rawValue || t.value,
-      ...(failedToResolve ? { failedToResolve } : {}),
-    } as ResolveTokenValuesResult;
+      failedToResolve,
+    } as ResolveTokenValuesResult;  
+
     return returnObject;
   });
 
