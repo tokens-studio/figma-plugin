@@ -102,7 +102,6 @@ export function Initiator() {
             setStorageType({ provider: pluginMessage.storageType });
             break;
           case MessageFromPluginTypes.API_CREDENTIALS: {
-            console.log(MessageFromPluginTypes.API_CREDENTIALS);
             const {
               status, credentials, featureFlagId, usedTokenSet,
             } = pluginMessage;

@@ -80,7 +80,6 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
       try {
         const { currentUser } = figma;
         const settings = await getUISettings();
-        // const featureFlagId = await getFeatureFlags();
         const usedTokenSet = await getUsedTokenSet();
         inspectDeep = settings.inspectDeep;
         const userId = await getUserId();

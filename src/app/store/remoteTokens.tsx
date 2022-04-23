@@ -69,7 +69,6 @@ export default function useRemoteTokens() {
 
     if (tokenValues) {
       dispatch.tokenState.setLastSyncedState(JSON.stringify(tokenValues.values, null, 2));
-      dispatch.tokenState.updateDocument();
       dispatch.tokenState.setTokenData({ ...tokenValues, usedTokenSet: usedTokenSet ?? {} });
       track('Launched with token sets', {
         count: Object.keys(tokenValues.values).length,
