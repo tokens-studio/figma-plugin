@@ -47,22 +47,25 @@ export function mapValuesToTokens(tokens: Map<string, AnyTokenList[number]>, val
   return mappedValues;
 }
 
-export function setTokensOnDocument(tokens: AnyTokenSet, updatedAt: string, usedTokenSet: UsedTokenSetsMap) {
+export function setTokensOnDocument(tokens: AnyTokenSet, updatedAt: string, usedTokenSet: UsedTokenSetsMap, checkForChanges: string) {
   tokensSharedDataHandler.set(figma.root, SharedPluginDataKeys.tokens.version, pjs.plugin_version);
   tokensSharedDataHandler.set(figma.root, SharedPluginDataKeys.tokens.values, JSON.stringify(tokens));
   tokensSharedDataHandler.set(figma.root, SharedPluginDataKeys.tokens.updatedAt, updatedAt);
   tokensSharedDataHandler.set(figma.root, SharedPluginDataKeys.tokens.usedTokenSet, JSON.stringify(usedTokenSet));
+  tokensSharedDataHandler.set(figma.root, SharedPluginDataKeys.tokens.checkForChanges, checkForChanges);
 }
 
 export function getTokenData(): {
   values: TokenStore['values'];
   updatedAt: string;
   version: string;
+  checkForChanges: string
 } | null {
   try {
     const values = tokensSharedDataHandler.get(figma.root, SharedPluginDataKeys.tokens.values);
     const version = tokensSharedDataHandler.get(figma.root, SharedPluginDataKeys.tokens.version);
     const updatedAt = tokensSharedDataHandler.get(figma.root, SharedPluginDataKeys.tokens.updatedAt);
+    const checkForChanges = tokensSharedDataHandler.get(figma.root, SharedPluginDataKeys.tokens.checkForChanges);
     if (values) {
       const parsedValues = JSON.parse(values);
       if (Object.keys(parsedValues).length > 0) {
@@ -74,6 +77,7 @@ export function getTokenData(): {
           values: tokenObject as TokenStore['values'],
           updatedAt,
           version,
+          checkForChanges,
         };
       }
     }

@@ -80,7 +80,7 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
       try {
         const { currentUser } = figma;
         const settings = await getUISettings();
-        const featureFlagId = await getFeatureFlags();
+        // const featureFlagId = await getFeatureFlags();
         const usedTokenSet = await getUsedTokenSet();
         inspectDeep = settings.inspectDeep;
         const userId = await getUserId();
@@ -98,22 +98,10 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
 
         const apiProviders = await figma.clientStorage.getAsync('apiProviders');
         if (apiProviders) notifyAPIProviders(JSON.parse(apiProviders));
-        switch (storageType.provider) {
-          case StorageProviderType.JSONBIN:
-          case StorageProviderType.GITHUB:
-          case StorageProviderType.GITLAB:
-          case StorageProviderType.URL: {
-            compareProvidersWithStored({
-              providers: apiProviders, storageType, featureFlagId, usedTokenSet,
-            });
-            break;
-          }
-          default: {
-            const oldTokens = getTokenData();
-            if (oldTokens) {
-              notifyTokenValues({ ...oldTokens, usedTokenSet });
-            }
-          }
+
+        const oldTokens = getTokenData();
+        if (oldTokens) {
+          notifyTokenValues({ ...oldTokens, usedTokenSet });
         }
       } catch (err) {
         figma.closePlugin('There was an error, check console (F12)');
@@ -204,7 +192,7 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
         updateStyles(msg.tokens, false, msg.settings);
       }
       if (msg.tokenValues && msg.updatedAt) {
-        setTokensOnDocument(msg.tokenValues, msg.updatedAt, msg.usedTokenSet);
+        setTokensOnDocument(msg.tokenValues, msg.updatedAt, msg.usedTokenSet, msg.checkForChanges);
       }
       if (msg.tokens) {
         const tokensMap = tokenArrayGroupToMap(msg.tokens);
@@ -320,6 +308,42 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
       createAnnotation(msg.tokens, msg.direction);
       break;
     }
+    case MessageToPluginTypes.GET_API_CREDENTIALS:
+      try {
+        const settings = await getUISettings();
+        const featureFlagId = await getFeatureFlags();
+        const usedTokenSet = await getUsedTokenSet();
+        inspectDeep = settings.inspectDeep;
+        const storageType = getSavedStorageType();
+        const apiProviders = await figma.clientStorage.getAsync('apiProviders');
+        if (apiProviders) notifyAPIProviders(JSON.parse(apiProviders));
+        switch (storageType.provider) {
+          case StorageProviderType.JSONBIN:
+          case StorageProviderType.GITHUB:
+          case StorageProviderType.GITLAB:
+          case StorageProviderType.URL: {
+            compareProvidersWithStored({
+              providers: apiProviders, storageType, featureFlagId, usedTokenSet,
+            });
+            break;
+          }
+          default: {
+            const oldTokens = getTokenData();
+            if (oldTokens) {
+              notifyTokenValues({ ...oldTokens, usedTokenSet });
+            }
+          }
+        }
+      } catch (err) {
+        figma.closePlugin('There was an error, check console (F12)');
+        console.error(err);
+        return;
+      }
+
+      if (!figma.currentPage.selection.length) {
+        notifyNoSelection();
+      }
+
     default:
   }
 });

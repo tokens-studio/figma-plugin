@@ -1,9 +1,10 @@
 import React from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import convertTokensToObject from '@/utils/convertTokensToObject';
 import Icon from './Icon';
 import Tooltip from './Tooltip';
 import useRemoteTokens from '../store/remoteTokens';
+import { Dispatch } from '../store';
 import { StorageProviderType } from '../../types/api';
 import Box from './Box';
 import {
@@ -41,12 +42,15 @@ export const Navbar: React.FC = () => {
   const editProhibited = useSelector(editProhibitedSelector);
   const lastSyncedState = useSelector(lastSyncedStateSelector);
   const usedTokenSet = useSelector(usedTokenSetSelector);
+  const dispatch = useDispatch<Dispatch>();
   const { pullTokens, pushTokens } = useRemoteTokens();
 
   const checkForChanges = React.useCallback(() => {
     if (lastSyncedState !== JSON.stringify(convertTokensToObject(tokens), null, 2)) {
+      dispatch.tokenState.updateCheckForChanges('true');
       return true;
     }
+    dispatch.tokenState.updateCheckForChanges('false');
     return false;
   }, [lastSyncedState, tokens]);
 

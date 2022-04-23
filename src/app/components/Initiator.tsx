@@ -2,6 +2,7 @@ import React from 'react';
 import { useDispatch } from 'react-redux';
 import { identify, track } from '@/utils/analytics';
 import { MessageFromPluginTypes, MessageToPluginTypes, PostToUIMessage } from '@/types/messages';
+import useConfirm from '@/app/hooks/useConfirm';
 import { postToFigma } from '../../plugin/notifiers';
 import useRemoteTokens from '../store/remoteTokens';
 import { Dispatch } from '../store';
@@ -15,9 +16,22 @@ export function Initiator() {
   const { pullTokens } = useRemoteTokens();
   const { fetchFeatureFlags } = useFeatureFlags();
   const { setStorageType } = useStorage();
+  const { confirm } = useConfirm();
+
+  async function askUserIfPull(): Promise<boolean> {
+    const { result } = await confirm({
+      text: 'Pull from GitHub?',
+      description: 'You have unsaved changes that will be lost. Do you want to pull from your repo?',
+    });
+    return result;
+  }
 
   const onInitiate = () => {
     postToFigma({ type: MessageToPluginTypes.INITIATE });
+  };
+
+  const getApiCredentials = () => {
+    postToFigma({ type: MessageToPluginTypes.GET_API_CREDENTIALS });
   };
 
   React.useEffect(() => {
@@ -63,10 +77,16 @@ export function Initiator() {
             break;
           case MessageFromPluginTypes.TOKEN_VALUES: {
             const { values } = pluginMessage;
-            if (values) {
-              dispatch.tokenState.setTokenData(values);
-              dispatch.uiState.setActiveTab('tokens');
+            if (values.checkForChanges === 'true') {
+              const userDecision = await askUserIfPull();
+              if (!userDecision) {
+                dispatch.tokenState.setTokenData(values);
+                dispatch.uiState.setActiveTab('tokens');
+              } else getApiCredentials();
+            } else {
+              getApiCredentials();
             }
+
             break;
           }
           case MessageFromPluginTypes.STYLES: {
@@ -82,6 +102,7 @@ export function Initiator() {
             setStorageType({ provider: pluginMessage.storageType });
             break;
           case MessageFromPluginTypes.API_CREDENTIALS: {
+            console.log(MessageFromPluginTypes.API_CREDENTIALS);
             const {
               status, credentials, featureFlagId, usedTokenSet,
             } = pluginMessage;

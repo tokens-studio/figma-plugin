@@ -28,6 +28,7 @@ type UpdateTokensOnSourcesPayload = {
   storageType: StorageType;
   lastUpdatedAt: string;
   api: ContextObject;
+  checkForChanges: string
 };
 
 async function updateRemoteTokens({
@@ -75,6 +76,7 @@ export default async function updateTokensOnSources({
   storageType,
   api,
   lastUpdatedAt,
+  checkForChanges,
 }: UpdateTokensOnSourcesPayload) {
   if (tokens && !isLocal && shouldUpdateRemote && !editProhibited) {
     updateRemoteTokens({
@@ -97,5 +99,6 @@ export default async function updateTokensOnSources({
     updatedAt,
     settings,
     usedTokenSet,
+    checkForChanges,
   });
 }
