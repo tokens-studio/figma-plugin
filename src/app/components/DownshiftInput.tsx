@@ -12,52 +12,65 @@ const StyledDropdown = styled('div', {
   position: 'absolute',
   zIndex: '10',
   width: '100%',
-  maxHeight: '130px',
-  borderRadius: '4px',
+  maxHeight: '140px',
+  borderRadius: '$contextMenu',
   overflowY: 'scroll',
   backgroundColor: 'white',
-  marginTop: '4px',
+  marginTop: '1px',
   cursor: 'pointer',
-  boxShadow: '0px 0px 20px 8px rgba(0, 0, 0, 0.42)',
+  boxShadow: '$contextMenu',
+});
+
+const StyledItemValue = styled('div', {
+  flexShrink: 0,
+  color: '$textMuted',
+  fontWeight: '$bold',
+  textAlign: 'right',
+  textTransform: 'uppercase',
 });
 
 const StyledItem = styled('div', {
   display: 'flex',
   alignItems: 'center',
-  padding: '4px 10px',
-  fontSize: '14px',
-  ' &:focus': {
-    backgroundColor: '$hover',
+  gap: '$2',
+  padding: '$2 $3',
+  fontSize: '$xsmall',
+  variants: {
+    isFocused: {
+      true: {
+        backgroundColor: '$hover',
+        color: '$onInteraction',
+        [`& ${StyledItemValue}`]: {
+          color: '$onInteraction',
+        },
+      },
+    },
   },
 });
 
 const StyledItemColorDiv = styled('div', {
-  width: '10%',
+  flexShrink: 0,
 });
 
 const StyledItemColor = styled('div', {
-  width: '20px',
-  height: '20px',
-  borderRadius: '4px',
+  width: '16px',
+  height: '16px',
+  borderRadius: '$colorSwatch',
+  border: '1px solid',
+  borderColor: '$borderMuted',
 });
 
 const StyledItemName = styled('div', {
-  width: '70%',
-  paddingLeft: '4px',
+  flexGrow: 1,
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
 });
 
-const StyledItemValue = styled('div', {
-  width: '20%',
-  color: '#959191',
-  fontWeight: '500',
-  paddingRight: '10px',
-  textAlign: 'right',
-  textTransform: 'uppercase',
-
+const StyledPart = styled('span', {
   variants: {
-    isFocused: {
+    matches: {
       true: {
-        color: 'black',
+        fontWeight: '$bold',
       },
     },
   },
@@ -103,9 +116,10 @@ const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
     return (
       <span>
         {parts.map((part, i) => (
-          <span key={i} style={part.toLowerCase() === highlight.toLowerCase() ? { fontWeight: 'bold' } : {}}>
+          // eslint-disable-next-line react/no-array-index-key
+          <StyledPart key={i} matches={part.toLowerCase() === highlight.toLowerCase()}>
             {part}
-          </span>
+          </StyledPart>
         ))}
         {' '}
       </span>
@@ -118,23 +132,23 @@ const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
         (token: SingleToken) => !filteredValue || token.name.toLowerCase().includes(filteredValue.toLowerCase()),
       )
       .filter((token: SingleToken) => token?.type === type),
-    [resolvedTokens, filteredValue],
+    [resolvedTokens, filteredValue, type],
   );
 
-  const handleSelect = useCallback((selectedItem: any, value) => {
+  const handleSelect = useCallback((selectedItem: any) => {
     setInputValue(value.includes('$') ? `$${selectedItem.name}` : `{${selectedItem.name}}`);
     setShowAutoSuggest(false);
-  }, []);
+  }, [setInputValue, setShowAutoSuggest, value]);
 
   return (
-    <Downshift onSelect={(selectedItem) => handleSelect(selectedItem, value)}>
+    <Downshift onSelect={handleSelect}>
       {({
-        selectedItem, highlightedIndex, getItemProps, getInputProps, getToggleButtonProps,
+        selectedItem, highlightedIndex, getItemProps, getInputProps,
       }) => (
         <div className="relative">
           <Stack direction="row" justify="between" align="center" css={{ marginBottom: '$1' }}>
-            {label ? <div className="text-xxs font-medium">{label}</div> : null}
-            {error ? <div className="text-red-500 font-bold">{error}</div> : null}
+            {label ? <div className="font-medium text-xxs">{label}</div> : null}
+            {error ? <div className="font-bold text-red-500">{error}</div> : null}
           </Stack>
           <Box css={{ display: 'flex', position: 'relative', width: '100%' }} className="input">
             {!!prefix && <StyledPrefix>{prefix}</StyledPrefix>}
@@ -154,7 +168,7 @@ const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
           && filteredTokenItems.length > 0
           && selectedItem?.name !== filteredValue
           && (showAutoSuggest || (['{', '$'].some((c) => value.includes(c)) && !value.includes('}'))) ? (
-            <StyledDropdown>
+            <StyledDropdown className="content scroll-container">
               {filteredTokenItems.map((token: SingleToken, index: number) => (
                 <StyledItem
                   className="dropdown-item"
@@ -162,14 +176,15 @@ const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
                   css={{
                     backgroundColor: highlightedIndex === index ? '$hover' : '$bgDefault',
                   }}
+                  isFocused={highlightedIndex === index}
                 >
                   {type === 'color' && (
                     <StyledItemColorDiv>
-                      <StyledItemColor style={{ backgroundColor: token.value }} />
+                      <StyledItemColor style={{ backgroundColor: token.value.toString() }} />
                     </StyledItemColorDiv>
                   )}
                   <StyledItemName>{getHighlightedText(token.name, filteredValue || '')}</StyledItemName>
-                  <StyledItemValue isFocused={highlightedIndex === index}>{token.value}</StyledItemValue>
+                  <StyledItemValue>{token.value}</StyledItemValue>
                 </StyledItem>
               ))}
             </StyledDropdown>
