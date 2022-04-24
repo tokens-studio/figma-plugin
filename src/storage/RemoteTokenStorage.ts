@@ -71,7 +71,7 @@ export abstract class RemoteTokenStorage<Metadata = unknown> {
     return this.write(files);
   }
 
-  public async retrieve(): Promise<RemoteTokenStorageData<Metadata>> {
+  public async retrieve(): Promise<RemoteTokenStorageData<Metadata> | null> {
     const data: RemoteTokenStorageData<Metadata> = {
       themes: [],
       tokens: {},
@@ -81,6 +81,10 @@ export abstract class RemoteTokenStorage<Metadata = unknown> {
     // start by reading the files from the remote source
     // it is up to the remote storage implementation to split it up into "File" objects
     const files = await this.read();
+    if (files.length === 0) {
+      return null;
+    }
+
     files.forEach((file) => {
       if (file.type === 'themes') {
         data.themes = [...data.themes, ...file.data];

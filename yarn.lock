@@ -8027,6 +8027,11 @@ just-extend@^6.0.1:
   resolved "https://registry.yarnpkg.com/just-extend/-/just-extend-6.0.1.tgz#e56276a36cbc360713612b9445f8753a7c73dd50"
   integrity sha512-CrwyGHRQ22XObWsZPQdnKlLLuCPj95OQ9HrLYdfjymCsYoYj7HPMFNrgqPW/LJjhK+CnVZAtftVSfo8Wr33RTA==
 
+just-is-empty@^3.1.2:
+  version "3.1.2"
+  resolved "https://registry.yarnpkg.com/just-is-empty/-/just-is-empty-3.1.2.tgz#beadca52926943bd0b8a4751c0872af17145c629"
+  integrity sha512-tQyYk2yvkgO8wP0Mc2yGOOYgyj9F4xBC2JIAMGeLwds2rDnIZyia3Ay0UiKM0/QvEJm90NVZRsaWXn1z/a98sg==
+
 just-omit@^2.0.1:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/just-omit/-/just-omit-2.0.1.tgz#25d5967424cc69a2ef4faa315ede1d5b7be3168c"

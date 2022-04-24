@@ -5,7 +5,7 @@ import { MessageToPluginTypes } from '@/types/messages';
 import useConfirm from '@/app/hooks/useConfirm';
 import usePushDialog from '@/app/hooks/usePushDialog';
 import { ContextObject } from '@/types/api';
-import { notifyToUI, postToFigma } from '../../../plugin/notifiers';
+import { notifyToUI, postToFigma } from '@/plugin/notifiers';
 import { FeatureFlags } from '@/utils/featureFlags';
 import {
   featureFlagsSelector, localApiStateSelector, themesListSelector, tokensSelector,

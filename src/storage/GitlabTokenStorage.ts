@@ -51,11 +51,13 @@ export class GitlabTokenStorage extends GitTokenStorage {
       }
     }
 
-    const projectsInGroup = await this.gitlabClient.Groups.projects(this.owner);
-    const project = projectsInGroup.filter((p) => p.path === this.repository)[0];
-    if (project) {
-      this.projectId = project.id;
-      this.groupId = project.namespace.id;
+    if (!this.projectId) {
+      const projectsInGroup = await this.gitlabClient.Groups.projects(this.owner);
+      const project = projectsInGroup.filter((p) => p.path === this.repository)[0];
+      if (project) {
+        this.projectId = project.id;
+        this.groupId = project.namespace.id;
+      }
     }
 
     if (!this.projectId) {
@@ -116,7 +118,7 @@ export class GitlabTokenStorage extends GitTokenStorage {
         return compact(jsonFileContents.map<RemoteTokenStorageFile<GitStorageMetadata> | null>((fileContent, index) => {
           const { path } = jsonFiles[index];
           if (IsJSONString(fileContent)) {
-            const name = path.replace('.json', '');
+            const name = path.replace('.json', '').replace(this.path, '').replace(/^\//, '').replace(/\/$/, '');
             const parsed = JSON.parse(fileContent) as GitMultiFileObject;
 
             if (name === '$themes') {
@@ -183,7 +185,7 @@ export class GitlabTokenStorage extends GitTokenStorage {
       branch,
       message,
       Object.entries(changeset).map(([filePath, content]) => ({
-        action: filesInTrees.includes(`${rootPath}/${filePath}`) ? 'update' : 'create',
+        action: filesInTrees.includes(filePath) ? 'update' : 'create',
         filePath,
         content,
       })),
