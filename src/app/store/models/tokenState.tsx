@@ -464,7 +464,7 @@ export const tokenState = createModel<RootModel>()({
           api: rootState.uiState.api,
           storageType: rootState.uiState.storageType,
           shouldUpdateRemote: params.updateRemote && rootState.settings.updateRemote,
-          checkForChanges: params.checkForChanges ? params.checkForChanges : 'false',
+          checkForChanges: params.checkForChanges || 'false',
         });
       } catch (e) {
         console.error('Error updating document', e);

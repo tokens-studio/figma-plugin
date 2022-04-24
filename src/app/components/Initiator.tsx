@@ -18,21 +18,16 @@ export function Initiator() {
   const { setStorageType } = useStorage();
   const { confirm } = useConfirm();
 
-  async function askUserIfPull(): Promise<boolean> {
+  const askUserIfPull: (() => Promise<boolean>) = React.useCallback(async () => {
     const { result } = await confirm({
       text: 'Pull from GitHub?',
       description: 'You have unsaved changes that will be lost. Do you want to pull from your repo?',
     });
     return result;
-  }
+  }, []);
 
-  const onInitiate = () => {
-    postToFigma({ type: MessageToPluginTypes.INITIATE });
-  };
-
-  const getApiCredentials = () => {
-    postToFigma({ type: MessageToPluginTypes.GET_API_CREDENTIALS });
-  };
+  const onInitiate = React.useCallback(() => postToFigma({ type: MessageToPluginTypes.INITIATE }), []);
+  const getApiCredentials = React.useCallback(() => postToFigma({ type: MessageToPluginTypes.GET_API_CREDENTIALS }), []);
 
   React.useEffect(() => {
     onInitiate();
@@ -77,12 +72,9 @@ export function Initiator() {
             break;
           case MessageFromPluginTypes.TOKEN_VALUES: {
             const { values } = pluginMessage;
-            if (values.checkForChanges === 'true') {
-              const userDecision = await askUserIfPull();
-              if (!userDecision) {
-                dispatch.tokenState.setTokenData(values);
-                dispatch.uiState.setActiveTab('tokens');
-              } else getApiCredentials();
+            if (values.checkForChanges === 'true' && !(await askUserIfPull())) {
+              dispatch.tokenState.setTokenData(values);
+              dispatch.uiState.setActiveTab('tokens');
             } else {
               getApiCredentials();
             }

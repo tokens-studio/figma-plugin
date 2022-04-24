@@ -53,7 +53,7 @@ export enum MessageToPluginTypes {
   REMOVE_TOKENS_BY_VALUE = 'remove-tokens-by-value',
   CHANGED_TABS = 'changed-tabs',
   SELECT_NODES = 'select-nodes',
-  GET_API_CREDENTIALS = 'get-api-credentails',
+  GET_API_CREDENTIALS = 'get-api-credentials',
 }
 
 export type NoSelectionFromPluginMessage = { type: MessageFromPluginTypes.NO_SELECTION };

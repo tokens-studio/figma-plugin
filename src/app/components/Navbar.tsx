@@ -46,12 +46,9 @@ export const Navbar: React.FC = () => {
   const { pullTokens, pushTokens } = useRemoteTokens();
 
   const checkForChanges = React.useCallback(() => {
-    if (lastSyncedState !== JSON.stringify(convertTokensToObject(tokens), null, 2)) {
-      dispatch.tokenState.updateCheckForChanges('true');
-      return true;
-    }
-    dispatch.tokenState.updateCheckForChanges('false');
-    return false;
+    const hasChanged = (lastSyncedState !== JSON.stringify(convertTokensToObject(tokens), null, 2));
+    dispatch.tokenState.updateCheckForChanges(String(hasChanged));
+    return hasChanged;
   }, [lastSyncedState, tokens]);
 
   return (
