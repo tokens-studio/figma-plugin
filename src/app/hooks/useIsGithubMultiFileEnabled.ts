@@ -10,7 +10,7 @@ export function useIsGithubMultiFileEnabled() {
   return useMemo(() => (
     Boolean(
       featureFlags?.gh_mfs_enabled
-      && (api.provider === StorageProviderType.GITHUB || api.provider === StorageProviderType.GITLAB)
+      && (api?.provider === StorageProviderType.GITHUB || api?.provider === StorageProviderType.GITLAB)
       && !api?.filePath?.endsWith('.json'),
     )
   ), [api, featureFlags]);
