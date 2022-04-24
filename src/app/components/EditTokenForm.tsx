@@ -284,7 +284,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
                 )
               }
               suffix={(
-                <StyledInputSuffix onClick={handleAutoSuggest}>
+                <StyledInputSuffix type="button" onClick={handleAutoSuggest}>
                   <StyledIconDisclosure />
                 </StyledInputSuffix>
               )}

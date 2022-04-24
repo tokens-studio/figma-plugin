@@ -147,7 +147,7 @@ const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
                 onChange: handleChange,
               })}
             />
-            {!!suffix && <button {...getToggleButtonProps()}>{suffix}</button>}
+            {!!suffix && suffix}
           </Box>
 
           {filteredTokenItems
