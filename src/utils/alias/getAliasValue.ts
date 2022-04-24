@@ -3,7 +3,6 @@ import { convertToRgb } from '../color';
 import { findReferences } from '../findReferences';
 import { isSingleTokenValueObject } from '../is';
 import { checkAndEvaluateMath } from '../math';
-import { theme } from '@/stitches.config';
 
 // @TODO This function logic needs to be explained to improve it. It is unclear at this time which cases it needs to handle and how
 export function getAliasValue(token: SingleToken | string | number, tokens: SingleToken[] = []): string | number | null {
@@ -27,12 +26,11 @@ export function getAliasValue(token: SingleToken | string | number, tokens: Sing
           const tokenAliasSplited = nameToLookFor.split('.');
           const tokenAliasSplitedLast = tokenAliasSplited.pop();
           const tokenAliasLastExcluded = tokenAliasSplited.join('.');
-          const foundToken = tokens.find((t) => t.name === nameToLookFor || t.name === tokenAliasLastExcluded);
-
+          let foundToken = tokens.find((t) => t.name === nameToLookFor || t.name === tokenAliasLastExcluded);
           if (foundToken?.name === nameToLookFor) { return getAliasValue(foundToken, tokens); }
 
           const candidateProperty = tokenAliasSplitedLast;
-          if (foundToken?.name === tokenAliasLastExcluded && candidateProperty && foundToken.rawValue?.hasOwnProperty(candidateProperty)) return foundToken?.rawValue[candidateProperty];
+          if (foundToken?.name === tokenAliasLastExcluded && candidateProperty && foundToken.rawValue?.hasOwnProperty(candidateProperty)) return getAliasValue(foundToken?.rawValue[candidateProperty], tokens);
         }
         return ref;
       });
@@ -40,10 +38,6 @@ export function getAliasValue(token: SingleToken | string | number, tokens: Sing
         const resolvedReference = resolvedReferences[index];
         const stringValue = String(resolvedReference);
         let resolved = checkAndEvaluateMath(stringValue);
-        if (String(resolved).startsWith("$")) {
-          const sizeProperty = String(resolved).slice(1, String(resolved).length);
-            resolved = theme.space[`${sizeProperty}`].value;
-        }
         returnedValue = returnedValue ? returnedValue.replace(reference, String(resolved)) : returnedValue;
       });
 
