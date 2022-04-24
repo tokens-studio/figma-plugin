@@ -28,7 +28,7 @@ import { isEqual } from '@/utils/isEqual';
 export interface TokenState {
   tokens: Record<string, AnyTokenList>;
   themes: ThemeObjectsList;
-  lastSyncedState: string;
+  lastSyncedState: string; // @README for reference, at this time this is a JSON stringified representation of the tokens and themes ([tokens, themes])
   importedTokens: {
     newTokens: SingleToken[];
     updatedTokens: SingleToken[];

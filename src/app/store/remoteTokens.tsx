@@ -70,7 +70,7 @@ export default function useRemoteTokens() {
     }
 
     if (remoteData) {
-      dispatch.tokenState.setLastSyncedState(JSON.stringify(remoteData.tokens, null, 2));
+      dispatch.tokenState.setLastSyncedState(JSON.stringify([remoteData.tokens, remoteData.themes], null, 2));
       dispatch.tokenState.setTokenData({
         values: remoteData.tokens,
         themes: remoteData.themes,

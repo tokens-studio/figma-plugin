@@ -156,13 +156,13 @@ export class GithubTokenStorage extends GitTokenStorage {
         return [
           {
             type: 'themes',
-            path: '$themes.json',
+            path: `${this.path}/$themes.json`,
             data: parsed.$themes ?? [],
           },
           ...(Object.entries(parsed).filter(([key]) => key !== '$themes') as [string, AnyTokenSet<false>][]).map<RemoteTokenStorageFile<GitStorageMetadata>>(([name, tokenSet]) => ({
             name,
             type: 'tokenSet',
-            path: `${name}.json`,
+            path: `${this.path}/${name}.json`,
             data: tokenSet,
           })),
         ];

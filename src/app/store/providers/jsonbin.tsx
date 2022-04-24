@@ -122,7 +122,7 @@ export function useJSONbin() {
         provider: context,
         shouldSetInDocument: true,
       });
-      dispatch.tokenState.setLastSyncedState(JSON.stringify(content.tokens, null, 2));
+      dispatch.tokenState.setLastSyncedState(JSON.stringify([content.tokens, content.themes], null, 2));
       dispatch.tokenState.setTokenData({
         values: content.tokens,
         themes: content.themes,

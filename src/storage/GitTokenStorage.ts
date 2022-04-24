@@ -93,7 +93,7 @@ export abstract class GitTokenStorage extends RemoteTokenStorage<GitStorageMetad
         if (file.type === 'tokenSet') {
           filesChangeset[`${this.path}/${file.name}.json`] = JSON.stringify(file.data, null, 2);
         } else if (file.type === 'themes') {
-          filesChangeset['$themes.json'] = JSON.stringify(file.data, null, 2);
+          filesChangeset[`${this.path}/$themes.json`] = JSON.stringify(file.data, null, 2);
         }
       });
     }
