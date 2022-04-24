@@ -29,7 +29,7 @@ export default function CreateBranchModal({
 
   const [formFields, setFormFields] = React.useState({});
   const [hasErrored, setHasErrored] = React.useState(false);
-  const inputRef = React.useRef(null);
+  const inputRef = React.useRef<HTMLInputElement | null>(null);
 
   /* @lifecycle
   ** set focus on input
@@ -38,7 +38,13 @@ export default function CreateBranchModal({
     inputRef.current?.focus();
   }, [inputRef.current]);
 
-  const handleCreateNewClick = async () => {
+  const handleChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormFields({ ...formFields, [e.target.name]: e.target.value });
+  }, [formFields]);
+
+  const handleSubmit = React.useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    
     const { branch } = formFields;
 
     setHasErrored(false);
@@ -58,19 +64,12 @@ export default function CreateBranchModal({
     }
 
     if (isCurrentChanges) await pushTokens({ ...apiData, branch });
-  };
+  }, [formFields, localApiState, apiData]);
 
-  const handleChange = (e: any) => {
-    setFormFields({ ...formFields, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = (e: any) => {
-    e.preventDefault();
-    handleCreateNewClick();
-  };
+  const onModalClose = React.useCallback(() => onClose(false), [onClose]);
 
   return (
-    <Modal large isOpen={isOpen} close={() => onClose(false)}>
+    <Modal large isOpen={isOpen} close={onModalClose}>
       <form onSubmit={handleSubmit}>
         <Stack direction="column" gap={4}>
           <Heading>

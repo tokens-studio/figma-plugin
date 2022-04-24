@@ -33,7 +33,7 @@ export default function Footer() {
     return false;
   }, [lastSyncedState, tokens]);
 
-  const transformProviderName = (provider: StorageProviderType) => {
+  const transformProviderName = React.useCallback((provider: StorageProviderType) => {
     switch (provider) {
       case StorageProviderType.JSONBIN:
         return 'JSONBin.io';
@@ -44,7 +44,10 @@ export default function Footer() {
       default:
         return provider;
     }
-  };
+  }, []);
+
+  const onPushButtonClicked = React.useCallback(() => pushTokens(), []);
+  const onPullButtonClicked = React.useCallback(() => pullTokens({ usedTokenSet }), [usedTokenSet]);
 
   return (
     <Box css={{
@@ -56,13 +59,13 @@ export default function Footer() {
         <>
           <BranchSelector currentBranch={localApiState.branch} />
           <Tooltip variant="top" label={`Pull from ${transformProviderName(storageType.provider)}`}>
-            <button onClick={() => pullTokens({ usedTokenSet })} type="button" className="button button-ghost">
+            <button onClick={onPullButtonClicked} type="button" className="button button-ghost">
               <DownloadIcon />
             </button>
           </Tooltip>
           <Tooltip variant="top" label={`Push to ${transformProviderName(storageType.provider)}`}>
             <button
-              onClick={() => pushTokens()}
+              onClick={onPushButtonClicked}
               type="button"
               className="relative button button-ghost"
               disabled={editProhibited}

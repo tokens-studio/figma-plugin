@@ -115,6 +115,29 @@ export default function BranchSelector() {
     dispatch.uiState.setLocalApiState({ ...localApiState, branch });
   };
 
+  const BranchSwitchMenuRadioElement = ({ branch, index } : { branch: string, index:number }) => {
+    const onSelect = React.useCallback(() => onBranchSelected(branch), [branch]);
+    return (
+      <BranchSwitchMenuRadioItem key={`radio_${index}`} value={branch} onSelect={onSelect}>
+        <BranchSwitchMenuItemIndicator>
+          <CheckIcon />
+        </BranchSwitchMenuItemIndicator>
+        <GitBranchIcon size={12} />
+        {` ${branch}`}
+      </BranchSwitchMenuRadioItem>
+    );
+  };
+
+  const BranchSwitchMenuItemElement = ({ branch, index } : { branch: string, index: number }) => {
+    const onSelect = React.useCallback(() => createNewBranchFrom(branch), [branch]);
+    return (
+      <BranchSwitchMenuItem key={`menu_item_${index}`} onSelect={onSelect}>
+        <GitBranchIcon size={12} />
+        {` ${branch}`}
+      </BranchSwitchMenuItem>
+    );
+  };
+
   return (
     <>
       {currentBranch
@@ -128,15 +151,7 @@ export default function BranchSelector() {
             <BranchSwitchMenuContent side="top" sideOffset={5}>
               <BranchSwitchMenuRadioGroup value={currentBranch}>
                 {branchState.branches.length > 0
-                  && branchState.branches.map((branch, index) => (
-                    <BranchSwitchMenuRadioItem key={index} value={branch} onSelect={() => onBranchSelected(branch)}>
-                      <BranchSwitchMenuItemIndicator>
-                        <CheckIcon />
-                      </BranchSwitchMenuItemIndicator>
-                      <GitBranchIcon size={12} />
-                      {` ${branch}`}
-                    </BranchSwitchMenuRadioItem>
-                  ))}
+                  && branchState.branches.map((branch, index) => <BranchSwitchMenuRadioElement branch={branch} index={index} />)}
               </BranchSwitchMenuRadioGroup>
               <BranchSwitchMenu>
                 <BranchSwitchMenuTrigger>
@@ -150,12 +165,7 @@ export default function BranchSelector() {
                     Current changes
                   </BranchSwitchMenuItem>
                   )}
-                  {branchState.branches.length > 0 && branchState.branches.map((branch, index) => (
-                    <BranchSwitchMenuItem key={index} onSelect={() => createNewBranchFrom(branch)}>
-                      <GitBranchIcon size={12} />
-                      {` ${branch}`}
-                    </BranchSwitchMenuItem>
-                  ))}
+                  {branchState.branches.length > 0 && branchState.branches.map((branch, index) => <BranchSwitchMenuItemElement branch={branch} index={index} />)}
                 </BranchSwitchMenuContent>
               </BranchSwitchMenu>
               <BranchSwitchMenuArrow offset={12} />
