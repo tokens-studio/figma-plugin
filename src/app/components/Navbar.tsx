@@ -73,7 +73,6 @@ export const Navbar: React.FC = () => {
         <div>
           <TabButton name={Tabs.TOKENS} label="Tokens" />
           <TabButton name={Tabs.INSPECTOR} label="Inspect" />
-          <TabButton name={Tabs.SYNCSETTINGS} label="Sync" />
           <TabButton name={Tabs.SETTINGS} label="Settings" />
         </div>
         <NavbarUndoButton />

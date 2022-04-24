@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { styled } from '@/stitches.config';
 import IconVisibility from './icons/IconVisibiltyOn';
 import IconVisibilityOff from './icons/IconVisibilityOff';
@@ -20,6 +20,7 @@ type Props = React.InputHTMLAttributes<HTMLInputElement> & {
   placeholder?: string;
   capitalize?: boolean;
   prefix?: React.ReactNode;
+  suffix?: React.ReactNode;
   step?: string;
   isMasked?: boolean;
   onChange?: React.ChangeEventHandler<HTMLInputElement>;
@@ -116,6 +117,7 @@ const Input = React.forwardRef<HTMLInputElement, Props>(({
   defaultValue,
   type,
   prefix,
+  suffix,
   step,
   custom = '',
   inputRef = null,
@@ -127,15 +129,13 @@ const Input = React.forwardRef<HTMLInputElement, Props>(({
   // if isMasked is true, then we need to handle toggle visibility
   const [show, setShow] = React.useState(false);
 
-  // @TODO this causes new function refs on each render
-  // should be a useCallback
-  const handleVisibility = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleVisibility = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     setShow(!show);
     if (inputRef?.current?.type) {
       inputRef.current.type = inputRef?.current?.type === 'password' ? 'text' : 'password';
     }
-  };
+  }, [show, inputRef]);
 
   return (
     <label htmlFor={name} className="text-xxs font-medium block">
@@ -164,7 +164,7 @@ const Input = React.forwardRef<HTMLInputElement, Props>(({
           hasSuffix={!!isMasked}
           {...inputProps}
         />
-
+        {!!suffix && <span>{suffix}</span>}
         {isMasked && (
           <StyledSuffix type="button" onClick={handleVisibility}>
             <StyledIcon>{show ? <IconVisibility /> : <IconVisibilityOff />}</StyledIcon>
@@ -176,3 +176,4 @@ const Input = React.forwardRef<HTMLInputElement, Props>(({
 });
 
 export default Input;
+export { StyledInput, StyledPrefix, StyledSuffix };
