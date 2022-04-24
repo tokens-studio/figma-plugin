@@ -8,7 +8,7 @@ describe('Loads application', () => {
           type: 'tokenvalues',
           values: {
             version: '5',
-            themes: {},
+            themes: [],
             activeTheme: null,
             values: {
               options: [

@@ -4,9 +4,9 @@ import { tokenStateSelector } from './tokenStateSelector';
 export const themeOptionsSelector = createSelector(
   tokenStateSelector,
   (state) => (
-    Object.entries(state.themes).map(([id, theme]) => ({
+    Object.values(state.themes).map(({ id, name }) => ({
       value: id,
-      label: theme.name,
+      label: name,
     }))
   ),
 );

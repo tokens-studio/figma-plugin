@@ -15,7 +15,7 @@ export function saveTheme(state: TokenState, data: Payload): TokenState {
   const nextState: TokenState = {
     ...state,
     themes: [
-      ...state.themes,
+      ...state.themes.filter((theme) => theme.id === themeId),
       {
         ...data,
         id: themeId,

@@ -9,7 +9,11 @@ export function setActiveTheme(state: TokenState, themeId: string | null): Token
         [tokenSet, themeObject.selectedTokenSets?.[tokenSet] ?? TokenSetStatus.DISABLED]
       )),
     )
-    : state.usedTokenSet;
+    : Object.fromEntries(
+      Object.keys(state.tokens).map((tokenSet) => (
+        [tokenSet, TokenSetStatus.DISABLED]
+      )),
+    );
 
   return {
     ...state,
