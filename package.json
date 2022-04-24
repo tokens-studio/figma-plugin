@@ -1,7 +1,7 @@
 {
     "name": "figma-tokens",
     "version": "1.0.0",
-    "plugin_version": "94",
+    "plugin_version": "95",
     "description": "Figma Tokens",
     "license": "MIT",
     "scripts": {
@@ -22,6 +22,7 @@
     },
     "dependencies": {
         "@figma-plugin/helpers": "^0.15.2",
+        "@gitbeaker/browser": "^35.6.0",
         "@octokit/rest": "^18.9.0",
         "@radix-ui/react-checkbox": "^0.1.5",
         "@radix-ui/react-context-menu": "^0.1.6",
@@ -145,7 +146,7 @@
     },
     "lint-staged": {
         "src/**/*.{ts,tsx}": [
-            "./eslint-non-blocking.sh",
+            "eslint --fix",
             "git add"
         ],
         "src/**/*.{js,jsx,css,json}": [
