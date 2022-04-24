@@ -3,6 +3,7 @@ import { RgbaColorPicker, RgbaColor } from 'react-colorful';
 import { parseToRgb, parseToHsl, toColorString } from 'polished';
 import Input from '../Input';
 import Button from '../Button';
+import { StyledColorPicker } from './StyledColorPicker';
 
 enum InputMode {
   RGBA = 'rgba',
@@ -54,6 +55,7 @@ const hexToRgbaColor = (value: string) => {
       a: 'alpha' in parsed ? roundTo(parsed.alpha, 2) : 1,
     };
   } catch (err) {
+    // eslint-disable-next-line no-console
     console.error(err);
     return { ...DEFAULT_RGBA };
   }
@@ -69,6 +71,7 @@ const hexToHslaColor = (value: string) => {
       a: 'alpha' in parsed ? roundTo(parsed.alpha, 2) : 1,
     };
   } catch (err) {
+    // eslint-disable-next-line no-console
     console.error(err);
     return { ...DEFAULT_HSLA };
   }
@@ -174,9 +177,9 @@ const ColorPicker: React.FC<Props> = ({ value, onChange }) => {
 
   return (
     <div className="mt-2">
-      <div className="color-picker mb-1">
+      <StyledColorPicker>
         <RgbaColorPicker color={rgba} onChange={handlePickerChange} />
-      </div>
+      </StyledColorPicker>
       <div className="flex">
         {inputMode === InputMode.RGBA && (
         <div className="grid gap-1 grid-cols-4 mr-1">

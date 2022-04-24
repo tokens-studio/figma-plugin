@@ -4,88 +4,7 @@
 
 @tailwind components;
 
-/* Vars */
-:root {
-  /* COLORS */
-  /* Accent */
-  --blue: #18a0fb;
-  --purple: #7b61ff;
-  --hot-pink: #ff00ff;
-  --green: #1bc47d;
-  --red: #f24822;
-  --yellow: #ffeb00;
-  /* Basic foreground */
-  --black: #000000;
-  --black8: rgba(0, 0, 0, 0.8);
-  --black8-opaque: #333333;
-  --black3: rgba(0, 0, 0, 0.3);
-  --black3-opaque: #b3b3b3;
-  --white: #ffffff;
-  --white8: rgba(255, 255, 255, 0.8);
-  --white4: rgba(255, 255, 255, 0.4);
-  /* Basic background */
-  --grey: #f0f0f0;
-  --silver: #e5e5e5;
-  --hud: #222222;
-  --toolbar: #2c2c2c;
-  /* Special */
-  --black1: rgba(0, 0, 0, 0.1);
-  --blue3: rgba(24, 145, 251, 0.3);
-  --purple4: rgba(123, 97, 255, 0.4);
-  --hover-fill: rgba(0, 0, 0, 0.06);
-  --selection-a: #daebf7;
-  --selection-b: #edf5fa;
-  --white2: rgba(255, 255, 255, 0.2);
-  /* TYPOGRAPHY */
-  /* Pos = positive applications (black on white) */
-  /* Neg = negative applications (white on black) */
-  /* Font stack */
-  --font-stack: 'Inter', sans-serif;
-  /* Font sizes */
-  --font-size-xsmall: 11px;
-  --font-size-small: 12px;
-  --font-size-large: 13px;
-  --font-size-xlarge: 14px;
-  /* Font weights */
-  --font-weight-normal: 400;
-  --font-weight-medium: 500;
-  --font-weight-bold: 600;
-  /* Lineheight */
-  --font-line-height: 16px;
-  /* Use For xsmall, small font sizes */
-  --font-line-height-large: 24px;
-  /* Use For large, xlarge font sizes */
-  /* Letterspacing */
-  --font-letter-spacing-pos-xsmall: 0.005em;
-  --font-letter-spacing-neg-xsmall: 0.01em;
-  --font-letter-spacing-pos-small: 0;
-  --font-letter-spacing-neg-small: 0.005em;
-  --font-letter-spacing-pos-large: -0.0025em;
-  --font-letter-spacing-neg-large: 0.0025em;
-  --font-letter-spacing-pos-xlarge: -0.001em;
-  --font-letter-spacing-neg-xlarge: -0.001em;
-  /* BORDER RADIUS */
-  --border-radius-small: 2px;
-  --border-radius-med: 5px;
-  --border-radius-large: 6px;
-  /* SHADOWS */
-  --shadow-hud: 0 5px 17px rgba(0, 0, 0, 0.2), 0 2px 7px rgba(0, 0, 0, 0.15);
-  --shadow-floating-window: 0 2px 14px rgba(0, 0, 0, 0.15);
-  /* SPACING + SIZING */
-  --size-xxxsmall: 4px;
-  --size-xxsmall: 8px;
-  --size-xsmall: 16px;
-  --size-small: 24px;
-  --size-medium: 32px;
-  --size-large: 40px;
-  --size-xlarge: 48px;
-  --size-xxlarge: 64px;
-  --size-xxxlarge: 80px;
-}
-
-body {
-  @apply font-body text-sm leading-normal;
-}
+/* @TODO Move ScrollContainer classes to stitches/component */
 
 .scroll-container {
   overflow-y: scroll;
@@ -116,16 +35,14 @@ textarea::-webkit-scrollbar-thumb {
   border: 2px solid;
 }
 
+/* @TODO Move TokenButton classes to stitches/component */
+
 .button-property + .property-wrapper {
   @apply mt-4;
 }
 
 .property-wrapper:not(:last-of-type) {
   @apply mb-4;
-}
-
-.property-wrapper .heading {
-  @apply text-xs text-gray-500 mb-2;
 }
 
 .property-wrapper .property-wrapper {
@@ -136,42 +53,7 @@ textarea::-webkit-scrollbar-thumb {
   @apply mb-0;
 }
 
-.property-value {
-  @apply text-gray-500 text-xs font-normal;
-}
-
-.button-group {
-  @apply rounded inline-flex border border-gray-400 overflow-hidden;
-}
-
-.button-value {
-  @apply text-gray-600 text-xs font-medium;
-}
-
-.button-extra {
-  @apply border-l border-black px-2 py-1;
-}
-
-.button-disabled .button-extra {
-  @apply border-gray-500;
-}
-
-.rotate {
-  animation: rotate 1000ms linear infinite;
-}
-
-@keyframes rotate {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.button-group .button {
-  @apply border-none rounded-none;
-}
+/* @TODO Move Button classes to stitches/component */
 
 .button {
   @apply border border-gray-400 rounded text-gray-800 font-medium text-xs p-2;
@@ -188,6 +70,8 @@ textarea::-webkit-scrollbar-thumb {
 .button-ghost:hover {
   @apply bg-gray-200;
 }
+
+/* @TODO Move TokenButton classes to stitches/component */
 
 .button-property {
   @apply border-none rounded bg-gray-100 px-0 py-0;
@@ -236,6 +120,8 @@ textarea::-webkit-scrollbar-thumb {
   @apply rounded w-full p-1 -mb-1;
 }
 
+/* @TODO Move Button classes to stitches/component */
+
 .button-text {
   @apply px-2 py-1 flex items-center justify-start flex-shrink-0;
 }
@@ -246,18 +132,6 @@ textarea::-webkit-scrollbar-thumb {
 
 .button-property-color .button-text {
   @apply p-0;
-}
-
-.button-edit:hover .button-text {
-  @apply opacity-25;
-}
-
-.button-edit-overlay {
-  @apply opacity-0 absolute top-0 left-0 right-0 bottom-0 flex items-center justify-center;
-}
-
-.button-edit:hover .button-edit-overlay {
-  @apply opacity-100;
 }
 
 .button-link {
@@ -272,10 +146,6 @@ textarea::-webkit-scrollbar-thumb {
   @apply bg-primary-500 text-white border-transparent;
 }
 
-.button-large {
-  @apply py-3 px-4;
-}
-
 button[disabled] {
   @apply opacity-50;
 }
@@ -283,44 +153,6 @@ button[disabled] {
 button:focus {
   outline: none;
   box-shadow: 0 0 0 4px theme('colors.primary.100');
-}
-
-[data-reach-dialog-content] {
-  width: 75vw !important;
-  padding: 0 !important;
-}
-
-[data-reach-dialog-overlay] {
-  @apply z-1;
-}
-
-[data-reach-tooltip] {
-  @apply text-xs;
-  max-width: 50%;
-  text-overflow: ellipsis;
-  overflow: hidden;
-}
-
-.modal-wrapper {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.4);
-  @apply p-2 z-20;
-}
-
-.modal-content {
-  overflow-y: auto;
-  @apply bg-white h-full rounded shadow-lg p-2;
-}
-
-textarea.input,
-select.input,
-input.input {
-  @apply outline-none;
-  @apply p-2;
 }
 
 .input textarea:focus,
@@ -345,36 +177,6 @@ input.input {
   height: 4px;
   top: -4px;
   background-color: var(--blue);
-}
-
-.color-picker .react-colorful {
-  width: 100%;
-}
-
-.color-picker .react-colorful__saturation {
-  @apply rounded-sm;
-}
-
-.color-picker .react-colorful__hue,
-.color-picker .react-colorful__alpha {
-  @apply h-4;
-  @apply rounded-lg;
-}
-
-.color-picker .react-colorful__hue-pointer,
-.color-picker .react-colorful__alpha-pointer {
-  @apply h-4;
-  @apply w-4;
-}
-
-.color-picker .react-colorful__hue {
-  @apply mt-2;
-  @apply mb-1;
-}
-
-.color-picker .react-colorful__alpha {
-  @apply mt-1;
-  @apply mb-2;
 }
 
 #corner {
