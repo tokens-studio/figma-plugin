@@ -51,15 +51,7 @@ export default function BranchSelector() {
     return false;
   }, [lastSyncedState, tokens]);
 
-  async function askUserIfPull(): Promise<boolean> {
-    const { result } = await confirm({
-      text: 'Pull from GitHub?',
-      description: 'Your repo already contains tokens, do you want to pull these now?',
-    });
-    return result;
-  }
-
-  async function askUserIfPushChanges(): Promise<boolean> {
+  const askUserIfPushChanges : (() => Promise<boolean>) = React.useCallback(async () => {
     const { result } = await confirm({
       text: 'You have unsaved changes',
       description: <div>
@@ -72,7 +64,7 @@ export default function BranchSelector() {
       cancelAction: 'Cancel',
     });
     return result;
-  }
+  }, []);
 
   const createBranchByChange = () => {
     setMenuOpened(false);
