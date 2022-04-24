@@ -42,12 +42,7 @@ export function getAliasValue(token: SingleToken | string | number, tokens: Sing
         let resolved = checkAndEvaluateMath(stringValue);
         if (String(resolved).startsWith("$")) {
           const sizeProperty = String(resolved).slice(1, String(resolved).length);
-          if (token && token.type === 'sizing') {
-            resolved = theme.sizes[`${sizeProperty}`].value;
-          }
-          if (token && token.type === 'spacing') {
             resolved = theme.space[`${sizeProperty}`].value;
-          }
         }
         returnedValue = returnedValue ? returnedValue.replace(reference, String(resolved)) : returnedValue;
       });
