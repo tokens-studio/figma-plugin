@@ -25,7 +25,7 @@ describe('App', () => {
             values: {
               version: '5',
               usedTokenSet: ['global'],
-              themes: {},
+              themes: [],
               activeTheme: null,
               values: {
                 global: {

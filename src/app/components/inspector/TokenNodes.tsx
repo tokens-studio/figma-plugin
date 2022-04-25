@@ -30,7 +30,7 @@ export default function TokenNodes({ nodes }: { nodes: NodeInfo[] }) {
           fontSize: '$small',
           maxHeight: `${VISIBLE_VIEWPORT_NODES * NODE_HEIGHT + CONTAINER_PADDING}px`,
         }}
-        className={`content ${nodes.length > VISIBLE_VIEWPORT_NODES ? 'scroll-container' : null}`}
+        className={`content content-dark ${nodes.length > VISIBLE_VIEWPORT_NODES ? 'scroll-container' : null}`}
       >
         {nodes.map(({ id, name, type }) => (
           <TokenNode key={id} id={id} name={name} type={type} />

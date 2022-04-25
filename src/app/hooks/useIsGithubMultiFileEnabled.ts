@@ -8,9 +8,9 @@ export function useIsGithubMultiFileEnabled() {
   const featureFlags = useSelector(featureFlagsSelector);
 
   return useMemo(() => (
-    true || Boolean(
+    Boolean(
       featureFlags?.gh_mfs_enabled
-      && api.provider === StorageProviderType.GITHUB
+      && (api?.provider === StorageProviderType.GITHUB || api?.provider === StorageProviderType.GITLAB)
       && !api?.filePath?.endsWith('.json'),
     )
   ), [api, featureFlags]);

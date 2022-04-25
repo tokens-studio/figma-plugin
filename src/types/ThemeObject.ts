@@ -9,5 +9,5 @@ export type ThemeObject = {
   selectedTokenSets: Record<string, TokenSetStatus>
   // @README these are the style IDs from Figma
   // this is considered meta-data so it is prefixed with $
-  $figmaStyleReferences: Record<string, number>
+  $figmaStyleReferences?: Record<string, number>
 };

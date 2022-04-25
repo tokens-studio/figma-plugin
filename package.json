@@ -1,7 +1,7 @@
 {
     "name": "figma-tokens",
     "version": "1.0.0",
-    "plugin_version": "90",
+    "plugin_version": "95",
     "description": "Figma Tokens",
     "license": "MIT",
     "scripts": {
@@ -22,6 +22,7 @@
     },
     "dependencies": {
         "@figma-plugin/helpers": "^0.15.2",
+        "@gitbeaker/browser": "^35.6.0",
         "@octokit/rest": "^18.9.0",
         "@radix-ui/react-checkbox": "^0.1.5",
         "@radix-ui/react-context-menu": "^0.1.6",
@@ -45,6 +46,7 @@
         "dnd-core": "^12.0.1",
         "dot-object": "^2.1.3",
         "dotenv-webpack": "6.0.4",
+        "downshift": "^6.1.7",
         "eventemitter3": "^4.0.7",
         "expr-eval": "^2.0.2",
         "figma-plugin-ds": "^0.1.8",
@@ -59,8 +61,7 @@
         "just-safe-get": "^4.0.1",
         "just-safe-set": "^4.0.2",
         "just-split": "^3.0.1",
-        "lodash": "^4.17.21",
-        "lodash.isequal": "^4.5.0",
+        "lodash.debounce": "^4.0.8",
         "mixpanel-figma": "^2.0.1",
         "ml-matrix": "^6.9.0",
         "object-hash": "^2.2.0",
@@ -87,7 +88,8 @@
         "set-value": "^3.0.2",
         "storyblok-js-client": "^3.3.1",
         "tailwindcss": "^3.0.0",
-        "use-debounce": "^6.0.1"
+        "use-debounce": "^6.0.1",
+        "zod": "^3.14.4"
     },
     "devDependencies": {
         "@babel/core": "^7.12.16",
@@ -100,7 +102,7 @@
         "@testing-library/jest-dom": "^5.11.9",
         "@testing-library/react": "^11.2.5",
         "@types/jest": "^26.0.20",
-        "@types/lodash.isequal": "^4.5.5",
+        "@types/lodash.debounce": "^4.0.7",
         "@types/object-hash": "^2.2.1",
         "@types/react": "^17.0.0",
         "@types/react-dom": "^17.0.0",
@@ -148,7 +150,7 @@
     },
     "lint-staged": {
         "src/**/*.{ts,tsx}": [
-            "./eslint-non-blocking.sh",
+            "eslint --fix",
             "git add"
         ],
         "src/**/*.{js,jsx,css,json}": [

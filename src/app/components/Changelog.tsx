@@ -43,9 +43,9 @@ export default function Changelog() {
               direction="column"
               gap={2}
               align="center"
-              css={{ textAlign: 'center', visibility: index === activeIndex ? 'visible' : 'hidden' }}
+              css={{ textAlign: 'center', display: index === activeIndex ? 'flex' : 'none' }}
             >
-              {item.image && <img src={item.image.filename} alt={item.image.alt} className="rounded mb-8" />}
+              {item.image && <img src={item.image.filename} alt={item.image.alt} className="mb-8 rounded" />}
               <Heading>{item.title}</Heading>
               <p className="text-xs">{item.excerpt}</p>
               {item.read_more_link && (
@@ -53,7 +53,7 @@ export default function Changelog() {
                   target="_blank"
                   rel="noreferrer"
                   href={item.read_more_link}
-                  className="inline-flex text-primary-500 text-xs"
+                  className="inline-flex text-xs text-primary-500"
                 >
                   {item.read_more_text ? item.read_more_text : 'Read more'}
                 </a>

@@ -10,17 +10,18 @@ type Payload = Omit<ThemeObject, 'id' | '$figmaStyleReferences'> & {
 export function saveTheme(state: TokenState, data: Payload): TokenState {
   const themeId = data.id || hash([Date.now(), data]);
   const isActiveTheme = state.activeTheme === themeId;
+  const themeObject = state.themes.find((theme) => theme.id === themeId);
 
   const nextState: TokenState = {
     ...state,
-    themes: {
-      ...state.themes,
-      [themeId]: {
+    themes: [
+      ...state.themes.filter((theme) => theme.id === themeId),
+      {
         ...data,
         id: themeId,
-        $figmaStyleReferences: state.themes?.[themeId]?.$figmaStyleReferences ?? {},
+        $figmaStyleReferences: themeObject?.$figmaStyleReferences ?? {},
       },
-    },
+    ],
   };
 
   if (isActiveTheme) {

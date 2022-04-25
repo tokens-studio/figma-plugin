@@ -1,5 +1,4 @@
 import React from 'react';
-import isEqual from 'lodash.isequal';
 import { useDispatch, useSelector } from 'react-redux';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { DndProvider } from 'react-dnd';
@@ -154,4 +153,11 @@ const TokenListing: React.FC<Props> = ({
   );
 };
 
-export default React.memo(TokenListing, isEqual);
+// @README the memo props check used to be a deep equals
+// but because the token sorting is done based on the order of an object
+// it comes as back as equals since object key order is disregarded in lodash's
+// isEqual check.
+// @TODO we should probably not rely on object key order for sorting anyways
+// since JS technically does not always ensure the same order of object keys.
+// in practice this is always the case but it is something to keep in mind in theory
+export default React.memo(TokenListing);

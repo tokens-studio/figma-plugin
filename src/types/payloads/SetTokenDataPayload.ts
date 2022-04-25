@@ -1,5 +1,5 @@
 import { TokenTypes } from '@/constants/TokenTypes';
-import { ThemeObjectsMap } from '../ThemeObjectsMap';
+import { ThemeObjectsList } from '../ThemeObjectsList';
 import { AnyTokenList, SingleToken } from '../tokens';
 import { UsedTokenSetsMap } from '../UsedTokenSetsMap';
 
@@ -10,8 +10,8 @@ export type SetTokenDataPayload = {
   SingleToken[]
   | Record<string, AnyTokenList>
   | Record<string, Partial<Record<TokenTypes, ShallowTokenMap | DeepTokenMap>>>
-  themes?: ThemeObjectsMap
+  themes?: ThemeObjectsList
   activeTheme?: string | null
   shouldUpdate?: boolean;
-  usedTokenSet?: UsedTokenSetsMap
+  usedTokenSet?: UsedTokenSetsMap | null
 };

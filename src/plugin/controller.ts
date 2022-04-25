@@ -101,6 +101,7 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
         switch (storageType.provider) {
           case StorageProviderType.JSONBIN:
           case StorageProviderType.GITHUB:
+          case StorageProviderType.GITLAB:
           case StorageProviderType.URL: {
             compareProvidersWithStored({
               providers: apiProviders, storageType, featureFlagId, usedTokenSet,
@@ -170,8 +171,8 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
       const nodesToRemove: { [key: string]: string[] } = {};
 
       msg.tokensToRemove.forEach((token) => {
-        token.nodes.forEach((node) => {
-          nodesToRemove[node] = nodesToRemove[node] ? [...nodesToRemove[node], token.property] : [token.property];
+        token.nodes.forEach(({ id }) => {
+          nodesToRemove[id] = nodesToRemove[id] ? [...nodesToRemove[id], token.property] : [token.property];
         });
       });
 

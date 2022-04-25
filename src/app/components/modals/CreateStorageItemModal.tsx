@@ -23,7 +23,8 @@ export default function CreateStorageItemModal({ isOpen, onClose, onSuccess }: P
   const [hasErrored, setHasErrored] = React.useState(false);
   let defaultFields;
   switch (localApiState.provider) {
-    case StorageProviderType.GITHUB: {
+    case StorageProviderType.GITHUB:
+    case StorageProviderType.GITLAB: {
       defaultFields = {
         secret: '',
         id: '',

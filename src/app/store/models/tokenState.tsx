@@ -1,6 +1,5 @@
 /* eslint-disable import/prefer-default-export */
 import { createModel } from '@rematch/core';
-import isEqual from 'lodash.isequal';
 import omit from 'just-omit';
 import { StorageProviderType } from '@/types/api';
 import * as tokenStateReducers from './reducers/tokenState';
@@ -22,13 +21,14 @@ import {
 } from '@/types/payloads';
 import { updateTokenPayloadToSingleToken } from '@/utils/updateTokenPayloadToSingleToken';
 import { RootModel } from '@/types/RootModel';
-import { ThemeObjectsMap, UsedTokenSetsMap } from '@/types';
+import { ThemeObjectsList, UsedTokenSetsMap } from '@/types';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
+import { isEqual } from '@/utils/isEqual';
 
 export interface TokenState {
   tokens: Record<string, AnyTokenList>;
-  themes: ThemeObjectsMap;
-  lastSyncedState: string;
+  themes: ThemeObjectsList;
+  lastSyncedState: string; // @README for reference, at this time this is a JSON stringified representation of the tokens and themes ([tokens, themes])
   importedTokens: {
     newTokens: SingleToken[];
     updatedTokens: SingleToken[];
@@ -45,8 +45,8 @@ export const tokenState = createModel<RootModel>()({
     tokens: {
       global: [],
     },
-    themes: {},
-    lastSyncedState: JSON.stringify({ global: {} }, null, 2),
+    themes: [],
+    lastSyncedState: JSON.stringify([{ global: {} }, []], null, 2),
     importedTokens: {
       newTokens: [],
       updatedTokens: [],

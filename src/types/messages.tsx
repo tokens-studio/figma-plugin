@@ -12,7 +12,8 @@ import { AnyTokenList, AnyTokenSet, TokenStore } from './tokens';
 import { PullStyleOptions } from './PullStylesOptions';
 import { UsedTokenSetsMap } from './UsedTokenSetsMap';
 import { TokenTypes } from '@/constants/TokenTypes';
-import { ThemeObjectsMap } from './ThemeObjectsMap';
+import { ThemeObjectsList } from './ThemeObjectsList';
+import { NodeInfo } from './NodeInfo';
 
 export enum MessageFromPluginTypes {
   SELECTION = 'selection',
@@ -137,10 +138,10 @@ export type ApiCredentialsFromPluginMessage = {
   type: MessageFromPluginTypes.API_CREDENTIALS;
   status: boolean;
   credentials: ApiDataType & {
-    internalId?: string
-  }
-  featureFlagId: string
-  usedTokenSet?: UsedTokenSetsMap | null
+    internalId?: string;
+  };
+  featureFlagId: string;
+  usedTokenSet?: UsedTokenSetsMap | null;
 };
 export type PostToUIMessage =
   | NoSelectionFromPluginMessage
@@ -181,7 +182,7 @@ export type UpdateToPluginMessage = {
   type: MessageToPluginTypes.UPDATE;
   tokenValues: AnyTokenSet;
   tokens: AnyTokenList | null;
-  themes: ThemeObjectsMap
+  themes: ThemeObjectsList
   updatedAt: string;
   settings: SettingsState;
   usedTokenSet: UsedTokenSetsMap;
@@ -240,7 +241,7 @@ export type RemapTokensToPluginMessage = {
 };
 export type RemoveTokensByValueToPluginMessage = {
   type: MessageToPluginTypes.REMOVE_TOKENS_BY_VALUE;
-  tokensToRemove: { nodes: string[]; property: Properties }[];
+  tokensToRemove: { nodes: NodeInfo[]; property: Properties }[];
 };
 export type ChangedTabsToPluginMessage = {
   type: MessageToPluginTypes.CHANGED_TABS;
