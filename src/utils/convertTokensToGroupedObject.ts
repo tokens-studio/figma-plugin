@@ -21,6 +21,18 @@ export default function convertTokensToGroupedObject(
     const obj = acc || {};
     const tokenWithType = appendTypeToToken(token);
     delete tokenWithType.name;
+    if (typeof tokenWithType.rawValue === 'string') {
+      if (options.resolveReferences === false) {
+        tokenWithType.value = tokenWithType.rawValue;
+      }
+      if (options.resolveReferences === 'math') {
+        const singleAliasRegEx = /^{[^}]*}$|^\$[^$]*$/;
+        if (singleAliasRegEx.test(tokenWithType.rawValue)) {
+          tokenWithType.value = tokenWithType.rawValue;
+        }
+      }
+    }
+
     if (!options.preserveRawValue) {
       delete tokenWithType.rawValue;
     }
