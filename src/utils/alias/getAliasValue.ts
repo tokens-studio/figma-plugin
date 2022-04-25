@@ -26,7 +26,7 @@ export function getAliasValue(token: SingleToken | string | number, tokens: Sing
           const tokenAliasSplited = nameToLookFor.split('.');
           const tokenAliasSplitedLast = tokenAliasSplited.pop();
           const tokenAliasLastExcluded = tokenAliasSplited.join('.');
-          let foundToken = tokens.find((t) => t.name === nameToLookFor || t.name === tokenAliasLastExcluded);
+          const foundToken = tokens.find((t) => t.name === nameToLookFor || t.name === tokenAliasLastExcluded);
           if (foundToken?.name === nameToLookFor) { return getAliasValue(foundToken, tokens); }
 
           const candidateProperty = tokenAliasSplitedLast;
@@ -37,7 +37,7 @@ export function getAliasValue(token: SingleToken | string | number, tokens: Sing
       tokenReferences.forEach((reference, index) => {
         const resolvedReference = resolvedReferences[index];
         const stringValue = String(resolvedReference);
-        let resolved = checkAndEvaluateMath(stringValue);
+        const resolved = checkAndEvaluateMath(stringValue);
         returnedValue = returnedValue ? returnedValue.replace(reference, String(resolved)) : returnedValue;
       });
 
