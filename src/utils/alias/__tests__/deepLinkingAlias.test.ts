@@ -58,7 +58,6 @@ describe('deepLinkingAlias', () => {
 
   inputTokens.forEach((token) => {
     it(`alias ${token.name}`, () => {
-      // @TODO check this test typing
       expect(getAliasValue({ value: token.input } as SingleToken, allTokens as unknown as SingleToken[])).toEqual(token.value);
     });
   });
