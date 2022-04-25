@@ -8,6 +8,7 @@ import Input from '../Input';
 import useRemoteTokens from '../../store/remoteTokens';
 import { apiSelector, localApiStateSelector } from '@/selectors';
 import Stack from '../Stack';
+import { ApiDataType } from '@/types/api';
 
 type Props = {
   isOpen: boolean
@@ -17,6 +18,10 @@ type Props = {
   onSuccess: (branch: string) => void
 };
 
+type FormData = {
+  branch: string
+}
+
 // @TODO use hooks
 
 export default function CreateBranchModal({
@@ -24,11 +29,11 @@ export default function CreateBranchModal({
 }: Props) {
   const { addNewBranch, pushTokens, fetchBranches } = useRemoteTokens();
 
-  const localApiState = useSelector(localApiStateSelector);
-  const apiData = useSelector(apiSelector);
+  const localApiState: ApiDataType = useSelector(localApiStateSelector);
+  const apiData: ApiDataType = useSelector(apiSelector);
 
-  const [formFields, setFormFields] = React.useState({});
-  const [hasErrored, setHasErrored] = React.useState(false);
+  const [formFields, setFormFields] = React.useState<FormData>({} as FormData);
+  const [hasErrored, setHasErrored] = React.useState<boolean>(false);
   const inputRef = React.useRef<HTMLInputElement | null>(null);
 
   /* @lifecycle

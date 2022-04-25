@@ -51,6 +51,8 @@ export default function BranchSelector() {
     return false;
   }, [lastSyncedState, tokens]);
 
+  const hasChanges = React.useMemo(() => checkForChanges(), [lastSyncedState, tokens]);
+
   const askUserIfPushChanges : (() => Promise<boolean>) = React.useCallback(async () => {
     const { result } = await confirm({
       text: 'You have unsaved changes',
@@ -74,11 +76,12 @@ export default function BranchSelector() {
   };
 
   const createNewBranchFrom = async (branch: string) => {
-    if (checkForChanges() && await askUserIfPushChanges()) {
+    setMenuOpened(false);
+    
+    if (hasChanges && await askUserIfPushChanges()) {
       await pushTokens();
     }
 
-    setMenuOpened(false);
     setStartBranch(branch);
     setCreateBranchModalVisible(true);
   };
@@ -92,7 +95,7 @@ export default function BranchSelector() {
   };
 
   const onBranchSelected = async (branch: string) => {
-    if (checkForChanges()) {
+    if (hasChanges) {
       if (await askUserIfPushChanges()) {
         await changeAndPull(branch);
       } else setMenuOpened(false);
@@ -159,12 +162,10 @@ export default function BranchSelector() {
                   <ChevronRightIcon />
                 </BranchSwitchMenuTrigger>
                 <BranchSwitchMenuContent side="left">
-                  {checkForChanges()
-                  && (
+                  {hasChanges && 
                   <BranchSwitchMenuItem onSelect={createBranchByChange}>
                     Current changes
-                  </BranchSwitchMenuItem>
-                  )}
+                  </BranchSwitchMenuItem>}
                   {branchState.branches.length > 0 && branchState.branches.map((branch, index) => <BranchSwitchMenuItemElement branch={branch} index={index} />)}
                 </BranchSwitchMenuContent>
               </BranchSwitchMenu>

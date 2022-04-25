@@ -33,6 +33,8 @@ export default function Footer() {
     return false;
   }, [lastSyncedState, tokens]);
 
+  const hasChanges = React.useMemo(() => checkForChanges(), [lastSyncedState, tokens]);
+
   const transformProviderName = React.useCallback((provider: StorageProviderType) => {
     switch (provider) {
       case StorageProviderType.JSONBIN:
@@ -70,7 +72,7 @@ export default function Footer() {
               className="relative button button-ghost"
               disabled={editProhibited}
             >
-              {checkForChanges() && <div className="absolute top-0 right-0 w-2 h-2 rounded-full bg-primary-500" />}
+              {hasChanges && <div className="absolute top-0 right-0 w-2 h-2 rounded-full bg-primary-500" />}
 
               <UploadIcon />
             </button>
