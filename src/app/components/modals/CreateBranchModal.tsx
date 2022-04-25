@@ -34,14 +34,16 @@ export default function CreateBranchModal({
 
   const [formFields, setFormFields] = React.useState<FormData>({} as FormData);
   const [hasErrored, setHasErrored] = React.useState<boolean>(false);
-  const inputRef = React.useRef<HTMLInputElement | null>(null);
+  const branchInputRef = React.useRef<HTMLInputElement | null>(null);
 
   /* @lifecycle
   ** set focus on input
   */
   React.useEffect(() => {
-    inputRef.current?.focus();
-  }, [inputRef.current]);
+    setTimeout(() => {
+      branchInputRef.current?.focus();
+    }, 200);
+  }, []);
 
   const handleChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setFormFields({ ...formFields, [e.target.name]: e.target.value });
@@ -90,16 +92,16 @@ export default function CreateBranchModal({
               )}
           </Heading>
           <Input
+            required
             full
+            autofocus
+            type="text"
             label="Branch name"
-            value={formFields.branch || ''}
+            value={formFields.branch}
             placeholder="branch"
             onChange={handleChange}
-            type="text"
             name="branch"
-            inputRef={inputRef}
-            autofocus
-            required
+            inputRef={branchInputRef}
           />
           <Stack direction="row" gap={4}>
             <Button variant="secondary" size="large" onClick={() => onClose(false)}>
