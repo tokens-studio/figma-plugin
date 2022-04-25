@@ -6,7 +6,7 @@ describe('deepLinkingAlias', () => {
     {
       name: 'font-size.tokenvalue',
       input: '$typography.tokensize.fontSize',
-      value: '4px',
+      value: '16px',
     },
     {
       name: 'font-size.pixelsize',
@@ -29,7 +29,7 @@ describe('deepLinkingAlias', () => {
     {
       name: 'typography.tokensize',
       rawValue: {
-        fontSize: '$2',
+        fontSize: '$16',
         fontWeight: 'bold'
       },
       value: '4px'
@@ -49,6 +49,10 @@ describe('deepLinkingAlias', () => {
         fontWeight: 'bold'
       },
       value: 10
+    },
+    {
+      name: '16',
+      value: '16px'
     }
   ]
 
