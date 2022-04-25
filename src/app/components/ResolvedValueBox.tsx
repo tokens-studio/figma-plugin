@@ -1,85 +1,98 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useUIDSeed } from 'react-uid';
 import { getAliasValue } from '@/utils/alias';
 import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
+import { isSingleBoxShadowToken, isSingleTypographyToken } from '@/utils/is';
+import { TokenTypes } from '@/constants/TokenTypes';
+import { TokensContext } from '@/context';
+import { SingleToken, SingleTypographyToken } from '@/types/tokens';
+import { TokenBoxshadowValue } from '@/types/values';
 import { findReferences } from '../../utils/findReferences';
+import useTokens from '../store/useTokens';
 import Box from './Box';
-import AliasBox from './AliasBox';
+import { SingleShadowValueDisplay } from './TokenTooltip/SingleShadowValueDisplay';
+import { SingleTypographyValueDisplay } from './TokenTooltip/SingleTypograhpyValueDisplay';
+import { EditTokenObject } from '../store/models/uiState';
+
 
 export default function ResolvedValueBox({
   alias,
-  resolvedTokens,
-  setValue,
+  selectedToken,
 }: {
   alias: string;
-  resolvedTokens: ResolveTokenValuesResult[];
-  setValue: (value) => void;
+  selectedToken: EditTokenObject | null;
 }) {
-  const resolvedValue = React.useMemo(() => {
-    if (alias) {
-      return typeof alias === 'object'
-        ? null
-        : getAliasValue(alias, resolvedTokens);
-    }
-    return null;
-  }, [alias, resolvedTokens]);
+  const seed = useUIDSeed();
+  const tokensContext = React.useContext(TokensContext);
+  const valueToCheck = React.useMemo(() => (
+    (selectedToken ? selectedToken?.value : alias )
+  ), [selectedToken, tokensContext.resolvedTokens, alias]);
 
-  const isJson = (str) => {
-    try {
-      JSON.parse(str);
-    } catch (e) {
-      return false;
+  useEffect(() => {
+    console.log("tochek", valueToCheck)
+  }, [valueToCheck])
+
+  if (selectedToken && isSingleTypographyToken(selectedToken)) {
+    console.log("istyop", selectedToken)
+    return (
+      <SingleTypographyValueDisplay
+        // @TODO strengthen type checking here
+        value={valueToCheck as SingleTypographyToken['value']}
+        shouldResolve={false}
+      />
+    );
+  }
+
+  if (selectedToken && isSingleBoxShadowToken(selectedToken)) {
+    console.log("isbox", selectedToken)
+    if (Array.isArray(valueToCheck)) {
+      return (
+        <div>
+          {valueToCheck.map((t) => (
+            <SingleShadowValueDisplay
+              key={seed(t)}
+              shadow={t}
+            />
+          ))}
+        </div>
+      );
     }
-    return true;
-  };
+
+    return (
+      <SingleShadowValueDisplay
+        // @TODO strengthen type checking here
+        shadow={valueToCheck as TokenBoxshadowValue}
+      />
+    );
+  }
+
+  if (typeof valueToCheck !== 'string' && typeof valueToCheck !== 'number') {
+    return <div>{JSON.stringify(valueToCheck, null, 2)}</div>;
+  }
+
+  // const resolvedValue = React.useMemo(() => {
+  //   if (alias) {
+  //     return typeof alias === 'object'
+  //       ? null
+  //       : getAliasValue(alias, resolvedTokens);
+  //   }
+  //   return null;
+  // }, [alias]);
+
+  // const isJson = (str) => {
+  //   try {
+  //     JSON.parse(str);
+  //   } catch (e) {
+  //     return false;
+  //   }
+  //   return true;
+  // };
 
   return (
     <Box css={{
       display: 'flex', flexDirection: 'column', gap: '$2',
-    }}
-    >
-      {
-        (resolvedValue && isJson(resolvedValue)) ? (
-          (resolvedValue?.toString().charAt(0) === '[') ? (
-            <AliasBox>
-              <Box css={{ display: 'grid', margin: '12px', marginRight: '60px' }}>
-                {
-                  findReferences(resolvedValue).map((value, index) => <p>{index + 1}</p>)
-                }
-              </Box>
-              <Box css={{ display: 'grid', margin: '12px' }}>
-                {
-                  findReferences(resolvedValue).map((value, index) => {
-                    let properties = '';
-                    for (const key in JSON.parse(value)) {
-                      const element = JSON.parse(value)[key];
-                      properties += `${key}` + ':' + `${element}` + '        ';
-                    }
-                    return <p key={index}>{properties}</p>;
-                  })
-                }
-              </Box>
-            </AliasBox>
-
-          ) : (
-            <AliasBox>
-              <Box css={{ display: 'grid', margin: '12px', marginRight: '60px' }}>
-                {
-                  Object.keys(JSON.parse(resolvedValue)).map((key, index) => <p>{key}</p>)
-                }
-              </Box>
-              <Box css={{ display: 'grid', margin: '12px' }}>
-                {
-                  Object.keys(JSON.parse(resolvedValue)).map((key) => <p>{JSON.parse(resolvedValue)[key]}</p>)
-                }
-              </Box>
-            </AliasBox>
-          )
-        ) : (
-          <AliasBox>
-            {resolvedValue}
-          </AliasBox>
-        )
-      }
+    }}>
+      {valueToCheck}
     </Box>
   );
 }

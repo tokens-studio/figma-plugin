@@ -14,7 +14,6 @@ export const TokenTooltipContent: React.FC<Props> = ({ token }) => {
   const tokenIsAlias = React.useMemo(() => (
     isAlias(token, tokensContext.resolvedTokens)
   ), [token, isAlias, tokensContext.resolvedTokens]);
-
   return (
     <div>
       <div className="text-xs font-bold text-gray-500">

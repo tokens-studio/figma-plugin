@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
+import { useSelector } from 'react-redux';
 import { TokensIcon, LinkBreak2Icon } from '@radix-ui/react-icons';
 import { checkIfContainsAlias } from '@/utils/alias';
 import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
+import { editTokenSelector } from '@/selectors';
 import Box from './Box';
 import Input from './Input';
 import ResolvedValueBox from './ResolvedValueBox';
@@ -29,57 +31,57 @@ export default function TypographyInput({
 }: {
   internalEditToken: EditTokenObject;
   handleTypographyChange: React.ChangeEventHandler;
-  handleTypographyChangeByAlias: React.ChangeEventHandler;
+  handleTypographyChangeByAlias: Function;
   resolvedTokens: ResolveTokenValuesResult[];
 }) {
-  const [mode, setMode] = useState('input');
+  const editToken = useSelector(editTokenSelector);
+  const defaultMode = (typeof internalEditToken.value === 'object')
+  const [mode, setMode] = useState(defaultMode ? 'input' : 'alias');
   const [alias, setAlias] = useState('');
+  const [selectedToken, setSelectedToken] = React.useState<typeof editToken>(null);
 
-  const handleMode = () => {
+  const handleMode = React.useCallback(() => {
     const changeMode = (mode === 'input') ? 'alias' : 'input';
     setMode(changeMode);
     setAlias('');
-    handleTypographyChangeByAlias(newToken);
-  };
+    handleTypographyChangeByAlias(newToken, '');
+  }, [mode]);
 
-  const handleAliasChange = (e) => {
-    setAlias(e.target.value);
-    const search = findReferences(e.target.value);
-    let selectedToken;
-    if (search.length > 0) {
-      const nameToLookFor = search[0].slice(1, search[0].length - 1);
-      selectedToken = resolvedTokens.find((t) => t.name === nameToLookFor);
+  const handleAliasChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>((
+    (e) => {
+      setAlias(e.target.value);
+      const search = findReferences(e.target.value);
+      if (search && search.length > 0) {
+        const nameToLookFor = search[0].slice(1, search[0].length - 1);
+        const foundToken = resolvedTokens.find((t) => t.name === nameToLookFor);
+        if (foundToken) setSelectedToken(foundToken);
+      }
+      handleTypographyChangeByAlias(e.target.value);
     }
-    handleTypographyChangeByAlias(selectedToken.value);
-  };
+  ), []);
 
   return (
     <>
       <Box css={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Heading>Typography</Heading>
         {
-            mode === 'input' ? (
-              <IconButton
-                tooltip="alias mode"
-                dataCy="button-mode-change"
-                onClick={handleMode}
-                icon={<TokensIcon />}
-              />
-
-            // <TokensIcon onClick={handleMode} style={{ cursor: 'pointer' }} />
-            ) : (
-              <IconButton
-                tooltip="input mode"
-                dataCy="button-mode-change"
-                onClick={handleMode}
-                icon={<LinkBreak2Icon />}
-              />
-
-            // <LinkBreak2Icon onClick={handleMode} style={{ cursor: 'pointer' }} />
-            )
+          mode === 'input' ? (
+            <IconButton
+              tooltip="alias mode"
+              dataCy="button-mode-change"
+              onClick={handleMode}
+              icon={<TokensIcon />}
+            />
+          ) : (
+            <IconButton
+              tooltip="input mode"
+              dataCy="button-mode-change"
+              onClick={handleMode}
+              icon={<LinkBreak2Icon />}
+            />
+          )
         }
       </Box>
-
       {
         mode === 'input' ? (
           Object.entries(internalEditToken.schema ?? {}).map(([key, schemaValue]: [string, string]) => (
@@ -108,14 +110,13 @@ export default function TypographyInput({
               type="text"
               name="aliasName"
               placeholder="Alias name"
+              value={alias}
             />
             {
-              checkIfContainsAlias(alias) && (
-              <ResolvedValueBox
-                alias={alias}
-                resolvedTokens={resolvedTokens}
-              />
-              )
+                checkIfContainsAlias(alias) && <ResolvedValueBox
+                  alias={alias}
+                  selectedToken={selectedToken}
+                />
             }
           </Box>
         )

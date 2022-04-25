@@ -131,7 +131,7 @@ function SingleShadowInput({
     >
       <Box css={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }} ref={ref}>
         {isMultiple && (
-          <Box css={{ display: 'flex', width: '$space$8' }}>
+          <Box css={{ display: 'flex', width: '$8' }}>
             <IconButton tooltip="Click to drag" icon={<IconGrabber />} data-handler-id={handlerId} />
           </Box>
         )}
@@ -184,10 +184,12 @@ export default function BoxShadowInput({
   value,
   setValue,
   resolvedTokens,
+  handleBoxShadowChangeByAlias,
 }: {
   value: ShadowTokenSingleValue | ShadowTokenSingleValue[];
   setValue: (shadow: ShadowTokenSingleValue | ShadowTokenSingleValue[]) => void;
   resolvedTokens: ResolveTokenValuesResult[]
+  handleBoxShadowChangeByAlias: Function;
 }) {
   const [mode, setMode] = useState('input');
   const [alias, setAlias] = useState('');
@@ -206,22 +208,25 @@ export default function BoxShadowInput({
     }
   };
 
-  const handleMode = () => {
+  const handleMode = React.useCallback(() => {
     setMode((mode === 'input') ? 'alias' : 'input');
     setAlias('');
     setValue(newToken);
-  };
+    handleBoxShadowChangeByAlias(newToken, '');
+  }, [mode]);
 
-  const handleAliasChange = (e) => {
-    const specifiedAlias = findReferences(e.target.value);
-    if (specifiedAlias) {
-      const [search] = specifiedAlias;
-      const nameToLookFor = search.slice(1, search.length - 1);
-      const selectedToken = resolvedTokens.find((t) => t.name === nameToLookFor);
-      setValue(selectedToken ? selectedToken.value : '');
+  const handleAliasChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>((
+    (e) => {
+      const specifiedAlias = findReferences(e.target.value);
+      if (specifiedAlias) {
+        const [search] = specifiedAlias;
+        const nameToLookFor = search.slice(1, search.length - 1);
+        const selectedToken = resolvedTokens.find((t) => t.name === nameToLookFor);
+        handleBoxShadowChangeByAlias(selectedToken?.value, e.target.value);
+      }
+      setAlias(e.target.value);
     }
-    setAlias(e.target.value);
-  };
+  ), []);
 
   return (
     <div>
@@ -291,13 +296,13 @@ export default function BoxShadowInput({
                 type="text"
                 name="aliasName"
                 placeholder="Alias name"
+                value={value}
               />
               {
                 checkIfContainsAlias(alias) && (
                   <ResolvedValueBox
                     alias={alias}
                     resolvedTokens={resolvedTokens}
-                    setValue={setValue}
                   />
                 )
               }

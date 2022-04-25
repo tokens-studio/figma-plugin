@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   useDispatch, useSelector,
 } from 'react-redux';
@@ -21,6 +21,9 @@ import { TokenTypes } from '@/constants/TokenTypes';
 import { EditTokenObject } from '../store/models/uiState';
 import TypographyInput from './TypographyInput';
 import Stack from './Stack';
+import { TokenBoxshadowValue, TokenTypograpyValue } from '@/types/values';
+import { SingleTypographyValueDisplay } from './TokenTooltip/SingleTypograhpyValueDisplay';
+import tokenTypes from '@/config/tokenTypes';
 
 type Props = {
   resolvedTokens: ResolveTokenValuesResult[];
@@ -41,12 +44,16 @@ function EditTokenForm({ resolvedTokens }: Props) {
 
   const isValid = React.useMemo(() => internalEditToken?.value && !error, [internalEditToken, error]);
 
+  React.useEffect(() => {
+    console.log("didmo", internalEditToken)
+  }, [])
   const hasNameThatExistsAlready = React.useMemo(
     () => resolvedTokens
       .filter((t) => t.internal__Parent === activeTokenSet)
       .find((t) => t.name === internalEditToken?.name),
     [internalEditToken, resolvedTokens, activeTokenSet],
   );
+
 
   const hasAnotherTokenThatStartsWithName = React.useMemo(
     () => resolvedTokens
@@ -87,7 +94,24 @@ function EditTokenForm({ resolvedTokens }: Props) {
     (shadow: SingleBoxShadowToken['value']) => {
       setError(null);
       if (internalEditToken?.type === TokenTypes.BOX_SHADOW) {
-        setInternalEditToken({ ...internalEditToken, value: shadow });
+        setInternalEditToken({ 
+        ...internalEditToken, 
+        value: shadow,
+      });
+      }
+    },
+    [internalEditToken],
+  );
+
+  const handleBoxShadowChangeByAlias = React.useCallback(
+    (rawValue: TokenBoxshadowValue | TokenBoxshadowValue[], value: string) => {
+      setError(null);
+      if (internalEditToken?.type === TokenTypes.BOX_SHADOW) {
+        setInternalEditToken({
+          ...internalEditToken,
+          rawValue,
+          value: value,
+        });
       }
     },
     [internalEditToken],
@@ -110,6 +134,9 @@ function EditTokenForm({ resolvedTokens }: Props) {
         setInternalEditToken({
           ...internalEditToken,
           value: { ...internalEditToken.value, [e.target.name]: e.target.value },
+          options: {
+            type: 'typography',
+          }
         });
       }
     },
@@ -117,10 +144,16 @@ function EditTokenForm({ resolvedTokens }: Props) {
   );
 
   const handleTypographyChangeByAlias = React.useCallback(
-    (typography) => {
+    (value: string) => {
       setError(null);
       if (internalEditToken?.type === TokenTypes.TYPOGRAPHY) {
-        setInternalEditToken({ ...internalEditToken, value: typography });
+        setInternalEditToken({
+          ...internalEditToken, 
+          value,
+          options: {
+            type: 'typography',
+          }
+        });
       }
     },
     [internalEditToken],
@@ -227,6 +260,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
             setValue={handleShadowChange}
             value={internalEditToken.value}
             resolvedTokens={resolvedTokens}
+            handleBoxShadowChangeByAlias={handleBoxShadowChangeByAlias}
           />
         );
       }

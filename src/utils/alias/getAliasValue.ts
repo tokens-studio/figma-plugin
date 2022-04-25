@@ -8,56 +8,50 @@ import { checkAndEvaluateMath } from '../math';
 export function getAliasValue(token: SingleToken | string | number, tokens: SingleToken[] = []): string | number | null {
   // @TODO not sure how this will handle typography and boxShadow values. I don't believe it works.
   // The logic was copied from the original function in aliases.tsx
-  let returnedValue = isSingleTokenValueObject(token) ? token.value : token.toString();
+  let returnedValue: string | null = isSingleTokenValueObject(token) ? token.value.toString() : token.toString();
   try {
-    if (typeof returnedValue === 'string') {
-      const tokenReferences = findReferences(returnedValue);
-      if (tokenReferences?.length) {
-        const resolvedReferences = Array.from(tokenReferences).map((ref) => {
-          if (ref.length > 1) {
-            let nameToLookFor: string;
-            if (ref.startsWith('{')) {
-              if (ref.endsWith('}')) nameToLookFor = ref.slice(1, ref.length - 1);
-              else nameToLookFor = ref.slice(1, ref.length);
-            } else nameToLookFor = ref.substring(1);
-            // exclude references to  self
-            if ((typeof token === 'object' && nameToLookFor === token.name) || nameToLookFor === token) return null;
+    const tokenReferences = findReferences(returnedValue);
 
-            const tokenAliasSplited = nameToLookFor.split('.');
-            const tokenAliasSplitedLast = tokenAliasSplited.pop();
-            const tokenAliasLastExcluded = tokenAliasSplited.join('.');
-            const foundToken = tokens.find((t) => t.name === nameToLookFor || t.name === tokenAliasLastExcluded);
-            if (foundToken?.name === nameToLookFor) { return getAliasValue(foundToken, tokens); }
+    if (tokenReferences?.length) {
+      const resolvedReferences = Array.from(tokenReferences).map((ref) => {
+        if (ref.length > 1) {
+          let nameToLookFor: string;
+          if (ref.startsWith('{')) {
+            if (ref.endsWith('}')) nameToLookFor = ref.slice(1, ref.length - 1);
+            else nameToLookFor = ref.slice(1, ref.length);
+          } else nameToLookFor = ref.substring(1);
+          // exclude references to  self
+          if ((typeof token === 'object' && nameToLookFor === token.name) || nameToLookFor === token) return null;
 
-            const candidateProperty = tokenAliasSplitedLast;
-            if (foundToken?.name === tokenAliasLastExcluded && candidateProperty && foundToken.rawValue?.hasOwnProperty(candidateProperty)) return foundToken?.rawValue[candidateProperty];
-          }
-          return ref;
-        });
-        tokenReferences.forEach((reference, index) => {
-          const resolvedReference = resolvedReferences[index];
-          const stringValue = String(resolvedReference);
-          const resolved = checkAndEvaluateMath(stringValue);
-          returnedValue = returnedValue ? returnedValue.replace(reference, String(resolved)) : returnedValue;
-        });
+          const tokenAliasSplited = nameToLookFor.split('.');
+          const tokenAliasSplitedLast = tokenAliasSplited.pop();
+          const tokenAliasLastExcluded = tokenAliasSplited.join('.');
+          let foundToken = tokens.find((t) => t.name === nameToLookFor || t.name === tokenAliasLastExcluded);
+          if (foundToken?.name === nameToLookFor) { return getAliasValue(foundToken, tokens); }
 
-        if (returnedValue === 'null') {
-          returnedValue = null;
+          const candidateProperty = tokenAliasSplitedLast;
+          if (foundToken?.name === tokenAliasLastExcluded && candidateProperty && foundToken.rawValue?.hasOwnProperty(candidateProperty)) return getAliasValue(foundToken?.rawValue[candidateProperty], tokens);
         }
+        return ref;
+      });
+      tokenReferences.forEach((reference, index) => {
+        const resolvedReference = resolvedReferences[index];
+        const stringValue = String(resolvedReference);
+        let resolved = checkAndEvaluateMath(stringValue);
+        returnedValue = returnedValue ? returnedValue.replace(reference, String(resolved)) : returnedValue;
+      });
+
+      if (returnedValue === 'null') {
+        returnedValue = null;
       }
     }
 
     if (returnedValue) {
-      if (typeof returnedValue === 'string') {
-        const remainingReferences = findReferences(returnedValue);
-        if (!remainingReferences) {
-          const couldBeNumberValue = checkAndEvaluateMath(returnedValue);
-          if (typeof couldBeNumberValue === 'number') return couldBeNumberValue;
-          return convertToRgb(couldBeNumberValue);
-        }
-      } else {
-        if (typeof returnedValue === 'object') return JSON.stringify(returnedValue);
-        return returnedValue;
+      const remainingReferences = findReferences(returnedValue);
+      if (!remainingReferences) {
+        const couldBeNumberValue = checkAndEvaluateMath(returnedValue);
+        if (typeof couldBeNumberValue === 'number') return couldBeNumberValue;
+        return convertToRgb(couldBeNumberValue);
       }
     }
   } catch (err) {
@@ -68,6 +62,5 @@ export function getAliasValue(token: SingleToken | string | number, tokens: Sing
   if (returnedValue) {
     return checkAndEvaluateMath(returnedValue);
   }
-
   return returnedValue;
 }

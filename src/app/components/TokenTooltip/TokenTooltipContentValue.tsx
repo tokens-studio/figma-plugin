@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useUIDSeed } from 'react-uid';
 import useTokens from '../../store/useTokens';
 import { SingleToken, SingleTypographyToken } from '@/types/tokens';
