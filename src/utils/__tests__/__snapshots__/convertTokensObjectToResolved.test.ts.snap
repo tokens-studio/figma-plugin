@@ -4,39 +4,32 @@ exports[`convertTokensObjectToResolved converts object-like unresolved tokens to
 Object {
   "colors": Object {
     "blue": Object {
-      "failedToResolve": false,
       "type": "color",
       "value": "#0000ff",
     },
     "primary": Object {
-      "failedToResolve": false,
       "type": "color",
       "value": "#ff0000",
     },
     "red": Object {
-      "failedToResolve": false,
       "type": "color",
       "value": "#ff0000",
     },
   },
   "sizing": Object {
     "base": Object {
-      "failedToResolve": false,
       "type": "sizing",
       "value": 2,
     },
     "medium": Object {
-      "failedToResolve": false,
       "type": "sizing",
       "value": 3,
     },
     "scale": Object {
-      "failedToResolve": false,
       "type": "sizing",
       "value": 1.5,
     },
     "small": Object {
-      "failedToResolve": false,
       "type": "sizing",
       "value": 2,
     },
@@ -48,7 +41,6 @@ exports[`convertTokensObjectToResolved does not expand shadows when not needed 1
 Object {
   "shadow": Object {
     "1": Object {
-      "failedToResolve": false,
       "rawValue": Object {
         "blur": "4",
         "color": "#000000",
@@ -68,7 +60,6 @@ Object {
       },
     },
     "2": Object {
-      "failedToResolve": false,
       "rawValue": Array [
         Object {
           "blur": "4",
@@ -115,7 +106,6 @@ exports[`convertTokensObjectToResolved does not expand typography when not neede
 Object {
   "typography": Object {
     "h1": Object {
-      "failedToResolve": false,
       "type": "typography",
       "value": Object {
         "fontFamily": "Roboto",
@@ -124,7 +114,6 @@ Object {
       },
     },
     "h2": Object {
-      "failedToResolve": false,
       "type": "typography",
       "value": Object {
         "fontFamily": "Roboto",
@@ -133,7 +122,6 @@ Object {
       },
     },
     "h3": Object {
-      "failedToResolve": false,
       "type": "typography",
       "value": Object {
         "fontFamily": "Roboto",
@@ -149,19 +137,16 @@ exports[`convertTokensObjectToResolved preserves rawValue when requested 1`] = `
 Object {
   "colors": Object {
     "background": Object {
-      "failedToResolve": false,
       "rawValue": "$colors.black",
       "type": "color",
       "value": "#000000",
     },
     "black": Object {
-      "failedToResolve": false,
       "rawValue": "#000000",
       "type": "color",
       "value": "#000000",
     },
     "white": Object {
-      "failedToResolve": false,
       "rawValue": "#ffffff",
       "type": "color",
       "value": "#ffffff",
@@ -174,17 +159,14 @@ exports[`convertTokensObjectToResolved respects used sets 1`] = `
 Object {
   "colors": Object {
     "background": Object {
-      "failedToResolve": false,
       "type": "color",
       "value": "#ffffff",
     },
     "black": Object {
-      "failedToResolve": false,
       "type": "color",
       "value": "#000000",
     },
     "white": Object {
-      "failedToResolve": false,
       "type": "color",
       "value": "#ffffff",
     },
