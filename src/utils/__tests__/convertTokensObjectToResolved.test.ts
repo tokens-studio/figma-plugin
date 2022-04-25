@@ -243,6 +243,23 @@ describe('convertTokensObjectToResolved', () => {
             type: 'sizing',
           },
         },
+        text: {
+          size: {
+            base: {
+              value: '16',
+              type: 'fontSize',
+            },
+            unit: {
+              value: 'px',
+              type: 'fontSize',
+            },
+            default: {
+              description: 'Should be resolved',
+              value: '{text.size.base}{text.size.unit}',
+              type: 'fontSize',
+            },
+          },
+        },
       },
     };
 
@@ -299,6 +316,23 @@ describe('convertTokensObjectToResolved', () => {
             type: 'sizing',
           },
         },
+        text: {
+          size: {
+            base: {
+              value: '16',
+              type: 'fontSize',
+            },
+            unit: {
+              value: 'px',
+              type: 'fontSize',
+            },
+            default: {
+              description: 'Should NOT be resolved',
+              value: '{text.size.base}{text.size.unit}',
+              type: 'fontSize',
+            },
+          },
+        },
       },
     };
 
@@ -353,6 +387,23 @@ describe('convertTokensObjectToResolved', () => {
             description: 'Should be resolved',
             value: '$sizing.medium * $sizing.scale',
             type: 'sizing',
+          },
+        },
+        text: {
+          size: {
+            base: {
+              value: '16',
+              type: 'fontSize',
+            },
+            unit: {
+              value: 'px',
+              type: 'fontSize',
+            },
+            default: {
+              description: 'Should be resolved',
+              value: '{text.size.base}{text.size.unit}',
+              type: 'fontSize',
+            },
           },
         },
       },

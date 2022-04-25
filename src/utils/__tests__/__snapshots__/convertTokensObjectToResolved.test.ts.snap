@@ -180,6 +180,23 @@ Object {
       "value": "1 * {sizing.base}",
     },
   },
+  "text": Object {
+    "size": Object {
+      "base": Object {
+        "type": "fontSize",
+        "value": "16",
+      },
+      "default": Object {
+        "description": "Should NOT be resolved",
+        "type": "fontSize",
+        "value": "{text.size.base}{text.size.unit}",
+      },
+      "unit": Object {
+        "type": "fontSize",
+        "value": "px",
+      },
+    },
+  },
 }
 `;
 
@@ -252,6 +269,23 @@ Object {
       "value": 2,
     },
   },
+  "text": Object {
+    "size": Object {
+      "base": Object {
+        "type": "fontSize",
+        "value": 16,
+      },
+      "default": Object {
+        "description": "Should be resolved",
+        "type": "fontSize",
+        "value": "16px",
+      },
+      "unit": Object {
+        "type": "fontSize",
+        "value": "px",
+      },
+    },
+  },
 }
 `;
 
@@ -300,6 +334,23 @@ Object {
       "description": "Should be resolved",
       "type": "sizing",
       "value": 2,
+    },
+  },
+  "text": Object {
+    "size": Object {
+      "base": Object {
+        "type": "fontSize",
+        "value": 16,
+      },
+      "default": Object {
+        "description": "Should be resolved",
+        "type": "fontSize",
+        "value": "16px",
+      },
+      "unit": Object {
+        "type": "fontSize",
+        "value": "px",
+      },
     },
   },
 }
