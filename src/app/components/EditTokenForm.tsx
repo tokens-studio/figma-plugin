@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import {
   useDispatch, useSelector,
 } from 'react-redux';
@@ -21,9 +21,7 @@ import { TokenTypes } from '@/constants/TokenTypes';
 import { EditTokenObject } from '../store/models/uiState';
 import TypographyInput from './TypographyInput';
 import Stack from './Stack';
-import { TokenBoxshadowValue, TokenTypograpyValue } from '@/types/values';
-import { SingleTypographyValueDisplay } from './TokenTooltip/SingleTypograhpyValueDisplay';
-import tokenTypes from '@/config/tokenTypes';
+import { TokenBoxshadowValue } from '@/types/values';
 
 type Props = {
   resolvedTokens: ResolveTokenValuesResult[];
@@ -83,6 +81,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
     (e) => {
       setError(null);
       e.persist();
+      console.log("head", internalEditToken)
       if (internalEditToken) {
         setInternalEditToken({ ...internalEditToken, [e.target.name]: e.target.value });
       }
@@ -143,21 +142,17 @@ function EditTokenForm({ resolvedTokens }: Props) {
     [internalEditToken],
   );
 
-  const handleTypographyChangeByAlias = React.useCallback(
-    (value: string) => {
+  const handleTypographyChangeByAlias = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>(
+    (e) => {
       setError(null);
-      if (internalEditToken?.type === TokenTypes.TYPOGRAPHY) {
-        setInternalEditToken({
-          ...internalEditToken, 
-          value,
-          options: {
-            type: 'typography',
-          }
-        });
+      e.persist();
+      if (internalEditToken) {
+        setInternalEditToken({ ...internalEditToken, [e.target.name]: e.target.value });
       }
     },
     [internalEditToken],
   );
+
 
   const handleOptionsChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>(
     (e) => {

@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import { useSelector } from 'react-redux';
 import { TokensIcon, LinkBreak2Icon } from '@radix-ui/react-icons';
 import { checkIfContainsAlias } from '@/utils/alias';
 import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
-import { editTokenSelector } from '@/selectors';
+import { TypographyTokenSingleValue } from '@/types/propertyTypes';
 import Box from './Box';
 import Input from './Input';
 import ResolvedValueBox from './ResolvedValueBox';
@@ -31,34 +30,29 @@ export default function TypographyInput({
 }: {
   internalEditToken: EditTokenObject;
   handleTypographyChange: React.ChangeEventHandler;
-  handleTypographyChangeByAlias: Function;
+  handleTypographyChangeByAlias: (shadow: TypographyTokenSingleValue | TypographyTokenSingleValue[]) => void;
   resolvedTokens: ResolveTokenValuesResult[];
 }) {
-  const editToken = useSelector(editTokenSelector);
-  const defaultMode = (typeof internalEditToken.value === 'object')
-  const [mode, setMode] = useState(defaultMode ? 'input' : 'alias');
+  const isInputMode = (typeof internalEditToken.value === 'object')
+  const [mode, setMode] = useState(isInputMode ? 'input' : 'alias');
   const [alias, setAlias] = useState('');
-  const [selectedToken, setSelectedToken] = React.useState<typeof editToken>(null);
+  // const [selectedToken, setSelectedToken] = React.useState<typeof editToken>(null);
 
   const handleMode = React.useCallback(() => {
     const changeMode = (mode === 'input') ? 'alias' : 'input';
     setMode(changeMode);
     setAlias('');
-    handleTypographyChangeByAlias(newToken, '');
   }, [mode]);
 
-  const handleAliasChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>((
-    (e) => {
-      setAlias(e.target.value);
-      const search = findReferences(e.target.value);
-      if (search && search.length > 0) {
-        const nameToLookFor = search[0].slice(1, search[0].length - 1);
-        const foundToken = resolvedTokens.find((t) => t.name === nameToLookFor);
-        if (foundToken) setSelectedToken(foundToken);
-      }
-      handleTypographyChangeByAlias(e.target.value);
+  const selectedToken = React.useMemo(() => {
+    const search = findReferences(internalEditToken.value);
+    if (search && search.length > 0) {
+      const nameToLookFor = search[0].slice(1, search[0].length - 1);
+      const foundToken = resolvedTokens.find((t) => t.name === nameToLookFor);
+      if (foundToken) return foundToken
     }
-  ), []);
+  }, [internalEditToken])
+  console.log("sele", selectedToken)
 
   return (
     <>
@@ -106,17 +100,17 @@ export default function TypographyInput({
               required
               full
               label="aliasName"
-              onChange={(e) => handleAliasChange(e)}
+              onChange={(e) => handleTypographyChangeByAlias(e)}
               type="text"
-              name="aliasName"
+              name="value"
               placeholder="Alias name"
-              value={alias}
+              value={isInputMode ? '' : internalEditToken.value}
             />
             {
-                checkIfContainsAlias(alias) && <ResolvedValueBox
-                  alias={alias}
-                  selectedToken={selectedToken}
-                />
+              !isInputMode && checkIfContainsAlias(internalEditToken.value) && <ResolvedValueBox
+                alias={alias}
+                selectedToken={selectedToken}
+              />
             }
           </Box>
         )

@@ -20,7 +20,7 @@ export default function ResolvedValueBox({
   selectedToken,
 }: {
   alias: string;
-  selectedToken: EditTokenObject | null;
+  selectedToken: ResolveTokenValuesResult | undefined;
 }) {
   const seed = useUIDSeed();
   const tokensContext = React.useContext(TokensContext);
@@ -31,6 +31,10 @@ export default function ResolvedValueBox({
   useEffect(() => {
     console.log("tochek", valueToCheck)
   }, [valueToCheck])
+
+  useEffect(() => {
+    console.log("87878", selectedToken)
+  }, [selectedToken])
 
   if (selectedToken && isSingleTypographyToken(selectedToken)) {
     console.log("istyop", selectedToken)
