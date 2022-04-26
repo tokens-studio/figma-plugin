@@ -7,6 +7,7 @@ import { TokensContext } from '@/context';
 import { isSingleBoxShadowToken, isSingleTypographyToken } from '@/utils/is';
 import { SingleTypographyValueDisplay } from './SingleTypograhpyValueDisplay';
 import { TokenBoxshadowValue } from '@/types/values';
+import Box from '../Box';
 
 type Props = {
   token: SingleToken;
@@ -66,8 +67,8 @@ export const TokenTooltipContentValue: React.FC<Props> = ({ token, shouldResolve
   }
 
   if (typeof valueToCheck !== 'string' && typeof valueToCheck !== 'number') {
-    return <div>{JSON.stringify(valueToCheck, null, 2)}</div>;
+    return <Box css={{color: '$bgDefault'}}>{JSON.stringify(valueToCheck, null, 2)}</Box>;
   }
 
-  return <div>{valueToCheck}</div>;
+  return <Box css={{color: '$bgDefault'}}>{valueToCheck}</Box>;
 };
