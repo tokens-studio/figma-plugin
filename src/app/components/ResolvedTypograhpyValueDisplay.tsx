@@ -14,15 +14,15 @@ export const ResolvedTypograhpyValueDisplay: React.FC<Props> = ({ value }) => {
     <Box css={{ display: 'flex', backgroundColor: '$bgSubtle', marginLeft: '$4' }}>
       <Box css={{ marginRight: '$6'}}>
         {
-          Object.keys(value).map((key) => {
-            return <p>{key}</p>
+          Object.keys(value).map((key, index) => {
+            return <p key={index}>{key}</p>
           })
         }
       </Box>
       <Box>
       {
-          Object.keys(value).map((key) => {
-            return <p>{value[key]}</p>
+          Object.keys(value).map((key, index) => {
+            return <p key={index}>{value[key]}</p>
           })
         }
       </Box>
