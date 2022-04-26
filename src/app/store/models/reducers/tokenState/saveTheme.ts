@@ -15,8 +15,9 @@ export function saveTheme(state: TokenState, data: Payload): TokenState {
   const nextState: TokenState = {
     ...state,
     themes: [
-      ...state.themes.filter((theme) => theme.id === themeId),
+      ...state.themes.filter((theme) => theme.id !== themeId),
       {
+        ...themeObject,
         ...data,
         id: themeId,
         $figmaStyleReferences: themeObject?.$figmaStyleReferences ?? {},
