@@ -1,28 +1,37 @@
 import React from 'react';
 import { SingleTypographyToken } from '@/types/tokens';
+import { styled } from '@/stitches.config';
 import Box from './Box';
-
-// @TODO confirm whether the typography token values
-// can still have the .value property from legacy
 
 type Props = {
   value: SingleTypographyToken['value']
 };
 
+const StyledPropertyItem = styled('div', {
+  color: '$textSubtle',
+  marginBottom: '$4',
+});
+
+const StyledValueItem = styled('div', {
+  marginBottom: '$4',
+});
+
+const properties = ['Font', 'Weight', 'Size', 'Line height', 'Letter', 'Paragraph', 'Decoration', 'Text Case'];
+
 export const ResolvedTypograhpyValueDisplay: React.FC<Props> = ({ value }) => {
   return (
-    <Box css={{ display: 'flex', backgroundColor: '$bgSubtle', marginLeft: '$4' }}>
-      <Box css={{ marginRight: '$6'}}>
+    <Box css={{ display: 'flex', backgroundColor: '$bgSubtle', padding: '$4' }}>
+      <Box css={{ display: 'grid', marginRight: '$6' }}>
         {
-          Object.keys(value).map((key, index) => {
-            return <p key={index}>{key}</p>
+          properties.map((property, index) => {
+            return <StyledPropertyItem key={index}>{property}</StyledPropertyItem>
           })
         }
       </Box>
       <Box>
-      {
+        {
           Object.keys(value).map((key, index) => {
-            return <p key={index}>{value[key]}</p>
+            return <StyledValueItem key={index}>{value[key]}</StyledValueItem>
           })
         }
       </Box>

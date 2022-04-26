@@ -230,7 +230,7 @@ export default function BoxShadowInput({
     <div>
       <Box css={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Heading size="small">Shadow</Heading>
-        <Box>
+        <Box css={{display: 'flex'}}>
           {mode === 'input' ? (
             <IconButton
               tooltip="alias mode"

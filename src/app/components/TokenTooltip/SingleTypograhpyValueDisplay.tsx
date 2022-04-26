@@ -12,7 +12,7 @@ type Props = {
 
 export const SingleTypographyValueDisplay: React.FC<Props> = ({ value, shouldResolve }) => {
   return (
-    <Box css={{color: '$bgDefault'}}>
+    <Box css={{ color: '$bgDefault' }}>
       <div>
         Font:
         {' '}
@@ -54,7 +54,7 @@ export const SingleTypographyValueDisplay: React.FC<Props> = ({ value, shouldRes
         {value.textDecoration?.value || value.textDecoration}
       </div>
       {
-        shouldResolve && <div>
+        shouldResolve && <Box css={{color: '$textSubtle'}}>
           {value.fontFamily}
           {' '}
           {value.fontWeight}
@@ -62,7 +62,7 @@ export const SingleTypographyValueDisplay: React.FC<Props> = ({ value, shouldRes
           /
           {' '}
           {value.fontSize}
-        </div>
+        </Box>
       }
     </Box>
   );
