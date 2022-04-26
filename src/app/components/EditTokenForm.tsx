@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import {
   useDispatch, useSelector,
 } from 'react-redux';
@@ -21,7 +21,6 @@ import { TokenTypes } from '@/constants/TokenTypes';
 import { EditTokenObject } from '../store/models/uiState';
 import TypographyInput from './TypographyInput';
 import Stack from './Stack';
-import { TokenBoxshadowValue } from '@/types/values';
 
 type Props = {
   resolvedTokens: ResolveTokenValuesResult[];
@@ -49,9 +48,6 @@ function EditTokenForm({ resolvedTokens }: Props) {
     [internalEditToken, resolvedTokens, activeTokenSet],
   );
 
-  useEffect(() => {
-    console.log("didmount", internalEditToken)
-  }, [])
   const hasAnotherTokenThatStartsWithName = React.useMemo(
     () => resolvedTokens
       .filter((t) => t.internal__Parent === activeTokenSet)
@@ -129,9 +125,6 @@ function EditTokenForm({ resolvedTokens }: Props) {
         setInternalEditToken({
           ...internalEditToken,
           value: { ...internalEditToken.value, [e.target.name]: e.target.value },
-          options: {
-            type: 'typography',
-          }
         });
       }
     },

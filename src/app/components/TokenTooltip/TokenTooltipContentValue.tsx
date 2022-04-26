@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useUIDSeed } from 'react-uid';
 import useTokens from '../../store/useTokens';
 import { SingleToken, SingleTypographyToken } from '@/types/tokens';
@@ -10,31 +10,29 @@ import { TokenBoxshadowValue } from '@/types/values';
 
 type Props = {
   token: SingleToken;
-  shouldResolve?: boolean;
-  tokenIsShadowOrTypographyAlias?: boolean;
+  shouldResolve: boolean;
+  tokenIsShadowOrTypographyAlias: boolean;
 };
 
 // Returns token value in display format
-export const TokenTooltipContentValue: React.FC<Props> = ({ token, shouldResolve = false, tokenIsShadowOrTypographyAlias = false }) => {
-  useEffect(()=> {
-    console.log("tokenIsShadowOrTypographyAlias", tokenIsShadowOrTypographyAlias,"token", token, "shouldResolve", shouldResolve)
-  }, [])
+export const TokenTooltipContentValue: React.FC<Props> = ({ token, shouldResolve , tokenIsShadowOrTypographyAlias }) => {
+
   const seed = useUIDSeed();
   const tokensContext = React.useContext(TokensContext);
-  let nameToLookFor: String ;
-  const tokenValueString = String(token.value);
-  if (tokenIsShadowOrTypographyAlias && tokenValueString.charAt(0) === '$') nameToLookFor = tokenValueString.slice(1, tokenValueString.length);
-  if (tokenIsShadowOrTypographyAlias && tokenValueString.charAt(0) === '{') nameToLookFor = tokenValueString.slice(1, tokenValueString.length - 1);
 
   const { getTokenValue } = useTokens();
-  const valueToCheck = React.useMemo(() => (
-    (shouldResolve && tokenIsShadowOrTypographyAlias
-      ? getTokenValue(nameToLookFor, tokensContext.resolvedTokens)?.value
-      : shouldResolve 
-        ? getTokenValue(token.name, tokensContext.resolvedTokens)?.value
-        : token.value)
-  ), [token, getTokenValue, shouldResolve, tokensContext.resolvedTokens]);
-  console.log("valuetockh", valueToCheck, 'token', token)
+  const valueToCheck = React.useMemo(() => {
+    if (shouldResolve && tokenIsShadowOrTypographyAlias) {
+      let nameToLookFor: String;
+      const tokenValueString = String(token.value);
+      if (tokenIsShadowOrTypographyAlias && tokenValueString.charAt(0) === '$') nameToLookFor = tokenValueString.slice(1, tokenValueString.length);
+      if (tokenIsShadowOrTypographyAlias && tokenValueString.charAt(0) === '{') nameToLookFor = tokenValueString.slice(1, tokenValueString.length - 1);
+      return getTokenValue(nameToLookFor, tokensContext.resolvedTokens)?.value
+    }
+    if (shouldResolve) return getTokenValue(token.name, tokensContext.resolvedTokens)?.value
+    else return token.value
+  }, [token, getTokenValue, shouldResolve, tokenIsShadowOrTypographyAlias, tokensContext.resolvedTokens]);
+
   if (isSingleTypographyToken(token)) {
     return (
       <SingleTypographyValueDisplay

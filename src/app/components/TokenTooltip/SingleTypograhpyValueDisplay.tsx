@@ -10,21 +10,6 @@ type Props = {
 };
 
 export const SingleTypographyValueDisplay: React.FC<Props> = ({ value, shouldResolve }) => {
-  console.log("display", value)
-  if (shouldResolve) {
-    return (
-      <div>
-        {value.fontFamily}
-        {' '}
-        {value.fontWeight}
-        {' '}
-        /
-        {' '}
-        {value.fontSize}
-      </div>
-    );
-  }
-
   return (
     <div>
       <div>
@@ -67,6 +52,17 @@ export const SingleTypographyValueDisplay: React.FC<Props> = ({ value, shouldRes
         {' '}
         {value.textDecoration?.value || value.textDecoration}
       </div>
+      {
+        shouldResolve && <div>
+          {value.fontFamily}
+          {' '}
+          {value.fontWeight}
+          {' '}
+          /
+          {' '}
+          {value.fontSize}
+        </div>
+      }
     </div>
   );
 };

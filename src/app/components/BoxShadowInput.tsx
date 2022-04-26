@@ -196,7 +196,6 @@ export default function BoxShadowInput({
   const isInputMode = (typeof internalEditToken.value === 'object')
   const [mode, setMode] = useState(isInputMode ? 'input' : 'alias');
   const [alias, setAlias] = useState('');
-  // const [selectedToken, setSelectedToken] = React.useState<typeof editToken>(null);
 
   const handleMode = React.useCallback(() => {
     const changeMode = (mode === 'input') ? 'alias' : 'input';

@@ -1,18 +1,13 @@
 import React, { useEffect } from 'react';
 import { useUIDSeed } from 'react-uid';
-import { getAliasValue } from '@/utils/alias';
 import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
 import { isSingleBoxShadowToken, isSingleTypographyToken } from '@/utils/is';
-import { TokenTypes } from '@/constants/TokenTypes';
 import { TokensContext } from '@/context';
-import { SingleToken, SingleTypographyToken } from '@/types/tokens';
+import { SingleTypographyToken } from '@/types/tokens';
 import { TokenBoxshadowValue } from '@/types/values';
-import { findReferences } from '../../utils/findReferences';
-import useTokens from '../store/useTokens';
 import Box from './Box';
 import { SingleShadowValueDisplay } from './TokenTooltip/SingleShadowValueDisplay';
 import { SingleTypographyValueDisplay } from './TokenTooltip/SingleTypograhpyValueDisplay';
-import { EditTokenObject } from '../store/models/uiState';
 
 
 export default function ResolvedValueBox({
@@ -37,7 +32,6 @@ export default function ResolvedValueBox({
   if (selectedToken && isSingleTypographyToken(selectedToken)) {
     return (
       <SingleTypographyValueDisplay
-        // @TODO strengthen type checking here
         value={valueToCheck as SingleTypographyToken['value']}
         shouldResolve={false}
       />
@@ -45,7 +39,6 @@ export default function ResolvedValueBox({
   }
 
   if (selectedToken && isSingleBoxShadowToken(selectedToken)) {
-    console.log("isbox", selectedToken)
     if (Array.isArray(valueToCheck)) {
       return (
         <div>
@@ -61,7 +54,6 @@ export default function ResolvedValueBox({
 
     return (
       <SingleShadowValueDisplay
-        // @TODO strengthen type checking here
         shadow={valueToCheck as TokenBoxshadowValue}
       />
     );
@@ -70,24 +62,6 @@ export default function ResolvedValueBox({
   if (typeof valueToCheck !== 'string' && typeof valueToCheck !== 'number') {
     return <div>{JSON.stringify(valueToCheck, null, 2)}</div>;
   }
-
-  // const resolvedValue = React.useMemo(() => {
-  //   if (alias) {
-  //     return typeof alias === 'object'
-  //       ? null
-  //       : getAliasValue(alias, resolvedTokens);
-  //   }
-  //   return null;
-  // }, [alias]);
-
-  // const isJson = (str) => {
-  //   try {
-  //     JSON.parse(str);
-  //   } catch (e) {
-  //     return false;
-  //   }
-  //   return true;
-  // };
 
   return (
     <Box css={{
