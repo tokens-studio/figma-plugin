@@ -125,13 +125,15 @@ const transform = async () => {
             preserveRawValue,
             throwErrorWhenNotResolved
         };
+        const usedSets = sets.length > 0 ? sets.includes(",") ? sets.split(",") : [sets] : [];
+        const excludedSets = excludes.length > 0 ? excludes.includes(",") ? excludes.split(",") : [excludes] : [];
 
         log(`transforming tokens from input: ${input}`);
-        log(`using sets: ${sets.length > 0 ? sets : '[]'}`);
-        log(`using excludes: ${excludes.length > 0 ? excludes : '[]'}`);
+        log(`using sets: ${usedSets.length > 0 ? usedSets : '[]'}`);
+        log(`using excludes: ${excludedSets.length > 0 ? excludedSets : '[]'}`);
         log(`using options: { expandTypography: ${expandTypography}, expandShadow: ${expandShadow}, preserveRawValue: ${preserveRawValue} }`);
 
-        const transformed = transformTokens(tokens, sets, excludes, options);
+        const transformed = transformTokens(tokens, usedSets, excludedSets, options);
 
         log(`writing tokens to output: ${output}`);
 
