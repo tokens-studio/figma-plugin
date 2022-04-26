@@ -10,6 +10,7 @@ type Props = {
 };
 
 export const SingleTypographyValueDisplay: React.FC<Props> = ({ value, shouldResolve }) => {
+  console.log("display", value)
   if (shouldResolve) {
     return (
       <div>

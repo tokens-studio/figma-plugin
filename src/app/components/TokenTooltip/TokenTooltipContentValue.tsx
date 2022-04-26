@@ -11,19 +11,30 @@ import { TokenBoxshadowValue } from '@/types/values';
 type Props = {
   token: SingleToken;
   shouldResolve?: boolean;
+  tokenIsShadowOrTypographyAlias?: boolean;
 };
 
 // Returns token value in display format
-export const TokenTooltipContentValue: React.FC<Props> = ({ token, shouldResolve = false }) => {
+export const TokenTooltipContentValue: React.FC<Props> = ({ token, shouldResolve = false, tokenIsShadowOrTypographyAlias = false }) => {
+  useEffect(()=> {
+    console.log("tokenIsShadowOrTypographyAlias", tokenIsShadowOrTypographyAlias,"token", token, "shouldResolve", shouldResolve)
+  }, [])
   const seed = useUIDSeed();
   const tokensContext = React.useContext(TokensContext);
+  let nameToLookFor: String ;
+  const tokenValueString = String(token.value);
+  if (tokenIsShadowOrTypographyAlias && tokenValueString.charAt(0) === '$') nameToLookFor = tokenValueString.slice(1, tokenValueString.length);
+  if (tokenIsShadowOrTypographyAlias && tokenValueString.charAt(0) === '{') nameToLookFor = tokenValueString.slice(1, tokenValueString.length - 1);
+
   const { getTokenValue } = useTokens();
   const valueToCheck = React.useMemo(() => (
-    (shouldResolve
-      ? getTokenValue(token.name, tokensContext.resolvedTokens)?.value
-      : token.value)
+    (shouldResolve && tokenIsShadowOrTypographyAlias
+      ? getTokenValue(nameToLookFor, tokensContext.resolvedTokens)?.value
+      : shouldResolve 
+        ? getTokenValue(token.name, tokensContext.resolvedTokens)?.value
+        : token.value)
   ), [token, getTokenValue, shouldResolve, tokensContext.resolvedTokens]);
-
+  console.log("valuetockh", valueToCheck, 'token', token)
   if (isSingleTypographyToken(token)) {
     return (
       <SingleTypographyValueDisplay

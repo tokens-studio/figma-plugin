@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   useDispatch, useSelector,
 } from 'react-redux';
@@ -42,9 +42,6 @@ function EditTokenForm({ resolvedTokens }: Props) {
 
   const isValid = React.useMemo(() => internalEditToken?.value && !error, [internalEditToken, error]);
 
-  React.useEffect(() => {
-    console.log("didmo", internalEditToken)
-  }, [])
   const hasNameThatExistsAlready = React.useMemo(
     () => resolvedTokens
       .filter((t) => t.internal__Parent === activeTokenSet)
@@ -52,7 +49,9 @@ function EditTokenForm({ resolvedTokens }: Props) {
     [internalEditToken, resolvedTokens, activeTokenSet],
   );
 
-
+  useEffect(() => {
+    console.log("didmount", internalEditToken)
+  }, [])
   const hasAnotherTokenThatStartsWithName = React.useMemo(
     () => resolvedTokens
       .filter((t) => t.internal__Parent === activeTokenSet)
@@ -81,7 +80,6 @@ function EditTokenForm({ resolvedTokens }: Props) {
     (e) => {
       setError(null);
       e.persist();
-      console.log("head", internalEditToken)
       if (internalEditToken) {
         setInternalEditToken({ ...internalEditToken, [e.target.name]: e.target.value });
       }
@@ -89,7 +87,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
     [internalEditToken],
   );
 
-  const handleShadowChange = React.useCallback(
+  const handleBoxShadowChange = React.useCallback(
     (shadow: SingleBoxShadowToken['value']) => {
       setError(null);
       if (internalEditToken?.type === TokenTypes.BOX_SHADOW) {
@@ -102,19 +100,17 @@ function EditTokenForm({ resolvedTokens }: Props) {
     [internalEditToken],
   );
 
-  const handleBoxShadowChangeByAlias = React.useCallback(
-    (rawValue: TokenBoxshadowValue | TokenBoxshadowValue[], value: string) => {
+  const handleBoxShadowChangeByAlias = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>(
+    (e) => {
       setError(null);
-      if (internalEditToken?.type === TokenTypes.BOX_SHADOW) {
-        setInternalEditToken({
-          ...internalEditToken,
-          rawValue,
-          value: value,
-        });
+      e.persist();
+      if (internalEditToken) {
+        setInternalEditToken({ ...internalEditToken, [e.target.name]: e.target.value });
       }
     },
     [internalEditToken],
   );
+
 
   const handleColorValueChange = React.useCallback(
     (color: string) => {
@@ -252,10 +248,10 @@ function EditTokenForm({ resolvedTokens }: Props) {
       case 'boxShadow': {
         return (
           <BoxShadowInput
-            setValue={handleShadowChange}
-            value={internalEditToken.value}
-            resolvedTokens={resolvedTokens}
-            handleBoxShadowChangeByAlias={handleBoxShadowChangeByAlias}
+          handleBoxShadowChange={handleBoxShadowChange}
+          handleBoxShadowChangeByAlias={handleBoxShadowChangeByAlias}
+          resolvedTokens={resolvedTokens}
+          internalEditToken={internalEditToken}
           />
         );
       }

@@ -224,7 +224,6 @@ export const tokenState = createModel<RootModel>()({
       let newTokens: TokenStore['values'] = {};
       const existingToken = state.tokens[data.parent].find((n) => n.name === data.name);
       if (!existingToken) {
-        console.log("exsit", data)
         newTokens = {
           [data.parent]: [
             ...state.tokens[data.parent],

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import Icon from './Icon';
 import TokenGroupHeading from './TokenGroupHeading';
@@ -45,6 +45,9 @@ const TokenTree: React.FC<Props> = ({
       };
     })
   ), [path, tokenValues, showNewForm]);
+  useEffect(() => {
+    console.log("valuesentir", tokenValuesEntries)
+  }, [])
   const [draggedToken, setDraggedToken] = useState<SingleToken | null>(null);
   const [dragOverToken, setDragOverToken] = useState<SingleToken | null>(null);
 

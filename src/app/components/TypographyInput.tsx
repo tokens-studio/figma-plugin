@@ -30,7 +30,7 @@ export default function TypographyInput({
 }: {
   internalEditToken: EditTokenObject;
   handleTypographyChange: React.ChangeEventHandler;
-  handleTypographyChangeByAlias: (shadow: TypographyTokenSingleValue | TypographyTokenSingleValue[]) => void;
+  handleTypographyChangeByAlias: (typography: TypographyTokenSingleValue | TypographyTokenSingleValue[]) => void;
   resolvedTokens: ResolveTokenValuesResult[];
 }) {
   const isInputMode = (typeof internalEditToken.value === 'object')
@@ -52,7 +52,6 @@ export default function TypographyInput({
       if (foundToken) return foundToken
     }
   }, [internalEditToken])
-  console.log("sele", selectedToken)
 
   return (
     <>

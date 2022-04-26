@@ -29,15 +29,12 @@ export default function ResolvedValueBox({
   ), [selectedToken, tokensContext.resolvedTokens, alias]);
 
   useEffect(() => {
-    console.log("tochek", valueToCheck)
   }, [valueToCheck])
 
   useEffect(() => {
-    console.log("87878", selectedToken)
   }, [selectedToken])
 
   if (selectedToken && isSingleTypographyToken(selectedToken)) {
-    console.log("istyop", selectedToken)
     return (
       <SingleTypographyValueDisplay
         // @TODO strengthen type checking here
