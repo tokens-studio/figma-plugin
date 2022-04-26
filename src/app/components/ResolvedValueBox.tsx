@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useUIDSeed } from 'react-uid';
 import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
 import { isSingleBoxShadowToken, isSingleTypographyToken } from '@/utils/is';
@@ -6,8 +6,8 @@ import { TokensContext } from '@/context';
 import { SingleTypographyToken } from '@/types/tokens';
 import { TokenBoxshadowValue } from '@/types/values';
 import Box from './Box';
-import { SingleShadowValueDisplay } from './TokenTooltip/SingleShadowValueDisplay';
-import { SingleTypographyValueDisplay } from './TokenTooltip/SingleTypograhpyValueDisplay';
+import { ResolvedShadowValueDisplay } from './ResolvedShadowValueDisplay';
+import { ResolvedTypograhpyValueDisplay } from './ResolvedTypograhpyValueDisplay';
 
 
 export default function ResolvedValueBox({
@@ -25,10 +25,7 @@ export default function ResolvedValueBox({
 
   if (selectedToken && isSingleTypographyToken(selectedToken)) {
     return (
-      <SingleTypographyValueDisplay
-        value={valueToCheck as SingleTypographyToken['value']}
-        shouldResolve={false}
-      />
+      <ResolvedTypograhpyValueDisplay value={valueToCheck as SingleTypographyToken['value']}/>
     );
   }
 
@@ -36,10 +33,11 @@ export default function ResolvedValueBox({
     if (Array.isArray(valueToCheck)) {
       return (
         <div>
-          {valueToCheck.map((t) => (
-            <SingleShadowValueDisplay
+          {valueToCheck.map((t, index) => (
+            <ResolvedShadowValueDisplay
               key={seed(t)}
               shadow={t}
+              index={index}
             />
           ))}
         </div>
@@ -47,8 +45,9 @@ export default function ResolvedValueBox({
     }
 
     return (
-      <SingleShadowValueDisplay
+      <ResolvedShadowValueDisplay
         shadow={valueToCheck as TokenBoxshadowValue}
+        index={1}
       />
     );
   }
