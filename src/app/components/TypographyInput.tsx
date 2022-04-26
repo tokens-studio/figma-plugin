@@ -11,17 +11,6 @@ import { findReferences } from '@/utils/findReferences';
 import IconButton from './IconButton';
 import Heading from './Heading';
 
-const newToken = {
-  fontFamily: 'Inter',
-  fontSize: 18,
-  fontWeight: 'Regular',
-  letterSpacing: '0%',
-  lineHeight: 'AUTO',
-  paragraphSpacing: 0,
-  textCase: 'none',
-  textDecoration: 'none',
-};
-
 export default function TypographyInput({
   internalEditToken,
   handleTypographyChange,
@@ -33,10 +22,9 @@ export default function TypographyInput({
   handleTypographyChangeByAlias: (typography: TypographyTokenSingleValue | TypographyTokenSingleValue[]) => void;
   resolvedTokens: ResolveTokenValuesResult[];
 }) {
-  const isInputMode = (typeof internalEditToken.value === 'object')
+  const isInputMode = (typeof internalEditToken.value === 'object');
   const [mode, setMode] = useState(isInputMode ? 'input' : 'alias');
   const [alias, setAlias] = useState('');
-  // const [selectedToken, setSelectedToken] = React.useState<typeof editToken>(null);
 
   const handleMode = React.useCallback(() => {
     const changeMode = (mode === 'input') ? 'alias' : 'input';
@@ -51,7 +39,7 @@ export default function TypographyInput({
       const foundToken = resolvedTokens.find((t) => t.name === nameToLookFor);
       if (foundToken) return foundToken
     }
-  }, [internalEditToken])
+  }, [internalEditToken]);
 
   return (
     <>
@@ -99,7 +87,7 @@ export default function TypographyInput({
               required
               full
               label="aliasName"
-              onChange={(e) => handleTypographyChangeByAlias(e)}
+              onChange={handleTypographyChangeByAlias}
               type="text"
               name="value"
               placeholder="Alias name"

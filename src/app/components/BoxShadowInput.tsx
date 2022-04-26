@@ -193,7 +193,7 @@ export default function BoxShadowInput({
   resolvedTokens: ResolveTokenValuesResult[]
   internalEditToken: EditTokenObject;
 }) {
-  const isInputMode = (typeof internalEditToken.value === 'object')
+  const isInputMode = (typeof internalEditToken.value === 'object');
   const [mode, setMode] = useState(isInputMode ? 'input' : 'alias');
   const [alias, setAlias] = useState('');
 
@@ -210,7 +210,7 @@ export default function BoxShadowInput({
       const foundToken = resolvedTokens.find((t) => t.name === nameToLookFor);
       if (foundToken) return foundToken
     }
-  }, [internalEditToken])
+  }, [internalEditToken]);
 
   const addShadow = () => {
     if (Array.isArray(internalEditToken.value)) {
@@ -290,7 +290,7 @@ export default function BoxShadowInput({
                 required
                 full
                 label="aliasName"
-                onChange={(e) => handleBoxShadowChangeByAlias(e)}
+                onChange={handleBoxShadowChangeByAlias}
                 type="text"
                 name="value"
                 placeholder="Alias name"

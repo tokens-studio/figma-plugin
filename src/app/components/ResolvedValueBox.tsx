@@ -23,12 +23,6 @@ export default function ResolvedValueBox({
     (selectedToken ? selectedToken?.value : alias )
   ), [selectedToken, tokensContext.resolvedTokens, alias]);
 
-  useEffect(() => {
-  }, [valueToCheck])
-
-  useEffect(() => {
-  }, [selectedToken])
-
   if (selectedToken && isSingleTypographyToken(selectedToken)) {
     return (
       <SingleTypographyValueDisplay
