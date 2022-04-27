@@ -107,22 +107,26 @@ export default function TokenSetSelector() {
       }}
       className="content"
     >
-      {featureFlags?.gh_mfs_enabled && api.provider === StorageProviderType.GITHUB && !api?.filePath?.endsWith('.json') ? (
-        <Box>
-          <TokenSetTree
+      {featureFlags?.gh_mfs_enabled
+        && (api.provider === StorageProviderType.GITHUB
+          || api.provider === StorageProviderType.GITLAB)
+          && !api?.filePath?.endsWith('.json')
+        ? (
+          <Box>
+            <TokenSetTree
+              tokenSets={allTokenSets}
+              onRename={handleRenameTokenSet}
+              onDelete={(set) => handleDeleteTokenSet(set)}
+            />
+          </Box>
+        ) : (
+          <TokenSetList
+            onReorder={(values: string[]) => handleReorder(values)}
             tokenSets={allTokenSets}
             onRename={handleRenameTokenSet}
             onDelete={handleDeleteTokenSet}
           />
-        </Box>
-      ) : (
-        <TokenSetList
-          onReorder={(values: string[]) => handleReorder(values)}
-          tokenSets={allTokenSets}
-          onRename={handleRenameTokenSet}
-          onDelete={(set) => handleDeleteTokenSet(set)}
-        />
-      )}
+        )}
       <Modal isOpen={showRenameTokenSetFields} close={() => setShowRenameTokenSetFields(false)}>
         <Stack direction="column" justify="center" gap={4} css={{ textAlign: 'center' }}>
           <Heading size="small">

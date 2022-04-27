@@ -1,6 +1,5 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
-import SyncSettings from './SyncSettings';
 import Settings from './Settings';
 import Inspector from './Inspector';
 import Tokens from './Tokens';
@@ -36,7 +35,6 @@ function App() {
           {activeTab === 'start' && <StartScreen />}
           <Tokens isActive={activeTab === 'tokens'} />
           {activeTab === 'inspector' && <Inspector />}
-          {activeTab === 'syncsettings' && <SyncSettings />}
           {activeTab === 'settings' && <Settings />}
         </Box>
         <Footer />
