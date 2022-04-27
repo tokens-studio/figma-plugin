@@ -5,6 +5,7 @@ import { models } from './store/models';
 import type { UIState } from './store/models/uiState';
 import type { SettingsState } from './store/models/settings';
 import type { TokenState } from './store/models/tokenState';
+import { UserState } from './store/models/userState';
 import type { InspectState } from './store/models/inspectState';
 import { undoableEnhancer } from './enhancers/undoableEnhancer';
 
@@ -22,8 +23,9 @@ export const store = init({
 export type Store = typeof store;
 export type Dispatch = RematchDispatch<RootModel>;
 export type RootState = {
-  uiState: UIState
-  settings: SettingsState
-  tokenState: TokenState
-  inspectState: InspectState
+  uiState: UIState;
+  settings: SettingsState;
+  tokenState: TokenState;
+  inspectState: InspectState;
+  userState: UserState;
 };

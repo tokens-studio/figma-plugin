@@ -117,7 +117,7 @@ export function Initiator() {
             break;
           }
           case MessageFromPluginTypes.USER_ID: {
-            dispatch.uiState.setUserId(pluginMessage.user.userId);
+            dispatch.userState.setUserId(pluginMessage.user.userId);
             identify(pluginMessage.user);
             track('Launched', { version: pjs.plugin_version });
             break;
@@ -155,7 +155,7 @@ export function Initiator() {
             break;
           }
           case MessageFromPluginTypes.LICENSE_KEY: {
-            dispatch.uiState.setLicenseKey(pluginMessage.licenseKey);
+            dispatch.userState.setLicenseKey(pluginMessage.licenseKey);
             break;
           }
           default:

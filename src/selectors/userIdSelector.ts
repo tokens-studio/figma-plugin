@@ -1,4 +1,4 @@
 import { createSelector } from 'reselect';
-import { uiStateSelector } from './uiStateSelector';
+import { userStateSelector } from './userStateSelector';
 
-export const userIdSelector = createSelector(uiStateSelector, (state) => state.userId);
+export const userIdSelector = createSelector(userStateSelector, (state) => state.userId);

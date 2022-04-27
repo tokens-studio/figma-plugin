@@ -10,29 +10,49 @@ import { licenseKeySelector } from '@/selectors/licenseKeySelector';
 import Heading from '../Heading';
 import Stack from '../Stack';
 import { Dispatch } from '@/app/store';
-import { featureFlagsSelector } from '@/selectors';
+import { licenseKeyErrorSelector } from '@/selectors/licenseKeyErrorSelector';
 
 export default function AddLicenseKey() {
   const dispatch = useDispatch<Dispatch>();
   const licenseKey = useSelector(licenseKeySelector);
+  const licenseKeyError = useSelector(licenseKeyErrorSelector);
   const [key, setLicenseKey] = useState(licenseKey);
 
   const addKey = useCallback(() => {
-    if (key) {
-      postToFigma({
-        type: MessageToPluginTypes.SET_LICENSE_KEY,
-        licenseKey: key,
-      });
-      dispatch.uiState.setLicenseKey(key);
-    }
+    postToFigma({
+      type: MessageToPluginTypes.SET_LICENSE_KEY,
+      licenseKey: key,
+    });
+    dispatch.userState.setLicenseKey(key);
   }, [key, dispatch]);
+
+  const removeKey = useCallback(() => {
+    // if (key) {
+    //   postToFigma({
+    //     type: MessageToPluginTypes.SET_LICENSE_KEY,
+    //     licenseKey: key,
+    //   });
+    //   dispatch.userState.setLicenseKey(key);
+    // }
+  }, [key, dispatch]);
+
+  const removeLicenseKeyButton = licenseKey && (
+    <Button variant="secondary" onClick={removeKey} disabled={!licenseKey}>
+      Remove license
+    </Button>
+  );
 
   return (
     <Stack direction="column" css={{ padding: '$4 0' }}>
       <Heading>License key</Heading>
-      <Box css={{
-        padding: '$4', display: 'flex', alignItems: 'center', width: '100%', paddingRight: '$9',
-      }}
+      <Box
+        css={{
+          padding: '$4',
+          display: 'flex',
+          alignItems: 'center',
+          width: '100%',
+          paddingRight: '$9',
+        }}
       >
         <Box css={{ flexGrow: 1, marginRight: '$4' }}>
           <Input
@@ -43,11 +63,26 @@ export default function AddLicenseKey() {
             onChange={(ev) => {
               setLicenseKey(ev.target.value);
             }}
+            error={licenseKeyError}
           />
         </Box>
-        <Button variant="secondary" onClick={addKey} disabled={licenseKey === key}>
-          Add license addKey
-        </Button>
+        <Box
+          css={{
+            alignSelf: licenseKeyError ? 'flex-end' : 'auto',
+          }}
+        >
+          <Button variant="primary" onClick={addKey} disabled={licenseKey === key}>
+            {licenseKey ? 'Update license key' : 'Add license addKey'}
+          </Button>
+        </Box>
+        <Box
+          css={{
+            alignSelf: licenseKeyError ? 'flex-end' : 'auto',
+            marginLeft: '$2',
+          }}
+        >
+          {removeLicenseKeyButton}
+        </Box>
       </Box>
     </Stack>
   );

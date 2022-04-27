@@ -4,15 +4,13 @@ import { StorageType, StorageProviderType, ApiDataType } from '@/types/api';
 import { track } from '@/utils/analytics';
 import type { RootModel } from '@/types/RootModel';
 import fetchChangelog from '@/utils/storyblok';
-import fetchEntitlementsForLicense from '@/utils/fetchEntitlementsForLicense';
 import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 import { postToFigma } from '@/plugin/notifiers';
 import { MessageToPluginTypes } from '@/types/messages';
 import { SingleToken } from '@/types/tokens';
 import { SelectionGroup, StoryblokStory } from '@/types';
 import { Tabs } from '@/constants/Tabs';
-import { FeatureFlags, FeatureKey } from '@/utils/featureFlags';
-import validateLicense from '@/utils/validateLicense';
+import { FeatureFlags } from '@/utils/featureFlags';
 
 type DisplayType = 'GRID' | 'LIST';
 
@@ -88,8 +86,6 @@ export interface UIState {
   collapsed: boolean;
   selectedLayers: number;
   featureFlags: FeatureFlags;
-  userId: string | null;
-  licenseKey: string | undefined;
 }
 
 const defaultConfirmState: ConfirmProps = {
@@ -132,8 +128,6 @@ export const uiState = createModel<RootModel>()({
     collapsed: false,
     selectedLayers: 0,
     featureFlags: {},
-    userId: null,
-    licenseKey: null,
   } as unknown) as UIState,
   reducers: {
     setShowPushDialog: (state, data: string | false) => ({
@@ -303,18 +297,6 @@ export const uiState = createModel<RootModel>()({
         featureFlags: mergedFlags,
       };
     },
-    setUserId(state, payload: string) {
-      return {
-        ...state,
-        userId: payload,
-      };
-    },
-    setLicenseKey(state, payload: string) {
-      return {
-        ...state,
-        licenseKey: payload,
-      };
-    },
     addJobTasks(state, payload: AddJobTasksPayload) {
       return {
         ...state,
@@ -372,23 +354,6 @@ export const uiState = createModel<RootModel>()({
         type: MessageToPluginTypes.SET_SHOW_EMPTY_GROUPS,
         showEmptyGroups: payload == null ? rootState.uiState.showEmptyGroups : payload,
       });
-    },
-    setLicenseKey: async (payload, rootState) => {
-      const { userId } = rootState.uiState;
-
-      const licenseIsValid = await validateLicense(payload, userId);
-      if (licenseIsValid) {
-        const entitlements = await fetchEntitlementsForLicense(payload);
-        if (!entitlements) {
-          dispatch.uiState.setFeatureFlags(null);
-        } else {
-          const featureFlags = entitlements.reduce((acc: FeatureFlags, curr: FeatureKey) => {
-            acc![curr] = true;
-            return acc;
-          }, {} as FeatureFlags);
-          dispatch.uiState.setFeatureFlags(featureFlags);
-        }
-      }
     },
   }),
 });

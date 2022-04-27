@@ -1,4 +1,4 @@
 import { createSelector } from 'reselect';
-import { uiStateSelector } from './uiStateSelector';
+import { userStateSelector } from './userStateSelector';
 
-export const licenseKeySelector = createSelector(uiStateSelector, (state) => state.licenseKey);
+export const licenseKeySelector = createSelector(userStateSelector, (state) => state.licenseKey);
