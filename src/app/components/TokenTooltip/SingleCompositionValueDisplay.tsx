@@ -6,16 +6,10 @@ import { SingleCompositionToken } from '@/types/tokens';
 
 type Props = {
   value: SingleCompositionToken['value']
-  shouldResolve: boolean
 };
 
-export const SingleCompositionValueDisplay: React.FC<Props> = ({ value, shouldResolve }) => {
-  if (shouldResolve) {
-    return (
-      <div />
-    );
-  }
-
+export const SingleCompositionValueDisplay: React.FC<Props> = ({ value }) => {
+  console.log("value", value)
   return (
     <div>
       {

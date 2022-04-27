@@ -1,14 +1,11 @@
 import React, { useEffect } from 'react';
-import { useSelector } from 'react-redux';
 import { CompositionTokenSingleValue } from '@/types/propertyTypes';
-import { getAliasValue } from '@/utils/alias';
-import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
 import IconMinus from '@/icons/minus.svg';
 import IconPlus from '@/icons/plus.svg';
-import { tokensSelector } from '@/selectors';
 import Heading from './Heading';
 import IconButton from './IconButton';
 import Box from './Box';
+import Input from './Input';
 import SelectableInput from './SelectableInput';
 import propertyOptions from '../../config/properties.js';
 
@@ -16,31 +13,22 @@ function SingleStyleInput({
   index,
   styleItem,
   tokens,
-  resolvedTokens,
-  tokenType,
   properties,
-  tokenValues,
   setValue,
   onRemove,
 }: {
   index: number;
   styleItem: CompositionTokenSingleValue;
   tokens: CompositionTokenSingleValue | CompositionTokenSingleValue[];
-  resolvedTokens: ResolveTokenValuesResult[];
-  tokenType: string;
   properties: object[],
-  tokenValues: object[],
   setValue: (property: CompositionTokenSingleValue | CompositionTokenSingleValue[]) => void;
   onRemove: (index: number) => void;
 }) {
-  const resolvedValue = React.useMemo(() => {
-    if (styleItem) {
-      return typeof styleItem.value === 'object'
-        ? null
-        : getAliasValue(styleItem.value, resolvedTokens);
-    }
-    return null;
-  }, [styleItem, resolvedTokens]);
+
+  const defaultProperty = {
+    value: styleItem.property,
+    label: styleItem.property,
+  };
 
   const onPropertyChange = (e) => {
     if (Array.isArray(tokens)) {
@@ -53,24 +41,17 @@ function SingleStyleInput({
     }
   };
 
-  const onValueChange = (e) => {
+  const onAliasChange = (e) => {
     if (Array.isArray(tokens)) {
       const values = tokens;
-      const newStyle = { ...tokens[index], value: e.value };
+      const newStyle = { ...tokens[index], value: e.target.value };
       values.splice(index, 1, newStyle);
       setValue(values);
     } else {
-      setValue({ ...tokens, value: e.value });
+      setValue({ ...tokens, value: e.target.value });
     }
   };
-  const defaultProperty = {
-    value: styleItem.property,
-    label: styleItem.property,
-  };
-  const defaultValue = {
-    value: styleItem.value,
-    label: styleItem.value,
-  };
+
   return (
     <Box>
       <Box css={{
@@ -81,9 +62,11 @@ function SingleStyleInput({
           flex: 1,
           marginRight: '$5',
         },
-        '& > div:nth-child(2)': {
+        '& > label:nth-child(2)': {
           flex: 2,
           marginRight: '$5',
+          fontSize: '$5',
+          height: '$10'
         },
       }}
       >
@@ -95,12 +78,15 @@ function SingleStyleInput({
           onChange={onPropertyChange}
           required
         />
-        <SelectableInput
-          name="value"
-          data={tokenValues}
-          defaultData={defaultValue}
-          onChange={onValueChange}
+
+        <Input
           required
+          full
+          value={styleItem.value}
+          onChange={onAliasChange}
+          type="text"
+          name="alias"
+          placeholder="Alias"
         />
 
         <Box css={{ width: '$5', marginRight: '$3' }}>
@@ -120,45 +106,25 @@ const newToken: CompositionTokenSingleValue = {
   property: '', value: '',
 };
 const properties: object[] = [];
-const tokenValues: object[] = [];
 
 export default function CompositionTokenForm({
   value,
   setValue,
-  resolvedTokens,
-  tokenType,
 }: {
   value: CompositionTokenSingleValue | CompositionTokenSingleValue[];
   setValue: (style: CompositionTokenSingleValue | CompositionTokenSingleValue[]) => void;
-  resolvedTokens: ResolveTokenValuesResult[];
-  tokenType: string
 }) {
-  const tokens = useSelector(tokensSelector);
 
   useEffect(() => {
     makePropertisMenu();
-    makeTokensMenu();
   }, []);
 
   const makePropertisMenu = () => {
     for (const property in propertyOptions) {
-      const tempObject = {
+      properties.push({
         value: property,
         label: property,
-      };
-      properties.push(tempObject);
-    }
-  };
-
-  const makeTokensMenu = () => {
-    for (const key in tokens) {
-      for (let index = 0; index < tokens[key].length; index++) {
-        const tempObject = {
-          value: tokens[key][index].name,
-          label: tokens[key][index].name,
-        };
-        tokenValues.push(tempObject);
-      }
+      });
     }
   };
 
@@ -195,10 +161,7 @@ export default function CompositionTokenForm({
               styleItem={style}
               tokens={value}
               key={`single-style-${index}`}
-              resolvedTokens={resolvedTokens}
-              tokenType={tokenType}
               properties={properties}
-              tokenValues={tokenValues}
               setValue={setValue}
               onRemove={removeStyle}
             />
@@ -208,10 +171,7 @@ export default function CompositionTokenForm({
             tokens={value}
             styleItem={value}
             index={0}
-            resolvedTokens={resolvedTokens}
             properties={properties}
-            tokenValues={tokenValues}
-            tokenType={tokenType}
             setValue={setValue}
           />
         )}

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import extend from 'just-extend';
 import { useDispatch, useSelector } from 'react-redux';
 import { track } from '@/utils/analytics';
@@ -62,7 +62,7 @@ export const TokenButton: React.FC<Props> = ({
     return (name ?? '').split('.').slice(-visibleDepth).join('.');
   }, [name]);
 
-  const properties = usePropertiesForTokenType(type);
+  const properties = usePropertiesForTokenType(type, token);
 
   // @TODO check type property typing
   const activeStateProperties = React.useMemo(() => (

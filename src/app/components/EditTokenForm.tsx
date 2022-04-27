@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   useDispatch, useSelector,
 } from 'react-redux';
@@ -21,6 +21,7 @@ import {
 import { TokenTypes } from '@/constants/TokenTypes';
 import { EditTokenObject } from '../store/models/uiState';
 import Stack from './Stack';
+import { CookieIcon } from '@radix-ui/react-icons';
 
 type Props = {
   resolvedTokens: ResolveTokenValuesResult[];
@@ -48,6 +49,9 @@ function EditTokenForm({ resolvedTokens }: Props) {
     [internalEditToken, resolvedTokens, activeTokenSet],
   );
 
+  useEffect(() => {
+    console.log("token", internalEditToken)
+  })
   const hasAnotherTokenThatStartsWithName = React.useMemo(
     () => resolvedTokens
       .filter((t) => t.internal__Parent === activeTokenSet)
@@ -241,13 +245,10 @@ function EditTokenForm({ resolvedTokens }: Props) {
         ));
       }
       case 'composition': {
-        const { value } = internalEditToken;
         return (
           <CompositionTokenForm
-            value={value}
+            value={internalEditToken.value}
             setValue={handleCompositionChange}
-            resolvedTokens={resolvedTokens}
-            tokenType={internalEditToken.type}
           />
         );
       }

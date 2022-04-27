@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useUIDSeed } from 'react-uid';
 import useTokens from '../../store/useTokens';
 import { SingleToken, SingleTypographyToken, SingleCompositionToken } from '@/types/tokens';
@@ -24,7 +24,9 @@ export const TokenTooltipContentValue: React.FC<Props> = ({ token, shouldResolve
       ? getTokenValue(token.name, tokensContext.resolvedTokens)?.value
       : token.value)
   ), [token, getTokenValue, shouldResolve, tokensContext.resolvedTokens]);
-
+  useEffect(() => {
+    console.log('valueto',valueToCheck, shouldResolve,'name' ,token.name, "tokensContext.resolvedTokens", tokensContext.resolvedTokens) 
+  }, [valueToCheck, shouldResolve])
   if (isSingleTypographyToken(token)) {
     return (
       <SingleTypographyValueDisplay
@@ -38,9 +40,7 @@ export const TokenTooltipContentValue: React.FC<Props> = ({ token, shouldResolve
   if (isSingleCompositionToken(token)) {
     return (
       <SingleCompositionValueDisplay
-        // @TODO strengthen type checking here
         value={valueToCheck as SingleCompositionToken['value']}
-        shouldResolve={shouldResolve}
       />
     );
   }

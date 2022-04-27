@@ -5,6 +5,7 @@ import { isSingleToken } from '@/utils/is';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { UsedTokenSetsMap } from '@/types';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
+import convertOffsetToFigma from './figmaTransforms/offset';
 
 export type ResolveTokenValuesResult = SingleToken<true, {
   failedToResolve?: boolean
@@ -17,17 +18,18 @@ export function findAllAliases(tokens: (SingleToken | string)[]) {
 }
 
 export function resolveTokenValues(tokens: SingleToken[], previousCount: number = 0): ResolveTokenValuesResult[] {
+  console.log("resolvetokvalues")
   const aliases = findAllAliases(tokens);
   let returnedTokens: ResolveTokenValuesResult[] = tokens;
   returnedTokens = tokens.map((t, _, tokensInProgress) => {
     let returnValue:
-    Record<string, ReturnType<typeof getAliasValue>>[] |
-    Record<string, ReturnType<typeof getAliasValue>> |
-    ReturnType<typeof getAliasValue>;
+      Record<string, ReturnType<typeof getAliasValue>>[] |
+      Record<string, ReturnType<typeof getAliasValue>> |
+      ReturnType<typeof getAliasValue>;
 
     let failedToResolve = false;
     // Iterate over Typography and boxShadow Object to get resolved values
-    if (t.type === TokenTypes.TYPOGRAPHY || t.type === TokenTypes.BOX_SHADOW || t.type === TokenTypes.COMPOSITION) {
+    if (t.type === TokenTypes.TYPOGRAPHY || t.type === TokenTypes.BOX_SHADOW) {
       if (Array.isArray(t.value)) {
         // If we're dealing with an array, iterate over each item and then key
         returnValue = t.value.map((item) => (
@@ -43,7 +45,17 @@ export function resolveTokenValues(tokens: SingleToken[], previousCount: number 
           return acc;
         }, {});
       }
-    } else {
+    }
+    if (t.type === TokenTypes.COMPOSITION && Array.isArray(t.value)) {
+      returnValue = t.value.map((item) => {
+        if (item && item.value) {
+          console.log("getl", getAliasValue(item.value, tokensInProgress), "item.value", item.value)
+          return getAliasValue(item.value, tokensInProgress);
+        }
+      })
+      console.log("return", returnValue)
+    }
+    else {
       // If we're not dealing with special tokens, just return resolved value
       returnValue = getAliasValue(t, tokensInProgress);
 
@@ -71,7 +83,7 @@ export function mergeTokenGroups(tokens: Record<string, SingleToken[]>, usedSets
   // @README we will use both ENABLED and SOURCE sets
   // we only need to ignore the SOURCE sets when creating styles
   const tokenSetsToMerge = Object.entries(usedSets)
-    .filter(([,status]) => status === TokenSetStatus.ENABLED || status === TokenSetStatus.SOURCE)
+    .filter(([, status]) => status === TokenSetStatus.ENABLED || status === TokenSetStatus.SOURCE)
     .map(([tokenSet]) => tokenSet);
 
   // Reverse token set order (right-most win) and check for duplicates

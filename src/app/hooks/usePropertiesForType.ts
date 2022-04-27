@@ -3,8 +3,10 @@ import { Properties } from '@/constants/Properties';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { PropertyObject } from '@/types/properties';
 import { isPropertyType } from '@/utils/is';
+import { SingleToken } from '@/types/tokens';
+import { padding } from 'polished';
 
-export function usePropertiesForTokenType(type: TokenTypes): PropertyObject[] {
+export function usePropertiesForTokenType(type: TokenTypes, token: SingleToken): PropertyObject[] {
   return useMemo(() => {
     const properties: PropertyObject[] = [];
     switch (type) {
@@ -71,6 +73,31 @@ export function usePropertiesForTokenType(type: TokenTypes): PropertyObject[] {
             name: Properties.border,
           },
         );
+        break;
+      case TokenTypes.COMPOSITION:
+        const labelName = {
+          borderRadiusTopLeft: 'Top Left',
+          borderRadiusTopRight: 'Top Right',
+          borderRadiusBottomRight: 'Bottom Right',
+          borderRadiusBottomLeft: 'Bottom Left',
+          itemSpacing: 'Gap',
+          paddingTop: 'Top',
+          paddingRight: 'Right',
+          paddingBottom: 'Bottom',
+          paddingLeft: 'Left',
+          border: 'Border',
+          fill: 'Fill',
+          width: 'Width',
+          height: 'Height',
+        }
+        if (Array.isArray(token.value)) {
+          token.value.map((item) => {
+            properties.push(
+              { label: labelName[item.property], name: Properties[item.property] },
+            )
+          });
+        }
+        console.log("properti", properties)
         break;
       default:
         if (isPropertyType(type)) {
