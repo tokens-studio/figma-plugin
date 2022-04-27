@@ -18,7 +18,7 @@ export function findAllAliases(tokens: (SingleToken | string)[]) {
 }
 
 export function resolveTokenValues(tokens: SingleToken[], previousCount: number = 0): ResolveTokenValuesResult[] {
-  console.log("resolvetokvalues")
+  console.log("resolvetokvalues", tokens)
   const aliases = findAllAliases(tokens);
   let returnedTokens: ResolveTokenValuesResult[] = tokens;
   returnedTokens = tokens.map((t, _, tokensInProgress) => {
@@ -32,12 +32,14 @@ export function resolveTokenValues(tokens: SingleToken[], previousCount: number 
     if (t.type === TokenTypes.TYPOGRAPHY || t.type === TokenTypes.BOX_SHADOW) {
       if (Array.isArray(t.value)) {
         // If we're dealing with an array, iterate over each item and then key
+        // console.log("34343", t)
         returnValue = t.value.map((item) => (
           Object.entries(item).reduce<Record<string, ReturnType<typeof getAliasValue>>>((acc, [key, value]) => {
             acc[key] = getAliasValue(value, tokensInProgress);
             return acc;
           }, {})
         ));
+        // console.log("rearra", returnValue)
         // If not, iterate over each key
       } else {
         returnValue = Object.entries(t.value).reduce<Record<string, ReturnType<typeof getAliasValue>>>((acc, [key, value]) => {
@@ -47,10 +49,11 @@ export function resolveTokenValues(tokens: SingleToken[], previousCount: number 
       }
     }
     if (t.type === TokenTypes.COMPOSITION && Array.isArray(t.value)) {
+      // console.log("121212", t)
       returnValue = t.value.map((item) => {
-        if (item && item.value) {
-          console.log("getl", getAliasValue(item.value, tokensInProgress), "item.value", item.value)
-          return getAliasValue(item.value, tokensInProgress);
+        return {
+          property: item.property,
+          value: getAliasValue(item.value, tokensInProgress)
         }
       })
       console.log("return", returnValue)

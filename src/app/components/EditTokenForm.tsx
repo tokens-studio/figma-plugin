@@ -145,6 +145,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
 
   // @TODO update to useCallback
   const submitTokenValue = async ({ value, name, options }: EditTokenObject) => {
+    console.log("ivalue", value)
     if (internalEditToken) {
       let oldName;
       if (internalEditToken.initialName !== name && internalEditToken.initialName) {
