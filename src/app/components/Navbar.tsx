@@ -25,6 +25,8 @@ const transformProviderName = (provider: StorageProviderType) => {
       return 'JSONBin.io';
     case StorageProviderType.GITHUB:
       return 'GitHub';
+    case StorageProviderType.GITLAB:
+      return 'GitLab';
     case StorageProviderType.URL:
       return 'URL';
     default:
@@ -66,7 +68,6 @@ export const Navbar: React.FC = () => {
         <div>
           <TabButton name={Tabs.TOKENS} label="Tokens" />
           <TabButton name={Tabs.INSPECTOR} label="Inspect" />
-          <TabButton name={Tabs.SYNCSETTINGS} label="Sync" />
           <TabButton name={Tabs.SETTINGS} label="Settings" />
         </div>
         <NavbarUndoButton />
@@ -81,7 +82,8 @@ export const Navbar: React.FC = () => {
                 </a>
               </Tooltip>
             )}
-            {storageType.provider === StorageProviderType.GITHUB && (
+            {(storageType.provider === StorageProviderType.GITHUB
+              || storageType.provider === StorageProviderType.GITLAB) && (
               <Tooltip variant="right" label={`Push to ${transformProviderName(storageType.provider)}`}>
                 <button
                   onClick={() => pushTokens()}
