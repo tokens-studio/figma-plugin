@@ -4,6 +4,8 @@ import { findReferences } from '../findReferences';
 import { isSingleTokenValueObject } from '../is';
 import { checkAndEvaluateMath } from '../math';
 
+type TokenNameNodeType = string | undefined;
+
 // @TODO This function logic needs to be explained to improve it. It is unclear at this time which cases it needs to handle and how
 export function getAliasValue(token: SingleToken | string | number, tokens: SingleToken[] = []): string | number | null {
   // @TODO not sure how this will handle typography and boxShadow values. I don't believe it works.
@@ -30,7 +32,6 @@ export function getAliasValue(token: SingleToken | string | number, tokens: Sing
           ) 
             return null;
 
-          type TokenNameNodeType = string | undefined;
           const tokenAliasSplited = nameToLookFor.split('.');
           const tokenAliasSplitedLast: TokenNameNodeType = tokenAliasSplited.pop();
           const tokenAliasLastExcluded = tokenAliasSplited.join('.');
