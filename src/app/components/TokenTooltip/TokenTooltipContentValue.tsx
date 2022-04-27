@@ -1,32 +1,40 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useUIDSeed } from 'react-uid';
 import useTokens from '../../store/useTokens';
-import { SingleToken, SingleTypographyToken, SingleCompositionToken } from '@/types/tokens';
+import { SingleCompositionToken, SingleToken, SingleTypographyToken } from '@/types/tokens';
 import { SingleShadowValueDisplay } from './SingleShadowValueDisplay';
 import { TokensContext } from '@/context';
 import { isSingleBoxShadowToken, isSingleTypographyToken, isSingleCompositionToken } from '@/utils/is';
 import { SingleTypographyValueDisplay } from './SingleTypograhpyValueDisplay';
-import { SingleCompositionValueDisplay } from './SingleCompositionValueDisplay';
 import { TokenBoxshadowValue } from '@/types/values';
+import Box from '../Box';
+import { SingleCompositionValueDisplay } from './SingleCompositionValueDisplay';
 
 type Props = {
   token: SingleToken;
-  shouldResolve?: boolean;
+  shouldResolve: boolean;
+  tokenIsShadowOrTypographyAlias: boolean;
 };
 
 // Returns token value in display format
-export const TokenTooltipContentValue: React.FC<Props> = ({ token, shouldResolve = false }) => {
+export const TokenTooltipContentValue: React.FC<Props> = ({ token, shouldResolve , tokenIsShadowOrTypographyAlias }) => {
+
   const seed = useUIDSeed();
   const tokensContext = React.useContext(TokensContext);
+
   const { getTokenValue } = useTokens();
-  const valueToCheck = React.useMemo(() => (
-    (shouldResolve
-      ? getTokenValue(token.name, tokensContext.resolvedTokens)?.value
-      : token.value)
-  ), [token, getTokenValue, shouldResolve, tokensContext.resolvedTokens]);
-  useEffect(() => {
-    console.log('valueto',valueToCheck, shouldResolve,'name' ,token.name, "tokensContext.resolvedTokens", tokensContext.resolvedTokens) 
-  }, [valueToCheck, shouldResolve])
+  const valueToCheck = React.useMemo(() => {
+    if (shouldResolve && tokenIsShadowOrTypographyAlias) {
+      let nameToLookFor: String;
+      const tokenValueString = String(token.value);
+      if (tokenIsShadowOrTypographyAlias && tokenValueString.charAt(0) === '$') nameToLookFor = tokenValueString.slice(1, tokenValueString.length);
+      if (tokenIsShadowOrTypographyAlias && tokenValueString.charAt(0) === '{') nameToLookFor = tokenValueString.slice(1, tokenValueString.length - 1);
+      return getTokenValue(nameToLookFor, tokensContext.resolvedTokens)?.value
+    }
+    if (shouldResolve) return getTokenValue(token.name, tokensContext.resolvedTokens)?.value
+    else return token.value
+  }, [token, getTokenValue, shouldResolve, tokenIsShadowOrTypographyAlias, tokensContext.resolvedTokens]);
+
   if (isSingleTypographyToken(token)) {
     return (
       <SingleTypographyValueDisplay
@@ -36,7 +44,7 @@ export const TokenTooltipContentValue: React.FC<Props> = ({ token, shouldResolve
       />
     );
   }
-
+  
   if (isSingleCompositionToken(token)) {
     return (
       <SingleCompositionValueDisplay
@@ -68,8 +76,8 @@ export const TokenTooltipContentValue: React.FC<Props> = ({ token, shouldResolve
   }
 
   if (typeof valueToCheck !== 'string' && typeof valueToCheck !== 'number') {
-    return <div>{JSON.stringify(valueToCheck, null, 2)}</div>;
+    return <Box css={{color: '$bgDefault'}}>{JSON.stringify(valueToCheck, null, 2)}</Box>;
   }
 
-  return <div>{valueToCheck}</div>;
+  return <Box css={{color: '$bgDefault'}}>{valueToCheck}</Box>;
 };

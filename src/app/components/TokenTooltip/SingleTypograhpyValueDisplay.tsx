@@ -1,5 +1,6 @@
 import React from 'react';
 import { SingleTypographyToken } from '@/types/tokens';
+import Box from '../Box';
 
 // @TODO confirm whether the typography token values
 // can still have the .value property from legacy
@@ -10,22 +11,8 @@ type Props = {
 };
 
 export const SingleTypographyValueDisplay: React.FC<Props> = ({ value, shouldResolve }) => {
-  if (shouldResolve) {
-    return (
-      <div>
-        {value.fontFamily}
-        {' '}
-        {value.fontWeight}
-        {' '}
-        /
-        {' '}
-        {value.fontSize}
-      </div>
-    );
-  }
-
   return (
-    <div>
+    <Box css={{ color: '$bgDefault' }}>
       <div>
         Font:
         {' '}
@@ -66,6 +53,17 @@ export const SingleTypographyValueDisplay: React.FC<Props> = ({ value, shouldRes
         {' '}
         {value.textDecoration?.value || value.textDecoration}
       </div>
-    </div>
+      {
+        shouldResolve && <Box css={{color: '$textSubtle'}}>
+          {value.fontFamily}
+          {' '}
+          {value.fontWeight}
+          {' '}
+          /
+          {' '}
+          {value.fontSize}
+        </Box>
+      }
+    </Box>
   );
 };

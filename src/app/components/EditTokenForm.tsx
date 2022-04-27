@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import {
   useDispatch, useSelector,
 } from 'react-redux';
@@ -21,7 +21,6 @@ import {
 import { TokenTypes } from '@/constants/TokenTypes';
 import { EditTokenObject } from '../store/models/uiState';
 import Stack from './Stack';
-import { CookieIcon } from '@radix-ui/react-icons';
 
 type Props = {
   resolvedTokens: ResolveTokenValuesResult[];
@@ -49,9 +48,6 @@ function EditTokenForm({ resolvedTokens }: Props) {
     [internalEditToken, resolvedTokens, activeTokenSet],
   );
 
-  useEffect(() => {
-    console.log("token", internalEditToken)
-  })
   const hasAnotherTokenThatStartsWithName = React.useMemo(
     () => resolvedTokens
       .filter((t) => t.internal__Parent === activeTokenSet)
@@ -145,7 +141,6 @@ function EditTokenForm({ resolvedTokens }: Props) {
 
   // @TODO update to useCallback
   const submitTokenValue = async ({ value, name, options }: EditTokenObject) => {
-    console.log("ivalue", value)
     if (internalEditToken) {
       let oldName;
       if (internalEditToken.initialName !== name && internalEditToken.initialName) {

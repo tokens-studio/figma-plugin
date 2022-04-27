@@ -1,7 +1,8 @@
 import React from 'react';
 import { SingleCompositionToken } from '@/types/tokens';
+import Box from '../Box';
 
-// @TODO confirm whether the compostion token values
+// @TODO confirm whether the Composition token values
 // can still have the .value property from legacy
 
 type Props = {
@@ -9,9 +10,8 @@ type Props = {
 };
 
 export const SingleCompositionValueDisplay: React.FC<Props> = ({ value }) => {
-  console.log("value", value)
   return (
-    <div>
+    <Box css={{ color: '$bgDefault' }}>
       {
         (Array.isArray(value)) ? (
           value.map((v, index) => (
@@ -29,6 +29,6 @@ export const SingleCompositionValueDisplay: React.FC<Props> = ({ value }) => {
           </div>
         )
       }
-    </div>
+    </Box>
   );
 };

@@ -21,7 +21,6 @@ export default async function setValuesOnNode(
       && node.type !== 'STICKY'
       && node.type !== 'CODE_BLOCK'
     ) {
-      console.log('node', node, 'values', values);
       if ('cornerRadius' in node && typeof values.borderRadius !== 'undefined') {
         node.cornerRadius = transformValue(values.borderRadius, 'borderRadius');
       }
@@ -98,25 +97,22 @@ export default async function setValuesOnNode(
           const pathname = path.slice(ignoreFirstPartForStyles ? 1 : 0, path.length).join('/');
           const matchingStyle = figmaStyleMaps.textStyles.get(pathname);
           if (matchingStyle) {
-            console.log('textif', matchingStyle);
             node.textStyleId = matchingStyle.id;
           } else {
-            console.log('textesle', node, 'values.typ', values.typography);
             setTextValuesOnTarget(node, { value: values.typography });
           }
         }
       } else if (
         values.fontFamilies
-              || values.fontWeights
-              || values.lineHeights
-              || values.fontSizes
-              || values.letterSpacing
-              || values.paragraphSpacing
-              || values.textCase
-              || values.textDecoration
+        || values.fontWeights
+        || values.lineHeights
+        || values.fontSizes
+        || values.letterSpacing
+        || values.paragraphSpacing
+        || values.textCase
+        || values.textDecoration
       ) {
         if (node.type === 'TEXT') {
-          console.log('TEXT', values);
           setTextValuesOnTarget(node, {
             value: {
               fontFamily: values.fontFamilies,
@@ -133,21 +129,12 @@ export default async function setValuesOnNode(
       }
 
       // compostion
-      if (values.composition) {
-        console.log('composition', values.composition);
-        if (node.type === 'TEXT') {
-          const path = data.composition.split('.'); // extract to helper fn
-          const pathname = path.slice(ignoreFirstPartForStyles ? 1 : 0, path.length).join('/');
-          const matchingStyle = figmaStyleMaps.textStyles.get(pathname);
-
-          if (matchingStyle) {
-            console.log('composiIF');
-            node.textStyleId = matchingStyle.id;
-          } else {
-            console.log('composELSE');
-            setTextValuesOnTarget(node, { value: values.composition });
-          }
-        }
+      if (values.composition && Array.isArray(values.composition)) {
+        let compositionValues: Object = {};
+        values.composition.map((value) => {
+          compositionValues[value.property] = value.value;
+        });
+        setValuesOnNode(node, compositionValues, data, figmaStyleMaps, ignoreFirstPartForStyles);
       }
 
       // BORDER COLOR

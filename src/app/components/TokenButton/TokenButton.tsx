@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import extend from 'just-extend';
 import { useDispatch, useSelector } from 'react-redux';
 import { track } from '@/utils/analytics';

@@ -8,7 +8,6 @@ import { isPropertyType, isTokenType } from '@/utils/is';
 export function useGetActiveState(properties: (PropertyObject | TokenTypes)[], type: string, name: string) {
   return useSelector((state: RootState) => {
     const { uiState } = state;
-
     if (
       !isPropertyType(type)
       && !isTokenType(type)
@@ -18,11 +17,11 @@ export function useGetActiveState(properties: (PropertyObject | TokenTypes)[], t
 
     return (
       uiState.mainNodeSelectionValues[type] === name
-      || properties.some((prop) => (
+      || properties.some((prop) => {
         // @TODO: This no longer seems to work for color tokens as prop is always string?
         typeof prop !== 'string'
         && uiState.mainNodeSelectionValues[prop.name] === name
-      ))
+      })
     );
   });
 }
