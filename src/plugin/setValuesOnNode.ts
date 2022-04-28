@@ -15,7 +15,6 @@ export default async function setValuesOnNode(
 ) {
   try {
     // BORDER RADIUS
-    console.log("setvalu", values)
     if (
       node.type !== 'CONNECTOR'
       && node.type !== 'SHAPE_WITH_TEXT'
@@ -39,16 +38,16 @@ export default async function setValuesOnNode(
       }
 
       // BOX SHADOW
-      // if ('effects' in node && typeof values.boxShadow !== 'undefined') {
-      //   const path = data.boxShadow.split('.');
-      //   const pathname = path.slice(ignoreFirstPartForStyles ? 1 : 0, path.length).join('/');
-      //   const matchingStyle = figmaStyleMaps.effectStyles.get(pathname);
-      //   if (matchingStyle) {
-      //     node.effectStyleId = matchingStyle.id;
-      //   } else {
-      //     setEffectValuesOnTarget(node, { value: values.boxShadow, type: TokenTypes.BOX_SHADOW });
-      //   }
-      // }
+      if ('effects' in node && typeof values.boxShadow !== 'undefined') {
+        const path = data.boxShadow.split('.');
+        const pathname = path.slice(ignoreFirstPartForStyles ? 1 : 0, path.length).join('/');
+        const matchingStyle = figmaStyleMaps.effectStyles.get(pathname);
+        if (matchingStyle) {
+          node.effectStyleId = matchingStyle.id;
+        } else {
+          setEffectValuesOnTarget(node, { value: values.boxShadow, type: TokenTypes.BOX_SHADOW });
+        }
+      }
 
       // BORDER WIDTH
       if ('strokeWeight' in node && typeof values.borderWidth !== 'undefined') {
@@ -78,11 +77,9 @@ export default async function setValuesOnNode(
       // FILL
       if (values.fill && typeof values.fill === 'string') {
         if ('fills' in node) {
-          console.log("data", data, "fill", data.fill)
           const path = data.fill.split('.');
           const pathname = path.slice(ignoreFirstPartForStyles ? 1 : 0, path.length).join('/');
           const matchingStyle = figmaStyleMaps.paintStyles.get(pathname);
-          console.log("mathin", matchingStyle)
           if (matchingStyle) {
             // matchingStyles[0].paints = [{color, opacity, type: 'SOLID'}];
             node.fillStyleId = matchingStyle.id;

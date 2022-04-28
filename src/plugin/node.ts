@@ -116,7 +116,6 @@ export function selectNodes(ids: string[]) {
 }
 
 export function mergeCompositionToken(values: Object): Object {
-  console.log("input", values);
   let tokensInCompositionToken: Object = {};
   if (values && values.composition) {
     values.composition.map((value) => {
@@ -125,21 +124,22 @@ export function mergeCompositionToken(values: Object): Object {
     const { composition, ...objExcludedCompositionToken } = values;
     values = { ...tokensInCompositionToken, ...objExcludedCompositionToken };
   }
-  console.log("output", values);
   return values;
 }
 
-export function extractCompositionToken(tokens: Map<string, AnyTokenList[number]>, values: NodeTokenRefMap): Object {
+export function mergeCompositionTokenForAlias(tokens: Map<string, AnyTokenList[number]>, values: NodeTokenRefMap): Object {
   if (values && values.composition) {
-    const resolvedToken = tokens.get(values[composition]);
-    console.log("resolve", resolvedToken)
-    values.composition.map((value) => {
-      tokensInCompositionToken[value.property] = value.value;
+    const resolvedToken = tokens.get(values.composition);
+    let tokensInCompositionToken: Object = {};
+    resolvedToken?.rawValue.map((token) => {
+      let strExcludedSymbol: string = '';
+      if (String(token.value).startsWith('$')) strExcludedSymbol = String(token.value).slice(1, String(token.value).length)
+      if (String(token.value).startsWith('{')) strExcludedSymbol = String(token.value).slice(1, String(token.value).length - 1)      
+      tokensInCompositionToken[token.property] = strExcludedSymbol;
     });  
     const { composition, ...objExcludedCompositionToken } = values;
     values = { ...tokensInCompositionToken, ...objExcludedCompositionToken };
   }
-  console.log("output", values);
   return values;
 }
 
@@ -169,11 +169,10 @@ export async function updateNodes(
       defaultWorker.schedule(async () => {
         try {
           if (entry.tokens) {
-            console.log("tokens", tokens,"entyr.toekns" ,entry.tokens)
-            // let mappedTokens = extractCompositionToken(tokens, entry.tokens);
+            let mappedTokens = mergeCompositionTokenForAlias(tokens, entry.tokens);
             let mappedValues = mapValuesToTokens(tokens, entry.tokens, resolvedTokens);
             mappedValues = mergeCompositionToken(mappedValues);
-            setValuesOnNode(entry.node, mappedValues, entry.tokens, figmaStyleMaps, ignoreFirstPartForStyles);
+            setValuesOnNode(entry.node, mappedValues, mappedTokens, figmaStyleMaps, ignoreFirstPartForStyles);
             store.successfulNodes.add(entry.node);
             returnedValues.add(entry.tokens);
           }
