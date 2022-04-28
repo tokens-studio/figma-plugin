@@ -29,6 +29,7 @@ type Props = {
   onRename: (tokenSet: string) => void;
   onDelete: (tokenSet: string) => void;
   onReorder: (tokenSets: string[]) => void;
+  onDuplicate: (tokenSets: string[]) => void;
 };
 
 export default function TokenSetList({
@@ -36,6 +37,7 @@ export default function TokenSetList({
   onRename,
   onDelete,
   onReorder,
+  onDuplicate,
 }: Props) {
   const { confirm } = useConfirm();
   const activeTokenSet = useSelector(activeTokenSetSelector);
@@ -94,6 +96,7 @@ export default function TokenSetList({
             onRename={onRename}
             onDelete={onDelete}
             onReorder={handleReorder}
+            onDuplicate={onDuplicate}
             onTreatAsSource={handleTreatAsSource}
           />
         ))}

@@ -83,6 +83,15 @@ export default function TokenSetSelector() {
     setShowRenameTokenSetFields(true);
   }, []);
 
+  const handleDuplicateTokenSet = React.useCallback((tokenSet: string) => {
+    track('Duplicate token set');
+    console.log("dialog");
+    dispatch.tokenState.addTokenSet(newTokenSetName.trim());
+    handleNewTokenSetNameChange(tokenSet);
+    setTokenSetMarkedForChange(tokenSet);
+    setShowRenameTokenSetFields(true);
+  }, []);
+
   const handleRenameTokenSetSubmit = React.useCallback((e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     dispatch.tokenState.renameTokenSet({ oldName: tokenSetMarkedForChange, newName: newTokenSetName.trim() });
@@ -117,6 +126,7 @@ export default function TokenSetSelector() {
               tokenSets={allTokenSets}
               onRename={handleRenameTokenSet}
               onDelete={(set) => handleDeleteTokenSet(set)}
+              onDuplicate={handleDuplicateTokenSet}
             />
           </Box>
         ) : (
@@ -125,6 +135,7 @@ export default function TokenSetSelector() {
             tokenSets={allTokenSets}
             onRename={handleRenameTokenSet}
             onDelete={handleDeleteTokenSet}
+            onDuplicate={handleDuplicateTokenSet}
           />
         )}
       <Modal isOpen={showRenameTokenSetFields} close={() => setShowRenameTokenSetFields(false)}>
