@@ -29,7 +29,7 @@ export default function useRemoteTokens() {
   const { setStorageType } = useStorage();
   const { pullTokensFromJSONBin, addJSONBinCredentials, createNewJSONBin } = useJSONbin();
   const {
-    addNewGitHubCredentials, syncTokensWithGitHub, pullTokensFromGitHub, pushTokensToGitHub,
+    addNewGitHubCredentials, syncTokensWithGitHub, pullTokensFromGitHub, pushTokensToGitHub, createGithubBranch, fetchGithubBranches,
   } = useGitHub();
   const {
     addNewGitLabCredentials, syncTokensWithGitLab, pullTokensFromGitLab, pushTokensToGitLab,
@@ -100,11 +100,11 @@ export default function useRemoteTokens() {
     return null;
   };
 
-  const pushTokens = async () => {
+  const pushTokens = async (context: ContextObject = api) => {
     track('pushTokens', { provider: api.provider });
     switch (api.provider) {
       case StorageProviderType.GITHUB: {
-        await pushTokensToGitHub(api);
+        await pushTokensToGitHub(context);
         break;
       }
       case StorageProviderType.GITLAB: {
@@ -154,6 +154,36 @@ export default function useRemoteTokens() {
     return false;
   }
 
+  async function addNewBranch({ branch, provider, startBranch }: { branch: string, provider: StorageProviderType, startBranch: string }): Promise<boolean> {
+    let newBranch;
+    switch (provider) {
+      case StorageProviderType.GITHUB: {
+        newBranch = await createGithubBranch({ context: api, branch, startBranch });
+        break;
+      }
+      default:
+        throw new Error('Not implemented');
+    }
+
+    return newBranch;
+  }
+
+  async function fetchBranches({
+    provider, secret, id, baseUrl,
+  } : { provider: StorageProviderType, secret: string, id: string, baseUrl: string }) {
+    const [owner, repo] = id.split('/');
+    switch (provider) {
+      case StorageProviderType.GITHUB:
+        return fetchGithubBranches({
+          secret, owner, repo, baseUrl,
+        });
+        break;
+      default:
+        return null;
+        break;
+    }
+  }
+
   const deleteProvider = (provider) => {
     postToFigma({
       type: MessageToPluginTypes.REMOVE_SINGLE_CREDENTIAL,
@@ -167,5 +197,7 @@ export default function useRemoteTokens() {
     pullTokens,
     pushTokens,
     addNewProviderItem,
+    addNewBranch,
+    fetchBranches,
   };
 }
