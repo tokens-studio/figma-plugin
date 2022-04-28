@@ -21,6 +21,7 @@ type Props = {
   placeholder?: string;
   capitalize?: boolean;
   prefix?: React.ReactNode;
+  suffix?: React.ReactNode;
   step?: string;
   min?: number;
   max?: number;
@@ -120,6 +121,7 @@ const Input: React.FC<Props> = ({
   defaultValue,
   type,
   prefix,
+  suffix,
   min,
   max,
   step,
@@ -171,7 +173,7 @@ const Input: React.FC<Props> = ({
           hasPrefix={!!prefix}
           hasSuffix={!!isMasked}
         />
-
+        {!!suffix && <span>{suffix}</span>}
         {isMasked && (
           <StyledSuffix type="button" onClick={handleVisibility}>
             <StyledIcon>{show ? <IconVisibility /> : <IconVisibilityOff />}</StyledIcon>
@@ -183,3 +185,4 @@ const Input: React.FC<Props> = ({
 };
 
 export default Input;
+export { StyledInput, StyledPrefix, StyledSuffix };
