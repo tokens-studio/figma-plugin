@@ -48,7 +48,6 @@ export async function sendPluginValues({ nodes, values, shouldSendSelectionValue
   let pluginValues = values;
   let mainNodeSelectionValues = [];
   let selectionValues;
-
   if (!pluginValues) {
     pluginValues = await defaultNodeManager.findNodesWithData({ nodes });
   }
@@ -98,7 +97,6 @@ export async function updatePluginData({
   entries, values, shouldOverride = false, shouldRemove = true,
 }: { entries: readonly NodeManagerNode[], values: NodeTokenRefMap, shouldOverride?: boolean, shouldRemove?: boolean }) {
   const namespace = SharedPluginDataNamespaces.TOKENS;
-
   postToUI({
     type: MessageFromPluginTypes.START_JOB,
     job: {

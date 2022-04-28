@@ -50,14 +50,7 @@ Object {
         "y": "3",
       },
       "type": "boxShadow",
-      "value": Object {
-        "blur": 4,
-        "color": "#000000",
-        "spread": 5,
-        "type": "dropShadow",
-        "x": 2,
-        "y": 3,
-      },
+      "value": "[object Object]",
     },
     "2": Object {
       "rawValue": Array [
@@ -79,24 +72,7 @@ Object {
         },
       ],
       "type": "boxShadow",
-      "value": Array [
-        Object {
-          "blur": 4,
-          "color": "#000000",
-          "spread": 5,
-          "type": "dropShadow",
-          "x": 2,
-          "y": 3,
-        },
-        Object {
-          "blur": 5,
-          "color": "#000000",
-          "spread": 6,
-          "type": "dropShadow",
-          "x": 3,
-          "y": 4,
-        },
-      ],
+      "value": "[object Object],[object Object]",
     },
   },
 }
@@ -107,27 +83,15 @@ Object {
   "typography": Object {
     "h1": Object {
       "type": "typography",
-      "value": Object {
-        "fontFamily": "Roboto",
-        "fontSize": 96,
-        "fontWeight": "Light",
-      },
+      "value": "[object Object]",
     },
     "h2": Object {
       "type": "typography",
-      "value": Object {
-        "fontFamily": "Roboto",
-        "fontSize": 60,
-        "fontWeight": "Light",
-      },
+      "value": "[object Object]",
     },
     "h3": Object {
       "type": "typography",
-      "value": Object {
-        "fontFamily": "Roboto",
-        "fontSize": 48,
-        "fontWeight": "Light",
-      },
+      "value": "[object Object]",
     },
   },
 }

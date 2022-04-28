@@ -115,6 +115,16 @@ export function selectNodes(ids: string[]) {
   figma.currentPage.selection = nodes;
 }
 
+export function mergeCompositionToken(values: Object): Object {
+  let tokensInCompositionToken: Object = {};
+  values.composition.map((value) => {
+    tokensInCompositionToken[value.property] = value.value;
+  });
+  const { composition, ...objExcludedCompositionToken } = values;
+  values = { ...tokensInCompositionToken, ...objExcludedCompositionToken };
+  return values
+}
+
 export async function updateNodes(
   entries: readonly NodeManagerNode[],
   tokens: Map<string, AnyTokenList[number]>,
@@ -141,7 +151,8 @@ export async function updateNodes(
       defaultWorker.schedule(async () => {
         try {
           if (entry.tokens) {
-            const mappedValues = mapValuesToTokens(tokens, entry.tokens, resolvedTokens);
+            let mappedValues = mapValuesToTokens(tokens, entry.tokens, resolvedTokens);
+            mappedValues = mergeCompositionToken(mappedValues);
             setValuesOnNode(entry.node, mappedValues, entry.tokens, figmaStyleMaps, ignoreFirstPartForStyles);
             store.successfulNodes.add(entry.node);
             returnedValues.add(entry.tokens);

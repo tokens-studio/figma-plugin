@@ -128,15 +128,6 @@ export default async function setValuesOnNode(
         }
       }
 
-      // compostion
-      if (values.composition && Array.isArray(values.composition)) {
-        let compositionValues: Object = {};
-        values.composition.map((value) => {
-          compositionValues[value.property] = value.value;
-        });
-        setValuesOnNode(node, compositionValues, data, figmaStyleMaps, ignoreFirstPartForStyles);
-      }
-
       // BORDER COLOR
       if (typeof values.border !== 'undefined') {
         if ('strokes' in node) {

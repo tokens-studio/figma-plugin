@@ -25,6 +25,7 @@ import { useSetNodeData } from '@/hooks/useSetNodeData';
 import { DragOverItem } from './DragOverItem';
 import { TokenButtonDraggable } from './TokenButtonDraggable';
 import type { ShowFormOptions } from '../TokenTree';
+import convertOffsetToFigma from '@/plugin/figmaTransforms/offset';
 
 // @TODO fix typings
 
