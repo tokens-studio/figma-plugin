@@ -84,13 +84,14 @@ export default function TokenSetSelector() {
   }, []);
 
   const handleDuplicateTokenSet = React.useCallback((tokenSet: string) => {
-    track('Duplicate token set');
-    handleNewTokenSetNameChange(tokenSet);
-    setTokenSetMarkedForChange(tokenSet);
-    setShowRenameTokenSetFields(true);
-    dispatch.tokenState.addTokenSet('222222');
+    const newTokenSetName = tokenSet + '_Copy';
+    track('Duplicate token set', { name: newTokenSetName });
+    dispatch.tokenState.duplicateTokenSet(tokenSet);
 
-  }, []);
+    handleNewTokenSetNameChange(newTokenSetName);
+    setTokenSetMarkedForChange(newTokenSetName);
+    setShowRenameTokenSetFields(true);
+  }, [dispatch]);
 
   const handleRenameTokenSetSubmit = React.useCallback((e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

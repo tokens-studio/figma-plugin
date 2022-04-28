@@ -28,8 +28,8 @@ type Props = {
   tokenSets: string[];
   onRename: (tokenSet: string) => void;
   onDelete: (tokenSet: string) => void;
+  onDuplicate: (tokenSet: string) => void;
   onReorder: (tokenSets: string[]) => void;
-  onDuplicate: (tokenSet: string[]) => void;
 };
 
 export default function TokenSetList({
