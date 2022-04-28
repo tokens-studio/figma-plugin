@@ -85,11 +85,11 @@ export default function TokenSetSelector() {
 
   const handleDuplicateTokenSet = React.useCallback((tokenSet: string) => {
     track('Duplicate token set');
-    console.log("dialog");
-    dispatch.tokenState.addTokenSet(newTokenSetName.trim());
     handleNewTokenSetNameChange(tokenSet);
     setTokenSetMarkedForChange(tokenSet);
     setShowRenameTokenSetFields(true);
+    dispatch.tokenState.addTokenSet('222222');
+
   }, []);
 
   const handleRenameTokenSetSubmit = React.useCallback((e: React.FormEvent<HTMLFormElement>) => {

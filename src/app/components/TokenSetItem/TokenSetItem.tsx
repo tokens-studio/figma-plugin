@@ -50,8 +50,8 @@ export type TokenSetItemProps<Item extends TreeItem | ListItem> = {
   canReorder?: boolean;
   onRename: (set: string) => void;
   onDelete: (set: string) => void;
-  onTreatAsSource: (set: string) => void;
   onDuplicate: (set: string) => void;
+  onTreatAsSource: (set: string) => void;
   onReorder?: () => void;
 };
 
