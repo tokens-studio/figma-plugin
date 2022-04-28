@@ -45,6 +45,7 @@ const TokenTree: React.FC<Props> = ({
       };
     })
   ), [path, tokenValues, showNewForm]);
+
   const [draggedToken, setDraggedToken] = useState<SingleToken | null>(null);
   const [dragOverToken, setDragOverToken] = useState<SingleToken | null>(null);
 
