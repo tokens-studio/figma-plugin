@@ -105,6 +105,22 @@ const SyncSettings = () => {
             .
           </div>
         );
+      case StorageProviderType.ADO:
+        return (
+          <div>
+            Sync your tokens with a Azure DevOps repository so your design decisions are up to date with code.
+            {' '}
+            <a
+              href="https://docs.tokens.studio/sync/ado"
+              target="_blank"
+              rel="noreferrer"
+              className="underline"
+            >
+              Read the guide
+            </a>
+            .
+          </div>
+        );
       case StorageProviderType.URL:
         return <div>Sync with a JSON stored on an external URL. This mode only allows Read Only.</div>;
       default:
@@ -184,6 +200,13 @@ const SyncSettings = () => {
                 onClick={handleProviderClick(StorageProviderType.GITLAB)}
                 text="GitLab"
                 id={StorageProviderType.GITLAB}
+              />
+              <ProviderSelector
+                isActive={localApiState?.provider === StorageProviderType.ADO}
+                isStored={storageType?.provider === StorageProviderType.ADO}
+                onClick={handleProviderClick(StorageProviderType.ADO)}
+                text="ADO"
+                id={StorageProviderType.ADO}
               />
             </Stack>
           </Stack>

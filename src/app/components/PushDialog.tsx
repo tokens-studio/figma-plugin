@@ -5,6 +5,7 @@ import { StorageProviderType } from '@/types/api';
 import usePushDialog from '../hooks/usePushDialog';
 import { getGithubCreatePullRequestUrl } from '../store/providers/github';
 import { getGitlabCreatePullRequestUrl } from '../store/providers/gitlab';
+import { getADOCreatePullRequestUrl } from '../store/providers/ado';
 import Button from './Button';
 import Heading from './Heading';
 import Icon from './Icon';
@@ -33,6 +34,9 @@ function ConfirmDialog() {
     case StorageProviderType.GITLAB:
       const [owner, repo] = localApiState.id.split('/');
       redirectHref = getGitlabCreatePullRequestUrl(owner, repo);
+      break;
+    case StorageProviderType.ADO:
+      redirectHref = getADOCreatePullRequestUrl(localApiState.id, branch);
       break;
     default:
       redirectHref = '';
@@ -96,6 +100,7 @@ function ConfirmDialog() {
               Pushing to
               {localApiState.provider === StorageProviderType.GITHUB && ' GitHub'}
               {localApiState.provider === StorageProviderType.GITLAB && ' GitLab'}
+              {localApiState.provider === StorageProviderType.ADO && ' ADO'}
             </Heading>
           </Stack>
         </Modal>
@@ -111,6 +116,7 @@ function ConfirmDialog() {
                 Changes pushed to
                 {localApiState.provider === StorageProviderType.GITHUB && ' GitHub'}
                 {localApiState.provider === StorageProviderType.GITLAB && ' GitLab'}
+                {localApiState.provider === StorageProviderType.ADO && ' ADO'}
                 .
               </div>
             </div>

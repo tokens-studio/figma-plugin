@@ -108,8 +108,11 @@ export default function TokenSetSelector() {
       className="content"
     >
       {featureFlags?.gh_mfs_enabled
-        && (api.provider === StorageProviderType.GITHUB
-          || api.provider === StorageProviderType.GITLAB)
+        && (
+          api.provider === StorageProviderType.GITHUB
+          || api.provider === StorageProviderType.GITLAB
+          || api.provider === StorageProviderType.ADO
+        )
           && !api?.filePath?.endsWith('.json')
         ? (
           <Box>

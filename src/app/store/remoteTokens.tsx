@@ -9,6 +9,7 @@ import { Dispatch } from '../store';
 import useStorage from './useStorage';
 import { useGitHub } from './providers/github';
 import { useGitLab } from './providers/gitlab';
+import { useADO } from './providers/ado';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
 import { FeatureFlags } from '@/utils/featureFlags';
 import { apiSelector } from '@/selectors';
@@ -34,6 +35,9 @@ export default function useRemoteTokens() {
   const {
     addNewGitLabCredentials, syncTokensWithGitLab, pullTokensFromGitLab, pushTokensToGitLab,
   } = useGitLab();
+  const {
+    addNewADOCredentials, syncTokensWithADO, pullTokensFromADO, pushTokensToADO,
+  } = useADO();
   const { pullTokensFromURL } = useURL();
 
   const pullTokens = async ({ context = api, featureFlags, usedTokenSet }: PullTokensOptiosn) => {
@@ -57,6 +61,10 @@ export default function useRemoteTokens() {
       }
       case StorageProviderType.GITLAB: {
         tokenValues = await pullTokensFromGitLab(context, featureFlags);
+        break;
+      }
+      case StorageProviderType.ADO: {
+        tokenValues = await pullTokensFromADO(context, featureFlags);
         break;
       }
       case StorageProviderType.URL: {
@@ -94,6 +102,10 @@ export default function useRemoteTokens() {
         await syncTokensWithGitLab(context);
         break;
       }
+      case StorageProviderType.ADO: {
+        await syncTokensWithADO(context);
+        break;
+      }
       default:
         await pullTokens(context);
     }
@@ -109,6 +121,10 @@ export default function useRemoteTokens() {
       }
       case StorageProviderType.GITLAB: {
         await pushTokensToGitLab(api);
+        break;
+      }
+      case StorageProviderType.ADO: {
+        await pushTokensToADO(api);
         break;
       }
       default:
@@ -136,6 +152,10 @@ export default function useRemoteTokens() {
       }
       case StorageProviderType.GITLAB: {
         data = await addNewGitLabCredentials(credentials);
+        break;
+      }
+      case StorageProviderType.ADO: {
+        data = await addNewADOCredentials(credentials);
         break;
       }
       case StorageProviderType.URL: {

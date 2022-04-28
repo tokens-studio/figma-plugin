@@ -27,6 +27,8 @@ const transformProviderName = (provider: StorageProviderType) => {
       return 'GitHub';
     case StorageProviderType.GITLAB:
       return 'GitLab';
+    case StorageProviderType.ADO:
+      return 'ADO';
     case StorageProviderType.URL:
       return 'URL';
     default:
@@ -82,8 +84,11 @@ export const Navbar: React.FC = () => {
                 </a>
               </Tooltip>
             )}
-            {(storageType.provider === StorageProviderType.GITHUB
-              || storageType.provider === StorageProviderType.GITLAB) && (
+            {(
+              storageType.provider === StorageProviderType.GITHUB
+              || storageType.provider === StorageProviderType.GITLAB
+              || storageType.provider === StorageProviderType.ADO
+            ) && (
               <Tooltip variant="right" label={`Push to ${transformProviderName(storageType.provider)}`}>
                 <button
                   onClick={() => pushTokens()}

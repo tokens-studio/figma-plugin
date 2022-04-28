@@ -20,6 +20,7 @@ export enum StorageProviderType {
   JSONBIN = 'jsonbin',
   GITHUB = 'github',
   GITLAB = 'gitlab',
+  ADO = 'ado',
   URL = 'url',
 }
 

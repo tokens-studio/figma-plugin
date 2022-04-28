@@ -58,6 +58,9 @@ async function updateRemoteTokens({
     case StorageProviderType.GITLAB: {
       break;
     }
+    case StorageProviderType.ADO: {
+      break;
+    }
     default:
       throw new Error('Not implemented');
   }
