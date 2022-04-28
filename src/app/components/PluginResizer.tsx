@@ -2,6 +2,7 @@ import React from 'react';
 import { styled } from '@/stitches.config';
 import Maximize from '../assets/maximize.svg';
 import useMinimizeWindow from './useMinimizeWindow';
+import Tooltip from './Tooltip';
 
 const StyledButton = styled('button', {
   all: 'unset',
@@ -10,9 +11,6 @@ const StyledButton = styled('button', {
   marginLeft: '$4',
   borderRadius: '$button',
   cursor: 'pointer',
-  '&:hover, &:focus': {
-    boxShadow: 'none',
-  },
 });
 
 type Props = {
@@ -23,9 +21,11 @@ const PluginResizerWrapper: React.FC<Props> = ({ children }) => {
   const { isPluginminimized, handleResize } = useMinimizeWindow();
 
   return isPluginminimized ? (
-    <StyledButton type="button" onClick={handleResize}>
-      <Maximize />
-    </StyledButton>
+    <Tooltip label="Maximize plugin">
+      <StyledButton type="button" onClick={handleResize}>
+        <Maximize />
+      </StyledButton>
+    </Tooltip>
   ) : (
     children
   );

@@ -22,7 +22,7 @@ import { NavbarUndoButton } from './NavbarUndoButton';
 import Minimize from '../assets/minimize.svg';
 import useMinimizeWindow from './useMinimizeWindow';
 
-const transformProviderName = (provider) => {
+const transformProviderName = (provider: StorageProviderType) => {
   switch (provider) {
     case StorageProviderType.JSONBIN:
       return 'JSONBin.io';
@@ -50,12 +50,9 @@ export const Navbar: React.FC = () => {
     all: 'unset',
     border: 'none',
     padding: '$1',
-    marginRight: '10px',
+    marginRight: '$3',
     borderRadius: '$button',
     cursor: 'pointer',
-    '&:hover, &:focus': {
-      boxShadow: 'none',
-    },
   });
 
   const checkForChanges = React.useCallback(() => {
@@ -120,9 +117,11 @@ export const Navbar: React.FC = () => {
             </Tooltip>
           </>
         )}
-        <StyledButton type="button" onClick={handleResize}>
-          <Minimize />
-        </StyledButton>
+        <Tooltip label="Minimize plugin">
+          <StyledButton type="button" onClick={handleResize}>
+            <Minimize />
+          </StyledButton>
+        </Tooltip>
       </Stack>
     </Box>
   );

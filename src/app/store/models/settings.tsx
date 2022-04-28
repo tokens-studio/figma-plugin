@@ -66,7 +66,7 @@ export const settings = createModel<RootModel>()({
       };
     },
     setMinimizePluginWindow(state, payload: { isMinimized: boolean; width: number; height: number }) {
-      track('Stored Window Size', { width: payload.width, height: payload.height });
+      track('Minimized plugin');
       return {
         ...state,
         uiWindow: {
