@@ -44,7 +44,7 @@ export function resolveTokenValues(tokens: SingleToken[], previousCount: number 
         }, {});
       }
     }
-    if (t.type === TokenTypes.COMPOSITION && Array.isArray(t.value)) {
+    else if (t.type === TokenTypes.COMPOSITION && Array.isArray(t.value)) {
       returnValue = t.value.map((item) => {
         return {
           property: item.property,

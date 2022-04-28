@@ -117,12 +117,14 @@ export function selectNodes(ids: string[]) {
 
 export function mergeCompositionToken(values: Object): Object {
   let tokensInCompositionToken: Object = {};
-  values.composition.map((value) => {
-    tokensInCompositionToken[value.property] = value.value;
-  });
-  const { composition, ...objExcludedCompositionToken } = values;
-  values = { ...tokensInCompositionToken, ...objExcludedCompositionToken };
-  return values
+  if (values && values.composition) {
+    values.composition.map((value) => {
+      tokensInCompositionToken[value.property] = value.value;
+    });  
+    const { composition, ...objExcludedCompositionToken } = values;
+    values = { ...tokensInCompositionToken, ...objExcludedCompositionToken };
+  }
+  return values;
 }
 
 export async function updateNodes(
