@@ -1,10 +1,34 @@
 import { MessageToPluginTypes } from '@/types/messages';
 import { mergeTokenGroups, resolveTokenValues } from '@/plugin/tokenHelpers';
-import { ContextObject, StorageProviderType } from '@/types/api';
+import { ContextObject, StorageProviderType, StorageType } from '@/types/api';
 import { notifyToUI, postToFigma } from '../../plugin/notifiers';
 import { updateJSONBinTokens } from './providers/jsonbin';
 import { track } from '@/utils/analytics';
-import { TokenValues } from '@/types/tokens';
+import type { AnyTokenSet, SingleToken } from '@/types/tokens';
+import type { UsedTokenSetsMap } from '@/types';
+import type { SettingsState } from './models/settings';
+
+type UpdateRemoteTokensPayload = {
+  provider: StorageProviderType;
+  tokens: Record<string, SingleToken[]>;
+  context: ContextObject;
+  updatedAt: string;
+  oldUpdatedAt?: string;
+};
+
+type UpdateTokensOnSourcesPayload = {
+  tokens: Record<string, SingleToken[]>;
+  tokenValues: AnyTokenSet;
+  usedTokenSet: UsedTokenSetsMap;
+  settings: SettingsState;
+  updatedAt: string;
+  shouldUpdateRemote: boolean;
+  isLocal: boolean;
+  editProhibited: boolean;
+  storageType: StorageType;
+  lastUpdatedAt: string;
+  api: ContextObject;
+};
 
 async function updateRemoteTokens({
   provider,
@@ -12,13 +36,7 @@ async function updateRemoteTokens({
   context,
   updatedAt,
   oldUpdatedAt,
-}: {
-  provider: StorageProviderType;
-  tokens: TokenValues;
-  context: ContextObject;
-  updatedAt: string;
-  oldUpdatedAt?: string;
-}) {
+}: UpdateRemoteTokensPayload) {
   if (!context) return;
   switch (provider) {
     case StorageProviderType.JSONBIN: {
@@ -35,6 +53,9 @@ async function updateRemoteTokens({
     }
 
     case StorageProviderType.GITHUB: {
+      break;
+    }
+    case StorageProviderType.GITLAB: {
       break;
     }
     default:
@@ -54,7 +75,7 @@ export default async function updateTokensOnSources({
   storageType,
   api,
   lastUpdatedAt,
-}) {
+}: UpdateTokensOnSourcesPayload) {
   if (tokens && !isLocal && shouldUpdateRemote && !editProhibited) {
     updateRemoteTokens({
       provider: storageType.provider,
@@ -64,7 +85,10 @@ export default async function updateTokensOnSources({
       oldUpdatedAt: lastUpdatedAt,
     });
   }
-  const mergedTokens = tokens ? resolveTokenValues(mergeTokenGroups(tokens, usedTokenSet)) : null;
+
+  const mergedTokens = tokens
+    ? resolveTokenValues(mergeTokenGroups(tokens, usedTokenSet))
+    : null;
 
   postToFigma({
     type: MessageToPluginTypes.UPDATE,

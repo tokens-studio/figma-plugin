@@ -1,8 +1,9 @@
-import { ContextObject, StorageProviderType, StoredCredentials } from '@/types/api';
+import { ContextObject, StorageProviderType, StorageType } from '@/types/api';
 
-function isSameCredentials(credential: ContextObject, stored: StoredCredentials): boolean {
+function isSameCredentials(credential: ContextObject, stored: StorageType): boolean {
   switch (stored.provider) {
-    case StorageProviderType.GITHUB: {
+    case StorageProviderType.GITHUB:
+    case StorageProviderType.GITLAB: {
       return (
         credential.id === stored.id
                 && credential.provider === stored.provider

@@ -1,6 +1,7 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import SyncSettings from './SyncSettings';
 import Checkbox from './Checkbox';
 import Heading from './Heading';
 import { Dispatch } from '../store';
@@ -10,7 +11,7 @@ import Stack from './Stack';
 import Box from './Box';
 import AddLicenseKey from './AddLicenseKey/AddLicenseKey';
 
-function SyncSettings() {
+function Settings() {
   const ignoreFirstPartForStyles = useSelector(ignoreFirstPartForStylesSelector);
   const dispatch = useDispatch<Dispatch>();
 
@@ -22,7 +23,7 @@ function SyncSettings() {
   );
 
   return (
-    <Box css={{ padding: '$4' }}>
+    <Box css={{ padding: '$5', overflowY: 'scroll' }} className="content scroll-container">
       <Stack direction="column" gap={4}>
         <Heading>Styles</Heading>
         <Stack direction="column" gap={2}>
@@ -36,10 +37,11 @@ function SyncSettings() {
             <Label htmlFor="ignoreFirstPartForStyles">Ignore first part of token name for styles</Label>
           </Stack>
         </Stack>
+        <SyncSettings />
       </Stack>
       <AddLicenseKey />
     </Box>
   );
 }
 
-export default SyncSettings;
+export default Settings;

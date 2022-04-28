@@ -12,6 +12,7 @@ import {
   projectURLSelector,
   storageTypeSelector,
   tokensSelector,
+  usedTokenSetSelector,
 } from '@/selectors';
 import { Tabs } from '@/constants/Tabs';
 import Stack from './Stack';
@@ -24,6 +25,8 @@ const transformProviderName = (provider: StorageProviderType) => {
       return 'JSONBin.io';
     case StorageProviderType.GITHUB:
       return 'GitHub';
+    case StorageProviderType.GITLAB:
+      return 'GitLab';
     case StorageProviderType.URL:
       return 'URL';
     default:
@@ -37,6 +40,7 @@ export const Navbar: React.FC = () => {
   const tokens = useSelector(tokensSelector);
   const editProhibited = useSelector(editProhibitedSelector);
   const lastSyncedState = useSelector(lastSyncedStateSelector);
+  const usedTokenSet = useSelector(usedTokenSetSelector);
   const { pullTokens, pushTokens } = useRemoteTokens();
 
   const checkForChanges = React.useCallback(() => {
@@ -64,13 +68,14 @@ export const Navbar: React.FC = () => {
         <div>
           <TabButton name={Tabs.TOKENS} label="Tokens" />
           <TabButton name={Tabs.INSPECTOR} label="Inspect" />
-          <TabButton name={Tabs.SYNCSETTINGS} label="Sync" />
           <TabButton name={Tabs.SETTINGS} label="Settings" />
         </div>
         <NavbarUndoButton />
       </Stack>
       <Stack direction="row" align="center">
-        {storageType.provider !== StorageProviderType.LOCAL && (
+        {storageType.provider !== StorageProviderType.LOCAL
+        && storageType.provider !== StorageProviderType.GITHUB
+        && (
           <>
             {storageType.provider === StorageProviderType.JSONBIN && (
               <Tooltip variant="right" label={`Go to ${transformProviderName(storageType.provider)}`}>
@@ -79,23 +84,8 @@ export const Navbar: React.FC = () => {
                 </a>
               </Tooltip>
             )}
-            {storageType.provider === StorageProviderType.GITHUB && (
-              <Tooltip variant="right" label={`Push to ${transformProviderName(storageType.provider)}`}>
-                <button
-                  onClick={() => pushTokens()}
-                  type="button"
-                  className="relative button button-ghost"
-                  disabled={editProhibited}
-                >
-                  {checkForChanges() && <div className="absolute top-0 right-0 w-2 h-2 rounded-full bg-primary-500" />}
-
-                  <Icon name="library" />
-                </button>
-              </Tooltip>
-            )}
-
             <Tooltip variant="right" label={`Pull from ${transformProviderName(storageType.provider)}`}>
-              <button onClick={() => pullTokens()} type="button" className="button button-ghost">
+              <button onClick={() => pullTokens({ usedTokenSet })} type="button" className="button button-ghost">
                 <Icon name="refresh" />
               </button>
             </Tooltip>

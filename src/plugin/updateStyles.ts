@@ -1,11 +1,12 @@
 import { SettingsState } from '@/app/store/models/settings';
+import { AnyTokenList } from '@/types/tokens';
 import { transformValue } from './helpers';
 import updateColorStyles from './updateColorStyles';
 import updateEffectStyles from './updateEffectStyles';
 import updateTextStyles from './updateTextStyles';
 
 export default function updateStyles(
-  tokens,
+  tokens: AnyTokenList,
   shouldCreate = false,
   settings: SettingsState = {} as SettingsState,
 ): void {

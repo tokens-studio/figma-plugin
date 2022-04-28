@@ -20,7 +20,7 @@ const itemStyles = {
   alignItems: 'center',
   height: 20,
   padding: '0 $2',
-  paddingLeft: '$4',
+  paddingLeft: '$5',
   userSelect: 'none',
 
   '&[data-disabled]': {
@@ -60,11 +60,15 @@ const StyledSeparator = styled(ContextMenuPrimitive.Separator, {
 
 const StyledItemIndicator = styled(ContextMenuPrimitive.ItemIndicator, {
   position: 'absolute',
-  left: 0,
+  left: '$2',
   width: '$5',
   display: 'inline-flex',
   alignItems: 'center',
   justifyContent: 'center',
+});
+
+const StyledArrow = styled(ContextMenuPrimitive.Arrow, {
+  fill: 'white',
 });
 
 // Exports
@@ -79,3 +83,4 @@ export const ContextMenuItemIndicator = StyledItemIndicator;
 export const ContextMenuTriggerItem = StyledTriggerItem;
 export const ContextMenuLabel = StyledLabel;
 export const ContextMenuSeparator = StyledSeparator;
+export const ContextMenuArrow = StyledArrow;

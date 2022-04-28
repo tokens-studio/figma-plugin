@@ -42,6 +42,7 @@ import compareProvidersWithStored from './compareProviders';
 import { defaultNodeManager } from './NodeManager';
 import { defaultWorker } from './Worker';
 import { getFeatureFlags } from '@/utils/featureFlags';
+import { getUsedTokenSet } from '@/utils/getUsedTokenSet';
 
 let inspectDeep = false;
 let shouldSendSelectionValues = false;
@@ -81,6 +82,7 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
         const { currentUser } = figma;
         const settings = await getUISettings();
         const featureFlagId = await getFeatureFlags();
+        const usedTokenSet = await getUsedTokenSet();
         inspectDeep = settings.inspectDeep;
         const userId = await getUserId();
         const lastOpened = await getLastOpened();
@@ -106,13 +108,18 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
         switch (storageType.provider) {
           case StorageProviderType.JSONBIN:
           case StorageProviderType.GITHUB:
+          case StorageProviderType.GITLAB:
           case StorageProviderType.URL: {
-            compareProvidersWithStored(apiProviders, storageType, featureFlagId);
+            compareProvidersWithStored({
+              providers: apiProviders, storageType, featureFlagId, usedTokenSet,
+            });
             break;
           }
           default: {
             const oldTokens = getTokenData();
-            notifyTokenValues(oldTokens);
+            if (oldTokens) {
+              notifyTokenValues({ ...oldTokens, usedTokenSet });
+            }
           }
         }
       } catch (err) {
@@ -171,8 +178,8 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
       const nodesToRemove: { [key: string]: string[] } = {};
 
       msg.tokensToRemove.forEach((token) => {
-        token.nodes.forEach((node) => {
-          nodesToRemove[node] = nodesToRemove[node] ? [...nodesToRemove[node], token.property] : [token.property];
+        token.nodes.forEach(({ id }) => {
+          nodesToRemove[id] = nodesToRemove[id] ? [...nodesToRemove[id], token.property] : [token.property];
         });
       });
 

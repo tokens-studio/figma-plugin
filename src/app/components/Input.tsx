@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { styled } from '@/stitches.config';
 import IconVisibility from './icons/IconVisibiltyOn';
 import IconVisibilityOff from './icons/IconVisibilityOff';
@@ -10,6 +10,7 @@ type Props = {
   inputRef?: React.MutableRefObject<HTMLInputElement | null>;
   error?: string;
   required?: boolean;
+  autofocus?: boolean;
   tabindex?: number | null;
   label?: string | null;
   full?: boolean;
@@ -20,6 +21,7 @@ type Props = {
   placeholder?: string;
   capitalize?: boolean;
   prefix?: React.ReactNode;
+  suffix?: React.ReactNode;
   step?: string;
   min?: number;
   max?: number;
@@ -109,6 +111,7 @@ const StyledPrefix = styled('div', {
 
 const Input: React.FC<Props> = ({
   name,
+  autofocus,
   error = '',
   required = false,
   tabindex = null,
@@ -119,6 +122,7 @@ const Input: React.FC<Props> = ({
   defaultValue,
   type,
   prefix,
+  suffix,
   min,
   max,
   step,
@@ -161,6 +165,7 @@ const Input: React.FC<Props> = ({
           name={name}
           onChange={onChange}
           required={required}
+          autoFocus={autofocus}
           min={min}
           max={max}
           step={step}
@@ -171,7 +176,7 @@ const Input: React.FC<Props> = ({
           hasSuffix={!!isMasked}
           disabled={disabled}
         />
-
+        {!!suffix && <span>{suffix}</span>}
         {isMasked && (
           <StyledSuffix type="button" onClick={handleVisibility}>
             <StyledIcon>{show ? <IconVisibility /> : <IconVisibilityOff />}</StyledIcon>
@@ -183,3 +188,4 @@ const Input: React.FC<Props> = ({
 };
 
 export default Input;
+export { StyledInput, StyledPrefix, StyledSuffix };

@@ -5,6 +5,7 @@ const globalTokens = {
   colors: {
     white: '#FFFFFF',
     background: '#FFFFFF',
+    blue: '#18a0fb',
     gray50: 'var(--theme-colors-gray-50, #FAFAFA)',
     gray100: 'var(--theme-colors-gray-100, #f5f5f5)',
     gray200: 'var(--theme-colors-gray-200, #eeeeee)',
@@ -53,6 +54,7 @@ export const {
       contextMenuForeground: globalTokens.colors.white,
       contextMenuForegroundMuted: globalTokens.colors.gray400,
       contextMenuSeperator: globalTokens.colors.gray700,
+      branchSwitchTriggerHover: globalTokens.colors.gray200,
       text: globalTokens.colors.gray900,
       textMuted: globalTokens.colors.gray600,
       textSubtle: globalTokens.colors.gray400,
@@ -71,6 +73,7 @@ export const {
       border: globalTokens.colors.gray300,
       borderMuted: globalTokens.colors.gray200,
       focus: globalTokens.colors.primary300,
+      hover: globalTokens.colors.blue,
     },
     space: {
       1: '2px',

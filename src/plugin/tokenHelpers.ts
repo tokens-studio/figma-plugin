@@ -3,6 +3,8 @@ import { SingleToken } from '@/types/tokens';
 import { checkIfAlias, checkIfContainsAlias, getAliasValue } from '@/utils/alias';
 import { isSingleToken } from '@/utils/is';
 import { TokenTypes } from '@/constants/TokenTypes';
+import { UsedTokenSetsMap } from '@/types';
+import { TokenSetStatus } from '@/constants/TokenSetStatus';
 
 export type ResolveTokenValuesResult = SingleToken<true, {
   failedToResolve?: boolean
@@ -23,7 +25,7 @@ export function resolveTokenValues(tokens: SingleToken[], previousCount: number 
     Record<string, ReturnType<typeof getAliasValue>> |
     ReturnType<typeof getAliasValue>;
 
-    let failedToResolve = false;
+    let _failedToResolve = false;
     // Iterate over Typography and boxShadow Object to get resolved values
     if (t.type === TokenTypes.TYPOGRAPHY || t.type === TokenTypes.BOX_SHADOW) {
       if (Array.isArray(t.value)) {
@@ -44,16 +46,16 @@ export function resolveTokenValues(tokens: SingleToken[], previousCount: number 
     } else {
       // If we're not dealing with special tokens, just return resolved value
       returnValue = getAliasValue(t, tokensInProgress);
-
-      failedToResolve = returnValue === null || checkIfContainsAlias(returnValue);
+      _failedToResolve = returnValue === null || checkIfContainsAlias(returnValue);
     }
-
+    const { failedToResolve, ...objExcludeFailedToResolve } = t;
     const returnObject = {
-      ...t,
+      ...objExcludeFailedToResolve,
       value: returnValue,
       rawValue: t.rawValue || t.value,
-      ...(failedToResolve ? { failedToResolve } : {}),
+      ...(_failedToResolve ? { failedToResolve: _failedToResolve } : {}),
     } as ResolveTokenValuesResult;
+
     return returnObject;
   });
 
@@ -64,13 +66,19 @@ export function resolveTokenValues(tokens: SingleToken[], previousCount: number 
   return returnedTokens;
 }
 
-export function mergeTokenGroups(tokens: Record<string, SingleToken[]>, usedSets: string[] = []): SingleToken[] {
+export function mergeTokenGroups(tokens: Record<string, SingleToken[]>, usedSets: UsedTokenSetsMap = {}): SingleToken[] {
   const mergedTokens: SingleToken[] = [];
+  // @README we will use both ENABLED and SOURCE sets
+  // we only need to ignore the SOURCE sets when creating styles
+  const tokenSetsToMerge = Object.entries(usedSets)
+    .filter(([,status]) => status === TokenSetStatus.ENABLED || status === TokenSetStatus.SOURCE)
+    .map(([tokenSet]) => tokenSet);
+
   // Reverse token set order (right-most win) and check for duplicates
   Object.entries(tokens)
     .reverse()
     .forEach((tokenGroup: [string, SingleToken[]]) => {
-      if (!usedSets || usedSets.length === 0 || usedSets.includes(tokenGroup[0])) {
+      if (tokenSetsToMerge.length === 0 || tokenSetsToMerge.includes(tokenGroup[0])) {
         tokenGroup[1].forEach((token) => {
           if (!mergedTokens.some((t) => t.name === token.name)) {
             mergedTokens.push({

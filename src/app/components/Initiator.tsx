@@ -8,6 +8,8 @@ import { Dispatch } from '../store';
 import useStorage from '../store/useStorage';
 import * as pjs from '../../../package.json';
 import { useFeatureFlags } from '../hooks/useFeatureFlags';
+import { fetchGithubBranches } from '../store/providers/github';
+import { StorageProviderType } from '@/types/api';
 
 export function Initiator() {
   const dispatch = useDispatch<Dispatch>();
@@ -81,7 +83,9 @@ export function Initiator() {
             setStorageType({ provider: pluginMessage.storageType });
             break;
           case MessageFromPluginTypes.API_CREDENTIALS: {
-            const { status, credentials, featureFlagId } = pluginMessage;
+            const {
+              status, credentials, featureFlagId, usedTokenSet,
+            } = pluginMessage;
             if (status === true) {
               let receivedFlags;
 
@@ -89,16 +93,28 @@ export function Initiator() {
                 receivedFlags = await fetchFeatureFlags(featureFlagId);
                 if (receivedFlags) {
                   dispatch.uiState.setFeatureFlags(receivedFlags);
+                  track('FeatureFlag', receivedFlags);
                 }
               }
 
               track('Fetched from remote', { provider: credentials.provider });
               if (!credentials.internalId) track('missingInternalId', { provider: credentials.provider });
 
+              const {
+                id, provider, secret, baseUrl,
+              } = credentials;
+              const [owner, repo] = id.split('/');
+              if (provider === StorageProviderType.GITHUB) {
+                const branches = await fetchGithubBranches({
+                  secret, owner, repo, baseUrl,
+                });
+                dispatch.branchState.setBranches(branches);
+              }
+
               dispatch.uiState.setApiData(credentials);
               dispatch.uiState.setLocalApiState(credentials);
 
-              await pullTokens(credentials, receivedFlags);
+              await pullTokens({ context: credentials, featureFlags: receivedFlags, usedTokenSet });
               dispatch.uiState.setActiveTab('tokens');
             }
             break;
