@@ -115,18 +115,15 @@ export default function CompositionTokenForm({
   setValue: (style: CompositionTokenSingleValue | CompositionTokenSingleValue[]) => void;
 }) {
 
-  useEffect(() => {
-    makePropertisMenu();
-  }, []);
-
-  const makePropertisMenu = () => {
+  const propertiesMenu = React.useMemo(() => {
     for (const property in Properties) {
       properties.push({
         value: property,
         label: property,
       });
     }
-  };
+    return properties;
+  }, [properties]);
 
   const addToken = () => {
     if (Array.isArray(value)) {
@@ -161,7 +158,7 @@ export default function CompositionTokenForm({
               token={token}
               tokens={value}
               key={`single-style-${index}`}
-              properties={properties}
+              properties={propertiesMenu}
               setValue={setValue}
               onRemove={removeToken}
             />
@@ -171,7 +168,7 @@ export default function CompositionTokenForm({
             tokens={value}
             token={value}
             index={0}
-            properties={properties}
+            properties={propertiesMenu}
             setValue={setValue}
           />
         )}

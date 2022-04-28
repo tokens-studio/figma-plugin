@@ -3,9 +3,8 @@ import { Properties } from '@/constants/Properties';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { PropertyObject } from '@/types/properties';
 import { isPropertyType } from '@/utils/is';
-import { SingleToken } from '@/types/tokens';
 
-export function usePropertiesForTokenType(type: TokenTypes, token: SingleToken): PropertyObject[] {
+export function usePropertiesForTokenType(type: TokenTypes): PropertyObject[] {
   return useMemo(() => {
     const properties: PropertyObject[] = [];
     switch (type) {

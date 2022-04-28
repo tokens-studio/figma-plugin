@@ -63,7 +63,7 @@ export const TokenButton: React.FC<Props> = ({
     return (name ?? '').split('.').slice(-visibleDepth).join('.');
   }, [name]);
 
-  const properties = usePropertiesForTokenType(type, token);
+  const properties = usePropertiesForTokenType(type);
 
   // @TODO check type property typing
   const activeStateProperties = React.useMemo(() => (
