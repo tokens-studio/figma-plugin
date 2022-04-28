@@ -1,5 +1,5 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Box from '../Box';
 import Input from '../Input';
@@ -11,33 +11,43 @@ import Heading from '../Heading';
 import Stack from '../Stack';
 import { Dispatch } from '@/app/store';
 import { licenseKeyErrorSelector } from '@/selectors/licenseKeyErrorSelector';
+import useConfirm from '@/app/hooks/useConfirm';
 
 export default function AddLicenseKey() {
   const dispatch = useDispatch<Dispatch>();
-  const licenseKey = useSelector(licenseKeySelector);
+  const existingKey = useSelector(licenseKeySelector);
   const licenseKeyError = useSelector(licenseKeyErrorSelector);
-  const [key, setLicenseKey] = useState(licenseKey);
+  const [newKey, setLicenseKey] = useState(existingKey);
+  const { confirm } = useConfirm();
 
   const addKey = useCallback(() => {
-    postToFigma({
-      type: MessageToPluginTypes.SET_LICENSE_KEY,
-      licenseKey: key,
+    if (newKey) {
+      postToFigma({
+        type: MessageToPluginTypes.SET_LICENSE_KEY,
+        licenseKey: newKey,
+      });
+      dispatch.userState.addLicenseKey({ key: newKey });
+    }
+  }, [newKey, dispatch]);
+
+  const removeKey = useCallback(async () => {
+    const confirmation = await confirm({
+      text: 'Are you sure you want to remove your license key?',
+      description: `Make sure you saved a copy of the license key somewhere,                    
+        as it won’t be stored on this device after you deleted it.`,
+      confirmAction: 'Remove license',
     });
-    dispatch.userState.setLicenseKey(key);
-  }, [key, dispatch]);
+    if (confirmation) {
+      dispatch.userState.removeLicenseKey('');
+    }
+  }, [dispatch, confirm]);
 
-  const removeKey = useCallback(() => {
-    // if (key) {
-    //   postToFigma({
-    //     type: MessageToPluginTypes.SET_LICENSE_KEY,
-    //     licenseKey: key,
-    //   });
-    //   dispatch.userState.setLicenseKey(key);
-    // }
-  }, [key, dispatch]);
+  useEffect(() => {
+    setLicenseKey(existingKey);
+  }, [existingKey]);
 
-  const removeLicenseKeyButton = licenseKey && (
-    <Button variant="secondary" onClick={removeKey} disabled={!licenseKey}>
+  const removeLicenseKeyButton = existingKey && (
+    <Button variant="secondary" onClick={removeKey} disabled={existingKey !== newKey}>
       Remove license
     </Button>
   );
@@ -58,10 +68,10 @@ export default function AddLicenseKey() {
           <Input
             name="license-key"
             type="text"
-            value={key || ''}
+            value={newKey || ''}
             full
             onChange={(ev) => {
-              setLicenseKey(ev.target.value);
+              setLicenseKey(ev.target.value.trim());
             }}
             error={licenseKeyError}
           />
@@ -71,8 +81,8 @@ export default function AddLicenseKey() {
             alignSelf: licenseKeyError ? 'flex-end' : 'auto',
           }}
         >
-          <Button variant="primary" onClick={addKey} disabled={licenseKey === key}>
-            {licenseKey ? 'Update license key' : 'Add license addKey'}
+          <Button variant="primary" onClick={addKey} disabled={existingKey === newKey}>
+            {existingKey ? 'Update license key' : 'Add license addKey'}
           </Button>
         </Box>
         <Box

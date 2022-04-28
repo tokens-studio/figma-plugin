@@ -155,7 +155,7 @@ export function Initiator() {
             break;
           }
           case MessageFromPluginTypes.LICENSE_KEY: {
-            dispatch.userState.setLicenseKey(pluginMessage.licenseKey);
+            dispatch.userState.addLicenseKey({ key: pluginMessage.licenseKey, fromPlugin: true });
             break;
           }
           default:

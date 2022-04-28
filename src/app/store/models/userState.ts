@@ -1,6 +1,9 @@
 import { createModel } from '@rematch/core';
 import { RootModel } from '@/types/RootModel';
 import validateLicense from '@/utils/validateLicense';
+import { notifyToUI, postToFigma } from '@/plugin/notifiers';
+import { MessageToPluginTypes } from '@/types/messages';
+import removeLicense from '@/utils/removeLicense';
 
 export interface UserState {
   userId: string | null;
@@ -26,7 +29,7 @@ export const userState = createModel<RootModel>()({
         licenseKey: payload,
       };
     },
-    setLicenseError(state, payload: string) {
+    setLicenseError(state, payload: string | undefined) {
       return {
         ...state,
         licenseError: payload,
@@ -34,14 +37,39 @@ export const userState = createModel<RootModel>()({
     },
   },
   effects: (dispatch) => ({
-    setLicenseKey: async (payload, rootState) => {
+    addLicenseKey: async (payload: { key: string; fromPlugin?: boolean }, rootState) => {
       const { userId } = rootState.userState;
+      const { key, fromPlugin } = payload;
 
-      const { error } = await validateLicense(payload, userId);
+      const { error } = await validateLicense(key, userId);
       if (error) {
         dispatch.userState.setLicenseError(error);
+        if (fromPlugin) {
+          notifyToUI('License key invalid, please check your Settings', { error: true });
+        }
       } else {
-        dispatch.userState.setLicenseKey(payload);
+        // clear errors when license validation is succesfull
+        dispatch.userState.setLicenseError(undefined);
+        if (!fromPlugin) {
+          notifyToUI('License added succesfully!');
+        }
+      }
+      dispatch.userState.setLicenseKey(key);
+    },
+    removeLicenseKey: async (payload, rootState) => {
+      const { licenseKey, userId } = rootState.userState;
+      if (licenseKey) {
+        const { error } = await removeLicense(licenseKey, userId);
+        if (error) {
+          notifyToUI('Error removing license, please contact support', { error: true });
+        } else {
+          postToFigma({
+            type: MessageToPluginTypes.SET_LICENSE_KEY,
+            licenseKey: null,
+          });
+          dispatch.userState.setLicenseKey(undefined);
+          dispatch.userState.setLicenseError(undefined);
+        }
       }
     },
   }),

@@ -260,7 +260,7 @@ export type SelectNodesPluginMessage = {
 
 export type SetLicenseKeyPluginMessage = {
   type: MessageToPluginTypes.SET_LICENSE_KEY;
-  licenseKey: string;
+  licenseKey: string | null;
 };
 
 export type PostToFigmaMessage =
