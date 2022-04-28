@@ -116,6 +116,7 @@ export function selectNodes(ids: string[]) {
 }
 
 export function mergeCompositionToken(values: Object): Object {
+  console.log("input", values);
   let tokensInCompositionToken: Object = {};
   if (values && values.composition) {
     values.composition.map((value) => {
@@ -124,6 +125,21 @@ export function mergeCompositionToken(values: Object): Object {
     const { composition, ...objExcludedCompositionToken } = values;
     values = { ...tokensInCompositionToken, ...objExcludedCompositionToken };
   }
+  console.log("output", values);
+  return values;
+}
+
+export function extractCompositionToken(tokens: Map<string, AnyTokenList[number]>, values: NodeTokenRefMap): Object {
+  if (values && values.composition) {
+    const resolvedToken = tokens.get(values[composition]);
+    console.log("resolve", resolvedToken)
+    values.composition.map((value) => {
+      tokensInCompositionToken[value.property] = value.value;
+    });  
+    const { composition, ...objExcludedCompositionToken } = values;
+    values = { ...tokensInCompositionToken, ...objExcludedCompositionToken };
+  }
+  console.log("output", values);
   return values;
 }
 
@@ -153,6 +169,8 @@ export async function updateNodes(
       defaultWorker.schedule(async () => {
         try {
           if (entry.tokens) {
+            console.log("tokens", tokens,"entyr.toekns" ,entry.tokens)
+            // let mappedTokens = extractCompositionToken(tokens, entry.tokens);
             let mappedValues = mapValuesToTokens(tokens, entry.tokens, resolvedTokens);
             mappedValues = mergeCompositionToken(mappedValues);
             setValuesOnNode(entry.node, mappedValues, entry.tokens, figmaStyleMaps, ignoreFirstPartForStyles);

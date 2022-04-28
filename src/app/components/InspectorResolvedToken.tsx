@@ -72,6 +72,22 @@ export default function InspectorResolvedToken({ token }: { token: SingleToken }
         </Box>
       );
     }
+    case 'composition': {
+      return (
+        <Box
+          css={{
+            background: '$bgSubtle',
+            fontSize: '$small',
+            padding: '$2 $3',
+            borderRadius: '$default',
+            width: '40px',
+          }}
+        >
+          <IconShadow />
+        </Box>
+      );
+    }
+
     default: {
       return (
         <Box

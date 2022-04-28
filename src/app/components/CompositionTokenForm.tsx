@@ -123,7 +123,7 @@ export default function CompositionTokenForm({
       });
     }
     return properties;
-  }, [properties]);
+  }, [Properties]);
 
   const addToken = () => {
     if (Array.isArray(value)) {
