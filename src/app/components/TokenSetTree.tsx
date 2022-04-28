@@ -15,7 +15,7 @@ import { TokenSetStatus } from '@/constants/TokenSetStatus';
 
 // @TODO use hooks
 
-export default function TokenSetTree({ tokenSets, onRename, onDelete, onDuplicate }: { tokenSets: string[], onRename: (tokenSet: string) => void, onDelete: (tokenSet: string) => void }) {
+export default function TokenSetTree({ tokenSets, onRename, onDelete, onDuplicate }: { tokenSets: string[], onRename: (tokenSet: string) => void, onDelete: (tokenSet: string) => void, onDuplicate: (tokenSet: string) => void }) {
   const activeTokenSet = useSelector(activeTokenSetSelector);
   const usedTokenSet = useSelector(usedTokenSetSelector);
   const editProhibited = useSelector(editProhibitedSelector);
