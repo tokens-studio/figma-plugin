@@ -1,6 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { Octokit } from '@octokit/rest';
-import { Dispatch, RootState } from '@/app/store';
 import { MessageToPluginTypes } from '@/types/messages';
 import convertTokensToObject from '@/utils/convertTokensToObject';
 import useConfirm from '@/app/hooks/useConfirm';
@@ -11,14 +10,17 @@ import { notifyToUI, postToFigma } from '../../../plugin/notifiers';
 import { FeatureFlags } from '@/utils/featureFlags';
 import { AnyTokenSet, TokenValues } from '@/types/tokens';
 import { decodeBase64 } from '@/utils/string';
-import { featureFlagsSelector, localApiStateSelector, tokensSelector } from '@/selectors';
+import {
+  apiSelector, featureFlagsSelector, localApiStateSelector, tokensSelector,
+} from '@/selectors';
+import { Dispatch } from '../../store';
 
 type TokenSets = {
   [key: string]: AnyTokenSet;
 };
 
 /** Returns a URL to a page where the user can create a pull request with a given branch */
-export function getCreatePullRequestUrl(id: string, branchName: string) {
+export function getGithubCreatePullRequestUrl(id: string, branchName: string) {
   return `https://github.com/${id}/compare/${branchName}?expand=1`;
 }
 
@@ -28,12 +30,25 @@ function hasSameContent(content: TokenValues, storedContent: string) {
   return stringifiedContent === storedContent;
 }
 
-export const fetchBranches = async ({ context, owner, repo }: { context: ContextObject, owner: string, repo: string }) => {
-  const octokit = new Octokit({ auth: context.secret, baseUrl: context.baseUrl });
+export const fetchGithubBranches = async ({
+  secret, owner, repo, baseUrl,
+}: { secret: string, owner: string, repo: string, baseUrl: string | undefined }) => {
+  const octokit = new Octokit({ auth: secret, baseUrl });
   const branches = await octokit.repos
     .listBranches({ owner, repo })
     .then((response) => response.data);
   return branches.map((branch) => branch.name);
+};
+
+export const createNewBranch = async (owner: string, repo: string, secret: string, baseUrl: string, startBranch: string, branch: string) => {
+  const octokit = new Octokit({ auth: secret, baseUrl });
+  const originRef = `heads/${startBranch}`;
+  const newRef = `refs/heads/${branch}`;
+  const originBranch = await octokit.rest.git.getRef({ owner, repo, ref: originRef });
+  const newBranch = await octokit.rest.git.createRef({
+    owner, repo, ref: newRef, sha: originBranch.data.object.sha,
+  });
+  return newBranch;
 };
 
 export const checkPermissions = async ({ context, owner, repo }: { context: ContextObject, owner: string, repo: string }) => {
@@ -199,6 +214,7 @@ export function useGitHub() {
   const tokens = useSelector(tokensSelector);
   const localApiState = useSelector(localApiStateSelector);
   const featureFlags = useSelector(featureFlagsSelector);
+  const apiData = useSelector(apiSelector);
   const dispatch = useDispatch<Dispatch>();
 
   const { confirm } = useConfirm();
@@ -237,7 +253,10 @@ export function useGitHub() {
       const OctokitWithPlugin = Octokit.plugin(require('octokit-commit-multiple-files'));
       const octokit = new OctokitWithPlugin({ auth: context.secret, baseUrl: context.baseUrl });
 
-      const branches = await fetchBranches({ context, owner, repo });
+      const { secret, baseUrl } = context;
+      const branches = await fetchGithubBranches({
+        secret, owner, repo, baseUrl,
+      });
       const branch = customBranch || context.branch;
       if (!branches) return null;
       let response;
@@ -356,10 +375,14 @@ export function useGitHub() {
   // Function to initially check auth and sync tokens with GitHub
   async function syncTokensWithGitHub(context: ContextObject): Promise<TokenValues | null> {
     try {
-      const [owner, repo] = context.id.split('/');
-      const hasBranches = await fetchBranches({ context, owner, repo });
+      const { id, secret, baseUrl } = context;
+      const [owner, repo] = id.split('/');
+      const branches = await fetchGithubBranches({
+        secret, owner, repo, baseUrl,
+      });
+      dispatch.branchState.setBranches(branches);
 
-      if (!hasBranches) {
+      if (!branches) {
         return null;
       }
 
@@ -384,6 +407,20 @@ export function useGitHub() {
     } catch (e) {
       notifyToUI('Error syncing with GitHub, check credentials', { error: true });
       console.log('Error', e);
+      return null;
+    }
+  }
+
+  async function createGithubBranch({
+    context, branch, startBranch,
+  }: { context: ContextObject, branch: string, startBranch: string }) {
+    try {
+      const { id, secret, baseUrl } = context;
+      const [owner, repo] = id.split('/');
+
+      return await createNewBranch(owner, repo, secret, baseUrl, startBranch, branch);
+    } catch (e) {
+      console.log(e);
       return null;
     }
   }
@@ -418,5 +455,7 @@ export function useGitHub() {
     syncTokensWithGitHub,
     pullTokensFromGitHub,
     pushTokensToGitHub,
+    createGithubBranch,
+    fetchGithubBranches,
   };
 }

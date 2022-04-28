@@ -8,6 +8,7 @@ import useURL from './providers/url';
 import { Dispatch } from '../store';
 import useStorage from './useStorage';
 import { useGitHub } from './providers/github';
+import { useGitLab } from './providers/gitlab';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
 import { FeatureFlags } from '@/utils/featureFlags';
 import { apiSelector } from '@/selectors';
@@ -28,8 +29,11 @@ export default function useRemoteTokens() {
   const { setStorageType } = useStorage();
   const { pullTokensFromJSONBin, addJSONBinCredentials, createNewJSONBin } = useJSONbin();
   const {
-    addNewGitHubCredentials, syncTokensWithGitHub, pullTokensFromGitHub, pushTokensToGitHub,
+    addNewGitHubCredentials, syncTokensWithGitHub, pullTokensFromGitHub, pushTokensToGitHub, createGithubBranch, fetchGithubBranches,
   } = useGitHub();
+  const {
+    addNewGitLabCredentials, syncTokensWithGitLab, pullTokensFromGitLab, pushTokensToGitLab,
+  } = useGitLab();
   const { pullTokensFromURL } = useURL();
 
   const pullTokens = async ({ context = api, featureFlags, usedTokenSet }: PullTokensOptiosn) => {
@@ -49,6 +53,10 @@ export default function useRemoteTokens() {
       }
       case StorageProviderType.GITHUB: {
         tokenValues = await pullTokensFromGitHub(context, featureFlags);
+        break;
+      }
+      case StorageProviderType.GITLAB: {
+        tokenValues = await pullTokensFromGitLab(context, featureFlags);
         break;
       }
       case StorageProviderType.URL: {
@@ -82,17 +90,25 @@ export default function useRemoteTokens() {
         await syncTokensWithGitHub(context);
         break;
       }
+      case StorageProviderType.GITLAB: {
+        await syncTokensWithGitLab(context);
+        break;
+      }
       default:
         await pullTokens(context);
     }
     return null;
   };
 
-  const pushTokens = async () => {
+  const pushTokens = async (context: ContextObject = api) => {
     track('pushTokens', { provider: api.provider });
     switch (api.provider) {
       case StorageProviderType.GITHUB: {
-        await pushTokensToGitHub(api);
+        await pushTokensToGitHub(context);
+        break;
+      }
+      case StorageProviderType.GITLAB: {
+        await pushTokensToGitLab(api);
         break;
       }
       default:
@@ -118,6 +134,10 @@ export default function useRemoteTokens() {
         data = await addNewGitHubCredentials(credentials);
         break;
       }
+      case StorageProviderType.GITLAB: {
+        data = await addNewGitLabCredentials(credentials);
+        break;
+      }
       case StorageProviderType.URL: {
         data = await pullTokensFromURL(context);
         break;
@@ -134,6 +154,36 @@ export default function useRemoteTokens() {
     return false;
   }
 
+  async function addNewBranch({ branch, provider, startBranch }: { branch: string, provider: StorageProviderType, startBranch: string }): Promise<boolean> {
+    let newBranch;
+    switch (provider) {
+      case StorageProviderType.GITHUB: {
+        newBranch = await createGithubBranch({ context: api, branch, startBranch });
+        break;
+      }
+      default:
+        throw new Error('Not implemented');
+    }
+
+    return newBranch;
+  }
+
+  async function fetchBranches({
+    provider, secret, id, baseUrl,
+  } : { provider: StorageProviderType, secret: string, id: string, baseUrl: string }) {
+    const [owner, repo] = id.split('/');
+    switch (provider) {
+      case StorageProviderType.GITHUB:
+        return fetchGithubBranches({
+          secret, owner, repo, baseUrl,
+        });
+        break;
+      default:
+        return null;
+        break;
+    }
+  }
+
   const deleteProvider = (provider) => {
     postToFigma({
       type: MessageToPluginTypes.REMOVE_SINGLE_CREDENTIAL,
@@ -147,5 +197,7 @@ export default function useRemoteTokens() {
     pullTokens,
     pushTokens,
     addNewProviderItem,
+    addNewBranch,
+    fetchBranches,
   };
 }

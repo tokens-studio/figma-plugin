@@ -1,6 +1,7 @@
 import { AliasRegex } from '@/constants/AliasRegex';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { SingleToken } from '@/types/tokens';
+import { values } from 'lodash';
 import { getAliasValue } from './getAliasValue';
 
 // @TODO -- removed string type logic for now
@@ -14,12 +15,15 @@ export function checkIfAlias(token: SingleToken | string, allTokens: SingleToken
       token.type === TokenTypes.TYPOGRAPHY
       || token.type === TokenTypes.BOX_SHADOW
     ) {
-      const arrayValue = Array.isArray(token.value) ? token.value : [token.value];
-      aliasToken = arrayValue.some((value) => (
-        Object.values(value).some((singleValue) => (
-          Boolean(singleValue?.toString().match(AliasRegex))
-        ))
-      ));
+      if (typeof token.value === 'string') aliasToken = Boolean(String(token.value).match(AliasRegex));
+      else {
+        const arrayValue = Array.isArray(token.value) ? token.value : [token.value];
+        aliasToken = arrayValue.some((value) => (
+          Object.values(value).some((singleValue) => (
+            Boolean(singleValue?.toString().match(AliasRegex))
+          ))
+        ));  
+      }
     } else {
       aliasToken = Boolean(token.value.toString().match(AliasRegex));
     }

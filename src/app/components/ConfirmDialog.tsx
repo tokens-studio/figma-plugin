@@ -104,7 +104,7 @@ function ConfirmDialog() {
           </Stack>
           <Stack direction="row" gap={3} justify="between">
             <Button variant="secondary" onClick={onCancel}>
-              Cancel
+              {confirmState?.cancelAction}
             </Button>
             <Button type="submit" variant="primary" buttonRef={confirmButton}>
               {confirmState?.confirmAction}
