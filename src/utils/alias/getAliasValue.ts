@@ -4,34 +4,64 @@ import { findReferences } from '../findReferences';
 import { isSingleTokenValueObject } from '../is';
 import { checkAndEvaluateMath } from '../math';
 
+type TokenNameNodeType = string | undefined;
+
 // @TODO This function logic needs to be explained to improve it. It is unclear at this time which cases it needs to handle and how
 export function getAliasValue(token: SingleToken | string | number, tokens: SingleToken[] = []): string | number | null {
   // @TODO not sure how this will handle typography and boxShadow values. I don't believe it works.
   // The logic was copied from the original function in aliases.tsx
   let returnedValue: string | null = isSingleTokenValueObject(token) ? token.value.toString() : token.toString();
-
   try {
     const tokenReferences = findReferences(returnedValue);
 
     if (tokenReferences?.length) {
       const resolvedReferences = Array.from(tokenReferences).map((ref) => {
         if (ref.length > 1) {
-          const nameToLookFor = ref.startsWith('{') ? ref.slice(1, ref.length - 1) : ref.substring(1);
-          // exclude references to  self
-          if ((typeof token === 'object' && nameToLookFor === token.name) || nameToLookFor === token) return null;
+          let nameToLookFor: string;
+          if (ref.startsWith('{')) 
+            if (ref.endsWith('}')) 
+              nameToLookFor = ref.slice(1, ref.length - 1);
+            else 
+              nameToLookFor = ref.slice(1, ref.length);
+          else 
+            nameToLookFor = ref.substring(1);
+
+          if (
+            (typeof token === 'object' && nameToLookFor === token.name) || 
+            nameToLookFor === token
+          ) 
+            return null;
 
           const tokenAliasSplited = nameToLookFor.split('.');
-          const tokenAliasSplitedLast = tokenAliasSplited.pop();
+          const tokenAliasSplitedLast: TokenNameNodeType = tokenAliasSplited.pop();
           const tokenAliasLastExcluded = tokenAliasSplited.join('.');
-          const foundToken = tokens.find((t) => t.name === nameToLookFor || t.name === tokenAliasLastExcluded);
+          const tokenAliasSplitedLastPrevious: number = Number(tokenAliasSplited.pop());
+          const tokenAliasLastPreviousExcluded = tokenAliasSplited.join('.');
+          const foundToken = tokens.find((t) => t.name === nameToLookFor || t.name === tokenAliasLastExcluded || t.name === tokenAliasLastPreviousExcluded);
 
-          if (foundToken?.name === nameToLookFor) { return getAliasValue(foundToken, tokens); }
+          if (foundToken?.name === nameToLookFor)  
+            return getAliasValue(foundToken, tokens);
 
-          const candidateProperty = tokenAliasSplitedLast;
-          if (foundToken?.name === tokenAliasLastExcluded && candidateProperty && foundToken.rawValue?.hasOwnProperty(candidateProperty)) return foundToken?.rawValue[candidateProperty];
+          if (
+            !!tokenAliasSplitedLast &&
+            foundToken?.name === tokenAliasLastExcluded && 
+            foundToken.rawValue?.hasOwnProperty(tokenAliasSplitedLast)
+          ) 
+            return getAliasValue(foundToken?.rawValue[tokenAliasSplitedLast], tokens);
+          
+          if (
+            tokenAliasSplitedLastPrevious !== undefined &&
+            !!tokenAliasSplitedLast &&
+            foundToken?.name === tokenAliasLastPreviousExcluded &&
+            Array.isArray(foundToken?.rawValue) &&
+            !!foundToken?.rawValue[tokenAliasSplitedLastPrevious] &&
+            foundToken?.rawValue[tokenAliasSplitedLastPrevious].hasOwnProperty(tokenAliasSplitedLast)
+          ) 
+            return getAliasValue(foundToken?.rawValue[tokenAliasSplitedLastPrevious][tokenAliasSplitedLast], tokens);
         }
         return ref;
       });
+
       tokenReferences.forEach((reference, index) => {
         const resolvedReference = resolvedReferences[index];
         const stringValue = String(resolvedReference);

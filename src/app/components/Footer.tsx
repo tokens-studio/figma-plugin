@@ -11,7 +11,7 @@ import useRemoteTokens from '../store/remoteTokens';
 import convertTokensToObject from '@/utils/convertTokensToObject';
 import { StorageProviderType } from '../../types/api';
 import {
-  localApiStateSelector, editProhibitedSelector, lastSyncedStateSelector, storageTypeSelector, tokensSelector,
+  localApiStateSelector, editProhibitedSelector, lastSyncedStateSelector, storageTypeSelector, tokensSelector, usedTokenSetSelector,
 } from '@/selectors';
 import DocsIcon from '@/icons/docs.svg';
 import FeedbackIcon from '@/icons/feedback.svg';
@@ -22,6 +22,7 @@ export default function Footer() {
   const lastSyncedState = useSelector(lastSyncedStateSelector);
   const editProhibited = useSelector(editProhibitedSelector);
   const localApiState = useSelector(localApiStateSelector);
+  const usedTokenSet = useSelector(usedTokenSetSelector);
 
   const { pullTokens, pushTokens } = useRemoteTokens();
 
@@ -32,7 +33,9 @@ export default function Footer() {
     return false;
   }, [lastSyncedState, tokens]);
 
-  const transformProviderName = (provider: StorageProviderType) => {
+  const hasChanges = React.useMemo(() => checkForChanges(), [lastSyncedState, tokens]);
+
+  const transformProviderName = React.useCallback((provider: StorageProviderType) => {
     switch (provider) {
       case StorageProviderType.JSONBIN:
         return 'JSONBin.io';
@@ -43,7 +46,10 @@ export default function Footer() {
       default:
         return provider;
     }
-  };
+  }, []);
+
+  const onPushButtonClicked = React.useCallback(() => pushTokens(), []);
+  const onPullButtonClicked = React.useCallback(() => pullTokens({ usedTokenSet }), [usedTokenSet]);
 
   return (
     <Box css={{
@@ -55,18 +61,18 @@ export default function Footer() {
         <>
           <BranchSelector currentBranch={localApiState.branch} />
           <Tooltip variant="top" label={`Pull from ${transformProviderName(storageType.provider)}`}>
-            <button onClick={() => pullTokens({})} type="button" className="button button-ghost">
+            <button onClick={onPullButtonClicked} type="button" className="button button-ghost">
               <DownloadIcon />
             </button>
           </Tooltip>
           <Tooltip variant="top" label={`Push to ${transformProviderName(storageType.provider)}`}>
             <button
-              onClick={() => pushTokens()}
+              onClick={onPushButtonClicked}
               type="button"
               className="relative button button-ghost"
               disabled={editProhibited}
             >
-              {checkForChanges() && <div className="absolute top-0 right-0 w-2 h-2 rounded-full bg-primary-500" />}
+              {hasChanges && <div className="absolute top-0 right-0 w-2 h-2 rounded-full bg-primary-500" />}
 
               <UploadIcon />
             </button>

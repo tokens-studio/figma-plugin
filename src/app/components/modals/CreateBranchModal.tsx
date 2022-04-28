@@ -8,29 +8,50 @@ import Input from '../Input';
 import useRemoteTokens from '../../store/remoteTokens';
 import { apiSelector, localApiStateSelector } from '@/selectors';
 import Stack from '../Stack';
+import { ApiDataType } from '@/types/api';
 
 type Props = {
-  isOpen: boolean
-  startBranch: string
-  isCurrentChanges: boolean
-  onClose: (arg: boolean) => void
-  onSuccess: (branch: string) => void
+  isOpen: boolean;
+  startBranch: string | null;
+  isCurrentChanges: boolean;
+  onClose: (arg: boolean) => void;
+  onSuccess: (branch: string, branches: string[]) => void;
 };
+
+type FormData = {
+  branch: string
+}
 
 // @TODO use hooks
 
 export default function CreateBranchModal({
   isOpen, onClose, onSuccess, startBranch, isCurrentChanges,
 }: Props) {
-  const { addNewBranch, pushTokens } = useRemoteTokens();
+  const { addNewBranch, pushTokens, fetchBranches } = useRemoteTokens();
 
-  const localApiState = useSelector(localApiStateSelector);
-  const apiData = useSelector(apiSelector);
+  const localApiState: ApiDataType = useSelector(localApiStateSelector);
+  const apiData: ApiDataType = useSelector(apiSelector);
 
-  const [formFields, setFormFields] = React.useState({});
-  const [hasErrored, setHasErrored] = React.useState(false);
+  const [formFields, setFormFields] = React.useState<FormData>({} as FormData);
+  const [hasErrored, setHasErrored] = React.useState<boolean>(false);
+  const branchInputRef = React.useRef<HTMLInputElement | null>(null);
 
-  const handleCreateNewClick = async () => {
+  /* @lifecycle
+  ** set focus on input
+  */
+  React.useEffect(() => {
+    setTimeout(() => {
+      branchInputRef.current?.focus();
+    }, 200);
+  }, []);
+
+  const handleChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormFields({ ...formFields, [e.target.name]: e.target.value });
+  }, [formFields]);
+
+  const handleSubmit = React.useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    
     const { branch } = formFields;
 
     setHasErrored(false);
@@ -41,26 +62,21 @@ export default function CreateBranchModal({
       branch,
     });
 
+    const branches = await fetchBranches(localApiState);
+
     if (response) {
-      onSuccess(branch);
+      onSuccess(branch, branches);
     } else {
       setHasErrored(true);
     }
 
     if (isCurrentChanges) await pushTokens({ ...apiData, branch });
-  };
+  }, [formFields, localApiState, apiData]);
 
-  const handleChange = (e: any) => {
-    setFormFields({ ...formFields, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = (e: any) => {
-    e.preventDefault();
-    handleCreateNewClick();
-  };
+  const onModalClose = React.useCallback(() => onClose(false), [onClose]);
 
   return (
-    <Modal large isOpen={isOpen} close={() => onClose(false)}>
+    <Modal large isOpen={isOpen} close={onModalClose}>
       <form onSubmit={handleSubmit}>
         <Stack direction="column" gap={4}>
           <Heading>
@@ -76,14 +92,16 @@ export default function CreateBranchModal({
               )}
           </Heading>
           <Input
+            required
             full
+            autofocus
+            type="text"
             label="Branch name"
             value={formFields.branch}
             placeholder="branch"
             onChange={handleChange}
-            type="text"
             name="branch"
-            required
+            inputRef={branchInputRef}
           />
           <Stack direction="row" gap={4}>
             <Button variant="secondary" size="large" onClick={() => onClose(false)}>

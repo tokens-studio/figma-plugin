@@ -20,7 +20,7 @@ type TokenSets = {
 };
 
 /** Returns a URL to a page where the user can create a pull request with a given branch */
-export function getCreatePullRequestUrl(id: string, branchName: string) {
+export function getGithubCreatePullRequestUrl(id: string, branchName: string) {
   return `https://github.com/${id}/compare/${branchName}?expand=1`;
 }
 
@@ -40,7 +40,7 @@ export const fetchGithubBranches = async ({
   return branches.map((branch) => branch.name);
 };
 
-export const createNewBranch = async (owner: string, repo: string, secret: string, baseUrl: string, startBranch: string, branch: string) => {
+export const createNewBranch = async (owner: string, repo: string, secret: string, baseUrl: string | undefined, startBranch: string, branch: string) => {
   const octokit = new Octokit({ auth: secret, baseUrl });
   const originRef = `heads/${startBranch}`;
   const newRef = `refs/heads/${branch}`;
@@ -417,16 +417,8 @@ export function useGitHub() {
     try {
       const { id, secret, baseUrl } = context;
       const [owner, repo] = id.split('/');
-      const newBranch = await createNewBranch(owner, repo, secret, baseUrl, startBranch, branch);
-      const branches = await fetchGithubBranches({
-        secret, owner, repo, baseUrl,
-      });
 
-      const newBranchName = newBranch.data.ref.split('/')[2];
-      branches.push(newBranchName);
-      dispatch.branchState.setBranches(branches);
-
-      return branches;
+      return await createNewBranch(owner, repo, secret, baseUrl, startBranch, branch);
     } catch (e) {
       console.log(e);
       return null;
@@ -464,5 +456,6 @@ export function useGitHub() {
     pullTokensFromGitHub,
     pushTokensToGitHub,
     createGithubBranch,
+    fetchGithubBranches,
   };
 }

@@ -1,29 +1,25 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import {
-  CheckIcon, ChevronRightIcon, ChevronUpIcon, ChevronDownIcon,
-} from '@radix-ui/react-icons';
+import { ChevronRightIcon } from '@radix-ui/react-icons';
 import { GitBranchIcon } from '@primer/octicons-react';
-import { StringIterator } from 'cypress/types/lodash';
 import {
   BranchSwitchMenu,
   BranchSwitchMenuContent,
   BranchSwitchMenuItem,
-  BranchSwitchMenuItemIndicator,
   BranchSwitchMenuMainTrigger,
   BranchSwitchMenuTrigger,
   BranchSwitchMenuRadioGroup,
-  BranchSwitchMenuRadioItem,
   BranchSwitchMenuArrow,
 } from './BranchSwitchMenu';
 import {
-  branchSelector, lastSyncedStateSelector, tokensSelector, localApiStateSelector, apiSelector,
+  branchSelector, lastSyncedStateSelector, tokensSelector, localApiStateSelector, apiSelector, usedTokenSetSelector,
 } from '@/selectors';
 import convertTokensToObject from '@/utils/convertTokensToObject';
 import useRemoteTokens from '../store/remoteTokens';
 import useConfirm from '@/app/hooks/useConfirm';
 import CreateBranchModal from './modals/CreateBranchModal';
 import { Dispatch } from '../store';
+import { BranchSwitchMenuRadioElement } from './BranchSwitchMenuRadioElement';
 
 export default function BranchSelector() {
   const { confirm } = useConfirm();
@@ -35,6 +31,7 @@ export default function BranchSelector() {
   const tokens = useSelector(tokensSelector);
   const localApiState = useSelector(localApiStateSelector);
   const apiData = useSelector(apiSelector);
+  const usedTokenSet = useSelector(usedTokenSetSelector);
 
   const [currentBranch, setCurrentBranch] = useState(localApiState.branch);
   const [startBranch, setStartBranch] = useState(null);
@@ -53,15 +50,9 @@ export default function BranchSelector() {
     return false;
   }, [lastSyncedState, tokens]);
 
-  async function askUserIfPull(): Promise<boolean> {
-    const { result } = await confirm({
-      text: 'Pull from GitHub?',
-      description: 'Your repo already contains tokens, do you want to pull these now?',
-    });
-    return result;
-  }
+  const hasChanges = React.useMemo(() => checkForChanges(), [lastSyncedState, tokens]);
 
-  async function askUserIfPushChanges(): Promise<boolean> {
+  const askUserIfPushChanges : (() => Promise<boolean>) = React.useCallback(async () => {
     const { result } = await confirm({
       text: 'You have unsaved changes',
       description: <div>
@@ -69,12 +60,12 @@ export default function BranchSelector() {
         <br />
         {' '}
         to your repository, the changes will be lost.
-                   </div>,
-      confirmAction: 'Push',
-      cancelAction: 'Discard changes',
+      </div>,
+      confirmAction: 'Discard changes',
+      cancelAction: 'Cancel',
     });
     return result;
-  }
+  }, []);
 
   const createBranchByChange = () => {
     setMenuOpened(false);
@@ -83,36 +74,57 @@ export default function BranchSelector() {
     setCreateBranchModalVisible(true);
   };
 
-  const createNewBranchFrom = async (branch: string) => {
-    if (checkForChanges() && await askUserIfPushChanges()) {
+  const createNewBranchFrom = React.useCallback(async (branch: string) => {
+    setMenuOpened(false);
+    
+    if (hasChanges && await askUserIfPushChanges()) {
       await pushTokens();
     }
 
-    setMenuOpened(false);
     setStartBranch(branch);
     setCreateBranchModalVisible(true);
-  };
+  }, [startBranch, currentBranch, hasChanges]);
 
-  const onBranchSelected = async (branch: string) => {
-    if (checkForChanges() && await askUserIfPushChanges()) {
-      await pushTokens();
-    }
-
+  const changeAndPull = async (branch: string) => {
     setMenuOpened(false);
     setCurrentBranch(branch);
-
-    if (await askUserIfPull()) await pullTokens({ context: { ...apiData, branch } });
-
     dispatch.uiState.setApiData({ ...apiData, branch });
     dispatch.uiState.setLocalApiState({ ...localApiState, branch });
+    await pullTokens({ context: { ...apiData, branch }, usedTokenSet });
   };
 
-  const onCreateBranchModalSuccess = (branch: string) => {
+  const onBranchSelected = React.useCallback(async (branch: string) => {
+    if (hasChanges) {
+      if (await askUserIfPushChanges()) {
+        await changeAndPull(branch);
+      } else setMenuOpened(false);
+    } else {
+      await changeAndPull(branch);
+    }
+  }, [startBranch, currentBranch, hasChanges]);
+
+  // @params
+  /*
+  ** branch: branch name which is just created.
+  ** branches: a list of branch names before new branch is created.
+  */
+  const onCreateBranchModalSuccess = (branch: string, branches: string[]) => {
     setCreateBranchModalVisible(false);
     setCurrentBranch(branch);
 
+    dispatch.branchState.setBranches(branches.includes(branch) ? branches : [...branches, branch]);
     dispatch.uiState.setApiData({ ...apiData, branch });
     dispatch.uiState.setLocalApiState({ ...localApiState, branch });
+  };
+  
+  const BranchSwitchMenuItemElement = ({ branch, index } : { branch: string, index: number }) => {
+    const onSelect = React.useCallback(() => createNewBranchFrom(branch), [branch]);
+    return (
+      <BranchSwitchMenuItem key={`menu_item_${index}`} onSelect={onSelect}>
+        <GitBranchIcon size={12} />
+        {` ${branch}`}
+      </BranchSwitchMenuItem>
+    );
   };
 
   return (
@@ -123,21 +135,12 @@ export default function BranchSelector() {
             <BranchSwitchMenuMainTrigger>
               <GitBranchIcon size={16} />
               <span>{currentBranch}</span>
-              {menuOpened ? <ChevronDownIcon /> : <ChevronUpIcon />}
             </BranchSwitchMenuMainTrigger>
 
             <BranchSwitchMenuContent side="top" sideOffset={5}>
               <BranchSwitchMenuRadioGroup value={currentBranch}>
                 {branchState.branches.length > 0
-                  && branchState.branches.map((branch, index) => (
-                    <BranchSwitchMenuRadioItem key={index} value={branch} onSelect={() => onBranchSelected(branch)}>
-                      <BranchSwitchMenuItemIndicator>
-                        <CheckIcon />
-                      </BranchSwitchMenuItemIndicator>
-                      <GitBranchIcon size={12} />
-                      {` ${branch}`}
-                    </BranchSwitchMenuRadioItem>
-                  ))}
+                  && branchState.branches.map((branch, index) => <BranchSwitchMenuRadioElement branch={branch} index={index} branchSelected={onBranchSelected} />)}
               </BranchSwitchMenuRadioGroup>
               <BranchSwitchMenu>
                 <BranchSwitchMenuTrigger>
@@ -145,18 +148,11 @@ export default function BranchSelector() {
                   <ChevronRightIcon />
                 </BranchSwitchMenuTrigger>
                 <BranchSwitchMenuContent side="left">
-                  {checkForChanges()
-                  && (
+                  {hasChanges && 
                   <BranchSwitchMenuItem onSelect={createBranchByChange}>
                     Current changes
-                  </BranchSwitchMenuItem>
-                  )}
-                  {branchState.branches.length > 0 && branchState.branches.map((branch, index) => (
-                    <BranchSwitchMenuItem key={index} onSelect={() => createNewBranchFrom(branch)}>
-                      <GitBranchIcon size={12} />
-                      {` ${branch}`}
-                    </BranchSwitchMenuItem>
-                  ))}
+                  </BranchSwitchMenuItem>}
+                  {branchState.branches.length > 0 && branchState.branches.map((branch, index) => <BranchSwitchMenuItemElement branch={branch} index={index} />)}
                 </BranchSwitchMenuContent>
               </BranchSwitchMenu>
               <BranchSwitchMenuArrow offset={12} />

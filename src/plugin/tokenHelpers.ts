@@ -25,7 +25,7 @@ export function resolveTokenValues(tokens: SingleToken[], previousCount: number 
       Record<string, ReturnType<typeof getAliasValue>> |
       ReturnType<typeof getAliasValue>;
 
-    let failedToResolve = false;
+    let _failedToResolve = false;
     // Iterate over Typography and boxShadow Object to get resolved values
     if (t.type === TokenTypes.TYPOGRAPHY || t.type === TokenTypes.BOX_SHADOW) {
       if (Array.isArray(t.value)) {
@@ -55,16 +55,16 @@ export function resolveTokenValues(tokens: SingleToken[], previousCount: number 
     else {
       // If we're not dealing with special tokens, just return resolved value
       returnValue = getAliasValue(t, tokensInProgress);
-
-      failedToResolve = returnValue === null || checkIfContainsAlias(returnValue);
+      _failedToResolve = returnValue === null || checkIfContainsAlias(returnValue);
     }
-
+    const { failedToResolve, ...objExcludeFailedToResolve } = t;
     const returnObject = {
-      ...t,
+      ...objExcludeFailedToResolve,
       value: returnValue,
       rawValue: t.rawValue || t.value,
-      ...(failedToResolve ? { failedToResolve } : {}),
+      ...(_failedToResolve ? { failedToResolve: _failedToResolve } : {}),
     } as ResolveTokenValuesResult;
+
     return returnObject;
   });
 

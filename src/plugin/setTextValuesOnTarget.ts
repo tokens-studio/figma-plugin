@@ -14,8 +14,8 @@ export default async function setTextValuesOnTarget(target, token) {
       textCase,
       textDecoration,
     } = value.value || value;
-    const family = fontFamily || target.fontName.family;
-    const style = fontWeight || target.fontName.style;
+    const family = fontFamily?.toString() || target.fontName.family;
+    const style = fontWeight?.toString() || target.fontName.style;
     await figma.loadFontAsync({ family, style });
     if (fontFamily || fontWeight) {
       target.fontName = {
