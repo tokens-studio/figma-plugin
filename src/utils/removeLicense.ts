@@ -8,11 +8,7 @@ export default async function removeLicense(
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ licenseKey, userId }),
     };
-    const res = await fetch(
-      'https://d1cd-2a02-2f08-e207-d400-2127-aa1b-76e-1c5a.ngrok.io/detach-license',
-      requestOptions,
-    );
-
+    const res = await fetch(`${process.env.LICENSE_API_URL}/detach-license`, requestOptions);
     if (res.status === 200) {
       const key = await res.json();
       return { key };
