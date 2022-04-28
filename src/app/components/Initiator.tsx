@@ -9,6 +9,8 @@ import { Dispatch } from '../store';
 import useStorage from '../store/useStorage';
 import * as pjs from '../../../package.json';
 import { useFeatureFlags } from '../hooks/useFeatureFlags';
+import { fetchGithubBranches } from '../store/providers/github';
+import { StorageProviderType } from '@/types/api';
 
 export function Initiator() {
   const dispatch = useDispatch<Dispatch>();
@@ -110,6 +112,17 @@ export function Initiator() {
 
               track('Fetched from remote', { provider: credentials.provider });
               if (!credentials.internalId) track('missingInternalId', { provider: credentials.provider });
+
+              const {
+                id, provider, secret, baseUrl,
+              } = credentials;
+              const [owner, repo] = id.split('/');
+              if (provider === StorageProviderType.GITHUB) {
+                const branches = await fetchGithubBranches({
+                  secret, owner, repo, baseUrl,
+                });
+                dispatch.branchState.setBranches(branches);
+              }
 
               dispatch.uiState.setApiData(credentials);
               dispatch.uiState.setLocalApiState(credentials);
