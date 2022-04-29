@@ -55,6 +55,7 @@ export enum MessageToPluginTypes {
   REMOVE_TOKENS_BY_VALUE = 'remove-tokens-by-value',
   CHANGED_TABS = 'changed-tabs',
   SELECT_NODES = 'select-nodes',
+  GET_API_CREDENTIALS = 'get-api-credentials',
 }
 
 export type NoSelectionFromPluginMessage = { type: MessageFromPluginTypes.NO_SELECTION };
@@ -70,6 +71,7 @@ export type UiSettingsFromPluginMessage = {
     uiWindow: {
       width: number;
       height: number;
+      isMinimized: boolean;
     };
     updateMode: UpdateMode;
     updateRemote: boolean;
@@ -187,6 +189,7 @@ export type UpdateToPluginMessage = {
   settings: SettingsState;
   usedTokenSet: UsedTokenSetsMap;
   activeTheme: string | null;
+  checkForChanges: string
 };
 export type CreateStylesToPluginMessage = {
   type: MessageToPluginTypes.CREATE_STYLES;
@@ -253,6 +256,10 @@ export type SelectNodesPluginMessage = {
   ids: string[];
 };
 
+export type GetApiCredentialsMessage = {
+  type: MessageToPluginTypes.GET_API_CREDENTIALS;
+};
+
 export type PostToFigmaMessage =
   | InitiateToPluginMessage
   | RemoveSingleCredentialToPluginMessage
@@ -272,4 +279,5 @@ export type PostToFigmaMessage =
   | RemapTokensToPluginMessage
   | RemoveTokensByValueToPluginMessage
   | ChangedTabsToPluginMessage
-  | SelectNodesPluginMessage;
+  | SelectNodesPluginMessage
+  | GetApiCredentialsMessage;

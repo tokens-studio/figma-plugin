@@ -14,6 +14,7 @@ export type ApiDataType = {
   branch?: string;
   new?: boolean;
   filePath?: string;
+  baseUrl?: string
 };
 
 export enum StorageProviderType {

@@ -38,11 +38,11 @@ type Props = {
   disabled?: boolean;
   tooltip?: string;
   dataCy?: string;
-  onClick: any;
   icon: any;
   css?: any;
   variant?: StyledButtonProps['buttonVariant'];
   tooltipSide?: 'bottom' | 'left' | undefined;
+  onClick?: () => void;
 };
 
 export default function IconButton({

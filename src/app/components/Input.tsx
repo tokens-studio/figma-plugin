@@ -6,10 +6,11 @@ import Box from './Box';
 import Stack from './Stack';
 
 type Props = React.InputHTMLAttributes<HTMLInputElement> & {
-  name: string;
+  name?: string;
   inputRef?: React.MutableRefObject<HTMLInputElement | null>;
   error?: string;
   required?: boolean;
+  autofocus?: boolean;
   tabindex?: number | null;
   label?: string | null;
   full?: boolean;
@@ -107,6 +108,7 @@ const StyledPrefix = styled('div', {
 
 const Input = React.forwardRef<HTMLInputElement, Props>(({
   name,
+  autofocus,
   error = '',
   required = false,
   tabindex = null,
@@ -157,6 +159,7 @@ const Input = React.forwardRef<HTMLInputElement, Props>(({
           name={name}
           onChange={onChange}
           required={required}
+          autoFocus={autofocus}
           step={step}
           data-custom={custom}
           placeholder={placeholder}

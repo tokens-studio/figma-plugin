@@ -22,6 +22,7 @@ function useConfirm<C = any>() {
       text,
       description,
       confirmAction,
+      cancelAction,
       choices,
       input,
     } = opts;
@@ -30,6 +31,7 @@ function useConfirm<C = any>() {
       input,
       description,
       confirmAction,
+      cancelAction,
       text: text ?? '',
       choices: choices ?? [],
     });

@@ -63,6 +63,23 @@ export class GithubTokenStorage extends GitTokenStorage {
     return branches.data.map((branch) => branch.name);
   }
 
+  public async createBranch(branch: string, source?: string) {
+    try {
+      const originRef = `heads/${source || this.branch}`;
+      const newRef = `refs/heads/${branch}`;
+      const originBranch = await this.octokitClient.git.getRef({
+        owner: this.owner, repo: this.repository, ref: originRef,
+      });
+      const newBranch = await this.octokitClient.git.createRef({
+        owner: this.owner, repo: this.repository, ref: newRef, sha: originBranch.data.object.sha,
+      });
+      return !!newBranch.data.ref;
+    } catch (err) {
+      console.error(err);
+      return false;
+    }
+  }
+
   public async canWrite() {
     const currentUser = await this.octokitClient.rest.users.getAuthenticated();
     if (!currentUser.data.login) return false;

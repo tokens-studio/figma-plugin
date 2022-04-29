@@ -31,9 +31,10 @@ export type EditTokenObject = SingleToken<true, {
 export type ConfirmProps = {
   show?: boolean;
   text?: string;
-  description?: string;
+  description?: React.ReactNode;
   choices?: { key: string; label: string; enabled?: boolean, unique?: boolean }[];
   confirmAction?: string;
+  cancelAction?: string;
   input?: {
     type: 'text';
     placeholder: string;
@@ -92,6 +93,7 @@ const defaultConfirmState: ConfirmProps = {
   description: '',
   choices: undefined,
   confirmAction: 'Yes',
+  cancelAction: 'Cancel',
   input: undefined,
 };
 
@@ -140,6 +142,7 @@ export const uiState = createModel<RootModel>()({
         description?: string;
         choices: { key: string; label: string; enabled?: boolean; unique?: boolean }[];
         confirmAction?: string;
+        cancelAction?: string;
         input?: {
           type: 'text';
           placeholder: string;
@@ -153,6 +156,7 @@ export const uiState = createModel<RootModel>()({
         description: data.description,
         choices: data.choices,
         confirmAction: data.confirmAction || defaultConfirmState.confirmAction,
+        cancelAction: data.cancelAction || defaultConfirmState.cancelAction,
         input: data.input,
       },
     }),

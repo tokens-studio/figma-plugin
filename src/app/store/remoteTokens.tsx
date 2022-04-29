@@ -31,7 +31,7 @@ export default function useRemoteTokens() {
   const { setStorageType } = useStorage();
   const { pullTokensFromJSONBin, addJSONBinCredentials, createNewJSONBin } = useJSONbin();
   const {
-    addNewGitHubCredentials, syncTokensWithGitHub, pullTokensFromGitHub, pushTokensToGitHub,
+    addNewGitHubCredentials, syncTokensWithGitHub, pullTokensFromGitHub, pushTokensToGitHub, createGithubBranch, fetchGithubBranches,
   } = useGitHub();
   const {
     addNewGitLabCredentials, syncTokensWithGitLab, pullTokensFromGitLab, pushTokensToGitLab,
@@ -119,11 +119,11 @@ export default function useRemoteTokens() {
     syncTokensWithGitLab,
   ]);
 
-  const pushTokens = useCallback(async () => {
+  const pushTokens = useCallback(async (context: ContextObject = api) => {
     track('pushTokens', { provider: api.provider });
     switch (api.provider) {
       case StorageProviderType.GITHUB: {
-        await pushTokensToGitHub(api);
+        await pushTokensToGitHub(context);
         break;
       }
       case StorageProviderType.GITLAB: {
@@ -187,7 +187,30 @@ export default function useRemoteTokens() {
     setStorageType,
   ]);
 
-  const deleteProvider = useCallback((provider: ContextObject) => {
+  const addNewBranch = useCallback(async (context: ContextObject, branch: string, source?: string) => {
+    let newBranchCreated = false;
+    switch (context.provider) {
+      case StorageProviderType.GITHUB: {
+        newBranchCreated = await createGithubBranch(context, branch, source);
+        break;
+      }
+      default:
+        throw new Error('Not implemented');
+    }
+
+    return newBranchCreated;
+  }, [createGithubBranch]);
+
+  const fetchBranches = useCallback(async (context: ContextObject) => {
+    switch (context.provider) {
+      case StorageProviderType.GITHUB:
+        return fetchGithubBranches(context);
+      default:
+        return null;
+    }
+  }, [fetchGithubBranches]);
+
+  const deleteProvider = useCallback((provider) => {
     postToFigma({
       type: MessageToPluginTypes.REMOVE_SINGLE_CREDENTIAL,
       context: provider,
@@ -200,11 +223,15 @@ export default function useRemoteTokens() {
     pullTokens,
     pushTokens,
     addNewProviderItem,
+    fetchBranches,
+    addNewBranch,
   }), [
     restoreStoredProvider,
     deleteProvider,
     pullTokens,
     pushTokens,
     addNewProviderItem,
+    addNewBranch,
+    fetchBranches,
   ]);
 }

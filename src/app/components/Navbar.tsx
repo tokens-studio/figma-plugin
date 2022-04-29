@@ -1,23 +1,22 @@
-import React, { useMemo, useCallback } from 'react';
+import React, { useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import Icon from './Icon';
 import Tooltip from './Tooltip';
 import useRemoteTokens from '../store/remoteTokens';
 import { StorageProviderType } from '../../types/api';
 import Box from './Box';
+import { styled } from '@/stitches.config';
 import {
-  editProhibitedSelector,
-  lastSyncedStateSelector,
   projectURLSelector,
   storageTypeSelector,
-  themesListSelector,
-  tokensSelector,
   usedTokenSetSelector,
 } from '@/selectors';
 import { Tabs } from '@/constants/Tabs';
 import Stack from './Stack';
 import { TabButton } from './TabButton';
 import { NavbarUndoButton } from './NavbarUndoButton';
+import Minimize from '../assets/minimize.svg';
+import useMinimizeWindow from './useMinimizeWindow';
 
 const transformProviderName = (provider: StorageProviderType) => {
   switch (provider) {
@@ -34,22 +33,22 @@ const transformProviderName = (provider: StorageProviderType) => {
   }
 };
 
-export const Navbar: React.FC = () => {
+const StyledButton = styled('button', {
+  all: 'unset',
+  border: 'none',
+  padding: '$1',
+  marginRight: '$3',
+  borderRadius: '$button',
+  cursor: 'pointer',
+});
+
+const Navbar: React.FC = () => {
   const projectURL = useSelector(projectURLSelector);
   const storageType = useSelector(storageTypeSelector);
-  const tokens = useSelector(tokensSelector);
-  const themes = useSelector(themesListSelector);
-  const editProhibited = useSelector(editProhibitedSelector);
-  const lastSyncedState = useSelector(lastSyncedStateSelector);
   const usedTokenSet = useSelector(usedTokenSetSelector);
-  const { pullTokens, pushTokens } = useRemoteTokens();
+  const { handleResize } = useMinimizeWindow();
 
-  const hasChanges = useMemo(() => (
-    lastSyncedState !== JSON.stringify([tokens, themes], null, 2)
-  ), [lastSyncedState, tokens, themes]);
-  const handlePushClick = useCallback(() => {
-    pushTokens();
-  }, [pushTokens]);
+  const { pullTokens } = useRemoteTokens();
 
   const handlePullTokens = useCallback(() => {
     pullTokens({ usedTokenSet });
@@ -78,7 +77,9 @@ export const Navbar: React.FC = () => {
         <NavbarUndoButton />
       </Stack>
       <Stack direction="row" align="center">
-        {storageType.provider !== StorageProviderType.LOCAL && (
+        {storageType.provider !== StorageProviderType.LOCAL
+        && storageType.provider !== StorageProviderType.GITHUB
+        && (
           <>
             {storageType.provider === StorageProviderType.JSONBIN && (
               <Tooltip label={`Go to ${transformProviderName(storageType.provider)}`}>
@@ -87,21 +88,6 @@ export const Navbar: React.FC = () => {
                 </a>
               </Tooltip>
             )}
-            {(storageType.provider === StorageProviderType.GITHUB
-              || storageType.provider === StorageProviderType.GITLAB) && (
-              <Tooltip label={`Push to ${transformProviderName(storageType.provider)}`}>
-                <button
-                  onClick={handlePushClick}
-                  type="button"
-                  className="relative button button-ghost"
-                  disabled={editProhibited}
-                >
-                  {hasChanges && <div className="absolute top-0 right-0 w-2 h-2 rounded-full bg-primary-500" />}
-                  <Icon name="library" />
-                </button>
-              </Tooltip>
-            )}
-
             <Tooltip label={`Pull from ${transformProviderName(storageType.provider)}`}>
               <button onClick={handlePullTokens} type="button" className="button button-ghost">
                 <Icon name="refresh" />
@@ -109,6 +95,11 @@ export const Navbar: React.FC = () => {
             </Tooltip>
           </>
         )}
+        <Tooltip label="Minimize plugin">
+          <StyledButton type="button" onClick={handleResize}>
+            <Minimize />
+          </StyledButton>
+        </Tooltip>
       </Stack>
     </Box>
   );

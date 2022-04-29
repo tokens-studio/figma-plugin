@@ -1431,6 +1431,11 @@
   dependencies:
     "@octokit/openapi-types" "^9.5.0"
 
+"@primer/octicons-react@^17.0.0":
+  version "17.0.0"
+  resolved "https://registry.yarnpkg.com/@primer/octicons-react/-/octicons-react-17.0.0.tgz#c16ac8671edee682a513b1afa8a004c7c5b1d767"
+  integrity sha512-/9VLaNVNWwmTFgFlaxO3r+4GbqiG05ytkDLbKxBAdBiOJLadUPo6P0k+/zJdp8No/S2bBNvEtZNNk5zQj87H4w==
+
 "@radix-ui/popper@0.0.10":
   version "0.0.10"
   resolved "https://registry.yarnpkg.com/@radix-ui/popper/-/popper-0.0.10.tgz#9f707d9cec8762423f81acaf8e650e40a554cb73"
@@ -8026,11 +8031,6 @@ just-extend@^6.0.1:
   version "6.0.1"
   resolved "https://registry.yarnpkg.com/just-extend/-/just-extend-6.0.1.tgz#e56276a36cbc360713612b9445f8753a7c73dd50"
   integrity sha512-CrwyGHRQ22XObWsZPQdnKlLLuCPj95OQ9HrLYdfjymCsYoYj7HPMFNrgqPW/LJjhK+CnVZAtftVSfo8Wr33RTA==
-
-just-is-empty@^3.1.2:
-  version "3.1.2"
-  resolved "https://registry.yarnpkg.com/just-is-empty/-/just-is-empty-3.1.2.tgz#beadca52926943bd0b8a4751c0872af17145c629"
-  integrity sha512-tQyYk2yvkgO8wP0Mc2yGOOYgyj9F4xBC2JIAMGeLwds2rDnIZyia3Ay0UiKM0/QvEJm90NVZRsaWXn1z/a98sg==
 
 just-omit@^2.0.1:
   version "2.0.1"

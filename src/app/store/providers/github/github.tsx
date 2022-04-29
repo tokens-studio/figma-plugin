@@ -192,15 +192,29 @@ export function useGitHub() {
     };
   }, [dispatch, tokens, themes, syncTokensWithGitHub]);
 
+  const fetchGithubBranches = useCallback(async (context: ContextObject) => {
+    const storage = storageClientFactory(context);
+    return storage.fetchBranches();
+  }, [storageClientFactory]);
+
+  const createGithubBranch = useCallback((context: ContextObject, newBranch: string, source?: string) => {
+    const storage = storageClientFactory(context);
+    return storage.createBranch(newBranch, source);
+  }, [storageClientFactory]);
+
   return useMemo(() => ({
     addNewGitHubCredentials,
     syncTokensWithGitHub,
     pullTokensFromGitHub,
     pushTokensToGitHub,
+    fetchGithubBranches,
+    createGithubBranch,
   }), [
     addNewGitHubCredentials,
     syncTokensWithGitHub,
     pullTokensFromGitHub,
     pushTokensToGitHub,
+    fetchGithubBranches,
+    createGithubBranch,
   ]);
 }

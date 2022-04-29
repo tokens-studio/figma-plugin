@@ -73,6 +73,21 @@ export class GitlabTokenStorage extends GitTokenStorage {
     return branches.map((branch) => branch.name);
   }
 
+  public async createBranch(branch: string, source?: string) {
+    try {
+      if (!this.projectId) throw new Error('Project ID not assigned');
+      const response = await this.gitlabClient.Branches.create(
+        this.projectId,
+        branch,
+        `heads/${source || this.branch}`,
+      );
+      return !!response.name;
+    } catch (err) {
+      console.error(err);
+      return false;
+    }
+  }
+
   public async canWrite(): Promise<boolean> {
     if (!this.groupId || !this.projectId) throw new Error('Missing Project or Group ID');
 
