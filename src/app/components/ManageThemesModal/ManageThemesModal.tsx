@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { activeThemeSelector, themesListSelector } from '@/selectors';
-import { Modal } from '../Modal';
+import Modal from '../Modal';
 import { Dispatch } from '@/app/store';
 import Blankslate from '../Blankslate';
 import Stack from '../Stack';
