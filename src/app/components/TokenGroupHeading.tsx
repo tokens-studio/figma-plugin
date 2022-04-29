@@ -6,7 +6,6 @@ import {
 import Stack from './Stack';
 import Button from './Button';
 import Heading from './Heading';
-import Icon from './Icon';
 import Input from './Input';
 import Modal from './Modal';
 import Box from './Box';
@@ -41,11 +40,11 @@ export default function TokenGroupHeading({ label, path, id }: Props) {
   const [tokenGroupMarkedForChange, setTokenGroupMarkedForChange] = React.useState('');
   const [newTokenGroupName, handleNewTokenGroupNameChange] = React.useState('');
 
-  const { deleteGroup } = useManageTokens();
+  const { deleteGroup, renameGroup } = useManageTokens();
 
   const handleRenameTokenGroupSubmit = React.useCallback((e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
+    renameGroup( {oldName: path, newName: newTokenGroupName} );
     setTokenGroupMarkedForChange('');
     setShowRenameTokenGroupField(false);
   }, [newTokenGroupName, tokenGroupMarkedForChange]);

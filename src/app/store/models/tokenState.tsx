@@ -19,11 +19,13 @@ import {
   ToggleManyTokenSetsPayload,
   UpdateDocumentPayload,
   UpdateTokenPayload,
+  RenameTokenGroupPayloads
 } from '@/types/payloads';
 import { updateTokenPayloadToSingleToken } from '@/utils/updateTokenPayloadToSingleToken';
 import { RootModel } from '@/types/RootModel';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { UsedTokenSetsMap } from '@/types';
+import { rest } from 'lodash';
 
 const defaultTokens: TokenStore = {
   version: pjs.plugin_version,
@@ -341,6 +343,42 @@ export const tokenState = createModel<RootModel>()({
         },
       };
 
+      return newState;
+    },
+    renameTokenGroup: (state, data: RenameTokenGroupPayloads) =>
+    {
+      const { parent, oldName, newName } = data;
+      const existingTokens = state.tokens[parent].filter((token) => token.name.includes(`${oldName}.`));
+      const existingTokensValue = state.tokens[parent].filter((token) => token.value.toString().includes(`${oldName}.`));
+      const _newTokenswithName = existingTokens.map((token) => {
+        let newtokenName = token.name;
+        console.log(token.name);
+        const { name, ...rest } = token;
+        console.log(oldName, newName);
+        newtokenName = newtokenName.replace(oldName, newName);
+        console.log(newtokenName);
+        return {
+          ...rest,
+          name: newtokenName,
+        };
+      });
+
+      // const _newTokenswithValue = existingTokensValue.map((token) => {
+      //   let newtokenValue = token.value.toString();
+      //   const { value, ...rest} = token;
+      //   newtokenValue = newtokenValue.toString().replace(oldName, newName);
+      //   return{
+      //     ...rest,
+      //     value: newtokenValue,
+      //   };
+      // });
+      const newState = {
+        ...state,
+        tokens:{
+          ...state.tokens,
+          [parent]: [..._newTokenswithName] ,
+        }
+      };
       return newState;
     },
     updateAliases: (state, data: { oldName: string; newName: string }) => {
