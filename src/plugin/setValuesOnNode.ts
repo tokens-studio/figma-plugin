@@ -14,7 +14,6 @@ export default async function setValuesOnNode(
   ignoreFirstPartForStyles = false,
 ) {
   try {
-    console.log("inpuvalus", values)
     // BORDER RADIUS
     if (
       node.type !== 'CONNECTOR'

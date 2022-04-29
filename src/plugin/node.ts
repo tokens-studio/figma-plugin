@@ -42,23 +42,19 @@ export function returnValueToLookFor(key: string) {
 // @TOOD fix object typing
 export function mapValuesToTokens(tokens: Map<string, AnyTokenList[number]>, values: NodeTokenRefMap, resolvedTokens: ResolveTokenValuesResult[]): object {
   const mappedValues = Object.entries(values).reduce((acc, [key, tokenOnNode]) => {
-    console.log("tokenon", tokenOnNode)
     const resolvedToken = tokens.get(tokenOnNode);
     if (!resolvedToken) return acc;
     if (isSingleToken(resolvedToken)) {
-      console.log("resolve", resolvedToken)
       // case composition token has typography or boxshadow property
       if (resolvedToken && resolvedToken.type === 'composition') {
         let tokenArray: Array<Object> = [];
         for (let index = 0;  index < resolvedToken.rawValue.length; index++) {
           const currentTokenWithRawValue = resolvedToken.rawValue[index];
           if (currentTokenWithRawValue.property === TokenTypes.TYPOGRAPHY || currentTokenWithRawValue.property === TokenTypes.BOX_SHADOW) {
-            console.log("dsfdfs", currentTokenWithRawValue.value)
             currentTokenWithRawValue.value
             let strExcludedSymbol: string = '';
             if (String(currentTokenWithRawValue.value).startsWith('$')) strExcludedSymbol = String(currentTokenWithRawValue.value).slice(1, String(currentTokenWithRawValue.value).length);
             if (String(currentTokenWithRawValue.value).startsWith('{')) strExcludedSymbol = String(currentTokenWithRawValue.value).slice(1, String(currentTokenWithRawValue.value).length - 1);
-            console.log("hhjjhjkj", tokens.get(strExcludedSymbol)?.value)
             tokenArray.push({
               property: currentTokenWithRawValue.property,
               value: tokens.get(strExcludedSymbol)?.value
@@ -71,7 +67,6 @@ export function mapValuesToTokens(tokens: Map<string, AnyTokenList[number]>, val
             });
           }        
         }
-        console.log("tokenarra", tokenArray)
         acc[key] = tokenArray;
       } else acc[key] = resolvedToken[returnValueToLookFor(key)];
     } else acc[key] = resolvedToken;
@@ -147,7 +142,6 @@ export function selectNodes(ids: string[]) {
 }
 
 export function mergeCompositionToken(values: Object): Object {
-  console.log("iiinput", values)
   let tokensInCompositionToken: Object = {};
   if (values && values.composition) {
     values.composition.map((value) => {

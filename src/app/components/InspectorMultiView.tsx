@@ -21,12 +21,7 @@ export default function InspectorMultiView({ resolvedTokens }: { resolvedTokens:
 
   React.useEffect(() => {
     dispatch.inspectState.setSelectedTokens([]);
-    console.log("selec", uiState.selectionValues)
   }, [uiState.selectionValues]);
-
-  React.useEffect(() => {
-    console.log("group", groupedSelectionValues)
-  }, [groupedSelectionValues, uiState.selectionValues]);
 
   const groupedSelectionValues = React.useMemo(() => uiState.selectionValues.reduce((acc, curr) => {
     if (acc[curr.category]) {

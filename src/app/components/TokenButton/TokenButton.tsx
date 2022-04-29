@@ -116,7 +116,6 @@ export const TokenButton: React.FC<Props> = ({
       [propsToSet[0].name || propsToSet[0]]: propsToSet[0].forcedValue || value,
     };
     if (propsToSet[0].clear) propsToSet[0].clear.map((item) => Object.assign(newProps, { [item]: 'delete' }));
-    console.log("newprops", newProps)
     if (type === 'composition' && value === 'delete') {
       const compositionToken = tokensContext.resolvedTokens.find((token) => token.name === tokenValue);
       let tokensInCompositionToken: Object = {};
