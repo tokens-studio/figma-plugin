@@ -31,7 +31,7 @@ export async function updateJSONBinTokens({
 
     if (oldUpdatedAt) {
       const remoteTokens = await storage.retrieve();
-      const comparison = await compareUpdatedAt(oldUpdatedAt, remoteTokens.metadata?.updatedAt ?? '');
+      const comparison = await compareUpdatedAt(oldUpdatedAt, remoteTokens?.metadata?.updatedAt ?? '');
       if (comparison === 'remote_older') {
         storage.save(payload);
       } else {
@@ -100,7 +100,7 @@ export function useJSONbin() {
         provider: StorageProviderType.JSONBIN,
       });
 
-      if (data.metadata && data.tokens) {
+      if (data?.metadata && data?.tokens) {
         dispatch.tokenState.setEditProhibited(false);
 
         return data;

@@ -1,9 +1,9 @@
-import z from 'zod';
 import { ThemeObjectsList } from '@/types';
 import { AnyTokenSet } from '@/types/tokens';
 import { RemoteTokenStorage, RemoteTokenStorageFile } from './RemoteTokenStorage';
 import { singleFileSchema } from './schemas/singleFileSchema';
 import IsJSONString from '@/utils/isJSONString';
+import { tokensMapSchema } from './schemas/tokensMapSchema';
 
 type UrlData = {
   values: Record<string, AnyTokenSet<false>>
@@ -54,12 +54,18 @@ export class UrlTokenStorage extends RemoteTokenStorage {
 
     if (response.ok) {
       const parsedJsonData = await response.json();
-      const validationResult = await z.object({
-        record: singleFileSchema,
-      }).safeParseAsync(parsedJsonData);
+      const validationResult = await singleFileSchema.safeParseAsync(parsedJsonData);
+      // @README if this validation passes we can assume it is in a newer format
       if (validationResult.success) {
-        const jsonbinData = validationResult.data.record as UrlData;
-        return this.convertUrlDataToFiles(jsonbinData);
+        const urlstorageData = validationResult.data as UrlData;
+        return this.convertUrlDataToFiles(urlstorageData);
+      }
+
+      // @README if not this is an older format where we just have tokens
+      const onlyTokensValidationResult = await tokensMapSchema.safeParseAsync(parsedJsonData);
+      if (onlyTokensValidationResult.success) {
+        const urlstorageData = onlyTokensValidationResult.data as UrlData['values'];
+        return this.convertUrlDataToFiles({ values: urlstorageData });
       }
     }
 

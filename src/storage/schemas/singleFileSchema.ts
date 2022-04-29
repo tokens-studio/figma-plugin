@@ -1,10 +1,8 @@
 import z from 'zod';
+import { tokensMapSchema } from './tokensMapSchema';
 
 export const singleFileSchema = z.object({
-  values: z.record(z.record(z.object({
-    value: z.any(),
-    type: z.string(),
-  }))),
+  values: z.record(tokensMapSchema),
   $themes: z.array(z.object({
     id: z.string(),
     name: z.string(),
