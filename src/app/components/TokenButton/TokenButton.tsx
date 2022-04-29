@@ -26,7 +26,6 @@ import { DragOverItem } from './DragOverItem';
 import { TokenButtonDraggable } from './TokenButtonDraggable';
 import type { ShowFormOptions } from '../TokenTree';
 import convertOffsetToFigma from '@/plugin/figmaTransforms/offset';
-import { resolveTokenValues } from '@/plugin/tokenHelpers';
 
 // @TODO fix typings
 
@@ -94,7 +93,7 @@ export const TokenButton: React.FC<Props> = ({
     duplicateSingleToken({ parent: activeTokenSet, name });
   }, [activeTokenSet, name, duplicateSingleToken]);
 
-  const setPluginValue = React.useCallback((value: SelectionValue | SelectionValue[]) => {
+  const setPluginValue = React.useCallback((value: SelectionValue) => {
     dispatch.uiState.startJob({ name: BackgroundJobs.UI_APPLYNODEVALUE });
     setNodeData(value, tokensContext.resolvedTokens);
     waitForMessage(MessageFromPluginTypes.REMOTE_COMPONENTS).then(() => {

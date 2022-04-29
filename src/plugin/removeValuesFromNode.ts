@@ -2,6 +2,7 @@ import { Properties } from '@/constants/Properties';
 
 export default function removeValuesFromNode(node: BaseNode, prop: Properties) {
   // BORDER RADIUS
+  console.log("prop", prop)
   switch (prop) {
     case 'borderRadius':
       if ('cornerRadius' in node && typeof node.cornerRadius !== 'undefined') {
@@ -30,6 +31,7 @@ export default function removeValuesFromNode(node: BaseNode, prop: Properties) {
       break;
     case 'borderWidth':
       if ('strokeWeight' in node && typeof node.strokeWeight !== 'undefined') {
+        console.log("56789")
         node.strokeWeight = 0;
       }
       break;
@@ -40,6 +42,7 @@ export default function removeValuesFromNode(node: BaseNode, prop: Properties) {
       break;
     case 'opacity':
       if ('opacity' in node && typeof node.opacity !== 'undefined') {
+        console.log("87654")
         node.opacity = 1;
       }
       break;

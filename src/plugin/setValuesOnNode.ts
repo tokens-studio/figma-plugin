@@ -14,6 +14,7 @@ export default async function setValuesOnNode(
   ignoreFirstPartForStyles = false,
 ) {
   try {
+    console.log("inpuvalus", values)
     // BORDER RADIUS
     if (
       node.type !== 'CONNECTOR'
@@ -56,7 +57,6 @@ export default async function setValuesOnNode(
 
       // OPACITY
       if ('opacity' in node && typeof values.opacity !== 'undefined') {
-        console.log("opacity", values, 'values.opa', values.opacity)
         node.opacity = transformValue(values.opacity, 'opacity');
       }
 

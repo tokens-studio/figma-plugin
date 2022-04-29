@@ -73,7 +73,6 @@ export async function removePluginData({ nodes, key, shouldRemoveValues = true }
         omit(tokens, key)
       ));
       if (shouldRemoveValues) {
-        console.log("shouldremove12", key)
         removeValuesFromNode(node, key);
       }
     } else {
@@ -84,7 +83,6 @@ export async function removePluginData({ nodes, key, shouldRemoveValues = true }
         node.setPluginData(prop, '');
         tokensSharedDataHandler.set(node, prop, '');
         if (shouldRemoveValues) {
-          console.log("shouldremove90")
           removeValuesFromNode(node, prop);
         }
       });
@@ -97,7 +95,7 @@ export async function removePluginData({ nodes, key, shouldRemoveValues = true }
 
 export async function updatePluginData({
   entries, values, shouldOverride = false, shouldRemove = true,
-}: { entries: readonly NodeManagerNode[], values: NodeTokenRefMap | NodeTokenRefMap[], shouldOverride?: boolean, shouldRemove?: boolean }) {
+}: { entries: readonly NodeManagerNode[], values: NodeTokenRefMap, shouldOverride?: boolean, shouldRemove?: boolean }) {
   const namespace = SharedPluginDataNamespaces.TOKENS;
   postToUI({
     type: MessageFromPluginTypes.START_JOB,
@@ -114,9 +112,8 @@ export async function updatePluginData({
   entries.forEach(({ node, tokens }) => {
     promises.add(defaultWorker.schedule(async () => {
       const currentValuesOnNode = tokens ?? {};
-      console.log("targevalues", values)
       const newValuesOnNode = { ...currentValuesOnNode, ...values };
-      console.log("newvalu", newValuesOnNode, 'entries', entries)
+
       await Promise.all(Object.entries(newValuesOnNode).map(async ([key, value]) => {
         if (value === currentValuesOnNode[key] && !shouldOverride) {
           return;
