@@ -4,7 +4,11 @@
   "description": "A utility that transforms tokens from Figma Tokens to a format that is readable by Style Dictionary.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build-typography-test": "node index.js tokens.json temp/typography.json base/options,base/sizing,core/typography base/options,base/sizing",
+    "build-light-test": "node index.js tokens.json temp/dark.json base/options,base/sizing,themes/dark,core/shadows base/options,base/sizing",
+    "build-dark-test": "node index.js tokens.json temp/light.json base/options,base/sizing,themes/light,core/shadows base/options,base/sizing",
+    "build-folder-test": "node index.js tokens temp/folder-light.json base/options,base/sizing,themes/light,core/shadows base/options,base/sizing",
+    "test": "npm run build-typography-test && npm run build-light-test && npm run build-dark-test && npm run build-folder-test && jest"
   },
   "author": "six7",
   "license": "MIT",
@@ -15,5 +19,8 @@
   "files": [
     "index.js",
     "dist"
-  ]
+  ],
+  "devDependencies": {
+    "jest": "^28.0.3"
+  }
 }

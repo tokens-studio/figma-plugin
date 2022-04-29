@@ -1,4 +1,38 @@
 {
+  "shadows": {
+    "multiple": {
+      "value": [
+        {
+          "color": "#1B1F24",
+          "type": "dropShadow",
+          "x": 0,
+          "y": 4,
+          "blur": 2,
+          "spread": 0
+        },
+        {
+          "color": "#1B1F24",
+          "type": "dropShadow",
+          "x": 0,
+          "y": 0,
+          "blur": 6,
+          "spread": 0
+        }
+      ],
+      "type": "boxShadow"
+    },
+    "single": {
+      "value": {
+        "color": "#1B1F24",
+        "type": "dropShadow",
+        "x": 0,
+        "y": 4,
+        "blur": 2,
+        "spread": 0
+      },
+      "type": "boxShadow"
+    }
+  },
   "theme": {
     "background": {
       "value": "#FAFBFC",
@@ -10,52 +44,11 @@
       "description": "Nested color value",
       "type": "color"
     },
-    "shadow": {
-      "default": {
-        "value": {
-          "0": "{",
-          "1": "s",
-          "2": "h",
-          "3": "a",
-          "4": "d",
-          "5": "o",
-          "6": "w",
-          "7": "s",
-          "8": ".",
-          "9": "m",
-          "10": "u",
-          "11": "l",
-          "12": "t",
-          "13": "i",
-          "14": "p",
-          "15": "l",
-          "16": "e",
-          "17": "}"
-        },
-        "description": "Shadow value",
-        "type": "boxShadow"
-      }
-    },
     "size": {
       "default": {
-        "value": {
-          "0": "{",
-          "1": "s",
-          "2": "i",
-          "3": "z",
-          "4": "i",
-          "5": "n",
-          "6": "g",
-          "7": ".",
-          "8": "l",
-          "9": "a",
-          "10": "r",
-          "11": "g",
-          "12": "e",
-          "13": "}"
-        },
-        "description": "Shadow value",
-        "type": "boxShadow"
+        "value": 8,
+        "description": "Sizing value",
+        "type": "sizing"
       }
     }
   }
