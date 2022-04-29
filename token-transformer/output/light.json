@@ -1,0 +1,62 @@
+{
+  "theme": {
+    "background": {
+      "value": "#FAFBFC",
+      "description": "Alias value",
+      "type": "color"
+    },
+    "backgroundSubtle": {
+      "value": "#fafbfc80",
+      "description": "Nested color value",
+      "type": "color"
+    },
+    "shadow": {
+      "default": {
+        "value": {
+          "0": "{",
+          "1": "s",
+          "2": "h",
+          "3": "a",
+          "4": "d",
+          "5": "o",
+          "6": "w",
+          "7": "s",
+          "8": ".",
+          "9": "m",
+          "10": "u",
+          "11": "l",
+          "12": "t",
+          "13": "i",
+          "14": "p",
+          "15": "l",
+          "16": "e",
+          "17": "}"
+        },
+        "description": "Shadow value",
+        "type": "boxShadow"
+      }
+    },
+    "size": {
+      "default": {
+        "value": {
+          "0": "{",
+          "1": "s",
+          "2": "i",
+          "3": "z",
+          "4": "i",
+          "5": "n",
+          "6": "g",
+          "7": ".",
+          "8": "l",
+          "9": "a",
+          "10": "r",
+          "11": "g",
+          "12": "e",
+          "13": "}"
+        },
+        "description": "Shadow value",
+        "type": "boxShadow"
+      }
+    }
+  }
+}
