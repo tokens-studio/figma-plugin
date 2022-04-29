@@ -153,7 +153,7 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
           await updatePluginData({ entries: nodes, values: msg.values });
           await sendPluginValues({
             nodes: figma.currentPage.selection,
-            values: await updateNodes(nodes, tokensMap, msg.settings, msg.tokens),
+            values: await updateNodes(nodes, tokensMap, msg.settings),
             shouldSendSelectionValues: false,
           });
         }
@@ -211,7 +211,7 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
           updateMode: msg.settings.updateMode,
         });
 
-        await updateNodes(allWithData, tokensMap, msg.settings, msg.tokens);
+        await updateNodes(allWithData, tokensMap, msg.settings);
         await updatePluginData({ entries: allWithData, values: {} });
         notifyRemoteComponents({
           nodes: store.successfulNodes.size,

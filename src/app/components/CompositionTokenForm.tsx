@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { CompositionTokenSingleValue } from '@/types/propertyTypes';
 import IconMinus from '@/icons/minus.svg';
 import IconPlus from '@/icons/plus.svg';
@@ -37,7 +37,7 @@ function SingleStyleInput({
       values.splice(index, 1, newToken);
       setValue(values);
     } else {
-      setValue({ ...tokens, property: e.value });
+      setValue([{ ...tokens, property: e.value }]);
     }
   };
 
@@ -48,7 +48,7 @@ function SingleStyleInput({
       values.splice(index, 1, newToken);
       setValue(values);
     } else {
-      setValue({ ...tokens, value: e.target.value });
+      setValue([{ ...tokens, value: e.target.value }]);
     }
   };
 
@@ -121,14 +121,7 @@ export default function CompositionTokenForm({
         value: Properties[key],
         label: Properties[key],
       }
-    })
-    // for (const property in Properties) {
-    //   properties.push({
-    //     value: property,
-    //     label: property,
-    //   });
-    // }
-    // return properties;
+    });
   }, [Properties]);
 
   const addToken = () => {

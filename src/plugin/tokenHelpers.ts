@@ -50,7 +50,7 @@ export function resolveTokenValues(tokens: SingleToken[], previousCount: number 
           property: item.property,
           value: getAliasValue(item.value, tokensInProgress)
         }
-      })
+      });
     }
     else {
       // If we're not dealing with special tokens, just return resolved value

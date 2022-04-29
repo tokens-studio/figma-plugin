@@ -19,9 +19,7 @@ import { ProgressTracker } from './ProgressTracker';
 import { AnyTokenList, TokenStore } from '@/types/tokens';
 import { isSingleToken } from '@/utils/is';
 import { UsedTokenSetsMap } from '@/types';
-import { tokenArrayGroupToMap } from '@/utils/tokenArrayGroupToMap';
 import { TokenTypes } from '@/constants/TokenTypes';
-import { compose } from 'redux';
 // @TODO fix typings
 
 export function returnValueToLookFor(key: string) {
@@ -40,34 +38,33 @@ export function returnValueToLookFor(key: string) {
 }
 
 // @TOOD fix object typing
-export function mapValuesToTokens(tokens: Map<string, AnyTokenList[number]>, values: NodeTokenRefMap, resolvedTokens: ResolveTokenValuesResult[]): object {
+export function mapValuesToTokens(tokens: Map<string, AnyTokenList[number]>, values: NodeTokenRefMap): object {
   const mappedValues = Object.entries(values).reduce((acc, [key, tokenOnNode]) => {
     const resolvedToken = tokens.get(tokenOnNode);
     if (!resolvedToken) return acc;
     if (isSingleToken(resolvedToken)) {
       // case composition token has typography or boxshadow property
-      if (resolvedToken && resolvedToken.type === 'composition') {
-        let tokenArray: Array<Object> = [];
+      if (resolvedToken && resolvedToken.type === TokenTypes.COMPOSITION) {
+        let tokensInComposition: Array<Object> = [];
         for (let index = 0;  index < resolvedToken.rawValue.length; index++) {
           const currentTokenWithRawValue = resolvedToken.rawValue[index];
           if (currentTokenWithRawValue.property === TokenTypes.TYPOGRAPHY || currentTokenWithRawValue.property === TokenTypes.BOX_SHADOW) {
-            currentTokenWithRawValue.value
             let strExcludedSymbol: string = '';
             if (String(currentTokenWithRawValue.value).startsWith('$')) strExcludedSymbol = String(currentTokenWithRawValue.value).slice(1, String(currentTokenWithRawValue.value).length);
             if (String(currentTokenWithRawValue.value).startsWith('{')) strExcludedSymbol = String(currentTokenWithRawValue.value).slice(1, String(currentTokenWithRawValue.value).length - 1);
-            tokenArray.push({
+            tokensInComposition.push({
               property: currentTokenWithRawValue.property,
               value: tokens.get(strExcludedSymbol)?.value
             });
           }
           else {
-            tokenArray.push({
+            tokensInComposition.push({
               property: currentTokenWithRawValue.property,
               value: resolvedToken.value[index].value
             });
           }        
         }
-        acc[key] = tokenArray;
+        acc[key] = tokensInComposition;
       } else acc[key] = resolvedToken[returnValueToLookFor(key)];
     } else acc[key] = resolvedToken;
     return acc;
@@ -173,7 +170,6 @@ export async function updateNodes(
   entries: readonly NodeManagerNode[],
   tokens: Map<string, AnyTokenList[number]>,
   settings?: UpdateNodesSettings,
-  resolvedTokens: ResolveTokenValuesResult[],
 ) {
   const { ignoreFirstPartForStyles } = settings ?? {};
   const figmaStyleMaps = getAllFigmaStyleMaps();
@@ -195,8 +191,8 @@ export async function updateNodes(
       defaultWorker.schedule(async () => {
         try {
           if (entry.tokens) {
-            let mappedTokens = mergeCompositionTokenForAlias(tokens, entry.tokens);
-            let mappedValues = mapValuesToTokens(tokens, entry.tokens, resolvedTokens);
+            const mappedTokens = mergeCompositionTokenForAlias(tokens, entry.tokens);
+            let mappedValues = mapValuesToTokens(tokens, entry.tokens);
             mappedValues = mergeCompositionToken(mappedValues);
             setValuesOnNode(entry.node, mappedValues, mappedTokens, figmaStyleMaps, ignoreFirstPartForStyles);
             store.successfulNodes.add(entry.node);
