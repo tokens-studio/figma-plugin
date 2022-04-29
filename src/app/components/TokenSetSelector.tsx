@@ -109,6 +109,10 @@ export default function TokenSetSelector() {
     setShowNewTokenSetFields(false);
   }, []);
 
+  const handleOpenNewTokenSetModal = useCallback(() => {
+    setShowNewTokenSetFields(true);
+  }, []);
+
   return (
     <Box
       css={{
@@ -195,7 +199,7 @@ export default function TokenSetSelector() {
           </form>
         </Stack>
       </Modal>
-      <StyledButton type="button" disabled={editProhibited} onClick={handleCloseNewTokenSetModal}>
+      <StyledButton type="button" disabled={editProhibited} onClick={handleOpenNewTokenSetModal}>
         New set
         <Icon name="add" />
       </StyledButton>
