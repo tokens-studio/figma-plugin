@@ -15,20 +15,26 @@ type Props = {
 
 export default function TokenGroupHeading({ label, path, id }: Props) {
   const editProhibited = useSelector(editProhibitedSelector);
-  const { deleteGroup } = useManageTokens();
+  const { deleteGroup, duplicateGroup } = useManageTokens();
 
-  const handleSelect = React.useCallback(() => {
+  const handleDelete = React.useCallback(() => {
     deleteGroup(path);
   }, [path, deleteGroup]);
 
+  const handleDuplicate = React.useCallback(() => {
+    duplicateGroup(path);
+  }, [path, duplicateGroup]);
   return (
     <ContextMenu>
       <ContextMenuTrigger id={`group-heading-${path}-${label}-${id}`}>
         <Heading muted size="small">{label}</Heading>
       </ContextMenuTrigger>
       <ContextMenuContent>
-        <ContextMenuItem disabled={editProhibited} onSelect={handleSelect}>
+        <ContextMenuItem disabled={editProhibited} onSelect={handleDelete}>
           Delete
+        </ContextMenuItem>
+        <ContextMenuItem disabled={editProhibited} onSelect={handleDuplicate}>
+          Duplicate
         </ContextMenuItem>
       </ContextMenuContent>
     </ContextMenu>

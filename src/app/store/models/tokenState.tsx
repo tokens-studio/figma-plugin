@@ -329,7 +329,6 @@ export const tokenState = createModel<RootModel>()({
           [data.parent]: state.tokens[data.parent].filter((token) => token.name !== data.path),
         },
       };
-
       return newState;
     },
     deleteTokenGroup: (state, data: DeleteTokenPayload) => {
@@ -340,7 +339,33 @@ export const tokenState = createModel<RootModel>()({
           [data.parent]: state.tokens[data.parent].filter((token) => !token.name.startsWith(data.path)),
         },
       };
+      return newState;
+    },
 
+    duplicateTokenGroup: (state, data: DeleteTokenPayload) => {
+      const selectedGroup = state.tokens[data.parent].filter((token) => token.name.includes(`${data.path}.`));
+      let newTokens: TokenStore['values'] = {};
+      const existingTokenIndex = state.tokens[data.parent].findIndex((n) => n.name === selectedGroup[0].name);
+      const oldName = selectedGroup[0].name.split('.');
+      if (existingTokenIndex > -1) {
+        const newName = `${oldName[0]}-copy.${oldName[1]}`;
+        const existingTokens = [...state.tokens[data.parent]];
+        existingTokens.splice(existingTokenIndex + 1, 0, {
+          ...state.tokens[data.parent][existingTokenIndex],
+          name: newName,
+        });
+
+        newTokens = {
+          [data.parent]: existingTokens,
+        };
+      }
+      const newState = {
+        ...state,
+        tokens: {
+          ...state.tokens,
+          ...newTokens,
+        },
+      };
       return newState;
     },
     updateAliases: (state, data: { oldName: string; newName: string }) => {

@@ -31,7 +31,7 @@ export default function useManageTokens() {
   const dispatch = useDispatch<Dispatch>();
   const { confirm } = useConfirm();
   const {
-    editToken, createToken, deleteToken, duplicateToken, deleteTokenGroup,
+    editToken, createToken, deleteToken, duplicateToken, deleteTokenGroup, duplicateTokenGroup
   } = dispatch.tokenState;
 
   const editSingleToken = useCallback(async (data: EditSingleTokenData) => {
@@ -122,7 +122,16 @@ export default function useManageTokens() {
     }
   }, [store, confirm, deleteTokenGroup, dispatch.uiState]);
 
+  const duplicateGroup = useCallback(async (path: string) => {
+    dispatch.uiState.startJob({
+      name: BackgroundJobs.UI_DUPLICATETGROUP,
+      isInfinite: true,
+    });
+    const activeTokenSet = activeTokenSetSelector(store.getState());
+    duplicateTokenGroup({ parent: activeTokenSet, path });
+  },[store, duplicateTokenGroup, dispatch.uiState]);
+
   return useMemo(() => ({
-    editSingleToken, createSingleToken, deleteSingleToken, deleteGroup, duplicateSingleToken,
+    editSingleToken, createSingleToken, deleteSingleToken, deleteGroup, duplicateSingleToken, duplicateGroup,
   }), [editSingleToken, createSingleToken, deleteSingleToken, deleteGroup, duplicateSingleToken]);
 }
