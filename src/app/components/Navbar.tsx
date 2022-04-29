@@ -1,24 +1,22 @@
 import React from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import convertTokensToObject from '@/utils/convertTokensToObject';
+import { useSelector } from 'react-redux';
 import Icon from './Icon';
 import Tooltip from './Tooltip';
 import useRemoteTokens from '../store/remoteTokens';
-import { Dispatch } from '../store';
 import { StorageProviderType } from '../../types/api';
 import Box from './Box';
+import { styled } from '@/stitches.config';
 import {
-  editProhibitedSelector,
-  lastSyncedStateSelector,
   projectURLSelector,
   storageTypeSelector,
-  tokensSelector,
   usedTokenSetSelector,
 } from '@/selectors';
 import { Tabs } from '@/constants/Tabs';
 import Stack from './Stack';
 import { TabButton } from './TabButton';
 import { NavbarUndoButton } from './NavbarUndoButton';
+import Minimize from '../assets/minimize.svg';
+import useMinimizeWindow from './useMinimizeWindow';
 
 const transformProviderName = (provider: StorageProviderType) => {
   switch (provider) {
@@ -38,18 +36,19 @@ const transformProviderName = (provider: StorageProviderType) => {
 export const Navbar: React.FC = () => {
   const projectURL = useSelector(projectURLSelector);
   const storageType = useSelector(storageTypeSelector);
-  const tokens = useSelector(tokensSelector);
-  const editProhibited = useSelector(editProhibitedSelector);
-  const lastSyncedState = useSelector(lastSyncedStateSelector);
   const usedTokenSet = useSelector(usedTokenSetSelector);
-  const dispatch = useDispatch<Dispatch>();
-  const { pullTokens, pushTokens } = useRemoteTokens();
+  const { handleResize } = useMinimizeWindow();
 
-  const checkForChanges = React.useCallback(() => {
-    const hasChanged = (lastSyncedState !== JSON.stringify(convertTokensToObject(tokens), null, 2));
-    dispatch.tokenState.updateCheckForChanges(String(hasChanged));
-    return hasChanged;
-  }, [lastSyncedState, tokens]);
+  const { pullTokens } = useRemoteTokens();
+
+  const StyledButton = styled('button', {
+    all: 'unset',
+    border: 'none',
+    padding: '$1',
+    marginRight: '$3',
+    borderRadius: '$button',
+    cursor: 'pointer',
+  });
 
   return (
     <Box
@@ -92,6 +91,11 @@ export const Navbar: React.FC = () => {
             </Tooltip>
           </>
         )}
+        <Tooltip label="Minimize plugin">
+          <StyledButton type="button" onClick={handleResize}>
+            <Minimize />
+          </StyledButton>
+        </Tooltip>
       </Stack>
     </Box>
   );
