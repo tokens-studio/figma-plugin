@@ -26,6 +26,7 @@ import { DragOverItem } from './DragOverItem';
 import { TokenButtonDraggable } from './TokenButtonDraggable';
 import type { ShowFormOptions } from '../TokenTree';
 import convertOffsetToFigma from '@/plugin/figmaTransforms/offset';
+import { resolveTokenValues } from '@/plugin/tokenHelpers';
 
 // @TODO fix typings
 
@@ -93,7 +94,7 @@ export const TokenButton: React.FC<Props> = ({
     duplicateSingleToken({ parent: activeTokenSet, name });
   }, [activeTokenSet, name, duplicateSingleToken]);
 
-  const setPluginValue = React.useCallback((value: SelectionValue) => {
+  const setPluginValue = React.useCallback((value: SelectionValue | SelectionValue[]) => {
     dispatch.uiState.startJob({ name: BackgroundJobs.UI_APPLYNODEVALUE });
     setNodeData(value, tokensContext.resolvedTokens);
     waitForMessage(MessageFromPluginTypes.REMOTE_COMPONENTS).then(() => {
@@ -116,6 +117,16 @@ export const TokenButton: React.FC<Props> = ({
       [propsToSet[0].name || propsToSet[0]]: propsToSet[0].forcedValue || value,
     };
     if (propsToSet[0].clear) propsToSet[0].clear.map((item) => Object.assign(newProps, { [item]: 'delete' }));
+    console.log("newprops", newProps)
+    if (type === 'composition' && value === 'delete') {
+      const compositionToken = tokensContext.resolvedTokens.find((token) => token.name === tokenValue);
+      let tokensInCompositionToken: Object = {};
+      compositionToken?.rawValue.map((token) => {
+        tokensInCompositionToken[token.property] = 'delete';
+      });
+      setPluginValue(tokensInCompositionToken);
+    }
+
     setPluginValue(newProps);
   }, [name, active, setPluginValue]);
 

@@ -191,7 +191,7 @@ export type CreateStylesToPluginMessage = {
 };
 export type SetNodeDataToPluginMessage = {
   type: MessageToPluginTypes.SET_NODE_DATA;
-  values: NodeTokenRefMap;
+  values: NodeTokenRefMap | NodeTokenRefMap[];
   tokens: AnyTokenList;
   settings: SettingsState;
 };

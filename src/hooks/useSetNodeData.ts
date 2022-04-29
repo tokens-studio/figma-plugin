@@ -10,7 +10,7 @@ import { RootState } from '@/app/store';
 export function useSetNodeData() {
   const store = useStore<RootState>();
 
-  const setNodeData = useCallback((data: SelectionValue, resolvedTokens: AnyTokenList) => {
+  const setNodeData = useCallback((data: SelectionValue | SelectionValue[], resolvedTokens: AnyTokenList) => {
     const settings = settingsStateSelector(store.getState());
     postToFigma({
       type: MessageToPluginTypes.SET_NODE_DATA,

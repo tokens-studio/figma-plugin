@@ -116,13 +116,19 @@ export default function CompositionTokenForm({
 }) {
 
   const propertiesMenu = React.useMemo(() => {
-    for (const property in Properties) {
-      properties.push({
-        value: property,
-        label: property,
-      });
-    }
-    return properties;
+    return Object.keys(Properties).map((key) => {
+      return {
+        value: Properties[key],
+        label: Properties[key],
+      }
+    })
+    // for (const property in Properties) {
+    //   properties.push({
+    //     value: property,
+    //     label: property,
+    //   });
+    // }
+    // return properties;
   }, [Properties]);
 
   const addToken = () => {

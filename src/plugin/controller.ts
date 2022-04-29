@@ -150,6 +150,7 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
         if (figma.currentPage.selection.length) {
           const tokensMap = tokenArrayGroupToMap(msg.tokens);
           const nodes = await defaultNodeManager.update(figma.currentPage.selection);
+          console.log('nodes', nodes, 'values', msg.values)
           await updatePluginData({ entries: nodes, values: msg.values });
           await sendPluginValues({
             nodes: figma.currentPage.selection,
@@ -174,7 +175,6 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
           nodesToRemove[id] = nodesToRemove[id] ? [...nodesToRemove[id], token.property] : [token.property];
         });
       });
-
       await Promise.all(
         Object.entries(nodesToRemove).map(async (node) => {
           const newEntries = node[1].reduce((acc, curr) => {
@@ -184,6 +184,7 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
 
           const nodeToUpdate = await defaultNodeManager.getNode(node[0]);
           if (nodeToUpdate) {
+            console.log("REMOVE_TOKENS_BY_VALUE")
             await updatePluginData({ entries: [nodeToUpdate], values: newEntries, shouldRemove: false });
           }
         }),
@@ -212,6 +213,8 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
         });
 
         await updateNodes(allWithData, tokensMap, msg.settings, msg.tokens);
+        console.log("create_tokens")
+
         await updatePluginData({ entries: allWithData, values: {} });
         notifyRemoteComponents({
           nodes: store.successfulNodes.size,
@@ -254,6 +257,7 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
           }
           return all;
         }, []);
+        console.log("remap_tokens")
         await updatePluginData({ entries: updatedNodes, values: {}, shouldOverride: true });
 
         await sendSelectionChange();

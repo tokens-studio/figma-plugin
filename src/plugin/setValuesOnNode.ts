@@ -56,6 +56,7 @@ export default async function setValuesOnNode(
 
       // OPACITY
       if ('opacity' in node && typeof values.opacity !== 'undefined') {
+        console.log("opacity", values, 'values.opa', values.opacity)
         node.opacity = transformValue(values.opacity, 'opacity');
       }
 
