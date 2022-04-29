@@ -133,25 +133,6 @@ export const tokenState = createModel<RootModel>()({
         },
       };
     },
-    duplicateTokenSet: (state, name: string): TokenState => {
-      if (!(name in state.tokens)) {
-        notifyToUI('Token set does not exist', { error: true });
-        return state;
-      }
-
-      const newName = name + '_Copy';
-      return {
-        ...state,
-        usedTokenSet: {
-          ...state.usedTokenSet,
-          [newName]: TokenSetStatus.DISABLED, // @README see comment (1)
-        },
-        tokens: {
-          ...state.tokens,
-          [newName]: [...state.tokens[name]],
-        },
-      }
-    },
     deleteTokenSet: (state, name: string) => {
       const oldTokens = { ...state.tokens };
       delete oldTokens[name];
@@ -426,9 +407,6 @@ export const tokenState = createModel<RootModel>()({
       dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
     },
     addTokenSet() {
-      dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
-    },
-    duplicateTokenSet() {
       dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
     },
     renameTokenSet() {
