@@ -122,7 +122,10 @@ export default function useManageTokens() {
     }
   }, [store, confirm, deleteTokenGroup, dispatch.uiState]);
 
+  const renameGroup = useCallback(async (path: string) => {
+
+  },[]);
   return useMemo(() => ({
-    editSingleToken, createSingleToken, deleteSingleToken, deleteGroup, duplicateSingleToken,
+    editSingleToken, createSingleToken, deleteSingleToken, deleteGroup, duplicateSingleToken,renameGroup
   }), [editSingleToken, createSingleToken, deleteSingleToken, deleteGroup, duplicateSingleToken]);
 }
