@@ -50,6 +50,7 @@ export type TokenSetItemProps<Item extends TreeItem | ListItem> = {
   canReorder?: boolean;
   onRename: (set: string) => void;
   onDelete: (set: string) => void;
+  onDuplicate: (set: string) => void;
   onTreatAsSource: (set: string) => void;
   onReorder?: () => void;
 };
@@ -69,6 +70,7 @@ export function TokenSetItem<Item extends TreeItem | ListItem = TreeItem | ListI
   onRename,
   onDelete,
   onTreatAsSource,
+  onDuplicate
 }: TokenSetItemProps<Item>) {
   const controls = useDragControls();
   const statusSelector = useCallback((state: RootState) => (
@@ -92,6 +94,9 @@ export function TokenSetItem<Item extends TreeItem | ListItem = TreeItem | ListI
     onDelete(item.path);
   }, [item.path, onDelete]);
 
+  const handleDuplicate = useCallback(() => {
+    onDuplicate(item.path);
+  }, [item.path, onDuplicate]);
   const handleTreatAsSource = useCallback(() => {
     onTreatAsSource(item.path);
   }, [item.path, onTreatAsSource]);
@@ -175,6 +180,7 @@ export function TokenSetItem<Item extends TreeItem | ListItem = TreeItem | ListI
             </ContextMenuTrigger>
             {canEdit ? (
               <ContextMenuContent>
+                <ContextMenuItem onSelect={handleDuplicate}>Duplicate</ContextMenuItem>
                 <ContextMenuItem onSelect={handleRename}>Rename</ContextMenuItem>
                 <ContextMenuItem disabled={!canDelete} onSelect={handleDelete}>
                   Delete
