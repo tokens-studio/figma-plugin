@@ -13,7 +13,9 @@ import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { TokenSetListOrTree } from './TokenSetListOrTree';
 import { tokenSetListToTree, TreeItem } from '@/utils/tokenset';
 
-export default function TokenSetTree({ tokenSets, onRename, onDelete }: { tokenSets: string[], onRename: (tokenSet: string) => void, onDelete: (tokenSet: string) => void }) {
+export default function TokenSetTree({
+  tokenSets, onRename, onDelete, onDuplicate,
+}: { tokenSets: string[], onRename: (tokenSet: string) => void, onDelete: (tokenSet: string) => void, onDuplicate: (tokenSet: string) => void }) {
   const activeTokenSet = useSelector(activeTokenSetSelector);
   const usedTokenSet = useSelector(usedTokenSetSelector);
   const editProhibited = useSelector(editProhibitedSelector);
@@ -99,10 +101,11 @@ export default function TokenSetTree({ tokenSets, onRename, onDelete }: { tokenS
         canDelete={item.canDelete}
         onRename={onRename}
         onDelete={onDelete}
+        onDuplicate={onDuplicate}
         onTreatAsSource={handleTreatAsSource}
       />
     </>
-  ), [editProhibited, onRename, onDelete, handleTreatAsSource, handleCheckedChange, handleClick]);
+  ), [editProhibited, onRename, onDelete, onDuplicate, handleTreatAsSource, handleCheckedChange, handleClick]);
 
   useEffect(() => {
     setItems(tokenSetListToTree(tokenSets));

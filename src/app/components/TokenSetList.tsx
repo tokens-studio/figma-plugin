@@ -24,6 +24,7 @@ type ExtendedTreeItem = TreeItem & {
   tokenSets: string[];
   onRename: (tokenSet: string) => void;
   onDelete: (tokenSet: string) => void;
+  onDuplicate: (tokenSet: string) => void;
 };
 type TreeRenderFunction = (props: React.PropsWithChildren<{
   item: ExtendedTreeItem
@@ -33,6 +34,7 @@ type Props = {
   onRename: (tokenSet: string) => void;
   onDelete: (tokenSet: string) => void;
   onReorder: (sets: string[]) => void;
+  onDuplicate: (tokenSet: string) => void;
 };
 
 function TokenSetListItem({ item, children }: Parameters<TreeRenderFunction>[0]) {
@@ -107,6 +109,7 @@ export function TokenSetListItemContent({ item }: Parameters<TreeRenderFunction>
       canDelete={!editProhibited || Object.keys(item.tokenSets).length > 1}
       onRename={item.onRename}
       onDelete={item.onDelete}
+      onDuplicate={item.onDuplicate}
       onDragStart={handleDragStart}
       onTreatAsSource={handleTreatAsSource}
     />
@@ -117,6 +120,7 @@ export default function TokenSetList({
   onRename,
   onDelete,
   onReorder,
+  onDuplicate,
 }: Props) {
   const [items, setItems] = React.useState(tokenSetListToList(tokenSets));
 
@@ -126,6 +130,7 @@ export default function TokenSetList({
       tokenSets,
       onRename,
       onDelete,
+      onDuplicate,
     } as unknown as ExtendedTreeItem))
   ), [items, tokenSets, onRename, onDelete]);
 

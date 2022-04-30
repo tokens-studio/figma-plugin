@@ -82,6 +82,16 @@ export default function TokenSetSelector() {
     setShowRenameTokenSetFields(true);
   }, []);
 
+  const handleDuplicateTokenSet = React.useCallback((tokenSet: string) => {
+    const newTokenSetName = `${tokenSet}_Copy`;
+    track('Duplicate token set', { name: newTokenSetName });
+    dispatch.tokenState.duplicateTokenSet(tokenSet);
+
+    handleNewTokenSetNameChange(newTokenSetName);
+    setTokenSetMarkedForChange(newTokenSetName);
+    setShowRenameTokenSetFields(true);
+  }, [dispatch]);
+
   const handleRenameTokenSetSubmit = React.useCallback((e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     dispatch.tokenState.renameTokenSet({ oldName: tokenSetMarkedForChange, newName: newTokenSetName.trim() });
@@ -132,6 +142,7 @@ export default function TokenSetSelector() {
             tokenSets={allTokenSets}
             onRename={handleRenameTokenSet}
             onDelete={handleDelete}
+            onDuplicate={handleDuplicateTokenSet}
           />
         </Box>
       ) : (
@@ -140,6 +151,7 @@ export default function TokenSetSelector() {
           tokenSets={allTokenSets}
           onRename={handleRenameTokenSet}
           onDelete={handleDeleteTokenSet}
+          onDuplicate={handleDuplicateTokenSet}
         />
       )}
       <Modal

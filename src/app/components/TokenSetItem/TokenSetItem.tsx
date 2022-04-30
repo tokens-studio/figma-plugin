@@ -36,6 +36,7 @@ export type TokenSetItemProps = {
   canReorder?: boolean;
   onRename: (set: string) => void;
   onDelete: (set: string) => void;
+  onDuplicate: (set: string) => void;
   onTreatAsSource: (set: string) => void;
   onDragStart?: (event: React.PointerEvent<HTMLDivElement>) => void;
 };
@@ -51,6 +52,7 @@ export function TokenSetItem({
   canReorder = false,
   onRename,
   onDelete,
+  onDuplicate,
   onTreatAsSource,
   onDragStart,
 }: TokenSetItemProps) {
@@ -70,6 +72,10 @@ export function TokenSetItem({
   const handleDelete = useCallback(() => {
     onDelete(item.path);
   }, [item.path, onDelete]);
+
+  const handleDuplicate = useCallback(() => {
+    onDuplicate(item.path);
+  }, [item.path, onDuplicate]);
 
   const handleTreatAsSource = useCallback(() => {
     onTreatAsSource(item.path);
@@ -135,6 +141,7 @@ export function TokenSetItem({
           {canEdit ? (
             <ContextMenuContent>
               <ContextMenuItem onSelect={handleRename}>Rename</ContextMenuItem>
+              <ContextMenuItem onSelect={handleDuplicate}>Duplicate</ContextMenuItem>
               <ContextMenuItem disabled={!canDelete} onSelect={handleDelete}>
                 Delete
               </ContextMenuItem>
