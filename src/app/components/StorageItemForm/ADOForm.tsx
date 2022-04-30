@@ -11,7 +11,15 @@ export default function ADOForm({
   return (
     <form onSubmit={handleSubmit}>
       <Stack direction="column" gap={4}>
-        <Input full label="Name" value={values.name} onChange={handleChange} type="text" name="name" required />
+        <Input
+          full
+          label="Project Name"
+          value={values.name}
+          onChange={handleChange}
+          type="text"
+          name="name"
+          required
+        />
         <Box css={{ position: 'relative' }}>
           <Input
             full
@@ -27,7 +35,7 @@ export default function ADOForm({
         </Box>
         <Input
           full
-          label="Repository (username/repo)"
+          label="Repository name"
           value={values.id}
           onChange={handleChange}
           type="text"
@@ -54,12 +62,13 @@ export default function ADOForm({
         />
         <Input
           full
-          label="baseUrl (optional)"
+          label="orgUrl"
           value={values.baseUrl}
-          placeholder="https://github.acme-inc.com/api/v3"
+          placeholder="https://dev.azure.com/yourOrgName"
           onChange={handleChange}
           type="text"
           name="baseUrl"
+          required
         />
         <Stack direction="row" gap={4}>
           <Button variant="secondary" size="large" onClick={handleCancel}>

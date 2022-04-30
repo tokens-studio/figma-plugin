@@ -36,7 +36,12 @@ function ConfirmDialog() {
       redirectHref = getGitlabCreatePullRequestUrl(owner, repo);
       break;
     case StorageProviderType.ADO:
-      redirectHref = getADOCreatePullRequestUrl(localApiState.id, branch);
+      redirectHref = getADOCreatePullRequestUrl({
+        branch,
+        projectName: localApiState.name,
+        orgUrl: localApiState.baseUrl,
+        repoName: localApiState.id,
+      });
       break;
     default:
       redirectHref = '';
