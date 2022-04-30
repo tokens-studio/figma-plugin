@@ -11,7 +11,7 @@ type Props = {
 };
 
 export const SingleTypographyValueDisplay: React.FC<Props> = ({ value, shouldResolve }) => (
-  <Box css={{ color: '$bgDefault' }}>
+  <Box css={{ color: '$fgToolTipMuted' }}>
     <div>
       Font:
       {' '}
@@ -54,7 +54,7 @@ export const SingleTypographyValueDisplay: React.FC<Props> = ({ value, shouldRes
     </div>
     {
         shouldResolve && (
-        <Box css={{ color: '$textSubtle' }}>
+        <Box css={{ color: '$fgToolTipMuted' }}>
           {value.fontFamily}
           {' '}
           {value.fontWeight}

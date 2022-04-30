@@ -66,8 +66,8 @@ export const TokenTooltipContentValue: React.FC<Props> = ({ token, shouldResolve
   }
 
   if (typeof valueToCheck !== 'string' && typeof valueToCheck !== 'number') {
-    return <Box css={{ color: '$bgDefault' }}>{JSON.stringify(valueToCheck, null, 2)}</Box>;
+    return <Box css={{ color: '$fgToolTipMuted' }}>{JSON.stringify(valueToCheck, null, 2)}</Box>;
   }
 
-  return <Box css={{ color: '$bgDefault' }}>{valueToCheck}</Box>;
+  return <Box css={{ color: '$fgToolTipMuted' }}>{valueToCheck}</Box>;
 };
