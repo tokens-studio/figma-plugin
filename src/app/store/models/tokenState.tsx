@@ -384,9 +384,7 @@ export const tokenState = createModel<RootModel>()({
       const _newTokensWithValue = selectedWithValueTokens.map((token) => {
         let newtokenValue = token.value.toString();
         const { value, ...rest} = token;
-        console.log('token',token);
         newtokenValue = newtokenValue.toString().replace(`${path}${oldName}`, `${path}${newName}`);
-        console.log('newtokenValue',newtokenValue);
         return{
           ...rest,
           value: newtokenValue,
