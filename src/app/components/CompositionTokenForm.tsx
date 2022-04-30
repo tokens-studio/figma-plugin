@@ -14,6 +14,7 @@ import {
   PropertySwitchMenuRadioItem
 } from './PropertySwitchMenu';
 import { Properties } from '@/constants/Properties';
+import { EditTokenObject } from '../store/models/uiState';
 
 function SingleStyleInput({
   index,
@@ -39,7 +40,7 @@ function SingleStyleInput({
       values.splice(index, 1, newToken);
       setValue(values);
     } else {
-      setValue([{ ...tokens, property: property }]);
+      setValue({ ...tokens, property: property });
     }
     setMenuOpened(false);
   }, [tokens]);
@@ -52,7 +53,7 @@ function SingleStyleInput({
       values.splice(index, 1, newToken);
       setValue(values);
     } else {
-      setValue([{ ...tokens, value: e.target.value }]);
+      setValue({ ...tokens, value: e.target.value });
     }
   };
 
@@ -117,10 +118,10 @@ const newToken: CompositionTokenSingleValue = {
 };
 
 export default function CompositionTokenForm({
-  value,
+  internalEditToken,
   setValue,
 }: {
-  value: CompositionTokenSingleValue | CompositionTokenSingleValue[];
+  internalEditToken: EditTokenObject;
   setValue: (style: CompositionTokenSingleValue | CompositionTokenSingleValue[]) => void;
 }) {
 
@@ -131,16 +132,16 @@ export default function CompositionTokenForm({
   }, [Properties]);
 
   const addToken = () => {
-    if (Array.isArray(value)) {
-      setValue([...value, newToken]);
+    if (Array.isArray(internalEditToken.value)) {
+      setValue([...internalEditToken.value, newToken]);
     } else {
-      setValue([value, newToken]);
+      setValue([internalEditToken.value, newToken]);
     }
   };
 
   const removeToken = (index) => {
-    if (Array.isArray(value)) {
-      setValue(value.filter((_, i) => i !== index));
+    if (Array.isArray(internalEditToken.value)) {
+      setValue(internalEditToken.value.filter((_, i) => i !== index));
     }
   };
 
@@ -156,12 +157,12 @@ export default function CompositionTokenForm({
         />
       </Box>
       <Box css={{ display: 'flex', flexDirection: 'column', gap: '$4' }}>
-        {Array.isArray(value) ? (
-          value.map((token, index) => (
+        {Array.isArray(internalEditToken.value) ? (
+          internalEditToken.value.map((token, index) => (
             <SingleStyleInput
               index={index}
               token={token}
-              tokens={value}
+              tokens={internalEditToken.value}
               key={`single-style-${index}`}
               properties={propertiesMenu}
               setValue={setValue}
@@ -170,8 +171,8 @@ export default function CompositionTokenForm({
           ))
         ) : (
           <SingleStyleInput
-            tokens={value}
-            token={value}
+            tokens={internalEditToken.value}
+            token={internalEditToken.value}
             index={0}
             properties={propertiesMenu}
             setValue={setValue}

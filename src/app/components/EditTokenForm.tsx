@@ -300,7 +300,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
       case 'composition': {
         return (
           <CompositionTokenForm
-            value={internalEditToken.value}
+            internalEditToken={internalEditToken}
             setValue={handleCompositionChange}
           />
         );

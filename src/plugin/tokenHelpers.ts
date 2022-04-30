@@ -44,13 +44,20 @@ export function resolveTokenValues(tokens: SingleToken[], previousCount: number 
         }, {});
       }
     }
-    else if (t.type === TokenTypes.COMPOSITION && Array.isArray(t.value)) {
-      returnValue = t.value.map((item) => {
-        return {
-          property: item.property,
-          value: getAliasValue(item.value, tokensInProgress)
+    else if (t.type === TokenTypes.COMPOSITION) {
+      if (Array.isArray(t.value)) {
+        returnValue = t.value.map((item) => {
+          return {
+            property: item.property,
+            value: getAliasValue(item.value, tokensInProgress)
+          }
+        });
+      } else {
+        returnValue = {
+          property: t.value.property,
+          value: getAliasValue(t.value.value, tokensInProgress)
         }
-      });
+      }
     }
     else {
       // If we're not dealing with special tokens, just return resolved value

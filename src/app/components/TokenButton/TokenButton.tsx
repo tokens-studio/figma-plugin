@@ -118,9 +118,13 @@ export const TokenButton: React.FC<Props> = ({
     if (type === 'composition' && value === 'delete') {
       const compositionToken = tokensContext.resolvedTokens.find((token) => token.name === tokenValue);
       let tokensInCompositionToken: Object = {};
-      compositionToken?.rawValue.map((token) => {
-        tokensInCompositionToken[token.property] = 'delete';
-      });
+      if (Array.isArray(compositionToken?.rawValue)) {
+        compositionToken?.rawValue.map((token) => {
+          tokensInCompositionToken[token.property] = 'delete';
+        });  
+      } else {
+        tokensInCompositionToken[compositionToken?.rawValue.property] = 'delete';
+      }
       setPluginValue(tokensInCompositionToken);
     }
     setPluginValue(newProps);
