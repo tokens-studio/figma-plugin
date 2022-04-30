@@ -351,21 +351,20 @@ export const tokenState = createModel<RootModel>()({
         const duplicatedName = token.name.replace(oldName, `${oldName}-copy`);
         const {name, ...rest} = token;
         return{
-          // ...state,
           ...rest,
           name: duplicatedName,
         }
       })
-      console.log(_duplicatedGroup);
       const newState = {
         ...state,
         tokens: {
           ...state.tokens,
-          ..._duplicatedGroup,
+          [parent]:[...state.tokens[parent], ..._duplicatedGroup],
         },
       };
       return newState;
     },
+
     updateAliases: (state, data: { oldName: string; newName: string }) => {
       const newTokens = Object.entries(state.tokens).reduce<TokenState['tokens']>(
         (acc, [key, values]) => {
