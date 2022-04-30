@@ -30,7 +30,6 @@ export default function TokenGroupHeading({ label, path, id }: Props) {
   }, [path, deleteGroup]);
 
   const handleDuplicate = React.useCallback(() => {
-
     const oldName = path.split('.').pop()?.toString();
     const newPath = path.slice(0, (path.length - oldName.length));
     duplicateGroup({newPath, oldName});
@@ -43,10 +42,9 @@ export default function TokenGroupHeading({ label, path, id }: Props) {
   }, []);
   const handleRenameTokenGroupSubmit = React.useCallback((e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setShowRenameTokenGroupField(false);
-
-    const oldName = path.split('.').pop()?.toString();
+    const oldName: string = path.split('.').pop()?.toString();
     const newPath = path.slice(0,(path.length-oldName.length));
+    setShowRenameTokenGroupField(false);
     if(!isDuplicated){
       renameGroup( { path: newPath, oldName: oldName, newName: newTokenGroupName} );
     }
@@ -54,13 +52,11 @@ export default function TokenGroupHeading({ label, path, id }: Props) {
       renameGroup( { path: newPath, oldName: `${oldName}-copy`, newName: newTokenGroupName} );
     }
     setIsDuplicated(false);
-    setTokenGroupMarkedForChange('');
-    setShowRenameTokenGroupField(false);
-    // setIsDuplicated(false);
   }, [newTokenGroupName, tokenGroupMarkedForChange, isDuplicated]);
 
   const handleRenameTokenGroup = React.useCallback(() => {
     setShowRenameTokenGroupField(true);
+    setTokenGroupMarkedForChange(path.split('.').pop());
   }, []);
   return (
     <Box

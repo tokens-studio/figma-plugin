@@ -346,6 +346,7 @@ export const tokenState = createModel<RootModel>()({
 
     duplicateTokenGroup: (state, data: DuplicateTokenGroupPayload) => {
       const {parent, path, oldName} = data;
+
       const selectedGroup = state.tokens[parent].filter((token) => token.name.startsWith(`${path}${oldName}.`));
       const _duplicatedGroup = selectedGroup.map((token) => {
         const duplicatedName = token.name.replace(`${path}${oldName}`, `${path}${oldName}-copy`);
@@ -366,11 +367,11 @@ export const tokenState = createModel<RootModel>()({
     },
     renameTokenGroup: (state, data: RenameTokenGroupPayloads) => {
       const { parent, path, oldName, newName } = data;
-      const existingTokens = state.tokens[parent].filter((token) => token.name.startsWith(`${path}${oldName}.`));
+      const selectedWithNameTokens = state.tokens[parent].filter((token) => token.name.startsWith(`${path}${oldName}.`));
       const remainingTokens = state.tokens[parent].filter((token) => !(token.name.startsWith(`${path}${oldName}.`)));
 
-      const existingTokensValue = state.tokens[parent].filter((token) => token.value.toString().startsWith(`{${path}${oldName}.`));
-      const _newTokenswithName = existingTokens.map((token) => {
+      const selectedWithValueTokens = state.tokens[parent].filter((token) => token.value.toString().startsWith(`{${path}${oldName}.`));
+      const _newTokensWithName = selectedWithNameTokens.map((token) => {
         const tokenName = token.name;
         const { name, ...rest } = token;
         const newtokenName = tokenName.replace(`${path}${oldName}`, `${path}${newName}`);
@@ -379,20 +380,24 @@ export const tokenState = createModel<RootModel>()({
           name: newtokenName,
         };
       });
-      const _newTokenswithValue = existingTokensValue.map((token) => {
+
+      const _newTokensWithValue = selectedWithValueTokens.map((token) => {
         let newtokenValue = token.value.toString();
         const { value, ...rest} = token;
+        console.log('token',token);
         newtokenValue = newtokenValue.toString().replace(`${path}${oldName}`, `${path}${newName}`);
+        console.log('newtokenValue',newtokenValue);
         return{
           ...rest,
           value: newtokenValue,
         };
       });
+
       const newState = {
         ...state,
         tokens:{
           ...state.tokens,
-          [parent]: [ ..._newTokenswithName, ..._newTokenswithValue, ...remainingTokens],
+          [parent]: [ ..._newTokensWithName, ..._newTokensWithValue, ...remainingTokens],
         }
       };
       return newState;
