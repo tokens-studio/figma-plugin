@@ -16,8 +16,8 @@ import { getAllFigmaStyleMaps } from '@/utils/getAllFigmaStyleMaps';
 import { ProgressTracker } from './ProgressTracker';
 import { AnyTokenList, AnyTokenSet, TokenStore } from '@/types/tokens';
 import { isSingleToken } from '@/utils/is';
-import { TokenTypes } from '@/constants/TokenTypes';
 import { ThemeObjectsList } from '@/types';
+import { TokenTypes } from '@/constants/TokenTypes';
 import { attemptOrFallback } from '@/utils/attemptOrFallback';
 
 // @TODO fix typings
