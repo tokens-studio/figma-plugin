@@ -78,7 +78,7 @@ function SingleStyleInput({
           <PropertySwitchMenuMainTrigger>
             <span>{token.property}</span>
           </PropertySwitchMenuMainTrigger>
-          <PropertySwitchMenuContent side="top" sideOffset={2}>
+          <PropertySwitchMenuContent sideOffset={2}>
             <PropertySwitchMenuRadioGroup value={token.property}>
               {properties.length > 0
                 && properties.map((property, index) => (

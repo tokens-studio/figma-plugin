@@ -16,8 +16,8 @@ const itemStyles = {
 };
 
 const StyledPropertySwitchMenuContent = styled(PropertySwitchMenuPrimitive.Content, {
-  minWidth: 180,
-  maxHeight: '250px',
+  minWidth: '180px',
+  maxHeight: 'calc(50vh - 50px)',
   overflow: 'auto',
   backgroundColor: '$bgSubtle',
   color: '$contextMenuBackground',
