@@ -95,7 +95,7 @@ export const TokenButtonDraggable: React.FC<Props> = ({
       });
       if (draggedTokenIndex !== null && dropTokenIndex !== null) {
         const insertTokensIndex = draggedTokenIndex > dropTokenIndex ? dropTokenIndex : dropTokenIndex - 1;
-        const set = tokens[activeTokenSet];
+        const set = [...tokens[activeTokenSet]];
         set.splice(insertTokensIndex, 0, set.splice(draggedTokenIndex, 1)[0]);
         const newTokens = {
           ...tokens,
