@@ -119,7 +119,7 @@ const TokenListing: React.FC<Props> = ({
           )}
 
           <IconButton
-            data-cy="button-add-new-token"
+            dataCy="button-add-new-token"
             disabled={editProhibited}
             icon={<AddIcon />}
             tooltip="Add a new token"
