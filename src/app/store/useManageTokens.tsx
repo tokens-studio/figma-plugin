@@ -122,22 +122,24 @@ export default function useManageTokens() {
     }
   }, [store, confirm, deleteTokenGroup, dispatch.uiState]);
 
-  const duplicateGroup = useCallback(async (data: {path: string, oldName: string}) => {
-    const {path, oldName} = data;
+  const duplicateGroup = useCallback(async (data: {newPath: string, oldName: string}) => {
+    const {newPath, oldName} = data;
     dispatch.uiState.startJob({
-      name: BackgroundJobs.UI_DUPLICATETGROUP,
+      name: BackgroundJobs.UI_DUPLICATTOKENGROUP,
       isInfinite: true,
     });
     const activeTokenSet = activeTokenSetSelector(store.getState());
-    duplicateTokenGroup({ parent: activeTokenSet, path, oldName });
+    duplicateTokenGroup({ parent: activeTokenSet, path: newPath, oldName });
   },[store, duplicateTokenGroup, dispatch.uiState]);
+
   const renameGroup = useCallback(async (data: {path: string, oldName: string, newName: string}) => {
       const activeTokenSet = activeTokenSetSelector(store.getState());
+      const {path, oldName, newName} = data;
       dispatch.uiState.startJob({
           name: BackgroundJobs.UI_RENAMETOKENGROUP,
           isInfinite: true,
         });
-      renameTokenGroup({ parent: activeTokenSet, path: data.path, oldName: data.oldName, newName: data.newName});
+      renameTokenGroup({ parent: activeTokenSet, path: path, oldName: oldName, newName: newName});
       dispatch.uiState.completeJob(BackgroundJobs.UI_RENAMETOKENGROUP);
     },[store, renameTokenGroup, dispatch.uiState]);
   return useMemo(() => ({

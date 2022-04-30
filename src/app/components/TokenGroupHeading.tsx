@@ -23,15 +23,20 @@ export default function TokenGroupHeading({ label, path, id }: Props) {
   const [showRenameTokenGroupField, setShowRenameTokenGroupField] = React.useState(false);
   const [tokenGroupMarkedForChange, setTokenGroupMarkedForChange] = React.useState('');
   const [newTokenGroupName, handleNewTokenGroupNameChange] = React.useState('');
+  const [isDuplicated , setIsDuplicated] = React.useState(false);
 
   const handleDelete = React.useCallback(() => {
     deleteGroup(path);
   }, [path, deleteGroup]);
 
   const handleDuplicate = React.useCallback(() => {
-    const oldName = path.split('.').pop();
-    duplicateGroup({path, oldName});
-  }, [path, duplicateGroup]);
+
+    const oldName = path.split('.').pop()?.toString();
+    const newPath = path.slice(0, (path.length - oldName.length));
+    duplicateGroup({newPath, oldName});
+    setIsDuplicated(true);
+    setShowRenameTokenGroupField(true);
+  }, [path, duplicateGroup, setShowRenameTokenGroupField, isDuplicated]);
   
 
   React.useEffect(() => {
@@ -39,12 +44,20 @@ export default function TokenGroupHeading({ label, path, id }: Props) {
   const handleRenameTokenGroupSubmit = React.useCallback((e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setShowRenameTokenGroupField(false);
-    const oldName = path.split('.').pop()?.toString();
-    renameGroup( { path: path, oldName: oldName, newName: newTokenGroupName} );
 
+    const oldName = path.split('.').pop()?.toString();
+    const newPath = path.slice(0,(path.length-oldName.length));
+    if(!isDuplicated){
+      renameGroup( { path: newPath, oldName: oldName, newName: newTokenGroupName} );
+    }
+    else{
+      renameGroup( { path: newPath, oldName: `${oldName}-copy`, newName: newTokenGroupName} );
+    }
+    setIsDuplicated(false);
     setTokenGroupMarkedForChange('');
     setShowRenameTokenGroupField(false);
-  }, [newTokenGroupName, tokenGroupMarkedForChange]);
+    // setIsDuplicated(false);
+  }, [newTokenGroupName, tokenGroupMarkedForChange, isDuplicated]);
 
   const handleRenameTokenGroup = React.useCallback(() => {
     setShowRenameTokenGroupField(true);

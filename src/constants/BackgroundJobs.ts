@@ -11,5 +11,6 @@ export enum BackgroundJobs {
   UI_DELETETOKEN = 'ui_deletetoken',
   UI_DELETETOKENGROUP = 'ui_deletetokengroup',
   UI_RENAMETOKENGROUP = 'ui_renametokengroup',
+  UI_DUPLICATTOKENGROUP = 'ui_duplicatetokengroup',
   UI_REDOING = 'ui_redoing',
 }

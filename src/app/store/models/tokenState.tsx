@@ -346,9 +346,9 @@ export const tokenState = createModel<RootModel>()({
 
     duplicateTokenGroup: (state, data: DuplicateTokenGroupPayload) => {
       const {parent, path, oldName} = data;
-      const selectedGroup = state.tokens[parent].filter((token) => token.name.includes(`${oldName}.`));
+      const selectedGroup = state.tokens[parent].filter((token) => token.name.startsWith(`${path}${oldName}.`));
       const _duplicatedGroup = selectedGroup.map((token) => {
-        const duplicatedName = token.name.replace(oldName, `${oldName}-copy`);
+        const duplicatedName = token.name.replace(`${path}${oldName}`, `${path}${oldName}-copy`);
         const {name, ...rest} = token;
         return{
           ...rest,
@@ -364,26 +364,25 @@ export const tokenState = createModel<RootModel>()({
       };
       return newState;
     },
-
-    renameTokenGroup: (state, data: RenameTokenGroupPayloads) =>
-    {
+    renameTokenGroup: (state, data: RenameTokenGroupPayloads) => {
       const { parent, path, oldName, newName } = data;
-      const existingTokens = state.tokens[parent].filter((token) => token.name.includes(`${oldName}.`));
-      const existingTokensValue = state.tokens[parent].filter((token) => token.value.toString().includes(`${oldName}.`));
-      const _newTokenswithName = existingTokens.map((token) => {
-      let tokenName = token.name;
-      const { name, ...rest } = token;
-      const newtokenName = tokenName.replace(oldName, newName);
-      return {
-        ...rest,
-        name: newtokenName,
-      };
-      });
+      const existingTokens = state.tokens[parent].filter((token) => token.name.startsWith(`${path}${oldName}.`));
+      const remainingTokens = state.tokens[parent].filter((token) => !(token.name.startsWith(`${path}${oldName}.`)));
 
+      const existingTokensValue = state.tokens[parent].filter((token) => token.value.toString().startsWith(`{${path}${oldName}.`));
+      const _newTokenswithName = existingTokens.map((token) => {
+        const tokenName = token.name;
+        const { name, ...rest } = token;
+        const newtokenName = tokenName.replace(`${path}${oldName}`, `${path}${newName}`);
+        return {
+          ...rest,
+          name: newtokenName,
+        };
+      });
       const _newTokenswithValue = existingTokensValue.map((token) => {
         let newtokenValue = token.value.toString();
         const { value, ...rest} = token;
-        newtokenValue = newtokenValue.toString().replace(oldName, newName);
+        newtokenValue = newtokenValue.toString().replace(`${path}${oldName}`, `${path}${newName}`);
         return{
           ...rest,
           value: newtokenValue,
@@ -393,7 +392,7 @@ export const tokenState = createModel<RootModel>()({
         ...state,
         tokens:{
           ...state.tokens,
-          [parent]: [..._newTokenswithName, ..._newTokenswithValue] ,
+          [parent]: [ ..._newTokenswithName, ..._newTokenswithValue, ...remainingTokens],
         }
       };
       return newState;
