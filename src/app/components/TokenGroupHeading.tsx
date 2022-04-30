@@ -25,6 +25,9 @@ export default function TokenGroupHeading({ label, path, id }: Props) {
   const [newTokenGroupName, handleNewTokenGroupNameChange] = React.useState('');
   const [isDuplicated , setIsDuplicated] = React.useState(false);
 
+  React.useEffect(() => {
+  }, []);
+
   const handleDelete = React.useCallback(() => {
     deleteGroup(path);
   }, [path, deleteGroup]);
@@ -35,11 +38,8 @@ export default function TokenGroupHeading({ label, path, id }: Props) {
     duplicateGroup({newPath, oldName});
     setIsDuplicated(true);
     setShowRenameTokenGroupField(true);
-  }, [path, duplicateGroup, setShowRenameTokenGroupField, isDuplicated]);
-  
+  }, [path, duplicateGroup, setShowRenameTokenGroupField, isDuplicated]);  
 
-  React.useEffect(() => {
-  }, []);
   const handleRenameTokenGroupSubmit = React.useCallback((e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const oldName: string = path.split('.').pop()?.toString();
