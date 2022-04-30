@@ -46,7 +46,7 @@ function SingleStyleInput({
   }, [tokens]);
 
 
-  const onAliasChange = (e) => {
+  const onAliasChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     if (Array.isArray(tokens)) {
       let values = tokens;
       const newToken = { ...tokens[index], value: e.target.value };
@@ -55,7 +55,7 @@ function SingleStyleInput({
     } else {
       setValue({ ...tokens, value: e.target.value });
     }
-  };
+  }, [tokens]);
 
   return (
     <Box>
@@ -131,19 +131,19 @@ export default function CompositionTokenForm({
     });
   }, [Properties]);
 
-  const addToken = () => {
+  const addToken = useCallback(() => {
     if (Array.isArray(internalEditToken.value)) {
       setValue([...internalEditToken.value, newToken]);
     } else {
       setValue([internalEditToken.value, newToken]);
     }
-  };
+  }, [internalEditToken]);
 
-  const removeToken = (index) => {
+  const removeToken = useCallback((index) => {
     if (Array.isArray(internalEditToken.value)) {
       setValue(internalEditToken.value.filter((_, i) => i !== index));
     }
-  };
+  },[internalEditToken]);
 
   return (
     <div>
