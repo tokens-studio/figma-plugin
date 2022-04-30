@@ -6,7 +6,7 @@ import useConfirm from '../hooks/useConfirm';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
 import { activeTokenSetSelector } from '@/selectors';
 import { TokenTypes } from '@/constants/TokenTypes';
-import { DeleteTokenPayload, UpdateTokenPayload } from '@/types/payloads';
+import { DeleteTokenPayload, UpdateTokenPayload  } from '@/types/payloads';
 
 type EditSingleTokenData = {
   parent: string;
@@ -31,7 +31,7 @@ export default function useManageTokens() {
   const dispatch = useDispatch<Dispatch>();
   const { confirm } = useConfirm();
   const {
-    editToken, createToken, deleteToken, duplicateToken, deleteTokenGroup, duplicateTokenGroup
+    editToken, createToken, deleteToken, duplicateToken, deleteTokenGroup, duplicateTokenGroup, renameTokenGroup
   } = dispatch.tokenState;
 
   const editSingleToken = useCallback(async (data: EditSingleTokenData) => {
@@ -131,8 +131,15 @@ export default function useManageTokens() {
     const activeTokenSet = activeTokenSetSelector(store.getState());
     duplicateTokenGroup({ parent: activeTokenSet, path, oldName });
   },[store, duplicateTokenGroup, dispatch.uiState]);
-
+  const renameGroup = useCallback(async (data: {path: string, oldName: string, newName: string}) => {
+      const activeTokenSet = activeTokenSetSelector(store.getState());
+      dispatch.uiState.startJob({
+          name: BackgroundJobs.UI_RENAMETOKENGROUP,
+          isInfinite: true,
+        });
+      renameTokenGroup({ parent: activeTokenSet, path: data.path, oldName: data.oldName, newName: data.newName});
+      dispatch.uiState.completeJob(BackgroundJobs.UI_RENAMETOKENGROUP);
+    },[store, renameTokenGroup, dispatch.uiState]);
   return useMemo(() => ({
-    editSingleToken, createSingleToken, deleteSingleToken, deleteGroup, duplicateSingleToken, duplicateGroup,
-  }), [editSingleToken, createSingleToken, deleteSingleToken, deleteGroup, duplicateSingleToken]);
-}
+    editSingleToken, createSingleToken, deleteSingleToken, deleteGroup, duplicateSingleToken, duplicateGroup, renameGroup
+  }), [editSingleToken, createSingleToken, deleteSingleToken, deleteGroup, duplicateSingleToken, duplicateGroup, renameGroup]);}

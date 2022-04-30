@@ -6,6 +6,7 @@ import Tooltip from './Tooltip';
 import useRemoteTokens from '../store/remoteTokens';
 import { StorageProviderType } from '../../types/api';
 import Box from './Box';
+import { styled } from '@/stitches.config';
 import {
   editProhibitedSelector,
   lastSyncedStateSelector,
@@ -18,6 +19,8 @@ import { Tabs } from '@/constants/Tabs';
 import Stack from './Stack';
 import { TabButton } from './TabButton';
 import { NavbarUndoButton } from './NavbarUndoButton';
+import Minimize from '../assets/minimize.svg';
+import useMinimizeWindow from './useMinimizeWindow';
 
 const transformProviderName = (provider: StorageProviderType) => {
   switch (provider) {
@@ -41,7 +44,18 @@ export const Navbar: React.FC = () => {
   const editProhibited = useSelector(editProhibitedSelector);
   const lastSyncedState = useSelector(lastSyncedStateSelector);
   const usedTokenSet = useSelector(usedTokenSetSelector);
+  const { handleResize } = useMinimizeWindow();
+
   const { pullTokens, pushTokens } = useRemoteTokens();
+
+  const StyledButton = styled('button', {
+    all: 'unset',
+    border: 'none',
+    padding: '$1',
+    marginRight: '$3',
+    borderRadius: '$button',
+    cursor: 'pointer',
+  });
 
   const checkForChanges = React.useCallback(() => {
     if (lastSyncedState !== JSON.stringify(convertTokensToObject(tokens), null, 2)) {
@@ -91,6 +105,11 @@ export const Navbar: React.FC = () => {
             </Tooltip>
           </>
         )}
+        <Tooltip label="Minimize plugin">
+          <StyledButton type="button" onClick={handleResize}>
+            <Minimize />
+          </StyledButton>
+        </Tooltip>
       </Stack>
     </Box>
   );

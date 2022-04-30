@@ -69,6 +69,7 @@ export type UiSettingsFromPluginMessage = {
     uiWindow: {
       width: number;
       height: number;
+      isMinimized: boolean;
     };
     updateMode: UpdateMode;
     updateRemote: boolean;

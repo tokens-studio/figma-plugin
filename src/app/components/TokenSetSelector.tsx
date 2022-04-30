@@ -79,7 +79,9 @@ export default function TokenSetSelector() {
   const handleRenameTokenSet = React.useCallback((tokenSet: string) => {
     track('Renamed token set');
     handleNewTokenSetNameChange(tokenSet);
+    console.log('tokenSet', tokenSet);
     setTokenSetMarkedForChange(tokenSet);
+    console.log('tokenSetMarkedForChange', tokenSetMarkedForChange);
     setShowRenameTokenSetFields(true);
   }, []);
 

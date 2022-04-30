@@ -9,6 +9,7 @@ import { RootModel } from '@/types/RootModel';
 type WindowSettingsType = {
   width: number;
   height: number;
+  isMinimized: boolean;
 };
 
 type TokenModeType = 'object' | 'array';
@@ -36,6 +37,7 @@ export const settings = createModel<RootModel>()({
     uiWindow: {
       width: 400,
       height: 600,
+      isMinimized: false,
     },
     updateMode: UpdateMode.PAGE,
     updateRemote: true,
@@ -57,8 +59,20 @@ export const settings = createModel<RootModel>()({
       return {
         ...state,
         uiWindow: {
+          ...state.uiWindow,
           width: payload.width,
           height: payload.height,
+        },
+      };
+    },
+    setMinimizePluginWindow(state, payload: { isMinimized: boolean; width: number; height: number }) {
+      track('Minimized plugin');
+      return {
+        ...state,
+        uiWindow: {
+          width: payload.width,
+          height: payload.height,
+          isMinimized: payload.isMinimized,
         },
       };
     },
@@ -118,6 +132,13 @@ export const settings = createModel<RootModel>()({
         type: MessageToPluginTypes.RESIZE_WINDOW,
         width: payload.width,
         height: payload.height,
+      });
+    },
+    setMinimizePluginWindow: (payload, rootState) => {
+      postToFigma({
+        type: MessageToPluginTypes.RESIZE_WINDOW,
+        width: payload.isMinimized ? 50 : payload.width,
+        height: payload.isMinimized ? 50 : payload.height,
       });
     },
     setUpdateStyles: (payload, rootState) => {
