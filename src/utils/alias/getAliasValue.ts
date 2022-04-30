@@ -65,7 +65,7 @@ export function getAliasValue(token: SingleToken | string | number, tokens: Sing
       tokenReferences.forEach((reference, index) => {
         const resolvedReference = resolvedReferences[index];
         const stringValue = String(resolvedReference);
-        const resolved = checkAndEvaluateMath(stringValue);
+        let resolved = checkAndEvaluateMath(stringValue);
         returnedValue = returnedValue ? returnedValue.replace(reference, String(resolved)) : returnedValue;
       });
 

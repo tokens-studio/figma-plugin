@@ -36,4 +36,5 @@ export * from './collapsedSelector';
 export * from './uiDisabledSelector';
 export * from './branchSelector';
 export * from './rootStateSelector';
+export * from './windowSizeSelector';
 export * from './tokenSetStatusSelector';
