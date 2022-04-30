@@ -14,7 +14,7 @@ module.exports = {
           600: 'var(--figma-color-text-secondary, #9e9e9e)',
           700: 'var(--figma-color-text-secondary, #9e9e9e)',
         },
-        modal: 'var(--figma-color-bg-menu, #f5f5f5)',
+        modal: 'var(--figma-color-bg, #fff)',
         input: 'var(--figma-color-bg-secondary, #f5f5f5)',
         brand: 'var(--figma-color-bg-brand, #0070f3)',
         'icon-brand': 'var(--figma-color-icon-brand, #0070f3)',

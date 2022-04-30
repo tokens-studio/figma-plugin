@@ -80,10 +80,10 @@ const Navbar: React.FC = () => {
                 </a>
               </Tooltip>
             )}
-            <IconButton tooltip={`Pull from ${transformProviderName(storageType.provider)}`} onClick={handlePullTokens} icon={RefreshIcon} />
+            <IconButton tooltip={`Pull from ${transformProviderName(storageType.provider)}`} onClick={handlePullTokens} icon={<RefreshIcon />} />
           </>
         )}
-        <IconButton tooltip="Minimize plugin" onClick={handleResize} icon={Minimize} />
+        <IconButton tooltip="Minimize plugin" onClick={handleResize} icon={<Minimize />} />
       </Stack>
     </Box>
   );

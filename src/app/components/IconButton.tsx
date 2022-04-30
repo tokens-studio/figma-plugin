@@ -64,7 +64,7 @@ export default function IconButton({
   }, [onClick]);
 
   return (
-    <Box css={css}>
+    <Box css={{ position: 'relative', ...css }}>
       <Tooltip side={tooltipSide} label={tooltip ?? ''}>
         <StyledButton disabled={disabled} data-cy={dataCy} type="button" onClick={handleClick} buttonVariant={variant}>
           <Box css={{ transition: 'transform 200ms ease-in-out', transform: 'var(--transform)' }}>{icon}</Box>
@@ -74,10 +74,10 @@ export default function IconButton({
                 position: 'absolute',
                 top: 0,
                 right: 0,
-                width: '$2',
-                height: '$2',
+                width: '$3',
+                height: '$3',
                 borderRadius: '100px',
-                backgroundColor: '$bgAccent',
+                backgroundColor: '$interaction',
               }}
             />
           )}

@@ -11,7 +11,7 @@ const PluginResizerWrapper: React.FC<Props> = ({ children }) => {
   const { isPluginminimized, handleResize } = useMinimizeWindow();
 
   return isPluginminimized ? (
-    <IconButton tooltip="Maximize plugin" onClick={handleResize} icon={Maximize} />
+    <IconButton tooltip="Maximize plugin" onClick={handleResize} icon={<Maximize />} />
   ) : (
     children
   );

@@ -54,8 +54,8 @@ function ImportToken({
         )}
       </Stack>
       <Stack direction="row" align="center" gap={1}>
-        <IconButton tooltip={updateAction} icon={AddIcon} onClick={updateToken} />
-        <IconButton tooltip="Ignore" icon={TrashIcon} onClick={removeToken} />
+        <IconButton tooltip={updateAction} icon={<AddIcon />} onClick={updateToken} />
+        <IconButton tooltip="Ignore" icon={<TrashIcon />} onClick={removeToken} />
       </Stack>
     </Stack>
   );

@@ -115,13 +115,13 @@ const TokenListing: React.FC<Props> = ({
         </button>
         <div className="absolute right-0 flex mr-2">
           {showDisplayToggle && (
-            <IconButton icon={displayType === 'GRID' ? ListIcon : GridIcon} tooltip={displayType === 'GRID' ? 'Show as List' : 'Show as Grid'} onClick={handleToggleDisplayType} />
+            <IconButton icon={displayType === 'GRID' ? <ListIcon /> : <GridIcon />} tooltip={displayType === 'GRID' ? 'Show as List' : 'Show as Grid'} onClick={handleToggleDisplayType} />
           )}
 
           <IconButton
             data-cy="button-add-new-token"
             disabled={editProhibited}
-            icon={AddIcon}
+            icon={<AddIcon />}
             tooltip="Add a new token"
             onClick={handleShowNewForm}
           />

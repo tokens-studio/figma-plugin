@@ -61,7 +61,7 @@ const TokenTree: React.FC<Props> = ({
                 <TokenGroupHeading label={name} path={stringPath} id="listing" />
                 <div className="opacity-0 group-hover:opacity-100 focus:opacity-100">
                   <IconButton
-                    icon={AddIcon}
+                    icon={<AddIcon />}
                     tooltip="Add a new token"
                     tooltipSide="left"
                     onClick={handleShowNewForm}
