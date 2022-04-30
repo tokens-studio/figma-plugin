@@ -22,39 +22,39 @@ describe('deepLinkingAlias', () => {
       name: 'font-weight.bold',
       input: '$typography.tokensize.fontWeight',
       value: 'bold',
-    }
-  ]
+    },
+  ];
 
   const allTokens = [
     {
       name: 'typography.tokensize',
       rawValue: {
         fontSize: '$16',
-        fontWeight: 'bold'
+        fontWeight: 'bold',
       },
-      value: '4px'
+      value: '4px',
     },
     {
       name: 'typography.pixelsize',
       rawValue: {
         fontSize: '5px',
-        fontWeight: 'bold'
+        fontWeight: 'bold',
       },
-      value: '5px'
+      value: '5px',
     },
     {
       name: 'typography.numbersize',
       rawValue: {
         fontSize: 10,
-        fontWeight: 'bold'
+        fontWeight: 'bold',
       },
-      value: 10
+      value: 10,
     },
     {
       name: '16',
-      value: '16px'
-    }
-  ]
+      value: '16px',
+    },
+  ];
 
   inputTokens.forEach((token) => {
     it(`alias ${token.name}`, () => {

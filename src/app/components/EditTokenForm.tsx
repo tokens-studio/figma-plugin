@@ -26,6 +26,21 @@ type Props = {
   resolvedTokens: ResolveTokenValuesResult[];
 };
 
+const StyledIconDisclosure = styled(IconDisclosure, {
+  width: '16px',
+  height: '16px',
+  transition: 'transform 0.2s ease-in-out',
+});
+
+const StyledInputSuffix = styled('button', {
+  width: '28px',
+  height: '28px',
+  backgroundColor: '#f0f0f0',
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+});
+
 // @TODO this needs to be reviewed from a typings perspective + performance
 function EditTokenForm({ resolvedTokens }: Props) {
   const firstInput = React.useRef<HTMLInputElement | null>(null);
@@ -91,10 +106,10 @@ function EditTokenForm({ resolvedTokens }: Props) {
     (shadow: SingleBoxShadowToken['value']) => {
       setError(null);
       if (internalEditToken?.type === TokenTypes.BOX_SHADOW) {
-        setInternalEditToken({ 
-        ...internalEditToken, 
-        value: shadow,
-      });
+        setInternalEditToken({
+          ...internalEditToken,
+          value: shadow,
+        });
       }
     },
     [internalEditToken],
@@ -155,6 +170,12 @@ function EditTokenForm({ resolvedTokens }: Props) {
     [internalEditToken],
   );
 
+  const handleDownShiftInputChange = React.useCallback((newInputValue: string) => {
+    setInternalEditToken({
+      ...internalEditToken,
+      value: newInputValue,
+    });
+  }, [internalEditToken]);
 
   const handleOptionsChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>(
     (e) => {
@@ -248,21 +269,6 @@ function EditTokenForm({ resolvedTokens }: Props) {
     }, 50);
   }, []);
 
-  const StyledIconDisclosure = styled(IconDisclosure, {
-    width: '16px',
-    height: '16px',
-    transition: 'transform 0.2s ease-in-out',
-  });
-
-  const StyledInputSuffix = styled('button', {
-    width: '28px',
-    height: '28px',
-    backgroundColor: '#f0f0f0',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-  });
-
   const resolvedValue = React.useMemo(() => {
     if (internalEditToken) {
       return typeof internalEditToken?.value === 'object'
@@ -280,10 +286,10 @@ function EditTokenForm({ resolvedTokens }: Props) {
       case 'boxShadow': {
         return (
           <BoxShadowInput
-          handleBoxShadowChange={handleBoxShadowChange}
-          handleBoxShadowChangeByAlias={handleBoxShadowChangeByAlias}
-          resolvedTokens={resolvedTokens}
-          internalEditToken={internalEditToken}
+            handleBoxShadowChange={handleBoxShadowChange}
+            handleBoxShadowChangeByAlias={handleBoxShadowChangeByAlias}
+            resolvedTokens={resolvedTokens}
+            internalEditToken={internalEditToken}
           />
         );
       }
@@ -316,7 +322,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
               resolvedTokens={resolvedTokens}
               handleChange={handleChange}
               setShowAutoSuggest={setShowAutoSuggest}
-              setInputValue={(newInputValue: string) => setInternalEditToken({ ...internalEditToken, value: newInputValue })}
+              setInputValue={handleDownShiftInputChange}
               placeholder={
                 internalEditToken.type === 'color' ? '#000000, hsla(), rgba() or {alias}' : 'Value or {alias}'
               }

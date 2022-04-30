@@ -1,4 +1,5 @@
 import React from 'react';
+import { useUIDSeed } from 'react-uid';
 import Box from './Box';
 import { styled } from '@/stitches.config';
 import { TokenBoxshadowValue } from '@/types/values';
@@ -17,20 +18,19 @@ const StyledValueItem = styled('div', {
 });
 
 export const ResolvedShadowValueDisplay: React.FC<Props> = ({ shadows }) => {
-  return (
-    <Box css={{ display: 'flex', backgroundColor: '$bgSubtle',  padding: '$4' }}>
-      <Box css={{ display: 'grid', marginRight: '$9' }}>
-      {
-        shadows.map((shadow, index) => {
-          return <StyledIndexItem key={index}>{index + 1}</StyledIndexItem>
-        })
-      }
-    </Box>
+  const seed = useUIDSeed();
 
-    <Box css={{ display: 'grid', marginLeft: '$6' }}>
-      {
-        shadows.map((shadow, index) => {
-          return <StyledValueItem key={index}>
+  return (
+    <Box css={{ display: 'flex', backgroundColor: '$bgSubtle', padding: '$4' }}>
+      <Box css={{ display: 'grid', marginRight: '$9' }}>
+        {shadows.map((shadow, index) => (
+          <StyledIndexItem key={seed(shadow)}>{index + 1}</StyledIndexItem>
+        ))}
+      </Box>
+
+      <Box css={{ display: 'grid', marginLeft: '$6' }}>
+        {shadows.map((shadow) => (
+          <StyledValueItem key={seed(shadow)}>
             {shadow.x}
             {' '}
             {shadow.y}
@@ -41,9 +41,8 @@ export const ResolvedShadowValueDisplay: React.FC<Props> = ({ shadows }) => {
             {' '}
             {shadow.color}
           </StyledValueItem>
-        })
-      }
+        ))}
+      </Box>
     </Box>
-  </Box>
-  )
+  );
 };

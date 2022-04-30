@@ -33,7 +33,7 @@ const globalTokens = {
 };
 
 export const {
-  styled, css, keyframes
+  styled, css, keyframes, theme,
 } = createStitches({
   theme: {
     fonts: {
@@ -73,6 +73,15 @@ export const {
       border: globalTokens.colors.gray300,
       borderMuted: globalTokens.colors.gray200,
       focus: globalTokens.colors.primary300,
+      borderSwitch: globalTokens.colors.gray900,
+      bgSwitchChecked: globalTokens.colors.gray900,
+      borderBtnDisabled: globalTokens.colors.gray500,
+      bgBtnPrimary: globalTokens.colors.primary500,
+      fgBtnPrimary: globalTokens.colors.white,
+      bgBtnSecondary: globalTokens.colors.white,
+      fgBtnSecondary: globalTokens.colors.gray900,
+      bgBtnGhost: 'transparent',
+      bgHoverBtnGhost: globalTokens.colors.gray200,
       hover: globalTokens.colors.blue,
     },
     space: {

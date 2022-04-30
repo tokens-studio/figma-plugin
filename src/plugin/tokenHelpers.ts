@@ -1,3 +1,4 @@
+import omit from 'just-omit';
 import { appendTypeToToken } from '@/app/components/createTokenObj';
 import { SingleToken } from '@/types/tokens';
 import { checkIfAlias, checkIfContainsAlias, getAliasValue } from '@/utils/alias';
@@ -25,7 +26,7 @@ export function resolveTokenValues(tokens: SingleToken[], previousCount: number 
       Record<string, ReturnType<typeof getAliasValue>> |
       ReturnType<typeof getAliasValue>;
 
-    let _failedToResolve = false;
+    let failedToResolve = false;
     // Iterate over Typography and boxShadow Object to get resolved values
     if (t.type === TokenTypes.TYPOGRAPHY || t.type === TokenTypes.BOX_SHADOW) {
       if (Array.isArray(t.value)) {
@@ -62,14 +63,13 @@ export function resolveTokenValues(tokens: SingleToken[], previousCount: number 
     else {
       // If we're not dealing with special tokens, just return resolved value
       returnValue = getAliasValue(t, tokensInProgress);
-      _failedToResolve = returnValue === null || checkIfContainsAlias(returnValue);
+      failedToResolve = returnValue === null || checkIfContainsAlias(returnValue);
     }
-    const { failedToResolve, ...objExcludeFailedToResolve } = t;
     const returnObject = {
-      ...objExcludeFailedToResolve,
+      ...omit(t, 'failedToResolve'),
       value: returnValue,
       rawValue: t.rawValue || t.value,
-      ...(_failedToResolve ? { failedToResolve: _failedToResolve } : {}),
+      ...(failedToResolve ? { failedToResolve } : {}),
     } as ResolveTokenValuesResult;
 
     return returnObject;

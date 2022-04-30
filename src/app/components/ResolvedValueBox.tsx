@@ -7,7 +7,6 @@ import Box from './Box';
 import { ResolvedShadowValueDisplay } from './ResolvedShadowValueDisplay';
 import { ResolvedTypograhpyValueDisplay } from './ResolvedTypograhpyValueDisplay';
 
-
 export default function ResolvedValueBox({
   alias,
   selectedToken,
@@ -27,8 +26,8 @@ export default function ResolvedValueBox({
   }
 
   if (selectedToken && isSingleBoxShadowToken(selectedToken)) {
-    if (Array.isArray(valueToCheck)) return <ResolvedShadowValueDisplay shadows={valueToCheck} />
-    else return <ResolvedShadowValueDisplay shadows={[valueToCheck]} />
+    if (Array.isArray(valueToCheck)) return <ResolvedShadowValueDisplay shadows={valueToCheck} />;
+    return <ResolvedShadowValueDisplay shadows={[valueToCheck]} />;
   }
 
   if (typeof valueToCheck !== 'string' && typeof valueToCheck !== 'number') {
@@ -38,7 +37,8 @@ export default function ResolvedValueBox({
   return (
     <Box css={{
       display: 'flex', flexDirection: 'column', gap: '$2',
-    }}>
+    }}
+    >
       {valueToCheck}
     </Box>
   );
