@@ -31,7 +31,7 @@ export type EditTokenObject = SingleToken<true, {
 export type ConfirmProps = {
   show?: boolean;
   text?: string;
-  description?: string;
+  description?: React.ReactNode;
   choices?: { key: string; label: string; enabled?: boolean, unique?: boolean }[];
   confirmAction?: string;
   cancelAction?: string;
@@ -84,6 +84,7 @@ export interface UIState {
   collapsed: boolean;
   selectedLayers: number;
   featureFlags: FeatureFlags
+  manageThemesModalOpen: boolean
 }
 
 const defaultConfirmState: ConfirmProps = {
@@ -127,6 +128,7 @@ export const uiState = createModel<RootModel>()({
     collapsed: false,
     selectedLayers: 0,
     featureFlags: {},
+    manageThemesModalOpen: false,
   } as unknown as UIState,
   reducers: {
     setShowPushDialog: (state, data: string | false) => ({
@@ -323,6 +325,12 @@ export const uiState = createModel<RootModel>()({
           }
           return job;
         }),
+      };
+    },
+    setManageThemesModalOpen(state, open: boolean) {
+      return {
+        ...state,
+        manageThemesModalOpen: open,
       };
     },
   },

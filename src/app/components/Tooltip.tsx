@@ -25,8 +25,8 @@ const StyledArrow = styled(Tooltip.Arrow, {
 });
 
 type Props = {
-  label: string | React.ReactElement;
   children: React.ReactElement;
+  label?: string | React.ReactElement;
   side?: 'left' | 'bottom';
 };
 
@@ -35,13 +35,15 @@ const Toolip: React.FC<Props> = ({
   children,
   side = 'left',
 }) => (
-  <Tooltip.Root delayDuration={0}>
-    <Tooltip.Trigger as="div">{children}</Tooltip.Trigger>
-    <StyledContent side={side}>
-      <StyledArrow offset={10} />
-      {label}
-    </StyledContent>
-  </Tooltip.Root>
+  label ? (
+    <Tooltip.Root delayDuration={0}>
+      <Tooltip.Trigger as="div">{children}</Tooltip.Trigger>
+      <StyledContent side={side}>
+        <StyledArrow offset={10} />
+        {label}
+      </StyledContent>
+    </Tooltip.Root>
+  ) : children
 );
 
 export default Toolip;

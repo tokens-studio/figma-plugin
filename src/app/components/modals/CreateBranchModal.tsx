@@ -15,12 +15,12 @@ type Props = {
   startBranch: string
   isCurrentChanges: boolean
   onClose: (arg: boolean) => void
-  onSuccess: (branch: string) => void
+  onSuccess: (branch: string, branches: string[]) => void
 };
 
 type FormData = {
   branch: string
-}
+};
 
 // @TODO use hooks
 
@@ -51,32 +51,37 @@ export default function CreateBranchModal({
 
   const handleSubmit = React.useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
+
     const { branch } = formFields;
 
     setHasErrored(false);
 
-    const response = await addNewBranch({
-      provider: localApiState.provider,
-      startBranch,
-      branch,
-    });
-
+    const response = await addNewBranch(localApiState, branch, startBranch);
     const branches = await fetchBranches(localApiState);
 
     if (response) {
-      onSuccess(branch, branches);
+      onSuccess(branch, branches ?? []);
     } else {
       setHasErrored(true);
     }
 
     if (isCurrentChanges) await pushTokens({ ...apiData, branch });
-  }, [formFields, localApiState, apiData]);
+  }, [
+    formFields,
+    localApiState,
+    apiData,
+    addNewBranch,
+    isCurrentChanges,
+    fetchBranches,
+    pushTokens,
+    onSuccess,
+    startBranch,
+  ]);
 
-  const onModalClose = React.useCallback(() => onClose(false), [onClose]);
+  const handleModalClose = React.useCallback(() => onClose(false), [onClose]);
 
   return (
-    <Modal large isOpen={isOpen} close={onModalClose}>
+    <Modal large isOpen={isOpen} close={handleModalClose}>
       <form onSubmit={handleSubmit}>
         <Stack direction="column" gap={4}>
           <Heading>
@@ -104,7 +109,7 @@ export default function CreateBranchModal({
             inputRef={branchInputRef}
           />
           <Stack direction="row" gap={4}>
-            <Button variant="secondary" size="large" onClick={() => onClose(false)}>
+            <Button variant="secondary" size="large" onClick={handleModalClose}>
               Cancel
             </Button>
             <Button variant="primary" type="submit" disabled={!formFields.branch}>

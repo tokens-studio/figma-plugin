@@ -4,8 +4,9 @@ import {
 } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { XYCoord } from 'dnd-core';
-import { debounce } from 'lodash';
+import debounce from 'lodash.debounce';
 import { TokensIcon, LinkBreak2Icon } from '@radix-ui/react-icons';
+import { useUIDSeed } from 'react-uid';
 import { ShadowTokenSingleValue } from '@/types/propertyTypes';
 import { checkIfContainsAlias } from '@/utils/alias';
 import { findReferences } from '@/utils/findReferences';
@@ -21,6 +22,8 @@ import Select from './Select';
 import Box from './Box';
 import Input from './Input';
 import ResolvedValueBox from './ResolvedValueBox';
+
+// @TODO these types need to be fixed
 
 interface DragItem {
   index: number;
@@ -49,7 +52,7 @@ function SingleShadowInput({
   onRemove: (index: number) => void;
   id: string;
 }) {
-  const onChange = (e) => {
+  const onChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     if (Array.isArray(value)) {
       const values = value;
       const newShadow = { ...value[index], [e.target.name]: e.target.value };
@@ -59,16 +62,21 @@ function SingleShadowInput({
     } else {
       handleBoxShadowChange({ ...value, [e.target.name]: e.target.value });
     }
-  };
+  }, [index, value, handleBoxShadowChange]);
 
-  const onMoveDebounce = (dragIndex, hoverIndex) => {
+  const onMoveDebounce = useCallback((dragIndex: number, hoverIndex: number) => {
     const values = value;
     const dragItem = values[dragIndex];
     values.splice(dragIndex, 1);
     values.splice(hoverIndex, 0, dragItem);
     onChange({ ...value, value: values });
-  };
-  const onMove = useCallback(debounce(onMoveDebounce, 300), [value]);
+  }, [value, onChange]);
+
+  const onMove = useCallback(debounce(onMoveDebounce, 300), [value, onChange]);
+
+  const handleRemove = useCallback(() => {
+    onRemove(index);
+  }, [index, onRemove]);
 
   const ref = React.useRef<HTMLDivElement>(null);
 
@@ -144,7 +152,7 @@ function SingleShadowInput({
           <IconButton
             tooltip="Remove this shadow"
             dataCy="button-shadow-remove-multiple"
-            onClick={() => onRemove(index)}
+            onClick={handleRemove}
             icon={<IconMinus />}
           />
         )}
@@ -186,13 +194,13 @@ export default function BoxShadowInput({
   handleBoxShadowChangeByAlias,
   resolvedTokens,
   internalEditToken,
-
 }: {
   handleBoxShadowChange: (shadow: ShadowTokenSingleValue | ShadowTokenSingleValue[]) => void;
   handleBoxShadowChangeByAlias: (shadow: ShadowTokenSingleValue | ShadowTokenSingleValue[]) => void;
   resolvedTokens: ResolveTokenValuesResult[]
   internalEditToken: EditTokenObject;
 }) {
+  const seed = useUIDSeed();
   const isInputMode = (typeof internalEditToken.value === 'object');
   const [mode, setMode] = useState(isInputMode ? 'input' : 'alias');
   const [alias, setAlias] = useState('');
@@ -208,29 +216,30 @@ export default function BoxShadowInput({
     if (search && search.length > 0) {
       const nameToLookFor = search[0].slice(1, search[0].length - 1);
       const foundToken = resolvedTokens.find((t) => t.name === nameToLookFor);
-      if (foundToken) return foundToken
+      if (foundToken) return foundToken;
     }
-  }, [internalEditToken]);
+    return null;
+  }, [internalEditToken, resolvedTokens]);
 
-  const addShadow = () => {
+  const addShadow = React.useCallback(() => {
     if (Array.isArray(internalEditToken.value)) {
       handleBoxShadowChange([...internalEditToken.value, newToken]);
     } else {
       handleBoxShadowChange([internalEditToken.value, newToken]);
     }
-  };
+  }, [internalEditToken, handleBoxShadowChange]);
 
-  const removeShadow = (index) => {
+  const removeShadow = React.useCallback((index: number) => {
     if (Array.isArray(internalEditToken.value)) {
       handleBoxShadowChange(internalEditToken.value.filter((_, i) => i !== index));
     }
-  };
+  }, [internalEditToken, handleBoxShadowChange]);
 
   return (
     <div>
       <Box css={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Heading size="small">Shadow</Heading>
-        <Box css={{display: 'flex'}}>
+        <Box css={{ display: 'flex' }}>
           {mode === 'input' ? (
             <IconButton
               tooltip="alias mode"
@@ -245,8 +254,7 @@ export default function BoxShadowInput({
               onClick={handleMode}
               icon={<LinkBreak2Icon />}
             />
-          )
-          }
+          )}
           <IconButton
             tooltip="Add another shadow"
             dataCy="button-shadow-add-multiple"
@@ -267,8 +275,8 @@ export default function BoxShadowInput({
                     handleBoxShadowChange={handleBoxShadowChange}
                     shadowItem={token}
                     index={index}
-                    id={index}
-                    key={`single-shadow-${index}`}
+                    id={String(index)}
+                    key={`single-shadow-${seed(index)}`}
                     onRemove={removeShadow}
                   />
                 ))
@@ -297,10 +305,12 @@ export default function BoxShadowInput({
                 value={isInputMode ? '' : internalEditToken.value}
               />
               {
-                !isInputMode && checkIfContainsAlias(internalEditToken.value) && <ResolvedValueBox
+                !isInputMode && checkIfContainsAlias(internalEditToken.value) && (
+                <ResolvedValueBox
                   alias={alias}
                   selectedToken={selectedToken}
                 />
+                )
               }
             </Box>
           )

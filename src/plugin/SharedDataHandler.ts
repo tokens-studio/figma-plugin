@@ -11,8 +11,9 @@ class SharedDataHandler {
     return node.getSharedPluginDataKeys(this.namespace);
   }
 
-  get(node: BaseNode, key: string) {
-    return node.getSharedPluginData(this.namespace, key);
+  get<Result = string>(node: BaseNode, key: string, transformer?: (value: string) => Result) {
+    const value = node.getSharedPluginData(this.namespace, key);
+    return (transformer ? transformer(value) : value) as Result;
   }
 
   set(node: BaseNode, key: string, value: string) {

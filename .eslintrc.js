@@ -24,6 +24,7 @@ module.exports = {
     "react/function-component-definition": 0,
     "react/require-default-props": 0,
     "react/jsx-props-no-spreading": 0,
+    "no-prototype-builtins": 0,
     "react/jsx-no-bind": [2, {
       ignoreDOMComponents: false,
       ignoreRefs: false,
