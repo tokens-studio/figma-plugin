@@ -122,13 +122,14 @@ export default function useManageTokens() {
     }
   }, [store, confirm, deleteTokenGroup, dispatch.uiState]);
 
-  const duplicateGroup = useCallback(async (path: string) => {
+  const duplicateGroup = useCallback(async (data: {path: string, oldName: string}) => {
+    const {path, oldName} = data;
     dispatch.uiState.startJob({
       name: BackgroundJobs.UI_DUPLICATETGROUP,
       isInfinite: true,
     });
     const activeTokenSet = activeTokenSetSelector(store.getState());
-    duplicateTokenGroup({ parent: activeTokenSet, path });
+    duplicateTokenGroup({ parent: activeTokenSet, path, oldName });
   },[store, duplicateTokenGroup, dispatch.uiState]);
 
   return useMemo(() => ({

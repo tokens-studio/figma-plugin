@@ -22,7 +22,9 @@ export default function TokenGroupHeading({ label, path, id }: Props) {
   }, [path, deleteGroup]);
 
   const handleDuplicate = React.useCallback(() => {
-    duplicateGroup(path);
+    const oldName = path.split('.').pop();
+    
+    duplicateGroup({path, oldName});
   }, [path, duplicateGroup]);
   return (
     <ContextMenu>

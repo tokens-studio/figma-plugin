@@ -24,6 +24,8 @@ import { updateTokenPayloadToSingleToken } from '@/utils/updateTokenPayloadToSin
 import { RootModel } from '@/types/RootModel';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { UsedTokenSetsMap } from '@/types';
+import { DuplicateTokenGroupPayload } from '@/types/payloads/DuplicateTokenGroupPayloads';
+import { rest } from 'lodash';
 
 const defaultTokens: TokenStore = {
   version: pjs.plugin_version,
@@ -342,28 +344,24 @@ export const tokenState = createModel<RootModel>()({
       return newState;
     },
 
-    duplicateTokenGroup: (state, data: DeleteTokenPayload) => {
-      const selectedGroup = state.tokens[data.parent].filter((token) => token.name.includes(`${data.path}.`));
-      let newTokens: TokenStore['values'] = {};
-      const existingTokenIndex = state.tokens[data.parent].findIndex((n) => n.name === selectedGroup[0].name);
-      const oldName = selectedGroup[0].name.split('.');
-      if (existingTokenIndex > -1) {
-        const newName = `${oldName[0]}-copy.${oldName[1]}`;
-        const existingTokens = [...state.tokens[data.parent]];
-        existingTokens.splice(existingTokenIndex + 1, 0, {
-          ...state.tokens[data.parent][existingTokenIndex],
-          name: newName,
-        });
-
-        newTokens = {
-          [data.parent]: existingTokens,
-        };
-      }
+    duplicateTokenGroup: (state, data: DuplicateTokenGroupPayload) => {
+      const {parent, path, oldName} = data;
+      const selectedGroup = state.tokens[parent].filter((token) => token.name.includes(`${oldName}.`));
+      const _duplicatedGroup = selectedGroup.map((token) => {
+        const duplicatedName = token.name.replace(oldName, `${oldName}-copy`);
+        const {name, ...rest} = token;
+        return{
+          // ...state,
+          ...rest,
+          name: duplicatedName,
+        }
+      })
+      console.log(_duplicatedGroup);
       const newState = {
         ...state,
         tokens: {
           ...state.tokens,
-          ...newTokens,
+          ..._duplicatedGroup,
         },
       };
       return newState;
