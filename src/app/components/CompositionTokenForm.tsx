@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback, useState } from 'react';
 import { CompositionTokenSingleValue } from '@/types/propertyTypes';
 import IconMinus from '@/icons/minus.svg';
 import IconPlus from '@/icons/plus.svg';
@@ -6,7 +6,13 @@ import Heading from './Heading';
 import IconButton from './IconButton';
 import Box from './Box';
 import Input from './Input';
-import SelectableInput from './SelectableInput';
+import {
+  PropertySwitchMenu,
+  PropertySwitchMenuContent,
+  PropertySwitchMenuMainTrigger,
+  PropertySwitchMenuRadioGroup,
+  PropertySwitchMenuRadioItem
+} from './PropertySwitchMenu';
 import { Properties } from '@/constants/Properties';
 
 function SingleStyleInput({
@@ -20,30 +26,28 @@ function SingleStyleInput({
   index: number;
   token: CompositionTokenSingleValue;
   tokens: CompositionTokenSingleValue | CompositionTokenSingleValue[];
-  properties: object[],
+  properties: string[],
   setValue: (property: CompositionTokenSingleValue | CompositionTokenSingleValue[]) => void;
   onRemove: (index: number) => void;
 }) {
 
-  const defaultProperty = {
-    value: token.property,
-    label: token.property,
-  };
-
-  const onPropertyChange = (e) => {
+  const [menuOpened, setMenuOpened] = useState(false);
+  const onPropertySelected = useCallback((property: string) => {
     if (Array.isArray(tokens)) {
-      const values = tokens;
-      const newToken = { ...tokens[index], property: e.value };
+      let values = tokens;
+      const newToken = { ...tokens[index], property: property };
       values.splice(index, 1, newToken);
       setValue(values);
     } else {
-      setValue([{ ...tokens, property: e.value }]);
+      setValue([{ ...tokens, property: property }]);
     }
-  };
+    setMenuOpened(false);
+  }, [tokens]);
+
 
   const onAliasChange = (e) => {
     if (Array.isArray(tokens)) {
-      const values = tokens;
+      let values = tokens;
       const newToken = { ...tokens[index], value: e.target.value };
       values.splice(index, 1, newToken);
       setValue(values);
@@ -58,28 +62,34 @@ function SingleStyleInput({
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        '& > div:nth-child(1)': {
-          flex: 1,
-          marginRight: '$5',
-        },
         '& > label': {
           flex: 2,
           fontSize: '$5 !important',
           '& > div > input': {
             flex: 2,
             marginRight: '$5',
-            height: '$10'  
+            height: '$10'
           }
         }
       }}
       >
-        <SelectableInput
-          name="property"
-          data={properties}
-          defaultData={defaultProperty}
-          onChange={onPropertyChange}
-          required
-        />
+        <PropertySwitchMenu open={menuOpened} onOpenChange={() => setMenuOpened(!menuOpened)}>
+          <PropertySwitchMenuMainTrigger>
+            <span>{token.property}</span>
+          </PropertySwitchMenuMainTrigger>
+          <PropertySwitchMenuContent side="top" sideOffset={2}>
+            <PropertySwitchMenuRadioGroup value={token.property}>
+              {properties.length > 0
+                && properties.map((property, index) => (
+                  <PropertySwitchMenuRadioItem value={property} key={index} onSelect={() => onPropertySelected(property)}>
+                    {` ${property}`}
+                  </PropertySwitchMenuRadioItem>
+                  )
+                )}
+            </PropertySwitchMenuRadioGroup>
+          </PropertySwitchMenuContent>
+        </PropertySwitchMenu>
+
         <Input
           required
           full
@@ -105,7 +115,6 @@ function SingleStyleInput({
 const newToken: CompositionTokenSingleValue = {
   property: '', value: '',
 };
-const properties: object[] = [];
 
 export default function CompositionTokenForm({
   value,
@@ -117,10 +126,7 @@ export default function CompositionTokenForm({
 
   const propertiesMenu = React.useMemo(() => {
     return Object.keys(Properties).map((key) => {
-      return {
-        value: Properties[key],
-        label: Properties[key],
-      }
+      return Properties[key];
     });
   }, [Properties]);
 
@@ -134,7 +140,7 @@ export default function CompositionTokenForm({
 
   const removeToken = (index) => {
     if (Array.isArray(value)) {
-      setValue([...value.filter((_, i) => i !== index)]);
+      setValue(value.filter((_, i) => i !== index));
     }
   };
 
