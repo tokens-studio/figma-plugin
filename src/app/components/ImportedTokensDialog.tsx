@@ -5,10 +5,12 @@ import Button from './Button';
 import Modal from './Modal';
 import { Dispatch } from '../store';
 import useManageTokens from '../store/useManageTokens';
-import Tooltip from './Tooltip';
-import Icon from './Icon';
 import { activeTokenSetSelector, importedTokensSelector } from '@/selectors';
 import Stack from './Stack';
+import IconButton from './IconButton';
+import AddIcon from '@/icons/add.svg';
+import TrashIcon from '@/icons/trash.svg';
+import { SingleToken } from '@/types/tokens';
 
 function ImportToken({
   name,
@@ -52,16 +54,8 @@ function ImportToken({
         )}
       </Stack>
       <Stack direction="row" align="center" gap={1}>
-        <Tooltip variant="right" label={updateAction}>
-          <button className="button button-ghost" type="button" onClick={updateToken}>
-            <Icon name="add" />
-          </button>
-        </Tooltip>
-        <Tooltip variant="right" label="Ignore">
-          <button className="button button-ghost" type="button" onClick={removeToken}>
-            <Icon name="trash" />
-          </button>
-        </Tooltip>
+        <IconButton tooltip={updateAction} icon={AddIcon} onClick={updateToken} />
+        <IconButton tooltip="Ignore" icon={TrashIcon} onClick={removeToken} />
       </Stack>
     </Stack>
   );
@@ -75,7 +69,15 @@ export default function ImportedTokensDialog() {
   const [newTokens, setNewTokens] = React.useState(importedTokens.newTokens);
   const [updatedTokens, setUpdatedTokens] = React.useState(importedTokens.updatedTokens);
 
-  const handleCreateNewClick = () => {
+  const handleSetUpdatedTokens = React.useCallback((tokens: SingleToken[]) => {
+    setUpdatedTokens(tokens);
+  }, [setUpdatedTokens]);
+
+  const handleSetNewTokens = React.useCallback((tokens: SingleToken[]) => {
+    setNewTokens(tokens);
+  }, [setNewTokens]);
+
+  const handleCreateNewClick = React.useCallback(() => {
     // Create new tokens according to styles
     // TODO: This should probably be a batch operation
     newTokens.forEach((token) => {
@@ -91,9 +93,9 @@ export default function ImportedTokensDialog() {
       });
     });
     setNewTokens([]);
-  };
+  }, [newTokens, activeTokenSet, createSingleToken]);
 
-  const handleUpdateClick = () => {
+  const handleUpdateClick = React.useCallback(() => {
     // Go through each token that needs to be updated
     // TODO: This should probably be a batch operation
     updatedTokens.forEach((token) => {
@@ -109,14 +111,14 @@ export default function ImportedTokensDialog() {
       });
     });
     setUpdatedTokens([]);
-  };
+  }, [updatedTokens, editSingleToken, activeTokenSet]);
 
-  const handleImportAllClick = () => {
+  const handleImportAllClick = React.useCallback(() => {
     // Perform both actions for all the tokens
     // TODO: This should probably be a batch operation
     handleUpdateClick();
     handleCreateNewClick();
-  };
+  }, [handleCreateNewClick, handleUpdateClick]);
 
   const handleCreateSingleClick = (token) => {
     // Create new tokens according to styles
@@ -133,7 +135,7 @@ export default function ImportedTokensDialog() {
     setNewTokens(newTokens.filter((t) => t.name !== token.name));
   };
 
-  const handleUpdateSingleClick = (token) => {
+  const handleUpdateSingleClick = React.useCallback((token) => {
     // Go through each token that needs to be updated
     editSingleToken({
       parent: activeTokenSet,
@@ -146,11 +148,11 @@ export default function ImportedTokensDialog() {
       shouldUpdateDocument: false,
     });
     setUpdatedTokens(updatedTokens.filter((t) => t.name !== token.name));
-  };
+  }, [updatedTokens, editSingleToken, activeTokenSet]);
 
-  const handleClose = () => {
+  const handleClose = React.useCallback(() => {
     dispatch.tokenState.resetImportedTokens();
-  };
+  }, [dispatch]);
 
   React.useEffect(() => {
     setNewTokens(importedTokens.newTokens);
@@ -192,8 +194,8 @@ export default function ImportedTokensDialog() {
                 value={token.value}
                 description={token.description}
                 updateAction="Create"
-                removeToken={() => setNewTokens(newTokens.filter((t) => t.name !== token.name))}
-                updateToken={() => handleCreateSingleClick(token)}
+                removeToken={handleSetNewTokens(newTokens.filter((t) => t.name !== token.name))}
+                updateToken={handleCreateSingleClick(token)}
               />
             ))}
           </div>
@@ -224,8 +226,8 @@ export default function ImportedTokensDialog() {
                 description={token.description}
                 oldDescription={token.oldDescription}
                 updateAction="Update"
-                removeToken={() => setUpdatedTokens(updatedTokens.filter((t) => t.name !== token.name))}
-                updateToken={() => handleUpdateSingleClick(token)}
+                removeToken={handleSetUpdatedTokens(updatedTokens.filter((t) => t.name !== token.name))}
+                updateToken={handleUpdateSingleClick(token)}
               />
             ))}
           </div>

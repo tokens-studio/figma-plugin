@@ -41,8 +41,9 @@ type Props = {
   icon: any;
   css?: any;
   variant?: StyledButtonProps['buttonVariant'];
-  tooltipSide?: 'bottom' | 'left' | undefined;
+  tooltipSide?: 'bottom' | 'left' | 'top' | undefined;
   onClick?: () => void;
+  badge?: boolean;
 };
 
 export default function IconButton({
@@ -54,6 +55,7 @@ export default function IconButton({
   css,
   variant = 'default',
   tooltipSide = 'left',
+  badge,
 }: Props) {
   const handleClick = React.useCallback(() => {
     if (onClick) {
@@ -66,6 +68,19 @@ export default function IconButton({
       <Tooltip side={tooltipSide} label={tooltip ?? ''}>
         <StyledButton disabled={disabled} data-cy={dataCy} type="button" onClick={handleClick} buttonVariant={variant}>
           <Box css={{ transition: 'transform 200ms ease-in-out', transform: 'var(--transform)' }}>{icon}</Box>
+          {badge && (
+            <Box
+              css={{
+                position: 'absolute',
+                top: 0,
+                right: 0,
+                width: '$2',
+                height: '$2',
+                borderRadius: '100px',
+                backgroundColor: '$bgAccent',
+              }}
+            />
+          )}
         </StyledButton>
       </Tooltip>
     </Box>

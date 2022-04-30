@@ -4,6 +4,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './assets/fonts/jetbrainsmono.css';
 import './styles/preflight.css';
+// import './styles/figma.css';
 import './styles/main.css';
 import { Provider } from 'react-redux';
 import * as Sentry from '@sentry/react';

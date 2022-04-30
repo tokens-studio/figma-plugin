@@ -83,7 +83,7 @@ textarea::-webkit-scrollbar-thumb {
 }
 
 .content-dark::-webkit-scrollbar-thumb {
-  @apply bg-gray-400 border-gray-950;
+  @apply bg-gray-400 border-gray-700;
   border-radius: 9px;
   border: 2px solid;
 }

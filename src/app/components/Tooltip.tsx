@@ -27,7 +27,7 @@ const StyledArrow = styled(Tooltip.Arrow, {
 type Props = {
   children: React.ReactElement;
   label?: string | React.ReactElement;
-  side?: 'left' | 'bottom';
+  side?: 'left' | 'bottom' | 'top';
 };
 
 const Toolip: React.FC<Props> = ({
