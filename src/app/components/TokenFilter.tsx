@@ -38,10 +38,14 @@ const TokenFilter = () => {
   }, [debounced]);
 
   return (
-    <Box css={{
-      display: 'flex', flexGrow: 1, alignItems: 'center', gap: '$2', position: 'relative',
-
-    }}
+    <Box
+      css={{
+        display: 'flex',
+        flexGrow: 1,
+        alignItems: 'center',
+        gap: '$2',
+        position: 'relative',
+      }}
     >
       <Box css={{ position: 'absolute', left: '$2' }}><MagnifyingGlassIcon /></Box>
       <StyledInput

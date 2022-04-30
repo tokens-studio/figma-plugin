@@ -17,8 +17,7 @@ type Props = {
 };
 
 // Returns token value in display format
-export const TokenTooltipContentValue: React.FC<Props> = ({ token, shouldResolve , tokenIsShadowOrTypographyAlias }) => {
-
+export const TokenTooltipContentValue: React.FC<Props> = ({ token, shouldResolve, tokenIsShadowOrTypographyAlias }) => {
   const seed = useUIDSeed();
   const tokensContext = React.useContext(TokensContext);
 
@@ -29,10 +28,10 @@ export const TokenTooltipContentValue: React.FC<Props> = ({ token, shouldResolve
       const tokenValueString = String(token.value);
       if (tokenIsShadowOrTypographyAlias && tokenValueString.charAt(0) === '$') nameToLookFor = tokenValueString.slice(1, tokenValueString.length);
       if (tokenIsShadowOrTypographyAlias && tokenValueString.charAt(0) === '{') nameToLookFor = tokenValueString.slice(1, tokenValueString.length - 1);
-      return getTokenValue(nameToLookFor, tokensContext.resolvedTokens)?.value
+      return getTokenValue(nameToLookFor, tokensContext.resolvedTokens)?.value;
     }
-    if (shouldResolve) return getTokenValue(token.name, tokensContext.resolvedTokens)?.value
-    else return token.value
+    if (shouldResolve) return getTokenValue(token.name, tokensContext.resolvedTokens)?.value;
+    return token.value;
   }, [token, getTokenValue, shouldResolve, tokenIsShadowOrTypographyAlias, tokensContext.resolvedTokens]);
 
   if (isSingleTypographyToken(token)) {
@@ -89,8 +88,8 @@ export const TokenTooltipContentValue: React.FC<Props> = ({ token, shouldResolve
   }
 
   if (typeof valueToCheck !== 'string' && typeof valueToCheck !== 'number') {
-    return <Box css={{color: '$bgDefault'}}>{JSON.stringify(valueToCheck, null, 2)}</Box>;
+    return <Box css={{ color: '$bgDefault' }}>{JSON.stringify(valueToCheck, null, 2)}</Box>;
   }
 
-  return <Box css={{color: '$bgDefault'}}>{valueToCheck}</Box>;
+  return <Box css={{ color: '$bgDefault' }}>{valueToCheck}</Box>;
 };
