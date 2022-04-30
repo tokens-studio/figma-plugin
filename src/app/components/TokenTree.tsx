@@ -66,7 +66,7 @@ const TokenTree: React.FC<Props> = ({
                     tooltipSide="left"
                     onClick={handleShowNewForm}
                     disabled={editProhibited}
-                    data-cy="button-add-new-token-in-group"
+                    dataCy="button-add-new-token-in-group"
                   />
                 </div>
               </div>
