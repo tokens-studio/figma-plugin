@@ -1,5 +1,4 @@
 import type { Action } from 'redux';
-import type { RootState } from '@/app/store';
 import { AnyInspectStateAction } from './AnyInspectStateAction';
 import { AnySettingsStateAction } from './AnySettingsStateAction';
 import { AnyTokenStateAction } from './AnyTokenStateAction';

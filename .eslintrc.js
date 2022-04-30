@@ -13,7 +13,7 @@ module.exports = {
     cy: 'readable',
     jest: 'readable',
   },
-  "rules": {
+  rules: {
     "import/prefer-default-export": 0,
     "import/extensions": 0,
     "no-await-in-loop": 0,
@@ -24,7 +24,14 @@ module.exports = {
     "react/function-component-definition": 0,
     "react/require-default-props": 0,
     "react/jsx-props-no-spreading": 0,
-    "react/jsx-no-bind": 2,
+    "no-prototype-builtins": 0,
+    "react/jsx-no-bind": [2, {
+      ignoreDOMComponents: false,
+      ignoreRefs: false,
+      allowArrowFunctions: false,
+      allowFunctions: false,
+      allowBind: false,
+    }],
     "@typescript-eslint/no-shadow": 1
   }
 };

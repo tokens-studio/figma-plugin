@@ -1,6 +1,5 @@
 import { useSelector } from 'react-redux';
 import { useCallback, useMemo } from 'react';
-import isEqual from 'lodash.isequal';
 import { postToFigma } from '@/plugin/notifiers';
 import { MessageToPluginTypes } from '@/types/messages';
 import {
@@ -22,6 +21,8 @@ import {
   usedTokenSetSelector,
 } from '@/selectors';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
+import { TokenTypes } from '@/constants/TokenTypes';
+import { isEqual } from '@/utils/isEqual';
 
 // @TODO fix typings
 
@@ -111,7 +112,7 @@ export default function useTokens() {
     });
   }, []);
 
-  const handleRemap = useCallback(async (type: Properties, name: string) => {
+  const handleRemap = useCallback(async (type: Properties | TokenTypes, name: string) => {
     const userDecision = await confirm({
       text: `Choose a new token for ${name}`,
       input: {

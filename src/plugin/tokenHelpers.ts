@@ -1,3 +1,4 @@
+import omit from 'just-omit';
 import { appendTypeToToken } from '@/app/components/createTokenObj';
 import { SingleToken } from '@/types/tokens';
 import { checkIfAlias, checkIfContainsAlias, getAliasValue } from '@/utils/alias';
@@ -46,16 +47,15 @@ export function resolveTokenValues(tokens: SingleToken[], previousCount: number 
     } else {
       // If we're not dealing with special tokens, just return resolved value
       returnValue = getAliasValue(t, tokensInProgress);
-
       failedToResolve = returnValue === null || checkIfContainsAlias(returnValue);
     }
-
     const returnObject = {
-      ...t,
+      ...omit(t, 'failedToResolve'),
       value: returnValue,
       rawValue: t.rawValue || t.value,
       ...(failedToResolve ? { failedToResolve } : {}),
     } as ResolveTokenValuesResult;
+
     return returnObject;
   });
 

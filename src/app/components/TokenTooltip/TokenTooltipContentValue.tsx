@@ -7,22 +7,31 @@ import { TokensContext } from '@/context';
 import { isSingleBoxShadowToken, isSingleTypographyToken } from '@/utils/is';
 import { SingleTypographyValueDisplay } from './SingleTypograhpyValueDisplay';
 import { TokenBoxshadowValue } from '@/types/values';
+import Box from '../Box';
 
 type Props = {
   token: SingleToken;
-  shouldResolve?: boolean;
+  shouldResolve: boolean;
+  tokenIsShadowOrTypographyAlias: boolean;
 };
 
 // Returns token value in display format
-export const TokenTooltipContentValue: React.FC<Props> = ({ token, shouldResolve = false }) => {
+export const TokenTooltipContentValue: React.FC<Props> = ({ token, shouldResolve, tokenIsShadowOrTypographyAlias }) => {
   const seed = useUIDSeed();
   const tokensContext = React.useContext(TokensContext);
+
   const { getTokenValue } = useTokens();
-  const valueToCheck = React.useMemo(() => (
-    (shouldResolve
-      ? getTokenValue(token.name, tokensContext.resolvedTokens)?.value
-      : token.value)
-  ), [token, getTokenValue, shouldResolve, tokensContext.resolvedTokens]);
+  const valueToCheck = React.useMemo(() => {
+    if (shouldResolve && tokenIsShadowOrTypographyAlias) {
+      let nameToLookFor: String;
+      const tokenValueString = String(token.value);
+      if (tokenIsShadowOrTypographyAlias && tokenValueString.charAt(0) === '$') nameToLookFor = tokenValueString.slice(1, tokenValueString.length);
+      if (tokenIsShadowOrTypographyAlias && tokenValueString.charAt(0) === '{') nameToLookFor = tokenValueString.slice(1, tokenValueString.length - 1);
+      return getTokenValue(nameToLookFor, tokensContext.resolvedTokens)?.value;
+    }
+    if (shouldResolve) return getTokenValue(token.name, tokensContext.resolvedTokens)?.value;
+    return token.value;
+  }, [token, getTokenValue, shouldResolve, tokenIsShadowOrTypographyAlias, tokensContext.resolvedTokens]);
 
   if (isSingleTypographyToken(token)) {
     return (
@@ -57,8 +66,8 @@ export const TokenTooltipContentValue: React.FC<Props> = ({ token, shouldResolve
   }
 
   if (typeof valueToCheck !== 'string' && typeof valueToCheck !== 'number') {
-    return <div>{JSON.stringify(valueToCheck, null, 2)}</div>;
+    return <Box css={{ color: '$bgDefault' }}>{JSON.stringify(valueToCheck, null, 2)}</Box>;
   }
 
-  return <div>{valueToCheck}</div>;
+  return <Box css={{ color: '$bgDefault' }}>{valueToCheck}</Box>;
 };
