@@ -122,13 +122,13 @@ export default function useManageTokens() {
     }
   }, [store, confirm, deleteTokenGroup, dispatch.uiState]);
 
-  const renameGroup = useCallback(async (data: {oldName: string, newName: string}) => {
+  const renameGroup = useCallback(async (data: {path: string, oldName: string, newName: string}) => {
     const activeTokenSet = activeTokenSetSelector(store.getState());
     dispatch.uiState.startJob({
         name: BackgroundJobs.UI_RENAMETOKENGROUP,
         isInfinite: true,
       });
-    renameTokenGroup({ parent: activeTokenSet, oldName: data.oldName, newName: data.newName});
+    renameTokenGroup({ parent: activeTokenSet, path: data.path, oldName: data.oldName, newName: data.newName});
     dispatch.uiState.completeJob(BackgroundJobs.UI_RENAMETOKENGROUP);
   },[store, renameTokenGroup, dispatch.uiState]);
   return useMemo(() => ({

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useSelector } from 'react-redux';
 import {
   ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger,
@@ -9,7 +9,6 @@ import Heading from './Heading';
 import Input from './Input';
 import Modal from './Modal';
 import Box from './Box';
-import { styled } from '@/stitches.config';
 import useManageTokens from '../store/useManageTokens';
 import { editProhibitedSelector } from '@/selectors';
 
@@ -18,43 +17,31 @@ type Props = {
   label: string
   path: string
 };
-const StyledButton = styled('button', {
-  flexShrink: 0,
-  width: '100%',
-  fontSize: '$xsmall',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  padding: '$3 $4',
-  gap: '$2',
-  '&:focus, &:hover': {
-    outline: 'none',
-    boxShadow: 'none',
-    backgroundColor: '$bgSubtle',
-  },
-});
-
 export default function TokenGroupHeading({ label, path, id }: Props) {
   const editProhibited = useSelector(editProhibitedSelector);
   const [showRenameTokenGroupField, setShowRenameTokenGroupField] = React.useState(false);
   const [tokenGroupMarkedForChange, setTokenGroupMarkedForChange] = React.useState('');
   const [newTokenGroupName, handleNewTokenGroupNameChange] = React.useState('');
-
   const { deleteGroup, renameGroup } = useManageTokens();
 
+  React.useEffect(() => {
+  }, []);
   const handleRenameTokenGroupSubmit = React.useCallback((e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    renameGroup( {oldName: path, newName: newTokenGroupName} );
+    setShowRenameTokenGroupField(false);
+    const oldName = path.split('.').pop()?.toString();
+    renameGroup( { path: path, oldName: oldName, newName: newTokenGroupName} );
+
     setTokenGroupMarkedForChange('');
     setShowRenameTokenGroupField(false);
   }, [newTokenGroupName, tokenGroupMarkedForChange]);
 
+  const handleRenameTokenGroup = React.useCallback(() => {
+    setShowRenameTokenGroupField(true);
+  }, []);
   const handleSelect = React.useCallback(() => {
     deleteGroup(path);
   }, [path, deleteGroup]);
-  const handleRename = React.useCallback(() => {
-    setShowRenameTokenGroupField(true);
-  }, [showRenameTokenGroupField]);
   return (
     <Box
       css={{
@@ -76,7 +63,7 @@ export default function TokenGroupHeading({ label, path, id }: Props) {
           <ContextMenuItem disabled={editProhibited} onSelect={handleSelect}>
             Delete
           </ContextMenuItem>
-          <ContextMenuItem disabled={editProhibited} onSelect={handleRename}>
+          <ContextMenuItem disabled={editProhibited} onSelect={handleRenameTokenGroup}>
             Rename
           </ContextMenuItem>
         </ContextMenuContent>

@@ -347,36 +347,33 @@ export const tokenState = createModel<RootModel>()({
     },
     renameTokenGroup: (state, data: RenameTokenGroupPayloads) =>
     {
-      const { parent, oldName, newName } = data;
+      const { parent, path, oldName, newName } = data;
       const existingTokens = state.tokens[parent].filter((token) => token.name.includes(`${oldName}.`));
       const existingTokensValue = state.tokens[parent].filter((token) => token.value.toString().includes(`${oldName}.`));
       const _newTokenswithName = existingTokens.map((token) => {
-        let newtokenName = token.name;
-        console.log(token.name);
-        const { name, ...rest } = token;
-        console.log(oldName, newName);
-        newtokenName = newtokenName.replace(oldName, newName);
-        console.log(newtokenName);
-        return {
-          ...rest,
-          name: newtokenName,
-        };
+      let tokenName = token.name;
+      const { name, ...rest } = token;
+      const newtokenName = tokenName.replace(oldName, newName);
+      return {
+        ...rest,
+        name: newtokenName,
+      };
       });
 
-      // const _newTokenswithValue = existingTokensValue.map((token) => {
-      //   let newtokenValue = token.value.toString();
-      //   const { value, ...rest} = token;
-      //   newtokenValue = newtokenValue.toString().replace(oldName, newName);
-      //   return{
-      //     ...rest,
-      //     value: newtokenValue,
-      //   };
-      // });
+      const _newTokenswithValue = existingTokensValue.map((token) => {
+        let newtokenValue = token.value.toString();
+        const { value, ...rest} = token;
+        newtokenValue = newtokenValue.toString().replace(oldName, newName);
+        return{
+          ...rest,
+          value: newtokenValue,
+        };
+      });
       const newState = {
         ...state,
         tokens:{
           ...state.tokens,
-          [parent]: [..._newTokenswithName] ,
+          [parent]: [..._newTokenswithName, ..._newTokenswithValue] ,
         }
       };
       return newState;
