@@ -8,10 +8,9 @@ import Tooltip from './Tooltip';
 import Stack from './Stack';
 import BranchSelector from './BranchSelector';
 import useRemoteTokens from '../store/remoteTokens';
-import convertTokensToObject from '@/utils/convertTokensToObject';
 import { StorageProviderType } from '../../types/api';
 import {
-  localApiStateSelector, editProhibitedSelector, lastSyncedStateSelector, storageTypeSelector, tokensSelector, usedTokenSetSelector,
+  localApiStateSelector, editProhibitedSelector, lastSyncedStateSelector, storageTypeSelector, tokensSelector, usedTokenSetSelector, themesListSelector,
 } from '@/selectors';
 import DocsIcon from '@/icons/docs.svg';
 import FeedbackIcon from '@/icons/feedback.svg';
@@ -19,6 +18,7 @@ import FeedbackIcon from '@/icons/feedback.svg';
 export default function Footer() {
   const storageType = useSelector(storageTypeSelector);
   const tokens = useSelector(tokensSelector);
+  const themes = useSelector(themesListSelector);
   const lastSyncedState = useSelector(lastSyncedStateSelector);
   const editProhibited = useSelector(editProhibitedSelector);
   const localApiState = useSelector(localApiStateSelector);
@@ -27,13 +27,13 @@ export default function Footer() {
   const { pullTokens, pushTokens } = useRemoteTokens();
 
   const checkForChanges = React.useCallback(() => {
-    if (lastSyncedState !== JSON.stringify(convertTokensToObject(tokens), null, 2)) {
+    if (lastSyncedState !== JSON.stringify([tokens, themes], null, 2)) {
       return true;
     }
     return false;
-  }, [lastSyncedState, tokens]);
+  }, [lastSyncedState, tokens, themes]);
 
-  const hasChanges = React.useMemo(() => checkForChanges(), [lastSyncedState, tokens]);
+  const hasChanges = React.useMemo(() => checkForChanges(), [checkForChanges]);
 
   const transformProviderName = React.useCallback((provider: StorageProviderType) => {
     switch (provider) {

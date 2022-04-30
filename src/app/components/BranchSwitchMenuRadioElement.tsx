@@ -3,17 +3,18 @@ import { CheckIcon } from '@radix-ui/react-icons';
 import { GitBranchIcon } from '@primer/octicons-react';
 import {
   BranchSwitchMenuItemIndicator,
-  BranchSwitchMenuRadioItem
+  BranchSwitchMenuRadioItem,
 } from './BranchSwitchMenu';
 
 type Props = {
-  branch: string, 
-  index:number, 
+  branch: string,
+  index:number,
   branchSelected: (branch: string) => void
 };
 
 export const BranchSwitchMenuRadioElement: React.FC<Props> = ({ branch, index, branchSelected }) => {
-  const onSelect = () => branchSelected(branch);
+  const onSelect = React.useCallback(() => branchSelected(branch), [branch, branchSelected]);
+
   return (
     <BranchSwitchMenuRadioItem key={`radio_${index}`} value={branch} onSelect={onSelect}>
       <BranchSwitchMenuItemIndicator>
@@ -23,4 +24,4 @@ export const BranchSwitchMenuRadioElement: React.FC<Props> = ({ branch, index, b
       {` ${branch}`}
     </BranchSwitchMenuRadioItem>
   );
-}
+};

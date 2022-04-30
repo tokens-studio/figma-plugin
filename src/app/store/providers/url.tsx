@@ -1,52 +1,30 @@
 import { useDispatch } from 'react-redux';
+import { useCallback, useMemo } from 'react';
 import { Dispatch } from '@/app/store';
 import { ContextObject, StorageProviderType } from '@/types/api';
 import { MessageToPluginTypes } from '@/types/messages';
-import { TokenValues } from '@/types/tokens';
 import { notifyToUI, postToFigma } from '../../../plugin/notifiers';
-
-async function readTokensFromURL({ secret, id }: ContextObject): Promise<TokenValues | null> {
-  let customHeaders: Record<string, string> = {};
-  const defaultHeaders = {
-    Accept: 'application/json',
-  };
-  try {
-    customHeaders = JSON.parse(secret) as typeof customHeaders;
-  } catch (err) {
-    // @RAEDME ignore error
-  }
-
-  const headers = {
-    ...defaultHeaders,
-    ...customHeaders,
-  };
-  const response = await fetch(id, {
-    method: 'GET',
-    headers,
-  });
-
-  if (response.ok) {
-    const data = await response.json();
-    return data;
-  }
-  notifyToUI('There was an error connecting, check your sync settings', { error: true });
-  return null;
-}
+import { UrlTokenStorage } from '@/storage/UrlTokenStorage';
 
 export default function useURL() {
   const dispatch = useDispatch<Dispatch>();
 
-  // Read tokens from URL
-  async function pullTokensFromURL(context: ContextObject): Promise<TokenValues | null> {
-    const { id, secret, name } = context;
+  const storageClientFactory = useCallback((context: ContextObject) => (
+    new UrlTokenStorage(context.id, context.secret)
+  ), []);
 
+  // Read tokens from URL
+  const pullTokensFromURL = useCallback(async (context: ContextObject) => {
+    const { id, secret, name } = context;
     if (!id && !secret) return null;
 
+    const storage = storageClientFactory(context);
+
     try {
-      const data = await readTokensFromURL({ id, secret });
+      const content = await storage.retrieve();
       dispatch.uiState.setProjectURL(id);
 
-      if (data) {
+      if (content) {
         postToFigma({
           type: MessageToPluginTypes.CREDENTIALS,
           id,
@@ -54,24 +32,31 @@ export default function useURL() {
           secret,
           provider: StorageProviderType.URL,
         });
-        if (data) {
-          const tokenObj = {
-            values: data,
-          };
-          dispatch.tokenState.setTokenData(tokenObj);
-          dispatch.tokenState.setEditProhibited(true);
-          return tokenObj;
-        }
 
+        if (Object.keys(content.tokens).length) {
+          dispatch.tokenState.setTokenData({
+            values: content.tokens,
+            themes: content.themes,
+          });
+          dispatch.tokenState.setEditProhibited(true);
+          return content;
+        }
         notifyToUI('No tokens stored on remote', { error: true });
       }
-    } catch (e) {
+    } catch (err) {
       notifyToUI('Error fetching from URL, check console (F12)', { error: true });
-      console.log('Error:', e);
+      console.log('Error:', err);
     }
+
     return null;
-  }
-  return {
+  }, [
+    dispatch,
+    storageClientFactory,
+  ]);
+
+  return useMemo(() => ({
     pullTokensFromURL,
-  };
+  }), [
+    pullTokensFromURL,
+  ]);
 }

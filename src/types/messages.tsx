@@ -11,6 +11,8 @@ import { SelectionValue } from './SelectionValue';
 import { AnyTokenList, AnyTokenSet, TokenStore } from './tokens';
 import { PullStyleOptions } from './PullStylesOptions';
 import { UsedTokenSetsMap } from './UsedTokenSetsMap';
+import { TokenTypes } from '@/constants/TokenTypes';
+import { ThemeObjectsList } from './ThemeObjectsList';
 import { NodeInfo } from './NodeInfo';
 
 export enum MessageFromPluginTypes {
@@ -182,9 +184,11 @@ export type UpdateToPluginMessage = {
   type: MessageToPluginTypes.UPDATE;
   tokenValues: AnyTokenSet;
   tokens: AnyTokenList | null;
+  themes: ThemeObjectsList
   updatedAt: string;
   settings: SettingsState;
   usedTokenSet: UsedTokenSetsMap;
+  activeTheme: string | null;
   checkForChanges: string
 };
 export type CreateStylesToPluginMessage = {
@@ -236,7 +240,7 @@ export type RemapTokensToPluginMessage = {
   oldName: string;
   newName: string;
   updateMode: UpdateMode;
-  category?: Properties;
+  category?: Properties | TokenTypes;
 };
 export type RemoveTokensByValueToPluginMessage = {
   type: MessageToPluginTypes.REMOVE_TOKENS_BY_VALUE;
@@ -252,7 +256,7 @@ export type SelectNodesPluginMessage = {
   ids: string[];
 };
 
-export type getApiCredentialsMessage = {
+export type GetApiCredentialsMessage = {
   type: MessageToPluginTypes.GET_API_CREDENTIALS;
 };
 
@@ -276,4 +280,4 @@ export type PostToFigmaMessage =
   | RemoveTokensByValueToPluginMessage
   | ChangedTabsToPluginMessage
   | SelectNodesPluginMessage
-  | getApiCredentialsMessage;
+  | GetApiCredentialsMessage;
