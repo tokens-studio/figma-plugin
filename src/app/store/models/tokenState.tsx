@@ -345,35 +345,37 @@ export const tokenState = createModel<RootModel>()({
 
       return newState;
     },
-    renameTokenGroup: (state, data: RenameTokenGroupPayloads) =>
-    {
+    renameTokenGroup: (state, data: RenameTokenGroupPayloads) => {
       const { parent, path, oldName, newName } = data;
-      const existingTokens = state.tokens[parent].filter((token) => token.name.includes(`${oldName}.`));
-      const existingTokensValue = state.tokens[parent].filter((token) => token.value.toString().includes(`${oldName}.`));
-      const _newTokenswithName = existingTokens.map((token) => {
-      let tokenName = token.name;
-      const { name, ...rest } = token;
-      const newtokenName = tokenName.replace(oldName, newName);
-      return {
-        ...rest,
-        name: newtokenName,
-      };
+      const selectedWithNameTokens = state.tokens[parent].filter((token) => token.name.startsWith(`${path}${oldName}.`));
+      const remainingTokens = state.tokens[parent].filter((token) => !(token.name.startsWith(`${path}${oldName}.`)));
+
+      const selectedWithValueTokens = state.tokens[parent].filter((token) => token.value.toString().startsWith(`{${path}${oldName}.`));
+      const _newTokensWithName = selectedWithNameTokens.map((token) => {
+        const tokenName = token.name;
+        const { name, ...rest } = token;
+        const newtokenName = tokenName.replace(`${path}${oldName}`, `${path}${newName}`);
+        return {
+          ...rest,
+          name: newtokenName,
+        };
       });
 
-      const _newTokenswithValue = existingTokensValue.map((token) => {
+      const _newTokensWithValue = selectedWithValueTokens.map((token) => {
         let newtokenValue = token.value.toString();
         const { value, ...rest} = token;
-        newtokenValue = newtokenValue.toString().replace(oldName, newName);
+        newtokenValue = newtokenValue.toString().replace(`${path}${oldName}`, `${path}${newName}`);
         return{
           ...rest,
           value: newtokenValue,
         };
       });
+
       const newState = {
         ...state,
         tokens:{
           ...state.tokens,
-          [parent]: [..._newTokenswithName, ..._newTokenswithValue] ,
+          [parent]: [ ..._newTokensWithName, ..._newTokensWithValue, ...remainingTokens],
         }
       };
       return newState;
