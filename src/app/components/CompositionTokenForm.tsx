@@ -36,11 +36,11 @@ function SingleStyleInput({
   const onPropertySelected = useCallback((property: string) => {
     if (Array.isArray(tokens)) {
       let values = tokens;
-      const newToken = { ...tokens[index], property: property };
+      const newToken = { ...tokens[index], property };
       values.splice(index, 1, newToken);
       setValue(values);
     } else {
-      setValue({ ...tokens, property: property });
+      setValue({ ...tokens, property });
     }
     setMenuOpened(false);
   }, [tokens]);
@@ -85,7 +85,7 @@ function SingleStyleInput({
                   <PropertySwitchMenuRadioItem value={property} key={index} onSelect={() => onPropertySelected(property)}>
                     {` ${property}`}
                   </PropertySwitchMenuRadioItem>
-                  )
+                )
                 )}
             </PropertySwitchMenuRadioGroup>
           </PropertySwitchMenuContent>
@@ -126,8 +126,8 @@ export default function CompositionTokenForm({
 }) {
 
   const propertiesMenu = React.useMemo(() => {
-    return Object.keys(Properties).map((key) => {
-      return Properties[key];
+    return Object.keys(Properties).map((key: string) => {
+      return String(Properties[key]);
     });
   }, [Properties]);
 
@@ -171,11 +171,13 @@ export default function CompositionTokenForm({
           ))
         ) : (
           <SingleStyleInput
-            tokens={internalEditToken.value}
+            index={-1}
             token={internalEditToken.value}
-            index={0}
+            tokens={internalEditToken.value}
+            key={`single-style`}
             properties={propertiesMenu}
             setValue={setValue}
+            onRemove={removeToken}
           />
         )}
       </Box>

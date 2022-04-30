@@ -109,7 +109,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
     },
     [internalEditToken],
   );
-  
+
   const handleBoxShadowChangeByAlias = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>(
     (e) => {
       setError(null);
