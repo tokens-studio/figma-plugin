@@ -96,8 +96,8 @@ export async function removePluginData({ nodes, key, shouldRemoveValues = true }
 }
 
 export async function updatePluginData({
-  entries, values, tokensMap, shouldOverride = false, shouldRemove = true,
-}: { entries: readonly NodeManagerNode[], values: NodeTokenRefMap, tokensMap: Map<string, AnyTokenList[number]> ,shouldOverride?: boolean, shouldRemove?: boolean }) {
+  entries, values, shouldOverride = false, shouldRemove = true, tokensMap
+}: { entries: readonly NodeManagerNode[], values: NodeTokenRefMap, shouldOverride?: boolean, shouldRemove?: boolean, tokensMap?: Map<string, AnyTokenList[number]> }) {
   const namespace = SharedPluginDataNamespaces.TOKENS;
   postToUI({
     type: MessageFromPluginTypes.START_JOB,
@@ -117,7 +117,7 @@ export async function updatePluginData({
       const newValuesOnNode = { ...currentValuesOnNode, ...values };
       if (currentValuesOnNode.composition) {
         // when select another composition token, reset applied properties by current composition token
-        const resolvedToken = tokensMap.get(currentValuesOnNode.composition);
+        const resolvedToken = tokensMap?.get(currentValuesOnNode.composition);
         let removeProperties: String[] = [];
         if (resolvedToken) {
           if (Array.isArray(resolvedToken.rawValue)) {
