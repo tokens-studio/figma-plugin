@@ -27,16 +27,6 @@ module.exports = {
           subtle: 'var(--figma-color-bg-secondary, #f5f5f5)',
           hover: 'var(--figma-color-bg-hover, #f5f5f5)',
         },
-        success: {
-          DEFAULT: 'var(--figma-color-text-success)',
-          muted: 'var(--figma-color-bg-success-secondary)',
-          subtle: 'var(--figma-color-bg-success-tertiary)',
-        },
-        danger: {
-          DEFAULT: 'var(--figma-color-text-danger)',
-          muted: 'var(--figma-color-bg-danger-secondary)',
-          subtle: 'var(--figma-color-bg-danger-tertiary)',
-        },
         border: {
           menu: 'var(--figma-color-border-menu, #eeeeee)',
           muted: 'var(--figma-color-border, #e0e0e0)',

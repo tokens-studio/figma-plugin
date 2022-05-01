@@ -85,6 +85,10 @@ export const {
       bgToolTip: 'var(--figma-color-bg-tooltip)',
       fgToolTip: 'var(--figma-color-text-tooltip)',
       fgToolTipMuted: 'var(--figma-color-text-tooltip-secondary)',
+      fgSuccess: 'var(--figma-color-text-success)',
+      bgSuccess: 'var(--figma-color-bg-success-tertiary)',
+      fgDanger: 'var(--figma-color-text-danger)',
+      bgDanger: 'var(--figma-color-bg-danger-tertiary)',
     },
     space: {
       1: '2px',
