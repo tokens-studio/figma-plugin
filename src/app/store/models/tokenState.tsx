@@ -10,7 +10,9 @@ import { notifyToUI } from '@/plugin/notifiers';
 import { replaceReferences } from '@/utils/findReferences';
 import parseJson from '@/utils/parseJson';
 import updateTokensOnSources from '../updateSources';
-import { AnyTokenList, SingleToken, TokenStore } from '@/types/tokens';
+import {
+  AnyTokenList, ImportToken, SingleToken, TokenStore,
+} from '@/types/tokens';
 import {
   DeleteTokenPayload,
   SetTokenDataPayload,
@@ -30,8 +32,8 @@ export interface TokenState {
   themes: ThemeObjectsList;
   lastSyncedState: string; // @README for reference, at this time this is a JSON stringified representation of the tokens and themes ([tokens, themes])
   importedTokens: {
-    newTokens: SingleToken[];
-    updatedTokens: SingleToken[];
+    newTokens: ImportToken[];
+    updatedTokens: ImportToken[];
   };
   activeTheme: string | null;
   activeTokenSet: string;

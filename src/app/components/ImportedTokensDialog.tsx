@@ -11,30 +11,31 @@ import IconButton from './IconButton';
 import AddIcon from '@/icons/add.svg';
 import TrashIcon from '@/icons/trash.svg';
 import Box from './Box';
+import { ImportToken } from '@/types/tokens';
 
-function ImportToken({
-  name,
-  value,
-  oldValue,
-  description,
-  oldDescription,
+function NewOrExistingToken({
+  token,
   updateAction,
   removeToken,
   updateToken,
 }: {
-  name: string;
-  value: string;
-  oldValue?: string;
-  description?: string;
-  oldDescription?: string;
+  token: ImportToken;
   updateAction: string;
-  removeToken: any;
-  updateToken: any;
+  removeToken: (token: ImportToken) => void;
+  updateToken: (token: ImportToken) => void;
 }) {
+  const onRemoveToken = React.useCallback(() => {
+    removeToken(token);
+  }, [removeToken, token]);
+
+  const onUpdateToken = React.useCallback(() => {
+    updateToken(token);
+  }, [updateToken, token]);
+
   return (
     <Stack direction="row" justify="between" css={{ padding: '$2 $4' }}>
       <Stack direction="column" gap={1}>
-        <div className="text-xs font-semibold">{name}</div>
+        <div className="text-xs font-semibold">{token.name}</div>
         <Stack direction="row" align="center" gap={1}>
           <Box css={{
             padding: '$2',
@@ -46,9 +47,9 @@ function ImportToken({
             color: '$fgSuccess',
           }}
           >
-            {typeof value === 'object' ? JSON.stringify(value) : value}
+            {typeof token.value === 'object' ? JSON.stringify(token.value) : token.value}
           </Box>
-          {oldValue ? (
+          {token.oldValue ? (
             <Box css={{
               padding: '$2',
               wordBreak: 'break-all',
@@ -59,21 +60,21 @@ function ImportToken({
               color: '$fgDanger',
             }}
             >
-              {typeof oldValue === 'object' ? JSON.stringify(oldValue) : oldValue}
+              {typeof token.oldValue === 'object' ? JSON.stringify(token.oldValue) : token.oldValue}
             </Box>
           ) : null}
         </Stack>
-        {(description || oldDescription) && (
+        {(token.description || token.oldDescription) && (
         <div className="text-xxs">
-          {description}
+          {token.description}
           {' '}
-          {oldDescription ? ` (before: ${oldDescription})` : ''}
+          {token.oldDescription ? ` (before: ${token.oldDescription})` : ''}
         </div>
         )}
       </Stack>
       <Stack direction="row" align="center" gap={1}>
-        <IconButton tooltip={updateAction} icon={<AddIcon />} onClick={updateToken} />
-        <IconButton tooltip="Ignore" icon={<TrashIcon />} onClick={removeToken} />
+        <IconButton tooltip={updateAction} icon={<AddIcon />} onClick={onUpdateToken} />
+        <IconButton tooltip="Ignore" icon={<TrashIcon />} onClick={onRemoveToken} />
       </Stack>
     </Stack>
   );
@@ -87,11 +88,11 @@ export default function ImportedTokensDialog() {
   const [newTokens, setNewTokens] = React.useState(importedTokens.newTokens);
   const [updatedTokens, setUpdatedTokens] = React.useState(importedTokens.updatedTokens);
 
-  const handleIgnoreExistingToken = React.useCallback((token) => () => {
+  const handleIgnoreExistingToken = React.useCallback((token) => {
     setUpdatedTokens((updatedTokens.filter((t) => t.name !== token.name)));
   }, [setUpdatedTokens, updatedTokens]);
 
-  const handleIgnoreNewToken = React.useCallback((token) => () => {
+  const handleIgnoreNewToken = React.useCallback((token) => {
     setNewTokens(newTokens.filter((t) => t.name !== token.name));
   }, [setNewTokens, newTokens]);
 
@@ -138,7 +139,7 @@ export default function ImportedTokensDialog() {
     handleCreateNewClick();
   }, [handleCreateNewClick, handleUpdateClick]);
 
-  const handleCreateSingleClick = React.useCallback((token) => () => {
+  const handleCreateSingleClick = React.useCallback((token) => {
     // Create new tokens according to styles
     createSingleToken({
       parent: activeTokenSet,
@@ -153,7 +154,7 @@ export default function ImportedTokensDialog() {
     setNewTokens(newTokens.filter((t) => t.name !== token.name));
   }, [newTokens, activeTokenSet, createSingleToken]);
 
-  const handleUpdateSingleClick = React.useCallback((token) => () => {
+  const handleUpdateSingleClick = React.useCallback((token) => {
     // Go through each token that needs to be updated
     editSingleToken({
       parent: activeTokenSet,
@@ -211,14 +212,12 @@ export default function ImportedTokensDialog() {
             }}
           >
             {newTokens.map((token) => (
-              <ImportToken
+              <NewOrExistingToken
+                token={token}
                 key={token.name}
-                name={token.name}
-                value={token.value}
-                description={token.description}
                 updateAction="Create"
-                removeToken={handleIgnoreNewToken(token)}
-                updateToken={handleCreateSingleClick(token)}
+                removeToken={handleIgnoreNewToken}
+                updateToken={handleCreateSingleClick}
               />
             ))}
           </Stack>
@@ -246,16 +245,12 @@ export default function ImportedTokensDialog() {
             }}
           >
             {updatedTokens.map((token) => (
-              <ImportToken
+              <NewOrExistingToken
+                token={token}
                 key={token.name}
-                name={token.name}
-                value={token.value}
-                oldValue={token.oldValue}
-                description={token.description}
-                oldDescription={token.oldDescription}
                 updateAction="Update"
-                removeToken={handleIgnoreExistingToken(token)}
-                updateToken={handleUpdateSingleClick(token)}
+                removeToken={handleIgnoreExistingToken}
+                updateToken={handleUpdateSingleClick}
               />
             ))}
           </Stack>

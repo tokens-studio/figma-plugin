@@ -85,7 +85,7 @@ export const ThemeSelector: React.FC<Props> = () => {
           <DropdownMenuRadioGroup value={activeTheme ?? ''}>
             {availableThemes.length === 0 && (
               <DropdownMenuRadioItem value="" disabled={!activeTheme} onSelect={handleClearTheme}>
-                <Text muted>No themes</Text>
+                <Text>No themes</Text>
               </DropdownMenuRadioItem>
             )}
             {availableThemeOptions}
