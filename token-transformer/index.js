@@ -57,6 +57,11 @@ const argv = yargs(hideBin(process.argv))
                 type: 'boolean',
                 describe: 'Throw error when failed to resolve token',
                 default: false
+            })
+            .option('resolveReferences', {
+                type: 'boolean | "math"',
+                describe: 'Resolves references, removing any aliases or math expressions',
+                default: true
             });
     })
 
@@ -115,7 +120,9 @@ const getTokens = async (input) => {
  * Reads the given input file, transforms all tokens and writes them to the output file
  */
 const transform = async () => {
-    const {input, output, sets, excludes, expandTypography, expandShadow, preserveRawValue, throwErrorWhenNotResolved} = argv;
+    const {input, output, sets, excludes, expandTypography, expandShadow, preserveRawValue, throwErrorWhenNotResolved, resolveReferences: resolveReferencesArg} = argv;
+    // yargs will convert a command option of type: 'boolean | "math"' to string type in all cases - convert back to primitive boolan if set to 'true'|'false':
+    const resolveReferences = ['true', 'false'].includes(resolveReferencesArg) ? resolveReferencesArg === 'true' : resolveReferencesArg;
 
     if (fs.existsSync(argv.input)) {
         const tokens = await getTokens(input)
@@ -123,13 +130,14 @@ const transform = async () => {
             expandTypography,
             expandShadow,
             preserveRawValue,
-            throwErrorWhenNotResolved
+            throwErrorWhenNotResolved,
+            resolveReferences
         };
 
         log(`transforming tokens from input: ${input}`);
         log(`using sets: ${sets.length > 0 ? sets : '[]'}`);
         log(`using excludes: ${excludes.length > 0 ? excludes : '[]'}`);
-        log(`using options: { expandTypography: ${expandTypography}, expandShadow: ${expandShadow}, preserveRawValue: ${preserveRawValue} }`);
+        log(`using options: { expandTypography: ${expandTypography}, expandShadow: ${expandShadow}, preserveRawValue: ${preserveRawValue}, resolveReferences: ${resolveReferences} }`);
 
         const transformed = transformTokens(tokens, sets, excludes, options);
 
