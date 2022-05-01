@@ -2,6 +2,7 @@ import { Properties } from '@/constants/Properties';
 
 export default function removeValuesFromNode(node: BaseNode, prop: Properties) {
   // BORDER RADIUS
+  console.log("prop", prop)
   switch (prop) {
     case 'borderRadius':
       if ('cornerRadius' in node && typeof node.cornerRadius !== 'undefined') {
