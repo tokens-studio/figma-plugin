@@ -9,6 +9,7 @@ import { Dispatch } from '../../store';
 import BrokenReferenceIndicator from '../BrokenReferenceIndicator';
 import { waitForMessage } from '@/utils/waitForMessage';
 import { MessageFromPluginTypes } from '@/types/messages';
+import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
 import { TokenTooltip } from '../TokenTooltip';
 import { TokensContext } from '@/context';
@@ -116,9 +117,9 @@ export const TokenButton: React.FC<Props> = ({
     };
     if (propsToSet[0].clear) propsToSet[0].clear.map((item) => Object.assign(newProps, { [item]: 'delete' }));
     if (type === 'composition' && value === 'delete') {
-      // distructure token in composition token when it is unselected
+      // distructure composition token when it is unselected
       const compositionToken = tokensContext.resolvedTokens.find((token) => token.name === tokenValue);
-      let tokensInCompositionToken: Object = {};
+      let tokensInCompositionToken: NodeTokenRefMap = {};
       if (Array.isArray(compositionToken?.rawValue)) {
         compositionToken?.rawValue.map((token) => {
           tokensInCompositionToken[token.property] = 'delete';
@@ -126,9 +127,9 @@ export const TokenButton: React.FC<Props> = ({
       } else {
         tokensInCompositionToken[compositionToken?.rawValue.property] = 'delete';
       }
+      tokensInCompositionToken.composition = 'delete';
       setPluginValue(tokensInCompositionToken);
-    }
-    setPluginValue(newProps);
+    } else setPluginValue(newProps);
   }, [name, active, setPluginValue]);
 
   const handleTokenClick = React.useCallback(() => {

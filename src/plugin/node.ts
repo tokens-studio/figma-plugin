@@ -43,7 +43,7 @@ export function mapValuesToTokens(tokens: Map<string, AnyTokenList[number]>, val
     const resolvedToken = tokens.get(tokenOnNode);
     if (!resolvedToken) return acc;
     if (isSingleToken(resolvedToken)) {
-      // case composition token has typography or boxshadow property
+      // typography or boxshadow property in composition token resovle alias
       if (resolvedToken && resolvedToken.type === TokenTypes.COMPOSITION && resolvedToken.rawValue) {
         let tokensInComposition: Array<Object> = [];
         if (Array.isArray(resolvedToken.rawValue)) {
@@ -164,7 +164,7 @@ export function selectNodes(ids: string[]) {
 }
 
 export function mergeCompositionToken(values: Partial<Record<Properties, string>>): Object {
-  let tokensInCompositionToken: Object = {};
+  let tokensInCompositionToken: NodeTokenRefMap = {};
   if (values && values.composition) {
     if (Array.isArray(values.composition)) {
       values.composition.map((value) => {
@@ -182,7 +182,7 @@ export function mergeCompositionToken(values: Partial<Record<Properties, string>
 export function mergeCompositionTokenForAlias(tokens: Map<string, AnyTokenList[number]>, values: NodeTokenRefMap): Object {
   if (values && values.composition) {
     const resolvedToken = tokens.get(values.composition);
-    let tokensInCompositionToken: Object = {};
+    let tokensInCompositionToken: NodeTokenRefMap = {};
     if (resolvedToken?.rawValue && Array.isArray(resolvedToken?.rawValue)) {
       resolvedToken?.rawValue.map((token) => {
         let strExcludedSymbol: string = '';
