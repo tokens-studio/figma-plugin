@@ -21,4 +21,9 @@ describe('token-transformer', () => {
         var testBuf = fs.readFileSync('temp/folder-light.json');
         expect(shouldBuf.toString()).toEqual(testBuf.toString());
     });
+    it('generates light theme files correctly and handles resolveReferences correctly', async () => {
+        var shouldBuf = fs.readFileSync('output/resolve-false.json');
+        var testBuf = fs.readFileSync('temp/resolve-false.json');
+        expect(shouldBuf.toString()).toEqual(testBuf.toString());
+    });
 });
