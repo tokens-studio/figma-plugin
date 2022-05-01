@@ -2,7 +2,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import * as azdev from 'azure-devops-node-api';
 import * as GitApi from 'azure-devops-node-api/GitApi';
 import * as GitInterfaces from 'azure-devops-node-api/interfaces/GitInterfaces';
-import { Dispatch, RootState } from '@/app/store';
+import { Dispatch } from '@/app/store';
 import { MessageToPluginTypes } from '@/types/messages';
 import convertTokensToObject from '@/utils/convertTokensToObject';
 import useConfirm from '@/app/hooks/useConfirm';
@@ -12,28 +12,15 @@ import { ContextObject } from '@/types/api';
 import { notifyToUI, postToFigma } from '../../../plugin/notifiers';
 import { FeatureFlags } from '@/utils/featureFlags';
 import { AnyTokenSet, TokenValues } from '@/types/tokens';
-import { decodeBase64 } from '@/utils/string';
 import { featureFlagsSelector, localApiStateSelector, tokensSelector } from '@/selectors';
 
-// export function getADOCreatePullRequestUrl(id: string, branchName: string) {
-//   return `https://github.com/${id}/compare/${branchName}?expand=1`;
-// }
+type FeatureFlagOpts = {
+  multiFile: boolean;
+};
 
-/**
- * https://github.com/Microsoft/azure-devops-node-api
- import * as azdev from "azure-devops-node-api";
-
-// your collection url
-let orgUrl = "https://dev.azure.com/yourorgname";
-
-let token: string = process.env.AZURE_PERSONAL_ACCESS_TOKEN;
-
-let authHandler = azdev.getPersonalAccessTokenHandler(token);
-let connection = new azdev.WebApi(orgUrl, authHandler);
-
-Project: needs to replace name in the gitform
-and Repository should be a url
- */
+type TokenSets = {
+  [key: string]: AnyTokenSet;
+};
 
 interface GetADOCreatePullRequestUrl {
   (args: {
@@ -44,23 +31,12 @@ interface GetADOCreatePullRequestUrl {
   }): string
 }
 
-type FeatureFlagOpts = {
-  multiFile: boolean;
-};
-
-type TokenSets = {
-  [key: string]: AnyTokenSet;
-};
-
-export const getADOCreatePullRequestUrl: GetADOCreatePullRequestUrl = (args) => {
-  const {
-    branch,
-    orgUrl,
-    projectName,
-    repoName,
-  } = args;
-  return `${orgUrl}/${projectName}{/_git/${repoName}/pullrequestcreate?sourceRef=&targetRef=${branch}`;
-};
+export const getADOCreatePullRequestUrl: GetADOCreatePullRequestUrl = ({
+  branch,
+  orgUrl,
+  projectName,
+  repoName,
+}) => `${orgUrl}/${projectName}{/_git/${repoName}/pullrequestcreate?sourceRef=&targetRef=${branch}`;
 
 export const getWebApi = async (context: ContextObject) => {
   const authHandler = azdev.getPersonalAccessTokenHandler(context.secret);
@@ -130,8 +106,8 @@ export const readContents = async ({ context, opts }: { context: ContextObject, 
   values: any
 }> => {
   if (opts.multiFile) {
-    const git = await getGitApi(context);
-    const result = await git.getItems(
+    const gitApi = await getGitApi(context);
+    const result = await gitApi.getItems(
       context.id,
       context.filePath,
       context.name,
@@ -177,20 +153,11 @@ export const readContents = async ({ context, opts }: { context: ContextObject, 
   const [tokens] = await fetchContent(context);
   return tokens;
 };
-// START HERE
 
 const hasSameContent = (content: TokenValues, storedContent: string) => {
   const stringifiedContent = JSON.stringify(content.values, null, 2);
 
   return stringifiedContent === storedContent;
-};
-
-export const fetchBranches = async ({ context, owner, repo }: { context: ContextObject, owner: string, repo: string }) => {
-  const octokit = new Octokit({ auth: context.secret, baseUrl: context.baseUrl });
-  const branches = await octokit.repos
-    .listBranches({ owner, repo })
-    .then((response) => response.data);
-  return branches.map((branch) => branch.name);
 };
 
 const extractFiles = (filePath: string, tokenObj: TokenSets, opts: FeatureFlagOpts) => {
@@ -202,35 +169,82 @@ const extractFiles = (filePath: string, tokenObj: TokenSets, opts: FeatureFlagOp
       files[`${filePath}/${key}.json`] = JSON.stringify(tokenObj[key], null, 2);
     });
   }
-
   return files;
 };
 
-const createOrUpdateFiles = (
-  octokit,
-  context: {
-    owner: string;
-    repo: string;
-    branch: string;
-    filePath: string;
-    tokenObj: TokenSets;
-    createNewBranch: boolean;
-    commitMessage?: string;
-  },
-  opts: FeatureFlagOpts,
-) => {
-  const files = extractFiles(context.filePath, context.tokenObj, opts);
+const createOrUpdateFiles = async ({
+  branch,
+  comment,
+  filePath,
+  gitApi,
+  multiFile,
+  project,
+  oldObjectId,
+  repo,
+  tokenObj,
+}: {
+  branch: string;
+  comment: string;
+  gitApi: GitApi.IGitApi
+  filePath: string;
+  project: string;
+  oldObjectId?: string,
+  repo: string;
+  tokenObj: TokenSets;
+  multiFile: boolean
+}): Promise<GitInterfaces.GitPush> => {
+  const files = extractFiles(filePath, tokenObj, { multiFile });
 
-  return octokit.repos.createOrUpdateFiles({
-    owner: context.owner,
-    repo: context.repo,
-    branch: context.branch,
-    createBranch: context.createNewBranch,
-    changes: [{ message: context.commitMessage || 'Commit from Figma', files }],
-  });
+  const result = await gitApi.getItems(
+    repo,
+    filePath,
+    project,
+    GitInterfaces.VersionControlRecursionType.Full,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    {
+      version: branch,
+      versionType: GitInterfaces.GitVersionType.Branch,
+    },
+  );
+  const tokensOnRemote = result.reduce<Set<string>>((acc, { path }) => {
+    if (path?.endsWith('.json')) {
+      acc.add(path);
+    }
+    return acc;
+  }, new Set());
+  const changes = Object.entries(files)
+    .map(([path, content]) => ({
+      changeType: tokensOnRemote.has(path) ? GitInterfaces.VersionControlChangeType.Edit : GitInterfaces.VersionControlChangeType.Add,
+      item: {
+        path,
+      },
+      newContent: {
+        content,
+        contentType: GitInterfaces.ItemContentType.RawText,
+      },
+    }));
+  return gitApi.createPush(
+    {
+      refUpdates: [
+        {
+          name: `refs/heads/${branch}`,
+          oldObjectId,
+        },
+      ],
+      commits: [
+        {
+          comment,
+          changes,
+        },
+      ],
+    },
+    repo,
+    project,
+  );
 };
-
-// STOP
 
 export const useADO = () => {
   const tokens = useSelector(tokensSelector);
@@ -255,8 +269,6 @@ export const useADO = () => {
     return { raw, string };
   };
 
-  // START HERE
-
   const writeTokensToADO = async ({
     context,
     tokenObj,
@@ -267,41 +279,44 @@ export const useADO = () => {
     tokenObj: TokenSets;
     commitMessage?: string;
     customBranch?: string;
-  }): Promise<TokenValues | null> => {
+  }) => {
+    const { id: repo, name: project } = context;
     try {
-      const webApi = await getWebApi(context);
-      const gitApi = await webApi.getGitApi();
+      const gitApi = await getGitApi(context);
+      const branches = await gitApi.getRefs(repo, project, 'heads');
 
-      const branches = await fetchBranches({ context, owner, repo });
       const branch = customBranch || context.branch;
       if (!branches) return null;
-      let response;
 
-      if (branches.includes(branch)) {
-        response = await createOrUpdateFiles(
-          gitApi,
-          {
-            branch,
-            filePath: context.filePath,
-            tokenObj,
-            createNewBranch: false,
-            commitMessage: commitMessage || 'Commit from Figma',
-          },
-          { multiFile: Boolean(featureFlags?.gh_mfs_enabled) },
-        );
-      } else {
-        response = await createOrUpdateFiles(
-          octokit,
-          {
-            branch,
-            filePath: context.filePath,
-            tokenObj,
-            createNewBranch: true,
-            commitMessage: commitMessage || 'Commit from Figma',
-          },
-          { multiFile: Boolean(featureFlags?.gh_mfs_enabled) },
-        );
+      let oldObjectId;
+
+      const newBranch = !branches.some(({ name, objectId }) => {
+        if ('refs/heads/main'.replace('refs/heads/', '') === name) {
+          oldObjectId = objectId;
+          return true;
+        }
+        return false;
+      });
+
+      if (newBranch) {
+        ({ objectId: oldObjectId } = await gitApi.updateRef(
+          { name: `refs/heads/${branch}`, repositoryId: repo, isLocked: false },
+          repo,
+          project,
+        ));
       }
+
+      const response = await createOrUpdateFiles({
+        gitApi,
+        branch,
+        comment: commitMessage || 'Commit from Figma',
+        filePath: context.filePath,
+        multiFile: Boolean(featureFlags?.gh_mfs_enabled),
+        oldObjectId,
+        project: context.name,
+        repo: context.id,
+        tokenObj,
+      });
       dispatch.tokenState.setLastSyncedState(JSON.stringify(tokenObj, null, 2));
       notifyToUI('Pushed changes to ADO');
       return response;
@@ -311,8 +326,6 @@ export const useADO = () => {
     }
     return null;
   };
-
-  // STOP HERE
 
   const pushTokensToADO = async (context: ContextObject): Promise<{}> => {
     const { raw: rawTokenObj, string: tokenObj } = getTokenObj();
@@ -373,10 +386,12 @@ export const useADO = () => {
     }
     return null;
   };
+
   const syncTokensWithADO = async (context: ContextObject): Promise<TokenValues | null> => {
     try {
-      const [owner, repo] = context.id.split('/');
-      const hasBranches = await fetchBranches({ context, owner, repo });
+      const gitApi = await getGitApi(context);
+      const branches = await gitApi.getRefs(context.id, context.name, 'heads');
+      const hasBranches = Boolean(branches.length);
 
       if (!hasBranches) {
         return null;
