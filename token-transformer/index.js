@@ -120,7 +120,9 @@ const getTokens = async (input) => {
  * Reads the given input file, transforms all tokens and writes them to the output file
  */
 const transform = async () => {
-    const {input, output, sets, excludes, expandTypography, expandShadow, preserveRawValue, throwErrorWhenNotResolved, resolveReferences} = argv;
+    const {input, output, sets, excludes, expandTypography, expandShadow, preserveRawValue, throwErrorWhenNotResolved, resolveReferences: resolveReferencesArg} = argv;
+    // yargs will convert a command option of type: 'boolean | "math"' to string type in all cases - convert back to primitive boolan if set to 'true'|'false':
+    const resolveReferences = ['true', 'false'].includes(resolveReferencesArg) ? resolveReferencesArg === 'true' : resolveReferencesArg;
 
     if (fs.existsSync(argv.input)) {
         const tokens = await getTokens(input)
