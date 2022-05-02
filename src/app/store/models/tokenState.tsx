@@ -373,7 +373,7 @@ export const tokenState = createModel<RootModel>()({
         ...state,
         tokens: {
           ...state.tokens,
-          [parent]: [..._newTokensWithName, ..._newTokensWithValue, ..._remainingTokens],
+          [parent]: [ ..._remainingTokens, ..._newTokensWithValue, ..._newTokensWithName ],
         }
       };
     },

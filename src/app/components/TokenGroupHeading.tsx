@@ -66,16 +66,16 @@ export default function TokenGroupHeading({ label, path, id, type }: Props) {
       <Modal isOpen={showNewGroupNameField} close={() => setShowNewGroupNameField(false)}>
         <Stack direction="column" justify="center" gap={4} css={{ textAlign: 'center' }}>
           <Heading size="small">Rename {path.split('.').pop()}</Heading>
+          <Heading size="small">Renaming only affects tokens of the same type</Heading>
           <form onSubmit={handleRenameTokenGroupSubmit}>
             <Stack direction="column" gap={4}>
               <Input
                 full
-                value={newTokenGroupName}
                 onChange={(e) => setNewTokenGroupName(e.target.value)}
                 type="text"
                 name="tokengroupname"
                 required
-                placeholder={path.split('.').pop() || ''}
+                defaultValue={path.split('.').pop() || ''}
               />
               <Stack direction="row" gap={4}>
                 <Button variant="secondary" size="large" onClick={() => setShowNewGroupNameField(false)}>
