@@ -338,7 +338,6 @@ export const tokenState = createModel<RootModel>()({
     renameTokenGroup: (state, data: RenameTokenGroupPayloads) => {
       const { parent, path, oldName, newName } = data;
       const selectedWithNameTokens = state.tokens[parent].filter(token => token.name.startsWith(`${path}${oldName}.`));
-      const remainingTokens = state.tokens[parent].filter(token => !token.name.startsWith(`${path}${oldName}.`));
       const selectedWithValueTokens = state.tokens[parent].filter(token => token.value.toString().startsWith(`{${path}${oldName}.`));
 
       const _newTokensWithName = selectedWithNameTokens.map(token => {
@@ -358,12 +357,11 @@ export const tokenState = createModel<RootModel>()({
           value: updatedNewTokenValue,
         };
       });
-
       return {
         ...state,
         tokens: {
           ...state.tokens,
-          [parent]: [..._newTokensWithName, ..._newTokensWithValue, ...remainingTokens],
+          [parent]: [..._newTokensWithName, ..._newTokensWithValue],
         }
       };
     },
