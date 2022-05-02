@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux';
-import * as azdev from 'azure-devops-node-api';
+import patm from 'azure-devops-node-api/handlers/personalaccesstoken';
 import * as GitApi from 'azure-devops-node-api/GitApi';
 import * as GitInterfaces from 'azure-devops-node-api/interfaces/GitInterfaces';
 import { Dispatch } from '@/app/store';
@@ -38,29 +38,18 @@ export const getADOCreatePullRequestUrl: GetADOCreatePullRequestUrl = ({
   repoName,
 }) => `${orgUrl}/${projectName}{/_git/${repoName}/pullrequestcreate?sourceRef=&targetRef=${branch}`;
 
-export const getWebApi = async (context: ContextObject) => {
-  const authHandler = azdev.getPersonalAccessTokenHandler(context.secret);
-  return new azdev.WebApi(context.baseUrl || '', authHandler);
-};
+const getPersonalAccessTokenHandler = (token: string, allowCrossOriginAuthentication?: boolean) => new patm.PersonalAccessTokenCredentialHandler(token, allowCrossOriginAuthentication);
 
 export const getGitApi = async (context: ContextObject): Promise<GitApi.IGitApi> => {
-  const webApi = await getWebApi(context);
-  const gitApi = await webApi.getGitApi();
+  const authHandler = getPersonalAccessTokenHandler(context.secret);
+  const gitApi = new GitApi.GitApi(context.baseUrl || '', [authHandler]);
   return gitApi;
 };
 
-export const checkPermissions = async (context: ContextObject) => {
-  try {
-    const webApi = await getWebApi(context);
-    await webApi.connect();
-    return true;
-  } catch (err) {
-    return false;
-  }
-};
-
 const checkAndSetAccess = async (context: ContextObject, dispatch: Dispatch) => {
-  const hasWriteAccess = await checkPermissions(context);
+  const gitApi = await getGitApi(context);
+  const branches = await gitApi.getRefs(context.id, context.name, 'heads');
+  const hasWriteAccess = Boolean(branches.length);
   dispatch.tokenState.setEditProhibited(!hasWriteAccess);
 };
 
