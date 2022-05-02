@@ -47,98 +47,100 @@ const multipleShadowToken = {
 };
 
 const tokens = new Map([
-  ['global.colors.blue', {
-    name: 'global.colors.blue',
-    type: 'color' as const,
-    value: '#0000ff'
-  }],
-  ['global.composition.singleProperty', {
-    name: 'global.composition.singleProperty',
-    type: 'composition' as const,
-    value: {
-      property: 'opacity',
-      value: '40%'
-    },
-    rawValue: {
-      property: 'opacity',
-      value: '{opacity.40}'
+  ['global.colors.blue',
+    {
+      name: 'global.colors.blue',
+      type: 'color' as const,
+      value: '#0000ff'
     }
-  }],
-  ['global.composition.multipleProperty', {
-    name: 'global.composition.multipleProperty',
-    type: 'composition' as const,
-    value: [
-      {
+  ],
+  ['global.composition.singleProperty',
+    {
+      name: 'global.composition.singleProperty',
+      type: 'composition' as const,
+      value: {
         property: 'opacity',
         value: '40%'
       },
-      {
-        property: 'borderRadius',
-        value: '24px'
-      },
-    ],
-    rawValue: [
-      {
+      rawValue: {
         property: 'opacity',
         value: '{opacity.40}'
-      },
-      {
-        property: 'borderRadius',
-        value: '{borde-radius.7}'
       }
-    ]
-  }],
-  ['global.composition.containSingleBoxshadow', {
-    name: 'global.composition.containSingleBoxshadow',
-    type: 'composition' as const,
-    value:
-    {
-      property: 'boxShadow',
-      value: '[object Object]'
-    },
-    rawValue:
-    {
-      property: 'boxShadow',
-      value: '{global.shadow.single}'
-    },
-  }],
-  ['global.composition.containMultiBoxshadow', {
-    name: 'global.composition.containMultiBoxshadow',
-    type: 'composition' as const,
-    value: {
-      property: 'boxShadow',
-      value: '[object Object]'
-    },
-    rawValue:
-    {
-      property: 'boxShadow',
-      value: '{global.shadow.multiple}'
     }
-  }],
-  ['global.shadow.single', {
-    ...singleShadowToken,
-    name: 'shadow.single',
-    rawValue: singleShadowToken.value,
-    value: {
-      ...singleShadowToken.value,
-    },
-  }],
-  ['global.shadow.multiple', {
-    ...multipleShadowToken,
-    name: 'shadow.multiple',
-    rawValue: multipleShadowToken.value,
-    value: [
+  ],
+  ['global.composition.multipleProperty',
+    {
+      name: 'global.composition.multipleProperty',
+      type: 'composition' as const,
+      value: [
+        {
+          property: 'opacity',
+          value: '40%'
+        },
+        {
+          property: 'borderRadius',
+          value: '24px'
+        },
+      ],
+      rawValue: [
+        {
+          property: 'opacity',
+          value: '{opacity.40}'
+        },
+        {
+          property: 'borderRadius',
+          value: '{borde-radius.7}'
+        }
+      ]
+    }
+  ],
+  ['global.composition.containSingleBoxshadow',
+    {
+      name: 'global.composition.containSingleBoxshadow',
+      type: 'composition' as const,
+      value:
       {
-        ...multipleShadowToken.value[0],
+        property: 'boxShadow',
+        value: '[object Object]'
       },
+      rawValue:
       {
-        ...multipleShadowToken.value[1],
+        property: 'boxShadow',
+        value: '{global.shadow.single}'
       },
+    }
+  ],
+  ['global.composition.containMultiBoxshadow',
+    {
+      name: 'global.composition.containMultiBoxshadow',
+      type: 'composition' as const,
+      value: {
+        property: 'boxShadow',
+        value: '[object Object]'
+      },
+      rawValue:
       {
-        ...multipleShadowToken.value[2],
-      },
-    ],
-  }],
+        property: 'boxShadow',
+        value: '{global.shadow.multiple}'
+      }
+    }
+  ],
+  ['global.shadow.single',
+    {
+      ...singleShadowToken,
+      name: 'shadow.single',
+      rawValue: singleShadowToken.value,
+      value: singleShadowToken.value,
+    }
+  ],
+  ['global.shadow.multiple',
+    {
+      ...multipleShadowToken,
+      name: 'shadow.multiple',
+      rawValue: multipleShadowToken.value,
+      value: multipleShadowToken.value
+    }
+  ],
 ]);
 
 const values = [
@@ -154,9 +156,7 @@ const values = [
 const mappedTokens = [
   { fill: '#0000ff' },
   {
-    composition: [
-      { property: 'opacity', value: '40%' }
-    ]
+    composition: [{ property: 'opacity', value: '40%' }]
   },
   {
     composition: [
@@ -165,17 +165,10 @@ const mappedTokens = [
     ]
   },
   {
-    composition: [
-      { property: 'boxShadow', value: { ...singleShadowToken.value } }
-    ]
+    composition: [{ property: 'boxShadow', value: singleShadowToken.value }]
   },
   {
-    composition: [
-      {
-        property: 'boxShadow',
-        value: multipleShadowToken.value
-      }
-    ]
+    composition: [{ property: 'boxShadow', value: multipleShadowToken.value}]
   },
   {
     boxShadow: singleShadowToken.value
@@ -188,7 +181,7 @@ const mappedTokens = [
 const applyProperties = [
   { fill: '#0000ff' },
   { opacity: '40%' },
-  { opacity: '40%', borderRadius: '24px'},
+  { opacity: '40%', borderRadius: '24px' },
   { boxShadow: singleShadowToken.value },
   { boxShadow: multipleShadowToken.value },
   { boxShadow: singleShadowToken.value },
