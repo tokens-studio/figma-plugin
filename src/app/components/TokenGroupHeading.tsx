@@ -22,6 +22,8 @@ export default function TokenGroupHeading({ label, path, id }: Props) {
   const [newTokenGroupName, handleNewTokenGroupNameChange] = React.useState('');
   const { deleteGroup, renameGroup } = useManageTokens();
 
+  React.useEffect(() => {
+  }, []);
   const handleRenameTokenGroupSubmit = React.useCallback((e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const oldName = path.split('.').pop()?.toString() || '';
