@@ -28,7 +28,7 @@ const StyledText = styled('div', {
   },
 });
 
-type TextProps = {
+type TextProps = Omit<React.ComponentProps<typeof StyledText>, 'muted' | 'bold' | 'size'> & {
   children: React.ReactNode;
   muted?: boolean;
   bold?: boolean;
@@ -36,9 +36,9 @@ type TextProps = {
 };
 
 const Text: React.FC<TextProps> = ({
-  children, muted, bold, size = 'small',
+  children, muted, bold, size = 'small', ...props
 }) => (
-  <StyledText muted={muted} size={size} bold={bold}>
+  <StyledText muted={muted} size={size} bold={bold} {...props}>
     {children}
   </StyledText>
 );

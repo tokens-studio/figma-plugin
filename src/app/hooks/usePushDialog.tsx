@@ -1,42 +1,55 @@
 import { useDispatch, useSelector } from 'react-redux';
+import { useCallback, useMemo } from 'react';
 import { showPushDialogSelector } from '@/selectors';
 import { Dispatch } from '../store';
 
 // @TODO fix using useCallback and other memoization
 
-let resolveCallback;
-function usePushDialog() {
+export type PushDialogPromiseResult = {
+  commitMessage: string;
+  customBranch: string;
+};
+
+export type UseDialogResult = {
+  closeDialog: () => void
+  pushDialog: (givenState?: string) => Promise<PushDialogPromiseResult | null>
+  onConfirm: (commitMessage: string, customBranch: string) => void
+  onCancel: () => void
+};
+
+let resolveCallback: (result: PushDialogPromiseResult | null) => void = () => {};
+function usePushDialog(): UseDialogResult {
   const showPushDialog = useSelector(showPushDialogSelector);
   const dispatch = useDispatch<Dispatch>();
 
-  const pushDialog = (givenState?: string): Promise<{ commitMessage: string; customBranch: string }> => {
+  const pushDialog: UseDialogResult['pushDialog'] = useCallback((givenState) => {
     if (givenState) {
       dispatch.uiState.setShowPushDialog(givenState);
     } else {
       dispatch.uiState.setShowPushDialog('initial');
     }
-    return new Promise((res) => {
+    return new Promise<PushDialogPromiseResult | null>((res) => {
       resolveCallback = res;
     });
-  };
+  }, [dispatch]);
 
-  const closeDialog = () => {
+  const closeDialog = useCallback(() => {
     dispatch.uiState.setShowPushDialog(false);
-  };
+  }, [dispatch]);
 
-  const onCancel = () => {
+  const onCancel = useCallback(() => {
     closeDialog();
     resolveCallback(null);
-  };
+  }, [closeDialog]);
 
-  const onConfirm = (commitMessage, customBranch) => {
+  const onConfirm = useCallback((commitMessage: string, customBranch: string) => {
     dispatch.uiState.setShowPushDialog('loading');
     resolveCallback({ commitMessage, customBranch });
-  };
+  }, [dispatch]);
 
-  return {
-    pushDialog, onConfirm, onCancel, showPushDialog,
-  };
+  return useMemo(() => ({
+    pushDialog, onConfirm, onCancel, showPushDialog, closeDialog,
+  }), [pushDialog, onConfirm, onCancel, closeDialog, showPushDialog]);
 }
 
 export default usePushDialog;

@@ -37,9 +37,10 @@ export default function TypographyInput({
     if (search && search.length > 0) {
       const nameToLookFor = search[0].slice(1, search[0].length - 1);
       const foundToken = resolvedTokens.find((t) => t.name === nameToLookFor);
-      if (foundToken) return foundToken
+      if (foundToken) return foundToken;
     }
-  }, [internalEditToken]);
+    return () => {};
+  }, [internalEditToken, resolvedTokens]);
 
   return (
     <>
@@ -94,10 +95,12 @@ export default function TypographyInput({
               value={isInputMode ? '' : internalEditToken.value}
             />
             {
-              !isInputMode && checkIfContainsAlias(internalEditToken.value) && <ResolvedValueBox
+              !isInputMode && checkIfContainsAlias(internalEditToken.value) && (
+              <ResolvedValueBox
                 alias={alias}
                 selectedToken={selectedToken}
               />
+              )
             }
           </Box>
         )

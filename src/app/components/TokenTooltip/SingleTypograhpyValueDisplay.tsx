@@ -10,51 +10,51 @@ type Props = {
   shouldResolve: boolean
 };
 
-export const SingleTypographyValueDisplay: React.FC<Props> = ({ value, shouldResolve }) => {
-  return (
-    <Box css={{ color: '$bgDefault' }}>
-      <div>
-        Font:
-        {' '}
-        {value.fontFamily?.value || value.fontFamily}
-      </div>
-      <div>
-        Weight:
-        {' '}
-        {value.fontWeight?.value || value.fontWeight}
-      </div>
-      <div>
-        Size:
-        {' '}
-        {value.fontSize?.value || value.fontSize}
-      </div>
-      <div>
-        Leading:
-        {' '}
-        {value.lineHeight?.value || value.lineHeight}
-      </div>
-      <div>
-        Tracking:
-        {' '}
-        {value.letterSpacing?.value || value.letterSpacing}
-      </div>
-      <div>
-        Paragraph Spacing:
-        {' '}
-        {value.paragraphSpacing?.value || value.paragraphSpacing}
-      </div>
-      <div>
-        Text Case:
-        {' '}
-        {value.textCase?.value || value.textCase}
-      </div>
-      <div>
-        Text Decoration:
-        {' '}
-        {value.textDecoration?.value || value.textDecoration}
-      </div>
-      {
-        shouldResolve && <Box css={{color: '$textSubtle'}}>
+export const SingleTypographyValueDisplay: React.FC<Props> = ({ value, shouldResolve }) => (
+  <Box css={{ color: '$bgDefault' }}>
+    <div>
+      Font:
+      {' '}
+      {value.fontFamily?.value || value.fontFamily}
+    </div>
+    <div>
+      Weight:
+      {' '}
+      {value.fontWeight?.value || value.fontWeight}
+    </div>
+    <div>
+      Size:
+      {' '}
+      {value.fontSize?.value || value.fontSize}
+    </div>
+    <div>
+      Leading:
+      {' '}
+      {value.lineHeight?.value || value.lineHeight}
+    </div>
+    <div>
+      Tracking:
+      {' '}
+      {value.letterSpacing?.value || value.letterSpacing}
+    </div>
+    <div>
+      Paragraph Spacing:
+      {' '}
+      {value.paragraphSpacing?.value || value.paragraphSpacing}
+    </div>
+    <div>
+      Text Case:
+      {' '}
+      {value.textCase?.value || value.textCase}
+    </div>
+    <div>
+      Text Decoration:
+      {' '}
+      {value.textDecoration?.value || value.textDecoration}
+    </div>
+    {
+        shouldResolve && (
+        <Box css={{ color: '$textSubtle' }}>
           {value.fontFamily}
           {' '}
           {value.fontWeight}
@@ -63,7 +63,7 @@ export const SingleTypographyValueDisplay: React.FC<Props> = ({ value, shouldRes
           {' '}
           {value.fontSize}
         </Box>
+        )
       }
-    </Box>
-  );
-};
+  </Box>
+);
