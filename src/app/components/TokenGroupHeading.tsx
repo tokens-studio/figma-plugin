@@ -26,9 +26,10 @@ export default function TokenGroupHeading({ label, path, id }: Props) {
   }, []);
   const handleRenameTokenGroupSubmit = React.useCallback((e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    const oldName: string = path.split('.').pop()?.toString();
+    const newPath = path.slice(0,(path.length-oldName.length));
     setShowRenameTokenGroupField(false);
-    const oldName = path.split('.').pop()?.toString();
-    renameGroup( { path: path, oldName: oldName, newName: newTokenGroupName} );
+    renameGroup( { path: newPath, oldName: oldName, newName: newTokenGroupName} );
 
     setTokenGroupMarkedForChange('');
     setShowRenameTokenGroupField(false);
@@ -36,6 +37,7 @@ export default function TokenGroupHeading({ label, path, id }: Props) {
 
   const handleRenameTokenGroup = React.useCallback(() => {
     setShowRenameTokenGroupField(true);
+    setTokenGroupMarkedForChange(path.split('.').pop());
   }, []);
   const handleSelect = React.useCallback(() => {
     deleteGroup(path);
