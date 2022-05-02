@@ -163,7 +163,7 @@ export function selectNodes(ids: string[]) {
   figma.currentPage.selection = nodes;
 }
 
-export function mergeCompositionToken(values: Partial<Record<Properties, string>>): Object {
+export function distructureCompositionToken(values: Partial<Record<Properties, string>>): Object {
   let tokensInCompositionToken: NodeTokenRefMap = {};
   if (values && values.composition) {
     if (Array.isArray(values.composition)) {
@@ -179,7 +179,7 @@ export function mergeCompositionToken(values: Partial<Record<Properties, string>
   return values;
 }
 
-export function mergeCompositionTokenForAlias(tokens: Map<string, AnyTokenList[number]>, values: NodeTokenRefMap): Object {
+export function distructureCompositionTokenForAlias(tokens: Map<string, AnyTokenList[number]>, values: NodeTokenRefMap): Object {
   if (values && values.composition) {
     const resolvedToken = tokens.get(values.composition);
     let tokensInCompositionToken: NodeTokenRefMap = {};
@@ -227,9 +227,9 @@ export async function updateNodes(
       defaultWorker.schedule(async () => {
         try {
           if (entry.tokens) {
-            const mappedTokens = mergeCompositionTokenForAlias(tokens, entry.tokens);
+            const mappedTokens = distructureCompositionTokenForAlias(tokens, entry.tokens);
             let mappedValues = mapValuesToTokens(tokens, entry.tokens);
-            mappedValues = mergeCompositionToken(mappedValues);
+            mappedValues = distructureCompositionToken(mappedValues);
             setValuesOnNode(entry.node, mappedValues, mappedTokens, figmaStyleMaps, ignoreFirstPartForStyles);
             store.successfulNodes.add(entry.node);
             returnedValues.add(entry.tokens);
