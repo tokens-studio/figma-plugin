@@ -337,42 +337,35 @@ export const tokenState = createModel<RootModel>()({
     },
     renameTokenGroup: (state, data: RenameTokenGroupPayloads) => {
       const { parent, path, oldName, newName } = data;
-      const selectedWithNameTokens = state.tokens[parent].filter((token) =>
-        token.name.startsWith(`${path}${oldName}.`)
-      );
-      const remainingTokens = state.tokens[parent].filter((token) => !token.name.startsWith(`${path}${oldName}.`));
+      const selectedWithNameTokens = state.tokens[parent].filter(token => token.name.startsWith(`${path}${oldName}.`));
+      const remainingTokens = state.tokens[parent].filter(token => !token.name.startsWith(`${path}${oldName}.`));
+      const selectedWithValueTokens = state.tokens[parent].filter(token => token.value.toString().startsWith(`{${path}${oldName}.`));
 
-      const selectedWithValueTokens = state.tokens[parent].filter((token) =>
-        token.value.toString().startsWith(`{${path}${oldName}.`)
-      );
-      const _newTokensWithName = selectedWithNameTokens.map((token) => {
-        const tokenName = token.name;
+      const _newTokensWithName = selectedWithNameTokens.map(token => {
         const { name, ...rest } = token;
-        const newtokenName = tokenName.replace(`${path}${oldName}`, `${path}${newName}`);
+        const newTokenName = name.replace(`${path}${oldName}`, `${path}${newName}`);
         return {
           ...rest,
-          name: newtokenName,
+          name: newTokenName,
         };
       });
 
-      const _newTokensWithValue = selectedWithValueTokens.map((token) => {
-        let newtokenValue = token.value.toString();
+      const _newTokensWithValue = selectedWithValueTokens.map(token => {
         const { value, ...rest } = token;
-        newtokenValue = newtokenValue.toString().replace(`${path}${oldName}`, `${path}${newName}`);
-        return {
+        const updatedNewTokenValue = value.toString().replace(`${path}${oldName}`, `${path}${newName}`);
+        return{
           ...rest,
-          value: newtokenValue,
+          value: updatedNewTokenValue,
         };
       });
 
-      const newState = {
+      return {
         ...state,
         tokens: {
           ...state.tokens,
           [parent]: [..._newTokensWithName, ..._newTokensWithValue, ...remainingTokens],
-        },
+        }
       };
-      return newState;
     },
     updateAliases: (state, data: { oldName: string; newName: string }) => {
       const newTokens = Object.entries(state.tokens).reduce<TokenState['tokens']>((acc, [key, values]) => {

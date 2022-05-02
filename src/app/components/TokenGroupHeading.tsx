@@ -22,19 +22,20 @@ export default function TokenGroupHeading({ label, path, id }: Props) {
   const [newTokenGroupName, handleNewTokenGroupNameChange] = React.useState('');
   const { deleteGroup, renameGroup } = useManageTokens();
 
-  const handleRenameTokenGroupSubmit = React.useCallback(
-    (e: React.FormEvent<HTMLFormElement>) => {
-      e.preventDefault();
-      renameGroup({ oldName: path, newName: newTokenGroupName });
-      setTokenGroupMarkedForChange('');
-      setShowRenameTokenGroupField(false);
-    },
-    [newTokenGroupName, tokenGroupMarkedForChange]
-  );
+  React.useEffect(() => {
+  }, []);
+  const handleRenameTokenGroupSubmit = React.useCallback((e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setShowRenameTokenGroupField(false);
+    const oldName = path.split('.').pop()?.toString();
+    renameGroup( { path: path, oldName: oldName, newName: newTokenGroupName} );
+
+    setTokenGroupMarkedForChange('');
+    setShowRenameTokenGroupField(false);
+  }, [newTokenGroupName, tokenGroupMarkedForChange]);
 
   const handleRenameTokenGroup = React.useCallback(() => {
     setShowRenameTokenGroupField(true);
-    setTokenGroupMarkedForChange(path.split('.').pop());
   }, []);
   const handleSelect = React.useCallback(() => {
     deleteGroup(path);
