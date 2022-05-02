@@ -58,7 +58,7 @@ const TokenTree: React.FC<Props> = ({
           {typeof value === 'object' && !isSingleToken(value) ? (
             <div className="property-wrapper w-full" data-cy={`token-group-${stringPath}`}>
               <div className="flex items-center justify-between group">
-                <TokenGroupHeading label={name} path={stringPath} id="listing" />
+                <TokenGroupHeading label={name} path={stringPath} id="listing" type = {type}/>
                 <Tooltip label="Add a new token" side="left">
                   <button
                     disabled={editProhibited}

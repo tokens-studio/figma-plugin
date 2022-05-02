@@ -18,6 +18,7 @@ import {
   ToggleManyTokenSetsPayload,
   UpdateDocumentPayload,
   UpdateTokenPayload,
+  RenameTokenGroupPayload,
 } from '@/types/payloads';
 import { updateTokenPayloadToSingleToken } from '@/utils/updateTokenPayloadToSingleToken';
 import { RootModel } from '@/types/RootModel';
@@ -341,6 +342,40 @@ export const tokenState = createModel<RootModel>()({
       };
 
       return newState;
+    },
+
+    renameTokenGroup: (state, data: RenameTokenGroupPayload) => {
+      const { parent, path, oldName, newName, type } = data;
+
+      const selectedWithNameTokens = state.tokens[parent].filter(token => (token.name.startsWith(`${path}${oldName}.`) && token.type === type));
+      const selectedWithValueTokens = state.tokens[parent].filter(token => (token.value.toString().startsWith(`{${path}${oldName}.`) && token.type === type));
+      const _remainingTokens = state.tokens[parent].filter(token => (!(token.name.startsWith(`${path}${oldName}.`) && token.type === type) || (token.value.toString().startsWith(`{${path}${oldName}.`) && token.type === type)));
+
+      const _newTokensWithName = selectedWithNameTokens.map(token => {
+        const { name, ...rest } = token;
+        const newTokenName = name.replace(`${path}${oldName}`, `${path}${newName}`);
+        return {
+          ...rest,
+          name: newTokenName,
+        };
+      });
+
+      const _newTokensWithValue = selectedWithValueTokens.map(token => {
+        const { value, ...rest } = token;
+        const updatedNewTokenValue = value.toString().replace(`${path}${oldName}`, `${path}${newName}`);
+        return{
+          ...rest,
+          value: updatedNewTokenValue,
+        };
+      });
+
+      return {
+        ...state,
+        tokens: {
+          ...state.tokens,
+          [parent]: [..._newTokensWithName, ..._newTokensWithValue, ..._remainingTokens],
+        }
+      };
     },
     updateAliases: (state, data: { oldName: string; newName: string }) => {
       const newTokens = Object.entries(state.tokens).reduce<TokenState['tokens']>(
