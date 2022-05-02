@@ -4,8 +4,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import Box from '../Box';
 import Input from '../Input';
 import Button from '../Button';
-import { postToFigma } from '@/plugin/notifiers';
-import { MessageToPluginTypes } from '@/types/messages';
 import { licenseKeySelector } from '@/selectors/licenseKeySelector';
 import Heading from '../Heading';
 import Stack from '../Stack';
@@ -22,10 +20,6 @@ export default function AddLicenseKey() {
 
   const addKey = useCallback(() => {
     if (newKey) {
-      postToFigma({
-        type: MessageToPluginTypes.SET_LICENSE_KEY,
-        licenseKey: newKey,
-      });
       dispatch.userState.addLicenseKey({ key: newKey });
     }
   }, [newKey, dispatch]);
@@ -45,6 +39,10 @@ export default function AddLicenseKey() {
   useEffect(() => {
     setLicenseKey(existingKey);
   }, [existingKey]);
+
+  const onLicenseKeyChange = useCallback((ev: React.ChangeEvent<HTMLInputElement>) => {
+    setLicenseKey(ev.target.value.trim());
+  }, []);
 
   const removeLicenseKeyButton = existingKey && (
     <Button variant="secondary" onClick={removeKey} disabled={existingKey !== newKey}>
@@ -70,9 +68,7 @@ export default function AddLicenseKey() {
             type="text"
             value={newKey || ''}
             full
-            onChange={(ev) => {
-              setLicenseKey(ev.target.value.trim());
-            }}
+            onChange={onLicenseKeyChange}
             error={licenseKeyError}
           />
         </Box>

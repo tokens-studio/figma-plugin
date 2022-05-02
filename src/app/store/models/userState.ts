@@ -53,24 +53,28 @@ export const userState = createModel<RootModel>()({
         if (!fromPlugin) {
           notifyToUI('License added succesfully!');
         }
+        postToFigma({
+          type: MessageToPluginTypes.SET_LICENSE_KEY,
+          licenseKey: key,
+        });
       }
       dispatch.userState.setLicenseKey(key);
     },
     removeLicenseKey: async (payload, rootState) => {
-      const { licenseKey, userId } = rootState.userState;
-      if (licenseKey) {
+      const { licenseKey, userId, licenseError } = rootState.userState;
+      if (!licenseError && licenseKey) {
         const { error } = await removeLicense(licenseKey, userId);
         if (error) {
           notifyToUI('Error removing license, please contact support', { error: true });
-        } else {
-          postToFigma({
-            type: MessageToPluginTypes.SET_LICENSE_KEY,
-            licenseKey: null,
-          });
-          dispatch.userState.setLicenseKey(undefined);
-          dispatch.userState.setLicenseError(undefined);
         }
       }
+
+      postToFigma({
+        type: MessageToPluginTypes.SET_LICENSE_KEY,
+        licenseKey: null,
+      });
+      dispatch.userState.setLicenseKey(undefined);
+      dispatch.userState.setLicenseError(undefined);
     },
   }),
 });
