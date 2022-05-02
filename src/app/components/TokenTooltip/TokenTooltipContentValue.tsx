@@ -27,12 +27,18 @@ export const TokenTooltipContentValue: React.FC<Props> = ({ token, shouldResolve
       const tokenValueString = String(token.value);
       if (tokenIsShadowOrTypographyAlias && tokenValueString.charAt(0) === '$') nameToLookFor = tokenValueString.slice(1, tokenValueString.length);
       if (tokenIsShadowOrTypographyAlias && tokenValueString.charAt(0) === '{') nameToLookFor = tokenValueString.slice(1, tokenValueString.length - 1);
-      return getTokenValue(nameToLookFor, tokensContext.resolvedTokens)?.value;
+      console.log("nametol", nameToLookFor);
+      const tokenValue = getTokenValue(nameToLookFor, tokensContext.resolvedTokens)?.value;
+      console.log("toknevalue", tokenValue)
+      return tokenValue || token.value;
     }
     if (shouldResolve) return getTokenValue(token.name, tokensContext.resolvedTokens)?.value;
     return token.value;
   }, [token, getTokenValue, shouldResolve, tokenIsShadowOrTypographyAlias, tokensContext.resolvedTokens]);
 
+  React.useEffect(() => {
+    console.log("value", valueToCheck)
+  }, [valueToCheck])
   if (isSingleTypographyToken(token)) {
     return (
       <SingleTypographyValueDisplay
@@ -44,6 +50,7 @@ export const TokenTooltipContentValue: React.FC<Props> = ({ token, shouldResolve
   }
 
   if (isSingleBoxShadowToken(token)) {
+    console.log("fdfdf", valueToCheck)
     if (Array.isArray(valueToCheck)) {
       return (
         <div>
