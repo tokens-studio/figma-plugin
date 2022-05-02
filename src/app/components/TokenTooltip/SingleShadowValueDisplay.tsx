@@ -7,7 +7,10 @@ type Props = {
 };
 
 export const SingleShadowValueDisplay: React.FC<Props> = ({ shadow }) => (
-  <Box css={{ display: 'flex', flexDirection: 'column', marginBottom: '$2' }}>
+  <Box css={{
+    display: 'flex', flexDirection: 'column', marginBottom: '$2', color: '$bgDefault',
+  }}
+  >
     <Box css={{ display: 'flex', color: '$contextMenuForegroundMuted' }}>{shadow.type}</Box>
     <Box css={{ display: 'flex' }}>
       {shadow.x}

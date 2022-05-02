@@ -10,6 +10,8 @@ export const SharedPluginDataKeys = Object.freeze({
     hash: 'hash',
     persistentNodesCache: 'persistentNodesCache',
     usedTokenSet: 'usedTokenSet',
+    activeTheme: 'activeTheme',
+    themes: 'themes',
     ...Properties,
   },
 });

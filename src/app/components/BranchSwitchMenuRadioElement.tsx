@@ -13,7 +13,8 @@ type Props = {
 };
 
 export const BranchSwitchMenuRadioElement: React.FC<Props> = ({ branch, index, branchSelected }) => {
-  const onSelect = () => branchSelected(branch);
+  const onSelect = React.useCallback(() => branchSelected(branch), [branch, branchSelected]);
+
   return (
     <BranchSwitchMenuRadioItem key={`radio_${index}`} value={branch} onSelect={onSelect}>
       <BranchSwitchMenuItemIndicator>

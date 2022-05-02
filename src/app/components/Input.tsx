@@ -1,12 +1,12 @@
-import React, { useEffect } from 'react';
+import React, { useCallback } from 'react';
 import { styled } from '@/stitches.config';
 import IconVisibility from './icons/IconVisibiltyOn';
 import IconVisibilityOff from './icons/IconVisibilityOff';
 import Box from './Box';
 import Stack from './Stack';
 
-type Props = {
-  name: string;
+type Props = React.InputHTMLAttributes<HTMLInputElement> & {
+  name?: string;
   inputRef?: React.MutableRefObject<HTMLInputElement | null>;
   error?: string;
   required?: boolean;
@@ -23,8 +23,6 @@ type Props = {
   prefix?: React.ReactNode;
   suffix?: React.ReactNode;
   step?: string;
-  min?: number;
-  max?: number;
   isMasked?: boolean;
   onChange?: React.ChangeEventHandler<HTMLInputElement>;
   disabled?: boolean;
@@ -109,7 +107,7 @@ const StyledPrefix = styled('div', {
   },
 });
 
-const Input: React.FC<Props> = ({
+const Input = React.forwardRef<HTMLInputElement, Props>(({
   name,
   autofocus,
   error = '',
@@ -123,28 +121,24 @@ const Input: React.FC<Props> = ({
   type,
   prefix,
   suffix,
-  min,
-  max,
   step,
   custom = '',
   inputRef = null,
   placeholder = '',
   capitalize = false,
   isMasked = false,
-  disabled = false,
-}) => {
+  ...inputProps
+}, ref) => {
   // if isMasked is true, then we need to handle toggle visibility
   const [show, setShow] = React.useState(false);
 
-  // @TODO this causes new function refs on each render
-  // should be a useCallback
-  const handleVisibility = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleVisibility = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     setShow(!show);
     if (inputRef?.current?.type) {
       inputRef.current.type = inputRef?.current?.type === 'password' ? 'text' : 'password';
     }
-  };
+  }, [show, inputRef]);
 
   return (
     <label htmlFor={name} className="text-xxs font-medium block">
@@ -154,9 +148,10 @@ const Input: React.FC<Props> = ({
           {error ? <div className="text-red-500 font-bold">{error}</div> : null}
         </Stack>
       )}
-      <Box css={{ display: 'flex', position: 'relative', width: full ? '100%' : 0 }} className="input">
+      <Box css={{ display: 'flex', position: 'relative', width: full ? '100%' : '' }} className="input">
         {!!prefix && <StyledPrefix>{prefix}</StyledPrefix>}
         <StyledInput
+          ref={inputRef ?? ref}
           spellCheck={false}
           tabIndex={tabindex ?? undefined}
           type={type}
@@ -166,15 +161,12 @@ const Input: React.FC<Props> = ({
           onChange={onChange}
           required={required}
           autoFocus={autofocus}
-          min={min}
-          max={max}
           step={step}
           data-custom={custom}
-          ref={inputRef}
           placeholder={placeholder}
           hasPrefix={!!prefix}
           hasSuffix={!!isMasked}
-          disabled={disabled}
+          {...inputProps}
         />
         {!!suffix && <span>{suffix}</span>}
         {isMasked && (
@@ -185,7 +177,7 @@ const Input: React.FC<Props> = ({
       </Box>
     </label>
   );
-};
+});
 
 export default Input;
 export { StyledInput, StyledPrefix, StyledSuffix };

@@ -29,7 +29,6 @@ import { sendPluginValues, updatePluginData, SelectionContent } from './pluginDa
 import {
   getTokenData,
   updateNodes,
-  setTokensOnDocument,
   goToNode,
   saveStorageType,
   getSavedStorageType,
@@ -43,6 +42,7 @@ import { defaultNodeManager } from './NodeManager';
 import { defaultWorker } from './Worker';
 import { getFeatureFlags } from '@/utils/featureFlags';
 import { getUsedTokenSet } from '@/utils/getUsedTokenSet';
+import { updateLocalTokensData } from '@/utils/figma';
 
 let inspectDeep = false;
 let shouldSendSelectionValues = false;
@@ -211,7 +211,13 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
         updateStyles(msg.tokens, false, msg.settings);
       }
       if (msg.tokenValues && msg.updatedAt) {
-        setTokensOnDocument(msg.tokenValues, msg.updatedAt, msg.usedTokenSet);
+        updateLocalTokensData({
+          tokens: msg.tokenValues,
+          themes: msg.themes,
+          activeTheme: msg.activeTheme,
+          usedTokenSets: msg.usedTokenSet,
+          updatedAt: msg.updatedAt,
+        });
       }
       if (msg.tokens) {
         const tokensMap = tokenArrayGroupToMap(msg.tokens);

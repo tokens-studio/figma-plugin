@@ -8,8 +8,9 @@ import { Dispatch } from '../store';
 import useStorage from '../store/useStorage';
 import * as pjs from '../../../package.json';
 import { useFeatureFlags } from '../hooks/useFeatureFlags';
-import { fetchGithubBranches } from '../store/providers/github';
+import { Tabs } from '@/constants/Tabs';
 import { StorageProviderType } from '@/types/api';
+import { GithubTokenStorage } from '@/storage/GithubTokenStorage';
 
 export function Initiator() {
   const dispatch = useDispatch<Dispatch>();
@@ -66,7 +67,7 @@ export function Initiator() {
             const { values } = pluginMessage;
             if (values) {
               dispatch.tokenState.setTokenData(values);
-              dispatch.uiState.setActiveTab('tokens');
+              dispatch.uiState.setActiveTab(Tabs.TOKENS);
             }
             break;
           }
@@ -75,7 +76,7 @@ export function Initiator() {
             if (values) {
               track('Import styles');
               dispatch.tokenState.setTokensFromStyles(values);
-              dispatch.uiState.setActiveTab('tokens');
+              dispatch.uiState.setActiveTab(Tabs.TOKENS);
             }
             break;
           }
@@ -105,9 +106,8 @@ export function Initiator() {
               } = credentials;
               const [owner, repo] = id.split('/');
               if (provider === StorageProviderType.GITHUB) {
-                const branches = await fetchGithubBranches({
-                  secret, owner, repo, baseUrl,
-                });
+                const storageClient = new GithubTokenStorage(secret, owner, repo, baseUrl);
+                const branches = await storageClient.fetchBranches();
                 dispatch.branchState.setBranches(branches);
               }
 
@@ -115,7 +115,7 @@ export function Initiator() {
               dispatch.uiState.setLocalApiState(credentials);
 
               await pullTokens({ context: credentials, featureFlags: receivedFlags, usedTokenSet });
-              dispatch.uiState.setActiveTab('tokens');
+              dispatch.uiState.setActiveTab(Tabs.TOKENS);
             }
             break;
           }

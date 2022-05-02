@@ -11,6 +11,8 @@ import { SelectionValue } from './SelectionValue';
 import { AnyTokenList, AnyTokenSet, TokenStore } from './tokens';
 import { PullStyleOptions } from './PullStylesOptions';
 import { UsedTokenSetsMap } from './UsedTokenSetsMap';
+import { TokenTypes } from '@/constants/TokenTypes';
+import { ThemeObjectsList } from './ThemeObjectsList';
 import { NodeInfo } from './NodeInfo';
 
 export enum MessageFromPluginTypes {
@@ -55,6 +57,7 @@ export enum MessageToPluginTypes {
   CHANGED_TABS = 'changed-tabs',
   SELECT_NODES = 'select-nodes',
   SET_LICENSE_KEY = 'set-license-key',
+  GET_API_CREDENTIALS = 'get-api-credentials',
 }
 
 export type NoSelectionFromPluginMessage = { type: MessageFromPluginTypes.NO_SELECTION };
@@ -70,6 +73,7 @@ export type UiSettingsFromPluginMessage = {
     uiWindow: {
       width: number;
       height: number;
+      isMinimized: boolean;
     };
     updateMode: UpdateMode;
     updateRemote: boolean;
@@ -188,9 +192,12 @@ export type UpdateToPluginMessage = {
   type: MessageToPluginTypes.UPDATE;
   tokenValues: AnyTokenSet;
   tokens: AnyTokenList | null;
+  themes: ThemeObjectsList
   updatedAt: string;
   settings: SettingsState;
   usedTokenSet: UsedTokenSetsMap;
+  activeTheme: string | null;
+  checkForChanges: string
 };
 export type CreateStylesToPluginMessage = {
   type: MessageToPluginTypes.CREATE_STYLES;
@@ -241,7 +248,7 @@ export type RemapTokensToPluginMessage = {
   oldName: string;
   newName: string;
   updateMode: UpdateMode;
-  category?: Properties;
+  category?: Properties | TokenTypes;
 };
 export type RemoveTokensByValueToPluginMessage = {
   type: MessageToPluginTypes.REMOVE_TOKENS_BY_VALUE;
@@ -260,6 +267,10 @@ export type SelectNodesPluginMessage = {
 export type SetLicenseKeyPluginMessage = {
   type: MessageToPluginTypes.SET_LICENSE_KEY;
   licenseKey: string | null;
+};
+
+export type GetApiCredentialsMessage = {
+  type: MessageToPluginTypes.GET_API_CREDENTIALS;
 };
 
 export type PostToFigmaMessage =
@@ -282,4 +293,5 @@ export type PostToFigmaMessage =
   | RemoveTokensByValueToPluginMessage
   | ChangedTabsToPluginMessage
   | SelectNodesPluginMessage
-  | SetLicenseKeyPluginMessage;
+  | SetLicenseKeyPluginMessage
+  | GetApiCredentialsMessage;
