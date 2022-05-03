@@ -9,19 +9,22 @@ import Label from './Label';
 import { ignoreFirstPartForStylesSelector } from '@/selectors';
 import Stack from './Stack';
 import Box from './Box';
+import AddLicenseKey from './AddLicenseKey/AddLicenseKey';
 
 function Settings() {
   const ignoreFirstPartForStyles = useSelector(ignoreFirstPartForStylesSelector);
   const dispatch = useDispatch<Dispatch>();
 
-  const handleIgnoreChange = React.useCallback((bool: boolean) => {
-    dispatch.settings.setIgnoreFirstPartForStyles(bool);
-  }, [dispatch.settings]);
+  const handleIgnoreChange = React.useCallback(
+    (bool: boolean) => {
+      dispatch.settings.setIgnoreFirstPartForStyles(bool);
+    },
+    [dispatch.settings],
+  );
 
   return (
     <Box css={{ padding: '$5', overflowY: 'scroll' }} className="content scroll-container">
       <Stack direction="column" gap={4}>
-
         <Heading>Styles</Heading>
         <Stack direction="column" gap={2}>
           <Stack direction="row" gap={2} align="center">
@@ -36,6 +39,7 @@ function Settings() {
         </Stack>
         <SyncSettings />
       </Stack>
+      <AddLicenseKey />
     </Box>
   );
 }

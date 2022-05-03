@@ -35,7 +35,7 @@ export const SingleThemeEntry: React.FC<Props> = ({ theme, isActive, onOpen }) =
   }, [dispatch, theme.id, isActive]);
 
   return (
-    <Box key={theme.id}>
+    <Box key={theme.id} data-cy="singlethemeentry">
       <Stack direction="row" align="center" justify="between">
         <Stack gap={4} direction="row" align="center">
           <Switch checked={isActive} onCheckedChange={handleToggle}>
@@ -50,6 +50,7 @@ export const SingleThemeEntry: React.FC<Props> = ({ theme, isActive, onOpen }) =
             Sets
           </StyledThemeMetaLabel>
           <IconButton
+            dataCy={`singlethemeentry-${theme.id}`}
             icon={<IconDiveInto />}
             onClick={handleOpenClick}
           />

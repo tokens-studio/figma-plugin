@@ -23,6 +23,7 @@ import {
   notifyUserId,
   notifyLastOpened,
   postToUI,
+  notifyLicenseKey,
 } from './notifiers';
 import { sendPluginValues, updatePluginData, SelectionContent } from './pluginData';
 import {
@@ -93,6 +94,12 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
             name: currentUser.name,
           });
         }
+
+        const licenseKey = await figma.clientStorage.getAsync('licenseKey');
+        if (licenseKey) {
+          notifyLicenseKey(licenseKey);
+        }
+
         notifyLastOpened(lastOpened);
         notifyStorageType(storageType);
 
@@ -324,6 +331,10 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
     }
     case MessageToPluginTypes.CREATE_ANNOTATION: {
       createAnnotation(msg.tokens, msg.direction);
+      break;
+    }
+    case MessageToPluginTypes.SET_LICENSE_KEY: {
+      await figma.clientStorage.setAsync('licenseKey', msg.licenseKey);
       break;
     }
     default:

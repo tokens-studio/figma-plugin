@@ -26,7 +26,9 @@ export function getAliasValue(token: SingleToken | string | number, tokens: Sing
           if (
             (typeof token === 'object' && nameToLookFor === token.name)
             || nameToLookFor === token
-          ) { return null; }
+          ) {
+            return isSingleTokenValueObject(token) ? token.value.toString() : token.toString();
+          }
 
           const tokenAliasSplited = nameToLookFor.split('.');
           const tokenAliasSplitedLast: TokenNameNodeType = tokenAliasSplited.pop();

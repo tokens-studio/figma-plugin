@@ -56,6 +56,7 @@ const tokens = [
   { name: 'theme.accent.default', value: 'rgba({colors.red.500}, 0.5)' },
   { name: 'theme.accent.subtle', value: 'rgba({colors.red.500}, {opacity.default})' },
   { name: 'theme.accent.deep', value: 'rgba({theme.accent.default}, {opacity.full})' },
+  { name: 'spacing.xs', value: '{spacing.xs}' },
   { name: 'shadow.single', ...singleShadowToken },
   { name: 'shadow.multiple', ...multipleShadowToken },
 ];
@@ -117,6 +118,12 @@ const output = [
     name: 'theme.accent.deep',
     rawValue: 'rgba({theme.accent.default}, {opacity.full})',
     value: '#ff0000',
+  },
+  {
+    failedToResolve: true,
+    name: 'spacing.xs',
+    rawValue: '{spacing.xs}',
+    value: '{spacing.xs}',
   },
   {
     ...singleShadowToken,
