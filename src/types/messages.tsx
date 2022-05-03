@@ -33,6 +33,7 @@ export enum MessageFromPluginTypes {
   CLEAR_JOBS = 'clear_jobs',
   ADD_JOB_TASKS = 'add_job_tasks',
   COMPLETE_JOB_TASKS = 'complete_job_tasks',
+  LICENSE_KEY = 'license_key',
 }
 
 export enum MessageToPluginTypes {
@@ -55,6 +56,7 @@ export enum MessageToPluginTypes {
   REMOVE_TOKENS_BY_VALUE = 'remove-tokens-by-value',
   CHANGED_TABS = 'changed-tabs',
   SELECT_NODES = 'select-nodes',
+  SET_LICENSE_KEY = 'set-license-key',
   GET_API_CREDENTIALS = 'get-api-credentials',
 }
 
@@ -145,6 +147,11 @@ export type ApiCredentialsFromPluginMessage = {
   featureFlagId: string;
   usedTokenSet?: UsedTokenSetsMap | null;
 };
+
+export type LicenseKeyFromPluginMessage = {
+  type: MessageFromPluginTypes.LICENSE_KEY;
+  licenseKey: string;
+};
 export type PostToUIMessage =
   | NoSelectionFromPluginMessage
   | SelectionFromPluginMessage
@@ -162,7 +169,8 @@ export type PostToUIMessage =
   | ClearJobsFromPluginMessage
   | AddJobTasksFromPluginMessage
   | CompleteJobTasksFromPluginMessage
-  | ApiCredentialsFromPluginMessage;
+  | ApiCredentialsFromPluginMessage
+  | LicenseKeyFromPluginMessage;
 
 export type InitiateToPluginMessage = { type: MessageToPluginTypes.INITIATE };
 export type RemoveSingleCredentialToPluginMessage = {
@@ -256,6 +264,11 @@ export type SelectNodesPluginMessage = {
   ids: string[];
 };
 
+export type SetLicenseKeyPluginMessage = {
+  type: MessageToPluginTypes.SET_LICENSE_KEY;
+  licenseKey: string | null;
+};
+
 export type GetApiCredentialsMessage = {
   type: MessageToPluginTypes.GET_API_CREDENTIALS;
 };
@@ -280,4 +293,5 @@ export type PostToFigmaMessage =
   | RemoveTokensByValueToPluginMessage
   | ChangedTabsToPluginMessage
   | SelectNodesPluginMessage
+  | SetLicenseKeyPluginMessage
   | GetApiCredentialsMessage;

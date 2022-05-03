@@ -25,6 +25,7 @@ type Props = React.InputHTMLAttributes<HTMLInputElement> & {
   step?: string;
   isMasked?: boolean;
   onChange?: React.ChangeEventHandler<HTMLInputElement>;
+  disabled?: boolean;
 };
 
 const StyledIcon = styled('div', {

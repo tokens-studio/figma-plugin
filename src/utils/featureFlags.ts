@@ -1,3 +1,5 @@
+export type FeatureKey = 'gh_mfs_enabled';
+
 export type FeatureFlags = {
   gh_mfs_enabled?: boolean;
 } | null;
