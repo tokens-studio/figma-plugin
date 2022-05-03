@@ -18,10 +18,15 @@ import { EditTokenObject } from '../store/models/uiState';
 import Heading from './Heading';
 import IconButton from './IconButton';
 import TokenInput from './TokenInput';
+import ColorPicker from './ColorPicker';
 import Select from './Select';
 import Box from './Box';
 import Input from './Input';
 import ResolvedValueBox from './ResolvedValueBox';
+import DownshiftInput from './DownshiftInput';
+import { StyledIconDisclosure, StyledInputSuffix } from './StyledInputSuffix'
+import { TokenBoxshadowValue } from '@/types/values';
+
 
 // @TODO these types need to be fixed
 
@@ -35,6 +40,18 @@ enum ItemTypes {
   CARD = 'card',
 }
 
+const newToken: ShadowTokenSingleValue = {
+  x: '0', y: '0', blur: '0', spread: '0', color: '#000000', type: 'dropShadow',
+};
+
+const propertyTypes = {
+  x: 'sizing',
+  y: 'sizing',
+  blur: 'sizing',
+  spread: 'sizing',
+  color: 'color',
+}
+
 function SingleShadowInput({
   value,
   isMultiple = false,
@@ -43,15 +60,49 @@ function SingleShadowInput({
   handleBoxShadowChange,
   onRemove,
   id,
+  resolvedTokens,
+  handleToggleInputHelper,
+  inputHelperOpen
 }: {
-  value: ShadowTokenSingleValue | ShadowTokenSingleValue[];
+  value: TokenBoxshadowValue | TokenBoxshadowValue[];
   isMultiple?: boolean;
-  shadowItem: ShadowTokenSingleValue;
+  shadowItem: TokenBoxshadowValue;
   index: number;
-  handleBoxShadowChange: (shadow: ShadowTokenSingleValue | ShadowTokenSingleValue[]) => void;
+  handleBoxShadowChange: (shadow: TokenBoxshadowValue | TokenBoxshadowValue[]) => void;
   onRemove: (index: number) => void;
   id: string;
+  resolvedTokens: ResolveTokenValuesResult[];
+  handleToggleInputHelper: () => void;
+  inputHelperOpen: boolean;
 }) {
+  const defalutShowAutoSuggest = React.useMemo(() => {
+    console.log("default")
+    if (shadowItem && typeof shadowItem === 'object') {
+      return Object.entries(shadowItem).map((property) => {
+        return false;
+      }, {});
+    }
+    return [false];
+  }, [shadowItem]);
+
+  const [showAutoSuggest, setShowAutoSuggest] = React.useState<Array<boolean>>(defalutShowAutoSuggest);
+
+  const handleAutoSuggest = React.useCallback((index: number) => {
+    let temp = [...showAutoSuggest];
+    temp[index] = !temp[index];
+    // showAutoSuggest.splice(index, 1, !showAutoSuggest[index]);
+    // console.log("showauto", showAutoSuggest)
+    setShowAutoSuggest(temp);
+  }, [showAutoSuggest]);
+
+  const closeAutoSuggest = React.useCallback((index: number) => {
+    let temp = [...showAutoSuggest];
+    temp[index] = false;
+    // showAutoSuggest.splice(index, 1, !showAutoSuggest[index]);
+    // console.log("showauto", showAutoSuggest)
+    setShowAutoSuggest(temp);
+  }, []);
+
   const onChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     if (Array.isArray(value)) {
       const values = value;
@@ -62,7 +113,31 @@ function SingleShadowInput({
     } else {
       handleBoxShadowChange({ ...value, [e.target.name]: e.target.value });
     }
-  }, [index, value, handleBoxShadowChange]);
+  }, [index, value, shadowItem]);
+
+  const onColorChange = useCallback((color: string) => {
+    if (Array.isArray(value)) {
+      const values = value;
+      const newShadow = { ...value[index], color };
+      values.splice(index, 1, newShadow);
+
+      handleBoxShadowChange(values);
+    } else {
+      handleBoxShadowChange({ ...value, color });
+    }
+  }, [index, value, shadowItem]);
+
+  const handleBoxshadowDownShiftInputChange = useCallback((newInputValue: string, property: string) => {
+    if (Array.isArray(value)) {
+      const values = value;
+      const newShadow = { ...value[index], [property]: newInputValue };
+      values.splice(index, 1, newShadow);
+
+      handleBoxShadowChange(values);
+    } else {
+      handleBoxShadowChange({ ...value, [property]: newInputValue });
+    }
+  }, [index, value, shadowItem])
 
   const onMoveDebounce = useCallback((dragIndex: number, hoverIndex: number) => {
     const values = value;
@@ -161,7 +236,7 @@ function SingleShadowInput({
         display: 'flex', flexDirection: 'column', gap: '$2', paddingLeft: isMultiple ? '$8' : '0',
       }}
       >
-        <TokenInput label="X" value={shadowItem.x} onChange={onChange} type="text" name="x" required />
+        {/* <TokenInput label="X" value={shadowItem.x} onChange={onChange} type="text" name="x" required />
         <TokenInput label="Y" value={shadowItem.y} onChange={onChange} type="text" name="y" required />
         <TokenInput label="Blur" value={shadowItem.blur} onChange={onChange} type="text" name="blur" required />
         <TokenInput
@@ -179,26 +254,72 @@ function SingleShadowInput({
           type="text"
           name="color"
           required
-        />
+        /> */}
+        {
+          Object.keys(propertyTypes).map((key, index) => {
+            return (
+              <>
+                <DownshiftInput
+                  name={key}
+                  value={shadowItem[key]}
+                  type={propertyTypes[key]}
+                  label={key}
+                  showAutoSuggest={showAutoSuggest[index]}
+                  resolvedTokens={resolvedTokens}
+                  handleChange={onChange}
+                  setShowAutoSuggest={() => closeAutoSuggest(index)}
+                  setInputValue={(newInputValue: string) => handleBoxshadowDownShiftInputChange(newInputValue, key)}
+                  placeholder={
+                    key === 'color' ? '#000000, hsla(), rgba() or {alias}' : 'Value or {alias}'
+                  }
+                  prefix={
+                    key === 'color' && (
+                      <button
+                        type="button"
+                        className="block w-4 h-4 rounded-sm cursor-pointer shadow-border shadow-gray-300 focus:shadow-focus focus:shadow-primary-400"
+                        style={{ background: shadowItem[key], fontSize: 0 }}
+                        onClick={handleToggleInputHelper}
+                      >
+                        {shadowItem[key]}
+                      </button>
+                    )
+                  }
+                  suffix={(
+                    <StyledInputSuffix type="button" onClick={() => handleAutoSuggest(index)}>
+                      <StyledIconDisclosure />
+                    </StyledInputSuffix>
+                  )}
+                />
+                {
+                  inputHelperOpen && key === 'color' && (
+                    <ColorPicker value={shadowItem[key]} onChange={onColorChange} />
+                  )
+                }
+              </>
+            )
+          })
+        }
       </Box>
     </Box>
   );
 }
 
-const newToken: ShadowTokenSingleValue = {
-  x: '0', y: '0', blur: '0', spread: '0', color: '#000000', type: 'dropShadow',
-};
 
 export default function BoxShadowInput({
   handleBoxShadowChange,
   handleBoxShadowChangeByAlias,
   resolvedTokens,
   internalEditToken,
+  handleToggleInputHelper,
+  inputHelperOpen
 }: {
   handleBoxShadowChange: (shadow: ShadowTokenSingleValue | ShadowTokenSingleValue[]) => void;
   handleBoxShadowChangeByAlias: (shadow: ShadowTokenSingleValue | ShadowTokenSingleValue[]) => void;
   resolvedTokens: ResolveTokenValuesResult[]
   internalEditToken: EditTokenObject;
+  handleToggleInputHelper: () => void;
+  inputHelperOpen: boolean;
+
 }) {
   const seed = useUIDSeed();
   const isInputMode = (typeof internalEditToken.value === 'object');
@@ -278,7 +399,10 @@ export default function BoxShadowInput({
                     id={String(index)}
                     key={`single-shadow-${seed(index)}`}
                     onRemove={removeShadow}
-                  />
+                    resolvedTokens={resolvedTokens}
+                    handleToggleInputHelper={handleToggleInputHelper}
+                    inputHelperOpen={inputHelperOpen}
+                    />
                 ))
               ) : (
                 <SingleShadowInput
@@ -286,6 +410,9 @@ export default function BoxShadowInput({
                   index={0}
                   value={internalEditToken.value}
                   shadowItem={internalEditToken.value}
+                  resolvedTokens={resolvedTokens}
+                  handleToggleInputHelper={handleToggleInputHelper}
+                  inputHelperOpen={inputHelperOpen}
                 />
               )}
             </DndProvider>
@@ -306,10 +433,10 @@ export default function BoxShadowInput({
               />
               {
                 !isInputMode && checkIfContainsAlias(internalEditToken.value) && (
-                <ResolvedValueBox
-                  alias={alias}
-                  selectedToken={selectedToken}
-                />
+                  <ResolvedValueBox
+                    alias={alias}
+                    selectedToken={selectedToken}
+                  />
                 )
               }
             </Box>

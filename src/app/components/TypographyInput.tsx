@@ -22,7 +22,8 @@ export default function TypographyInput({
   handleTypographyDownShiftInputChange,
   showAliasModeAutoSuggest,
   setShowAliasModeAutoSuggest,
-  handleDownShiftInputChange
+  handleDownShiftInputChange,
+  handleAliasModeAutoSuggest
 }: {
   internalEditToken: EditTokenObject;
   handleTypographyChange: React.ChangeEventHandler;
@@ -33,6 +34,7 @@ export default function TypographyInput({
   showAliasModeAutoSuggest: boolean;
   setShowAliasModeAutoSuggest: (show: boolean) => void;
   handleDownShiftInputChange: (newInputValue: string) => void;
+  handleAliasModeAutoSuggest: () => void;
 }) {
 
   const defalutShowAutoSuggest = React.useMemo(() => {
@@ -165,7 +167,7 @@ export default function TypographyInput({
               value={isInputMode ? '' : internalEditToken.value}
             /> */}
             <DownshiftInput
-              value={isInputMode ? '' : internalEditToken.value}
+              value={typeof internalEditToken.value === 'string' ? internalEditToken.value : ''}
               type={internalEditToken.type}
               label={internalEditToken.property}
               showAutoSuggest={showAliasModeAutoSuggest}

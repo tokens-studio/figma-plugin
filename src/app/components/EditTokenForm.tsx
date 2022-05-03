@@ -152,7 +152,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
       setInternalEditToken({
         ...internalEditToken,
         value: { ...internalEditToken.value, [property]: newInputValue },
-      }); 
+      });
     }
   }, [internalEditToken]);
 
@@ -277,21 +277,24 @@ function EditTokenForm({ resolvedTokens }: Props) {
             handleBoxShadowChangeByAlias={handleBoxShadowChangeByAlias}
             resolvedTokens={resolvedTokens}
             internalEditToken={internalEditToken}
+            handleToggleInputHelper={handleToggleInputHelper}
+            inputHelperOpen={inputHelperOpen}
           />
         );
       }
       case 'typography': {
         return (
           <TypographyInput
-          internalEditToken={internalEditToken}
-          handleTypographyChange={handleTypographyChange}
+            internalEditToken={internalEditToken}
+            handleTypographyChange={handleTypographyChange}
             handleTypographyChangeByAlias={handleTypographyChangeByAlias}
             resolvedTokens={resolvedTokens}
             handleTypographyDownShiftInputChange={handleTypographyDownShiftInputChange}
             handleToggleInputHelper={handleToggleInputHelper}
             showAliasModeAutoSuggest={showAutoSuggest}
             setShowAliasModeAutoSuggest={setShowAutoSuggest}
-            handleDownShiftInputChange={handleDownShiftInputChange}          
+            handleDownShiftInputChange={handleDownShiftInputChange}
+            handleAliasModeAutoSuggest={handleAutoSuggest}
           />
         );
       }
