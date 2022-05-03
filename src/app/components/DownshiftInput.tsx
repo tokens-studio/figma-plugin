@@ -77,6 +77,7 @@ const StyledPart = styled('span', {
 });
 
 interface DownShiftProps {
+  name?: string;
   type: string;
   label?: string;
   error?: string;
@@ -92,6 +93,7 @@ interface DownShiftProps {
 }
 
 const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
+  name,
   type,
   label,
   error,
@@ -109,7 +111,6 @@ const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
     showAutoSuggest,
     value,
   ]); // removing non-alphanumberic except . from the input value
-
   const getHighlightedText = useCallback((text: string, highlight: string) => {
     // Split on highlight term and include term into parts, ignore case
     const parts = text.split(new RegExp(`(${highlight})`, 'gi'));
@@ -135,7 +136,12 @@ const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
     [resolvedTokens, filteredValue, type],
   );
 
+  React.useEffect(() => {
+    console.log("filte", filteredTokenItems, "filtervalu", filteredValue, 'type', type)
+  }, [filteredTokenItems, filteredValue, type])
+
   const handleSelect = useCallback((selectedItem: any) => {
+    console.log('onselecet')
     setInputValue(value.includes('$') ? `$${selectedItem.name}` : `{${selectedItem.name}}`);
     setShowAutoSuggest(false);
   }, [setInputValue, setShowAutoSuggest, value]);
@@ -155,7 +161,7 @@ const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
             <StyledInput
               {...getInputProps({
                 label: type || null,
-                name: 'value',
+                name: name || 'value',
                 placeholder,
                 value: value || '',
                 onChange: handleChange,

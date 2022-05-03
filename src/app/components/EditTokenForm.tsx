@@ -1,8 +1,6 @@
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { styled } from '@/stitches.config';
 import { track } from '@/utils/analytics';
-import IconDisclosure from '@/icons/disclosure.svg';
 import { UpdateMode } from '@/types/state';
 import { Dispatch } from '../store';
 import useManageTokens from '../store/useManageTokens';
@@ -20,25 +18,11 @@ import { EditTokenObject } from '../store/models/uiState';
 import TypographyInput from './TypographyInput';
 import Stack from './Stack';
 import DownshiftInput from './DownshiftInput';
+import { StyledIconDisclosure, StyledInputSuffix } from './StyledInputSuffix';
 
 type Props = {
   resolvedTokens: ResolveTokenValuesResult[];
 };
-
-const StyledIconDisclosure = styled(IconDisclosure, {
-  width: '16px',
-  height: '16px',
-  transition: 'transform 0.2s ease-in-out',
-});
-
-const StyledInputSuffix = styled('button', {
-  width: '28px',
-  height: '28px',
-  backgroundColor: '#f0f0f0',
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-});
 
 // @TODO this needs to be reviewed from a typings perspective + performance
 function EditTokenForm({ resolvedTokens }: Props) {
@@ -91,6 +75,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
 
   const handleChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>(
     (e) => {
+      console.log("handlechange");
       setError(null);
       e.persist();
       if (internalEditToken) {
@@ -137,6 +122,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
 
   const handleTypographyChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>(
     (e) => {
+      console.log("typography")
       e.persist();
       if (internalEditToken?.type === TokenTypes.TYPOGRAPHY && typeof internalEditToken?.value === 'object') {
         setInternalEditToken({
@@ -158,6 +144,17 @@ function EditTokenForm({ resolvedTokens }: Props) {
     },
     [internalEditToken],
   );
+
+  const handleTypographyDownShiftInputChange = React.useCallback((newInputValue: string, property: string) => {
+    console.log("newva", newInputValue, "property", property)
+    console.log("intrr", internalEditToken)
+    if (internalEditToken?.type === TokenTypes.TYPOGRAPHY && typeof internalEditToken?.value === 'object') {
+      setInternalEditToken({
+        ...internalEditToken,
+        value: { ...internalEditToken.value, [property]: newInputValue },
+      }); 
+    }
+  }, [internalEditToken]);
 
   const handleDownShiftInputChange = React.useCallback((newInputValue: string) => {
     setInternalEditToken({
@@ -265,6 +262,9 @@ function EditTokenForm({ resolvedTokens }: Props) {
     return null;
   }, [internalEditToken, resolvedTokens]);
 
+  React.useEffect(() => {
+    console.log("intr", internalEditToken)
+  }, [internalEditToken])
   const renderTokenForm = () => {
     if (!internalEditToken) {
       return null;
@@ -283,10 +283,12 @@ function EditTokenForm({ resolvedTokens }: Props) {
       case 'typography': {
         return (
           <TypographyInput
-            handleTypographyChange={handleTypographyChange}
+          internalEditToken={internalEditToken}
+          handleTypographyChange={handleTypographyChange}
             handleTypographyChangeByAlias={handleTypographyChangeByAlias}
-            internalEditToken={internalEditToken}
             resolvedTokens={resolvedTokens}
+            handleTypographyDownShiftInputChange={handleTypographyDownShiftInputChange}
+            handleToggleInputHelper={handleToggleInputHelper}
           />
         );
       }
