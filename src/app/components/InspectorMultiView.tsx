@@ -39,6 +39,10 @@ export default function InspectorMultiView({ resolvedTokens }: { resolvedTokens:
     return acc;
   }, {}), [uiState.selectionValues]);
 
+  React.useEffect(() => {
+    console.log("iuyuioiuy", groupedSelectionValues)
+  }, [groupedSelectionValues])
+
   const removeTokens = React.useCallback(() => {
     const valuesToRemove = uiState.selectionValues
       .filter((v) => inspectState.selectedTokens.includes(`${v.category}-${v.value}`))

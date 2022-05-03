@@ -118,6 +118,7 @@ export default function TypographyInput({
           Object.entries(internalEditToken.value ?? {}).map(([key, value]: [string, string], index) => (
             <DownshiftInput
               name={key}
+              key={`typography-input-${index}`}
               value={value}
               type={properties[key]}
               label={key}

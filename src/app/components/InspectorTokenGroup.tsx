@@ -8,6 +8,9 @@ import { SelectionGroup } from '@/types';
 
 export default function InspectorTokenGroup({ group, resolvedTokens }: { group: [Properties, SelectionGroup[]], resolvedTokens: SingleToken[] }) {
   const [groupKey, groupValue] = group;
+  React.useEffect(() => {
+    console.log("goupva", groupValue)
+  }, []);
   return (
     <Box
       css={{

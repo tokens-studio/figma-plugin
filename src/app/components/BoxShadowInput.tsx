@@ -20,12 +20,10 @@ import IconButton from './IconButton';
 import ColorPicker from './ColorPicker';
 import Select from './Select';
 import Box from './Box';
-import Input from './Input';
 import ResolvedValueBox from './ResolvedValueBox';
 import DownshiftInput from './DownshiftInput';
 import { StyledIconDisclosure, StyledInputSuffix } from './StyledInputSuffix'
 import { TokenBoxshadowValue } from '@/types/values';
-import { SingleBoxShadowToken } from '@/types/tokens';
 interface DragItem {
   index: number;
   id: string;
@@ -257,6 +255,7 @@ function SingleShadowInput({
               <>
                 <DownshiftInput
                   name={key}
+                  key={`boxshadow-input-${index}`}
                   value={shadowItem[key]}
                   type={propertyTypes[key]}
                   label={key}
