@@ -70,7 +70,7 @@ export const ManageThemesModal: React.FC<Props> = () => {
         <Stack gap={2} direction="row" justify="end">
           {!themeEditorOpen && (
             <Button
-              data-cy="button-manage-themes-modal-new-theme"
+              id="button-manage-themes-modal-new-theme"
               variant="secondary"
               icon={<IconPlus />}
               onClick={handleToggleThemeEditor}
@@ -82,7 +82,7 @@ export const ManageThemesModal: React.FC<Props> = () => {
             <>
               <Box css={{ marginRight: 'auto' }}>
                 <Button
-                  data-cy="button-manage-themes-modal-cancel"
+                  id="button-manage-themes-modal-cancel"
                   variant="secondary"
                   onClick={handleToggleThemeEditor}
                 >
@@ -91,7 +91,7 @@ export const ManageThemesModal: React.FC<Props> = () => {
               </Box>
               {typeof themeEditorOpen === 'string' && (
                 <Button
-                  data-cy="button-manage-themes-modal-delete-theme"
+                  id="button-manage-themes-modal-delete-theme"
                   variant="secondary"
                   type="submit"
                   onClick={handleDeleteTheme}
@@ -100,7 +100,7 @@ export const ManageThemesModal: React.FC<Props> = () => {
                 </Button>
               )}
               <Button
-                data-cy="button-manage-themes-modal-save-theme"
+                id="button-manage-themes-modal-save-theme"
                 variant="primary"
                 type="submit"
                 form="form-create-or-edit-theme"
