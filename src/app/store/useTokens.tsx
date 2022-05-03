@@ -115,7 +115,6 @@ export default function useTokens() {
   const handleRemap = useCallback(async (type: Properties | TokenTypes, name: string, newTokenName: string) => {
 
       track('remapToken', { fromInspect: true });
-      console.log("type", type, "new", newTokenName)
       postToFigma({
         type: MessageToPluginTypes.REMAP_TOKENS,
         category: type,

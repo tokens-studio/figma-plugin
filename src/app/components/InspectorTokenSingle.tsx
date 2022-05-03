@@ -44,9 +44,6 @@ export default function InspectorTokenSingle({
     setChecked(inspectState.selectedTokens.includes(`${token.category}-${token.value}`));
   }, [inspectState.selectedTokens, token]);
 
-  React.useEffect(() => {
-    console.log("token", token)
-  }, [token])
   const handleChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>(
     (e) => {
       e.persist();
@@ -71,13 +68,11 @@ export default function InspectorTokenSingle({
   }, [inputHelperOpen]);
 
   const handleAutoSuggest = React.useCallback(() => {
-    console.log("shouwauto", !showAutoSuggest)
     setShowAutoSuggest(!showAutoSuggest);
   }, [showAutoSuggest]
   );
 
   const onConfirm = React.useCallback(() => {
-    console.log("nw", newTokenName)
     handleRemap(token.category, token.value, newTokenName);
     setShowDialog(false);
   }, [token, handleRemap, newTokenName]);

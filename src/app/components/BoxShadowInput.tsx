@@ -70,7 +70,6 @@ function SingleShadowInput({
   inputHelperOpen: boolean;
 }) {
   const defalutShowAutoSuggest = React.useMemo(() => {
-    console.log("default")
     if (shadowItem && typeof shadowItem === 'object') {
       return Object.entries(shadowItem).map((property) => {
         return false;
@@ -84,16 +83,12 @@ function SingleShadowInput({
   const handleAutoSuggest = React.useCallback((index: number) => {
     let temp = [...showAutoSuggest];
     temp[index] = !temp[index];
-    // showAutoSuggest.splice(index, 1, !showAutoSuggest[index]);
-    // console.log("showauto", showAutoSuggest)
     setShowAutoSuggest(temp);
   }, [showAutoSuggest]);
 
   const closeAutoSuggest = React.useCallback((index: number) => {
     let temp = [...showAutoSuggest];
     temp[index] = false;
-    // showAutoSuggest.splice(index, 1, !showAutoSuggest[index]);
-    // console.log("showauto", showAutoSuggest)
     setShowAutoSuggest(temp);
   }, []);
 

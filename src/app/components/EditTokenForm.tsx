@@ -72,14 +72,12 @@ function EditTokenForm({ resolvedTokens }: Props) {
   }, [inputHelperOpen]);
 
   const handleAutoSuggest = React.useCallback(() => {
-      console.log("shouwauto", !showAutoSuggest)
       setShowAutoSuggest(!showAutoSuggest);
     }, [showAutoSuggest]
   );
 
   const handleChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>(
     (e) => {
-      console.log("handlechange");
       setError(null);
       e.persist();
       if (internalEditToken) {
@@ -126,7 +124,6 @@ function EditTokenForm({ resolvedTokens }: Props) {
 
   const handleTypographyChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>(
     (e) => {
-      console.log("typography")
       e.persist();
       if (internalEditToken?.type === TokenTypes.TYPOGRAPHY && typeof internalEditToken?.value === 'object') {
         setInternalEditToken({
@@ -150,8 +147,6 @@ function EditTokenForm({ resolvedTokens }: Props) {
   );
 
   const handleTypographyDownShiftInputChange = React.useCallback((newInputValue: string, property: string) => {
-    console.log("newva", newInputValue, "property", property)
-    console.log("intrr", internalEditToken)
     if (internalEditToken?.type === TokenTypes.TYPOGRAPHY && typeof internalEditToken?.value === 'object') {
       setInternalEditToken({
         ...internalEditToken,
@@ -266,9 +261,6 @@ function EditTokenForm({ resolvedTokens }: Props) {
     return null;
   }, [internalEditToken, resolvedTokens]);
 
-  React.useEffect(() => {
-    console.log("intr", internalEditToken)
-  }, [internalEditToken])
   const renderTokenForm = () => {
     if (!internalEditToken) {
       return null;

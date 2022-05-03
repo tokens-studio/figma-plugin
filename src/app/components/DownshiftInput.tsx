@@ -136,12 +136,7 @@ const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
     [resolvedTokens, filteredValue, type],
   );
 
-  React.useEffect(() => {
-    console.log("filte", filteredTokenItems, "filtervalu", filteredValue, 'type', type)
-  }, [filteredTokenItems, filteredValue, type])
-
   const handleSelect = useCallback((selectedItem: any) => {
-    console.log('onselecet')
     setInputValue(value.includes('$') ? `$${selectedItem.name}` : `{${selectedItem.name}}`);
     setShowAutoSuggest(false);
   }, [setInputValue, setShowAutoSuggest, value]);
