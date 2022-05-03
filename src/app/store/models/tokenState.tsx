@@ -345,37 +345,41 @@ export const tokenState = createModel<RootModel>()({
     },
 
     renameTokenGroup: (state, data: RenameTokenGroupPayload) => {
-      const { parent, path, oldName, newName, type } = data;
+      const { path, oldName, newName, type } = data;
 
-      const selectedWithNameTokens = state.tokens[parent].filter(token => (token.name.startsWith(`${path}${oldName}.`) && token.type === type));
-      const selectedWithValueTokens = state.tokens[parent].filter(token => (token.value.toString().startsWith(`{${path}${oldName}.`) && token.type === type));
-      const _remainingTokens = state.tokens[parent].filter(token => (!(token.name.startsWith(`${path}${oldName}.`) && token.type === type) || (token.value.toString().startsWith(`{${path}${oldName}.`) && token.type === type)));
-
-      const _newTokensWithName = selectedWithNameTokens.map(token => {
-        const { name, ...rest } = token;
-        const newTokenName = name.replace(`${path}${oldName}`, `${path}${newName}`);
+      const tokenSetsList = Object.keys(state.usedTokenSet);
+      const newTokenGroupState = tokenSetsList.map(tokenSets => {
+        const newTokenGroups = state.tokens[tokenSets].map(token => {
+          if(token.name.startsWith(`${path}${oldName}.`) && token.type === type){
+            const { name, ...rest } = token;
+            const newTokenName = name.replace(`${path}${oldName}`, `${path}${newName}`);
+            return {
+              ...rest,
+              name: newTokenName,
+            };    
+          };
+          if(token.value.toString().startsWith(`{${path}${oldName}.`)){
+            const { value, ...rest } = token;
+            const updatedNewTokenValue = value.toString().replace(`${path}${oldName}`, `${path}${newName}`);
+            return{
+              ...rest,
+              value: updatedNewTokenValue,
+            }; 
+          };
+          return token;
+        });
         return {
-          ...rest,
-          name: newTokenName,
-        };
-      });
-
-      const _newTokensWithValue = selectedWithValueTokens.map(token => {
-        const { value, ...rest } = token;
-        const updatedNewTokenValue = value.toString().replace(`${path}${oldName}`, `${path}${newName}`);
-        return{
-          ...rest,
-          value: updatedNewTokenValue,
-        };
-      });
-
-      return {
-        ...state,
-        tokens: {
-          ...state.tokens,
-          [parent]: [ ..._remainingTokens, ..._newTokensWithValue, ..._newTokensWithName ],
+          [tokenSets] :newTokenGroups,
         }
+      });
+
+      const newState = {
+        ...state,
+        tokens: newTokenGroupState.reduce((acc, cur) => {
+          return { ...acc, ...cur };
+        }, {}),
       };
+      return newState;
     },
     updateAliases: (state, data: { oldName: string; newName: string }) => {
       const newTokens = Object.entries(state.tokens).reduce<TokenState['tokens']>(

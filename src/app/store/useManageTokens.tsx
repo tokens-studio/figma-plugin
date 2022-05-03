@@ -128,7 +128,7 @@ export default function useManageTokens() {
     const newPath = path.slice(0, path.length-oldName.length);
     
     dispatch.uiState.startJob({ name: BackgroundJobs.UI_RENAMETOKENGROUP, isInfinite: true });
-    renameTokenGroup({ parent: activeTokenSet, path: newPath, oldName: oldName, newName: newName, type: type});
+    await renameTokenGroup({ parent: activeTokenSet, path: newPath, oldName: oldName, newName: newName, type: type});
     dispatch.uiState.completeJob(BackgroundJobs.UI_RENAMETOKENGROUP);
   }, [store, renameTokenGroup, dispatch.uiState]);
   return useMemo(() => ({
