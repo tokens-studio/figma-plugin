@@ -79,7 +79,7 @@ export const tokenState = createModel<RootModel>()({
     }),
     toggleManyTokenSets: (state, data: ToggleManyTokenSetsPayload) => {
       const oldSetsWithoutInput = Object.fromEntries(
-        Object.entries(state.usedTokenSet).filter(([tokenSet]) => !data.sets.includes(tokenSet))
+        Object.entries(state.usedTokenSet).filter(([tokenSet]) => !data.sets.includes(tokenSet)),
       );
 
       if (data.shouldCheck) {
@@ -268,8 +268,8 @@ export const tokenState = createModel<RootModel>()({
           if (oldValue) {
             if (isEqual(oldValue.value, token.value)) {
               if (
-                oldValue.description === token.description ||
-                (typeof token.description === 'undefined' && oldValue.description === '')
+                oldValue.description === token.description
+                || (typeof token.description === 'undefined' && oldValue.description === '')
               ) {
                 existingTokens.push(token);
               } else {
@@ -336,14 +336,14 @@ export const tokenState = createModel<RootModel>()({
     },
     duplicateTokenGroup: (state, data: DuplicateTokenGroupPayload) => {
       const { parent, path, oldName } = data;
-      const selectedGroup = state.tokens[parent].filter(token => token.name.startsWith(`${path}${oldName}.`));
-      const _duplicatedGroup = selectedGroup.map(token => {
+      const selectedGroup = state.tokens[parent].filter((token) => token.name.startsWith(`${path}${oldName}.`));
+      const _duplicatedGroup = selectedGroup.map((token) => {
         const { name, ...rest } = token;
         const duplicatedName = name.replace(`${path}${oldName}`, `${path}${oldName}-copy`);
         return {
           ...rest,
           name: duplicatedName,
-        }
+        };
       });
 
       return {
@@ -355,12 +355,14 @@ export const tokenState = createModel<RootModel>()({
       };
     },
     renameTokenGroup: (state, data: RenameTokenGroupPayloads) => {
-      const { parent, path, oldName, newName } = data;
-      const selectedWithNameTokens = state.tokens[parent].filter(token => token.name.startsWith(`${path}${oldName}.`));
-      const remainingTokens = state.tokens[parent].filter(token => !token.name.startsWith(`${path}${oldName}.`));
-      const selectedWithValueTokens = state.tokens[parent].filter(token => token.value.toString().startsWith(`{${path}${oldName}.`));
+      const {
+        parent, path, oldName, newName,
+      } = data;
+      const selectedWithNameTokens = state.tokens[parent].filter((token) => token.name.startsWith(`${path}${oldName}.`));
+      const remainingTokens = state.tokens[parent].filter((token) => !token.name.startsWith(`${path}${oldName}.`));
+      const selectedWithValueTokens = state.tokens[parent].filter((token) => token.value.toString().startsWith(`{${path}${oldName}.`));
 
-      const _newTokensWithName = selectedWithNameTokens.map(token => {
+      const _newTokensWithName = selectedWithNameTokens.map((token) => {
         const { name, ...rest } = token;
         const newTokenName = name.replace(`${path}${oldName}`, `${path}${newName}`);
         return {
@@ -369,10 +371,10 @@ export const tokenState = createModel<RootModel>()({
         };
       });
 
-      const _newTokensWithValue = selectedWithValueTokens.map(token => {
+      const _newTokensWithValue = selectedWithValueTokens.map((token) => {
         const { value, ...rest } = token;
         const updatedNewTokenValue = value.toString().replace(`${path}${oldName}`, `${path}${newName}`);
-        return{
+        return {
           ...rest,
           value: updatedNewTokenValue,
         };
@@ -383,7 +385,7 @@ export const tokenState = createModel<RootModel>()({
         tokens: {
           ...state.tokens,
           [parent]: [..._newTokensWithName, ..._newTokensWithValue, ...remainingTokens],
-        }
+        },
       };
     },
     updateAliases: (state, data: { oldName: string; newName: string }) => {
@@ -392,12 +394,10 @@ export const tokenState = createModel<RootModel>()({
           if (Array.isArray(token.value)) {
             return {
               ...token,
-              value: token.value.map((t) =>
-                Object.entries(t).reduce<Record<string, string | number>>((a, [k, v]) => {
-                  a[k] = replaceReferences(v.toString(), data.oldName, data.newName);
-                  return a;
-                }, {})
-              ),
+              value: token.value.map((t) => Object.entries(t).reduce<Record<string, string | number>>((a, [k, v]) => {
+                a[k] = replaceReferences(v.toString(), data.oldName, data.newName);
+                return a;
+              }, {})),
             } as SingleToken;
           }
           if (typeof token.value === 'object') {
@@ -508,6 +508,10 @@ export const tokenState = createModel<RootModel>()({
         console.error('Error updating document', e);
       }
     },
-    ...Object.fromEntries(Object.entries(tokenStateEffects).map(([key, factory]) => [key, factory(dispatch)])),
+    ...Object.fromEntries(
+      (Object.entries(tokenStateEffects).map(([key, factory]) => (
+        [key, factory(dispatch)]
+      ))),
+    ),
   }),
 });
