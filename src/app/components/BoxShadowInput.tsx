@@ -17,7 +17,6 @@ import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
 import { EditTokenObject } from '../store/models/uiState';
 import Heading from './Heading';
 import IconButton from './IconButton';
-import TokenInput from './TokenInput';
 import ColorPicker from './ColorPicker';
 import Select from './Select';
 import Box from './Box';
@@ -26,19 +25,16 @@ import ResolvedValueBox from './ResolvedValueBox';
 import DownshiftInput from './DownshiftInput';
 import { StyledIconDisclosure, StyledInputSuffix } from './StyledInputSuffix'
 import { TokenBoxshadowValue } from '@/types/values';
-
-
-// @TODO these types need to be fixed
-
+import { SingleBoxShadowToken } from '@/types/tokens';
 interface DragItem {
   index: number;
   id: string;
   type: string;
-}
+};
 
 enum ItemTypes {
   CARD = 'card',
-}
+};
 
 const newToken: ShadowTokenSingleValue = {
   x: '0', y: '0', blur: '0', spread: '0', color: '#000000', type: 'dropShadow',
@@ -50,7 +46,7 @@ const propertyTypes = {
   blur: 'sizing',
   spread: 'sizing',
   color: 'color',
-}
+};
 
 function SingleShadowInput({
   value,
@@ -302,8 +298,7 @@ function SingleShadowInput({
       </Box>
     </Box>
   );
-}
-
+};
 
 export default function BoxShadowInput({
   handleBoxShadowChange,
@@ -311,7 +306,11 @@ export default function BoxShadowInput({
   resolvedTokens,
   internalEditToken,
   handleToggleInputHelper,
-  inputHelperOpen
+  inputHelperOpen,
+  showAliasModeAutoSuggest,
+  setShowAliasModeAutoSuggest,
+  handleAliasModeAutoSuggest,
+  handleDownShiftInputChange,
 }: {
   handleBoxShadowChange: (shadow: ShadowTokenSingleValue | ShadowTokenSingleValue[]) => void;
   handleBoxShadowChangeByAlias: (shadow: ShadowTokenSingleValue | ShadowTokenSingleValue[]) => void;
@@ -319,7 +318,10 @@ export default function BoxShadowInput({
   internalEditToken: EditTokenObject;
   handleToggleInputHelper: () => void;
   inputHelperOpen: boolean;
-
+  showAliasModeAutoSuggest: boolean;
+  setShowAliasModeAutoSuggest: (show: boolean) => void;
+  handleDownShiftInputChange: (newInputValue: string) => void;
+  handleAliasModeAutoSuggest: () => void;
 }) {
   const seed = useUIDSeed();
   const isInputMode = (typeof internalEditToken.value === 'object');
@@ -333,7 +335,7 @@ export default function BoxShadowInput({
   }, [mode]);
 
   const selectedToken = React.useMemo(() => {
-    const search = findReferences(internalEditToken.value);
+    const search = findReferences(String(internalEditToken.value));
     if (search && search.length > 0) {
       const nameToLookFor = search[0].slice(1, search[0].length - 1);
       const foundToken = resolvedTokens.find((t) => t.name === nameToLookFor);
@@ -402,7 +404,7 @@ export default function BoxShadowInput({
                     resolvedTokens={resolvedTokens}
                     handleToggleInputHelper={handleToggleInputHelper}
                     inputHelperOpen={inputHelperOpen}
-                    />
+                  />
                 ))
               ) : (
                 <SingleShadowInput
@@ -421,7 +423,7 @@ export default function BoxShadowInput({
               display: 'flex', flexDirection: 'column', gap: '$2',
             }}
             >
-              <Input
+              {/* <Input
                 required
                 full
                 label="aliasName"
@@ -430,9 +432,28 @@ export default function BoxShadowInput({
                 name="value"
                 placeholder="Alias name"
                 value={isInputMode ? '' : internalEditToken.value}
+              /> */}
+              <DownshiftInput
+                value={isInputMode ? '' : String(internalEditToken.value)}
+                type={internalEditToken.type}
+                label={internalEditToken.property}
+                showAutoSuggest={showAliasModeAutoSuggest}
+                resolvedTokens={resolvedTokens}
+                handleChange={handleBoxShadowChangeByAlias}
+                setShowAutoSuggest={setShowAliasModeAutoSuggest}
+                setInputValue={handleDownShiftInputChange}
+                placeholder={
+                  internalEditToken.type === 'color' ? '#000000, hsla(), rgba() or {alias}' : 'Value or {alias}'
+                }
+                suffix={(
+                  <StyledInputSuffix type="button" onClick={handleAliasModeAutoSuggest}>
+                    <StyledIconDisclosure />
+                  </StyledInputSuffix>
+                )}
               />
+
               {
-                !isInputMode && checkIfContainsAlias(internalEditToken.value) && (
+                !isInputMode && checkIfContainsAlias(String(internalEditToken.value)) && (
                   <ResolvedValueBox
                     alias={alias}
                     selectedToken={selectedToken}
@@ -445,4 +466,4 @@ export default function BoxShadowInput({
       </Box>
     </div>
   );
-}
+};

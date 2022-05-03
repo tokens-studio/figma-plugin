@@ -4,7 +4,6 @@ import { checkIfContainsAlias } from '@/utils/alias';
 import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
 import { TypographyTokenSingleValue } from '@/types/propertyTypes';
 import Box from './Box';
-import Input from './Input';
 import ResolvedValueBox from './ResolvedValueBox';
 import { EditTokenObject } from '../store/models/uiState';
 import { findReferences } from '@/utils/findReferences';
@@ -13,12 +12,22 @@ import Heading from './Heading';
 import DownshiftInput from './DownshiftInput';
 import { StyledIconDisclosure, StyledInputSuffix } from './StyledInputSuffix'
 
+const properties = {
+  fontSize: 'fontSizes',
+  fontFamily: 'fontFamilies',
+  fontWeight: 'fontWeights',
+  letterSpacing: 'letterSpacing',
+  paragraphSpacing: 'paragraphSpacing',
+  textDecoration: 'textDecoration',
+  lineHeight: 'lineHeights',
+  textCase: 'textCase'
+};
+
 export default function TypographyInput({
   internalEditToken,
   handleTypographyChange,
   handleTypographyChangeByAlias,
   resolvedTokens,
-  handleToggleInputHelper,
   handleTypographyDownShiftInputChange,
   showAliasModeAutoSuggest,
   setShowAliasModeAutoSuggest,
@@ -29,7 +38,6 @@ export default function TypographyInput({
   handleTypographyChange: React.ChangeEventHandler;
   handleTypographyChangeByAlias: (typography: TypographyTokenSingleValue | TypographyTokenSingleValue[]) => void;
   resolvedTokens: ResolveTokenValuesResult[];
-  handleToggleInputHelper: () => void;
   handleTypographyDownShiftInputChange: (newInputValue: string, property: string) => void;
   showAliasModeAutoSuggest: boolean;
   setShowAliasModeAutoSuggest: (show: boolean) => void;
@@ -38,7 +46,6 @@ export default function TypographyInput({
 }) {
 
   const defalutShowAutoSuggest = React.useMemo(() => {
-    console.log("default")
     if (internalEditToken.value) {
       return Object.entries(internalEditToken.value).map((property) => {
         return false;
@@ -52,17 +59,6 @@ export default function TypographyInput({
   const [alias, setAlias] = useState('');
   const [showAutoSuggest, setShowAutoSuggest] = React.useState<Array<boolean>>(defalutShowAutoSuggest);
 
-  const properties = {
-    fontSize: 'fontSizes',
-    fontFamily: 'fontFamilies',
-    fontWeight: 'fontWeights',
-    letterSpacing: 'letterSpacing',
-    paragraphSpacing: 'paragraphSpacing',
-    textDecoration: 'textDecoration',
-    lineHeight: 'lineHeights',
-    textCase: 'textCase'
-  };
-
   const handleMode = React.useCallback(() => {
     const changeMode = (mode === 'input') ? 'alias' : 'input';
     setMode(changeMode);
@@ -70,13 +66,13 @@ export default function TypographyInput({
   }, [mode]);
 
   const selectedToken = React.useMemo(() => {
-    const search = findReferences(internalEditToken.value);
+    const search = findReferences(String(internalEditToken.value));
     if (search && search.length > 0) {
       const nameToLookFor = search[0].slice(1, search[0].length - 1);
       const foundToken = resolvedTokens.find((t) => t.name === nameToLookFor);
       if (foundToken) return foundToken;
     }
-    return () => { };
+    return null;
   }, [internalEditToken, resolvedTokens]);
 
   const handleAutoSuggest = React.useCallback((index: number) => {
@@ -93,18 +89,7 @@ export default function TypographyInput({
     // showAutoSuggest.splice(index, 1, !showAutoSuggest[index]);
     // console.log("showauto", showAutoSuggest)
     setShowAutoSuggest(temp);
-  }, []);
-
-  React.useEffect(() => {
-    console.log("show", showAutoSuggest)
-  }, [showAutoSuggest])
-  // const handleTypographyDownShiftInputChange = React.useCallback((newInputValue: string, property: string) => {
-  //   console.log("handledonwsshif");
-  //   setInternalEditToken({
-  //     ...internalEditToken,
-  //     property: newInputValue,
-  //   });
-  // }, [internalEditToken]);
+  }, [showAutoSuggest]);
 
   return (
     <>
@@ -156,18 +141,9 @@ export default function TypographyInput({
             display: 'flex', flexDirection: 'column', gap: '$2',
           }}
           >
-            {/* <Input
-              required
-              full
-              label="aliasName"
-              onChange={handleTypographyChangeByAlias}
-              type="text"
-              name="value"
-              placeholder="Alias name"
-              value={isInputMode ? '' : internalEditToken.value}
-            /> */}
             <DownshiftInput
-              value={typeof internalEditToken.value === 'string' ? internalEditToken.value : ''}
+              name='value'
+              value={isInputMode ? '' : String(internalEditToken.value)}
               type={internalEditToken.type}
               label={internalEditToken.property}
               showAutoSuggest={showAliasModeAutoSuggest}
@@ -186,7 +162,7 @@ export default function TypographyInput({
             />
 
             {
-              !isInputMode && checkIfContainsAlias(internalEditToken.value) && (
+              !isInputMode && typeof internalEditToken.value === 'string' && checkIfContainsAlias(internalEditToken.value) && (
                 <ResolvedValueBox
                   alias={alias}
                   selectedToken={selectedToken}

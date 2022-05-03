@@ -190,7 +190,7 @@ const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
                     </StyledItemColorDiv>
                   )}
                   <StyledItemName>{getHighlightedText(token.name, filteredValue || '')}</StyledItemName>
-                  <StyledItemValue>{token.value}</StyledItemValue>
+                  <StyledItemValue>{token.value.toString()}</StyledItemValue>
                 </StyledItem>
               ))}
             </StyledDropdown>

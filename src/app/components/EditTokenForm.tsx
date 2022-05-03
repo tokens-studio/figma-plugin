@@ -71,7 +71,11 @@ function EditTokenForm({ resolvedTokens }: Props) {
     setInputHelperOpen(!inputHelperOpen);
   }, [inputHelperOpen]);
 
-  const handleAutoSuggest = React.useCallback(() => setShowAutoSuggest(!showAutoSuggest), [showAutoSuggest]);
+  const handleAutoSuggest = React.useCallback(() => {
+      console.log("shouwauto", !showAutoSuggest)
+      setShowAutoSuggest(!showAutoSuggest);
+    }, [showAutoSuggest]
+  );
 
   const handleChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>(
     (e) => {
@@ -279,6 +283,10 @@ function EditTokenForm({ resolvedTokens }: Props) {
             internalEditToken={internalEditToken}
             handleToggleInputHelper={handleToggleInputHelper}
             inputHelperOpen={inputHelperOpen}
+            showAliasModeAutoSuggest={showAutoSuggest}
+            setShowAliasModeAutoSuggest={setShowAutoSuggest}
+            handleDownShiftInputChange={handleDownShiftInputChange}
+            handleAliasModeAutoSuggest={handleAutoSuggest}
           />
         );
       }
@@ -290,7 +298,6 @@ function EditTokenForm({ resolvedTokens }: Props) {
             handleTypographyChangeByAlias={handleTypographyChangeByAlias}
             resolvedTokens={resolvedTokens}
             handleTypographyDownShiftInputChange={handleTypographyDownShiftInputChange}
-            handleToggleInputHelper={handleToggleInputHelper}
             showAliasModeAutoSuggest={showAutoSuggest}
             setShowAliasModeAutoSuggest={setShowAutoSuggest}
             handleDownShiftInputChange={handleDownShiftInputChange}
