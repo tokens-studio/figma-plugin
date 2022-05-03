@@ -289,6 +289,9 @@ function EditTokenForm({ resolvedTokens }: Props) {
             resolvedTokens={resolvedTokens}
             handleTypographyDownShiftInputChange={handleTypographyDownShiftInputChange}
             handleToggleInputHelper={handleToggleInputHelper}
+            showAliasModeAutoSuggest={showAutoSuggest}
+            setShowAliasModeAutoSuggest={setShowAutoSuggest}
+            handleDownShiftInputChange={handleDownShiftInputChange}          
           />
         );
       }

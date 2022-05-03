@@ -19,7 +19,10 @@ export default function TypographyInput({
   handleTypographyChangeByAlias,
   resolvedTokens,
   handleToggleInputHelper,
-  handleTypographyDownShiftInputChange
+  handleTypographyDownShiftInputChange,
+  showAliasModeAutoSuggest,
+  setShowAliasModeAutoSuggest,
+  handleDownShiftInputChange
 }: {
   internalEditToken: EditTokenObject;
   handleTypographyChange: React.ChangeEventHandler;
@@ -27,6 +30,9 @@ export default function TypographyInput({
   resolvedTokens: ResolveTokenValuesResult[];
   handleToggleInputHelper: () => void;
   handleTypographyDownShiftInputChange: (newInputValue: string, property: string) => void;
+  showAliasModeAutoSuggest: boolean;
+  setShowAliasModeAutoSuggest: (show: boolean) => void;
+  handleDownShiftInputChange: (newInputValue: string) => void;
 }) {
 
   const defalutShowAutoSuggest = React.useMemo(() => {
@@ -34,7 +40,7 @@ export default function TypographyInput({
     if (internalEditToken.value) {
       return Object.entries(internalEditToken.value).map((property) => {
         return false;
-      }, {})  
+      }, {})
     }
     return [false];
   }, [internalEditToken]);
@@ -136,18 +142,6 @@ export default function TypographyInput({
               placeholder={
                 internalEditToken.type === 'color' ? '#000000, hsla(), rgba() or {alias}' : 'Value or {alias}'
               }
-              prefix={
-                internalEditToken.type === 'color' && (
-                  <button
-                    type="button"
-                    className="block w-4 h-4 rounded-sm cursor-pointer shadow-border shadow-gray-300 focus:shadow-focus focus:shadow-primary-400"
-                    style={{ background: internalEditToken.value, fontSize: 0 }}
-                    onClick={handleToggleInputHelper}
-                  >
-                    {internalEditToken.value}
-                  </button>
-                )
-              }
               suffix={(
                 <StyledInputSuffix type="button" onClick={() => handleAutoSuggest(index)}>
                   <StyledIconDisclosure />
@@ -160,7 +154,7 @@ export default function TypographyInput({
             display: 'flex', flexDirection: 'column', gap: '$2',
           }}
           >
-            <Input
+            {/* <Input
               required
               full
               label="aliasName"
@@ -169,7 +163,26 @@ export default function TypographyInput({
               name="value"
               placeholder="Alias name"
               value={isInputMode ? '' : internalEditToken.value}
+            /> */}
+            <DownshiftInput
+              value={isInputMode ? '' : internalEditToken.value}
+              type={internalEditToken.type}
+              label={internalEditToken.property}
+              showAutoSuggest={showAliasModeAutoSuggest}
+              resolvedTokens={resolvedTokens}
+              handleChange={handleTypographyChangeByAlias}
+              setShowAutoSuggest={setShowAliasModeAutoSuggest}
+              setInputValue={handleDownShiftInputChange}
+              placeholder={
+                internalEditToken.type === 'color' ? '#000000, hsla(), rgba() or {alias}' : 'Value or {alias}'
+              }
+              suffix={(
+                <StyledInputSuffix type="button" onClick={handleAliasModeAutoSuggest}>
+                  <StyledIconDisclosure />
+                </StyledInputSuffix>
+              )}
             />
+
             {
               !isInputMode && checkIfContainsAlias(internalEditToken.value) && (
                 <ResolvedValueBox
