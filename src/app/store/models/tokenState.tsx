@@ -10,7 +10,9 @@ import { notifyToUI } from '@/plugin/notifiers';
 import { replaceReferences } from '@/utils/findReferences';
 import parseJson from '@/utils/parseJson';
 import updateTokensOnSources from '../updateSources';
-import { AnyTokenList, SingleToken, TokenStore } from '@/types/tokens';
+import {
+  AnyTokenList, SingleToken, TokenStore, TokenTypeSchema,
+} from '@/types/tokens';
 import {
   DeleteTokenPayload,
   SetTokenDataPayload,
@@ -24,6 +26,7 @@ import { RootModel } from '@/types/RootModel';
 import { ThemeObjectsList, UsedTokenSetsMap } from '@/types';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { isEqual } from '@/utils/isEqual';
+import { mappedTokens } from '../../components/createTokenObj';
 
 export interface TokenState {
   tokens: Record<string, AnyTokenList>;
@@ -435,6 +438,31 @@ export const tokenState = createModel<RootModel>()({
     duplicateToken(payload: UpdateTokenPayload, rootState) {
       if (payload.shouldUpdate && rootState.settings.updateOnChange) {
         dispatch.tokenState.updateDocument();
+      }
+      const { tokens } = rootState.tokenState;
+      const { tokenFilter } = rootState.uiState;
+      const { activeTokenSet } = rootState.tokenState;
+      const structuredTokens = mappedTokens(tokens[activeTokenSet], tokenFilter);
+      const duplicatedToken = tokens[activeTokenSet].find((token) => token?.name === `${payload.name}-copy`);
+      const duplicatedTokenType: [String, TokenTypeSchema] | undefined = structuredTokens.find((item) => item[0] === duplicatedToken?.type);
+
+      if (duplicatedToken && duplicatedTokenType) {
+        dispatch.uiState.setShowEditForm(true);
+        dispatch.uiState.setEditToken({
+          value: duplicatedToken.value || '',
+          type: duplicatedTokenType[0],
+          name: duplicatedToken.name,
+          initialName: duplicatedToken.name,
+          isPristine: false,
+          explainer: duplicatedTokenType[1].explainer || '',
+          property: duplicatedTokenType[1].property,
+          schema: duplicatedTokenType[1].schema,
+          optionsSchema: duplicatedTokenType[1].schema?.options || {},
+          options: {
+            description: duplicatedToken?.description || '',
+            type: duplicatedTokenType[0],
+          },
+        });
       }
     },
     createToken(payload: UpdateTokenPayload, rootState) {
