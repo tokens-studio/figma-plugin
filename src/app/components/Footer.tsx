@@ -52,9 +52,14 @@ export default function Footer() {
   const onPullButtonClicked = React.useCallback(() => pullTokens({ usedTokenSet }), [usedTokenSet]);
 
   return (
-    <Box css={{
-      display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0, padding: '$4',
-    }}
+    <Box
+      css={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        flexShrink: 0,
+        padding: '$4',
+      }}
     >
       <Stack direction="row">
         {localApiState.branch && (
@@ -88,25 +93,21 @@ export default function Footer() {
         </Box>
 
         <Text size="xsmall">
-          <a
-            href="https://docs.tokens.studio/?ref=pf"
-            target="_blank"
-            rel="noreferrer"
-          >
+          <a href="https://docs.tokens.studio/?ref=pf" target="_blank" rel="noreferrer">
             <Stack direction="row" gap={1}>
-              <Box as="span" css={{ color: '$textMuted' }}>Docs</Box>
+              <Box as="span" css={{ color: '$textMuted' }}>
+                Docs
+              </Box>
               <DocsIcon />
             </Stack>
           </a>
         </Text>
         <Text size="xsmall">
-          <a
-            href="https://github.com/six7/figma-tokens"
-            target="_blank"
-            rel="noreferrer"
-          >
+          <a href="https://github.com/six7/figma-tokens" target="_blank" rel="noreferrer">
             <Stack direction="row" gap={1}>
-              <Box as="span" css={{ color: '$textMuted' }}>Feedback</Box>
+              <Box as="span" css={{ color: '$textMuted' }}>
+                Feedback
+              </Box>
               <FeedbackIcon />
             </Stack>
           </a>
