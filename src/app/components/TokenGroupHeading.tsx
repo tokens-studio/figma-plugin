@@ -22,9 +22,13 @@ type Props = {
 export default function TokenGroupHeading({ label, path, id, type }: Props) {
   const editProhibited = useSelector(editProhibitedSelector);
   const [newTokenGroupName, setNewTokenGroupName] = React.useState<string>('');
-  const [showNewGroupNameField, setShowNewGroupNameField] = React.useState(false);
+  const [showNewGroupNameField, setShowNewGroupNameField] = React.useState<boolean>(false);
+  const [oldTokenGoupName, setOldTokenGoupName] = React.useState<string>('');
   const { deleteGroup, renameGroup } = useManageTokens();
 
+  React.useEffect(() => {
+    setOldTokenGoupName(path.split('.').pop() || '');
+  },[oldTokenGoupName]);
   const handleDelete = React.useCallback(() => {
     deleteGroup(path);
   }, [path, deleteGroup]);
@@ -37,6 +41,14 @@ export default function TokenGroupHeading({ label, path, id, type }: Props) {
     setShowNewGroupNameField(false);
     renameGroup(path, newTokenGroupName, type);
   }, [newTokenGroupName]);
+
+  const handleNewTokenGroupNameChange = React.useCallback((e) => {
+  setNewTokenGroupName(e.target.value);
+  }, [newTokenGroupName]);
+
+  const handleSetNewTokenGroupNameFileClose = React.useCallback(() => {
+    setShowNewGroupNameField(false);
+  }, [showNewGroupNameField]);
   return (
     <Box
       css={{
@@ -63,29 +75,29 @@ export default function TokenGroupHeading({ label, path, id, type }: Props) {
           </ContextMenuItem>
         </ContextMenuContent>
       </ContextMenu>
-      <Modal isOpen={showNewGroupNameField} close={() => setShowNewGroupNameField(false)}>
+      <Modal isOpen={showNewGroupNameField} close={() => handleSetNewTokenGroupNameFileClose}>
         <Stack direction="column" justify="center" gap={4} css={{ textAlign: 'center' }}>
-          <Heading size="small">Rename {path.split('.').pop()}</Heading>
+          <Heading size="small">Rename {oldTokenGoupName}</Heading>
           <Heading size="small">Renaming only affects tokens of the same type</Heading>
           <form onSubmit={handleRenameTokenGroupSubmit}>
             <Stack direction="column" gap={4}>
               <Input
                 full
-                onChange={(e) => setNewTokenGroupName(e.target.value)}
+                onChange={(e) => handleNewTokenGroupNameChange(e)}
                 type="text"
                 name="tokengroupname"
                 required
-                defaultValue={path.split('.').pop() || ''}
+                defaultValue={oldTokenGoupName}
               />
               <Stack direction="row" gap={4}>
-                <Button variant="secondary" size="large" onClick={() => setShowNewGroupNameField(false)}>
+                <Button variant="secondary" size="large" onClick={() => handleSetNewTokenGroupNameFileClose}>
                   Cancel
                 </Button>
                 <Button
                   type="submit"
                   variant="primary"
                   size="large"
-                  disabled={path.split('.').pop() === newTokenGroupName}
+                  disabled={oldTokenGoupName === newTokenGroupName}
                 >
                   Change
                 </Button>
