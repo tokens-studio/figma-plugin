@@ -386,7 +386,6 @@ export const tokenState = createModel<RootModel>()({
     duplicateTokenGroup: (state, data: DuplicateTokenGroupPayload) => {
       const { parent, path, oldName, type } = data;
       const selectedTokenGroup = state.tokens[parent].filter(token => (token.name.startsWith(`${path}${oldName}.`) && token.type === type));
-      const remainingTokenGroup = state.tokens[parent].filter(token => !(token.name.startsWith(`${path}${oldName}.`) && token.type === type));
       const newTokenGroup = selectedTokenGroup.map(token => {
         const { name, ...rest } = token;
         const duplicatedTokenGroupName = token.name.replace(`${path}${oldName}`, `${path}${oldName}-copy`);
@@ -400,7 +399,7 @@ export const tokenState = createModel<RootModel>()({
         ...state,
         tokens:{
           ...state.tokens,
-          [parent]: [...newTokenGroup, ...remainingTokenGroup],
+          [parent]: [...state.tokens[parent], ...newTokenGroup],
         }
       }
     },
