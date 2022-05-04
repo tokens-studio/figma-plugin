@@ -1,6 +1,7 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { DownloadIcon, UploadIcon } from '@primer/octicons-react';
+import { useFlags } from 'launchdarkly-react-client-sdk';
 import * as pjs from '../../../package.json';
 import Box from './Box';
 import Text from './Text';
@@ -10,7 +11,13 @@ import BranchSelector from './BranchSelector';
 import useRemoteTokens from '../store/remoteTokens';
 import { StorageProviderType } from '../../types/api';
 import {
-  localApiStateSelector, editProhibitedSelector, lastSyncedStateSelector, storageTypeSelector, tokensSelector, usedTokenSetSelector, themesListSelector,
+  localApiStateSelector,
+  editProhibitedSelector,
+  lastSyncedStateSelector,
+  storageTypeSelector,
+  tokensSelector,
+  usedTokenSetSelector,
+  themesListSelector,
 } from '@/selectors';
 import DocsIcon from '@/icons/docs.svg';
 import FeedbackIcon from '@/icons/feedback.svg';
@@ -23,7 +30,7 @@ export default function Footer() {
   const editProhibited = useSelector(editProhibitedSelector);
   const localApiState = useSelector(localApiStateSelector);
   const usedTokenSet = useSelector(usedTokenSetSelector);
-
+  const { gitBranchSelector } = useFlags();
   const { pullTokens, pushTokens } = useRemoteTokens();
 
   const checkForChanges = React.useCallback(() => {
@@ -62,33 +69,32 @@ export default function Footer() {
       }}
     >
       <Stack direction="row">
-        {localApiState.branch && (
-        <>
-          <BranchSelector currentBranch={localApiState.branch} />
-          <Tooltip variant="top" label={`Pull from ${transformProviderName(storageType.provider)}`}>
-            <button onClick={onPullButtonClicked} type="button" className="button button-ghost">
-              <DownloadIcon />
-            </button>
-          </Tooltip>
-          <Tooltip variant="top" label={`Push to ${transformProviderName(storageType.provider)}`}>
-            <button
-              onClick={onPushButtonClicked}
-              type="button"
-              className="relative button button-ghost"
-              disabled={editProhibited}
-            >
-              {hasChanges && <div className="absolute top-0 right-0 w-2 h-2 rounded-full bg-primary-500" />}
+        {localApiState.branch && gitBranchSelector && (
+          <>
+            <BranchSelector currentBranch={localApiState.branch} />
+            <Tooltip variant="top" label={`Pull from ${transformProviderName(storageType.provider)}`}>
+              <button onClick={onPullButtonClicked} type="button" className="button button-ghost">
+                <DownloadIcon />
+              </button>
+            </Tooltip>
+            <Tooltip variant="top" label={`Push to ${transformProviderName(storageType.provider)}`}>
+              <button
+                onClick={onPushButtonClicked}
+                type="button"
+                className="relative button button-ghost"
+                disabled={editProhibited}
+              >
+                {hasChanges && <div className="absolute top-0 right-0 w-2 h-2 rounded-full bg-primary-500" />}
 
-              <UploadIcon />
-            </button>
-          </Tooltip>
-        </>
+                <UploadIcon />
+              </button>
+            </Tooltip>
+          </>
         )}
       </Stack>
       <Stack direction="row" gap={4}>
         <Box css={{ color: '$textMuted', fontSize: '$xsmall' }}>
           Version
-          {' '}
           {pjs.plugin_version}
         </Box>
 
