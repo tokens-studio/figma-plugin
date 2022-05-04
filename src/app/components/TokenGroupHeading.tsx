@@ -24,7 +24,6 @@ export default function TokenGroupHeading({ label, path, id, type }: Props) {
   const [newTokenGroupName, setNewTokenGroupName] = React.useState<string>('');
   const [showNewGroupNameField, setShowNewGroupNameField] = React.useState<boolean>(false);
   const [oldTokenGroupName, setOldTokenGroupName] = React.useState<string>('');
-  const [tokenGroupMarkedForChange, setTokenGroupMarkedForChange] = React.useState<string>('');
   const [isTokenGroupDuplicated, setIsTokenGroupDuplicated] = React.useState<boolean>(false);
   const { deleteGroup, renameGroup, duplicateGroup } = useManageTokens();
 
@@ -44,7 +43,6 @@ export default function TokenGroupHeading({ label, path, id, type }: Props) {
   const handleRenameTokenGroupSubmit = React.useCallback((e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setShowNewGroupNameField(false);
-    setTokenGroupMarkedForChange('');
     if(isTokenGroupDuplicated)
       renameGroup(`${path}-copy`, newTokenGroupName, type);
     else renameGroup(path, newTokenGroupName, type);
@@ -57,7 +55,6 @@ export default function TokenGroupHeading({ label, path, id, type }: Props) {
 
   const handleSetNewTokenGroupNameFileClose = React.useCallback(() => {
     setShowNewGroupNameField(false);
-    setTokenGroupMarkedForChange('');
   }, [showNewGroupNameField]);
 
   const handleDuplicate = React.useCallback(() => {
