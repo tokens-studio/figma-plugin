@@ -5,7 +5,6 @@ import Tooltip from './Tooltip';
 import useRemoteTokens from '../store/remoteTokens';
 import { StorageProviderType } from '../../types/api';
 import Box from './Box';
-import { styled } from '@/stitches.config';
 import {
   projectURLSelector,
   storageTypeSelector,
@@ -17,6 +16,8 @@ import { TabButton } from './TabButton';
 import { NavbarUndoButton } from './NavbarUndoButton';
 import Minimize from '../assets/minimize.svg';
 import useMinimizeWindow from './useMinimizeWindow';
+import IconButton from './IconButton';
+import RefreshIcon from '@/icons/refresh.svg';
 
 const transformProviderName = (provider: StorageProviderType) => {
   switch (provider) {
@@ -32,15 +33,6 @@ const transformProviderName = (provider: StorageProviderType) => {
       return provider;
   }
 };
-
-const StyledButton = styled('button', {
-  all: 'unset',
-  border: 'none',
-  padding: '$1',
-  marginRight: '$3',
-  borderRadius: '$button',
-  cursor: 'pointer',
-});
 
 const Navbar: React.FC = () => {
   const projectURL = useSelector(projectURLSelector);
@@ -88,18 +80,10 @@ const Navbar: React.FC = () => {
                 </a>
               </Tooltip>
             )}
-            <Tooltip label={`Pull from ${transformProviderName(storageType.provider)}`}>
-              <button onClick={handlePullTokens} type="button" className="button button-ghost">
-                <Icon name="refresh" />
-              </button>
-            </Tooltip>
+            <IconButton tooltip={`Pull from ${transformProviderName(storageType.provider)}`} onClick={handlePullTokens} icon={<RefreshIcon />} />
           </>
         )}
-        <Tooltip label="Minimize plugin">
-          <StyledButton type="button" onClick={handleResize}>
-            <Minimize />
-          </StyledButton>
-        </Tooltip>
+        <IconButton tooltip="Minimize plugin" onClick={handleResize} icon={<Minimize />} />
       </Stack>
     </Box>
   );

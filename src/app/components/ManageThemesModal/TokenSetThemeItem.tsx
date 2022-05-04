@@ -53,14 +53,14 @@ export const TokenSetThemeItem: React.FC<Props> = ({
             </StyledThemeLabel>
             {item.isLeaf && (
               <DropdownMenu>
-                <DropdownMenuTrigger>
+                <DropdownMenuTrigger data-cy={`tokensettheme-item--dropdown-trigger--${item.key}`}>
                   <span>{tokenSetSatusLabels[tokenSetStatus]}</span>
                   <IconChevronDown />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent side="bottom">
                   <DropdownMenuRadioGroup value={tokenSetStatus} onValueChange={handleValueChange}>
                     {tokenSetStatusValues.map((status) => (
-                      <DropdownMenuRadioItem key={status} value={status}>
+                      <DropdownMenuRadioItem key={status} value={status} data-cy={`tokensettheme-item--dropdown-content--${status}`}>
                         <DropdownMenuItemIndicator>
                           <CheckIcon />
                         </DropdownMenuItemIndicator>

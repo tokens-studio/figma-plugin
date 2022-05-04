@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
-import Icon from './Icon';
 import TokenGroupHeading from './TokenGroupHeading';
-import Tooltip from './Tooltip';
 import { TokenButton } from './TokenButton';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { editProhibitedSelector } from '@/selectors';
 import { DeepKeyTokenMap, SingleToken, TokenTypeSchema } from '@/types/tokens';
 import { isSingleToken } from '@/utils/is';
+import IconButton from './IconButton';
+import AddIcon from '@/icons/add.svg';
 
 export type ShowFormOptions = {
   name: string;
@@ -59,17 +59,16 @@ const TokenTree: React.FC<Props> = ({
             <div className="property-wrapper w-full" data-cy={`token-group-${stringPath}`}>
               <div className="flex items-center justify-between group">
                 <TokenGroupHeading label={name} path={stringPath} id="listing" type = {type}/>
-                <Tooltip label="Add a new token" side="left">
-                  <button
-                    disabled={editProhibited}
-                    data-cy="button-add-new-token-in-group"
-                    className="button button-ghost opacity-0 group-hover:opacity-100 focus:opacity-100"
-                    type="button"
+                <div className="opacity-0 group-hover:opacity-100 focus:opacity-100">
+                  <IconButton
+                    icon={<AddIcon />}
+                    tooltip="Add a new token"
+                    tooltipSide="left"
                     onClick={handleShowNewForm}
-                  >
-                    <Icon name="add" />
-                  </button>
-                </Tooltip>
+                    disabled={editProhibited}
+                    dataCy="button-add-new-token-in-group"
+                  />
+                </div>
               </div>
 
               <TokenTree
