@@ -63,7 +63,6 @@ export default function TokenGroupHeading({ label, path, id, type }: Props) {
     setShowNewGroupNameField(true);
     duplicateGroup(path, type);
   }, [oldTokenGroupName]);
-
   return (
     <Box
       css={{
