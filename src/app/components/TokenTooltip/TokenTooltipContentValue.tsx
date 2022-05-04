@@ -19,7 +19,6 @@ type Props = {
 export const TokenTooltipContentValue: React.FC<Props> = ({ token, shouldResolve, tokenIsShadowOrTypographyAlias }) => {
   const seed = useUIDSeed();
   const tokensContext = React.useContext(TokensContext);
-
   const { getTokenValue } = useTokens();
   const valueToCheck = React.useMemo(() => {
     if (shouldResolve && tokenIsShadowOrTypographyAlias) {
@@ -27,7 +26,8 @@ export const TokenTooltipContentValue: React.FC<Props> = ({ token, shouldResolve
       const tokenValueString = String(token.value);
       if (tokenIsShadowOrTypographyAlias && tokenValueString.charAt(0) === '$') nameToLookFor = tokenValueString.slice(1, tokenValueString.length);
       if (tokenIsShadowOrTypographyAlias && tokenValueString.charAt(0) === '{') nameToLookFor = tokenValueString.slice(1, tokenValueString.length - 1);
-      return getTokenValue(nameToLookFor, tokensContext.resolvedTokens)?.value;
+      const tokenValue = getTokenValue(nameToLookFor, tokensContext.resolvedTokens)?.value;
+      return tokenValue || token.value;
     }
     if (shouldResolve) return getTokenValue(token.name, tokensContext.resolvedTokens)?.value;
     return token.value;
