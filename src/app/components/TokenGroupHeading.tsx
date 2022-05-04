@@ -43,12 +43,12 @@ export default function TokenGroupHeading({ label, path, id, type }: Props) {
 
   const handleRenameTokenGroupSubmit = React.useCallback((e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log(oldTokenGroupName, newTokenGroupName);
     setShowNewGroupNameField(false);
     setTokenGroupMarkedForChange('');
     if(isTokenGroupDuplicated)
       renameGroup(`${path}-copy`, newTokenGroupName, type);
     else renameGroup(path, newTokenGroupName, type);
+    setIsTokenGroupDuplicated(false);
   }, [newTokenGroupName]);
 
   const handleNewTokenGroupNameChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -63,7 +63,6 @@ export default function TokenGroupHeading({ label, path, id, type }: Props) {
   const handleDuplicate = React.useCallback(() => {
     setIsTokenGroupDuplicated(true);
     setShowNewGroupNameField(true);
-    console.log(isTokenGroupDuplicated);
     duplicateGroup(path, type);
   }, []);
   return (
@@ -113,7 +112,7 @@ export default function TokenGroupHeading({ label, path, id, type }: Props) {
                 <Button variant="secondary" size="large" onClick={handleSetNewTokenGroupNameFileClose}>
                   Cancel
                 </Button>
-                <Button type="submit" variant="primary" size="large" disabled={tokenGroupMarkedForChange === newTokenGroupName}>
+                <Button type="submit" variant="primary" size="large" disabled={oldTokenGroupName === newTokenGroupName}>
                   Change
                 </Button>
               </Stack>
