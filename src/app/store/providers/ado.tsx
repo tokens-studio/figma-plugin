@@ -1,13 +1,10 @@
 import { useDispatch, useSelector } from 'react-redux';
-import patm from 'azure-devops-node-api/handlers/personalaccesstoken';
-import * as GitApi from 'azure-devops-node-api/GitApi';
 import * as GitInterfaces from 'azure-devops-node-api/interfaces/GitInterfaces';
 import { Dispatch } from '@/app/store';
 import { MessageToPluginTypes } from '@/types/messages';
 import convertTokensToObject from '@/utils/convertTokensToObject';
 import useConfirm from '@/app/hooks/useConfirm';
 import usePushDialog from '@/app/hooks/usePushDialog';
-import IsJSONString from '@/utils/isJSONString';
 import { ContextObject } from '@/types/api';
 import { notifyToUI, postToFigma } from '../../../plugin/notifiers';
 import { FeatureFlags } from '@/utils/featureFlags';
@@ -26,60 +23,159 @@ interface GetADOCreatePullRequestUrl {
   (args: {
     branch?: string
     orgUrl?: string
-    projectName?: string
-    repoName?: string
+    projectId?: string
+    repositoryId?: string
   }): string
 }
 
 export const getADOCreatePullRequestUrl: GetADOCreatePullRequestUrl = ({
   branch,
   orgUrl,
-  projectName,
-  repoName,
-}) => `${orgUrl}/${projectName}{/_git/${repoName}/pullrequestcreate?sourceRef=&targetRef=${branch}`;
+  projectId,
+  repositoryId,
+}) => `${orgUrl}/${projectId ? `${projectId}/` : ''}/_git/${repositoryId}/pullrequestcreate?sourceRef=&targetRef=${branch}`;
 
-const getPersonalAccessTokenHandler = (token: string, allowCrossOriginAuthentication?: boolean) => new patm.PersonalAccessTokenCredentialHandler(token, allowCrossOriginAuthentication);
+interface FetchGit {
+  body?: Record<string, any>
+  gitResource: 'refs' | 'items' | 'pushes'
+  token: string
+  orgUrl?: string
+  params?: Record<string, string | boolean | Record<string, string | boolean>>
+  projectId?:string
+  repositoryId: string
+}
 
-export const getGitApi = async (context: ContextObject): Promise<GitApi.IGitApi> => {
-  const authHandler = getPersonalAccessTokenHandler(context.secret);
-  const gitApi = new GitApi.GitApi(context.baseUrl || '', [authHandler]);
-  return gitApi;
+const fetchGit = async ({
+  body,
+  gitResource,
+  orgUrl,
+  params,
+  projectId,
+  repositoryId,
+  token,
+}: FetchGit): Promise<Record<string, any>> => {
+  const apiVersion = 'api-version=7.1-preview.1';
+  const paramString = params
+    ? [...Object.entries(params).map(([key, value]) => `${key}=${typeof value === 'string' ? value : JSON.stringify(value)}`), apiVersion].join('&')
+    : apiVersion;
+
+  const formattedBody = body ? { body: JSON.stringify(body) } : {};
+  return fetch(
+    `${orgUrl}/${projectId ? `${projectId}/` : ''}_apis/git/repositories/${repositoryId}/${gitResource}?${paramString}`,
+    {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Basic ${window.btoa(`:${token}`)}`,
+      },
+      ...formattedBody,
+    },
+  );
 };
 
 const checkAndSetAccess = async (context: ContextObject, dispatch: Dispatch) => {
-  const gitApi = await getGitApi(context);
-  const branches = await gitApi.getRefs(context.id, context.name, 'heads');
-  const hasWriteAccess = Boolean(branches.length);
-  dispatch.tokenState.setEditProhibited(!hasWriteAccess);
+  const { status } = await fetchGit({
+    gitResource: 'refs',
+    orgUrl: context.baseUrl,
+    params: {
+      filter: 'heads',
+    },
+    projectId: context.name,
+    repositoryId: context.id,
+    token: context.secret,
+  });
+  dispatch.tokenState.setEditProhibited(status === 200);
+};
+
+type GitApiArgs = Pick<FetchGit, 'body' | 'params'>;
+type GitItemsArgs = {
+  filePath: string
+  branch: string
+};
+type GitApiMethods = {
+  getItems(args: GitItemsArgs): Promise<{ count: number, value: GitInterfaces.GitItem[] }>;
+  getItem(args: GitItemsArgs): Promise<Record<string, any>>
+  getRefs(args: GitApiArgs): Promise<GitInterfaces.GitRef[]>;
+  getPushes(args: GitApiArgs): Promise<GitInterfaces.GitPush>;
+};
+export const getGitApi = (context: ContextObject): GitApiMethods => {
+  const itemsDefault: Omit<FetchGit, 'body' | 'params'> = {
+    gitResource: 'items',
+    orgUrl: context.baseUrl,
+    projectId: context.name,
+    repositoryId: context.id,
+    token: context.secret,
+  };
+  return ({
+    async getItem(args) {
+      const response = await fetchGit({
+        ...itemsDefault,
+        params: {
+          path: args.filePath,
+          versionDescriptor: {
+            version: args.branch,
+            versionType: 'branch',
+          },
+          includeContent: true,
+        },
+      });
+      if (response.status !== 200) {
+        return undefined;
+      }
+      return response.json();
+    },
+    async getItems({ filePath, branch }) {
+      const response = await fetchGit({
+        ...itemsDefault,
+        params: {
+          scopePath: filePath.replace(/\.json$/, ''),
+          recursionLevel: 'full',
+          versionDescriptor: {
+            version: branch,
+            versionType: 'branch',
+          },
+        },
+      });
+      return response.json();
+    },
+    async getRefs(args: GitApiArgs) {
+      const response = await fetchGit({
+        body: args.body,
+        gitResource: 'refs',
+        orgUrl: context.baseUrl,
+        params: args.params,
+        projectId: context.name,
+        repositoryId: context.id,
+        token: context.secret,
+      });
+      return response.json();
+    },
+    async getPushes(args: GitApiArgs) {
+      const response = await fetchGit({
+        body: args.body,
+        gitResource: 'pushes',
+        orgUrl: context.baseUrl,
+        params: args.params,
+        projectId: context.name,
+        repositoryId: context.id,
+        token: context.secret,
+      });
+      return response.json();
+    },
+  });
 };
 
 const fetchContent = async (context: ContextObject, filePath?: string): Promise<[
   { values: any },
   string,
 ]> => {
-  const git = await getGitApi(context);
+  const gitApi = getGitApi(context);
   try {
-    const { content, path } = await git.getItem(
-      context.id,
-      filePath || context.filePath,
-      context.name,
-      undefined,
-      undefined,
-      false,
-      false,
-      false,
-      {
-        version: context.branch,
-        versionType: GitInterfaces.GitVersionType.Branch,
-      },
-      true,
-      false,
-      false,
-    );
-    if (content && IsJSONString(content)) {
-      const parsed = JSON.parse(content);
+    const path = filePath || context.filePath;
+    const content = await gitApi.getItem({ filePath: path, branch: context.branch });
+    if (content) {
       return [
-        { values: parsed },
+        { values: content },
         path || '',
       ];
     }
@@ -96,21 +192,8 @@ export const readContents = async ({ context, opts }: { context: ContextObject, 
 }> => {
   if (opts.multiFile) {
     const gitApi = await getGitApi(context);
-    const result = await gitApi.getItems(
-      context.id,
-      context.filePath,
-      context.name,
-      GitInterfaces.VersionControlRecursionType.Full,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      {
-        version: context.branch,
-        versionType: GitInterfaces.GitVersionType.Branch,
-      },
-    );
-    const filePaths = result.reduce<string[]>((acc: string[], cur: GitInterfaces.GitItem) => {
+    const { value } = await gitApi.getItems({ filePath: context.filePath, branch: context.branch });
+    const filePaths = value.reduce<string[]>((acc: string[], cur: GitInterfaces.GitItem) => {
       const { path } = cur;
       if (path?.endsWith('.json')) {
         acc.push(path);
@@ -161,44 +244,27 @@ const extractFiles = (filePath: string, tokenObj: TokenSets, opts: FeatureFlagOp
   return files;
 };
 
-const createOrUpdateFiles = async ({
-  branch,
-  comment,
-  filePath,
-  gitApi,
-  multiFile,
-  project,
-  oldObjectId,
-  repo,
-  tokenObj,
-}: {
-  branch: string;
-  comment: string;
-  gitApi: GitApi.IGitApi
-  filePath: string;
-  project: string;
-  oldObjectId?: string,
-  repo: string;
-  tokenObj: TokenSets;
-  multiFile: boolean
-}): Promise<GitInterfaces.GitPush> => {
-  const files = extractFiles(filePath, tokenObj, { multiFile });
+interface GetChanges {
+  (args: {
+    files: { [key: string]: string }
+    value: GitInterfaces.GitItem[]
+  }) : {
+    changeType: GitInterfaces.VersionControlChangeType;
+    item: {
+      path: string;
+    };
+    newContent: {
+      content: string;
+      contentType: GitInterfaces.ItemContentType;
+    };
+  }[]
+}
 
-  const result = await gitApi.getItems(
-    repo,
-    filePath,
-    project,
-    GitInterfaces.VersionControlRecursionType.Full,
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    {
-      version: branch,
-      versionType: GitInterfaces.GitVersionType.Branch,
-    },
-  );
-  const tokensOnRemote = result.reduce<Set<string>>((acc, { path }) => {
+const getChanges: GetChanges = ({
+  files,
+  value,
+}) => {
+  const tokensOnRemote = value.reduce<Set<string>>((acc, { path }) => {
     if (path?.endsWith('.json')) {
       acc.add(path);
     }
@@ -215,24 +281,16 @@ const createOrUpdateFiles = async ({
         contentType: GitInterfaces.ItemContentType.RawText,
       },
     }));
-  return gitApi.createPush(
-    {
-      refUpdates: [
-        {
-          name: `refs/heads/${branch}`,
-          oldObjectId,
-        },
-      ],
-      commits: [
-        {
-          comment,
-          changes,
-        },
-      ],
+  return changes;
+};
+
+const getHeads = async (context: ContextObject) => {
+  const gitApi = await getGitApi(context);
+  return gitApi.getRefs({
+    params: {
+      filter: 'heads',
     },
-    repo,
-    project,
-  );
+  });
 };
 
 export const useADO = () => {
@@ -260,51 +318,62 @@ export const useADO = () => {
 
   const writeTokensToADO = async ({
     context,
+    multiFile,
     tokenObj,
     commitMessage,
     customBranch,
   }: {
     context: ContextObject;
+    multiFile: boolean;
     tokenObj: TokenSets;
     commitMessage?: string;
     customBranch?: string;
   }) => {
     const { id: repo, name: project } = context;
     try {
-      const gitApi = await getGitApi(context);
-      const branches = await gitApi.getRefs(repo, project, 'heads');
-
+      const branches = await getHeads(context);
       const branch = customBranch || context.branch;
       if (!branches) return null;
 
       let oldObjectId;
 
       const newBranch = !branches.some(({ name, objectId }) => {
-        if ('refs/heads/main'.replace('refs/heads/', '') === name) {
+        if (name?.replace('refs/heads/', '') === branch) {
           oldObjectId = objectId;
           return true;
         }
         return false;
       });
-
+      const gitApi = await getGitApi(context);
       if (newBranch) {
-        ({ objectId: oldObjectId } = await gitApi.updateRef(
-          { name: `refs/heads/${branch}`, repositoryId: repo, isLocked: false },
-          repo,
-          project,
-        ));
+        const refs = await gitApi.getRefs(
+          { params: { name: `refs/heads/${branch}`, repositoryId: repo, isLocked: false } },
+        );
+        oldObjectId = refs[0].objectId ?? oldObjectId;
       }
 
-      const response = await createOrUpdateFiles({
-        gitApi,
-        branch,
-        comment: commitMessage || 'Commit from Figma',
-        filePath: context.filePath,
-        multiFile: Boolean(featureFlags?.gh_mfs_enabled),
-        oldObjectId,
-        project: context.name,
-        repo: context.id,
-        tokenObj,
+      const files = extractFiles(context.filePath, tokenObj, { multiFile });
+
+      const { value } = await gitApi.getItems({ filePath: context.filePath, branch });
+      const changes = getChanges({
+        files,
+        value,
+      });
+      const response = await gitApi.getPushes({
+        body: {
+          refUpdates: [
+            {
+              name: `refs/heads/${branch}`,
+              oldObjectId,
+            },
+          ],
+          commits: [
+            {
+              comment: commitMessage || 'Commit from Figma',
+              changes,
+            },
+          ],
+        },
       });
       dispatch.tokenState.setLastSyncedState(JSON.stringify(tokenObj, null, 2));
       notifyToUI('Pushed changes to ADO');
@@ -338,6 +407,7 @@ export const useADO = () => {
       const { commitMessage, customBranch } = pushSettings;
       try {
         await writeTokensToADO({
+          multiFile: Boolean(featureFlags?.gh_mfs_enabled),
           context,
           tokenObj: rawTokenObj,
           commitMessage,
@@ -354,11 +424,13 @@ export const useADO = () => {
     return rawTokenObj;
   };
 
-  const pullTokensFromADO = async (context: ContextObject, receivedFeatureFlags?: FeatureFlags | undefined): Promise<{
+  const pullTokensFromADO = async (context: ContextObject, receivedFeatureFlags?: FeatureFlags | undefined):Promise<{
     values: any;
   } | null> => {
     const multiFile = receivedFeatureFlags ? receivedFeatureFlags.gh_mfs_enabled : featureFlags?.gh_mfs_enabled;
-
+    if (!context.baseUrl) {
+      return null;
+    }
     await checkAndSetAccess(context, dispatch);
 
     try {
@@ -378,8 +450,7 @@ export const useADO = () => {
 
   const syncTokensWithADO = async (context: ContextObject): Promise<TokenValues | null> => {
     try {
-      const gitApi = await getGitApi(context);
-      const branches = await gitApi.getRefs(context.id, context.name, 'heads');
+      const branches = await getHeads(context);
       const hasBranches = Boolean(branches.length);
 
       if (!hasBranches) {
