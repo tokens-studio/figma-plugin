@@ -75,7 +75,7 @@ export default function TokenGroupHeading({ label, path, id, type }: Props) {
           </ContextMenuItem>
         </ContextMenuContent>
       </ContextMenu>
-      <Modal isOpen={showNewGroupNameField} close={() => handleSetNewTokenGroupNameFileClose}>
+      <Modal isOpen={showNewGroupNameField} close={handleSetNewTokenGroupNameFileClose}>
         <Stack direction="column" justify="center" gap={4} css={{ textAlign: 'center' }}>
           <Heading size="small">Rename {oldTokenGoupName}</Heading>
           <Heading size="small">Renaming only affects tokens of the same type</Heading>
@@ -90,7 +90,7 @@ export default function TokenGroupHeading({ label, path, id, type }: Props) {
                 defaultValue={oldTokenGoupName}
               />
               <Stack direction="row" gap={4}>
-                <Button variant="secondary" size="large" onClick={() => handleSetNewTokenGroupNameFileClose}>
+                <Button variant="secondary" size="large" onClick={handleSetNewTokenGroupNameFileClose}>
                   Cancel
                 </Button>
                 <Button
