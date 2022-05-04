@@ -44,6 +44,34 @@ const multipleShadowToken = {
   ],
 };
 
+const resolvedTypographyToken = {
+  type: 'typography',
+  value: {
+    fontFamily: 'IBM Plex Serif',
+    fontWeight: 'bold',
+    fontSize: '{size.25}',
+    lineHeight: 0,
+    letterSpacing: 0,
+    paragraphSpacing: 0,
+    textCase: 'uppercase',
+    textDecoration: 'none',  
+  }
+}
+
+const unResolvedTypographyToken = {
+  type: 'typography',
+  value: {
+    fontFamily: 'IBM Plex Serif',
+    fontWeight: 'bold',
+    fontSize: '{size.0}',
+    lineHeight: 0,
+    letterSpacing: 0,
+    paragraphSpacing: 0,
+    textCase: 'uppercase',
+    textDecoration: 'none',  
+  }
+}
+
 const tokens = [
   { name: 'foo', value: 3 },
   { name: 'bar', value: '{foo}' },
@@ -59,6 +87,9 @@ const tokens = [
   { name: 'spacing.xs', value: '{spacing.xs}' },
   { name: 'shadow.single', ...singleShadowToken },
   { name: 'shadow.multiple', ...multipleShadowToken },
+  { name: 'size.25', value: '2px' },
+  { name: 'typography.resolved', ...resolvedTypographyToken },
+  { name: 'typography.unResolved', ...unResolvedTypographyToken }
 ];
 
 const output = [
@@ -152,6 +183,27 @@ const output = [
         color: '#000000',
       },
     ],
+  },
+  {
+    name: 'size.25',
+    rawValue: '2px',
+    value: '2px'
+  },
+  {
+    ...resolvedTypographyToken,
+    name: 'typography.resolved',
+    value: {
+      ...resolvedTypographyToken.value,
+      fontSize: '2px'
+    },
+    rawValue: resolvedTypographyToken.value
+  },
+  {
+    ...unResolvedTypographyToken,
+    failedToResolve: true,
+    name: 'typography.unResolved',
+    rawValue: unResolvedTypographyToken.value,
+    value: unResolvedTypographyToken.value
   },
 ];
 describe('resolveTokenValues', () => {
