@@ -3,5 +3,5 @@ import { userStateSelector } from './userStateSelector';
 
 export const checkedLocalStorageForKeySelector = createSelector(
   userStateSelector,
-  (state) => state.checkedLocalStorageForKey
+  (state) => state.checkedLocalStorageForKey,
 );

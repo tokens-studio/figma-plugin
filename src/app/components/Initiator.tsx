@@ -92,7 +92,9 @@ export function Initiator() {
             setStorageType({ provider: pluginMessage.storageType });
             break;
           case MessageFromPluginTypes.API_CREDENTIALS: {
-            const { status, credentials, featureFlagId, usedTokenSet } = pluginMessage;
+            const {
+              status, credentials, featureFlagId, usedTokenSet,
+            } = pluginMessage;
             if (status === true) {
               let receivedFlags;
 
@@ -107,7 +109,9 @@ export function Initiator() {
               track('Fetched from remote', { provider: credentials.provider });
               if (!credentials.internalId) track('missingInternalId', { provider: credentials.provider });
 
-              const { id, provider, secret, baseUrl } = credentials;
+              const {
+                id, provider, secret, baseUrl,
+              } = credentials;
               const [owner, repo] = id.split('/');
               if (provider === StorageProviderType.GITHUB) {
                 const storageClient = new GithubTokenStorage(secret, owner, repo, baseUrl);
