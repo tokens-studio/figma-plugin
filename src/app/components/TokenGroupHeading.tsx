@@ -76,6 +76,9 @@ export default function TokenGroupHeading({ label, path, id, type }: Props) {
           <ContextMenuItem disabled={editProhibited} onSelect={handleRename}>
             Rename
           </ContextMenuItem>
+          <ContextMenuItem disabled={editProhibited} onSelect={handleRename}>
+            Rename
+          </ContextMenuItem>
         </ContextMenuContent>
       </ContextMenu>
       <Modal isOpen={showNewGroupNameField} close={handleSetNewTokenGroupNameFileClose}>
