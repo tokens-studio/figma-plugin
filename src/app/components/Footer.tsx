@@ -4,7 +4,6 @@ import { DownloadIcon, UploadIcon } from '@primer/octicons-react';
 import * as pjs from '../../../package.json';
 import Box from './Box';
 import Text from './Text';
-import Tooltip from './Tooltip';
 import Stack from './Stack';
 import BranchSelector from './BranchSelector';
 import useRemoteTokens from '../store/remoteTokens';
@@ -14,6 +13,7 @@ import {
 } from '@/selectors';
 import DocsIcon from '@/icons/docs.svg';
 import FeedbackIcon from '@/icons/feedback.svg';
+import IconButton from './IconButton';
 
 export default function Footer() {
   const storageType = useSelector(storageTypeSelector);
@@ -65,23 +65,8 @@ export default function Footer() {
         {localApiState.branch && (
         <>
           <BranchSelector currentBranch={localApiState.branch} />
-          <Tooltip variant="top" label={`Pull from ${transformProviderName(storageType.provider)}`}>
-            <button onClick={onPullButtonClicked} type="button" className="button button-ghost">
-              <DownloadIcon />
-            </button>
-          </Tooltip>
-          <Tooltip variant="top" label={`Push to ${transformProviderName(storageType.provider)}`}>
-            <button
-              onClick={onPushButtonClicked}
-              type="button"
-              className="relative button button-ghost"
-              disabled={editProhibited}
-            >
-              {hasChanges && <div className="absolute top-0 right-0 w-2 h-2 rounded-full bg-primary-500" />}
-
-              <UploadIcon />
-            </button>
-          </Tooltip>
+          <IconButton icon={<DownloadIcon />} onClick={onPullButtonClicked} tooltipSide="top" tooltip={`Pull from ${transformProviderName(storageType.provider)}`} />
+          <IconButton badge={hasChanges} icon={<UploadIcon />} onClick={onPushButtonClicked} tooltipSide="top" disabled={editProhibited} tooltip={`Push to ${transformProviderName(storageType.provider)}`} />
         </>
         )}
       </Stack>
