@@ -32,6 +32,7 @@ export default function TokenGroupHeading({ label, path, id, type }: Props) {
     if(isTokenGroupDuplicated)
       setOldTokenGroupName(`${path.split('.').pop()}-copy` || '');
     else setOldTokenGroupName(`${path.split('.').pop()}` || '');
+    setNewTokenGroupName(path.split('.').pop() || '');
   },[oldTokenGroupName, isTokenGroupDuplicated]);
   const handleDelete = React.useCallback(() => {
     deleteGroup(path);
@@ -42,6 +43,7 @@ export default function TokenGroupHeading({ label, path, id, type }: Props) {
 
   const handleRenameTokenGroupSubmit = React.useCallback((e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    console.log(oldTokenGroupName, newTokenGroupName);
     setShowNewGroupNameField(false);
     setTokenGroupMarkedForChange('');
     if(isTokenGroupDuplicated)
@@ -61,8 +63,9 @@ export default function TokenGroupHeading({ label, path, id, type }: Props) {
   const handleDuplicate = React.useCallback(() => {
     setIsTokenGroupDuplicated(true);
     setShowNewGroupNameField(true);
+    console.log(isTokenGroupDuplicated);
     duplicateGroup(path, type);
-  }, [oldTokenGroupName]);
+  }, []);
   return (
     <Box
       css={{
