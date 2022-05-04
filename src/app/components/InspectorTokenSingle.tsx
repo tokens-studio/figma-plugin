@@ -8,8 +8,10 @@ import useTokens from '../store/useTokens';
 import InspectorResolvedToken from './InspectorResolvedToken';
 import { Dispatch } from '../store';
 import { SelectionGroup } from '@/types';
+import { TokenTypes } from '@/constants/TokenTypes';
 import TokenNodes from './inspector/TokenNodes';
 import { inspectStateSelector } from '@/selectors';
+import { checkIfContainsAlias, getAliasValue } from '@/utils/alias';
 import { IconToggleableDisclosure } from './icons/IconToggleableDisclosure';
 import Button from './Button';
 import Heading from './Heading';
@@ -35,9 +37,16 @@ export default function InspectorTokenSingle({
   const [inputHelperOpen, setInputHelperOpen] = React.useState<boolean>(false);
   const [showDialog, setShowDialog] = React.useState<boolean>(false);
 
-  const mappedToken = React.useMemo(() => (
-    getTokenValue(token.value, resolvedTokens)
-  ), [token, resolvedTokens, getTokenValue]);
+  const mappedToken = React.useMemo(() => {
+    if (checkIfContainsAlias(token.value)) {
+      let nameToLookFor: string = '';
+      const tokenValueString = String(token.value);
+      if (tokenValueString.charAt(0) === '$') nameToLookFor = tokenValueString.slice(1, tokenValueString.length);
+      if (tokenValueString.charAt(0) === '{') nameToLookFor = tokenValueString.slice(1, tokenValueString.length - 1);
+      return getTokenValue(nameToLookFor, resolvedTokens);  
+    } 
+    return getTokenValue(token.value, resolvedTokens);
+  }, [token, resolvedTokens, getTokenValue]);
   const [isChecked, setChecked] = React.useState(false);
 
   React.useEffect(() => {
