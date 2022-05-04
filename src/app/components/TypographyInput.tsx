@@ -76,19 +76,15 @@ export default function TypographyInput({
   }, [internalEditToken, resolvedTokens]);
 
   const handleAutoSuggest = React.useCallback((index: number) => {
-    let temp = [...showAutoSuggest];
-    temp[index] = !temp[index];
-    // showAutoSuggest.splice(index, 1, !showAutoSuggest[index]);
-    // console.log("showauto", showAutoSuggest)
-    setShowAutoSuggest(temp);
+    const newAutoSuggest = [...showAutoSuggest];
+    newAutoSuggest[index] = !newAutoSuggest[index];
+    setShowAutoSuggest(newAutoSuggest);
   }, [showAutoSuggest]);
 
   const closeAutoSuggest = React.useCallback((index: number) => {
-    let temp = [...showAutoSuggest];
-    temp[index] = false;
-    // showAutoSuggest.splice(index, 1, !showAutoSuggest[index]);
-    // console.log("showauto", showAutoSuggest)
-    setShowAutoSuggest(temp);
+    const newAutoSuggest = [...showAutoSuggest];
+    newAutoSuggest[index] = false;
+    setShowAutoSuggest(newAutoSuggest);
   }, [showAutoSuggest]);
 
   return (
@@ -143,7 +139,6 @@ export default function TypographyInput({
           }}
           >
             <DownshiftInput
-              name='value'
               value={isInputMode ? '' : String(internalEditToken.value)}
               type={internalEditToken.type}
               label={internalEditToken.property}

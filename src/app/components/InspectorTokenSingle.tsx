@@ -154,7 +154,7 @@ export default function InspectorTokenSingle({
                           <button
                             type="button"
                             className="block w-4 h-4 rounded-sm cursor-pointer shadow-border shadow-gray-300 focus:shadow-focus focus:shadow-primary-400"
-                            style={{ background: token.value, fontSize: 0 }}
+                            style={{ background: newTokenName, fontSize: 0 }}
                             onClick={handleToggleInputHelper}
                           >
                             {newTokenName}

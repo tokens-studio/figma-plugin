@@ -92,10 +92,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
     (shadow: SingleBoxShadowToken['value']) => {
       setError(null);
       if (internalEditToken?.type === TokenTypes.BOX_SHADOW) {
-        setInternalEditToken({
-          ...internalEditToken,
-          value: shadow,
-        });
+        setInternalEditToken(prev => ({...prev, value: shadow}));
       }
     },
     [internalEditToken],

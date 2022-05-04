@@ -81,15 +81,15 @@ function SingleShadowInput({
   const [showAutoSuggest, setShowAutoSuggest] = React.useState<Array<boolean>>(defalutShowAutoSuggest);
 
   const handleAutoSuggest = React.useCallback((index: number) => {
-    let temp = [...showAutoSuggest];
-    temp[index] = !temp[index];
-    setShowAutoSuggest(temp);
+    const newShowAutoSuggest = [...showAutoSuggest];
+    newShowAutoSuggest[index] = !newShowAutoSuggest[index];
+    setShowAutoSuggest(newShowAutoSuggest);
   }, [showAutoSuggest]);
 
   const closeAutoSuggest = React.useCallback((index: number) => {
-    let temp = [...showAutoSuggest];
-    temp[index] = false;
-    setShowAutoSuggest(temp);
+    const newShowAutoSuggest = [...showAutoSuggest];
+    newShowAutoSuggest[index] = false;
+    setShowAutoSuggest(newShowAutoSuggest);
   }, []);
 
   const onChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -225,25 +225,6 @@ function SingleShadowInput({
         display: 'flex', flexDirection: 'column', gap: '$2', paddingLeft: isMultiple ? '$8' : '0',
       }}
       >
-        {/* <TokenInput label="X" value={shadowItem.x} onChange={onChange} type="text" name="x" required />
-        <TokenInput label="Y" value={shadowItem.y} onChange={onChange} type="text" name="y" required />
-        <TokenInput label="Blur" value={shadowItem.blur} onChange={onChange} type="text" name="blur" required />
-        <TokenInput
-          label="Spread"
-          value={shadowItem.spread}
-          onChange={onChange}
-          type="text"
-          name="spread"
-          required
-        />
-        <TokenInput
-          label="Color"
-          value={shadowItem.color}
-          onChange={onChange}
-          type="text"
-          name="color"
-          required
-        /> */}
         {
           Object.keys(propertyTypes).map((key, index) => {
             return (
@@ -417,16 +398,6 @@ export default function BoxShadowInput({
               display: 'flex', flexDirection: 'column', gap: '$2',
             }}
             >
-              {/* <Input
-                required
-                full
-                label="aliasName"
-                onChange={handleBoxShadowChangeByAlias}
-                type="text"
-                name="value"
-                placeholder="Alias name"
-                value={isInputMode ? '' : internalEditToken.value}
-              /> */}
               <DownshiftInput
                 value={isInputMode ? '' : String(internalEditToken.value)}
                 type={internalEditToken.type}
