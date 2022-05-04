@@ -9,3 +9,5 @@ cypress/videos
 .env.production
 package
 .idea
+storybook-static
+src/stories
