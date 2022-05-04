@@ -28,6 +28,7 @@ export default function TokenGroupHeading({ label, path, id, type }: Props) {
 
   React.useEffect(() => {
     setOldTokenGoupName(path.split('.').pop() || '');
+    setNewTokenGroupName(path.split('.').pop() || '');
   },[oldTokenGoupName]);
   const handleDelete = React.useCallback(() => {
     deleteGroup(path);
