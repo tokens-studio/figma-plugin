@@ -128,7 +128,6 @@ export default function useManageTokens() {
     const newPath = path.slice(0, path.length-oldName.length);
     
     dispatch.uiState.startJob({ name: BackgroundJobs.UI_RENAMETOKENGROUP, isInfinite: true });
-<<<<<<< HEAD
     await renameTokenGroup({ parent: activeTokenSet, path: newPath, oldName: oldName, newName: newName, type: type});
     dispatch.uiState.completeJob(BackgroundJobs.UI_RENAMETOKENGROUP);
   }, [store, renameTokenGroup, dispatch.uiState]);
@@ -145,12 +144,4 @@ export default function useManageTokens() {
   return useMemo(() => ({
     editSingleToken, createSingleToken, deleteSingleToken, deleteGroup, duplicateSingleToken, renameGroup, duplicateGroup
   }), [editSingleToken, createSingleToken, deleteSingleToken, deleteGroup, duplicateSingleToken, renameGroup, duplicateGroup]);
-=======
-    renameTokenGroup({ parent: activeTokenSet, path: newPath, oldName: oldName, newName: newName, type: type});
-    dispatch.uiState.completeJob(BackgroundJobs.UI_RENAMETOKENGROUP);
-  }, [store, renameTokenGroup, dispatch.uiState]);
-  return useMemo(() => ({
-    editSingleToken, createSingleToken, deleteSingleToken, deleteGroup, duplicateSingleToken, renameGroup
-  }), [editSingleToken, createSingleToken, deleteSingleToken, deleteGroup, duplicateSingleToken, renameGroup]);
->>>>>>> 20bddac (resolve conflict)
 }
