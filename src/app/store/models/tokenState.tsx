@@ -21,10 +21,7 @@ import {
   UpdateDocumentPayload,
   UpdateTokenPayload,
   RenameTokenGroupPayload,
-<<<<<<< HEAD
   DuplicateTokenGroupPayload,
-=======
->>>>>>> 20bddac (resolve conflict)
 } from '@/types/payloads';
 import { updateTokenPayloadToSingleToken } from '@/utils/updateTokenPayloadToSingleToken';
 import { RootModel } from '@/types/RootModel';
