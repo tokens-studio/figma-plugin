@@ -8,10 +8,9 @@ import useTokens from '../store/useTokens';
 import InspectorResolvedToken from './InspectorResolvedToken';
 import { Dispatch } from '../store';
 import { SelectionGroup } from '@/types';
-import { TokenTypes } from '@/constants/TokenTypes';
 import TokenNodes from './inspector/TokenNodes';
 import { inspectStateSelector } from '@/selectors';
-import { checkIfContainsAlias, getAliasValue } from '@/utils/alias';
+import { checkIfContainsAlias } from '@/utils/alias';
 import { IconToggleableDisclosure } from './icons/IconToggleableDisclosure';
 import Button from './Button';
 import Heading from './Heading';
@@ -130,7 +129,7 @@ export default function InspectorTokenSingle({
             gap: '$1',
           }}
         >
-          <Box css={{ fontSize: '$small' }}>{token.value}</Box>
+          <Box css={{ fontSize: '$small' }}>{ mappedToken?.name || token.value}</Box>
           <IconButton
             tooltip="Change to another token"
             dataCy="button-token-remap"
