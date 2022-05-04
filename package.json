@@ -62,6 +62,7 @@
         "just-safe-get": "^4.0.1",
         "just-safe-set": "^4.0.2",
         "just-split": "^3.0.1",
+        "launchdarkly-react-client-sdk": "^2.26.0",
         "lodash.debounce": "^4.0.8",
         "mixpanel-figma": "^2.0.1",
         "ml-matrix": "^6.9.0",

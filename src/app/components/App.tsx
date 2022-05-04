@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
+import { withLDProvider, useLDClient } from 'launchdarkly-react-client-sdk';
 import Settings from './Settings';
 import Inspector from './Inspector';
 import Tokens from './Tokens';
@@ -16,9 +17,28 @@ import WindowResizer from './WindowResizer';
 import Box from './Box';
 import { activeTabSelector } from '@/selectors';
 import PluginResizerWrapper from './PluginResizer';
+import { userIdSelector } from '@/selectors/userIdSelector';
+import { planSelector } from '@/selectors/planSelector';
+import { userNameSelector } from '@/selectors/userNameSelector';
 
 function App() {
   const activeTab = useSelector(activeTabSelector);
+  const userId = useSelector(userIdSelector);
+  const userName = useSelector(userNameSelector);
+  const plan = useSelector(planSelector);
+  const ldClient = useLDClient();
+
+  useEffect(() => {
+    if (userId) {
+      ldClient?.identify({
+        key: userId!,
+        custom: {
+          plan,
+          name: userName,
+        },
+      });
+    }
+  }, [userId, ldClient, plan, userName]);
 
   return (
     <Box css={{ backgroundColor: '$bgDefault' }}>
@@ -60,4 +80,6 @@ function App() {
   );
 }
 
-export default App;
+export default withLDProvider({
+  clientSideID: process.env.LAUNCHDARKLY_SDK_CLIENT!,
+})(App);
