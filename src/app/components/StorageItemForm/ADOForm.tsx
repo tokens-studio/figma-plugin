@@ -13,12 +13,11 @@ export default function ADOForm({
       <Stack direction="column" gap={4}>
         <Input
           full
-          label="Project Name"
+          label="Project Name (optional)"
           value={values.name}
           onChange={handleChange}
           type="text"
           name="name"
-          required
         />
         <Box css={{ position: 'relative' }}>
           <Input
