@@ -19,6 +19,7 @@ import {
   UpdateDocumentPayload,
   UpdateTokenPayload,
   RenameTokenGroupPayload,
+  DuplicateTokenGroupPayload,
 } from '@/types/payloads';
 import { updateTokenPayloadToSingleToken } from '@/utils/updateTokenPayloadToSingleToken';
 import { RootModel } from '@/types/RootModel';
@@ -380,6 +381,28 @@ export const tokenState = createModel<RootModel>()({
         }, {}),
       };
       return newState;
+    },
+
+    duplicateTokenGroup: (state, data: DuplicateTokenGroupPayload) => {
+      const { parent, path, oldName, type } = data;
+      const selectedTokenGroup = state.tokens[parent].filter(token => (token.name.startsWith(`${path}${oldName}.`) && token.type === type));
+      const remainingTokenGroup = state.tokens[parent].filter(token => !(token.name.startsWith(`${path}${oldName}.`) && token.type === type));
+      const newTokenGroup = selectedTokenGroup.map(token => {
+        const { name, ...rest } = token;
+        const duplicatedTokenGroupName = token.name.replace(`${path}${oldName}`, `${path}${oldName}-copy`);
+        return {
+          name: duplicatedTokenGroupName,
+          ...rest,
+        }
+      })
+      
+      return {
+        ...state,
+        tokens:{
+          ...state.tokens,
+          [parent]: [...newTokenGroup, ...remainingTokenGroup],
+        }
+      }
     },
     updateAliases: (state, data: { oldName: string; newName: string }) => {
       const newTokens = Object.entries(state.tokens).reduce<TokenState['tokens']>(

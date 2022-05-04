@@ -23,13 +23,13 @@ export default function TokenGroupHeading({ label, path, id, type }: Props) {
   const editProhibited = useSelector(editProhibitedSelector);
   const [newTokenGroupName, setNewTokenGroupName] = React.useState<string>('');
   const [showNewGroupNameField, setShowNewGroupNameField] = React.useState<boolean>(false);
-  const [oldTokenGoupName, setOldTokenGoupName] = React.useState<string>('');
+  const [oldTokenGroupName, setOldTokenGroupName] = React.useState<string>('');
   const [tokenGroupMarkedForChange, setTokenGroupMarkedForChange] = React.useState<string>('');
-  const { deleteGroup, renameGroup } = useManageTokens();
+  const { deleteGroup, renameGroup, duplicateGroup } = useManageTokens();
 
   React.useEffect(() => {
-    setOldTokenGoupName(path.split('.').pop() || '');
-  },[oldTokenGoupName]);
+    setOldTokenGroupName(path.split('.').pop() || '');
+  },[oldTokenGroupName]);
   const handleDelete = React.useCallback(() => {
     deleteGroup(path);
   }, [path, deleteGroup]);
@@ -52,6 +52,13 @@ export default function TokenGroupHeading({ label, path, id, type }: Props) {
     setShowNewGroupNameField(false);
     setTokenGroupMarkedForChange('');
   }, [showNewGroupNameField]);
+
+
+  const handleDuplicate = React.useCallback(() => {
+    setShowNewGroupNameField(true);
+    duplicateGroup(path, type);
+  }, [oldTokenGroupName]);
+
   return (
     <Box
       css={{
@@ -76,14 +83,14 @@ export default function TokenGroupHeading({ label, path, id, type }: Props) {
           <ContextMenuItem disabled={editProhibited} onSelect={handleRename}>
             Rename
           </ContextMenuItem>
-          <ContextMenuItem disabled={editProhibited} onSelect={handleRename}>
-            Rename
+          <ContextMenuItem disabled={editProhibited} onSelect={handleDuplicate}>
+            Duplicate
           </ContextMenuItem>
         </ContextMenuContent>
       </ContextMenu>
       <Modal isOpen={showNewGroupNameField} close={handleSetNewTokenGroupNameFileClose}>
         <Stack direction="column" justify="center" gap={4} css={{ textAlign: 'center' }}>
-          <Heading size="small">Rename {oldTokenGoupName}</Heading>
+          <Heading size="small">Rename {oldTokenGroupName}</Heading>
           <Heading size="small">Renaming only affects tokens of the same type</Heading>
           <form onSubmit={handleRenameTokenGroupSubmit}>
             <Stack direction="column" gap={4}>
@@ -93,7 +100,7 @@ export default function TokenGroupHeading({ label, path, id, type }: Props) {
                 type="text"
                 name="tokengroupname"
                 required
-                defaultValue={oldTokenGoupName}
+                defaultValue={oldTokenGroupName}
               />
               <Stack direction="row" gap={4}>
                 <Button variant="secondary" size="large" onClick={handleSetNewTokenGroupNameFileClose}>

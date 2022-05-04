@@ -5,3 +5,4 @@ export * from './SetTokenDataPayload';
 export * from './UpdateDocumentPayload';
 export * from './ToggleManyTokenSetsPayload';
 export * from './RenameTokenGroupPayload';
+export * from './DuplicateTokenGroupPayload';
