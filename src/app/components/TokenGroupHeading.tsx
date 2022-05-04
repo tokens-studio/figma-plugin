@@ -24,6 +24,7 @@ export default function TokenGroupHeading({ label, path, id, type }: Props) {
   const [newTokenGroupName, setNewTokenGroupName] = React.useState<string>('');
   const [showNewGroupNameField, setShowNewGroupNameField] = React.useState<boolean>(false);
   const [oldTokenGoupName, setOldTokenGoupName] = React.useState<string>('');
+  const [tokenGroupMarkedForChange, setTokenGroupMarkedForChange] = React.useState<string>('');
   const { deleteGroup, renameGroup } = useManageTokens();
 
   React.useEffect(() => {
@@ -39,15 +40,17 @@ export default function TokenGroupHeading({ label, path, id, type }: Props) {
   const handleRenameTokenGroupSubmit = React.useCallback((e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setShowNewGroupNameField(false);
+    setTokenGroupMarkedForChange('');
     renameGroup(path, newTokenGroupName, type);
   }, [newTokenGroupName]);
 
-  const handleNewTokenGroupNameChange = React.useCallback((e) => {
+  const handleNewTokenGroupNameChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
   setNewTokenGroupName(e.target.value);
   }, [newTokenGroupName]);
 
   const handleSetNewTokenGroupNameFileClose = React.useCallback(() => {
     setShowNewGroupNameField(false);
+    setTokenGroupMarkedForChange('');
   }, [showNewGroupNameField]);
   return (
     <Box
@@ -75,7 +78,7 @@ export default function TokenGroupHeading({ label, path, id, type }: Props) {
           </ContextMenuItem>
         </ContextMenuContent>
       </ContextMenu>
-      <Modal isOpen={showNewGroupNameField} close={() => handleSetNewTokenGroupNameFileClose}>
+      <Modal isOpen={showNewGroupNameField} close={handleSetNewTokenGroupNameFileClose}>
         <Stack direction="column" justify="center" gap={4} css={{ textAlign: 'center' }}>
           <Heading size="small">Rename {oldTokenGoupName}</Heading>
           <Heading size="small">Renaming only affects tokens of the same type</Heading>
@@ -83,22 +86,17 @@ export default function TokenGroupHeading({ label, path, id, type }: Props) {
             <Stack direction="column" gap={4}>
               <Input
                 full
-                onChange={(e) => handleNewTokenGroupNameChange(e)}
+                onChange={handleNewTokenGroupNameChange}
                 type="text"
                 name="tokengroupname"
                 required
                 defaultValue={oldTokenGoupName}
               />
               <Stack direction="row" gap={4}>
-                <Button variant="secondary" size="large" onClick={() => handleSetNewTokenGroupNameFileClose}>
+                <Button variant="secondary" size="large" onClick={handleSetNewTokenGroupNameFileClose}>
                   Cancel
                 </Button>
-                <Button
-                  type="submit"
-                  variant="primary"
-                  size="large"
-                  disabled={oldTokenGoupName === newTokenGroupName}
-                >
+                <Button type="submit" variant="primary" size="large" disabled={tokenGroupMarkedForChange === newTokenGroupName}>
                   Change
                 </Button>
               </Stack>
