@@ -64,6 +64,17 @@ const fetchGit = async ({
 
   const formattedBody = body ? { body: JSON.stringify(body) } : {};
   const input = `${orgUrl}/${projectId ? `${projectId}/` : ''}_apis/git/repositories/${repositoryId}/${gitResource}?${paramString}`;
+  console.log(
+    input,
+    {
+      method,
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Basic ${btoa(`:${token}`)}`,
+      },
+      ...formattedBody,
+    },
+  );
   const res = await fetch(
     input,
     {
@@ -89,7 +100,7 @@ const checkAndSetAccess = async (context: ContextObject, dispatch: Dispatch) => 
     repositoryId: context.id,
     token: context.secret,
   });
-  dispatch.tokenState.setEditProhibited(status === 200);
+  dispatch.tokenState.setEditProhibited(status !== 200);
 };
 
 type GitItemsArgs = {
@@ -135,7 +146,7 @@ export const getGitApi = (context: ContextObject): GitApiMethods => {
       const response = await fetchGit({
         ...itemsDefault,
         params: {
-          scopePath: filePath.replace(/\.json$/, ''),
+          scopePath: filePath.replace(/[^/]+\.json$/, ''),
           recursionLevel: 'full',
           'versionDescriptor.version': branch,
           'versionDescriptor.versionType': 'branch',
@@ -160,6 +171,10 @@ export const getGitApi = (context: ContextObject): GitApiMethods => {
     async getPushes({
       branch, changes, commitMessage = 'Commit from Figma', oldObjectId,
     }) {
+      console.log({
+        name: `refs/heads/${branch}`,
+        oldObjectId,
+      });
       const response = await fetchGit({
         body: JSON.stringify({
           refUpdates: [
@@ -250,7 +265,6 @@ export const readContents = async ({ context, opts }: { context: ContextObject, 
 
 const hasSameContent = (content: TokenValues, storedContent: string) => {
   const stringifiedContent = JSON.stringify(content.values, null, 2);
-
   return stringifiedContent === storedContent;
 };
 
@@ -303,9 +317,9 @@ const getChanges: GetChanges = ({
   }, new Set());
   const changes = Object.entries(files)
     .map(([path, content]) => ({
-      changeType: tokensOnRemote.has(path) ? ChangeType.edit : ChangeType.add,
+      changeType: tokensOnRemote.has(`/${path}`) ? ChangeType.edit : ChangeType.add,
       item: {
-        path,
+        path: `/${path}`,
       },
       newContent: {
         content,
@@ -372,17 +386,18 @@ export const useADO = () => {
       const branches = await getBranches(context);
       const branch = customBranch || context.branch;
       if (branches.size === 0) return null;
-
-      const oldObjectId = branches.has(branch) ? branches.get(branch)?.objectId : branches.get(context.branch)?.objectId;
+      const newBranch = !branches.has(branch);
+      const oldObjectId = newBranch ? branches.get(context.branch)?.objectId : branches.get(branch)?.objectId;
 
       const files = extractFiles(context.filePath, tokenObj, { multiFile });
-
       const gitApi = await getGitApi(context);
-      const { value } = await gitApi.getItems({ filePath: context.filePath, branch });
+      const { value } = await gitApi.getItems({ filePath: context.filePath, branch: newBranch ? context.branch : branch });
+
       const changes = getChanges({
         files,
         value,
       });
+
       const response = await gitApi.getPushes({
         branch,
         changes,
