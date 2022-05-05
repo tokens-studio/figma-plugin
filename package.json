@@ -20,7 +20,8 @@
     "cy:run": "cypress run --headless",
     "serve": "serve dist",
     "storybook": "start-storybook -p 6006",
-    "build-storybook": "build-storybook"
+    "build-storybook": "build-storybook",
+    "tokenstory": "yarn build-storybook & yarn storybook"
   },
   "dependencies": {
     "@figma-plugin/helpers": "^0.15.2",
@@ -39,6 +40,7 @@
     "@rematch/core": "^2.2.0",
     "@sentry/react": "^6.2.5",
     "@stitches/react": "^1.2.7",
+    "@storybook/addon-postcss": "^2.0.0",
     "@welldone-software/why-did-you-render": "^6.2.3",
     "autoprefixer": "^10.2.5",
     "axios": "^0.21.2",
@@ -101,6 +103,7 @@
     "@babel/preset-typescript": "^7.12.16",
     "@figma/plugin-typings": "^1.41.1",
     "@storybook/addon-actions": "^6.4.22",
+    "@storybook/addon-docs": "^6.4.22",
     "@storybook/addon-essentials": "^6.4.22",
     "@storybook/addon-interactions": "^6.4.22",
     "@storybook/addon-links": "^6.4.22",

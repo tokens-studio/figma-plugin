@@ -10,4 +10,3 @@ cypress/videos
 package
 .idea
 storybook-static
-src/stories
