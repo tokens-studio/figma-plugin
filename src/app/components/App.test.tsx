@@ -22,9 +22,11 @@ describe('App', () => {
         data: {
           pluginMessage: {
             type: 'tokenvalues',
-            usedTokenSet: ['global'],
             values: {
               version: '5',
+              usedTokenSet: ['global'],
+              themes: [],
+              activeTheme: null,
               values: {
                 global: {
                   size: {

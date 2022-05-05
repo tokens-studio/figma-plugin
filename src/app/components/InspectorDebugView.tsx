@@ -1,6 +1,5 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
-import isEqual from 'lodash.isequal';
 import Box from './Box';
 import Blankslate from './Blankslate';
 import AnnotationBuilder from './AnnotationBuilder';
@@ -8,6 +7,7 @@ import { SingleToken } from '@/types/tokens';
 import useTokens from '../store/useTokens';
 import { uiStateSelector } from '@/selectors';
 import Stack from './Stack';
+import { isEqual } from '@/utils/isEqual';
 
 export default function InspectorDebugView({ resolvedTokens }: { resolvedTokens: SingleToken[] }) {
   const uiState = useSelector(uiStateSelector, isEqual);
@@ -21,7 +21,7 @@ export default function InspectorDebugView({ resolvedTokens }: { resolvedTokens:
   return (
     <Box
       css={{
-        display: 'flex', flexDirection: 'column', flexGrow: 1, padding: '$4', justifyContent: 'center',
+        display: 'flex', flexDirection: 'column', flexGrow: 1, padding: '$4',
       }}
       className="content scroll-container"
     >

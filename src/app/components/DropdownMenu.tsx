@@ -1,7 +1,7 @@
 import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu';
 import { styled } from '@/stitches.config';
 
-const itemStyles: Parameters<typeof styled>[1] = {
+const itemStyles = {
   fontSize: '$xsmall',
   padding: '$2 $3 $2 $6',
   borderRadius: '$contextMenuItem',
@@ -62,9 +62,18 @@ const StyledDropdownMenuTrigger = styled(DropdownMenuPrimitive.Trigger, {
   },
 });
 
+const StyledDropdownSubmenu = styled(DropdownMenuPrimitive.DropdownMenuGroup, {
+  position: 'absolute',
+  left: '$2',
+});
+
 const StyledDropdownMenuRadioGroup = styled(DropdownMenuPrimitive.RadioGroup, {});
 
 const StyledDropdownMenuRadioItem = styled(DropdownMenuPrimitive.RadioItem, itemStyles);
+
+const StyledDropdownMenuArrow = styled(DropdownMenuPrimitive.Arrow, { fill: 'black' });
+
+const StyledDropdownMenu = styled(DropdownMenuPrimitive.Root, {});
 
 export const DropdownMenuContent = StyledDropdownMenuContent;
 export const DropdownMenuCheckboxItem = StyledDropdownMenuCheckboxItem;
@@ -74,4 +83,6 @@ export const DropdownMenuTrigger = StyledDropdownMenuTrigger;
 export const DropdownMenuSeparator = StyledDropdownMenuSeparator;
 export const DropdownMenuItem = StyledDropdownMenuItem;
 export const DropdownMenuItemIndicator = StyledDropdownMenuItemIndicator;
-export const DropdownMenu = DropdownMenuPrimitive.Root;
+export const DropdownMenu = StyledDropdownMenu;
+export const DropdownSubmenu = StyledDropdownSubmenu;
+export const DropdownMenuArrow = StyledDropdownMenuArrow;

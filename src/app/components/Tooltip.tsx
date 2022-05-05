@@ -14,8 +14,8 @@ const StyledContent = styled(Tooltip.Content, {
   fontSize: 12,
   maxWidth: '70vw',
   width: 'auto',
-  backgroundColor: '$contextMenuBackground',
-  color: '$contextMenuForeground',
+  backgroundColor: '$bgToolTip',
+  color: '$fgToolTip',
   transformOrigin: 'var(--radix-tooltip-content-transform-origin)',
   animation: `${scaleIn} 0.1s ease-out`,
 });
@@ -25,9 +25,9 @@ const StyledArrow = styled(Tooltip.Arrow, {
 });
 
 type Props = {
-  label: string | React.ReactElement;
   children: React.ReactElement;
-  side?: 'left' | 'bottom';
+  label?: string | React.ReactElement;
+  side?: 'left' | 'bottom' | 'top';
 };
 
 const Toolip: React.FC<Props> = ({
@@ -35,13 +35,15 @@ const Toolip: React.FC<Props> = ({
   children,
   side = 'left',
 }) => (
-  <Tooltip.Root delayDuration={0}>
-    <Tooltip.Trigger as="div">{children}</Tooltip.Trigger>
-    <StyledContent side={side}>
-      <StyledArrow offset={10} />
-      {label}
-    </StyledContent>
-  </Tooltip.Root>
+  label ? (
+    <Tooltip.Root delayDuration={0}>
+      <Tooltip.Trigger as="div">{children}</Tooltip.Trigger>
+      <StyledContent side={side}>
+        <StyledArrow offset={10} />
+        {label}
+      </StyledContent>
+    </Tooltip.Root>
+  ) : children
 );
 
 export default Toolip;

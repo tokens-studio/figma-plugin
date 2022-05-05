@@ -44,7 +44,15 @@ export function notifyNoSelection() {
   });
 }
 
-export function notifySelection({ selectionValues, mainNodeSelectionValues, selectedNodes }: { selectionValues: SelectionGroup[], mainNodeSelectionValues: SelectionValue[], selectedNodes: number }) {
+export function notifySelection({
+  selectionValues,
+  mainNodeSelectionValues,
+  selectedNodes,
+}: {
+  selectionValues: SelectionGroup[];
+  mainNodeSelectionValues: SelectionValue[];
+  selectedNodes: number;
+}) {
   postToUI({
     type: MessageFromPluginTypes.SELECTION,
     selectionValues,
@@ -83,6 +91,7 @@ export function notifyUISettings(
       uiWindow: {
         width,
         height,
+        isMinimized: false,
       },
       updateMode,
       updateRemote,
@@ -99,8 +108,8 @@ export function notifyUISettings(
 }
 
 type Data = {
-  nodes: number
-  remotes: Set<BaseNode>
+  nodes: number;
+  remotes: Set<BaseNode>;
 };
 
 export function notifyRemoteComponents({ nodes, remotes }: Data) {
@@ -138,6 +147,13 @@ export function notifyUserId(user: UserIdFromPluginMessage['user']) {
   postToUI({
     type: MessageFromPluginTypes.USER_ID,
     user,
+  });
+}
+
+export function notifyLicenseKey(licenseKey: string) {
+  postToUI({
+    type: MessageFromPluginTypes.LICENSE_KEY,
+    licenseKey,
   });
 }
 

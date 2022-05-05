@@ -1,9 +1,10 @@
 import set from 'set-value';
 import { appendTypeToToken } from '@/app/components/createTokenObj';
+import { AnyTokenList, AnyTokenSet } from '@/types/tokens';
 
-export default function convertTokensToObject(tokens) {
-  const tokenObj = Object.entries(tokens).reduce((acc, [key, val]) => {
-    const tokenGroupObj = {};
+export default function convertTokensToObject(tokens: Record<string, AnyTokenList>) {
+  const tokenObj = Object.entries(tokens).reduce<Record<string, AnyTokenSet<false>>>((acc, [key, val]) => {
+    const tokenGroupObj: AnyTokenSet<false> = {};
     val.forEach((token) => {
       const tokenWithType = appendTypeToToken(token);
       const { name, ...tokenWithoutName } = tokenWithType;

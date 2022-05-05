@@ -9,10 +9,12 @@ import { Dispatch } from '../store';
 import useStorage from '../store/useStorage';
 import * as pjs from '../../../package.json';
 import { useFeatureFlags } from '../hooks/useFeatureFlags';
+import { Tabs } from '@/constants/Tabs';
+import { StorageProviderType } from '@/types/api';
+import { GithubTokenStorage } from '@/storage/GithubTokenStorage';
 
 export function Initiator() {
   const dispatch = useDispatch<Dispatch>();
-
   const { pullTokens } = useRemoteTokens();
   const { fetchFeatureFlags } = useFeatureFlags();
   const { setStorageType } = useStorage();
@@ -33,8 +35,8 @@ export function Initiator() {
     onInitiate();
     window.onmessage = async (event: {
       data: {
-        pluginMessage: PostToUIMessage
-      }
+        pluginMessage: PostToUIMessage;
+      };
     }) => {
       if (event.data.pluginMessage) {
         const { pluginMessage } = event.data;
@@ -77,6 +79,7 @@ export function Initiator() {
               dispatch.uiState.setActiveTab('tokens');
             } else {
               getApiCredentials();
+              dispatch.uiState.setActiveTab(Tabs.TOKENS);
             }
 
             break;
@@ -86,7 +89,7 @@ export function Initiator() {
             if (values) {
               track('Import styles');
               dispatch.tokenState.setTokensFromStyles(values);
-              dispatch.uiState.setActiveTab('tokens');
+              dispatch.uiState.setActiveTab(Tabs.TOKENS);
             }
             break;
           }
@@ -111,11 +114,21 @@ export function Initiator() {
               track('Fetched from remote', { provider: credentials.provider });
               if (!credentials.internalId) track('missingInternalId', { provider: credentials.provider });
 
+              const {
+                id, provider, secret, baseUrl,
+              } = credentials;
+              const [owner, repo] = id.split('/');
+              if (provider === StorageProviderType.GITHUB) {
+                const storageClient = new GithubTokenStorage(secret, owner, repo, baseUrl);
+                const branches = await storageClient.fetchBranches();
+                dispatch.branchState.setBranches(branches);
+              }
+
               dispatch.uiState.setApiData(credentials);
               dispatch.uiState.setLocalApiState(credentials);
 
               await pullTokens({ context: credentials, featureFlags: receivedFlags, usedTokenSet });
-              dispatch.uiState.setActiveTab('tokens');
+              dispatch.uiState.setActiveTab(Tabs.TOKENS);
             }
             break;
           }
@@ -133,6 +146,7 @@ export function Initiator() {
             break;
           }
           case MessageFromPluginTypes.USER_ID: {
+            dispatch.userState.setUserId(pluginMessage.user.userId);
             identify(pluginMessage.user);
             track('Launched', { version: pjs.plugin_version });
             break;
@@ -167,6 +181,10 @@ export function Initiator() {
               count: pluginMessage.count,
               timePerTask: pluginMessage.timePerTask,
             });
+            break;
+          }
+          case MessageFromPluginTypes.LICENSE_KEY: {
+            dispatch.userState.addLicenseKey({ key: pluginMessage.licenseKey, fromPlugin: true });
             break;
           }
           default:

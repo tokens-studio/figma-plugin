@@ -1,0 +1,22 @@
+{
+  "global": {
+    "red": {
+      "value": "#ff0000",
+      "type": "color"
+    },
+    "yellow": {
+      "value": "#fff000",
+      "type": "color"
+    },
+    "pink": {
+      "value": "#ff00bb",
+      "type": "color"
+    }
+  },
+  "brand/marketing": {
+    "red": {
+      "value": "#ff0000",
+      "type": "color"
+    }
+  }
+}

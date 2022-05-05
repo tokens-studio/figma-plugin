@@ -1,11 +1,9 @@
 import React from 'react';
-import isEqual from 'lodash.isequal';
 import { useDispatch, useSelector } from 'react-redux';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { DndProvider } from 'react-dnd';
 import { TokenTypeSchema } from '@/types/tokens';
 import Heading from './Heading';
-import Icon from './Icon';
 import TokenTree, { ShowFormOptions, ShowNewFormOptions } from './TokenTree';
 import Tooltip from './Tooltip';
 import { Dispatch } from '../store';
@@ -13,6 +11,10 @@ import { TokenTypes } from '@/constants/TokenTypes';
 import {
   collapsedSelector, displayTypeSelector, editProhibitedSelector, showEmptyGroupsSelector,
 } from '@/selectors';
+import IconButton from './IconButton';
+import ListIcon from '@/icons/list.svg';
+import GridIcon from '@/icons/grid.svg';
+import AddIcon from '@/icons/add.svg';
 
 type Props = Omit<TokenTypeSchema, 'type'> & {
   tokenKey: string;
@@ -64,6 +66,12 @@ const TokenListing: React.FC<Props> = ({
     showForm({ token: null, name, isPristine: true });
   }, [showForm]);
 
+  const handleShowNewForm = React.useCallback(() => showNewForm({ }), [showNewForm]);
+
+  const handleToggleDisplayType = React.useCallback(() => {
+    dispatch.uiState.setDisplayType(displayType === 'GRID' ? 'LIST' : 'GRID');
+  }, [displayType, dispatch]);
+
   const handleSetIntCollapsed = React.useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
     if (e.altKey) {
@@ -80,10 +88,10 @@ const TokenListing: React.FC<Props> = ({
   if (!values && !showEmptyGroups) return null;
 
   return (
-    <div className="border-b border-gray-200" data-cy={`tokenlisting-${tokenKey}`}>
+    <div className="border-b border-border-muted" data-cy={`tokenlisting-${tokenKey}`}>
       <div className="relative flex items-center justify-between space-x-8">
         <button
-          className={`flex items-center w-full h-full p-4 space-x-2 hover:bg-gray-100 focus:outline-none ${
+          className={`flex items-center w-full h-full p-4 space-x-2 hover:bg-background-subtle focus:outline-none ${
             isIntCollapsed ? 'opacity-50' : null
           }`}
           data-cy={`tokenlisting-header-${tokenKey}`}
@@ -107,30 +115,16 @@ const TokenListing: React.FC<Props> = ({
         </button>
         <div className="absolute right-0 flex mr-2">
           {showDisplayToggle && (
-            <Tooltip label={displayType === 'GRID' ? 'Show as List' : 'Show as Grid'}>
-              <button
-                onClick={() => dispatch.uiState.setDisplayType(displayType === 'GRID' ? 'LIST' : 'GRID')}
-                type="button"
-                className="button button-ghost"
-              >
-                <Icon name={displayType === 'GRID' ? 'list' : 'grid'} />
-              </button>
-            </Tooltip>
+            <IconButton icon={displayType === 'GRID' ? <ListIcon /> : <GridIcon />} tooltip={displayType === 'GRID' ? 'Show as List' : 'Show as Grid'} onClick={handleToggleDisplayType} />
           )}
 
-          <Tooltip label="Add a new token">
-            <button
-              disabled={editProhibited}
-              data-cy="button-add-new-token"
-              className="button button-ghost"
-              type="button"
-              onClick={() => {
-                showNewForm({});
-              }}
-            >
-              <Icon name="add" />
-            </button>
-          </Tooltip>
+          <IconButton
+            dataCy="button-add-new-token"
+            disabled={editProhibited}
+            icon={<AddIcon />}
+            tooltip="Add a new token"
+            onClick={handleShowNewForm}
+          />
         </div>
       </div>
       {values && (

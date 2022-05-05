@@ -1,24 +1,23 @@
-import React from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import convertTokensToObject from '@/utils/convertTokensToObject';
+import React,  { useCallback } from 'react';
+import { useSelector } from 'react-redux';
 import Icon from './Icon';
 import Tooltip from './Tooltip';
 import useRemoteTokens from '../store/remoteTokens';
-import { Dispatch } from '../store';
 import { StorageProviderType } from '../../types/api';
 import Box from './Box';
 import {
-  editProhibitedSelector,
-  lastSyncedStateSelector,
   projectURLSelector,
   storageTypeSelector,
-  tokensSelector,
   usedTokenSetSelector,
 } from '@/selectors';
 import { Tabs } from '@/constants/Tabs';
 import Stack from './Stack';
 import { TabButton } from './TabButton';
 import { NavbarUndoButton } from './NavbarUndoButton';
+import Minimize from '../assets/minimize.svg';
+import useMinimizeWindow from './useMinimizeWindow';
+import IconButton from './IconButton';
+import RefreshIcon from '@/icons/refresh.svg';
 
 const transformProviderName = (provider: StorageProviderType) => {
   switch (provider) {
@@ -35,21 +34,16 @@ const transformProviderName = (provider: StorageProviderType) => {
   }
 };
 
-export const Navbar: React.FC = () => {
+const Navbar: React.FC = () => {
   const projectURL = useSelector(projectURLSelector);
   const storageType = useSelector(storageTypeSelector);
-  const tokens = useSelector(tokensSelector);
-  const editProhibited = useSelector(editProhibitedSelector);
-  const lastSyncedState = useSelector(lastSyncedStateSelector);
   const usedTokenSet = useSelector(usedTokenSetSelector);
-  const dispatch = useDispatch<Dispatch>();
-  const { pullTokens, pushTokens } = useRemoteTokens();
+  const { pullTokens } = useRemoteTokens();
+  const { handleResize } = useMinimizeWindow();
 
-  const checkForChanges = React.useCallback(() => {
-    const hasChanged = (lastSyncedState !== JSON.stringify(convertTokensToObject(tokens), null, 2));
-    dispatch.tokenState.updateCheckForChanges(String(hasChanged));
-    return hasChanged;
-  }, [lastSyncedState, tokens]);
+  const handlePullTokens = useCallback(() => {
+    pullTokens({ usedTokenSet });
+  }, [pullTokens, usedTokenSet]);
 
   return (
     <Box
@@ -74,38 +68,21 @@ export const Navbar: React.FC = () => {
         <NavbarUndoButton />
       </Stack>
       <Stack direction="row" align="center">
-        {storageType.provider !== StorageProviderType.LOCAL && (
+        {storageType.provider !== StorageProviderType.LOCAL
+        && storageType.provider !== StorageProviderType.GITHUB
+        && (
           <>
             {storageType.provider === StorageProviderType.JSONBIN && (
-              <Tooltip variant="right" label={`Go to ${transformProviderName(storageType.provider)}`}>
+              <Tooltip label={`Go to ${transformProviderName(storageType.provider)}`}>
                 <a href={projectURL} target="_blank" rel="noreferrer" className="block button button-ghost">
                   <Icon name="library" />
                 </a>
               </Tooltip>
             )}
-            {(storageType.provider === StorageProviderType.GITHUB
-              || storageType.provider === StorageProviderType.GITLAB) && (
-              <Tooltip variant="right" label={`Push to ${transformProviderName(storageType.provider)}`}>
-                <button
-                  onClick={() => pushTokens()}
-                  type="button"
-                  className="relative button button-ghost"
-                  disabled={editProhibited}
-                >
-                  {checkForChanges() && <div className="absolute top-0 right-0 w-2 h-2 rounded-full bg-primary-500" />}
-
-                  <Icon name="library" />
-                </button>
-              </Tooltip>
-            )}
-
-            <Tooltip variant="right" label={`Pull from ${transformProviderName(storageType.provider)}`}>
-              <button onClick={() => pullTokens({ usedTokenSet })} type="button" className="button button-ghost">
-                <Icon name="refresh" />
-              </button>
-            </Tooltip>
+            <IconButton tooltip={`Pull from ${transformProviderName(storageType.provider)}`} onClick={handlePullTokens} icon={<RefreshIcon />} />
           </>
         )}
+        <IconButton tooltip="Minimize plugin" onClick={handleResize} icon={<Minimize />} />
       </Stack>
     </Box>
   );

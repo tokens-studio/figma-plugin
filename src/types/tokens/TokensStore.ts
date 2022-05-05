@@ -1,3 +1,4 @@
+import { ThemeObjectsList } from '../ThemeObjectsList';
 import { UsedTokenSetsMap } from '../UsedTokenSetsMap';
 import { AnyTokenList } from './AnyTokenList';
 
@@ -8,4 +9,6 @@ export type TokenStore = {
   values: Record<string, AnyTokenList>
   usedTokenSet?: UsedTokenSetsMap | null;
   checkForChanges?: string;
+  activeTheme: string | null;
+  themes: ThemeObjectsList;
 };

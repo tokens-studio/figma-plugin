@@ -3,6 +3,8 @@ import { SingleToken } from '@/types/tokens';
 import useTokens from '@/app/store/useTokens';
 import { TokensContext } from '@/context';
 import { TokenTooltipContentValue } from './TokenTooltipContentValue';
+import { TokenTypes } from '@/constants/TokenTypes';
+import Box from '../Box';
 
 type Props = {
   token: SingleToken;
@@ -14,19 +16,25 @@ export const TokenTooltipContent: React.FC<Props> = ({ token }) => {
   const tokenIsAlias = React.useMemo(() => (
     isAlias(token, tokensContext.resolvedTokens)
   ), [token, isAlias, tokensContext.resolvedTokens]);
+  const tokenIsShadowOrTypographyAlias = React.useMemo(() => (
+    token.type === TokenTypes.TYPOGRAPHY || token.type === TokenTypes.BOX_SHADOW) && 
+    typeof token.value === 'string'
+    , [token, tokensContext.resolvedTokens]
+  );
 
   return (
     <div>
-      <div className="text-xs font-bold text-gray-500">
+      <Box css={{ fontSize: '$0', fontWeight: '$bold', color: '$fgToolTip' }}>
         {token.name.split('.')[token.name.split('.').length - 1]}
-      </div>
-      <TokenTooltipContentValue token={token} />
-      {tokenIsAlias && (
-        <div className="text-gray-400">
-          <TokenTooltipContentValue token={token} shouldResolve />
-        </div>
-      )}
-      {token.description && <div className="text-gray-500">{token.description}</div>}
+      </Box>
+      <Box css={{ color: '$fgToolTipMuted' }}>
+        <TokenTooltipContentValue
+          token={token}
+          shouldResolve={tokenIsAlias}
+          tokenIsShadowOrTypographyAlias={tokenIsShadowOrTypographyAlias}
+        />
+      </Box>
+      {token.description && <Box css={{ color: '$fgToolTipMuted' }}>{token.description}</Box>}
     </div>
   );
 };

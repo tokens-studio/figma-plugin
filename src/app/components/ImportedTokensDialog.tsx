@@ -5,63 +5,76 @@ import Button from './Button';
 import Modal from './Modal';
 import { Dispatch } from '../store';
 import useManageTokens from '../store/useManageTokens';
-import Tooltip from './Tooltip';
-import Icon from './Icon';
 import { activeTokenSetSelector, importedTokensSelector } from '@/selectors';
 import Stack from './Stack';
+import IconButton from './IconButton';
+import AddIcon from '@/icons/add.svg';
+import TrashIcon from '@/icons/trash.svg';
+import Box from './Box';
+import { ImportToken } from '@/types/tokens';
 
-function ImportToken({
-  name,
-  value,
-  oldValue,
-  description,
-  oldDescription,
+function NewOrExistingToken({
+  token,
   updateAction,
   removeToken,
   updateToken,
 }: {
-  name: string;
-  value: string;
-  oldValue?: string;
-  description?: string;
-  oldDescription?: string;
+  token: ImportToken;
   updateAction: string;
-  removeToken: any;
-  updateToken: any;
+  removeToken: (token: ImportToken) => void;
+  updateToken: (token: ImportToken) => void;
 }) {
+  const onRemoveToken = React.useCallback(() => {
+    removeToken(token);
+  }, [removeToken, token]);
+
+  const onUpdateToken = React.useCallback(() => {
+    updateToken(token);
+  }, [updateToken, token]);
+
   return (
     <Stack direction="row" justify="between" css={{ padding: '$2 $4' }}>
       <Stack direction="column" gap={1}>
-        <div className="font-semibold text-xs">{name}</div>
+        <div className="text-xs font-semibold">{token.name}</div>
         <Stack direction="row" align="center" gap={1}>
-          <div className="font-bold text-xxs bg-green-100 text-green-800 p-1 rounded break-all">
-            {typeof value === 'object' ? JSON.stringify(value) : value}
-          </div>
-          {oldValue ? (
-            <div className="font-bold text-xxs bg-red-100 text-red-800 p-1 rounded break-all">
-              {typeof oldValue === 'object' ? JSON.stringify(oldValue) : oldValue}
-            </div>
+          <Box css={{
+            padding: '$2',
+            wordBreak: 'break-all',
+            fontWeight: '$bold',
+            borderRadius: '$default',
+            fontSize: '$xsmall',
+            backgroundColor: '$bgSuccess',
+            color: '$fgSuccess',
+          }}
+          >
+            {typeof token.value === 'object' ? JSON.stringify(token.value) : token.value}
+          </Box>
+          {token.oldValue ? (
+            <Box css={{
+              padding: '$2',
+              wordBreak: 'break-all',
+              fontWeight: '$bold',
+              borderRadius: '$default',
+              fontSize: '$xsmall',
+              backgroundColor: '$bgDanger',
+              color: '$fgDanger',
+            }}
+            >
+              {typeof token.oldValue === 'object' ? JSON.stringify(token.oldValue) : token.oldValue}
+            </Box>
           ) : null}
         </Stack>
-        {(description || oldDescription) && (
+        {(token.description || token.oldDescription) && (
         <div className="text-xxs">
-          {description}
+          {token.description}
           {' '}
-          {oldDescription ? ` (before: ${oldDescription})` : ''}
+          {token.oldDescription ? ` (before: ${token.oldDescription})` : ''}
         </div>
         )}
       </Stack>
       <Stack direction="row" align="center" gap={1}>
-        <Tooltip variant="right" label={updateAction}>
-          <button className="button button-ghost" type="button" onClick={updateToken}>
-            <Icon name="add" />
-          </button>
-        </Tooltip>
-        <Tooltip variant="right" label="Ignore">
-          <button className="button button-ghost" type="button" onClick={removeToken}>
-            <Icon name="trash" />
-          </button>
-        </Tooltip>
+        <IconButton tooltip={updateAction} icon={<AddIcon />} onClick={onUpdateToken} />
+        <IconButton tooltip="Ignore" icon={<TrashIcon />} onClick={onRemoveToken} />
       </Stack>
     </Stack>
   );
@@ -75,7 +88,15 @@ export default function ImportedTokensDialog() {
   const [newTokens, setNewTokens] = React.useState(importedTokens.newTokens);
   const [updatedTokens, setUpdatedTokens] = React.useState(importedTokens.updatedTokens);
 
-  const handleCreateNewClick = () => {
+  const handleIgnoreExistingToken = React.useCallback((token) => {
+    setUpdatedTokens((updatedTokens.filter((t) => t.name !== token.name)));
+  }, [setUpdatedTokens, updatedTokens]);
+
+  const handleIgnoreNewToken = React.useCallback((token) => {
+    setNewTokens(newTokens.filter((t) => t.name !== token.name));
+  }, [setNewTokens, newTokens]);
+
+  const handleCreateNewClick = React.useCallback(() => {
     // Create new tokens according to styles
     // TODO: This should probably be a batch operation
     newTokens.forEach((token) => {
@@ -91,9 +112,9 @@ export default function ImportedTokensDialog() {
       });
     });
     setNewTokens([]);
-  };
+  }, [newTokens, activeTokenSet, createSingleToken]);
 
-  const handleUpdateClick = () => {
+  const handleUpdateClick = React.useCallback(() => {
     // Go through each token that needs to be updated
     // TODO: This should probably be a batch operation
     updatedTokens.forEach((token) => {
@@ -109,16 +130,16 @@ export default function ImportedTokensDialog() {
       });
     });
     setUpdatedTokens([]);
-  };
+  }, [updatedTokens, editSingleToken, activeTokenSet]);
 
-  const handleImportAllClick = () => {
+  const handleImportAllClick = React.useCallback(() => {
     // Perform both actions for all the tokens
     // TODO: This should probably be a batch operation
     handleUpdateClick();
     handleCreateNewClick();
-  };
+  }, [handleCreateNewClick, handleUpdateClick]);
 
-  const handleCreateSingleClick = (token) => {
+  const handleCreateSingleClick = React.useCallback((token) => {
     // Create new tokens according to styles
     createSingleToken({
       parent: activeTokenSet,
@@ -131,9 +152,9 @@ export default function ImportedTokensDialog() {
       shouldUpdateDocument: false,
     });
     setNewTokens(newTokens.filter((t) => t.name !== token.name));
-  };
+  }, [newTokens, activeTokenSet, createSingleToken]);
 
-  const handleUpdateSingleClick = (token) => {
+  const handleUpdateSingleClick = React.useCallback((token) => {
     // Go through each token that needs to be updated
     editSingleToken({
       parent: activeTokenSet,
@@ -146,11 +167,11 @@ export default function ImportedTokensDialog() {
       shouldUpdateDocument: false,
     });
     setUpdatedTokens(updatedTokens.filter((t) => t.name !== token.name));
-  };
+  }, [updatedTokens, editSingleToken, activeTokenSet]);
 
-  const handleClose = () => {
+  const handleClose = React.useCallback(() => {
     dispatch.tokenState.resetImportedTokens();
-  };
+  }, [dispatch]);
 
   React.useEffect(() => {
     setNewTokens(importedTokens.newTokens);
@@ -175,28 +196,31 @@ export default function ImportedTokensDialog() {
             direction="row"
             justify="between"
             align="center"
-            css={{
-              marginBottom: '$4', paddingLeft: '$4', paddingRight: '$4', paddingBottom: '$2',
-            }}
+            css={{ padding: '$2 $4' }}
           >
             <Heading>New Tokens</Heading>
             <Button variant="secondary" id="button-import-create-all" onClick={handleCreateNewClick}>
               Create all
             </Button>
           </Stack>
-          <div className="space-y-2 border-t border-gray-300">
+          <Stack
+            direction="column"
+            gap={1}
+            css={{
+              borderTop: '1px solid',
+              borderColor: '$borderMuted',
+            }}
+          >
             {newTokens.map((token) => (
-              <ImportToken
+              <NewOrExistingToken
+                token={token}
                 key={token.name}
-                name={token.name}
-                value={token.value}
-                description={token.description}
                 updateAction="Create"
-                removeToken={() => setNewTokens(newTokens.filter((t) => t.name !== token.name))}
-                updateToken={() => handleCreateSingleClick(token)}
+                removeToken={handleIgnoreNewToken}
+                updateToken={handleCreateSingleClick}
               />
             ))}
-          </div>
+          </Stack>
         </div>
         )}
         {updatedTokens.length > 0 && (
@@ -205,40 +229,48 @@ export default function ImportedTokensDialog() {
             direction="row"
             justify="between"
             align="center"
-            css={{
-              marginBottom: '$4', paddingLeft: '$4', paddingRight: '$4', paddingBottom: '$2',
-            }}
+            css={{ padding: '$2 $4' }}
           >
             <Heading>Existing Tokens</Heading>
             <Button variant="secondary" id="button-import-update-all" onClick={handleUpdateClick}>
               Update all
             </Button>
           </Stack>
-          <div className="space-y-2 border-t border-gray-300">
+          <Stack
+            direction="column"
+            gap={1}
+            css={{
+              borderTop: '1px solid',
+              borderColor: '$borderMuted',
+            }}
+          >
             {updatedTokens.map((token) => (
-              <ImportToken
+              <NewOrExistingToken
+                token={token}
                 key={token.name}
-                name={token.name}
-                value={token.value}
-                oldValue={token.oldValue}
-                description={token.description}
-                oldDescription={token.oldDescription}
                 updateAction="Update"
-                removeToken={() => setUpdatedTokens(updatedTokens.filter((t) => t.name !== token.name))}
-                updateToken={() => handleUpdateSingleClick(token)}
+                removeToken={handleIgnoreExistingToken}
+                updateToken={handleUpdateSingleClick}
               />
             ))}
-          </div>
+          </Stack>
         </div>
         )}
-        <div className="flex justify-between border-t border-gray-300 p-4 ">
+        <Box css={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          padding: '$4',
+          borderTop: '1px solid',
+          borderColor: '$borderMuted',
+        }}
+        >
           <Button variant="secondary" id="button-import-close" onClick={handleClose}>
             Cancel
           </Button>
           <Button variant="primary" id="button-import-all" onClick={handleImportAllClick}>
             Import all
           </Button>
-        </div>
+        </Box>
       </Stack>
     </Modal>
   );

@@ -11,6 +11,8 @@ import { SelectionValue } from './SelectionValue';
 import { AnyTokenList, AnyTokenSet, TokenStore } from './tokens';
 import { PullStyleOptions } from './PullStylesOptions';
 import { UsedTokenSetsMap } from './UsedTokenSetsMap';
+import { TokenTypes } from '@/constants/TokenTypes';
+import { ThemeObjectsList } from './ThemeObjectsList';
 import { NodeInfo } from './NodeInfo';
 
 export enum MessageFromPluginTypes {
@@ -31,6 +33,7 @@ export enum MessageFromPluginTypes {
   CLEAR_JOBS = 'clear_jobs',
   ADD_JOB_TASKS = 'add_job_tasks',
   COMPLETE_JOB_TASKS = 'complete_job_tasks',
+  LICENSE_KEY = 'license_key',
 }
 
 export enum MessageToPluginTypes {
@@ -53,6 +56,7 @@ export enum MessageToPluginTypes {
   REMOVE_TOKENS_BY_VALUE = 'remove-tokens-by-value',
   CHANGED_TABS = 'changed-tabs',
   SELECT_NODES = 'select-nodes',
+  SET_LICENSE_KEY = 'set-license-key',
   GET_API_CREDENTIALS = 'get-api-credentials',
 }
 
@@ -69,6 +73,7 @@ export type UiSettingsFromPluginMessage = {
     uiWindow: {
       width: number;
       height: number;
+      isMinimized: boolean;
     };
     updateMode: UpdateMode;
     updateRemote: boolean;
@@ -142,6 +147,11 @@ export type ApiCredentialsFromPluginMessage = {
   featureFlagId: string;
   usedTokenSet?: UsedTokenSetsMap | null;
 };
+
+export type LicenseKeyFromPluginMessage = {
+  type: MessageFromPluginTypes.LICENSE_KEY;
+  licenseKey: string;
+};
 export type PostToUIMessage =
   | NoSelectionFromPluginMessage
   | SelectionFromPluginMessage
@@ -159,7 +169,8 @@ export type PostToUIMessage =
   | ClearJobsFromPluginMessage
   | AddJobTasksFromPluginMessage
   | CompleteJobTasksFromPluginMessage
-  | ApiCredentialsFromPluginMessage;
+  | ApiCredentialsFromPluginMessage
+  | LicenseKeyFromPluginMessage;
 
 export type InitiateToPluginMessage = { type: MessageToPluginTypes.INITIATE };
 export type RemoveSingleCredentialToPluginMessage = {
@@ -181,9 +192,11 @@ export type UpdateToPluginMessage = {
   type: MessageToPluginTypes.UPDATE;
   tokenValues: AnyTokenSet;
   tokens: AnyTokenList | null;
+  themes: ThemeObjectsList
   updatedAt: string;
   settings: SettingsState;
   usedTokenSet: UsedTokenSetsMap;
+  activeTheme: string | null;
   checkForChanges: string
 };
 export type CreateStylesToPluginMessage = {
@@ -235,7 +248,7 @@ export type RemapTokensToPluginMessage = {
   oldName: string;
   newName: string;
   updateMode: UpdateMode;
-  category?: Properties;
+  category?: Properties | TokenTypes;
 };
 export type RemoveTokensByValueToPluginMessage = {
   type: MessageToPluginTypes.REMOVE_TOKENS_BY_VALUE;
@@ -251,7 +264,12 @@ export type SelectNodesPluginMessage = {
   ids: string[];
 };
 
-export type getApiCredentialsMessage = {
+export type SetLicenseKeyPluginMessage = {
+  type: MessageToPluginTypes.SET_LICENSE_KEY;
+  licenseKey: string | null;
+};
+
+export type GetApiCredentialsMessage = {
   type: MessageToPluginTypes.GET_API_CREDENTIALS;
 };
 
@@ -275,4 +293,5 @@ export type PostToFigmaMessage =
   | RemoveTokensByValueToPluginMessage
   | ChangedTabsToPluginMessage
   | SelectNodesPluginMessage
-  | getApiCredentialsMessage;
+  | SetLicenseKeyPluginMessage
+  | GetApiCredentialsMessage;

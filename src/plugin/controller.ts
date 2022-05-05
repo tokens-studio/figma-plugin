@@ -23,16 +23,17 @@ import {
   notifyUserId,
   notifyLastOpened,
   postToUI,
+  notifyLicenseKey,
 } from './notifiers';
 import { sendPluginValues, updatePluginData, SelectionContent } from './pluginData';
 import {
   getTokenData,
   updateNodes,
-  setTokensOnDocument,
   goToNode,
   saveStorageType,
   getSavedStorageType,
   selectNodes,
+  setTokensOnDocument
 } from './node';
 
 import { MessageFromPluginTypes, MessageToPluginTypes, PostToFigmaMessage } from '../types/messages';
@@ -42,6 +43,7 @@ import { defaultNodeManager } from './NodeManager';
 import { defaultWorker } from './Worker';
 import { getFeatureFlags } from '@/utils/featureFlags';
 import { getUsedTokenSet } from '@/utils/getUsedTokenSet';
+import { updateLocalTokensData } from '@/utils/figma';
 
 let inspectDeep = false;
 let shouldSendSelectionValues = false;
@@ -92,6 +94,12 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
             name: currentUser.name,
           });
         }
+
+        const licenseKey = await figma.clientStorage.getAsync('licenseKey');
+        if (licenseKey) {
+          notifyLicenseKey(licenseKey);
+        }
+
         notifyLastOpened(lastOpened);
         notifyStorageType(storageType);
 
@@ -192,6 +200,13 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
       }
       if (msg.tokenValues && msg.updatedAt) {
         setTokensOnDocument(msg.tokenValues, msg.updatedAt, msg.usedTokenSet, msg.checkForChanges);
+        updateLocalTokensData({
+          tokens: msg.tokenValues,
+          themes: msg.themes,
+          activeTheme: msg.activeTheme,
+          usedTokenSets: msg.usedTokenSet,
+          updatedAt: msg.updatedAt,
+        });
       }
       if (msg.tokens) {
         const tokensMap = tokenArrayGroupToMap(msg.tokens);
@@ -341,8 +356,14 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
 
       if (!figma.currentPage.selection.length) {
         notifyNoSelection();
+        return;
       }
+      return;
 
+    case MessageToPluginTypes.SET_LICENSE_KEY: {
+      await figma.clientStorage.setAsync('licenseKey', msg.licenseKey);
+      break;
+    }
     default:
   }
 });
