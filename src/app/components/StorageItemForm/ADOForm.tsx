@@ -13,11 +13,13 @@ export default function ADOForm({
       <Stack direction="column" gap={4}>
         <Input
           full
-          label="Project Name (optional)"
-          value={values.name}
+          label="orgUrl"
+          value={values.baseUrl}
+          placeholder="https://dev.azure.com/yourOrgName"
           onChange={handleChange}
           type="text"
-          name="name"
+          name="baseUrl"
+          required
         />
         <Box css={{ position: 'relative' }}>
           <Input
@@ -61,13 +63,11 @@ export default function ADOForm({
         />
         <Input
           full
-          label="orgUrl"
-          value={values.baseUrl}
-          placeholder="https://dev.azure.com/yourOrgName"
+          label="Project Name (optional)"
+          value={values.name}
           onChange={handleChange}
           type="text"
-          name="baseUrl"
-          required
+          name="name"
         />
         <Stack direction="row" gap={4}>
           <Button variant="secondary" size="large" onClick={handleCancel}>

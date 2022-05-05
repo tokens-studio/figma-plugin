@@ -28,7 +28,7 @@ interface GetADOCreatePullRequestUrl {
   }): string
 }
 
-const apiVersion = 'api-version=7.1-preview.2';
+const apiVersion = 'api-version=6.0';
 
 export const getADOCreatePullRequestUrl: GetADOCreatePullRequestUrl = ({
   branch,
@@ -42,7 +42,7 @@ interface FetchGit {
   gitResource: 'refs' | 'items' | 'pushes'
   method?: 'GET' | 'POST'
   orgUrl?: string
-  params?: Record<string, string | boolean | Record<string, string | boolean>>
+  params?: Record<string, string | boolean>
   projectId?:string
   repositoryId: string
   token: string
@@ -59,19 +59,13 @@ const fetchGit = async ({
   method = 'GET',
 }: FetchGit): Promise<Record<string, any>> => {
   const paramString = params
-    ? Object.entries(params).reduce<string>((acc, [key, value]) => {
-      if (typeof value === 'object') {
-        return acc + Object.entries(value).map(
-          ([subKey, subValue]) => `${key}.${subKey}=${subValue}`,
-        ).join('&');
-      }
-      return `${acc}${key}=${value}&`;
-    }, '') + apiVersion
+    ? Object.entries(params).reduce<string>((acc, [key, value]) => `${acc}${key}=${value}&`, '') + apiVersion
     : apiVersion;
 
   const formattedBody = body ? { body: JSON.stringify(body) } : {};
-  return fetch(
-    `${orgUrl}/${projectId ? `${projectId}/` : ''}_apis/git/repositories/${repositoryId}/${gitResource}?${paramString}`,
+  const input = `${orgUrl}/${projectId ? `${projectId}/` : ''}_apis/git/repositories/${repositoryId}/${gitResource}?${paramString}`;
+  const res = await fetch(
+    input,
     {
       method,
       headers: {
@@ -81,6 +75,7 @@ const fetchGit = async ({
       ...formattedBody,
     },
   );
+  return res;
 };
 
 const checkAndSetAccess = async (context: ContextObject, dispatch: Dispatch) => {
@@ -97,7 +92,6 @@ const checkAndSetAccess = async (context: ContextObject, dispatch: Dispatch) => 
   dispatch.tokenState.setEditProhibited(status === 200);
 };
 
-type GitApiArgs = Pick<FetchGit, 'body' | 'params'>;
 type GitItemsArgs = {
   filePath: string
   branch: string
@@ -105,7 +99,7 @@ type GitItemsArgs = {
 type GitApiMethods = {
   getItems(args: GitItemsArgs): Promise<{ count: number, value: GitInterfaces.GitItem[] }>;
   getItem(args: GitItemsArgs): Promise<Record<string, any>>
-  getRefs(args: Record<string, string>): Promise<GitInterfaces.GitRef[]>;
+  getRefs(args: Record<string, string>): Promise<{ count: number, value: GitInterfaces.GitRef[] }>;
   getPushes(args: {
     branch: string,
     changes: Record<string, any>,
@@ -127,10 +121,8 @@ export const getGitApi = (context: ContextObject): GitApiMethods => {
         ...itemsDefault,
         params: {
           path: args.filePath,
-          versionDescriptor: { // versionDescriptor.version = branch
-            version: args.branch,
-            versionType: 'branch',
-          },
+          'versionDescriptor.version': args.branch,
+          'versionDescriptor.versionType': 'branch',
           includeContent: true,
         },
       });
@@ -145,10 +137,8 @@ export const getGitApi = (context: ContextObject): GitApiMethods => {
         params: {
           scopePath: filePath.replace(/\.json$/, ''),
           recursionLevel: 'full',
-          versionDescriptor: {
-            version: branch,
-            versionType: 'branch',
-          },
+          'versionDescriptor.version': branch,
+          'versionDescriptor.versionType': 'branch',
         },
       });
       return response.json();
@@ -326,14 +316,20 @@ const getChanges: GetChanges = ({
 };
 
 const getBranches = async (context: ContextObject) => {
-  const gitApi = await getGitApi(context);
-  const heads = await gitApi.getRefs({ filter: 'heads' });
-  return heads.reduce<Map<string, GitInterfaces.GitRef>>((acc, cur) => {
-    if (cur.name) {
-      acc.set(cur.name.replace(/^refs\/heads\//, ''), cur);
-    }
-    return acc;
-  }, new Map());
+  try {
+    const gitApi = await getGitApi(context);
+    const { value } = await gitApi.getRefs({ filter: 'heads' });
+    return value.reduce<Map<string, GitInterfaces.GitRef>>((acc, cur) => {
+      if (cur.name) {
+        acc.set(cur.name.replace(/^refs\/heads\//, ''), cur);
+      }
+      return acc;
+    }, new Map());
+  } catch (e) {
+    notifyToUI('Error syncing with ADO, check credentials', { error: true });
+    console.log('Error', e);
+    return new Map();
+  }
 };
 
 export const useADO = () => {
