@@ -28,7 +28,7 @@ function StartScreen() {
   };
 
   return (
-    <div className="h-auto p-4 my-auto">
+    <div className="h-auto p-4 my-auto overflow-auto">
       <Stack direction="column" gap={4}>
         <a href="https://jansix.at/resources/figma-tokens?ref=figma-tokens-plugin" target="_blank" rel="noreferrer">
           <img alt="Figma Tokens Splashscreen" src={require('../assets/tokens-intro.jpg')} className="rounded" />

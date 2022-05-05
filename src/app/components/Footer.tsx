@@ -63,7 +63,7 @@ export default function Footer() {
       }}
     >
       <Stack direction="row">
-        {(localApiState.branch && activeTab === 'loading') && (
+        {(localApiState.branch && activeTab !== 'loading' && activeTab !== 'start') && (
         <>
           <BranchSelector currentBranch={localApiState.branch} />
           <Tooltip variant="top" label={`Pull from ${transformProviderName(storageType.provider)}`}>

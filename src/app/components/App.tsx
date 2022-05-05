@@ -5,7 +5,6 @@ import Inspector from './Inspector';
 import Tokens from './Tokens';
 import StartScreen from './StartScreen';
 import Navbar from './Navbar';
-import LoadingBar from './LoadingBar';
 import FigmaLoading from './FigmaLoading'
 import Footer from './Footer';
 import Changelog from './Changelog';

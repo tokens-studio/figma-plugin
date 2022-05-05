@@ -1,10 +1,13 @@
 import React from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import Icon from './Icon';
 import { postToFigma } from '@/plugin/notifiers';
 import { MessageToPluginTypes } from '@/types/messages';
+import { Tabs } from '@/constants/Tabs';
 import * as pjs from '../../../package.json';
 import Button from './Button';
 import Stack from './Stack';
+import { Dispatch } from '../store';
 
 const lodingStyle = { 
   background: 'Black', 
@@ -13,13 +16,27 @@ const lodingStyle = {
   color: 'White', 
   overflow: 'scroll', 
   overflowX: 'hidden',
+  justifyContent: 'center',
   '& > button:hover': {
     color: 'wheat',
     background: 'black !important'
   },
+  '& > button': {
+    textDecoration: 'underline'
+  },
+  media: {
+    bp1: '(min-width: 640px)',
+  },
+  'bp1': {
+    background: 'White'
+  }
 }
+
 export default function FigmaLoading() {
+  const dispatch = useDispatch<Dispatch>();
+
   const handleCancel = React.useCallback(() => {
+    dispatch.uiState.setActiveTab(Tabs.START);
     postToFigma({
       type: MessageToPluginTypes.CANCEL_OPERATION,
     });
@@ -27,12 +44,12 @@ export default function FigmaLoading() {
 
   return (
     <Stack direction="column" gap={4} css={{...lodingStyle}}>
-      <Stack direction="column" gap={4} css={{ fontSize: '60px' }}>
+      <Stack direction="column" gap={4} css={{ fontSize: '60px', alignItems: 'center' }}>
         <div>
-          Figma
+          <img alt="Figma" src={require('../assets/mark.png')} className="rounded width-13w"/>
         </div>
         <div>
-          Tokens
+          <img alt="Figma" src={require('../assets/letter.png')} className="rounded width-30w"/>
         </div>
       </Stack>
       <Stack direction="column" gap={4} css={{ color: '$textMuted', fontSize: '$xsmall' }}>
@@ -42,8 +59,8 @@ export default function FigmaLoading() {
       </Stack>
       <Stack direction="row" gap={4} justify="center" align="center">
         <Stack direction="column" gap={4} justify="center" align="center">
-          <div className="rotate bg-primary-100">
-            <Icon name="loading" />
+          <div className="rotate initial-loading">
+            <Icon name="loading"/>
           </div>
         </Stack>
         <Stack direction="column" gap={4} justify="center" align="center">
