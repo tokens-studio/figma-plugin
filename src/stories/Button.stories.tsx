@@ -1,17 +1,13 @@
-// Button.stories.ts|tsx
-
 import React from 'react';
 
 import { ComponentStory, ComponentMeta } from '@storybook/react';
 
-import  Button  from '../app/components/Button/Button';
+import  Button  from '@/app/components/Button/Button';
 
 export default {
-
   title: 'Button',
   component: Button,
   argTypes: {
-
   },
 } as ComponentMeta<typeof Button>;
 
