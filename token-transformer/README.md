@@ -35,4 +35,6 @@ Excludes: Sets that should not be part of the export (e.g. a global color scale)
 
 --preserveRawValue: true|false to enable/disable addition of a rawValue key containing the unresolved value (default: false)
 
+--throwErrorWhenNotResolved: true|false to enable/disable throwing errors when a reference fails to resolve (default: false)
+
 --resolveReferences: true|false|'math' to enable/disable resolving references, removing any aliases or math expressions (default: true)

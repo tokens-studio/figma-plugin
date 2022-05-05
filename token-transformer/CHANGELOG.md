@@ -1,3 +1,8 @@
+## v0.0.21 (2022-05-03)
+
+Added throwErrorWhenNotResolved (thanks @borbit)
+Added resolveReferences (thanks @jakobe)
+
 ## v0.0.20 (2022-04-02)
 
 Added expandShadow option (thanks @iShavgula-TacTill)
