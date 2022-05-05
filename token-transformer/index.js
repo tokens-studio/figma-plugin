@@ -120,7 +120,9 @@ const getTokens = async (input) => {
  * Reads the given input file, transforms all tokens and writes them to the output file
  */
 const transform = async () => {
-    const {input, output, sets, excludes, expandTypography, expandShadow, preserveRawValue, throwErrorWhenNotResolved, resolveReferences: resolveReferencesArg} = argv;
+    const {input, output, sets: setsArg, excludes: excludesArg, expandTypography, expandShadow, preserveRawValue, throwErrorWhenNotResolved, resolveReferences: resolveReferencesArg} = argv;
+    const sets = typeof setsArg === 'string' ? setsArg.split(',') : setsArg;
+    const excludes = typeof excludesArg === 'string' ? excludesArg.split(',') : excludesArg;
     // yargs will convert a command option of type: 'boolean | "math"' to string type in all cases - convert back to primitive boolan if set to 'true'|'false':
     const resolveReferences = ['true', 'false'].includes(resolveReferencesArg) ? resolveReferencesArg === 'true' : resolveReferencesArg;
 
