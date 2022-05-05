@@ -83,6 +83,7 @@ export default function useRemoteTokens() {
     }
 
     dispatch.uiState.completeJob(BackgroundJobs.UI_PULLTOKENS);
+    return remoteData;
   }, [
     dispatch,
     api,

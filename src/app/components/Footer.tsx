@@ -10,7 +10,7 @@ import BranchSelector from './BranchSelector';
 import useRemoteTokens from '../store/remoteTokens';
 import { StorageProviderType } from '../../types/api';
 import {
-  localApiStateSelector, editProhibitedSelector, lastSyncedStateSelector, storageTypeSelector, tokensSelector, usedTokenSetSelector, themesListSelector,
+  localApiStateSelector, editProhibitedSelector, lastSyncedStateSelector, storageTypeSelector, tokensSelector, usedTokenSetSelector, themesListSelector, activeTabSelector
 } from '@/selectors';
 import DocsIcon from '@/icons/docs.svg';
 import FeedbackIcon from '@/icons/feedback.svg';
@@ -23,6 +23,7 @@ export default function Footer() {
   const editProhibited = useSelector(editProhibitedSelector);
   const localApiState = useSelector(localApiStateSelector);
   const usedTokenSet = useSelector(usedTokenSetSelector);
+  const activeTab = useSelector(activeTabSelector);
 
   const { pullTokens, pushTokens } = useRemoteTokens();
 
@@ -62,7 +63,7 @@ export default function Footer() {
       }}
     >
       <Stack direction="row">
-        {localApiState.branch && (
+        {(localApiState.branch && activeTab === 'loading') && (
         <>
           <BranchSelector currentBranch={localApiState.branch} />
           <Tooltip variant="top" label={`Pull from ${transformProviderName(storageType.provider)}`}>

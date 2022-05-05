@@ -6,7 +6,6 @@ import Button from './Button';
 import Callout from './Callout';
 import { StorageProviderType } from '../../types/api';
 import { Dispatch } from '../store';
-import Box from './Box';
 import { storageTypeSelector } from '@/selectors';
 import Stack from './Stack';
 
