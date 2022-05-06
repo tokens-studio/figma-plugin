@@ -1,7 +1,10 @@
-## v0.0.21 (2022-05-03)
+## v0.0.22 (2022-05-06)
+
+Fixed a bug that got introduced in 0.0.21 affecting multiple sets
+## v0.0.21 (2022-04-29)
 
 Added throwErrorWhenNotResolved (thanks @borbit)
-Added resolveReferences (thanks @jakobe)
+Added resolveReferences option (thanks @jakobe)
 
 ## v0.0.20 (2022-04-02)
 
