@@ -23,12 +23,6 @@ const lodingStyle = {
   },
   '& > button': {
     textDecoration: 'underline'
-  },
-  media: {
-    bp1: '(min-width: 640px)',
-  },
-  'bp1': {
-    background: 'White'
   }
 }
 

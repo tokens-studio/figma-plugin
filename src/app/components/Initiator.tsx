@@ -67,7 +67,6 @@ export function Initiator() {
             const { values } = pluginMessage;
             if (values) {
               dispatch.tokenState.setTokenData(values);
-              dispatch.uiState.setActiveTab(Tabs.START);
               const existTokens = Object.values(values?.values ?? {}).some(value => {
                 return value.length > 0;
               });
