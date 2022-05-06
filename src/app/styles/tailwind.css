@@ -384,4 +384,21 @@ input.input {
   cursor: nwse-resize;
 }
 
+.width-30w {
+  width: calc(30vw);
+}
+
+.width-13w {
+  width: calc(13vw);
+}
+
+.overflow-auto {
+  overflow: auto;
+  overflow-x: hidden;
+}
+
+.initial-loading > svg{
+  filter: invert(99%) sepia(4%) saturate(2476%) hue-rotate(86deg) brightness(118%) contrast(119%);
+}
+
 @tailwind utilities;

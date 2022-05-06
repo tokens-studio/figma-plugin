@@ -1,5 +1,5 @@
 import React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import Icon from './Icon';
 import { postToFigma } from '@/plugin/notifiers';
 import { MessageToPluginTypes } from '@/types/messages';
@@ -23,7 +23,7 @@ const lodingStyle = {
   },
   '& > button': {
     textDecoration: 'underline'
-  }
+  },
 }
 
 export default function FigmaLoading() {
@@ -38,7 +38,7 @@ export default function FigmaLoading() {
 
   return (
     <Stack direction="column" gap={4} css={{...lodingStyle}}>
-      <Stack direction="column" gap={4} css={{ fontSize: '60px', alignItems: 'center' }}>
+      <Stack direction="column" gap={4} css={{ alignItems: 'center' }}>
         <div>
           <img alt="Figma" src={require('../assets/mark.png')} className="rounded width-13w"/>
         </div>

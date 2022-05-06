@@ -92,7 +92,6 @@ export function Initiator() {
               status, credentials, featureFlagId, usedTokenSet,
             } = pluginMessage;
             if (status === true) {
-              console.log("status", status, "credentia", credentials, "featurfalid", featureFlagId, usedTokenSet, 'usedTokese')
               let receivedFlags;
 
               if (featureFlagId) {
