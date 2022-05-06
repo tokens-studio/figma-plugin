@@ -146,6 +146,7 @@ export type ApiCredentialsFromPluginMessage = {
   };
   featureFlagId: string;
   usedTokenSet?: UsedTokenSetsMap | null;
+  shouldPull?: boolean;
 };
 
 export type LicenseKeyFromPluginMessage = {
@@ -271,6 +272,7 @@ export type SetLicenseKeyPluginMessage = {
 
 export type GetApiCredentialsMessage = {
   type: MessageToPluginTypes.GET_API_CREDENTIALS;
+  shouldPull: boolean;
 };
 
 export type PostToFigmaMessage =

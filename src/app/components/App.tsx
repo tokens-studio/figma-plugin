@@ -48,7 +48,7 @@ function App() {
             {activeTab === 'inspector' && <Inspector />}
             {activeTab === 'settings' && <Settings />}
           </Box>
-          <Footer />
+            {activeTab !== 'start' && <Footer />}
           <Changelog />
           <ImportedTokensDialog />
           <ConfirmDialog />

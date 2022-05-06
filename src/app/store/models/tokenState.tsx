@@ -48,7 +48,7 @@ export const tokenState = createModel<RootModel>()({
       global: [],
     },
     themes: [],
-    lastSyncedState: JSON.stringify([{ global: {} }, []], null, 2),
+    lastSyncedState: JSON.stringify([{ global: [] }, []], null, 2),
     importedTokens: {
       newTokens: [],
       updatedTokens: [],
@@ -178,10 +178,12 @@ export const tokenState = createModel<RootModel>()({
         activeTokenSet: state.activeTokenSet === data.oldName ? data.newName : state.activeTokenSet,
       };
     },
-    setLastSyncedState: (state, data: string) => ({
-      ...state,
-      lastSyncedState: data,
-    }),
+    setLastSyncedState: (state, data: string) => {
+      return {
+        ...state,
+        lastSyncedState: data,
+      }
+    },
     setTokenSetOrder: (state, data: string[]) => {
       const newTokens = {};
       data.forEach((set) => {

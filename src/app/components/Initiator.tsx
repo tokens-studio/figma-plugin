@@ -12,6 +12,7 @@ import { useFeatureFlags } from '../hooks/useFeatureFlags';
 import { Tabs } from '@/constants/Tabs';
 import { StorageProviderType } from '@/types/api';
 import { GithubTokenStorage } from '@/storage/GithubTokenStorage';
+import { boolean } from 'zod';
 
 export function Initiator() {
   const dispatch = useDispatch<Dispatch>();
@@ -20,16 +21,16 @@ export function Initiator() {
   const { setStorageType } = useStorage();
   const { confirm } = useConfirm();
 
-  const askUserIfPull: (() => Promise<boolean>) = React.useCallback(async () => {
-    const { result } = await confirm({
+  const askUserIfPull: (() => Promise<any>) = React.useCallback(async () => {
+    const shouldPull = await confirm({
       text: 'Pull from GitHub?',
       description: 'You have unsaved changes that will be lost. Do you want to pull from your repo?',
     });
-    return result;
+    return shouldPull;
   }, []);
 
   const onInitiate = React.useCallback(() => postToFigma({ type: MessageToPluginTypes.INITIATE }), []);
-  const getApiCredentials = React.useCallback(() => postToFigma({ type: MessageToPluginTypes.GET_API_CREDENTIALS }), []);
+  const getApiCredentials = React.useCallback((shouldPull: boolean) => postToFigma({ type: MessageToPluginTypes.GET_API_CREDENTIALS, shouldPull }), []);
 
   React.useEffect(() => {
     onInitiate();
@@ -74,14 +75,14 @@ export function Initiator() {
             break;
           case MessageFromPluginTypes.TOKEN_VALUES: {
             const { values } = pluginMessage;
-            if (values.checkForChanges === 'true' && !(await askUserIfPull())) {
-              dispatch.tokenState.setTokenData(values);
-              dispatch.uiState.setActiveTab('tokens');
-            } else {
-              getApiCredentials();
-              dispatch.uiState.setActiveTab(Tabs.TOKENS);
+            let shouldPull: boolean = true;
+            if (values.checkForChanges === 'true') {
+              shouldPull = await askUserIfPull();
+              if (!shouldPull) {
+                dispatch.tokenState.setTokenData(values);
+              }
             }
-
+            getApiCredentials(shouldPull);
             break;
           }
           case MessageFromPluginTypes.STYLES: {
@@ -98,7 +99,7 @@ export function Initiator() {
             break;
           case MessageFromPluginTypes.API_CREDENTIALS: {
             const {
-              status, credentials, featureFlagId, usedTokenSet,
+              status, credentials, featureFlagId, usedTokenSet, shouldPull
             } = pluginMessage;
             if (status === true) {
               let receivedFlags;
@@ -126,8 +127,7 @@ export function Initiator() {
 
               dispatch.uiState.setApiData(credentials);
               dispatch.uiState.setLocalApiState(credentials);
-
-              await pullTokens({ context: credentials, featureFlags: receivedFlags, usedTokenSet });
+              if (shouldPull) await pullTokens({ context: credentials, featureFlags: receivedFlags, usedTokenSet });
               dispatch.uiState.setActiveTab(Tabs.TOKENS);
             }
             break;

@@ -16,6 +16,7 @@ import {
 import DocsIcon from '@/icons/docs.svg';
 import FeedbackIcon from '@/icons/feedback.svg';
 import IconButton from './IconButton';
+import { last } from 'cypress/types/lodash';
 
 export default function Footer() {
   const storageType = useSelector(storageTypeSelector);
@@ -30,10 +31,10 @@ export default function Footer() {
   const { pullTokens, pushTokens } = useRemoteTokens();
 
   const checkForChanges = React.useCallback(() => {
-    const hasChanged = (lastSyncedState !== JSON.stringify(convertTokensToObject(tokens), null, 2));
+    const hasChanged = (lastSyncedState !== JSON.stringify([tokens, themes], null, 2));
     dispatch.tokenState.updateCheckForChanges(String(hasChanged));
     return hasChanged;
-  }, [lastSyncedState, tokens]);
+  }, [lastSyncedState, tokens, themes]);
 
   const hasChanges = React.useMemo(() => checkForChanges(), [checkForChanges]);
 
@@ -66,7 +67,7 @@ export default function Footer() {
       <Stack direction="row">
         {localApiState.branch && (
         <>
-          <BranchSelector currentBranch={localApiState.branch} />
+          <BranchSelector/>
           <IconButton icon={<DownloadIcon />} onClick={onPullButtonClicked} tooltipSide="top" tooltip={`Pull from ${transformProviderName(storageType.provider)}`} />
           <IconButton badge={hasChanges} icon={<UploadIcon />} onClick={onPushButtonClicked} tooltipSide="top" disabled={editProhibited} tooltip={`Push to ${transformProviderName(storageType.provider)}`} />
         </>

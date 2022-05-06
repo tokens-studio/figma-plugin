@@ -94,7 +94,6 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
             name: currentUser.name,
           });
         }
-
         const licenseKey = await figma.clientStorage.getAsync('licenseKey');
         if (licenseKey) {
           notifyLicenseKey(licenseKey);
@@ -105,7 +104,6 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
 
         const apiProviders = await figma.clientStorage.getAsync('apiProviders');
         if (apiProviders) notifyAPIProviders(JSON.parse(apiProviders));
-
         const oldTokens = getTokenData();
         if (oldTokens) {
           notifyTokenValues({ ...oldTokens, usedTokenSet });
@@ -337,7 +335,7 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
           case StorageProviderType.GITLAB:
           case StorageProviderType.URL: {
             compareProvidersWithStored({
-              providers: apiProviders, storageType, featureFlagId, usedTokenSet,
+              providers: apiProviders, storageType, featureFlagId, usedTokenSet, shouldPull: msg.shouldPull
             });
             break;
           }
