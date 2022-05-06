@@ -13,38 +13,4 @@ describe('App', () => {
 
     expect(WelcomeText).toBeInTheDocument();
   });
-
-  it('calls setTokenData when received values', () => {
-    const { getByText } = render(<App />);
-    fireEvent(
-      window,
-      new MessageEvent('message', {
-        data: {
-          pluginMessage: {
-            type: 'tokenvalues',
-            values: {
-              version: '5',
-              usedTokenSet: ['global'],
-              themes: [],
-              activeTheme: null,
-              values: {
-                global: {
-                  size: {
-                    xs: {
-                      type: 'sizing',
-                      description: 'some size',
-                      value: '4',
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
-      }),
-    );
-    const TokensText = getByText('Size');
-
-    expect(TokensText).toBeInTheDocument();
-  });
 });
