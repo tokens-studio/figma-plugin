@@ -5,7 +5,7 @@ import Stack from '../Stack';
 import { ModalFooter } from './ModalFooter';
 import { ModalHeader } from './ModalHeader';
 
-if (process.env.NODE_ENV !== 'test') ReactModal.setAppElement('#app');
+if (process.env.NODE_ENV !== 'test') ReactModal.setAppElement('#root');
 
 const customStyles = (large = false): ReactModalStyles => ({
   overlay: {
@@ -30,7 +30,7 @@ const customStyles = (large = false): ReactModalStyles => ({
   },
 });
 
-type ModalProps = {
+export type ModalProps = {
   id?: string;
   title?: string;
   full?: boolean;
