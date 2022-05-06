@@ -18,12 +18,15 @@ const FgLoadingScreen = styled('div', {
   color: 'White',
   alignItems: 'center',
   justifyContent: 'center',
-  '& > button:hover': {
+  overflowX: 'hidden',
+  overflowY: 'scroll',
+  '& > div > button:hover': {
     color: 'wheat',
     background: 'black !important'
   },
-  '& > button': {
-    textDecoration: 'underline'
+  '& > div > button': {
+    textDecoration: 'underline',
+    width: 'inherit'
   },
   '.rotate > svg': {
     filter: 'invert(99%) sepia(4%) saturate(2476%) hue-rotate(86deg) brightness(118%) contrast(119%)'
@@ -41,7 +44,7 @@ export default function FigmaLoading() {
   }, []);
 
   return (
-    <FgLoadingScreen className='content scroll-container'>
+    <FgLoadingScreen className='content'>
       <Stack direction="column" gap={4} align="center">
         <Icon name="figma" />
         <Icon name="figmaLetter" />
@@ -62,7 +65,7 @@ export default function FigmaLoading() {
         </Stack>
       </Stack>
 
-      <Stack direction="column" gap={4} align="center" css={{ '& > button': { width: 'inherit' }}}>
+      <Stack direction="column" gap={4} align="center">
         <Button variant="ghost" size="small" onClick={handleCancel}>Cancel</Button>
       </Stack>
     </FgLoadingScreen>
