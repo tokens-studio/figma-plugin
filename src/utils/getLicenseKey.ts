@@ -12,7 +12,7 @@ export default async function getLicenseKey(userId: string | null): Promise<{ ke
   } catch (e) {
     console.log(e);
     return {
-      error: 'Error validating license',
+      error: 'Error fetching license',
     };
   }
 }
