@@ -1,7 +1,9 @@
+import { Entitlements } from '@/app/store/models/userState';
+
 export default async function validateLicense(
   licenseKey: string,
   userId: string | null,
-): Promise<{ plan?: string; error?: string }> {
+): Promise<{ plan?: string; entitlements?: Entitlements[]; email?: string; error?: string }> {
   try {
     const res = await fetch(
       `${process.env.LICENSE_API_URL}/validate-license?licenseKey=${licenseKey}&userId=${userId}`,

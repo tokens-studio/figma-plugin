@@ -19,26 +19,36 @@ import { activeTabSelector } from '@/selectors';
 import PluginResizerWrapper from './PluginResizer';
 import { userIdSelector } from '@/selectors/userIdSelector';
 import { planSelector } from '@/selectors/planSelector';
-import { userNameSelector } from '@/selectors/userNameSelector';
+import { clientEmailSelector } from '@/selectors/getClientEmail';
+import { entitlementsSelector } from '@/selectors/getEntitlements';
+import { Entitlements } from '../store/models/userState';
 
 function App() {
   const activeTab = useSelector(activeTabSelector);
   const userId = useSelector(userIdSelector);
-  const userName = useSelector(userNameSelector);
   const plan = useSelector(planSelector);
   const ldClient = useLDClient();
+  const clientEmail = useSelector(clientEmailSelector);
+  const entitlements = useSelector(entitlementsSelector);
 
   useEffect(() => {
     if (userId) {
+      const userAttributes: Record<string, string | boolean> = {
+        plan: plan || '',
+        email: clientEmail || '',
+        os: !entitlements.includes(Entitlements.PRO),
+      };
+
+      entitlements.forEach((entitlement) => {
+        userAttributes[entitlement] = true;
+      });
+
       ldClient?.identify({
         key: userId!,
-        custom: {
-          plan,
-          name: userName,
-        },
+        custom: userAttributes,
       });
     }
-  }, [userId, ldClient, plan, userName]);
+  }, [userId, ldClient, plan, clientEmail, entitlements]);
 
   return (
     <Box css={{ backgroundColor: '$bgDefault' }}>

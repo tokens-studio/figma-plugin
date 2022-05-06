@@ -69,9 +69,9 @@ export default function Footer() {
       }}
     >
       <Stack direction="row">
-        {localApiState.branch && gitBranchSelector && (
+        {localApiState.branch && (
           <>
-            <BranchSelector currentBranch={localApiState.branch} />
+            {gitBranchSelector && <BranchSelector currentBranch={localApiState.branch} />}
             <Tooltip variant="top" label={`Pull from ${transformProviderName(storageType.provider)}`}>
               <button onClick={onPullButtonClicked} type="button" className="button button-ghost">
                 <DownloadIcon />

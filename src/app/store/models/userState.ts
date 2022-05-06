@@ -11,6 +11,10 @@ export enum AddLicenseSource {
   UI,
 }
 
+export enum Entitlements {
+  PRO = 'pro',
+  BETA = 'beta',
+}
 export interface UserState {
   // this flag is used at initial plugin load
   // We only want to get the license key from the backend if there is not license key stored in local storage
@@ -18,8 +22,14 @@ export interface UserState {
   userId: string | null;
   licenseKey: string | undefined;
   licenseError: string | undefined;
-  plan: string;
   userName: string;
+  licenseDetails: LicenseDetails;
+}
+
+interface LicenseDetails {
+  plan: string | undefined;
+  clientEmail: string | undefined;
+  entitlements: string[];
 }
 
 export const userState = createModel<RootModel>()({
@@ -27,20 +37,19 @@ export const userState = createModel<RootModel>()({
     checkedLocalStorageForKey: false,
     userId: null,
     licenseKey: undefined,
-    plan: '',
+    licenseError: undefined,
     userName: '',
+    licenseDetails: {
+      plan: '',
+      clientEmail: undefined,
+      entitlements: [],
+    },
   } as UserState,
   reducers: {
     setUserId(state, payload: string | null) {
       return {
         ...state,
         userId: payload,
-      };
-    },
-    setPlan(state, payload: string) {
-      return {
-        ...state,
-        plan: payload,
       };
     },
     setUserName(state, payload: string) {
@@ -67,12 +76,20 @@ export const userState = createModel<RootModel>()({
         licenseError: payload,
       };
     },
+    setLicenseDetails(state, payload: LicenseDetails) {
+      return {
+        ...state,
+        licenseDetails: payload,
+      };
+    },
   },
   effects: (dispatch) => ({
     addLicenseKey: async (payload: { key: string; source: AddLicenseSource }, rootState) => {
       const { userId } = rootState.userState;
       const { key, source } = payload;
-      const { error, plan } = await validateLicense(key, userId);
+      const {
+        error, plan, email: clientEmail, entitlements,
+      } = await validateLicense(key, userId);
 
       if (error) {
         dispatch.userState.setLicenseError(error);
@@ -82,9 +99,12 @@ export const userState = createModel<RootModel>()({
       } else {
         // clear errors when license validation is succesfull
         dispatch.userState.setLicenseError(undefined);
-        if (plan) {
-          dispatch.userState.setPlan(plan);
-        }
+        dispatch.userState.setLicenseDetails({
+          plan,
+          clientEmail,
+          entitlements: [...new Set(entitlements)],
+        });
+
         if (source === AddLicenseSource.UI) {
           notifyToUI('License added succesfully!');
         }
@@ -116,7 +136,11 @@ export const userState = createModel<RootModel>()({
 
       dispatch.userState.setLicenseKey(undefined);
       dispatch.userState.setLicenseError(undefined);
-      dispatch.userState.setPlan('');
+      dispatch.userState.setLicenseDetails({
+        plan: '',
+        entitlements: [],
+        clientEmail: '',
+      });
     },
   }),
 });
