@@ -9,9 +9,9 @@ describe('App', () => {
 
   it('shows loading screen', () => {
     const { getByText } = render(<App />);
-    const LodingText = getByText('Loading. please wait');
+    const LoadingText = getByText('Loading. please wait');
 
-    expect(LodingText).toBeInTheDocument();
+    expect(LoadingText).toBeInTheDocument();
   });
 
   it('skip to start screen when there is no tokens', () => {

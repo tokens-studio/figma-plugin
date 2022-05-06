@@ -1,4 +1,5 @@
 import React from 'react';
+import { styled } from '@/stitches.config';
 import { useDispatch } from 'react-redux';
 import Icon from './Icon';
 import { postToFigma } from '@/plugin/notifiers';
@@ -9,9 +10,11 @@ import Button from './Button';
 import Stack from './Stack';
 import { Dispatch } from '../store';
 
-const lodingStyle = { 
+const LoadingBox = styled('div', {
+  display: 'flex',
   background: 'Black', 
-  padding: '$8', height: 'inherit', 
+  padding: '$8', 
+  height: 'inherit', 
   alignItems: 'center', 
   color: 'White', 
   overflow: 'scroll', 
@@ -24,7 +27,7 @@ const lodingStyle = {
   '& > button': {
     textDecoration: 'underline'
   },
-}
+});
 
 export default function FigmaLoading() {
   const dispatch = useDispatch<Dispatch>();
@@ -37,7 +40,7 @@ export default function FigmaLoading() {
   }, []);
 
   return (
-    <Stack direction="column" gap={4} css={{...lodingStyle}}>
+    <LoadingBox>
       <Stack direction="column" gap={4} css={{ alignItems: 'center' }}>
         <div>
           <img alt="Figma" src={require('../assets/mark.png')} className="rounded width-13w"/>
@@ -63,6 +66,6 @@ export default function FigmaLoading() {
       </Stack>
 
       <Button variant="ghost" size="small" onClick={handleCancel}>Cancel</Button>
-    </Stack>
+    </LoadingBox>
   );
 }
