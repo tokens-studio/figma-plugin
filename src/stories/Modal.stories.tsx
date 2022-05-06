@@ -1,9 +1,8 @@
 import React, {useState} from 'react';
 import Modal from '@/app/components/Modal';
 import { ModalFooter } from '@/app/components/Modal/ModalFooter';
-import ReactModal, { Styles as ReactModalStyles } from 'react-modal';
-
 import { ComponentStory, ComponentMeta } from '@storybook/react';
+import { setAppElement } from 'react-modal';
 
 export default {
   title: 'Modal',
@@ -12,8 +11,13 @@ export default {
     title: {controls: 'Modal Story'}
   },
   args:{
-    // isOpen: true,
-    // title: 'Modal Story',
+    title: 'Primary',
+    full: false,
+    large: false,
+    isOpen: true,
+    footer: ModalFooter,
+    showClose: true,
+    compact: false,
   }
 } as ComponentMeta<typeof Modal>;
 
@@ -29,8 +33,8 @@ const Template: ComponentStory<typeof Modal> = (args) => {
 
   return (
     <div>
-      <button onClick={handleModalOpen}></button>
-      <Modal title='Primary Modal' isOpen={isModalOpen} close={handleModalClose}>
+      <button onClick={handleModalOpen}>Click Here to Open Modal</button>
+      <Modal title='Primary Modal' isOpen={isModalOpen} close={handleModalClose} >
       </Modal>
     </div>
   )

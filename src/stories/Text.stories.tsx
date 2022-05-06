@@ -11,14 +11,15 @@ export default {
   args:{
     size: 'small',
     bold: true,
+    children: '333',
+    muted: false,
   }
 } as ComponentMeta<typeof Text>;
 
 const Template: ComponentStory<typeof Text> = (args) => 
 {
   return (
-    <Text>
-      {/* {args} */}
+    <Text {...args}>
       This is the Story of the Figma Token Plugin
     </Text>
   )

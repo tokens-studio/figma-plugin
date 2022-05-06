@@ -1,5 +1,4 @@
 import React from 'react';
-import { Provider } from 'react-redux';
 import TokenGroupHeading from '@/app/components/TokenGroupHeading';
 
 import { ComponentStory, ComponentMeta } from '@storybook/react';
@@ -17,11 +16,8 @@ export default {
 const Template: ComponentStory<typeof TokenGroupHeading> = (args) => {
   return (
    <div>
-     <Provider>
-        <TokenGroupHeading id='333' path='333'>
-        {/* {args} */}
+        <TokenGroupHeading {...args}>
         </TokenGroupHeading>
-     </Provider>
    </div>
   )
 };
