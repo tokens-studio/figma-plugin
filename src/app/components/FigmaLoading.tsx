@@ -10,15 +10,13 @@ import Button from './Button';
 import Stack from './Stack';
 import { Dispatch } from '../store';
 
-const LoadingBox = styled('div', {
-  display: 'flex',
-  background: 'Black', 
-  padding: '$8', 
-  height: 'inherit', 
-  alignItems: 'center', 
-  color: 'White', 
-  overflow: 'scroll', 
-  overflowX: 'hidden',
+const FgLoadingScreen = styled('div', {
+  display: 'grid',
+  background: 'Black',
+  padding: '$8',
+  height: 'inherit',
+  color: 'White',
+  alignItems: 'center',
   justifyContent: 'center',
   '& > button:hover': {
     color: 'wheat',
@@ -26,6 +24,9 @@ const LoadingBox = styled('div', {
   },
   '& > button': {
     textDecoration: 'underline'
+  },
+  '.rotate > svg': {
+    filter: 'invert(99%) sepia(4%) saturate(2476%) hue-rotate(86deg) brightness(118%) contrast(119%)'
   },
 });
 
@@ -40,23 +41,19 @@ export default function FigmaLoading() {
   }, []);
 
   return (
-    <LoadingBox>
-      <Stack direction="column" gap={4} css={{ alignItems: 'center' }}>
-        <div>
-          <img alt="Figma" src={require('../assets/mark.png')} className="rounded width-13w"/>
-        </div>
-        <div>
-          <img alt="Figma" src={require('../assets/letter.png')} className="rounded width-30w"/>
-        </div>
+    <FgLoadingScreen className='content scroll-container'>
+      <Stack direction="column" gap={4} align="center">
+        <Icon name="figma" />
+        <Icon name="figmaLetter" />
       </Stack>
-      <Stack direction="column" gap={4} css={{ color: '$textMuted', fontSize: '$xsmall' }}>
+      <Stack direction="column" gap={4} align="center" css={{ color: '$textMuted', fontSize: '$xsmall' }}>
         Version
         {' '}
         {pjs.plugin_version}
       </Stack>
       <Stack direction="row" gap={4} justify="center" align="center">
         <Stack direction="column" gap={4} justify="center" align="center">
-          <div className="rotate initial-loading">
+          <div className="rotate">
             <Icon name="loading"/>
           </div>
         </Stack>
@@ -65,7 +62,9 @@ export default function FigmaLoading() {
         </Stack>
       </Stack>
 
-      <Button variant="ghost" size="small" onClick={handleCancel}>Cancel</Button>
-    </LoadingBox>
+      <Stack direction="column" gap={4} align="center" css={{ '& > button': { width: 'inherit' }}}>
+        <Button variant="ghost" size="small" onClick={handleCancel}>Cancel</Button>
+      </Stack>
+    </FgLoadingScreen>
   );
 }
