@@ -15,7 +15,7 @@ describe('updateStyles', () => {
     expect(effectSpy).not.toHaveBeenCalled();
   });
 
-  it('calls update functions with correct tokens when all tokens are given', () => {
+  it('calls update functions with correct tokens when all tokens are given', async () => {
     const colorTokens = [
       {
         name: 'primary.500',
@@ -52,25 +52,25 @@ describe('updateStyles', () => {
       },
     ];
 
-    updateStyles([...typographyTokens, ...colorTokens, ...effectTokens]);
+    await updateStyles([...typographyTokens, ...colorTokens, ...effectTokens]);
     expect(colorSpy).toHaveBeenCalledWith(
       colorTokens.map((t) => ({
         ...t,
-        name: t.name.replace('.', '/'),
+        path: t.name.replace('.', '/'),
       })),
       false,
     );
     expect(textSpy).toHaveBeenCalledWith(
       typographyTokens.map((t) => ({
         ...t,
-        name: t.name.replace('.', '/'),
+        path: t.name.replace('.', '/'),
       })),
       false,
     );
     expect(effectSpy).toHaveBeenCalledWith(
       effectTokens.map((t) => ({
         ...t,
-        name: t.name.replace('.', '/'),
+        path: t.name.replace('.', '/'),
       })),
       false,
     );
@@ -89,7 +89,7 @@ describe('updateStyles', () => {
     expect(colorSpy).toHaveBeenCalledWith(
       colorTokens.map((t) => ({
         ...t,
-        name: t.name.replace('.', '/'),
+        path: t.name.replace('.', '/'),
       })),
       false,
     );
@@ -114,7 +114,7 @@ describe('updateStyles', () => {
     expect(textSpy).toHaveBeenCalledWith(
       typographyTokens.map((t) => ({
         ...t,
-        name: t.name.replace('.', '/'),
+        path: t.name.replace('.', '/'),
       })),
       false,
     );
@@ -126,6 +126,7 @@ describe('updateStyles', () => {
     const effectTokens = [
       {
         name: 'shadow.large',
+        path: 'shadow/large',
         type: 'boxShadow',
         description: 'the one with one shadow',
         value: {
@@ -143,7 +144,7 @@ describe('updateStyles', () => {
     expect(effectSpy).toHaveBeenCalledWith(
       effectTokens.map((t) => ({
         ...t,
-        name: t.name.replace('.', '/'),
+        path: t.name.replace('.', '/'),
       })),
       false,
     );

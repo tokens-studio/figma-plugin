@@ -22,8 +22,8 @@ export default async function updateColorStyles(colorTokens: SinglePathToken[], 
   colorTokens.forEach((token) => {
     if (token.type === TokenTypes.COLOR) {
       const possibleStyleNames = [
-        token.path,
         compact([activeThemeObject?.name, token.path]).join('/'),
+        token.path,
       ];
       const matchingStyleName = possibleStyleNames.find((path) => (
         paintToKeyMap.has(path)
@@ -36,7 +36,7 @@ export default async function updateColorStyles(colorTokens: SinglePathToken[], 
       } else if (shouldCreate) {
         const style = figma.createPaintStyle();
         style.name = compact([activeThemeObject?.name, token.path]).join('/');
-        tokenToStyleMap[token.name] = style.id;
+        tokenToStyleMap[token.path] = style.id;
         setColorValuesOnTarget(style, token);
       }
     }

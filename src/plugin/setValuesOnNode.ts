@@ -52,7 +52,7 @@ export default async function setValuesOnNode(
           activeThemeObject?.$figmaStyleReferences?.[pathname]
           || figmaStyleMaps.effectStyles.get(pathname)?.id
         );
-        if (!matchingStyleId || !trySetStyleId(node, 'effect', matchingStyleId)) {
+        if (!matchingStyleId || (matchingStyleId && !trySetStyleId(node, 'effect', matchingStyleId))) {
           setEffectValuesOnTarget(node, { value: values.boxShadow, type: TokenTypes.BOX_SHADOW });
         }
       }
@@ -90,7 +90,7 @@ export default async function setValuesOnNode(
             activeThemeObject?.$figmaStyleReferences?.[pathname]
             || figmaStyleMaps.paintStyles.get(pathname)?.id
           );
-          if (!matchingStyleId || !trySetStyleId(node, 'fill', matchingStyleId)) {
+          if (!matchingStyleId || (matchingStyleId && !trySetStyleId(node, 'fill', matchingStyleId))) {
             setColorValuesOnTarget(node, { value: values.fill }, 'fills');
           }
         }
@@ -106,7 +106,7 @@ export default async function setValuesOnNode(
             || figmaStyleMaps.textStyles.get(pathname)?.id
           );
 
-          if (!matchingStyleId || !trySetStyleId(node, 'text', matchingStyleId)) {
+          if (!matchingStyleId || (matchingStyleId && !trySetStyleId(node, 'text', matchingStyleId))) {
             setTextValuesOnTarget(node, { value: values.typography });
           }
         }
@@ -144,7 +144,7 @@ export default async function setValuesOnNode(
             activeThemeObject?.$figmaStyleReferences?.[pathname]
             || figmaStyleMaps.paintStyles.get(pathname)?.id
           );
-          if (!matchingStyleId || !trySetStyleId(node, 'text', matchingStyleId)) {
+          if (!matchingStyleId || (matchingStyleId && !trySetStyleId(node, 'text', matchingStyleId))) {
             setColorValuesOnTarget(node, { value: values.border }, 'strokes');
           }
         }

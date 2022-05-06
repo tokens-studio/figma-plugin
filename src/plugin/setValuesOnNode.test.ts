@@ -10,6 +10,11 @@ describe('updateNode', () => {
     textStyles: new Map(),
   };
 
+  const emptyThemeInfo = {
+    activeTheme: null,
+    themes: [],
+  };
+
   const setTextValuesOnTargetSpy = jest.spyOn(setTextValuesOnTarget, 'default');
   const setEffectValuesOnTargetSpy = jest.spyOn(setEffectValuesOnTarget, 'default');
 
@@ -48,6 +53,7 @@ describe('updateNode', () => {
   beforeEach(() => {
     textNodeMock = {
       type: 'TEXT',
+      textStyleId: '',
       fontName: {
         family: 'Inter',
         style: 'Regular',
@@ -56,22 +62,25 @@ describe('updateNode', () => {
 
     solidNodeMock = {
       type: 'SOLID',
+      fillStyleId: '',
+      effectStyleId: '',
+      strokeStyleId: '',
       effects: [],
     };
   });
 
-  it('calls setTextValuesOnTarget if text node and atomic typography tokens are given', () => {
-    setValuesOnNode(textNodeMock, atomicValues, dataOnNode, emptyFigmaStylesMap);
+  it('calls setTextValuesOnTarget if text node and atomic typography tokens are given', async () => {
+    await setValuesOnNode(textNodeMock, atomicValues, dataOnNode, emptyFigmaStylesMap, emptyThemeInfo);
     expect(setTextValuesOnTargetSpy).toHaveBeenCalled();
   });
 
-  it('doesnt call setTextValuesOnTarget if no text node', () => {
-    setValuesOnNode(solidNodeMock, atomicValues, dataOnNode, emptyFigmaStylesMap);
+  it('doesnt call setTextValuesOnTarget if no text node', async () => {
+    await setValuesOnNode(solidNodeMock, atomicValues, dataOnNode, emptyFigmaStylesMap, emptyThemeInfo);
     expect(setTextValuesOnTargetSpy).not.toHaveBeenCalled();
   });
 
-  it('calls setTextValuesOnTarget if text node and composite typography tokens are given', () => {
-    setValuesOnNode(textNodeMock, typographyValues, dataOnNode, emptyFigmaStylesMap);
+  it('calls setTextValuesOnTarget if text node and composite typography tokens are given', async () => {
+    await setValuesOnNode(textNodeMock, typographyValues, dataOnNode, emptyFigmaStylesMap, emptyThemeInfo);
     expect(setTextValuesOnTargetSpy).toHaveBeenCalled();
   });
 
@@ -81,7 +90,7 @@ describe('updateNode', () => {
       textStyles: new Map([
         ['type/heading/h1', { name: 'type/heading/h1', id: '123' }],
       ]),
-    });
+    }, emptyThemeInfo);
     expect(setTextValuesOnTargetSpy).not.toHaveBeenCalled();
     expect(textNodeMock).toEqual({ ...textNodeMock, textStyleId: '123' });
   });
@@ -92,7 +101,7 @@ describe('updateNode', () => {
       textStyles: new Map([
         ['heading/h1', { name: 'heading/h1', id: '456' }],
       ]),
-    }, true);
+    }, emptyThemeInfo, true);
     expect(setTextValuesOnTargetSpy).not.toHaveBeenCalled();
     expect(textNodeMock).toEqual({ ...textNodeMock, textStyleId: '456' });
   });
@@ -103,7 +112,7 @@ describe('updateNode', () => {
       effectStyles: new Map([
         ['shadows/default', { name: 'shadows/default', id: '123' }],
       ]),
-    });
+    }, emptyThemeInfo);
     expect(setEffectValuesOnTargetSpy).not.toHaveBeenCalled();
     expect(solidNodeMock).toEqual({ ...solidNodeMock, effectStyleId: '123' });
   });
@@ -114,7 +123,7 @@ describe('updateNode', () => {
       effectStyles: new Map([
         ['shadows/other', { name: 'shadows/other', id: '123' }],
       ]),
-    });
+    }, emptyThemeInfo);
     expect(setEffectValuesOnTargetSpy).toHaveBeenCalled();
   });
 });

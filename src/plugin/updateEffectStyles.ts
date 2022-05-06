@@ -20,8 +20,8 @@ export default async function updateEffectStyles(effectTokens: SinglePathToken[]
 
   effectTokens.forEach((token) => {
     const possibleStyleNames = [
-      token.path,
       compact([activeThemeObject?.name, token.path]).join('/'),
+      token.path,
     ];
     const matchingStyleName = possibleStyleNames.find((path) => (
       effectStylesToKeyMap.has(path)
@@ -29,12 +29,12 @@ export default async function updateEffectStyles(effectTokens: SinglePathToken[]
 
     if (matchingStyleName) {
       const effectStyle = effectStylesToKeyMap.get(matchingStyleName)!;
-      tokenToStyleMap[token.name] = effectStyle.id;
+      tokenToStyleMap[token.path] = effectStyle.id;
       setEffectValuesOnTarget(effectStyle, token);
     } else if (shouldCreate) {
       const style = figma.createEffectStyle();
       style.name = compact([activeThemeObject?.name, token.path]).join('/');
-      tokenToStyleMap[token.name] = style.id;
+      tokenToStyleMap[token.path] = style.id;
       setEffectValuesOnTarget(style, token);
     }
   });

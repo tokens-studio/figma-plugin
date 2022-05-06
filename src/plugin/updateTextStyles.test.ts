@@ -6,6 +6,7 @@ const setTextValuesOnTargetSpy = jest.spyOn(setTextValuesOnTarget, 'default');
 const typographyTokens = [
   {
     name: 'H1.withValue',
+    path: 'H1/withValue',
     value: {
       fontFamily: 'Inter',
       fontWeight: 'Bold',
@@ -17,6 +18,7 @@ const typographyTokens = [
   },
   {
     name: 'H1.withValueDescription',
+    path: 'H1/withValueDescription',
     value: {
       fontFamily: 'Inter',
       fontWeight: 'Regular',
@@ -49,14 +51,14 @@ describe('updateTextStyles', () => {
     await updateTextStyles(typographyTokens, true);
     expect(setTextValuesOnTargetSpy).toHaveBeenCalledTimes(2);
     expect(setTextValuesOnTargetSpy).toHaveBeenLastCalledWith(
-      { ...newStyle, name: 'H1.withValueDescription' },
+      { ...newStyle, name: 'H1/withValueDescription' },
       typographyTokens.find((t) => t.name === 'H1.withValueDescription'),
     );
   });
 
-  it('calls functions with correct transformed values when a matching style was found', () => {
+  it('calls functions with correct transformed values when a matching style was found', async () => {
     figma.getLocalTextStyles.mockReturnValueOnce([matchingFigmaStyle]);
-    updateTextStyles(typographyTokens);
+    await updateTextStyles(typographyTokens);
     expect(setTextValuesOnTargetSpy).toHaveBeenCalledWith(
       matchingFigmaStyle,
       typographyTokens.find((t) => t.name === 'H1.withValue'),

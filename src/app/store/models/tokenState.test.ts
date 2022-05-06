@@ -84,6 +84,8 @@ describe('editToken', () => {
               newTokens: [],
               updatedTokens: [],
             },
+            themes: [],
+            activeTheme: null,
             activeTokenSet: 'global',
           },
         },

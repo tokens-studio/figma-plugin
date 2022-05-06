@@ -20,8 +20,8 @@ export default async function updateTextStyles(textTokens: SinglePathToken[], sh
 
   textTokens.forEach((token) => {
     const possibleStyleNames = [
-      token.path,
       compact([activeThemeObject?.name, token.path]).join('/'),
+      token.path,
     ];
     const matchingStyleName = possibleStyleNames.find((path) => (
       textStylesToKeyMap.has(path)
@@ -29,12 +29,12 @@ export default async function updateTextStyles(textTokens: SinglePathToken[], sh
 
     if (matchingStyleName) {
       const textStyle = textStylesToKeyMap.get(matchingStyleName)!;
-      tokenToStyleMap[token.name] = textStyle.id;
+      tokenToStyleMap[token.path] = textStyle.id;
       setTextValuesOnTarget(textStyle, token);
     } else if (shouldCreate) {
       const style = figma.createTextStyle();
       style.name = compact([activeThemeObject?.name, token.path]).join('/');
-      tokenToStyleMap[token.name] = style.id;
+      tokenToStyleMap[token.path] = style.id;
       setTextValuesOnTarget(style, token);
     }
   });
