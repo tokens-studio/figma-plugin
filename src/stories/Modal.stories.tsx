@@ -2,7 +2,6 @@ import React, {useState} from 'react';
 import Modal from '@/app/components/Modal';
 import { ModalFooter } from '@/app/components/Modal/ModalFooter';
 import { ComponentStory, ComponentMeta } from '@storybook/react';
-import { setAppElement } from 'react-modal';
 
 export default {
   title: 'Modal',
@@ -34,7 +33,7 @@ const Template: ComponentStory<typeof Modal> = (args) => {
   return (
     <div>
       <button onClick={handleModalOpen}>Click Here to Open Modal</button>
-      <Modal title='Primary Modal' isOpen={isModalOpen} close={handleModalClose} >
+      <Modal>
       </Modal>
     </div>
   )

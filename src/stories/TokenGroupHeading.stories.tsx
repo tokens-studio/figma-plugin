@@ -1,5 +1,7 @@
 import React from 'react';
 import TokenGroupHeading from '@/app/components/TokenGroupHeading';
+import {Provider} from 'react-redux';
+import {store} from '@/app/store';
 
 import { ComponentStory, ComponentMeta } from '@storybook/react';
 
@@ -15,10 +17,10 @@ export default {
 
 const Template: ComponentStory<typeof TokenGroupHeading> = (args) => {
   return (
-   <div>
+      <Provider store={store}>
         <TokenGroupHeading {...args}>
         </TokenGroupHeading>
-   </div>
+      </Provider>
   )
 };
 
