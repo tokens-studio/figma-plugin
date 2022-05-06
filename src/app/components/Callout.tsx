@@ -4,21 +4,32 @@ import Heading from './Heading';
 import Icon from './Icon';
 import Stack from './Stack';
 import Text from './Text';
+import Box from './Box';
 
 const StyledButton = styled('button', {
   fontSize: '$xsmall',
   color: '$interaction',
 });
 
+type Props = {
+  id: string
+  heading: React.ReactNode
+  description: React.ReactNode
+  action: {
+    text: React.ReactNode
+    onClick: () => void
+  }
+};
+
 export default function Callout({
   heading, description, action, id,
-}) {
+}: Props) {
   return (
-    <div className="bg-primary-100 p-4 rounded">
+    <Box css={{ backgroundColor: '$bgSubtle', padding: '$4', borderRadius: '$default' }}>
       <Stack direction="row" gap={2}>
-        <div className="text-primary-500">
+        <Box css={{ color: '$interaction' }}>
           <Icon name="bell" />
-        </div>
+        </Box>
         <Stack align="start" direction="column" gap={2}>
           <Heading>{heading}</Heading>
           <Text size="xsmall">{description}</Text>
@@ -27,6 +38,6 @@ export default function Callout({
           </StyledButton>
         </Stack>
       </Stack>
-    </div>
+    </Box>
   );
 }

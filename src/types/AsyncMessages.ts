@@ -31,6 +31,7 @@ export enum AsyncMessageTypes {
   SET_UI = 'async/set-ui',
   CREATE_ANNOTATION = 'async/create-annotation',
   UPDATE = 'async/update',
+  SET_LICENSE_KEY = 'async/set-license-key',
   // the below messages are going from plugin to UI
   GET_THEME_INFO = 'async/get-theme-info',
 }
@@ -129,6 +130,11 @@ export type UpdateAsyncMessage = AsyncMessage<AsyncMessageTypes.UPDATE, {
 }>;
 export type UpdateAsyncMessageResult = AsyncMessage<AsyncMessageTypes.UPDATE, { styleIds: Record<string, string>; }>;
 
+export type SetLicenseKeyMessage = AsyncMessage<AsyncMessageTypes.SET_LICENSE_KEY, {
+  licenseKey: string | null
+}>;
+export type SetLicenseKeyMessageResult = AsyncMessage<AsyncMessageTypes.SET_LICENSE_KEY>;
+
 export type GetThemeInfoMessage = AsyncMessage<AsyncMessageTypes.GET_THEME_INFO>;
 export type GetThemeInfoMessageResult = AsyncMessage<AsyncMessageTypes.GET_THEME_INFO, {
   activeTheme: string | null
@@ -155,7 +161,8 @@ export type AsyncMessages =
   | SetUiAsyncMessage
   | CreateAnnotationAsyncMessage
   | UpdateAsyncMessage
-  | GetThemeInfoMessage;
+  | GetThemeInfoMessage
+  | SetLicenseKeyMessage;
 export type AsyncMessageResults =
   CreateStylesAsyncMessageResult
   | InitiateAsyncMessageResult
@@ -176,7 +183,8 @@ export type AsyncMessageResults =
   | SetUiAsyncMessageResult
   | CreateAnnotationAsyncMessageResult
   | UpdateAsyncMessageResult
-  | GetThemeInfoMessageResult;
+  | GetThemeInfoMessageResult
+  | SetLicenseKeyMessageResult;
 
 export type AsyncMessagesMap = {
   [K in AsyncMessageTypes]: Extract<AsyncMessages, { type: K }>

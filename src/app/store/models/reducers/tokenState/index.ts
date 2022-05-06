@@ -7,3 +7,4 @@ export * from './toggleManyTokenSets';
 export * from './deleteTokenSet';
 export * from './renameTokenSet';
 export * from './assignStyleIdsToCurrentTheme';
+export * from './setEmptyTokens';

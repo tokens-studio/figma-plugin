@@ -8,6 +8,7 @@ import { backgroundJobsSelector } from '@/selectors';
 import Stack from './Stack';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
+import Box from './Box';
 
 const backgroundJobTitles = {
   [BackgroundJobs.NODEMANAGER_UPDATE]: 'Finding and caching tokens...',
@@ -26,6 +27,7 @@ const backgroundJobTitles = {
 
 export default function LoadingBar() {
   const backgroundJobs = useSelector(backgroundJobsSelector);
+  const currentJob = React.useMemo(() => backgroundJobs?.[backgroundJobs.length - 1], [backgroundJobs]);
   const hasInfiniteJobs = React.useMemo(() => backgroundJobs.some((job) => job.isInfinite), [backgroundJobs]);
   const expectedWaitTime = React.useMemo(() => backgroundJobs.reduce((time, job) => (
     time + (job.totalTasks ? (
@@ -62,12 +64,12 @@ export default function LoadingBar() {
           backgroundColor: '$bgSubtle', padding: '$2', borderRadius: '$default', margin: '$2',
         }}
       >
-        <div className="inline-flex rotate">
+        <Box css={{ color: '$text' }} className="inline-flex rotate">
           <Icon name="loading" />
-        </div>
+        </Box>
         <div className="flex flex-grow items-center justify-between">
           <div className="font-medium text-xxs">
-            {backgroundJobTitles[backgroundJobs[backgroundJobs.length - 1]?.name] ?? 'Hold on, updating...'}
+            {(currentJob ? backgroundJobTitles[currentJob.name as keyof typeof backgroundJobTitles] : null) ?? 'Hold on, updating...'}
             {expectedWaitTimeInSeconds >= 1 && (
               `(${expectedWaitTimeInSeconds}s remaining)`
             )}

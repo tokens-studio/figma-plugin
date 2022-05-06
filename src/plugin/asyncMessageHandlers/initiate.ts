@@ -10,7 +10,7 @@ import compareProvidersWithStored from '../compareProviders';
 import { getUserId } from '../helpers';
 import { getSavedStorageType, getTokenData } from '../node';
 import {
-  notifyAPIProviders, notifyLastOpened, notifyNoSelection, notifyStorageType, notifyTokenValues, notifyUserId,
+  notifyAPIProviders, notifyLastOpened, notifyLicenseKey, notifyNoSelection, notifyStorageType, notifyTokenValues, notifyUserId,
 } from '../notifiers';
 import { getActiveTheme } from '@/utils/getActiveTheme';
 
@@ -34,6 +34,11 @@ export const initiate: AsyncMessageChannelHandlers[AsyncMessageTypes.INITIATE] =
     }
     notifyLastOpened(lastOpened);
     notifyStorageType(storageType);
+
+    const licenseKey = await figma.clientStorage.getAsync('licenseKey');
+    if (licenseKey) {
+      notifyLicenseKey(licenseKey);
+    }
 
     // @TODO fix setting of activeTheme
     const apiProviders = await figma.clientStorage.getAsync('apiProviders');

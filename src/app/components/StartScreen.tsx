@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Heading from './Heading';
 import Text from './Text';
@@ -6,32 +6,33 @@ import Button from './Button';
 import Callout from './Callout';
 import { StorageProviderType } from '../../types/api';
 import { Dispatch } from '../store';
-import Box from './Box';
 import { storageTypeSelector } from '@/selectors';
 import Stack from './Stack';
+import { Tabs } from '@/constants/Tabs';
 
 function StartScreen() {
   const dispatch = useDispatch<Dispatch>();
 
   const storageType = useSelector(storageTypeSelector);
-  const onSetDefaultTokens = () => {
-    dispatch.uiState.setActiveTab('tokens');
+  const onSetDefaultTokens = useCallback(() => {
+    dispatch.uiState.setActiveTab(Tabs.TOKENS);
     dispatch.tokenState.setEmptyTokens();
-  };
-  const onSetSyncClick = () => {
-    dispatch.uiState.setActiveTab('settings');
+  }, [dispatch]);
+  const onSetSyncClick = useCallback(() => {
+    dispatch.uiState.setActiveTab(Tabs.SETTINGS);
     dispatch.tokenState.setEmptyTokens();
     dispatch.uiState.setLocalApiState({
       ...storageType,
       secret: '',
       new: true,
     });
-  };
+  }, [storageType, dispatch]);
 
   return (
     <div className="h-auto p-4 my-auto">
       <Stack direction="column" gap={4}>
         <a href="https://jansix.at/resources/figma-tokens?ref=figma-tokens-plugin" target="_blank" rel="noreferrer">
+          {/* eslint-disable-next-line */}
           <img alt="Figma Tokens Splashscreen" src={require('../assets/tokens-intro.jpg')} className="rounded" />
         </a>
         <Stack direction="column" gap={2}>

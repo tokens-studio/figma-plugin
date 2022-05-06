@@ -4,7 +4,6 @@ import { DownloadIcon, UploadIcon } from '@primer/octicons-react';
 import * as pjs from '../../../package.json';
 import Box from './Box';
 import Text from './Text';
-import Tooltip from './Tooltip';
 import Stack from './Stack';
 import BranchSelector from './BranchSelector';
 import useRemoteTokens from '../store/remoteTokens';
@@ -14,6 +13,7 @@ import {
 } from '@/selectors';
 import DocsIcon from '@/icons/docs.svg';
 import FeedbackIcon from '@/icons/feedback.svg';
+import IconButton from './IconButton';
 
 export default function Footer() {
   const storageType = useSelector(storageTypeSelector);
@@ -52,32 +52,22 @@ export default function Footer() {
   const onPullButtonClicked = React.useCallback(() => pullTokens({ usedTokenSet }), [pullTokens, usedTokenSet]);
 
   return (
-    <Box css={{
-      display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0, padding: '$4',
-    }}
+    <Box
+      css={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        flexShrink: 0,
+        padding: '$4',
+      }}
     >
       <Stack direction="row">
         {localApiState.branch && (
-        <>
-          <BranchSelector />
-          <Tooltip label={`Pull from ${transformProviderName(storageType.provider)}`}>
-            <button onClick={onPullButtonClicked} type="button" className="button button-ghost">
-              <DownloadIcon />
-            </button>
-          </Tooltip>
-          <Tooltip label={`Push to ${transformProviderName(storageType.provider)}`}>
-            <button
-              onClick={onPushButtonClicked}
-              type="button"
-              className="relative button button-ghost"
-              disabled={editProhibited}
-            >
-              {hasChanges && <div className="absolute top-0 right-0 w-2 h-2 rounded-full bg-primary-500" />}
-
-              <UploadIcon />
-            </button>
-          </Tooltip>
-        </>
+          <>
+            <BranchSelector />
+            <IconButton icon={<DownloadIcon />} onClick={onPullButtonClicked} tooltipSide="top" tooltip={`Pull from ${transformProviderName(storageType.provider)}`} />
+            <IconButton badge={hasChanges} icon={<UploadIcon />} onClick={onPushButtonClicked} tooltipSide="top" disabled={editProhibited} tooltip={`Push to ${transformProviderName(storageType.provider)}`} />
+          </>
         )}
       </Stack>
       <Stack direction="row" gap={4}>
@@ -88,25 +78,21 @@ export default function Footer() {
         </Box>
 
         <Text size="xsmall">
-          <a
-            href="https://docs.tokens.studio/?ref=pf"
-            target="_blank"
-            rel="noreferrer"
-          >
+          <a href="https://docs.tokens.studio/?ref=pf" target="_blank" rel="noreferrer">
             <Stack direction="row" gap={1}>
-              <Box as="span" css={{ color: '$textMuted' }}>Docs</Box>
+              <Box as="span" css={{ color: '$textMuted' }}>
+                Docs
+              </Box>
               <DocsIcon />
             </Stack>
           </a>
         </Text>
         <Text size="xsmall">
-          <a
-            href="https://github.com/six7/figma-tokens"
-            target="_blank"
-            rel="noreferrer"
-          >
+          <a href="https://github.com/six7/figma-tokens" target="_blank" rel="noreferrer">
             <Stack direction="row" gap={1}>
-              <Box as="span" css={{ color: '$textMuted' }}>Feedback</Box>
+              <Box as="span" css={{ color: '$textMuted' }}>
+                Feedback
+              </Box>
               <FeedbackIcon />
             </Stack>
           </a>

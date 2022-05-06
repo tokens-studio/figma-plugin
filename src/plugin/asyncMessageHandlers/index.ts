@@ -17,3 +17,4 @@ export * from './setUi';
 export * from './createAnnotation';
 export * from './createStyles';
 export * from './update';
+export * from './setLicenseKey';

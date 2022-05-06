@@ -62,8 +62,8 @@ const StatusToast = ({ open, error }: { open: boolean; error: string | null }) =
           >
             <Box
               css={{
-                background: '$dangerBgEmphasis',
-                color: '$textOnEmphasis',
+                background: '$dangerBg',
+                color: '$onDanger',
                 fontSize: '$xsmall',
                 fontWeight: '$bold',
                 padding: '$3 $4',
@@ -173,6 +173,18 @@ function Tokens({ isActive }: { isActive: boolean }) {
     }
   }, [confirm, shouldConfirm, dispatch.tokenState, activeTokensTab, stringTokens]);
 
+  const handleToggleTokenSetsVisible = React.useCallback(() => {
+    setTokenSetsVisible(!tokenSetsVisible);
+  }, [tokenSetsVisible]);
+
+  const handleSwitchToList = React.useCallback(() => {
+    setActiveTokensTab('list');
+  }, []);
+
+  const handleSwitchToJson = React.useCallback(() => {
+    setActiveTokensTab('json');
+  }, []);
+
   const tokensContextValue = React.useMemo(() => ({
     resolvedTokens,
   }), [resolvedTokens]);
@@ -217,7 +229,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
           }}
         >
           <Box>
-            <StyledButton style={{ height: '100%' }} type="button" onClick={() => setTokenSetsVisible(!tokenSetsVisible)}>
+            <StyledButton style={{ height: '100%' }} type="button" onClick={handleToggleTokenSetsVisible}>
               <Box
                 css={{
                   fontWeight: '$bold',
@@ -248,7 +260,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
             <IconButton
               variant={activeTokensTab === 'list' ? 'primary' : 'default'}
               dataCy="tokensTabList"
-              onClick={() => setActiveTokensTab('list')}
+              onClick={handleSwitchToList}
               icon={<IconListing />}
               tooltipSide="bottom"
               tooltip="Listing"
@@ -256,7 +268,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
             <IconButton
               variant={activeTokensTab === 'json' ? 'primary' : 'default'}
               dataCy="tokensTabJSON"
-              onClick={() => setActiveTokensTab('json')}
+              onClick={handleSwitchToJson}
               icon={<IconJSON />}
               tooltipSide="bottom"
               tooltip="JSON"

@@ -26,6 +26,7 @@ export enum MessageFromPluginTypes {
   CLEAR_JOBS = 'clear_jobs',
   ADD_JOB_TASKS = 'add_job_tasks',
   COMPLETE_JOB_TASKS = 'complete_job_tasks',
+  LICENSE_KEY = 'license_key',
 }
 
 export type NoSelectionFromPluginMessage = { type: MessageFromPluginTypes.NO_SELECTION };
@@ -116,6 +117,12 @@ export type ApiCredentialsFromPluginMessage = {
   usedTokenSet?: UsedTokenSetsMap | null;
   activeTheme?: string | null;
 };
+
+export type LicenseKeyFromPluginMessage = {
+  type: MessageFromPluginTypes.LICENSE_KEY;
+  licenseKey: string;
+};
+
 export type PostToUIMessage =
   | NoSelectionFromPluginMessage
   | SelectionFromPluginMessage
@@ -133,4 +140,5 @@ export type PostToUIMessage =
   | ClearJobsFromPluginMessage
   | AddJobTasksFromPluginMessage
   | CompleteJobTasksFromPluginMessage
-  | ApiCredentialsFromPluginMessage;
+  | ApiCredentialsFromPluginMessage
+  | LicenseKeyFromPluginMessage;

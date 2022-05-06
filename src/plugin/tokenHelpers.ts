@@ -29,11 +29,19 @@ export function resolveTokenValues(tokens: SingleToken[], previousCount: number 
     let failedToResolve = false;
     // Iterate over Typography and boxShadow Object to get resolved values
     if (t.type === TokenTypes.TYPOGRAPHY || t.type === TokenTypes.BOX_SHADOW) {
-      if (Array.isArray(t.value)) {
+      // If value is alias
+      if (typeof t.value === 'string') {
+        returnValue = getAliasValue(t.value, tokensInProgress);
+        failedToResolve = returnValue === null || checkIfContainsAlias(returnValue);
+      } else if (Array.isArray(t.value)) {
         // If we're dealing with an array, iterate over each item and then key
         returnValue = t.value.map((item) => (
           Object.entries(item).reduce<Record<string, ReturnType<typeof getAliasValue>>>((acc, [key, value]) => {
             acc[key] = getAliasValue(value, tokensInProgress);
+            const itemFailedToResolve = acc[key] === null || checkIfContainsAlias(acc[key]);
+            if (itemFailedToResolve) {
+              failedToResolve = true;
+            }
             return acc;
           }, {})
         ));
@@ -41,6 +49,10 @@ export function resolveTokenValues(tokens: SingleToken[], previousCount: number 
       } else {
         returnValue = Object.entries(t.value).reduce<Record<string, ReturnType<typeof getAliasValue>>>((acc, [key, value]) => {
           acc[key] = getAliasValue(value, tokensInProgress);
+          const itemFailedToResolve = acc[key] === null || checkIfContainsAlias(acc[key]);
+          if (itemFailedToResolve) {
+            failedToResolve = true;
+          }
           return acc;
         }, {});
       }
@@ -55,7 +67,6 @@ export function resolveTokenValues(tokens: SingleToken[], previousCount: number 
       rawValue: t.rawValue || t.value,
       ...(failedToResolve ? { failedToResolve } : {}),
     } as ResolveTokenValuesResult;
-
     return returnObject;
   });
 
@@ -71,7 +82,7 @@ export function mergeTokenGroups(tokens: Record<string, SingleToken[]>, usedSets
   // @README we will use both ENABLED and SOURCE sets
   // we only need to ignore the SOURCE sets when creating styles
   const tokenSetsToMerge = Object.entries(usedSets)
-    .filter(([,status]) => status === TokenSetStatus.ENABLED || status === TokenSetStatus.SOURCE)
+    .filter(([, status]) => status === TokenSetStatus.ENABLED || status === TokenSetStatus.SOURCE)
     .map(([tokenSet]) => tokenSet);
 
   // Reverse token set order (right-most win) and check for duplicates
