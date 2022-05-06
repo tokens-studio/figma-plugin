@@ -10,9 +10,17 @@ export default {
   },
 } as ComponentMeta<typeof Stack>;
 
-const Template: ComponentStory<typeof Stack> = (args) => <Stack { ...args } />;
+const Template: ComponentStory<typeof Stack> = (args) =>
+{
+  return (
+    <Stack { ...args } >
+      333
+    </Stack>
+  )
+};
 
 export const Primary = Template.bind({});
 Primary.args = {
   direction : 'row',
+  
 }

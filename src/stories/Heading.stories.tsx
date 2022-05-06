@@ -10,7 +10,13 @@ export default {
   },
 } as ComponentMeta<typeof Heading>;
 
-const Template: ComponentStory<typeof Heading> = (args) => <Heading { ...args } />;
+const Template: ComponentStory<typeof Heading> = (args) => {
+  return (
+  <Heading { ...args }>
+    Story
+  </Heading>
+  )
+}
 
 export const Primary = Template.bind({});
 Primary.args = {

@@ -6,4 +6,10 @@ export const parameters = {
       date: /Date$/,
     },
   },
+  a11y: {
+    // the target DOM element
+    element: '#root',
+    // sets the execution mode for the addon
+    manual: false,
+  },
 }
