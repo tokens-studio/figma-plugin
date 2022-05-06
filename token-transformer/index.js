@@ -120,7 +120,9 @@ const getTokens = async (input) => {
  * Reads the given input file, transforms all tokens and writes them to the output file
  */
 const transform = async () => {
-    const {input, output, sets, excludes, expandTypography, expandShadow, preserveRawValue, throwErrorWhenNotResolved, resolveReferences: resolveReferencesArg} = argv;
+    const {input, output, sets: setsArg, excludes: excludesArg, expandTypography, expandShadow, preserveRawValue, throwErrorWhenNotResolved, resolveReferences: resolveReferencesArg} = argv;
+    const sets = typeof setsArg === 'string' ? setsArg.split(',') : setsArg;
+    const excludes = typeof excludesArg === 'string' ? excludesArg.split(',') : excludesArg;
     // yargs will convert a command option of type: 'boolean | "math"' to string type in all cases - convert back to primitive boolan if set to 'true'|'false':
     const resolveReferences = ['true', 'false'].includes(resolveReferencesArg) ? resolveReferencesArg === 'true' : resolveReferencesArg;
 
@@ -134,15 +136,12 @@ const transform = async () => {
             resolveReferences
         };
 
-        const usedSets = sets.length > 0 ? sets.includes(",") ? sets.split(",") : [sets] : [];
-        const excludedSets = excludes.length > 0 ? excludes.includes(",") ? excludes.split(",") : [excludes] : [];
-
         log(`transforming tokens from input: ${input}`);
-        log(`using sets: ${usedSets.length > 0 ? usedSets : '[]'}`);
-        log(`using excludes: ${excludedSets.length > 0 ? excludedSets : '[]'}`);
+        log(`using sets: ${sets.length > 0 ? sets : '[]'}`);
+        log(`using excludes: ${excludes.length > 0 ? excludes : '[]'}`);
         log(`using options: { expandTypography: ${expandTypography}, expandShadow: ${expandShadow}, preserveRawValue: ${preserveRawValue}, resolveReferences: ${resolveReferences} }`);
 
-        const transformed = transformTokens(tokens, usedSets, excludedSets, options);
+        const transformed = transformTokens(tokens, sets, excludes, options);
 
         log(`writing tokens to output: ${output}`);
 
