@@ -45,11 +45,11 @@ export default function InspectorTokenSingle({
       return getTokenValue(nameToLookFor, resolvedTokens);  
     } 
     return getTokenValue(token.value, resolvedTokens);
-  }, [token, resolvedTokens, getTokenValue]);
+  }, [token, resolvedTokens, getTokenValue, newTokenName]);
   const [isChecked, setChecked] = React.useState(false);
 
   React.useEffect(() => {
-    setChecked(inspectState.selectedTokens.includes(`${token.category}-${mappedToken?.name || token.value}`));
+    setChecked(inspectState.selectedTokens.includes(`${token.category}-${token.value}`));
   }, [inspectState.selectedTokens, token]);
 
   const handleChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>(
@@ -68,7 +68,9 @@ export default function InspectorTokenSingle({
   );
 
   const handleDownShiftInputChange = React.useCallback((newInputValue: string) => {
-    setNewTokenName(newInputValue);
+    if (newInputValue.charAt(0) === '$') setNewTokenName(newInputValue.slice(1, newInputValue.length));
+    if (newInputValue.charAt(0) === '{') setNewTokenName(newInputValue.slice(1, newInputValue.length - 1));
+    else setNewTokenName(newInputValue);
   }, [newTokenName]);
 
   const handleToggleInputHelper = React.useCallback(() => {
@@ -81,7 +83,7 @@ export default function InspectorTokenSingle({
   );
 
   const onConfirm = React.useCallback(() => {
-    handleRemap(token.category, mappedToken?.name || token.value, newTokenName);
+    handleRemap(token.category, token.value, newTokenName);
     setShowDialog(false);
   }, [token, handleRemap, newTokenName, mappedToken]);
 
@@ -114,8 +116,8 @@ export default function InspectorTokenSingle({
       >
         <Checkbox
           checked={isChecked}
-          id={`${token.category}-${mappedToken?.name || token.value}`}
-          onCheckedChange={() => dispatch.inspectState.toggleSelectedTokens(`${token.category}-${mappedToken?.name || token.value}`)}
+          id={`${token.category}-${token.value}`}
+          onCheckedChange={() => dispatch.inspectState.toggleSelectedTokens(`${token.category}-${token.value}`)}
         />
         {(!!mappedToken) && (
           <InspectorResolvedToken token={mappedToken} />
@@ -129,7 +131,7 @@ export default function InspectorTokenSingle({
             gap: '$1',
           }}
         >
-          <Box css={{ fontSize: '$small' }}>{ mappedToken?.name || token.value}</Box>
+          <Box css={{ fontSize: '$small' }}>{ token.value}</Box>
           <IconButton
             tooltip="Change to another token"
             dataCy="button-token-remap"
