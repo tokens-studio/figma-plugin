@@ -49,7 +49,7 @@ export default function InspectorTokenSingle({
   const [isChecked, setChecked] = React.useState(false);
 
   React.useEffect(() => {
-    setChecked(inspectState.selectedTokens.includes(`${token.category}-${token.value}`));
+    setChecked(inspectState.selectedTokens.includes(`${token.category}-${mappedToken?.name || token.value}`));
   }, [inspectState.selectedTokens, token]);
 
   const handleChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>(
@@ -81,9 +81,9 @@ export default function InspectorTokenSingle({
   );
 
   const onConfirm = React.useCallback(() => {
-    handleRemap(token.category, token.value, newTokenName);
+    handleRemap(token.category, mappedToken?.name || token.value, newTokenName);
     setShowDialog(false);
-  }, [token, handleRemap, newTokenName]);
+  }, [token, handleRemap, newTokenName, mappedToken]);
 
   const handleClick = React.useCallback(() => {
     setShowDialog(true);
@@ -114,8 +114,8 @@ export default function InspectorTokenSingle({
       >
         <Checkbox
           checked={isChecked}
-          id={`${token.category}-${token.value}`}
-          onCheckedChange={() => dispatch.inspectState.toggleSelectedTokens(`${token.category}-${token.value}`)}
+          id={`${token.category}-${mappedToken?.name || token.value}`}
+          onCheckedChange={() => dispatch.inspectState.toggleSelectedTokens(`${token.category}-${mappedToken?.name || token.value}`)}
         />
         {(!!mappedToken) && (
           <InspectorResolvedToken token={mappedToken} />
@@ -145,7 +145,7 @@ export default function InspectorTokenSingle({
               >
                 <Stack direction="column" gap={4}>
                   <Stack direction="column" gap={2}>
-                    <Heading>Choose a new token for {token.value}</Heading>
+                    <Heading>Choose a new token for {mappedToken?.name || token.value}</Heading>
                     <DownshiftInput
                       value={newTokenName}
                       type={Properties[token.category] === 'fill' ? 'color' : Properties[token.category]}
