@@ -1,12 +1,13 @@
-import { MessageToPluginTypes } from '@/types/messages';
+import { AsyncMessageChannel } from '@/AsyncMessageChannel';
+import { SelectionValue } from '@/types';
+import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { track } from '@/utils/analytics';
-import { postToFigma } from '../../plugin/notifiers';
 
-const createAnnotation = (tokens, direction = 'left') => {
+const createAnnotation = (tokens: SelectionValue, direction = 'left') => {
   track('Created annotation', { direction });
 
-  postToFigma({
-    type: MessageToPluginTypes.CREATE_ANNOTATION,
+  AsyncMessageChannel.message({
+    type: AsyncMessageTypes.CREATE_ANNOTATION,
     tokens,
     direction,
   });

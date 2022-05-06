@@ -17,6 +17,8 @@ import { AnyTokenList, AnyTokenSet, TokenStore } from '@/types/tokens';
 import { isSingleToken } from '@/utils/is';
 import { ThemeObjectsList } from '@/types';
 import { attemptOrFallback } from '@/utils/attemptOrFallback';
+import { AsyncMessageChannel } from '@/AsyncMessageChannel';
+import { AsyncMessageTypes } from '@/types/AsyncMessages';
 
 // @TODO fix typings
 
@@ -125,6 +127,9 @@ export async function updateNodes(
 ) {
   const { ignoreFirstPartForStyles } = settings ?? {};
   const figmaStyleMaps = getAllFigmaStyleMaps();
+  const themeInfo = await AsyncMessageChannel.message({
+    type: AsyncMessageTypes.GET_THEME_INFO,
+  });
   postToUI({
     type: MessageFromPluginTypes.START_JOB,
     job: {
@@ -145,7 +150,7 @@ export async function updateNodes(
           if (entry.tokens) {
             const mappedValues = mapValuesToTokens(tokens, entry.tokens);
 
-            setValuesOnNode(entry.node, mappedValues, entry.tokens, figmaStyleMaps, ignoreFirstPartForStyles);
+            setValuesOnNode(entry.node, mappedValues, entry.tokens, figmaStyleMaps, themeInfo, ignoreFirstPartForStyles);
             store.successfulNodes.add(entry.node);
             returnedValues.add(entry.tokens);
           }

@@ -7,6 +7,7 @@ import './styles/preflight.css';
 import './styles/main.css';
 import { Provider } from 'react-redux';
 import * as Sentry from '@sentry/react';
+import * as asyncHandlers from './asyncMessageHandlers';
 import { initializeAnalytics } from '../utils/analytics';
 import App from './components/App';
 import Heading from './components/Heading';
@@ -14,8 +15,13 @@ import { store } from './store';
 import * as pjs from '../../package.json';
 import Stack from './components/Stack';
 import Text from './components/Text';
+import { AsyncMessageChannel } from '@/AsyncMessageChannel';
+import { AsyncMessageTypes } from '@/types/AsyncMessages';
 
 initializeAnalytics();
+
+AsyncMessageChannel.connect();
+AsyncMessageChannel.handle(AsyncMessageTypes.GET_THEME_INFO, asyncHandlers.getThemeInfo);
 
 if (process.env.ENVIRONMENT === 'production' || process.env.ENVIRONMENT === 'beta') {
   Sentry.init({

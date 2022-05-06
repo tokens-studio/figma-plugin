@@ -48,8 +48,8 @@ export default function Footer() {
     }
   }, []);
 
-  const onPushButtonClicked = React.useCallback(() => pushTokens(), []);
-  const onPullButtonClicked = React.useCallback(() => pullTokens({ usedTokenSet }), [usedTokenSet]);
+  const onPushButtonClicked = React.useCallback(() => pushTokens(), [pushTokens]);
+  const onPullButtonClicked = React.useCallback(() => pullTokens({ usedTokenSet }), [pullTokens, usedTokenSet]);
 
   return (
     <Box css={{
@@ -59,13 +59,13 @@ export default function Footer() {
       <Stack direction="row">
         {localApiState.branch && (
         <>
-          <BranchSelector currentBranch={localApiState.branch} />
-          <Tooltip variant="top" label={`Pull from ${transformProviderName(storageType.provider)}`}>
+          <BranchSelector />
+          <Tooltip label={`Pull from ${transformProviderName(storageType.provider)}`}>
             <button onClick={onPullButtonClicked} type="button" className="button button-ghost">
               <DownloadIcon />
             </button>
           </Tooltip>
-          <Tooltip variant="top" label={`Push to ${transformProviderName(storageType.provider)}`}>
+          <Tooltip label={`Push to ${transformProviderName(storageType.provider)}`}>
             <button
               onClick={onPushButtonClicked}
               type="button"

@@ -7,11 +7,12 @@ type Options = {
   providers?: string | null,
   storageType: StorageType,
   featureFlagId?: string | null,
+  activeTheme?: string | null
   usedTokenSet?: UsedTokenSetsMap | null
 };
 
 export default function compareProvidersWithStored({
-  providers, storageType, featureFlagId, usedTokenSet,
+  providers, storageType, featureFlagId, usedTokenSet, activeTheme,
 }: Options) {
   if (providers) {
     const parsedProviders = JSON.parse(providers) as any[]; // @TODO type properly
@@ -24,6 +25,7 @@ export default function compareProvidersWithStored({
         credentials: matchingSet,
         featureFlagId,
         usedTokenSet,
+        activeTheme,
       });
       return;
     }

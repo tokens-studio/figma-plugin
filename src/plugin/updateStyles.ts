@@ -1,36 +1,39 @@
 import { SettingsState } from '@/app/store/models/settings';
-import { AnyTokenList } from '@/types/tokens';
+import { AnyTokenList, SingleToken } from '@/types/tokens';
+import { convertTokenNameToPath } from '@/utils/convertTokenNameToPath';
 import { transformValue } from './helpers';
 import updateColorStyles from './updateColorStyles';
 import updateEffectStyles from './updateEffectStyles';
 import updateTextStyles from './updateTextStyles';
 
-export default function updateStyles(
+export type SinglePathToken = SingleToken<true, { path: string }>;
+
+export default async function updateStyles(
   tokens: AnyTokenList,
   shouldCreate = false,
   settings: SettingsState = {} as SettingsState,
-): void {
+): Promise<Record<string, string>> {
   const styleTokens = tokens.map((token) => {
     const slice = settings?.ignoreFirstPartForStyles ? 1 : 0;
-    const name = token.name.split('.').slice(slice).join('/');
+    const path = convertTokenNameToPath(token.name, slice);
     return {
       ...token,
-      name,
+      path,
       value: transformValue(token.value, token.type),
-    };
+    } as SinglePathToken;
   });
   const colorTokens = styleTokens.filter((n) => ['color', 'colors'].includes(n.type));
   const textTokens = styleTokens.filter((n) => ['typography'].includes(n.type));
   const effectTokens = styleTokens.filter((n) => ['boxShadow'].includes(n.type));
 
-  if (!colorTokens && !textTokens && !effectTokens) return;
-  if (colorTokens.length > 0) {
-    updateColorStyles(colorTokens, shouldCreate);
+  if (!colorTokens && !textTokens && !effectTokens) {
+    return {};
   }
-  if (textTokens.length > 0) {
-    updateTextStyles(textTokens, shouldCreate);
-  }
-  if (effectTokens.length > 0) {
-    updateEffectStyles(effectTokens, shouldCreate);
-  }
+
+  const allStyleIds = {
+    ...(colorTokens.length > 0 ? await updateColorStyles(colorTokens, shouldCreate) : {}),
+    ...(textTokens.length > 0 ? await updateTextStyles(textTokens, shouldCreate) : {}),
+    ...(effectTokens.length > 0 ? await updateEffectStyles(effectTokens, shouldCreate) : {}),
+  };
+  return allStyleIds;
 }

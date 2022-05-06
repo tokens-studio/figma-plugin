@@ -1,7 +1,5 @@
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useCallback, useMemo } from 'react';
-import { postToFigma } from '@/plugin/notifiers';
-import { MessageToPluginTypes } from '@/types/messages';
 import {
   AnyTokenList,
   SingleToken,
@@ -15,6 +13,7 @@ import { Properties } from '@/constants/Properties';
 import { track } from '@/utils/analytics';
 import { checkIfAlias } from '@/utils/alias';
 import {
+  activeThemeObjectSelector,
   activeTokenSetSelector,
   settingsStateSelector,
   tokensSelector,
@@ -23,8 +22,10 @@ import {
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { isEqual } from '@/utils/isEqual';
-
-// @TODO fix typings
+import { AsyncMessageChannel } from '@/AsyncMessageChannel';
+import { AsyncMessageTypes } from '@/types/AsyncMessages';
+import type { NodeInfo } from '@/types/NodeInfo';
+import { Dispatch } from '../store';
 
 type ConfirmResult =
   ('textStyles' | 'colorStyles' | 'effectStyles')[]
@@ -37,9 +38,11 @@ type GetFormattedTokensOptions = {
   expandShadow: boolean;
 };
 
-type RemoveTokensByValueData = { property: Properties; nodes: string[] }[];
+type RemoveTokensByValueData = { property: Properties; nodes: NodeInfo[] }[];
 
 export default function useTokens() {
+  const dispatch = useDispatch<Dispatch>();
+  const activeThemeObject = useSelector(activeThemeObjectSelector);
   const usedTokenSet = useSelector(usedTokenSetSelector);
   const activeTokenSet = useSelector(activeTokenSetSelector);
   const tokens = useSelector(tokensSelector);
@@ -92,8 +95,8 @@ export default function useTokens() {
         effectStyles: userDecision.data.includes('effectStyles'),
       });
 
-      postToFigma({
-        type: MessageToPluginTypes.PULL_STYLES,
+      AsyncMessageChannel.message({
+        type: AsyncMessageTypes.PULL_STYLES,
         styleTypes: {
           textStyles: userDecision.data.includes('textStyles'),
           colorStyles: userDecision.data.includes('colorStyles'),
@@ -106,8 +109,8 @@ export default function useTokens() {
   const removeTokensByValue = useCallback((data: RemoveTokensByValueData) => {
     track('removeTokensByValue', { count: data.length });
 
-    postToFigma({
-      type: MessageToPluginTypes.REMOVE_TOKENS_BY_VALUE,
+    AsyncMessageChannel.message({
+      type: AsyncMessageTypes.REMOVE_TOKENS_BY_VALUE,
       tokensToRemove: data,
     });
   }, []);
@@ -125,8 +128,8 @@ export default function useTokens() {
     if (userDecision && typeof userDecision.data === 'string') {
       track('remapToken', { fromInspect: true });
 
-      postToFigma({
-        type: MessageToPluginTypes.REMAP_TOKENS,
+      AsyncMessageChannel.message({
+        type: AsyncMessageTypes.REMAP_TOKENS,
         category: type,
         oldName: name,
         newName: userDecision.data,
@@ -139,8 +142,8 @@ export default function useTokens() {
   const remapToken = useCallback(async (oldName: string, newName: string, updateMode?: UpdateMode) => {
     track('remapToken', { fromRename: true });
 
-    postToFigma({
-      type: MessageToPluginTypes.REMAP_TOKENS,
+    AsyncMessageChannel.message({
+      type: AsyncMessageTypes.REMAP_TOKENS,
       oldName,
       newName,
       updateMode: updateMode || settings.updateMode,
@@ -148,7 +151,7 @@ export default function useTokens() {
   }, [settings.updateMode]);
 
   // Calls Figma with all tokens to create styles
-  const createStylesFromTokens = useCallback(() => {
+  const createStylesFromTokens = useCallback(async () => {
     track('createStyles');
 
     const enabledTokenSets = Object.entries(usedTokenSet)
@@ -160,12 +163,14 @@ export default function useTokens() {
       && (!token.internal__Parent || enabledTokenSets.includes(token.internal__Parent)) // filter out SOURCE tokens
     ));
 
-    postToFigma({
-      type: MessageToPluginTypes.CREATE_STYLES,
+    const createStylesResult = await AsyncMessageChannel.message({
+      type: AsyncMessageTypes.CREATE_STYLES,
       tokens: withoutIgnoredAndSourceTokens,
+      activeTheme: activeThemeObject,
       settings,
     });
-  }, [settings, tokens, usedTokenSet]);
+    dispatch.tokenState.assignStyleIdsToCurrentTheme(createStylesResult.styleIds);
+  }, [dispatch, settings, tokens, usedTokenSet, activeThemeObject]);
 
   return useMemo(() => ({
     isAlias,

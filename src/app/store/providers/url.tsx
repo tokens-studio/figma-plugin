@@ -2,9 +2,10 @@ import { useDispatch } from 'react-redux';
 import { useCallback, useMemo } from 'react';
 import { Dispatch } from '@/app/store';
 import { ContextObject, StorageProviderType } from '@/types/api';
-import { MessageToPluginTypes } from '@/types/messages';
-import { notifyToUI, postToFigma } from '../../../plugin/notifiers';
+import { notifyToUI } from '../../../plugin/notifiers';
 import { UrlTokenStorage } from '@/storage/UrlTokenStorage';
+import { AsyncMessageChannel } from '@/AsyncMessageChannel';
+import { AsyncMessageTypes } from '@/types/AsyncMessages';
 
 export default function useURL() {
   const dispatch = useDispatch<Dispatch>();
@@ -25,8 +26,8 @@ export default function useURL() {
       dispatch.uiState.setProjectURL(id);
 
       if (content) {
-        postToFigma({
-          type: MessageToPluginTypes.CREDENTIALS,
+        await AsyncMessageChannel.message({
+          type: AsyncMessageTypes.CREDENTIALS,
           id,
           name,
           secret,

@@ -1,11 +1,10 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { useCallback, useMemo } from 'react';
 import { Dispatch } from '@/app/store';
-import { MessageToPluginTypes } from '@/types/messages';
 import useConfirm from '@/app/hooks/useConfirm';
 import usePushDialog from '@/app/hooks/usePushDialog';
 import { ContextObject } from '@/types/api';
-import { notifyToUI, postToFigma } from '@/plugin/notifiers';
+import { notifyToUI } from '@/plugin/notifiers';
 import { FeatureFlags } from '@/utils/featureFlags';
 import {
   featureFlagsSelector, localApiStateSelector, themesListSelector, tokensSelector,
@@ -14,6 +13,8 @@ import { GithubTokenStorage } from '@/storage/GithubTokenStorage';
 import { isEqual } from '@/utils/isEqual';
 import { RemoteTokenStorageData } from '@/storage/RemoteTokenStorage';
 import { GitStorageMetadata } from '@/storage/GitTokenStorage';
+import { AsyncMessageChannel } from '@/AsyncMessageChannel';
+import { AsyncMessageTypes } from '@/types/AsyncMessages';
 
 export function useGitHub() {
   const tokens = useSelector(tokensSelector);
@@ -168,8 +169,8 @@ export function useGitHub() {
     const data = await syncTokensWithGitHub(context);
 
     if (data) {
-      postToFigma({
-        type: MessageToPluginTypes.CREDENTIALS,
+      await AsyncMessageChannel.message({
+        type: AsyncMessageTypes.CREDENTIALS,
         ...context,
       });
       if (data?.tokens) {

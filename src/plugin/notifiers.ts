@@ -1,34 +1,24 @@
 import { UpdateMode } from '@/types/state';
 import { ApiDataType, StorageType } from '@/types/api';
 import {
-  PostToFigmaMessage,
   MessageFromPluginTypes,
-  MessageToPluginTypes,
   PostToUIMessage,
-  NotifyToPluginMessage,
   UserIdFromPluginMessage,
 } from '@/types/messages';
 import store from './store';
 import { TokenStore } from '@/types/tokens';
 import { SelectionGroup } from '@/types/SelectionGroup';
 import { SelectionValue } from '@/types/SelectionValue';
-
-export function postToFigma(props: PostToFigmaMessage) {
-  parent.postMessage(
-    {
-      pluginMessage: props,
-    },
-    '*',
-  );
-}
+import { AsyncMessageChannel } from '@/AsyncMessageChannel';
+import { AsyncMessageTypes } from '@/types/AsyncMessages';
 
 export function notifyUI(msg: string, opts?: NotificationOptions) {
   figma.notify(msg, opts);
 }
 
-export function notifyToUI(msg: string, opts: NotifyToPluginMessage['opts'] = {}) {
-  postToFigma({
-    type: MessageToPluginTypes.NOTIFY,
+export function notifyToUI(msg: string, opts: NotificationOptions = {}) {
+  AsyncMessageChannel.message({
+    type: AsyncMessageTypes.NOTIFY,
     msg,
     opts,
   });

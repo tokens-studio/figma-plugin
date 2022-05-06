@@ -1,12 +1,13 @@
-import { MessageToPluginTypes } from '@/types/messages';
 import { mergeTokenGroups, resolveTokenValues } from '@/plugin/tokenHelpers';
 import { ContextObject, StorageProviderType, StorageType } from '@/types/api';
-import { notifyToUI, postToFigma } from '../../plugin/notifiers';
+import { notifyToUI } from '../../plugin/notifiers';
 import { updateJSONBinTokens } from './providers/jsonbin';
 import { track } from '@/utils/analytics';
 import type { AnyTokenSet, SingleToken } from '@/types/tokens';
 import type { ThemeObjectsList, UsedTokenSetsMap } from '@/types';
 import type { SettingsState } from './models/settings';
+import { AsyncMessageChannel } from '@/AsyncMessageChannel';
+import { AsyncMessageTypes } from '@/types/AsyncMessages';
 
 type UpdateRemoteTokensPayload = {
   provider: StorageProviderType;
@@ -83,7 +84,6 @@ export default async function updateTokensOnSources({
   api,
   lastUpdatedAt,
 }: UpdateTokensOnSourcesPayload) {
-  // @TODO themes
   if (tokens && !isLocal && shouldUpdateRemote && !editProhibited) {
     updateRemoteTokens({
       provider: storageType.provider,
@@ -99,8 +99,8 @@ export default async function updateTokensOnSources({
     ? resolveTokenValues(mergeTokenGroups(tokens, usedTokenSet))
     : null;
 
-  postToFigma({
-    type: MessageToPluginTypes.UPDATE,
+  AsyncMessageChannel.message({
+    type: AsyncMessageTypes.UPDATE,
     tokenValues,
     tokens: tokens ? mergedTokens : null,
     themes,

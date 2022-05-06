@@ -2,12 +2,12 @@ import React from 'react';
 import { useSelector } from 'react-redux';
 import Icon from './Icon';
 import Button from './Button';
-import { postToFigma } from '@/plugin/notifiers';
-import { MessageToPluginTypes } from '@/types/messages';
 import { useDelayedFlag } from '@/hooks';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
 import { backgroundJobsSelector } from '@/selectors';
 import Stack from './Stack';
+import { AsyncMessageChannel } from '@/AsyncMessageChannel';
+import { AsyncMessageTypes } from '@/types/AsyncMessages';
 
 const backgroundJobTitles = {
   [BackgroundJobs.NODEMANAGER_UPDATE]: 'Finding and caching tokens...',
@@ -43,8 +43,8 @@ export default function LoadingBar() {
   );
 
   const handleCancel = React.useCallback(() => {
-    postToFigma({
-      type: MessageToPluginTypes.CANCEL_OPERATION,
+    AsyncMessageChannel.message({
+      type: AsyncMessageTypes.CANCEL_OPERATION,
     });
   }, []);
 

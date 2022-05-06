@@ -5,12 +5,12 @@ import { track } from '@/utils/analytics';
 import type { RootModel } from '@/types/RootModel';
 import fetchChangelog from '@/utils/storyblok';
 import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
-import { postToFigma } from '@/plugin/notifiers';
-import { MessageToPluginTypes } from '@/types/messages';
 import { SingleToken } from '@/types/tokens';
 import { SelectionGroup, StoryblokStory } from '@/types';
 import { Tabs } from '@/constants/Tabs';
 import { FeatureFlags } from '@/utils/featureFlags';
+import { AsyncMessageChannel } from '@/AsyncMessageChannel';
+import { AsyncMessageTypes } from '@/types/AsyncMessages';
 
 type DisplayType = 'GRID' | 'LIST';
 
@@ -343,14 +343,14 @@ export const uiState = createModel<RootModel>()({
     setActiveTab: (payload: Tabs) => {
       const requiresSelectionValues = payload === Tabs.INSPECTOR;
 
-      postToFigma({
-        type: MessageToPluginTypes.CHANGED_TABS,
+      AsyncMessageChannel.message({
+        type: AsyncMessageTypes.CHANGED_TABS,
         requiresSelectionValues,
       });
     },
     toggleShowEmptyGroups(payload: null | boolean, rootState) {
-      postToFigma({
-        type: MessageToPluginTypes.SET_SHOW_EMPTY_GROUPS,
+      AsyncMessageChannel.message({
+        type: AsyncMessageTypes.SET_SHOW_EMPTY_GROUPS,
         showEmptyGroups: payload == null ? rootState.uiState.showEmptyGroups : payload,
       });
     },

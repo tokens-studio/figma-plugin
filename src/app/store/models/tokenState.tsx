@@ -1,6 +1,5 @@
 /* eslint-disable import/prefer-default-export */
 import { createModel } from '@rematch/core';
-import omit from 'just-omit';
 import { StorageProviderType } from '@/types/api';
 import * as tokenStateReducers from './reducers/tokenState';
 import * as tokenStateEffects from './effects/tokenState';
@@ -15,7 +14,6 @@ import {
   DeleteTokenPayload,
   SetTokenDataPayload,
   SetTokensFromStylesPayload,
-  ToggleManyTokenSetsPayload,
   UpdateDocumentPayload,
   UpdateTokenPayload,
 } from '@/types/payloads';
@@ -62,43 +60,6 @@ export const tokenState = createModel<RootModel>()({
       return {
         ...state,
         editProhibited: payload,
-      };
-    },
-    toggleUsedTokenSet: (state, tokenSet: string) => ({
-      ...state,
-      usedTokenSet: {
-        ...state.usedTokenSet,
-        // @README it was decided the user can not simply toggle to the intermediate SOURCE state
-        // this means for toggling we only switch between ENABLED and DISABLED
-        // setting as source is a separate action
-        [tokenSet]: state.usedTokenSet[tokenSet] === TokenSetStatus.DISABLED
-          ? TokenSetStatus.ENABLED
-          : TokenSetStatus.DISABLED,
-      },
-    }),
-    toggleManyTokenSets: (state, data: ToggleManyTokenSetsPayload) => {
-      const oldSetsWithoutInput = Object.fromEntries(
-        Object.entries(state.usedTokenSet)
-          .filter(([tokenSet]) => !data.sets.includes(tokenSet)),
-      );
-
-      if (data.shouldCheck) {
-        return {
-          ...state,
-          usedTokenSet: {
-            ...oldSetsWithoutInput,
-            ...Object.fromEntries(data.sets.map((tokenSet) => ([tokenSet, TokenSetStatus.ENABLED]))),
-          },
-        };
-      }
-
-      return {
-        ...state,
-        usedTokenSet: {
-          ...oldSetsWithoutInput,
-          ...Object.fromEntries(data.sets.map((tokenSet) => ([tokenSet, TokenSetStatus.DISABLED]))),
-          // @README see comment (1) - ensure that all token sets are always available
-        },
       };
     },
     toggleTreatAsSource: (state, tokenSet: string) => ({
@@ -148,32 +109,6 @@ export const tokenState = createModel<RootModel>()({
           ...state.tokens,
           [newName]: [...state.tokens[name]],
         },
-      };
-    },
-    deleteTokenSet: (state, name: string) => {
-      const oldTokens = { ...state.tokens };
-      delete oldTokens[name];
-      return {
-        ...state,
-        tokens: oldTokens,
-        activeTokenSet: state.activeTokenSet === name
-          ? Object.keys(state.tokens)[0]
-          : state.activeTokenSet,
-        usedTokenSet: omit({ ...state.usedTokenSet }, name),
-      };
-    },
-    renameTokenSet: (state, data: { oldName: string; newName: string }) => {
-      const oldTokens = { ...state.tokens };
-      if (Object.keys(oldTokens).includes(data.newName) && data.oldName !== data.newName) {
-        notifyToUI('Token set already exists', { error: true });
-        return state;
-      }
-      oldTokens[data.newName] = oldTokens[data.oldName];
-      delete oldTokens[data.oldName];
-      return {
-        ...state,
-        tokens: oldTokens,
-        activeTokenSet: state.activeTokenSet === data.oldName ? data.newName : state.activeTokenSet,
       };
     },
     setLastSyncedState: (state, data: string) => ({
