@@ -20,8 +20,7 @@
     "cy:run": "cypress run --headless",
     "serve": "serve dist",
     "storybook": "start-storybook -p 6006",
-    "build-storybook": "build-storybook",
-    "tokenstory": "yarn build-storybook & yarn storybook"
+    "build-storybook": "build-storybook"
   },
   "dependencies": {
     "@figma-plugin/helpers": "^0.15.2",

@@ -5,7 +5,7 @@ import Stack from '../Stack';
 import { ModalFooter } from './ModalFooter';
 import { ModalHeader } from './ModalHeader';
 
-if (process.env.NODE_ENV !== 'test') ReactModal.setAppElement('#root');
+if (process.env.NODE_ENV !== 'test') ReactModal.setAppElement('#app');
 
 const customStyles = (large = false): ReactModalStyles => ({
   overlay: {

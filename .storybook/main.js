@@ -14,6 +14,7 @@ module.exports = {
   ],
   framework: "@storybook/react",
   webpackFinal: async (config, { configType }) => {
+    config.mode = 'none';
     config.resolve.alias['@'] = path.resolve(__dirname, '../src/');
     return config;
   },
