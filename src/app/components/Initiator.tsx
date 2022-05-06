@@ -12,7 +12,6 @@ import { useFeatureFlags } from '../hooks/useFeatureFlags';
 import { Tabs } from '@/constants/Tabs';
 import { StorageProviderType } from '@/types/api';
 import { GithubTokenStorage } from '@/storage/GithubTokenStorage';
-import { boolean } from 'zod';
 
 export function Initiator() {
   const dispatch = useDispatch<Dispatch>();
