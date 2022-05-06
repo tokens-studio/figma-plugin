@@ -20,6 +20,7 @@ import { EditTokenObject } from '../store/models/uiState';
 import TypographyInput from './TypographyInput';
 import Stack from './Stack';
 import DownshiftInput from './DownshiftInput';
+import Button from './Button';
 
 type Props = {
   resolvedTokens: ResolveTokenValuesResult[];
@@ -374,12 +375,12 @@ function EditTokenForm({ resolvedTokens }: Props) {
         ))
         : null}
       <Stack direction="row" justify="end" gap={2}>
-        <button className="button button-link" type="button" onClick={handleReset}>
+        <Button variant="secondary" type="button" onClick={handleReset}>
           Cancel
-        </button>
-        <button disabled={!isValid} className="button button-primary" type="submit">
+        </Button>
+        <Button disabled={!isValid} variant="primary" type="submit">
           {internalEditToken?.isPristine ? 'Create' : 'Update'}
-        </button>
+        </Button>
       </Stack>
     </form>
   );

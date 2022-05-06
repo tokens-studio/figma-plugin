@@ -14,8 +14,8 @@ const StyledContent = styled(Tooltip.Content, {
   fontSize: 12,
   maxWidth: '70vw',
   width: 'auto',
-  backgroundColor: '$contextMenuBackground',
-  color: '$contextMenuForeground',
+  backgroundColor: '$bgToolTip',
+  color: '$fgToolTip',
   transformOrigin: 'var(--radix-tooltip-content-transform-origin)',
   animation: `${scaleIn} 0.1s ease-out`,
 });
@@ -27,7 +27,7 @@ const StyledArrow = styled(Tooltip.Arrow, {
 type Props = {
   children: React.ReactElement;
   label?: string | React.ReactElement;
-  side?: 'left' | 'bottom';
+  side?: 'left' | 'bottom' | 'top';
 };
 
 const Toolip: React.FC<Props> = ({
