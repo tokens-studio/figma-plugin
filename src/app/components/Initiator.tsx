@@ -68,12 +68,11 @@ export function Initiator() {
             if (values) {
               dispatch.tokenState.setTokenData(values);
               dispatch.uiState.setActiveTab(Tabs.START);
-              // console.log("values", values);
-              // const existTokens = Object.values(values ?? {}).some(value => {
-              //   return value.length > 0;
-              // });
-              // if (existTokens) dispatch.uiState.setActiveTab(Tabs.TOKENS);
-              // else dispatch.uiState.setActiveTab(Tabs.START);
+              const existTokens = Object.values(values?.values ?? {}).some(value => {
+                return value.length > 0;
+              });
+              if (existTokens) dispatch.uiState.setActiveTab(Tabs.TOKENS);
+              else dispatch.uiState.setActiveTab(Tabs.START);
             }
             break;
           }
