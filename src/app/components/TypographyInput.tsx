@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { TokensIcon, LinkBreak2Icon } from '@radix-ui/react-icons';
 import { checkIfContainsAlias } from '@/utils/alias';
 import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
-import { TypographyTokenSingleValue } from '@/types/propertyTypes';
 import Box from './Box';
 import ResolvedValueBox from './ResolvedValueBox';
 import { EditTokenObject } from '../store/models/uiState';
@@ -36,7 +35,7 @@ export default function TypographyInput({
 }: {
   internalEditToken: EditTokenObject;
   handleTypographyChange: React.ChangeEventHandler;
-  handleTypographyChangeByAlias: (typography: TypographyTokenSingleValue | TypographyTokenSingleValue[]) => void;
+  handleTypographyChangeByAlias: React.ChangeEventHandler;
   resolvedTokens: ResolveTokenValuesResult[];
   handleTypographyDownShiftInputChange: (newInputValue: string, property: string) => void;
   showAliasModeAutoSuggest: boolean;
@@ -47,7 +46,7 @@ export default function TypographyInput({
 
   const defalutShowAutoSuggest = React.useMemo(() => {
     if (internalEditToken.value) {
-      return Object.entries(internalEditToken.value).map((property) => {
+      return Object.entries(internalEditToken.value).map(() => {
         return false;
       }, {})
     }
@@ -55,8 +54,8 @@ export default function TypographyInput({
   }, [internalEditToken]);
 
   const isInputMode = (typeof internalEditToken.value === 'object');
-  const [mode, setMode] = useState(isInputMode ? 'input' : 'alias');
-  const [alias, setAlias] = useState('');
+  const [mode, setMode] = React.useState<string>(isInputMode ? 'input' : 'alias');
+  const [alias, setAlias] = React.useState<string>('');
   const [showAutoSuggest, setShowAutoSuggest] = React.useState<Array<boolean>>(defalutShowAutoSuggest);
 
   const handleMode = React.useCallback(() => {
@@ -75,17 +74,22 @@ export default function TypographyInput({
     return null;
   }, [internalEditToken, resolvedTokens]);
 
-  const handleAutoSuggest = React.useCallback((index: number) => {
-    const newAutoSuggest = [...showAutoSuggest];
-    newAutoSuggest[index] = !newAutoSuggest[index];
-    setShowAutoSuggest(newAutoSuggest);
+  const handleAutoSuggest = React.useCallback((keyIndex: number) => (() => changeAutoSuggest(keyIndex)), []);
+
+  const changeAutoSuggest = React.useCallback((index: number) => {
+    const newShowAutoSuggest = [...showAutoSuggest];
+    newShowAutoSuggest[index] = !newShowAutoSuggest[index];
+    setShowAutoSuggest(newShowAutoSuggest);
   }, [showAutoSuggest]);
+
+  const handleCloseAutoSuggest = React.useCallback((index: number) => (() => closeAutoSuggest(index)), []);
 
   const closeAutoSuggest = React.useCallback((index: number) => {
     const newAutoSuggest = [...showAutoSuggest];
     newAutoSuggest[index] = false;
     setShowAutoSuggest(newAutoSuggest);
   }, [showAutoSuggest]);
+
 
   return (
     <>
@@ -116,18 +120,16 @@ export default function TypographyInput({
               name={key}
               key={`typography-input-${index}`}
               value={value}
-              type={properties[key]}
+              type={properties[key as keyof typeof properties]}
               label={key}
               showAutoSuggest={showAutoSuggest[index]}
               resolvedTokens={resolvedTokens}
               handleChange={handleTypographyChange}
-              setShowAutoSuggest={() => closeAutoSuggest(index)}
+              setShowAutoSuggest={handleCloseAutoSuggest(index)}
               setInputValue={(newInputValue: string) => handleTypographyDownShiftInputChange(newInputValue, key)}
-              placeholder={
-                internalEditToken.type === 'color' ? '#000000, hsla(), rgba() or {alias}' : 'Value or {alias}'
-              }
+              placeholder='Value or {alias}'
               suffix={(
-                <StyledInputSuffix type="button" onClick={() => handleAutoSuggest(index)}>
+                <StyledInputSuffix type="button" onClick={handleAutoSuggest(index)}>
                   <StyledIconDisclosure />
                 </StyledInputSuffix>
               )}
@@ -147,9 +149,7 @@ export default function TypographyInput({
               handleChange={handleTypographyChangeByAlias}
               setShowAutoSuggest={setShowAliasModeAutoSuggest}
               setInputValue={handleDownShiftInputChange}
-              placeholder={
-                internalEditToken.type === 'color' ? '#000000, hsla(), rgba() or {alias}' : 'Value or {alias}'
-              }
+              placeholder='Value or {alias}'
               suffix={(
                 <StyledInputSuffix type="button" onClick={handleAliasModeAutoSuggest}>
                   <StyledIconDisclosure />

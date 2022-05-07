@@ -92,7 +92,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
     (shadow: SingleBoxShadowToken['value']) => {
       setError(null);
       if (internalEditToken?.type === TokenTypes.BOX_SHADOW) {
-        setInternalEditToken(prev => ({...prev, value: shadow}));
+        setInternalEditToken(prev => ({...prev, value: shadow} as typeof editToken));
       }
     },
     [internalEditToken],
@@ -156,7 +156,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
     setInternalEditToken({
       ...internalEditToken,
       value: newInputValue,
-    });
+    } as typeof editToken);
   }, [internalEditToken]);
 
   const handleOptionsChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>(
