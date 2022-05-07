@@ -38,9 +38,9 @@ function ConfirmDialog() {
     case StorageProviderType.ADO:
       redirectHref = getADOCreatePullRequestUrl({
         branch,
-        projectName: localApiState.name,
+        projectId: localApiState.name,
         orgUrl: localApiState.baseUrl,
-        repoName: localApiState.id,
+        repositoryId: localApiState.id,
       });
       break;
     default:

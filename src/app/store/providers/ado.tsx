@@ -35,7 +35,7 @@ export const getADOCreatePullRequestUrl: GetADOCreatePullRequestUrl = ({
   orgUrl,
   projectId,
   repositoryId,
-}) => `${orgUrl}/${projectId ? `${projectId}/` : ''}/_git/${repositoryId}/pullrequestcreate?sourceRef=&targetRef=${branch}`;
+}) => `${orgUrl}/${projectId ? `${projectId}/` : ''}_git/${repositoryId}/pullrequestcreate?sourceRef=&targetRef=${branch}`;
 
 interface FetchGit {
   body?: string
@@ -61,20 +61,7 @@ const fetchGit = async ({
   const paramString = params
     ? Object.entries(params).reduce<string>((acc, [key, value]) => `${acc}${key}=${value}&`, '') + apiVersion
     : apiVersion;
-
-  const formattedBody = body ? { body: JSON.stringify(body) } : {};
   const input = `${orgUrl}/${projectId ? `${projectId}/` : ''}_apis/git/repositories/${repositoryId}/${gitResource}?${paramString}`;
-  console.log(
-    input,
-    {
-      method,
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Basic ${btoa(`:${token}`)}`,
-      },
-      ...formattedBody,
-    },
-  );
   const res = await fetch(
     input,
     {
@@ -83,7 +70,7 @@ const fetchGit = async ({
         'Content-Type': 'application/json',
         Authorization: `Basic ${btoa(`:${token}`)}`,
       },
-      ...formattedBody,
+      body,
     },
   );
   return res;
@@ -171,10 +158,6 @@ export const getGitApi = (context: ContextObject): GitApiMethods => {
     async getPushes({
       branch, changes, commitMessage = 'Commit from Figma', oldObjectId,
     }) {
-      console.log({
-        name: `refs/heads/${branch}`,
-        oldObjectId,
-      });
       const response = await fetchGit({
         body: JSON.stringify({
           refUpdates: [
