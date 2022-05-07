@@ -181,6 +181,16 @@ Object {
     },
   },
   "text": Object {
+    "fontWeight": Object {
+      "base": Object {
+        "type": "fontWeight",
+        "value": "100",
+      },
+      "light": Object {
+        "type": "fontWeight",
+        "value": "Light",
+      },
+    },
     "size": Object {
       "base": Object {
         "type": "fontSize",
@@ -191,9 +201,42 @@ Object {
         "type": "fontSize",
         "value": "{text.size.base}{text.size.unit}",
       },
+      "h1": Object {
+        "type": "fontSize",
+        "value": "96",
+      },
       "unit": Object {
         "type": "fontSize",
         "value": "px",
+      },
+    },
+  },
+  "typography": Object {
+    "h1": Object {
+      "description": "Should NOT be resolved",
+      "type": "typography",
+      "value": Object {
+        "fontFamily": "Roboto",
+        "fontSize": "{text.size.h1}",
+        "fontWeight": "{text.fontWeight.light}",
+      },
+    },
+    "h2": Object {
+      "description": "Should NOT be resolved",
+      "type": "typography",
+      "value": Object {
+        "fontFamily": "Roboto",
+        "fontSize": "3.75 * {text.size.base}",
+        "fontWeight": "7 * {text.fontWeight.base}",
+      },
+    },
+    "h3": Object {
+      "description": "Should NOT be resolved",
+      "type": "typography",
+      "value": Object {
+        "fontFamily": "Roboto",
+        "fontSize": "3 * {text.size.base}",
+        "fontWeight": "5 * 100",
       },
     },
   },
@@ -270,6 +313,16 @@ Object {
     },
   },
   "text": Object {
+    "fontWeight": Object {
+      "base": Object {
+        "type": "fontWeight",
+        "value": 100,
+      },
+      "light": Object {
+        "type": "fontWeight",
+        "value": "Light",
+      },
+    },
     "size": Object {
       "base": Object {
         "type": "fontSize",
@@ -280,9 +333,42 @@ Object {
         "type": "fontSize",
         "value": "16px",
       },
+      "h1": Object {
+        "type": "fontSize",
+        "value": 96,
+      },
       "unit": Object {
         "type": "fontSize",
         "value": "px",
+      },
+    },
+  },
+  "typography": Object {
+    "h1": Object {
+      "description": "Should be resolved",
+      "type": "typography",
+      "value": Object {
+        "fontFamily": "Roboto",
+        "fontSize": 96,
+        "fontWeight": "Light",
+      },
+    },
+    "h2": Object {
+      "description": "Should be resolved",
+      "type": "typography",
+      "value": Object {
+        "fontFamily": "Roboto",
+        "fontSize": 60,
+        "fontWeight": 700,
+      },
+    },
+    "h3": Object {
+      "description": "Should be resolved",
+      "type": "typography",
+      "value": Object {
+        "fontFamily": "Roboto",
+        "fontSize": 48,
+        "fontWeight": 500,
       },
     },
   },
@@ -337,6 +423,16 @@ Object {
     },
   },
   "text": Object {
+    "fontWeight": Object {
+      "base": Object {
+        "type": "fontWeight",
+        "value": 100,
+      },
+      "light": Object {
+        "type": "fontWeight",
+        "value": "Light",
+      },
+    },
     "size": Object {
       "base": Object {
         "type": "fontSize",
@@ -347,9 +443,42 @@ Object {
         "type": "fontSize",
         "value": "16px",
       },
+      "h1": Object {
+        "type": "fontSize",
+        "value": 96,
+      },
       "unit": Object {
         "type": "fontSize",
         "value": "px",
+      },
+    },
+  },
+  "typography": Object {
+    "h1": Object {
+      "description": "Should NOT be resolved",
+      "type": "typography",
+      "value": Object {
+        "fontFamily": "Roboto",
+        "fontSize": "{text.size.base}",
+        "fontWeight": "{text.fontWeight.light}",
+      },
+    },
+    "h2": Object {
+      "description": "Should be resolved",
+      "type": "typography",
+      "value": Object {
+        "fontFamily": "Roboto",
+        "fontSize": 60,
+        "fontWeight": 700,
+      },
+    },
+    "h3": Object {
+      "description": "Should be resolved",
+      "type": "typography",
+      "value": Object {
+        "fontFamily": "Roboto",
+        "fontSize": 48,
+        "fontWeight": 500,
       },
     },
   },
