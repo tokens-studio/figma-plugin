@@ -270,8 +270,6 @@ function EditTokenForm({ resolvedTokens }: Props) {
             handleBoxShadowChangeByAlias={handleBoxShadowChangeByAlias}
             resolvedTokens={resolvedTokens}
             internalEditToken={internalEditToken}
-            handleToggleInputHelper={handleToggleInputHelper}
-            inputHelperOpen={inputHelperOpen}
             showAliasModeAutoSuggest={showAutoSuggest}
             setShowAliasModeAutoSuggest={setShowAutoSuggest}
             handleDownShiftInputChange={handleDownShiftInputChange}
