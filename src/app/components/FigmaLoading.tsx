@@ -35,7 +35,7 @@ const InitialLoading = {
   '& > .rotate > svg': {
     filter: 'invert(99%) sepia(4%) saturate(2476%) hue-rotate(86deg) brightness(118%) contrast(119%)'
   }
-}
+};
 
 export default function FigmaLoading() {
   const dispatch = useDispatch<Dispatch>();
