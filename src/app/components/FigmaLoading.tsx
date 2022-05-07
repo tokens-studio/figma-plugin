@@ -26,7 +26,7 @@ const buttonWrapper = {
   '& > button': {
     textDecoration: 'underline',
     '&:hover': {
-      color: '$contextMenuBackground'  
+      color: '$contextMenuBackground'
     }
   },
 };
@@ -48,7 +48,7 @@ export default function FigmaLoading() {
   }, []);
 
   return (
-    <Stack direction="column" gap={4} className='content' css={{...fgLoadingScreen}}>
+    <Stack direction="column" gap={4} className='content' css={{ ...fgLoadingScreen }}>
       <Stack direction="column" gap={4} align="center">
         <FigmaMark />
         <FigmaLetter />
@@ -58,15 +58,15 @@ export default function FigmaLoading() {
         {' '}
         {pjs.plugin_version}
       </Stack>
-      <Stack direction="row" gap={4} justify="center" align="center" css={{...InitialLoading}}>
-          <div className="rotate">
-            <Icon name="loading"/>
-          </div>
+      <Stack direction="row" gap={4} justify="center" align="center" css={{ ...InitialLoading }}>
+        <div className="rotate">
+          <Icon name="loading" />
+        </div>
         <Stack direction="column" gap={4} justify="center" align="center">
           Loading. please wait
         </Stack>
       </Stack>
-      <Stack direction="row" gap={4} css={{...buttonWrapper}}>
+      <Stack direction="row" gap={4} css={{ ...buttonWrapper }}>
         <Button variant="ghost" size="small" onClick={handleCancel}>Cancel</Button>
       </Stack>
     </Stack>
