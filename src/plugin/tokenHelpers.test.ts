@@ -44,6 +44,79 @@ const multipleShadowToken = {
   ],
 };
 
+const resolvedTypographyToken = {
+  type: 'typography',
+  value: {
+    fontFamily: 'IBM Plex Serif',
+    fontWeight: 'bold',
+    fontSize: '{size.25}',
+    lineHeight: 0,
+    letterSpacing: 0,
+    paragraphSpacing: 0,
+    textCase: 'uppercase',
+    textDecoration: 'none',  
+  }
+}
+
+const unResolvedTypographyToken = {
+  type: 'typography',
+  value: {
+    fontFamily: 'IBM Plex Serif',
+    fontWeight: 'bold',
+    fontSize: '{size.0}',
+    lineHeight: 0,
+    letterSpacing: 0,
+    paragraphSpacing: 0,
+    textCase: 'uppercase',
+    textDecoration: 'none',  
+  }
+}
+
+const unResolvedSingleShadowToken = {
+  type: 'boxShadow',
+  description: 'the one with one shadow',
+  value: {
+    type: 'dropShadow',
+    color: '{colors.blue.500}',
+    x: 0,
+    y: 0,
+    blur: 10,
+    spread: 0,
+  },
+};
+
+const unResolvedMultipleShadowToken = {
+  type: 'boxShadow',
+  description: 'the one with multiple shadow',
+  value: [
+    {
+      type: 'dropShadow',
+      color: 'rgba({colors.blue.500}, 0.5)',
+      x: 0,
+      y: 0,
+      blur: 2,
+      spread: 4,
+    },
+    {
+      type: 'dropShadow',
+      color: '{theme.accent.subtle}',
+      x: 0,
+      y: 4,
+      blur: 4,
+      spread: 4,
+    },
+    {
+      type: 'dropShadow',
+      color: '#000000',
+      x: 0,
+      y: 8,
+      blur: 16,
+      spread: 4,
+    },
+  ],
+};
+
+
 const tokens = [
   { name: 'foo', value: 3 },
   { name: 'bar', value: '{foo}' },
@@ -56,6 +129,7 @@ const tokens = [
   { name: 'theme.accent.default', value: 'rgba({colors.red.500}, 0.5)' },
   { name: 'theme.accent.subtle', value: 'rgba({colors.red.500}, {opacity.default})' },
   { name: 'theme.accent.deep', value: 'rgba({theme.accent.default}, {opacity.full})' },
+  { name: 'spacing.xs', value: '{spacing.xs}' },
   { name: 'shadow.single', ...singleShadowToken },
   { name: 'shadow.multiple', ...multipleShadowToken },
   { name: 'opacity.40', value: '40%' },
@@ -90,6 +164,11 @@ const tokens = [
       value: '{colors.red.500}'
     }
   },
+  { name: 'size.25', value: '2px' },
+  { name: 'typography.resolved', ...resolvedTypographyToken },
+  { name: 'typography.unResolved', ...unResolvedTypographyToken },
+  { name: 'shadow.unResolvedSingle', ...unResolvedSingleShadowToken },
+  { name: 'shadow.unResolvedMultiple', ...unResolvedMultipleShadowToken },
 ];
 
 const output = [
@@ -149,6 +228,12 @@ const output = [
     name: 'theme.accent.deep',
     rawValue: 'rgba({theme.accent.default}, {opacity.full})',
     value: '#ff0000',
+  },
+  {
+    failedToResolve: true,
+    name: 'spacing.xs',
+    rawValue: '{spacing.xs}',
+    value: '{spacing.xs}',
   },
   {
     ...singleShadowToken,
@@ -235,6 +320,55 @@ const output = [
       property: 'fill',
       value: '{colors.red.500}'
     }
+  },
+  {
+    name: 'size.25',
+    rawValue: '2px',
+    value: '2px'
+  },
+  {
+    ...resolvedTypographyToken,
+    name: 'typography.resolved',
+    value: {
+      ...resolvedTypographyToken.value,
+      fontSize: '2px'
+    },
+    rawValue: resolvedTypographyToken.value
+  },
+  {
+    ...unResolvedTypographyToken,
+    failedToResolve: true,
+    name: 'typography.unResolved',
+    rawValue: unResolvedTypographyToken.value,
+    value: unResolvedTypographyToken.value
+  },
+  {
+    ...unResolvedSingleShadowToken,
+    failedToResolve: true,
+    name: 'shadow.unResolvedSingle',
+    rawValue: unResolvedSingleShadowToken.value,
+    value: {
+      ...unResolvedSingleShadowToken.value,
+    },
+  },
+  {
+    ...unResolvedMultipleShadowToken,
+    failedToResolve: true,
+    name: 'shadow.unResolvedMultiple',
+    rawValue: unResolvedMultipleShadowToken.value,
+    value: [
+      {
+        ...unResolvedMultipleShadowToken.value[0],
+      },
+      {
+        ...unResolvedMultipleShadowToken.value[1],
+        color: '#ff000066',
+      },
+      {
+        ...unResolvedMultipleShadowToken.value[2],
+        color: '#000000',
+      },
+    ],
   },
 ];
 describe('resolveTokenValues', () => {

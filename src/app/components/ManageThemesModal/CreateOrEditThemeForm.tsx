@@ -48,6 +48,8 @@ export const CreateOrEditThemeForm: React.FC<Props> = ({ defaultValues, onSubmit
     <Controller
       name="tokenSets"
       control={control}
+      // this is the only way to do this
+      // eslint-disable-next-line
       render={({ field }) => (
         <TokenSetThemeItem
           {...props}
@@ -61,7 +63,7 @@ export const CreateOrEditThemeForm: React.FC<Props> = ({ defaultValues, onSubmit
   return (
     <StyledForm id="form-create-or-edit-theme" onSubmit={handleSubmit(onSubmit)}>
       <StyledNameInputBox>
-        <Input label="Name" {...register('name', { required: true })} />
+        <Input data-cy="create-or-edit-theme-form--input--name" label="Name" {...register('name', { required: true })} />
       </StyledNameInputBox>
       <Box css={{ paddingTop: '$4' }}>
         <TokenSetListOrTree

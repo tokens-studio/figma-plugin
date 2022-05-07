@@ -27,3 +27,4 @@ export * from './TokensStore';
 export * from './TokenValues';
 export * from './DeepKeyTokenMap';
 export * from './SingleCompositionToken';
+export * from './ImportToken';

@@ -14,7 +14,6 @@ import { GithubTokenStorage } from '@/storage/GithubTokenStorage';
 
 export function Initiator() {
   const dispatch = useDispatch<Dispatch>();
-
   const { pullTokens } = useRemoteTokens();
   const { fetchFeatureFlags } = useFeatureFlags();
   const { setStorageType } = useStorage();
@@ -27,8 +26,8 @@ export function Initiator() {
     onInitiate();
     window.onmessage = async (event: {
       data: {
-        pluginMessage: PostToUIMessage
-      }
+        pluginMessage: PostToUIMessage;
+      };
     }) => {
       if (event.data.pluginMessage) {
         const { pluginMessage } = event.data;
@@ -134,6 +133,7 @@ export function Initiator() {
             break;
           }
           case MessageFromPluginTypes.USER_ID: {
+            dispatch.userState.setUserId(pluginMessage.user.userId);
             identify(pluginMessage.user);
             track('Launched', { version: pjs.plugin_version });
             break;
@@ -168,6 +168,10 @@ export function Initiator() {
               count: pluginMessage.count,
               timePerTask: pluginMessage.timePerTask,
             });
+            break;
+          }
+          case MessageFromPluginTypes.LICENSE_KEY: {
+            dispatch.userState.addLicenseKey({ key: pluginMessage.licenseKey, fromPlugin: true });
             break;
           }
           default:
