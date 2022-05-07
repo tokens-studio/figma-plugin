@@ -1,119 +1,14 @@
-import React, { useCallback, useState } from 'react';
-import { CompositionTokenSingleValue } from '@/types/propertyTypes';
-import IconMinus from '@/icons/minus.svg';
+import React, { useCallback } from 'react';
+import { TokenCompositionValue } from '@/types/values';
 import IconPlus from '@/icons/plus.svg';
+import { Properties } from '@/constants/Properties';
+import { SingleCompositionToken } from '@/types/tokens';
 import Heading from './Heading';
 import IconButton from './IconButton';
 import Box from './Box';
-import Input from './Input';
-import {
-  PropertySwitchMenu,
-  PropertySwitchMenuContent,
-  PropertySwitchMenuMainTrigger,
-  PropertySwitchMenuRadioGroup,
-  PropertySwitchMenuRadioItem
-} from './PropertySwitchMenu';
-import { Properties } from '@/constants/Properties';
-import { EditTokenObject } from '../store/models/uiState';
+import SingleCompositionTokenForm from './SingleCompositionTokenForm';
 
-function SingleStyleInput({
-  index,
-  token,
-  tokens,
-  properties,
-  setValue,
-  onRemove,
-}: {
-  index: number;
-  token: CompositionTokenSingleValue;
-  tokens: CompositionTokenSingleValue | CompositionTokenSingleValue[];
-  properties: string[],
-  setValue: (property: CompositionTokenSingleValue | CompositionTokenSingleValue[]) => void;
-  onRemove: (index: number) => void;
-}) {
-
-  const [menuOpened, setMenuOpened] = useState(false);
-  const onPropertySelected = useCallback((property: string) => {
-    if (Array.isArray(tokens)) {
-      let values = tokens;
-      const newToken = { ...tokens[index], property };
-      values.splice(index, 1, newToken);
-      setValue(values);
-    } else {
-      setValue({ ...tokens, property });
-    }
-    setMenuOpened(false);
-  }, [tokens]);
-
-
-  const onAliasChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    if (Array.isArray(tokens)) {
-      let values = tokens;
-      const newToken = { ...tokens[index], value: e.target.value };
-      values.splice(index, 1, newToken);
-      setValue(values);
-    } else {
-      setValue({ ...tokens, value: e.target.value });
-    }
-  }, [tokens]);
-
-  return (
-    <Box>
-      <Box css={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        '& > label': {
-          flex: 2,
-          fontSize: '$5 !important',
-          '& > div > input': {
-            flex: 2,
-            marginRight: '$5',
-            height: '$10'
-          }
-        }
-      }}
-      >
-        <PropertySwitchMenu open={menuOpened} onOpenChange={() => setMenuOpened(!menuOpened)}>
-          <PropertySwitchMenuMainTrigger>
-            <span>{token.property}</span>
-          </PropertySwitchMenuMainTrigger>
-          <PropertySwitchMenuContent sideOffset={2}>
-            <PropertySwitchMenuRadioGroup value={token.property}>
-              {properties.length > 0
-                && properties.map((property, index) => (
-                  <PropertySwitchMenuRadioItem value={property} key={index} onSelect={() => onPropertySelected(property)}>
-                    {` ${property}`}
-                  </PropertySwitchMenuRadioItem>
-                )
-                )}
-            </PropertySwitchMenuRadioGroup>
-          </PropertySwitchMenuContent>
-        </PropertySwitchMenu>
-
-        <Input
-          required
-          full
-          value={token.value}
-          onChange={onAliasChange}
-          type="text"
-          name="alias"
-          placeholder="Alias"
-        />
-        <Box css={{ width: '$5', marginRight: '$3' }}>
-          <IconButton
-            tooltip="Remove this style"
-            dataCy="button-style-remove-multiple"
-            onClick={() => onRemove(index)}
-            icon={<IconMinus />}
-          />
-        </Box>
-      </Box>
-    </Box>
-  );
-}
-
-const newToken: CompositionTokenSingleValue = {
+const newToken: TokenCompositionValue = {
   property: '', value: '',
 };
 
@@ -121,15 +16,15 @@ export default function CompositionTokenForm({
   internalEditToken,
   setValue,
 }: {
-  internalEditToken: EditTokenObject;
-  setValue: (style: CompositionTokenSingleValue | CompositionTokenSingleValue[]) => void;
+  internalEditToken: SingleCompositionToken;
+  setValue: (style: TokenCompositionValue | TokenCompositionValue[]) => void;
 }) {
 
-  const propertiesMenu = React.useMemo(() => {
-    return Object.keys(Properties).map((key: string) => {
-      return String(Properties[key]);
-    });
-  }, [Properties]);
+  const propertiesMenu = React.useMemo(() => (
+    Object.keys(Properties).map((key: string) => (
+      String(Properties[key as keyof typeof Properties])
+    ))
+  ), [Properties]);
 
   const addToken = useCallback(() => {
     if (Array.isArray(internalEditToken.value)) {
@@ -159,7 +54,7 @@ export default function CompositionTokenForm({
       <Box css={{ display: 'flex', flexDirection: 'column', gap: '$4' }}>
         {Array.isArray(internalEditToken.value) ? (
           internalEditToken.value.map((token, index) => (
-            <SingleStyleInput
+            <SingleCompositionTokenForm
               index={index}
               token={token}
               tokens={internalEditToken.value}
@@ -170,7 +65,7 @@ export default function CompositionTokenForm({
             />
           ))
         ) : (
-          <SingleStyleInput
+          <SingleCompositionTokenForm
             index={-1}
             token={internalEditToken.value}
             tokens={internalEditToken.value}

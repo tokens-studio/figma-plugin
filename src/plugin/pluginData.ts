@@ -4,7 +4,7 @@ import { SharedPluginDataNamespaces } from '@/constants/SharedPluginDataNamespac
 import { Properties } from '@/constants/Properties';
 import { MessageFromPluginTypes } from '@/types/messages';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
-import { AnyTokenList, SingleCompositionToken } from '@/types/tokens';
+import { AnyTokenList } from '@/types/tokens';
 import store from './store';
 import { notifySelection, postToUI } from './notifiers';
 import removeValuesFromNode from './removeValuesFromNode';
@@ -13,7 +13,6 @@ import { tokensSharedDataHandler } from './SharedDataHandler';
 import { defaultWorker } from './Worker';
 import { ProgressTracker } from './ProgressTracker';
 import { SelectionGroup, SelectionValue } from '@/types';
-import { TokenCompositionValue } from '@/types/values';
 
 // @TODO FIX TYPINGS! Missing or bad typings are very difficult for other developers to work in
 
@@ -114,7 +113,7 @@ export async function updatePluginData({
   entries.forEach(({ node, tokens }) => {
     promises.add(defaultWorker.schedule(async () => {
       const currentValuesOnNode = tokens ?? {};
-      let newValuesOnNode = {};
+      let newValuesOnNode: NodeTokenRefMap = {};
       if (values.composition === 'delete') newValuesOnNode = { ...values, ...currentValuesOnNode, composition: values.composition };
       else newValuesOnNode = { ...currentValuesOnNode, ...values };
       if (currentValuesOnNode.composition) {

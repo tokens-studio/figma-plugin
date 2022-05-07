@@ -119,9 +119,9 @@ export const TokenButton: React.FC<Props> = ({
     if (type === 'composition' && value === 'delete') {
       // distructure composition token when it is unselected
       const compositionToken = tokensContext.resolvedTokens.find((token) => token.name === tokenValue);
-      let tokensInCompositionToken: NodeTokenRefMap = {};
+      const tokensInCompositionToken: NodeTokenRefMap = {};
       if (Array.isArray(compositionToken?.rawValue)) {
-        compositionToken?.rawValue.map((token) => {
+        compositionToken?.rawValue.forEach((token) => {
           tokensInCompositionToken[token.property] = 'delete';
         });  
       } else {

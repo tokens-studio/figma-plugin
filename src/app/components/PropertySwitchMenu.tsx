@@ -1,5 +1,5 @@
 import * as PropertySwitchMenuPrimitive from '@radix-ui/react-dropdown-menu';
-import { styled, keyframes } from '@/stitches.config';
+import { styled } from '@/stitches.config';
 
 const itemStyles = {
   fontSize: '$xsmall',

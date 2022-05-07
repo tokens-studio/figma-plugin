@@ -17,11 +17,11 @@ export function useGetActiveState(properties: (PropertyObject | TokenTypes)[], t
 
     return (
       uiState.mainNodeSelectionValues[type] === name
-      || properties.some((prop) => {
+      || properties.some((prop) => (
         // @TODO: This no longer seems to work for color tokens as prop is always string?
         typeof prop !== 'string'
         && uiState.mainNodeSelectionValues[prop.name] === name
-      })
+      ))
     );
   });
 }

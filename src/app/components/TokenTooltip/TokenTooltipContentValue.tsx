@@ -1,7 +1,7 @@
 import React from 'react';
 import { useUIDSeed } from 'react-uid';
 import useTokens from '../../store/useTokens';
-import { SingleCompositionToken, SingleToken, SingleTypographyToken } from '@/types/tokens';
+import { SingleToken, SingleTypographyToken } from '@/types/tokens';
 import { SingleShadowValueDisplay } from './SingleShadowValueDisplay';
 import { TokensContext } from '@/context';
 import { isSingleBoxShadowToken, isSingleTypographyToken, isSingleCompositionToken } from '@/utils/is';
