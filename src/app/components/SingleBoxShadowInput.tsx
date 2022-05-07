@@ -119,7 +119,7 @@ export default function SingleBoxShadowInput({
     } else {
       handleBoxShadowChange({ ...value, [property]: newInputValue });
     }
-  }, [index, value, shadowItem])
+  }, [index, value, shadowItem]);
 
   const onMoveDebounce = React.useCallback((dragIndex: number, hoverIndex: number) => {
     const values = value;

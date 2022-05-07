@@ -2,7 +2,6 @@ import React, { useCallback, useMemo } from 'react';
 import Downshift from 'downshift';
 import { styled } from '@/stitches.config';
 import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
-
 import Box from './Box';
 import Stack from './Stack';
 import { SingleToken } from '@/types/tokens';

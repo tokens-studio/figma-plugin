@@ -43,7 +43,6 @@ export default function TypographyInput({
   handleDownShiftInputChange: (newInputValue: string) => void;
   handleAliasModeAutoSuggest: () => void;
 }) {
-
   const defalutShowAutoSuggest = React.useMemo(() => {
     if (internalEditToken.value) {
       return Object.entries(internalEditToken.value).map(() => {
@@ -58,12 +57,6 @@ export default function TypographyInput({
   const [alias, setAlias] = React.useState<string>('');
   const [showAutoSuggest, setShowAutoSuggest] = React.useState<Array<boolean>>(defalutShowAutoSuggest);
 
-  const handleMode = React.useCallback(() => {
-    const changeMode = (mode === 'input') ? 'alias' : 'input';
-    setMode(changeMode);
-    setAlias('');
-  }, [mode]);
-
   const selectedToken = React.useMemo(() => {
     const search = findReferences(String(internalEditToken.value));
     if (search && search.length > 0) {
@@ -73,6 +66,12 @@ export default function TypographyInput({
     }
     return null;
   }, [internalEditToken, resolvedTokens]);
+
+  const handleMode = React.useCallback(() => {
+    const changeMode = (mode === 'input') ? 'alias' : 'input';
+    setMode(changeMode);
+    setAlias('');
+  }, [mode]);
 
   const handleAutoSuggest = React.useCallback((keyIndex: number) => (() => changeAutoSuggest(keyIndex)), []);
 
@@ -89,7 +88,6 @@ export default function TypographyInput({
     newAutoSuggest[index] = false;
     setShowAutoSuggest(newAutoSuggest);
   }, [showAutoSuggest]);
-
 
   return (
     <>
