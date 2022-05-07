@@ -62,58 +62,62 @@ export default function Footer() {
         padding: '$4',
       }}
     >
-      <Stack direction="row">
-        {(localApiState.branch && activeTab !== 'loading' && activeTab !== 'start') && (
-        <>
-          <BranchSelector currentBranch={localApiState.branch} />
-          <Tooltip variant="top" label={`Pull from ${transformProviderName(storageType.provider)}`}>
-            <button onClick={onPullButtonClicked} type="button" className="button button-ghost">
-              <DownloadIcon />
-            </button>
-          </Tooltip>
-          <Tooltip variant="top" label={`Push to ${transformProviderName(storageType.provider)}`}>
-            <button
-              onClick={onPushButtonClicked}
-              type="button"
-              className="relative button button-ghost"
-              disabled={editProhibited}
-            >
-              {hasChanges && <div className="absolute top-0 right-0 w-2 h-2 rounded-full bg-primary-500" />}
-
-              <UploadIcon />
-            </button>
-          </Tooltip>
-        </>
-        )}
-      </Stack>
-      <Stack direction="row" gap={4}>
-        <Box css={{ color: '$textMuted', fontSize: '$xsmall' }}>
-          Version
-          {' '}
-          {pjs.plugin_version}
-        </Box>
-
-        <Text size="xsmall">
-          <a href="https://docs.tokens.studio/?ref=pf" target="_blank" rel="noreferrer">
-            <Stack direction="row" gap={1}>
-              <Box as="span" css={{ color: '$textMuted' }}>
-                Docs
-              </Box>
-              <DocsIcon />
+      {
+        (activeTab !== 'loading' && activeTab !== 'start') && (
+          <>
+            <Stack direction="row">
+              {(localApiState.branch) && (
+                <>
+                  <BranchSelector currentBranch={localApiState.branch} />
+                  <Tooltip variant="top" label={`Pull from ${transformProviderName(storageType.provider)}`}>
+                    <button onClick={onPullButtonClicked} type="button" className="button button-ghost">
+                      <DownloadIcon />
+                    </button>
+                  </Tooltip>
+                  <Tooltip variant="top" label={`Push to ${transformProviderName(storageType.provider)}`}>
+                    <button
+                      onClick={onPushButtonClicked}
+                      type="button"
+                      className="relative button button-ghost"
+                      disabled={editProhibited}
+                    >
+                      {hasChanges && <div className="absolute top-0 right-0 w-2 h-2 rounded-full bg-primary-500" />}
+                      <UploadIcon />
+                    </button>
+                  </Tooltip>
+                </>
+              )}
             </Stack>
-          </a>
-        </Text>
-        <Text size="xsmall">
-          <a href="https://github.com/six7/figma-tokens" target="_blank" rel="noreferrer">
-            <Stack direction="row" gap={1}>
-              <Box as="span" css={{ color: '$textMuted' }}>
-                Feedback
+            <Stack direction="row" gap={4}>
+              <Box css={{ color: '$textMuted', fontSize: '$xsmall' }}>
+                Version
+                {' '}
+                {pjs.plugin_version}
               </Box>
-              <FeedbackIcon />
+              <Text size="xsmall">
+                <a href="https://docs.tokens.studio/?ref=pf" target="_blank" rel="noreferrer">
+                  <Stack direction="row" gap={1}>
+                    <Box as="span" css={{ color: '$textMuted' }}>
+                      Docs
+                    </Box>
+                    <DocsIcon />
+                  </Stack>
+                </a>
+              </Text>
+              <Text size="xsmall">
+                <a href="https://github.com/six7/figma-tokens" target="_blank" rel="noreferrer">
+                  <Stack direction="row" gap={1}>
+                    <Box as="span" css={{ color: '$textMuted' }}>
+                      Feedback
+                    </Box>
+                    <FeedbackIcon />
+                  </Stack>
+                </a>
+              </Text>
             </Stack>
-          </a>
-        </Text>
-      </Stack>
+          </>
+        )
+      }
     </Box>
   );
 }

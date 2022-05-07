@@ -1,37 +1,35 @@
 import React from 'react';
-import { styled } from '@/stitches.config';
 import { useDispatch } from 'react-redux';
-import Icon from './Icon';
 import { postToFigma } from '@/plugin/notifiers';
 import { MessageToPluginTypes } from '@/types/messages';
 import { Tabs } from '@/constants/Tabs';
+import FigmaMark from '@/icons/figma-mark.svg';
+import FigmaLetter from '@/icons/figma-letter.svg';
+import InitialLoading from '@/icons/initial-loading.svg';
 import * as pjs from '../../../package.json';
 import Button from './Button';
 import Stack from './Stack';
 import { Dispatch } from '../store';
 
-const FgLoadingScreen = styled('div', {
-  display: 'grid',
-  background: 'Black',
+const figmaLoadingScreen = {
+  background: '$contextMenuBackground',
   padding: '$8',
   height: 'inherit',
-  color: 'White',
+  color: '$bgDefault',
   alignItems: 'center',
   justifyContent: 'center',
   overflowX: 'hidden',
-  overflowY: 'scroll',
-  '& > div > button:hover': {
-    color: 'wheat',
-    background: 'black !important'
-  },
-  '& > div > button': {
+};
+
+const buttonWrapper = {
+  textAlign: 'center',
+  '& > button': {
     textDecoration: 'underline',
-    width: 'inherit'
+    '&:hover': {
+      color: '$contextMenuBackground'  
+    }
   },
-  '.rotate > svg': {
-    filter: 'invert(99%) sepia(4%) saturate(2476%) hue-rotate(86deg) brightness(118%) contrast(119%)'
-  },
-});
+};
 
 export default function FigmaLoading() {
   const dispatch = useDispatch<Dispatch>();
@@ -44,10 +42,10 @@ export default function FigmaLoading() {
   }, []);
 
   return (
-    <FgLoadingScreen className='content'>
+    <Stack direction="column" gap={4} className='content' css={{...figmaLoadingScreen}}>
       <Stack direction="column" gap={4} align="center">
-        <Icon name="figma" />
-        <Icon name="figmaLetter" />
+        <FigmaMark />
+        <FigmaLetter />
       </Stack>
       <Stack direction="column" gap={4} align="center" css={{ color: '$textMuted', fontSize: '$xsmall' }}>
         Version
@@ -55,19 +53,16 @@ export default function FigmaLoading() {
         {pjs.plugin_version}
       </Stack>
       <Stack direction="row" gap={4} justify="center" align="center">
-        <Stack direction="column" gap={4} justify="center" align="center">
           <div className="rotate">
-            <Icon name="loading"/>
+            <InitialLoading/>
           </div>
-        </Stack>
         <Stack direction="column" gap={4} justify="center" align="center">
           Loading. please wait
         </Stack>
       </Stack>
-
-      <Stack direction="column" gap={4} align="center">
+      <Stack direction="row" gap={4} css={{...buttonWrapper}}>
         <Button variant="ghost" size="small" onClick={handleCancel}>Cancel</Button>
       </Stack>
-    </FgLoadingScreen>
+    </Stack>
   );
 }

@@ -20,8 +20,6 @@ import IconRefresh from './icons/IconRefresh';
 import IconTrash from './icons/IconTrash';
 import IconBell from './icons/IconBell';
 import IconLibrary from './icons/IconLibrary';
-import IconFigma from './icons/IconFigma';
-import IconFigmaLetter from './icons/IconFigmaLetter';
 
 const icons = {
   edit: IconEdit,
@@ -44,8 +42,6 @@ const icons = {
   trash: IconTrash,
   bell: IconBell,
   library: IconLibrary,
-  figma: IconFigma,
-  figmaLetter: IconFigmaLetter
 };
 
 function Icon({ name }) {

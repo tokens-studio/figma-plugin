@@ -5,7 +5,7 @@ import Inspector from './Inspector';
 import Tokens from './Tokens';
 import StartScreen from './StartScreen';
 import Navbar from './Navbar';
-import FigmaLoading from './FigmaLoading'
+import FigmaLoading from './FigmaLoading';
 import Footer from './Footer';
 import Changelog from './Changelog';
 import ImportedTokensDialog from './ImportedTokensDialog';
@@ -16,6 +16,7 @@ import WindowResizer from './WindowResizer';
 import Box from './Box';
 import { activeTabSelector } from '@/selectors';
 import PluginResizerWrapper from './PluginResizer';
+import LoadingBar from './LoadingBar';
 
 function App() {
   const activeTab = useSelector(activeTabSelector);
@@ -23,6 +24,7 @@ function App() {
   return (
     <Box css={{ backgroundColor: '$bgDefault' }}>
       <Initiator />
+      { activeTab !== 'loading' && <LoadingBar />}
       <PluginResizerWrapper>
         <Box
           css={{
