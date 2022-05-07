@@ -120,8 +120,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
     (style: SingleCompositionToken['value']) => {
       setError(null);
       if (internalEditToken?.type === TokenTypes.COMPOSITION) {
-        setInternalEditToken(prev => ({ ...prev, value: style }));
-        // setInternalEditToken({ ...internalEditToken, value: style });
+        setInternalEditToken(prev => ({...prev, value: style} as EditTokenObject));
       }
     },
     [internalEditToken],
