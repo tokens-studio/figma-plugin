@@ -35,6 +35,7 @@ export default function InspectorTokenSingle({
   const [newTokenName, setNewTokenName] = React.useState<string>('');
   const [inputHelperOpen, setInputHelperOpen] = React.useState<boolean>(false);
   const [showDialog, setShowDialog] = React.useState<boolean>(false);
+  const [isChecked, setChecked] = React.useState<boolean>(false);
 
   const mappedToken = React.useMemo(() => {
     if (checkIfContainsAlias(token.value)) {
@@ -46,7 +47,7 @@ export default function InspectorTokenSingle({
     } 
     return getTokenValue(token.value, resolvedTokens);
   }, [token, resolvedTokens, getTokenValue, newTokenName]);
-  const [isChecked, setChecked] = React.useState(false);
+
 
   React.useEffect(() => {
     setChecked(inspectState.selectedTokens.includes(`${token.category}-${token.value}`));
@@ -56,16 +57,12 @@ export default function InspectorTokenSingle({
     (e) => {
       e.persist();
       setNewTokenName(e.target.value);
-    },
-    [newTokenName],
-  );
+    }, [newTokenName]);
 
   const handleColorValueChange = React.useCallback(
     (color: string) => {
       setNewTokenName(color);
-    },
-    [newTokenName],
-  );
+    }, [newTokenName]);
 
   const handleDownShiftInputChange = React.useCallback((newInputValue: string) => {
     if (newInputValue.charAt(0) === '$') setNewTokenName(newInputValue.slice(1, newInputValue.length));
@@ -79,8 +76,7 @@ export default function InspectorTokenSingle({
 
   const handleAutoSuggest = React.useCallback(() => {
     setShowAutoSuggest(!showAutoSuggest);
-  }, [showAutoSuggest]
-  );
+  }, [showAutoSuggest]);
 
   const onConfirm = React.useCallback(() => {
     handleRemap(token.category, token.value, newTokenName);
@@ -93,7 +89,7 @@ export default function InspectorTokenSingle({
 
   const onCancel = React.useCallback(() => {
     setShowDialog(false);
-  }, [showDialog])
+  }, [showDialog]);
 
   return (
     <Box
@@ -122,7 +118,6 @@ export default function InspectorTokenSingle({
         {(!!mappedToken) && (
           <InspectorResolvedToken token={mappedToken} />
         )}
-
         <Box
           css={{
             display: 'flex',
@@ -150,17 +145,17 @@ export default function InspectorTokenSingle({
                     <Heading>Choose a new token for {mappedToken?.name || token.value}</Heading>
                     <DownshiftInput
                       value={newTokenName}
-                      type={Properties[token.category] === 'fill' ? 'color' : Properties[token.category]}
+                      type={Properties[token.category as keyof typeof Properties] === 'fill' ? 'color' : Properties[token.category as keyof typeof Properties]}
                       showAutoSuggest={showAutoSuggest}
                       resolvedTokens={resolvedTokens}
                       handleChange={handleChange}
                       setShowAutoSuggest={setShowAutoSuggest}
                       setInputValue={handleDownShiftInputChange}
                       placeholder={
-                        Properties[token.category] === 'fill' ? '#000000, hsla(), rgba() or {alias}' : 'Value or {alias}'
+                        Properties[token.category as keyof typeof Properties] === 'fill' ? '#000000, hsla(), rgba() or {alias}' : 'Value or {alias}'
                       }
                       prefix={
-                        Properties[token.category] === 'fill' && (
+                        Properties[token.category as keyof typeof Properties] === 'fill' && (
                           <button
                             type="button"
                             className="block w-4 h-4 rounded-sm cursor-pointer shadow-border shadow-gray-300 focus:shadow-focus focus:shadow-primary-400"
@@ -177,7 +172,7 @@ export default function InspectorTokenSingle({
                         </StyledInputSuffix>
                       )}
                     />
-                    {inputHelperOpen && Properties[token.category] === 'fill' && (
+                    {inputHelperOpen && Properties[token.category as keyof typeof Properties] === 'fill' && (
                       <ColorPicker value={newTokenName} onChange={handleColorValueChange} />
                     )}
 

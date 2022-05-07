@@ -7,7 +7,7 @@ import { ModalHeader } from './ModalHeader';
 
 if (process.env.NODE_ENV !== 'test') ReactModal.setAppElement('#app');
 
-const customStyles = (large = false, autoHeight = false): ReactModalStyles => ({
+const customStyles = (large = false): ReactModalStyles => ({
   overlay: {
     backgroundColor: 'rgba(0,0,0,0.2)',
     display: 'flex',
@@ -25,7 +25,6 @@ const customStyles = (large = false, autoHeight = false): ReactModalStyles => ({
     left: 'unset',
     overflow: 'auto',
     maxHeight: '100%',
-    height: autoHeight ? 'calc(50vh)' : 'auto',
     border: 'none',
     width: large ? '100%' : 'auto',
   },
@@ -41,7 +40,6 @@ type ModalProps = {
   children: React.ReactNode;
   footer?: React.ReactNode
   showClose?: boolean;
-  autoHeight?: boolean;
   close: () => void;
 };
 
@@ -54,7 +52,6 @@ export function Modal({
   close,
   children,
   footer,
-  autoHeight,
   showClose = false,
   compact = false,
 }: ModalProps) {
@@ -72,7 +69,7 @@ export function Modal({
     <ReactModal
       isOpen={isOpen}
       onRequestClose={close}
-      style={customStyles(large, autoHeight)}
+      style={customStyles(large)}
       contentLabel={title || ''}
     >
       {(showClose || title) && (
