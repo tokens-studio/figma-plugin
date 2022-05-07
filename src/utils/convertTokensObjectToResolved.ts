@@ -14,6 +14,7 @@ export default function convertTokensObjectToResolved(
     expandTypography: false,
     expandShadow: false,
     preserveRawValue: false,
+    resolveReferences: true,
   },
 ) {
   // Parse tokens into array structure
