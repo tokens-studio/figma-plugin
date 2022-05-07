@@ -5,13 +5,13 @@ import { MessageToPluginTypes } from '@/types/messages';
 import { Tabs } from '@/constants/Tabs';
 import FigmaMark from '@/icons/figma-mark.svg';
 import FigmaLetter from '@/icons/figma-letter.svg';
-import InitialLoading from '@/icons/initial-loading.svg';
+import Icon from './Icon';
 import * as pjs from '../../../package.json';
 import Button from './Button';
 import Stack from './Stack';
 import { Dispatch } from '../store';
 
-const figmaLoadingScreen = {
+const fgLoadingScreen = {
   background: '$contextMenuBackground',
   padding: '$8',
   height: 'inherit',
@@ -31,6 +31,12 @@ const buttonWrapper = {
   },
 };
 
+const InitialLoading = {
+  '& > .rotate > svg': {
+    filter: 'invert(99%) sepia(4%) saturate(2476%) hue-rotate(86deg) brightness(118%) contrast(119%)'
+  }
+}
+
 export default function FigmaLoading() {
   const dispatch = useDispatch<Dispatch>();
 
@@ -42,7 +48,7 @@ export default function FigmaLoading() {
   }, []);
 
   return (
-    <Stack direction="column" gap={4} className='content' css={{...figmaLoadingScreen}}>
+    <Stack direction="column" gap={4} className='content' css={{...fgLoadingScreen}}>
       <Stack direction="column" gap={4} align="center">
         <FigmaMark />
         <FigmaLetter />
@@ -52,9 +58,9 @@ export default function FigmaLoading() {
         {' '}
         {pjs.plugin_version}
       </Stack>
-      <Stack direction="row" gap={4} justify="center" align="center">
+      <Stack direction="row" gap={4} justify="center" align="center" css={{...InitialLoading}}>
           <div className="rotate">
-            <InitialLoading/>
+            <Icon name="loading"/>
           </div>
         <Stack direction="column" gap={4} justify="center" align="center">
           Loading. please wait
