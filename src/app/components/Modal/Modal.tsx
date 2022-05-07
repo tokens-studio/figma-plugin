@@ -30,7 +30,7 @@ const customStyles = (large = false): ReactModalStyles => ({
   },
 });
 
-type ModalProps = {
+export type ModalProps = {
   id?: string;
   title?: string;
   full?: boolean;
