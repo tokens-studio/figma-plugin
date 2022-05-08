@@ -60,7 +60,7 @@ export const {
       textDisabled: 'var(--figma-color-text-disabled)',
       fgSubtle: 'var(--figma-color-text-secondary)',
       bgSubtle: 'var(--figma-color-bg-secondary)',
-      bgAccent: 'var(--figma-color-bg-selected-tertiary)',
+      bgAccent: 'var(--figma-color-bg-selected)',
       bgAccentHover: 'var(--figma-color-bg-selected-hover)',
       interaction: 'var(--figma-color-bg-brand)',
       interactionSubtle: 'var(--figma-color-bg-brand-secondary)',
