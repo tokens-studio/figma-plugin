@@ -133,6 +133,73 @@ Object {
 }
 `;
 
+exports[`convertTokensObjectToResolved preserves all references when requested 1`] = `
+Object {
+  "colors": Object {
+    "blue": Object {
+      "type": "color",
+      "value": "#0000ff",
+    },
+    "primary": Object {
+      "description": "Should NOT be resolved",
+      "type": "color",
+      "value": "$colors.red",
+    },
+    "red": Object {
+      "type": "color",
+      "value": "#ff0000",
+    },
+  },
+  "sizing": Object {
+    "base": Object {
+      "type": "sizing",
+      "value": "2",
+    },
+    "large": Object {
+      "description": "Should NOT be resolved",
+      "type": "sizing",
+      "value": "$sizing.medium * $sizing.scale",
+    },
+    "medium": Object {
+      "description": "Should NOT be resolved",
+      "type": "sizing",
+      "value": "{sizing.small} * {sizing.scale}",
+    },
+    "scale": Object {
+      "type": "sizing",
+      "value": "1.5",
+    },
+    "small": Object {
+      "description": "Should NOT be resolved",
+      "type": "sizing",
+      "value": "{sizing.base}",
+    },
+    "xsmall": Object {
+      "description": "Should NOT be resolved",
+      "type": "sizing",
+      "value": "1 * {sizing.base}",
+    },
+  },
+  "text": Object {
+    "size": Object {
+      "base": Object {
+        "type": "fontSize",
+        "value": "16",
+      },
+      "default": Object {
+        "description": "Should NOT be resolved",
+        "type": "fontSize",
+        "value": "{text.size.base}{text.size.unit}",
+      },
+      "unit": Object {
+        "type": "fontSize",
+        "value": "px",
+      },
+    },
+  },
+}
+`;
+
 exports[`convertTokensObjectToResolved preserves rawValue when requested 1`] = `
 Object {
   "colors": Object {
@@ -150,6 +217,140 @@ Object {
       "rawValue": "#ffffff",
       "type": "color",
       "value": "#ffffff",
+    },
+  },
+}
+`;
+
+exports[`convertTokensObjectToResolved resolves all references when requested 1`] = `
+Object {
+  "colors": Object {
+    "blue": Object {
+      "type": "color",
+      "value": "#0000ff",
+    },
+    "primary": Object {
+      "description": "Should be resolved",
+      "type": "color",
+      "value": "#ff0000",
+    },
+    "red": Object {
+      "type": "color",
+      "value": "#ff0000",
+    },
+  },
+  "sizing": Object {
+    "base": Object {
+      "type": "sizing",
+      "value": 2,
+    },
+    "large": Object {
+      "description": "Should be resolved",
+      "type": "sizing",
+      "value": 4.5,
+    },
+    "medium": Object {
+      "description": "Should be resolved",
+      "type": "sizing",
+      "value": 3,
+    },
+    "scale": Object {
+      "type": "sizing",
+      "value": 1.5,
+    },
+    "small": Object {
+      "description": "Should be resolved",
+      "type": "sizing",
+      "value": 2,
+    },
+    "xsmall": Object {
+      "description": "Should be resolved",
+      "type": "sizing",
+      "value": 2,
+    },
+  },
+  "text": Object {
+    "size": Object {
+      "base": Object {
+        "type": "fontSize",
+        "value": 16,
+      },
+      "default": Object {
+        "description": "Should be resolved",
+        "type": "fontSize",
+        "value": "16px",
+      },
+      "unit": Object {
+        "type": "fontSize",
+        "value": "px",
+      },
+    },
+  },
+}
+`;
+
+exports[`convertTokensObjectToResolved resolves only math expressions when requested 1`] = `
+Object {
+  "colors": Object {
+    "blue": Object {
+      "type": "color",
+      "value": "#0000ff",
+    },
+    "primary": Object {
+      "description": "Should NOT be resolved",
+      "type": "color",
+      "value": "$colors.red",
+    },
+    "red": Object {
+      "type": "color",
+      "value": "#ff0000",
+    },
+  },
+  "sizing": Object {
+    "base": Object {
+      "type": "sizing",
+      "value": 2,
+    },
+    "large": Object {
+      "description": "Should be resolved",
+      "type": "sizing",
+      "value": 4.5,
+    },
+    "medium": Object {
+      "description": "Should be resolved",
+      "type": "sizing",
+      "value": 3,
+    },
+    "scale": Object {
+      "type": "sizing",
+      "value": 1.5,
+    },
+    "small": Object {
+      "description": "Should NOT be resolved",
+      "type": "sizing",
+      "value": "{sizing.base}",
+    },
+    "xsmall": Object {
+      "description": "Should be resolved",
+      "type": "sizing",
+      "value": 2,
+    },
+  },
+  "text": Object {
+    "size": Object {
+      "base": Object {
+        "type": "fontSize",
+        "value": 16,
+      },
+      "default": Object {
+        "description": "Should be resolved",
+        "type": "fontSize",
+        "value": "16px",
+      },
+      "unit": Object {
+        "type": "fontSize",
+        "value": "px",
+      },
     },
   },
 }

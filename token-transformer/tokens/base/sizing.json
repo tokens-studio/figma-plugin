@@ -1,0 +1,14 @@
+{
+  "sizing": {
+    "base": {
+      "value": "4",
+      "description": "Alias value",
+      "type": "sizing"
+    },
+    "large": {
+      "value": "$sizing.base * 2",
+      "description": "Math value",
+      "type": "sizing"
+    }
+  }
+}

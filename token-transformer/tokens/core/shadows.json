@@ -1,0 +1,36 @@
+{
+  "shadows": {
+    "multiple": {
+      "value": [
+        {
+          "color": "{colors.gray.900}",
+          "type": "dropShadow",
+          "x": "0",
+          "y": "4",
+          "blur": "2",
+          "spread": "0"
+        },
+        {
+          "color": "{colors.gray.900}",
+          "type": "dropShadow",
+          "x": "0",
+          "y": "0",
+          "blur": "6",
+          "spread": "0"
+        }
+      ],
+      "type": "boxShadow"
+    },
+    "single": {
+      "value": {
+        "color": "{colors.gray.900}",
+        "type": "dropShadow",
+        "x": "0",
+        "y": "4",
+        "blur": "2",
+        "spread": "0"
+      },
+      "type": "boxShadow"
+    }
+  }
+}

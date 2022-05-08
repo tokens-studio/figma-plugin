@@ -194,4 +194,223 @@ describe('convertTokensObjectToResolved', () => {
 
     expect(convertTokensObjectToResolved(tokens, [], [], { expandTypography: false, expandShadow: false, preserveRawValue: true })).toMatchSnapshot();
   });
+
+  it('resolves all references when requested', () => {
+    const tokens = {
+      global: {
+        colors: {
+          blue: {
+            type: 'color',
+            value: '#0000ff',
+          },
+          primary: {
+            description: 'Should be resolved',
+            type: 'color',
+            value: '$colors.red',
+          },
+          red: {
+            type: 'color',
+            value: '#ff0000',
+          },
+        },
+        sizing: {
+          base: {
+            value: '2',
+            type: 'sizing',
+          },
+          scale: {
+            value: '1.5',
+            type: 'sizing',
+          },
+          xsmall: {
+            description: 'Should be resolved',
+            value: '1 * {sizing.base}',
+            type: 'sizing',
+          },
+          small: {
+            description: 'Should be resolved',
+            value: '{sizing.base}',
+            type: 'sizing',
+          },
+          medium: {
+            description: 'Should be resolved',
+            value: '{sizing.small} * {sizing.scale}',
+            type: 'sizing',
+          },
+          large: {
+            description: 'Should be resolved',
+            value: '$sizing.medium * $sizing.scale',
+            type: 'sizing',
+          },
+        },
+        text: {
+          size: {
+            base: {
+              value: '16',
+              type: 'fontSize',
+            },
+            unit: {
+              value: 'px',
+              type: 'fontSize',
+            },
+            default: {
+              description: 'Should be resolved',
+              value: '{text.size.base}{text.size.unit}',
+              type: 'fontSize',
+            },
+          },
+        },
+      },
+    };
+
+    expect(convertTokensObjectToResolved(tokens, [], [], {
+      expandTypography: false, expandShadow: false, preserveRawValue: false, resolveReferences: true,
+    })).toMatchSnapshot();
+  });
+
+  it('preserves all references when requested', () => {
+    const tokens = {
+      global: {
+        colors: {
+          blue: {
+            type: 'color',
+            value: '#0000ff',
+          },
+          primary: {
+            description: 'Should NOT be resolved',
+            type: 'color',
+            value: '$colors.red',
+          },
+          red: {
+            type: 'color',
+            value: '#ff0000',
+          },
+        },
+        sizing: {
+          base: {
+            value: '2',
+            type: 'sizing',
+          },
+          scale: {
+            value: '1.5',
+            type: 'sizing',
+          },
+          xsmall: {
+            description: 'Should NOT be resolved',
+            value: '1 * {sizing.base}',
+            type: 'sizing',
+          },
+          small: {
+            description: 'Should NOT be resolved',
+            value: '{sizing.base}',
+            type: 'sizing',
+          },
+          medium: {
+            description: 'Should NOT be resolved',
+            value: '{sizing.small} * {sizing.scale}',
+            type: 'sizing',
+          },
+          large: {
+            description: 'Should NOT be resolved',
+            value: '$sizing.medium * $sizing.scale',
+            type: 'sizing',
+          },
+        },
+        text: {
+          size: {
+            base: {
+              value: '16',
+              type: 'fontSize',
+            },
+            unit: {
+              value: 'px',
+              type: 'fontSize',
+            },
+            default: {
+              description: 'Should NOT be resolved',
+              value: '{text.size.base}{text.size.unit}',
+              type: 'fontSize',
+            },
+          },
+        },
+      },
+    };
+
+    expect(convertTokensObjectToResolved(tokens, [], [], {
+      expandTypography: false, expandShadow: false, preserveRawValue: false, resolveReferences: false,
+    })).toMatchSnapshot();
+  });
+
+  it('resolves only math expressions when requested', () => {
+    const tokens = {
+      global: {
+        colors: {
+          blue: {
+            type: 'color',
+            value: '#0000ff',
+          },
+          primary: {
+            description: 'Should NOT be resolved',
+            type: 'color',
+            value: '$colors.red',
+          },
+          red: {
+            type: 'color',
+            value: '#ff0000',
+          },
+        },
+        sizing: {
+          base: {
+            value: '2',
+            type: 'sizing',
+          },
+          scale: {
+            value: '1.5',
+            type: 'sizing',
+          },
+          xsmall: {
+            description: 'Should be resolved',
+            value: '1 * {sizing.base}',
+            type: 'sizing',
+          },
+          small: {
+            description: 'Should NOT be resolved',
+            value: '{sizing.base}',
+            type: 'sizing',
+          },
+          medium: {
+            description: 'Should be resolved',
+            value: '{sizing.small} * {sizing.scale}',
+            type: 'sizing',
+          },
+          large: {
+            description: 'Should be resolved',
+            value: '$sizing.medium * $sizing.scale',
+            type: 'sizing',
+          },
+        },
+        text: {
+          size: {
+            base: {
+              value: '16',
+              type: 'fontSize',
+            },
+            unit: {
+              value: 'px',
+              type: 'fontSize',
+            },
+            default: {
+              description: 'Should be resolved',
+              value: '{text.size.base}{text.size.unit}',
+              type: 'fontSize',
+            },
+          },
+        },
+      },
+    };
+
+    expect(convertTokensObjectToResolved(tokens, [], [], {
+      expandTypography: false, expandShadow: false, preserveRawValue: false, resolveReferences: 'math',
+    })).toMatchSnapshot();
+  });
 });
