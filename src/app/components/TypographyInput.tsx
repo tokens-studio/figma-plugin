@@ -73,7 +73,7 @@ export default function TypographyInput({
     setAlias('');
   }, [mode]);
 
-  const handleAutoSuggest = React.useCallback((keyIndex: number) => (() => changeAutoSuggest(keyIndex)), []);
+  const handleAutoSuggest = React.useCallback((keyIndex: number) => (() => changeAutoSuggest(keyIndex)), [showAutoSuggest]);
 
   const changeAutoSuggest = React.useCallback((index: number) => {
     const newShowAutoSuggest = [...showAutoSuggest];
@@ -81,7 +81,7 @@ export default function TypographyInput({
     setShowAutoSuggest(newShowAutoSuggest);
   }, [showAutoSuggest]);
 
-  const handleCloseAutoSuggest = React.useCallback((index: number) => (() => closeAutoSuggest(index)), []);
+  const handleCloseAutoSuggest = React.useCallback((index: number) => (() => closeAutoSuggest(index)), [showAutoSuggest]);
 
   const closeAutoSuggest = React.useCallback((index: number) => {
     const newAutoSuggest = [...showAutoSuggest];

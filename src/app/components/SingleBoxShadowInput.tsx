@@ -65,7 +65,7 @@ export default function SingleBoxShadowInput({
 
   const handleToggleInputHelper = React.useCallback(() => setInputHelperOpen(!inputHelperOpen), [inputHelperOpen]);
 
-  const handleAutoSuggest = React.useCallback((keyIndex: number) => (() => changeAutoSuggest(keyIndex)), []);
+  const handleAutoSuggest = React.useCallback((keyIndex: number) => (() => changeAutoSuggest(keyIndex)), [showAutoSuggest]);
 
   const changeAutoSuggest = React.useCallback((index: number) => {
     const newShowAutoSuggest = [...showAutoSuggest];
@@ -73,13 +73,13 @@ export default function SingleBoxShadowInput({
     setShowAutoSuggest(newShowAutoSuggest);
   }, [showAutoSuggest]);
 
-  const handleCloseAutoSuggest = React.useCallback((keyIndex: number) => (() => closeAutoSuggest(keyIndex)), []);
+  const handleCloseAutoSuggest = React.useCallback((keyIndex: number) => (() => closeAutoSuggest(keyIndex)), [showAutoSuggest]);
 
   const closeAutoSuggest = React.useCallback((index: number) => {
     const newShowAutoSuggest = [...showAutoSuggest];
     newShowAutoSuggest[index] = false;
     setShowAutoSuggest(newShowAutoSuggest);
-  }, []);
+  }, [showAutoSuggest]);
 
   const onChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     if (Array.isArray(value)) {

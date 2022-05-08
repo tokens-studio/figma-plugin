@@ -6,6 +6,8 @@ import Box from './Box';
 import Stack from './Stack';
 import { SingleToken } from '@/types/tokens';
 import { StyledInput, StyledPrefix } from './Input';
+import { TokenTypes } from '@/constants/TokenTypes';
+import { TokenBoxshadowValue } from '@/types/values';
 
 const StyledDropdown = styled('div', {
   position: 'absolute',
@@ -134,6 +136,27 @@ const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
     [resolvedTokens, filteredValue, type],
   );
 
+  const resolveValue = useCallback((token: SingleToken) => {
+    let returnValue: string;
+    if (token.type === TokenTypes.TYPOGRAPHY || token.type === TokenTypes.BOX_SHADOW) {
+      if (Array.isArray(token.value)) {
+        returnValue = token.value.reduce<string>((totalAcc, item) => {
+          const singleReturnValue = Object.entries(item).reduce<string>((acc, [key, value]) => {
+            return acc += `${value.toString()}/`;
+          }, '');
+          return totalAcc += `${singleReturnValue},`
+        }, '');
+      } else {
+        returnValue = Object.entries(token.value).reduce<string>((acc, [key, value]) => {
+          return acc += `${value.toString()}/`;
+        }, '');
+      }
+    } else {
+      returnValue = token.value;
+    }
+    return returnValue;
+  }, []);
+
   const handleSelect = useCallback((selectedItem: any) => {
     setInputValue(value.includes('$') ? `$${selectedItem.name}` : `{${selectedItem.name}}`);
     setShowAutoSuggest(false);
@@ -183,7 +206,7 @@ const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
                     </StyledItemColorDiv>
                   )}
                   <StyledItemName>{getHighlightedText(token.name, filteredValue || '')}</StyledItemName>
-                  <StyledItemValue>{token.value.toString()}</StyledItemValue>
+                  <StyledItemValue>{resolveValue(token)}</StyledItemValue>
                 </StyledItem>
               ))}
             </StyledDropdown>
