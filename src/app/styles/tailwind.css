@@ -66,6 +66,7 @@ body {
 .content::-webkit-scrollbar,
 .ReactModal__Content::-webkit-scrollbar,
 textarea::-webkit-scrollbar {
+  @apply bg-background;
   width: 9px;
 }
 

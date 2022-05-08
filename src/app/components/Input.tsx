@@ -59,6 +59,7 @@ const StyledInput = styled('input', {
       true: {
         borderTopRightRadius: 0,
         borderBottomRightRadius: 0,
+        borderRight: 0,
       },
     },
     hasPrefix: {
