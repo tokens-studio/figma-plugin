@@ -5,7 +5,7 @@ import { TransformerOptions } from './types';
 
 function getSimpleValue(resolvedValue: string | number, rawValue: string | number, options: TransformerOptions) {
   let value = resolvedValue;
-  if (typeof rawValue === 'string') {
+  if (typeof rawValue === 'string' && resolvedValue.toString() !== rawValue) {
     if (options.resolveReferences === false) {
       value = rawValue;
     }
