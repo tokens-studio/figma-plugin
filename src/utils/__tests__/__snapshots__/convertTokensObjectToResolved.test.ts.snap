@@ -153,7 +153,7 @@ Object {
   "sizing": Object {
     "base": Object {
       "type": "sizing",
-      "value": "2",
+      "value": 2,
     },
     "large": Object {
       "description": "Should NOT be resolved",
@@ -167,7 +167,7 @@ Object {
     },
     "scale": Object {
       "type": "sizing",
-      "value": "1.5",
+      "value": 1.5,
     },
     "small": Object {
       "description": "Should NOT be resolved",
@@ -184,7 +184,7 @@ Object {
     "fontWeight": Object {
       "base": Object {
         "type": "fontWeight",
-        "value": "100",
+        "value": 100,
       },
       "light": Object {
         "type": "fontWeight",
@@ -194,7 +194,7 @@ Object {
     "size": Object {
       "base": Object {
         "type": "fontSize",
-        "value": "16",
+        "value": 16,
       },
       "default": Object {
         "description": "Should NOT be resolved",
@@ -203,7 +203,7 @@ Object {
       },
       "h1": Object {
         "type": "fontSize",
-        "value": "96",
+        "value": 96,
       },
       "unit": Object {
         "type": "fontSize",
