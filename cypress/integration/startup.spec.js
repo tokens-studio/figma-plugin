@@ -17,14 +17,16 @@ describe('Loads application', () => {
                   value: 4,
                 },
               ],
-            },
-            global: [
-              {
-                name: 'size',
-                value: '11',
-                type: 'sizing'
-              }
-            ],
+              values: {
+                global: [
+                  {
+                    name: 'size',
+                    value: '11',
+                    type: 'sizing'
+                  }
+                ],
+              },
+            }
           },
         },
       };
