@@ -97,9 +97,7 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
         }
 
         const licenseKey = await figma.clientStorage.getAsync('licenseKey');
-        if (licenseKey) {
-          notifyLicenseKey(licenseKey);
-        }
+        notifyLicenseKey(licenseKey);
 
         notifyLastOpened(lastOpened);
         notifyStorageType(storageType);

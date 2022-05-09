@@ -10,6 +10,7 @@ import Stack from '../Stack';
 import { Dispatch } from '@/app/store';
 import { licenseKeyErrorSelector } from '@/selectors/licenseKeyErrorSelector';
 import useConfirm from '@/app/hooks/useConfirm';
+import { AddLicenseSource } from '@/app/store/models/userState';
 
 export default function AddLicenseKey() {
   const dispatch = useDispatch<Dispatch>();
@@ -20,7 +21,7 @@ export default function AddLicenseKey() {
 
   const addKey = useCallback(() => {
     if (newKey) {
-      dispatch.userState.addLicenseKey({ key: newKey });
+      dispatch.userState.addLicenseKey({ key: newKey, source: AddLicenseSource.UI });
     }
   }, [newKey, dispatch]);
 

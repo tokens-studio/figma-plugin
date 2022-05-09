@@ -15,7 +15,7 @@ export interface ButtonProps {
   id?: string;
   icon?: React.ReactNode;
   buttonRef?: React.MutableRefObject<HTMLButtonElement | null>;
-};
+}
 
 const Button: React.FC<ButtonProps> = ({
   size = 'small',
