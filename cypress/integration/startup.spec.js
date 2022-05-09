@@ -42,6 +42,12 @@ describe('Loads application', () => {
       const message = {
         pluginMessage: {
           type: 'tokenvalues',
+          values: {
+            values: {
+              global: [],
+            },
+          }
+
         },
       };
       $window.postMessage(message, '*');
