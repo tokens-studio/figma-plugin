@@ -1,6 +1,7 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { DownloadIcon, UploadIcon } from '@primer/octicons-react';
+import { useFlags } from 'launchdarkly-react-client-sdk';
 import * as pjs from '../../../package.json';
 import Box from './Box';
 import Text from './Text';
@@ -9,7 +10,14 @@ import BranchSelector from './BranchSelector';
 import useRemoteTokens from '../store/remoteTokens';
 import { StorageProviderType } from '../../types/api';
 import {
-  localApiStateSelector, editProhibitedSelector, lastSyncedStateSelector, storageTypeSelector, tokensSelector, usedTokenSetSelector, themesListSelector, activeTabSelector,
+  localApiStateSelector,
+  editProhibitedSelector,
+  lastSyncedStateSelector,
+  storageTypeSelector,
+  tokensSelector,
+  usedTokenSetSelector,
+  themesListSelector,
+  activeTabSelector,
 } from '@/selectors';
 import DocsIcon from '@/icons/docs.svg';
 import FeedbackIcon from '@/icons/feedback.svg';
@@ -24,7 +32,7 @@ export default function Footer() {
   const localApiState = useSelector(localApiStateSelector);
   const usedTokenSet = useSelector(usedTokenSetSelector);
   const activeTab = useSelector(activeTabSelector);
-
+  const { gitBranchSelector } = useFlags();
   const { pullTokens, pushTokens } = useRemoteTokens();
 
   const checkForChanges = React.useCallback(() => {
@@ -65,7 +73,7 @@ export default function Footer() {
       <Stack direction="row">
         {localApiState.branch && (
         <>
-          <BranchSelector currentBranch={localApiState.branch} />
+          {gitBranchSelector && <BranchSelector currentBranch={localApiState.branch} />}
           <IconButton icon={<DownloadIcon />} onClick={onPullButtonClicked} tooltipSide="top" tooltip={`Pull from ${transformProviderName(storageType.provider)}`} />
           <IconButton badge={hasChanges} icon={<UploadIcon />} onClick={onPushButtonClicked} tooltipSide="top" disabled={editProhibited} tooltip={`Push to ${transformProviderName(storageType.provider)}`} />
         </>

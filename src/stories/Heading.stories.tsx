@@ -1,7 +1,6 @@
 import React from 'react';
-import Heading from '@/app/components/Heading';
-
 import { ComponentStory, ComponentMeta } from '@storybook/react';
+import Heading from '@/app/components/Heading';
 
 export default {
   title: 'Heading',
@@ -10,15 +9,13 @@ export default {
   },
 } as ComponentMeta<typeof Heading>;
 
-const Template: ComponentStory<typeof Heading> = (args) => {
-  return (
-  <Heading { ...args }>
+const Template: ComponentStory<typeof Heading> = (args) => (
+  <Heading {...args}>
     Story
   </Heading>
-  )
-}
+);
 
 export const Primary = Template.bind({});
 Primary.args = {
-  size : 'small',
-}
+  size: 'small',
+};
