@@ -1,0 +1,30 @@
+{
+  "typography": {
+    "fontFamily": {
+      "value": "Roboto",
+      "description": "Font value",
+      "type": "fontFamilies"
+    },
+    "fontWeight": {
+      "value": "Bold",
+      "description": "Weight value",
+      "type": "fontWeights"
+    },
+    "h1": {
+      "value": {
+        "fontFamily": "{typography.fontFamily}",
+        "fontSize": "96",
+        "fontWeight": "{typography.fontWeight}"
+      },
+      "type": "typography"
+    },
+    "h2": {
+      "value": {
+        "fontFamily": "{typography.fontFamily}",
+        "fontSize": "60",
+        "fontWeight": "{typography.fontWeight}"
+      },
+      "type": "typography"
+    }
+  }
+}

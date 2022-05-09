@@ -19,11 +19,15 @@
       "./node_modules/@figma"
     ],
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": [
+        "src/*"
+      ]
     },
   },
   "exclude": [
-    "**/node_modules"
+    "**/node_modules",
+    "./storybook",
+    "storybook-static"
   ],
   "include": [
     "**/*.ts",
