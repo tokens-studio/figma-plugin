@@ -44,7 +44,7 @@ function App() {
             }}
           >
             {activeTab === 'loading' && <FigmaLoading />}
-            {(activeTab !=='start' && activeTab !== 'loading') && <Navbar/>}
+            {(activeTab !== 'start' && activeTab !== 'loading') && <Navbar />}
             {activeTab === 'start' && <StartScreen />}
             <Tokens isActive={activeTab === 'tokens'} />
             {activeTab === 'inspector' && <Inspector />}

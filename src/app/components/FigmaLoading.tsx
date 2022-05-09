@@ -7,28 +7,23 @@ import FigmaMark from '@/icons/figma-mark.svg';
 import FigmaLetter from '@/icons/figma-letter.svg';
 import Icon from './Icon';
 import * as pjs from '../../../package.json';
-import Button from './Button';
 import Stack from './Stack';
 import { Dispatch } from '../store';
+import { styled } from '@/stitches.config';
 
-const fgLoadingScreen = {
-  background: '$contextMenuBackground',
+const StyledLoadingScreen = styled(Stack, {
+  background: '$loadingScreenBg',
   height: 'inherit',
-  color: '$bgDefault',
-  '& > div': {
-    margin: 'auto'
-  }
-};
+  color: '$loadingScreenFg',
+});
 
-const buttonWrapper = {
-  '& > button': {
-    textDecoration: 'underline',
-    color: '$bgDefault',
-    '&:hover': {
-      color: '$contextMenuBackground',
-    }
-  }
-};
+const StyledLoadingButton = styled('button', {
+  textDecoration: 'underline',
+  color: '$loadingScreenFgMuted',
+  '&:hover, &:focus': {
+    color: '$loadingScreenFg',
+  },
+});
 
 export default function FigmaLoading() {
   const dispatch = useDispatch<Dispatch>();
@@ -38,16 +33,16 @@ export default function FigmaLoading() {
     postToFigma({
       type: MessageToPluginTypes.CANCEL_OPERATION,
     });
-  }, []);
+  }, [dispatch.uiState]);
 
   return (
-    <Stack direction="column" gap={4} className='content scroll-container' css={{ ...fgLoadingScreen }}>
+    <StyledLoadingScreen justify="center" direction="column" gap={4} className="content scroll-container">
       <Stack direction="column" gap={4} align="center">
         <Stack direction="column" gap={4} align="center">
           <FigmaMark />
           <FigmaLetter />
         </Stack>
-        <Stack direction="column" gap={4} align="center" css={{ color: '$bgDefault', fontSize: '$xsmall' }}>
+        <Stack direction="column" gap={4} align="center" css={{ color: '$loadingScrenFgMuted', fontSize: '$xsmall' }}>
           Version
           {' '}
           {pjs.plugin_version}
@@ -60,10 +55,10 @@ export default function FigmaLoading() {
             Loading. please wait
           </Stack>
         </Stack>
-        <Stack direction="row" gap={4} css={{...buttonWrapper}}>
-          <Button variant="ghost" size="small" onClick={handleCancel}>Cancel</Button>
+        <Stack direction="row" gap={4}>
+          <StyledLoadingButton type="button" onClick={handleCancel}>Cancel</StyledLoadingButton>
         </Stack>
       </Stack>
-    </Stack>
+    </StyledLoadingScreen>
   );
 }
