@@ -15,24 +15,19 @@ const fgLoadingScreen = {
   background: '$contextMenuBackground',
   height: 'inherit',
   color: '$bgDefault',
-  alignItems: 'center',
-  justifyContent: 'center',
-};
-
-const InitialLoadingIcon = {
-  '& > .rotate > svg': {
-    filter: 'invert(99%) sepia(4%) saturate(2476%) hue-rotate(86deg) brightness(118%) contrast(119%)'
+  '& > div': {
+    margin: 'auto'
   }
 };
 
 const buttonWrapper = {
-  textAlign: 'center',
   '& > button': {
     textDecoration: 'underline',
+    color: '$bgDefault',
     '&:hover': {
-      color: '$contextMenuBackground'
+      color: '$contextMenuBackground',
     }
-  },
+  }
 };
 
 export default function FigmaLoading() {
@@ -48,24 +43,26 @@ export default function FigmaLoading() {
   return (
     <Stack direction="column" gap={4} className='content scroll-container' css={{ ...fgLoadingScreen }}>
       <Stack direction="column" gap={4} align="center">
-        <FigmaMark />
-        <FigmaLetter />
-      </Stack>
-      <Stack direction="column" gap={4} align="center" css={{ color: '$bgDefault', fontSize: '$xsmall' }}>
-        Version
-        {' '}
-        {pjs.plugin_version}
-      </Stack>
-      <Stack direction="row" gap={4} justify="center" align="center" css={{ ...InitialLoadingIcon }}>
-        <div className="rotate">
-          <Icon name="loading" />
-        </div>
-        <Stack direction="column" gap={4} justify="center" align="center">
-          Loading. please wait
+        <Stack direction="column" gap={4} align="center">
+          <FigmaMark />
+          <FigmaLetter />
         </Stack>
-      </Stack>
-      <Stack direction="row" gap={4} css={{ ...buttonWrapper }}>
-        <Button variant="ghost" size="small" onClick={handleCancel}>Cancel</Button>
+        <Stack direction="column" gap={4} align="center" css={{ color: '$bgDefault', fontSize: '$xsmall' }}>
+          Version
+          {' '}
+          {pjs.plugin_version}
+        </Stack>
+        <Stack direction="row" gap={4} justify="center" align="center">
+          <div className="rotate">
+            <Icon name="loading" />
+          </div>
+          <Stack direction="column" gap={4} justify="center" align="center">
+            Loading. please wait
+          </Stack>
+        </Stack>
+        <Stack direction="row" gap={4} css={{...buttonWrapper}}>
+          <Button variant="ghost" size="small" onClick={handleCancel}>Cancel</Button>
+        </Stack>
       </Stack>
     </Stack>
   );

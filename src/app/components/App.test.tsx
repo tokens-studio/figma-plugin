@@ -41,7 +41,7 @@ describe('App', () => {
     expect(WelcomeText).toBeInTheDocument();
   });
 
-  it('skip to token tab when there is a token', () => {
+  it('skip to token screen when there is a token', () => {
     const { getByText } = render(<App />);
     fireEvent(
       window,
