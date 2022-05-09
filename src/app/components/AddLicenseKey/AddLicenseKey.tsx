@@ -64,6 +64,7 @@ export default function AddLicenseKey() {
       >
         <Box css={{ flexGrow: 1 }}>
           <Input
+            size="large"
             name="license-key"
             type="text"
             value={newKey || ''}

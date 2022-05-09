@@ -30,7 +30,7 @@ function Settings() {
         <Divider />
         <SyncSettings />
         <Divider />
-        <Stack direction="column" gap={2} css={{ padding: '0 $4' }}>
+        <Stack direction="column" gap={3} css={{ padding: '0 $4' }}>
           <Heading size="medium">Styles</Heading>
           <Stack direction="row" gap={2} align="center">
             <Checkbox

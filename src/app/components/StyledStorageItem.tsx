@@ -2,7 +2,7 @@ import { styled } from '@/stitches.config';
 
 export const StyledStorageItem = styled('div', {
   border: '1px solid',
-  padding: '$2',
+  padding: '$2 $3',
   textAlign: 'left',
   display: 'flex',
   width: '100%',

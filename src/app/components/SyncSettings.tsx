@@ -137,7 +137,7 @@ const SyncSettings = () => {
   }, [localApiState.provider]);
 
   return (
-    <Box css={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }} className="content">
+    <Box css={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
       {confirmModalVisible && (
         <ConfirmLocalStorageModal
           isOpen={confirmModalVisible}
@@ -162,7 +162,7 @@ const SyncSettings = () => {
       )}
       <Box css={{ padding: '0 $4' }}>
         <Stack gap={4} direction="column" align="start">
-          <Stack gap={4} direction="column">
+          <Stack gap={3} direction="column">
             <Heading size="medium">Token Storage</Heading>
             <Stack direction="row" gap={2}>
               <ProviderSelector
