@@ -300,7 +300,7 @@ const getChanges: GetChanges = ({
   }, new Set());
   const changes = Object.entries(files)
     .map(([path, content]) => ({
-      changeType: tokensOnRemote.has(`/${path}`) ? ChangeType.edit : ChangeType.add,
+      changeType: tokensOnRemote.has(path.startsWith('/') ? path : `/${path}`) ? ChangeType.edit : ChangeType.add,
       item: {
         path: `/${path}`,
       },
@@ -405,11 +405,9 @@ export const useADO = () => {
       opts: { multiFile: Boolean(featureFlags?.gh_mfs_enabled) },
     });
 
-    if (Object.keys(content.values).length) {
-      if (content && hasSameContent(content, tokenObj)) {
-        notifyToUI('Nothing to commit');
-        return rawTokenObj;
-      }
+    if (Object.keys(content.values).length && content && hasSameContent(content, tokenObj)) {
+      notifyToUI('Nothing to commit');
+      return rawTokenObj;
     }
 
     dispatch.uiState.setLocalApiState({ ...context });
