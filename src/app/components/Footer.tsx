@@ -9,7 +9,7 @@ import BranchSelector from './BranchSelector';
 import useRemoteTokens from '../store/remoteTokens';
 import { StorageProviderType } from '../../types/api';
 import {
-  localApiStateSelector, editProhibitedSelector, lastSyncedStateSelector, storageTypeSelector, tokensSelector, usedTokenSetSelector, themesListSelector,
+  localApiStateSelector, editProhibitedSelector, lastSyncedStateSelector, storageTypeSelector, tokensSelector, usedTokenSetSelector, themesListSelector, activeTabSelector
 } from '@/selectors';
 import DocsIcon from '@/icons/docs.svg';
 import FeedbackIcon from '@/icons/feedback.svg';
@@ -23,6 +23,7 @@ export default function Footer() {
   const editProhibited = useSelector(editProhibitedSelector);
   const localApiState = useSelector(localApiStateSelector);
   const usedTokenSet = useSelector(usedTokenSetSelector);
+  const activeTab = useSelector(activeTabSelector);
 
   const { pullTokens, pushTokens } = useRemoteTokens();
 
@@ -61,43 +62,49 @@ export default function Footer() {
         padding: '$4',
       }}
     >
-      <Stack direction="row">
-        {localApiState.branch && (
-        <>
-          <BranchSelector currentBranch={localApiState.branch} />
-          <IconButton icon={<DownloadIcon />} onClick={onPullButtonClicked} tooltipSide="top" tooltip={`Pull from ${transformProviderName(storageType.provider)}`} />
-          <IconButton badge={hasChanges} icon={<UploadIcon />} onClick={onPushButtonClicked} tooltipSide="top" disabled={editProhibited} tooltip={`Push to ${transformProviderName(storageType.provider)}`} />
-        </>
-        )}
-      </Stack>
-      <Stack direction="row" gap={4}>
-        <Box css={{ color: '$textMuted', fontSize: '$xsmall' }}>
-          Version
-          {' '}
-          {pjs.plugin_version}
-        </Box>
+      {
+        (activeTab !== 'loading' && activeTab !== 'start') && (
+          <>
+            <Stack direction="row">
+              {localApiState.branch && (
+                <>
+                  <BranchSelector currentBranch={localApiState.branch} />
+                  <IconButton icon={<DownloadIcon />} onClick={onPullButtonClicked} tooltipSide="top" tooltip={`Pull from ${transformProviderName(storageType.provider)}`} />
+                  <IconButton badge={hasChanges} icon={<UploadIcon />} onClick={onPushButtonClicked} tooltipSide="top" disabled={editProhibited} tooltip={`Push to ${transformProviderName(storageType.provider)}`} />
+                </>
+              )}
+            </Stack>
+            <Stack direction="row" gap={4}>
+              <Box css={{ color: '$textMuted', fontSize: '$xsmall' }}>
+                Version
+                {' '}
+                {pjs.plugin_version}
+              </Box>
 
-        <Text size="xsmall">
-          <a href="https://docs.tokens.studio/?ref=pf" target="_blank" rel="noreferrer">
-            <Stack direction="row" gap={1}>
-              <Box as="span" css={{ color: '$textMuted' }}>
-                Docs
-              </Box>
-              <DocsIcon />
+              <Text size="xsmall">
+                <a href="https://docs.tokens.studio/?ref=pf" target="_blank" rel="noreferrer">
+                  <Stack direction="row" gap={1}>
+                    <Box as="span" css={{ color: '$textMuted' }}>
+                      Docs
+                    </Box>
+                    <DocsIcon />
+                  </Stack>
+                </a>
+              </Text>
+              <Text size="xsmall">
+                <a href="https://github.com/six7/figma-tokens" target="_blank" rel="noreferrer">
+                  <Stack direction="row" gap={1}>
+                    <Box as="span" css={{ color: '$textMuted' }}>
+                      Feedback
+                    </Box>
+                    <FeedbackIcon />
+                  </Stack>
+                </a>
+              </Text>
             </Stack>
-          </a>
-        </Text>
-        <Text size="xsmall">
-          <a href="https://github.com/six7/figma-tokens" target="_blank" rel="noreferrer">
-            <Stack direction="row" gap={1}>
-              <Box as="span" css={{ color: '$textMuted' }}>
-                Feedback
-              </Box>
-              <FeedbackIcon />
-            </Stack>
-          </a>
-        </Text>
-      </Stack>
+          </>
+        )
+      }
     </Box>
   );
 }

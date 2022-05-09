@@ -12,7 +12,16 @@ describe('Themes', () => {
     cy.receiveTokenValues({
       version: '5',
       values: {
-        global: [],
+        options: [{
+          name: 'sizing.xs',
+          value: 4,
+          type: 'sizing'
+        }],
+        global: [{
+          name: 'sizing.xs',
+          value: 4,
+          type: 'sizing'
+        }],
       },
     });
     cy.receiveStorageTypeLocal();
@@ -30,16 +39,25 @@ describe('Themes', () => {
   it('Can enable a previously created theme', () => {
     cy.receiveTokenValues({
       version: '5',
-      values: { global: [] },
-      themes: [
-        {
-          id: 'my-first-theme',
-          name: 'My first theme',
-          selectedTokenSets: {
-            global: 'source',
-          },
-        }
-      ]
+      values: {
+        options: [{
+          name: 'sizing.xs',
+          value: 4,
+          type: 'sizing'
+        }],
+        global: [{
+          name: 'sizing.xs',
+          value: 4,
+          type: 'sizing'
+        }],
+      },
+      themes: [{
+        id: 'my-first-theme',
+        name: 'My first theme',
+        selectedTokenSets: {
+          global: 'source',
+        },
+      }]
     });
     cy.receiveStorageTypeLocal();
     cy.get('[data-cy="themeselector-dropdown"]').click()
@@ -50,16 +68,25 @@ describe('Themes', () => {
   it('Can delete a theme', () => {
     cy.receiveTokenValues({
       version: '5',
-      values: { global: [] },
-      themes: [
-        {
-          id: 'my-first-theme',
-          name: 'My first theme',
-          selectedTokenSets: {
-            global: 'source',
-          },
-        }
-      ]
+      values: {
+        options: [{
+          name: 'sizing.xs',
+          value: 4,
+          type: 'sizing'
+        }],
+        global: [{
+          name: 'sizing.xs',
+          value: 4,
+          type: 'sizing'
+        }],
+      },
+      themes: [{
+        id: 'my-first-theme',
+        name: 'My first theme',
+        selectedTokenSets: {
+          global: 'source',
+        },
+      }]
     });
     cy.receiveStorageTypeLocal();
     cy.get('[data-cy="themeselector-dropdown"]').click()
