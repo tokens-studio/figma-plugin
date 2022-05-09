@@ -47,7 +47,7 @@ export default function AddLicenseKey() {
 
   const removeLicenseKeyButton = existingKey && (
     <Button variant="secondary" onClick={removeKey} disabled={existingKey !== newKey}>
-      Remove license
+      Remove key
     </Button>
   );
 

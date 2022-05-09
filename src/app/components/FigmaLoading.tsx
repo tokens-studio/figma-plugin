@@ -52,7 +52,7 @@ export default function FigmaLoading() {
             <Icon name="loading" />
           </div>
           <Stack direction="column" gap={4} justify="center" align="center">
-            Loading. please wait
+            Loading, please wait.
           </Stack>
         </Stack>
         <Stack direction="row" gap={4}>

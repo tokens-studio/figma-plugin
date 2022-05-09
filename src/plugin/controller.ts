@@ -50,7 +50,6 @@ let shouldSendSelectionValues = false;
 figma.skipInvisibleInstanceChildren = true;
 
 figma.showUI(__html__, {
-  themeColors: true,
   width: DefaultWindowSize.width,
   height: DefaultWindowSize.height,
 });
