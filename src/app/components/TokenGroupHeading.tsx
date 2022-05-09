@@ -7,7 +7,7 @@ import Heading from './Heading';
 import useManageTokens from '../store/useManageTokens';
 import { editProhibitedSelector } from '@/selectors';
 
-type Props = {
+export type Props = {
   id: string
   label: string
   path: string

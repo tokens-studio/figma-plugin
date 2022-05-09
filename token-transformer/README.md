@@ -17,6 +17,8 @@ Install (either globally or local)
 
 `node token-transformer input.json output.json --expandTypography=false --expandShadow=false --preserveRawValue=true`
 
+`node token-transformer input.json output.json --expandTypography=false --expandShadow=false --preserveRawValue=true resolveReferences=false`
+
 ## Parameters
 
 Input: Filename of input
@@ -32,3 +34,7 @@ Excludes: Sets that should not be part of the export (e.g. a global color scale)
 --expandShadow: true|false to enable/disable automatic expansion of boxShadow types (default: false)
 
 --preserveRawValue: true|false to enable/disable addition of a rawValue key containing the unresolved value (default: false)
+
+--throwErrorWhenNotResolved: true|false to enable/disable throwing errors when a reference fails to resolve (default: false)
+
+--resolveReferences: true|false|'math' to enable/disable resolving references, removing any aliases or math expressions (default: true)
