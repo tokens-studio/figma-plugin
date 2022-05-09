@@ -20,7 +20,7 @@ describe('Loads application', () => {
               values: {
                 global: [
                   {
-                    name: 'size',
+                    name: 'sizing.xs',
                     value: '11',
                     type: 'sizing'
                   }
