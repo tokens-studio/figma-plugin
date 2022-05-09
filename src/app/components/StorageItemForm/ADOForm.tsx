@@ -13,7 +13,7 @@ export default function ADOForm({
       <Stack direction="column" gap={4}>
         <Input
           full
-          label="orgUrl"
+          label="Organization Url"
           value={values.baseUrl}
           placeholder="https://dev.azure.com/yourOrgName"
           onChange={handleChange}
