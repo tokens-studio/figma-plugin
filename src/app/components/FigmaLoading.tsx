@@ -13,12 +13,16 @@ import { Dispatch } from '../store';
 
 const fgLoadingScreen = {
   background: '$contextMenuBackground',
-  padding: '$8',
   height: 'inherit',
   color: '$bgDefault',
   alignItems: 'center',
   justifyContent: 'center',
-  overflowX: 'hidden',
+};
+
+const InitialLoadingIcon = {
+  '& > .rotate > svg': {
+    filter: 'invert(99%) sepia(4%) saturate(2476%) hue-rotate(86deg) brightness(118%) contrast(119%)'
+  }
 };
 
 const buttonWrapper = {
@@ -29,12 +33,6 @@ const buttonWrapper = {
       color: '$contextMenuBackground'
     }
   },
-};
-
-const InitialLoading = {
-  '& > .rotate > svg': {
-    filter: 'invert(99%) sepia(4%) saturate(2476%) hue-rotate(86deg) brightness(118%) contrast(119%)'
-  }
 };
 
 export default function FigmaLoading() {
@@ -48,17 +46,17 @@ export default function FigmaLoading() {
   }, []);
 
   return (
-    <Stack direction="column" gap={4} className='content' css={{ ...fgLoadingScreen }}>
+    <Stack direction="column" gap={4} className='content scroll-container' css={{ ...fgLoadingScreen }}>
       <Stack direction="column" gap={4} align="center">
         <FigmaMark />
         <FigmaLetter />
       </Stack>
-      <Stack direction="column" gap={4} align="center" css={{ color: '$textMuted', fontSize: '$xsmall' }}>
+      <Stack direction="column" gap={4} align="center" css={{ color: '$bgDefault', fontSize: '$xsmall' }}>
         Version
         {' '}
         {pjs.plugin_version}
       </Stack>
-      <Stack direction="row" gap={4} justify="center" align="center" css={{ ...InitialLoading }}>
+      <Stack direction="row" gap={4} justify="center" align="center" css={{ ...InitialLoadingIcon }}>
         <div className="rotate">
           <Icon name="loading" />
         </div>
