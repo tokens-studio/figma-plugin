@@ -42,7 +42,7 @@ export default function FigmaLoading() {
           <FigmaMark />
           <FigmaLetter />
         </Stack>
-        <Stack direction="column" gap={4} align="center" css={{ color: '$loadingScrenFgMuted', fontSize: '$xsmall' }}>
+        <Stack direction="column" gap={4} align="center" css={{ color: '$loadingScrenFgMuted' }}>
           Version
           {' '}
           {pjs.plugin_version}

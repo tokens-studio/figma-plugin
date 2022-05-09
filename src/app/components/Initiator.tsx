@@ -76,9 +76,14 @@ export function Initiator() {
             if (values) {
               dispatch.tokenState.setTokenData(values);
               const existTokens = Object.values(values?.values ?? {}).some((value) => value.length > 0);
+
               if (existTokens) dispatch.uiState.setActiveTab(Tabs.TOKENS);
               else dispatch.uiState.setActiveTab(Tabs.START);
             }
+            break;
+          }
+          case MessageFromPluginTypes.NO_TOKEN_VALUES: {
+            dispatch.uiState.setActiveTab(Tabs.START);
             break;
           }
           case MessageFromPluginTypes.STYLES: {

@@ -20,6 +20,7 @@ export enum MessageFromPluginTypes {
   NO_SELECTION = 'noselection',
   REMOTE_COMPONENTS = 'remotecomponents',
   TOKEN_VALUES = 'tokenvalues',
+  NO_TOKEN_VALUES = 'notokenvalues',
   STYLES = 'styles',
   RECEIVED_STORAGE_TYPE = 'receivedStorageType',
   API_CREDENTIALS = 'apiCredentials',
@@ -95,6 +96,9 @@ export type TokenValuesFromPluginMessage = {
   type: MessageFromPluginTypes.TOKEN_VALUES;
   values: TokenStore;
 };
+export type NoTokenValuesFromPluginMessage = {
+  type: MessageFromPluginTypes.NO_TOKEN_VALUES;
+};
 export type ReceivedStorageTypeFromPluginMessage = {
   type: MessageFromPluginTypes.RECEIVED_STORAGE_TYPE;
   storageType: StorageType;
@@ -159,6 +163,7 @@ export type PostToUIMessage =
   | ShowEmptyGroupsFromPluginMessage
   | RemoteCommentsFromPluginMessage
   | TokenValuesFromPluginMessage
+  | NoTokenValuesFromPluginMessage
   | ReceivedStorageTypeFromPluginMessage
   | ApiProvidersFromPluginMessage
   | StylesFromPluginMessage
