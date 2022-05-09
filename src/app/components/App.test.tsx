@@ -7,14 +7,14 @@ describe('App', () => {
     resetStore();
   });
 
-  it('shows welcome screen when no tokens are found', () => {
+  it('shows loading screen', () => {
     const { getByText } = render(<App />);
-    const WelcomeText = getByText('Welcome to Figma Tokens.');
+    const LoadingText = getByText('Loading. please wait');
 
-    expect(WelcomeText).toBeInTheDocument();
+    expect(LoadingText).toBeInTheDocument();
   });
 
-  it('calls setTokenData when received values', () => {
+  it('skip to start screen when there is no tokens', () => {
     const { getByText } = render(<App />);
     fireEvent(
       window,
@@ -22,29 +22,55 @@ describe('App', () => {
         data: {
           pluginMessage: {
             type: 'tokenvalues',
+            status: '',
             values: {
               version: '5',
               usedTokenSet: ['global'],
               themes: [],
               activeTheme: null,
               values: {
-                global: {
-                  size: {
-                    xs: {
-                      type: 'sizing',
-                      description: 'some size',
-                      value: '4',
-                    },
-                  },
-                },
+                global: [],
               },
             },
           },
         },
       }),
     );
-    const TokensText = getByText('Size');
+    const WelcomeText = getByText('Welcome to Figma Tokens.');
 
-    expect(TokensText).toBeInTheDocument();
+    expect(WelcomeText).toBeInTheDocument();
+  });
+
+  it('skip to token screen when there is a token', () => {
+    const { getByText } = render(<App />);
+    fireEvent(
+      window,
+      new MessageEvent('message', {
+        data: {
+          pluginMessage: {
+            type: 'tokenvalues',
+            status: '',
+            values: {
+              version: '5',
+              usedTokenSet: ['global'],
+              themes: [],
+              activeTheme: null,
+              values: {
+                global: [
+                  {
+                    name: 'size',
+                    value: '11',
+                    type: 'sizing'
+                  }
+                ],
+              },
+            },
+          },
+        },
+      }),
+    );
+    const TokenText = getByText('size');
+
+    expect(TokenText).toBeInTheDocument();
   });
 });

@@ -75,7 +75,11 @@ export function Initiator() {
             const { values } = pluginMessage;
             if (values) {
               dispatch.tokenState.setTokenData(values);
-              dispatch.uiState.setActiveTab(Tabs.TOKENS);
+              const existTokens = Object.values(values?.values ?? {}).some(value => {
+                return value.length > 0;
+              });
+              if (existTokens) dispatch.uiState.setActiveTab(Tabs.TOKENS);
+              else dispatch.uiState.setActiveTab(Tabs.START);
             }
             break;
           }
@@ -122,8 +126,12 @@ export function Initiator() {
               dispatch.uiState.setApiData(credentials);
               dispatch.uiState.setLocalApiState(credentials);
 
-              await pullTokens({ context: credentials, featureFlags: receivedFlags, usedTokenSet });
-              dispatch.uiState.setActiveTab(Tabs.TOKENS);
+              const remoteData = await pullTokens({ context: credentials, featureFlags: receivedFlags, usedTokenSet });
+              const existTokens = Object.values(remoteData?.tokens ?? {}).some(value => {
+                return value.length > 0;
+              });
+              if (existTokens) dispatch.uiState.setActiveTab(Tabs.TOKENS);
+              else dispatch.uiState.setActiveTab(Tabs.START);
             }
             break;
           }

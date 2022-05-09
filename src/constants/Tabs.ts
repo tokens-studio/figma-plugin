@@ -4,4 +4,5 @@ export enum Tabs {
   JSON = 'json',
   INSPECTOR = 'inspector',
   SETTINGS = 'settings',
+  LOADING = 'loading',
 }

@@ -6,7 +6,7 @@ import Inspector from './Inspector';
 import Tokens from './Tokens';
 import StartScreen from './StartScreen';
 import Navbar from './Navbar';
-import LoadingBar from './LoadingBar';
+import FigmaLoading from './FigmaLoading';
 import Footer from './Footer';
 import Changelog from './Changelog';
 import ImportedTokensDialog from './ImportedTokensDialog';
@@ -22,6 +22,7 @@ import { planSelector } from '@/selectors/planSelector';
 import { clientEmailSelector } from '@/selectors/getClientEmail';
 import { entitlementsSelector } from '@/selectors/getEntitlements';
 import { Entitlements } from '../store/models/userState';
+import LoadingBar from './LoadingBar';
 
 function App() {
   const activeTab = useSelector(activeTabSelector);
@@ -53,7 +54,7 @@ function App() {
   return (
     <Box css={{ backgroundColor: '$bgDefault' }}>
       <Initiator />
-      <LoadingBar />
+      { activeTab !== 'loading' && <LoadingBar />}
       <PluginResizerWrapper>
         <Box
           css={{
@@ -72,7 +73,8 @@ function App() {
               overflow: 'hidden',
             }}
           >
-            {activeTab !== 'start' && <Navbar />}
+            {activeTab === 'loading' && <FigmaLoading />}
+            {(activeTab !=='start' && activeTab !== 'loading') && <Navbar/>}
             {activeTab === 'start' && <StartScreen />}
             <Tokens isActive={activeTab === 'tokens'} />
             {activeTab === 'inspector' && <Inspector />}

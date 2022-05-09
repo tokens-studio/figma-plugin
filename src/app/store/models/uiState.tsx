@@ -104,7 +104,7 @@ export const uiState = createModel<RootModel>()({
     disabled: false,
     displayType: 'GRID',
     backgroundJobs: [],
-    activeTab: Tabs.START,
+    activeTab: Tabs.LOADING,
     projectURL: '',
     storageType: {
       provider: StorageProviderType.LOCAL,
