@@ -58,6 +58,7 @@ export const {
       loadingScreenFgMuted: '#CECECE',
       loadingScreenBg: '#141414',
       text: 'var(--figma-color-text)',
+      fgDefault: 'var(--figma-color-text)',
       textMuted: 'var(--figma-color-text-secondary)',
       textSubtle: 'var(--figma-color-text-tertiary)',
       textDisabled: 'var(--figma-color-text-disabled)',

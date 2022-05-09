@@ -5,11 +5,11 @@ import { MessageToPluginTypes } from '@/types/messages';
 import { Tabs } from '@/constants/Tabs';
 import FigmaMark from '@/icons/figma-mark.svg';
 import FigmaLetter from '@/icons/figma-letter.svg';
-import Icon from './Icon';
 import * as pjs from '../../../package.json';
 import Stack from './Stack';
 import { Dispatch } from '../store';
 import { styled } from '@/stitches.config';
+import Spinner from './Spinner';
 
 const StyledLoadingScreen = styled(Stack, {
   background: '$loadingScreenBg',
@@ -48,9 +48,7 @@ export default function FigmaLoading() {
           {pjs.plugin_version}
         </Stack>
         <Stack direction="row" gap={4} justify="center" align="center">
-          <div className="rotate">
-            <Icon name="loading" />
-          </div>
+          <Spinner inverse />
           <Stack direction="column" gap={4} justify="center" align="center">
             Loading, please wait.
           </Stack>

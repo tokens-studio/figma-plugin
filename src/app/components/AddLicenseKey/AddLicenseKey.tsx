@@ -59,7 +59,7 @@ export default function AddLicenseKey() {
         gap={2}
         css={{
           display: 'flex',
-          alignItems: 'center',
+          alignItems: 'flex-end',
           width: '100%',
         }}
       >
