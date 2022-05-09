@@ -75,9 +75,7 @@ export function Initiator() {
             const { values } = pluginMessage;
             if (values) {
               dispatch.tokenState.setTokenData(values);
-              const existTokens = Object.values(values?.values ?? {}).some(value => {
-                return value.length > 0;
-              });
+              const existTokens = Object.values(values?.values ?? {}).some((value) => value.length > 0);
               if (existTokens) dispatch.uiState.setActiveTab(Tabs.TOKENS);
               else dispatch.uiState.setActiveTab(Tabs.START);
             }
@@ -127,9 +125,7 @@ export function Initiator() {
               dispatch.uiState.setLocalApiState(credentials);
 
               const remoteData = await pullTokens({ context: credentials, featureFlags: receivedFlags, usedTokenSet });
-              const existTokens = Object.values(remoteData?.tokens ?? {}).some(value => {
-                return value.length > 0;
-              });
+              const existTokens = Object.values(remoteData?.tokens ?? {}).some((value) => value.length > 0);
               if (existTokens) dispatch.uiState.setActiveTab(Tabs.TOKENS);
               else dispatch.uiState.setActiveTab(Tabs.START);
             }
