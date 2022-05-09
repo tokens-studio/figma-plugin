@@ -35,7 +35,7 @@ export const getADOCreatePullRequestUrl: GetADOCreatePullRequestUrl = ({
   orgUrl,
   projectId,
   repositoryId,
-}) => `${orgUrl}/${projectId ? `${projectId}/` : ''}_git/${repositoryId}/pullrequestcreate?sourceRef=&targetRef=${branch}`;
+}) => `${orgUrl}${projectId && `/${projectId}`}/_git/${repositoryId}/pullrequestcreate?sourceRef=${branch}&targetRef=main`;
 
 interface FetchGit {
   body?: string
