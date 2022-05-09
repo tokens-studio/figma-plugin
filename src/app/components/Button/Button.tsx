@@ -3,7 +3,7 @@ import { track } from '@/utils/analytics';
 import { StyledButtonIconContainer } from './StyledButtonIconContainer';
 import { StyledButton } from './StyledButton';
 
-type ButtonProps = {
+export interface ButtonProps {
   type?: 'button' | 'submit';
   form?: string
   variant: 'secondary' | 'primary' | 'ghost';

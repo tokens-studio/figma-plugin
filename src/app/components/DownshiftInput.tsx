@@ -38,7 +38,7 @@ const StyledItem = styled('div', {
   variants: {
     isFocused: {
       true: {
-        backgroundColor: '$hover',
+        backgroundColor: '$interaction',
         color: '$onInteraction',
         [`& ${StyledItemValue}`]: {
           color: '$onInteraction',
@@ -196,7 +196,7 @@ const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
                   className="dropdown-item"
                   {...getItemProps({ key: token.name, index, item: token })}
                   css={{
-                    backgroundColor: highlightedIndex === index ? '$hover' : '$bgDefault',
+                    backgroundColor: highlightedIndex === index ? '$interaction' : '$bgDefault',
                   }}
                   isFocused={highlightedIndex === index}
                 >
