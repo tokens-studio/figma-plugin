@@ -10,6 +10,7 @@ import { ignoreFirstPartForStylesSelector } from '@/selectors';
 import Stack from './Stack';
 import Box from './Box';
 import AddLicenseKey from './AddLicenseKey/AddLicenseKey';
+import { Divider } from './Divider';
 
 function Settings() {
   const ignoreFirstPartForStyles = useSelector(ignoreFirstPartForStylesSelector);
@@ -23,10 +24,14 @@ function Settings() {
   );
 
   return (
-    <Box css={{ padding: '$5', overflowY: 'scroll' }} className="content scroll-container">
-      <Stack direction="column" gap={4}>
-        <Heading>Styles</Heading>
-        <Stack direction="column" gap={2}>
+    <Box className="content scroll-container">
+      <Stack direction="column" gap={4} css={{ padding: '$3 0' }}>
+        <AddLicenseKey />
+        <Divider />
+        <SyncSettings />
+        <Divider />
+        <Stack direction="column" gap={2} css={{ padding: '0 $4' }}>
+          <Heading size="medium">Styles</Heading>
           <Stack direction="row" gap={2} align="center">
             <Checkbox
               id="ignoreFirstPartForStyles"
@@ -37,9 +42,7 @@ function Settings() {
             <Label htmlFor="ignoreFirstPartForStyles">Ignore first part of token name for styles</Label>
           </Stack>
         </Stack>
-        <SyncSettings />
       </Stack>
-      <AddLicenseKey />
     </Box>
   );
 }

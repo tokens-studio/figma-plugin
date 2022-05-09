@@ -71,6 +71,7 @@ export const {
       onDanger: 'var(--figma-color-text-ondanger)',
       border: 'var(--figma-color-border)',
       borderMuted: 'var(--figma-color-border)',
+      borderAccent: 'var(--figma-color-border-brand)',
       focus: 'var(--figma-color-bg-brand-tertiary)',
       borderSwitch: 'var(--figma-color-border)',
       bgSwitchChecked: 'var(--figma-color-border)',

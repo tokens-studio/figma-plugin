@@ -5,10 +5,17 @@ import isSameCredentials from '@/utils/isSameCredentials';
 import Button from './Button';
 import useRemoteTokens from '../store/remoteTokens';
 import { storageTypeSelector } from '@/selectors';
+import { StyledStorageItem } from './StyledStorageItem';
+import { ApiDataType } from '@/types/api';
 
 // @TODO typings
 
-const StorageItem = ({ item, onEdit = null }) => {
+type Props = {
+  item: ApiDataType,
+  onEdit?: () => void
+};
+
+const StorageItem = ({ item, onEdit = null }: Props) => {
   const storageType = useSelector(storageTypeSelector);
   const {
     provider, id, branch, name,
@@ -20,13 +27,20 @@ const StorageItem = ({ item, onEdit = null }) => {
     isSameCredentials(item, storageType)
   ), [item, storageType]);
 
+  const handleDelete = React.useCallback(() => {
+    deleteProvider(item);
+  }, [deleteProvider, item]);
+
+  const handleRestore = React.useCallback(() => {
+    restoreStoredProvider(item);
+  }, [item, restoreStoredProvider]);
+
   return (
-    <div
+    <StyledStorageItem
       data-cy={`storageitem-${provider}-${id}`}
       key={`${provider}-${id}`}
-      className={`border text-left flex w-full flex-row justify-between rounded p-2 ${
-        isActive() ? 'bg-blue-100 bg-opacity-50 border-blue-400' : 'hover:border-blue-300 border-gray-300'
-      }`}
+      active={isActive()}
+
     >
       <div className="flex flex-col grow items-start">
         <div className="text-xs font-bold">{name}</div>
@@ -39,7 +53,7 @@ const StorageItem = ({ item, onEdit = null }) => {
         <button
           type="button"
           className="inline-flex text-left text-red-600 underline text-xxs"
-          onClick={() => deleteProvider(item)}
+          onClick={handleDelete}
         >
           Delete local credentials
         </button>
@@ -55,13 +69,13 @@ const StorageItem = ({ item, onEdit = null }) => {
         <Button
           id="button-storageitem-apply"
           variant="secondary"
-          onClick={() => restoreStoredProvider(item)}
+          onClick={handleRestore}
         >
           Apply
         </Button>
         )}
       </div>
-    </div>
+    </StyledStorageItem>
   );
 };
 
