@@ -5,7 +5,7 @@ const StyledButton = styled('button', {
   fontWeight: '$bold',
   fontSize: '$xsmall',
   display: 'flex',
-  padding: '$4',
+  padding: '$3 $4',
   borderRadius: '$default',
   border: '1px solid transparent',
   '&:focus': {
@@ -17,6 +17,10 @@ const StyledButton = styled('button', {
         backgroundColor: '$bgAccent',
         borderColor: '$interaction',
       },
+      false: {
+        backgroundColor: '$bgSubtle',
+        borderColor: '$bgSubtle',
+      },
     },
     isStored: {
       true: {
@@ -27,9 +31,17 @@ const StyledButton = styled('button', {
   },
 });
 
+type Props = {
+  text: string;
+  onClick: () => void;
+  isActive: boolean;
+  isStored: boolean;
+  id: string;
+};
+
 export default function StorageItem({
   text, onClick, isActive, isStored, id,
-}) {
+}: Props) {
   return (
     <StyledButton
       data-cy={`provider-${id}`}

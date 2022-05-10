@@ -2,6 +2,7 @@ import React from 'react';
 import ReactModal, { Styles as ReactModalStyles } from 'react-modal';
 import Heading from '../Heading';
 import Stack from '../Stack';
+import XIcon from '@/icons/x.svg';
 import { ModalFooter } from './ModalFooter';
 import { ModalHeader } from './ModalHeader';
 
@@ -65,6 +66,10 @@ export function Modal({
     return 'p-8';
   };
 
+  const handleClose = React.useCallback(() => {
+    close();
+  }, [close]);
+
   return (
     <ReactModal
       isOpen={isOpen}
@@ -82,24 +87,10 @@ export function Modal({
             )}
             <button
               type="button"
-              onClick={() => close()}
+              onClick={handleClose}
               className="p-4 hover:bg-gray-100 rounded focus:outline-none"
             >
-              <svg
-                className="svg"
-                width="12"
-                height="12"
-                viewBox="0 0 12 12"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M6 5.293l4.789-4.79.707.708-4.79 4.79 4.79 4.789-.707.707-4.79-4.79-4.789 4.79-.707-.707L5.293 6 .502 1.211 1.21.504 6 5.294z"
-                  fillRule="nonzero"
-                  fillOpacity="1"
-                  fill="#000"
-                  stroke="none"
-                />
-              </svg>
+              <XIcon />
             </button>
           </Stack>
         </ModalHeader>

@@ -1,15 +1,15 @@
 import React from 'react';
+import { ComponentStory, ComponentMeta } from '@storybook/react';
 import Modal from '@/app/components/Modal';
 import { ModalFooter } from '@/app/components/Modal/ModalFooter';
-import { ComponentStory, ComponentMeta } from '@storybook/react';
 
 export default {
   title: 'Modal',
   component: Modal,
   argTypes: {
-    title: { controls: 'Modal Story' }
+    title: { controls: 'Modal Story' },
   },
-  args:{
+  args: {
     title: 'Primary',
     full: false,
     large: false,
@@ -17,7 +17,7 @@ export default {
     footer: ModalFooter,
     showClose: true,
     compact: false,
-  }
+  },
 } as ComponentMeta<typeof Modal>;
 
 const Template: ComponentStory<typeof Modal> = (args) => {
@@ -31,10 +31,9 @@ const Template: ComponentStory<typeof Modal> = (args) => {
   return (
     <div>
       <button onClick={handleModalOpen}>Click Here to Open Modal</button>
-      <Modal title='Primary' full={false} large={false} isOpen={isModalOpen} close={handleModalClose}>
-      </Modal>
+      <Modal title="Primary" full={false} large={false} isOpen={isModalOpen} close={handleModalClose} />
     </div>
-  )
+  );
 };
 
 export const Primary = Template.bind({});
@@ -47,4 +46,4 @@ Primary.args = {
   footer: ModalFooter,
   showClose: true,
   compact: false,
-}
+};

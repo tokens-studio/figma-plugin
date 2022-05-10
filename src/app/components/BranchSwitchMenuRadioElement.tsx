@@ -8,15 +8,14 @@ import {
 
 type Props = {
   branch: string,
-  index:number,
   branchSelected: (branch: string) => void
 };
 
-export const BranchSwitchMenuRadioElement: React.FC<Props> = ({ branch, index, branchSelected }) => {
+export const BranchSwitchMenuRadioElement: React.FC<Props> = ({ branch, branchSelected }) => {
   const onSelect = React.useCallback(() => branchSelected(branch), [branch, branchSelected]);
 
   return (
-    <BranchSwitchMenuRadioItem key={`radio_${index}`} value={branch} onSelect={onSelect}>
+    <BranchSwitchMenuRadioItem value={branch} onSelect={onSelect}>
       <BranchSwitchMenuItemIndicator>
         <CheckIcon />
       </BranchSwitchMenuItemIndicator>

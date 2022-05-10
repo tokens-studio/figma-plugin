@@ -26,6 +26,7 @@ type Props = React.InputHTMLAttributes<HTMLInputElement> & {
   isMasked?: boolean;
   onChange?: React.ChangeEventHandler<HTMLInputElement>;
   disabled?: boolean;
+  size?: 'small' | 'large';
 };
 
 const StyledIcon = styled('div', {
@@ -41,7 +42,6 @@ const StyledIcon = styled('div', {
 
 const StyledInput = styled('input', {
   padding: '0 $3',
-  height: '28px',
   flexGrow: 1,
   width: '100%',
   backgroundColor: '$bgDefault',
@@ -55,10 +55,19 @@ const StyledInput = styled('input', {
   },
 
   variants: {
+    size: {
+      small: {
+        height: '28px',
+      },
+      large: {
+        height: '36px',
+      },
+    },
     hasSuffix: {
       true: {
         borderTopRightRadius: 0,
         borderBottomRightRadius: 0,
+        borderRight: 0,
       },
     },
     hasPrefix: {
@@ -107,7 +116,7 @@ const StyledPrefix = styled('div', {
   },
 });
 
-const Input = React.forwardRef<HTMLInputElement, Props>(({
+const Input = React.forwardRef<Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'>, Props>(({
   name,
   autofocus,
   error = '',
@@ -127,6 +136,7 @@ const Input = React.forwardRef<HTMLInputElement, Props>(({
   placeholder = '',
   capitalize = false,
   isMasked = false,
+  size = 'small',
   ...inputProps
 }, ref) => {
   // if isMasked is true, then we need to handle toggle visibility
@@ -166,6 +176,7 @@ const Input = React.forwardRef<HTMLInputElement, Props>(({
           placeholder={placeholder}
           hasPrefix={!!prefix}
           hasSuffix={!!isMasked}
+          size={size}
           {...inputProps}
         />
         {!!suffix && <span>{suffix}</span>}

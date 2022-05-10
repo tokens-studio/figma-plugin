@@ -2,6 +2,7 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AnimatePresence, motion } from 'framer-motion';
+import { useFlags } from 'launchdarkly-react-client-sdk';
 import { mergeTokenGroups, resolveTokenValues } from '@/plugin/tokenHelpers';
 import TokenListing from './TokenListing';
 import TokensBottomBar from './TokensBottomBar';
@@ -42,7 +43,6 @@ const StyledButton = styled('button', {
 
 const StatusToast = ({ open, error }: { open: boolean; error: string | null }) => {
   const [isOpen, setOpen] = React.useState(open);
-
   React.useEffect(() => {
     setOpen(open);
   }, [open]);
@@ -101,6 +101,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
   const [activeTokensTab, setActiveTokensTab] = React.useState('list');
   const [tokenSetsVisible, setTokenSetsVisible] = React.useState(true);
   const { getStringTokens } = useTokens();
+  const { tokenThemes } = useFlags();
 
   const updateMode = useSelector(updateModeSelector);
   const { confirm } = useConfirm();
@@ -235,7 +236,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
             </StyledButton>
           </Box>
           <TokenFilter />
-          <ThemeSelector />
+          {tokenThemes && <ThemeSelector />}
           <Box
             css={{
               display: 'flex',

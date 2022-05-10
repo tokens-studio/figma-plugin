@@ -36,7 +36,11 @@ const StyledIconDisclosure = styled(IconDisclosure, {
 const StyledInputSuffix = styled('button', {
   width: '28px',
   height: '28px',
-  backgroundColor: '#f0f0f0',
+  backgroundColor: '$bgSubtle',
+  border: '1px solid',
+  borderColor: '$borderMuted',
+  borderTopRightRadius: '$input',
+  borderBottomRightRadius: '$input',
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
