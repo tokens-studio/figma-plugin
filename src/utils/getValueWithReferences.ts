@@ -11,7 +11,9 @@ function getSimpleValue(resolvedValue: string | number, rawValue: string | numbe
     }
     if (options.resolveReferences === 'math') {
       const singleAliasRegEx = /^{[^}]*}$|^\$[^$]*$/;
-      if (singleAliasRegEx.test(rawValue)) {
+      const oneOrMoreAliasRegEx = /{[^}]*}|\$[\w.-]*/g;
+      const aliasRegEx = typeof resolvedValue === 'number' ? singleAliasRegEx : oneOrMoreAliasRegEx;
+      if (aliasRegEx.test(rawValue)) {
         value = rawValue;
       }
     }
