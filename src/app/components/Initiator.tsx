@@ -1,5 +1,5 @@
-import React from 'react';
-import { useDispatch } from 'react-redux';
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { identify, track } from '@/utils/analytics';
 import { MessageFromPluginTypes, MessageToPluginTypes, PostToUIMessage } from '@/types/messages';
 import useConfirm from '@/app/hooks/useConfirm';
@@ -12,6 +12,11 @@ import { useFeatureFlags } from '../hooks/useFeatureFlags';
 import { Tabs } from '@/constants/Tabs';
 import { StorageProviderType } from '@/types/api';
 import { GithubTokenStorage } from '@/storage/GithubTokenStorage';
+import { userIdSelector } from '@/selectors/userIdSelector';
+import getLicenseKey from '@/utils/getLicenseKey';
+import { licenseKeySelector } from '@/selectors/licenseKeySelector';
+import { checkedLocalStorageForKeySelector } from '@/selectors/checkedLocalStorageForKeySelector';
+import { AddLicenseSource } from '../store/models/userState';
 
 export function Initiator() {
   const dispatch = useDispatch<Dispatch>();
@@ -19,6 +24,10 @@ export function Initiator() {
   const { fetchFeatureFlags } = useFeatureFlags();
   const { setStorageType } = useStorage();
   const { confirm } = useConfirm();
+
+  const licenseKey = useSelector(licenseKeySelector);
+  const checkedLocalStorage = useSelector(checkedLocalStorageForKeySelector);
+  const userId = useSelector(userIdSelector);
 
   const askUserIfPull: (() => Promise<any>) = React.useCallback(async () => {
     const shouldPull = await confirm({
@@ -31,7 +40,7 @@ export function Initiator() {
   const onInitiate = React.useCallback(() => postToFigma({ type: MessageToPluginTypes.INITIATE }), []);
   const getApiCredentials = React.useCallback((shouldPull: boolean) => postToFigma({ type: MessageToPluginTypes.GET_API_CREDENTIALS, shouldPull }), []);
 
-  React.useEffect(() => {
+  useEffect(() => {
     onInitiate();
     window.onmessage = async (event: {
       data: {
@@ -74,14 +83,23 @@ export function Initiator() {
             break;
           case MessageFromPluginTypes.TOKEN_VALUES: {
             const { values } = pluginMessage;
-            let shouldPull: boolean = true;
-            if (values.checkForChanges === 'true') {
-              shouldPull = await askUserIfPull();
-              if (!shouldPull) {
-                dispatch.tokenState.setTokenData(values);
-              }
+            const existChanges = values.checkForChanges === 'true';
+            
+            if (existChanges && await askUserIfPull()) {
+                getApiCredentials(true);
+            } else {
+              dispatch.tokenState.setTokenData(values);
+              const existTokens = Object.values(values?.values ?? {}).some((value) => value.length > 0);
+              
+              if (existTokens) 
+                dispatch.uiState.setActiveTab(Tabs.TOKENS);
+              else
+                dispatch.uiState.setActiveTab(Tabs.START);
             }
-            getApiCredentials(shouldPull);
+            break;
+          }
+          case MessageFromPluginTypes.NO_TOKEN_VALUES: {
+            dispatch.uiState.setActiveTab(Tabs.START);
             break;
           }
           case MessageFromPluginTypes.STYLES: {
@@ -126,8 +144,11 @@ export function Initiator() {
 
               dispatch.uiState.setApiData(credentials);
               dispatch.uiState.setLocalApiState(credentials);
-              if (shouldPull) await pullTokens({ context: credentials, featureFlags: receivedFlags, usedTokenSet });
-              dispatch.uiState.setActiveTab(Tabs.TOKENS);
+
+              const remoteData = await pullTokens({ context: credentials, featureFlags: receivedFlags, usedTokenSet });
+              const existTokens = Object.values(remoteData?.tokens ?? {}).some((value) => value.length > 0);
+              if (existTokens) dispatch.uiState.setActiveTab(Tabs.TOKENS);
+              else dispatch.uiState.setActiveTab(Tabs.START);
             }
             break;
           }
@@ -145,7 +166,8 @@ export function Initiator() {
             break;
           }
           case MessageFromPluginTypes.USER_ID: {
-            dispatch.userState.setUserId(pluginMessage.user.userId);
+            dispatch.userState.setUserId(pluginMessage.user.figmaId);
+            dispatch.userState.setUserName(pluginMessage.user.name);
             identify(pluginMessage.user);
             track('Launched', { version: pjs.plugin_version });
             break;
@@ -183,7 +205,11 @@ export function Initiator() {
             break;
           }
           case MessageFromPluginTypes.LICENSE_KEY: {
-            dispatch.userState.addLicenseKey({ key: pluginMessage.licenseKey, fromPlugin: true });
+            if (pluginMessage.licenseKey) {
+              dispatch.userState.addLicenseKey({ key: pluginMessage.licenseKey, source: AddLicenseSource.PLUGIN });
+            } else {
+              dispatch.userState.setCheckedLocalStorage(true);
+            }
             break;
           }
           default:
@@ -192,6 +218,18 @@ export function Initiator() {
       }
     };
   }, []);
+
+  useEffect(() => {
+    async function getLicense() {
+      const { key } = await getLicenseKey(userId);
+      if (key) {
+        dispatch.userState.addLicenseKey({ key, source: AddLicenseSource.INITAL_LOAD });
+      }
+    }
+    if (userId && checkedLocalStorage && !licenseKey) {
+      getLicense();
+    }
+  }, [userId, dispatch, checkedLocalStorage, licenseKey]);
 
   return null;
 }

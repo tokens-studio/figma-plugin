@@ -1,8 +1,8 @@
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { DownloadIcon, UploadIcon } from '@primer/octicons-react';
-import convertTokensToObject from '@/utils/convertTokensToObject';
 import { Dispatch } from '../store';
+import { useFlags } from 'launchdarkly-react-client-sdk';
 import * as pjs from '../../../package.json';
 import Box from './Box';
 import Text from './Text';
@@ -11,12 +11,18 @@ import BranchSelector from './BranchSelector';
 import useRemoteTokens from '../store/remoteTokens';
 import { StorageProviderType } from '../../types/api';
 import {
-  localApiStateSelector, editProhibitedSelector, lastSyncedStateSelector, storageTypeSelector, tokensSelector, usedTokenSetSelector, themesListSelector,
+  localApiStateSelector,
+  editProhibitedSelector,
+  lastSyncedStateSelector,
+  storageTypeSelector,
+  tokensSelector,
+  usedTokenSetSelector,
+  themesListSelector,
+  activeTabSelector,
 } from '@/selectors';
 import DocsIcon from '@/icons/docs.svg';
 import FeedbackIcon from '@/icons/feedback.svg';
 import IconButton from './IconButton';
-import { last } from 'cypress/types/lodash';
 
 export default function Footer() {
   const storageType = useSelector(storageTypeSelector);
@@ -28,6 +34,8 @@ export default function Footer() {
   const usedTokenSet = useSelector(usedTokenSetSelector);
   const dispatch = useDispatch<Dispatch>();
 
+  const activeTab = useSelector(activeTabSelector);
+  const { gitBranchSelector } = useFlags();
   const { pullTokens, pushTokens } = useRemoteTokens();
 
   const checkForChanges = React.useCallback(() => {
@@ -51,10 +59,10 @@ export default function Footer() {
     }
   }, []);
 
-  const onPushButtonClicked = React.useCallback(() => pushTokens(), []);
-  const onPullButtonClicked = React.useCallback(() => pullTokens({ usedTokenSet }), [usedTokenSet]);
+  const onPushButtonClicked = React.useCallback(() => pushTokens(), [pushTokens]);
+  const onPullButtonClicked = React.useCallback(() => pullTokens({ usedTokenSet }), [pullTokens, usedTokenSet]);
 
-  return (
+  return activeTab !== 'loading' && activeTab !== 'start' ? (
     <Box
       css={{
         display: 'flex',
@@ -67,7 +75,7 @@ export default function Footer() {
       <Stack direction="row">
         {localApiState.branch && (
         <>
-          <BranchSelector/>
+          {gitBranchSelector && <BranchSelector currentBranch={localApiState.branch} />}
           <IconButton icon={<DownloadIcon />} onClick={onPullButtonClicked} tooltipSide="top" tooltip={`Pull from ${transformProviderName(storageType.provider)}`} />
           <IconButton badge={hasChanges} icon={<UploadIcon />} onClick={onPushButtonClicked} tooltipSide="top" disabled={editProhibited} tooltip={`Push to ${transformProviderName(storageType.provider)}`} />
         </>
@@ -102,5 +110,5 @@ export default function Footer() {
         </Text>
       </Stack>
     </Box>
-  );
+  ) : null;
 }

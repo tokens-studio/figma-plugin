@@ -1,6 +1,5 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
-import Icon from './Icon';
 import Button from './Button';
 import { postToFigma } from '@/plugin/notifiers';
 import { MessageToPluginTypes } from '@/types/messages';
@@ -8,7 +7,7 @@ import { useDelayedFlag } from '@/hooks';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
 import { backgroundJobsSelector } from '@/selectors';
 import Stack from './Stack';
-import Box from './Box';
+import Spinner from './Spinner';
 
 const backgroundJobTitles = {
   [BackgroundJobs.NODEMANAGER_UPDATE]: 'Finding and caching tokens...',
@@ -63,9 +62,7 @@ export default function LoadingBar() {
           backgroundColor: '$bgSubtle', padding: '$2', borderRadius: '$default', margin: '$2',
         }}
       >
-        <Box css={{ color: '$text' }} className="inline-flex rotate">
-          <Icon name="loading" />
-        </Box>
+        <Spinner />
         <div className="flex flex-grow items-center justify-between">
           <div className="font-medium text-xxs">
             {backgroundJobTitles[backgroundJobs[backgroundJobs.length - 1]?.name] ?? 'Hold on, updating...'}

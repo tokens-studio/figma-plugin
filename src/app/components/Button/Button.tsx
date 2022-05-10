@@ -3,7 +3,7 @@ import { track } from '@/utils/analytics';
 import { StyledButtonIconContainer } from './StyledButtonIconContainer';
 import { StyledButton } from './StyledButton';
 
-type ButtonProps = {
+export interface ButtonProps {
   type?: 'button' | 'submit';
   form?: string
   variant: 'secondary' | 'primary' | 'ghost';
@@ -15,7 +15,7 @@ type ButtonProps = {
   id?: string;
   icon?: React.ReactNode;
   buttonRef?: React.MutableRefObject<HTMLButtonElement | null>;
-};
+}
 
 const Button: React.FC<ButtonProps> = ({
   size = 'small',

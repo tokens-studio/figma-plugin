@@ -17,7 +17,7 @@ export const StyledCheckbox = styled(Box, {
         opacity: 1,
       },
       false: {
-        opacity: 0,
+        opacity: 0.5,
         '&:hover, &:focus': {
           opacity: 1,
         },
