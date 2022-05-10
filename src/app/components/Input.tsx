@@ -116,7 +116,7 @@ const StyledPrefix = styled('div', {
   },
 });
 
-const Input = React.forwardRef<HTMLInputElement, Props>(({
+const Input = React.forwardRef<Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'>, Props>(({
   name,
   autofocus,
   error = '',
