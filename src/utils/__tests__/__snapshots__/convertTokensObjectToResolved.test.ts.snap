@@ -161,6 +161,17 @@ Object {
       "value": 0.5,
     },
   },
+  "radii": Object {
+    "full": Object {
+      "type": "borderRadius",
+      "value": "100%",
+    },
+    "leaf": Object {
+      "description": "Should NOT be resolved",
+      "type": "borderRadius",
+      "value": "{radii.full} 0%",
+    },
+  },
   "sizing": Object {
     "base": Object {
       "type": "sizing",
@@ -314,6 +325,17 @@ Object {
       "value": 0.5,
     },
   },
+  "radii": Object {
+    "full": Object {
+      "type": "borderRadius",
+      "value": "100%",
+    },
+    "leaf": Object {
+      "description": "Should be resolved",
+      "type": "borderRadius",
+      "value": "100% 0%",
+    },
+  },
   "sizing": Object {
     "base": Object {
       "type": "sizing",
@@ -443,6 +465,17 @@ Object {
     "medium": Object {
       "type": "opacity",
       "value": 0.5,
+    },
+  },
+  "radii": Object {
+    "full": Object {
+      "type": "borderRadius",
+      "value": "100%",
+    },
+    "leaf": Object {
+      "description": "Should NOT be resolved",
+      "type": "borderRadius",
+      "value": "{radii.full} 0%",
     },
   },
   "sizing": Object {

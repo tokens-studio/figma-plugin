@@ -224,6 +224,17 @@ describe('convertTokensObjectToResolved', () => {
             value: '0.5',
           },
         },
+        radii: {
+          full: {
+            value: '100%',
+            type: 'borderRadius',
+          },
+          leaf: {
+            description: 'Should be resolved',
+            value: '{radii.full} 0%',
+            type: 'borderRadius',
+          },
+        },
         sizing: {
           base: {
             value: '2',
@@ -364,6 +375,17 @@ describe('convertTokensObjectToResolved', () => {
             value: '0.5',
           },
         },
+        radii: {
+          full: {
+            value: '100%',
+            type: 'borderRadius',
+          },
+          leaf: {
+            description: 'Should NOT be resolved',
+            value: '{radii.full} 0%',
+            type: 'borderRadius',
+          },
+        },
         sizing: {
           base: {
             value: '2',
@@ -502,6 +524,17 @@ describe('convertTokensObjectToResolved', () => {
           medium: {
             type: 'opacity',
             value: '0.5',
+          },
+        },
+        radii: {
+          full: {
+            value: '100%',
+            type: 'borderRadius',
+          },
+          leaf: {
+            description: 'Should NOT be resolved',
+            value: '{radii.full} 0%',
+            type: 'borderRadius',
           },
         },
         sizing: {
