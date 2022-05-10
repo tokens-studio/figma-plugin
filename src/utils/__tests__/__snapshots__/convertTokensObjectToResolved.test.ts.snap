@@ -439,9 +439,9 @@ Object {
         "value": 16,
       },
       "default": Object {
-        "description": "Should be resolved",
+        "description": "Should NOT be resolved",
         "type": "fontSize",
-        "value": "16px",
+        "value": "{text.size.base}{text.size.unit}",
       },
       "h1": Object {
         "type": "fontSize",

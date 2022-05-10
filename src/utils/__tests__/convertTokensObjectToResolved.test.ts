@@ -496,7 +496,7 @@ describe('convertTokensObjectToResolved', () => {
               type: 'fontSize',
             },
             default: {
-              description: 'Should be resolved',
+              description: 'Should NOT be resolved',
               value: '{text.size.base}{text.size.unit}',
               type: 'fontSize',
             },
