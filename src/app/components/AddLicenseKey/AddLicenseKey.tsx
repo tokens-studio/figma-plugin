@@ -27,10 +27,10 @@ export default function AddLicenseKey() {
 
   const removeKey = useCallback(async () => {
     const confirmation = await confirm({
-      text: 'Are you sure you want to remove your license key?',
-      description: `Make sure you saved a copy of the license key somewhere,                    
+      text: 'Are you sure you want to remove your beta key?',
+      description: `Make sure you saved a copy of the beta key somewhere,                    
         as it won’t be stored on this device after you deleted it.`,
-      confirmAction: 'Remove license',
+      confirmAction: 'Remove beta key',
     });
     if (confirmation) {
       dispatch.userState.removeLicenseKey('');
@@ -47,24 +47,25 @@ export default function AddLicenseKey() {
 
   const removeLicenseKeyButton = existingKey && (
     <Button variant="secondary" onClick={removeKey} disabled={existingKey !== newKey}>
-      Remove license
+      Remove key
     </Button>
   );
 
   return (
-    <Stack direction="column" css={{ padding: '$4 0' }}>
-      <Heading>License key</Heading>
-      <Box
+    <Stack direction="column" gap={3} css={{ padding: '0 $4' }}>
+      <Heading size="medium">Beta key</Heading>
+      <Stack
+        direction="row"
+        gap={2}
         css={{
-          padding: '$4',
           display: 'flex',
-          alignItems: 'center',
+          alignItems: 'flex-end',
           width: '100%',
-          paddingRight: '$9',
         }}
       >
-        <Box css={{ flexGrow: 1, marginRight: '$4' }}>
+        <Box css={{ flexGrow: 1 }}>
           <Input
+            size="large"
             name="license-key"
             type="text"
             value={newKey || ''}
@@ -73,24 +74,14 @@ export default function AddLicenseKey() {
             error={licenseKeyError}
           />
         </Box>
-        <Box
-          css={{
-            alignSelf: licenseKeyError ? 'flex-end' : 'auto',
-          }}
-        >
-          <Button variant="primary" onClick={addKey} disabled={existingKey === newKey}>
-            {existingKey ? 'Update license key' : 'Add license addKey'}
-          </Button>
-        </Box>
-        <Box
-          css={{
-            alignSelf: licenseKeyError ? 'flex-end' : 'auto',
-            marginLeft: '$2',
-          }}
-        >
+
+        <Button variant="primary" onClick={addKey} disabled={existingKey === newKey}>
+          {existingKey ? 'Update key' : 'Add beta key'}
+        </Button>
+        <Box>
           {removeLicenseKeyButton}
         </Box>
-      </Box>
+      </Stack>
     </Stack>
   );
 }

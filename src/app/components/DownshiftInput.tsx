@@ -15,7 +15,7 @@ const StyledDropdown = styled('div', {
   maxHeight: '140px',
   borderRadius: '$contextMenu',
   overflowY: 'scroll',
-  backgroundColor: 'white',
+  backgroundColor: '$contextMenuBackground',
   marginTop: '1px',
   cursor: 'pointer',
   boxShadow: '$contextMenu',
@@ -153,6 +153,7 @@ const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
           <Box css={{ display: 'flex', position: 'relative', width: '100%' }} className="input">
             {!!prefix && <StyledPrefix>{prefix}</StyledPrefix>}
             <StyledInput
+              hasSuffix={!!suffix}
               {...getInputProps({
                 label: type || null,
                 name: 'value',
