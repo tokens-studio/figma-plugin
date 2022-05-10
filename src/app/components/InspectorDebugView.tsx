@@ -1,6 +1,5 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
-import isEqual from 'lodash.isequal';
 import Box from './Box';
 import Blankslate from './Blankslate';
 import AnnotationBuilder from './AnnotationBuilder';
@@ -8,6 +7,9 @@ import { SingleToken } from '@/types/tokens';
 import useTokens from '../store/useTokens';
 import { uiStateSelector } from '@/selectors';
 import Stack from './Stack';
+import { isEqual } from '@/utils/isEqual';
+import { StyledInspectBadge } from './StyledInspectBadge';
+import Text from './Text';
 
 export default function InspectorDebugView({ resolvedTokens }: { resolvedTokens: SingleToken[] }) {
   const uiState = useSelector(uiStateSelector, isEqual);
@@ -39,11 +41,10 @@ export default function InspectorDebugView({ resolvedTokens }: { resolvedTokens:
                       <div className="font-bold">{property}</div>
                       :
                       {' '}
-                      <div className="p-1 text-white bg-gray-700 rounded text-xxs">
-                        $
+                      <StyledInspectBadge>
                         {typeof value === 'string' && value.split('.').join('-')}
-                      </div>
-                      <div className="text-gray-500 break-all">{`/* ${JSON.stringify(getTokenValue(value, resolvedTokens))} */`}</div>
+                      </StyledInspectBadge>
+                      <Text size="xsmall" muted css={{ wordBreak: 'break-all' }}>{`/* ${JSON.stringify(getTokenValue(value, resolvedTokens))} */`}</Text>
                     </code>
                   </Stack>
                 ))}

@@ -8,4 +8,5 @@ export const StyledWrapper = styled(Box, {
   gap: '$1',
   fontWeight: '$bold',
   fontSize: '$xsmall',
+  width: '100%',
 });

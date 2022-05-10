@@ -7,6 +7,7 @@ import { TokenTypes } from '@/constants/TokenTypes';
 import { lightOrDark } from '@/utils/color';
 import { TokensContext } from '@/context';
 import { getAliasValue } from '@/utils/alias';
+import { theme } from '@/stitches.config';
 
 type Props = {
   active: boolean;
@@ -44,7 +45,7 @@ export const TokenButtonDraggable: React.FC<Props> = ({
       style.borderRadius = `${displayValue}px`;
     } else if (type === TokenTypes.COLOR) {
       style['--backgroundColor'] = displayValue;
-      style['--borderColor'] = lightOrDark(String(displayValue)) === 'light' ? '#e7e7e7' : 'white';
+      style['--borderColor'] = lightOrDark(String(displayValue)) === 'light' ? theme.colors.border : theme.colors.borderMuted;
 
       buttonClass.push('button-property-color');
       if (displayType === 'LIST') {

@@ -1,4 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux';
+import { useCallback, useMemo } from 'react';
 import { ContextObject, StorageProviderType } from '@/types/api';
 import { MessageToPluginTypes } from '@/types/messages';
 import { track } from '@/utils/analytics';
@@ -14,8 +15,9 @@ import { BackgroundJobs } from '@/constants/BackgroundJobs';
 import { FeatureFlags } from '@/utils/featureFlags';
 import { apiSelector } from '@/selectors';
 import { UsedTokenSetsMap } from '@/types';
+import { RemoteTokenStorageData } from '@/storage/RemoteTokenStorage';
 
-type PullTokensOptiosn = {
+type PullTokensOptions = {
   context?: ContextObject,
   featureFlags?: FeatureFlags,
   usedTokenSet?: UsedTokenSetsMap | null
@@ -30,7 +32,7 @@ export default function useRemoteTokens() {
   const { setStorageType } = useStorage();
   const { pullTokensFromJSONBin, addJSONBinCredentials, createNewJSONBin } = useJSONbin();
   const {
-    addNewGitHubCredentials, syncTokensWithGitHub, pullTokensFromGitHub, pushTokensToGitHub,
+    addNewGitHubCredentials, syncTokensWithGitHub, pullTokensFromGitHub, pushTokensToGitHub, createGithubBranch, fetchGithubBranches,
   } = useGitHub();
   const {
     addNewGitLabCredentials, syncTokensWithGitLab, pullTokensFromGitLab, pushTokensToGitLab,
@@ -40,7 +42,7 @@ export default function useRemoteTokens() {
   } = useADO();
   const { pullTokensFromURL } = useURL();
 
-  const pullTokens = async ({ context = api, featureFlags, usedTokenSet }: PullTokensOptiosn) => {
+  const pullTokens = useCallback(async ({ context = api, featureFlags, usedTokenSet }: PullTokensOptions) => {
     track('pullTokens', { provider: context.provider });
 
     dispatch.uiState.startJob({
@@ -48,46 +50,59 @@ export default function useRemoteTokens() {
       isInfinite: true,
     });
 
-    let tokenValues;
+    let remoteData: RemoteTokenStorageData<unknown> | null = null;
 
     switch (context.provider) {
       case StorageProviderType.JSONBIN: {
-        tokenValues = await pullTokensFromJSONBin(context);
+        remoteData = await pullTokensFromJSONBin(context);
         break;
       }
       case StorageProviderType.GITHUB: {
-        tokenValues = await pullTokensFromGitHub(context, featureFlags);
+        remoteData = await pullTokensFromGitHub(context, featureFlags);
         break;
       }
       case StorageProviderType.GITLAB: {
-        tokenValues = await pullTokensFromGitLab(context, featureFlags);
+        remoteData = await pullTokensFromGitLab(context, featureFlags);
         break;
       }
       case StorageProviderType.ADO: {
-        tokenValues = await pullTokensFromADO(context, featureFlags);
+        remoteData = await pullTokensFromADO(context, featureFlags);
         break;
       }
       case StorageProviderType.URL: {
-        tokenValues = await pullTokensFromURL(context);
+        remoteData = await pullTokensFromURL(context);
         break;
       }
       default:
         throw new Error('Not implemented');
     }
 
-    if (tokenValues) {
-      dispatch.tokenState.setLastSyncedState(JSON.stringify(tokenValues.values, null, 2));
-      dispatch.tokenState.setTokenData({ ...tokenValues, usedTokenSet: usedTokenSet ?? {} });
+    if (remoteData) {
+      dispatch.tokenState.setLastSyncedState(JSON.stringify([remoteData.tokens, remoteData.themes], null, 2));
+      dispatch.tokenState.setTokenData({
+        values: remoteData.tokens,
+        themes: remoteData.themes,
+        usedTokenSet: usedTokenSet ?? {},
+      });
       track('Launched with token sets', {
-        count: Object.keys(tokenValues.values).length,
-        setNames: Object.keys(tokenValues.values),
+        count: Object.keys(remoteData.tokens).length,
+        setNames: Object.keys(remoteData.tokens),
       });
     }
 
     dispatch.uiState.completeJob(BackgroundJobs.UI_PULLTOKENS);
-  };
+    return remoteData;
+  }, [
+    dispatch,
+    api,
+    pullTokensFromGitHub,
+    pullTokensFromGitLab,
+    pullTokensFromJSONBin,
+    pullTokensFromURL,
+    pullTokensFromADO,
+  ]);
 
-  const restoreStoredProvider = async (context) => {
+  const restoreStoredProvider = useCallback(async (context: ContextObject) => {
     track('restoreStoredProvider', { provider: context.provider });
     dispatch.uiState.setLocalApiState(context);
     dispatch.uiState.setApiData(context);
@@ -107,16 +122,23 @@ export default function useRemoteTokens() {
         break;
       }
       default:
-        await pullTokens(context);
+        await pullTokens({ context });
     }
     return null;
-  };
+  }, [
+    dispatch,
+    setStorageType,
+    pullTokens,
+    syncTokensWithGitHub,
+    syncTokensWithGitLab,
+    syncTokensWithADO,
+  ]);
 
-  const pushTokens = async () => {
+  const pushTokens = useCallback(async (context: ContextObject = api) => {
     track('pushTokens', { provider: api.provider });
     switch (api.provider) {
       case StorageProviderType.GITHUB: {
-        await pushTokensToGitHub(api);
+        await pushTokensToGitHub(context);
         break;
       }
       case StorageProviderType.GITLAB: {
@@ -130,9 +152,14 @@ export default function useRemoteTokens() {
       default:
         throw new Error('Not implemented');
     }
-  };
+  }, [
+    api,
+    pushTokensToGitHub,
+    pushTokensToGitLab,
+    pushTokensToADO,
+  ]);
 
-  async function addNewProviderItem(context): Promise<boolean> {
+  const addNewProviderItem = useCallback(async (context: ContextObject): Promise<boolean> => {
     const credentials = context;
     let data;
     switch (context.provider) {
@@ -141,8 +168,10 @@ export default function useRemoteTokens() {
           data = await addJSONBinCredentials(context);
         } else {
           const id = await createNewJSONBin(context);
-          credentials.id = id;
-          data = true;
+          if (id) {
+            credentials.id = id;
+            data = true;
+          }
         }
         break;
       }
@@ -172,20 +201,62 @@ export default function useRemoteTokens() {
       return true;
     }
     return false;
-  }
+  }, [
+    dispatch,
+    addJSONBinCredentials,
+    addNewGitLabCredentials,
+    addNewGitHubCredentials,
+    addNewADOCredentials,
+    createNewJSONBin,
+    pullTokensFromURL,
+    setStorageType,
+  ]);
 
-  const deleteProvider = (provider) => {
+  const addNewBranch = useCallback(async (context: ContextObject, branch: string, source?: string) => {
+    let newBranchCreated = false;
+    switch (context.provider) {
+      case StorageProviderType.GITHUB: {
+        newBranchCreated = await createGithubBranch(context, branch, source);
+        break;
+      }
+      default:
+        throw new Error('Not implemented');
+    }
+
+    return newBranchCreated;
+  }, [createGithubBranch]);
+
+  const fetchBranches = useCallback(async (context: ContextObject) => {
+    switch (context.provider) {
+      case StorageProviderType.GITHUB:
+        return fetchGithubBranches(context);
+      default:
+        return null;
+    }
+  }, [fetchGithubBranches]);
+
+  const deleteProvider = useCallback((provider) => {
     postToFigma({
       type: MessageToPluginTypes.REMOVE_SINGLE_CREDENTIAL,
       context: provider,
     });
-  };
+  }, []);
 
-  return {
+  return useMemo(() => ({
     restoreStoredProvider,
     deleteProvider,
     pullTokens,
     pushTokens,
     addNewProviderItem,
-  };
+    fetchBranches,
+    addNewBranch,
+  }), [
+    restoreStoredProvider,
+    deleteProvider,
+    pullTokens,
+    pushTokens,
+    addNewProviderItem,
+    addNewBranch,
+    fetchBranches,
+  ]);
 }

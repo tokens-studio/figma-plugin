@@ -16,7 +16,7 @@ export default function StorageItemForm({
 
   switch (localApiState.provider) {
     case StorageProviderType.GITHUB:
-    case StorageProviderType.GITLAB: { // needto create custom ado form
+    case StorageProviderType.GITLAB: {
       return (
         <GitForm
           handleChange={handleChange}

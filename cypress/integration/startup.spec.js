@@ -8,6 +8,8 @@ describe('Loads application', () => {
           type: 'tokenvalues',
           values: {
             version: '5',
+            themes: [],
+            activeTheme: null,
             values: {
               options: [
                 {
@@ -15,7 +17,16 @@ describe('Loads application', () => {
                   value: 4,
                 },
               ],
-            },
+              values: {
+                global: [
+                  {
+                    name: 'sizing.xs',
+                    value: 4,
+                    type: 'sizing'
+                  }
+                ],
+              },
+            }
           },
         },
       };
@@ -31,6 +42,12 @@ describe('Loads application', () => {
       const message = {
         pluginMessage: {
           type: 'tokenvalues',
+          values: {
+            values: {
+              global: [],
+            },
+          }
+
         },
       };
       $window.postMessage(message, '*');

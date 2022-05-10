@@ -29,20 +29,20 @@ const SyncSettings = () => {
   const [editStorageItemModalVisible, setShowEditStorageModalVisible] = React.useState(Boolean(localApiState.new));
   const [createStorageItemModalVisible, setShowCreateStorageModalVisible] = React.useState(false);
 
-  const handleEditClick = (provider) => {
+  const handleEditClick = React.useCallback((provider) => () => {
     track('Edit Credentials');
     dispatch.uiState.setLocalApiState(provider);
     setShowEditStorageModalVisible(true);
-  };
+  }, [dispatch.uiState]);
 
-  const handleProviderClick = (provider: StorageProviderType) => React.useCallback(() => {
+  const handleProviderClick = React.useCallback((provider: StorageProviderType) => () => {
     dispatch.uiState.setLocalApiState({
       name: '',
       secret: '',
       id: '',
       provider,
     });
-  }, [provider]);
+  }, [dispatch.uiState]);
 
   const selectedRemoteProvider = React.useMemo(() => [StorageProviderType.JSONBIN, StorageProviderType.GITHUB, StorageProviderType.GITLAB, StorageProviderType.ADO, StorageProviderType.URL].includes(
     localApiState?.provider as StorageProviderType,
@@ -128,48 +128,63 @@ const SyncSettings = () => {
     }
   };
 
+  const handleSubmitLocalStorage = React.useCallback(() => {
+    dispatch.uiState.setLocalApiState({ provider: StorageProviderType.LOCAL });
+    setStorageType({
+      provider: { provider: StorageProviderType.LOCAL },
+      shouldSetInDocument: true,
+    });
+    showConfirmModal(false);
+  }, [dispatch.uiState, setStorageType]);
+
+  const handleSetLocalStorage = React.useCallback(() => {
+    if (storageType?.provider === StorageProviderType.LOCAL) {
+      showConfirmModal(true);
+    }
+  }, [storageType?.provider]);
+
+  const handleHideStorageModal = React.useCallback(() => {
+    setShowEditStorageModalVisible(false);
+  }, []);
+
+  const handleHideAddCredentials = React.useCallback(() => {
+    track('Add Credentials', { provider: localApiState.provider });
+    setShowCreateStorageModalVisible(true);
+  }, [localApiState.provider]);
+
   return (
-    <Box css={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }} className="content">
+    <Box css={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
       {confirmModalVisible && (
         <ConfirmLocalStorageModal
           isOpen={confirmModalVisible}
           onClose={showConfirmModal}
-          onSuccess={() => {
-            dispatch.uiState.setLocalApiState({ provider: StorageProviderType.LOCAL });
-            setStorageType({
-              provider: { provider: StorageProviderType.LOCAL },
-              shouldSetInDocument: true,
-            });
-            showConfirmModal(false);
-          }}
+          onSuccess={handleSubmitLocalStorage}
         />
       )}
       {editStorageItemModalVisible && (
         <EditStorageItemModal
           isOpen={editStorageItemModalVisible}
-          onClose={() => setShowEditStorageModalVisible(false)}
+          onClose={handleHideStorageModal}
           initialValue={localApiState}
-          onSuccess={() => {
-            setShowEditStorageModalVisible(false);
-          }}
+          onSuccess={handleHideStorageModal}
         />
       )}
       {createStorageItemModalVisible && (
         <CreateStorageItemModal
           isOpen={createStorageItemModalVisible}
-          onClose={() => setShowCreateStorageModalVisible(false)}
-          onSuccess={() => setShowCreateStorageModalVisible(false)}
+          onClose={handleHideStorageModal}
+          onSuccess={handleHideStorageModal}
         />
       )}
-      <Box>
+      <Box css={{ padding: '0 $4' }}>
         <Stack gap={4} direction="column" align="start">
-          <Stack gap={4} direction="column">
-            <Heading>Token Storage</Heading>
+          <Stack gap={3} direction="column">
+            <Heading size="medium">Token Storage</Heading>
             <Stack direction="row" gap={2}>
               <ProviderSelector
                 isActive={localApiState?.provider === StorageProviderType.LOCAL}
                 isStored={storageType?.provider === StorageProviderType.LOCAL}
-                onClick={() => (storageType?.provider === StorageProviderType.LOCAL ? null : showConfirmModal(true))}
+                onClick={handleSetLocalStorage}
                 text="Local document"
                 id={StorageProviderType.LOCAL}
               />
@@ -216,10 +231,7 @@ const SyncSettings = () => {
             <Button
               id="button-add-new-credentials"
               variant="secondary"
-              onClick={() => {
-                track('Add Credentials', { provider: localApiState.provider });
-                setShowCreateStorageModalVisible(true);
-              }}
+              onClick={handleHideAddCredentials}
             >
               Add new credentials
             </Button>
@@ -228,8 +240,8 @@ const SyncSettings = () => {
               <Stack direction="column" gap={2} width="full" align="start">
                 {storedApiProviders().map((item) => (
                   <StorageItem
-                    key={item.internalId || `${item.provider}-${item.id}-${item.secret}`}
-                    onEdit={() => handleEditClick(item)}
+                    key={item?.internalId || `${item.provider}-${item.id}-${item.secret}`}
+                    onEdit={handleEditClick(item)}
                     item={item}
                   />
                 ))}
