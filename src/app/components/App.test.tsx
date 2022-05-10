@@ -9,7 +9,7 @@ describe('App', () => {
 
   it('shows loading screen', () => {
     const { getByText } = render(<App />);
-    const LoadingText = getByText('Loading. please wait');
+    const LoadingText = getByText('Loading, please wait.');
 
     expect(LoadingText).toBeInTheDocument();
   });
@@ -60,8 +60,8 @@ describe('App', () => {
                   {
                     name: 'size',
                     value: '11',
-                    type: 'sizing'
-                  }
+                    type: 'sizing',
+                  },
                 ],
               },
             },
