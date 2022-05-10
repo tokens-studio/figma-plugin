@@ -189,6 +189,20 @@ const tokenTypes = {
     },
     explainer: 'none | underline | line-through',
   },
+  composition: {
+    label: 'Composition',
+    property: 'Composition',
+    type: 'composition',
+    schema: {
+      value: {
+        property: '',
+        value: '',
+      },
+      options: {
+        description: '',
+      },
+    },
+  },
   other: {
     label: 'Other',
     property: 'other',
