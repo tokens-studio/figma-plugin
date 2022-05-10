@@ -15,6 +15,7 @@ import updateStyles from './updateStyles';
 import store from './store';
 import {
   notifyNoSelection,
+  notifyNoTokenValues,
   notifyTokenValues,
   notifyRemoteComponents,
   notifyStorageType,
@@ -96,9 +97,7 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
         }
 
         const licenseKey = await figma.clientStorage.getAsync('licenseKey');
-        if (licenseKey) {
-          notifyLicenseKey(licenseKey);
-        }
+        notifyLicenseKey(licenseKey);
 
         notifyLastOpened(lastOpened);
         notifyStorageType(storageType);
@@ -119,6 +118,8 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
             const oldTokens = getTokenData();
             if (oldTokens) {
               notifyTokenValues({ ...oldTokens, usedTokenSet });
+            } else {
+              notifyNoTokenValues();
             }
           }
         }

@@ -48,7 +48,16 @@ describe('TokenListing', () => {
     cy.receiveTokenValues({
       version: '5',
       values: {
-        options: [],
+        options: [{
+          name: 'sizing.xs',
+          value: 4,
+          type: 'sizing'
+        }],
+        global: [{
+          name: 'sizing.xs',
+          value: 4,
+          type: 'sizing'
+        }],
       },
     });
     cy.receiveStorageTypeLocal();
@@ -70,7 +79,16 @@ describe('TokenListing', () => {
     cy.receiveTokenValues({
       version: '5',
       values: {
-        options: [],
+        options: [{
+          name: 'sizing.xs',
+          value: 4,
+          type: 'sizing'
+        }],
+        global: [{
+          name: 'sizing.xs',
+          value: 4,
+          type: 'sizing'
+        }],
       },
     });
     cy.receiveStorageTypeLocal();
@@ -109,7 +127,16 @@ describe('TokenListing', () => {
     cy.receiveTokenValues({
       version: '5',
       values: {
-        options: [],
+        options: [{
+          name: 'sizing.xs',
+          value: 4,
+          type: 'sizing'
+        }],
+        global: [{
+          name: 'sizing.xs',
+          value: 4,
+          type: 'sizing'
+        }],
       },
     });
     cy.receiveStorageTypeLocal();
@@ -158,7 +185,16 @@ describe('TokenListing', () => {
     cy.receiveTokenValues({
       version: '5',
       values: {
-        options: [],
+        options: [{
+          name: 'sizing.xs',
+          value: 4,
+          type: 'sizing'
+        }],
+        global: [{
+          name: 'sizing.xs',
+          value: 4,
+          type: 'sizing'
+        }],
       },
     });
     cy.receiveStorageTypeLocal();
@@ -200,12 +236,16 @@ describe('TokenListing', () => {
     cy.receiveTokenValues({
       version: '5',
       values: {
-        options: [
-          {
-            name: 'sizing.xs',
-            value: 4,
-          },
-        ],
+        options: [{
+          name: 'sizing.xs',
+          value: 4,
+          type: 'sizing'
+        }],
+        global: [{
+          name: 'sizing.xs',
+          value: 4,
+          type: 'sizing'
+        }],
       },
     });
     cy.receiveStorageTypeLocal();
@@ -224,12 +264,16 @@ describe('TokenListing', () => {
     cy.receiveTokenValues({
       version: '5',
       values: {
-        options: [
-          {
-            name: 'sizing.xs',
-            value: 4,
-          },
-        ],
+        options: [{
+          name: 'sizing.xs',
+          value: 4,
+          type: 'sizing'
+        }],
+        global: [{
+          name: 'sizing.xs',
+          value: 4,
+          type: 'sizing'
+        }],
       },
     });
     cy.receiveStorageTypeLocal();

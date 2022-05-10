@@ -1,7 +1,6 @@
 import React from 'react';
-import Tokens from '@/app/components/Tokens';
-
 import { ComponentStory, ComponentMeta } from '@storybook/react';
+import Tokens from '@/app/components/Tokens';
 
 export default {
   title: 'Token',
@@ -10,9 +9,9 @@ export default {
   },
 } as ComponentMeta<typeof Tokens>;
 
-const Template: ComponentStory<typeof Tokens> = (args) => <Tokens { ...args } />;
+const Template: ComponentStory<typeof Tokens> = (args) => <Tokens {...args} />;
 
 export const Primary = Template.bind({});
 Primary.args = {
-  isActive : true,
-}
+  isActive: true,
+};

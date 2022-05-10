@@ -160,7 +160,7 @@ export default function BranchSelector() {
           <BranchSwitchMenuContent side="top" sideOffset={5}>
             <BranchSwitchMenuRadioGroup value={currentBranch}>
               {branchState.branches.length > 0
-              && branchState.branches.map((branch, index) => <BranchSwitchMenuRadioElement branch={branch} index={index} branchSelected={onBranchSelected} />)}
+              && branchState.branches.map((branch, index) => <BranchSwitchMenuRadioElement key={`radio_${seed(index)}`} branch={branch} branchSelected={onBranchSelected} />)}
             </BranchSwitchMenuRadioGroup>
             <BranchSwitchMenu>
               <BranchSwitchMenuTrigger>

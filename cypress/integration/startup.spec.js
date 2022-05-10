@@ -17,7 +17,16 @@ describe('Loads application', () => {
                   value: 4,
                 },
               ],
-            },
+              values: {
+                global: [
+                  {
+                    name: 'sizing.xs',
+                    value: 4,
+                    type: 'sizing'
+                  }
+                ],
+              },
+            }
           },
         },
       };
@@ -33,6 +42,12 @@ describe('Loads application', () => {
       const message = {
         pluginMessage: {
           type: 'tokenvalues',
+          values: {
+            values: {
+              global: [],
+            },
+          }
+
         },
       };
       $window.postMessage(message, '*');

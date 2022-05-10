@@ -1,31 +1,27 @@
 import React from 'react';
-import TokenGroupHeading from '@/app/components/TokenGroupHeading';
-import {Provider} from 'react-redux';
-import {store} from '@/app/store';
-
+import { Provider } from 'react-redux';
 import { ComponentStory, ComponentMeta } from '@storybook/react';
+import TokenGroupHeading from '@/app/components/TokenGroupHeading';
+import { store } from '@/app/store';
 
 export default {
   title: 'TokenGroupHeading',
   component: TokenGroupHeading,
   argTypes: {
   },
-  args:{
-    path: '333.333'
-  }
+  args: {
+    path: '333.333',
+  },
 } as ComponentMeta<typeof TokenGroupHeading>;
 
-const Template: ComponentStory<typeof TokenGroupHeading> = (args) => {
-  return (
-      <Provider store={store}>
-        <TokenGroupHeading {...args}>
-        </TokenGroupHeading>
-      </Provider>
-  )
-};
+const Template: ComponentStory<typeof TokenGroupHeading> = (args) => (
+  <Provider store={store}>
+    <TokenGroupHeading {...args} />
+  </Provider>
+);
 
 export const Primary = Template.bind({});
 Primary.args = {
   label: 'TokenGroup',
   path: '333',
-}
+};
