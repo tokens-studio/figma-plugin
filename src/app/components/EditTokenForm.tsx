@@ -18,7 +18,6 @@ import { EditTokenObject } from '../store/models/uiState';
 import TypographyInput from './TypographyInput';
 import Stack from './Stack';
 import DownshiftInput from './DownshiftInput';
-import { StyledIconDisclosure, StyledInputSuffix } from './StyledInputSuffix';
 import Button from './Button';
 
 type Props = {
@@ -92,9 +91,8 @@ function EditTokenForm({ resolvedTokens }: Props) {
   }, [inputHelperOpen]);
 
   const handleAutoSuggest = React.useCallback(() => {
-      setShowAutoSuggest(!showAutoSuggest);
-    }, [showAutoSuggest]
-  );
+    setShowAutoSuggest(!showAutoSuggest);
+  }, [showAutoSuggest]);
 
   const handleChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>(
     (e) => {
@@ -112,7 +110,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
     (shadow: SingleBoxShadowToken['value']) => {
       setError(null);
       if (internalEditToken?.type === TokenTypes.BOX_SHADOW) {
-        setInternalEditToken(prev => ({...prev, value: shadow} as typeof editToken));
+        setInternalEditToken((prev) => ({ ...prev, value: shadow } as typeof editToken));
       }
     },
     [internalEditToken],
