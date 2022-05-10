@@ -15,6 +15,7 @@ import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
 import { activeTokenSetSelector, editTokenSelector } from '@/selectors';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { EditTokenObject } from '../store/models/uiState';
+import { StyledIconDisclosure, StyledInputSuffix } from './StyledInputSuffix';
 import TypographyInput from './TypographyInput';
 import Stack from './Stack';
 import DownshiftInput from './DownshiftInput';
@@ -23,25 +24,6 @@ import Button from './Button';
 type Props = {
   resolvedTokens: ResolveTokenValuesResult[];
 };
-
-const StyledIconDisclosure = styled(IconDisclosure, {
-  width: '16px',
-  height: '16px',
-  transition: 'transform 0.2s ease-in-out',
-});
-
-const StyledInputSuffix = styled('button', {
-  width: '28px',
-  height: '28px',
-  backgroundColor: '$bgSubtle',
-  border: '1px solid',
-  borderColor: '$borderMuted',
-  borderTopRightRadius: '$input',
-  borderBottomRightRadius: '$input',
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-});
 
 // @TODO this needs to be reviewed from a typings perspective + performance
 function EditTokenForm({ resolvedTokens }: Props) {
