@@ -5,6 +5,23 @@ import { TransformerOptions } from './types';
 
 function getSimpleValue(resolvedValue: string | number, rawValue: string | number, options: TransformerOptions) {
   let value = resolvedValue;
+  /*
+   * ***************************************************************************
+   * TOKEN EXAMPLES WHEN USING --resolveReferences='math'
+   * ***************************************************************************
+   * {spacing.xs} * 2                 =>  MATH EXPRESSION       => RESOLVE
+   * {spacing.xs} * {spacing.scale}   =>  MATH EXPRESSION       => RESOLVE
+   *
+   * {spacing.xs}                     =>  SINGLE TOKEN          => DON'T RESOLVE
+   * {spacing.xs}rem                  =>  SINGLE TOKEN + UNIT   => DON'T RESOLVE
+   * {spacing.xs}{spacing.unit}       =>  MULTIPLE TOKENS       => DON'T RESOLVE
+   *
+   * rgba(255, 0, 0, {opacity.low})   =>  CSS FUNCTION          => DON'T RESOLVE
+   * calc({spacing.xl} * 2)           =>  CSS FUNCTION          => DON'T RESOLVE
+   * 20% {border-radius.smooth}       =>  CSS LIST VALUE        => DON'T RESOLVE
+   * ***************************************************************************
+   */
+
   if (typeof rawValue === 'string' && resolvedValue.toString() !== rawValue) {
     if (options.resolveReferences === false) {
       value = rawValue;
