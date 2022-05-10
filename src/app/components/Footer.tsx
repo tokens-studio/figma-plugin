@@ -1,8 +1,8 @@
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { DownloadIcon, UploadIcon } from '@primer/octicons-react';
-import { Dispatch } from '../store';
 import { useFlags } from 'launchdarkly-react-client-sdk';
+import { Dispatch } from '../store';
 import * as pjs from '../../../package.json';
 import Box from './Box';
 import Text from './Text';
@@ -18,7 +18,6 @@ import {
   tokensSelector,
   usedTokenSetSelector,
   themesListSelector,
-  activeTabSelector,
 } from '@/selectors';
 import DocsIcon from '@/icons/docs.svg';
 import FeedbackIcon from '@/icons/feedback.svg';
@@ -34,7 +33,6 @@ export default function Footer() {
   const usedTokenSet = useSelector(usedTokenSetSelector);
   const dispatch = useDispatch<Dispatch>();
 
-  const activeTab = useSelector(activeTabSelector);
   const { gitBranchSelector } = useFlags();
   const { pullTokens, pushTokens } = useRemoteTokens();
 
@@ -62,7 +60,7 @@ export default function Footer() {
   const onPushButtonClicked = React.useCallback(() => pushTokens(), [pushTokens]);
   const onPullButtonClicked = React.useCallback(() => pullTokens({ usedTokenSet }), [pullTokens, usedTokenSet]);
 
-  return activeTab !== 'loading' && activeTab !== 'start' ? (
+  return (
     <Box
       css={{
         display: 'flex',
@@ -110,5 +108,5 @@ export default function Footer() {
         </Text>
       </Stack>
     </Box>
-  ) : null;
+  );
 }

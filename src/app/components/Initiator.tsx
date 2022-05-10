@@ -84,17 +84,13 @@ export function Initiator() {
           case MessageFromPluginTypes.TOKEN_VALUES: {
             const { values } = pluginMessage;
             const existChanges = values.checkForChanges === 'true';
-            
-            if (existChanges && await askUserIfPull()) {
-                getApiCredentials(true);
+            if (!existChanges || (existChanges && await askUserIfPull())) {
+              getApiCredentials(true);
             } else {
               dispatch.tokenState.setTokenData(values);
               const existTokens = Object.values(values?.values ?? {}).some((value) => value.length > 0);
-              
-              if (existTokens) 
-                dispatch.uiState.setActiveTab(Tabs.TOKENS);
-              else
-                dispatch.uiState.setActiveTab(Tabs.START);
+
+              if (existTokens) { getApiCredentials(false); } else { dispatch.uiState.setActiveTab(Tabs.START); }
             }
             break;
           }
@@ -116,7 +112,7 @@ export function Initiator() {
             break;
           case MessageFromPluginTypes.API_CREDENTIALS: {
             const {
-              status, credentials, featureFlagId, usedTokenSet, shouldPull
+              status, credentials, featureFlagId, usedTokenSet, shouldPull,
             } = pluginMessage;
             if (status === true) {
               let receivedFlags;
@@ -144,11 +140,14 @@ export function Initiator() {
 
               dispatch.uiState.setApiData(credentials);
               dispatch.uiState.setLocalApiState(credentials);
+              if (shouldPull) {
+                const remoteData = await pullTokens({ context: credentials, featureFlags: receivedFlags, usedTokenSet });
+                const existTokens = Object.values(remoteData?.tokens ?? {}).some((value) => value.length > 0);
 
-              const remoteData = await pullTokens({ context: credentials, featureFlags: receivedFlags, usedTokenSet });
-              const existTokens = Object.values(remoteData?.tokens ?? {}).some((value) => value.length > 0);
-              if (existTokens) dispatch.uiState.setActiveTab(Tabs.TOKENS);
-              else dispatch.uiState.setActiveTab(Tabs.START);
+                if (existTokens) { dispatch.uiState.setActiveTab(Tabs.TOKENS); } else { dispatch.uiState.setActiveTab(Tabs.START); }
+              } else {
+                dispatch.uiState.setActiveTab(Tabs.TOKENS);
+              }
             }
             break;
           }

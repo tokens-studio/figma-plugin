@@ -80,7 +80,7 @@ function App() {
             {activeTab === 'inspector' && <Inspector />}
             {activeTab === 'settings' && <Settings />}
           </Box>
-            {activeTab !== 'start' && <Footer />}
+          {activeTab !== 'loading' && activeTab !== 'start' && <Footer />}
           <Changelog />
           <ImportedTokensDialog />
           <ConfirmDialog />
