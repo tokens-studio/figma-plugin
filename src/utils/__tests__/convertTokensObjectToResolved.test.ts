@@ -212,6 +212,17 @@ describe('convertTokensObjectToResolved', () => {
             type: 'color',
             value: '#ff0000',
           },
+          opaqueRed: {
+            description: 'Should be resolved',
+            type: 'color',
+            value: 'rgba(255, 0, 0, {opacity.medium})',
+          },
+        },
+        opacity: {
+          medium: {
+            type: 'opacity',
+            value: '0.5',
+          },
         },
         sizing: {
           base: {
@@ -240,6 +251,16 @@ describe('convertTokensObjectToResolved', () => {
           large: {
             description: 'Should be resolved',
             value: '$sizing.medium * $sizing.scale',
+            type: 'sizing',
+          },
+          responsive25: {
+            description: 'Should be resolved',
+            value: 'calc(25vw * $sizing.small)',
+            type: 'sizing',
+          },
+          responsive50: {
+            description: 'Should be resolved',
+            value: 'calc(50vw - {sizing.large}px)',
             type: 'sizing',
           },
         },
@@ -331,6 +352,17 @@ describe('convertTokensObjectToResolved', () => {
             type: 'color',
             value: '#ff0000',
           },
+          opaqueRed: {
+            description: 'Should NOT be resolved',
+            type: 'color',
+            value: 'rgba(255, 0, 0, {opacity.medium})',
+          },
+        },
+        opacity: {
+          medium: {
+            type: 'opacity',
+            value: '0.5',
+          },
         },
         sizing: {
           base: {
@@ -359,6 +391,16 @@ describe('convertTokensObjectToResolved', () => {
           large: {
             description: 'Should NOT be resolved',
             value: '$sizing.medium * $sizing.scale',
+            type: 'sizing',
+          },
+          responsive25: {
+            description: 'Should NOT be resolved',
+            value: 'calc(25vw * $sizing.small)',
+            type: 'sizing',
+          },
+          responsive50: {
+            description: 'Should NOT be resolved',
+            value: 'calc(50vw - {sizing.large}px)',
             type: 'sizing',
           },
         },
@@ -450,6 +492,17 @@ describe('convertTokensObjectToResolved', () => {
             type: 'color',
             value: '#ff0000',
           },
+          opaqueRed: {
+            description: 'Should NOT be resolved',
+            type: 'color',
+            value: 'rgba(255, 0, 0, {opacity.medium})',
+          },
+        },
+        opacity: {
+          medium: {
+            type: 'opacity',
+            value: '0.5',
+          },
         },
         sizing: {
           base: {
@@ -478,6 +531,16 @@ describe('convertTokensObjectToResolved', () => {
           large: {
             description: 'Should be resolved',
             value: '$sizing.medium * $sizing.scale',
+            type: 'sizing',
+          },
+          responsive25: {
+            description: 'Should NOT be resolved',
+            value: 'calc(25vw * $sizing.small)',
+            type: 'sizing',
+          },
+          responsive50: {
+            description: 'Should NOT be resolved',
+            value: 'calc(50vw - {sizing.large}px)',
             type: 'sizing',
           },
         },

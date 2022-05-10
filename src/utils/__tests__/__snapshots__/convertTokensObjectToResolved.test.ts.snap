@@ -140,6 +140,11 @@ Object {
       "type": "color",
       "value": "#0000ff",
     },
+    "opaqueRed": Object {
+      "description": "Should NOT be resolved",
+      "type": "color",
+      "value": "rgba(255, 0, 0, {opacity.medium})",
+    },
     "primary": Object {
       "description": "Should NOT be resolved",
       "type": "color",
@@ -148,6 +153,12 @@ Object {
     "red": Object {
       "type": "color",
       "value": "#ff0000",
+    },
+  },
+  "opacity": Object {
+    "medium": Object {
+      "type": "opacity",
+      "value": 0.5,
     },
   },
   "sizing": Object {
@@ -164,6 +175,16 @@ Object {
       "description": "Should NOT be resolved",
       "type": "sizing",
       "value": "{sizing.small} * {sizing.scale}",
+    },
+    "responsive25": Object {
+      "description": "Should NOT be resolved",
+      "type": "sizing",
+      "value": "calc(25vw * $sizing.small)",
+    },
+    "responsive50": Object {
+      "description": "Should NOT be resolved",
+      "type": "sizing",
+      "value": "calc(50vw - {sizing.large}px)",
     },
     "scale": Object {
       "type": "sizing",
@@ -272,6 +293,11 @@ Object {
       "type": "color",
       "value": "#0000ff",
     },
+    "opaqueRed": Object {
+      "description": "Should be resolved",
+      "type": "color",
+      "value": "#ff000080",
+    },
     "primary": Object {
       "description": "Should be resolved",
       "type": "color",
@@ -280,6 +306,12 @@ Object {
     "red": Object {
       "type": "color",
       "value": "#ff0000",
+    },
+  },
+  "opacity": Object {
+    "medium": Object {
+      "type": "opacity",
+      "value": 0.5,
     },
   },
   "sizing": Object {
@@ -296,6 +328,16 @@ Object {
       "description": "Should be resolved",
       "type": "sizing",
       "value": 3,
+    },
+    "responsive25": Object {
+      "description": "Should be resolved",
+      "type": "sizing",
+      "value": "calc(25vw * 2)",
+    },
+    "responsive50": Object {
+      "description": "Should be resolved",
+      "type": "sizing",
+      "value": "calc(50vw - 4.5px)",
     },
     "scale": Object {
       "type": "sizing",
@@ -382,6 +424,11 @@ Object {
       "type": "color",
       "value": "#0000ff",
     },
+    "opaqueRed": Object {
+      "description": "Should NOT be resolved",
+      "type": "color",
+      "value": "rgba(255, 0, 0, {opacity.medium})",
+    },
     "primary": Object {
       "description": "Should NOT be resolved",
       "type": "color",
@@ -390,6 +437,12 @@ Object {
     "red": Object {
       "type": "color",
       "value": "#ff0000",
+    },
+  },
+  "opacity": Object {
+    "medium": Object {
+      "type": "opacity",
+      "value": 0.5,
     },
   },
   "sizing": Object {
@@ -406,6 +459,16 @@ Object {
       "description": "Should be resolved",
       "type": "sizing",
       "value": 3,
+    },
+    "responsive25": Object {
+      "description": "Should NOT be resolved",
+      "type": "sizing",
+      "value": "calc(25vw * $sizing.small)",
+    },
+    "responsive50": Object {
+      "description": "Should NOT be resolved",
+      "type": "sizing",
+      "value": "calc(50vw - {sizing.large}px)",
     },
     "scale": Object {
       "type": "sizing",
