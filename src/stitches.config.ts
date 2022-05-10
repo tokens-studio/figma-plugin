@@ -78,7 +78,7 @@ export const {
       borderAccent: 'var(--figma-color-border-brand)',
       focus: 'var(--figma-color-bg-brand-tertiary)',
       borderSwitch: 'var(--figma-color-border)',
-      bgSwitchChecked: 'var(--figma-color-border)',
+      bgSwitchChecked: 'var(--figma-color-bg-brand)',
       borderBtnDisabled: 'var(--figma-color-border-disabled)',
       bgBtnPrimary: 'var(--figma-color-bg-brand)',
       fgBtnPrimary: 'var(--figma-color-text-onbrand)',
