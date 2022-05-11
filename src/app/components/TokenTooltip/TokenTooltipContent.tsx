@@ -16,11 +16,10 @@ export const TokenTooltipContent: React.FC<Props> = ({ token }) => {
   const tokenIsAlias = React.useMemo(() => (
     isAlias(token, tokensContext.resolvedTokens)
   ), [token, isAlias, tokensContext.resolvedTokens]);
-  const tokenIsShadowOrTypographyAlias = React.useMemo(
-    () => (
-      token.type === TokenTypes.TYPOGRAPHY || token.type === TokenTypes.BOX_SHADOW)
-    && typeof token.value === 'string',
-    [token, tokensContext.resolvedTokens],
+  const tokenIsShadowOrTypographyAlias = React.useMemo(() => (
+    token.type === TokenTypes.TYPOGRAPHY || token.type === TokenTypes.BOX_SHADOW) && 
+    typeof token.value === 'string'
+    , [token, tokensContext.resolvedTokens]
   );
 
   return (

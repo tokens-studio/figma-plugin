@@ -6,6 +6,14 @@ import { ContextObject } from '@/types/api';
 
 const apiVersion = 'api-version=6.0';
 
+enum ChangeType {
+  add = 'add',
+  edit = 'edit',
+}
+enum ContentType {
+  rawtext = 'rawtext',
+}
+
 interface FetchGit {
   body?: string
   gitResource: 'refs' | 'items' | 'pushes'
@@ -24,33 +32,32 @@ type PostPushesArgs = {
   oldObjectId?: string,
 };
 
-enum ChangeType {
-  add = 'add',
-  edit = 'edit',
-}
-
-enum ContentType {
-  rawtext = 'rawtext',
-}
+type PostRefsArgs = {
+  name: string
+  oldObjectId: string,
+  newObjectId: string,
+};
 
 export class ADOTokenStorage extends GitTokenStorage {
   protected orgUrl: string;
 
   protected projectId?: string;
 
+  protected source: string = 'main';
+
   constructor({
     baseUrl: orgUrl = '',
     secret,
     id: repositoryId,
-    branch = 'main',
-    filePath = '/',
     name: projectId,
   }: ContextObject) {
     super(secret, '', repositoryId, orgUrl);
     this.orgUrl = orgUrl;
     this.projectId = projectId;
-    super.selectBranch(branch);
-    super.changePath(filePath);
+  }
+
+  public setSource(source: string) {
+    this.source = source;
   }
 
   public async fetchGit({
@@ -95,12 +102,12 @@ export class ADOTokenStorage extends GitTokenStorage {
     return status === 200;
   }
 
-  private async getRefs(params:Record<string, string>): Promise<{ count: number, value: GitInterfaces.GitRef[] }> {
+  private async getRefs(filter: string = 'heads'): Promise<{ count: number, value: GitInterfaces.GitRef[] }> {
     try {
       const response = await this.fetchGit({
         gitResource: 'refs',
         orgUrl: this.orgUrl,
-        params,
+        params: { filter },
         projectId: this.projectId,
         repositoryId: this.repository,
         token: this.secret,
@@ -112,7 +119,7 @@ export class ADOTokenStorage extends GitTokenStorage {
     }
   }
 
-  private async postRefs(body: Record<string, string>) {
+  private async postRefs(body: PostRefsArgs) {
     try {
       const response = await this.fetchGit({
         gitResource: 'refs',
@@ -130,7 +137,7 @@ export class ADOTokenStorage extends GitTokenStorage {
   }
 
   public async fetchBranches() {
-    const { value } = await this.getRefs({ filter: 'heads' });
+    const { value } = await this.getRefs();
     const branches = [];
     for (const val of value) {
       if (val.name) {
@@ -140,11 +147,11 @@ export class ADOTokenStorage extends GitTokenStorage {
     return branches;
   }
 
-  public async createBranch(branch: string, source: string): Promise<boolean> {
-    const { value } = await this.getRefs({ filter: `heads/${source}` });
+  public async createBranch(branch: string, source: string = this.branch): Promise<boolean> {
+    const { value } = await this.getRefs(`heads/${source}`);
     if (value[0].objectId) {
       const response = await this.postRefs({
-        name: `1refs/heads/${branch}`,
+        name: `refs/heads/${branch}`,
         oldObjectId: '0000000000000000000000000000000000000000',
         newObjectId: value[0].objectId,
       });
@@ -155,15 +162,14 @@ export class ADOTokenStorage extends GitTokenStorage {
   }
 
   private async getOldObjectId(branch:string, shouldCreateBranch: boolean) {
-    const { value } = await this.getRefs({ filter: 'heads' });
+    const { value } = await this.getRefs();
     const branches = new Map<string, GitInterfaces.GitRef>();
     for (const val of value) {
       if (val.name) {
         branches.set(val.name.replace(/^refs\/heads\//, ''), val);
       }
     }
-
-    return shouldCreateBranch ? branches.get(this.branch)?.objectId : branches.get(branch)?.objectId;
+    return shouldCreateBranch ? branches.get(this.source)?.objectId : branches.get(branch)?.objectId;
   }
 
   private itemsDefault(): Omit<FetchGit, 'body' | 'params'> {
@@ -201,8 +207,10 @@ export class ADOTokenStorage extends GitTokenStorage {
         params: {
           scopePath: this.path.replace(/[^/]+\.json$/, ''),
           recursionLevel: 'full',
-          'versionDescriptor.version': this.branch,
-          'versionDescriptor.versionType': 'branch',
+          ...(this.source && {
+            'versionDescriptor.version': this.source,
+            'versionDescriptor.versionType': 'branch',
+          }),
         },
       });
       return await response.json();
@@ -304,21 +312,23 @@ export class ADOTokenStorage extends GitTokenStorage {
   }
 
   public async writeChangeset(changeset: Record<string, string>, message: string, branch: string, shouldCreateBranch: boolean = false): Promise<boolean> {
-    console.log(branch);
-    const oldObjectId = await this.getOldObjectId(branch, shouldCreateBranch);
+    const oldObjectId = await this.getOldObjectId(this.source, shouldCreateBranch);
     const { value } = await this.getItems();
     const tokensOnRemote = value.map((val) => val.path);
     const changes = Object.entries(changeset)
-      .map(([path, content]) => ({
-        changeType: tokensOnRemote.includes(path.startsWith('/') ? path : `/${path}`) ? ChangeType.edit : ChangeType.add,
-        item: {
-          path: `/${path}`,
-        },
-        newContent: {
-          content,
-          contentType: ContentType.rawtext,
-        },
-      }));
+      .map(([path, content]) => {
+        const formattedPath = path.startsWith('/') ? path : `/${path}`;
+        return ({
+          changeType: tokensOnRemote.includes(formattedPath) ? ChangeType.edit : ChangeType.add,
+          item: {
+            path: formattedPath,
+          },
+          newContent: {
+            content,
+            contentType: ContentType.rawtext,
+          },
+        });
+      });
     const response = await this.postPushes({
       branch,
       changes,

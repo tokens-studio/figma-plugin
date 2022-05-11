@@ -38,7 +38,7 @@ export default function useRemoteTokens() {
     addNewGitLabCredentials, syncTokensWithGitLab, pullTokensFromGitLab, pushTokensToGitLab,
   } = useGitLab();
   const {
-    addNewADOCredentials, syncTokensWithADO, pullTokensFromADO, pushTokensToADO,
+    addNewADOCredentials, syncTokensWithADO, pullTokensFromADO, pushTokensToADO, createADOBranch, fetchADOBranches,
   } = useADO();
   const { pullTokensFromURL } = useURL();
 
@@ -219,21 +219,27 @@ export default function useRemoteTokens() {
         newBranchCreated = await createGithubBranch(context, branch, source);
         break;
       }
+      case StorageProviderType.ADO: {
+        newBranchCreated = await createADOBranch(context, branch, source);
+        break;
+      }
       default:
         throw new Error('Not implemented');
     }
 
     return newBranchCreated;
-  }, [createGithubBranch]);
+  }, [createGithubBranch, createADOBranch]);
 
   const fetchBranches = useCallback(async (context: ContextObject) => {
     switch (context.provider) {
       case StorageProviderType.GITHUB:
         return fetchGithubBranches(context);
+      case StorageProviderType.ADO:
+        return fetchADOBranches(context);
       default:
         return null;
     }
-  }, [fetchGithubBranches]);
+  }, [fetchGithubBranches, fetchADOBranches]);
 
   const deleteProvider = useCallback((provider) => {
     postToFigma({

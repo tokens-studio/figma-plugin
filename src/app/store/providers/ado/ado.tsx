@@ -43,6 +43,9 @@ export const useADO = () => {
 
   const pushTokensToADO = React.useCallback(async (context: ContextObject) => {
     const storage = storageClientFactory(context);
+    if (context.branch) {
+      storage.setSource(context.branch);
+    }
     const content = await storage.retrieve();
 
     if (
@@ -60,6 +63,7 @@ export const useADO = () => {
     if (pushSettings) {
       const { commitMessage, customBranch } = pushSettings;
       try {
+        if (customBranch) storage.selectBranch(customBranch);
         await storage.save({
           themes,
           tokens,
@@ -116,7 +120,6 @@ export const useADO = () => {
     try {
       const storage = storageClientFactory(context);
       const branches = await storage.fetchBranches();
-
       if (branches.length === 0) {
         return null;
       }

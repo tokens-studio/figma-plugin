@@ -54,9 +54,9 @@ const resolvedTypographyToken = {
     letterSpacing: 0,
     paragraphSpacing: 0,
     textCase: 'uppercase',
-    textDecoration: 'none',
-  },
-};
+    textDecoration: 'none',  
+  }
+}
 
 const unResolvedTypographyToken = {
   type: 'typography',
@@ -68,9 +68,9 @@ const unResolvedTypographyToken = {
     letterSpacing: 0,
     paragraphSpacing: 0,
     textCase: 'uppercase',
-    textDecoration: 'none',
-  },
-};
+    textDecoration: 'none',  
+  }
+}
 
 const unResolvedSingleShadowToken = {
   type: 'boxShadow',
@@ -115,6 +115,7 @@ const unResolvedMultipleShadowToken = {
     },
   ],
 };
+
 
 const tokens = [
   { name: 'foo', value: 3 },
@@ -233,23 +234,23 @@ const output = [
   {
     name: 'size.25',
     rawValue: '2px',
-    value: '2px',
+    value: '2px'
   },
   {
     ...resolvedTypographyToken,
     name: 'typography.resolved',
     value: {
       ...resolvedTypographyToken.value,
-      fontSize: '2px',
+      fontSize: '2px'
     },
-    rawValue: resolvedTypographyToken.value,
+    rawValue: resolvedTypographyToken.value
   },
   {
     ...unResolvedTypographyToken,
     failedToResolve: true,
     name: 'typography.unResolved',
     rawValue: unResolvedTypographyToken.value,
-    value: unResolvedTypographyToken.value,
+    value: unResolvedTypographyToken.value
   },
   {
     ...unResolvedSingleShadowToken,

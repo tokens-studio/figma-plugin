@@ -42,7 +42,6 @@ function Settings() {
             <Label htmlFor="ignoreFirstPartForStyles">Ignore first part of token name for styles</Label>
           </Stack>
         </Stack>
-        <SyncSettings />
       </Stack>
     </Box>
   );
