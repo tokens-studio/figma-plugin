@@ -17,6 +17,7 @@ import { AnyTokenList, AnyTokenSet, TokenStore } from '@/types/tokens';
 import { isSingleToken } from '@/utils/is';
 import { ThemeObjectsList } from '@/types';
 import { attemptOrFallback } from '@/utils/attemptOrFallback';
+import { TokenTypes } from '@/constants/TokenTypes';
 
 // @TODO fix typings
 
@@ -38,8 +39,24 @@ export function returnValueToLookFor(key: string) {
 // @TOOD fix object typing
 export function mapValuesToTokens(tokens: Map<string, AnyTokenList[number]>, values: NodeTokenRefMap): object {
   const mappedValues = Object.entries(values).reduce((acc, [key, tokenOnNode]) => {
-    const resolvedToken = tokens.get(tokenOnNode);
-    if (!resolvedToken) return acc;
+    let resolvedToken = tokens.get(tokenOnNode);
+    if ((
+      resolvedToken?.type === TokenTypes.BOX_SHADOW
+      || resolvedToken?.type === TokenTypes.TYPOGRAPHY
+    )
+      && typeof resolvedToken.value === 'string') {
+      let nameToLookFor: string = '';
+      const tokenValueString = String(resolvedToken.rawValue);
+
+      if (tokenValueString.charAt(0) === '$') { nameToLookFor = tokenValueString.slice(1, tokenValueString.length); }
+
+      if (tokenValueString.charAt(0) === '{') { nameToLookFor = tokenValueString.slice(1, tokenValueString.length - 1); }
+
+      resolvedToken = tokens.get(nameToLookFor);
+    }
+
+    if (!resolvedToken) { return acc; }
+
     acc[key] = isSingleToken(resolvedToken) ? resolvedToken[returnValueToLookFor(key)] : resolvedToken;
     return acc;
   }, {});
