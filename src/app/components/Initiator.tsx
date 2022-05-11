@@ -133,6 +133,8 @@ export function Initiator() {
               const existTokens = Object.values(remoteData?.tokens ?? {}).some((value) => value.length > 0);
               if (existTokens) dispatch.uiState.setActiveTab(Tabs.TOKENS);
               else dispatch.uiState.setActiveTab(Tabs.START);
+            } else {
+              dispatch.uiState.setActiveTab(Tabs.START);
             }
             break;
           }
