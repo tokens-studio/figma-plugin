@@ -1,5 +1,5 @@
 import { TokenTypes } from '@/constants/TokenTypes';
-import { TokenTypograpyValue } from '../values';
+import { TokenTypographyValue } from '../values';
 import { SingleGenericToken } from './SingleGenericToken';
 
-export type SingleTypographyToken<Named extends boolean = true, P = unknown> = SingleGenericToken<TokenTypes.TYPOGRAPHY, TokenTypograpyValue | string, Named, P>;
+export type SingleTypographyToken<Named extends boolean = true, P = unknown> = SingleGenericToken<TokenTypes.TYPOGRAPHY, TokenTypographyValue | string, Named, P>;
