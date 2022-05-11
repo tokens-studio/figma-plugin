@@ -71,7 +71,7 @@ const StyledDropdownMenuRadioGroup = styled(DropdownMenuPrimitive.RadioGroup, {}
 
 const StyledDropdownMenuRadioItem = styled(DropdownMenuPrimitive.RadioItem, itemStyles);
 
-const StyledDropdownMenuArrow = styled(DropdownMenuPrimitive.Arrow, { fill: 'black' });
+const StyledDropdownMenuArrow = styled(DropdownMenuPrimitive.Arrow, { fill: '$contextMenuBackground' });
 
 const StyledDropdownMenu = styled(DropdownMenuPrimitive.Root, {});
 

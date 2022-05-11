@@ -94,6 +94,7 @@ export const {
       bgSuccess: 'var(--figma-color-bg-success-tertiary)',
       fgDanger: 'var(--figma-color-text-danger)',
       bgDanger: 'var(--figma-color-bg-danger-tertiary)',
+      spinnerInverse: '#ffffff',
     },
     space: {
       1: '2px',
