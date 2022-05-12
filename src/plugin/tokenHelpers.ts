@@ -38,7 +38,7 @@ export function resolveTokenValues(tokens: SingleToken[], previousCount: number 
         returnValue = t.value.map((item) => (
           Object.entries(item).reduce<Record<string, ReturnType<typeof getAliasValue>>>((acc, [key, value]) => {
             acc[key] = getAliasValue(value, tokensInProgress);
-            let itemFailedToResolve = acc[key] === null || checkIfContainsAlias(acc[key]);
+            const itemFailedToResolve = acc[key] === null || checkIfContainsAlias(acc[key]);
             if (itemFailedToResolve) {
               failedToResolve = true;
             }
@@ -49,7 +49,7 @@ export function resolveTokenValues(tokens: SingleToken[], previousCount: number 
       } else {
         returnValue = Object.entries(t.value).reduce<Record<string, ReturnType<typeof getAliasValue>>>((acc, [key, value]) => {
           acc[key] = getAliasValue(value, tokensInProgress);
-          let itemFailedToResolve = acc[key] === null || checkIfContainsAlias(acc[key]);
+          const itemFailedToResolve = acc[key] === null || checkIfContainsAlias(acc[key]);
           if (itemFailedToResolve) {
             failedToResolve = true;
           }
