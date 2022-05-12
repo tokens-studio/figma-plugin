@@ -1,15 +1,16 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { styled } from '@/stitches.config';
 import IconVisibility from './icons/IconVisibiltyOn';
 import IconVisibilityOff from './icons/IconVisibilityOff';
 import Box from './Box';
 import Stack from './Stack';
 
-type Props = {
-  name: string;
+type Props = React.InputHTMLAttributes<HTMLInputElement> & {
+  name?: string;
   inputRef?: React.MutableRefObject<HTMLInputElement | null>;
   error?: string;
   required?: boolean;
+  autofocus?: boolean;
   tabindex?: number | null;
   label?: string | null;
   full?: boolean;
@@ -20,11 +21,12 @@ type Props = {
   placeholder?: string;
   capitalize?: boolean;
   prefix?: React.ReactNode;
+  suffix?: React.ReactNode;
   step?: string;
-  min?: number;
-  max?: number;
   isMasked?: boolean;
   onChange?: React.ChangeEventHandler<HTMLInputElement>;
+  disabled?: boolean;
+  size?: 'small' | 'large';
 };
 
 const StyledIcon = styled('div', {
@@ -40,7 +42,6 @@ const StyledIcon = styled('div', {
 
 const StyledInput = styled('input', {
   padding: '0 $3',
-  height: '28px',
   flexGrow: 1,
   width: '100%',
   backgroundColor: '$bgDefault',
@@ -54,10 +55,19 @@ const StyledInput = styled('input', {
   },
 
   variants: {
+    size: {
+      small: {
+        height: '28px',
+      },
+      large: {
+        height: '36px',
+      },
+    },
     hasSuffix: {
       true: {
         borderTopRightRadius: 0,
         borderBottomRightRadius: 0,
+        borderRight: 0,
       },
     },
     hasPrefix: {
@@ -106,8 +116,9 @@ const StyledPrefix = styled('div', {
   },
 });
 
-const Input: React.FC<Props> = ({
+const Input = React.forwardRef<Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'>, Props>(({
   name,
+  autofocus,
   error = '',
   required = false,
   tabindex = null,
@@ -118,27 +129,26 @@ const Input: React.FC<Props> = ({
   defaultValue,
   type,
   prefix,
-  min,
-  max,
+  suffix,
   step,
   custom = '',
   inputRef = null,
   placeholder = '',
   capitalize = false,
   isMasked = false,
-}) => {
+  size = 'small',
+  ...inputProps
+}, ref) => {
   // if isMasked is true, then we need to handle toggle visibility
   const [show, setShow] = React.useState(false);
 
-  // @TODO this causes new function refs on each render
-  // should be a useCallback
-  const handleVisibility = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleVisibility = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     setShow(!show);
     if (inputRef?.current?.type) {
       inputRef.current.type = inputRef?.current?.type === 'password' ? 'text' : 'password';
     }
-  };
+  }, [show, inputRef]);
 
   return (
     <label htmlFor={name} className="text-xxs font-medium block">
@@ -148,9 +158,10 @@ const Input: React.FC<Props> = ({
           {error ? <div className="text-red-500 font-bold">{error}</div> : null}
         </Stack>
       )}
-      <Box css={{ display: 'flex', position: 'relative', width: full ? '100%' : 0 }} className="input">
+      <Box css={{ display: 'flex', position: 'relative', width: full ? '100%' : '' }} className="input">
         {!!prefix && <StyledPrefix>{prefix}</StyledPrefix>}
         <StyledInput
+          ref={inputRef ?? ref}
           spellCheck={false}
           tabIndex={tabindex ?? undefined}
           type={type}
@@ -159,16 +170,16 @@ const Input: React.FC<Props> = ({
           name={name}
           onChange={onChange}
           required={required}
-          min={min}
-          max={max}
+          autoFocus={autofocus}
           step={step}
           data-custom={custom}
-          ref={inputRef}
           placeholder={placeholder}
           hasPrefix={!!prefix}
           hasSuffix={!!isMasked}
+          size={size}
+          {...inputProps}
         />
-
+        {!!suffix && <span>{suffix}</span>}
         {isMasked && (
           <StyledSuffix type="button" onClick={handleVisibility}>
             <StyledIcon>{show ? <IconVisibility /> : <IconVisibilityOff />}</StyledIcon>
@@ -177,6 +188,7 @@ const Input: React.FC<Props> = ({
       </Box>
     </label>
   );
-};
+});
 
 export default Input;
+export { StyledInput, StyledPrefix, StyledSuffix };

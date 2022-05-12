@@ -68,7 +68,7 @@ const StyledStack = styled('div', {
   },
 });
 
-type StackProps = {
+type StackProps = React.HTMLAttributes<HTMLDivElement> & {
   gap?: 0 | 1 | 2 | 3 | 4;
   direction: 'row' | 'column';
   align?: 'center' | 'start' | 'end';
@@ -80,10 +80,10 @@ type StackProps = {
 };
 
 export default function Stack({
-  gap, direction, align, justify, width, wrap, children, css,
+  gap, direction, align, justify, width, wrap, children, css, ...props
 }: StackProps) {
   return (
-    <StyledStack gap={gap} direction={direction} align={align} justify={justify} width={width} css={css} wrap={wrap}>
+    <StyledStack gap={gap} direction={direction} align={align} justify={justify} width={width} css={css} wrap={wrap} {...props}>
       {children}
     </StyledStack>
   );

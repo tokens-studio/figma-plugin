@@ -1,9 +1,7 @@
 import omit from 'just-omit';
 import store from './store';
 import setValuesOnNode from './setValuesOnNode';
-import { AnyTokenSet } from '../types/tokens';
 import { ContextObject, StorageProviderType, StorageType } from '../types/api';
-import * as pjs from '../../package.json';
 import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 import { NodeManagerNode } from './NodeManager';
 import { UpdateNodesSettings } from '@/types/UpdateNodesSettings';
@@ -15,9 +13,10 @@ import { BackgroundJobs } from '@/constants/BackgroundJobs';
 import { defaultWorker } from './Worker';
 import { getAllFigmaStyleMaps } from '@/utils/getAllFigmaStyleMaps';
 import { ProgressTracker } from './ProgressTracker';
-import { AnyTokenList, TokenStore } from '@/types/tokens';
+import { AnyTokenList, AnyTokenSet, TokenStore } from '@/types/tokens';
 import { isSingleToken } from '@/utils/is';
-import { UsedTokenSetsMap } from '@/types';
+import { ThemeObjectsList } from '@/types';
+import { attemptOrFallback } from '@/utils/attemptOrFallback';
 
 // @TODO fix typings
 
@@ -41,41 +40,48 @@ export function mapValuesToTokens(tokens: Map<string, AnyTokenList[number]>, val
   const mappedValues = Object.entries(values).reduce((acc, [key, tokenOnNode]) => {
     const resolvedToken = tokens.get(tokenOnNode);
     if (!resolvedToken) return acc;
+
     acc[key] = isSingleToken(resolvedToken) ? resolvedToken[returnValueToLookFor(key)] : resolvedToken;
     return acc;
   }, {});
   return mappedValues;
 }
 
-export function setTokensOnDocument(tokens: AnyTokenSet, updatedAt: string, usedTokenSet: UsedTokenSetsMap) {
-  tokensSharedDataHandler.set(figma.root, SharedPluginDataKeys.tokens.version, pjs.plugin_version);
-  tokensSharedDataHandler.set(figma.root, SharedPluginDataKeys.tokens.values, JSON.stringify(tokens));
-  tokensSharedDataHandler.set(figma.root, SharedPluginDataKeys.tokens.updatedAt, updatedAt);
-  tokensSharedDataHandler.set(figma.root, SharedPluginDataKeys.tokens.usedTokenSet, JSON.stringify(usedTokenSet));
-}
-
 export function getTokenData(): {
   values: TokenStore['values'];
+  themes: ThemeObjectsList
+  activeTheme: string | null
   updatedAt: string;
   version: string;
 } | null {
   try {
-    const values = tokensSharedDataHandler.get(figma.root, SharedPluginDataKeys.tokens.values);
+    const values = tokensSharedDataHandler.get(figma.root, SharedPluginDataKeys.tokens.values, (value) => (
+      attemptOrFallback<Record<string, AnyTokenSet>>(() => (value ? JSON.parse(value) : {}), {})
+    ));
+    const themes = tokensSharedDataHandler.get(figma.root, SharedPluginDataKeys.tokens.themes, (value) => (
+      attemptOrFallback<ThemeObjectsList>(() => {
+        const parsedValue = (value ? JSON.parse(value) : []);
+        return Array.isArray(parsedValue) ? parsedValue : [];
+      }, [])
+    ));
+    const activeTheme = tokensSharedDataHandler.get(figma.root, SharedPluginDataKeys.tokens.activeTheme, (value) => (
+      value || null
+    ));
     const version = tokensSharedDataHandler.get(figma.root, SharedPluginDataKeys.tokens.version);
     const updatedAt = tokensSharedDataHandler.get(figma.root, SharedPluginDataKeys.tokens.updatedAt);
-    if (values) {
-      const parsedValues = JSON.parse(values);
-      if (Object.keys(parsedValues).length > 0) {
-        const tokenObject = Object.entries(parsedValues).reduce((acc, [key, groupValues]) => {
-          acc[key] = typeof groupValues === 'string' ? JSON.parse(groupValues) : groupValues;
-          return acc;
-        }, {});
-        return {
-          values: tokenObject as TokenStore['values'],
-          updatedAt,
-          version,
-        };
-      }
+
+    if (Object.keys(values).length > 0) {
+      const tokenObject = Object.entries(values).reduce((acc, [key, groupValues]) => {
+        acc[key] = typeof groupValues === 'string' ? JSON.parse(groupValues) : groupValues;
+        return acc;
+      }, {});
+      return {
+        values: tokenObject as TokenStore['values'],
+        themes,
+        activeTheme,
+        updatedAt,
+        version,
+      };
     }
   } catch (e) {
     console.log('Error reading tokens', e);

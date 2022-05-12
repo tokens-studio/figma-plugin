@@ -6,7 +6,6 @@ import Button from './Button';
 import Callout from './Callout';
 import { StorageProviderType } from '../../types/api';
 import { Dispatch } from '../store';
-import Box from './Box';
 import { storageTypeSelector } from '@/selectors';
 import Stack from './Stack';
 
@@ -19,7 +18,7 @@ function StartScreen() {
     dispatch.tokenState.setEmptyTokens();
   };
   const onSetSyncClick = () => {
-    dispatch.uiState.setActiveTab('syncsettings');
+    dispatch.uiState.setActiveTab('settings');
     dispatch.tokenState.setEmptyTokens();
     dispatch.uiState.setLocalApiState({
       ...storageType,
@@ -29,7 +28,7 @@ function StartScreen() {
   };
 
   return (
-    <div className="h-auto p-4 my-auto">
+    <div className="h-auto p-4 my-auto content scroll-container">
       <Stack direction="column" gap={4}>
         <a href="https://jansix.at/resources/figma-tokens?ref=figma-tokens-plugin" target="_blank" rel="noreferrer">
           <img alt="Figma Tokens Splashscreen" src={require('../assets/tokens-intro.jpg')} className="rounded" />

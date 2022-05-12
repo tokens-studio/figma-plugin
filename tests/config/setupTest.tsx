@@ -15,7 +15,7 @@ const resetStore = () => {
   store.dispatch({ type: 'RESET_APP' });
 };
 
-const customRender = (ui: ReactElement, options?: Omit<RenderOptions, 'queries', 'providerProps'>) => render(ui, { wrapper: AllTheProviders, ...options });
+const customRender = (ui: ReactElement, options?: Omit<RenderOptions, 'queries' | 'providerProps'>) => render(ui, { wrapper: AllTheProviders, ...options });
 
 export * from '@testing-library/react';
 

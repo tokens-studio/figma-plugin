@@ -3,11 +3,28 @@ import Box from './Box';
 import Heading from './Heading';
 import Text from './Text';
 
-export default function Blankslate({ title, text }: { title: string; text: string }) {
+type BoxProps = React.ComponentProps<typeof Box>;
+type Props = BoxProps & {
+  css?: BoxProps['css']
+  title: string
+  text: string
+};
+
+export default function Blankslate({
+  title, text, css = {}, ...props
+}: Props) {
   return (
-    <Box css={{
-      display: 'flex', flexDirection: 'column', flexGrow: 1, gap: '$2', alignItems: 'center', justifyContent: 'center',
-    }}
+    <Box
+      css={{
+        ...css,
+        display: 'flex',
+        flexDirection: 'column',
+        flexGrow: 1,
+        gap: '$2',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+      {...props}
     >
       <Heading>{title}</Heading>
       <Text muted size="small">{text}</Text>
