@@ -6,24 +6,25 @@ import Stack from './Stack';
 import Text from './Text';
 import Box from './Box';
 import { isEqual } from '@/utils/isEqual';
+import { Direction } from '@/constants/Direction';
 
 export default function AnnotationBuilder() {
   const uiState = useSelector(uiStateSelector, isEqual);
 
   const createAnnotationLeft = React.useCallback(() => {
-    createAnnotation(uiState.mainNodeSelectionValues, 'left');
+    createAnnotation(uiState.mainNodeSelectionValues, Direction.LEFT);
   }, [uiState]);
 
   const createAnnotationTop = React.useCallback(() => {
-    createAnnotation(uiState.mainNodeSelectionValues, 'top');
+    createAnnotation(uiState.mainNodeSelectionValues, Direction.TOP);
   }, [uiState]);
 
   const createAnnotationBottom = React.useCallback(() => {
-    createAnnotation(uiState.mainNodeSelectionValues, 'bottom');
+    createAnnotation(uiState.mainNodeSelectionValues, Direction.BOTTOM);
   }, [uiState]);
 
   const createAnnotationRight = React.useCallback(() => {
-    createAnnotation(uiState.mainNodeSelectionValues, 'right');
+    createAnnotation(uiState.mainNodeSelectionValues, Direction.RIGHT);
   }, [uiState]);
 
   return Object.entries(uiState.mainNodeSelectionValues).length > 0 ? (

@@ -5,7 +5,6 @@ import {
   ApiDataType, ContextObject, StorageProviderType, StorageType,
 } from './api';
 import { NodeTokenRefMap } from './NodeTokenRefMap';
-import { UpdateMode } from './state';
 import { SelectionGroup } from './SelectionGroup';
 import { SelectionValue } from './SelectionValue';
 import { AnyTokenList, AnyTokenSet, TokenStore } from './tokens';
@@ -14,6 +13,8 @@ import { UsedTokenSetsMap } from './UsedTokenSetsMap';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { ThemeObjectsList } from './ThemeObjectsList';
 import { NodeInfo } from './NodeInfo';
+import { UpdateMode } from '@/constants/UpdateMode';
+import { Direction } from '@/constants/Direction';
 
 export enum MessageFromPluginTypes {
   SELECTION = 'selection',
@@ -245,8 +246,8 @@ export type CancelOperationToPluginMessage = {
 };
 export type CreateAnnotationToPluginMessage = {
   type: MessageToPluginTypes.CREATE_ANNOTATION;
-  tokens: object;
-  direction: string;
+  tokens: SelectionValue;
+  direction: Direction;
 };
 export type RemapTokensToPluginMessage = {
   type: MessageToPluginTypes.REMAP_TOKENS;
