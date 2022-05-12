@@ -11,7 +11,7 @@
     "watch-transform": "webpack --mode=development --watch --config webpack-transform.config.js",
     "build-js": "webpack --mode=production",
     "build": "yarn build-css && yarn build-js",
-    "build:cy": "cross-env LAUNCHDARKLY_ENABLED=false yarn build",
+    "build:cy": "cross-env LAUNCHDARKLY_FLAGS=tokenThemes,gitBranchSelector yarn build",
     "build:watch": "concurrently 'yarn watch-css' 'yarn watch-js'",
     "build-transform": "webpack --mode=production --config webpack-transform.config.js",
     "prettier:format": "prettier --write 'src/**/*.{js,jsx,ts,tsx,css,json}' ",
@@ -161,5 +161,15 @@
     "hooks": {
       "pre-commit": "lint-staged"
     }
+  },
+  "lint-staged": {
+    "src/**/*.{ts,tsx}": [
+      "eslint --fix",
+      "git add"
+    ],
+    "src/**/*.{js,jsx,css,json}": [
+      "prettier --write",
+      "git add"
+    ]
   }
 }
