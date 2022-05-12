@@ -10,18 +10,21 @@ type Props = {
 
 const StyledIndexItem = styled('div', {
   color: '$textSubtle',
-  marginBottom: '$4',
+  marginBottom: '$2',
 });
 
 const StyledValueItem = styled('div', {
-  marginBottom: '$4',
+  marginBottom: '$2',
 });
 
 export const ResolvedShadowValueDisplay: React.FC<Props> = ({ shadows }) => {
   const seed = useUIDSeed();
 
   return (
-    <Box css={{ display: 'flex', backgroundColor: '$bgSubtle', padding: '$4' }}>
+    <Box css={{
+      display: 'flex', backgroundColor: '$bgSubtle', padding: '$4', fontSize: '$xsmall',
+    }}
+    >
       <Box css={{ display: 'grid', marginRight: '$9' }}>
         {shadows.map((shadow, index) => (
           <StyledIndexItem key={seed(shadow)}>{index + 1}</StyledIndexItem>

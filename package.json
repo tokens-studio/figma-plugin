@@ -1,7 +1,7 @@
 {
   "name": "figma-tokens",
   "version": "1.0.0",
-  "plugin_version": "96",
+  "plugin_version": "97",
   "description": "Figma Tokens",
   "license": "MIT",
   "scripts": {
@@ -44,6 +44,7 @@
     "@welldone-software/why-did-you-render": "^6.2.3",
     "autoprefixer": "^10.2.5",
     "axios": "^0.21.2",
+    "azure-devops-node-api": "^11.1.1",
     "classnames": "^2.3.1",
     "color2k": "^1.2.4",
     "core-js": "^3.9.1",

@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { identify, track } from '@/utils/analytics';
 import { MessageFromPluginTypes, MessageToPluginTypes, PostToUIMessage } from '@/types/messages';
-import { postToFigma } from '../../plugin/notifiers';
+import { notifyToUI, postToFigma } from '../../plugin/notifiers';
 import useRemoteTokens from '../store/remoteTokens';
 import { Dispatch } from '../store';
 import useStorage from '../store/useStorage';
@@ -103,36 +103,44 @@ export function Initiator() {
               status, credentials, featureFlagId, usedTokenSet,
             } = pluginMessage;
             if (status === true) {
-              let receivedFlags;
+              try {
+                let receivedFlags;
 
-              if (featureFlagId) {
-                receivedFlags = await fetchFeatureFlags(featureFlagId);
-                if (receivedFlags) {
-                  dispatch.uiState.setFeatureFlags(receivedFlags);
-                  track('FeatureFlag', receivedFlags);
+                if (featureFlagId) {
+                  receivedFlags = await fetchFeatureFlags(featureFlagId);
+                  if (receivedFlags) {
+                    dispatch.uiState.setFeatureFlags(receivedFlags);
+                    track('FeatureFlag', receivedFlags);
+                  }
                 }
+
+                track('Fetched from remote', { provider: credentials.provider });
+                if (!credentials.internalId) track('missingInternalId', { provider: credentials.provider });
+
+                const {
+                  id, provider, secret, baseUrl,
+                } = credentials;
+                const [owner, repo] = id.split('/');
+                if (provider === StorageProviderType.GITHUB) {
+                  const storageClient = new GithubTokenStorage(secret, owner, repo, baseUrl);
+                  const branches = await storageClient.fetchBranches();
+                  dispatch.branchState.setBranches(branches);
+                }
+
+                dispatch.uiState.setApiData(credentials);
+                dispatch.uiState.setLocalApiState(credentials);
+
+                const remoteData = await pullTokens({ context: credentials, featureFlags: receivedFlags, usedTokenSet });
+                const existTokens = Object.values(remoteData?.tokens ?? {}).some((value) => value.length > 0);
+                if (existTokens) dispatch.uiState.setActiveTab(Tabs.TOKENS);
+                else dispatch.uiState.setActiveTab(Tabs.START);
+              } catch (e) {
+                console.error(e);
+                dispatch.uiState.setActiveTab(Tabs.START);
+                notifyToUI('Failed to fetch tokens, check your credentials', { error: true });
               }
-
-              track('Fetched from remote', { provider: credentials.provider });
-              if (!credentials.internalId) track('missingInternalId', { provider: credentials.provider });
-
-              const {
-                id, provider, secret, baseUrl,
-              } = credentials;
-              const [owner, repo] = id.split('/');
-              if (provider === StorageProviderType.GITHUB) {
-                const storageClient = new GithubTokenStorage(secret, owner, repo, baseUrl);
-                const branches = await storageClient.fetchBranches();
-                dispatch.branchState.setBranches(branches);
-              }
-
-              dispatch.uiState.setApiData(credentials);
-              dispatch.uiState.setLocalApiState(credentials);
-
-              const remoteData = await pullTokens({ context: credentials, featureFlags: receivedFlags, usedTokenSet });
-              const existTokens = Object.values(remoteData?.tokens ?? {}).some((value) => value.length > 0);
-              if (existTokens) dispatch.uiState.setActiveTab(Tabs.TOKENS);
-              else dispatch.uiState.setActiveTab(Tabs.START);
+            } else {
+              dispatch.uiState.setActiveTab(Tabs.START);
             }
             break;
           }
