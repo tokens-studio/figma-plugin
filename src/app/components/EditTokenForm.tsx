@@ -288,7 +288,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
       return null;
     }
     switch (internalEditToken.type) {
-      case 'boxShadow': {
+      case TokenTypes.BOX_SHADOW: {
         return (
           <BoxShadowInput
             handleBoxShadowChange={handleBoxShadowChange}
@@ -298,7 +298,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
           />
         );
       }
-      case 'typography': {
+      case TokenTypes.TYPOGRAPHY: {
         return (
           <TypographyInput
             handleTypographyChange={handleTypographyChange}
@@ -308,7 +308,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
           />
         );
       }
-      case 'composition': {
+      case TokenTypes.COMPOSITION: {
         return (
           <CompositionTokenForm
             internalEditToken={internalEditToken}

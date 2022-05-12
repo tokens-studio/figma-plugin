@@ -1,80 +1,18 @@
 import React, { useCallback, useMemo } from 'react';
 import Downshift from 'downshift';
-import { styled } from '@/stitches.config';
 import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
-
-import Box from './Box';
-import Stack from './Stack';
+import Box from '../Box';
+import Stack from '../Stack';
 import { SingleToken } from '@/types/tokens';
-import { StyledInput, StyledPrefix } from './Input';
-
-const StyledDropdown = styled('div', {
-  position: 'absolute',
-  zIndex: '10',
-  width: '100%',
-  maxHeight: '140px',
-  borderRadius: '$contextMenu',
-  overflowY: 'scroll',
-  backgroundColor: '$contextMenuBackground',
-  marginTop: '1px',
-  cursor: 'pointer',
-  boxShadow: '$contextMenu',
-});
-
-const StyledItemValue = styled('div', {
-  flexShrink: 0,
-  color: '$textMuted',
-  fontWeight: '$bold',
-  textAlign: 'right',
-  textTransform: 'uppercase',
-});
-
-const StyledItem = styled('div', {
-  display: 'flex',
-  alignItems: 'center',
-  gap: '$2',
-  padding: '$2 $3',
-  fontSize: '$xsmall',
-  variants: {
-    isFocused: {
-      true: {
-        backgroundColor: '$interaction',
-        color: '$onInteraction',
-        [`& ${StyledItemValue}`]: {
-          color: '$onInteraction',
-        },
-      },
-    },
-  },
-});
-
-const StyledItemColorDiv = styled('div', {
-  flexShrink: 0,
-});
-
-const StyledItemColor = styled('div', {
-  width: '16px',
-  height: '16px',
-  borderRadius: '$colorSwatch',
-  border: '1px solid',
-  borderColor: '$borderMuted',
-});
-
-const StyledItemName = styled('div', {
-  flexGrow: 1,
-  overflow: 'hidden',
-  textOverflow: 'ellipsis',
-});
-
-const StyledPart = styled('span', {
-  variants: {
-    matches: {
-      true: {
-        fontWeight: '$bold',
-      },
-    },
-  },
-});
+import { StyledPrefix } from '../Input';
+import { StyledItemColorDiv } from './StyledItemColorDiv';
+import { StyledItemColor } from './StyledItemColor';
+import { StyledItemName } from './StyledItemName';
+import { StyledItemValue } from './StyledItemValue';
+import { StyledDropdown } from './StyledDropdown';
+import { StyledItem } from './StyledItem';
+import { StyledPart } from './StyledPart';
+import { StyledDownshiftInput } from './StyledDownshiftInput';
 
 interface DownShiftProps {
   type: string;
@@ -91,7 +29,7 @@ interface DownShiftProps {
   handleChange?: React.ChangeEventHandler<HTMLInputElement>;
 }
 
-const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
+export const DownshiftInput: React.FC<DownShiftProps> = ({
   type,
   label,
   error,
@@ -152,15 +90,13 @@ const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
           </Stack>
           <Box css={{ display: 'flex', position: 'relative', width: '100%' }} className="input">
             {!!prefix && <StyledPrefix>{prefix}</StyledPrefix>}
-            <StyledInput
-              hasSuffix={!!suffix}
-              {...getInputProps({
-                label: type || null,
-                name: 'value',
-                placeholder,
-                value: value || '',
-                onChange: handleChange,
-              })}
+            <StyledDownshiftInput
+              suffix={suffix}
+              type={type}
+              placeholder={placeholder}
+              value={value}
+              onChange={handleChange}
+              getInputProps={getInputProps}
             />
             {!!suffix && suffix}
           </Box>
@@ -195,5 +131,3 @@ const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
     </Downshift>
   );
 };
-
-export default DownshiftInput;
