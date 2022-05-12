@@ -122,7 +122,7 @@ const SyncSettings = () => {
   }, [dispatch.uiState, setStorageType]);
 
   const handleSetLocalStorage = React.useCallback(() => {
-    if (storageType?.provider === StorageProviderType.LOCAL) {
+    if (storageType?.provider !== StorageProviderType.LOCAL) {
       showConfirmModal(true);
     }
   }, [storageType?.provider]);
@@ -132,6 +132,10 @@ const SyncSettings = () => {
   }, []);
 
   const handleHideAddCredentials = React.useCallback(() => {
+    setShowCreateStorageModalVisible(false);
+  }, []);
+
+  const handleShowAddCredentials = React.useCallback(() => {
     track('Add Credentials', { provider: localApiState.provider });
     setShowCreateStorageModalVisible(true);
   }, [localApiState.provider]);
@@ -156,8 +160,8 @@ const SyncSettings = () => {
       {createStorageItemModalVisible && (
         <CreateStorageItemModal
           isOpen={createStorageItemModalVisible}
-          onClose={handleHideStorageModal}
-          onSuccess={handleHideStorageModal}
+          onClose={handleHideAddCredentials}
+          onSuccess={handleHideAddCredentials}
         />
       )}
       <Box css={{ padding: '0 $4' }}>
@@ -208,7 +212,7 @@ const SyncSettings = () => {
             <Button
               id="button-add-new-credentials"
               variant="secondary"
-              onClick={handleHideAddCredentials}
+              onClick={handleShowAddCredentials}
             >
               Add new credentials
             </Button>
