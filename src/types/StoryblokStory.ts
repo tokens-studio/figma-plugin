@@ -1,3 +1,5 @@
+import { ChangelogItem } from './ChangelogItem';
+
 // @README https://www.storyblok.com/docs/api/content-delivery#core-resources/stories/stories
 export type StoryblokStory<P = unknown> = {
   id: number;
@@ -9,8 +11,7 @@ export type StoryblokStory<P = unknown> = {
   created_at: string;
   published_at: string;
   first_published_at: string;
-  content: {
+  content: ChangelogItem & {
     component: string;
-    // @TODO update to ChangelogItem
   } & P;
 };

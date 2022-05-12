@@ -10,11 +10,8 @@ export function checkIfAlias(token: SingleToken | string, allTokens: SingleToken
     let aliasToken = false;
     if (typeof token === 'string') {
       aliasToken = Boolean(token.match(AliasRegex));
-    } 
-    else if (token.type === TokenTypes.TYPOGRAPHY || token.type === TokenTypes.BOX_SHADOW) {
-      if (typeof token.value === 'string') 
-        aliasToken = Boolean(String(token.value).match(AliasRegex));
-      else {
+    } else if (token.type === TokenTypes.TYPOGRAPHY || token.type === TokenTypes.BOX_SHADOW) {
+      if (typeof token.value === 'string') { aliasToken = Boolean(String(token.value).match(AliasRegex)); } else {
         const arrayValue = Array.isArray(token.value) ? token.value : [token.value];
         aliasToken = arrayValue.some((value) => (
           Object.values(value).some((singleValue) => (
@@ -22,11 +19,7 @@ export function checkIfAlias(token: SingleToken | string, allTokens: SingleToken
           ))
         ));
       }
-    } 
-    else if (token.type === TokenTypes.COMPOSITION) 
-      return true;
-    else 
-      aliasToken = Boolean(token.value.toString().match(AliasRegex));
+    } else if (token.type === TokenTypes.COMPOSITION) { return true; } else { aliasToken = Boolean(token.value.toString().match(AliasRegex)); }
 
     // Check if alias is found
     if (aliasToken) {

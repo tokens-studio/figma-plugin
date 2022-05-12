@@ -125,23 +125,27 @@ export default function useManageTokens() {
   const renameGroup = useCallback(async (path: string, newName: string, type: string) => {
     const activeTokenSet = activeTokenSetSelector(store.getState());
     const oldName = path.split('.').pop() || '';
-    const newPath = path.slice(0, path.length-oldName.length);
-    
+    const newPath = path.slice(0, path.length - oldName.length);
+
     dispatch.uiState.startJob({ name: BackgroundJobs.UI_RENAMETOKENGROUP, isInfinite: true });
-    await renameTokenGroup({ parent: activeTokenSet, path: newPath, oldName: oldName, newName: newName, type: type});
+    await renameTokenGroup({
+      parent: activeTokenSet, path: newPath, oldName, newName, type,
+    });
     dispatch.uiState.completeJob(BackgroundJobs.UI_RENAMETOKENGROUP);
   }, [store, renameTokenGroup, dispatch.uiState]);
 
   const duplicateGroup = useCallback(async (path: string, type: string) => {
     const activeTokenSet = activeTokenSetSelector(store.getState());
     const oldName = path.split('.').pop() || '';
-    const newPath = path.slice(0, path.length-oldName.length);
+    const newPath = path.slice(0, path.length - oldName.length);
 
-    dispatch.uiState.startJob({ name: BackgroundJobs.UI_DUPLICATETOKENGROUP, isInfinite: true});
-    await duplicateTokenGroup({parent: activeTokenSet, path: newPath, oldName: oldName, type: type});
+    dispatch.uiState.startJob({ name: BackgroundJobs.UI_DUPLICATETOKENGROUP, isInfinite: true });
+    await duplicateTokenGroup({
+      parent: activeTokenSet, path: newPath, oldName, type,
+    });
     dispatch.uiState.completeJob(BackgroundJobs.UI_DUPLICATETOKENGROUP);
   }, [store, duplicateTokenGroup, dispatch.uiState]);
   return useMemo(() => ({
-    editSingleToken, createSingleToken, deleteSingleToken, deleteGroup, duplicateSingleToken, renameGroup, duplicateGroup
+    editSingleToken, createSingleToken, deleteSingleToken, deleteGroup, duplicateSingleToken, renameGroup, duplicateGroup,
   }), [editSingleToken, createSingleToken, deleteSingleToken, deleteGroup, duplicateSingleToken, renameGroup, duplicateGroup]);
 }

@@ -7,6 +7,9 @@ import URLForm from './StorageItemForm/URLForm';
 import { localApiStateSelector } from '@/selectors';
 
 // @TODO typings
+type Props = {
+  isNew?: boolean
+};
 
 export default function StorageItemForm({
   isNew = false, handleChange, handleSubmit, handleCancel, values, hasErrored,

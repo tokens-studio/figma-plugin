@@ -8,24 +8,27 @@ import { StorageProviderType } from '../../types/api';
 import { Dispatch } from '../store';
 import { storageTypeSelector } from '@/selectors';
 import Stack from './Stack';
+import { Tabs } from '@/constants/Tabs';
 
 function StartScreen() {
   const dispatch = useDispatch<Dispatch>();
 
   const storageType = useSelector(storageTypeSelector);
-  const onSetDefaultTokens = () => {
-    dispatch.uiState.setActiveTab('tokens');
+
+  const onSetDefaultTokens = React.useCallback(() => {
+    dispatch.uiState.setActiveTab(Tabs.TOKENS);
     dispatch.tokenState.setEmptyTokens();
-  };
-  const onSetSyncClick = () => {
-    dispatch.uiState.setActiveTab('settings');
+  }, [dispatch]);
+
+  const onSetSyncClick = React.useCallback(() => {
+    dispatch.uiState.setActiveTab(Tabs.TOKENS);
     dispatch.tokenState.setEmptyTokens();
     dispatch.uiState.setLocalApiState({
       ...storageType,
       secret: '',
       new: true,
     });
-  };
+  }, [dispatch, storageType]);
 
   return (
     <div className="h-auto p-4 my-auto content scroll-container">

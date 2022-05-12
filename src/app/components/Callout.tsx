@@ -11,9 +11,19 @@ const StyledButton = styled('button', {
   color: '$interaction',
 });
 
+type Props = {
+  id: string
+  heading: React.ReactNode
+  description: React.ReactNode
+  action: {
+    text: React.ReactNode
+    onClick: React.ComponentProps<typeof StyledButton>['onClick']
+  }
+};
+
 export default function Callout({
   heading, description, action, id,
-}) {
+}: Props) {
   return (
     <Box css={{ backgroundColor: '$bgSubtle', padding: '$4', borderRadius: '$default' }}>
       <Stack direction="row" gap={2}>

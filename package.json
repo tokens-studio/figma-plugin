@@ -159,5 +159,15 @@
     "hooks": {
       "pre-commit": "lint-staged"
     }
+  },
+  "lint-staged": {
+    "src/**/*.{ts,tsx}": [
+        "./eslint-non-blocking.sh",
+        "git add"
+    ],
+    "src/**/*.{js,jsx,css,json}": [
+        "prettier --write",
+        "git add"
+    ]
   }
 }

@@ -4,10 +4,18 @@ import Heading from '../Heading';
 import StorageItemForm from '../StorageItemForm';
 import useRemoteTokens from '../../store/remoteTokens';
 import Stack from '../Stack';
+import { ApiDataType } from '@/types/api';
+
+type Props = {
+  isOpen: boolean
+  initialValue: ApiDataType
+  onClose: () => void
+  onSuccess: () => void
+};
 
 export default function EditStorageItemModal({
   isOpen, initialValue, onClose, onSuccess,
-}) {
+}: Props) {
   const [formFields, setFormFields] = React.useState(initialValue);
   const [hasErrored, setHasErrored] = React.useState(false);
   const { addNewProviderItem } = useRemoteTokens();
@@ -27,13 +35,13 @@ export default function EditStorageItemModal({
   };
 
   return (
-    <Modal large id="modal-edit-storage-item" isOpen={isOpen} close={() => onClose(false)}>
+    <Modal large id="modal-edit-storage-item" isOpen={isOpen} close={onClose}>
       <Stack direction="column" gap={4}>
         <Heading>Edit storage item</Heading>
         <StorageItemForm
           handleChange={handleChange}
           handleSubmit={handleSubmit}
-          handleCancel={() => onClose(false)}
+          handleCancel={onClose}
           values={formFields}
           hasErrored={hasErrored}
         />

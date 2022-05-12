@@ -3,8 +3,8 @@ import { createModel } from '@rematch/core';
 import { postToFigma } from '@/plugin/notifiers';
 import { track } from '@/utils/analytics';
 import { MessageToPluginTypes } from '@/types/messages';
-import { UpdateMode } from '@/types/state';
 import { RootModel } from '@/types/RootModel';
+import { UpdateMode } from '@/constants/UpdateMode';
 
 type WindowSettingsType = {
   width: number;

@@ -1,5 +1,5 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useFlags } from 'launchdarkly-react-client-sdk';
@@ -19,7 +19,6 @@ import IconListing from '@/icons/listing.svg';
 import IconJSON from '@/icons/json.svg';
 import useConfirm from '../hooks/useConfirm';
 import { track } from '@/utils/analytics';
-import { UpdateMode } from '@/types/state';
 import useTokens from '../store/useTokens';
 import parseTokenValues from '@/utils/parseTokenValues';
 import parseJson from '@/utils/parseJson';
@@ -33,6 +32,7 @@ import { IconToggleableDisclosure } from './icons/IconToggleableDisclosure';
 import { styled } from '@/stitches.config';
 import { ManageThemesModal } from './ManageThemesModal';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
+import { UpdateMode } from '@/constants/UpdateMode';
 
 const StyledButton = styled('button', {
   '&:focus, &:hover': {

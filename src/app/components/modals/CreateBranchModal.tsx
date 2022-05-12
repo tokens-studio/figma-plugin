@@ -56,7 +56,7 @@ export default function CreateBranchModal({
 
     setHasErrored(false);
 
-    const response = await addNewBranch(localApiState, branch, startBranch);
+    const response = await addNewBranch(localApiState, branch, startBranch ?? undefined);
     const branches = await fetchBranches(localApiState);
 
     if (response) {

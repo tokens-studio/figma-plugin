@@ -95,7 +95,7 @@ export async function removePluginData({ nodes, key, shouldRemoveValues = true }
 }
 
 export async function updatePluginData({
-  entries, values, shouldOverride = false, shouldRemove = true, tokensMap
+  entries, values, shouldOverride = false, shouldRemove = true, tokensMap,
 }: { entries: readonly NodeManagerNode[], values: NodeTokenRefMap, shouldOverride?: boolean, shouldRemove?: boolean, tokensMap?: Map<string, AnyTokenList[number]> }) {
   const namespace = SharedPluginDataNamespaces.TOKENS;
   postToUI({
@@ -124,16 +124,15 @@ export async function updatePluginData({
           if (Array.isArray(resolvedToken.rawValue)) {
             removeProperties = resolvedToken?.rawValue.map((item) => (
               item.property
-            ));  
-          }
-          else {
+            ));
+          } else {
             removeProperties.push(resolvedToken?.rawValue.property);
           }
         }
         if (removeProperties && removeProperties.length > 0) {
           await Promise.all(removeProperties.map(async (property) => {
             await removePluginData({ nodes: [node], key: property as Properties, shouldRemoveValues: shouldRemove });
-          }));  
+          }));
         }
       }
 

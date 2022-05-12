@@ -22,9 +22,9 @@ export function resolveTokenValues(tokens: SingleToken[], previousCount: number 
   let returnedTokens: ResolveTokenValuesResult[] = tokens;
   returnedTokens = tokens.map((t, _, tokensInProgress) => {
     let returnValue:
-      Record<string, ReturnType<typeof getAliasValue>>[] |
-      Record<string, ReturnType<typeof getAliasValue>> |
-      ReturnType<typeof getAliasValue>;
+    Record<string, ReturnType<typeof getAliasValue>>[] |
+    Record<string, ReturnType<typeof getAliasValue>> |
+    ReturnType<typeof getAliasValue>;
 
     let failedToResolve = false;
     // Iterate over Typography and boxShadow Object to get resolved values
@@ -38,7 +38,7 @@ export function resolveTokenValues(tokens: SingleToken[], previousCount: number 
         returnValue = t.value.map((item) => (
           Object.entries(item).reduce<Record<string, ReturnType<typeof getAliasValue>>>((acc, [key, value]) => {
             acc[key] = getAliasValue(value, tokensInProgress);
-            let itemFailedToResolve = acc[key] === null || checkIfContainsAlias(acc[key]);
+            const itemFailedToResolve = acc[key] === null || checkIfContainsAlias(acc[key]);
             if (itemFailedToResolve) {
               failedToResolve = true;
             }
@@ -49,30 +49,26 @@ export function resolveTokenValues(tokens: SingleToken[], previousCount: number 
       } else {
         returnValue = Object.entries(t.value).reduce<Record<string, ReturnType<typeof getAliasValue>>>((acc, [key, value]) => {
           acc[key] = getAliasValue(value, tokensInProgress);
-          let itemFailedToResolve = acc[key] === null || checkIfContainsAlias(acc[key]);
+          const itemFailedToResolve = acc[key] === null || checkIfContainsAlias(acc[key]);
           if (itemFailedToResolve) {
             failedToResolve = true;
           }
           return acc;
         }, {});
       }
-    }
-    else if (t.type === TokenTypes.COMPOSITION) {
+    } else if (t.type === TokenTypes.COMPOSITION) {
       if (Array.isArray(t.value)) {
-        returnValue = t.value.map((item) => {
-          return {
-            property: item.property,
-            value: getAliasValue(item.value, tokensInProgress)
-          }
-        });
+        returnValue = t.value.map((item) => ({
+          property: item.property,
+          value: getAliasValue(item.value, tokensInProgress),
+        }));
       } else {
         returnValue = {
           property: t.value.property,
-          value: getAliasValue(t.value.value, tokensInProgress)
-        }
+          value: getAliasValue(t.value.value, tokensInProgress),
+        };
       }
-    }
-    else {
+    } else {
       // If we're not dealing with special tokens, just return resolved value
       returnValue = getAliasValue(t, tokensInProgress);
       failedToResolve = returnValue === null || checkIfContainsAlias(returnValue);

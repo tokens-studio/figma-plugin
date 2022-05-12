@@ -54,9 +54,9 @@ const resolvedTypographyToken = {
     letterSpacing: 0,
     paragraphSpacing: 0,
     textCase: 'uppercase',
-    textDecoration: 'none',  
-  }
-}
+    textDecoration: 'none',
+  },
+};
 
 const unResolvedTypographyToken = {
   type: 'typography',
@@ -68,9 +68,9 @@ const unResolvedTypographyToken = {
     letterSpacing: 0,
     paragraphSpacing: 0,
     textCase: 'uppercase',
-    textDecoration: 'none',  
-  }
-}
+    textDecoration: 'none',
+  },
+};
 
 const unResolvedSingleShadowToken = {
   type: 'boxShadow',
@@ -116,7 +116,6 @@ const unResolvedMultipleShadowToken = {
   ],
 };
 
-
 const tokens = [
   { name: 'foo', value: 3 },
   { name: 'bar', value: '{foo}' },
@@ -139,8 +138,8 @@ const tokens = [
     type: 'composition',
     value: {
       property: 'opacity',
-      value: '{opacity.40}'
-    }
+      value: '{opacity.40}',
+    },
   },
   {
     name: 'composition.multiple',
@@ -148,21 +147,21 @@ const tokens = [
     value: [
       {
         property: 'opacity',
-        value: '{opacity.40}'
+        value: '{opacity.40}',
       },
       {
         property: 'borderRadius',
-        value: '{border-radius.7}'
+        value: '{border-radius.7}',
       },
-    ]
+    ],
   },
   {
     name: 'composition.alias',
     type: 'composition',
     value: {
       property: 'fill',
-      value: '{colors.red.500}'
-    }
+      value: '{colors.red.500}',
+    },
   },
   { name: 'size.25', value: '2px' },
   { name: 'typography.resolved', ...resolvedTypographyToken },
@@ -278,12 +277,12 @@ const output = [
     type: 'composition',
     value: {
       property: 'opacity',
-      value: '40%'
+      value: '40%',
     },
     rawValue: {
       property: 'opacity',
-      value: '{opacity.40}'
-    }
+      value: '{opacity.40}',
+    },
   },
   {
     name: 'composition.multiple',
@@ -291,56 +290,56 @@ const output = [
     value: [
       {
         property: 'opacity',
-        value: '40%'
+        value: '40%',
       },
       {
         property: 'borderRadius',
-        value: '24px'
+        value: '24px',
       },
     ],
     rawValue: [
       {
         property: 'opacity',
-        value: '{opacity.40}'
+        value: '{opacity.40}',
       },
       {
         property: 'borderRadius',
-        value: '{border-radius.7}'
-      }
-    ]
+        value: '{border-radius.7}',
+      },
+    ],
   },
   {
     name: 'composition.alias',
     type: 'composition',
     value: {
       property: 'fill',
-      value: '#ff0000'
+      value: '#ff0000',
     },
     rawValue: {
       property: 'fill',
-      value: '{colors.red.500}'
-    }
+      value: '{colors.red.500}',
+    },
   },
   {
     name: 'size.25',
     rawValue: '2px',
-    value: '2px'
+    value: '2px',
   },
   {
     ...resolvedTypographyToken,
     name: 'typography.resolved',
     value: {
       ...resolvedTypographyToken.value,
-      fontSize: '2px'
+      fontSize: '2px',
     },
-    rawValue: resolvedTypographyToken.value
+    rawValue: resolvedTypographyToken.value,
   },
   {
     ...unResolvedTypographyToken,
     failedToResolve: true,
     name: 'typography.unResolved',
     rawValue: unResolvedTypographyToken.value,
-    value: unResolvedTypographyToken.value
+    value: unResolvedTypographyToken.value,
   },
   {
     ...unResolvedSingleShadowToken,

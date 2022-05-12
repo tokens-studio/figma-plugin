@@ -1,4 +1,3 @@
-import { UpdateMode } from '@/types/state';
 import { ApiDataType, StorageType } from '@/types/api';
 import {
   PostToFigmaMessage,
@@ -12,6 +11,7 @@ import store from './store';
 import { TokenStore } from '@/types/tokens';
 import { SelectionGroup } from '@/types/SelectionGroup';
 import { SelectionValue } from '@/types/SelectionValue';
+import { UpdateMode } from '@/constants/UpdateMode';
 
 export function postToFigma(props: PostToFigmaMessage) {
   parent.postMessage(
@@ -64,6 +64,7 @@ export function notifySelection({
 export type SavedSettings = {
   width: number;
   height: number;
+  showEmptyGroups: boolean
   updateMode: UpdateMode;
   updateRemote: boolean;
   updateOnChange: boolean;
@@ -79,11 +80,11 @@ export function notifyUISettings(
     updateMode,
     updateOnChange,
     updateStyles,
+    showEmptyGroups,
     ignoreFirstPartForStyles,
     updateRemote = true,
     inspectDeep,
   }: SavedSettings,
-  showEmptyGroups: boolean,
 ) {
   postToUI({
     type: MessageFromPluginTypes.UI_SETTINGS,

@@ -1,11 +1,12 @@
 import React, { useCallback } from 'react';
 import { styled } from '@/stitches.config';
+import type { StitchesCSS } from '@/types';
 import IconVisibility from './icons/IconVisibiltyOn';
 import IconVisibilityOff from './icons/IconVisibilityOff';
 import Box from './Box';
 import Stack from './Stack';
 
-type Props = React.InputHTMLAttributes<HTMLInputElement> & {
+type Props = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'> & {
   name?: string;
   inputRef?: React.MutableRefObject<HTMLInputElement | null>;
   error?: string;
@@ -27,6 +28,7 @@ type Props = React.InputHTMLAttributes<HTMLInputElement> & {
   onChange?: React.ChangeEventHandler<HTMLInputElement>;
   disabled?: boolean;
   size?: 'small' | 'large';
+  css?: StitchesCSS
 };
 
 const StyledIcon = styled('div', {
@@ -116,7 +118,7 @@ const StyledPrefix = styled('div', {
   },
 });
 
-const Input = React.forwardRef<Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'>, Props>(({
+const Input = React.forwardRef<HTMLInputElement, Props>(({
   name,
   autofocus,
   error = '',

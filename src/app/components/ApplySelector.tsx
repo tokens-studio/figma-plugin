@@ -11,11 +11,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuCheckboxItem,
 } from './DropdownMenu';
-import { UpdateMode } from '@/types/state';
 import { Dispatch } from '../store';
 import IconChevronDown from './icons/IconChevronDown';
 import { settingsStateSelector } from '@/selectors';
 import { isEqual } from '@/utils/isEqual';
+import { UpdateMode } from '@/constants/UpdateMode';
 
 export default function ApplySelector() {
   const {
@@ -26,29 +26,29 @@ export default function ApplySelector() {
     setUpdateMode, setUpdateOnChange, setUpdateRemote, setUpdateStyles,
   } = useDispatch<Dispatch>().settings;
 
-  const handleApplySelection = () => {
+  const handleApplySelection = React.useCallback(() => {
     setUpdateMode(UpdateMode.SELECTION);
-  };
+  }, [setUpdateMode]);
 
-  const handleApplyPage = () => {
+  const handleApplyPage = React.useCallback(() => {
     setUpdateMode(UpdateMode.PAGE);
-  };
+  }, [setUpdateMode]);
 
-  const handleApplyDocument = () => {
+  const handleApplyDocument = React.useCallback(() => {
     setUpdateMode(UpdateMode.DOCUMENT);
-  };
+  }, [setUpdateMode]);
 
-  const handleUpdateOnChange = () => {
+  const handleUpdateOnChange = React.useCallback(() => {
     setUpdateOnChange(!updateOnChange);
-  };
+  }, [updateOnChange, setUpdateOnChange]);
 
-  const handleUpdateRemote = () => {
+  const handleUpdateRemote = React.useCallback(() => {
     setUpdateRemote(!updateRemote);
-  };
+  }, [updateRemote, setUpdateRemote]);
 
-  const handleUpdateStyles = () => {
+  const handleUpdateStyles = React.useCallback(() => {
     setUpdateStyles(!updateStyles);
-  };
+  }, [updateStyles, setUpdateStyles]);
 
   return (
     <DropdownMenu>

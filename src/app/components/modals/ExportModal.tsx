@@ -9,12 +9,32 @@ import Label from '../Label';
 import Box from '../Box';
 import Stack from '../Stack';
 
-export default function ExportModal({ onClose }) {
+type Props = {
+  onClose: () => void
+};
+
+export default function ExportModal({ onClose }: Props) {
   const { getFormattedTokens } = useTokens();
   const [includeAllTokens, setIncludeAllTokens] = React.useState(false);
   const [includeParent, setIncludeParent] = React.useState(true);
   const [expandTypography, setExpandTypography] = React.useState(false);
   const [expandShadow, setExpandShadow] = React.useState(false);
+
+  const handleToggleIncludeAllTokens = React.useCallback(() => {
+    setIncludeAllTokens(!includeAllTokens);
+  }, [includeAllTokens]);
+
+  const handleToggleIncludeParent = React.useCallback(() => {
+    setIncludeParent(!includeParent);
+  }, [includeParent]);
+
+  const handleToggleExpandTypograhy = React.useCallback(() => {
+    setExpandTypography(!expandTypography);
+  }, [expandTypography]);
+
+  const handleToggleExpandShadow = React.useCallback(() => {
+    setExpandShadow(!expandShadow);
+  }, [expandShadow]);
 
   return (
     <Modal large isOpen close={onClose}>
@@ -39,7 +59,7 @@ export default function ExportModal({ onClose }) {
               id="includeAllTokens"
               checked={includeAllTokens}
               defaultChecked={includeAllTokens}
-              onCheckedChange={() => setIncludeAllTokens(!includeAllTokens)}
+              onCheckedChange={handleToggleIncludeAllTokens}
             />
             <Label htmlFor="includeAllTokens">All token sets</Label>
           </Box>
@@ -49,7 +69,7 @@ export default function ExportModal({ onClose }) {
               id="includeParent"
               checked={includeParent}
               defaultChecked={includeParent}
-              onCheckedChange={() => setIncludeParent(!includeParent)}
+              onCheckedChange={handleToggleIncludeParent}
             />
             <Label disabled={includeAllTokens} htmlFor="includeParent">
               Include parent key
@@ -60,7 +80,7 @@ export default function ExportModal({ onClose }) {
               id="expandTypography"
               checked={expandTypography}
               defaultChecked={expandTypography}
-              onCheckedChange={() => setExpandTypography(!expandTypography)}
+              onCheckedChange={handleToggleExpandTypograhy}
             />
             <Label htmlFor="expandTypography">Expand Typography</Label>
           </Box>
@@ -69,7 +89,7 @@ export default function ExportModal({ onClose }) {
               id="expandShadow"
               checked={expandShadow}
               defaultChecked={expandShadow}
-              onCheckedChange={() => setExpandShadow(!expandShadow)}
+              onCheckedChange={handleToggleExpandShadow}
             />
             <Label htmlFor="expandShadow">Expand Shadows</Label>
           </Box>

@@ -139,7 +139,7 @@ export const uiState = createModel<RootModel>()({
       state,
       data: {
         text: string;
-        description?: string;
+        description?: React.ReactNode;
         choices: { key: string; label: string; enabled?: boolean; unique?: boolean }[];
         confirmAction?: string;
         cancelAction?: string;

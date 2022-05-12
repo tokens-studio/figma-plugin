@@ -6,39 +6,31 @@ import Modal from './Modal';
 import { changelogSelector } from '@/selectors';
 import Stack from './Stack';
 
-type ChangelogItem = {
-  _uid: string;
-  image?: {
-    alt: string;
-    filename: string;
-  };
-  title: string;
-  excerpt: string;
-  read_more_link?: string;
-  read_more_text?: string;
-};
-
 export default function Changelog() {
   const [changelogOpen, setChangelogOpen] = React.useState(true);
   const changelog = useSelector(changelogSelector);
 
   const [activeIndex, setIndex] = React.useState(0);
 
-  const handleNext = () => {
+  const handleNext = React.useCallback(() => {
     setIndex(activeIndex + 1);
-  };
+  }, [activeIndex]);
 
-  const handlePrev = () => {
+  const handlePrev = React.useCallback(() => {
     setIndex(activeIndex - 1);
-  };
+  }, [activeIndex]);
+
+  const handleClose = React.useCallback(() => {
+    setChangelogOpen(false);
+  }, []);
 
   return (
-    <Modal showClose isOpen={changelog.length > 0 && changelogOpen} close={() => setChangelogOpen(false)}>
+    <Modal showClose isOpen={changelog.length > 0 && changelogOpen} close={handleClose}>
       <Stack direction="column" gap={4}>
         <div>
-          {changelog.map((item: ChangelogItem, index) => (
-            // eslint-disable-next-line no-underscore-dangle
+          {changelog.map((item, index) => (
             <Stack
+              // eslint-disable-next-line no-underscore-dangle
               key={item._uid}
               direction="column"
               gap={2}
@@ -62,7 +54,7 @@ export default function Changelog() {
           ))}
         </div>
         <Stack direction="row" gap={2} justify="between">
-          <Button id="button-changelog-close" onClick={() => setChangelogOpen(false)} variant="secondary">
+          <Button id="button-changelog-close" onClick={handleClose} variant="secondary">
             Close
           </Button>
           <Stack direction="row" justify="between" gap={2}>

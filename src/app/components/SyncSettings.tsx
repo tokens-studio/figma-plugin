@@ -141,7 +141,7 @@ const SyncSettings = () => {
       {confirmModalVisible && (
         <ConfirmLocalStorageModal
           isOpen={confirmModalVisible}
-          onClose={showConfirmModal}
+          onToggle={showConfirmModal}
           onSuccess={handleSubmitLocalStorage}
         />
       )}

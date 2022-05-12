@@ -7,7 +7,6 @@ import { XYCoord } from 'dnd-core';
 import debounce from 'lodash.debounce';
 import { TokensIcon, LinkBreak2Icon } from '@radix-ui/react-icons';
 import { useUIDSeed } from 'react-uid';
-import { ShadowTokenSingleValue } from '@/types/propertyTypes';
 import { checkIfContainsAlias } from '@/utils/alias';
 import { findReferences } from '@/utils/findReferences';
 import IconMinus from '@/icons/minus.svg';
@@ -22,18 +21,29 @@ import Select from './Select';
 import Box from './Box';
 import Input from './Input';
 import ResolvedValueBox from './ResolvedValueBox';
+import { TokenBoxshadowValue } from '@/types/values';
+import { BoxShadowTypes } from '@/constants/BoxShadowTypes';
 
 // @TODO these types need to be fixed
 
+enum ItemTypes {
+  CARD = 'card',
+}
 interface DragItem {
   index: number;
   id: string;
   type: string;
 }
 
-enum ItemTypes {
-  CARD = 'card',
-}
+type Props = {
+  value: TokenBoxshadowValue | TokenBoxshadowValue[];
+  isMultiple?: boolean;
+  shadowItem: TokenBoxshadowValue;
+  index: number;
+  handleBoxShadowChange: (shadow: TokenBoxshadowValue | TokenBoxshadowValue[]) => void;
+  onRemove: (index: number) => void;
+  id: string;
+};
 
 function SingleShadowInput({
   value,
@@ -43,15 +53,7 @@ function SingleShadowInput({
   handleBoxShadowChange,
   onRemove,
   id,
-}: {
-  value: ShadowTokenSingleValue | ShadowTokenSingleValue[];
-  isMultiple?: boolean;
-  shadowItem: ShadowTokenSingleValue;
-  index: number;
-  handleBoxShadowChange: (shadow: ShadowTokenSingleValue | ShadowTokenSingleValue[]) => void;
-  onRemove: (index: number) => void;
-  id: string;
-}) {
+}: Props) {
   const onChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     if (Array.isArray(value)) {
       const values = value;
@@ -66,10 +68,12 @@ function SingleShadowInput({
 
   const onMoveDebounce = useCallback((dragIndex: number, hoverIndex: number) => {
     const values = value;
-    const dragItem = values[dragIndex];
-    values.splice(dragIndex, 1);
-    values.splice(hoverIndex, 0, dragItem);
-    onChange({ ...value, value: values });
+    if (Array.isArray(values)) {
+      const dragItem = values[dragIndex];
+      values.splice(dragIndex, 1);
+      values.splice(hoverIndex, 0, dragItem);
+      onChange({ ...value, value: values });
+    }
   }, [value, onChange]);
 
   const onMove = useCallback(debounce(onMoveDebounce, 300), [value, onChange]);
@@ -185,8 +189,8 @@ function SingleShadowInput({
   );
 }
 
-const newToken: ShadowTokenSingleValue = {
-  x: '0', y: '0', blur: '0', spread: '0', color: '#000000', type: 'dropShadow',
+const newToken: TokenBoxshadowValue = {
+  x: '0', y: '0', blur: '0', spread: '0', color: '#000000', type: BoxShadowTypes.DROP_SHADOW,
 };
 
 export default function BoxShadowInput({
@@ -195,8 +199,8 @@ export default function BoxShadowInput({
   resolvedTokens,
   internalEditToken,
 }: {
-  handleBoxShadowChange: (shadow: ShadowTokenSingleValue | ShadowTokenSingleValue[]) => void;
-  handleBoxShadowChangeByAlias: (shadow: ShadowTokenSingleValue | ShadowTokenSingleValue[]) => void;
+  handleBoxShadowChange: (shadow: TokenBoxshadowValue | TokenBoxshadowValue[]) => void;
+  handleBoxShadowChangeByAlias: (shadow: TokenBoxshadowValue | TokenBoxshadowValue[]) => void;
   resolvedTokens: ResolveTokenValuesResult[]
   internalEditToken: EditTokenObject;
 }) {
