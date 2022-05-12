@@ -7,7 +7,6 @@ import Stack from './Stack';
 import { SingleToken } from '@/types/tokens';
 import { StyledInput, StyledPrefix } from './Input';
 import { TokenTypes } from '@/constants/TokenTypes';
-import { TokenBoxshadowValue } from '@/types/values';
 
 const StyledDropdown = styled('div', {
   position: 'absolute',
@@ -141,15 +140,15 @@ const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
     if (token.type === TokenTypes.TYPOGRAPHY || token.type === TokenTypes.BOX_SHADOW) {
       if (Array.isArray(token.value)) {
         returnValue = token.value.reduce<string>((totalAcc, item) => {
-          const singleReturnValue = Object.entries(item).reduce<string>((acc, [key, value]) => {
-            return acc += `${value.toString()}/`;
-          }, '');
-          return totalAcc += `${singleReturnValue},`
+          const singleReturnValue = Object.entries(item).reduce<string>((acc, [,propertyValue]) => (
+            `${acc}${propertyValue.toString()}/`
+          ), '');
+          return `${totalAcc}${singleReturnValue},`;
         }, '');
       } else {
-        returnValue = Object.entries(token.value).reduce<string>((acc, [key, value]) => {
-          return acc += `${value.toString()}/`;
-        }, '');
+        returnValue = Object.entries(token.value).reduce<string>((acc, [,propertyValue]) => (
+          `${acc}${propertyValue.toString()}/`
+        ), '');
       }
     } else {
       returnValue = token.value;

@@ -43,32 +43,29 @@ export default function InspectorTokenSingle({
       const tokenValueString = String(token.value);
       if (tokenValueString.charAt(0) === '$') nameToLookFor = tokenValueString.slice(1, tokenValueString.length);
       if (tokenValueString.charAt(0) === '{') nameToLookFor = tokenValueString.slice(1, tokenValueString.length - 1);
-      return getTokenValue(nameToLookFor, resolvedTokens);  
-    } 
+      return getTokenValue(nameToLookFor, resolvedTokens);
+    }
     return getTokenValue(token.value, resolvedTokens);
-  }, [token, resolvedTokens, getTokenValue, newTokenName]);
-
+  }, [token, resolvedTokens, getTokenValue]);
 
   React.useEffect(() => {
     setChecked(inspectState.selectedTokens.includes(`${token.category}-${token.value}`));
   }, [inspectState.selectedTokens, token]);
 
-  const handleChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>(
-    (e) => {
-      e.persist();
-      setNewTokenName(e.target.value);
-    }, [newTokenName]);
+  const handleChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>((e) => {
+    e.persist();
+    setNewTokenName(e.target.value);
+  }, []);
 
-  const handleColorValueChange = React.useCallback(
-    (color: string) => {
-      setNewTokenName(color);
-    }, [newTokenName]);
+  const handleColorValueChange = React.useCallback((color: string) => {
+    setNewTokenName(color);
+  }, []);
 
   const handleDownShiftInputChange = React.useCallback((newInputValue: string) => {
     if (newInputValue.charAt(0) === '$') setNewTokenName(newInputValue.slice(1, newInputValue.length));
     if (newInputValue.charAt(0) === '{') setNewTokenName(newInputValue.slice(1, newInputValue.length - 1));
     else setNewTokenName(newInputValue);
-  }, [newTokenName]);
+  }, []);
 
   const handleToggleInputHelper = React.useCallback(() => {
     setInputHelperOpen(!inputHelperOpen);
@@ -81,15 +78,19 @@ export default function InspectorTokenSingle({
   const onConfirm = React.useCallback(() => {
     handleRemap(token.category, token.value, newTokenName);
     setShowDialog(false);
-  }, [token, handleRemap, newTokenName, mappedToken]);
+  }, [token, handleRemap, newTokenName]);
 
   const handleClick = React.useCallback(() => {
     setShowDialog(true);
-  }, [showDialog]);
+  }, []);
 
   const onCancel = React.useCallback(() => {
     setShowDialog(false);
-  }, [showDialog]);
+  }, []);
+
+  const onCheckedChanged = React.useCallback(() => {
+    dispatch.inspectState.toggleSelectedTokens(`${token.category}-${token.value}`);
+  }, [token, dispatch.inspectState]);
 
   return (
     <Box
@@ -113,7 +114,7 @@ export default function InspectorTokenSingle({
         <Checkbox
           checked={isChecked}
           id={`${token.category}-${token.value}`}
-          onCheckedChange={() => dispatch.inspectState.toggleSelectedTokens(`${token.category}-${token.value}`)}
+          onCheckedChange={onCheckedChanged}
         />
         {(!!mappedToken) && (
           <InspectorResolvedToken token={mappedToken} />
@@ -142,7 +143,10 @@ export default function InspectorTokenSingle({
               >
                 <Stack direction="column" gap={4}>
                   <Stack direction="column" gap={2}>
-                    <Heading>Choose a new token for {mappedToken?.name || token.value}</Heading>
+                    <Heading>
+                      Choose a new token for
+                      {mappedToken?.name || token.value}
+                    </Heading>
                     <DownshiftInput
                       value={newTokenName}
                       type={Properties[token.category as keyof typeof Properties] === 'fill' ? 'color' : Properties[token.category as keyof typeof Properties]}
