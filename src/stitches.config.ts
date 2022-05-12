@@ -106,6 +106,7 @@ export const {
       7: '32px',
       8: '48px',
       9: '64px',
+      10: '38px',
     },
     sizes: {
       1: '2px',
@@ -116,6 +117,7 @@ export const {
       6: '24px',
       7: '32px',
       8: '48px',
+      10: '38px',
     },
     radii: {
       default: globalTokens.radii.sm,

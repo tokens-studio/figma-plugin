@@ -43,6 +43,9 @@ function transformName(name: string): TokenTypes {
       return TokenTypes.LETTER_SPACING;
     case 'paragraphSpacing':
       return TokenTypes.PARAGRAPH_SPACING;
+    case 'composition':
+      return TokenTypes.COMPOSITION;
+
     default:
       return TokenTypes.OTHER;
   }

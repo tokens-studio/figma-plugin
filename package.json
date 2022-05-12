@@ -43,6 +43,7 @@
     "@welldone-software/why-did-you-render": "^6.2.3",
     "autoprefixer": "^10.2.5",
     "axios": "^0.21.2",
+    "azure-devops-node-api": "^11.1.1",
     "classnames": "^2.3.1",
     "color2k": "^1.2.4",
     "core-js": "^3.9.1",
@@ -159,15 +160,5 @@
     "hooks": {
       "pre-commit": "lint-staged"
     }
-  },
-  "lint-staged": {
-    "src/**/*.{ts,tsx}": [
-      "eslint --fix",
-      "git add"
-    ],
-    "src/**/*.{js,jsx,css,json}": [
-      "prettier --write",
-      "git add"
-    ]
   }
 }

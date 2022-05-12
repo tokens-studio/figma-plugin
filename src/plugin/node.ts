@@ -2,6 +2,7 @@ import omit from 'just-omit';
 import store from './store';
 import setValuesOnNode from './setValuesOnNode';
 import { ContextObject, StorageProviderType, StorageType } from '../types/api';
+import { Properties } from '@/constants/Properties';
 import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 import { NodeManagerNode } from './NodeManager';
 import { UpdateNodesSettings } from '@/types/UpdateNodesSettings';
@@ -16,6 +17,7 @@ import { ProgressTracker } from './ProgressTracker';
 import { AnyTokenList, AnyTokenSet, TokenStore } from '@/types/tokens';
 import { isSingleToken } from '@/utils/is';
 import { ThemeObjectsList } from '@/types';
+import { TokenTypes } from '@/constants/TokenTypes';
 import { attemptOrFallback } from '@/utils/attemptOrFallback';
 
 // @TODO fix typings
@@ -40,8 +42,48 @@ export function mapValuesToTokens(tokens: Map<string, AnyTokenList[number]>, val
   const mappedValues = Object.entries(values).reduce((acc, [key, tokenOnNode]) => {
     const resolvedToken = tokens.get(tokenOnNode);
     if (!resolvedToken) return acc;
-
-    acc[key] = isSingleToken(resolvedToken) ? resolvedToken[returnValueToLookFor(key)] : resolvedToken;
+    if (isSingleToken(resolvedToken)) {
+      // typography or boxshadow property in composition token resovle alias
+      if (resolvedToken && resolvedToken.type === TokenTypes.COMPOSITION && resolvedToken.rawValue) {
+        const tokensInComposition: Array<Object> = [];
+        if (Array.isArray(resolvedToken.rawValue)) {
+          for (let index = 0; index < resolvedToken.rawValue.length; index++) {
+            const currentTokenWithRawValue = resolvedToken.rawValue[index];
+            if (currentTokenWithRawValue.property === TokenTypes.TYPOGRAPHY || currentTokenWithRawValue.property === TokenTypes.BOX_SHADOW) {
+              let strExcludedSymbol: string = '';
+              if (String(currentTokenWithRawValue.value).startsWith('$')) strExcludedSymbol = String(currentTokenWithRawValue.value).slice(1, String(currentTokenWithRawValue.value).length);
+              if (String(currentTokenWithRawValue.value).startsWith('{')) strExcludedSymbol = String(currentTokenWithRawValue.value).slice(1, String(currentTokenWithRawValue.value).length - 1);
+              tokensInComposition.push({
+                property: currentTokenWithRawValue.property,
+                value: tokens.get(strExcludedSymbol)?.value,
+              });
+            } else {
+              tokensInComposition.push({
+                property: currentTokenWithRawValue.property,
+                value: resolvedToken.value[index].value,
+              });
+            }
+          }
+        } else {
+          const currentTokenWithRawValue = resolvedToken.rawValue;
+          if (currentTokenWithRawValue.property === TokenTypes.TYPOGRAPHY || currentTokenWithRawValue.property === TokenTypes.BOX_SHADOW) {
+            let strExcludedSymbol: string = '';
+            if (String(currentTokenWithRawValue.value).startsWith('$')) strExcludedSymbol = String(currentTokenWithRawValue.value).slice(1, String(currentTokenWithRawValue.value).length);
+            if (String(currentTokenWithRawValue.value).startsWith('{')) strExcludedSymbol = String(currentTokenWithRawValue.value).slice(1, String(currentTokenWithRawValue.value).length - 1);
+            tokensInComposition.push({
+              property: currentTokenWithRawValue.property,
+              value: tokens.get(strExcludedSymbol)?.value,
+            });
+          } else {
+            tokensInComposition.push({
+              property: currentTokenWithRawValue.property,
+              value: resolvedToken.value.value,
+            });
+          }
+        }
+        acc[key] = tokensInComposition;
+      } else acc[key] = resolvedToken[returnValueToLookFor(key)];
+    } else acc[key] = resolvedToken;
     return acc;
   }, {});
   return mappedValues;
@@ -119,6 +161,45 @@ export function selectNodes(ids: string[]) {
   figma.currentPage.selection = nodes;
 }
 
+export function distructureCompositionToken(values: Partial<Record<Properties, string>>): Object {
+  const tokensInCompositionToken: NodeTokenRefMap = {};
+  if (values && values.composition) {
+    if (Array.isArray(values.composition)) {
+      values.composition.map((value) => {
+        tokensInCompositionToken[value.property] = value.value;
+      });
+    } else {
+      tokensInCompositionToken[values.composition.value.property] = values.composition.value.value;
+    }
+    const { composition, ...objExcludedCompositionToken } = values;
+    values = { ...tokensInCompositionToken, ...objExcludedCompositionToken };
+  }
+  return values;
+}
+
+export function distructureCompositionTokenForAlias(tokens: Map<string, AnyTokenList[number]>, values: NodeTokenRefMap): Object {
+  if (values && values.composition) {
+    const resolvedToken = tokens.get(values.composition);
+    const tokensInCompositionToken: NodeTokenRefMap = {};
+    if (resolvedToken?.rawValue && Array.isArray(resolvedToken?.rawValue)) {
+      resolvedToken?.rawValue.map((token) => {
+        let strExcludedSymbol: string = '';
+        if (String(token.value).startsWith('$')) strExcludedSymbol = String(token.value).slice(1, String(token.value).length);
+        if (String(token.value).startsWith('{')) strExcludedSymbol = String(token.value).slice(1, String(token.value).length - 1);
+        tokensInCompositionToken[token.property] = strExcludedSymbol;
+      });
+    } else if (resolvedToken?.rawValue) {
+      let strExcludedSymbol: string = '';
+      if (String(resolvedToken?.rawValue.value).startsWith('$')) strExcludedSymbol = String(resolvedToken?.rawValue.value).slice(1, String(resolvedToken?.rawValue.value).length);
+      if (String(resolvedToken?.rawValue.value).startsWith('{')) strExcludedSymbol = String(resolvedToken?.rawValue.value).slice(1, String(resolvedToken?.rawValue.value).length - 1);
+      tokensInCompositionToken[resolvedToken?.rawValue.property] = strExcludedSymbol;
+    }
+    const { composition, ...objExcludedCompositionToken } = values;
+    values = { ...tokensInCompositionToken, ...objExcludedCompositionToken };
+  }
+  return values;
+}
+
 export async function updateNodes(
   entries: readonly NodeManagerNode[],
   tokens: Map<string, AnyTokenList[number]>,
@@ -144,9 +225,10 @@ export async function updateNodes(
       defaultWorker.schedule(async () => {
         try {
           if (entry.tokens) {
-            const mappedValues = mapValuesToTokens(tokens, entry.tokens);
-
-            setValuesOnNode(entry.node, mappedValues, entry.tokens, figmaStyleMaps, ignoreFirstPartForStyles);
+            const mappedTokens = distructureCompositionTokenForAlias(tokens, entry.tokens);
+            let mappedValues = mapValuesToTokens(tokens, entry.tokens);
+            mappedValues = distructureCompositionToken(mappedValues);
+            setValuesOnNode(entry.node, mappedValues, mappedTokens, figmaStyleMaps, ignoreFirstPartForStyles);
             store.successfulNodes.add(entry.node);
             returnedValues.add(entry.tokens);
           }

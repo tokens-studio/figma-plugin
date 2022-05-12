@@ -4,6 +4,7 @@ import { SharedPluginDataNamespaces } from '@/constants/SharedPluginDataNamespac
 import { Properties } from '@/constants/Properties';
 import { MessageFromPluginTypes } from '@/types/messages';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
+import { AnyTokenList } from '@/types/tokens';
 import store from './store';
 import { notifySelection, postToUI } from './notifiers';
 import removeValuesFromNode from './removeValuesFromNode';
@@ -48,11 +49,9 @@ export async function sendPluginValues({ nodes, values, shouldSendSelectionValue
   let pluginValues = values;
   let mainNodeSelectionValues = [];
   let selectionValues;
-
   if (!pluginValues) {
     pluginValues = await defaultNodeManager.findNodesWithData({ nodes });
   }
-
   // TODO: Handle all selected nodes share the same properties
   // TODO: Handle many selected and mixed (for Tokens tab)
   if (pluginValues?.length > 0) {
@@ -96,10 +95,9 @@ export async function removePluginData({ nodes, key, shouldRemoveValues = true }
 }
 
 export async function updatePluginData({
-  entries, values, shouldOverride = false, shouldRemove = true,
-}: { entries: readonly NodeManagerNode[], values: NodeTokenRefMap, shouldOverride?: boolean, shouldRemove?: boolean }) {
+  entries, values, shouldOverride = false, shouldRemove = true, tokensMap
+}: { entries: readonly NodeManagerNode[], values: NodeTokenRefMap, shouldOverride?: boolean, shouldRemove?: boolean, tokensMap?: Map<string, AnyTokenList[number]> }) {
   const namespace = SharedPluginDataNamespaces.TOKENS;
-
   postToUI({
     type: MessageFromPluginTypes.START_JOB,
     job: {
@@ -115,7 +113,29 @@ export async function updatePluginData({
   entries.forEach(({ node, tokens }) => {
     promises.add(defaultWorker.schedule(async () => {
       const currentValuesOnNode = tokens ?? {};
-      const newValuesOnNode = { ...currentValuesOnNode, ...values };
+      let newValuesOnNode: NodeTokenRefMap = {};
+      if (values.composition === 'delete') newValuesOnNode = { ...values, ...currentValuesOnNode, composition: values.composition };
+      else newValuesOnNode = { ...currentValuesOnNode, ...values };
+      if (currentValuesOnNode.composition) {
+        // when select another composition token, reset applied properties by current composition token
+        const resolvedToken = tokensMap?.get(currentValuesOnNode.composition);
+        let removeProperties: String[] = [];
+        if (resolvedToken) {
+          if (Array.isArray(resolvedToken.rawValue)) {
+            removeProperties = resolvedToken?.rawValue.map((item) => (
+              item.property
+            ));  
+          }
+          else {
+            removeProperties.push(resolvedToken?.rawValue.property);
+          }
+        }
+        if (removeProperties && removeProperties.length > 0) {
+          await Promise.all(removeProperties.map(async (property) => {
+            await removePluginData({ nodes: [node], key: property as Properties, shouldRemoveValues: shouldRemove });
+          }));  
+        }
+      }
 
       await Promise.all(Object.entries(newValuesOnNode).map(async ([key, value]) => {
         if (value === currentValuesOnNode[key] && !shouldOverride) {
