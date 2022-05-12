@@ -108,6 +108,7 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
           case StorageProviderType.JSONBIN:
           case StorageProviderType.GITHUB:
           case StorageProviderType.GITLAB:
+          case StorageProviderType.ADO:
           case StorageProviderType.URL: {
             compareProvidersWithStored({
               providers: apiProviders, storageType, featureFlagId, usedTokenSet,

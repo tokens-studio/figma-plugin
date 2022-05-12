@@ -24,7 +24,8 @@ export default function CreateStorageItemModal({ isOpen, onClose, onSuccess }: P
   let defaultFields;
   switch (localApiState.provider) {
     case StorageProviderType.GITHUB:
-    case StorageProviderType.GITLAB: {
+    case StorageProviderType.GITLAB:
+    case StorageProviderType.ADO: {
       defaultFields = {
         secret: '',
         id: '',
