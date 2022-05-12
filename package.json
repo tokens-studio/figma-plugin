@@ -15,7 +15,7 @@
     "build:watch": "concurrently 'yarn watch-css' 'yarn watch-js'",
     "build-transform": "webpack --mode=production --config webpack-transform.config.js",
     "prettier:format": "prettier --write 'src/**/*.{js,jsx,ts,tsx,css,json}' ",
-    "test": "jest",
+    "test": "cross-env LAUNCHDARKLY_FLAGS=tokenThemes,gitBranchSelector jest",
     "svgr": "svgr -d src/icons/ assets/",
     "cy:open": "cypress open",
     "cy:run": "cypress run --headless",
