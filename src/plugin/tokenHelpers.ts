@@ -22,9 +22,9 @@ export function resolveTokenValues(tokens: SingleToken[], previousCount: number 
   let returnedTokens: ResolveTokenValuesResult[] = tokens;
   returnedTokens = tokens.map((t, _, tokensInProgress) => {
     let returnValue:
-      Record<string, ReturnType<typeof getAliasValue>>[] |
-      Record<string, ReturnType<typeof getAliasValue>> |
-      ReturnType<typeof getAliasValue>;
+    Record<string, ReturnType<typeof getAliasValue>>[] |
+    Record<string, ReturnType<typeof getAliasValue>> |
+    ReturnType<typeof getAliasValue>;
 
     let failedToResolve = false;
     // Iterate over Typography and boxShadow Object to get resolved values
