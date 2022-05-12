@@ -305,7 +305,7 @@ export const tokenState = createModel<RootModel>()({
           newTokens,
           updatedTokens,
         },
-      };
+      } as TokenState;
     },
     editToken: (state, data: UpdateTokenPayload) => {
       const nameToFind = data.oldName ? data.oldName : data.name;
@@ -348,62 +348,64 @@ export const tokenState = createModel<RootModel>()({
     },
 
     renameTokenGroup: (state, data: RenameTokenGroupPayload) => {
-      const { path, oldName, newName, type } = data;
+      const {
+        path, oldName, newName, type,
+      } = data;
 
       const tokenSetsList = Object.keys(state.usedTokenSet);
-      const newTokenGroupState = tokenSetsList.map(tokenSets => {
-        const newTokenGroups = state.tokens[tokenSets].map(token => {
-          if(token.name.startsWith(`${path}${oldName}.`) && token.type === type){
+      const newTokenGroupState = tokenSetsList.map((tokenSets) => {
+        const newTokenGroups = state.tokens[tokenSets].map((token) => {
+          if (token.name.startsWith(`${path}${oldName}.`) && token.type === type) {
             const { name, ...rest } = token;
             const newTokenName = name.replace(`${path}${oldName}`, `${path}${newName}`);
             return {
               ...rest,
               name: newTokenName,
-            };    
-          };
-          if(token.value.toString().startsWith(`{${path}${oldName}.`)){
+            };
+          }
+          if (token.value.toString().startsWith(`{${path}${oldName}.`)) {
             const { value, ...rest } = token;
             const updatedNewTokenValue = value.toString().replace(`${path}${oldName}`, `${path}${newName}`);
-            return{
+            return {
               ...rest,
               value: updatedNewTokenValue,
-            }; 
-          };
+            };
+          }
           return token;
         });
         return {
-          [tokenSets] :newTokenGroups,
-        }
+          [tokenSets]: newTokenGroups,
+        };
       });
 
       const newState = {
         ...state,
-        tokens: newTokenGroupState.reduce((acc, cur) => {
-          return { ...acc, ...cur };
-        }, {}),
+        tokens: newTokenGroupState.reduce((acc, cur) => ({ ...acc, ...cur }), {}),
       };
-      return newState;
+      return newState as TokenState;
     },
 
     duplicateTokenGroup: (state, data: DuplicateTokenGroupPayload) => {
-      const { parent, path, oldName, type } = data;
-      const selectedTokenGroup = state.tokens[parent].filter(token => (token.name.startsWith(`${path}${oldName}.`) && token.type === type));
-      const newTokenGroup = selectedTokenGroup.map(token => {
+      const {
+        parent, path, oldName, type,
+      } = data;
+      const selectedTokenGroup = state.tokens[parent].filter((token) => (token.name.startsWith(`${path}${oldName}.`) && token.type === type));
+      const newTokenGroup = selectedTokenGroup.map((token) => {
         const { name, ...rest } = token;
         const duplicatedTokenGroupName = token.name.replace(`${path}${oldName}`, `${path}${oldName}-copy`);
         return {
           name: duplicatedTokenGroupName,
           ...rest,
-        }
-      })
-      
+        };
+      });
+
       return {
         ...state,
-        tokens:{
+        tokens: {
           ...state.tokens,
           [parent]: [...state.tokens[parent], ...newTokenGroup],
-        }
-      }
+        },
+      };
     },
     updateAliases: (state, data: { oldName: string; newName: string }) => {
       const newTokens = Object.entries(state.tokens).reduce<TokenState['tokens']>(
