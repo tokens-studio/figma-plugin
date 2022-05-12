@@ -57,6 +57,8 @@ export default function Footer() {
         return 'GitHub';
       case StorageProviderType.GITLAB:
         return 'GitLab';
+      case StorageProviderType.ADO:
+        return 'ADO';
       case StorageProviderType.URL:
         return 'URL';
       default:
@@ -92,6 +94,7 @@ export default function Footer() {
         {storageType.provider !== StorageProviderType.LOCAL
         && storageType.provider !== StorageProviderType.GITHUB
         && storageType.provider !== StorageProviderType.GITLAB
+        && storageType.provider !== StorageProviderType.ADO
         && (
           <Stack align="center" direction="row" gap={2}>
             <Text muted>Sync</Text>
