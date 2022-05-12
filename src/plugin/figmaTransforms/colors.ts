@@ -1,6 +1,7 @@
 import { hexToFigmaRGB, webRGBToFigmaRGB } from '@figma-plugin/helpers';
 import { toHex } from 'color2k';
 
+type WebRGBA = [number, number, number, number];
 interface RGBA {
   r: number;
   g: number;
@@ -8,11 +9,11 @@ interface RGBA {
   a?: number;
 }
 
-export function RGBAToHexA(red, green, blue, alpha) {
-  const r = parseInt(red, 10);
-  const g = parseInt(green, 10);
-  const b = parseInt(blue, 10);
-  const a = parseFloat(alpha).toFixed(2);
+export function RGBAToHexA(red: number | string, green: number | string, blue: number | string, alpha: number | string) {
+  const r = parseInt(String(red), 10);
+  const g = parseInt(String(green), 10);
+  const b = parseInt(String(blue), 10);
+  const a = parseFloat(parseFloat(String(alpha)).toFixed(2));
 
   const outParts = [
     r.toString(16),
@@ -33,15 +34,11 @@ export function RGBAToHexA(red, green, blue, alpha) {
   return `#${outParts.join('')}`;
 }
 
-export function hslaToRgba(hslaValues) {
+export function hslaToRgba(hslaValues: number[]) {
   const h = hslaValues[0];
   let s = hslaValues[1];
   let l = hslaValues[2];
-  let a = 1;
-
-  if (hslaValues[3]) {
-    a = hslaValues[3];
-  }
+  const a = hslaValues?.[3] ?? 1;
 
   // Must be fractions of 1
   s /= 100;
@@ -86,22 +83,23 @@ export function hslaToRgba(hslaValues) {
   return [r, g, b, a];
 }
 
-function roundToTwo(num) {
+function roundToTwo(num: number) {
   return +`${Math.round(Number(`${num}e+2`))}e-2`;
 }
 
-export function convertToFigmaColor(input) {
+export function convertToFigmaColor(input: string) {
   let color;
   let opacity;
   if (input.startsWith('rgb')) {
-    const rgbValues = input.replace(/^rgba?\(|\s+|\)$/g, '').split(',');
+    const rgbValues = input.replace(/^rgba?\(|\s+|\)$/g, '').split(',').map(parseFloat) as WebRGBA;
+
     const {
       r, g, b, a = 1,
     } = webRGBToFigmaRGB(rgbValues);
     color = { r, g, b };
     opacity = Number(a);
   } else if (input.startsWith('hsl')) {
-    const hslValues = input.replace(/^hsla?\(|\s+|%|\)$/g, '').split(',');
+    const hslValues = input.replace(/^hsla?\(|\s+|%|\)$/g, '').split(',').map(parseFloat);
     const rgbValues: any = hslaToRgba(hslValues);
     const {
       r, g, b, a = 1,
