@@ -9,9 +9,11 @@ import { Dispatch } from '../../store';
 import BrokenReferenceIndicator from '../BrokenReferenceIndicator';
 import { waitForMessage } from '@/utils/waitForMessage';
 import { MessageFromPluginTypes } from '@/types/messages';
+import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
 import { TokenTooltip } from '../TokenTooltip';
 import { TokensContext } from '@/context';
+import { Properties } from '@/constants/Properties';
 import { SelectionValue } from '@/types';
 import { DocumentationProperties } from '@/constants/DocumentationProperties';
 import { useGetActiveState } from '@/hooks';
@@ -25,6 +27,7 @@ import { useSetNodeData } from '@/hooks/useSetNodeData';
 import { DragOverItem } from './DragOverItem';
 import { TokenButtonDraggable } from './TokenButtonDraggable';
 import type { ShowFormOptions } from '../TokenTree';
+import { TokenCompositionValue } from '@/types/values';
 
 // @TODO fix typings
 
@@ -115,7 +118,20 @@ export const TokenButton: React.FC<Props> = ({
       [propsToSet[0].name || propsToSet[0]]: propsToSet[0].forcedValue || value,
     };
     if (propsToSet[0].clear) propsToSet[0].clear.map((item) => Object.assign(newProps, { [item]: 'delete' }));
-    setPluginValue(newProps);
+    if (type === 'composition' && value === 'delete') {
+      // distructure composition token when it is unselected
+      const compositionToken = tokensContext.resolvedTokens.find((token) => token.name === tokenValue);
+      const tokensInCompositionToken: NodeTokenRefMap = {};
+      if (Array.isArray(compositionToken?.rawValue)) {
+        compositionToken?.rawValue.forEach((token) => {
+          tokensInCompositionToken[(token as TokenCompositionValue).property as keyof typeof Properties] = 'delete';
+        });
+      } else {
+        tokensInCompositionToken[(compositionToken?.rawValue as TokenCompositionValue).property as keyof typeof Properties] = 'delete';
+      }
+      tokensInCompositionToken.composition = 'delete';
+      setPluginValue(tokensInCompositionToken);
+    } else setPluginValue(newProps);
   }, [name, active, setPluginValue]);
 
   const handleTokenClick = React.useCallback(() => {

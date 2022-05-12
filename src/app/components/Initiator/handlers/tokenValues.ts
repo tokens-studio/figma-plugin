@@ -6,6 +6,8 @@ export function tokenValues(dispatch: Dispatch, message: TokenValuesFromPluginMe
   const { values } = message;
   if (values) {
     dispatch.tokenState.setTokenData(values);
-    dispatch.uiState.setActiveTab(Tabs.TOKENS);
+    const existTokens = Object.values(values?.values ?? {}).some((value) => value.length > 0);
+    if (existTokens) dispatch.uiState.setActiveTab(Tabs.TOKENS);
+    else dispatch.uiState.setActiveTab(Tabs.START);
   }
 }

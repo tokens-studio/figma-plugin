@@ -7,11 +7,12 @@ import { UpdateMode } from '@/types/state';
 import { Dispatch } from '../store';
 import useManageTokens from '../store/useManageTokens';
 import BoxShadowInput from './BoxShadowInput';
+import CompositionTokenForm from './CompositionTokenForm';
 import Input from './Input';
 import ColorPicker from './ColorPicker';
 import useConfirm from '../hooks/useConfirm';
 import useTokens from '../store/useTokens';
-import { SingleBoxShadowToken } from '@/types/tokens';
+import { SingleBoxShadowToken, SingleCompositionToken } from '@/types/tokens';
 import { checkIfContainsAlias, getAliasValue } from '@/utils/alias';
 import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
 import { activeTokenSetSelector, editTokenSelector } from '@/selectors';
@@ -35,7 +36,11 @@ const StyledIconDisclosure = styled(IconDisclosure, {
 const StyledInputSuffix = styled('button', {
   width: '28px',
   height: '28px',
-  backgroundColor: '#f0f0f0',
+  backgroundColor: '$bgSubtle',
+  border: '1px solid',
+  borderColor: '$borderMuted',
+  borderTopRightRadius: '$input',
+  borderBottomRightRadius: '$input',
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
@@ -115,6 +120,16 @@ function EditTokenForm({ resolvedTokens }: Props) {
     [internalEditToken],
   );
 
+  const handleCompositionChange = React.useCallback(
+    (style: SingleCompositionToken['value']) => {
+      setError(null);
+      if (internalEditToken?.type === TokenTypes.COMPOSITION) {
+        setInternalEditToken(prev => ({...prev, value: style} as EditTokenObject));
+      }
+    },
+    [internalEditToken],
+  );
+
   const handleBoxShadowChangeByAlias = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>(
     (e) => {
       setError(null);
@@ -187,13 +202,14 @@ function EditTokenForm({ resolvedTokens }: Props) {
       if (internalEditToken.initialName !== name && internalEditToken.initialName) {
         oldName = internalEditToken.initialName;
       }
+
       const newName = name
         .split('/')
         .map((n) => n.trim())
         .join('.');
+
       if (internalEditToken.isPristine) {
         track('Create token', { type: internalEditToken.type });
-
         createSingleToken({
           parent: activeTokenSet,
           name: newName,
@@ -226,6 +242,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
               { key: UpdateMode.DOCUMENT, label: 'Document', unique: true },
             ],
           });
+
           if (shouldRemap) {
             remapToken(oldName, newName, shouldRemap.data[0]);
           }
@@ -288,6 +305,14 @@ function EditTokenForm({ resolvedTokens }: Props) {
             handleTypographyChangeByAlias={handleTypographyChangeByAlias}
             internalEditToken={internalEditToken}
             resolvedTokens={resolvedTokens}
+          />
+        );
+      }
+      case 'composition': {
+        return (
+          <CompositionTokenForm
+            internalEditToken={internalEditToken}
+            setValue={handleCompositionChange}
           />
         );
       }

@@ -18,6 +18,7 @@ export enum TokenTypes {
   PARAGRAPH_SPACING = 'paragraphSpacing',
   TEXT_DECORATION = 'textDecoration',
   TEXT_CASE = 'textCase',
+  COMPOSITION = 'composition',
 
   // @deprecated ?
   BORDER = 'border',

@@ -3,4 +3,5 @@ export interface TransformerOptions {
   expandShadow: boolean;
   preserveRawValue: boolean;
   throwErrorWhenNotResolved?: boolean;
+  resolveReferences: boolean | 'math';
 }

@@ -1,0 +1,21 @@
+{
+  "theme": {
+    "background": {
+      "value": "{colors.gray.100}",
+      "description": "Alias value",
+      "type": "color"
+    },
+    "backgroundSubtle": {
+      "value": "rgba({colors.gray.100}, 0.5)",
+      "description": "Nested color value",
+      "type": "color"
+    },
+    "size": {
+      "default": {
+        "value": "{sizing.large}",
+        "description": "Sizing value",
+        "type": "sizing"
+      }
+    }
+  }
+}

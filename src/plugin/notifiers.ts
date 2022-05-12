@@ -121,6 +121,10 @@ export function notifyTokenValues(values: TokenStore) {
   postToUI({ type: MessageFromPluginTypes.TOKEN_VALUES, values });
 }
 
+export function notifyNoTokenValues() {
+  postToUI({ type: MessageFromPluginTypes.NO_TOKEN_VALUES });
+}
+
 export function notifyStorageType(storageType: StorageType) {
   postToUI({ type: MessageFromPluginTypes.RECEIVED_STORAGE_TYPE, storageType });
 }

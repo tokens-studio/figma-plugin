@@ -10,7 +10,7 @@ import compareProvidersWithStored from '../compareProviders';
 import { getUserId } from '../helpers';
 import { getSavedStorageType, getTokenData } from '../node';
 import {
-  notifyAPIProviders, notifyLastOpened, notifyLicenseKey, notifyNoSelection, notifyStorageType, notifyTokenValues, notifyUserId,
+  notifyAPIProviders, notifyLastOpened, notifyLicenseKey, notifyNoSelection, notifyNoTokenValues, notifyStorageType, notifyTokenValues, notifyUserId,
 } from '../notifiers';
 import { getActiveTheme } from '@/utils/getActiveTheme';
 
@@ -36,9 +36,7 @@ export const initiate: AsyncMessageChannelHandlers[AsyncMessageTypes.INITIATE] =
     notifyStorageType(storageType);
 
     const licenseKey = await figma.clientStorage.getAsync('licenseKey');
-    if (licenseKey) {
-      notifyLicenseKey(licenseKey);
-    }
+    notifyLicenseKey(licenseKey);
 
     // @TODO fix setting of activeTheme
     const apiProviders = await figma.clientStorage.getAsync('apiProviders');
@@ -47,6 +45,7 @@ export const initiate: AsyncMessageChannelHandlers[AsyncMessageTypes.INITIATE] =
       case StorageProviderType.JSONBIN:
       case StorageProviderType.GITHUB:
       case StorageProviderType.GITLAB:
+      case StorageProviderType.ADO:
       case StorageProviderType.URL: {
         compareProvidersWithStored({
           providers: apiProviders,
@@ -61,6 +60,8 @@ export const initiate: AsyncMessageChannelHandlers[AsyncMessageTypes.INITIATE] =
         const oldTokens = getTokenData();
         if (oldTokens) {
           notifyTokenValues({ ...oldTokens, activeTheme, usedTokenSet });
+        } else {
+          notifyNoTokenValues();
         }
       }
     }

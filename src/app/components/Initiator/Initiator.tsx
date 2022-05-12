@@ -1,5 +1,5 @@
-import React from 'react';
-import { useDispatch } from 'react-redux';
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import * as handlers from './handlers';
 import { identify, track } from '@/utils/analytics';
 import { MessageFromPluginTypes, PostToUIMessage } from '@/types/messages';
@@ -10,6 +10,12 @@ import * as pjs from '../../../../package.json';
 import { useFeatureFlags } from '../../hooks/useFeatureFlags';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
+import { Tabs } from '@/constants/Tabs';
+import { AddLicenseSource } from '@/app/store/models/userState';
+import getLicenseKey from '@/utils/getLicenseKey';
+import { licenseKeySelector } from '@/selectors/licenseKeySelector';
+import { checkedLocalStorageForKeySelector } from '@/selectors/checkedLocalStorageForKeySelector';
+import { userIdSelector } from '@/selectors/userIdSelector';
 
 export function Initiator() {
   const dispatch = useDispatch<Dispatch>();
@@ -17,6 +23,10 @@ export function Initiator() {
   const { pullTokens } = useRemoteTokens();
   const { fetchFeatureFlags } = useFeatureFlags();
   const { setStorageType } = useStorage();
+
+  const licenseKey = useSelector(licenseKeySelector);
+  const checkedLocalStorage = useSelector(checkedLocalStorageForKeySelector);
+  const userId = useSelector(userIdSelector);
 
   React.useEffect(() => {
     AsyncMessageChannel.message({ type: AsyncMessageTypes.INITIATE });
@@ -43,6 +53,10 @@ export function Initiator() {
             break;
           case MessageFromPluginTypes.TOKEN_VALUES: {
             handlers.tokenValues(dispatch, pluginMessage);
+            break;
+          }
+          case MessageFromPluginTypes.NO_TOKEN_VALUES: {
+            dispatch.uiState.setActiveTab(Tabs.START);
             break;
           }
           case MessageFromPluginTypes.STYLES: {
@@ -72,6 +86,8 @@ export function Initiator() {
             break;
           }
           case MessageFromPluginTypes.USER_ID: {
+            dispatch.userState.setUserId(pluginMessage.user.figmaId);
+            dispatch.userState.setUserName(pluginMessage.user.name);
             identify(pluginMessage.user);
             track('Launched', { version: pjs.plugin_version });
             break;
@@ -108,12 +124,32 @@ export function Initiator() {
             });
             break;
           }
+          case MessageFromPluginTypes.LICENSE_KEY: {
+            if (pluginMessage.licenseKey) {
+              dispatch.userState.addLicenseKey({ key: pluginMessage.licenseKey, source: AddLicenseSource.PLUGIN });
+            } else {
+              dispatch.userState.setCheckedLocalStorage(true);
+            }
+            break;
+          }
           default:
             break;
         }
       }
     };
   }, []);
+
+  useEffect(() => {
+    async function getLicense() {
+      const { key } = await getLicenseKey(userId);
+      if (key) {
+        dispatch.userState.addLicenseKey({ key, source: AddLicenseSource.INITAL_LOAD });
+      }
+    }
+    if (userId && checkedLocalStorage && !licenseKey) {
+      getLicense();
+    }
+  }, [userId, dispatch, checkedLocalStorage, licenseKey]);
 
   return null;
 }

@@ -112,13 +112,13 @@ export default async function setValuesOnNode(
         }
       } else if (
         values.fontFamilies
-              || values.fontWeights
-              || values.lineHeights
-              || values.fontSizes
-              || values.letterSpacing
-              || values.paragraphSpacing
-              || values.textCase
-              || values.textDecoration
+        || values.fontWeights
+        || values.lineHeights
+        || values.fontSizes
+        || values.letterSpacing
+        || values.paragraphSpacing
+        || values.textCase
+        || values.textDecoration
       ) {
         if (node.type === 'TEXT') {
           setTextValuesOnTarget(node, {

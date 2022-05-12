@@ -131,6 +131,38 @@ const tokens = [
   { name: 'spacing.xs', value: '{spacing.xs}' },
   { name: 'shadow.single', ...singleShadowToken },
   { name: 'shadow.multiple', ...multipleShadowToken },
+  { name: 'opacity.40', value: '40%' },
+  { name: 'border-radius.7', value: '24px' },
+  {
+    name: 'composition.single',
+    type: 'composition',
+    value: {
+      property: 'opacity',
+      value: '{opacity.40}'
+    }
+  },
+  {
+    name: 'composition.multiple',
+    type: 'composition',
+    value: [
+      {
+        property: 'opacity',
+        value: '{opacity.40}'
+      },
+      {
+        property: 'borderRadius',
+        value: '{border-radius.7}'
+      },
+    ]
+  },
+  {
+    name: 'composition.alias',
+    type: 'composition',
+    value: {
+      property: 'fill',
+      value: '{colors.red.500}'
+    }
+  },
   { name: 'size.25', value: '2px' },
   { name: 'typography.resolved', ...resolvedTypographyToken },
   { name: 'typography.unResolved', ...unResolvedTypographyToken },
@@ -229,6 +261,64 @@ const output = [
         color: '#000000',
       },
     ],
+  },
+  {
+    name: 'opacity.40',
+    rawValue: '40%',
+    value: '40%',
+  },
+  {
+    name: 'border-radius.7',
+    rawValue: '24px',
+    value: '24px',
+  },
+  {
+    name: 'composition.single',
+    type: 'composition',
+    value: {
+      property: 'opacity',
+      value: '40%'
+    },
+    rawValue: {
+      property: 'opacity',
+      value: '{opacity.40}'
+    }
+  },
+  {
+    name: 'composition.multiple',
+    type: 'composition',
+    value: [
+      {
+        property: 'opacity',
+        value: '40%'
+      },
+      {
+        property: 'borderRadius',
+        value: '24px'
+      },
+    ],
+    rawValue: [
+      {
+        property: 'opacity',
+        value: '{opacity.40}'
+      },
+      {
+        property: 'borderRadius',
+        value: '{border-radius.7}'
+      }
+    ]
+  },
+  {
+    name: 'composition.alias',
+    type: 'composition',
+    value: {
+      property: 'fill',
+      value: '#ff0000'
+    },
+    rawValue: {
+      property: 'fill',
+      value: '{colors.red.500}'
+    }
   },
   {
     name: 'size.25',
