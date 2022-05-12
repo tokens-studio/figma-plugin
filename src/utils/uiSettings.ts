@@ -1,4 +1,4 @@
-import { UpdateMode } from '@/types/state';
+import { UpdateMode } from '@/constants/UpdateMode';
 import { notifyUISettings, notifyUI, SavedSettings } from '@/plugin/notifiers';
 
 // update credentials

@@ -8,7 +8,6 @@ import getLastOpened from '@/utils/getLastOpened';
 import { DefaultWindowSize } from '@/constants/DefaultWindowSize';
 import { createAnnotation } from '@/utils/annotations';
 import { tokenArrayGroupToMap } from '@/utils/tokenArrayGroupToMap';
-import { UpdateMode } from '@/types/state';
 import { getUserId } from './helpers';
 import pullStyles from './pullStyles';
 import updateStyles from './updateStyles';
@@ -44,6 +43,7 @@ import { defaultWorker } from './Worker';
 import { getFeatureFlags } from '@/utils/featureFlags';
 import { getUsedTokenSet } from '@/utils/getUsedTokenSet';
 import { updateLocalTokensData } from '@/utils/figma';
+import { UpdateMode } from '@/constants/UpdateMode';
 
 let inspectDeep = false;
 let shouldSendSelectionValues = false;

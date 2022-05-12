@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { styled } from '@/stitches.config';
 import { track } from '@/utils/analytics';
 import IconDisclosure from '@/icons/disclosure.svg';
-import { UpdateMode } from '@/types/state';
 import { Dispatch } from '../store';
 import useManageTokens from '../store/useManageTokens';
 import BoxShadowInput from './BoxShadowInput';
@@ -22,6 +21,7 @@ import TypographyInput from './TypographyInput';
 import Stack from './Stack';
 import DownshiftInput from './DownshiftInput';
 import Button from './Button';
+import { UpdateMode } from '@/constants/UpdateMode';
 
 type Props = {
   resolvedTokens: ResolveTokenValuesResult[];

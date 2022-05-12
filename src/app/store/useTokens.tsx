@@ -9,7 +9,6 @@ import {
 import stringifyTokens from '@/utils/stringifyTokens';
 import formatTokens from '@/utils/formatTokens';
 import { mergeTokenGroups, resolveTokenValues } from '@/plugin/tokenHelpers';
-import { UpdateMode } from '@/types/state';
 import useConfirm from '../hooks/useConfirm';
 import { Properties } from '@/constants/Properties';
 import { track } from '@/utils/analytics';
@@ -23,6 +22,7 @@ import {
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { isEqual } from '@/utils/isEqual';
+import { UpdateMode } from '@/constants/UpdateMode';
 
 // @TODO fix typings
 
