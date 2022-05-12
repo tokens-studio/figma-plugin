@@ -1,7 +1,6 @@
 import React, { useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { DownloadIcon, UploadIcon } from '@primer/octicons-react';
-import { useFlags } from 'launchdarkly-react-client-sdk';
 import * as pjs from '../../../package.json';
 import Box from './Box';
 import Text from './Text';
@@ -24,6 +23,7 @@ import DocsIcon from '@/icons/docs.svg';
 import RefreshIcon from '@/icons/refresh.svg';
 import FeedbackIcon from '@/icons/feedback.svg';
 import IconButton from './IconButton';
+import { useFlags } from './LaunchDarkly';
 import Tooltip from './Tooltip';
 import Icon from './Icon';
 

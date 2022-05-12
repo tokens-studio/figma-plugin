@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { withLDProvider, useLDClient } from 'launchdarkly-react-client-sdk';
+import { useLDClient } from 'launchdarkly-react-client-sdk';
 import Settings from './Settings';
 import Inspector from './Inspector';
 import Tokens from './Tokens';
@@ -23,6 +23,7 @@ import { clientEmailSelector } from '@/selectors/getClientEmail';
 import { entitlementsSelector } from '@/selectors/getEntitlements';
 import { Entitlements } from '../store/models/userState';
 import LoadingBar from './LoadingBar';
+import { withLDProvider } from './LaunchDarkly';
 
 function App() {
   const activeTab = useSelector(activeTabSelector);
