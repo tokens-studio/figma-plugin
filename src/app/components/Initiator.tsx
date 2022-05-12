@@ -90,7 +90,8 @@ export function Initiator() {
               dispatch.tokenState.setTokenData(values);
               const existTokens = Object.values(values?.values ?? {}).some((value) => value.length > 0);
 
-              if (existTokens) { getApiCredentials(false); } else { dispatch.uiState.setActiveTab(Tabs.START); }
+              if (existTokens) getApiCredentials(false);
+              else dispatch.uiState.setActiveTab(Tabs.START);
             }
             break;
           }
