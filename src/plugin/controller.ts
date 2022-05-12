@@ -25,6 +25,7 @@ import {
   notifyLastOpened,
   postToUI,
   notifyLicenseKey,
+  notifySetTokens,
 } from './notifiers';
 import { sendPluginValues, updatePluginData, SelectionContent } from './pluginData';
 import {
@@ -141,9 +142,8 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
       try {
         if (figma.currentPage.selection.length) {
           const tokensMap = tokenArrayGroupToMap(msg.tokens);
-
           const nodes = await defaultNodeManager.update(figma.currentPage.selection);
-          await updatePluginData({ entries: nodes, values: msg.values });
+          await updatePluginData({ entries: nodes, values: msg.values, tokensMap });
           await sendPluginValues({
             nodes: figma.currentPage.selection,
             values: await updateNodes(nodes, tokensMap, msg.settings),
@@ -210,6 +210,7 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
         const allWithData = await defaultNodeManager.findNodesWithData({
           updateMode: msg.settings.updateMode,
         });
+
         await updateNodes(allWithData, tokensMap, msg.settings);
         await updatePluginData({ entries: allWithData, values: {} });
         notifyRemoteComponents({
@@ -341,7 +342,7 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
           default: {
             const oldTokens = getTokenData();
             if (oldTokens) {
-              notifyTokenValues({ ...oldTokens, usedTokenSet });
+              notifySetTokens({ ...oldTokens, usedTokenSet });
             }
           }
         }

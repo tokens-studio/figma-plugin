@@ -96,7 +96,6 @@ export default async function setValuesOnNode(
           const path = data.typography.split('.'); // extract to helper fn
           const pathname = path.slice(ignoreFirstPartForStyles ? 1 : 0, path.length).join('/');
           const matchingStyle = figmaStyleMaps.textStyles.get(pathname);
-
           if (matchingStyle) {
             node.textStyleId = matchingStyle.id;
           } else {
@@ -105,13 +104,13 @@ export default async function setValuesOnNode(
         }
       } else if (
         values.fontFamilies
-              || values.fontWeights
-              || values.lineHeights
-              || values.fontSizes
-              || values.letterSpacing
-              || values.paragraphSpacing
-              || values.textCase
-              || values.textDecoration
+        || values.fontWeights
+        || values.lineHeights
+        || values.fontSizes
+        || values.letterSpacing
+        || values.paragraphSpacing
+        || values.textCase
+        || values.textDecoration
       ) {
         if (node.type === 'TEXT') {
           setTextValuesOnTarget(node, {

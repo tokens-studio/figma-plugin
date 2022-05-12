@@ -10,6 +10,7 @@ import { Dispatch } from '../store';
 import useStorage from './useStorage';
 import { useGitHub } from './providers/github';
 import { useGitLab } from './providers/gitlab';
+import { useADO } from './providers/ado';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
 import { FeatureFlags } from '@/utils/featureFlags';
 import { apiSelector } from '@/selectors';
@@ -36,6 +37,9 @@ export default function useRemoteTokens() {
   const {
     addNewGitLabCredentials, syncTokensWithGitLab, pullTokensFromGitLab, pushTokensToGitLab,
   } = useGitLab();
+  const {
+    addNewADOCredentials, syncTokensWithADO, pullTokensFromADO, pushTokensToADO, createADOBranch, fetchADOBranches,
+  } = useADO();
   const { pullTokensFromURL } = useURL();
 
   const pullTokens = useCallback(async ({ context = api, featureFlags, usedTokenSet }: PullTokensOptions) => {
@@ -59,6 +63,10 @@ export default function useRemoteTokens() {
       }
       case StorageProviderType.GITLAB: {
         remoteData = await pullTokensFromGitLab(context, featureFlags);
+        break;
+      }
+      case StorageProviderType.ADO: {
+        remoteData = await pullTokensFromADO(context, featureFlags);
         break;
       }
       case StorageProviderType.URL: {
@@ -91,6 +99,7 @@ export default function useRemoteTokens() {
     pullTokensFromGitLab,
     pullTokensFromJSONBin,
     pullTokensFromURL,
+    pullTokensFromADO,
   ]);
 
   const restoreStoredProvider = useCallback(async (context: ContextObject) => {
@@ -108,6 +117,10 @@ export default function useRemoteTokens() {
         await syncTokensWithGitLab(context);
         break;
       }
+      case StorageProviderType.ADO: {
+        await syncTokensWithADO(context);
+        break;
+      }
       default:
         await pullTokens({ context });
     }
@@ -118,6 +131,7 @@ export default function useRemoteTokens() {
     pullTokens,
     syncTokensWithGitHub,
     syncTokensWithGitLab,
+    syncTokensWithADO,
   ]);
 
   const pushTokens = useCallback(async (context: ContextObject = api) => {
@@ -131,6 +145,10 @@ export default function useRemoteTokens() {
         await pushTokensToGitLab(api);
         break;
       }
+      case StorageProviderType.ADO: {
+        await pushTokensToADO(api);
+        break;
+      }
       default:
         throw new Error('Not implemented');
     }
@@ -138,6 +156,7 @@ export default function useRemoteTokens() {
     api,
     pushTokensToGitHub,
     pushTokensToGitLab,
+    pushTokensToADO,
   ]);
 
   const addNewProviderItem = useCallback(async (context: ContextObject): Promise<boolean> => {
@@ -164,6 +183,10 @@ export default function useRemoteTokens() {
         data = await addNewGitLabCredentials(credentials);
         break;
       }
+      case StorageProviderType.ADO: {
+        data = await addNewADOCredentials(credentials);
+        break;
+      }
       case StorageProviderType.URL: {
         data = await pullTokensFromURL(context);
         break;
@@ -183,6 +206,7 @@ export default function useRemoteTokens() {
     addJSONBinCredentials,
     addNewGitLabCredentials,
     addNewGitHubCredentials,
+    addNewADOCredentials,
     createNewJSONBin,
     pullTokensFromURL,
     setStorageType,
@@ -195,21 +219,27 @@ export default function useRemoteTokens() {
         newBranchCreated = await createGithubBranch(context, branch, source);
         break;
       }
+      case StorageProviderType.ADO: {
+        newBranchCreated = await createADOBranch(context, branch, source);
+        break;
+      }
       default:
         throw new Error('Not implemented');
     }
 
     return newBranchCreated;
-  }, [createGithubBranch]);
+  }, [createGithubBranch, createADOBranch]);
 
   const fetchBranches = useCallback(async (context: ContextObject) => {
     switch (context.provider) {
       case StorageProviderType.GITHUB:
         return fetchGithubBranches(context);
+      case StorageProviderType.ADO:
+        return fetchADOBranches(context);
       default:
         return null;
     }
-  }, [fetchGithubBranches]);
+  }, [fetchGithubBranches, fetchADOBranches]);
 
   const deleteProvider = useCallback((provider) => {
     postToFigma({

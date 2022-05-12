@@ -18,6 +18,14 @@ describe('checkIfAlias', () => {
       name: 'nonexistant',
       value: '$colors.nonexistant',
     },
+    {
+      name: 'composition-token',
+      type: 'composition',
+      value: {
+        property: 'opacity',
+        value: 'opacity.40'
+      }
+    }
   ];
   const incorrectTokens = [
     { name: 'string', value: 'foo' },

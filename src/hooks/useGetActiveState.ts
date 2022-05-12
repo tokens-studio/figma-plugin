@@ -8,7 +8,6 @@ import { isPropertyType, isTokenType } from '@/utils/is';
 export function useGetActiveState(properties: (PropertyObject | TokenTypes)[], type: string, name: string) {
   return useSelector((state: RootState) => {
     const { uiState } = state;
-
     if (
       !isPropertyType(type)
       && !isTokenType(type)

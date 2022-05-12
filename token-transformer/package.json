@@ -1,27 +1,27 @@
 {
-  "name": "token-transformer",
-  "version": "0.0.22",
-  "description": "A utility that transforms tokens from Figma Tokens to a format that is readable by Style Dictionary.",
-  "main": "index.js",
-  "scripts": {
-    "build-typography-test": "node index.js tokens.json temp/typography.json base/options,base/sizing,core/typography base/options,base/sizing",
-    "build-light-test": "node index.js tokens.json temp/dark.json base/options,base/sizing,themes/dark,core/shadows base/options,base/sizing",
-    "build-dark-test": "node index.js tokens.json temp/light.json base/options,base/sizing,themes/light,core/shadows base/options,base/sizing",
-    "build-folder-test": "node index.js tokens temp/folder-light.json base/options,base/sizing,themes/light,core/shadows base/options,base/sizing",
-    "build-resolve-false-test": "node index.js tokens.json temp/resolve-false.json base/options,base/sizing,themes/dark,core/shadows base/options,base/sizing --resolveReferences=false",
-    "test": "npm run build-typography-test && npm run build-light-test && npm run build-dark-test && npm run build-folder-test && npm run build-resolve-false-test && jest"
-  },
-  "author": "six7",
-  "license": "MIT",
-  "bin": "index.js",
-  "dependencies": {
-    "yargs": "^17.4.1"
-  },
-  "files": [
-    "index.js",
-    "dist"
-  ],
-  "devDependencies": {
-    "jest": "^28.0.3"
+    "name": "token-transformer",
+    "version": "0.0.22",
+    "description": "A utility that transforms tokens from Figma Tokens to a format that is readable by Style Dictionary.",
+    "main": "index.js",
+    "scripts": {
+      "build-typography-test": "node index.js tokens.json temp/typography.json base/options,base/sizing,core/typography base/options,base/sizing",
+      "build-light-test": "node index.js tokens.json temp/dark.json base/options,base/sizing,themes/dark,core/shadows base/options,base/sizing",
+      "build-dark-test": "node index.js tokens.json temp/light.json base/options,base/sizing,themes/light,core/shadows base/options,base/sizing",
+      "build-folder-test": "node index.js tokens temp/folder-light.json base/options,base/sizing,themes/light,core/shadows base/options,base/sizing",
+      "build-resolve-false-test": "node index.js tokens.json temp/resolve-false.json base/options,base/sizing,themes/dark,core/shadows base/options,base/sizing --resolveReferences=false",
+      "test": "npm run build-typography-test && npm run build-light-test && npm run build-dark-test && npm run build-folder-test && npm run build-resolve-false-test && jest"
+    },
+    "author": "six7",
+    "license": "MIT",
+    "bin": "index.js",
+    "dependencies": {
+      "yargs": "^17.4.1"
+    },
+    "files": [
+      "index.js",
+      "dist"
+    ],
+    "devDependencies": {
+      "jest": "^28.0.3"
+    }
   }
-}

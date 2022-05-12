@@ -44,7 +44,7 @@ const SyncSettings = () => {
     });
   }, [dispatch.uiState]);
 
-  const selectedRemoteProvider = React.useMemo(() => [StorageProviderType.JSONBIN, StorageProviderType.GITHUB, StorageProviderType.GITLAB, StorageProviderType.URL].includes(
+  const selectedRemoteProvider = React.useMemo(() => [StorageProviderType.JSONBIN, StorageProviderType.GITHUB, StorageProviderType.GITLAB, StorageProviderType.ADO, StorageProviderType.URL].includes(
     localApiState?.provider as StorageProviderType,
   ), [localApiState?.provider]);
 
@@ -96,6 +96,22 @@ const SyncSettings = () => {
             {' '}
             <a
               href="https://docs.tokens.studio/sync/gitlab"
+              target="_blank"
+              rel="noreferrer"
+              className="underline"
+            >
+              Read the guide
+            </a>
+            .
+          </div>
+        );
+      case StorageProviderType.ADO:
+        return (
+          <div>
+            Sync your tokens with a Azure DevOps repository so your design decisions are up to date with code.
+            {' '}
+            <a
+              href="https://docs.tokens.studio/sync/ado"
               target="_blank"
               rel="noreferrer"
               className="underline"
@@ -199,6 +215,13 @@ const SyncSettings = () => {
                 onClick={handleProviderClick(StorageProviderType.GITLAB)}
                 text="GitLab"
                 id={StorageProviderType.GITLAB}
+              />
+              <ProviderSelector
+                isActive={localApiState?.provider === StorageProviderType.ADO}
+                isStored={storageType?.provider === StorageProviderType.ADO}
+                onClick={handleProviderClick(StorageProviderType.ADO)}
+                text="ADO"
+                id={StorageProviderType.ADO}
               />
             </Stack>
           </Stack>
