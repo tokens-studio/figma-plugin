@@ -29,8 +29,8 @@ export default function TypographyInput({
   handleTypographyChange,
   handleTypographyChangeByAlias,
   resolvedTokens,
-  handleTypographyDownShiftInputChange,
   showAliasModeAutoSuggest,
+  handleTypographyDownShiftInputChange,
   setShowAliasModeAutoSuggest,
   handleDownShiftInputChange,
   handleAliasModeAutoSuggest,
@@ -39,8 +39,8 @@ export default function TypographyInput({
   handleTypographyChange: React.ChangeEventHandler;
   handleTypographyChangeByAlias: React.ChangeEventHandler;
   resolvedTokens: ResolveTokenValuesResult[];
-  handleTypographyDownShiftInputChange: (newInputValue: string, property: string) => void;
   showAliasModeAutoSuggest: boolean;
+  handleTypographyDownShiftInputChange: (newInputValue: string, property: string) => void;
   setShowAliasModeAutoSuggest: (show: boolean) => void;
   handleDownShiftInputChange: (newInputValue: string) => void;
   handleAliasModeAutoSuggest: () => void;
