@@ -6,6 +6,7 @@ import { isSingleToken } from '@/utils/is';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { UsedTokenSetsMap } from '@/types';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
+import { TokenBoxshadowValue } from '@/types/values';
 
 export type ResolveTokenValuesResult = SingleToken<true, {
   failedToResolve?: boolean
@@ -27,6 +28,7 @@ export function resolveTokenValues(tokens: SingleToken[], previousCount: number 
       ReturnType<typeof getAliasValue>;
 
     let failedToResolve = false;
+    let itemFailedToResolve = false;
     // Iterate over Typography and boxShadow Object to get resolved values
     if (t.type === TokenTypes.TYPOGRAPHY || t.type === TokenTypes.BOX_SHADOW) {
       // If value is alias
@@ -38,7 +40,7 @@ export function resolveTokenValues(tokens: SingleToken[], previousCount: number 
         returnValue = t.value.map((item) => (
           Object.entries(item).reduce<Record<string, ReturnType<typeof getAliasValue>>>((acc, [key, value]) => {
             acc[key] = getAliasValue(value, tokensInProgress);
-            let itemFailedToResolve = acc[key] === null || checkIfContainsAlias(acc[key]);
+            itemFailedToResolve = acc[key] === null || checkIfContainsAlias(acc[key]);
             if (itemFailedToResolve) {
               failedToResolve = true;
             }
@@ -49,7 +51,7 @@ export function resolveTokenValues(tokens: SingleToken[], previousCount: number 
       } else {
         returnValue = Object.entries(t.value).reduce<Record<string, ReturnType<typeof getAliasValue>>>((acc, [key, value]) => {
           acc[key] = getAliasValue(value, tokensInProgress);
-          let itemFailedToResolve = acc[key] === null || checkIfContainsAlias(acc[key]);
+          itemFailedToResolve = acc[key] === null || checkIfContainsAlias(acc[key]);
           if (itemFailedToResolve) {
             failedToResolve = true;
           }
@@ -58,17 +60,108 @@ export function resolveTokenValues(tokens: SingleToken[], previousCount: number 
       }
     }
     else if (t.type === TokenTypes.COMPOSITION) {
+      let returnItemValue:
+        Record<string, ReturnType<typeof getAliasValue>>[] |
+        Record<string, ReturnType<typeof getAliasValue>> |
+        ReturnType<typeof getAliasValue>;
       if (Array.isArray(t.value)) {
         returnValue = t.value.map((item) => {
-          return {
-            property: item.property,
-            value: getAliasValue(item.value, tokensInProgress)
+          if (checkIfContainsAlias(item.value)) {
+            returnItemValue = getAliasValue(item.value, tokensInProgress);
+            itemFailedToResolve = returnItemValue === null || checkIfContainsAlias(returnItemValue);
+            if (itemFailedToResolve) {
+              failedToResolve = true;
+            }
+            return {
+              property: item.property,
+              value: returnItemValue
+            };
+          }
+          else if (item.property === TokenTypes.BOX_SHADOW || item.property === TokenTypes.TYPOGRAPHY) {
+            if (Array.isArray(item.value)) {
+              returnItemValue = item.value.map((item) => (
+                Object.entries(item as TokenBoxshadowValue).reduce<Record<string, ReturnType<typeof getAliasValue>>>((acc, [key, value]) => {
+                  acc[key] = getAliasValue(value, tokensInProgress);
+                  itemFailedToResolve = acc[key] === null || checkIfContainsAlias(acc[key]);
+                  if (itemFailedToResolve) {
+                    failedToResolve = true;
+                  }
+                  return acc;
+                }, {})
+              ));
+              return {
+                property: item.property,
+                value: returnItemValue
+              };
+            } else {
+              returnItemValue = Object.entries(item.value).reduce<Record<string, ReturnType<typeof getAliasValue>>>((acc, [key, value]) => {
+                acc[key] = getAliasValue(value, tokensInProgress);
+                itemFailedToResolve = acc[key] === null || checkIfContainsAlias(acc[key]);
+                if (itemFailedToResolve) {
+                  failedToResolve = true;
+                }
+                return acc;
+              }, {});
+              return {
+                property: item.property,
+                value: returnItemValue
+              };
+            }
+          } else {
+            returnItemValue = getAliasValue(item.value, tokensInProgress);
+            failedToResolve = returnItemValue === null || checkIfContainsAlias(returnItemValue);
+            return {
+              property: item.property,
+              value: returnItemValue
+            };
           }
         });
       } else {
-        returnValue = {
-          property: t.value.property,
-          value: getAliasValue(t.value.value, tokensInProgress)
+        if (checkIfContainsAlias(t.value.value)) {
+          returnItemValue = getAliasValue(t.value.value, tokensInProgress);
+          failedToResolve = returnItemValue === null || checkIfContainsAlias(returnItemValue);
+          returnValue = {
+            property: t.value.property,
+            value: returnItemValue
+          };
+        }
+        else if (t.value.property === TokenTypes.BOX_SHADOW || t.value.property === TokenTypes.TYPOGRAPHY) {
+          if (Array.isArray(t.value.value)) {
+            returnItemValue = t.value.value.map((item) => (
+              Object.entries(item as TokenBoxshadowValue).reduce<Record<string, ReturnType<typeof getAliasValue>>>((acc, [key, value]) => {
+                acc[key] = getAliasValue(value, tokensInProgress);
+                itemFailedToResolve = acc[key] === null || checkIfContainsAlias(acc[key]);
+                if (itemFailedToResolve) {
+                  failedToResolve = true;
+                }
+                return acc;
+              }, {})
+            ));
+            returnValue = {
+              property: t.value.property,
+              value: returnItemValue
+            };
+          } else {
+            returnItemValue = Object.entries(t.value.value).reduce<Record<string, ReturnType<typeof getAliasValue>>>((acc, [key, value]) => {
+              acc[key] = getAliasValue(value, tokensInProgress);
+              itemFailedToResolve = acc[key] === null || checkIfContainsAlias(acc[key]);
+              if (itemFailedToResolve) {
+                failedToResolve = true;
+              }
+              return acc;
+            }, {});
+            returnValue = {
+              property: t.value.property,
+              value: returnItemValue
+            };
+          }
+        } else {
+          returnItemValue = getAliasValue(t.value.value, tokensInProgress);
+          failedToResolve = returnItemValue === null || checkIfContainsAlias(returnItemValue);
+          returnValue = {
+            property: t.value.property,
+            value: returnItemValue
+          };
         }
       }
     }

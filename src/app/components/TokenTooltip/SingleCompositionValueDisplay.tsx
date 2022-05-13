@@ -14,7 +14,7 @@ export const SingleCompositionValueDisplay: React.FC<Props> = ({ value }) => {
     <Box css={{ color: '$bgDefault' }}>
         {value?.property}
         {' : '}
-        {value?.value}
+        {value?.value.toString()}
     </Box>
 
   );

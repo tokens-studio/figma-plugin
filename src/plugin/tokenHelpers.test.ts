@@ -1,7 +1,8 @@
+import { TokenTypes } from '@/constants/TokenTypes';
 import { resolveTokenValues } from './tokenHelpers';
 
 const singleShadowToken = {
-  type: 'boxShadow',
+  type: TokenTypes.BOX_SHADOW,
   description: 'the one with one shadow',
   value: {
     type: 'dropShadow',
@@ -14,7 +15,7 @@ const singleShadowToken = {
 };
 
 const multipleShadowToken = {
-  type: 'boxShadow',
+  type: TokenTypes.BOX_SHADOW,
   description: 'the one with multiple shadow',
   value: [
     {
@@ -45,7 +46,7 @@ const multipleShadowToken = {
 };
 
 const resolvedTypographyToken = {
-  type: 'typography',
+  type: TokenTypes.TYPOGRAPHY,
   value: {
     fontFamily: 'IBM Plex Serif',
     fontWeight: 'bold',
@@ -54,12 +55,12 @@ const resolvedTypographyToken = {
     letterSpacing: 0,
     paragraphSpacing: 0,
     textCase: 'uppercase',
-    textDecoration: 'none',  
-  }
-}
+    textDecoration: 'none',
+  },
+};
 
 const unResolvedTypographyToken = {
-  type: 'typography',
+  type: TokenTypes.TYPOGRAPHY,
   value: {
     fontFamily: 'IBM Plex Serif',
     fontWeight: 'bold',
@@ -68,12 +69,12 @@ const unResolvedTypographyToken = {
     letterSpacing: 0,
     paragraphSpacing: 0,
     textCase: 'uppercase',
-    textDecoration: 'none',  
-  }
-}
+    textDecoration: 'none',
+  },
+};
 
 const unResolvedSingleShadowToken = {
-  type: 'boxShadow',
+  type: TokenTypes.BOX_SHADOW,
   description: 'the one with one shadow',
   value: {
     type: 'dropShadow',
@@ -86,7 +87,7 @@ const unResolvedSingleShadowToken = {
 };
 
 const unResolvedMultipleShadowToken = {
-  type: 'boxShadow',
+  type: TokenTypes.BOX_SHADOW,
   description: 'the one with multiple shadow',
   value: [
     {
@@ -115,7 +116,6 @@ const unResolvedMultipleShadowToken = {
     },
   ],
 };
-
 
 const tokens = [
   { name: 'foo', value: 3 },
@@ -169,6 +169,12 @@ const tokens = [
   { name: 'typography.unResolved', ...unResolvedTypographyToken },
   { name: 'shadow.unResolvedSingle', ...unResolvedSingleShadowToken },
   { name: 'shadow.unResolvedMultiple', ...unResolvedMultipleShadowToken },
+  {
+    name: 'shadow.shadowAlias',
+    value: '{shadow.single}',
+    description: 'the one with a nested shadow alias',
+    type: TokenTypes.BOX_SHADOW,
+  },
 ];
 
 const output = [
@@ -324,23 +330,23 @@ const output = [
   {
     name: 'size.25',
     rawValue: '2px',
-    value: '2px'
+    value: '2px',
   },
   {
     ...resolvedTypographyToken,
     name: 'typography.resolved',
     value: {
       ...resolvedTypographyToken.value,
-      fontSize: '2px'
+      fontSize: '2px',
     },
-    rawValue: resolvedTypographyToken.value
+    rawValue: resolvedTypographyToken.value,
   },
   {
     ...unResolvedTypographyToken,
     failedToResolve: true,
     name: 'typography.unResolved',
     rawValue: unResolvedTypographyToken.value,
-    value: unResolvedTypographyToken.value
+    value: unResolvedTypographyToken.value,
   },
   {
     ...unResolvedSingleShadowToken,
@@ -369,6 +375,16 @@ const output = [
         color: '#000000',
       },
     ],
+  },
+  {
+    ...singleShadowToken,
+    description: 'the one with a nested shadow alias',
+    name: 'shadow.shadowAlias',
+    rawValue: '{shadow.single}',
+    value: {
+      ...singleShadowToken.value,
+      color: '#ff0000',
+    },
   },
 ];
 describe('resolveTokenValues', () => {
