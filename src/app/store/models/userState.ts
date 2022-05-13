@@ -4,6 +4,8 @@ import validateLicense from '@/utils/validateLicense';
 import { notifyToUI, postToFigma } from '@/plugin/notifiers';
 import { MessageToPluginTypes } from '@/types/messages';
 import removeLicense from '@/utils/removeLicense';
+import { LicenseStatus } from '@/constants/LicenseStatus';
+import * as userStateReducers from './reducers/userState';
 
 export enum AddLicenseSource {
   PLUGIN,
@@ -22,6 +24,7 @@ export interface UserState {
   userId: string | null;
   licenseKey: string | undefined;
   licenseError: string | undefined;
+  licenseStatus: LicenseStatus;
   userName: string;
   licenseDetails: LicenseDetails;
 }
@@ -36,6 +39,7 @@ export const userState = createModel<RootModel>()({
   state: {
     checkedLocalStorageForKey: false,
     userId: null,
+    licenseStatus: LicenseStatus.UNKNOWN,
     licenseKey: undefined,
     licenseError: undefined,
     userName: '',
@@ -82,9 +86,12 @@ export const userState = createModel<RootModel>()({
         licenseDetails: payload,
       };
     },
+    ...userStateReducers,
   },
   effects: (dispatch) => ({
     addLicenseKey: async (payload: { key: string; source: AddLicenseSource }, rootState) => {
+      dispatch.userState.setLicenseStatus(LicenseStatus.VERIFYING);
+
       const { userId } = rootState.userState;
       const { key, source } = payload;
       const {
@@ -92,6 +99,7 @@ export const userState = createModel<RootModel>()({
       } = await validateLicense(key, userId);
 
       if (error) {
+        dispatch.userState.setLicenseStatus(LicenseStatus.ERROR);
         dispatch.userState.setLicenseError(error);
         if (source === AddLicenseSource.INITAL_LOAD) {
           notifyToUI('License key invalid, please check your Settings', { error: true });
@@ -104,6 +112,7 @@ export const userState = createModel<RootModel>()({
           clientEmail,
           entitlements: [...new Set(entitlements)],
         });
+        dispatch.userState.setLicenseStatus(LicenseStatus.VERIFIED);
 
         if (source === AddLicenseSource.UI) {
           notifyToUI('License added succesfully!');
