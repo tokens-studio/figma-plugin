@@ -25,6 +25,7 @@ export enum Properties {
   fontSizes = 'fontSizes',
   lineHeights = 'lineHeights',
   typography = 'typography',
+  composition = 'composition',
   letterSpacing = 'letterSpacing',
   paragraphSpacing = 'paragraphSpacing',
   textCase = 'textCase',

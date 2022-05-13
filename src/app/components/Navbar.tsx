@@ -27,6 +27,8 @@ const transformProviderName = (provider: StorageProviderType) => {
       return 'GitHub';
     case StorageProviderType.GITLAB:
       return 'GitLab';
+    case StorageProviderType.ADO:
+      return 'ADO';
     case StorageProviderType.URL:
       return 'URL';
     default:

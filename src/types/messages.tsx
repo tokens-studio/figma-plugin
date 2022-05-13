@@ -35,6 +35,7 @@ export enum MessageFromPluginTypes {
   ADD_JOB_TASKS = 'add_job_tasks',
   COMPLETE_JOB_TASKS = 'complete_job_tasks',
   LICENSE_KEY = 'license_key',
+  SET_TOKENS = 'set_tokens',
 }
 
 export enum MessageToPluginTypes {
@@ -157,6 +158,12 @@ export type LicenseKeyFromPluginMessage = {
   type: MessageFromPluginTypes.LICENSE_KEY;
   licenseKey: string;
 };
+
+export type SetTokensFromPluginMessage = {
+  type: MessageFromPluginTypes.SET_TOKENS;
+  values: TokenStore;
+};
+
 export type PostToUIMessage =
   | NoSelectionFromPluginMessage
   | SelectionFromPluginMessage
@@ -176,7 +183,8 @@ export type PostToUIMessage =
   | AddJobTasksFromPluginMessage
   | CompleteJobTasksFromPluginMessage
   | ApiCredentialsFromPluginMessage
-  | LicenseKeyFromPluginMessage;
+  | LicenseKeyFromPluginMessage
+  | SetTokensFromPluginMessage;
 
 export type InitiateToPluginMessage = { type: MessageToPluginTypes.INITIATE };
 export type RemoveSingleCredentialToPluginMessage = {

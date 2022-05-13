@@ -95,6 +95,18 @@ export function Initiator() {
             }
             break;
           }
+          case MessageFromPluginTypes.SET_TOKENS: {
+            const { values } = pluginMessage;
+            const existTokens = Object.values(values?.values ?? {}).some((value) => value.length > 0);
+
+            if (existTokens) { 
+              dispatch.tokenState.setTokenData(values);
+              dispatch.uiState.setActiveTab(Tabs.TOKENS); 
+            } else { 
+              dispatch.uiState.setActiveTab(Tabs.START); 
+            }
+            break;
+          }
           case MessageFromPluginTypes.NO_TOKEN_VALUES: {
             dispatch.uiState.setActiveTab(Tabs.START);
             break;
@@ -129,23 +141,25 @@ export function Initiator() {
               track('Fetched from remote', { provider: credentials.provider });
               if (!credentials.internalId) track('missingInternalId', { provider: credentials.provider });
 
-              const {
-                id, provider, secret, baseUrl,
-              } = credentials;
-              const [owner, repo] = id.split('/');
-              if (provider === StorageProviderType.GITHUB) {
-                const storageClient = new GithubTokenStorage(secret, owner, repo, baseUrl);
-                const branches = await storageClient.fetchBranches();
-                dispatch.branchState.setBranches(branches);
-              }
-
-              dispatch.uiState.setApiData(credentials);
-              dispatch.uiState.setLocalApiState(credentials);
-              if (shouldPull) {
-                const remoteData = await pullTokens({ context: credentials, featureFlags: receivedFlags, usedTokenSet });
-                const existTokens = Object.values(remoteData?.tokens ?? {}).some((value) => value.length > 0);
-
-                if (existTokens) { dispatch.uiState.setActiveTab(Tabs.TOKENS); } else { dispatch.uiState.setActiveTab(Tabs.START); }
+              if (credentials) {
+                const { id, provider, secret, baseUrl } = credentials;
+                const [owner, repo] = id.split('/');
+                if (provider === StorageProviderType.GITHUB) {
+                  const storageClient = new GithubTokenStorage(secret, owner, repo, baseUrl);
+                  const branches = await storageClient.fetchBranches();
+                  dispatch.branchState.setBranches(branches);
+                }
+  
+                dispatch.uiState.setApiData(credentials);
+                dispatch.uiState.setLocalApiState(credentials);
+                if (shouldPull) {
+                  const remoteData = await pullTokens({ context: credentials, featureFlags: receivedFlags, usedTokenSet });
+                  const existTokens = Object.values(remoteData?.tokens ?? {}).some((value) => value.length > 0);
+  
+                  if (existTokens) { dispatch.uiState.setActiveTab(Tabs.TOKENS); } else { dispatch.uiState.setActiveTab(Tabs.START); }
+                } else {
+                  dispatch.uiState.setActiveTab(Tabs.TOKENS);
+                }
               } else {
                 dispatch.uiState.setActiveTab(Tabs.TOKENS);
               }

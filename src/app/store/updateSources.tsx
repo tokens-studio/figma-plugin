@@ -64,6 +64,9 @@ async function updateRemoteTokens({
     case StorageProviderType.GITLAB: {
       break;
     }
+    case StorageProviderType.ADO: {
+      break;
+    }
     default:
       throw new Error('Not implemented');
   }
@@ -100,7 +103,6 @@ export default async function updateTokensOnSources({
   const mergedTokens = tokens
     ? resolveTokenValues(mergeTokenGroups(tokens, usedTokenSet))
     : null;
-
   postToFigma({
     type: MessageToPluginTypes.UPDATE,
     tokenValues,
