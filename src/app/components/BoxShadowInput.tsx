@@ -24,20 +24,20 @@ const newToken: TokenBoxshadowValue = {
 };
 
 export default function BoxShadowInput({
-  handleBoxShadowChange,
-  handleBoxShadowChangeByAlias,
   resolvedTokens,
   internalEditToken,
   showAliasModeAutoSuggest,
+  handleBoxShadowChange,
+  handleBoxShadowChangeByAlias,
   setShowAliasModeAutoSuggest,
   handleAliasModeAutoSuggest,
   handleDownShiftInputChange,
 }: {
-  handleBoxShadowChange: (shadow: TokenBoxshadowValue | TokenBoxshadowValue[]) => void;
-  handleBoxShadowChangeByAlias: React.ChangeEventHandler;
   resolvedTokens: ResolveTokenValuesResult[];
   internalEditToken: SingleBoxShadowToken;
   showAliasModeAutoSuggest: boolean;
+  handleBoxShadowChange: (shadow: TokenBoxshadowValue | TokenBoxshadowValue[]) => void;
+  handleBoxShadowChangeByAlias: React.ChangeEventHandler;
   setShowAliasModeAutoSuggest: (show: boolean) => void;
   handleDownShiftInputChange: (newInputValue: string) => void;
   handleAliasModeAutoSuggest: () => void;
