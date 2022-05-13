@@ -1,7 +1,6 @@
 import React, { useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { DownloadIcon, UploadIcon } from '@primer/octicons-react';
-import { useFlags } from 'launchdarkly-react-client-sdk';
 import * as pjs from '../../../package.json';
 import Box from './Box';
 import Text from './Text';
@@ -24,6 +23,7 @@ import DocsIcon from '@/icons/docs.svg';
 import RefreshIcon from '@/icons/refresh.svg';
 import FeedbackIcon from '@/icons/feedback.svg';
 import IconButton from './IconButton';
+import { useFlags } from './LaunchDarkly';
 import Tooltip from './Tooltip';
 import Icon from './Icon';
 
@@ -57,6 +57,8 @@ export default function Footer() {
         return 'GitHub';
       case StorageProviderType.GITLAB:
         return 'GitLab';
+      case StorageProviderType.ADO:
+        return 'ADO';
       case StorageProviderType.URL:
         return 'URL';
       default:
@@ -92,6 +94,7 @@ export default function Footer() {
         {storageType.provider !== StorageProviderType.LOCAL
         && storageType.provider !== StorageProviderType.GITHUB
         && storageType.provider !== StorageProviderType.GITLAB
+        && storageType.provider !== StorageProviderType.ADO
         && (
           <Stack align="center" direction="row" gap={2}>
             <Text muted>Sync</Text>

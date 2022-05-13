@@ -17,6 +17,7 @@ import { ProgressTracker } from './ProgressTracker';
 import { AnyTokenList, AnyTokenSet, TokenStore } from '@/types/tokens';
 import { isSingleToken } from '@/utils/is';
 import { ThemeObjectsList } from '@/types';
+import { TokenTypes } from '@/constants/TokenTypes';
 import { attemptOrFallback } from '@/utils/attemptOrFallback';
 
 // @TODO fix typings
@@ -41,7 +42,48 @@ export function mapValuesToTokens(tokens: Map<string, AnyTokenList[number]>, val
   const mappedValues = Object.entries(values).reduce((acc, [key, tokenOnNode]) => {
     const resolvedToken = tokens.get(tokenOnNode);
     if (!resolvedToken) return acc;
-    acc[key] = isSingleToken(resolvedToken) ? resolvedToken[returnValueToLookFor(key)] : resolvedToken;
+    if (isSingleToken(resolvedToken)) {
+      // typography or boxshadow property in composition token resovle alias
+      if (resolvedToken && resolvedToken.type === TokenTypes.COMPOSITION && resolvedToken.rawValue) {
+        const tokensInComposition: Array<Object> = [];
+        if (Array.isArray(resolvedToken.rawValue)) {
+          for (let index = 0; index < resolvedToken.rawValue.length; index++) {
+            const currentTokenWithRawValue = resolvedToken.rawValue[index];
+            if (currentTokenWithRawValue.property === TokenTypes.TYPOGRAPHY || currentTokenWithRawValue.property === TokenTypes.BOX_SHADOW) {
+              let strExcludedSymbol: string = '';
+              if (String(currentTokenWithRawValue.value).startsWith('$')) strExcludedSymbol = String(currentTokenWithRawValue.value).slice(1, String(currentTokenWithRawValue.value).length);
+              if (String(currentTokenWithRawValue.value).startsWith('{')) strExcludedSymbol = String(currentTokenWithRawValue.value).slice(1, String(currentTokenWithRawValue.value).length - 1);
+              tokensInComposition.push({
+                property: currentTokenWithRawValue.property,
+                value: tokens.get(strExcludedSymbol)?.value,
+              });
+            } else {
+              tokensInComposition.push({
+                property: currentTokenWithRawValue.property,
+                value: resolvedToken.value[index].value,
+              });
+            }
+          }
+        } else {
+          const currentTokenWithRawValue = resolvedToken.rawValue;
+          if (currentTokenWithRawValue.property === TokenTypes.TYPOGRAPHY || currentTokenWithRawValue.property === TokenTypes.BOX_SHADOW) {
+            let strExcludedSymbol: string = '';
+            if (String(currentTokenWithRawValue.value).startsWith('$')) strExcludedSymbol = String(currentTokenWithRawValue.value).slice(1, String(currentTokenWithRawValue.value).length);
+            if (String(currentTokenWithRawValue.value).startsWith('{')) strExcludedSymbol = String(currentTokenWithRawValue.value).slice(1, String(currentTokenWithRawValue.value).length - 1);
+            tokensInComposition.push({
+              property: currentTokenWithRawValue.property,
+              value: tokens.get(strExcludedSymbol)?.value,
+            });
+          } else {
+            tokensInComposition.push({
+              property: currentTokenWithRawValue.property,
+              value: resolvedToken.value.value,
+            });
+          }
+        }
+        acc[key] = tokensInComposition;
+      } else acc[key] = resolvedToken[returnValueToLookFor(key)];
+    } else acc[key] = resolvedToken;
     return acc;
   }, {});
   return mappedValues;
@@ -138,7 +180,7 @@ export function distructureCompositionToken(values: Partial<Record<Properties, s
 export function distructureCompositionTokenForAlias(tokens: Map<string, AnyTokenList[number]>, values: NodeTokenRefMap): Object {
   if (values && values.composition) {
     const resolvedToken = tokens.get(values.composition);
-    let tokensInCompositionToken: NodeTokenRefMap = {};
+    const tokensInCompositionToken: NodeTokenRefMap = {};
     if (resolvedToken?.rawValue && Array.isArray(resolvedToken?.rawValue)) {
       resolvedToken?.rawValue.map((token) => {
         let strExcludedSymbol: string = '';

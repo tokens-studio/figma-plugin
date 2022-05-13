@@ -43,6 +43,7 @@ export const TokenTooltipContentValue: React.FC<Props> = ({ token, shouldResolve
       />
     );
   }
+  
   if (isSingleCompositionToken(token)) {
     if (Array.isArray(valueToCheck)) {
       return (
@@ -50,7 +51,7 @@ export const TokenTooltipContentValue: React.FC<Props> = ({ token, shouldResolve
           {valueToCheck.map((t) => (
             <SingleCompositionValueDisplay
               key={seed(t)}
-              value={t}
+              value={t as TokenCompositionValue}
             />
           ))}
         </div>

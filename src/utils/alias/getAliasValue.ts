@@ -1,4 +1,3 @@
-import tokenTypes from '@/config/tokenTypes';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { SingleToken } from '@/types/tokens';
 import { TokenBoxshadowValue, TokenTypograpyValue } from '@/types/values';
