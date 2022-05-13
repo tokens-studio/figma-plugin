@@ -15,21 +15,20 @@ describe('App', () => {
   });
 
   it('skip to start screen when there is no tokens', async () => {
-    const { getAllByText, getByText } = render(<App />);
+    const { getByText } = render(<App />);
 
     fireEvent(
       window,
       new MessageEvent('message', {
         data: {
           pluginMessage: {
-            type: 'tokenvalues',
+            type: 'set_tokens',
             status: '',
             values: {
               version: '5',
               usedTokenSet: ['global'],
               themes: [],
               activeTheme: null,
-              checkForChanges: 'true',
               values: {
                 global: [],
               },
@@ -39,12 +38,40 @@ describe('App', () => {
       }),
     );
 
-    const cancelButtons = getAllByText('Cancel');
-    fireEvent.click(cancelButtons[1]);
+    const WelcomeText = getByText('Welcome to Figma Tokens.');
+    expect(WelcomeText).toBeInTheDocument();
+  });
 
-    await new Promise((r) => setTimeout(r, 1000));
+  it('skip to token screen when there is a token', () => {
+    const { getByText } = render(<App />);
+    fireEvent(
+      window,
+      new MessageEvent('message', {
+        data: {
+          pluginMessage: {
+            type: 'set_tokens',
+            status: '',
+            values: {
+              version: '5',
+              usedTokenSet: ['global'],
+              themes: [],
+              activeTheme: null,
+              values: {
+                global: [
+                  {
+                    name: 'size',
+                    value: '11',
+                    type: 'sizing',
+                  },
+                ],
+              },
+            },
+          },
+        },
+      }),
+    );
+    const TokenText = getByText('size');
 
-    const welcomeText = getByText('Welcome to Figma Tokens.');
-    expect(welcomeText).toBeInTheDocument();
+    expect(TokenText).toBeInTheDocument();
   });
 });
