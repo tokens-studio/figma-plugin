@@ -357,7 +357,6 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
         return;
       }
       return;
-
     case MessageToPluginTypes.SET_LICENSE_KEY: {
       await figma.clientStorage.setAsync('licenseKey', msg.licenseKey);
       break;
