@@ -31,7 +31,7 @@ type UpdateTokensOnSourcesPayload = {
   storageType: StorageType;
   lastUpdatedAt: string;
   api: ContextObject;
-  checkForChanges: string
+  checkForChanges: string;
 };
 
 async function updateRemoteTokens({
