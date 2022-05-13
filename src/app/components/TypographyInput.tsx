@@ -9,9 +9,9 @@ import { EditTokenObject } from '../store/models/uiState';
 import { findReferences } from '@/utils/findReferences';
 import IconButton from './IconButton';
 import Heading from './Heading';
-import DownshiftInput from './DownshiftInput';
 import { StyledIconDisclosure, StyledInputSuffix } from './StyledInputSuffix';
-import SingleDownShiftInput from './SingleDownShiftInput';
+import SingleTypographyDownShiftInput from './SingleTypographyDownShiftInput';
+import DownshiftInput from './DownshiftInput';
 
 const properties = {
   fontSize: 'fontSizes',
@@ -111,7 +111,7 @@ export default function TypographyInput({
       {
         mode === 'input' ? (
           Object.entries(internalEditToken.value ?? {}).map(([key, value]: [string, string], keyIndex) => (
-            <SingleDownShiftInput
+            <SingleTypographyDownShiftInput
               name={key}
               key={`typography-input-${seed(keyIndex)}`}
               keyIndex={keyIndex}

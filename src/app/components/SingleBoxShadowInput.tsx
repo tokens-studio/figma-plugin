@@ -13,7 +13,7 @@ import IconButton from './IconButton';
 import ColorPicker from './ColorPicker';
 import Select from './Select';
 import Box from './Box';
-import SingleDownShiftInput from './SingleDownShiftInput';
+import SingleBoxShadowDownShiftInput from './SingleBoxShadowDownShiftInput';
 
 interface DragItem {
   index: number;
@@ -219,7 +219,7 @@ export default function SingleBoxShadowInput({
         {
           Object.keys(propertyTypes).map((key, keyIndex) => (
             <>
-              <SingleDownShiftInput
+              <SingleBoxShadowDownShiftInput
                 name={key}
                 key={`boxshadow-input-${seed(index)}-${seed(keyIndex)}`}
                 keyIndex={keyIndex}
