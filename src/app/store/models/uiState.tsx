@@ -8,7 +8,6 @@ import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 import { SingleToken } from '@/types/tokens';
 import { SelectionGroup, StoryblokStory } from '@/types';
 import { Tabs } from '@/constants/Tabs';
-import { FeatureFlags } from '@/utils/featureFlags';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 
@@ -83,8 +82,7 @@ export interface UIState {
   showEmptyGroups: boolean;
   collapsed: boolean;
   selectedLayers: number;
-  featureFlags: FeatureFlags
-  manageThemesModalOpen: boolean
+  manageThemesModalOpen: boolean;
 }
 
 const defaultConfirmState: ConfirmProps = {
@@ -127,7 +125,6 @@ export const uiState = createModel<RootModel>()({
     showEmptyGroups: true,
     collapsed: false,
     selectedLayers: 0,
-    featureFlags: {},
     manageThemesModalOpen: false,
   } as unknown as UIState,
   reducers: {
@@ -284,12 +281,6 @@ export const uiState = createModel<RootModel>()({
       return {
         ...state,
         collapsed: !state.collapsed,
-      };
-    },
-    setFeatureFlags(state, payload: FeatureFlags) {
-      return {
-        ...state,
-        featureFlags: payload,
       };
     },
     addJobTasks(state, payload: AddJobTasksPayload) {

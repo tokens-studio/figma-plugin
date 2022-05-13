@@ -1,5 +1,6 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { useCallback, useMemo } from 'react';
+import { LDProps } from 'launchdarkly-react-client-sdk/lib/withLDConsumer';
 import { ContextObject, StorageProviderType } from '@/types/api';
 import { track } from '@/utils/analytics';
 import { useJSONbin } from './providers/jsonbin';
@@ -10,7 +11,6 @@ import { useGitHub } from './providers/github';
 import { useGitLab } from './providers/gitlab';
 import { useADO } from './providers/ado';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
-import { FeatureFlags } from '@/utils/featureFlags';
 import { apiSelector } from '@/selectors';
 import { UsedTokenSetsMap } from '@/types';
 import { RemoteTokenStorageData } from '@/storage/RemoteTokenStorage';
@@ -19,7 +19,7 @@ import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 
 type PullTokensOptions = {
   context?: ContextObject,
-  featureFlags?: FeatureFlags,
+  featureFlags?: LDProps['flags'],
   usedTokenSet?: UsedTokenSetsMap | null
 };
 

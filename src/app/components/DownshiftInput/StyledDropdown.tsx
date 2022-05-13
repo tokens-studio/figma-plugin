@@ -7,7 +7,7 @@ export const StyledDropdown = styled('div', {
   maxHeight: '140px',
   borderRadius: '$contextMenu',
   overflowY: 'scroll',
-  backgroundColor: '$contextMenuBackground',
+  backgroundColor: '$bgDefault',
   marginTop: '1px',
   cursor: 'pointer',
   boxShadow: '$contextMenu',
