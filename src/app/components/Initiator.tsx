@@ -1,4 +1,4 @@
-import { MutableRefObject, useCallback, useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { withLDConsumer } from 'launchdarkly-react-client-sdk';
 import type { LDProps } from 'launchdarkly-react-client-sdk/lib/withLDConsumer';
@@ -17,12 +17,13 @@ import getLicenseKey from '@/utils/getLicenseKey';
 import { licenseKeySelector } from '@/selectors/licenseKeySelector';
 import { checkedLocalStorageForKeySelector } from '@/selectors/checkedLocalStorageForKeySelector';
 import { AddLicenseSource } from '../store/models/userState';
+import { LicenseStatus } from '@/constants/LicenseStatus';
 
 type Props = LDProps & {
-  identificationPromiseRef: MutableRefObject<Promise<LDProps['flags']>>
+  identificationPromise: Promise<LDProps['flags']>
 };
 
-function InitiatorContainer({ ldClient, identificationPromiseRef }: Props) {
+function InitiatorContainer({ ldClient, identificationPromise }: Props) {
   const dispatch = useDispatch<Dispatch>();
   const { pullTokens } = useRemoteTokens();
   const { setStorageType } = useStorage();
@@ -114,7 +115,7 @@ function InitiatorContainer({ ldClient, identificationPromiseRef }: Props) {
                 if (!credentials.internalId) track('missingInternalId', { provider: credentials.provider });
 
                 // wait of identification
-                const receivedFlags = await identificationPromiseRef.current;
+                const receivedFlags = await identificationPromise;
 
                 const {
                   id, provider, secret, baseUrl,
@@ -199,6 +200,7 @@ function InitiatorContainer({ ldClient, identificationPromiseRef }: Props) {
             if (pluginMessage.licenseKey) {
               dispatch.userState.addLicenseKey({ key: pluginMessage.licenseKey, source: AddLicenseSource.PLUGIN });
             } else {
+              dispatch.userState.setLicenseStatus(LicenseStatus.NO_LICENSE);
               dispatch.userState.setCheckedLocalStorage(true);
             }
             break;

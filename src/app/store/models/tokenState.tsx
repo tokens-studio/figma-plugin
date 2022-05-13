@@ -264,7 +264,7 @@ export const tokenState = createModel<RootModel>()({
       };
     },
     // Imports received styles as tokens, if needed
-    setTokensFromStyles: (state, receivedStyles: SetTokensFromStylesPayload) => {
+    setTokensFromStyles: (state, receivedStyles: SetTokensFromStylesPayload): TokenState => {
       const newTokens: SingleToken[] = [];
       const existingTokens: SingleToken[] = [];
       const updatedTokens: SingleToken[] = [];
