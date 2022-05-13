@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { identify, track } from '@/utils/analytics';
 import { MessageFromPluginTypes, MessageToPluginTypes, PostToUIMessage } from '@/types/messages';
 import useConfirm from '@/app/hooks/useConfirm';
-import { postToFigma } from '../../plugin/notifiers';
+import { notifyToUI, postToFigma } from '../../plugin/notifiers';
 import useRemoteTokens from '../store/remoteTokens';
 import { Dispatch } from '../store';
 import useStorage from '../store/useStorage';
@@ -99,11 +99,11 @@ export function Initiator() {
             const { values } = pluginMessage;
             const existTokens = Object.values(values?.values ?? {}).some((value) => value.length > 0);
 
-            if (existTokens) { 
+            if (existTokens) {
               dispatch.tokenState.setTokenData(values);
-              dispatch.uiState.setActiveTab(Tabs.TOKENS); 
-            } else { 
-              dispatch.uiState.setActiveTab(Tabs.START); 
+              dispatch.uiState.setActiveTab(Tabs.TOKENS);
+            } else {
+              dispatch.uiState.setActiveTab(Tabs.START);
             }
             break;
           }

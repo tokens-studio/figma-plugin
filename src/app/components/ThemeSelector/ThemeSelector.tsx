@@ -73,7 +73,7 @@ export const ThemeSelector: React.FC<Props> = () => {
   ), [availableThemes, handleSelectTheme]);
 
   return (
-    <Flex alignItems="center">
+    <Flex alignItems="center" css={{ flexShrink: 0 }}>
       <DropdownMenu>
         <DropdownMenuTrigger data-cy="themeselector-dropdown">
           <Flex>

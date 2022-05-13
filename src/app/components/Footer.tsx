@@ -1,7 +1,6 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { DownloadIcon, UploadIcon } from '@primer/octicons-react';
-import { useFlags } from 'launchdarkly-react-client-sdk';
 import { Dispatch } from '../store';
 import * as pjs from '../../../package.json';
 import Box from './Box';
@@ -18,10 +17,16 @@ import {
   tokensSelector,
   usedTokenSetSelector,
   themesListSelector,
+  activeTabSelector,
+  projectURLSelector,
 } from '@/selectors';
 import DocsIcon from '@/icons/docs.svg';
+import RefreshIcon from '@/icons/refresh.svg';
 import FeedbackIcon from '@/icons/feedback.svg';
 import IconButton from './IconButton';
+import { useFlags } from './LaunchDarkly';
+import Tooltip from './Tooltip';
+import Icon from './Icon';
 
 export default function Footer() {
   const storageType = useSelector(storageTypeSelector);
@@ -33,6 +38,8 @@ export default function Footer() {
   const usedTokenSet = useSelector(usedTokenSetSelector);
   const dispatch = useDispatch<Dispatch>();
 
+  const activeTab = useSelector(activeTabSelector);
+  const projectURL = useSelector(projectURLSelector);
   const { gitBranchSelector } = useFlags();
   const { pullTokens, pushTokens } = useRemoteTokens();
 
@@ -50,6 +57,10 @@ export default function Footer() {
         return 'JSONBin.io';
       case StorageProviderType.GITHUB:
         return 'GitHub';
+      case StorageProviderType.GITLAB:
+        return 'GitLab';
+      case StorageProviderType.ADO:
+        return 'ADO';
       case StorageProviderType.URL:
         return 'URL';
       default:
@@ -59,6 +70,9 @@ export default function Footer() {
 
   const onPushButtonClicked = React.useCallback(() => pushTokens(), [pushTokens]);
   const onPullButtonClicked = React.useCallback(() => pullTokens({ usedTokenSet }), [pullTokens, usedTokenSet]);
+  const handlePullTokens = useCallback(() => {
+    pullTokens({ usedTokenSet });
+  }, [pullTokens, usedTokenSet]);
 
   return (
     <Box
@@ -77,6 +91,23 @@ export default function Footer() {
           <IconButton icon={<DownloadIcon />} onClick={onPullButtonClicked} tooltipSide="top" tooltip={`Pull from ${transformProviderName(storageType.provider)}`} />
           <IconButton badge={hasChanges} icon={<UploadIcon />} onClick={onPushButtonClicked} tooltipSide="top" disabled={editProhibited} tooltip={`Push to ${transformProviderName(storageType.provider)}`} />
         </>
+        )}
+        {storageType.provider !== StorageProviderType.LOCAL
+        && storageType.provider !== StorageProviderType.GITHUB
+        && storageType.provider !== StorageProviderType.GITLAB
+        && storageType.provider !== StorageProviderType.ADO
+        && (
+          <Stack align="center" direction="row" gap={2}>
+            <Text muted>Sync</Text>
+            {storageType.provider === StorageProviderType.JSONBIN && (
+              <Tooltip label={`Go to ${transformProviderName(storageType.provider)}`}>
+                <a href={projectURL} target="_blank" rel="noreferrer" className="block button button-ghost">
+                  <Icon name="library" />
+                </a>
+              </Tooltip>
+            )}
+            <IconButton tooltip={`Pull from ${transformProviderName(storageType.provider)}`} onClick={handlePullTokens} icon={<RefreshIcon />} />
+          </Stack>
         )}
       </Stack>
       <Stack direction="row" gap={4}>

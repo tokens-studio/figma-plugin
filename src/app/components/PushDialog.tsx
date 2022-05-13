@@ -8,10 +8,10 @@ import { getGitlabCreatePullRequestUrl } from '../store/providers/gitlab';
 import { getADOCreatePullRequestUrl } from '../store/providers/ado';
 import Button from './Button';
 import Heading from './Heading';
-import Icon from './Icon';
 import Input from './Input';
 import Modal from './Modal';
 import Stack from './Stack';
+import Spinner from './Spinner';
 
 function ConfirmDialog() {
   const { onConfirm, onCancel, showPushDialog } = usePushDialog();
@@ -98,9 +98,7 @@ function ConfirmDialog() {
       return (
         <Modal large isOpen close={onCancel}>
           <Stack direction="column" gap={4} justify="center" align="center">
-            <div className="rotate">
-              <Icon name="loading" />
-            </div>
+            <Spinner />
             <Heading size="large">
               Pushing to
               {localApiState.provider === StorageProviderType.GITHUB && ' GitHub'}

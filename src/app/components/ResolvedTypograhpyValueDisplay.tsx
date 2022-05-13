@@ -10,11 +10,11 @@ type Props = {
 
 const StyledPropertyItem = styled('div', {
   color: '$textSubtle',
-  marginBottom: '$4',
+  marginBottom: '$2',
 });
 
 const StyledValueItem = styled('div', {
-  marginBottom: '$4',
+  marginBottom: '$2',
 });
 
 const properties = ['Font', 'Weight', 'Size', 'Line height', 'Letter', 'Paragraph', 'Decoration', 'Text Case'];
@@ -23,7 +23,10 @@ export const ResolvedTypograhpyValueDisplay: React.FC<Props> = ({ value }) => {
   const seed = useUIDSeed();
 
   return (
-    <Box css={{ display: 'flex', backgroundColor: '$bgSubtle', padding: '$4' }}>
+    <Box css={{
+      display: 'flex', backgroundColor: '$bgSubtle', padding: '$4', fontSize: '$xsmall',
+    }}
+    >
       <Box css={{ display: 'grid', marginRight: '$6' }}>
         {properties.map((property) => (
           <StyledPropertyItem key={seed(property)}>{property}</StyledPropertyItem>

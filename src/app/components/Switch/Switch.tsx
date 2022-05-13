@@ -16,7 +16,7 @@ const StyledThumb = styled(SwitchPrimitive.Thumb, {
   display: 'block',
   width: 13,
   height: 13,
-  backgroundColor: '$bgDefault',
+  backgroundColor: '$fgDefault',
   borderRadius: '9999px',
   transition: 'transform 100ms',
   willChange: 'transform',
