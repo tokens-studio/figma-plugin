@@ -42,7 +42,7 @@ export function useGitHub() {
     return confirmResult.result;
   }, [confirm]);
 
-  const pushTokensToGitHub = useCallback(async (context: ContextObject) => {
+  const pushTokensToGitHub = useCallback(async (context: ContextObject): Promise<RemoteTokenStorageData<GitStorageMetadata> | null> => {
     const storage = storageClientFactory(context);
     const content = await storage.retrieve();
 
@@ -53,7 +53,11 @@ export function useGitHub() {
         && isEqual(content.themes, themes)
       ) {
         notifyToUI('Nothing to commit');
-        return false;
+        return {
+          tokens: tokens,
+          themes: themes,
+          metadata: {}
+        };
       }
     }
 
@@ -69,18 +73,29 @@ export function useGitHub() {
           tokens,
           metadata: { commitMessage },
         });
-
         dispatch.uiState.setLocalApiState({ ...localApiState, branch: customBranch });
         dispatch.uiState.setApiData({ ...context, branch: customBranch });
-
+        dispatch.tokenState.setLastSyncedState(JSON.stringify([tokens, themes], null, 2));
+        dispatch.tokenState.setTokenData({
+          values: tokens,
+          themes: themes,
+        });
         pushDialog('success');
-        return true;
+        return {
+          tokens: tokens,
+          themes: themes,
+          metadata: { commitMessage }
+        };
       } catch (e) {
         console.log('Error pushing to GitHub', e);
       }
     }
 
-    return false;
+    return {
+      tokens: tokens,
+      themes: themes,
+      metadata: {}
+    };
   }, [
     dispatch,
     storageClientFactory,
@@ -124,13 +139,10 @@ export function useGitHub() {
     try {
       const storage = storageClientFactory(context);
       const hasBranches = await storage.fetchBranches();
-
       if (!hasBranches || !hasBranches.length) {
         return null;
       }
-
       const content = await storage.retrieve();
-
       if (content) {
         if (
           !isEqual(content.tokens, tokens)
@@ -148,8 +160,7 @@ export function useGitHub() {
         }
         return content;
       }
-      await pushTokensToGitHub(context);
-      return content;
+      return await pushTokensToGitHub(context);
     } catch (e) {
       notifyToUI('Error syncing with GitHub, check credentials', { error: true });
       console.log('Error', e);
@@ -166,7 +177,6 @@ export function useGitHub() {
 
   const addNewGitHubCredentials = useCallback(async (context: ContextObject): Promise<RemoteTokenStorageData<GitStorageMetadata> | null> => {
     const data = await syncTokensWithGitHub(context);
-
     if (data) {
       postToFigma({
         type: MessageToPluginTypes.CREDENTIALS,
@@ -184,7 +194,6 @@ export function useGitHub() {
     } else {
       return null;
     }
-
     return {
       tokens: data.tokens ?? tokens,
       themes: data.themes ?? themes,

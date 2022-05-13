@@ -51,7 +51,11 @@ export function useGitLab() {
     if (content) {
       if (content && isEqual(content.tokens, tokens) && isEqual(content.themes, themes)) {
         notifyToUI('Nothing to commit');
-        return null;
+        return {
+          tokens: tokens,
+          themes: themes,
+          metadata: {}
+        };
       }
     }
 
@@ -69,15 +73,28 @@ export function useGitLab() {
         });
         dispatch.uiState.setLocalApiState({ ...localApiState, branch: customBranch });
         dispatch.uiState.setApiData({ ...context, branch: customBranch });
+        dispatch.tokenState.setLastSyncedState(JSON.stringify([tokens, themes], null, 2));
+        dispatch.tokenState.setTokenData({
+          values: tokens,
+          themes: themes,
+        });
 
         pushDialog('success');
-        return true;
+        return {
+          tokens: tokens,
+          themes: themes,
+          metadata: {}
+        };
       } catch (e) {
         console.log('Error pushing to GitLab', e);
       }
     }
-    return false;
-  }, [
+    return {
+      tokens: tokens,
+      themes: themes,
+      metadata: {}
+    };
+}, [
     dispatch,
     storageClientFactory,
     tokens,
@@ -135,13 +152,12 @@ export function useGitLab() {
               values: content.tokens,
               themes: content.themes,
             });
-            notifyToUI('Pulled tokens from GitHub');
+            notifyToUI('Pulled tokens from GitLab');
           }
         }
         return content;
       }
-      await pushTokensToGitLab(context);
-      return content;
+      return await pushTokensToGitLab(context);
     } catch (err) {
       notifyToUI('Error syncing with GitLab, check credentials', { error: true });
       console.log('Error', err);
