@@ -92,101 +92,108 @@ export class GithubTokenStorage extends GitTokenStorage {
   }
 
   public async read(): Promise<RemoteTokenStorageFile<GitStorageMetadata>[]> {
-    const response = await this.octokitClient.rest.repos.getContent({
-      owner: this.owner,
-      repo: this.repository,
-      path: this.path,
-      ref: this.branch,
-    });
+    try {
 
-    // read entire directory
-    if (Array.isArray(response.data) && this.flags.multiFileEnabled) {
-      const directoryTreeResponse = await this.octokitClient.rest.git.createTree({
+      const response = await this.octokitClient.rest.repos.getContent({
         owner: this.owner,
         repo: this.repository,
-        tree: response.data.map((item) => ({
-          path: item.path,
-          sha: item.sha,
-          mode: getTreeMode(item.type),
-        })),
+        path: this.path,
+        ref: this.branch,
       });
-      if (directoryTreeResponse.data.tree[0].sha) {
-        const treeResponse = await this.octokitClient.rest.git.getTree({
+
+      // read entire directory
+      if (Array.isArray(response.data) && this.flags.multiFileEnabled) {
+        const directoryTreeResponse = await this.octokitClient.rest.git.createTree({
           owner: this.owner,
           repo: this.repository,
-          tree_sha: directoryTreeResponse.data.tree[0].sha,
-          recursive: 'true',
+          tree: response.data.map((item) => ({
+            path: item.path,
+            sha: item.sha,
+            mode: getTreeMode(item.type),
+          })),
         });
-        if (treeResponse.data.tree.length > 0) {
-          const jsonFiles = treeResponse.data.tree.filter((file) => (
-            file.path?.endsWith('.json')
-          )).sort((a, b) => (
-            (a.path && b.path) ? a.path.localeCompare(b.path) : 0
-          ));
+        if (directoryTreeResponse.data.tree[0].sha) {
+          const treeResponse = await this.octokitClient.rest.git.getTree({
+            owner: this.owner,
+            repo: this.repository,
+            tree_sha: directoryTreeResponse.data.tree[0].sha,
+            recursive: 'true',
+          });
+          if (treeResponse.data.tree.length > 0) {
+            const jsonFiles = treeResponse.data.tree.filter((file) => (
+              file.path?.endsWith('.json')
+            )).sort((a, b) => (
+              (a.path && b.path) ? a.path.localeCompare(b.path) : 0
+            ));
 
-          const jsonFileContents = await Promise.all(jsonFiles.map((treeItem) => (
-            treeItem.path ? this.octokitClient.rest.repos.getContent({
-              owner: this.owner,
-              repo: this.repository,
-              path: `${this.path}/${treeItem.path}`,
-              ref: this.branch,
-            }) : Promise.resolve(null)
-          )));
+            const jsonFileContents = await Promise.all(jsonFiles.map((treeItem) => (
+              treeItem.path ? this.octokitClient.rest.repos.getContent({
+                owner: this.owner,
+                repo: this.repository,
+                path: `${this.path}/${treeItem.path}`,
+                ref: this.branch,
+              }) : Promise.resolve(null)
+            )));
 
-          return compact(jsonFileContents.map<RemoteTokenStorageFile<GitStorageMetadata> | null>((fileContent, index) => {
-            const { path } = jsonFiles[index];
+            return compact(jsonFileContents.map<RemoteTokenStorageFile<GitStorageMetadata> | null>((fileContent, index) => {
+              const { path } = jsonFiles[index];
 
-            if (
-              path
-              && fileContent?.data
-              && !Array.isArray(fileContent?.data)
-              && 'content' in fileContent.data
-            ) {
-              const name = path.replace('.json', '');
-              const parsed = JSON.parse(decodeBase64(fileContent.data.content)) as GitMultiFileObject;
-              // @REAMDE we will need to ensure these reserved names
-              if (name === '$themes') {
+              if (
+                path
+                && fileContent?.data
+                && !Array.isArray(fileContent?.data)
+                && 'content' in fileContent.data
+              ) {
+                const name = path.replace('.json', '');
+                const parsed = JSON.parse(decodeBase64(fileContent.data.content)) as GitMultiFileObject;
+                // @REAMDE we will need to ensure these reserved names
+                if (name === '$themes') {
+                  return {
+                    path,
+                    type: 'themes',
+                    data: parsed as ThemeObjectsList,
+                  };
+                }
+
                 return {
                   path,
-                  type: 'themes',
-                  data: parsed as ThemeObjectsList,
+                  name,
+                  type: 'tokenSet',
+                  data: parsed as AnyTokenSet<false>,
                 };
               }
 
-              return {
-                path,
-                name,
-                type: 'tokenSet',
-                data: parsed as AnyTokenSet<false>,
-              };
-            }
+              return null;
+            }));
+          }
+        }
+      } else if ('content' in response.data) {
+        const data = decodeBase64(response.data.content);
+        if (IsJSONString(data)) {
+          const parsed = JSON.parse(data) as GitSingleFileObject;
 
-            return null;
-          }));
+          return [
+            {
+              type: 'themes',
+              path: `${this.path}/$themes.json`,
+              data: parsed.$themes ?? [],
+            },
+            ...(Object.entries(parsed).filter(([key]) => key !== '$themes') as [string, AnyTokenSet<false>][]).map<RemoteTokenStorageFile<GitStorageMetadata>>(([name, tokenSet]) => ({
+              name,
+              type: 'tokenSet',
+              path: `${this.path}/${name}.json`,
+              data: tokenSet,
+            })),
+          ];
         }
       }
-    } else if ('content' in response.data) {
-      const data = decodeBase64(response.data.content);
-      if (IsJSONString(data)) {
-        const parsed = JSON.parse(data) as GitSingleFileObject;
 
-        return [
-          {
-            type: 'themes',
-            path: `${this.path}/$themes.json`,
-            data: parsed.$themes ?? [],
-          },
-          ...(Object.entries(parsed).filter(([key]) => key !== '$themes') as [string, AnyTokenSet<false>][]).map<RemoteTokenStorageFile<GitStorageMetadata>>(([name, tokenSet]) => ({
-            name,
-            type: 'tokenSet',
-            path: `${this.path}/${name}.json`,
-            data: tokenSet,
-          })),
-        ];
-      }
+      return [];
+    } catch (e) {
+      // Raise error (usually this is an auth error)
+      console.log('Error', e);
+      return [];
     }
-
-    return [];
   }
 
   public async writeChangeset(changeset: Record<string, string>, message: string, branch: string, shouldCreateBranch?: boolean): Promise<boolean> {
@@ -202,7 +209,6 @@ export class GithubTokenStorage extends GitTokenStorage {
         },
       ],
     });
-
     return !!response;
   }
 }

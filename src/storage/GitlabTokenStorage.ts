@@ -176,6 +176,7 @@ export class GitlabTokenStorage extends GitTokenStorage {
     } catch (err) {
       // Raise error (usually this is an auth error)
       console.error(err);
+      return [];
     }
 
     return [];

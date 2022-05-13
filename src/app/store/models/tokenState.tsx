@@ -48,7 +48,7 @@ export const tokenState = createModel<RootModel>()({
       global: [],
     },
     themes: [],
-    lastSyncedState: JSON.stringify([{ global: {} }, []], null, 2),
+    lastSyncedState: JSON.stringify([{ global: [] }, []], null, 2),
     importedTokens: {
       newTokens: [],
       updatedTokens: [],
