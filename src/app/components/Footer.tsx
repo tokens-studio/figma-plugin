@@ -7,7 +7,6 @@ import Text from './Text';
 import Stack from './Stack';
 import BranchSelector from './BranchSelector';
 import useRemoteTokens from '../store/remoteTokens';
-import { StorageProviderType } from '../../types/api';
 import {
   localApiStateSelector,
   editProhibitedSelector,
@@ -26,6 +25,7 @@ import IconButton from './IconButton';
 import { useFlags } from './LaunchDarkly';
 import Tooltip from './Tooltip';
 import Icon from './Icon';
+import { StorageProviderType } from '@/constants/StorageProviderType';
 
 export default function Footer() {
   const storageType = useSelector(storageTypeSelector);

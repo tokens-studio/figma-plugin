@@ -1,7 +1,7 @@
 import omit from 'just-omit';
 import store from './store';
 import setValuesOnNode from './setValuesOnNode';
-import { ContextObject, StorageProviderType, StorageType } from '../types/api';
+import { ContextObject, StorageType } from '../types/api';
 import { Properties } from '@/constants/Properties';
 import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 import { NodeManagerNode } from './NodeManager';
@@ -19,6 +19,7 @@ import { isSingleToken } from '@/utils/is';
 import { ThemeObjectsList } from '@/types';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { attemptOrFallback } from '@/utils/attemptOrFallback';
+import { StorageProviderType } from '@/constants/StorageProviderType';
 
 // @TODO fix typings
 

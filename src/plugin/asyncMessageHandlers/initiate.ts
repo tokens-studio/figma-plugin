@@ -1,8 +1,6 @@
 import store from '../store';
 import { AsyncMessageChannelHandlers } from '@/AsyncMessageChannel';
-import { StorageProviderType } from '@/types/api';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
-import { getFeatureFlags } from '@/utils/featureFlags';
 import getLastOpened from '@/utils/getLastOpened';
 import { getUsedTokenSet } from '@/utils/getUsedTokenSet';
 import { getUISettings } from '@/utils/uiSettings';
@@ -13,17 +11,18 @@ import {
   notifyAPIProviders, notifyLastOpened, notifyLicenseKey, notifyNoSelection, notifyNoTokenValues, notifyStorageType, notifyTokenValues, notifyUserId,
 } from '../notifiers';
 import { getActiveTheme } from '@/utils/getActiveTheme';
+import { StorageProviderType } from '@/constants/StorageProviderType';
 
 export const initiate: AsyncMessageChannelHandlers[AsyncMessageTypes.INITIATE] = async () => {
   try {
     const { currentUser } = figma;
     const settings = await getUISettings();
-    const featureFlagId = await getFeatureFlags();
     const usedTokenSet = await getUsedTokenSet();
     const activeTheme = await getActiveTheme();
     const userId = await getUserId();
     const lastOpened = await getLastOpened();
     const storageType = getSavedStorageType();
+    console.log(storageType);
     store.inspectDeep = settings.inspectDeep;
     if (currentUser) {
       notifyUserId({
@@ -50,7 +49,6 @@ export const initiate: AsyncMessageChannelHandlers[AsyncMessageTypes.INITIATE] =
         compareProvidersWithStored({
           providers: apiProviders,
           storageType,
-          featureFlagId,
           usedTokenSet,
         });
         break;

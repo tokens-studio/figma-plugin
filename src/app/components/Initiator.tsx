@@ -9,7 +9,6 @@ import { Dispatch } from '../store';
 import useStorage from '../store/useStorage';
 import * as pjs from '../../../package.json';
 import { Tabs } from '@/constants/Tabs';
-import { StorageProviderType } from '@/types/api';
 import { GithubTokenStorage } from '@/storage/GithubTokenStorage';
 import { userIdSelector } from '@/selectors/userIdSelector';
 import getLicenseKey from '@/utils/getLicenseKey';
@@ -20,6 +19,7 @@ import { LicenseStatus } from '@/constants/LicenseStatus';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { notifyToUI } from '@/plugin/notifiers';
+import { StorageProviderType } from '@/constants/StorageProviderType';
 
 type Props = LDProps & {
   identificationPromise: Promise<LDProps['flags']>

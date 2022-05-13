@@ -1,12 +1,12 @@
 import React, { useCallback } from 'react';
 import { useSelector } from 'react-redux';
-import { StorageProviderType } from '@/types/api';
 import Modal from '../Modal';
 import Heading from '../Heading';
 import StorageItemForm from '../StorageItemForm';
 import useRemoteTokens from '../../store/remoteTokens';
 import { localApiStateSelector } from '@/selectors';
 import Stack from '../Stack';
+import { StorageProviderType } from '@/constants/StorageProviderType';
 
 type Props = {
   isOpen: boolean

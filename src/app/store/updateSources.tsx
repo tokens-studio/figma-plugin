@@ -1,5 +1,5 @@
 import { mergeTokenGroups, resolveTokenValues } from '@/plugin/tokenHelpers';
-import { ContextObject, StorageProviderType, StorageType } from '@/types/api';
+import { ContextObject, StorageType } from '@/types/api';
 import { notifyToUI } from '../../plugin/notifiers';
 import { updateJSONBinTokens } from './providers/jsonbin';
 import { track } from '@/utils/analytics';
@@ -8,6 +8,7 @@ import type { ThemeObjectsList, UsedTokenSetsMap } from '@/types';
 import type { SettingsState } from './models/settings';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
+import { StorageProviderType } from '@/constants/StorageProviderType';
 
 type UpdateRemoteTokensPayload = {
   provider: StorageProviderType;

@@ -1,4 +1,5 @@
-import { ContextObject, StorageProviderType, StorageType } from '@/types/api';
+import { StorageProviderType } from '@/constants/StorageProviderType';
+import { ContextObject, StorageType } from '@/types/api';
 
 function isSameCredentials(credential: ContextObject, stored: StorageType): boolean {
   switch (stored.provider) {

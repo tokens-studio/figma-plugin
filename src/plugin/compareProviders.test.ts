@@ -1,4 +1,4 @@
-import { StorageProviderType } from '../types/api';
+import { StorageProviderType } from '@/constants/StorageProviderType';
 import { MessageFromPluginTypes } from '../types/messages';
 import compareProvidersWithStored from './compareProviders';
 

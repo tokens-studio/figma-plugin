@@ -1,7 +1,7 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { useCallback, useMemo } from 'react';
 import { LDProps } from 'launchdarkly-react-client-sdk/lib/withLDConsumer';
-import { ContextObject, StorageProviderType } from '@/types/api';
+import { ContextObject } from '@/types/api';
 import { track } from '@/utils/analytics';
 import { useJSONbin } from './providers/jsonbin';
 import useURL from './providers/url';
@@ -16,6 +16,7 @@ import { UsedTokenSetsMap } from '@/types';
 import { RemoteTokenStorageData } from '@/storage/RemoteTokenStorage';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
+import { StorageProviderType } from '@/constants/StorageProviderType';
 
 type PullTokensOptions = {
   context?: ContextObject,

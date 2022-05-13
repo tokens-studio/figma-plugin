@@ -1,12 +1,11 @@
 import { useDispatch, useSelector } from 'react-redux';
 import React from 'react';
+import { LDProps } from 'launchdarkly-react-client-sdk/lib/withLDConsumer';
 import { Dispatch } from '@/app/store';
-import { MessageToPluginTypes } from '@/types/messages';
 import useConfirm from '@/app/hooks/useConfirm';
 import usePushDialog from '@/app/hooks/usePushDialog';
 import { ContextObject } from '@/types/api';
-import { notifyToUI, postToFigma } from '../../../../plugin/notifiers';
-import { FeatureFlags } from '@/utils/featureFlags';
+import { notifyToUI } from '../../../../plugin/notifiers';
 import {
   featureFlagsSelector, localApiStateSelector, tokensSelector, themesListSelector,
 } from '@/selectors';
@@ -14,6 +13,8 @@ import { ADOTokenStorage } from '@/storage/ADOTokenStorage';
 import { isEqual } from '@/utils/isEqual';
 import { RemoteTokenStorageData } from '@/storage/RemoteTokenStorage';
 import { GitStorageMetadata } from '@/storage/GitTokenStorage';
+import { AsyncMessageChannel } from '@/AsyncMessageChannel';
+import { AsyncMessageTypes } from '@/types/AsyncMessages';
 
 export const useADO = () => {
   const tokens = useSelector(tokensSelector);
@@ -95,9 +96,9 @@ export const useADO = () => {
     dispatch.tokenState.setEditProhibited(!hasWriteAccess);
   }, [dispatch, storageClientFactory]);
 
-  const pullTokensFromADO = React.useCallback(async (context: ContextObject, receivedFeatureFlags?: FeatureFlags | undefined) => {
+  const pullTokensFromADO = React.useCallback(async (context: ContextObject, receivedFeatureFlags?: LDProps['flags']) => {
     const storage = storageClientFactory(context);
-    if (receivedFeatureFlags?.gh_mfs_enabled) storage.enableMultiFile();
+    if (receivedFeatureFlags?.multiFileSync) storage.enableMultiFile();
 
     await checkAndSetAccess(context);
 
@@ -164,8 +165,8 @@ export const useADO = () => {
       const data = await syncTokensWithADO(context);
 
       if (data) {
-        postToFigma({
-          type: MessageToPluginTypes.CREDENTIALS,
+        AsyncMessageChannel.message({
+          type: AsyncMessageTypes.CREDENTIALS,
           ...context,
         });
         if (data?.tokens) {

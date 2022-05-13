@@ -1,3 +1,5 @@
+import { StorageProviderType } from '@/constants/StorageProviderType';
+
 export type StorageType = {
   provider: StorageProviderType;
   id?: string;
@@ -16,15 +18,6 @@ export type ApiDataType = {
   filePath?: string;
   baseUrl?: string
 };
-
-export enum StorageProviderType {
-  LOCAL = 'local',
-  JSONBIN = 'jsonbin',
-  GITHUB = 'github',
-  GITLAB = 'gitlab',
-  ADO = 'ado',
-  URL = 'url',
-}
 
 export interface ContextObject extends ApiDataType {
   branch?: string;

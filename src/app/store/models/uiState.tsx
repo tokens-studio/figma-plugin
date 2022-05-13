@@ -1,6 +1,6 @@
 /* eslint-disable import/prefer-default-export */
 import { createModel } from '@rematch/core';
-import { StorageType, StorageProviderType, ApiDataType } from '@/types/api';
+import { StorageType, ApiDataType } from '@/types/api';
 import { track } from '@/utils/analytics';
 import type { RootModel } from '@/types/RootModel';
 import fetchChangelog from '@/utils/storyblok';
@@ -10,6 +10,7 @@ import { SelectionGroup, StoryblokStory } from '@/types';
 import { Tabs } from '@/constants/Tabs';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
+import { StorageProviderType } from '@/constants/StorageProviderType';
 
 type DisplayType = 'GRID' | 'LIST';
 

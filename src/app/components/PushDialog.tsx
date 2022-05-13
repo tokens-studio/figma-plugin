@@ -1,7 +1,6 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { localApiStateSelector } from '@/selectors';
-import { StorageProviderType } from '@/types/api';
 import usePushDialog from '../hooks/usePushDialog';
 import { getGithubCreatePullRequestUrl } from '../store/providers/github';
 import { getGitlabCreatePullRequestUrl } from '../store/providers/gitlab';
@@ -12,6 +11,7 @@ import Input from './Input';
 import Modal from './Modal';
 import Stack from './Stack';
 import Spinner from './Spinner';
+import { StorageProviderType } from '@/constants/StorageProviderType';
 
 function ConfirmDialog() {
   const { onConfirm, onCancel, showPushDialog } = usePushDialog();

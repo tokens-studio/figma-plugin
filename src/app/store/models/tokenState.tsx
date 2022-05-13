@@ -1,7 +1,6 @@
 /* eslint-disable import/prefer-default-export */
 import { createModel } from '@rematch/core';
 import omit from 'just-omit';
-import { StorageProviderType } from '@/types/api';
 import * as tokenStateReducers from './reducers/tokenState';
 import * as tokenStateEffects from './effects/tokenState';
 
@@ -28,6 +27,7 @@ import { RootModel } from '@/types/RootModel';
 import { ThemeObjectsList, UsedTokenSetsMap } from '@/types';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { isEqual } from '@/utils/isEqual';
+import { StorageProviderType } from '@/constants/StorageProviderType';
 
 export interface TokenState {
   tokens: Record<string, AnyTokenList>;

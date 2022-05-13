@@ -1,7 +1,7 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { useCallback, useMemo } from 'react';
 import { Dispatch } from '@/app/store';
-import { ContextObject, StorageProviderType } from '@/types/api';
+import { ContextObject } from '@/types/api';
 import { notifyToUI } from '../../../plugin/notifiers';
 import * as pjs from '../../../../package.json';
 import useStorage from '../useStorage';
@@ -11,6 +11,7 @@ import { UpdateRemoteFunctionPayload } from '@/types/UpdateRemoteFunction';
 import { JSONBinTokenStorage } from '@/storage';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
+import { StorageProviderType } from '@/constants/StorageProviderType';
 
 export async function updateJSONBinTokens({
   tokens, themes, context, updatedAt, oldUpdatedAt = null,

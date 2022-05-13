@@ -4,11 +4,11 @@ import Heading from './Heading';
 import Text from './Text';
 import Button from './Button';
 import Callout from './Callout';
-import { StorageProviderType } from '../../types/api';
 import { Dispatch } from '../store';
 import { storageTypeSelector } from '@/selectors';
 import Stack from './Stack';
 import { Tabs } from '@/constants/Tabs';
+import { StorageProviderType } from '@/constants/StorageProviderType';
 
 function StartScreen() {
   const dispatch = useDispatch<Dispatch>();

@@ -1,5 +1,5 @@
+import { StorageProviderType } from '@/constants/StorageProviderType';
 import * as helpers from '@/plugin/helpers';
-import { StorageProviderType } from '../types/api';
 import { removeSingleCredential, updateCredentials } from './credentials';
 
 describe('updateCredentials', () => {

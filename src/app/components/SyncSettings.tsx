@@ -2,7 +2,6 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { track } from '@/utils/analytics';
-import { StorageProviderType } from '@/types/api';
 import Button from './Button';
 import Heading from './Heading';
 import ConfirmLocalStorageModal from './modals/ConfirmLocalStorageModal';
@@ -16,6 +15,7 @@ import { apiProvidersSelector, localApiStateSelector, storageTypeSelector } from
 import Stack from './Stack';
 import Box from './Box';
 import Text from './Text';
+import { StorageProviderType } from '@/constants/StorageProviderType';
 
 const SyncSettings = () => {
   const localApiState = useSelector(localApiStateSelector);
