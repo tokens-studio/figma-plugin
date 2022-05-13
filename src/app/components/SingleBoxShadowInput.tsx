@@ -170,7 +170,6 @@ export default function SingleBoxShadowInput({
       }
 
       onMove(dragIndex, hoverIndex);
-
       item.index = hoverIndex;
     },
   });
