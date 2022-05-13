@@ -29,9 +29,9 @@ export function Initiator() {
   const checkedLocalStorage = useSelector(checkedLocalStorageForKeySelector);
   const userId = useSelector(userIdSelector);
 
-  const askUserIfPull: (() => Promise<any>) = React.useCallback(async () => {
+  const askUserIfPull: ((storageType: StorageType | undefined) => Promise<any>) = React.useCallback(async (storageType) => {
     const shouldPull = await confirm({
-      text: 'Pull from?',
+      text: `Pull from ${storageType?.provider}?`,
       description: 'You have unsaved changes that will be lost. Do you want to pull from your repo?',
     });
     return shouldPull;
@@ -84,7 +84,7 @@ export function Initiator() {
           case MessageFromPluginTypes.TOKEN_VALUES: {
             const { values } = pluginMessage;
             const existChanges = values.checkForChanges === 'true';
-            if (!existChanges || (existChanges && await askUserIfPull())) {
+            if (!existChanges || (existChanges && await askUserIfPull(values?.storageType))) {
               getApiCredentials(true);
             } else {
               dispatch.tokenState.setTokenData(values);
