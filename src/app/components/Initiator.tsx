@@ -29,13 +29,13 @@ export function Initiator() {
   const checkedLocalStorage = useSelector(checkedLocalStorageForKeySelector);
   const userId = useSelector(userIdSelector);
 
-  const askUserIfPull: ((storageType: StorageType) => Promise<any>) = React.useCallback(async (storageType: StorageType) => {
+  const askUserIfPull: (() => Promise<any>) = React.useCallback(async () => {
     const shouldPull = await confirm({
-      text: `Pull from ${storageType.provider}?`,
+      text: 'Pull from?',
       description: 'You have unsaved changes that will be lost. Do you want to pull from your repo?',
     });
     return shouldPull;
-  }, [confirm]);
+  }, []);
 
   const onInitiate = React.useCallback(() => postToFigma({ type: MessageToPluginTypes.INITIATE }), []);
   const getApiCredentials = React.useCallback((shouldPull: boolean) => postToFigma({ type: MessageToPluginTypes.GET_API_CREDENTIALS, shouldPull }), []);
@@ -84,7 +84,7 @@ export function Initiator() {
           case MessageFromPluginTypes.TOKEN_VALUES: {
             const { values } = pluginMessage;
             const existChanges = values.checkForChanges === 'true';
-            if (!existChanges || (existChanges && await askUserIfPull(values.storageType))) {
+            if (!existChanges || (existChanges && await askUserIfPull())) {
               getApiCredentials(true);
             } else {
               dispatch.tokenState.setTokenData(values);
@@ -234,7 +234,7 @@ export function Initiator() {
         }
       }
     };
-  });
+  }, []);
 
   useEffect(() => {
     async function getLicense() {
