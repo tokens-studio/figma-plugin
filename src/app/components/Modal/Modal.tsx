@@ -6,7 +6,9 @@ import XIcon from '@/icons/x.svg';
 import { ModalFooter } from './ModalFooter';
 import { ModalHeader } from './ModalHeader';
 
-if (process.env.NODE_ENV !== 'test') ReactModal.setAppElement('#app');
+if (typeof document !== 'undefined' && document.getElementById('app')) {
+  ReactModal.setAppElement('#app');
+}
 
 const customStyles = (large = false): ReactModalStyles => ({
   overlay: {

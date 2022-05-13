@@ -22,6 +22,7 @@ export enum StorageProviderType {
   JSONBIN = 'jsonbin',
   GITHUB = 'github',
   GITLAB = 'gitlab',
+  ADO = 'ado',
   URL = 'url',
 }
 
@@ -29,7 +30,7 @@ export interface ContextObject extends ApiDataType {
   branch?: string;
   filePath?: string;
   tokens?: string;
-  baseUrl?: string;
+  baseUrl?: string
   internalId?: string;
   updatedAt?: string;
 }

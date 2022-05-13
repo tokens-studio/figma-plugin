@@ -306,7 +306,6 @@ export const tokenState = createModel<RootModel>()({
           updatedTokens,
         },
       } as TokenState;
-      // @TODO fix this
     },
     editToken: (state, data: UpdateTokenPayload) => {
       const nameToFind = data.oldName ? data.oldName : data.name;
@@ -382,9 +381,8 @@ export const tokenState = createModel<RootModel>()({
       const newState = {
         ...state,
         tokens: newTokenGroupState.reduce((acc, cur) => ({ ...acc, ...cur }), {}),
-      } as TokenState;
-      // @TODO fix this
-      return newState;
+      };
+      return newState as TokenState;
     },
 
     duplicateTokenGroup: (state, data: DuplicateTokenGroupPayload) => {

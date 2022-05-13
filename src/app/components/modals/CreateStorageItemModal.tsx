@@ -1,6 +1,5 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useSelector } from 'react-redux';
-import { RootState } from '@/app/store';
 import { StorageProviderType } from '@/types/api';
 import Modal from '../Modal';
 import Heading from '../Heading';
@@ -11,7 +10,7 @@ import Stack from '../Stack';
 
 type Props = {
   isOpen: boolean
-  onClose: (arg: boolean) => void
+  onClose: () => void
   onSuccess: () => void
 };
 
@@ -24,7 +23,8 @@ export default function CreateStorageItemModal({ isOpen, onClose, onSuccess }: P
   let defaultFields;
   switch (localApiState.provider) {
     case StorageProviderType.GITHUB:
-    case StorageProviderType.GITLAB: {
+    case StorageProviderType.GITLAB:
+    case StorageProviderType.ADO: {
       defaultFields = {
         secret: '',
         id: '',
@@ -39,7 +39,7 @@ export default function CreateStorageItemModal({ isOpen, onClose, onSuccess }: P
       break;
   }
   const [formFields, setFormFields] = React.useState(defaultFields);
-  const handleCreateNewClick = async () => {
+  const handleCreateNewClick = React.useCallback(async () => {
     setHasErrored(false);
     const response = await addNewProviderItem({
       provider: localApiState.provider,
@@ -50,26 +50,26 @@ export default function CreateStorageItemModal({ isOpen, onClose, onSuccess }: P
     } else {
       setHasErrored(true);
     }
-  };
+  }, [addNewProviderItem, formFields, localApiState.provider, onSuccess]);
 
-  const handleChange = (e) => {
+  const handleChange = useCallback((e) => {
     setFormFields({ ...formFields, [e.target.name]: e.target.value });
-  };
+  }, [formFields]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = useCallback((e) => {
     e.preventDefault();
     handleCreateNewClick();
-  };
+  }, [handleCreateNewClick]);
 
   return (
-    <Modal large isOpen={isOpen} close={() => onClose(false)}>
+    <Modal large isOpen={isOpen} close={onClose}>
       <Stack direction="column" gap={4}>
         <Heading>Add new credentials</Heading>
         <StorageItemForm
           isNew
           handleChange={handleChange}
           handleSubmit={handleSubmit}
-          handleCancel={() => onClose(false)}
+          handleCancel={onClose}
           values={formFields}
           hasErrored={hasErrored}
         />

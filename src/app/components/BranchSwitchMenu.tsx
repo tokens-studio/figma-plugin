@@ -99,7 +99,7 @@ const StyledBranchSwitchMenuRadioGroup = styled(BranchSwitchMenuPrimitive.RadioG
 
 const StyledBranchSwitchMenuRadioItem = styled(BranchSwitchMenuPrimitive.RadioItem, itemStyles);
 
-const StyledBranchSwitchMenuArrow = styled(BranchSwitchMenuPrimitive.Arrow, { fill: 'black' });
+const StyledBranchSwitchMenuArrow = styled(BranchSwitchMenuPrimitive.Arrow, { fill: '$contextMenuBackground' });
 
 const StyledBranchSwitchMenu = styled(BranchSwitchMenuPrimitive.Root, {});
 

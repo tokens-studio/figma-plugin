@@ -51,6 +51,7 @@ let shouldSendSelectionValues = false;
 figma.skipInvisibleInstanceChildren = true;
 
 figma.showUI(__html__, {
+  themeColors: true,
   width: DefaultWindowSize.width,
   height: DefaultWindowSize.height,
 });
@@ -108,6 +109,7 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
           case StorageProviderType.JSONBIN:
           case StorageProviderType.GITHUB:
           case StorageProviderType.GITLAB:
+          case StorageProviderType.ADO:
           case StorageProviderType.URL: {
             compareProvidersWithStored({
               providers: apiProviders, storageType, featureFlagId, usedTokenSet,
