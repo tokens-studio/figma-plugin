@@ -2,14 +2,15 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useCallback, useMemo } from 'react';
 import { Dispatch } from '@/app/store';
 import { ContextObject, StorageProviderType } from '@/types/api';
-import { MessageToPluginTypes } from '@/types/messages';
-import { notifyToUI, postToFigma } from '../../../plugin/notifiers';
+import { notifyToUI } from '../../../plugin/notifiers';
 import * as pjs from '../../../../package.json';
 import useStorage from '../useStorage';
 import { compareUpdatedAt } from '@/utils/date';
 import { themesListSelector, tokensSelector } from '@/selectors';
 import { UpdateRemoteFunctionPayload } from '@/types/UpdateRemoteFunction';
 import { JSONBinTokenStorage } from '@/storage';
+import { AsyncMessageTypes } from '@/types/AsyncMessages';
+import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 
 export async function updateJSONBinTokens({
   tokens, themes, context, updatedAt, oldUpdatedAt = null,
@@ -67,8 +68,8 @@ export function useJSONbin() {
         themes,
         updatedAt,
       });
-      postToFigma({
-        type: MessageToPluginTypes.CREDENTIALS,
+      AsyncMessageChannel.message({
+        type: AsyncMessageTypes.CREDENTIALS,
         id: result.metadata.id,
         name,
         secret,
@@ -92,8 +93,8 @@ export function useJSONbin() {
       const data = await storage.retrieve();
       dispatch.uiState.setProjectURL(`https://jsonbin.io/${id}`);
 
-      postToFigma({
-        type: MessageToPluginTypes.CREDENTIALS,
+      AsyncMessageChannel.message({
+        type: AsyncMessageTypes.CREDENTIALS,
         id,
         name,
         secret,

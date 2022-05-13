@@ -1,8 +1,7 @@
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { identify, track } from '@/utils/analytics';
-import { MessageFromPluginTypes, MessageToPluginTypes, PostToUIMessage } from '@/types/messages';
-import { notifyToUI, postToFigma } from '../../plugin/notifiers';
+import { MessageFromPluginTypes, PostToUIMessage } from '@/types/messages';
 import useRemoteTokens from '../store/remoteTokens';
 import { Dispatch } from '../store';
 import useStorage from '../store/useStorage';
@@ -16,6 +15,8 @@ import getLicenseKey from '@/utils/getLicenseKey';
 import { licenseKeySelector } from '@/selectors/licenseKeySelector';
 import { checkedLocalStorageForKeySelector } from '@/selectors/checkedLocalStorageForKeySelector';
 import { AddLicenseSource } from '../store/models/userState';
+import { AsyncMessageTypes } from '@/types/AsyncMessages';
+import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 
 export function Initiator() {
   const dispatch = useDispatch<Dispatch>();
@@ -26,7 +27,7 @@ export function Initiator() {
   const checkedLocalStorage = useSelector(checkedLocalStorageForKeySelector);
 
   const onInitiate = () => {
-    postToFigma({ type: MessageToPluginTypes.INITIATE });
+    AsyncMessageChannel.message({ type: AsyncMessageTypes.INITIATE });
   };
   const userId = useSelector(userIdSelector);
 

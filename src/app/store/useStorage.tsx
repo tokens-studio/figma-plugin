@@ -1,9 +1,9 @@
 import { useDispatch } from 'react-redux';
 import { useCallback } from 'react';
-import { postToFigma } from '@/plugin/notifiers';
 import { ContextObject } from '@/types/api';
-import { MessageToPluginTypes } from '@/types/messages';
 import type { Dispatch } from '../store';
+import { AsyncMessageTypes } from '@/types/AsyncMessages';
+import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 
 type SetStorageTypeOptions = {
   provider: ContextObject;
@@ -18,8 +18,8 @@ export default function useStorage() {
     shouldSetInDocument = false,
   }: SetStorageTypeOptions) => {
     if (shouldSetInDocument) {
-      postToFigma({
-        type: MessageToPluginTypes.SET_STORAGE_TYPE,
+      AsyncMessageChannel.message({
+        type: AsyncMessageTypes.SET_STORAGE_TYPE,
         storageType: provider,
       });
     }

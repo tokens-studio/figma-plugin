@@ -1,9 +1,10 @@
 import { createModel } from '@rematch/core';
 import { RootModel } from '@/types/RootModel';
 import validateLicense from '@/utils/validateLicense';
-import { notifyToUI, postToFigma } from '@/plugin/notifiers';
-import { MessageToPluginTypes } from '@/types/messages';
+import { notifyToUI } from '@/plugin/notifiers';
 import removeLicense from '@/utils/removeLicense';
+import { AsyncMessageChannel } from '@/AsyncMessageChannel';
+import { AsyncMessageTypes } from '@/types/AsyncMessages';
 
 export enum AddLicenseSource {
   PLUGIN,
@@ -109,8 +110,8 @@ export const userState = createModel<RootModel>()({
           notifyToUI('License added succesfully!');
         }
         if (source !== AddLicenseSource.PLUGIN) {
-          postToFigma({
-            type: MessageToPluginTypes.SET_LICENSE_KEY,
+          AsyncMessageChannel.message({
+            type: AsyncMessageTypes.SET_LICENSE_KEY,
             licenseKey: key,
           });
         }
@@ -129,8 +130,8 @@ export const userState = createModel<RootModel>()({
         }
       }
 
-      postToFigma({
-        type: MessageToPluginTypes.SET_LICENSE_KEY,
+      AsyncMessageChannel.message({
+        type: AsyncMessageTypes.SET_LICENSE_KEY,
         licenseKey: null,
       });
 

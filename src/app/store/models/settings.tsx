@@ -1,10 +1,10 @@
 /* eslint-disable import/prefer-default-export */
 import { createModel } from '@rematch/core';
-import { postToFigma } from '@/plugin/notifiers';
 import { track } from '@/utils/analytics';
-import { MessageToPluginTypes } from '@/types/messages';
 import { RootModel } from '@/types/RootModel';
 import { UpdateMode } from '@/constants/UpdateMode';
+import { AsyncMessageTypes } from '@/types/AsyncMessages';
+import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 
 type WindowSettingsType = {
   width: number;
@@ -26,8 +26,8 @@ export interface SettingsState {
 }
 
 const setUI = (state: SettingsState) => {
-  postToFigma({
-    type: MessageToPluginTypes.SET_UI,
+  AsyncMessageChannel.message({
+    type: AsyncMessageTypes.SET_UI,
     ...state,
   });
 };
@@ -128,15 +128,15 @@ export const settings = createModel<RootModel>()({
   },
   effects: () => ({
     setWindowSize: (payload) => {
-      postToFigma({
-        type: MessageToPluginTypes.RESIZE_WINDOW,
+      AsyncMessageChannel.message({
+        type: AsyncMessageTypes.RESIZE_WINDOW,
         width: payload.width,
         height: payload.height,
       });
     },
     setMinimizePluginWindow: (payload) => {
-      postToFigma({
-        type: MessageToPluginTypes.RESIZE_WINDOW,
+      AsyncMessageChannel.message({
+        type: AsyncMessageTypes.RESIZE_WINDOW,
         width: payload.isMinimized ? 50 : payload.width,
         height: payload.isMinimized ? 50 : payload.height,
       });
