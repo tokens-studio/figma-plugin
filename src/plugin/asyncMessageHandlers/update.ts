@@ -10,9 +10,8 @@ import store from '../store';
 import updateStyles from '../updateStyles';
 
 export const update: AsyncMessageChannelHandlers[AsyncMessageTypes.UPDATE] = async (msg) => {
-  let receivedStyleIds: Record<string, string> = {};
   if (msg.settings.updateStyles && msg.tokens) {
-    receivedStyleIds = await updateStyles(msg.tokens, false, msg.settings);
+    updateStyles(msg.tokens, false, msg.settings);
   }
 
   if (msg.tokenValues && msg.updatedAt) {
@@ -36,8 +35,4 @@ export const update: AsyncMessageChannelHandlers[AsyncMessageTypes.UPDATE] = asy
       remotes: store.remoteComponents,
     });
   }
-
-  return {
-    styleIds: receivedStyleIds,
-  };
 };

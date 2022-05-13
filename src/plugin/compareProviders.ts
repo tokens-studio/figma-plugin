@@ -6,6 +6,7 @@ import { MessageFromPluginTypes } from '../types/messages';
 type Options = {
   providers?: string | null,
   storageType: StorageType,
+  activeTheme?: string | null
   featureFlagId?: string | null,
   usedTokenSet?: UsedTokenSetsMap | null
 };

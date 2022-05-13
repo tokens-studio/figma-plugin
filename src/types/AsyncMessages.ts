@@ -116,7 +116,7 @@ export type CreateStylesAsyncMessage = AsyncMessage<AsyncMessageTypes.CREATE_STY
   tokens: AnyTokenList;
   settings: SettingsState;
 }>;
-export type CreateStylesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.CREATE_STYLES, { styleIds: Record<string, string>; }>;
+export type CreateStylesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.CREATE_STYLES>;
 
 export type UpdateAsyncMessage = AsyncMessage<AsyncMessageTypes.UPDATE, {
   tokenValues: AnyTokenSet;
@@ -128,7 +128,7 @@ export type UpdateAsyncMessage = AsyncMessage<AsyncMessageTypes.UPDATE, {
   activeTheme: string | null;
   checkForChanges?: string
 }>;
-export type UpdateAsyncMessageResult = AsyncMessage<AsyncMessageTypes.UPDATE, { styleIds: Record<string, string>; }>;
+export type UpdateAsyncMessageResult = AsyncMessage<AsyncMessageTypes.UPDATE>;
 
 export type SetLicenseKeyMessage = AsyncMessage<AsyncMessageTypes.SET_LICENSE_KEY, {
   licenseKey: string | null

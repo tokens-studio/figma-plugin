@@ -51,7 +51,6 @@ export const initiate: AsyncMessageChannelHandlers[AsyncMessageTypes.INITIATE] =
           providers: apiProviders,
           storageType,
           featureFlagId,
-          activeTheme,
           usedTokenSet,
         });
         break;
