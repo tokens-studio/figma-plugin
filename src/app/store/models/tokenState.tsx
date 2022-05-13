@@ -48,7 +48,7 @@ export const tokenState = createModel<RootModel>()({
       global: [],
     },
     themes: [],
-    lastSyncedState: JSON.stringify([{ global: {} }, []], null, 2),
+    lastSyncedState: JSON.stringify([{ global: [] }, []], null, 2),
     importedTokens: {
       newTokens: [],
       updatedTokens: [],
@@ -264,7 +264,7 @@ export const tokenState = createModel<RootModel>()({
       };
     },
     // Imports received styles as tokens, if needed
-    setTokensFromStyles: (state, receivedStyles: SetTokensFromStylesPayload) => {
+    setTokensFromStyles: (state, receivedStyles: SetTokensFromStylesPayload): TokenState => {
       const newTokens: SingleToken[] = [];
       const existingTokens: SingleToken[] = [];
       const updatedTokens: SingleToken[] = [];

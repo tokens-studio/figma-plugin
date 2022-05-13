@@ -299,7 +299,6 @@ const output = [
 ];
 describe('resolveTokenValues', () => {
   it('resolves all values it can resolve', () => {
-    console.log('checking tokens', tokens);
 
     expect(resolveTokenValues(tokens)).toEqual(output);
   });

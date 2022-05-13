@@ -1,14 +1,15 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { useCallback, useMemo } from 'react';
+import { useFlags } from 'launchdarkly-react-client-sdk';
+import { LDProps } from 'launchdarkly-react-client-sdk/lib/withLDConsumer';
 import { Dispatch } from '@/app/store';
 import { MessageToPluginTypes } from '@/types/messages';
 import useConfirm from '@/app/hooks/useConfirm';
 import usePushDialog from '@/app/hooks/usePushDialog';
 import { ContextObject } from '@/types/api';
 import { notifyToUI, postToFigma } from '@/plugin/notifiers';
-import { FeatureFlags } from '@/utils/featureFlags';
 import {
-  featureFlagsSelector, localApiStateSelector, themesListSelector, tokensSelector,
+  localApiStateSelector, themesListSelector, tokensSelector,
 } from '@/selectors';
 import { GitlabTokenStorage } from '@/storage/GitlabTokenStorage';
 import { isEqual } from '@/utils/isEqual';
@@ -19,7 +20,7 @@ export function useGitLab() {
   const tokens = useSelector(tokensSelector);
   const themes = useSelector(themesListSelector);
   const localApiState = useSelector(localApiStateSelector);
-  const featureFlags = useSelector(featureFlagsSelector);
+  const { multiFileSync } = useFlags();
   const dispatch = useDispatch<Dispatch>();
 
   const { confirm } = useConfirm();
@@ -30,9 +31,9 @@ export function useGitLab() {
     const storageClient = new GitlabTokenStorage(context.secret, owner ?? splitContextId[0], repo ?? splitContextId[1], context.baseUrl ?? '');
     if (context.filePath) storageClient.changePath(context.filePath);
     if (context.branch) storageClient.selectBranch(context.branch);
-    if (featureFlags?.gh_mfs_enabled) storageClient.enableMultiFile();
+    if (multiFileSync) storageClient.enableMultiFile();
     return storageClient.assignProjectId();
-  }, [featureFlags]);
+  }, [multiFileSync]);
 
   const askUserIfPull = useCallback(async () => {
     const confirmResult = await confirm({
@@ -51,7 +52,11 @@ export function useGitLab() {
     if (content) {
       if (content && isEqual(content.tokens, tokens) && isEqual(content.themes, themes)) {
         notifyToUI('Nothing to commit');
-        return null;
+        return {
+          tokens,
+          themes,
+          metadata: {},
+        };
       }
     }
 
@@ -69,14 +74,27 @@ export function useGitLab() {
         });
         dispatch.uiState.setLocalApiState({ ...localApiState, branch: customBranch });
         dispatch.uiState.setApiData({ ...context, branch: customBranch });
+        dispatch.tokenState.setLastSyncedState(JSON.stringify([tokens, themes], null, 2));
+        dispatch.tokenState.setTokenData({
+          values: tokens,
+          themes,
+        });
 
         pushDialog('success');
-        return true;
+        return {
+          tokens,
+          themes,
+          metadata: {},
+        };
       } catch (e) {
         console.log('Error pushing to GitLab', e);
       }
     }
-    return false;
+    return {
+      tokens,
+      themes,
+      metadata: {},
+    };
   }, [
     dispatch,
     storageClientFactory,
@@ -92,9 +110,9 @@ export function useGitLab() {
     dispatch.tokenState.setEditProhibited(!hasWriteAccess);
   }, [dispatch, storageClientFactory]);
 
-  const pullTokensFromGitLab = useCallback(async (context: ContextObject, receivedFeatureFlags?: FeatureFlags) => {
+  const pullTokensFromGitLab = useCallback(async (context: ContextObject, receivedFeatureFlags?: LDProps['flags']) => {
     const storage = await storageClientFactory(context);
-    if (receivedFeatureFlags?.gh_mfs_enabled) storage.enableMultiFile();
+    if (receivedFeatureFlags?.multiFileSync) storage.enableMultiFile();
 
     const [owner, repo] = context.id.split('/');
 
@@ -135,13 +153,12 @@ export function useGitLab() {
               values: content.tokens,
               themes: content.themes,
             });
-            notifyToUI('Pulled tokens from GitHub');
+            notifyToUI('Pulled tokens from GitLab');
           }
         }
         return content;
       }
-      await pushTokensToGitLab(context);
-      return content;
+      return await pushTokensToGitLab(context);
     } catch (err) {
       notifyToUI('Error syncing with GitLab, check credentials', { error: true });
       console.log('Error', err);

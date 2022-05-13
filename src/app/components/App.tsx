@@ -1,6 +1,8 @@
 import React, { useEffect } from 'react';
+import Case from 'case';
 import { useSelector } from 'react-redux';
 import { withLDProvider, useLDClient } from 'launchdarkly-react-client-sdk';
+import { LDProps } from 'launchdarkly-react-client-sdk/lib/withLDConsumer';
 import Settings from './Settings';
 import Inspector from './Inspector';
 import Tokens from './Tokens';
@@ -15,7 +17,7 @@ import ConfirmDialog from './ConfirmDialog';
 import PushDialog from './PushDialog';
 import WindowResizer from './WindowResizer';
 import Box from './Box';
-import { activeTabSelector } from '@/selectors';
+import { activeTabSelector, licenseStatusSelector } from '@/selectors';
 import PluginResizerWrapper from './PluginResizer';
 import { userIdSelector } from '@/selectors/userIdSelector';
 import { planSelector } from '@/selectors/planSelector';
@@ -23,6 +25,12 @@ import { clientEmailSelector } from '@/selectors/getClientEmail';
 import { entitlementsSelector } from '@/selectors/getEntitlements';
 import { Entitlements } from '../store/models/userState';
 import LoadingBar from './LoadingBar';
+import { LicenseStatus } from '@/constants/LicenseStatus';
+
+let ldIdentificationResolver: (flags: LDProps['flags']) => void = () => {};
+const ldIdentificationPromise = new Promise<LDProps['flags']>((resolve) => {
+  ldIdentificationResolver = resolve;
+});
 
 function App() {
   const activeTab = useSelector(activeTabSelector);
@@ -31,9 +39,18 @@ function App() {
   const ldClient = useLDClient();
   const clientEmail = useSelector(clientEmailSelector);
   const entitlements = useSelector(entitlementsSelector);
+  const licenseStatus = useSelector(licenseStatusSelector);
 
   useEffect(() => {
-    if (userId) {
+    if (
+      userId
+      && ldClient
+      && (
+        licenseStatus !== LicenseStatus.UNKNOWN
+        && licenseStatus !== LicenseStatus.VERIFYING
+        // license should be verified (or returned an error) before identifying launchdarkly with entitlements
+      )
+    ) {
       const userAttributes: Record<string, string | boolean> = {
         plan: plan || '',
         email: clientEmail || '',
@@ -44,16 +61,25 @@ function App() {
         userAttributes[entitlement] = true;
       });
 
-      ldClient?.identify({
+      // we need to be able to await the identifiaction process in the initiator
+      // this logic could be improved later to be more reactive
+      ldClient.identify({
         key: userId!,
         custom: userAttributes,
+      }).then((rawFlags) => {
+        const normalizedFlags = Object.fromEntries(
+          Object.entries(rawFlags).map(([key, value]) => (
+            [Case.camel(key), value]
+          )),
+        );
+        ldIdentificationResolver(normalizedFlags);
       });
     }
-  }, [userId, ldClient, plan, clientEmail, entitlements]);
+  }, [userId, ldClient, licenseStatus, plan, clientEmail, entitlements]);
 
   return (
     <Box css={{ backgroundColor: '$bgDefault' }}>
-      <Initiator />
+      <Initiator identificationPromise={ldIdentificationPromise} />
       { activeTab !== 'loading' && <LoadingBar />}
       <PluginResizerWrapper>
         <Box
