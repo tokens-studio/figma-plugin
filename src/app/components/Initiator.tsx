@@ -161,7 +161,7 @@ export function Initiator() {
                   dispatch.uiState.setActiveTab(Tabs.TOKENS);
                 }
               } else {
-                dispatch.uiState.setActiveTab(Tabs.TOKENS);
+                dispatch.uiState.setActiveTab(Tabs.START);
               }
             }
             break;
