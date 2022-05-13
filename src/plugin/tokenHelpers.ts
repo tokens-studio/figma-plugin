@@ -75,8 +75,7 @@ export function resolveTokenValues(tokens: SingleToken[], previousCount: number 
               property: item.property,
               value: returnItemValue,
             };
-          }
-          if (item.property === TokenTypes.BOX_SHADOW || item.property === TokenTypes.TYPOGRAPHY) {
+          } if (item.property === TokenTypes.BOX_SHADOW || item.property === TokenTypes.TYPOGRAPHY) {
             if (Array.isArray(item.value)) {
               returnItemValue = item.value.map((item) => (
                 Object.entries(item as TokenBoxshadowValue).reduce<Record<string, ReturnType<typeof getAliasValue>>>((acc, [key, value]) => {
@@ -107,7 +106,10 @@ export function resolveTokenValues(tokens: SingleToken[], previousCount: number 
             };
           }
           returnItemValue = getAliasValue(item.value, tokensInProgress);
-          failedToResolve = returnItemValue === null || checkIfContainsAlias(returnItemValue);
+          itemFailedToResolve = returnItemValue === null || checkIfContainsAlias(returnItemValue);
+          if (itemFailedToResolve) {
+            failedToResolve = true;
+          }
           return {
             property: item.property,
             value: returnItemValue,
