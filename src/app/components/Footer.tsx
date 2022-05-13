@@ -17,7 +17,6 @@ import {
   tokensSelector,
   usedTokenSetSelector,
   themesListSelector,
-  activeTabSelector,
   projectURLSelector,
 } from '@/selectors';
 import DocsIcon from '@/icons/docs.svg';
@@ -37,8 +36,6 @@ export default function Footer() {
   const localApiState = useSelector(localApiStateSelector);
   const usedTokenSet = useSelector(usedTokenSetSelector);
   const dispatch = useDispatch<Dispatch>();
-
-  const activeTab = useSelector(activeTabSelector);
   const projectURL = useSelector(projectURLSelector);
   const { gitBranchSelector } = useFlags();
   const { pullTokens, pushTokens } = useRemoteTokens();
@@ -47,7 +44,7 @@ export default function Footer() {
     const hasChanged = (lastSyncedState !== JSON.stringify([tokens, themes], null, 2));
     dispatch.tokenState.updateCheckForChanges(String(hasChanged));
     return hasChanged;
-  }, [lastSyncedState, tokens, themes]);
+  }, [lastSyncedState, tokens, themes, dispatch.tokenState]);
 
   const hasChanges = React.useMemo(() => checkForChanges(), [checkForChanges]);
 

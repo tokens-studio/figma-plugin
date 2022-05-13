@@ -15,7 +15,6 @@ import updateStyles from './updateStyles';
 import store from './store';
 import {
   notifyNoSelection,
-  notifyNoTokenValues,
   notifyTokenValues,
   notifyRemoteComponents,
   notifyStorageType,
@@ -35,7 +34,7 @@ import {
   saveStorageType,
   getSavedStorageType,
   selectNodes,
-  setTokensOnDocument
+  setTokensOnDocument,
 } from './node';
 
 import { MessageFromPluginTypes, MessageToPluginTypes, PostToFigmaMessage } from '../types/messages';
@@ -107,7 +106,7 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
         if (apiProviders) notifyAPIProviders(JSON.parse(apiProviders));
         const oldTokens = getTokenData();
         if (oldTokens) {
-          notifyTokenValues({ ...oldTokens, usedTokenSet });
+          notifyTokenValues({ ...oldTokens, usedTokenSet, storageType });
         }
       } catch (err) {
         figma.closePlugin('There was an error, check console (F12)');
@@ -336,7 +335,7 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
           case StorageProviderType.GITLAB:
           case StorageProviderType.URL: {
             compareProvidersWithStored({
-              providers: apiProviders, storageType, featureFlagId, usedTokenSet, shouldPull: msg.shouldPull
+              providers: apiProviders, storageType, featureFlagId, usedTokenSet, shouldPull: msg.shouldPull,
             });
             break;
           }

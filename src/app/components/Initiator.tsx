@@ -10,7 +10,7 @@ import useStorage from '../store/useStorage';
 import * as pjs from '../../../package.json';
 import { useFeatureFlags } from '../hooks/useFeatureFlags';
 import { Tabs } from '@/constants/Tabs';
-import { StorageProviderType } from '@/types/api';
+import { StorageProviderType, StorageType } from '@/types/api';
 import { GithubTokenStorage } from '@/storage/GithubTokenStorage';
 import { userIdSelector } from '@/selectors/userIdSelector';
 import getLicenseKey from '@/utils/getLicenseKey';
@@ -29,13 +29,13 @@ export function Initiator() {
   const checkedLocalStorage = useSelector(checkedLocalStorageForKeySelector);
   const userId = useSelector(userIdSelector);
 
-  const askUserIfPull: (() => Promise<any>) = React.useCallback(async () => {
+  const askUserIfPull: ((storageType: StorageType) => Promise<any>) = React.useCallback(async (storageType: StorageType) => {
     const shouldPull = await confirm({
-      text: 'Pull from GitHub?',
+      text: `Pull from ${storageType.provider}?`,
       description: 'You have unsaved changes that will be lost. Do you want to pull from your repo?',
     });
     return shouldPull;
-  }, []);
+  }, [confirm]);
 
   const onInitiate = React.useCallback(() => postToFigma({ type: MessageToPluginTypes.INITIATE }), []);
   const getApiCredentials = React.useCallback((shouldPull: boolean) => postToFigma({ type: MessageToPluginTypes.GET_API_CREDENTIALS, shouldPull }), []);
@@ -84,7 +84,7 @@ export function Initiator() {
           case MessageFromPluginTypes.TOKEN_VALUES: {
             const { values } = pluginMessage;
             const existChanges = values.checkForChanges === 'true';
-            if (!existChanges || (existChanges && await askUserIfPull())) {
+            if (!existChanges || (existChanges && await askUserIfPull(values.storageType))) {
               getApiCredentials(true);
             } else {
               dispatch.tokenState.setTokenData(values);
@@ -142,26 +142,29 @@ export function Initiator() {
               if (!credentials.internalId) track('missingInternalId', { provider: credentials.provider });
 
               if (credentials) {
-                const { id, provider, secret, baseUrl } = credentials;
+                const {
+                  id, provider, secret, baseUrl,
+                } = credentials;
                 const [owner, repo] = id.split('/');
                 if (provider === StorageProviderType.GITHUB) {
                   const storageClient = new GithubTokenStorage(secret, owner, repo, baseUrl);
                   const branches = await storageClient.fetchBranches();
                   dispatch.branchState.setBranches(branches);
                 }
-  
+
                 dispatch.uiState.setApiData(credentials);
                 dispatch.uiState.setLocalApiState(credentials);
                 if (shouldPull) {
                   const remoteData = await pullTokens({ context: credentials, featureFlags: receivedFlags, usedTokenSet });
                   const existTokens = Object.values(remoteData?.tokens ?? {}).some((value) => value.length > 0);
-  
+
                   if (existTokens) { dispatch.uiState.setActiveTab(Tabs.TOKENS); } else { dispatch.uiState.setActiveTab(Tabs.START); }
                 } else {
                   dispatch.uiState.setActiveTab(Tabs.TOKENS);
                 }
               } else {
                 dispatch.uiState.setActiveTab(Tabs.START);
+                notifyToUI('Failed to fetch tokens, check your credentials', { error: true });
               }
             }
             break;
@@ -231,7 +234,7 @@ export function Initiator() {
         }
       }
     };
-  }, []);
+  });
 
   useEffect(() => {
     async function getLicense() {
