@@ -1,7 +1,7 @@
 {
   "name": "figma-tokens",
   "version": "1.0.0",
-  "plugin_version": "97",
+  "plugin_version": "96",
   "description": "Figma Tokens",
   "license": "MIT",
   "scripts": {
@@ -11,11 +11,10 @@
     "watch-transform": "webpack --mode=development --watch --config webpack-transform.config.js",
     "build-js": "webpack --mode=production",
     "build": "yarn build-css && yarn build-js",
-    "build:cy": "cross-env LAUNCHDARKLY_FLAGS=tokenThemes,gitBranchSelector yarn build",
     "build:watch": "concurrently 'yarn watch-css' 'yarn watch-js'",
     "build-transform": "webpack --mode=production --config webpack-transform.config.js",
     "prettier:format": "prettier --write 'src/**/*.{js,jsx,ts,tsx,css,json}' ",
-    "test": "cross-env LAUNCHDARKLY_FLAGS=tokenThemes,gitBranchSelector jest",
+    "test": "jest",
     "svgr": "svgr -d src/icons/ assets/",
     "cy:open": "cypress open",
     "cy:run": "cypress run --headless",
@@ -44,7 +43,6 @@
     "@welldone-software/why-did-you-render": "^6.2.3",
     "autoprefixer": "^10.2.5",
     "axios": "^0.21.2",
-    "azure-devops-node-api": "^11.1.1",
     "classnames": "^2.3.1",
     "color2k": "^1.2.4",
     "core-js": "^3.9.1",
@@ -67,7 +65,6 @@
     "just-safe-get": "^4.0.1",
     "just-safe-set": "^4.0.2",
     "just-split": "^3.0.1",
-    "launchdarkly-react-client-sdk": "^2.26.0",
     "lodash.debounce": "^4.0.8",
     "mixpanel-figma": "^2.0.1",
     "ml-matrix": "^6.9.0",
@@ -94,6 +91,9 @@
     "reselect": "^4.1.5",
     "set-value": "^3.0.2",
     "storyblok-js-client": "^3.3.1",
+    "storybook-preset-inline-svg": "^1.0.1",
+    "svg-inline-loader": "^0.8.2",
+    "svg-react-loader": "^0.4.6",
     "tailwindcss": "^3.0.0",
     "use-debounce": "^6.0.1",
     "zod": "^3.14.4"
@@ -112,7 +112,7 @@
     "@storybook/react": "^6.4.22",
     "@storybook/testing-library": "^0.0.11",
     "@svgr/cli": "^5.5.0",
-    "@svgr/webpack": "^5.5.0",
+    "@svgr/webpack": "^6.2.1",
     "@testing-library/jest-dom": "^5.11.9",
     "@testing-library/react": "^11.2.5",
     "@types/jest": "^26.0.20",
@@ -126,8 +126,8 @@
     "@typescript-eslint/parser": "^5.0.0",
     "babel-jest": "^26.6.3",
     "babel-loader": "^8.2.2",
+    "chromatic": "^6.5.4",
     "concurrently": "^5.2.0",
-    "cross-env": "^7.0.3",
     "css-loader": "^3.1.0",
     "cypress": "^6.6.0",
     "eslint": "^8.2.0",
@@ -140,7 +140,7 @@
     "eslint-plugin-react-hooks": "^4.4.0",
     "html-webpack-inline-source-plugin": "^0.0.10",
     "html-webpack-plugin": "^3.2.0",
-    "husky": "^8.0.1",
+    "husky": "^3.0.2",
     "jest": "^26.6.3",
     "lint-staged": "^9.2.1",
     "npm-run-all": "^4.1.5",
@@ -162,5 +162,15 @@
     "hooks": {
       "pre-commit": "lint-staged"
     }
+  },
+  "lint-staged": {
+    "src/**/*.{ts,tsx}": [
+      "eslint --fix",
+      "git add"
+    ],
+    "src/**/*.{js,jsx,css,json}": [
+      "prettier --write",
+      "git add"
+    ]
   }
 }
