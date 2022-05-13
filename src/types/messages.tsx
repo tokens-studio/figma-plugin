@@ -148,7 +148,6 @@ export type ApiCredentialsFromPluginMessage = {
   credentials: ApiDataType & {
     internalId?: string;
   };
-  featureFlagId: string;
   usedTokenSet?: UsedTokenSetsMap | null;
 };
 

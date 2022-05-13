@@ -43,6 +43,7 @@
     "@welldone-software/why-did-you-render": "^6.2.3",
     "autoprefixer": "^10.2.5",
     "axios": "^0.21.2",
+    "case": "^1.6.3",
     "classnames": "^2.3.1",
     "color2k": "^1.2.4",
     "core-js": "^3.9.1",

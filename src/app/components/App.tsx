@@ -1,6 +1,8 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
+import Case from 'case';
 import { useSelector } from 'react-redux';
 import { withLDProvider, useLDClient } from 'launchdarkly-react-client-sdk';
+import { LDProps } from 'launchdarkly-react-client-sdk/lib/withLDConsumer';
 import Settings from './Settings';
 import Inspector from './Inspector';
 import Tokens from './Tokens';
@@ -24,6 +26,8 @@ import { entitlementsSelector } from '@/selectors/getEntitlements';
 import { Entitlements } from '../store/models/userState';
 import LoadingBar from './LoadingBar';
 
+const indefinitePromise = new Promise<LDProps['flags']>(() => {});
+
 function App() {
   const activeTab = useSelector(activeTabSelector);
   const userId = useSelector(userIdSelector);
@@ -31,9 +35,10 @@ function App() {
   const ldClient = useLDClient();
   const clientEmail = useSelector(clientEmailSelector);
   const entitlements = useSelector(entitlementsSelector);
+  const ldIdentificationPromiseRef = useRef<Promise<LDProps['flags']>>(indefinitePromise);
 
   useEffect(() => {
-    if (userId) {
+    if (userId && ldClient) {
       const userAttributes: Record<string, string | boolean> = {
         plan: plan || '',
         email: clientEmail || '',
@@ -44,16 +49,33 @@ function App() {
         userAttributes[entitlement] = true;
       });
 
-      ldClient?.identify({
-        key: userId!,
-        custom: userAttributes,
+      // we need to be able to await the identifiaction process in the initiator
+      // this logic could be improved later to be more reactive
+      ldIdentificationPromiseRef.current = new Promise((resolve) => {
+        ldClient.on('change', (rawFlags: {
+          [K in keyof NonNullable<LDProps['flags']>]: {
+            current: NonNullable<LDProps['flags']>[K]
+            previous: NonNullable<LDProps['flags']>[K]
+          }
+        }) => {
+          const normalizedFlags = Object.fromEntries(
+            Object.entries(rawFlags).map(([key, value]) => (
+              [Case.camel(key), value.current]
+            )),
+          );
+          resolve(normalizedFlags);
+        });
+        ldClient.identify({
+          key: userId!,
+          custom: userAttributes,
+        });
       });
     }
   }, [userId, ldClient, plan, clientEmail, entitlements]);
 
   return (
     <Box css={{ backgroundColor: '$bgDefault' }}>
-      <Initiator />
+      <Initiator identificationPromiseRef={ldIdentificationPromiseRef} />
       { activeTab !== 'loading' && <LoadingBar />}
       <PluginResizerWrapper>
         <Box
