@@ -11,11 +11,11 @@ import Stack from '../Stack';
 import { ApiDataType } from '@/types/api';
 
 type Props = {
-  isOpen: boolean
-  startBranch: string
-  isCurrentChanges: boolean
-  onClose: (arg: boolean) => void
-  onSuccess: (branch: string, branches: string[]) => void
+  isOpen: boolean;
+  startBranch: string | null;
+  isCurrentChanges: boolean;
+  onClose: (arg: boolean) => void;
+  onSuccess: (branch: string, branches: string[]) => void;
 };
 
 type FormData = {

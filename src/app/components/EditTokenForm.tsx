@@ -5,11 +5,12 @@ import { UpdateMode } from '@/types/state';
 import { Dispatch } from '../store';
 import useManageTokens from '../store/useManageTokens';
 import BoxShadowInput from './BoxShadowInput';
+import CompositionTokenForm from './CompositionTokenForm';
 import Input from './Input';
 import ColorPicker from './ColorPicker';
 import useConfirm from '../hooks/useConfirm';
 import useTokens from '../store/useTokens';
-import { SingleBoxShadowToken } from '@/types/tokens';
+import { SingleBoxShadowToken, SingleCompositionToken } from '@/types/tokens';
 import { checkIfContainsAlias, getAliasValue } from '@/utils/alias';
 import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
 import { activeTokenSetSelector, editTokenSelector } from '@/selectors';
@@ -98,6 +99,16 @@ function EditTokenForm({ resolvedTokens }: Props) {
     [internalEditToken],
   );
 
+  const handleCompositionChange = React.useCallback(
+    (style: SingleCompositionToken['value']) => {
+      setError(null);
+      if (internalEditToken?.type === TokenTypes.COMPOSITION) {
+        setInternalEditToken(prev => ({...prev, value: style} as EditTokenObject));
+      }
+    },
+    [internalEditToken],
+  );
+
   const handleBoxShadowChangeByAlias = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>(
     (e) => {
       setError(null);
@@ -179,13 +190,14 @@ function EditTokenForm({ resolvedTokens }: Props) {
       if (internalEditToken.initialName !== name && internalEditToken.initialName) {
         oldName = internalEditToken.initialName;
       }
+
       const newName = name
         .split('/')
         .map((n) => n.trim())
         .join('.');
+
       if (internalEditToken.isPristine) {
         track('Create token', { type: internalEditToken.type });
-
         createSingleToken({
           parent: activeTokenSet,
           name: newName,
@@ -218,6 +230,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
               { key: UpdateMode.DOCUMENT, label: 'Document', unique: true },
             ],
           });
+
           if (shouldRemap) {
             remapToken(oldName, newName, shouldRemap.data[0]);
           }
@@ -289,6 +302,14 @@ function EditTokenForm({ resolvedTokens }: Props) {
             setShowAliasModeAutoSuggest={setShowAutoSuggest}
             handleDownShiftInputChange={handleDownShiftInputChange}
             handleAliasModeAutoSuggest={handleAutoSuggest}
+          />
+        );
+      }
+      case 'composition': {
+        return (
+          <CompositionTokenForm
+            internalEditToken={internalEditToken}
+            setValue={handleCompositionChange}
           />
         );
       }

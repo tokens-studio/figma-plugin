@@ -44,7 +44,7 @@ const SyncSettings = () => {
     });
   }, [dispatch.uiState]);
 
-  const selectedRemoteProvider = React.useMemo(() => [StorageProviderType.JSONBIN, StorageProviderType.GITHUB, StorageProviderType.GITLAB, StorageProviderType.URL].includes(
+  const selectedRemoteProvider = React.useMemo(() => [StorageProviderType.JSONBIN, StorageProviderType.GITHUB, StorageProviderType.GITLAB, StorageProviderType.ADO, StorageProviderType.URL].includes(
     localApiState?.provider as StorageProviderType,
   ), [localApiState?.provider]);
 
@@ -105,6 +105,22 @@ const SyncSettings = () => {
             .
           </div>
         );
+      case StorageProviderType.ADO:
+        return (
+          <div>
+            Sync your tokens with a Azure DevOps repository so your design decisions are up to date with code.
+            {' '}
+            <a
+              href="https://docs.tokens.studio/sync/ado"
+              target="_blank"
+              rel="noreferrer"
+              className="underline"
+            >
+              Read the guide
+            </a>
+            .
+          </div>
+        );
       case StorageProviderType.URL:
         return <div>Sync with a JSON stored on an external URL. This mode only allows Read Only.</div>;
       default:
@@ -122,7 +138,7 @@ const SyncSettings = () => {
   }, [dispatch.uiState, setStorageType]);
 
   const handleSetLocalStorage = React.useCallback(() => {
-    if (storageType?.provider === StorageProviderType.LOCAL) {
+    if (storageType?.provider !== StorageProviderType.LOCAL) {
       showConfirmModal(true);
     }
   }, [storageType?.provider]);
@@ -132,6 +148,10 @@ const SyncSettings = () => {
   }, []);
 
   const handleHideAddCredentials = React.useCallback(() => {
+    setShowCreateStorageModalVisible(false);
+  }, []);
+
+  const handleShowAddCredentials = React.useCallback(() => {
     track('Add Credentials', { provider: localApiState.provider });
     setShowCreateStorageModalVisible(true);
   }, [localApiState.provider]);
@@ -156,8 +176,8 @@ const SyncSettings = () => {
       {createStorageItemModalVisible && (
         <CreateStorageItemModal
           isOpen={createStorageItemModalVisible}
-          onClose={handleHideStorageModal}
-          onSuccess={handleHideStorageModal}
+          onClose={handleHideAddCredentials}
+          onSuccess={handleHideAddCredentials}
         />
       )}
       <Box css={{ padding: '0 $4' }}>
@@ -200,6 +220,13 @@ const SyncSettings = () => {
                 text="GitLab"
                 id={StorageProviderType.GITLAB}
               />
+              <ProviderSelector
+                isActive={localApiState?.provider === StorageProviderType.ADO}
+                isStored={storageType?.provider === StorageProviderType.ADO}
+                onClick={handleProviderClick(StorageProviderType.ADO)}
+                text="ADO"
+                id={StorageProviderType.ADO}
+              />
             </Stack>
           </Stack>
           {selectedRemoteProvider && (
@@ -208,7 +235,7 @@ const SyncSettings = () => {
             <Button
               id="button-add-new-credentials"
               variant="secondary"
-              onClick={handleHideAddCredentials}
+              onClick={handleShowAddCredentials}
             >
               Add new credentials
             </Button>

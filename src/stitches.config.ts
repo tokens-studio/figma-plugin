@@ -78,7 +78,7 @@ export const {
       borderAccent: 'var(--figma-color-border-brand)',
       focus: 'var(--figma-color-bg-brand-tertiary)',
       borderSwitch: 'var(--figma-color-border)',
-      bgSwitchChecked: 'var(--figma-color-border)',
+      bgSwitchChecked: 'var(--figma-color-bg-brand)',
       borderBtnDisabled: 'var(--figma-color-border-disabled)',
       bgBtnPrimary: 'var(--figma-color-bg-brand)',
       fgBtnPrimary: 'var(--figma-color-text-onbrand)',
@@ -94,6 +94,7 @@ export const {
       bgSuccess: 'var(--figma-color-bg-success-tertiary)',
       fgDanger: 'var(--figma-color-text-danger)',
       bgDanger: 'var(--figma-color-bg-danger-tertiary)',
+      spinnerInverse: '#ffffff',
     },
     space: {
       1: '2px',
@@ -105,6 +106,7 @@ export const {
       7: '32px',
       8: '48px',
       9: '64px',
+      10: '38px',
     },
     sizes: {
       1: '2px',
@@ -115,6 +117,7 @@ export const {
       6: '24px',
       7: '32px',
       8: '48px',
+      10: '38px',
     },
     radii: {
       default: globalTokens.radii.sm,
