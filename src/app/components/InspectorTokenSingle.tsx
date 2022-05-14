@@ -10,12 +10,10 @@ import { Dispatch } from '../store';
 import { SelectionGroup } from '@/types';
 import TokenNodes from './inspector/TokenNodes';
 import { inspectStateSelector } from '@/selectors';
-import { checkIfContainsAlias } from '@/utils/alias';
 import { IconToggleableDisclosure } from './icons/IconToggleableDisclosure';
 import Button from './Button';
 import Heading from './Heading';
 import DownshiftInput from './DownshiftInput';
-import { StyledIconDisclosure, StyledInputSuffix } from './StyledInputSuffix';
 import Modal from './Modal';
 import Stack from './Stack';
 import ColorPicker from './ColorPicker';
@@ -31,22 +29,12 @@ export default function InspectorTokenSingle({
   const { handleRemap, getTokenValue } = useTokens();
   const inspectState = useSelector(inspectStateSelector, shallowEqual);
   const dispatch = useDispatch<Dispatch>();
-  const [showAutoSuggest, setShowAutoSuggest] = React.useState<boolean>(false);
   const [newTokenName, setNewTokenName] = React.useState<string>('');
   const [inputHelperOpen, setInputHelperOpen] = React.useState<boolean>(false);
   const [showDialog, setShowDialog] = React.useState<boolean>(false);
   const [isChecked, setChecked] = React.useState<boolean>(false);
 
-  const mappedToken = React.useMemo(() => {
-    if (checkIfContainsAlias(token.value)) {
-      let nameToLookFor: string = '';
-      const tokenValueString = String(token.value);
-      if (tokenValueString.charAt(0) === '$') nameToLookFor = tokenValueString.slice(1, tokenValueString.length);
-      if (tokenValueString.charAt(0) === '{') nameToLookFor = tokenValueString.slice(1, tokenValueString.length - 1);
-      return getTokenValue(nameToLookFor, resolvedTokens);
-    }
-    return getTokenValue(token.value, resolvedTokens);
-  }, [token, resolvedTokens, getTokenValue]);
+  const mappedToken = React.useMemo(() => getTokenValue(token.value, resolvedTokens), [token, resolvedTokens, getTokenValue]);
 
   React.useEffect(() => {
     setChecked(inspectState.selectedTokens.includes(`${token.category}-${token.value}`));
@@ -70,10 +58,6 @@ export default function InspectorTokenSingle({
   const handleToggleInputHelper = React.useCallback(() => {
     setInputHelperOpen(!inputHelperOpen);
   }, [inputHelperOpen]);
-
-  const handleAutoSuggest = React.useCallback(() => {
-    setShowAutoSuggest(!showAutoSuggest);
-  }, [showAutoSuggest]);
 
   const onConfirm = React.useCallback(() => {
     handleRemap(token.category, token.value, newTokenName);
@@ -150,10 +134,8 @@ export default function InspectorTokenSingle({
                     <DownshiftInput
                       value={newTokenName}
                       type={Properties[token.category as keyof typeof Properties] === 'fill' ? 'color' : Properties[token.category as keyof typeof Properties]}
-                      showAutoSuggest={showAutoSuggest}
                       resolvedTokens={resolvedTokens}
                       handleChange={handleChange}
-                      setShowAutoSuggest={setShowAutoSuggest}
                       setInputValue={handleDownShiftInputChange}
                       placeholder={
                         Properties[token.category as keyof typeof Properties] === 'fill' ? '#000000, hsla(), rgba() or {alias}' : 'Value or {alias}'
@@ -163,18 +145,14 @@ export default function InspectorTokenSingle({
                           <button
                             type="button"
                             className="block w-4 h-4 rounded-sm cursor-pointer shadow-border shadow-gray-300 focus:shadow-focus focus:shadow-primary-400"
-                            style={{ background: newTokenName, fontSize: 0 }}
+                            style={{ background: '$borderMuted', fontSize: 0 }}
                             onClick={handleToggleInputHelper}
                           >
                             {newTokenName}
                           </button>
                         )
                       }
-                      suffix={(
-                        <StyledInputSuffix type="button" onClick={handleAutoSuggest}>
-                          <StyledIconDisclosure />
-                        </StyledInputSuffix>
-                      )}
+                      suffix
                     />
                     {inputHelperOpen && Properties[token.category as keyof typeof Properties] === 'fill' && (
                       <ColorPicker value={newTokenName} onChange={handleColorValueChange} />

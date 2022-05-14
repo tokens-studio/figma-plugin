@@ -16,7 +16,6 @@ import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
 import { activeTokenSetSelector, editTokenSelector } from '@/selectors';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { EditTokenObject } from '../store/models/uiState';
-import { StyledIconDisclosure, StyledInputSuffix } from './StyledInputSuffix';
 import TypographyInput from './TypographyInput';
 import Stack from './Stack';
 import DownshiftInput from './DownshiftInput';
@@ -37,7 +36,6 @@ function EditTokenForm({ resolvedTokens }: Props) {
   const [inputHelperOpen, setInputHelperOpen] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const [internalEditToken, setInternalEditToken] = React.useState<typeof editToken>(editToken);
-  const [showAutoSuggest, setShowAutoSuggest] = React.useState<boolean>(false);
   const { confirm } = useConfirm();
 
   const isValid = React.useMemo(() => internalEditToken?.value && !error, [internalEditToken, error]);
@@ -73,17 +71,12 @@ function EditTokenForm({ resolvedTokens }: Props) {
     setInputHelperOpen(!inputHelperOpen);
   }, [inputHelperOpen]);
 
-  const handleAutoSuggest = React.useCallback(() => {
-    setShowAutoSuggest(!showAutoSuggest);
-  }, [showAutoSuggest]);
-
   const handleChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>(
     (e) => {
       setError(null);
       e.persist();
       if (internalEditToken) {
         setInternalEditToken({ ...internalEditToken, [e.target.name]: e.target.value });
-        setShowAutoSuggest(false);
       }
     },
     [internalEditToken],
@@ -103,7 +96,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
     (style: SingleCompositionToken['value']) => {
       setError(null);
       if (internalEditToken?.type === TokenTypes.COMPOSITION) {
-        setInternalEditToken(prev => ({...prev, value: style} as EditTokenObject));
+        setInternalEditToken((prev) => ({ ...prev, value: style } as EditTokenObject));
       }
     },
     [internalEditToken],
@@ -283,10 +276,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
             handleBoxShadowChangeByAlias={handleBoxShadowChangeByAlias}
             resolvedTokens={resolvedTokens}
             internalEditToken={internalEditToken}
-            showAliasModeAutoSuggest={showAutoSuggest}
-            setShowAliasModeAutoSuggest={setShowAutoSuggest}
             handleDownShiftInputChange={handleDownShiftInputChange}
-            handleAliasModeAutoSuggest={handleAutoSuggest}
           />
         );
       }
@@ -298,10 +288,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
             handleTypographyChangeByAlias={handleTypographyChangeByAlias}
             resolvedTokens={resolvedTokens}
             handleTypographyDownShiftInputChange={handleTypographyDownShiftInputChange}
-            showAliasModeAutoSuggest={showAutoSuggest}
-            setShowAliasModeAutoSuggest={setShowAutoSuggest}
             handleDownShiftInputChange={handleDownShiftInputChange}
-            handleAliasModeAutoSuggest={handleAutoSuggest}
           />
         );
       }
@@ -320,10 +307,8 @@ function EditTokenForm({ resolvedTokens }: Props) {
               value={internalEditToken.value}
               type={internalEditToken.type}
               label={internalEditToken.property}
-              showAutoSuggest={showAutoSuggest}
               resolvedTokens={resolvedTokens}
               handleChange={handleChange}
-              setShowAutoSuggest={setShowAutoSuggest}
               setInputValue={handleDownShiftInputChange}
               placeholder={
                 internalEditToken.type === 'color' ? '#000000, hsla(), rgba() or {alias}' : 'Value or {alias}'
@@ -340,11 +325,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
                   </button>
                 )
               }
-              suffix={(
-                <StyledInputSuffix type="button" onClick={handleAutoSuggest}>
-                  <StyledIconDisclosure />
-                </StyledInputSuffix>
-              )}
+              suffix
             />
 
             {inputHelperOpen && internalEditToken.type === 'color' && (

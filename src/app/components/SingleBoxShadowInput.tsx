@@ -53,29 +53,9 @@ export default function SingleBoxShadowInput({
   resolvedTokens: ResolveTokenValuesResult[];
 }) {
   const seed = useUIDSeed();
-  const defalutShowAutoSuggest = React.useMemo(() => {
-    if (shadowItem && typeof shadowItem === 'object') {
-      return Object.entries(shadowItem).map(() => false, {});
-    }
-    return [false];
-  }, [shadowItem]);
-
-  const [showAutoSuggest, setShowAutoSuggest] = React.useState<Array<boolean>>(defalutShowAutoSuggest);
   const [inputHelperOpen, setInputHelperOpen] = React.useState<boolean>(false);
 
   const handleToggleInputHelper = React.useCallback(() => setInputHelperOpen(!inputHelperOpen), [inputHelperOpen]);
-
-  const changeAutoSuggest = React.useCallback((keyIndex: number) => {
-    const newShowAutoSuggest = [...showAutoSuggest];
-    newShowAutoSuggest[keyIndex] = !newShowAutoSuggest[keyIndex];
-    setShowAutoSuggest(newShowAutoSuggest);
-  }, [showAutoSuggest]);
-
-  const closeAutoSuggest = React.useCallback((keyIndex: number) => {
-    const newShowAutoSuggest = [...showAutoSuggest];
-    newShowAutoSuggest[keyIndex] = false;
-    setShowAutoSuggest(newShowAutoSuggest);
-  }, [showAutoSuggest]);
 
   const onChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     if (Array.isArray(value)) {
@@ -221,17 +201,14 @@ export default function SingleBoxShadowInput({
               <SingleBoxShadowDownShiftInput
                 name={key}
                 key={`boxshadow-input-${seed(index)}-${seed(keyIndex)}`}
-                keyIndex={keyIndex}
                 value={String(shadowItem[key as keyof typeof propertyTypes])}
                 type={propertyTypes[key as keyof typeof propertyTypes]}
                 shadowItem={shadowItem}
-                showAutoSuggest={showAutoSuggest[keyIndex]}
                 resolvedTokens={resolvedTokens}
+                propertyTypes={propertyTypes}
                 handleChange={onChange}
-                setShowAutoSuggest={closeAutoSuggest}
                 setInputValue={handleBoxshadowDownShiftInputChange}
                 handleToggleInputHelper={handleToggleInputHelper}
-                handleAutoSuggest={changeAutoSuggest}
               />
               {
                 inputHelperOpen && key === 'color' && (

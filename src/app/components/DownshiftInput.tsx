@@ -3,6 +3,7 @@ import Downshift from 'downshift';
 import { styled } from '@/stitches.config';
 import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
 import Box from './Box';
+import { StyledIconDisclosure, StyledInputSuffix } from './StyledInputSuffix';
 import Stack from './Stack';
 import { SingleToken } from '@/types/tokens';
 import { StyledInput, StyledPrefix } from './Input';
@@ -83,11 +84,9 @@ interface DownShiftProps {
   value: string;
   placeholder?: string;
   prefix?: React.ReactNode;
-  suffix?: React.ReactNode;
+  suffix?: boolean;
   resolvedTokens: ResolveTokenValuesResult[];
   setInputValue(value: string): void;
-  showAutoSuggest: boolean;
-  setShowAutoSuggest(show: boolean): void;
   handleChange?: React.ChangeEventHandler<HTMLInputElement>;
 }
 
@@ -102,10 +101,10 @@ const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
   placeholder,
   setInputValue,
   resolvedTokens,
-  showAutoSuggest,
-  setShowAutoSuggest,
   handleChange,
 }) => {
+  const [showAutoSuggest, setShowAutoSuggest] = React.useState<boolean>(false);
+
   const filteredValue = useMemo(() => (showAutoSuggest ? '' : value.replace(/[^a-zA-Z0-9.]/g, '')), [
     showAutoSuggest,
     value,
@@ -140,13 +139,13 @@ const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
     if (token.type === TokenTypes.TYPOGRAPHY || token.type === TokenTypes.BOX_SHADOW) {
       if (Array.isArray(token.value)) {
         returnValue = token.value.reduce<string>((totalAcc, item) => {
-          const singleReturnValue = Object.entries(item).reduce<string>((acc, [,propertyValue]) => (
+          const singleReturnValue = Object.entries(item).reduce<string>((acc, [, propertyValue]) => (
             `${acc}${propertyValue.toString()}/`
           ), '');
           return `${totalAcc}${singleReturnValue},`;
         }, '');
       } else {
-        returnValue = Object.entries(token.value).reduce<string>((acc, [,propertyValue]) => (
+        returnValue = Object.entries(token.value).reduce<string>((acc, [, propertyValue]) => (
           `${acc}${propertyValue.toString()}/`
         ), '');
       }
@@ -161,6 +160,10 @@ const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
     setShowAutoSuggest(false);
   }, [setInputValue, setShowAutoSuggest, value]);
 
+  const handleAutoSuggest = React.useCallback(() => {
+    setShowAutoSuggest(!showAutoSuggest);
+  }, [showAutoSuggest]);
+
   return (
     <Downshift onSelect={handleSelect}>
       {({
@@ -174,7 +177,7 @@ const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
           <Box css={{ display: 'flex', position: 'relative', width: '100%' }} className="input">
             {!!prefix && <StyledPrefix>{prefix}</StyledPrefix>}
             <StyledInput
-              hasSuffix={!!suffix}
+              hasSuffix={suffix}
               {...getInputProps({
                 label: type || null,
                 name: name || 'value',
@@ -183,33 +186,37 @@ const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
                 onChange: handleChange,
               })}
             />
-            {!!suffix && suffix}
+            {suffix && (
+              <StyledInputSuffix type="button" onClick={handleAutoSuggest}>
+                <StyledIconDisclosure />
+              </StyledInputSuffix>
+            )}
           </Box>
 
           {filteredTokenItems
-          && filteredTokenItems.length > 0
-          && selectedItem?.name !== filteredValue
-          && (showAutoSuggest || (['{', '$'].some((c) => value.includes(c)) && !value.includes('}'))) ? (
-            <StyledDropdown className="content scroll-container">
-              {filteredTokenItems.map((token: SingleToken, index: number) => (
-                <StyledItem
-                  className="dropdown-item"
-                  {...getItemProps({ key: token.name, index, item: token })}
-                  css={{
-                    backgroundColor: highlightedIndex === index ? '$interaction' : '$bgDefault',
-                  }}
-                  isFocused={highlightedIndex === index}
-                >
-                  {type === 'color' && (
+            && filteredTokenItems.length > 0
+            && selectedItem?.name !== filteredValue
+            && (showAutoSuggest || (['{', '$'].some((c) => value.includes(c)) && !value.includes('}'))) ? (
+              <StyledDropdown className="content scroll-container">
+                {filteredTokenItems.map((token: SingleToken, index: number) => (
+                  <StyledItem
+                    className="dropdown-item"
+                    {...getItemProps({ key: token.name, index, item: token })}
+                    css={{
+                      backgroundColor: highlightedIndex === index ? '$interaction' : '$bgDefault',
+                    }}
+                    isFocused={highlightedIndex === index}
+                  >
+                    {type === 'color' && (
                     <StyledItemColorDiv>
                       <StyledItemColor style={{ backgroundColor: token.value.toString() }} />
                     </StyledItemColorDiv>
-                  )}
-                  <StyledItemName>{getHighlightedText(token.name, filteredValue || '')}</StyledItemName>
-                  <StyledItemValue>{resolveValue(token)}</StyledItemValue>
-                </StyledItem>
-              ))}
-            </StyledDropdown>
+                    )}
+                    <StyledItemName>{getHighlightedText(token.name, filteredValue || '')}</StyledItemName>
+                    <StyledItemValue>{resolveValue(token)}</StyledItemValue>
+                  </StyledItem>
+                ))}
+              </StyledDropdown>
             ) : null}
         </div>
       )}
