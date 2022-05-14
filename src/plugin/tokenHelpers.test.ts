@@ -136,33 +136,49 @@ const tokens = [
   { name: 'border-radius.7', value: '24px' },
   {
     name: 'composition.single',
-    type: 'composition',
+    type: TokenTypes.COMPOSITION,
     value: {
       property: 'opacity',
-      value: '{opacity.40}'
-    }
+      value: '{opacity.40}',
+    },
   },
   {
     name: 'composition.multiple',
-    type: 'composition',
+    type: TokenTypes.COMPOSITION,
     value: [
       {
         property: 'opacity',
-        value: '{opacity.40}'
+        value: '{opacity.40}',
       },
       {
         property: 'borderRadius',
-        value: '{border-radius.7}'
+        value: '{border-radius.7}',
       },
-    ]
+    ],
   },
   {
     name: 'composition.alias',
-    type: 'composition',
+    type: TokenTypes.COMPOSITION,
     value: {
       property: 'fill',
-      value: '{colors.red.500}'
-    }
+      value: '{colors.red.500}',
+    },
+  },
+  {
+    name: 'composition.containBoxShadow',
+    type: TokenTypes.COMPOSITION,
+    value: {
+      property: 'boxshadow',
+      value: '{shadow.single}',
+    },
+  },
+  {
+    name: 'composition.containMultiBoxShadow',
+    type: TokenTypes.COMPOSITION,
+    value: {
+      property: 'boxshadow',
+      value: '{shadow.multiple}',
+    },
   },
   { name: 'size.25', value: '2px' },
   { name: 'typography.resolved', ...resolvedTypographyToken },
@@ -281,51 +297,91 @@ const output = [
   },
   {
     name: 'composition.single',
-    type: 'composition',
+    type: TokenTypes.COMPOSITION,
     value: {
       property: 'opacity',
-      value: '40%'
+      value: '40%',
     },
     rawValue: {
       property: 'opacity',
-      value: '{opacity.40}'
-    }
+      value: '{opacity.40}',
+    },
   },
   {
     name: 'composition.multiple',
-    type: 'composition',
+    type: TokenTypes.COMPOSITION,
     value: [
       {
         property: 'opacity',
-        value: '40%'
+        value: '40%',
       },
       {
         property: 'borderRadius',
-        value: '24px'
+        value: '24px',
       },
     ],
     rawValue: [
       {
         property: 'opacity',
-        value: '{opacity.40}'
+        value: '{opacity.40}',
       },
       {
         property: 'borderRadius',
-        value: '{border-radius.7}'
-      }
-    ]
+        value: '{border-radius.7}',
+      },
+    ],
   },
   {
     name: 'composition.alias',
-    type: 'composition',
+    type: TokenTypes.COMPOSITION,
     value: {
       property: 'fill',
-      value: '#ff0000'
+      value: '#ff0000',
     },
     rawValue: {
       property: 'fill',
-      value: '{colors.red.500}'
-    }
+      value: '{colors.red.500}',
+    },
+  },
+  {
+    name: 'composition.containBoxShadow',
+    type: TokenTypes.COMPOSITION,
+    value: {
+      property: 'boxshadow',
+      value: {
+        ...singleShadowToken.value,
+        color: '#ff0000',
+      },
+    },
+    rawValue: {
+      property: 'boxshadow',
+      value: '{shadow.single}',
+    },
+  },
+  {
+    name: 'composition.containMultiBoxShadow',
+    type: TokenTypes.COMPOSITION,
+    value: {
+      property: 'boxshadow',
+      value: [
+        {
+          ...multipleShadowToken.value[0],
+          color: '#ff000080',
+        },
+        {
+          ...multipleShadowToken.value[1],
+          color: '#ff000066',
+        },
+        {
+          ...multipleShadowToken.value[2],
+          color: '#000000',
+        },
+      ],
+    },
+    rawValue: {
+      property: 'boxshadow',
+      value: '{shadow.multiple}',
+    },
   },
   {
     name: 'size.25',
@@ -389,8 +445,6 @@ const output = [
 ];
 describe('resolveTokenValues', () => {
   it('resolves all values it can resolve', () => {
-    console.log('checking tokens', tokens);
-
     expect(resolveTokenValues(tokens)).toEqual(output);
   });
 });
