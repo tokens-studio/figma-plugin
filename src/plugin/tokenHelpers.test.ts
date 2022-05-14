@@ -139,8 +139,8 @@ const tokens = [
     type: 'composition',
     value: {
       property: 'opacity',
-      value: '{opacity.40}'
-    }
+      value: '{opacity.40}',
+    },
   },
   {
     name: 'composition.multiple',
@@ -148,21 +148,21 @@ const tokens = [
     value: [
       {
         property: 'opacity',
-        value: '{opacity.40}'
+        value: '{opacity.40}',
       },
       {
         property: 'borderRadius',
-        value: '{border-radius.7}'
+        value: '{border-radius.7}',
       },
-    ]
+    ],
   },
   {
     name: 'composition.alias',
     type: 'composition',
     value: {
       property: 'fill',
-      value: '{colors.red.500}'
-    }
+      value: '{colors.red.500}',
+    },
   },
   { name: 'size.25', value: '2px' },
   { name: 'typography.resolved', ...resolvedTypographyToken },
@@ -284,12 +284,12 @@ const output = [
     type: 'composition',
     value: {
       property: 'opacity',
-      value: '40%'
+      value: '40%',
     },
     rawValue: {
       property: 'opacity',
-      value: '{opacity.40}'
-    }
+      value: '{opacity.40}',
+    },
   },
   {
     name: 'composition.multiple',
@@ -297,35 +297,35 @@ const output = [
     value: [
       {
         property: 'opacity',
-        value: '40%'
+        value: '40%',
       },
       {
         property: 'borderRadius',
-        value: '24px'
+        value: '24px',
       },
     ],
     rawValue: [
       {
         property: 'opacity',
-        value: '{opacity.40}'
+        value: '{opacity.40}',
       },
       {
         property: 'borderRadius',
-        value: '{border-radius.7}'
-      }
-    ]
+        value: '{border-radius.7}',
+      },
+    ],
   },
   {
     name: 'composition.alias',
     type: 'composition',
     value: {
       property: 'fill',
-      value: '#ff0000'
+      value: '#ff0000',
     },
     rawValue: {
       property: 'fill',
-      value: '{colors.red.500}'
-    }
+      value: '{colors.red.500}',
+    },
   },
   {
     name: 'size.25',
@@ -389,8 +389,6 @@ const output = [
 ];
 describe('resolveTokenValues', () => {
   it('resolves all values it can resolve', () => {
-    console.log('checking tokens', tokens);
-
     expect(resolveTokenValues(tokens)).toEqual(output);
   });
 });

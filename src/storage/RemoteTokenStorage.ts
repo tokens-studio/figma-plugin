@@ -67,7 +67,6 @@ export abstract class RemoteTokenStorage<Metadata = unknown> {
         data: data.metadata,
       });
     }
-
     return this.write(files);
   }
 

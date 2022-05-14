@@ -1,14 +1,15 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { useCallback, useMemo } from 'react';
+import { useFlags } from 'launchdarkly-react-client-sdk';
+import { LDProps } from 'launchdarkly-react-client-sdk/lib/withLDConsumer';
 import { Dispatch } from '@/app/store';
 import { MessageToPluginTypes } from '@/types/messages';
 import useConfirm from '@/app/hooks/useConfirm';
 import usePushDialog from '@/app/hooks/usePushDialog';
 import { ContextObject } from '@/types/api';
 import { notifyToUI, postToFigma } from '@/plugin/notifiers';
-import { FeatureFlags } from '@/utils/featureFlags';
 import {
-  featureFlagsSelector, localApiStateSelector, themesListSelector, tokensSelector,
+  localApiStateSelector, themesListSelector, tokensSelector,
 } from '@/selectors';
 import { GithubTokenStorage } from '@/storage/GithubTokenStorage';
 import { isEqual } from '@/utils/isEqual';
@@ -19,7 +20,7 @@ export function useGitHub() {
   const tokens = useSelector(tokensSelector);
   const themes = useSelector(themesListSelector);
   const localApiState = useSelector(localApiStateSelector);
-  const featureFlags = useSelector(featureFlagsSelector);
+  const { multiFileSync } = useFlags();
   const dispatch = useDispatch<Dispatch>();
   const { confirm } = useConfirm();
   const { pushDialog } = usePushDialog();
@@ -29,9 +30,9 @@ export function useGitHub() {
     const storageClient = new GithubTokenStorage(context.secret, owner ?? splitContextId[0], repo ?? splitContextId[1], context.baseUrl ?? '');
     if (context.filePath) storageClient.changePath(context.filePath);
     if (context.branch) storageClient.selectBranch(context.branch);
-    if (featureFlags?.gh_mfs_enabled) storageClient.enableMultiFile();
+    if (multiFileSync) storageClient.enableMultiFile();
     return storageClient;
-  }, [featureFlags]);
+  }, [multiFileSync]);
 
   const askUserIfPull = useCallback(async () => {
     const confirmResult = await confirm({
@@ -42,7 +43,7 @@ export function useGitHub() {
     return confirmResult.result;
   }, [confirm]);
 
-  const pushTokensToGitHub = useCallback(async (context: ContextObject) => {
+  const pushTokensToGitHub = useCallback(async (context: ContextObject): Promise<RemoteTokenStorageData<GitStorageMetadata> | null> => {
     const storage = storageClientFactory(context);
     const content = await storage.retrieve();
 
@@ -53,7 +54,11 @@ export function useGitHub() {
         && isEqual(content.themes, themes)
       ) {
         notifyToUI('Nothing to commit');
-        return false;
+        return {
+          tokens,
+          themes,
+          metadata: {},
+        };
       }
     }
 
@@ -69,18 +74,29 @@ export function useGitHub() {
           tokens,
           metadata: { commitMessage },
         });
-
         dispatch.uiState.setLocalApiState({ ...localApiState, branch: customBranch });
         dispatch.uiState.setApiData({ ...context, branch: customBranch });
-
+        dispatch.tokenState.setLastSyncedState(JSON.stringify([tokens, themes], null, 2));
+        dispatch.tokenState.setTokenData({
+          values: tokens,
+          themes,
+        });
         pushDialog('success');
-        return true;
+        return {
+          tokens,
+          themes,
+          metadata: { commitMessage },
+        };
       } catch (e) {
         console.log('Error pushing to GitHub', e);
       }
     }
 
-    return false;
+    return {
+      tokens,
+      themes,
+      metadata: {},
+    };
   }, [
     dispatch,
     storageClientFactory,
@@ -96,9 +112,9 @@ export function useGitHub() {
     dispatch.tokenState.setEditProhibited(!hasWriteAccess);
   }, [dispatch, storageClientFactory]);
 
-  const pullTokensFromGitHub = useCallback(async (context: ContextObject, receivedFeatureFlags?: FeatureFlags) => {
+  const pullTokensFromGitHub = useCallback(async (context: ContextObject, receivedFeatureFlags?: LDProps['flags']) => {
     const storage = storageClientFactory(context);
-    if (receivedFeatureFlags?.gh_mfs_enabled) storage.enableMultiFile();
+    if (receivedFeatureFlags?.multiFileSync) storage.enableMultiFile();
 
     const [owner, repo] = context.id.split('/');
 
@@ -124,13 +140,10 @@ export function useGitHub() {
     try {
       const storage = storageClientFactory(context);
       const hasBranches = await storage.fetchBranches();
-
       if (!hasBranches || !hasBranches.length) {
         return null;
       }
-
       const content = await storage.retrieve();
-
       if (content) {
         if (
           !isEqual(content.tokens, tokens)
@@ -148,8 +161,7 @@ export function useGitHub() {
         }
         return content;
       }
-      await pushTokensToGitHub(context);
-      return content;
+      return await pushTokensToGitHub(context);
     } catch (e) {
       notifyToUI('Error syncing with GitHub, check credentials', { error: true });
       console.log('Error', e);
@@ -166,7 +178,6 @@ export function useGitHub() {
 
   const addNewGitHubCredentials = useCallback(async (context: ContextObject): Promise<RemoteTokenStorageData<GitStorageMetadata> | null> => {
     const data = await syncTokensWithGitHub(context);
-
     if (data) {
       postToFigma({
         type: MessageToPluginTypes.CREDENTIALS,
@@ -184,7 +195,6 @@ export function useGitHub() {
     } else {
       return null;
     }
-
     return {
       tokens: data.tokens ?? tokens,
       themes: data.themes ?? themes,
