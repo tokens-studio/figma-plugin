@@ -25,6 +25,7 @@ module.exports = {
     "react/require-default-props": 0,
     "react/jsx-props-no-spreading": 0,
     "no-prototype-builtins": 0,
+    "no-restricted-syntax": ["error", "ForInStatement", "LabeledStatement", "WithStatement"],
     "react/jsx-no-bind": [2, {
       ignoreDOMComponents: false,
       ignoreRefs: false,
