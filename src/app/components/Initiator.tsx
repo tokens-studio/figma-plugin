@@ -119,12 +119,23 @@ function InitiatorContainer({ ldClient, identificationPromise }: Props) {
                 // wait of identification
                 const receivedFlags = await identificationPromise;
 
-                const {
-                  id, provider, secret, baseUrl,
-                } = credentials;
-                const [owner, repo] = id.split('/');
-                if (provider === StorageProviderType.GITHUB) {
-                  const storageClient = new GithubTokenStorage(secret, owner, repo, baseUrl);
+                if (
+                  credentials.provider === StorageProviderType.GITHUB
+                  || credentials.provider === StorageProviderType.GITLAB
+                  || credentials.provider === StorageProviderType.ADO
+                ) {
+                  const {
+                    id, provider, secret, baseUrl,
+                  } = credentials;
+                  const [owner, repo] = id.split('/');
+
+                  const storageClientFactories = {
+                    [StorageProviderType.GITHUB]: GithubTokenStorage,
+                    [StorageProviderType.GITLAB]: GithubTokenStorage,
+                    [StorageProviderType.ADO]: GithubTokenStorage,
+                  };
+
+                  const storageClient = new storageClientFactories[provider](secret, owner, repo, baseUrl);
                   const branches = await storageClient.fetchBranches();
                   dispatch.branchState.setBranches(branches);
                 }

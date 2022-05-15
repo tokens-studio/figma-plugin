@@ -32,7 +32,7 @@ export type GitStorageType = GenericStorageType<StorageProviderType.GITHUB | Sto
   id: string; // this should be the repository identifier; eg {username}/{repo}
   branch: string; // this is teh base branch
   filePath: string; // this is the path to the token file or files (depends on multifile support)
-  baseUri?: string; // this is the base API url. This is important for self hosted environments
+  baseUrl?: string; // this is the base API url. This is important for self hosted environments
 }>;
 
 export type ADOStorageType = GenericStorageType<StorageProviderType.ADO, {
