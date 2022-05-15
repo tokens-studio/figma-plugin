@@ -1,4 +1,3 @@
-import { ApiDataType, StorageType } from '@/types/api';
 import {
   MessageFromPluginTypes,
   PostToUIMessage,
@@ -11,6 +10,7 @@ import { SelectionValue } from '@/types/SelectionValue';
 import { UpdateMode } from '@/constants/UpdateMode';
 import { AsyncMessageTypes, NotifyAsyncMessage } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
+import { StorageType, StorageTypeCredentials } from '@/types/StorageType';
 
 export function notifyUI(msg: string, opts?: NotificationOptions) {
   figma.notify(msg, opts);
@@ -130,7 +130,7 @@ export function notifyStorageType(storageType: StorageType) {
   postToUI({ type: MessageFromPluginTypes.RECEIVED_STORAGE_TYPE, storageType });
 }
 
-export function notifyAPIProviders(providers: ApiDataType[]) {
+export function notifyAPIProviders(providers: StorageTypeCredentials[]) {
   postToUI({ type: MessageFromPluginTypes.API_PROVIDERS, providers });
 }
 

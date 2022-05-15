@@ -1,8 +1,7 @@
-import { SharedPluginDataKeys } from '@/constants/SharedPluginDataKeys';
-import { tokensSharedDataHandler } from '@/plugin/SharedDataHandler';
+import { ActiveThemeProperty } from '@/figmaStorage';
 
 export async function getActiveTheme(): Promise<string | null> {
-  const activeTheme = tokensSharedDataHandler.get(figma.root, SharedPluginDataKeys.tokens.activeTheme);
+  const activeTheme = await ActiveThemeProperty.read();
   if (activeTheme) {
     return activeTheme;
   }

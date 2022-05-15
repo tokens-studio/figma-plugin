@@ -1,12 +1,12 @@
 import { useDispatch } from 'react-redux';
 import { useCallback } from 'react';
-import { ContextObject } from '@/types/api';
 import type { Dispatch } from '../store';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
+import { StorageType } from '@/types/StorageType';
 
 type SetStorageTypeOptions = {
-  provider: ContextObject;
+  provider: StorageType;
   shouldSetInDocument?: boolean;
 };
 

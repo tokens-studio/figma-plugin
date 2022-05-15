@@ -5,6 +5,7 @@ import { convertLineHeightToFigma } from './figmaTransforms/lineHeight';
 import { convertBoxShadowTypeToFigma } from './figmaTransforms/boxShadow';
 import { convertTextCaseToFigma } from './figmaTransforms/textCase';
 import { convertTextDecorationToFigma } from './figmaTransforms/textDecoration';
+import { UserIdProperty } from '@/figmaStorage';
 
 export function generateId(len: number, charSet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789') {
   let randomString = '';
@@ -19,15 +20,15 @@ export async function getUserId() {
   let userId = generateId(24);
 
   try {
-    const id = await figma.clientStorage.getAsync('userId');
-    if (typeof id === 'undefined') {
-      figma.clientStorage.setAsync('userId', userId);
+    const id = await UserIdProperty.read();
+    if (id === null) {
+      await UserIdProperty.write(userId);
     } else {
       userId = id;
     }
   } catch (e) {
     console.error('error retrieving userId', e);
-    figma.clientStorage.setAsync('userId', userId);
+    await UserIdProperty.write(userId);
   }
 
   return userId;

@@ -1,12 +1,10 @@
 import type { BackgroundJob } from '@/app/store/models/uiState';
-import {
-  ApiDataType, StorageType,
-} from './api';
 import { SelectionGroup } from './SelectionGroup';
 import { SelectionValue } from './SelectionValue';
 import { TokenStore } from './tokens';
 import { UsedTokenSetsMap } from './UsedTokenSetsMap';
 import { UpdateMode } from '@/constants/UpdateMode';
+import { StorageType, StorageTypeCredentials } from './StorageType';
 
 export enum MessageFromPluginTypes {
   SELECTION = 'selection',
@@ -74,7 +72,7 @@ export type ReceivedStorageTypeFromPluginMessage = {
 };
 export type ApiProvidersFromPluginMessage = {
   type: MessageFromPluginTypes.API_PROVIDERS;
-  providers: ApiDataType[];
+  providers: StorageTypeCredentials[];
 };
 export type StylesFromPluginMessage = {
   type: MessageFromPluginTypes.STYLES;
@@ -114,9 +112,7 @@ export type CompleteJobTasksFromPluginMessage = {
 export type ApiCredentialsFromPluginMessage = {
   type: MessageFromPluginTypes.API_CREDENTIALS;
   status: boolean;
-  credentials: ApiDataType & {
-    internalId?: string;
-  };
+  credentials: StorageTypeCredentials;
   usedTokenSet?: UsedTokenSetsMap | null;
 };
 

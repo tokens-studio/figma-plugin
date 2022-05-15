@@ -3,5 +3,5 @@ import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { saveStorageType } from '../node';
 
 export const setStorageType: AsyncMessageChannelHandlers[AsyncMessageTypes.SET_STORAGE_TYPE] = async (msg) => {
-  saveStorageType(msg.storageType);
+  await saveStorageType(msg.storageType);
 };

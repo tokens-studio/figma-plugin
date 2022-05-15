@@ -1,21 +1,17 @@
-import { SharedPluginDataKeys } from '@/constants/SharedPluginDataKeys';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
-import { tokensSharedDataHandler } from '@/plugin/SharedDataHandler';
+import { UsedTokenSetProperty } from '@/figmaStorage';
 import { UsedTokenSetsMap } from '@/types';
 import { migrate } from './migrate';
 
 export async function getUsedTokenSet(): Promise<UsedTokenSetsMap | null> {
-  const usedTokenSets = tokensSharedDataHandler.get(figma.root, SharedPluginDataKeys.tokens.usedTokenSet);
-  let parsedUsedTokenSet: UsedTokenSetsMap = {};
+  const usedTokenSets = await UsedTokenSetProperty.read();
+  let migratedUsedTokenSet: UsedTokenSetsMap = {};
   if (usedTokenSets) {
     // @README in previous versions the used tokens were saved as string[]
     // this means we will need to normalize it into the new format to support
     // multi-state token sets (disabled,source,enabled)
-    const savedUsedTokensSet = JSON.parse(usedTokenSets) as (
-      string[] | UsedTokenSetsMap
-    );
-    parsedUsedTokenSet = migrate<typeof savedUsedTokensSet, UsedTokenSetsMap>(
-      savedUsedTokensSet,
+    migratedUsedTokenSet = migrate<typeof usedTokenSets, UsedTokenSetsMap>(
+      usedTokenSets,
       (input): input is string[] => Array.isArray(input),
       (input) => (
         Object.fromEntries<TokenSetStatus>(
@@ -26,7 +22,7 @@ export async function getUsedTokenSet(): Promise<UsedTokenSetsMap | null> {
       ),
     );
 
-    return parsedUsedTokenSet;
+    return migratedUsedTokenSet;
   }
   return null;
 }

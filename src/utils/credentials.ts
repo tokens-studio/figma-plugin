@@ -1,18 +1,18 @@
+import compact from 'just-compact';
 import { ContextObject } from '@/types/api';
 import { generateId } from '@/plugin/helpers';
 import { notifyAPIProviders, notifyUI } from '@/plugin/notifiers';
 import isSameCredentials from './isSameCredentials';
+import { ApiProvidersProperty } from '@/figmaStorage';
 
 // update credentials
 export async function updateCredentials(context: ContextObject) {
   try {
     delete context.new;
-    const data = await figma.clientStorage.getAsync('apiProviders');
-    let existingProviders = [];
+    const data = await ApiProvidersProperty.read();
+    let existingProviders: NonNullable<typeof data> = [];
     if (data) {
-      const parsedData = await JSON.parse(data);
-
-      existingProviders = parsedData;
+      existingProviders = data;
 
       let matchingProvider;
 
@@ -32,9 +32,9 @@ export async function updateCredentials(context: ContextObject) {
     } else {
       existingProviders.push({ ...context, internalId: generateId(24) });
     }
-    await figma.clientStorage.setAsync('apiProviders', JSON.stringify(existingProviders));
-    const newProviders = await figma.clientStorage.getAsync('apiProviders');
-    notifyAPIProviders(JSON.parse(newProviders));
+    await ApiProvidersProperty.write(existingProviders);
+    const newProviders = await ApiProvidersProperty.read();
+    notifyAPIProviders(newProviders ?? []);
   } catch (err) {
     notifyUI('There was an issue saving your credentials. Please try again.');
   }
@@ -42,16 +42,16 @@ export async function updateCredentials(context: ContextObject) {
 
 export async function removeSingleCredential(context: ContextObject) {
   try {
-    const data = await figma.clientStorage.getAsync('apiProviders');
-    let existingProviders = [];
+    const data = await ApiProvidersProperty.read();
+    let existingProviders: NonNullable<typeof data> = [];
     if (data) {
-      const parsedData = await JSON.parse(data);
-
-      existingProviders = parsedData.map((i) => (isSameCredentials(i, context) ? null : i)).filter((i) => i);
+      existingProviders = compact(
+        data.map((i) => (isSameCredentials(i, context) ? null : i)).filter((i) => i),
+      );
     }
-    await figma.clientStorage.setAsync('apiProviders', JSON.stringify(existingProviders));
-    const newProviders = await figma.clientStorage.getAsync('apiProviders');
-    notifyAPIProviders(JSON.parse(newProviders));
+    await ApiProvidersProperty.write(existingProviders);
+    const newProviders = await ApiProvidersProperty.read();
+    notifyAPIProviders(newProviders ?? []);
   } catch (err) {
     notifyUI('There was an issue saving your credentials. Please try again.');
   }

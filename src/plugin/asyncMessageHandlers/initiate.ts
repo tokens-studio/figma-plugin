@@ -12,6 +12,8 @@ import {
 } from '../notifiers';
 import { getActiveTheme } from '@/utils/getActiveTheme';
 import { StorageProviderType } from '@/constants/StorageProviderType';
+import { LicenseKeyProperty } from '@/figmaStorage/LicenseKeyProperty';
+import { ApiProvidersProperty } from '@/figmaStorage';
 
 export const initiate: AsyncMessageChannelHandlers[AsyncMessageTypes.INITIATE] = async () => {
   try {
@@ -21,8 +23,7 @@ export const initiate: AsyncMessageChannelHandlers[AsyncMessageTypes.INITIATE] =
     const activeTheme = await getActiveTheme();
     const userId = await getUserId();
     const lastOpened = await getLastOpened();
-    const storageType = getSavedStorageType();
-    console.log(storageType);
+    const storageType = await getSavedStorageType();
     store.inspectDeep = settings.inspectDeep;
     if (currentUser) {
       notifyUserId({
@@ -34,12 +35,12 @@ export const initiate: AsyncMessageChannelHandlers[AsyncMessageTypes.INITIATE] =
     notifyLastOpened(lastOpened);
     notifyStorageType(storageType);
 
-    const licenseKey = await figma.clientStorage.getAsync('licenseKey');
-    notifyLicenseKey(licenseKey);
+    const licenseKey = await LicenseKeyProperty.read();
+    if (licenseKey) notifyLicenseKey(licenseKey);
 
     // @TODO fix setting of activeTheme
-    const apiProviders = await figma.clientStorage.getAsync('apiProviders');
-    if (apiProviders) notifyAPIProviders(JSON.parse(apiProviders));
+    const apiProviders = await ApiProvidersProperty.read();
+    if (apiProviders) notifyAPIProviders(apiProviders);
     switch (storageType.provider) {
       case StorageProviderType.JSONBIN:
       case StorageProviderType.GITHUB:
@@ -47,14 +48,14 @@ export const initiate: AsyncMessageChannelHandlers[AsyncMessageTypes.INITIATE] =
       case StorageProviderType.ADO:
       case StorageProviderType.URL: {
         compareProvidersWithStored({
-          providers: apiProviders,
+          providers: apiProviders ?? [],
           storageType,
           usedTokenSet,
         });
         break;
       }
       default: {
-        const oldTokens = getTokenData();
+        const oldTokens = await getTokenData();
         if (oldTokens) {
           notifyTokenValues({ ...oldTokens, activeTheme, usedTokenSet });
         } else {

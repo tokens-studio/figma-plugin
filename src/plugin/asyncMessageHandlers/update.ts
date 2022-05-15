@@ -15,7 +15,7 @@ export const update: AsyncMessageChannelHandlers[AsyncMessageTypes.UPDATE] = asy
   }
 
   if (msg.tokenValues && msg.updatedAt) {
-    updateLocalTokensData({
+    await updateLocalTokensData({
       tokens: msg.tokenValues,
       themes: msg.themes,
       activeTheme: msg.activeTheme,

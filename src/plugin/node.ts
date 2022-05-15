@@ -1,25 +1,25 @@
-import omit from 'just-omit';
+import compact from 'just-compact';
 import store from './store';
 import setValuesOnNode from './setValuesOnNode';
-import { ContextObject, StorageType } from '../types/api';
 import { Properties } from '@/constants/Properties';
 import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 import { NodeManagerNode } from './NodeManager';
 import { UpdateNodesSettings } from '@/types/UpdateNodesSettings';
-import { SharedPluginDataKeys } from '@/constants/SharedPluginDataKeys';
-import { tokensSharedDataHandler } from './SharedDataHandler';
 import { postToUI } from './notifiers';
 import { MessageFromPluginTypes } from '@/types/messages';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
 import { defaultWorker } from './Worker';
 import { getAllFigmaStyleMaps } from '@/utils/getAllFigmaStyleMaps';
 import { ProgressTracker } from './ProgressTracker';
-import { AnyTokenList, AnyTokenSet, TokenStore } from '@/types/tokens';
+import { AnyTokenList, TokenStore } from '@/types/tokens';
 import { isSingleToken } from '@/utils/is';
 import { ThemeObjectsList } from '@/types';
 import { TokenTypes } from '@/constants/TokenTypes';
-import { attemptOrFallback } from '@/utils/attemptOrFallback';
 import { StorageProviderType } from '@/constants/StorageProviderType';
+import { StorageType } from '@/types/StorageType';
+import {
+  ActiveThemeProperty, StorageTypeProperty, ThemesProperty, UpdatedAtProperty, ValuesProperty, VersionProperty,
+} from '@/figmaStorage';
 
 // @TODO fix typings
 
@@ -90,28 +90,19 @@ export function mapValuesToTokens(tokens: Map<string, AnyTokenList[number]>, val
   return mappedValues;
 }
 
-export function getTokenData(): {
+export async function getTokenData(): Promise<{
   values: TokenStore['values'];
   themes: ThemeObjectsList
   activeTheme: string | null
   updatedAt: string;
   version: string;
-} | null {
+} | null> {
   try {
-    const values = tokensSharedDataHandler.get(figma.root, SharedPluginDataKeys.tokens.values, (value) => (
-      attemptOrFallback<Record<string, AnyTokenSet>>(() => (value ? JSON.parse(value) : {}), {})
-    ));
-    const themes = tokensSharedDataHandler.get(figma.root, SharedPluginDataKeys.tokens.themes, (value) => (
-      attemptOrFallback<ThemeObjectsList>(() => {
-        const parsedValue = (value ? JSON.parse(value) : []);
-        return Array.isArray(parsedValue) ? parsedValue : [];
-      }, [])
-    ));
-    const activeTheme = tokensSharedDataHandler.get(figma.root, SharedPluginDataKeys.tokens.activeTheme, (value) => (
-      value || null
-    ));
-    const version = tokensSharedDataHandler.get(figma.root, SharedPluginDataKeys.tokens.version);
-    const updatedAt = tokensSharedDataHandler.get(figma.root, SharedPluginDataKeys.tokens.updatedAt);
+    const values = await ValuesProperty.read(figma.root) ?? {};
+    const themes = await ThemesProperty.read(figma.root) ?? [];
+    const activeTheme = await ActiveThemeProperty.read(figma.root);
+    const version = await VersionProperty.read(figma.root);
+    const updatedAt = await UpdatedAtProperty.read(figma.root);
 
     if (Object.keys(values).length > 0) {
       const tokenObject = Object.entries(values).reduce((acc, [key, groupValues]) => {
@@ -122,8 +113,8 @@ export function getTokenData(): {
         values: tokenObject as TokenStore['values'],
         themes,
         activeTheme,
-        updatedAt,
-        version,
+        updatedAt: updatedAt || '',
+        version: version || '',
       };
     }
   } catch (e) {
@@ -133,32 +124,37 @@ export function getTokenData(): {
 }
 
 // set storage type (i.e. local or some remote provider)
-export function saveStorageType(context: ContextObject) {
-  // remove secret
-  const storageToSave = omit(context, ['secret']);
-  tokensSharedDataHandler.set(figma.root, SharedPluginDataKeys.tokens.storageType, JSON.stringify(storageToSave));
+export async function saveStorageType(context: StorageType) {
+  await StorageTypeProperty.write(context);
 }
 
-export function getSavedStorageType(): StorageType {
-  const values = tokensSharedDataHandler.get(figma.root, SharedPluginDataKeys.tokens.storageType);
+export async function getSavedStorageType(): Promise<StorageType> {
+  // the saved storage types will never contain credentials
+  // as they should not be shared across
+  const storageType = await StorageTypeProperty.read(figma.root);
 
-  if (values) {
-    const context = JSON.parse(values);
-    return context;
+  if (storageType) {
+    return storageType;
   }
   return { provider: StorageProviderType.LOCAL };
 }
 
 export function goToNode(id: string) {
   const node = figma.getNodeById(id);
-  if (node) {
+  if (
+    node
+    && node.type !== 'PAGE'
+    && node.type !== 'DOCUMENT'
+  ) {
     figma.currentPage.selection = [node];
     figma.viewport.scrollAndZoomIntoView([node]);
   }
 }
 
 export function selectNodes(ids: string[]) {
-  const nodes = ids.map(figma.getNodeById);
+  const nodes = compact(ids.map(figma.getNodeById)).filter((node) => (
+    node.type !== 'PAGE' && node.type !== 'DOCUMENT'
+  )) as (Exclude<BaseNode, PageNode | DocumentNode>)[];
   figma.currentPage.selection = nodes;
 }
 

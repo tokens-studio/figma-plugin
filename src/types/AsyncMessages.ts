@@ -2,13 +2,14 @@ import { UpdateMode } from '@/constants/UpdateMode';
 import type { SettingsState } from '@/app/store/models/settings';
 import type { Properties } from '@/constants/Properties';
 import type { TokenTypes } from '@/constants/TokenTypes';
-import type { ContextObject, StorageProviderType } from './api';
 import type { NodeInfo } from './NodeInfo';
 import type { NodeTokenRefMap } from './NodeTokenRefMap';
 import type { PullStyleOptions } from './PullStylesOptions';
 import type { ThemeObjectsList } from './ThemeObjectsList';
 import type { AnyTokenList, AnyTokenSet } from './tokens';
 import type { UsedTokenSetsMap } from './UsedTokenSetsMap';
+import { StorageType, StorageTypeCredentials } from './StorageType';
+import { StorageProviderType } from '@/constants/StorageProviderType';
 
 export enum AsyncMessageTypes {
   // the below messages are going from UI to plugin
@@ -52,10 +53,10 @@ export type CredentialsAsyncMessageResult = AsyncMessage<AsyncMessageTypes.CREDE
 export type ChangedTabsAsyncMessage = AsyncMessage<AsyncMessageTypes.CHANGED_TABS, { requiresSelectionValues: boolean; }>;
 export type ChangedTabsAsyncMessageResult = AsyncMessage<AsyncMessageTypes.CHANGED_TABS>;
 
-export type RemoveSingleCredentialAsyncMessage = AsyncMessage<AsyncMessageTypes.REMOVE_SINGLE_CREDENTIAL, { context: ContextObject; }>;
+export type RemoveSingleCredentialAsyncMessage = AsyncMessage<AsyncMessageTypes.REMOVE_SINGLE_CREDENTIAL, { context: StorageTypeCredentials; }>;
 export type RemoveSingleCredentialAsyncMessageResult = AsyncMessage<AsyncMessageTypes.REMOVE_SINGLE_CREDENTIAL>;
 
-export type SetStorageTypeAsyncMessage = AsyncMessage<AsyncMessageTypes.SET_STORAGE_TYPE, { storageType: ContextObject; }>;
+export type SetStorageTypeAsyncMessage = AsyncMessage<AsyncMessageTypes.SET_STORAGE_TYPE, { storageType: StorageType; }>;
 export type SetStorageTypeAsyncMessageResult = AsyncMessage<AsyncMessageTypes.SET_STORAGE_TYPE>;
 
 export type SetNodeDataAsyncMessage = AsyncMessage<AsyncMessageTypes.SET_NODE_DATA, { values: NodeTokenRefMap; tokens: AnyTokenList; settings: SettingsState; }>;

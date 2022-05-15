@@ -1,6 +1,5 @@
 /* eslint-disable import/prefer-default-export */
 import { createModel } from '@rematch/core';
-import { StorageType, ApiDataType } from '@/types/api';
 import { track } from '@/utils/analytics';
 import type { RootModel } from '@/types/RootModel';
 import fetchChangelog from '@/utils/storyblok';
@@ -11,6 +10,7 @@ import { Tabs } from '@/constants/Tabs';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { StorageProviderType } from '@/constants/StorageProviderType';
+import { StorageType, StorageTypeCredentials } from '@/types/StorageType';
 
 type DisplayType = 'GRID' | 'LIST';
 
@@ -69,9 +69,9 @@ export interface UIState {
   activeTab: Tabs;
   projectURL: string;
   storageType: StorageType;
-  api: ApiDataType;
-  apiProviders: ApiDataType[];
-  localApiState: ApiDataType;
+  api: StorageTypeCredentials;
+  apiProviders: StorageTypeCredentials[];
+  localApiState: StorageTypeCredentials;
   lastUpdatedAt: Date | null;
   changelog: StoryblokStory['content'][];
   lastOpened: number | null;
@@ -236,19 +236,19 @@ export const uiState = createModel<RootModel>()({
         storageType: payload,
       };
     },
-    setApiData(state, payload: ApiDataType) {
+    setApiData(state, payload: StorageTypeCredentials) {
       return {
         ...state,
         api: payload,
       };
     },
-    setLocalApiState(state, payload: ApiDataType) {
+    setLocalApiState(state, payload: StorageTypeCredentials) {
       return {
         ...state,
         localApiState: payload,
       };
     },
-    setAPIProviders(state, payload: ApiDataType[]) {
+    setAPIProviders(state, payload: StorageTypeCredentials[]) {
       return {
         ...state,
         apiProviders: payload,
