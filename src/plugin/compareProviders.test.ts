@@ -14,7 +14,7 @@ describe('compareProvidersWithStored', () => {
   };
 
   it('calls postMessage with true if one matches', () => {
-    compareProvidersWithStored({ providers: JSON.stringify([firstProvider, otherProvider]), storageType: firstProvider });
+    compareProvidersWithStored({ providers: [firstProvider, otherProvider], storageType: firstProvider });
 
     expect(figma.ui.postMessage).toHaveBeenCalledWith({
       type: MessageFromPluginTypes.API_CREDENTIALS,
@@ -33,7 +33,7 @@ describe('compareProvidersWithStored', () => {
   });
 
   it('calls postMessage with false, if no matching providers exist', () => {
-    compareProvidersWithStored({ providers: JSON.stringify([otherProvider]), storageType: firstProvider });
+    compareProvidersWithStored({ providers: [otherProvider], storageType: firstProvider });
 
     expect(figma.ui.postMessage).toHaveBeenCalledWith({
       type: MessageFromPluginTypes.API_CREDENTIALS,
