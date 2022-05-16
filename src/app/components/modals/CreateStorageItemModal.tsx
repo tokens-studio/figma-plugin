@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React from 'react';
 import { useSelector } from 'react-redux';
 import Modal from '../Modal';
 import Heading from '../Heading';
@@ -6,7 +6,7 @@ import StorageItemForm from '../StorageItemForm';
 import useRemoteTokens from '../../store/remoteTokens';
 import { localApiStateSelector } from '@/selectors';
 import Stack from '../Stack';
-import { StorageProviderType } from '@/constants/StorageProviderType';
+import { StorageTypeFormValues } from '@/types/StorageType';
 
 type Props = {
   isOpen: boolean
@@ -14,51 +14,31 @@ type Props = {
   onSuccess: () => void
 };
 
-// @TODO use hooks
-
 export default function CreateStorageItemModal({ isOpen, onClose, onSuccess }: Props) {
   const localApiState = useSelector(localApiStateSelector);
   const { addNewProviderItem } = useRemoteTokens();
   const [hasErrored, setHasErrored] = React.useState(false);
-  let defaultFields;
-  switch (localApiState.provider) {
-    case StorageProviderType.GITHUB:
-    case StorageProviderType.GITLAB:
-    case StorageProviderType.ADO: {
-      defaultFields = {
-        secret: '',
-        id: '',
-        branch: '',
-        filePath: '',
-        baseUrl: '',
-      };
-      break;
-    }
-    default:
-      defaultFields = { id: '', name: '', secret: '' };
-      break;
-  }
-  const [formFields, setFormFields] = React.useState(defaultFields);
-  const handleCreateNewClick = React.useCallback(async () => {
+
+  const [formFields, setFormFields] = React.useState<StorageTypeFormValues<true>>(React.useMemo(() => ({
+    provider: localApiState.provider,
+  }), [localApiState]));
+
+  const handleCreateNewClick = React.useCallback(async (values: StorageTypeFormValues<false>) => {
     setHasErrored(false);
-    const response = await addNewProviderItem({
-      provider: localApiState.provider,
-      ...formFields,
-    });
+    const response = await addNewProviderItem(values);
     if (response) {
       onSuccess();
     } else {
       setHasErrored(true);
     }
-  }, [addNewProviderItem, formFields, localApiState.provider, onSuccess]);
+  }, [addNewProviderItem, onSuccess]);
 
-  const handleChange = useCallback((e) => {
+  const handleChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setFormFields({ ...formFields, [e.target.name]: e.target.value });
   }, [formFields]);
 
-  const handleSubmit = useCallback((e) => {
-    e.preventDefault();
-    handleCreateNewClick();
+  const handleSubmit = React.useCallback((values: StorageTypeFormValues<false>) => {
+    handleCreateNewClick(values);
   }, [handleCreateNewClick]);
 
   return (
@@ -67,9 +47,9 @@ export default function CreateStorageItemModal({ isOpen, onClose, onSuccess }: P
         <Heading>Add new credentials</Heading>
         <StorageItemForm
           isNew
-          handleChange={handleChange}
-          handleSubmit={handleSubmit}
-          handleCancel={onClose}
+          onChange={handleChange}
+          onSubmit={handleSubmit}
+          onCancel={onClose}
           values={formFields}
           hasErrored={hasErrored}
         />

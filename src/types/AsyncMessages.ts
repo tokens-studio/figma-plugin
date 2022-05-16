@@ -9,7 +9,6 @@ import type { ThemeObjectsList } from './ThemeObjectsList';
 import type { AnyTokenList, AnyTokenSet } from './tokens';
 import type { UsedTokenSetsMap } from './UsedTokenSetsMap';
 import { StorageType, StorageTypeCredentials } from './StorageType';
-import { StorageProviderType } from '@/constants/StorageProviderType';
 
 export enum AsyncMessageTypes {
   // the below messages are going from UI to plugin
@@ -43,10 +42,7 @@ export type InitiateAsyncMessage = AsyncMessage<AsyncMessageTypes.INITIATE>;
 export type InitiateAsyncMessageResult = AsyncMessage<AsyncMessageTypes.INITIATE>;
 
 export type CredentialsAsyncMessage = AsyncMessage<AsyncMessageTypes.CREDENTIALS, {
-  id: string;
-  name: string;
-  secret: string;
-  provider: StorageProviderType;
+  credential: StorageTypeCredentials;
 }>;
 export type CredentialsAsyncMessageResult = AsyncMessage<AsyncMessageTypes.CREDENTIALS>;
 

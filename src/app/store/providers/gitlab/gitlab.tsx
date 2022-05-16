@@ -5,7 +5,6 @@ import { LDProps } from 'launchdarkly-react-client-sdk/lib/withLDConsumer';
 import { Dispatch } from '@/app/store';
 import useConfirm from '@/app/hooks/useConfirm';
 import usePushDialog from '@/app/hooks/usePushDialog';
-import { ContextObject } from '@/types/api';
 import { notifyToUI } from '@/plugin/notifiers';
 import {
   localApiStateSelector, themesListSelector, tokensSelector,
@@ -16,6 +15,11 @@ import { RemoteTokenStorageData } from '@/storage/RemoteTokenStorage';
 import { GitStorageMetadata } from '@/storage/GitTokenStorage';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
+import { StorageTypeCredentials, StorageTypeFormValues } from '@/types/StorageType';
+import { StorageProviderType } from '@/constants/StorageProviderType';
+
+type GitlabCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.GITHUB | StorageProviderType.GITLAB; }>;
+type GitlabFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.GITHUB | StorageProviderType.GITLAB }>;
 
 export function useGitLab() {
   const tokens = useSelector(tokensSelector);
@@ -27,7 +31,7 @@ export function useGitLab() {
   const { confirm } = useConfirm();
   const { pushDialog } = usePushDialog();
 
-  const storageClientFactory = useCallback(async (context: ContextObject, owner?: string, repo?: string) => {
+  const storageClientFactory = useCallback(async (context: GitlabCredentials, owner?: string, repo?: string) => {
     const splitContextId = context.id.split('/');
     const storageClient = new GitlabTokenStorage(context.secret, owner ?? splitContextId[0], repo ?? splitContextId[1], context.baseUrl ?? '');
     if (context.filePath) storageClient.changePath(context.filePath);
@@ -45,7 +49,7 @@ export function useGitLab() {
     return confirmResult.result;
   }, [confirm]);
 
-  const pushTokensToGitLab = useCallback(async (context: ContextObject) => {
+  const pushTokensToGitLab = useCallback(async (context: GitlabCredentials) => {
     const storage = await storageClientFactory(context);
 
     const content = await storage.retrieve();
@@ -73,7 +77,7 @@ export function useGitLab() {
           tokens,
           metadata: { commitMessage },
         });
-        dispatch.uiState.setLocalApiState({ ...localApiState, branch: customBranch });
+        dispatch.uiState.setLocalApiState({ ...localApiState, branch: customBranch } as GitlabCredentials);
         dispatch.uiState.setApiData({ ...context, branch: customBranch });
         dispatch.tokenState.setLastSyncedState(JSON.stringify([tokens, themes], null, 2));
         dispatch.tokenState.setTokenData({
@@ -105,13 +109,13 @@ export function useGitLab() {
     localApiState,
   ]);
 
-  const checkAndSetAccess = useCallback(async ({ context, owner, repo }: { context: ContextObject; owner: string; repo: string }) => {
+  const checkAndSetAccess = useCallback(async ({ context, owner, repo }: { context: GitlabCredentials; owner: string; repo: string }) => {
     const storage = await storageClientFactory(context, owner, repo);
     const hasWriteAccess = await storage.canWrite();
     dispatch.tokenState.setEditProhibited(!hasWriteAccess);
   }, [dispatch, storageClientFactory]);
 
-  const pullTokensFromGitLab = useCallback(async (context: ContextObject, receivedFeatureFlags?: LDProps['flags']) => {
+  const pullTokensFromGitLab = useCallback(async (context: GitlabCredentials, receivedFeatureFlags?: LDProps['flags']) => {
     const storage = await storageClientFactory(context);
     if (receivedFeatureFlags?.multiFileSync) storage.enableMultiFile();
 
@@ -131,7 +135,7 @@ export function useGitLab() {
     return null;
   }, [storageClientFactory, checkAndSetAccess]);
 
-  const syncTokensWithGitLab = useCallback(async (context: ContextObject): Promise<RemoteTokenStorageData<GitStorageMetadata> | null> => {
+  const syncTokensWithGitLab = useCallback(async (context: GitlabCredentials): Promise<RemoteTokenStorageData<GitStorageMetadata> | null> => {
     try {
       const storage = await storageClientFactory(context);
       const hasBranches = await storage.fetchBranches();
@@ -174,12 +178,12 @@ export function useGitLab() {
     tokens,
   ]);
 
-  const addNewGitLabCredentials = useCallback(async (context: ContextObject): Promise<RemoteTokenStorageData<GitStorageMetadata> | null> => {
+  const addNewGitLabCredentials = useCallback(async (context: GitlabFormValues): Promise<RemoteTokenStorageData<GitStorageMetadata> | null> => {
     const data = await syncTokensWithGitLab(context);
     if (data) {
       AsyncMessageChannel.message({
         type: AsyncMessageTypes.CREDENTIALS,
-        ...context,
+        credential: context,
       });
       if (data?.tokens) {
         dispatch.tokenState.setLastSyncedState(JSON.stringify([data.tokens, data.themes], null, 2));

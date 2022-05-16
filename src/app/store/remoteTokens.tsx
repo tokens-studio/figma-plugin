@@ -1,7 +1,6 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { useCallback, useMemo } from 'react';
 import { LDProps } from 'launchdarkly-react-client-sdk/lib/withLDConsumer';
-import { ContextObject } from '@/types/api';
 import { track } from '@/utils/analytics';
 import { useJSONbin } from './providers/jsonbin';
 import useURL from './providers/url';
@@ -17,9 +16,10 @@ import { RemoteTokenStorageData } from '@/storage/RemoteTokenStorage';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { StorageProviderType } from '@/constants/StorageProviderType';
+import { StorageTypeCredentials, StorageTypeFormValues } from '@/types/StorageType';
 
 type PullTokensOptions = {
-  context?: ContextObject,
+  context?: StorageTypeCredentials,
   featureFlags?: LDProps['flags'],
   usedTokenSet?: UsedTokenSetsMap | null
 };
@@ -103,7 +103,7 @@ export default function useRemoteTokens() {
     pullTokensFromADO,
   ]);
 
-  const restoreStoredProvider = useCallback(async (context: ContextObject) => {
+  const restoreStoredProvider = useCallback(async (context: StorageTypeCredentials) => {
     track('restoreStoredProvider', { provider: context.provider });
     dispatch.uiState.setLocalApiState(context);
     dispatch.uiState.setApiData(context);
@@ -135,19 +135,19 @@ export default function useRemoteTokens() {
     syncTokensWithADO,
   ]);
 
-  const pushTokens = useCallback(async (context: ContextObject = api) => {
-    track('pushTokens', { provider: api.provider });
-    switch (api.provider) {
+  const pushTokens = useCallback(async (context: StorageTypeCredentials = api) => {
+    track('pushTokens', { provider: context.provider });
+    switch (context.provider) {
       case StorageProviderType.GITHUB: {
         await pushTokensToGitHub(context);
         break;
       }
       case StorageProviderType.GITLAB: {
-        await pushTokensToGitLab(api);
+        await pushTokensToGitLab(context);
         break;
       }
       case StorageProviderType.ADO: {
-        await pushTokensToADO(api);
+        await pushTokensToADO(context);
         break;
       }
       default:
@@ -160,15 +160,14 @@ export default function useRemoteTokens() {
     pushTokensToADO,
   ]);
 
-  const addNewProviderItem = useCallback(async (context: ContextObject): Promise<boolean> => {
-    const credentials = context;
+  const addNewProviderItem = useCallback(async (credentials: StorageTypeFormValues<false>): Promise<boolean> => {
     let data;
-    switch (context.provider) {
+    switch (credentials.provider) {
       case StorageProviderType.JSONBIN: {
-        if (context.id) {
-          data = await addJSONBinCredentials(context);
+        if (credentials.id) {
+          data = await addJSONBinCredentials(credentials);
         } else {
-          const id = await createNewJSONBin(context);
+          const id = await createNewJSONBin(credentials);
           if (id) {
             credentials.id = id;
             data = true;
@@ -189,16 +188,16 @@ export default function useRemoteTokens() {
         break;
       }
       case StorageProviderType.URL: {
-        data = await pullTokensFromURL(context);
+        data = await pullTokensFromURL(credentials);
         break;
       }
       default:
         throw new Error('Not implemented');
     }
     if (data) {
-      dispatch.uiState.setLocalApiState(credentials);
-      dispatch.uiState.setApiData(credentials);
-      setStorageType({ provider: credentials, shouldSetInDocument: true });
+      dispatch.uiState.setLocalApiState(credentials as StorageTypeCredentials); // in JSONBIN the ID can technically be omitted, but this function handles this by creating a new JSONBin and assigning the ID
+      dispatch.uiState.setApiData(credentials as StorageTypeCredentials);
+      setStorageType({ provider: credentials as StorageTypeCredentials, shouldSetInDocument: true });
       return true;
     }
     return false;
@@ -213,7 +212,7 @@ export default function useRemoteTokens() {
     setStorageType,
   ]);
 
-  const addNewBranch = useCallback(async (context: ContextObject, branch: string, source?: string) => {
+  const addNewBranch = useCallback(async (context: StorageTypeCredentials, branch: string, source?: string) => {
     let newBranchCreated = false;
     switch (context.provider) {
       case StorageProviderType.GITHUB: {
@@ -231,7 +230,7 @@ export default function useRemoteTokens() {
     return newBranchCreated;
   }, [createGithubBranch, createADOBranch]);
 
-  const fetchBranches = useCallback(async (context: ContextObject) => {
+  const fetchBranches = useCallback(async (context: StorageTypeCredentials) => {
     switch (context.provider) {
       case StorageProviderType.GITHUB:
         return fetchGithubBranches(context);

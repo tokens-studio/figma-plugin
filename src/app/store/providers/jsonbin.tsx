@@ -1,7 +1,6 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { useCallback, useMemo } from 'react';
 import { Dispatch } from '@/app/store';
-import { ContextObject } from '@/types/api';
 import { notifyToUI } from '../../../plugin/notifiers';
 import * as pjs from '../../../../package.json';
 import useStorage from '../useStorage';
@@ -12,6 +11,7 @@ import { JSONBinTokenStorage } from '@/storage';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { StorageProviderType } from '@/constants/StorageProviderType';
+import { StorageTypeCredentials, StorageTypeFormValues } from '@/types/StorageType';
 
 export async function updateJSONBinTokens({
   tokens, themes, context, updatedAt, oldUpdatedAt = null,
@@ -56,8 +56,9 @@ export function useJSONbin() {
   const tokens = useSelector(tokensSelector);
   const themes = useSelector(themesListSelector);
 
-  const createNewJSONBin = useCallback(async (context: ContextObject) => {
-    const { secret, name, updatedAt = new Date().toISOString() } = context;
+  const createNewJSONBin = useCallback(async (context: Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.JSONBIN }>) => {
+    const { secret, name } = context;
+    const updatedAt = new Date().toISOString();
     const result = await JSONBinTokenStorage.create(name, updatedAt, secret);
     if (result) {
       updateJSONBinTokens({
@@ -71,10 +72,12 @@ export function useJSONbin() {
       });
       AsyncMessageChannel.message({
         type: AsyncMessageTypes.CREDENTIALS,
-        id: result.metadata.id,
-        name,
-        secret,
-        provider: StorageProviderType.JSONBIN,
+        credential: {
+          provider: StorageProviderType.JSONBIN,
+          id: result.metadata.id,
+          name,
+          secret,
+        },
       });
       dispatch.uiState.setProjectURL(`https://jsonbin.io/${result.metadata.id}`);
 
@@ -85,9 +88,9 @@ export function useJSONbin() {
   }, [dispatch, themes, tokens]);
 
   // Read tokens from JSONBin
-  const pullTokensFromJSONBin = useCallback(async (context: ContextObject) => {
+  const pullTokensFromJSONBin = useCallback(async (context: Extract<StorageTypeCredentials, { provider: StorageProviderType.JSONBIN }>) => {
     const { id, secret, name } = context;
-    if (!id && !secret) return null;
+    if (!id || !secret) return null;
 
     try {
       const storage = new JSONBinTokenStorage(id, secret);
@@ -96,10 +99,12 @@ export function useJSONbin() {
 
       AsyncMessageChannel.message({
         type: AsyncMessageTypes.CREDENTIALS,
-        id,
-        name,
-        secret,
-        provider: StorageProviderType.JSONBIN,
+        credential: {
+          id,
+          name,
+          secret,
+          provider: StorageProviderType.JSONBIN,
+        },
       });
 
       if (data?.metadata && data?.tokens) {
@@ -116,12 +121,27 @@ export function useJSONbin() {
     }
   }, [dispatch]);
 
-  const addJSONBinCredentials = useCallback(async (context: ContextObject) => {
-    const content = await pullTokensFromJSONBin(context);
+  const addJSONBinCredentials = useCallback(async (context: Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.JSONBIN }>) => {
+    const {
+      provider, id, name, secret, internalId,
+    } = context;
+    if (!id || !secret) return null;
+
+    const content = await pullTokensFromJSONBin({
+      provider,
+      id,
+      name,
+      secret,
+      internalId,
+    });
     if (content) {
-      dispatch.uiState.setApiData(context);
+      dispatch.uiState.setApiData({
+        provider, id, name, secret, internalId,
+      });
       setStorageType({
-        provider: context,
+        provider: {
+          provider, id, name, internalId,
+        },
         shouldSetInDocument: true,
       });
       dispatch.tokenState.setLastSyncedState(JSON.stringify([content.tokens, content.themes], null, 2));

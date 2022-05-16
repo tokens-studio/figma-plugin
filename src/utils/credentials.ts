@@ -1,36 +1,20 @@
 import compact from 'just-compact';
-import { ContextObject } from '@/types/api';
-import { generateId } from '@/plugin/helpers';
 import { notifyAPIProviders, notifyUI } from '@/plugin/notifiers';
 import isSameCredentials from './isSameCredentials';
 import { ApiProvidersProperty } from '@/figmaStorage';
+import { StorageTypeCredentials } from '@/types/StorageType';
 
-// update credentials
-export async function updateCredentials(context: ContextObject) {
+export async function updateCredentials(context: StorageTypeCredentials) {
   try {
-    delete context.new;
     const data = await ApiProvidersProperty.read();
     let existingProviders: NonNullable<typeof data> = [];
     if (data) {
       existingProviders = data;
 
-      let matchingProvider;
-
-      if (context.internalId) {
-        matchingProvider = existingProviders.findIndex((i) => i.internalId === context.internalId);
-      } else {
-        matchingProvider = existingProviders.findIndex((i) => isSameCredentials(i, context));
-      }
-      // Handle case for old credentials where  we had no internalId. Check id and secret and provider then
+      const matchingProvider = existingProviders.findIndex((i) => i.internalId === context.internalId);
       if (matchingProvider !== -1) {
         existingProviders.splice(matchingProvider, 1, context);
       }
-
-      if (!parsedData || matchingProvider === -1) {
-        existingProviders.push({ ...context, internalId: generateId(24) });
-      }
-    } else {
-      existingProviders.push({ ...context, internalId: generateId(24) });
     }
     await ApiProvidersProperty.write(existingProviders);
     const newProviders = await ApiProvidersProperty.read();
@@ -40,7 +24,7 @@ export async function updateCredentials(context: ContextObject) {
   }
 }
 
-export async function removeSingleCredential(context: ContextObject) {
+export async function removeSingleCredential(context: StorageTypeCredentials) {
   try {
     const data = await ApiProvidersProperty.read();
     let existingProviders: NonNullable<typeof data> = [];

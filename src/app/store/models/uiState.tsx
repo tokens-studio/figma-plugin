@@ -10,7 +10,7 @@ import { Tabs } from '@/constants/Tabs';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { StorageProviderType } from '@/constants/StorageProviderType';
-import { StorageType, StorageTypeCredentials } from '@/types/StorageType';
+import { StorageType, StorageTypeCredentials, StorageTypeFormValues } from '@/types/StorageType';
 
 type DisplayType = 'GRID' | 'LIST';
 
@@ -71,7 +71,7 @@ export interface UIState {
   storageType: StorageType;
   api: StorageTypeCredentials;
   apiProviders: StorageTypeCredentials[];
-  localApiState: StorageTypeCredentials;
+  localApiState: StorageTypeFormValues;
   lastUpdatedAt: Date | null;
   changelog: StoryblokStory['content'][];
   lastOpened: number | null;

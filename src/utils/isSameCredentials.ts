@@ -1,7 +1,7 @@
 import { StorageProviderType } from '@/constants/StorageProviderType';
-import { StorageType, StorageTypeCredentials } from '@/types/StorageType';
+import { StorageType, StorageTypeCredentials, StorageTypeFormValues } from '@/types/StorageType';
 
-function isSameCredentials(credential: StorageTypeCredentials, stored: StorageType): boolean {
+function isSameCredentials(credential: StorageTypeCredentials, stored: StorageType | StorageTypeFormValues<false>): boolean {
   switch (stored.provider) {
     case StorageProviderType.GITHUB:
     case StorageProviderType.GITLAB:
