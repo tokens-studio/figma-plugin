@@ -44,7 +44,11 @@ const icons = {
   library: IconLibrary,
 };
 
-function Icon({ name }) {
+type Props = {
+  name: keyof typeof icons;
+};
+
+function Icon({ name }: Props) {
   const IconName = icons[name];
   return <IconName />;
 }

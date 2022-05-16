@@ -26,6 +26,7 @@ import { useFlags } from './LaunchDarkly';
 import Tooltip from './Tooltip';
 import Icon from './Icon';
 import { StorageProviderType } from '@/constants/StorageProviderType';
+import { isGitProvider } from '@/utils/is';
 
 export default function Footer() {
   const storageType = useSelector(storageTypeSelector);
@@ -84,9 +85,9 @@ export default function Footer() {
       }}
     >
       <Stack direction="row">
-        {localApiState.branch && (
+        {!!(localApiState && isGitProvider(localApiState) && localApiState.branch) && (
         <>
-          {gitBranchSelector && <BranchSelector currentBranch={localApiState.branch} />}
+          {gitBranchSelector && <BranchSelector />}
           <IconButton icon={<DownloadIcon />} onClick={onPullButtonClicked} tooltipSide="top" tooltip={`Pull from ${transformProviderName(storageType.provider)}`} />
           <IconButton badge={hasChanges} icon={<UploadIcon />} onClick={onPushButtonClicked} tooltipSide="top" disabled={editProhibited} tooltip={`Push to ${transformProviderName(storageType.provider)}`} />
         </>

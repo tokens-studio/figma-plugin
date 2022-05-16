@@ -71,7 +71,7 @@ export interface UIState {
   storageType: StorageType;
   api: StorageTypeCredentials;
   apiProviders: StorageTypeCredentials[];
-  localApiState: StorageTypeFormValues;
+  localApiState: StorageTypeFormValues<true>;
   lastUpdatedAt: Date | null;
   changelog: StoryblokStory['content'][];
   lastOpened: number | null;
@@ -242,7 +242,7 @@ export const uiState = createModel<RootModel>()({
         api: payload,
       };
     },
-    setLocalApiState(state, payload: StorageTypeCredentials) {
+    setLocalApiState(state, payload: StorageTypeFormValues<true>) {
       return {
         ...state,
         localApiState: payload,

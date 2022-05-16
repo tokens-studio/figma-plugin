@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { TokensIcon, LinkBreak2Icon } from '@radix-ui/react-icons';
 import { checkIfContainsAlias } from '@/utils/alias';
 import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
-import { TypographyTokenSingleValue } from '@/types/propertyTypes';
 import Box from './Box';
 import Input from './Input';
 import ResolvedValueBox from './ResolvedValueBox';
@@ -10,6 +9,7 @@ import { EditTokenObject } from '../store/models/uiState';
 import { findReferences } from '@/utils/findReferences';
 import IconButton from './IconButton';
 import Heading from './Heading';
+import { TokenTypograpyValue } from '@/types/values';
 
 export default function TypographyInput({
   internalEditToken,
@@ -19,7 +19,7 @@ export default function TypographyInput({
 }: {
   internalEditToken: EditTokenObject;
   handleTypographyChange: React.ChangeEventHandler;
-  handleTypographyChangeByAlias: (typography: TypographyTokenSingleValue | TypographyTokenSingleValue[]) => void;
+  handleTypographyChangeByAlias: (typography: string | TokenTypograpyValue) => void;
   resolvedTokens: ResolveTokenValuesResult[];
 }) {
   const isInputMode = (typeof internalEditToken.value === 'object');
@@ -33,7 +33,7 @@ export default function TypographyInput({
   }, [mode]);
 
   const selectedToken = React.useMemo(() => {
-    const search = findReferences(internalEditToken.value);
+    const search = typeof internalEditToken.value === 'string' ? findReferences(internalEditToken.value) : null;
     if (search && search.length > 0) {
       const nameToLookFor = search[0].slice(1, search[0].length - 1);
       const foundToken = resolvedTokens.find((t) => t.name === nameToLookFor);

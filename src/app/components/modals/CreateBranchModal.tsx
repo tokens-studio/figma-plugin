@@ -8,7 +8,8 @@ import Input from '../Input';
 import useRemoteTokens from '../../store/remoteTokens';
 import { apiSelector, localApiStateSelector } from '@/selectors';
 import Stack from '../Stack';
-import { ApiDataType } from '@/types/api';
+import { isGitProvider } from '@/utils/is';
+import type { StorageTypeCredentials } from '@/types/StorageType';
 
 type Props = {
   isOpen: boolean;
@@ -22,15 +23,13 @@ type FormData = {
   branch: string
 };
 
-// @TODO use hooks
-
 export default function CreateBranchModal({
   isOpen, onClose, onSuccess, startBranch, isCurrentChanges,
 }: Props) {
   const { addNewBranch, pushTokens, fetchBranches } = useRemoteTokens();
 
-  const localApiState: ApiDataType = useSelector(localApiStateSelector);
-  const apiData: ApiDataType = useSelector(apiSelector);
+  const localApiState = useSelector(localApiStateSelector);
+  const apiData = useSelector(apiSelector);
 
   const [formFields, setFormFields] = React.useState<FormData>({} as FormData);
   const [hasErrored, setHasErrored] = React.useState<boolean>(false);
@@ -56,16 +55,24 @@ export default function CreateBranchModal({
 
     setHasErrored(false);
 
-    const response = await addNewBranch(localApiState, branch, startBranch ?? undefined);
-    const branches = await fetchBranches(localApiState);
+    if (
+      isGitProvider(localApiState)
+      && isGitProvider(apiData)
+    ) {
+      // type casting because of "name" error - ignoring because not important
+      const response = await addNewBranch(localApiState as StorageTypeCredentials, branch, startBranch ?? undefined);
+      const branches = await fetchBranches(localApiState as StorageTypeCredentials);
 
-    if (response) {
-      onSuccess(branch, branches ?? []);
-    } else {
-      setHasErrored(true);
+      if (response) {
+        onSuccess(branch, branches ?? []);
+      } else {
+        setHasErrored(true);
+      }
+
+      if (isCurrentChanges) {
+        await pushTokens({ ...apiData, branch });
+      }
     }
-
-    if (isCurrentChanges) await pushTokens({ ...apiData, branch });
   }, [
     formFields,
     localApiState,

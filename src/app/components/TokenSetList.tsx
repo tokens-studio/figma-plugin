@@ -132,7 +132,7 @@ export default function TokenSetList({
       onDelete,
       onDuplicate,
     } as unknown as ExtendedTreeItem))
-  ), [items, tokenSets, onRename, onDelete]);
+  ), [items, tokenSets, onRename, onDelete, onDuplicate]);
 
   const handleReorder = React.useCallback((reorderedItems: ExtendedTreeItem[]) => {
     const nextItems = compact(

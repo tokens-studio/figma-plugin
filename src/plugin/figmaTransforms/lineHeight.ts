@@ -22,13 +22,11 @@ export function convertLineHeightToFigma(inputValue: string): LineHeight | null 
   return lineHeight;
 }
 
-export function convertFigmaToLineHeight(inputValue) {
-  const { unit, value } = inputValue;
-  if (unit === 'PIXELS') {
-    return +value.toFixed(2);
-  }
-  if (unit === 'PERCENT') {
-    return `${+value.toFixed(2)}%`;
+export function convertFigmaToLineHeight(inputValue: LineHeight): string | number {
+  if (inputValue.unit === 'PIXELS') {
+    return +inputValue.value.toFixed(2);
+  } if (inputValue.unit === 'PERCENT') {
+    return `${+inputValue.value.toFixed(2)}%`;
   }
   return 'AUTO';
 }

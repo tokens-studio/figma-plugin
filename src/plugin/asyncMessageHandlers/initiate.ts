@@ -36,7 +36,7 @@ export const initiate: AsyncMessageChannelHandlers[AsyncMessageTypes.INITIATE] =
     notifyStorageType(storageType);
 
     const licenseKey = await LicenseKeyProperty.read();
-    if (licenseKey) notifyLicenseKey(licenseKey);
+    notifyLicenseKey(licenseKey ?? '');
 
     // @TODO fix setting of activeTheme
     const apiProviders = await ApiProvidersProperty.read();

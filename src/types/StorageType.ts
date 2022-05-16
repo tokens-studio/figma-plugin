@@ -61,4 +61,5 @@ export type StorageTypeFormValues<Incomplete extends boolean = false> =
   ({ new?: boolean; provider: StorageProviderType.URL } & OptionalPartial<Incomplete, Omit<StorageTypeCredential<URLStorageType>, 'provider'>>)
   | ({ new?: boolean; id?: string; provider: StorageProviderType.JSONBIN } & OptionalPartial<Incomplete, Omit<StorageTypeCredential<JSONBinStorageType>, 'provider' | 'id'>>)
   | ({ new?: boolean; provider: StorageProviderType.GITHUB | StorageProviderType.GITLAB } & OptionalPartial<Incomplete, Omit<StorageTypeCredential<GitStorageType>, 'provider'>>)
-  | ({ new?: boolean; provider: StorageProviderType.ADO } & OptionalPartial<Incomplete, Omit<StorageTypeCredential<ADOStorageType>, 'provider'>>);
+  | ({ new?: boolean; provider: StorageProviderType.ADO } & OptionalPartial<Incomplete, Omit<StorageTypeCredential<ADOStorageType>, 'provider'>>)
+  | ({ new?: boolean; provider: StorageProviderType.LOCAL });

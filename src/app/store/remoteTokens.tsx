@@ -219,6 +219,7 @@ export default function useRemoteTokens() {
         newBranchCreated = await createGithubBranch(context, branch, source);
         break;
       }
+
       case StorageProviderType.ADO: {
         newBranchCreated = await createADOBranch(context, branch, source);
         break;

@@ -88,7 +88,7 @@ function roundToTwo(num: number) {
 }
 
 export function convertToFigmaColor(input: string) {
-  let color;
+  let color: RGBA;
   let opacity;
   if (input.startsWith('rgb')) {
     const rgbValues = input.replace(/^rgba?\(|\s+|\)$/g, '').split(',').map(parseFloat) as WebRGBA;
@@ -96,7 +96,9 @@ export function convertToFigmaColor(input: string) {
     const {
       r, g, b, a = 1,
     } = webRGBToFigmaRGB(rgbValues);
-    color = { r, g, b };
+    color = {
+      r, g, b, a,
+    };
     opacity = Number(a);
   } else if (input.startsWith('hsl')) {
     const hslValues = input.replace(/^hsla?\(|\s+|%|\)$/g, '').split(',').map(parseFloat);
@@ -104,13 +106,17 @@ export function convertToFigmaColor(input: string) {
     const {
       r, g, b, a = 1,
     } = webRGBToFigmaRGB(rgbValues);
-    color = { r, g, b };
+    color = {
+      r, g, b, a,
+    };
     opacity = Number(a);
   } else {
     const {
       r, g, b, a = 1,
     }: RGBA = hexToFigmaRGB(toHex(input));
-    color = { r, g, b };
+    color = {
+      r, g, b, a,
+    };
     opacity = roundToTwo(a);
   }
 

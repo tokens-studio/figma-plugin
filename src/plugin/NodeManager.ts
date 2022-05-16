@@ -48,7 +48,7 @@ export class NodeManager {
   private updating: Promise<void> | null = null;
 
   constructor() {
-    this.updating = new Promise(async () => {
+    this.updating = new Promise(async (resolve) => {
       if (typeof figma.root !== 'undefined') {
         const parsedCache = await PersistentNodesCacheProperty.read(figma.root);
         if (parsedCache) {
@@ -60,6 +60,7 @@ export class NodeManager {
           await PersistentNodesCacheProperty.write(entries);
         }, 500));
       }
+      resolve();
     });
   }
 

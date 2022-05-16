@@ -1,23 +1,27 @@
 import { useDispatch } from 'react-redux';
 import { useCallback, useMemo } from 'react';
 import { Dispatch } from '@/app/store';
-import { ContextObject } from '@/types/api';
 import { notifyToUI } from '../../../plugin/notifiers';
 import { UrlTokenStorage } from '@/storage/UrlTokenStorage';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { StorageProviderType } from '@/constants/StorageProviderType';
+import { StorageTypeCredentials } from '@/types/StorageType';
+
+type UrlCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.URL; }>;
 
 export default function useURL() {
   const dispatch = useDispatch<Dispatch>();
 
-  const storageClientFactory = useCallback((context: ContextObject) => (
+  const storageClientFactory = useCallback((context: UrlCredentials) => (
     new UrlTokenStorage(context.id, context.secret)
   ), []);
 
   // Read tokens from URL
-  const pullTokensFromURL = useCallback(async (context: ContextObject) => {
-    const { id, secret, name } = context;
+  const pullTokensFromURL = useCallback(async (context: UrlCredentials) => {
+    const {
+      id, secret, name, internalId,
+    } = context;
     if (!id && !secret) return null;
 
     const storage = storageClientFactory(context);
@@ -29,10 +33,13 @@ export default function useURL() {
       if (content) {
         AsyncMessageChannel.message({
           type: AsyncMessageTypes.CREDENTIALS,
-          id,
-          name,
-          secret,
-          provider: StorageProviderType.URL,
+          credential: {
+            id,
+            internalId,
+            name,
+            secret,
+            provider: StorageProviderType.URL,
+          },
         });
 
         if (Object.keys(content.tokens).length) {

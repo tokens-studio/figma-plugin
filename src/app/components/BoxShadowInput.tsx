@@ -54,7 +54,7 @@ function SingleShadowInput({
   onRemove,
   id,
 }: Props) {
-  const onChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+  const onChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     if (Array.isArray(value)) {
       const values = value;
       const newShadow = { ...value[index], [e.target.name]: e.target.value };

@@ -1,4 +1,5 @@
 import React from 'react';
+import get from 'just-safe-get';
 import { useSelector } from 'react-redux';
 import Button from './Button';
 import { useDelayedFlag } from '@/hooks';
@@ -65,7 +66,7 @@ export default function LoadingBar() {
         <Spinner />
         <div className="flex flex-grow items-center justify-between">
           <div className="font-medium text-xxs">
-            {backgroundJobTitles[backgroundJobs[backgroundJobs.length - 1]?.name] ?? 'Hold on, updating...'}
+            {get(backgroundJobTitles, backgroundJobs[backgroundJobs.length - 1]?.name) ?? 'Hold on, updating...'}
             {expectedWaitTimeInSeconds >= 1 && (
               `(${expectedWaitTimeInSeconds}s remaining)`
             )}

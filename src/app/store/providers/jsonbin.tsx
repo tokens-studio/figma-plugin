@@ -57,7 +57,7 @@ export function useJSONbin() {
   const themes = useSelector(themesListSelector);
 
   const createNewJSONBin = useCallback(async (context: Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.JSONBIN }>) => {
-    const { secret, name } = context;
+    const { secret, name, internalId } = context;
     const updatedAt = new Date().toISOString();
     const result = await JSONBinTokenStorage.create(name, updatedAt, secret);
     if (result) {
@@ -75,6 +75,7 @@ export function useJSONbin() {
         credential: {
           provider: StorageProviderType.JSONBIN,
           id: result.metadata.id,
+          internalId,
           name,
           secret,
         },
@@ -89,7 +90,9 @@ export function useJSONbin() {
 
   // Read tokens from JSONBin
   const pullTokensFromJSONBin = useCallback(async (context: Extract<StorageTypeCredentials, { provider: StorageProviderType.JSONBIN }>) => {
-    const { id, secret, name } = context;
+    const {
+      id, secret, name, internalId,
+    } = context;
     if (!id || !secret) return null;
 
     try {
@@ -101,6 +104,7 @@ export function useJSONbin() {
         type: AsyncMessageTypes.CREDENTIALS,
         credential: {
           id,
+          internalId,
           name,
           secret,
           provider: StorageProviderType.JSONBIN,

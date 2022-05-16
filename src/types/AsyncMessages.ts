@@ -6,9 +6,10 @@ import type { NodeInfo } from './NodeInfo';
 import type { NodeTokenRefMap } from './NodeTokenRefMap';
 import type { PullStyleOptions } from './PullStylesOptions';
 import type { ThemeObjectsList } from './ThemeObjectsList';
-import type { AnyTokenList, AnyTokenSet } from './tokens';
+import type { AnyTokenList } from './tokens';
 import type { UsedTokenSetsMap } from './UsedTokenSetsMap';
 import { StorageType, StorageTypeCredentials } from './StorageType';
+import { Direction } from '@/constants/Direction';
 
 export enum AsyncMessageTypes {
   // the below messages are going from UI to plugin
@@ -105,7 +106,7 @@ export type SetUiAsyncMessageResult = AsyncMessage<AsyncMessageTypes.SET_UI>;
 
 export type CreateAnnotationAsyncMessage = AsyncMessage<AsyncMessageTypes.CREATE_ANNOTATION, {
   tokens: object;
-  direction: string;
+  direction: Direction;
 }>;
 export type CreateAnnotationAsyncMessageResult = AsyncMessage<AsyncMessageTypes.CREATE_ANNOTATION>;
 
@@ -116,7 +117,7 @@ export type CreateStylesAsyncMessage = AsyncMessage<AsyncMessageTypes.CREATE_STY
 export type CreateStylesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.CREATE_STYLES>;
 
 export type UpdateAsyncMessage = AsyncMessage<AsyncMessageTypes.UPDATE, {
-  tokenValues: AnyTokenSet;
+  tokenValues: Record<string, AnyTokenList>;
   tokens: AnyTokenList | null;
   themes: ThemeObjectsList
   updatedAt: string;
