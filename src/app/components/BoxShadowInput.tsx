@@ -306,10 +306,10 @@ export default function BoxShadowInput({
               />
               {
                 !isInputMode && checkIfContainsAlias(internalEditToken.value) && (
-                <ResolvedValueBox
-                  alias={alias}
-                  selectedToken={selectedToken}
-                />
+                  <ResolvedValueBox
+                    alias={alias}
+                    selectedToken={selectedToken}
+                  />
                 )
               }
             </Box>

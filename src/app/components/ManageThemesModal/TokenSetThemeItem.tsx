@@ -13,7 +13,7 @@ import {
   DropdownMenuItemIndicator,
 } from '../DropdownMenu';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
-import IconChevronDown from '../icons/IconChevronDown';
+import IconChevronDown from '@/icons/chevrondown.svg';
 
 type Props = {
   item: TreeItem

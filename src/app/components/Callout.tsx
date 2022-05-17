@@ -1,7 +1,7 @@
 import React from 'react';
 import { styled } from '@/stitches.config';
 import Heading from './Heading';
-import Icon from './Icon';
+import IconBell from '@/icons/bell.svg';
 import Stack from './Stack';
 import Text from './Text';
 import Box from './Box';
@@ -18,7 +18,7 @@ export default function Callout({
     <Box css={{ backgroundColor: '$bgSubtle', padding: '$4', borderRadius: '$default' }}>
       <Stack direction="row" gap={2}>
         <Box css={{ color: '$interaction' }}>
-          <Icon name="bell" />
+          <IconBell />
         </Box>
         <Stack align="start" direction="column" gap={2}>
           <Heading>{heading}</Heading>

@@ -10,7 +10,7 @@ import { Dispatch } from '../store';
 import { SelectionGroup } from '@/types';
 import TokenNodes from './inspector/TokenNodes';
 import { inspectStateSelector } from '@/selectors';
-import { IconToggleableDisclosure } from './icons/IconToggleableDisclosure';
+import { IconToggleableDisclosure } from '@/icons/IconToggleableDisclosure';
 
 export default function InspectorTokenSingle({
   token,
