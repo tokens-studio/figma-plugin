@@ -8,16 +8,15 @@ import useTokens from '../store/useTokens';
 import InspectorResolvedToken from './InspectorResolvedToken';
 import { Dispatch } from '../store';
 import { SelectionGroup } from '@/types';
+import { IconToggleableDisclosure } from '@/icons/IconToggleableDisclosure';
 import TokenNodes from './inspector/TokenNodes';
 import { inspectStateSelector } from '@/selectors';
 import { useTypeForProperty } from '../hooks/useTypeForProperty';
-import { IconToggleableDisclosure } from './icons/IconToggleableDisclosure';
 import Button from './Button';
 import Heading from './Heading';
 import DownshiftInput from './DownshiftInput';
 import Modal from './Modal';
 import Stack from './Stack';
-import ColorPicker from './ColorPicker';
 
 export default function InspectorTokenSingle({
   token,
@@ -31,7 +30,6 @@ export default function InspectorTokenSingle({
   const inspectState = useSelector(inspectStateSelector, shallowEqual);
   const dispatch = useDispatch<Dispatch>();
   const [newTokenName, setNewTokenName] = React.useState<string>('');
-  const [inputHelperOpen, setInputHelperOpen] = React.useState<boolean>(false);
   const [showDialog, setShowDialog] = React.useState<boolean>(false);
   const [isChecked, setChecked] = React.useState<boolean>(false);
 
@@ -41,24 +39,11 @@ export default function InspectorTokenSingle({
     setChecked(inspectState.selectedTokens.includes(`${token.category}-${token.value}`));
   }, [inspectState.selectedTokens, token]);
 
-  const handleChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>((e) => {
-    e.persist();
-    setNewTokenName(e.target.value);
-  }, []);
-
-  const handleColorValueChange = React.useCallback((color: string) => {
-    setNewTokenName(color);
-  }, []);
-
   const handleDownShiftInputChange = React.useCallback((newInputValue: string) => {
     if (newInputValue.charAt(0) === '$') setNewTokenName(newInputValue.slice(1, newInputValue.length));
     if (newInputValue.charAt(0) === '{') setNewTokenName(newInputValue.slice(1, newInputValue.length - 1));
     else setNewTokenName(newInputValue);
   }, []);
-
-  const handleToggleInputHelper = React.useCallback(() => {
-    setInputHelperOpen(!inputHelperOpen);
-  }, [inputHelperOpen]);
 
   const onConfirm = React.useCallback(() => {
     handleRemap(token.category, token.value, newTokenName);
@@ -126,38 +111,23 @@ export default function InspectorTokenSingle({
               <form
                 onSubmit={onConfirm}
               >
-                <Stack direction="column" gap={4}>
+                <Stack direction="column" gap={4} css={{ minHeight: '$215', justifyContent: 'center' }}>
                   <Stack direction="column" gap={2}>
                     <Heading>
                       Choose a new token for
+                      {' '}
                       {mappedToken?.name || token.value}
                     </Heading>
                     <DownshiftInput
                       value={newTokenName}
                       type={property === 'fill' ? 'color' : property}
                       resolvedTokens={resolvedTokens}
-                      handleChange={handleChange}
                       setInputValue={handleDownShiftInputChange}
                       placeholder={
                         property === 'fill' ? '#000000, hsla(), rgba() or {alias}' : 'Value or {alias}'
                       }
-                      prefix={
-                        property === 'fill' && (
-                          <button
-                            type="button"
-                            className="block w-4 h-4 rounded-sm cursor-pointer shadow-border shadow-gray-300 focus:shadow-focus focus:shadow-primary-400"
-                            style={{ background: '$borderMuted', fontSize: 0 }}
-                            onClick={handleToggleInputHelper}
-                          >
-                            {newTokenName}
-                          </button>
-                        )
-                      }
                       suffix
                     />
-                    {inputHelperOpen && property === 'fill' && (
-                      <ColorPicker value={newTokenName} onChange={handleColorValueChange} />
-                    )}
 
                   </Stack>
                   <Stack direction="row" gap={4} justify="between">
