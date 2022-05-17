@@ -7,9 +7,9 @@ export function updateTokenPayloadToSingleToken(
   return {
     name: payload.name,
     value: payload.value,
-    type: payload.options.type,
-    ...(payload.options.description ? {
-      description: payload.options.description,
+    type: payload.type,
+    ...(payload.description ? {
+      description: payload.description,
     } : {}),
   } as SingleToken;
 }

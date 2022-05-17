@@ -8,21 +8,24 @@ import { activeTokenSetSelector } from '@/selectors';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { DeleteTokenPayload, UpdateTokenPayload } from '@/types/payloads';
 
+// @TODO this typing could be more strict in the future
+
 type EditSingleTokenData = {
   parent: string;
+  type: TokenTypes;
   name: string;
-  value: SingleToken;
-  options?: { description?: string; type: TokenTypes };
+  value: SingleToken['value'];
+  description?: string;
   oldName?: string;
   shouldUpdateDocument?: boolean;
 };
 
 type CreateSingleTokenData = {
   parent: string;
+  type: TokenTypes;
   name: string;
-  value: SingleToken;
-  options?: { description?: string; type: TokenTypes };
-  newGroup?: boolean;
+  value: SingleToken['value'];
+  description?: string;
   shouldUpdateDocument?: boolean;
 };
 
@@ -36,7 +39,7 @@ export default function useManageTokens() {
 
   const editSingleToken = useCallback(async (data: EditSingleTokenData) => {
     const {
-      parent, name, value, options, oldName, shouldUpdateDocument = true,
+      parent, type, name, value, description, oldName, shouldUpdateDocument = true,
     } = data;
     dispatch.uiState.startJob({
       name: BackgroundJobs.UI_EDITSINGLETOKEN,
@@ -50,18 +53,19 @@ export default function useManageTokens() {
       editToken({
         parent,
         name,
+        type,
         value,
-        options,
+        description,
         oldName,
         shouldUpdate: shouldUpdateDocument,
-      });
+      } as UpdateTokenPayload);
     }
     dispatch.uiState.completeJob(BackgroundJobs.UI_EDITSINGLETOKEN);
   }, [editToken, dispatch.uiState]);
 
   const createSingleToken = useCallback(async (data: CreateSingleTokenData) => {
     const {
-      parent, name, value, options, newGroup = false, shouldUpdateDocument = true,
+      parent, type, name, value, description, shouldUpdateDocument = true,
     } = data;
     dispatch.uiState.startJob({
       name: BackgroundJobs.UI_CREATESINGLETOKEN,
@@ -69,15 +73,16 @@ export default function useManageTokens() {
     });
     // should be a setting which users can toggle on / off to disable auto-sync after each token change
     const shouldUpdate = true;
+
     if (shouldUpdate) {
       createToken({
         parent,
         name,
+        type,
         value,
-        options,
-        newGroup,
+        description,
         shouldUpdate: shouldUpdateDocument,
-      });
+      } as UpdateTokenPayload);
     }
     dispatch.uiState.completeJob(BackgroundJobs.UI_CREATESINGLETOKEN);
   }, [createToken, dispatch.uiState]);

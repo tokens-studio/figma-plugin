@@ -3,7 +3,6 @@ import {
   PostToUIMessage,
   UserIdFromPluginMessage,
 } from '@/types/messages';
-import store from './store';
 import { TokenStore } from '@/types/tokens';
 import { SelectionGroup } from '@/types/SelectionGroup';
 import { SelectionValue } from '@/types/SelectionValue';
@@ -96,26 +95,6 @@ export function notifyUISettings(
     type: MessageFromPluginTypes.SHOW_EMPTY_GROUPS,
     showEmptyGroups,
   });
-}
-
-type Data = {
-  nodes: number;
-  remotes: Set<BaseNode>;
-};
-
-export function notifyRemoteComponents({ nodes, remotes }: Data) {
-  const opts = { timeout: 600 };
-  if (nodes > 0 && remotes.size > 0) {
-    notifyUI(`Updated ${nodes} nodes, unable to update ${remotes.size} remote components`, opts);
-  } else if (nodes > 0 && remotes.size === 0) {
-    notifyUI(`Success! Updated ${nodes} nodes`, opts);
-  }
-  postToUI({
-    type: MessageFromPluginTypes.REMOTE_COMPONENTS,
-  });
-
-  store.successfulNodes.clear();
-  store.remoteComponents.clear();
 }
 
 export function notifyTokenValues(values: TokenStore) {

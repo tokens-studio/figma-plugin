@@ -3,9 +3,7 @@ import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { tokenArrayGroupToMap } from '@/utils/tokenArrayGroupToMap';
 import { updateNodes } from '../node';
 import { defaultNodeManager } from '../NodeManager';
-import { notifyRemoteComponents } from '../notifiers';
 import { sendPluginValues, updatePluginData } from '../pluginData';
-import store from '../store';
 
 export const setNodeData: AsyncMessageChannelHandlers[AsyncMessageTypes.SET_NODE_DATA] = async (msg) => {
   try {
@@ -23,8 +21,4 @@ export const setNodeData: AsyncMessageChannelHandlers[AsyncMessageTypes.SET_NODE
   } catch (e) {
     console.error(e);
   }
-  notifyRemoteComponents({
-    nodes: store.successfulNodes.size,
-    remotes: store.remoteComponents,
-  });
 };

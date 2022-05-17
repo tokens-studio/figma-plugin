@@ -13,7 +13,6 @@ import IconMinus from '@/icons/minus.svg';
 import IconPlus from '@/icons/plus.svg';
 import IconGrabber from '@/icons/grabber.svg';
 import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
-import { EditTokenObject } from '../store/models/uiState';
 import Heading from './Heading';
 import IconButton from './IconButton';
 import TokenInput from './TokenInput';
@@ -23,6 +22,8 @@ import Input from './Input';
 import ResolvedValueBox from './ResolvedValueBox';
 import { TokenBoxshadowValue } from '@/types/values';
 import { BoxShadowTypes } from '@/constants/BoxShadowTypes';
+import { EditTokenObject } from '@/types/tokens';
+import { TokenTypes } from '@/constants/TokenTypes';
 
 // @TODO these types need to be fixed
 
@@ -35,12 +36,14 @@ interface DragItem {
   type: string;
 }
 
+type EditTokenType = Extract<EditTokenObject, { type: TokenTypes.BOX_SHADOW }>;
+
 type Props = {
-  value: TokenBoxshadowValue | TokenBoxshadowValue[];
+  value: string | TokenBoxshadowValue | TokenBoxshadowValue[];
   isMultiple?: boolean;
   shadowItem: TokenBoxshadowValue;
   index: number;
-  handleBoxShadowChange: (shadow: TokenBoxshadowValue | TokenBoxshadowValue[]) => void;
+  handleBoxShadowChange: (shadow: string | TokenBoxshadowValue | TokenBoxshadowValue[]) => void;
   onRemove: (index: number) => void;
   id: string;
 };
@@ -199,10 +202,10 @@ export default function BoxShadowInput({
   resolvedTokens,
   internalEditToken,
 }: {
-  handleBoxShadowChange: (shadow: TokenBoxshadowValue | TokenBoxshadowValue[]) => void;
-  handleBoxShadowChangeByAlias: (shadow: TokenBoxshadowValue | TokenBoxshadowValue[]) => void;
+  handleBoxShadowChange: (shadow: string | TokenBoxshadowValue | TokenBoxshadowValue[]) => void;
+  handleBoxShadowChangeByAlias: (e: React.ChangeEvent<HTMLInputElement>) => void;
   resolvedTokens: ResolveTokenValuesResult[]
-  internalEditToken: EditTokenObject;
+  internalEditToken: EditTokenType;
 }) {
   const seed = useUIDSeed();
   const isInputMode = (typeof internalEditToken.value === 'object');

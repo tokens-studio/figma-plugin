@@ -21,6 +21,7 @@ import {
   UpdateTokenPayload,
   RenameTokenGroupPayload,
   DuplicateTokenGroupPayload,
+  DuplicateTokenPayload,
 } from '@/types/payloads';
 import { updateTokenPayloadToSingleToken } from '@/utils/updateTokenPayloadToSingleToken';
 import { RootModel } from '@/types/RootModel';
@@ -242,7 +243,7 @@ export const tokenState = createModel<RootModel>()({
         },
       };
     },
-    duplicateToken: (state, data: UpdateTokenPayload) => {
+    duplicateToken: (state, data: DuplicateTokenPayload) => {
       let newTokens: TokenStore['values'] = {};
       const existingTokenIndex = state.tokens[data.parent].findIndex((n) => n.name === data.name);
       if (existingTokenIndex > -1) {
@@ -518,8 +519,8 @@ export const tokenState = createModel<RootModel>()({
           themes: rootState.tokenState.themes,
           activeTheme: rootState.tokenState.activeTheme,
           settings: rootState.settings,
-          updatedAt: new Date().toString(),
-          lastUpdatedAt: rootState.uiState.lastUpdatedAt,
+          updatedAt: new Date().toISOString(),
+          lastUpdatedAt: rootState.uiState.lastUpdatedAt ?? new Date().toISOString(),
           isLocal: rootState.uiState.storageType.provider === StorageProviderType.LOCAL,
           editProhibited: rootState.tokenState.editProhibited,
           api: rootState.uiState.api,

@@ -1,10 +1,8 @@
 import { AsyncMessageChannelHandlers } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { defaultNodeManager } from '../NodeManager';
-import { notifyRemoteComponents } from '../notifiers';
 import { updatePluginData } from '../pluginData';
 import { sendSelectionChange } from '../sendSelectionChange';
-import store from '../store';
 
 export const remapTokens: AsyncMessageChannelHandlers[AsyncMessageTypes.REMAP_TOKENS] = async (msg) => {
   try {
@@ -44,15 +42,7 @@ export const remapTokens: AsyncMessageChannelHandlers[AsyncMessageTypes.REMAP_TO
     await updatePluginData({ entries: updatedNodes, values: {}, shouldOverride: true });
 
     await sendSelectionChange();
-    notifyRemoteComponents({
-      nodes: store.successfulNodes.size,
-      remotes: store.remoteComponents,
-    });
   } catch (e) {
     console.error(e);
   }
-  notifyRemoteComponents({
-    nodes: store.successfulNodes.size,
-    remotes: store.remoteComponents,
-  });
 };

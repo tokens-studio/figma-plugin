@@ -9,7 +9,7 @@ import Stack from './Stack';
 type Props = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'> & {
   name?: string;
   inputRef?: React.MutableRefObject<HTMLInputElement | null>;
-  error?: string;
+  error?: string | null;
   required?: boolean;
   autofocus?: boolean;
   tabindex?: number | null;

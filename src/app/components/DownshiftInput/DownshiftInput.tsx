@@ -18,7 +18,7 @@ interface DownShiftProps {
   type: string;
   label?: string;
   error?: string;
-  value: string;
+  value?: string;
   placeholder?: string;
   prefix?: React.ReactNode;
   suffix?: React.ReactNode;
@@ -43,7 +43,7 @@ export const DownshiftInput: React.FC<DownShiftProps> = ({
   setShowAutoSuggest,
   handleChange,
 }) => {
-  const filteredValue = useMemo(() => (showAutoSuggest ? '' : value.replace(/[^a-zA-Z0-9.]/g, '')), [
+  const filteredValue = useMemo(() => ((showAutoSuggest || !value) ? '' : value.replace(/[^a-zA-Z0-9.]/g, '')), [
     showAutoSuggest,
     value,
   ]); // removing non-alphanumberic except . from the input value
@@ -74,7 +74,7 @@ export const DownshiftInput: React.FC<DownShiftProps> = ({
   );
 
   const handleSelect = useCallback((selectedItem: any) => {
-    setInputValue(value.includes('$') ? `$${selectedItem.name}` : `{${selectedItem.name}}`);
+    setInputValue(value?.includes('$') ? `$${selectedItem.name}` : `{${selectedItem.name}}`);
     setShowAutoSuggest(false);
   }, [setInputValue, setShowAutoSuggest, value]);
 
@@ -104,7 +104,7 @@ export const DownshiftInput: React.FC<DownShiftProps> = ({
           {filteredTokenItems
           && filteredTokenItems.length > 0
           && selectedItem?.name !== filteredValue
-          && (showAutoSuggest || (['{', '$'].some((c) => value.includes(c)) && !value.includes('}'))) ? (
+          && (showAutoSuggest || (['{', '$'].some((c) => value?.includes(c)) && !value?.includes('}'))) ? (
             <StyledDropdown className="content scroll-container">
               {filteredTokenItems.map((token: SingleToken, index: number) => (
                 <StyledItem

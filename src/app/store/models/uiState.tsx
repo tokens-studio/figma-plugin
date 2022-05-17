@@ -4,29 +4,18 @@ import { track } from '@/utils/analytics';
 import type { RootModel } from '@/types/RootModel';
 import fetchChangelog from '@/utils/storyblok';
 import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
-import { SingleToken } from '@/types/tokens';
 import { SelectionGroup, StoryblokStory } from '@/types';
 import { Tabs } from '@/constants/Tabs';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StorageType, StorageTypeCredentials, StorageTypeFormValues } from '@/types/StorageType';
+import { EditTokenObject } from '@/types/tokens';
+import { TokenTypes } from '@/constants/TokenTypes';
 
 type DisplayType = 'GRID' | 'LIST';
 
 type SelectionValue = NodeTokenRefMap;
-
-export type EditTokenObject = SingleToken<true, {
-  initialName: string;
-  path: string;
-  isPristine: boolean;
-  explainer?: string;
-  property: string;
-  // @TODO get rid of thse object types
-  schema?: object;
-  optionsSchema: object;
-  options: object;
-}>;
 
 export type ConfirmProps = {
   show?: boolean;
@@ -72,10 +61,10 @@ export interface UIState {
   api: StorageTypeCredentials;
   apiProviders: StorageTypeCredentials[];
   localApiState: StorageTypeFormValues<true>;
-  lastUpdatedAt: Date | null;
+  lastUpdatedAt: string | null;
   changelog: StoryblokStory['content'][];
   lastOpened: number | null;
-  editToken: EditTokenObject | null;
+  editToken: EditTokenObject;
   showEditForm: boolean;
   tokenFilter: string;
   confirmState: ConfirmProps;
@@ -117,7 +106,10 @@ export const uiState = createModel<RootModel>()({
     lastUpdatedAt: null,
     changelog: [],
     lastOpened: '',
-    editToken: null,
+    editToken: {
+      type: TokenTypes.OTHER,
+      isPristine: true,
+    },
     showEditForm: false,
     tokenFilter: '',
     tokenFilterVisible: false,

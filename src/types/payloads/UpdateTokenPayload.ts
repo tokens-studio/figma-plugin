@@ -1,7 +1,6 @@
 import { TokenTypes } from '@/constants/TokenTypes';
 import {
   SingleColorToken,
-  SingleImplicitToken,
   SingleBorderRadiusToken,
   SingleTextToken,
   SingleTypographyToken,
@@ -18,16 +17,16 @@ import {
   SingleTextCaseToken,
   SingleSpacingToken,
   SingleOtherToken,
+  SingleCompositionToken,
+  SingleSizingToken,
 } from '../tokens';
 
 type GenericTokenInput<T extends TokenTypes, V = string> = {
   parent: string; // the currently active tokenSet
   name: string;
+  type: T;
   value: V;
-  options: {
-    type: T;
-    description?: string;
-  };
+  description?: string;
   oldName?: string; // only passed when editing token
   shouldUpdate?: boolean
   shouldUpdateDocument?: boolean;
@@ -35,7 +34,6 @@ type GenericTokenInput<T extends TokenTypes, V = string> = {
 
 export type UpdateTokenPayload =
   GenericTokenInput<TokenTypes.COLOR, SingleColorToken['value']>
-  | GenericTokenInput<TokenTypes.IMPLICIT, SingleImplicitToken['value']>
   | GenericTokenInput<TokenTypes.BORDER_RADIUS, SingleBorderRadiusToken['value']>
   | GenericTokenInput<TokenTypes.TEXT, SingleTextToken['value']>
   | GenericTokenInput<TokenTypes.TYPOGRAPHY, SingleTypographyToken['value']>
@@ -51,4 +49,6 @@ export type UpdateTokenPayload =
   | GenericTokenInput<TokenTypes.TEXT_DECORATION, SingleTextDecorationToken['value']>
   | GenericTokenInput<TokenTypes.TEXT_CASE, SingleTextCaseToken['value']>
   | GenericTokenInput<TokenTypes.SPACING, SingleSpacingToken['value']>
+  | GenericTokenInput<TokenTypes.SIZING, SingleSizingToken['value']>
+  | GenericTokenInput<TokenTypes.COMPOSITION, SingleCompositionToken['value']>
   | GenericTokenInput<TokenTypes.OTHER, SingleOtherToken['value']>;

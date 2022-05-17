@@ -11,12 +11,11 @@ import Input from './Input';
 import ColorPicker from './ColorPicker';
 import useConfirm from '../hooks/useConfirm';
 import useTokens from '../store/useTokens';
-import { SingleBoxShadowToken, SingleCompositionToken } from '@/types/tokens';
+import { EditTokenObject, SingleBoxShadowToken, SingleCompositionToken } from '@/types/tokens';
 import { checkIfContainsAlias, getAliasValue } from '@/utils/alias';
 import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
 import { activeTokenSetSelector, editTokenSelector } from '@/selectors';
 import { TokenTypes } from '@/constants/TokenTypes';
-import { EditTokenObject } from '../store/models/uiState';
 import TypographyInput from './TypographyInput';
 import Stack from './Stack';
 import DownshiftInput from './DownshiftInput';
@@ -176,19 +175,26 @@ function EditTokenForm({ resolvedTokens }: Props) {
   );
 
   const handleDownShiftInputChange = React.useCallback((newInputValue: string) => {
-    setInternalEditToken({
-      ...internalEditToken,
-      value: newInputValue,
-    });
+    if (
+      internalEditToken.type !== TokenTypes.COMPOSITION
+      && internalEditToken.type !== TokenTypes.BOX_SHADOW
+      && internalEditToken.type !== TokenTypes.TYPOGRAPHY
+    ) {
+      const updatedToken = {
+        ...internalEditToken,
+        value: newInputValue,
+      } as EditTokenObject;
+      setInternalEditToken(updatedToken);
+    }
   }, [internalEditToken]);
 
-  const handleOptionsChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>(
+  const handleDescriptionChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>(
     (e) => {
       e.persist();
       if (internalEditToken) {
         setInternalEditToken({
           ...internalEditToken,
-          options: { ...internalEditToken.options, [e.target.name]: e.target.value },
+          description: e.target.value,
         });
       }
     },
@@ -196,8 +202,8 @@ function EditTokenForm({ resolvedTokens }: Props) {
   );
 
   // @TODO update to useCallback
-  const submitTokenValue = async ({ value, name, options }: EditTokenObject) => {
-    if (internalEditToken) {
+  const submitTokenValue = async ({ type, value, name }: EditTokenObject) => {
+    if (internalEditToken && value && name) {
       let oldName;
       if (internalEditToken.initialName !== name && internalEditToken.initialName) {
         oldName = internalEditToken.initialName;
@@ -213,16 +219,16 @@ function EditTokenForm({ resolvedTokens }: Props) {
         createSingleToken({
           parent: activeTokenSet,
           name: newName,
+          type,
           value,
-          options,
         });
       } else {
         editSingleToken({
           parent: activeTokenSet,
           name: newName,
           oldName,
+          type,
           value,
-          options,
         });
         // When users change token names references are still pointing to the old name, ask user to remap
         if (oldName && oldName !== newName) {
@@ -276,9 +282,9 @@ function EditTokenForm({ resolvedTokens }: Props) {
 
   const resolvedValue = React.useMemo(() => {
     if (internalEditToken) {
-      return typeof internalEditToken?.value === 'object'
-        ? null
-        : getAliasValue(internalEditToken.value, resolvedTokens);
+      return typeof internalEditToken?.value === 'string'
+        ? getAliasValue(internalEditToken.value, resolvedTokens)
+        : null;
     }
     return null;
   }, [internalEditToken, resolvedTokens]);
@@ -322,7 +328,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
             <DownshiftInput
               value={internalEditToken.value}
               type={internalEditToken.type}
-              label={internalEditToken.property}
+              label={internalEditToken.schema?.property}
               showAutoSuggest={showAutoSuggest}
               resolvedTokens={resolvedTokens}
               handleChange={handleChange}
@@ -356,7 +362,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
             {checkIfContainsAlias(internalEditToken.value) && (
               <div className="flex p-2 mt-2 font-mono text-gray-700 bg-gray-100 border-gray-300 rounded text-xxs itms-center">
                 {internalEditToken.type === 'color' ? (
-                  <div className="w-4 h-4 mr-1 border border-gray-200 rounded" style={{ background: resolvedValue }} />
+                  <div className="w-4 h-4 mr-1 border border-gray-200 rounded" style={{ background: String(resolvedValue) }} />
                 ) : null}
                 {resolvedValue}
               </div>
@@ -383,22 +389,17 @@ function EditTokenForm({ resolvedTokens }: Props) {
       />
       {renderTokenForm()}
 
-      {internalEditToken?.explainer && <div className="mt-1 text-gray-600 text-xxs">{internalEditToken.explainer}</div>}
-      {internalEditToken?.optionsSchema
-        ? Object.entries(internalEditToken?.optionsSchema).map(([key, schemaValue]: [string, string]) => (
-          <Input
-            key={key}
-            full
-            label={key}
-            value={internalEditToken.options[key]}
-            onChange={handleOptionsChange}
-            type="text"
-            name={key}
-            custom={schemaValue}
-            capitalize
-          />
-        ))
-        : null}
+      {internalEditToken?.schema?.explainer && <div className="mt-1 text-gray-600 text-xxs">{internalEditToken.schema.explainer}</div>}
+      <Input
+        full
+        key="description"
+        label="description"
+        value={internalEditToken?.description}
+        onChange={handleDescriptionChange}
+        type="text"
+        name="description"
+        capitalize
+      />
       <Stack direction="row" justify="end" gap={2}>
         <Button variant="secondary" type="button" onClick={handleReset}>
           Cancel

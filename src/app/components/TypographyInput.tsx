@@ -19,7 +19,7 @@ export default function TypographyInput({
 }: {
   internalEditToken: EditTokenObject;
   handleTypographyChange: React.ChangeEventHandler;
-  handleTypographyChangeByAlias: (typography: string | TokenTypograpyValue) => void;
+  handleTypographyChangeByAlias: (e: React.ChangeEvent<HTMLInputElement>) => void;
   resolvedTokens: ResolveTokenValuesResult[];
 }) {
   const isInputMode = (typeof internalEditToken.value === 'object');

@@ -2,11 +2,12 @@ import React, { useCallback } from 'react';
 import { TokenCompositionValue } from '@/types/values';
 import IconPlus from '@/icons/plus.svg';
 import { Properties } from '@/constants/Properties';
-import { SingleCompositionToken } from '@/types/tokens';
+import { EditTokenObject } from '@/types/tokens';
 import Heading from './Heading';
 import IconButton from './IconButton';
 import Box from './Box';
 import SingleCompositionTokenForm from './SingleCompositionTokenForm';
+import { TokenTypes } from '@/constants/TokenTypes';
 
 const newToken: TokenCompositionValue = {
   property: '', value: '',
@@ -16,7 +17,7 @@ export default function CompositionTokenForm({
   internalEditToken,
   setValue,
 }: {
-  internalEditToken: SingleCompositionToken;
+  internalEditToken: Extract<EditTokenObject, { type: TokenTypes.COMPOSITION }>;
   setValue: (style: TokenCompositionValue | TokenCompositionValue[]) => void;
 }) {
   const propertiesMenu = React.useMemo(() => (
