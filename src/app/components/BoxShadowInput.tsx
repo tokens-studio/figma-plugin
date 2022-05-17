@@ -13,7 +13,7 @@ import IconButton from './IconButton';
 import Box from './Box';
 import ResolvedValueBox from './ResolvedValueBox';
 import DownshiftInput from './DownshiftInput';
-import { StyledIconDisclosure, StyledInputSuffix } from './StyledInputSuffix'
+import { StyledIconDisclosure, StyledInputSuffix } from './StyledInputSuffix';
 import { TokenBoxshadowValue } from '@/types/values';
 import { SingleBoxShadowToken } from '@/types/tokens';
 import { TokenTypes } from '@/constants/TokenTypes';
@@ -148,7 +148,7 @@ export default function BoxShadowInput({
                 handleChange={handleBoxShadowChangeByAlias}
                 setShowAutoSuggest={setShowAliasModeAutoSuggest}
                 setInputValue={handleDownShiftInputChange}
-                placeholder='Value or {alias}'
+                placeholder="Value or {alias}"
                 suffix={(
                   <StyledInputSuffix type="button" onClick={handleAliasModeAutoSuggest}>
                     <StyledIconDisclosure />
@@ -156,7 +156,7 @@ export default function BoxShadowInput({
                 )}
               />
               {
-                !isInputMode && checkIfContainsAlias(String(internalEditToken.value)) && (
+                !isInputMode && checkIfContainsAlias(internalEditToken.value) && (
                   <ResolvedValueBox
                     alias={alias}
                     selectedToken={selectedToken}
@@ -169,4 +169,4 @@ export default function BoxShadowInput({
       </Box>
     </div>
   );
-};
+}

@@ -41,3 +41,4 @@ export * from './rootStateSelector';
 export * from './windowSizeSelector';
 export * from './tokenSetStatusSelector';
 export * from './allTokenSetsSelector';
+export * from './licenseStatusSelector';

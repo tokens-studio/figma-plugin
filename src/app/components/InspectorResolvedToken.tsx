@@ -1,7 +1,7 @@
 import React from 'react';
 import Box from './Box';
 import Tooltip from './Tooltip';
-import IconBrokenLink from './icons/IconBrokenLink';
+import IconBrokenLink from '@/icons/brokenlink.svg';
 import { SingleToken } from '@/types/tokens';
 import IconShadow from '@/icons/shadow.svg';
 import IconComposition from '@/icons/composition.svg';

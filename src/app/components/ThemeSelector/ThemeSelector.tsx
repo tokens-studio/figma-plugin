@@ -15,7 +15,7 @@ import {
 import { Flex } from '../Flex';
 import Text from '../Text';
 import { styled } from '@/stitches.config';
-import { IconToggleableDisclosure } from '../icons/IconToggleableDisclosure';
+import { IconToggleableDisclosure } from '@/icons/IconToggleableDisclosure';
 import { Dispatch } from '@/app/store';
 
 const ThemeDropdownLabel = styled(Text, {

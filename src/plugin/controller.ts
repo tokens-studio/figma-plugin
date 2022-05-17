@@ -41,7 +41,6 @@ import { StorageProviderType } from '../types/api';
 import compareProvidersWithStored from './compareProviders';
 import { defaultNodeManager } from './NodeManager';
 import { defaultWorker } from './Worker';
-import { getFeatureFlags } from '@/utils/featureFlags';
 import { getUsedTokenSet } from '@/utils/getUsedTokenSet';
 import { updateLocalTokensData } from '@/utils/figma';
 
@@ -83,7 +82,6 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
       try {
         const { currentUser } = figma;
         const settings = await getUISettings();
-        const featureFlagId = await getFeatureFlags();
         const usedTokenSet = await getUsedTokenSet();
         inspectDeep = settings.inspectDeep;
         const userId = await getUserId();
@@ -112,7 +110,7 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
           case StorageProviderType.ADO:
           case StorageProviderType.URL: {
             compareProvidersWithStored({
-              providers: apiProviders, storageType, featureFlagId, usedTokenSet,
+              providers: apiProviders, storageType, usedTokenSet,
             });
             break;
           }
