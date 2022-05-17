@@ -10,6 +10,7 @@ import { Dispatch } from '../store';
 import { SelectionGroup } from '@/types';
 import TokenNodes from './inspector/TokenNodes';
 import { inspectStateSelector } from '@/selectors';
+import { useTypeForProperty } from '../hooks/useTypeForProperty';
 import { IconToggleableDisclosure } from './icons/IconToggleableDisclosure';
 import Button from './Button';
 import Heading from './Heading';
@@ -17,7 +18,6 @@ import DownshiftInput from './DownshiftInput';
 import Modal from './Modal';
 import Stack from './Stack';
 import ColorPicker from './ColorPicker';
-import { Properties } from '@/constants/Properties';
 
 export default function InspectorTokenSingle({
   token,
@@ -27,6 +27,7 @@ export default function InspectorTokenSingle({
   resolvedTokens: SingleToken[];
 }) {
   const { handleRemap, getTokenValue } = useTokens();
+  const property = useTypeForProperty(token.category);
   const inspectState = useSelector(inspectStateSelector, shallowEqual);
   const dispatch = useDispatch<Dispatch>();
   const [newTokenName, setNewTokenName] = React.useState<string>('');
@@ -133,15 +134,15 @@ export default function InspectorTokenSingle({
                     </Heading>
                     <DownshiftInput
                       value={newTokenName}
-                      type={Properties[token.category as keyof typeof Properties] === 'fill' ? 'color' : Properties[token.category as keyof typeof Properties]}
+                      type={property === 'fill' ? 'color' : property}
                       resolvedTokens={resolvedTokens}
                       handleChange={handleChange}
                       setInputValue={handleDownShiftInputChange}
                       placeholder={
-                        Properties[token.category as keyof typeof Properties] === 'fill' ? '#000000, hsla(), rgba() or {alias}' : 'Value or {alias}'
+                        property === 'fill' ? '#000000, hsla(), rgba() or {alias}' : 'Value or {alias}'
                       }
                       prefix={
-                        Properties[token.category as keyof typeof Properties] === 'fill' && (
+                        property === 'fill' && (
                           <button
                             type="button"
                             className="block w-4 h-4 rounded-sm cursor-pointer shadow-border shadow-gray-300 focus:shadow-focus focus:shadow-primary-400"
@@ -154,7 +155,7 @@ export default function InspectorTokenSingle({
                       }
                       suffix
                     />
-                    {inputHelperOpen && Properties[token.category as keyof typeof Properties] === 'fill' && (
+                    {inputHelperOpen && property === 'fill' && (
                       <ColorPicker value={newTokenName} onChange={handleColorValueChange} />
                     )}
 
