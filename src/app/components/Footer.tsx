@@ -25,7 +25,7 @@ import FeedbackIcon from '@/icons/feedback.svg';
 import IconButton from './IconButton';
 import { useFlags } from './LaunchDarkly';
 import Tooltip from './Tooltip';
-import Icon from './Icon';
+import IconLibrary from '@/icons/library.svg';
 
 export default function Footer() {
   const storageType = useSelector(storageTypeSelector);
@@ -85,29 +85,29 @@ export default function Footer() {
     >
       <Stack direction="row">
         {localApiState.branch && (
-        <>
-          {gitBranchSelector && <BranchSelector currentBranch={localApiState.branch} />}
-          <IconButton icon={<DownloadIcon />} onClick={onPullButtonClicked} tooltipSide="top" tooltip={`Pull from ${transformProviderName(storageType.provider)}`} />
-          <IconButton badge={hasChanges} icon={<UploadIcon />} onClick={onPushButtonClicked} tooltipSide="top" disabled={editProhibited} tooltip={`Push to ${transformProviderName(storageType.provider)}`} />
-        </>
+          <>
+            {gitBranchSelector && <BranchSelector currentBranch={localApiState.branch} />}
+            <IconButton icon={<DownloadIcon />} onClick={onPullButtonClicked} tooltipSide="top" tooltip={`Pull from ${transformProviderName(storageType.provider)}`} />
+            <IconButton badge={hasChanges} icon={<UploadIcon />} onClick={onPushButtonClicked} tooltipSide="top" disabled={editProhibited} tooltip={`Push to ${transformProviderName(storageType.provider)}`} />
+          </>
         )}
         {storageType.provider !== StorageProviderType.LOCAL
-        && storageType.provider !== StorageProviderType.GITHUB
-        && storageType.provider !== StorageProviderType.GITLAB
-        && storageType.provider !== StorageProviderType.ADO
-        && (
-          <Stack align="center" direction="row" gap={2}>
-            <Text muted>Sync</Text>
-            {storageType.provider === StorageProviderType.JSONBIN && (
-              <Tooltip label={`Go to ${transformProviderName(storageType.provider)}`}>
-                <a href={projectURL} target="_blank" rel="noreferrer" className="block button button-ghost">
-                  <Icon name="library" />
-                </a>
-              </Tooltip>
-            )}
-            <IconButton tooltip={`Pull from ${transformProviderName(storageType.provider)}`} onClick={handlePullTokens} icon={<RefreshIcon />} />
-          </Stack>
-        )}
+          && storageType.provider !== StorageProviderType.GITHUB
+          && storageType.provider !== StorageProviderType.GITLAB
+          && storageType.provider !== StorageProviderType.ADO
+          && (
+            <Stack align="center" direction="row" gap={2}>
+              <Text muted>Sync</Text>
+              {storageType.provider === StorageProviderType.JSONBIN && (
+                <Tooltip label={`Go to ${transformProviderName(storageType.provider)}`}>
+                  <a href={projectURL} target="_blank" rel="noreferrer" className="block button button-ghost">
+                    <IconLibrary />
+                  </a>
+                </Tooltip>
+              )}
+              <IconButton tooltip={`Pull from ${transformProviderName(storageType.provider)}`} onClick={handlePullTokens} icon={<RefreshIcon />} />
+            </Stack>
+          )}
       </Stack>
       <Stack direction="row" gap={4}>
         <Box css={{ color: '$textMuted', fontSize: '$xsmall' }}>

@@ -1,8 +1,4 @@
-import React from 'react';
-
-function IconBell() {
-  return (
-    <svg width="32" height="33" viewBox="0 0 32 33" fill="none" xmlns="http://www.w3.org/2000/svg">
+<svg width="32" height="33" viewBox="0 0 32 33" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path
         fillRule="evenodd"
         clipRule="evenodd"
@@ -13,8 +9,4 @@ function IconBell() {
         d="M16 23.7282C14.8954 23.7282 14 22.8328 14 21.7282H13C13 23.3851 14.3431 24.7282 16 24.7282C17.6569 24.7282 19 23.3851 19 21.7282H18C18 22.8328 17.1046 23.7282 16 23.7282Z"
         fill="currentColor"
       />
-    </svg>
-  );
-}
-
-export default IconBell;
+</svg>

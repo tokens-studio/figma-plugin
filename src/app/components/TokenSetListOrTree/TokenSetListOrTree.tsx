@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import IconChevronDown from '../icons/IconChevronDown';
+import IconChevronDown from '@/icons/chevrondown.svg';
 import { StyledFolderButton } from './StyledFolderButton';
 import { StyledItem } from './StyledItem';
 import { StyledFolderButtonChevronBox } from './StyledFolderButtonChevronBox';
@@ -49,15 +49,15 @@ export function TokenSetListOrTree<T extends TreeOrListItem>({
           <StyledItem>
             <RenderItemContent item={item}>
               {(!item.isLeaf && displayType === 'tree') && (
-              <StyledFolderButton
-                type="button"
-                css={{ left: `${5 * item.level}px` }}
-                onClick={onToggleCollapsed}
-              >
-                <StyledFolderButtonChevronBox collapsed={collapsed.includes(item.key)}>
-                  <IconChevronDown />
-                </StyledFolderButtonChevronBox>
-              </StyledFolderButton>
+                <StyledFolderButton
+                  type="button"
+                  css={{ left: `${5 * item.level}px` }}
+                  onClick={onToggleCollapsed}
+                >
+                  <StyledFolderButtonChevronBox collapsed={collapsed.includes(item.key)}>
+                    <IconChevronDown />
+                  </StyledFolderButtonChevronBox>
+                </StyledFolderButton>
               )}
             </RenderItemContent>
           </StyledItem>
