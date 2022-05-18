@@ -1,5 +1,4 @@
-import { borderRadius } from 'polished';
-import { distructureCompositionToken, mapValuesToTokens, returnValueToLookFor } from './node';
+import { destructureCompositionToken, mapValuesToTokens, returnValueToLookFor } from './node';
 
 const singleShadowToken = {
   type: 'boxShadow',
@@ -195,10 +194,10 @@ describe('mapValuesToTokens', () => {
   });
 });
 
-describe('distructureCompositionToken', () => {
+describe('destructureCompositionToken', () => {
   it('return properties in compositionToken', () => {
     mappedTokens.map((token, index) => {
-      expect(distructureCompositionToken(token)).toEqual(applyProperties[index]);
+      expect(destructureCompositionToken(token)).toEqual(applyProperties[index]);
     });
   });
 });

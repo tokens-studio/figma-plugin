@@ -19,7 +19,7 @@ function checkForTokens({
   returnValuesOnly?: boolean
   expandTypography?: boolean
   expandShadow?: boolean
-}): [SingleToken[], SingleToken] {
+}): [SingleToken[], SingleToken | undefined] {
   // replaces / in token name
   let returnValue: Pick<SingleToken<false>, 'name' | 'value'> | {
     type: TokenTypes;
@@ -76,11 +76,7 @@ function checkForTokens({
     returnValue.name = returnValue.name.split('/').join('.');
   }
 
-  if (typeof returnValue === 'undefined') {
-    throw new Error('Failed');
-  }
-
-  return [obj, returnValue as SingleToken];
+  return [obj, returnValue as SingleToken | undefined];
 }
 
 export default function convertToTokenArray({

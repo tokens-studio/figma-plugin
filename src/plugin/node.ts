@@ -38,7 +38,6 @@ export function returnValueToLookFor(key: string) {
   }
 }
 
-// @TOOD fix object typing
 type MapValuesToTokensResult = Record<string, string | SingleToken['value'] | {
   property: string
   value?: SingleToken['value'];
@@ -173,11 +172,14 @@ export function selectNodes(ids: string[]) {
 }
 
 export function destructureCompositionToken(values: MapValuesToTokensResult): MapValuesToTokensResult {
-  const tokensInCompositionToken: NodeTokenRefMap = {};
+  const tokensInCompositionToken: Partial<
+  Record<TokenTypes, SingleToken['value']>
+  & Record<Properties, SingleToken['value']>
+  > = {};
   if (values && values.composition) {
     if (Array.isArray(values.composition)) {
       values.composition.forEach((value) => {
-        if (typeof value === 'object' && 'value' in value && typeof value.value === 'string') {
+        if (typeof value === 'object' && 'value' in value) {
           tokensInCompositionToken[value.property as Properties] = value.value;
         }
       });

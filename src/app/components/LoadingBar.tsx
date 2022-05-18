@@ -53,7 +53,7 @@ export default function LoadingBar() {
     return null;
   }
 
-  const message = get(backgroundJobTitles, backgroundJobs[backgroundJobs.length - 1]?.name, '');
+  const message = get(backgroundJobTitles, backgroundJobs[backgroundJobs.length - 1]?.name ?? '', '');
 
   return (
     <div className="fixed w-full z-20" data-cy="loadingBar">
