@@ -2,7 +2,7 @@ import { checkAndEvaluateMath } from '../checkAndEvaluateMath';
 
 describe('checkAndEvaluateMath', () => {
   it('solves simple unit-less expressions', () => {
-    expect(checkAndEvaluateMath('10 + 20 * 3')).toEqual('70');
+    expect(checkAndEvaluateMath('10 + 20 * 3')).toEqual(70);
   });
 
   it('solves simple expressions with units', () => {
