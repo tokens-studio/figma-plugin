@@ -104,13 +104,12 @@ function InitiatorContainer({ ldClient }: Props) {
           }
           case MessageFromPluginTypes.SET_TOKENS: {
             const { values } = pluginMessage;
-            const existTokens = Object.values(values?.values ?? {}).some((value) => value.length > 0);
-
-            if (existTokens) {
+            if (values) {
               dispatch.tokenState.setTokenData(values);
-              dispatch.uiState.setActiveTab(Tabs.TOKENS);
-            } else {
-              dispatch.uiState.setActiveTab(Tabs.START);
+              const existTokens = Object.values(values?.values ?? {}).some((value) => value.length > 0);
+
+              if (existTokens) dispatch.uiState.setActiveTab(Tabs.TOKENS);
+              else dispatch.uiState.setActiveTab(Tabs.START);
             }
             break;
           }
