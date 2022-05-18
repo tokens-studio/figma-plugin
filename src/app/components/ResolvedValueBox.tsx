@@ -6,13 +6,14 @@ import { SingleTypographyToken } from '@/types/tokens';
 import Box from './Box';
 import { ResolvedShadowValueDisplay } from './ResolvedShadowValueDisplay';
 import { ResolvedTypograhpyValueDisplay } from './ResolvedTypograhpyValueDisplay';
+import { TokenBoxshadowValue } from '@/types/values';
 
 export default function ResolvedValueBox({
   alias,
   selectedToken,
 }: {
   alias: string;
-  selectedToken: ResolveTokenValuesResult | undefined;
+  selectedToken: ResolveTokenValuesResult | null;
 }) {
   const tokensContext = React.useContext(TokensContext);
   const valueToCheck = React.useMemo(() => (
@@ -27,7 +28,7 @@ export default function ResolvedValueBox({
 
   if (selectedToken && isSingleBoxShadowToken(selectedToken)) {
     if (Array.isArray(valueToCheck)) return <ResolvedShadowValueDisplay shadows={valueToCheck} />;
-    return <ResolvedShadowValueDisplay shadows={[valueToCheck]} />;
+    return <ResolvedShadowValueDisplay shadows={[valueToCheck as TokenBoxshadowValue]} />;
   }
 
   if (typeof valueToCheck !== 'string' && typeof valueToCheck !== 'number') {

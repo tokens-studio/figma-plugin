@@ -112,27 +112,16 @@ export default function useTokens() {
     });
   }, []);
 
-  const handleRemap = useCallback(async (type: Properties | TokenTypes, name: string) => {
-    const userDecision = await confirm({
-      text: `Choose a new token for ${name}`,
-      input: {
-        type: 'text',
-        placeholder: 'New token name',
-      },
-      confirmAction: 'Remap',
-    });
+  const handleRemap = useCallback(async (type: Properties | TokenTypes, name: string, newTokenName: string) => {
 
-    if (userDecision && typeof userDecision.data === 'string') {
       track('remapToken', { fromInspect: true });
-
       postToFigma({
         type: MessageToPluginTypes.REMAP_TOKENS,
         category: type,
         oldName: name,
-        newName: userDecision.data,
+        newName: newTokenName,
         updateMode: UpdateMode.SELECTION,
       });
-    }
   }, [confirm]);
 
   // Calls Figma with an old name and new name and asks it to update all tokens that use the old name

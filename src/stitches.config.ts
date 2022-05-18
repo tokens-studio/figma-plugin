@@ -118,6 +118,7 @@ export const {
       7: '32px',
       8: '48px',
       10: '38px',
+      215: '215px',
     },
     radii: {
       default: globalTokens.radii.sm,

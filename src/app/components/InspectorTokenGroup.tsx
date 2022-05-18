@@ -8,6 +8,7 @@ import { SelectionGroup } from '@/types';
 
 export default function InspectorTokenGroup({ group, resolvedTokens }: { group: [Properties, SelectionGroup[]], resolvedTokens: SingleToken[] }) {
   const [groupKey, groupValue] = group;
+
   return (
     <Box
       css={{
