@@ -4,16 +4,12 @@ import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import getLastOpened from '@/utils/getLastOpened';
 import { getUsedTokenSet } from '@/utils/getUsedTokenSet';
 import { getUISettings } from '@/utils/uiSettings';
-import compareProvidersWithStored from '../compareProviders';
 import { getUserId } from '../helpers';
 import { getSavedStorageType, getTokenData } from '../node';
 import {
-  notifyAPIProviders, notifyLastOpened, notifyLicenseKey, notifyNoSelection, notifyNoTokenValues, notifyStorageType, notifyTokenValues, notifyUserId,
+  notifyAPIProviders, notifyLastOpened, notifyLicenseKey, notifyNoSelection, notifyStorageType, notifyTokenValues, notifyUserId,
 } from '../notifiers';
 import { getActiveTheme } from '@/utils/getActiveTheme';
-import { StorageProviderType } from '@/constants/StorageProviderType';
-import { LicenseKeyProperty } from '@/figmaStorage/LicenseKeyProperty';
-import { ApiProvidersProperty } from '@/figmaStorage';
 
 export const initiate: AsyncMessageChannelHandlers[AsyncMessageTypes.INITIATE] = async () => {
   try {
@@ -32,36 +28,19 @@ export const initiate: AsyncMessageChannelHandlers[AsyncMessageTypes.INITIATE] =
         name: currentUser.name,
       });
     }
+    const licenseKey = await figma.clientStorage.getAsync('licenseKey');
+    notifyLicenseKey(licenseKey);
+
     notifyLastOpened(lastOpened);
     notifyStorageType(storageType);
 
-    const licenseKey = await LicenseKeyProperty.read();
-    notifyLicenseKey(licenseKey ?? '');
-
-    // @TODO fix setting of activeTheme
-    const apiProviders = await ApiProvidersProperty.read();
-    if (apiProviders) notifyAPIProviders(apiProviders);
-    switch (storageType.provider) {
-      case StorageProviderType.JSONBIN:
-      case StorageProviderType.GITHUB:
-      case StorageProviderType.GITLAB:
-      case StorageProviderType.ADO:
-      case StorageProviderType.URL: {
-        compareProvidersWithStored({
-          providers: apiProviders ?? [],
-          storageType,
-          usedTokenSet,
-        });
-        break;
-      }
-      default: {
-        const oldTokens = await getTokenData();
-        if (oldTokens) {
-          notifyTokenValues({ ...oldTokens, activeTheme, usedTokenSet });
-        } else {
-          notifyNoTokenValues();
-        }
-      }
+    const apiProviders = await figma.clientStorage.getAsync('apiProviders');
+    if (apiProviders) notifyAPIProviders(JSON.parse(apiProviders));
+    const oldTokens = await getTokenData();
+    if (oldTokens) {
+      notifyTokenValues({
+        ...oldTokens, activeTheme, usedTokenSet, storageType,
+      });
     }
   } catch (err) {
     figma.closePlugin('There was an error, check console (F12)');

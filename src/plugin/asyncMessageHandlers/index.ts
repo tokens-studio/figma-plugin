@@ -18,3 +18,4 @@ export * from './createAnnotation';
 export * from './createStyles';
 export * from './update';
 export * from './setLicenseKey';
+export * from './getApiCredentials';

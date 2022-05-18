@@ -19,7 +19,11 @@ export function checkIfAlias(token: SingleToken | string, allTokens: SingleToken
           ))
         ));
       }
-    } else if (token.type === TokenTypes.COMPOSITION) { return true; } else { aliasToken = Boolean(token.value.toString().match(AliasRegex)); }
+    } else if (token.type === TokenTypes.COMPOSITION) {
+      return true;
+    } else {
+      aliasToken = Boolean(token.value.toString().match(AliasRegex));
+    }
 
     // Check if alias is found
     if (aliasToken) {

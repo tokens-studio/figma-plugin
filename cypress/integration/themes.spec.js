@@ -9,7 +9,7 @@ describe('Themes', () => {
   });
 
   it('Can create a new theme', () => {
-    cy.receiveTokenValues({
+    cy.receiveSetTokens({
       version: '5',
       values: {
         options: [{
@@ -37,7 +37,7 @@ describe('Themes', () => {
   });
 
   it('Can enable a previously created theme', () => {
-    cy.receiveTokenValues({
+    cy.receiveSetTokens({
       version: '5',
       values: {
         options: [{
@@ -66,7 +66,7 @@ describe('Themes', () => {
   });
 
   it('Can delete a theme', () => {
-    cy.receiveTokenValues({
+    cy.receiveSetTokens({
       version: '5',
       values: {
         options: [{

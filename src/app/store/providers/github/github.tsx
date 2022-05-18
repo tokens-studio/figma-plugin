@@ -79,6 +79,7 @@ export function useGitHub() {
           tokens,
           metadata: { commitMessage },
         });
+        dispatch.tokenState.setLastSyncedState(JSON.stringify([tokens, themes], null, 2));
         dispatch.uiState.setLocalApiState({ ...localApiState, branch: customBranch } as GithubCredentials);
         dispatch.uiState.setApiData({ ...context, branch: customBranch });
         dispatch.tokenState.setLastSyncedState(JSON.stringify([tokens, themes], null, 2));

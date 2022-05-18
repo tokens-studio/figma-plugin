@@ -4,6 +4,7 @@ import { StyledInput } from '../Input';
 
 type Props = {
   type: string;
+  name?: string;
   value?: string;
   placeholder?: string;
   suffix?: React.ReactNode;
@@ -13,6 +14,7 @@ type Props = {
 
 export const StyledDownshiftInput: React.FC<Props> = ({
   type,
+  name,
   value,
   placeholder,
   suffix,
@@ -21,7 +23,7 @@ export const StyledDownshiftInput: React.FC<Props> = ({
 }) => {
   const { ref, size, ...inputProps } = getInputProps({
     label: type || null,
-    name: 'value',
+    name: name || 'value',
     placeholder,
     value: value || '',
     onChange,

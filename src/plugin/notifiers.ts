@@ -137,3 +137,7 @@ export function notifyLastOpened(lastOpened: number) {
     lastOpened,
   });
 }
+
+export function notifySetTokens(values: TokenStore) {
+  postToUI({ type: MessageFromPluginTypes.SET_TOKENS, values });
+}
