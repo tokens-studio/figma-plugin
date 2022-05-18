@@ -12,7 +12,7 @@ export default function ResolvedValueBox({
   selectedToken,
 }: {
   alias: string;
-  selectedToken: ResolveTokenValuesResult | undefined;
+  selectedToken: ResolveTokenValuesResult | null;
 }) {
   const valueToCheck = React.useMemo(() => (
     (selectedToken ? selectedToken?.value : alias)
@@ -27,10 +27,8 @@ export default function ResolvedValueBox({
   }
 
   if (selectedToken && isSingleBoxShadowToken(selectedToken)) {
-    if (Array.isArray(valueToCheck)) {
-      return <ResolvedShadowValueDisplay shadows={valueToCheck as TokenBoxshadowValue[]} />;
-    }
-    return <ResolvedShadowValueDisplay shadows={[valueToCheck] as TokenBoxshadowValue[]} />;
+    if (Array.isArray(valueToCheck)) return <ResolvedShadowValueDisplay shadows={valueToCheck as TokenBoxshadowValue[]} />;
+    return <ResolvedShadowValueDisplay shadows={[valueToCheck as TokenBoxshadowValue]} />;
   }
 
   if (typeof valueToCheck !== 'string' && typeof valueToCheck !== 'number') {

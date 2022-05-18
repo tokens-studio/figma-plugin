@@ -11,3 +11,4 @@ export * from './PersistentNodesCacheProperty';
 export * from './HashProperty';
 export * from './UsedTokenSetProperty';
 export * from './LastOpenedProperty';
+export * from './CheckForChangesProperty';

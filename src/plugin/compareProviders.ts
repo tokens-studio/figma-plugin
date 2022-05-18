@@ -7,10 +7,11 @@ type Options = {
   providers: StorageTypeCredentials[],
   storageType: StorageType,
   usedTokenSet?: UsedTokenSetsMap | null
+  shouldPull?: boolean,
 };
 
 export default function compareProvidersWithStored({
-  providers, storageType, usedTokenSet,
+  providers, storageType, usedTokenSet, shouldPull,
 }: Options) {
   if (providers) {
     const matchingSet = providers.find((i) => isSameCredentials(i, storageType));
@@ -21,6 +22,7 @@ export default function compareProvidersWithStored({
         status: true,
         credentials: matchingSet,
         usedTokenSet,
+        shouldPull,
       });
       return;
     }

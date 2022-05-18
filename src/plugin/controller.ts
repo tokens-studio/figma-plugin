@@ -45,5 +45,6 @@ AsyncMessageChannel.handle(AsyncMessageTypes.CREATE_ANNOTATION, asyncHandlers.cr
 AsyncMessageChannel.handle(AsyncMessageTypes.CREATE_STYLES, asyncHandlers.createStyles);
 AsyncMessageChannel.handle(AsyncMessageTypes.UPDATE, asyncHandlers.update);
 AsyncMessageChannel.handle(AsyncMessageTypes.SET_LICENSE_KEY, asyncHandlers.setLicenseKey);
+AsyncMessageChannel.handle(AsyncMessageTypes.GET_API_CREDENTIALS, asyncHandlers.getApiCredentials);
 
 figma.root.setSharedPluginData('tokens', 'nodemanagerCache', '');

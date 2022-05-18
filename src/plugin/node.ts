@@ -18,7 +18,7 @@ import { TokenTypes } from '@/constants/TokenTypes';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StorageType } from '@/types/StorageType';
 import {
-  ActiveThemeProperty, StorageTypeProperty, ThemesProperty, UpdatedAtProperty, ValuesProperty, VersionProperty,
+  ActiveThemeProperty, CheckForChangesProperty, StorageTypeProperty, ThemesProperty, UpdatedAtProperty, ValuesProperty, VersionProperty,
 } from '@/figmaStorage';
 
 // @TODO fix typings
@@ -109,6 +109,7 @@ export async function getTokenData(): Promise<{
   activeTheme: string | null
   updatedAt: string;
   version: string;
+  checkForChanges: string | null
 } | null> {
   try {
     const values = await ValuesProperty.read(figma.root) ?? {};
@@ -116,6 +117,7 @@ export async function getTokenData(): Promise<{
     const activeTheme = await ActiveThemeProperty.read(figma.root);
     const version = await VersionProperty.read(figma.root);
     const updatedAt = await UpdatedAtProperty.read(figma.root);
+    const checkForChanges = await CheckForChangesProperty.read(figma.root);
 
     if (Object.keys(values).length > 0) {
       const tokenObject = Object.entries(values).reduce<Record<string, AnyTokenList>>((acc, [key, groupValues]) => {
@@ -128,6 +130,7 @@ export async function getTokenData(): Promise<{
         activeTheme,
         updatedAt: updatedAt || '',
         version: version || '',
+        checkForChanges,
       };
     }
   } catch (e) {

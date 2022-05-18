@@ -45,7 +45,7 @@ describe('TokenListing', () => {
   });
 
   it('can add a new token', () => {
-    cy.receiveTokenValues({
+    cy.receiveSetTokens({
       version: '5',
       values: {
         options: [{
@@ -76,7 +76,7 @@ describe('TokenListing', () => {
   });
 
   it('can add a new shadow token', () => {
-    cy.receiveTokenValues({
+    cy.receiveSetTokens({
       version: '5',
       values: {
         options: [{
@@ -124,7 +124,7 @@ describe('TokenListing', () => {
   });
 
   it('can add multiple shadow tokens', () => {
-    cy.receiveTokenValues({
+    cy.receiveSetTokens({
       version: '5',
       values: {
         options: [{
@@ -182,7 +182,7 @@ describe('TokenListing', () => {
   });
 
   it('can add a new typography token', () => {
-    cy.receiveTokenValues({
+    cy.receiveSetTokens({
       version: '5',
       values: {
         options: [{
@@ -233,7 +233,7 @@ describe('TokenListing', () => {
   });
 
   it('can add a new token in group', () => {
-    cy.receiveTokenValues({
+    cy.receiveSetTokens({
       version: '5',
       values: {
         options: [{
@@ -261,7 +261,7 @@ describe('TokenListing', () => {
   });
 
   it('token listing stays collapsed after creating a new token', () => {
-    cy.receiveTokenValues({
+    cy.receiveSetTokens({
       version: '5',
       values: {
         options: [{
