@@ -116,7 +116,7 @@ export default function InspectorTokenSingle({
               <form
                 onSubmit={onConfirm}
               >
-                <Stack direction="column" gap={4} css={{ minHeight: '$215', justifyContent: 'center' }}>
+                <Stack direction="column" gap={4} css={{ minHeight: '215px', justifyContent: 'center' }}>
                   <Stack direction="column" gap={2}>
                     <Heading>
                       Choose a new token for
@@ -129,9 +129,7 @@ export default function InspectorTokenSingle({
                       resolvedTokens={resolvedTokens}
                       handleChange={handleChange}
                       setInputValue={handleDownShiftInputChange}
-                      placeholder={
-                        property === 'fill' ? '#000000, hsla(), rgba() or {alias}' : 'Value or {alias}'
-                      }
+                      placeholder="Choose a new token"
                       suffix
                     />
 
