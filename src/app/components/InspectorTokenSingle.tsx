@@ -45,6 +45,11 @@ export default function InspectorTokenSingle({
     else setNewTokenName(newInputValue);
   }, []);
 
+  const handleChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>((e) => {
+    e.persist();
+    setNewTokenName(e.target.value);
+  }, []);
+
   const onConfirm = React.useCallback(() => {
     handleRemap(token.category, token.value, newTokenName);
     setShowDialog(false);
@@ -122,6 +127,7 @@ export default function InspectorTokenSingle({
                       value={newTokenName}
                       type={property === 'fill' ? 'color' : property}
                       resolvedTokens={resolvedTokens}
+                      handleChange={handleChange}
                       setInputValue={handleDownShiftInputChange}
                       placeholder={
                         property === 'fill' ? '#000000, hsla(), rgba() or {alias}' : 'Value or {alias}'
