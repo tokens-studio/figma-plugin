@@ -1,5 +1,7 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { withLDConsumer } from 'launchdarkly-react-client-sdk';
+import type { LDProps } from 'launchdarkly-react-client-sdk/lib/withLDConsumer';
 import { identify, track } from '@/utils/analytics';
 import { MessageFromPluginTypes, MessageToPluginTypes, PostToUIMessage } from '@/types/messages';
 import useConfirm from '@/app/hooks/useConfirm';
@@ -8,7 +10,6 @@ import useRemoteTokens from '../store/remoteTokens';
 import { Dispatch } from '../store';
 import useStorage from '../store/useStorage';
 import * as pjs from '../../../package.json';
-import { useFeatureFlags } from '../hooks/useFeatureFlags';
 import { Tabs } from '@/constants/Tabs';
 import { StorageProviderType, StorageType } from '@/types/api';
 import { GithubTokenStorage } from '@/storage/GithubTokenStorage';
@@ -17,11 +18,15 @@ import getLicenseKey from '@/utils/getLicenseKey';
 import { licenseKeySelector } from '@/selectors/licenseKeySelector';
 import { checkedLocalStorageForKeySelector } from '@/selectors/checkedLocalStorageForKeySelector';
 import { AddLicenseSource } from '../store/models/userState';
+import { LicenseStatus } from '@/constants/LicenseStatus';
 
-export function Initiator() {
+type Props = LDProps & {
+  identificationPromise: Promise<LDProps['flags']>
+};
+
+function InitiatorContainer({ ldClient }: Props) {
   const dispatch = useDispatch<Dispatch>();
   const { pullTokens } = useRemoteTokens();
-  const { fetchFeatureFlags } = useFeatureFlags();
   const { setStorageType } = useStorage();
   const { confirm } = useConfirm();
 
@@ -35,12 +40,14 @@ export function Initiator() {
       description: 'You have unsaved changes that will be lost. Do you want to pull from your repo?',
     });
     return shouldPull;
-  }, []);
+  }, [confirm]);
 
   const onInitiate = React.useCallback(() => postToFigma({ type: MessageToPluginTypes.INITIATE }), []);
   const getApiCredentials = React.useCallback((shouldPull: boolean) => postToFigma({ type: MessageToPluginTypes.GET_API_CREDENTIALS, shouldPull }), []);
 
   useEffect(() => {
+    if (!ldClient) return;
+
     onInitiate();
     window.onmessage = async (event: {
       data: {
@@ -125,18 +132,10 @@ export function Initiator() {
             break;
           case MessageFromPluginTypes.API_CREDENTIALS: {
             const {
-              status, credentials, featureFlagId, usedTokenSet, shouldPull,
+              status, credentials, usedTokenSet, shouldPull,
             } = pluginMessage;
             if (status === true) {
               let receivedFlags;
-
-              if (featureFlagId) {
-                receivedFlags = await fetchFeatureFlags(featureFlagId);
-                if (receivedFlags) {
-                  dispatch.uiState.setFeatureFlags(receivedFlags);
-                  track('FeatureFlag', receivedFlags);
-                }
-              }
 
               track('Fetched from remote', { provider: credentials.provider });
               if (!credentials.internalId) track('missingInternalId', { provider: credentials.provider });
@@ -157,7 +156,6 @@ export function Initiator() {
                 if (shouldPull) {
                   const remoteData = await pullTokens({ context: credentials, featureFlags: receivedFlags, usedTokenSet });
                   const existTokens = Object.values(remoteData?.tokens ?? {}).some((value) => value.length > 0);
-
                   if (existTokens) { dispatch.uiState.setActiveTab(Tabs.TOKENS); } else { dispatch.uiState.setActiveTab(Tabs.START); }
                 } else {
                   dispatch.uiState.setActiveTab(Tabs.TOKENS);
@@ -225,6 +223,7 @@ export function Initiator() {
             if (pluginMessage.licenseKey) {
               dispatch.userState.addLicenseKey({ key: pluginMessage.licenseKey, source: AddLicenseSource.PLUGIN });
             } else {
+              dispatch.userState.setLicenseStatus(LicenseStatus.NO_LICENSE);
               dispatch.userState.setCheckedLocalStorage(true);
             }
             break;
@@ -234,7 +233,7 @@ export function Initiator() {
         }
       }
     };
-  }, []);
+  }, [ldClient]);
 
   useEffect(() => {
     async function getLicense() {
@@ -250,3 +249,5 @@ export function Initiator() {
 
   return null;
 }
+
+export const Initiator = withLDConsumer()(InitiatorContainer);

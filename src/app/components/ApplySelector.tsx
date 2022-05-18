@@ -13,7 +13,7 @@ import {
 } from './DropdownMenu';
 import { UpdateMode } from '@/types/state';
 import { Dispatch } from '../store';
-import IconChevronDown from './icons/IconChevronDown';
+import IconChevronDown from '@/icons/chevrondown.svg';
 import { settingsStateSelector } from '@/selectors';
 import { isEqual } from '@/utils/isEqual';
 

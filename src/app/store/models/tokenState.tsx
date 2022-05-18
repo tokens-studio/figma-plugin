@@ -180,12 +180,10 @@ export const tokenState = createModel<RootModel>()({
         activeTokenSet: state.activeTokenSet === data.oldName ? data.newName : state.activeTokenSet,
       };
     },
-    setLastSyncedState: (state, data: string) => {
-      return {
-        ...state,
-        lastSyncedState: data,
-      }
-    },
+    setLastSyncedState: (state, data: string) => ({
+      ...state,
+      lastSyncedState: data,
+    }),
     setTokenSetOrder: (state, data: string[]) => {
       const newTokens = {};
       data.forEach((set) => {
@@ -268,7 +266,7 @@ export const tokenState = createModel<RootModel>()({
       };
     },
     // Imports received styles as tokens, if needed
-    setTokensFromStyles: (state, receivedStyles: SetTokensFromStylesPayload) => {
+    setTokensFromStyles: (state, receivedStyles: SetTokensFromStylesPayload): TokenState => {
       const newTokens: SingleToken[] = [];
       const existingTokens: SingleToken[] = [];
       const updatedTokens: SingleToken[] = [];

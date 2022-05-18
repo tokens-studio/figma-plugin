@@ -1,17 +1,18 @@
 import { useSelector } from 'react-redux';
 import { useMemo } from 'react';
-import { apiSelector, featureFlagsSelector } from '@/selectors';
+import { useFlags } from 'launchdarkly-react-client-sdk';
+import { apiSelector } from '@/selectors';
 import { StorageProviderType } from '@/types/api';
 
 export function useIsGithubMultiFileEnabled() {
   const api = useSelector(apiSelector);
-  const featureFlags = useSelector(featureFlagsSelector);
+  const { multiFileSync } = useFlags();
 
   return useMemo(() => (
     Boolean(
-      featureFlags?.gh_mfs_enabled
+      multiFileSync
       && (api?.provider === StorageProviderType.GITHUB || api?.provider === StorageProviderType.GITLAB)
       && !api?.filePath?.endsWith('.json'),
     )
-  ), [api, featureFlags]);
+  ), [api, multiFileSync]);
 }

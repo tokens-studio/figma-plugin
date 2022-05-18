@@ -42,7 +42,6 @@ import { StorageProviderType } from '../types/api';
 import compareProvidersWithStored from './compareProviders';
 import { defaultNodeManager } from './NodeManager';
 import { defaultWorker } from './Worker';
-import { getFeatureFlags } from '@/utils/featureFlags';
 import { getUsedTokenSet } from '@/utils/getUsedTokenSet';
 import { updateLocalTokensData } from '@/utils/figma';
 
@@ -323,7 +322,6 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
     case MessageToPluginTypes.GET_API_CREDENTIALS:
       try {
         const settings = await getUISettings();
-        const featureFlagId = await getFeatureFlags();
         const usedTokenSet = await getUsedTokenSet();
         inspectDeep = settings.inspectDeep;
         const storageType = getSavedStorageType();
@@ -335,7 +333,7 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
           case StorageProviderType.GITLAB:
           case StorageProviderType.URL: {
             compareProvidersWithStored({
-              providers: apiProviders, storageType, featureFlagId, usedTokenSet, shouldPull: msg.shouldPull,
+              providers: apiProviders, storageType, usedTokenSet, shouldPull: msg.shouldPull,
             });
             break;
           }
