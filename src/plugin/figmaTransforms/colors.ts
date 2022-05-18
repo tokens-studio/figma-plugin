@@ -97,7 +97,7 @@ export function convertToFigmaColor(input: string) {
       r, g, b, a = 1,
     } = webRGBToFigmaRGB(rgbValues);
     color = {
-      r, g, b, a,
+      r, g, b,
     };
     opacity = Number(a);
   } else if (input.startsWith('hsl')) {
@@ -107,7 +107,7 @@ export function convertToFigmaColor(input: string) {
       r, g, b, a = 1,
     } = webRGBToFigmaRGB(rgbValues);
     color = {
-      r, g, b, a,
+      r, g, b,
     };
     opacity = Number(a);
   } else {
@@ -115,7 +115,7 @@ export function convertToFigmaColor(input: string) {
       r, g, b, a = 1,
     }: RGBA = hexToFigmaRGB(toHex(input));
     color = {
-      r, g, b, a,
+      r, g, b,
     };
     opacity = roundToTwo(a);
   }

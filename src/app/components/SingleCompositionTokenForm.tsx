@@ -21,8 +21,8 @@ export default function SingleCompositionTokenForm({
   onRemove,
 }: {
   index: number;
-  token: TokenCompositionValue;
-  tokens: TokenCompositionValue | TokenCompositionValue[];
+  token?: TokenCompositionValue;
+  tokens?: TokenCompositionValue | TokenCompositionValue[];
   properties: string[],
   setValue: (property: TokenCompositionValue | TokenCompositionValue[]) => void;
   onRemove: (index: number) => void;
@@ -34,11 +34,11 @@ export default function SingleCompositionTokenForm({
       const newToken = { ...tokens[index], property };
       values.splice(index, 1, newToken);
       setValue(values);
-    } else {
+    } else if (tokens) {
       setValue({ ...tokens, property });
     }
     setMenuOpened(false);
-  }, [tokens]);
+  }, [index, tokens, setValue]);
 
   const onAliasChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     if (Array.isArray(tokens)) {
@@ -46,10 +46,10 @@ export default function SingleCompositionTokenForm({
       const newToken = { ...tokens[index], value: e.target.value };
       values.splice(index, 1, newToken);
       setValue(values);
-    } else {
+    } else if (tokens) {
       setValue({ ...tokens, value: e.target.value });
     }
-  }, [tokens]);
+  }, [index, tokens, setValue]);
 
   const handleToggleMenu = useCallback(() => {
     setMenuOpened(!menuOpened);
@@ -78,10 +78,10 @@ export default function SingleCompositionTokenForm({
       >
         <PropertySwitchMenu open={menuOpened} onOpenChange={handleToggleMenu}>
           <PropertySwitchMenuMainTrigger>
-            <span>{token.property}</span>
+            <span>{token?.property}</span>
           </PropertySwitchMenuMainTrigger>
           <PropertySwitchMenuContent sideOffset={2}>
-            <PropertySwitchMenuRadioGroup value={token.property}>
+            <PropertySwitchMenuRadioGroup value={token?.property}>
               {properties.length > 0
               && properties.map((property, index) => <PropertySwitchMenuRadioElement property={property} index={index} propertySelected={onPropertySelected} />)}
             </PropertySwitchMenuRadioGroup>
@@ -91,7 +91,7 @@ export default function SingleCompositionTokenForm({
         <Input
           required
           full
-          value={token.value}
+          value={token?.value}
           onChange={onAliasChange}
           type="text"
           name="alias"

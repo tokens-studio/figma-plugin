@@ -6,7 +6,7 @@ import useConfirm from '../hooks/useConfirm';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
 import { activeTokenSetSelector } from '@/selectors';
 import { TokenTypes } from '@/constants/TokenTypes';
-import { DeleteTokenPayload, UpdateTokenPayload } from '@/types/payloads';
+import { DeleteTokenPayload, DuplicateTokenPayload, UpdateTokenPayload } from '@/types/payloads';
 
 // @TODO this typing could be more strict in the future
 
@@ -87,7 +87,7 @@ export default function useManageTokens() {
     dispatch.uiState.completeJob(BackgroundJobs.UI_CREATESINGLETOKEN);
   }, [createToken, dispatch.uiState]);
 
-  const duplicateSingleToken = useCallback(async (data: UpdateTokenPayload) => {
+  const duplicateSingleToken = useCallback(async (data: DuplicateTokenPayload) => {
     dispatch.uiState.startJob({
       name: BackgroundJobs.UI_DUPLICATETOKEN,
       isInfinite: true,

@@ -1,12 +1,12 @@
 import React from 'react';
-import { SingleTypographyToken } from '@/types/tokens';
 import Box from '../Box';
+import { TokenTypograpyValue } from '@/types/values';
 
 // @TODO confirm whether the typography token values
 // can still have the .value property from legacy
 
 type Props = {
-  value: SingleTypographyToken['value']
+  value: TokenTypograpyValue
   shouldResolve: boolean
 };
 
@@ -15,42 +15,42 @@ export const SingleTypographyValueDisplay: React.FC<Props> = ({ value, shouldRes
     <div>
       Font:
       {' '}
-      {value.fontFamily?.value || value.fontFamily}
+      {value.fontFamily}
     </div>
     <div>
       Weight:
       {' '}
-      {value.fontWeight?.value || value.fontWeight}
+      {value.fontWeight}
     </div>
     <div>
       Size:
       {' '}
-      {value.fontSize?.value || value.fontSize}
+      {value.fontSize}
     </div>
     <div>
       Leading:
       {' '}
-      {value.lineHeight?.value || value.lineHeight}
+      {value.lineHeight}
     </div>
     <div>
       Tracking:
       {' '}
-      {value.letterSpacing?.value || value.letterSpacing}
+      {value.letterSpacing}
     </div>
     <div>
       Paragraph Spacing:
       {' '}
-      {value.paragraphSpacing?.value || value.paragraphSpacing}
+      {value.paragraphSpacing}
     </div>
     <div>
       Text Case:
       {' '}
-      {value.textCase?.value || value.textCase}
+      {value.textCase}
     </div>
     <div>
       Text Decoration:
       {' '}
-      {value.textDecoration?.value || value.textDecoration}
+      {value.textDecoration}
     </div>
     {
         shouldResolve && (

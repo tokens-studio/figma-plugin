@@ -498,7 +498,7 @@ export const tokenState = createModel<RootModel>()({
     toggleTreatAsSource() {
       dispatch.tokenState.updateDocument({ updateRemote: false });
     },
-    duplicateToken(payload: UpdateTokenPayload, rootState) {
+    duplicateToken(payload: DuplicateTokenPayload, rootState) {
       if (payload.shouldUpdate && rootState.settings.updateOnChange) {
         dispatch.tokenState.updateDocument();
       }

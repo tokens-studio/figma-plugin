@@ -1,3 +1,5 @@
+import { BoxShadowTypes } from '@/constants/BoxShadowTypes';
+
 export function convertBoxShadowTypeToFigma(value: string) {
   switch (value) {
     case 'innerShadow':
@@ -10,8 +12,8 @@ export function convertBoxShadowTypeToFigma(value: string) {
 export function convertBoxShadowTypeFromFigma(value: string) {
   switch (value) {
     case 'INNER_SHADOW':
-      return 'innerShadow';
+      return BoxShadowTypes.INNER_SHADOW;
     default:
-      return 'dropShadow';
+      return BoxShadowTypes.DROP_SHADOW;
   }
 }

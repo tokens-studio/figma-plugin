@@ -82,7 +82,6 @@ function InitiatorContainer({ ldClient, identificationPromise }: Props) {
             break;
           case MessageFromPluginTypes.TOKEN_VALUES: {
             const { values } = pluginMessage;
-            console.log('values', values);
             if (values) {
               dispatch.tokenState.setTokenData(values);
               const existTokens = Object.values(values?.values ?? {}).some((value) => value.length > 0);

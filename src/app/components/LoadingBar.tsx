@@ -53,6 +53,8 @@ export default function LoadingBar() {
     return null;
   }
 
+  const message = get(backgroundJobTitles, backgroundJobs[backgroundJobs.length - 1]?.name, '');
+
   return (
     <div className="fixed w-full z-20" data-cy="loadingBar">
       <Stack
@@ -66,7 +68,7 @@ export default function LoadingBar() {
         <Spinner />
         <div className="flex flex-grow items-center justify-between">
           <div className="font-medium text-xxs">
-            {get(backgroundJobTitles, backgroundJobs[backgroundJobs.length - 1]?.name) ?? 'Hold on, updating...'}
+            {message || 'Hold on, updating...'}
             {expectedWaitTimeInSeconds >= 1 && (
               `(${expectedWaitTimeInSeconds}s remaining)`
             )}

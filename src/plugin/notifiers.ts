@@ -3,7 +3,7 @@ import {
   PostToUIMessage,
   UserIdFromPluginMessage,
 } from '@/types/messages';
-import { TokenStore } from '@/types/tokens';
+import { AnyTokenList, TokenStore } from '@/types/tokens';
 import { SelectionGroup } from '@/types/SelectionGroup';
 import { SelectionValue } from '@/types/SelectionValue';
 import { UpdateMode } from '@/constants/UpdateMode';
@@ -113,7 +113,7 @@ export function notifyAPIProviders(providers: StorageTypeCredentials[]) {
   postToUI({ type: MessageFromPluginTypes.API_PROVIDERS, providers });
 }
 
-export function notifyStyleValues(values = undefined) {
+export function notifyStyleValues(values: Record<string, AnyTokenList>) {
   postToUI({ type: MessageFromPluginTypes.STYLES, values });
 }
 

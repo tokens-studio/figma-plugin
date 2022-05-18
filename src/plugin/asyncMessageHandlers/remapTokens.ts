@@ -1,6 +1,6 @@
 import { AsyncMessageChannelHandlers } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
-import { defaultNodeManager } from '../NodeManager';
+import { defaultNodeManager, NodeManagerNode } from '../NodeManager';
 import { updatePluginData } from '../pluginData';
 import { sendSelectionChange } from '../sendSelectionChange';
 
@@ -14,7 +14,7 @@ export const remapTokens: AsyncMessageChannelHandlers[AsyncMessageTypes.REMAP_TO
     });
 
     // Go through allWithData and update all appearances of oldName to newName
-    const updatedNodes = allWithData.reduce((all, node) => {
+    const updatedNodes = allWithData.reduce<(NodeManagerNode & { tokens: Record<string, string> })[]>((all, node) => {
       const { tokens } = node;
       let shouldBeRemapped = false;
       // @TODO I dont believe this typing is quite right - need to check and fix

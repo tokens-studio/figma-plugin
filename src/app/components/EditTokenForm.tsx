@@ -290,9 +290,8 @@ function EditTokenForm({ resolvedTokens }: Props) {
   }, [internalEditToken, resolvedTokens]);
 
   const renderTokenForm = () => {
-    if (!internalEditToken) {
-      return null;
-    }
+    if (!internalEditToken) return null;
+
     switch (internalEditToken.type) {
       case TokenTypes.BOX_SHADOW: {
         return (
@@ -307,6 +306,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
       case TokenTypes.TYPOGRAPHY: {
         return (
           <TypographyInput
+            schema={editToken.schema}
             handleTypographyChange={handleTypographyChange}
             handleTypographyChangeByAlias={handleTypographyChangeByAlias}
             internalEditToken={internalEditToken}

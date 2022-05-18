@@ -1,4 +1,5 @@
 import React, { useState, useCallback } from 'react';
+import compact from 'just-compact';
 import {
   DndProvider, useDrop, useDrag, DropTargetMonitor,
 } from 'react-dnd';
@@ -25,7 +26,9 @@ import { BoxShadowTypes } from '@/constants/BoxShadowTypes';
 import { EditTokenObject } from '@/types/tokens';
 import { TokenTypes } from '@/constants/TokenTypes';
 
-// @TODO these types need to be fixed
+const newTokenValue: TokenBoxshadowValue = {
+  x: '0', y: '0', blur: '0', spread: '0', color: '#000000', type: BoxShadowTypes.DROP_SHADOW,
+};
 
 enum ItemTypes {
   CARD = 'card',
@@ -39,13 +42,13 @@ interface DragItem {
 type EditTokenType = Extract<EditTokenObject, { type: TokenTypes.BOX_SHADOW }>;
 
 type Props = {
-  value: string | TokenBoxshadowValue | TokenBoxshadowValue[];
-  isMultiple?: boolean;
-  shadowItem: TokenBoxshadowValue;
-  index: number;
-  handleBoxShadowChange: (shadow: string | TokenBoxshadowValue | TokenBoxshadowValue[]) => void;
-  onRemove: (index: number) => void;
   id: string;
+  value: EditTokenType['value'];
+  isMultiple?: boolean;
+  shadowItem?: TokenBoxshadowValue;
+  index: number;
+  handleBoxShadowChange: (shadow: TokenBoxshadowValue | TokenBoxshadowValue[]) => void;
+  onRemove?: (index: number) => void;
 };
 
 function SingleShadowInput({
@@ -64,7 +67,7 @@ function SingleShadowInput({
       values.splice(index, 1, newShadow);
 
       handleBoxShadowChange(values);
-    } else {
+    } else if (value && typeof value !== 'string') {
       handleBoxShadowChange({ ...value, [e.target.name]: e.target.value });
     }
   }, [index, value, handleBoxShadowChange]);
@@ -75,14 +78,16 @@ function SingleShadowInput({
       const dragItem = values[dragIndex];
       values.splice(dragIndex, 1);
       values.splice(hoverIndex, 0, dragItem);
-      onChange({ ...value, value: values });
+      handleBoxShadowChange(values);
     }
-  }, [value, onChange]);
+  }, [value, handleBoxShadowChange]);
 
   const onMove = useCallback(debounce(onMoveDebounce, 300), [value, onChange]);
 
   const handleRemove = useCallback(() => {
-    onRemove(index);
+    if (onRemove) {
+      onRemove(index);
+    }
   }, [index, onRemove]);
 
   const ref = React.useRef<HTMLDivElement>(null);
@@ -151,7 +156,7 @@ function SingleShadowInput({
             <IconButton tooltip="Click to drag" icon={<IconGrabber />} data-handler-id={handlerId} />
           </Box>
         )}
-        <Select css={{ flexGrow: 1 }} value={shadowItem.type} id="type" onChange={onChange}>
+        <Select css={{ flexGrow: 1 }} value={shadowItem?.type ?? newTokenValue.type} id="type" onChange={onChange}>
           <option value="innerShadow">Inner Shadow</option>
           <option value="dropShadow">Drop Shadow</option>
         </Select>
@@ -168,12 +173,12 @@ function SingleShadowInput({
         display: 'flex', flexDirection: 'column', gap: '$2', paddingLeft: isMultiple ? '$8' : '0',
       }}
       >
-        <TokenInput label="X" value={shadowItem.x} onChange={onChange} type="text" name="x" required />
-        <TokenInput label="Y" value={shadowItem.y} onChange={onChange} type="text" name="y" required />
-        <TokenInput label="Blur" value={shadowItem.blur} onChange={onChange} type="text" name="blur" required />
+        <TokenInput label="X" value={shadowItem?.x ?? newTokenValue.x} onChange={onChange} type="text" name="x" required />
+        <TokenInput label="Y" value={shadowItem?.y ?? newTokenValue.y} onChange={onChange} type="text" name="y" required />
+        <TokenInput label="Blur" value={shadowItem?.blur ?? newTokenValue.blur} onChange={onChange} type="text" name="blur" required />
         <TokenInput
           label="Spread"
-          value={shadowItem.spread}
+          value={shadowItem?.spread ?? newTokenValue.x}
           onChange={onChange}
           type="text"
           name="spread"
@@ -181,7 +186,7 @@ function SingleShadowInput({
         />
         <TokenInput
           label="Color"
-          value={shadowItem.color}
+          value={shadowItem?.color ?? newTokenValue.color}
           onChange={onChange}
           type="text"
           name="color"
@@ -192,24 +197,20 @@ function SingleShadowInput({
   );
 }
 
-const newToken: TokenBoxshadowValue = {
-  x: '0', y: '0', blur: '0', spread: '0', color: '#000000', type: BoxShadowTypes.DROP_SHADOW,
-};
-
 export default function BoxShadowInput({
   handleBoxShadowChange,
   handleBoxShadowChangeByAlias,
   resolvedTokens,
   internalEditToken,
 }: {
-  handleBoxShadowChange: (shadow: string | TokenBoxshadowValue | TokenBoxshadowValue[]) => void;
+  handleBoxShadowChange: (shadow: TokenBoxshadowValue | TokenBoxshadowValue[]) => void;
   handleBoxShadowChangeByAlias: (e: React.ChangeEvent<HTMLInputElement>) => void;
   resolvedTokens: ResolveTokenValuesResult[]
   internalEditToken: EditTokenType;
 }) {
   const seed = useUIDSeed();
-  const isInputMode = (typeof internalEditToken.value === 'object');
-  const [mode, setMode] = useState(isInputMode ? 'input' : 'alias');
+  const isAliasMode = (internalEditToken.value && typeof internalEditToken.value === 'string');
+  const [mode, setMode] = useState(isAliasMode ? 'alias' : 'input');
   const [alias, setAlias] = useState('');
 
   const handleMode = React.useCallback(() => {
@@ -219,7 +220,7 @@ export default function BoxShadowInput({
   }, [mode]);
 
   const selectedToken = React.useMemo(() => {
-    const search = findReferences(internalEditToken.value);
+    const search = findReferences(typeof internalEditToken.value === 'string' ? internalEditToken.value : '');
     if (search && search.length > 0) {
       const nameToLookFor = search[0].slice(1, search[0].length - 1);
       const foundToken = resolvedTokens.find((t) => t.name === nameToLookFor);
@@ -230,9 +231,9 @@ export default function BoxShadowInput({
 
   const addShadow = React.useCallback(() => {
     if (Array.isArray(internalEditToken.value)) {
-      handleBoxShadowChange([...internalEditToken.value, newToken]);
-    } else {
-      handleBoxShadowChange([internalEditToken.value, newToken]);
+      handleBoxShadowChange([...internalEditToken.value, newTokenValue]);
+    } else if (typeof internalEditToken.value !== 'string') {
+      handleBoxShadowChange(compact([internalEditToken.value, newTokenValue]));
     }
   }, [internalEditToken, handleBoxShadowChange]);
 
@@ -288,19 +289,19 @@ export default function BoxShadowInput({
                   />
                 ))
               ) : (
-                <SingleShadowInput
-                  handleBoxShadowChange={handleBoxShadowChange}
-                  index={0}
-                  value={internalEditToken.value}
-                  shadowItem={internalEditToken.value}
-                />
+                typeof internalEditToken.value === 'object' && (
+                  <SingleShadowInput
+                    handleBoxShadowChange={handleBoxShadowChange}
+                    id="0"
+                    index={0}
+                    value={internalEditToken.value}
+                    shadowItem={internalEditToken.value}
+                  />
+                )
               )}
             </DndProvider>
           ) : (
-            <Box css={{
-              display: 'flex', flexDirection: 'column', gap: '$2',
-            }}
-            >
+            <Box css={{ display: 'flex', flexDirection: 'column', gap: '$2' }}>
               <Input
                 required
                 full
@@ -309,16 +310,19 @@ export default function BoxShadowInput({
                 type="text"
                 name="value"
                 placeholder="Alias name"
-                value={isInputMode ? '' : internalEditToken.value}
+                value={typeof internalEditToken.value === 'string' ? internalEditToken.value : ''}
               />
-              {
-                !isInputMode && checkIfContainsAlias(internalEditToken.value) && (
+              {(
+                isAliasMode
+                && selectedToken
+                && typeof internalEditToken.value === 'string'
+                && checkIfContainsAlias(internalEditToken.value)
+              ) && (
                 <ResolvedValueBox
                   alias={alias}
                   selectedToken={selectedToken}
                 />
-                )
-              }
+              )}
             </Box>
           )
         }

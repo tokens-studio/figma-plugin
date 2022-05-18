@@ -11,7 +11,7 @@ import { BackgroundJobs } from '@/constants/BackgroundJobs';
 import { defaultWorker } from './Worker';
 import { getAllFigmaStyleMaps } from '@/utils/getAllFigmaStyleMaps';
 import { ProgressTracker } from './ProgressTracker';
-import { AnyTokenList, TokenStore } from '@/types/tokens';
+import { AnyTokenList, SingleToken, TokenStore } from '@/types/tokens';
 import { isSingleToken } from '@/utils/is';
 import { ThemeObjectsList } from '@/types';
 import { TokenTypes } from '@/constants/TokenTypes';
@@ -39,14 +39,22 @@ export function returnValueToLookFor(key: string) {
 }
 
 // @TOOD fix object typing
-export function mapValuesToTokens(tokens: Map<string, AnyTokenList[number]>, values: NodeTokenRefMap): object {
-  const mappedValues = Object.entries(values).reduce((acc, [key, tokenOnNode]) => {
+type MapValuesToTokensResult = Record<string, string | SingleToken['value'] | {
+  property: string
+  value?: SingleToken['value'];
+}[]>;
+
+export function mapValuesToTokens(tokens: Map<string, AnyTokenList[number]>, values: NodeTokenRefMap): MapValuesToTokensResult {
+  const mappedValues = Object.entries(values).reduce<MapValuesToTokensResult>((acc, [key, tokenOnNode]) => {
     const resolvedToken = tokens.get(tokenOnNode);
     if (!resolvedToken) return acc;
     if (isSingleToken(resolvedToken)) {
       // typography or boxshadow property in composition token resovle alias
       if (resolvedToken && resolvedToken.type === TokenTypes.COMPOSITION && resolvedToken.rawValue) {
-        const tokensInComposition: Array<Object> = [];
+        const tokensInComposition: {
+          property: string
+          value?: SingleToken['value'];
+        }[] = [];
         if (Array.isArray(resolvedToken.rawValue)) {
           for (let index = 0; index < resolvedToken.rawValue.length; index++) {
             const currentTokenWithRawValue = resolvedToken.rawValue[index];
@@ -58,7 +66,7 @@ export function mapValuesToTokens(tokens: Map<string, AnyTokenList[number]>, val
                 property: currentTokenWithRawValue.property,
                 value: tokens.get(strExcludedSymbol)?.value,
               });
-            } else {
+            } else if (Array.isArray(resolvedToken.value)) {
               tokensInComposition.push({
                 property: currentTokenWithRawValue.property,
                 value: resolvedToken.value[index].value,
@@ -75,7 +83,7 @@ export function mapValuesToTokens(tokens: Map<string, AnyTokenList[number]>, val
               property: currentTokenWithRawValue.property,
               value: tokens.get(strExcludedSymbol)?.value,
             });
-          } else {
+          } else if ('value' in resolvedToken.value) {
             tokensInComposition.push({
               property: currentTokenWithRawValue.property,
               value: resolvedToken.value.value,
@@ -83,7 +91,13 @@ export function mapValuesToTokens(tokens: Map<string, AnyTokenList[number]>, val
           }
         }
         acc[key] = tokensInComposition;
-      } else acc[key] = resolvedToken[returnValueToLookFor(key)];
+      } else {
+        const valueToLookFor = returnValueToLookFor(key);
+        const value = resolvedToken[valueToLookFor];
+        if (typeof value !== 'undefined') {
+          acc[key] = value;
+        }
+      }
     } else acc[key] = resolvedToken;
     return acc;
   }, {});
@@ -105,7 +119,7 @@ export async function getTokenData(): Promise<{
     const updatedAt = await UpdatedAtProperty.read(figma.root);
 
     if (Object.keys(values).length > 0) {
-      const tokenObject = Object.entries(values).reduce((acc, [key, groupValues]) => {
+      const tokenObject = Object.entries(values).reduce<Record<string, AnyTokenList>>((acc, [key, groupValues]) => {
         acc[key] = typeof groupValues === 'string' ? JSON.parse(groupValues) : groupValues;
         return acc;
       }, {});
@@ -158,15 +172,18 @@ export function selectNodes(ids: string[]) {
   figma.currentPage.selection = nodes;
 }
 
-export function distructureCompositionToken(values: Partial<Record<Properties, string>>): Object {
+export function destructureCompositionToken(values: MapValuesToTokensResult): MapValuesToTokensResult {
   const tokensInCompositionToken: NodeTokenRefMap = {};
   if (values && values.composition) {
     if (Array.isArray(values.composition)) {
-      values.composition.map((value) => {
-        tokensInCompositionToken[value.property] = value.value;
+      values.composition.forEach((value) => {
+        if (typeof value === 'object' && 'value' in value && typeof value.value === 'string') {
+          tokensInCompositionToken[value.property as Properties] = value.value;
+        }
       });
-    } else {
-      tokensInCompositionToken[values.composition.value.property] = values.composition.value.value;
+    } else if (typeof values.composition === 'object' && 'property' in values.composition) {
+      // @TODO this may not be correct
+      tokensInCompositionToken[values.composition.property as Properties] = values.composition.value;
     }
     const { composition, ...objExcludedCompositionToken } = values;
     values = { ...tokensInCompositionToken, ...objExcludedCompositionToken };
@@ -174,22 +191,24 @@ export function distructureCompositionToken(values: Partial<Record<Properties, s
   return values;
 }
 
-export function distructureCompositionTokenForAlias(tokens: Map<string, AnyTokenList[number]>, values: NodeTokenRefMap): Object {
+export function destructureCompositionTokenForAlias(tokens: Map<string, AnyTokenList[number]>, values: NodeTokenRefMap): NodeTokenRefMap {
   if (values && values.composition) {
     const resolvedToken = tokens.get(values.composition);
     const tokensInCompositionToken: NodeTokenRefMap = {};
     if (resolvedToken?.rawValue && Array.isArray(resolvedToken?.rawValue)) {
-      resolvedToken?.rawValue.map((token) => {
-        let strExcludedSymbol: string = '';
-        if (String(token.value).startsWith('$')) strExcludedSymbol = String(token.value).slice(1, String(token.value).length);
-        if (String(token.value).startsWith('{')) strExcludedSymbol = String(token.value).slice(1, String(token.value).length - 1);
-        tokensInCompositionToken[token.property] = strExcludedSymbol;
+      resolvedToken?.rawValue.forEach((token) => {
+        if ('value' in token) {
+          let strExcludedSymbol: string = '';
+          if (String(token.value).startsWith('$')) strExcludedSymbol = String(token.value).slice(1, String(token.value).length);
+          if (String(token.value).startsWith('{')) strExcludedSymbol = String(token.value).slice(1, String(token.value).length - 1);
+          tokensInCompositionToken[token.property as Properties] = strExcludedSymbol;
+        }
       });
-    } else if (resolvedToken?.rawValue) {
+    } else if (resolvedToken?.rawValue && typeof resolvedToken.rawValue === 'object' && 'value' in resolvedToken.rawValue) {
       let strExcludedSymbol: string = '';
       if (String(resolvedToken?.rawValue.value).startsWith('$')) strExcludedSymbol = String(resolvedToken?.rawValue.value).slice(1, String(resolvedToken?.rawValue.value).length);
       if (String(resolvedToken?.rawValue.value).startsWith('{')) strExcludedSymbol = String(resolvedToken?.rawValue.value).slice(1, String(resolvedToken?.rawValue.value).length - 1);
-      tokensInCompositionToken[resolvedToken?.rawValue.property] = strExcludedSymbol;
+      tokensInCompositionToken[resolvedToken.rawValue.property as Properties] = strExcludedSymbol;
     }
     const { composition, ...objExcludedCompositionToken } = values;
     values = { ...tokensInCompositionToken, ...objExcludedCompositionToken };
@@ -222,9 +241,9 @@ export async function updateNodes(
       defaultWorker.schedule(async () => {
         try {
           if (entry.tokens) {
-            const mappedTokens = distructureCompositionTokenForAlias(tokens, entry.tokens);
+            const mappedTokens = destructureCompositionTokenForAlias(tokens, entry.tokens);
             let mappedValues = mapValuesToTokens(tokens, entry.tokens);
-            mappedValues = distructureCompositionToken(mappedValues);
+            mappedValues = destructureCompositionToken(mappedValues);
             setValuesOnNode(entry.node, mappedValues, mappedTokens, figmaStyleMaps, ignoreFirstPartForStyles);
             store.successfulNodes.add(entry.node);
             returnedValues.add(entry.tokens);
@@ -246,7 +265,7 @@ export async function updateNodes(
   });
 
   if (returnedValues.size) {
-    return returnedValues[0];
+    return returnedValues.entries().next();
   }
 
   return {};

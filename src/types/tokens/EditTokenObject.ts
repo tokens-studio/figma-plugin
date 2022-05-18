@@ -25,24 +25,24 @@ type EditTokenObjectProperties = {
   schema: TokenTypeSchema;
 };
 
-type PartialExceptType<Named extends boolean, T extends SingleToken<Named>> = { type: T['type'] } & Partial<Omit<T, 'type'>>;
+type PartialExceptTypeAndSchema<Named extends boolean, T extends SingleToken<Named>> = { type: T['type']; schema: EditTokenObjectProperties['schema'] } & Partial<Omit<T, 'type' | 'schema'>>;
 
 export type EditTokenObject<Named extends boolean = true> =
-PartialExceptType<Named, SingleColorToken<Named, EditTokenObjectProperties>>
-| PartialExceptType<Named, SingleBorderRadiusToken<Named, EditTokenObjectProperties>>
-| PartialExceptType<Named, SingleTextToken<Named, EditTokenObjectProperties>>
-| PartialExceptType<Named, SingleTypographyToken<Named, EditTokenObjectProperties>>
-| PartialExceptType<Named, SingleOpacityToken<Named, EditTokenObjectProperties>>
-| PartialExceptType<Named, SingleBorderWidthToken<Named, EditTokenObjectProperties>>
-| PartialExceptType<Named, SingleBoxShadowToken<Named, EditTokenObjectProperties>>
-| PartialExceptType<Named, SingleFontFamiliesToken<Named, EditTokenObjectProperties>>
-| PartialExceptType<Named, SingleFontWeightsToken<Named, EditTokenObjectProperties>>
-| PartialExceptType<Named, SingleLineHeightsToken<Named, EditTokenObjectProperties>>
-| PartialExceptType<Named, SingleLetterSpacingToken<Named, EditTokenObjectProperties>>
-| PartialExceptType<Named, SingleFontSizesToken<Named, EditTokenObjectProperties>>
-| PartialExceptType<Named, SingleParagraphSpacingToken<Named, EditTokenObjectProperties>>
-| PartialExceptType<Named, SingleTextDecorationToken<Named, EditTokenObjectProperties>>
-| PartialExceptType<Named, SingleTextCaseToken<Named, EditTokenObjectProperties>>
-| PartialExceptType<Named, SingleSpacingToken<Named, EditTokenObjectProperties>>
-| PartialExceptType<Named, SingleOtherToken<Named, EditTokenObjectProperties>>
-| PartialExceptType<Named, SingleCompositionToken<Named, EditTokenObjectProperties>>;
+PartialExceptTypeAndSchema<Named, SingleColorToken<Named, EditTokenObjectProperties>>
+| PartialExceptTypeAndSchema<Named, SingleBorderRadiusToken<Named, EditTokenObjectProperties>>
+| PartialExceptTypeAndSchema<Named, SingleTextToken<Named, EditTokenObjectProperties>>
+| PartialExceptTypeAndSchema<Named, SingleTypographyToken<Named, EditTokenObjectProperties>>
+| PartialExceptTypeAndSchema<Named, SingleOpacityToken<Named, EditTokenObjectProperties>>
+| PartialExceptTypeAndSchema<Named, SingleBorderWidthToken<Named, EditTokenObjectProperties>>
+| PartialExceptTypeAndSchema<Named, SingleBoxShadowToken<Named, EditTokenObjectProperties>>
+| PartialExceptTypeAndSchema<Named, SingleFontFamiliesToken<Named, EditTokenObjectProperties>>
+| PartialExceptTypeAndSchema<Named, SingleFontWeightsToken<Named, EditTokenObjectProperties>>
+| PartialExceptTypeAndSchema<Named, SingleLineHeightsToken<Named, EditTokenObjectProperties>>
+| PartialExceptTypeAndSchema<Named, SingleLetterSpacingToken<Named, EditTokenObjectProperties>>
+| PartialExceptTypeAndSchema<Named, SingleFontSizesToken<Named, EditTokenObjectProperties>>
+| PartialExceptTypeAndSchema<Named, SingleParagraphSpacingToken<Named, EditTokenObjectProperties>>
+| PartialExceptTypeAndSchema<Named, SingleTextDecorationToken<Named, EditTokenObjectProperties>>
+| PartialExceptTypeAndSchema<Named, SingleTextCaseToken<Named, EditTokenObjectProperties>>
+| PartialExceptTypeAndSchema<Named, SingleSpacingToken<Named, EditTokenObjectProperties>>
+| PartialExceptTypeAndSchema<Named, SingleOtherToken<Named, EditTokenObjectProperties>>
+| PartialExceptTypeAndSchema<Named, SingleCompositionToken<Named, EditTokenObjectProperties>>;

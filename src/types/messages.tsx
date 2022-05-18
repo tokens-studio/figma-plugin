@@ -1,10 +1,10 @@
 import type { BackgroundJob } from '@/app/store/models/uiState';
-import { SelectionGroup } from './SelectionGroup';
-import { SelectionValue } from './SelectionValue';
-import { TokenStore } from './tokens';
-import { UsedTokenSetsMap } from './UsedTokenSetsMap';
-import { UpdateMode } from '@/constants/UpdateMode';
-import { StorageType, StorageTypeCredentials } from './StorageType';
+import type { SelectionGroup } from './SelectionGroup';
+import type { SelectionValue } from './SelectionValue';
+import type { AnyTokenList, TokenStore } from './tokens';
+import type { UsedTokenSetsMap } from './UsedTokenSetsMap';
+import type { UpdateMode } from '@/constants/UpdateMode';
+import type { StorageType, StorageTypeCredentials } from './StorageType';
 
 export enum MessageFromPluginTypes {
   SELECTION = 'selection',
@@ -76,7 +76,7 @@ export type ApiProvidersFromPluginMessage = {
 };
 export type StylesFromPluginMessage = {
   type: MessageFromPluginTypes.STYLES;
-  values?: any;
+  values?: Record<string, AnyTokenList>;
 };
 export type UserIdFromPluginMessage = {
   type: MessageFromPluginTypes.USER_ID;

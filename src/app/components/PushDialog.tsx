@@ -12,40 +12,44 @@ import Modal from './Modal';
 import Stack from './Stack';
 import Spinner from './Spinner';
 import { StorageProviderType } from '@/constants/StorageProviderType';
+import { isGitProvider } from '@/utils/is';
 
 function ConfirmDialog() {
   const { onConfirm, onCancel, showPushDialog } = usePushDialog();
   const localApiState = useSelector(localApiStateSelector);
   const [commitMessage, setCommitMessage] = React.useState('');
-  const [branch, setBranch] = React.useState(localApiState.branch);
+  const [branch, setBranch] = React.useState((isGitProvider(localApiState) ? localApiState.branch : '') || '');
 
   React.useEffect(() => {
-    if (showPushDialog === 'initial') {
+    if (showPushDialog === 'initial' && isGitProvider(localApiState)) {
       setCommitMessage('');
-      setBranch(localApiState.branch);
+      setBranch(localApiState.branch ?? '');
     }
-  }, [showPushDialog, localApiState.branch]);
+  }, [showPushDialog, localApiState]);
 
+  // @TODO ANTI-PATTERN - FIX THIS
   let redirectHref = '';
-  switch (localApiState.provider) {
-    case StorageProviderType.GITHUB:
-      redirectHref = getGithubCreatePullRequestUrl(localApiState.id, branch);
-      break;
-    case StorageProviderType.GITLAB:
-      const [owner, repo] = localApiState.id.split('/');
-      redirectHref = getGitlabCreatePullRequestUrl(owner, repo);
-      break;
-    case StorageProviderType.ADO:
-      redirectHref = getADOCreatePullRequestUrl({
-        branch,
-        projectId: localApiState.name,
-        orgUrl: localApiState.baseUrl,
-        repositoryId: localApiState.id,
-      });
-      break;
-    default:
-      redirectHref = '';
-      break;
+  if (localApiState && 'id' in localApiState && localApiState.id) {
+    switch (localApiState.provider) {
+      case StorageProviderType.GITHUB:
+        redirectHref = getGithubCreatePullRequestUrl(localApiState.id, branch);
+        break;
+      case StorageProviderType.GITLAB:
+        const [owner, repo] = localApiState.id.split('/');
+        redirectHref = getGitlabCreatePullRequestUrl(owner, repo);
+        break;
+      case StorageProviderType.ADO:
+        redirectHref = getADOCreatePullRequestUrl({
+          branch,
+          projectId: localApiState.name,
+          orgUrl: localApiState.baseUrl,
+          repositoryId: localApiState.id,
+        });
+        break;
+      default:
+        redirectHref = '';
+        break;
+    }
   }
 
   switch (showPushDialog) {
@@ -60,7 +64,7 @@ function ConfirmDialog() {
                 <Heading>Push changes</Heading>
                 <p className="text-xs">Push your local changes to your repository.</p>
                 <div className="text-xxs font-mono bg-gray-100 rounded p-2 text-gray-600">
-                  {localApiState.id}
+                  {'id' in localApiState ? localApiState.id : null}
                 </div>
                 <Input
                   full
@@ -99,7 +103,7 @@ function ConfirmDialog() {
         <Modal large isOpen close={onCancel}>
           <Stack direction="column" gap={4} justify="center" align="center">
             <Spinner />
-            <Heading size="large">
+            <Heading size="medium">
               Pushing to
               {localApiState.provider === StorageProviderType.GITHUB && ' GitHub'}
               {localApiState.provider === StorageProviderType.GITLAB && ' GitLab'}
@@ -114,7 +118,7 @@ function ConfirmDialog() {
         <Modal large isOpen close={onCancel}>
           <div className="text-center">
             <div className="mb-8 space-y-4">
-              <Heading size="large">All done!</Heading>
+              <Heading size="medium">All done!</Heading>
               <div className="text-xs">
                 Changes pushed to
                 {localApiState.provider === StorageProviderType.GITHUB && ' GitHub'}
