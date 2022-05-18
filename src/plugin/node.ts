@@ -9,6 +9,7 @@ import { UpdateNodesSettings } from '@/types/UpdateNodesSettings';
 import { SharedPluginDataKeys } from '@/constants/SharedPluginDataKeys';
 import { tokensSharedDataHandler } from './SharedDataHandler';
 import { postToUI } from './notifiers';
+import * as pjs from '../../package.json';
 import { MessageFromPluginTypes } from '@/types/messages';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
 import { defaultWorker } from './Worker';
@@ -16,7 +17,7 @@ import { getAllFigmaStyleMaps } from '@/utils/getAllFigmaStyleMaps';
 import { ProgressTracker } from './ProgressTracker';
 import { AnyTokenList, AnyTokenSet, TokenStore } from '@/types/tokens';
 import { isSingleToken } from '@/utils/is';
-import { ThemeObjectsList } from '@/types';
+import { ThemeObjectsList, UsedTokenSetsMap } from '@/types';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { attemptOrFallback } from '@/utils/attemptOrFallback';
 
@@ -89,12 +90,21 @@ export function mapValuesToTokens(tokens: Map<string, AnyTokenList[number]>, val
   return mappedValues;
 }
 
+export function setTokensOnDocument(tokens: AnyTokenSet, updatedAt: string, usedTokenSet: UsedTokenSetsMap, checkForChanges: string) {
+  tokensSharedDataHandler.set(figma.root, SharedPluginDataKeys.tokens.version, pjs.plugin_version);
+  tokensSharedDataHandler.set(figma.root, SharedPluginDataKeys.tokens.values, JSON.stringify(tokens));
+  tokensSharedDataHandler.set(figma.root, SharedPluginDataKeys.tokens.updatedAt, updatedAt);
+  tokensSharedDataHandler.set(figma.root, SharedPluginDataKeys.tokens.usedTokenSet, JSON.stringify(usedTokenSet));
+  tokensSharedDataHandler.set(figma.root, SharedPluginDataKeys.tokens.checkForChanges, checkForChanges);
+}
+
 export function getTokenData(): {
   values: TokenStore['values'];
   themes: ThemeObjectsList
   activeTheme: string | null
   updatedAt: string;
   version: string;
+  checkForChanges: string
 } | null {
   try {
     const values = tokensSharedDataHandler.get(figma.root, SharedPluginDataKeys.tokens.values, (value) => (
@@ -111,7 +121,7 @@ export function getTokenData(): {
     ));
     const version = tokensSharedDataHandler.get(figma.root, SharedPluginDataKeys.tokens.version);
     const updatedAt = tokensSharedDataHandler.get(figma.root, SharedPluginDataKeys.tokens.updatedAt);
-
+    const checkForChanges = tokensSharedDataHandler.get(figma.root, SharedPluginDataKeys.tokens.checkForChanges);
     if (Object.keys(values).length > 0) {
       const tokenObject = Object.entries(values).reduce((acc, [key, groupValues]) => {
         acc[key] = typeof groupValues === 'string' ? JSON.parse(groupValues) : groupValues;
@@ -123,6 +133,7 @@ export function getTokenData(): {
         activeTheme,
         updatedAt,
         version,
+        checkForChanges
       };
     }
   } catch (e) {

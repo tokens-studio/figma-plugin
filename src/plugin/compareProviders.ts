@@ -6,11 +6,12 @@ import { MessageFromPluginTypes } from '../types/messages';
 type Options = {
   providers?: string | null,
   storageType: StorageType,
-  usedTokenSet?: UsedTokenSetsMap | null
+  usedTokenSet?: UsedTokenSetsMap | null,
+  shouldPull?: boolean,
 };
 
 export default function compareProvidersWithStored({
-  providers, storageType, usedTokenSet,
+  providers, storageType, usedTokenSet, shouldPull,
 }: Options) {
   if (providers) {
     const parsedProviders = JSON.parse(providers) as any[]; // @TODO type properly
@@ -22,6 +23,7 @@ export default function compareProvidersWithStored({
         status: true,
         credentials: matchingSet,
         usedTokenSet,
+        shouldPull,
       });
       return;
     }

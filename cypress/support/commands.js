@@ -74,3 +74,15 @@ Cypress.Commands.add('receiveTokenValues', (values) => {
     $window.postMessage(message, '*');
   });
 });
+
+Cypress.Commands.add('receiveSetTokens', (values) => {
+  cy.window().then(($window) => {
+    const message = {
+      pluginMessage: {
+        type: MessageFromPluginTypes.SET_TOKENS,
+        values,
+      },
+    };
+    $window.postMessage(message, '*');
+  });
+});

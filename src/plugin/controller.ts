@@ -15,7 +15,6 @@ import updateStyles from './updateStyles';
 import store from './store';
 import {
   notifyNoSelection,
-  notifyNoTokenValues,
   notifyTokenValues,
   notifyRemoteComponents,
   notifyStorageType,
@@ -25,6 +24,7 @@ import {
   notifyLastOpened,
   postToUI,
   notifyLicenseKey,
+  notifySetTokens,
 } from './notifiers';
 import { sendPluginValues, updatePluginData, SelectionContent } from './pluginData';
 import {
@@ -34,6 +34,7 @@ import {
   saveStorageType,
   getSavedStorageType,
   selectNodes,
+  setTokensOnDocument,
 } from './node';
 
 import { MessageFromPluginTypes, MessageToPluginTypes, PostToFigmaMessage } from '../types/messages';
@@ -94,7 +95,6 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
             name: currentUser.name,
           });
         }
-
         const licenseKey = await figma.clientStorage.getAsync('licenseKey');
         notifyLicenseKey(licenseKey);
 
@@ -103,25 +103,9 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
 
         const apiProviders = await figma.clientStorage.getAsync('apiProviders');
         if (apiProviders) notifyAPIProviders(JSON.parse(apiProviders));
-        switch (storageType.provider) {
-          case StorageProviderType.JSONBIN:
-          case StorageProviderType.GITHUB:
-          case StorageProviderType.GITLAB:
-          case StorageProviderType.ADO:
-          case StorageProviderType.URL: {
-            compareProvidersWithStored({
-              providers: apiProviders, storageType, usedTokenSet,
-            });
-            break;
-          }
-          default: {
-            const oldTokens = getTokenData();
-            if (oldTokens) {
-              notifyTokenValues({ ...oldTokens, usedTokenSet });
-            } else {
-              notifyNoTokenValues();
-            }
-          }
+        const oldTokens = getTokenData();
+        if (oldTokens) {
+          notifyTokenValues({ ...oldTokens, usedTokenSet, storageType });
         }
       } catch (err) {
         figma.closePlugin('There was an error, check console (F12)');
@@ -211,6 +195,7 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
         updateStyles(msg.tokens, false, msg.settings);
       }
       if (msg.tokenValues && msg.updatedAt) {
+        setTokensOnDocument(msg.tokenValues, msg.updatedAt, msg.usedTokenSet, msg.checkForChanges);
         updateLocalTokensData({
           tokens: msg.tokenValues,
           themes: msg.themes,
@@ -334,6 +319,42 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
       createAnnotation(msg.tokens, msg.direction);
       break;
     }
+    case MessageToPluginTypes.GET_API_CREDENTIALS:
+      try {
+        const settings = await getUISettings();
+        const usedTokenSet = await getUsedTokenSet();
+        inspectDeep = settings.inspectDeep;
+        const storageType = getSavedStorageType();
+        const apiProviders = await figma.clientStorage.getAsync('apiProviders');
+        if (apiProviders) notifyAPIProviders(JSON.parse(apiProviders));
+        switch (storageType.provider) {
+          case StorageProviderType.JSONBIN:
+          case StorageProviderType.GITHUB:
+          case StorageProviderType.GITLAB:
+          case StorageProviderType.URL: {
+            compareProvidersWithStored({
+              providers: apiProviders, storageType, usedTokenSet, shouldPull: msg.shouldPull,
+            });
+            break;
+          }
+          default: {
+            const oldTokens = getTokenData();
+            if (oldTokens) {
+              notifySetTokens({ ...oldTokens, usedTokenSet });
+            }
+          }
+        }
+      } catch (err) {
+        figma.closePlugin('There was an error, check console (F12)');
+        console.error(err);
+        return;
+      }
+
+      if (!figma.currentPage.selection.length) {
+        notifyNoSelection();
+        return;
+      }
+      return;
     case MessageToPluginTypes.SET_LICENSE_KEY: {
       await figma.clientStorage.setAsync('licenseKey', msg.licenseKey);
       break;

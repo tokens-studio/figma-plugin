@@ -507,6 +507,9 @@ export const tokenState = createModel<RootModel>()({
         dispatch.tokenState.updateDocument();
       }
     },
+    updateCheckForChanges(checkForChanges: string) {
+      dispatch.tokenState.updateDocument({ checkForChanges });
+    },
     updateDocument(options?: UpdateDocumentPayload, rootState?) {
       const defaults = { shouldUpdateNodes: true, updateRemote: true };
       const params = { ...defaults, ...options };
@@ -525,6 +528,7 @@ export const tokenState = createModel<RootModel>()({
           api: rootState.uiState.api,
           storageType: rootState.uiState.storageType,
           shouldUpdateRemote: params.updateRemote && rootState.settings.updateRemote,
+          checkForChanges: params.checkForChanges || 'false',
         });
       } catch (e) {
         console.error('Error updating document', e);

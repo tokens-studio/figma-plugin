@@ -1,16 +1,17 @@
-import { useCallback, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { withLDConsumer } from 'launchdarkly-react-client-sdk';
 import type { LDProps } from 'launchdarkly-react-client-sdk/lib/withLDConsumer';
 import { identify, track } from '@/utils/analytics';
 import { MessageFromPluginTypes, MessageToPluginTypes, PostToUIMessage } from '@/types/messages';
+import useConfirm from '@/app/hooks/useConfirm';
 import { notifyToUI, postToFigma } from '../../plugin/notifiers';
 import useRemoteTokens from '../store/remoteTokens';
 import { Dispatch } from '../store';
 import useStorage from '../store/useStorage';
 import * as pjs from '../../../package.json';
 import { Tabs } from '@/constants/Tabs';
-import { StorageProviderType } from '@/types/api';
+import { StorageProviderType, StorageType } from '@/types/api';
 import { GithubTokenStorage } from '@/storage/GithubTokenStorage';
 import { userIdSelector } from '@/selectors/userIdSelector';
 import getLicenseKey from '@/utils/getLicenseKey';
@@ -23,17 +24,26 @@ type Props = LDProps & {
   identificationPromise: Promise<LDProps['flags']>
 };
 
-function InitiatorContainer({ ldClient, identificationPromise }: Props) {
+function InitiatorContainer({ ldClient }: Props) {
   const dispatch = useDispatch<Dispatch>();
   const { pullTokens } = useRemoteTokens();
   const { setStorageType } = useStorage();
+  const { confirm } = useConfirm();
+
   const licenseKey = useSelector(licenseKeySelector);
   const checkedLocalStorage = useSelector(checkedLocalStorageForKeySelector);
   const userId = useSelector(userIdSelector);
 
-  const onInitiate = useCallback(() => {
-    postToFigma({ type: MessageToPluginTypes.INITIATE });
-  }, []);
+  const askUserIfPull: ((storageType: StorageType | undefined) => Promise<any>) = React.useCallback(async (storageType) => {
+    const shouldPull = await confirm({
+      text: `Pull from ${storageType?.provider}?`,
+      description: 'You have unsaved changes that will be lost. Do you want to pull from your repo?',
+    });
+    return shouldPull;
+  }, [confirm]);
+
+  const onInitiate = React.useCallback(() => postToFigma({ type: MessageToPluginTypes.INITIATE }), []);
+  const getApiCredentials = React.useCallback((shouldPull: boolean) => postToFigma({ type: MessageToPluginTypes.GET_API_CREDENTIALS, shouldPull }), []);
 
   useEffect(() => {
     if (!ldClient) return;
@@ -80,6 +90,20 @@ function InitiatorContainer({ ldClient, identificationPromise }: Props) {
             break;
           case MessageFromPluginTypes.TOKEN_VALUES: {
             const { values } = pluginMessage;
+            const existChanges = values.checkForChanges === 'true';
+            if (!existChanges || (existChanges && await askUserIfPull(values?.storageType))) {
+              getApiCredentials(true);
+            } else {
+              dispatch.tokenState.setTokenData(values);
+              const existTokens = Object.values(values?.values ?? {}).some((value) => value.length > 0);
+
+              if (existTokens) getApiCredentials(false);
+              else dispatch.uiState.setActiveTab(Tabs.START);
+            }
+            break;
+          }
+          case MessageFromPluginTypes.SET_TOKENS: {
+            const { values } = pluginMessage;
             if (values) {
               dispatch.tokenState.setTokenData(values);
               const existTokens = Object.values(values?.values ?? {}).some((value) => value.length > 0);
@@ -107,16 +131,15 @@ function InitiatorContainer({ ldClient, identificationPromise }: Props) {
             break;
           case MessageFromPluginTypes.API_CREDENTIALS: {
             const {
-              status, credentials, usedTokenSet,
+              status, credentials, usedTokenSet, shouldPull,
             } = pluginMessage;
             if (status === true) {
-              try {
-                track('Fetched from remote', { provider: credentials.provider });
-                if (!credentials.internalId) track('missingInternalId', { provider: credentials.provider });
+              let receivedFlags;
 
-                // wait of identification
-                const receivedFlags = await identificationPromise;
+              track('Fetched from remote', { provider: credentials.provider });
+              if (!credentials.internalId) track('missingInternalId', { provider: credentials.provider });
 
+              if (credentials) {
                 const {
                   id, provider, secret, baseUrl,
                 } = credentials;
@@ -129,18 +152,17 @@ function InitiatorContainer({ ldClient, identificationPromise }: Props) {
 
                 dispatch.uiState.setApiData(credentials);
                 dispatch.uiState.setLocalApiState(credentials);
-
-                const remoteData = await pullTokens({ context: credentials, usedTokenSet, featureFlags: receivedFlags });
-                const existTokens = Object.values(remoteData?.tokens ?? {}).some((value) => value.length > 0);
-                if (existTokens) dispatch.uiState.setActiveTab(Tabs.TOKENS);
-                else dispatch.uiState.setActiveTab(Tabs.START);
-              } catch (e) {
-                console.error(e);
+                if (shouldPull) {
+                  const remoteData = await pullTokens({ context: credentials, featureFlags: receivedFlags, usedTokenSet });
+                  const existTokens = Object.values(remoteData?.tokens ?? {}).some((value) => value.length > 0);
+                  if (existTokens) { dispatch.uiState.setActiveTab(Tabs.TOKENS); } else { dispatch.uiState.setActiveTab(Tabs.START); }
+                } else {
+                  dispatch.uiState.setActiveTab(Tabs.TOKENS);
+                }
+              } else {
                 dispatch.uiState.setActiveTab(Tabs.START);
                 notifyToUI('Failed to fetch tokens, check your credentials', { error: true });
               }
-            } else {
-              dispatch.uiState.setActiveTab(Tabs.START);
             }
             break;
           }
