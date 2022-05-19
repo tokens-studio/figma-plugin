@@ -10,26 +10,25 @@ import {
   DropdownMenuRadioGroup,
 } from './DropdownMenu';
 import { PropertyDropdownMenuRadioElement } from './PropertyDropdownMenuRadioElement';
-
-type CompositionTokenToArrayItem = {
-  property: string,
-  value: string
-};
+import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
+import { Properties } from '@/constants/Properties';
 
 export default function SingleCompositionTokenForm({
   index,
-  token,
-  tokens,
+  property,
+  value,
+  tokenValue,
   properties,
   setValue,
   onRemove,
 }: {
   index: number;
-  token: CompositionTokenToArrayItem;
-  tokens: CompositionTokenToArrayItem[];
+  property: string;
+  value: string;
+  tokenValue: NodeTokenRefMap | null
   properties: string[],
-  setValue: (token: CompositionTokenToArrayItem[]) => void;
-  onRemove: (index: number) => void;
+  setValue: (neweTokenValue: NodeTokenRefMap) => void;
+  onRemove: (property: string) => void;
 }) {
   const [menuOpened, setMenuOpened] = useState(false);
   const onPropertySelected = useCallback((property: string) => {
@@ -49,10 +48,6 @@ export default function SingleCompositionTokenForm({
     setMenuOpened(false);
   }, [tokens]);
 
-  React.useEffect(() => {
-    console.log("tokens", tokens, properties)
-  }, [])
-
   const onAliasChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     // if (Array.isArray(tokens)) {
     //   let values = tokens;
@@ -62,19 +57,20 @@ export default function SingleCompositionTokenForm({
     // } else {
     //   setValue({ ...tokens, value: e.target.value });
     // }
-    const values = tokens;
-    const newToken = { ...tokens[index], value: e.target.value };
-    values.splice(index, 1, newToken);
-    setValue(values);
-  }, [tokens]);
+    if (property.length > 0) {
+      let newTokenValue = tokenValue;
+      newTokenValue[property as keyof typeof Properties] = e.target.value;
+      setValue(newTokenValue);  
+    }
+  }, [tokenValue]);
 
   const handleToggleMenu = useCallback(() => {
     setMenuOpened(!menuOpened);
   }, [menuOpened]);
 
   const handleRemove = useCallback(() => {
-    onRemove(index);
-  }, [onRemove, index]);
+    onRemove(property);
+  }, [onRemove, property]);
 
   return (
     <Box>

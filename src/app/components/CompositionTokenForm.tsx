@@ -6,42 +6,34 @@ import Heading from './Heading';
 import IconButton from './IconButton';
 import Box from './Box';
 import SingleCompositionTokenForm from './SingleCompositionTokenForm';
-
-type CompositionTokenToArrayItem = {
-  property: string,
-  value: string
-};
-
-const newToken: CompositionTokenToArrayItem = {
-  property: '', value: '',
-};
+import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 
 export default function CompositionTokenForm({
   internalEditToken,
   setValue,
 }: {
   internalEditToken: SingleCompositionToken;
-  setValue: (style: CompositionTokenToArrayItem[]) => void;
+  setValue: (newTokenValue: NodeTokenRefMap) => void;
 }) {
-  // const [compositionTokenToArray, setCompositionTokenToArray] = React.useState();
+
   const propertiesMenu = React.useMemo(() => (
     Object.keys(Properties).map((key: string) => (
       String(Properties[key as keyof typeof Properties])
     ))
   ), [Properties]);
 
-  const compositionTokenToArray = React.useMemo(() => {
-    console.log('inter', internalEditToken);
-    if (internalEditToken.value === null) {
-      return [newToken];
-    }
-    return Object.entries(internalEditToken.value).map(([key, value]) => (
-      {
-        property: key,
-        value,
-      }
-    ));
-  }, [internalEditToken.value]);
+  // const compositionTokenToArray = React.useMemo(() => {
+  //   console.log("usememo", internalEditToken.value)
+  //   if (internalEditToken.value === null) {
+  //     return [newToken];
+  //   }
+  //   return Object.entries(internalEditToken.value).map(([key, value]) => (
+  //     {
+  //       property: key,
+  //       value,
+  //     }
+  //   ));
+  // }, [internalEditToken]);
 
   const addToken = useCallback(() => {
     // if (Array.isArray(internalEditToken.value)) {
@@ -49,14 +41,18 @@ export default function CompositionTokenForm({
     // } else {
     //   setValue([internalEditToken.value, newToken]);
     // }
-    setValue([...compositionTokenToArray, newToken]);
-  }, [internalEditToken.value]);
+    const newTokenValue = internalEditToken.value;
+    Object.defineProperty(newTokenValue, '', {
+      value: ''
+    });
+    setValue(newTokenValue);
+  }, [internalEditToken]);
 
-  const removeToken = useCallback((index) => {
-    if (compositionTokenToArray.length > 1) {
-      setValue(compositionTokenToArray.filter((_, i) => i !== index));
-    }
-  }, [compositionTokenToArray]);
+  const removeToken = useCallback((property: string) => {
+    const newTokenValue = internalEditToken.value;
+    delete newTokenValue[property as keyof typeof Properties];
+    setValue(newTokenValue);
+  }, [internalEditToken]);
 
   return (
     <div>
@@ -70,41 +66,31 @@ export default function CompositionTokenForm({
         />
       </Box>
       <Box css={{ display: 'flex', flexDirection: 'column', gap: '$4' }}>
-        {/* {Array.isArray(internalEditToken.value) ? (
-          internalEditToken.value.map((token, index) => (
-            <SingleCompositionTokenForm
-              index={index}
-              token={token}
-              tokens={internalEditToken.value}
-              key={`single-style-${index}`}
-              properties={propertiesMenu}
-              setValue={setValue}
-              onRemove={removeToken}
-            />
-          ))
-        ) : (
-          <SingleCompositionTokenForm
-            index={-1}
-            token={internalEditToken.value}
-            tokens={internalEditToken.value}
-            key={`single-style`}
-            properties={propertiesMenu}
-            setValue={setValue}
-            onRemove={removeToken}
-          />
-        )} */}
         {
-          compositionTokenToArray.map((token, index) => (
+          internalEditToken.value === null ? (
             <SingleCompositionTokenForm
-              index={index}
-              token={token}
-              tokens={compositionTokenToArray}
-              key={`single-style-${index}`}
+              index={0}
+              property=''
+              value=''
+              tokenValue={null}
               properties={propertiesMenu}
               setValue={setValue}
               onRemove={removeToken}
             />
-          ))
+          ) : (
+            Object.entries(internalEditToken.value).map(([property, value], index) => (
+              <SingleCompositionTokenForm
+                key={`single-style-${index}`}
+                index={index}
+                property={property}
+                value={value}
+                tokenValue={internalEditToken.value}
+                properties={propertiesMenu}
+                setValue={setValue}
+                onRemove={removeToken}
+              />
+            ))
+          )
         }
       </Box>
     </div>

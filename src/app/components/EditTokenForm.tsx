@@ -101,15 +101,12 @@ function EditTokenForm({ resolvedTokens }: Props) {
   const handleCompositionChange = React.useCallback(
     (compositionTokenToArray: CompositionTokenToArrayItem[]) => {
       setError(null);
-      const newCompositionToken = React.useMemo(() => {
-        const tempCompositionToken: NodeTokenRefMap = {};
-        compositionTokenToArray.forEach((compositionTokenItem) => {
-          Object.defineProperty(tempCompositionToken, compositionTokenItem.property, {
-            value: compositionTokenItem.value,
-          });
+      const newCompositionToken: NodeTokenRefMap = {};
+      compositionTokenToArray.forEach((compositionTokenItem) => {
+        Object.defineProperty(newCompositionToken, compositionTokenItem.property, {
+          value: compositionTokenItem.value,
         });
-        return tempCompositionToken;
-      }, [compositionTokenToArray]);
+      });
       console.log('handloecomposi', newCompositionToken);
       if (internalEditToken?.type === TokenTypes.COMPOSITION) {
         setInternalEditToken((prev) => ({ ...prev, value: newCompositionToken } as EditTokenObject));
@@ -118,6 +115,9 @@ function EditTokenForm({ resolvedTokens }: Props) {
     [internalEditToken],
   );
 
+  React.useEffect(() => {
+    console.log("edit", internalEditToken)
+  }, [internalEditToken])
   const handleBoxShadowChangeByAlias = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>(
     (e) => {
       setError(null);
