@@ -36,42 +36,15 @@
   --selection-a: #daebf7;
   --selection-b: #edf5fa;
   --white2: rgba(255, 255, 255, 0.2);
-  /* TYPOGRAPHY */
-  /* Pos = positive applications (black on white) */
-  /* Neg = negative applications (white on black) */
-  /* Font stack */
   --font-stack: 'Inter', sans-serif;
-  /* Font sizes */
   --font-size-xsmall: 11px;
-  --font-size-small: 12px;
-  --font-size-large: 13px;
-  --font-size-xlarge: 14px;
   /* Font weights */
   --font-weight-normal: 400;
   --font-weight-medium: 500;
   --font-weight-bold: 600;
-  /* Lineheight */
   --font-line-height: 16px;
-  /* Use For xsmall, small font sizes */
-  --font-line-height-large: 24px;
-  /* Use For large, xlarge font sizes */
-  /* Letterspacing */
   --font-letter-spacing-pos-xsmall: 0.005em;
-  --font-letter-spacing-neg-xsmall: 0.01em;
-  --font-letter-spacing-pos-small: 0;
-  --font-letter-spacing-neg-small: 0.005em;
-  --font-letter-spacing-pos-large: -0.0025em;
-  --font-letter-spacing-neg-large: 0.0025em;
-  --font-letter-spacing-pos-xlarge: -0.001em;
-  --font-letter-spacing-neg-xlarge: -0.001em;
-  /* BORDER RADIUS */
   --border-radius-small: 2px;
-  --border-radius-med: 5px;
-  --border-radius-large: 6px;
-  /* SHADOWS */
-  --shadow-hud: 0 5px 17px rgba(0, 0, 0, 0.2), 0 2px 7px rgba(0, 0, 0, 0.15);
-  --shadow-floating-window: 0 2px 14px rgba(0, 0, 0, 0.15);
-  /* SPACING + SIZING */
   --size-xxxsmall: 4px;
   --size-xxsmall: 8px;
   --size-xsmall: 16px;
@@ -80,11 +53,10 @@
   --size-large: 40px;
   --size-xlarge: 48px;
   --size-xxlarge: 64px;
-  --size-xxxlarge: 80px;
 }
 
 body {
-  @apply font-body text-sm leading-normal;
+  @apply font-body text-sm leading-normal text-foreground;
 }
 
 .scroll-container {
@@ -105,13 +77,13 @@ textarea::-webkit-scrollbar {
 .overflow-x-auto::-webkit-scrollbar-thumb,
 .ReactModal__Content::-webkit-scrollbar-thumb,
 textarea::-webkit-scrollbar-thumb {
-  @apply bg-gray-400;
+  @apply bg-border-muted border-background;
   border-radius: 9px;
-  border: 2px solid white;
+  border: 2px solid var(--figma-color-bg);
 }
 
 .content-dark::-webkit-scrollbar-thumb {
-  @apply bg-gray-400 border-gray-950;
+  @apply bg-gray-400 border-gray-700;
   border-radius: 9px;
   border: 2px solid;
 }
@@ -125,11 +97,11 @@ textarea::-webkit-scrollbar-thumb {
 }
 
 .property-wrapper .heading {
-  @apply text-xs text-gray-500 mb-2;
+  @apply text-xs text-foreground-muted mb-2;
 }
 
 .property-wrapper .property-wrapper {
-  @apply mb-0 rounded-none pl-2 pb-2 border-l border-gray-300;
+  @apply mb-0 rounded-none pl-2 pb-2 border-l border-border-muted;
 }
 
 .property-wrapper:last-of-type {
@@ -137,23 +109,23 @@ textarea::-webkit-scrollbar-thumb {
 }
 
 .property-value {
-  @apply text-gray-500 text-xs font-normal;
+  @apply text-foreground-muted text-xs font-normal;
 }
 
 .button-group {
-  @apply rounded inline-flex border border-gray-400 overflow-hidden;
+  @apply rounded inline-flex border border-border-muted overflow-hidden;
 }
 
 .button-value {
-  @apply text-gray-600 text-xs font-medium;
+  @apply text-foreground-muted text-xs font-medium;
 }
 
 .button-extra {
-  @apply border-l border-black px-2 py-1;
+  @apply border-l border-border-muted px-2 py-1;
 }
 
 .button-disabled .button-extra {
-  @apply border-gray-500;
+  @apply border-border-muted;
 }
 
 .rotate {
@@ -174,11 +146,11 @@ textarea::-webkit-scrollbar-thumb {
 }
 
 .button {
-  @apply border border-gray-400 rounded text-gray-800 font-medium text-xs p-2;
+  @apply border border-border-muted rounded text-foreground-muted font-medium text-xs p-2;
 }
 
 .button-disabled {
-  @apply border-gray-500;
+  @apply border-border-muted;
 }
 
 .button-ghost {
@@ -190,7 +162,7 @@ textarea::-webkit-scrollbar-thumb {
 }
 
 .button-property {
-  @apply border-none rounded bg-gray-100 px-0 py-0;
+  @apply border-none rounded bg-background-subtle px-0 py-0;
 }
 
 .button-property button {
@@ -198,7 +170,7 @@ textarea::-webkit-scrollbar-thumb {
 }
 
 .button-property:hover {
-  @apply bg-gray-100 bg-opacity-50;
+  @apply bg-background-hover bg-opacity-50;
 }
 
 .button-property-edit {
@@ -237,7 +209,7 @@ textarea::-webkit-scrollbar-thumb {
 }
 
 .button-text {
-  @apply px-2 py-1 flex items-center justify-start flex-shrink-0;
+  @apply text-foreground px-2 py-1 flex items-center justify-start flex-shrink-0;
 }
 
 .button-property-color .button-text span {
@@ -265,11 +237,11 @@ textarea::-webkit-scrollbar-thumb {
 }
 
 .button-secondary {
-  @apply bg-white text-black border border-gray-200;
+  @apply bg-background text-foreground border border-border-muted;
 }
 
 .button-primary {
-  @apply bg-primary-500 text-white border-transparent;
+  @apply bg-brand text-white border-transparent;
 }
 
 .button-large {
@@ -313,7 +285,7 @@ button:focus {
 
 .modal-content {
   overflow-y: auto;
-  @apply bg-white h-full rounded shadow-lg p-2;
+  @apply bg-modal h-full rounded shadow-lg p-2;
 }
 
 textarea.input,
@@ -382,6 +354,14 @@ input.input {
   right: 0px;
   bottom: 0px;
   cursor: nwse-resize;
+}
+
+.ReactModal__Content {
+  @apply bg-modal border-border-menu border !important;
+}
+
+input {
+  @apply bg-background;
 }
 
 @tailwind utilities;

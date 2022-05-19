@@ -10,7 +10,6 @@ import { MessageToPluginTypes } from '@/types/messages';
 import { SingleToken } from '@/types/tokens';
 import { SelectionGroup, StoryblokStory } from '@/types';
 import { Tabs } from '@/constants/Tabs';
-import { FeatureFlags } from '@/utils/featureFlags';
 
 type DisplayType = 'GRID' | 'LIST';
 
@@ -31,9 +30,10 @@ export type EditTokenObject = SingleToken<true, {
 export type ConfirmProps = {
   show?: boolean;
   text?: string;
-  description?: string;
+  description?: React.ReactNode;
   choices?: { key: string; label: string; enabled?: boolean, unique?: boolean }[];
   confirmAction?: string;
+  cancelAction?: string;
   input?: {
     type: 'text';
     placeholder: string;
@@ -82,7 +82,7 @@ export interface UIState {
   showEmptyGroups: boolean;
   collapsed: boolean;
   selectedLayers: number;
-  featureFlags: FeatureFlags
+  manageThemesModalOpen: boolean;
 }
 
 const defaultConfirmState: ConfirmProps = {
@@ -91,6 +91,7 @@ const defaultConfirmState: ConfirmProps = {
   description: '',
   choices: undefined,
   confirmAction: 'Yes',
+  cancelAction: 'Cancel',
   input: undefined,
 };
 
@@ -101,7 +102,7 @@ export const uiState = createModel<RootModel>()({
     disabled: false,
     displayType: 'GRID',
     backgroundJobs: [],
-    activeTab: Tabs.START,
+    activeTab: Tabs.LOADING,
     projectURL: '',
     storageType: {
       provider: StorageProviderType.LOCAL,
@@ -124,7 +125,7 @@ export const uiState = createModel<RootModel>()({
     showEmptyGroups: true,
     collapsed: false,
     selectedLayers: 0,
-    featureFlags: {},
+    manageThemesModalOpen: false,
   } as unknown as UIState,
   reducers: {
     setShowPushDialog: (state, data: string | false) => ({
@@ -138,6 +139,7 @@ export const uiState = createModel<RootModel>()({
         description?: string;
         choices: { key: string; label: string; enabled?: boolean; unique?: boolean }[];
         confirmAction?: string;
+        cancelAction?: string;
         input?: {
           type: 'text';
           placeholder: string;
@@ -151,6 +153,7 @@ export const uiState = createModel<RootModel>()({
         description: data.description,
         choices: data.choices,
         confirmAction: data.confirmAction || defaultConfirmState.confirmAction,
+        cancelAction: data.cancelAction || defaultConfirmState.cancelAction,
         input: data.input,
       },
     }),
@@ -280,12 +283,6 @@ export const uiState = createModel<RootModel>()({
         collapsed: !state.collapsed,
       };
     },
-    setFeatureFlags(state, payload: FeatureFlags) {
-      return {
-        ...state,
-        featureFlags: payload,
-      };
-    },
     addJobTasks(state, payload: AddJobTasksPayload) {
       return {
         ...state,
@@ -319,6 +316,12 @@ export const uiState = createModel<RootModel>()({
           }
           return job;
         }),
+      };
+    },
+    setManageThemesModalOpen(state, open: boolean) {
+      return {
+        ...state,
+        manageThemesModalOpen: open,
       };
     },
   },

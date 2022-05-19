@@ -1,31 +1,48 @@
-import React from 'react';
-import { useDispatch } from 'react-redux';
+import { useCallback, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { withLDConsumer } from 'launchdarkly-react-client-sdk';
+import type { LDProps } from 'launchdarkly-react-client-sdk/lib/withLDConsumer';
 import { identify, track } from '@/utils/analytics';
 import { MessageFromPluginTypes, MessageToPluginTypes, PostToUIMessage } from '@/types/messages';
-import { postToFigma } from '../../plugin/notifiers';
+import { notifyToUI, postToFigma } from '../../plugin/notifiers';
 import useRemoteTokens from '../store/remoteTokens';
 import { Dispatch } from '../store';
 import useStorage from '../store/useStorage';
 import * as pjs from '../../../package.json';
-import { useFeatureFlags } from '../hooks/useFeatureFlags';
+import { Tabs } from '@/constants/Tabs';
+import { StorageProviderType } from '@/types/api';
+import { GithubTokenStorage } from '@/storage/GithubTokenStorage';
+import { userIdSelector } from '@/selectors/userIdSelector';
+import getLicenseKey from '@/utils/getLicenseKey';
+import { licenseKeySelector } from '@/selectors/licenseKeySelector';
+import { checkedLocalStorageForKeySelector } from '@/selectors/checkedLocalStorageForKeySelector';
+import { AddLicenseSource } from '../store/models/userState';
+import { LicenseStatus } from '@/constants/LicenseStatus';
 
-export function Initiator() {
+type Props = LDProps & {
+  identificationPromise: Promise<LDProps['flags']>
+};
+
+function InitiatorContainer({ ldClient, identificationPromise }: Props) {
   const dispatch = useDispatch<Dispatch>();
-
   const { pullTokens } = useRemoteTokens();
-  const { fetchFeatureFlags } = useFeatureFlags();
   const { setStorageType } = useStorage();
+  const licenseKey = useSelector(licenseKeySelector);
+  const checkedLocalStorage = useSelector(checkedLocalStorageForKeySelector);
+  const userId = useSelector(userIdSelector);
 
-  const onInitiate = () => {
+  const onInitiate = useCallback(() => {
     postToFigma({ type: MessageToPluginTypes.INITIATE });
-  };
+  }, []);
 
-  React.useEffect(() => {
+  useEffect(() => {
+    if (!ldClient) return;
+
     onInitiate();
     window.onmessage = async (event: {
       data: {
-        pluginMessage: PostToUIMessage
-      }
+        pluginMessage: PostToUIMessage;
+      };
     }) => {
       if (event.data.pluginMessage) {
         const { pluginMessage } = event.data;
@@ -65,8 +82,15 @@ export function Initiator() {
             const { values } = pluginMessage;
             if (values) {
               dispatch.tokenState.setTokenData(values);
-              dispatch.uiState.setActiveTab('tokens');
+              const existTokens = Object.values(values?.values ?? {}).some((value) => value.length > 0);
+
+              if (existTokens) dispatch.uiState.setActiveTab(Tabs.TOKENS);
+              else dispatch.uiState.setActiveTab(Tabs.START);
             }
+            break;
+          }
+          case MessageFromPluginTypes.NO_TOKEN_VALUES: {
+            dispatch.uiState.setActiveTab(Tabs.START);
             break;
           }
           case MessageFromPluginTypes.STYLES: {
@@ -74,7 +98,7 @@ export function Initiator() {
             if (values) {
               track('Import styles');
               dispatch.tokenState.setTokensFromStyles(values);
-              dispatch.uiState.setActiveTab('tokens');
+              dispatch.uiState.setActiveTab(Tabs.TOKENS);
             }
             break;
           }
@@ -83,27 +107,40 @@ export function Initiator() {
             break;
           case MessageFromPluginTypes.API_CREDENTIALS: {
             const {
-              status, credentials, featureFlagId, usedTokenSet,
+              status, credentials, usedTokenSet,
             } = pluginMessage;
             if (status === true) {
-              let receivedFlags;
+              try {
+                track('Fetched from remote', { provider: credentials.provider });
+                if (!credentials.internalId) track('missingInternalId', { provider: credentials.provider });
 
-              if (featureFlagId) {
-                receivedFlags = await fetchFeatureFlags(featureFlagId);
-                if (receivedFlags) {
-                  dispatch.uiState.setFeatureFlags(receivedFlags);
-                  track('FeatureFlag', receivedFlags);
+                // wait of identification
+                const receivedFlags = await identificationPromise;
+
+                const {
+                  id, provider, secret, baseUrl,
+                } = credentials;
+                const [owner, repo] = id.split('/');
+                if (provider === StorageProviderType.GITHUB) {
+                  const storageClient = new GithubTokenStorage(secret, owner, repo, baseUrl);
+                  const branches = await storageClient.fetchBranches();
+                  dispatch.branchState.setBranches(branches);
                 }
+
+                dispatch.uiState.setApiData(credentials);
+                dispatch.uiState.setLocalApiState(credentials);
+
+                const remoteData = await pullTokens({ context: credentials, usedTokenSet, featureFlags: receivedFlags });
+                const existTokens = Object.values(remoteData?.tokens ?? {}).some((value) => value.length > 0);
+                if (existTokens) dispatch.uiState.setActiveTab(Tabs.TOKENS);
+                else dispatch.uiState.setActiveTab(Tabs.START);
+              } catch (e) {
+                console.error(e);
+                dispatch.uiState.setActiveTab(Tabs.START);
+                notifyToUI('Failed to fetch tokens, check your credentials', { error: true });
               }
-
-              track('Fetched from remote', { provider: credentials.provider });
-              if (!credentials.internalId) track('missingInternalId', { provider: credentials.provider });
-
-              dispatch.uiState.setApiData(credentials);
-              dispatch.uiState.setLocalApiState(credentials);
-
-              await pullTokens({ context: credentials, featureFlags: receivedFlags, usedTokenSet });
-              dispatch.uiState.setActiveTab('tokens');
+            } else {
+              dispatch.uiState.setActiveTab(Tabs.START);
             }
             break;
           }
@@ -121,6 +158,8 @@ export function Initiator() {
             break;
           }
           case MessageFromPluginTypes.USER_ID: {
+            dispatch.userState.setUserId(pluginMessage.user.figmaId);
+            dispatch.userState.setUserName(pluginMessage.user.name);
             identify(pluginMessage.user);
             track('Launched', { version: pjs.plugin_version });
             break;
@@ -157,12 +196,35 @@ export function Initiator() {
             });
             break;
           }
+          case MessageFromPluginTypes.LICENSE_KEY: {
+            if (pluginMessage.licenseKey) {
+              dispatch.userState.addLicenseKey({ key: pluginMessage.licenseKey, source: AddLicenseSource.PLUGIN });
+            } else {
+              dispatch.userState.setLicenseStatus(LicenseStatus.NO_LICENSE);
+              dispatch.userState.setCheckedLocalStorage(true);
+            }
+            break;
+          }
           default:
             break;
         }
       }
     };
-  }, []);
+  }, [ldClient]);
+
+  useEffect(() => {
+    async function getLicense() {
+      const { key } = await getLicenseKey(userId);
+      if (key) {
+        dispatch.userState.addLicenseKey({ key, source: AddLicenseSource.INITAL_LOAD });
+      }
+    }
+    if (userId && checkedLocalStorage && !licenseKey) {
+      getLicense();
+    }
+  }, [userId, dispatch, checkedLocalStorage, licenseKey]);
 
   return null;
 }
+
+export const Initiator = withLDConsumer()(InitiatorContainer);

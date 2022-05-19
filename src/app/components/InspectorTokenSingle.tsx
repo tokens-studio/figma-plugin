@@ -5,12 +5,12 @@ import Box from './Box';
 import Checkbox from './Checkbox';
 import IconButton from './IconButton';
 import useTokens from '../store/useTokens';
-import IconDisclosure from '@/icons/disclosure.svg';
 import InspectorResolvedToken from './InspectorResolvedToken';
 import { Dispatch } from '../store';
 import { SelectionGroup } from '@/types';
 import TokenNodes from './inspector/TokenNodes';
 import { inspectStateSelector } from '@/selectors';
+import { IconToggleableDisclosure } from './icons/IconToggleableDisclosure';
 
 export default function InspectorTokenSingle({
   token,
@@ -22,13 +22,18 @@ export default function InspectorTokenSingle({
   const { handleRemap, getTokenValue } = useTokens();
   const inspectState = useSelector(inspectStateSelector, shallowEqual);
   const dispatch = useDispatch<Dispatch>();
+  const mappedToken = React.useMemo(() => (
+    getTokenValue(token.value, resolvedTokens)
+  ), [token, resolvedTokens, getTokenValue]);
   const [isChecked, setChecked] = React.useState(false);
+
+  const handleClick = React.useCallback(() => {
+    handleRemap(token.category, token.value);
+  }, [token, handleRemap]);
 
   React.useEffect(() => {
     setChecked(inspectState.selectedTokens.includes(`${token.category}-${token.value}`));
   }, [inspectState.selectedTokens, token]);
-
-  const mappedToken = getTokenValue(token.value, resolvedTokens);
 
   return (
     <Box
@@ -54,7 +59,9 @@ export default function InspectorTokenSingle({
           id={`${token.category}-${token.value}`}
           onCheckedChange={() => dispatch.inspectState.toggleSelectedTokens(`${token.category}-${token.value}`)}
         />
-        <InspectorResolvedToken token={mappedToken} />
+        {(!!mappedToken) && (
+          <InspectorResolvedToken token={mappedToken} />
+        )}
 
         <Box
           css={{
@@ -68,8 +75,8 @@ export default function InspectorTokenSingle({
           <IconButton
             tooltip="Change to another token"
             dataCy="button-token-remap"
-            onClick={() => handleRemap(token.category, token.value)}
-            icon={<IconDisclosure />}
+            onClick={handleClick}
+            icon={<IconToggleableDisclosure />}
           />
         </Box>
       </Box>

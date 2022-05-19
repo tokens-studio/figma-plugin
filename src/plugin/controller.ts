@@ -15,6 +15,7 @@ import updateStyles from './updateStyles';
 import store from './store';
 import {
   notifyNoSelection,
+  notifyNoTokenValues,
   notifyTokenValues,
   notifyRemoteComponents,
   notifyStorageType,
@@ -23,12 +24,12 @@ import {
   notifyUserId,
   notifyLastOpened,
   postToUI,
+  notifyLicenseKey,
 } from './notifiers';
 import { sendPluginValues, updatePluginData, SelectionContent } from './pluginData';
 import {
   getTokenData,
   updateNodes,
-  setTokensOnDocument,
   goToNode,
   saveStorageType,
   getSavedStorageType,
@@ -40,8 +41,8 @@ import { StorageProviderType } from '../types/api';
 import compareProvidersWithStored from './compareProviders';
 import { defaultNodeManager } from './NodeManager';
 import { defaultWorker } from './Worker';
-import { getFeatureFlags } from '@/utils/featureFlags';
 import { getUsedTokenSet } from '@/utils/getUsedTokenSet';
+import { updateLocalTokensData } from '@/utils/figma';
 
 let inspectDeep = false;
 let shouldSendSelectionValues = false;
@@ -49,6 +50,7 @@ let shouldSendSelectionValues = false;
 figma.skipInvisibleInstanceChildren = true;
 
 figma.showUI(__html__, {
+  themeColors: true,
   width: DefaultWindowSize.width,
   height: DefaultWindowSize.height,
 });
@@ -80,7 +82,6 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
       try {
         const { currentUser } = figma;
         const settings = await getUISettings();
-        const featureFlagId = await getFeatureFlags();
         const usedTokenSet = await getUsedTokenSet();
         inspectDeep = settings.inspectDeep;
         const userId = await getUserId();
@@ -93,6 +94,10 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
             name: currentUser.name,
           });
         }
+
+        const licenseKey = await figma.clientStorage.getAsync('licenseKey');
+        notifyLicenseKey(licenseKey);
+
         notifyLastOpened(lastOpened);
         notifyStorageType(storageType);
 
@@ -101,9 +106,10 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
         switch (storageType.provider) {
           case StorageProviderType.JSONBIN:
           case StorageProviderType.GITHUB:
+          case StorageProviderType.GITLAB:
           case StorageProviderType.URL: {
             compareProvidersWithStored({
-              providers: apiProviders, storageType, featureFlagId, usedTokenSet,
+              providers: apiProviders, storageType, usedTokenSet,
             });
             break;
           }
@@ -111,6 +117,8 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
             const oldTokens = getTokenData();
             if (oldTokens) {
               notifyTokenValues({ ...oldTokens, usedTokenSet });
+            } else {
+              notifyNoTokenValues();
             }
           }
         }
@@ -203,7 +211,13 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
         updateStyles(msg.tokens, false, msg.settings);
       }
       if (msg.tokenValues && msg.updatedAt) {
-        setTokensOnDocument(msg.tokenValues, msg.updatedAt, msg.usedTokenSet);
+        updateLocalTokensData({
+          tokens: msg.tokenValues,
+          themes: msg.themes,
+          activeTheme: msg.activeTheme,
+          usedTokenSets: msg.usedTokenSet,
+          updatedAt: msg.updatedAt,
+        });
       }
       if (msg.tokens) {
         const tokensMap = tokenArrayGroupToMap(msg.tokens);
@@ -317,6 +331,10 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
     }
     case MessageToPluginTypes.CREATE_ANNOTATION: {
       createAnnotation(msg.tokens, msg.direction);
+      break;
+    }
+    case MessageToPluginTypes.SET_LICENSE_KEY: {
+      await figma.clientStorage.setAsync('licenseKey', msg.licenseKey);
       break;
     }
     default:

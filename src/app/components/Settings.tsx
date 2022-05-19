@@ -1,6 +1,7 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import SyncSettings from './SyncSettings';
 import Checkbox from './Checkbox';
 import Heading from './Heading';
 import { Dispatch } from '../store';
@@ -8,21 +9,29 @@ import Label from './Label';
 import { ignoreFirstPartForStylesSelector } from '@/selectors';
 import Stack from './Stack';
 import Box from './Box';
+import AddLicenseKey from './AddLicenseKey/AddLicenseKey';
+import { Divider } from './Divider';
 
-function SyncSettings() {
+function Settings() {
   const ignoreFirstPartForStyles = useSelector(ignoreFirstPartForStylesSelector);
   const dispatch = useDispatch<Dispatch>();
 
-  const handleIgnoreChange = React.useCallback((bool: boolean) => {
-    dispatch.settings.setIgnoreFirstPartForStyles(bool);
-  }, [dispatch.settings]);
+  const handleIgnoreChange = React.useCallback(
+    (bool: boolean) => {
+      dispatch.settings.setIgnoreFirstPartForStyles(bool);
+    },
+    [dispatch.settings],
+  );
 
   return (
-    <Box css={{ padding: '$4' }}>
-      <Stack direction="column" gap={4}>
-
-        <Heading>Styles</Heading>
-        <Stack direction="column" gap={2}>
+    <Box className="content scroll-container">
+      <Stack direction="column" gap={4} css={{ padding: '$3 0' }}>
+        <AddLicenseKey />
+        <Divider />
+        <SyncSettings />
+        <Divider />
+        <Stack direction="column" gap={3} css={{ padding: '0 $4' }}>
+          <Heading size="medium">Styles</Heading>
           <Stack direction="row" gap={2} align="center">
             <Checkbox
               id="ignoreFirstPartForStyles"
@@ -38,4 +47,4 @@ function SyncSettings() {
   );
 }
 
-export default SyncSettings;
+export default Settings;

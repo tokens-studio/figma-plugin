@@ -1,0 +1,18 @@
+{
+  "red": {
+    "value": "#ff0000",
+    "type": "color"
+  },
+  "yellow": {
+    "value": "#fff000",
+    "type": "color"
+  },
+  "pink": {
+    "value": "#ff00bb",
+    "type": "color"
+  },
+  "white": {
+    "value": "#ffffff",
+    "type": "color"
+  }
+}

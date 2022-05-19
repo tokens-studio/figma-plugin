@@ -13,21 +13,25 @@ export type ApiDataType = {
   name: string;
   branch?: string;
   new?: boolean;
+  filePath?: string;
+  baseUrl?: string
 };
 
 export enum StorageProviderType {
   LOCAL = 'local',
   JSONBIN = 'jsonbin',
   GITHUB = 'github',
+  GITLAB = 'gitlab',
   URL = 'url',
 }
 
 export interface ContextObject extends ApiDataType {
-  branch: string;
-  filePath: string;
+  branch?: string;
+  filePath?: string;
   tokens?: string;
   baseUrl?: string;
   internalId?: string;
+  updatedAt?: string;
 }
 
 export interface StoredCredentials {

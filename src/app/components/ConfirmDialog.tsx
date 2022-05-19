@@ -10,6 +10,29 @@ import Label from './Label';
 import Input from './Input';
 import Stack from './Stack';
 
+const ChoiceCheckbox: React.FC<{
+  checked?: boolean
+  choice: { key: string; unique?: boolean; enabled?: boolean }
+  onCheckedChange: (key: string, unique?: boolean) => void
+}> = ({
+  checked,
+  choice,
+  onCheckedChange,
+}) => {
+  const handleCheckedChange = React.useCallback(() => {
+    onCheckedChange(choice.key, choice.unique);
+  }, [choice, onCheckedChange]);
+
+  return (
+    <Checkbox
+      checked={!!checked}
+      defaultChecked={choice.enabled}
+      id={choice.key}
+      onCheckedChange={handleCheckedChange}
+    />
+  );
+};
+
 function ConfirmDialog() {
   const confirmButton = React.useRef<HTMLButtonElement | null>(null);
   const firstInput = React.useRef<HTMLInputElement | null>(null);
@@ -32,9 +55,15 @@ function ConfirmDialog() {
       } else {
         setChosen(chosen.filter((item) => item !== id));
       }
+
+      return () => {};
     },
     [chosen],
   );
+
+  const handleInputChange = React.useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    setInputValue(event.target.value);
+  }, []);
 
   const handleConfirm = React.useCallback((event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -73,7 +102,7 @@ function ConfirmDialog() {
                 id="input"
                 type={confirmState.input.type}
                 value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
+                onChange={handleInputChange}
                 className="w-full"
                 inputRef={firstInput}
                 full
@@ -88,11 +117,10 @@ function ConfirmDialog() {
                   css={{ display: 'flex', alignItems: 'center', flexDirection: 'row' }}
                   key={choice.key}
                 >
-                  <Checkbox
+                  <ChoiceCheckbox
                     checked={chosen.includes(choice.key)}
-                    defaultChecked={choice.enabled}
-                    id={choice.key}
-                    onCheckedChange={() => toggleChosen(choice.key, choice.unique)}
+                    choice={choice}
+                    onCheckedChange={toggleChosen}
                   />
                   <Label css={{ paddingLeft: '$3' }} htmlFor={choice.key}>
                     {choice.label}
@@ -104,7 +132,7 @@ function ConfirmDialog() {
           </Stack>
           <Stack direction="row" gap={3} justify="between">
             <Button variant="secondary" onClick={onCancel}>
-              Cancel
+              {confirmState?.cancelAction}
             </Button>
             <Button type="submit" variant="primary" buttonRef={confirmButton}>
               {confirmState?.confirmAction}

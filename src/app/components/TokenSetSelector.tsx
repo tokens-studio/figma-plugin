@@ -12,11 +12,11 @@ import TokenSetTree from './TokenSetTree';
 import Box from './Box';
 import { styled } from '@/stitches.config';
 import TokenSetList from './TokenSetList';
-import { StorageProviderType } from '@/types/api';
 import {
-  apiSelector, editProhibitedSelector, featureFlagsSelector, tokensSelector,
+  editProhibitedSelector, tokensSelector,
 } from '@/selectors';
 import Stack from './Stack';
+import { useIsGithubMultiFileEnabled } from '../hooks/useIsGithubMultiFileEnabled';
 
 const StyledButton = styled('button', {
   flexShrink: 0,
@@ -37,8 +37,7 @@ const StyledButton = styled('button', {
 export default function TokenSetSelector() {
   const tokens = useSelector(tokensSelector);
   const editProhibited = useSelector(editProhibitedSelector);
-  const featureFlags = useSelector(featureFlagsSelector);
-  const api = useSelector(apiSelector);
+  const mfsEnabled = useIsGithubMultiFileEnabled();
   const dispatch = useDispatch<Dispatch>();
   const { confirm } = useConfirm();
 
@@ -83,6 +82,16 @@ export default function TokenSetSelector() {
     setShowRenameTokenSetFields(true);
   }, []);
 
+  const handleDuplicateTokenSet = React.useCallback((tokenSet: string) => {
+    const newTokenSetName = `${tokenSet}_Copy`;
+    track('Duplicate token set', { name: newTokenSetName });
+    dispatch.tokenState.duplicateTokenSet(tokenSet);
+
+    handleNewTokenSetNameChange(newTokenSetName);
+    setTokenSetMarkedForChange(newTokenSetName);
+    setShowRenameTokenSetFields(true);
+  }, [dispatch]);
+
   const handleRenameTokenSetSubmit = React.useCallback((e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     dispatch.tokenState.renameTokenSet({ oldName: tokenSetMarkedForChange, newName: newTokenSetName.trim() });
@@ -93,6 +102,26 @@ export default function TokenSetSelector() {
   const handleReorder = useCallback((values: string[]) => {
     dispatch.tokenState.setTokenSetOrder(values);
   }, [dispatch]);
+
+  const handleDelete = useCallback((set: string) => {
+    handleDeleteTokenSet(set);
+  }, [handleDeleteTokenSet]);
+
+  const handleCloseRenameModal = useCallback(() => {
+    setShowRenameTokenSetFields(false);
+  }, []);
+
+  const handleChangeName = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    handleNewTokenSetNameChange(event.target.value);
+  }, []);
+
+  const handleCloseNewTokenSetModal = useCallback(() => {
+    setShowNewTokenSetFields(false);
+  }, []);
+
+  const handleOpenNewTokenSetModal = useCallback(() => {
+    setShowNewTokenSetFields(true);
+  }, []);
 
   return (
     <Box
@@ -107,23 +136,28 @@ export default function TokenSetSelector() {
       }}
       className="content"
     >
-      {featureFlags?.gh_mfs_enabled && api.provider === StorageProviderType.GITHUB && !api?.filePath?.endsWith('.json') ? (
+      {mfsEnabled ? (
         <Box>
           <TokenSetTree
             tokenSets={allTokenSets}
             onRename={handleRenameTokenSet}
-            onDelete={handleDeleteTokenSet}
+            onDelete={handleDelete}
+            onDuplicate={handleDuplicateTokenSet}
           />
         </Box>
       ) : (
         <TokenSetList
-          onReorder={(values: string[]) => handleReorder(values)}
+          onReorder={handleReorder}
           tokenSets={allTokenSets}
           onRename={handleRenameTokenSet}
-          onDelete={(set) => handleDeleteTokenSet(set)}
+          onDelete={handleDeleteTokenSet}
+          onDuplicate={handleDuplicateTokenSet}
         />
       )}
-      <Modal isOpen={showRenameTokenSetFields} close={() => setShowRenameTokenSetFields(false)}>
+      <Modal
+        isOpen={showRenameTokenSetFields}
+        close={handleCloseRenameModal}
+      >
         <Stack direction="column" justify="center" gap={4} css={{ textAlign: 'center' }}>
           <Heading size="small">
             Rename
@@ -135,13 +169,13 @@ export default function TokenSetSelector() {
               <Input
                 full
                 value={newTokenSetName}
-                onChange={(e) => handleNewTokenSetNameChange(e.target.value)}
+                onChange={handleChangeName}
                 type="text"
                 name="tokensetname"
                 required
               />
               <Stack direction="row" gap={4}>
-                <Button variant="secondary" size="large" onClick={() => setShowRenameTokenSetFields(false)}>
+                <Button variant="secondary" size="large" onClick={handleCloseRenameModal}>
                   Cancel
                 </Button>
                 <Button type="submit" variant="primary" size="large" disabled={tokenSetMarkedForChange === newTokenSetName}>
@@ -152,7 +186,7 @@ export default function TokenSetSelector() {
           </form>
         </Stack>
       </Modal>
-      <Modal isOpen={showNewTokenSetFields} close={() => setShowNewTokenSetFields(false)}>
+      <Modal isOpen={showNewTokenSetFields} close={handleCloseNewTokenSetModal}>
         <Stack direction="column" justify="center" gap={4} css={{ textAlign: 'center' }}>
           <Heading size="small">New set</Heading>
           <form onSubmit={handleNewTokenSetSubmit}>
@@ -160,13 +194,13 @@ export default function TokenSetSelector() {
               <Input
                 full
                 value={newTokenSetName}
-                onChange={(e) => handleNewTokenSetNameChange(e.target.value)}
+                onChange={handleChangeName}
                 type="text"
                 name="tokensetname"
                 required
               />
               <Stack direction="row" gap={4}>
-                <Button variant="secondary" size="large" onClick={() => setShowNewTokenSetFields(false)}>
+                <Button variant="secondary" size="large" onClick={handleCloseNewTokenSetModal}>
                   Cancel
                 </Button>
                 <Button type="submit" variant="primary" size="large">
@@ -177,7 +211,7 @@ export default function TokenSetSelector() {
           </form>
         </Stack>
       </Modal>
-      <StyledButton type="button" disabled={editProhibited} onClick={() => setShowNewTokenSetFields(true)}>
+      <StyledButton type="button" disabled={editProhibited} onClick={handleOpenNewTokenSetModal}>
         New set
         <Icon name="add" />
       </StyledButton>
