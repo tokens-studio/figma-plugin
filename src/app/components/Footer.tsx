@@ -43,7 +43,7 @@ export default function Footer() {
 
   const checkForChanges = React.useCallback(() => {
     const hasChanged = (lastSyncedState !== JSON.stringify([tokens, themes], null, 2));
-    dispatch.tokenState.updateCheckForChanges(String(hasChanged));
+    dispatch.tokenState.updateCheckForChanges(hasChanged);
     return hasChanged;
   }, [lastSyncedState, tokens, themes, dispatch.tokenState]);
 

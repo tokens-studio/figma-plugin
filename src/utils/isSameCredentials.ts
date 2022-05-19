@@ -18,7 +18,7 @@ function isSameCredentials(credential: StorageTypeCredentials, stored: StorageTy
       return credential.id === stored.id && credential.provider === stored.provider;
     }
     default:
-      return true;
+      return false;
   }
 }
 

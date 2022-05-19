@@ -3,6 +3,7 @@ import { ThemeObjectsList, UsedTokenSetsMap } from '@/types';
 import { AnyTokenList } from '@/types/tokens';
 import {
   ActiveThemeProperty,
+  CheckForChangesProperty,
   ThemesProperty, UpdatedAtProperty, UsedTokenSetProperty, ValuesProperty, VersionProperty,
 } from '@/figmaStorage';
 
@@ -12,6 +13,7 @@ type Payload = {
   usedTokenSets: UsedTokenSetsMap
   activeTheme: string | null
   updatedAt: string
+  checkForChanges: boolean
 };
 
 export async function updateLocalTokensData(payload: Payload) {
@@ -21,4 +23,5 @@ export async function updateLocalTokensData(payload: Payload) {
   await UsedTokenSetProperty.write(payload.usedTokenSets);
   await UpdatedAtProperty.write(payload.updatedAt);
   await ActiveThemeProperty.write(payload.activeTheme);
+  await CheckForChangesProperty.write(payload.checkForChanges);
 }

@@ -20,22 +20,26 @@ function getParentSelection(sel: SceneNode, distance: number, direction: Directi
   if (position.width === 0) position.width = sel.width - DIST; // save original width
 
   if ('parent' in sel && sel.parent) {
-    if (sel.parent.type !== 'DOCUMENT' && sel.parent.type !== 'PAGE') {
-      switch (direction) {
-        case Direction.TOP:
-        case Direction.BOTTOM:
-          distance += sel.y;
-          break;
-        case Direction.RIGHT:
-          distance = sel.parent.width - sel.x - position.x - position.width;
-          break;
-        default:
-          distance += sel.x;
-          break;
+    if (sel.parent.type !== 'DOCUMENT') {
+      if (sel.parent.type !== 'PAGE') {
+        switch (direction) {
+          case Direction.TOP:
+          case Direction.BOTTOM:
+            distance += sel.y;
+            break;
+          case Direction.RIGHT:
+            distance = sel.parent.width - sel.x - position.x - position.width;
+            break;
+          default:
+            distance += sel.x;
+            break;
+        }
       }
       position.x += sel.x;
       position.y += sel.y;
-      return getParentSelection(sel.parent, distance, direction, position);
+      return sel.parent.type !== 'PAGE'
+        ? getParentSelection(sel.parent, distance, direction, position)
+        : { distance, position };
     }
   }
 

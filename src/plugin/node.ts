@@ -55,7 +55,7 @@ export function mapValuesToTokens(tokens: Map<string, AnyTokenList[number]>, val
           value?: SingleToken['value'];
         }[] = [];
         if (Array.isArray(resolvedToken.rawValue)) {
-          for (let index = 0; index < resolvedToken.rawValue.length; index++) {
+          for (let index = 0; index < resolvedToken.rawValue.length; index += 1) {
             const currentTokenWithRawValue = resolvedToken.rawValue[index];
             if (currentTokenWithRawValue.property === TokenTypes.TYPOGRAPHY || currentTokenWithRawValue.property === TokenTypes.BOX_SHADOW) {
               let strExcludedSymbol: string = '';
@@ -109,7 +109,7 @@ export async function getTokenData(): Promise<{
   activeTheme: string | null
   updatedAt: string;
   version: string;
-  checkForChanges: string | null
+  checkForChanges: boolean | null
 } | null> {
   try {
     const values = await ValuesProperty.read(figma.root) ?? {};

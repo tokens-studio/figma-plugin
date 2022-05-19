@@ -96,7 +96,7 @@ function InitiatorContainer({ ldClient }: Props) {
             break;
           case MessageFromPluginTypes.TOKEN_VALUES: {
             const { values } = pluginMessage;
-            const existChanges = values.checkForChanges === 'true';
+            const existChanges = values.checkForChanges;
             if (!existChanges || (existChanges && await askUserIfPull(values?.storageType))) {
               getApiCredentials(true);
             } else {

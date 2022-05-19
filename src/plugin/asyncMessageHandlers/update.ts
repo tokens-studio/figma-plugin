@@ -19,6 +19,7 @@ export const update: AsyncMessageChannelHandlers[AsyncMessageTypes.UPDATE] = asy
       activeTheme: msg.activeTheme,
       usedTokenSets: msg.usedTokenSet,
       updatedAt: msg.updatedAt,
+      checkForChanges: msg.checkForChanges ?? false,
     });
   }
   if (msg.tokens) {
