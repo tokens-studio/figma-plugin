@@ -1,5 +1,6 @@
 import { AsyncMessageChannelHandlers } from '@/AsyncMessageChannel';
 import { StorageProviderType } from '@/constants/StorageProviderType';
+import { ApiProvidersProperty } from '@/figmaStorage';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { getUsedTokenSet } from '@/utils/getUsedTokenSet';
 import { getUISettings } from '@/utils/uiSettings';
@@ -14,15 +15,15 @@ export const getApiCredentials: AsyncMessageChannelHandlers[AsyncMessageTypes.GE
     const usedTokenSet = await getUsedTokenSet();
     store.inspectDeep = settings.inspectDeep;
     const storageType = await getSavedStorageType();
-    const apiProviders = await figma.clientStorage.getAsync('apiProviders');
-    if (apiProviders) notifyAPIProviders(JSON.parse(apiProviders));
+    const apiProviders = await ApiProvidersProperty.read();
+    if (apiProviders) notifyAPIProviders(apiProviders);
     switch (storageType.provider) {
       case StorageProviderType.JSONBIN:
       case StorageProviderType.GITHUB:
       case StorageProviderType.GITLAB:
       case StorageProviderType.URL: {
         compareProvidersWithStored({
-          providers: apiProviders, storageType, usedTokenSet, shouldPull: msg.shouldPull,
+          providers: apiProviders ?? [], storageType, usedTokenSet, shouldPull: msg.shouldPull,
         });
         break;
       }

@@ -10,6 +10,8 @@ import {
   notifyAPIProviders, notifyLastOpened, notifyLicenseKey, notifyNoSelection, notifyStorageType, notifyTokenValues, notifyUserId,
 } from '../notifiers';
 import { getActiveTheme } from '@/utils/getActiveTheme';
+import { LicenseKeyProperty } from '@/figmaStorage/LicenseKeyProperty';
+import { ApiProvidersProperty } from '@/figmaStorage';
 
 export const initiate: AsyncMessageChannelHandlers[AsyncMessageTypes.INITIATE] = async () => {
   try {
@@ -28,14 +30,14 @@ export const initiate: AsyncMessageChannelHandlers[AsyncMessageTypes.INITIATE] =
         name: currentUser.name,
       });
     }
-    const licenseKey = await figma.clientStorage.getAsync('licenseKey');
-    notifyLicenseKey(licenseKey);
+    const licenseKey = await LicenseKeyProperty.read();
+    notifyLicenseKey(licenseKey ?? '');
 
     notifyLastOpened(lastOpened);
     notifyStorageType(storageType);
 
-    const apiProviders = await figma.clientStorage.getAsync('apiProviders');
-    if (apiProviders) notifyAPIProviders(JSON.parse(apiProviders));
+    const apiProviders = await ApiProvidersProperty.read();
+    if (apiProviders) notifyAPIProviders(apiProviders);
     const oldTokens = await getTokenData();
     if (oldTokens) {
       notifyTokenValues({
