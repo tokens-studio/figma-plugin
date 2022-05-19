@@ -70,6 +70,9 @@ module.exports = (env, argv) => ({
       '@': path.resolve(__dirname, 'src'),
       'react-redux': 'react-redux/dist/react-redux.js',
     },
+    fallback: {
+      buffer: require.resolve('buffer/'),
+    },
     extensions: ['.tsx', '.ts', '.jsx', '.js'],
   },
 
@@ -96,6 +99,9 @@ module.exports = (env, argv) => ({
       typescript: {
         configFile: 'tsconfig.build.json',
       },
-    })
+    }),
+    new webpack.ProvidePlugin({
+      Buffer: ['buffer', 'Buffer'],
+  }),
   ],
 });
