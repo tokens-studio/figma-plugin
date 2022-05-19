@@ -8,7 +8,6 @@ import { checkIfContainsAlias } from '@/utils/alias';
 import { findReferences } from '@/utils/findReferences';
 import IconPlus from '@/icons/plus.svg';
 import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
-import { BoxShadowTypes } from '@/constants/BoxShadowTypes';
 import Heading from './Heading';
 import IconButton from './IconButton';
 import Box from './Box';
@@ -16,14 +15,10 @@ import ResolvedValueBox from './ResolvedValueBox';
 import DownshiftInput from './DownshiftInput';
 import { TokenBoxshadowValue } from '@/types/values';
 import { TokenTypes } from '@/constants/TokenTypes';
-import SingleBoxShadowInput from './SingleBoxShadowInput';
+import SingleBoxShadowInput, { newTokenValue } from './SingleBoxShadowInput';
 import { EditTokenObject } from '@/types/tokens';
 
 type EditTokenType = Extract<EditTokenObject, { type: TokenTypes.BOX_SHADOW }>;
-
-const newTokenValue: TokenBoxshadowValue = {
-  x: '0', y: '0', blur: '0', spread: '0', color: '#000000', type: BoxShadowTypes.INNER_SHADOW,
-};
 
 export default function BoxShadowInput({
   resolvedTokens,
@@ -120,7 +115,7 @@ export default function BoxShadowInput({
                   />
                 ))
               ) : (
-                typeof internalEditToken.value === 'object' && (
+                typeof internalEditToken.value !== 'string' && (
                   <SingleBoxShadowInput
                     handleBoxShadowChange={handleBoxShadowChange}
                     index={0}

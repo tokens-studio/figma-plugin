@@ -14,6 +14,7 @@ import ColorPicker from './ColorPicker';
 import Select from './Select';
 import Box from './Box';
 import SingleBoxShadowDownShiftInput from './SingleBoxShadowDownShiftInput';
+import { BoxShadowTypes } from '@/constants/BoxShadowTypes';
 
 interface DragItem {
   index: number;
@@ -33,6 +34,10 @@ const propertyTypes = {
   color: 'color',
 };
 
+export const newTokenValue: TokenBoxshadowValue = {
+  x: '0', y: '0', blur: '0', spread: '0', color: '#000000', type: BoxShadowTypes.INNER_SHADOW,
+};
+
 export default function SingleBoxShadowInput({
   value,
   isMultiple = false,
@@ -43,9 +48,9 @@ export default function SingleBoxShadowInput({
   id,
   resolvedTokens,
 }: {
-  value: TokenBoxshadowValue | TokenBoxshadowValue[];
+  value?: TokenBoxshadowValue | TokenBoxshadowValue[]
   isMultiple?: boolean;
-  shadowItem: TokenBoxshadowValue;
+  shadowItem?: TokenBoxshadowValue;
   index: number;
   handleBoxShadowChange: (shadow: TokenBoxshadowValue | TokenBoxshadowValue[]) => void;
   onRemove: (index: number) => void;
@@ -65,7 +70,11 @@ export default function SingleBoxShadowInput({
 
       handleBoxShadowChange(values);
     } else {
-      handleBoxShadowChange({ ...value, [e.target.name]: e.target.value });
+      handleBoxShadowChange({
+        ...newTokenValue,
+        ...value,
+        [e.target.name]: e.target.value,
+      });
     }
   }, [index, value, handleBoxShadowChange]);
 
@@ -77,7 +86,11 @@ export default function SingleBoxShadowInput({
 
       handleBoxShadowChange(values);
     } else {
-      handleBoxShadowChange({ ...value, [property]: newInputValue });
+      handleBoxShadowChange({
+        ...newTokenValue,
+        ...value,
+        [property]: newInputValue,
+      });
     }
   }, [index, value, handleBoxShadowChange]);
 
@@ -93,7 +106,11 @@ export default function SingleBoxShadowInput({
 
       handleBoxShadowChange(values);
     } else {
-      handleBoxShadowChange({ ...value, color });
+      handleBoxShadowChange({
+        ...newTokenValue,
+        ...value,
+        color,
+      });
     }
   }, [index, value, handleBoxShadowChange]);
 
@@ -104,7 +121,7 @@ export default function SingleBoxShadowInput({
       values.splice(dragIndex, 1);
       values.splice(hoverIndex, 0, dragItem);
     }
-    exchangeBoxshadowValue(values);
+    exchangeBoxshadowValue(values ?? []);
   }, [value, exchangeBoxshadowValue]);
 
   const onMove = React.useCallback(debounce(onMoveDebounce, 300), [onMoveDebounce]);
@@ -178,7 +195,7 @@ export default function SingleBoxShadowInput({
             <IconButton tooltip="Click to drag" icon={<IconGrabber />} data-handler-id={handlerId} />
           </Box>
         )}
-        <Select css={{ flexGrow: 1 }} value={shadowItem.type} id="type" onChange={onChange}>
+        <Select css={{ flexGrow: 1 }} value={shadowItem?.type ?? newTokenValue.type} id="type" onChange={onChange}>
           <option value="innerShadow">Inner Shadow</option>
           <option value="dropShadow">Drop Shadow</option>
         </Select>
@@ -201,20 +218,19 @@ export default function SingleBoxShadowInput({
               <SingleBoxShadowDownShiftInput
                 name={key}
                 key={`boxshadow-input-${seed(index)}-${seed(keyIndex)}`}
-                value={String(shadowItem[key as keyof typeof propertyTypes])}
+                value={String(
+                  shadowItem?.[key as keyof typeof propertyTypes]
+                  ?? newTokenValue[key as keyof typeof newTokenValue],
+                )}
                 type={propertyTypes[key as keyof typeof propertyTypes]}
-                shadowItem={shadowItem}
                 resolvedTokens={resolvedTokens}
-                propertyTypes={propertyTypes}
                 handleChange={onChange}
                 setInputValue={handleBoxshadowDownShiftInputChange}
                 handleToggleInputHelper={handleToggleInputHelper}
               />
-              {
-                inputHelperOpen && key === 'color' && (
-                  <ColorPicker value={shadowItem[key]} onChange={onColorChange} />
-                )
-              }
+              {inputHelperOpen && key === 'color' && (
+                <ColorPicker value={shadowItem?.[key] || newTokenValue?.[key]} onChange={onColorChange} />
+              )}
             </>
           ))
         }

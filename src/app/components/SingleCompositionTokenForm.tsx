@@ -34,8 +34,11 @@ export default function SingleCompositionTokenForm({
       const newToken = { ...tokens[index], property };
       values.splice(index, 1, newToken);
       setValue(values);
-    } else if (tokens) {
-      setValue({ ...tokens, property });
+    } else {
+      setValue({
+        value: tokens?.value ?? '',
+        property,
+      });
     }
     setMenuOpened(false);
   }, [index, tokens, setValue]);
@@ -47,7 +50,10 @@ export default function SingleCompositionTokenForm({
       values.splice(index, 1, newToken);
       setValue(values);
     } else if (tokens) {
-      setValue({ ...tokens, value: e.target.value });
+      setValue({
+        property: tokens.property,
+        value: e.target.value,
+      });
     }
   }, [index, tokens, setValue]);
 
