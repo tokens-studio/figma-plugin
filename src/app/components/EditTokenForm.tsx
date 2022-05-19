@@ -99,17 +99,11 @@ function EditTokenForm({ resolvedTokens }: Props) {
   );
 
   const handleCompositionChange = React.useCallback(
-    (compositionTokenToArray: CompositionTokenToArrayItem[]) => {
+    (newTokenValue: NodeTokenRefMap) => {
       setError(null);
-      const newCompositionToken: NodeTokenRefMap = {};
-      compositionTokenToArray.forEach((compositionTokenItem) => {
-        Object.defineProperty(newCompositionToken, compositionTokenItem.property, {
-          value: compositionTokenItem.value,
-        });
-      });
-      console.log('handloecomposi', newCompositionToken);
+      console.log("setNewToken", newTokenValue)
       if (internalEditToken?.type === TokenTypes.COMPOSITION) {
-        setInternalEditToken((prev) => ({ ...prev, value: newCompositionToken } as EditTokenObject));
+        setInternalEditToken((prev) => ({ ...prev, value: newTokenValue } as EditTokenObject));
       }
     },
     [internalEditToken],

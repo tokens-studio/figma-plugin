@@ -19,19 +19,23 @@ export default function SingleCompositionTokenForm({
   value,
   tokenValue,
   properties,
+  orderObj,
   setValue,
   onRemove,
+  handleOrderObj
 }: {
   index: number;
   property: string;
   value: string;
-  tokenValue: NodeTokenRefMap | null
+  tokenValue: NodeTokenRefMap
   properties: string[],
+  orderObj: NodeTokenRefMap;
   setValue: (neweTokenValue: NodeTokenRefMap) => void;
   onRemove: (property: string) => void;
+  handleOrderObj: (newOrderObj: object) => void;
 }) {
   const [menuOpened, setMenuOpened] = useState(false);
-  const onPropertySelected = useCallback((property: string) => {
+  const onPropertySelected = useCallback((newProperty: string) => {
     // if (Array.isArray(tokens)) {
     //   let values = tokens;
     //   const newToken = { ...tokens[index], property };
@@ -41,12 +45,25 @@ export default function SingleCompositionTokenForm({
     //   setValue({ ...tokens, property });
     // }
     // setMenuOpened(false);
-    const values = tokens;
-    const newToken = { ...tokens[index], property };
-    values.splice(index, 1, newToken);
-    setValue(values);
-    setMenuOpened(false);
-  }, [tokens]);
+    let newTokenValue = tokenValue;
+    let keysInTokenValue = Object.keys(newTokenValue);
+    keysInTokenValue.splice(index, 1, newProperty);
+    console.log("keysinTokenvalue", keysInTokenValue);
+    let newOrderObj: Object = {};
+    keysInTokenValue.map((key, index) => {
+      Object.defineProperty(newOrderObj, key, {
+        value: index
+      })
+    });
+    console.log("neweorderobj", newOrderObj)
+    handleOrderObj(newOrderObj);
+    delete newTokenValue[property as keyof typeof Properties];
+    Object.defineProperty(newTokenValue, newProperty, {
+      value: ''
+    });
+    console.log("firstnewTokenvalue", newTokenValue)
+    setValue(newTokenValue);
+  }, [tokenValue]);
 
   const onAliasChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     // if (Array.isArray(tokens)) {
@@ -57,11 +74,10 @@ export default function SingleCompositionTokenForm({
     // } else {
     //   setValue({ ...tokens, value: e.target.value });
     // }
-    if (property.length > 0) {
       let newTokenValue = tokenValue;
       newTokenValue[property as keyof typeof Properties] = e.target.value;
-      setValue(newTokenValue);  
-    }
+      console.log("aliaschange", newTokenValue)
+      setValue(newTokenValue);
   }, [tokenValue]);
 
   const handleToggleMenu = useCallback(() => {
@@ -69,9 +85,13 @@ export default function SingleCompositionTokenForm({
   }, [menuOpened]);
 
   const handleRemove = useCallback(() => {
+    console.log("remove", property)
     onRemove(property);
   }, [onRemove, property]);
 
+  React.useEffect(() => {
+    console.log("value", value, "property", property, "tokenvalue", tokenValue)
+  }, [property, value, tokenValue])
   return (
     <Box>
       <Box css={{
@@ -92,10 +112,10 @@ export default function SingleCompositionTokenForm({
       >
         <DropdownMenu open={menuOpened} onOpenChange={handleToggleMenu}>
           <DropdownMenuTrigger css={{flex: 2, minHeight: '38px', border: '1px solid black'}}>
-            <span>{token.property}</span>
+            <span>{property}</span>
           </DropdownMenuTrigger>
           <DropdownMenuContent sideOffset={2} className='content scroll-container' css={{maxHeight: '140px'}}>
-            <DropdownMenuRadioGroup value={token.property}>
+            <DropdownMenuRadioGroup value={property}>
               {properties.length > 0
                 && properties.map((property, index) => <PropertyDropdownMenuRadioElement property={property} index={index} propertySelected={onPropertySelected} />)}
             </DropdownMenuRadioGroup>
@@ -105,7 +125,7 @@ export default function SingleCompositionTokenForm({
         <Input
           required
           full
-          value={token.value}
+          value={value}
           onChange={onAliasChange}
           type="text"
           name="alias"

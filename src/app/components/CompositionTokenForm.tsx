@@ -7,6 +7,7 @@ import IconButton from './IconButton';
 import Box from './Box';
 import SingleCompositionTokenForm from './SingleCompositionTokenForm';
 import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
+import tokenTypes from '@/config/tokenTypes';
 
 export default function CompositionTokenForm({
   internalEditToken,
@@ -15,6 +16,7 @@ export default function CompositionTokenForm({
   internalEditToken: SingleCompositionToken;
   setValue: (newTokenValue: NodeTokenRefMap) => void;
 }) {
+  const [orderObj, setOrderObj] = React.useState({});
 
   const propertiesMenu = React.useMemo(() => (
     Object.keys(Properties).map((key: string) => (
@@ -22,6 +24,35 @@ export default function CompositionTokenForm({
     ))
   ), [Properties]);
 
+  React.useEffect(() => {
+    let newOrderObj: object = {};
+    Object.keys(internalEditToken.value).map((key, index) => {
+      Object.defineProperty(newOrderObj, key, {
+        value: index
+      })
+    });
+    console.log("didmount", newOrderObj);
+    setOrderObj(newOrderObj);
+  }, []);
+
+  const arrangedTokenValue: NodeTokenRefMap = React.useMemo(() => {
+    console.log("usememeo", internalEditToken.value, "orderobj", orderObj)
+    let newOrderObj: object = {};
+    Object.entries(internalEditToken.value).forEach(([key, value]) => {
+      newOrderObj[key] = value;
+    })
+    console.log("neworderobjdddd", newOrderObj)
+    console.log("keys", Object.keys(newOrderObj))
+    console.log("sadfasfdsadf", ...Object.keys(newOrderObj).sort((a, b) => orderObj[a] - orderObj[b]))
+    const res = Object.assign({}, ...Object.keys(newOrderObj).sort((a, b) => orderObj[a] - orderObj[b]).map(x => { return { [x]: newOrderObj[x]}}))
+    console.log("finalnewOrder", res)
+    return res;
+  }, [internalEditToken, orderObj]);
+
+  React.useEffect(() => {
+    console.log("arranged", arrangedTokenValue)
+    console.log("ifif", (internalEditToken.value === {}))
+  }, [arrangedTokenValue])
   // const compositionTokenToArray = React.useMemo(() => {
   //   console.log("usememo", internalEditToken.value)
   //   if (internalEditToken.value === null) {
@@ -54,6 +85,11 @@ export default function CompositionTokenForm({
     setValue(newTokenValue);
   }, [internalEditToken]);
 
+  const handleOrderObj = (newOrderObj: object) => {
+    console.log("setNewOrderobj", newOrderObj)
+    setOrderObj(newOrderObj);
+  }
+
   return (
     <div>
       <Box css={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -67,18 +103,20 @@ export default function CompositionTokenForm({
       </Box>
       <Box css={{ display: 'flex', flexDirection: 'column', gap: '$4' }}>
         {
-          internalEditToken.value === null ? (
+          Object.entries(arrangedTokenValue).length < 1 ? (
             <SingleCompositionTokenForm
               index={0}
               property=''
               value=''
-              tokenValue={null}
+              tokenValue={{}}
               properties={propertiesMenu}
+              orderObj={orderObj}
               setValue={setValue}
               onRemove={removeToken}
+              handleOrderObj={handleOrderObj}
             />
           ) : (
-            Object.entries(internalEditToken.value).map(([property, value], index) => (
+            Object.entries(arrangedTokenValue).map(([property, value], index) => (
               <SingleCompositionTokenForm
                 key={`single-style-${index}`}
                 index={index}
@@ -86,8 +124,10 @@ export default function CompositionTokenForm({
                 value={value}
                 tokenValue={internalEditToken.value}
                 properties={propertiesMenu}
+                orderObj={orderObj}
                 setValue={setValue}
                 onRemove={removeToken}
+                handleOrderObj={handleOrderObj}
               />
             ))
           )
