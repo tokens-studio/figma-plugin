@@ -54,8 +54,6 @@ function InitiatorContainer({ ldClient }: Props) {
   ), []);
 
   useEffect(() => {
-    if (!ldClient) return;
-
     onInitiate();
     window.onmessage = async (event: {
       data: {
