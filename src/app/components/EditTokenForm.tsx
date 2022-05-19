@@ -20,9 +20,15 @@ import TypographyInput from './TypographyInput';
 import Stack from './Stack';
 import DownshiftInput from './DownshiftInput';
 import Button from './Button';
+import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 
 type Props = {
   resolvedTokens: ResolveTokenValuesResult[];
+};
+
+type CompositionTokenToArrayItem = {
+  property: string,
+  value: string
 };
 
 // @TODO this needs to be reviewed from a typings perspective + performance
@@ -93,10 +99,20 @@ function EditTokenForm({ resolvedTokens }: Props) {
   );
 
   const handleCompositionChange = React.useCallback(
-    (style: SingleCompositionToken['value']) => {
+    (compositionTokenToArray: CompositionTokenToArrayItem[]) => {
       setError(null);
+      const newCompositionToken = React.useMemo(() => {
+        const tempCompositionToken: NodeTokenRefMap = {};
+        compositionTokenToArray.forEach((compositionTokenItem) => {
+          Object.defineProperty(tempCompositionToken, compositionTokenItem.property, {
+            value: compositionTokenItem.value,
+          });
+        });
+        return tempCompositionToken;
+      }, [compositionTokenToArray]);
+      console.log('handloecomposi', newCompositionToken);
       if (internalEditToken?.type === TokenTypes.COMPOSITION) {
-        setInternalEditToken((prev) => ({ ...prev, value: style } as EditTokenObject));
+        setInternalEditToken((prev) => ({ ...prev, value: newCompositionToken } as EditTokenObject));
       }
     },
     [internalEditToken],

@@ -1,5 +1,4 @@
 import React, { useCallback } from 'react';
-import { TokenCompositionValue } from '@/types/values';
 import IconPlus from '@/icons/plus.svg';
 import { Properties } from '@/constants/Properties';
 import { SingleCompositionToken } from '@/types/tokens';
@@ -8,7 +7,12 @@ import IconButton from './IconButton';
 import Box from './Box';
 import SingleCompositionTokenForm from './SingleCompositionTokenForm';
 
-const newToken: TokenCompositionValue = {
+type CompositionTokenToArrayItem = {
+  property: string,
+  value: string
+};
+
+const newToken: CompositionTokenToArrayItem = {
   property: '', value: '',
 };
 
@@ -17,28 +21,41 @@ export default function CompositionTokenForm({
   setValue,
 }: {
   internalEditToken: SingleCompositionToken;
-  setValue: (style: TokenCompositionValue | TokenCompositionValue[]) => void;
+  setValue: (style: CompositionTokenToArrayItem | CompositionTokenToArrayItem[]) => void;
 }) {
-
   const propertiesMenu = React.useMemo(() => (
     Object.keys(Properties).map((key: string) => (
       String(Properties[key as keyof typeof Properties])
     ))
   ), [Properties]);
 
-  const addToken = useCallback(() => {
-    if (Array.isArray(internalEditToken.value)) {
-      setValue([...internalEditToken.value, newToken]);
-    } else {
-      setValue([internalEditToken.value, newToken]);
+  const compositionTokenToArray = React.useMemo(() => {
+    console.log('inter', internalEditToken.value);
+    if (internalEditToken.value === null) {
+      return [newToken];
     }
-  }, [internalEditToken]);
+    return Object.entries(internalEditToken.value).map(([key, value]) => (
+      {
+        property: key,
+        value,
+      }
+    ));
+  }, [internalEditToken.value]);
+
+  const addToken = useCallback(() => {
+    // if (Array.isArray(internalEditToken.value)) {
+    //   setValue([...internalEditToken.value, newToken]);
+    // } else {
+    //   setValue([internalEditToken.value, newToken]);
+    // }
+    setValue([...compositionTokenToArray, newToken]);
+  }, [compositionTokenToArray]);
 
   const removeToken = useCallback((index) => {
-    if (Array.isArray(internalEditToken.value)) {
-      setValue(internalEditToken.value.filter((_, i) => i !== index));
+    if (compositionTokenToArray.length > 1) {
+      setValue(compositionTokenToArray.filter((_, i) => i !== index));
     }
-  },[internalEditToken]);
+  }, [compositionTokenToArray]);
 
   return (
     <div>
@@ -52,7 +69,7 @@ export default function CompositionTokenForm({
         />
       </Box>
       <Box css={{ display: 'flex', flexDirection: 'column', gap: '$4' }}>
-        {Array.isArray(internalEditToken.value) ? (
+        {/* {Array.isArray(internalEditToken.value) ? (
           internalEditToken.value.map((token, index) => (
             <SingleCompositionTokenForm
               index={index}
@@ -74,7 +91,20 @@ export default function CompositionTokenForm({
             setValue={setValue}
             onRemove={removeToken}
           />
-        )}
+        )} */}
+        {
+          compositionTokenToArray.map((token, index) => (
+            <SingleCompositionTokenForm
+              index={index}
+              token={token}
+              tokens={compositionTokenToArray}
+              key={`single-style-${index}`}
+              properties={propertiesMenu}
+              setValue={setValue}
+              onRemove={removeToken}
+            />
+          ))
+        }
       </Box>
     </div>
   );

@@ -194,10 +194,6 @@ const tokenTypes = {
     property: 'Composition',
     type: 'composition',
     schema: {
-      value: {
-        property: '',
-        value: '',
-      },
       options: {
         description: '',
       },

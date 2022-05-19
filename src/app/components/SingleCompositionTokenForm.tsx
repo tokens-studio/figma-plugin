@@ -1,16 +1,20 @@
 import React, { useCallback, useState } from 'react';
-import { TokenCompositionValue } from '@/types/values';
 import IconMinus from '@/icons/minus.svg';
 import IconButton from './IconButton';
 import Box from './Box';
 import Input from './Input';
 import {
-  PropertySwitchMenu,
-  PropertySwitchMenuContent,
-  PropertySwitchMenuMainTrigger,
-  PropertySwitchMenuRadioGroup
-} from './PropertySwitchMenu';
-import { PropertySwitchMenuRadioElement } from './PropertySwitchMenuRadioElement';
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+  DropdownMenuRadioGroup,
+} from './DropdownMenu';
+import { PropertyDropdownMenuRadioElement } from './PropertyDropdownMenuRadioElement';
+
+type CompositionTokenToArrayItem = {
+  property: string,
+  value: string
+};
 
 export default function SingleCompositionTokenForm({
   index,
@@ -21,36 +25,43 @@ export default function SingleCompositionTokenForm({
   onRemove,
 }: {
   index: number;
-  token: TokenCompositionValue;
-  tokens: TokenCompositionValue | TokenCompositionValue[];
+  token: CompositionTokenToArrayItem;
+  tokens: CompositionTokenToArrayItem[];
   properties: string[],
-  setValue: (property: TokenCompositionValue | TokenCompositionValue[]) => void;
+  setValue: (token: CompositionTokenToArrayItem[]) => void;
   onRemove: (index: number) => void;
 }) {
-
   const [menuOpened, setMenuOpened] = useState(false);
   const onPropertySelected = useCallback((property: string) => {
-    if (Array.isArray(tokens)) {
-      let values = tokens;
-      const newToken = { ...tokens[index], property };
-      values.splice(index, 1, newToken);
-      setValue(values);
-    } else {
-      setValue({ ...tokens, property });
-    }
+    // if (Array.isArray(tokens)) {
+    //   let values = tokens;
+    //   const newToken = { ...tokens[index], property };
+    //   values.splice(index, 1, newToken);
+    //   setValue(values);
+    // } else {
+    //   setValue({ ...tokens, property });
+    // }
+    // setMenuOpened(false);
+    const values = tokens;
+    const newToken = { ...tokens[index], property };
+    values.splice(index, 1, newToken);
+    setValue(values);
     setMenuOpened(false);
   }, [tokens]);
 
-
   const onAliasChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    if (Array.isArray(tokens)) {
-      let values = tokens;
-      const newToken = { ...tokens[index], value: e.target.value };
-      values.splice(index, 1, newToken);
-      setValue(values);
-    } else {
-      setValue({ ...tokens, value: e.target.value });
-    }
+    // if (Array.isArray(tokens)) {
+    //   let values = tokens;
+    //   const newToken = { ...tokens[index], value: e.target.value };
+    //   values.splice(index, 1, newToken);
+    //   setValue(values);
+    // } else {
+    //   setValue({ ...tokens, value: e.target.value });
+    // }
+    const values = tokens;
+    const newToken = { ...tokens[index], value: e.target.value };
+    values.splice(index, 1, newToken);
+    setValue(values);
   }, [tokens]);
 
   const handleToggleMenu = useCallback(() => {
@@ -60,7 +71,7 @@ export default function SingleCompositionTokenForm({
   const handleRemove = useCallback(() => {
     onRemove(index);
   }, [onRemove, index]);
-  
+
   return (
     <Box>
       <Box css={{
@@ -73,22 +84,22 @@ export default function SingleCompositionTokenForm({
           '& > div > input': {
             flex: 2,
             marginRight: '$5',
-            height: '$10'
-          }
-        }
+            height: '$10',
+          },
+        },
       }}
       >
-        <PropertySwitchMenu open={menuOpened} onOpenChange={handleToggleMenu}>
-          <PropertySwitchMenuMainTrigger>
+        <DropdownMenu open={menuOpened} onOpenChange={handleToggleMenu}>
+          <DropdownMenuTrigger>
             <span>{token.property}</span>
-          </PropertySwitchMenuMainTrigger>
-          <PropertySwitchMenuContent sideOffset={2}>
-            <PropertySwitchMenuRadioGroup value={token.property}>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent sideOffset={2}>
+            <DropdownMenuRadioGroup value={token.property}>
               {properties.length > 0
-              && properties.map((property, index) => <PropertySwitchMenuRadioElement property={property} index={index} propertySelected={onPropertySelected}/>)}
-            </PropertySwitchMenuRadioGroup>
-          </PropertySwitchMenuContent>
-        </PropertySwitchMenu>
+                && properties.map((property, index) => <PropertyDropdownMenuRadioElement property={property} index={index} propertySelected={onPropertySelected} />)}
+            </DropdownMenuRadioGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
 
         <Input
           required

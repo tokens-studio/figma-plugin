@@ -1,7 +1,5 @@
 import { TokenTypes } from '@/constants/TokenTypes';
-import { TokenCompositionValue } from '../values';
+import { NodeTokenRefMap } from '../NodeTokenRefMap';
 import { SingleGenericToken } from './SingleGenericToken';
 
-export type SingleCompositionToken<Named extends boolean = true, P = unknown> = SingleGenericToken<TokenTypes.COMPOSITION, (
-  TokenCompositionValue | TokenCompositionValue[]
-), Named, P>;
+export type SingleCompositionToken<Named extends boolean = true, P = unknown> = SingleGenericToken<TokenTypes.COMPOSITION, NodeTokenRefMap, Named, P>;
