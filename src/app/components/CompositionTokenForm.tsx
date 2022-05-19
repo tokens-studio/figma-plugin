@@ -21,8 +21,9 @@ export default function CompositionTokenForm({
   setValue,
 }: {
   internalEditToken: SingleCompositionToken;
-  setValue: (style: CompositionTokenToArrayItem | CompositionTokenToArrayItem[]) => void;
+  setValue: (style: CompositionTokenToArrayItem[]) => void;
 }) {
+  // const [compositionTokenToArray, setCompositionTokenToArray] = React.useState();
   const propertiesMenu = React.useMemo(() => (
     Object.keys(Properties).map((key: string) => (
       String(Properties[key as keyof typeof Properties])
@@ -30,7 +31,7 @@ export default function CompositionTokenForm({
   ), [Properties]);
 
   const compositionTokenToArray = React.useMemo(() => {
-    console.log('inter', internalEditToken.value);
+    console.log('inter', internalEditToken);
     if (internalEditToken.value === null) {
       return [newToken];
     }
@@ -49,7 +50,7 @@ export default function CompositionTokenForm({
     //   setValue([internalEditToken.value, newToken]);
     // }
     setValue([...compositionTokenToArray, newToken]);
-  }, [compositionTokenToArray]);
+  }, [internalEditToken.value]);
 
   const removeToken = useCallback((index) => {
     if (compositionTokenToArray.length > 1) {

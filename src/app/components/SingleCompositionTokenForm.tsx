@@ -49,6 +49,10 @@ export default function SingleCompositionTokenForm({
     setMenuOpened(false);
   }, [tokens]);
 
+  React.useEffect(() => {
+    console.log("tokens", tokens, properties)
+  }, [])
+
   const onAliasChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     // if (Array.isArray(tokens)) {
     //   let values = tokens;
@@ -78,8 +82,9 @@ export default function SingleCompositionTokenForm({
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
+        gap: '$3',
         '& > label': {
-          flex: 2,
+          flex: 1,
           fontSize: '$5 !important',
           '& > div > input': {
             flex: 2,
@@ -90,10 +95,10 @@ export default function SingleCompositionTokenForm({
       }}
       >
         <DropdownMenu open={menuOpened} onOpenChange={handleToggleMenu}>
-          <DropdownMenuTrigger>
+          <DropdownMenuTrigger css={{flex: 2, minHeight: '38px', border: '1px solid black'}}>
             <span>{token.property}</span>
           </DropdownMenuTrigger>
-          <DropdownMenuContent sideOffset={2}>
+          <DropdownMenuContent sideOffset={2} className='content scroll-container' css={{maxHeight: '140px'}}>
             <DropdownMenuRadioGroup value={token.property}>
               {properties.length > 0
                 && properties.map((property, index) => <PropertyDropdownMenuRadioElement property={property} index={index} propertySelected={onPropertySelected} />)}
