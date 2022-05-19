@@ -125,10 +125,13 @@ function EditTokenForm({ resolvedTokens }: Props) {
   const handleTypographyChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>(
     (e) => {
       e.persist();
-      if (internalEditToken?.type === TokenTypes.TYPOGRAPHY && typeof internalEditToken?.value === 'object') {
+      if (internalEditToken?.type === TokenTypes.TYPOGRAPHY && typeof internalEditToken?.value !== 'string') {
         setInternalEditToken({
           ...internalEditToken,
-          value: { ...internalEditToken.value, [e.target.name]: e.target.value },
+          value: {
+            ...internalEditToken.value,
+            [e.target.name]: e.target.value,
+          },
         });
       }
     },
@@ -147,7 +150,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
   );
 
   const handleTypographyDownShiftInputChange = React.useCallback((newInputValue: string, property: string) => {
-    if (internalEditToken?.type === TokenTypes.TYPOGRAPHY && typeof internalEditToken?.value === 'object') {
+    if (internalEditToken?.type === TokenTypes.TYPOGRAPHY && typeof internalEditToken?.value !== 'string') {
       setInternalEditToken({
         ...internalEditToken,
         value: { ...internalEditToken.value, [property]: newInputValue },
