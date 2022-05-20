@@ -119,7 +119,7 @@ export const {
       7: '32px',
       8: '48px',
       10: '38px',
-      11: '140px'
+      11: '140px',
     },
     radii: {
       default: globalTokens.radii.sm,

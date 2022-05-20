@@ -50,7 +50,6 @@ export function mapValuesToTokens(tokens: Map<string, AnyTokenList[number]>, val
   return mappedValues;
 }
 
-
 export function setTokensOnDocument(tokens: AnyTokenSet, updatedAt: string, usedTokenSet: UsedTokenSetsMap, checkForChanges: string) {
   tokensSharedDataHandler.set(figma.root, SharedPluginDataKeys.tokens.version, pjs.plugin_version);
   tokensSharedDataHandler.set(figma.root, SharedPluginDataKeys.tokens.values, JSON.stringify(tokens));
@@ -94,7 +93,7 @@ export function getTokenData(): {
         activeTheme,
         updatedAt,
         version,
-        checkForChanges
+        checkForChanges,
       };
     }
   } catch (e) {
@@ -138,8 +137,7 @@ export function distructureCompositionToken(values: Partial<Record<Properties, s
   if (values && values.composition) {
     Object.entries(values.composition).forEach(([property, value]) => {
       tokensInCompositionToken[property as CompositionTokenProperty] = value;
-    })
-
+    });
     const { composition, ...objExcludedCompositionToken } = values;
     values = { ...tokensInCompositionToken, ...objExcludedCompositionToken };
   }
@@ -151,7 +149,7 @@ export function distructureCompositionTokenForAlias(tokens: Map<string, AnyToken
     const resolvedToken = tokens.get(values.composition);
     const tokensInCompositionToken: NodeTokenRefMap = {};
     if (resolvedToken?.rawValue) {
-      Object.entries(resolvedToken?.rawValue).map(([property, value]) => {
+      Object.entries(resolvedToken?.rawValue).forEach(([property, value]) => {
         let strExcludedSymbol: string = '';
         if (String(value).startsWith('$')) strExcludedSymbol = String(value).slice(1, String(value).length);
         if (String(value).startsWith('{')) strExcludedSymbol = String(value).slice(1, String(value).length - 1);
@@ -160,8 +158,8 @@ export function distructureCompositionTokenForAlias(tokens: Map<string, AnyToken
       const { composition, ...objExcludedCompositionToken } = values;
       values = { ...tokensInCompositionToken, ...objExcludedCompositionToken };
     }
-    return values;
   }
+  return values;
 }
 
 export async function updateNodes(
