@@ -7,7 +7,7 @@ import IconButton from './IconButton';
 import Box from './Box';
 import SingleCompositionTokenForm from './SingleCompositionTokenForm';
 import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
-import { compositionTokenProperty } from '@/types/CompositionTokenProperty';
+import { CompositionTokenProperty } from '@/types/CompositionTokenProperty';
 
 export default function CompositionTokenForm({
   internalEditToken,
@@ -18,33 +18,33 @@ export default function CompositionTokenForm({
 }) {
   const defaultOrderObj: NodeTokenRefMap = {};
   Object.keys(internalEditToken.value).map((key, index) => {
-    defaultOrderObj[key as compositionTokenProperty] = String(index);
+    defaultOrderObj[key as CompositionTokenProperty] = String(index);
   });
   const [orderObj, setOrderObj] = React.useState(defaultOrderObj);
   const [error, setError] = React.useState(false);
 
   const propertiesMenu = React.useMemo(() => (
     Object.keys(Properties).map((key: string) => (
-      String(Properties[key as compositionTokenProperty])
+      String(Properties[key as CompositionTokenProperty])
     ))
   ), [Properties]);
 
   // keep order of the properties in composition token
   const arrangedTokenValue = React.useMemo<NodeTokenRefMap>(() => {
-    return Object.assign({}, ...Object.keys(internalEditToken.value).sort((a, b) => Number(orderObj[a as compositionTokenProperty]) - Number(orderObj[b as compositionTokenProperty]))
-      .map(x => { return { [x as compositionTokenProperty]: internalEditToken.value[x as compositionTokenProperty] } }))
+    return Object.assign({}, ...Object.keys(internalEditToken.value).sort((a, b) => Number(orderObj[a as CompositionTokenProperty]) - Number(orderObj[b as CompositionTokenProperty]))
+      .map(x => { return { [x as CompositionTokenProperty]: internalEditToken.value[x as CompositionTokenProperty] } }))
   }, [internalEditToken, orderObj]);
 
   const addToken = useCallback(() => {
     if(internalEditToken.value.hasOwnProperty('') || Object.keys(internalEditToken.value).length === 0 ) {
       setError(true);
     }
-    internalEditToken.value['' as compositionTokenProperty] = '';
+    internalEditToken.value['' as CompositionTokenProperty] = '';
     setTokenValue(internalEditToken.value);
   }, [internalEditToken]);
 
   const removeToken = useCallback((property: string) => {
-    delete internalEditToken.value[property as compositionTokenProperty];
+    delete internalEditToken.value[property as CompositionTokenProperty];
     setTokenValue(internalEditToken.value);
   }, [internalEditToken]);
 

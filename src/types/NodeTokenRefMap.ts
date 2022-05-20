@@ -1,8 +1,8 @@
 import type { Properties } from '@/constants/Properties';
 import type { TokenTypes } from '@/constants/TokenTypes';
-import { NodeTokenRefValue } from './NodeTokenRefValue';
+import { TokenBoxshadowValue } from './values';
 
 export type NodeTokenRefMap = Partial<
-Record<TokenTypes, NodeTokenRefValue>
-& Record<Properties, NodeTokenRefValue>
+Record<TokenTypes, string | object | Array<TokenBoxshadowValue>>
+& Record<Properties, string | object | Array<TokenBoxshadowValue>>
 >;

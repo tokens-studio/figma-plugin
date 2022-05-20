@@ -6,6 +6,9 @@ import { isSingleToken } from '@/utils/is';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { UsedTokenSetsMap } from '@/types';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
+import { object } from 'zod';
+import { TokenBoxshadowValue } from '@/types/values';
+import { CompositionTokenProperty, CompositionTokenValue } from '@/types/CompositionTokenProperty';
 
 export type ResolveTokenValuesResult = SingleToken<true, {
   failedToResolve?: boolean
@@ -58,19 +61,44 @@ export function resolveTokenValues(tokens: SingleToken[], previousCount: number 
       }
     }
     else if (t.type === TokenTypes.COMPOSITION) {
-      if (Array.isArray(t.value)) {
-        returnValue = t.value.map((item) => {
-          return {
-            property: item.property,
-            value: getAliasValue(item.value, tokensInProgress)
+      let itemFailedToResolve = false;
+      const compositionReturnValue: CompositionTokenValue = {};
+      Object.entries(t.value).forEach(([property, value]) => {
+        if (Array.isArray(value)) {
+          const resolvedValue = value.map((item) => (
+            Object.entries(item as TokenBoxshadowValue).reduce<Record<string, ReturnType<typeof getAliasValue>>>((acc, [key, value]) => {
+              acc[key] = getAliasValue(value, tokensInProgress);
+              itemFailedToResolve = acc[key] === null || checkIfContainsAlias(acc[key]);
+              if (itemFailedToResolve) {
+                failedToResolve = true;
+              }
+              return acc;
+            }, {})
+          ));
+          compositionReturnValue[property as CompositionTokenProperty] = resolvedValue;
+        } else if (typeof value === 'object') {
+          const resolvedValue = Object.entries(value).reduce<Record<string, ReturnType<typeof getAliasValue>>>((acc, [key, value]) => {
+            acc[key] = getAliasValue(value, tokensInProgress);
+            itemFailedToResolve = acc[key] === null || checkIfContainsAlias(acc[key]);
+            if (itemFailedToResolve) {
+              failedToResolve = true;
+            }
+            return acc;
+          }, {});
+          compositionReturnValue[property as CompositionTokenProperty] = resolvedValue;
+        } else {
+          const resolvedValue = getAliasValue(value, tokensInProgress);
+          if (resolvedValue) {
+            compositionReturnValue[property as CompositionTokenProperty] = resolvedValue;
           }
-        });
-      } else {
-        returnValue = {
-          property: t.value.property,
-          value: getAliasValue(t.value.value, tokensInProgress)
+          itemFailedToResolve = resolvedValue === null || checkIfContainsAlias(resolvedValue);
+          if (itemFailedToResolve) {
+            failedToResolve = true;
+          }
         }
-      }
+      })
+      returnValue = compositionReturnValue;
+      console.log("compostion", compositionReturnValue)
     }
     else {
       // If we're not dealing with special tokens, just return resolved value

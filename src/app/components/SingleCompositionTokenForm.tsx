@@ -12,7 +12,7 @@ import {
 import { PropertyDropdownMenuRadioElement } from './PropertyDropdownMenuRadioElement';
 import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 import { Properties } from '@/constants/Properties';
-import { compositionTokenProperty } from '@/types/CompositionTokenProperty';
+import { CompositionTokenProperty } from '@/types/CompositionTokenProperty';
 
 export default function SingleCompositionTokenForm({
   index,
@@ -56,7 +56,7 @@ export default function SingleCompositionTokenForm({
   }, [tokenValue]);
 
   const onAliasChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    tokenValue[property as compositionTokenProperty] = e.target.value;
+    tokenValue[property as CompositionTokenProperty] = e.target.value;
     setTokenValue(tokenValue);
   }, [tokenValue]);
 
