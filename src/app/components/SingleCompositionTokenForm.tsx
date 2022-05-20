@@ -20,18 +20,22 @@ export default function SingleCompositionTokenForm({
   value,
   tokenValue,
   properties,
+  error,
   setTokenValue,
   onRemove,
-  handleOrderObj
+  handleOrderObj,
+  handleError,
 }: {
   index: number;
   property: string;
   value: string;
   tokenValue: NodeTokenRefMap;
-  properties: string[],
+  properties: string[];
+  error: boolean;
   setTokenValue: (neweTokenValue: NodeTokenRefMap) => void;
   onRemove: (property: string) => void;
   handleOrderObj: (newOrderObj: object) => void;
+  handleError: (newError: false) => void;
 }) {
   const [menuOpened, setMenuOpened] = useState(false);
   const onPropertySelected = useCallback((newProperty: string) => {
@@ -48,6 +52,7 @@ export default function SingleCompositionTokenForm({
     delete tokenValue[property as keyof typeof Properties];
     tokenValue[newProperty as keyof typeof Properties] = value;
     setTokenValue(tokenValue);
+    handleError(false);
   }, [tokenValue]);
 
   const onAliasChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -80,13 +85,13 @@ export default function SingleCompositionTokenForm({
       }}
       >
         <DropdownMenu open={menuOpened} onOpenChange={handleToggleMenu}>
-          <DropdownMenuTrigger css={{ flex: 4, minHeight: '$10',   border: '1px solid $borderMuted' }}>
+          <DropdownMenuTrigger css={{ flex: 4, minHeight: '$10', border: `1px solid ${error && property.length === 0 ? '$fgDanger' : '$borderMuted'}` }}>
             <span>{property}</span>
           </DropdownMenuTrigger>
           <DropdownMenuContent sideOffset={2} className='content scroll-container' css={{ maxHeight: '$11', backgroundColor: '$bgDefault', color: '$text'}}>
             <DropdownMenuRadioGroup value={property}>
               {properties.length > 0
-                && properties.map((property, index) => <PropertyDropdownMenuRadioElement property={property} index={index} propertySelected={onPropertySelected} />)}
+                && properties.map((property, index) => <PropertyDropdownMenuRadioElement key={index} property={property} index={index} propertySelected={onPropertySelected} />)}
             </DropdownMenuRadioGroup>
           </DropdownMenuContent>
         </DropdownMenu>

@@ -21,6 +21,7 @@ export default function CompositionTokenForm({
     defaultOrderObj[key as compositionTokenProperty] = String(index);
   });
   const [orderObj, setOrderObj] = React.useState(defaultOrderObj);
+  const [error, setError] = React.useState(false);
 
   const propertiesMenu = React.useMemo(() => (
     Object.keys(Properties).map((key: string) => (
@@ -30,12 +31,14 @@ export default function CompositionTokenForm({
 
   // keep order of the properties in composition token
   const arrangedTokenValue = React.useMemo<NodeTokenRefMap>(() => {
-    const tokenValue = internalEditToken.value;
     return Object.assign({}, ...Object.keys(internalEditToken.value).sort((a, b) => Number(orderObj[a as compositionTokenProperty]) - Number(orderObj[b as compositionTokenProperty]))
       .map(x => { return { [x as compositionTokenProperty]: internalEditToken.value[x as compositionTokenProperty] } }))
   }, [internalEditToken, orderObj]);
 
   const addToken = useCallback(() => {
+    if(internalEditToken.value.hasOwnProperty('') || Object.keys(internalEditToken.value).length === 0 ) {
+      setError(true);
+    }
     internalEditToken.value['' as compositionTokenProperty] = '';
     setTokenValue(internalEditToken.value);
   }, [internalEditToken]);
@@ -45,9 +48,13 @@ export default function CompositionTokenForm({
     setTokenValue(internalEditToken.value);
   }, [internalEditToken]);
 
-  const handleOrderObj = (newOrderObj: object) => {
+  const handleOrderObj = useCallback((newOrderObj: object) => {
     setOrderObj(newOrderObj);
-  }
+  }, [orderObj])
+
+  const handleError = useCallback((newError: boolean) => {
+    setError(newError);
+  }, [error])
 
   return (
     <div>
@@ -69,9 +76,11 @@ export default function CompositionTokenForm({
               value=''
               tokenValue={arrangedTokenValue}
               properties={propertiesMenu}
+              error={error}
               setTokenValue={setTokenValue}
               onRemove={removeToken}
               handleOrderObj={handleOrderObj}
+              handleError={handleError}
             />
           ) : (
             Object.entries(arrangedTokenValue).map(([property, value], index) => (
@@ -82,10 +91,12 @@ export default function CompositionTokenForm({
                 value={value}
                 tokenValue={arrangedTokenValue}
                 properties={propertiesMenu}
+                error={error}
                 setTokenValue={setTokenValue}
                 onRemove={removeToken}
                 handleOrderObj={handleOrderObj}
-              />
+                handleError={handleError}
+                />
             ))
           )
         }
