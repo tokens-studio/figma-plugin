@@ -10,7 +10,17 @@ type Props = {
   shouldResolve: boolean
 };
 
-export const SingleTypographyValueDisplay: React.FC<Props> = ({ value, shouldResolve }) => (
+export const SingleTypographyValueDisplay: React.FC<Props> = ({ value, shouldResolve }) => (shouldResolve ? (
+  <Box css={{ color: '$fgToolTipMuted' }}>
+    {value.fontFamily}
+    {' '}
+    {value.fontWeight}
+    {' '}
+    /
+    {' '}
+    {value.fontSize}
+  </Box>
+) : (
   <Box css={{ color: '$fgToolTipMuted' }}>
     <div>
       Font:
@@ -52,18 +62,5 @@ export const SingleTypographyValueDisplay: React.FC<Props> = ({ value, shouldRes
       {' '}
       {value.textDecoration}
     </div>
-    {
-        shouldResolve && (
-        <Box css={{ color: '$fgToolTipMuted' }}>
-          {value.fontFamily}
-          {' '}
-          {value.fontWeight}
-          {' '}
-          /
-          {' '}
-          {value.fontSize}
-        </Box>
-        )
-      }
   </Box>
-);
+));
