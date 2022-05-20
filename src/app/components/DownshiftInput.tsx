@@ -150,6 +150,10 @@ const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
           `${acc}${propertyValue.toString()}/`
         ), '');
       }
+    } else if (token.type === TokenTypes.COMPOSITION) {
+      returnValue = Object.entries(token.value).reduce<string>((acc, [property, value]) => (
+        `${acc}${property}:${value}`
+      ), '');
     } else {
       returnValue = token.value;
     }
@@ -198,27 +202,27 @@ const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
             && filteredTokenItems.length > 0
             && selectedItem?.name !== filteredValue
             && (showAutoSuggest || (['{', '$'].some((c) => value.includes(c)) && !value.includes('}'))) ? (
-              <StyledDropdown className="content scroll-container">
-                {filteredTokenItems.map((token: SingleToken, index: number) => (
-                  <StyledItem
-                    className="dropdown-item"
-                    {...getItemProps({ key: token.name, index, item: token })}
-                    css={{
-                      backgroundColor: highlightedIndex === index ? '$interaction' : '$bgDefault',
-                    }}
-                    isFocused={highlightedIndex === index}
-                  >
-                    {type === 'color' && (
+            <StyledDropdown className="content scroll-container">
+              {filteredTokenItems.map((token: SingleToken, index: number) => (
+                <StyledItem
+                  className="dropdown-item"
+                  {...getItemProps({ key: token.name, index, item: token })}
+                  css={{
+                    backgroundColor: highlightedIndex === index ? '$interaction' : '$bgDefault',
+                  }}
+                  isFocused={highlightedIndex === index}
+                >
+                  {type === 'color' && (
                     <StyledItemColorDiv>
                       <StyledItemColor style={{ backgroundColor: token.value.toString() }} />
                     </StyledItemColorDiv>
-                    )}
-                    <StyledItemName>{getHighlightedText(token.name, filteredValue || '')}</StyledItemName>
-                    <StyledItemValue>{resolveValue(token)}</StyledItemValue>
-                  </StyledItem>
-                ))}
-              </StyledDropdown>
-            ) : null}
+                  )}
+                  <StyledItemName>{getHighlightedText(token.name, filteredValue || '')}</StyledItemName>
+                  <StyledItemValue>{resolveValue(token)}</StyledItemValue>
+                </StyledItem>
+              ))}
+            </StyledDropdown>
+          ) : null}
         </div>
       )}
     </Downshift>
