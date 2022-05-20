@@ -11,7 +11,8 @@ import {
 } from './DropdownMenu';
 import { PropertyDropdownMenuRadioElement } from './PropertyDropdownMenuRadioElement';
 import { Properties } from '@/constants/Properties';
-import { CompositionTokenProperty, CompositionTokenValue } from '@/types/CompositionTokenProperty';
+import { CompositionTokenProperty } from '@/types/CompositionTokenProperty';
+import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 
 export default function SingleCompositionTokenForm({
   index,
@@ -22,36 +23,36 @@ export default function SingleCompositionTokenForm({
   error,
   setTokenValue,
   onRemove,
-  handleOrderObj,
-  handleError,
+  setOrderObj,
+  setError,
 }: {
   index: number;
   property: string;
   value: string;
-  tokenValue: CompositionTokenValue;
+  tokenValue: NodeTokenRefMap;
   properties: string[];
-  error: boolean;
-  setTokenValue: (neweTokenValue: CompositionTokenValue) => void;
+  error: string | null;
+  setTokenValue: (neweTokenValue: NodeTokenRefMap) => void;
   onRemove: (property: string) => void;
-  handleOrderObj: (newOrderObj: object) => void;
-  handleError: (newError: false) => void;
+  setOrderObj: (newOrderObj: object) => void;
+  setError: (newError: string | null) => void;
 }) {
   const [menuOpened, setMenuOpened] = useState(false);
   const onPropertySelected = useCallback((newProperty: string) => {
     // keep the order of the properties when select new property
-    const newOrderObj: CompositionTokenValue = {};
+    const newOrderObj: NodeTokenRefMap = {};
     let keysInTokenValue = Object.keys(tokenValue);
     keysInTokenValue.splice(index, 1, newProperty);
     keysInTokenValue.map((key, index) => {
       newOrderObj[key as keyof typeof Properties] = String(index)
     });
-    handleOrderObj(newOrderObj);
+    setOrderObj(newOrderObj);
 
     // set newTokenValue
     delete tokenValue[property as keyof typeof Properties];
     tokenValue[newProperty as keyof typeof Properties] = value;
     setTokenValue(tokenValue);
-    handleError(false);
+    setError(null);
   }, [tokenValue]);
 
   const onAliasChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -87,7 +88,7 @@ export default function SingleCompositionTokenForm({
           <DropdownMenuTrigger css={{ flex: 4, minHeight: '$10', border: `1px solid ${error && property.length === 0 ? '$fgDanger' : '$borderMuted'}` }}>
             <span>{property}</span>
           </DropdownMenuTrigger>
-          <DropdownMenuContent sideOffset={2} className='content scroll-container' css={{ maxHeight: '$11', backgroundColor: '$bgDefault', color: '$text'}}>
+          <DropdownMenuContent sideOffset={2} className='content scroll-container' css={{ maxHeight: '$11', backgroundColor: '$bgDefault', color: '$text' }}>
             <DropdownMenuRadioGroup value={property}>
               {properties.length > 0
                 && properties.map((property, index) => <PropertyDropdownMenuRadioElement key={index} property={property} index={index} propertySelected={onPropertySelected} />)}

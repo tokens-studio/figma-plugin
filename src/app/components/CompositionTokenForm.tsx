@@ -6,21 +6,26 @@ import Heading from './Heading';
 import IconButton from './IconButton';
 import Box from './Box';
 import SingleCompositionTokenForm from './SingleCompositionTokenForm';
-import { CompositionTokenProperty, CompositionTokenValue } from '@/types/CompositionTokenProperty';
+import { CompositionTokenProperty } from '@/types/CompositionTokenProperty';
+import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 
 export default function CompositionTokenForm({
   internalEditToken,
   setTokenValue,
+  error,
+  setError
 }: {
   internalEditToken: SingleCompositionToken;
-  setTokenValue: (newTokenValue: CompositionTokenValue) => void;
+  setTokenValue: (newTokenValue: NodeTokenRefMap) => void;
+  error: string | null;
+  setError: (newError: string | null) => void;
 }) {
-  const defaultOrderObj: CompositionTokenValue = {};
+  const defaultOrderObj: NodeTokenRefMap = {};
   Object.keys(internalEditToken.value).map((key, index) => {
     defaultOrderObj[key as CompositionTokenProperty] = String(index);
   });
   const [orderObj, setOrderObj] = React.useState(defaultOrderObj);
-  const [error, setError] = React.useState(false);
+  // const [error, setError] = React.useState(false);
 
   const propertiesMenu = React.useMemo(() => (
     Object.keys(Properties).map((key: string) => (
@@ -29,31 +34,27 @@ export default function CompositionTokenForm({
   ), [Properties]);
 
   // keep order of the properties in composition token
-  const arrangedTokenValue = React.useMemo<CompositionTokenValue>(() => {
+  const arrangedTokenValue = React.useMemo<NodeTokenRefMap>(() => {
     return Object.assign({}, ...Object.keys(internalEditToken.value).sort((a, b) => Number(orderObj[a as CompositionTokenProperty]) - Number(orderObj[b as CompositionTokenProperty]))
       .map(x => { return { [x as CompositionTokenProperty]: internalEditToken.value[x as CompositionTokenProperty] } }))
   }, [internalEditToken, orderObj]);
 
   const addToken = useCallback(() => {
     if(internalEditToken.value.hasOwnProperty('') || Object.keys(internalEditToken.value).length === 0 ) {
-      setError(true);
+      setError('Property must be exist');
     }
     internalEditToken.value['' as CompositionTokenProperty] = '';
-    setTokenValue(internalEditToken.value);
+    setTokenValue(internalEditToken.value as NodeTokenRefMap);
   }, [internalEditToken]);
 
   const removeToken = useCallback((property: string) => {
     delete internalEditToken.value[property as CompositionTokenProperty];
-    setTokenValue(internalEditToken.value);
+    setTokenValue(internalEditToken.value as NodeTokenRefMap);
   }, [internalEditToken]);
 
   const handleOrderObj = useCallback((newOrderObj: object) => {
     setOrderObj(newOrderObj);
   }, [orderObj])
-
-  const handleError = useCallback((newError: boolean) => {
-    setError(newError);
-  }, [error])
 
   return (
     <div>
@@ -78,8 +79,8 @@ export default function CompositionTokenForm({
               error={error}
               setTokenValue={setTokenValue}
               onRemove={removeToken}
-              handleOrderObj={handleOrderObj}
-              handleError={handleError}
+              setOrderObj={handleOrderObj}
+              setError={setError}
             />
           ) : (
             Object.entries(arrangedTokenValue).map(([property, value], index) => (
@@ -93,8 +94,8 @@ export default function CompositionTokenForm({
                 error={error}
                 setTokenValue={setTokenValue}
                 onRemove={removeToken}
-                handleOrderObj={handleOrderObj}
-                handleError={handleError}
+                setOrderObj={handleOrderObj}
+                setError={setError}
                 />
             ))
           )
