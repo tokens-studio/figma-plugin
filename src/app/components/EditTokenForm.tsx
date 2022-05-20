@@ -10,7 +10,7 @@ import Input from './Input';
 import ColorPicker from './ColorPicker';
 import useConfirm from '../hooks/useConfirm';
 import useTokens from '../store/useTokens';
-import { SingleBoxShadowToken, SingleCompositionToken } from '@/types/tokens';
+import { SingleBoxShadowToken } from '@/types/tokens';
 import { checkIfContainsAlias, getAliasValue } from '@/utils/alias';
 import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
 import { activeTokenSetSelector, editTokenSelector } from '@/selectors';
@@ -24,11 +24,6 @@ import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 
 type Props = {
   resolvedTokens: ResolveTokenValuesResult[];
-};
-
-type CompositionTokenToArrayItem = {
-  property: string,
-  value: string
 };
 
 // @TODO this needs to be reviewed from a typings perspective + performance
