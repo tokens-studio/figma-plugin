@@ -123,13 +123,6 @@ export const TokenButton: React.FC<Props> = ({
       // distructure composition token when it is unselected
       const compositionToken = tokensContext.resolvedTokens.find((token) => token.name === tokenValue);
       const tokensInCompositionToken: CompositionTokenValue = {};
-      // if (Array.isArray(compositionToken?.rawValue)) {
-      //   compositionToken?.rawValue.forEach((token) => {
-      //     tokensInCompositionToken[(token as TokenCompositionValue).property as keyof typeof Properties] = 'delete';
-      //   });
-      // } else {
-      //   tokensInCompositionToken[(compositionToken?.rawValue as TokenCompositionValue).property as keyof typeof Properties] = 'delete';
-      // }
       if (compositionToken) {
         Object.keys(compositionToken.value).forEach((property: string) => {
           tokensInCompositionToken[property as CompositionTokenProperty] = 'delete';

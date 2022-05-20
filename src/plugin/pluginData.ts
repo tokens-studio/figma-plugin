@@ -13,6 +13,7 @@ import { tokensSharedDataHandler } from './SharedDataHandler';
 import { defaultWorker } from './Worker';
 import { ProgressTracker } from './ProgressTracker';
 import { SelectionGroup, SelectionValue } from '@/types';
+import { CompositionTokenProperty } from '@/types/CompositionTokenProperty';
 
 // @TODO FIX TYPINGS! Missing or bad typings are very difficult for other developers to work in
 
@@ -121,34 +122,29 @@ export async function updatePluginData({
         const resolvedToken = tokensMap?.get(currentValuesOnNode.composition);
         let removeProperties: String[] = [];
         if (resolvedToken) {
-          if (Array.isArray(resolvedToken.rawValue)) {
-            removeProperties = resolvedToken?.rawValue.map((item) => (
-              item.property
-            ));  
-          }
-          else {
-            removeProperties.push(resolvedToken?.rawValue.property);
-          }
+          removeProperties = Object.keys(resolvedToken?.rawValue).map((property) => (
+            property
+          ));
         }
         if (removeProperties && removeProperties.length > 0) {
           await Promise.all(removeProperties.map(async (property) => {
             await removePluginData({ nodes: [node], key: property as Properties, shouldRemoveValues: shouldRemove });
-          }));  
+          }));
         }
       }
 
       await Promise.all(Object.entries(newValuesOnNode).map(async ([key, value]) => {
-        if (value === currentValuesOnNode[key] && !shouldOverride) {
+        if (value === currentValuesOnNode[key as CompositionTokenProperty] && !shouldOverride) {
           return;
         }
 
         const jsonValue = JSON.stringify(value);
         switch (value) {
           case 'delete':
-            delete newValuesOnNode[key];
+            delete newValuesOnNode[key as CompositionTokenProperty];
             await removePluginData({ nodes: [node], key: key as Properties, shouldRemoveValues: shouldRemove });
             break;
-            // Pre-Version 53 had horizontalPadding and verticalPadding.
+          // Pre-Version 53 had horizontalPadding and verticalPadding.
           case 'horizontalPadding':
             newValuesOnNode.paddingLeft = jsonValue;
             newValuesOnNode.paddingRight = jsonValue;
