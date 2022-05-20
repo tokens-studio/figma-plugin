@@ -10,7 +10,6 @@ import {
   DropdownMenuRadioGroup,
 } from './DropdownMenu';
 import { PropertyDropdownMenuRadioElement } from './PropertyDropdownMenuRadioElement';
-import { CompositionTokenValue } from '@/types/CompositionTokenValue';
 import { Properties } from '@/constants/Properties';
 import { CompositionTokenProperty, CompositionTokenValue } from '@/types/CompositionTokenProperty';
 

@@ -98,7 +98,6 @@ export function resolveTokenValues(tokens: SingleToken[], previousCount: number 
         }
       })
       returnValue = compositionReturnValue;
-      console.log("compostion", compositionReturnValue)
     }
     else {
       // If we're not dealing with special tokens, just return resolved value

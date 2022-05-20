@@ -23,7 +23,7 @@ export const TokenTooltipContentValue: React.FC<Props> = ({ token, shouldResolve
   const { getTokenValue } = useTokens();
   const valueToCheck = React.useMemo(() => {
     if (shouldResolve && tokenIsShadowOrTypographyAlias) {
-      let nameToLookFor: String;
+      let nameToLookFor: string = '';
       const tokenValueString = String(token.value);
       if (tokenIsShadowOrTypographyAlias && tokenValueString.charAt(0) === '$') nameToLookFor = tokenValueString.slice(1, tokenValueString.length);
       if (tokenIsShadowOrTypographyAlias && tokenValueString.charAt(0) === '{') nameToLookFor = tokenValueString.slice(1, tokenValueString.length - 1);
@@ -33,6 +33,10 @@ export const TokenTooltipContentValue: React.FC<Props> = ({ token, shouldResolve
     if (shouldResolve) return getTokenValue(token.name, tokensContext.resolvedTokens)?.value;
     return token.value;
   }, [token, getTokenValue, shouldResolve, tokenIsShadowOrTypographyAlias, tokensContext.resolvedTokens]);
+
+  React.useEffect(() => {
+    console.log("token", token)
+  }, [token])
 
   if (isSingleTypographyToken(token)) {
     return (
@@ -45,24 +49,18 @@ export const TokenTooltipContentValue: React.FC<Props> = ({ token, shouldResolve
   }
   
   if (isSingleCompositionToken(token)) {
-    if (Array.isArray(valueToCheck)) {
       return (
+        valueToCheck && 
         <div>
-          {valueToCheck.map((t) => (
+          {Object.entries(valueToCheck).map(([property, value], index) => (
             <SingleCompositionValueDisplay
-              key={seed(t)}
-              value={t}
+              key={seed(index)}
+              property={property}
+              value={value}
             />
           ))}
         </div>
       );
-    }
-
-    return (
-      <SingleCompositionValueDisplay
-        value={valueToCheck as TokenCompositionValue}
-      />
-    );
   }
 
   if (isSingleBoxShadowToken(token)) {
