@@ -43,7 +43,7 @@ export const TokenTooltipContentValue: React.FC<Props> = ({ token, shouldResolve
       />
     );
   }
-  
+
   if (isSingleCompositionToken(token)) {
     if (Array.isArray(valueToCheck)) {
       return (
