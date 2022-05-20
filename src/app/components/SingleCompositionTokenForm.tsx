@@ -10,9 +10,9 @@ import {
   DropdownMenuRadioGroup,
 } from './DropdownMenu';
 import { PropertyDropdownMenuRadioElement } from './PropertyDropdownMenuRadioElement';
-import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
+import { CompositionTokenValue } from '@/types/CompositionTokenValue';
 import { Properties } from '@/constants/Properties';
-import { CompositionTokenProperty } from '@/types/CompositionTokenProperty';
+import { CompositionTokenProperty, CompositionTokenValue } from '@/types/CompositionTokenProperty';
 
 export default function SingleCompositionTokenForm({
   index,
@@ -29,10 +29,10 @@ export default function SingleCompositionTokenForm({
   index: number;
   property: string;
   value: string;
-  tokenValue: NodeTokenRefMap;
+  tokenValue: CompositionTokenValue;
   properties: string[];
   error: boolean;
-  setTokenValue: (neweTokenValue: NodeTokenRefMap) => void;
+  setTokenValue: (neweTokenValue: CompositionTokenValue) => void;
   onRemove: (property: string) => void;
   handleOrderObj: (newOrderObj: object) => void;
   handleError: (newError: false) => void;
@@ -40,7 +40,7 @@ export default function SingleCompositionTokenForm({
   const [menuOpened, setMenuOpened] = useState(false);
   const onPropertySelected = useCallback((newProperty: string) => {
     // keep the order of the properties when select new property
-    const newOrderObj: NodeTokenRefMap = {};
+    const newOrderObj: CompositionTokenValue = {};
     let keysInTokenValue = Object.keys(tokenValue);
     keysInTokenValue.splice(index, 1, newProperty);
     keysInTokenValue.map((key, index) => {

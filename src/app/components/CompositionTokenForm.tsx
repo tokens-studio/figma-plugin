@@ -6,17 +6,16 @@ import Heading from './Heading';
 import IconButton from './IconButton';
 import Box from './Box';
 import SingleCompositionTokenForm from './SingleCompositionTokenForm';
-import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
-import { CompositionTokenProperty } from '@/types/CompositionTokenProperty';
+import { CompositionTokenProperty, CompositionTokenValue } from '@/types/CompositionTokenProperty';
 
 export default function CompositionTokenForm({
   internalEditToken,
   setTokenValue,
 }: {
   internalEditToken: SingleCompositionToken;
-  setTokenValue: (newTokenValue: NodeTokenRefMap) => void;
+  setTokenValue: (newTokenValue: CompositionTokenValue) => void;
 }) {
-  const defaultOrderObj: NodeTokenRefMap = {};
+  const defaultOrderObj: CompositionTokenValue = {};
   Object.keys(internalEditToken.value).map((key, index) => {
     defaultOrderObj[key as CompositionTokenProperty] = String(index);
   });
@@ -30,7 +29,7 @@ export default function CompositionTokenForm({
   ), [Properties]);
 
   // keep order of the properties in composition token
-  const arrangedTokenValue = React.useMemo<NodeTokenRefMap>(() => {
+  const arrangedTokenValue = React.useMemo<CompositionTokenValue>(() => {
     return Object.assign({}, ...Object.keys(internalEditToken.value).sort((a, b) => Number(orderObj[a as CompositionTokenProperty]) - Number(orderObj[b as CompositionTokenProperty]))
       .map(x => { return { [x as CompositionTokenProperty]: internalEditToken.value[x as CompositionTokenProperty] } }))
   }, [internalEditToken, orderObj]);
