@@ -1,6 +1,4 @@
-import { borderRadius } from 'polished';
 import { distructureCompositionToken, mapValuesToTokens, returnValueToLookFor } from './node';
-
 
 const singleShadowToken = {
   type: 'boxShadow',
@@ -51,79 +49,59 @@ const tokens = new Map([
     {
       name: 'global.colors.blue',
       type: 'color' as const,
-      value: '#0000ff'
-    }
+      value: '#0000ff',
+    },
   ],
   ['global.composition.singleProperty',
     {
       name: 'global.composition.singleProperty',
       type: 'composition' as const,
       value: {
-        property: 'opacity',
-        value: '40%'
+        opacity: '40%',
       },
       rawValue: {
-        property: 'opacity',
-        value: '{opacity.40}'
-      }
-    }
+        opacity: '{opacity.40}',
+      },
+    },
   ],
   ['global.composition.multipleProperty',
     {
       name: 'global.composition.multipleProperty',
       type: 'composition' as const,
-      value: [
-        {
-          property: 'opacity',
-          value: '40%'
-        },
-        {
-          property: 'borderRadius',
-          value: '24px'
-        },
-      ],
-      rawValue: [
-        {
-          property: 'opacity',
-          value: '{opacity.40}'
-        },
-        {
-          property: 'borderRadius',
-          value: '{borde-radius.7}'
-        }
-      ]
-    }
+      value: {
+        opacity: '40%',
+        borderRadius: '24px',
+      },
+      rawValue: {
+        opacity: '{opacity.40}',
+        borderRadius: '{borde-radius.7}',
+      },
+    },
   ],
   ['global.composition.containSingleBoxshadow',
     {
       name: 'global.composition.containSingleBoxshadow',
       type: 'composition' as const,
-      value:
-      {
-        property: 'boxShadow',
-        value: '[object Object]'
+      value: {
+        boxShadow: singleShadowToken.value,
       },
-      rawValue:
-      {
-        property: 'boxShadow',
-        value: '{global.shadow.single}'
+      rawValue: {
+        boxShadow: '{global.shadow.single}',
       },
-    }
+    },
   ],
   ['global.composition.containMultiBoxshadow',
     {
       name: 'global.composition.containMultiBoxshadow',
       type: 'composition' as const,
       value: {
-        property: 'boxShadow',
-        value: '[object Object]'
+        boxShadow: multipleShadowToken.value,
       },
       rawValue:
       {
-        property: 'boxShadow',
-        value: '{global.shadow.multiple}'
-      }
-    }
+        boxShadow: '{global.shadow.multiple}',
+      },
+    },
   ],
   ['global.shadow.single',
     {
@@ -131,15 +109,15 @@ const tokens = new Map([
       name: 'shadow.single',
       rawValue: singleShadowToken.value,
       value: singleShadowToken.value,
-    }
+    },
   ],
   ['global.shadow.multiple',
     {
       ...multipleShadowToken,
       name: 'shadow.multiple',
       rawValue: multipleShadowToken.value,
-      value: multipleShadowToken.value
-    }
+      value: multipleShadowToken.value,
+    },
   ],
 ]);
 
@@ -156,26 +134,30 @@ const values = [
 const mappedTokens = [
   { fill: '#0000ff' },
   {
-    composition: [{ property: 'opacity', value: '40%' }]
+    composition: { opacity: '40%' },
   },
   {
-    composition: [
-      { property: 'opacity', value: '40%' },
-      { property: 'borderRadius', value: '24px' },
-    ]
+    composition: {
+      opacity: '40%',
+      borderRadius: '24px',
+    },
   },
   {
-    composition: [{ property: 'boxShadow', value: singleShadowToken.value }]
+    composition: {
+      boxShadow: singleShadowToken.value,
+    },
   },
   {
-    composition: [{ property: 'boxShadow', value: multipleShadowToken.value}]
+    composition: {
+      boxShadow: multipleShadowToken.value,
+    },
   },
   {
-    boxShadow: singleShadowToken.value
+    boxShadow: singleShadowToken.value,
   },
   {
-    boxShadow: multipleShadowToken.value
-  }
+    boxShadow: multipleShadowToken.value,
+  },
 ];
 
 const applyProperties = [
@@ -186,23 +168,23 @@ const applyProperties = [
   { boxShadow: multipleShadowToken.value },
   { boxShadow: singleShadowToken.value },
   { boxShadow: multipleShadowToken.value },
-]
+];
 
 describe('mapValuesToTokens', () => {
   it('maps values to tokens', () => {
-    values.map((value, index) => {
+    values.forEach((value, index) => {
       expect(mapValuesToTokens(tokens, value)).toEqual(mappedTokens[index]);
-    })
+    });
   });
 });
 
 describe('distructureCompositionToken', () => {
   it('return properties in compositionToken', () => {
-    mappedTokens.map((token, index) => {
-      expect(distructureCompositionToken(token)).toEqual(applyProperties[index])
-    })
-  })
-})
+    mappedTokens.forEach((token, index) => {
+      expect(distructureCompositionToken(token)).toEqual(applyProperties[index]);
+    });
+  });
+});
 
 describe('returnValueToLookFor', () => {
   it('returns value that were looking for', () => {
