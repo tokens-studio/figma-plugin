@@ -194,6 +194,10 @@ function EditTokenForm({ resolvedTokens }: Props) {
       if (internalEditToken.isPristine) {
         track('Create token', { type: internalEditToken.type });
         createSingleToken({
+          description: (
+            internalEditToken.description
+            ?? internalEditToken.oldDescription
+          ),
           parent: activeTokenSet,
           name: newName,
           type,
@@ -201,6 +205,10 @@ function EditTokenForm({ resolvedTokens }: Props) {
         });
       } else {
         editSingleToken({
+          description: (
+            internalEditToken.description
+            ?? internalEditToken.oldDescription
+          ),
           parent: activeTokenSet,
           name: newName,
           oldName,
