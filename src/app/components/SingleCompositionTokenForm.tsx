@@ -1,4 +1,5 @@
 import React, { useCallback, useState } from 'react';
+import { useUIDSeed } from 'react-uid';
 import IconMinus from '@/icons/minus.svg';
 import IconButton from './IconButton';
 import Box from './Box';
@@ -38,13 +39,15 @@ export default function SingleCompositionTokenForm({
   setError: (newError: string | null) => void;
 }) {
   const [menuOpened, setMenuOpened] = useState(false);
+  const seed = useUIDSeed();
+
   const onPropertySelected = useCallback((newProperty: string) => {
     // keep the order of the properties when select new property
     const newOrderObj: NodeTokenRefMap = {};
-    let keysInTokenValue = Object.keys(tokenValue);
+    const keysInTokenValue = Object.keys(tokenValue);
     keysInTokenValue.splice(index, 1, newProperty);
-    keysInTokenValue.map((key, index) => {
-      newOrderObj[key as keyof typeof Properties] = String(index)
+    keysInTokenValue.forEach((key, index) => {
+      newOrderObj[key as keyof typeof Properties] = String(index);
     });
     setOrderObj(newOrderObj);
 
@@ -76,7 +79,7 @@ export default function SingleCompositionTokenForm({
         alignItems: 'center',
         gap: '$3',
         '& > label': {
-          flex: 3,
+          flex: 4,
           fontSize: '$5 !important',
           '& > div > input': {
             height: '$10',
@@ -85,13 +88,13 @@ export default function SingleCompositionTokenForm({
       }}
       >
         <DropdownMenu open={menuOpened} onOpenChange={handleToggleMenu}>
-          <DropdownMenuTrigger css={{ flex: 4, minHeight: '$10', border: `1px solid ${error && property.length === 0 ? '$fgDanger' : '$borderMuted'}` }}>
+          <DropdownMenuTrigger css={{ flex: 3, minHeight: '$10', border: `1px solid ${error && property.length === 0 ? '$fgDanger' : '$borderMuted'}` }}>
             <span>{property}</span>
           </DropdownMenuTrigger>
-          <DropdownMenuContent sideOffset={2} className='content scroll-container' css={{ maxHeight: '$11', backgroundColor: '$bgDefault', color: '$text' }}>
+          <DropdownMenuContent sideOffset={2} className="content scroll-container" css={{ maxHeight: '$11', backgroundColor: '$bgDefault', color: '$text' }}>
             <DropdownMenuRadioGroup value={property}>
               {properties.length > 0
-                && properties.map((property, index) => <PropertyDropdownMenuRadioElement key={index} property={property} index={index} propertySelected={onPropertySelected} />)}
+                && properties.map((property, index) => <PropertyDropdownMenuRadioElement key={`property-${seed(index)}`} property={property} index={index} propertySelected={onPropertySelected} />)}
             </DropdownMenuRadioGroup>
           </DropdownMenuContent>
         </DropdownMenu>
