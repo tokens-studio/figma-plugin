@@ -71,21 +71,19 @@ export default function SingleCompositionTokenForm({
         alignItems: 'center',
         gap: '$3',
         '& > label': {
-          flex: 1,
+          flex: 3,
           fontSize: '$5 !important',
           '& > div > input': {
-            flex: 2,
-            marginRight: '$5',
             height: '$10',
           },
         },
       }}
       >
         <DropdownMenu open={menuOpened} onOpenChange={handleToggleMenu}>
-          <DropdownMenuTrigger css={{ flex: 2, minHeight: '38px', border: '1px solid black' }}>
+          <DropdownMenuTrigger css={{ flex: 4, minHeight: '$10',   border: '1px solid $borderMuted' }}>
             <span>{property}</span>
           </DropdownMenuTrigger>
-          <DropdownMenuContent sideOffset={2} className='content scroll-container' css={{ maxHeight: '140px' }}>
+          <DropdownMenuContent sideOffset={2} className='content scroll-container' css={{ maxHeight: '$11', backgroundColor: '$bgDefault', color: '$text'}}>
             <DropdownMenuRadioGroup value={property}>
               {properties.length > 0
                 && properties.map((property, index) => <PropertyDropdownMenuRadioElement property={property} index={index} propertySelected={onPropertySelected} />)}
