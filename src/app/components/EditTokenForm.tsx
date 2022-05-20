@@ -101,7 +101,6 @@ function EditTokenForm({ resolvedTokens }: Props) {
   const handleCompositionChange = React.useCallback(
     (newTokenValue: NodeTokenRefMap) => {
       setError(null);
-      console.log("setNewToken", newTokenValue)
       if (internalEditToken?.type === TokenTypes.COMPOSITION) {
         setInternalEditToken((prev) => ({ ...prev, value: newTokenValue } as EditTokenObject));
       }
@@ -109,9 +108,6 @@ function EditTokenForm({ resolvedTokens }: Props) {
     [internalEditToken],
   );
 
-  React.useEffect(() => {
-    console.log("edit", internalEditToken)
-  }, [internalEditToken])
   const handleBoxShadowChangeByAlias = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>(
     (e) => {
       setError(null);
@@ -306,7 +302,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
         return (
           <CompositionTokenForm
             internalEditToken={internalEditToken}
-            setValue={handleCompositionChange}
+            setTokenValue={handleCompositionChange}
           />
         );
       }

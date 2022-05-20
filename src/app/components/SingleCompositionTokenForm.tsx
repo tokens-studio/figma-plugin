@@ -12,6 +12,7 @@ import {
 import { PropertyDropdownMenuRadioElement } from './PropertyDropdownMenuRadioElement';
 import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 import { Properties } from '@/constants/Properties';
+import { compositionTokenProperty } from '@/types/CompositionTokenProperty';
 
 export default function SingleCompositionTokenForm({
   index,
@@ -19,65 +20,39 @@ export default function SingleCompositionTokenForm({
   value,
   tokenValue,
   properties,
-  orderObj,
-  setValue,
+  setTokenValue,
   onRemove,
   handleOrderObj
 }: {
   index: number;
   property: string;
   value: string;
-  tokenValue: NodeTokenRefMap
+  tokenValue: NodeTokenRefMap;
   properties: string[],
-  orderObj: NodeTokenRefMap;
-  setValue: (neweTokenValue: NodeTokenRefMap) => void;
+  setTokenValue: (neweTokenValue: NodeTokenRefMap) => void;
   onRemove: (property: string) => void;
   handleOrderObj: (newOrderObj: object) => void;
 }) {
   const [menuOpened, setMenuOpened] = useState(false);
   const onPropertySelected = useCallback((newProperty: string) => {
-    // if (Array.isArray(tokens)) {
-    //   let values = tokens;
-    //   const newToken = { ...tokens[index], property };
-    //   values.splice(index, 1, newToken);
-    //   setValue(values);
-    // } else {
-    //   setValue({ ...tokens, property });
-    // }
-    // setMenuOpened(false);
-    let newTokenValue = tokenValue;
-    let keysInTokenValue = Object.keys(newTokenValue);
+    // keep the order of the properties when select new property
+    const newOrderObj: NodeTokenRefMap = {};
+    let keysInTokenValue = Object.keys(tokenValue);
     keysInTokenValue.splice(index, 1, newProperty);
-    console.log("keysinTokenvalue", keysInTokenValue);
-    let newOrderObj: Object = {};
     keysInTokenValue.map((key, index) => {
-      Object.defineProperty(newOrderObj, key, {
-        value: index
-      })
+      newOrderObj[key as keyof typeof Properties] = String(index)
     });
-    console.log("neweorderobj", newOrderObj)
     handleOrderObj(newOrderObj);
-    delete newTokenValue[property as keyof typeof Properties];
-    Object.defineProperty(newTokenValue, newProperty, {
-      value: ''
-    });
-    console.log("firstnewTokenvalue", newTokenValue)
-    setValue(newTokenValue);
+
+    // set newTokenValue
+    delete tokenValue[property as keyof typeof Properties];
+    tokenValue[newProperty as keyof typeof Properties] = value;
+    setTokenValue(tokenValue);
   }, [tokenValue]);
 
   const onAliasChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    // if (Array.isArray(tokens)) {
-    //   let values = tokens;
-    //   const newToken = { ...tokens[index], value: e.target.value };
-    //   values.splice(index, 1, newToken);
-    //   setValue(values);
-    // } else {
-    //   setValue({ ...tokens, value: e.target.value });
-    // }
-      let newTokenValue = tokenValue;
-      newTokenValue[property as keyof typeof Properties] = e.target.value;
-      console.log("aliaschange", newTokenValue)
-      setValue(newTokenValue);
+    tokenValue[property as compositionTokenProperty] = e.target.value;
+    setTokenValue(tokenValue);
   }, [tokenValue]);
 
   const handleToggleMenu = useCallback(() => {
@@ -85,13 +60,9 @@ export default function SingleCompositionTokenForm({
   }, [menuOpened]);
 
   const handleRemove = useCallback(() => {
-    console.log("remove", property)
     onRemove(property);
   }, [onRemove, property]);
 
-  React.useEffect(() => {
-    console.log("value", value, "property", property, "tokenvalue", tokenValue)
-  }, [property, value, tokenValue])
   return (
     <Box>
       <Box css={{
@@ -111,10 +82,10 @@ export default function SingleCompositionTokenForm({
       }}
       >
         <DropdownMenu open={menuOpened} onOpenChange={handleToggleMenu}>
-          <DropdownMenuTrigger css={{flex: 2, minHeight: '38px', border: '1px solid black'}}>
+          <DropdownMenuTrigger css={{ flex: 2, minHeight: '38px', border: '1px solid black' }}>
             <span>{property}</span>
           </DropdownMenuTrigger>
-          <DropdownMenuContent sideOffset={2} className='content scroll-container' css={{maxHeight: '140px'}}>
+          <DropdownMenuContent sideOffset={2} className='content scroll-container' css={{ maxHeight: '140px' }}>
             <DropdownMenuRadioGroup value={property}>
               {properties.length > 0
                 && properties.map((property, index) => <PropertyDropdownMenuRadioElement property={property} index={index} propertySelected={onPropertySelected} />)}

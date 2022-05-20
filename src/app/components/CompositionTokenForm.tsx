@@ -7,86 +7,55 @@ import IconButton from './IconButton';
 import Box from './Box';
 import SingleCompositionTokenForm from './SingleCompositionTokenForm';
 import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
-import tokenTypes from '@/config/tokenTypes';
+import { compositionTokenProperty } from '@/types/CompositionTokenProperty';
 
 export default function CompositionTokenForm({
   internalEditToken,
-  setValue,
+  setTokenValue,
 }: {
   internalEditToken: SingleCompositionToken;
-  setValue: (newTokenValue: NodeTokenRefMap) => void;
+  setTokenValue: (newTokenValue: NodeTokenRefMap) => void;
 }) {
-  const [orderObj, setOrderObj] = React.useState({});
+  const defaultOrderObj: NodeTokenRefMap = {};
+  Object.keys(internalEditToken.value).map((key, index) => {
+    defaultOrderObj[key as compositionTokenProperty] = String(index);
+  });
+  const [orderObj, setOrderObj] = React.useState(defaultOrderObj);
 
   const propertiesMenu = React.useMemo(() => (
     Object.keys(Properties).map((key: string) => (
-      String(Properties[key as keyof typeof Properties])
+      String(Properties[key as compositionTokenProperty])
     ))
   ), [Properties]);
 
-  React.useEffect(() => {
-    let newOrderObj: object = {};
-    Object.keys(internalEditToken.value).map((key, index) => {
-      Object.defineProperty(newOrderObj, key, {
-        value: index
-      })
-    });
-    console.log("didmount", newOrderObj);
-    setOrderObj(newOrderObj);
-  }, []);
+  // React.useEffect(() => {
+  //   let newOrderObj: NodeTokenRefMap = {};
+  //   Object.keys(internalEditToken.value).map((key, index) => {
+  //     newOrderObj[key as compositionTokenProperty] = String(index);
+  //   });
+  //   setOrderObj(newOrderObj);
+  // }, []);
 
-  const arrangedTokenValue: NodeTokenRefMap = React.useMemo(() => {
-    console.log("usememeo", internalEditToken.value, "orderobj", orderObj)
-    let newOrderObj: object = {};
-    Object.entries(internalEditToken.value).forEach(([key, value]) => {
-      newOrderObj[key] = value;
-    })
-    console.log("neworderobjdddd", newOrderObj)
-    console.log("keys", Object.keys(newOrderObj))
-    console.log("sadfasfdsadf", ...Object.keys(newOrderObj).sort((a, b) => orderObj[a] - orderObj[b]))
-    const res = Object.assign({}, ...Object.keys(newOrderObj).sort((a, b) => orderObj[a] - orderObj[b]).map(x => { return { [x]: newOrderObj[x]}}))
-    console.log("finalnewOrder", res)
-    return res;
+  // keep order of the properties in composition token
+  const arrangedTokenValue = React.useMemo<NodeTokenRefMap>(() => {
+    const tokenValue = internalEditToken.value;
+    return Object.assign({}, ...Object.keys(tokenValue).sort((a, b) => Number(orderObj[a as compositionTokenProperty]) - Number(orderObj[b as compositionTokenProperty]))
+      .map(x => { return { [x as compositionTokenProperty]: tokenValue[x as compositionTokenProperty] } }))
   }, [internalEditToken, orderObj]);
 
-  React.useEffect(() => {
-    console.log("arranged", arrangedTokenValue)
-    console.log("ifif", (internalEditToken.value === {}))
-  }, [arrangedTokenValue])
-  // const compositionTokenToArray = React.useMemo(() => {
-  //   console.log("usememo", internalEditToken.value)
-  //   if (internalEditToken.value === null) {
-  //     return [newToken];
-  //   }
-  //   return Object.entries(internalEditToken.value).map(([key, value]) => (
-  //     {
-  //       property: key,
-  //       value,
-  //     }
-  //   ));
-  // }, [internalEditToken]);
-
   const addToken = useCallback(() => {
-    // if (Array.isArray(internalEditToken.value)) {
-    //   setValue([...internalEditToken.value, newToken]);
-    // } else {
-    //   setValue([internalEditToken.value, newToken]);
-    // }
     const newTokenValue = internalEditToken.value;
-    Object.defineProperty(newTokenValue, '', {
-      value: ''
-    });
-    setValue(newTokenValue);
+    newTokenValue['' as compositionTokenProperty] = '';
+    setTokenValue(newTokenValue);
   }, [internalEditToken]);
 
   const removeToken = useCallback((property: string) => {
     const newTokenValue = internalEditToken.value;
-    delete newTokenValue[property as keyof typeof Properties];
-    setValue(newTokenValue);
+    delete newTokenValue[property as compositionTokenProperty];
+    setTokenValue(newTokenValue);
   }, [internalEditToken]);
 
   const handleOrderObj = (newOrderObj: object) => {
-    console.log("setNewOrderobj", newOrderObj)
     setOrderObj(newOrderObj);
   }
 
@@ -108,10 +77,9 @@ export default function CompositionTokenForm({
               index={0}
               property=''
               value=''
-              tokenValue={{}}
+              tokenValue={arrangedTokenValue}
               properties={propertiesMenu}
-              orderObj={orderObj}
-              setValue={setValue}
+              setTokenValue={setTokenValue}
               onRemove={removeToken}
               handleOrderObj={handleOrderObj}
             />
@@ -122,10 +90,9 @@ export default function CompositionTokenForm({
                 index={index}
                 property={property}
                 value={value}
-                tokenValue={internalEditToken.value}
+                tokenValue={arrangedTokenValue}
                 properties={propertiesMenu}
-                orderObj={orderObj}
-                setValue={setValue}
+                setTokenValue={setTokenValue}
                 onRemove={removeToken}
                 handleOrderObj={handleOrderObj}
               />

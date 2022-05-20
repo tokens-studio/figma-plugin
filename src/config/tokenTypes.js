@@ -1,3 +1,5 @@
+import { object } from "dot-object";
+
 const tokenTypes = {
   sizing: {
     label: 'Size',
