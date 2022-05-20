@@ -18,8 +18,8 @@ import { ProgressTracker } from './ProgressTracker';
 import { AnyTokenList, AnyTokenSet, TokenStore } from '@/types/tokens';
 import { isSingleToken } from '@/utils/is';
 import { ThemeObjectsList, UsedTokenSetsMap } from '@/types';
-import { TokenTypes } from '@/constants/TokenTypes';
 import { attemptOrFallback } from '@/utils/attemptOrFallback';
+import { CompositionTokenProperty } from '@/types/CompositionTokenProperty';
 
 // @TODO fix typings
 
@@ -43,52 +43,13 @@ export function mapValuesToTokens(tokens: Map<string, AnyTokenList[number]>, val
   const mappedValues = Object.entries(values).reduce((acc, [key, tokenOnNode]) => {
     const resolvedToken = tokens.get(tokenOnNode);
     if (!resolvedToken) return acc;
-    if (isSingleToken(resolvedToken)) {
-      // typography or boxshadow property in composition token resovle alias
-      if (resolvedToken && resolvedToken.type === TokenTypes.COMPOSITION && resolvedToken.rawValue) {
-        const tokensInComposition: Array<Object> = [];
-        if (Array.isArray(resolvedToken.rawValue)) {
-          for (let index = 0; index < resolvedToken.rawValue.length; index++) {
-            const currentTokenWithRawValue = resolvedToken.rawValue[index];
-            if (currentTokenWithRawValue.property === TokenTypes.TYPOGRAPHY || currentTokenWithRawValue.property === TokenTypes.BOX_SHADOW) {
-              let strExcludedSymbol: string = '';
-              if (String(currentTokenWithRawValue.value).startsWith('$')) strExcludedSymbol = String(currentTokenWithRawValue.value).slice(1, String(currentTokenWithRawValue.value).length);
-              if (String(currentTokenWithRawValue.value).startsWith('{')) strExcludedSymbol = String(currentTokenWithRawValue.value).slice(1, String(currentTokenWithRawValue.value).length - 1);
-              tokensInComposition.push({
-                property: currentTokenWithRawValue.property,
-                value: tokens.get(strExcludedSymbol)?.value,
-              });
-            } else {
-              tokensInComposition.push({
-                property: currentTokenWithRawValue.property,
-                value: resolvedToken.value[index].value,
-              });
-            }
-          }
-        } else {
-          const currentTokenWithRawValue = resolvedToken.rawValue;
-          if (currentTokenWithRawValue.property === TokenTypes.TYPOGRAPHY || currentTokenWithRawValue.property === TokenTypes.BOX_SHADOW) {
-            let strExcludedSymbol: string = '';
-            if (String(currentTokenWithRawValue.value).startsWith('$')) strExcludedSymbol = String(currentTokenWithRawValue.value).slice(1, String(currentTokenWithRawValue.value).length);
-            if (String(currentTokenWithRawValue.value).startsWith('{')) strExcludedSymbol = String(currentTokenWithRawValue.value).slice(1, String(currentTokenWithRawValue.value).length - 1);
-            tokensInComposition.push({
-              property: currentTokenWithRawValue.property,
-              value: tokens.get(strExcludedSymbol)?.value,
-            });
-          } else {
-            tokensInComposition.push({
-              property: currentTokenWithRawValue.property,
-              value: resolvedToken.value.value,
-            });
-          }
-        }
-        acc[key] = tokensInComposition;
-      } else acc[key] = resolvedToken[returnValueToLookFor(key)];
-    } else acc[key] = resolvedToken;
+
+    acc[key] = isSingleToken(resolvedToken) ? resolvedToken[returnValueToLookFor(key)] : resolvedToken;
     return acc;
   }, {});
   return mappedValues;
 }
+
 
 export function setTokensOnDocument(tokens: AnyTokenSet, updatedAt: string, usedTokenSet: UsedTokenSetsMap, checkForChanges: string) {
   tokensSharedDataHandler.set(figma.root, SharedPluginDataKeys.tokens.version, pjs.plugin_version);
@@ -175,13 +136,10 @@ export function selectNodes(ids: string[]) {
 export function distructureCompositionToken(values: Partial<Record<Properties, string>>): Object {
   const tokensInCompositionToken: NodeTokenRefMap = {};
   if (values && values.composition) {
-    if (Array.isArray(values.composition)) {
-      values.composition.map((value) => {
-        tokensInCompositionToken[value.property] = value.value;
-      });
-    } else {
-      tokensInCompositionToken[values.composition.value.property] = values.composition.value.value;
-    }
+    Object.entries(values.composition).forEach(([property, value]) => {
+      tokensInCompositionToken[property as CompositionTokenProperty] = value;
+    })
+
     const { composition, ...objExcludedCompositionToken } = values;
     values = { ...tokensInCompositionToken, ...objExcludedCompositionToken };
   }
@@ -192,23 +150,18 @@ export function distructureCompositionTokenForAlias(tokens: Map<string, AnyToken
   if (values && values.composition) {
     const resolvedToken = tokens.get(values.composition);
     const tokensInCompositionToken: NodeTokenRefMap = {};
-    if (resolvedToken?.rawValue && Array.isArray(resolvedToken?.rawValue)) {
-      resolvedToken?.rawValue.map((token) => {
+    if (resolvedToken?.rawValue) {
+      Object.entries(resolvedToken?.rawValue).map(([property, value]) => {
         let strExcludedSymbol: string = '';
-        if (String(token.value).startsWith('$')) strExcludedSymbol = String(token.value).slice(1, String(token.value).length);
-        if (String(token.value).startsWith('{')) strExcludedSymbol = String(token.value).slice(1, String(token.value).length - 1);
-        tokensInCompositionToken[token.property] = strExcludedSymbol;
+        if (String(value).startsWith('$')) strExcludedSymbol = String(value).slice(1, String(value).length);
+        if (String(value).startsWith('{')) strExcludedSymbol = String(value).slice(1, String(value).length - 1);
+        tokensInCompositionToken[property as CompositionTokenProperty] = strExcludedSymbol;
       });
-    } else if (resolvedToken?.rawValue) {
-      let strExcludedSymbol: string = '';
-      if (String(resolvedToken?.rawValue.value).startsWith('$')) strExcludedSymbol = String(resolvedToken?.rawValue.value).slice(1, String(resolvedToken?.rawValue.value).length);
-      if (String(resolvedToken?.rawValue.value).startsWith('{')) strExcludedSymbol = String(resolvedToken?.rawValue.value).slice(1, String(resolvedToken?.rawValue.value).length - 1);
-      tokensInCompositionToken[resolvedToken?.rawValue.property] = strExcludedSymbol;
+      const { composition, ...objExcludedCompositionToken } = values;
+      values = { ...tokensInCompositionToken, ...objExcludedCompositionToken };
     }
-    const { composition, ...objExcludedCompositionToken } = values;
-    values = { ...tokensInCompositionToken, ...objExcludedCompositionToken };
+    return values;
   }
-  return values;
 }
 
 export async function updateNodes(

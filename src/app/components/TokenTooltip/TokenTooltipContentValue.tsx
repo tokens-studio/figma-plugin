@@ -6,7 +6,7 @@ import { SingleShadowValueDisplay } from './SingleShadowValueDisplay';
 import { TokensContext } from '@/context';
 import { isSingleBoxShadowToken, isSingleTypographyToken, isSingleCompositionToken } from '@/utils/is';
 import { SingleTypographyValueDisplay } from './SingleTypograhpyValueDisplay';
-import { TokenBoxshadowValue, TokenCompositionValue } from '@/types/values';
+import { TokenBoxshadowValue } from '@/types/values';
 import Box from '../Box';
 import { SingleCompositionValueDisplay } from './SingleCompositionValueDisplay';
 
@@ -34,10 +34,6 @@ export const TokenTooltipContentValue: React.FC<Props> = ({ token, shouldResolve
     return token.value;
   }, [token, getTokenValue, shouldResolve, tokenIsShadowOrTypographyAlias, tokensContext.resolvedTokens]);
 
-  React.useEffect(() => {
-    console.log("token", token)
-  }, [token])
-
   if (isSingleTypographyToken(token)) {
     return (
       <SingleTypographyValueDisplay
@@ -47,10 +43,10 @@ export const TokenTooltipContentValue: React.FC<Props> = ({ token, shouldResolve
       />
     );
   }
-  
+
   if (isSingleCompositionToken(token)) {
-      return (
-        valueToCheck && 
+    return (
+      valueToCheck ? (
         <div>
           {Object.entries(valueToCheck).map(([property, value], index) => (
             <SingleCompositionValueDisplay
@@ -60,7 +56,8 @@ export const TokenTooltipContentValue: React.FC<Props> = ({ token, shouldResolve
             />
           ))}
         </div>
-      );
+      ) : null
+    );
   }
 
   if (isSingleBoxShadowToken(token)) {
