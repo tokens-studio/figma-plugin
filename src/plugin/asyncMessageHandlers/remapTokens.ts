@@ -1,5 +1,8 @@
 import { AsyncMessageChannelHandlers } from '@/AsyncMessageChannel';
+import { UpdateMode } from '@/constants/UpdateMode';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
+import { tokenArrayGroupToMap } from '@/utils/tokenArrayGroupToMap';
+import { updateNodes } from '../node';
 import { defaultNodeManager, NodeManagerNode } from '../NodeManager';
 import { updatePluginData } from '../pluginData';
 import { sendSelectionChange } from '../sendSelectionChange';
@@ -42,6 +45,10 @@ export const remapTokens: AsyncMessageChannelHandlers[AsyncMessageTypes.REMAP_TO
     await updatePluginData({ entries: updatedNodes, values: {}, shouldOverride: true });
 
     await sendSelectionChange();
+    if (msg.tokens && updateMode === UpdateMode.SELECTION) {
+      const tokensMap = tokenArrayGroupToMap(msg.tokens);
+      await updateNodes(updatedNodes, tokensMap, msg.settings);
+    }
   } catch (e) {
     console.error(e);
   }

@@ -51,7 +51,7 @@ export default function InspectorTokenSingle({
   }, []);
 
   const onConfirm = React.useCallback(() => {
-    handleRemap(token.category, token.value, newTokenName);
+    handleRemap(token.category, token.value, newTokenName, resolvedTokens);
     setShowDialog(false);
   }, [token, handleRemap, newTokenName]);
 

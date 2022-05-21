@@ -70,6 +70,8 @@ export type RemapTokensAsyncMessage = AsyncMessage<AsyncMessageTypes.REMAP_TOKEN
   newName: string;
   updateMode: UpdateMode;
   category?: Properties | TokenTypes;
+  tokens?: AnyTokenList;
+  settings?: SettingsState;
 }>;
 export type RemapTokensMessageAsyncResult = AsyncMessage<AsyncMessageTypes.REMAP_TOKENS>;
 

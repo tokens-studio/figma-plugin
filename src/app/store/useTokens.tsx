@@ -1,4 +1,4 @@
-import { useSelector } from 'react-redux';
+import { useSelector, useStore } from 'react-redux';
 import { useCallback, useMemo } from 'react';
 import {
   AnyTokenList,
@@ -24,8 +24,7 @@ import { UpdateMode } from '@/constants/UpdateMode';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { NodeInfo } from '@/types/NodeInfo';
-
-// @TODO fix typings
+import type { RootState } from '../store';
 
 type ConfirmResult =
   ('textStyles' | 'colorStyles' | 'effectStyles')[]
@@ -46,6 +45,7 @@ export default function useTokens() {
   const tokens = useSelector(tokensSelector);
   const settings = useSelector(settingsStateSelector, isEqual);
   const { confirm } = useConfirm<ConfirmResult>();
+  const store = useStore<RootState>();
 
   // Gets value of token
   const getTokenValue = useCallback((name: string, resolved: AnyTokenList) => (
@@ -113,15 +113,17 @@ export default function useTokens() {
     });
   }, []);
 
-  const handleRemap = useCallback(async (type: Properties | TokenTypes, name: string, newTokenName: string) => {
+  const handleRemap = useCallback(async (type: Properties | TokenTypes, name: string, newTokenName: string, resolvedTokens: SingleToken[]) => {
+    const settings = settingsStateSelector(store.getState());
     track('remapToken', { fromInspect: true });
-
     AsyncMessageChannel.message({
       type: AsyncMessageTypes.REMAP_TOKENS,
       category: type,
       oldName: name,
       newName: newTokenName,
       updateMode: UpdateMode.SELECTION,
+      tokens: resolvedTokens,
+      settings,
     });
   }, [confirm]);
 
