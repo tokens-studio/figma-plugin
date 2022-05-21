@@ -21,7 +21,6 @@ export default function SingleCompositionTokenForm({
   value,
   tokenValue,
   properties,
-  error,
   setTokenValue,
   onRemove,
   setOrderObj,
@@ -32,11 +31,10 @@ export default function SingleCompositionTokenForm({
   value: string;
   tokenValue: NodeTokenRefMap;
   properties: string[];
-  error: string | null;
   setTokenValue: (neweTokenValue: NodeTokenRefMap) => void;
   onRemove: (property: string) => void;
   setOrderObj: (newOrderObj: object) => void;
-  setError: (newError: string | null) => void;
+  setError: (newError: boolean) => void;
 }) {
   const [menuOpened, setMenuOpened] = useState(false);
   const seed = useUIDSeed();
@@ -55,7 +53,7 @@ export default function SingleCompositionTokenForm({
     delete tokenValue[property as keyof typeof Properties];
     tokenValue[newProperty as keyof typeof Properties] = value;
     setTokenValue(tokenValue);
-    setError(null);
+    setError(false);
   }, [tokenValue]);
 
   const onAliasChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -88,10 +86,11 @@ export default function SingleCompositionTokenForm({
       }}
       >
         <DropdownMenu open={menuOpened} onOpenChange={handleToggleMenu}>
-          <DropdownMenuTrigger css={{ flex: 3, minHeight: '$10', border: `1px solid ${error && property.length === 0 ? '$fgDanger' : '$borderMuted'}` }}>
-            <span>{property}</span>
+          <DropdownMenuTrigger bordered css={{ flex: 3, minHeight: '$10' }}>
+            <span>{property || 'Choose a property'}</span>
           </DropdownMenuTrigger>
-          <DropdownMenuContent sideOffset={2} className="content scroll-container" css={{ maxHeight: '$11', backgroundColor: '$bgDefault', color: '$text' }}>
+          <DropdownMenuContent sideOffset={2} className="content scroll-container" css={{ maxHeight: '$dropdownMaxHeight' }}>
+            {' '}
             <DropdownMenuRadioGroup value={property}>
               {properties.length > 0
                 && properties.map((property, index) => <PropertyDropdownMenuRadioElement key={`property-${seed(index)}`} property={property} index={index} propertySelected={onPropertySelected} />)}

@@ -39,7 +39,13 @@ function EditTokenForm({ resolvedTokens }: Props) {
   const [internalEditToken, setInternalEditToken] = React.useState<typeof editToken>(editToken);
   const { confirm } = useConfirm();
 
-  const isValid = React.useMemo(() => internalEditToken?.value && !error, [internalEditToken, error]);
+  const isValid = React.useMemo(() => {
+    if (internalEditToken?.type === TokenTypes.COMPOSITION
+      && (internalEditToken.value.hasOwnProperty('') || Object.keys(internalEditToken.value).length === 0)) {
+      return false;
+    }
+    return internalEditToken?.value && !error;
+  }, [internalEditToken, error]);
 
   const hasNameThatExistsAlready = React.useMemo(
     () => resolvedTokens
@@ -101,10 +107,6 @@ function EditTokenForm({ resolvedTokens }: Props) {
     },
     [internalEditToken],
   );
-
-  const handleError = React.useCallback((newError: string | null) => {
-    setError(newError);
-  }, [error])
 
   const handleBoxShadowChangeByAlias = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>(
     (e) => {
@@ -241,11 +243,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
   const handleSubmit = React.useCallback(
     (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
-      if (internalEditToken?.type === TokenTypes.COMPOSITION &&
-        (internalEditToken.value.hasOwnProperty('') || Object.keys(internalEditToken.value).length === 0)) {
-        setError('Property must be exist');
-      }
-      else if (isValid && internalEditToken) {
+      if (isValid && internalEditToken) {
         submitTokenValue(internalEditToken);
         dispatch.uiState.setShowEditForm(false);
       }
@@ -305,8 +303,6 @@ function EditTokenForm({ resolvedTokens }: Props) {
           <CompositionTokenForm
             internalEditToken={internalEditToken}
             setTokenValue={handleCompositionChange}
-            error={error}
-            setError={handleError}
           />
         );
       }

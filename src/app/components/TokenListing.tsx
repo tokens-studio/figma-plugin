@@ -89,7 +89,7 @@ const TokenListing: React.FC<Props> = ({
 
   return (
     <div className="border-b border-border-muted" data-cy={`tokenlisting-${tokenKey}`}>
-      <div className="relative flex items-center justify-between space-x-8 mb-4">
+      <div className="relative flex items-center justify-between space-x-8">
         <button
           className={`flex items-center w-full h-full p-4 space-x-2 hover:bg-background-subtle focus:outline-none ${
             isIntCollapsed ? 'opacity-50' : null

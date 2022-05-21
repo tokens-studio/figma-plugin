@@ -107,7 +107,6 @@ export const {
       8: '48px',
       9: '64px',
       10: '38px',
-      11: '140px',
     },
     sizes: {
       1: '2px',
@@ -119,7 +118,7 @@ export const {
       7: '32px',
       8: '48px',
       10: '38px',
-      11: '140px',
+      dropdownMaxHeight: '170px',
     },
     radii: {
       default: globalTokens.radii.sm,

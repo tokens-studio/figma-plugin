@@ -8,7 +8,7 @@ type Props = {
 };
 
 export const SingleCompositionValueDisplay: React.FC<Props> = ({ property, value }) => (
-  <Box css={{ color: '$bgDefault' }}>
+  <Box css={{ color: '$fgToolTipMuted' }}>
     {property}
     {' : '}
     {value.toString()}

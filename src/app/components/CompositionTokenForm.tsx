@@ -13,16 +13,13 @@ import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 export default function CompositionTokenForm({
   internalEditToken,
   setTokenValue,
-  error,
-  setError,
 }: {
   internalEditToken: SingleCompositionToken;
   setTokenValue: (newTokenValue: NodeTokenRefMap) => void;
-  error: string | null;
-  setError: (newError: string | null) => void;
 }) {
   const seed = useUIDSeed();
   const [orderObj, setOrderObj] = React.useState({});
+  const [error, setError] = React.useState(false);
   const propertiesMenu = React.useMemo(() => (
     Object.keys(Properties).map((key: string) => (
       String(Properties[key as CompositionTokenProperty])
@@ -45,7 +42,7 @@ export default function CompositionTokenForm({
 
   const addToken = useCallback(() => {
     if (internalEditToken.value.hasOwnProperty('') || Object.keys(internalEditToken.value).length === 0) {
-      setError('Property must be exist');
+      setError(true);
     }
     internalEditToken.value['' as CompositionTokenProperty] = '';
     setTokenValue(internalEditToken.value as NodeTokenRefMap);
@@ -65,10 +62,11 @@ export default function CompositionTokenForm({
       <Box css={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Heading size="small">Tokens</Heading>
         <IconButton
-          tooltip="Add another style"
+          tooltip={error ? 'Choose a property first' : 'Add another style'}
           dataCy="button-style-add-multiple"
           onClick={addToken}
           icon={<IconPlus />}
+          disabled={error}
         />
       </Box>
       <Box css={{ display: 'flex', flexDirection: 'column', gap: '$4' }}>
@@ -80,7 +78,6 @@ export default function CompositionTokenForm({
               value=""
               tokenValue={arrangedTokenValue}
               properties={propertiesMenu}
-              error={error}
               setTokenValue={setTokenValue}
               onRemove={removeToken}
               setOrderObj={handleOrderObj}
@@ -95,7 +92,6 @@ export default function CompositionTokenForm({
                 value={value}
                 tokenValue={arrangedTokenValue}
                 properties={propertiesMenu}
-                error={error}
                 setTokenValue={setTokenValue}
                 onRemove={removeToken}
                 setOrderObj={handleOrderObj}
