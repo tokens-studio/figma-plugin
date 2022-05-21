@@ -48,7 +48,7 @@ export function mapValuesToTokens(tokens: Map<string, AnyTokenList[number]>, val
       if (resolvedToken && resolvedToken.type === TokenTypes.COMPOSITION && resolvedToken.rawValue) {
         const tokensInComposition: Array<Object> = [];
         if (Array.isArray(resolvedToken.rawValue)) {
-          for (let index = 0; index < resolvedToken.rawValue.length; index++) {
+          for (let index = 0; index < resolvedToken.rawValue.length; index += 1) {
             const currentTokenWithRawValue = resolvedToken.rawValue[index];
             if (currentTokenWithRawValue.property === TokenTypes.TYPOGRAPHY || currentTokenWithRawValue.property === TokenTypes.BOX_SHADOW) {
               let strExcludedSymbol: string = '';
@@ -133,7 +133,7 @@ export function getTokenData(): {
         activeTheme,
         updatedAt,
         version,
-        checkForChanges
+        checkForChanges,
       };
     }
   } catch (e) {
@@ -176,7 +176,7 @@ export function distructureCompositionToken(values: Partial<Record<Properties, s
   const tokensInCompositionToken: NodeTokenRefMap = {};
   if (values && values.composition) {
     if (Array.isArray(values.composition)) {
-      values.composition.map((value) => {
+      values.composition.forEach((value) => {
         tokensInCompositionToken[value.property] = value.value;
       });
     } else {
@@ -193,7 +193,7 @@ export function distructureCompositionTokenForAlias(tokens: Map<string, AnyToken
     const resolvedToken = tokens.get(values.composition);
     const tokensInCompositionToken: NodeTokenRefMap = {};
     if (resolvedToken?.rawValue && Array.isArray(resolvedToken?.rawValue)) {
-      resolvedToken?.rawValue.map((token) => {
+      resolvedToken?.rawValue.forEach((token) => {
         let strExcludedSymbol: string = '';
         if (String(token.value).startsWith('$')) strExcludedSymbol = String(token.value).slice(1, String(token.value).length);
         if (String(token.value).startsWith('{')) strExcludedSymbol = String(token.value).slice(1, String(token.value).length - 1);

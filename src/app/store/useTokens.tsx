@@ -1,5 +1,6 @@
-import { useSelector } from 'react-redux';
+import { useSelector, useStore } from 'react-redux';
 import { useCallback, useMemo } from 'react';
+import { RootState } from '@/app/store';
 import { postToFigma } from '@/plugin/notifiers';
 import { MessageToPluginTypes } from '@/types/messages';
 import {
@@ -45,6 +46,7 @@ export default function useTokens() {
   const tokens = useSelector(tokensSelector);
   const settings = useSelector(settingsStateSelector, isEqual);
   const { confirm } = useConfirm<ConfirmResult>();
+  const store = useStore<RootState>();
 
   // Gets value of token
   const getTokenValue = useCallback((name: string, resolved: AnyTokenList) => (
@@ -112,16 +114,18 @@ export default function useTokens() {
     });
   }, []);
 
-  const handleRemap = useCallback(async (type: Properties | TokenTypes, name: string, newTokenName: string) => {
-
-      track('remapToken', { fromInspect: true });
-      postToFigma({
-        type: MessageToPluginTypes.REMAP_TOKENS,
-        category: type,
-        oldName: name,
-        newName: newTokenName,
-        updateMode: UpdateMode.SELECTION,
-      });
+  const handleRemap = useCallback(async (type: Properties | TokenTypes, name: string, newTokenName: string, resolvedTokens: SingleToken[]) => {
+    const settings = settingsStateSelector(store.getState());
+    track('remapToken', { fromInspect: true });
+    postToFigma({
+      type: MessageToPluginTypes.REMAP_TOKENS,
+      category: type,
+      oldName: name,
+      newName: newTokenName,
+      updateMode: UpdateMode.SELECTION,
+      tokens: resolvedTokens,
+      settings,
+    });
   }, [confirm]);
 
   // Calls Figma with an old name and new name and asks it to update all tokens that use the old name
