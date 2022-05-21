@@ -255,7 +255,7 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
         }, []);
         await updatePluginData({ entries: updatedNodes, values: {}, shouldOverride: true });
         await sendSelectionChange();
-        if (updateMode === UpdateMode.SELECTION) {
+        if (msg.tokens && updateMode === UpdateMode.SELECTION) {
           const tokensMap = tokenArrayGroupToMap(msg.tokens);
           await updateNodes(updatedNodes, tokensMap, msg.settings);
         }
