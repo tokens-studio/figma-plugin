@@ -227,6 +227,7 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
         const allWithData = await defaultNodeManager.findNodesWithData({
           updateMode,
         });
+        console.log("updatemode", updateMode, "category", category, "allwidta", allWithData)
 
         // Go through allWithData and update all appearances of oldName to newName
         const updatedNodes = allWithData.reduce((all, node) => {
@@ -245,6 +246,7 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
             }
             return acc;
           }, {});
+          console.log("updatedTokens", updatedTokens)
           if (shouldBeRemapped) {
             all.push({
               ...node,
@@ -253,8 +255,10 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
           }
           return all;
         }, []);
+        console.log("updatedNOde", updatedNodes)
+        
         await updatePluginData({ entries: updatedNodes, values: {}, shouldOverride: true });
-
+        // await updateNodes(updatedNodes, tokensMap, msg.settings)
         await sendSelectionChange();
         notifyRemoteComponents({
           nodes: store.successfulNodes.size,

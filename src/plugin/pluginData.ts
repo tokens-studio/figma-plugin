@@ -46,6 +46,7 @@ export type SelectionContent = {
 };
 
 export async function sendPluginValues({ nodes, values, shouldSendSelectionValues }: { nodes: readonly BaseNode[], values?: NodeTokenRefMap, shouldSendSelectionValues: boolean }): Promise<SelectionContent> {
+  console.log("values", values)
   let pluginValues = values;
   let mainNodeSelectionValues = [];
   let selectionValues;

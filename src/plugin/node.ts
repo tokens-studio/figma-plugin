@@ -216,6 +216,7 @@ export async function updateNodes(
   tokens: Map<string, AnyTokenList[number]>,
   settings?: UpdateNodesSettings,
 ) {
+  console.log("entries", entries, "tokens", tokens, "setting", settings)
   const { ignoreFirstPartForStyles } = settings ?? {};
   const figmaStyleMaps = getAllFigmaStyleMaps();
   postToUI({
