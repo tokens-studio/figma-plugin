@@ -254,8 +254,11 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
           return all;
         }, []);
         await updatePluginData({ entries: updatedNodes, values: {}, shouldOverride: true });
-
         await sendSelectionChange();
+        if (msg.tokens && updateMode === UpdateMode.SELECTION) {
+          const tokensMap = tokenArrayGroupToMap(msg.tokens);
+          await updateNodes(updatedNodes, tokensMap, msg.settings);
+        }
         notifyRemoteComponents({
           nodes: store.successfulNodes.size,
           remotes: store.remoteComponents,

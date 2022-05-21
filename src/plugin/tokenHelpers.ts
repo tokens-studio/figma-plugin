@@ -6,7 +6,6 @@ import { isSingleToken } from '@/utils/is';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { UsedTokenSetsMap } from '@/types';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
-import { object } from 'zod';
 import { TokenBoxshadowValue } from '@/types/values';
 import { CompositionTokenProperty, CompositionTokenValue } from '@/types/CompositionTokenProperty';
 
@@ -59,8 +58,7 @@ export function resolveTokenValues(tokens: SingleToken[], previousCount: number 
           return acc;
         }, {});
       }
-    }
-    else if (t.type === TokenTypes.COMPOSITION) {
+    } else if (t.type === TokenTypes.COMPOSITION) {
       let itemFailedToResolve = false;
       const compositionReturnValue: CompositionTokenValue = {};
       Object.entries(t.value).forEach(([property, value]) => {
@@ -96,10 +94,9 @@ export function resolveTokenValues(tokens: SingleToken[], previousCount: number 
             failedToResolve = true;
           }
         }
-      })
+      });
       returnValue = compositionReturnValue;
-    }
-    else {
+    } else {
       // If we're not dealing with special tokens, just return resolved value
       returnValue = getAliasValue(t, tokensInProgress);
       failedToResolve = returnValue === null || checkIfContainsAlias(returnValue);
