@@ -140,7 +140,6 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
     case MessageToPluginTypes.SET_NODE_DATA:
       try {
         if (figma.currentPage.selection.length) {
-          console.log("msgtokens", msg.tokens)
           const tokensMap = tokenArrayGroupToMap(msg.tokens);
           const nodes = await defaultNodeManager.update(figma.currentPage.selection);
           await updatePluginData({ entries: nodes, values: msg.values, tokensMap });
@@ -223,12 +222,11 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
     case MessageToPluginTypes.REMAP_TOKENS:
       try {
         const {
-          oldName, newName, updateMode, category, tokens, settings
+          oldName, newName, updateMode, category,
         } = msg;
         const allWithData = await defaultNodeManager.findNodesWithData({
           updateMode,
         });
-        console.log("updatemode", updateMode, "category", category, "allwidta", allWithData)
 
         // Go through allWithData and update all appearances of oldName to newName
         const updatedNodes = allWithData.reduce((all, node) => {
@@ -247,7 +245,6 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
             }
             return acc;
           }, {});
-          console.log("updatedTokens", updatedTokens)
           if (shouldBeRemapped) {
             all.push({
               ...node,
@@ -256,14 +253,12 @@ figma.ui.on('message', async (msg: PostToFigmaMessage) => {
           }
           return all;
         }, []);
-        console.log("updatedNOde", updatedNodes)
-
         await updatePluginData({ entries: updatedNodes, values: {}, shouldOverride: true });
+        await sendSelectionChange();
         if (updateMode === UpdateMode.SELECTION) {
           const tokensMap = tokenArrayGroupToMap(msg.tokens);
-          await updateNodes(updatedNodes, tokensMap, msg.settings)
+          await updateNodes(updatedNodes, tokensMap, msg.settings);
         }
-        await sendSelectionChange();
         notifyRemoteComponents({
           nodes: store.successfulNodes.size,
           remotes: store.remoteComponents,
