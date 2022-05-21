@@ -1,5 +1,6 @@
-import { useSelector } from 'react-redux';
-import { useCallback, useMemo } from 'react';
+import { useSelector, useStore } from 'react-redux';
+import { useCallback, useMemo, useContext } from 'react';
+import { RootState } from '@/app/store';
 import { postToFigma } from '@/plugin/notifiers';
 import { MessageToPluginTypes } from '@/types/messages';
 import {
@@ -11,6 +12,7 @@ import formatTokens from '@/utils/formatTokens';
 import { mergeTokenGroups, resolveTokenValues } from '@/plugin/tokenHelpers';
 import { UpdateMode } from '@/types/state';
 import useConfirm from '../hooks/useConfirm';
+import { TokensContext } from '@/context';
 import { Properties } from '@/constants/Properties';
 import { track } from '@/utils/analytics';
 import { checkIfAlias } from '@/utils/alias';
@@ -45,6 +47,8 @@ export default function useTokens() {
   const tokens = useSelector(tokensSelector);
   const settings = useSelector(settingsStateSelector, isEqual);
   const { confirm } = useConfirm<ConfirmResult>();
+  const tokensContext = useContext(TokensContext);
+  const store = useStore<RootState>();
 
   // Gets value of token
   const getTokenValue = useCallback((name: string, resolved: AnyTokenList) => (
@@ -113,7 +117,7 @@ export default function useTokens() {
   }, []);
 
   const handleRemap = useCallback(async (type: Properties | TokenTypes, name: string, newTokenName: string) => {
-
+    const settings = settingsStateSelector(store.getState());
       track('remapToken', { fromInspect: true });
       postToFigma({
         type: MessageToPluginTypes.REMAP_TOKENS,
@@ -121,6 +125,8 @@ export default function useTokens() {
         oldName: name,
         newName: newTokenName,
         updateMode: UpdateMode.SELECTION,
+        tokens: tokensContext.resolvedTokens,
+        settings
       });
   }, [confirm]);
 
