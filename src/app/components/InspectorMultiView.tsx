@@ -11,6 +11,10 @@ import InspectorTokenGroup from './InspectorTokenGroup';
 import { SingleToken } from '@/types/tokens';
 import { inspectStateSelector, uiStateSelector } from '@/selectors';
 import { isEqual } from '@/utils/isEqual';
+import { TokenTypes } from '@/constants/TokenTypes';
+import { Properties } from '@/constants/Properties';
+import { SelectionGroup } from '@/types';
+import { NodeInfo } from '@/types/NodeInfo';
 
 export default function InspectorMultiView({ resolvedTokens }: { resolvedTokens: SingleToken[] }) {
   const inspectState = useSelector(inspectStateSelector, isEqual);
@@ -23,26 +27,34 @@ export default function InspectorMultiView({ resolvedTokens }: { resolvedTokens:
     dispatch.inspectState.setSelectedTokens([]);
   }, [uiState.selectionValues]);
 
-  const groupedSelectionValues = React.useMemo(() => uiState.selectionValues.reduce((acc, curr) => {
-    if (acc[curr.category]) {
-      const sameValueIndex = acc[curr.category].findIndex((v) => v.value === curr.value);
+  const groupedSelectionValues = React.useMemo(() => (
+    uiState.selectionValues.reduce<Partial<
+    Record<TokenTypes, SelectionGroup[]>
+    & Record<Properties, SelectionGroup[]>
+    >>((acc, curr) => {
+      if (acc[curr.category]) {
+        const sameValueIndex = acc[curr.category]!.findIndex((v) => v.value === curr.value);
 
-      if (sameValueIndex > -1) {
-        acc[curr.category][sameValueIndex].nodes.push(...curr.nodes);
+        if (sameValueIndex > -1) {
+          acc[curr.category]![sameValueIndex].nodes.push(...curr.nodes);
+        } else {
+          acc[curr.category] = [...acc[curr.category]!, curr];
+        }
       } else {
-        acc[curr.category] = [...acc[curr.category], curr];
+        acc[curr.category] = [curr];
       }
-    } else {
-      acc[curr.category] = [curr];
-    }
 
-    return acc;
-  }, {}), [uiState.selectionValues]);
+      return acc;
+    }, {})
+  ), [uiState.selectionValues]);
 
   const removeTokens = React.useCallback(() => {
     const valuesToRemove = uiState.selectionValues
       .filter((v) => inspectState.selectedTokens.includes(`${v.category}-${v.value}`))
-      .map((v) => ({ nodes: v.nodes, property: v.type }));
+      .map((v) => ({ nodes: v.nodes, property: v.type })) as ({
+      property: Properties;
+      nodes: NodeInfo[];
+    }[]);
 
     removeTokensByValue(valuesToRemove);
   }, [inspectState.selectedTokens, removeTokensByValue, uiState.selectionValues]);
@@ -83,7 +95,7 @@ export default function InspectorMultiView({ resolvedTokens }: { resolvedTokens:
               Remove selected
             </Button>
           </Box>
-          {Object.entries(groupedSelectionValues).map((group) => <InspectorTokenGroup key={`inspect-group-${group[0]}`} group={group} resolvedTokens={resolvedTokens} />)}
+          {Object.entries(groupedSelectionValues).map((group) => <InspectorTokenGroup key={`inspect-group-${group[0]}`} group={group as [Properties, SelectionGroup[]]} resolvedTokens={resolvedTokens} />)}
         </Box>
       ) : (
         <Blankslate title={uiState.selectedLayers > 0 ? 'No tokens found' : 'No layers selected'} text={uiState.selectedLayers > 0 ? 'None of the selected layers contain any tokens' : 'Select a layer to see applied tokens'} />

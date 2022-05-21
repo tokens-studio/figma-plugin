@@ -1,5 +1,7 @@
 import { SettingsState } from '@/app/store/models/settings';
-import { AnyTokenList } from '@/types/tokens';
+import {
+  AnyTokenList, SingleBoxShadowToken, SingleColorToken, SingleTypographyToken,
+} from '@/types/tokens';
 import { transformValue } from './helpers';
 import updateColorStyles from './updateColorStyles';
 import updateEffectStyles from './updateEffectStyles';
@@ -16,12 +18,14 @@ export default function updateStyles(
     return {
       ...token,
       name,
-      value: transformValue(token.value, token.type),
+      value: (typeof token.value === 'string')
+        ? transformValue(token.value, token.type)
+        : token.value,
     };
   });
-  const colorTokens = styleTokens.filter((n) => ['color', 'colors'].includes(n.type));
-  const textTokens = styleTokens.filter((n) => ['typography'].includes(n.type));
-  const effectTokens = styleTokens.filter((n) => ['boxShadow'].includes(n.type));
+  const colorTokens = styleTokens.filter((n) => ['color', 'colors'].includes(n.type)) as SingleColorToken[];
+  const textTokens = styleTokens.filter((n) => ['typography'].includes(n.type)) as SingleTypographyToken[];
+  const effectTokens = styleTokens.filter((n) => ['boxShadow'].includes(n.type)) as SingleBoxShadowToken[];
 
   if (!colorTokens && !textTokens && !effectTokens) return;
   if (colorTokens.length > 0) {

@@ -1,17 +1,14 @@
-import React, { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { withLDConsumer } from 'launchdarkly-react-client-sdk';
 import type { LDProps } from 'launchdarkly-react-client-sdk/lib/withLDConsumer';
 import { identify, track } from '@/utils/analytics';
-import { MessageFromPluginTypes, MessageToPluginTypes, PostToUIMessage } from '@/types/messages';
-import useConfirm from '@/app/hooks/useConfirm';
-import { notifyToUI, postToFigma } from '../../plugin/notifiers';
+import { MessageFromPluginTypes, PostToUIMessage } from '@/types/messages';
 import useRemoteTokens from '../store/remoteTokens';
 import { Dispatch } from '../store';
 import useStorage from '../store/useStorage';
 import * as pjs from '../../../package.json';
 import { Tabs } from '@/constants/Tabs';
-import { StorageProviderType, StorageType } from '@/types/api';
 import { GithubTokenStorage } from '@/storage/GithubTokenStorage';
 import { userIdSelector } from '@/selectors/userIdSelector';
 import getLicenseKey from '@/utils/getLicenseKey';
@@ -19,10 +16,14 @@ import { licenseKeySelector } from '@/selectors/licenseKeySelector';
 import { checkedLocalStorageForKeySelector } from '@/selectors/checkedLocalStorageForKeySelector';
 import { AddLicenseSource } from '../store/models/userState';
 import { LicenseStatus } from '@/constants/LicenseStatus';
+import { AsyncMessageChannel } from '@/AsyncMessageChannel';
+import { AsyncMessageTypes } from '@/types/AsyncMessages';
+import { notifyToUI } from '@/plugin/notifiers';
+import { StorageProviderType } from '@/constants/StorageProviderType';
+import useConfirm from '../hooks/useConfirm';
+import { StorageType } from '@/types/StorageType';
 
-type Props = LDProps & {
-  identificationPromise: Promise<LDProps['flags']>
-};
+type Props = LDProps;
 
 function InitiatorContainer({ ldClient }: Props) {
   const dispatch = useDispatch<Dispatch>();
@@ -34,7 +35,7 @@ function InitiatorContainer({ ldClient }: Props) {
   const checkedLocalStorage = useSelector(checkedLocalStorageForKeySelector);
   const userId = useSelector(userIdSelector);
 
-  const askUserIfPull: ((storageType: StorageType | undefined) => Promise<any>) = React.useCallback(async (storageType) => {
+  const askUserIfPull: ((storageType: StorageType | undefined) => Promise<any>) = useCallback(async (storageType) => {
     const shouldPull = await confirm({
       text: `Pull from ${storageType?.provider}?`,
       description: 'You have unsaved changes that will be lost. Do you want to pull from your repo?',
@@ -42,12 +43,17 @@ function InitiatorContainer({ ldClient }: Props) {
     return shouldPull;
   }, [confirm]);
 
-  const onInitiate = React.useCallback(() => postToFigma({ type: MessageToPluginTypes.INITIATE }), []);
-  const getApiCredentials = React.useCallback((shouldPull: boolean) => postToFigma({ type: MessageToPluginTypes.GET_API_CREDENTIALS, shouldPull }), []);
+  const onInitiate = useCallback(() => {
+    AsyncMessageChannel.message({ type: AsyncMessageTypes.INITIATE });
+  }, []);
+  const getApiCredentials = useCallback((shouldPull: boolean) => (
+    AsyncMessageChannel.message({
+      type: AsyncMessageTypes.GET_API_CREDENTIALS,
+      shouldPull,
+    })
+  ), []);
 
   useEffect(() => {
-    if (!ldClient) return;
-
     onInitiate();
     window.onmessage = async (event: {
       data: {
@@ -90,7 +96,7 @@ function InitiatorContainer({ ldClient }: Props) {
             break;
           case MessageFromPluginTypes.TOKEN_VALUES: {
             const { values } = pluginMessage;
-            const existChanges = values.checkForChanges === 'true';
+            const existChanges = values.checkForChanges;
             if (!existChanges || (existChanges && await askUserIfPull(values?.storageType))) {
               getApiCredentials(true);
             } else {
@@ -134,32 +140,50 @@ function InitiatorContainer({ ldClient }: Props) {
               status, credentials, usedTokenSet, shouldPull,
             } = pluginMessage;
             if (status === true) {
-              let receivedFlags;
+              let receivedFlags: LDProps['flags'];
 
-              track('Fetched from remote', { provider: credentials.provider });
-              if (!credentials.internalId) track('missingInternalId', { provider: credentials.provider });
+              try {
+                track('Fetched from remote', { provider: credentials.provider });
+                if (!credentials.internalId) track('missingInternalId', { provider: credentials.provider });
 
-              if (credentials) {
-                const {
-                  id, provider, secret, baseUrl,
-                } = credentials;
-                const [owner, repo] = id.split('/');
-                if (provider === StorageProviderType.GITHUB) {
-                  const storageClient = new GithubTokenStorage(secret, owner, repo, baseUrl);
-                  const branches = await storageClient.fetchBranches();
-                  dispatch.branchState.setBranches(branches);
-                }
+                if (credentials) {
+                  if (
+                    credentials.provider === StorageProviderType.GITHUB
+                    || credentials.provider === StorageProviderType.GITLAB
+                    || credentials.provider === StorageProviderType.ADO
+                  ) {
+                    const {
+                      id, provider, secret, baseUrl,
+                    } = credentials;
+                    const [owner, repo] = id.split('/');
 
-                dispatch.uiState.setApiData(credentials);
-                dispatch.uiState.setLocalApiState(credentials);
-                if (shouldPull) {
-                  const remoteData = await pullTokens({ context: credentials, featureFlags: receivedFlags, usedTokenSet });
-                  const existTokens = Object.values(remoteData?.tokens ?? {}).some((value) => value.length > 0);
-                  if (existTokens) { dispatch.uiState.setActiveTab(Tabs.TOKENS); } else { dispatch.uiState.setActiveTab(Tabs.START); }
+                    const storageClientFactories = {
+                      [StorageProviderType.GITHUB]: GithubTokenStorage,
+                      [StorageProviderType.GITLAB]: GithubTokenStorage,
+                      [StorageProviderType.ADO]: GithubTokenStorage,
+                    };
+
+                    const storageClient = new storageClientFactories[provider](secret, owner, repo, baseUrl);
+                    const branches = await storageClient.fetchBranches();
+                    dispatch.branchState.setBranches(branches);
+                  }
+
+                  dispatch.uiState.setApiData(credentials);
+                  dispatch.uiState.setLocalApiState(credentials);
+
+                  if (shouldPull) {
+                    const remoteData = await pullTokens({ context: credentials, featureFlags: receivedFlags, usedTokenSet });
+                    const existTokens = Object.values(remoteData?.tokens ?? {}).some((value) => value.length > 0);
+                    if (existTokens) { dispatch.uiState.setActiveTab(Tabs.TOKENS); } else { dispatch.uiState.setActiveTab(Tabs.START); }
+                  } else {
+                    dispatch.uiState.setActiveTab(Tabs.TOKENS);
+                  }
                 } else {
-                  dispatch.uiState.setActiveTab(Tabs.TOKENS);
+                  dispatch.uiState.setActiveTab(Tabs.START);
+                  notifyToUI('Failed to fetch tokens, check your credentials', { error: true });
                 }
-              } else {
+              } catch (e) {
+                console.error(e);
                 dispatch.uiState.setActiveTab(Tabs.START);
                 notifyToUI('Failed to fetch tokens, check your credentials', { error: true });
               }

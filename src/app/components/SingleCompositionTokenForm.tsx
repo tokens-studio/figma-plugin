@@ -8,7 +8,7 @@ import {
   PropertySwitchMenu,
   PropertySwitchMenuContent,
   PropertySwitchMenuMainTrigger,
-  PropertySwitchMenuRadioGroup
+  PropertySwitchMenuRadioGroup,
 } from './PropertySwitchMenu';
 import { PropertySwitchMenuRadioElement } from './PropertySwitchMenuRadioElement';
 
@@ -21,37 +21,41 @@ export default function SingleCompositionTokenForm({
   onRemove,
 }: {
   index: number;
-  token: TokenCompositionValue;
-  tokens: TokenCompositionValue | TokenCompositionValue[];
+  token?: TokenCompositionValue;
+  tokens?: TokenCompositionValue | TokenCompositionValue[];
   properties: string[],
   setValue: (property: TokenCompositionValue | TokenCompositionValue[]) => void;
   onRemove: (index: number) => void;
 }) {
-
   const [menuOpened, setMenuOpened] = useState(false);
   const onPropertySelected = useCallback((property: string) => {
     if (Array.isArray(tokens)) {
-      let values = tokens;
+      const values = tokens;
       const newToken = { ...tokens[index], property };
       values.splice(index, 1, newToken);
       setValue(values);
     } else {
-      setValue({ ...tokens, property });
+      setValue({
+        value: tokens?.value ?? '',
+        property,
+      });
     }
     setMenuOpened(false);
-  }, [tokens]);
-
+  }, [index, tokens, setValue]);
 
   const onAliasChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     if (Array.isArray(tokens)) {
-      let values = tokens;
+      const values = tokens;
       const newToken = { ...tokens[index], value: e.target.value };
       values.splice(index, 1, newToken);
       setValue(values);
-    } else {
-      setValue({ ...tokens, value: e.target.value });
+    } else if (tokens) {
+      setValue({
+        property: tokens.property,
+        value: e.target.value,
+      });
     }
-  }, [tokens]);
+  }, [index, tokens, setValue]);
 
   const handleToggleMenu = useCallback(() => {
     setMenuOpened(!menuOpened);
@@ -60,7 +64,7 @@ export default function SingleCompositionTokenForm({
   const handleRemove = useCallback(() => {
     onRemove(index);
   }, [onRemove, index]);
-  
+
   return (
     <Box>
       <Box css={{
@@ -73,19 +77,19 @@ export default function SingleCompositionTokenForm({
           '& > div > input': {
             flex: 2,
             marginRight: '$5',
-            height: '$10'
-          }
-        }
+            height: '$10',
+          },
+        },
       }}
       >
         <PropertySwitchMenu open={menuOpened} onOpenChange={handleToggleMenu}>
           <PropertySwitchMenuMainTrigger>
-            <span>{token.property}</span>
+            <span>{token?.property}</span>
           </PropertySwitchMenuMainTrigger>
           <PropertySwitchMenuContent sideOffset={2}>
-            <PropertySwitchMenuRadioGroup value={token.property}>
+            <PropertySwitchMenuRadioGroup value={token?.property}>
               {properties.length > 0
-              && properties.map((property, index) => <PropertySwitchMenuRadioElement property={property} index={index} propertySelected={onPropertySelected}/>)}
+              && properties.map((property, index) => <PropertySwitchMenuRadioElement property={property} index={index} propertySelected={onPropertySelected} />)}
             </PropertySwitchMenuRadioGroup>
           </PropertySwitchMenuContent>
         </PropertySwitchMenu>
@@ -93,7 +97,7 @@ export default function SingleCompositionTokenForm({
         <Input
           required
           full
-          value={token.value}
+          value={token?.value}
           onChange={onAliasChange}
           type="text"
           name="alias"

@@ -5,6 +5,7 @@ describe('setTextValuesOnTarget', () => {
 
   beforeEach(() => {
     textNodeMock = {
+      description: '',
       type: 'TEXT',
       fontName: {
         family: 'Inter',
@@ -39,6 +40,7 @@ describe('setTextValuesOnTarget', () => {
       description: 'Use with care',
       value: { textDecoration: 'STRIKETHROUGH', textCase: 'TITLE' },
     });
+    console.log(textNodeMock);
     expect(textNodeMock).toEqual({
       ...textNodeMock,
       description: 'Use with care',

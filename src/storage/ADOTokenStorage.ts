@@ -1,8 +1,9 @@
 import * as GitInterfaces from 'azure-devops-node-api/interfaces/GitInterfaces';
 import compact from 'just-compact';
+import { StorageProviderType } from '@/constants/StorageProviderType';
+import { StorageTypeCredentials } from '@/types/StorageType';
 import { GitStorageMetadata, GitTokenStorage } from './GitTokenStorage';
 import { RemoteTokenStorageFile, RemoteTokenStorageSingleTokenSetFile, RemoteTokenStorageThemesFile } from './RemoteTokenStorage';
-import { ContextObject } from '@/types/api';
 
 const apiVersion = 'api-version=6.0';
 
@@ -50,7 +51,7 @@ export class ADOTokenStorage extends GitTokenStorage {
     secret,
     id: repositoryId,
     name: projectId,
-  }: ContextObject) {
+  }: Extract<StorageTypeCredentials, { provider: StorageProviderType.ADO }>) {
     super(secret, '', repositoryId, orgUrl);
     this.orgUrl = orgUrl;
     this.projectId = projectId;

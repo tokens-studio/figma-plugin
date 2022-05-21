@@ -1,7 +1,5 @@
 import React from 'react';
 import { useDispatch } from 'react-redux';
-import { postToFigma } from '@/plugin/notifiers';
-import { MessageToPluginTypes } from '@/types/messages';
 import { Tabs } from '@/constants/Tabs';
 import FigmaMark from '@/icons/figma-mark.svg';
 import FigmaLetter from '@/icons/figma-letter.svg';
@@ -10,6 +8,8 @@ import Stack from './Stack';
 import { Dispatch } from '../store';
 import { styled } from '@/stitches.config';
 import Spinner from './Spinner';
+import { AsyncMessageChannel } from '@/AsyncMessageChannel';
+import { AsyncMessageTypes } from '@/types/AsyncMessages';
 
 const StyledLoadingScreen = styled(Stack, {
   background: '$loadingScreenBg',
@@ -30,8 +30,8 @@ export default function FigmaLoading() {
 
   const handleCancel = React.useCallback(() => {
     dispatch.uiState.setActiveTab(Tabs.START);
-    postToFigma({
-      type: MessageToPluginTypes.CANCEL_OPERATION,
+    AsyncMessageChannel.message({
+      type: AsyncMessageTypes.CANCEL_OPERATION,
     });
   }, [dispatch.uiState]);
 

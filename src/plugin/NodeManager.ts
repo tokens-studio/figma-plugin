@@ -5,7 +5,6 @@ import { EventEmitter } from 'eventemitter3';
 import { Properties } from '@/constants/Properties';
 import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 import { NodeTokenRefValue } from '@/types/NodeTokenRefValue';
-import { UpdateMode } from '@/types/state';
 import { hasTokens } from '@/utils/hasTokens';
 import { SharedPluginDataKeys } from '@/constants/SharedPluginDataKeys';
 import { MessageFromPluginTypes } from '@/types/messages';
@@ -17,8 +16,10 @@ import { postToUI } from './notifiers';
 import { defaultWorker } from './Worker';
 import pkg from '../../package.json';
 import { ProgressTracker } from './ProgressTracker';
+import { UpdateMode } from '@/constants/UpdateMode';
+import { HashProperty, PersistentNodesCacheProperty, VersionProperty } from '@/figmaStorage';
 
-type NodemanagerCacheNode = {
+export type NodemanagerCacheNode = {
   hash: string;
   mainKey?: string;
   tokens: NodeTokenRefMap;
@@ -47,18 +48,20 @@ export class NodeManager {
   private updating: Promise<void> | null = null;
 
   constructor() {
-    if (typeof figma.root !== 'undefined') {
-      const cacheJson = tokensSharedDataHandler.get(figma.root, SharedPluginDataKeys.tokens.persistentNodesCache);
-      if (cacheJson) {
-        const parsedCache = JSON.parse(cacheJson) as [string, NodemanagerCacheNode][];
-        this.persistentNodesCache = new Map(parsedCache);
-      }
+    this.updating = new Promise(async (resolve) => {
+      if (typeof figma.root !== 'undefined') {
+        const parsedCache = await PersistentNodesCacheProperty.read(figma.root);
+        if (parsedCache) {
+          this.persistentNodesCache = new Map(parsedCache);
+        }
 
-      this.emitter.on('cache-update', debounce(() => {
-        const entries = Array.from(this.persistentNodesCache.entries());
-        tokensSharedDataHandler.set(figma.root, SharedPluginDataKeys.tokens.persistentNodesCache, JSON.stringify(entries));
-      }, 500));
-    }
+        this.emitter.on('cache-update', debounce(async () => {
+          const entries = Array.from(this.persistentNodesCache.entries());
+          await PersistentNodesCacheProperty.write(entries);
+        }, 500));
+      }
+      resolve();
+    });
   }
 
   private normalizePluginTokenRef(map: NodeTokenRefMap) {
@@ -76,7 +79,7 @@ export class NodeManager {
   }
 
   private async getNodePluginData(node: BaseNode) {
-    const checksum = tokensSharedDataHandler.get(node, SharedPluginDataKeys.tokens.hash);
+    const checksum = await HashProperty.read(node);
 
     const registeredPersistentEntry = this.persistentNodesCache.get(node.id);
     if (
@@ -97,7 +100,7 @@ export class NodeManager {
     }
 
     const currentPluginVersion = parseInt(pkg.plugin_version, 10);
-    const version = parseIntOrDefault(tokensSharedDataHandler.get(node, SharedPluginDataKeys.tokens.version), 0);
+    const version = parseIntOrDefault(await VersionProperty.read(node), 0);
     const migrationFlags = {
       v72: version && version >= currentPluginVersion,
     };
@@ -185,10 +188,10 @@ export class NodeManager {
 
     if (Object.keys(entry.tokens).length) {
       if (entry.hash !== checksum) {
-        tokensSharedDataHandler.set(node, SharedPluginDataKeys.tokens.hash, checksum);
+        await HashProperty.write(checksum);
       }
       if (version !== currentPluginVersion) {
-        tokensSharedDataHandler.set(node, SharedPluginDataKeys.tokens.version, String(currentPluginVersion));
+        await VersionProperty.write(String(currentPluginVersion));
       }
 
       this.persistentNodesCache.set(entry.id, {
@@ -336,7 +339,7 @@ export class NodeManager {
         });
         entry.tokens = tokens;
         entry.hash = checksum;
-        tokensSharedDataHandler.set(node, SharedPluginDataKeys.tokens.hash, hash(tokens));
+        await HashProperty.write(hash(tokens));
       }
     }
   }

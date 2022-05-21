@@ -1,25 +1,25 @@
-import omit from 'just-omit';
+import compact from 'just-compact';
 import store from './store';
 import setValuesOnNode from './setValuesOnNode';
-import { ContextObject, StorageProviderType, StorageType } from '../types/api';
 import { Properties } from '@/constants/Properties';
 import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 import { NodeManagerNode } from './NodeManager';
 import { UpdateNodesSettings } from '@/types/UpdateNodesSettings';
-import { SharedPluginDataKeys } from '@/constants/SharedPluginDataKeys';
-import { tokensSharedDataHandler } from './SharedDataHandler';
 import { postToUI } from './notifiers';
-import * as pjs from '../../package.json';
 import { MessageFromPluginTypes } from '@/types/messages';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
 import { defaultWorker } from './Worker';
 import { getAllFigmaStyleMaps } from '@/utils/getAllFigmaStyleMaps';
 import { ProgressTracker } from './ProgressTracker';
-import { AnyTokenList, AnyTokenSet, TokenStore } from '@/types/tokens';
+import { AnyTokenList, SingleToken, TokenStore } from '@/types/tokens';
 import { isSingleToken } from '@/utils/is';
-import { ThemeObjectsList, UsedTokenSetsMap } from '@/types';
+import { ThemeObjectsList } from '@/types';
 import { TokenTypes } from '@/constants/TokenTypes';
-import { attemptOrFallback } from '@/utils/attemptOrFallback';
+import { StorageProviderType } from '@/constants/StorageProviderType';
+import { StorageType } from '@/types/StorageType';
+import {
+  ActiveThemeProperty, CheckForChangesProperty, StorageTypeProperty, ThemesProperty, UpdatedAtProperty, ValuesProperty, VersionProperty,
+} from '@/figmaStorage';
 
 // @TODO fix typings
 
@@ -38,15 +38,22 @@ export function returnValueToLookFor(key: string) {
   }
 }
 
-// @TOOD fix object typing
-export function mapValuesToTokens(tokens: Map<string, AnyTokenList[number]>, values: NodeTokenRefMap): object {
-  const mappedValues = Object.entries(values).reduce((acc, [key, tokenOnNode]) => {
+type MapValuesToTokensResult = Record<string, string | SingleToken['value'] | {
+  property: string
+  value?: SingleToken['value'];
+}[]>;
+
+export function mapValuesToTokens(tokens: Map<string, AnyTokenList[number]>, values: NodeTokenRefMap): MapValuesToTokensResult {
+  const mappedValues = Object.entries(values).reduce<MapValuesToTokensResult>((acc, [key, tokenOnNode]) => {
     const resolvedToken = tokens.get(tokenOnNode);
     if (!resolvedToken) return acc;
     if (isSingleToken(resolvedToken)) {
       // typography or boxshadow property in composition token resovle alias
       if (resolvedToken && resolvedToken.type === TokenTypes.COMPOSITION && resolvedToken.rawValue) {
-        const tokensInComposition: Array<Object> = [];
+        const tokensInComposition: {
+          property: string
+          value?: SingleToken['value'];
+        }[] = [];
         if (Array.isArray(resolvedToken.rawValue)) {
           for (let index = 0; index < resolvedToken.rawValue.length; index += 1) {
             const currentTokenWithRawValue = resolvedToken.rawValue[index];
@@ -58,7 +65,7 @@ export function mapValuesToTokens(tokens: Map<string, AnyTokenList[number]>, val
                 property: currentTokenWithRawValue.property,
                 value: tokens.get(strExcludedSymbol)?.value,
               });
-            } else {
+            } else if (Array.isArray(resolvedToken.value)) {
               tokensInComposition.push({
                 property: currentTokenWithRawValue.property,
                 value: resolvedToken.value[index].value,
@@ -75,7 +82,7 @@ export function mapValuesToTokens(tokens: Map<string, AnyTokenList[number]>, val
               property: currentTokenWithRawValue.property,
               value: tokens.get(strExcludedSymbol)?.value,
             });
-          } else {
+          } else if ('value' in resolvedToken.value) {
             tokensInComposition.push({
               property: currentTokenWithRawValue.property,
               value: resolvedToken.value.value,
@@ -83,47 +90,37 @@ export function mapValuesToTokens(tokens: Map<string, AnyTokenList[number]>, val
           }
         }
         acc[key] = tokensInComposition;
-      } else acc[key] = resolvedToken[returnValueToLookFor(key)];
+      } else {
+        const valueToLookFor = returnValueToLookFor(key);
+        const value = resolvedToken[valueToLookFor];
+        if (typeof value !== 'undefined') {
+          acc[key] = value;
+        }
+      }
     } else acc[key] = resolvedToken;
     return acc;
   }, {});
   return mappedValues;
 }
 
-export function setTokensOnDocument(tokens: AnyTokenSet, updatedAt: string, usedTokenSet: UsedTokenSetsMap, checkForChanges: string) {
-  tokensSharedDataHandler.set(figma.root, SharedPluginDataKeys.tokens.version, pjs.plugin_version);
-  tokensSharedDataHandler.set(figma.root, SharedPluginDataKeys.tokens.values, JSON.stringify(tokens));
-  tokensSharedDataHandler.set(figma.root, SharedPluginDataKeys.tokens.updatedAt, updatedAt);
-  tokensSharedDataHandler.set(figma.root, SharedPluginDataKeys.tokens.usedTokenSet, JSON.stringify(usedTokenSet));
-  tokensSharedDataHandler.set(figma.root, SharedPluginDataKeys.tokens.checkForChanges, checkForChanges);
-}
-
-export function getTokenData(): {
+export async function getTokenData(): Promise<{
   values: TokenStore['values'];
   themes: ThemeObjectsList
   activeTheme: string | null
   updatedAt: string;
   version: string;
-  checkForChanges: string
-} | null {
+  checkForChanges: boolean | null
+} | null> {
   try {
-    const values = tokensSharedDataHandler.get(figma.root, SharedPluginDataKeys.tokens.values, (value) => (
-      attemptOrFallback<Record<string, AnyTokenSet>>(() => (value ? JSON.parse(value) : {}), {})
-    ));
-    const themes = tokensSharedDataHandler.get(figma.root, SharedPluginDataKeys.tokens.themes, (value) => (
-      attemptOrFallback<ThemeObjectsList>(() => {
-        const parsedValue = (value ? JSON.parse(value) : []);
-        return Array.isArray(parsedValue) ? parsedValue : [];
-      }, [])
-    ));
-    const activeTheme = tokensSharedDataHandler.get(figma.root, SharedPluginDataKeys.tokens.activeTheme, (value) => (
-      value || null
-    ));
-    const version = tokensSharedDataHandler.get(figma.root, SharedPluginDataKeys.tokens.version);
-    const updatedAt = tokensSharedDataHandler.get(figma.root, SharedPluginDataKeys.tokens.updatedAt);
-    const checkForChanges = tokensSharedDataHandler.get(figma.root, SharedPluginDataKeys.tokens.checkForChanges);
+    const values = await ValuesProperty.read(figma.root) ?? {};
+    const themes = await ThemesProperty.read(figma.root) ?? [];
+    const activeTheme = await ActiveThemeProperty.read(figma.root);
+    const version = await VersionProperty.read(figma.root);
+    const updatedAt = await UpdatedAtProperty.read(figma.root);
+    const checkForChanges = await CheckForChangesProperty.read(figma.root);
+
     if (Object.keys(values).length > 0) {
-      const tokenObject = Object.entries(values).reduce((acc, [key, groupValues]) => {
+      const tokenObject = Object.entries(values).reduce<Record<string, AnyTokenList>>((acc, [key, groupValues]) => {
         acc[key] = typeof groupValues === 'string' ? JSON.parse(groupValues) : groupValues;
         return acc;
       }, {});
@@ -131,8 +128,8 @@ export function getTokenData(): {
         values: tokenObject as TokenStore['values'],
         themes,
         activeTheme,
-        updatedAt,
-        version,
+        updatedAt: updatedAt || '',
+        version: version || '',
         checkForChanges,
       };
     }
@@ -143,44 +140,55 @@ export function getTokenData(): {
 }
 
 // set storage type (i.e. local or some remote provider)
-export function saveStorageType(context: ContextObject) {
-  // remove secret
-  const storageToSave = omit(context, ['secret']);
-  tokensSharedDataHandler.set(figma.root, SharedPluginDataKeys.tokens.storageType, JSON.stringify(storageToSave));
+export async function saveStorageType(context: StorageType) {
+  await StorageTypeProperty.write(context);
 }
 
-export function getSavedStorageType(): StorageType {
-  const values = tokensSharedDataHandler.get(figma.root, SharedPluginDataKeys.tokens.storageType);
+export async function getSavedStorageType(): Promise<StorageType> {
+  // the saved storage types will never contain credentials
+  // as they should not be shared across
+  const storageType = await StorageTypeProperty.read(figma.root);
 
-  if (values) {
-    const context = JSON.parse(values);
-    return context;
+  if (storageType) {
+    return storageType;
   }
   return { provider: StorageProviderType.LOCAL };
 }
 
 export function goToNode(id: string) {
   const node = figma.getNodeById(id);
-  if (node) {
+  if (
+    node
+    && node.type !== 'PAGE'
+    && node.type !== 'DOCUMENT'
+  ) {
     figma.currentPage.selection = [node];
     figma.viewport.scrollAndZoomIntoView([node]);
   }
 }
 
 export function selectNodes(ids: string[]) {
-  const nodes = ids.map(figma.getNodeById);
+  const nodes = compact(ids.map(figma.getNodeById)).filter((node) => (
+    node.type !== 'PAGE' && node.type !== 'DOCUMENT'
+  )) as (Exclude<BaseNode, PageNode | DocumentNode>)[];
   figma.currentPage.selection = nodes;
 }
 
-export function distructureCompositionToken(values: Partial<Record<Properties, string>>): Object {
-  const tokensInCompositionToken: NodeTokenRefMap = {};
+export function destructureCompositionToken(values: MapValuesToTokensResult): MapValuesToTokensResult {
+  const tokensInCompositionToken: Partial<
+  Record<TokenTypes, SingleToken['value']>
+  & Record<Properties, SingleToken['value']>
+  > = {};
   if (values && values.composition) {
     if (Array.isArray(values.composition)) {
       values.composition.forEach((value) => {
-        tokensInCompositionToken[value.property] = value.value;
+        if (typeof value === 'object' && 'value' in value) {
+          tokensInCompositionToken[value.property as Properties] = value.value;
+        }
       });
-    } else {
-      tokensInCompositionToken[values.composition.value.property] = values.composition.value.value;
+    } else if (typeof values.composition === 'object' && 'property' in values.composition) {
+      // @TODO this may not be correct
+      tokensInCompositionToken[values.composition.property as Properties] = values.composition.value;
     }
     const { composition, ...objExcludedCompositionToken } = values;
     values = { ...tokensInCompositionToken, ...objExcludedCompositionToken };
@@ -188,22 +196,24 @@ export function distructureCompositionToken(values: Partial<Record<Properties, s
   return values;
 }
 
-export function distructureCompositionTokenForAlias(tokens: Map<string, AnyTokenList[number]>, values: NodeTokenRefMap): Object {
+export function destructureCompositionTokenForAlias(tokens: Map<string, AnyTokenList[number]>, values: NodeTokenRefMap): NodeTokenRefMap {
   if (values && values.composition) {
     const resolvedToken = tokens.get(values.composition);
     const tokensInCompositionToken: NodeTokenRefMap = {};
     if (resolvedToken?.rawValue && Array.isArray(resolvedToken?.rawValue)) {
       resolvedToken?.rawValue.forEach((token) => {
-        let strExcludedSymbol: string = '';
-        if (String(token.value).startsWith('$')) strExcludedSymbol = String(token.value).slice(1, String(token.value).length);
-        if (String(token.value).startsWith('{')) strExcludedSymbol = String(token.value).slice(1, String(token.value).length - 1);
-        tokensInCompositionToken[token.property] = strExcludedSymbol;
+        if ('value' in token) {
+          let strExcludedSymbol: string = '';
+          if (String(token.value).startsWith('$')) strExcludedSymbol = String(token.value).slice(1, String(token.value).length);
+          if (String(token.value).startsWith('{')) strExcludedSymbol = String(token.value).slice(1, String(token.value).length - 1);
+          tokensInCompositionToken[token.property as Properties] = strExcludedSymbol;
+        }
       });
-    } else if (resolvedToken?.rawValue) {
+    } else if (resolvedToken?.rawValue && typeof resolvedToken.rawValue === 'object' && 'value' in resolvedToken.rawValue) {
       let strExcludedSymbol: string = '';
       if (String(resolvedToken?.rawValue.value).startsWith('$')) strExcludedSymbol = String(resolvedToken?.rawValue.value).slice(1, String(resolvedToken?.rawValue.value).length);
       if (String(resolvedToken?.rawValue.value).startsWith('{')) strExcludedSymbol = String(resolvedToken?.rawValue.value).slice(1, String(resolvedToken?.rawValue.value).length - 1);
-      tokensInCompositionToken[resolvedToken?.rawValue.property] = strExcludedSymbol;
+      tokensInCompositionToken[resolvedToken.rawValue.property as Properties] = strExcludedSymbol;
     }
     const { composition, ...objExcludedCompositionToken } = values;
     values = { ...tokensInCompositionToken, ...objExcludedCompositionToken };
@@ -236,9 +246,9 @@ export async function updateNodes(
       defaultWorker.schedule(async () => {
         try {
           if (entry.tokens) {
-            const mappedTokens = distructureCompositionTokenForAlias(tokens, entry.tokens);
+            const mappedTokens = destructureCompositionTokenForAlias(tokens, entry.tokens);
             let mappedValues = mapValuesToTokens(tokens, entry.tokens);
-            mappedValues = distructureCompositionToken(mappedValues);
+            mappedValues = destructureCompositionToken(mappedValues);
             setValuesOnNode(entry.node, mappedValues, mappedTokens, figmaStyleMaps, ignoreFirstPartForStyles);
             store.successfulNodes.add(entry.node);
             returnedValues.add(entry.tokens);
@@ -260,7 +270,7 @@ export async function updateNodes(
   });
 
   if (returnedValues.size) {
-    return returnedValues[0];
+    return returnedValues.entries().next();
   }
 
   return {};

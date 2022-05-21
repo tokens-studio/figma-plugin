@@ -1,12 +1,14 @@
 import React, { useCallback } from 'react';
+import compact from 'just-compact';
 import { TokenCompositionValue } from '@/types/values';
 import IconPlus from '@/icons/plus.svg';
 import { Properties } from '@/constants/Properties';
-import { SingleCompositionToken } from '@/types/tokens';
+import { EditTokenObject } from '@/types/tokens';
 import Heading from './Heading';
 import IconButton from './IconButton';
 import Box from './Box';
 import SingleCompositionTokenForm from './SingleCompositionTokenForm';
+import { TokenTypes } from '@/constants/TokenTypes';
 
 const newToken: TokenCompositionValue = {
   property: '', value: '',
@@ -16,29 +18,28 @@ export default function CompositionTokenForm({
   internalEditToken,
   setValue,
 }: {
-  internalEditToken: SingleCompositionToken;
+  internalEditToken: Extract<EditTokenObject, { type: TokenTypes.COMPOSITION }>;
   setValue: (style: TokenCompositionValue | TokenCompositionValue[]) => void;
 }) {
-
   const propertiesMenu = React.useMemo(() => (
     Object.keys(Properties).map((key: string) => (
       String(Properties[key as keyof typeof Properties])
     ))
-  ), [Properties]);
+  ), []);
 
   const addToken = useCallback(() => {
     if (Array.isArray(internalEditToken.value)) {
       setValue([...internalEditToken.value, newToken]);
     } else {
-      setValue([internalEditToken.value, newToken]);
+      setValue(compact([internalEditToken.value, newToken]));
     }
-  }, [internalEditToken]);
+  }, [internalEditToken, setValue]);
 
   const removeToken = useCallback((index) => {
     if (Array.isArray(internalEditToken.value)) {
       setValue(internalEditToken.value.filter((_, i) => i !== index));
     }
-  },[internalEditToken]);
+  }, [internalEditToken, setValue]);
 
   return (
     <div>
@@ -69,7 +70,7 @@ export default function CompositionTokenForm({
             index={-1}
             token={internalEditToken.value}
             tokens={internalEditToken.value}
-            key={`single-style`}
+            key="single-style"
             properties={propertiesMenu}
             setValue={setValue}
             onRemove={removeToken}

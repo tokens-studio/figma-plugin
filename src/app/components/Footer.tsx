@@ -8,7 +8,6 @@ import Text from './Text';
 import Stack from './Stack';
 import BranchSelector from './BranchSelector';
 import useRemoteTokens from '../store/remoteTokens';
-import { StorageProviderType } from '../../types/api';
 import {
   localApiStateSelector,
   editProhibitedSelector,
@@ -25,6 +24,8 @@ import FeedbackIcon from '@/icons/feedback.svg';
 import IconButton from './IconButton';
 import { useFlags } from './LaunchDarkly';
 import Tooltip from './Tooltip';
+import { StorageProviderType } from '@/constants/StorageProviderType';
+import { isGitProvider } from '@/utils/is';
 import IconLibrary from '@/icons/library.svg';
 
 export default function Footer() {
@@ -42,7 +43,7 @@ export default function Footer() {
 
   const checkForChanges = React.useCallback(() => {
     const hasChanged = (lastSyncedState !== JSON.stringify([tokens, themes], null, 2));
-    dispatch.tokenState.updateCheckForChanges(String(hasChanged));
+    dispatch.tokenState.updateCheckForChanges(hasChanged);
     return hasChanged;
   }, [lastSyncedState, tokens, themes, dispatch.tokenState]);
 
@@ -82,9 +83,9 @@ export default function Footer() {
       }}
     >
       <Stack direction="row">
-        {localApiState.branch && (
+        {isGitProvider(localApiState) && localApiState.branch && (
           <>
-            {gitBranchSelector && <BranchSelector currentBranch={localApiState.branch} />}
+            {gitBranchSelector && <BranchSelector />}
             <IconButton icon={<DownloadIcon />} onClick={onPullButtonClicked} tooltipSide="top" tooltip={`Pull from ${transformProviderName(storageType.provider)}`} />
             <IconButton badge={hasChanges} icon={<UploadIcon />} onClick={onPushButtonClicked} tooltipSide="top" disabled={editProhibited} tooltip={`Push to ${transformProviderName(storageType.provider)}`} />
           </>

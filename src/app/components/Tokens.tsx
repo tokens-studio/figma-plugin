@@ -18,7 +18,6 @@ import IconListing from '@/icons/listing.svg';
 import IconJSON from '@/icons/json.svg';
 import useConfirm from '../hooks/useConfirm';
 import { track } from '@/utils/analytics';
-import { UpdateMode } from '@/types/state';
 import useTokens from '../store/useTokens';
 import parseTokenValues from '@/utils/parseTokenValues';
 import parseJson from '@/utils/parseJson';
@@ -32,6 +31,7 @@ import { IconToggleableDisclosure } from '@/icons/IconToggleableDisclosure';
 import { styled } from '@/stitches.config';
 import { ManageThemesModal } from './ManageThemesModal';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
+import { UpdateMode } from '@/constants/UpdateMode';
 import { useFlags } from './LaunchDarkly';
 
 const StyledButton = styled('button', {
@@ -299,16 +299,13 @@ function Tokens({ isActive }: { isActive: boolean }) {
               </Box>
             ) : (
               <Box css={{ width: '100%', paddingBottom: '$6' }} className="content scroll-container">
-                {memoizedTokens.map(([key, group]) => (
+                {memoizedTokens.map(([key, { values, ...schema }]) => (
                   <div key={key}>
                     <TokenListing
                       tokenKey={key}
-                      label={group.label || key}
-                      explainer={group.explainer}
-                      schema={group.schema}
-                      property={group.property}
-                      tokenType={group.type}
-                      values={group.values}
+                      label={schema.label || key}
+                      schema={schema}
+                      values={values}
                     />
                   </div>
                 ))}

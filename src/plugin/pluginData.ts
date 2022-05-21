@@ -1,4 +1,6 @@
 import omit from 'just-omit';
+import get from 'just-safe-get';
+import compact from 'just-compact';
 import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 import { SharedPluginDataNamespaces } from '@/constants/SharedPluginDataNamespaces';
 import { Properties } from '@/constants/Properties';
@@ -13,11 +15,12 @@ import { tokensSharedDataHandler } from './SharedDataHandler';
 import { defaultWorker } from './Worker';
 import { ProgressTracker } from './ProgressTracker';
 import { SelectionGroup, SelectionValue } from '@/types';
+import { TokenTypes } from '@/constants/TokenTypes';
 
 // @TODO FIX TYPINGS! Missing or bad typings are very difficult for other developers to work in
 
-export function transformPluginDataToSelectionValues(pluginData): SelectionGroup {
-  const selectionValues = pluginData.reduce((acc, curr) => {
+export function transformPluginDataToSelectionValues(pluginData: NodeManagerNode[]): SelectionGroup[] {
+  const selectionValues = pluginData.reduce<SelectionGroup[]>((acc, curr) => {
     const { tokens, id, node: { name, type } } = curr;
 
     Object.entries(tokens).forEach(([key, value]) => {
@@ -26,7 +29,7 @@ export function transformPluginDataToSelectionValues(pluginData): SelectionGroup
       if (existing) {
         existing.nodes.push({ id, name, type });
       } else {
-        const category = Properties[key];
+        const category = get(Properties, key) as Properties | TokenTypes;
 
         acc.push({
           value, type: key, category, nodes: [{ id, name, type }],
@@ -46,22 +49,22 @@ export type SelectionContent = {
 };
 
 export async function sendPluginValues({ nodes, values, shouldSendSelectionValues }: { nodes: readonly BaseNode[], values?: NodeTokenRefMap, shouldSendSelectionValues: boolean }): Promise<SelectionContent> {
-  let pluginValues = values;
-  let mainNodeSelectionValues = [];
+  let pluginValues: typeof values | NodeManagerNode[] = values;
+  let mainNodeSelectionValues: SelectionValue[] = [];
   let selectionValues;
   if (!pluginValues) {
     pluginValues = await defaultNodeManager.findNodesWithData({ nodes });
   }
   // TODO: Handle all selected nodes share the same properties
   // TODO: Handle many selected and mixed (for Tokens tab)
-  if (pluginValues?.length > 0) {
+  if (Array.isArray(pluginValues) && pluginValues?.length > 0) {
     if (shouldSendSelectionValues) selectionValues = transformPluginDataToSelectionValues(pluginValues);
     mainNodeSelectionValues = pluginValues.map((value) => value.tokens);
   }
 
   const selectedNodes = figma.currentPage.selection.length;
 
-  notifySelection({ selectionValues, mainNodeSelectionValues, selectedNodes });
+  notifySelection({ selectionValues: selectionValues ?? [], mainNodeSelectionValues, selectedNodes });
   return { selectionValues, mainNodeSelectionValues, selectedNodes };
 }
 
@@ -122,10 +125,14 @@ export async function updatePluginData({
         let removeProperties: String[] = [];
         if (resolvedToken) {
           if (Array.isArray(resolvedToken.rawValue)) {
-            removeProperties = resolvedToken?.rawValue.map((item) => (
-              item.property
-            ));
-          } else {
+            removeProperties = compact(resolvedToken?.rawValue.map((item) => (
+              'property' in item ? item.property : null
+            )));
+          } else if (
+            resolvedToken.rawValue
+            && typeof resolvedToken.rawValue === 'object'
+            && 'property' in resolvedToken.rawValue
+          ) {
             removeProperties.push(resolvedToken?.rawValue.property);
           }
         }
@@ -137,14 +144,14 @@ export async function updatePluginData({
       }
 
       await Promise.all(Object.entries(newValuesOnNode).map(async ([key, value]) => {
-        if (value === currentValuesOnNode[key] && !shouldOverride) {
+        if (value === currentValuesOnNode[key as keyof typeof currentValuesOnNode] && !shouldOverride) {
           return;
         }
 
         const jsonValue = JSON.stringify(value);
         switch (value) {
           case 'delete':
-            delete newValuesOnNode[key];
+            delete newValuesOnNode[key as keyof typeof newValuesOnNode];
             await removePluginData({ nodes: [node], key: key as Properties, shouldRemoveValues: shouldRemove });
             break;
             // Pre-Version 53 had horizontalPadding and verticalPadding.

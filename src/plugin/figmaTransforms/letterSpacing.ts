@@ -18,7 +18,7 @@ export function convertLetterSpacingToFigma(inputValue: string): LetterSpacing |
   return letterSpacing;
 }
 
-export function convertFigmaToLetterSpacing(inputValue) {
+export function convertFigmaToLetterSpacing(inputValue: LetterSpacing): string | number {
   const { unit, value } = inputValue;
   if (unit === 'PERCENT') {
     return `${+value.toFixed(2)}%`;

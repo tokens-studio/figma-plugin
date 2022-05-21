@@ -1,13 +1,14 @@
 import React, { useCallback, useMemo } from 'react';
 import Downshift from 'downshift';
-import { styled } from '@/stitches.config';
 import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
-import Box from './Box';
-import { StyledIconDisclosure, StyledInputSuffix } from './StyledInputSuffix';
-import Stack from './Stack';
+import Box from '../Box';
+import { StyledIconDisclosure, StyledInputSuffix } from '../StyledInputSuffix';
+import Stack from '../Stack';
 import { SingleToken } from '@/types/tokens';
-import { StyledInput, StyledPrefix } from './Input';
+import { StyledPrefix } from '../Input';
 import { TokenTypes } from '@/constants/TokenTypes';
+import { styled } from '@/stitches.config';
+import { StyledDownshiftInput } from './StyledDownshiftInput';
 
 const StyledDropdown = styled('div', {
   position: 'absolute',
@@ -82,7 +83,7 @@ interface DownShiftProps {
   type: string;
   label?: string;
   error?: string;
-  value: string;
+  value?: string;
   placeholder?: string;
   prefix?: React.ReactNode;
   suffix?: boolean;
@@ -91,7 +92,7 @@ interface DownShiftProps {
   handleChange?: React.ChangeEventHandler<HTMLInputElement>;
 }
 
-const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
+export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
   name,
   type,
   label,
@@ -106,7 +107,7 @@ const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
 }) => {
   const [showAutoSuggest, setShowAutoSuggest] = React.useState<boolean>(false);
 
-  const filteredValue = useMemo(() => (showAutoSuggest ? '' : value.replace(/[^a-zA-Z0-9.]/g, '')), [
+  const filteredValue = useMemo(() => ((showAutoSuggest || typeof value !== 'string') ? '' : value?.replace(/[^a-zA-Z0-9.]/g, '')), [
     showAutoSuggest,
     value,
   ]); // removing non-alphanumberic except . from the input value
@@ -136,7 +137,7 @@ const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
   );
 
   const resolveValue = useCallback((token: SingleToken) => {
-    let returnValue: string;
+    let returnValue: string = '';
     if (token.type === TokenTypes.TYPOGRAPHY || token.type === TokenTypes.BOX_SHADOW) {
       if (Array.isArray(token.value)) {
         returnValue = token.value.reduce<string>((totalAcc, item) => {
@@ -150,14 +151,14 @@ const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
           `${acc}${propertyValue.toString()}/`
         ), '');
       }
-    } else {
+    } else if (typeof token.value === 'string') {
       returnValue = token.value;
     }
     return returnValue;
   }, []);
 
   const handleSelect = useCallback((selectedItem: any) => {
-    setInputValue(value.includes('$') ? `$${selectedItem.name}` : `{${selectedItem.name}}`);
+    setInputValue(value?.includes('$') ? `$${selectedItem.name}` : `{${selectedItem.name}}`);
     setShowAutoSuggest(false);
   }, [setInputValue, setShowAutoSuggest, value]);
 
@@ -177,15 +178,14 @@ const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
           </Stack>
           <Box css={{ display: 'flex', position: 'relative', width: '100%' }} className="input">
             {!!prefix && <StyledPrefix>{prefix}</StyledPrefix>}
-            <StyledInput
-              hasSuffix={suffix}
-              {...getInputProps({
-                label: type || null,
-                name: name || 'value',
-                placeholder,
-                value: value || '',
-                onChange: handleChange,
-              })}
+            <StyledDownshiftInput
+              suffix={suffix}
+              type={type}
+              name={name}
+              placeholder={placeholder}
+              value={value}
+              onChange={handleChange}
+              getInputProps={getInputProps}
             />
             {suffix && (
               <StyledInputSuffix type="button" onClick={handleAutoSuggest}>
@@ -197,7 +197,7 @@ const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
           {filteredTokenItems
             && filteredTokenItems.length > 0
             && selectedItem?.name !== filteredValue
-            && (showAutoSuggest || (['{', '$'].some((c) => value.includes(c)) && !value.includes('}'))) ? (
+            && (showAutoSuggest || (['{', '$'].some((c) => value?.includes(c)) && !value?.includes('}'))) ? (
               <StyledDropdown className="content scroll-container">
                 {filteredTokenItems.map((token: SingleToken, index: number) => (
                   <StyledItem
@@ -224,5 +224,3 @@ const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
     </Downshift>
   );
 };
-
-export default DownshiftInput;

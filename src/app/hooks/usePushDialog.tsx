@@ -11,6 +11,7 @@ export type PushDialogPromiseResult = {
 };
 
 export type UseDialogResult = {
+  showPushDialog?: string | boolean
   closeDialog: () => void
   pushDialog: (givenState?: string) => Promise<PushDialogPromiseResult | null>
   onConfirm: (commitMessage: string, customBranch: string) => void

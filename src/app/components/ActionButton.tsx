@@ -33,6 +33,16 @@ const StyledButton = styled('button', {
   },
 });
 
+type Props = {
+  disabled?: boolean;
+  dataCy?: string | null;
+  onClick: any;
+  icon?: any;
+  css?: any;
+  variant?: React.ComponentProps<typeof StyledButton>['buttonVariant'];
+  text: string;
+};
+
 export default function ActionButton({
   disabled = false,
   dataCy = null,
@@ -41,15 +51,7 @@ export default function ActionButton({
   css,
   variant = 'default',
   text,
-}: {
-  disabled?: boolean;
-  dataCy?: string;
-  onClick: any;
-  icon?: any;
-  css?: any;
-  variant?: string;
-  text: string;
-}) {
+}: Props) {
   const handleClick = React.useCallback(() => {
     if (onClick) {
       onClick();

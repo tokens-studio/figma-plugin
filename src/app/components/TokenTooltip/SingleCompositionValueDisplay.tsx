@@ -9,13 +9,11 @@ type Props = {
   value: TokenCompositionValue
 };
 
-export const SingleCompositionValueDisplay: React.FC<Props> = ({ value }) => {
-  return (
-    <Box css={{ color: '$bgDefault' }}>
-        {value?.property}
-        {' : '}
-        {value?.value}
-    </Box>
+export const SingleCompositionValueDisplay: React.FC<Props> = ({ value }) => (
+  <Box css={{ color: '$bgDefault' }}>
+    {value?.property}
+    {' : '}
+    {value?.value}
+  </Box>
 
-  );
-};
+);

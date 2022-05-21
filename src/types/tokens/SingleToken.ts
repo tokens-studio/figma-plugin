@@ -1,5 +1,4 @@
 import { SingleColorToken } from './SingleColorToken';
-import { SingleImplicitToken } from './SingleImplicitToken';
 import { SingleBorderRadiusToken } from './SingleBorderRadiusToken';
 import { SingleTextToken } from './SingleTextToken';
 import { SingleSpacingToken } from './SingleSpacingToken';
@@ -16,12 +15,10 @@ import { SingleParagraphSpacingToken } from './SingleParagraphSpacingToken';
 import { SingleTextDecorationToken } from './SingleTextDecorationToken';
 import { SingleTextCaseToken } from './SingleTextCaseToken';
 import { SingleOtherToken } from './SingleOtherToken';
-import { SingleUndefinedToken } from './SingleUndefinedToken';
 import { SingleCompositionToken } from './SingleCompositionToken';
 
 export type SingleToken<Named extends boolean = true, P = unknown> =
   SingleColorToken<Named, P>
-  | SingleImplicitToken<Named, P>
   | SingleBorderRadiusToken<Named, P>
   | SingleTextToken<Named, P>
   | SingleTypographyToken<Named, P>
@@ -38,5 +35,4 @@ export type SingleToken<Named extends boolean = true, P = unknown> =
   | SingleTextCaseToken<Named, P>
   | SingleSpacingToken<Named, P>
   | SingleOtherToken<Named, P>
-  | SingleUndefinedToken<Named, P>
   | SingleCompositionToken<Named, P>;

@@ -20,7 +20,7 @@ export default {
   },
 } as ComponentMeta<typeof Modal>;
 
-const Template: ComponentStory<typeof Modal> = (args) => {
+const Template: ComponentStory<typeof Modal> = () => {
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
   const handleModalOpen = React.useCallback(() => {
     setIsModalOpen(true);
