@@ -32,9 +32,7 @@ const globalTokens = {
   },
 };
 
-export const {
-  styled, css, keyframes, theme,
-} = createStitches({
+export const stitchesInstance = createStitches({
   theme: {
     fonts: {
       sans: 'Inter, sans-serif',
@@ -137,3 +135,11 @@ export const {
     },
   },
 });
+
+const {
+  styled, css, keyframes, theme,
+} = stitchesInstance;
+
+export {
+  styled, css, keyframes, theme,
+};

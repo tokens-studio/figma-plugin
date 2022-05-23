@@ -5,3 +5,4 @@ export * from './isSingleToken';
 export * from './isPropertyType';
 export * from './isSingleBoxShadowToken';
 export * from './isTokenType';
+export * from './isGitProvider';

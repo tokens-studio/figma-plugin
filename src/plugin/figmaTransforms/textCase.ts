@@ -1,4 +1,4 @@
-export function convertTextCaseToFigma(value: string) {
+export function convertTextCaseToFigma(value: string): TextCase {
   switch (value.toLowerCase()) {
     case 'uppercase':
     case 'upper':
@@ -11,10 +11,10 @@ export function convertTextCaseToFigma(value: string) {
       return 'TITLE';
     case 'small-caps':
     case 'small_caps':
-      return 'SMALL_CAPS';
+      return 'SMALL_CAPS' as TextCase; // @TODO not sure if these are supported
     case 'all-small-caps':
     case 'small_caps_forced':
-      return 'SMALL_CAPS_FORCED';
+      return 'SMALL_CAPS_FORCED' as TextCase; // @TODO not sure if these are supported
     default:
       return 'ORIGINAL';
   }

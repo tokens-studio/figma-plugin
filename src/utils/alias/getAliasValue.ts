@@ -35,10 +35,10 @@ export function getAliasValue(token: SingleToken | string | number, tokens: Sing
   // @TODO not sure how this will handle typography and boxShadow values. I don't believe it works.
   // The logic was copied from the original function in aliases.tsx
 
-  let returnedValue: string | TokenTypograpyValue | TokenBoxshadowValue | TokenBoxshadowValue[] | null = getReturnedValue(token);
+  let returnedValue: ReturnType<typeof getReturnedValue> | null = getReturnedValue(token);
 
   try {
-    const tokenReferences = findReferences(returnedValue);
+    const tokenReferences = typeof returnedValue === 'string' ? findReferences(returnedValue) : null;
 
     if (tokenReferences?.length) {
       const resolvedReferences = Array.from(tokenReferences).map((ref) => {
@@ -69,7 +69,13 @@ export function getAliasValue(token: SingleToken | string | number, tokens: Sing
             !!tokenAliasSplitedLast
             && foundToken?.name === tokenAliasLastExcluded
             && foundToken.rawValue?.hasOwnProperty(tokenAliasSplitedLast)
-          ) { return getAliasValue(foundToken?.rawValue[tokenAliasSplitedLast], tokens); }
+          ) {
+            const { rawValue } = foundToken;
+            if (typeof rawValue === 'object' && !Array.isArray(rawValue)) {
+              const value = rawValue[tokenAliasSplitedLast as keyof typeof rawValue] as string | number;
+              return getAliasValue(value, tokens);
+            }
+          }
 
           if (
             tokenAliasSplitedLastPrevious !== undefined
@@ -78,7 +84,10 @@ export function getAliasValue(token: SingleToken | string | number, tokens: Sing
             && Array.isArray(foundToken?.rawValue)
             && !!foundToken?.rawValue[tokenAliasSplitedLastPrevious]
             && foundToken?.rawValue[tokenAliasSplitedLastPrevious].hasOwnProperty(tokenAliasSplitedLast)
-          ) { return getAliasValue(foundToken?.rawValue[tokenAliasSplitedLastPrevious][tokenAliasSplitedLast], tokens); }
+          ) {
+            const rawValueEntry = foundToken?.rawValue[tokenAliasSplitedLastPrevious];
+            return getAliasValue(rawValueEntry[tokenAliasSplitedLast as keyof typeof rawValueEntry] || tokenAliasSplitedLastPrevious, tokens);
+          }
         }
         return ref;
       });
@@ -93,7 +102,7 @@ export function getAliasValue(token: SingleToken | string | number, tokens: Sing
       }
     }
 
-    if (returnedValue) {
+    if (returnedValue && typeof returnedValue === 'string') {
       const remainingReferences = findReferences(returnedValue);
       if (!remainingReferences) {
         const couldBeNumberValue = checkAndEvaluateMath(returnedValue);

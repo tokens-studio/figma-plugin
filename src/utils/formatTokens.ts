@@ -1,5 +1,15 @@
 import set from 'set-value';
 import { expand } from '@/utils/expand';
+import { AnyTokenList } from '@/types/tokens';
+
+type Options = {
+  tokens: Record<string, AnyTokenList>;
+  tokenSets: string[];
+  includeAllTokens?: boolean;
+  includeParent?: boolean;
+  expandTypography?: boolean;
+  expandShadow?: boolean;
+};
 
 export default function formatTokens({
   tokens,
@@ -8,7 +18,7 @@ export default function formatTokens({
   includeParent = true,
   expandTypography = false,
   expandShadow = false,
-}) {
+}: Options) {
   const nestUnderParent = includeAllTokens ? true : includeParent;
   const tokenObj = {};
 

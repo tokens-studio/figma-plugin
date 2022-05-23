@@ -19,7 +19,9 @@ export type Props = {
   type: string
 };
 
-export default function TokenGroupHeading({ label, path, id, type }: Props) {
+export default function TokenGroupHeading({
+  label, path, id, type,
+}: Props) {
   const editProhibited = useSelector(editProhibitedSelector);
   const [newTokenGroupName, setNewTokenGroupName] = React.useState<string>('');
   const [showNewGroupNameField, setShowNewGroupNameField] = React.useState<boolean>(false);
@@ -28,29 +30,27 @@ export default function TokenGroupHeading({ label, path, id, type }: Props) {
   const { deleteGroup, renameGroup, duplicateGroup } = useManageTokens();
 
   React.useEffect(() => {
-    if(isTokenGroupDuplicated)
-      setOldTokenGroupName(`${path.split('.').pop()}-copy` || '');
+    if (isTokenGroupDuplicated) setOldTokenGroupName(`${path.split('.').pop()}-copy` || '');
     else setOldTokenGroupName(`${path.split('.').pop()}` || '');
     setNewTokenGroupName(path.split('.').pop() || '');
-  },[oldTokenGroupName, isTokenGroupDuplicated]);
+  }, [oldTokenGroupName, isTokenGroupDuplicated]);
   const handleDelete = React.useCallback(() => {
     deleteGroup(path);
   }, [path, deleteGroup]);
   const handleRename = React.useCallback(() => {
     setShowNewGroupNameField(true);
-  },[path, renameGroup]);
+  }, [path, renameGroup]);
 
   const handleRenameTokenGroupSubmit = React.useCallback((e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setShowNewGroupNameField(false);
-    if(isTokenGroupDuplicated)
-      renameGroup(`${path}-copy`, newTokenGroupName, type);
+    if (isTokenGroupDuplicated) renameGroup(`${path}-copy`, newTokenGroupName, type);
     else renameGroup(path, newTokenGroupName, type);
     setIsTokenGroupDuplicated(false);
   }, [newTokenGroupName]);
 
   const handleNewTokenGroupNameChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-  setNewTokenGroupName(e.target.value);
+    setNewTokenGroupName(e.target.value);
   }, [newTokenGroupName]);
 
   const handleSetNewTokenGroupNameFileClose = React.useCallback(() => {
@@ -93,7 +93,10 @@ export default function TokenGroupHeading({ label, path, id, type }: Props) {
       </ContextMenu>
       <Modal isOpen={showNewGroupNameField} close={handleSetNewTokenGroupNameFileClose}>
         <Stack direction="column" justify="center" gap={4} css={{ textAlign: 'center' }}>
-          <Heading size="small">Rename {oldTokenGroupName}</Heading>
+          <Heading size="small">
+            Rename
+            {oldTokenGroupName}
+          </Heading>
           <Heading size="small">Renaming only affects tokens of the same type</Heading>
           <form onSubmit={handleRenameTokenGroupSubmit}>
             <Stack direction="column" gap={4}>

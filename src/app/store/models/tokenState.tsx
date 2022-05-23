@@ -1,7 +1,6 @@
 /* eslint-disable import/prefer-default-export */
 import { createModel } from '@rematch/core';
 import omit from 'just-omit';
-import { StorageProviderType } from '@/types/api';
 import * as tokenStateReducers from './reducers/tokenState';
 import * as tokenStateEffects from './effects/tokenState';
 
@@ -22,12 +21,14 @@ import {
   UpdateTokenPayload,
   RenameTokenGroupPayload,
   DuplicateTokenGroupPayload,
+  DuplicateTokenPayload,
 } from '@/types/payloads';
 import { updateTokenPayloadToSingleToken } from '@/utils/updateTokenPayloadToSingleToken';
 import { RootModel } from '@/types/RootModel';
 import { ThemeObjectsList, UsedTokenSetsMap } from '@/types';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { isEqual } from '@/utils/isEqual';
+import { StorageProviderType } from '@/constants/StorageProviderType';
 
 export interface TokenState {
   tokens: Record<string, AnyTokenList>;
@@ -242,7 +243,7 @@ export const tokenState = createModel<RootModel>()({
         },
       };
     },
-    duplicateToken: (state, data: UpdateTokenPayload) => {
+    duplicateToken: (state, data: DuplicateTokenPayload) => {
       let newTokens: TokenStore['values'] = {};
       const existingTokenIndex = state.tokens[data.parent].findIndex((n) => n.name === data.name);
       if (existingTokenIndex > -1) {
@@ -497,7 +498,7 @@ export const tokenState = createModel<RootModel>()({
     toggleTreatAsSource() {
       dispatch.tokenState.updateDocument({ updateRemote: false });
     },
-    duplicateToken(payload: UpdateTokenPayload, rootState) {
+    duplicateToken(payload: DuplicateTokenPayload, rootState) {
       if (payload.shouldUpdate && rootState.settings.updateOnChange) {
         dispatch.tokenState.updateDocument();
       }
@@ -507,7 +508,7 @@ export const tokenState = createModel<RootModel>()({
         dispatch.tokenState.updateDocument();
       }
     },
-    updateCheckForChanges(checkForChanges: string) {
+    updateCheckForChanges(checkForChanges: boolean) {
       dispatch.tokenState.updateDocument({ checkForChanges });
     },
     updateDocument(options?: UpdateDocumentPayload, rootState?) {
@@ -521,14 +522,14 @@ export const tokenState = createModel<RootModel>()({
           themes: rootState.tokenState.themes,
           activeTheme: rootState.tokenState.activeTheme,
           settings: rootState.settings,
-          updatedAt: new Date().toString(),
-          lastUpdatedAt: rootState.uiState.lastUpdatedAt,
+          updatedAt: new Date().toISOString(),
+          lastUpdatedAt: rootState.uiState.lastUpdatedAt ?? new Date().toISOString(),
           isLocal: rootState.uiState.storageType.provider === StorageProviderType.LOCAL,
           editProhibited: rootState.tokenState.editProhibited,
           api: rootState.uiState.api,
           storageType: rootState.uiState.storageType,
           shouldUpdateRemote: params.updateRemote && rootState.settings.updateRemote,
-          checkForChanges: params.checkForChanges || 'false',
+          checkForChanges: params.checkForChanges || false,
         });
       } catch (e) {
         console.error('Error updating document', e);

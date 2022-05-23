@@ -1,14 +1,16 @@
-import React from 'react';
+import React, { useState } from 'react';
+import get from 'just-safe-get';
 import { TokensIcon, LinkBreak2Icon } from '@radix-ui/react-icons';
 import { useUIDSeed } from 'react-uid';
 import { checkIfContainsAlias } from '@/utils/alias';
 import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
 import Box from './Box';
 import ResolvedValueBox from './ResolvedValueBox';
-import { EditTokenObject } from '../store/models/uiState';
 import { findReferences } from '@/utils/findReferences';
 import IconButton from './IconButton';
 import Heading from './Heading';
+import { EditTokenObject } from '@/types/tokens';
+import { TokenTypes } from '@/constants/TokenTypes';
 import SingleTypographyDownShiftInput from './SingleTypographyDownShiftInput';
 import DownshiftInput from './DownshiftInput';
 
@@ -31,17 +33,17 @@ export default function TypographyInput({
   handleTypographyDownShiftInputChange,
   handleDownShiftInputChange,
 }: {
-  internalEditToken: EditTokenObject;
+  internalEditToken: Extract<EditTokenObject, { type: TokenTypes.TYPOGRAPHY }>;
   handleTypographyChange: React.ChangeEventHandler;
-  handleTypographyChangeByAlias: React.ChangeEventHandler;
+  handleTypographyChangeByAlias: (e: React.ChangeEvent<HTMLInputElement>) => void;
   resolvedTokens: ResolveTokenValuesResult[];
   handleTypographyDownShiftInputChange: (newInputValue: string, property: string) => void;
   handleDownShiftInputChange: (newInputValue: string) => void;
 }) {
   const seed = useUIDSeed();
-  const isInputMode = (typeof internalEditToken.value === 'object');
-  const [mode, setMode] = React.useState<string>(isInputMode ? 'input' : 'alias');
-  const [alias, setAlias] = React.useState<string>('');
+  const isAliasMode = (internalEditToken.value && typeof internalEditToken.value === 'string');
+  const [mode, setMode] = useState(isAliasMode ? 'alias' : 'input');
+  const [alias, setAlias] = useState('');
 
   const selectedToken = React.useMemo(() => {
     const search = findReferences(String(internalEditToken.value));
@@ -81,47 +83,42 @@ export default function TypographyInput({
           )
         }
       </Box>
-      {
-        mode === 'input' ? (
-          Object.entries(internalEditToken.value ?? {}).map(([key, value]: [string, string], keyIndex) => (
-            <SingleTypographyDownShiftInput
-              name={key}
-              key={`typography-input-${seed(keyIndex)}`}
-              value={value}
-              type={properties[key as keyof typeof properties]}
-              resolvedTokens={resolvedTokens}
-              handleChange={handleTypographyChange}
-              setInputValue={handleTypographyDownShiftInputChange}
-            />
+      {(mode === 'input' && internalEditToken.schema.schemas.value.type === 'object') ? (
+        Object.entries(internalEditToken.schema.schemas.value.properties ?? {}).map(([key], keyIndex) => (
+          <SingleTypographyDownShiftInput
+            name={key}
+            key={`typography-input-${seed(keyIndex)}`}
+            value={typeof internalEditToken.value === 'object' ? get(internalEditToken.value, key, '') : ''}
+            type={properties[key as keyof typeof properties]}
+            resolvedTokens={resolvedTokens}
+            handleChange={handleTypographyChange}
+            setInputValue={handleTypographyDownShiftInputChange}
+          />
+        ))
+      ) : (
+        <Box css={{
+          display: 'flex', flexDirection: 'column', gap: '$2',
+        }}
+        >
+          <DownshiftInput
+            value={!isAliasMode ? '' : String(internalEditToken.value)}
+            type={internalEditToken.type}
+            label={internalEditToken.schema.property}
+            resolvedTokens={resolvedTokens}
+            handleChange={handleTypographyChangeByAlias}
+            setInputValue={handleDownShiftInputChange}
+            placeholder="Value or {alias}"
+            suffix
+          />
 
-          ))
-        ) : (
-          <Box css={{
-            display: 'flex', flexDirection: 'column', gap: '$2',
-          }}
-          >
-            <DownshiftInput
-              value={isInputMode ? '' : String(internalEditToken.value)}
-              type={internalEditToken.type}
-              label={internalEditToken.property}
-              resolvedTokens={resolvedTokens}
-              handleChange={handleTypographyChangeByAlias}
-              setInputValue={handleDownShiftInputChange}
-              placeholder="Value or {alias}"
-              suffix
-            />
-
-            {
-              !isInputMode && typeof internalEditToken.value === 'string' && checkIfContainsAlias(internalEditToken.value) && (
-                <ResolvedValueBox
-                  alias={alias}
-                  selectedToken={selectedToken}
-                />
-              )
-            }
-          </Box>
-        )
-      }
+          {isAliasMode && typeof internalEditToken.value === 'string' && checkIfContainsAlias(internalEditToken.value) && (
+          <ResolvedValueBox
+            alias={alias}
+            selectedToken={selectedToken}
+          />
+          )}
+        </Box>
+      )}
     </>
   );
 }

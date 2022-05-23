@@ -1,4 +1,4 @@
-import { StorageType } from '../api';
+import { StorageType } from '../StorageType';
 import { ThemeObjectsList } from '../ThemeObjectsList';
 import { UsedTokenSetsMap } from '../UsedTokenSetsMap';
 import { AnyTokenList } from './AnyTokenList';
@@ -9,7 +9,7 @@ export type TokenStore = {
   // @README these could be different themes or sets of tokens
   values: Record<string, AnyTokenList>;
   usedTokenSet?: UsedTokenSetsMap | null;
-  checkForChanges?: string;
+  checkForChanges?: boolean | null;
   activeTheme: string | null;
   themes: ThemeObjectsList;
   storageType?: StorageType

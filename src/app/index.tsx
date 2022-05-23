@@ -38,11 +38,13 @@ function ErrorFallback({ error }: { error: Error }) {
   );
 }
 
-ReactDOM.render(
-  <Sentry.ErrorBoundary fallback={ErrorFallback}>
-    <Provider store={store}>
-      <App />
-    </Provider>
-  </Sentry.ErrorBoundary>,
-  document.getElementById('app'),
-);
+document.addEventListener('DOMContentLoaded', () => {
+  ReactDOM.render(
+    <Sentry.ErrorBoundary fallback={ErrorFallback}>
+      <Provider store={store}>
+        <App />
+      </Provider>
+    </Sentry.ErrorBoundary>,
+    document.getElementById('app'),
+  );
+});

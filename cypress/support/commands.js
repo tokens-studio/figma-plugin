@@ -1,5 +1,5 @@
 import { MessageFromPluginTypes } from '../../src/types/messages';
-import { StorageProviderType } from '../../src/types/api';
+import { StorageProviderType } from '../../src/constants/StorageProviderType';
 
 // ***********************************************
 // This example commands.js shows you how to

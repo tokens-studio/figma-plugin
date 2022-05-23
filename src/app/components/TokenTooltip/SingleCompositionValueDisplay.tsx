@@ -13,5 +13,4 @@ export const SingleCompositionValueDisplay: React.FC<Props> = ({ property, value
     {' : '}
     {value.toString()}
   </Box>
-
 );

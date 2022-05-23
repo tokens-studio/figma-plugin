@@ -1,12 +1,12 @@
 import React from 'react';
 import { useUIDSeed } from 'react-uid';
 import useTokens from '../../store/useTokens';
-import { SingleToken, SingleTypographyToken } from '@/types/tokens';
+import { SingleToken } from '@/types/tokens';
 import { SingleShadowValueDisplay } from './SingleShadowValueDisplay';
 import { TokensContext } from '@/context';
 import { isSingleBoxShadowToken, isSingleTypographyToken, isSingleCompositionToken } from '@/utils/is';
 import { SingleTypographyValueDisplay } from './SingleTypograhpyValueDisplay';
-import { TokenBoxshadowValue } from '@/types/values';
+import { TokenBoxshadowValue, TokenTypograpyValue } from '@/types/values';
 import Box from '../Box';
 import { SingleCompositionValueDisplay } from './SingleCompositionValueDisplay';
 
@@ -37,8 +37,7 @@ export const TokenTooltipContentValue: React.FC<Props> = ({ token, shouldResolve
   if (isSingleTypographyToken(token)) {
     return (
       <SingleTypographyValueDisplay
-        // @TODO strengthen type checking here
-        value={valueToCheck as SingleTypographyToken['value']}
+        value={valueToCheck as TokenTypograpyValue}
         shouldResolve={shouldResolve}
       />
     );
@@ -67,7 +66,7 @@ export const TokenTooltipContentValue: React.FC<Props> = ({ token, shouldResolve
           {valueToCheck.map((t) => (
             <SingleShadowValueDisplay
               key={seed(t)}
-              shadow={t}
+              shadow={t as TokenBoxshadowValue}
             />
           ))}
         </div>

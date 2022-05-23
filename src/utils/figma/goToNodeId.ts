@@ -1,9 +1,9 @@
-import { postToFigma } from '@/plugin/notifiers';
-import { MessageToPluginTypes } from '@/types/messages';
+import { AsyncMessageChannel } from '@/AsyncMessageChannel';
+import { AsyncMessageTypes } from '@/types/AsyncMessages';
 
 export function goToNodeId(id: string) {
-  postToFigma({
-    type: MessageToPluginTypes.GO_TO_NODE,
+  AsyncMessageChannel.message({
+    type: AsyncMessageTypes.GOTO_NODE,
     id,
   });
 }

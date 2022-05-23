@@ -13,10 +13,10 @@ type Props = {
 export default function ExportModal({ onClose }: Props) {
   const dispatch = useDispatch<Dispatch>();
 
-  const handleSetDefault = () => {
+  const handleSetDefault = React.useCallback(() => {
     dispatch.tokenState.setDefaultTokens();
     onClose();
-  };
+  }, [dispatch, onClose]);
 
   return (
     <Modal showClose isOpen close={onClose}>

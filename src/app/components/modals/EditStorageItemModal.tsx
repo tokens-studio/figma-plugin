@@ -4,36 +4,43 @@ import Heading from '../Heading';
 import StorageItemForm from '../StorageItemForm';
 import useRemoteTokens from '../../store/remoteTokens';
 import Stack from '../Stack';
+import { StorageTypeFormValues } from '@/types/StorageType';
+
+type Props = {
+  isOpen: boolean;
+  initialValue: StorageTypeFormValues<true>;
+  onClose: () => void;
+  onSuccess: () => void;
+};
 
 export default function EditStorageItemModal({
   isOpen, initialValue, onClose, onSuccess,
-}) {
-  const [formFields, setFormFields] = React.useState(initialValue);
+}: Props) {
+  const [formFields, setFormFields] = React.useState<StorageTypeFormValues<true>>(initialValue);
   const [hasErrored, setHasErrored] = React.useState(false);
   const { addNewProviderItem } = useRemoteTokens();
 
-  const handleChange = (e) => {
+  const handleChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setFormFields({ ...formFields, [e.target.name]: e.target.value });
-  };
+  }, [formFields]);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const response = await addNewProviderItem(formFields);
+  const handleSubmit = React.useCallback(async (values: StorageTypeFormValues<false>) => {
+    const response = await addNewProviderItem(values);
     if (!response) {
       setHasErrored(true);
     } else {
       onSuccess();
     }
-  };
+  }, [addNewProviderItem, onSuccess]);
 
   return (
-    <Modal large id="modal-edit-storage-item" isOpen={isOpen} close={() => onClose(false)}>
+    <Modal large id="modal-edit-storage-item" isOpen={isOpen} close={onClose}>
       <Stack direction="column" gap={4}>
         <Heading>Edit storage item</Heading>
         <StorageItemForm
-          handleChange={handleChange}
-          handleSubmit={handleSubmit}
-          handleCancel={() => onClose(false)}
+          onChange={handleChange}
+          onSubmit={handleSubmit}
+          onCancel={onClose}
           values={formFields}
           hasErrored={hasErrored}
         />

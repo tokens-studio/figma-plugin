@@ -1,8 +1,9 @@
-const HtmlWebpackInlineSourcePlugin = require('html-webpack-inline-source-plugin');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
 const path = require('path');
 const Dotenv = require('dotenv-webpack');
 const webpack = require('webpack');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const HtmlInlineScriptPlugin = require('html-inline-script-webpack-plugin');
+const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 
 module.exports = (env, argv) => ({
   mode: argv.mode === 'production' ? 'production' : 'development',
@@ -30,7 +31,7 @@ module.exports = (env, argv) => ({
       },
 
       // Enables including CSS by doing "import './file.css'" in your TypeScript code
-      { test: /\.css$/, loader: [{ loader: 'style-loader' }, { loader: 'css-loader' }] },
+      { test: /\.css$/, use: [{ loader: 'style-loader' }, { loader: 'css-loader' }] },
       // Imports webfonts
       {
         test: /\.(woff|woff2)$/,
@@ -41,7 +42,7 @@ module.exports = (env, argv) => ({
           },
         },
       },
-      { test: /\.(png|jpg|gif|webp)$/, loader: [{ loader: 'url-loader' }] },
+      { test: /\.(png|jpg|gif|webp)$/, use: [{ loader: 'url-loader' }] },
       {
         test: /\.svg$/,
         use: [{
@@ -69,6 +70,9 @@ module.exports = (env, argv) => ({
       '@': path.resolve(__dirname, 'src'),
       'react-redux': 'react-redux/dist/react-redux.js',
     },
+    fallback: {
+      buffer: require.resolve('buffer/'),
+    },
     extensions: ['.tsx', '.ts', '.jsx', '.js'],
   },
 
@@ -85,12 +89,19 @@ module.exports = (env, argv) => ({
     new HtmlWebpackPlugin({
       template: './src/app/index.html',
       filename: 'index.html',
-      inlineSource: '.(js)$',
       chunks: ['ui'],
     }),
-    new HtmlWebpackInlineSourcePlugin(),
+    new HtmlInlineScriptPlugin(),
     new webpack.DefinePlugin({
       'process.env.LAUNCHDARKLY_FLAGS': JSON.stringify(process.env.LAUNCHDARKLY_FLAGS),
-    })
+    }),
+    new ForkTsCheckerWebpackPlugin({
+      typescript: {
+        configFile: 'tsconfig.build.json',
+      },
+    }),
+    new webpack.ProvidePlugin({
+      Buffer: ['buffer', 'Buffer'],
+  }),
   ],
 });

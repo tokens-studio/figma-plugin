@@ -1,34 +1,23 @@
-import { UpdateMode } from '@/types/state';
-import { ApiDataType, StorageType } from '@/types/api';
 import {
-  PostToFigmaMessage,
   MessageFromPluginTypes,
-  MessageToPluginTypes,
   PostToUIMessage,
-  NotifyToPluginMessage,
   UserIdFromPluginMessage,
 } from '@/types/messages';
-import store from './store';
-import { TokenStore } from '@/types/tokens';
+import { AnyTokenList, TokenStore } from '@/types/tokens';
 import { SelectionGroup } from '@/types/SelectionGroup';
 import { SelectionValue } from '@/types/SelectionValue';
-
-export function postToFigma(props: PostToFigmaMessage) {
-  parent.postMessage(
-    {
-      pluginMessage: props,
-    },
-    '*',
-  );
-}
+import { UpdateMode } from '@/constants/UpdateMode';
+import { AsyncMessageTypes, NotifyAsyncMessage } from '@/types/AsyncMessages';
+import { AsyncMessageChannel } from '@/AsyncMessageChannel';
+import { StorageType, StorageTypeCredentials } from '@/types/StorageType';
 
 export function notifyUI(msg: string, opts?: NotificationOptions) {
   figma.notify(msg, opts);
 }
 
-export function notifyToUI(msg: string, opts: NotifyToPluginMessage['opts'] = {}) {
-  postToFigma({
-    type: MessageToPluginTypes.NOTIFY,
+export function notifyToUI(msg: string, opts: NotifyAsyncMessage['opts'] = {}) {
+  AsyncMessageChannel.message({
+    type: AsyncMessageTypes.NOTIFY,
     msg,
     opts,
   });
@@ -64,6 +53,7 @@ export function notifySelection({
 export type SavedSettings = {
   width: number;
   height: number;
+  showEmptyGroups: boolean
   updateMode: UpdateMode;
   updateRemote: boolean;
   updateOnChange: boolean;
@@ -79,11 +69,11 @@ export function notifyUISettings(
     updateMode,
     updateOnChange,
     updateStyles,
+    showEmptyGroups,
     ignoreFirstPartForStyles,
     updateRemote = true,
     inspectDeep,
   }: SavedSettings,
-  showEmptyGroups: boolean,
 ) {
   postToUI({
     type: MessageFromPluginTypes.UI_SETTINGS,
@@ -107,26 +97,6 @@ export function notifyUISettings(
   });
 }
 
-type Data = {
-  nodes: number;
-  remotes: Set<BaseNode>;
-};
-
-export function notifyRemoteComponents({ nodes, remotes }: Data) {
-  const opts = { timeout: 600 };
-  if (nodes > 0 && remotes.size > 0) {
-    notifyUI(`Updated ${nodes} nodes, unable to update ${remotes.size} remote components`, opts);
-  } else if (nodes > 0 && remotes.size === 0) {
-    notifyUI(`Success! Updated ${nodes} nodes`, opts);
-  }
-  postToUI({
-    type: MessageFromPluginTypes.REMOTE_COMPONENTS,
-  });
-
-  store.successfulNodes.clear();
-  store.remoteComponents.clear();
-}
-
 export function notifyTokenValues(values: TokenStore) {
   postToUI({ type: MessageFromPluginTypes.TOKEN_VALUES, values });
 }
@@ -139,11 +109,11 @@ export function notifyStorageType(storageType: StorageType) {
   postToUI({ type: MessageFromPluginTypes.RECEIVED_STORAGE_TYPE, storageType });
 }
 
-export function notifyAPIProviders(providers: ApiDataType[]) {
+export function notifyAPIProviders(providers: StorageTypeCredentials[]) {
   postToUI({ type: MessageFromPluginTypes.API_PROVIDERS, providers });
 }
 
-export function notifyStyleValues(values = undefined) {
+export function notifyStyleValues(values: Record<string, AnyTokenList>) {
   postToUI({ type: MessageFromPluginTypes.STYLES, values });
 }
 

@@ -23,9 +23,9 @@ describe('checkIfAlias', () => {
       type: 'composition',
       value: {
         property: 'opacity',
-        value: 'opacity.40'
-      }
-    }
+        value: 'opacity.40',
+      },
+    },
   ];
   const incorrectTokens = [
     { name: 'string', value: 'foo' },

@@ -27,10 +27,7 @@ import { Entitlements } from '../store/models/userState';
 import LoadingBar from './LoadingBar';
 import { LicenseStatus } from '@/constants/LicenseStatus';
 
-let ldIdentificationResolver: (flags: LDProps['flags']) => void = () => {};
-const ldIdentificationPromise = new Promise<LDProps['flags']>((resolve) => {
-  ldIdentificationResolver = resolve;
-});
+const ldIdentificationResolver: (flags: LDProps['flags']) => void = () => {};
 
 function App() {
   const activeTab = useSelector(activeTabSelector);
@@ -79,7 +76,7 @@ function App() {
 
   return (
     <Box css={{ backgroundColor: '$bgDefault' }}>
-      <Initiator identificationPromise={ldIdentificationPromise} />
+      <Initiator />
       { activeTab !== 'loading' && <LoadingBar />}
       <PluginResizerWrapper>
         <Box
