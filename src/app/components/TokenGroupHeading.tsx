@@ -33,13 +33,15 @@ export default function TokenGroupHeading({
     if (isTokenGroupDuplicated) setOldTokenGroupName(`${path.split('.').pop()}-copy` || '');
     else setOldTokenGroupName(`${path.split('.').pop()}` || '');
     setNewTokenGroupName(path.split('.').pop() || '');
-  }, [oldTokenGroupName, isTokenGroupDuplicated]);
+  }, [oldTokenGroupName, isTokenGroupDuplicated, path]);
+
   const handleDelete = React.useCallback(() => {
     deleteGroup(path);
   }, [path, deleteGroup]);
+
   const handleRename = React.useCallback(() => {
     setShowNewGroupNameField(true);
-  }, [path, renameGroup]);
+  }, []);
 
   const handleRenameTokenGroupSubmit = React.useCallback((e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -47,21 +49,21 @@ export default function TokenGroupHeading({
     if (isTokenGroupDuplicated) renameGroup(`${path}-copy`, newTokenGroupName, type);
     else renameGroup(path, newTokenGroupName, type);
     setIsTokenGroupDuplicated(false);
-  }, [newTokenGroupName]);
+  }, [isTokenGroupDuplicated, newTokenGroupName, path, renameGroup, type]);
 
   const handleNewTokenGroupNameChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setNewTokenGroupName(e.target.value);
-  }, [newTokenGroupName]);
+  }, []);
 
   const handleSetNewTokenGroupNameFileClose = React.useCallback(() => {
     setShowNewGroupNameField(false);
-  }, [showNewGroupNameField]);
+  }, []);
 
   const handleDuplicate = React.useCallback(() => {
     setIsTokenGroupDuplicated(true);
     setShowNewGroupNameField(true);
     duplicateGroup(path, type);
-  }, []);
+  }, [duplicateGroup, path, type]);
   return (
     <Box
       css={{
@@ -73,7 +75,6 @@ export default function TokenGroupHeading({
         borderColor: '$borderMuted',
         overflowY: 'auto',
       }}
-      className="content"
     >
       <ContextMenu>
         <ContextMenuTrigger id={`group-heading-${path}-${label}-${id}`}>
