@@ -57,7 +57,14 @@
     "schemas": {
       "value": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "x": { "type": "string" },
+          "y": { "type": "string" },
+          "blur": { "type": "string" },
+          "spread": { "type": "string" },
+          "color": { "type": "string" },
+          "type": { "type": "string" }
+        }
       }
     }
   },
@@ -69,7 +76,16 @@
     "schemas": {
       "value": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "fontFamily": { "type": "string" },
+          "fontWeight": { "type": "string" },
+          "lineHeight": { "type": "string" },
+          "fontSize": { "type": "string" },
+          "letterSpacing": { "type": "string" },
+          "paragraphSpacing": { "type": "string" },
+          "textDecoration": { "type": "string" },
+          "textCase": { "type": "string" }
+        }
       }
     }
   },

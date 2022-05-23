@@ -8,7 +8,7 @@ import Input from './Input';
 import ColorPicker from './ColorPicker';
 import useConfirm from '../hooks/useConfirm';
 import useTokens from '../store/useTokens';
-import { EditTokenObject, SingleBoxShadowToken, SingleCompositionToken } from '@/types/tokens';
+import { EditTokenObject, SingleBoxShadowToken } from '@/types/tokens';
 import { checkIfContainsAlias, getAliasValue } from '@/utils/alias';
 import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
 import { activeTokenSetSelector, editTokenSelector } from '@/selectors';
@@ -45,9 +45,6 @@ function EditTokenForm({ resolvedTokens }: Props) {
     }
     return internalEditToken?.value && !error;
   }, [internalEditToken, error]);
-  React.useEffect(() => {
-    console.log("sdfdsfsdf", internalEditToken)
-  }, [internalEditToken])
 
   const hasNameThatExistsAlready = React.useMemo(
     () => resolvedTokens

@@ -71,14 +71,12 @@ export async function sendPluginValues({ nodes, values, shouldSendSelectionValue
 export async function removePluginData({ nodes, key, shouldRemoveValues = true }: { nodes: readonly (BaseNode | SceneNode)[], key?: Properties, shouldRemoveValues?: boolean }) {
   return Promise.all(nodes.map(async (node) => {
     if (key) {
-      console.log("remove11", key)
       node.setPluginData(key, '');
       tokensSharedDataHandler.set(node, key, '');
       await defaultNodeManager.updateNode(node, (tokens) => (
         omit(tokens, key)
       ));
       if (shouldRemoveValues) {
-        console.log("remove", key)
         removeValuesFromNode(node, key);
       }
     } else {
@@ -130,14 +128,12 @@ export async function updatePluginData({
             property
           ));
         }
-        console.log("removeproper", removeProperties)
         if (removeProperties && removeProperties.length > 0) {
           await Promise.all(removeProperties.map(async (property) => {
             await removePluginData({ nodes: [node], key: property as Properties, shouldRemoveValues: shouldRemove });
           }));
         }
       }
-      console.log("newvlaues",newValuesOnNode)
       await Promise.all(Object.entries(newValuesOnNode).map(async ([key, value]) => {
         if (value === currentValuesOnNode[key as CompositionTokenProperty] && !shouldOverride) {
           return;

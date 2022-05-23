@@ -49,7 +49,7 @@ export function mapValuesToTokens(tokens: Map<string, AnyTokenList[number]>, val
     const resolvedToken = tokens.get(tokenOnNode);
     if (!resolvedToken) return acc;
 
-    acc[key] = isSingleToken(resolvedToken) ? resolvedToken[returnValueToLookFor(key)] || resolvedToken.value: resolvedToken;
+    acc[key] = isSingleToken(resolvedToken) ? resolvedToken[returnValueToLookFor(key)] || resolvedToken.value : resolvedToken;
     return acc;
   }, {});
   return mappedValues;
@@ -131,7 +131,6 @@ export function destructureCompositionToken(values: MapValuesToTokensResult): Ma
   Record<TokenTypes, SingleToken['value']>
   & Record<Properties, SingleToken['value']>
   > = {};
-  console.log("input",values)
   if (values && values.composition) {
     Object.entries(values.composition).forEach(([property, value]) => {
       tokensInCompositionToken[property as CompositionTokenProperty] = value;
@@ -139,12 +138,10 @@ export function destructureCompositionToken(values: MapValuesToTokensResult): Ma
     const { composition, ...objExcludedCompositionToken } = values;
     values = { ...tokensInCompositionToken, ...objExcludedCompositionToken };
   }
-  console.log("oiutput",values)
   return values;
 }
 
 export function destructureCompositionTokenForAlias(tokens: Map<string, AnyTokenList[number]>, values: NodeTokenRefMap): NodeTokenRefMap {
-  console.log("aliainput",values)
   if (values && values.composition) {
     const resolvedToken = tokens.get(values.composition);
     const tokensInCompositionToken: NodeTokenRefMap = {};
@@ -159,7 +156,6 @@ export function destructureCompositionTokenForAlias(tokens: Map<string, AnyToken
       values = { ...tokensInCompositionToken, ...objExcludedCompositionToken };
     }
   }
-  console.log("aliasutput",values)
   return values;
 }
 
