@@ -90,12 +90,14 @@ module.exports = (env, argv) => ({
       template: './src/app/index.html',
       filename: 'index.html',
       chunks: ['ui'],
+      cache: argv.mode === 'production',
     }),
     new HtmlInlineScriptPlugin(),
     new webpack.DefinePlugin({
       'process.env.LAUNCHDARKLY_FLAGS': JSON.stringify(process.env.LAUNCHDARKLY_FLAGS),
     }),
     new ForkTsCheckerWebpackPlugin({
+      async: argv.mode === 'development',
       typescript: {
         configFile: 'tsconfig.build.json',
       },
