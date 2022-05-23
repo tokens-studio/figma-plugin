@@ -140,6 +140,11 @@ Object {
       "type": "color",
       "value": "#0000ff",
     },
+    "opaqueRed": Object {
+      "description": "Should NOT be resolved",
+      "type": "color",
+      "value": "rgba(255, 0, 0, {opacity.medium})",
+    },
     "primary": Object {
       "description": "Should NOT be resolved",
       "type": "color",
@@ -150,10 +155,27 @@ Object {
       "value": "#ff0000",
     },
   },
+  "opacity": Object {
+    "medium": Object {
+      "type": "opacity",
+      "value": 0.5,
+    },
+  },
+  "radii": Object {
+    "full": Object {
+      "type": "borderRadius",
+      "value": "100%",
+    },
+    "leaf": Object {
+      "description": "Should NOT be resolved",
+      "type": "borderRadius",
+      "value": "{radii.full} 0%",
+    },
+  },
   "sizing": Object {
     "base": Object {
       "type": "sizing",
-      "value": "2",
+      "value": 2,
     },
     "large": Object {
       "description": "Should NOT be resolved",
@@ -165,9 +187,19 @@ Object {
       "type": "sizing",
       "value": "{sizing.small} * {sizing.scale}",
     },
+    "responsive25": Object {
+      "description": "Should NOT be resolved",
+      "type": "sizing",
+      "value": "calc(25vw * $sizing.small)",
+    },
+    "responsive50": Object {
+      "description": "Should NOT be resolved",
+      "type": "sizing",
+      "value": "calc(50vw - {sizing.large}px)",
+    },
     "scale": Object {
       "type": "sizing",
-      "value": "1.5",
+      "value": 1.5,
     },
     "small": Object {
       "description": "Should NOT be resolved",
@@ -181,19 +213,62 @@ Object {
     },
   },
   "text": Object {
+    "fontWeight": Object {
+      "base": Object {
+        "type": "fontWeight",
+        "value": 100,
+      },
+      "light": Object {
+        "type": "fontWeight",
+        "value": "Light",
+      },
+    },
     "size": Object {
       "base": Object {
         "type": "fontSize",
-        "value": "16",
+        "value": 16,
       },
       "default": Object {
         "description": "Should NOT be resolved",
         "type": "fontSize",
         "value": "{text.size.base}{text.size.unit}",
       },
+      "h1": Object {
+        "type": "fontSize",
+        "value": 96,
+      },
       "unit": Object {
         "type": "fontSize",
         "value": "px",
+      },
+    },
+  },
+  "typography": Object {
+    "h1": Object {
+      "description": "Should NOT be resolved",
+      "type": "typography",
+      "value": Object {
+        "fontFamily": "Roboto",
+        "fontSize": "{text.size.h1}",
+        "fontWeight": "{text.fontWeight.light}",
+      },
+    },
+    "h2": Object {
+      "description": "Should NOT be resolved",
+      "type": "typography",
+      "value": Object {
+        "fontFamily": "Roboto",
+        "fontSize": "3.75 * {text.size.base}",
+        "fontWeight": "7 * {text.fontWeight.base}",
+      },
+    },
+    "h3": Object {
+      "description": "Should NOT be resolved",
+      "type": "typography",
+      "value": Object {
+        "fontFamily": "Roboto",
+        "fontSize": "3 * {text.size.base}",
+        "fontWeight": "5 * 100",
       },
     },
   },
@@ -229,6 +304,11 @@ Object {
       "type": "color",
       "value": "#0000ff",
     },
+    "opaqueRed": Object {
+      "description": "Should be resolved",
+      "type": "color",
+      "value": "#ff000080",
+    },
     "primary": Object {
       "description": "Should be resolved",
       "type": "color",
@@ -237,6 +317,23 @@ Object {
     "red": Object {
       "type": "color",
       "value": "#ff0000",
+    },
+  },
+  "opacity": Object {
+    "medium": Object {
+      "type": "opacity",
+      "value": 0.5,
+    },
+  },
+  "radii": Object {
+    "full": Object {
+      "type": "borderRadius",
+      "value": "100%",
+    },
+    "leaf": Object {
+      "description": "Should be resolved",
+      "type": "borderRadius",
+      "value": "100% 0%",
     },
   },
   "sizing": Object {
@@ -253,6 +350,16 @@ Object {
       "description": "Should be resolved",
       "type": "sizing",
       "value": 3,
+    },
+    "responsive25": Object {
+      "description": "Should be resolved",
+      "type": "sizing",
+      "value": "calc(25vw * 2)",
+    },
+    "responsive50": Object {
+      "description": "Should be resolved",
+      "type": "sizing",
+      "value": "calc(50vw - 4.5px)",
     },
     "scale": Object {
       "type": "sizing",
@@ -270,6 +377,16 @@ Object {
     },
   },
   "text": Object {
+    "fontWeight": Object {
+      "base": Object {
+        "type": "fontWeight",
+        "value": 100,
+      },
+      "light": Object {
+        "type": "fontWeight",
+        "value": "Light",
+      },
+    },
     "size": Object {
       "base": Object {
         "type": "fontSize",
@@ -280,9 +397,42 @@ Object {
         "type": "fontSize",
         "value": "16px",
       },
+      "h1": Object {
+        "type": "fontSize",
+        "value": 96,
+      },
       "unit": Object {
         "type": "fontSize",
         "value": "px",
+      },
+    },
+  },
+  "typography": Object {
+    "h1": Object {
+      "description": "Should be resolved",
+      "type": "typography",
+      "value": Object {
+        "fontFamily": "Roboto",
+        "fontSize": 96,
+        "fontWeight": "Light",
+      },
+    },
+    "h2": Object {
+      "description": "Should be resolved",
+      "type": "typography",
+      "value": Object {
+        "fontFamily": "Roboto",
+        "fontSize": 60,
+        "fontWeight": 700,
+      },
+    },
+    "h3": Object {
+      "description": "Should be resolved",
+      "type": "typography",
+      "value": Object {
+        "fontFamily": "Roboto",
+        "fontSize": 48,
+        "fontWeight": 500,
       },
     },
   },
@@ -296,6 +446,11 @@ Object {
       "type": "color",
       "value": "#0000ff",
     },
+    "opaqueRed": Object {
+      "description": "Should NOT be resolved",
+      "type": "color",
+      "value": "rgba(255, 0, 0, {opacity.medium})",
+    },
     "primary": Object {
       "description": "Should NOT be resolved",
       "type": "color",
@@ -304,6 +459,23 @@ Object {
     "red": Object {
       "type": "color",
       "value": "#ff0000",
+    },
+  },
+  "opacity": Object {
+    "medium": Object {
+      "type": "opacity",
+      "value": 0.5,
+    },
+  },
+  "radii": Object {
+    "full": Object {
+      "type": "borderRadius",
+      "value": "100%",
+    },
+    "leaf": Object {
+      "description": "Should NOT be resolved",
+      "type": "borderRadius",
+      "value": "{radii.full} 0%",
     },
   },
   "sizing": Object {
@@ -320,6 +492,16 @@ Object {
       "description": "Should be resolved",
       "type": "sizing",
       "value": 3,
+    },
+    "responsive25": Object {
+      "description": "Should NOT be resolved",
+      "type": "sizing",
+      "value": "calc(25vw * $sizing.small)",
+    },
+    "responsive50": Object {
+      "description": "Should NOT be resolved",
+      "type": "sizing",
+      "value": "calc(50vw - {sizing.large}px)",
     },
     "scale": Object {
       "type": "sizing",
@@ -337,19 +519,62 @@ Object {
     },
   },
   "text": Object {
+    "fontWeight": Object {
+      "base": Object {
+        "type": "fontWeight",
+        "value": 100,
+      },
+      "light": Object {
+        "type": "fontWeight",
+        "value": "Light",
+      },
+    },
     "size": Object {
       "base": Object {
         "type": "fontSize",
         "value": 16,
       },
       "default": Object {
-        "description": "Should be resolved",
+        "description": "Should NOT be resolved",
         "type": "fontSize",
-        "value": "16px",
+        "value": "{text.size.base}{text.size.unit}",
+      },
+      "h1": Object {
+        "type": "fontSize",
+        "value": 96,
       },
       "unit": Object {
         "type": "fontSize",
         "value": "px",
+      },
+    },
+  },
+  "typography": Object {
+    "h1": Object {
+      "description": "Should NOT be resolved",
+      "type": "typography",
+      "value": Object {
+        "fontFamily": "Roboto",
+        "fontSize": "{text.size.base}",
+        "fontWeight": "{text.fontWeight.light}",
+      },
+    },
+    "h2": Object {
+      "description": "Should be resolved",
+      "type": "typography",
+      "value": Object {
+        "fontFamily": "Roboto",
+        "fontSize": 60,
+        "fontWeight": 700,
+      },
+    },
+    "h3": Object {
+      "description": "Should be resolved",
+      "type": "typography",
+      "value": Object {
+        "fontFamily": "Roboto",
+        "fontSize": 48,
+        "fontWeight": 500,
       },
     },
   },
