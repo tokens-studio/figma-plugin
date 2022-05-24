@@ -89,7 +89,7 @@ interface DownShiftProps {
   suffix?: boolean;
   resolvedTokens: ResolveTokenValuesResult[];
   setInputValue(value: string): void;
-  handleChange?: React.ChangeEventHandler<HTMLInputElement>;
+  handleChange: React.ChangeEventHandler<HTMLInputElement>;
 }
 
 export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
@@ -106,6 +106,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
   handleChange,
 }) => {
   const [showAutoSuggest, setShowAutoSuggest] = React.useState<boolean>(false);
+  const [isFirstLoading, setisFirstLoading] = React.useState<boolean>(true);
 
   const filteredValue = useMemo(() => ((showAutoSuggest || typeof value !== 'string') ? '' : value?.replace(/[^a-zA-Z0-9.]/g, '')), [
     showAutoSuggest,
@@ -166,9 +167,11 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
     setShowAutoSuggest(!showAutoSuggest);
   }, [showAutoSuggest]);
 
-  React.useEffect(() => {
-    console.log("value", value, "shouauto", showAutoSuggest)
-  }, [value, showAutoSuggest])
+  const handleInputChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setisFirstLoading(false);
+    handleChange(e);
+  }, [showAutoSuggest]);
+
   return (
     <Downshift onSelect={handleSelect}>
       {({
@@ -187,7 +190,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
               name={name}
               placeholder={placeholder}
               value={value}
-              onChange={handleChange}
+              onChange={handleInputChange}
               getInputProps={getInputProps}
             />
             {suffix && (
@@ -200,7 +203,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
           {filteredTokenItems
             && filteredTokenItems.length > 0
             && selectedItem?.name !== filteredValue
-            && (showAutoSuggest || (['{', '$'].some((c) => value?.includes(c)) && !value?.includes('}'))) ? (
+            && (showAutoSuggest || (!isFirstLoading && (['{', '$'].some((c) => value?.includes(c)) && !value?.includes('}')))) ? (
               <StyledDropdown className="content scroll-container">
                 {filteredTokenItems.map((token: SingleToken, index: number) => (
                   <StyledItem
