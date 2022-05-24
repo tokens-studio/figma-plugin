@@ -158,6 +158,10 @@ function EditTokenForm({ resolvedTokens }: Props) {
     }
   }, [internalEditToken]);
 
+  React.useEffect(() => {
+    console.log("internal", internalEditToken)
+  }, [internalEditToken])
+
   const handleDownShiftInputChange = React.useCallback((newInputValue: string) => {
     setInternalEditToken({
       ...internalEditToken,

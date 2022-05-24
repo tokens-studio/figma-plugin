@@ -166,6 +166,9 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
     setShowAutoSuggest(!showAutoSuggest);
   }, [showAutoSuggest]);
 
+  React.useEffect(() => {
+    console.log("value", value, "shouauto", showAutoSuggest)
+  }, [value, showAutoSuggest])
   return (
     <Downshift onSelect={handleSelect}>
       {({

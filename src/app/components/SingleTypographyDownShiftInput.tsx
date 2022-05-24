@@ -19,6 +19,9 @@ export default function SingleTypographyDownShiftInput({
 }) {
   const onChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => handleChange(e), [handleChange]);
   const handleBoxshadowDownShiftInputChange = React.useCallback((newInputValue: string) => setInputValue(newInputValue, name), [name, setInputValue]);
+  React.useEffect(() => {
+    console.log("value", value)
+  }, [])
   return (
     <DownshiftInput
       name={name}
