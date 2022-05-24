@@ -141,7 +141,6 @@ function InitiatorContainer({ ldClient }: Props) {
             } = pluginMessage;
             if (status === true) {
               let receivedFlags: LDProps['flags'];
-
               try {
                 track('Fetched from remote', { provider: credentials.provider });
                 if (!credentials.internalId) track('missingInternalId', { provider: credentials.provider });
