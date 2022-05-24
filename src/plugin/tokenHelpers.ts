@@ -71,7 +71,7 @@ export function resolveTokenValues(tokens: SingleToken[], previousCount: number 
                 failedToResolve = true;
               }
               return acc;
-            }, {})
+            }, {}) as TokenBoxshadowValue
           ));
           compositionReturnValue[property as CompositionTokenProperty] = resolvedValue;
         } else if (typeof value === 'object') {
