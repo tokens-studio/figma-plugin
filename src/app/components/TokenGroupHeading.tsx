@@ -8,7 +8,6 @@ import Button from './Button';
 import Heading from './Heading';
 import Input from './Input';
 import Modal from './Modal';
-import Box from './Box';
 import useManageTokens from '../store/useManageTokens';
 import { editProhibitedSelector } from '@/selectors';
 
@@ -33,13 +32,15 @@ export default function TokenGroupHeading({
     if (isTokenGroupDuplicated) setOldTokenGroupName(`${path.split('.').pop()}-copy` || '');
     else setOldTokenGroupName(`${path.split('.').pop()}` || '');
     setNewTokenGroupName(path.split('.').pop() || '');
-  }, [oldTokenGroupName, isTokenGroupDuplicated]);
+  }, [oldTokenGroupName, isTokenGroupDuplicated, path]);
+
   const handleDelete = React.useCallback(() => {
     deleteGroup(path);
   }, [path, deleteGroup]);
+
   const handleRename = React.useCallback(() => {
     setShowNewGroupNameField(true);
-  }, [path, renameGroup]);
+  }, []);
 
   const handleRenameTokenGroupSubmit = React.useCallback((e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -47,34 +48,23 @@ export default function TokenGroupHeading({
     if (isTokenGroupDuplicated) renameGroup(`${path}-copy`, newTokenGroupName, type);
     else renameGroup(path, newTokenGroupName, type);
     setIsTokenGroupDuplicated(false);
-  }, [newTokenGroupName]);
+  }, [isTokenGroupDuplicated, newTokenGroupName, path, renameGroup, type]);
 
   const handleNewTokenGroupNameChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setNewTokenGroupName(e.target.value);
-  }, [newTokenGroupName]);
+  }, []);
 
   const handleSetNewTokenGroupNameFileClose = React.useCallback(() => {
     setShowNewGroupNameField(false);
-  }, [showNewGroupNameField]);
+  }, []);
 
   const handleDuplicate = React.useCallback(() => {
     setIsTokenGroupDuplicated(true);
     setShowNewGroupNameField(true);
     duplicateGroup(path, type);
-  }, []);
+  }, [duplicateGroup, path, type]);
   return (
-    <Box
-      css={{
-        display: 'flex',
-        height: '100%',
-        flexDirection: 'column',
-        width: '150px',
-        borderRight: '1px solid',
-        borderColor: '$borderMuted',
-        overflowY: 'auto',
-      }}
-      className="content"
-    >
+    <>
       <ContextMenu>
         <ContextMenuTrigger id={`group-heading-${path}-${label}-${id}`}>
           <Heading muted size="small">{label}</Heading>
@@ -91,12 +81,22 @@ export default function TokenGroupHeading({
           </ContextMenuItem>
         </ContextMenuContent>
       </ContextMenu>
-      <Modal isOpen={showNewGroupNameField} close={handleSetNewTokenGroupNameFileClose}>
+      <Modal
+        title={`Rename ${oldTokenGroupName}`}
+        isOpen={showNewGroupNameField}
+        close={handleSetNewTokenGroupNameFileClose}
+        footer={(
+          <Stack direction="row" gap={4}>
+            <Button variant="secondary" size="large" onClick={handleSetNewTokenGroupNameFileClose}>
+              Cancel
+            </Button>
+            <Button type="submit" variant="primary" size="large" disabled={oldTokenGroupName === newTokenGroupName}>
+              Change
+            </Button>
+          </Stack>
+        )}
+      >
         <Stack direction="column" justify="center" gap={4} css={{ textAlign: 'center' }}>
-          <Heading size="small">
-            Rename
-            {oldTokenGroupName}
-          </Heading>
           <Heading size="small">Renaming only affects tokens of the same type</Heading>
           <form onSubmit={handleRenameTokenGroupSubmit}>
             <Stack direction="column" gap={4}>
@@ -108,18 +108,10 @@ export default function TokenGroupHeading({
                 required
                 defaultValue={oldTokenGroupName}
               />
-              <Stack direction="row" gap={4}>
-                <Button variant="secondary" size="large" onClick={handleSetNewTokenGroupNameFileClose}>
-                  Cancel
-                </Button>
-                <Button type="submit" variant="primary" size="large" disabled={oldTokenGroupName === newTokenGroupName}>
-                  Change
-                </Button>
-              </Stack>
             </Stack>
           </form>
         </Stack>
       </Modal>
-    </Box>
+    </>
   );
 }
