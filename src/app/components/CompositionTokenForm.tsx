@@ -7,7 +7,7 @@ import Heading from './Heading';
 import IconButton from './IconButton';
 import Box from './Box';
 import SingleCompositionTokenForm from './SingleCompositionTokenForm';
-import { CompositionTokenProperty, CompositionTokenValue } from '@/types/CompositionTokenProperty';
+import { CompositionTokenProperty } from '@/types/CompositionTokenProperty';
 import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 import { TokenTypes } from '@/constants/TokenTypes';
 
@@ -19,7 +19,7 @@ export default function CompositionTokenForm({
   setTokenValue: (newTokenValue: NodeTokenRefMap) => void;
 }) {
   const seed = useUIDSeed();
-  const [orderObj, setOrderObj] = React.useState<CompositionTokenValue>({});
+  const [orderObj, setOrderObj] = React.useState<NodeTokenRefMap>({});
   const [error, setError] = React.useState(false);
   const propertiesMenu = React.useMemo(() => (
     Object.keys(Properties).map((key: string) => (
@@ -58,7 +58,7 @@ export default function CompositionTokenForm({
     setTokenValue(internalEditTokenValue as NodeTokenRefMap);
   }, [internalEditToken]);
 
-  const handleOrderObj = useCallback((newOrderObj: object) => {
+  const handleOrderObj = useCallback((newOrderObj: NodeTokenRefMap) => {
     setOrderObj(newOrderObj);
   }, []);
 

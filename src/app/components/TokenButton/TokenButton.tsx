@@ -25,7 +25,8 @@ import { useSetNodeData } from '@/hooks/useSetNodeData';
 import { DragOverItem } from './DragOverItem';
 import { TokenButtonDraggable } from './TokenButtonDraggable';
 import type { ShowFormOptions } from '../TokenTree';
-import { CompositionTokenProperty, CompositionTokenValue } from '@/types/CompositionTokenProperty';
+import { CompositionTokenProperty } from '@/types/CompositionTokenProperty';
+import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 
 // @TODO fix typings
 
@@ -119,14 +120,14 @@ export const TokenButton: React.FC<Props> = ({
     if (type === 'composition' && value === 'delete') {
       // distructure composition token when it is unselected
       const compositionToken = tokensContext.resolvedTokens.find((token) => token.name === tokenValue);
-      const tokensInCompositionToken: CompositionTokenValue = {};
+      const tokensInCompositionToken: NodeTokenRefMap = {};
       if (compositionToken) {
         Object.keys(compositionToken.value).forEach((property: string) => {
           tokensInCompositionToken[property as CompositionTokenProperty] = 'delete';
         });
       }
       tokensInCompositionToken.composition = 'delete';
-      setPluginValue(tokensInCompositionToken as SelectionValue);
+      setPluginValue(tokensInCompositionToken);
     } else setPluginValue(newProps);
   }, [name, active, setPluginValue]);
 

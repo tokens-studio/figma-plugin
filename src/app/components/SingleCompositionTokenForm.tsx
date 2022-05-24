@@ -33,7 +33,7 @@ export default function SingleCompositionTokenForm({
   properties: string[];
   setTokenValue: (neweTokenValue: NodeTokenRefMap) => void;
   onRemove: (property: string) => void;
-  setOrderObj: (newOrderObj: object) => void;
+  setOrderObj: (newOrderObj: NodeTokenRefMap) => void;
   setError: (newError: boolean) => void;
 }) {
   const [menuOpened, setMenuOpened] = useState(false);

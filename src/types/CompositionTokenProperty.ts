@@ -1,10 +1,10 @@
-import { Properties } from "@/constants/Properties";
+import { Properties } from '@/constants/Properties';
 import type { TokenTypes } from '@/constants/TokenTypes';
-import { TokenBoxshadowValue } from "./values";
+import { TokenBoxshadowValue, TokenTypograpyValue } from "./values";
 
 export type CompositionTokenProperty = keyof typeof Properties;
 
 export type CompositionTokenValue = Partial<
-Record<TokenTypes, string | number | object | Array<TokenBoxshadowValue>>
-& Record<Properties, string | number | object | Array<TokenBoxshadowValue>>
+Record<TokenTypes, string | number | TokenTypograpyValue | TokenBoxshadowValue | Array<TokenBoxshadowValue>>
+& Record<Properties, string | number | TokenTypograpyValue | TokenBoxshadowValue | Array<TokenBoxshadowValue>>
 >;
