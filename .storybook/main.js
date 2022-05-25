@@ -67,11 +67,10 @@ module.exports = {
         })
 
         config.module.rules.push({
-            test: /\app.css$/,
+            test: /\main.css$/,
             use: [
                 "style-loader",
                 "css-loader",
-                "postcss-loader",
             ],
         })
 
@@ -86,7 +85,6 @@ module.exports = {
                         modules: true,
                     },
                 },
-                "postcss-loader",
             ],
         })
 
