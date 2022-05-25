@@ -101,6 +101,7 @@ export class GithubTokenStorage extends GitTokenStorage {
       });
 
       // read entire directory
+      console.log('response.data', response.data, 'multifalg', this.flags.multiFileEnabled);
       if (Array.isArray(response.data) && this.flags.multiFileEnabled) {
         const directoryTreeResponse = await this.octokitClient.rest.git.createTree({
           owner: this.owner,
@@ -111,6 +112,7 @@ export class GithubTokenStorage extends GitTokenStorage {
             mode: getTreeMode(item.type),
           })),
         });
+        console.log('directorytreerespose', directoryTreeResponse);
         if (directoryTreeResponse.data.tree[0].sha) {
           const treeResponse = await this.octokitClient.rest.git.getTree({
             owner: this.owner,
@@ -118,21 +120,24 @@ export class GithubTokenStorage extends GitTokenStorage {
             tree_sha: directoryTreeResponse.data.tree[0].sha,
             recursive: 'true',
           });
+          console.log('treerespnse', treeResponse);
           if (treeResponse.data.tree.length > 0) {
             const jsonFiles = treeResponse.data.tree.filter((file) => (
               file.path?.endsWith('.json')
             )).sort((a, b) => (
               (a.path && b.path) ? a.path.localeCompare(b.path) : 0
             ));
-
+            console.log('jsonFiles', jsonFiles, 'path', `${this.path}`);
+            const directoryName = this.path.split('/')[0];
             const jsonFileContents = await Promise.all(jsonFiles.map((treeItem) => (
               treeItem.path ? this.octokitClient.rest.repos.getContent({
                 owner: this.owner,
                 repo: this.repository,
-                path: `${this.path}/${treeItem.path}`,
+                path: `${directoryName}/${treeItem.path}`,
                 ref: this.branch,
               }) : Promise.resolve(null)
             )));
+            console.log('jsonFilecontenst', jsonFileContents);
 
             return compact(jsonFileContents.map<RemoteTokenStorageFile<GitStorageMetadata> | null>((fileContent, index) => {
               const { path } = jsonFiles[index];
