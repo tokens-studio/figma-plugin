@@ -1,6 +1,6 @@
 import { useCallback, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { withLDConsumer } from 'launchdarkly-react-client-sdk';
+import { withLDConsumer, useFlags } from 'launchdarkly-react-client-sdk';
 import type { LDProps } from 'launchdarkly-react-client-sdk/lib/withLDConsumer';
 import { identify, track } from '@/utils/analytics';
 import { MessageFromPluginTypes, PostToUIMessage } from '@/types/messages';
@@ -30,6 +30,7 @@ function InitiatorContainer({ ldClient }: Props) {
   const { pullTokens } = useRemoteTokens();
   const { setStorageType } = useStorage();
   const { confirm } = useConfirm();
+  const { multiFileSync } = useFlags();
 
   const licenseKey = useSelector(licenseKeySelector);
   const checkedLocalStorage = useSelector(checkedLocalStorageForKeySelector);
@@ -140,7 +141,7 @@ function InitiatorContainer({ ldClient }: Props) {
               status, credentials, usedTokenSet, shouldPull,
             } = pluginMessage;
             if (status === true) {
-              let receivedFlags: LDProps['flags'];
+              const receivedFlags: LDProps['flags'] = multiFileSync;
 
               try {
                 track('Fetched from remote', { provider: credentials.provider });
