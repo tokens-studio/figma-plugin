@@ -21,7 +21,6 @@ import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { notifyToUI } from '@/plugin/notifiers';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import useConfirm from '../hooks/useConfirm';
-import { StorageType } from '@/types/StorageType';
 
 type Props = LDProps;
 
@@ -35,9 +34,9 @@ function InitiatorContainer({ ldClient }: Props) {
   const checkedLocalStorage = useSelector(checkedLocalStorageForKeySelector);
   const userId = useSelector(userIdSelector);
 
-  const askUserIfPull: ((storageType: StorageType | undefined) => Promise<any>) = useCallback(async (storageType) => {
+  const askUserIfPull: ((storageType: StorageProviderType | undefined) => Promise<any>) = useCallback(async (storageType) => {
     const shouldPull = await confirm({
-      text: `Pull from ${storageType?.provider}?`,
+      text: `Pull from ${storageType}?`,
       description: 'You have unsaved changes that will be lost. Do you want to pull from your repo?',
     });
     return shouldPull;
@@ -97,7 +96,8 @@ function InitiatorContainer({ ldClient }: Props) {
           case MessageFromPluginTypes.TOKEN_VALUES: {
             const { values } = pluginMessage;
             const existChanges = values.checkForChanges;
-            if (!existChanges || (existChanges && await askUserIfPull(values?.storageType))) {
+            const storageType = values.storageType?.provider;
+            if (!existChanges || ((storageType && storageType !== StorageProviderType.LOCAL) && existChanges && await askUserIfPull(storageType))) {
               getApiCredentials(true);
             } else {
               dispatch.tokenState.setTokenData(values);
@@ -141,7 +141,6 @@ function InitiatorContainer({ ldClient }: Props) {
             } = pluginMessage;
             if (status === true) {
               let receivedFlags: LDProps['flags'];
-
               try {
                 track('Fetched from remote', { provider: credentials.provider });
                 if (!credentials.internalId) track('missingInternalId', { provider: credentials.provider });

@@ -1,69 +1,73 @@
 import React, { useCallback, useState } from 'react';
-import { TokenCompositionValue } from '@/types/values';
+import { useUIDSeed } from 'react-uid';
 import IconMinus from '@/icons/minus.svg';
 import IconButton from './IconButton';
 import Box from './Box';
 import Input from './Input';
 import {
-  PropertySwitchMenu,
-  PropertySwitchMenuContent,
-  PropertySwitchMenuMainTrigger,
-  PropertySwitchMenuRadioGroup,
-} from './PropertySwitchMenu';
-import { PropertySwitchMenuRadioElement } from './PropertySwitchMenuRadioElement';
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+  DropdownMenuRadioGroup,
+} from './DropdownMenu';
+import { PropertyDropdownMenuRadioElement } from './PropertyDropdownMenuRadioElement';
+import { Properties } from '@/constants/Properties';
+import { CompositionTokenProperty } from '@/types/CompositionTokenProperty';
+import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 
 export default function SingleCompositionTokenForm({
   index,
-  token,
-  tokens,
+  property,
+  value,
+  tokenValue,
   properties,
-  setValue,
+  setTokenValue,
   onRemove,
+  setOrderObj,
+  setError,
 }: {
   index: number;
-  token?: TokenCompositionValue;
-  tokens?: TokenCompositionValue | TokenCompositionValue[];
-  properties: string[],
-  setValue: (property: TokenCompositionValue | TokenCompositionValue[]) => void;
-  onRemove: (index: number) => void;
+  property: string;
+  value: string;
+  tokenValue: NodeTokenRefMap;
+  properties: string[];
+  setTokenValue: (neweTokenValue: NodeTokenRefMap) => void;
+  onRemove: (property: string) => void;
+  setOrderObj: (newOrderObj: NodeTokenRefMap) => void;
+  setError: (newError: boolean) => void;
 }) {
   const [menuOpened, setMenuOpened] = useState(false);
-  const onPropertySelected = useCallback((property: string) => {
-    if (Array.isArray(tokens)) {
-      const values = tokens;
-      const newToken = { ...tokens[index], property };
-      values.splice(index, 1, newToken);
-      setValue(values);
-    } else {
-      setValue({
-        value: tokens?.value ?? '',
-        property,
-      });
-    }
-    setMenuOpened(false);
-  }, [index, tokens, setValue]);
+  const seed = useUIDSeed();
+
+  const onPropertySelected = useCallback((newProperty: string) => {
+    // keep the order of the properties when select new property
+    const newOrderObj: NodeTokenRefMap = {};
+    const keysInTokenValue = Object.keys(tokenValue);
+    keysInTokenValue.splice(index, 1, newProperty);
+    keysInTokenValue.forEach((key, index) => {
+      newOrderObj[key as keyof typeof Properties] = String(index);
+    });
+    setOrderObj(newOrderObj);
+
+    // set newTokenValue
+    delete tokenValue[property as keyof typeof Properties];
+    tokenValue[newProperty as keyof typeof Properties] = value;
+    setTokenValue(tokenValue);
+    setError(false);
+  }, [tokenValue]);
 
   const onAliasChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    if (Array.isArray(tokens)) {
-      const values = tokens;
-      const newToken = { ...tokens[index], value: e.target.value };
-      values.splice(index, 1, newToken);
-      setValue(values);
-    } else if (tokens) {
-      setValue({
-        property: tokens.property,
-        value: e.target.value,
-      });
-    }
-  }, [index, tokens, setValue]);
+    tokenValue[property as CompositionTokenProperty] = e.target.value;
+    setTokenValue(tokenValue);
+  }, [tokenValue]);
 
   const handleToggleMenu = useCallback(() => {
     setMenuOpened(!menuOpened);
   }, [menuOpened]);
 
   const handleRemove = useCallback(() => {
-    onRemove(index);
-  }, [onRemove, index]);
+    onRemove(property);
+  }, [onRemove, property]);
 
   return (
     <Box>
@@ -71,33 +75,33 @@ export default function SingleCompositionTokenForm({
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
+        gap: '$3',
         '& > label': {
-          flex: 2,
+          flex: 4,
           fontSize: '$5 !important',
           '& > div > input': {
-            flex: 2,
-            marginRight: '$5',
             height: '$10',
           },
         },
       }}
       >
-        <PropertySwitchMenu open={menuOpened} onOpenChange={handleToggleMenu}>
-          <PropertySwitchMenuMainTrigger>
-            <span>{token?.property}</span>
-          </PropertySwitchMenuMainTrigger>
-          <PropertySwitchMenuContent sideOffset={2}>
-            <PropertySwitchMenuRadioGroup value={token?.property}>
+        <DropdownMenu open={menuOpened} onOpenChange={handleToggleMenu}>
+          <DropdownMenuTrigger bordered css={{ flex: 3, minHeight: '$10' }}>
+            <span>{property || 'Choose a property'}</span>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent sideOffset={2} className="content scroll-container" css={{ maxHeight: '$dropdownMaxHeight' }}>
+            {' '}
+            <DropdownMenuRadioGroup value={property}>
               {properties.length > 0
-              && properties.map((property, index) => <PropertySwitchMenuRadioElement property={property} index={index} propertySelected={onPropertySelected} />)}
-            </PropertySwitchMenuRadioGroup>
-          </PropertySwitchMenuContent>
-        </PropertySwitchMenu>
+                && properties.map((property, index) => <PropertyDropdownMenuRadioElement key={`property-${seed(index)}`} property={property} index={index} propertySelected={onPropertySelected} />)}
+            </DropdownMenuRadioGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
 
         <Input
           required
           full
-          value={token?.value}
+          value={value}
           onChange={onAliasChange}
           type="text"
           name="alias"

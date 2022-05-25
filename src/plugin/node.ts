@@ -14,6 +14,7 @@ import { ProgressTracker } from './ProgressTracker';
 import { AnyTokenList, SingleToken, TokenStore } from '@/types/tokens';
 import { isSingleToken } from '@/utils/is';
 import { ThemeObjectsList } from '@/types';
+import { CompositionTokenProperty } from '@/types/CompositionTokenProperty';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StorageType } from '@/types/StorageType';
@@ -40,7 +41,7 @@ export function returnValueToLookFor(key: string) {
   }
 }
 
-type MapValuesToTokensResult = Record<string, string | SingleToken['value'] | {
+type MapValuesToTokensResult = Record<string, string | number | SingleToken['value'] | {
   property: string
   value?: SingleToken['value'];
 }[]>;
@@ -49,57 +50,8 @@ export function mapValuesToTokens(tokens: Map<string, AnyTokenList[number]>, val
   const mappedValues = Object.entries(values).reduce<MapValuesToTokensResult>((acc, [key, tokenOnNode]) => {
     const resolvedToken = tokens.get(tokenOnNode);
     if (!resolvedToken) return acc;
-    if (isSingleToken(resolvedToken)) {
-      // typography or boxshadow property in composition token resovle alias
-      if (resolvedToken && resolvedToken.type === TokenTypes.COMPOSITION && resolvedToken.rawValue) {
-        const tokensInComposition: {
-          property: string
-          value?: SingleToken['value'];
-        }[] = [];
-        if (Array.isArray(resolvedToken.rawValue)) {
-          for (let index = 0; index < resolvedToken.rawValue.length; index += 1) {
-            const currentTokenWithRawValue = resolvedToken.rawValue[index];
-            if (currentTokenWithRawValue.property === TokenTypes.TYPOGRAPHY || currentTokenWithRawValue.property === TokenTypes.BOX_SHADOW) {
-              let strExcludedSymbol: string = '';
-              if (String(currentTokenWithRawValue.value).startsWith('$')) strExcludedSymbol = String(currentTokenWithRawValue.value).slice(1, String(currentTokenWithRawValue.value).length);
-              if (String(currentTokenWithRawValue.value).startsWith('{')) strExcludedSymbol = String(currentTokenWithRawValue.value).slice(1, String(currentTokenWithRawValue.value).length - 1);
-              tokensInComposition.push({
-                property: currentTokenWithRawValue.property,
-                value: tokens.get(strExcludedSymbol)?.value,
-              });
-            } else if (Array.isArray(resolvedToken.value)) {
-              tokensInComposition.push({
-                property: currentTokenWithRawValue.property,
-                value: resolvedToken.value[index].value,
-              });
-            }
-          }
-        } else {
-          const currentTokenWithRawValue = resolvedToken.rawValue;
-          if (currentTokenWithRawValue.property === TokenTypes.TYPOGRAPHY || currentTokenWithRawValue.property === TokenTypes.BOX_SHADOW) {
-            let strExcludedSymbol: string = '';
-            if (String(currentTokenWithRawValue.value).startsWith('$')) strExcludedSymbol = String(currentTokenWithRawValue.value).slice(1, String(currentTokenWithRawValue.value).length);
-            if (String(currentTokenWithRawValue.value).startsWith('{')) strExcludedSymbol = String(currentTokenWithRawValue.value).slice(1, String(currentTokenWithRawValue.value).length - 1);
-            tokensInComposition.push({
-              property: currentTokenWithRawValue.property,
-              value: tokens.get(strExcludedSymbol)?.value,
-            });
-          } else if ('value' in resolvedToken.value) {
-            tokensInComposition.push({
-              property: currentTokenWithRawValue.property,
-              value: resolvedToken.value.value,
-            });
-          }
-        }
-        acc[key] = tokensInComposition;
-      } else {
-        const valueToLookFor = returnValueToLookFor(key);
-        const value = resolvedToken[valueToLookFor];
-        if (typeof value !== 'undefined') {
-          acc[key] = value;
-        }
-      }
-    } else acc[key] = resolvedToken;
+
+    acc[key] = isSingleToken(resolvedToken) ? resolvedToken[returnValueToLookFor(key)] || resolvedToken.value : resolvedToken;
     return acc;
   }, {});
   return mappedValues;
@@ -182,16 +134,9 @@ export function destructureCompositionToken(values: MapValuesToTokensResult): Ma
   & Record<Properties, SingleToken['value']>
   > = {};
   if (values && values.composition) {
-    if (Array.isArray(values.composition)) {
-      values.composition.forEach((value) => {
-        if (typeof value === 'object' && 'value' in value) {
-          tokensInCompositionToken[value.property as Properties] = value.value;
-        }
-      });
-    } else if (typeof values.composition === 'object' && 'property' in values.composition) {
-      // @TODO this may not be correct
-      tokensInCompositionToken[values.composition.property as Properties] = values.composition.value;
-    }
+    Object.entries(values.composition).forEach(([property, value]) => {
+      tokensInCompositionToken[property as CompositionTokenProperty] = value;
+    });
     const { composition, ...objExcludedCompositionToken } = values;
     values = { ...tokensInCompositionToken, ...objExcludedCompositionToken };
   }
@@ -202,23 +147,16 @@ export function destructureCompositionTokenForAlias(tokens: Map<string, AnyToken
   if (values && values.composition) {
     const resolvedToken = tokens.get(values.composition);
     const tokensInCompositionToken: NodeTokenRefMap = {};
-    if (resolvedToken?.rawValue && Array.isArray(resolvedToken?.rawValue)) {
-      resolvedToken?.rawValue.forEach((token) => {
-        if ('value' in token) {
-          let strExcludedSymbol: string = '';
-          if (String(token.value).startsWith('$')) strExcludedSymbol = String(token.value).slice(1, String(token.value).length);
-          if (String(token.value).startsWith('{')) strExcludedSymbol = String(token.value).slice(1, String(token.value).length - 1);
-          tokensInCompositionToken[token.property as Properties] = strExcludedSymbol;
-        }
+    if (resolvedToken?.rawValue) {
+      Object.entries(resolvedToken?.rawValue).forEach(([property, value]) => {
+        let strExcludedSymbol: string = '';
+        if (String(value).startsWith('$')) strExcludedSymbol = String(value).slice(1, String(value).length);
+        if (String(value).startsWith('{')) strExcludedSymbol = String(value).slice(1, String(value).length - 1);
+        tokensInCompositionToken[property as CompositionTokenProperty] = strExcludedSymbol;
       });
-    } else if (resolvedToken?.rawValue && typeof resolvedToken.rawValue === 'object' && 'value' in resolvedToken.rawValue) {
-      let strExcludedSymbol: string = '';
-      if (String(resolvedToken?.rawValue.value).startsWith('$')) strExcludedSymbol = String(resolvedToken?.rawValue.value).slice(1, String(resolvedToken?.rawValue.value).length);
-      if (String(resolvedToken?.rawValue.value).startsWith('{')) strExcludedSymbol = String(resolvedToken?.rawValue.value).slice(1, String(resolvedToken?.rawValue.value).length - 1);
-      tokensInCompositionToken[resolvedToken.rawValue.property as Properties] = strExcludedSymbol;
+      const { composition, ...objExcludedCompositionToken } = values;
+      values = { ...tokensInCompositionToken, ...objExcludedCompositionToken };
     }
-    const { composition, ...objExcludedCompositionToken } = values;
-    values = { ...tokensInCompositionToken, ...objExcludedCompositionToken };
   }
   return values;
 }

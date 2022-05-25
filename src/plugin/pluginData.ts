@@ -1,6 +1,5 @@
 import omit from 'just-omit';
 import get from 'just-safe-get';
-import compact from 'just-compact';
 import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 import { SharedPluginDataNamespaces } from '@/constants/SharedPluginDataNamespaces';
 import { Properties } from '@/constants/Properties';
@@ -15,6 +14,7 @@ import { tokensSharedDataHandler } from './SharedDataHandler';
 import { defaultWorker } from './Worker';
 import { ProgressTracker } from './ProgressTracker';
 import { SelectionGroup, SelectionValue } from '@/types';
+import { CompositionTokenProperty } from '@/types/CompositionTokenProperty';
 import { TokenTypes } from '@/constants/TokenTypes';
 
 // @TODO FIX TYPINGS! Missing or bad typings are very difficult for other developers to work in
@@ -123,18 +123,10 @@ export async function updatePluginData({
         // when select another composition token, reset applied properties by current composition token
         const resolvedToken = tokensMap?.get(currentValuesOnNode.composition);
         let removeProperties: String[] = [];
-        if (resolvedToken) {
-          if (Array.isArray(resolvedToken.rawValue)) {
-            removeProperties = compact(resolvedToken?.rawValue.map((item) => (
-              'property' in item ? item.property : null
-            )));
-          } else if (
-            resolvedToken.rawValue
-            && typeof resolvedToken.rawValue === 'object'
-            && 'property' in resolvedToken.rawValue
-          ) {
-            removeProperties.push(resolvedToken?.rawValue.property);
-          }
+        if (resolvedToken && resolvedToken.rawValue) {
+          removeProperties = Object.keys(resolvedToken.rawValue).map((property) => (
+            property
+          ));
         }
         if (removeProperties && removeProperties.length > 0) {
           await Promise.all(removeProperties.map(async (property) => {
@@ -142,19 +134,18 @@ export async function updatePluginData({
           }));
         }
       }
-
       await Promise.all(Object.entries(newValuesOnNode).map(async ([key, value]) => {
-        if (value === currentValuesOnNode[key as keyof typeof currentValuesOnNode] && !shouldOverride) {
+        if (value === currentValuesOnNode[key as CompositionTokenProperty] && !shouldOverride) {
           return;
         }
 
         const jsonValue = JSON.stringify(value);
         switch (value) {
           case 'delete':
-            delete newValuesOnNode[key as keyof typeof newValuesOnNode];
+            delete newValuesOnNode[key as CompositionTokenProperty];
             await removePluginData({ nodes: [node], key: key as Properties, shouldRemoveValues: shouldRemove });
             break;
-            // Pre-Version 53 had horizontalPadding and verticalPadding.
+          // Pre-Version 53 had horizontalPadding and verticalPadding.
           case 'horizontalPadding':
             newValuesOnNode.paddingLeft = jsonValue;
             newValuesOnNode.paddingRight = jsonValue;
