@@ -68,6 +68,7 @@ export function useGitHub() {
     }
 
     dispatch.uiState.setLocalApiState({ ...context });
+    console.log("context", context);
 
     const pushSettings = await pushDialog();
     if (pushSettings) {
