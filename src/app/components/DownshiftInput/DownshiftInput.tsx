@@ -151,6 +151,10 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
           `${acc}${propertyValue.toString()}/`
         ), '');
       }
+    } else if (token.type === TokenTypes.COMPOSITION) {
+      returnValue = Object.entries(token.value).reduce<string>((acc, [property, value]) => (
+        `${acc}${property}:${value}`
+      ), '');
     } else if (typeof token.value === 'string') {
       returnValue = token.value;
     }
@@ -212,13 +216,13 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
                     <StyledItemColorDiv>
                       <StyledItemColor style={{ backgroundColor: token.value.toString() }} />
                     </StyledItemColorDiv>
-                    )}
-                    <StyledItemName>{getHighlightedText(token.name, filteredValue || '')}</StyledItemName>
-                    <StyledItemValue>{resolveValue(token)}</StyledItemValue>
-                  </StyledItem>
-                ))}
-              </StyledDropdown>
-            ) : null}
+                  )}
+                  <StyledItemName>{getHighlightedText(token.name, filteredValue || '')}</StyledItemName>
+                  <StyledItemValue>{resolveValue(token)}</StyledItemValue>
+                </StyledItem>
+              ))}
+            </StyledDropdown>
+          ) : null}
         </div>
       )}
     </Downshift>

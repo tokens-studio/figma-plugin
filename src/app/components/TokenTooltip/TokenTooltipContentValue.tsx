@@ -6,7 +6,7 @@ import { SingleShadowValueDisplay } from './SingleShadowValueDisplay';
 import { TokensContext } from '@/context';
 import { isSingleBoxShadowToken, isSingleTypographyToken, isSingleCompositionToken } from '@/utils/is';
 import { SingleTypographyValueDisplay } from './SingleTypograhpyValueDisplay';
-import { TokenBoxshadowValue, TokenCompositionValue, TokenTypograpyValue } from '@/types/values';
+import { TokenBoxshadowValue, TokenTypograpyValue } from '@/types/values';
 import Box from '../Box';
 import { SingleCompositionValueDisplay } from './SingleCompositionValueDisplay';
 
@@ -44,23 +44,18 @@ export const TokenTooltipContentValue: React.FC<Props> = ({ token, shouldResolve
   }
 
   if (isSingleCompositionToken(token)) {
-    if (Array.isArray(valueToCheck)) {
-      return (
+    return (
+      valueToCheck ? (
         <div>
-          {valueToCheck.map((t) => (
+          {Object.entries(valueToCheck).map(([property, value], index) => (
             <SingleCompositionValueDisplay
-              key={seed(t)}
-              value={t as TokenCompositionValue}
+              key={seed(index)}
+              property={property}
+              value={value}
             />
           ))}
         </div>
-      );
-    }
-
-    return (
-      <SingleCompositionValueDisplay
-        value={valueToCheck as TokenCompositionValue}
-      />
+      ) : null
     );
   }
 
