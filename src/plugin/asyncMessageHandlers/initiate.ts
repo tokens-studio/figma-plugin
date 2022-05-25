@@ -7,7 +7,7 @@ import { getUISettings } from '@/utils/uiSettings';
 import { getUserId } from '../helpers';
 import { getSavedStorageType, getTokenData } from '../node';
 import {
-  notifyAPIProviders, notifyLastOpened, notifyLicenseKey, notifyNoSelection, notifyStorageType, notifyTokenValues, notifyUserId,
+  notifyAPIProviders, notifyLastOpened, notifyLicenseKey, notifyNoSelection, notifyNoTokenValues, notifyStorageType, notifyTokenValues, notifyUserId,
 } from '../notifiers';
 import { getActiveTheme } from '@/utils/getActiveTheme';
 import { LicenseKeyProperty } from '@/figmaStorage/LicenseKeyProperty';
@@ -43,6 +43,8 @@ export const initiate: AsyncMessageChannelHandlers[AsyncMessageTypes.INITIATE] =
       notifyTokenValues({
         ...oldTokens, activeTheme, usedTokenSet, storageType,
       });
+    } else {
+      notifyNoTokenValues();
     }
   } catch (err) {
     figma.closePlugin('There was an error, check console (F12)');
