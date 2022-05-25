@@ -5,6 +5,8 @@ import { RootModel } from '@/types/RootModel';
 import { UpdateMode } from '@/constants/UpdateMode';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
+import * as settingsStateReducers from './reducers/settingsState';
+import * as settingsStateEffects from './effects/settingsState';
 
 type WindowSettingsType = {
   width: number;
@@ -22,6 +24,7 @@ export interface SettingsState {
   updateStyles?: boolean;
   tokenType?: TokenModeType;
   ignoreFirstPartForStyles?: boolean;
+  prefixStylesWithThemeName?: boolean;
   inspectDeep: boolean;
 }
 
@@ -45,9 +48,11 @@ export const settings = createModel<RootModel>()({
     updateStyles: true,
     tokenType: 'object',
     ignoreFirstPartForStyles: false,
+    prefixStylesWithThemeName: false,
     inspectDeep: false,
   } as SettingsState,
   reducers: {
+    ...settingsStateReducers,
     setInspectDeep(state, payload: boolean) {
       return {
         ...state,
@@ -159,5 +164,10 @@ export const settings = createModel<RootModel>()({
     setInspectDeep: (payload, rootState) => {
       setUI(rootState.settings);
     },
+    ...Object.fromEntries(
+      (Object.entries(settingsStateEffects).map(([key, factory]) => (
+        [key, factory()]
+      ))),
+    ),
   }),
 });

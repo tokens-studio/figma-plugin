@@ -137,7 +137,7 @@ function InitiatorContainer({ ldClient }: Props) {
             break;
           case MessageFromPluginTypes.API_CREDENTIALS: {
             const {
-              status, credentials, usedTokenSet, shouldPull,
+              status, credentials, usedTokenSet, activeTheme, shouldPull,
             } = pluginMessage;
             if (status === true) {
               let receivedFlags: LDProps['flags'];
@@ -170,11 +170,13 @@ function InitiatorContainer({ ldClient }: Props) {
 
                   dispatch.uiState.setApiData(credentials);
                   dispatch.uiState.setLocalApiState(credentials);
+                  dispatch.tokenState.setActiveTheme(activeTheme || null); // @TODO look into this
 
                   if (shouldPull) {
                     const remoteData = await pullTokens({ context: credentials, featureFlags: receivedFlags, usedTokenSet });
                     const existTokens = Object.values(remoteData?.tokens ?? {}).some((value) => value.length > 0);
-                    if (existTokens) { dispatch.uiState.setActiveTab(Tabs.TOKENS); } else { dispatch.uiState.setActiveTab(Tabs.START); }
+                    if (existTokens) dispatch.uiState.setActiveTab(Tabs.TOKENS);
+                    else dispatch.uiState.setActiveTab(Tabs.START);
                   } else {
                     dispatch.uiState.setActiveTab(Tabs.TOKENS);
                   }

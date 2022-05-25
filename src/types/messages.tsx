@@ -49,6 +49,7 @@ export type UiSettingsFromPluginMessage = {
     updateOnChange: boolean;
     updateStyles: boolean;
     ignoreFirstPartForStyles: boolean;
+    prefixStylesWithThemeName: boolean;
     inspectDeep: boolean;
   };
 };
@@ -115,6 +116,7 @@ export type ApiCredentialsFromPluginMessage = {
   status: boolean;
   credentials: StorageTypeCredentials;
   usedTokenSet?: UsedTokenSetsMap | null;
+  activeTheme?: string | null;
   shouldPull?: boolean;
 };
 

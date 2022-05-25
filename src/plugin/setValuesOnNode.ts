@@ -1,6 +1,9 @@
 import { Properties } from '@/constants/Properties';
+import { GetThemeInfoMessageResult } from '@/types/AsyncMessages';
 import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
+import { convertTokenNameToPath } from '@/utils/convertTokenNameToPath';
 import { getAllFigmaStyleMaps } from '@/utils/getAllFigmaStyleMaps';
+import { trySetStyleId } from '@/utils/trySetStyleId';
 import { transformValue } from './helpers';
 import setColorValuesOnTarget from './setColorValuesOnTarget';
 import setEffectValuesOnTarget from './setEffectValuesOnTarget';
@@ -11,8 +14,18 @@ export default async function setValuesOnNode(
   values: Partial<Record<Properties, string>>,
   data: NodeTokenRefMap,
   figmaStyleMaps: ReturnType<typeof getAllFigmaStyleMaps>,
+  themeInfo: Omit<GetThemeInfoMessageResult, 'type'>,
   ignoreFirstPartForStyles = false,
+  prefixStylesWithThemeName = false,
 ) {
+  const activeThemeObject = themeInfo.activeTheme
+    ? themeInfo.themes.find(({ id }) => themeInfo.activeTheme === id) ?? null
+    : null;
+  const stylePathSlice = ignoreFirstPartForStyles ? 1 : 0;
+  const stylePathPrefix = prefixStylesWithThemeName && activeThemeObject
+    ? activeThemeObject.name
+    : null;
+
   try {
     // BORDER RADIUS
     if (
@@ -39,12 +52,12 @@ export default async function setValuesOnNode(
 
       // BOX SHADOW
       if ('effects' in node && typeof values.boxShadow !== 'undefined' && data.boxShadow) {
-        const path = data.boxShadow.split('.');
-        const pathname = path.slice(ignoreFirstPartForStyles ? 1 : 0, path.length).join('/');
-        const matchingStyle = figmaStyleMaps.effectStyles.get(pathname);
-        if (matchingStyle) {
-          node.effectStyleId = matchingStyle.id;
-        } else {
+        const pathname = convertTokenNameToPath(data.boxShadow, stylePathPrefix, stylePathSlice);
+        const matchingStyleId = (
+          activeThemeObject?.$figmaStyleReferences?.[pathname]
+          || figmaStyleMaps.effectStyles.get(pathname)?.id
+        );
+        if (!matchingStyleId || (matchingStyleId && !trySetStyleId(node, 'effect', matchingStyleId))) {
           setEffectValuesOnTarget(node, { value: values.boxShadow });
         }
       }
@@ -77,13 +90,12 @@ export default async function setValuesOnNode(
       // FILL
       if (values.fill && typeof values.fill === 'string') {
         if ('fills' in node && data.fill) {
-          const path = data.fill.split('.');
-          const pathname = path.slice(ignoreFirstPartForStyles ? 1 : 0, path.length).join('/');
-          const matchingStyle = figmaStyleMaps.paintStyles.get(pathname);
-          if (matchingStyle) {
-            // matchingStyles[0].paints = [{color, opacity, type: 'SOLID'}];
-            node.fillStyleId = matchingStyle.id;
-          } else {
+          const pathname = convertTokenNameToPath(data.fill, stylePathPrefix, stylePathSlice);
+          const matchingStyleId = (
+            activeThemeObject?.$figmaStyleReferences?.[pathname]
+            || figmaStyleMaps.paintStyles.get(pathname)?.id
+          );
+          if (!matchingStyleId || (matchingStyleId && !trySetStyleId(node, 'fill', matchingStyleId))) {
             setColorValuesOnTarget(node, { value: values.fill }, 'fills');
           }
         }
@@ -93,12 +105,12 @@ export default async function setValuesOnNode(
       // Either set typography or individual values, if typography is present we prefer that.
       if (values.typography) {
         if (node.type === 'TEXT' && data.typography) {
-          const path = data.typography.split('.'); // extract to helper fn
-          const pathname = path.slice(ignoreFirstPartForStyles ? 1 : 0, path.length).join('/');
-          const matchingStyle = figmaStyleMaps.textStyles.get(pathname);
-          if (matchingStyle) {
-            node.textStyleId = matchingStyle.id;
-          } else {
+          const pathname = convertTokenNameToPath(data.typography, stylePathPrefix, stylePathSlice);
+          const matchingStyleId = (
+            activeThemeObject?.$figmaStyleReferences?.[pathname]
+            || figmaStyleMaps.paintStyles.get(pathname)?.id
+          );
+          if (!matchingStyleId || (matchingStyleId && !trySetStyleId(node, 'text', matchingStyleId))) {
             setTextValuesOnTarget(node, { value: values.typography });
           }
         }
@@ -131,12 +143,12 @@ export default async function setValuesOnNode(
       // BORDER COLOR
       if (typeof values.border !== 'undefined') {
         if ('strokes' in node && data.border) {
-          const path = data.border.split('.');
-          const pathname = path.slice(ignoreFirstPartForStyles ? 1 : 0, path.length).join('/');
-          const matchingStyle = figmaStyleMaps.paintStyles.get(pathname);
-          if (matchingStyle) {
-            node.strokeStyleId = matchingStyle.id;
-          } else {
+          const pathname = convertTokenNameToPath(data.border, stylePathPrefix, stylePathSlice);
+          const matchingStyleId = (
+            activeThemeObject?.$figmaStyleReferences?.[pathname]
+            || figmaStyleMaps.paintStyles.get(pathname)?.id
+          );
+          if (!matchingStyleId || (matchingStyleId && !trySetStyleId(node, 'stroke', matchingStyleId))) {
             setColorValuesOnTarget(node, { value: values.border }, 'strokes');
           }
         }

@@ -134,7 +134,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
 
   const memoizedTokens = React.useMemo(() => {
     if (tokens[activeTokenSet]) {
-      return mappedTokens(tokens[activeTokenSet], tokenFilter).sort((a, b) => {
+      const mapped = mappedTokens(tokens[activeTokenSet], tokenFilter).sort((a, b) => {
         if (b[1].values) {
           return 1;
         }
@@ -143,6 +143,11 @@ function Tokens({ isActive }: { isActive: boolean }) {
         }
         return 0;
       });
+      return mapped.map(([key, { values, ...schema }]) => ({
+        key,
+        values,
+        schema,
+      }));
     }
     return [];
   }, [tokens, activeTokenSet, tokenFilter]);
@@ -173,6 +178,18 @@ function Tokens({ isActive }: { isActive: boolean }) {
       dispatch.tokenState.setJSONData(stringTokens);
     }
   }, [confirm, shouldConfirm, dispatch.tokenState, activeTokensTab, stringTokens]);
+
+  const handleToggleTokenSetsVisible = React.useCallback(() => {
+    setTokenSetsVisible(!tokenSetsVisible);
+  }, [tokenSetsVisible]);
+
+  const handleSwitchToList = React.useCallback(() => {
+    setActiveTokensTab('list');
+  }, []);
+
+  const handleSwitchToJson = React.useCallback(() => {
+    setActiveTokensTab('json');
+  }, []);
 
   const tokensContextValue = React.useMemo(() => ({
     resolvedTokens,
@@ -218,7 +235,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
           }}
         >
           <Box>
-            <StyledButton style={{ height: '100%' }} type="button" onClick={() => setTokenSetsVisible(!tokenSetsVisible)}>
+            <StyledButton style={{ height: '100%' }} type="button" onClick={handleToggleTokenSetsVisible}>
               <Box
                 css={{
                   fontWeight: '$bold',
@@ -249,7 +266,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
             <IconButton
               variant={activeTokensTab === 'list' ? 'primary' : 'default'}
               dataCy="tokensTabList"
-              onClick={() => setActiveTokensTab('list')}
+              onClick={handleSwitchToList}
               icon={<IconListing />}
               tooltipSide="bottom"
               tooltip="Listing"
@@ -257,7 +274,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
             <IconButton
               variant={activeTokensTab === 'json' ? 'primary' : 'default'}
               dataCy="tokensTabJSON"
-              onClick={() => setActiveTokensTab('json')}
+              onClick={handleSwitchToJson}
               icon={<IconJSON />}
               tooltipSide="bottom"
               tooltip="JSON"
@@ -299,7 +316,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
               </Box>
             ) : (
               <Box css={{ width: '100%', paddingBottom: '$6' }} className="content scroll-container">
-                {memoizedTokens.map(([key, { values, ...schema }]) => (
+                {memoizedTokens.map(({ key, values, schema }) => (
                   <div key={key}>
                     <TokenListing
                       tokenKey={key}
