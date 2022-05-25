@@ -9,12 +9,14 @@ import './styles/main.css';
 import { Provider } from 'react-redux';
 import * as Sentry from '@sentry/react';
 import { initializeAnalytics } from '../utils/analytics';
-import App from './components/App';
 import Heading from './components/Heading';
 import { store } from './store';
 import * as pjs from '../../package.json';
 import Stack from './components/Stack';
 import Text from './components/Text';
+import AppContainer from './components/AppContainer';
+import Initiator from './components/Initiator';
+import { ldIdentificationPromise } from './components/App';
 
 initializeAnalytics();
 
@@ -31,8 +33,12 @@ function ErrorFallback({ error }: { error: Error }) {
     <Stack direction="column" align="center" gap={4} justify="center" css={{ height: '100%', textAlign: 'center' }}>
       <Heading>Something went wrong!</Heading>
       <Stack direction="column" gap={2}>
-        <Text size="xsmall" muted>{error.message}</Text>
-        <Text size="xsmall" muted>Restart the plugin and try again.</Text>
+        <Text size="xsmall" muted>
+          {error.message}
+        </Text>
+        <Text size="xsmall" muted>
+          Restart the plugin and try again.
+        </Text>
       </Stack>
     </Stack>
   );
@@ -41,7 +47,8 @@ function ErrorFallback({ error }: { error: Error }) {
 ReactDOM.render(
   <Sentry.ErrorBoundary fallback={ErrorFallback}>
     <Provider store={store}>
-      <App />
+      <Initiator identificationPromise={ldIdentificationPromise} />
+      <AppContainer />
     </Provider>
   </Sentry.ErrorBoundary>,
   document.getElementById('app'),

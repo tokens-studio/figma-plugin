@@ -1,6 +1,5 @@
 import { useCallback, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { withLDConsumer } from 'launchdarkly-react-client-sdk';
 import type { LDProps } from 'launchdarkly-react-client-sdk/lib/withLDConsumer';
 import { identify, track } from '@/utils/analytics';
 import { MessageFromPluginTypes, MessageToPluginTypes, PostToUIMessage } from '@/types/messages';
@@ -23,7 +22,7 @@ type Props = LDProps & {
   identificationPromise: Promise<LDProps['flags']>
 };
 
-function InitiatorContainer({ ldClient, identificationPromise }: Props) {
+function Initiator({ identificationPromise }: Props) {
   const dispatch = useDispatch<Dispatch>();
   const { pullTokens } = useRemoteTokens();
   const { setStorageType } = useStorage();
@@ -36,8 +35,6 @@ function InitiatorContainer({ ldClient, identificationPromise }: Props) {
   }, []);
 
   useEffect(() => {
-    if (!ldClient) return;
-
     onInitiate();
     window.onmessage = async (event: {
       data: {
@@ -106,9 +103,7 @@ function InitiatorContainer({ ldClient, identificationPromise }: Props) {
             setStorageType({ provider: pluginMessage.storageType });
             break;
           case MessageFromPluginTypes.API_CREDENTIALS: {
-            const {
-              status, credentials, usedTokenSet,
-            } = pluginMessage;
+            const { status, credentials, usedTokenSet } = pluginMessage;
             if (status === true) {
               try {
                 track('Fetched from remote', { provider: credentials.provider });
@@ -130,7 +125,11 @@ function InitiatorContainer({ ldClient, identificationPromise }: Props) {
                 dispatch.uiState.setApiData(credentials);
                 dispatch.uiState.setLocalApiState(credentials);
 
-                const remoteData = await pullTokens({ context: credentials, usedTokenSet, featureFlags: receivedFlags });
+                const remoteData = await pullTokens({
+                  context: credentials,
+                  usedTokenSet,
+                  featureFlags: receivedFlags,
+                });
                 const existTokens = Object.values(remoteData?.tokens ?? {}).some((value) => value.length > 0);
                 if (existTokens) dispatch.uiState.setActiveTab(Tabs.TOKENS);
                 else dispatch.uiState.setActiveTab(Tabs.START);
@@ -210,7 +209,7 @@ function InitiatorContainer({ ldClient, identificationPromise }: Props) {
         }
       }
     };
-  }, [ldClient]);
+  }, []);
 
   useEffect(() => {
     async function getLicense() {
@@ -227,4 +226,4 @@ function InitiatorContainer({ ldClient, identificationPromise }: Props) {
   return null;
 }
 
-export const Initiator = withLDConsumer()(InitiatorContainer);
+export default Initiator;
