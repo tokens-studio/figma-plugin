@@ -1,0 +1,376 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`convertTokensObjectToResolved converts object-like unresolved tokens to resolved object 1`] = `
+Object {
+  "colors": Object {
+    "blue": Object {
+      "type": "color",
+      "value": "#0000ff",
+    },
+    "primary": Object {
+      "type": "color",
+      "value": "#ff0000",
+    },
+    "red": Object {
+      "type": "color",
+      "value": "#ff0000",
+    },
+  },
+  "sizing": Object {
+    "base": Object {
+      "type": "sizing",
+      "value": 2,
+    },
+    "medium": Object {
+      "type": "sizing",
+      "value": 3,
+    },
+    "scale": Object {
+      "type": "sizing",
+      "value": 1.5,
+    },
+    "small": Object {
+      "type": "sizing",
+      "value": 2,
+    },
+  },
+}
+`;
+
+exports[`convertTokensObjectToResolved does not expand shadows when not needed 1`] = `
+Object {
+  "shadow": Object {
+    "1": Object {
+      "rawValue": Object {
+        "blur": "4",
+        "color": "#000000",
+        "spread": "5",
+        "type": "dropShadow",
+        "x": "2",
+        "y": "3",
+      },
+      "type": "boxShadow",
+      "value": Object {
+        "blur": 4,
+        "color": "#000000",
+        "spread": 5,
+        "type": "dropShadow",
+        "x": 2,
+        "y": 3,
+      },
+    },
+    "2": Object {
+      "rawValue": Array [
+        Object {
+          "blur": "4",
+          "color": "#000000",
+          "spread": "5",
+          "type": "dropShadow",
+          "x": "2",
+          "y": "3",
+        },
+        Object {
+          "blur": "5",
+          "color": "#000000",
+          "spread": "6",
+          "type": "dropShadow",
+          "x": "3",
+          "y": "4",
+        },
+      ],
+      "type": "boxShadow",
+      "value": Array [
+        Object {
+          "blur": 4,
+          "color": "#000000",
+          "spread": 5,
+          "type": "dropShadow",
+          "x": 2,
+          "y": 3,
+        },
+        Object {
+          "blur": 5,
+          "color": "#000000",
+          "spread": 6,
+          "type": "dropShadow",
+          "x": 3,
+          "y": 4,
+        },
+      ],
+    },
+  },
+}
+`;
+
+exports[`convertTokensObjectToResolved does not expand typography when not needed 1`] = `
+Object {
+  "typography": Object {
+    "h1": Object {
+      "type": "typography",
+      "value": Object {
+        "fontFamily": "Roboto",
+        "fontSize": 96,
+        "fontWeight": "Light",
+      },
+    },
+    "h2": Object {
+      "type": "typography",
+      "value": Object {
+        "fontFamily": "Roboto",
+        "fontSize": 60,
+        "fontWeight": "Light",
+      },
+    },
+    "h3": Object {
+      "type": "typography",
+      "value": Object {
+        "fontFamily": "Roboto",
+        "fontSize": 48,
+        "fontWeight": "Light",
+      },
+    },
+  },
+}
+`;
+
+exports[`convertTokensObjectToResolved preserves all references when requested 1`] = `
+Object {
+  "colors": Object {
+    "blue": Object {
+      "type": "color",
+      "value": "#0000ff",
+    },
+    "primary": Object {
+      "description": "Should NOT be resolved",
+      "type": "color",
+      "value": "$colors.red",
+    },
+    "red": Object {
+      "type": "color",
+      "value": "#ff0000",
+    },
+  },
+  "sizing": Object {
+    "base": Object {
+      "type": "sizing",
+      "value": "2",
+    },
+    "large": Object {
+      "description": "Should NOT be resolved",
+      "type": "sizing",
+      "value": "$sizing.medium * $sizing.scale",
+    },
+    "medium": Object {
+      "description": "Should NOT be resolved",
+      "type": "sizing",
+      "value": "{sizing.small} * {sizing.scale}",
+    },
+    "scale": Object {
+      "type": "sizing",
+      "value": "1.5",
+    },
+    "small": Object {
+      "description": "Should NOT be resolved",
+      "type": "sizing",
+      "value": "{sizing.base}",
+    },
+    "xsmall": Object {
+      "description": "Should NOT be resolved",
+      "type": "sizing",
+      "value": "1 * {sizing.base}",
+    },
+  },
+  "text": Object {
+    "size": Object {
+      "base": Object {
+        "type": "fontSize",
+        "value": "16",
+      },
+      "default": Object {
+        "description": "Should NOT be resolved",
+        "type": "fontSize",
+        "value": "{text.size.base}{text.size.unit}",
+      },
+      "unit": Object {
+        "type": "fontSize",
+        "value": "px",
+      },
+    },
+  },
+}
+`;
+
+exports[`convertTokensObjectToResolved preserves rawValue when requested 1`] = `
+Object {
+  "colors": Object {
+    "background": Object {
+      "rawValue": "$colors.black",
+      "type": "color",
+      "value": "#000000",
+    },
+    "black": Object {
+      "rawValue": "#000000",
+      "type": "color",
+      "value": "#000000",
+    },
+    "white": Object {
+      "rawValue": "#ffffff",
+      "type": "color",
+      "value": "#ffffff",
+    },
+  },
+}
+`;
+
+exports[`convertTokensObjectToResolved resolves all references when requested 1`] = `
+Object {
+  "colors": Object {
+    "blue": Object {
+      "type": "color",
+      "value": "#0000ff",
+    },
+    "primary": Object {
+      "description": "Should be resolved",
+      "type": "color",
+      "value": "#ff0000",
+    },
+    "red": Object {
+      "type": "color",
+      "value": "#ff0000",
+    },
+  },
+  "sizing": Object {
+    "base": Object {
+      "type": "sizing",
+      "value": 2,
+    },
+    "large": Object {
+      "description": "Should be resolved",
+      "type": "sizing",
+      "value": 4.5,
+    },
+    "medium": Object {
+      "description": "Should be resolved",
+      "type": "sizing",
+      "value": 3,
+    },
+    "scale": Object {
+      "type": "sizing",
+      "value": 1.5,
+    },
+    "small": Object {
+      "description": "Should be resolved",
+      "type": "sizing",
+      "value": 2,
+    },
+    "xsmall": Object {
+      "description": "Should be resolved",
+      "type": "sizing",
+      "value": 2,
+    },
+  },
+  "text": Object {
+    "size": Object {
+      "base": Object {
+        "type": "fontSize",
+        "value": 16,
+      },
+      "default": Object {
+        "description": "Should be resolved",
+        "type": "fontSize",
+        "value": "16px",
+      },
+      "unit": Object {
+        "type": "fontSize",
+        "value": "px",
+      },
+    },
+  },
+}
+`;
+
+exports[`convertTokensObjectToResolved resolves only math expressions when requested 1`] = `
+Object {
+  "colors": Object {
+    "blue": Object {
+      "type": "color",
+      "value": "#0000ff",
+    },
+    "primary": Object {
+      "description": "Should NOT be resolved",
+      "type": "color",
+      "value": "$colors.red",
+    },
+    "red": Object {
+      "type": "color",
+      "value": "#ff0000",
+    },
+  },
+  "sizing": Object {
+    "base": Object {
+      "type": "sizing",
+      "value": 2,
+    },
+    "large": Object {
+      "description": "Should be resolved",
+      "type": "sizing",
+      "value": 4.5,
+    },
+    "medium": Object {
+      "description": "Should be resolved",
+      "type": "sizing",
+      "value": 3,
+    },
+    "scale": Object {
+      "type": "sizing",
+      "value": 1.5,
+    },
+    "small": Object {
+      "description": "Should NOT be resolved",
+      "type": "sizing",
+      "value": "{sizing.base}",
+    },
+    "xsmall": Object {
+      "description": "Should be resolved",
+      "type": "sizing",
+      "value": 2,
+    },
+  },
+  "text": Object {
+    "size": Object {
+      "base": Object {
+        "type": "fontSize",
+        "value": 16,
+      },
+      "default": Object {
+        "description": "Should be resolved",
+        "type": "fontSize",
+        "value": "16px",
+      },
+      "unit": Object {
+        "type": "fontSize",
+        "value": "px",
+      },
+    },
+  },
+}
+`;
+
+exports[`convertTokensObjectToResolved respects used sets 1`] = `
+Object {
+  "colors": Object {
+    "background": Object {
+      "type": "color",
+      "value": "#ffffff",
+    },
+    "black": Object {
+      "type": "color",
+      "value": "#000000",
+    },
+    "white": Object {
+      "type": "color",
+      "value": "#ffffff",
+    },
+  },
+}
+`;
