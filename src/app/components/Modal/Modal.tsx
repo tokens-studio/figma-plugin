@@ -55,7 +55,9 @@ export function Modal({
   compact = false,
 }: ModalProps) {
   React.useEffect(() => {
-    ReactModal.setAppElement('#app');
+    if (typeof document !== 'undefined' && document.getElementById('app')) {
+      ReactModal.setAppElement('#app');
+    }
   }, []);
 
   const paddingClass = () => {
