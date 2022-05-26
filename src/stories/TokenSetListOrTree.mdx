@@ -1,0 +1,18 @@
+import { Meta, Story, ArgsTable, Canvas, Preview } from "@storybook/addon-docs";
+import TokenSetListOrTree from "@/app/components/TokenSetListOrTree";
+
+<Meta title="TokenSetListOrTree" component={TokenSetListOrTree} />
+
+<ArgsTable of={TokenSetListOrTree}/>
+
+export const TokenSetListOrTreeDefaultStory = (args) => {
+  return (
+    <TokenSetListOrTree/>
+  )
+}
+
+<Canvas>
+  <Story name="Default">
+    {TokenSetListOrTreeDefaultStory.bind({})}
+  </Story>
+</Canvas>

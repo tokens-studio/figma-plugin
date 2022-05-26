@@ -1,0 +1,27 @@
+import { Meta, Story, ArgsTable, Canvas, Preview } from "@storybook/addon-docs";
+
+import Checkbox from "@/app/components/Checkbox";
+
+<Meta 
+  title="Checkbox"
+  component={Checkbox}
+  args={{
+    checked: false,
+    defaultChecked: false,
+    disabled: false,
+  }}
+/>
+
+<ArgsTable of={Checkbox} />
+
+export const CheckboxDefaultStory = (args) => {
+  return (
+    <Checkbox {...args}/>
+  )
+}
+
+<Canvas>
+  <Story name="Default">
+    {CheckboxDefaultStory.bind({})}
+  </Story>
+</Canvas>

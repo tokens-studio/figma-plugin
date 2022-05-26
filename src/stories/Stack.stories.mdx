@@ -1,0 +1,26 @@
+import { Meta, Story, ArgsTable, Canvas, Preview } from "@storybook/addon-docs";
+import Stack from '@/app/components/Stack';
+
+<Meta title="Stack" component={Stack}/>
+
+<ArgsTable of={Stack} />
+
+export const StackDefaultStory = (args) => {
+  return (
+    <Stack gap={args.gap} direction={args.direction} align={args.align} justify={args.justify} width={args.width}>
+      Figma Token Plugin Stack component
+    </Stack>
+  )
+}
+
+<Canvas>
+  <Story name="Primary" args={{
+    gap: 1,
+    direction: 'column',
+    align: 'start',
+    justify: 'start',
+    wrap: false,
+  }}>
+    {StackDefaultStory.bind({})}
+  </Story>
+</Canvas>
