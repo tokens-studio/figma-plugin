@@ -19,6 +19,7 @@ function ConfirmDialog() {
   const localApiState = useSelector(localApiStateSelector);
   const [commitMessage, setCommitMessage] = React.useState('');
   const [branch, setBranch] = React.useState((isGitProvider(localApiState) ? localApiState.branch : '') || '');
+  const [owner, repo] = localApiState.id.split('/');
 
   React.useEffect(() => {
     if (showPushDialog === 'initial' && isGitProvider(localApiState)) {
@@ -32,11 +33,13 @@ function ConfirmDialog() {
   if (localApiState && 'id' in localApiState && localApiState.id) {
     switch (localApiState.provider) {
       case StorageProviderType.GITHUB:
-        redirectHref = getGithubCreatePullRequestUrl(localApiState.id, branch);
+        redirectHref = getGithubCreatePullRequestUrl({
+          base: localApiState.baseUrl, repo: localApiState.id, branch,
+        });
         break;
       case StorageProviderType.GITLAB:
-        const [owner, repo] = localApiState.id.split('/');
-        redirectHref = getGitlabCreatePullRequestUrl(owner, repo);
+
+        redirectHref = getGitlabCreatePullRequestUrl({ owner, repo });
         break;
       case StorageProviderType.ADO:
         redirectHref = getADOCreatePullRequestUrl({
@@ -56,9 +59,8 @@ function ConfirmDialog() {
     case 'initial': {
       return (
         <Modal large isOpen close={onCancel}>
-          <form
-            onSubmit={() => onConfirm(commitMessage, branch)}
-          >
+          {/* eslint-disable-next-line react/jsx-no-bind */}
+          <form onSubmit={() => onConfirm(commitMessage, branch)}>
             <Stack direction="column" gap={4}>
               <Stack direction="column" gap={2}>
                 <Heading>Push changes</Heading>
@@ -70,6 +72,7 @@ function ConfirmDialog() {
                   full
                   label="Commit message"
                   value={commitMessage}
+                  // eslint-disable-next-line react/jsx-no-bind
                   onChange={(e) => setCommitMessage(e.target.value)}
                   type="text"
                   name="commitMessage"
@@ -79,6 +82,7 @@ function ConfirmDialog() {
                   full
                   label="Branch"
                   value={branch}
+                  // eslint-disable-next-line react/jsx-no-bind
                   onChange={(e) => setBranch(e.target.value)}
                   type="text"
                   name="branch"
