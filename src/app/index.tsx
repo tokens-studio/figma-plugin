@@ -14,9 +14,7 @@ import { store } from './store';
 import * as pjs from '../../package.json';
 import Stack from './components/Stack';
 import Text from './components/Text';
-import AppContainer from './components/AppContainer';
-import Initiator from './components/Initiator';
-import { ldIdentificationPromise } from './components/App';
+import App from './components/App';
 
 initializeAnalytics();
 
@@ -47,8 +45,7 @@ function ErrorFallback({ error }: { error: Error }) {
 ReactDOM.render(
   <Sentry.ErrorBoundary fallback={ErrorFallback}>
     <Provider store={store}>
-      <Initiator identificationPromise={ldIdentificationPromise} />
-      <AppContainer />
+      <App />
     </Provider>
   </Sentry.ErrorBoundary>,
   document.getElementById('app'),

@@ -2,7 +2,6 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AnimatePresence, motion } from 'framer-motion';
-import { useFlags } from 'launchdarkly-react-client-sdk';
 import { mergeTokenGroups, resolveTokenValues } from '@/plugin/tokenHelpers';
 import TokenListing from './TokenListing';
 import TokensBottomBar from './TokensBottomBar';
@@ -26,13 +25,21 @@ import parseJson from '@/utils/parseJson';
 import AttentionIcon from '@/icons/attention.svg';
 import { TokensContext } from '@/context';
 import {
-  activeTokenSetSelector, manageThemesModalOpenSelector, showEditFormSelector, tokenFilterSelector, tokensSelector, tokenTypeSelector, updateModeSelector, usedTokenSetSelector,
+  activeTokenSetSelector,
+  manageThemesModalOpenSelector,
+  showEditFormSelector,
+  tokenFilterSelector,
+  tokensSelector,
+  tokenTypeSelector,
+  updateModeSelector,
+  usedTokenSetSelector,
 } from '@/selectors';
 import { ThemeSelector } from './ThemeSelector';
 import { IconToggleableDisclosure } from './icons/IconToggleableDisclosure';
 import { styled } from '@/stitches.config';
 import { ManageThemesModal } from './ManageThemesModal';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
+import { useFlags } from './LaunchDarkly/useFlags';
 
 const StyledButton = styled('button', {
   '&:focus, &:hover': {
@@ -108,15 +115,15 @@ function Tokens({ isActive }: { isActive: boolean }) {
   const shouldConfirm = React.useMemo(() => updateMode === UpdateMode.DOCUMENT, [updateMode]);
 
   const resolvedTokens = React.useMemo(
-    () => resolveTokenValues(mergeTokenGroups(tokens, {
-      ...usedTokenSet,
-      [activeTokenSet]: TokenSetStatus.ENABLED,
-    })),
+    () => resolveTokenValues(
+      mergeTokenGroups(tokens, {
+        ...usedTokenSet,
+        [activeTokenSet]: TokenSetStatus.ENABLED,
+      }),
+    ),
     [tokens, usedTokenSet, activeTokenSet],
   );
-  const [stringTokens, setStringTokens] = React.useState(
-    JSON.stringify(tokens[activeTokenSet], null, 2),
-  );
+  const [stringTokens, setStringTokens] = React.useState(JSON.stringify(tokens[activeTokenSet], null, 2));
   const tokenType = useSelector(tokenTypeSelector);
 
   const [error, setError] = React.useState<string | null>(null);
@@ -174,9 +181,12 @@ function Tokens({ isActive }: { isActive: boolean }) {
     }
   }, [confirm, shouldConfirm, dispatch.tokenState, activeTokensTab, stringTokens]);
 
-  const tokensContextValue = React.useMemo(() => ({
-    resolvedTokens,
-  }), [resolvedTokens]);
+  const tokensContextValue = React.useMemo(
+    () => ({
+      resolvedTokens,
+    }),
+    [resolvedTokens],
+  );
 
   React.useEffect(() => {
     // @README these dependencies aren't exhaustive
@@ -218,7 +228,11 @@ function Tokens({ isActive }: { isActive: boolean }) {
           }}
         >
           <Box>
-            <StyledButton style={{ height: '100%' }} type="button" onClick={() => setTokenSetsVisible(!tokenSetsVisible)}>
+            <StyledButton
+              style={{ height: '100%' }}
+              type="button"
+              onClick={() => setTokenSetsVisible(!tokenSetsVisible)}
+            >
               <Box
                 css={{
                   fontWeight: '$bold',
@@ -292,10 +306,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
             {activeTokensTab === 'json' ? (
               <Box css={{ position: 'relative', height: '100%' }}>
                 <JSONEditor stringTokens={stringTokens} handleChange={handleChangeJSON} hasError={Boolean(error)} />
-                <StatusToast
-                  open={Boolean(error)}
-                  error={error}
-                />
+                <StatusToast open={Boolean(error)} error={error} />
               </Box>
             ) : (
               <Box css={{ width: '100%', paddingBottom: '$6' }} className="content scroll-container">
@@ -319,11 +330,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
             )}
           </Box>
         </Box>
-        <TokensBottomBar
-          handleUpdate={handleUpdate}
-          handleSaveJSON={handleSaveJSON}
-          hasJSONError={!!error}
-        />
+        <TokensBottomBar handleUpdate={handleUpdate} handleSaveJSON={handleSaveJSON} hasJSONError={!!error} />
       </Box>
     </TokensContext.Provider>
   );

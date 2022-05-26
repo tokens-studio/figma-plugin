@@ -1,6 +1,6 @@
 import { useSelector } from 'react-redux';
 import { useMemo } from 'react';
-import { useFlags } from 'launchdarkly-react-client-sdk';
+import { useFlags } from '../components/LaunchDarkly/useFlags';
 import { apiSelector } from '@/selectors';
 import { StorageProviderType } from '@/types/api';
 

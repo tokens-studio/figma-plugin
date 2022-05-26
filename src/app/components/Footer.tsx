@@ -1,7 +1,6 @@
 import React, { useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { DownloadIcon, UploadIcon } from '@primer/octicons-react';
-import { useFlags } from 'launchdarkly-react-client-sdk';
 import * as pjs from '../../../package.json';
 import Box from './Box';
 import Text from './Text';
@@ -26,6 +25,7 @@ import FeedbackIcon from '@/icons/feedback.svg';
 import IconButton from './IconButton';
 import Tooltip from './Tooltip';
 import Icon from './Icon';
+import { useFlags } from './LaunchDarkly/useFlags';
 
 export default function Footer() {
   const storageType = useSelector(storageTypeSelector);

@@ -1,77 +1,59 @@
+import React from 'react';
+
 import { useSelector } from 'react-redux';
-import React, { useEffect } from 'react';
-import { useLDClient } from 'launchdarkly-react-client-sdk';
-import { LDProps } from 'launchdarkly-react-client-sdk/lib/withLDConsumer';
-import Case from 'case';
-import { planSelector } from '@/selectors/planSelector';
-import { clientEmailSelector } from '@/selectors/getClientEmail';
-import { activeTabSelector, licenseStatusSelector } from '@/selectors';
-import { entitlementsSelector } from '@/selectors/getEntitlements';
-import { Entitlements } from '../store/models/userState';
-import { LicenseStatus } from '@/constants/LicenseStatus';
-import Settings from './Settings';
-import Inspector from './Inspector';
-import Tokens from './Tokens';
-import StartScreen from './StartScreen';
-import Navbar from './Navbar';
-import { userIdSelector } from '@/selectors/userIdSelector';
-
-let ldIdentificationResolver: (flags: LDProps['flags']) => void = () => {};
-
-export const ldIdentificationPromise = new Promise<LDProps['flags']>((resolve) => {
-  ldIdentificationResolver = resolve;
-});
+import Footer from './Footer';
+import Changelog from './Changelog';
+import ImportedTokensDialog from './ImportedTokensDialog';
+import ConfirmDialog from './ConfirmDialog';
+import PushDialog from './PushDialog';
+import WindowResizer from './WindowResizer';
+import Box from './Box';
+import { activeTabSelector } from '@/selectors';
+import LoadingBar from './LoadingBar';
+import PluginResizerWrapper from './PluginResizer';
+import MainContent, { ldIdentificationPromise } from './MainContent';
+import LDProviderWrapper from './LaunchDarkly';
+import Initiator from './Initiator';
 
 function App() {
   const activeTab = useSelector(activeTabSelector);
-  const plan = useSelector(planSelector);
-  const ldClient = useLDClient();
-  const clientEmail = useSelector(clientEmailSelector);
-  const entitlements = useSelector(entitlementsSelector);
-  const licenseStatus = useSelector(licenseStatusSelector);
-  const userId = useSelector(userIdSelector);
-
-  useEffect(() => {
-    if (
-      userId
-      && ldClient
-      && licenseStatus !== LicenseStatus.UNKNOWN
-      && licenseStatus !== LicenseStatus.VERIFYING
-      // license should be verified (or returned an error) before identifying launchdarkly with entitlements
-    ) {
-      const userAttributes: Record<string, string | boolean> = {
-        plan: plan || '',
-        os: !entitlements.includes(Entitlements.PRO),
-      };
-
-      entitlements.forEach((entitlement) => {
-        userAttributes[entitlement] = true;
-      });
-
-      // we need to be able to await the identifiaction process in the initiator
-      // this logic could be improved later to be more reactive
-      ldClient
-        .identify({
-          key: userId!,
-          custom: userAttributes,
-          email: clientEmail,
-        })
-        .then((rawFlags) => {
-          const normalizedFlags = Object.fromEntries(
-            Object.entries(rawFlags).map(([key, value]) => [Case.camel(key), value]),
-          );
-          ldIdentificationResolver(normalizedFlags);
-        });
-    }
-  }, [userId, ldClient, licenseStatus, plan, clientEmail, entitlements]);
   return (
-    <>
-      {activeTab !== 'start' && activeTab !== 'loading' && <Navbar />}
-      {activeTab === 'start' && <StartScreen />}
-      <Tokens isActive={activeTab === 'tokens'} />
-      {activeTab === 'inspector' && <Inspector />}
-      {activeTab === 'settings' && <Settings />}
-    </>
+    <LDProviderWrapper>
+      <>
+        <Initiator identificationPromise={ldIdentificationPromise} />
+        <Box css={{ backgroundColor: '$bgDefault' }}>
+          {activeTab !== 'loading' && <LoadingBar />}
+          <PluginResizerWrapper>
+            <Box
+              css={{
+                display: 'flex',
+                flexDirection: 'column',
+                height: '100%',
+                overflow: 'hidden',
+              }}
+            >
+              <Box
+                css={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  flexGrow: 1,
+                  height: '100%',
+                  overflow: 'hidden',
+                }}
+              >
+                <MainContent />
+              </Box>
+              <Footer />
+              <Changelog />
+              <ImportedTokensDialog />
+              <ConfirmDialog />
+              <PushDialog />
+              <WindowResizer />
+            </Box>
+          </PluginResizerWrapper>
+        </Box>
+      </>
+    </LDProviderWrapper>
   );
 }
 

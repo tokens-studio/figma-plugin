@@ -1,6 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { useCallback, useMemo } from 'react';
-import { useFlags } from 'launchdarkly-react-client-sdk';
 import { LDProps } from 'launchdarkly-react-client-sdk/lib/withLDConsumer';
 import { Dispatch } from '@/app/store';
 import { MessageToPluginTypes } from '@/types/messages';
@@ -8,13 +7,12 @@ import useConfirm from '@/app/hooks/useConfirm';
 import usePushDialog from '@/app/hooks/usePushDialog';
 import { ContextObject } from '@/types/api';
 import { notifyToUI, postToFigma } from '@/plugin/notifiers';
-import {
-  localApiStateSelector, themesListSelector, tokensSelector,
-} from '@/selectors';
+import { localApiStateSelector, themesListSelector, tokensSelector } from '@/selectors';
 import { GitlabTokenStorage } from '@/storage/GitlabTokenStorage';
 import { isEqual } from '@/utils/isEqual';
 import { RemoteTokenStorageData } from '@/storage/RemoteTokenStorage';
 import { GitStorageMetadata } from '@/storage/GitTokenStorage';
+import { useFlags } from '@/app/components/LaunchDarkly/useFlags';
 
 export function useGitLab() {
   const tokens = useSelector(tokensSelector);
