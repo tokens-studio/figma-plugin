@@ -31,9 +31,8 @@ const SyncSettings = () => {
   const [editStorageItemModalVisible, setShowEditStorageModalVisible] = React.useState(Boolean(localApiState.new));
   const [createStorageItemModalVisible, setShowCreateStorageModalVisible] = React.useState(false);
 
-  const setLocalBranches = React.useCallback(async(provider: ApiDataType) => {
+  const setLocalBranches = React.useCallback(async (provider: ApiDataType) => {
     const branches = await fetchBranches(provider);
-    console.log("branches", branches)
     if (branches) {
       dispatch.branchState.setBranches(branches);
     }
