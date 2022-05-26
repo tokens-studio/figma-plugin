@@ -19,7 +19,7 @@
     "svgr": "svgr -d src/icons/ assets/",
     "cy:open": "cypress open",
     "cy:run": "cypress run --headless",
-    "serve": "cross-env 'LAUNCHDARKLY_FLAGS=tokenThemes,gitBranchSelector' serve dist",
+    "serve": "serve dist",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook"
   },
