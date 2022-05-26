@@ -13,10 +13,9 @@ import { ApiDataType } from '@/types/api';
 type Props = {
   item: ApiDataType,
   onEdit: () => void,
-  setLocalBranches: (provider: ApiDataType) => void;
 };
 
-const StorageItem = ({ item, onEdit, setLocalBranches }: Props) => {
+const StorageItem = ({ item, onEdit }: Props) => {
   const storageType = useSelector(storageTypeSelector);
   const {
     provider, id, branch, name,
@@ -34,7 +33,6 @@ const StorageItem = ({ item, onEdit, setLocalBranches }: Props) => {
 
   const handleRestore = React.useCallback(() => {
     restoreStoredProvider(item);
-    setLocalBranches(item);
   }, [item, restoreStoredProvider]);
 
   return (

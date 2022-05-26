@@ -234,7 +234,6 @@ const SyncSettings = () => {
                     key={item?.internalId || `${item.provider}-${item.id}-${item.secret}`}
                     onEdit={handleEditClick(item)}
                     item={item}
-                    setLocalBranches={setLocalBranches}
                   />
                 ))}
               </Stack>
