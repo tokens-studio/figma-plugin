@@ -175,6 +175,11 @@ export default function useRemoteTokens() {
       dispatch.uiState.setLocalApiState(credentials);
       dispatch.uiState.setApiData(credentials);
       setStorageType({ provider: credentials, shouldSetInDocument: true });
+      const branches = await fetchBranches(credentials);
+      if (branches) {
+        dispatch.branchState.setBranches(branches);
+      }
+  
       return true;
     }
     return false;

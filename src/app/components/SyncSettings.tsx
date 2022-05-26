@@ -2,7 +2,7 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { track } from '@/utils/analytics';
-import { StorageProviderType } from '@/types/api';
+import { ApiDataType, StorageProviderType } from '@/types/api';
 import Button from './Button';
 import Heading from './Heading';
 import ConfirmLocalStorageModal from './modals/ConfirmLocalStorageModal';
@@ -12,6 +12,7 @@ import EditStorageItemModal from './modals/EditStorageItemModal';
 import CreateStorageItemModal from './modals/CreateStorageItemModal';
 import useStorage from '../store/useStorage';
 import { Dispatch } from '../store';
+import useRemoteTokens from '../store/remoteTokens';
 import { apiProvidersSelector, localApiStateSelector, storageTypeSelector } from '@/selectors';
 import Stack from './Stack';
 import Box from './Box';
@@ -24,14 +25,24 @@ const SyncSettings = () => {
   const dispatch = useDispatch<Dispatch>();
 
   const { setStorageType } = useStorage();
+  const { fetchBranches } = useRemoteTokens();
 
   const [confirmModalVisible, showConfirmModal] = React.useState(false);
   const [editStorageItemModalVisible, setShowEditStorageModalVisible] = React.useState(Boolean(localApiState.new));
   const [createStorageItemModalVisible, setShowCreateStorageModalVisible] = React.useState(false);
 
+  const setLocalBranches = React.useCallback(async(provider: ApiDataType) => {
+    const branches = await fetchBranches(provider);
+    console.log("branches", branches)
+    if (branches) {
+      dispatch.branchState.setBranches(branches);
+    }
+  }, [dispatch.uiState]);
+
   const handleEditClick = React.useCallback((provider) => () => {
     track('Edit Credentials');
     dispatch.uiState.setLocalApiState(provider);
+    setLocalBranches(provider);
     setShowEditStorageModalVisible(true);
   }, [dispatch.uiState]);
 
@@ -224,6 +235,7 @@ const SyncSettings = () => {
                     key={item?.internalId || `${item.provider}-${item.id}-${item.secret}`}
                     onEdit={handleEditClick(item)}
                     item={item}
+                    setLocalBranches={setLocalBranches}
                   />
                 ))}
               </Stack>
