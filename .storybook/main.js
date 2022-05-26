@@ -20,7 +20,6 @@ module.exports = {
   },
   framework: "@storybook/react",
   webpackFinal: async (config, { configType }) => {
-    config.mode = 'none';
     config.resolve.alias['@'] = path.resolve(__dirname, '../src/');
     // Remove the default .css webpack module rule
     // This is necessary because we use both global CSS and CSS modules
@@ -33,7 +32,7 @@ module.exports = {
     });
 
     config.module.rules.push({
-      test: /\main.css$/,
+      test: /\.css$/,
       use: [
         "style-loader",
         "css-loader",
