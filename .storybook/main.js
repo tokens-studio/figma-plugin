@@ -29,8 +29,8 @@ module.exports = {
       if (".css".match(r.test)) {
         return false;
       }
-      return true
-    })
+      return true;
+    });
 
     config.module.rules.push({
       test: /\main.css$/,
@@ -38,7 +38,7 @@ module.exports = {
         "style-loader",
         "css-loader",
       ],
-    })
+    });
     return config;
   },
   typescript: {
