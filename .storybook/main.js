@@ -38,6 +38,25 @@ module.exports = {
         "css-loader",
       ],
     });
+
+    config.module.rules = config.module.rules.filter((r) => {
+      if (".svg".match(r.test)) {
+        return false;
+      }
+      return true;
+    });
+
+    config.module.rules.push({
+      test: /\.svg$/,
+      use: [{
+        loader: '@svgr/webpack',
+        options: {
+          svgoConfig: {
+            plugins: [{ removeViewBox: false }]
+          }
+        }
+      }],
+    });
     return config;
   },
   typescript: {
