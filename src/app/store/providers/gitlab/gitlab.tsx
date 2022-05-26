@@ -134,6 +134,7 @@ export function useGitLab() {
     try {
       const storage = await storageClientFactory(context);
       const hasBranches = await storage.fetchBranches();
+      dispatch.branchState.setBranches(hasBranches);
 
       if (!hasBranches || !hasBranches.length) {
         return null;

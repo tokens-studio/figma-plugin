@@ -140,6 +140,7 @@ export function useGitHub() {
     try {
       const storage = storageClientFactory(context);
       const hasBranches = await storage.fetchBranches();
+      dispatch.branchState.setBranches(hasBranches);
       if (!hasBranches || !hasBranches.length) {
         return null;
       }
