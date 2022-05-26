@@ -6,5 +6,8 @@ export function getGithubCreatePullRequestUrl({
   repo: string,
   branch?: string
 }) {
-  return `${base}/${repo}/compare/${branch}?expand=1`;
+  // We need to remove the `api/v3` part of the URL for GHE instances
+  const baseUrl = base.replace('/api/v3', '');
+
+  return `${baseUrl}/${repo}/compare/${branch}?expand=1`;
 }
