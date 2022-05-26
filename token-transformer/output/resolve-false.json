@@ -3,7 +3,7 @@
     "multiple": {
       "value": [
         {
-          "color": "#1B1F24",
+          "color": "{colors.gray.900}",
           "type": "dropShadow",
           "x": 0,
           "y": 4,
@@ -11,7 +11,7 @@
           "spread": 0
         },
         {
-          "color": "#1B1F24",
+          "color": "{colors.gray.900}",
           "type": "dropShadow",
           "x": 0,
           "y": 0,
@@ -23,7 +23,7 @@
     },
     "single": {
       "value": {
-        "color": "#1B1F24",
+        "color": "{colors.gray.900}",
         "type": "dropShadow",
         "x": 0,
         "y": 4,

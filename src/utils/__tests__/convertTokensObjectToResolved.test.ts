@@ -212,6 +212,28 @@ describe('convertTokensObjectToResolved', () => {
             type: 'color',
             value: '#ff0000',
           },
+          opaqueRed: {
+            description: 'Should be resolved',
+            type: 'color',
+            value: 'rgba(255, 0, 0, {opacity.medium})',
+          },
+        },
+        opacity: {
+          medium: {
+            type: 'opacity',
+            value: '0.5',
+          },
+        },
+        radii: {
+          full: {
+            value: '100%',
+            type: 'borderRadius',
+          },
+          leaf: {
+            description: 'Should be resolved',
+            value: '{radii.full} 0%',
+            type: 'borderRadius',
+          },
         },
         sizing: {
           base: {
@@ -242,11 +264,25 @@ describe('convertTokensObjectToResolved', () => {
             value: '$sizing.medium * $sizing.scale',
             type: 'sizing',
           },
+          responsive25: {
+            description: 'Should be resolved',
+            value: 'calc(25vw * $sizing.small)',
+            type: 'sizing',
+          },
+          responsive50: {
+            description: 'Should be resolved',
+            value: 'calc(50vw - {sizing.large}px)',
+            type: 'sizing',
+          },
         },
         text: {
           size: {
             base: {
               value: '16',
+              type: 'fontSize',
+            },
+            h1: {
+              value: '96',
               type: 'fontSize',
             },
             unit: {
@@ -259,6 +295,48 @@ describe('convertTokensObjectToResolved', () => {
               type: 'fontSize',
             },
           },
+          fontWeight: {
+            base: {
+              value: '100',
+              type: 'fontWeight',
+            },
+            light: {
+              value: 'Light',
+              type: 'fontWeight',
+            },
+          },
+          typography: [
+            {
+              description: 'Should be resolved',
+              name: 'typography.h1',
+              type: 'typography',
+              value: {
+                fontFamily: 'Roboto',
+                fontSize: '{text.size.h1}',
+                fontWeight: '{text.fontWeight.light}',
+              },
+            },
+            {
+              description: 'Should be resolved',
+              name: 'typography.h2',
+              type: 'typography',
+              value: {
+                fontFamily: 'Roboto',
+                fontSize: '3.75 * {text.size.base}',
+                fontWeight: '7 * {text.fontWeight.base}',
+              },
+            },
+            {
+              description: 'Should be resolved',
+              name: 'typography.h3',
+              type: 'typography',
+              value: {
+                fontFamily: 'Roboto',
+                fontSize: '3 * {text.size.base}',
+                fontWeight: '5 * 100',
+              },
+            },
+          ],
         },
       },
     };
@@ -285,6 +363,28 @@ describe('convertTokensObjectToResolved', () => {
             type: 'color',
             value: '#ff0000',
           },
+          opaqueRed: {
+            description: 'Should NOT be resolved',
+            type: 'color',
+            value: 'rgba(255, 0, 0, {opacity.medium})',
+          },
+        },
+        opacity: {
+          medium: {
+            type: 'opacity',
+            value: '0.5',
+          },
+        },
+        radii: {
+          full: {
+            value: '100%',
+            type: 'borderRadius',
+          },
+          leaf: {
+            description: 'Should NOT be resolved',
+            value: '{radii.full} 0%',
+            type: 'borderRadius',
+          },
         },
         sizing: {
           base: {
@@ -315,11 +415,25 @@ describe('convertTokensObjectToResolved', () => {
             value: '$sizing.medium * $sizing.scale',
             type: 'sizing',
           },
+          responsive25: {
+            description: 'Should NOT be resolved',
+            value: 'calc(25vw * $sizing.small)',
+            type: 'sizing',
+          },
+          responsive50: {
+            description: 'Should NOT be resolved',
+            value: 'calc(50vw - {sizing.large}px)',
+            type: 'sizing',
+          },
         },
         text: {
           size: {
             base: {
               value: '16',
+              type: 'fontSize',
+            },
+            h1: {
+              value: '96',
               type: 'fontSize',
             },
             unit: {
@@ -332,6 +446,48 @@ describe('convertTokensObjectToResolved', () => {
               type: 'fontSize',
             },
           },
+          fontWeight: {
+            base: {
+              value: '100',
+              type: 'fontWeight',
+            },
+            light: {
+              value: 'Light',
+              type: 'fontWeight',
+            },
+          },
+          typography: [
+            {
+              description: 'Should NOT be resolved',
+              name: 'typography.h1',
+              type: 'typography',
+              value: {
+                fontFamily: 'Roboto',
+                fontSize: '{text.size.h1}',
+                fontWeight: '{text.fontWeight.light}',
+              },
+            },
+            {
+              description: 'Should NOT be resolved',
+              name: 'typography.h2',
+              type: 'typography',
+              value: {
+                fontFamily: 'Roboto',
+                fontSize: '3.75 * {text.size.base}',
+                fontWeight: '7 * {text.fontWeight.base}',
+              },
+            },
+            {
+              description: 'Should NOT be resolved',
+              name: 'typography.h3',
+              type: 'typography',
+              value: {
+                fontFamily: 'Roboto',
+                fontSize: '3 * {text.size.base}',
+                fontWeight: '5 * 100',
+              },
+            },
+          ],
         },
       },
     };
@@ -358,6 +514,28 @@ describe('convertTokensObjectToResolved', () => {
             type: 'color',
             value: '#ff0000',
           },
+          opaqueRed: {
+            description: 'Should NOT be resolved',
+            type: 'color',
+            value: 'rgba(255, 0, 0, {opacity.medium})',
+          },
+        },
+        opacity: {
+          medium: {
+            type: 'opacity',
+            value: '0.5',
+          },
+        },
+        radii: {
+          full: {
+            value: '100%',
+            type: 'borderRadius',
+          },
+          leaf: {
+            description: 'Should NOT be resolved',
+            value: '{radii.full} 0%',
+            type: 'borderRadius',
+          },
         },
         sizing: {
           base: {
@@ -388,6 +566,16 @@ describe('convertTokensObjectToResolved', () => {
             value: '$sizing.medium * $sizing.scale',
             type: 'sizing',
           },
+          responsive25: {
+            description: 'Should NOT be resolved',
+            value: 'calc(25vw * $sizing.small)',
+            type: 'sizing',
+          },
+          responsive50: {
+            description: 'Should NOT be resolved',
+            value: 'calc(50vw - {sizing.large}px)',
+            type: 'sizing',
+          },
         },
         text: {
           size: {
@@ -395,16 +583,62 @@ describe('convertTokensObjectToResolved', () => {
               value: '16',
               type: 'fontSize',
             },
+            h1: {
+              value: '96',
+              type: 'fontSize',
+            },
             unit: {
               value: 'px',
               type: 'fontSize',
             },
             default: {
-              description: 'Should be resolved',
+              description: 'Should NOT be resolved',
               value: '{text.size.base}{text.size.unit}',
               type: 'fontSize',
             },
           },
+          fontWeight: {
+            base: {
+              value: '100',
+              type: 'fontWeight',
+            },
+            light: {
+              value: 'Light',
+              type: 'fontWeight',
+            },
+          },
+          typography: [
+            {
+              description: 'Should NOT be resolved',
+              name: 'typography.h1',
+              type: 'typography',
+              value: {
+                fontFamily: 'Roboto',
+                fontSize: '{text.size.base}',
+                fontWeight: '{text.fontWeight.light}',
+              },
+            },
+            {
+              description: 'Should be resolved',
+              name: 'typography.h2',
+              type: 'typography',
+              value: {
+                fontFamily: 'Roboto',
+                fontSize: '3.75 * {text.size.base}',
+                fontWeight: '7 * {text.fontWeight.base}',
+              },
+            },
+            {
+              description: 'Should be resolved',
+              name: 'typography.h3',
+              type: 'typography',
+              value: {
+                fontFamily: 'Roboto',
+                fontSize: '3 * {text.size.base}',
+                fontWeight: '5 * 100',
+              },
+            },
+          ],
         },
       },
     };
