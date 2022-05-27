@@ -1,0 +1,31 @@
+import { useState } from 'react';
+import { Meta, Story, ArgsTable, Canvas, Preview } from '@storybook/addon-docs';
+import ColorPicker from '@/app/components/ColorPicker';
+
+<Meta 
+  title='ColorPicker' 
+  component={ColorPicker}
+  argsType={{
+    value: {
+      control: 'color',
+    }
+  }}
+/>
+
+<ArgsTable of={args}/>
+
+export const ColorPickerDefaultStory = (args) => {
+  const [value, setValue] = useState(null);
+  return (
+    <ColorPicker
+      value={value}
+      onChange={(v) => setValue(v)}
+    />
+  );
+};
+
+<Canvas>
+  <Story name='ColorPicker'>
+    {ColorPickerDefaultStory.bind({})}
+  </Story>
+</Canvas>

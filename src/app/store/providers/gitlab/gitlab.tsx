@@ -7,7 +7,7 @@ import useConfirm from '@/app/hooks/useConfirm';
 import usePushDialog from '@/app/hooks/usePushDialog';
 import { notifyToUI } from '@/plugin/notifiers';
 import {
-  localApiStateSelector, themesListSelector, tokensSelector,
+  localApiStateSelector, themesListSelector, tokensSelector, usedTokenSetSelector,
 } from '@/selectors';
 import { GitlabTokenStorage } from '@/storage/GitlabTokenStorage';
 import { isEqual } from '@/utils/isEqual';
@@ -25,6 +25,7 @@ export function useGitLab() {
   const tokens = useSelector(tokensSelector);
   const themes = useSelector(themesListSelector);
   const localApiState = useSelector(localApiStateSelector);
+  const usedTokenSet = useSelector(usedTokenSetSelector);
   const { multiFileSync } = useFlags();
   const dispatch = useDispatch<Dispatch>();
 
@@ -84,6 +85,7 @@ export function useGitLab() {
         dispatch.tokenState.setTokenData({
           values: tokens,
           themes,
+          usedTokenSet,
         });
 
         pushDialog('success');
@@ -158,6 +160,7 @@ export function useGitLab() {
             dispatch.tokenState.setTokenData({
               values: content.tokens,
               themes: content.themes,
+              usedTokenSet,
             });
             notifyToUI('Pulled tokens from GitLab');
           }
@@ -191,6 +194,7 @@ export function useGitLab() {
         dispatch.tokenState.setTokenData({
           values: data.tokens,
           themes: data.themes,
+          usedTokenSet,
         });
       } else {
         notifyToUI('No tokens stored on remote');

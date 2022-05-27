@@ -31,7 +31,7 @@ function replaceAliasWithResolvedReference(token: string | TokenTypograpyValue |
 }
 
 // @TODO This function logic needs to be explained to improve it. It is unclear at this time which cases it needs to handle and how
-export function getAliasValue(token: SingleToken | string | number, tokens: SingleToken[] = []): string | number | object | null {
+export function getAliasValue(token: SingleToken | string | number, tokens: SingleToken[] = []): string | number | TokenTypograpyValue | TokenBoxshadowValue | Array<TokenBoxshadowValue> | null {
   // @TODO not sure how this will handle typography and boxShadow values. I don't believe it works.
   // The logic was copied from the original function in aliases.tsx
 
@@ -86,7 +86,7 @@ export function getAliasValue(token: SingleToken | string | number, tokens: Sing
             && foundToken?.rawValue[tokenAliasSplitedLastPrevious].hasOwnProperty(tokenAliasSplitedLast)
           ) {
             const rawValueEntry = foundToken?.rawValue[tokenAliasSplitedLastPrevious];
-            return getAliasValue(rawValueEntry[tokenAliasSplitedLast as keyof typeof rawValueEntry], tokens);
+            return getAliasValue(rawValueEntry[tokenAliasSplitedLast as keyof typeof rawValueEntry] || tokenAliasSplitedLastPrevious, tokens);
           }
         }
         return ref;
