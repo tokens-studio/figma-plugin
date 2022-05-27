@@ -1,9 +1,9 @@
-import { Meta, Story, ArgsTable, Canvas, Preview } from "@storybook/addon-docs";
+import { Meta, Story, ArgsTable, Canvas, Preview } from '@storybook/addon-docs';
 
-import GitForm from "@/app/components/StorageItemForm/GitForm";
+import GitForm from '@/app/components/StorageItemForm/GitForm';
 
 <Meta 
-  title="GitForm" 
+  title='GitForm' 
   component={GitForm} 
   args={{
     values: {
@@ -27,7 +27,7 @@ export const GitFormDefaultStory = (args) => {
 }
 
 <Canvas>
-  <Story name="Default">
+  <Story name='Default'>
     {GitFormDefaultStory.bind({})}
   </Story>
 </Canvas>

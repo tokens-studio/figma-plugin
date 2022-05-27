@@ -1,7 +1,10 @@
-import { Meta, Story, ArgsTable, Canvas, Preview } from "@storybook/addon-docs";
+import { Meta, Story, ArgsTable, Canvas, Preview } from '@storybook/addon-docs';
 import Text from '@/app/components/Text';
 
-<Meta title='Text' component={Text}/>
+<Meta 
+  title='Text' 
+  component={Text}
+/>
 
 <ArgsTable of={Text}/>
 
@@ -12,7 +15,7 @@ export const TextDefaultStory = (args) => {
 }
 
 <Canvas>
-  <Story name="Default" args={{
+  <Story name='Default' args={{
     bold: true,
     size: 'small'
   }}>

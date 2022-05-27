@@ -6,13 +6,16 @@ import { store } from '@/app/store';
 import {ManageThemesModal} from '@/app/components/ManageThemesModal/ManageThemesModal';
 import Button from '@/app/components/Button/Button';
 
-<Meta title="ManageThemesModal" component={ManageThemesModal} />
+<Meta title='ManageThemesModal' component={ManageThemesModal} />
 
 <ArgsTable of={ManageThemesModal} />
 
 export const ManageThemesModalDefaultStory = (args) => {
   return (
     <>
+    <Button onClick={() => setIsOpen(true)}>
+      Click to Open a ManageThemes Modal
+    </Button>
     <Provider store={store}>
       <ManageThemesModal />
     </Provider>
@@ -21,7 +24,7 @@ export const ManageThemesModalDefaultStory = (args) => {
 }
 
 <Canvas>
-  <Story name="Default">
+  <Story name='Default'>
     {ManageThemesModalDefaultStory.bind({})}
   </Story>
 </Canvas>

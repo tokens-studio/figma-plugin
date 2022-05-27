@@ -1,4 +1,4 @@
-import { Meta, Story, ArgsTable, Canvas, Preview } from "@storybook/addon-docs";
+import { Meta, Story, ArgsTable, Canvas, Preview } from '@storybook/addon-docs';
 import { Provider } from 'react-redux';
 
 import { store } from '@/app/store';
@@ -9,7 +9,7 @@ import { TokenButton } from '@/app/components/TokenButton';
 import TokenTree from '@/app/components/TokenTree';
 
 <Meta 
-	title="TokenButton"
+	title='TokenButton'
 	component={TokenButton}
 	args={{
 		type: TokenTypes.SIZING,
@@ -30,7 +30,7 @@ export const TokenButtonDefaultStory = (args) => {
 }
 
 <Canvas>
-	<Story name="TokenButton" args={{
+	<Story name='TokenButton' args={{
 	}}>
 		{TokenButtonDefaultStory.bind({})}
 	</Story>

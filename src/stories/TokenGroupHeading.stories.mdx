@@ -1,9 +1,11 @@
-import { Meta, Story, ArgsTable, Canvas, Preview } from "@storybook/addon-docs";
+import { Meta, Story, ArgsTable, Canvas, Preview } from '@storybook/addon-docs';
 import TokenGroupHeading from '@/app/components/TokenGroupHeading';
 import { Provider } from 'react-redux';
 import { store } from '@/app/store';
 
-<Meta title="TokenGroupHeading"/>
+<Meta 
+  title='TokenGroupHeading'
+/>
 
 <ArgsTable of={TokenGroupHeading} />
 
@@ -16,10 +18,10 @@ export const TokenGroupHeadingDefaultStory = (args) => {
 }
 
 <Canvas>
-  <Story name="Primary" args={{
-    label: "Primary",
-    path: "default.token",
-    id: "listing",
+  <Story name='Primary' args={{
+    label: 'Primary',
+    path: 'default.token',
+    id: 'listing',
   }}>
     {TokenGroupHeadingDefaultStory.bind({})}
   </Story>

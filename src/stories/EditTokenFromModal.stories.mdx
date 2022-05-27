@@ -1,12 +1,12 @@
-import { Meta, Story, ArgsTable, Canvas, Preview } from "@storybook/addon-docs";
-import { Provider } from "react-redux";
+import { Meta, Story, ArgsTable, Canvas, Preview } from '@storybook/addon-docs';
+import { Provider } from 'react-redux';
 
-import { store } from "@/app/store";
+import { store } from '@/app/store';
 
-import EditTokenFormModal from "@/app/components/EditTokenFormModal";
+import EditTokenFormModal from '@/app/components/EditTokenFormModal';
 
 <Meta 
-  title="EditTokenFormModal" 
+  title='EditTokenFormModal' 
   component={EditTokenFormModal}
 />
 
@@ -15,6 +15,9 @@ import EditTokenFormModal from "@/app/components/EditTokenFormModal";
 export const EditTokenFormModalDefaultStory = (args) => {
   return (
     <>
+    <Button onClick={() => setIsOpen(true)}>
+      Click to Open a EditTokenFormModal Modal
+    </Button>
     <Provider store={store}>
       <EditTokenFormModal isOpen={true}/>
     </Provider>
@@ -23,7 +26,7 @@ export const EditTokenFormModalDefaultStory = (args) => {
 }
 
 <Canvas>
-  <Story name="Default">
+  <Story name='Default'>
     {EditTokenFormModalDefaultStory.bind({})}
   </Story>
 </Canvas>

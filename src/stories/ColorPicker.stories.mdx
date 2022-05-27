@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { Meta, Story, ArgsTable, Canvas, Preview } from "@storybook/addon-docs";
-import ColorPicker from "@/app/components/ColorPicker";
+import { Meta, Story, ArgsTable, Canvas, Preview } from '@storybook/addon-docs';
+import ColorPicker from '@/app/components/ColorPicker';
 
 <Meta 
-  title="ColorPicker" 
+  title='ColorPicker' 
   component={ColorPicker}
   argsType={{
     value: {
@@ -25,7 +25,7 @@ export const ColorPickerDefaultStory = (args) => {
 };
 
 <Canvas>
-  <Story name="ColorPicker">
+  <Story name='ColorPicker'>
     {ColorPickerDefaultStory.bind({})}
   </Story>
 </Canvas>

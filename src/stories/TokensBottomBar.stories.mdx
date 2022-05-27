@@ -1,11 +1,11 @@
-import { Meta, Story, ArgsTable, Canvas, Preview } from "@storybook/addon-docs";
+import { Meta, Story, ArgsTable, Canvas, Preview } from '@storybook/addon-docs';
 import { Provider } from 'react-redux';
 
 import { store } from '@/app/store';
 
 import TokensBottomBar from '@/app/components/TokensBottomBar';
 <Meta 
-  title="TokensBottomBar"
+  title='TokensBottomBar'
   component={TokensBottomBar}
 />
 
@@ -20,10 +20,10 @@ export const TokensBottomBarDefaultStory = (args) => {
 }
 
 <Canvas>
-  <Story name="Primary" args={{
-    label: "Primary",
-    path: "default.token",
-    id: "listing",
+  <Story name='Primary' args={{
+    label: 'Primary',
+    path: 'default.token',
+    id: 'listing',
   }}>
     {TokensBottomBarDefaultStory.bind({})}
   </Story>
