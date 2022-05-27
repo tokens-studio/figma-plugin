@@ -1,3 +1,4 @@
+import { LDProps } from 'launchdarkly-react-client-sdk/lib/withLDConsumer';
 import { UsedTokenSetsMap } from '@/types';
 import { StorageType, StorageTypeCredentials } from '@/types/StorageType';
 import isSameCredentials from '@/utils/isSameCredentials';
@@ -8,10 +9,11 @@ type Options = {
   storageType: StorageType,
   usedTokenSet?: UsedTokenSetsMap | null
   shouldPull?: boolean,
+  featureFlags?: LDProps['flags']
 };
 
 export default function compareProvidersWithStored({
-  providers, storageType, usedTokenSet, shouldPull,
+  providers, storageType, usedTokenSet, shouldPull, featureFlags,
 }: Options) {
   if (providers) {
     const matchingSet = providers.find((i) => isSameCredentials(i, storageType));
@@ -23,6 +25,7 @@ export default function compareProvidersWithStored({
         credentials: matchingSet,
         usedTokenSet,
         shouldPull,
+        featureFlags,
       });
       return;
     }

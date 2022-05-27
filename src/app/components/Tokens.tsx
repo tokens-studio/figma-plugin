@@ -101,10 +101,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
   const [activeTokensTab, setActiveTokensTab] = React.useState('list');
   const [tokenSetsVisible, setTokenSetsVisible] = React.useState(true);
   const { getStringTokens } = useTokens();
-  const { tokenThemes, multiFileSync } = useFlags();
-  React.useEffect(() => {
-    console.log("themes", multiFileSync, tokenThemes)
-  }, [multiFileSync, tokenThemes])
+  const { tokenThemes } = useFlags();
 
   const updateMode = useSelector(updateModeSelector);
   const { confirm } = useConfirm();

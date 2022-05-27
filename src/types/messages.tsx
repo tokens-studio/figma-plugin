@@ -1,3 +1,4 @@
+import { LDProps } from 'launchdarkly-react-client-sdk/lib/withLDConsumer';
 import type { BackgroundJob } from '@/app/store/models/uiState';
 import type { SelectionGroup } from './SelectionGroup';
 import type { SelectionValue } from './SelectionValue';
@@ -27,7 +28,7 @@ export enum MessageFromPluginTypes {
   COMPLETE_JOB_TASKS = 'complete_job_tasks',
   LICENSE_KEY = 'license_key',
   SET_TOKENS = 'set_tokens',
-  GET_FEATURE_FLAGS = 'get_feature_flags'
+  GET_FEATURE_FLAGS = 'get_feature_flags',
 }
 
 export type NoSelectionFromPluginMessage = { type: MessageFromPluginTypes.NO_SELECTION };
@@ -117,6 +118,7 @@ export type ApiCredentialsFromPluginMessage = {
   credentials: StorageTypeCredentials;
   usedTokenSet?: UsedTokenSetsMap | null;
   shouldPull?: boolean;
+  featureFlags?: LDProps['flags'];
 };
 
 export type LicenseKeyFromPluginMessage = {

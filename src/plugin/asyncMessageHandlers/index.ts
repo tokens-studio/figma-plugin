@@ -19,4 +19,3 @@ export * from './createStyles';
 export * from './update';
 export * from './setLicenseKey';
 export * from './getApiCredentials';
-export * from './setFeatureFlags';

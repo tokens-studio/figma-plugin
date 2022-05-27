@@ -13,21 +13,18 @@ import { Tabs } from '@/constants/Tabs';
 import { GithubTokenStorage } from '@/storage/GithubTokenStorage';
 import { userIdSelector } from '@/selectors/userIdSelector';
 import getLicenseKey from '@/utils/getLicenseKey';
-import { licenseStatusSelector } from '@/selectors';
 import { licenseKeySelector } from '@/selectors/licenseKeySelector';
-import { clientEmailSelector } from '@/selectors/getClientEmail';
-import { entitlementsSelector } from '@/selectors/getEntitlements';
-import { planSelector } from '@/selectors/planSelector';
 import { checkedLocalStorageForKeySelector } from '@/selectors/checkedLocalStorageForKeySelector';
 import { AddLicenseSource, Entitlements } from '../store/models/userState';
 import { LicenseStatus } from '@/constants/LicenseStatus';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
-import { notifyFeatureFlags, notifyToUI } from '@/plugin/notifiers';
+import { notifyToUI } from '@/plugin/notifiers';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import useConfirm from '../hooks/useConfirm';
 import { StorageType } from '@/types/StorageType';
-import { FeatureFlags } from '@gitbeaker/browser/dist/types';
+import validateLicense from '@/utils/validateLicense';
+import { TokenStore } from '@/types/tokens';
 
 type Props = LDProps;
 
@@ -38,11 +35,7 @@ function InitiatorContainer({ ldClient }: Props) {
   const { confirm } = useConfirm();
   const licenseKey = useSelector(licenseKeySelector);
   const checkedLocalStorage = useSelector(checkedLocalStorageForKeySelector);
-  const plan = useSelector(planSelector);
   const userId = useSelector(userIdSelector);
-  const clientEmail = useSelector(clientEmailSelector);
-  const entitlements = useSelector(entitlementsSelector);
-  const licenseStatus = useSelector(licenseStatusSelector);
 
   const askUserIfPull: ((storageType: StorageType | undefined) => Promise<any>) = useCallback(async (storageType) => {
     const shouldPull = await confirm({
@@ -52,24 +45,45 @@ function InitiatorContainer({ ldClient }: Props) {
     return shouldPull;
   }, [confirm]);
 
-  const ldIdentificationResolver: (flags: LDProps['flags']) => void = () => {};
-
   const onInitiate = useCallback(() => {
     AsyncMessageChannel.message({ type: AsyncMessageTypes.INITIATE });
   }, []);
 
-  const getApiCredentials = useCallback((shouldPull: boolean) => (
+  const getApiCredentials = useCallback((shouldPull: boolean, featureFlags: LDProps['flags']) => (
     AsyncMessageChannel.message({
       type: AsyncMessageTypes.GET_API_CREDENTIALS,
       shouldPull,
+      featureFlags,
     })
   ), []);
 
-  const setFeatureFlags = useCallback((featureFlags) => {
-    AsyncMessageChannel.message({
-      type: AsyncMessageTypes.SET_FEATURE_FLAGS,
-      featureFlags
-    })
+  const getFeatureFlags = useCallback(async (values: TokenStore, ldClient: LDProps['ldClient']) => {
+    if (values.licenseKey && values.userId) {
+      const {
+        plan, email: clientEmail, entitlements,
+      } = await validateLicense(values.licenseKey, values.userId);
+      if (ldClient) {
+        const userAttributes: Record<string, string | boolean> = {
+          plan: plan || '',
+          email: clientEmail || '',
+          os: !entitlements?.includes(Entitlements.PRO),
+        };
+        entitlements?.forEach((entitlement) => {
+          userAttributes[entitlement] = true;
+        });
+        const rawFlags = await ldClient.identify({
+          key: values.userId!,
+          custom: userAttributes,
+        });
+        const normalizedFlags = Object.fromEntries(
+          Object.entries(rawFlags).map(([key, value]) => (
+            [Case.camel(key), value]
+          )),
+        );
+        return normalizedFlags;
+      }
+    }
+    return undefined;
   }, []);
 
   useEffect(() => {
@@ -115,15 +129,22 @@ function InitiatorContainer({ ldClient }: Props) {
             break;
           case MessageFromPluginTypes.TOKEN_VALUES: {
             const { values } = pluginMessage;
+            let featureFlags: LDProps['flags'];
             const existChanges = values.checkForChanges;
             if (!existChanges || (existChanges && await askUserIfPull(values?.storageType))) {
-              getApiCredentials(true);
+              if (ldClient) {
+                featureFlags = await getFeatureFlags(values, ldClient);
+                getApiCredentials(true, featureFlags);
+              }
             } else {
               dispatch.tokenState.setTokenData(values);
               const existTokens = Object.values(values?.values ?? {}).some((value) => value.length > 0);
-
-              if (existTokens) getApiCredentials(false);
-              else dispatch.uiState.setActiveTab(Tabs.START);
+              if (existTokens) {
+                if (ldClient) {
+                  featureFlags = await getFeatureFlags(values, ldClient);
+                  getApiCredentials(false, featureFlags);
+                }
+              } else dispatch.uiState.setActiveTab(Tabs.START);
             }
             break;
           }
@@ -156,11 +177,10 @@ function InitiatorContainer({ ldClient }: Props) {
             break;
           case MessageFromPluginTypes.API_CREDENTIALS: {
             const {
-              status, credentials, usedTokenSet, shouldPull,
+              status, credentials, usedTokenSet, shouldPull, featureFlags,
             } = pluginMessage;
             if (status === true) {
-              let receivedFlags: LDProps['flags'];
-
+              const receivedFlags: LDProps['flags'] = featureFlags;
               try {
                 track('Fetched from remote', { provider: credentials.provider });
                 if (!credentials.internalId) track('missingInternalId', { provider: credentials.provider });
@@ -267,39 +287,6 @@ function InitiatorContainer({ ldClient }: Props) {
             } else {
               dispatch.userState.setLicenseStatus(LicenseStatus.NO_LICENSE);
               dispatch.userState.setCheckedLocalStorage(true);
-            }
-            break;
-          }
-          case MessageFromPluginTypes.GET_FEATURE_FLAGS: {
-            console.log("useId", userId, ldClient)
-            if (
-              userId
-              && ldClient
-            ) {
-              const userAttributes: Record<string, string | boolean> = {
-                plan: plan || '',
-                email: clientEmail || '',
-                os: !entitlements.includes(Entitlements.PRO),
-              };
-              entitlements.forEach((entitlement) => {
-                userAttributes[entitlement] = true;
-              });
-
-              ldClient.identify({
-                key: userId!,
-                custom: userAttributes,
-              }).then((rawFlags) => {
-                console.log('rawflags', rawFlags);
-                const normalizedFlags = Object.fromEntries(
-                  Object.entries(rawFlags).map(([key, value]) => (
-                    [Case.camel(key), value]
-                  )),
-                );
-                setFeatureFlags(normalizedFlags);
-              })
-              .catch(() => {
-                setFeatureFlags(null);
-              });
             }
             break;
           }

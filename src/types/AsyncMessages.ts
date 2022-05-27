@@ -1,3 +1,4 @@
+import { LDProps } from 'launchdarkly-react-client-sdk/lib/withLDConsumer';
 import { UpdateMode } from '@/constants/UpdateMode';
 import type { SettingsState } from '@/app/store/models/settings';
 import type { Properties } from '@/constants/Properties';
@@ -10,7 +11,6 @@ import type { AnyTokenList } from './tokens';
 import type { UsedTokenSetsMap } from './UsedTokenSetsMap';
 import { StorageType, StorageTypeCredentials } from './StorageType';
 import { Direction } from '@/constants/Direction';
-import { LDProps } from 'launchdarkly-react-client-sdk/lib/withLDConsumer';
 
 export enum AsyncMessageTypes {
   // the below messages are going from UI to plugin
@@ -37,7 +37,6 @@ export enum AsyncMessageTypes {
   GET_API_CREDENTIALS = 'async/get-api-credentials',
   // the below messages are going from plugin to UI
   GET_THEME_INFO = 'async/get-theme-info',
-  SET_FEATURE_FLAGS = 'set_feature_flags'
 }
 
 export type AsyncMessage<T extends AsyncMessageTypes, P = unknown> = P & { type: T };
@@ -140,6 +139,7 @@ export type SetLicenseKeyMessageResult = AsyncMessage<AsyncMessageTypes.SET_LICE
 
 export type GetApiCredentials = AsyncMessage<AsyncMessageTypes.GET_API_CREDENTIALS, {
   shouldPull?: boolean
+  featureFlags?: LDProps['flags']
 }>;
 export type GetApiCredentialsResult = AsyncMessage<AsyncMessageTypes.GET_API_CREDENTIALS>;
 
@@ -148,11 +148,6 @@ export type GetThemeInfoMessageResult = AsyncMessage<AsyncMessageTypes.GET_THEME
   activeTheme: string | null
   themes: ThemeObjectsList
 }>;
-
-export type SetFeatureFlags = AsyncMessage<AsyncMessageTypes.SET_FEATURE_FLAGS, {
-  featureFlags: LDProps['flags']
-}>;
-export type SetFeatureFlagsResult = AsyncMessage<AsyncMessageTypes.SET_FEATURE_FLAGS>;
 
 export type AsyncMessages =
   CreateStylesAsyncMessage
@@ -176,8 +171,7 @@ export type AsyncMessages =
   | UpdateAsyncMessage
   | GetThemeInfoMessage
   | SetLicenseKeyMessage
-  | GetApiCredentials
-  | SetFeatureFlags;
+  | GetApiCredentials;
 export type AsyncMessageResults =
   CreateStylesAsyncMessageResult
   | InitiateAsyncMessageResult
@@ -200,8 +194,7 @@ export type AsyncMessageResults =
   | UpdateAsyncMessageResult
   | GetThemeInfoMessageResult
   | SetLicenseKeyMessageResult
-  | GetApiCredentialsResult
-  | SetFeatureFlagsResult;
+  | GetApiCredentialsResult;
 
 export type AsyncMessagesMap = {
   [K in AsyncMessageTypes]: Extract<AsyncMessages, { type: K }>

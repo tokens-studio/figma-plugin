@@ -12,5 +12,7 @@ export type TokenStore = {
   checkForChanges?: boolean | null;
   activeTheme: string | null;
   themes: ThemeObjectsList;
-  storageType?: StorageType
+  storageType?: StorageType;
+  userId?:string | null;
+  licenseKey?: string | null;
 };
