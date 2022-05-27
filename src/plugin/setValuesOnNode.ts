@@ -44,7 +44,7 @@ export default async function setValuesOnNode(
         const matchingStyle = figmaStyleMaps.effectStyles.get(pathname);
         if (matchingStyle) {
           node.effectStyleId = matchingStyle.id;
-        } else {
+        } else if (node.effectStyleId === '') { // only set raw token value if node isn't linked to a Figma style:
           setEffectValuesOnTarget(node, { value: values.boxShadow });
         }
       }
@@ -83,7 +83,7 @@ export default async function setValuesOnNode(
           if (matchingStyle) {
             // matchingStyles[0].paints = [{color, opacity, type: 'SOLID'}];
             node.fillStyleId = matchingStyle.id;
-          } else {
+          } else if (node.fillStyleId === '') { // only set raw token value if node isn't linked to a Figma style:
             setColorValuesOnTarget(node, { value: values.fill }, 'fills');
           }
         }
@@ -98,7 +98,7 @@ export default async function setValuesOnNode(
           const matchingStyle = figmaStyleMaps.textStyles.get(pathname);
           if (matchingStyle) {
             node.textStyleId = matchingStyle.id;
-          } else {
+          } else if (node.textStyleId === '') { // only set raw token value if node isn't linked to a Figma style:
             setTextValuesOnTarget(node, { value: values.typography });
           }
         }
@@ -136,7 +136,7 @@ export default async function setValuesOnNode(
           const matchingStyle = figmaStyleMaps.paintStyles.get(pathname);
           if (matchingStyle) {
             node.strokeStyleId = matchingStyle.id;
-          } else {
+          } else if (node.strokeStyleId === '') { // only set raw token value if node isn't linked to a Figma style:
             setColorValuesOnTarget(node, { value: values.border }, 'strokes');
           }
         }
