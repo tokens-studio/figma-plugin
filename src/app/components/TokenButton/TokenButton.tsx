@@ -9,11 +9,9 @@ import { Dispatch } from '../../store';
 import BrokenReferenceIndicator from '../BrokenReferenceIndicator';
 import { waitForMessage } from '@/utils/waitForMessage';
 import { MessageFromPluginTypes } from '@/types/messages';
-import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
 import { TokenTooltip } from '../TokenTooltip';
 import { TokensContext } from '@/context';
-import { Properties } from '@/constants/Properties';
 import { SelectionValue } from '@/types';
 import { DocumentationProperties } from '@/constants/DocumentationProperties';
 import { useGetActiveState } from '@/hooks';
@@ -27,7 +25,8 @@ import { useSetNodeData } from '@/hooks/useSetNodeData';
 import { DragOverItem } from './DragOverItem';
 import { TokenButtonDraggable } from './TokenButtonDraggable';
 import type { ShowFormOptions } from '../TokenTree';
-import { TokenCompositionValue } from '@/types/values';
+import { CompositionTokenProperty } from '@/types/CompositionTokenProperty';
+import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 
 // @TODO fix typings
 
@@ -122,12 +121,10 @@ export const TokenButton: React.FC<Props> = ({
       // distructure composition token when it is unselected
       const compositionToken = tokensContext.resolvedTokens.find((token) => token.name === tokenValue);
       const tokensInCompositionToken: NodeTokenRefMap = {};
-      if (Array.isArray(compositionToken?.rawValue)) {
-        compositionToken?.rawValue.forEach((token) => {
-          tokensInCompositionToken[(token as TokenCompositionValue).property as keyof typeof Properties] = 'delete';
+      if (compositionToken) {
+        Object.keys(compositionToken.value).forEach((property: string) => {
+          tokensInCompositionToken[property as CompositionTokenProperty] = 'delete';
         });
-      } else {
-        tokensInCompositionToken[(compositionToken?.rawValue as TokenCompositionValue).property as keyof typeof Properties] = 'delete';
       }
       tokensInCompositionToken.composition = 'delete';
       setPluginValue(tokensInCompositionToken);

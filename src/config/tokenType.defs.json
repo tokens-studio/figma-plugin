@@ -164,10 +164,7 @@
     "schemas": {
       "value": {
         "type": "object",
-        "properties": {
-          "property": { "type": "string" },
-          "value": { "type": "string" }
-        }
+        "properties": {}
       }
     }
   },

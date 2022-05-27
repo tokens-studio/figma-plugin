@@ -138,30 +138,22 @@ const tokens = [
     name: 'composition.single',
     type: 'composition',
     value: {
-      property: 'opacity',
-      value: '{opacity.40}',
+      opacity: '{opacity.40}',
     },
   },
   {
     name: 'composition.multiple',
     type: 'composition',
-    value: [
-      {
-        property: 'opacity',
-        value: '{opacity.40}',
-      },
-      {
-        property: 'borderRadius',
-        value: '{border-radius.7}',
-      },
-    ],
+    value: {
+      opacity: '{opacity.40}',
+      borderRadius: '{border-radius.7}',
+    },
   },
   {
     name: 'composition.alias',
     type: 'composition',
     value: {
-      property: 'fill',
-      value: '{colors.red.500}',
+      fill: '{colors.red.500}',
     },
   },
   { name: 'size.25', value: '2px' },
@@ -283,48 +275,32 @@ const output = [
     name: 'composition.single',
     type: 'composition',
     value: {
-      property: 'opacity',
-      value: '40%',
+      opacity: '40%',
     },
     rawValue: {
-      property: 'opacity',
-      value: '{opacity.40}',
+      opacity: '{opacity.40}',
     },
   },
   {
     name: 'composition.multiple',
     type: 'composition',
-    value: [
-      {
-        property: 'opacity',
-        value: '40%',
-      },
-      {
-        property: 'borderRadius',
-        value: '24px',
-      },
-    ],
-    rawValue: [
-      {
-        property: 'opacity',
-        value: '{opacity.40}',
-      },
-      {
-        property: 'borderRadius',
-        value: '{border-radius.7}',
-      },
-    ],
+    value: {
+      opacity: '40%',
+      borderRadius: '24px',
+    },
+    rawValue: {
+      opacity: '{opacity.40}',
+      borderRadius: '{border-radius.7}',
+    },
   },
   {
     name: 'composition.alias',
     type: 'composition',
     value: {
-      property: 'fill',
-      value: '#ff0000',
+      fill: '#ff0000',
     },
     rawValue: {
-      property: 'fill',
-      value: '{colors.red.500}',
+      fill: '{colors.red.500}',
     },
   },
   {

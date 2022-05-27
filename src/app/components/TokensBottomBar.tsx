@@ -4,9 +4,9 @@ import ApplySelector from './ApplySelector';
 import ExportModal from './modals/ExportModal';
 import PresetModal from './modals/PresetModal';
 import Box from './Box';
-import ActionButton from './ActionButton';
 import StylesDropdown from './StylesDropdown';
 import { editProhibitedSelector, hasUnsavedChangesSelector } from '@/selectors';
+import Button from './Button';
 
 type Props = {
   handleUpdate: () => void;
@@ -38,7 +38,9 @@ export default function TokensBottomBar({ handleUpdate, handleSaveJSON, hasJSONE
           }}
         >
           <Box css={{ fontSize: '$xsmall' }}>Unsaved changes</Box>
-          <ActionButton variant="primary" disabled={hasJSONError} onClick={() => handleSaveJSON()} text="Save JSON" />
+          <Button variant="primary" disabled={hasJSONError} onClick={() => handleSaveJSON()}>
+            Save JSON
+          </Button>
         </Box>
       )
         : (
@@ -48,10 +50,16 @@ export default function TokensBottomBar({ handleUpdate, handleSaveJSON, hasJSONE
           >
             <ApplySelector />
             <Box css={{ display: 'flex', flexDirection: 'row', gap: '$2' }}>
-              <ActionButton text="Load" disabled={editProhibited} onClick={() => showPresetModal(true)} />
-              <ActionButton text="Export" onClick={() => showExportModal(true)} />
+              <Button variant="ghost" disabled={editProhibited} onClick={() => showPresetModal(true)}>
+                Load
+              </Button>
+              <Button variant="ghost" onClick={() => showExportModal(true)}>
+                Export
+              </Button>
               <StylesDropdown />
-              <ActionButton text="Update" variant="primary" onClick={handleUpdate} />
+              <Button variant="primary" onClick={handleUpdate}>
+                Update
+              </Button>
             </Box>
           </Box>
         )}

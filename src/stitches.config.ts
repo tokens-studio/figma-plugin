@@ -116,6 +116,7 @@ export const stitchesInstance = createStitches({
       7: '32px',
       8: '48px',
       10: '38px',
+      dropdownMaxHeight: '170px',
     },
     radii: {
       default: globalTokens.radii.sm,

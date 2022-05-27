@@ -22,7 +22,6 @@ import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { notifyToUI } from '@/plugin/notifiers';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import useConfirm from '../hooks/useConfirm';
-import { StorageType } from '@/types/StorageType';
 import validateLicense from '@/utils/validateLicense';
 import { TokenStore } from '@/types/tokens';
 
@@ -37,9 +36,9 @@ function InitiatorContainer({ ldClient }: Props) {
   const checkedLocalStorage = useSelector(checkedLocalStorageForKeySelector);
   const userId = useSelector(userIdSelector);
 
-  const askUserIfPull: ((storageType: StorageType | undefined) => Promise<any>) = useCallback(async (storageType) => {
+  const askUserIfPull: ((storageType: StorageProviderType | undefined) => Promise<any>) = useCallback(async (storageType) => {
     const shouldPull = await confirm({
-      text: `Pull from ${storageType?.provider}?`,
+      text: `Pull from ${storageType}?`,
       description: 'You have unsaved changes that will be lost. Do you want to pull from your repo?',
     });
     return shouldPull;
@@ -129,7 +128,8 @@ function InitiatorContainer({ ldClient }: Props) {
             const { values } = pluginMessage;
             let featureFlags: LDProps['flags'] | null;
             const existChanges = values.checkForChanges;
-            if (!existChanges || (existChanges && await askUserIfPull(values?.storageType))) {
+            const storageType = values.storageType?.provider;
+            if (!existChanges || ((storageType && storageType !== StorageProviderType.LOCAL) && existChanges && await askUserIfPull(storageType))) {
               featureFlags = await getFeatureFlags(values);
               getApiCredentials(true, featureFlags);
             } else {

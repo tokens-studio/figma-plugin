@@ -1,6 +1,5 @@
 import React, { useCallback } from 'react';
-import compact from 'just-compact';
-import { TokenCompositionValue } from '@/types/values';
+import { useUIDSeed } from 'react-uid';
 import IconPlus from '@/icons/plus.svg';
 import { Properties } from '@/constants/Properties';
 import { EditTokenObject } from '@/types/tokens';
@@ -8,74 +7,103 @@ import Heading from './Heading';
 import IconButton from './IconButton';
 import Box from './Box';
 import SingleCompositionTokenForm from './SingleCompositionTokenForm';
+import { CompositionTokenProperty } from '@/types/CompositionTokenProperty';
+import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 import { TokenTypes } from '@/constants/TokenTypes';
-
-const newToken: TokenCompositionValue = {
-  property: '', value: '',
-};
 
 export default function CompositionTokenForm({
   internalEditToken,
-  setValue,
+  setTokenValue,
 }: {
   internalEditToken: Extract<EditTokenObject, { type: TokenTypes.COMPOSITION }>;
-  setValue: (style: TokenCompositionValue | TokenCompositionValue[]) => void;
+  setTokenValue: (newTokenValue: NodeTokenRefMap) => void;
 }) {
+  const seed = useUIDSeed();
+  const [orderObj, setOrderObj] = React.useState<NodeTokenRefMap>({});
+  const [error, setError] = React.useState(false);
   const propertiesMenu = React.useMemo(() => (
     Object.keys(Properties).map((key: string) => (
-      String(Properties[key as keyof typeof Properties])
+      String(Properties[key as CompositionTokenProperty])
     ))
   ), []);
 
-  const addToken = useCallback(() => {
-    if (Array.isArray(internalEditToken.value)) {
-      setValue([...internalEditToken.value, newToken]);
-    } else {
-      setValue(compact([internalEditToken.value, newToken]));
-    }
-  }, [internalEditToken, setValue]);
+  React.useEffect(() => {
+    const defaultOrderObj: NodeTokenRefMap = {};
+    Object.keys(internalEditToken.value || internalEditToken.schema.schemas.value.properties).forEach((key, index) => {
+      defaultOrderObj[key as CompositionTokenProperty] = String(index);
+    });
+    setOrderObj(defaultOrderObj);
+  }, []);
 
-  const removeToken = useCallback((index) => {
-    if (Array.isArray(internalEditToken.value)) {
-      setValue(internalEditToken.value.filter((_, i) => i !== index));
+  // keep order of the properties in composition token
+  const arrangedTokenValue = React.useMemo<NodeTokenRefMap>(() => {
+    const internalEditTokenValue = internalEditToken.value || internalEditToken.schema.schemas.value.properties;
+    return Object.assign({}, ...Object.keys(internalEditTokenValue).sort((a, b) => Number(orderObj[a as CompositionTokenProperty]) - Number(orderObj[b as CompositionTokenProperty]))
+      .map((x) => ({ [x as CompositionTokenProperty]: internalEditTokenValue[x as CompositionTokenProperty] })));
+  }, [internalEditToken, orderObj]);
+
+  const addToken = useCallback(() => {
+    const internalEditTokenValue = internalEditToken.value || internalEditToken.schema.schemas.value.properties;
+    if (internalEditTokenValue.hasOwnProperty('') || Object.keys(internalEditTokenValue).length === 0) {
+      setError(true);
     }
-  }, [internalEditToken, setValue]);
+    internalEditTokenValue['' as CompositionTokenProperty] = '';
+    setTokenValue(internalEditTokenValue as NodeTokenRefMap);
+  }, [internalEditToken]);
+
+  const removeToken = useCallback((property: string) => {
+    const internalEditTokenValue = internalEditToken.value || internalEditToken.schema.schemas.value.properties;
+    delete internalEditTokenValue[property as CompositionTokenProperty];
+    setTokenValue(internalEditTokenValue as NodeTokenRefMap);
+  }, [internalEditToken]);
+
+  const handleOrderObj = useCallback((newOrderObj: NodeTokenRefMap) => {
+    setOrderObj(newOrderObj);
+  }, []);
 
   return (
     <div>
       <Box css={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Heading size="small">Tokens</Heading>
         <IconButton
-          tooltip="Add another style"
+          tooltip={error ? 'Choose a property first' : 'Add another style'}
           dataCy="button-style-add-multiple"
           onClick={addToken}
           icon={<IconPlus />}
+          disabled={error}
         />
       </Box>
       <Box css={{ display: 'flex', flexDirection: 'column', gap: '$4' }}>
-        {Array.isArray(internalEditToken.value) ? (
-          internalEditToken.value.map((token, index) => (
+        {
+          Object.entries(arrangedTokenValue).length < 1 ? (
             <SingleCompositionTokenForm
-              index={index}
-              token={token}
-              tokens={internalEditToken.value}
-              key={`single-style-${index}`}
+              index={0}
+              property=""
+              value=""
+              tokenValue={arrangedTokenValue}
               properties={propertiesMenu}
-              setValue={setValue}
+              setTokenValue={setTokenValue}
               onRemove={removeToken}
+              setOrderObj={handleOrderObj}
+              setError={setError}
             />
-          ))
-        ) : (
-          <SingleCompositionTokenForm
-            index={-1}
-            token={internalEditToken.value}
-            tokens={internalEditToken.value}
-            key="single-style"
-            properties={propertiesMenu}
-            setValue={setValue}
-            onRemove={removeToken}
-          />
-        )}
+          ) : (
+            Object.entries(arrangedTokenValue).map(([property, value], index) => (
+              <SingleCompositionTokenForm
+                key={`single-style-${seed(index)}`}
+                index={index}
+                property={property}
+                value={value}
+                tokenValue={arrangedTokenValue}
+                properties={propertiesMenu}
+                setTokenValue={setTokenValue}
+                onRemove={removeToken}
+                setOrderObj={handleOrderObj}
+                setError={setError}
+              />
+            ))
+          )
+        }
       </Box>
     </div>
   );
