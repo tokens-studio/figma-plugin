@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { localApiStateSelector } from '@/selectors';
 import usePushDialog from '../hooks/usePushDialog';
@@ -55,12 +55,15 @@ function ConfirmDialog() {
     }
   }
 
+  const handleFormSubmit = useCallback(() => onConfirm(commitMessage, branch), [commitMessage, branch]);
+  const handleBranchChange = useCallback((e) => setBranch(e.target.value), [setBranch]);
+  const handleCommitMessageChange = useCallback((e) => setCommitMessage(e.target.value), [setCommitMessage]);
+
   switch (showPushDialog) {
     case 'initial': {
       return (
         <Modal large isOpen close={onCancel}>
-          {/* eslint-disable-next-line react/jsx-no-bind */}
-          <form onSubmit={() => onConfirm(commitMessage, branch)}>
+          <form onSubmit={handleFormSubmit}>
             <Stack direction="column" gap={4}>
               <Stack direction="column" gap={2}>
                 <Heading>Push changes</Heading>
@@ -72,8 +75,7 @@ function ConfirmDialog() {
                   full
                   label="Commit message"
                   value={commitMessage}
-                  // eslint-disable-next-line react/jsx-no-bind
-                  onChange={(e) => setCommitMessage(e.target.value)}
+                  onChange={handleCommitMessageChange}
                   type="text"
                   name="commitMessage"
                   required
@@ -82,8 +84,7 @@ function ConfirmDialog() {
                   full
                   label="Branch"
                   value={branch}
-                  // eslint-disable-next-line react/jsx-no-bind
-                  onChange={(e) => setBranch(e.target.value)}
+                  onChange={handleBranchChange}
                   type="text"
                   name="branch"
                   required
