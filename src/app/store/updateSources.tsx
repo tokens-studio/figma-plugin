@@ -1,25 +1,27 @@
-import { MessageToPluginTypes } from '@/types/messages';
 import { mergeTokenGroups, resolveTokenValues } from '@/plugin/tokenHelpers';
-import { ContextObject, StorageProviderType, StorageType } from '@/types/api';
-import { notifyToUI, postToFigma } from '../../plugin/notifiers';
+import { notifyToUI } from '../../plugin/notifiers';
 import { updateJSONBinTokens } from './providers/jsonbin';
 import { track } from '@/utils/analytics';
-import type { AnyTokenSet, SingleToken } from '@/types/tokens';
+import type { AnyTokenList } from '@/types/tokens';
 import type { ThemeObjectsList, UsedTokenSetsMap } from '@/types';
 import type { SettingsState } from './models/settings';
+import { AsyncMessageTypes } from '@/types/AsyncMessages';
+import { AsyncMessageChannel } from '@/AsyncMessageChannel';
+import { StorageProviderType } from '@/constants/StorageProviderType';
+import { StorageType, StorageTypeCredentials } from '@/types/StorageType';
 
 type UpdateRemoteTokensPayload = {
   provider: StorageProviderType;
-  tokens: Record<string, SingleToken[]>;
+  tokens: Record<string, AnyTokenList>;
   themes: ThemeObjectsList
-  context: ContextObject;
+  context: StorageTypeCredentials;
   updatedAt: string;
   oldUpdatedAt?: string;
 };
 
 type UpdateTokensOnSourcesPayload = {
-  tokens: Record<string, SingleToken[]>;
-  tokenValues: AnyTokenSet;
+  tokens: Record<string, AnyTokenList> | null;
+  tokenValues: Record<string, AnyTokenList>;
   usedTokenSet: UsedTokenSetsMap;
   themes: ThemeObjectsList;
   activeTheme: string | null;
@@ -30,7 +32,8 @@ type UpdateTokensOnSourcesPayload = {
   editProhibited: boolean;
   storageType: StorageType;
   lastUpdatedAt: string;
-  api: ContextObject;
+  api: StorageTypeCredentials;
+  checkForChanges: boolean;
 };
 
 async function updateRemoteTokens({
@@ -63,6 +66,9 @@ async function updateRemoteTokens({
     case StorageProviderType.GITLAB: {
       break;
     }
+    case StorageProviderType.ADO: {
+      break;
+    }
     default:
       throw new Error('Not implemented');
   }
@@ -82,8 +88,8 @@ export default async function updateTokensOnSources({
   storageType,
   api,
   lastUpdatedAt,
+  checkForChanges,
 }: UpdateTokensOnSourcesPayload) {
-  // @TODO themes
   if (tokens && !isLocal && shouldUpdateRemote && !editProhibited) {
     updateRemoteTokens({
       provider: storageType.provider,
@@ -98,15 +104,15 @@ export default async function updateTokensOnSources({
   const mergedTokens = tokens
     ? resolveTokenValues(mergeTokenGroups(tokens, usedTokenSet))
     : null;
-
-  postToFigma({
-    type: MessageToPluginTypes.UPDATE,
+  AsyncMessageChannel.message({
+    type: AsyncMessageTypes.UPDATE,
     tokenValues,
     tokens: tokens ? mergedTokens : null,
     themes,
     updatedAt,
     settings,
     usedTokenSet,
+    checkForChanges,
     activeTheme,
   });
 }

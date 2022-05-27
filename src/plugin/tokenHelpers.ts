@@ -6,6 +6,8 @@ import { isSingleToken } from '@/utils/is';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { UsedTokenSetsMap } from '@/types';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
+import { TokenBoxshadowValue } from '@/types/values';
+import { CompositionTokenProperty, CompositionTokenValue } from '@/types/CompositionTokenProperty';
 
 export type ResolveTokenValuesResult = SingleToken<true, {
   failedToResolve?: boolean
@@ -32,13 +34,13 @@ export function resolveTokenValues(tokens: SingleToken[], previousCount: number 
       // If value is alias
       if (typeof t.value === 'string') {
         returnValue = getAliasValue(t.value, tokensInProgress);
-        failedToResolve = returnValue === null || checkIfContainsAlias(returnValue);
+        failedToResolve = returnValue === null || checkIfContainsAlias(typeof returnValue === 'string' ? returnValue : '');
       } else if (Array.isArray(t.value)) {
         // If we're dealing with an array, iterate over each item and then key
         returnValue = t.value.map((item) => (
           Object.entries(item).reduce<Record<string, ReturnType<typeof getAliasValue>>>((acc, [key, value]) => {
             acc[key] = getAliasValue(value, tokensInProgress);
-            const itemFailedToResolve = acc[key] === null || checkIfContainsAlias(acc[key]);
+            const itemFailedToResolve = acc[key] === null || checkIfContainsAlias(typeof acc[key] === 'string' ? acc[key] as string : '');
             if (itemFailedToResolve) {
               failedToResolve = true;
             }
@@ -49,17 +51,55 @@ export function resolveTokenValues(tokens: SingleToken[], previousCount: number 
       } else {
         returnValue = Object.entries(t.value).reduce<Record<string, ReturnType<typeof getAliasValue>>>((acc, [key, value]) => {
           acc[key] = getAliasValue(value, tokensInProgress);
-          const itemFailedToResolve = acc[key] === null || checkIfContainsAlias(acc[key]);
+          const itemFailedToResolve = acc[key] === null || checkIfContainsAlias(typeof acc[key] === 'string' ? acc[key] as string : '');
           if (itemFailedToResolve) {
             failedToResolve = true;
           }
           return acc;
         }, {});
       }
+    } else if (t.type === TokenTypes.COMPOSITION) {
+      let itemFailedToResolve = false;
+      const compositionReturnValue: CompositionTokenValue = {};
+      Object.entries(t.value).forEach(([property, value]) => {
+        if (Array.isArray(value)) {
+          const resolvedValue = value.map((item) => (
+            Object.entries(item as TokenBoxshadowValue).reduce<Record<string, ReturnType<typeof getAliasValue>>>((acc, [key, value]) => {
+              acc[key] = getAliasValue(value, tokensInProgress);
+              itemFailedToResolve = acc[key] === null || checkIfContainsAlias(acc[key]);
+              if (itemFailedToResolve) {
+                failedToResolve = true;
+              }
+              return acc;
+            }, {}) as TokenBoxshadowValue
+          ));
+          compositionReturnValue[property as CompositionTokenProperty] = resolvedValue;
+        } else if (typeof value === 'object') {
+          const resolvedValue = Object.entries(value).reduce<Record<string, ReturnType<typeof getAliasValue>>>((acc, [key, value]) => {
+            acc[key] = getAliasValue(value, tokensInProgress);
+            itemFailedToResolve = acc[key] === null || checkIfContainsAlias(acc[key]);
+            if (itemFailedToResolve) {
+              failedToResolve = true;
+            }
+            return acc;
+          }, {});
+          compositionReturnValue[property as CompositionTokenProperty] = resolvedValue;
+        } else {
+          const resolvedValue = getAliasValue(value, tokensInProgress);
+          if (resolvedValue) {
+            compositionReturnValue[property as CompositionTokenProperty] = resolvedValue;
+          }
+          itemFailedToResolve = resolvedValue === null || checkIfContainsAlias(resolvedValue);
+          if (itemFailedToResolve) {
+            failedToResolve = true;
+          }
+        }
+      });
+      returnValue = compositionReturnValue;
     } else {
       // If we're not dealing with special tokens, just return resolved value
       returnValue = getAliasValue(t, tokensInProgress);
-      failedToResolve = returnValue === null || checkIfContainsAlias(returnValue);
+      failedToResolve = returnValue === null || checkIfContainsAlias(typeof returnValue === 'string' ? returnValue : '');
     }
     const returnObject = {
       ...omit(t, 'failedToResolve'),

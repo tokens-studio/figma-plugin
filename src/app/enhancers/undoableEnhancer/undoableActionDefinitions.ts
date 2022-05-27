@@ -37,10 +37,8 @@ export const undoableActionDefinitions = [
             parent: action.payload.parent,
             value: snapshot.value,
             shouldUpdate: true,
-            options: {
-              type: snapshot.type,
-              description: snapshot.description,
-            },
+            type: snapshot.type,
+            description: snapshot.description,
           } as UpdateTokenPayload,
           meta: { silent: true },
         });

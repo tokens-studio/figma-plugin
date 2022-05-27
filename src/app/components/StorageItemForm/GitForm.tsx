@@ -1,23 +1,60 @@
 import React, { useRef } from 'react';
+import zod from 'zod';
+import { StorageProviderType } from '@/constants/StorageProviderType';
+import { StorageTypeFormValues } from '@/types/StorageType';
 import Box from '../Box';
 import Button from '../Button';
 import Input from '../Input';
 import Stack from '../Stack';
+import { generateId } from '@/utils/generateId';
+
+type ValidatedFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.GITHUB | StorageProviderType.GITLAB }>;
+type Props = {
+  values: Extract<StorageTypeFormValues<true>, { provider: StorageProviderType.GITHUB | StorageProviderType.GITLAB }>;
+  onChange: React.ChangeEventHandler<HTMLInputElement>;
+  onSubmit: (values: ValidatedFormValues) => void;
+  onCancel: () => void;
+  hasErrored?: boolean;
+};
 
 export default function GitForm({
-  handleChange, handleSubmit, handleCancel, values, hasErrored,
-}) {
-  const inputEl = useRef(null);
+  onChange, onSubmit, onCancel, values, hasErrored,
+}: Props) {
+  const inputEl = useRef<HTMLInputElement | null>(null);
+
+  const handleSubmit = React.useCallback((event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    const zodSchema = zod.object({
+      provider: zod.string(),
+      name: zod.string(),
+      id: zod.string(),
+      branch: zod.string(),
+      filePath: zod.string(),
+      baseUrl: zod.string().optional(),
+      secret: zod.string(),
+      internalId: zod.string().optional(),
+    });
+    const validationResult = zodSchema.safeParse(values);
+    if (validationResult.success) {
+      const formFields = {
+        ...validationResult.data,
+        internalId: validationResult.data.internalId || generateId(24),
+      } as ValidatedFormValues;
+      onSubmit(formFields);
+    }
+  }, [values, onSubmit]);
+
   return (
     <form onSubmit={handleSubmit}>
       <Stack direction="column" gap={4}>
-        <Input full label="Name" value={values.name} onChange={handleChange} type="text" name="name" required />
+        <Input full label="Name" value={values.name} onChange={onChange} type="text" name="name" required />
         <Box css={{ position: 'relative' }}>
           <Input
             full
             label="Personal Access Token"
             value={values.secret}
-            onChange={handleChange}
+            onChange={onChange}
             inputRef={inputEl}
             isMasked
             type="password"
@@ -29,7 +66,7 @@ export default function GitForm({
           full
           label="Repository (username/repo)"
           value={values.id}
-          onChange={handleChange}
+          onChange={onChange}
           type="text"
           name="id"
           required
@@ -38,7 +75,7 @@ export default function GitForm({
           full
           label="Default Branch"
           value={values.branch}
-          onChange={handleChange}
+          onChange={onChange}
           type="text"
           name="branch"
           required
@@ -47,7 +84,7 @@ export default function GitForm({
           full
           label="File Path (e.g. data/tokens.json)"
           value={values.filePath}
-          onChange={handleChange}
+          onChange={onChange}
           type="text"
           name="filePath"
           required
@@ -57,12 +94,12 @@ export default function GitForm({
           label="baseUrl (optional)"
           value={values.baseUrl}
           placeholder="https://github.acme-inc.com/api/v3"
-          onChange={handleChange}
+          onChange={onChange}
           type="text"
           name="baseUrl"
         />
         <Stack direction="row" gap={4}>
-          <Button variant="secondary" size="large" onClick={handleCancel}>
+          <Button variant="secondary" size="large" onClick={onCancel}>
             Cancel
           </Button>
 

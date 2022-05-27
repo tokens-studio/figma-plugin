@@ -27,10 +27,7 @@ import { Entitlements } from '../store/models/userState';
 import LoadingBar from './LoadingBar';
 import { LicenseStatus } from '@/constants/LicenseStatus';
 
-let ldIdentificationResolver: (flags: LDProps['flags']) => void = () => {};
-const ldIdentificationPromise = new Promise<LDProps['flags']>((resolve) => {
-  ldIdentificationResolver = resolve;
-});
+const ldIdentificationResolver: (flags: LDProps['flags']) => void = () => {};
 
 function App() {
   const activeTab = useSelector(activeTabSelector);
@@ -53,7 +50,6 @@ function App() {
     ) {
       const userAttributes: Record<string, string | boolean> = {
         plan: plan || '',
-        email: clientEmail || '',
         os: !entitlements.includes(Entitlements.PRO),
       };
 
@@ -63,23 +59,24 @@ function App() {
 
       // we need to be able to await the identifiaction process in the initiator
       // this logic could be improved later to be more reactive
-      ldClient.identify({
-        key: userId!,
-        custom: userAttributes,
-      }).then((rawFlags) => {
-        const normalizedFlags = Object.fromEntries(
-          Object.entries(rawFlags).map(([key, value]) => (
-            [Case.camel(key), value]
-          )),
-        );
-        ldIdentificationResolver(normalizedFlags);
-      });
+      ldClient
+        .identify({
+          key: userId!,
+          custom: userAttributes,
+          email: clientEmail,
+        })
+        .then((rawFlags) => {
+          const normalizedFlags = Object.fromEntries(
+            Object.entries(rawFlags).map(([key, value]) => [Case.camel(key), value]),
+          );
+          ldIdentificationResolver(normalizedFlags);
+        });
     }
   }, [userId, ldClient, licenseStatus, plan, clientEmail, entitlements]);
 
   return (
     <Box css={{ backgroundColor: '$bgDefault' }}>
-      <Initiator identificationPromise={ldIdentificationPromise} />
+      <Initiator />
       { activeTab !== 'loading' && <LoadingBar />}
       <PluginResizerWrapper>
         <Box
@@ -106,7 +103,7 @@ function App() {
             {activeTab === 'inspector' && <Inspector />}
             {activeTab === 'settings' && <Settings />}
           </Box>
-          <Footer />
+          {activeTab !== 'loading' && activeTab !== 'start' && <Footer />}
           <Changelog />
           <ImportedTokensDialog />
           <ConfirmDialog />

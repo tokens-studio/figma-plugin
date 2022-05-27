@@ -1,5 +1,5 @@
 import { Properties } from '@/constants/Properties';
-import { TokenTypes } from '@/constants/TokenTypes';
+import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 import { getAllFigmaStyleMaps } from '@/utils/getAllFigmaStyleMaps';
 import { transformValue } from './helpers';
 import setColorValuesOnTarget from './setColorValuesOnTarget';
@@ -9,7 +9,7 @@ import setTextValuesOnTarget from './setTextValuesOnTarget';
 export default async function setValuesOnNode(
   node: BaseNode,
   values: Partial<Record<Properties, string>>,
-  data,
+  data: NodeTokenRefMap,
   figmaStyleMaps: ReturnType<typeof getAllFigmaStyleMaps>,
   ignoreFirstPartForStyles = false,
 ) {
@@ -38,14 +38,14 @@ export default async function setValuesOnNode(
       }
 
       // BOX SHADOW
-      if ('effects' in node && typeof values.boxShadow !== 'undefined') {
+      if ('effects' in node && typeof values.boxShadow !== 'undefined' && data.boxShadow) {
         const path = data.boxShadow.split('.');
         const pathname = path.slice(ignoreFirstPartForStyles ? 1 : 0, path.length).join('/');
         const matchingStyle = figmaStyleMaps.effectStyles.get(pathname);
         if (matchingStyle) {
           node.effectStyleId = matchingStyle.id;
         } else {
-          setEffectValuesOnTarget(node, { value: values.boxShadow, type: TokenTypes.BOX_SHADOW });
+          setEffectValuesOnTarget(node, { value: values.boxShadow });
         }
       }
 
@@ -76,7 +76,7 @@ export default async function setValuesOnNode(
 
       // FILL
       if (values.fill && typeof values.fill === 'string') {
-        if ('fills' in node) {
+        if ('fills' in node && data.fill) {
           const path = data.fill.split('.');
           const pathname = path.slice(ignoreFirstPartForStyles ? 1 : 0, path.length).join('/');
           const matchingStyle = figmaStyleMaps.paintStyles.get(pathname);
@@ -92,11 +92,10 @@ export default async function setValuesOnNode(
       // TYPOGRAPHY
       // Either set typography or individual values, if typography is present we prefer that.
       if (values.typography) {
-        if (node.type === 'TEXT') {
+        if (node.type === 'TEXT' && data.typography) {
           const path = data.typography.split('.'); // extract to helper fn
           const pathname = path.slice(ignoreFirstPartForStyles ? 1 : 0, path.length).join('/');
           const matchingStyle = figmaStyleMaps.textStyles.get(pathname);
-
           if (matchingStyle) {
             node.textStyleId = matchingStyle.id;
           } else {
@@ -105,13 +104,13 @@ export default async function setValuesOnNode(
         }
       } else if (
         values.fontFamilies
-              || values.fontWeights
-              || values.lineHeights
-              || values.fontSizes
-              || values.letterSpacing
-              || values.paragraphSpacing
-              || values.textCase
-              || values.textDecoration
+        || values.fontWeights
+        || values.lineHeights
+        || values.fontSizes
+        || values.letterSpacing
+        || values.paragraphSpacing
+        || values.textCase
+        || values.textDecoration
       ) {
         if (node.type === 'TEXT') {
           setTextValuesOnTarget(node, {
@@ -131,7 +130,7 @@ export default async function setValuesOnNode(
 
       // BORDER COLOR
       if (typeof values.border !== 'undefined') {
-        if ('strokes' in node) {
+        if ('strokes' in node && data.border) {
           const path = data.border.split('.');
           const pathname = path.slice(ignoreFirstPartForStyles ? 1 : 0, path.length).join('/');
           const matchingStyle = figmaStyleMaps.paintStyles.get(pathname);

@@ -14,14 +14,15 @@ describe('App', () => {
     expect(LoadingText).toBeInTheDocument();
   });
 
-  it('skip to start screen when there is no tokens', () => {
+  it('skip to start screen when there is no tokens', async () => {
     const { getByText } = render(<App />);
+
     fireEvent(
       window,
       new MessageEvent('message', {
         data: {
           pluginMessage: {
-            type: 'tokenvalues',
+            type: 'set_tokens',
             status: '',
             values: {
               version: '5',
@@ -36,8 +37,8 @@ describe('App', () => {
         },
       }),
     );
-    const WelcomeText = getByText('Welcome to Figma Tokens.');
 
+    const WelcomeText = getByText('Welcome to Figma Tokens.');
     expect(WelcomeText).toBeInTheDocument();
   });
 
@@ -48,7 +49,7 @@ describe('App', () => {
       new MessageEvent('message', {
         data: {
           pluginMessage: {
-            type: 'tokenvalues',
+            type: 'set_tokens',
             status: '',
             values: {
               version: '5',

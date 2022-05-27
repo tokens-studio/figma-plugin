@@ -1,10 +1,12 @@
 type State = {
-  remoteComponents: Set<BaseNode | SceneNode>;
+  inspectDeep: boolean
+  shouldSendSelectionValues: boolean
   successfulNodes: Set<BaseNode | SceneNode>;
 };
 
 const store: State = {
-  remoteComponents: new Set(),
+  inspectDeep: false,
+  shouldSendSelectionValues: false,
   successfulNodes: new Set(),
 };
 

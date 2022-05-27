@@ -1,9 +1,9 @@
 /* eslint-disable no-param-reassign */
+import compact from 'just-compact';
 import { figmaRGBToHex } from '@figma-plugin/helpers';
 import {
-  SingleToken, SingleBoxShadowToken, SingleColorToken,
+  SingleToken, SingleColorToken, AnyTokenList,
 } from '@/types/tokens';
-import { ColorToken, ShadowTokenSingleValue } from '@/types/propertyTypes';
 import { convertBoxShadowTypeFromFigma } from './figmaTransforms/boxShadow';
 import { convertFigmaGradientToString } from './figmaTransforms/gradients';
 import { convertFigmaToLetterSpacing } from './figmaTransforms/letterSpacing';
@@ -13,6 +13,8 @@ import { convertFigmaToTextDecoration } from './figmaTransforms/textDecoration';
 import { notifyStyleValues } from './notifiers';
 import { PullStyleOptions } from '@/types';
 import { slugify } from '@/utils/string';
+import { TokenTypes } from '@/constants/TokenTypes';
+import { TokenBoxshadowValue } from '@/types/values';
 
 export default function pullStyles(styleTypes: PullStyleOptions): void {
   // @TODO should be specifically typed according to their type
@@ -28,12 +30,12 @@ export default function pullStyles(styleTypes: PullStyleOptions): void {
   let textCase: SingleToken[] = [];
   let textDecoration: SingleToken[] = [];
   if (styleTypes.colorStyles) {
-    colors = figma
+    colors = compact(figma
       .getLocalPaintStyles()
       .filter((style) => style.paints.length === 1)
       .map((style) => {
         const paint = style.paints[0];
-        let styleObject: SingleColorToken = {} as SingleColorToken;
+        let styleObject: SingleColorToken | null = {} as SingleColorToken;
         if (style.description) {
           styleObject.description = style.description;
         }
@@ -55,23 +57,22 @@ export default function pullStyles(styleTypes: PullStyleOptions): void {
 
         return styleObject
           ? {
-            name: normalizedName,
-            type: 'color',
             ...styleObject,
+            name: normalizedName,
+            type: TokenTypes.COLOR,
           }
           : null;
-      })
-      .filter(Boolean);
+      }));
   }
 
   if (styleTypes.textStyles) {
-    const rawFontSizes = [];
-    const fontCombinations = [];
-    const rawLineHeights = [];
-    const rawParagraphSpacing = [];
-    const rawLetterSpacing = [];
-    const rawTextCase = [];
-    const rawTextDecoration = [];
+    const rawFontSizes: number[] = [];
+    const fontCombinations: FontName[] = [];
+    const rawLineHeights: LineHeight[] = [];
+    const rawParagraphSpacing: number[] = [];
+    const rawLetterSpacing: LetterSpacing[] = [];
+    const rawTextCase: TextCase[] = [];
+    const rawTextDecoration: TextDecoration[] = [];
 
     const figmaTextStyles = figma.getLocalTextStyles();
 
@@ -90,30 +91,30 @@ export default function pullStyles(styleTypes: PullStyleOptions): void {
       .map((size, idx) => ({
         name: `fontSize.${idx}`,
         value: size.toString(),
-        type: 'fontSizes',
+        type: TokenTypes.FONT_SIZES,
       }));
 
     const uniqueFontCombinations = fontCombinations.filter(
       (v, i, a) => a.findIndex((t) => t.family === v.family && t.style === v.style) === i,
     );
     lineHeights = rawLineHeights
-      .filter((v, i, a) => a.findIndex((t) => t.unit === v.unit && t.value === v.value) === i)
+      .filter((v, i, a) => a.findIndex((t) => t.unit === v.unit && ('value' in t && 'value' in v ? t.value === v.value : true)) === i)
       .map((lh, idx) => ({
         name: `lineHeights.${idx}`,
         value: convertFigmaToLineHeight(lh).toString(),
-        type: 'lineHeights',
+        type: TokenTypes.LINE_HEIGHTS,
       }));
 
     fontFamilies = [...new Set(uniqueFontCombinations.map((font) => font.family))].map((fontFamily) => ({
       name: `fontFamilies.${slugify(fontFamily)}`,
       value: fontFamily,
-      type: 'fontFamilies',
+      type: TokenTypes.FONT_FAMILIES,
     }));
 
     fontWeights = uniqueFontCombinations.map((font, idx) => ({
       name: `fontWeights.${slugify(font.family)}-${idx}`,
       value: font.style,
-      type: 'fontWeights',
+      type: TokenTypes.FONT_WEIGHTS,
     }));
 
     paragraphSpacing = rawParagraphSpacing
@@ -121,7 +122,7 @@ export default function pullStyles(styleTypes: PullStyleOptions): void {
       .map((size, idx) => ({
         name: `paragraphSpacing.${idx}`,
         value: size.toString(),
-        type: 'paragraphSpacing',
+        type: TokenTypes.PARAGRAPH_SPACING,
       }));
 
     letterSpacing = rawLetterSpacing
@@ -129,19 +130,19 @@ export default function pullStyles(styleTypes: PullStyleOptions): void {
       .map((lh, idx) => ({
         name: `letterSpacing.${idx}`,
         value: convertFigmaToLetterSpacing(lh).toString(),
-        type: 'letterSpacing',
+        type: TokenTypes.LETTER_SPACING,
       }));
 
     textCase = rawTextCase.map((value) => ({
       name: `textCase.${convertFigmaToTextCase(value)}`,
       value: convertFigmaToTextCase(value),
-      type: 'textCase',
+      type: TokenTypes.TEXT_CASE,
     }));
 
     textDecoration = rawTextDecoration.map((value) => ({
       name: `textDecoration.${convertFigmaToTextDecoration(value)}`,
       value: convertFigmaToTextDecoration(value),
-      type: 'textDecoration',
+      type: TokenTypes.TEXT_DECORATION,
     }));
 
     typography = figmaTextStyles.map((style) => {
@@ -182,7 +183,7 @@ export default function pullStyles(styleTypes: PullStyleOptions): void {
         .map((section) => section.trim())
         .join('.');
 
-      const styleObject: SingleToken = { name: normalizedName, value: obj, type: 'typography' };
+      const styleObject: SingleToken = { name: normalizedName, value: obj, type: TokenTypes.TYPOGRAPHY };
 
       if (style.description) {
         styleObject.description = style.description;
@@ -193,20 +194,21 @@ export default function pullStyles(styleTypes: PullStyleOptions): void {
   }
 
   if (styleTypes.effectStyles) {
-    effects = figma
+    effects = compact(figma
       .getLocalEffectStyles()
       .filter((style) => style.effects.every((effect) => ['DROP_SHADOW', 'INNER_SHADOW'].includes(effect.type)))
       .map((style) => {
+        const effects = style.effects as DropShadowEffect[];
         // convert paint to object containg x, y, spread, color
-        const shadows: SingleBoxShadowToken['value'][] = style.effects.map((effect) => {
-          const effectObject: SingleBoxShadowToken['value'] = {} as SingleBoxShadowToken['value'];
+        const shadows: TokenBoxshadowValue[] = effects.map((effect) => {
+          const effectObject: TokenBoxshadowValue = {} as TokenBoxshadowValue;
 
           effectObject.color = figmaRGBToHex(effect.color);
           effectObject.type = convertBoxShadowTypeFromFigma(effect.type);
           effectObject.x = effect.offset.x;
           effectObject.y = effect.offset.y;
           effectObject.blur = effect.radius;
-          effectObject.spread = effect.spread;
+          effectObject.spread = effect.spread || 0;
 
           return effectObject;
         });
@@ -220,7 +222,7 @@ export default function pullStyles(styleTypes: PullStyleOptions): void {
 
         const styleObject: SingleToken = {
           value: shadows.length > 1 ? shadows : shadows[0],
-          type: 'boxShadow',
+          type: TokenTypes.BOX_SHADOW,
           name: normalizedName,
         };
         if (style.description) {
@@ -228,8 +230,7 @@ export default function pullStyles(styleTypes: PullStyleOptions): void {
         }
 
         return styleObject;
-      })
-      .filter(Boolean);
+      }));
   }
 
   const stylesObject = {
@@ -246,7 +247,9 @@ export default function pullStyles(styleTypes: PullStyleOptions): void {
     textDecoration,
   };
 
-  const returnedObject = Object.entries(stylesObject).reduce((acc, [key, value]) => {
+  type ResultObject = Record<string, AnyTokenList>;
+
+  const returnedObject = Object.entries(stylesObject).reduce<ResultObject>((acc, [key, value]) => {
     if (value.length > 0) {
       acc[key] = value;
     }

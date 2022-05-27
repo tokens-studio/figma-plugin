@@ -1,7 +1,5 @@
-import { useSelector } from 'react-redux';
+import { useSelector, useStore } from 'react-redux';
 import { useCallback, useMemo } from 'react';
-import { postToFigma } from '@/plugin/notifiers';
-import { MessageToPluginTypes } from '@/types/messages';
 import {
   AnyTokenList,
   SingleToken,
@@ -9,7 +7,6 @@ import {
 import stringifyTokens from '@/utils/stringifyTokens';
 import formatTokens from '@/utils/formatTokens';
 import { mergeTokenGroups, resolveTokenValues } from '@/plugin/tokenHelpers';
-import { UpdateMode } from '@/types/state';
 import useConfirm from '../hooks/useConfirm';
 import { Properties } from '@/constants/Properties';
 import { track } from '@/utils/analytics';
@@ -23,8 +20,11 @@ import {
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { isEqual } from '@/utils/isEqual';
-
-// @TODO fix typings
+import { UpdateMode } from '@/constants/UpdateMode';
+import { AsyncMessageTypes } from '@/types/AsyncMessages';
+import { AsyncMessageChannel } from '@/AsyncMessageChannel';
+import { NodeInfo } from '@/types/NodeInfo';
+import type { RootState } from '../store';
 
 type ConfirmResult =
   ('textStyles' | 'colorStyles' | 'effectStyles')[]
@@ -37,7 +37,7 @@ type GetFormattedTokensOptions = {
   expandShadow: boolean;
 };
 
-type RemoveTokensByValueData = { property: Properties; nodes: string[] }[];
+type RemoveTokensByValueData = { property: Properties; nodes: NodeInfo[] }[];
 
 export default function useTokens() {
   const usedTokenSet = useSelector(usedTokenSetSelector);
@@ -45,6 +45,7 @@ export default function useTokens() {
   const tokens = useSelector(tokensSelector);
   const settings = useSelector(settingsStateSelector, isEqual);
   const { confirm } = useConfirm<ConfirmResult>();
+  const store = useStore<RootState>();
 
   // Gets value of token
   const getTokenValue = useCallback((name: string, resolved: AnyTokenList) => (
@@ -92,8 +93,8 @@ export default function useTokens() {
         effectStyles: userDecision.data.includes('effectStyles'),
       });
 
-      postToFigma({
-        type: MessageToPluginTypes.PULL_STYLES,
+      AsyncMessageChannel.message({
+        type: AsyncMessageTypes.PULL_STYLES,
         styleTypes: {
           textStyles: userDecision.data.includes('textStyles'),
           colorStyles: userDecision.data.includes('colorStyles'),
@@ -106,41 +107,32 @@ export default function useTokens() {
   const removeTokensByValue = useCallback((data: RemoveTokensByValueData) => {
     track('removeTokensByValue', { count: data.length });
 
-    postToFigma({
-      type: MessageToPluginTypes.REMOVE_TOKENS_BY_VALUE,
+    AsyncMessageChannel.message({
+      type: AsyncMessageTypes.REMOVE_TOKENS_BY_VALUE,
       tokensToRemove: data,
     });
   }, []);
 
-  const handleRemap = useCallback(async (type: Properties | TokenTypes, name: string) => {
-    const userDecision = await confirm({
-      text: `Choose a new token for ${name}`,
-      input: {
-        type: 'text',
-        placeholder: 'New token name',
-      },
-      confirmAction: 'Remap',
+  const handleRemap = useCallback(async (type: Properties | TokenTypes, name: string, newTokenName: string, resolvedTokens: SingleToken[]) => {
+    const settings = settingsStateSelector(store.getState());
+    track('remapToken', { fromInspect: true });
+    AsyncMessageChannel.message({
+      type: AsyncMessageTypes.REMAP_TOKENS,
+      category: type,
+      oldName: name,
+      newName: newTokenName,
+      updateMode: UpdateMode.SELECTION,
+      tokens: resolvedTokens,
+      settings,
     });
-
-    if (userDecision && typeof userDecision.data === 'string') {
-      track('remapToken', { fromInspect: true });
-
-      postToFigma({
-        type: MessageToPluginTypes.REMAP_TOKENS,
-        category: type,
-        oldName: name,
-        newName: userDecision.data,
-        updateMode: UpdateMode.SELECTION,
-      });
-    }
   }, [confirm]);
 
   // Calls Figma with an old name and new name and asks it to update all tokens that use the old name
   const remapToken = useCallback(async (oldName: string, newName: string, updateMode?: UpdateMode) => {
     track('remapToken', { fromRename: true });
 
-    postToFigma({
-      type: MessageToPluginTypes.REMAP_TOKENS,
+    AsyncMessageChannel.message({
+      type: AsyncMessageTypes.REMAP_TOKENS,
       oldName,
       newName,
       updateMode: updateMode || settings.updateMode,
@@ -160,8 +152,8 @@ export default function useTokens() {
       && (!token.internal__Parent || enabledTokenSets.includes(token.internal__Parent)) // filter out SOURCE tokens
     ));
 
-    postToFigma({
-      type: MessageToPluginTypes.CREATE_STYLES,
+    AsyncMessageChannel.message({
+      type: AsyncMessageTypes.CREATE_STYLES,
       tokens: withoutIgnoredAndSourceTokens,
       settings,
     });

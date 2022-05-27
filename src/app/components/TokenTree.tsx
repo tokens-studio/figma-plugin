@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 import TokenGroupHeading from './TokenGroupHeading';
 import { TokenButton } from './TokenButton';
-import { TokenTypes } from '@/constants/TokenTypes';
 import { editProhibitedSelector } from '@/selectors';
 import { DeepKeyTokenMap, SingleToken, TokenTypeSchema } from '@/types/tokens';
 import { isSingleToken } from '@/utils/is';
@@ -21,16 +20,15 @@ export type ShowNewFormOptions = {
 
 type Props = {
   displayType: 'GRID' | 'LIST';
-  type: TokenTypes;
-  schema: TokenTypeSchema['schema']
-  tokenValues: DeepKeyTokenMap
-  path?: string | null
-  showNewForm: (opts: ShowNewFormOptions) => void
-  showForm: (opts: ShowFormOptions) => void
+  schema: TokenTypeSchema;
+  tokenValues: DeepKeyTokenMap;
+  path?: string | null;
+  showNewForm: (opts: ShowNewFormOptions) => void;
+  showForm: (opts: ShowFormOptions) => void;
 };
 
 const TokenTree: React.FC<Props> = ({
-  displayType, tokenValues, showNewForm, showForm, schema, path = null, type,
+  displayType, tokenValues, showNewForm, showForm, schema, path = null,
 }) => {
   const editProhibited = useSelector(editProhibitedSelector);
   const tokenValuesEntries = React.useMemo(() => (
@@ -58,7 +56,7 @@ const TokenTree: React.FC<Props> = ({
           {typeof value === 'object' && !isSingleToken(value) ? (
             <div className="property-wrapper w-full" data-cy={`token-group-${stringPath}`}>
               <div className="flex items-center justify-between group">
-                <TokenGroupHeading label={name} path={stringPath} id="listing" />
+                <TokenGroupHeading label={name} path={stringPath} id="listing" type={schema.type} />
                 <div className="opacity-0 group-hover:opacity-100 focus:opacity-100">
                   <IconButton
                     icon={<AddIcon />}
@@ -77,13 +75,12 @@ const TokenTree: React.FC<Props> = ({
                 showForm={showForm}
                 schema={schema}
                 path={stringPath}
-                type={type}
                 displayType={displayType}
               />
             </div>
           ) : (
             <TokenButton
-              type={type}
+              type={schema.type}
               token={value}
               showForm={showForm}
               draggedToken={draggedToken}

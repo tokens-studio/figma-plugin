@@ -1,9 +1,9 @@
-import { postToFigma } from '@/plugin/notifiers';
-import { MessageToPluginTypes } from '@/types/messages';
+import { AsyncMessageChannel } from '@/AsyncMessageChannel';
+import { AsyncMessageTypes } from '@/types/AsyncMessages';
 
 export function selectNodes(ids: string[]) {
-  postToFigma({
-    type: MessageToPluginTypes.SELECT_NODES,
+  AsyncMessageChannel.message({
+    type: AsyncMessageTypes.SELECT_NODES,
     ids,
   });
 }

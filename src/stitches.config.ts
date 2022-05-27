@@ -32,9 +32,7 @@ const globalTokens = {
   },
 };
 
-export const {
-  styled, css, keyframes, theme,
-} = createStitches({
+export const stitchesInstance = createStitches({
   theme: {
     fonts: {
       sans: 'Inter, sans-serif',
@@ -106,6 +104,7 @@ export const {
       7: '32px',
       8: '48px',
       9: '64px',
+      10: '38px',
     },
     sizes: {
       1: '2px',
@@ -116,6 +115,8 @@ export const {
       6: '24px',
       7: '32px',
       8: '48px',
+      10: '38px',
+      dropdownMaxHeight: '170px',
     },
     radii: {
       default: globalTokens.radii.sm,
@@ -134,3 +135,11 @@ export const {
     },
   },
 });
+
+const {
+  styled, css, keyframes, theme,
+} = stitchesInstance;
+
+export {
+  styled, css, keyframes, theme,
+};

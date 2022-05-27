@@ -1,22 +1,27 @@
 import * as pjs from '../../../package.json';
-import { SharedPluginDataKeys } from '@/constants/SharedPluginDataKeys';
-import { tokensSharedDataHandler } from '@/plugin/SharedDataHandler';
 import { ThemeObjectsList, UsedTokenSetsMap } from '@/types';
-import { AnyTokenSet } from '@/types/tokens';
+import { AnyTokenList } from '@/types/tokens';
+import {
+  ActiveThemeProperty,
+  CheckForChangesProperty,
+  ThemesProperty, UpdatedAtProperty, UsedTokenSetProperty, ValuesProperty, VersionProperty,
+} from '@/figmaStorage';
 
 type Payload = {
-  tokens: AnyTokenSet
+  tokens: Record<string, AnyTokenList>
   themes: ThemeObjectsList
   usedTokenSets: UsedTokenSetsMap
   activeTheme: string | null
   updatedAt: string
+  checkForChanges: boolean
 };
 
-export function updateLocalTokensData(payload: Payload) {
-  tokensSharedDataHandler.set(figma.root, SharedPluginDataKeys.tokens.version, pjs.plugin_version);
-  tokensSharedDataHandler.set(figma.root, SharedPluginDataKeys.tokens.themes, JSON.stringify(payload.themes));
-  tokensSharedDataHandler.set(figma.root, SharedPluginDataKeys.tokens.values, JSON.stringify(payload.tokens));
-  tokensSharedDataHandler.set(figma.root, SharedPluginDataKeys.tokens.usedTokenSet, JSON.stringify(payload.usedTokenSets));
-  tokensSharedDataHandler.set(figma.root, SharedPluginDataKeys.tokens.updatedAt, payload.updatedAt);
-  tokensSharedDataHandler.set(figma.root, SharedPluginDataKeys.tokens.activeTheme, payload.activeTheme ?? '');
+export async function updateLocalTokensData(payload: Payload) {
+  await VersionProperty.write(pjs.plugin_version);
+  await ThemesProperty.write(payload.themes);
+  await ValuesProperty.write(payload.tokens);
+  await UsedTokenSetProperty.write(payload.usedTokenSets);
+  await UpdatedAtProperty.write(payload.updatedAt);
+  await ActiveThemeProperty.write(payload.activeTheme);
+  await CheckForChangesProperty.write(payload.checkForChanges);
 }

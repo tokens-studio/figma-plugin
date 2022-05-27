@@ -1,12 +1,12 @@
-import * as helpers from '@/plugin/helpers';
-import { StorageProviderType } from '../types/api';
+import { StorageProviderType } from '@/constants/StorageProviderType';
+import * as generateId from '@/utils/generateId';
 import { removeSingleCredential, updateCredentials } from './credentials';
 
 describe('updateCredentials', () => {
   afterEach(() => {
     jest.clearAllMocks();
   });
-  const generateIdSpy = jest.spyOn(helpers, 'generateId').mockImplementation(() => 'idMock');
+  const generateIdSpy = jest.spyOn(generateId, 'generateId').mockImplementation(() => 'idMock');
 
   // Mock id for test
 

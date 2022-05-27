@@ -6,6 +6,8 @@ type Props = {
   shadow: TokenBoxshadowValue
 };
 
+// @TODO: Figure out how to display resolved shadow value without seeming duplicative / like we do for typography a shorthand
+
 export const SingleShadowValueDisplay: React.FC<Props> = ({ shadow }) => (
   <Box css={{
     display: 'flex', flexDirection: 'column', marginBottom: '$2', color: '$fgToolTipMuted',

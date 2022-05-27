@@ -4,7 +4,7 @@ const yargs = require('yargs/yargs');
 const {hideBin} = require('yargs/helpers');
 const fs = require('fs');
 const getDirName = require('path').dirname;
-const transformTokens = require('./dist/transform').default;
+const transformTokens = require('./dist/transform').tokenTransformer.default;
 const path = require("path")
 
 /**

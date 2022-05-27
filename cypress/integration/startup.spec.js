@@ -5,7 +5,7 @@ describe('Loads application', () => {
     cy.window().then(($window) => {
       const message = {
         pluginMessage: {
-          type: 'tokenvalues',
+          type: 'set_tokens',
           values: {
             version: '5',
             themes: [],
@@ -41,7 +41,7 @@ describe('Loads application', () => {
     cy.window().then(($window) => {
       const message = {
         pluginMessage: {
-          type: 'tokenvalues',
+          type: 'set_tokens',
           values: {
             values: {
               global: [],

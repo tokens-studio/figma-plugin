@@ -27,10 +27,10 @@ export default function AddLicenseKey() {
 
   const removeKey = useCallback(async () => {
     const confirmation = await confirm({
-      text: 'Are you sure you want to remove your beta key?',
-      description: `Make sure you saved a copy of the beta key somewhere,                    
+      text: 'Are you sure you want to remove your license key?',
+      description: `Make sure you saved a copy of the license key somewhere,                    
         as it won’t be stored on this device after you deleted it.`,
-      confirmAction: 'Remove beta key',
+      confirmAction: 'Remove license key',
     });
     if (confirmation) {
       dispatch.userState.removeLicenseKey('');
@@ -53,7 +53,7 @@ export default function AddLicenseKey() {
 
   return (
     <Stack direction="column" gap={3} css={{ padding: '0 $4' }}>
-      <Heading size="medium">Beta key</Heading>
+      <Heading size="medium">License key</Heading>
       <Stack
         direction="row"
         gap={2}
@@ -76,11 +76,9 @@ export default function AddLicenseKey() {
         </Box>
 
         <Button variant="primary" onClick={addKey} disabled={existingKey === newKey}>
-          {existingKey ? 'Update key' : 'Add beta key'}
+          {existingKey ? 'Update key' : 'Add license key'}
         </Button>
-        <Box>
-          {removeLicenseKeyButton}
-        </Box>
+        <Box>{removeLicenseKeyButton}</Box>
       </Stack>
     </Stack>
   );

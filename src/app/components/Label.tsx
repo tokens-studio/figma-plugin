@@ -1,5 +1,6 @@
 import React, { ReactNode } from 'react';
 import { styled } from '@/stitches.config';
+import type { StitchesCSS } from '@/types';
 
 export default function Label({
   htmlFor,
@@ -10,7 +11,7 @@ export default function Label({
   htmlFor: string;
   children: ReactNode;
   disabled?: boolean;
-  css?: object;
+  css?: StitchesCSS;
 }) {
   const StyledLabel = styled('label', {
     fontSize: '$small',
@@ -27,6 +28,7 @@ export default function Label({
       },
     },
   });
+
   return (
     <StyledLabel isDisabled={disabled} css={css} htmlFor={htmlFor}>
       {children}

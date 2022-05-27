@@ -2,7 +2,7 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { DndProvider } from 'react-dnd';
-import { TokenTypeSchema } from '@/types/tokens';
+import { DeepKeyTokenMap, EditTokenObject, TokenTypeSchema } from '@/types/tokens';
 import Heading from './Heading';
 import TokenTree, { ShowFormOptions, ShowNewFormOptions } from './TokenTree';
 import Tooltip from './Tooltip';
@@ -16,18 +16,17 @@ import ListIcon from '@/icons/list.svg';
 import GridIcon from '@/icons/grid.svg';
 import AddIcon from '@/icons/add.svg';
 
-type Props = Omit<TokenTypeSchema, 'type'> & {
-  tokenKey: string;
-  tokenType: TokenTypes;
+type Props = {
+  tokenKey: string
+  label: string
+  schema: TokenTypeSchema
+  values: DeepKeyTokenMap
 };
 
 const TokenListing: React.FC<Props> = ({
   tokenKey,
   label,
   schema,
-  explainer = '',
-  property,
-  tokenType = TokenTypes.IMPLICIT,
   values,
 }) => {
   const editProhibited = useSelector(editProhibitedSelector);
@@ -36,31 +35,20 @@ const TokenListing: React.FC<Props> = ({
   const collapsed = useSelector(collapsedSelector);
   const dispatch = useDispatch<Dispatch>();
 
-  const showDisplayToggle = React.useMemo(() => tokenType === TokenTypes.COLOR, [tokenType]);
+  const showDisplayToggle = React.useMemo(() => schema.type === TokenTypes.COLOR, [schema.type]);
 
   const [isIntCollapsed, setIntCollapsed] = React.useState(false);
 
   const showForm = React.useCallback(({ token, name, isPristine = false }: ShowFormOptions) => {
-    const tokenValue = token?.value ?? (typeof schema?.value === 'object' ? schema.value : '');
-
-    // @TODO fix these typings depending on usage
     dispatch.uiState.setShowEditForm(true);
     dispatch.uiState.setEditToken({
-      value: tokenValue,
-      type: tokenType,
-      name,
-      initialName: name,
+      ...token,
+      type: schema.type,
+      schema,
       isPristine,
-      explainer,
-      property,
-      schema: schema?.value,
-      optionsSchema: schema?.options,
-      options: {
-        description: token?.description,
-        type: tokenType,
-      },
-    });
-  }, [schema, tokenType, dispatch, explainer, property]);
+      initialName: name,
+    } as EditTokenObject);
+  }, [schema, dispatch]);
 
   const showNewForm = React.useCallback(({ name = '' }: ShowNewFormOptions) => {
     showForm({ token: null, name, isPristine: true });
@@ -138,7 +126,6 @@ const TokenListing: React.FC<Props> = ({
               showNewForm={showNewForm}
               showForm={showForm}
               schema={schema}
-              type={tokenType}
               displayType={displayType}
             />
           </div>

@@ -6,20 +6,20 @@ import Button from './Button';
 import useRemoteTokens from '../store/remoteTokens';
 import { storageTypeSelector } from '@/selectors';
 import { StyledStorageItem } from './StyledStorageItem';
-import { ApiDataType } from '@/types/api';
-
-// @TODO typings
+import type { StorageTypeCredentials } from '@/types/StorageType';
+import { isGitProvider } from '@/utils/is';
 
 type Props = {
-  item: ApiDataType,
+  item: StorageTypeCredentials,
   onEdit: () => void
 };
 
 const StorageItem = ({ item, onEdit }: Props) => {
   const storageType = useSelector(storageTypeSelector);
   const {
-    provider, id, branch, name,
+    provider, id, name,
   } = item;
+  const branch = isGitProvider(item) ? item.branch : null;
 
   const { restoreStoredProvider, deleteProvider } = useRemoteTokens();
 

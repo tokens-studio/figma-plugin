@@ -1,0 +1,34 @@
+import { Meta, Story, ArgsTable, Canvas, Preview } from '@storybook/addon-docs';
+import { Provider } from 'react-redux';
+
+import { store } from '@/app/store';
+import { Tabs } from '@/constants/Tabs';
+
+import { TabButton } from '@/app/components/TabButton';
+
+<Meta 
+  title='TabButton' 
+  component={TabButton} 
+  args={{
+    name: Tabs.TOKENS,
+    label: 'TOKENS'
+  }}
+/>
+
+<ArgsTable of={TabButton}/>
+
+export const TabButtonDefaultStory = (args) => {
+  return (
+    <Provider store={store}>
+      <TabButton name={args.name} label={args.label}/>
+    </Provider>
+  )
+}
+
+<Canvas>
+  <Story name='Default' args={{
+  }}
+  >
+    {TabButtonDefaultStory.bind({})}
+  </Story>
+</Canvas>

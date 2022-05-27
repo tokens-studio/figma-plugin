@@ -93,7 +93,6 @@ export class GithubTokenStorage extends GitTokenStorage {
 
   public async read(): Promise<RemoteTokenStorageFile<GitStorageMetadata>[]> {
     try {
-
       const response = await this.octokitClient.rest.repos.getContent({
         owner: this.owner,
         repo: this.repository,

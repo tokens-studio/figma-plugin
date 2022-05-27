@@ -1,7 +1,6 @@
 export enum TokenTypes {
   OTHER = 'other',
   COLOR = 'color',
-  IMPLICIT = 'implicit',
   BORDER_RADIUS = 'borderRadius',
   SIZING = 'sizing',
   SPACING = 'spacing',
@@ -18,9 +17,5 @@ export enum TokenTypes {
   PARAGRAPH_SPACING = 'paragraphSpacing',
   TEXT_DECORATION = 'textDecoration',
   TEXT_CASE = 'textCase',
-
-  // @deprecated ?
-  BORDER = 'border',
-  // @deprecated - should not be used
-  UNDEFINED = 'undefined',
+  COMPOSITION = 'composition',
 }

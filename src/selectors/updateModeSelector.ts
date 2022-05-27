@@ -1,5 +1,5 @@
 import { createSelector } from 'reselect';
-import { UpdateMode } from '@/types/state';
+import { UpdateMode } from '@/constants/UpdateMode';
 import { settingsStateSelector } from './settingsStateSelector';
 
 export const updateModeSelector = createSelector(

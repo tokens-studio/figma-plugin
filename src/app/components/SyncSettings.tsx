@@ -2,7 +2,6 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { track } from '@/utils/analytics';
-import { StorageProviderType } from '@/types/api';
 import Button from './Button';
 import Heading from './Heading';
 import ConfirmLocalStorageModal from './modals/ConfirmLocalStorageModal';
@@ -16,6 +15,7 @@ import { apiProvidersSelector, localApiStateSelector, storageTypeSelector } from
 import Stack from './Stack';
 import Box from './Box';
 import Text from './Text';
+import { StorageProviderType } from '@/constants/StorageProviderType';
 
 const SyncSettings = () => {
   const localApiState = useSelector(localApiStateSelector);
@@ -44,7 +44,7 @@ const SyncSettings = () => {
     });
   }, [dispatch.uiState]);
 
-  const selectedRemoteProvider = React.useMemo(() => [StorageProviderType.JSONBIN, StorageProviderType.GITHUB, StorageProviderType.GITLAB, StorageProviderType.URL].includes(
+  const selectedRemoteProvider = React.useMemo(() => [StorageProviderType.JSONBIN, StorageProviderType.GITHUB, StorageProviderType.GITLAB, StorageProviderType.ADO, StorageProviderType.URL].includes(
     localApiState?.provider as StorageProviderType,
   ), [localApiState?.provider]);
 
@@ -105,6 +105,22 @@ const SyncSettings = () => {
             .
           </div>
         );
+      case StorageProviderType.ADO:
+        return (
+          <div>
+            Sync your tokens with a Azure DevOps repository so your design decisions are up to date with code.
+            {' '}
+            <a
+              href="https://docs.tokens.studio/sync/ado"
+              target="_blank"
+              rel="noreferrer"
+              className="underline"
+            >
+              Read the guide
+            </a>
+            .
+          </div>
+        );
       case StorageProviderType.URL:
         return <div>Sync with a JSON stored on an external URL. This mode only allows Read Only.</div>;
       default:
@@ -145,7 +161,7 @@ const SyncSettings = () => {
       {confirmModalVisible && (
         <ConfirmLocalStorageModal
           isOpen={confirmModalVisible}
-          onClose={showConfirmModal}
+          onToggle={showConfirmModal}
           onSuccess={handleSubmitLocalStorage}
         />
       )}
@@ -203,6 +219,13 @@ const SyncSettings = () => {
                 onClick={handleProviderClick(StorageProviderType.GITLAB)}
                 text="GitLab"
                 id={StorageProviderType.GITLAB}
+              />
+              <ProviderSelector
+                isActive={localApiState?.provider === StorageProviderType.ADO}
+                isStored={storageType?.provider === StorageProviderType.ADO}
+                onClick={handleProviderClick(StorageProviderType.ADO)}
+                text="ADO"
+                id={StorageProviderType.ADO}
               />
             </Stack>
           </Stack>

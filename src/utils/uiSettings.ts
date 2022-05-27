@@ -1,8 +1,8 @@
-import { UpdateMode } from '@/types/state';
+import { UpdateMode } from '@/constants/UpdateMode';
 import { notifyUISettings, notifyUI, SavedSettings } from '@/plugin/notifiers';
 
 // update credentials
-export async function updateUISettings(uiSettings) {
+export async function updateUISettings(uiSettings: Partial<SavedSettings>) {
   try {
     const data = await figma.clientStorage.getAsync('uiSettings');
     const parsedData = data ? await JSON.parse(data) : {};
@@ -41,6 +41,7 @@ export async function getUISettings(): Promise<SavedSettings> {
       settings = {
         width: Math.max(300, width),
         height: Math.max(200, height),
+        showEmptyGroups,
         updateMode,
         updateOnChange,
         updateRemote,
@@ -49,7 +50,7 @@ export async function getUISettings(): Promise<SavedSettings> {
         inspectDeep,
       };
 
-      notifyUISettings(settings, showEmptyGroups);
+      notifyUISettings(settings);
     }
   } catch (err) {
     notifyUI('There was an issue saving your credentials. Please try again.');

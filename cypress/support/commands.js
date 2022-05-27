@@ -1,5 +1,5 @@
 import { MessageFromPluginTypes } from '../../src/types/messages';
-import { StorageProviderType } from '../../src/types/api';
+import { StorageProviderType } from '../../src/constants/StorageProviderType';
 
 // ***********************************************
 // This example commands.js shows you how to
@@ -68,6 +68,18 @@ Cypress.Commands.add('receiveTokenValues', (values) => {
     const message = {
       pluginMessage: {
         type: MessageFromPluginTypes.TOKEN_VALUES,
+        values,
+      },
+    };
+    $window.postMessage(message, '*');
+  });
+});
+
+Cypress.Commands.add('receiveSetTokens', (values) => {
+  cy.window().then(($window) => {
+    const message = {
+      pluginMessage: {
+        type: MessageFromPluginTypes.SET_TOKENS,
         values,
       },
     };

@@ -1,19 +1,10 @@
-import { SettingsState } from '@/app/store/models/settings';
-import { Properties } from '@/constants/Properties';
 import type { BackgroundJob } from '@/app/store/models/uiState';
-import {
-  ApiDataType, ContextObject, StorageProviderType, StorageType,
-} from './api';
-import { NodeTokenRefMap } from './NodeTokenRefMap';
-import { UpdateMode } from './state';
-import { SelectionGroup } from './SelectionGroup';
-import { SelectionValue } from './SelectionValue';
-import { AnyTokenList, AnyTokenSet, TokenStore } from './tokens';
-import { PullStyleOptions } from './PullStylesOptions';
-import { UsedTokenSetsMap } from './UsedTokenSetsMap';
-import { TokenTypes } from '@/constants/TokenTypes';
-import { ThemeObjectsList } from './ThemeObjectsList';
-import { NodeInfo } from './NodeInfo';
+import type { SelectionGroup } from './SelectionGroup';
+import type { SelectionValue } from './SelectionValue';
+import type { AnyTokenList, TokenStore } from './tokens';
+import type { UsedTokenSetsMap } from './UsedTokenSetsMap';
+import type { UpdateMode } from '@/constants/UpdateMode';
+import type { StorageType, StorageTypeCredentials } from './StorageType';
 
 export enum MessageFromPluginTypes {
   SELECTION = 'selection',
@@ -35,30 +26,7 @@ export enum MessageFromPluginTypes {
   ADD_JOB_TASKS = 'add_job_tasks',
   COMPLETE_JOB_TASKS = 'complete_job_tasks',
   LICENSE_KEY = 'license_key',
-}
-
-export enum MessageToPluginTypes {
-  INITIATE = 'initiate',
-  REMOVE_SINGLE_CREDENTIAL = 'remove-single-credential',
-  GO_TO_NODE = 'gotonode',
-  CREDENTIALS = 'credentials',
-  UPDATE = 'update',
-  CREATE_STYLES = 'create-styles',
-  SET_NODE_DATA = 'set-node-data',
-  PULL_STYLES = 'pull-styles',
-  SET_STORAGE_TYPE = 'set-storage-type',
-  NOTIFY = 'notify',
-  SET_UI = 'set_ui',
-  SET_SHOW_EMPTY_GROUPS = 'set_show_empty_groups',
-  RESIZE_WINDOW = 'resize_window',
-  CANCEL_OPERATION = 'cancel_operation',
-  CREATE_ANNOTATION = 'create-annotation',
-  REMAP_TOKENS = 'remap-tokens',
-  REMOVE_TOKENS_BY_VALUE = 'remove-tokens-by-value',
-  CHANGED_TABS = 'changed-tabs',
-  SELECT_NODES = 'select-nodes',
-  SET_LICENSE_KEY = 'set-license-key',
-  GET_API_CREDENTIALS = 'get-api-credentials',
+  SET_TOKENS = 'set_tokens',
 }
 
 export type NoSelectionFromPluginMessage = { type: MessageFromPluginTypes.NO_SELECTION };
@@ -105,11 +73,11 @@ export type ReceivedStorageTypeFromPluginMessage = {
 };
 export type ApiProvidersFromPluginMessage = {
   type: MessageFromPluginTypes.API_PROVIDERS;
-  providers: ApiDataType[];
+  providers: StorageTypeCredentials[];
 };
 export type StylesFromPluginMessage = {
   type: MessageFromPluginTypes.STYLES;
-  values?: any;
+  values?: Record<string, AnyTokenList>;
 };
 export type UserIdFromPluginMessage = {
   type: MessageFromPluginTypes.USER_ID;
@@ -145,16 +113,21 @@ export type CompleteJobTasksFromPluginMessage = {
 export type ApiCredentialsFromPluginMessage = {
   type: MessageFromPluginTypes.API_CREDENTIALS;
   status: boolean;
-  credentials: ApiDataType & {
-    internalId?: string;
-  };
+  credentials: StorageTypeCredentials;
   usedTokenSet?: UsedTokenSetsMap | null;
+  shouldPull?: boolean;
 };
 
 export type LicenseKeyFromPluginMessage = {
   type: MessageFromPluginTypes.LICENSE_KEY;
   licenseKey: string;
 };
+
+export type SetTokensFromPluginMessage = {
+  type: MessageFromPluginTypes.SET_TOKENS;
+  values: TokenStore;
+};
+
 export type PostToUIMessage =
   | NoSelectionFromPluginMessage
   | SelectionFromPluginMessage
@@ -174,128 +147,5 @@ export type PostToUIMessage =
   | AddJobTasksFromPluginMessage
   | CompleteJobTasksFromPluginMessage
   | ApiCredentialsFromPluginMessage
-  | LicenseKeyFromPluginMessage;
-
-export type InitiateToPluginMessage = { type: MessageToPluginTypes.INITIATE };
-export type RemoveSingleCredentialToPluginMessage = {
-  type: MessageToPluginTypes.REMOVE_SINGLE_CREDENTIAL;
-  context: ContextObject;
-};
-export type GoToNodeToPluginMessage = {
-  type: MessageToPluginTypes.GO_TO_NODE;
-  id: string;
-};
-export type CredentialsToPluginMessage = {
-  type: MessageToPluginTypes.CREDENTIALS;
-  id: string;
-  name: string;
-  secret: string;
-  provider: StorageProviderType;
-};
-export type UpdateToPluginMessage = {
-  type: MessageToPluginTypes.UPDATE;
-  tokenValues: AnyTokenSet;
-  tokens: AnyTokenList | null;
-  themes: ThemeObjectsList
-  updatedAt: string;
-  settings: SettingsState;
-  usedTokenSet: UsedTokenSetsMap;
-  activeTheme: string | null;
-  checkForChanges: string
-};
-export type CreateStylesToPluginMessage = {
-  type: MessageToPluginTypes.CREATE_STYLES;
-  tokens: AnyTokenList;
-  settings: SettingsState;
-};
-export type SetNodeDataToPluginMessage = {
-  type: MessageToPluginTypes.SET_NODE_DATA;
-  values: NodeTokenRefMap;
-  tokens: AnyTokenList;
-  settings: SettingsState;
-};
-export type PullStylesToPluginMessage = {
-  type: MessageToPluginTypes.PULL_STYLES;
-  styleTypes: PullStyleOptions;
-};
-export type SetStorageTypeToPluginMessage = {
-  type: MessageToPluginTypes.SET_STORAGE_TYPE;
-  storageType: ContextObject;
-};
-export type NotifyToPluginMessage = {
-  type: MessageToPluginTypes.NOTIFY;
-  msg: string;
-  opts: NotificationOptions;
-};
-export type SetUiToPluginMessage = SettingsState & {
-  type: MessageToPluginTypes.SET_UI;
-};
-export type SetShowEmptyGroupsPluginMessage = {
-  type: MessageToPluginTypes.SET_SHOW_EMPTY_GROUPS;
-  showEmptyGroups: boolean;
-};
-export type ResizeWindowToPluginMessage = {
-  type: MessageToPluginTypes.RESIZE_WINDOW;
-  width: number;
-  height: number;
-};
-export type CancelOperationToPluginMessage = {
-  type: MessageToPluginTypes.CANCEL_OPERATION;
-};
-export type CreateAnnotationToPluginMessage = {
-  type: MessageToPluginTypes.CREATE_ANNOTATION;
-  tokens: object;
-  direction: string;
-};
-export type RemapTokensToPluginMessage = {
-  type: MessageToPluginTypes.REMAP_TOKENS;
-  oldName: string;
-  newName: string;
-  updateMode: UpdateMode;
-  category?: Properties | TokenTypes;
-};
-export type RemoveTokensByValueToPluginMessage = {
-  type: MessageToPluginTypes.REMOVE_TOKENS_BY_VALUE;
-  tokensToRemove: { nodes: NodeInfo[]; property: Properties }[];
-};
-export type ChangedTabsToPluginMessage = {
-  type: MessageToPluginTypes.CHANGED_TABS;
-  requiresSelectionValues: boolean;
-};
-
-export type SelectNodesPluginMessage = {
-  type: MessageToPluginTypes.SELECT_NODES;
-  ids: string[];
-};
-
-export type SetLicenseKeyPluginMessage = {
-  type: MessageToPluginTypes.SET_LICENSE_KEY;
-  licenseKey: string | null;
-};
-
-export type GetApiCredentialsMessage = {
-  type: MessageToPluginTypes.GET_API_CREDENTIALS;
-};
-
-export type PostToFigmaMessage =
-  | InitiateToPluginMessage
-  | RemoveSingleCredentialToPluginMessage
-  | GoToNodeToPluginMessage
-  | CredentialsToPluginMessage
-  | UpdateToPluginMessage
-  | CreateStylesToPluginMessage
-  | SetNodeDataToPluginMessage
-  | PullStylesToPluginMessage
-  | SetStorageTypeToPluginMessage
-  | NotifyToPluginMessage
-  | SetUiToPluginMessage
-  | SetShowEmptyGroupsPluginMessage
-  | ResizeWindowToPluginMessage
-  | CancelOperationToPluginMessage
-  | CreateAnnotationToPluginMessage
-  | RemapTokensToPluginMessage
-  | RemoveTokensByValueToPluginMessage
-  | ChangedTabsToPluginMessage
-  | SelectNodesPluginMessage
-  | SetLicenseKeyPluginMessage
-  | GetApiCredentialsMessage;
+  | LicenseKeyFromPluginMessage
+  | SetTokensFromPluginMessage;

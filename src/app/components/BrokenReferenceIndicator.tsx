@@ -1,6 +1,6 @@
 import React from 'react';
 import { styled } from '@/stitches.config';
-import IconBrokenLink from './icons/IconBrokenLink';
+import IconBrokenLink from '@/icons/brokenlink.svg';
 import { SingleToken } from '@/types/tokens';
 import { TokensContext } from '@/context';
 

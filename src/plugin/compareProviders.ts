@@ -1,20 +1,20 @@
 import { UsedTokenSetsMap } from '@/types';
-import { StorageType } from '@/types/api';
+import { StorageType, StorageTypeCredentials } from '@/types/StorageType';
 import isSameCredentials from '@/utils/isSameCredentials';
 import { MessageFromPluginTypes } from '../types/messages';
 
 type Options = {
-  providers?: string | null,
+  providers: StorageTypeCredentials[],
   storageType: StorageType,
   usedTokenSet?: UsedTokenSetsMap | null
+  shouldPull?: boolean,
 };
 
 export default function compareProvidersWithStored({
-  providers, storageType, usedTokenSet,
+  providers, storageType, usedTokenSet, shouldPull,
 }: Options) {
   if (providers) {
-    const parsedProviders = JSON.parse(providers) as any[]; // @TODO type properly
-    const matchingSet = parsedProviders.find((i) => isSameCredentials(i, storageType));
+    const matchingSet = providers.find((i) => isSameCredentials(i, storageType));
     if (matchingSet) {
       // send a message to the UI with the credentials stored in the client
       figma.ui.postMessage({
@@ -22,6 +22,7 @@ export default function compareProvidersWithStored({
         status: true,
         credentials: matchingSet,
         usedTokenSet,
+        shouldPull,
       });
       return;
     }

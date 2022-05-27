@@ -1,26 +1,42 @@
 import React from 'react';
-import { useSelector } from 'react-redux';
-import { StorageProviderType } from '@/types/api';
 import GitForm from './StorageItemForm/GitForm';
+import ADOForm from './StorageItemForm/ADOForm';
 import JSONBinForm from './StorageItemForm/JSONBinForm';
 import URLForm from './StorageItemForm/URLForm';
-import { localApiStateSelector } from '@/selectors';
+import { StorageTypeFormValues } from '@/types/StorageType';
+import { StorageProviderType } from '@/constants/StorageProviderType';
 
-// @TODO typings
+type Props = {
+  values: StorageTypeFormValues<true>
+  onChange: React.ChangeEventHandler<HTMLInputElement>;
+  onCancel: () => void;
+  onSubmit: (values: StorageTypeFormValues<false>) => void;
+  isNew?: boolean;
+  hasErrored?: boolean;
+};
 
 export default function StorageItemForm({
-  isNew = false, handleChange, handleSubmit, handleCancel, values, hasErrored,
-}) {
-  const localApiState = useSelector(localApiStateSelector);
-
-  switch (localApiState.provider) {
+  isNew = false, onChange, onSubmit, onCancel, values, hasErrored,
+}: Props) {
+  switch (values.provider) {
     case StorageProviderType.GITHUB:
     case StorageProviderType.GITLAB: {
       return (
         <GitForm
-          handleChange={handleChange}
-          handleSubmit={handleSubmit}
-          handleCancel={handleCancel}
+          onChange={onChange}
+          onSubmit={onSubmit}
+          onCancel={onCancel}
+          values={values}
+          hasErrored={hasErrored}
+        />
+      );
+    }
+    case StorageProviderType.ADO: {
+      return (
+        <ADOForm
+          onChange={onChange}
+          onSubmit={onSubmit}
+          onCancel={onCancel}
           values={values}
           hasErrored={hasErrored}
         />
@@ -29,25 +45,28 @@ export default function StorageItemForm({
     case StorageProviderType.URL: {
       return (
         <URLForm
-          handleChange={handleChange}
-          handleSubmit={handleSubmit}
-          handleCancel={handleCancel}
+          onChange={onChange}
+          onSubmit={onSubmit}
+          onCancel={onCancel}
+          values={values}
+          hasErrored={hasErrored}
+        />
+      );
+    }
+    case StorageProviderType.JSONBIN: {
+      return (
+        <JSONBinForm
+          isNew={isNew}
+          onChange={onChange}
+          onSubmit={onSubmit}
+          onCancel={onCancel}
           values={values}
           hasErrored={hasErrored}
         />
       );
     }
     default: {
-      return (
-        <JSONBinForm
-          isNew={isNew}
-          handleChange={handleChange}
-          handleSubmit={handleSubmit}
-          handleCancel={handleCancel}
-          values={values}
-          hasErrored={hasErrored}
-        />
-      );
+      return null;
     }
   }
 }

@@ -1,4 +1,4 @@
-export default function IsJSONString(str) {
+export default function IsJSONString(str: string) {
   try {
     JSON.parse(str);
   } catch (e) {

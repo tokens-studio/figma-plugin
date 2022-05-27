@@ -2,7 +2,7 @@
 import React from 'react';
 import { useDispatch } from 'react-redux';
 import { Dispatch } from '../store';
-import IconResizeWindow from './icons/IconResizeWindow';
+import IconResizeWindow from '@/icons/resizewindow.svg';
 
 export default function WindowResizer() {
   const dispatch = useDispatch<Dispatch>();
