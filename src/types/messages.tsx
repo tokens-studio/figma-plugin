@@ -131,10 +131,6 @@ export type SetTokensFromPluginMessage = {
   values: TokenStore;
 };
 
-export type GetFeatureFlagsFromPluginMessage = {
-  type: MessageFromPluginTypes.GET_FEATURE_FLAGS;
-};
-
 export type PostToUIMessage =
   | NoSelectionFromPluginMessage
   | SelectionFromPluginMessage
@@ -155,5 +151,4 @@ export type PostToUIMessage =
   | CompleteJobTasksFromPluginMessage
   | ApiCredentialsFromPluginMessage
   | LicenseKeyFromPluginMessage
-  | SetTokensFromPluginMessage
-  | GetFeatureFlagsFromPluginMessage;
+  | SetTokensFromPluginMessage;

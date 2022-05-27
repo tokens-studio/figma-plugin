@@ -141,7 +141,3 @@ export function notifyLastOpened(lastOpened: number) {
 export function notifySetTokens(values: TokenStore) {
   postToUI({ type: MessageFromPluginTypes.SET_TOKENS, values });
 }
-
-export function notifyFeatureFlags() {
-  postToUI({ type: MessageFromPluginTypes.GET_FEATURE_FLAGS});
-}
