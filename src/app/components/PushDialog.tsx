@@ -55,7 +55,7 @@ function ConfirmDialog() {
     }
   }
 
-  const handleFormSubmit = useCallback(() => onConfirm(commitMessage, branch), [commitMessage, branch]);
+  const handleFormSubmit = useCallback(() => onConfirm(commitMessage, branch), [commitMessage, branch, onConfirm]);
   const handleBranchChange = useCallback((e) => setBranch(e.target.value), [setBranch]);
   const handleCommitMessageChange = useCallback((e) => setCommitMessage(e.target.value), [setCommitMessage]);
 
