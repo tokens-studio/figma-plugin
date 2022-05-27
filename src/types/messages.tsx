@@ -27,6 +27,7 @@ export enum MessageFromPluginTypes {
   COMPLETE_JOB_TASKS = 'complete_job_tasks',
   LICENSE_KEY = 'license_key',
   SET_TOKENS = 'set_tokens',
+  GET_FEATURE_FLAGS = 'get_feature_flags'
 }
 
 export type NoSelectionFromPluginMessage = { type: MessageFromPluginTypes.NO_SELECTION };
@@ -128,6 +129,10 @@ export type SetTokensFromPluginMessage = {
   values: TokenStore;
 };
 
+export type GetFeatureFlagsFromPluginMessage = {
+  type: MessageFromPluginTypes.GET_FEATURE_FLAGS;
+};
+
 export type PostToUIMessage =
   | NoSelectionFromPluginMessage
   | SelectionFromPluginMessage
@@ -148,4 +153,5 @@ export type PostToUIMessage =
   | CompleteJobTasksFromPluginMessage
   | ApiCredentialsFromPluginMessage
   | LicenseKeyFromPluginMessage
-  | SetTokensFromPluginMessage;
+  | SetTokensFromPluginMessage
+  | GetFeatureFlagsFromPluginMessage;

@@ -6,7 +6,7 @@ import { getUsedTokenSet } from '@/utils/getUsedTokenSet';
 import { getUISettings } from '@/utils/uiSettings';
 import compareProvidersWithStored from '../compareProviders';
 import { getSavedStorageType, getTokenData } from '../node';
-import { notifyAPIProviders, notifyNoSelection, notifySetTokens } from '../notifiers';
+import { notifyAPIProviders, notifyNoSelection, notifySetTokens, notifyFeatureFlags } from '../notifiers';
 import { LicenseKeyProperty } from '@/figmaStorage/LicenseKeyProperty';
 import store from '../store';
 
@@ -19,7 +19,7 @@ export const getApiCredentials: AsyncMessageChannelHandlers[AsyncMessageTypes.GE
     const apiProviders = await ApiProvidersProperty.read();
     const licenseKey = await LicenseKeyProperty.read();
     if (licenseKey) {
-
+      notifyFeatureFlags();
     }
     if (apiProviders) notifyAPIProviders(apiProviders);
     switch (storageType.provider) {

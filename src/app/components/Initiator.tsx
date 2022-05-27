@@ -23,10 +23,11 @@ import { AddLicenseSource, Entitlements } from '../store/models/userState';
 import { LicenseStatus } from '@/constants/LicenseStatus';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
-import { notifyToUI } from '@/plugin/notifiers';
+import { notifyFeatureFlags, notifyToUI } from '@/plugin/notifiers';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import useConfirm from '../hooks/useConfirm';
 import { StorageType } from '@/types/StorageType';
+import { FeatureFlags } from '@gitbeaker/browser/dist/types';
 
 type Props = LDProps;
 
@@ -56,12 +57,20 @@ function InitiatorContainer({ ldClient }: Props) {
   const onInitiate = useCallback(() => {
     AsyncMessageChannel.message({ type: AsyncMessageTypes.INITIATE });
   }, []);
+
   const getApiCredentials = useCallback((shouldPull: boolean) => (
     AsyncMessageChannel.message({
       type: AsyncMessageTypes.GET_API_CREDENTIALS,
       shouldPull,
     })
   ), []);
+
+  const setFeatureFlags = useCallback((featureFlags) => {
+    AsyncMessageChannel.message({
+      type: AsyncMessageTypes.SET_FEATURE_FLAGS,
+      featureFlags
+    })
+  }, []);
 
   useEffect(() => {
     onInitiate();
@@ -150,44 +159,7 @@ function InitiatorContainer({ ldClient }: Props) {
               status, credentials, usedTokenSet, shouldPull,
             } = pluginMessage;
             if (status === true) {
-              if (
-                userId
-                && ldClient
-                && (
-                  licenseStatus !== LicenseStatus.UNKNOWN
-                  && licenseStatus !== LicenseStatus.VERIFYING
-                  // license should be verified (or returned an error) before identifying launchdarkly with entitlements
-                )
-              ) {
-                const userAttributes: Record<string, string | boolean> = {
-                  plan: plan || '',
-                  email: clientEmail || '',
-                  os: !entitlements.includes(Entitlements.PRO),
-                };
-                console.log('elements', entitlements);
-                entitlements.forEach((entitlement) => {
-                  userAttributes[entitlement] = true;
-                });
-
-                // we need to be able to await the identifiaction process in the initiator
-                // this logic could be improved later to be more reactive
-                ldClient.identify({
-                  key: userId!,
-                  custom: userAttributes,
-                }).then((rawFlags) => {
-                  console.log('rawflags', rawFlags);
-                  const normalizedFlags = Object.fromEntries(
-                    Object.entries(rawFlags).map(([key, value]) => (
-                      [Case.camel(key), value]
-                    )),
-                  );
-                  ldIdentificationResolver(normalizedFlags);
-                });
-              }
-              const allFlags = ldClient?.allFlags();
-              console.log('allflags', allFlags);
               let receivedFlags: LDProps['flags'];
-              console.log('');
 
               try {
                 track('Fetched from remote', { provider: credentials.provider });
@@ -295,6 +267,39 @@ function InitiatorContainer({ ldClient }: Props) {
             } else {
               dispatch.userState.setLicenseStatus(LicenseStatus.NO_LICENSE);
               dispatch.userState.setCheckedLocalStorage(true);
+            }
+            break;
+          }
+          case MessageFromPluginTypes.GET_FEATURE_FLAGS: {
+            console.log("useId", userId, ldClient)
+            if (
+              userId
+              && ldClient
+            ) {
+              const userAttributes: Record<string, string | boolean> = {
+                plan: plan || '',
+                email: clientEmail || '',
+                os: !entitlements.includes(Entitlements.PRO),
+              };
+              entitlements.forEach((entitlement) => {
+                userAttributes[entitlement] = true;
+              });
+
+              ldClient.identify({
+                key: userId!,
+                custom: userAttributes,
+              }).then((rawFlags) => {
+                console.log('rawflags', rawFlags);
+                const normalizedFlags = Object.fromEntries(
+                  Object.entries(rawFlags).map(([key, value]) => (
+                    [Case.camel(key), value]
+                  )),
+                );
+                setFeatureFlags(normalizedFlags);
+              })
+              .catch(() => {
+                setFeatureFlags(null);
+              });
             }
             break;
           }
