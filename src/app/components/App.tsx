@@ -69,6 +69,7 @@ function App() {
             [Case.camel(key), value]
           )),
         );
+        console.log('app.txs', normalizedFlags, 'rawflags', rawFlags);
         ldIdentificationResolver(normalizedFlags);
       });
     }

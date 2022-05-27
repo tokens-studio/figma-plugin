@@ -7,6 +7,7 @@ import { getUISettings } from '@/utils/uiSettings';
 import compareProvidersWithStored from '../compareProviders';
 import { getSavedStorageType, getTokenData } from '../node';
 import { notifyAPIProviders, notifyNoSelection, notifySetTokens } from '../notifiers';
+import { LicenseKeyProperty } from '@/figmaStorage/LicenseKeyProperty';
 import store from '../store';
 
 export const getApiCredentials: AsyncMessageChannelHandlers[AsyncMessageTypes.GET_API_CREDENTIALS] = async (msg) => {
@@ -16,6 +17,10 @@ export const getApiCredentials: AsyncMessageChannelHandlers[AsyncMessageTypes.GE
     store.inspectDeep = settings.inspectDeep;
     const storageType = await getSavedStorageType();
     const apiProviders = await ApiProvidersProperty.read();
+    const licenseKey = await LicenseKeyProperty.read();
+    if (licenseKey) {
+
+    }
     if (apiProviders) notifyAPIProviders(apiProviders);
     switch (storageType.provider) {
       case StorageProviderType.JSONBIN:

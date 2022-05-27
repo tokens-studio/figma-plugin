@@ -1,5 +1,6 @@
 import { useCallback, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import Case from 'case';
 import { withLDConsumer } from 'launchdarkly-react-client-sdk';
 import type { LDProps } from 'launchdarkly-react-client-sdk/lib/withLDConsumer';
 import { identify, track } from '@/utils/analytics';
@@ -12,9 +13,13 @@ import { Tabs } from '@/constants/Tabs';
 import { GithubTokenStorage } from '@/storage/GithubTokenStorage';
 import { userIdSelector } from '@/selectors/userIdSelector';
 import getLicenseKey from '@/utils/getLicenseKey';
+import { licenseStatusSelector } from '@/selectors';
 import { licenseKeySelector } from '@/selectors/licenseKeySelector';
+import { clientEmailSelector } from '@/selectors/getClientEmail';
+import { entitlementsSelector } from '@/selectors/getEntitlements';
+import { planSelector } from '@/selectors/planSelector';
 import { checkedLocalStorageForKeySelector } from '@/selectors/checkedLocalStorageForKeySelector';
-import { AddLicenseSource } from '../store/models/userState';
+import { AddLicenseSource, Entitlements } from '../store/models/userState';
 import { LicenseStatus } from '@/constants/LicenseStatus';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
@@ -30,10 +35,13 @@ function InitiatorContainer({ ldClient }: Props) {
   const { pullTokens } = useRemoteTokens();
   const { setStorageType } = useStorage();
   const { confirm } = useConfirm();
-
   const licenseKey = useSelector(licenseKeySelector);
   const checkedLocalStorage = useSelector(checkedLocalStorageForKeySelector);
+  const plan = useSelector(planSelector);
   const userId = useSelector(userIdSelector);
+  const clientEmail = useSelector(clientEmailSelector);
+  const entitlements = useSelector(entitlementsSelector);
+  const licenseStatus = useSelector(licenseStatusSelector);
 
   const askUserIfPull: ((storageType: StorageType | undefined) => Promise<any>) = useCallback(async (storageType) => {
     const shouldPull = await confirm({
@@ -42,6 +50,8 @@ function InitiatorContainer({ ldClient }: Props) {
     });
     return shouldPull;
   }, [confirm]);
+
+  const ldIdentificationResolver: (flags: LDProps['flags']) => void = () => {};
 
   const onInitiate = useCallback(() => {
     AsyncMessageChannel.message({ type: AsyncMessageTypes.INITIATE });
@@ -140,7 +150,44 @@ function InitiatorContainer({ ldClient }: Props) {
               status, credentials, usedTokenSet, shouldPull,
             } = pluginMessage;
             if (status === true) {
+              if (
+                userId
+                && ldClient
+                && (
+                  licenseStatus !== LicenseStatus.UNKNOWN
+                  && licenseStatus !== LicenseStatus.VERIFYING
+                  // license should be verified (or returned an error) before identifying launchdarkly with entitlements
+                )
+              ) {
+                const userAttributes: Record<string, string | boolean> = {
+                  plan: plan || '',
+                  email: clientEmail || '',
+                  os: !entitlements.includes(Entitlements.PRO),
+                };
+                console.log('elements', entitlements);
+                entitlements.forEach((entitlement) => {
+                  userAttributes[entitlement] = true;
+                });
+
+                // we need to be able to await the identifiaction process in the initiator
+                // this logic could be improved later to be more reactive
+                ldClient.identify({
+                  key: userId!,
+                  custom: userAttributes,
+                }).then((rawFlags) => {
+                  console.log('rawflags', rawFlags);
+                  const normalizedFlags = Object.fromEntries(
+                    Object.entries(rawFlags).map(([key, value]) => (
+                      [Case.camel(key), value]
+                    )),
+                  );
+                  ldIdentificationResolver(normalizedFlags);
+                });
+              }
+              const allFlags = ldClient?.allFlags();
+              console.log('allflags', allFlags);
               let receivedFlags: LDProps['flags'];
+              console.log('');
 
               try {
                 track('Fetched from remote', { provider: credentials.provider });
