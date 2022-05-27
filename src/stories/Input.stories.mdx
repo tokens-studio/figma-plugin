@@ -1,0 +1,24 @@
+import { Meta, Story, ArgsTable, Canvas, Preview } from '@storybook/addon-docs';
+import Input from '@/app/components/Input';
+
+<Meta title='Input' component={Input}/>
+
+<ArgsTable of={Input}/>
+
+export const InputDefaultStory = (args) => {
+  return (
+    <Input {...args} />
+  )
+}
+
+<Canvas>
+  <Story name='Default' args={{
+    name: 'Figma Token Plugin Input Component',
+    autofocus: true,
+    error: '',
+    required: true,
+    placeholder: 'Figma',
+  }}>
+    {InputDefaultStory.bind({})}
+  </Story>
+</Canvas>

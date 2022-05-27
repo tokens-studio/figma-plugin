@@ -1,0 +1,23 @@
+import { Meta, Story, ArgsTable, Canvas, Preview } from '@storybook/addon-docs';
+import TextArea from '@/app/components/Textarea';
+
+<Meta 
+  title='Textarea' 
+  component={TextArea}
+/>
+
+<ArgsTable of={TextArea}/>
+
+export const TextAreaDefaultStory = (args) => {
+  return (
+    <Text {...args}>Figma Token Plugin Compoent TextArea</Text>
+  )
+}
+
+<Canvas>
+  <Story name='Default' args={{
+    size: 'small'
+  }}>
+    {TextAreaDefaultStory.bind({})}
+  </Story>
+</Canvas>
