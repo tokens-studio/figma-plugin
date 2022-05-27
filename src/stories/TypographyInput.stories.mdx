@@ -1,0 +1,22 @@
+import { Meta, Story, ArgsTable, Canvas, Preview } from '@storybook/addon-docs';
+import TypographyInput from '@/app/components/TypographyInput';
+
+<Meta 
+  title='TypographyInput' 
+  component={TypographyInput}
+/>
+
+<ArgsTable of={TypographyInput}/>
+
+export const TypographyInputDefaultStory = (args) => {
+  return (
+    <TypographyInput {...args} />
+  )
+}
+
+<Canvas>
+  <Story name='Default' args={{
+  }}>
+    {TypographyInputDefaultStory.bind({})}
+  </Story>
+</Canvas>

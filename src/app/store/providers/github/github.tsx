@@ -7,7 +7,7 @@ import useConfirm from '@/app/hooks/useConfirm';
 import usePushDialog from '@/app/hooks/usePushDialog';
 import { notifyToUI } from '@/plugin/notifiers';
 import {
-  localApiStateSelector, themesListSelector, tokensSelector,
+  localApiStateSelector, themesListSelector, tokensSelector, usedTokenSetSelector,
 } from '@/selectors';
 import { GithubTokenStorage } from '@/storage/GithubTokenStorage';
 import { isEqual } from '@/utils/isEqual';
@@ -25,6 +25,7 @@ export function useGitHub() {
   const tokens = useSelector(tokensSelector);
   const themes = useSelector(themesListSelector);
   const localApiState = useSelector(localApiStateSelector);
+  const usedTokenSet = useSelector(usedTokenSetSelector);
   const { multiFileSync } = useFlags();
   const dispatch = useDispatch<Dispatch>();
   const { confirm } = useConfirm();
@@ -82,10 +83,10 @@ export function useGitHub() {
         dispatch.tokenState.setLastSyncedState(JSON.stringify([tokens, themes], null, 2));
         dispatch.uiState.setLocalApiState({ ...localApiState, branch: customBranch } as GithubCredentials);
         dispatch.uiState.setApiData({ ...context, branch: customBranch });
-        dispatch.tokenState.setLastSyncedState(JSON.stringify([tokens, themes], null, 2));
         dispatch.tokenState.setTokenData({
           values: tokens,
           themes,
+          usedTokenSet,
         });
         pushDialog('success');
         return {
@@ -161,6 +162,7 @@ export function useGitHub() {
             dispatch.tokenState.setTokenData({
               values: content.tokens,
               themes: content.themes,
+              usedTokenSet,
             });
             notifyToUI('Pulled tokens from GitHub');
           }
@@ -194,6 +196,7 @@ export function useGitHub() {
         dispatch.tokenState.setTokenData({
           values: data.tokens,
           themes: data.themes,
+          usedTokenSet,
         });
       } else {
         notifyToUI('No tokens stored on remote');

@@ -1,0 +1,35 @@
+import { useState } from 'react';
+import { Meta, Story, ArgsTable, Canvas, Preview } from '@storybook/addon-docs';
+import { Provider } from 'react-redux';
+
+import { store } from '@/app/store';
+
+import Button from '@/app/components/Button/Button';
+import CreateStorageItemModal from '@/app/components/modals/CreateStorageItemModal';
+
+<Meta title='CreateStorageItemModal' component={CreateStorageItemModal} />
+
+<ArgsTable of={CreateStorageItemModal}/>
+
+export const CreateStorageItemModalDefaultStory = (args) => {
+  const [isOpen, setIsOpen] = useState(false);
+  return (
+    <>
+    <Button onClick={() => setIsOpen(true)}>
+      Click to Open a CreateStorageItem Modal
+    </Button>
+    <Provider store={store}>
+      <CreateStorageItemModal
+        isOpen={isOpen}
+        onClose={() => setIsOpen(false)}
+      />
+    </Provider>
+    </>
+  )
+}
+
+<Canvas>
+  <Story name='Default'>
+    {CreateStorageItemModalDefaultStory.bind({})}
+  </Story>
+</Canvas>

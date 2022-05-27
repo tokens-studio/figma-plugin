@@ -1,0 +1,29 @@
+import { Meta, Story, ArgsTable, Canvas, Preview } from '@storybook/addon-docs';
+import { useState } from 'react';
+import { Provider } from 'react-redux';
+import { store } from '@/app/store';
+import ExportModal from '@/app/components/modals/ExportModal';
+import Button from '@/app/components/Button/Button';
+
+
+<Meta title='ExportModal' component={ExportModal}/>
+
+export const ExportModalDefaultStory = () => {
+	const [isOpen, setIsOpen] = useState(false);
+	return (
+		<>
+		<Button onClick={() => setIsOpen(true)}>
+      Click to Open a Export Modal
+    </Button>
+		<Provider store={store}>
+			{isOpen && <ExportModal onClose={() => setIsOpen(false)} />}
+		</Provider>
+		</>
+	)
+}
+
+<Canvas>
+	<Story name='Default' >
+		{ExportModalDefaultStory.bind({})}
+	</Story>
+</Canvas>

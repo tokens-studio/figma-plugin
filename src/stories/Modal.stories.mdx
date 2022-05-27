@@ -1,0 +1,42 @@
+import { useState } from 'react';
+import { Meta, Story, ArgsTable, Canvas, Preview } from '@storybook/addon-docs';
+import Modal from '@/app/components/Modal';
+import Stack from '@/app/components/Stack';
+import Heading from '@/app/components/Heading';
+import Button from '@/app/components/Button/Button';
+
+<Meta title='Modal' />
+
+<ArgsTable of={Modal} />
+
+export const ModalDefaultStory = (args) => {
+  const [isOpen, setIsOpen] = useState(false);
+  return (
+    <>
+    <Button onClick={() => setIsOpen(true)}>
+      Click to Open a Modal
+    </Button>
+    <Modal isOpen={isOpen} close={() => setIsOpen(false)} {...args}>
+      <Stack gap={4} direction='column'>
+        <Heading>Standard</Heading>
+          <p className='text-xs'>
+            This is an early version of a standard Modal
+          </p>
+      </Stack>
+    </Modal>
+    </>
+  )
+}
+
+<Canvas>
+  <Story
+    name='Primary'
+    args={{
+      title: 'primary',
+      full: true,
+      footer: 'Standard Modal',
+    }}
+  >
+    {ModalDefaultStory.bind({})}
+  </Story>
+</Canvas>

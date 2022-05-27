@@ -8,7 +8,7 @@ import Input from './Input';
 import ColorPicker from './ColorPicker';
 import useConfirm from '../hooks/useConfirm';
 import useTokens from '../store/useTokens';
-import { EditTokenObject, SingleBoxShadowToken, SingleCompositionToken } from '@/types/tokens';
+import { EditTokenObject, SingleBoxShadowToken } from '@/types/tokens';
 import { checkIfContainsAlias, getAliasValue } from '@/utils/alias';
 import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
 import { activeTokenSetSelector, editTokenSelector } from '@/selectors';
@@ -17,6 +17,7 @@ import TypographyInput from './TypographyInput';
 import Stack from './Stack';
 import DownshiftInput from './DownshiftInput';
 import Button from './Button';
+import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 import { UpdateMode } from '@/constants/UpdateMode';
 import BoxShadowInput from './BoxShadowInput';
 
@@ -37,7 +38,13 @@ function EditTokenForm({ resolvedTokens }: Props) {
   const [internalEditToken, setInternalEditToken] = React.useState<typeof editToken>(editToken);
   const { confirm } = useConfirm();
 
-  const isValid = React.useMemo(() => internalEditToken?.value && !error, [internalEditToken, error]);
+  const isValid = React.useMemo(() => {
+    if (internalEditToken?.type === TokenTypes.COMPOSITION && internalEditToken.value
+      && (internalEditToken.value.hasOwnProperty('') || Object.keys(internalEditToken.value).length === 0)) {
+      return false;
+    }
+    return internalEditToken?.value && !error;
+  }, [internalEditToken, error]);
 
   const hasNameThatExistsAlready = React.useMemo(
     () => resolvedTokens
@@ -92,10 +99,9 @@ function EditTokenForm({ resolvedTokens }: Props) {
   );
 
   const handleCompositionChange = React.useCallback(
-    (style: SingleCompositionToken['value']) => {
-      setError(null);
+    (newTokenValue: NodeTokenRefMap) => {
       if (internalEditToken?.type === TokenTypes.COMPOSITION) {
-        setInternalEditToken((prev) => ({ ...prev, value: style } as EditTokenObject));
+        setInternalEditToken((prev) => ({ ...prev, value: newTokenValue } as EditTokenObject));
       }
     },
     [internalEditToken],
@@ -305,7 +311,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
         return (
           <CompositionTokenForm
             internalEditToken={internalEditToken}
-            setValue={handleCompositionChange}
+            setTokenValue={handleCompositionChange}
           />
         );
       }
