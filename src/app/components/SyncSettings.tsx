@@ -37,9 +37,7 @@ const SyncSettings = () => {
 
   const handleProviderClick = React.useCallback((provider: StorageProviderType) => () => {
     dispatch.uiState.setLocalApiState({
-      name: '',
-      secret: '',
-      id: '',
+      ...localApiState,
       provider,
     });
   }, [dispatch.uiState]);
