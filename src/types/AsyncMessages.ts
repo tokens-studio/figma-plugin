@@ -139,7 +139,7 @@ export type SetLicenseKeyMessageResult = AsyncMessage<AsyncMessageTypes.SET_LICE
 
 export type GetApiCredentials = AsyncMessage<AsyncMessageTypes.GET_API_CREDENTIALS, {
   shouldPull?: boolean
-  featureFlags?: LDProps['flags']
+  featureFlags?: LDProps['flags'] | null
 }>;
 export type GetApiCredentialsResult = AsyncMessage<AsyncMessageTypes.GET_API_CREDENTIALS>;
 

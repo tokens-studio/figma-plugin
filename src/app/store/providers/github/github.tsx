@@ -35,7 +35,6 @@ export function useGitHub() {
     const storageClient = new GithubTokenStorage(context.secret, owner ?? splitContextId[0], repo ?? splitContextId[1], context.baseUrl ?? '');
     if (context.filePath) storageClient.changePath(context.filePath);
     if (context.branch) storageClient.selectBranch(context.branch);
-    console.log('multifil', multiFileSync);
     if (multiFileSync) storageClient.enableMultiFile();
     return storageClient;
   }, [multiFileSync]);

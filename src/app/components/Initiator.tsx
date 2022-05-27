@@ -49,7 +49,7 @@ function InitiatorContainer({ ldClient }: Props) {
     AsyncMessageChannel.message({ type: AsyncMessageTypes.INITIATE });
   }, []);
 
-  const getApiCredentials = useCallback((shouldPull: boolean, featureFlags: LDProps['flags']) => (
+  const getApiCredentials = useCallback((shouldPull: boolean, featureFlags: LDProps['flags'] | null) => (
     AsyncMessageChannel.message({
       type: AsyncMessageTypes.GET_API_CREDENTIALS,
       shouldPull,
@@ -57,34 +57,32 @@ function InitiatorContainer({ ldClient }: Props) {
     })
   ), []);
 
-  const getFeatureFlags = useCallback(async (values: TokenStore, ldClient: LDProps['ldClient']) => {
-    if (values.licenseKey && values.userId) {
+  const getFeatureFlags = useCallback(async (values: TokenStore) => {
+    if (values.licenseKey && values.userId && ldClient) {
       const {
         plan, email: clientEmail, entitlements,
       } = await validateLicense(values.licenseKey, values.userId);
-      if (ldClient) {
-        const userAttributes: Record<string, string | boolean> = {
-          plan: plan || '',
-          email: clientEmail || '',
-          os: !entitlements?.includes(Entitlements.PRO),
-        };
-        entitlements?.forEach((entitlement) => {
-          userAttributes[entitlement] = true;
-        });
-        const rawFlags = await ldClient.identify({
-          key: values.userId!,
-          custom: userAttributes,
-        });
-        const normalizedFlags = Object.fromEntries(
-          Object.entries(rawFlags).map(([key, value]) => (
-            [Case.camel(key), value]
-          )),
-        );
-        return normalizedFlags;
-      }
+      const userAttributes: Record<string, string | boolean> = {
+        plan: plan || '',
+        email: clientEmail || '',
+        os: !entitlements?.includes(Entitlements.PRO),
+      };
+      entitlements?.forEach((entitlement) => {
+        userAttributes[entitlement] = true;
+      });
+      const rawFlags = await ldClient.identify({
+        key: values.userId!,
+        custom: userAttributes,
+      });
+      const normalizedFlags = Object.fromEntries(
+        Object.entries(rawFlags).map(([key, value]) => (
+          [Case.camel(key), value]
+        )),
+      );
+      return normalizedFlags;
     }
-    return undefined;
-  }, []);
+    return null;
+  }, [ldClient]);
 
   useEffect(() => {
     onInitiate();
@@ -129,21 +127,17 @@ function InitiatorContainer({ ldClient }: Props) {
             break;
           case MessageFromPluginTypes.TOKEN_VALUES: {
             const { values } = pluginMessage;
-            let featureFlags: LDProps['flags'];
+            let featureFlags: LDProps['flags'] | null;
             const existChanges = values.checkForChanges;
             if (!existChanges || (existChanges && await askUserIfPull(values?.storageType))) {
-              if (ldClient) {
-                featureFlags = await getFeatureFlags(values, ldClient);
-                getApiCredentials(true, featureFlags);
-              }
+              featureFlags = await getFeatureFlags(values);
+              getApiCredentials(true, featureFlags);
             } else {
               dispatch.tokenState.setTokenData(values);
               const existTokens = Object.values(values?.values ?? {}).some((value) => value.length > 0);
               if (existTokens) {
-                if (ldClient) {
-                  featureFlags = await getFeatureFlags(values, ldClient);
-                  getApiCredentials(false, featureFlags);
-                }
+                featureFlags = await getFeatureFlags(values);
+                getApiCredentials(false, featureFlags);
               } else dispatch.uiState.setActiveTab(Tabs.START);
             }
             break;

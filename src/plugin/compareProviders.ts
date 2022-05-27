@@ -9,7 +9,7 @@ type Options = {
   storageType: StorageType,
   usedTokenSet?: UsedTokenSetsMap | null
   shouldPull?: boolean,
-  featureFlags?: LDProps['flags']
+  featureFlags?: LDProps['flags'] | null
 };
 
 export default function compareProvidersWithStored({
