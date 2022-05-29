@@ -103,14 +103,7 @@ export function useGitLab() {
       themes,
       metadata: {},
     };
-  }, [
-    dispatch,
-    storageClientFactory,
-    tokens,
-    themes,
-    pushDialog,
-    localApiState,
-  ]);
+  }, [storageClientFactory, dispatch.uiState, dispatch.tokenState, pushDialog, tokens, themes, localApiState, usedTokenSet]);
 
   const checkAndSetAccess = useCallback(async ({ context, owner, repo }: { context: GitlabCredentials; owner: string; repo: string }) => {
     const storage = await storageClientFactory(context, owner, repo);
@@ -142,6 +135,7 @@ export function useGitLab() {
     try {
       const storage = await storageClientFactory(context);
       const hasBranches = await storage.fetchBranches();
+      dispatch.branchState.setBranches(hasBranches);
 
       if (!hasBranches || !hasBranches.length) {
         return null;
@@ -208,22 +202,24 @@ export function useGitLab() {
       themes: data.themes ?? themes,
       metadata: {},
     };
-  }, [
-    dispatch,
-    tokens,
-    themes,
-    syncTokensWithGitLab,
-  ]);
+  }, [syncTokensWithGitLab, tokens, themes, dispatch.tokenState, usedTokenSet]);
+
+  const fetchGitLabBranches = useCallback(async (context: ContextObject) => {
+    const storage = await storageClientFactory(context);
+    return storage.fetchBranches();
+  }, [storageClientFactory]);
 
   return useMemo(() => ({
     addNewGitLabCredentials,
     syncTokensWithGitLab,
     pullTokensFromGitLab,
     pushTokensToGitLab,
+    fetchGitLabBranches,
   }), [
     addNewGitLabCredentials,
     syncTokensWithGitLab,
     pullTokensFromGitLab,
     pushTokensToGitLab,
+    fetchGitLabBranches,
   ]);
 }

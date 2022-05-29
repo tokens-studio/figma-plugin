@@ -104,14 +104,7 @@ export function useGitHub() {
       themes,
       metadata: {},
     };
-  }, [
-    dispatch,
-    storageClientFactory,
-    themes,
-    tokens,
-    pushDialog,
-    localApiState,
-  ]);
+  }, [storageClientFactory, dispatch.uiState, dispatch.tokenState, pushDialog, tokens, themes, localApiState, usedTokenSet]);
 
   const checkAndSetAccess = useCallback(async ({ context, owner, repo }: { context: GithubCredentials; owner: string; repo: string }) => {
     const storage = storageClientFactory(context, owner, repo);
@@ -147,6 +140,7 @@ export function useGitHub() {
     try {
       const storage = storageClientFactory(context);
       const hasBranches = await storage.fetchBranches();
+      dispatch.branchState.setBranches(hasBranches);
       if (!hasBranches || !hasBranches.length) {
         return null;
       }
