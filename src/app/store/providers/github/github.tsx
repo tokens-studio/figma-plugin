@@ -203,7 +203,7 @@ export function useGitHub() {
       themes: data.themes ?? themes,
       metadata: {},
     };
-  }, [dispatch, tokens, themes, syncTokensWithGitHub]);
+  }, [syncTokensWithGitHub, tokens, themes, dispatch.tokenState, usedTokenSet]);
 
   const fetchGithubBranches = useCallback(async (context: GithubCredentials) => {
     const storage = storageClientFactory(context);

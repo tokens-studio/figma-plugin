@@ -167,14 +167,7 @@ export function useGitLab() {
       console.log('Error', err);
       return null;
     }
-  }, [
-    storageClientFactory,
-    askUserIfPull,
-    dispatch,
-    pushTokensToGitLab,
-    themes,
-    tokens,
-  ]);
+  }, [storageClientFactory, dispatch.branchState, dispatch.tokenState, pushTokensToGitLab, tokens, themes, askUserIfPull, usedTokenSet]);
 
   const addNewGitLabCredentials = useCallback(async (context: GitlabFormValues): Promise<RemoteTokenStorageData<GitStorageMetadata> | null> => {
     const data = await syncTokensWithGitLab(context);
@@ -204,7 +197,7 @@ export function useGitLab() {
     };
   }, [syncTokensWithGitLab, tokens, themes, dispatch.tokenState, usedTokenSet]);
 
-  const fetchGitLabBranches = useCallback(async (context: ContextObject) => {
+  const fetchGitLabBranches = useCallback(async (context: GitlabCredentials) => {
     const storage = await storageClientFactory(context);
     return storage.fetchBranches();
   }, [storageClientFactory]);
