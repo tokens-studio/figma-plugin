@@ -16,6 +16,8 @@ import Stack from './Stack';
 import Box from './Box';
 import Text from './Text';
 import { StorageProviderType } from '@/constants/StorageProviderType';
+import useRemoteTokens from '../store/remoteTokens';
+import { StorageTypeCredentials } from '@/types/StorageType';
 
 const SyncSettings = () => {
   const localApiState = useSelector(localApiStateSelector);
@@ -24,17 +26,25 @@ const SyncSettings = () => {
   const dispatch = useDispatch<Dispatch>();
 
   const { setStorageType } = useStorage();
+  const { fetchBranches } = useRemoteTokens();
 
   const [confirmModalVisible, showConfirmModal] = React.useState(false);
   const [editStorageItemModalVisible, setShowEditStorageModalVisible] = React.useState(Boolean(localApiState.new));
   const [createStorageItemModalVisible, setShowCreateStorageModalVisible] = React.useState(false);
 
+  const setLocalBranches = React.useCallback(async (provider: StorageTypeCredentials) => {
+    const branches = await fetchBranches(provider);
+    if (branches) {
+      dispatch.branchState.setBranches(branches);
+    }
+  }, [dispatch.branchState, fetchBranches]);
+
   const handleEditClick = React.useCallback((provider) => () => {
     track('Edit Credentials');
     dispatch.uiState.setLocalApiState(provider);
     setShowEditStorageModalVisible(true);
-    console.log(localApiState, provider);
-  }, [dispatch.uiState]);
+    setLocalBranches(provider);
+  }, [dispatch.uiState, setLocalBranches]);
 
   const handleProviderClick = React.useCallback((provider: StorageProviderType) => () => {
     dispatch.uiState.setLocalApiState({
