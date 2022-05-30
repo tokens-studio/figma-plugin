@@ -108,7 +108,7 @@ export default async function setValuesOnNode(
           const pathname = convertTokenNameToPath(data.typography, stylePathPrefix, stylePathSlice);
           const matchingStyleId = (
             activeThemeObject?.$figmaStyleReferences?.[pathname]
-            || figmaStyleMaps.paintStyles.get(pathname)?.id
+            || figmaStyleMaps.textStyles.get(pathname)?.id
           );
           if (!matchingStyleId || (matchingStyleId && !await trySetStyleId(node, 'text', matchingStyleId))) {
             setTextValuesOnTarget(node, { value: values.typography });

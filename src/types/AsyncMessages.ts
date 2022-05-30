@@ -8,8 +8,9 @@ import type { PullStyleOptions } from './PullStylesOptions';
 import type { ThemeObjectsList } from './ThemeObjectsList';
 import type { AnyTokenList } from './tokens';
 import type { UsedTokenSetsMap } from './UsedTokenSetsMap';
-import { StorageType, StorageTypeCredentials } from './StorageType';
-import { Direction } from '@/constants/Direction';
+import type { StorageType, StorageTypeCredentials } from './StorageType';
+import type { Direction } from '@/constants/Direction';
+import type { SelectionValue } from './SelectionValue';
 
 export enum AsyncMessageTypes {
   // the below messages are going from UI to plugin
@@ -108,7 +109,7 @@ export type SetUiAsyncMessage = AsyncMessage<AsyncMessageTypes.SET_UI, SettingsS
 export type SetUiAsyncMessageResult = AsyncMessage<AsyncMessageTypes.SET_UI>;
 
 export type CreateAnnotationAsyncMessage = AsyncMessage<AsyncMessageTypes.CREATE_ANNOTATION, {
-  tokens: object;
+  tokens: SelectionValue;
   direction: Direction;
 }>;
 export type CreateAnnotationAsyncMessageResult = AsyncMessage<AsyncMessageTypes.CREATE_ANNOTATION>;
