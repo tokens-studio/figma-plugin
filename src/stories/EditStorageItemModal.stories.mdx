@@ -11,6 +11,7 @@ import Button from '@/app/components/Button/Button';
   title='EditStorageItemModal' 
   component={EditStorageItemModal} 
   args={{
+    isOpend: false,
   }}
 />
 
@@ -26,7 +27,7 @@ export const EditStorageItemModalDefaultStory = (args) => {
     <Provider store={store}>
       <EditStorageItemModal
         isOpen={isOpen}
-        onClose={() => setIsOpen(false)}
+        close={() => setIsOpen(false)}
       />
     </Provider>
     </>
