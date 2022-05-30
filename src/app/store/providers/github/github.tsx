@@ -129,7 +129,6 @@ export function useGitHub() {
 
     try {
       const content = await storage.retrieve();
-      console.log('content', content);
       if (content) {
         return content;
       }
@@ -151,7 +150,6 @@ export function useGitHub() {
         return null;
       }
       const content = await storage.retrieve();
-      console.log('content', content);
       if (content) {
         if (
           !isEqual(content.tokens, tokens)
