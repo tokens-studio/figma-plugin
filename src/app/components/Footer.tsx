@@ -71,6 +71,7 @@ export default function Footer() {
   const handlePullTokens = useCallback(() => {
     pullTokens({ usedTokenSet });
   }, [pullTokens, usedTokenSet]);
+
   return (
     <Box
       css={{
