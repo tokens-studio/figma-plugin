@@ -1,9 +1,10 @@
 import React from 'react';
 import { styled } from '@/stitches.config';
 import Tooltip from './Tooltip';
+import { StyledDirtyStateBadge } from './StyledDirtyStateBadge';
 
-const Box = styled('div', {});
-const StyledButton = styled('button', {
+const commonStyles = {
+  display: 'inline-flex',
   all: 'unset',
   backgroundColor: 'red',
   border: 'none',
@@ -31,7 +32,11 @@ const StyledButton = styled('button', {
       },
     },
   },
-});
+};
+
+const Box = styled('div', {});
+const StyledButton = styled('button', commonStyles);
+const StyledLink = styled('a', commonStyles);
 
 type StyledButtonProps = React.ComponentProps<typeof StyledButton>;
 type Props = {
@@ -43,14 +48,26 @@ type Props = {
   variant?: StyledButtonProps['buttonVariant'];
   tooltipSide?: 'bottom' | 'left' | 'top' | undefined;
   onClick?: () => void;
+  href?: string;
   badge?: boolean;
 };
+
+function IconButtonInnerContent({ icon, badge }: { icon: Props['icon']; badge?: Props['badge'] }) {
+  return (
+    <>
+      <Box css={{ transition: 'transform 200ms ease-in-out', transform: 'var(--transform)' }}>{icon}</Box>
+      {badge && <StyledDirtyStateBadge />}
+    </>
+
+  );
+}
 
 export default function IconButton({
   disabled = false,
   tooltip,
   dataCy,
   onClick,
+  href,
   icon,
   css,
   variant = 'default',
@@ -66,22 +83,24 @@ export default function IconButton({
   return (
     <Box css={{ position: 'relative', ...css }}>
       <Tooltip side={tooltipSide} label={tooltip ?? ''}>
-        <StyledButton disabled={disabled} data-cy={dataCy} type="button" onClick={handleClick} buttonVariant={variant}>
-          <Box css={{ transition: 'transform 200ms ease-in-out', transform: 'var(--transform)' }}>{icon}</Box>
-          {badge && (
-            <Box
-              css={{
-                position: 'absolute',
-                top: 0,
-                right: 0,
-                width: '$3',
-                height: '$3',
-                borderRadius: '100px',
-                backgroundColor: '$interaction',
-              }}
-            />
+        {href ? (
+          <Box>
+            <StyledLink
+              target="_blank"
+              rel="noreferrer"
+              href={href}
+              data-cy={dataCy}
+              buttonVariant={variant}
+            >
+              <IconButtonInnerContent icon={icon} badge={badge} />
+            </StyledLink>
+          </Box>
+        )
+          : (
+            <StyledButton disabled={disabled} data-cy={dataCy} type="button" onClick={handleClick} buttonVariant={variant}>
+              <IconButtonInnerContent icon={icon} badge={badge} />
+            </StyledButton>
           )}
-        </StyledButton>
       </Tooltip>
     </Box>
   );

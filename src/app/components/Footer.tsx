@@ -110,31 +110,13 @@ export default function Footer() {
       </Stack>
       <Stack direction="row" gap={4}>
         <Box css={{ color: '$textMuted', fontSize: '$xsmall' }}>
-          Version
+          V
           {' '}
           {pjs.plugin_version}
         </Box>
-
-        <Text size="xsmall">
-          <a href="https://docs.tokens.studio/?ref=pf" target="_blank" rel="noreferrer">
-            <Stack direction="row" gap={1}>
-              <Box as="span" css={{ color: '$textMuted' }}>
-                Docs
-              </Box>
-              <DocsIcon />
-            </Stack>
-          </a>
-        </Text>
-        <Text size="xsmall">
-          <a href="https://github.com/six7/figma-tokens" target="_blank" rel="noreferrer">
-            <Stack direction="row" gap={1}>
-              <Box as="span" css={{ color: '$textMuted' }}>
-                Feedback
-              </Box>
-              <FeedbackIcon />
-            </Stack>
-          </a>
-        </Text>
+        <IconButton href="https://figmatokens.com" icon={<DocsIcon />} tooltip="More info" />
+        <IconButton href="https://docs.tokens.studio/?ref=pf" icon={<DocsIcon />} tooltip="Docs" />
+        <IconButton href="https://github.com/six7/figma-tokens" icon={<FeedbackIcon />} tooltip="Feedback" />
       </Stack>
     </Box>
   );
