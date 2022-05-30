@@ -222,13 +222,13 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
                     <StyledItemColorDiv>
                       <StyledItemColor style={{ backgroundColor: token.value.toString() }} />
                     </StyledItemColorDiv>
-                  )}
-                  <StyledItemName>{getHighlightedText(token.name, filteredValue || '')}</StyledItemName>
-                  <StyledItemValue>{resolveValue(token)}</StyledItemValue>
-                </StyledItem>
-              ))}
-            </StyledDropdown>
-          ) : null}
+                    )}
+                    <StyledItemName>{getHighlightedText(token.name, filteredValue || '')}</StyledItemName>
+                    <StyledItemValue>{resolveValue(token)}</StyledItemValue>
+                  </StyledItem>
+                ))}
+              </StyledDropdown>
+            ) : null}
         </div>
       )}
     </Downshift>

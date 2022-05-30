@@ -36,7 +36,7 @@ export default function useRemoteTokens() {
     addNewGitHubCredentials, syncTokensWithGitHub, pullTokensFromGitHub, pushTokensToGitHub, createGithubBranch, fetchGithubBranches,
   } = useGitHub();
   const {
-    addNewGitLabCredentials, syncTokensWithGitLab, pullTokensFromGitLab, pushTokensToGitLab,
+    addNewGitLabCredentials, syncTokensWithGitLab, pullTokensFromGitLab, pushTokensToGitLab, fetchGitLabBranches,
   } = useGitLab();
   const {
     addNewADOCredentials, syncTokensWithADO, pullTokensFromADO, pushTokensToADO, createADOBranch, fetchADOBranches,
@@ -234,12 +234,14 @@ export default function useRemoteTokens() {
     switch (context.provider) {
       case StorageProviderType.GITHUB:
         return fetchGithubBranches(context);
+      case StorageProviderType.GITLAB:
+        return fetchGitLabBranches(context);
       case StorageProviderType.ADO:
         return fetchADOBranches(context);
       default:
         return null;
     }
-  }, [fetchGithubBranches, fetchADOBranches]);
+  }, [fetchGithubBranches, fetchGitLabBranches, fetchADOBranches]);
 
   const deleteProvider = useCallback((provider) => {
     AsyncMessageChannel.message({
