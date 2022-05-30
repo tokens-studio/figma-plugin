@@ -124,16 +124,18 @@ export class GithubTokenStorage extends GitTokenStorage {
             )).sort((a, b) => (
               (a.path && b.path) ? a.path.localeCompare(b.path) : 0
             ));
-            const directoryName = this.path.split('/')[0];
+            const DirectoryNameSplit = this.path.split('/');
+            const RootDirectoryName = DirectoryNameSplit.splice(1, DirectoryNameSplit.length - 1, DirectoryNameSplit[0]);
+            const subDirectoryName = DirectoryNameSplit.join('/');
+            console.log("RootDirectoryName", RootDirectoryName,"subDirectoryName", subDirectoryName, "jsonFiles", jsonFiles)
             const jsonFileContents = await Promise.all(jsonFiles.map((treeItem) => (
               treeItem.path ? this.octokitClient.rest.repos.getContent({
                 owner: this.owner,
                 repo: this.repository,
-                path: `${directoryName}/${treeItem.path}`,
+                path: `${RootDirectoryName}/${treeItem.path}`,
                 ref: this.branch,
               }) : Promise.resolve(null)
             )));
-
             return compact(jsonFileContents.map<RemoteTokenStorageFile<GitStorageMetadata> | null>((fileContent, index) => {
               const { path } = jsonFiles[index];
 
@@ -143,7 +145,8 @@ export class GithubTokenStorage extends GitTokenStorage {
                 && !Array.isArray(fileContent?.data)
                 && 'content' in fileContent.data
               ) {
-                const name = path.replace('.json', '');
+                let name = path.replace(subDirectoryName, '');
+                name = path.replace('.json', '');
                 const parsed = JSON.parse(decodeBase64(fileContent.data.content)) as GitMultiFileObject;
                 // @REAMDE we will need to ensure these reserved names
                 if (name === '$themes') {
