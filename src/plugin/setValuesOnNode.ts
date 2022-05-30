@@ -57,7 +57,7 @@ export default async function setValuesOnNode(
           activeThemeObject?.$figmaStyleReferences?.[pathname]
           || figmaStyleMaps.effectStyles.get(pathname)?.id
         );
-        if (!matchingStyleId || (matchingStyleId && !trySetStyleId(node, 'effect', matchingStyleId))) {
+        if (!matchingStyleId || (matchingStyleId && !await trySetStyleId(node, 'effect', matchingStyleId))) {
           setEffectValuesOnTarget(node, { value: values.boxShadow });
         }
       }
@@ -95,7 +95,7 @@ export default async function setValuesOnNode(
             activeThemeObject?.$figmaStyleReferences?.[pathname]
             || figmaStyleMaps.paintStyles.get(pathname)?.id
           );
-          if (!matchingStyleId || (matchingStyleId && !trySetStyleId(node, 'fill', matchingStyleId))) {
+          if (!matchingStyleId || (matchingStyleId && !await trySetStyleId(node, 'fill', matchingStyleId))) {
             setColorValuesOnTarget(node, { value: values.fill }, 'fills');
           }
         }
@@ -110,7 +110,7 @@ export default async function setValuesOnNode(
             activeThemeObject?.$figmaStyleReferences?.[pathname]
             || figmaStyleMaps.paintStyles.get(pathname)?.id
           );
-          if (!matchingStyleId || (matchingStyleId && !trySetStyleId(node, 'text', matchingStyleId))) {
+          if (!matchingStyleId || (matchingStyleId && !await trySetStyleId(node, 'text', matchingStyleId))) {
             setTextValuesOnTarget(node, { value: values.typography });
           }
         }
@@ -148,7 +148,7 @@ export default async function setValuesOnNode(
             activeThemeObject?.$figmaStyleReferences?.[pathname]
             || figmaStyleMaps.paintStyles.get(pathname)?.id
           );
-          if (!matchingStyleId || (matchingStyleId && !trySetStyleId(node, 'stroke', matchingStyleId))) {
+          if (!matchingStyleId || (matchingStyleId && !await trySetStyleId(node, 'stroke', matchingStyleId))) {
             setColorValuesOnTarget(node, { value: values.border }, 'strokes');
           }
         }

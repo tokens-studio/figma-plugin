@@ -7,8 +7,16 @@ export async function updateUISettings(uiSettings: Partial<SavedSettings>) {
   try {
     const data = await UiSettingsProperty.read();
     await UiSettingsProperty.write({
-      ...(data ?? {}),
-      ...uiSettings,
+      width: uiSettings.width ?? data?.width,
+      height: uiSettings.height ?? data?.height,
+      showEmptyGroups: uiSettings.showEmptyGroups ?? data?.showEmptyGroups,
+      updateMode: uiSettings.updateMode ?? data?.updateMode,
+      updateRemote: uiSettings.updateRemote ?? data?.updateRemote,
+      updateOnChange: uiSettings.updateOnChange ?? data?.updateOnChange,
+      updateStyles: uiSettings.updateStyles ?? data?.updateStyles,
+      ignoreFirstPartForStyles: uiSettings.ignoreFirstPartForStyles ?? data?.ignoreFirstPartForStyles,
+      prefixStylesWithThemeName: uiSettings.prefixStylesWithThemeName ?? data?.prefixStylesWithThemeName,
+      inspectDeep: uiSettings.inspectDeep ?? data?.inspectDeep,
     });
   } catch (err) {
     notifyUI('There was an issue saving your credentials. Please try again.');
