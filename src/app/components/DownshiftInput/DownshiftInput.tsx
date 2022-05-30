@@ -174,7 +174,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
   const handleInputChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setisFirstLoading(false);
     handleChange(e);
-  }, [showAutoSuggest]);
+  }, [handleChange]);
 
   return (
     <Downshift onSelect={handleSelect}>
