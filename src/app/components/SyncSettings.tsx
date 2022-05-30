@@ -241,28 +241,28 @@ const SyncSettings = () => {
             </Stack>
           </Stack>
           {selectedRemoteProvider && (
-          <>
-            <Text muted size="xsmall">{storageProviderText()}</Text>
-            <Button
-              id="button-add-new-credentials"
-              variant="secondary"
-              onClick={handleShowAddCredentials}
-            >
-              Add new credentials
-            </Button>
+            <>
+              <Text muted size="xsmall">{storageProviderText()}</Text>
+              <Button
+                id="button-add-new-credentials"
+                variant="secondary"
+                onClick={handleShowAddCredentials}
+              >
+                Add new credentials
+              </Button>
 
-            {storedApiProviders().length > 0 && (
-              <Stack direction="column" gap={2} width="full" align="start">
-                {storedApiProviders().map((item) => (
-                  <StorageItem
-                    key={item?.internalId || `${item.provider}-${item.id}-${item.secret}`}
-                    onEdit={handleEditClick(item)}
-                    item={item}
-                  />
-                ))}
-              </Stack>
-            )}
-          </>
+              {storedApiProviders().length > 0 && (
+                <Stack direction="column" gap={2} width="full" align="start">
+                  {storedApiProviders().map((item) => (
+                    <StorageItem
+                      key={item?.internalId || `${item.provider}-${item.id}-${item.secret}`}
+                      onEdit={handleEditClick(item)}
+                      item={item}
+                    />
+                  ))}
+                </Stack>
+              )}
+            </>
           )}
         </Stack>
       </Box>
