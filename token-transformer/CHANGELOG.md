@@ -1,3 +1,7 @@
+## v0.0.23 (2022-05-24)
+
+Shadow and typography tokens now respect the resolveReferences option (thanks @jakobe)
+
 ## v0.0.22 (2022-05-06)
 
 Fixed a bug that got introduced in 0.0.21 affecting multiple sets

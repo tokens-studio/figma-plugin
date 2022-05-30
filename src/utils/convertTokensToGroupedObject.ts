@@ -2,6 +2,7 @@ import set from 'set-value';
 import { appendTypeToToken } from '@/app/components/createTokenObj';
 import { TransformerOptions } from './types';
 import { expand } from '@/utils/expand';
+import { getValueWithReferences } from '@/utils/getValueWithReferences';
 import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
 import { SingleToken } from '@/types/tokens';
 
@@ -22,16 +23,8 @@ export default function convertTokensToGroupedObject(
     const obj = acc || {};
     const tokenWithType = appendTypeToToken(token) as SingleToken<false>;
     delete tokenWithType.name;
-    if (typeof tokenWithType.rawValue === 'string') {
-      if (options.resolveReferences === false) {
-        tokenWithType.value = tokenWithType.rawValue;
-      }
-      if (options.resolveReferences === 'math') {
-        const singleAliasRegEx = /^{[^}]*}$|^\$[^$]*$/;
-        if (singleAliasRegEx.test(tokenWithType.rawValue)) {
-          tokenWithType.value = tokenWithType.rawValue;
-        }
-      }
+    if (options.resolveReferences !== true) {
+      tokenWithType.value = getValueWithReferences(tokenWithType as SingleToken, options);
     }
 
     if (!options.preserveRawValue) {

@@ -50,7 +50,6 @@ function App() {
     ) {
       const userAttributes: Record<string, string | boolean> = {
         plan: plan || '',
-        email: clientEmail || '',
         os: !entitlements.includes(Entitlements.PRO),
       };
 
@@ -60,17 +59,18 @@ function App() {
 
       // we need to be able to await the identifiaction process in the initiator
       // this logic could be improved later to be more reactive
-      ldClient.identify({
-        key: userId!,
-        custom: userAttributes,
-      }).then((rawFlags) => {
-        const normalizedFlags = Object.fromEntries(
-          Object.entries(rawFlags).map(([key, value]) => (
-            [Case.camel(key), value]
-          )),
-        );
-        ldIdentificationResolver(normalizedFlags);
-      });
+      ldClient
+        .identify({
+          key: userId!,
+          custom: userAttributes,
+          email: clientEmail,
+        })
+        .then((rawFlags) => {
+          const normalizedFlags = Object.fromEntries(
+            Object.entries(rawFlags).map(([key, value]) => [Case.camel(key), value]),
+          );
+          ldIdentificationResolver(normalizedFlags);
+        });
     }
   }, [userId, ldClient, licenseStatus, plan, clientEmail, entitlements]);
 
