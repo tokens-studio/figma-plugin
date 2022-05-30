@@ -12,6 +12,16 @@ import Button from '@/app/components/Button/Button';
   component={EditStorageItemModal} 
   args={{
     isOpend: false,
+    initialValue:{
+      provider: "github",
+      name: "takao",
+      id: "MightyDevKnight/figma-tokens",
+      branch: "main",
+      filePath: "figma/tokens.json",
+      baseUrl: "",
+      secret: "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",
+      internalId: "fwSGFJHtqsxTOsiTNwa4uXYh"
+    },
   }}
 />
 
@@ -26,8 +36,9 @@ export const EditStorageItemModalDefaultStory = (args) => {
     </Button>
     <Provider store={store}>
       <EditStorageItemModal
+        {...args}
         isOpen={isOpen}
-        close={() => setIsOpen(false)}
+        onClose={() => setIsOpen(false)}
       />
     </Provider>
     </>
