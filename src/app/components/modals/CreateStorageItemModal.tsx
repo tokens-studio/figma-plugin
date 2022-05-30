@@ -1,27 +1,28 @@
 import React from 'react';
-import { useSelector } from 'react-redux';
 import Modal from '../Modal';
 import Heading from '../Heading';
 import StorageItemForm from '../StorageItemForm';
 import useRemoteTokens from '../../store/remoteTokens';
-import { localApiStateSelector } from '@/selectors';
 import Stack from '../Stack';
 import { StorageTypeFormValues } from '@/types/StorageType';
+import { StorageProviderType } from '@/constants/StorageProviderType';
 
 type Props = {
   isOpen: boolean
   onClose: () => void
   onSuccess: () => void
+  storageProvider: StorageProviderType
 };
 
-export default function CreateStorageItemModal({ isOpen, onClose, onSuccess }: Props) {
-  const localApiState = useSelector(localApiStateSelector);
+export default function CreateStorageItemModal({
+  isOpen, onClose, onSuccess, storageProvider,
+}: Props) {
   const { addNewProviderItem } = useRemoteTokens();
   const [hasErrored, setHasErrored] = React.useState(false);
 
   const [formFields, setFormFields] = React.useState<StorageTypeFormValues<true>>(React.useMemo(() => ({
-    provider: localApiState.provider,
-  }), [localApiState]));
+    provider: storageProvider,
+  }), [storageProvider]));
 
   const handleCreateNewClick = React.useCallback(async (values: StorageTypeFormValues<false>) => {
     setHasErrored(false);
