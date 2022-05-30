@@ -23,7 +23,7 @@ import { notifyToUI } from '@/plugin/notifiers';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import useConfirm from '../hooks/useConfirm';
 import validateLicense from '@/utils/validateLicense';
-import { TokenStore } from '@/types/tokens';
+import { UserData } from '@/types/userData';
 
 type Props = LDProps;
 
@@ -56,11 +56,11 @@ function InitiatorContainer({ ldClient }: Props) {
     })
   ), []);
 
-  const getFeatureFlags = useCallback(async (values: TokenStore) => {
-    if (values.licenseKey && values.userId && ldClient) {
+  const getFeatureFlags = useCallback(async (userData: UserData) => {
+    if (userData.licenseKey && userData.userId && ldClient) {
       const {
         plan, email: clientEmail, entitlements,
-      } = await validateLicense(values.licenseKey, values.userId);
+      } = await validateLicense(userData.licenseKey, userData.userId);
       const userAttributes: Record<string, string | boolean> = {
         plan: plan || '',
         email: clientEmail || '',
@@ -70,7 +70,7 @@ function InitiatorContainer({ ldClient }: Props) {
         userAttributes[entitlement] = true;
       });
       const rawFlags = await ldClient.identify({
-        key: values.userId!,
+        key: userData.userId!,
         custom: userAttributes,
       });
       const normalizedFlags = Object.fromEntries(
@@ -125,18 +125,18 @@ function InitiatorContainer({ ldClient }: Props) {
           case MessageFromPluginTypes.REMOTE_COMPONENTS:
             break;
           case MessageFromPluginTypes.TOKEN_VALUES: {
-            const { values } = pluginMessage;
+            const { values, userData } = pluginMessage;
             let featureFlags: LDProps['flags'] | null;
             const existChanges = values.checkForChanges;
             const storageType = values.storageType?.provider;
             if (!existChanges || ((storageType && storageType !== StorageProviderType.LOCAL) && existChanges && await askUserIfPull(storageType))) {
-              featureFlags = await getFeatureFlags(values);
+              featureFlags = await getFeatureFlags(userData);
               getApiCredentials(true, featureFlags);
             } else {
               dispatch.tokenState.setTokenData(values);
               const existTokens = Object.values(values?.values ?? {}).some((value) => value.length > 0);
               if (existTokens) {
-                featureFlags = await getFeatureFlags(values);
+                featureFlags = await getFeatureFlags(userData);
                 getApiCredentials(false, featureFlags);
               } else dispatch.uiState.setActiveTab(Tabs.START);
             }

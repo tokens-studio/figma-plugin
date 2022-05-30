@@ -13,6 +13,4 @@ export type TokenStore = {
   activeTheme: string | null;
   themes: ThemeObjectsList;
   storageType?: StorageType;
-  userId?:string | null;
-  licenseKey?: string | null;
 };
