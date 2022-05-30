@@ -211,7 +211,7 @@ const ColorPicker: React.FC<Props> = ({ value = '#000000', onChange }) => {
         </div>
         )}
         <Button variant="secondary" size="small" onClick={handleInputModeToggle}>
-          {inputMode === InputMode.RGBA ? 'HSL(A)' : 'RGB(A)'}
+          {inputMode === InputMode.RGBA ? 'RGB(A)' : 'HSL(A)'}
         </Button>
       </div>
     </div>
