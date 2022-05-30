@@ -52,7 +52,6 @@ export default function useRemoteTokens() {
     });
 
     let remoteData: RemoteTokenStorageData<unknown> | null = null;
-    console.log('pull', context);
     switch (context.provider) {
       case StorageProviderType.JSONBIN: {
         remoteData = await pullTokensFromJSONBin(context);
@@ -108,7 +107,6 @@ export default function useRemoteTokens() {
     dispatch.uiState.setLocalApiState(context);
     dispatch.uiState.setApiData(context);
     dispatch.tokenState.setEditProhibited(false);
-    console.log('restore', context);
     setStorageType({ provider: context, shouldSetInDocument: true });
     switch (context.provider) {
       case StorageProviderType.GITHUB: {
@@ -138,7 +136,6 @@ export default function useRemoteTokens() {
 
   const pushTokens = useCallback(async (context: StorageTypeCredentials = api) => {
     track('pushTokens', { provider: context.provider });
-    console.log('push', context);
     switch (context.provider) {
       case StorageProviderType.GITHUB: {
         await pushTokensToGitHub(context);
@@ -164,7 +161,6 @@ export default function useRemoteTokens() {
 
   const addNewProviderItem = useCallback(async (credentials: StorageTypeFormValues<false>): Promise<boolean> => {
     let data;
-    console.log('add', credentials);
     switch (credentials.provider) {
       case StorageProviderType.JSONBIN: {
         if (credentials.id) {
@@ -217,7 +213,6 @@ export default function useRemoteTokens() {
 
   const addNewBranch = useCallback(async (context: StorageTypeCredentials, branch: string, source?: string) => {
     let newBranchCreated = false;
-    console.log('context', context);
     switch (context.provider) {
       case StorageProviderType.GITHUB: {
         newBranchCreated = await createGithubBranch(context, branch, source);

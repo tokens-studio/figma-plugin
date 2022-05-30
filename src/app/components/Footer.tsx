@@ -71,9 +71,6 @@ export default function Footer() {
   const handlePullTokens = useCallback(() => {
     pullTokens({ usedTokenSet });
   }, [pullTokens, usedTokenSet]);
-  React.useEffect(() => {
-    console.log('localapi', localApiState);
-  }, [localApiState]);
   return (
     <Box
       css={{
