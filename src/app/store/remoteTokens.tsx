@@ -36,7 +36,7 @@ export default function useRemoteTokens() {
     addNewGitHubCredentials, syncTokensWithGitHub, pullTokensFromGitHub, pushTokensToGitHub, createGithubBranch, fetchGithubBranches,
   } = useGitHub();
   const {
-    addNewGitLabCredentials, syncTokensWithGitLab, pullTokensFromGitLab, pushTokensToGitLab, fetchGitLabBranches,
+    addNewGitLabCredentials, syncTokensWithGitLab, pullTokensFromGitLab, pushTokensToGitLab, fetchGitLabBranches, createGitLabBranch
   } = useGitLab();
   const {
     addNewADOCredentials, syncTokensWithADO, pullTokensFromADO, pushTokensToADO, createADOBranch, fetchADOBranches,
@@ -217,7 +217,10 @@ export default function useRemoteTokens() {
         newBranchCreated = await createGithubBranch(context, branch, source);
         break;
       }
-
+      case StorageProviderType.GITLAB: {
+        newBranchCreated = await createGitLabBranch(context, branch, source);
+        break;
+      }
       case StorageProviderType.ADO: {
         newBranchCreated = await createADOBranch(context, branch, source);
         break;
