@@ -74,6 +74,8 @@ export class GitlabTokenStorage extends GitTokenStorage {
   }
 
   public async createBranch(branch: string, source?: string) {
+    console.log("create", branch, "source", source)
+    console.log("projectId", this.projectId)
     try {
       if (!this.projectId) throw new Error('Project ID not assigned');
       const response = await this.gitlabClient.Branches.create(
@@ -81,6 +83,7 @@ export class GitlabTokenStorage extends GitTokenStorage {
         branch,
         `heads/${source || this.branch}`,
       );
+      console.log("response", response)
       return !!response.name;
     } catch (err) {
       console.error(err);
