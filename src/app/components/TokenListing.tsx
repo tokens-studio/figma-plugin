@@ -47,6 +47,7 @@ const TokenListing: React.FC<Props> = ({
       schema,
       isPristine,
       initialName: name,
+      name,
     } as EditTokenObject);
   }, [schema, dispatch]);
 
