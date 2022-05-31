@@ -150,6 +150,7 @@ export function useGitHub() {
         return null;
       }
       const content = await storage.retrieve();
+      console.log("content", content)
       if (content) {
         if (
           !isEqual(content.tokens, tokens)

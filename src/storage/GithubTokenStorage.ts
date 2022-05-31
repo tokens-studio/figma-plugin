@@ -99,7 +99,7 @@ export class GithubTokenStorage extends GitTokenStorage {
         path: this.path,
         ref: this.branch,
       });
-
+      console.log("response", response);
       // read entire directory
       if (Array.isArray(response.data) && this.flags.multiFileEnabled) {
         const directoryTreeResponse = await this.octokitClient.rest.git.createTree({
@@ -118,15 +118,18 @@ export class GithubTokenStorage extends GitTokenStorage {
             tree_sha: directoryTreeResponse.data.tree[0].sha,
             recursive: 'true',
           });
+          console.log("treerespose", treeResponse)
           if (treeResponse.data.tree.length > 0) {
             const jsonFiles = treeResponse.data.tree.filter((file) => (
               file.path?.endsWith('.json')
             )).sort((a, b) => (
               (a.path && b.path) ? a.path.localeCompare(b.path) : 0
             ));
+            console.log("jsonfile", jsonFiles)
             const DirectoryNameSplit = this.path.split('/');
             const RootDirectoryName = DirectoryNameSplit[0];
             const subDirectoryName = `${DirectoryNameSplit.splice(1, DirectoryNameSplit.length - 1).join('/')}/`;
+            console.log("subdirectoryname", subDirectoryName)
             const jsonFileContents = await Promise.all(jsonFiles.map((treeItem) => (
               treeItem.path ? this.octokitClient.rest.repos.getContent({
                 owner: this.owner,

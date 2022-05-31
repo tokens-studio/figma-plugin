@@ -123,6 +123,9 @@ export default function TokenSetSelector() {
     setShowNewTokenSetFields(true);
   }, []);
 
+  React.useEffect(() => {
+    console.log("alltokenset", allTokenSets)
+  }, [allTokenSets])
   return (
     <Box
       css={{
