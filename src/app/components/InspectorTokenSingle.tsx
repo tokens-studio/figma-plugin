@@ -17,13 +17,16 @@ import Heading from './Heading';
 import DownshiftInput from './DownshiftInput';
 import Modal from './Modal';
 import Stack from './Stack';
+import { IconBrokenLink } from '@/icons';
 
 export default function InspectorTokenSingle({
   token,
   resolvedTokens,
+  isInResolvedTokens,
 }: {
   token: SelectionGroup;
   resolvedTokens: SingleToken[];
+  isInResolvedTokens: SingleToken | undefined;
 }) {
   const { handleRemap, getTokenValue } = useTokens();
   const property = useTypeForProperty(token.category);
@@ -91,6 +94,7 @@ export default function InspectorTokenSingle({
           id={`${token.category}-${token.value}`}
           onCheckedChange={onCheckedChanged}
         />
+        {!isInResolvedTokens && <IconBrokenLink />}
         {(!!mappedToken) && (
           <InspectorResolvedToken token={mappedToken} />
         )}
@@ -102,7 +106,7 @@ export default function InspectorTokenSingle({
             gap: '$1',
           }}
         >
-          <Box css={{ fontSize: '$small' }}>{ token.value}</Box>
+          <Box css={{ fontSize: '$small' }}>{token.value}</Box>
           <IconButton
             tooltip="Change to another token"
             dataCy="button-token-remap"
