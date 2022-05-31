@@ -52,7 +52,6 @@ export default function useRemoteTokens() {
     });
 
     let remoteData: RemoteTokenStorageData<unknown> | null = null;
-
     switch (context.provider) {
       case StorageProviderType.JSONBIN: {
         remoteData = await pullTokensFromJSONBin(context);
