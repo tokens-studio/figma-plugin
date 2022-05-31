@@ -1,6 +1,7 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import React, { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useLDClient } from 'launchdarkly-react-client-sdk';
 import Box from '../Box';
 import Input from '../Input';
 import Button from '../Button';
@@ -11,6 +12,7 @@ import { Dispatch } from '@/app/store';
 import { licenseKeyErrorSelector } from '@/selectors/licenseKeyErrorSelector';
 import useConfirm from '@/app/hooks/useConfirm';
 import { AddLicenseSource } from '@/app/store/models/userState';
+import { userIdSelector } from '@/selectors/userIdSelector';
 
 export default function AddLicenseKey() {
   const dispatch = useDispatch<Dispatch>();
@@ -18,12 +20,22 @@ export default function AddLicenseKey() {
   const licenseKeyError = useSelector(licenseKeyErrorSelector);
   const [newKey, setLicenseKey] = useState(existingKey);
   const { confirm } = useConfirm();
+  const userId = useSelector(userIdSelector);
+  const ldClient = useLDClient();
 
   const addKey = useCallback(() => {
     if (newKey) {
       dispatch.userState.addLicenseKey({ key: newKey, source: AddLicenseSource.UI });
     }
   }, [newKey, dispatch]);
+
+  const removeAccessToFeatures = useCallback(() => {
+    if (userId) {
+      ldClient?.identify({
+        key: userId,
+      });
+    }
+  }, [userId, ldClient]);
 
   const removeKey = useCallback(async () => {
     const confirmation = await confirm({
@@ -34,8 +46,9 @@ export default function AddLicenseKey() {
     });
     if (confirmation) {
       dispatch.userState.removeLicenseKey('');
+      removeAccessToFeatures();
     }
-  }, [dispatch, confirm]);
+  }, [dispatch, confirm, removeAccessToFeatures]);
 
   useEffect(() => {
     setLicenseKey(existingKey);
