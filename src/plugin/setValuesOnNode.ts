@@ -1,10 +1,13 @@
+import { figmaRGBToHex } from '@figma-plugin/helpers';
 import { Properties } from '@/constants/Properties';
 import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 import { getAllFigmaStyleMaps } from '@/utils/getAllFigmaStyleMaps';
+import { convertToFigmaColor } from './figmaTransforms/colors';
 import { transformValue } from './helpers';
 import setColorValuesOnTarget from './setColorValuesOnTarget';
 import setEffectValuesOnTarget from './setEffectValuesOnTarget';
 import setTextValuesOnTarget from './setTextValuesOnTarget';
+import { tokensSharedDataHandler } from './SharedDataHandler';
 
 export default async function setValuesOnNode(
   node: BaseNode,
@@ -79,11 +82,50 @@ export default async function setValuesOnNode(
         if ('fills' in node && data.fill) {
           const path = data.fill.split('.');
           const pathname = path.slice(ignoreFirstPartForStyles ? 1 : 0, path.length).join('/');
-          const matchingStyle = figmaStyleMaps.paintStyles.get(pathname);
+          let matchingStyle = figmaStyleMaps.paintStyles.get(pathname);
+
+          if (!matchingStyle) {
+            const fillStyleIdBackupKey = 'fillStyleId_original';
+            let hasMatchingNonLocalStyle = false;
+            const fillStyleIdOriginal = tokensSharedDataHandler.get(node, fillStyleIdBackupKey, (val) => (val ? JSON.parse(val) as string : val));
+            const fillStyleId = fillStyleIdOriginal || (typeof node.fillStyleId === 'string' && node.fillStyleId);
+
+            if (fillStyleId) {
+              // console.log('setValuesOnNode -> looking for non-local style:', fillStyleId);
+              const nonLocalStyle = figma.getStyleById(fillStyleId);
+              if (nonLocalStyle?.type === 'PAINT') {
+                // console.log('setValuesOnNode -> node has nonLocalStyle:', nonLocalStyle.name);
+
+                const existingPaint = (nonLocalStyle as PaintStyle).paints[0] ?? null;
+                if (existingPaint && existingPaint.type === 'SOLID') {
+                  const { color, opacity } = convertToFigmaColor(values.fill);
+                  const newPaint: SolidPaint = { color, opacity, type: 'SOLID' };
+                  // Comparison using isPaintEqual doesn't work as Figma's hexToFigmaRGB has a rounding issue,
+                  // that doesn't produce same RGB floats as the existing paint :(
+                  // hasMatchingNonLocalStyle = isPaintEqual(newPaint, existingPaint);
+                  // Compare using hex instead for now:
+                  const existingHex = figmaRGBToHex(existingPaint.color);
+                  const newHex = figmaRGBToHex(newPaint.color);
+                  hasMatchingNonLocalStyle = existingHex === newHex;
+                  if (hasMatchingNonLocalStyle) {
+                    // console.log('setValuesOnNode -> hasMatchingNonLocalStyle=true so re-set it to linked style:', nonLocalStyle.name);
+                    matchingStyle = nonLocalStyle as PaintStyle;
+                    // Remove fillStyleId backup:
+                    tokensSharedDataHandler.set(node, fillStyleIdBackupKey, '');
+                  } else {
+                    // console.log('setValuesOnNode -> hasMatchingNonLocalStyle=false so back up fillStyleId to restore later:', node.fillStyleId);
+                    tokensSharedDataHandler.set(node, fillStyleIdBackupKey, JSON.stringify(fillStyleId));
+                  }
+                }
+              }
+            }
+          }
+
           if (matchingStyle) {
             // matchingStyles[0].paints = [{color, opacity, type: 'SOLID'}];
+            // console.log('setValuesOnNode -> matching style found:', matchingStyle, ', node name:', node.name);
             node.fillStyleId = matchingStyle.id;
-          } else if (node.fillStyleId === '') { // only set raw token value if node isn't linked to a Figma style:
+          } else {
             setColorValuesOnTarget(node, { value: values.fill }, 'fills');
           }
         }
