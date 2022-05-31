@@ -36,7 +36,7 @@ export default function useRemoteTokens() {
     addNewGitHubCredentials, syncTokensWithGitHub, pullTokensFromGitHub, pushTokensToGitHub, createGithubBranch, fetchGithubBranches,
   } = useGitHub();
   const {
-    addNewGitLabCredentials, syncTokensWithGitLab, pullTokensFromGitLab, pushTokensToGitLab, fetchGitLabBranches,
+    addNewGitLabCredentials, syncTokensWithGitLab, pullTokensFromGitLab, pushTokensToGitLab, fetchGitLabBranches, createGitLabBranch
   } = useGitLab();
   const {
     addNewADOCredentials, syncTokensWithADO, pullTokensFromADO, pushTokensToADO, createADOBranch, fetchADOBranches,
@@ -45,7 +45,6 @@ export default function useRemoteTokens() {
 
   const pullTokens = useCallback(async ({ context = api, featureFlags, usedTokenSet }: PullTokensOptions) => {
     track('pullTokens', { provider: context.provider });
-
     dispatch.uiState.startJob({
       name: BackgroundJobs.UI_PULLTOKENS,
       isInfinite: true,
@@ -218,7 +217,10 @@ export default function useRemoteTokens() {
         newBranchCreated = await createGithubBranch(context, branch, source);
         break;
       }
-
+      case StorageProviderType.GITLAB: {
+        newBranchCreated = await createGitLabBranch(context, branch, source);
+        break;
+      }
       case StorageProviderType.ADO: {
         newBranchCreated = await createADOBranch(context, branch, source);
         break;

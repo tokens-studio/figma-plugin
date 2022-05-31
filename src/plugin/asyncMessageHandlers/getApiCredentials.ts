@@ -23,7 +23,7 @@ export const getApiCredentials: AsyncMessageChannelHandlers[AsyncMessageTypes.GE
       case StorageProviderType.GITLAB:
       case StorageProviderType.URL: {
         compareProvidersWithStored({
-          providers: apiProviders ?? [], storageType, usedTokenSet, shouldPull: msg.shouldPull,
+          providers: apiProviders ?? [], storageType, usedTokenSet, shouldPull: msg.shouldPull, featureFlags: msg.featureFlags,
         });
         break;
       }
