@@ -122,7 +122,7 @@ export async function updatePluginData({
       if (currentValuesOnNode.composition) {
         // when select another composition token, reset applied properties by current composition token
         const resolvedToken = tokensMap?.get(currentValuesOnNode.composition);
-        let removeProperties: String[] = [];
+        let removeProperties: string[] = [];
         if (resolvedToken && resolvedToken.rawValue) {
           removeProperties = Object.keys(resolvedToken.rawValue).map((property) => (
             property

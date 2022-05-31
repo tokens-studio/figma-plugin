@@ -69,6 +69,7 @@ Cypress.Commands.add('receiveTokenValues', (values) => {
       pluginMessage: {
         type: MessageFromPluginTypes.TOKEN_VALUES,
         values,
+        userData: {}
       },
     };
     $window.postMessage(message, '*');

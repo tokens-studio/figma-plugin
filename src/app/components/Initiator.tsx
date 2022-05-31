@@ -1,5 +1,6 @@
 import { useCallback, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import Case from 'case';
 import { withLDConsumer } from 'launchdarkly-react-client-sdk';
 import type { LDProps } from 'launchdarkly-react-client-sdk/lib/withLDConsumer';
 import { identify, track } from '@/utils/analytics';
@@ -14,13 +15,15 @@ import { userIdSelector } from '@/selectors/userIdSelector';
 import getLicenseKey from '@/utils/getLicenseKey';
 import { licenseKeySelector } from '@/selectors/licenseKeySelector';
 import { checkedLocalStorageForKeySelector } from '@/selectors/checkedLocalStorageForKeySelector';
-import { AddLicenseSource } from '../store/models/userState';
+import { AddLicenseSource, Entitlements } from '../store/models/userState';
 import { LicenseStatus } from '@/constants/LicenseStatus';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { notifyToUI } from '@/plugin/notifiers';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import useConfirm from '../hooks/useConfirm';
+import validateLicense from '@/utils/validateLicense';
+import { UserData } from '@/types/userData';
 
 type Props = LDProps;
 
@@ -29,7 +32,6 @@ function InitiatorContainer({ ldClient }: Props) {
   const { pullTokens } = useRemoteTokens();
   const { setStorageType } = useStorage();
   const { confirm } = useConfirm();
-
   const licenseKey = useSelector(licenseKeySelector);
   const checkedLocalStorage = useSelector(checkedLocalStorageForKeySelector);
   const userId = useSelector(userIdSelector);
@@ -45,12 +47,41 @@ function InitiatorContainer({ ldClient }: Props) {
   const onInitiate = useCallback(() => {
     AsyncMessageChannel.message({ type: AsyncMessageTypes.INITIATE });
   }, []);
-  const getApiCredentials = useCallback((shouldPull: boolean) => (
+
+  const getApiCredentials = useCallback((shouldPull: boolean, featureFlags: LDProps['flags'] | null) => (
     AsyncMessageChannel.message({
       type: AsyncMessageTypes.GET_API_CREDENTIALS,
       shouldPull,
+      featureFlags,
     })
   ), []);
+
+  const getFeatureFlags = useCallback(async (userData: UserData) => {
+    if (userData.licenseKey && userData.userId && ldClient) {
+      const {
+        plan, email: clientEmail, entitlements,
+      } = await validateLicense(userData.licenseKey, userData.userId);
+      const userAttributes: Record<string, string | boolean> = {
+        plan: plan || '',
+        email: clientEmail || '',
+        os: !entitlements?.includes(Entitlements.PRO),
+      };
+      entitlements?.forEach((entitlement) => {
+        userAttributes[entitlement] = true;
+      });
+      const rawFlags = await ldClient.identify({
+        key: userData.userId!,
+        custom: userAttributes,
+      });
+      const normalizedFlags = Object.fromEntries(
+        Object.entries(rawFlags).map(([key, value]) => (
+          [Case.camel(key), value]
+        )),
+      );
+      return normalizedFlags;
+    }
+    return null;
+  }, [ldClient]);
 
   useEffect(() => {
     onInitiate();
@@ -94,17 +125,20 @@ function InitiatorContainer({ ldClient }: Props) {
           case MessageFromPluginTypes.REMOTE_COMPONENTS:
             break;
           case MessageFromPluginTypes.TOKEN_VALUES: {
-            const { values } = pluginMessage;
+            const { values, userData } = pluginMessage;
+            let featureFlags: LDProps['flags'] | null;
             const existChanges = values.checkForChanges;
             const storageType = values.storageType?.provider;
             if (!existChanges || ((storageType && storageType !== StorageProviderType.LOCAL) && existChanges && await askUserIfPull(storageType))) {
-              getApiCredentials(true);
+              featureFlags = await getFeatureFlags(userData);
+              getApiCredentials(true, featureFlags);
             } else {
               dispatch.tokenState.setTokenData(values);
               const existTokens = Object.values(values?.values ?? {}).some((value) => value.length > 0);
-
-              if (existTokens) getApiCredentials(false);
-              else dispatch.uiState.setActiveTab(Tabs.START);
+              if (existTokens) {
+                featureFlags = await getFeatureFlags(userData);
+                getApiCredentials(false, featureFlags);
+              } else dispatch.uiState.setActiveTab(Tabs.START);
             }
             break;
           }
@@ -137,10 +171,10 @@ function InitiatorContainer({ ldClient }: Props) {
             break;
           case MessageFromPluginTypes.API_CREDENTIALS: {
             const {
-              status, credentials, usedTokenSet, shouldPull,
+              status, credentials, usedTokenSet, shouldPull, featureFlags,
             } = pluginMessage;
             if (status === true) {
-              let receivedFlags: LDProps['flags'];
+              const receivedFlags: LDProps['flags'] = featureFlags;
               try {
                 track('Fetched from remote', { provider: credentials.provider });
                 if (!credentials.internalId) track('missingInternalId', { provider: credentials.provider });

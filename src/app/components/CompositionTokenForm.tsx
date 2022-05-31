@@ -39,9 +39,8 @@ export default function CompositionTokenForm({
   const arrangedTokenValue = React.useMemo<NodeTokenRefMap>(() => {
     const internalEditTokenValue = internalEditToken.value || internalEditToken.schema.schemas.value.properties;
     return Object.assign({}, ...Object.keys(internalEditTokenValue).sort((a, b) => Number(orderObj[a as CompositionTokenProperty]) - Number(orderObj[b as CompositionTokenProperty]))
-      .map((x) => ({ [x as CompositionTokenProperty]: internalEditTokenValue[x as CompositionTokenProperty] })))
+      .map((x) => ({ [x as CompositionTokenProperty]: internalEditTokenValue[x as CompositionTokenProperty] })));
   }, [internalEditToken, orderObj]);
-
 
   const addToken = useCallback(() => {
     const internalEditTokenValue = internalEditToken.value || internalEditToken.schema.schemas.value.properties;
