@@ -8,7 +8,7 @@ import useTokens from '../store/useTokens';
 import InspectorResolvedToken from './InspectorResolvedToken';
 import { Dispatch } from '../store';
 import { SelectionGroup } from '@/types';
-import { IconToggleableDisclosure } from '@/icons/IconToggleableDisclosure';
+import IconToggleableDisclosure from '@/app/components/IconToggleableDisclosure';
 import TokenNodes from './inspector/TokenNodes';
 import { inspectStateSelector } from '@/selectors';
 import { useTypeForProperty } from '../hooks/useTypeForProperty';
