@@ -20,10 +20,7 @@ export default function InspectorTokenGroup({ group, resolvedTokens }: { group: 
       key={`${groupKey}`}
     >
       <Heading size="small">{groupKey}</Heading>
-      {groupValue.map((uniqueToken) => {
-        const isInResolvedTokens = resolvedTokens.find((token) => token.name === uniqueToken.value);
-        return <InspectorTokenSingle key={`${uniqueToken.category}-${uniqueToken.value}`} token={uniqueToken} resolvedTokens={resolvedTokens} isInResolvedTokens={isInResolvedTokens} />;
-      })}
+      {groupValue.map((uniqueToken) => <InspectorTokenSingle key={`${uniqueToken.category}-${uniqueToken.value}`} token={uniqueToken} resolvedTokens={resolvedTokens} />)}
     </Box>
   );
 }
