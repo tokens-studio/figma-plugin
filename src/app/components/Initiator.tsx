@@ -10,7 +10,6 @@ import { Dispatch } from '../store';
 import useStorage from '../store/useStorage';
 import * as pjs from '../../../package.json';
 import { Tabs } from '@/constants/Tabs';
-import { GithubTokenStorage } from '@/storage/GithubTokenStorage';
 import { userIdSelector } from '@/selectors/userIdSelector';
 import getLicenseKey from '@/utils/getLicenseKey';
 import { licenseKeySelector } from '@/selectors/licenseKeySelector';
@@ -24,12 +23,13 @@ import { StorageProviderType } from '@/constants/StorageProviderType';
 import useConfirm from '../hooks/useConfirm';
 import validateLicense from '@/utils/validateLicense';
 import { UserData } from '@/types/userData';
+import { StorageTypeCredentials } from '@/types/StorageType';
 
 type Props = LDProps;
 
 function InitiatorContainer({ ldClient }: Props) {
   const dispatch = useDispatch<Dispatch>();
-  const { pullTokens } = useRemoteTokens();
+  const { pullTokens, fetchBranches } = useRemoteTokens();
   const { setStorageType } = useStorage();
   const { confirm } = useConfirm();
   const licenseKey = useSelector(licenseKeySelector);
@@ -185,20 +185,8 @@ function InitiatorContainer({ ldClient }: Props) {
                     || credentials.provider === StorageProviderType.GITLAB
                     || credentials.provider === StorageProviderType.ADO
                   ) {
-                    const {
-                      id, provider, secret, baseUrl,
-                    } = credentials;
-                    const [owner, repo] = id.split('/');
-
-                    const storageClientFactories = {
-                      [StorageProviderType.GITHUB]: GithubTokenStorage,
-                      [StorageProviderType.GITLAB]: GithubTokenStorage,
-                      [StorageProviderType.ADO]: GithubTokenStorage,
-                    };
-
-                    const storageClient = new storageClientFactories[provider](secret, owner, repo, baseUrl);
-                    const branches = await storageClient.fetchBranches();
-                    dispatch.branchState.setBranches(branches);
+                    const branches = await fetchBranches(credentials as StorageTypeCredentials);
+                    if (branches) dispatch.branchState.setBranches(branches);
                   }
 
                   dispatch.uiState.setApiData(credentials);
