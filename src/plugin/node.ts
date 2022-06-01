@@ -189,6 +189,7 @@ export async function updateNodes(
             mappedValues = destructureCompositionToken(mappedValues);
             setValuesOnNode(entry.node, mappedValues, mappedTokens, figmaStyleMaps, ignoreFirstPartForStyles);
             store.successfulNodes.add(entry.node);
+            console.log("entry.tokens", entry)
             returnedValues.add(entry.tokens);
           }
         } catch (e) {
@@ -206,7 +207,7 @@ export async function updateNodes(
     type: MessageFromPluginTypes.COMPLETE_JOB,
     name: BackgroundJobs.PLUGIN_UPDATENODES,
   });
-
+  console.log("returnvalues", returnedValues)
   if (returnedValues.size) {
     return returnedValues.entries().next();
   }

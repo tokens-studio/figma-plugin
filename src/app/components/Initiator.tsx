@@ -95,11 +95,13 @@ function InitiatorContainer({ ldClient }: Props) {
         switch (pluginMessage.type) {
           case MessageFromPluginTypes.SELECTION: {
             const { selectionValues, mainNodeSelectionValues, selectedNodes } = pluginMessage;
+            console.log("plugin message", pluginMessage)
             dispatch.uiState.setSelectedLayers(selectedNodes);
             dispatch.uiState.setDisabled(false);
             if (mainNodeSelectionValues.length > 1) {
               dispatch.uiState.setMainNodeSelectionValues({});
             } else if (mainNodeSelectionValues.length > 0) {
+              console.log("mainnodesele", mainNodeSelectionValues)
               // When only one node is selected, we can set the state
               dispatch.uiState.setMainNodeSelectionValues(mainNodeSelectionValues[0]);
             } else {
