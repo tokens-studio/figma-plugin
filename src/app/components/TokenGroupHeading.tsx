@@ -86,7 +86,7 @@ export default function TokenGroupHeading({
         isOpen={showNewGroupNameField}
         close={handleSetNewTokenGroupNameFileClose}
         footer={(
-          <form onSubmit={handleRenameTokenGroupSubmit}>
+          <form id="renameTokenGroup" onSubmit={handleRenameTokenGroupSubmit}>
             <Stack direction="row" gap={4}>
               <Button variant="secondary" size="large" onClick={handleSetNewTokenGroupNameFileClose}>
                 Cancel
@@ -102,6 +102,7 @@ export default function TokenGroupHeading({
           <Heading size="small">Renaming only affects tokens of the same type</Heading>
           <Stack direction="column" gap={4}>
             <Input
+              form="renameTokenGroup"
               full
               onChange={handleNewTokenGroupNameChange}
               type="text"
