@@ -9,6 +9,39 @@ import setEffectValuesOnTarget from './setEffectValuesOnTarget';
 import setTextValuesOnTarget from './setTextValuesOnTarget';
 import { tokensSharedDataHandler } from './SharedDataHandler';
 
+function findMatchingNonLocalStyle(node: BaseNode, styleId: string, colorToken: string) {
+  let matchingStyle: PaintStyle | undefined;
+
+  let hasMatchingNonLocalStyle = false;
+
+  if (styleId) {
+    // console.log('setValuesOnNode -> looking for non-local style:', fillStyleId);
+    const nonLocalStyle = figma.getStyleById(styleId);
+    if (nonLocalStyle?.type === 'PAINT') {
+      // console.log('setValuesOnNode -> node has nonLocalStyle:', nonLocalStyle.name);
+
+      const existingPaint = (nonLocalStyle as PaintStyle).paints[0] ?? null;
+      if (existingPaint && existingPaint.type === 'SOLID') {
+        const { color, opacity } = convertToFigmaColor(colorToken);
+        const newPaint: SolidPaint = { color, opacity, type: 'SOLID' };
+        // Comparison using isPaintEqual doesn't work as Figma's hexToFigmaRGB has a rounding issue,
+        // that doesn't produce same RGB floats as the existing paint :(
+        // hasMatchingNonLocalStyle = isPaintEqual(newPaint, existingPaint);
+        // Compare using hex instead for now:
+        const existingHex = figmaRGBToHex(existingPaint.color);
+        const newHex = figmaRGBToHex(newPaint.color);
+        hasMatchingNonLocalStyle = existingHex === newHex;
+        if (hasMatchingNonLocalStyle) {
+          // console.log('setValuesOnNode -> hasMatchingNonLocalStyle=true so re-set it to linked style:', nonLocalStyle.name);
+          matchingStyle = nonLocalStyle as PaintStyle;
+        }
+      }
+    }
+  }
+
+  return matchingStyle;
+}
+
 export default async function setValuesOnNode(
   node: BaseNode,
   values: Partial<Record<Properties, string>>,
@@ -86,39 +119,17 @@ export default async function setValuesOnNode(
 
           if (!matchingStyle) {
             const fillStyleIdBackupKey = 'fillStyleId_original';
-            let hasMatchingNonLocalStyle = false;
-            const fillStyleIdOriginal = tokensSharedDataHandler.get(node, fillStyleIdBackupKey, (val) => (val ? JSON.parse(val) as string : val));
-            const fillStyleId = fillStyleIdOriginal || (typeof node.fillStyleId === 'string' && node.fillStyleId);
-
-            if (fillStyleId) {
-              // console.log('setValuesOnNode -> looking for non-local style:', fillStyleId);
-              const nonLocalStyle = figma.getStyleById(fillStyleId);
-              if (nonLocalStyle?.type === 'PAINT') {
-                // console.log('setValuesOnNode -> node has nonLocalStyle:', nonLocalStyle.name);
-
-                const existingPaint = (nonLocalStyle as PaintStyle).paints[0] ?? null;
-                if (existingPaint && existingPaint.type === 'SOLID') {
-                  const { color, opacity } = convertToFigmaColor(values.fill);
-                  const newPaint: SolidPaint = { color, opacity, type: 'SOLID' };
-                  // Comparison using isPaintEqual doesn't work as Figma's hexToFigmaRGB has a rounding issue,
-                  // that doesn't produce same RGB floats as the existing paint :(
-                  // hasMatchingNonLocalStyle = isPaintEqual(newPaint, existingPaint);
-                  // Compare using hex instead for now:
-                  const existingHex = figmaRGBToHex(existingPaint.color);
-                  const newHex = figmaRGBToHex(newPaint.color);
-                  hasMatchingNonLocalStyle = existingHex === newHex;
-                  if (hasMatchingNonLocalStyle) {
-                    // console.log('setValuesOnNode -> hasMatchingNonLocalStyle=true so re-set it to linked style:', nonLocalStyle.name);
-                    matchingStyle = nonLocalStyle as PaintStyle;
-                    // Remove fillStyleId backup:
-                    tokensSharedDataHandler.set(node, fillStyleIdBackupKey, '');
-                  } else {
-                    // console.log('setValuesOnNode -> hasMatchingNonLocalStyle=false so back up fillStyleId to restore later:', node.fillStyleId);
-                    tokensSharedDataHandler.set(node, fillStyleIdBackupKey, JSON.stringify(fillStyleId));
-                  }
-                }
-              }
+            let fillStyleId = tokensSharedDataHandler.get(node, fillStyleIdBackupKey, (val) => (val ? JSON.parse(val) as string : val));
+            if (fillStyleId === '' && typeof node.fillStyleId === 'string') {
+              fillStyleId = node.fillStyleId;
             }
+            matchingStyle = findMatchingNonLocalStyle(node, fillStyleId, values.fill);
+            let fillStyleIdBackup = ''; // Setting to empty string will delete the plugin data key if the style matches or doesn't exist
+            if (fillStyleId && !matchingStyle) {
+              fillStyleIdBackup = JSON.stringify(fillStyleId);
+            }
+            console.log(`setValuesOnNode -> hasMatchingNonLocalStyle: ${!!matchingStyle}, fillStyleIdBackup: ${fillStyleIdBackup}, linked style: ${matchingStyle?.name}`);
+            tokensSharedDataHandler.set(node, fillStyleIdBackupKey, fillStyleIdBackup);
           }
 
           if (matchingStyle) {
@@ -175,10 +186,26 @@ export default async function setValuesOnNode(
         if ('strokes' in node && data.border) {
           const path = data.border.split('.');
           const pathname = path.slice(ignoreFirstPartForStyles ? 1 : 0, path.length).join('/');
-          const matchingStyle = figmaStyleMaps.paintStyles.get(pathname);
+          let matchingStyle = figmaStyleMaps.paintStyles.get(pathname);
+
+          if (!matchingStyle) {
+            const strokeStyleIdBackupKey = 'strokeStyleId_original';
+            let strokeStyleId = tokensSharedDataHandler.get(node, strokeStyleIdBackupKey, (val) => (val ? JSON.parse(val) as string : val));
+            if (strokeStyleId === '' && typeof node.strokeStyleId === 'string') {
+              strokeStyleId = node.strokeStyleId;
+            }
+            matchingStyle = findMatchingNonLocalStyle(node, strokeStyleId, values.border);
+            let strokeStyleIdBackup = ''; // Setting to empty string will delete the plugin data key if the style matches or doesn't exist
+            if (strokeStyleId && !matchingStyle) {
+              strokeStyleIdBackup = JSON.stringify(strokeStyleId);
+            }
+            console.log(`setValuesOnNode -> hasMatchingNonLocalStyle: ${!!matchingStyle}, strokeStyleIdBackup: ${strokeStyleIdBackup}, linked style: ${matchingStyle?.name}`);
+            tokensSharedDataHandler.set(node, strokeStyleIdBackupKey, strokeStyleIdBackup);
+          }
+
           if (matchingStyle) {
             node.strokeStyleId = matchingStyle.id;
-          } else if (node.strokeStyleId === '') { // only set raw token value if node isn't linked to a Figma style:
+          } else {
             setColorValuesOnTarget(node, { value: values.border }, 'strokes');
           }
         }
