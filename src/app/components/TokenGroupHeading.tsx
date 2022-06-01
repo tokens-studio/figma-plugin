@@ -29,9 +29,9 @@ export default function TokenGroupHeading({
   const { deleteGroup, renameGroup, duplicateGroup } = useManageTokens();
 
   React.useEffect(() => {
-    if (isTokenGroupDuplicated) setOldTokenGroupName(`${path.split('.').pop()}-copy` || '');
-    else setOldTokenGroupName(`${path.split('.').pop()}` || '');
-    setNewTokenGroupName(path.split('.').pop() || '');
+    if (isTokenGroupDuplicated) setNewTokenGroupName(`${path.split('.').pop()}-copy` || '');
+    else setNewTokenGroupName(path.split('.').pop() || '');
+    setOldTokenGroupName(`${path.split('.').pop()}` || '');
   }, [oldTokenGroupName, isTokenGroupDuplicated, path]);
 
   const handleDelete = React.useCallback(() => {
@@ -46,10 +46,8 @@ export default function TokenGroupHeading({
     e.preventDefault();
 
     setShowNewGroupNameField(false);
-    if (isTokenGroupDuplicated) {
-      if (path === newTokenGroupName) renameGroup(`${path}-copy`, `${newTokenGroupName}-copy`, type);
-      else renameGroup(`${path}-copy`, newTokenGroupName, type);
-    } else renameGroup(path, newTokenGroupName, type);
+    if (isTokenGroupDuplicated) renameGroup(`${path}-copy`, `${newTokenGroupName}`, type);
+    else renameGroup(path, newTokenGroupName, type);
     setIsTokenGroupDuplicated(false);
   }, [isTokenGroupDuplicated, newTokenGroupName, path, renameGroup, type]);
 
@@ -63,7 +61,6 @@ export default function TokenGroupHeading({
 
   const handleDuplicate = React.useCallback(() => {
     duplicateGroup(path, type);
-    setNewTokenGroupName(`${oldTokenGroupName}-copy`);
     setIsTokenGroupDuplicated(true);
     setShowNewGroupNameField(true);
   }, [duplicateGroup, path, type]);
@@ -111,8 +108,8 @@ export default function TokenGroupHeading({
               onChange={handleNewTokenGroupNameChange}
               type="text"
               name="tokengroupname"
+              value={newTokenGroupName}
               required
-              defaultValue={oldTokenGroupName}
             />
           </Stack>
         </Stack>
