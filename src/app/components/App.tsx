@@ -9,7 +9,6 @@ import FigmaLoading from './FigmaLoading';
 import Footer from './Footer';
 import Changelog from './Changelog';
 import ImportedTokensDialog from './ImportedTokensDialog';
-import { Initiator } from './Initiator';
 import ConfirmDialog from './ConfirmDialog';
 import PushDialog from './PushDialog';
 import WindowResizer from './WindowResizer';
@@ -24,7 +23,6 @@ function App() {
   return (
     <LDProviderWrapper>
       <Box css={{ backgroundColor: '$bgDefault' }}>
-        <Initiator />
         <LDIdentifier />
         {activeTab !== 'loading' && <LoadingBar />}
         <PluginResizerWrapper>

@@ -15,6 +15,7 @@ import { store } from './store';
 import * as pjs from '../../package.json';
 import Stack from './components/Stack';
 import Text from './components/Text';
+import { Initiator } from './components/Initiator';
 
 initializeAnalytics();
 
@@ -42,6 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
   ReactDOM.render(
     <Sentry.ErrorBoundary fallback={ErrorFallback}>
       <Provider store={store}>
+        <Initiator />
         <App />
       </Provider>
     </Sentry.ErrorBoundary>,
