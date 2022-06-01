@@ -48,24 +48,17 @@ export type SelectionContent = {
   selectedNodes: number
 };
 
-export async function sendPluginValues({ nodes, values, shouldSendSelectionValues }: { nodes: readonly BaseNode[], values?: NodeTokenRefMap, shouldSendSelectionValues: boolean }): Promise<SelectionContent> {
-  let pluginValues: typeof values | NodeManagerNode[] = values;
-  console.log("firspulgin", pluginValues, "nodes", nodes)
+export async function sendPluginValues({ nodes, shouldSendSelectionValues }: { nodes: readonly BaseNode[], shouldSendSelectionValues: boolean }): Promise<SelectionContent> {
   let mainNodeSelectionValues: SelectionValue[] = [];
   let selectionValues;
-  if (!pluginValues) {
-    console.log("ififif");
-    pluginValues = await defaultNodeManager.findNodesWithData({ nodes });
-  }
+  const pluginValues = await defaultNodeManager.findNodesWithData({ nodes });
   // TODO: Handle all selected nodes share the same properties
   // TODO: Handle many selected and mixed (for Tokens tab)
-  console.log("pluginvalue", pluginValues)
   if (Array.isArray(pluginValues) && pluginValues?.length > 0) {
     if (shouldSendSelectionValues) selectionValues = transformPluginDataToSelectionValues(pluginValues);
     mainNodeSelectionValues = pluginValues.map((value) => value.tokens);
   }
   const selectedNodes = figma.currentPage.selection.length;
-  console.log("selectionValues", selectionValues, "selectedNodes", selectedNodes)
 
   notifySelection({ selectionValues: selectionValues ?? [], mainNodeSelectionValues, selectedNodes });
   return { selectionValues, mainNodeSelectionValues, selectedNodes };

@@ -179,6 +179,7 @@ export async function updateNodes(
   const tracker = new ProgressTracker(BackgroundJobs.PLUGIN_UPDATENODES);
   const promises: Set<Promise<void>> = new Set();
   const returnedValues: Set<NodeTokenRefMap> = new Set();
+  console.log('entries', entries);
   entries.forEach((entry) => {
     promises.add(
       defaultWorker.schedule(async () => {
@@ -189,8 +190,9 @@ export async function updateNodes(
             mappedValues = destructureCompositionToken(mappedValues);
             setValuesOnNode(entry.node, mappedValues, mappedTokens, figmaStyleMaps, ignoreFirstPartForStyles);
             store.successfulNodes.add(entry.node);
-            console.log("entry.tokens", entry)
+            console.log('entry.tokens', entry.tokens);
             returnedValues.add(entry.tokens);
+            console.log('returnedValues', returnedValues);
           }
         } catch (e) {
           console.log('got error', e);
@@ -207,7 +209,6 @@ export async function updateNodes(
     type: MessageFromPluginTypes.COMPLETE_JOB,
     name: BackgroundJobs.PLUGIN_UPDATENODES,
   });
-  console.log("returnvalues", returnedValues)
   if (returnedValues.size) {
     return returnedValues.entries().next();
   }
