@@ -113,11 +113,9 @@ export async function updatePluginData({
     promises.add(defaultWorker.schedule(async () => {
       const currentValuesOnNode = tokens ?? {};
       let newValuesOnNode: NodeTokenRefMap = {};
-      console.log("values", values, "currentvalue", currentValuesOnNode)
       if (values.composition === 'delete') newValuesOnNode = { ...values, ...currentValuesOnNode, composition: values.composition };
       else newValuesOnNode = { ...currentValuesOnNode, ...values };
-      console.log("newvalues", newValuesOnNode)
-      if (currentValuesOnNode.composition) {
+      if (currentValuesOnNode.composition && values.composition) {
         // when select another composition token, reset applied properties by current composition token
         const resolvedToken = tokensMap?.get(currentValuesOnNode.composition);
         let removeProperties: string[] = [];
@@ -126,12 +124,12 @@ export async function updatePluginData({
             property
           ));
         }
-        console.log("removeProeprti", removeProperties)
         if (removeProperties && removeProperties.length > 0) {
           await Promise.all(removeProperties.map(async (property) => {
             await removePluginData({ nodes: [node], key: property as Properties, shouldRemoveValues: shouldRemove });
           }));
         }
+        shouldOverride = true;
       }
       await Promise.all(Object.entries(newValuesOnNode).map(async ([key, value]) => {
         if (value === currentValuesOnNode[key as CompositionTokenProperty] && !shouldOverride) {

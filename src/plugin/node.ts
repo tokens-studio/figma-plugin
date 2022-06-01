@@ -131,7 +131,6 @@ export function destructureCompositionToken(values: MapValuesToTokensResult): Ma
   Record<TokenTypes, SingleToken['value']>
   & Record<Properties, SingleToken['value']>
   > = {};
-  console.log("input", values)
   if (values && values.composition) {
     Object.entries(values.composition).forEach(([property, value]) => {
       tokensInCompositionToken[property as CompositionTokenProperty] = value;
@@ -139,12 +138,10 @@ export function destructureCompositionToken(values: MapValuesToTokensResult): Ma
     const { composition, ...objExcludedCompositionToken } = values;
     values = { ...tokensInCompositionToken, ...objExcludedCompositionToken };
   }
-  console.log("output", values)
   return values;
 }
 
 export function destructureCompositionTokenForAlias(tokens: Map<string, AnyTokenList[number]>, values: NodeTokenRefMap): NodeTokenRefMap {
-  console.log("aliainput", values)
   if (values && values.composition) {
     const resolvedToken = tokens.get(values.composition);
     const tokensInCompositionToken: NodeTokenRefMap = {};
@@ -159,7 +156,6 @@ export function destructureCompositionTokenForAlias(tokens: Map<string, AnyToken
       values = { ...tokensInCompositionToken, ...objExcludedCompositionToken };
     }
   }
-  console.log("aliaoutput", values)
   return values;
 }
 
@@ -183,7 +179,6 @@ export async function updateNodes(
   const tracker = new ProgressTracker(BackgroundJobs.PLUGIN_UPDATENODES);
   const promises: Set<Promise<void>> = new Set();
   const returnedValues: Set<NodeTokenRefMap> = new Set();
-  console.log('entries', entries);
   entries.forEach((entry) => {
     promises.add(
       defaultWorker.schedule(async () => {
@@ -194,9 +189,7 @@ export async function updateNodes(
             mappedValues = destructureCompositionToken(mappedValues);
             setValuesOnNode(entry.node, mappedValues, mappedTokens, figmaStyleMaps, ignoreFirstPartForStyles);
             store.successfulNodes.add(entry.node);
-            console.log('entry.tokens', entry.tokens);
             returnedValues.add(entry.tokens);
-            console.log('returnedValues', returnedValues);
           }
         } catch (e) {
           console.log('got error', e);
