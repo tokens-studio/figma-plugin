@@ -36,7 +36,7 @@ export default function useRemoteTokens() {
     addNewGitHubCredentials, syncTokensWithGitHub, pullTokensFromGitHub, pushTokensToGitHub, createGithubBranch, fetchGithubBranches,
   } = useGitHub();
   const {
-    addNewGitLabCredentials, syncTokensWithGitLab, pullTokensFromGitLab, pushTokensToGitLab, fetchGitLabBranches, createGitLabBranch
+    addNewGitLabCredentials, syncTokensWithGitLab, pullTokensFromGitLab, pushTokensToGitLab, fetchGitLabBranches, createGitLabBranch,
   } = useGitLab();
   const {
     addNewADOCredentials, syncTokensWithADO, pullTokensFromADO, pushTokensToADO, createADOBranch, fetchADOBranches,
@@ -266,7 +266,7 @@ export default function useRemoteTokens() {
     pullTokens,
     pushTokens,
     addNewProviderItem,
-    addNewBranch,
     fetchBranches,
+    addNewBranch,
   ]);
 }
