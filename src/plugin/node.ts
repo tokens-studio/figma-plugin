@@ -131,6 +131,7 @@ export function destructureCompositionToken(values: MapValuesToTokensResult): Ma
   Record<TokenTypes, SingleToken['value']>
   & Record<Properties, SingleToken['value']>
   > = {};
+  console.log("input", values)
   if (values && values.composition) {
     Object.entries(values.composition).forEach(([property, value]) => {
       tokensInCompositionToken[property as CompositionTokenProperty] = value;
@@ -138,10 +139,12 @@ export function destructureCompositionToken(values: MapValuesToTokensResult): Ma
     const { composition, ...objExcludedCompositionToken } = values;
     values = { ...tokensInCompositionToken, ...objExcludedCompositionToken };
   }
+  console.log("output", values)
   return values;
 }
 
 export function destructureCompositionTokenForAlias(tokens: Map<string, AnyTokenList[number]>, values: NodeTokenRefMap): NodeTokenRefMap {
+  console.log("aliainput", values)
   if (values && values.composition) {
     const resolvedToken = tokens.get(values.composition);
     const tokensInCompositionToken: NodeTokenRefMap = {};
@@ -156,6 +159,7 @@ export function destructureCompositionTokenForAlias(tokens: Map<string, AnyToken
       values = { ...tokensInCompositionToken, ...objExcludedCompositionToken };
     }
   }
+  console.log("aliaoutput", values)
   return values;
 }
 

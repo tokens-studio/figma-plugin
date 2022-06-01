@@ -103,14 +103,12 @@ export const TokenButton: React.FC<Props> = ({
   }, [dispatch, tokensContext.resolvedTokens, setNodeData]);
 
   const handleClick = React.useCallback((givenProperties: PropertyObject | PropertyObject[], isActive = active) => {
-    console.log("isactive", isActive, "givePro", givenProperties)
     const propsToSet = (Array.isArray(givenProperties) ? givenProperties : [givenProperties]).map((prop) => (
       extend(true, {}, prop) as typeof prop
     ));
     const tokenValue = name;
     track('Apply Token', { givenProperties });
     let value = isActive ? 'delete' : tokenValue;
-    console.log("value", value)
     if (propsToSet[0].clear && !isActive) {
       value = 'delete';
       propsToSet[0].forcedValue = tokenValue;
@@ -118,7 +116,6 @@ export const TokenButton: React.FC<Props> = ({
     const newProps = {
       [propsToSet[0].name || propsToSet[0]]: propsToSet[0].forcedValue || value,
     };
-    console.log("newProps", newProps)
     if (propsToSet[0].clear) propsToSet[0].clear.map((item) => Object.assign(newProps, { [item]: 'delete' }));
     if (type === 'composition' && value === 'delete') {
       // distructure composition token when it is unselected
