@@ -4,6 +4,7 @@ import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StorageTypeCredentials } from '@/types/StorageType';
 import { GitStorageMetadata, GitTokenStorage } from './GitTokenStorage';
 import { RemoteTokenStorageFile, RemoteTokenStorageSingleTokenSetFile, RemoteTokenStorageThemesFile } from './RemoteTokenStorage';
+import { multiFileSchema, complexSingleFileSchema } from './schemas';
 
 const apiVersion = 'api-version=6.0';
 
@@ -27,16 +28,16 @@ interface FetchGit {
 }
 
 type PostPushesArgs = {
-  branch: string,
-  changes: Record<string, any>,
-  commitMessage?: string,
-  oldObjectId?: string,
+  branch: string
+  changes: Record<string, any>
+  commitMessage?: string
+  oldObjectId?: string
 };
 
 type PostRefsArgs = {
   name: string
-  oldObjectId: string,
-  newObjectId: string,
+  oldObjectId: string
+  newObjectId: string
 };
 
 export class ADOTokenStorage extends GitTokenStorage {
@@ -183,7 +184,7 @@ export class ADOTokenStorage extends GitTokenStorage {
     };
   }
 
-  private async getItem(path: string = this.path): Promise<Record<string, any>> {
+  private async getItem(path: string = this.path): Promise<any> {
     try {
       const response = await this.fetchGit({
         ...this.itemsDefault(),
@@ -201,7 +202,7 @@ export class ADOTokenStorage extends GitTokenStorage {
     }
   }
 
-  private async getItems(): Promise<{ count: number, value: GitInterfaces.GitItem[] }> {
+  private async getItems(): Promise<{ count: number, value?: GitInterfaces.GitItem[] }> {
     try {
       const response = await this.fetchGit({
         ...this.itemsDefault(),
@@ -223,61 +224,73 @@ export class ADOTokenStorage extends GitTokenStorage {
 
   public async read(): Promise<RemoteTokenStorageFile<GitStorageMetadata>[]> {
     try {
-      if (this.flags.multiFileEnabled) {
+      if (this.flags.multiFileEnabled && !this.path.endsWith('.json')) {
         const { value } = await this.getItems();
         const jsonFiles = value
-          .filter((file) => (file.path?.endsWith('.json')))
+          ?.filter((file) => (file.path?.endsWith('.json')))
           .sort((a, b) => (
             (a.path && b.path) ? a.path.localeCompare(b.path) : 0
-          ));
+          )) ?? [];
 
         if (!jsonFiles.length) return [];
 
-        const jsonFileContents = await Promise.all(
+        const jsonFileContents = compact(await Promise.all(
           jsonFiles.map(async ({ path }) => {
             const res = await this.getItem(path);
-            return res;
+            const validationResult = await multiFileSchema.safeParseAsync(res);
+            if (validationResult.success) {
+              return validationResult.data;
+            }
+            return null;
           }),
-        );
+        ));
         return compact(jsonFileContents.map<RemoteTokenStorageFile<GitStorageMetadata> | null>((fileContent, index) => {
           const { path } = jsonFiles[index];
           if (fileContent) {
-            const name = path?.replace(/[^/]+\.json$/, '');
-            const { $themes = [], ...data } = fileContent;
+            const name = path?.split(/[\\/]/).pop()?.replace(/\.json$/, '');
 
-            if (name === '$themes') {
+            if (name === '$themes' && Array.isArray(fileContent)) {
               return {
                 path,
                 type: 'themes',
-                data: $themes,
+                data: fileContent,
               } as RemoteTokenStorageThemesFile;
             }
 
-            return {
-              path,
-              name,
-              type: 'tokenSet',
-              data,
-            } as RemoteTokenStorageSingleTokenSetFile;
+            if (!Array.isArray(fileContent)) {
+              return {
+                path,
+                name,
+                type: 'tokenSet',
+                data: fileContent,
+              } as RemoteTokenStorageSingleTokenSetFile;
+            }
           }
 
           return null;
         }));
       }
-      const { $themes = [], ...data } = await this.getItem();
-      return [
-        {
-          type: 'themes',
-          path: `${this.path}/$themes.json`,
-          data: $themes,
-        },
-        ...Object.entries(data).map<RemoteTokenStorageFile<GitStorageMetadata>>(([name, tokenSet]) => ({
-          name,
-          type: 'tokenSet',
-          path: `${this.path}/${name}.json`,
-          data: tokenSet,
-        })),
-      ];
+
+      const singleItem = await this.getItem();
+      const singleItemValidationResult = await complexSingleFileSchema.safeParseAsync(singleItem);
+
+      if (singleItemValidationResult.success) {
+        const { $themes = [], ...data } = singleItemValidationResult.data;
+
+        return [
+          {
+            type: 'themes',
+            path: `${this.path}/$themes.json`,
+            data: Array.isArray($themes) ? $themes : [],
+          },
+          ...Object.entries(data).map<RemoteTokenStorageFile<GitStorageMetadata>>(([name, tokenSet]) => ({
+            name,
+            type: 'tokenSet',
+            path: `${this.path}/${name}.json`,
+            data: !Array.isArray(tokenSet) ? tokenSet : {},
+          })),
+        ];
+      }
     } catch (e) {
       console.log(e);
     }
@@ -315,7 +328,7 @@ export class ADOTokenStorage extends GitTokenStorage {
   public async writeChangeset(changeset: Record<string, string>, message: string, branch: string, shouldCreateBranch: boolean = false): Promise<boolean> {
     const oldObjectId = await this.getOldObjectId(this.source, shouldCreateBranch);
     const { value } = await this.getItems();
-    const tokensOnRemote = value.map((val) => val.path);
+    const tokensOnRemote = value?.map((val) => val.path) ?? [];
     const changes = Object.entries(changeset)
       .map(([path, content]) => {
         const formattedPath = path.startsWith('/') ? path : `/${path}`;

@@ -20,6 +20,45 @@ function ConfirmDialog() {
   const [commitMessage, setCommitMessage] = React.useState('');
   const [branch, setBranch] = React.useState((isGitProvider(localApiState) ? localApiState.branch : '') || '');
 
+  const redirectHref = React.useMemo(() => {
+    let redirectHref = '';
+    if (localApiState && 'id' in localApiState && localApiState.id) {
+      switch (localApiState.provider) {
+        case StorageProviderType.GITHUB:
+          redirectHref = getGithubCreatePullRequestUrl(localApiState.id, branch);
+          break;
+        case StorageProviderType.GITLAB: {
+          const [owner, repo] = localApiState.id.split('/');
+          redirectHref = getGitlabCreatePullRequestUrl(owner, repo);
+          break;
+        }
+        case StorageProviderType.ADO:
+          redirectHref = getADOCreatePullRequestUrl({
+            branch,
+            projectId: localApiState.name,
+            orgUrl: localApiState.baseUrl,
+            repositoryId: localApiState.id,
+          });
+          break;
+        default:
+          break;
+      }
+    }
+    return redirectHref;
+  }, [branch, localApiState]);
+
+  const handleCommitMessageChange = React.useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    setCommitMessage(event.target.value);
+  }, [setCommitMessage]);
+
+  const handleBranchChange = React.useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    setBranch(event.target.value);
+  }, [setBranch]);
+
+  const handleSubmit = React.useCallback(() => {
+    onConfirm(commitMessage, branch);
+  }, [branch, commitMessage, onConfirm]);
+
   React.useEffect(() => {
     if (showPushDialog === 'initial' && isGitProvider(localApiState)) {
       setCommitMessage('');
@@ -27,38 +66,11 @@ function ConfirmDialog() {
     }
   }, [showPushDialog, localApiState]);
 
-  // @TODO ANTI-PATTERN - FIX THIS
-  let redirectHref = '';
-  if (localApiState && 'id' in localApiState && localApiState.id) {
-    switch (localApiState.provider) {
-      case StorageProviderType.GITHUB:
-        redirectHref = getGithubCreatePullRequestUrl(localApiState.id, branch);
-        break;
-      case StorageProviderType.GITLAB:
-        const [owner, repo] = localApiState.id.split('/');
-        redirectHref = getGitlabCreatePullRequestUrl(owner, repo);
-        break;
-      case StorageProviderType.ADO:
-        redirectHref = getADOCreatePullRequestUrl({
-          branch,
-          projectId: localApiState.name,
-          orgUrl: localApiState.baseUrl,
-          repositoryId: localApiState.id,
-        });
-        break;
-      default:
-        redirectHref = '';
-        break;
-    }
-  }
-
   switch (showPushDialog) {
     case 'initial': {
       return (
         <Modal large isOpen close={onCancel}>
-          <form
-            onSubmit={() => onConfirm(commitMessage, branch)}
-          >
+          <form onSubmit={handleSubmit}>
             <Stack direction="column" gap={4}>
               <Stack direction="column" gap={2}>
                 <Heading>Push changes</Heading>
@@ -70,7 +82,7 @@ function ConfirmDialog() {
                   full
                   label="Commit message"
                   value={commitMessage}
-                  onChange={(e) => setCommitMessage(e.target.value)}
+                  onChange={handleCommitMessageChange}
                   type="text"
                   name="commitMessage"
                   required
@@ -79,7 +91,7 @@ function ConfirmDialog() {
                   full
                   label="Branch"
                   value={branch}
-                  onChange={(e) => setBranch(e.target.value)}
+                  onChange={handleBranchChange}
                   type="text"
                   name="branch"
                   required
