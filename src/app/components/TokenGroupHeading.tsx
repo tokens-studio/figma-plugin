@@ -86,30 +86,31 @@ export default function TokenGroupHeading({
         isOpen={showNewGroupNameField}
         close={handleSetNewTokenGroupNameFileClose}
         footer={(
-          <Stack direction="row" gap={4}>
-            <Button variant="secondary" size="large" onClick={handleSetNewTokenGroupNameFileClose}>
-              Cancel
-            </Button>
-            <Button type="submit" variant="primary" size="large" disabled={oldTokenGroupName === newTokenGroupName}>
-              Change
-            </Button>
-          </Stack>
+          <form id="renameTokenGroup" onSubmit={handleRenameTokenGroupSubmit}>
+            <Stack direction="row" gap={4}>
+              <Button variant="secondary" size="large" onClick={handleSetNewTokenGroupNameFileClose}>
+                Cancel
+              </Button>
+              <Button type="submit" variant="primary" size="large" disabled={oldTokenGroupName === newTokenGroupName}>
+                Change
+              </Button>
+            </Stack>
+          </form>
         )}
       >
         <Stack direction="column" justify="center" gap={4} css={{ textAlign: 'center' }}>
           <Heading size="small">Renaming only affects tokens of the same type</Heading>
-          <form onSubmit={handleRenameTokenGroupSubmit}>
-            <Stack direction="column" gap={4}>
-              <Input
-                full
-                onChange={handleNewTokenGroupNameChange}
-                type="text"
-                name="tokengroupname"
-                required
-                defaultValue={oldTokenGroupName}
-              />
-            </Stack>
-          </form>
+          <Stack direction="column" gap={4}>
+            <Input
+              form="renameTokenGroup"
+              full
+              onChange={handleNewTokenGroupNameChange}
+              type="text"
+              name="tokengroupname"
+              required
+              defaultValue={oldTokenGroupName}
+            />
+          </Stack>
         </Stack>
       </Modal>
     </>
