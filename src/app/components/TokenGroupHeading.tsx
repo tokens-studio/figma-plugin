@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React from 'react';
 import { useSelector } from 'react-redux';
 import {
   ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger,
@@ -27,7 +27,6 @@ export default function TokenGroupHeading({
   const [oldTokenGroupName, setOldTokenGroupName] = React.useState<string>('');
   const [isTokenGroupDuplicated, setIsTokenGroupDuplicated] = React.useState<boolean>(false);
   const { deleteGroup, renameGroup, duplicateGroup } = useManageTokens();
-  const newName = useRef(null);
 
   React.useEffect(() => {
     if (isTokenGroupDuplicated) setOldTokenGroupName(`${path.split('.').pop()}-copy` || '');
@@ -45,10 +44,12 @@ export default function TokenGroupHeading({
 
   const handleRenameTokenGroupSubmit = React.useCallback((e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log('event', e, 'e.prevent', e.preventDefault());
+
     setShowNewGroupNameField(false);
-    if (isTokenGroupDuplicated) renameGroup(`${path}-copy`, newName.current, type);
-    else renameGroup(path, newTokenGroupName, type);
+    if (isTokenGroupDuplicated) {
+      if (path === newTokenGroupName) renameGroup(`${path}-copy`, `${newTokenGroupName}-copy`, type);
+      else renameGroup(`${path}-copy`, newTokenGroupName, type);
+    } else renameGroup(path, newTokenGroupName, type);
     setIsTokenGroupDuplicated(false);
   }, [isTokenGroupDuplicated, newTokenGroupName, path, renameGroup, type]);
 
@@ -62,6 +63,7 @@ export default function TokenGroupHeading({
 
   const handleDuplicate = React.useCallback(() => {
     duplicateGroup(path, type);
+    setNewTokenGroupName(`${oldTokenGroupName}-copy`);
     setIsTokenGroupDuplicated(true);
     setShowNewGroupNameField(true);
   }, [duplicateGroup, path, type]);
