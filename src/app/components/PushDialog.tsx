@@ -19,7 +19,6 @@ function ConfirmDialog() {
   const localApiState = useSelector(localApiStateSelector);
   const [commitMessage, setCommitMessage] = React.useState('');
   const [branch, setBranch] = React.useState((isGitProvider(localApiState) ? localApiState.branch : '') || '');
-  const [owner, repo] = localApiState.id.split('/');
 
   React.useEffect(() => {
     if (showPushDialog === 'initial' && isGitProvider(localApiState)) {
@@ -31,6 +30,8 @@ function ConfirmDialog() {
   // @TODO ANTI-PATTERN - FIX THIS
   let redirectHref = '';
   if (localApiState && 'id' in localApiState && localApiState.id) {
+    const [owner, repo] = localApiState.id.split('/');
+
     switch (localApiState.provider) {
       case StorageProviderType.GITHUB:
         redirectHref = getGithubCreatePullRequestUrl({
