@@ -10,7 +10,6 @@ type Props = {
 
 const StyledItemValue = styled('div', {
   fontWeight: '$bold',
-  textAlign: 'right',
   textOverflow: 'ellipsis',
   overflow: 'hidden',
   maxWidth: '300px',
