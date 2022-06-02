@@ -26,13 +26,13 @@ export default function TokenGroupHeading({
   const [showNewGroupNameField, setShowNewGroupNameField] = React.useState<boolean>(false);
   const [oldTokenGroupName, setOldTokenGroupName] = React.useState<string>('');
   const [isTokenGroupDuplicated, setIsTokenGroupDuplicated] = React.useState<boolean>(false);
+  const [copyName, setCopyName] = React.useState<string>('');
   const { deleteGroup, renameGroup, duplicateGroup } = useManageTokens();
 
   React.useEffect(() => {
-    if (isTokenGroupDuplicated) setNewTokenGroupName(`${path.split('.').pop()}-copy` || '');
-    else setNewTokenGroupName(path.split('.').pop() || '');
-    setOldTokenGroupName(`${path.split('.').pop()}` || '');
-  }, [oldTokenGroupName, isTokenGroupDuplicated, path]);
+    setNewTokenGroupName(`${path.split('.').pop()}${copyName}` || '');
+    setOldTokenGroupName(`${path.split('.').pop()}${copyName}` || '');
+  }, [oldTokenGroupName, isTokenGroupDuplicated, copyName, path]);
 
   const handleDelete = React.useCallback(() => {
     deleteGroup(path);
@@ -46,9 +46,9 @@ export default function TokenGroupHeading({
     e.preventDefault();
 
     setShowNewGroupNameField(false);
-    if (isTokenGroupDuplicated) renameGroup(`${path}-copy`, `${newTokenGroupName}`, type);
-    else renameGroup(path, newTokenGroupName, type);
+    renameGroup(`${path}${copyName}`, `${newTokenGroupName}`, type);
     setIsTokenGroupDuplicated(false);
+    setCopyName('');
   }, [isTokenGroupDuplicated, newTokenGroupName, path, renameGroup, type]);
 
   const handleNewTokenGroupNameChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -62,6 +62,7 @@ export default function TokenGroupHeading({
   const handleDuplicate = React.useCallback(() => {
     duplicateGroup(path, type);
     setIsTokenGroupDuplicated(true);
+    setCopyName('-copy');
     setShowNewGroupNameField(true);
   }, [duplicateGroup, path, type]);
   return (
