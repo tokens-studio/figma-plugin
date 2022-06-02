@@ -1,0 +1,24 @@
+import { Meta, Story, ArgsTable, Canvas, Preview } from '@storybook/addon-docs';
+import Text from '@/app/components/Text';
+
+<Meta 
+  title='Text' 
+  component={Text}
+/>
+
+<ArgsTable of={Text}/>
+
+export const TextDefaultStory = (args) => {
+  return (
+    <Text {...args}>Figma Token Plugin Compoent Text</Text>
+  )
+}
+
+<Canvas>
+  <Story name='Default' args={{
+    bold: true,
+    size: 'small'
+  }}>
+    {TextDefaultStory.bind({})}
+  </Story>
+</Canvas>

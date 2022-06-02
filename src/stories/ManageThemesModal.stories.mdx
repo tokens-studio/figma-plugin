@@ -1,0 +1,31 @@
+import { useState } from 'react';
+import { Provider } from 'react-redux';
+import { Meta, Story, ArgsTable, Canvas, Preview } from '@storybook/addon-docs';
+
+import { store } from '@/app/store';
+import { ManageThemesModal } from '@/app/components/ManageThemesModal/ManageThemesModal';
+import Button from '@/app/components/Button/Button';
+
+<Meta title='ManageThemesModal' component={ManageThemesModal} />
+
+<ArgsTable of={ManageThemesModal} />
+
+export const ManageThemesModalDefaultStory = (args) => {
+  const [isOpen, setIsOpen] = useState(false);
+  return (
+    <>
+    <Button onClick={() => setIsOpen(true)}>
+      Click to Open a ManageThemes Modal
+    </Button>
+    <Provider store={store}>
+      {isOpen && <ManageThemesModal close={() => setIsOpen(false)}/>}
+    </Provider>
+    </>
+  )
+}
+
+<Canvas>
+  <Story name='Default'>
+    {ManageThemesModalDefaultStory.bind({})}
+  </Story>
+</Canvas>

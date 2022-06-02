@@ -1,0 +1,52 @@
+import { useState } from 'react';
+import { Meta, Story, ArgsTable, Canvas, Preview } from '@storybook/addon-docs';
+import { Provider, useSelector } from 'react-redux';
+
+import { store } from '@/app/store';
+
+import EditStorageItemModal from '@/app/components/modals/EditStorageItemModal';
+import Button from '@/app/components/Button/Button';
+
+<Meta 
+  title='EditStorageItemModal' 
+  component={EditStorageItemModal} 
+  args={{
+    isOpen: false,
+    initialValue:{
+      provider: "github",
+      name: "takao",
+      id: "MightyDevKnight/figma-tokens",
+      branch: "main",
+      filePath: "figma/tokens.json",
+      baseUrl: "",
+      secret: "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",
+      internalId: "fwSGFJHtqsxTOsiTNwa4uXYh"
+    },
+  }}
+/>
+
+<ArgsTable of={EditStorageItemModal}/>
+
+export const EditStorageItemModalDefaultStory = (args) => {
+  const [isOpen, setIsOpen] = useState(false);
+  return (
+    <>
+    <Button onClick={() => setIsOpen(true)}>
+      Click to Open a EditStorageItem Modal
+    </Button>
+    <Provider store={store}>
+      <EditStorageItemModal
+        {...args}
+        isOpen={isOpen}
+        onClose={() => setIsOpen(false)}
+      />
+    </Provider>
+    </>
+  )
+}
+
+<Canvas>
+  <Story name='Default'>
+    {EditStorageItemModalDefaultStory.bind({})}
+  </Story>
+</Canvas>

@@ -1,0 +1,25 @@
+import { Meta, Story, ArgsTable, Canvas, Preview } from '@storybook/addon-docs';
+import Heading from '@/app/components/Heading';
+
+<Meta title='Heading' component={Heading}/>
+
+<ArgsTable of={Heading} />
+
+export const HeadingDefaultStory = (args) => {
+  return (
+    <Heading 
+      size={args.size}
+      children={args.children}
+      id={args.id}
+      muted={args.muted}
+    >
+      Heading Story
+    </Heading>
+  )
+}
+
+<Canvas>
+  <Story name='Default'>
+    {HeadingDefaultStory.bind({})}
+  </Story>
+</Canvas>

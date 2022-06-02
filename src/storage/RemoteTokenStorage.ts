@@ -83,7 +83,6 @@ export abstract class RemoteTokenStorage<Metadata = unknown> {
     if (files.length === 0) {
       return null;
     }
-
     files.forEach((file) => {
       if (file.type === 'themes') {
         data.themes = [...data.themes, ...file.data];

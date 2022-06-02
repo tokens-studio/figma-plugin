@@ -1,0 +1,37 @@
+import { useState } from 'react';
+import { Meta, Story, ArgsTable, Canvas, Preview } from '@storybook/addon-docs';
+import Button from '@/app/components/Button/Button';
+import ConfirmLocalStorageModal from '@/app/components/modals/ConfirmLocalStorageModal';
+
+<Meta 
+  title='ConfirmLocalStorageModal' 
+  component={ConfirmLocalStorageModal}
+  args={{
+    isOpen: false,
+  }}
+/>
+
+<ArgsTable of={ConfirmLocalStorageModal}/>
+
+export const ConfirmLocalStorageModalDefaultStory = (args) => {
+  const [isOpen, setIsOpen] = useState(false);
+  return (
+    <>
+      <Button onClick={() => setIsOpen(true)}>
+        Click to Open a Confirmation Modal
+      </Button>
+      <ConfirmLocalStorageModal 
+        isOpen={isOpen} 
+        onToggle={() => setIsOpen(false)}
+      />
+    </>
+  );
+};
+
+<Canvas>
+  <Story name='Default' args={{
+  }}
+  >
+    {ConfirmLocalStorageModalDefaultStory.bind({})}
+  </Story>
+</Canvas>

@@ -3,7 +3,7 @@ import { SingleToken } from '@/types/tokens';
 import { TokenBoxshadowValue, TokenTypograpyValue } from '@/types/values';
 import { TransformerOptions } from './types';
 
-function getSimpleValue(resolvedValue: string | number, rawValue: string | number, options: TransformerOptions) {
+function getSimpleValue(resolvedValue: SingleToken['value'], rawValue: SingleToken['value'], options: TransformerOptions) {
   let value = resolvedValue;
   /*
    * ***************************************************************************
@@ -38,7 +38,7 @@ function getSimpleValue(resolvedValue: string | number, rawValue: string | numbe
   return value as string; // TODO: remove `as string` when SingleGenericToken supports value as `string|number`
 }
 
-function getComplexValue<T extends TokenTypograpyValue | TokenBoxshadowValue>(
+function getComplexValue<T extends SingleToken['value']>(
   resolvedValue: T,
   rawValue: T,
   options: TransformerOptions,
@@ -46,7 +46,8 @@ function getComplexValue<T extends TokenTypograpyValue | TokenBoxshadowValue>(
   type IndexedValueType = Record<string, string | number>;
   return Object.entries(resolvedValue).reduce((acc, [key, val]) => {
     const rawVal = (rawValue as IndexedValueType)[key];
-    acc[key] = getSimpleValue(val, rawVal, options);
+    // TODO: Remove as SingleToken["value"]
+    acc[key] = getSimpleValue(val as SingleToken['value'], rawVal as SingleToken['value'], options);
     return acc;
   }, {} as IndexedValueType) as T;
 }

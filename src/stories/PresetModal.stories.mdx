@@ -1,0 +1,32 @@
+import { useState } from 'react';
+import { Meta, Story, ArgsTable, Canvas, Preview } from '@storybook/addon-docs';
+import { Provider } from 'react-redux';
+
+import { store } from '@/app/store';
+
+import PresetModal from '@/app/components/modals/PresetModal';
+import Button from '@/app/components/Button/Button';
+
+<Meta title='PresetModal' component={PresetModal} />
+
+<ArgsTable of={PresetModal}/>
+
+export const PresetModalDefaultStory = (args) => {
+  const [isOpen, setIsOpen] = useState(false);
+  return (
+    <>
+    <Button onClick={() => setIsOpen(true)}>
+      Click to Open a Preset Modal
+    </Button>
+    <Provider store={store}>
+      {isOpen && <PresetModal onClose={() => setIsOpen(false)}/>}
+    </Provider>
+    </>
+  )
+}
+
+<Canvas>
+  <Story name='Default'>
+    {PresetModalDefaultStory.bind({})}
+  </Story>
+</Canvas>
