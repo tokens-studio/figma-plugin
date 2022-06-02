@@ -48,15 +48,11 @@ export const remapTokens: AsyncMessageChannelHandlers[AsyncMessageTypes.REMAP_TO
       await updatePluginData({
         entries: allWithData, values: { [category]: newName }, shouldOverride: true, tokensMap,
       });
+      await updateNodes(updatedNodes, tokensMap, msg.settings);
     } else {
       await updatePluginData({ entries: updatedNodes, values: {}, shouldOverride: true });
     }
-
     await sendSelectionChange();
-    if (msg.tokens && updateMode === UpdateMode.SELECTION) {
-      const tokensMap = tokenArrayGroupToMap(msg.tokens);
-      await updateNodes(updatedNodes, tokensMap, msg.settings);
-    }
   } catch (e) {
     console.error(e);
   }
