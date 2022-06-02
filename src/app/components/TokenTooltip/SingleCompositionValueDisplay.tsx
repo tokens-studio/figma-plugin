@@ -36,7 +36,9 @@ export const SingleCompositionValueDisplay: React.FC<Props> = ({ property, value
       returnValue = Object.entries(value).reduce<string>((acc, [, propertyValue]) => (
         `${acc}${propertyValue.toString()}/`
       ), '');
-    } else if (typeof value === 'string') {
+    } else if (typeof value === 'number') {
+      returnValue = value.toString();
+    } else {
       returnValue = value;
     }
     return returnValue;
