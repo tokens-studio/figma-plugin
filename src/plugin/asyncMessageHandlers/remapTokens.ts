@@ -10,7 +10,7 @@ import { sendSelectionChange } from '../sendSelectionChange';
 export const remapTokens: AsyncMessageChannelHandlers[AsyncMessageTypes.REMAP_TOKENS] = async (msg) => {
   try {
     const {
-      oldName, newName, updateMode, category,
+      oldName, newName, updateMode, category, tokens,
     } = msg;
     const allWithData = await defaultNodeManager.findNodesWithData({
       updateMode,
@@ -42,7 +42,15 @@ export const remapTokens: AsyncMessageChannelHandlers[AsyncMessageTypes.REMAP_TO
       }
       return all;
     }, []);
-    await updatePluginData({ entries: updatedNodes, values: {}, shouldOverride: true });
+
+    if (updateMode === UpdateMode.SELECTION && category && tokens) {
+      const tokensMap = tokenArrayGroupToMap(tokens);
+      await updatePluginData({
+        entries: allWithData, values: { [category]: newName }, shouldOverride: true, tokensMap,
+      });
+    } else {
+      await updatePluginData({ entries: updatedNodes, values: {}, shouldOverride: true });
+    }
 
     await sendSelectionChange();
     if (msg.tokens && updateMode === UpdateMode.SELECTION) {

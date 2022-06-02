@@ -115,6 +115,7 @@ export async function updatePluginData({
       let newValuesOnNode: NodeTokenRefMap = {};
       if (values.composition === 'delete') newValuesOnNode = { ...values, ...currentValuesOnNode, composition: values.composition };
       else newValuesOnNode = { ...currentValuesOnNode, ...values };
+      console.log('newe', newValuesOnNode, 'cure', currentValuesOnNode, 'value', values);
       if (currentValuesOnNode.composition && values.composition) {
         // when select another composition token, reset applied properties by current composition token
         const resolvedToken = tokensMap?.get(currentValuesOnNode.composition);
@@ -124,6 +125,7 @@ export async function updatePluginData({
             property
           ));
         }
+        console.log('remo', removeProperties);
         if (removeProperties && removeProperties.length > 0) {
           await Promise.all(removeProperties.map(async (property) => {
             await removePluginData({ nodes: [node], key: property as Properties, shouldRemoveValues: shouldRemove });
