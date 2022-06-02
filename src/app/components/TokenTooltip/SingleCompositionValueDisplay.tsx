@@ -17,7 +17,7 @@ const StyledItemValue = styled('div', {
 });
 
 const StyledItemName = styled('div', {
-  flexGrow: 1,
+  flexShrink: 0,
   overflow: 'hidden',
   textOverflow: 'ellipsis',
 });
