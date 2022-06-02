@@ -122,7 +122,6 @@ export function useGitHub() {
 
     try {
       const content = await storage.retrieve();
-
       if (content) {
         return content;
       }

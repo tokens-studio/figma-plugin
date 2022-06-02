@@ -142,7 +142,6 @@ export function useGitLab() {
       }
 
       const content = await storage.retrieve();
-
       if (content) {
         if (
           !isEqual(content.tokens, tokens)
@@ -202,17 +201,24 @@ export function useGitLab() {
     return storage.fetchBranches();
   }, [storageClientFactory]);
 
+  const createGitLabBranch = useCallback(async (context: GitlabCredentials, newBranch: string, source?: string) => {
+    const storage = await storageClientFactory(context);
+    return storage.createBranch(newBranch, source);
+  }, [storageClientFactory]);
+
   return useMemo(() => ({
     addNewGitLabCredentials,
     syncTokensWithGitLab,
     pullTokensFromGitLab,
     pushTokensToGitLab,
     fetchGitLabBranches,
+    createGitLabBranch,
   }), [
     addNewGitLabCredentials,
     syncTokensWithGitLab,
     pullTokensFromGitLab,
     pushTokensToGitLab,
     fetchGitLabBranches,
+    createGitLabBranch,
   ]);
 }

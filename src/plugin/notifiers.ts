@@ -4,6 +4,7 @@ import {
   UserIdFromPluginMessage,
 } from '@/types/messages';
 import { AnyTokenList, TokenStore } from '@/types/tokens';
+import { UserData } from '@/types/userData';
 import { SelectionGroup } from '@/types/SelectionGroup';
 import { SelectionValue } from '@/types/SelectionValue';
 import { UpdateMode } from '@/constants/UpdateMode';
@@ -97,8 +98,8 @@ export function notifyUISettings(
   });
 }
 
-export function notifyTokenValues(values: TokenStore) {
-  postToUI({ type: MessageFromPluginTypes.TOKEN_VALUES, values });
+export function notifyTokenValues(values: TokenStore, userData: UserData) {
+  postToUI({ type: MessageFromPluginTypes.TOKEN_VALUES, values, userData });
 }
 
 export function notifyNoTokenValues() {

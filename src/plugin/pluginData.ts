@@ -48,20 +48,16 @@ export type SelectionContent = {
   selectedNodes: number
 };
 
-export async function sendPluginValues({ nodes, values, shouldSendSelectionValues }: { nodes: readonly BaseNode[], values?: NodeTokenRefMap, shouldSendSelectionValues: boolean }): Promise<SelectionContent> {
-  let pluginValues: typeof values | NodeManagerNode[] = values;
+export async function sendPluginValues({ nodes, shouldSendSelectionValues }: { nodes: readonly BaseNode[], shouldSendSelectionValues: boolean }): Promise<SelectionContent> {
   let mainNodeSelectionValues: SelectionValue[] = [];
   let selectionValues;
-  if (!pluginValues) {
-    pluginValues = await defaultNodeManager.findNodesWithData({ nodes });
-  }
+  const pluginValues = await defaultNodeManager.findNodesWithData({ nodes });
   // TODO: Handle all selected nodes share the same properties
   // TODO: Handle many selected and mixed (for Tokens tab)
   if (Array.isArray(pluginValues) && pluginValues?.length > 0) {
     if (shouldSendSelectionValues) selectionValues = transformPluginDataToSelectionValues(pluginValues);
     mainNodeSelectionValues = pluginValues.map((value) => value.tokens);
   }
-
   const selectedNodes = figma.currentPage.selection.length;
 
   notifySelection({ selectionValues: selectionValues ?? [], mainNodeSelectionValues, selectedNodes });
@@ -119,10 +115,10 @@ export async function updatePluginData({
       let newValuesOnNode: NodeTokenRefMap = {};
       if (values.composition === 'delete') newValuesOnNode = { ...values, ...currentValuesOnNode, composition: values.composition };
       else newValuesOnNode = { ...currentValuesOnNode, ...values };
-      if (currentValuesOnNode.composition) {
+      if (currentValuesOnNode.composition && values.composition) {
         // when select another composition token, reset applied properties by current composition token
         const resolvedToken = tokensMap?.get(currentValuesOnNode.composition);
-        let removeProperties: String[] = [];
+        let removeProperties: string[] = [];
         if (resolvedToken && resolvedToken.rawValue) {
           removeProperties = Object.keys(resolvedToken.rawValue).map((property) => (
             property
@@ -133,6 +129,7 @@ export async function updatePluginData({
             await removePluginData({ nodes: [node], key: property as Properties, shouldRemoveValues: shouldRemove });
           }));
         }
+        shouldOverride = true;
       }
       await Promise.all(Object.entries(newValuesOnNode).map(async ([key, value]) => {
         if (value === currentValuesOnNode[key as CompositionTokenProperty] && !shouldOverride) {

@@ -281,7 +281,6 @@ export class NodeManager {
     await this.waitForUpdating();
 
     const { updateMode, nodes } = opts;
-
     let relevantNodes: BaseNode[] = [];
     if (nodes) {
       relevantNodes = Array.from(nodes);

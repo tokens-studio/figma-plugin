@@ -1,6 +1,5 @@
 import { useCallback, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { withLDConsumer } from 'launchdarkly-react-client-sdk';
 import type { LDProps } from 'launchdarkly-react-client-sdk/lib/withLDConsumer';
 import { identify, track } from '@/utils/analytics';
 import { MessageFromPluginTypes, PostToUIMessage } from '@/types/messages';
@@ -9,7 +8,6 @@ import { Dispatch } from '../store';
 import useStorage from '../store/useStorage';
 import * as pjs from '../../../package.json';
 import { Tabs } from '@/constants/Tabs';
-import { GithubTokenStorage } from '@/storage/GithubTokenStorage';
 import { userIdSelector } from '@/selectors/userIdSelector';
 import getLicenseKey from '@/utils/getLicenseKey';
 import { licenseKeySelector } from '@/selectors/licenseKeySelector';
@@ -21,15 +19,14 @@ import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { notifyToUI } from '@/plugin/notifiers';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import useConfirm from '../hooks/useConfirm';
+import { StorageTypeCredentials } from '@/types/StorageType';
+import { ldIdentificationPromise } from './LaunchDarkly';
 
-type Props = LDProps;
-
-function InitiatorContainer({ ldClient }: Props) {
+export function Initiator() {
   const dispatch = useDispatch<Dispatch>();
-  const { pullTokens } = useRemoteTokens();
+  const { pullTokens, fetchBranches } = useRemoteTokens();
   const { setStorageType } = useStorage();
   const { confirm } = useConfirm();
-
   const licenseKey = useSelector(licenseKeySelector);
   const checkedLocalStorage = useSelector(checkedLocalStorageForKeySelector);
   const userId = useSelector(userIdSelector);
@@ -45,10 +42,12 @@ function InitiatorContainer({ ldClient }: Props) {
   const onInitiate = useCallback(() => {
     AsyncMessageChannel.message({ type: AsyncMessageTypes.INITIATE });
   }, []);
-  const getApiCredentials = useCallback((shouldPull: boolean) => (
+
+  const getApiCredentials = useCallback((shouldPull: boolean, featureFlags: LDProps['flags'] | null) => (
     AsyncMessageChannel.message({
       type: AsyncMessageTypes.GET_API_CREDENTIALS,
       shouldPull,
+      featureFlags,
     })
   ), []);
 
@@ -95,16 +94,17 @@ function InitiatorContainer({ ldClient }: Props) {
             break;
           case MessageFromPluginTypes.TOKEN_VALUES: {
             const { values } = pluginMessage;
+            const receivedFlags = await ldIdentificationPromise;
             const existChanges = values.checkForChanges;
             const storageType = values.storageType?.provider;
             if (!existChanges || ((storageType && storageType !== StorageProviderType.LOCAL) && existChanges && await askUserIfPull(storageType))) {
-              getApiCredentials(true);
+              getApiCredentials(true, receivedFlags);
             } else {
               dispatch.tokenState.setTokenData(values);
               const existTokens = Object.values(values?.values ?? {}).some((value) => value.length > 0);
-
-              if (existTokens) getApiCredentials(false);
-              else dispatch.uiState.setActiveTab(Tabs.START);
+              if (existTokens) {
+                getApiCredentials(false, receivedFlags);
+              } else dispatch.uiState.setActiveTab(Tabs.START);
             }
             break;
           }
@@ -137,10 +137,10 @@ function InitiatorContainer({ ldClient }: Props) {
             break;
           case MessageFromPluginTypes.API_CREDENTIALS: {
             const {
-              status, credentials, usedTokenSet, shouldPull,
+              status, credentials, usedTokenSet, shouldPull, featureFlags,
             } = pluginMessage;
             if (status === true) {
-              let receivedFlags: LDProps['flags'];
+              const receivedFlags: LDProps['flags'] = featureFlags;
               try {
                 track('Fetched from remote', { provider: credentials.provider });
                 if (!credentials.internalId) track('missingInternalId', { provider: credentials.provider });
@@ -151,20 +151,8 @@ function InitiatorContainer({ ldClient }: Props) {
                     || credentials.provider === StorageProviderType.GITLAB
                     || credentials.provider === StorageProviderType.ADO
                   ) {
-                    const {
-                      id, provider, secret, baseUrl,
-                    } = credentials;
-                    const [owner, repo] = id.split('/');
-
-                    const storageClientFactories = {
-                      [StorageProviderType.GITHUB]: GithubTokenStorage,
-                      [StorageProviderType.GITLAB]: GithubTokenStorage,
-                      [StorageProviderType.ADO]: GithubTokenStorage,
-                    };
-
-                    const storageClient = new storageClientFactories[provider](secret, owner, repo, baseUrl);
-                    const branches = await storageClient.fetchBranches();
-                    dispatch.branchState.setBranches(branches);
+                    const branches = await fetchBranches(credentials as StorageTypeCredentials);
+                    if (branches) dispatch.branchState.setBranches(branches);
                   }
 
                   dispatch.uiState.setApiData(credentials);
@@ -255,7 +243,7 @@ function InitiatorContainer({ ldClient }: Props) {
         }
       }
     };
-  }, [ldClient]);
+  }, []);
 
   useEffect(() => {
     async function getLicense() {
@@ -271,5 +259,3 @@ function InitiatorContainer({ ldClient }: Props) {
 
   return null;
 }
-
-export const Initiator = withLDConsumer()(InitiatorContainer);
