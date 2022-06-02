@@ -1,7 +1,5 @@
 import { useCallback, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import Case from 'case';
-import { withLDConsumer } from 'launchdarkly-react-client-sdk';
 import type { LDProps } from 'launchdarkly-react-client-sdk/lib/withLDConsumer';
 import { identify, track } from '@/utils/analytics';
 import { MessageFromPluginTypes, PostToUIMessage } from '@/types/messages';
@@ -10,26 +8,23 @@ import { Dispatch } from '../store';
 import useStorage from '../store/useStorage';
 import * as pjs from '../../../package.json';
 import { Tabs } from '@/constants/Tabs';
-import { GithubTokenStorage } from '@/storage/GithubTokenStorage';
 import { userIdSelector } from '@/selectors/userIdSelector';
 import getLicenseKey from '@/utils/getLicenseKey';
 import { licenseKeySelector } from '@/selectors/licenseKeySelector';
 import { checkedLocalStorageForKeySelector } from '@/selectors/checkedLocalStorageForKeySelector';
-import { AddLicenseSource, Entitlements } from '../store/models/userState';
+import { AddLicenseSource } from '../store/models/userState';
 import { LicenseStatus } from '@/constants/LicenseStatus';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { notifyToUI } from '@/plugin/notifiers';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import useConfirm from '../hooks/useConfirm';
-import validateLicense from '@/utils/validateLicense';
-import { UserData } from '@/types/userData';
+import { StorageTypeCredentials } from '@/types/StorageType';
+import { ldIdentificationPromise } from './LaunchDarkly';
 
-type Props = LDProps;
-
-function InitiatorContainer({ ldClient }: Props) {
+export function Initiator() {
   const dispatch = useDispatch<Dispatch>();
-  const { pullTokens } = useRemoteTokens();
+  const { pullTokens, fetchBranches } = useRemoteTokens();
   const { setStorageType } = useStorage();
   const { confirm } = useConfirm();
   const licenseKey = useSelector(licenseKeySelector);
@@ -55,33 +50,6 @@ function InitiatorContainer({ ldClient }: Props) {
       featureFlags,
     })
   ), []);
-
-  const getFeatureFlags = useCallback(async (userData: UserData) => {
-    if (userData.licenseKey && userData.userId && ldClient) {
-      const {
-        plan, email: clientEmail, entitlements,
-      } = await validateLicense(userData.licenseKey, userData.userId);
-      const userAttributes: Record<string, string | boolean> = {
-        plan: plan || '',
-        email: clientEmail || '',
-        os: !entitlements?.includes(Entitlements.PRO),
-      };
-      entitlements?.forEach((entitlement) => {
-        userAttributes[entitlement] = true;
-      });
-      const rawFlags = await ldClient.identify({
-        key: userData.userId!,
-        custom: userAttributes,
-      });
-      const normalizedFlags = Object.fromEntries(
-        Object.entries(rawFlags).map(([key, value]) => (
-          [Case.camel(key), value]
-        )),
-      );
-      return normalizedFlags;
-    }
-    return null;
-  }, [ldClient]);
 
   useEffect(() => {
     onInitiate();
@@ -125,19 +93,17 @@ function InitiatorContainer({ ldClient }: Props) {
           case MessageFromPluginTypes.REMOTE_COMPONENTS:
             break;
           case MessageFromPluginTypes.TOKEN_VALUES: {
-            const { values, userData } = pluginMessage;
-            let featureFlags: LDProps['flags'] | null;
+            const { values } = pluginMessage;
+            const receivedFlags = await ldIdentificationPromise;
             const existChanges = values.checkForChanges;
             const storageType = values.storageType?.provider;
             if (!existChanges || ((storageType && storageType !== StorageProviderType.LOCAL) && existChanges && await askUserIfPull(storageType))) {
-              featureFlags = await getFeatureFlags(userData);
-              getApiCredentials(true, featureFlags);
+              getApiCredentials(true, receivedFlags);
             } else {
               dispatch.tokenState.setTokenData(values);
               const existTokens = Object.values(values?.values ?? {}).some((value) => value.length > 0);
               if (existTokens) {
-                featureFlags = await getFeatureFlags(userData);
-                getApiCredentials(false, featureFlags);
+                getApiCredentials(false, receivedFlags);
               } else dispatch.uiState.setActiveTab(Tabs.START);
             }
             break;
@@ -185,20 +151,8 @@ function InitiatorContainer({ ldClient }: Props) {
                     || credentials.provider === StorageProviderType.GITLAB
                     || credentials.provider === StorageProviderType.ADO
                   ) {
-                    const {
-                      id, provider, secret, baseUrl,
-                    } = credentials;
-                    const [owner, repo] = id.split('/');
-
-                    const storageClientFactories = {
-                      [StorageProviderType.GITHUB]: GithubTokenStorage,
-                      [StorageProviderType.GITLAB]: GithubTokenStorage,
-                      [StorageProviderType.ADO]: GithubTokenStorage,
-                    };
-
-                    const storageClient = new storageClientFactories[provider](secret, owner, repo, baseUrl);
-                    const branches = await storageClient.fetchBranches();
-                    dispatch.branchState.setBranches(branches);
+                    const branches = await fetchBranches(credentials as StorageTypeCredentials);
+                    if (branches) dispatch.branchState.setBranches(branches);
                   }
 
                   dispatch.uiState.setApiData(credentials);
@@ -289,7 +243,7 @@ function InitiatorContainer({ ldClient }: Props) {
         }
       }
     };
-  }, [ldClient]);
+  }, []);
 
   useEffect(() => {
     async function getLicense() {
@@ -305,5 +259,3 @@ function InitiatorContainer({ ldClient }: Props) {
 
   return null;
 }
-
-export const Initiator = withLDConsumer()(InitiatorContainer);

@@ -142,7 +142,6 @@ export function useGitLab() {
       }
 
       const content = await storage.retrieve();
-
       if (content) {
         if (
           !isEqual(content.tokens, tokens)
