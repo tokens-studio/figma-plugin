@@ -57,10 +57,10 @@ describe('TokenTooltip', () => {
         type: 'dropShadow',
       },
       type: TokenTypes.BOX_SHADOW,
-      name: 'typodgraphy.headlines.small',
+      name: 'typography.headlines.small',
     };
     const { getByText } = render(<TokenTooltipContent token={token} />);
-    expect(getByText('dropShadow') || getByText('innerShadow')).toBeInTheDocument();
+    expect(getByText('dropShadow')).toBeInTheDocument();
   });
 
   it('display FontFamily TokenTooltip', () => {
