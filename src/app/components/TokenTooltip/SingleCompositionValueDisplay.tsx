@@ -22,7 +22,7 @@ const StyledItemName = styled('div', {
 });
 
 export const SingleCompositionValueDisplay: React.FC<Props> = ({ property, value }) => {
-  const resolveValue = React.useCallback((value: SingleToken['value'] | number) => {
+  const resolveValue = React.useMemo(() => {
     let returnValue: string = '';
     if (Array.isArray(value)) {
       returnValue = value.reduce<string>((totalAcc, item) => {
@@ -41,12 +41,12 @@ export const SingleCompositionValueDisplay: React.FC<Props> = ({ property, value
       returnValue = value;
     }
     return returnValue;
-  }, []);
+  }, [value]);
 
   return (
     <Box css={{ color: '$fgToolTipMuted', display: 'flex', gap: '$2' }}>
       <StyledItemName>{`${property} : `}</StyledItemName>
-      <StyledItemValue>{resolveValue(value)}</StyledItemValue>
+      <StyledItemValue>{resolveValue}</StyledItemValue>
     </Box>
   );
 };
