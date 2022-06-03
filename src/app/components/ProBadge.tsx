@@ -1,26 +1,31 @@
 import React from 'react';
+import { useSelector } from 'react-redux';
 import { styled } from '@/stitches.config';
+import { licenseKeySelector } from '@/selectors/licenseKeySelector';
 
 const StyledBadge = styled('a', {
   display: 'inline-flex',
   alignItems: 'center',
   justifyContent: 'center',
-  fontSize: '$xsmall',
-  padding: '$2 $3',
+  fontSize: '$xxsmall',
+  padding: '$2',
   borderRadius: '$badge',
-  backgroundColor: '$bgPro',
-  color: '$fgPro',
+  backgroundColor: '$bgProSubtle',
+  lineHeight: 1,
+  color: '$fgDefault',
   fontWeight: '$bold',
   textTransform: 'uppercase',
+  border: '1px solid transparent',
 
   '&:hover, &:focus': {
-    backgroundColor: '$bgProHover',
-    color: '$fgPro',
+    borderColor: '$borderPro',
   },
 });
 
 export default function ProBadge() {
+  const existingKey = useSelector(licenseKeySelector);
+
   return (
-    <StyledBadge href="https://figmatokens.com" target="_blank">Get Pro</StyledBadge>
+    <StyledBadge href="https://figmatokens.com" target="_blank">{existingKey ? 'Pro' : 'Get Pro'}</StyledBadge>
   );
 }

@@ -39,6 +39,7 @@ export const stitchesInstance = createStitches({
       mono: 'JetBrainsMono, monospace',
     },
     fontSizes: {
+      xxsmall: '10px',
       xsmall: '11px',
       small: '12px',
     },
@@ -93,8 +94,8 @@ export const stitchesInstance = createStitches({
       fgDanger: 'var(--figma-color-text-danger)',
       bgDanger: 'var(--figma-color-bg-danger-tertiary)',
       fgPro: 'var(--figma-color-text-component)',
-      bgPro: 'var(--figma-color-bg-component-tertiary)',
-      bgProHover: 'var(--figma-color-bg-component-secondary)',
+      bgProSubtle: 'var(--figma-color-bg-component-tertiary)',
+      borderPro: 'var(--figma-color-bg-component)',
       spinnerInverse: '#ffffff',
     },
     space: {

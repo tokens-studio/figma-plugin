@@ -27,6 +27,7 @@ import Tooltip from './Tooltip';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { isGitProvider } from '@/utils/is';
 import IconLibrary from '@/icons/library.svg';
+import ProBadge from './ProBadge';
 
 export default function Footer() {
   const storageType = useSelector(storageTypeSelector);
@@ -115,7 +116,7 @@ export default function Footer() {
           {pjs.plugin_version}
         </Box>
         <Stack direction="row" gap={1}>
-          <IconButton href="https://figmatokens.com" icon={<DocsIcon />} tooltip="More info" />
+          <ProBadge />
           <IconButton href="https://docs.tokens.studio/?ref=pf" icon={<DocsIcon />} tooltip="Docs" />
           <IconButton href="https://github.com/six7/figma-tokens" icon={<FeedbackIcon />} tooltip="Feedback" />
         </Stack>
