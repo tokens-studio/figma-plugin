@@ -4,7 +4,6 @@ import Tooltip from './Tooltip';
 import { StyledDirtyStateBadge } from './StyledDirtyStateBadge';
 
 const commonStyles = {
-  display: 'inline-flex',
   all: 'unset',
   backgroundColor: 'red',
   border: 'none',
@@ -17,6 +16,7 @@ const commonStyles = {
   variants: {
     buttonVariant: {
       primary: {
+        display: 'block',
         backgroundColor: '$interaction',
         color: '$onInteraction',
         '&:hover, &:focus': {
@@ -24,6 +24,7 @@ const commonStyles = {
         },
       },
       default: {
+        display: 'block',
         backgroundColor: 'transparent',
         color: '$text',
         '&:hover, &:focus': {
