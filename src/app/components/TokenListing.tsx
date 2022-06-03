@@ -15,12 +15,15 @@ import IconButton from './IconButton';
 import ListIcon from '@/icons/list.svg';
 import GridIcon from '@/icons/grid.svg';
 import AddIcon from '@/icons/add.svg';
+import ProBadge from './ProBadge';
+import { useFlags } from './LaunchDarkly';
 
 type Props = {
   tokenKey: string
   label: string
   schema: TokenTypeSchema
   values: DeepKeyTokenMap
+  isPro?: boolean
 };
 
 const TokenListing: React.FC<Props> = ({
@@ -28,12 +31,14 @@ const TokenListing: React.FC<Props> = ({
   label,
   schema,
   values,
+  isPro,
 }) => {
   const editProhibited = useSelector(editProhibitedSelector);
   const displayType = useSelector(displayTypeSelector);
   const showEmptyGroups = useSelector(showEmptyGroupsSelector);
   const collapsed = useSelector(collapsedSelector);
   const dispatch = useDispatch<Dispatch>();
+  const { compositionTokens } = useFlags();
 
   const showDisplayToggle = React.useMemo(() => schema.type === TokenTypes.COLOR, [schema.type]);
 
@@ -101,6 +106,7 @@ const TokenListing: React.FC<Props> = ({
             </div>
           </Tooltip>
           <Heading size="small">{label}</Heading>
+          {isPro ? <ProBadge /> : null}
         </button>
         <div className="absolute right-0 flex mr-2">
           {showDisplayToggle && (
@@ -109,7 +115,8 @@ const TokenListing: React.FC<Props> = ({
 
           <IconButton
             dataCy="button-add-new-token"
-            disabled={editProhibited}
+            // TODO: Add proper logic to disable adding a token type depending on flags
+            disabled={editProhibited || (isPro && !compositionTokens)}
             icon={<AddIcon />}
             tooltip="Add a new token"
             onClick={handleShowNewForm}

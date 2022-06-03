@@ -27,6 +27,7 @@ import Tooltip from './Tooltip';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { isGitProvider } from '@/utils/is';
 import IconLibrary from '@/icons/library.svg';
+import ProBadge from './ProBadge';
 
 export default function Footer() {
   const storageType = useSelector(storageTypeSelector);
@@ -108,33 +109,17 @@ export default function Footer() {
             </Stack>
           )}
       </Stack>
-      <Stack direction="row" gap={4}>
+      <Stack direction="row" gap={4} align="center">
         <Box css={{ color: '$textMuted', fontSize: '$xsmall' }}>
-          Version
+          V
           {' '}
           {pjs.plugin_version}
         </Box>
-
-        <Text size="xsmall">
-          <a href="https://docs.tokens.studio/?ref=pf" target="_blank" rel="noreferrer">
-            <Stack direction="row" gap={1}>
-              <Box as="span" css={{ color: '$textMuted' }}>
-                Docs
-              </Box>
-              <DocsIcon />
-            </Stack>
-          </a>
-        </Text>
-        <Text size="xsmall">
-          <a href="https://github.com/six7/figma-tokens" target="_blank" rel="noreferrer">
-            <Stack direction="row" gap={1}>
-              <Box as="span" css={{ color: '$textMuted' }}>
-                Feedback
-              </Box>
-              <FeedbackIcon />
-            </Stack>
-          </a>
-        </Text>
+        <Stack direction="row" gap={1}>
+          <ProBadge />
+          <IconButton href="https://docs.tokens.studio/?ref=pf" icon={<DocsIcon />} tooltip="Docs" />
+          <IconButton href="https://github.com/six7/figma-tokens" icon={<FeedbackIcon />} tooltip="Feedback" />
+        </Stack>
       </Stack>
     </Box>
   );
