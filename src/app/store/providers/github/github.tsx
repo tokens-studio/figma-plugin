@@ -36,7 +36,7 @@ export function useGitHub() {
     const storageClient = new GithubTokenStorage(context.secret, owner ?? splitContextId[0], repo ?? splitContextId[1], context.baseUrl ?? '');
     if (context.filePath) storageClient.changePath(context.filePath);
     if (context.branch) storageClient.selectBranch(context.branch);
-    if (multiFileSync) storageClient.enableMultiFile();
+    if (multiFileSync || true) storageClient.enableMultiFile();
     return storageClient;
   }, [multiFileSync]);
 
@@ -114,7 +114,7 @@ export function useGitHub() {
 
   const pullTokensFromGitHub = useCallback(async (context: GithubCredentials, receivedFeatureFlags?: LDProps['flags']) => {
     const storage = storageClientFactory(context);
-    if (receivedFeatureFlags?.multiFileSync) storage.enableMultiFile();
+    if (receivedFeatureFlags?.multiFileSync || true) storage.enableMultiFile();
 
     const [owner, repo] = context.id.split('/');
 
