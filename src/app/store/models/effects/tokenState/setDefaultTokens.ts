@@ -5,6 +5,7 @@ import type { RootModel } from '@/types/RootModel';
 import type { TokenStore } from '@/types/tokens';
 import parseTokenValues from '@/utils/parseTokenValues';
 import { SetTokenDataPayload } from '@/types/payloads';
+import { TokenSetStatus } from '@/constants/TokenSetStatus';
 
 const defaultTokens: TokenStore = {
   version: pjs.plugin_version,
@@ -21,6 +22,7 @@ export function setDefaultTokens(dispatch: RematchDispatch<RootModel>) {
       values: defaultTokens.values,
       themes: defaultTokens.themes,
       activeTheme: defaultTokens.activeTheme,
+      usedTokenSet: { global: TokenSetStatus.SOURCE, light: TokenSetStatus.ENABLED, theme: TokenSetStatus.ENABLED },
     });
   };
 }
