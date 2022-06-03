@@ -24,11 +24,13 @@ const StyledDropdown = styled('div', {
 });
 
 const StyledItemValue = styled('div', {
-  flexShrink: 0,
   color: '$textMuted',
   fontWeight: '$bold',
   textAlign: 'right',
   textTransform: 'uppercase',
+  maxWidth: '300px',
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
 });
 
 const StyledItem = styled('div', {
