@@ -8,18 +8,19 @@ const StyledBadge = styled('a', {
   fontSize: '$xsmall',
   padding: '$2 $3',
   borderRadius: '$badge',
-  backgroundColor: '$bgAccent',
-  color: '$onInteraction',
+  backgroundColor: '$bgPro',
+  color: '$fgPro',
   fontWeight: '$bold',
+  textTransform: 'uppercase',
 
   '&:hover, &:focus': {
-    backgroundColor: '$bgAccentHover',
-    color: '$onInteraction',
+    backgroundColor: '$bgProHover',
+    color: '$fgPro',
   },
 });
 
 export default function ProBadge() {
   return (
-    <StyledBadge href="https://figmatokens.com" target="_blank">Pro</StyledBadge>
+    <StyledBadge href="https://figmatokens.com" target="_blank">Get Pro</StyledBadge>
   );
 }

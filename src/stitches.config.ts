@@ -92,6 +92,9 @@ export const stitchesInstance = createStitches({
       bgSuccess: 'var(--figma-color-bg-success-tertiary)',
       fgDanger: 'var(--figma-color-text-danger)',
       bgDanger: 'var(--figma-color-bg-danger-tertiary)',
+      fgPro: 'var(--figma-color-text-component)',
+      bgPro: 'var(--figma-color-bg-component-tertiary)',
+      bgProHover: 'var(--figma-color-bg-component-secondary)',
       spinnerInverse: '#ffffff',
     },
     space: {
