@@ -115,7 +115,7 @@ const TokenListing: React.FC<Props> = ({
 
           <IconButton
             dataCy="button-add-new-token"
-            {/* TODO: Add proper logic to disable adding a token type depending on flags */}
+            // TODO: Add proper logic to disable adding a token type depending on flags
             disabled={editProhibited || (isPro && !compositionTokens)}
             icon={<AddIcon />}
             tooltip="Add a new token"
