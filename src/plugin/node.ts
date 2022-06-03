@@ -206,7 +206,6 @@ export async function updateNodes(
     type: MessageFromPluginTypes.COMPLETE_JOB,
     name: BackgroundJobs.PLUGIN_UPDATENODES,
   });
-
   if (returnedValues.size) {
     return returnedValues.entries().next();
   }

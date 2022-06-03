@@ -40,9 +40,12 @@ export const initiate: AsyncMessageChannelHandlers[AsyncMessageTypes.INITIATE] =
     if (apiProviders) notifyAPIProviders(apiProviders);
     const oldTokens = await getTokenData();
     if (oldTokens) {
-      notifyTokenValues({
-        ...oldTokens, activeTheme, usedTokenSet, storageType,
-      });
+      notifyTokenValues(
+        {
+          ...oldTokens, activeTheme, usedTokenSet, storageType,
+        },
+        { userId: currentUser?.id, licenseKey },
+      );
     } else {
       notifyNoTokenValues();
     }
