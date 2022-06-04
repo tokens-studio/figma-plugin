@@ -8,3 +8,4 @@ export * from './UsedTokenSetsMap';
 export * from './StitchesCSS';
 export * from './UpdateRemoteFunction';
 export * from './ThemeObjectsList';
+export * from './DeepTokensMap';
