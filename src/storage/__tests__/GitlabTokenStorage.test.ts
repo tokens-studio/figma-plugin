@@ -3,14 +3,14 @@ import { GitlabTokenStorage } from '../GitlabTokenStorage';
 
 const mockGetUserName = jest.fn();
 const mockGetProjects = jest.fn();
-const mockGetGroupsProjects = jest.fn();
-const mockBranchesAll = jest.fn();
-const mockBranchesCreate = jest.fn();
-const mockGroupMembersShow = jest.fn();
+const mockGetProjectsInGroups = jest.fn();
+const mockGetBranches = jest.fn();
+const mockCreateBranch = jest.fn();
+const mockGetGroupMembers = jest.fn();
 const mockGetCurrentUser = jest.fn();
-const mockProjectMembersShow = jest.fn();
-const mockRepositoriesTree = jest.fn();
-const mockRepositoriesFiles = jest.fn();
+const mockGetProjectMembers = jest.fn();
+const mockGetRepositories = jest.fn();
+const mockGetRepositoryFiles = jest.fn();
 const mockCreateCommits = jest.fn();
 
 jest.mock('@gitbeaker/browser', () => ({
@@ -21,23 +21,23 @@ jest.mock('@gitbeaker/browser', () => ({
       current: mockGetCurrentUser,
     },
     Groups: {
-      projects: mockGetGroupsProjects,
+      projects: mockGetProjectsInGroups,
     },
     Branches: {
-      all: mockBranchesAll,
-      create: mockBranchesCreate,
+      all: mockGetBranches,
+      create: mockCreateBranch,
     },
     GroupMembers: {
-      show: mockGroupMembersShow,
+      show: mockGetGroupMembers,
     },
     ProjectMembers: {
-      show: mockProjectMembersShow,
+      show: mockGetProjectMembers,
     },
     Repositories: {
-      tree: mockRepositoriesTree,
+      tree: mockGetRepositories,
     },
     RepositoryFiles: {
-      showRaw: mockRepositoriesFiles,
+      showRaw: mockGetRepositoryFiles,
     },
     Commits: {
       create: mockCreateCommits,
@@ -54,14 +54,39 @@ describe('GitlabTokenStorage', () => {
     storageProvider.disableMultiFile();
   });
 
-  it('should assign projectId by groups', async () => {
+  it('should assign projectId by projects in group', async () => {
     mockGetUserName.mockImplementationOnce(() => (
-      Promise.resolve({
-        data: [],
-      })
+      Promise.resolve([])
     ));
 
-    mockGetGroupsProjects.mockImplementationOnce(() => (
+    mockGetProjectsInGroups.mockImplementationOnce(() => (
+      Promise.resolve(
+        [{
+          name: 'figma-tokens',
+          id: 35102363,
+          path: 'figma-tokens',
+          namespace: {
+            full_path: 'six7',
+            id: 51634506,
+          },
+        }],
+      )
+    ));
+
+    expect(
+      await storageProvider.assignProjectId(),
+    ).toHaveProperty('projectId', 35102363);
+    expect(
+      await storageProvider.assignProjectId(),
+    ).toHaveProperty('groupId', 51634506);
+  });
+
+  it('should assign projectId by projects in user', async () => {
+    mockGetUserName.mockImplementationOnce(() => (
+      Promise.resolve(['six7'])
+    ));
+
+    mockGetProjects.mockImplementationOnce(() => (
       Promise.resolve(
         [{
           name: 'figma-tokens',
@@ -84,7 +109,7 @@ describe('GitlabTokenStorage', () => {
   });
 
   it('should fetch branches as a simple list', async () => {
-    mockBranchesAll.mockImplementationOnce(() => (
+    mockGetBranches.mockImplementationOnce(() => (
       Promise.resolve(
         [
           { name: 'main' },
@@ -101,13 +126,22 @@ describe('GitlabTokenStorage', () => {
   });
 
   it('should try to create a branch', async () => {
-    mockBranchesCreate.mockImplementationOnce(() => (
+    mockCreateBranch.mockImplementationOnce(() => (
       Promise.resolve({
         name: 'development',
       })
     ));
     expect(await storageProvider.createBranch('development', 'main')).toBe(true);
-    expect(mockBranchesCreate).toBeCalledWith(35102363, 'development', 'heads/main');
+    expect(mockCreateBranch).toBeCalledWith(35102363, 'development', 'heads/main');
+  });
+
+  it('create a branch should return false when it is failed', async () => {
+    mockCreateBranch.mockImplementationOnce(() => (
+      Promise.resolve({
+      })
+    ));
+    expect(await storageProvider.createBranch('development', 'main')).toBe(false);
+    expect(mockCreateBranch).toBeCalledWith(35102363, 'development', 'heads/main');
   });
 
   it('canWrite should return true if use is a collaborator by GroupMember', async () => {
@@ -117,13 +151,13 @@ describe('GitlabTokenStorage', () => {
         state: 'active',
       })
     ));
-    mockGroupMembersShow.mockImplementationOnce(() => (
+    mockGetGroupMembers.mockImplementationOnce(() => (
       Promise.resolve({
         access_level: 50,
       })
     ));
     expect(await storageProvider.canWrite()).toBe(true);
-    expect(mockGroupMembersShow).toBeCalledWith(51634506, 11289475);
+    expect(mockGetGroupMembers).toBeCalledWith(51634506, 11289475);
   });
 
   it('canWrite should return true if user is a collaborator by projectMember', async () => {
@@ -133,16 +167,16 @@ describe('GitlabTokenStorage', () => {
         state: 'active',
       })
     ));
-    mockGroupMembersShow.mockImplementationOnce(() => (
+    mockGetGroupMembers.mockImplementationOnce(() => (
       Promise.reject(new Error())
     ));
-    mockProjectMembersShow.mockImplementationOnce(() => (
+    mockGetProjectMembers.mockImplementationOnce(() => (
       Promise.resolve({
         access_level: 50,
       })
     ));
     expect(await storageProvider.canWrite()).toBe(true);
-    expect(mockProjectMembersShow).toBeCalledWith(35102363, 11289475);
+    expect(mockGetProjectMembers).toBeCalledWith(35102363, 11289475);
   });
 
   it('canWrite should return false if user is not a collaborator', async () => {
@@ -152,7 +186,7 @@ describe('GitlabTokenStorage', () => {
         state: 'active',
       })
     ));
-    mockGroupMembersShow.mockImplementationOnce(() => (
+    mockGetGroupMembers.mockImplementationOnce(() => (
       Promise.resolve({
         access_level: 20,
       })
@@ -160,67 +194,66 @@ describe('GitlabTokenStorage', () => {
     expect(await storageProvider.canWrite()).toBe(false);
   });
 
-  // it('can read from Git in single file format', async () => {
+  it('can read from Git in single file format', async () => {
+    mockGetRepositories.mockImplementationOnce(() => (
+      Promise.resolve([])
+    ));
 
-  //   mockRepositoriesTree.mockImplementationOnce(() => (
-  //     Promise.resolve([])
-  //   ));
+    storageProvider.changePath('data/global.json');
+    mockGetRepositoryFiles.mockImplementationOnce(() => (
+      Promise.resolve(JSON.stringify({
+        global: {
+          red: {
+            value: '#ff0000',
+            type: 'color',
+          },
+          black: {
+            value: '#000000',
+            type: 'color',
+          },
+        },
+        $themes: {
+          id: 'light',
+          name: 'Light',
+          selectedTokenSets: {
+            global: 'enabled',
+          },
+        },
+      }))
+    ));
+    expect(await storageProvider.read()).toEqual([
+      {
+        data: {
+          id: 'light',
+          name: 'Light',
+          selectedTokenSets: {
+            global: 'enabled',
+          },
 
-  //   storageProvider.changePath('data/global.json');
-  //   mockRepositoriesFiles.mockImplementationOnce(() => (
-  //     Promise.resolve(JSON.stringify({
-  //       "global": {
-  //         "red": {
-  //           "value": "#ff0000",
-  //           "type": "color"
-  //         },
-  //         "black": {
-  //           "value": "#000000",
-  //           "type": "color"
-  //         }
-  //       },
-  //       "$themes": {
-  //         id: 'light',
-  //         name: 'Light',
-  //         selectedTokenSets: {
-  //           global: 'enabled',
-  //         },
-  //       }
-  //     }))
-  //   ))
-  //   expect(await storageProvider.read()).toEqual([
-  //     {
-  //       data: {
-  //         id: 'light',
-  //         name: 'Light',
-  //         selectedTokenSets: {
-  //           global: 'enabled',
-  //         },
-
-  //       },
-  //       path: "data/global.json/$themes.json",
-  //       type: "themes",
-  //     },
-  //     {
-  //       name: "global",
-  //       path: "data/global.json/global.json",
-  //       type: "tokenSet",
-  //       data: {
-  //         'red': {
-  //           value: '#ff0000', type: 'color'
-  //         },
-  //         'black': { value: '#000000', type: 'color' }
-  //       },
-  //     },
-  //   ]);
-  //   expect(mockRepositoriesFiles).toBeCalledWith(35102363, 'data/global.json', { ref: 'main' });
-  // });
+        },
+        path: 'data/global.json/$themes.json',
+        type: 'themes',
+      },
+      {
+        name: 'global',
+        path: 'data/global.json/global.json',
+        type: 'tokenSet',
+        data: {
+          red: {
+            value: '#ff0000', type: 'color',
+          },
+          black: { value: '#000000', type: 'color' },
+        },
+      },
+    ]);
+    expect(mockGetRepositoryFiles).toBeCalledWith(35102363, 'data/global.json', { ref: 'main' });
+  });
 
   it('can read from Git in a multifile format', async () => {
     storageProvider.enableMultiFile();
     storageProvider.changePath('data');
 
-    mockRepositoriesTree.mockImplementationOnce(() => (
+    mockGetRepositories.mockImplementationOnce(() => (
       Promise.resolve([
         {
           id: 'b2ce0083a14576540b8eed3de53bc6d7a43e00e6',
@@ -239,7 +272,7 @@ describe('GitlabTokenStorage', () => {
       ])
     ));
 
-    mockRepositoriesFiles.mockImplementationOnce(() => Promise.resolve(JSON.stringify({
+    mockGetRepositoryFiles.mockImplementationOnce(() => Promise.resolve(JSON.stringify({
       id: 'light',
       name: 'Light',
       selectedTokenSets: {
@@ -247,7 +280,7 @@ describe('GitlabTokenStorage', () => {
       },
     })));
 
-    mockRepositoriesFiles.mockImplementationOnce(() => Promise.resolve(JSON.stringify({
+    mockGetRepositoryFiles.mockImplementationOnce(() => Promise.resolve(JSON.stringify({
       red: {
         value: '#ff0000',
         type: 'color',
@@ -286,15 +319,14 @@ describe('GitlabTokenStorage', () => {
   });
 
   it('should return an empty array when reading results in an error', async () => {
-    mockRepositoriesTree.mockImplementationOnce(() => (
+    mockGetRepositories.mockImplementationOnce(() => (
       Promise.reject(new Error())
     ));
     expect(await storageProvider.read()).toEqual([]);
   });
 
   it('should be able to write', async () => {
-    storageProvider.selectBranch('main');
-    mockBranchesAll.mockImplementation(() => (
+    mockGetBranches.mockImplementation(() => (
       Promise.resolve(
         [
           { name: 'main' },
@@ -304,7 +336,7 @@ describe('GitlabTokenStorage', () => {
     ));
     storageProvider.changePath('data/global.json');
 
-    mockRepositoriesTree.mockImplementationOnce(() => (
+    mockGetRepositories.mockImplementationOnce(() => (
       Promise.resolve([])
     ));
 
@@ -372,9 +404,8 @@ describe('GitlabTokenStorage', () => {
   });
 
   it('should be able to write a multifile structure', async () => {
-    storageProvider.selectBranch('main');
     storageProvider.enableMultiFile();
-    mockBranchesAll.mockImplementation(() => (
+    mockGetBranches.mockImplementation(() => (
       Promise.resolve(
         [
           { name: 'main' },
@@ -384,7 +415,7 @@ describe('GitlabTokenStorage', () => {
     ));
     storageProvider.changePath('data');
 
-    mockRepositoriesTree.mockImplementationOnce(() => (
+    mockGetRepositories.mockImplementationOnce(() => (
       Promise.resolve([])
     ));
 
