@@ -43,6 +43,8 @@ export const LDIdentifier = () => {
           );
           ldIdentificationResolver(normalizedFlags);
         });
+    } else {
+      ldIdentificationResolver({});
     }
   }, [userId, ldClient, licenseKey, plan, clientEmail, entitlements]);
 
