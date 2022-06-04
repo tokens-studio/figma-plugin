@@ -10,5 +10,5 @@ interface ComplexSingleFileFormat {
 }
 
 export const complexSingleFileSchema: z.ZodType<ComplexSingleFileFormat> = z.lazy(() => (
-  (z.record(z.record(tokensMapSchema).or(z.array(themeObjectSchema).optional())) as z.ZodType<ComplexSingleFileFormat>)
+  (z.record(tokensMapSchema.or(z.array(themeObjectSchema))) as z.ZodType<ComplexSingleFileFormat>)
 ));

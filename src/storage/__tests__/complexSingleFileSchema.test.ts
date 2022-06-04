@@ -13,6 +13,13 @@ describe('complexSingleFileSchema', () => {
           },
         },
       },
+      mobile: {
+        iphone: {
+          value: {
+          },
+          type: 'typography',
+        },
+      },
     });
     expect(validationResult.success).toBe(true);
   });
