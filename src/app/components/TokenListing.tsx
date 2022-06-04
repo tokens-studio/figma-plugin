@@ -38,7 +38,7 @@ const TokenListing: React.FC<Props> = ({
   const showEmptyGroups = useSelector(showEmptyGroupsSelector);
   const collapsed = useSelector(collapsedSelector);
   const dispatch = useDispatch<Dispatch>();
-  const { compositionTokens } = useFlags();
+  const { gitBranchSelector } = useFlags();
 
   const showDisplayToggle = React.useMemo(() => schema.type === TokenTypes.COLOR, [schema.type]);
 
@@ -116,7 +116,7 @@ const TokenListing: React.FC<Props> = ({
           <IconButton
             dataCy="button-add-new-token"
             // TODO: Add proper logic to disable adding a token type depending on flags
-            disabled={editProhibited || (isPro && !compositionTokens)}
+            disabled={editProhibited || (isPro && !gitBranchSelector)}
             icon={<AddIcon />}
             tooltip="Add a new token"
             onClick={handleShowNewForm}
