@@ -1,11 +1,16 @@
 import { checkIfContainsAlias } from '../checkIfContainsAlias';
 
-const tokenWithAlias = '{size.6}';
+const tokenAliasValue = [
+  '{size.6}',
+  '$color.#450987',
+];
 const tokenWithOutAlias = '2';
 
 describe('contain alias test', () => {
   it('ifContainAlias', () => {
-    expect(checkIfContainsAlias(tokenWithAlias)).toBe(true);
+    tokenAliasValue.forEach((tokenValue) => {
+      expect(checkIfContainsAlias(tokenValue)).toBe(true);
+    });
   });
   it('ifContain no Alias', () => {
     expect(checkIfContainsAlias(tokenWithOutAlias)).toBe(false);
