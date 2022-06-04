@@ -65,7 +65,7 @@ export abstract class GitTokenStorage extends RemoteTokenStorage<GitStorageMetad
     this.flags.multiFileEnabled = false;
     return this;
   }
-  
+
   public abstract fetchBranches(): Promise<string[]>;
   public abstract createBranch(branch: string, source?: string): Promise<boolean>;
   public abstract canWrite(): Promise<boolean>;
@@ -77,6 +77,7 @@ export abstract class GitTokenStorage extends RemoteTokenStorage<GitStorageMetad
   ): Promise<boolean>;
 
   public async write(files: RemoteTokenStorageFile<GitStorageMetadata>[]): Promise<boolean> {
+    console.log('files', files);
     const branches = await this.fetchBranches();
     if (!branches) return false;
 
@@ -104,6 +105,7 @@ export abstract class GitTokenStorage extends RemoteTokenStorage<GitStorageMetad
       });
     }
 
+    console.log('fileschangeset', filesChangeset);
     return this.writeChangeset(
       filesChangeset,
       metadataFile?.data.commitMessage ?? 'Commit from Figma',

@@ -41,7 +41,6 @@ export class GitlabTokenStorage extends GitTokenStorage {
 
   public async assignProjectId() {
     const users = await this.gitlabClient.Users.username(this.owner);
-
     if (Array.isArray(users) && users.length > 0) {
       const projectsInPerson = await this.gitlabClient.Users.projects(users[0].id);
       const project = projectsInPerson.filter((p) => p.path === this.repository)[0];
@@ -91,12 +90,10 @@ export class GitlabTokenStorage extends GitTokenStorage {
     if (!this.groupId || !this.projectId) throw new Error('Missing Project or Group ID');
 
     const currentUser = await this.gitlabClient.Users.current();
-    console.log("current", currentUser)
     try {
       if (!currentUser || currentUser.state !== 'active') return false;
 
       const groupPermission = await this.gitlabClient.GroupMembers.show(this.groupId, currentUser.id);
-      console.log("permisionleve", groupPermission)
       return groupPermission.access_level >= GitLabAccessLevel.Developer;
     } catch (e) {
       try {
@@ -118,7 +115,6 @@ export class GitlabTokenStorage extends GitTokenStorage {
         path: this.path,
         ref: this.branch,
       });
-      console.log("tre", trees)
       if (trees.length > 0 && this.flags.multiFileEnabled) {
         const jsonFiles = trees.filter((file) => (
           file.path.endsWith('.json')
@@ -129,7 +125,6 @@ export class GitlabTokenStorage extends GitTokenStorage {
         const jsonFileContents = await Promise.all(jsonFiles.map((treeItem) => (
           this.gitlabClient.RepositoryFiles.showRaw(this.projectId!, treeItem.path, { ref: this.branch })
         )));
-        console.log("json", jsonFileContents)
 
         return compact(jsonFileContents.map<RemoteTokenStorageFile<GitStorageMetadata> | null>((fileContent, index) => {
           const { path } = jsonFiles[index];
@@ -157,10 +152,8 @@ export class GitlabTokenStorage extends GitTokenStorage {
         }));
       }
       const data = await this.gitlabClient.RepositoryFiles.showRaw(this.projectId, this.path, { ref: this.branch });
-      console.log("data", data)
       if (IsJSONString(data)) {
         const parsed = JSON.parse(data) as GitSingleFileObject;
-
         return [
           {
             type: 'themes',
@@ -211,7 +204,6 @@ export class GitlabTokenStorage extends GitTokenStorage {
         startBranch: branches[0],
       } : undefined,
     );
-
     return !!response;
   }
 }
