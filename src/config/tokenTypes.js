@@ -1,3 +1,5 @@
+import { object } from 'dot-object';
+
 const tokenTypes = {
   sizing: {
     label: 'Size',
@@ -188,6 +190,17 @@ const tokenTypes = {
       },
     },
     explainer: 'none | underline | line-through',
+  },
+  composition: {
+    label: 'Composition',
+    property: 'Composition',
+    type: 'composition',
+    schema: {
+      value: {},
+      options: {
+        description: '',
+      },
+    },
   },
   other: {
     label: 'Other',

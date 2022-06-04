@@ -1,9 +1,11 @@
 import omit from 'just-omit';
+import get from 'just-safe-get';
 import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 import { SharedPluginDataNamespaces } from '@/constants/SharedPluginDataNamespaces';
 import { Properties } from '@/constants/Properties';
 import { MessageFromPluginTypes } from '@/types/messages';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
+import { AnyTokenList } from '@/types/tokens';
 import store from './store';
 import { notifySelection, postToUI } from './notifiers';
 import removeValuesFromNode from './removeValuesFromNode';
@@ -12,11 +14,13 @@ import { tokensSharedDataHandler } from './SharedDataHandler';
 import { defaultWorker } from './Worker';
 import { ProgressTracker } from './ProgressTracker';
 import { SelectionGroup, SelectionValue } from '@/types';
+import { CompositionTokenProperty } from '@/types/CompositionTokenProperty';
+import { TokenTypes } from '@/constants/TokenTypes';
 
 // @TODO FIX TYPINGS! Missing or bad typings are very difficult for other developers to work in
 
-export function transformPluginDataToSelectionValues(pluginData): SelectionGroup {
-  const selectionValues = pluginData.reduce((acc, curr) => {
+export function transformPluginDataToSelectionValues(pluginData: NodeManagerNode[]): SelectionGroup[] {
+  const selectionValues = pluginData.reduce<SelectionGroup[]>((acc, curr) => {
     const { tokens, id, node: { name, type } } = curr;
 
     Object.entries(tokens).forEach(([key, value]) => {
@@ -25,7 +29,7 @@ export function transformPluginDataToSelectionValues(pluginData): SelectionGroup
       if (existing) {
         existing.nodes.push({ id, name, type });
       } else {
-        const category = Properties[key];
+        const category = get(Properties, key) as Properties | TokenTypes;
 
         acc.push({
           value, type: key, category, nodes: [{ id, name, type }],
@@ -44,25 +48,19 @@ export type SelectionContent = {
   selectedNodes: number
 };
 
-export async function sendPluginValues({ nodes, values, shouldSendSelectionValues }: { nodes: readonly BaseNode[], values?: NodeTokenRefMap, shouldSendSelectionValues: boolean }): Promise<SelectionContent> {
-  let pluginValues = values;
-  let mainNodeSelectionValues = [];
+export async function sendPluginValues({ nodes, shouldSendSelectionValues }: { nodes: readonly BaseNode[], shouldSendSelectionValues: boolean }): Promise<SelectionContent> {
+  let mainNodeSelectionValues: SelectionValue[] = [];
   let selectionValues;
-
-  if (!pluginValues) {
-    pluginValues = await defaultNodeManager.findNodesWithData({ nodes });
-  }
-
+  const pluginValues = await defaultNodeManager.findNodesWithData({ nodes });
   // TODO: Handle all selected nodes share the same properties
   // TODO: Handle many selected and mixed (for Tokens tab)
-  if (pluginValues?.length > 0) {
+  if (Array.isArray(pluginValues) && pluginValues?.length > 0) {
     if (shouldSendSelectionValues) selectionValues = transformPluginDataToSelectionValues(pluginValues);
     mainNodeSelectionValues = pluginValues.map((value) => value.tokens);
   }
-
   const selectedNodes = figma.currentPage.selection.length;
 
-  notifySelection({ selectionValues, mainNodeSelectionValues, selectedNodes });
+  notifySelection({ selectionValues: selectionValues ?? [], mainNodeSelectionValues, selectedNodes });
   return { selectionValues, mainNodeSelectionValues, selectedNodes };
 }
 
@@ -96,10 +94,9 @@ export async function removePluginData({ nodes, key, shouldRemoveValues = true }
 }
 
 export async function updatePluginData({
-  entries, values, shouldOverride = false, shouldRemove = true,
-}: { entries: readonly NodeManagerNode[], values: NodeTokenRefMap, shouldOverride?: boolean, shouldRemove?: boolean }) {
+  entries, values, shouldOverride = false, shouldRemove = true, tokensMap,
+}: { entries: readonly NodeManagerNode[], values: NodeTokenRefMap, shouldOverride?: boolean, shouldRemove?: boolean, tokensMap?: Map<string, AnyTokenList[number]> }) {
   const namespace = SharedPluginDataNamespaces.TOKENS;
-
   postToUI({
     type: MessageFromPluginTypes.START_JOB,
     job: {
@@ -115,20 +112,37 @@ export async function updatePluginData({
   entries.forEach(({ node, tokens }) => {
     promises.add(defaultWorker.schedule(async () => {
       const currentValuesOnNode = tokens ?? {};
-      const newValuesOnNode = { ...currentValuesOnNode, ...values };
-
+      let newValuesOnNode: NodeTokenRefMap = {};
+      if (values.composition === 'delete') newValuesOnNode = { ...values, ...currentValuesOnNode, composition: values.composition };
+      else newValuesOnNode = { ...currentValuesOnNode, ...values };
+      if (currentValuesOnNode.composition && values.composition) {
+        // when select another composition token, reset applied properties by current composition token
+        const resolvedToken = tokensMap?.get(currentValuesOnNode.composition);
+        let removeProperties: string[] = [];
+        if (resolvedToken && resolvedToken.rawValue) {
+          removeProperties = Object.keys(resolvedToken.rawValue).map((property) => (
+            property
+          ));
+        }
+        if (removeProperties && removeProperties.length > 0) {
+          await Promise.all(removeProperties.map(async (property) => {
+            await removePluginData({ nodes: [node], key: property as Properties, shouldRemoveValues: shouldRemove });
+          }));
+        }
+        shouldOverride = true;
+      }
       await Promise.all(Object.entries(newValuesOnNode).map(async ([key, value]) => {
-        if (value === currentValuesOnNode[key] && !shouldOverride) {
+        if (value === currentValuesOnNode[key as CompositionTokenProperty] && !shouldOverride) {
           return;
         }
 
         const jsonValue = JSON.stringify(value);
         switch (value) {
           case 'delete':
-            delete newValuesOnNode[key];
+            delete newValuesOnNode[key as CompositionTokenProperty];
             await removePluginData({ nodes: [node], key: key as Properties, shouldRemoveValues: shouldRemove });
             break;
-            // Pre-Version 53 had horizontalPadding and verticalPadding.
+          // Pre-Version 53 had horizontalPadding and verticalPadding.
           case 'horizontalPadding':
             newValuesOnNode.paddingLeft = jsonValue;
             newValuesOnNode.paddingRight = jsonValue;

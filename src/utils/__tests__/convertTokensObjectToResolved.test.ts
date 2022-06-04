@@ -305,38 +305,36 @@ describe('convertTokensObjectToResolved', () => {
               type: 'fontWeight',
             },
           },
-          typography: [
-            {
-              description: 'Should be resolved',
-              name: 'typography.h1',
-              type: 'typography',
-              value: {
-                fontFamily: 'Roboto',
-                fontSize: '{text.size.h1}',
-                fontWeight: '{text.fontWeight.light}',
-              },
+        },
+        typography: {
+          h1: {
+            description: 'Should be resolved',
+            name: 'typography.h1',
+            type: 'typography',
+            value: {
+              fontFamily: 'Roboto',
+              fontSize: '{text.size.h1}',
+              fontWeight: '{text.fontWeight.light}',
             },
-            {
-              description: 'Should be resolved',
-              name: 'typography.h2',
-              type: 'typography',
-              value: {
-                fontFamily: 'Roboto',
-                fontSize: '3.75 * {text.size.base}',
-                fontWeight: '7 * {text.fontWeight.base}',
-              },
+          },
+          h2: {
+            description: 'Should be resolved',
+            type: 'typography',
+            value: {
+              fontFamily: 'Roboto',
+              fontSize: '3.75 * {text.size.base}',
+              fontWeight: '7 * {text.fontWeight.base}',
             },
-            {
-              description: 'Should be resolved',
-              name: 'typography.h3',
-              type: 'typography',
-              value: {
-                fontFamily: 'Roboto',
-                fontSize: '3 * {text.size.base}',
-                fontWeight: '5 * 100',
-              },
+          },
+          h3: {
+            description: 'Should be resolved',
+            type: 'typography',
+            value: {
+              fontFamily: 'Roboto',
+              fontSize: '3 * {text.size.base}',
+              fontWeight: '5 * 100',
             },
-          ],
+          },
         },
       },
     };
@@ -456,38 +454,35 @@ describe('convertTokensObjectToResolved', () => {
               type: 'fontWeight',
             },
           },
-          typography: [
-            {
-              description: 'Should NOT be resolved',
-              name: 'typography.h1',
-              type: 'typography',
-              value: {
-                fontFamily: 'Roboto',
-                fontSize: '{text.size.h1}',
-                fontWeight: '{text.fontWeight.light}',
-              },
+        },
+        typography: {
+          h1: {
+            description: 'Should NOT be resolved',
+            type: 'typography',
+            value: {
+              fontFamily: 'Roboto',
+              fontSize: '{text.size.h1}',
+              fontWeight: '{text.fontWeight.light}',
             },
-            {
-              description: 'Should NOT be resolved',
-              name: 'typography.h2',
-              type: 'typography',
-              value: {
-                fontFamily: 'Roboto',
-                fontSize: '3.75 * {text.size.base}',
-                fontWeight: '7 * {text.fontWeight.base}',
-              },
+          },
+          h2: {
+            description: 'Should NOT be resolved',
+            type: 'typography',
+            value: {
+              fontFamily: 'Roboto',
+              fontSize: '3.75 * {text.size.base}',
+              fontWeight: '7 * {text.fontWeight.base}',
             },
-            {
-              description: 'Should NOT be resolved',
-              name: 'typography.h3',
-              type: 'typography',
-              value: {
-                fontFamily: 'Roboto',
-                fontSize: '3 * {text.size.base}',
-                fontWeight: '5 * 100',
-              },
+          },
+          h3: {
+            description: 'Should NOT be resolved',
+            type: 'typography',
+            value: {
+              fontFamily: 'Roboto',
+              fontSize: '3 * {text.size.base}',
+              fontWeight: '5 * 100',
             },
-          ],
+          },
         },
       },
     };
@@ -607,38 +602,35 @@ describe('convertTokensObjectToResolved', () => {
               type: 'fontWeight',
             },
           },
-          typography: [
-            {
-              description: 'Should NOT be resolved',
-              name: 'typography.h1',
-              type: 'typography',
-              value: {
-                fontFamily: 'Roboto',
-                fontSize: '{text.size.base}',
-                fontWeight: '{text.fontWeight.light}',
-              },
+        },
+        typography: {
+          h1: {
+            description: 'Should NOT be resolved',
+            type: 'typography',
+            value: {
+              fontFamily: 'Roboto',
+              fontSize: '{text.size.base}',
+              fontWeight: '{text.fontWeight.light}',
             },
-            {
-              description: 'Should be resolved',
-              name: 'typography.h2',
-              type: 'typography',
-              value: {
-                fontFamily: 'Roboto',
-                fontSize: '3.75 * {text.size.base}',
-                fontWeight: '7 * {text.fontWeight.base}',
-              },
+          },
+          h2: {
+            description: 'Should be resolved',
+            type: 'typography',
+            value: {
+              fontFamily: 'Roboto',
+              fontSize: '3.75 * {text.size.base}',
+              fontWeight: '7 * {text.fontWeight.base}',
             },
-            {
-              description: 'Should be resolved',
-              name: 'typography.h3',
-              type: 'typography',
-              value: {
-                fontFamily: 'Roboto',
-                fontSize: '3 * {text.size.base}',
-                fontWeight: '5 * 100',
-              },
+          },
+          h3: {
+            description: 'Should be resolved',
+            type: 'typography',
+            value: {
+              fontFamily: 'Roboto',
+              fontSize: '3 * {text.size.base}',
+              fontWeight: '5 * 100',
             },
-          ],
+          },
         },
       },
     };

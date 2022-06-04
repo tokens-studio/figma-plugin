@@ -1,0 +1,32 @@
+import { Meta, Story, ArgsTable, Canvas, Preview } from '@storybook/addon-docs';
+import  Button  from '@/app/components/Button/Button';
+
+<Meta 
+  title='Button' 
+  component={Button}
+  argTypes={{
+    variant: {
+      options: ['primary', 'secondary', 'ghost'],
+      controls: { type: 'radio' },
+    },
+  }}  
+/>
+
+<ArgsTable of={args}/>
+
+export const ButtonDefaultStory = (args) =>{
+  return (
+    <Button {...args}>
+      Button
+    </Button>
+  )
+}
+
+<Canvas>
+  <Story name='Button' args={{
+    type: 'button',
+    variant: 'primary',
+  }}>
+    {ButtonDefaultStory.bind({})}
+  </Story>
+</Canvas>

@@ -1,14 +1,16 @@
 import React, { useCallback } from 'react';
 import { styled } from '@/stitches.config';
-import IconVisibility from './icons/IconVisibiltyOn';
-import IconVisibilityOff from './icons/IconVisibilityOff';
+import IconVisibility from '@/icons/visibilityon.svg';
+import IconVisibilityOff from '@/icons/visibilityoff.svg';
+import type { StitchesCSS } from '@/types';
 import Box from './Box';
 import Stack from './Stack';
 
-type Props = React.InputHTMLAttributes<HTMLInputElement> & {
+type Props = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'> & {
+  form?: string;
   name?: string;
   inputRef?: React.MutableRefObject<HTMLInputElement | null>;
-  error?: string;
+  error?: string | null;
   required?: boolean;
   autofocus?: boolean;
   tabindex?: number | null;
@@ -27,6 +29,7 @@ type Props = React.InputHTMLAttributes<HTMLInputElement> & {
   onChange?: React.ChangeEventHandler<HTMLInputElement>;
   disabled?: boolean;
   size?: 'small' | 'large';
+  css?: StitchesCSS
 };
 
 const StyledIcon = styled('div', {
@@ -116,7 +119,8 @@ const StyledPrefix = styled('div', {
   },
 });
 
-const Input = React.forwardRef<Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'>, Props>(({
+const Input = React.forwardRef<HTMLInputElement, Props>(({
+  form,
   name,
   autofocus,
   error = '',
@@ -161,6 +165,7 @@ const Input = React.forwardRef<Omit<React.InputHTMLAttributes<HTMLInputElement>,
       <Box css={{ display: 'flex', position: 'relative', width: full ? '100%' : '' }} className="input">
         {!!prefix && <StyledPrefix>{prefix}</StyledPrefix>}
         <StyledInput
+          form={form}
           ref={inputRef ?? ref}
           spellCheck={false}
           tabIndex={tabindex ?? undefined}

@@ -3,30 +3,36 @@ import { useCallback, useMemo } from 'react';
 import { useFlags } from 'launchdarkly-react-client-sdk';
 import { LDProps } from 'launchdarkly-react-client-sdk/lib/withLDConsumer';
 import { Dispatch } from '@/app/store';
-import { MessageToPluginTypes } from '@/types/messages';
 import useConfirm from '@/app/hooks/useConfirm';
 import usePushDialog from '@/app/hooks/usePushDialog';
-import { ContextObject } from '@/types/api';
-import { notifyToUI, postToFigma } from '@/plugin/notifiers';
+import { notifyToUI } from '@/plugin/notifiers';
 import {
-  localApiStateSelector, themesListSelector, tokensSelector,
+  localApiStateSelector, themesListSelector, tokensSelector, usedTokenSetSelector,
 } from '@/selectors';
 import { GitlabTokenStorage } from '@/storage/GitlabTokenStorage';
 import { isEqual } from '@/utils/isEqual';
 import { RemoteTokenStorageData } from '@/storage/RemoteTokenStorage';
 import { GitStorageMetadata } from '@/storage/GitTokenStorage';
+import { AsyncMessageTypes } from '@/types/AsyncMessages';
+import { AsyncMessageChannel } from '@/AsyncMessageChannel';
+import { StorageTypeCredentials, StorageTypeFormValues } from '@/types/StorageType';
+import { StorageProviderType } from '@/constants/StorageProviderType';
+
+type GitlabCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.GITHUB | StorageProviderType.GITLAB; }>;
+type GitlabFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.GITHUB | StorageProviderType.GITLAB }>;
 
 export function useGitLab() {
   const tokens = useSelector(tokensSelector);
   const themes = useSelector(themesListSelector);
   const localApiState = useSelector(localApiStateSelector);
+  const usedTokenSet = useSelector(usedTokenSetSelector);
   const { multiFileSync } = useFlags();
   const dispatch = useDispatch<Dispatch>();
 
   const { confirm } = useConfirm();
   const { pushDialog } = usePushDialog();
 
-  const storageClientFactory = useCallback(async (context: ContextObject, owner?: string, repo?: string) => {
+  const storageClientFactory = useCallback(async (context: GitlabCredentials, owner?: string, repo?: string) => {
     const splitContextId = context.id.split('/');
     const storageClient = new GitlabTokenStorage(context.secret, owner ?? splitContextId[0], repo ?? splitContextId[1], context.baseUrl ?? '');
     if (context.filePath) storageClient.changePath(context.filePath);
@@ -44,7 +50,7 @@ export function useGitLab() {
     return confirmResult.result;
   }, [confirm]);
 
-  const pushTokensToGitLab = useCallback(async (context: ContextObject) => {
+  const pushTokensToGitLab = useCallback(async (context: GitlabCredentials) => {
     const storage = await storageClientFactory(context);
 
     const content = await storage.retrieve();
@@ -72,12 +78,14 @@ export function useGitLab() {
           tokens,
           metadata: { commitMessage },
         });
-        dispatch.uiState.setLocalApiState({ ...localApiState, branch: customBranch });
+        dispatch.tokenState.setLastSyncedState(JSON.stringify([tokens, themes], null, 2));
+        dispatch.uiState.setLocalApiState({ ...localApiState, branch: customBranch } as GitlabCredentials);
         dispatch.uiState.setApiData({ ...context, branch: customBranch });
         dispatch.tokenState.setLastSyncedState(JSON.stringify([tokens, themes], null, 2));
         dispatch.tokenState.setTokenData({
           values: tokens,
           themes,
+          usedTokenSet,
         });
 
         pushDialog('success');
@@ -95,22 +103,15 @@ export function useGitLab() {
       themes,
       metadata: {},
     };
-  }, [
-    dispatch,
-    storageClientFactory,
-    tokens,
-    themes,
-    pushDialog,
-    localApiState,
-  ]);
+  }, [storageClientFactory, dispatch.uiState, dispatch.tokenState, pushDialog, tokens, themes, localApiState, usedTokenSet]);
 
-  const checkAndSetAccess = useCallback(async ({ context, owner, repo }: { context: ContextObject; owner: string; repo: string }) => {
+  const checkAndSetAccess = useCallback(async ({ context, owner, repo }: { context: GitlabCredentials; owner: string; repo: string }) => {
     const storage = await storageClientFactory(context, owner, repo);
     const hasWriteAccess = await storage.canWrite();
     dispatch.tokenState.setEditProhibited(!hasWriteAccess);
   }, [dispatch, storageClientFactory]);
 
-  const pullTokensFromGitLab = useCallback(async (context: ContextObject, receivedFeatureFlags?: LDProps['flags']) => {
+  const pullTokensFromGitLab = useCallback(async (context: GitlabCredentials, receivedFeatureFlags?: LDProps['flags']) => {
     const storage = await storageClientFactory(context);
     if (receivedFeatureFlags?.multiFileSync) storage.enableMultiFile();
 
@@ -130,17 +131,17 @@ export function useGitLab() {
     return null;
   }, [storageClientFactory, checkAndSetAccess]);
 
-  const syncTokensWithGitLab = useCallback(async (context: ContextObject): Promise<RemoteTokenStorageData<GitStorageMetadata> | null> => {
+  const syncTokensWithGitLab = useCallback(async (context: GitlabCredentials): Promise<RemoteTokenStorageData<GitStorageMetadata> | null> => {
     try {
       const storage = await storageClientFactory(context);
       const hasBranches = await storage.fetchBranches();
+      dispatch.branchState.setBranches(hasBranches);
 
       if (!hasBranches || !hasBranches.length) {
         return null;
       }
 
       const content = await storage.retrieve();
-
       if (content) {
         if (
           !isEqual(content.tokens, tokens)
@@ -152,6 +153,7 @@ export function useGitLab() {
             dispatch.tokenState.setTokenData({
               values: content.tokens,
               themes: content.themes,
+              usedTokenSet,
             });
             notifyToUI('Pulled tokens from GitLab');
           }
@@ -164,27 +166,21 @@ export function useGitLab() {
       console.log('Error', err);
       return null;
     }
-  }, [
-    storageClientFactory,
-    askUserIfPull,
-    dispatch,
-    pushTokensToGitLab,
-    themes,
-    tokens,
-  ]);
+  }, [storageClientFactory, dispatch.branchState, dispatch.tokenState, pushTokensToGitLab, tokens, themes, askUserIfPull, usedTokenSet]);
 
-  const addNewGitLabCredentials = useCallback(async (context: ContextObject): Promise<RemoteTokenStorageData<GitStorageMetadata> | null> => {
+  const addNewGitLabCredentials = useCallback(async (context: GitlabFormValues): Promise<RemoteTokenStorageData<GitStorageMetadata> | null> => {
     const data = await syncTokensWithGitLab(context);
     if (data) {
-      postToFigma({
-        type: MessageToPluginTypes.CREDENTIALS,
-        ...context,
+      AsyncMessageChannel.message({
+        type: AsyncMessageTypes.CREDENTIALS,
+        credential: context,
       });
       if (data?.tokens) {
         dispatch.tokenState.setLastSyncedState(JSON.stringify([data.tokens, data.themes], null, 2));
         dispatch.tokenState.setTokenData({
           values: data.tokens,
           themes: data.themes,
+          usedTokenSet,
         });
       } else {
         notifyToUI('No tokens stored on remote');
@@ -198,22 +194,31 @@ export function useGitLab() {
       themes: data.themes ?? themes,
       metadata: {},
     };
-  }, [
-    dispatch,
-    tokens,
-    themes,
-    syncTokensWithGitLab,
-  ]);
+  }, [syncTokensWithGitLab, tokens, themes, dispatch.tokenState, usedTokenSet]);
+
+  const fetchGitLabBranches = useCallback(async (context: GitlabCredentials) => {
+    const storage = await storageClientFactory(context);
+    return storage.fetchBranches();
+  }, [storageClientFactory]);
+
+  const createGitLabBranch = useCallback(async (context: GitlabCredentials, newBranch: string, source?: string) => {
+    const storage = await storageClientFactory(context);
+    return storage.createBranch(newBranch, source);
+  }, [storageClientFactory]);
 
   return useMemo(() => ({
     addNewGitLabCredentials,
     syncTokensWithGitLab,
     pullTokensFromGitLab,
     pushTokensToGitLab,
+    fetchGitLabBranches,
+    createGitLabBranch,
   }), [
     addNewGitLabCredentials,
     syncTokensWithGitLab,
     pullTokensFromGitLab,
     pushTokensToGitLab,
+    fetchGitLabBranches,
+    createGitLabBranch,
   ]);
 }

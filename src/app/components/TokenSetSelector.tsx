@@ -5,7 +5,7 @@ import useConfirm from '../hooks/useConfirm';
 import { Dispatch } from '../store';
 import Button from './Button';
 import Heading from './Heading';
-import Icon from './Icon';
+import IconAdd from '@/icons/add.svg';
 import Input from './Input';
 import Modal from './Modal';
 import TokenSetTree from './TokenSetTree';
@@ -213,7 +213,7 @@ export default function TokenSetSelector() {
       </Modal>
       <StyledButton type="button" disabled={editProhibited} onClick={handleOpenNewTokenSetModal}>
         New set
-        <Icon name="add" />
+        <IconAdd />
       </StyledButton>
     </Box>
   );

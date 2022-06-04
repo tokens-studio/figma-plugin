@@ -103,11 +103,9 @@ export default function ImportedTokensDialog() {
       createSingleToken({
         parent: activeTokenSet,
         name: token.name,
+        type: token.type,
         value: token.value,
-        options: {
-          type: token.type,
-          description: token.description,
-        },
+        description: token.description,
         shouldUpdateDocument: false,
       });
     });
@@ -122,10 +120,8 @@ export default function ImportedTokensDialog() {
         parent: activeTokenSet,
         name: token.name,
         value: token.value,
-        options: {
-          type: token.type,
-          description: token.description,
-        },
+        type: token.type,
+        description: token.description,
         shouldUpdateDocument: false,
       });
     });
@@ -145,10 +141,8 @@ export default function ImportedTokensDialog() {
       parent: activeTokenSet,
       name: token.name,
       value: token.value,
-      options: {
-        type: token.type,
-        description: token.description,
-      },
+      type: token.type,
+      description: token.description,
       shouldUpdateDocument: false,
     });
     setNewTokens(newTokens.filter((t) => t.name !== token.name));
@@ -160,10 +154,8 @@ export default function ImportedTokensDialog() {
       parent: activeTokenSet,
       name: token.name,
       value: token.value,
-      options: {
-        type: token.type,
-        description: token.description,
-      },
+      type: token.type,
+      description: token.description,
       shouldUpdateDocument: false,
     });
     setUpdatedTokens(updatedTokens.filter((t) => t.name !== token.name));

@@ -1,6 +1,6 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
-import IconChevronDown from './icons/IconChevronDown';
+import IconChevronDown from '@/icons/chevrondown.svg';
 import useTokens from '../store/useTokens';
 import {
   DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem,

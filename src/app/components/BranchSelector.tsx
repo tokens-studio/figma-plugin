@@ -13,14 +13,14 @@ import {
   BranchSwitchMenuArrow,
 } from './BranchSwitchMenu';
 import {
-  branchSelector, lastSyncedStateSelector, tokensSelector, localApiStateSelector, apiSelector, usedTokenSetSelector,
+  branchSelector, lastSyncedStateSelector, tokensSelector, localApiStateBranchSelector, apiSelector, usedTokenSetSelector, localApiStateSelector, themesListSelector,
 } from '@/selectors';
-import convertTokensToObject from '@/utils/convertTokensToObject';
 import useRemoteTokens from '../store/remoteTokens';
 import useConfirm from '@/app/hooks/useConfirm';
 import CreateBranchModal from './modals/CreateBranchModal';
 import { Dispatch } from '../store';
 import { BranchSwitchMenuRadioElement } from './BranchSwitchMenuRadioElement';
+import { isGitProvider } from '@/utils/is';
 
 const BranchSwitchMenuItemElement: React.FC<{
   branch: string
@@ -47,26 +47,27 @@ export default function BranchSelector() {
   const branchState = useSelector(branchSelector);
   const lastSyncedState = useSelector(lastSyncedStateSelector);
   const tokens = useSelector(tokensSelector);
+  const themes = useSelector(themesListSelector);
+
   const localApiState = useSelector(localApiStateSelector);
+  const localApiStateBranch = useSelector(localApiStateBranchSelector);
   const apiData = useSelector(apiSelector);
   const usedTokenSet = useSelector(usedTokenSetSelector);
 
-  const [currentBranch, setCurrentBranch] = useState(localApiState.branch);
+  const [currentBranch, setCurrentBranch] = useState(localApiStateBranch);
   const [startBranch, setStartBranch] = useState<string | null>(null);
   const [menuOpened, setMenuOpened] = useState(false);
   const [createBranchModalVisible, setCreateBranchModalVisible] = useState(false);
   const [isCurrentChanges, setIsCurrentChanges] = useState(false);
 
   useEffect(() => {
-    setCurrentBranch(localApiState.branch);
-  }, [localApiState.branch, setCurrentBranch]);
+    setCurrentBranch(localApiStateBranch);
+  }, [localApiStateBranch, setCurrentBranch]);
 
   const checkForChanges = React.useCallback(() => {
-    if (lastSyncedState !== JSON.stringify(convertTokensToObject(tokens), null, 2)) {
-      return true;
-    }
-    return false;
-  }, [lastSyncedState, tokens]);
+    const hasChanged = (lastSyncedState !== JSON.stringify([tokens, themes], null, 2));
+    return hasChanged;
+  }, [lastSyncedState, tokens, themes]);
 
   const hasChanges = React.useMemo(() => checkForChanges(), [checkForChanges]);
 
@@ -109,11 +110,13 @@ export default function BranchSelector() {
   }, [hasChanges, askUserIfPushChanges, pushTokens]);
 
   const changeAndPull = React.useCallback(async (branch: string) => {
-    setMenuOpened(false);
-    setCurrentBranch(branch);
-    dispatch.uiState.setApiData({ ...apiData, branch });
-    dispatch.uiState.setLocalApiState({ ...localApiState, branch });
-    await pullTokens({ context: { ...apiData, branch }, usedTokenSet });
+    if (isGitProvider(apiData) && isGitProvider(localApiState)) {
+      setMenuOpened(false);
+      setCurrentBranch(branch);
+      dispatch.uiState.setApiData({ ...apiData, branch });
+      dispatch.uiState.setLocalApiState({ ...localApiState, branch });
+      await pullTokens({ context: { ...apiData, branch }, usedTokenSet });
+    }
   }, [apiData, localApiState, pullTokens, usedTokenSet, dispatch]);
 
   const onBranchSelected = React.useCallback(async (branch: string) => {
@@ -134,10 +137,11 @@ export default function BranchSelector() {
   const onCreateBranchModalSuccess = React.useCallback((branch: string, branches: string[]) => {
     setCreateBranchModalVisible(false);
     setCurrentBranch(branch);
-
-    dispatch.branchState.setBranches(branches.includes(branch) ? branches : [...branches, branch]);
-    dispatch.uiState.setApiData({ ...apiData, branch });
-    dispatch.uiState.setLocalApiState({ ...localApiState, branch });
+    if (isGitProvider(apiData) && isGitProvider(localApiState)) {
+      dispatch.branchState.setBranches(branches.includes(branch) ? branches : [...branches, branch]);
+      dispatch.uiState.setApiData({ ...apiData, branch });
+      dispatch.uiState.setLocalApiState({ ...localApiState, branch });
+    }
   }, [dispatch, apiData, localApiState]);
 
   const handleToggleMenu = React.useCallback(() => {
@@ -160,7 +164,7 @@ export default function BranchSelector() {
           <BranchSwitchMenuContent side="top" sideOffset={5}>
             <BranchSwitchMenuRadioGroup value={currentBranch}>
               {branchState.branches.length > 0
-              && branchState.branches.map((branch, index) => <BranchSwitchMenuRadioElement key={`radio_${seed(index)}`} branch={branch} branchSelected={onBranchSelected} />)}
+                && branchState.branches.map((branch, index) => <BranchSwitchMenuRadioElement key={`radio_${seed(index)}`} branch={branch} branchSelected={onBranchSelected} />)}
             </BranchSwitchMenuRadioGroup>
             <BranchSwitchMenu>
               <BranchSwitchMenuTrigger>
@@ -169,11 +173,11 @@ export default function BranchSelector() {
               </BranchSwitchMenuTrigger>
               <BranchSwitchMenuContent side="left">
                 {hasChanges
-              && (
-              <BranchSwitchMenuItem onSelect={createBranchByChange}>
-                Current changes
-              </BranchSwitchMenuItem>
-              )}
+                  && (
+                    <BranchSwitchMenuItem onSelect={createBranchByChange}>
+                      Current changes
+                    </BranchSwitchMenuItem>
+                  )}
                 {branchState.branches.length > 0 && branchState.branches.map((branch, index) => (
                   <BranchSwitchMenuItemElement
                     key={seed(index)}

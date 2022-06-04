@@ -1,6 +1,6 @@
 // write a test for isSameCredentials function
 
-import { StorageProviderType } from '@/types/api';
+import { StorageProviderType } from '@/constants/StorageProviderType';
 import isSameCredentials from './isSameCredentials';
 
 describe('isSameCredentials', () => {

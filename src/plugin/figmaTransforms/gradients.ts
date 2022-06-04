@@ -60,10 +60,10 @@ export function convertStringToFigmaGradient(value: string) {
       color: gradientColor,
       position: parseFloat(seperatedStop[1]) / 100,
     };
-  });
+  }) as ColorStop[];
 
   return {
     gradientStops,
-    gradientTransform: [gradientTransformMatrix[0], gradientTransformMatrix[1]],
+    gradientTransform: [gradientTransformMatrix[0], gradientTransformMatrix[1]] as Transform,
   };
 }

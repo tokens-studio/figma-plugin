@@ -1,6 +1,7 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import type { CheckedState } from '@radix-ui/react-checkbox';
 import SyncSettings from './SyncSettings';
 import Checkbox from './Checkbox';
 import Heading from './Heading';
@@ -17,8 +18,8 @@ function Settings() {
   const dispatch = useDispatch<Dispatch>();
 
   const handleIgnoreChange = React.useCallback(
-    (bool: boolean) => {
-      dispatch.settings.setIgnoreFirstPartForStyles(bool);
+    (state: CheckedState) => {
+      dispatch.settings.setIgnoreFirstPartForStyles(!!state);
     },
     [dispatch.settings],
   );

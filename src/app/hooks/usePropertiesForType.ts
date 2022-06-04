@@ -7,7 +7,6 @@ import { isPropertyType } from '@/utils/is';
 export function usePropertiesForTokenType(type: TokenTypes): PropertyObject[] {
   return useMemo(() => {
     const properties: PropertyObject[] = [];
-
     switch (type) {
       case TokenTypes.BORDER_RADIUS:
         properties.push(

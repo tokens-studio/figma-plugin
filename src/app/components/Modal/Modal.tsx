@@ -6,8 +6,6 @@ import XIcon from '@/icons/x.svg';
 import { ModalFooter } from './ModalFooter';
 import { ModalHeader } from './ModalHeader';
 
-if (process.env.NODE_ENV !== 'test') ReactModal.setAppElement('#app');
-
 const customStyles = (large = false): ReactModalStyles => ({
   overlay: {
     backgroundColor: 'rgba(0,0,0,0.2)',
@@ -56,6 +54,12 @@ export function Modal({
   showClose = false,
   compact = false,
 }: ModalProps) {
+  React.useEffect(() => {
+    if (typeof document !== 'undefined' && document.getElementById('app')) {
+      ReactModal.setAppElement('#app');
+    }
+  }, []);
+
   const paddingClass = () => {
     if (compact) {
       return 'p-4';

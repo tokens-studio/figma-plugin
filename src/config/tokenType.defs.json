@@ -1,0 +1,180 @@
+{
+  "sizing": {
+    "label": "Sizing",
+    "property": "Size",
+    "type": "sizing",
+    "schemas": {
+      "value": { "type": "string" }
+    }
+  },
+  "spacing": {
+    "label": "Spacing",
+    "property": "Value",
+    "type": "spacing",
+    "schemas": {
+      "value": { "type": "string" }
+    }
+  },
+  "color": {
+    "label": "Color",
+    "property": "Color",
+    "type": "color",
+    "schemas": {
+      "value": { "type": "string" }
+    },
+    "help": "If a (local) style is found with the same name it will match to that, if not, will use hex value. Use 'Create Style' to batch-create styles from your tokens (e.g. in your design library). In the future we'll load all 'remote' styles and reference them inside the JSON."
+  },
+  "borderRadius": {
+    "label": "Border Radius",
+    "property": "Border Radius",
+    "type": "borderRadius",
+    "schemas": {
+      "value": { "type": "string" }
+    }
+  },
+  "borderWidth": {
+    "label": "Border Width",
+    "property": "Border Width",
+    "type": "borderWidth",
+    "explainer": "Enter as a number, e.g. 4",
+    "schemas": {
+      "value": { "type": "string" }
+    }
+  },
+  "opacity": {
+    "label": "Opacity",
+    "property": "Opacity",
+    "type": "opacity",
+    "explainer": "Set as 50% or 0.5",
+    "schemas": {
+      "value": { "type": "string" }
+    }
+  },
+  "boxShadow": {
+    "label": "Box Shadow",
+    "property": "Box Shadow",
+    "type": "boxShadow",
+    "schemas": {
+      "value": {
+        "type": "object",
+        "properties": {
+          "x": { "type": "string" },
+          "y": { "type": "string" },
+          "blur": { "type": "string" },
+          "spread": { "type": "string" },
+          "color": { "type": "string" },
+          "type": { "type": "string" }
+        }
+      }
+    }
+  },
+  "typography": {
+    "label": "Typography",
+    "property": "Typography",
+    "type": "typography",
+    "help": "If a (local) style is found with the same name it will match to that, if not, will use raw font values. Use 'Create Style' to batch-create styles from your tokens (e.g. in your design library). In the future we'll load all 'remote' styles and reference them inside the JSON.",
+    "schemas": {
+      "value": {
+        "type": "object",
+        "properties": {
+          "fontFamily": { "type": "string" },
+          "fontWeight": { "type": "string" },
+          "lineHeight": { "type": "string" },
+          "fontSize": { "type": "string" },
+          "letterSpacing": { "type": "string" },
+          "paragraphSpacing": { "type": "string" },
+          "textDecoration": { "type": "string" },
+          "textCase": { "type": "string" }
+        }
+      }
+    }
+  },
+  "fontFamilies": {
+    "label": "Font Family",
+    "property": "Font Family",
+    "type": "fontFamilies",
+    "help": "Only works in combination with a Font Weight",
+    "schemas": {
+      "value": { "type": "string" }
+    }
+  },
+  "fontWeights": {
+    "label": "Font Weight",
+    "property": "Font Weight",
+    "type": "fontWeights",
+    "schemas": {
+      "value": { "type": "string" }
+    }
+  },
+  "lineHeights": {
+    "label": "Line Height",
+    "property": "Line Height",
+    "type": "lineHeights",
+    "explainer": "e.g. 100% or 14",
+    "schemas": {
+      "value": { "type": "string" }
+    }
+  },
+  "fontSizes": {
+    "label": "Font Size",
+    "property": "Font Size",
+    "type": "fontSizes",
+    "schemas": {
+      "value": { "type": "string" }
+    }
+  },
+  "letterSpacing": {
+    "label": "Letter Spacing",
+    "property": "Letter Spacing",
+    "type": "letterSpacing",
+    "schemas": {
+      "value": { "type": "string" }
+    }
+  },
+  "paragraphSpacing": {
+    "label": "Paragraph Spacing",
+    "property": "Paragraph Spacing",
+    "type": "paragraphSpacing",
+    "schemas": {
+      "value": { "type": "string" }
+    }
+  },
+  "textCase": {
+    "label": "Text Case",
+    "property": "TextCase",
+    "type": "textCase",
+    "explainer": "none | uppercase | lowercase | capitalize",
+    "schemas": {
+      "value": { "type": "string" }
+    }
+  },
+  "textDecoration": {
+    "label": "Text Decoration",
+    "property": "TextDecoration",
+    "type": "textDecoration",
+    "explainer": "none | underline | line-through",
+    "schemas": {
+      "value": { "type": "string" }
+    }
+  },
+  "composition": {
+    "label": "Composition",
+    "property": "Composition",
+    "type": "composition",
+    "isPro": true,
+    "schemas": {
+      "value": {
+        "type": "object",
+        "properties": {}
+      }
+    }
+  },
+  "other": {
+    "label": "Other",
+    "property": "other",
+    "type": "other",
+    "schemas": {
+      "value": { "type": "string" }
+    }
+  }
+}

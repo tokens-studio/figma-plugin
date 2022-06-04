@@ -32,15 +32,14 @@ const globalTokens = {
   },
 };
 
-export const {
-  styled, css, keyframes, theme,
-} = createStitches({
+export const stitchesInstance = createStitches({
   theme: {
     fonts: {
       sans: 'Inter, sans-serif',
       mono: 'JetBrainsMono, monospace',
     },
     fontSizes: {
+      xxsmall: '10px',
       xsmall: '11px',
       small: '12px',
     },
@@ -94,6 +93,9 @@ export const {
       bgSuccess: 'var(--figma-color-bg-success-tertiary)',
       fgDanger: 'var(--figma-color-text-danger)',
       bgDanger: 'var(--figma-color-bg-danger-tertiary)',
+      fgPro: 'var(--figma-color-text-component)',
+      bgProSubtle: 'var(--figma-color-bg-component-tertiary)',
+      borderPro: 'var(--figma-color-bg-component)',
       spinnerInverse: '#ffffff',
     },
     space: {
@@ -106,6 +108,7 @@ export const {
       7: '32px',
       8: '48px',
       9: '64px',
+      10: '38px',
     },
     sizes: {
       1: '2px',
@@ -116,6 +119,8 @@ export const {
       6: '24px',
       7: '32px',
       8: '48px',
+      10: '38px',
+      dropdownMaxHeight: '170px',
     },
     radii: {
       default: globalTokens.radii.sm,
@@ -124,6 +129,7 @@ export const {
       contextMenu: globalTokens.radii.lg,
       contextMenuItem: globalTokens.radii.sm,
       card: globalTokens.radii.lg,
+      badge: globalTokens.radii.lg,
     },
     shadows: {
       default: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
@@ -134,3 +140,11 @@ export const {
     },
   },
 });
+
+const {
+  styled, css, keyframes, theme,
+} = stitchesInstance;
+
+export {
+  styled, css, keyframes, theme,
+};

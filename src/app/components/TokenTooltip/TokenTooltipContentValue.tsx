@@ -1,13 +1,14 @@
 import React from 'react';
 import { useUIDSeed } from 'react-uid';
 import useTokens from '../../store/useTokens';
-import { SingleToken, SingleTypographyToken } from '@/types/tokens';
+import { SingleToken } from '@/types/tokens';
 import { SingleShadowValueDisplay } from './SingleShadowValueDisplay';
 import { TokensContext } from '@/context';
-import { isSingleBoxShadowToken, isSingleTypographyToken } from '@/utils/is';
+import { isSingleBoxShadowToken, isSingleTypographyToken, isSingleCompositionToken } from '@/utils/is';
 import { SingleTypographyValueDisplay } from './SingleTypograhpyValueDisplay';
-import { TokenBoxshadowValue } from '@/types/values';
+import { TokenBoxshadowValue, TokenTypograpyValue } from '@/types/values';
 import Box from '../Box';
+import { SingleCompositionValueDisplay } from './SingleCompositionValueDisplay';
 
 type Props = {
   token: SingleToken;
@@ -22,7 +23,7 @@ export const TokenTooltipContentValue: React.FC<Props> = ({ token, shouldResolve
   const { getTokenValue } = useTokens();
   const valueToCheck = React.useMemo(() => {
     if (shouldResolve && tokenIsShadowOrTypographyAlias) {
-      let nameToLookFor: String;
+      let nameToLookFor: string = '';
       const tokenValueString = String(token.value);
       if (tokenIsShadowOrTypographyAlias && tokenValueString.charAt(0) === '$') nameToLookFor = tokenValueString.slice(1, tokenValueString.length);
       if (tokenIsShadowOrTypographyAlias && tokenValueString.charAt(0) === '{') nameToLookFor = tokenValueString.slice(1, tokenValueString.length - 1);
@@ -36,10 +37,25 @@ export const TokenTooltipContentValue: React.FC<Props> = ({ token, shouldResolve
   if (isSingleTypographyToken(token)) {
     return (
       <SingleTypographyValueDisplay
-        // @TODO strengthen type checking here
-        value={valueToCheck as SingleTypographyToken['value']}
+        value={valueToCheck as TokenTypograpyValue}
         shouldResolve={shouldResolve}
       />
+    );
+  }
+
+  if (isSingleCompositionToken(token)) {
+    return (
+      valueToCheck ? (
+        <div>
+          {Object.entries(valueToCheck).map(([property, value], index) => (
+            <SingleCompositionValueDisplay
+              key={seed(index)}
+              property={property}
+              value={value}
+            />
+          ))}
+        </div>
+      ) : null
     );
   }
 
@@ -50,7 +66,7 @@ export const TokenTooltipContentValue: React.FC<Props> = ({ token, shouldResolve
           {valueToCheck.map((t) => (
             <SingleShadowValueDisplay
               key={seed(t)}
-              shadow={t}
+              shadow={t as TokenBoxshadowValue}
             />
           ))}
         </div>

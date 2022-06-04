@@ -1,6 +1,14 @@
-// @TODO typing!
-export function expand(token) {
-  return Object.entries(token).reduce((acc, [key, val]) => {
+import { SingleToken } from '@/types/tokens';
+
+interface Result {
+  [K: string]: {
+    type: string;
+    value: string | number
+  } | Result
+}
+
+export function expand(token: SingleToken['value']) {
+  return Object.entries(token).reduce<Result>((acc, [key, val]) => {
     if (typeof val === 'string' || typeof val === 'number') {
       acc[key] = {
         value: val,

@@ -1,6 +1,6 @@
-import { TokenArrayGroup } from '@/types/tokens';
+import { AnyTokenList } from '@/types/tokens';
 
-export function tokenArrayGroupToMap(tokens: TokenArrayGroup) {
-  const tokensByNameMap = new Map<string, TokenArrayGroup[number]>(tokens.map((token) => ([token.name, token])));
+export function tokenArrayGroupToMap(tokens: AnyTokenList) {
+  const tokensByNameMap = new Map<string, AnyTokenList[number]>(tokens.map((token) => ([token.name, token])));
   return tokensByNameMap;
 }

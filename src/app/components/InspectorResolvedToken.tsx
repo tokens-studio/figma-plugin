@@ -1,9 +1,10 @@
 import React from 'react';
 import Box from './Box';
 import Tooltip from './Tooltip';
-import IconBrokenLink from './icons/IconBrokenLink';
+import IconBrokenLink from '@/icons/brokenlink.svg';
 import { SingleToken } from '@/types/tokens';
 import IconShadow from '@/icons/shadow.svg';
+import IconComposition from '@/icons/composition.svg';
 
 export default function InspectorResolvedToken({ token }: { token: SingleToken }) {
   // TODO: Introduce shared component for token tooltips
@@ -72,6 +73,22 @@ export default function InspectorResolvedToken({ token }: { token: SingleToken }
         </Box>
       );
     }
+    case 'composition': {
+      return (
+        <Box
+          css={{
+            background: '$bgSubtle',
+            fontSize: '$small',
+            padding: '$2 $3',
+            borderRadius: '$default',
+            width: '40px',
+          }}
+        >
+          <IconComposition />
+        </Box>
+      );
+    }
+
     default: {
       return (
         <Box

@@ -6,9 +6,26 @@ import Stack from './Stack';
 import Text from './Text';
 import Box from './Box';
 import { isEqual } from '@/utils/isEqual';
+import { Direction } from '@/constants/Direction';
 
 export default function AnnotationBuilder() {
   const uiState = useSelector(uiStateSelector, isEqual);
+
+  const createAnnotationLeft = React.useCallback(() => {
+    createAnnotation(uiState.mainNodeSelectionValues, Direction.LEFT);
+  }, [uiState]);
+
+  const createAnnotationTop = React.useCallback(() => {
+    createAnnotation(uiState.mainNodeSelectionValues, Direction.TOP);
+  }, [uiState]);
+
+  const createAnnotationBottom = React.useCallback(() => {
+    createAnnotation(uiState.mainNodeSelectionValues, Direction.BOTTOM);
+  }, [uiState]);
+
+  const createAnnotationRight = React.useCallback(() => {
+    createAnnotation(uiState.mainNodeSelectionValues, Direction.RIGHT);
+  }, [uiState]);
 
   return Object.entries(uiState.mainNodeSelectionValues).length > 0 ? (
     <Box css={{ borderBottom: '1px solid $border', paddingBottom: '$4', marginBottom: '$4' }}>
@@ -18,7 +35,7 @@ export default function AnnotationBuilder() {
           <button
             className="p-1 button button-secondary"
             type="button"
-            onClick={() => createAnnotation(uiState.mainNodeSelectionValues, 'left')}
+            onClick={createAnnotationLeft}
           >
             ←
           </button>
@@ -26,14 +43,14 @@ export default function AnnotationBuilder() {
             <button
               className="p-1 button button-secondary"
               type="button"
-              onClick={() => createAnnotation(uiState.mainNodeSelectionValues, 'top')}
+              onClick={createAnnotationTop}
             >
               ↑
             </button>
             <button
               className="p-1 button button-secondary"
               type="button"
-              onClick={() => createAnnotation(uiState.mainNodeSelectionValues, 'bottom')}
+              onClick={createAnnotationBottom}
             >
               ↓
             </button>
@@ -41,7 +58,7 @@ export default function AnnotationBuilder() {
           <button
             className="p-1 button button-secondary"
             type="button"
-            onClick={() => createAnnotation(uiState.mainNodeSelectionValues, 'right')}
+            onClick={createAnnotationRight}
           >
             →
           </button>

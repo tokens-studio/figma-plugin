@@ -1,0 +1,36 @@
+import { useState } from 'react';
+import { Meta, Story, ArgsTable, Canvas, Preview } from '@storybook/addon-docs';
+import { Provider } from 'react-redux';
+
+import { store } from '@/app/store';
+
+import CreateBranchModal from '@/app/components/modals/CreateBranchModal';
+import Button from '@/app/components/Button/Button';
+
+<Meta title='CreateBranchModal' component={CreateBranchModal} />
+
+<ArgsTable of={CreateBranchModal}/>
+
+export const CreateBranchModalDefaultStory = (args) => {
+  const [isOpen, setIsOpen] = useState(false);
+  return (
+    <>
+    <Button onClick={() => setIsOpen(true)}>
+      Click to Open a CreateBranch Modal
+    </Button>
+    <Provider store={store}>
+      <CreateBranchModal
+        isOpen={isOpen}
+        startBranch='main'
+        onClose={() => setIsOpen(false)}
+      />
+    </Provider>
+    </>
+  )
+}
+
+<Canvas>
+  <Story name='Default'>
+    {CreateBranchModalDefaultStory.bind({})}
+  </Story>
+</Canvas>

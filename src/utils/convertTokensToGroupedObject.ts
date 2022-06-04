@@ -21,7 +21,7 @@ export default function convertTokensToGroupedObject(
       return acc;
     }
     const obj = acc || {};
-    const tokenWithType = appendTypeToToken(token);
+    const tokenWithType = appendTypeToToken(token) as SingleToken<false>;
     delete tokenWithType.name;
     if (options.resolveReferences !== true) {
       tokenWithType.value = getValueWithReferences(tokenWithType as SingleToken, options);

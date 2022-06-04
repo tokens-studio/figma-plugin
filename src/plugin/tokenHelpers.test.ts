@@ -132,6 +132,30 @@ const tokens = [
   { name: 'spacing.xs', value: '{spacing.xs}' },
   { name: 'shadow.single', ...singleShadowToken },
   { name: 'shadow.multiple', ...multipleShadowToken },
+  { name: 'opacity.40', value: '40%' },
+  { name: 'border-radius.7', value: '24px' },
+  {
+    name: 'composition.single',
+    type: 'composition',
+    value: {
+      opacity: '{opacity.40}',
+    },
+  },
+  {
+    name: 'composition.multiple',
+    type: 'composition',
+    value: {
+      opacity: '{opacity.40}',
+      borderRadius: '{border-radius.7}',
+    },
+  },
+  {
+    name: 'composition.alias',
+    type: 'composition',
+    value: {
+      fill: '{colors.red.500}',
+    },
+  },
   { name: 'size.25', value: '2px' },
   { name: 'typography.resolved', ...resolvedTypographyToken },
   { name: 'typography.unResolved', ...unResolvedTypographyToken },
@@ -238,6 +262,48 @@ const output = [
     ],
   },
   {
+    name: 'opacity.40',
+    rawValue: '40%',
+    value: '40%',
+  },
+  {
+    name: 'border-radius.7',
+    rawValue: '24px',
+    value: '24px',
+  },
+  {
+    name: 'composition.single',
+    type: 'composition',
+    value: {
+      opacity: '40%',
+    },
+    rawValue: {
+      opacity: '{opacity.40}',
+    },
+  },
+  {
+    name: 'composition.multiple',
+    type: 'composition',
+    value: {
+      opacity: '40%',
+      borderRadius: '24px',
+    },
+    rawValue: {
+      opacity: '{opacity.40}',
+      borderRadius: '{border-radius.7}',
+    },
+  },
+  {
+    name: 'composition.alias',
+    type: 'composition',
+    value: {
+      fill: '#ff0000',
+    },
+    rawValue: {
+      fill: '{colors.red.500}',
+    },
+  },
+  {
     name: 'size.25',
     rawValue: '2px',
     value: '2px',
@@ -299,7 +365,6 @@ const output = [
 ];
 describe('resolveTokenValues', () => {
   it('resolves all values it can resolve', () => {
-
     expect(resolveTokenValues(tokens)).toEqual(output);
   });
 });

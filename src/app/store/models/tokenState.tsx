@@ -1,7 +1,6 @@
 /* eslint-disable import/prefer-default-export */
 import { createModel } from '@rematch/core';
 import omit from 'just-omit';
-import { StorageProviderType } from '@/types/api';
 import * as tokenStateReducers from './reducers/tokenState';
 import * as tokenStateEffects from './effects/tokenState';
 
@@ -20,12 +19,16 @@ import {
   ToggleManyTokenSetsPayload,
   UpdateDocumentPayload,
   UpdateTokenPayload,
+  RenameTokenGroupPayload,
+  DuplicateTokenGroupPayload,
+  DuplicateTokenPayload,
 } from '@/types/payloads';
 import { updateTokenPayloadToSingleToken } from '@/utils/updateTokenPayloadToSingleToken';
 import { RootModel } from '@/types/RootModel';
 import { ThemeObjectsList, UsedTokenSetsMap } from '@/types';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { isEqual } from '@/utils/isEqual';
+import { StorageProviderType } from '@/constants/StorageProviderType';
 
 export interface TokenState {
   tokens: Record<string, AnyTokenList>;
@@ -240,7 +243,7 @@ export const tokenState = createModel<RootModel>()({
         },
       };
     },
-    duplicateToken: (state, data: UpdateTokenPayload) => {
+    duplicateToken: (state, data: DuplicateTokenPayload) => {
       let newTokens: TokenStore['values'] = {};
       const existingTokenIndex = state.tokens[data.parent].findIndex((n) => n.name === data.name);
       if (existingTokenIndex > -1) {
@@ -303,7 +306,7 @@ export const tokenState = createModel<RootModel>()({
           newTokens,
           updatedTokens,
         },
-      };
+      } as TokenState;
     },
     editToken: (state, data: UpdateTokenPayload) => {
       const nameToFind = data.oldName ? data.oldName : data.name;
@@ -343,6 +346,67 @@ export const tokenState = createModel<RootModel>()({
       };
 
       return newState;
+    },
+
+    renameTokenGroup: (state, data: RenameTokenGroupPayload) => {
+      const {
+        path, oldName, newName, type,
+      } = data;
+
+      const tokenSetsList = Object.keys(state.usedTokenSet);
+      const newTokenGroupState = tokenSetsList.map((tokenSets) => {
+        const newTokenGroups = state.tokens[tokenSets].map((token) => {
+          if (token.name.startsWith(`${path}${oldName}.`) && token.type === type) {
+            const { name, ...rest } = token;
+            const newTokenName = name.replace(`${path}${oldName}`, `${path}${newName}`);
+            return {
+              ...rest,
+              name: newTokenName,
+            };
+          }
+          if (token.value.toString().startsWith(`{${path}${oldName}.`)) {
+            const { value, ...rest } = token;
+            const updatedNewTokenValue = value.toString().replace(`${path}${oldName}`, `${path}${newName}`);
+            return {
+              ...rest,
+              value: updatedNewTokenValue,
+            };
+          }
+          return token;
+        });
+        return {
+          [tokenSets]: newTokenGroups,
+        };
+      });
+
+      const newState = {
+        ...state,
+        tokens: newTokenGroupState.reduce((acc, cur) => ({ ...acc, ...cur }), {}),
+      };
+      return newState as TokenState;
+    },
+
+    duplicateTokenGroup: (state, data: DuplicateTokenGroupPayload) => {
+      const {
+        parent, path, oldName, type,
+      } = data;
+      const selectedTokenGroup = state.tokens[parent].filter((token) => (token.name.startsWith(`${path}${oldName}.`) && token.type === type));
+      const newTokenGroup = selectedTokenGroup.map((token) => {
+        const { name, ...rest } = token;
+        const duplicatedTokenGroupName = token.name.replace(`${path}${oldName}`, `${path}${oldName}-copy`);
+        return {
+          name: duplicatedTokenGroupName,
+          ...rest,
+        };
+      });
+
+      return {
+        ...state,
+        tokens: {
+          ...state.tokens,
+          [parent]: [...state.tokens[parent], ...newTokenGroup],
+        },
+      };
     },
     updateAliases: (state, data: { oldName: string; newName: string }) => {
       const newTokens = Object.entries(state.tokens).reduce<TokenState['tokens']>(
@@ -434,7 +498,7 @@ export const tokenState = createModel<RootModel>()({
     toggleTreatAsSource() {
       dispatch.tokenState.updateDocument({ updateRemote: false });
     },
-    duplicateToken(payload: UpdateTokenPayload, rootState) {
+    duplicateToken(payload: DuplicateTokenPayload, rootState) {
       if (payload.shouldUpdate && rootState.settings.updateOnChange) {
         dispatch.tokenState.updateDocument();
       }
@@ -443,6 +507,9 @@ export const tokenState = createModel<RootModel>()({
       if (payload.shouldUpdate && rootState.settings.updateOnChange) {
         dispatch.tokenState.updateDocument();
       }
+    },
+    updateCheckForChanges(checkForChanges: boolean) {
+      dispatch.tokenState.updateDocument({ checkForChanges });
     },
     updateDocument(options?: UpdateDocumentPayload, rootState?) {
       const defaults = { shouldUpdateNodes: true, updateRemote: true };
@@ -455,13 +522,14 @@ export const tokenState = createModel<RootModel>()({
           themes: rootState.tokenState.themes,
           activeTheme: rootState.tokenState.activeTheme,
           settings: rootState.settings,
-          updatedAt: new Date().toString(),
-          lastUpdatedAt: rootState.uiState.lastUpdatedAt,
+          updatedAt: new Date().toISOString(),
+          lastUpdatedAt: rootState.uiState.lastUpdatedAt ?? new Date().toISOString(),
           isLocal: rootState.uiState.storageType.provider === StorageProviderType.LOCAL,
           editProhibited: rootState.tokenState.editProhibited,
           api: rootState.uiState.api,
           storageType: rootState.uiState.storageType,
           shouldUpdateRemote: params.updateRemote && rootState.settings.updateRemote,
+          checkForChanges: params.checkForChanges || false,
         });
       } catch (e) {
         console.error('Error updating document', e);

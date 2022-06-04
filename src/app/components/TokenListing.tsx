@@ -2,7 +2,7 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { DndProvider } from 'react-dnd';
-import { TokenTypeSchema } from '@/types/tokens';
+import { DeepKeyTokenMap, EditTokenObject, TokenTypeSchema } from '@/types/tokens';
 import Heading from './Heading';
 import TokenTree, { ShowFormOptions, ShowNewFormOptions } from './TokenTree';
 import Tooltip from './Tooltip';
@@ -15,52 +15,46 @@ import IconButton from './IconButton';
 import ListIcon from '@/icons/list.svg';
 import GridIcon from '@/icons/grid.svg';
 import AddIcon from '@/icons/add.svg';
+import ProBadge from './ProBadge';
+import { useFlags } from './LaunchDarkly';
 
-type Props = Omit<TokenTypeSchema, 'type'> & {
-  tokenKey: string;
-  tokenType: TokenTypes;
+type Props = {
+  tokenKey: string
+  label: string
+  schema: TokenTypeSchema
+  values: DeepKeyTokenMap
+  isPro?: boolean
 };
 
 const TokenListing: React.FC<Props> = ({
   tokenKey,
   label,
   schema,
-  explainer = '',
-  property,
-  tokenType = TokenTypes.IMPLICIT,
   values,
+  isPro,
 }) => {
   const editProhibited = useSelector(editProhibitedSelector);
   const displayType = useSelector(displayTypeSelector);
   const showEmptyGroups = useSelector(showEmptyGroupsSelector);
   const collapsed = useSelector(collapsedSelector);
   const dispatch = useDispatch<Dispatch>();
+  const { gitBranchSelector } = useFlags();
 
-  const showDisplayToggle = React.useMemo(() => tokenType === TokenTypes.COLOR, [tokenType]);
+  const showDisplayToggle = React.useMemo(() => schema.type === TokenTypes.COLOR, [schema.type]);
 
   const [isIntCollapsed, setIntCollapsed] = React.useState(false);
 
   const showForm = React.useCallback(({ token, name, isPristine = false }: ShowFormOptions) => {
-    const tokenValue = token?.value ?? (typeof schema?.value === 'object' ? schema.value : '');
-
-    // @TODO fix these typings depending on usage
     dispatch.uiState.setShowEditForm(true);
     dispatch.uiState.setEditToken({
-      value: tokenValue,
-      type: tokenType,
-      name,
-      initialName: name,
+      ...token,
+      type: schema.type,
+      schema,
       isPristine,
-      explainer,
-      property,
-      schema: schema?.value,
-      optionsSchema: schema?.options,
-      options: {
-        description: token?.description,
-        type: tokenType,
-      },
-    });
-  }, [schema, tokenType, dispatch, explainer, property]);
+      initialName: name,
+      name,
+    } as EditTokenObject);
+  }, [schema, dispatch]);
 
   const showNewForm = React.useCallback(({ name = '' }: ShowNewFormOptions) => {
     showForm({ token: null, name, isPristine: true });
@@ -112,6 +106,7 @@ const TokenListing: React.FC<Props> = ({
             </div>
           </Tooltip>
           <Heading size="small">{label}</Heading>
+          {isPro ? <ProBadge /> : null}
         </button>
         <div className="absolute right-0 flex mr-2">
           {showDisplayToggle && (
@@ -120,7 +115,8 @@ const TokenListing: React.FC<Props> = ({
 
           <IconButton
             dataCy="button-add-new-token"
-            disabled={editProhibited}
+            // TODO: Add proper logic to disable adding a token type depending on flags
+            disabled={editProhibited || (isPro && !gitBranchSelector)}
             icon={<AddIcon />}
             tooltip="Add a new token"
             onClick={handleShowNewForm}
@@ -138,7 +134,6 @@ const TokenListing: React.FC<Props> = ({
               showNewForm={showNewForm}
               showForm={showForm}
               schema={schema}
-              type={tokenType}
               displayType={displayType}
             />
           </div>

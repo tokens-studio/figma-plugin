@@ -24,7 +24,7 @@ type Hsla = {
 };
 
 type Props = {
-  value: string;
+  value?: string;
   onChange: (color: string) => void;
 };
 
@@ -74,7 +74,7 @@ const hexToHslaColor = (value: string) => {
   }
 };
 
-const ColorPicker: React.FC<Props> = ({ value, onChange }) => {
+const ColorPicker: React.FC<Props> = ({ value = '#000000', onChange }) => {
   const [inputMode, setInputMode] = React.useState(InputMode.RGBA);
   const [internalValue, setInternalValue] = React.useState(value);
   const [rgba, setRgba] = React.useState<Rgba>(hexToRgbaColor(value));
@@ -211,7 +211,7 @@ const ColorPicker: React.FC<Props> = ({ value, onChange }) => {
         </div>
         )}
         <Button variant="secondary" size="small" onClick={handleInputModeToggle}>
-          {inputMode === InputMode.RGBA ? 'HSL(A)' : 'RGB(A)'}
+          {inputMode === InputMode.RGBA ? 'RGB(A)' : 'HSL(A)'}
         </Button>
       </div>
     </div>

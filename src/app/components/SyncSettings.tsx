@@ -2,7 +2,6 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { track } from '@/utils/analytics';
-import { StorageProviderType } from '@/types/api';
 import Button from './Button';
 import Heading from './Heading';
 import ConfirmLocalStorageModal from './modals/ConfirmLocalStorageModal';
@@ -16,6 +15,9 @@ import { apiProvidersSelector, localApiStateSelector, storageTypeSelector } from
 import Stack from './Stack';
 import Box from './Box';
 import Text from './Text';
+import { StorageProviderType } from '@/constants/StorageProviderType';
+import useRemoteTokens from '../store/remoteTokens';
+import { StorageTypeCredentials } from '@/types/StorageType';
 
 const SyncSettings = () => {
   const localApiState = useSelector(localApiStateSelector);
@@ -24,34 +26,39 @@ const SyncSettings = () => {
   const dispatch = useDispatch<Dispatch>();
 
   const { setStorageType } = useStorage();
+  const { fetchBranches } = useRemoteTokens();
 
   const [confirmModalVisible, showConfirmModal] = React.useState(false);
   const [editStorageItemModalVisible, setShowEditStorageModalVisible] = React.useState(Boolean(localApiState.new));
   const [createStorageItemModalVisible, setShowCreateStorageModalVisible] = React.useState(false);
+  const [storageProvider, setStorageProvider] = React.useState(localApiState.provider);
+
+  const setLocalBranches = React.useCallback(async (provider: StorageTypeCredentials) => {
+    const branches = await fetchBranches(provider);
+    if (branches) {
+      dispatch.branchState.setBranches(branches);
+    }
+  }, [dispatch.branchState, fetchBranches]);
 
   const handleEditClick = React.useCallback((provider) => () => {
     track('Edit Credentials');
     dispatch.uiState.setLocalApiState(provider);
     setShowEditStorageModalVisible(true);
-  }, [dispatch.uiState]);
+    setLocalBranches(provider);
+  }, [dispatch.uiState, setLocalBranches]);
 
   const handleProviderClick = React.useCallback((provider: StorageProviderType) => () => {
-    dispatch.uiState.setLocalApiState({
-      name: '',
-      secret: '',
-      id: '',
-      provider,
-    });
-  }, [dispatch.uiState]);
+    setStorageProvider(provider);
+  }, []);
 
-  const selectedRemoteProvider = React.useMemo(() => [StorageProviderType.JSONBIN, StorageProviderType.GITHUB, StorageProviderType.GITLAB, StorageProviderType.URL].includes(
-    localApiState?.provider as StorageProviderType,
-  ), [localApiState?.provider]);
+  const selectedRemoteProvider = React.useMemo(() => [StorageProviderType.JSONBIN, StorageProviderType.GITHUB, StorageProviderType.GITLAB, StorageProviderType.ADO, StorageProviderType.URL].includes(
+    storageProvider as StorageProviderType,
+  ), [storageProvider]);
 
-  const storedApiProviders = () => apiProviders.filter((item) => item.provider === localApiState?.provider);
+  const storedApiProviders = () => apiProviders.filter((item) => item.provider === storageProvider);
 
   const storageProviderText = () => {
-    switch (localApiState?.provider) {
+    switch (storageProvider) {
       case StorageProviderType.JSONBIN:
         return (
           <div>
@@ -105,6 +112,22 @@ const SyncSettings = () => {
             .
           </div>
         );
+      case StorageProviderType.ADO:
+        return (
+          <div>
+            Sync your tokens with a Azure DevOps repository so your design decisions are up to date with code.
+            {' '}
+            <a
+              href="https://docs.tokens.studio/sync/ado"
+              target="_blank"
+              rel="noreferrer"
+              className="underline"
+            >
+              Read the guide
+            </a>
+            .
+          </div>
+        );
       case StorageProviderType.URL:
         return <div>Sync with a JSON stored on an external URL. This mode only allows Read Only.</div>;
       default:
@@ -114,6 +137,7 @@ const SyncSettings = () => {
 
   const handleSubmitLocalStorage = React.useCallback(() => {
     dispatch.uiState.setLocalApiState({ provider: StorageProviderType.LOCAL });
+    setStorageProvider(StorageProviderType.LOCAL);
     setStorageType({
       provider: { provider: StorageProviderType.LOCAL },
       shouldSetInDocument: true,
@@ -136,7 +160,7 @@ const SyncSettings = () => {
   }, []);
 
   const handleShowAddCredentials = React.useCallback(() => {
-    track('Add Credentials', { provider: localApiState.provider });
+    track('Add Credentials', { provider: storageProvider });
     setShowCreateStorageModalVisible(true);
   }, [localApiState.provider]);
 
@@ -145,7 +169,7 @@ const SyncSettings = () => {
       {confirmModalVisible && (
         <ConfirmLocalStorageModal
           isOpen={confirmModalVisible}
-          onClose={showConfirmModal}
+          onToggle={showConfirmModal}
           onSuccess={handleSubmitLocalStorage}
         />
       )}
@@ -162,6 +186,7 @@ const SyncSettings = () => {
           isOpen={createStorageItemModalVisible}
           onClose={handleHideAddCredentials}
           onSuccess={handleHideAddCredentials}
+          storageProvider={storageProvider}
         />
       )}
       <Box css={{ padding: '0 $4' }}>
@@ -170,65 +195,72 @@ const SyncSettings = () => {
             <Heading size="medium">Token Storage</Heading>
             <Stack direction="row" gap={2}>
               <ProviderSelector
-                isActive={localApiState?.provider === StorageProviderType.LOCAL}
+                isActive={storageProvider === StorageProviderType.LOCAL}
                 isStored={storageType?.provider === StorageProviderType.LOCAL}
                 onClick={handleSetLocalStorage}
                 text="Local document"
                 id={StorageProviderType.LOCAL}
               />
               <ProviderSelector
-                isActive={localApiState?.provider === StorageProviderType.URL}
+                isActive={storageProvider === StorageProviderType.URL}
                 isStored={storageType?.provider === StorageProviderType.URL}
                 onClick={handleProviderClick(StorageProviderType.URL)}
                 text="URL"
                 id={StorageProviderType.URL}
               />
               <ProviderSelector
-                isActive={localApiState?.provider === StorageProviderType.JSONBIN}
+                isActive={storageProvider === StorageProviderType.JSONBIN}
                 isStored={storageType?.provider === StorageProviderType.JSONBIN}
                 onClick={handleProviderClick(StorageProviderType.JSONBIN)}
                 text="JSONbin"
                 id={StorageProviderType.JSONBIN}
               />
               <ProviderSelector
-                isActive={localApiState?.provider === StorageProviderType.GITHUB}
+                isActive={storageProvider === StorageProviderType.GITHUB}
                 isStored={storageType?.provider === StorageProviderType.GITHUB}
                 onClick={handleProviderClick(StorageProviderType.GITHUB)}
                 text="GitHub"
                 id={StorageProviderType.GITHUB}
               />
               <ProviderSelector
-                isActive={localApiState?.provider === StorageProviderType.GITLAB}
+                isActive={storageProvider === StorageProviderType.GITLAB}
                 isStored={storageType?.provider === StorageProviderType.GITLAB}
                 onClick={handleProviderClick(StorageProviderType.GITLAB)}
                 text="GitLab"
                 id={StorageProviderType.GITLAB}
               />
+              <ProviderSelector
+                isActive={storageProvider === StorageProviderType.ADO}
+                isStored={storageType?.provider === StorageProviderType.ADO}
+                onClick={handleProviderClick(StorageProviderType.ADO)}
+                text="ADO"
+                id={StorageProviderType.ADO}
+              />
             </Stack>
           </Stack>
           {selectedRemoteProvider && (
-          <>
-            <Text muted size="xsmall">{storageProviderText()}</Text>
-            <Button
-              id="button-add-new-credentials"
-              variant="secondary"
-              onClick={handleShowAddCredentials}
-            >
-              Add new credentials
-            </Button>
+            <>
+              <Text muted size="xsmall">{storageProviderText()}</Text>
+              <Button
+                id="button-add-new-credentials"
+                variant="secondary"
+                onClick={handleShowAddCredentials}
+              >
+                Add new credentials
+              </Button>
 
-            {storedApiProviders().length > 0 && (
-              <Stack direction="column" gap={2} width="full" align="start">
-                {storedApiProviders().map((item) => (
-                  <StorageItem
-                    key={item?.internalId || `${item.provider}-${item.id}-${item.secret}`}
-                    onEdit={handleEditClick(item)}
-                    item={item}
-                  />
-                ))}
-              </Stack>
-            )}
-          </>
+              {storedApiProviders().length > 0 && (
+                <Stack direction="column" gap={2} width="full" align="start">
+                  {storedApiProviders().map((item) => (
+                    <StorageItem
+                      key={item?.internalId || `${item.provider}-${item.id}-${item.secret}`}
+                      onEdit={handleEditClick(item)}
+                      item={item}
+                    />
+                  ))}
+                </Stack>
+              )}
+            </>
           )}
         </Stack>
       </Box>

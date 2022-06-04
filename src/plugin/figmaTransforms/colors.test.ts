@@ -70,7 +70,7 @@ describe('round-trip from plugin to figma', () => {
     const converted = convertToRgb(color);
 
     expect(converted).toEqual('#ffff0080');
-    expect(convertToFigmaColor(converted)).toEqual({
+    expect(convertToFigmaColor(converted!)).toEqual({
       color: {
         r: 1,
         g: 1,

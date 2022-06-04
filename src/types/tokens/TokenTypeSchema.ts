@@ -1,6 +1,10 @@
 import { TokenTypes } from '@/constants/TokenTypes';
-import { DeepKeyTokenMap } from './DeepKeyTokenMap';
-import { SingleToken } from './SingleToken';
+
+interface StringSchemaType { type: 'string' }
+interface ObjectSchemaType {
+  type: 'object'
+  properties: Record<string, StringSchemaType | ObjectSchemaType>
+}
 
 export type TokenTypeSchema = {
   label: string;
@@ -8,11 +12,8 @@ export type TokenTypeSchema = {
   type: TokenTypes;
   explainer?: string;
   help?: string;
-  schema: {
-    value?: SingleToken['value']
-    options?: {
-      description?: string;
-    }
+  isPro?: boolean;
+  schemas: {
+    value: ObjectSchemaType;
   }
-  values?: DeepKeyTokenMap,
 };

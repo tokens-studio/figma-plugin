@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import IconChevronDown from '../icons/IconChevronDown';
+import IconChevronDown from '@/icons/chevrondown.svg';
 import { StyledFolderButton } from './StyledFolderButton';
 import { StyledItem } from './StyledItem';
 import { StyledFolderButtonChevronBox } from './StyledFolderButtonChevronBox';
@@ -35,7 +35,8 @@ export function TokenSetListOrTree<T extends TreeOrListItem>({
   const mappedItems = useMemo(() => (
     items.filter((item) => (
       // remove items which are in a collapsed parent
-      !collapsed.some((parentKey) => item.parent?.startsWith(parentKey))
+      !collapsed.some((parentKey) => item.parent === parentKey
+      || (item.parent?.startsWith(parentKey) && item.parent?.charAt(parentKey.length) === '/'))
     )).map((item) => ({
       item,
       onToggleCollapsed: () => handleToggleCollapsed(item.key),
@@ -49,15 +50,15 @@ export function TokenSetListOrTree<T extends TreeOrListItem>({
           <StyledItem>
             <RenderItemContent item={item}>
               {(!item.isLeaf && displayType === 'tree') && (
-              <StyledFolderButton
-                type="button"
-                css={{ left: `${5 * item.level}px` }}
-                onClick={onToggleCollapsed}
-              >
-                <StyledFolderButtonChevronBox collapsed={collapsed.includes(item.key)}>
-                  <IconChevronDown />
-                </StyledFolderButtonChevronBox>
-              </StyledFolderButton>
+                <StyledFolderButton
+                  type="button"
+                  css={{ left: `${5 * item.level}px` }}
+                  onClick={onToggleCollapsed}
+                >
+                  <StyledFolderButtonChevronBox collapsed={collapsed.includes(item.key)}>
+                    <IconChevronDown />
+                  </StyledFolderButtonChevronBox>
+                </StyledFolderButton>
               )}
             </RenderItemContent>
           </StyledItem>
