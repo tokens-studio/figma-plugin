@@ -56,7 +56,7 @@ jobs:
       
       # 4: Run tests
       - name: Run test command
-        run: yarn test
+        run: yarn test:write
       # 5: Show coverage
       - name: Show coverage
         uses: mattallty/jest-github-action@v1
