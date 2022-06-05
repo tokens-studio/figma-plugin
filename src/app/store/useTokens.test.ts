@@ -182,5 +182,10 @@ const resolvedTokens: AnyTokenList = [
 ];
 
 describe('useToken test', () => {
+  const mockUsedTokenSetsSelector = jest.spyOn(ReactRedux, 'useSelector');
+  it('test', () => {
+    mockUsedTokenSetsSelector.mockReturnValue({
 
+    })
+  })
 });
