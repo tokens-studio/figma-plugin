@@ -1,0 +1,7 @@
+uses: mattallty/jest-github-action@v1
+env:
+  GITHUB_TOKEN: ${{ secrets.PAT }}
+with:
+  # Runs tests related to the changes since the base branch of your pull request
+  # Default to false if not set
+  changes-only: true
