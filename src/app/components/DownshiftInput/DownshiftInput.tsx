@@ -9,6 +9,7 @@ import { StyledPrefix } from '../Input';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { styled } from '@/stitches.config';
 import { StyledDownshiftInput } from './StyledDownshiftInput';
+import Tooltip from '../Tooltip';
 
 const StyledDropdown = styled('div', {
   position: 'absolute',
@@ -83,7 +84,7 @@ const StyledPart = styled('span', {
 interface DownShiftProps {
   name?: string;
   type: string;
-  label?: string;
+  label?: React.ReactElement | string;
   inlineLabel?: boolean;
   error?: string;
   value?: string;
@@ -191,7 +192,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
             {error ? <div className="font-bold text-red-500">{error}</div> : null}
           </Stack>
           <Box css={{ display: 'flex', position: 'relative', width: '100%' }} className="input">
-            {!!inlineLabel && !prefix && <StyledPrefix isText>{label}</StyledPrefix>}
+            {!!inlineLabel && !prefix && <Tooltip label={name}><StyledPrefix isText>{label}</StyledPrefix></Tooltip>}
             {!!prefix && <StyledPrefix>{prefix}</StyledPrefix>}
             <StyledDownshiftInput
               suffix={suffix}
