@@ -26,13 +26,13 @@ export default function TokenGroupHeading({
   const [showNewGroupNameField, setShowNewGroupNameField] = React.useState<boolean>(false);
   const [oldTokenGroupName, setOldTokenGroupName] = React.useState<string>('');
   const [isTokenGroupDuplicated, setIsTokenGroupDuplicated] = React.useState<boolean>(false);
+  const [copyName, setCopyName] = React.useState<string>('');
   const { deleteGroup, renameGroup, duplicateGroup } = useManageTokens();
 
   React.useEffect(() => {
-    if (isTokenGroupDuplicated) setOldTokenGroupName(`${path.split('.').pop()}-copy` || '');
-    else setOldTokenGroupName(`${path.split('.').pop()}` || '');
-    setNewTokenGroupName(path.split('.').pop() || '');
-  }, [oldTokenGroupName, isTokenGroupDuplicated, path]);
+    setNewTokenGroupName(`${path.split('.').pop()}${copyName}` || '');
+    setOldTokenGroupName(`${path.split('.').pop()}${copyName}` || '');
+  }, [oldTokenGroupName, isTokenGroupDuplicated, copyName, path]);
 
   const handleDelete = React.useCallback(() => {
     deleteGroup(path);
@@ -44,10 +44,11 @@ export default function TokenGroupHeading({
 
   const handleRenameTokenGroupSubmit = React.useCallback((e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
     setShowNewGroupNameField(false);
-    if (isTokenGroupDuplicated) renameGroup(`${path}-copy`, newTokenGroupName, type);
-    else renameGroup(path, newTokenGroupName, type);
+    renameGroup(`${path}${copyName}`, `${newTokenGroupName}`, type);
     setIsTokenGroupDuplicated(false);
+    setCopyName('');
   }, [isTokenGroupDuplicated, newTokenGroupName, path, renameGroup, type]);
 
   const handleNewTokenGroupNameChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -59,9 +60,10 @@ export default function TokenGroupHeading({
   }, []);
 
   const handleDuplicate = React.useCallback(() => {
-    setIsTokenGroupDuplicated(true);
-    setShowNewGroupNameField(true);
     duplicateGroup(path, type);
+    setIsTokenGroupDuplicated(true);
+    setCopyName('-copy');
+    setShowNewGroupNameField(true);
   }, [duplicateGroup, path, type]);
   return (
     <>
@@ -107,8 +109,8 @@ export default function TokenGroupHeading({
               onChange={handleNewTokenGroupNameChange}
               type="text"
               name="tokengroupname"
+              value={newTokenGroupName}
               required
-              defaultValue={oldTokenGroupName}
             />
           </Stack>
         </Stack>
