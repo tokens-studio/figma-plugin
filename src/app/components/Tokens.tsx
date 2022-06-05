@@ -299,13 +299,14 @@ function Tokens({ isActive }: { isActive: boolean }) {
               </Box>
             ) : (
               <Box css={{ width: '100%', paddingBottom: '$6' }} className="content scroll-container">
-                {memoizedTokens.map(([key, { values, ...schema }]) => (
+                {memoizedTokens.map(([key, { values, isPro, ...schema }]) => (
                   <div key={key}>
                     <TokenListing
                       tokenKey={key}
                       label={schema.label || key}
                       schema={schema}
                       values={values}
+                      isPro={isPro}
                     />
                   </div>
                 ))}

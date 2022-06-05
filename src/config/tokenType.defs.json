@@ -1,6 +1,6 @@
 {
   "sizing": {
-    "label": "Size",
+    "label": "Sizing",
     "property": "Size",
     "type": "sizing",
     "schemas": {
@@ -8,7 +8,7 @@
     }
   },
   "spacing": {
-    "label": "Space",
+    "label": "Spacing",
     "property": "Value",
     "type": "spacing",
     "schemas": {
@@ -161,6 +161,7 @@
     "label": "Composition",
     "property": "Composition",
     "type": "composition",
+    "isPro": true,
     "schemas": {
       "value": {
         "type": "object",
