@@ -56,7 +56,17 @@ jobs:
       
       # 4: Run tests
       - name: Run test command
-        run: yarn test
+        run: yarn test:write
+      # 5: Show coverage
+      - name: Show coverage
+        uses: mattallty/jest-github-action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN  }}
+        with:
+          # Runs tests related to the changes since the base branch of your pull request
+          # Default to false if not set
+          changes-only: true
+
   test-transform:
     name: Transformer Tests
     runs-on: ubuntu-latest
