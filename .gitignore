@@ -10,3 +10,4 @@ cypress/videos
 package
 .idea
 storybook-static
+coverage
