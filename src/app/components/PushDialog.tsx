@@ -23,13 +23,15 @@ function ConfirmDialog() {
   const redirectHref = React.useMemo(() => {
     let redirectHref = '';
     if (localApiState && 'id' in localApiState && localApiState.id) {
+      const [owner, repo] = localApiState.id.split('/');
       switch (localApiState.provider) {
         case StorageProviderType.GITHUB:
-          redirectHref = getGithubCreatePullRequestUrl(localApiState.id, branch);
+          redirectHref = getGithubCreatePullRequestUrl({
+            base: localApiState.baseUrl, repo: localApiState.id, branch,
+          });
           break;
         case StorageProviderType.GITLAB: {
-          const [owner, repo] = localApiState.id.split('/');
-          redirectHref = getGitlabCreatePullRequestUrl(owner, repo);
+          redirectHref = getGitlabCreatePullRequestUrl({ owner, repo });
           break;
         }
         case StorageProviderType.ADO:
@@ -75,7 +77,7 @@ function ConfirmDialog() {
               <Stack direction="column" gap={2}>
                 <Heading>Push changes</Heading>
                 <p className="text-xs">Push your local changes to your repository.</p>
-                <div className="text-xxs font-mono bg-gray-100 rounded p-2 text-gray-600">
+                <div className="p-2 font-mono text-gray-600 bg-gray-100 rounded text-xxs">
                   {'id' in localApiState ? localApiState.id : null}
                 </div>
                 <Input
