@@ -1,6 +1,6 @@
 import { Properties } from '@/constants/Properties';
 import type { TokenTypes } from '@/constants/TokenTypes';
-import { TokenBoxshadowValue, TokenTypograpyValue } from "./values";
+import { TokenBoxshadowValue, TokenTypograpyValue } from './values';
 
 export type CompositionTokenProperty = keyof typeof Properties;
 

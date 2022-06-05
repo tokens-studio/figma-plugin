@@ -60,7 +60,11 @@ export const useADO = () => {
       && isEqual(content.themes, themes)
     ) {
       notifyToUI('Nothing to commit');
-      return false;
+      return {
+        tokens,
+        themes,
+        metadata: {},
+      };
     }
 
     dispatch.uiState.setLocalApiState({ ...context });
@@ -80,12 +84,22 @@ export const useADO = () => {
         dispatch.uiState.setApiData({ ...context, branch: customBranch });
 
         pushDialog('success');
-        return true;
+
+        return {
+          tokens,
+          themes,
+          metadata: { commitMessage },
+        };
       } catch (e) {
         console.log('Error pushing to ADO', e);
       }
     }
-    return false;
+
+    return {
+      tokens,
+      themes,
+      metadata: {},
+    };
   }, [
     dispatch,
     storageClientFactory,
@@ -149,8 +163,8 @@ export const useADO = () => {
         }
         return content;
       }
-      await pushTokensToADO(context);
-      return content;
+
+      return await pushTokensToADO(context);
     } catch (e) {
       notifyToUI('Error syncing with ADO, check credentials', { error: true });
       console.log('Error', e);

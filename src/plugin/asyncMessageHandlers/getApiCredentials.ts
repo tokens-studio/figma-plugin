@@ -21,9 +21,10 @@ export const getApiCredentials: AsyncMessageChannelHandlers[AsyncMessageTypes.GE
       case StorageProviderType.JSONBIN:
       case StorageProviderType.GITHUB:
       case StorageProviderType.GITLAB:
+      case StorageProviderType.ADO:
       case StorageProviderType.URL: {
         compareProvidersWithStored({
-          providers: apiProviders ?? [], storageType, usedTokenSet, shouldPull: msg.shouldPull,
+          providers: apiProviders ?? [], storageType, usedTokenSet, shouldPull: msg.shouldPull, featureFlags: msg.featureFlags,
         });
         break;
       }

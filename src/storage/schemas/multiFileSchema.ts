@@ -1,11 +1,14 @@
 import z from 'zod';
+import { TokenSetStatus } from '@/constants/TokenSetStatus';
+import { singleTokenSchema } from './singleTokenSchema';
 
-export const multiFileSchema = z.record(z.record(z.object({
-  value: z.any(),
-  type: z.string(),
-}))).or(z.array(z.object({
+export const multiFileSchema = z.record(singleTokenSchema).or(z.array(z.object({
   id: z.string(),
   name: z.string(),
-  selectedTokenSets: z.record(z.string()),
+  selectedTokenSets: z.record(z.enum([
+    TokenSetStatus.ENABLED,
+    TokenSetStatus.DISABLED,
+    TokenSetStatus.SOURCE,
+  ])),
   $figmaStyleReferences: z.record(z.string()).optional(),
 })));

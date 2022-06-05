@@ -14,7 +14,6 @@ export function useGetActiveState(properties: (PropertyObject | TokenTypes)[], t
     ) {
       return false;
     }
-
     return (
       uiState.mainNodeSelectionValues[type] === name
       || properties.some((prop) => (

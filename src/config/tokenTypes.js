@@ -1,4 +1,4 @@
-import { object } from "dot-object";
+import { object } from 'dot-object';
 
 const tokenTypes = {
   sizing: {
