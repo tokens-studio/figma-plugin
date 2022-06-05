@@ -15,15 +15,14 @@ import {
 import { Flex } from '../Flex';
 import Text from '../Text';
 import { styled } from '@/stitches.config';
-import { IconToggleableDisclosure } from '@/icons/IconToggleableDisclosure';
+import IconToggleableDisclosure from '@/app/components/IconToggleableDisclosure';
 import { Dispatch } from '@/app/store';
 
 const ThemeDropdownLabel = styled(Text, {
   marginRight: '$2',
 });
 
-type Props = {
-};
+type Props = never;
 
 export const ThemeSelector: React.FC<Props> = () => {
   const dispatch = useDispatch<Dispatch>();

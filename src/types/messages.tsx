@@ -1,3 +1,4 @@
+import { LDProps } from 'launchdarkly-react-client-sdk/lib/withLDConsumer';
 import type { BackgroundJob } from '@/app/store/models/uiState';
 import type { SelectionGroup } from './SelectionGroup';
 import type { SelectionValue } from './SelectionValue';
@@ -5,6 +6,7 @@ import type { AnyTokenList, TokenStore } from './tokens';
 import type { UsedTokenSetsMap } from './UsedTokenSetsMap';
 import type { UpdateMode } from '@/constants/UpdateMode';
 import type { StorageType, StorageTypeCredentials } from './StorageType';
+import { UserData } from './userData';
 
 export enum MessageFromPluginTypes {
   SELECTION = 'selection',
@@ -64,6 +66,7 @@ export type RemoteCommentsFromPluginMessage = {
 export type TokenValuesFromPluginMessage = {
   type: MessageFromPluginTypes.TOKEN_VALUES;
   values: TokenStore;
+  userData: UserData;
 };
 export type NoTokenValuesFromPluginMessage = {
   type: MessageFromPluginTypes.NO_TOKEN_VALUES;
@@ -118,6 +121,7 @@ export type ApiCredentialsFromPluginMessage = {
   usedTokenSet?: UsedTokenSetsMap | null;
   activeTheme?: string | null;
   shouldPull?: boolean;
+  featureFlags?: LDProps['flags'];
 };
 
 export type LicenseKeyFromPluginMessage = {

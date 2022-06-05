@@ -1,5 +1,5 @@
-import { ThemeObjectsList } from '@/types';
-import type { AnyTokenList, AnyTokenSet } from '@/types/tokens';
+import { DeepTokensMap, ThemeObjectsList } from '@/types';
+import type { AnyTokenList, SingleToken } from '@/types/tokens';
 import convertTokensToObject from '@/utils/convertTokensToObject';
 import parseTokenValues from '@/utils/parseTokenValues';
 
@@ -13,7 +13,7 @@ export interface RemoteTokenStorageSingleTokenSetFile {
   type: 'tokenSet'
   path: string
   name: string
-  data: AnyTokenSet<false> // @README we save tokens without their name, but rather key them by their name
+  data: Record<string, SingleToken<false> | DeepTokensMap<false>>;// @README we save tokens without their name, but rather key them by their name
 }
 
 export interface RemoteTokenStorageThemesFile {
@@ -83,7 +83,6 @@ export abstract class RemoteTokenStorage<Metadata = unknown> {
     if (files.length === 0) {
       return null;
     }
-
     files.forEach((file) => {
       if (file.type === 'themes') {
         data.themes = [...data.themes, ...file.data];

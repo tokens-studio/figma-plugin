@@ -7,6 +7,7 @@ import Box from './Box';
 import Stack from './Stack';
 
 type Props = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'> & {
+  form?: string;
   name?: string;
   inputRef?: React.MutableRefObject<HTMLInputElement | null>;
   error?: string | null;
@@ -119,6 +120,7 @@ const StyledPrefix = styled('div', {
 });
 
 const Input = React.forwardRef<HTMLInputElement, Props>(({
+  form,
   name,
   autofocus,
   error = '',
@@ -163,6 +165,7 @@ const Input = React.forwardRef<HTMLInputElement, Props>(({
       <Box css={{ display: 'flex', position: 'relative', width: full ? '100%' : '' }} className="input">
         {!!prefix && <StyledPrefix>{prefix}</StyledPrefix>}
         <StyledInput
+          form={form}
           ref={inputRef ?? ref}
           spellCheck={false}
           tabIndex={tabindex ?? undefined}

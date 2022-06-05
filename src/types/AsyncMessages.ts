@@ -1,3 +1,4 @@
+import { LDProps } from 'launchdarkly-react-client-sdk/lib/withLDConsumer';
 import { UpdateMode } from '@/constants/UpdateMode';
 import type { SettingsState } from '@/app/store/models/settings';
 import type { Properties } from '@/constants/Properties';
@@ -143,6 +144,7 @@ export type SetLicenseKeyMessageResult = AsyncMessage<AsyncMessageTypes.SET_LICE
 
 export type GetApiCredentials = AsyncMessage<AsyncMessageTypes.GET_API_CREDENTIALS, {
   shouldPull?: boolean
+  featureFlags?: LDProps['flags'] | null
 }>;
 export type GetApiCredentialsResult = AsyncMessage<AsyncMessageTypes.GET_API_CREDENTIALS>;
 

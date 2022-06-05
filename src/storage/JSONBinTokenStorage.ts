@@ -1,7 +1,7 @@
 import z from 'zod';
 import * as pjs from '../../package.json';
-import { ThemeObjectsList } from '@/types';
-import { AnyTokenSet } from '@/types/tokens';
+import { DeepTokensMap, ThemeObjectsList } from '@/types';
+import { SingleToken } from '@/types/tokens';
 import { RemoteTokenStorage, RemoteTokenStorageFile } from './RemoteTokenStorage';
 import { singleFileSchema } from './schemas/singleFileSchema';
 
@@ -15,7 +15,7 @@ type JsonBinMetadata = {
 };
 
 type JsonbinData = JsonBinMetadata & {
-  values: Record<string, AnyTokenSet<false>>
+  values: Record<string, Record<string, SingleToken<false> | DeepTokensMap<false>>>
   $themes?: ThemeObjectsList
 };
 

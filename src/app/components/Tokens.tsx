@@ -27,7 +27,7 @@ import {
   activeTokenSetSelector, manageThemesModalOpenSelector, showEditFormSelector, tokenFilterSelector, tokensSelector, tokenTypeSelector, updateModeSelector, usedTokenSetSelector,
 } from '@/selectors';
 import { ThemeSelector } from './ThemeSelector';
-import { IconToggleableDisclosure } from '@/icons/IconToggleableDisclosure';
+import IconToggleableDisclosure from '@/app/components/IconToggleableDisclosure';
 import { styled } from '@/stitches.config';
 import { ManageThemesModal } from './ManageThemesModal';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
@@ -143,10 +143,11 @@ function Tokens({ isActive }: { isActive: boolean }) {
         }
         return 0;
       });
-      return mapped.map(([key, { values, ...schema }]) => ({
+      return mapped.map(([key, { values, isPro, ...schema }]) => ({
         key,
         values,
         schema,
+        isPro,
       }));
     }
     return [];
@@ -316,13 +317,16 @@ function Tokens({ isActive }: { isActive: boolean }) {
               </Box>
             ) : (
               <Box css={{ width: '100%', paddingBottom: '$6' }} className="content scroll-container">
-                {memoizedTokens.map(({ key, values, schema }) => (
+                {memoizedTokens.map(({
+                  key, values, isPro, schema,
+                }) => (
                   <div key={key}>
                     <TokenListing
                       tokenKey={key}
                       label={schema.label || key}
                       schema={schema}
                       values={values}
+                      isPro={isPro}
                     />
                   </div>
                 ))}

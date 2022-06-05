@@ -84,11 +84,11 @@ export class GithubTokenStorage extends GitTokenStorage {
     const currentUser = await this.octokitClient.rest.users.getAuthenticated();
     if (!currentUser.data.login) return false;
 
-    return !!this.octokitClient.rest.repos.getCollaboratorPermissionLevel({
+    return !!(await this.octokitClient.rest.repos.getCollaboratorPermissionLevel({
       owner: this.owner,
       repo: this.repository,
       username: currentUser.data.login,
-    });
+    })).data;
   }
 
   public async read(): Promise<RemoteTokenStorageFile<GitStorageMetadata>[]> {
@@ -111,6 +111,7 @@ export class GithubTokenStorage extends GitTokenStorage {
             mode: getTreeMode(item.type),
           })),
         });
+
         if (directoryTreeResponse.data.tree[0].sha) {
           const treeResponse = await this.octokitClient.rest.git.getTree({
             owner: this.owner,
@@ -118,22 +119,30 @@ export class GithubTokenStorage extends GitTokenStorage {
             tree_sha: directoryTreeResponse.data.tree[0].sha,
             recursive: 'true',
           });
+
           if (treeResponse.data.tree.length > 0) {
             const jsonFiles = treeResponse.data.tree.filter((file) => (
               file.path?.endsWith('.json')
             )).sort((a, b) => (
               (a.path && b.path) ? a.path.localeCompare(b.path) : 0
             ));
+            const DirectoryNameSplit = this.path.split('/');
+            const RootDirectoryName = DirectoryNameSplit[0];
+            let subDirectoryName: string;
+            if (DirectoryNameSplit.length > 1) {
+              subDirectoryName = `${DirectoryNameSplit.splice(1, DirectoryNameSplit.length - 1).join('/')}/`;
+            } else {
+              subDirectoryName = '';
+            }
 
             const jsonFileContents = await Promise.all(jsonFiles.map((treeItem) => (
               treeItem.path ? this.octokitClient.rest.repos.getContent({
                 owner: this.owner,
                 repo: this.repository,
-                path: `${this.path}/${treeItem.path}`,
+                path: `${RootDirectoryName}/${treeItem.path}`,
                 ref: this.branch,
               }) : Promise.resolve(null)
             )));
-
             return compact(jsonFileContents.map<RemoteTokenStorageFile<GitStorageMetadata> | null>((fileContent, index) => {
               const { path } = jsonFiles[index];
 
@@ -143,7 +152,8 @@ export class GithubTokenStorage extends GitTokenStorage {
                 && !Array.isArray(fileContent?.data)
                 && 'content' in fileContent.data
               ) {
-                const name = path.replace('.json', '');
+                let name = path.replace(subDirectoryName, '');
+                name = name.replace('.json', '');
                 const parsed = JSON.parse(decodeBase64(fileContent.data.content)) as GitMultiFileObject;
                 // @REAMDE we will need to ensure these reserved names
                 if (name === '$themes') {
@@ -170,7 +180,6 @@ export class GithubTokenStorage extends GitTokenStorage {
         const data = decodeBase64(response.data.content);
         if (IsJSONString(data)) {
           const parsed = JSON.parse(data) as GitSingleFileObject;
-
           return [
             {
               type: 'themes',
@@ -208,6 +217,6 @@ export class GithubTokenStorage extends GitTokenStorage {
         },
       ],
     });
-    return !!response;
+    return !!response.data.content;
   }
 }

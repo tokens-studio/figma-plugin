@@ -10,6 +10,7 @@ import SingleCompositionTokenForm from './SingleCompositionTokenForm';
 import { CompositionTokenProperty } from '@/types/CompositionTokenProperty';
 import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 import { TokenTypes } from '@/constants/TokenTypes';
+import { filterValidCompositionTokenTypes } from '@/utils/filterValidCompositionTokenTypes';
 
 export default function CompositionTokenForm({
   internalEditToken,
@@ -22,7 +23,7 @@ export default function CompositionTokenForm({
   const [orderObj, setOrderObj] = React.useState<NodeTokenRefMap>({});
   const [error, setError] = React.useState(false);
   const propertiesMenu = React.useMemo(() => (
-    Object.keys(Properties).map((key: string) => (
+    filterValidCompositionTokenTypes(Object.keys(Properties)).map((key: string) => (
       String(Properties[key as CompositionTokenProperty])
     ))
   ), []);
@@ -39,9 +40,8 @@ export default function CompositionTokenForm({
   const arrangedTokenValue = React.useMemo<NodeTokenRefMap>(() => {
     const internalEditTokenValue = internalEditToken.value || internalEditToken.schema.schemas.value.properties;
     return Object.assign({}, ...Object.keys(internalEditTokenValue).sort((a, b) => Number(orderObj[a as CompositionTokenProperty]) - Number(orderObj[b as CompositionTokenProperty]))
-      .map((x) => ({ [x as CompositionTokenProperty]: internalEditTokenValue[x as CompositionTokenProperty] })))
+      .map((x) => ({ [x as CompositionTokenProperty]: internalEditTokenValue[x as CompositionTokenProperty] })));
   }, [internalEditToken, orderObj]);
-
 
   const addToken = useCallback(() => {
     const internalEditTokenValue = internalEditToken.value || internalEditToken.schema.schemas.value.properties;
