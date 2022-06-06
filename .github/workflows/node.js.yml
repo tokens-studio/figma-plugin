@@ -57,11 +57,13 @@ jobs:
       # 4: Run tests
       - name: Run test command
         run: yarn test
-      - name: TestCoverage
+      
+      # 5: Run test coverage report
+      - name: Run test coverage report
         id: testCoverage
         uses: anuraag016/Jest-Coverage-Diff@master
         with:
-          fullCoverageDiff: false // defaults to false, if made true whole coverage report is commented with the diff
+          fullCoverageDiff: false
           runCommand: "npx jest --collectCoverageFrom='[\"src/**/*.{js,jsx,ts,tsx}\"]' --coverage --collectCoverage=true --coverageDirectory='./' --coverageReporters='json-summary' --forceExit --detectOpenHandles test/.*test.*"
           delta: 0.5
   test-transform:
