@@ -129,6 +129,25 @@ describe('GithubTokenStorage', () => {
     });
   });
 
+  it('canWrite should return false if it wasnt possible to fetch collaboration level', async () => {
+    mockGetAuthenticated.mockImplementationOnce(() => (
+      Promise.resolve({
+        data: {
+          login: 'six7',
+        },
+      })
+    ));
+    mockGetCollaboratorPermissionLevel.mockImplementationOnce(() => {
+      throw new Error('Could not fetch collaboration level');
+    });
+    expect(await storageProvider.canWrite()).toBe(false);
+    expect(mockGetCollaboratorPermissionLevel).toBeCalledWith({
+      owner: 'six7',
+      repo: 'figma-tokens',
+      username: 'six7',
+    });
+  });
+
   it('canWrite should return true if a collaborator', async () => {
     mockGetAuthenticated.mockImplementationOnce(() => (
       Promise.resolve({
