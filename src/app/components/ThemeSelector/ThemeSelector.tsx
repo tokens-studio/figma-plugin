@@ -22,9 +22,7 @@ const ThemeDropdownLabel = styled(Text, {
   marginRight: '$2',
 });
 
-type Props = never;
-
-export const ThemeSelector: React.FC<Props> = () => {
+export const ThemeSelector: React.FC = () => {
   const dispatch = useDispatch<Dispatch>();
   const activeTheme = useSelector(activeThemeSelector);
   const availableThemes = useSelector(themeOptionsSelector);
