@@ -6,13 +6,13 @@ const tokenAliasValue = [
 ];
 const tokenWithOutAlias = '2';
 
-describe('contain alias test', () => {
-  it('ifContainAlias', () => {
+describe('test if the value contains alias', () => {
+  it('returns true when token value is an alias', () => {
     tokenAliasValue.forEach((tokenValue) => {
       expect(checkIfContainsAlias(tokenValue)).toBe(true);
     });
   });
-  it('ifContain no Alias', () => {
+  it('returns false when token value is an alias', () => {
     expect(checkIfContainsAlias(tokenWithOutAlias)).toBe(false);
   });
 });
