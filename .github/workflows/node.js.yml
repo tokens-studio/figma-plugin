@@ -54,7 +54,7 @@ jobs:
       - name: Install dependencies
         run: yarn --frozen-lockfile
       # 5: Show coverage
-      - name: Test
+      - name: Test and show coverage
         uses: mattallty/jest-github-action@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN  }}
@@ -62,6 +62,7 @@ jobs:
           # Runs tests related to the changes since the base branch of your pull request
           # Default to false if not set
           changes-only: true
+          test-command: yarn test:write
 
   test-transform:
     name: Transformer Tests
