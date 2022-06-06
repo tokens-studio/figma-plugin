@@ -8,6 +8,10 @@ import setColorValuesOnTarget from './setColorValuesOnTarget';
 import setEffectValuesOnTarget from './setEffectValuesOnTarget';
 import setTextValuesOnTarget from './setTextValuesOnTarget';
 import { tokensSharedDataHandler } from './SharedDataHandler';
+import { TokenBoxshadowValue } from '@/types/values';
+import { convertBoxShadowTypeToFigma } from './figmaTransforms/boxShadow';
+import { convertTypographyNumberToFigma } from './figmaTransforms/generic';
+import convertOffsetToFigma from './figmaTransforms/offset';
 
 function figmaColorToHex(color: RGBA | RGB, opacity?: number): string {
   if ('a' in color) {
@@ -53,6 +57,84 @@ function findMatchingNonLocalPaintStyle(styleId: string, colorToken: string) {
   return matchingStyle;
 }
 
+function isEffectEqual(effect1?: Effect, effect2?: Effect) {
+  if (effect1 && effect2) {
+    if (effect1.type === effect2.type) {
+      if (
+        (effect1.type === 'DROP_SHADOW' && effect2.type === 'DROP_SHADOW')
+        || (effect1.type === 'INNER_SHADOW' && effect2.type === 'INNER_SHADOW')
+      ) {
+        const effect1Hex = figmaColorToHex(effect1.color);
+        const effect2Hex = figmaColorToHex(effect2.color);
+
+        return (
+          // Comparison using rgb doesn't work as Figma has a rounding issue,
+          // that doesn't produce same RGB floats as the existing color :(
+          // effect1.color.r === effect2.color.r
+          // && effect1.color.g === effect2.color.g
+          // && effect1.color.b === effect2.color.b
+          // Compare using hex instead for now:
+          effect1Hex === effect2Hex
+          && effect1.offset.x === effect2.offset.x
+          && effect1.offset.y === effect2.offset.y
+          && effect1.radius === effect2.radius
+          && effect1.spread === effect2.spread
+          && effect1.blendMode === effect2.blendMode
+          // Token doesn't store this effect subvalue (yet) so omit from comparison:
+          // && paint1.showShadowBehindNode === paint2.showShadowBehindNode
+        );
+      }
+      if (
+        (effect1.type === 'BACKGROUND_BLUR' && effect2.type === 'BACKGROUND_BLUR')
+        || (effect1.type === 'LAYER_BLUR' && effect2.type === 'LAYER_BLUR')
+      ) {
+        return effect1.radius === effect2.radius;
+      }
+    }
+  }
+  return false;
+}
+
+function convertBoxShadowToFigmaEffect(value: TokenBoxshadowValue): Effect {
+  const { color, opacity: a } = convertToFigmaColor(value.color);
+  const { r, g, b } = color;
+  return {
+    color: {
+      r,
+      g,
+      b,
+      a,
+    },
+    type: convertBoxShadowTypeToFigma(value.type),
+    spread: convertTypographyNumberToFigma(value.spread.toString()),
+    radius: convertTypographyNumberToFigma(value.blur.toString()),
+    offset: convertOffsetToFigma(convertTypographyNumberToFigma(value.x.toString()), convertTypographyNumberToFigma(value.y.toString())),
+    blendMode: (value.blendMode || 'NORMAL') as BlendMode,
+    visible: true,
+  };
+}
+
+function findMatchingNonLocalEffectStyle(styleId: string, boxShadowToken: string | TokenBoxshadowValue | TokenBoxshadowValue[]) {
+  let matchingStyle: EffectStyle | undefined;
+
+  const nonLocalStyle = figma.getStyleById(styleId);
+  if (typeof boxShadowToken !== 'string' && nonLocalStyle?.type === 'EFFECT') {
+    const boxShadowTokenArr = Array.isArray(boxShadowToken) ? boxShadowToken : [boxShadowToken];
+    const styleEffects = (nonLocalStyle as EffectStyle).effects;
+    if (styleEffects.length === boxShadowTokenArr.length) {
+      if (styleEffects.every((styleEffect, idx) => {
+        const tokenEffect = convertBoxShadowToFigmaEffect(boxShadowTokenArr[idx]);
+        return isEffectEqual(styleEffect, tokenEffect);
+      })) {
+        // console.log('findMatchingNonLocalEffectStyle -> hasMatchingNonLocalStyle=true);
+        matchingStyle = nonLocalStyle as EffectStyle;
+      }
+    }
+  }
+
+  return matchingStyle;
+}
+
 export default async function setValuesOnNode(
   node: BaseNode,
   values: Partial<Record<Properties, string>>,
@@ -88,10 +170,26 @@ export default async function setValuesOnNode(
       if ('effects' in node && typeof values.boxShadow !== 'undefined' && data.boxShadow) {
         const path = data.boxShadow.split('.');
         const pathname = path.slice(ignoreFirstPartForStyles ? 1 : 0, path.length).join('/');
-        const matchingStyle = figmaStyleMaps.effectStyles.get(pathname);
+        let matchingStyle = figmaStyleMaps.effectStyles.get(pathname);
+        // Pretend we didn't find the style...
+        // if (!matchingStyle) {
+        if (matchingStyle && matchingStyle.name === 'shadows/default') {
+          const effectStyleIdBackupKey = 'effectStyleId_original';
+          let effectStyleId = tokensSharedDataHandler.get(node, effectStyleIdBackupKey, (val) => (val ? JSON.parse(val) as string : val));
+          if (effectStyleId === '' && typeof node.effectStyleId === 'string') {
+            effectStyleId = node.effectStyleId;
+          }
+          matchingStyle = findMatchingNonLocalEffectStyle(effectStyleId, values.boxShadow);
+          let effectStyleIdBackup = ''; // Setting to empty string will delete the plugin data key if the style matches or doesn't exist
+          if (effectStyleId && !matchingStyle) {
+            effectStyleIdBackup = JSON.stringify(effectStyleId);
+          }
+          // console.log(`setValuesOnNode -> hasMatchingNonLocalStyle: ${!!matchingStyle}, effectStyleIdBackup: ${effectStyleIdBackup}, linked style: ${matchingStyle?.name}`);
+          tokensSharedDataHandler.set(node, effectStyleIdBackupKey, effectStyleIdBackup);
+        }
         if (matchingStyle) {
           node.effectStyleId = matchingStyle.id;
-        } else if (node.effectStyleId === '') { // only set raw token value if node isn't linked to a Figma style:
+        } else {
           setEffectValuesOnTarget(node, { value: values.boxShadow });
         }
       }
