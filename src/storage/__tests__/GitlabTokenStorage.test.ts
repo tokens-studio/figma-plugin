@@ -1,4 +1,5 @@
 import { TokenTypes } from '@/constants/TokenTypes';
+import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { GitlabTokenStorage } from '../GitlabTokenStorage';
 
 const mockGetUserName = jest.fn();
@@ -144,7 +145,7 @@ describe('GitlabTokenStorage', () => {
     expect(mockCreateBranch).toBeCalledWith(35102363, 'development', 'heads/main');
   });
 
-  it('canWrite should return true if use is a collaborator by GroupMember', async () => {
+  it('canWrite should return true if user is a collaborator by GroupMember', async () => {
     mockGetCurrentUser.mockImplementationOnce(() => (
       Promise.resolve({
         id: 11289475,
@@ -199,7 +200,7 @@ describe('GitlabTokenStorage', () => {
       Promise.resolve([])
     ));
 
-    storageProvider.changePath('data/global.json');
+    storageProvider.changePath('data/tokens.json');
     mockGetRepositoryFiles.mockImplementationOnce(() => (
       Promise.resolve(JSON.stringify({
         global: {
@@ -231,12 +232,12 @@ describe('GitlabTokenStorage', () => {
           },
 
         },
-        path: 'data/global.json/$themes.json',
+        path: 'data/tokens.json/$themes.json',
         type: 'themes',
       },
       {
         name: 'global',
-        path: 'data/global.json/global.json',
+        path: 'data/tokens.json/global.json',
         type: 'tokenSet',
         data: {
           red: {
@@ -246,7 +247,7 @@ describe('GitlabTokenStorage', () => {
         },
       },
     ]);
-    expect(mockGetRepositoryFiles).toBeCalledWith(35102363, 'data/global.json', { ref: 'main' });
+    expect(mockGetRepositoryFiles).toBeCalledWith(35102363, 'data/tokens.json', { ref: 'main' });
   });
 
   it('can read from Git in a multifile format', async () => {
@@ -334,7 +335,7 @@ describe('GitlabTokenStorage', () => {
         ],
       )
     ));
-    storageProvider.changePath('data/global.json');
+    storageProvider.changePath('data/tokens.json');
 
     mockGetRepositories.mockImplementationOnce(() => (
       Promise.resolve([])
@@ -358,13 +359,13 @@ describe('GitlabTokenStorage', () => {
         type: 'themes',
         path: '$themes.json',
         data: [
-          // {
-          //   id: 'light',
-          //   name: 'Light',
-          //   selectedTokenSets: {
-          //     global: TokenSetStatus.ENABLED,
-          //   },
-          // },
+          {
+            id: 'light',
+            name: 'Light',
+            selectedTokenSets: {
+              global: TokenSetStatus.ENABLED,
+            },
+          },
         ],
       },
       {
@@ -388,7 +389,13 @@ describe('GitlabTokenStorage', () => {
         {
           action: 'create',
           content: JSON.stringify({
-            $themes: [],
+            $themes: [{
+              id: 'light',
+              name: 'Light',
+              selectedTokenSets: {
+                global: TokenSetStatus.ENABLED,
+              },
+            }],
             global: {
               red: {
                 type: TokenTypes.COLOR,
@@ -396,7 +403,7 @@ describe('GitlabTokenStorage', () => {
               },
             },
           }, null, 2),
-          filePath: 'data/global.json',
+          filePath: 'data/tokens.json',
         },
       ],
       undefined,
@@ -437,19 +444,19 @@ describe('GitlabTokenStorage', () => {
         type: 'themes',
         path: '$themes.json',
         data: [
-          // {
-          //   id: 'light',
-          //   name: 'Light',
-          //   selectedTokenSets: {
-          //     global: TokenSetStatus.ENABLED,
-          //   },
-          // },
+          {
+            id: 'light',
+            name: 'Light',
+            selectedTokenSets: {
+              global: TokenSetStatus.ENABLED,
+            },
+          },
         ],
       },
       {
         type: 'tokenSet',
-        name: 'global',
-        path: 'global.json',
+        name: 'tokens',
+        path: 'tokens.json',
         data: {
           red: {
             type: TokenTypes.COLOR,
@@ -466,7 +473,13 @@ describe('GitlabTokenStorage', () => {
       [
         {
           action: 'create',
-          content: JSON.stringify([]),
+          content: JSON.stringify([{
+            id: 'light',
+            name: 'Light',
+            selectedTokenSets: {
+              global: TokenSetStatus.ENABLED,
+            },
+          }], null, 2),
           filePath: 'data/$themes.json',
         },
         {
@@ -477,7 +490,7 @@ describe('GitlabTokenStorage', () => {
               value: '#ff0000',
             },
           }, null, 2),
-          filePath: 'data/global.json',
+          filePath: 'data/tokens.json',
         },
       ],
       undefined,
