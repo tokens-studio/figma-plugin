@@ -3,5 +3,6 @@ declare module 'launchdarkly-js-sdk-common' {
     gitBranchSelector?: boolean
     tokenThemes?: boolean
     multiFileSync?: boolean
+    compositionTokens?: boolean
   }
 }
