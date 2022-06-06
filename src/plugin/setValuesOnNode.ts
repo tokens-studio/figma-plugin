@@ -9,10 +9,22 @@ import setEffectValuesOnTarget from './setEffectValuesOnTarget';
 import setTextValuesOnTarget from './setTextValuesOnTarget';
 import { tokensSharedDataHandler } from './SharedDataHandler';
 
-function findMatchingNonLocalStyle(node: BaseNode, styleId: string, colorToken: string) {
-  let matchingStyle: PaintStyle | undefined;
+function figmaColorToHex(color: RGBA | RGB, opacity?: number): string {
+  if ('a' in color) {
+    return figmaRGBToHex(color);
+  }
+  const { r, g, b } = color;
+  return figmaRGBToHex({
+    r, g, b, a: opacity,
+  });
+}
 
-  let hasMatchingNonLocalStyle = false;
+function figmaPaintToHex(paint: SolidPaint): string {
+  return figmaColorToHex(paint.color, paint.opacity);
+}
+
+function findMatchingNonLocalPaintStyle(styleId: string, colorToken: string) {
+  let matchingStyle: PaintStyle | undefined;
 
   if (styleId) {
     // console.log('setValuesOnNode -> looking for non-local style:', fillStyleId);
@@ -28,10 +40,9 @@ function findMatchingNonLocalStyle(node: BaseNode, styleId: string, colorToken: 
         // that doesn't produce same RGB floats as the existing paint :(
         // hasMatchingNonLocalStyle = isPaintEqual(newPaint, existingPaint);
         // Compare using hex instead for now:
-        const existingHex = figmaRGBToHex(existingPaint.color);
-        const newHex = figmaRGBToHex(newPaint.color);
-        hasMatchingNonLocalStyle = existingHex === newHex;
-        if (hasMatchingNonLocalStyle) {
+        const existingHex = figmaPaintToHex(existingPaint);
+        const newHex = figmaPaintToHex(newPaint);
+        if (existingHex === newHex) {
           // console.log('setValuesOnNode -> hasMatchingNonLocalStyle=true so re-set it to linked style:', nonLocalStyle.name);
           matchingStyle = nonLocalStyle as PaintStyle;
         }
@@ -123,7 +134,7 @@ export default async function setValuesOnNode(
             if (fillStyleId === '' && typeof node.fillStyleId === 'string') {
               fillStyleId = node.fillStyleId;
             }
-            matchingStyle = findMatchingNonLocalStyle(node, fillStyleId, values.fill);
+            matchingStyle = findMatchingNonLocalPaintStyle(fillStyleId, values.fill);
             let fillStyleIdBackup = ''; // Setting to empty string will delete the plugin data key if the style matches or doesn't exist
             if (fillStyleId && !matchingStyle) {
               fillStyleIdBackup = JSON.stringify(fillStyleId);
@@ -194,7 +205,7 @@ export default async function setValuesOnNode(
             if (strokeStyleId === '' && typeof node.strokeStyleId === 'string') {
               strokeStyleId = node.strokeStyleId;
             }
-            matchingStyle = findMatchingNonLocalStyle(node, strokeStyleId, values.border);
+            matchingStyle = findMatchingNonLocalPaintStyle(strokeStyleId, values.border);
             let strokeStyleIdBackup = ''; // Setting to empty string will delete the plugin data key if the style matches or doesn't exist
             if (strokeStyleId && !matchingStyle) {
               strokeStyleIdBackup = JSON.stringify(strokeStyleId);
