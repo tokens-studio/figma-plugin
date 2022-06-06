@@ -12,6 +12,7 @@ import { Dispatch } from '@/app/store';
 import { licenseKeyErrorSelector } from '@/selectors/licenseKeyErrorSelector';
 import useConfirm from '@/app/hooks/useConfirm';
 import { AddLicenseSource } from '@/app/store/models/userState';
+import ProBadge from '../ProBadge';
 import { userIdSelector } from '@/selectors/userIdSelector';
 
 export default function AddLicenseKey() {
@@ -66,7 +67,10 @@ export default function AddLicenseKey() {
 
   return (
     <Stack direction="column" gap={3} css={{ padding: '0 $4' }}>
-      <Heading size="medium">License key</Heading>
+      <Stack direction="row" gap={2} align="center" justify="between">
+        <Heading size="medium">License key</Heading>
+        <ProBadge />
+      </Stack>
       <Stack
         direction="row"
         gap={2}
