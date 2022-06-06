@@ -53,17 +53,17 @@ jobs:
       # 3: Install dependencies
       - name: Install dependencies
         run: yarn --frozen-lockfile
-      # 5: Show coverage
-      - name: Test and show coverage
-        uses: mattallty/jest-github-action@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN  }}
+      
+      # 4: Run tests
+      - name: Run test command
+        run: yarn test
+      - name: TestCoverage
+        id: testCoverage
+        uses: anuraag016/Jest-Coverage-Diff@master
         with:
-          # Runs tests related to the changes since the base branch of your pull request
-          # Default to false if not set
-          changes-only: true
-          test-command: yarn test:write
-
+          fullCoverageDiff: false // defaults to false, if made true whole coverage report is commented with the diff
+          runCommand: "npx jest --collectCoverageFrom='[\"src/**/*.{js,jsx,ts,tsx}\"]' --coverage --collectCoverage=true --coverageDirectory='./' --coverageReporters='json-summary' --forceExit --detectOpenHandles test/.*test.*"
+          delta: 0.5
   test-transform:
     name: Transformer Tests
     runs-on: ubuntu-latest
