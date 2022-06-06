@@ -119,7 +119,7 @@ describe('GithubTokenStorage', () => {
       })
     ));
     mockGetCollaboratorPermissionLevel.mockImplementationOnce(() => (
-      Promise.resolve({ data: null })
+      Promise.resolve(null)
     ));
     expect(await storageProvider.canWrite()).toBe(false);
     expect(mockGetCollaboratorPermissionLevel).toBeCalledWith({
