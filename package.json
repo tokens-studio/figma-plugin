@@ -121,6 +121,7 @@
     "@svgr/webpack": "^5.5.0",
     "@testing-library/jest-dom": "^5.11.9",
     "@testing-library/react": "^11.2.5",
+    "@testing-library/react-hooks": "^8.0.0",
     "@types/jest": "^26.0.20",
     "@types/lodash.debounce": "^4.0.7",
     "@types/object-hash": "^2.2.1",

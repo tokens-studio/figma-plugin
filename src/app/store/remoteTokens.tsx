@@ -44,6 +44,7 @@ export default function useRemoteTokens() {
   const { pullTokensFromURL } = useURL();
 
   const pullTokens = useCallback(async ({ context = api, featureFlags, usedTokenSet }: PullTokensOptions) => {
+    console.log('conte', context, 'used', usedTokenSet);
     track('pullTokens', { provider: context.provider });
     dispatch.uiState.startJob({
       name: BackgroundJobs.UI_PULLTOKENS,
@@ -90,6 +91,7 @@ export default function useRemoteTokens() {
     }
 
     dispatch.uiState.completeJob(BackgroundJobs.UI_PULLTOKENS);
+    console.log('remote', remoteData);
     return remoteData;
   }, [
     dispatch,
