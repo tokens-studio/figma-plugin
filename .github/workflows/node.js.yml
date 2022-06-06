@@ -53,12 +53,8 @@ jobs:
       # 3: Install dependencies
       - name: Install dependencies
         run: yarn --frozen-lockfile
-      
-      # 4: Run tests
-      - name: Run test command
-        run: yarn test:write
       # 5: Show coverage
-      - name: Show coverage
+      - name: Test
         uses: mattallty/jest-github-action@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN  }}
