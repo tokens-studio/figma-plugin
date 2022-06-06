@@ -36,7 +36,7 @@ export default function useRemoteTokens() {
     addNewGitHubCredentials, syncTokensWithGitHub, pullTokensFromGitHub, pushTokensToGitHub, createGithubBranch, fetchGithubBranches,
   } = useGitHub();
   const {
-    addNewGitLabCredentials, syncTokensWithGitLab, pullTokensFromGitLab, pushTokensToGitLab,
+    addNewGitLabCredentials, syncTokensWithGitLab, pullTokensFromGitLab, pushTokensToGitLab, fetchGitLabBranches, createGitLabBranch,
   } = useGitLab();
   const {
     addNewADOCredentials, syncTokensWithADO, pullTokensFromADO, pushTokensToADO, createADOBranch, fetchADOBranches,
@@ -45,14 +45,12 @@ export default function useRemoteTokens() {
 
   const pullTokens = useCallback(async ({ context = api, featureFlags, usedTokenSet }: PullTokensOptions) => {
     track('pullTokens', { provider: context.provider });
-
     dispatch.uiState.startJob({
       name: BackgroundJobs.UI_PULLTOKENS,
       isInfinite: true,
     });
 
     let remoteData: RemoteTokenStorageData<unknown> | null = null;
-
     switch (context.provider) {
       case StorageProviderType.JSONBIN: {
         remoteData = await pullTokensFromJSONBin(context);
@@ -219,7 +217,10 @@ export default function useRemoteTokens() {
         newBranchCreated = await createGithubBranch(context, branch, source);
         break;
       }
-
+      case StorageProviderType.GITLAB: {
+        newBranchCreated = await createGitLabBranch(context, branch, source);
+        break;
+      }
       case StorageProviderType.ADO: {
         newBranchCreated = await createADOBranch(context, branch, source);
         break;
@@ -235,12 +236,14 @@ export default function useRemoteTokens() {
     switch (context.provider) {
       case StorageProviderType.GITHUB:
         return fetchGithubBranches(context);
+      case StorageProviderType.GITLAB:
+        return fetchGitLabBranches(context);
       case StorageProviderType.ADO:
         return fetchADOBranches(context);
       default:
         return null;
     }
-  }, [fetchGithubBranches, fetchADOBranches]);
+  }, [fetchGithubBranches, fetchGitLabBranches, fetchADOBranches]);
 
   const deleteProvider = useCallback((provider) => {
     AsyncMessageChannel.message({
@@ -263,7 +266,7 @@ export default function useRemoteTokens() {
     pullTokens,
     pushTokens,
     addNewProviderItem,
-    addNewBranch,
     fetchBranches,
+    addNewBranch,
   ]);
 }

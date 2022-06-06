@@ -1,12 +1,14 @@
-import { ThemeObjectsList } from '@/types';
-import { AnyTokenSet } from '@/types/tokens';
+import { DeepTokensMap, ThemeObjectsList } from '@/types';
+import { AnyTokenSet, SingleToken } from '@/types/tokens';
 import { RemoteTokenStorage, RemoteTokenStorageFile, RemoteTokenStorageMetadataFile } from './RemoteTokenStorage';
 
 type StorageFlags = {
   multiFileEnabled: boolean
 };
 
-export type GitSingleFileObject = Record<string, AnyTokenSet<false>> & {
+export type GitSingleFileObject = Record<string, (
+  Record<string, SingleToken<false> | DeepTokensMap<false>>
+)> & {
   $themes?: ThemeObjectsList
 };
 
@@ -58,6 +60,11 @@ export abstract class GitTokenStorage extends RemoteTokenStorage<GitStorageMetad
 
   public enableMultiFile() {
     this.flags.multiFileEnabled = true;
+    return this;
+  }
+
+  public disableMultiFile() {
+    this.flags.multiFileEnabled = false;
     return this;
   }
 

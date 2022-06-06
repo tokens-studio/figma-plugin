@@ -26,7 +26,6 @@ import IconGrabber from './grabber.svg';
 import IconGrid from './grid.svg';
 import IconHelp from './help.svg';
 import IconHorizontalPadding from './horizontalpadding.svg';
-import { IconToggleableDisclosure } from './IconToggleableDisclosure';
 import IconTrash from './IconTrash.svg';
 import IconImport from './import.svg';
 import IconIndeterminateAlt from './indeterminate-alt.svg';
@@ -98,7 +97,6 @@ export {
   IconShadow,
   IconSpacing,
   IconStyle,
-  IconToggleableDisclosure,
   IconTrash,
   IconUndo,
   IconVerticalPadding,

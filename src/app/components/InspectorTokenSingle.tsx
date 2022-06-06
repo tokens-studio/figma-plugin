@@ -8,7 +8,7 @@ import useTokens from '../store/useTokens';
 import InspectorResolvedToken from './InspectorResolvedToken';
 import { Dispatch } from '../store';
 import { SelectionGroup } from '@/types';
-import { IconToggleableDisclosure } from '@/icons/IconToggleableDisclosure';
+import IconToggleableDisclosure from '@/app/components/IconToggleableDisclosure';
 import TokenNodes from './inspector/TokenNodes';
 import { inspectStateSelector } from '@/selectors';
 import { useTypeForProperty } from '../hooks/useTypeForProperty';
@@ -17,6 +17,7 @@ import Heading from './Heading';
 import DownshiftInput from './DownshiftInput';
 import Modal from './Modal';
 import Stack from './Stack';
+import { IconBrokenLink } from '@/icons';
 
 export default function InspectorTokenSingle({
   token,
@@ -32,11 +33,13 @@ export default function InspectorTokenSingle({
   const [newTokenName, setNewTokenName] = React.useState<string>('');
   const [showDialog, setShowDialog] = React.useState<boolean>(false);
   const [isChecked, setChecked] = React.useState<boolean>(false);
+  const [isBrokenLink, setIsBrokenLink] = React.useState<boolean>(false);
 
   const mappedToken = React.useMemo(() => getTokenValue(token.value, resolvedTokens), [token, resolvedTokens, getTokenValue]);
 
   React.useEffect(() => {
     setChecked(inspectState.selectedTokens.includes(`${token.category}-${token.value}`));
+    if (!resolvedTokens.find((resolvedToken) => resolvedToken.name === token.value)) setIsBrokenLink(true);
   }, [inspectState.selectedTokens, token]);
 
   const handleDownShiftInputChange = React.useCallback((newInputValue: string) => {
@@ -91,6 +94,7 @@ export default function InspectorTokenSingle({
           id={`${token.category}-${token.value}`}
           onCheckedChange={onCheckedChanged}
         />
+        {isBrokenLink && <IconBrokenLink />}
         {(!!mappedToken) && (
           <InspectorResolvedToken token={mappedToken} />
         )}
@@ -102,7 +106,7 @@ export default function InspectorTokenSingle({
             gap: '$1',
           }}
         >
-          <Box css={{ fontSize: '$small' }}>{ token.value}</Box>
+          <Box css={{ fontSize: '$small' }}>{token.value}</Box>
           <IconButton
             tooltip="Change to another token"
             dataCy="button-token-remap"

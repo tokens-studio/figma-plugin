@@ -13,9 +13,8 @@ import {
   BranchSwitchMenuArrow,
 } from './BranchSwitchMenu';
 import {
-  branchSelector, lastSyncedStateSelector, tokensSelector, localApiStateBranchSelector, apiSelector, usedTokenSetSelector, localApiStateSelector,
+  branchSelector, lastSyncedStateSelector, tokensSelector, localApiStateBranchSelector, apiSelector, usedTokenSetSelector, localApiStateSelector, themesListSelector,
 } from '@/selectors';
-import convertTokensToObject from '@/utils/convertTokensToObject';
 import useRemoteTokens from '../store/remoteTokens';
 import useConfirm from '@/app/hooks/useConfirm';
 import CreateBranchModal from './modals/CreateBranchModal';
@@ -48,6 +47,8 @@ export default function BranchSelector() {
   const branchState = useSelector(branchSelector);
   const lastSyncedState = useSelector(lastSyncedStateSelector);
   const tokens = useSelector(tokensSelector);
+  const themes = useSelector(themesListSelector);
+
   const localApiState = useSelector(localApiStateSelector);
   const localApiStateBranch = useSelector(localApiStateBranchSelector);
   const apiData = useSelector(apiSelector);
@@ -64,11 +65,9 @@ export default function BranchSelector() {
   }, [localApiStateBranch, setCurrentBranch]);
 
   const checkForChanges = React.useCallback(() => {
-    if (lastSyncedState !== JSON.stringify(convertTokensToObject(tokens), null, 2)) {
-      return true;
-    }
-    return false;
-  }, [lastSyncedState, tokens]);
+    const hasChanged = (lastSyncedState !== JSON.stringify([tokens, themes], null, 2));
+    return hasChanged;
+  }, [lastSyncedState, tokens, themes]);
 
   const hasChanges = React.useMemo(() => checkForChanges(), [checkForChanges]);
 
@@ -165,7 +164,7 @@ export default function BranchSelector() {
           <BranchSwitchMenuContent side="top" sideOffset={5}>
             <BranchSwitchMenuRadioGroup value={currentBranch}>
               {branchState.branches.length > 0
-              && branchState.branches.map((branch, index) => <BranchSwitchMenuRadioElement key={`radio_${seed(index)}`} branch={branch} branchSelected={onBranchSelected} />)}
+                && branchState.branches.map((branch, index) => <BranchSwitchMenuRadioElement key={`radio_${seed(index)}`} branch={branch} branchSelected={onBranchSelected} />)}
             </BranchSwitchMenuRadioGroup>
             <BranchSwitchMenu>
               <BranchSwitchMenuTrigger>
@@ -174,11 +173,11 @@ export default function BranchSelector() {
               </BranchSwitchMenuTrigger>
               <BranchSwitchMenuContent side="left">
                 {hasChanges
-              && (
-              <BranchSwitchMenuItem onSelect={createBranchByChange}>
-                Current changes
-              </BranchSwitchMenuItem>
-              )}
+                  && (
+                    <BranchSwitchMenuItem onSelect={createBranchByChange}>
+                      Current changes
+                    </BranchSwitchMenuItem>
+                  )}
                 {branchState.branches.length > 0 && branchState.branches.map((branch, index) => (
                   <BranchSwitchMenuItemElement
                     key={seed(index)}
