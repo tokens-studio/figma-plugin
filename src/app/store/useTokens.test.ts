@@ -1,11 +1,13 @@
 import * as ReactRedux from 'react-redux';
 
+import { renderHook, act } from '@testing-library/react-hooks';
+
 import useTokens from './useTokens';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { BoxShadowTypes } from '@/constants/BoxShadowTypes';
+
 import {
   AnyTokenList,
-  SingleToken,
 } from '@/types/tokens';
 
 const resolvedTokens: AnyTokenList = [
@@ -180,12 +182,31 @@ const resolvedTokens: AnyTokenList = [
     rawValue: '{font-style.normal}',
   },
 ];
+const mockDispatch = jest.fn();
+jest.mock('react-redux', () => ({
+  useDispatch: () => mockDispatch,
+}));
+jest.mock('react-redux', () => {
+  const ActualReactRedux = jest.requireActual('react-redux');
+  return {
+    ...ActualReactRedux,
+    useSelector: jest.fn().mockImplementation((usedTokenSet) => {
+      'enabled';
+      'disabled';
+      'source';
+    }),
+  };
+});
 
+const { result } = renderHook(() => useTokens());
 describe('useToken test', () => {
-  const mockUsedTokenSetsSelector = jest.spyOn(ReactRedux, 'useSelector');
-  it('test', () => {
-    mockUsedTokenSetsSelector.mockReturnValue({
-
-    })
-  })
+  it('getTokenValue test', () => {
+    act(() => {
+      const mockedDispatch = jest.fn();
+      ReactRedux.useDispatch.mockReturnValue(mockedDispatch);
+      resolvedTokens.forEach((token) => {
+        expect(result.current.getTokenValue(token.name, resolvedTokens)).toBe(token.value);
+      });
+    });
+  });
 });
