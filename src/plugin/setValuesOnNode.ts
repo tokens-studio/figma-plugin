@@ -140,17 +140,19 @@ function findMatchingNonLocalPaintStyle(styleId: string, colorToken: string) {
 function findMatchingNonLocalEffectStyle(styleId: string, boxShadowToken: string | TokenBoxshadowValue | TokenBoxshadowValue[]) {
   let matchingStyle: EffectStyle | undefined;
 
-  const nonLocalStyle = figma.getStyleById(styleId);
-  if (typeof boxShadowToken !== 'string' && nonLocalStyle?.type === 'EFFECT') {
-    const boxShadowTokenArr = Array.isArray(boxShadowToken) ? boxShadowToken : [boxShadowToken];
-    const styleEffects = (nonLocalStyle as EffectStyle).effects;
-    if (styleEffects.length === boxShadowTokenArr.length) {
-      if (styleEffects.every((styleEffect, idx) => {
-        const tokenEffect = convertBoxShadowToFigmaEffect(boxShadowTokenArr[idx]);
-        return isEffectEqual(styleEffect, tokenEffect);
-      })) {
-        // console.log('findMatchingNonLocalEffectStyle -> hasMatchingNonLocalStyle=true);
-        matchingStyle = nonLocalStyle as EffectStyle;
+  if (styleId) {
+    const nonLocalStyle = figma.getStyleById(styleId);
+    if (typeof boxShadowToken !== 'string' && nonLocalStyle?.type === 'EFFECT') {
+      const boxShadowTokenArr = Array.isArray(boxShadowToken) ? boxShadowToken : [boxShadowToken];
+      const styleEffects = (nonLocalStyle as EffectStyle).effects;
+      if (styleEffects.length === boxShadowTokenArr.length) {
+        if (styleEffects.every((styleEffect, idx) => {
+          const tokenEffect = convertBoxShadowToFigmaEffect(boxShadowTokenArr[idx]);
+          return isEffectEqual(styleEffect, tokenEffect);
+        })) {
+          // console.log('findMatchingNonLocalEffectStyle -> hasMatchingNonLocalStyle=true);
+          matchingStyle = nonLocalStyle as EffectStyle;
+        }
       }
     }
   }
