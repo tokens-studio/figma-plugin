@@ -41,7 +41,6 @@ export class GitlabTokenStorage extends GitTokenStorage {
 
   public async assignProjectId() {
     const users = await this.gitlabClient.Users.username(this.owner);
-
     if (Array.isArray(users) && users.length > 0) {
       const projectsInPerson = await this.gitlabClient.Users.projects(users[0].id);
       const project = projectsInPerson.filter((p) => p.path === this.repository)[0];
@@ -63,7 +62,6 @@ export class GitlabTokenStorage extends GitTokenStorage {
     if (!this.projectId) {
       throw new Error('Project not accessible');
     }
-
     return this;
   }
 
@@ -92,7 +90,6 @@ export class GitlabTokenStorage extends GitTokenStorage {
     if (!this.groupId || !this.projectId) throw new Error('Missing Project or Group ID');
 
     const currentUser = await this.gitlabClient.Users.current();
-
     try {
       if (!currentUser || currentUser.state !== 'active') return false;
 
@@ -118,7 +115,6 @@ export class GitlabTokenStorage extends GitTokenStorage {
         path: this.path,
         ref: this.branch,
       });
-
       if (trees.length > 0 && this.flags.multiFileEnabled) {
         const jsonFiles = trees.filter((file) => (
           file.path.endsWith('.json')
@@ -158,7 +154,6 @@ export class GitlabTokenStorage extends GitTokenStorage {
       const data = await this.gitlabClient.RepositoryFiles.showRaw(this.projectId, this.path, { ref: this.branch });
       if (IsJSONString(data)) {
         const parsed = JSON.parse(data) as GitSingleFileObject;
-
         return [
           {
             type: 'themes',
@@ -209,7 +204,6 @@ export class GitlabTokenStorage extends GitTokenStorage {
         startBranch: branches[0],
       } : undefined,
     );
-
     return !!response;
   }
 }
