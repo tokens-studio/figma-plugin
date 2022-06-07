@@ -27,34 +27,42 @@ function figmaPaintToHex(paint: SolidPaint): string {
   return figmaColorToHex(paint.color, paint.opacity);
 }
 
-function findMatchingNonLocalPaintStyle(styleId: string, colorToken: string) {
-  let matchingStyle: PaintStyle | undefined;
+function isColorEqual(color1: RGBA, color2: RGBA) {
+  // Comparison using rgb doesn't work as Figma has a rounding issue,
+  // that doesn't produce same RGB floats as the existing color :(
+  // color1.r === color2.r
+  // && color1.g === color2.g
+  // && color1.b === color2.b
+  // Compare using hex instead for now:
+  const color1Hex = figmaColorToHex(color1);
+  const color2Hex = figmaColorToHex(color2);
+  return color1Hex === color2Hex;
+}
 
-  if (styleId) {
-    // console.log('setValuesOnNode -> looking for non-local style:', fillStyleId);
-    const nonLocalStyle = figma.getStyleById(styleId);
-    if (nonLocalStyle?.type === 'PAINT') {
-      // console.log('setValuesOnNode -> node has nonLocalStyle:', nonLocalStyle.name);
-
-      const existingPaint = (nonLocalStyle as PaintStyle).paints[0] ?? null;
-      if (existingPaint && existingPaint.type === 'SOLID') {
-        const { color, opacity } = convertToFigmaColor(colorToken);
-        const newPaint: SolidPaint = { color, opacity, type: 'SOLID' };
-        // Comparison using isPaintEqual doesn't work as Figma's hexToFigmaRGB has a rounding issue,
-        // that doesn't produce same RGB floats as the existing paint :(
-        // hasMatchingNonLocalStyle = isPaintEqual(newPaint, existingPaint);
-        // Compare using hex instead for now:
-        const existingHex = figmaPaintToHex(existingPaint);
-        const newHex = figmaPaintToHex(newPaint);
-        if (existingHex === newHex) {
-          // console.log('setValuesOnNode -> hasMatchingNonLocalStyle=true so re-set it to linked style:', nonLocalStyle.name);
-          matchingStyle = nonLocalStyle as PaintStyle;
-        }
+function isPaintEqual(paint1: SolidPaint, paint2: SolidPaint) {
+  if (paint1 && paint2) {
+    if (paint1.type === paint2.type) {
+      if (paint1.type === 'SOLID' && paint2.type === 'SOLID') {
+        const paint1Hex = figmaPaintToHex(paint1);
+        const paint2Hex = figmaPaintToHex(paint2);
+        return (
+          paint1.opacity === paint2.opacity
+          // Comparison using rgb doesn't work as Figma has a rounding issue,
+          // that doesn't produce same RGB floats as the existing color :(
+          // && paint1.color.r === paint2.color.r
+          // && paint1.color.g === paint2.color.g
+          // && paint1.color.b === paint2.color.b
+          // Compare using hex instead for now:
+          && paint1Hex === paint2Hex
+        );
       }
+      // TODO: Compare gradients using hex...
+      // if (paint1.type === 'GRADIENT_LINEAR' && paint2.type === 'GRADIENT_LINEAR') {
+      //   ...
+      // }
     }
   }
-
-  return matchingStyle;
+  return false;
 }
 
 function isEffectEqual(effect1?: Effect, effect2?: Effect) {
@@ -64,17 +72,8 @@ function isEffectEqual(effect1?: Effect, effect2?: Effect) {
         (effect1.type === 'DROP_SHADOW' && effect2.type === 'DROP_SHADOW')
         || (effect1.type === 'INNER_SHADOW' && effect2.type === 'INNER_SHADOW')
       ) {
-        const effect1Hex = figmaColorToHex(effect1.color);
-        const effect2Hex = figmaColorToHex(effect2.color);
-
         return (
-          // Comparison using rgb doesn't work as Figma has a rounding issue,
-          // that doesn't produce same RGB floats as the existing color :(
-          // effect1.color.r === effect2.color.r
-          // && effect1.color.g === effect2.color.g
-          // && effect1.color.b === effect2.color.b
-          // Compare using hex instead for now:
-          effect1Hex === effect2Hex
+          isColorEqual(effect1.color, effect2.color)
           && effect1.offset.x === effect2.offset.x
           && effect1.offset.y === effect2.offset.y
           && effect1.radius === effect2.radius
@@ -112,6 +111,30 @@ function convertBoxShadowToFigmaEffect(value: TokenBoxshadowValue): Effect {
     blendMode: (value.blendMode || 'NORMAL') as BlendMode,
     visible: true,
   };
+}
+
+function findMatchingNonLocalPaintStyle(styleId: string, colorToken: string) {
+  let matchingStyle: PaintStyle | undefined;
+
+  if (styleId) {
+    // console.log('setValuesOnNode -> looking for non-local style:', fillStyleId);
+    const nonLocalStyle = figma.getStyleById(styleId);
+    if (nonLocalStyle?.type === 'PAINT') {
+      // console.log('setValuesOnNode -> node has nonLocalStyle:', nonLocalStyle.name);
+
+      const stylePaint = (nonLocalStyle as PaintStyle).paints[0] ?? null;
+      if (stylePaint?.type === 'SOLID') {
+        const { color, opacity } = convertToFigmaColor(colorToken);
+        const tokenPaint: SolidPaint = { color, opacity, type: 'SOLID' };
+        if (isPaintEqual(stylePaint, tokenPaint)) {
+          // console.log('setValuesOnNode -> hasMatchingNonLocalStyle=true so re-set it to linked style:', nonLocalStyle.name);
+          matchingStyle = nonLocalStyle as PaintStyle;
+        }
+      }
+    }
+  }
+
+  return matchingStyle;
 }
 
 function findMatchingNonLocalEffectStyle(styleId: string, boxShadowToken: string | TokenBoxshadowValue | TokenBoxshadowValue[]) {
@@ -173,7 +196,7 @@ export default async function setValuesOnNode(
         let matchingStyle = figmaStyleMaps.effectStyles.get(pathname);
         // Pretend we didn't find the style...
         // if (!matchingStyle) {
-        if (matchingStyle && matchingStyle.name === 'shadows/default') {
+        if (matchingStyle?.name === 'shadows/default') {
           const effectStyleIdBackupKey = 'effectStyleId_original';
           let effectStyleId = tokensSharedDataHandler.get(node, effectStyleIdBackupKey, (val) => (val ? JSON.parse(val) as string : val));
           if (effectStyleId === '' && typeof node.effectStyleId === 'string') {
