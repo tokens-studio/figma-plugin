@@ -181,15 +181,15 @@ function findMatchingNonLocalTextStyle(styleId: string, typographyToken: string 
         textDecoration,
       } = typographyToken;
 
-      if (!fontFamily || (fontFamily && textStyle.fontName.family !== fontFamily)) {
+      if (textStyle.fontName.family !== fontFamily) {
         console.log('findMatchingNonLocalTextStyle -> fontFamily not matching! style: ', textStyle.fontName.family, ', token: ', fontFamily);
         matchingStyle = undefined;
       }
-      if (!fontWeight || (fontWeight && textStyle.fontName.style !== fontWeight)) {
+      if (textStyle.fontName.style !== fontWeight) {
         console.log('findMatchingNonLocalTextStyle -> fontWeight not matching! style: ', textStyle.fontName.style, ', token: ', fontWeight);
         matchingStyle = undefined;
       }
-      if (!fontSize || (fontSize && textStyle.fontSize !== transformValue(fontSize, 'fontSizes'))) {
+      if (fontSize === undefined || textStyle.fontSize !== transformValue(fontSize, 'fontSizes')) {
         console.log('findMatchingNonLocalTextStyle -> fontSize not matching! style: ', textStyle.fontSize, ', token: ', transformValue(String(fontSize), 'fontSizes'));
         matchingStyle = undefined;
       }
@@ -208,22 +208,24 @@ function findMatchingNonLocalTextStyle(styleId: string, typographyToken: string 
         console.log('findMatchingNonLocalTextStyle -> letterSpacing not matching! style: ', textStyle.letterSpacing, ', token: ', tokenLetterSpacing);
         matchingStyle = undefined;
       }
-      if (!paragraphSpacing || (paragraphSpacing && textStyle.paragraphSpacing !== transformValue(paragraphSpacing, 'paragraphSpacing'))) {
+      if (paragraphSpacing === undefined || textStyle.paragraphSpacing !== transformValue(paragraphSpacing, 'paragraphSpacing')) {
         console.log('findMatchingNonLocalTextStyle -> paragraphSpacing not matching! style: ', textStyle.paragraphSpacing, ', token: ', transformValue(String(paragraphSpacing), 'paragraphSpacing'));
         matchingStyle = undefined;
       }
-      if (!textCase || (textCase && textStyle.textCase !== transformValue(textCase, 'textCase'))) {
-        console.log('findMatchingNonLocalTextStyle -> textCase not matching! style: ', textStyle.textCase, ', token: ', transformValue(String(textCase), 'textCase'));
+      const tokenTextCase = transformValue(String(textCase), 'textCase'); // This will default to `ORIGINAL` if textCase token is not set
+      if (tokenTextCase !== textStyle.textCase) {
+        console.log('findMatchingNonLocalTextStyle -> textCase not matching! style: ', textStyle.textCase, ', token: ', tokenTextCase);
         matchingStyle = undefined;
       }
-      if (!textDecoration || (textDecoration && textStyle.textDecoration !== transformValue(textDecoration, 'textDecoration'))) {
+      const tokenTextDecoration = transformValue(String(textDecoration), 'textDecoration'); // This will default to `NONE` if textDecoration token is not set
+      if (tokenTextDecoration !== textStyle.textDecoration) {
         console.log('findMatchingNonLocalTextStyle -> textDecoration not matching! style: ', textStyle.textDecoration, ', token: ', transformValue(String(textDecoration), 'textDecoration'));
         matchingStyle = undefined;
       }
       // TODO: Should description also match? 🤷
       if (textStyle.description !== '' && textStyle.description !== description) {
         console.log('findMatchingNonLocalTextStyle -> description not matching! style: ', textStyle.description, ', token: ', description);
-        matchingStyle = undefined;
+        // matchingStyle = undefined;
       }
     }
   }
