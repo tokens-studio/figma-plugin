@@ -8,7 +8,7 @@ import setColorValuesOnTarget from './setColorValuesOnTarget';
 import setEffectValuesOnTarget from './setEffectValuesOnTarget';
 import setTextValuesOnTarget from './setTextValuesOnTarget';
 import { tokensSharedDataHandler } from './SharedDataHandler';
-import { TokenBoxshadowValue } from '@/types/values';
+import { TokenBoxshadowValue, TokenTypograpyValue } from '@/types/values';
 import { convertBoxShadowTypeToFigma } from './figmaTransforms/boxShadow';
 import { convertTypographyNumberToFigma } from './figmaTransforms/generic';
 import convertOffsetToFigma from './figmaTransforms/offset';
@@ -160,6 +160,77 @@ function findMatchingNonLocalEffectStyle(styleId: string, boxShadowToken: string
   return matchingStyle;
 }
 
+function findMatchingNonLocalTextStyle(styleId: string, typographyToken: string | TokenTypograpyValue, description?: string) {
+  let matchingStyle: TextStyle | undefined;
+
+  if (styleId) {
+    const nonLocalStyle = figma.getStyleById(styleId);
+    if (typeof typographyToken !== 'string' && nonLocalStyle?.type === 'TEXT') {
+      const textStyle = (nonLocalStyle as TextStyle);
+      matchingStyle = textStyle; // Assume match until it checks out otherwise below
+      // console.log('findMatchingNonLocalTextStyle -> textStyle:', textStyle);
+
+      const {
+        fontFamily,
+        fontWeight,
+        fontSize,
+        lineHeight,
+        letterSpacing,
+        paragraphSpacing,
+        textCase,
+        textDecoration,
+      } = typographyToken;
+
+      if (!fontFamily || (fontFamily && textStyle.fontName.family !== fontFamily)) {
+        console.log('findMatchingNonLocalTextStyle -> fontFamily not matching! style: ', textStyle.fontName.family, ', token: ', fontFamily);
+        matchingStyle = undefined;
+      }
+      if (!fontWeight || (fontWeight && textStyle.fontName.style !== fontWeight)) {
+        console.log('findMatchingNonLocalTextStyle -> fontWeight not matching! style: ', textStyle.fontName.style, ', token: ', fontWeight);
+        matchingStyle = undefined;
+      }
+      if (!fontSize || (fontSize && textStyle.fontSize !== transformValue(fontSize, 'fontSizes'))) {
+        console.log('findMatchingNonLocalTextStyle -> fontSize not matching! style: ', textStyle.fontSize, ', token: ', transformValue(String(fontSize), 'fontSizes'));
+        matchingStyle = undefined;
+      }
+      const tokenLineHeight = transformValue(String(lineHeight), 'lineHeights'); // This will default to `{ unit: 'AUTO' }` if lineHeight token is not set
+      if (tokenLineHeight?.unit !== textStyle.lineHeight.unit) {
+        console.log('findMatchingNonLocalTextStyle -> lineHeight not matching! style: ', textStyle.lineHeight, ', token: ', tokenLineHeight);
+        matchingStyle = undefined;
+      } else if (tokenLineHeight.unit !== 'AUTO' && textStyle.lineHeight.unit !== 'AUTO') {
+        if (tokenLineHeight.unit !== textStyle.lineHeight.unit || tokenLineHeight.value !== textStyle.lineHeight.value) {
+          console.log('findMatchingNonLocalTextStyle -> lineHeight not matching! style: ', textStyle.lineHeight, ', token: ', tokenLineHeight);
+          matchingStyle = undefined;
+        }
+      }
+      const tokenLetterSpacing = transformValue(String(letterSpacing), 'letterSpacing'); // This will default to `null` if letterSpacing token is not set
+      if (tokenLetterSpacing?.unit !== textStyle.letterSpacing.unit || tokenLetterSpacing?.value !== textStyle.letterSpacing.value) {
+        console.log('findMatchingNonLocalTextStyle -> letterSpacing not matching! style: ', textStyle.letterSpacing, ', token: ', tokenLetterSpacing);
+        matchingStyle = undefined;
+      }
+      if (!paragraphSpacing || (paragraphSpacing && textStyle.paragraphSpacing !== transformValue(paragraphSpacing, 'paragraphSpacing'))) {
+        console.log('findMatchingNonLocalTextStyle -> paragraphSpacing not matching! style: ', textStyle.paragraphSpacing, ', token: ', transformValue(String(paragraphSpacing), 'paragraphSpacing'));
+        matchingStyle = undefined;
+      }
+      if (!textCase || (textCase && textStyle.textCase !== transformValue(textCase, 'textCase'))) {
+        console.log('findMatchingNonLocalTextStyle -> textCase not matching! style: ', textStyle.textCase, ', token: ', transformValue(String(textCase), 'textCase'));
+        matchingStyle = undefined;
+      }
+      if (!textDecoration || (textDecoration && textStyle.textDecoration !== transformValue(textDecoration, 'textDecoration'))) {
+        console.log('findMatchingNonLocalTextStyle -> textDecoration not matching! style: ', textStyle.textDecoration, ', token: ', transformValue(String(textDecoration), 'textDecoration'));
+        matchingStyle = undefined;
+      }
+      // TODO: Should description also match? 🤷
+      if (textStyle.description !== '' && textStyle.description !== description) {
+        console.log('findMatchingNonLocalTextStyle -> description not matching! style: ', textStyle.description, ', token: ', description);
+        matchingStyle = undefined;
+      }
+    }
+  }
+
+  return matchingStyle;
+}
+
 export default async function setValuesOnNode(
   node: BaseNode,
   values: Partial<Record<Properties, string>>,
@@ -282,10 +353,26 @@ export default async function setValuesOnNode(
         if (node.type === 'TEXT' && data.typography) {
           const path = data.typography.split('.'); // extract to helper fn
           const pathname = path.slice(ignoreFirstPartForStyles ? 1 : 0, path.length).join('/');
-          const matchingStyle = figmaStyleMaps.textStyles.get(pathname);
+          let matchingStyle = figmaStyleMaps.textStyles.get(pathname);
+          // Pretend we didn't find the style...
+          // if (!matchingStyle) {
+          if (matchingStyle?.name === 'text/min/heading/01') {
+            const textStyleIdBackupKey = 'textStyleId_original';
+            let textStyleId = tokensSharedDataHandler.get(node, textStyleIdBackupKey, (val) => (val ? JSON.parse(val) as string : val));
+            if (textStyleId === '' && typeof node.textStyleId === 'string') {
+              textStyleId = node.textStyleId;
+            }
+            matchingStyle = findMatchingNonLocalTextStyle(textStyleId, values.typography, values.description);
+            let textStyleIdBackup = ''; // Setting to empty string will delete the plugin data key if the style matches or doesn't exist
+            if (textStyleId && !matchingStyle) {
+              textStyleIdBackup = JSON.stringify(textStyleId);
+            }
+            console.log(`setValuesOnNode -> hasMatchingNonLocalStyle: ${!!matchingStyle}, textStyleIdBackup: ${textStyleIdBackup}, linked style: ${matchingStyle?.name}`);
+            tokensSharedDataHandler.set(node, textStyleIdBackupKey, textStyleIdBackup);
+          }
           if (matchingStyle) {
             node.textStyleId = matchingStyle.id;
-          } else if (node.textStyleId === '') { // only set raw token value if node isn't linked to a Figma style:
+          } else {
             setTextValuesOnTarget(node, { value: values.typography });
           }
         }
