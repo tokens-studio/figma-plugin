@@ -270,8 +270,8 @@ export default async function setValuesOnNode(
         const pathname = path.slice(ignoreFirstPartForStyles ? 1 : 0, path.length).join('/');
         let matchingStyle = figmaStyleMaps.effectStyles.get(pathname);
         // Pretend we didn't find the style...
-        // if (!matchingStyle) {
-        if (matchingStyle?.name === 'shadows/default') {
+        // if (matchingStyle?.name === 'shadows/default') {
+        if (!matchingStyle) {
           const effectStyleIdBackupKey = 'effectStyleId_original';
           let effectStyleId = tokensSharedDataHandler.get(node, effectStyleIdBackupKey, (val) => (val ? JSON.parse(val) as string : val));
           if (effectStyleId === '' && typeof node.effectStyleId === 'string') {
@@ -357,8 +357,8 @@ export default async function setValuesOnNode(
           const pathname = path.slice(ignoreFirstPartForStyles ? 1 : 0, path.length).join('/');
           let matchingStyle = figmaStyleMaps.textStyles.get(pathname);
           // Pretend we didn't find the style...
-          // if (!matchingStyle) {
-          if (matchingStyle?.name === 'text/min/heading/01') {
+          // if (matchingStyle?.name === 'text/min/heading/01') {
+          if (!matchingStyle) {
             const textStyleIdBackupKey = 'textStyleId_original';
             let textStyleId = tokensSharedDataHandler.get(node, textStyleIdBackupKey, (val) => (val ? JSON.parse(val) as string : val));
             if (textStyleId === '' && typeof node.textStyleId === 'string') {
