@@ -81,17 +81,14 @@ export class GithubTokenStorage extends GitTokenStorage {
   }
 
   public async canWrite() {
-    try {
-      const currentUser = await this.octokitClient.rest.users.getAuthenticated();
-      if (!currentUser.data.login) return false;
-      return !!(await this.octokitClient.rest.repos.getCollaboratorPermissionLevel({
-        owner: this.owner,
-        repo: this.repository,
-        username: currentUser.data.login,
-      })).data;  
-    } catch {
-      return false;
-    }
+    const currentUser = await this.octokitClient.rest.users.getAuthenticated();
+    if (!currentUser.data.login) return false;
+
+    return !!(await this.octokitClient.rest.repos.getCollaboratorPermissionLevel({
+      owner: this.owner,
+      repo: this.repository,
+      username: currentUser.data.login,
+    })).data;
   }
 
   public async read(): Promise<RemoteTokenStorageFile<GitStorageMetadata>[]> {
@@ -102,6 +99,7 @@ export class GithubTokenStorage extends GitTokenStorage {
         path: this.path,
         ref: this.branch,
       });
+
       // read entire directory
       if (Array.isArray(response.data) && this.flags.multiFileEnabled) {
         const directoryTreeResponse = await this.octokitClient.rest.git.createTree({
