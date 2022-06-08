@@ -221,6 +221,6 @@ export class GithubTokenStorage extends GitTokenStorage {
         },
       ],
     });
-    return !!response.data.content;
+    return !!response;
   }
 }
