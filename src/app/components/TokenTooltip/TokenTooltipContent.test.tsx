@@ -1,10 +1,12 @@
 import React from 'react';
+import { renderHook, act } from '@testing-library/react-hooks';
 import { TokenTooltipContent } from './TokenTooltipContent';
 import { SingleToken } from '@/types/tokens';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { BoxShadowTypes } from '@/constants/BoxShadowTypes';
 import { render } from '../../../../tests/config/setupTest';
 import { getAliasValue } from '@/utils/alias';
+import { TokensContext } from '@/context';
 
 const tokens: SingleToken[] = [
   {
@@ -356,7 +358,15 @@ const tokens: SingleToken[] = [
 // });
 describe('TokenTooltip value', () => {
   it('tooltip test', () => {
-
+    jest.spyOn(React, 'useContext').mockImplementation((TokensContext) => tokens);
+    const input: SingleToken = {
+      name: 'size.alias',
+      type: TokenTypes.SIZING,
+      value: '{size.6}',
+      rawValue: '2',
+    };
+    const { getByText } = render(<TokenTooltipContent token={input}></TokenTooltipContent>)
+    expect(getByText(input.rawValue)).toBeInTheDocument();
   });
 });
 describe('TokenTooltip alias', () => {
