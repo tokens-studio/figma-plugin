@@ -6,6 +6,7 @@ import { updateNodes } from '../node';
 import { defaultNodeManager, NodeManagerNode } from '../NodeManager';
 import { updatePluginData } from '../pluginData';
 import { sendSelectionChange } from '../sendSelectionChange';
+import { TokenTypes } from '@/constants/TokenTypes';
 
 export const remapTokens: AsyncMessageChannelHandlers[AsyncMessageTypes.REMAP_TOKENS] = async (msg) => {
   try {
@@ -17,7 +18,10 @@ export const remapTokens: AsyncMessageChannelHandlers[AsyncMessageTypes.REMAP_TO
     });
 
     // Go through allWithData and update all appearances of oldName to newName
-    const updatedNodes = allWithData.reduce<(NodeManagerNode & { tokens: Record<string, string> })[]>((all, node) => {
+    const updatedNodes: NodeManagerNode[] = [];
+    const updatedNodesWithOldTokens: NodeManagerNode[] = [];
+
+    allWithData.forEach((node) => {
       const { tokens } = node;
       let shouldBeRemapped = false;
       // @TODO I dont believe this typing is quite right - need to check and fix
@@ -35,19 +39,28 @@ export const remapTokens: AsyncMessageChannelHandlers[AsyncMessageTypes.REMAP_TO
         return acc;
       }, {});
       if (shouldBeRemapped) {
-        all.push({
+        updatedNodes.push({
           ...node,
           tokens: updatedTokens,
         });
+        updatedNodesWithOldTokens.push({
+          ...node,
+          tokens,
+        });
       }
-      return all;
-    }, []);
+    });
 
     if (updateMode === UpdateMode.SELECTION && category && tokens) {
       const tokensMap = tokenArrayGroupToMap(tokens);
-      await updatePluginData({
-        entries: allWithData, values: { [category]: newName }, shouldOverride: true, tokensMap,
-      });
+      if (category === TokenTypes.COMPOSITION) {
+        await updatePluginData({
+          entries: updatedNodesWithOldTokens, values: { [category]: newName }, shouldOverride: true, tokensMap,
+        });
+      } else {
+        await updatePluginData({
+          entries: updatedNodes, values: { [category]: newName }, shouldOverride: true, tokensMap,
+        });
+      }
       await updateNodes(updatedNodes, tokensMap, msg.settings);
     } else {
       await updatePluginData({ entries: updatedNodes, values: {}, shouldOverride: true });
