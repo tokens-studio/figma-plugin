@@ -1,0 +1,57 @@
+import { Meta, Story, ArgsTable, Canvas, Preview } from '@storybook/addon-docs';
+
+import { TokenTypes } from '@/constants/TokenTypes';
+import DownshiftInput  from '@/app/components/DownshiftInput';
+
+<Meta 
+  title='DownshiftInput'
+  component={DownshiftInput}
+  args={{
+    name: 'string',
+    type: TokenTypes.SIZING,
+    label: 'string',
+    error: 'string',
+    value: 'string',
+    placeholder: 'DownshiftInput',
+    suffix: false,
+    resolvedTokens:[
+      {
+        value: 2,
+        type: 'sizing',
+        name: '2',
+        internal__Parent: 'core',
+        rawValue: '2'
+      },
+      {
+        value: 11,
+        type: 'sizing',
+        name: '1111',
+        internal__Parent: 'core',
+        rawValue: '11'
+      },
+      {
+        value: '#f8fafc',
+        type: 'color',
+        name: 'color.slate.50',
+        internal__Parent: 'core',
+        rawValue: '#f8fafc'
+      }
+    ]
+  }}
+/>
+
+<ArgsTable of={DownshiftInput} />
+
+export const DownshiftInputDefaultStory = (args) => {
+  return (
+    <>
+    <DownshiftInput {...args}/>
+    </>
+  )
+}
+
+<Canvas>
+  <Story name='Default'>
+    {DownshiftInputDefaultStory.bind({})}
+  </Story>
+</Canvas>
