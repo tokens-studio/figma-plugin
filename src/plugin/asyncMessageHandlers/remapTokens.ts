@@ -6,6 +6,7 @@ import { updateNodes } from '../node';
 import { defaultNodeManager, NodeManagerNode } from '../NodeManager';
 import { updatePluginData } from '../pluginData';
 import { sendSelectionChange } from '../sendSelectionChange';
+import { TokenTypes } from '@/constants/TokenTypes';
 
 export const remapTokens: AsyncMessageChannelHandlers[AsyncMessageTypes.REMAP_TOKENS] = async (msg) => {
   try {
@@ -45,9 +46,32 @@ export const remapTokens: AsyncMessageChannelHandlers[AsyncMessageTypes.REMAP_TO
 
     if (updateMode === UpdateMode.SELECTION && category && tokens) {
       const tokensMap = tokenArrayGroupToMap(tokens);
-      await updatePluginData({
-        entries: allWithData, values: { [category]: newName }, shouldOverride: true, tokensMap,
-      });
+      if (category === TokenTypes.COMPOSITION) {
+        const updatedNodesWithOldTokens = allWithData.reduce<(NodeManagerNode & { tokens: Record<string, string> })[]>((all, node) => {
+          const { tokens } = node;
+          let shouldBeRemapped = false;
+          Object.entries(tokens).reduce<Record<string, string>>((acc, [, val]) => {
+            if (val === oldName) {
+              shouldBeRemapped = true;
+            }
+            return acc;
+          }, {});
+          if (shouldBeRemapped) {
+            all.push({
+              ...node,
+              tokens,
+            });
+          }
+          return all;
+        }, []);
+        await updatePluginData({
+          entries: updatedNodesWithOldTokens, values: { [category]: newName }, shouldOverride: true, tokensMap,
+        });
+      } else {
+        await updatePluginData({
+          entries: updatedNodes, values: { [category]: newName }, shouldOverride: true, tokensMap,
+        });
+      }
       await updateNodes(updatedNodes, tokensMap, msg.settings);
     } else {
       await updatePluginData({ entries: updatedNodes, values: {}, shouldOverride: true });
