@@ -123,6 +123,7 @@ export default {
 
   // The paths to modules that run some code to configure or set up the testing environment before each test
   setupFiles: [
+    './tests/__mocks__/textEncoderDecoderMock.js',
     './tests/__mocks__/figmaMock.js',
     './tests/__mocks__/asyncMessageChannelMock.js',
   ],
