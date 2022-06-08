@@ -9,8 +9,6 @@ export default async function fetchFeatureFlags(userData: UserData) {
     const {
       plan, email: clientEmail, entitlements,
     } = await validateLicense(userData.licenseKey, userData.userId);
-    console.log(await validateLicense(userData.licenseKey, userData.userId));
-    console.log(plan, clientEmail, entitlements);
     const userAttributes: Record<string, string | boolean> = {
       plan: plan || '',
       email: clientEmail || '',
@@ -24,10 +22,9 @@ export default async function fetchFeatureFlags(userData: UserData) {
       key: userData.userId,
       custom: userAttributes,
     });
-    console.log('cline', client);
+    console.log("clien", client)
     await client.waitUntilReady();
     const rawFlags = client.allFlags();
-    console.log('raw', rawFlags);
     const normalizedFlags = Object.fromEntries(
       Object.entries(rawFlags).map(([key, value]) => [Case.camel(key), value]),
     );
