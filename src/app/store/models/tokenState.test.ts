@@ -2,6 +2,7 @@ import { init, RematchStore } from '@rematch/core';
 import { RootModel } from '@/types/RootModel';
 import { models } from './index';
 import { TokenTypes } from '@/constants/TokenTypes';
+import { TokenSetStatus } from '@/constants/TokenSetStatus';
 
 const shadowArray = [
   {
@@ -79,7 +80,9 @@ describe('editToken', () => {
                 },
               ],
             },
-            usedTokenSet: ['global'],
+            usedTokenSet: {
+              global: TokenSetStatus.ENABLED,
+            },
             importedTokens: {
               newTokens: [],
               updatedTokens: [],
@@ -214,5 +217,38 @@ describe('editToken', () => {
         value: '2',
       },
     ]);
+  });
+
+  it('should reset imported tokens', async () => {
+    store.dispatch.tokenState.setTokensFromStyles({
+      colors: [
+        {
+          type: TokenTypes.COLOR,
+          name: 'primary',
+          value: '2',
+        },
+      ],
+    });
+    store.dispatch.tokenState.resetImportedTokens();
+    const { importedTokens } = store.getState().tokenState;
+    expect(importedTokens).toEqual({
+      newTokens: [],
+      updatedTokens: [],
+    });
+  });
+
+  it('should set editProhibited', () => {
+    store.dispatch.tokenState.setEditProhibited(true);
+    expect(store.getState().tokenState.editProhibited).toBe(true);
+
+    store.dispatch.tokenState.setEditProhibited(false);
+    expect(store.getState().tokenState.editProhibited).toBe(false);
+  });
+
+  it('should duplicate a token set', () => {
+    store.dispatch.tokenState.duplicateTokenSet('global');
+    const { tokenState } = store.getState();
+    expect(tokenState.usedTokenSet.global_Copy).toEqual(TokenSetStatus.DISABLED);
+    expect(tokenState.tokens).toHaveProperty('global_Copy');
   });
 });
