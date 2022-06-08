@@ -16,7 +16,7 @@ type Options = {
 export default function compareProvidersWithStored({
   providers, storageType, usedTokenSet, shouldPull, activeTheme, featureFlags,
 }: Options) {
-  if (providers) {
+  if (providers?.length) {
     const matchingSet = providers.find((i) => isSameCredentials(i, storageType));
     if (matchingSet) {
       // send a message to the UI with the credentials stored in the client
