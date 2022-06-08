@@ -81,14 +81,17 @@ export class GithubTokenStorage extends GitTokenStorage {
   }
 
   public async canWrite() {
-    const currentUser = await this.octokitClient.rest.users.getAuthenticated();
-    if (!currentUser.data.login) return false;
-
-    return !!(await this.octokitClient.rest.repos.getCollaboratorPermissionLevel({
-      owner: this.owner,
-      repo: this.repository,
-      username: currentUser.data.login,
-    })).data;
+    try {
+      const currentUser = await this.octokitClient.rest.users.getAuthenticated();
+      if (!currentUser.data.login) return false;
+      return !!(await this.octokitClient.rest.repos.getCollaboratorPermissionLevel({
+        owner: this.owner,
+        repo: this.repository,
+        username: currentUser.data.login,
+      })).data;
+    } catch {
+      return false;
+    }
   }
 
   public async read(): Promise<RemoteTokenStorageFile<GitStorageMetadata>[]> {
