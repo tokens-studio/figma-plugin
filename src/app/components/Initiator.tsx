@@ -6,13 +6,14 @@ import { MessageFromPluginTypes, PostToUIMessage } from '@/types/messages';
 import useRemoteTokens from '../store/remoteTokens';
 import { Dispatch } from '../store';
 import useStorage from '../store/useStorage';
+import { AddLicenseSource } from '../store/models/userState';
 import * as pjs from '../../../package.json';
 import { Tabs } from '@/constants/Tabs';
 import { userIdSelector } from '@/selectors/userIdSelector';
 import getLicenseKey from '@/utils/getLicenseKey';
+import fetchFeatureFlags from '@/utils/fetchFeatureFlags';
 import { licenseKeySelector } from '@/selectors/licenseKeySelector';
 import { checkedLocalStorageForKeySelector } from '@/selectors/checkedLocalStorageForKeySelector';
-import { AddLicenseSource } from '../store/models/userState';
 import { LicenseStatus } from '@/constants/LicenseStatus';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
@@ -20,7 +21,6 @@ import { notifyToUI } from '@/plugin/notifiers';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import useConfirm from '../hooks/useConfirm';
 import { StorageTypeCredentials } from '@/types/StorageType';
-import { ldIdentificationPromise } from './LaunchDarkly';
 
 export function Initiator() {
   const dispatch = useDispatch<Dispatch>();
@@ -93,17 +93,21 @@ export function Initiator() {
           case MessageFromPluginTypes.REMOTE_COMPONENTS:
             break;
           case MessageFromPluginTypes.TOKEN_VALUES: {
-            const { values } = pluginMessage;
-            const receivedFlags = await ldIdentificationPromise;
+            const { values, userData } = pluginMessage;
+            let featureFlags: LDProps['flags'] | null;
             const existChanges = values.checkForChanges;
             const storageType = values.storageType?.provider;
-            if (!existChanges || ((storageType && storageType !== StorageProviderType.LOCAL) && existChanges && await askUserIfPull(storageType))) {
-              getApiCredentials(true, receivedFlags);
+            if (!existChanges
+              || ((storageType && storageType !== StorageProviderType.LOCAL)
+              && existChanges && await askUserIfPull(storageType))) {
+              featureFlags = await fetchFeatureFlags(userData);
+              getApiCredentials(true, featureFlags);
             } else {
               dispatch.tokenState.setTokenData(values);
               const existTokens = Object.values(values?.values ?? {}).some((value) => value.length > 0);
               if (existTokens) {
-                getApiCredentials(false, receivedFlags);
+                featureFlags = await fetchFeatureFlags(userData);
+                getApiCredentials(false, featureFlags);
               } else dispatch.uiState.setActiveTab(Tabs.START);
             }
             break;
