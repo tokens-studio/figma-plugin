@@ -38,7 +38,7 @@ export const SingleTypographyValueDisplay: React.FC<Props> = ({ value, shouldRes
       {value.fontSize}
     </div>
     <div>
-      Leading:
+      Line height:
       {' '}
       {value.lineHeight}
     </div>

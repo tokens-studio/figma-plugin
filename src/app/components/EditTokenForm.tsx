@@ -361,39 +361,41 @@ function EditTokenForm({ resolvedTokens }: Props) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col justify-start space-y-4">
-      <Input
-        required
-        full
-        label="Name"
-        value={internalEditToken?.name}
-        onChange={handleChange}
-        type="text"
-        name="name"
-        inputRef={firstInput}
-        error={error}
-        placeholder="Unique name"
-      />
-      {renderTokenForm()}
+    <form onSubmit={handleSubmit}>
+      <Stack gap={3} direction="column" justify="start">
+        <Input
+          required
+          full
+          label="Name"
+          value={internalEditToken?.name}
+          onChange={handleChange}
+          type="text"
+          name="name"
+          inputRef={firstInput}
+          error={error}
+          placeholder="Unique name"
+        />
+        {renderTokenForm()}
 
-      {internalEditToken?.schema?.explainer && <div className="mt-1 text-gray-600 text-xxs">{internalEditToken.schema.explainer}</div>}
-      <Input
-        full
-        key="description"
-        label="description"
-        value={internalEditToken?.description}
-        onChange={handleDescriptionChange}
-        type="text"
-        name="description"
-        capitalize
-      />
-      <Stack direction="row" justify="end" gap={2}>
-        <Button variant="secondary" type="button" onClick={handleReset}>
-          Cancel
-        </Button>
-        <Button disabled={!isValid} variant="primary" type="submit">
-          {internalEditToken?.isPristine ? 'Create' : 'Update'}
-        </Button>
+        {internalEditToken?.schema?.explainer && <div className="mt-1 text-gray-600 text-xxs">{internalEditToken.schema.explainer}</div>}
+        <Input
+          full
+          key="description"
+          label="description"
+          value={internalEditToken?.description}
+          onChange={handleDescriptionChange}
+          type="text"
+          name="description"
+          capitalize
+        />
+        <Stack direction="row" justify="end" gap={2}>
+          <Button variant="secondary" type="button" onClick={handleReset}>
+            Cancel
+          </Button>
+          <Button disabled={!isValid} variant="primary" type="submit">
+            {internalEditToken?.isPristine ? 'Create' : 'Update'}
+          </Button>
+        </Stack>
       </Stack>
     </form>
   );
