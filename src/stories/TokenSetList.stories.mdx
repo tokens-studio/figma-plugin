@@ -1,0 +1,21 @@
+import { Meta, Story, ArgsTable, Canvas, Preview } from '@storybook/addon-docs';
+import * as TokenSetList from '@/app/components/TokenSetList';
+
+<Meta 
+  title='TokenSetItem' 
+  component={TokenSetItem} 
+/>
+
+<ArgsTable of={TokenSetItem}/>
+
+export const TokenSetItemDefaultStory = (args) => {
+  return (
+    <TokenSetItem/>
+  )
+}
+
+<Canvas>
+  <Story name='Default'>
+    {TokenSetItemDefaultStory.bind({})}
+  </Story>
+</Canvas>
