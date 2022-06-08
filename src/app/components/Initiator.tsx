@@ -97,7 +97,9 @@ export function Initiator() {
             let featureFlags: LDProps['flags'] | null;
             const existChanges = values.checkForChanges;
             const storageType = values.storageType?.provider;
-            if (!existChanges || ((storageType && storageType !== StorageProviderType.LOCAL) && existChanges && await askUserIfPull(storageType))) {
+            if (!existChanges
+              || ((storageType && storageType !== StorageProviderType.LOCAL)
+              && existChanges && await askUserIfPull(storageType))) {
               featureFlags = await fetchFeatureFlags(userData);
               getApiCredentials(true, featureFlags);
             } else {
@@ -176,6 +178,8 @@ export function Initiator() {
                 dispatch.uiState.setActiveTab(Tabs.START);
                 notifyToUI('Failed to fetch tokens, check your credentials', { error: true });
               }
+            } else {
+              dispatch.uiState.setActiveTab(Tabs.START);
             }
             break;
           }
@@ -252,6 +256,8 @@ export function Initiator() {
       const { key } = await getLicenseKey(userId);
       if (key) {
         dispatch.userState.addLicenseKey({ key, source: AddLicenseSource.INITAL_LOAD });
+      } else {
+        dispatch.userState.setLicenseStatus(LicenseStatus.NO_LICENSE);
       }
     }
     if (userId && checkedLocalStorage && !licenseKey) {
