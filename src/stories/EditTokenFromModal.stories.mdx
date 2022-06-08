@@ -47,7 +47,7 @@ export const EditTokenFormModalDefaultStory = (args) => {
       Click to Open a EditTokenFormModal Modal
     </Button>
     <Provider store={store}>
-      {isOpen && <EditTokenFormModal {...args} isOpen={true}/>}
+      {isOpen && <EditTokenFormModal {...args} isOpen={isOpen}/>}
     </Provider>
     </>
   )
