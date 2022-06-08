@@ -1,0 +1,1 @@
+export const mockAsyncMessageChannelMessage: jest.Mock;

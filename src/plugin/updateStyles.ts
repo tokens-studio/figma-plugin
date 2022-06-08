@@ -14,7 +14,7 @@ import updateTextStyles from './updateTextStyles';
 export default async function updateStyles(
   tokens: AnyTokenList,
   shouldCreate = false,
-  settings: SettingsState = {} as SettingsState,
+  settings: Partial<SettingsState> = {},
 ): Promise<Record<string, string>> {
   const themeInfo = await AsyncMessageChannel.message({
     type: AsyncMessageTypes.GET_THEME_INFO,

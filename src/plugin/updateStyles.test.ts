@@ -4,6 +4,8 @@ import * as updateTextStyles from './updateTextStyles';
 import * as updateEffectStyles from './updateEffectStyles';
 import { SingleToken } from '@/types/tokens';
 import { TokenTypes } from '@/constants/TokenTypes';
+import { mockAsyncMessageChannelMessage } from '../../tests/__mocks__/asyncMessageChannelMock';
+import { AsyncMessageTypes } from '@/types/AsyncMessages';
 
 type ExtendedSingleToken = SingleToken<true, { path: string }>;
 
@@ -141,5 +143,35 @@ describe('updateStyles', () => {
     );
     expect(colorSpy).not.toHaveBeenCalled();
     expect(textSpy).not.toHaveBeenCalled();
+  });
+
+  it('calls update functions with correct tokens and theme prefix', async () => {
+    const colorTokens = [
+      {
+        name: 'primary.500',
+        path: 'light/primary/500',
+        value: '#ff0000',
+        type: 'color',
+      },
+    ] as ExtendedSingleToken[];
+
+    mockAsyncMessageChannelMessage.mockImplementationOnce(() => (
+      Promise.resolve({
+        type: AsyncMessageTypes.GET_THEME_INFO,
+        activeTheme: 'light',
+        themes: [{
+          id: 'light',
+          name: 'light',
+        }],
+      })
+    ));
+
+    await updateStyles([...colorTokens], false, {
+      prefixStylesWithThemeName: true,
+    });
+    expect(colorSpy).toHaveBeenCalledWith(
+      colorTokens,
+      false,
+    );
   });
 });
