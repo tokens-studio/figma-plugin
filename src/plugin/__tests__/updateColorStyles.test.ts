@@ -21,7 +21,7 @@ describe('updateColorStyles', () => {
       true,
     );
 
-    expect(createdPaint.paints).toEqual([
+    expect(createdEffect.paints).toEqual([
       {
         type: 'SOLID',
         color: { r: 1, g: 0, b: 0 },
