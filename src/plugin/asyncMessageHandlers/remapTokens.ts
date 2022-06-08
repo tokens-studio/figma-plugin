@@ -18,7 +18,10 @@ export const remapTokens: AsyncMessageChannelHandlers[AsyncMessageTypes.REMAP_TO
     });
 
     // Go through allWithData and update all appearances of oldName to newName
-    const updatedNodes = allWithData.reduce<(NodeManagerNode & { tokens: Record<string, string> })[]>((all, node) => {
+    const updatedNodes: NodeManagerNode[] = [];
+    const updatedNodesWithOldTokens: NodeManagerNode[] = [];
+
+    allWithData.forEach((node) => {
       const { tokens } = node;
       let shouldBeRemapped = false;
       // @TODO I dont believe this typing is quite right - need to check and fix
@@ -36,34 +39,20 @@ export const remapTokens: AsyncMessageChannelHandlers[AsyncMessageTypes.REMAP_TO
         return acc;
       }, {});
       if (shouldBeRemapped) {
-        all.push({
+        updatedNodes.push({
           ...node,
           tokens: updatedTokens,
         });
+        updatedNodesWithOldTokens.push({
+          ...node,
+          tokens,
+        });
       }
-      return all;
-    }, []);
+    });
 
     if (updateMode === UpdateMode.SELECTION && category && tokens) {
       const tokensMap = tokenArrayGroupToMap(tokens);
       if (category === TokenTypes.COMPOSITION) {
-        const updatedNodesWithOldTokens = allWithData.reduce<(NodeManagerNode & { tokens: Record<string, string> })[]>((all, node) => {
-          const { tokens } = node;
-          let shouldBeRemapped = false;
-          Object.entries(tokens).reduce<Record<string, string>>((acc, [, val]) => {
-            if (val === oldName) {
-              shouldBeRemapped = true;
-            }
-            return acc;
-          }, {});
-          if (shouldBeRemapped) {
-            all.push({
-              ...node,
-              tokens,
-            });
-          }
-          return all;
-        }, []);
         await updatePluginData({
           entries: updatedNodesWithOldTokens, values: { [category]: newName }, shouldOverride: true, tokensMap,
         });
