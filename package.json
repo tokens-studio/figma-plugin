@@ -1,7 +1,7 @@
 {
   "name": "figma-tokens",
   "version": "1.0.0",
-  "plugin_version": "103",
+  "plugin_version": "107",
   "description": "Figma Tokens",
   "license": "MIT",
   "scripts": {
@@ -70,6 +70,7 @@
     "just-safe-get": "^4.0.1",
     "just-safe-set": "^4.0.2",
     "just-split": "^3.0.1",
+    "launchdarkly-js-client-sdk": "^2.22.1",
     "launchdarkly-react-client-sdk": "^2.26.0",
     "lodash.debounce": "^4.0.8",
     "mixpanel-figma": "^2.0.1",
