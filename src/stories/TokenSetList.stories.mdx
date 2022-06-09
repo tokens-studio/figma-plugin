@@ -3,14 +3,17 @@ import TokenSetList from '@/app/components/TokenSetList';
 
 <Meta 
   title='TokenSetList' 
-  component={TokenSetList} 
+  component={TokenSetList}
+  args={{
+
+  }}
 />
 
 <ArgsTable of={TokenSetList}/>
 
 export const TokenSetListDefaultStory = (args) => {
   return (
-    <TokenSetList/>
+    <TokenSetList {...args}/>
   )
 }
 
