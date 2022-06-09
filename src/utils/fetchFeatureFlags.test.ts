@@ -11,7 +11,7 @@ jest.mock('launchdarkly-js-client-sdk', () => ({
 }));
 
 describe('fetchFeatureFlags', (() => {
-  it('return flags', (async () => {
+  it('return flags when a user has a licenseKey', (async () => {
     const userData = {
       userId: 'six7',
       licenseKey: 'licenseKey',
@@ -44,4 +44,13 @@ describe('fetchFeatureFlags', (() => {
       },
     );
   }));
+
+  it('should return null when a user has no licenseKey or userId', (async () => {
+    const userData = {
+      userId: 'six7',
+    };
+    const flags = await fetchFeatureFlags(userData);
+    expect(flags).toEqual(null);
+  }));
+
 }));
