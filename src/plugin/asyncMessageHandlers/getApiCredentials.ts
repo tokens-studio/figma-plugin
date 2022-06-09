@@ -2,6 +2,7 @@ import { AsyncMessageChannelHandlers } from '@/AsyncMessageChannel';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { ApiProvidersProperty } from '@/figmaStorage';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
+import { getActiveTheme } from '@/utils/getActiveTheme';
 import { getUsedTokenSet } from '@/utils/getUsedTokenSet';
 import { getUISettings } from '@/utils/uiSettings';
 import compareProvidersWithStored from '../compareProviders';
@@ -13,6 +14,7 @@ export const getApiCredentials: AsyncMessageChannelHandlers[AsyncMessageTypes.GE
   try {
     const settings = await getUISettings();
     const usedTokenSet = await getUsedTokenSet();
+    const activeTheme = await getActiveTheme();
     store.inspectDeep = settings.inspectDeep;
     const storageType = await getSavedStorageType();
     const apiProviders = await ApiProvidersProperty.read();
@@ -24,7 +26,12 @@ export const getApiCredentials: AsyncMessageChannelHandlers[AsyncMessageTypes.GE
       case StorageProviderType.ADO:
       case StorageProviderType.URL: {
         compareProvidersWithStored({
-          providers: apiProviders ?? [], storageType, usedTokenSet, shouldPull: msg.shouldPull, featureFlags: msg.featureFlags,
+          providers: apiProviders ?? [],
+          storageType,
+          usedTokenSet,
+          activeTheme,
+          shouldPull: msg.shouldPull,
+          featureFlags: msg.featureFlags,
         });
         break;
       }

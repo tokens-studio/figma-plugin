@@ -7,13 +7,14 @@ import { MessageFromPluginTypes } from '../types/messages';
 type Options = {
   providers: StorageTypeCredentials[],
   storageType: StorageType,
+  activeTheme?: string | null
   usedTokenSet?: UsedTokenSetsMap | null
   shouldPull?: boolean,
   featureFlags?: LDProps['flags'] | null
 };
 
 export default function compareProvidersWithStored({
-  providers, storageType, usedTokenSet, shouldPull, featureFlags,
+  providers, storageType, usedTokenSet, activeTheme, shouldPull, featureFlags,
 }: Options) {
   if (providers?.length) {
     const matchingSet = providers.find((i) => isSameCredentials(i, storageType));
@@ -24,6 +25,7 @@ export default function compareProvidersWithStored({
         status: true,
         credentials: matchingSet,
         usedTokenSet,
+        activeTheme,
         shouldPull,
         featureFlags,
       });
