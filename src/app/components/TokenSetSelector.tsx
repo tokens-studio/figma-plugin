@@ -56,7 +56,7 @@ export default function TokenSetSelector() {
     setShowNewTokenSetFields(false);
     handleNewTokenSetNameChange('');
   }, [tokens]);
-  console.log(allTokenSets);
+
   const handleNewTokenSetSubmit = React.useCallback((e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     track('Created token set', { name: newTokenSetName });
