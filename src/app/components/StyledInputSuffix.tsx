@@ -18,4 +18,12 @@ export const StyledInputSuffix = styled('button', {
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
+
+  '&:focus': {
+    outline: 'none',
+    backgroundColor: '$interaction',
+    color: '$onInteraction',
+    boxShadow: 'none',
+    borderColor: '$interaction',
+  },
 });
