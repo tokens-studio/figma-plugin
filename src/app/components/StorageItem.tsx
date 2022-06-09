@@ -19,7 +19,7 @@ const StorageItem = ({ item, onEdit }: Props) => {
   const {
     provider, id, name,
   } = item;
-  console.log(item);
+
   const branch = isGitProvider(item) ? item.branch : null;
 
   const { restoreStoredProvider, deleteProvider } = useRemoteTokens();
