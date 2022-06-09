@@ -195,8 +195,14 @@ function findMatchingNonLocalTextStyle(styleId: string, typographyToken: string 
       }
       const tokenLineHeight = transformValue(String(lineHeight), 'lineHeights'); // This will default to `{ unit: 'AUTO' }` if lineHeight token is not set
       if (tokenLineHeight?.unit !== textStyle.lineHeight.unit) {
-        console.log('findMatchingNonLocalTextStyle -> lineHeight not matching! style: ', textStyle.lineHeight, ', token: ', tokenLineHeight);
-        matchingStyle = undefined;
+        let hasMismatch = true;
+        if (tokenLineHeight && tokenLineHeight.unit !== 'AUTO' && textStyle.lineHeight.unit !== 'AUTO') {
+          hasMismatch = tokenLineHeight.value > 0 || textStyle.lineHeight.value > 0;
+        }
+        if (hasMismatch) {
+          console.log('findMatchingNonLocalTextStyle -> lineHeight not matching! style: ', textStyle.lineHeight, ', token: ', tokenLineHeight);
+          matchingStyle = undefined;
+        }
       } else if (tokenLineHeight.unit !== 'AUTO' && textStyle.lineHeight.unit !== 'AUTO') {
         if (tokenLineHeight.unit !== textStyle.lineHeight.unit || tokenLineHeight.value !== textStyle.lineHeight.value) {
           console.log('findMatchingNonLocalTextStyle -> lineHeight not matching! style: ', textStyle.lineHeight, ', token: ', tokenLineHeight);
@@ -205,8 +211,10 @@ function findMatchingNonLocalTextStyle(styleId: string, typographyToken: string 
       }
       const tokenLetterSpacing = transformValue(String(letterSpacing), 'letterSpacing'); // This will default to `null` if letterSpacing token is not set
       if (tokenLetterSpacing?.unit !== textStyle.letterSpacing.unit || tokenLetterSpacing?.value !== textStyle.letterSpacing.value) {
-        console.log('findMatchingNonLocalTextStyle -> letterSpacing not matching! style: ', textStyle.letterSpacing, ', token: ', tokenLetterSpacing);
-        matchingStyle = undefined;
+        if ((tokenLetterSpacing?.value && tokenLetterSpacing.value > 0) || textStyle.letterSpacing.value > 0) {
+          console.log('findMatchingNonLocalTextStyle -> letterSpacing not matching! style: ', textStyle.letterSpacing, ', token: ', tokenLetterSpacing);
+          matchingStyle = undefined;
+        }
       }
       if (paragraphSpacing === undefined || textStyle.paragraphSpacing !== transformValue(paragraphSpacing, 'paragraphSpacing')) {
         console.log('findMatchingNonLocalTextStyle -> paragraphSpacing not matching! style: ', textStyle.paragraphSpacing, ', token: ', transformValue(String(paragraphSpacing), 'paragraphSpacing'));
@@ -224,7 +232,7 @@ function findMatchingNonLocalTextStyle(styleId: string, typographyToken: string 
       }
       // TODO: Should description also match? 🤷
       if (textStyle.description !== '' && textStyle.description !== description) {
-        console.log('findMatchingNonLocalTextStyle -> description not matching! style: ', textStyle.description, ', token: ', description);
+        console.log('findMatchingNonLocalTextStyle -> description not matching, but we don`t use that for comparison (yet)... style: ', textStyle.description, ', token: ', description);
         // matchingStyle = undefined;
       }
     }
