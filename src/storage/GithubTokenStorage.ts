@@ -103,7 +103,6 @@ export class GithubTokenStorage extends GitTokenStorage {
         path: this.path,
         ref: this.branch,
       });
-
       // read entire directory
       if (Array.isArray(response.data) && this.flags.multiFileEnabled) {
         const directoryTreeResponse = await this.octokitClient.rest.git.createTree({
