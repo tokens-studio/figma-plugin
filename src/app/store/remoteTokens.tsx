@@ -20,10 +20,10 @@ import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StorageTypeCredentials, StorageTypeFormValues } from '@/types/StorageType';
 
 type PullTokensOptions = {
-  context?: StorageTypeCredentials;
-  featureFlags?: LDProps['flags'];
-  usedTokenSet?: UsedTokenSetsMap | null;
-  activeTheme?: string | null;
+  context?: StorageTypeCredentials,
+  featureFlags?: LDProps['flags'],
+  usedTokenSet?: UsedTokenSetsMap | null
+  activeTheme?: string | null
 };
 
 // @TODO typings and hooks
@@ -68,15 +68,14 @@ export default function useRemoteTokens() {
   } = useADO();
   const { pullTokensFromURL } = useURL();
 
-  const pullTokens = useCallback(
-    async ({
-      context = api, featureFlags, usedTokenSet, activeTheme,
-    }: PullTokensOptions) => {
-      track('pullTokens', { provider: context.provider });
-      dispatch.uiState.startJob({
-        name: BackgroundJobs.UI_PULLTOKENS,
-        isInfinite: true,
-      });
+  const pullTokens = useCallback(async ({
+    context = api, featureFlags, usedTokenSet, activeTheme,
+  }: PullTokensOptions) => {
+    track('pullTokens', { provider: context.provider });
+    dispatch.uiState.startJob({
+      name: BackgroundJobs.UI_PULLTOKENS,
+      isInfinite: true,
+    });
 
       let remoteData: RemoteTokenStorageData<unknown> | null = null;
       switch (context.provider) {
