@@ -1,0 +1,34 @@
+import { Meta, Story, ArgsTable, Canvas, Preview } from '@storybook/addon-docs';
+import { Provider } from 'react-redux';
+
+import { store } from '@/app/store';
+import { Tabs } from '@/constants/Tabs';
+
+import StorageProviderSelector from '@/app/components/StorageProviderSelector';
+
+<Meta 
+  title='StorageProviderSelector' 
+  component={StorageProviderSelector} 
+  args={{
+    text: 'StorageProviderSelector',
+    isActive: true,
+    isStored: true,
+    id: 'storageproviderID',
+  }}
+/>
+
+<ArgsTable of={StorageProviderSelector}/>
+
+export const StorageProviderSelectorDefaultStory = (args) => {
+  return (
+    <Provider store={store}>
+      <StorageProviderSelector {...args}/>
+    </Provider>
+  )
+}
+
+<Canvas>
+  <Story name='Default'>
+    {StorageProviderSelectorDefaultStory.bind({})}
+  </Story>
+</Canvas>
