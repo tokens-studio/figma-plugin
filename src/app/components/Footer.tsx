@@ -1,7 +1,6 @@
 import React, { useCallback } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { DownloadIcon, UploadIcon } from '@primer/octicons-react';
-import { Dispatch } from '../store';
 import * as pjs from '../../../package.json';
 import Box from './Box';
 import Text from './Text';
@@ -37,16 +36,11 @@ export default function Footer() {
   const editProhibited = useSelector(editProhibitedSelector);
   const localApiState = useSelector(localApiStateSelector);
   const usedTokenSet = useSelector(usedTokenSetSelector);
-  const dispatch = useDispatch<Dispatch>();
   const projectURL = useSelector(projectURLSelector);
   const { gitBranchSelector } = useFlags();
   const { pullTokens, pushTokens } = useRemoteTokens();
 
-  const checkForChanges = React.useCallback(() => {
-    const hasChanged = (lastSyncedState !== JSON.stringify([tokens, themes], null, 2));
-    dispatch.tokenState.updateCheckForChanges(hasChanged);
-    return hasChanged;
-  }, [lastSyncedState, tokens, themes, dispatch.tokenState]);
+  const checkForChanges = React.useCallback(() => (lastSyncedState !== JSON.stringify([tokens, themes], null, 2)), [lastSyncedState, tokens, themes]);
 
   const hasChanges = React.useMemo(() => checkForChanges(), [checkForChanges]);
 
