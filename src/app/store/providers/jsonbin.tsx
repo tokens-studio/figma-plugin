@@ -93,11 +93,14 @@ export function useJSONbin() {
     const {
       id, secret, name, internalId,
     } = context;
+    console.log('before esel');
     if (!id || !secret) return null;
-
+    console.log('esleelse');
     try {
       const storage = new JSONBinTokenStorage(id, secret);
+      console.log('storage', storage);
       const data = await storage.retrieve();
+      console.log('jsonbindata', data);
       dispatch.uiState.setProjectURL(`https://jsonbin.io/${id}`);
 
       AsyncMessageChannel.message({

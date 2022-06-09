@@ -109,11 +109,11 @@ export function useGitHub() {
   const checkAndSetAccess = useCallback(async ({ context, owner, repo }: { context: GithubCredentials; owner: string; repo: string }) => {
     const storage = storageClientFactory(context, owner, repo);
     const hasWriteAccess = await storage.canWrite();
+    console.log('hasWrite', hasWriteAccess);
     dispatch.tokenState.setEditProhibited(!hasWriteAccess);
   }, [dispatch, storageClientFactory]);
 
   const pullTokensFromGitHub = useCallback(async (context: GithubCredentials, receivedFeatureFlags?: LDProps['flags']) => {
-    console.log('start');
     const storage = storageClientFactory(context);
     if (receivedFeatureFlags?.multiFileSync) storage.enableMultiFile();
 
