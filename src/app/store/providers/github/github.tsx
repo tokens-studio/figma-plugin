@@ -7,6 +7,7 @@ import useConfirm from '@/app/hooks/useConfirm';
 import usePushDialog from '@/app/hooks/usePushDialog';
 import { notifyToUI } from '@/plugin/notifiers';
 import {
+  activeThemeSelector,
   localApiStateSelector, themesListSelector, tokensSelector, usedTokenSetSelector,
 } from '@/selectors';
 import { GithubTokenStorage } from '@/storage/GithubTokenStorage';
@@ -23,6 +24,7 @@ type GithubFormValues = Extract<StorageTypeFormValues<false>, { provider: Storag
 
 export function useGitHub() {
   const tokens = useSelector(tokensSelector);
+  const activeTheme = useSelector(activeThemeSelector);
   const themes = useSelector(themesListSelector);
   const localApiState = useSelector(localApiStateSelector);
   const usedTokenSet = useSelector(usedTokenSetSelector);
@@ -87,6 +89,7 @@ export function useGitHub() {
           values: tokens,
           themes,
           usedTokenSet,
+          activeTheme,
         });
         pushDialog('success');
         return {
@@ -104,7 +107,17 @@ export function useGitHub() {
       themes,
       metadata: {},
     };
-  }, [storageClientFactory, dispatch.uiState, dispatch.tokenState, pushDialog, tokens, themes, localApiState, usedTokenSet]);
+  }, [
+    storageClientFactory,
+    dispatch.uiState,
+    dispatch.tokenState,
+    pushDialog,
+    tokens,
+    themes,
+    localApiState,
+    usedTokenSet,
+    activeTheme,
+  ]);
 
   const checkAndSetAccess = useCallback(async ({ context, owner, repo }: { context: GithubCredentials; owner: string; repo: string }) => {
     const storage = storageClientFactory(context, owner, repo);
@@ -155,6 +168,7 @@ export function useGitHub() {
             dispatch.tokenState.setTokenData({
               values: content.tokens,
               themes: content.themes,
+              activeTheme,
               usedTokenSet,
             });
             notifyToUI('Pulled tokens from GitHub');
@@ -173,6 +187,8 @@ export function useGitHub() {
     dispatch,
     pushTokensToGitHub,
     storageClientFactory,
+    usedTokenSet,
+    activeTheme,
     themes,
     tokens,
   ]);
@@ -190,6 +206,7 @@ export function useGitHub() {
           values: data.tokens,
           themes: data.themes,
           usedTokenSet,
+          activeTheme,
         });
       } else {
         notifyToUI('No tokens stored on remote');
@@ -202,7 +219,14 @@ export function useGitHub() {
       themes: data.themes ?? themes,
       metadata: {},
     };
-  }, [syncTokensWithGitHub, tokens, themes, dispatch.tokenState, usedTokenSet]);
+  }, [
+    syncTokensWithGitHub,
+    tokens,
+    themes,
+    dispatch.tokenState,
+    usedTokenSet,
+    activeTheme,
+  ]);
 
   const fetchGithubBranches = useCallback(async (context: GithubCredentials) => {
     const storage = storageClientFactory(context);
