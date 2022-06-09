@@ -1,0 +1,55 @@
+import { Meta, Story, ArgsTable, Canvas, Preview } from '@storybook/addon-docs';
+import { Provider } from 'react-redux';
+
+import { store } from '@/app/store';
+import TokenSetList from '@/app/components/TokenSetList';
+
+<Meta 
+  title='TokenSetList' 
+  component={TokenSetList}
+  args={{
+    tokenSets: [
+      'core/base',
+      'core/font',
+      'core/color',
+      'semantic/font',
+      'button/primary',
+      'icon-button',
+      'link',
+      'text-field',
+      'radio/button',
+      'checkbox',
+      'switch',
+      'field-label',
+      'help-text/assist',
+      'heading/content',
+      'heading/header',
+      'heading/footer',
+      'body',
+      'detail',
+      'code',
+      'avatar/small',
+      'avatar/medium',
+      'tag',
+      'alert-banner',
+      'divider',
+      'menu-item'
+    ]
+  }}
+/>
+
+<ArgsTable of={TokenSetList}/>
+
+export const TokenSetListDefaultStory = (args) => {
+  return (
+    <Provider store={store}>
+      <TokenSetList {...args}/>
+    </Provider>
+  )
+}
+
+<Canvas>
+  <Story name='Default'>
+    {TokenSetListDefaultStory.bind({})}
+  </Story>
+</Canvas>
