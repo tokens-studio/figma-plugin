@@ -5,7 +5,9 @@ import { notifyToUI } from '../../../plugin/notifiers';
 import * as pjs from '../../../../package.json';
 import useStorage from '../useStorage';
 import { compareUpdatedAt } from '@/utils/date';
-import { themesListSelector, tokensSelector } from '@/selectors';
+import {
+  activeThemeSelector, themesListSelector, tokensSelector, usedTokenSetSelector,
+} from '@/selectors';
 import { UpdateRemoteFunctionPayload } from '@/types/UpdateRemoteFunction';
 import { JSONBinTokenStorage } from '@/storage';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
@@ -55,6 +57,8 @@ export function useJSONbin() {
   const { setStorageType } = useStorage();
   const tokens = useSelector(tokensSelector);
   const themes = useSelector(themesListSelector);
+  const activeTheme = useSelector(activeThemeSelector);
+  const usedTokenSets = useSelector(usedTokenSetSelector);
 
   const createNewJSONBin = useCallback(async (context: Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.JSONBIN }>) => {
     const { secret, name, internalId } = context;
@@ -152,11 +156,19 @@ export function useJSONbin() {
       dispatch.tokenState.setTokenData({
         values: content.tokens,
         themes: content.themes,
+        usedTokenSet: usedTokenSets,
+        activeTheme,
       });
     }
 
     return content;
-  }, [dispatch, pullTokensFromJSONBin, setStorageType]);
+  }, [
+    dispatch,
+    pullTokensFromJSONBin,
+    setStorageType,
+    usedTokenSets,
+    activeTheme,
+  ]);
 
   return useMemo(() => ({
     addJSONBinCredentials,
