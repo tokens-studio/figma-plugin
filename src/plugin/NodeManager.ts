@@ -188,10 +188,10 @@ export class NodeManager {
 
     if (Object.keys(entry.tokens).length) {
       if (entry.hash !== checksum) {
-        await HashProperty.write(checksum);
+        await HashProperty.write(checksum, node);
       }
       if (version !== currentPluginVersion) {
-        await VersionProperty.write(String(currentPluginVersion));
+        await VersionProperty.write(String(currentPluginVersion), node);
       }
 
       this.persistentNodesCache.set(entry.id, {
@@ -338,7 +338,7 @@ export class NodeManager {
         });
         entry.tokens = tokens;
         entry.hash = checksum;
-        await HashProperty.write(hash(tokens));
+        await HashProperty.write(hash(tokens), node);
       }
     }
   }

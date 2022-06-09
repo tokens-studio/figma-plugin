@@ -1,0 +1,215 @@
+import { useState } from 'react';
+import { Meta, Story, ArgsTable, Canvas, Preview } from '@storybook/addon-docs';
+
+import { TokenTypes } from '@/constants/TokenTypes';
+import { SingleToken } from '@/types/tokens';
+import DownshiftInput  from '@/app/components/DownshiftInput';
+
+<Meta 
+  title='DownshiftInput'
+  component={DownshiftInput}
+  args={{
+    name: 'string',
+    type: TokenTypes.SIZING,
+    label: 'size',
+    error: '',
+    value: '12',
+    prefix: false,
+    suffix: true,
+    placeholder: 'Value or alias',
+  }}
+/>
+
+<ArgsTable of={DownshiftInput} />
+
+export const DownshiftInputDefaultStory = (args) => {
+  const [value, setValue] = useState('');
+  const resolvedTokens = [
+  {
+    value: 2,
+    type: TokenTypes.SIZING,
+    name: '2',
+    rawValue: 2
+  },
+  {
+    value: '64px',
+    type: TokenTypes.BORDER_RADIUS,
+    name: 'border-radius.0',
+    rawValue: '64px'
+  },
+  {
+      value: 0,
+      type: TokenTypes.BORDER_WIDTH,
+      name: 'border-width.0',
+      rawValue: '0'
+  },
+  {
+    value: '#64748b',
+    type: TokenTypes.COLOR,
+    name: 'color.slate',
+    rawValue: '#64748b'
+  },
+  {
+    value: '#d4d4d8',
+    type: TokenTypes.COLOR,
+    name: 'color.zinc',
+    rawValue: '#d4d4d8'
+  },
+  {
+    value: '#fecaca',
+    type: TokenTypes.COLOR,
+    name: 'color.red',
+    rawValue: '#fecaca'
+  },
+  {
+    value: '#f97316',
+    type: TokenTypes.COLOR,
+    name: 'color.orange',
+    rawValue: '#f97316'
+  },
+  {
+    value: '#eab308',
+    type: TokenTypes.COLOR,
+    name: 'color.yellow',
+    rawValue: '#eab308'
+  },
+  {
+    value: '12px',
+    type: 'fontSizes',
+    name: 'font-size.2',
+    rawValue: '12px'
+  },
+  {
+    value: 'normal',
+    type: TokenTypes.OTHER,
+    name: 'font-style.normal',
+    rawValue: 'normal'
+  },
+  {
+    value: 'Regular',
+    type: TokenTypes.FONT_WEIGHTS,
+    default: '400',
+    name: 'font-weight.regular',
+    rawValue: 'Regular'
+  },
+  {
+    value: '15%',
+    type: 'opacity',
+    name: 'opacity.15',
+    rawValue: '15%'
+  },
+  {
+    value: 14,
+    type: TokenTypes.SPACING,
+    name: 'space.175',
+    rawValue: '14'
+  }
+];
+  return (
+    <>
+    <DownshiftInput {...args} resolvedTokens={resolvedTokens} setInputValue={(v) => setValue(v)}/>
+    </>
+  )
+}
+
+<Canvas>
+  <Story name='Default'>
+    {DownshiftInputDefaultStory.bind({})}
+  </Story>
+  <Story name='Color' args={{
+    name: 'color',
+    type: TokenTypes.COLOR,
+    label: 'color',
+    error: '',
+    value: '#F8FAFC',
+    prefix: false,
+    suffix: true,
+    placeholder: '#000000, hsla(), rgba() or {alias}',
+  }}>
+    {DownshiftInputDefaultStory.bind({})}
+  </Story>
+  <Story name='Border Radius' args={{
+    name: 'color',
+    type: TokenTypes.BORDER_RADIUS,
+    label: 'border-radius',
+    error: '',
+    value: '64px',
+    prefix: false,
+    suffix: true,
+    placeholder: 'Value or alias',
+  }}>
+    {DownshiftInputDefaultStory.bind({})}
+  </Story>
+  <Story name='Border Width' args={{
+    name: 'Border-Width',
+    type: TokenTypes.BORDER_WIDTH,
+    label: 'border-width',
+    error: '',
+    value: '0',
+    prefix: false,
+    suffix: true,
+    placeholder: 'Value or alias',
+  }}>
+    {DownshiftInputDefaultStory.bind({})}
+  </Story>
+  <Story name='Font Size' args={{
+    name: 'font-size.2',
+    type: TokenTypes.FONT_SIZE,
+    label: 'font-size',
+    error: '',
+    value: '12px',
+    prefix: false,
+    suffix: true,
+    placeholder: 'Value or alias',
+  }}>
+    {DownshiftInputDefaultStory.bind({})}
+  </Story>
+  <Story name='Other' args={{
+    name: 'font-style.normal',
+    type: TokenTypes.OTHER,
+    label: 'font-size',
+    error: '',
+    value: 'normal',
+    prefix: false,
+    suffix: true,
+    placeholder: 'Value or alias',
+  }}>
+    {DownshiftInputDefaultStory.bind({})}
+  </Story>
+  <Story name='Font-Weight' args={{
+    name: 'font-weight.regular',
+    type: TokenTypes.FONT_WEIGHTS,
+    label: 'font-size',
+    error: '',
+    value: 'Regular',
+    prefix: false,
+    suffix: true,
+    placeholder: 'Value or alias',
+  }}>
+    {DownshiftInputDefaultStory.bind({})}
+  </Story>
+  <Story name='Opacity' args={{
+    name: 'opacity.15',
+    type: TokenTypes.OPACITY,
+    label: 'opacity',
+    error: '',
+    value: '15%',
+    prefix: false,
+    suffix: true,
+    placeholder: 'Value or alias',
+  }}>
+    {DownshiftInputDefaultStory.bind({})}
+  </Story>
+  <Story name='Spacing' args={{
+    name: 'space.175',
+    type: TokenTypes.SPACING,
+    label: 'spacing',
+    error: '',
+    value: 14,
+    prefix: false,
+    suffix: true,
+    placeholder: 'Value or alias',
+  }}>
+    {DownshiftInputDefaultStory.bind({})}
+  </Story>
+</Canvas>
