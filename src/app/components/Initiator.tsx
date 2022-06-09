@@ -149,7 +149,7 @@ export function Initiator() {
             break;
           case MessageFromPluginTypes.API_CREDENTIALS: {
             const {
-              status, credentials, usedTokenSet, shouldPull, featureFlags,
+              status, credentials, usedTokenSet, activeTheme, shouldPull, featureFlags,
             } = pluginMessage;
             if (status === true) {
               const receivedFlags: LDProps['flags'] = featureFlags;
@@ -173,9 +173,7 @@ export function Initiator() {
 
                   if (shouldPull) {
                     const remoteData = await pullTokens({
-                      context: credentials,
-                      featureFlags: receivedFlags,
-                      usedTokenSet,
+                      context: credentials, featureFlags: receivedFlags, usedTokenSet, activeTheme,
                     });
                     const existTokens = Object.values(remoteData?.tokens ?? {}).some((value) => value.length > 0);
                     if (existTokens) {
