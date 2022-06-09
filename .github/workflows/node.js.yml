@@ -56,17 +56,16 @@ jobs:
       
       # 4: Run tests
       - name: Run test command
-        run: yarn test:write
-      # 5: Show coverage
-      - name: Show coverage
-        uses: mattallty/jest-github-action@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN  }}
+        run: yarn test
+      
+      # 5: Run test coverage report
+      - name: Run test coverage report
+        id: testCoverage
+        uses: anuraag016/Jest-Coverage-Diff@master
         with:
-          # Runs tests related to the changes since the base branch of your pull request
-          # Default to false if not set
-          changes-only: true
-
+          fullCoverageDiff: false
+          runCommand: "npx jest --collectCoverageFrom='[\"src/**/*.{js,jsx,ts,tsx}\"]' --coverage --collectCoverage=true --coverageDirectory='./' --coverageReporters='json-summary' --forceExit --detectOpenHandles"
+          delta: 0.5
   test-transform:
     name: Transformer Tests
     runs-on: ubuntu-latest

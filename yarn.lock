@@ -12561,7 +12561,7 @@ latest-version@^3.0.0:
   dependencies:
     package-json "^4.0.0"
 
-launchdarkly-js-client-sdk@2.22.1:
+launchdarkly-js-client-sdk@2.22.1, launchdarkly-js-client-sdk@^2.22.1:
   version "2.22.1"
   resolved "https://registry.yarnpkg.com/launchdarkly-js-client-sdk/-/launchdarkly-js-client-sdk-2.22.1.tgz#e6064c79bc575eea0aa4364be41754d54d89ae6a"
   integrity sha512-EAdw7B8w4m/WZGmHHLj9gbYBP6lCqJs5TQDCM9kWJOnvHBz7DJIxOdqazNMDn5AzBxfvaMG7cpLms+Cur5LD5g==

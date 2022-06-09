@@ -111,11 +111,21 @@ const StyledPrefix = styled('div', {
   backgroundColor: '$bgDefault',
   display: 'flex',
   alignItems: 'center',
+  fontSize: '$xsmall',
+  color: '$textMuted',
 
   '&:focus': {
     outline: 'none',
     boxShadow: 'none',
     backgroundColor: '$bgSubtle',
+  },
+
+  variants: {
+    isText: {
+      true: {
+        minWidth: '60px',
+      },
+    },
   },
 });
 

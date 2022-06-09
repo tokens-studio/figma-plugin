@@ -50,6 +50,12 @@ import IconVerticalPadding from './verticalpadding.svg';
 import IconVisibilityOff from './visibilityoff.svg';
 import IconVisibility from './visibilityon.svg';
 import IconX from './x.svg';
+import IconFontSize from './font-size.svg';
+import IconLetterSpacing from './letter-spacing.svg';
+import IconParagraphSpacing from './paragraph-spacing.svg';
+import IconTextCase from './text-case.svg';
+import IconTextDecoration from './text-decoration.svg';
+import IconLineHeight from './line-height.svg';
 
 export {
   IconAdd,
@@ -104,4 +110,10 @@ export {
   IconVisibility,
   IconX,
   Icon_Trash,
+  IconFontSize,
+  IconLetterSpacing,
+  IconParagraphSpacing,
+  IconTextCase,
+  IconTextDecoration,
+  IconLineHeight,
 };
