@@ -19,6 +19,7 @@ const StorageItem = ({ item, onEdit }: Props) => {
   const {
     provider, id, name,
   } = item;
+  console.log(item);
   const branch = isGitProvider(item) ? item.branch : null;
 
   const { restoreStoredProvider, deleteProvider } = useRemoteTokens();
@@ -50,29 +51,29 @@ const StorageItem = ({ item, onEdit }: Props) => {
           {branch && ` (${branch})`}
         </div>
         {!isActive() && (
-        <button
-          type="button"
-          className="inline-flex text-left text-red-600 underline text-xxs"
-          onClick={handleDelete}
-        >
-          Delete local credentials
-        </button>
+          <button
+            type="button"
+            className="inline-flex text-left text-red-600 underline text-xxs"
+            onClick={handleDelete}
+          >
+            Delete local credentials
+          </button>
         )}
       </div>
       <div className="space-x-2 flex-nowrap flex items-center">
         {onEdit && (
-        <Button id="button-storageitem-edit" variant="secondary" onClick={onEdit}>
-          Edit
-        </Button>
+          <Button id="button-storageitem-edit" variant="secondary" onClick={onEdit}>
+            Edit
+          </Button>
         )}
         {!isActive() && (
-        <Button
-          id="button-storageitem-apply"
-          variant="secondary"
-          onClick={handleRestore}
-        >
-          Apply
-        </Button>
+          <Button
+            id="button-storageitem-apply"
+            variant="secondary"
+            onClick={handleRestore}
+          >
+            Apply
+          </Button>
         )}
       </div>
     </StyledStorageItem>
