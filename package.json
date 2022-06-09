@@ -61,7 +61,7 @@
     "expr-eval": "^2.0.2",
     "figma-plugin-ds": "^0.1.8",
     "file-loader": "^6.2.0",
-    "framer-motion": "^6.3.0",
+    "framer-motion": "^6.3.11",
     "ignore-styles": "^5.0.1",
     "json5": "^2.2.0",
     "just-compact": "^3.0.1",
