@@ -1,21 +1,21 @@
 import { Meta, Story, ArgsTable, Canvas, Preview } from '@storybook/addon-docs';
-import * as TokenSetList from '@/app/components/TokenSetList';
+import TokenSetList from '@/app/components/TokenSetList';
 
 <Meta 
-  title='TokenSetItem' 
-  component={TokenSetItem} 
+  title='TokenSetList' 
+  component={TokenSetList} 
 />
 
-<ArgsTable of={TokenSetItem}/>
+<ArgsTable of={TokenSetList}/>
 
-export const TokenSetItemDefaultStory = (args) => {
+export const TokenSetListDefaultStory = (args) => {
   return (
-    <TokenSetItem/>
+    <TokenSetList/>
   )
 }
 
 <Canvas>
   <Story name='Default'>
-    {TokenSetItemDefaultStory.bind({})}
+    {TokenSetListDefaultStory.bind({})}
   </Story>
 </Canvas>
