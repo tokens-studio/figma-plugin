@@ -150,7 +150,6 @@ export function Initiator() {
             break;
           case MessageFromPluginTypes.API_CREDENTIALS: {
             const { status, credentials, usedTokenSet, activeTheme, shouldPull, featureFlags } = pluginMessage;
-
             if (status === true) {
               const receivedFlags: LDProps['flags'] = featureFlags;
               try {

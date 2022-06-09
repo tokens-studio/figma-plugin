@@ -69,9 +69,7 @@ export default function useRemoteTokens() {
   const { pullTokensFromURL } = useURL();
 
   const pullTokens = useCallback(
-    async ({
-      context = api, featureFlags, usedTokenSet, activeTheme,
-    }: PullTokensOptions) => {
+    async ({ context = api, featureFlags, usedTokenSet, activeTheme }: PullTokensOptions) => {
       track('pullTokens', { provider: context.provider });
       dispatch.uiState.startJob({
         name: BackgroundJobs.UI_PULLTOKENS,
@@ -134,7 +132,7 @@ export default function useRemoteTokens() {
       pullTokensFromJSONBin,
       pullTokensFromURL,
       pullTokensFromADO,
-    ],
+    ]
   );
 
   const restoreStoredProvider = useCallback(
@@ -201,7 +199,7 @@ export default function useRemoteTokens() {
           throw new Error('Not implemented');
       }
     },
-    [api, pushTokensToGitHub, pushTokensToGitLab, pushTokensToBitbucket, pushTokensToADO],
+    [api, pushTokensToGitHub, pushTokensToGitLab, pushTokensToBitbucket, pushTokensToADO]
   );
 
   const addNewProviderItem = useCallback(
@@ -261,7 +259,7 @@ export default function useRemoteTokens() {
       createNewJSONBin,
       pullTokensFromURL,
       setStorageType,
-    ],
+    ]
   );
 
   const addNewBranch = useCallback(
@@ -290,7 +288,7 @@ export default function useRemoteTokens() {
 
       return newBranchCreated;
     },
-    [createGithubBranch, createADOBranch, createBitbucketBranch],
+    [createGithubBranch, createADOBranch, createBitbucketBranch]
   );
 
   const fetchBranches = useCallback(
@@ -308,7 +306,7 @@ export default function useRemoteTokens() {
           return null;
       }
     },
-    [fetchGithubBranches, fetchGitLabBranches, fetchBitbucketBranches, fetchADOBranches],
+    [fetchGithubBranches, fetchGitLabBranches, fetchBitbucketBranches, fetchADOBranches]
   );
 
   const deleteProvider = useCallback((provider) => {
@@ -328,6 +326,6 @@ export default function useRemoteTokens() {
       fetchBranches,
       addNewBranch,
     }),
-    [restoreStoredProvider, deleteProvider, pullTokens, pushTokens, addNewProviderItem, fetchBranches, addNewBranch],
+    [restoreStoredProvider, deleteProvider, pullTokens, pushTokens, addNewProviderItem, fetchBranches, addNewBranch]
   );
 }
