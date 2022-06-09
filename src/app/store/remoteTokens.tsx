@@ -68,15 +68,14 @@ export default function useRemoteTokens() {
   } = useADO();
   const { pullTokensFromURL } = useURL();
 
-  const pullTokens = useCallback(
-    async ({
-      context = api, featureFlags, usedTokenSet, activeTheme,
-    }: PullTokensOptions) => {
-      track('pullTokens', { provider: context.provider });
-      dispatch.uiState.startJob({
-        name: BackgroundJobs.UI_PULLTOKENS,
-        isInfinite: true,
-      });
+  const pullTokens = useCallback(async ({
+    context = api, featureFlags, usedTokenSet, activeTheme,
+  }: PullTokensOptions) => {
+    track('pullTokens', { provider: context.provider });
+    dispatch.uiState.startJob({
+      name: BackgroundJobs.UI_PULLTOKENS,
+      isInfinite: true,
+    });
 
       let remoteData: RemoteTokenStorageData<unknown> | null = null;
       switch (context.provider) {
