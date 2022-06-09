@@ -20,10 +20,17 @@ import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StorageTypeCredentials, StorageTypeFormValues } from '@/types/StorageType';
 
 type PullTokensOptions = {
+<<<<<<< HEAD
   context?: StorageTypeCredentials;
   featureFlags?: LDProps['flags'];
   usedTokenSet?: UsedTokenSetsMap | null;
   activeTheme?: string | null;
+=======
+  context?: StorageTypeCredentials,
+  featureFlags?: LDProps['flags'],
+  usedTokenSet?: UsedTokenSetsMap | null
+  activeTheme?: string | null
+>>>>>>> f355fae (feat: pass along stored activeTheme)
 };
 
 // @TODO typings and hooks
@@ -68,13 +75,14 @@ export default function useRemoteTokens() {
   } = useADO();
   const { pullTokensFromURL } = useURL();
 
-  const pullTokens = useCallback(
-    async ({ context = api, featureFlags, usedTokenSet, activeTheme }: PullTokensOptions) => {
-      track('pullTokens', { provider: context.provider });
-      dispatch.uiState.startJob({
-        name: BackgroundJobs.UI_PULLTOKENS,
-        isInfinite: true,
-      });
+  const pullTokens = useCallback(async ({
+    context = api, featureFlags, usedTokenSet, activeTheme,
+  }: PullTokensOptions) => {
+    track('pullTokens', { provider: context.provider });
+    dispatch.uiState.startJob({
+      name: BackgroundJobs.UI_PULLTOKENS,
+      isInfinite: true,
+    });
 
       let remoteData: RemoteTokenStorageData<unknown> | null = null;
       switch (context.provider) {
@@ -106,6 +114,7 @@ export default function useRemoteTokens() {
           throw new Error('Not implemented');
       }
 
+<<<<<<< HEAD
       if (remoteData) {
         dispatch.tokenState.setLastSyncedState(JSON.stringify([remoteData.tokens, remoteData.themes], null, 2));
         dispatch.tokenState.setTokenData({
@@ -119,6 +128,21 @@ export default function useRemoteTokens() {
           setNames: Object.keys(remoteData.tokens),
         });
       }
+=======
+    if (remoteData) {
+      dispatch.tokenState.setLastSyncedState(JSON.stringify([remoteData.tokens, remoteData.themes], null, 2));
+      dispatch.tokenState.setTokenData({
+        values: remoteData.tokens,
+        themes: remoteData.themes,
+        activeTheme: activeTheme ?? null,
+        usedTokenSet: usedTokenSet ?? {},
+      });
+      track('Launched with token sets', {
+        count: Object.keys(remoteData.tokens).length,
+        setNames: Object.keys(remoteData.tokens),
+      });
+    }
+>>>>>>> f355fae (feat: pass along stored activeTheme)
 
       dispatch.uiState.completeJob(BackgroundJobs.UI_PULLTOKENS);
       return remoteData;
