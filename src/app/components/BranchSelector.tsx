@@ -13,7 +13,7 @@ import {
   BranchSwitchMenuArrow,
 } from './BranchSwitchMenu';
 import {
-  branchSelector, lastSyncedStateSelector, tokensSelector, localApiStateBranchSelector, apiSelector, usedTokenSetSelector, localApiStateSelector, themesListSelector,
+  branchSelector, lastSyncedStateSelector, tokensSelector, localApiStateBranchSelector, apiSelector, usedTokenSetSelector, localApiStateSelector, themesListSelector, activeThemeSelector,
 } from '@/selectors';
 import useRemoteTokens from '../store/remoteTokens';
 import useConfirm from '@/app/hooks/useConfirm';
@@ -52,6 +52,7 @@ export default function BranchSelector() {
   const localApiState = useSelector(localApiStateSelector);
   const localApiStateBranch = useSelector(localApiStateBranchSelector);
   const apiData = useSelector(apiSelector);
+  const activeTheme = useSelector(activeThemeSelector);
   const usedTokenSet = useSelector(usedTokenSetSelector);
 
   const [currentBranch, setCurrentBranch] = useState(localApiStateBranch);
@@ -115,9 +116,9 @@ export default function BranchSelector() {
       setCurrentBranch(branch);
       dispatch.uiState.setApiData({ ...apiData, branch });
       dispatch.uiState.setLocalApiState({ ...localApiState, branch });
-      await pullTokens({ context: { ...apiData, branch }, usedTokenSet });
+      await pullTokens({ context: { ...apiData, branch }, usedTokenSet, activeTheme });
     }
-  }, [apiData, localApiState, pullTokens, usedTokenSet, dispatch]);
+  }, [apiData, localApiState, pullTokens, usedTokenSet, activeTheme, dispatch]);
 
   const onBranchSelected = React.useCallback(async (branch: string) => {
     if (hasChanges) {

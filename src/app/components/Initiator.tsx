@@ -143,7 +143,7 @@ export function Initiator() {
             break;
           case MessageFromPluginTypes.API_CREDENTIALS: {
             const {
-              status, credentials, usedTokenSet, shouldPull, featureFlags,
+              status, credentials, usedTokenSet, activeTheme, shouldPull, featureFlags,
             } = pluginMessage;
             if (status === true) {
               const receivedFlags: LDProps['flags'] = featureFlags;
@@ -165,7 +165,9 @@ export function Initiator() {
                   dispatch.uiState.setLocalApiState(credentials);
 
                   if (shouldPull) {
-                    const remoteData = await pullTokens({ context: credentials, featureFlags: receivedFlags, usedTokenSet });
+                    const remoteData = await pullTokens({
+                      context: credentials, featureFlags: receivedFlags, usedTokenSet, activeTheme,
+                    });
                     const existTokens = Object.values(remoteData?.tokens ?? {}).some((value) => value.length > 0);
                     if (existTokens) { dispatch.uiState.setActiveTab(Tabs.TOKENS); } else { dispatch.uiState.setActiveTab(Tabs.START); }
                   } else {

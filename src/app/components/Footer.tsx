@@ -17,6 +17,7 @@ import {
   usedTokenSetSelector,
   themesListSelector,
   projectURLSelector,
+  activeThemeSelector,
 } from '@/selectors';
 import DocsIcon from '@/icons/docs.svg';
 import RefreshIcon from '@/icons/refresh.svg';
@@ -37,6 +38,7 @@ export default function Footer() {
   const editProhibited = useSelector(editProhibitedSelector);
   const localApiState = useSelector(localApiStateSelector);
   const usedTokenSet = useSelector(usedTokenSetSelector);
+  const activeTheme = useSelector(activeThemeSelector);
   const dispatch = useDispatch<Dispatch>();
   const projectURL = useSelector(projectURLSelector);
   const { gitBranchSelector } = useFlags();
@@ -70,8 +72,8 @@ export default function Footer() {
   const onPushButtonClicked = React.useCallback(() => pushTokens(), [pushTokens]);
   const onPullButtonClicked = React.useCallback(() => pullTokens({ usedTokenSet }), [pullTokens, usedTokenSet]);
   const handlePullTokens = useCallback(() => {
-    pullTokens({ usedTokenSet });
-  }, [pullTokens, usedTokenSet]);
+    pullTokens({ usedTokenSet, activeTheme });
+  }, [pullTokens, usedTokenSet, activeTheme]);
 
   return (
     <Box

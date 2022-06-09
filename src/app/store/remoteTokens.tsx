@@ -22,6 +22,7 @@ type PullTokensOptions = {
   context?: StorageTypeCredentials,
   featureFlags?: LDProps['flags'],
   usedTokenSet?: UsedTokenSetsMap | null
+  activeTheme?: string | null
 };
 
 // @TODO typings and hooks
@@ -43,7 +44,9 @@ export default function useRemoteTokens() {
   } = useADO();
   const { pullTokensFromURL } = useURL();
 
-  const pullTokens = useCallback(async ({ context = api, featureFlags, usedTokenSet }: PullTokensOptions) => {
+  const pullTokens = useCallback(async ({
+    context = api, featureFlags, usedTokenSet, activeTheme,
+  }: PullTokensOptions) => {
     track('pullTokens', { provider: context.provider });
     dispatch.uiState.startJob({
       name: BackgroundJobs.UI_PULLTOKENS,
@@ -81,6 +84,7 @@ export default function useRemoteTokens() {
       dispatch.tokenState.setTokenData({
         values: remoteData.tokens,
         themes: remoteData.themes,
+        activeTheme: activeTheme ?? null,
         usedTokenSet: usedTokenSet ?? {},
       });
       track('Launched with token sets', {
