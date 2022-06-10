@@ -45,8 +45,8 @@ export function useGitHub() {
       text: 'Pull from GitHub?',
       description: 'Your repo already contains tokens, do you want to pull these now?',
     });
-    if (confirmResult === false) return false;
-    return confirmResult.result;
+    console.log("confirmrsult", confirmResult)
+    return confirmResult;
   }, [confirm]);
 
   const pushTokensToGitHub = useCallback(async (context: GithubCredentials): Promise<RemoteTokenStorageData<GitStorageMetadata> | null> => {
@@ -109,7 +109,6 @@ export function useGitHub() {
   const checkAndSetAccess = useCallback(async ({ context, owner, repo }: { context: GithubCredentials; owner: string; repo: string }) => {
     const storage = storageClientFactory(context, owner, repo);
     const hasWriteAccess = await storage.canWrite();
-    console.log('hasWrite', hasWriteAccess);
     dispatch.tokenState.setEditProhibited(!hasWriteAccess);
   }, [dispatch, storageClientFactory]);
 
@@ -123,7 +122,6 @@ export function useGitHub() {
 
     try {
       const content = await storage.retrieve();
-      console.log('conte', content);
       if (content) {
         return content;
       }
@@ -138,6 +136,7 @@ export function useGitHub() {
 
   // Function to initially check auth and sync tokens with GitHub
   const syncTokensWithGitHub = useCallback(async (context: GithubCredentials): Promise<RemoteTokenStorageData<GitStorageMetadata> | null> => {
+    console.log("synctokenswithgithub")
     try {
       const storage = storageClientFactory(context);
       const hasBranches = await storage.fetchBranches();
@@ -146,12 +145,15 @@ export function useGitHub() {
         return null;
       }
       const content = await storage.retrieve();
+      console.log("tokens", tokens)
       if (content) {
+        console.log("!isEqual(content.tokens, tokens)", !isEqual(content.tokens, tokens))
         if (
           !isEqual(content.tokens, tokens)
           || !isEqual(content.themes, themes)
         ) {
           const userDecision = await askUserIfPull();
+          console.log("uerDecisiont", userDecision)
           if (userDecision) {
             dispatch.tokenState.setLastSyncedState(JSON.stringify([content.tokens, content.themes], null, 2));
             dispatch.tokenState.setTokenData({
@@ -162,6 +164,7 @@ export function useGitHub() {
             notifyToUI('Pulled tokens from GitHub');
           }
         }
+        console.log("returnconte", content)
         return content;
       }
       return await pushTokensToGitHub(context);
