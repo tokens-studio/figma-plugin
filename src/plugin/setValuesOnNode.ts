@@ -393,7 +393,6 @@ export default async function setValuesOnNode(
           const path = data.border.split('.');
           const pathname = path.slice(ignoreFirstPartForStyles ? 1 : 0, path.length).join('/');
           let matchingStyle = figmaStyleMaps.paintStyles.get(pathname);
-
           if (!matchingStyle) {
             const strokeStyleIdBackupKey = 'strokeStyleId_original';
             let { strokeStyleId } = node;
