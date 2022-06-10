@@ -143,6 +143,10 @@ export function useGitHub() {
       if (!hasBranches || !hasBranches.length) {
         return null;
       }
+
+      const [owner, repo] = context.id.split('/');
+      await checkAndSetAccess({ context, owner, repo });
+
       const content = await storage.retrieve();
       if (content) {
         if (
