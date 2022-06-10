@@ -1,0 +1,30 @@
+import { useState } from 'react';
+import { Meta, Story, ArgsTable, Canvas, Preview } from '@storybook/addon-docs';
+
+import Checkbox from '@/app/components/Checkbox';
+import Heading from '@/app/components/Heading';
+
+<Meta 
+  title='Checkbox' 
+  component={Checkbox} 
+  args={{
+    id: 'SB checkbox',
+    defaultChecked: true,
+    disabled: false,
+  }}
+/>
+
+<ArgsTable of={Checkbox}/>
+
+export const CheckboxDefaultStory = (args) => {
+  const [isChecked, setIsChecked] = useState(false);
+  return (
+    <Checkbox {...args} checked={isChecked} onCheckedChange={() => setIsChecked(!isChecked)}/>
+  )
+}
+
+<Canvas>
+  <Story name='Default'>
+    {CheckboxDefaultStory.bind({})}
+  </Story>
+</Canvas>
