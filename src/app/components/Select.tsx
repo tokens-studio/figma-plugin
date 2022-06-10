@@ -5,7 +5,7 @@ import type { StitchesCSS } from '@/types';
 const StyledSelect = styled('select', {
   all: 'unset',
   borderRadius: '$input',
-  padding: '$4 $3',
+  padding: '$3',
   fontSize: 12,
   lineHeight: 1,
   color: '$text',

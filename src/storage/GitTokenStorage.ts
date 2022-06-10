@@ -63,6 +63,11 @@ export abstract class GitTokenStorage extends RemoteTokenStorage<GitStorageMetad
     return this;
   }
 
+  public disableMultiFile() {
+    this.flags.multiFileEnabled = false;
+    return this;
+  }
+
   public abstract fetchBranches(): Promise<string[]>;
   public abstract createBranch(branch: string, source?: string): Promise<boolean>;
   public abstract canWrite(): Promise<boolean>;
