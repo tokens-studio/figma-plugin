@@ -281,9 +281,9 @@ export default async function setValuesOnNode(
         // if (matchingStyle?.name === 'shadows/default') {
         if (!matchingStyle) {
           const effectStyleIdBackupKey = 'effectStyleId_original';
-          let effectStyleId = tokensSharedDataHandler.get(node, effectStyleIdBackupKey, (val) => (val ? JSON.parse(val) as string : val));
-          if (effectStyleId === '' && typeof node.effectStyleId === 'string') {
-            effectStyleId = node.effectStyleId;
+          let { effectStyleId } = node;
+          if (effectStyleId === '') {
+            effectStyleId = tokensSharedDataHandler.get(node, effectStyleIdBackupKey, (val) => (val ? JSON.parse(val) as string : val));
           }
           matchingStyle = findMatchingNonLocalEffectStyle(effectStyleId, values.boxShadow);
           let effectStyleIdBackup = ''; // Setting to empty string will delete the plugin data key if the style matches or doesn't exist
@@ -334,9 +334,9 @@ export default async function setValuesOnNode(
 
           if (!matchingStyle) {
             const fillStyleIdBackupKey = 'fillStyleId_original';
-            let fillStyleId = tokensSharedDataHandler.get(node, fillStyleIdBackupKey, (val) => (val ? JSON.parse(val) as string : val));
-            if (fillStyleId === '' && typeof node.fillStyleId === 'string') {
-              fillStyleId = node.fillStyleId;
+            let fillStyleId = typeof node.fillStyleId === 'string' ? node.fillStyleId : '';
+            if (fillStyleId === '') {
+              fillStyleId = tokensSharedDataHandler.get(node, fillStyleIdBackupKey, (val) => (val ? JSON.parse(val) as string : val));
             }
             matchingStyle = findMatchingNonLocalPaintStyle(fillStyleId, values.fill);
             let fillStyleIdBackup = ''; // Setting to empty string will delete the plugin data key if the style matches or doesn't exist
@@ -368,9 +368,9 @@ export default async function setValuesOnNode(
           // if (matchingStyle?.name === 'text/min/heading/01') {
           if (!matchingStyle) {
             const textStyleIdBackupKey = 'textStyleId_original';
-            let textStyleId = tokensSharedDataHandler.get(node, textStyleIdBackupKey, (val) => (val ? JSON.parse(val) as string : val));
-            if (textStyleId === '' && typeof node.textStyleId === 'string') {
-              textStyleId = node.textStyleId;
+            let textStyleId = typeof node.textStyleId === 'string' ? node.textStyleId : '';
+            if (textStyleId === '') {
+              textStyleId = tokensSharedDataHandler.get(node, textStyleIdBackupKey, (val) => (val ? JSON.parse(val) as string : val));
             }
             matchingStyle = findMatchingNonLocalTextStyle(textStyleId, values.typography, values.description);
             let textStyleIdBackup = ''; // Setting to empty string will delete the plugin data key if the style matches or doesn't exist
@@ -421,9 +421,9 @@ export default async function setValuesOnNode(
 
           if (!matchingStyle) {
             const strokeStyleIdBackupKey = 'strokeStyleId_original';
-            let strokeStyleId = tokensSharedDataHandler.get(node, strokeStyleIdBackupKey, (val) => (val ? JSON.parse(val) as string : val));
-            if (strokeStyleId === '' && typeof node.strokeStyleId === 'string') {
-              strokeStyleId = node.strokeStyleId;
+            let { strokeStyleId } = node;
+            if (strokeStyleId === '') {
+              strokeStyleId = tokensSharedDataHandler.get(node, strokeStyleIdBackupKey, (val) => (val ? JSON.parse(val) as string : val));
             }
             matchingStyle = findMatchingNonLocalPaintStyle(strokeStyleId, values.border);
             let strokeStyleIdBackup = ''; // Setting to empty string will delete the plugin data key if the style matches or doesn't exist
