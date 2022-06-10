@@ -4,7 +4,6 @@ import { TokensIcon, LinkBreak2Icon } from '@radix-ui/react-icons';
 import { useUIDSeed } from 'react-uid';
 import { checkIfContainsAlias } from '@/utils/alias';
 import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
-import Box from './Box';
 import ResolvedValueBox from './ResolvedValueBox';
 import { findReferences } from '@/utils/findReferences';
 import IconButton from './IconButton';
@@ -13,6 +12,7 @@ import { EditTokenObject } from '@/types/tokens';
 import { TokenTypes } from '@/constants/TokenTypes';
 import SingleTypographyDownShiftInput from './SingleTypographyDownShiftInput';
 import DownshiftInput from './DownshiftInput';
+import Stack from './Stack';
 
 const properties = {
   fontSize: 'fontSizes',
@@ -62,8 +62,8 @@ export default function TypographyInput({
   }, [mode]);
 
   return (
-    <>
-      <Box css={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+    <Stack direction="column" gap={2}>
+      <Stack direction="row" gap={2} justify="between" align="center">
         <Heading>Typography</Heading>
         {
           mode === 'input' ? (
@@ -82,28 +82,28 @@ export default function TypographyInput({
             />
           )
         }
-      </Box>
+      </Stack>
       {(mode === 'input' && internalEditToken.schema.schemas.value.type === 'object') ? (
-        Object.entries(internalEditToken.schema.schemas.value.properties ?? {}).map(([key], keyIndex) => (
-          <SingleTypographyDownShiftInput
-            name={key}
-            key={`typography-input-${seed(keyIndex)}`}
-            value={typeof internalEditToken.value === 'object' ? get(internalEditToken.value, key, '') : ''}
-            type={properties[key as keyof typeof properties]}
-            resolvedTokens={resolvedTokens}
-            handleChange={handleTypographyChange}
-            setInputValue={handleTypographyDownShiftInputChange}
-          />
-        ))
+        <Stack gap={2} direction="column">
+          {Object.entries(internalEditToken.schema.schemas.value.properties ?? {}).map(([key], keyIndex) => (
+            <SingleTypographyDownShiftInput
+              name={key}
+              key={`typography-input-${seed(keyIndex)}`}
+              value={typeof internalEditToken.value === 'object' ? get(internalEditToken.value, key, '') : ''}
+              type={properties[key as keyof typeof properties]}
+              resolvedTokens={resolvedTokens}
+              handleChange={handleTypographyChange}
+              setInputValue={handleTypographyDownShiftInputChange}
+            />
+          ))}
+        </Stack>
       ) : (
-        <Box css={{
-          display: 'flex', flexDirection: 'column', gap: '$2',
-        }}
-        >
+        <Stack direction="column" gap={2}>
           <DownshiftInput
             value={!isAliasMode ? '' : String(internalEditToken.value)}
             type={internalEditToken.type}
             label={internalEditToken.schema.property}
+            inlineLabel
             resolvedTokens={resolvedTokens}
             handleChange={handleTypographyChangeByAlias}
             setInputValue={handleDownShiftInputChange}
@@ -117,8 +117,8 @@ export default function TypographyInput({
             selectedToken={selectedToken}
           />
           )}
-        </Box>
+        </Stack>
       )}
-    </>
+    </Stack>
   );
 }

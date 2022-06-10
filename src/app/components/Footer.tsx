@@ -1,6 +1,8 @@
 import React, { useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { DownloadIcon, UploadIcon } from '@primer/octicons-react';
+import {
+  DownloadIcon, UploadIcon,
+} from '@primer/octicons-react';
 import { Dispatch } from '../store';
 import * as pjs from '../../../package.json';
 import Box from './Box';

@@ -80,15 +80,19 @@ export class GithubTokenStorage extends GitTokenStorage {
     }
   }
 
-  public async canWrite() {
+  public async canWrite(): Promise<boolean> {
     const currentUser = await this.octokitClient.rest.users.getAuthenticated();
     if (!currentUser.data.login) return false;
-
-    return !!this.octokitClient.rest.repos.getCollaboratorPermissionLevel({
-      owner: this.owner,
-      repo: this.repository,
-      username: currentUser.data.login,
-    });
+    try {
+      const canWrite = await this.octokitClient.rest.repos.getCollaboratorPermissionLevel({
+        owner: this.owner,
+        repo: this.repository,
+        username: currentUser.data.login,
+      });
+      return !!canWrite;
+    } catch (e) {
+      return false;
+    }
   }
 
   public async read(): Promise<RemoteTokenStorageFile<GitStorageMetadata>[]> {
@@ -99,6 +103,7 @@ export class GithubTokenStorage extends GitTokenStorage {
         path: this.path,
         ref: this.branch,
       });
+
       // read entire directory
       if (Array.isArray(response.data) && this.flags.multiFileEnabled) {
         const directoryTreeResponse = await this.octokitClient.rest.git.createTree({
@@ -110,6 +115,7 @@ export class GithubTokenStorage extends GitTokenStorage {
             mode: getTreeMode(item.type),
           })),
         });
+
         if (directoryTreeResponse.data.tree[0].sha) {
           const treeResponse = await this.octokitClient.rest.git.getTree({
             owner: this.owner,
@@ -117,6 +123,7 @@ export class GithubTokenStorage extends GitTokenStorage {
             tree_sha: directoryTreeResponse.data.tree[0].sha,
             recursive: 'true',
           });
+
           if (treeResponse.data.tree.length > 0) {
             const jsonFiles = treeResponse.data.tree.filter((file) => (
               file.path?.endsWith('.json')
@@ -131,6 +138,7 @@ export class GithubTokenStorage extends GitTokenStorage {
             } else {
               subDirectoryName = '';
             }
+
             const jsonFileContents = await Promise.all(jsonFiles.map((treeItem) => (
               treeItem.path ? this.octokitClient.rest.repos.getContent({
                 owner: this.owner,

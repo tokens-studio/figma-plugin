@@ -1,0 +1,64 @@
+import { useCallback } from 'react';
+import { Provider, useDispatch } from 'react-redux';
+import { Meta, Story, ArgsTable, Canvas, Preview } from '@storybook/addon-docs';
+
+import { store } from '@/app/store';
+import StorageItem from '@/app/components/StorageItem';
+
+<Meta 
+  title='StorageItem' 
+  component={StorageItem} 
+/>
+
+<ArgsTable of={StorageItem}/>
+
+export const StorageItemDefaultStory = (args) => {
+  return (
+    <Provider store={store}>
+      <StorageItem {...args}/>
+    </Provider>
+  )
+}
+
+<Canvas>
+  <Story name='GitHub and GitLab' args={{
+    item:{
+      provider: 'github',
+      name: 'GitHub&GitLab',
+      id: 'six7/tokens',
+      branch: 'main',
+      filePath: 'data/write5.json',
+      secret: 'xxx',
+      internalId: 'GWkxszSgmSNvzEaNAVI1kAIG'
+    }
+  }}>
+    {StorageItemDefaultStory.bind({})}
+  </Story>
+  <Story name='JSONbin' args={{
+    item:{
+      provider: 'JSONbin',
+      name: 'json',
+      id: 'six7/tokens',
+      branch: 'main',
+      filePath: 'data/write5.json',
+      secret: 'xxx',
+      internalId: 'GWkxszSgmSNvzEaNAVI1kAIG'
+    }
+  }}>
+    {StorageItemDefaultStory.bind({})}
+  </Story>
+  <Story name='ADO' args={{
+    item:{
+      provider: 'JSONbin',
+      name: 'ADO',
+      id: 'six7/tokens',
+      branch: 'main',
+      filePath: 'data/write5.json',
+      secret: 'xxx',
+      internalId: 'GWkxszSgmSNvzEaNAVI1kAIG',
+      projectName: 'figmaToken',
+    }
+  }}>
+    {StorageItemDefaultStory.bind({})}
+  </Story>
+</Canvas>
