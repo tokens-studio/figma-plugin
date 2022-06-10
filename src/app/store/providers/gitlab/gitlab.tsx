@@ -193,6 +193,7 @@ export function useGitLab() {
     askUserIfPull,
     usedTokenSet,
     activeTheme,
+    checkAndSetAccess,
   ]);
 
   const addNewGitLabCredentials = useCallback(async (context: GitlabFormValues): Promise<RemoteTokenStorageData<GitStorageMetadata> | null> => {
