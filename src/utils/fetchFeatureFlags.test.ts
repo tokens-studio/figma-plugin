@@ -57,14 +57,12 @@ describe('fetchFeatureFlags', (() => {
   }));
 
   it('should return null when a user has no licenseKey or userId', (async () => {
-    const launchDarklyFlags = process.env.LAUNCHDARKLY_FLAGS;
-    process.env.LAUNCHDARKLY_FLAGS = '';
-
     const userData = {
       userId: 'six7',
     };
     const flags = await fetchFeatureFlags(userData);
     expect(flags).toEqual(null);
+  }));
 
   it('should return mock flags when provided', async () => {
     process.env.LAUNCHDARKLY_FLAGS = 'multiFileSync';
