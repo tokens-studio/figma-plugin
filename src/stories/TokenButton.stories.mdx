@@ -12,7 +12,6 @@ import TokenTree from '@/app/components/TokenTree';
 	title='TokenButton'
 	component={TokenButton}
 	args={{
-		type: TokenTypes.SIZING,
 		displayType:'GRID',
 		draggedToken: SingleToken | null,
   	dragOverToken: SingleToken | null,
@@ -30,7 +29,12 @@ export const TokenButtonDefaultStory = (args) => {
 }
 
 <Canvas>
-	<Story name='TokenButton' args={{
+	<Story name='Color-swatch' args={{
+		token:{
+      name: 'colors.foo',
+      value: 'red',
+		},
+		type: TokenTypes.COLOR,
 	}}>
 		{TokenButtonDefaultStory.bind({})}
 	</Story>
