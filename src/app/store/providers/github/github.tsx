@@ -196,6 +196,7 @@ export function useGitHub() {
     activeTheme,
     themes,
     tokens,
+    checkAndSetAccess,
   ]);
 
   const addNewGitHubCredentials = useCallback(async (context: GithubFormValues): Promise<RemoteTokenStorageData<GitStorageMetadata> | null> => {
