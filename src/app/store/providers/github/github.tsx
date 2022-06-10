@@ -1,6 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { useCallback, useMemo } from 'react';
-import { useFlags } from 'launchdarkly-react-client-sdk';
 import { LDProps } from 'launchdarkly-react-client-sdk/lib/withLDConsumer';
 import { Dispatch } from '@/app/store';
 import useConfirm from '@/app/hooks/useConfirm';
@@ -18,6 +17,7 @@ import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { StorageTypeCredentials, StorageTypeFormValues } from '@/types/StorageType';
 import { StorageProviderType } from '@/constants/StorageProviderType';
+import { useFlags } from '@/app/components/LaunchDarkly';
 
 type GithubCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.GITHUB | StorageProviderType.GITLAB; }>;
 type GithubFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.GITHUB | StorageProviderType.GITLAB }>;
@@ -36,6 +36,7 @@ export function useGitHub() {
   const storageClientFactory = useCallback((context: GithubCredentials, owner?: string, repo?: string) => {
     const splitContextId = context.id.split('/');
     const storageClient = new GithubTokenStorage(context.secret, owner ?? splitContextId[0], repo ?? splitContextId[1], context.baseUrl ?? '');
+
     if (context.filePath) storageClient.changePath(context.filePath);
     if (context.branch) storageClient.selectBranch(context.branch);
     if (multiFileSync) storageClient.enableMultiFile();
