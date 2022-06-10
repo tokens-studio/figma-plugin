@@ -146,6 +146,8 @@ export const useADO = () => {
         return null;
       }
 
+      await checkAndSetAccess(context);
+
       const content = await storage.retrieve();
 
       if (content) {
