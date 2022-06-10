@@ -4,6 +4,7 @@ import { Provider } from 'react-redux';
 import { store } from '@/app/store';
 import { SingleToken } from '@/types/tokens';
 import { TokenTypes } from '@/constants/TokenTypes';
+import { BoxShadowTypes } from '@/constants/BoxShadowTypes';
 
 import { TokenButton } from '@/app/components/TokenButton';
 import TokenTree from '@/app/components/TokenTree';
@@ -35,6 +36,119 @@ export const TokenButtonDefaultStory = (args) => {
       value: 'red',
 		},
 		type: TokenTypes.COLOR,
+	}}>
+		{TokenButtonDefaultStory.bind({})}
+	</Story>
+	<Story name='Border-radius' args={{
+		token:{
+      name: 'border-radius.0',
+    	type: TokenTypes.BORDER_RADIUS,
+			value: '64px',
+		},
+		type: TokenTypes.OTHEERS,
+	}}>
+		{TokenButtonDefaultStory.bind({})}
+	</Story>
+	<Story name='Opacity' args={{
+		token:{
+      name: 'opacity.10',
+    	type: TokenTypes.OPACITY,
+			value: '10%',
+			rawValue: '10%',
+		},
+		type: TokenTypes.OTHEERS,
+	}}>
+		{TokenButtonDefaultStory.bind({})}
+	</Story>
+	<Story name='Typography' args={{
+		token:{
+      name: 'typography.headlines.small',
+			type: TokenTypes.TYPOGRAPHY,
+			value: {
+				fontFamily: 'Inter',
+				fontWeight: 'Regular',
+				lineHeight: 'AUTO',
+				fontSize: '14',
+				letterSpacing: '0%',
+				paragraphSpacing: '0',
+				textDecoration: 'none',
+				textCase: 'none',
+			},
+		},
+		type: TokenTypes.TYPOGRAPHY,
+	}}>
+		{TokenButtonDefaultStory.bind({})}
+	</Story>
+	<Story name='Font-family' args={{
+		token:{
+      name: 'font-family.serif',
+    	type: TokenTypes.FONT_FAMILIES,
+    	value: 'IBM Plex Serif',
+    	rawValue: 'IBM Plex Serif',
+		},		
+		type: TokenTypes.FONT_FAMILIES,
+	}}>
+		{TokenButtonDefaultStory.bind({})}
+	</Story>
+	<Story name='Line-height' args={{
+		token:{
+      name: 'line-height.1',
+			type: TokenTypes.LINE_HEIGHTS,
+			value: '130%',
+			rawValue: '130%',
+		},		
+		type: TokenTypes.LINE_HEIGHTS,
+	}}>
+		{TokenButtonDefaultStory.bind({})}
+	</Story>
+	<Story name='Box-Shadow' args={{
+		token:{
+      name: 'typography.headlines.boxshadow',
+			type: TokenTypes.BOX_SHADOW,
+			value: {
+				x: '2',
+				y: '2',
+				blur: '2',
+				spread: '2',
+				color: '#000000',
+				type: BoxShadowTypes.DROP_SHADOW,
+			},
+		},
+		type: TokenTypes.BOX_SHADOW,
+	}}>
+		{TokenButtonDefaultStory.bind({})}
+	</Story>
+	<Story name='Font-Weight' args={{
+		token:{
+      name: 'font-weight.regular',
+			type: TokenTypes.FONT_WEIGHTS,
+			value: 'Regular',
+			default: '400',
+			rawValue: 'Regular',
+		},
+		type: TokenTypes.FONT_WEIGHTS,
+	}}>
+		{TokenButtonDefaultStory.bind({})}
+	</Story>
+	<Story name='Font-Style' args={{
+		token:{
+      name: 'font-style.normal',
+			type: TokenTypes.OTHER,
+			value: 'normal',
+			rawValue: 'normal',
+		},
+		type: TokenTypes.OTHER,
+	}}>
+		{TokenButtonDefaultStory.bind({})}
+	</Story>
+	<Story name='Sizing' args={{
+		token:{
+      name: 'size.6',
+			type: TokenTypes.SIZING,
+			value: '2',
+			rawValue: '2',
+		},
+		type: TokenTypes.SIZE,
 	}}>
 		{TokenButtonDefaultStory.bind({})}
 	</Story>
