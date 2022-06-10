@@ -261,8 +261,6 @@ export default async function setValuesOnNode(
         const path = data.boxShadow.split('.');
         const pathname = path.slice(ignoreFirstPartForStyles ? 1 : 0, path.length).join('/');
         let matchingStyle = figmaStyleMaps.effectStyles.get(pathname);
-        // Pretend we didn't find the style...
-        // if (matchingStyle?.name === 'shadows/default') {
         if (!matchingStyle) {
           const effectStyleIdBackupKey = 'effectStyleId_original';
           let { effectStyleId } = node;
@@ -345,8 +343,6 @@ export default async function setValuesOnNode(
           const path = data.typography.split('.'); // extract to helper fn
           const pathname = path.slice(ignoreFirstPartForStyles ? 1 : 0, path.length).join('/');
           let matchingStyle = figmaStyleMaps.textStyles.get(pathname);
-          // Pretend we didn't find the style...
-          // if (matchingStyle?.name === 'text/min/heading/01') {
           if (!matchingStyle) {
             const textStyleIdBackupKey = 'textStyleId_original';
             let textStyleId = typeof node.textStyleId === 'string' ? node.textStyleId : '';
