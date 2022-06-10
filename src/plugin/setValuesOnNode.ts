@@ -79,7 +79,7 @@ function isEffectEqual(effect1?: Effect, effect2?: Effect) {
           && effect1.radius === effect2.radius
           && effect1.spread === effect2.spread
           && effect1.blendMode === effect2.blendMode
-          // Token doesn't store this effect subvalue (yet) so omit from comparison:
+          // Figma Tokens doesn't store this effect subvalue (yet?) so omit from comparison:
           // && paint1.showShadowBehindNode === paint2.showShadowBehindNode
         );
       }
