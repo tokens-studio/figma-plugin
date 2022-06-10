@@ -1,0 +1,26 @@
+import { Provider } from 'react-redux';
+import { Meta, Story, ArgsTable, Canvas, Preview } from '@storybook/addon-docs';
+
+import { store } from '@/app/store';
+import ProBadge from '@/app/components/ProBadge';
+
+<Meta 
+  title='ProBadge' 
+  component={ProBadge}
+/>
+
+<ArgsTable of={ProBadge} />
+
+export const ProBadgeDefaultStory = (args) => {
+  return (
+    <Provider store={store}>
+      <ProBadge/>
+    </Provider>
+  )
+}
+
+<Canvas>
+  <Story name='Default'>
+    {ProBadgeDefaultStory.bind({})}
+  </Story>
+</Canvas>
