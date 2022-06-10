@@ -244,4 +244,36 @@ describe('editToken', () => {
     const { editProhibited } = store.getState().tokenState;
     expect(editProhibited).toBe(true);
   });
+
+  it('can set token data', () => {
+    store.dispatch.tokenState.setTokenData({
+      values: {},
+      activeTheme: 'base',
+      usedTokenSet: {
+        global: TokenSetStatus.ENABLED,
+      },
+      themes: [
+        {
+          id: 'base',
+          name: 'Base',
+          selectedTokenSets: {
+            global: TokenSetStatus.ENABLED,
+          },
+        },
+      ],
+    });
+    const {
+      tokens, themes, usedTokenSet,
+    } = store.getState().tokenState;
+    expect(tokens).toEqual({});
+    expect(themes).toEqual([
+      {
+        id: 'base',
+        name: 'Base',
+        selectedTokenSets: {
+        },
+      },
+    ]);
+    expect(usedTokenSet).toEqual({});
+  });
 });
