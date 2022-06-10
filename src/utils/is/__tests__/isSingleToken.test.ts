@@ -11,9 +11,9 @@ describe('isSingleTokenValueObject', () => {
     objectZero: {
       value: 0,
     },
-    objectNull: {
-      value: null,
-    },
+    // objectNull: {
+    //   value: null,
+    // },
   };
   const incorrectToken = {
     string: 'foo',

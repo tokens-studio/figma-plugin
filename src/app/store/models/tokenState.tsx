@@ -509,7 +509,7 @@ export const tokenState = createModel<RootModel>()({
       }
     },
     updateCheckForChanges(checkForChanges: boolean) {
-      dispatch.tokenState.updateDocument({ checkForChanges });
+      dispatch.tokenState.updateDocument({ checkForChanges, shouldUpdateNodes: false });
     },
     updateDocument(options?: UpdateDocumentPayload, rootState?) {
       const defaults = { shouldUpdateNodes: true, updateRemote: true };

@@ -33,7 +33,7 @@ export default function TokenSetTree({
     const itemPaths = items.filter((i) => i.path.startsWith(item.path) && i.path !== item.path).map((i) => i.path);
     const childTokenSetStatuses = Object.entries(usedTokenSet)
       .filter(([tokenSet]) => itemPaths.includes(tokenSet))
-      .map(([,tokenSetStatus]) => tokenSetStatus);
+      .map(([, tokenSetStatus]) => tokenSetStatus);
 
     if (childTokenSetStatuses.every((status) => (
       status === TokenSetStatus.ENABLED
