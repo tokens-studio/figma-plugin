@@ -312,7 +312,6 @@ export default async function setValuesOnNode(
           const path = data.fill.split('.');
           const pathname = path.slice(ignoreFirstPartForStyles ? 1 : 0, path.length).join('/');
           let matchingStyle = figmaStyleMaps.paintStyles.get(pathname);
-
           if (!matchingStyle) {
             const fillStyleIdBackupKey = 'fillStyleId_original';
             let fillStyleId = typeof node.fillStyleId === 'string' ? node.fillStyleId : '';
