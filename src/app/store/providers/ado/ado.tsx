@@ -185,6 +185,7 @@ export const useADO = () => {
     tokens,
     activeTheme,
     usedTokenSets,
+    checkAndSetAccess,
   ]);
 
   const addNewADOCredentials = React.useCallback(
