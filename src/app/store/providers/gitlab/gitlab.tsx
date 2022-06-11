@@ -1,12 +1,12 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { useCallback, useMemo } from 'react';
-import { useFlags } from 'launchdarkly-react-client-sdk';
 import { LDProps } from 'launchdarkly-react-client-sdk/lib/withLDConsumer';
 import { Dispatch } from '@/app/store';
 import useConfirm from '@/app/hooks/useConfirm';
 import usePushDialog from '@/app/hooks/usePushDialog';
 import { notifyToUI } from '@/plugin/notifiers';
 import {
+  activeThemeSelector,
   localApiStateSelector, themesListSelector, tokensSelector, usedTokenSetSelector,
 } from '@/selectors';
 import { GitlabTokenStorage } from '@/storage/GitlabTokenStorage';
@@ -17,6 +17,7 @@ import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { StorageTypeCredentials, StorageTypeFormValues } from '@/types/StorageType';
 import { StorageProviderType } from '@/constants/StorageProviderType';
+import { useFlags } from '@/app/components/LaunchDarkly';
 
 type GitlabCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.GITHUB | StorageProviderType.GITLAB; }>;
 type GitlabFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.GITHUB | StorageProviderType.GITLAB }>;
@@ -26,6 +27,7 @@ export function useGitLab() {
   const themes = useSelector(themesListSelector);
   const localApiState = useSelector(localApiStateSelector);
   const usedTokenSet = useSelector(usedTokenSetSelector);
+  const activeTheme = useSelector(activeThemeSelector);
   const { multiFileSync } = useFlags();
   const dispatch = useDispatch<Dispatch>();
 
@@ -86,6 +88,7 @@ export function useGitLab() {
           values: tokens,
           themes,
           usedTokenSet,
+          activeTheme,
         });
 
         pushDialog('success');
@@ -103,7 +106,17 @@ export function useGitLab() {
       themes,
       metadata: {},
     };
-  }, [storageClientFactory, dispatch.uiState, dispatch.tokenState, pushDialog, tokens, themes, localApiState, usedTokenSet]);
+  }, [
+    storageClientFactory,
+    dispatch.uiState,
+    dispatch.tokenState,
+    pushDialog,
+    tokens,
+    themes,
+    localApiState,
+    usedTokenSet,
+    activeTheme,
+  ]);
 
   const checkAndSetAccess = useCallback(async ({ context, owner, repo }: { context: GitlabCredentials; owner: string; repo: string }) => {
     const storage = await storageClientFactory(context, owner, repo);
@@ -157,6 +170,7 @@ export function useGitLab() {
               values: content.tokens,
               themes: content.themes,
               usedTokenSet,
+              activeTheme,
             });
             notifyToUI('Pulled tokens from GitLab');
           }
@@ -169,7 +183,18 @@ export function useGitLab() {
       console.log('Error', err);
       return null;
     }
-  }, [storageClientFactory, dispatch.branchState, dispatch.tokenState, pushTokensToGitLab, tokens, themes, askUserIfPull, usedTokenSet]);
+  }, [
+    storageClientFactory,
+    dispatch.branchState,
+    dispatch.tokenState,
+    pushTokensToGitLab,
+    tokens,
+    themes,
+    askUserIfPull,
+    usedTokenSet,
+    activeTheme,
+    checkAndSetAccess,
+  ]);
 
   const addNewGitLabCredentials = useCallback(async (context: GitlabFormValues): Promise<RemoteTokenStorageData<GitStorageMetadata> | null> => {
     const data = await syncTokensWithGitLab(context);
@@ -184,6 +209,7 @@ export function useGitLab() {
           values: data.tokens,
           themes: data.themes,
           usedTokenSet,
+          activeTheme,
         });
       } else {
         notifyToUI('No tokens stored on remote');
@@ -197,7 +223,14 @@ export function useGitLab() {
       themes: data.themes ?? themes,
       metadata: {},
     };
-  }, [syncTokensWithGitLab, tokens, themes, dispatch.tokenState, usedTokenSet]);
+  }, [
+    syncTokensWithGitLab,
+    tokens,
+    themes,
+    dispatch.tokenState,
+    usedTokenSet,
+    activeTheme,
+  ]);
 
   const fetchGitLabBranches = useCallback(async (context: GitlabCredentials) => {
     const storage = await storageClientFactory(context);

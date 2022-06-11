@@ -1,4 +1,4 @@
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useCallback, useMemo } from 'react';
 import { Dispatch } from '@/app/store';
 import { notifyToUI } from '../../../plugin/notifiers';
@@ -7,11 +7,14 @@ import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StorageTypeCredentials } from '@/types/StorageType';
+import { activeThemeSelector, usedTokenSetSelector } from '@/selectors';
 
 type UrlCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.URL; }>;
 
 export default function useURL() {
   const dispatch = useDispatch<Dispatch>();
+  const activeTheme = useSelector(activeThemeSelector);
+  const usedTokenSets = useSelector(usedTokenSetSelector);
 
   const storageClientFactory = useCallback((context: UrlCredentials) => (
     new UrlTokenStorage(context.id, context.secret)
@@ -46,6 +49,8 @@ export default function useURL() {
           dispatch.tokenState.setTokenData({
             values: content.tokens,
             themes: content.themes,
+            usedTokenSet: usedTokenSets,
+            activeTheme,
           });
           dispatch.tokenState.setEditProhibited(true);
           return content;
@@ -61,6 +66,8 @@ export default function useURL() {
   }, [
     dispatch,
     storageClientFactory,
+    usedTokenSets,
+    activeTheme,
   ]);
 
   return useMemo(() => ({

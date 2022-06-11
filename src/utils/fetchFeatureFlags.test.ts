@@ -11,6 +11,17 @@ jest.mock('launchdarkly-js-client-sdk', () => ({
 }));
 
 describe('fetchFeatureFlags', (() => {
+  let envFlags: string | undefined = '';
+
+  beforeAll(() => {
+    envFlags = process.env.LAUNCHDARKLY_FLAGS;
+    process.env.LAUNCHDARKLY_FLAGS = '';
+  });
+
+  afterAll(() => {
+    process.env.LAUNCHDARKLY_FLAGS = envFlags;
+  });
+
   it('return flags when a user has a licenseKey', (async () => {
     const userData = {
       userId: 'six7',
@@ -53,4 +64,11 @@ describe('fetchFeatureFlags', (() => {
     expect(flags).toEqual(null);
   }));
 
+  it('should return mock flags when provided', async () => {
+    process.env.LAUNCHDARKLY_FLAGS = 'multiFileSync';
+    const flags = await fetchFeatureFlags({});
+    expect(flags).toEqual({
+      multiFileSync: true,
+    });
+  });
 }));

@@ -5,6 +5,12 @@ import validateLicense from '@/utils/validateLicense';
 import { UserData } from '@/types/userData';
 
 export default async function fetchFeatureFlags(userData: UserData) {
+  if (process.env.LAUNCHDARKLY_FLAGS) {
+    return Object.fromEntries(process.env.LAUNCHDARKLY_FLAGS!.split(',').map((flag) => (
+      [flag, true]
+    )));
+  }
+
   if (userData.licenseKey && userData.userId) {
     const {
       plan, email: clientEmail, entitlements,
