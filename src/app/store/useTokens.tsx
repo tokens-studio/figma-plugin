@@ -46,7 +46,7 @@ export default function useTokens() {
   const settings = useSelector(settingsStateSelector, isEqual);
   const { confirm } = useConfirm<ConfirmResult>();
   const store = useStore<RootState>();
-
+  console.log('store', store);
   // Gets value of token
   const getTokenValue = useCallback((name: string, resolved: AnyTokenList) => (
     resolved.find((t) => t.name === name)
