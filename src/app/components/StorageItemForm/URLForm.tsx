@@ -26,7 +26,7 @@ export default function URLForm({
       provider: zod.string(),
       name: zod.string().optional(),
       id: zod.string(),
-      secret: zod.string(),
+      secret: zod.string().optional(),
       internalId: zod.string().optional(),
     });
     const validationResult = zodSchema.safeParse(values);
@@ -44,7 +44,7 @@ export default function URLForm({
     <form onSubmit={handleSubmit}>
       <Stack direction="column" gap={4}>
         <Input full label="Name" value={values.name} onChange={onChange} type="text" name="name" required />
-        <Input full label="Headers" value={values.secret} onChange={onChange} type="text" name="secret" />
+        <Input full label="Headers (optional)" value={values.secret} onChange={onChange} type="text" name="secret" />
         <Input full label="URL" value={values.id} onChange={onChange} type="text" name="id" required />
         <Stack direction="row" gap={4}>
           <Button variant="secondary" size="large" onClick={onCancel}>
