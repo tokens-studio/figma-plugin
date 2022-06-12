@@ -80,15 +80,19 @@ export class GithubTokenStorage extends GitTokenStorage {
     }
   }
 
-  public async canWrite() {
+  public async canWrite(): Promise<boolean> {
     const currentUser = await this.octokitClient.rest.users.getAuthenticated();
     if (!currentUser.data.login) return false;
-
-    return !!(await this.octokitClient.rest.repos.getCollaboratorPermissionLevel({
-      owner: this.owner,
-      repo: this.repository,
-      username: currentUser.data.login,
-    })).data;
+    try {
+      const canWrite = await this.octokitClient.rest.repos.getCollaboratorPermissionLevel({
+        owner: this.owner,
+        repo: this.repository,
+        username: currentUser.data.login,
+      });
+      return !!canWrite;
+    } catch (e) {
+      return false;
+    }
   }
 
   public async read(): Promise<RemoteTokenStorageFile<GitStorageMetadata>[]> {
@@ -217,6 +221,6 @@ export class GithubTokenStorage extends GitTokenStorage {
         },
       ],
     });
-    return !!response.data.content;
+    return !!response;
   }
 }

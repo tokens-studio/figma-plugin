@@ -25,6 +25,10 @@ module.exports = {
         'style-loader',
         'css-loader',
       ],
+    }, {
+      type: 'javascript/auto',
+      test: /\.mjs$/,
+      include: /node_modules/,
     });
 
     config.module.rules = config.module.rules.filter((r) => {

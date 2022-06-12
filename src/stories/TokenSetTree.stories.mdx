@@ -1,0 +1,56 @@
+import { useState } from 'react';
+import { Meta, Story, ArgsTable, Canvas, Preview } from '@storybook/addon-docs';
+import { Provider } from 'react-redux';
+
+import { store } from '@/app/store';
+import TokenSetTree from '@/app/components/TokenSetTree';
+
+<Meta 
+  title='TokenSetTree' 
+  component={TokenSetTree}
+  args={{
+    tokenSets: [
+      'core/base',
+      'core/font',
+      'core/color',
+      'semantic/font',
+      'button/primary',
+      'icon-button',
+      'link',
+      'text-field',
+      'radio/button',
+      'checkbox',
+      'switch',
+      'field-label',
+      'help-text/assist',
+      'heading/content',
+      'heading/header',
+      'heading/footer',
+      'body',
+      'detail',
+      'code',
+      'avatar/small',
+      'avatar/medium',
+      'tag',
+      'alert-banner',
+      'divider',
+      'menu-item'
+    ]
+  }}
+/>
+
+<ArgsTable of={TokenSetTree}/>
+
+export const TokenSetTreeDefaultStory = (args) => {
+  return (
+    <Provider store={store}>
+      <TokenSetTree {...args} />
+    </Provider>
+  )
+}
+
+<Canvas>
+  <Story name='Default'>
+    {TokenSetTreeDefaultStory.bind({})}
+  </Story>
+</Canvas>

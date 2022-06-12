@@ -219,36 +219,63 @@ describe('editToken', () => {
     ]);
   });
 
-  it('should reset imported tokens', async () => {
-    store.dispatch.tokenState.setTokensFromStyles({
-      colors: [
+  it('can toggle many token sets (disabled)', () => {
+    store.dispatch.tokenState.toggleManyTokenSets({
+      sets: ['global'],
+      shouldCheck: false,
+    });
+    const { usedTokenSet } = store.getState().tokenState;
+    expect(usedTokenSet).toEqual({
+      global: TokenSetStatus.DISABLED,
+    });
+  });
+
+  it('can toggle many token sets (enabled)', () => {
+    store.dispatch.tokenState.toggleManyTokenSets({
+      sets: ['global'],
+      shouldCheck: true,
+    });
+    const { usedTokenSet } = store.getState().tokenState;
+    expect(usedTokenSet).toEqual({
+      global: TokenSetStatus.ENABLED,
+    });
+  });
+
+  it('can toggle editProhibited', () => {
+    store.dispatch.tokenState.setEditProhibited(true);
+    const { editProhibited } = store.getState().tokenState;
+    expect(editProhibited).toBe(true);
+  });
+
+  it('can set token data', () => {
+    store.dispatch.tokenState.setTokenData({
+      values: {},
+      activeTheme: 'base',
+      usedTokenSet: {
+        global: TokenSetStatus.ENABLED,
+      },
+      themes: [
         {
-          type: TokenTypes.COLOR,
-          name: 'primary',
-          value: '2',
+          id: 'base',
+          name: 'Base',
+          selectedTokenSets: {
+            global: TokenSetStatus.ENABLED,
+          },
         },
       ],
     });
-    store.dispatch.tokenState.resetImportedTokens();
-    const { importedTokens } = store.getState().tokenState;
-    expect(importedTokens).toEqual({
-      newTokens: [],
-      updatedTokens: [],
-    });
-  });
-
-  it('should set editProhibited', () => {
-    store.dispatch.tokenState.setEditProhibited(true);
-    expect(store.getState().tokenState.editProhibited).toBe(true);
-
-    store.dispatch.tokenState.setEditProhibited(false);
-    expect(store.getState().tokenState.editProhibited).toBe(false);
-  });
-
-  it('should duplicate a token set', () => {
-    store.dispatch.tokenState.duplicateTokenSet('global');
-    const { tokenState } = store.getState();
-    expect(tokenState.usedTokenSet.global_Copy).toEqual(TokenSetStatus.DISABLED);
-    expect(tokenState.tokens).toHaveProperty('global_Copy');
+    const {
+      tokens, themes, usedTokenSet,
+    } = store.getState().tokenState;
+    expect(tokens).toEqual({});
+    expect(themes).toEqual([
+      {
+        id: 'base',
+        name: 'Base',
+        selectedTokenSets: {
+        },
+      },
+    ]);
+    expect(usedTokenSet).toEqual({});
   });
 });

@@ -27,6 +27,7 @@ export default function SingleBoxShadowDownShiftInput({
       value={value}
       type={type}
       label={name}
+      inlineLabel
       resolvedTokens={resolvedTokens}
       handleChange={onChange}
       setInputValue={handleBoxshadowDownShiftInputChange}

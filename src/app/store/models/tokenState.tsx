@@ -1,6 +1,5 @@
 /* eslint-disable import/prefer-default-export */
 import { createModel } from '@rematch/core';
-import omit from 'just-omit';
 import * as tokenStateReducers from './reducers/tokenState';
 import * as tokenStateEffects from './effects/tokenState';
 
@@ -28,6 +27,7 @@ import { ThemeObjectsList, UsedTokenSetsMap } from '@/types';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { isEqual } from '@/utils/isEqual';
 import { StorageProviderType } from '@/constants/StorageProviderType';
+import { updateTokenSetsInState } from '@/utils/tokenset/updateTokenSetsInState';
 
 export interface TokenState {
   tokens: Record<string, AnyTokenList>;
@@ -86,17 +86,8 @@ export const tokenState = createModel<RootModel>()({
         notifyToUI('Token set already exists', { error: true });
         return state;
       }
-      return {
-        ...state,
-        usedTokenSet: {
-          ...state.usedTokenSet,
-          [name]: TokenSetStatus.DISABLED, // @README see comment (1)
-        },
-        tokens: {
-          ...state.tokens,
-          [name]: [],
-        },
-      };
+
+      return updateTokenSetsInState(state, null, [name]);
     },
     duplicateTokenSet: (state, name: string): TokenState => {
       if (!(name in state.tokens)) {
@@ -105,30 +96,14 @@ export const tokenState = createModel<RootModel>()({
       }
 
       const newName = `${name}_Copy`;
-      return {
-        ...state,
-        usedTokenSet: {
-          ...state.usedTokenSet,
-          [newName]: TokenSetStatus.DISABLED, // @README see comment (1)
-        },
-        tokens: {
-          ...state.tokens,
-          [newName]: [...state.tokens[name]],
-        },
-      };
+      return updateTokenSetsInState(state, null, [newName]);
     },
-    deleteTokenSet: (state, name: string) => {
-      const oldTokens = { ...state.tokens };
-      delete oldTokens[name];
-      return {
-        ...state,
-        tokens: oldTokens,
-        activeTokenSet: state.activeTokenSet === name
-          ? Object.keys(state.tokens)[0]
-          : state.activeTokenSet,
-        usedTokenSet: omit({ ...state.usedTokenSet }, name),
-      };
-    },
+    deleteTokenSet: (state, name: string) => updateTokenSetsInState(
+      state,
+      (setName, tokenSet) => (
+        setName === name ? null : [setName, tokenSet]
+      ),
+    ),
     setLastSyncedState: (state, data: string) => ({
       ...state,
       lastSyncedState: data,
@@ -457,7 +432,7 @@ export const tokenState = createModel<RootModel>()({
       }
     },
     updateCheckForChanges(checkForChanges: boolean) {
-      dispatch.tokenState.updateDocument({ checkForChanges });
+      dispatch.tokenState.updateDocument({ checkForChanges, shouldUpdateNodes: false });
     },
     updateDocument(options?: UpdateDocumentPayload, rootState?) {
       const defaults = { shouldUpdateNodes: true, updateRemote: true };
