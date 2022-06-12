@@ -25,7 +25,6 @@ import DocsIcon from '@/icons/docs.svg';
 import RefreshIcon from '@/icons/refresh.svg';
 import FeedbackIcon from '@/icons/feedback.svg';
 import IconButton from './IconButton';
-import { useFlags } from './LaunchDarkly';
 import Tooltip from './Tooltip';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { isGitProvider } from '@/utils/is';
@@ -43,7 +42,6 @@ export default function Footer() {
   const activeTheme = useSelector(activeThemeSelector);
   const dispatch = useDispatch<Dispatch>();
   const projectURL = useSelector(projectURLSelector);
-  const { gitBranchSelector } = useFlags();
   const { pullTokens, pushTokens } = useRemoteTokens();
 
   const checkForChanges = React.useCallback(() => {
@@ -90,7 +88,7 @@ export default function Footer() {
       <Stack direction="row">
         {isGitProvider(localApiState) && localApiState.branch && (
           <>
-            {gitBranchSelector && <BranchSelector />}
+            <BranchSelector />
             <IconButton icon={<DownloadIcon />} onClick={onPullButtonClicked} tooltipSide="top" tooltip={`Pull from ${transformProviderName(storageType.provider)}`} />
             <IconButton badge={hasChanges} icon={<UploadIcon />} onClick={onPushButtonClicked} tooltipSide="top" disabled={editProhibited} tooltip={`Push to ${transformProviderName(storageType.provider)}`} />
           </>

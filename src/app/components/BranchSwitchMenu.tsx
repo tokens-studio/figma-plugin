@@ -8,10 +8,14 @@ const itemStyles = {
   cursor: 'default',
   userselect: 'none',
 
-  '&:focus': {
+  '&:hover:not([data-disabled]), &:focus:not([data-disabled])': {
     outline: 'none',
     backgroundColor: '$interaction',
     color: '$onInteraction',
+  },
+
+  '&[data-disabled]': {
+    color: '$contextMenuForegroundDisabled',
   },
 };
 
