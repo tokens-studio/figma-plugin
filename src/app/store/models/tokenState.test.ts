@@ -351,4 +351,77 @@ describe('editToken', () => {
       global_Copy: TokenSetStatus.DISABLED,
     });
   });
+
+  it('can reset imported tokens', () => {
+    store.dispatch.tokenState.setTokensFromStyles({
+      colors: [
+        {
+          type: TokenTypes.COLOR,
+          name: 'primary',
+          value: '2',
+        },
+      ],
+    });
+    store.dispatch.tokenState.resetImportedTokens();
+    const { importedTokens } = store.getState().tokenState;
+    expect(importedTokens).toEqual({
+      newTokens: [],
+      updatedTokens: [],
+    });
+  });
+
+  it('can create token', () => {
+    store.dispatch.tokenState.createToken({
+      name: 'test',
+      parent: 'global',
+      type: TokenTypes.COLOR,
+      value: '#000000',
+    });
+    const { tokens } = store.getState().tokenState;
+    expect(tokens.global).toEqual([
+      {
+        name: 'primary',
+        value: '1',
+      },
+      {
+        name: 'alias',
+        value: '$primary',
+      },
+      {
+        name: 'primary50',
+        value: '0.50',
+      },
+      {
+        name: 'alias50',
+        value: '$primary50',
+      },
+      {
+        name: 'header 1',
+        type: 'typography',
+        value: {
+          fontWeight: '400',
+          fontSize: '16',
+        },
+      },
+      {
+        name: 'header 1',
+        type: 'typography',
+        value: {
+          fontWeight: '400',
+          fontSize: '16',
+        },
+      },
+      {
+        name: 'shadow.mixed',
+        type: 'boxShadow',
+        description: 'the one with mixed shadows',
+        value: shadowArray,
+      },
+      {
+        name: 'test',
+        type: TokenTypes.COLOR,
+        value: '#000000',
+      },
+    ]);
+  });
 });
