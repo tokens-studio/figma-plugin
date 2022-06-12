@@ -52,6 +52,7 @@ export const stitchesInstance = createStitches({
       contextMenuBackground: 'var(--figma-color-bg-menu)',
       contextMenuForeground: 'var(--figma-color-text-menu)',
       contextMenuForegroundMuted: 'var(--figma-color-text-menu-secondary)',
+      contextMenuForegroundDisabled: 'var(--figma-color-text-menu-disabled)',
       contextMenuSeperator: 'var(--figma-color-border-menu)',
       loadingScreenFg: '#FFFFFF',
       loadingScreenFgMuted: '#CECECE',

@@ -32,7 +32,6 @@ import { styled } from '@/stitches.config';
 import { ManageThemesModal } from './ManageThemesModal';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { UpdateMode } from '@/constants/UpdateMode';
-import { useFlags } from './LaunchDarkly';
 
 const StyledButton = styled('button', {
   '&:focus, &:hover': {
@@ -101,7 +100,6 @@ function Tokens({ isActive }: { isActive: boolean }) {
   const [activeTokensTab, setActiveTokensTab] = React.useState('list');
   const [tokenSetsVisible, setTokenSetsVisible] = React.useState(true);
   const { getStringTokens } = useTokens();
-  const { tokenThemes } = useFlags();
 
   const updateMode = useSelector(updateModeSelector);
   const { confirm } = useConfirm();
@@ -150,6 +148,18 @@ function Tokens({ isActive }: { isActive: boolean }) {
   const handleSaveJSON = React.useCallback(() => {
     dispatch.tokenState.setJSONData(stringTokens);
   }, [dispatch.tokenState, stringTokens]);
+
+  const handleToggleTokenSetsVisibility = React.useCallback(() => {
+    setTokenSetsVisible(!tokenSetsVisible);
+  }, [tokenSetsVisible]);
+
+  const handleSetTokensTabToList = React.useCallback(() => {
+    setActiveTokensTab('list');
+  }, []);
+
+  const handleSetTokensTabToJSON = React.useCallback(() => {
+    setActiveTokensTab('json');
+  }, []);
 
   const handleUpdate = React.useCallback(async () => {
     if (activeTokensTab === 'list') {
@@ -218,7 +228,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
           }}
         >
           <Box>
-            <StyledButton style={{ height: '100%' }} type="button" onClick={() => setTokenSetsVisible(!tokenSetsVisible)}>
+            <StyledButton style={{ height: '100%' }} type="button" onClick={handleToggleTokenSetsVisibility}>
               <Box
                 css={{
                   fontWeight: '$bold',
@@ -236,7 +246,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
             </StyledButton>
           </Box>
           <TokenFilter />
-          {tokenThemes && <ThemeSelector />}
+          <ThemeSelector />
           <Box
             css={{
               display: 'flex',
@@ -249,7 +259,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
             <IconButton
               variant={activeTokensTab === 'list' ? 'primary' : 'default'}
               dataCy="tokensTabList"
-              onClick={() => setActiveTokensTab('list')}
+              onClick={handleSetTokensTabToList}
               icon={<IconListing />}
               tooltipSide="bottom"
               tooltip="Listing"
@@ -257,7 +267,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
             <IconButton
               variant={activeTokensTab === 'json' ? 'primary' : 'default'}
               dataCy="tokensTabJSON"
-              onClick={() => setActiveTokensTab('json')}
+              onClick={handleSetTokensTabToJSON}
               icon={<IconJSON />}
               tooltipSide="bottom"
               tooltip="JSON"
