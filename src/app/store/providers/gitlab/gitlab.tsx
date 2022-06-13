@@ -68,7 +68,7 @@ export function useGitLab() {
     dispatch.uiState.setLocalApiState({ ...context });
 
     const pushSettings = await pushDialog();
-    console.log("pushsettinggitlab", pushSettings)
+    // console.log("pushsettinggitlab", pushSettings)
     if (pushSettings) {
       const { commitMessage, customBranch } = pushSettings;
       try {
@@ -134,7 +134,9 @@ export function useGitLab() {
 
   const syncTokensWithGitLab = useCallback(async (context: GitlabCredentials): Promise<RemoteTokenStorageData<GitStorageMetadata> | null> => {
     try {
+      console.log("syncgitlab")
       const storage = await storageClientFactory(context);
+      console.log("gitlabstorage")
       const hasBranches = await storage.fetchBranches();
       dispatch.branchState.setBranches(hasBranches);
 
@@ -170,6 +172,7 @@ export function useGitLab() {
   }, [storageClientFactory, dispatch.branchState, dispatch.tokenState, pushTokensToGitLab, tokens, themes, askUserIfPull, usedTokenSet]);
 
   const addNewGitLabCredentials = useCallback(async (context: GitlabFormValues): Promise<RemoteTokenStorageData<GitStorageMetadata> | null> => {
+    console.log("addgitlab")
     const data = await syncTokensWithGitLab(context);
     if (data) {
       AsyncMessageChannel.message({
