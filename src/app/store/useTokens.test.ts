@@ -498,4 +498,13 @@ describe('useToken test', () => {
     };
     expect(result.current.getFormattedTokens(opts)).toBeTruthy();
   });
+  it('getStringTokens test', () => {
+    expect(result.current.getStringTokens()).toBeTruthy();
+  });
+  it('pullStyles test', async () => {
+    mockConfirm.mockImplementation(() => {
+      Promise.resolve(true);
+    });
+    await expect(result.current.pullStyles()).resolves.not.toThrow();
+  });
 });
