@@ -11,7 +11,6 @@ import * as pjs from '../../../package.json';
 import { Tabs } from '@/constants/Tabs';
 import { userIdSelector } from '@/selectors/userIdSelector';
 import getLicenseKey from '@/utils/getLicenseKey';
-import fetchFeatureFlags from '@/utils/fetchFeatureFlags';
 import { licenseKeySelector } from '@/selectors/licenseKeySelector';
 import { checkedLocalStorageForKeySelector } from '@/selectors/checkedLocalStorageForKeySelector';
 import { LicenseStatus } from '@/constants/LicenseStatus';
@@ -21,6 +20,7 @@ import { notifyToUI } from '@/plugin/notifiers';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import useConfirm from '../hooks/useConfirm';
 import { StorageTypeCredentials } from '@/types/StorageType';
+import { ldIdentificationPromise } from './LaunchDarkly';
 
 export function Initiator() {
   const dispatch = useDispatch<Dispatch>();
@@ -93,21 +93,17 @@ export function Initiator() {
           case MessageFromPluginTypes.REMOTE_COMPONENTS:
             break;
           case MessageFromPluginTypes.TOKEN_VALUES: {
-            const { values, userData } = pluginMessage;
-            let featureFlags: LDProps['flags'] | null;
+            const { values } = pluginMessage;
+            const receivedFlags = await ldIdentificationPromise;
             const existChanges = values.checkForChanges;
             const storageType = values.storageType?.provider;
-            if (!existChanges
-              || ((storageType && storageType !== StorageProviderType.LOCAL)
-              && existChanges && await askUserIfPull(storageType))) {
-              featureFlags = await fetchFeatureFlags(userData);
-              getApiCredentials(true, featureFlags);
+            if (!existChanges || ((storageType && storageType !== StorageProviderType.LOCAL) && existChanges && await askUserIfPull(storageType))) {
+              getApiCredentials(true, receivedFlags);
             } else {
               dispatch.tokenState.setTokenData(values);
               const existTokens = Object.values(values?.values ?? {}).some((value) => value.length > 0);
               if (existTokens) {
-                featureFlags = await fetchFeatureFlags(userData);
-                getApiCredentials(false, featureFlags);
+                getApiCredentials(false, receivedFlags);
               } else dispatch.uiState.setActiveTab(Tabs.START);
             }
             break;
