@@ -1,4 +1,4 @@
-import { renderHook } from '@testing-library/react-hooks';
+import { renderHook, act } from '@testing-library/react-hooks';
 import { Selector } from 'reselect';
 
 import { TokenTypes } from '@/constants/TokenTypes';
@@ -504,6 +504,9 @@ describe('useToken test', () => {
   it('pullStyles test', async () => {
     mockConfirm.mockImplementation(() => {
       Promise.resolve(true);
+    });
+    act(() => {
+      result.current.pullStyles();
     });
     await expect(result.current.pullStyles()).resolves.not.toThrow();
   });
