@@ -197,11 +197,28 @@ const mockSelector = (selector: Selector) => {
     case activeTokenSetSelector:
       return 'global';
     case usedTokenSetSelector:
-      return [
-        'global',
-        'core',
-        'semantic',
-      ];
+      return {
+        semantic: 'enabled',
+        core: 'enabled',
+        button: 'enabled',
+        'icon-button': 'enabled',
+        link: 'enabled',
+        'text-field': 'enabled',
+        radio: 'enabled',
+        checkbox: 'enabled',
+        switch: 'disabled',
+        'field-label': 'disabled',
+        'help-text': 'disabled',
+        heading: 'disabled',
+        body: 'disabled',
+        detail: 'disabled',
+        code: 'disabled',
+        avatar: 'disabled',
+        tag: 'disabled',
+        'alert-banner': 'source',
+        divider: 'source',
+        'menu-item': 'source',
+      };
     case tokensSelector:
       return {
         global: [
