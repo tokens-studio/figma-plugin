@@ -97,13 +97,7 @@ export function Initiator() {
             const receivedFlags = await ldIdentificationPromise;
             const existChanges = values.checkForChanges;
             const storageType = values.storageType?.provider;
-            if (
-              !existChanges
-              || (
-                (storageType && storageType !== StorageProviderType.LOCAL)
-                && existChanges && await askUserIfPull(storageType)
-              )
-            ) {
+            if (!existChanges || ((storageType && storageType !== StorageProviderType.LOCAL) && existChanges && await askUserIfPull(storageType))) {
               getApiCredentials(true, receivedFlags);
             } else {
               dispatch.tokenState.setTokenData(values);
