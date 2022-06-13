@@ -16,6 +16,13 @@ import {
   AnyTokenList, SingleToken,
 } from '@/types/tokens';
 
+type GetFormattedTokensOptions = {
+  includeAllTokens: boolean;
+  includeParent: boolean;
+  expandTypography: boolean;
+  expandShadow: boolean;
+};
+
 const resolvedTokens: AnyTokenList = [
   {
     name: 'size.6',
@@ -481,5 +488,14 @@ describe('useToken test', () => {
     };
     expect(result.current.isAlias(aliasToken, resolvedTokens)).toBe(true);
     expect(result.current.isAlias(token, resolvedTokens)).toBe(false);
+  });
+  it('getFormattedTokens test', () => {
+    const opts: GetFormattedTokensOptions = {
+      includeAllTokens: false,
+      includeParent: false,
+      expandTypography: false,
+      expandShadow: false,
+    };
+    expect(result.current.getFormattedTokens(opts)).toBeTruthy();
   });
 });
