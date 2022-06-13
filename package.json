@@ -1,11 +1,7 @@
 {
   "name": "figma-tokens",
   "version": "1.0.0",
-  "plugin_version": "109",
-  "description": "Figma Tokens",
-  "license": "MIT",
   "scripts": {
-    "build-css": "postcss src/app/styles/tailwind.css -o src/app/styles/main.css",
     "watch-css": "postcss src/app/styles/tailwind.css -o src/app/styles/main.css -w",
     "watch-js": "webpack --mode=development --watch",
     "watch-transform": "webpack --mode=development --watch --config webpack-transform.config.js",
