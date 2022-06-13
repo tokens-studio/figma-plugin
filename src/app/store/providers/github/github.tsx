@@ -45,14 +45,12 @@ export function useGitHub() {
       text: 'Pull from GitHub?',
       description: 'Your repo already contains tokens, do you want to pull these now?',
     });
-    console.log("confirmrsult", confirmResult)
     return confirmResult;
   }, [confirm]);
 
   const pushTokensToGitHub = useCallback(async (context: GithubCredentials): Promise<RemoteTokenStorageData<GitStorageMetadata> | null> => {
     const storage = storageClientFactory(context);
     const content = await storage.retrieve();
-
     if (content) {
       if (
         content
@@ -69,6 +67,7 @@ export function useGitHub() {
     }
 
     dispatch.uiState.setLocalApiState({ ...context });
+    console.log("pushTokens22222")
 
     const pushSettings = await pushDialog();
     if (pushSettings) {
@@ -136,7 +135,6 @@ export function useGitHub() {
 
   // Function to initially check auth and sync tokens with GitHub
   const syncTokensWithGitHub = useCallback(async (context: GithubCredentials): Promise<RemoteTokenStorageData<GitStorageMetadata> | null> => {
-    console.log("synctokenswithgithub")
     try {
       const storage = storageClientFactory(context);
       const hasBranches = await storage.fetchBranches();
@@ -145,15 +143,12 @@ export function useGitHub() {
         return null;
       }
       const content = await storage.retrieve();
-      console.log("tokens", tokens)
       if (content) {
-        console.log("!isEqual(content.tokens, tokens)", !isEqual(content.tokens, tokens))
         if (
           !isEqual(content.tokens, tokens)
           || !isEqual(content.themes, themes)
         ) {
           const userDecision = await askUserIfPull();
-          console.log("uerDecisiont", userDecision)
           if (userDecision) {
             dispatch.tokenState.setLastSyncedState(JSON.stringify([content.tokens, content.themes], null, 2));
             dispatch.tokenState.setTokenData({
@@ -164,7 +159,6 @@ export function useGitHub() {
             notifyToUI('Pulled tokens from GitHub');
           }
         }
-        console.log("returnconte", content)
         return content;
       }
       return await pushTokensToGitHub(context);

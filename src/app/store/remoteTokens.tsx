@@ -121,6 +121,7 @@ export default function useRemoteTokens() {
         break;
       }
       default:
+        console.log("pull Tokens")
         await pullTokens({ context });
     }
     return null;

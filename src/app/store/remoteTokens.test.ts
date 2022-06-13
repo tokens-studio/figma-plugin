@@ -2,12 +2,13 @@ import { renderHook } from '@testing-library/react-hooks';
 import useRemoteTokens from './remoteTokens';
 import { StorageTypeCredentials } from '@/types/StorageType';
 import {
-  localApiStateSelector, themesListSelector, tokensSelector, usedTokenSetSelector,
+  themesListSelector,
+  tokensSelector
 } from '@/selectors';
-import useConfirm from '@/app/hooks/useConfirm';
 import { Selector } from 'reselect';
+import { waitFor } from '@testing-library/react';
+import { notifyToUI } from '@/plugin/notifiers';
 
-const mockSelector = jest.fn();
 const mockStartJob = jest.fn();
 const mockRetrieve = jest.fn();
 const mockCanWrite = jest.fn();
@@ -27,22 +28,13 @@ const mockFetchBranches = jest.fn();
 const mockSetBranches = jest.fn();
 const mockConfirm = jest.fn();
 const mockSetShowConfirm = jest.fn();
-mockRetrieve.mockImplementation(() => (
-  Promise.resolve(
-    {
-      metadata: {
-        commitMessage: 'Initial commit',
-      },
-      themes: [
-        {
-          id: 'light',
-          name: 'Light',
-          selectedTokenSets: {
-            global: 'enabled',
-          },
-        }
-      ],
-      tokens: {
+const mockPushDialog = jest.fn();
+const mockPullTokens = jest.fn();
+
+const mockSelector = (selector: Selector) => {
+  switch (selector) {
+    case tokensSelector:
+      return {
         global: [
           {
             value: '#ffffff',
@@ -50,25 +42,21 @@ mockRetrieve.mockImplementation(() => (
             name: 'black',
           },
         ],
-      },
-    },
-  )
-));
-
-const mockSelectors = (selector: Selector) => {
-  console.log("selector")
-  if (selector === tokensSelector) {
-    return {
-      global: [
+      }
+    case themesListSelector:
+      return [
         {
-          value: '#ffffff',
-          type: 'color',
-          name: 'black'
+          id: 'light',
+          name: 'Light',
+          selectedTokenSets: {
+            global: 'enabled',
+          },
         }
       ]
-    }
+    default:
+      return {}
   }
-}
+};
 
 jest.mock('react-redux', () => ({
   useDispatch: jest.fn().mockImplementation(() => ({
@@ -90,11 +78,9 @@ jest.mock('react-redux', () => ({
       setBranches: mockSetBranches
     }
   })),
-  useSelector: jest.fn().mockImplementation(() => (
-    mockSelector
-  )),
+  useSelector: (selector: Selector) => mockSelector(selector)
 }));
-jest.mock('@/storage/GithubTokenStorage', () => ({
+jest.mock('../../storage/GithubTokenStorage', () => ({
   GithubTokenStorage: jest.fn().mockImplementation(() => (
     {
       retrieve: mockRetrieve,
@@ -106,7 +92,7 @@ jest.mock('@/storage/GithubTokenStorage', () => ({
     }
   ))
 }));
-jest.mock('@/storage/GitlabTokenStorage', () => ({
+jest.mock('../../storage/GitlabTokenStorage', () => ({
   GitlabTokenStorage: jest.fn().mockImplementation(() => (
     {
       retrieve: mockRetrieve,
@@ -114,18 +100,26 @@ jest.mock('@/storage/GitlabTokenStorage', () => ({
       changePath: mockChangePath,
       selectBranch: mockSelectBrach,
       enableMultiFile: mockEnableMultiFile,
-      assignProjectId: mockAssignProjectId
+      assignProjectId: jest.fn().mockImplementation(() => ({
+        retrieve: mockRetrieve,
+        canWrite: mockCanWrite,
+        changePath: mockChangePath,
+        selectBranch: mockSelectBrach,
+        enableMultiFile: mockEnableMultiFile,
+        assignProjectId: mockAssignProjectId,
+        fetchBranches: mockFetchBranches
+      }))
     }
   ))
 }));
-jest.mock('@/storage', () => ({
+jest.mock('../../storage/JSONBinTokenStorage', () => ({
   JSONBinTokenStorage: jest.fn().mockImplementation(() => (
     {
       retrieve: mockRetrieve,
     }
   ))
 }));
-jest.mock('@/storage/ADOTokenStorage', () => ({
+jest.mock('../../storage/ADOTokenStorage', () => ({
   ADOTokenStorage: jest.fn().mockImplementation(() => (
     {
       retrieve: mockRetrieve,
@@ -133,22 +127,32 @@ jest.mock('@/storage/ADOTokenStorage', () => ({
       changePath: mockChangePath,
       selectBranch: mockSelectBrach,
       enableMultiFile: mockEnableMultiFile,
+      fetchBranches: mockFetchBranches
     }
   ))
 }));
-jest.mock('@/storage/UrlTokenStorage', () => ({
+jest.mock('../../storage/UrlTokenStorage', () => ({
   UrlTokenStorage: jest.fn().mockImplementation(() => (
     {
       retrieve: mockRetrieve,
     }
   ))
 }));
-jest.mock("@/app/hooks/useConfirm", () => ({
+jest.mock("../hooks/useConfirm", () => ({
   __esModule: true,
   default: () => ({
     confirm: mockConfirm
   }),
 }));
+jest.mock("../hooks/usePushDialog", () => ({
+  __esModule: true,
+  default: () => ({
+    pushDialog: mockPushDialog
+  }),
+}));
+jest.mock("../../plugin/notifiers", (() => ({
+  notifyToUI: jest.fn()
+})));
 
 const gitHubContext = {
   branch: 'main',
@@ -183,181 +187,140 @@ const urlContext = {
   secret: 'url',
 };
 
+const contexts = [gitHubContext, gitLabContext, jsonbinContext, adoContext, urlContext];
+const contextNames = ['GitHub', 'GitLab', 'jsonbin', 'ADO', 'url'];
 describe('remoteTokens', () => {
   let { result } = renderHook(() => useRemoteTokens());
   beforeEach(() => {
     result = renderHook(() => useRemoteTokens()).result;
-  });
-
-  it('pull tokens from GitHub', async () => {
-    expect(await result.current.pullTokens({ context: gitHubContext as StorageTypeCredentials })).toEqual({
-      metadata: {
-        commitMessage: 'Initial commit',
-      },
-      themes: [
+    mockRetrieve.mockImplementation(() => (
+      Promise.resolve(
         {
-          id: 'light',
-          name: 'Light',
-          selectedTokenSets: {
-            global: 'enabled',
+          metadata: {
+            commitMessage: 'Initial commit',
           },
-        }
-      ],
-      tokens: {
-        global: [
-          {
-            value: '#ffffff',
-            type: 'color',
-            name: 'black'
-          }
-        ]
-      }
-    });
-  });
-
-  it('pull tokens from GitLab', async () => {
-    mockAssignProjectId.mockImplementation(() => ({
-      retrieve: mockRetrieve,
-      canWrite: mockCanWrite,
-      changePath: mockChangePath,
-      selectBranch: mockSelectBrach,
-      enableMultiFile: mockEnableMultiFile,
-      assignProjectId: mockAssignProjectId
-    }))
-    expect(await result.current.pullTokens({ context: gitLabContext as StorageTypeCredentials })).toEqual({
-      metadata: {
-        commitMessage: 'Initial commit',
-      },
-      themes: [
-        {
-          id: 'light',
-          name: 'Light',
-          selectedTokenSets: {
-            global: 'enabled',
+          themes: [
+            {
+              id: 'light',
+              name: 'Light',
+              selectedTokenSets: {
+                global: 'enabled',
+              },
+            }
+          ],
+          tokens: {
+            global: [
+              {
+                value: '#ffffff',
+                type: 'color',
+                name: 'black',
+              },
+            ],
           },
-        }
-      ],
-      tokens: {
-        global: [
-          {
-            value: '#ffffff',
-            type: 'color',
-            name: 'black'
-          }
-        ]
-      }
-    });
-  });
-
-  it('pull tokens from jsonbin', async () => {
-    expect(await result.current.pullTokens({ context: jsonbinContext as StorageTypeCredentials })).toEqual({
-      metadata: {
-        commitMessage: 'Initial commit',
-      },
-      themes: [
-        {
-          id: 'light',
-          name: 'Light',
-          selectedTokenSets: {
-            global: 'enabled',
-          },
-        }
-      ],
-      tokens: {
-        global: [
-          {
-            value: '#ffffff',
-            type: 'color',
-            name: 'black'
-          }
-        ]
-      }
-    });
-  });
-
-  it('pull tokens from ADO', async () => {
-    expect(await result.current.pullTokens({ context: adoContext as StorageTypeCredentials })).toEqual({
-      metadata: {
-        commitMessage: 'Initial commit',
-      },
-      themes: [
-        {
-          id: 'light',
-          name: 'Light',
-          selectedTokenSets: {
-            global: 'enabled',
-          },
-        }
-      ],
-      tokens: {
-        global: [
-          {
-            value: '#ffffff',
-            type: 'color',
-            name: 'black'
-          }
-        ]
-      }
-    });
-  });
-
-  it('pull tokens from URL', async () => {
-    expect(await result.current.pullTokens({ context: urlContext as StorageTypeCredentials })).toEqual({
-      metadata: {
-        commitMessage: 'Initial commit',
-      },
-      themes: [
-        {
-          id: 'light',
-          name: 'Light',
-          selectedTokenSets: {
-            global: 'enabled',
-          },
-        }
-      ],
-      tokens: {
-        global: [
-          {
-            value: '#ffffff',
-            type: 'color',
-            name: 'black'
-          }
-        ]
-      }
-    });
-  });
-
-  it('restoreStoredProvider from GitHub', async () => {
-    mockFetchBranches.mockImplementationOnce(() => (
-      Promise.resolve(['main'])
+        },
+      )
     ));
-    mockSelector.mockImplementation(selector => mockSelectors(selector));
-    mockConfirm.mockImplementationOnce(() => (
-      Promise.resolve(false)
-    ))
-    expect(await result.current.restoreStoredProvider(gitHubContext as StorageTypeCredentials)).toEqual({
-      metadata: {
-        commitMessage: 'Initial commit',
-      },
-      themes: [
-        {
-          id: 'light',
-          name: 'Light',
-          selectedTokenSets: {
-            global: 'enabled',
-          },
-        }
-      ],
-      tokens: {
-        global: [
-          {
-            value: '#ffffff',
-            type: 'color',
-            name: 'black'
-          }
-        ]
-      }
-    });
   });
+  afterEach(() => {
+    jest.clearAllMocks();
+  })
 
+  contexts.forEach((context) => {
+    it(`pull tokens from ${context.provider}`, async () => {
+      expect(await result.current.pullTokens({ context: context as StorageTypeCredentials })).toEqual({
+        metadata: {
+          commitMessage: 'Initial commit',
+        },
+        themes: [
+          {
+            id: 'light',
+            name: 'Light',
+            selectedTokenSets: {
+              global: 'enabled',
+            },
+          }
+        ],
+        tokens: {
+          global: [
+            {
+              value: '#ffffff',
+              type: 'color',
+              name: 'black'
+            }
+          ]
+        }
+      });
+    })
+  })
+
+  contexts.forEach((context, index) => {
+    it(`trying to restoreStoredProvider from ${context.provider}, notify pull tokens if a user agree`, async () => {
+      mockFetchBranches.mockImplementationOnce(() => (
+        Promise.resolve(['main'])
+      ));
+      mockRetrieve.mockImplementation(() => (
+        Promise.resolve(
+          {
+            metadata: {
+              commitMessage: 'Initial commit',
+            },
+            themes: [
+              {
+                id: 'black',
+                name: 'Black',
+                selectedTokenSets: {
+                  global: 'enabled',
+                },
+              }
+            ],
+            tokens: {
+              global: [
+                {
+                  value: '#000000',
+                  type: 'color',
+                  name: 'white',
+                },
+              ],
+            },
+          },
+        )
+      ));
+      mockConfirm.mockImplementation(() => (
+        Promise.resolve(true)
+      ));
+      await waitFor(() => { result.current.restoreStoredProvider(context as StorageTypeCredentials); });
+      if (context === gitHubContext || context === gitLabContext || context === adoContext) {
+        expect(notifyToUI).toBeCalledTimes(1);
+        expect(notifyToUI).toBeCalledWith(`Pulled tokens from ${contextNames[index]}`);  
+      }
+      else if (context === jsonbinContext || context === urlContext) {
+        expect(mockStartJob).toBeCalledWith({
+          isInfinite: true, 
+          name: "ui_pulltokens"
+        });
+      }
+    })
+  })
+
+  contexts.forEach((context) => {
+    it(`trying to restoreStoredProvider from ${context.provider}, should push tokens if there is no file in the repo`, async () => {
+      mockFetchBranches.mockImplementationOnce(() => (
+        Promise.resolve(['main'])
+      ));
+      mockRetrieve.mockImplementation(() => (
+        Promise.resolve(null)
+      ));
+      await waitFor(() => { result.current.restoreStoredProvider(context as StorageTypeCredentials) });
+      if (context === gitHubContext || context === gitLabContext || context === adoContext) {
+        expect(mockPushDialog).toBeCalledTimes(1);
+      }
+      else if (context === jsonbinContext || context === urlContext) {
+        expect(mockStartJob).toBeCalledWith({
+          isInfinite: true, 
+          name: "ui_pulltokens"
+        });
+      }
+
+    })
+  })
 });
