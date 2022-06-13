@@ -135,9 +135,7 @@ export function useGitHub() {
   // Function to initially check auth and sync tokens with GitHub
   const syncTokensWithGitHub = useCallback(async (context: GithubCredentials): Promise<RemoteTokenStorageData<GitStorageMetadata> | null> => {
     try {
-      console.log("syncgithub")
       const storage = storageClientFactory(context);
-      console.log("sotrage")
       const hasBranches = await storage.fetchBranches();
       dispatch.branchState.setBranches(hasBranches);
       if (!hasBranches || !hasBranches.length) {
@@ -184,9 +182,7 @@ export function useGitHub() {
         type: AsyncMessageTypes.CREDENTIALS,
         credential: context,
       });
-      console.log("datagithub", data)
       if (data?.tokens) {
-        console.log("data.tokens")
         dispatch.tokenState.setLastSyncedState(JSON.stringify([data.tokens, data.themes], null, 2));
         dispatch.tokenState.setTokenData({
           values: data.tokens,
