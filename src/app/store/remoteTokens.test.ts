@@ -30,6 +30,7 @@ const mockConfirm = jest.fn();
 const mockSetShowConfirm = jest.fn();
 const mockPushDialog = jest.fn();
 const mockPullTokens = jest.fn();
+const mockSave = jest.fn();
 
 const mockSelector = (selector: Selector) => {
   switch (selector) {
@@ -88,7 +89,8 @@ jest.mock('../../storage/GithubTokenStorage', () => ({
       changePath: mockChangePath,
       selectBranch: mockSelectBrach,
       enableMultiFile: mockEnableMultiFile,
-      fetchBranches: mockFetchBranches
+      fetchBranches: mockFetchBranches,
+      save: mockSave,
     }
   ))
 }));
@@ -100,6 +102,7 @@ jest.mock('../../storage/GitlabTokenStorage', () => ({
       changePath: mockChangePath,
       selectBranch: mockSelectBrach,
       enableMultiFile: mockEnableMultiFile,
+      save: mockSave,
       assignProjectId: jest.fn().mockImplementation(() => ({
         retrieve: mockRetrieve,
         canWrite: mockCanWrite,
@@ -107,7 +110,8 @@ jest.mock('../../storage/GitlabTokenStorage', () => ({
         selectBranch: mockSelectBrach,
         enableMultiFile: mockEnableMultiFile,
         assignProjectId: mockAssignProjectId,
-        fetchBranches: mockFetchBranches
+        fetchBranches: mockFetchBranches,
+        save: mockSave,
       }))
     }
   ))
@@ -127,7 +131,8 @@ jest.mock('../../storage/ADOTokenStorage', () => ({
       changePath: mockChangePath,
       selectBranch: mockSelectBrach,
       enableMultiFile: mockEnableMultiFile,
-      fetchBranches: mockFetchBranches
+      fetchBranches: mockFetchBranches,
+      save: mockSave,
     }
   ))
 }));
@@ -291,11 +296,11 @@ describe('remoteTokens', () => {
       await waitFor(() => { result.current.restoreStoredProvider(context as StorageTypeCredentials); });
       if (context === gitHubContext || context === gitLabContext || context === adoContext) {
         expect(notifyToUI).toBeCalledTimes(1);
-        expect(notifyToUI).toBeCalledWith(`Pulled tokens from ${contextNames[index]}`);  
+        expect(notifyToUI).toBeCalledWith(`Pulled tokens from ${contextNames[index]}`);
       }
       else if (context === jsonbinContext || context === urlContext) {
         expect(mockStartJob).toBeCalledWith({
-          isInfinite: true, 
+          isInfinite: true,
           name: "ui_pulltokens"
         });
       }
@@ -316,11 +321,32 @@ describe('remoteTokens', () => {
       }
       else if (context === jsonbinContext || context === urlContext) {
         expect(mockStartJob).toBeCalledWith({
-          isInfinite: true, 
+          isInfinite: true,
           name: "ui_pulltokens"
         });
       }
+    })
+  })
 
+  contexts.forEach((context) => {
+    it(`push tokens to ${context.provider}`, async () => {
+      mockRetrieve.mockImplementation(() => (
+        Promise.resolve(null)
+      ));
+      mockPushDialog.mockImplementation(() => (
+        Promise.resolve({
+          customBranch: 'development',
+          commitMessage: 'Initial commit'
+        })
+      ));
+      if (context === gitHubContext || context === gitLabContext || context === adoContext) {
+        await waitFor(() => { result.current.pushTokens(context as StorageTypeCredentials) });
+        expect(mockPushDialog).toBeCalledTimes(2);
+        expect(mockPushDialog.mock.calls[1][0]).toBe('successfully pushed');
+      }
+      else if (context === jsonbinContext || context === urlContext) {
+        return;
+      }
     })
   })
 });

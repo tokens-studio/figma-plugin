@@ -68,10 +68,12 @@ export function useGitLab() {
     dispatch.uiState.setLocalApiState({ ...context });
 
     const pushSettings = await pushDialog();
+    console.log("pushsettinggitlab", pushSettings)
     if (pushSettings) {
       const { commitMessage, customBranch } = pushSettings;
       try {
         if (customBranch) storage.selectBranch(customBranch);
+        console.log("beforesave")
         await storage.save({
           themes,
           tokens,
@@ -86,8 +88,8 @@ export function useGitLab() {
           themes,
           usedTokenSet,
         });
-
-        pushDialog('success');
+        console.log("after")
+        pushDialog('successfully pushed');
         return {
           tokens,
           themes,

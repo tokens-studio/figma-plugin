@@ -70,6 +70,7 @@ export function useGitHub() {
     console.log("pushTokens22222")
 
     const pushSettings = await pushDialog();
+    console.log("pushsetting", pushSettings)
     if (pushSettings) {
       const { commitMessage, customBranch } = pushSettings;
       try {
@@ -87,7 +88,7 @@ export function useGitHub() {
           themes,
           usedTokenSet,
         });
-        pushDialog('success');
+        pushDialog('successfully pushed');
         return {
           tokens,
           themes,
