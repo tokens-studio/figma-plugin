@@ -22,7 +22,7 @@ export const TokenTooltipContent: React.FC<Props> = ({ token }) => {
       && typeof token.value === 'string',
     [token],
   );
-
+  console.log('tokenIsAlias', tokenIsAlias);
   return (
     <div>
       <Box css={{ fontSize: '$0', fontWeight: '$bold', color: '$fgToolTip' }}>
