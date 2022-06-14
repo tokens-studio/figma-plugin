@@ -26,7 +26,7 @@ export default function useURL() {
       id, secret, name, internalId,
     } = context;
     if (!id && !secret) return null;
-
+    console.log(context);
     const storage = storageClientFactory(context);
 
     try {
