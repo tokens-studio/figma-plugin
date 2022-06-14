@@ -78,6 +78,7 @@ export function useGitHub() {
       const { commitMessage, customBranch } = pushSettings;
       try {
         if (customBranch) storage.selectBranch(customBranch);
+        console.log("tokens", tokens)
         await storage.save({
           themes,
           tokens,
