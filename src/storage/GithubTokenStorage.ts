@@ -19,7 +19,8 @@ type ExtendedOctokitClient = Omit<Octokit, 'repos'> & {
       changes: {
         message: string
         files: Record<string, string>,
-        filesToDelete: string[]
+        filesToDelete: string[],
+        ignoreDeletionFailures?: boolean
       }[],
     }) => ReturnType<Octokit['repos']['createOrUpdateFileContents']>
   }
@@ -209,7 +210,7 @@ export class GithubTokenStorage extends GitTokenStorage {
     }
   }
 
-  public async fileExistsInRepo(owner: string , repo: string, path: string, branch: string) {
+  private async fileExistsInRepo(owner: string , repo: string, path: string, branch: string) {
     try {
       await this.octokitClient.rest.repos.getContent({
         method: "HEAD",
@@ -228,11 +229,9 @@ export class GithubTokenStorage extends GitTokenStorage {
     let filesToDelete: string[] = [];
     if (await this.fileExistsInRepo(this.owner, this.repository, this.path, this.branch)) {
       const allFiles = await this.read();
-      const allTokenSets = allFiles.filter((file) => file.type === 'tokenSet');
-      allTokenSets.forEach((tokenFile) => {
-        filesToDelete.push(tokenFile.path);
-      })
-      console.log("alllTokens", allTokenSets);
+      filesToDelete = allFiles.filter((file) => file.type === 'tokenSet').map((tokenFile) => (
+        `${this.path.split('/')[0]}/${tokenFile.path}`
+      ));
     }
     const response = await this.octokitClient.repos.createOrUpdateFiles({
       branch,
@@ -243,7 +242,7 @@ export class GithubTokenStorage extends GitTokenStorage {
         {
           message,
           files: changeset,
-          filesToDelete
+          filesToDelete,
         },
       ],
     });
