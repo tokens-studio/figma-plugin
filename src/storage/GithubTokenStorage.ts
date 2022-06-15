@@ -19,8 +19,6 @@ type ExtendedOctokitClient = Omit<Octokit, 'repos'> & {
       changes: {
         message: string
         files: Record<string, string>,
-        filesToDelete: string[],
-        ignoreDeletionFailures?: boolean
       }[],
     }) => ReturnType<Octokit['repos']['createOrUpdateFileContents']>
   }
@@ -149,6 +147,7 @@ export class GithubTokenStorage extends GitTokenStorage {
                 ref: this.branch,
               }) : Promise.resolve(null)
             )));
+            console.log('jsonFilecone', jsonFileContents);
             return compact(jsonFileContents.map<RemoteTokenStorageFile<GitStorageMetadata> | null>((fileContent, index) => {
               const { path } = jsonFiles[index];
 
@@ -167,6 +166,7 @@ export class GithubTokenStorage extends GitTokenStorage {
                     path,
                     type: 'themes',
                     data: parsed as ThemeObjectsList,
+                    sha: fileContent.data.sha,
                   };
                 }
 
@@ -175,6 +175,7 @@ export class GithubTokenStorage extends GitTokenStorage {
                   name,
                   type: 'tokenSet',
                   data: parsed as AnyTokenSet<false>,
+                  sha: fileContent.data.sha,
                 };
               }
 
@@ -210,14 +211,14 @@ export class GithubTokenStorage extends GitTokenStorage {
     }
   }
 
-  private async fileExistsInRepo(owner: string , repo: string, path: string, branch: string) {
+  private async fileExistsInRepo(owner: string, repo: string, path: string, branch: string) {
     try {
       await this.octokitClient.rest.repos.getContent({
-        method: "HEAD",
+        method: 'HEAD',
         owner,
         repo,
         path,
-        ref: branch
+        ref: branch,
       });
       return true;
     } catch (e) {
@@ -226,26 +227,53 @@ export class GithubTokenStorage extends GitTokenStorage {
   }
 
   public async writeChangeset(changeset: Record<string, string>, message: string, branch: string, shouldCreateBranch?: boolean): Promise<boolean> {
-    let filesToDelete: string[] = [];
-    if (await this.fileExistsInRepo(this.owner, this.repository, this.path, this.branch)) {
-      const allFiles = await this.read();
-      filesToDelete = allFiles.filter((file) => file.type === 'tokenSet').map((tokenFile) => (
-        `${this.path.split('/')[0]}/${tokenFile.path}`
-      ));
+    try {
+      const { data: target } = (await this.octokitClient.rest.repos.getContent({
+        owner: this.owner,
+        repo: this.repository,
+        path: this.path,
+      })) as
+        | { data: { path: string; sha: string } }
+        | { data: Array<{ path: string; sha: string }> };
+
+      if (Array.isArray(target)) {
+        for (const item of target) {
+          await this.octokitClient.rest.repos.deleteFile({
+            owner: this.owner,
+            repo: this.repository,
+            path: item.path,
+            message: `remove file ${item.path}`,
+            sha: item.sha,
+          });
+        }
+      }
+      const response = await this.octokitClient.repos.createOrUpdateFiles({
+        branch,
+        owner: this.owner,
+        repo: this.repository,
+        createBranch: shouldCreateBranch,
+        changes: [
+          {
+            message,
+            files: changeset,
+          },
+        ],
+      });
+      return !!response;
+    } catch {
+      const response = await this.octokitClient.repos.createOrUpdateFiles({
+        branch,
+        owner: this.owner,
+        repo: this.repository,
+        createBranch: shouldCreateBranch,
+        changes: [
+          {
+            message,
+            files: changeset,
+          },
+        ],
+      });
+      return !!response;
     }
-    const response = await this.octokitClient.repos.createOrUpdateFiles({
-      branch,
-      owner: this.owner,
-      repo: this.repository,
-      createBranch: shouldCreateBranch,
-      changes: [
-        {
-          message,
-          files: changeset,
-          filesToDelete,
-        },
-      ],
-    });
-    return !!response;
   }
 }
