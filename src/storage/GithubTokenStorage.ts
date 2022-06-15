@@ -210,21 +210,6 @@ export class GithubTokenStorage extends GitTokenStorage {
     }
   }
 
-  private async fileExistsInRepo(owner: string, repo: string, path: string, branch: string) {
-    try {
-      await this.octokitClient.rest.repos.getContent({
-        method: 'HEAD',
-        owner,
-        repo,
-        path,
-        ref: branch,
-      });
-      return true;
-    } catch (e) {
-      return false;
-    }
-  }
-
   public async writeChangeset(changeset: Record<string, string>, message: string, branch: string, modifiedTokenSet: string[], shouldCreateBranch?: boolean): Promise<boolean> {
     const filesToDelete = modifiedTokenSet.map((tokenSet) => (
       `${this.path}/${tokenSet}.json`
