@@ -7,7 +7,7 @@ import usePushDialog from '@/app/hooks/usePushDialog';
 import { notifyToUI } from '@/plugin/notifiers';
 import {
   activeThemeSelector,
-  localApiStateSelector, themesListSelector, tokensSelector, usedTokenSetSelector,
+  localApiStateSelector, themesListSelector, tokensSelector, usedTokenSetSelector, modifiedTokenSetSelector,
 } from '@/selectors';
 import { GithubTokenStorage } from '@/storage/GithubTokenStorage';
 import { isEqual } from '@/utils/isEqual';
@@ -28,6 +28,7 @@ export function useGitHub() {
   const themes = useSelector(themesListSelector);
   const localApiState = useSelector(localApiStateSelector);
   const usedTokenSet = useSelector(usedTokenSetSelector);
+  const modifiedTokenSetList = useSelector(modifiedTokenSetSelector);
   const { multiFileSync } = useFlags();
   const dispatch = useDispatch<Dispatch>();
   const { confirm } = useConfirm();
@@ -72,18 +73,18 @@ export function useGitHub() {
     }
 
     dispatch.uiState.setLocalApiState({ ...context });
-
+    console.log('modifiedTokenSetList', modifiedTokenSetList);
     const pushSettings = await pushDialog();
     if (pushSettings) {
       const { commitMessage, customBranch } = pushSettings;
       try {
         if (customBranch) storage.selectBranch(customBranch);
-        console.log("tokens", tokens)
         await storage.save({
           themes,
           tokens,
           metadata: { commitMessage },
-        });
+        }, modifiedTokenSetList);
+        dispatch.tokenState.resetModifiedTokenSet();
         dispatch.tokenState.setLastSyncedState(JSON.stringify([tokens, themes], null, 2));
         dispatch.uiState.setLocalApiState({ ...localApiState, branch: customBranch } as GithubCredentials);
         dispatch.uiState.setApiData({ ...context, branch: customBranch });

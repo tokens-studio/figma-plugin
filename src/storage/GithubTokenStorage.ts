@@ -19,6 +19,8 @@ type ExtendedOctokitClient = Omit<Octokit, 'repos'> & {
       changes: {
         message: string
         files: Record<string, string>,
+        filesToDelete: string[],
+        ignoreDeletionFailures?: boolean
       }[],
     }) => ReturnType<Octokit['repos']['createOrUpdateFileContents']>
   }
@@ -103,7 +105,6 @@ export class GithubTokenStorage extends GitTokenStorage {
         path: this.path,
         ref: this.branch,
       });
-      console.log('respnse', response);
 
       // read entire directory
       if (Array.isArray(response.data) && this.flags.multiFileEnabled) {
@@ -148,7 +149,6 @@ export class GithubTokenStorage extends GitTokenStorage {
                 ref: this.branch,
               }) : Promise.resolve(null)
             )));
-            console.log('jsonFilecone', jsonFileContents);
             return compact(jsonFileContents.map<RemoteTokenStorageFile<GitStorageMetadata> | null>((fileContent, index) => {
               const { path } = jsonFiles[index];
 
@@ -167,7 +167,6 @@ export class GithubTokenStorage extends GitTokenStorage {
                     path,
                     type: 'themes',
                     data: parsed as ThemeObjectsList,
-                    sha: fileContent.data.sha,
                   };
                 }
 
@@ -176,7 +175,6 @@ export class GithubTokenStorage extends GitTokenStorage {
                   name,
                   type: 'tokenSet',
                   data: parsed as AnyTokenSet<false>,
-                  sha: fileContent.data.sha,
                 };
               }
 
@@ -227,118 +225,31 @@ export class GithubTokenStorage extends GitTokenStorage {
     }
   }
 
-  public async writeChangeset(changeset: Record<string, string>, message: string, branch: string, shouldCreateBranch?: boolean): Promise<boolean> {
-    try {
-      // const { data: target } = (await this.octokitClient.rest.repos.getContent({
-      //   owner: this.owner,
-      //   repo: this.repository,
-      //   path: this.path,
-      // })) as
-      //   | { data: { path: string; sha: string } }
-      //   | { data: Array<{ path: string; sha: string }> };
-
-      // console.log("targetfirst", target)
-      // if (Array.isArray(target)) {
-      //   const jsonFiles = target.filter((file) => (
-      //     file.path?.endsWith('.json')
-      //   )).sort((a, b) => (
-      //     (a.path && b.path) ? a.path.localeCompare(b.path) : 0
-      //   ));
-      //   for (const item of jsonFiles) {
-      //     await this.octokitClient.rest.repos.deleteFile({
-      //       owner: this.owner,
-      //       repo: this.repository,
-      //       path: item.path,
-      //       message: `remove file ${item.path}`,
-      //       sha: item.sha,
-      //     });
-      //   }
-      // }
-
-      const readData = await this.octokitClient.rest.repos.getContent({
-        owner: this.owner,
-        repo: this.repository,
-        path: this.path,
-      });
-
-      if (Array.isArray(readData.data) && this.flags.multiFileEnabled) {
-        const directoryTreeResponse = await this.octokitClient.rest.git.createTree({
-          owner: this.owner,
-          repo: this.repository,
-          tree: readData.data.map((item) => ({
-            path: item.path,
-            sha: item.sha,
-            mode: getTreeMode(item.type),
-          })),
-        });
-
-        if (directoryTreeResponse.data.tree[0].sha) {
-          const treeResponse = await this.octokitClient.rest.git.getTree({
-            owner: this.owner,
-            repo: this.repository,
-            tree_sha: directoryTreeResponse.data.tree[0].sha,
-            recursive: 'true',
-          });
-
-          if (treeResponse.data.tree.length > 0) {
-            const jsonFiles = treeResponse.data.tree.filter((file) => (
-              file.path?.endsWith('.json')
-            )).sort((a, b) => (
-              (a.path && b.path) ? a.path.localeCompare(b.path) : 0
-            ));
-            console.log('deletejsonFiles', jsonFiles);
-            for (const item of jsonFiles) {
-              if (item.path && item.sha) {
-                await this.octokitClient.rest.repos.deleteFile({
-                  owner: this.owner,
-                  repo: this.repository,
-                  path: `${this.path.split('/')[0]}/${item.path}`,
-                  message: `remove file ${item.path}`,
-                  sha: item.sha,
-                });
-              }
-            }
-
-            // await Promise.all(jsonFiles.map(async (treeItem) => {
-            //   treeItem.path && treeItem.sha ? this.octokitClient.rest.repos.deleteFile({
-            //     owner: this.owner,
-            //     repo: this.repository,
-            //     path: `${this.path.split('/')[0]}/${treeItem.path}`,
-            //     message: `remove file ${treeItem.path}`,
-            //     sha: treeItem.sha,
-            //   }) : Promise.resolve(null)
-            // }));
-          }
-        }
-      }
-
-      const response = await this.octokitClient.repos.createOrUpdateFiles({
-        branch,
-        owner: this.owner,
-        repo: this.repository,
-        createBranch: shouldCreateBranch,
-        changes: [
-          {
-            message,
-            files: changeset,
-          },
-        ],
-      });
-      return !!response;
-    } catch {
-      const response = await this.octokitClient.repos.createOrUpdateFiles({
-        branch,
-        owner: this.owner,
-        repo: this.repository,
-        createBranch: shouldCreateBranch,
-        changes: [
-          {
-            message,
-            files: changeset,
-          },
-        ],
-      });
-      return !!response;
-    }
+  public async writeChangeset(changeset: Record<string, string>, message: string, branch: string, modifiedTokenSet: string[], shouldCreateBranch?: boolean): Promise<boolean> {
+    const filesToDelete = modifiedTokenSet.map((tokenSet) => (
+      `${this.path.split('/')[0]}/${tokenSet}`
+    ));
+    // if (await this.fileExistsInRepo(this.owner, this.repository, this.path, this.branch)) {
+    //   const allFiles = await this.read();
+    //   filesToDelete = allFiles.filter((file) => file.type === 'tokenSet').map((tokenFile) => (
+    //     `${this.path.split('/')[0]}/${tokenFile.path}`
+    //   ));
+    // }
+    console.log('filesto', filesToDelete);
+    const response = await this.octokitClient.repos.createOrUpdateFiles({
+      branch,
+      owner: this.owner,
+      repo: this.repository,
+      createBranch: shouldCreateBranch,
+      changes: [
+        {
+          message,
+          files: changeset,
+          filesToDelete,
+          ignoreDeletionFailures: true,
+        },
+      ],
+    });
+    return !!response;
   }
 }

@@ -72,6 +72,8 @@ export default function TokenSetSelector() {
     });
     if (userConfirmation) {
       dispatch.tokenState.deleteTokenSet(tokenSet);
+      console.log('tokenSet', tokenSet);
+      dispatch.tokenState.setModifiedTokenSet(tokenSet);
     }
   }, [confirm, dispatch]);
 
@@ -95,6 +97,8 @@ export default function TokenSetSelector() {
   const handleRenameTokenSetSubmit = React.useCallback((e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     dispatch.tokenState.renameTokenSet({ oldName: tokenSetMarkedForChange, newName: newTokenSetName.trim() });
+    console.log('tokenSetMarkedForChange', tokenSetMarkedForChange);
+    dispatch.tokenState.setModifiedTokenSet(tokenSetMarkedForChange);
     setTokenSetMarkedForChange('');
     setShowRenameTokenSetFields(false);
   }, [dispatch, newTokenSetName, tokenSetMarkedForChange]);

@@ -6,7 +6,7 @@ import useConfirm from '@/app/hooks/useConfirm';
 import usePushDialog from '@/app/hooks/usePushDialog';
 import { notifyToUI } from '../../../../plugin/notifiers';
 import {
-  localApiStateSelector, tokensSelector, themesListSelector, activeThemeSelector, usedTokenSetSelector,
+  localApiStateSelector, tokensSelector, themesListSelector, activeThemeSelector, usedTokenSetSelector, modifiedTokenSetSelector,
 } from '@/selectors';
 import { ADOTokenStorage } from '@/storage/ADOTokenStorage';
 import { isEqual } from '@/utils/isEqual';
@@ -27,6 +27,7 @@ export const useADO = () => {
   const localApiState = useSelector(localApiStateSelector);
   const activeTheme = useSelector(activeThemeSelector);
   const usedTokenSets = useSelector(usedTokenSetSelector);
+  const modifiedTokenSetList = useSelector(modifiedTokenSetSelector);
   const dispatch = useDispatch<Dispatch>();
   const { multiFileSync } = useFlags();
   const { confirm } = useConfirm();
@@ -80,8 +81,8 @@ export const useADO = () => {
           themes,
           tokens,
           metadata: { commitMessage },
-        });
-
+        }, modifiedTokenSetList);
+        dispatch.tokenState.resetModifiedTokenSet();
         dispatch.uiState.setLocalApiState({ ...localApiState, branch: customBranch } as AdoCredentials);
         dispatch.uiState.setApiData({ ...context, branch: customBranch });
 

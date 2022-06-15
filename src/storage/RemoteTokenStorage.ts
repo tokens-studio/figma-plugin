@@ -34,10 +34,10 @@ export type RemoteTokenStorageFile<Metadata = unknown> =
   | RemoteTokenStorageMetadataFile<Metadata>;
 
 export abstract class RemoteTokenStorage<Metadata = unknown> {
-  public abstract write(files: RemoteTokenStorageFile<Metadata>[]): Promise<boolean>;
+  public abstract write(files: RemoteTokenStorageFile<Metadata>[], modifiedTokenSet?: string[]): Promise<boolean>;
   public abstract read(): Promise<RemoteTokenStorageFile<Metadata>[]>;
 
-  public async save(data: RemoteTokenStorageData<Metadata>): Promise<boolean> {
+  public async save(data: RemoteTokenStorageData<Metadata>, modifiedTokenSet?: string[]): Promise<boolean> {
     const files: RemoteTokenStorageFile<Metadata>[] = [];
 
     // First we'll convert the incoming data into files
@@ -66,8 +66,8 @@ export abstract class RemoteTokenStorage<Metadata = unknown> {
         path: '$metadata.json',
         data: data.metadata,
       });
-    }    
-    return this.write(files);
+    }
+    return this.write(files, modifiedTokenSet);
   }
 
   public async retrieve(): Promise<RemoteTokenStorageData<Metadata> | null> {

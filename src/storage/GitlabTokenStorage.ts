@@ -177,7 +177,7 @@ export class GitlabTokenStorage extends GitTokenStorage {
     return [];
   }
 
-  public async writeChangeset(changeset: Record<string, string>, message: string, branch: string, shouldCreateBranch?: boolean): Promise<boolean> {
+  public async writeChangeset(changeset: Record<string, string>, message: string, branch: string, modifiedTokenSet: string[], shouldCreateBranch?: boolean): Promise<boolean> {
     if (!this.projectId) throw new Error('Missing Project ID');
 
     const branches = await this.fetchBranches();

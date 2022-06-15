@@ -7,7 +7,7 @@ import usePushDialog from '@/app/hooks/usePushDialog';
 import { notifyToUI } from '@/plugin/notifiers';
 import {
   activeThemeSelector,
-  localApiStateSelector, themesListSelector, tokensSelector, usedTokenSetSelector,
+  localApiStateSelector, themesListSelector, tokensSelector, usedTokenSetSelector, modifiedTokenSetSelector,
 } from '@/selectors';
 import { GitlabTokenStorage } from '@/storage/GitlabTokenStorage';
 import { isEqual } from '@/utils/isEqual';
@@ -28,6 +28,7 @@ export function useGitLab() {
   const localApiState = useSelector(localApiStateSelector);
   const usedTokenSet = useSelector(usedTokenSetSelector);
   const activeTheme = useSelector(activeThemeSelector);
+  const modifiedTokenSetList = useSelector(modifiedTokenSetSelector);
   const { multiFileSync } = useFlags();
   const dispatch = useDispatch<Dispatch>();
 
@@ -79,7 +80,8 @@ export function useGitLab() {
           themes,
           tokens,
           metadata: { commitMessage },
-        });
+        }, modifiedTokenSetList);
+        dispatch.tokenState.resetModifiedTokenSet();
         dispatch.tokenState.setLastSyncedState(JSON.stringify([tokens, themes], null, 2));
         dispatch.uiState.setLocalApiState({ ...localApiState, branch: customBranch } as GitlabCredentials);
         dispatch.uiState.setApiData({ ...context, branch: customBranch });

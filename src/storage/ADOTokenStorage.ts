@@ -325,7 +325,7 @@ export class ADOTokenStorage extends GitTokenStorage {
     return response;
   }
 
-  public async writeChangeset(changeset: Record<string, string>, message: string, branch: string, shouldCreateBranch: boolean = false): Promise<boolean> {
+  public async writeChangeset(changeset: Record<string, string>, message: string, branch: string, modifiedTokenSet: string[], shouldCreateBranch: boolean = false): Promise<boolean> {
     const oldObjectId = await this.getOldObjectId(this.source, shouldCreateBranch);
     const { value } = await this.getItems();
     const tokensOnRemote = value?.map((val) => val.path) ?? [];

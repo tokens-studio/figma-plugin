@@ -6,7 +6,7 @@ import * as pjs from '../../../../package.json';
 import useStorage from '../useStorage';
 import { compareUpdatedAt } from '@/utils/date';
 import {
-  activeThemeSelector, themesListSelector, tokensSelector, usedTokenSetSelector,
+  activeThemeSelector, themesListSelector, tokensSelector, usedTokenSetSelector, modifiedTokenSetSelector,
 } from '@/selectors';
 import { UpdateRemoteFunctionPayload } from '@/types/UpdateRemoteFunction';
 import { JSONBinTokenStorage } from '@/storage';
@@ -19,6 +19,7 @@ export async function updateJSONBinTokens({
   tokens, themes, context, updatedAt, oldUpdatedAt = null,
 }: UpdateRemoteFunctionPayload) {
   const { id, secret } = context;
+
   try {
     if (!id || !secret) throw new Error('Missing JSONBin ID or secret');
 

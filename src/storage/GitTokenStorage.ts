@@ -75,10 +75,11 @@ export abstract class GitTokenStorage extends RemoteTokenStorage<GitStorageMetad
     changeset: Record<string, string>,
     message: string,
     branch: string,
-    shouldCreateBranch?: boolean
+    modifiedTokenSet: string[],
+    shouldCreateBranch?: boolean,
   ): Promise<boolean>;
 
-  public async write(files: RemoteTokenStorageFile<GitStorageMetadata>[]): Promise<boolean> {
+  public async write(files: RemoteTokenStorageFile<GitStorageMetadata>[], modifiedTokenSet: string[]): Promise<boolean> {
     const branches = await this.fetchBranches();
     if (!branches) return false;
 
@@ -105,11 +106,12 @@ export abstract class GitTokenStorage extends RemoteTokenStorage<GitStorageMetad
         }
       });
     }
-    console.log("fileschangest", filesChangeset)
+    console.log('fileschangest', filesChangeset);
     return this.writeChangeset(
       filesChangeset,
       metadataFile?.data.commitMessage ?? 'Commit from Figma',
       this.branch,
+      modifiedTokenSet,
       !branches.includes(this.branch),
     );
   }
