@@ -53,14 +53,9 @@ export function Initiator() {
 
   const removeDuplicatedProviders = useCallback((providers: StorageTypeCredentials[]) => {
     const uniqProviders: StorageTypeCredentials[] = [];
-    console.log('before', providers, uniqProviders);
-    providers.forEach((p) => {
-      if (uniqProviders.includes(p)) {
-        console.log('p', p, 'uniqProviders', uniqProviders);
-        uniqProviders.push(p);
-      }
+    providers.forEach((provider) => {
+      if (!uniqProviders.find((p) => p.id === provider.id)) { uniqProviders.push(provider); }
     });
-    console.log('after', uniqProviders);
     return uniqProviders;
   }, []);
 

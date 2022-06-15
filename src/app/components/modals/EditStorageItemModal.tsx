@@ -1,12 +1,10 @@
 import React from 'react';
-import { useSelector } from 'react-redux';
 import Modal from '../Modal';
 import Heading from '../Heading';
 import StorageItemForm from '../StorageItemForm';
 import useRemoteTokens from '../../store/remoteTokens';
 import Stack from '../Stack';
 import { StorageTypeFormValues } from '@/types/StorageType';
-import { apiProvidersSelector } from '@/selectors';
 
 type Props = {
   isOpen: boolean;
@@ -20,13 +18,12 @@ export default function EditStorageItemModal({
 }: Props) {
   const [formFields, setFormFields] = React.useState<StorageTypeFormValues<true>>(initialValue);
   const [hasErrored, setHasErrored] = React.useState(false);
-  const apiProviders = useSelector(apiProvidersSelector);
   const { addNewProviderItem } = useRemoteTokens();
 
   const handleChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setFormFields({ ...formFields, [e.target.name]: e.target.value });
   }, [formFields]);
-  console.log(apiProviders);
+
   const handleSubmit = React.useCallback(async (values: StorageTypeFormValues<false>) => {
     const response = await addNewProviderItem(values);
     if (!response) {

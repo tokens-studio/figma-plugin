@@ -54,7 +54,7 @@ const SyncSettings = () => {
   const selectedRemoteProvider = React.useMemo(() => [StorageProviderType.JSONBIN, StorageProviderType.GITHUB, StorageProviderType.GITLAB, StorageProviderType.ADO, StorageProviderType.URL].includes(
     storageProvider as StorageProviderType,
   ), [storageProvider]);
-  console.log('apiProviders', apiProviders);
+
   const storedApiProviders = () => apiProviders.filter((item) => item.provider === storageProvider);
 
   const storageProviderText = () => {
