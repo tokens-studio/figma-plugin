@@ -51,6 +51,19 @@ export function Initiator() {
     })
   ), []);
 
+  const removeDuplicatedProviders = useCallback((providers: StorageTypeCredentials[]) => {
+    const uniqProviders: StorageTypeCredentials[] = [];
+    console.log('before', providers, uniqProviders);
+    providers.forEach((p) => {
+      if (uniqProviders.includes(p)) {
+        console.log('p', p, 'uniqProviders', uniqProviders);
+        uniqProviders.push(p);
+      }
+    });
+    console.log('after', uniqProviders);
+    return uniqProviders;
+  }, []);
+
   useEffect(() => {
     onInitiate();
     window.onmessage = async (event: {
@@ -186,7 +199,7 @@ export function Initiator() {
             break;
           }
           case MessageFromPluginTypes.API_PROVIDERS: {
-            dispatch.uiState.setAPIProviders(pluginMessage.providers);
+            dispatch.uiState.setAPIProviders(removeDuplicatedProviders(pluginMessage.providers));
             break;
           }
           case MessageFromPluginTypes.UI_SETTINGS: {
