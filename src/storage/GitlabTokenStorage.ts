@@ -191,6 +191,12 @@ export class GitlabTokenStorage extends GitTokenStorage {
     });
     const filesInTrees = tree.map((t) => t.path);
 
+    await Promise.all(filesInTrees.filter((file) => (
+      file.endsWith('.json')
+    )).map((file) => (
+      this.gitlabClient.RepositoryFiles.remove(this.projectId!, file, this.branch, `remove file ${file}`)
+    )));
+
     const response = await this.gitlabClient.Commits.create(
       this.projectId,
       branch,
