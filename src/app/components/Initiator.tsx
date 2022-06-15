@@ -99,7 +99,7 @@ export function Initiator() {
             const storageType = values.storageType?.provider;
             if (!existChanges
               || ((storageType && storageType !== StorageProviderType.LOCAL)
-              && existChanges && await askUserIfPull(storageType))) {
+                && existChanges && await askUserIfPull(storageType))) {
               featureFlags = await fetchFeatureFlags(userData);
               getApiCredentials(true, featureFlags);
             } else {
