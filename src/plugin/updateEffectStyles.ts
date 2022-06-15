@@ -15,7 +15,7 @@ export default function updateEffectStyles(effectTokens: SingleBoxShadowToken<tr
       setEffectValuesOnTarget(effectStyle, token);
     } else if (shouldCreate) {
       const style = figma.createEffectStyle();
-      style.name = token.name;
+      style.name = token.path;
       tokenToStyleMap[token.path] = style.id;
       setEffectValuesOnTarget(style, token);
     }
