@@ -118,6 +118,7 @@ export function useGitLab() {
     localApiState,
     usedTokenSet,
     activeTheme,
+    modifiedTokenSetList,
   ]);
 
   const checkAndSetAccess = useCallback(async ({ context, owner, repo }: { context: GitlabCredentials; owner: string; repo: string }) => {

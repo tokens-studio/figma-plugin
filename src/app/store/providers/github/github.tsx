@@ -73,7 +73,6 @@ export function useGitHub() {
     }
 
     dispatch.uiState.setLocalApiState({ ...context });
-    console.log('modifiedTokenSetList', modifiedTokenSetList);
     const pushSettings = await pushDialog();
     if (pushSettings) {
       const { commitMessage, customBranch } = pushSettings;
@@ -120,6 +119,7 @@ export function useGitHub() {
     localApiState,
     usedTokenSet,
     activeTheme,
+    modifiedTokenSetList,
   ]);
 
   const checkAndSetAccess = useCallback(async ({ context, owner, repo }: { context: GithubCredentials; owner: string; repo: string }) => {

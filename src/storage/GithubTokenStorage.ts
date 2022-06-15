@@ -227,15 +227,8 @@ export class GithubTokenStorage extends GitTokenStorage {
 
   public async writeChangeset(changeset: Record<string, string>, message: string, branch: string, modifiedTokenSet: string[], shouldCreateBranch?: boolean): Promise<boolean> {
     const filesToDelete = modifiedTokenSet.map((tokenSet) => (
-      `${this.path.split('/')[0]}/${tokenSet}`
+      `${this.path}/${tokenSet}.json`
     ));
-    // if (await this.fileExistsInRepo(this.owner, this.repository, this.path, this.branch)) {
-    //   const allFiles = await this.read();
-    //   filesToDelete = allFiles.filter((file) => file.type === 'tokenSet').map((tokenFile) => (
-    //     `${this.path.split('/')[0]}/${tokenFile.path}`
-    //   ));
-    // }
-    console.log('filesto', filesToDelete);
     const response = await this.octokitClient.repos.createOrUpdateFiles({
       branch,
       owner: this.owner,

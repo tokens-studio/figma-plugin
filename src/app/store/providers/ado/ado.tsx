@@ -110,6 +110,7 @@ export const useADO = () => {
     themes,
     pushDialog,
     localApiState,
+    modifiedTokenSetList,
   ]);
 
   const checkAndSetAccess = React.useCallback(async (context: AdoCredentials) => {
