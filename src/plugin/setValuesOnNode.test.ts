@@ -59,6 +59,8 @@ describe('updateNode', () => {
     solidNodeMock = {
       type: 'SOLID',
       effects: [],
+      getSharedPluginData: () => '',
+      setSharedPluginData: () => undefined,
     };
   });
 
