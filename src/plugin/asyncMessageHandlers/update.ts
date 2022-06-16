@@ -8,7 +8,6 @@ import { updatePluginData } from '../pluginData';
 import updateStyles from '../updateStyles';
 
 export const update: AsyncMessageChannelHandlers[AsyncMessageTypes.UPDATE] = async (msg) => {
-  console.log('modified', msg.modifiedTokenSet);
   if (msg.settings.updateStyles && msg.tokens) {
     updateStyles(msg.tokens, false, msg.settings);
   }

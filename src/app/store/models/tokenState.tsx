@@ -170,15 +170,12 @@ export const tokenState = createModel<RootModel>()({
       lastSyncedState: data,
     }),
     setModifiedTokenSet: (state, data: string | string[]) => {
-      console.log('data', data);
       if (Array.isArray(data)) {
-        console.log('array', [...state.modifiedTokenSet, ...data]);
         return {
           ...state,
           modifiedTokenSet: [...state.modifiedTokenSet, ...data],
         };
       }
-      console.log('single', [...state.modifiedTokenSet, data]);
       return {
         ...state,
         modifiedTokenSet: [...state.modifiedTokenSet, data],

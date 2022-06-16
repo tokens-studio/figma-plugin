@@ -58,7 +58,7 @@ export default function TokenSetSelector() {
     handleNewTokenSetNameChange('');
   }, [tokens]);
 
-  const checkShouldDeleteTokenSet = React.useCallback((modifiedTokenSet: string) => (
+  const checkShouldModifyTokenSet = React.useCallback((modifiedTokenSet: string) => (
     Object.keys(JSON.parse(lastSyncedState)[0]).some((tokenSet) => tokenSet === modifiedTokenSet)
   ), [lastSyncedState]);
 
@@ -77,7 +77,7 @@ export default function TokenSetSelector() {
     });
     if (userConfirmation) {
       dispatch.tokenState.deleteTokenSet(tokenSet);
-      if (checkShouldDeleteTokenSet(tokenSet)) {
+      if (checkShouldModifyTokenSet(tokenSet)) {
         dispatch.tokenState.setModifiedTokenSet(tokenSet);
       }
     }
@@ -103,7 +103,7 @@ export default function TokenSetSelector() {
   const handleRenameTokenSetSubmit = React.useCallback((e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     dispatch.tokenState.renameTokenSet({ oldName: tokenSetMarkedForChange, newName: newTokenSetName.trim() });
-    if (checkShouldDeleteTokenSet(tokenSetMarkedForChange)) {
+    if (checkShouldModifyTokenSet(tokenSetMarkedForChange)) {
       dispatch.tokenState.setModifiedTokenSet(tokenSetMarkedForChange);
     }
     setTokenSetMarkedForChange('');
