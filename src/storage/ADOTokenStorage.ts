@@ -4,7 +4,7 @@ import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StorageTypeCredentials } from '@/types/StorageType';
 import { GitStorageMetadata, GitTokenStorage } from './GitTokenStorage';
 import { RemoteTokenStorageFile, RemoteTokenStorageSingleTokenSetFile, RemoteTokenStorageThemesFile } from './RemoteTokenStorage';
-import { multiFileSchema, complexSingleFileSchema } from './schemas';
+import { complexSingleFileSchema } from './schemas';
 
 const apiVersion = 'api-version=6.0';
 
@@ -237,7 +237,7 @@ export class ADOTokenStorage extends GitTokenStorage {
         const jsonFileContents = compact(await Promise.all(
           jsonFiles.map(async ({ path }) => {
             const res = await this.getItem(path);
-            const validationResult = await multiFileSchema.safeParseAsync(res);
+            const validationResult = await complexSingleFileSchema.safeParseAsync(res);
             if (validationResult.success) {
               return validationResult.data;
             }
@@ -273,7 +273,6 @@ export class ADOTokenStorage extends GitTokenStorage {
 
       const singleItem = await this.getItem();
       const singleItemValidationResult = await complexSingleFileSchema.safeParseAsync(singleItem);
-
       if (singleItemValidationResult.success) {
         const { $themes = [], ...data } = singleItemValidationResult.data;
 
