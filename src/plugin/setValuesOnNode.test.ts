@@ -52,6 +52,8 @@ describe('updateNode', () => {
         family: 'Inter',
         style: 'Regular',
       },
+      getSharedPluginData: () => '',
+      setSharedPluginData: () => undefined,
     };
 
     solidNodeMock = {
