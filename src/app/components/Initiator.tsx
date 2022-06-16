@@ -51,14 +51,6 @@ export function Initiator() {
     })
   ), []);
 
-  const removeDuplicatedProviders = useCallback((providers: StorageTypeCredentials[]) => {
-    const uniqProviders: StorageTypeCredentials[] = [];
-    providers.forEach((provider) => {
-      if (!uniqProviders.find((p) => p.id === provider.id)) { uniqProviders.push(provider); }
-    });
-    return uniqProviders;
-  }, []);
-
   useEffect(() => {
     onInitiate();
     window.onmessage = async (event: {
@@ -194,7 +186,11 @@ export function Initiator() {
             break;
           }
           case MessageFromPluginTypes.API_PROVIDERS: {
-            dispatch.uiState.setAPIProviders(removeDuplicatedProviders(pluginMessage.providers));
+            const uniqProviders: StorageTypeCredentials[] = [];
+            pluginMessage.providers.forEach((provider) => {
+              if (!uniqProviders.find((p) => p.id === provider.id)) { uniqProviders.push(provider); }
+            });
+            dispatch.uiState.setAPIProviders(uniqProviders);
             break;
           }
           case MessageFromPluginTypes.UI_SETTINGS: {
