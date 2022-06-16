@@ -169,10 +169,21 @@ export const tokenState = createModel<RootModel>()({
       ...state,
       lastSyncedState: data,
     }),
-    setModifiedTokenSet: (state, data: string | string[]) => ({
-      ...state,
-      modifiedTokenSet: [...state.modifiedTokenSet, ...data],
-    }),
+    setModifiedTokenSet: (state, data: string | string[]) => {
+      console.log('data', data);
+      if (Array.isArray(data)) {
+        console.log('array', [...state.modifiedTokenSet, ...data]);
+        return {
+          ...state,
+          modifiedTokenSet: [...state.modifiedTokenSet, ...data],
+        };
+      }
+      console.log('single', [...state.modifiedTokenSet, data]);
+      return {
+        ...state,
+        modifiedTokenSet: [...state.modifiedTokenSet, data],
+      };
+    },
     resetModifiedTokenSet: (state) => ({
       ...state,
       modifiedTokenSet: [],
@@ -472,6 +483,9 @@ export const tokenState = createModel<RootModel>()({
       dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
     },
     setTokenSetOrder() {
+      dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
+    },
+    setModifiedTokenSet() {
       dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
     },
     setJSONData() {

@@ -24,6 +24,7 @@ export const initiate: AsyncMessageChannelHandlers[AsyncMessageTypes.INITIATE] =
     const lastOpened = await getLastOpened();
     const storageType = await getSavedStorageType();
     const modifiedTokenSet = await getModifiedTokenSet();
+    console.log('initia', modifiedTokenSet);
     store.inspectDeep = settings.inspectDeep;
     if (currentUser) {
       notifyUserId({
