@@ -1,4 +1,7 @@
-const mockFetchPromise = Promise.resolve({
-  json: () => Promise.resolve({}),
-});
-global.fetch = jest.fn(() => mockFetchPromise);
+module.exports.mockFetch = jest.fn(() => (
+  Promise.resolve({
+    ok: true,
+    json: () => Promise.resolve({})
+  })
+))
+global.fetch = module.exports.mockFetch;
