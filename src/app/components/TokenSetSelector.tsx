@@ -13,7 +13,7 @@ import Box from './Box';
 import { styled } from '@/stitches.config';
 import TokenSetList from './TokenSetList';
 import {
-  editProhibitedSelector, tokensSelector,
+  editProhibitedSelector, tokensSelector, lastSyncedStateSelector,
 } from '@/selectors';
 import Stack from './Stack';
 import { useIsGithubMultiFileEnabled } from '../hooks/useIsGithubMultiFileEnabled';
@@ -37,6 +37,7 @@ const StyledButton = styled('button', {
 export default function TokenSetSelector() {
   const tokens = useSelector(tokensSelector);
   const editProhibited = useSelector(editProhibitedSelector);
+  const lastSyncedState = useSelector(lastSyncedStateSelector);
   const mfsEnabled = useIsGithubMultiFileEnabled();
   const dispatch = useDispatch<Dispatch>();
   const { confirm } = useConfirm();
@@ -57,6 +58,10 @@ export default function TokenSetSelector() {
     handleNewTokenSetNameChange('');
   }, [tokens]);
 
+  const checkShouldDeleteTokenSet = React.useCallback((modifiedTokenSet: string) => (
+    Object.keys(JSON.parse(lastSyncedState)[0]).some((tokenSet) => tokenSet === modifiedTokenSet)
+  ), [lastSyncedState]);
+
   const handleNewTokenSetSubmit = React.useCallback((e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     track('Created token set', { name: newTokenSetName });
@@ -72,7 +77,9 @@ export default function TokenSetSelector() {
     });
     if (userConfirmation) {
       dispatch.tokenState.deleteTokenSet(tokenSet);
-      dispatch.tokenState.setModifiedTokenSet(tokenSet);
+      if (checkShouldDeleteTokenSet(tokenSet)) {
+        dispatch.tokenState.setModifiedTokenSet(tokenSet);
+      }
     }
   }, [confirm, dispatch]);
 
@@ -96,7 +103,9 @@ export default function TokenSetSelector() {
   const handleRenameTokenSetSubmit = React.useCallback((e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     dispatch.tokenState.renameTokenSet({ oldName: tokenSetMarkedForChange, newName: newTokenSetName.trim() });
-    dispatch.tokenState.setModifiedTokenSet(tokenSetMarkedForChange);
+    if (checkShouldDeleteTokenSet(tokenSetMarkedForChange)) {
+      dispatch.tokenState.setModifiedTokenSet(tokenSetMarkedForChange);
+    }
     setTokenSetMarkedForChange('');
     setShowRenameTokenSetFields(false);
   }, [dispatch, newTokenSetName, tokenSetMarkedForChange]);

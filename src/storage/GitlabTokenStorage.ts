@@ -194,29 +194,37 @@ export class GitlabTokenStorage extends GitTokenStorage {
     const filesToDelete = modifiedTokenSet.map((tokenSet) => (
       `${this.path}/${tokenSet}.json`
     ));
-    console.log('filestodelete', filesToDelete);
-    for (const file of filesToDelete) {
-      await this.gitlabClient.RepositoryFiles.remove(this.projectId!, file, this.branch, `remove file ${file}`);
-    }
-    // await Promise.all(filesInTrees.filter((file) => (
-    //   file.endsWith('.json')
-    // )).map((file) => (
-    //   this.gitlabClient.RepositoryFiles.remove(this.projectId!, file, this.branch, `remove file ${file}`)
-    // )));
 
-    const response = await this.gitlabClient.Commits.create(
-      this.projectId,
-      branch,
-      message,
-      Object.entries(changeset).map(([filePath, content]) => ({
-        action: filesInTrees.includes(filePath) ? 'update' : 'create',
-        filePath,
-        content,
-      })),
-      shouldCreateBranch ? {
-        startBranch: branches[0],
-      } : undefined,
-    );
-    return !!response;
+    try {
+      await this.gitlabClient.Commits.create(
+        this.projectId,
+        branch,
+        message,
+        filesToDelete.map((filePath) => ({
+          action: 'delete',
+          filePath,
+        })),
+        shouldCreateBranch ? {
+          startBranch: branches[0],
+        } : undefined,
+      );
+
+      const response = await this.gitlabClient.Commits.create(
+        this.projectId,
+        branch,
+        message,
+        Object.entries(changeset).map(([filePath, content]) => ({
+          action: filesInTrees.includes(filePath) ? 'update' : 'create',
+          filePath,
+          content,
+        })),
+        shouldCreateBranch ? {
+          startBranch: branches[0],
+        } : undefined,
+      );
+      return !!response;
+    } catch {
+      return false;
+    }
   }
 }
