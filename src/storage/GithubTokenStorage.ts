@@ -116,11 +116,11 @@ export class GithubTokenStorage extends GitTokenStorage {
           })),
         });
 
-        if (directoryTreeResponse.data.tree[0].sha) {
+        if (directoryTreeResponse.data.sha) {
           const treeResponse = await this.octokitClient.rest.git.getTree({
             owner: this.owner,
             repo: this.repository,
-            tree_sha: directoryTreeResponse.data.tree[0].sha,
+            tree_sha: directoryTreeResponse.data.sha,
             recursive: 'true',
           });
 

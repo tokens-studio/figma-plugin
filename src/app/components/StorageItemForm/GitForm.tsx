@@ -83,11 +83,11 @@ export default function GitForm({
         <Input
           full
           label="File Path (e.g. data/tokens.json)"
+          defaultValue=""
           value={values.filePath}
           onChange={onChange}
           type="text"
           name="filePath"
-          required
         />
         <Input
           full

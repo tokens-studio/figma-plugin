@@ -255,6 +255,7 @@ describe('GithubTokenStorage', () => {
     mockCreateTree.mockImplementationOnce(() => (
       Promise.resolve({
         data: {
+          sha: 'sha(data)',
           tree: [
             {
               type: 'tree',
@@ -269,6 +270,7 @@ describe('GithubTokenStorage', () => {
     mockGetTree.mockImplementationOnce(() => (
       Promise.resolve({
         data: {
+          sha: 'sha(data)',
           tree: [
             { path: '$themes.json', type: 'blob', sha: 'sha($themes.json)' },
             { path: 'global.json', type: 'blob', sha: 'sha(global.json)' },
