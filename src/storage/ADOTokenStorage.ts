@@ -4,7 +4,7 @@ import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StorageTypeCredentials } from '@/types/StorageType';
 import { GitStorageMetadata, GitTokenStorage } from './GitTokenStorage';
 import { RemoteTokenStorageFile, RemoteTokenStorageSingleTokenSetFile, RemoteTokenStorageThemesFile } from './RemoteTokenStorage';
-import { complexSingleFileSchema } from './schemas';
+import { multiFileSchema, complexSingleFileSchema } from './schemas';
 
 const apiVersion = 'api-version=6.0';
 
@@ -234,7 +234,7 @@ export class ADOTokenStorage extends GitTokenStorage {
 
         if (!jsonFiles.length) return [];
 
-        const jsonFileContents = compact(await Promise.all(
+        const jsonFileContents = await Promise.all(
           jsonFiles.map(async ({ path }) => {
             const res = await this.getItem(path);
             const validationResult = await complexSingleFileSchema.safeParseAsync(res);
@@ -243,12 +243,11 @@ export class ADOTokenStorage extends GitTokenStorage {
             }
             return null;
           }),
-        ));
+        );
         return compact(jsonFileContents.map<RemoteTokenStorageFile<GitStorageMetadata> | null>((fileContent, index) => {
           const { path } = jsonFiles[index];
-          if (fileContent) {
-            const name = path?.split(/[\\/]/).pop()?.replace(/\.json$/, '');
-
+          if (fileContent && path) {
+            const name = path.replace(`/${this.path}/`, '').replace('.json', '');
             if (name === '$themes' && Array.isArray(fileContent)) {
               return {
                 path,
@@ -273,6 +272,7 @@ export class ADOTokenStorage extends GitTokenStorage {
 
       const singleItem = await this.getItem();
       const singleItemValidationResult = await complexSingleFileSchema.safeParseAsync(singleItem);
+
       if (singleItemValidationResult.success) {
         const { $themes = [], ...data } = singleItemValidationResult.data;
 
