@@ -6,7 +6,7 @@ import * as pjs from '../../../../package.json';
 import useStorage from '../useStorage';
 import { compareUpdatedAt } from '@/utils/date';
 import {
-  activeThemeSelector, themesListSelector, tokensSelector, usedTokenSetSelector, modifiedTokenSetSelector,
+  activeThemeSelector, themesListSelector, tokensSelector, usedTokenSetSelector,
 } from '@/selectors';
 import { UpdateRemoteFunctionPayload } from '@/types/UpdateRemoteFunction';
 import { JSONBinTokenStorage } from '@/storage';
