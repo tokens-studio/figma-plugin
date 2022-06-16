@@ -1,7 +1,8 @@
-import { figmaRGBToHex } from '@figma-plugin/helpers';
 import { Properties } from '@/constants/Properties';
 import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 import { getAllFigmaStyleMaps } from '@/utils/getAllFigmaStyleMaps';
+import { isEffectEqual } from '@/utils/isEffectEqual';
+import { isPaintEqual } from '@/utils/isPaintEqual';
 import { convertToFigmaColor } from './figmaTransforms/colors';
 import { transformValue } from './helpers';
 import setColorValuesOnTarget from './setColorValuesOnTarget';
@@ -12,87 +13,6 @@ import { TokenBoxshadowValue, TokenTypograpyValue } from '@/types/values';
 import { convertBoxShadowTypeToFigma } from './figmaTransforms/boxShadow';
 import { convertTypographyNumberToFigma } from './figmaTransforms/generic';
 import convertOffsetToFigma from './figmaTransforms/offset';
-
-function figmaColorToHex(color: RGBA | RGB, opacity?: number): string {
-  if ('a' in color) {
-    return figmaRGBToHex(color);
-  }
-  const { r, g, b } = color;
-  return figmaRGBToHex({
-    r, g, b, a: opacity,
-  });
-}
-
-function figmaPaintToHex(paint: SolidPaint): string {
-  return figmaColorToHex(paint.color, paint.opacity);
-}
-
-function isColorEqual(color1: RGBA, color2: RGBA) {
-  // Comparison using rgb doesn't work as Figma has a rounding issue,
-  // that doesn't produce same RGB floats as the existing color :(
-  // color1.r === color2.r
-  // && color1.g === color2.g
-  // && color1.b === color2.b
-  // Compare using hex instead for now:
-  const color1Hex = figmaColorToHex(color1);
-  const color2Hex = figmaColorToHex(color2);
-  return color1Hex === color2Hex;
-}
-
-function isPaintEqual(paint1: SolidPaint, paint2: SolidPaint) {
-  if (paint1 && paint2) {
-    if (paint1.type === paint2.type) {
-      if (paint1.type === 'SOLID' && paint2.type === 'SOLID') {
-        const paint1Hex = figmaPaintToHex(paint1);
-        const paint2Hex = figmaPaintToHex(paint2);
-        return (
-          paint1.opacity === paint2.opacity
-          // Comparison using rgb doesn't work as Figma has a rounding issue,
-          // that doesn't produce same RGB floats as the existing color :(
-          // && paint1.color.r === paint2.color.r
-          // && paint1.color.g === paint2.color.g
-          // && paint1.color.b === paint2.color.b
-          // Compare using hex instead for now:
-          && paint1Hex === paint2Hex
-        );
-      }
-      // TODO: Compare gradients using hex...
-      // if (paint1.type === 'GRADIENT_LINEAR' && paint2.type === 'GRADIENT_LINEAR') {
-      //   ...
-      // }
-    }
-  }
-  return false;
-}
-
-function isEffectEqual(effect1?: Effect, effect2?: Effect) {
-  if (effect1 && effect2) {
-    if (effect1.type === effect2.type) {
-      if (
-        (effect1.type === 'DROP_SHADOW' && effect2.type === 'DROP_SHADOW')
-        || (effect1.type === 'INNER_SHADOW' && effect2.type === 'INNER_SHADOW')
-      ) {
-        return (
-          isColorEqual(effect1.color, effect2.color)
-          && effect1.offset.x === effect2.offset.x
-          && effect1.offset.y === effect2.offset.y
-          && effect1.radius === effect2.radius
-          && effect1.spread === effect2.spread
-          && effect1.blendMode === effect2.blendMode
-          // Figma Tokens doesn't store this effect subvalue (yet?) so omit from comparison:
-          // && paint1.showShadowBehindNode === paint2.showShadowBehindNode
-        );
-      }
-      if (
-        (effect1.type === 'BACKGROUND_BLUR' && effect2.type === 'BACKGROUND_BLUR')
-        || (effect1.type === 'LAYER_BLUR' && effect2.type === 'LAYER_BLUR')
-      ) {
-        return effect1.radius === effect2.radius;
-      }
-    }
-  }
-  return false;
-}
 
 function convertBoxShadowToFigmaEffect(value: TokenBoxshadowValue): Effect {
   const { color, opacity: a } = convertToFigmaColor(value.color);
