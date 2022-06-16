@@ -1,149 +1,13 @@
 import { Properties } from '@/constants/Properties';
 import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 import { getAllFigmaStyleMaps } from '@/utils/getAllFigmaStyleMaps';
-import { isEffectEqual } from '@/utils/isEffectEqual';
-import { isPaintEqual } from '@/utils/isPaintEqual';
-import { convertToFigmaColor } from './figmaTransforms/colors';
+import { findMatchingNonLocalEffectStyle, findMatchingNonLocalPaintStyle, findMatchingNonLocalTextStyle } from './figmaUtils/nonLocalStyles';
+import { getStyleId } from './figmaUtils/getStyleId';
+import { setStyleIdBackup } from './figmaUtils/setStyleIdBackup';
 import { transformValue } from './helpers';
 import setColorValuesOnTarget from './setColorValuesOnTarget';
 import setEffectValuesOnTarget from './setEffectValuesOnTarget';
 import setTextValuesOnTarget from './setTextValuesOnTarget';
-import { tokensSharedDataHandler } from './SharedDataHandler';
-import { TokenBoxshadowValue, TokenTypograpyValue } from '@/types/values';
-import { convertBoxShadowTypeToFigma } from './figmaTransforms/boxShadow';
-import { convertTypographyNumberToFigma } from './figmaTransforms/generic';
-import convertOffsetToFigma from './figmaTransforms/offset';
-
-function convertBoxShadowToFigmaEffect(value: TokenBoxshadowValue): Effect {
-  const { color, opacity: a } = convertToFigmaColor(value.color);
-  const { r, g, b } = color;
-  return {
-    color: {
-      r,
-      g,
-      b,
-      a,
-    },
-    type: convertBoxShadowTypeToFigma(value.type),
-    spread: convertTypographyNumberToFigma(value.spread.toString()),
-    radius: convertTypographyNumberToFigma(value.blur.toString()),
-    offset: convertOffsetToFigma(convertTypographyNumberToFigma(value.x.toString()), convertTypographyNumberToFigma(value.y.toString())),
-    blendMode: (value.blendMode || 'NORMAL') as BlendMode,
-    visible: true,
-  };
-}
-
-function findMatchingNonLocalPaintStyle(styleId: string, colorToken: string) {
-  let matchingStyle: PaintStyle | undefined;
-
-  if (styleId) {
-    const nonLocalStyle = figma.getStyleById(styleId);
-    if (nonLocalStyle?.type === 'PAINT') {
-      const stylePaint = (nonLocalStyle as PaintStyle).paints[0] ?? null;
-      if (stylePaint?.type === 'SOLID') {
-        const { color, opacity } = convertToFigmaColor(colorToken);
-        const tokenPaint: SolidPaint = { color, opacity, type: 'SOLID' };
-        if (isPaintEqual(stylePaint, tokenPaint)) {
-          matchingStyle = nonLocalStyle as PaintStyle;
-        }
-      }
-    }
-  }
-
-  return matchingStyle;
-}
-
-function findMatchingNonLocalEffectStyle(styleId: string, boxShadowToken: string | TokenBoxshadowValue | TokenBoxshadowValue[]) {
-  let matchingStyle: EffectStyle | undefined;
-
-  if (styleId) {
-    const nonLocalStyle = figma.getStyleById(styleId);
-    if (typeof boxShadowToken !== 'string' && nonLocalStyle?.type === 'EFFECT') {
-      const boxShadowTokenArr = Array.isArray(boxShadowToken) ? boxShadowToken : [boxShadowToken];
-      const styleEffects = (nonLocalStyle as EffectStyle).effects;
-      if (styleEffects.length === boxShadowTokenArr.length) {
-        if (styleEffects.every((styleEffect, idx) => {
-          const tokenEffect = convertBoxShadowToFigmaEffect(boxShadowTokenArr[idx]);
-          return isEffectEqual(styleEffect, tokenEffect);
-        })) {
-          matchingStyle = nonLocalStyle as EffectStyle;
-        }
-      }
-    }
-  }
-
-  return matchingStyle;
-}
-
-function findMatchingNonLocalTextStyle(styleId: string, typographyToken: string | TokenTypograpyValue, description?: string) {
-  let matchingStyle: TextStyle | undefined;
-
-  if (styleId) {
-    const nonLocalStyle = figma.getStyleById(styleId);
-    if (typeof typographyToken !== 'string' && nonLocalStyle?.type === 'TEXT') {
-      const textStyle = (nonLocalStyle as TextStyle);
-      matchingStyle = textStyle; // Assume match until it checks out otherwise below
-
-      const {
-        fontFamily,
-        fontWeight,
-        fontSize,
-        lineHeight,
-        letterSpacing,
-        paragraphSpacing,
-        textCase,
-        textDecoration,
-      } = typographyToken;
-
-      if (textStyle.fontName.family !== fontFamily) {
-        matchingStyle = undefined;
-      }
-      if (textStyle.fontName.style !== fontWeight) {
-        matchingStyle = undefined;
-      }
-      if (fontSize === undefined || textStyle.fontSize !== transformValue(fontSize, 'fontSizes')) {
-        matchingStyle = undefined;
-      }
-      const tokenLineHeight = transformValue(String(lineHeight), 'lineHeights'); // This will default to `{ unit: 'AUTO' }` if lineHeight token is not set
-      if (tokenLineHeight?.unit !== textStyle.lineHeight.unit) {
-        let hasMismatch = true;
-        if (tokenLineHeight && tokenLineHeight.unit !== 'AUTO' && textStyle.lineHeight.unit !== 'AUTO') {
-          hasMismatch = tokenLineHeight.value > 0 || textStyle.lineHeight.value > 0;
-        }
-        if (hasMismatch) {
-          matchingStyle = undefined;
-        }
-      } else if (tokenLineHeight.unit !== 'AUTO' && textStyle.lineHeight.unit !== 'AUTO') {
-        if (tokenLineHeight.unit !== textStyle.lineHeight.unit || tokenLineHeight.value !== textStyle.lineHeight.value) {
-          matchingStyle = undefined;
-        }
-      }
-      const tokenLetterSpacing = transformValue(String(letterSpacing), 'letterSpacing'); // This will default to `null` if letterSpacing token is not set
-      if (tokenLetterSpacing?.unit !== textStyle.letterSpacing.unit || tokenLetterSpacing?.value !== textStyle.letterSpacing.value) {
-        if ((tokenLetterSpacing?.value && tokenLetterSpacing.value > 0) || textStyle.letterSpacing.value > 0) {
-          matchingStyle = undefined;
-        }
-      }
-      if (paragraphSpacing === undefined || textStyle.paragraphSpacing !== transformValue(paragraphSpacing, 'paragraphSpacing')) {
-        matchingStyle = undefined;
-      }
-      const tokenTextCase = transformValue(String(textCase), 'textCase'); // This will default to `ORIGINAL` if textCase token is not set
-      if (tokenTextCase !== textStyle.textCase) {
-        matchingStyle = undefined;
-      }
-      const tokenTextDecoration = transformValue(String(textDecoration), 'textDecoration'); // This will default to `NONE` if textDecoration token is not set
-      if (tokenTextDecoration !== textStyle.textDecoration) {
-        matchingStyle = undefined;
-      }
-      // TODO: Should description also match? 🤷
-      if (textStyle.description !== '' && textStyle.description !== description) {
-        // matchingStyle = undefined;
-      }
-    }
-  }
-
-  return matchingStyle;
-}
 
 export default async function setValuesOnNode(
   node: BaseNode,
@@ -182,17 +46,11 @@ export default async function setValuesOnNode(
         const pathname = path.slice(ignoreFirstPartForStyles ? 1 : 0, path.length).join('/');
         let matchingStyle = figmaStyleMaps.effectStyles.get(pathname);
         if (!matchingStyle) {
-          const effectStyleIdBackupKey = 'effectStyleId_original';
-          let { effectStyleId } = node;
-          if (effectStyleId === '') {
-            effectStyleId = tokensSharedDataHandler.get(node, effectStyleIdBackupKey, (val) => (val ? JSON.parse(val) as string : val));
-          }
-          matchingStyle = findMatchingNonLocalEffectStyle(effectStyleId, values.boxShadow);
-          let effectStyleIdBackup = ''; // Setting to empty string will delete the plugin data key if the style matches or doesn't exist
-          if (effectStyleId && !matchingStyle) {
-            effectStyleIdBackup = JSON.stringify(effectStyleId);
-          }
-          tokensSharedDataHandler.set(node, effectStyleIdBackupKey, effectStyleIdBackup);
+          // Local style not found - look for non-local matching style:
+          const styleIdBackupKey = 'effectStyleId_original';
+          const styleId = getStyleId(node, styleIdBackupKey, 'effects');
+          matchingStyle = findMatchingNonLocalEffectStyle(styleId, values.boxShadow);
+          setStyleIdBackup(node, matchingStyle ? '' : styleId, styleIdBackupKey);
         }
         if (matchingStyle) {
           node.effectStyleId = matchingStyle.id;
@@ -233,17 +91,11 @@ export default async function setValuesOnNode(
           const pathname = path.slice(ignoreFirstPartForStyles ? 1 : 0, path.length).join('/');
           let matchingStyle = figmaStyleMaps.paintStyles.get(pathname);
           if (!matchingStyle) {
+            // Local style not found - look for non-local matching style:
             const fillStyleIdBackupKey = 'fillStyleId_original';
-            let fillStyleId = typeof node.fillStyleId === 'string' ? node.fillStyleId : '';
-            if (fillStyleId === '') {
-              fillStyleId = tokensSharedDataHandler.get(node, fillStyleIdBackupKey, (val) => (val ? JSON.parse(val) as string : val));
-            }
+            const fillStyleId = getStyleId(node, fillStyleIdBackupKey, 'fills');
             matchingStyle = findMatchingNonLocalPaintStyle(fillStyleId, values.fill);
-            let fillStyleIdBackup = ''; // Setting to empty string will delete the plugin data key if the style matches or doesn't exist
-            if (fillStyleId && !matchingStyle) {
-              fillStyleIdBackup = JSON.stringify(fillStyleId);
-            }
-            tokensSharedDataHandler.set(node, fillStyleIdBackupKey, fillStyleIdBackup);
+            setStyleIdBackup(node, matchingStyle ? '' : fillStyleId, fillStyleIdBackupKey);
           }
 
           if (matchingStyle) {
@@ -263,17 +115,11 @@ export default async function setValuesOnNode(
           const pathname = path.slice(ignoreFirstPartForStyles ? 1 : 0, path.length).join('/');
           let matchingStyle = figmaStyleMaps.textStyles.get(pathname);
           if (!matchingStyle) {
-            const textStyleIdBackupKey = 'textStyleId_original';
-            let textStyleId = typeof node.textStyleId === 'string' ? node.textStyleId : '';
-            if (textStyleId === '') {
-              textStyleId = tokensSharedDataHandler.get(node, textStyleIdBackupKey, (val) => (val ? JSON.parse(val) as string : val));
-            }
-            matchingStyle = findMatchingNonLocalTextStyle(textStyleId, values.typography, values.description);
-            let textStyleIdBackup = ''; // Setting to empty string will delete the plugin data key if the style matches or doesn't exist
-            if (textStyleId && !matchingStyle) {
-              textStyleIdBackup = JSON.stringify(textStyleId);
-            }
-            tokensSharedDataHandler.set(node, textStyleIdBackupKey, textStyleIdBackup);
+            // Local style not found - look for non-local matching style:
+            const styleIdBackupKey = 'textStyleId_original';
+            const styleId = getStyleId(node, styleIdBackupKey, 'typography');
+            matchingStyle = findMatchingNonLocalTextStyle(styleId, values.typography, values.description);
+            setStyleIdBackup(node, matchingStyle ? '' : styleId, styleIdBackupKey);
           }
           if (matchingStyle) {
             node.textStyleId = matchingStyle.id;
@@ -314,17 +160,11 @@ export default async function setValuesOnNode(
           const pathname = path.slice(ignoreFirstPartForStyles ? 1 : 0, path.length).join('/');
           let matchingStyle = figmaStyleMaps.paintStyles.get(pathname);
           if (!matchingStyle) {
-            const strokeStyleIdBackupKey = 'strokeStyleId_original';
-            let { strokeStyleId } = node;
-            if (strokeStyleId === '') {
-              strokeStyleId = tokensSharedDataHandler.get(node, strokeStyleIdBackupKey, (val) => (val ? JSON.parse(val) as string : val));
-            }
-            matchingStyle = findMatchingNonLocalPaintStyle(strokeStyleId, values.border);
-            let strokeStyleIdBackup = ''; // Setting to empty string will delete the plugin data key if the style matches or doesn't exist
-            if (strokeStyleId && !matchingStyle) {
-              strokeStyleIdBackup = JSON.stringify(strokeStyleId);
-            }
-            tokensSharedDataHandler.set(node, strokeStyleIdBackupKey, strokeStyleIdBackup);
+            // Local style not found - look for non-local matching style:
+            const styleIdBackupKey = 'strokeStyleId_original';
+            const styleId = getStyleId(node, styleIdBackupKey, 'strokes');
+            matchingStyle = findMatchingNonLocalPaintStyle(styleId, values.border);
+            setStyleIdBackup(node, matchingStyle ? '' : styleId, styleIdBackupKey);
           }
 
           if (matchingStyle) {
