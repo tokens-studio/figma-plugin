@@ -23,7 +23,6 @@ function ConfirmDialog() {
   const redirectHref = React.useMemo(() => {
     let redirectHref = '';
     if (localApiState && 'id' in localApiState && localApiState.id) {
-      const [owner, repo] = localApiState.id.split('/');
       switch (localApiState.provider) {
         case StorageProviderType.GITHUB:
           redirectHref = getGithubCreatePullRequestUrl({
@@ -31,7 +30,7 @@ function ConfirmDialog() {
           });
           break;
         case StorageProviderType.GITLAB: {
-          redirectHref = getGitlabCreatePullRequestUrl({ owner, repo });
+          redirectHref = getGitlabCreatePullRequestUrl(localApiState.id);
           break;
         }
         case StorageProviderType.ADO:
