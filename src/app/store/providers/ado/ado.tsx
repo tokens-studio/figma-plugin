@@ -142,6 +142,7 @@ export const useADO = () => {
     try {
       const storage = storageClientFactory(context);
       const branches = await storage.fetchBranches();
+      dispatch.branchState.setBranches(branches);
       if (branches.length === 0) {
         return null;
       }
