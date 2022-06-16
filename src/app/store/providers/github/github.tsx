@@ -171,6 +171,7 @@ export function useGitHub() {
         ) {
           const userDecision = await askUserIfPull();
           if (userDecision) {
+            dispatch.tokenState.resetModifiedTokenSet();
             dispatch.tokenState.setLastSyncedState(JSON.stringify([content.tokens, content.themes], null, 2));
             dispatch.tokenState.setTokenData({
               values: content.tokens,
@@ -209,6 +210,7 @@ export function useGitHub() {
         credential: context,
       });
       if (data?.tokens) {
+        dispatch.tokenState.resetModifiedTokenSet();
         dispatch.tokenState.setLastSyncedState(JSON.stringify([data.tokens, data.themes], null, 2));
         dispatch.tokenState.setTokenData({
           values: data.tokens,

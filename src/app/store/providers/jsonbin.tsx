@@ -154,6 +154,7 @@ export function useJSONbin() {
         shouldSetInDocument: true,
       });
       dispatch.tokenState.setLastSyncedState(JSON.stringify([content.tokens, content.themes], null, 2));
+      dispatch.tokenState.resetModifiedTokenSet();
       dispatch.tokenState.setTokenData({
         values: content.tokens,
         themes: content.themes,

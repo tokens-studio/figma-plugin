@@ -20,6 +20,7 @@ export const update: AsyncMessageChannelHandlers[AsyncMessageTypes.UPDATE] = asy
       usedTokenSets: msg.usedTokenSet,
       updatedAt: msg.updatedAt,
       checkForChanges: msg.checkForChanges ?? false,
+      modifiedTokenSet: msg.modifiedTokenSet,
     });
   }
   if (msg.tokens) {

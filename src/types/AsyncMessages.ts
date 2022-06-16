@@ -128,7 +128,8 @@ export type UpdateAsyncMessage = AsyncMessage<AsyncMessageTypes.UPDATE, {
   settings: SettingsState;
   usedTokenSet: UsedTokenSetsMap;
   activeTheme: string | null;
-  checkForChanges?: boolean
+  modifiedTokenSet: string[];
+  checkForChanges?: boolean;
 }>;
 export type UpdateAsyncMessageResult = AsyncMessage<AsyncMessageTypes.UPDATE>;
 

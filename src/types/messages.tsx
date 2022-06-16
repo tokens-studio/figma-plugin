@@ -29,6 +29,7 @@ export enum MessageFromPluginTypes {
   COMPLETE_JOB_TASKS = 'complete_job_tasks',
   LICENSE_KEY = 'license_key',
   SET_TOKENS = 'set_tokens',
+  RECEIVED_MODIFIED_TOKEN_SET = 'modifiedTokenSet',
 }
 
 export type NoSelectionFromPluginMessage = { type: MessageFromPluginTypes.NO_SELECTION };
@@ -133,6 +134,11 @@ export type SetTokensFromPluginMessage = {
   values: TokenStore;
 };
 
+export type ReceivedModifiedTokenSet = {
+  type: MessageFromPluginTypes.RECEIVED_MODIFIED_TOKEN_SET;
+  modifiedTokenSet: string[];
+};
+
 export type PostToUIMessage =
   | NoSelectionFromPluginMessage
   | SelectionFromPluginMessage
@@ -153,4 +159,5 @@ export type PostToUIMessage =
   | CompleteJobTasksFromPluginMessage
   | ApiCredentialsFromPluginMessage
   | LicenseKeyFromPluginMessage
-  | SetTokensFromPluginMessage;
+  | SetTokensFromPluginMessage
+  | ReceivedModifiedTokenSet;

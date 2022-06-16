@@ -13,6 +13,7 @@ export const SharedPluginDataKeys = Object.freeze({
     checkForChanges: 'checkForChanges',
     activeTheme: 'activeTheme',
     themes: 'themes',
+    modifiedTokenSet: 'modifiedTokenSet',
     ...Properties,
   },
 });

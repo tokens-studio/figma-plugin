@@ -169,9 +169,9 @@ export const tokenState = createModel<RootModel>()({
       ...state,
       lastSyncedState: data,
     }),
-    setModifiedTokenSet: (state, data: string) => ({
+    setModifiedTokenSet: (state, data: string | string[]) => ({
       ...state,
-      modifiedTokenSet: [...state.modifiedTokenSet, data],
+      modifiedTokenSet: [...state.modifiedTokenSet, ...data],
     }),
     resetModifiedTokenSet: (state) => ({
       ...state,
@@ -523,6 +523,7 @@ export const tokenState = createModel<RootModel>()({
           storageType: rootState.uiState.storageType,
           shouldUpdateRemote: params.updateRemote && rootState.settings.updateRemote,
           checkForChanges: params.checkForChanges || false,
+          modifiedTokenSet: rootState.tokenState.modifiedTokenSet,
         });
       } catch (e) {
         console.error('Error updating document', e);

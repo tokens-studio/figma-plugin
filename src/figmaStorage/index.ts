@@ -12,3 +12,4 @@ export * from './HashProperty';
 export * from './UsedTokenSetProperty';
 export * from './LastOpenedProperty';
 export * from './CheckForChangesProperty';
+export * from './ModifiedTokenSetProperty';

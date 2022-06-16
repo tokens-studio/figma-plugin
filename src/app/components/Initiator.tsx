@@ -246,6 +246,10 @@ export function Initiator() {
             }
             break;
           }
+          case MessageFromPluginTypes.RECEIVED_MODIFIED_TOKEN_SET: {
+            dispatch.tokenState.setModifiedTokenSet(pluginMessage.modifiedTokenSet);
+            break;
+          }
           default:
             break;
         }

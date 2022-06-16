@@ -159,6 +159,7 @@ export const useADO = () => {
         ) {
           const userDecision = await askUserIfPull();
           if (userDecision) {
+            dispatch.tokenState.resetModifiedTokenSet();
             dispatch.tokenState.setLastSyncedState(JSON.stringify([content.tokens, content.themes], null, 2));
             dispatch.tokenState.setTokenData({
               values: content.tokens,

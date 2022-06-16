@@ -82,7 +82,6 @@ export function useGitLab() {
           metadata: { commitMessage },
         }, modifiedTokenSetList);
         dispatch.tokenState.resetModifiedTokenSet();
-        dispatch.tokenState.setLastSyncedState(JSON.stringify([tokens, themes], null, 2));
         dispatch.uiState.setLocalApiState({ ...localApiState, branch: customBranch } as GitlabCredentials);
         dispatch.uiState.setApiData({ ...context, branch: customBranch });
         dispatch.tokenState.setLastSyncedState(JSON.stringify([tokens, themes], null, 2));
@@ -168,6 +167,7 @@ export function useGitLab() {
         ) {
           const userDecision = await askUserIfPull();
           if (userDecision) {
+            dispatch.tokenState.resetModifiedTokenSet();
             dispatch.tokenState.setLastSyncedState(JSON.stringify([content.tokens, content.themes], null, 2));
             dispatch.tokenState.setTokenData({
               values: content.tokens,
@@ -207,6 +207,7 @@ export function useGitLab() {
         credential: context,
       });
       if (data?.tokens) {
+        dispatch.tokenState.resetModifiedTokenSet();
         dispatch.tokenState.setLastSyncedState(JSON.stringify([data.tokens, data.themes], null, 2));
         dispatch.tokenState.setTokenData({
           values: data.tokens,

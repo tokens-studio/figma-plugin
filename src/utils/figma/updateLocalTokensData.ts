@@ -4,7 +4,7 @@ import { AnyTokenList } from '@/types/tokens';
 import {
   ActiveThemeProperty,
   CheckForChangesProperty,
-  ThemesProperty, UpdatedAtProperty, UsedTokenSetProperty, ValuesProperty, VersionProperty,
+  ThemesProperty, UpdatedAtProperty, UsedTokenSetProperty, ValuesProperty, VersionProperty, ModifiedTokenSetProperty,
 } from '@/figmaStorage';
 
 type Payload = {
@@ -14,6 +14,7 @@ type Payload = {
   activeTheme: string | null
   updatedAt: string
   checkForChanges: boolean
+  modifiedTokenSet: string[]
 };
 
 export async function updateLocalTokensData(payload: Payload) {
@@ -24,4 +25,5 @@ export async function updateLocalTokensData(payload: Payload) {
   await UpdatedAtProperty.write(payload.updatedAt);
   await ActiveThemeProperty.write(payload.activeTheme);
   await CheckForChangesProperty.write(payload.checkForChanges);
+  await ModifiedTokenSetProperty.write(payload.modifiedTokenSet);
 }

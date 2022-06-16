@@ -142,3 +142,7 @@ export function notifyLastOpened(lastOpened: number) {
 export function notifySetTokens(values: TokenStore) {
   postToUI({ type: MessageFromPluginTypes.SET_TOKENS, values });
 }
+
+export function notifyModifiedTokenSet(modifiedTokenSet: Array<string>) {
+  postToUI({ type: MessageFromPluginTypes.RECEIVED_MODIFIED_TOKEN_SET, modifiedTokenSet });
+}
