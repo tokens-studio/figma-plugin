@@ -4,7 +4,7 @@ import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StorageTypeCredentials } from '@/types/StorageType';
 import { GitStorageMetadata, GitTokenStorage } from './GitTokenStorage';
 import { RemoteTokenStorageFile, RemoteTokenStorageSingleTokenSetFile, RemoteTokenStorageThemesFile } from './RemoteTokenStorage';
-import { multiFileSchema, complexSingleFileSchema } from './schemas';
+import { complexSingleFileSchema } from './schemas';
 
 const apiVersion = 'api-version=6.0';
 
@@ -19,7 +19,7 @@ enum ContentType {
 interface FetchGit {
   body?: string
   gitResource: 'refs' | 'items' | 'pushes'
-  method?: 'GET' | 'POST'
+  method?: 'GET' | 'POST' | 'DELETE'
   orgUrl?: string
   params?: Record<string, string | boolean>
   projectId?: string
@@ -234,21 +234,20 @@ export class ADOTokenStorage extends GitTokenStorage {
 
         if (!jsonFiles.length) return [];
 
-        const jsonFileContents = compact(await Promise.all(
+        const jsonFileContents = await Promise.all(
           jsonFiles.map(async ({ path }) => {
             const res = await this.getItem(path);
-            const validationResult = await multiFileSchema.safeParseAsync(res);
+            const validationResult = await complexSingleFileSchema.safeParseAsync(res);
             if (validationResult.success) {
               return validationResult.data;
             }
             return null;
           }),
-        ));
+        );
         return compact(jsonFileContents.map<RemoteTokenStorageFile<GitStorageMetadata> | null>((fileContent, index) => {
           const { path } = jsonFiles[index];
-          if (fileContent) {
-            const name = path?.split(/[\\/]/).pop()?.replace(/\.json$/, '');
-
+          if (fileContent && path) {
+            const name = path.replace(`/${this.path}/`, '').replace('.json', '');
             if (name === '$themes' && Array.isArray(fileContent)) {
               return {
                 path,
@@ -317,6 +316,34 @@ export class ADOTokenStorage extends GitTokenStorage {
       }),
       gitResource: 'pushes',
       method: 'POST',
+      orgUrl: this.orgUrl,
+      projectId: this.projectId,
+      repositoryId: this.repository,
+      token: this.secret,
+    });
+    return response;
+  }
+
+  private async deleteItems({
+    branch, changes, commitMessage = 'remove files', oldObjectId,
+  }: PostPushesArgs): Promise<GitInterfaces.GitPush> {
+    const response = await this.fetchGit({
+      body: JSON.stringify({
+        refUpdates: [
+          {
+            name: `refs/heads/${branch}`,
+            oldObjectId,
+          },
+        ],
+        commits: [
+          {
+            comment: commitMessage,
+            changes,
+          },
+        ],
+      }),
+      gitResource: 'pushes',
+      method: 'DELETE',
       orgUrl: this.orgUrl,
       projectId: this.projectId,
       repositoryId: this.repository,
