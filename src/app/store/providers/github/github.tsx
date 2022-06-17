@@ -136,6 +136,7 @@ export function useGitHub() {
 
     try {
       const content = await storage.retrieve();
+      console.log('pullGithu', content);
       if (content) {
         return content;
       }
@@ -162,6 +163,7 @@ export function useGitHub() {
       await checkAndSetAccess({ context, owner, repo });
 
       const content = await storage.retrieve();
+      console.log('syncGithu', content);
       if (content) {
         if (
           !isEqual(content.tokens, tokens)
@@ -206,15 +208,7 @@ export function useGitHub() {
         type: AsyncMessageTypes.CREDENTIALS,
         credential: context,
       });
-      if (data?.tokens) {
-        dispatch.tokenState.setLastSyncedState(JSON.stringify([data.tokens, data.themes], null, 2));
-        dispatch.tokenState.setTokenData({
-          values: data.tokens,
-          themes: data.themes,
-          usedTokenSet,
-          activeTheme,
-        });
-      } else {
+      if (!data.tokens) {
         notifyToUI('No tokens stored on remote');
       }
     } else {
