@@ -136,6 +136,7 @@ export function useGitHub() {
 
     try {
       const content = await storage.retrieve();
+
       if (content) {
         return content;
       }
@@ -162,6 +163,7 @@ export function useGitHub() {
       await checkAndSetAccess({ context, owner, repo });
 
       const content = await storage.retrieve();
+
       if (content) {
         if (
           !isEqual(content.tokens, tokens)
