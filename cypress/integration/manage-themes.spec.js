@@ -48,7 +48,8 @@ describe('TokenListing', () => {
     createToken({ name: 'token2' });
     createToken({ name: 'token3' });
 
-    
+    cy.get()
+
     cy.get('@postMessage').should('be.calledTwice');
     receiveRemoteComponents();
   });
