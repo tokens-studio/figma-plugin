@@ -169,18 +169,10 @@ export const tokenState = createModel<RootModel>()({
       ...state,
       lastSyncedState: data,
     }),
-    setModifiedTokenSet: (state, data: string | string[]) => {
-      if (Array.isArray(data)) {
-        return {
-          ...state,
-          modifiedTokenSet: [...state.modifiedTokenSet, ...data],
-        };
-      }
-      return {
-        ...state,
-        modifiedTokenSet: [...state.modifiedTokenSet, data],
-      };
-    },
+    setModifiedTokenSet: (state, data: string[]) => ({
+      ...state,
+      modifiedTokenSet: [...state.modifiedTokenSet, ...data],
+    }),
     resetModifiedTokenSet: (state) => ({
       ...state,
       modifiedTokenSet: [],

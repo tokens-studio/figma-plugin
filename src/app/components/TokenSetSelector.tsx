@@ -78,7 +78,7 @@ export default function TokenSetSelector() {
     if (userConfirmation) {
       dispatch.tokenState.deleteTokenSet(tokenSet);
       if (checkShouldModifyTokenSet(tokenSet)) {
-        dispatch.tokenState.setModifiedTokenSet(tokenSet);
+        dispatch.tokenState.setModifiedTokenSet([tokenSet]);
       }
     }
   }, [confirm, dispatch]);
@@ -104,7 +104,7 @@ export default function TokenSetSelector() {
     e.preventDefault();
     dispatch.tokenState.renameTokenSet({ oldName: tokenSetMarkedForChange, newName: newTokenSetName.trim() });
     if (checkShouldModifyTokenSet(tokenSetMarkedForChange)) {
-      dispatch.tokenState.setModifiedTokenSet(tokenSetMarkedForChange);
+      dispatch.tokenState.setModifiedTokenSet([tokenSetMarkedForChange]);
     }
     setTokenSetMarkedForChange('');
     setShowRenameTokenSetFields(false);
