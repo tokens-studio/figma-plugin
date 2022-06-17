@@ -76,12 +76,12 @@ export default function TokenSetSelector() {
       description: 'Are you sure you want to delete this set?',
     });
     if (userConfirmation) {
-      dispatch.tokenState.deleteTokenSet(tokenSet);
       if (checkShouldModifyTokenSet(tokenSet)) {
         dispatch.tokenState.setModifiedTokenSet([tokenSet]);
       }
+      dispatch.tokenState.deleteTokenSet(tokenSet);
     }
-  }, [confirm, dispatch]);
+  }, [confirm, dispatch, checkShouldModifyTokenSet]);
 
   const handleRenameTokenSet = React.useCallback((tokenSet: string) => {
     track('Renamed token set');
@@ -102,13 +102,13 @@ export default function TokenSetSelector() {
 
   const handleRenameTokenSetSubmit = React.useCallback((e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    dispatch.tokenState.renameTokenSet({ oldName: tokenSetMarkedForChange, newName: newTokenSetName.trim() });
     if (checkShouldModifyTokenSet(tokenSetMarkedForChange)) {
       dispatch.tokenState.setModifiedTokenSet([tokenSetMarkedForChange]);
     }
+    dispatch.tokenState.renameTokenSet({ oldName: tokenSetMarkedForChange, newName: newTokenSetName.trim() });
     setTokenSetMarkedForChange('');
     setShowRenameTokenSetFields(false);
-  }, [dispatch, newTokenSetName, tokenSetMarkedForChange]);
+  }, [dispatch, newTokenSetName, tokenSetMarkedForChange, checkShouldModifyTokenSet]);
 
   const handleReorder = useCallback((values: string[]) => {
     dispatch.tokenState.setTokenSetOrder(values);
