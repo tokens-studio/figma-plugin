@@ -32,6 +32,7 @@ const StyledButton = styled('button', {
     boxShadow: 'none',
     backgroundColor: '$bgSubtle',
   },
+  length: 0,
 });
 
 export default function TokenSetSelector() {
@@ -54,7 +55,7 @@ export default function TokenSetSelector() {
 
   React.useEffect(() => {
     setShowNewTokenSetFields(false);
-    handleNewTokenSetNameChange('');
+    handleNewTokenSetNameChange(tokenSetMarkedForChange);
   }, [tokens]);
 
   const handleNewTokenSetSubmit = React.useCallback((e: React.FormEvent<HTMLFormElement>) => {
