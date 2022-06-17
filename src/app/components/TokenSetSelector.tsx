@@ -32,7 +32,6 @@ const StyledButton = styled('button', {
     boxShadow: 'none',
     backgroundColor: '$bgSubtle',
   },
-  length: 0,
 });
 
 export default function TokenSetSelector() {
