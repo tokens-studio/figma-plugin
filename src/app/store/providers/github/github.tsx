@@ -136,7 +136,6 @@ export function useGitHub() {
 
     try {
       const content = await storage.retrieve();
-      console.log('pullGithu', content);
       if (content) {
         return content;
       }
@@ -163,7 +162,6 @@ export function useGitHub() {
       await checkAndSetAccess({ context, owner, repo });
 
       const content = await storage.retrieve();
-      console.log('syncGithu', content);
       if (content) {
         if (
           !isEqual(content.tokens, tokens)
