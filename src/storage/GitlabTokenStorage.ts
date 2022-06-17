@@ -177,7 +177,7 @@ export class GitlabTokenStorage extends GitTokenStorage {
     return [];
   }
 
-  public async writeChangeset(changeset: Record<string, string>, message: string, branch: string, modifiedTokenSet: string[], shouldCreateBranch?: boolean): Promise<boolean> {
+  public async createOrUpdate(changeset: Record<string, string>, message: string, branch: string, shouldCreateBranch?: boolean): Promise<boolean> {
     if (!this.projectId) throw new Error('Missing Project ID');
 
     const branches = await this.fetchBranches();
@@ -190,41 +190,45 @@ export class GitlabTokenStorage extends GitTokenStorage {
       ref: branch,
     });
     const filesInTrees = tree.map((t) => t.path);
+    const response = await this.gitlabClient.Commits.create(
+      this.projectId,
+      branch,
+      message,
+      Object.entries(changeset).map(([filePath, content]) => ({
+        action: filesInTrees.includes(filePath) ? 'update' : 'create',
+        filePath,
+        content,
+      })),
+      shouldCreateBranch ? {
+        startBranch: branches[0],
+      } : undefined,
+    );
+    return !!response;
+  }
 
-    const filesToDelete = modifiedTokenSet.map((tokenSet) => (
-      `${this.path}/${tokenSet}.json`
-    ));
+  public async writeChangeset(changeset: Record<string, string>, message: string, branch: string, modifiedTokenSet: string[], shouldCreateBranch?: boolean): Promise<boolean> {
+    if (!this.projectId) throw new Error('Missing Project ID');
 
+    // delete modified TokenSet in multifileSync
     try {
-      await this.gitlabClient.Commits.create(
-        this.projectId,
-        branch,
-        message,
-        filesToDelete.map((filePath) => ({
-          action: 'delete',
-          filePath,
-        })),
-        shouldCreateBranch ? {
-          startBranch: branches[0],
-        } : undefined,
-      );
+      if (!this.path.endsWith('.json')) {
+        const filesToDelete = modifiedTokenSet.map((tokenSet) => (
+          `${this.path}/${tokenSet}.json`
+        ));
 
-      const response = await this.gitlabClient.Commits.create(
-        this.projectId,
-        branch,
-        message,
-        Object.entries(changeset).map(([filePath, content]) => ({
-          action: filesInTrees.includes(filePath) ? 'update' : 'create',
-          filePath,
-          content,
-        })),
-        shouldCreateBranch ? {
-          startBranch: branches[0],
-        } : undefined,
-      );
-      return !!response;
+        await this.gitlabClient.Commits.create(
+          this.projectId,
+          branch,
+          'remove tokenSet',
+          filesToDelete.map((filePath) => ({
+            action: 'delete',
+            filePath,
+          })),
+        );
+      }
+      return await this.createOrUpdate(changeset, message, branch, shouldCreateBranch);
     } catch {
-      return false;
+      return await this.createOrUpdate(changeset, message, branch, shouldCreateBranch);
     }
   }
 }
