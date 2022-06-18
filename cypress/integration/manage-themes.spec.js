@@ -10,7 +10,7 @@ function receiveRemoteComponents() {
   });
 }
 
-const createToken = ({ name }) => {
+const createTokenSet = ({ name }) => {
   cy.get('[data-cy="button-new-token-set"]').click({ timeout: 1000 })
       .get('[data-cy="token-set-input"]')
       .type(name).type('{enter}');
@@ -42,16 +42,68 @@ describe('TokenListing', () => {
         }],
       },
     });
+    cy.receiveSetTokens({
+      version: '5',
+      values: {
+        options: [{
+          name: 'sizing.xs',
+          value: 4,
+          type: 'sizing'
+        }],
+        global: [{
+          name: 'sizing.xs',
+          value: 4,
+          type: 'sizing'
+        }],
+      },
+      themes: [{
+        id: 'my-first-theme',
+        name: 'My first theme',
+        selectedTokenSets: {
+          global: 'source',
+        },
+      }]
+    });
     cy.receiveStorageTypeLocal();
     
-    createToken({ name: 'token1' });
-    createToken({ name: 'token2' });
-    createToken({ name: 'token3' });
+    createTokenSet({ name: 'token-source' });
+    createTokenSet({ name: 'token-enabled' });
+    createTokenSet({ name: 'token-disabled' });
 
-    cy.get()
-
-    cy.get('@postMessage').should('be.calledTwice');
     receiveRemoteComponents();
   });
   
+  it('Can create a new theme', () => {
+    cy.receiveSetTokens({
+      version: '5',
+      values: {
+        options: [{
+          name: 'sizing.xs',
+          value: 4,
+          type: 'sizing'
+        }],
+        global: [{
+          name: 'sizing.xs',
+          value: 4,
+          type: 'sizing'
+        }],
+      },
+    });
+    cy.receiveStorageTypeLocal();
+
+    createTokenSet({ name: 'token-source' });
+    createTokenSet({ name: 'token-enabled' });
+    createTokenSet({ name: 'token-disabled' });
+
+    cy.get('[data-cy="themeselector-dropdown"]').click()
+      .get('[data-cy="themeselector-managethemes"]').click()
+      .get('[data-cy="button-manage-themes-modal-new-theme"]').click()
+      .get('[data-cy="create-or-edit-theme-form--input--name"]').type('My first theme')
+      .get('[data-cy="tokensettheme-item--dropdown-trigger--token-source-set"]').click()
+      .get('[data-cy="tokensettheme-item--dropdown-content--source"]').click()
+      .get('[data-cy="tokensettheme-item--dropdown-trigger--token-enabled-set"]').click()
+      .get('[data-cy="tokensettheme-item--dropdown-content--source"]').click()
+      .get('[data-cy="tokensettheme-item--dropdown-trigger--token-disabled-set"]').click()
+      .get('[data-cy="tokensettheme-item--dropdown-content--source"]').click();
+  });
 });
