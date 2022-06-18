@@ -42,38 +42,16 @@ describe('TokenListing', () => {
         }],
       },
     });
-    cy.receiveSetTokens({
-      version: '5',
-      values: {
-        options: [{
-          name: 'sizing.xs',
-          value: 4,
-          type: 'sizing'
-        }],
-        global: [{
-          name: 'sizing.xs',
-          value: 4,
-          type: 'sizing'
-        }],
-      },
-      themes: [{
-        id: 'my-first-theme',
-        name: 'My first theme',
-        selectedTokenSets: {
-          global: 'source',
-        },
-      }]
-    });
     cy.receiveStorageTypeLocal();
     
     createTokenSet({ name: 'token-source' });
     createTokenSet({ name: 'token-enabled' });
     createTokenSet({ name: 'token-disabled' });
 
-    receiveRemoteComponents();
+    // receiveRemoteComponents();
   });
   
-  it('Can create a new theme', () => {
+  it('Can create a new theme & select theme', () => {
     cy.receiveSetTokens({
       version: '5',
       values: {
@@ -102,8 +80,17 @@ describe('TokenListing', () => {
       .get('[data-cy="tokensettheme-item--dropdown-trigger--token-source-set"]').click()
       .get('[data-cy="tokensettheme-item--dropdown-content--source"]').click()
       .get('[data-cy="tokensettheme-item--dropdown-trigger--token-enabled-set"]').click()
-      .get('[data-cy="tokensettheme-item--dropdown-content--source"]').click()
+      .get('[data-cy="tokensettheme-item--dropdown-content--enabled"]').click()
       .get('[data-cy="tokensettheme-item--dropdown-trigger--token-disabled-set"]').click()
-      .get('[data-cy="tokensettheme-item--dropdown-content--source"]').click();
+      .get('[data-cy="tokensettheme-item--dropdown-content--disabled"]').click()
+      .get('[data-cy="button-manage-themes-modal-save-theme"]').click();
+    cy.get('[data-cy="close-button"]').click();
+    createTokenSet({ name: 'token-extra' });
+
+    cy.get('[data-cy="themeselector-dropdown"]').click()
+      .get('.c-fqGJgX').click();
+    cy.get('[data-state="indeterminate"]').should('have.length', 2);
+    cy.get('[data-state="checked"]').should('have.length', 2);
+    cy.get('[data-state="unchecked"]').should('have.length', 4);
   });
 });
