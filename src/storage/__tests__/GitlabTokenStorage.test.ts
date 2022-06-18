@@ -349,13 +349,6 @@ describe('GitlabTokenStorage', () => {
 
     await storageProvider.write([
       {
-        type: 'metadata',
-        path: '$metadata.json',
-        data: {
-          commitMessage: 'Initial commit',
-        },
-      },
-      {
         type: 'themes',
         path: '$themes.json',
         data: [
@@ -379,7 +372,9 @@ describe('GitlabTokenStorage', () => {
           },
         },
       },
-    ]);
+    ], {
+      commitMessage: 'Initial commit',
+    });
 
     expect(mockCreateCommits).toBeCalledWith(
       35102363,
@@ -434,13 +429,6 @@ describe('GitlabTokenStorage', () => {
 
     await storageProvider.write([
       {
-        type: 'metadata',
-        path: '$metadata.json',
-        data: {
-          commitMessage: 'Initial commit',
-        },
-      },
-      {
         type: 'themes',
         path: '$themes.json',
         data: [
@@ -464,7 +452,9 @@ describe('GitlabTokenStorage', () => {
           },
         },
       },
-    ]);
+    ], {
+      commitMessage: 'Initial commit',
+    });
 
     expect(mockCreateCommits).toBeCalledWith(
       35102363,

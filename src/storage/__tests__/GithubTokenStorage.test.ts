@@ -334,13 +334,6 @@ describe('GithubTokenStorage', () => {
     storageProvider.changePath('data/tokens.json');
     await storageProvider.write([
       {
-        type: 'metadata',
-        path: 'metadata.json',
-        data: {
-          commitMessage: 'Initial commit',
-        },
-      },
-      {
         type: 'themes',
         path: '$themes.json',
         data: [
@@ -365,7 +358,9 @@ describe('GithubTokenStorage', () => {
           },
         },
       },
-    ]);
+    ], {
+      commitMessage: 'Initial commit',
+    });
 
     expect(mockCreateOrUpdateFiles).toBeCalledWith({
       branch: 'main',
@@ -420,13 +415,6 @@ describe('GithubTokenStorage', () => {
     storageProvider.changePath('data');
     await storageProvider.write([
       {
-        type: 'metadata',
-        path: 'metadata.json',
-        data: {
-          commitMessage: 'Initial commit',
-        },
-      },
-      {
         type: 'themes',
         path: '$themes.json',
         data: [
@@ -451,7 +439,9 @@ describe('GithubTokenStorage', () => {
           },
         },
       },
-    ]);
+    ], {
+      commitMessage: 'Initial commit',
+    });
 
     expect(mockCreateOrUpdateFiles).toBeCalledWith({
       branch: 'main',

@@ -65,7 +65,6 @@ export const useADO = () => {
       return {
         tokens,
         themes,
-        metadata: {},
       };
     }
 
@@ -79,7 +78,11 @@ export const useADO = () => {
         await storage.save({
           themes,
           tokens,
-          metadata: { commitMessage },
+          metadata: {
+            tokenSetOrder: Object.keys(tokens),
+          },
+        }, {
+          commitMessage,
         });
 
         dispatch.uiState.setLocalApiState({ ...localApiState, branch: customBranch } as AdoCredentials);
@@ -90,7 +93,6 @@ export const useADO = () => {
         return {
           tokens,
           themes,
-          metadata: { commitMessage },
         };
       } catch (e) {
         console.log('Error pushing to ADO', e);
@@ -100,7 +102,6 @@ export const useADO = () => {
     return {
       tokens,
       themes,
-      metadata: {},
     };
   }, [
     dispatch,

@@ -6,7 +6,7 @@ import parseTokenValues from '@/utils/parseTokenValues';
 export type RemoteTokenStorageData<Metadata = unknown> = {
   tokens: Record<string, AnyTokenList>
   themes: ThemeObjectsList
-  metadata: Metadata | null
+  metadata?: Metadata | null
 };
 
 export interface RemoteTokenStorageSingleTokenSetFile {
@@ -33,11 +33,11 @@ export type RemoteTokenStorageFile<Metadata = unknown> =
   | RemoteTokenStorageThemesFile
   | RemoteTokenStorageMetadataFile<Metadata>;
 
-export abstract class RemoteTokenStorage<Metadata = unknown> {
-  public abstract write(files: RemoteTokenStorageFile<Metadata>[]): Promise<boolean>;
+export abstract class RemoteTokenStorage<Metadata = unknown, SaveOptions = unknown> {
+  public abstract write(files: RemoteTokenStorageFile<Metadata>[], saveOptions?: SaveOptions): Promise<boolean>;
   public abstract read(): Promise<RemoteTokenStorageFile<Metadata>[]>;
 
-  public async save(data: RemoteTokenStorageData<Metadata>): Promise<boolean> {
+  public async save(data: RemoteTokenStorageData<Metadata>, saveOptions?: SaveOptions): Promise<boolean> {
     const files: RemoteTokenStorageFile<Metadata>[] = [];
 
     // First we'll convert the incoming data into files
@@ -60,21 +60,21 @@ export abstract class RemoteTokenStorage<Metadata = unknown> {
       data: data.themes,
     });
 
-    if (data.metadata) {
+    if ('metadata' in data && data.metadata) {
       files.push({
         type: 'metadata',
         path: '$metadata.json',
         data: data.metadata,
       });
     }
-    return this.write(files);
+
+    return this.write(files, saveOptions);
   }
 
   public async retrieve(): Promise<RemoteTokenStorageData<Metadata> | null> {
     const data: RemoteTokenStorageData<Metadata> = {
       themes: [],
       tokens: {},
-      metadata: null,
     };
 
     // start by reading the files from the remote source

@@ -81,7 +81,11 @@ export function useGitHub() {
         await storage.save({
           themes,
           tokens,
-          metadata: { commitMessage },
+          metadata: {
+            tokenSetOrder: Object.keys(tokens),
+          },
+        }, {
+          commitMessage,
         });
         dispatch.tokenState.setLastSyncedState(JSON.stringify([tokens, themes], null, 2));
         dispatch.uiState.setLocalApiState({ ...localApiState, branch: customBranch } as GithubCredentials);
@@ -96,7 +100,6 @@ export function useGitHub() {
         return {
           tokens,
           themes,
-          metadata: { commitMessage },
         };
       } catch (e) {
         console.log('Error pushing to GitHub', e);

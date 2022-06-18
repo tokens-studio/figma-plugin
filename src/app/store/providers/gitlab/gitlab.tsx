@@ -79,7 +79,11 @@ export function useGitLab() {
         await storage.save({
           themes,
           tokens,
-          metadata: { commitMessage },
+          metadata: {
+            tokenSetOrder: Object.keys(tokens),
+          },
+        }, {
+          commitMessage,
         });
         dispatch.tokenState.setLastSyncedState(JSON.stringify([tokens, themes], null, 2));
         dispatch.uiState.setLocalApiState({ ...localApiState, branch: customBranch } as GitlabCredentials);
