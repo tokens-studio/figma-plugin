@@ -222,6 +222,19 @@ describe('GithubTokenStorage', () => {
     });
   });
 
+  it('can handle invalid file content', async () => {
+    mockGetContent.mockImplementationOnce(() => (
+      Promise.resolve({
+        data: {
+          content: 'RW1wdHkgZmlsZQ==',
+        },
+      })
+    ));
+
+    storageProvider.changePath('data/tokens.json');
+    expect(await storageProvider.read()).toEqual([]);
+  });
+
   it('can read from Git in a multifile format', async () => {
     mockGetContent.mockImplementation((opts: { path: string }) => {
       if (opts.path === 'data') {
