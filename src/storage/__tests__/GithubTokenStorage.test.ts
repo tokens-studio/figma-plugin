@@ -272,8 +272,8 @@ describe('GithubTokenStorage', () => {
         data: {
           sha: 'sha(data)',
           tree: [
-            { path: '$themes.json', type: 'blob', sha: 'sha($themes.json)' },
-            { path: 'global.json', type: 'blob', sha: 'sha(global.json)' },
+            { path: 'data/$themes.json', type: 'blob', sha: 'sha($themes.json)' },
+            { path: 'data/global.json', type: 'blob', sha: 'sha(global.json)' },
           ],
         },
       })
@@ -283,7 +283,7 @@ describe('GithubTokenStorage', () => {
     storageProvider.changePath('data');
     expect(await storageProvider.read()).toEqual([
       {
-        path: '$themes.json',
+        path: 'data/$themes.json',
         type: 'themes',
         data: [{
           id: 'light',
@@ -294,7 +294,7 @@ describe('GithubTokenStorage', () => {
         }],
       },
       {
-        path: 'global.json',
+        path: 'data/global.json',
         name: 'global',
         type: 'tokenSet',
         data: {
