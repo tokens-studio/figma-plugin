@@ -189,7 +189,7 @@ export class ADOTokenStorage extends GitTokenStorage {
 
   private async getItem(path: string = this.path): Promise<any> {
     try {
-      // @REAMDE setting includeContent to true
+      // @README setting includeContent to true
       // enables downloading the content instead
       const response = await this.fetchGit({
         ...this.itemsDefault(),
