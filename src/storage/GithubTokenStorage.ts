@@ -130,23 +130,16 @@ export class GithubTokenStorage extends GitTokenStorage {
             )).sort((a, b) => (
               (a.path && b.path) ? a.path.localeCompare(b.path) : 0
             ));
-            const DirectoryNameSplit = this.path.split('/');
-            const RootDirectoryName = DirectoryNameSplit[0];
-            let subDirectoryName: string;
-            if (DirectoryNameSplit.length > 1) {
-              subDirectoryName = `${DirectoryNameSplit.splice(1, DirectoryNameSplit.length - 1).join('/')}/`;
-            } else {
-              subDirectoryName = '';
-            }
 
             const jsonFileContents = await Promise.all(jsonFiles.map((treeItem) => (
               treeItem.path ? this.octokitClient.rest.repos.getContent({
                 owner: this.owner,
                 repo: this.repository,
-                path: `${RootDirectoryName}/${treeItem.path}`,
+                path: treeItem.path,
                 ref: this.branch,
               }) : Promise.resolve(null)
             )));
+
             return compact(jsonFileContents.map<RemoteTokenStorageFile<GitStorageMetadata> | null>((fileContent, index) => {
               const { path } = jsonFiles[index];
 
@@ -156,7 +149,7 @@ export class GithubTokenStorage extends GitTokenStorage {
                 && !Array.isArray(fileContent?.data)
                 && 'content' in fileContent.data
               ) {
-                let name = path.replace(subDirectoryName, '');
+                let name = path.substring(this.path.length).replace(/^\/+/, '');
                 name = name.replace('.json', '');
                 const parsed = JSON.parse(decodeBase64(fileContent.data.content)) as GitMultiFileObject;
                 // @REAMDE we will need to ensure these reserved names
