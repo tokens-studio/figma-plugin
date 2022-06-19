@@ -19,7 +19,7 @@ export const TokenTooltipContent: React.FC<Props> = ({ token }) => {
   const tokenIsShadowOrTypographyAlias = React.useMemo(
     () => (
       token.type === TokenTypes.TYPOGRAPHY || token.type === TokenTypes.BOX_SHADOW)
-    && typeof token.value === 'string',
+      && typeof token.value === 'string',
     [token],
   );
 

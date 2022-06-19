@@ -51,7 +51,7 @@ export class GitlabTokenStorage extends GitTokenStorage {
     }
 
     if (!this.projectId) {
-      const projectsInGroup = await this.gitlabClient.Groups.projects(this.owner);
+      const projectsInGroup = await this.gitlabClient.Groups.projects(this.owner, { include_subgroups: true });
       const project = projectsInGroup.filter((p) => p.path === this.repository)[0];
       if (project) {
         this.projectId = project.id;

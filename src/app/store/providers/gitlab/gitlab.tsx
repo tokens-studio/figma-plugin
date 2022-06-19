@@ -18,6 +18,7 @@ import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { StorageTypeCredentials, StorageTypeFormValues } from '@/types/StorageType';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { useFlags } from '@/app/components/LaunchDarkly';
+import { getRepositoryInformation } from '../getRepositoryInformation';
 
 type GitlabCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.GITHUB | StorageProviderType.GITLAB; }>;
 type GitlabFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.GITHUB | StorageProviderType.GITLAB }>;
@@ -35,8 +36,8 @@ export function useGitLab() {
   const { pushDialog } = usePushDialog();
 
   const storageClientFactory = useCallback(async (context: GitlabCredentials, owner?: string, repo?: string) => {
-    const splitContextId = context.id.split('/');
-    const storageClient = new GitlabTokenStorage(context.secret, owner ?? splitContextId[0], repo ?? splitContextId[1], context.baseUrl ?? '');
+    const { ownerId, repositoryId } = getRepositoryInformation(context.id);
+    const storageClient = new GitlabTokenStorage(context.secret, owner ?? ownerId, repo ?? repositoryId, context.baseUrl ?? '');
     if (context.filePath) storageClient.changePath(context.filePath);
     if (context.branch) storageClient.selectBranch(context.branch);
     if (multiFileSync) storageClient.enableMultiFile();
@@ -127,8 +128,7 @@ export function useGitLab() {
   const pullTokensFromGitLab = useCallback(async (context: GitlabCredentials, receivedFeatureFlags?: LDProps['flags']) => {
     const storage = await storageClientFactory(context);
     if (receivedFeatureFlags?.multiFileSync) storage.enableMultiFile();
-
-    const [owner, repo] = context.id.split('/');
+    const { ownerId: owner, repositoryId: repo } = getRepositoryInformation(context.id);
 
     await checkAndSetAccess({ context, owner, repo });
 
@@ -154,7 +154,7 @@ export function useGitLab() {
         return null;
       }
 
-      const [owner, repo] = context.id.split('/');
+      const { ownerId: owner, repositoryId: repo } = getRepositoryInformation(context.id);
       await checkAndSetAccess({ context, owner, repo });
 
       const content = await storage.retrieve();
@@ -203,15 +203,7 @@ export function useGitLab() {
         type: AsyncMessageTypes.CREDENTIALS,
         credential: context,
       });
-      if (data?.tokens) {
-        dispatch.tokenState.setLastSyncedState(JSON.stringify([data.tokens, data.themes], null, 2));
-        dispatch.tokenState.setTokenData({
-          values: data.tokens,
-          themes: data.themes,
-          usedTokenSet,
-          activeTheme,
-        });
-      } else {
+      if (!data.tokens) {
         notifyToUI('No tokens stored on remote');
       }
     } else {

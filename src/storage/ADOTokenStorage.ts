@@ -124,9 +124,10 @@ export class ADOTokenStorage extends GitTokenStorage {
   private async postRefs(body: PostRefsArgs) {
     try {
       const response = await this.fetchGit({
+        method: 'POST',
         gitResource: 'refs',
         orgUrl: this.orgUrl,
-        body: JSON.stringify(body),
+        body: JSON.stringify([body]),
         projectId: this.projectId,
         repositoryId: this.repository,
         token: this.secret,
@@ -157,8 +158,7 @@ export class ADOTokenStorage extends GitTokenStorage {
         oldObjectId: '0000000000000000000000000000000000000000',
         newObjectId: value[0].objectId,
       });
-      const { value: { success } } = response;
-      return Boolean(success);
+      return response?.value[0]?.success ?? false;
     }
     return false;
   }
