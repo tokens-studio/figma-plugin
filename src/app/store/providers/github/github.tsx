@@ -206,15 +206,7 @@ export function useGitHub() {
         type: AsyncMessageTypes.CREDENTIALS,
         credential: context,
       });
-      if (data?.tokens) {
-        dispatch.tokenState.setLastSyncedState(JSON.stringify([data.tokens, data.themes], null, 2));
-        dispatch.tokenState.setTokenData({
-          values: data.tokens,
-          themes: data.themes,
-          usedTokenSet,
-          activeTheme,
-        });
-      } else {
+      if (!data.tokens) {
         notifyToUI('No tokens stored on remote');
       }
     } else {

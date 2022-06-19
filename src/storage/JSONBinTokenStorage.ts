@@ -7,6 +7,7 @@ import { singleFileSchema } from './schemas/singleFileSchema';
 
 const jsonbinSchema = singleFileSchema.extend({
   version: z.string(),
+  updatedAt: z.string().optional(),
 });
 
 type JsonBinMetadata = {
@@ -101,7 +102,6 @@ export class JSONBinTokenStorage extends RemoteTokenStorage<JsonBinMetadata> {
         ['X-Bin-Meta', '0'],
       ]),
     });
-
     if (response.ok) {
       const parsedJsonData = await response.json();
       const validationResult = await z.object({
