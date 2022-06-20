@@ -45,8 +45,7 @@ export const useADO = () => {
       text: 'Pull from Ado?',
       description: 'Your repo already contains tokens, do you want to pull these now?',
     });
-    if (confirmResult === false) return false;
-    return confirmResult.result;
+    return confirmResult
   }, [confirm]);
 
   const pushTokensToADO = React.useCallback(async (context: AdoCredentials) => {
