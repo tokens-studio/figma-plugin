@@ -344,7 +344,7 @@ describe('remoteTokens', () => {
       if (context === gitHubContext || context === gitLabContext || context === adoContext) {
         await waitFor(() => { result.current.pushTokens(context as StorageTypeCredentials); });
         expect(mockPushDialog).toBeCalledTimes(2);
-        expect(mockPushDialog.mock.calls[1][0]).toBe('successfully pushed');
+        expect(mockPushDialog.mock.calls[1][0]).toBe('success');
       }
     });
   });
@@ -375,7 +375,7 @@ describe('remoteTokens', () => {
         ));
         await waitFor(() => { result.current.pushTokens(context as StorageTypeCredentials); });
         expect(mockPushDialog).toBeCalledTimes(2);
-        expect(mockPushDialog.mock.calls[1][0]).toBe('successfully pushed');
+        expect(mockPushDialog.mock.calls[1][0]).toBe('success');
         expect(await result.current.addNewProviderItem(context as StorageTypeCredentials)).toEqual(true);
       });
     } else {

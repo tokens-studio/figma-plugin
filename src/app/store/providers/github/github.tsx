@@ -86,7 +86,7 @@ export function useGitHub() {
           themes,
           usedTokenSet,
         });
-        pushDialog('successfully pushed');
+        pushDialog('success');
         return {
           tokens,
           themes,

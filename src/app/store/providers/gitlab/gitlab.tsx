@@ -86,7 +86,7 @@ export function useGitLab() {
           themes,
           usedTokenSet,
         });
-        pushDialog('successfully pushed');
+        pushDialog('success');
         return {
           tokens,
           themes,

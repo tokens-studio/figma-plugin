@@ -82,7 +82,7 @@ export const useADO = () => {
         dispatch.uiState.setLocalApiState({ ...localApiState, branch: customBranch } as AdoCredentials);
         dispatch.uiState.setApiData({ ...context, branch: customBranch });
 
-        pushDialog('successfully pushed');
+        pushDialog('success');
 
         return {
           tokens,
