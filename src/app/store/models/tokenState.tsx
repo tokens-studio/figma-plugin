@@ -137,15 +137,8 @@ export const tokenState = createModel<RootModel>()({
       }
 
       const newName = `${name}_Copy`;
-      const newState = {
-        ...state,
-        tokens: {
-          ...state.tokens,
-          [newName]: [...state.tokens[name]],
-        },
-      };
 
-      return updateTokenSetsInState(newState, null);
+      return updateTokenSetsInState(state, null, [newName, state.tokens[name]]);
     },
     deleteTokenSet: (state, name: string) => updateTokenSetsInState(
       state,
