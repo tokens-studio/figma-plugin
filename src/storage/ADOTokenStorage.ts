@@ -237,7 +237,7 @@ export class ADOTokenStorage extends GitTokenStorage {
         const jsonFileContents = await Promise.all(
           jsonFiles.map(async ({ path }) => {
             const res = await this.getItem(path);
-            const validationResult = await complexSingleFileSchema.safeParseAsync(res);
+            const validationResult = await multiFileSchema.safeParseAsync(res);
             if (validationResult.success) {
               return validationResult.data;
             }
