@@ -18,7 +18,9 @@ type ExtendedOctokitClient = Omit<Octokit, 'repos'> & {
       createBranch?: boolean
       changes: {
         message: string
-        files: Record<string, string>
+        files: Record<string, string>,
+        filesToDelete?: string[],
+        ignoreDeletionFailures?: boolean,
       }[]
     }) => ReturnType<Octokit['repos']['createOrUpdateFileContents']>
   }
@@ -208,7 +210,7 @@ export class GithubTokenStorage extends GitTokenStorage {
     }
   }
 
-  public async writeChangeset(changeset: Record<string, string>, message: string, branch: string, shouldCreateBranch?: boolean): Promise<boolean> {
+  public async createOrUpdate(changeset: Record<string, string>, message: string, branch: string, shouldCreateBranch?: boolean, filesToDelete?: string[], ignoreDeletionFailures?: boolean): Promise<boolean> {
     const response = await this.octokitClient.repos.createOrUpdateFiles({
       branch,
       owner: this.owner,
@@ -218,9 +220,59 @@ export class GithubTokenStorage extends GitTokenStorage {
         {
           message,
           files: changeset,
+          filesToDelete,
+          ignoreDeletionFailures,
         },
       ],
     });
     return !!response;
+  }
+
+  public async writeChangeset(changeset: Record<string, string>, message: string, branch: string, shouldCreateBranch?: boolean): Promise<boolean> {
+    try {
+      const response = await this.octokitClient.rest.repos.getContent({
+        owner: this.owner,
+        repo: this.repository,
+        path: this.path,
+        ref: this.branch,
+      });
+
+      if (Array.isArray(response.data) && this.flags.multiFileEnabled) {
+        const directoryTreeResponse = await this.octokitClient.rest.git.createTree({
+          owner: this.owner,
+          repo: this.repository,
+          tree: response.data.map((item) => ({
+            path: item.path,
+            sha: item.sha,
+            mode: getTreeMode(item.type),
+          })),
+        });
+
+        if (directoryTreeResponse.data.tree[0].sha) {
+          const treeResponse = await this.octokitClient.rest.git.getTree({
+            owner: this.owner,
+            repo: this.repository,
+            tree_sha: directoryTreeResponse.data.tree[0].sha,
+            recursive: 'true',
+          });
+
+          if (treeResponse.data.tree.length > 0) {
+            const jsonFiles = treeResponse.data.tree.filter((file) => (
+              file.path?.endsWith('.json')
+            )).sort((a, b) => (
+              (a.path && b.path) ? a.path.localeCompare(b.path) : 0
+            ));
+
+            const filesToDelete = jsonFiles.filter((jsonFile) => !Object.keys(changeset).some((item) => jsonFile.path && item.endsWith(jsonFile?.path)))
+              .map((fileToDelete) => (`${this.path.split('/')[0]}/${fileToDelete.path}` ?? ''));
+            return await this.createOrUpdate(changeset, message, branch, shouldCreateBranch, filesToDelete, true);
+          }
+        }
+      }
+
+      return await this.createOrUpdate(changeset, message, branch, shouldCreateBranch);
+    } catch {
+      return await this.createOrUpdate(changeset, message, branch, shouldCreateBranch);
+    }
   }
 }
