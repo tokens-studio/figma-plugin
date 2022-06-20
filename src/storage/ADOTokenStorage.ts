@@ -331,8 +331,7 @@ export class ADOTokenStorage extends GitTokenStorage {
     return response;
   }
 
-  private async createOrUpdate(changeset: Record<string, string>, message: string, branch: string, shouldCreateBranch: boolean): Promise<boolean> {
-    const oldObjectId = await this.getOldObjectId(this.source, shouldCreateBranch);
+  private async createOrUpdate(changeset: Record<string, string>, message: string, branch: string, oldObjectId?: string): Promise<boolean> {
     const { value } = await this.getItems();
     const tokensOnRemote = value?.map((val) => val.path) ?? [];
     const changes = Object.entries(changeset)
@@ -360,8 +359,8 @@ export class ADOTokenStorage extends GitTokenStorage {
   }
 
   public async writeChangeset(changeset: Record<string, string>, message: string, branch: string, shouldCreateBranch: boolean = false): Promise<boolean> {
-    if (this.flags.multiFileEnabled && !this.path.endsWith('.json')) {
-      const oldObjectId = await this.getOldObjectId(this.source, shouldCreateBranch);
+    const oldObjectId = await this.getOldObjectId(this.source, shouldCreateBranch);
+    if (!this.path.endsWith('.json')) {
       const { value } = await this.getItems();
       const jsonFiles = value
         ?.filter((file) => (file.path?.endsWith('.json')))
@@ -386,8 +385,8 @@ export class ADOTokenStorage extends GitTokenStorage {
         commitMessage: message,
         oldObjectId,
       });
-      return this.createOrUpdate(changeset, message, branch, shouldCreateBranch);
+      return this.createOrUpdate(changeset, message, branch, oldObjectId);
     }
-    return this.createOrUpdate(changeset, message, branch, shouldCreateBranch);
+    return this.createOrUpdate(changeset, message, branch, oldObjectId);
   }
 }

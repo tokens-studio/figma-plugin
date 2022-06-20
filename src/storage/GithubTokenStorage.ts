@@ -237,7 +237,7 @@ export class GithubTokenStorage extends GitTokenStorage {
         ref: this.branch,
       });
 
-      if (Array.isArray(response.data) && this.flags.multiFileEnabled) {
+      if (Array.isArray(response.data)) {
         const directoryTreeResponse = await this.octokitClient.rest.git.createTree({
           owner: this.owner,
           repo: this.repository,

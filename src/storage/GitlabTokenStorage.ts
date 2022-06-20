@@ -195,17 +195,19 @@ export class GitlabTokenStorage extends GitTokenStorage {
       (a.path && b.path) ? a.path.localeCompare(b.path) : 0
     )).map((jsonFile) => jsonFile.path);
 
-    const filesToDelete = jsonFiles.filter((jsonFile) => !Object.keys(changeset).some((item) => item.endsWith(jsonFile)));
+    if (!this.path.endsWith('.json')) {
+      const filesToDelete = jsonFiles.filter((jsonFile) => !Object.keys(changeset).some((item) => item.endsWith(jsonFile)));
 
-    await this.gitlabClient.Commits.create(
-      this.projectId,
-      branch,
-      'remove tokenSet',
-      filesToDelete.map((filePath) => ({
-        action: 'delete',
-        filePath,
-      })),
-    );
+      await this.gitlabClient.Commits.create(
+        this.projectId,
+        branch,
+        'remove tokenSet',
+        filesToDelete.map((filePath) => ({
+          action: 'delete',
+          filePath,
+        })),
+      );
+    }
 
     const response = await this.gitlabClient.Commits.create(
       this.projectId,
