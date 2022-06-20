@@ -49,8 +49,7 @@ export function useGitLab() {
       text: 'Pull from GitLab?',
       description: 'Your repo already contains tokens, do you want to pull these now?',
     });
-    if (confirmResult === false) return false;
-    return confirmResult.result;
+    return confirmResult;
   }, [confirm]);
 
   const pushTokensToGitLab = useCallback(async (context: GitlabCredentials) => {
@@ -91,7 +90,6 @@ export function useGitLab() {
           usedTokenSet,
           activeTheme,
         });
-
         pushDialog('success');
         return {
           tokens,
