@@ -16006,7 +16006,6 @@ react-style-singleton@^2.1.0:
     "tslib" "^1.0.0"
 
 "react-svg-core@^3.0.3":
-  "integrity" "sha512-Ws3eM3xCAwcaYeqm4Ajcz3zxBYNI6BeTWWhFR0cpOT+pWuVtozgHYK9xUM0S/ilapZgYMQDe49XgOxpvooFq4w=="
   "resolved" "https://registry.npmjs.org/react-svg-core/-/react-svg-core-3.0.3.tgz"
   "version" "3.0.3"
   dependencies:
@@ -16057,7 +16056,6 @@ react-uid@^2.3.1:
 "react-window@^1.8.6":
   "integrity" "sha512-8VwEEYyjz6DCnGBsd+MgkD0KJ2/OXFULyDtorIiTz+QzwoP94tBoA7CnbtyXMm+cCeAUER5KJcPtWl9cpKbOBg=="
   "resolved" "https://registry.npmjs.org/react-window/-/react-window-1.8.6.tgz"
-  "version" "1.8.6"
   dependencies:
     "@babel/runtime" "^7.0.0"
     "memoize-one" ">=3.1.1 <6"
