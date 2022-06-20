@@ -45,6 +45,7 @@ export default function StorageItemForm({
     case StorageProviderType.URL: {
       return (
         <URLForm
+          isNew={isNew}
           onChange={onChange}
           onSubmit={onSubmit}
           onCancel={onCancel}

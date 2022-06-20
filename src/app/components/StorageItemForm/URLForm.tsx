@@ -1,11 +1,14 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import zod from 'zod';
+import { useSelector } from 'react-redux';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StorageTypeFormValues } from '@/types/StorageType';
 import Button from '../Button';
 import Input from '../Input';
 import Stack from '../Stack';
 import { generateId } from '@/utils/generateId';
+import { apiProvidersSelector } from '@/selectors';
+import useRemoteTokens from '@/app/store/remoteTokens';
 
 type ValidatedFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.URL; }>;
 type Props = {
@@ -14,11 +17,15 @@ type Props = {
   onCancel: () => void;
   onSubmit: (values: ValidatedFormValues) => void;
   hasErrored?: boolean;
+  isNew?: boolean;
 };
 
 export default function URLForm({
-  onChange, onSubmit, onCancel, values, hasErrored,
+  onChange, onSubmit, onCancel, values, hasErrored, isNew,
 }: Props) {
+  const apiProviders = useSelector(apiProvidersSelector);
+  const { deleteProvider } = useRemoteTokens();
+  const storedApiProviders = () => apiProviders.filter((item) => item.provider === 'url');
   const handleSubmit = React.useCallback((event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
@@ -39,6 +46,22 @@ export default function URLForm({
       onSubmit(formFields);
     }
   }, [values, onSubmit]);
+
+  useEffect(() => {
+    if (!isNew) {
+      const item = storedApiProviders().find((providedItem) => {
+        const {
+          name, provider, secret, id,
+        } = providedItem;
+        if (name === values.name && provider === values.provider && secret === values.secret) {
+          const res = { id, name, provider };
+          return res;
+        }
+        return {};
+      });
+      deleteProvider(item);
+    }
+  }, [isNew, values, deleteProvider]);
 
   return (
     <form onSubmit={handleSubmit}>

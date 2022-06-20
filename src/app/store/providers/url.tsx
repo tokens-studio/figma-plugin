@@ -16,9 +16,11 @@ export default function useURL() {
   const activeTheme = useSelector(activeThemeSelector);
   const usedTokenSets = useSelector(usedTokenSetSelector);
 
-  const storageClientFactory = useCallback((context: UrlCredentials) => (
-    new UrlTokenStorage(context.id, context.secret)
-  ), []);
+  const storageClientFactory = useCallback((context: UrlCredentials) => {
+    const storageClient = new UrlTokenStorage(context.id, context.secret);
+
+    return storageClient;
+  }, []);
 
   // Read tokens from URL
   const pullTokensFromURL = useCallback(async (context: UrlCredentials) => {
@@ -27,23 +29,21 @@ export default function useURL() {
     } = context;
     if (!id && !secret) return null;
     const storage = storageClientFactory(context);
-
     try {
       const content = await storage.retrieve();
       dispatch.uiState.setProjectURL(id);
 
+      AsyncMessageChannel.message({
+        type: AsyncMessageTypes.CREDENTIALS,
+        credential: {
+          id,
+          internalId,
+          name,
+          secret,
+          provider: StorageProviderType.URL,
+        },
+      });
       if (content) {
-        AsyncMessageChannel.message({
-          type: AsyncMessageTypes.CREDENTIALS,
-          credential: {
-            id,
-            internalId,
-            name,
-            secret,
-            provider: StorageProviderType.URL,
-          },
-        });
-
         if (Object.keys(content.tokens).length) {
           dispatch.tokenState.setTokenData({
             values: content.tokens,
@@ -54,8 +54,8 @@ export default function useURL() {
           dispatch.tokenState.setEditProhibited(true);
           return content;
         }
-        notifyToUI('No tokens stored on remote', { error: true });
       }
+      notifyToUI('No tokens stored on remote', { error: true });
     } catch (err) {
       notifyToUI('Error fetching from URL, check console (F12)', { error: true });
       console.log('Error:', err);

@@ -186,11 +186,7 @@ export function Initiator() {
             break;
           }
           case MessageFromPluginTypes.API_PROVIDERS: {
-            const uniqProviders: StorageTypeCredentials[] = [];
-            pluginMessage.providers.forEach((provider) => {
-              if (!uniqProviders.find((p) => p.id === provider.id)) { uniqProviders.push(provider); }
-            });
-            dispatch.uiState.setAPIProviders(uniqProviders);
+            dispatch.uiState.setAPIProviders(pluginMessage.providers);
             break;
           }
           case MessageFromPluginTypes.UI_SETTINGS: {
