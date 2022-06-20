@@ -210,7 +210,7 @@ export class GithubTokenStorage extends GitTokenStorage {
     }
   }
 
-  public async createOrUpdate(changeset: Record<string, string>, message: string, branch: string, shouldCreateBranch?: boolean, filesToDelete?: string[], ignoreDeletionFailures?: boolean): Promise<boolean> {
+  private async createOrUpdate(changeset: Record<string, string>, message: string, branch: string, shouldCreateBranch?: boolean, filesToDelete?: string[], ignoreDeletionFailures?: boolean): Promise<boolean> {
     const response = await this.octokitClient.repos.createOrUpdateFiles({
       branch,
       owner: this.owner,

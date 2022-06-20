@@ -121,7 +121,6 @@ export class GitlabTokenStorage extends GitTokenStorage {
         )).sort((a, b) => (
           (a.path && b.path) ? a.path.localeCompare(b.path) : 0
         ));
-        console.log('jsnfiles', jsonFiles);
 
         const jsonFileContents = await Promise.all(jsonFiles.map((treeItem) => (
           this.gitlabClient.RepositoryFiles.showRaw(this.projectId!, treeItem.path, { ref: this.branch })
