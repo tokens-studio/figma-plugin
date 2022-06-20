@@ -8,6 +8,7 @@ import { generateId } from './generateId';
 export async function updateCredentials(context: StorageTypeCredentials) {
   try {
     const data = await ApiProvidersProperty.read();
+    console.log('data', data);
     let existingProviders: NonNullable<typeof data> = [];
     if (data) {
       existingProviders = data;
