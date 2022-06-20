@@ -30,7 +30,7 @@ function ConfirmDialog() {
           });
           break;
         case StorageProviderType.GITLAB: {
-          redirectHref = getGitlabCreatePullRequestUrl(localApiState.id, localApiState.baseUrl);
+          redirectHref = getGitlabCreatePullRequestUrl(localApiState.id);
           break;
         }
         case StorageProviderType.ADO:
