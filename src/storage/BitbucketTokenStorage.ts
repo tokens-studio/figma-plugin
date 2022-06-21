@@ -77,6 +77,22 @@ export class BitbucketTokenStorage extends GitTokenStorage {
     }
   }
 
+  // https://bitbucketjs.netlify.app/#api-repositories-repositories_createSrcFileCommit
+  // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-source/#api-repositories-workspace-repo-slug-src-post
+  public async createOrUpdateFiles({ owner, repo, branch, changes }: CreatedOrUpdatedFilesType) {
+    const { message, files } = changes[0];
+    const response = await this.bitbucketClient.repositories.createSrcFileCommit({
+      branch,
+      // TODO: see above, need to extend BitbucketClient/RepositoriesCreateSrcFileCommit type to handle Record<string,string>
+      files,
+      message,
+      repo_slug: repo,
+      workspace: owner,
+    });
+
+    return response;
+  }
+
   // https://bitbucketjs.netlify.app/#api-users-users_getAuthedUser OR
   // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-users/?utm_source=%2Fbitbucket%2Fapi%2F2%2Freference%2Fresource%2Fuser&utm_medium=302#api-user-get
   // this would be best: https://developer.atlassian.com/cloud/bitbucket/rest/api-group-repositories/#api-repositories-workspace-repo-slug-permissions-config-users-selected-user-id-get
@@ -153,7 +169,7 @@ export class BitbucketTokenStorage extends GitTokenStorage {
     changeset: Record<string, string>,
     message: string,
     branch: string,
-    shouldCreateBranch?: boolean,
+    shouldCreateBranch?: boolean
   ): Promise<boolean> {
     const response = this.createOrUpdateFiles({
       owner: this.owner,

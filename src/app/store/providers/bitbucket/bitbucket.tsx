@@ -6,9 +6,7 @@ import { Dispatch } from '@/app/store';
 import useConfirm from '@/app/hooks/useConfirm';
 import usePushDialog from '@/app/hooks/usePushDialog';
 import { notifyToUI } from '@/plugin/notifiers';
-import {
-  localApiStateSelector, themesListSelector, tokensSelector, usedTokenSetSelector,
-} from '@/selectors';
+import { localApiStateSelector, themesListSelector, tokensSelector, usedTokenSetSelector } from '@/selectors';
 import { BitbucketTokenStorage } from '@/storage/BitbucketTokenStorage';
 import { isEqual } from '@/utils/isEqual';
 import { RemoteTokenStorageData } from '@/storage/RemoteTokenStorage';
@@ -38,15 +36,14 @@ export function useBitbucket() {
         context.secret,
         owner ?? splitContextId[0],
         repo ?? splitContextId[1],
-        context.baseUrl ?? '',
+        context.baseUrl ?? ''
       );
-
       if (context.filePath) storageClient.changePath(context.filePath);
       if (context.branch) storageClient.selectBranch(context.branch);
       if (multiFileSync) storageClient.enableMultiFile();
       return storageClient;
     },
-    [multiFileSync],
+    [multiFileSync]
   );
 
   const askUserIfPull = useCallback(async () => {
@@ -120,7 +117,7 @@ export function useBitbucket() {
       themes,
       localApiState,
       usedTokenSet,
-    ],
+    ]
   );
 
   const checkAndSetAccess = useCallback(
@@ -129,7 +126,7 @@ export function useBitbucket() {
       const hasWriteAccess = await storage.canWrite();
       dispatch.tokenState.setEditProhibited(!hasWriteAccess);
     },
-    [dispatch, storageClientFactory],
+    [dispatch, storageClientFactory]
   );
 
   const pullTokensFromBitbucket = useCallback(
@@ -151,7 +148,7 @@ export function useBitbucket() {
       }
       return null;
     },
-    [checkAndSetAccess, storageClientFactory],
+    [checkAndSetAccess, storageClientFactory]
   );
 
   // Function to initially check auth and sync tokens with Bitbucket
@@ -191,7 +188,7 @@ export function useBitbucket() {
         return null;
       }
     },
-    [askUserIfPull, dispatch, pushTokensToBitbucket, storageClientFactory, themes, tokens],
+    [askUserIfPull, dispatch, pushTokensToBitbucket, storageClientFactory, themes, tokens]
   );
 
   const addNewBitbucketCredentials = useCallback(
@@ -221,7 +218,7 @@ export function useBitbucket() {
         metadata: {},
       };
     },
-    [syncTokensWithBitbucket, tokens, themes, dispatch.tokenState, usedTokenSet],
+    [syncTokensWithBitbucket, tokens, themes, dispatch.tokenState, usedTokenSet]
   );
 
   const fetchBitbucketBranches = useCallback(
@@ -229,7 +226,7 @@ export function useBitbucket() {
       const storage = storageClientFactory(context);
       return storage.fetchBranches();
     },
-    [storageClientFactory],
+    [storageClientFactory]
   );
 
   const createBitbucketBranch = useCallback(
@@ -237,7 +234,7 @@ export function useBitbucket() {
       const storage = storageClientFactory(context);
       return storage.createBranch(newBranch, source);
     },
-    [storageClientFactory],
+    [storageClientFactory]
   );
 
   return useMemo(
@@ -256,6 +253,6 @@ export function useBitbucket() {
       pushTokensToBitbucket,
       fetchBitbucketBranches,
       createBitbucketBranch,
-    ],
+    ]
   );
 }
