@@ -39,7 +39,7 @@ export function Initiator() {
       });
       return shouldPull;
     },
-    [confirm],
+    [confirm]
   );
 
   const onInitiate = useCallback(() => {
@@ -47,12 +47,13 @@ export function Initiator() {
   }, []);
 
   const getApiCredentials = useCallback(
-    (shouldPull: boolean, featureFlags: LDProps['flags'] | null) => AsyncMessageChannel.message({
-      type: AsyncMessageTypes.GET_API_CREDENTIALS,
-      shouldPull,
-      featureFlags,
-    }),
-    [],
+    (shouldPull: boolean, featureFlags: LDProps['flags'] | null) =>
+      AsyncMessageChannel.message({
+        type: AsyncMessageTypes.GET_API_CREDENTIALS,
+        shouldPull,
+        featureFlags,
+      }),
+    []
   );
 
   useEffect(() => {
@@ -102,11 +103,11 @@ export function Initiator() {
             const existChanges = values.checkForChanges;
             const storageType = values.storageType?.provider;
             if (
-              !existChanges
-              || (storageType
-                && storageType !== StorageProviderType.LOCAL
-                && existChanges
-                && (await askUserIfPull(storageType)))
+              !existChanges ||
+              (storageType &&
+                storageType !== StorageProviderType.LOCAL &&
+                existChanges &&
+                (await askUserIfPull(storageType)))
             ) {
               featureFlags = await fetchFeatureFlags(userData);
               getApiCredentials(true, featureFlags);
@@ -148,9 +149,7 @@ export function Initiator() {
             setStorageType({ provider: pluginMessage.storageType });
             break;
           case MessageFromPluginTypes.API_CREDENTIALS: {
-            const {
-              status, credentials, usedTokenSet, activeTheme, shouldPull, featureFlags,
-            } = pluginMessage;
+            const { status, credentials, usedTokenSet, activeTheme, shouldPull, featureFlags } = pluginMessage;
             if (status === true) {
               const receivedFlags: LDProps['flags'] = featureFlags;
               try {
@@ -159,10 +158,10 @@ export function Initiator() {
 
                 if (credentials) {
                   if (
-                    credentials.provider === StorageProviderType.GITHUB
-                    || credentials.provider === StorageProviderType.GITLAB
-                    || credentials.provider === StorageProviderType.BITBUCKET
-                    || credentials.provider === StorageProviderType.ADO
+                    credentials.provider === StorageProviderType.GITHUB ||
+                    credentials.provider === StorageProviderType.GITLAB ||
+                    credentials.provider === StorageProviderType.BITBUCKET ||
+                    credentials.provider === StorageProviderType.ADO
                   ) {
                     const branches = await fetchBranches(credentials as StorageTypeCredentials);
                     if (branches) dispatch.branchState.setBranches(branches);
@@ -173,7 +172,10 @@ export function Initiator() {
 
                   if (shouldPull) {
                     const remoteData = await pullTokens({
-                      context: credentials, featureFlags: receivedFlags, usedTokenSet, activeTheme,
+                      context: credentials,
+                      featureFlags: receivedFlags,
+                      usedTokenSet,
+                      activeTheme,
                     });
                     const existTokens = Object.values(remoteData?.tokens ?? {}).some((value) => value.length > 0);
                     if (existTokens) {
