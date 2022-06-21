@@ -79,7 +79,8 @@ const SyncSettings = () => {
       case StorageProviderType.JSONBIN:
         return (
           <div>
-            Create an account at{' '}
+            Create an account at
+            {' '}
             <a href="https://jsonbin.io/" target="_blank" rel="noreferrer" className="underline">
               JSONbin.io
             </a>
