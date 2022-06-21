@@ -47,8 +47,6 @@ describe('TokenListing', () => {
     createTokenSet({ name: 'token-source' });
     createTokenSet({ name: 'token-enabled' });
     createTokenSet({ name: 'token-disabled' });
-
-    // receiveRemoteComponents();
   });
   
   it('Can create a new theme & select theme', () => {
