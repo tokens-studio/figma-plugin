@@ -16,7 +16,6 @@ import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 import DownshiftInput from './DownshiftInput';
 import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
 import { useTypeForProperty } from '../hooks/useTypeForProperty';
-import ColorPicker from './ColorPicker';
 
 export default function SingleCompositionTokenForm({
   index,
@@ -43,7 +42,6 @@ export default function SingleCompositionTokenForm({
 }) {
   const [menuOpened, setMenuOpened] = useState(false);
   const propertyType = useTypeForProperty(property);
-  const [inputHelperOpen, setInputHelperOpen] = React.useState(false);
   const seed = useUIDSeed();
 
   const onPropertySelected = useCallback((newProperty: string) => {
@@ -84,18 +82,6 @@ export default function SingleCompositionTokenForm({
     onRemove(property);
   }, [onRemove, property]);
 
-  const handleToggleInputHelper = React.useCallback(() => {
-    setInputHelperOpen(!inputHelperOpen);
-  }, [inputHelperOpen]);
-
-  const handleColorValueChange = React.useCallback(
-    (color: string) => {
-      tokenValue[property as CompositionTokenProperty] = color;
-      setTokenValue(tokenValue);
-    },
-    [tokenValue],
-  );
-
   return (
     <Box>
       <Box css={{
@@ -103,7 +89,7 @@ export default function SingleCompositionTokenForm({
         justifyContent: 'space-between',
         alignItems: 'center',
         gap: '$3',
-        '& > .down-shift-box ': {
+        '& > .relative ': {
           flex: '2',
         },
       }}
@@ -120,34 +106,17 @@ export default function SingleCompositionTokenForm({
             </DropdownMenuRadioGroup>
           </DropdownMenuContent>
         </DropdownMenu>
-        <Box className="down-shift-box">
-          <DownshiftInput
-            value={propertyValue}
-            type={propertyType === 'fill' ? 'color' : propertyType}
-            resolvedTokens={resolvedTokens}
-            handleChange={onPropertyValueChanged}
-            setInputValue={handleDownShiftInputChange}
-            prefix={
-              propertyType === 'fill' && (
-                <button
-                  type="button"
-                  className="block w-4 h-4 rounded-sm cursor-pointer shadow-border shadow-gray-300 focus:shadow-focus focus:shadow-primary-400"
-                  style={{ background: propertyValue, fontSize: 0 }}
-                  onClick={handleToggleInputHelper}
-                >
-                  {propertyValue}
-                </button>
-              )
-            }
-            placeholder={
-              propertyType === 'fill' ? '#000000, hsla(), rgba() or {alias}' : 'Value or {alias}'
-            }
-            suffix
-          />
-          {inputHelperOpen && propertyType === 'fill' && (
-            <ColorPicker value={propertyValue} onChange={handleColorValueChange} />
-          )}
-        </Box>
+        <DownshiftInput
+          value={propertyValue}
+          type={propertyType === 'fill' ? 'color' : propertyType}
+          resolvedTokens={resolvedTokens}
+          handleChange={onPropertyValueChanged}
+          setInputValue={handleDownShiftInputChange}
+          placeholder={
+            propertyType === 'fill' ? '#000000, hsla(), rgba() or {alias}' : 'Value or {alias}'
+          }
+          suffix
+        />
         <Box css={{ width: '$5', marginRight: '$3' }}>
           <IconButton
             tooltip="Remove this style"
