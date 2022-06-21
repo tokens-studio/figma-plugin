@@ -3,7 +3,6 @@ import { useUIDSeed } from 'react-uid';
 import IconMinus from '@/icons/minus.svg';
 import IconButton from './IconButton';
 import Box from './Box';
-import Input from './Input';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,13 +13,17 @@ import { PropertyDropdownMenuRadioElement } from './PropertyDropdownMenuRadioEle
 import { Properties } from '@/constants/Properties';
 import { CompositionTokenProperty } from '@/types/CompositionTokenProperty';
 import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
+import DownshiftInput from './DownshiftInput';
+import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
+import { useTypeForProperty } from '../hooks/useTypeForProperty';
 
 export default function SingleCompositionTokenForm({
   index,
   property,
-  value,
+  propertyValue,
   tokenValue,
   properties,
+  resolvedTokens,
   setTokenValue,
   onRemove,
   setOrderObj,
@@ -28,15 +31,18 @@ export default function SingleCompositionTokenForm({
 }: {
   index: number;
   property: string;
-  value: string;
+  propertyValue: string;
   tokenValue: NodeTokenRefMap;
   properties: string[];
+  resolvedTokens: ResolveTokenValuesResult[];
   setTokenValue: (neweTokenValue: NodeTokenRefMap) => void;
   onRemove: (property: string) => void;
   setOrderObj: (newOrderObj: NodeTokenRefMap) => void;
   setError: (newError: boolean) => void;
 }) {
   const [menuOpened, setMenuOpened] = useState(false);
+  const propertyType = useTypeForProperty(property);
+  const [inputHelperOpen, setInputHelperOpen] = React.useState(false);
   const seed = useUIDSeed();
 
   const onPropertySelected = useCallback((newProperty: string) => {
@@ -51,15 +57,28 @@ export default function SingleCompositionTokenForm({
 
     // set newTokenValue
     delete tokenValue[property as keyof typeof Properties];
-    tokenValue[newProperty as keyof typeof Properties] = value;
+    tokenValue[newProperty as keyof typeof Properties] = propertyValue;
     setTokenValue(tokenValue);
     setError(false);
   }, [tokenValue]);
 
-  const onAliasChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    tokenValue[property as CompositionTokenProperty] = e.target.value;
+  const onPropertyValueChanged = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>(
+    (e) => {
+      tokenValue[property as CompositionTokenProperty] = e.target.value;
+      setTokenValue(tokenValue);
+    },
+    [tokenValue],
+  );
+
+  const handleDownShiftInputChange = React.useCallback((newInputValue: string) => {
+    tokenValue[property as CompositionTokenProperty] = newInputValue;
     setTokenValue(tokenValue);
   }, [tokenValue]);
+
+  // const onPropertyValueChanged = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+  //   tokenValue[property as CompositionTokenProperty] = e.target.value;
+  //   setTokenValue(tokenValue);
+  // }, [tokenValue]);
 
   const handleToggleMenu = useCallback(() => {
     setMenuOpened(!menuOpened);
@@ -68,6 +87,10 @@ export default function SingleCompositionTokenForm({
   const handleRemove = useCallback(() => {
     onRemove(property);
   }, [onRemove, property]);
+
+  const handleToggleInputHelper = React.useCallback(() => {
+    setInputHelperOpen(!inputHelperOpen);
+  }, [inputHelperOpen]);
 
   return (
     <Box>
@@ -98,15 +121,30 @@ export default function SingleCompositionTokenForm({
           </DropdownMenuContent>
         </DropdownMenu>
 
-        <Input
-          required
-          full
-          value={value}
-          onChange={onAliasChange}
-          type="text"
-          name="alias"
-          placeholder="Alias"
+        <DownshiftInput
+          value={propertyValue}
+          type={propertyType === 'fill' ? 'color' : propertyType}
+          resolvedTokens={resolvedTokens}
+          handleChange={onPropertyValueChanged}
+          setInputValue={handleDownShiftInputChange}
+          prefix={
+            propertyType === 'color' && (
+              <button
+                type="button"
+                className="block w-4 h-4 rounded-sm cursor-pointer shadow-border shadow-gray-300 focus:shadow-focus focus:shadow-primary-400"
+                style={{ background: propertyValue, fontSize: 0 }}
+                onClick={handleToggleInputHelper}
+              >
+                {propertyValue}
+              </button>
+            )
+          }
+          placeholder={
+            propertyType === 'color' ? '#000000, hsla(), rgba() or {alias}' : 'Value or {alias}'
+          }
+          suffix
         />
+
         <Box css={{ width: '$5', marginRight: '$3' }}>
           <IconButton
             tooltip="Remove this style"

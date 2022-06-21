@@ -133,6 +133,9 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
     );
   }, []);
 
+  React.useEffect(() => {
+    console.log('type', type, 'value', value);
+  }, [type, value]);
   const filteredTokenItems = useMemo(
     () => resolvedTokens
       .filter(
