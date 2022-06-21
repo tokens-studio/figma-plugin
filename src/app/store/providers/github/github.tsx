@@ -48,14 +48,12 @@ export function useGitHub() {
       text: 'Pull from GitHub?',
       description: 'Your repo already contains tokens, do you want to pull these now?',
     });
-    if (confirmResult === false) return false;
-    return confirmResult.result;
+    return confirmResult;
   }, [confirm]);
 
   const pushTokensToGitHub = useCallback(async (context: GithubCredentials): Promise<RemoteTokenStorageData<GitStorageMetadata> | null> => {
     const storage = storageClientFactory(context);
     const content = await storage.retrieve();
-
     if (content) {
       if (
         content
@@ -206,15 +204,7 @@ export function useGitHub() {
         type: AsyncMessageTypes.CREDENTIALS,
         credential: context,
       });
-      if (data?.tokens) {
-        dispatch.tokenState.setLastSyncedState(JSON.stringify([data.tokens, data.themes], null, 2));
-        dispatch.tokenState.setTokenData({
-          values: data.tokens,
-          themes: data.themes,
-          usedTokenSet,
-          activeTheme,
-        });
-      } else {
+      if (!data.tokens) {
         notifyToUI('No tokens stored on remote');
       }
     } else {
