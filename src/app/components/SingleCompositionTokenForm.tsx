@@ -16,6 +16,7 @@ import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 import DownshiftInput from './DownshiftInput';
 import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
 import { useTypeForProperty } from '../hooks/useTypeForProperty';
+import ColorPicker from './ColorPicker';
 
 export default function SingleCompositionTokenForm({
   index,
@@ -75,11 +76,6 @@ export default function SingleCompositionTokenForm({
     setTokenValue(tokenValue);
   }, [tokenValue]);
 
-  // const onPropertyValueChanged = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-  //   tokenValue[property as CompositionTokenProperty] = e.target.value;
-  //   setTokenValue(tokenValue);
-  // }, [tokenValue]);
-
   const handleToggleMenu = useCallback(() => {
     setMenuOpened(!menuOpened);
   }, [menuOpened]);
@@ -92,6 +88,14 @@ export default function SingleCompositionTokenForm({
     setInputHelperOpen(!inputHelperOpen);
   }, [inputHelperOpen]);
 
+  const handleColorValueChange = React.useCallback(
+    (color: string) => {
+      tokenValue[property as CompositionTokenProperty] = color;
+      setTokenValue(tokenValue);
+    },
+    [tokenValue],
+  );
+
   return (
     <Box>
       <Box css={{
@@ -99,17 +103,10 @@ export default function SingleCompositionTokenForm({
         justifyContent: 'space-between',
         alignItems: 'center',
         gap: '$3',
-        '& > label': {
-          flex: 4,
-          fontSize: '$5 !important',
-          '& > div > input': {
-            height: '$10',
-          },
-        },
       }}
       >
         <DropdownMenu open={menuOpened} onOpenChange={handleToggleMenu}>
-          <DropdownMenuTrigger bordered css={{ flex: 3, minHeight: '$10' }}>
+          <DropdownMenuTrigger bordered css={{ flex: 3, height: '$10' }}>
             <span>{property || 'Choose a property'}</span>
           </DropdownMenuTrigger>
           <DropdownMenuContent sideOffset={2} className="content scroll-container" css={{ maxHeight: '$dropdownMaxHeight' }}>
@@ -128,7 +125,7 @@ export default function SingleCompositionTokenForm({
           handleChange={onPropertyValueChanged}
           setInputValue={handleDownShiftInputChange}
           prefix={
-            propertyType === 'color' && (
+            propertyType === 'fill' && (
               <button
                 type="button"
                 className="block w-4 h-4 rounded-sm cursor-pointer shadow-border shadow-gray-300 focus:shadow-focus focus:shadow-primary-400"
@@ -140,10 +137,14 @@ export default function SingleCompositionTokenForm({
             )
           }
           placeholder={
-            propertyType === 'color' ? '#000000, hsla(), rgba() or {alias}' : 'Value or {alias}'
+            propertyType === 'fill' ? '#000000, hsla(), rgba() or {alias}' : 'Value or {alias}'
           }
           suffix
         />
+
+        {inputHelperOpen && propertyType === 'fill' && (
+          <ColorPicker value={propertyValue} onChange={handleColorValueChange} />
+        )}
 
         <Box css={{ width: '$5', marginRight: '$3' }}>
           <IconButton
