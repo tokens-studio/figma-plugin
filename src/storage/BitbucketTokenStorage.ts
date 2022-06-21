@@ -107,6 +107,7 @@ export class BitbucketTokenStorage extends GitTokenStorage {
         // path: this.path,
         // ref: this.branch,
       });
+
       // TODO: create a tree structure and read the directory
       // the Bitbucket cloud API doesn't have a method like `createTree`
 
@@ -155,7 +156,7 @@ export class BitbucketTokenStorage extends GitTokenStorage {
     changeset: Record<string, string>,
     message: string,
     branch: string,
-    shouldCreateBranch?: boolean
+    shouldCreateBranch?: boolean,
   ): Promise<boolean> {
     const response = this.createOrUpdateFiles({
       branch,
