@@ -247,7 +247,7 @@ export class ADOTokenStorage extends GitTokenStorage {
         return compact(jsonFileContents.map<RemoteTokenStorageFile<GitStorageMetadata> | null>((fileContent, index) => {
           const { path } = jsonFiles[index];
           if (fileContent) {
-            const name = path?.replace('.json', '').replace(this.path, '').replace(/^\//, '').replace(/\/$/, '');
+            const name = path?.replace(this.path, '')?.replace(/^\/+/, '')?.replace('.json', '');
             if (name === '$themes' && Array.isArray(fileContent)) {
               return {
                 path,
