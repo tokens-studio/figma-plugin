@@ -31,25 +31,29 @@ export function Initiator() {
   const checkedLocalStorage = useSelector(checkedLocalStorageForKeySelector);
   const userId = useSelector(userIdSelector);
 
-  const askUserIfPull: ((storageType: StorageProviderType | undefined) => Promise<any>) = useCallback(async (storageType) => {
-    const shouldPull = await confirm({
-      text: `Pull from ${storageType}?`,
-      description: 'You have unsaved changes that will be lost. Do you want to pull from your repo?',
-    });
-    return shouldPull;
-  }, [confirm]);
+  const askUserIfPull: (storageType: StorageProviderType | undefined) => Promise<any> = useCallback(
+    async (storageType) => {
+      const shouldPull = await confirm({
+        text: `Pull from ${storageType}?`,
+        description: 'You have unsaved changes that will be lost. Do you want to pull from your repo?',
+      });
+      return shouldPull;
+    },
+    [confirm],
+  );
 
   const onInitiate = useCallback(() => {
     AsyncMessageChannel.message({ type: AsyncMessageTypes.INITIATE });
   }, []);
 
-  const getApiCredentials = useCallback((shouldPull: boolean, featureFlags: LDProps['flags'] | null) => (
-    AsyncMessageChannel.message({
+  const getApiCredentials = useCallback(
+    (shouldPull: boolean, featureFlags: LDProps['flags'] | null) => AsyncMessageChannel.message({
       type: AsyncMessageTypes.GET_API_CREDENTIALS,
       shouldPull,
       featureFlags,
-    })
-  ), []);
+    }),
+    [],
+  );
 
   useEffect(() => {
     onInitiate();
@@ -97,9 +101,13 @@ export function Initiator() {
             let featureFlags: LDProps['flags'] | null;
             const existChanges = values.checkForChanges;
             const storageType = values.storageType?.provider;
-            if (!existChanges
-              || ((storageType && storageType !== StorageProviderType.LOCAL)
-              && existChanges && await askUserIfPull(storageType))) {
+            if (
+              !existChanges
+              || (storageType
+                && storageType !== StorageProviderType.LOCAL
+                && existChanges
+                && (await askUserIfPull(storageType)))
+            ) {
               featureFlags = await fetchFeatureFlags(userData);
               getApiCredentials(true, featureFlags);
             } else {
@@ -153,6 +161,7 @@ export function Initiator() {
                   if (
                     credentials.provider === StorageProviderType.GITHUB
                     || credentials.provider === StorageProviderType.GITLAB
+                    || credentials.provider === StorageProviderType.BITBUCKET
                     || credentials.provider === StorageProviderType.ADO
                   ) {
                     const branches = await fetchBranches(credentials as StorageTypeCredentials);
@@ -163,9 +172,17 @@ export function Initiator() {
                   dispatch.uiState.setLocalApiState(credentials);
 
                   if (shouldPull) {
-                    const remoteData = await pullTokens({ context: credentials, featureFlags: receivedFlags, usedTokenSet });
+                    const remoteData = await pullTokens({
+                      context: credentials,
+                      featureFlags: receivedFlags,
+                      usedTokenSet,
+                    });
                     const existTokens = Object.values(remoteData?.tokens ?? {}).some((value) => value.length > 0);
-                    if (existTokens) { dispatch.uiState.setActiveTab(Tabs.TOKENS); } else { dispatch.uiState.setActiveTab(Tabs.START); }
+                    if (existTokens) {
+                      dispatch.uiState.setActiveTab(Tabs.TOKENS);
+                    } else {
+                      dispatch.uiState.setActiveTab(Tabs.START);
+                    }
                   } else {
                     dispatch.uiState.setActiveTab(Tabs.TOKENS);
                   }
