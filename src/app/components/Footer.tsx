@@ -1,8 +1,6 @@
 import React, { useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import {
-  DownloadIcon, UploadIcon,
-} from '@primer/octicons-react';
+import { DownloadIcon, UploadIcon } from '@primer/octicons-react';
 import { Dispatch } from '../store';
 import * as pjs from '../../../package.json';
 import Box from './Box';
@@ -45,7 +43,7 @@ export default function Footer() {
   const { pullTokens, pushTokens } = useRemoteTokens();
 
   const checkForChanges = React.useCallback(() => {
-    const hasChanged = (lastSyncedState !== JSON.stringify([tokens, themes], null, 2));
+    const hasChanged = lastSyncedState !== JSON.stringify([tokens, themes], null, 2);
     dispatch.tokenState.updateCheckForChanges(hasChanged);
     return hasChanged;
   }, [lastSyncedState, tokens, themes, dispatch.tokenState]);
@@ -60,6 +58,8 @@ export default function Footer() {
         return 'GitHub';
       case StorageProviderType.GITLAB:
         return 'GitLab';
+      case StorageProviderType.BITBUCKET:
+        return 'Bitbucket';
       case StorageProviderType.ADO:
         return 'ADO';
       case StorageProviderType.URL:
@@ -89,15 +89,27 @@ export default function Footer() {
         {isGitProvider(localApiState) && localApiState.branch && (
           <>
             {gitBranchSelector && <BranchSelector />}
-            <IconButton icon={<DownloadIcon />} onClick={onPullButtonClicked} tooltipSide="top" tooltip={`Pull from ${transformProviderName(storageType.provider)}`} />
-            <IconButton badge={hasChanges} icon={<UploadIcon />} onClick={onPushButtonClicked} tooltipSide="top" disabled={editProhibited} tooltip={`Push to ${transformProviderName(storageType.provider)}`} />
+            <IconButton
+              icon={<DownloadIcon />}
+              onClick={onPullButtonClicked}
+              tooltipSide="top"
+              tooltip={`Pull from ${transformProviderName(storageType.provider)}`}
+            />
+            <IconButton
+              badge={hasChanges}
+              icon={<UploadIcon />}
+              onClick={onPushButtonClicked}
+              tooltipSide="top"
+              disabled={editProhibited}
+              tooltip={`Push to ${transformProviderName(storageType.provider)}`}
+            />
           </>
         )}
         {storageType.provider !== StorageProviderType.LOCAL
           && storageType.provider !== StorageProviderType.GITHUB
           && storageType.provider !== StorageProviderType.GITLAB
-          && storageType.provider !== StorageProviderType.ADO
-          && (
+          && storageType.provider !== StorageProviderType.BITBUCKET
+          && storageType.provider !== StorageProviderType.ADO && (
             <Stack align="center" direction="row" gap={2}>
               <Text muted>Sync</Text>
               {storageType.provider === StorageProviderType.JSONBIN && (
@@ -107,14 +119,17 @@ export default function Footer() {
                   </a>
                 </Tooltip>
               )}
-              <IconButton tooltip={`Pull from ${transformProviderName(storageType.provider)}`} onClick={handlePullTokens} icon={<RefreshIcon />} />
+              <IconButton
+                tooltip={`Pull from ${transformProviderName(storageType.provider)}`}
+                onClick={handlePullTokens}
+                icon={<RefreshIcon />}
+              />
             </Stack>
-          )}
+        )}
       </Stack>
       <Stack direction="row" gap={4} align="center">
         <Box css={{ color: '$textMuted', fontSize: '$xsmall' }}>
           V
-          {' '}
           {pjs.plugin_version}
         </Box>
         <Stack direction="row" gap={1}>
