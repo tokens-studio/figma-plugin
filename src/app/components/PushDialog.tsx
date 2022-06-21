@@ -137,6 +137,7 @@ function ConfirmDialog() {
               Pushing to
               {localApiState.provider === StorageProviderType.GITHUB && ' GitHub'}
               {localApiState.provider === StorageProviderType.GITLAB && ' GitLab'}
+              {localApiState.provider === StorageProviderType.BITBUCKET && ' Bitbucket'}
               {localApiState.provider === StorageProviderType.ADO && ' ADO'}
             </Heading>
           </Stack>
@@ -153,8 +154,8 @@ function ConfirmDialog() {
                 Changes pushed to
                 {localApiState.provider === StorageProviderType.GITHUB && ' GitHub'}
                 {localApiState.provider === StorageProviderType.GITLAB && ' GitLab'}
+                {localApiState.provider === StorageProviderType.BITBUCKET && ' Bitbucket'}
                 {localApiState.provider === StorageProviderType.ADO && ' ADO'}
-                .
               </div>
             </div>
             <Button variant="primary" href={redirectHref}>
