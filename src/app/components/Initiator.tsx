@@ -149,13 +149,8 @@ export function Initiator() {
             setStorageType({ provider: pluginMessage.storageType });
             break;
           case MessageFromPluginTypes.API_CREDENTIALS: {
-<<<<<<< HEAD
             const { status, credentials, usedTokenSet, activeTheme, shouldPull, featureFlags } = pluginMessage;
-=======
-            const {
-              status, credentials, usedTokenSet, activeTheme, shouldPull, featureFlags,
-            } = pluginMessage;
->>>>>>> f355fae (feat: pass along stored activeTheme)
+
             if (status === true) {
               const receivedFlags: LDProps['flags'] = featureFlags;
               try {
@@ -178,14 +173,10 @@ export function Initiator() {
 
                   if (shouldPull) {
                     const remoteData = await pullTokens({
-<<<<<<< HEAD
                       context: credentials,
                       featureFlags: receivedFlags,
                       usedTokenSet,
                       activeTheme,
-=======
-                      context: credentials, featureFlags: receivedFlags, usedTokenSet, activeTheme,
->>>>>>> f355fae (feat: pass along stored activeTheme)
                     });
                     const existTokens = Object.values(remoteData?.tokens ?? {}).some((value) => value.length > 0);
                     if (existTokens) {
