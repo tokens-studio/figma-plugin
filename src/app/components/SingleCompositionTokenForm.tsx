@@ -103,10 +103,13 @@ export default function SingleCompositionTokenForm({
         justifyContent: 'space-between',
         alignItems: 'center',
         gap: '$3',
+        '& > .down-shift-box ': {
+          flex: '2',
+        },
       }}
       >
         <DropdownMenu open={menuOpened} onOpenChange={handleToggleMenu}>
-          <DropdownMenuTrigger bordered css={{ flex: 3, height: '$10' }}>
+          <DropdownMenuTrigger bordered css={{ flex: 1, height: '$10' }}>
             <span>{property || 'Choose a property'}</span>
           </DropdownMenuTrigger>
           <DropdownMenuContent sideOffset={2} className="content scroll-container" css={{ maxHeight: '$dropdownMaxHeight' }}>
@@ -117,35 +120,34 @@ export default function SingleCompositionTokenForm({
             </DropdownMenuRadioGroup>
           </DropdownMenuContent>
         </DropdownMenu>
-
-        <DownshiftInput
-          value={propertyValue}
-          type={propertyType === 'fill' ? 'color' : propertyType}
-          resolvedTokens={resolvedTokens}
-          handleChange={onPropertyValueChanged}
-          setInputValue={handleDownShiftInputChange}
-          prefix={
-            propertyType === 'fill' && (
-              <button
-                type="button"
-                className="block w-4 h-4 rounded-sm cursor-pointer shadow-border shadow-gray-300 focus:shadow-focus focus:shadow-primary-400"
-                style={{ background: propertyValue, fontSize: 0 }}
-                onClick={handleToggleInputHelper}
-              >
-                {propertyValue}
-              </button>
-            )
-          }
-          placeholder={
-            propertyType === 'fill' ? '#000000, hsla(), rgba() or {alias}' : 'Value or {alias}'
-          }
-          suffix
-        />
-
-        {inputHelperOpen && propertyType === 'fill' && (
-          <ColorPicker value={propertyValue} onChange={handleColorValueChange} />
-        )}
-
+        <Box className="down-shift-box">
+          <DownshiftInput
+            value={propertyValue}
+            type={propertyType === 'fill' ? 'color' : propertyType}
+            resolvedTokens={resolvedTokens}
+            handleChange={onPropertyValueChanged}
+            setInputValue={handleDownShiftInputChange}
+            prefix={
+              propertyType === 'fill' && (
+                <button
+                  type="button"
+                  className="block w-4 h-4 rounded-sm cursor-pointer shadow-border shadow-gray-300 focus:shadow-focus focus:shadow-primary-400"
+                  style={{ background: propertyValue, fontSize: 0 }}
+                  onClick={handleToggleInputHelper}
+                >
+                  {propertyValue}
+                </button>
+              )
+            }
+            placeholder={
+              propertyType === 'fill' ? '#000000, hsla(), rgba() or {alias}' : 'Value or {alias}'
+            }
+            suffix
+          />
+          {inputHelperOpen && propertyType === 'fill' && (
+            <ColorPicker value={propertyValue} onChange={handleColorValueChange} />
+          )}
+        </Box>
         <Box css={{ width: '$5', marginRight: '$3' }}>
           <IconButton
             tooltip="Remove this style"
