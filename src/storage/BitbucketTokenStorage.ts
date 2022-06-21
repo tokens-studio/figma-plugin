@@ -170,6 +170,7 @@ export class BitbucketTokenStorage extends GitTokenStorage {
         // TODO: sort
         // .sort((a: { path: string }, b: { path: any }) => (a.path && b.path ? a.path.localeCompare(b.path) : 0));
 
+<<<<<<< HEAD
         const DirectoryNameSplit = this.path.split('/');
         const RootDirectoryName = DirectoryNameSplit[0];
         let subDirectoryName: string;
@@ -178,6 +179,47 @@ export class BitbucketTokenStorage extends GitTokenStorage {
           subDirectoryName = `${DirectoryNameSplit.splice(1, DirectoryNameSplit.length - 1).join('/')}/`;
         } else {
           subDirectoryName = '';
+=======
+            const jsonFileContents = await Promise.all(
+              jsonFiles.map((treeItem) => (treeItem.path
+                ? this.bitbucketClient.rest.repositories.get({
+                  workspace: this.owner,
+                  repo_slug: this.repository,
+                  path: `${RootDirectoryName}/${treeItem.path}`,
+                  ref: this.branch,
+                })
+                : Promise.resolve(null))),
+            );
+            return compact(
+              jsonFileContents.map<RemoteTokenStorageFile<GitStorageMetadata> | null>((fileContent, index) => {
+                const { path } = jsonFiles[index];
+
+                if (path && fileContent?.data && !Array.isArray(fileContent?.data) && 'content' in fileContent.data) {
+                  let name = path.replace(subDirectoryName, '');
+                  name = name.replace('.json', '');
+                  const parsed = JSON.parse(decodeBase64(fileContent.data.content)) as GitMultiFileObject;
+                  // @REAMDE we will need to ensure these reserved names
+                  if (name === '$themes') {
+                    return {
+                      path,
+                      type: 'themes',
+                      data: parsed as ThemeObjectsList,
+                    };
+                  }
+
+                  return {
+                    path,
+                    name,
+                    type: 'tokenSet',
+                    data: parsed as AnyTokenSet<false>,
+                  };
+                }
+
+                return null;
+              }),
+            );
+          }
+>>>>>>> 70307f3 (add methods for bitbucket providers)
         }
 
         const jsonFileContents = await Promise.all(
