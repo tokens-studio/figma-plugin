@@ -2,6 +2,7 @@ import React from 'react';
 import { useSelector } from 'react-redux';
 import { localApiStateSelector } from '@/selectors';
 import usePushDialog from '../hooks/usePushDialog';
+import { getBitbucketCreatePullRequestUrl } from '../store/providers/bitbucket';
 import { getGithubCreatePullRequestUrl } from '../store/providers/github';
 import { getGitlabCreatePullRequestUrl } from '../store/providers/gitlab';
 import { getADOCreatePullRequestUrl } from '../store/providers/ado';
@@ -27,7 +28,16 @@ function ConfirmDialog() {
       switch (localApiState.provider) {
         case StorageProviderType.GITHUB:
           redirectHref = getGithubCreatePullRequestUrl({
-            base: localApiState.baseUrl, repo: localApiState.id, branch,
+            base: localApiState.baseUrl,
+            repo: localApiState.id,
+            branch,
+          });
+          break;
+        case StorageProviderType.BITBUCKET:
+          redirectHref = getBitbucketCreatePullRequestUrl({
+            base: localApiState.baseUrl,
+            repo: localApiState.id,
+            branch,
           });
           break;
         case StorageProviderType.GITLAB: {
@@ -49,13 +59,19 @@ function ConfirmDialog() {
     return redirectHref;
   }, [branch, localApiState]);
 
-  const handleCommitMessageChange = React.useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    setCommitMessage(event.target.value);
-  }, [setCommitMessage]);
+  const handleCommitMessageChange = React.useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setCommitMessage(event.target.value);
+    },
+    [setCommitMessage],
+  );
 
-  const handleBranchChange = React.useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    setBranch(event.target.value);
-  }, [setBranch]);
+  const handleBranchChange = React.useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setBranch(event.target.value);
+    },
+    [setBranch],
+  );
 
   const handleSubmit = React.useCallback(() => {
     onConfirm(commitMessage, branch);

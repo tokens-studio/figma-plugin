@@ -3,11 +3,12 @@ import GitForm from './StorageItemForm/GitForm';
 import ADOForm from './StorageItemForm/ADOForm';
 import JSONBinForm from './StorageItemForm/JSONBinForm';
 import URLForm from './StorageItemForm/URLForm';
+import BitbucketForm from './StorageItemForm/BitbucketForm';
 import { StorageTypeFormValues } from '@/types/StorageType';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 
 type Props = {
-  values: StorageTypeFormValues<true>
+  values: StorageTypeFormValues<true>;
   onChange: React.ChangeEventHandler<HTMLInputElement>;
   onCancel: () => void;
   onSubmit: (values: StorageTypeFormValues<false>) => void;
@@ -22,7 +23,12 @@ export default function StorageItemForm({
     case StorageProviderType.GITHUB:
     case StorageProviderType.GITLAB: {
       return (
-        <GitForm
+        <GitForm onChange={onChange} onSubmit={onSubmit} onCancel={onCancel} values={values} hasErrored={hasErrored} />
+      );
+    }
+    case StorageProviderType.BITBUCKET: {
+      return (
+        <BitbucketForm
           onChange={onChange}
           onSubmit={onSubmit}
           onCancel={onCancel}
@@ -33,24 +39,12 @@ export default function StorageItemForm({
     }
     case StorageProviderType.ADO: {
       return (
-        <ADOForm
-          onChange={onChange}
-          onSubmit={onSubmit}
-          onCancel={onCancel}
-          values={values}
-          hasErrored={hasErrored}
-        />
+        <ADOForm onChange={onChange} onSubmit={onSubmit} onCancel={onCancel} values={values} hasErrored={hasErrored} />
       );
     }
     case StorageProviderType.URL: {
       return (
-        <URLForm
-          onChange={onChange}
-          onSubmit={onSubmit}
-          onCancel={onCancel}
-          values={values}
-          hasErrored={hasErrored}
-        />
+        <URLForm onChange={onChange} onSubmit={onSubmit} onCancel={onCancel} values={values} hasErrored={hasErrored} />
       );
     }
     case StorageProviderType.JSONBIN: {
