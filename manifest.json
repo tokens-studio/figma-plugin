@@ -1,6 +1,11 @@
 {
+<<<<<<< HEAD
   "name": "Figma Tokens Bitbucket",
   "id": "0000000000000000",
+=======
+  "name": "Tokens",
+  "id": "843461159747178978",
+>>>>>>> 90c0c7f (add methods for bitbucket providers)
   "api": "1.0.0",
   "main": "dist/code.js",
   "ui": "dist/index.html",
