@@ -89,6 +89,10 @@ export default function useRemoteTokens() {
           remoteData = await pullTokensFromGitLab(context, featureFlags);
           break;
         }
+        case StorageProviderType.BITBUCKET: {
+          remoteData = await pullTokensFromBitbucket(context, featureFlags);
+          break;
+        }
         case StorageProviderType.ADO: {
           remoteData = await pullTokensFromADO(context, featureFlags);
           break;
@@ -121,11 +125,12 @@ export default function useRemoteTokens() {
       dispatch,
       api,
       pullTokensFromGitHub,
+      pullTokensFromBitbucket,
       pullTokensFromGitLab,
       pullTokensFromJSONBin,
       pullTokensFromURL,
       pullTokensFromADO,
-    ]
+    ],
   );
 
   const restoreStoredProvider = useCallback(
@@ -144,6 +149,10 @@ export default function useRemoteTokens() {
           await syncTokensWithGitLab(context);
           break;
         }
+        case StorageProviderType.BITBUCKET: {
+          await syncTokensWithBitbucket(context);
+          break;
+        }
         case StorageProviderType.ADO: {
           await syncTokensWithADO(context);
           break;
@@ -153,7 +162,15 @@ export default function useRemoteTokens() {
       }
       return null;
     },
-    [dispatch, setStorageType, pullTokens, syncTokensWithGitHub, syncTokensWithGitLab, syncTokensWithADO]
+    [
+      dispatch,
+      setStorageType,
+      pullTokens,
+      syncTokensWithGitHub,
+      syncTokensWithGitLab,
+      syncTokensWithBitbucket,
+      syncTokensWithADO,
+    ],
   );
 
   const pushTokens = useCallback(
@@ -162,6 +179,10 @@ export default function useRemoteTokens() {
       switch (context.provider) {
         case StorageProviderType.GITHUB: {
           await pushTokensToGitHub(context);
+          break;
+        }
+        case StorageProviderType.BITBUCKET: {
+          await pushTokensToBitbucket(context);
           break;
         }
         case StorageProviderType.GITLAB: {
@@ -176,7 +197,7 @@ export default function useRemoteTokens() {
           throw new Error('Not implemented');
       }
     },
-    [api, pushTokensToGitHub, pushTokensToGitLab, pushTokensToADO]
+    [api, pushTokensToGitHub, pushTokensToGitLab, pushTokensToBitbucket, pushTokensToADO],
   );
 
   const addNewProviderItem = useCallback(
@@ -230,12 +251,13 @@ export default function useRemoteTokens() {
       dispatch,
       addJSONBinCredentials,
       addNewGitLabCredentials,
+      addNewBitbucketCredentials,
       addNewGitHubCredentials,
       addNewADOCredentials,
       createNewJSONBin,
       pullTokensFromURL,
       setStorageType,
-    ]
+    ],
   );
 
   const addNewBranch = useCallback(
@@ -244,6 +266,10 @@ export default function useRemoteTokens() {
       switch (context.provider) {
         case StorageProviderType.GITHUB: {
           newBranchCreated = await createGithubBranch(context, branch, source);
+          break;
+        }
+        case StorageProviderType.BITBUCKET: {
+          newBranchCreated = await createBitbucketBranch(context, branch, source);
           break;
         }
         case StorageProviderType.GITLAB: {
@@ -260,7 +286,7 @@ export default function useRemoteTokens() {
 
       return newBranchCreated;
     },
-    [createGithubBranch, createADOBranch]
+    [createGithubBranch, createADOBranch, createBitbucketBranch],
   );
 
   const fetchBranches = useCallback(
@@ -268,6 +294,8 @@ export default function useRemoteTokens() {
       switch (context.provider) {
         case StorageProviderType.GITHUB:
           return fetchGithubBranches(context);
+        case StorageProviderType.BITBUCKET:
+          return fetchBitbucketBranches(context);
         case StorageProviderType.GITLAB:
           return fetchGitLabBranches(context);
         case StorageProviderType.ADO:
@@ -276,7 +304,7 @@ export default function useRemoteTokens() {
           return null;
       }
     },
-    [fetchGithubBranches, fetchGitLabBranches, fetchADOBranches]
+    [fetchGithubBranches, fetchGitLabBranches, fetchBitbucketBranches, fetchADOBranches],
   );
 
   const deleteProvider = useCallback((provider) => {
@@ -296,6 +324,6 @@ export default function useRemoteTokens() {
       fetchBranches,
       addNewBranch,
     }),
-    [restoreStoredProvider, deleteProvider, pullTokens, pushTokens, addNewProviderItem, fetchBranches, addNewBranch]
+    [restoreStoredProvider, deleteProvider, pullTokens, pushTokens, addNewProviderItem, fetchBranches, addNewBranch],
   );
 }
