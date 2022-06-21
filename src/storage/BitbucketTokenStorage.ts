@@ -5,7 +5,9 @@ import { RemoteTokenStorageFile } from './RemoteTokenStorage';
 import IsJSONString from '@/utils/isJSONString';
 import { AnyTokenSet } from '@/types/tokens';
 import { ThemeObjectsList } from '@/types';
-import { GitMultiFileObject, GitSingleFileObject, GitStorageMetadata, GitTokenStorage } from './GitTokenStorage';
+import {
+  GitMultiFileObject, GitSingleFileObject, GitStorageMetadata, GitTokenStorage,
+} from './GitTokenStorage';
 
 type BitbucketClient = typeof Bitbucket;
 
@@ -140,16 +142,14 @@ export class BitbucketTokenStorage extends GitTokenStorage {
             }
 
             const jsonFileContents = await Promise.all(
-              jsonFiles.map((treeItem) =>
-                treeItem.path
-                  ? this.bitbucketClient.rest.repositories.get({
-                      workspace: this.owner,
-                      repo_slug: this.repository,
-                      path: `${RootDirectoryName}/${treeItem.path}`,
-                      ref: this.branch,
-                    })
-                  : Promise.resolve(null)
-              )
+              jsonFiles.map((treeItem) => (treeItem.path
+                ? this.bitbucketClient.rest.repositories.get({
+                  workspace: this.owner,
+                  repo_slug: this.repository,
+                  path: `${RootDirectoryName}/${treeItem.path}`,
+                  ref: this.branch,
+                })
+                : Promise.resolve(null))),
             );
             return compact(
               jsonFileContents.map<RemoteTokenStorageFile<GitStorageMetadata> | null>((fileContent, index) => {
@@ -177,7 +177,7 @@ export class BitbucketTokenStorage extends GitTokenStorage {
                 }
 
                 return null;
-              })
+              }),
             );
           }
         }
@@ -192,7 +192,7 @@ export class BitbucketTokenStorage extends GitTokenStorage {
               data: parsed.$themes ?? [],
             },
             ...(Object.entries(parsed).filter(([key]) => key !== '$themes') as [string, AnyTokenSet<false>][]).map<
-              RemoteTokenStorageFile<GitStorageMetadata>
+            RemoteTokenStorageFile<GitStorageMetadata>
             >(([name, tokenSet]) => ({
               name,
               type: 'tokenSet',
@@ -215,7 +215,7 @@ export class BitbucketTokenStorage extends GitTokenStorage {
     changeset: Record<string, string>,
     message: string,
     branch: string,
-    shouldCreateBranch?: boolean
+    shouldCreateBranch?: boolean,
   ): Promise<boolean> {
     const response = await this.bitbucketClient.repos.createOrUpdateFiles({
       branch,
