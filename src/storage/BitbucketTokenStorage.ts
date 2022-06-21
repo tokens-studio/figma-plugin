@@ -64,13 +64,9 @@ export class BitbucketTokenStorage extends GitTokenStorage {
       //   workspace: this.owner,
       //   repo_slug: this.repository,
       //   ref: newRef,
-      //   sha: originBranch.data.object.sha,
       // });
 
       const newBranch = await this.bitbucketClient.refs.createBranch({
-        // README: we will need to get the hash somehow
-        _body: { target: { hash: 'main' } },
-        repo_slug: this.repository,
         workspace: this.owner,
       });
 
