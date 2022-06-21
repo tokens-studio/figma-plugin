@@ -84,7 +84,7 @@ export function useBitbucket() {
             metadata: { commitMessage },
           });
           dispatch.tokenState.setLastSyncedState(JSON.stringify([tokens, themes], null, 2));
-          dispatch.uiState.setLocalApiState({ ...localApiState, branch: customBranch } as GithubCredentials);
+          dispatch.uiState.setLocalApiState({ ...localApiState, branch: customBranch } as BitbucketCredentials);
           dispatch.uiState.setApiData({ ...context, branch: customBranch });
           dispatch.tokenState.setTokenData({
             values: tokens,

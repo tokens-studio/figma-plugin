@@ -40,7 +40,7 @@ const SyncSettings = () => {
         dispatch.branchState.setBranches(branches);
       }
     },
-    [dispatch.branchState, fetchBranches]
+    [dispatch.branchState, fetchBranches],
   );
 
   const handleEditClick = React.useCallback(
@@ -50,27 +50,26 @@ const SyncSettings = () => {
       setShowEditStorageModalVisible(true);
       setLocalBranches(provider);
     },
-    [dispatch.uiState, setLocalBranches]
+    [dispatch.uiState, setLocalBranches],
   );
 
   const handleProviderClick = React.useCallback(
     (provider: StorageProviderType) => () => {
       setStorageProvider(provider);
     },
-    []
+    [],
   );
 
   const selectedRemoteProvider = React.useMemo(
-    () =>
-      [
-        StorageProviderType.JSONBIN,
-        StorageProviderType.GITHUB,
-        StorageProviderType.GITLAB,
-        StorageProviderType.ADO,
-        StorageProviderType.URL,
-        StorageProviderType.BITBUCKET,
-      ].includes(storageProvider as StorageProviderType),
-    [storageProvider]
+    () => [
+      StorageProviderType.JSONBIN,
+      StorageProviderType.GITHUB,
+      StorageProviderType.GITLAB,
+      StorageProviderType.ADO,
+      StorageProviderType.URL,
+      StorageProviderType.BITBUCKET,
+    ].includes(storageProvider as StorageProviderType),
+    [storageProvider],
   );
 
   const storedApiProviders = () => apiProviders.filter((item) => item.provider === storageProvider);
@@ -80,12 +79,14 @@ const SyncSettings = () => {
       case StorageProviderType.JSONBIN:
         return (
           <div>
-            Create an account at{' '}
+            Create an account at
+            {' '}
             <a href="https://jsonbin.io/" target="_blank" rel="noreferrer" className="underline">
               JSONbin.io
             </a>
             , copy the Secret Key into the field, and click on save. If you or your team already have a version stored,
-            add the secret and the corresponding ID.{' '}
+            add the secret and the corresponding ID.
+            {' '}
             <a href="https://docs.tokens.studio/sync" target="_blank" rel="noreferrer" className="underline">
               Read more on docs.tokens.studio
             </a>
@@ -94,7 +95,8 @@ const SyncSettings = () => {
       case StorageProviderType.GITHUB:
         return (
           <div>
-            Sync your tokens with a GitHub repository so your design decisions are up to date with code.{' '}
+            Sync your tokens with a GitHub repository so your design decisions are up to date with code.
+            {' '}
             <a href="https://docs.tokens.studio/sync/github" target="_blank" rel="noreferrer" className="underline">
               Read the guide
             </a>
@@ -104,7 +106,8 @@ const SyncSettings = () => {
       case StorageProviderType.GITLAB:
         return (
           <div>
-            Sync your tokens with a Gitlab repository so your design decisions are up to date with code.{' '}
+            Sync your tokens with a Gitlab repository so your design decisions are up to date with code.
+            {' '}
             <a href="https://docs.tokens.studio/sync/gitlab" target="_blank" rel="noreferrer" className="underline">
               Read the guide
             </a>
@@ -114,7 +117,8 @@ const SyncSettings = () => {
       case StorageProviderType.BITBUCKET:
         return (
           <div>
-            Sync your tokens with a Bitbucket repository so your design decisions are up to date with code.{' '}
+            Sync your tokens with a Bitbucket repository so your design decisions are up to date with code.
+            {' '}
             <a href="https://docs.tokens.studio/sync/bitbucket" target="_blank" rel="noreferrer" className="underline">
               Read the guide
             </a>
@@ -124,7 +128,8 @@ const SyncSettings = () => {
       case StorageProviderType.ADO:
         return (
           <div>
-            Sync your tokens with a Azure DevOps repository so your design decisions are up to date with code.{' '}
+            Sync your tokens with a Azure DevOps repository so your design decisions are up to date with code.
+            {' '}
             <a href="https://docs.tokens.studio/sync/ado" target="_blank" rel="noreferrer" className="underline">
               Read the guide
             </a>

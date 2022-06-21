@@ -17,7 +17,9 @@ type Props = {
   hasErrored?: boolean;
 };
 
-export default function BitbucketForm({ onChange, onSubmit, onCancel, values, hasErrored }: Props) {
+export default function BitbucketForm({
+  onChange, onSubmit, onCancel, values, hasErrored,
+}: Props) {
   const inputEl = useRef<HTMLInputElement | null>(null);
 
   const handleSubmit = React.useCallback(
@@ -43,7 +45,7 @@ export default function BitbucketForm({ onChange, onSubmit, onCancel, values, ha
         onSubmit(formFields);
       }
     },
-    [values, onSubmit]
+    [values, onSubmit],
   );
 
   return (
