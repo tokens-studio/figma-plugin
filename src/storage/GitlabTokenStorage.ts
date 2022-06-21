@@ -114,6 +114,7 @@ export class GitlabTokenStorage extends GitTokenStorage {
       const trees = await this.gitlabClient.Repositories.tree(this.projectId, {
         path: this.path,
         ref: this.branch,
+        recursive: true,
       });
 
       if (!this.path.endsWith('.json') && this.flags.multiFileEnabled) {
