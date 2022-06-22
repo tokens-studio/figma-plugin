@@ -23,7 +23,7 @@ export class BitbucketTokenStorage extends GitTokenStorage {
     };
 
     // eslint-disable-next-line
-    this.bitbucketClient = new Bitbucket({
+    this.bitbucketClient = new Bitbucket.Bitbucket({
       auth: {
         username: this.owner,
         password: this.secret,
@@ -156,7 +156,7 @@ export class BitbucketTokenStorage extends GitTokenStorage {
     changeset: Record<string, string>,
     message: string,
     branch: string,
-    shouldCreateBranch?: boolean,
+    shouldCreateBranch?: boolean
   ): Promise<boolean> {
     const response = this.createOrUpdateFiles({
       owner: this.owner,
