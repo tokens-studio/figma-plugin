@@ -381,6 +381,16 @@ describe('ADOTokenStorage', () => {
       }),
     }))
       .mockImplementationOnce(() => Promise.resolve({ ok: true }))
+      .mockImplementationOnce(() => Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve({
+          count: 1,
+          value: [
+            { path: '/multifile/global.json' },
+            { path: '/multifile/$themes.json' },
+          ],
+        }),
+      }))
       .mockImplementationOnce(() => Promise.resolve({ ok: true }));
 
     storageProvider.enableMultiFile();
@@ -421,7 +431,7 @@ describe('ADOTokenStorage', () => {
       },
     ])).toBe(true);
     expect(mockFetch).toHaveBeenNthCalledWith(
-      4,
+      6,
       `${baseUrl}/${projectId}/_apis/git/repositories/${repositoryId}/pushes?api-version=6.0`,
       {
         method: 'POST',
