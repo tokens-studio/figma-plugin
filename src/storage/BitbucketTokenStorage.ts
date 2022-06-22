@@ -79,7 +79,9 @@ export class BitbucketTokenStorage extends GitTokenStorage {
 
   // https://bitbucketjs.netlify.app/#api-repositories-repositories_createSrcFileCommit
   // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-source/#api-repositories-workspace-repo-slug-src-post
-  public async createOrUpdateFiles({ owner, repo, branch, changes }: CreatedOrUpdatedFilesType) {
+  public async createOrUpdateFiles({
+    owner, repo, branch, changes,
+  }: CreatedOrUpdatedFilesType) {
     const { message, files } = changes[0];
     const response = await this.bitbucketClient.repositories.createSrcFileCommit({
       branch,
@@ -169,7 +171,7 @@ export class BitbucketTokenStorage extends GitTokenStorage {
     changeset: Record<string, string>,
     message: string,
     branch: string,
-    shouldCreateBranch?: boolean
+    shouldCreateBranch?: boolean,
   ): Promise<boolean> {
     const response = this.createOrUpdateFiles({
       owner: this.owner,
