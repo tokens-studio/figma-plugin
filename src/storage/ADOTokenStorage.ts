@@ -166,7 +166,7 @@ export class ADOTokenStorage extends GitTokenStorage {
     return false;
   }
 
-  private async getOldObjectId(branch:string, shouldCreateBranch: boolean) {
+  private async getOldObjectId(branch: string, shouldCreateBranch: boolean) {
     const { value } = await this.getRefs();
     const branches = new Map<string, GitInterfaces.GitRef>();
     for (const val of value) {
@@ -239,7 +239,7 @@ export class ADOTokenStorage extends GitTokenStorage {
 
         if (!jsonFiles.length) return [];
 
-        const jsonFileContents = compact(await Promise.all(
+        const jsonFileContents = await Promise.all(
           jsonFiles.map(async ({ path }) => {
             const res = await this.getItem(path);
             const validationResult = await multiFileSchema.safeParseAsync(res);
@@ -248,12 +248,11 @@ export class ADOTokenStorage extends GitTokenStorage {
             }
             return null;
           }),
-        ));
+        );
         return compact(jsonFileContents.map<RemoteTokenStorageFile<GitStorageMetadata> | null>((fileContent, index) => {
           const { path } = jsonFiles[index];
           if (fileContent) {
-            const name = path?.split(/[\\/]/).pop()?.replace(/\.json$/, '');
-
+            const name = path?.replace(this.path, '')?.replace(/^\/+/, '')?.replace('.json', '');
             if (name === '$themes' && Array.isArray(fileContent)) {
               return {
                 path,
