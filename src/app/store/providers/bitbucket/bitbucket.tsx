@@ -38,7 +38,7 @@ export function useBitbucket() {
         repo ?? splitContextId[1],
         context.baseUrl ?? ''
       );
-      console.log('storageClient: ', storageClient);
+
       if (context.filePath) storageClient.changePath(context.filePath);
       if (context.branch) storageClient.selectBranch(context.branch);
       if (multiFileSync) storageClient.enableMultiFile();
