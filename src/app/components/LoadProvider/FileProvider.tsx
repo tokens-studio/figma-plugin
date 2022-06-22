@@ -7,17 +7,24 @@ type Props = {
 };
 
 export default function FileProvider({ onCancel }: Props) {
-  const hiddenFileInput = React.useRef(null);
+  const hiddenFileInput = React.useRef<HTMLInputElement>(null);
   const [fileList, setFileList] = React.useState<FileList>();
 
   const handleClick = React.useCallback(() => {
-    hiddenFileInput.current.click();
+    hiddenFileInput.current?.click();
   }, [hiddenFileInput]);
 
   const handleChange = React.useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    const { files } = event.target;
+    hiddenFileInput.current?.setAttribute("directory", "");
+    hiddenFileInput.current?.setAttribute("webkitdirectory", "");
+    const files = event.target.files;
     if (!files) return;
     setFileList(files);
+    const reader = new FileReader();
+    reader.readAsText(files[0]);
+    reader.onload = () => {
+      const result = reader.result;
+    }
   }, [fileList]);
 
   return (
@@ -36,7 +43,9 @@ export default function FileProvider({ onCancel }: Props) {
           type="file"
           ref={hiddenFileInput}
           style={{ display: 'none' }}
+          multiple
           onChange={handleChange}
+          accept='*.json'
         />
       </Stack>
     </Stack>
