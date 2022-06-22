@@ -5,7 +5,7 @@ import Input from '../Input';
 import { allTokenSetsSelector, usedTokenSetSelector } from '@/selectors';
 import { StyledNameInputBox } from './StyledNameInputBox';
 import { tokenSetListToTree, tokenSetListToList, TreeItem } from '@/utils/tokenset';
-import { useIsGithubMultiFileEnabled } from '@/app/hooks/useIsGithubMultiFileEnabled';
+import { useIsGitMultiFileEnabled } from '@/app/hooks/useIsGitMultiFileEnabled';
 import { TokenSetListOrTree } from '../TokenSetListOrTree';
 import { TokenSetThemeItem } from './TokenSetThemeItem';
 import { StyledForm } from './StyledForm';
@@ -25,7 +25,7 @@ type Props = {
 
 export const CreateOrEditThemeForm: React.FC<Props> = ({ defaultValues, onSubmit }) => {
   const store = useStore();
-  const githubMfsEnabled = useIsGithubMultiFileEnabled();
+  const githubMfsEnabled = useIsGitMultiFileEnabled();
   const selectedTokenSets = useMemo(() => (
     usedTokenSetSelector(store.getState())
   ), [store]);
