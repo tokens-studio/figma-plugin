@@ -4,7 +4,7 @@ import { useFlags } from 'launchdarkly-react-client-sdk';
 import { apiSelector } from '@/selectors';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 
-export function useIsGithubMultiFileEnabled() {
+export function useIsGitMultiFileEnabled() {
   const api = useSelector(apiSelector);
   const { multiFileSync } = useFlags();
 
@@ -13,6 +13,7 @@ export function useIsGithubMultiFileEnabled() {
       multiFileSync
           && (api?.provider === StorageProviderType.GITHUB
             || api?.provider === StorageProviderType.GITLAB
+            || api?.provider === StorageProviderType.ADO
             || api?.provider === StorageProviderType.BITBUCKET)
           && !api?.filePath?.endsWith('.json'),
     ),
