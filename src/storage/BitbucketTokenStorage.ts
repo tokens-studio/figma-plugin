@@ -1,5 +1,5 @@
 import compact from 'just-compact';
-import { Bitbucket } from 'bitbucket';
+import RepositoriesCreateSrcFileCommit, { Bitbucket } from 'bitbucket';
 import { decodeBase64 } from '@/utils/string';
 import { RemoteTokenStorageFile } from './RemoteTokenStorage';
 import IsJSONString from '@/utils/isJSONString';
@@ -21,7 +21,16 @@ import { GitMultiFileObject, GitSingleFileObject, GitStorageMetadata, GitTokenSt
 //   repo_slug: string;
 //   workspace: string;
 // };
-
+// type ExtendedCreateSrcFileCommit = Omit<Bitbucket<RepositoriesCreateSrcFileCommit, 'files' | 'message'>> & {
+//   owner: string;
+//   repo: string;
+//   branch: string;
+//   createBranch?: boolean;
+//   changes: {
+//     message: string;
+//     files: Record<string, string>;
+//   }[];
+// };
 // Ideally, we'd use Omit and extend the type, something like:
 // type ExtendedBitbucketClient = BitbucketClient<Omit<RepositoriesCreateSrcFileCommit, 'files'>> & {
 //   repositories: BitbucketClient['RepositoriesCreateSrcFileCommit'] & {
