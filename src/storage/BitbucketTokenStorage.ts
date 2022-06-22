@@ -1,55 +1,18 @@
 import compact from 'just-compact';
-import RepositoriesCreateSrcFileCommit, { Bitbucket } from 'bitbucket';
+import * as Bitbucket from 'bitbucket';
 import { decodeBase64 } from '@/utils/string';
 import { RemoteTokenStorageFile } from './RemoteTokenStorage';
 import IsJSONString from '@/utils/isJSONString';
 import { AnyTokenSet } from '@/types/tokens';
 import { ThemeObjectsList } from '@/types';
-import {
-  GitMultiFileObject, GitSingleFileObject, GitStorageMetadata, GitTokenStorage,
-} from './GitTokenStorage';
+import { GitMultiFileObject, GitSingleFileObject, GitStorageMetadata, GitTokenStorage } from './GitTokenStorage';
 
-// type BitbucketClient = typeof Bitbucket;
-// TODO: extend BitbucketClient
-
-// type RepositoriesCreateSrcFileCommit = {
-//   _body?: FormData | Schema.AnyObject;
-//   author?: string;
-//   branch?: string;
-//   files?: string; <---------- this is the type we need to extend/modify but unsure how to extend this correctly
-
-//   message?: string;
-//   parents?: string;
-//   repo_slug: string;
-//   workspace: string;
-// };
-// type ExtendedCreateSrcFileCommit = Omit<Bitbucket<RepositoriesCreateSrcFileCommit, 'files' | 'message'>> & {
-//   owner: string;
-//   repo: string;
-//   branch: string;
-//   createBranch?: boolean;
-//   changes: {
-//     message: string;
-//     files: Record<string, string>;
-//   }[];
-// };
-// Ideally, we'd use Omit and extend the type, something like:
-// type ExtendedBitbucketClient = BitbucketClient<Omit<RepositoriesCreateSrcFileCommit, 'files'>> & {
-//   repositories: BitbucketClient['RepositoriesCreateSrcFileCommit'] & {
-//     createOrUpdateFiles: (params: {
-//       owner: string;
-//       repo: string;
-//       branch: string;
-//       createBranch?: boolean;
-//       changes: {
-//         message: string;
-//         files: Record<string, string>;
-//       }[];
-//     }) => ReturnType<BitbucketClient['APIClient']['createOrUpdateFileContents']>;
-//   };
-// };
-
-type CreatedOrUpdatedFilesType = {
+type CreatedOrUpdatedBitbucketFilesType = Omit<
+  Bitbucket.Params.RepositoriesCreateSrcFileCommit,
+  'files|message|workspace'
+> & {
+  _body?: FormData | Bitbucket.Schema.AnyObject;
+  author?: string;
   owner: string;
   repo: string;
   branch: string;
@@ -59,6 +22,26 @@ type CreatedOrUpdatedFilesType = {
     files: Record<string, string>;
   }[];
 };
+
+// type RepositoriesCreateSrcFileCommit = {
+//   _body?: FormData | Schema.AnyObject;
+//   author?: string;
+//   branch?: string;
+//   files?: string; <---------- this is the type we need to extend/modify but unsure how to extend this correctly
+//   message?: string;  <---------- this is the type we need to extend/modify but unsure how to extend this correctly
+//   parents?: string;
+//   repo_slug: string;
+//   workspace: string;
+// };
+
+function getTreeMode(type: 'dir' | 'file' | string) {
+  switch (type) {
+    case 'dir':
+      return '040000';
+    default:
+      return '100644';
+  }
+}
 
 export class BitbucketTokenStorage extends GitTokenStorage {
   private bitbucketClient;
@@ -70,7 +53,7 @@ export class BitbucketTokenStorage extends GitTokenStorage {
     };
 
     // eslint-disable-next-line
-    this.bitbucketClient = new Bitbucket({
+    this.bitbucketClient = new Bitbucket.Bitbucket({
       auth: {
         username: this.owner,
         password: this.secret,
@@ -117,13 +100,10 @@ export class BitbucketTokenStorage extends GitTokenStorage {
 
   // https://bitbucketjs.netlify.app/#api-repositories-repositories_createSrcFileCommit
   // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-source/#api-repositories-workspace-repo-slug-src-post
-  public async createOrUpdateFiles({
-    owner, repo, branch, changes,
-  }: CreatedOrUpdatedFilesType) {
+  public async createOrUpdateFiles({ owner, repo, branch, changes }: CreatedOrUpdatedBitbucketFilesType) {
     const { message, files } = changes[0];
     const response = await this.bitbucketClient.repositories.createSrcFileCommit({
       branch,
-      // TODO: see above, need to extend BitbucketClient/RepositoriesCreateSrcFileCommit type to handle Record<string,string>
       files,
       message,
       repo_slug: repo,
@@ -154,7 +134,7 @@ export class BitbucketTokenStorage extends GitTokenStorage {
   // Equivalent to directly hitting /2.0/repositories/{username}/{repo_slug}/src/{commit}/{path} without having to know the name or SHA1 of the repo's main branch.
   public async read(): Promise<RemoteTokenStorageFile<GitStorageMetadata>[]> {
     try {
-      const response = await this.bitbucketClient.source.readRoot({
+      const response = await this.bitbucketClient.repositories.get({
         workspace: this.owner,
         repo_slug: this.repository,
         // path: this.path,
@@ -162,33 +142,50 @@ export class BitbucketTokenStorage extends GitTokenStorage {
       });
 
       // read entire directory
-      if (Array.isArray(response.data.values) && this.flags.multiFileEnabled) {
-        //  To walk the entire directory tree, parse each response and follow the self links of each commit_directory object
-        const directoryResponse = response.data.values.filter((file) => file.type === 'commit_file');
+      if (Array.isArray(response.data) && this.flags.multiFileEnabled) {
+        const directoryTreeResponse = await this.bitbucketClient.rest.git.createTree({
+          owner: this.owner,
+          repo: this.repository,
+          tree: response.data.map((item) => ({
+            path: item.path,
+            sha: item.sha,
+            mode: getTreeMode(item.type),
+          })),
+        });
 
-        const jsonFiles = directoryResponse.filter((file) => file.path?.endsWith('.json'));
-        // TODO: sort
-        // .sort((a: { path: string }, b: { path: any }) => (a.path && b.path ? a.path.localeCompare(b.path) : 0));
+        if (directoryTreeResponse.data.tree[0].sha) {
+          const treeResponse = await this.bitbucketClient.rest.git.getTree({
+            owner: this.owner,
+            repo: this.repository,
+            tree_sha: directoryTreeResponse.data.tree[0].sha,
+            recursive: 'true',
+          });
 
-<<<<<<< HEAD
-        const DirectoryNameSplit = this.path.split('/');
-        const RootDirectoryName = DirectoryNameSplit[0];
-        let subDirectoryName: string;
+          if (treeResponse.data.tree.length > 0) {
+            const jsonFiles = treeResponse.data.tree
+              .filter((file: { path: string }) => file.path?.endsWith('.json'))
+              .sort((a: { path: string }, b: { path: any }) => (a.path && b.path ? a.path.localeCompare(b.path) : 0));
+            const DirectoryNameSplit = this.path.split('/');
+            const RootDirectoryName = DirectoryNameSplit[0];
+            let subDirectoryName: string;
+            if (DirectoryNameSplit.length > 1) {
+              subDirectoryName = `${DirectoryNameSplit.splice(1, DirectoryNameSplit.length - 1).join('/')}/`;
+            } else {
+              subDirectoryName = '';
+            }
 
-        if (DirectoryNameSplit.length > 1) {
-          subDirectoryName = `${DirectoryNameSplit.splice(1, DirectoryNameSplit.length - 1).join('/')}/`;
-        } else {
-          subDirectoryName = '';
-=======
             const jsonFileContents = await Promise.all(
-              jsonFiles.map((treeItem) => (treeItem.path
-                ? this.bitbucketClient.rest.repositories.get({
-                  workspace: this.owner,
-                  repo_slug: this.repository,
-                  path: `${RootDirectoryName}/${treeItem.path}`,
-                  ref: this.branch,
-                })
-                : Promise.resolve(null))),
+              // eslint-disable-next-line no-confusing-arrow
+              jsonFiles.map((treeItem: { path: any }) =>
+                treeItem.path
+                  ? this.bitbucketClient.repositories.get({
+                      owner: this.owner,
+                      repo: this.repository,
+                      path: `${RootDirectoryName}/${treeItem.path}`,
+                      ref: this.branch,
+                    })
+                  : Promise.resolve(null)
+              )
             );
             return compact(
               jsonFileContents.map<RemoteTokenStorageFile<GitStorageMetadata> | null>((fileContent, index) => {
@@ -216,54 +213,12 @@ export class BitbucketTokenStorage extends GitTokenStorage {
                 }
 
                 return null;
-              }),
+              })
             );
           }
->>>>>>> 70307f3 (add methods for bitbucket providers)
         }
-
-        const jsonFileContents = await Promise.all(
-          jsonFiles.map((item) => (item.path
-            ? this.bitbucketClient.repositories.get({
-              workspace: this.owner,
-              repo_slug: this.repository,
-              // path: `${RootDirectoryName}/${treeItem.path}`,
-              // ref: this.branch,
-            })
-            : Promise.resolve(null))),
-        );
-
-        return compact(
-          jsonFileContents.map<RemoteTokenStorageFile<GitStorageMetadata> | null>((fileContent, index) => {
-            const { path } = jsonFiles[index];
-
-            if (path && fileContent?.data && !Array.isArray(fileContent?.data) && 'content' in fileContent.data) {
-              let name = path.replace(subDirectoryName, '');
-              name = name.replace('.json', '');
-              const parsed = JSON.parse(decodeBase64(fileContent.data.content)) as GitMultiFileObject;
-              // @REAMDE we will need to ensure these reserved names
-              if (name === '$themes') {
-                return {
-                  path,
-                  type: 'themes',
-                  data: parsed as ThemeObjectsList,
-                };
-              }
-
-              return {
-                path,
-                name,
-                type: 'tokenSet',
-                data: parsed as AnyTokenSet<false>,
-              };
-            }
-
-            return null;
-          }),
-        );
-      }
-      if ('content' in response.data) {
-        const data = decodeBase64(response);
+      } else if ('content' in response.data) {
+        const data = decodeBase64(response.data.content);
         if (IsJSONString(data)) {
           const parsed = JSON.parse(data) as GitSingleFileObject;
           return [
@@ -273,7 +228,7 @@ export class BitbucketTokenStorage extends GitTokenStorage {
               data: parsed.$themes ?? [],
             },
             ...(Object.entries(parsed).filter(([key]) => key !== '$themes') as [string, AnyTokenSet<false>][]).map<
-            RemoteTokenStorageFile<GitStorageMetadata>
+              RemoteTokenStorageFile<GitStorageMetadata>
             >(([name, tokenSet]) => ({
               name,
               type: 'tokenSet',
@@ -296,9 +251,9 @@ export class BitbucketTokenStorage extends GitTokenStorage {
     changeset: Record<string, string>,
     message: string,
     branch: string,
-    shouldCreateBranch?: boolean,
+    shouldCreateBranch?: boolean
   ): Promise<boolean> {
-    const response = await this.createOrUpdateFiles({
+    const response = await this.bitbucketClient.repositories.createOrUpdateFiles({
       branch,
       owner: this.owner,
       repo: this.repository,
