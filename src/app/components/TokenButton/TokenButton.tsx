@@ -65,7 +65,6 @@ export const TokenButton: React.FC<Props> = ({
   }, [name]);
 
   const properties = usePropertiesForTokenType(type);
-  // console.log('usePropertiesForTokenType', properties);
   // @TODO check type property typing
   const activeStateProperties = React.useMemo(() => (
     [...properties, ...DocumentationProperties]
@@ -106,7 +105,7 @@ export const TokenButton: React.FC<Props> = ({
     const propsToSet = (Array.isArray(givenProperties) ? givenProperties : [givenProperties]).map((prop) => (
       extend(true, {}, prop) as typeof prop
     ));
-    // console.log(JSON.parse(JSON.stringify(propsToSet)));
+
     const tokenValue = name;
     track('Apply Token', { givenProperties });
     let value = isActive ? 'delete' : tokenValue;
@@ -119,7 +118,7 @@ export const TokenButton: React.FC<Props> = ({
       [propsToSet[0].name || propsToSet[0]]: propsToSet[0].forcedValue || value,
     };
     if (propsToSet[0].clear) propsToSet[0].clear.map((item) => Object.assign(newProps, { [item]: 'delete' }));
-    // console.log(newProps);
+
     if (type === 'composition' && value === 'delete') {
       // distructure composition token when it is unselected
       const compositionToken = tokensContext.resolvedTokens.find((token) => token.name === tokenValue);
@@ -135,7 +134,6 @@ export const TokenButton: React.FC<Props> = ({
   }, [name, active, setPluginValue]);
 
   const handleTokenClick = React.useCallback(() => {
-    // console.log('apply all', properties[0]);
     handleClick(properties[0]);
   }, [properties, handleClick]);
 
