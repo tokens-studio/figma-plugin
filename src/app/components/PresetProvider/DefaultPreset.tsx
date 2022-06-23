@@ -8,7 +8,7 @@ type Props = {
   onCancel: () => void;
 };
 
-export default function PresetProvider({ onCancel }: Props) {
+export default function DefaultPreset({ onCancel }: Props) {
   const dispatch = useDispatch<Dispatch>();
   const handleSetDefault = React.useCallback(() => {
     dispatch.tokenState.setDefaultTokens();

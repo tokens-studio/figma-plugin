@@ -23,7 +23,7 @@ type Props = {
   onCancel: () => void;
 };
 
-export default function FileProvider({ onCancel }: Props) {
+export default function FilePreset({ onCancel }: Props) {
   const hiddenFileInput = React.useRef<HTMLInputElement>(null);
   const hiddenDirectoryInput = React.useRef<HTMLInputElement>(null);
   const { readTokensFromFileOrDirectory } = useFile();
