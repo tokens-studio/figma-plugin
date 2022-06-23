@@ -379,6 +379,11 @@ describe('GitlabTokenStorage', () => {
 
     await storageProvider.write([
       {
+        type: 'metadata',
+        path: '$metadata.json',
+        data: {},
+      },
+      {
         type: 'themes',
         path: '$themes.json',
         data: [
@@ -414,6 +419,7 @@ describe('GitlabTokenStorage', () => {
         {
           action: 'create',
           content: JSON.stringify({
+            $metadata: {},
             $themes: [{
               id: 'light',
               name: 'Light',
@@ -459,6 +465,13 @@ describe('GitlabTokenStorage', () => {
 
     await storageProvider.write([
       {
+        type: 'metadata',
+        path: '$metadata.json',
+        data: {
+          tokenSetOrder: ['tokens'],
+        },
+      },
+      {
         type: 'themes',
         path: '$themes.json',
         data: [
@@ -491,6 +504,13 @@ describe('GitlabTokenStorage', () => {
       'main',
       'Initial commit',
       [
+        {
+          action: 'create',
+          content: JSON.stringify({
+            tokenSetOrder: ['tokens'],
+          }, null, 2),
+          filePath: 'data/$metadata.json',
+        },
         {
           action: 'create',
           content: JSON.stringify([{

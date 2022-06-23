@@ -521,4 +521,16 @@ describe('GithubTokenStorage', () => {
       ],
     });
   });
+
+  it('should return false if there are no branches', async () => {
+    mockListBranches.mockImplementationOnce(() => (
+      Promise.resolve({
+        data: [],
+      })
+    ));
+
+    expect(await storageProvider.write([], {
+      commitMessage: '',
+    })).toBe(false);
+  });
 });

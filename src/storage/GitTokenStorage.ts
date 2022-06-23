@@ -86,7 +86,7 @@ export abstract class GitTokenStorage extends RemoteTokenStorage<GitStorageMetad
 
   public async write(files: RemoteTokenStorageFile<GitStorageMetadata>[], saveOptions: GitStorageSaveOptions): Promise<boolean> {
     const branches = await this.fetchBranches();
-    if (!branches) return false;
+    if (!branches.length) return false;
 
     const filesChangeset: Record<string, string> = {};
     if (this.path.endsWith('.json')) {
@@ -97,7 +97,7 @@ export abstract class GitTokenStorage extends RemoteTokenStorage<GitStorageMetad
           } else if (file.type === 'themes') {
             acc.$themes = [...acc.$themes ?? [], ...file.data];
           } else if (file.type === 'metadata') {
-            acc.$metadata = file.data;
+            acc.$metadata = { ...acc.$metadata ?? {}, ...file.data };
           }
           return acc;
         }, {}),

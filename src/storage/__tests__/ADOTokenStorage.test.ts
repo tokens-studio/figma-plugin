@@ -278,6 +278,11 @@ describe('ADOTokenStorage', () => {
     storageProvider.changePath('data/tokens.json');
     expect(await storageProvider.write([
       {
+        type: 'metadata',
+        path: '$metadata.json',
+        data: {},
+      },
+      {
         type: 'themes',
         path: '$themes.json',
         data: [
@@ -330,6 +335,7 @@ describe('ADOTokenStorage', () => {
                   item: { path: '/data/tokens.json' },
                   newContent: {
                     content: JSON.stringify({
+                      $metadata: {},
                       $themes: [
                         {
                           id: 'light',
@@ -385,6 +391,7 @@ describe('ADOTokenStorage', () => {
         value: [
           { path: '/multifile/global.json' },
           { path: '/multifile/$themes.json' },
+          { path: '/multifile/$metadata.json' },
         ],
       }),
     }))
@@ -395,6 +402,13 @@ describe('ADOTokenStorage', () => {
     storageProvider.selectBranch('main');
     storageProvider.changePath('multifile');
     expect(await storageProvider.write([
+      {
+        type: 'metadata',
+        path: '$metadata.json',
+        data: {
+          tokenSetOrder: ['global'],
+        },
+      },
       {
         type: 'themes',
         path: '$themes.json',
@@ -443,6 +457,16 @@ describe('ADOTokenStorage', () => {
             {
               comment: 'Initial commit',
               changes: [
+                {
+                  changeType: 'edit',
+                  item: { path: '/multifile/$metadata.json' },
+                  newContent: {
+                    content: JSON.stringify({
+                      tokenSetOrder: ['global'],
+                    }, null, 2),
+                    contentType: 'rawtext',
+                  },
+                },
                 {
                   changeType: 'edit',
                   item: { path: '/multifile/$themes.json' },
