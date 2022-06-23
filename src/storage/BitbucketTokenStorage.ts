@@ -6,9 +6,7 @@ import { RemoteTokenStorageFile } from './RemoteTokenStorage';
 import IsJSONString from '@/utils/isJSONString';
 import { AnyTokenSet } from '@/types/tokens';
 import { ThemeObjectsList } from '@/types';
-import {
-  GitMultiFileObject, GitSingleFileObject, GitStorageMetadata, GitTokenStorage,
-} from './GitTokenStorage';
+import { GitMultiFileObject, GitSingleFileObject, GitStorageMetadata, GitTokenStorage } from './GitTokenStorage';
 
 type CreatedOrUpdatedFileType = {
   owner: string;
@@ -20,7 +18,7 @@ type CreatedOrUpdatedFileType = {
     files: Record<string, string>;
   }[];
 };
-
+// TODO: extend Bitbucket client
 type ExtendedBitbucketClient = Omit<BitbucketClient.APIEndpoints, 'repositories'> & {
   repositories: BitbucketClient.APIEndpoints['repositories'] & {
     createOrUpdateFiles: (params: {
@@ -36,17 +34,8 @@ type ExtendedBitbucketClient = Omit<BitbucketClient.APIEndpoints, 'repositories'
   };
 };
 
-function getTreeMode(type: 'dir' | 'file' | string) {
-  switch (type) {
-    case 'dir':
-      return '040000';
-    default:
-      return '100644';
-  }
-}
-
 export class BitbucketTokenStorage extends GitTokenStorage {
-  private bitbucketClient: ExtendedBitbucketClient;
+  private bitbucketClient;
 
   constructor(secret: string, owner: string, repository: string, baseUrl?: string) {
     super(secret, owner, repository, baseUrl);
@@ -54,15 +43,15 @@ export class BitbucketTokenStorage extends GitTokenStorage {
       multiFileEnabled: false,
     };
 
-    const ExtendedBitbucketConstructor: any = () => new Bitbucket();
+    // const ExtendedBitbucketConstructor: any = () => new Bitbucket();
     // eslint-disable-next-line
-    this.bitbucketClient = new ExtendedBitbucketConstructor({
+    this.bitbucketClient = new Bitbucket({
       auth: {
         username: this.owner,
         password: this.secret,
       },
       baseUrl: this.baseUrl || undefined,
-    }) as ExtendedBitbucketClient;
+    });
   }
 
   // https://bitbucketjs.netlify.app/#api-repositories-repositories_listBranches OR
@@ -103,13 +92,12 @@ export class BitbucketTokenStorage extends GitTokenStorage {
 
   // https://bitbucketjs.netlify.app/#api-repositories-repositories_createSrcFileCommit
   // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-source/#api-repositories-workspace-repo-slug-src-post
-  public async createOrUpdateFiles({
-    owner, repo, branch, changes,
-  }: CreatedOrUpdatedFileType) {
+  public async createOrUpdateFiles({ owner, repo, branch, changes }: CreatedOrUpdatedFileType) {
     const { message, files } = changes[0];
     console.log('files: ', files);
     const response = await this.bitbucketClient.repositories.createSrcFileCommit({
       branch,
+      // TODO: extend Bitbucket client
       files,
       message,
       repo_slug: repo,
@@ -146,102 +134,7 @@ export class BitbucketTokenStorage extends GitTokenStorage {
         // path: this.path,
         // ref: this.branch,
       });
-
-      // read entire directory
-      if (Array.isArray(response.data) && this.flags.multiFileEnabled) {
-        const directoryTreeResponse = await this.bitbucketClient.rest.git.createTree({
-          owner: this.owner,
-          repo: this.repository,
-          tree: response.data.map((item) => ({
-            path: item.path,
-            sha: item.sha,
-            mode: getTreeMode(item.type),
-          })),
-        });
-
-        if (directoryTreeResponse.data.tree[0].sha) {
-          const treeResponse = await this.bitbucketClient.rest.git.getTree({
-            owner: this.owner,
-            repo: this.repository,
-            tree_sha: directoryTreeResponse.data.tree[0].sha,
-            recursive: 'true',
-          });
-
-          if (treeResponse.data.tree.length > 0) {
-            const jsonFiles = treeResponse.data.tree
-              .filter((file: { path: string }) => file.path?.endsWith('.json'))
-              .sort((a: { path: string }, b: { path: any }) => (a.path && b.path ? a.path.localeCompare(b.path) : 0));
-            const DirectoryNameSplit = this.path.split('/');
-            const RootDirectoryName = DirectoryNameSplit[0];
-            let subDirectoryName: string;
-            if (DirectoryNameSplit.length > 1) {
-              subDirectoryName = `${DirectoryNameSplit.splice(1, DirectoryNameSplit.length - 1).join('/')}/`;
-            } else {
-              subDirectoryName = '';
-            }
-
-            const jsonFileContents = await Promise.all(
-              // eslint-disable-next-line no-confusing-arrow
-              jsonFiles.map((treeItem: { path: any }) => treeItem.path
-                ? this.bitbucketClient.repositories.get({
-                  owner: this.owner,
-                  repo: this.repository,
-                  path: `${RootDirectoryName}/${treeItem.path}`,
-                  ref: this.branch,
-                })
-                : Promise.resolve(null)),
-            );
-            return compact(
-              jsonFileContents.map<RemoteTokenStorageFile<GitStorageMetadata> | null>((fileContent, index) => {
-                const { path } = jsonFiles[index];
-
-                if (path && fileContent?.data && !Array.isArray(fileContent?.data) && 'content' in fileContent.data) {
-                  let name = path.replace(subDirectoryName, '');
-                  name = name.replace('.json', '');
-                  const parsed = JSON.parse(decodeBase64(fileContent.data.content)) as GitMultiFileObject;
-                  // @REAMDE we will need to ensure these reserved names
-                  if (name === '$themes') {
-                    return {
-                      path,
-                      type: 'themes',
-                      data: parsed as ThemeObjectsList,
-                    };
-                  }
-
-                  return {
-                    path,
-                    name,
-                    type: 'tokenSet',
-                    data: parsed as AnyTokenSet<false>,
-                  };
-                }
-
-                return null;
-              }),
-            );
-          }
-        }
-      } else if ('content' in response.data) {
-        const data = decodeBase64(response.data.content);
-        if (IsJSONString(data)) {
-          const parsed = JSON.parse(data) as GitSingleFileObject;
-          return [
-            {
-              type: 'themes',
-              path: `${this.path}/$themes.json`,
-              data: parsed.$themes ?? [],
-            },
-            ...(Object.entries(parsed).filter(([key]) => key !== '$themes') as [string, AnyTokenSet<false>][]).map<
-            RemoteTokenStorageFile<GitStorageMetadata>
-            >(([name, tokenSet]) => ({
-              name,
-              type: 'tokenSet',
-              path: `${this.path}/${name}.json`,
-              data: tokenSet,
-            })),
-          ];
-        }
-      }
+      // TODO: implement read directory
 
       return [];
     } catch (e) {
@@ -255,7 +148,7 @@ export class BitbucketTokenStorage extends GitTokenStorage {
     changeset: Record<string, string>,
     message: string,
     branch: string,
-    shouldCreateBranch?: boolean,
+    shouldCreateBranch?: boolean
   ): Promise<boolean> {
     const response = this.createOrUpdateFiles({
       branch,
