@@ -1,5 +1,6 @@
 import compact from 'just-compact';
-import * as Bitbucket from 'bitbucket';
+import { Bitbucket } from 'bitbucket';
+import * as BitbucketClient from 'bitbucket';
 import { decodeBase64 } from '@/utils/string';
 import { RemoteTokenStorageFile } from './RemoteTokenStorage';
 import IsJSONString from '@/utils/isJSONString';
@@ -9,8 +10,19 @@ import {
   GitMultiFileObject, GitSingleFileObject, GitStorageMetadata, GitTokenStorage,
 } from './GitTokenStorage';
 
-type ExtendedBitbucketClient = Omit<Bitbucket.APIClient, 'repositories'> & {
-  repositories: Bitbucket.APIClient['repositories'] & {
+type CreatedOrUpdatedFileType = {
+  owner: string;
+  repo: string;
+  branch: string;
+  createBranch?: boolean;
+  changes: {
+    message: string;
+    files: Record<string, string>;
+  }[];
+};
+
+type ExtendedBitbucketClient = Omit<BitbucketClient.APIEndpoints, 'repositories'> & {
+  repositories: BitbucketClient.APIEndpoints['repositories'] & {
     createOrUpdateFiles: (params: {
       owner: string;
       repo: string;
@@ -20,7 +32,7 @@ type ExtendedBitbucketClient = Omit<Bitbucket.APIClient, 'repositories'> & {
         message: string;
         files: Record<string, string>;
       }[];
-    }) => ReturnType<Bitbucket.APIClient['repositories']['createSrcFileCommit']>;
+    }) => ReturnType<BitbucketClient.APIEndpoints['repositories']['createSrcFileCommit']>;
   };
 };
 
@@ -42,14 +54,15 @@ export class BitbucketTokenStorage extends GitTokenStorage {
       multiFileEnabled: false,
     };
 
+    const ExtendedBitbucketConstructor: any = () => new Bitbucket();
     // eslint-disable-next-line
-    this.bitbucketClient = new Bitbucket({
+    this.bitbucketClient = new ExtendedBitbucketConstructor({
       auth: {
         username: this.owner,
         password: this.secret,
       },
       baseUrl: this.baseUrl || undefined,
-    });
+    }) as ExtendedBitbucketClient;
   }
 
   // https://bitbucketjs.netlify.app/#api-repositories-repositories_listBranches OR
@@ -92,8 +105,9 @@ export class BitbucketTokenStorage extends GitTokenStorage {
   // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-source/#api-repositories-workspace-repo-slug-src-post
   public async createOrUpdateFiles({
     owner, repo, branch, changes,
-  }: CreatedOrUpdatedBitbucketFilesType) {
+  }: CreatedOrUpdatedFileType) {
     const { message, files } = changes[0];
+    console.log('files: ', files);
     const response = await this.bitbucketClient.repositories.createSrcFileCommit({
       branch,
       files,
@@ -243,7 +257,7 @@ export class BitbucketTokenStorage extends GitTokenStorage {
     branch: string,
     shouldCreateBranch?: boolean,
   ): Promise<boolean> {
-    const response = await this.bitbucketClient.repositories.createOrUpdateFiles({
+    const response = this.createOrUpdateFiles({
       branch,
       owner: this.owner,
       repo: this.repository,
