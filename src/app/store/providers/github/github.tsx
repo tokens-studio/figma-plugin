@@ -48,14 +48,12 @@ export function useGitHub() {
       text: 'Pull from GitHub?',
       description: 'Your repo already contains tokens, do you want to pull these now?',
     });
-    if (confirmResult === false) return false;
-    return confirmResult.result;
+    return confirmResult;
   }, [confirm]);
 
   const pushTokensToGitHub = useCallback(async (context: GithubCredentials): Promise<RemoteTokenStorageData<GitStorageMetadata> | null> => {
     const storage = storageClientFactory(context);
     const content = await storage.retrieve();
-
     if (content) {
       if (
         content
@@ -139,6 +137,7 @@ export function useGitHub() {
 
     try {
       const content = await storage.retrieve();
+
       if (content) {
         return content;
       }
@@ -165,6 +164,7 @@ export function useGitHub() {
       await checkAndSetAccess({ context, owner, repo });
 
       const content = await storage.retrieve();
+
       if (content) {
         if (
           !isEqual(content.tokens, tokens)
