@@ -188,7 +188,7 @@ describe('GithubTokenStorage', () => {
     mockGetContent.mockImplementationOnce(() => (
       Promise.resolve({
         data: {
-          content: 'ewogICJnbG9iYWwiOiB7CiAgICAicmVkIjogewogICAgICAidHlwZSI6ICJjb2xvciIsCiAgICAgICJuYW1lIjogInJlZCIsCiAgICAgICJ2YWx1ZSI6ICIjZmYwMDAwIgogICAgfSwKICAgICJibGFjayI6IHsKICAgICAgInR5cGUiOiAiY29sb3IiLAogICAgICAibmFtZSI6ICJibGFjayIsCiAgICAgICJ2YWx1ZSI6ICIjMDAwMDAwIgogICAgfQogIH0sCiAgIiR0aGVtZXMiOiBbCiAgICB7CiAgICAgICJpZCI6ICJsaWdodCIsCiAgICAgICJuYW1lIjogIkxpZ2h0IiwKICAgICAgInNlbGVjdGVkVG9rZW5TZXRzIjogewogICAgICAgICJnbG9iYWwiOiAiZW5hYmxlZCIKICAgICAgfQogICAgfQogIF0KfQ==',
+          content: 'ewogICJnbG9iYWwiOiB7CiAgICAicmVkIjogewogICAgICAidHlwZSI6ICJjb2xvciIsCiAgICAgICJuYW1lIjogInJlZCIsCiAgICAgICJ2YWx1ZSI6ICIjZmYwMDAwIgogICAgfSwKICAgICJibGFjayI6IHsKICAgICAgInR5cGUiOiAiY29sb3IiLAogICAgICAibmFtZSI6ICJibGFjayIsCiAgICAgICJ2YWx1ZSI6ICIjMDAwMDAwIgogICAgfQogIH0sCiAgIiR0aGVtZXMiOiBbCiAgICB7CiAgICAgICJpZCI6ICJsaWdodCIsCiAgICAgICJuYW1lIjogIkxpZ2h0IiwKICAgICAgInNlbGVjdGVkVG9rZW5TZXRzIjogewogICAgICAgICJnbG9iYWwiOiAiZW5hYmxlZCIKICAgICAgfQogICAgfQogIF0sCiAgIiRtZXRhZGF0YSI6IHt9Cn0=',
         },
       })
     ));
@@ -294,6 +294,7 @@ describe('GithubTokenStorage', () => {
       Promise.resolve({
         data: {
           tree: [
+            { path: '$metadata.json', type: 'blob', sha: 'sha($metadata.json)' },
             { path: '$themes.json', type: 'blob', sha: 'sha($themes.json)' },
             { path: 'global.json', type: 'blob', sha: 'sha(global.json)' },
           ],
@@ -304,6 +305,13 @@ describe('GithubTokenStorage', () => {
     storageProvider.enableMultiFile();
     storageProvider.changePath('data');
     expect(await storageProvider.read()).toEqual([
+      {
+        path: '$metadata.json',
+        type: 'metadata',
+        data: {
+          tokenSetOrder: ['global'],
+        },
+      },
       {
         path: '$themes.json',
         type: 'themes',
@@ -358,6 +366,11 @@ describe('GithubTokenStorage', () => {
     storageProvider.changePath('data/tokens.json');
     await storageProvider.write([
       {
+        type: 'metadata',
+        path: '$metadata.json',
+        data: {},
+      },
+      {
         type: 'themes',
         path: '$themes.json',
         data: [
@@ -396,6 +409,7 @@ describe('GithubTokenStorage', () => {
           message: 'Initial commit',
           files: {
             'data/tokens.json': JSON.stringify({
+              $metadata: {},
               $themes: [
                 {
                   id: 'light',
@@ -439,6 +453,13 @@ describe('GithubTokenStorage', () => {
     storageProvider.changePath('data');
     await storageProvider.write([
       {
+        type: 'metadata',
+        path: '$metadata.json',
+        data: {
+          tokenSetOrder: ['global'],
+        },
+      },
+      {
         type: 'themes',
         path: '$themes.json',
         data: [
@@ -476,6 +497,9 @@ describe('GithubTokenStorage', () => {
         {
           message: 'Initial commit',
           files: {
+            'data/$metadata.json': JSON.stringify({
+              tokenSetOrder: ['global'],
+            }, null, 2),
             'data/$themes.json': JSON.stringify([
               {
                 id: 'light',
