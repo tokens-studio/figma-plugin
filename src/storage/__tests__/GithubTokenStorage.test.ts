@@ -89,6 +89,9 @@ describe('GithubTokenStorage', () => {
       owner: 'six7',
       repo: 'figma-tokens',
       ref: 'heads/main',
+      headers: {
+        'If-None-Match': '',
+      },
     });
     expect(mockCreateRef).toBeCalledWith({
       owner: 'six7',
@@ -126,6 +129,9 @@ describe('GithubTokenStorage', () => {
       owner: 'six7',
       repo: 'figma-tokens',
       username: 'six7',
+      headers: {
+        'If-None-Match': '',
+      },
     });
   });
 
@@ -145,6 +151,9 @@ describe('GithubTokenStorage', () => {
       owner: 'six7',
       repo: 'figma-tokens',
       username: 'six7',
+      headers: {
+        'If-None-Match': '',
+      },
     });
   });
 
@@ -169,6 +178,9 @@ describe('GithubTokenStorage', () => {
       owner: 'six7',
       repo: 'figma-tokens',
       username: 'six7',
+      headers: {
+        'If-None-Match': '',
+      },
     });
   });
 
@@ -219,6 +231,9 @@ describe('GithubTokenStorage', () => {
       repo: 'figma-tokens',
       path: 'data/tokens.json',
       ref: 'main',
+      headers: {
+        'If-None-Match': '',
+      },
     });
   });
 
