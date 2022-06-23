@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import Heading from '../Heading';
 import Modal from '../Modal';
 import Stack from '../Stack';
 import LoadProviderItem from '../LoadProviderSelector';
@@ -19,7 +18,7 @@ export default function ExportModal({ onClose }: Props) {
   }, [loadProvider]);
 
   return (
-    <Modal showClose isOpen close={onClose}>
+    <Modal showClose isOpen close={onClose} title="Import">
       <Stack direction="column" justify="center" gap={4} css={{ textAlign: 'center' }}>
         <Stack direction="column" gap={2}>
           <Stack direction="row" gap={1}>
@@ -36,7 +35,6 @@ export default function ExportModal({ onClose }: Props) {
               id={LoadProviderType.FILE}
             />
           </Stack>
-          <Heading>Import</Heading>
           {
             loadProvider === LoadProviderType.PRESET
               ? <DefaultPreset onCancel={onClose} />

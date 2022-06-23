@@ -12,8 +12,6 @@ type StorageFlags = {
 export class FileTokenStorage extends RemoteTokenStorage {
   private files: FileList;
 
-  private fileReader: FileReader;
-
   protected flags: StorageFlags = {
     multiFileEnabled: false,
   };
@@ -21,7 +19,6 @@ export class FileTokenStorage extends RemoteTokenStorage {
   constructor(files: FileList) {
     super();
     this.files = files;
-    this.fileReader = new FileReader();
   }
 
   public enableMultiFile() {
@@ -36,10 +33,10 @@ export class FileTokenStorage extends RemoteTokenStorage {
         const filePromises = jsonFiles.map((file) =>
           // Return a promise per file
           new Promise((resolve) => {
-            this.fileReader = new FileReader();
-            this.fileReader.readAsText(file);
-            this.fileReader.onload = async () => {
-              const fileContent = this.fileReader.result as string;
+            const reader = new FileReader();
+            reader.readAsText(file);
+            reader.onload = async () => {
+              const fileContent = reader.result as string;
               if (fileContent && IsJSONString(fileContent)) {
                 const parsedJsonData = JSON.parse(fileContent);
                 const validationResult = await multiFileSchema.safeParseAsync(parsedJsonData);
@@ -55,8 +52,7 @@ export class FileTokenStorage extends RemoteTokenStorage {
         return compact(jsonFileContents.map<RemoteTokenStorageFile | null>((fileContent, index) => {
           const { webkitRelativePath } = jsonFiles[index];
           if (fileContent) {
-            const name = webkitRelativePath?.split(/[\\/]/).pop()?.replace(/\.json$/, '');
-
+            const name = webkitRelativePath.substring(webkitRelativePath.indexOf('/') + 1).replace('.json', '');
             if (name === '$themes' && Array.isArray(fileContent)) {
               return {
                 path: webkitRelativePath,
@@ -78,10 +74,11 @@ export class FileTokenStorage extends RemoteTokenStorage {
         }));
       }
 
-      this.fileReader.readAsText(this.files[0]);
+      const reader = new FileReader();
+      reader.readAsText(this.files[0]);
       return await new Promise<RemoteTokenStorageFile[]>((resolve) => {
-        this.fileReader.onload = async () => {
-          const result = this.fileReader.result as string;
+        reader.onload = async () => {
+          const result = reader.result as string;
 
           if (result && IsJSONString(result)) {
             const parsedJsonData = JSON.parse(result);

@@ -80,7 +80,6 @@ export abstract class RemoteTokenStorage<Metadata = unknown> {
     // start by reading the files from the remote source
     // it is up to the remote storage implementation to split it up into "File" objects
     const files = await this.read();
-    console.log('files', files);
     if (files.length === 0) {
       return null;
     }

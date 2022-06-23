@@ -53,33 +53,44 @@ export default function FilePreset({ onCancel }: Props) {
   return (
     <Stack direction="column" gap={2}>
       <p className="text-xs text-gray-600">
-        Import your existing tokens JSON files into the plugin. &#39; If you're using a single file, the first-level keys should be the token set names. &#39; If you're using multiple files, the file name / path are the set names.
+        Import your existing tokens JSON files into the plugin.
+        {' '}
+        <br />
+        {' '}
+        If you're using a single file, the first-level keys should be the token set names.
+        {' '}
+        <br />
+        {' '}
+        If you're using multiple files, the file name / path are the set names.
       </p>
       <Stack direction="row" gap={4} justify="between">
         <Button variant="secondary" onClick={onCancel}>
           Cancel
         </Button>
-        <Button variant="primary" onClick={handleFileButtonClick}>
-          Choose file
-        </Button>
-        <input
-          type="file"
-          ref={hiddenFileInput}
-          style={{ display: 'none' }}
-          onChange={handleFileChange}
-          accept="*.json"
-        />
-        <Button variant="primary" onClick={handleDirectoryButtonClick}>
-          Choose folder
-        </Button>
-        <input
-          type="file"
-          ref={hiddenDirectoryInput}
-          style={{ display: 'none' }}
-          webkitdirectory=""
-          directory=""
-          onChange={handleDirectoryChange}
-        />
+        <Stack direction="row" gap={3}>
+          <Button variant="primary" onClick={handleFileButtonClick}>
+            Choose file
+          </Button>
+          <input
+            type="file"
+            ref={hiddenFileInput}
+            style={{ display: 'none' }}
+            onChange={handleFileChange}
+            accept=".json"
+          />
+          <Button variant="primary" onClick={handleDirectoryButtonClick}>
+            Choose folder
+          </Button>
+          <input
+            type="file"
+            ref={hiddenDirectoryInput}
+            style={{ display: 'none' }}
+            webkitdirectory=""
+            directory=""
+            onChange={handleDirectoryChange}
+            accept=".json"
+          />
+        </Stack>
       </Stack>
     </Stack>
   );
