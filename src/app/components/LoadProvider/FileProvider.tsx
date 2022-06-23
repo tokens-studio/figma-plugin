@@ -1,9 +1,9 @@
 import React from 'react';
 import { DeepTokensMap, ThemeObjectsList } from '@/types';
 import { SingleToken } from '@/types/tokens';
+import useFile from '@/app/store/providers/file';
 import Button from '../Button';
 import Stack from '../Stack';
-import useFile from '@/app/store/providers/file';
 
 declare module 'react' {
   interface InputHTMLAttributes<T> extends HTMLAttributes<T> {
@@ -26,7 +26,7 @@ type Props = {
 export default function FileProvider({ onCancel }: Props) {
   const hiddenFileInput = React.useRef<HTMLInputElement>(null);
   const hiddenDirectoryInput = React.useRef<HTMLInputElement>(null);
-  const { readTokensFromFile } = useFile();
+  const { readTokensFromFileOrDirectory } = useFile();
 
   const handleFileButtonClick = React.useCallback(() => {
     hiddenFileInput.current?.click();
@@ -35,28 +35,25 @@ export default function FileProvider({ onCancel }: Props) {
   const handleFileChange = React.useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
     const { files } = event.target;
     if (!files) return;
-    await readTokensFromFile(files, files[0].webkitRelativePath);
-  }, [readTokensFromFile]);
+    await readTokensFromFileOrDirectory(files);
+    onCancel();
+  }, [readTokensFromFileOrDirectory]);
 
   const handleDirectoryButtonClick = React.useCallback(() => {
     hiddenDirectoryInput.current?.click();
   }, [hiddenDirectoryInput]);
 
-  const handleDirectoryChange = React.useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    // const files = event.target.files;
-    // if (!files) return;
-    // setFileList(files);
-    // const reader = new FileReader();
-    // reader.readAsText(files[0]);
-    // reader.onload = () => {
-    //   const result = reader.result;
-    // }
-  }, []);
+  const handleDirectoryChange = React.useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { files } = event.target;
+    if (!files) return;
+    await readTokensFromFileOrDirectory(files);
+    onCancel();
+  }, [readTokensFromFileOrDirectory]);
 
   return (
     <Stack direction="column" gap={2}>
       <p className="text-xs text-gray-600">
-        Import your existing tokens JSON files into the plugin. If you're using a single file, the first-level keys should be the token set names. If you're using multiple files, the file name / path are the set names.
+        Import your existing tokens JSON files into the plugin. &#39; If you're using a single file, the first-level keys should be the token set names. &#39; If you're using multiple files, the file name / path are the set names.
       </p>
       <Stack direction="row" gap={4} justify="between">
         <Button variant="secondary" onClick={onCancel}>

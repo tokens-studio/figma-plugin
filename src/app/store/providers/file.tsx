@@ -12,20 +12,18 @@ export default function useFile() {
   const usedTokenSets = useSelector(usedTokenSetSelector);
   const { multiFileSync } = useFlags();
 
-  const storageClientFactory = useCallback((files: FileList, path: string) => {
-    const storageClient = new FileTokenStorage(files, path);
+  const storageClientFactory = useCallback((files: FileList) => {
+    const storageClient = new FileTokenStorage(files);
 
     if (multiFileSync) storageClient.enableMultiFile();
     return storageClient;
   }, [multiFileSync]);
 
-  // Read tokens from URL
-  const readTokensFromFile = useCallback(async (files: FileList, path: string) => {
-    const storage = storageClientFactory(files, path);
+  const readTokensFromFileOrDirectory = useCallback(async (files: FileList) => {
+    const storage = storageClientFactory(files);
 
     try {
       const content = await storage.retrieve();
-      console.log('content', content);
       if (content) {
         if (Object.keys(content.tokens).length) {
           dispatch.tokenState.setTokenData({
@@ -42,7 +40,6 @@ export default function useFile() {
       notifyToUI('Error fetching from File, check console (F12)', { error: true });
       console.log('Error:', err);
     }
-
     return null;
   }, [
     dispatch,
@@ -52,8 +49,8 @@ export default function useFile() {
   ]);
 
   return useMemo(() => ({
-    readTokensFromFile,
+    readTokensFromFileOrDirectory,
   }), [
-    readTokensFromFile,
+    readTokensFromFileOrDirectory,
   ]);
 }
