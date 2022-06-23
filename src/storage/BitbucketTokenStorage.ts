@@ -1,20 +1,7 @@
-<<<<<<< HEAD
 import { Bitbucket } from 'bitbucket';
 import { RemoteTokenStorageFile } from './RemoteTokenStorage';
 import { GitMultiFileObject, GitSingleFileObject, GitStorageMetadata, GitTokenStorage } from './GitTokenStorage';
-=======
-import compact from 'just-compact';
-import { Bitbucket } from 'bitbucket';
-import * as BitbucketClient from 'bitbucket';
-import { decodeBase64 } from '@/utils/string';
-import { RemoteTokenStorageFile } from './RemoteTokenStorage';
-import IsJSONString from '@/utils/isJSONString';
-import { AnyTokenSet } from '@/types/tokens';
-import { ThemeObjectsList } from '@/types';
-import {
-  GitMultiFileObject, GitSingleFileObject, GitStorageMetadata, GitTokenStorage,
-} from './GitTokenStorage';
->>>>>>> 00ab73e (wrestling with extending bitbucket constructor)
+
 
 type CreatedOrUpdatedFileType = {
   owner: string;
@@ -28,7 +15,7 @@ type CreatedOrUpdatedFileType = {
 };
 
 export class BitbucketTokenStorage extends GitTokenStorage {
-  private bitbucketClient: ExtendedBitbucketClient;
+  private bitbucketClient;
 
   constructor(secret: string, owner: string, repository: string, baseUrl?: string) {
     super(secret, owner, repository, baseUrl);
@@ -36,15 +23,15 @@ export class BitbucketTokenStorage extends GitTokenStorage {
       multiFileEnabled: false,
     };
 
-    const ExtendedBitbucketConstructor: any = () => new Bitbucket();
+    // const ExtendedBitbucketConstructor: any = () => new Bitbucket();
     // eslint-disable-next-line
-    this.bitbucketClient = new ExtendedBitbucketConstructor({
+    this.bitbucketClient = new Bitbucket({
       auth: {
         username: this.owner,
         password: this.secret,
       },
       baseUrl: this.baseUrl || undefined,
-    }) as ExtendedBitbucketClient;
+    });
   }
 
   // https://bitbucketjs.netlify.app/#api-repositories-repositories_listBranches OR
@@ -91,7 +78,7 @@ export class BitbucketTokenStorage extends GitTokenStorage {
       return false;
     }
   }
-  
+
   // https://bitbucketjs.netlify.app/#api-users-users_getAuthedUser OR
   // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-users/?utm_source=%2Fbitbucket%2Fapi%2F2%2Freference%2Fresource%2Fuser&utm_medium=302#api-user-get
   // this would be best: https://developer.atlassian.com/cloud/bitbucket/rest/api-group-repositories/#api-repositories-workspace-repo-slug-permissions-config-users-selected-user-id-get
@@ -120,13 +107,10 @@ export class BitbucketTokenStorage extends GitTokenStorage {
         // path: this.path,
         // ref: this.branch,
       });
-
-
       // TODO: create a tree structure and read the directory
       // the Bitbucket cloud API doesn't have a method like `createTree`
 
       // read entire directory
-
       return [];
     } catch (e) {
       // Raise error (usually this is an auth error)
@@ -171,7 +155,7 @@ export class BitbucketTokenStorage extends GitTokenStorage {
     changeset: Record<string, string>,
     message: string,
     branch: string,
-    shouldCreateBranch?: boolean,
+    shouldCreateBranch?: boolean
   ): Promise<boolean> {
     const response = this.createOrUpdateFiles({
       owner: this.owner,
