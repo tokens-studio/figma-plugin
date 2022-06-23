@@ -116,7 +116,8 @@ export class GitlabTokenStorage extends GitTokenStorage {
         ref: this.branch,
         recursive: true,
       });
-      if (trees.length > 0 && this.flags.multiFileEnabled) {
+
+      if (!this.path.endsWith('.json') && this.flags.multiFileEnabled) {
         const jsonFiles = trees.filter((file) => (
           file.path.endsWith('.json')
         )).sort((a, b) => (
@@ -152,6 +153,7 @@ export class GitlabTokenStorage extends GitTokenStorage {
           return null;
         }));
       }
+
       const data = await this.gitlabClient.RepositoryFiles.showRaw(this.projectId, this.path, { ref: this.branch });
       if (IsJSONString(data)) {
         const parsed = JSON.parse(data) as GitSingleFileObject;
