@@ -2257,9 +2257,9 @@
     matrix-inverse "^1.0.1"
 
 "@figma/plugin-typings@^1.47.0":
-  version "1.47.0"
-  resolved "https://registry.yarnpkg.com/@figma/plugin-typings/-/plugin-typings-1.47.0.tgz#cc6345b1611a156228655c0869c87953cd1ec868"
-  integrity sha512-DwMHzjDvks2cRWOTz4JRXqh+PZ2YP71MAdegw6qTqjjpACIWQGfuiFPrO2duoqB8pY1mMZsBK8xqozF2LIr7Kw==
+  version "1.48.0"
+  resolved "https://registry.yarnpkg.com/@figma/plugin-typings/-/plugin-typings-1.48.0.tgz#722ae2e1464598982b255f05930ab601e2d464a2"
+  integrity sha512-GPQTfxolu0O6Yzw2UbZndt4+lKPT8JTnFsl+ERdZtvKU3aBQBfWenlIHuHHmUdzg4TocsFHTZz2HWvRS6S9Pjw==
 
 "@gar/promisify@^1.0.1":
   version "1.1.3"

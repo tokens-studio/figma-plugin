@@ -26,6 +26,24 @@ export function usePropertiesForTokenType(type: TokenTypes): PropertyObject[] {
           { label: 'Bottom Left', name: Properties.borderRadiusBottomLeft },
         );
         break;
+      case TokenTypes.BORDER_WIDTH:
+        properties.push(
+          {
+            label: 'All',
+            name: Properties.borderWidth,
+            clear: [
+              Properties.borderWidthTop,
+              Properties.borderWidthRight,
+              Properties.borderWidthBottom,
+              Properties.borderWidthLeft,
+            ],
+          },
+          { label: 'Top', name: Properties.borderWidthTop },
+          { label: 'Right', name: Properties.borderWidthRight },
+          { label: 'Bottom', name: Properties.borderWidthBottom },
+          { label: 'Left', name: Properties.borderWidthLeft },
+        );
+        break;
       case TokenTypes.SPACING:
         properties.push(
           { label: 'Gap', name: Properties.itemSpacing, icon: 'Gap' },
