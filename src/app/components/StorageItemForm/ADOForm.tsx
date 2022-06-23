@@ -92,11 +92,11 @@ export default function ADOForm({
         <Input
           full
           label="File Path (e.g. data/tokens.json)"
+          defaultValue=""
           value={values.filePath}
           onChange={onChange}
           type="text"
           name="filePath"
-          required
         />
         <Input
           full
