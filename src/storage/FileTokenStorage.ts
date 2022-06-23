@@ -1,14 +1,8 @@
-import { AnyTokenSet } from '@/types/tokens';
-import { RemoteTokenStorage, RemoteTokenStorageFile } from './RemoteTokenStorage';
+import { RemoteTokenStorage, RemoteTokenStorageFile, RemoteTokenStorageSingleTokenSetFile, RemoteTokenStorageThemesFile } from './RemoteTokenStorage';
 import IsJSONString from '@/utils/isJSONString';
-import { singleFileSchema } from './schemas';
-import { ThemeObjectsList } from '@/types';
-import { tokensMapSchema } from './schemas/tokensMapSchema';
-
-type FileData = {
-  values: Record<string, AnyTokenSet<false>>
-  $themes?: ThemeObjectsList
-};
+import { complexSingleFileSchema, multiFileSchema } from './schemas';
+import { GitStorageMetadata } from './GitTokenStorage';
+import { compact } from 'lodash';
 
 type StorageFlags = {
   multiFileEnabled: boolean
@@ -37,53 +31,87 @@ export class FileTokenStorage extends RemoteTokenStorage {
     return this;
   }
 
-  private convertUrlDataToFiles(data: FileData): RemoteTokenStorageFile[] {
-    return [
-      {
-        type: 'themes',
-        path: '$themes.json',
-        data: data.$themes ?? [],
-      },
-      ...Object.entries(data.values).map<RemoteTokenStorageFile>(([name, tokenSet]) => ({
-        name,
-        type: 'tokenSet',
-        path: `${name}.json`,
-        data: tokenSet,
-      })),
-    ];
-  }
-
   public async read(): Promise<RemoteTokenStorageFile[]> {
-    let data: RemoteTokenStorageFile[] = [];
-    console.log("data", this.files)
-    if (this.files.length === 1) {
-      this.fileReader.readAsText(this.files[0]);
-      this.fileReader.onload = async () => {
-        console.log("ansyce")
-        const result = this.fileReader.result as string;
-        console.log("result", result)
-        if (result && IsJSONString(result)) {
-          const parsedJsonData = JSON.parse(result);
-          console.log("parsed", parsedJsonData)
-          const validationResult = await singleFileSchema.safeParseAsync(parsedJsonData);
-          console.log("validata", validationResult)
-          // @README if this validation passes we can assume it is in a newer format
-          if (validationResult.success) {
-            const urlstorageData = validationResult.data as FileData;
-            data = this.convertUrlDataToFiles(urlstorageData);
-          }
+    try {
+      if (this.flags.multiFileEnabled && this.files.length > 1) {
+        const jsonFiles = Array.from(this.files)
+        const data = await Promise.all(jsonFiles.map(async (file) => {
+          const www = await new Promise((resolve) => {
+            this.fileReader.readAsText(file);
+            this.fileReader.onload = async () => {
+              const result = this.fileReader.result as string;
+              if (result && IsJSONString(result)) {
+                const parsedJsonData = JSON.parse(result);
+                const validationResult = await multiFileSchema.safeParseAsync(parsedJsonData);
+                if (validationResult.success) {
+                  resolve(validationResult.data)
+                }
+              }
+              // resolve();
+            };
+          })
+          return www;
+        }));
+        return compact(data.map<RemoteTokenStorageFile<GitStorageMetadata> | null>((fileContent, index) => {
+          const { webkitRelativePath } = jsonFiles[index];
+          if (fileContent) {
+            const name = webkitRelativePath?.split(/[\\/]/).pop()?.replace(/\.json$/, '');
 
-          // @README if not this is an older format where we just have tokens
-          const onlyTokensValidationResult = await tokensMapSchema.safeParseAsync(parsedJsonData);
-          if (onlyTokensValidationResult.success) {
-            const urlstorageData = onlyTokensValidationResult.data as FileData['values'];
-            data = this.convertUrlDataToFiles({ values: urlstorageData });
+            if (name === '$themes' && Array.isArray(fileContent)) {
+              return {
+                path: webkitRelativePath,
+                type: 'themes',
+                data: fileContent,
+              } as RemoteTokenStorageThemesFile;
+            }
+
+            if (!Array.isArray(fileContent)) {
+              return {
+                path: webkitRelativePath,
+                name,
+                type: 'tokenSet',
+                data: fileContent,
+              } as RemoteTokenStorageSingleTokenSetFile;
+            }
           }
-        }
-      };
-      return data;
+          return null;
+        }));
+        
+      }
+
+      if (this.files.length === 1) {
+        this.fileReader.readAsText(this.files[0]);
+        const data = await new Promise<RemoteTokenStorageFile[]>((resolve) => {
+          this.fileReader.onload = async () => {
+            const result = this.fileReader.result as string;
+            if (result && IsJSONString(result)) {
+              const parsedJsonData = JSON.parse(result);
+              const validationResult = await complexSingleFileSchema.safeParseAsync(parsedJsonData);
+              if (validationResult.success) {
+                const { $themes = [], ...data } = validationResult.data;
+                resolve([
+                  {
+                    type: 'themes',
+                    path: this.path,
+                    data: Array.isArray($themes) ? $themes : [],
+                  },
+                  ...Object.entries(data).map<RemoteTokenStorageFile<GitStorageMetadata>>(([name, tokenSet]) => ({
+                    name,
+                    type: 'tokenSet',
+                    path: this.path,
+                    data: !Array.isArray(tokenSet) ? tokenSet : {},
+                  })),
+                ]);
+              }
+            }
+            resolve([]);
+          };
+        });
+        return data;
+      }
+    } catch (e) {
+      console.log(e);
     }
-
     return [];
   }
 

@@ -25,7 +25,7 @@ export default function useFile() {
 
     try {
       const content = await storage.retrieve();
-
+      console.log('content', content);
       if (content) {
         if (Object.keys(content.tokens).length) {
           dispatch.tokenState.setTokenData({
