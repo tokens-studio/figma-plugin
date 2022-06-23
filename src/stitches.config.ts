@@ -108,7 +108,6 @@ export const stitchesInstance = createStitches({
       7: '32px',
       8: '48px',
       9: '64px',
-      10: '38px',
     },
     sizes: {
       1: '2px',
@@ -119,7 +118,7 @@ export const stitchesInstance = createStitches({
       6: '24px',
       7: '32px',
       8: '48px',
-      10: '38px',
+      10: '28px',
       dropdownMaxHeight: '170px',
     },
     radii: {
