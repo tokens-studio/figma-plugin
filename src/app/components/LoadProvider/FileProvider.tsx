@@ -34,8 +34,8 @@ export default function FileProvider({ onCancel }: Props) {
 
   const handleFileChange = React.useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
     const { files } = event.target;
-    if (!files) return [];
-    return readTokensFromFile(files, files[0].webkitRelativePath);
+    if (!files) return;
+    await readTokensFromFile(files, files[0].webkitRelativePath);
   }, [readTokensFromFile]);
 
   const handleDirectoryButtonClick = React.useCallback(() => {
