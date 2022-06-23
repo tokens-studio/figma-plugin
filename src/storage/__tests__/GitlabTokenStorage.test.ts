@@ -270,53 +270,83 @@ describe('GitlabTokenStorage', () => {
           path: 'data/$themes.json',
           type: 'blob',
         },
+        {
+          id: '$metadata.json',
+          mode: '100644',
+          name: '$metadata.json',
+          path: 'data/$metadata.json',
+          type: 'blob',
+        },
       ])
     ));
 
-    mockGetRepositoryFiles.mockImplementationOnce(() => Promise.resolve(JSON.stringify({
-      id: 'light',
-      name: 'Light',
-      selectedTokenSets: {
-        global: 'enabled',
-      },
-    })));
-
-    mockGetRepositoryFiles.mockImplementationOnce(() => Promise.resolve(JSON.stringify({
-      red: {
-        value: '#ff0000',
-        type: 'color',
-      },
-      black: {
-        value: '#000000',
-        type: 'color',
-      },
-    })));
-
-    expect(await storageProvider.read()).toEqual([
-      {
-        data: {
+    mockGetRepositoryFiles.mockImplementation(async (projectId: number, path: string) => {
+      if (path === 'data/$themes.json') {
+        return JSON.stringify([{
           id: 'light',
           name: 'Light',
           selectedTokenSets: {
             global: 'enabled',
           },
+        }]);
+      }
 
+      if (path === 'data/$metadata.json') {
+        return JSON.stringify({
+          tokenSetOrder: ['global'],
+        });
+      }
+
+      return JSON.stringify({
+        red: {
+          value: '#ff0000',
+          type: 'color',
         },
-        path: 'data/$themes.json',
-        type: 'themes',
+        black: {
+          value: '#000000',
+          type: 'color',
+        },
+      });
+    });
+
+    const received = await storageProvider.read();
+    expect(received[0]).toEqual({
+      data: {
+        tokenSetOrder: [
+          'global',
+        ],
       },
-      {
-        name: 'global',
-        path: 'data/global.json',
-        type: 'tokenSet',
-        data: {
-          red: {
-            value: '#ff0000', type: 'color',
+      path: 'data/$metadata.json',
+      type: 'metadata',
+    });
+    expect(received[1]).toEqual({
+      data: [
+        {
+          id: 'light',
+          name: 'Light',
+          selectedTokenSets: {
+            global: 'enabled',
           },
-          black: { value: '#000000', type: 'color' },
+        },
+      ],
+      path: 'data/$themes.json',
+      type: 'themes',
+    });
+    expect(received[2]).toEqual({
+      data: {
+        black: {
+          type: 'color',
+          value: '#000000',
+        },
+        red: {
+          type: 'color',
+          value: '#ff0000',
         },
       },
-    ]);
+      name: 'global',
+      path: 'data/global.json',
+      type: 'tokenSet',
+    });
   });
 
   it('should return an empty array when reading results in an error', async () => {

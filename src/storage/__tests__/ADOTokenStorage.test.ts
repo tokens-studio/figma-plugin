@@ -178,9 +178,15 @@ describe('ADOTokenStorage', () => {
       json: () => Promise.resolve({
         count: 2,
         value: [
+          { path: 'multifile/$metadata.json' },
           { path: 'multifile/$themes.json' },
           { path: 'multifile/global.json' },
         ],
+      }),
+    })).mockImplementationOnce(() => Promise.resolve({
+      ok: true,
+      json: () => Promise.resolve({
+        tokenSetOrder: ['global'],
       }),
     })).mockImplementationOnce(() => Promise.resolve({
       ok: true,
@@ -207,6 +213,13 @@ describe('ADOTokenStorage', () => {
 
     const result = await storageProvider.read();
     expect(result[0]).toEqual({
+      type: 'metadata',
+      path: 'multifile/$metadata.json',
+      data: {
+        tokenSetOrder: ['global'],
+      },
+    });
+    expect(result[1]).toEqual({
       type: 'themes',
       path: 'multifile/$themes.json',
       data: [{
@@ -215,7 +228,7 @@ describe('ADOTokenStorage', () => {
         selectedTokenSets: {},
       }],
     });
-    expect(result[1]).toEqual({
+    expect(result[2]).toEqual({
       type: 'tokenSet',
       name: 'global',
       path: 'multifile/global.json',

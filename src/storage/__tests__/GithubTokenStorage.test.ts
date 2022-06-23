@@ -242,9 +242,18 @@ describe('GithubTokenStorage', () => {
       if (opts.path === 'data') {
         return Promise.resolve({
           data: [
+            { path: 'data/$metadata.json', sha: 'sha(data/$metadata.json)', type: 'file' },
             { path: 'data/$themes.json', sha: 'sha(data/$themes.json)', type: 'file' },
             { path: 'data/global.json', sha: 'sha(data/global.json)', type: 'file' },
           ],
+        });
+      }
+
+      if (opts.path === 'data/$metadata.json') {
+        return Promise.resolve({
+          data: {
+            content: 'ewogICJ0b2tlblNldE9yZGVyIjogWyJnbG9iYWwiXQp9',
+          },
         });
       }
 

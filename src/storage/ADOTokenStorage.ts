@@ -268,7 +268,6 @@ export class ADOTokenStorage extends GitTokenStorage {
               if (name === SystemFilenames.METADATA) {
                 return {
                   path,
-                  name,
                   type: 'metadata',
                   data: fileContent,
                 } as RemoteTokenStorageMetadataFile<GitStorageMetadata>;
