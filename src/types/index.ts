@@ -10,7 +10,11 @@ export * from './UpdateRemoteFunction';
 export * from './ThemeObjectsList';
 export * from './DeepTokensMap';
 <<<<<<< HEAD
+<<<<<<< HEAD
 export * from './ExtendedBitbucketClient';
 =======
 export * from './CreatedOrUpdatedBitbucketFileType';
 >>>>>>> 3e201dc (add type augmentation for bitbucket created or updated file type)
+=======
+export * from './ExtendedBitbucketClient';
+>>>>>>> 00ab73e (wrestling with extending bitbucket constructor)

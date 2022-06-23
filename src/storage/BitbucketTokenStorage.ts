@@ -1,6 +1,20 @@
+<<<<<<< HEAD
 import { Bitbucket } from 'bitbucket';
 import { RemoteTokenStorageFile } from './RemoteTokenStorage';
 import { GitMultiFileObject, GitSingleFileObject, GitStorageMetadata, GitTokenStorage } from './GitTokenStorage';
+=======
+import compact from 'just-compact';
+import { Bitbucket } from 'bitbucket';
+import * as BitbucketClient from 'bitbucket';
+import { decodeBase64 } from '@/utils/string';
+import { RemoteTokenStorageFile } from './RemoteTokenStorage';
+import IsJSONString from '@/utils/isJSONString';
+import { AnyTokenSet } from '@/types/tokens';
+import { ThemeObjectsList } from '@/types';
+import {
+  GitMultiFileObject, GitSingleFileObject, GitStorageMetadata, GitTokenStorage,
+} from './GitTokenStorage';
+>>>>>>> 00ab73e (wrestling with extending bitbucket constructor)
 
 type CreatedOrUpdatedFileType = {
   owner: string;
@@ -22,14 +36,15 @@ export class BitbucketTokenStorage extends GitTokenStorage {
       multiFileEnabled: false,
     };
 
+    const ExtendedBitbucketConstructor: any = () => new Bitbucket();
     // eslint-disable-next-line
-    this.bitbucketClient = new Bitbucket({
+    this.bitbucketClient = new ExtendedBitbucketConstructor({
       auth: {
         username: this.owner,
         password: this.secret,
       },
       baseUrl: this.baseUrl || undefined,
-    });
+    }) as ExtendedBitbucketClient;
   }
 
   // https://bitbucketjs.netlify.app/#api-repositories-repositories_listBranches OR
