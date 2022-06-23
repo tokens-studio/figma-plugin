@@ -19,6 +19,7 @@ import { StorageTypeCredentials, StorageTypeFormValues } from '@/types/StorageTy
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { useFlags } from '@/app/components/LaunchDarkly';
 import { getRepositoryInformation } from '../getRepositoryInformation';
+import { applyTokenSetOrder } from '@/utils/tokenset';
 
 type GitlabCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.GITHUB | StorageProviderType.GITLAB; }>;
 type GitlabFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.GITHUB | StorageProviderType.GITLAB }>;
@@ -58,7 +59,12 @@ export function useGitLab() {
     const content = await storage.retrieve();
 
     if (content) {
-      if (content && isEqual(content.tokens, tokens) && isEqual(content.themes, themes)) {
+      if (
+        content
+        && isEqual(content.tokens, tokens)
+        && isEqual(content.themes, themes)
+        && isEqual(content.metadata?.tokenSetOrder ?? Object.keys(tokens), Object.keys(tokens))
+      ) {
         notifyToUI('Nothing to commit');
         return {
           tokens,
@@ -138,7 +144,11 @@ export function useGitLab() {
       const content = await storage.retrieve();
 
       if (content) {
-        return content;
+        const sortedTokens = applyTokenSetOrder(content.tokens, content.metadata?.tokenSetOrder ?? []);
+        return {
+          ...content,
+          tokens: sortedTokens,
+        };
       }
     } catch (e) {
       console.log('Error', e);
@@ -164,6 +174,7 @@ export function useGitLab() {
         if (
           !isEqual(content.tokens, tokens)
           || !isEqual(content.themes, themes)
+          || !isEqual(content.metadata?.tokenSetOrder ?? Object.keys(tokens), Object.keys(tokens))
         ) {
           const userDecision = await askUserIfPull();
           if (userDecision) {

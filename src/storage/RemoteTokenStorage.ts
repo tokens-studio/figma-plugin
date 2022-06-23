@@ -2,6 +2,7 @@ import { DeepTokensMap, ThemeObjectsList } from '@/types';
 import type { AnyTokenList, SingleToken } from '@/types/tokens';
 import convertTokensToObject from '@/utils/convertTokensToObject';
 import parseTokenValues from '@/utils/parseTokenValues';
+import { SystemFilenames } from './SystemFilenames';
 
 export type RemoteTokenStorageData<Metadata = unknown> = {
   tokens: Record<string, AnyTokenList>
@@ -56,14 +57,14 @@ export abstract class RemoteTokenStorage<Metadata = unknown, SaveOptions = unkno
     // we will also include a separate file for the themes called $themes
     files.push({
       type: 'themes',
-      path: '$themes.json',
+      path: `${SystemFilenames.THEMES}.json`,
       data: data.themes,
     });
 
     if ('metadata' in data && data.metadata) {
       files.push({
         type: 'metadata',
-        path: '$metadata.json',
+        path: `${SystemFilenames.METADATA}.json`,
         data: data.metadata,
       });
     }

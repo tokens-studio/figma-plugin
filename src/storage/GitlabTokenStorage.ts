@@ -7,6 +7,7 @@ import {
 import { RemoteTokenStorageFile } from './RemoteTokenStorage';
 import { AnyTokenSet } from '@/types/tokens';
 import { ThemeObjectsList } from '@/types';
+import { SystemFilenames } from './SystemFilenames';
 
 enum GitLabAccessLevel {
   NoAccess = 0,
@@ -133,11 +134,19 @@ export class GitlabTokenStorage extends GitTokenStorage {
             const name = path.replace('.json', '').replace(this.path, '').replace(/^\//, '').replace(/\/$/, '');
             const parsed = JSON.parse(fileContent) as GitMultiFileObject;
 
-            if (name === '$themes') {
+            if (name === SystemFilenames.THEMES) {
               return {
                 path,
                 type: 'themes',
                 data: parsed as ThemeObjectsList,
+              };
+            }
+
+            if (name === SystemFilenames.METADATA) {
+              return {
+                path,
+                type: 'metadata',
+                data: parsed as GitStorageMetadata,
               };
             }
 
@@ -158,10 +167,12 @@ export class GitlabTokenStorage extends GitTokenStorage {
         return [
           {
             type: 'themes',
-            path: `${this.path}/$themes.json`,
+            path: `${this.path}/${SystemFilenames.THEMES}.json`,
             data: parsed.$themes ?? [],
           },
-          ...(Object.entries(parsed).filter(([key]) => key !== '$themes') as [string, AnyTokenSet<false>][]).map<RemoteTokenStorageFile<GitStorageMetadata>>(([name, tokenSet]) => ({
+          ...(Object.entries(parsed).filter(([key]) => (
+            !Object.values<string>(SystemFilenames).includes(key)
+          )) as [string, AnyTokenSet<false>][]).map<RemoteTokenStorageFile<GitStorageMetadata>>(([name, tokenSet]) => ({
             name,
             type: 'tokenSet',
             path: `${this.path}/${name}.json`,

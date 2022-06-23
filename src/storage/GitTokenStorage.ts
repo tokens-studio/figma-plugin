@@ -1,6 +1,7 @@
 import { DeepTokensMap, ThemeObjectsList } from '@/types';
 import { AnyTokenSet, SingleToken } from '@/types/tokens';
 import { RemoteTokenStorage, RemoteTokenStorageFile } from './RemoteTokenStorage';
+import { SystemFilenames } from './SystemFilenames';
 
 type StorageFlags = {
   multiFileEnabled: boolean
@@ -106,9 +107,9 @@ export abstract class GitTokenStorage extends RemoteTokenStorage<GitStorageMetad
         if (file.type === 'tokenSet') {
           filesChangeset[`${this.path}/${file.name}.json`] = JSON.stringify(file.data, null, 2);
         } else if (file.type === 'themes') {
-          filesChangeset[`${this.path}/$themes.json`] = JSON.stringify(file.data, null, 2);
+          filesChangeset[`${this.path}/${SystemFilenames.THEMES}.json`] = JSON.stringify(file.data, null, 2);
         } else if (file.type === 'metadata') {
-          filesChangeset[`${this.path}/$metadata.json`] = JSON.stringify(file.data, null, 2);
+          filesChangeset[`${this.path}/${SystemFilenames.METADATA}.json`] = JSON.stringify(file.data, null, 2);
         }
       });
     }

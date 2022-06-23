@@ -17,6 +17,7 @@ import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { StorageTypeCredentials, StorageTypeFormValues } from '@/types/StorageType';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { useFlags } from '@/app/components/LaunchDarkly';
+import { applyTokenSetOrder } from '@/utils/tokenset';
 
 type AdoCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.ADO; }>;
 type AdoFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.ADO; }>;
@@ -45,7 +46,7 @@ export const useADO = () => {
       text: 'Pull from Ado?',
       description: 'Your repo already contains tokens, do you want to pull these now?',
     });
-    return confirmResult
+    return confirmResult;
   }, [confirm]);
 
   const pushTokensToADO = React.useCallback(async (context: AdoCredentials) => {
@@ -59,6 +60,7 @@ export const useADO = () => {
       content
       && isEqual(content.tokens, tokens)
       && isEqual(content.themes, themes)
+      && isEqual(content.metadata?.tokenSetOrder ?? Object.keys(tokens), Object.keys(tokens))
     ) {
       notifyToUI('Nothing to commit');
       return {
@@ -127,7 +129,11 @@ export const useADO = () => {
       const content = await storage.retrieve();
 
       if (content) {
-        return content;
+        const sortedTokens = applyTokenSetOrder(content.tokens, content.metadata?.tokenSetOrder ?? []);
+        return {
+          ...content,
+          tokens: sortedTokens,
+        };
       }
     } catch (e) {
       console.log('Error', e);
@@ -155,6 +161,7 @@ export const useADO = () => {
         if (
           !isEqual(content.tokens, tokens)
           || !isEqual(content.themes, themes)
+          || !isEqual(content.metadata?.tokenSetOrder ?? Object.keys(tokens), Object.keys(tokens))
         ) {
           const userDecision = await askUserIfPull();
           if (userDecision) {
