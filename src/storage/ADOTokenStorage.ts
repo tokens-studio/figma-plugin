@@ -167,7 +167,7 @@ export class ADOTokenStorage extends GitTokenStorage {
     return false;
   }
 
-  private async getOldObjectId(branch:string, shouldCreateBranch: boolean) {
+  private async getOldObjectId(branch: string, shouldCreateBranch: boolean) {
     const { value } = await this.getRefs();
     const branches = new Map<string, GitInterfaces.GitRef>();
     for (const val of value) {
