@@ -16,7 +16,7 @@ import {
   editProhibitedSelector, tokensSelector,
 } from '@/selectors';
 import Stack from './Stack';
-import { useIsGithubMultiFileEnabled } from '../hooks/useIsGithubMultiFileEnabled';
+import { useIsGitMultiFileEnabled } from '../hooks/useIsGitMultiFileEnabled';
 
 const StyledButton = styled('button', {
   flexShrink: 0,
@@ -37,7 +37,7 @@ const StyledButton = styled('button', {
 export default function TokenSetSelector() {
   const tokens = useSelector(tokensSelector);
   const editProhibited = useSelector(editProhibitedSelector);
-  const mfsEnabled = useIsGithubMultiFileEnabled();
+  const mfsEnabled = useIsGitMultiFileEnabled();
   const dispatch = useDispatch<Dispatch>();
   const { confirm } = useConfirm();
 
@@ -54,7 +54,7 @@ export default function TokenSetSelector() {
 
   React.useEffect(() => {
     setShowNewTokenSetFields(false);
-    handleNewTokenSetNameChange('');
+    handleNewTokenSetNameChange(tokenSetMarkedForChange);
   }, [tokens]);
 
   const handleNewTokenSetSubmit = React.useCallback((e: React.FormEvent<HTMLFormElement>) => {
