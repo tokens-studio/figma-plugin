@@ -1,9 +1,9 @@
 import React from 'react';
+import { DeepTokensMap, ThemeObjectsList } from '@/types';
+import { SingleToken } from '@/types/tokens';
 import Button from '../Button';
 import Stack from '../Stack';
-import IsJSONString from '@/utils/isJSONString';
-import { DeepTokensMap, ThemeObjectsList } from '@/types';
-import { AnyTokenSet, SingleToken } from '@/types/tokens';
+import useFile from '@/app/store/providers/file';
 
 declare module 'react' {
   interface InputHTMLAttributes<T> extends HTMLAttributes<T> {
@@ -26,57 +26,17 @@ type Props = {
 export default function FileProvider({ onCancel }: Props) {
   const hiddenFileInput = React.useRef<HTMLInputElement>(null);
   const hiddenDirectoryInput = React.useRef<HTMLInputElement>(null);
-  const [fileList, setFileList] = React.useState<FileList>();
-
-  const readFileContents = (files: FileList) => {
-    const reader = new FileReader();
-    let result: string | ArrayBuffer | null = '';
-    if (files.length > 1) {
-      // const fileContents = files.map((file) => {
-      //   reader.readAsText(file);
-      //   reader.onload = () => {
-      //     const result = reader.result;
-      //     return result;
-      //   }
-      // });
-    }
-    reader.readAsText(files[0]);
-    reader.onload = () => {
-      result = reader.result;
-    };
-    return result;
-  };
+  const { readTokensFromFile } = useFile();
 
   const handleFileButtonClick = React.useCallback(() => {
     hiddenFileInput.current?.click();
   }, [hiddenFileInput]);
 
-  const handleFileChange = React.useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
+  const handleFileChange = React.useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { files } = event.target;
     if (!files) return [];
-    const path = files[0].webkitRelativePath;
-    const data = readFileContents(files);
-    console.log("fileconte", data)
-    if (IsJSONString(data)) {
-      const parsed = JSON.parse(data) as SingleFileObject;
-      return [
-        {
-          type: 'themes',
-          path: `${path}/$themes.json`,
-          data: parsed.$themes ?? [],
-        },
-        ...(Object.entries(parsed).filter(([key]) => key !== '$themes') as [string, AnyTokenSet<false>][]).map(([name, tokenSet]) => ({
-          name,
-          type: 'tokenSet',
-          path: `${path}/${name}.json`,
-          data: tokenSet,
-        })),
-      ];
-    }
-    return [];
-  }, [fileList]);
-
-  
+    return readTokensFromFile(files, files[0].webkitRelativePath);
+  }, [readTokensFromFile]);
 
   const handleDirectoryButtonClick = React.useCallback(() => {
     hiddenDirectoryInput.current?.click();
@@ -91,8 +51,7 @@ export default function FileProvider({ onCancel }: Props) {
     // reader.onload = () => {
     //   const result = reader.result;
     // }
-  }, [fileList]);
-
+  }, []);
 
   return (
     <Stack direction="column" gap={2}>
@@ -111,7 +70,7 @@ export default function FileProvider({ onCancel }: Props) {
           ref={hiddenFileInput}
           style={{ display: 'none' }}
           onChange={handleFileChange}
-          accept='*.json'
+          accept="*.json"
         />
         <Button variant="primary" onClick={handleDirectoryButtonClick}>
           Choose folder
@@ -120,8 +79,8 @@ export default function FileProvider({ onCancel }: Props) {
           type="file"
           ref={hiddenDirectoryInput}
           style={{ display: 'none' }}
-          webkitdirectory=''
-          directory=''
+          webkitdirectory=""
+          directory=""
           onChange={handleDirectoryChange}
         />
       </Stack>
