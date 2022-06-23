@@ -265,13 +265,6 @@ describe('ADOTokenStorage', () => {
     storageProvider.changePath('data/tokens.json');
     expect(await storageProvider.write([
       {
-        type: 'metadata',
-        path: 'metadata.json',
-        data: {
-          commitMessage: 'Initial commit',
-        },
-      },
-      {
         type: 'themes',
         path: '$themes.json',
         data: [
@@ -296,7 +289,9 @@ describe('ADOTokenStorage', () => {
           },
         },
       },
-    ])).toBe(true);
+    ], {
+      commitMessage: 'Initial commit',
+    })).toBe(true);
     expect(mockFetch).toHaveBeenNthCalledWith(
       4,
       `${baseUrl}/${projectId}/_apis/git/repositories/${repositoryId}/pushes?api-version=6.0`,
@@ -388,13 +383,6 @@ describe('ADOTokenStorage', () => {
     storageProvider.changePath('multifile');
     expect(await storageProvider.write([
       {
-        type: 'metadata',
-        path: 'metadata.json',
-        data: {
-          commitMessage: 'Initial commit',
-        },
-      },
-      {
         type: 'themes',
         path: '$themes.json',
         data: [
@@ -419,7 +407,9 @@ describe('ADOTokenStorage', () => {
           },
         },
       },
-    ])).toBe(true);
+    ], {
+      commitMessage: 'Initial commit',
+    })).toBe(true);
     expect(mockFetch).toHaveBeenNthCalledWith(
       4,
       `${baseUrl}/${projectId}/_apis/git/repositories/${repositoryId}/pushes?api-version=6.0`,
