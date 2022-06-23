@@ -6,6 +6,14 @@ type Props = {
   onCancel: () => void;
 };
 
+declare module 'react' {
+  interface InputHTMLAttributes<T> extends HTMLAttributes<T> {
+    // extends React's HTMLAttributes
+    directory?: string;
+    webkitdirectory?: string;
+  }
+}
+
 export default function FileProvider({ onCancel }: Props) {
   const hiddenFileInput = React.useRef<HTMLInputElement>(null);
   const [fileList, setFileList] = React.useState<FileList>();
@@ -15,8 +23,6 @@ export default function FileProvider({ onCancel }: Props) {
   }, [hiddenFileInput]);
 
   const handleChange = React.useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    hiddenFileInput.current?.setAttribute("directory", "");
-    hiddenFileInput.current?.setAttribute("webkitdirectory", "");
     const files = event.target.files;
     if (!files) return;
     setFileList(files);
@@ -47,6 +53,7 @@ export default function FileProvider({ onCancel }: Props) {
           onChange={handleChange}
           accept='*.json'
         />
+
       </Stack>
     </Stack>
   );
