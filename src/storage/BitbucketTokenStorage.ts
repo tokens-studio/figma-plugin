@@ -14,7 +14,7 @@ type CreatedOrUpdatedFileType = {
 };
 
 export class BitbucketTokenStorage extends GitTokenStorage {
-  private bitbucketClient;
+  private bitbucketClient: ExtendedBitbucketClient;
 
   constructor(secret: string, owner: string, repository: string, baseUrl?: string) {
     super(secret, owner, repository, baseUrl);
@@ -23,7 +23,7 @@ export class BitbucketTokenStorage extends GitTokenStorage {
     };
 
     // eslint-disable-next-line
-    this.bitbucketClient = new Bitbucket.Bitbucket({
+    this.bitbucketClient = new Bitbucket({
       auth: {
         username: this.owner,
         password: this.secret,
@@ -156,7 +156,7 @@ export class BitbucketTokenStorage extends GitTokenStorage {
     changeset: Record<string, string>,
     message: string,
     branch: string,
-    shouldCreateBranch?: boolean
+    shouldCreateBranch?: boolean,
   ): Promise<boolean> {
     const response = this.createOrUpdateFiles({
       owner: this.owner,
