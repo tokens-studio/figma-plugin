@@ -34,6 +34,11 @@ function getTreeMode(type: 'dir' | 'file' | string) {
   }
 }
 
+// @README https://github.com/octokit/octokit.js/issues/890
+const octokitClientDefaultHeaders = {
+  'If-None-Match': '',
+};
+
 export class GithubTokenStorage extends GitTokenStorage {
   private octokitClient: ExtendedOctokitClient;
 
@@ -60,6 +65,7 @@ export class GithubTokenStorage extends GitTokenStorage {
     const branches = await this.octokitClient.repos.listBranches({
       owner: this.owner,
       repo: this.repository,
+      headers: octokitClientDefaultHeaders,
     });
     return branches.data.map((branch) => branch.name);
   }
@@ -69,7 +75,10 @@ export class GithubTokenStorage extends GitTokenStorage {
       const originRef = `heads/${source || this.branch}`;
       const newRef = `refs/heads/${branch}`;
       const originBranch = await this.octokitClient.git.getRef({
-        owner: this.owner, repo: this.repository, ref: originRef,
+        owner: this.owner,
+        repo: this.repository,
+        ref: originRef,
+        headers: octokitClientDefaultHeaders,
       });
       const newBranch = await this.octokitClient.git.createRef({
         owner: this.owner, repo: this.repository, ref: newRef, sha: originBranch.data.object.sha,
@@ -89,6 +98,7 @@ export class GithubTokenStorage extends GitTokenStorage {
         owner: this.owner,
         repo: this.repository,
         username: currentUser.data.login,
+        headers: octokitClientDefaultHeaders,
       });
       return !!canWrite;
     } catch (e) {
@@ -103,6 +113,7 @@ export class GithubTokenStorage extends GitTokenStorage {
         repo: this.repository,
         path: this.path,
         ref: this.branch,
+        headers: octokitClientDefaultHeaders,
       });
 
       // read entire directory
@@ -115,6 +126,7 @@ export class GithubTokenStorage extends GitTokenStorage {
             sha: item.sha,
             mode: getTreeMode(item.type),
           })),
+          headers: octokitClientDefaultHeaders,
         });
 
         if (directoryTreeResponse.data.tree[0].sha) {
@@ -123,6 +135,7 @@ export class GithubTokenStorage extends GitTokenStorage {
             repo: this.repository,
             tree_sha: directoryTreeResponse.data.tree[0].sha,
             recursive: 'true',
+            headers: octokitClientDefaultHeaders,
           });
 
           if (treeResponse.data.tree.length > 0) {
@@ -146,6 +159,7 @@ export class GithubTokenStorage extends GitTokenStorage {
                 repo: this.repository,
                 path: `${RootDirectoryName}/${treeItem.path}`,
                 ref: this.branch,
+                headers: octokitClientDefaultHeaders,
               }) : Promise.resolve(null)
             )));
             return compact(jsonFileContents.map<RemoteTokenStorageFile<GitStorageMetadata> | null>((fileContent, index) => {
