@@ -22,10 +22,14 @@ export const StyledProBadge = styled('a', {
   },
 });
 
-export default function ProBadge() {
+type Props = {
+  compact?: boolean;
+};
+
+export default function ProBadge({ compact }: Props) {
   const existingKey = useSelector(licenseKeySelector);
 
   return (
-    <StyledProBadge href="https://figmatokens.com" target="_blank">{existingKey ? 'Pro' : 'Get Pro'}</StyledProBadge>
+    <StyledProBadge href="https://figmatokens.com" target="_blank">{existingKey || compact ? 'Pro' : 'Get Pro'}</StyledProBadge>
   );
 }

@@ -23,7 +23,7 @@ import { Dispatch } from '../store';
 import { BranchSwitchMenuRadioElement } from './BranchSwitchMenuRadioElement';
 import { isGitProvider } from '@/utils/is';
 import { useFlags } from './LaunchDarkly';
-import { StyledProBadge } from './ProBadge';
+import ProBadge from './ProBadge';
 
 const BranchSwitchMenuItemElement: React.FC<{
   branch: string
@@ -172,7 +172,7 @@ export default function BranchSelector() {
               <BranchSwitchMenuItem css={{ display: 'flex', justifyContent: 'space-between' }}>
 
                 <span>Upgrade to Pro</span>
-                <StyledProBadge>Pro</StyledProBadge>
+                <ProBadge compact />
 
               </BranchSwitchMenuItem>
               <BranchSwitchMenuSeparator />

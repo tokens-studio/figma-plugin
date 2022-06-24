@@ -17,7 +17,7 @@ import Text from '../Text';
 import { styled } from '@/stitches.config';
 import IconToggleableDisclosure from '@/app/components/IconToggleableDisclosure';
 import { Dispatch } from '@/app/store';
-import { StyledProBadge } from '../ProBadge';
+import ProBadge from '../ProBadge';
 import { useFlags } from '../LaunchDarkly';
 
 const ThemeDropdownLabel = styled(Text, {
@@ -101,7 +101,7 @@ export const ThemeSelector: React.FC = () => {
             onSelect={handleManageThemes}
           >
             <span>Manage themes</span>
-            {!tokenThemes && <StyledProBadge>Pro</StyledProBadge>}
+            {!tokenThemes && <ProBadge compact />}
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

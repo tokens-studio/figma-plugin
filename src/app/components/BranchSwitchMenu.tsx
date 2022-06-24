@@ -73,7 +73,7 @@ const StyledBranchSwitchMenuTrigger = styled(BranchSwitchMenuPrimitive.Trigger, 
   color: '$contextMenuForeground',
   fontSize: '$xsmall',
 
-  '&:focus, &:hover': {
+  '&:hover:not([disabled]), &:focus:not([disabled])': {
     outline: 'none',
     boxShadow: 'none',
     backgroundColor: '$interaction',
