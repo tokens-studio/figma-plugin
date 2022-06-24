@@ -229,7 +229,7 @@ export class ADOTokenStorage extends GitTokenStorage {
 
   public async read(): Promise<RemoteTokenStorageFile<GitStorageMetadata>[]> {
     try {
-      if (this.flags.multiFileEnabled && !this.path.endsWith('.json')) {
+      if (!this.path.endsWith('.json')) {
         const { value } = await this.getItems();
         const jsonFiles = value
           ?.filter((file) => (file.path?.endsWith('.json')))

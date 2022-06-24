@@ -117,7 +117,7 @@ export class GitlabTokenStorage extends GitTokenStorage {
         recursive: true,
       });
 
-      if (!this.path.endsWith('.json') && this.flags.multiFileEnabled) {
+      if (!this.path.endsWith('.json')) {
         const jsonFiles = trees.filter((file) => (
           file.path.endsWith('.json')
         )).sort((a, b) => (
