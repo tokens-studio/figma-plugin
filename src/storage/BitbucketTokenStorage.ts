@@ -23,8 +23,6 @@ export class BitbucketTokenStorage extends GitTokenStorage {
       multiFileEnabled: false,
     };
 
-    // const ExtendedBitbucketConstructor: any = (...args: ConstructorParameters<typeof Bitbucket>) =>
-    //   new Bitbucket(...args);
     // eslint-disable-next-line
     this.bitbucketClient = new Bitbucket({
       auth: {
@@ -160,9 +158,9 @@ export class BitbucketTokenStorage extends GitTokenStorage {
     shouldCreateBranch?: boolean
   ): Promise<boolean> {
     const response = this.createOrUpdateFiles({
+      branch,
       owner: this.owner,
       repo: this.repository,
-      branch,
       createBranch: shouldCreateBranch,
       changes: [
         {
