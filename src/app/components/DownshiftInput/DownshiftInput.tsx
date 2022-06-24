@@ -113,7 +113,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
   const [showAutoSuggest, setShowAutoSuggest] = React.useState<boolean>(false);
   const [isFirstLoading, setisFirstLoading] = React.useState<boolean>(true);
 
-  const filteredValue = useMemo(() => ((showAutoSuggest || typeof value !== 'string') ? '' : value?.replace(/[^a-zA-Z0-9.]/g, '')), [
+  const filteredValue = useMemo(() => ((showAutoSuggest || typeof value !== 'string') ? '' : value?.replace(/[{}$]/g, '')), [
     showAutoSuggest,
     value,
   ]); // removing non-alphanumberic except . from the input value

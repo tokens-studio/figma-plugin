@@ -17,7 +17,16 @@ const StyledValueItem = styled('div', {
   marginBottom: '$2',
 });
 
-const properties = ['Font', 'Weight', 'Size', 'Line height', 'Letter', 'Paragraph', 'Decoration', 'Text Case'];
+const properties = {
+  fontFamily: 'Font',
+  fontWeight: 'Weight',
+  fontSize: 'Size',
+  lineHeight: 'Line height',
+  letterSpacing: 'Letter',
+  paragraphSpacing: 'Paragraph',
+  textDecoration: 'Decoration',
+  textCase: 'Text Case',
+};
 
 export const ResolvedTypograhpyValueDisplay: React.FC<Props> = ({ value }) => {
   const seed = useUIDSeed();
@@ -28,12 +37,13 @@ export const ResolvedTypograhpyValueDisplay: React.FC<Props> = ({ value }) => {
     }}
     >
       <Box css={{ display: 'grid', marginRight: '$6' }}>
-        {properties.map((property) => (
-          <StyledPropertyItem key={seed(property)}>{property}</StyledPropertyItem>
+        {Object.values(properties).map((value) => (
+          <StyledPropertyItem key={seed(value)}>{value}</StyledPropertyItem>
         ))}
+
       </Box>
       <Box>
-        {Object.keys(value).map((key) => (
+        {Object.keys(properties).map((key) => (
           <StyledValueItem key={seed(key)}>{value[key as keyof typeof value]}</StyledValueItem>
         ))}
       </Box>
