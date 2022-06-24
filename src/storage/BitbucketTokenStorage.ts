@@ -43,7 +43,8 @@ export class BitbucketTokenStorage extends GitTokenStorage {
       multiFileEnabled: false,
     };
 
-    // const ExtendedBitbucketConstructor: any = () => new Bitbucket();
+    // const ExtendedBitbucketConstructor: any = (...args: ConstructorParameters<typeof Bitbucket>) =>
+    //   new Bitbucket(...args);
     // eslint-disable-next-line
     this.bitbucketClient = new Bitbucket({
       auth: {
@@ -93,13 +94,10 @@ export class BitbucketTokenStorage extends GitTokenStorage {
   // https://bitbucketjs.netlify.app/#api-repositories-repositories_createSrcFileCommit
   // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-source/#api-repositories-workspace-repo-slug-src-post
   public async createOrUpdateFiles({ owner, repo, branch, changes }: CreatedOrUpdatedFileType) {
-    const { message, files } = changes[0];
-    console.log('files: ', files);
     const response = await this.bitbucketClient.repositories.createSrcFileCommit({
       branch,
-      // TODO: extend Bitbucket client
-      files,
-      message,
+      _body: changes[0].files,
+      message: changes[0].message,
       repo_slug: repo,
       workspace: owner,
     });
@@ -114,9 +112,11 @@ export class BitbucketTokenStorage extends GitTokenStorage {
     const currentUser = await this.bitbucketClient.users.getAuthedUser({});
     if (!currentUser.data.account_id) return false;
     try {
-      const { permission } = await this.bitbucketClient.listPermissions().data.values[0];
-      // TODO: double check logic here
+      const { data } = await this.bitbucketClient.repositories.listPermissions({});
+      const permission = data.values?.[0]?.permission;
+
       const canWrite = !!(permission === 'admin' || 'write');
+
       return !!canWrite;
     } catch (e) {
       return false;
@@ -150,7 +150,7 @@ export class BitbucketTokenStorage extends GitTokenStorage {
     branch: string,
     shouldCreateBranch?: boolean
   ): Promise<boolean> {
-    const response = this.createOrUpdateFiles({
+    const response = this.bitbucketClient.createOrUpdateFiles({
       branch,
       owner: this.owner,
       repo: this.repository,
