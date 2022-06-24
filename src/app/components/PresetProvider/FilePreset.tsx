@@ -1,7 +1,7 @@
 import React from 'react';
 import { DeepTokensMap, ThemeObjectsList } from '@/types';
 import { SingleToken } from '@/types/tokens';
-import useFile from '@/app/store/providers/file';
+import useRemoteTokens from '../../store/remoteTokens';
 import Button from '../Button';
 import Stack from '../Stack';
 
@@ -26,29 +26,21 @@ type Props = {
 export default function FilePreset({ onCancel }: Props) {
   const hiddenFileInput = React.useRef<HTMLInputElement>(null);
   const hiddenDirectoryInput = React.useRef<HTMLInputElement>(null);
-  const { readTokensFromFileOrDirectory } = useFile();
+  const { fetchTokensFromFileOrDirectory } = useRemoteTokens();
 
   const handleFileButtonClick = React.useCallback(() => {
     hiddenFileInput.current?.click();
   }, [hiddenFileInput]);
 
-  const handleFileChange = React.useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { files } = event.target;
-    if (!files) return;
-    await readTokensFromFileOrDirectory(files);
-    onCancel();
-  }, [readTokensFromFileOrDirectory]);
-
   const handleDirectoryButtonClick = React.useCallback(() => {
     hiddenDirectoryInput.current?.click();
   }, [hiddenDirectoryInput]);
 
-  const handleDirectoryChange = React.useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileOrDirectoryChange = React.useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
     const { files } = event.target;
-    if (!files) return;
-    await readTokensFromFileOrDirectory(files);
+    await fetchTokensFromFileOrDirectory(files);
     onCancel();
-  }, [readTokensFromFileOrDirectory]);
+  }, [fetchTokensFromFileOrDirectory]);
 
   return (
     <Stack direction="column" gap={2}>
@@ -75,7 +67,7 @@ export default function FilePreset({ onCancel }: Props) {
             type="file"
             ref={hiddenFileInput}
             style={{ display: 'none' }}
-            onChange={handleFileChange}
+            onChange={handleFileOrDirectoryChange}
             accept=".json"
           />
           <Button variant="primary" onClick={handleDirectoryButtonClick}>
@@ -87,8 +79,7 @@ export default function FilePreset({ onCancel }: Props) {
             style={{ display: 'none' }}
             webkitdirectory=""
             directory=""
-            onChange={handleDirectoryChange}
-            accept=".json"
+            onChange={handleFileOrDirectoryChange}
           />
         </Stack>
       </Stack>

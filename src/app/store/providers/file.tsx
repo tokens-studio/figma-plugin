@@ -1,15 +1,11 @@
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { useCallback, useMemo } from 'react';
 import { Dispatch } from '@/app/store';
-import { notifyToUI } from '../../../plugin/notifiers';
 import { useFlags } from '@/app/components/LaunchDarkly';
-import { activeThemeSelector, usedTokenSetSelector } from '@/selectors';
 import { FileTokenStorage } from '@/storage/FileTokenStorage';
 
 export default function useFile() {
   const dispatch = useDispatch<Dispatch>();
-  const activeTheme = useSelector(activeThemeSelector);
-  const usedTokenSets = useSelector(usedTokenSetSelector);
   const { multiFileSync } = useFlags();
 
   const storageClientFactory = useCallback((files: FileList) => {
@@ -25,27 +21,15 @@ export default function useFile() {
     try {
       const content = await storage.retrieve();
       if (content) {
-        if (Object.keys(content.tokens).length) {
-          dispatch.tokenState.setTokenData({
-            values: content.tokens,
-            themes: content.themes,
-            usedTokenSet: usedTokenSets,
-            activeTheme,
-          });
-          return content;
-        }
-        notifyToUI('No tokens stored on file', { error: true });
+        return content;
       }
-    } catch (err) {
-      notifyToUI('Error fetching from File, check console (F12)', { error: true });
-      console.log('Error:', err);
+    } catch (e) {
+      console.log('Error', e);
     }
     return null;
   }, [
     dispatch,
     storageClientFactory,
-    usedTokenSets,
-    activeTheme,
   ]);
 
   return useMemo(() => ({

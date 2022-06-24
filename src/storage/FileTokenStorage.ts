@@ -29,7 +29,7 @@ export class FileTokenStorage extends RemoteTokenStorage {
   public async read(): Promise<RemoteTokenStorageFile[]> {
     try {
       if (this.flags.multiFileEnabled && this.files.length > 1) {
-        const jsonFiles = Array.from(this.files);
+        const jsonFiles = Array.from(this.files).filter((file) => file.webkitRelativePath.endsWith('.json'));
         const filePromises = jsonFiles.map((file) =>
           // Return a promise per file
           new Promise((resolve) => {
@@ -52,7 +52,7 @@ export class FileTokenStorage extends RemoteTokenStorage {
         return compact(jsonFileContents.map<RemoteTokenStorageFile | null>((fileContent, index) => {
           const { webkitRelativePath } = jsonFiles[index];
           if (fileContent) {
-            const name = webkitRelativePath.substring(webkitRelativePath.indexOf('/') + 1).replace('.json', '');
+            const name = webkitRelativePath?.substring(webkitRelativePath.indexOf('/') + 1)?.replace('.json', '');
             if (name === '$themes' && Array.isArray(fileContent)) {
               return {
                 path: webkitRelativePath,
@@ -73,37 +73,38 @@ export class FileTokenStorage extends RemoteTokenStorage {
           return null;
         }));
       }
+      if (this.files[0].name.endsWith('.json')) {
+        const reader = new FileReader();
+        reader.readAsText(this.files[0]);
+        return await new Promise<RemoteTokenStorageFile[]>((resolve) => {
+          reader.onload = async () => {
+            const result = reader.result as string;
 
-      const reader = new FileReader();
-      reader.readAsText(this.files[0]);
-      return await new Promise<RemoteTokenStorageFile[]>((resolve) => {
-        reader.onload = async () => {
-          const result = reader.result as string;
+            if (result && IsJSONString(result)) {
+              const parsedJsonData = JSON.parse(result);
+              const validationResult = await complexSingleFileSchema.safeParseAsync(parsedJsonData);
 
-          if (result && IsJSONString(result)) {
-            const parsedJsonData = JSON.parse(result);
-            const validationResult = await complexSingleFileSchema.safeParseAsync(parsedJsonData);
-
-            if (validationResult.success) {
-              const { $themes = [], ...data } = validationResult.data;
-              resolve([
-                {
-                  type: 'themes',
-                  path: this.files[0].webkitRelativePath,
-                  data: Array.isArray($themes) ? $themes : [],
-                },
-                ...Object.entries(data).map<RemoteTokenStorageFile>(([name, tokenSet]) => ({
-                  name,
-                  type: 'tokenSet',
-                  path: this.files[0].webkitRelativePath,
-                  data: !Array.isArray(tokenSet) ? tokenSet : {},
-                })),
-              ]);
+              if (validationResult.success) {
+                const { $themes = [], ...data } = validationResult.data;
+                resolve([
+                  {
+                    type: 'themes',
+                    path: this.files[0].name,
+                    data: Array.isArray($themes) ? $themes : [],
+                  },
+                  ...Object.entries(data).map<RemoteTokenStorageFile>(([name, tokenSet]) => ({
+                    name,
+                    type: 'tokenSet',
+                    path: this.files[0].name,
+                    data: !Array.isArray(tokenSet) ? tokenSet : {},
+                  })),
+                ]);
+              }
             }
-          }
-          resolve([]);
-        };
-      });
+            resolve([]);
+          };
+        });
+      }
     } catch (e) {
       console.log(e);
     }
