@@ -7,22 +7,21 @@ import { TokensContext } from '@/context';
 import { isSingleBoxShadowToken, isSingleTypographyToken, isSingleCompositionToken } from '@/utils/is';
 import { SingleTypographyValueDisplay } from './SingleTypograhpyValueDisplay';
 import { TokenBoxshadowValue, TokenTypograpyValue } from '@/types/values';
-import Box from '../Box';
 import { SingleCompositionValueDisplay } from './SingleCompositionValueDisplay';
+import TooltipProperty from './TooltipProperty';
 
 type Props = {
   token: SingleToken;
-  shouldResolve: boolean;
   tokenIsShadowOrTypographyAlias: boolean;
 };
 
 // Returns token value in display format
-export const TokenTooltipContentValue: React.FC<Props> = ({ token, shouldResolve, tokenIsShadowOrTypographyAlias }) => {
+export const TokenTooltipContentValue: React.FC<Props> = ({ token, tokenIsShadowOrTypographyAlias }) => {
   const seed = useUIDSeed();
   const tokensContext = React.useContext(TokensContext);
   const { getTokenValue } = useTokens();
   const valueToCheck = React.useMemo(() => {
-    if (shouldResolve && tokenIsShadowOrTypographyAlias) {
+    if (tokenIsShadowOrTypographyAlias) {
       let nameToLookFor: string = '';
       const tokenValueString = String(token.value);
       if (tokenIsShadowOrTypographyAlias && tokenValueString.charAt(0) === '$') nameToLookFor = tokenValueString.slice(1, tokenValueString.length);
@@ -30,15 +29,14 @@ export const TokenTooltipContentValue: React.FC<Props> = ({ token, shouldResolve
       const tokenValue = getTokenValue(nameToLookFor, tokensContext.resolvedTokens)?.value;
       return tokenValue || token.value;
     }
-    if (shouldResolve) return getTokenValue(token.name, tokensContext.resolvedTokens)?.value;
-    return token.value;
-  }, [token, getTokenValue, shouldResolve, tokenIsShadowOrTypographyAlias, tokensContext.resolvedTokens]);
+    return getTokenValue(token.name, tokensContext.resolvedTokens)?.value;
+  }, [token, getTokenValue, tokenIsShadowOrTypographyAlias, tokensContext.resolvedTokens]);
 
   if (isSingleTypographyToken(token)) {
     return (
       <SingleTypographyValueDisplay
-        value={valueToCheck as TokenTypograpyValue}
-        shouldResolve={shouldResolve}
+        value={token.value as TokenTypograpyValue}
+        rawValue={valueToCheck as TokenTypograpyValue}
       />
     );
   }
@@ -60,13 +58,14 @@ export const TokenTooltipContentValue: React.FC<Props> = ({ token, shouldResolve
   }
 
   if (isSingleBoxShadowToken(token)) {
-    if (Array.isArray(valueToCheck)) {
+    if (Array.isArray(valueToCheck) && Array.isArray(token.value)) {
       return (
         <div>
-          {valueToCheck.map((t) => (
+          {valueToCheck.map((t, index) => (
             <SingleShadowValueDisplay
               key={seed(t)}
               shadow={t as TokenBoxshadowValue}
+              rawValue={Array.isArray(token.value) ? token.value[index] as TokenBoxshadowValue : null}
             />
           ))}
         </div>
@@ -76,14 +75,19 @@ export const TokenTooltipContentValue: React.FC<Props> = ({ token, shouldResolve
     return (
       <SingleShadowValueDisplay
         // @TODO strengthen type checking here
-        shadow={valueToCheck as TokenBoxshadowValue}
+        shadow={token.value as TokenBoxshadowValue}
+        rawValue={valueToCheck as TokenBoxshadowValue}
       />
     );
   }
 
   if (typeof valueToCheck !== 'string' && typeof valueToCheck !== 'number') {
-    return <Box css={{ color: '$fgToolTipMuted' }}>{JSON.stringify(valueToCheck, null, 2)}</Box>;
+    return (
+      <TooltipProperty value={JSON.stringify(valueToCheck, null, 2)} />
+    );
   }
 
-  return <Box css={{ color: '$fgToolTipMuted' }}>{valueToCheck}</Box>;
+  return (
+    <TooltipProperty value={token.value} rawValue={valueToCheck} />
+  );
 };
