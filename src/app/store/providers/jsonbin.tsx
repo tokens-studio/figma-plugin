@@ -98,7 +98,6 @@ export function useJSONbin() {
       id, secret, name, internalId,
     } = context;
     if (!id || !secret) return null;
-
     try {
       const storage = new JSONBinTokenStorage(id, secret);
       const data = await storage.retrieve();

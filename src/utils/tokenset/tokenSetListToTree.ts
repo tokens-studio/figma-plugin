@@ -47,6 +47,5 @@ export function tokenSetListToTree(items: string[]) {
     }
     return 0;
   });
-
   return sorted;
 }

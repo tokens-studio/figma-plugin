@@ -232,7 +232,6 @@ export default function useRemoteTokens() {
       default:
         throw new Error('Not implemented');
     }
-
     return newBranchCreated;
   }, [createGithubBranch, createADOBranch]);
 
