@@ -237,6 +237,19 @@ describe('GithubTokenStorage', () => {
     });
   });
 
+  it('can handle invalid file content', async () => {
+    mockGetContent.mockImplementationOnce(() => (
+      Promise.resolve({
+        data: {
+          content: 'RW1wdHkgZmlsZQ==',
+        },
+      })
+    ));
+
+    storageProvider.changePath('data/tokens.json');
+    expect(await storageProvider.read()).toEqual([]);
+  });
+
   it('can read from Git in a multifile format', async () => {
     mockGetContent.mockImplementation((opts: { path: string }) => {
       if (opts.path === 'data') {
@@ -279,6 +292,7 @@ describe('GithubTokenStorage', () => {
     mockCreateTree.mockImplementationOnce(() => (
       Promise.resolve({
         data: {
+          sha: 'sha(data)',
           tree: [
             {
               type: 'tree',
@@ -293,10 +307,11 @@ describe('GithubTokenStorage', () => {
     mockGetTree.mockImplementationOnce(() => (
       Promise.resolve({
         data: {
+          sha: 'sha(data)',
           tree: [
-            { path: '$metadata.json', type: 'blob', sha: 'sha($metadata.json)' },
-            { path: '$themes.json', type: 'blob', sha: 'sha($themes.json)' },
-            { path: 'global.json', type: 'blob', sha: 'sha(global.json)' },
+            { path: 'data/$metadata.json', type: 'blob', sha: 'sha($metadata.json)' },
+            { path: 'data/$themes.json', type: 'blob', sha: 'sha($themes.json)' },
+            { path: 'data/global.json', type: 'blob', sha: 'sha(global.json)' },
           ],
         },
       })
@@ -306,14 +321,14 @@ describe('GithubTokenStorage', () => {
     storageProvider.changePath('data');
     expect(await storageProvider.read()).toEqual([
       {
-        path: '$metadata.json',
+        path: 'data/$metadata.json',
         type: 'metadata',
         data: {
           tokenSetOrder: ['global'],
         },
       },
       {
-        path: '$themes.json',
+        path: 'data/$themes.json',
         type: 'themes',
         data: [{
           id: 'light',
@@ -324,7 +339,7 @@ describe('GithubTokenStorage', () => {
         }],
       },
       {
-        path: 'global.json',
+        path: 'data/global.json',
         name: 'global',
         type: 'tokenSet',
         data: {

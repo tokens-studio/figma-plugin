@@ -6,6 +6,7 @@ global.figma = {
   notify: jest.fn(() => Promise.resolve({})),
   ui: {
     postMessage: jest.fn(() => Promise.resolve({})),
+    on: jest.fn(() => Promise.resolve({}))
   },
   getLocalPaintStyles: jest.fn(() => []),
   getLocalTextStyles: jest.fn(() => []),
