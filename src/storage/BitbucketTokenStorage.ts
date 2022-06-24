@@ -23,7 +23,8 @@ export class BitbucketTokenStorage extends GitTokenStorage {
       multiFileEnabled: false,
     };
 
-    // const ExtendedBitbucketConstructor: any = () => new Bitbucket();
+    // const ExtendedBitbucketConstructor: any = (...args: ConstructorParameters<typeof Bitbucket>) =>
+    //   new Bitbucket(...args);
     // eslint-disable-next-line
     this.bitbucketClient = new Bitbucket({
       auth: {
@@ -90,6 +91,7 @@ export class BitbucketTokenStorage extends GitTokenStorage {
       const permission = data.values?.[0]?.permission;
 
       const canWrite = !!(permission === 'admin' || 'write');
+
       return !!canWrite;
     } catch (e) {
       return false;
