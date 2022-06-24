@@ -85,6 +85,7 @@ export class ADOTokenStorage extends GitTokenStorage {
       {
         method,
         headers: {
+          'Cache-Control': 'no-cache',
           'Content-Type': 'application/json',
           Authorization: `Basic ${btoa(`:${token}`)}`,
         },
@@ -330,10 +331,11 @@ export class ADOTokenStorage extends GitTokenStorage {
     return response;
   }
 
-  private async createOrUpdate(changeset: Record<string, string>, message: string, branch: string, oldObjectId?: string): Promise<boolean> {
+  public async writeChangeset(changeset: Record<string, string>, message: string, branch: string, shouldCreateBranch: boolean = false): Promise<boolean> {
+    const oldObjectId = await this.getOldObjectId(this.source, shouldCreateBranch);
     const { value } = await this.getItems();
     const tokensOnRemote = value?.map((val) => val.path) ?? [];
-    const changes = Object.entries(changeset)
+    const changesForUpdateOrCreate = Object.entries(changeset)
       .map(([path, content]) => {
         const formattedPath = path.startsWith('/') ? path : `/${path}`;
         return ({
@@ -347,28 +349,11 @@ export class ADOTokenStorage extends GitTokenStorage {
           },
         });
       });
-    const response = await this.postPushes({
-      branch,
-      changes,
-      commitMessage: message,
-      oldObjectId,
-    });
-
-    return !!response;
-  }
-
-  public async writeChangeset(changeset: Record<string, string>, message: string, branch: string, shouldCreateBranch: boolean = false): Promise<boolean> {
-    const oldObjectId = await this.getOldObjectId(this.source, shouldCreateBranch);
     if (!this.path.endsWith('.json')) {
-      const { value } = await this.getItems();
-      const jsonFiles = value
-        ?.filter((file) => (file.path?.endsWith('.json')))
-        .sort((a, b) => (
-          (a.path && b.path) ? a.path.localeCompare(b.path) : 0
-        )) ?? [];
-      const filesToDelete = jsonFiles.filter((jsonFile) => !Object.keys(changeset).some((item) => jsonFile.path && jsonFile.path.endsWith(item)))
-        .map((fileToDelete) => (fileToDelete.path ?? ''));
-      const deleteChanges = filesToDelete.map((path) => {
+      const jsonFiles = value?.filter((file) => (file.path?.endsWith('.json')))?.map((val) => val.path) ?? [];
+      const filesToDelete = jsonFiles.filter((jsonFile) => !Object.keys(changeset).some((item) => jsonFile && jsonFile.endsWith(item)))
+        .map((fileToDelete) => (fileToDelete ?? ''));
+      const changesForDelete = filesToDelete.map((path) => {
         const formattedPath = path.startsWith('/') ? path : `/${path}`;
         return ({
           changeType: ChangeType.delete,
@@ -377,15 +362,23 @@ export class ADOTokenStorage extends GitTokenStorage {
           },
         });
       });
+      const changes = changesForDelete.concat(changesForUpdateOrCreate);
 
-      await this.postPushes({
+      const response = await this.postPushes({
         branch,
-        changes: deleteChanges,
+        changes,
         commitMessage: message,
         oldObjectId,
       });
-      return this.createOrUpdate(changeset, message, branch, oldObjectId);
+
+      return !!response;
     }
-    return this.createOrUpdate(changeset, message, branch, oldObjectId);
+    const response = await this.postPushes({
+      branch,
+      changes: changesForUpdateOrCreate,
+      commitMessage: message,
+      oldObjectId,
+    });
+    return !!response;
   }
 }
