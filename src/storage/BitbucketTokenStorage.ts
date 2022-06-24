@@ -158,6 +158,8 @@ export class BitbucketTokenStorage extends GitTokenStorage {
     branch: string,
     shouldCreateBranch?: boolean,
   ): Promise<boolean> {
+    console.log('message in writeChanges line 136: ', message);
+    this.fetchBranches();
     const response = this.createOrUpdateFiles({
       branch,
       owner: this.owner,
