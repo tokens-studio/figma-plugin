@@ -1,7 +1,10 @@
-import * as Bitbucket from 'bitbucket';
+import * as BitbucketClient from 'bitbucket';
 
-export type ExtendedBitbucketClient = Omit<Bitbucket.APIEndpoints, 'repositories'> & {
-  repositories: Bitbucket.APIEndpoints['repositories'] & {
+// const ExtendedBitbucketConstructor: any = (...args: ConstructorParameters<typeof Bitbucket>) =>
+//   new Bitbucket(...args);
+
+type ExtendedBitbucketClient = Omit<BitbucketClient.APIEndpoints, 'repositories'> & {
+  repositories: BitbucketClient.APIEndpoints['repositories'] & {
     createOrUpdateFiles: (params: {
       owner: string;
       repo: string;
@@ -11,6 +14,6 @@ export type ExtendedBitbucketClient = Omit<Bitbucket.APIEndpoints, 'repositories
         message: string;
         files: Record<string, string>;
       }[];
-    }) => ReturnType<Bitbucket.APIEndpoints['repositories']['createSrcFileCommit']>;
+    }) => ReturnType<BitbucketClient.APIEndpoints['repositories']['createSrcFileCommit']>;
   };
 };
