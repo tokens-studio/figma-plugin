@@ -18,21 +18,6 @@ type CreatedOrUpdatedFileType = {
     files: Record<string, string>;
   }[];
 };
-// TODO: extend Bitbucket client
-type ExtendedBitbucketClient = Omit<BitbucketClient.APIEndpoints, 'repositories'> & {
-  repositories: BitbucketClient.APIEndpoints['repositories'] & {
-    createOrUpdateFiles: (params: {
-      owner: string;
-      repo: string;
-      branch: string;
-      createBranch?: boolean;
-      changes: {
-        message: string;
-        files: Record<string, string>;
-      }[];
-    }) => ReturnType<BitbucketClient.APIEndpoints['repositories']['createSrcFileCommit']>;
-  };
-};
 
 export class BitbucketTokenStorage extends GitTokenStorage {
   private bitbucketClient;
@@ -43,8 +28,6 @@ export class BitbucketTokenStorage extends GitTokenStorage {
       multiFileEnabled: false,
     };
 
-    // const ExtendedBitbucketConstructor: any = (...args: ConstructorParameters<typeof Bitbucket>) =>
-    //   new Bitbucket(...args);
     // eslint-disable-next-line
     this.bitbucketClient = new Bitbucket({
       auth: {
@@ -150,7 +133,7 @@ export class BitbucketTokenStorage extends GitTokenStorage {
     branch: string,
     shouldCreateBranch?: boolean
   ): Promise<boolean> {
-    const response = this.bitbucketClient.createOrUpdateFiles({
+    const response = this.createOrUpdateFiles({
       branch,
       owner: this.owner,
       repo: this.repository,
