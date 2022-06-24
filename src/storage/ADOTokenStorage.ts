@@ -85,7 +85,6 @@ export class ADOTokenStorage extends GitTokenStorage {
       {
         method,
         headers: {
-          'Cache-Control': 'no-cache',
           'Content-Type': 'application/json',
           Authorization: `Basic ${btoa(`:${token}`)}`,
         },
