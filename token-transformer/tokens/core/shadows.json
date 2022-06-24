@@ -31,6 +31,14 @@
         "spread": "0"
       },
       "type": "boxShadow"
+    },
+    "reference-multiple": {
+      "value": "shadows.multiple",
+      "type": "boxShadow"
+    },
+    "reference-multi": {
+      "value": "shadows.single",
+      "type": "boxShadow"
     }
   }
 }
