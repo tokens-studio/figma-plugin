@@ -54,6 +54,22 @@ export default async function setValuesOnNode(
         node.strokeWeight = transformValue(values.borderWidth, 'borderWidth');
       }
 
+      if ('strokeTopWeight' in node && typeof values.borderWidthTop !== 'undefined') {
+        node.strokeTopWeight = transformValue(values.borderWidthTop, 'borderWidthTop');
+      }
+
+      if ('strokeRightWeight' in node && typeof values.borderWidthRight !== 'undefined') {
+        node.strokeRightWeight = transformValue(values.borderWidthRight, 'borderWidthRight');
+      }
+
+      if ('strokeBottomWeight' in node && typeof values.borderWidthBottom !== 'undefined') {
+        node.strokeBottomWeight = transformValue(values.borderWidthBottom, 'borderWidthBottom');
+      }
+
+      if ('strokeLeftWeight' in node && typeof values.borderWidthLeft !== 'undefined') {
+        node.strokeLeftWeight = transformValue(values.borderWidthLeft, 'borderWidthLeft');
+      }
+
       // OPACITY
       if ('opacity' in node && typeof values.opacity !== 'undefined') {
         node.opacity = transformValue(values.opacity, 'opacity');

@@ -1,5 +1,6 @@
 import { DeepTokensMap, ThemeObjectsList } from '@/types';
 import { AnyTokenSet, SingleToken } from '@/types/tokens';
+import { joinPath } from '@/utils/string';
 import { RemoteTokenStorage, RemoteTokenStorageFile, RemoteTokenStorageMetadataFile } from './RemoteTokenStorage';
 
 type StorageFlags = {
@@ -27,7 +28,7 @@ export abstract class GitTokenStorage extends RemoteTokenStorage<GitStorageMetad
 
   protected branch: string = 'main';
 
-  protected path: string = '/';
+  protected path: string = '';
 
   protected baseUrl: string | undefined = undefined;
 
@@ -54,7 +55,7 @@ export abstract class GitTokenStorage extends RemoteTokenStorage<GitStorageMetad
   }
 
   public changePath(path: string) {
-    this.path = path;
+    this.path = joinPath(path);
     return this;
   }
 
@@ -99,9 +100,9 @@ export abstract class GitTokenStorage extends RemoteTokenStorage<GitStorageMetad
     } else if (this.flags.multiFileEnabled) {
       files.forEach((file) => {
         if (file.type === 'tokenSet') {
-          filesChangeset[`${this.path}/${file.name}.json`] = JSON.stringify(file.data, null, 2);
+          filesChangeset[joinPath(this.path, `${file.name}.json`)] = JSON.stringify(file.data, null, 2);
         } else if (file.type === 'themes') {
-          filesChangeset[`${this.path}/$themes.json`] = JSON.stringify(file.data, null, 2);
+          filesChangeset[joinPath(this.path, '$themes.json')] = JSON.stringify(file.data, null, 2);
         }
       });
     }
