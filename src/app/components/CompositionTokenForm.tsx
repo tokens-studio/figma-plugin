@@ -11,13 +11,16 @@ import { CompositionTokenProperty } from '@/types/CompositionTokenProperty';
 import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { filterValidCompositionTokenTypes } from '@/utils/filterValidCompositionTokenTypes';
+import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
 
 export default function CompositionTokenForm({
   internalEditToken,
   setTokenValue,
+  resolvedTokens,
 }: {
   internalEditToken: Extract<EditTokenObject, { type: TokenTypes.COMPOSITION }>;
   setTokenValue: (newTokenValue: NodeTokenRefMap) => void;
+  resolvedTokens: ResolveTokenValuesResult[];
 }) {
   const seed = useUIDSeed();
   const [orderObj, setOrderObj] = React.useState<NodeTokenRefMap>({});
@@ -80,23 +83,25 @@ export default function CompositionTokenForm({
             <SingleCompositionTokenForm
               index={0}
               property=""
-              value=""
+              propertyValue=""
               tokenValue={arrangedTokenValue}
               properties={propertiesMenu}
+              resolvedTokens={resolvedTokens}
               setTokenValue={setTokenValue}
               onRemove={removeToken}
               setOrderObj={handleOrderObj}
               setError={setError}
             />
           ) : (
-            Object.entries(arrangedTokenValue).map(([property, value], index) => (
+            Object.entries(arrangedTokenValue).map(([property, propertyValue], index) => (
               <SingleCompositionTokenForm
                 key={`single-style-${seed(index)}`}
                 index={index}
                 property={property}
-                value={value}
+                propertyValue={propertyValue}
                 tokenValue={arrangedTokenValue}
                 properties={propertiesMenu}
+                resolvedTokens={resolvedTokens}
                 setTokenValue={setTokenValue}
                 onRemove={removeToken}
                 setOrderObj={handleOrderObj}
