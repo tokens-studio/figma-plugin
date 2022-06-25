@@ -1,4 +1,5 @@
 import compact from 'just-compact';
+
 import { Bitbucket } from 'bitbucket';
 import { decodeBase64 } from '@/utils/string';
 import { RemoteTokenStorageFile } from './RemoteTokenStorage';
@@ -50,7 +51,7 @@ export class BitbucketTokenStorage extends GitTokenStorage {
     if (!branches.data) {
       return ['No data'];
     }
-    console.log('branches: ', branches);
+
     return branches.data!.values!.map((branch) => branch.name) as string[];
   }
 
@@ -122,14 +123,30 @@ export class BitbucketTokenStorage extends GitTokenStorage {
   // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-source/#api-repositories-workspace-repo-slug-src-post
   public async createOrUpdateFiles({ owner, repo, branch, changes }: CreatedOrUpdatedFileType) {
     const { message, files } = changes[0];
-    console.log('commit message: ', message);
+    const data = new FormData();
+
+    // @README the files object is Record<string, string> here
+    // with the key equal to the filename and the value equal to the new content
+    // this actually doesn't take into account deletions - but we can consider this later
+    // as per the Bitbucket API we basically need to add these key value pairs to the FormData object "as-is"
+    Object.entries(files).forEach(([file, content]) => {
+      data.append(file, content);
+
+      // we will also add all the "files" parameters so we can perform deletions later down the line
+      // as per the doc - any specified path in "files" whithout a content definition elsewhere in the FormData
+      // will be deleted
+      // @NOTE we can actually add the files parameter multiple times - this is fine and Bitbucket will pick this up correctly
+      data.append('files', file);
+    });
+
     const response = await this.bitbucketClient.repositories.createSrcFileCommit({
+      _body: data,
       branch,
-      _body: files,
       message,
       repo_slug: repo,
       workspace: owner,
     });
+
     return response;
   }
 

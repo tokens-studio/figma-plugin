@@ -29,34 +29,28 @@ describe('BitbucketTokenStorage', () => {
   });
 
   it('should return false if unauthenticated', async () => {
-    mockGetAuthedUser.mockImplementationOnce(() =>
-      Promise.resolve({
-        data: {
-          values: [
-            {
-              permission: '' || 'read',
-            },
-          ],
-        },
-      })
-    );
+    mockGetAuthedUser.mockImplementationOnce(() => Promise.resolve({
+      data: {
+        values: [
+          {
+            permission: '' || 'read',
+          },
+        ],
+      },
+    }));
 
     expect(await storageProvider.canWrite()).toBe(false);
   });
 
   it('should be able to write', async () => {
-    mockListBranches.mockImplementationOnce(() =>
-      Promise.resolve({
-        data: [{ name: 'main' }],
-      })
-    );
-    mockCreateOrUpdateFiles.mockImplementationOnce(() =>
-      Promise.resolve({
-        data: {
-          content: {},
-        },
-      })
-    );
+    mockListBranches.mockImplementationOnce(() => Promise.resolve({
+      data: [{ name: 'main' }],
+    }));
+    mockCreateOrUpdateFiles.mockImplementationOnce(() => Promise.resolve({
+      data: {
+        content: {},
+      },
+    }));
 
     storageProvider.changePath('data/tokens.json');
     await storageProvider.write([
@@ -123,7 +117,7 @@ describe('BitbucketTokenStorage', () => {
                 },
               },
               null,
-              2
+              2,
             ),
           },
         },
