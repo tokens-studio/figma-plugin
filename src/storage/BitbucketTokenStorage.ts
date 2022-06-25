@@ -76,19 +76,6 @@ export class BitbucketTokenStorage extends GitTokenStorage {
     }
   }
 
-  // https://bitbucketjs.netlify.app/#api-repositories-repositories_createSrcFileCommit
-  // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-source/#api-repositories-workspace-repo-slug-src-post
-  public async createOrUpdateFiles({ owner, repo, branch, changes }: CreatedOrUpdatedFileType) {
-    const response = await this.bitbucketClient.repositories.createSrcFileCommit({
-      branch,
-      _body: changes[0].files,
-      message: changes[0].message,
-      repo_slug: repo,
-      workspace: owner,
-    });
-    return response;
-  }
-
   // https://bitbucketjs.netlify.app/#api-users-users_getAuthedUser OR
   // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-users/?utm_source=%2Fbitbucket%2Fapi%2F2%2Freference%2Fresource%2Fuser&utm_medium=302#api-user-get
   // this would be best: https://developer.atlassian.com/cloud/bitbucket/rest/api-group-repositories/#api-repositories-workspace-repo-slug-permissions-config-users-selected-user-id-get
@@ -128,18 +115,29 @@ export class BitbucketTokenStorage extends GitTokenStorage {
     }
   }
 
+  // https://bitbucketjs.netlify.app/#api-repositories-repositories_createSrcFileCommit
+  // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-source/#api-repositories-workspace-repo-slug-src-post
+  public async createOrUpdateFiles({ owner, repo, branch, changes }: CreatedOrUpdatedFileType) {
+    const response = await this.bitbucketClient.repositories.createSrcFileCommit({
+      branch,
+      _body: changes[0].files,
+      message: changes[0].message,
+      repo_slug: repo,
+      workspace: owner,
+    });
+    return response;
+  }
+
   public async writeChangeset(
     changeset: Record<string, string>,
     message: string,
     branch: string,
     shouldCreateBranch?: boolean,
   ): Promise<boolean> {
-    console.log('message in writeChanges line 136: ', message);
-    this.fetchBranches();
     const response = this.createOrUpdateFiles({
-      branch,
       owner: this.owner,
       repo: this.repository,
+      branch,
       createBranch: shouldCreateBranch,
       changes: [
         {
