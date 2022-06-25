@@ -48,9 +48,11 @@ export default function useTokens() {
   const store = useStore<RootState>();
 
   // Gets value of token
-  const getTokenValue = useCallback((name: string, resolved: AnyTokenList) => (
-    resolved.find((t) => t.name === name)
-  ), []);
+  const getTokenValue = useCallback((name: string, resolved: AnyTokenList) => {
+    console.log('getTokenValue', name, resolved);
+
+    return resolved.find((t) => t.name === name);
+  }, []);
 
   // Returns resolved value of a specific token
   const isAlias = useCallback((token: SingleToken, resolvedTokens: AnyTokenList) => (
