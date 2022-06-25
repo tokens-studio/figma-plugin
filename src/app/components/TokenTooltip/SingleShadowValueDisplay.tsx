@@ -12,12 +12,12 @@ type Props = {
 export const SingleShadowValueDisplay: React.FC<Props> = ({ value, rawValue }) => (
   <Box>
     <Box css={{ display: 'flex', color: '$fgToolTip' }}>{value.type}</Box>
-    <Stack direction="column" gap={1}>
-      <TooltipProperty label="x" value={value.x} rawValue={rawValue?.x} />
-      <TooltipProperty label="y" value={value.y} rawValue={rawValue?.y} />
-      <TooltipProperty label="Blur" value={value.blur} rawValue={rawValue?.blur} />
-      <TooltipProperty label="Spread" value={value.spread} rawValue={rawValue?.spread} />
-      <TooltipProperty label="Color" value={value.color} rawValue={rawValue?.color} />
+    <Stack direction="row" align="start" gap={2} wrap>
+      <TooltipProperty value={value.x} rawValue={rawValue?.x} />
+      <TooltipProperty value={value.y} rawValue={rawValue?.y} />
+      <TooltipProperty value={value.blur} rawValue={rawValue?.blur} />
+      <TooltipProperty value={value.spread} rawValue={rawValue?.spread} />
+      <TooltipProperty value={value.color} rawValue={rawValue?.color} />
     </Stack>
   </Box>
 );

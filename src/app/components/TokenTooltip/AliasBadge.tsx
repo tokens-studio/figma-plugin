@@ -2,10 +2,10 @@ import React from 'react';
 import { styled } from '@/stitches.config';
 
 const StyledAliasBadge = styled('div', {
-  borderRadius: '$badge',
   padding: '$1 $2',
   backgroundColor: '$bgOnDarkAccentSubtle',
   color: '$fgOnDarkAccent',
+  height: '100%',
 });
 
 type Props = {

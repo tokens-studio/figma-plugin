@@ -90,6 +90,7 @@ export const stitchesInstance = createStitches({
       bgToolTip: 'var(--figma-color-bg-tooltip)',
       fgToolTip: 'var(--figma-color-text-tooltip)',
       fgToolTipMuted: 'var(--figma-color-text-tooltip-secondary)',
+      bgOnDarkSubtle: '#2B2A2A',
       bgOnDarkAccentSubtle: '#1F3D68',
       fgOnDarkAccent: '#A0C0EF',
       bgOnDarkDangerSubtle: '#422B2B',

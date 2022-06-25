@@ -9,7 +9,7 @@ type Props = {
 };
 
 export const SingleTypographyValueDisplay: React.FC<Props> = ({ value, rawValue }) => (
-  <Stack direction="column" gap={1}>
+  <Stack direction="column" align="start" gap={1}>
     <TooltipProperty label="Font" value={value.fontFamily} rawValue={rawValue?.fontFamily} />
     <TooltipProperty label="Weight" value={value.fontWeight} rawValue={rawValue?.fontWeight} />
     <TooltipProperty label="Size" value={value.fontSize} rawValue={rawValue?.fontSize} />
