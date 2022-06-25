@@ -20,7 +20,6 @@ export const TokenTooltipContentValue: React.FC<Props> = ({ token }) => {
   const tokensContext = React.useContext(TokensContext);
   const { getTokenValue } = useTokens();
   const resolvedValue = React.useMemo(() => getTokenValue(token.name, tokensContext.resolvedTokens)?.value, [token, getTokenValue, tokensContext.resolvedTokens]);
-  console.log('Token', token, tokensContext.resolvedTokens, resolvedValue);
 
   if (isSingleTypographyToken(token)) {
     return (
@@ -51,11 +50,11 @@ export const TokenTooltipContentValue: React.FC<Props> = ({ token }) => {
     if (Array.isArray(resolvedValue) && Array.isArray(token.value)) {
       return (
         <div>
-          {resolvedValue.map((t, index) => (
+          {token.value.map((t, index) => (
             <SingleShadowValueDisplay
               key={seed(t)}
-              shadow={t as TokenBoxshadowValue}
-              rawValue={Array.isArray(token.value) ? token.value[index] as TokenBoxshadowValue : null}
+              value={t as TokenBoxshadowValue}
+              rawValue={resolvedValue[index] as TokenBoxshadowValue}
             />
           ))}
         </div>
@@ -65,7 +64,7 @@ export const TokenTooltipContentValue: React.FC<Props> = ({ token }) => {
     return (
       <SingleShadowValueDisplay
         // @TODO strengthen type checking here
-        shadow={token.value as TokenBoxshadowValue}
+        value={token.value as TokenBoxshadowValue}
         rawValue={resolvedValue as TokenBoxshadowValue}
       />
     );
