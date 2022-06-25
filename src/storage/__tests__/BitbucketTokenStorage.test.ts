@@ -21,7 +21,7 @@ jest.mock('bitbucket', () => ({
 }));
 
 describe('BitbucketTokenStorage', () => {
-  const storageProvider = new BitbucketTokenStorage('', 'MattOliver', 'testing-repo-atlassian');
+  const storageProvider = new BitbucketTokenStorage('EmDVU7Tch3kR7DDq8f4A', 'MattOliver', 'testing-repo-atlassian');
   storageProvider.selectBranch('main');
 
   beforeEach(() => {
@@ -29,24 +29,34 @@ describe('BitbucketTokenStorage', () => {
   });
 
   it('should return false if unauthenticated', async () => {
-    mockGetAuthedUser.mockImplementationOnce(() => Promise.resolve({
-      data: {
-        username: '',
-      },
-    }));
+    mockGetAuthedUser.mockImplementationOnce(() =>
+      Promise.resolve({
+        data: {
+          values: [
+            {
+              permission: '' || 'read',
+            },
+          ],
+        },
+      })
+    );
 
     expect(await storageProvider.canWrite()).toBe(false);
   });
 
   it('should be able to write', async () => {
-    mockListBranches.mockImplementationOnce(() => Promise.resolve({
-      data: [{ name: 'main' }],
-    }));
-    mockCreateOrUpdateFiles.mockImplementationOnce(() => Promise.resolve({
-      data: {
-        content: {},
-      },
-    }));
+    mockListBranches.mockImplementationOnce(() =>
+      Promise.resolve({
+        data: [{ name: 'main' }],
+      })
+    );
+    mockCreateOrUpdateFiles.mockImplementationOnce(() =>
+      Promise.resolve({
+        data: {
+          content: {},
+        },
+      })
+    );
 
     storageProvider.changePath('data/tokens.json');
     await storageProvider.write([
@@ -113,7 +123,7 @@ describe('BitbucketTokenStorage', () => {
                 },
               },
               null,
-              2,
+              2
             ),
           },
         },

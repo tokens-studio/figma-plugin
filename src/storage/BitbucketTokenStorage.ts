@@ -1,6 +1,5 @@
 import compact from 'just-compact';
 import { Bitbucket } from 'bitbucket';
-import * as BitbucketClient from 'bitbucket';
 import { decodeBase64 } from '@/utils/string';
 import { RemoteTokenStorageFile } from './RemoteTokenStorage';
 import IsJSONString from '@/utils/isJSONString';
@@ -51,7 +50,7 @@ export class BitbucketTokenStorage extends GitTokenStorage {
     if (!branches.data) {
       return ['No data'];
     }
-
+    console.log('branches: ', branches);
     return branches.data!.values!.map((branch) => branch.name) as string[];
   }
 
@@ -122,10 +121,12 @@ export class BitbucketTokenStorage extends GitTokenStorage {
   // https://bitbucketjs.netlify.app/#api-repositories-repositories_createSrcFileCommit
   // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-source/#api-repositories-workspace-repo-slug-src-post
   public async createOrUpdateFiles({ owner, repo, branch, changes }: CreatedOrUpdatedFileType) {
+    const { message, files } = changes[0];
+    console.log('commit message: ', message);
     const response = await this.bitbucketClient.repositories.createSrcFileCommit({
       branch,
-      _body: changes[0].files,
-      message: changes[0].message,
+      _body: files,
+      message,
       repo_slug: repo,
       workspace: owner,
     });
