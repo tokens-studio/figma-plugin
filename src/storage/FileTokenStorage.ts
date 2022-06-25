@@ -29,7 +29,10 @@ export class FileTokenStorage extends RemoteTokenStorage {
   public async read(): Promise<RemoteTokenStorageFile[]> {
     try {
       if (this.flags.multiFileEnabled && this.files.length > 1) {
-        const jsonFiles = Array.from(this.files).filter((file) => file.webkitRelativePath.endsWith('.json'));
+        const jsonFiles = Array.from(this.files).filter((file) => file.webkitRelativePath.endsWith('.json'))
+          .sort((a, b) => (
+            (a.webkitRelativePath && b.webkitRelativePath) ? a.webkitRelativePath.localeCompare(b.webkitRelativePath) : 0
+          ));
         const filePromises = jsonFiles.map((file) =>
           // Return a promise per file
           new Promise((resolve) => {
