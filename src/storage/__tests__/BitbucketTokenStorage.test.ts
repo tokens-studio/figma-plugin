@@ -165,7 +165,7 @@ describe('BitbucketTokenStorage', () => {
                 },
               },
               null,
-              2
+              2,
             ),
           },
         },
