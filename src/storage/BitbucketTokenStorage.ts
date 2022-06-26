@@ -1,12 +1,6 @@
-<<<<<<< HEAD
-=======
-import compact from 'just-compact';
-
->>>>>>> 6e21b62 (turns changes files object into formdata)
 import { Bitbucket } from 'bitbucket';
 import { RemoteTokenStorageFile } from './RemoteTokenStorage';
 import { GitMultiFileObject, GitSingleFileObject, GitStorageMetadata, GitTokenStorage } from './GitTokenStorage';
-
 
 type CreatedOrUpdatedFileType = {
   owner: string;
@@ -49,12 +43,8 @@ export class BitbucketTokenStorage extends GitTokenStorage {
     if (!branches.data) {
       return ['No data'];
     }
-<<<<<<< HEAD
     // README we'll have to account for paginated branches somehow, this only returns
     // the first 10 branches which is fine for now
-=======
-
->>>>>>> 6e21b62 (turns changes files object into formdata)
     return branches.data!.values!.map((branch) => branch.name) as string[];
   }
 
@@ -108,6 +98,7 @@ export class BitbucketTokenStorage extends GitTokenStorage {
   // https://bitbucketjs.netlify.app/#api-source-source_readRoot OR
   // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-source/#api-repositories-workspace-repo-slug-src-commit-path-get
   // Equivalent to directly hitting /2.0/repositories/{username}/{repo_slug}/src/{commit}/{path} without having to know the name or SHA1 of the repo's main branch.
+  // TODO
   public async read(): Promise<RemoteTokenStorageFile<GitStorageMetadata>[]> {
     try {
       const response = await this.bitbucketClient.repositories.get({
@@ -133,10 +124,7 @@ export class BitbucketTokenStorage extends GitTokenStorage {
   // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-source/#api-repositories-workspace-repo-slug-src-post
   public async createOrUpdateFiles({ owner, repo, branch, changes }: CreatedOrUpdatedFileType) {
     const { message, files } = changes[0];
-<<<<<<< HEAD
     console.log('changes: ', changes);
-=======
->>>>>>> 6e21b62 (turns changes files object into formdata)
     const data = new FormData();
 
     // @README the files object is Record<string, string> here

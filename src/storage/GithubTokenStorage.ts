@@ -5,9 +5,7 @@ import { RemoteTokenStorageFile } from './RemoteTokenStorage';
 import IsJSONString from '@/utils/isJSONString';
 import { AnyTokenSet } from '@/types/tokens';
 import { ThemeObjectsList } from '@/types';
-import {
-  GitMultiFileObject, GitSingleFileObject, GitStorageMetadata, GitTokenStorage,
-} from './GitTokenStorage';
+import { GitMultiFileObject, GitSingleFileObject, GitStorageMetadata, GitTokenStorage } from './GitTokenStorage';
 
 type ExtendedOctokitClient = Omit<Octokit, 'repos'> & {
   repos: Octokit['repos'] & {
@@ -138,14 +136,16 @@ export class GithubTokenStorage extends GitTokenStorage {
             }
 
             const jsonFileContents = await Promise.all(
-              jsonFiles.map((treeItem) => (treeItem.path
-                ? this.octokitClient.rest.repos.getContent({
-                  owner: this.owner,
-                  repo: this.repository,
-                  path: `${RootDirectoryName}/${treeItem.path}`,
-                  ref: this.branch,
-                })
-                : Promise.resolve(null))),
+              jsonFiles.map((treeItem) =>
+                treeItem.path
+                  ? this.octokitClient.rest.repos.getContent({
+                      owner: this.owner,
+                      repo: this.repository,
+                      path: `${RootDirectoryName}/${treeItem.path}`,
+                      ref: this.branch,
+                    })
+                  : Promise.resolve(null)
+              )
             );
             return compact(
               jsonFileContents.map<RemoteTokenStorageFile<GitStorageMetadata> | null>((fileContent, index) => {
@@ -173,11 +173,12 @@ export class GithubTokenStorage extends GitTokenStorage {
                 }
 
                 return null;
-              }),
+              })
             );
           }
         }
       } else if ('content' in response.data) {
+        console.log('response.data: ', response.data);
         const data = decodeBase64(response.data.content);
         if (IsJSONString(data)) {
           const parsed = JSON.parse(data) as GitSingleFileObject;
@@ -188,7 +189,7 @@ export class GithubTokenStorage extends GitTokenStorage {
               data: parsed.$themes ?? [],
             },
             ...(Object.entries(parsed).filter(([key]) => key !== '$themes') as [string, AnyTokenSet<false>][]).map<
-            RemoteTokenStorageFile<GitStorageMetadata>
+              RemoteTokenStorageFile<GitStorageMetadata>
             >(([name, tokenSet]) => ({
               name,
               type: 'tokenSet',
@@ -211,7 +212,7 @@ export class GithubTokenStorage extends GitTokenStorage {
     changeset: Record<string, string>,
     message: string,
     branch: string,
-    shouldCreateBranch?: boolean,
+    shouldCreateBranch?: boolean
   ): Promise<boolean> {
     const response = await this.octokitClient.repos.createOrUpdateFiles({
       branch,

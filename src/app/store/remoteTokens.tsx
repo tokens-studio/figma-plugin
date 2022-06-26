@@ -309,7 +309,6 @@ export default function useRemoteTokens() {
   );
 
   const deleteProvider = useCallback((provider) => {
-    console.log('deleteProvider provider: ', provider);
     AsyncMessageChannel.message({
       type: AsyncMessageTypes.REMOVE_SINGLE_CREDENTIAL,
       context: provider,
