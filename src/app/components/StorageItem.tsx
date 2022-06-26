@@ -37,7 +37,9 @@ const StorageItem = ({ item, onEdit }: Props) => {
       <div className="flex flex-col grow items-start">
         <div className="text-xs font-bold">{name}</div>
         <div className="opacity-75 text-xxs">
-          {id} {branch && ` (${branch})`}
+          {id}
+          {' '}
+          {branch && ` (${branch})`}
         </div>
         {!isActive() && (
           <button
