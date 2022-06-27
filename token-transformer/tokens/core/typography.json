@@ -25,6 +25,10 @@
         "fontWeight": "{typography.fontWeight}"
       },
       "type": "typography"
+    },
+    "reference": {
+      "value": "{typography.h1}",
+      "type": "typography"
     }
   }
 }
