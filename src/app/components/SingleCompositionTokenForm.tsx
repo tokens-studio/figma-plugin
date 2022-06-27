@@ -95,7 +95,7 @@ export default function SingleCompositionTokenForm({
       }}
       >
         <DropdownMenu open={menuOpened} onOpenChange={handleToggleMenu}>
-          <DropdownMenuTrigger bordered css={{ flex: 1, height: '$10' }}>
+          <DropdownMenuTrigger data-cy="composition-token-dropdown" bordered css={{ flex: 1, height: '$10' }}>
             <span>{property || 'Choose a property'}</span>
           </DropdownMenuTrigger>
           <DropdownMenuContent sideOffset={2} className="content scroll-container" css={{ maxHeight: '$dropdownMaxHeight' }}>
