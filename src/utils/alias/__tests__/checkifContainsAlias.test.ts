@@ -6,6 +6,9 @@ const tokenAliasValue = [
   'rgba({size.2}, 0.5)',
   'linear-gradient(90deg, {colors.primary} 0%, {colors.secondary} 100%)',
   '{colors.primary}',
+  '{sizing.small} * {sizing.base}',
+  '2 * {sizing.base}',
+  '{sizing.small} * 2',
 ];
 const tokenWithOutAlias = [
   '2',
