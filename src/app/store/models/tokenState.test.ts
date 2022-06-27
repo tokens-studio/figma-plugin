@@ -2,6 +2,7 @@ import { init, RematchStore } from '@rematch/core';
 import { RootModel } from '@/types/RootModel';
 import { models } from './index';
 import { TokenTypes } from '@/constants/TokenTypes';
+import { TokenSetStatus } from '@/constants/TokenSetStatus';
 
 const shadowArray = [
   {
@@ -79,7 +80,9 @@ describe('editToken', () => {
                 },
               ],
             },
-            usedTokenSet: ['global'],
+            usedTokenSet: {
+              global: TokenSetStatus.ENABLED,
+            },
             importedTokens: {
               newTokens: [],
               updatedTokens: [],
@@ -212,5 +215,65 @@ describe('editToken', () => {
         value: '2',
       },
     ]);
+  });
+
+  it('can toggle many token sets (disabled)', () => {
+    store.dispatch.tokenState.toggleManyTokenSets({
+      sets: ['global'],
+      shouldCheck: false,
+    });
+    const { usedTokenSet } = store.getState().tokenState;
+    expect(usedTokenSet).toEqual({
+      global: TokenSetStatus.DISABLED,
+    });
+  });
+
+  it('can toggle many token sets (enabled)', () => {
+    store.dispatch.tokenState.toggleManyTokenSets({
+      sets: ['global'],
+      shouldCheck: true,
+    });
+    const { usedTokenSet } = store.getState().tokenState;
+    expect(usedTokenSet).toEqual({
+      global: TokenSetStatus.ENABLED,
+    });
+  });
+
+  it('can toggle editProhibited', () => {
+    store.dispatch.tokenState.setEditProhibited(true);
+    const { editProhibited } = store.getState().tokenState;
+    expect(editProhibited).toBe(true);
+  });
+
+  it('can set token data', () => {
+    store.dispatch.tokenState.setTokenData({
+      values: {},
+      activeTheme: 'base',
+      usedTokenSet: {
+        global: TokenSetStatus.ENABLED,
+      },
+      themes: [
+        {
+          id: 'base',
+          name: 'Base',
+          selectedTokenSets: {
+            global: TokenSetStatus.ENABLED,
+          },
+        },
+      ],
+    });
+    const {
+      tokens, themes, usedTokenSet,
+    } = store.getState().tokenState;
+    expect(tokens).toEqual({});
+    expect(themes).toEqual([
+      {
+        id: 'base',
+        name: 'Base',
+        selectedTokenSets: {
+        },
+      },
+    ]);
+    expect(usedTokenSet).toEqual({});
   });
 });

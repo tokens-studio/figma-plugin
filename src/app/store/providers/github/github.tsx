@@ -1,12 +1,12 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { useCallback, useMemo } from 'react';
-import { useFlags } from 'launchdarkly-react-client-sdk';
 import { LDProps } from 'launchdarkly-react-client-sdk/lib/withLDConsumer';
 import { Dispatch } from '@/app/store';
 import useConfirm from '@/app/hooks/useConfirm';
 import usePushDialog from '@/app/hooks/usePushDialog';
 import { notifyToUI } from '@/plugin/notifiers';
 import {
+  activeThemeSelector,
   localApiStateSelector, themesListSelector, tokensSelector, usedTokenSetSelector,
 } from '@/selectors';
 import { GithubTokenStorage } from '@/storage/GithubTokenStorage';
@@ -17,12 +17,14 @@ import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { StorageTypeCredentials, StorageTypeFormValues } from '@/types/StorageType';
 import { StorageProviderType } from '@/constants/StorageProviderType';
+import { useFlags } from '@/app/components/LaunchDarkly';
 
 type GithubCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.GITHUB | StorageProviderType.GITLAB; }>;
 type GithubFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.GITHUB | StorageProviderType.GITLAB }>;
 
 export function useGitHub() {
   const tokens = useSelector(tokensSelector);
+  const activeTheme = useSelector(activeThemeSelector);
   const themes = useSelector(themesListSelector);
   const localApiState = useSelector(localApiStateSelector);
   const usedTokenSet = useSelector(usedTokenSetSelector);
@@ -34,6 +36,7 @@ export function useGitHub() {
   const storageClientFactory = useCallback((context: GithubCredentials, owner?: string, repo?: string) => {
     const splitContextId = context.id.split('/');
     const storageClient = new GithubTokenStorage(context.secret, owner ?? splitContextId[0], repo ?? splitContextId[1], context.baseUrl ?? '');
+
     if (context.filePath) storageClient.changePath(context.filePath);
     if (context.branch) storageClient.selectBranch(context.branch);
     if (multiFileSync) storageClient.enableMultiFile();
@@ -45,14 +48,12 @@ export function useGitHub() {
       text: 'Pull from GitHub?',
       description: 'Your repo already contains tokens, do you want to pull these now?',
     });
-    if (confirmResult === false) return false;
-    return confirmResult.result;
+    return confirmResult;
   }, [confirm]);
 
   const pushTokensToGitHub = useCallback(async (context: GithubCredentials): Promise<RemoteTokenStorageData<GitStorageMetadata> | null> => {
     const storage = storageClientFactory(context);
     const content = await storage.retrieve();
-
     if (content) {
       if (
         content
@@ -87,6 +88,7 @@ export function useGitHub() {
           values: tokens,
           themes,
           usedTokenSet,
+          activeTheme,
         });
         pushDialog('success');
         return {
@@ -104,7 +106,17 @@ export function useGitHub() {
       themes,
       metadata: {},
     };
-  }, [storageClientFactory, dispatch.uiState, dispatch.tokenState, pushDialog, tokens, themes, localApiState, usedTokenSet]);
+  }, [
+    storageClientFactory,
+    dispatch.uiState,
+    dispatch.tokenState,
+    pushDialog,
+    tokens,
+    themes,
+    localApiState,
+    usedTokenSet,
+    activeTheme,
+  ]);
 
   const checkAndSetAccess = useCallback(async ({ context, owner, repo }: { context: GithubCredentials; owner: string; repo: string }) => {
     const storage = storageClientFactory(context, owner, repo);
@@ -122,6 +134,7 @@ export function useGitHub() {
 
     try {
       const content = await storage.retrieve();
+
       if (content) {
         return content;
       }
@@ -143,7 +156,12 @@ export function useGitHub() {
       if (!hasBranches || !hasBranches.length) {
         return null;
       }
+
+      const [owner, repo] = context.id.split('/');
+      await checkAndSetAccess({ context, owner, repo });
+
       const content = await storage.retrieve();
+
       if (content) {
         if (
           !isEqual(content.tokens, tokens)
@@ -155,6 +173,7 @@ export function useGitHub() {
             dispatch.tokenState.setTokenData({
               values: content.tokens,
               themes: content.themes,
+              activeTheme,
               usedTokenSet,
             });
             notifyToUI('Pulled tokens from GitHub');
@@ -173,8 +192,11 @@ export function useGitHub() {
     dispatch,
     pushTokensToGitHub,
     storageClientFactory,
+    usedTokenSet,
+    activeTheme,
     themes,
     tokens,
+    checkAndSetAccess,
   ]);
 
   const addNewGitHubCredentials = useCallback(async (context: GithubFormValues): Promise<RemoteTokenStorageData<GitStorageMetadata> | null> => {
@@ -184,14 +206,7 @@ export function useGitHub() {
         type: AsyncMessageTypes.CREDENTIALS,
         credential: context,
       });
-      if (data?.tokens) {
-        dispatch.tokenState.setLastSyncedState(JSON.stringify([data.tokens, data.themes], null, 2));
-        dispatch.tokenState.setTokenData({
-          values: data.tokens,
-          themes: data.themes,
-          usedTokenSet,
-        });
-      } else {
+      if (!data.tokens) {
         notifyToUI('No tokens stored on remote');
       }
     } else {
@@ -202,7 +217,14 @@ export function useGitHub() {
       themes: data.themes ?? themes,
       metadata: {},
     };
-  }, [syncTokensWithGitHub, tokens, themes, dispatch.tokenState, usedTokenSet]);
+  }, [
+    syncTokensWithGitHub,
+    tokens,
+    themes,
+    dispatch.tokenState,
+    usedTokenSet,
+    activeTheme,
+  ]);
 
   const fetchGithubBranches = useCallback(async (context: GithubCredentials) => {
     const storage = storageClientFactory(context);

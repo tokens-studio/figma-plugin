@@ -1,0 +1,31 @@
+import { Meta, Story, ArgsTable, Canvas, Preview } from '@storybook/addon-docs';
+import IconButton from '@/app/components/IconButton';
+import { IconBell } from '@/icons';
+
+<Meta 
+  title='IconButton' 
+  component={IconButton}
+/>
+
+<ArgsTable of={IconButton}/>
+
+export const IconButtonDefaultStory = (args) => {
+  return (
+    <IconButton {...args}/>
+  )
+}
+
+<Canvas>
+  <Story name='Default' args={{
+    disabled: false,
+    tooltip: 'IconButton',
+    dataCy: 'iconbuttonDataCy',
+    icon: <IconBell/>,
+    variant: 'primary',
+    tooltipSide: 'bottom',
+    href: 'href',
+    badge: true,
+  }}>
+    {IconButtonDefaultStory.bind({})}
+  </Story>
+</Canvas>

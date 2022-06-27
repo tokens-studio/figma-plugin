@@ -6,7 +6,7 @@ import useConfirm from '@/app/hooks/useConfirm';
 import usePushDialog from '@/app/hooks/usePushDialog';
 import { notifyToUI } from '../../../../plugin/notifiers';
 import {
-  localApiStateSelector, tokensSelector, themesListSelector,
+  localApiStateSelector, tokensSelector, themesListSelector, activeThemeSelector, usedTokenSetSelector,
 } from '@/selectors';
 import { ADOTokenStorage } from '@/storage/ADOTokenStorage';
 import { isEqual } from '@/utils/isEqual';
@@ -25,8 +25,10 @@ export const useADO = () => {
   const tokens = useSelector(tokensSelector);
   const themes = useSelector(themesListSelector);
   const localApiState = useSelector(localApiStateSelector);
-  const { multiFileSync } = useFlags();
+  const activeTheme = useSelector(activeThemeSelector);
+  const usedTokenSets = useSelector(usedTokenSetSelector);
   const dispatch = useDispatch<Dispatch>();
+  const { multiFileSync } = useFlags();
   const { confirm } = useConfirm();
   const { pushDialog } = usePushDialog();
 
@@ -43,8 +45,7 @@ export const useADO = () => {
       text: 'Pull from Ado?',
       description: 'Your repo already contains tokens, do you want to pull these now?',
     });
-    if (confirmResult === false) return false;
-    return confirmResult.result;
+    return confirmResult
   }, [confirm]);
 
   const pushTokensToADO = React.useCallback(async (context: AdoCredentials) => {
@@ -140,9 +141,12 @@ export const useADO = () => {
     try {
       const storage = storageClientFactory(context);
       const branches = await storage.fetchBranches();
+      dispatch.branchState.setBranches(branches);
       if (branches.length === 0) {
         return null;
       }
+
+      await checkAndSetAccess(context);
 
       const content = await storage.retrieve();
 
@@ -157,6 +161,8 @@ export const useADO = () => {
             dispatch.tokenState.setTokenData({
               values: content.tokens,
               themes: content.themes,
+              usedTokenSet: usedTokenSets,
+              activeTheme,
             });
             notifyToUI('Pulled tokens from ADO');
           }
@@ -177,6 +183,9 @@ export const useADO = () => {
     storageClientFactory,
     themes,
     tokens,
+    activeTheme,
+    usedTokenSets,
+    checkAndSetAccess,
   ]);
 
   const addNewADOCredentials = React.useCallback(
@@ -188,13 +197,7 @@ export const useADO = () => {
           type: AsyncMessageTypes.CREDENTIALS,
           credential: context,
         });
-        if (data?.tokens) {
-          dispatch.tokenState.setLastSyncedState(JSON.stringify([data.tokens, data.themes], null, 2));
-          dispatch.tokenState.setTokenData({
-            values: data.tokens,
-            themes: data.themes,
-          });
-        } else {
+        if (!data.tokens) {
           notifyToUI('No tokens stored on remote');
         }
       } else {
@@ -211,6 +214,8 @@ export const useADO = () => {
       dispatch,
       tokens,
       themes,
+      usedTokenSets,
+      activeTheme,
       syncTokensWithADO,
     ],
   );

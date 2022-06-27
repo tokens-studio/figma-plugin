@@ -1,0 +1,60 @@
+import { useState } from 'react';
+import { Meta, Story, ArgsTable, Canvas, Preview } from '@storybook/addon-docs';
+import { Provider } from 'react-redux';
+import { CheckIcon } from '@radix-ui/react-icons';
+
+import { store } from '@/app/store';
+import Heading from '@/app/components/Heading';
+
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuCheckboxItem,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuItemIndicator,
+  DropdownMenuTriggerItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuArrow,
+} from '@/app/components/DropdownMenu';
+
+<Meta title='DropdownMenu' />
+
+export const DropdownMenuDefaultStory = (args) => {
+  return (
+    <>
+    <DropdownMenu>
+      <DropdownMenuTrigger>
+        <Heading>
+          DropDownMenu Storybook
+        </Heading>
+      </DropdownMenuTrigger>
+        <DropdownMenuContent>
+          <DropdownMenuItem>
+            DropdownMenuItem
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuCheckboxItem
+            key='CheckBoxItemKey'
+            checked={true}
+          >
+            <DropdownMenuItemIndicator>
+              <CheckIcon />
+            </DropdownMenuItemIndicator>
+              SB DropDown
+            <DropdownMenuArrow />
+          </DropdownMenuCheckboxItem>
+        </DropdownMenuContent>
+    </DropdownMenu>
+    </>
+  )
+}
+
+<Canvas>
+  <Story name='Default'>
+    {DropdownMenuDefaultStory.bind({})}
+  </Story>
+</Canvas>

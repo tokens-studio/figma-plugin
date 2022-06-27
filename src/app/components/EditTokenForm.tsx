@@ -312,6 +312,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
           <CompositionTokenForm
             internalEditToken={internalEditToken}
             setTokenValue={handleCompositionChange}
+            resolvedTokens={resolvedTokens}
           />
         );
       }

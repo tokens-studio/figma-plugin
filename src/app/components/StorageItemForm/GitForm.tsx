@@ -45,6 +45,8 @@ export default function GitForm({
     }
   }, [values, onSubmit]);
 
+  const baseUrlPlaceholder = `https://${values.provider}.acme-inc.com${values.provider === StorageProviderType.GITHUB ? '/api/v3' : ''}`;
+
   return (
     <form onSubmit={handleSubmit}>
       <Stack direction="column" gap={4}>
@@ -83,17 +85,17 @@ export default function GitForm({
         <Input
           full
           label="File Path (e.g. data/tokens.json)"
+          defaultValue=""
           value={values.filePath}
           onChange={onChange}
           type="text"
           name="filePath"
-          required
         />
         <Input
           full
           label="baseUrl (optional)"
           value={values.baseUrl}
-          placeholder="https://github.acme-inc.com/api/v3"
+          placeholder={baseUrlPlaceholder}
           onChange={onChange}
           type="text"
           name="baseUrl"

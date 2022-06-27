@@ -14,6 +14,8 @@ export function useTypeForProperty(property: string): string {
       case Properties.paddingRight:
       case Properties.paddingTop:
       case Properties.itemSpacing:
+      case Properties.verticalPadding:
+      case Properties.horizontalPadding:
         type = Properties.spacing;
         break;
       case Properties.borderRadiusBottomLeft:
