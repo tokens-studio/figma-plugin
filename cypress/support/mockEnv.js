@@ -44,16 +44,6 @@ const MockEnv = () => {
     cy.intercept('PATCH', 'http://localhost:5000/six7/repos/122/figma-tokens/git/refs/heads%2Fmain', {
         content: {}
     }).as('mainPatch');
-    
-    
-    // cy.intercept('POST', 'http://localhost:5000/six7/repos/122/figma-tokens/git/blobs', {
-    //     content: {}
-    // }).as('push');
-
-    // cy.intercept('POST', 'http://localhost:5000/six7/repos/122/figma-tokens/git/trees', {
-    //     content: {}
-    // }).as('push');
-
 };
 
 export default MockEnv;
