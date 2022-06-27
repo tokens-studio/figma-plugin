@@ -97,19 +97,19 @@ export default async function setValuesOnNode(
       }
 
       if ('strokeTopWeight' in node && typeof values.borderWidthTop !== 'undefined') {
-        node.strokeTopWeight = transformValue(values.borderWidthTop, 'borderWidthTop');
+        node.strokeTopWeight = transformValue(String(values.borderWidthTop), 'borderWidthTop');
       }
 
       if ('strokeRightWeight' in node && typeof values.borderWidthRight !== 'undefined') {
-        node.strokeRightWeight = transformValue(values.borderWidthRight, 'borderWidthRight');
+        node.strokeRightWeight = transformValue(String(values.borderWidthRight), 'borderWidthRight');
       }
 
       if ('strokeBottomWeight' in node && typeof values.borderWidthBottom !== 'undefined') {
-        node.strokeBottomWeight = transformValue(values.borderWidthBottom, 'borderWidthBottom');
+        node.strokeBottomWeight = transformValue(String(values.borderWidthBottom), 'borderWidthBottom');
       }
 
       if ('strokeLeftWeight' in node && typeof values.borderWidthLeft !== 'undefined') {
-        node.strokeLeftWeight = transformValue(values.borderWidthLeft, 'borderWidthLeft');
+        node.strokeLeftWeight = transformValue(String(values.borderWidthLeft), 'borderWidthLeft');
       }
 
       // OPACITY
