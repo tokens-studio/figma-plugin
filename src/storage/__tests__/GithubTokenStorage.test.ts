@@ -89,6 +89,9 @@ describe('GithubTokenStorage', () => {
       owner: 'six7',
       repo: 'figma-tokens',
       ref: 'heads/main',
+      headers: {
+        'If-None-Match': '',
+      },
     });
     expect(mockCreateRef).toBeCalledWith({
       owner: 'six7',
@@ -126,6 +129,9 @@ describe('GithubTokenStorage', () => {
       owner: 'six7',
       repo: 'figma-tokens',
       username: 'six7',
+      headers: {
+        'If-None-Match': '',
+      },
     });
   });
 
@@ -145,6 +151,9 @@ describe('GithubTokenStorage', () => {
       owner: 'six7',
       repo: 'figma-tokens',
       username: 'six7',
+      headers: {
+        'If-None-Match': '',
+      },
     });
   });
 
@@ -169,6 +178,9 @@ describe('GithubTokenStorage', () => {
       owner: 'six7',
       repo: 'figma-tokens',
       username: 'six7',
+      headers: {
+        'If-None-Match': '',
+      },
     });
   });
 
@@ -219,7 +231,23 @@ describe('GithubTokenStorage', () => {
       repo: 'figma-tokens',
       path: 'data/tokens.json',
       ref: 'main',
+      headers: {
+        'If-None-Match': '',
+      },
     });
+  });
+
+  it('can handle invalid file content', async () => {
+    mockGetContent.mockImplementationOnce(() => (
+      Promise.resolve({
+        data: {
+          content: 'RW1wdHkgZmlsZQ==',
+        },
+      })
+    ));
+
+    storageProvider.changePath('data/tokens.json');
+    expect(await storageProvider.read()).toEqual([]);
   });
 
   it('can read from Git in a multifile format', async () => {
@@ -255,6 +283,7 @@ describe('GithubTokenStorage', () => {
     mockCreateTree.mockImplementationOnce(() => (
       Promise.resolve({
         data: {
+          sha: 'sha(data)',
           tree: [
             {
               type: 'tree',
@@ -269,9 +298,10 @@ describe('GithubTokenStorage', () => {
     mockGetTree.mockImplementationOnce(() => (
       Promise.resolve({
         data: {
+          sha: 'sha(data)',
           tree: [
-            { path: '$themes.json', type: 'blob', sha: 'sha($themes.json)' },
-            { path: 'global.json', type: 'blob', sha: 'sha(global.json)' },
+            { path: 'data/$themes.json', type: 'blob', sha: 'sha($themes.json)' },
+            { path: 'data/global.json', type: 'blob', sha: 'sha(global.json)' },
           ],
         },
       })
@@ -281,7 +311,7 @@ describe('GithubTokenStorage', () => {
     storageProvider.changePath('data');
     expect(await storageProvider.read()).toEqual([
       {
-        path: '$themes.json',
+        path: 'data/$themes.json',
         type: 'themes',
         data: [{
           id: 'light',
@@ -292,7 +322,7 @@ describe('GithubTokenStorage', () => {
         }],
       },
       {
-        path: 'global.json',
+        path: 'data/global.json',
         name: 'global',
         type: 'tokenSet',
         data: {

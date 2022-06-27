@@ -7,6 +7,7 @@ import { convertTextCaseToFigma } from './figmaTransforms/textCase';
 import { convertTextDecorationToFigma } from './figmaTransforms/textDecoration';
 import { UserIdProperty } from '@/figmaStorage';
 import { generateId } from '@/utils/generateId';
+import { Properties } from '@/constants/Properties';
 
 export async function getUserId() {
   let userId = generateId(24);
@@ -34,7 +35,11 @@ export function transformValue(value: string, type: 'textDecoration'): ReturnTyp
 export function transformValue(value: string, type: string): number;
 export function transformValue(value: string, type: string) {
   switch (type) {
-    case 'borderWidth':
+    case Properties.borderWidth:
+    case Properties.borderWidthTop:
+    case Properties.borderWidthRight:
+    case Properties.borderWidthBottom:
+    case Properties.borderWidthLeft:
     case 'width':
     case 'height':
     case 'sizing':
