@@ -87,3 +87,16 @@ Cypress.Commands.add('receiveSetTokens', (values) => {
     $window.postMessage(message, '*');
   });
 });
+
+Cypress.Commands.add('apiCredentials', (values) => {
+  cy.window().then(($window) => {
+    const message = {
+      pluginMessage: {
+        type: MessageFromPluginTypes.API_CREDENTIALS,
+        status: true,
+        credentials: values,
+        },
+    };
+    $window.postMessage(message, '*');
+  });
+});

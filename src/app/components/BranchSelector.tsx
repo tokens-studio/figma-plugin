@@ -157,7 +157,7 @@ export default function BranchSelector() {
     currentBranch
       ? (
         <BranchSwitchMenu open={menuOpened} onOpenChange={handleToggleMenu}>
-          <BranchSwitchMenuMainTrigger>
+          <BranchSwitchMenuMainTrigger data-cy="branch-switch-dropdown">
             <GitBranchIcon size={16} />
             <span>{currentBranch}</span>
           </BranchSwitchMenuMainTrigger>
