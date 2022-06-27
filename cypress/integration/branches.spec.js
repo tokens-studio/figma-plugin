@@ -1,4 +1,5 @@
 import { StorageProviderType } from '@/constants/StorageProviderType';
+import MockEnv from '../support/mockEnv'
 
 describe('Branch swither', () => {
   const provider = {
@@ -12,17 +13,26 @@ describe('Branch swither', () => {
       },
     });
     cy.waitForReact(1000);
+    MockEnv();
   });
 
   it('successfully shows list of branches', () => {
     cy.apiCredentials(provider);
-    cy.intercept('GET', 'https://api.github.com/repos/122//branches', [
-          { name: 'main' },
-          { name: 'development' },
-        ],
-    );
-    cy.get('[data-cy=branch-switch-dropdown]').click();
-    cy.get('[data-cy=branch-switch-dropdown-menu-element]').should('have.length', 2).and('have.contain', 'main').and('have.contain', 'development');
+    cy.get('[data-cy=branch-selector-menu-trigger]').click();
+    cy.get('[data-cy=branch-switch-menu-radio-element-main]').should('have.length', 1);
+    cy.get('[data-cy=branch-switch-menu-radio-element-development]').should('have.length', 1);
   });
+
+  it('successfully create a new branch', () => {
+    cy.apiCredentials(provider);
+    cy.get('[data-cy=branch-selector-menu-trigger]').click();
+    cy.get('[data-cy=branch-selector-create-new-branch-trigger]').click();
+    cy.get('[data-cy=branch-selector-create-branch-from-branch-main]').click();
+    cy.get('input[name=branch]').type('new-branch');
+    cy.get('button[type=submit]').click();
+    cy.get('[data-cy=branch-selector-menu-trigger]').click();
+    cy.get('[data-cy=branch-switch-menu-radio-element-new-branch]').should('have.length', 1);
+  });
+
 
 });
