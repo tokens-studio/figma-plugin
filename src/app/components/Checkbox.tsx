@@ -1,6 +1,5 @@
 import * as CheckboxPrimitive from '@radix-ui/react-checkbox';
 import React, { useMemo } from 'react';
-import { undefined } from 'zod';
 import { styled } from '@/stitches.config';
 import IconCheck from '@/icons/check.svg';
 import IconIndeterminate from '@/icons/indeterminate.svg';
