@@ -11,6 +11,7 @@ module.exports.mockCreatePaintStyle = jest.fn();
 module.exports.mockCreateEffectStyle = jest.fn();
 module.exports.mockImportStyleByKeyAsync = jest.fn(() => Promise.reject());
 module.exports.mockUiOn = jest.fn(() => {})
+module.exports.mockRootSetSharedPluginData = jest.fn(() => {})
 
 global.figma = {
   clientStorage: {
@@ -21,6 +22,9 @@ global.figma = {
   ui: {
     postMessage: module.exports.mockPostMessage,
     on: module.exports.mockUiOn,
+  },
+  root: {
+    setSharedPluginData: module.exports.mockRootSetSharedPluginData,
   },
   getLocalPaintStyles: module.exports.mockGetLocalPaintStyles,
   getLocalTextStyles: module.exports.mockGetLocalTextStyles,

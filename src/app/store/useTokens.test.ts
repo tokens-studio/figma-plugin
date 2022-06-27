@@ -503,10 +503,10 @@ describe('useToken test', () => {
   });
   it('pullStyles test', async () => {
     mockConfirm.mockImplementation(() => {
-      Promise.resolve(true);
+      Promise.resolve(['textStyles', 'colorStyles', 'effectStyles']);
     });
-    act(() => {
-      result.current.pullStyles();
+    await act(async () => {
+      await result.current.pullStyles();
     });
     await expect(result.current.pullStyles()).resolves.not.toThrow();
   });
