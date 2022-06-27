@@ -33,11 +33,11 @@
       "type": "boxShadow"
     },
     "reference-multiple": {
-      "value": "shadows.multiple",
+      "value": "{shadows.multiple}",
       "type": "boxShadow"
     },
-    "reference-multi": {
-      "value": "shadows.single",
+    "reference-single": {
+      "value": "{shadows.single}",
       "type": "boxShadow"
     }
   }
