@@ -265,7 +265,7 @@ describe('TokenListing', () => {
     cy.get('[data-cy=composition-token-dropdown]').click();
     cy.get('[data-cy=property-dropdown-menu-element-sizing]').click();
     fillInput({
-      input: 'alias',
+      input: 'value',
       value: '$sizing.xs',
     });
     cy.get('[data-cy=button-style-add-multiple]').click();
@@ -273,7 +273,7 @@ describe('TokenListing', () => {
     cy.get('[data-cy=composition-token-dropdown]').eq(1).click();
     cy.get('[data-cy=property-dropdown-menu-element-opacity]').click();
     fillInputNth({
-      input: 'alias',
+      input: 'value',
       value: '$opacity.30',
       nth: 1,
     });
@@ -282,7 +282,7 @@ describe('TokenListing', () => {
     cy.get('[data-cy=composition-token-dropdown]').eq(2).click();
     cy.get('[data-cy=property-dropdown-menu-element-fontSizes]').click();
     fillInputNth({
-      input: 'alias',
+      input: 'value',
       value: '$font-size.4',
       nth: 2,
       submit: true,
