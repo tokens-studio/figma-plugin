@@ -4,62 +4,91 @@ import { SingleToken } from '@/types/tokens';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { BoxShadowTypes } from '@/constants/BoxShadowTypes';
 import { render } from '../../../../tests/config/setupTest';
-import { getAliasValue } from '@/utils/alias';
+import { TokensContext } from '@/context';
 
 const tokens: SingleToken[] = [
   {
-    name: 'size.6',
+    name: 'size.2',
     type: TokenTypes.SIZING,
-    value: '2',
-    rawValue: '2',
+    value: 'test-value-size.2',
+    rawValue: 'test-value-size.2',
+    description: 'regular size token',
   },
   {
     name: 'size.alias',
     type: TokenTypes.SIZING,
-    value: '2',
-    rawValue: '{size.6}',
+    value: 'test-value-size.2',
+    rawValue: '{size.2}',
+    description: 'alias size token',
   },
   {
     name: 'color.slate.50',
     type: TokenTypes.COLOR,
     value: '#f8fafc',
     rawValue: '#f8fafc',
+    description: 'regular color token',
   },
   {
     name: 'color.alias',
     type: TokenTypes.COLOR,
     value: '#f8fafc',
     rawValue: '{color.slate.50}',
+    description: 'alias color token',
   },
   {
     name: 'border-radius.0',
     type: TokenTypes.BORDER_RADIUS,
     value: '64px',
     rawValue: '64px',
+    description: 'regular radius token',
   },
   {
     name: 'border-radius.alias',
     type: TokenTypes.BORDER_RADIUS,
     value: '64px',
     rawValue: '{border-radius.0}',
+    description: 'alias size token',
   },
   {
     name: 'opacity.10',
     type: TokenTypes.OPACITY,
     value: '10%',
     rawValue: '10%',
+    description: 'regular opacity token',
   },
   {
     name: 'opacity.alias',
     type: TokenTypes.OPACITY,
-    rawValue: '10%',
-    value: '{opacity.10}',
+    value: '10%',
+    rawValue: '{opacity.10}',
+    description: 'alias size token',
+  },
+  {
+    name: 'boxshadow.regular',
+    type: TokenTypes.BOX_SHADOW,
+    value: {
+      x: '2',
+      y: '2',
+      blur: '2',
+      spread: '2',
+      color: 'test-value-object-value',
+      type: BoxShadowTypes.DROP_SHADOW,
+    },
+    rawValue: {
+      x: '2',
+      y: '2',
+      blur: '2',
+      spread: '2',
+      color: 'test-value-object-value',
+      type: BoxShadowTypes.DROP_SHADOW,
+    },
+    description: 'regular shadow token',
   },
   {
     name: 'typography.headlines.small',
     type: TokenTypes.TYPOGRAPHY,
     value: {
-      fontFamily: 'Inter',
+      fontFamily: 'test-value-object-value',
       fontWeight: 'Regular',
       lineHeight: 'AUTO',
       fontSize: '14',
@@ -69,7 +98,7 @@ const tokens: SingleToken[] = [
       textCase: 'none',
     },
     rawValue: {
-      fontFamily: 'Inter',
+      fontFamily: 'test-value-object-value',
       fontWeight: 'Regular',
       lineHeight: 'AUTO',
       fontSize: '14',
@@ -78,203 +107,80 @@ const tokens: SingleToken[] = [
       textDecoration: 'none',
       textCase: 'none',
     },
-  },
-  {
-    name: 'typography.alias',
-    type: TokenTypes.TYPOGRAPHY,
-    value: {
-      fontFamily: 'Inter',
-      fontWeight: 'Regular',
-      lineHeight: 'AUTO',
-      fontSize: '14',
-      letterSpacing: '0%',
-      paragraphSpacing: '0',
-      textDecoration: 'none',
-      textCase: 'none',
-    },
-    rawValue: '{typography.headlines.small}',
+    description: 'regular typography token',
   },
   {
     name: 'font-family.serif',
     type: TokenTypes.FONT_FAMILIES,
     value: 'IBM Plex Serif',
     rawValue: 'IBM Plex Serif',
+    description: 'regular fontFamily token',
   },
   {
     name: 'font-family.alias',
     type: TokenTypes.FONT_FAMILIES,
-    rawValue: '{font-family.serif}',
     value: 'IBM Plex Serif',
+    rawValue: '{font-family.serif}',
+    description: 'alias fontFamily token',
   },
   {
     name: 'line-height.1',
     type: TokenTypes.LINE_HEIGHTS,
     value: '130%',
     rawValue: '130%',
+    description: 'regular line height token',
   },
   {
     name: 'line-height.alias',
     type: TokenTypes.LINE_HEIGHTS,
     value: '130%',
     rawValue: '{line-height.1}',
-  },
-  {
-    name: 'typography.headlines.boxshadow',
-    type: TokenTypes.BOX_SHADOW,
-    value: {
-      x: '2',
-      y: '2',
-      blur: '2',
-      spread: '2',
-      color: '#000000',
-      type: BoxShadowTypes.DROP_SHADOW,
-    },
-    rawValue: {
-      x: '2',
-      y: '2',
-      blur: '2',
-      spread: '2',
-      color: '#000000',
-      type: BoxShadowTypes.DROP_SHADOW,
-    },
-  },
-  {
-    name: 'typography.boxshadow.alias',
-    type: TokenTypes.BOX_SHADOW,
-    value: {
-      x: 2,
-      y: 2,
-      blur: 2,
-      spread: 2,
-      color: '#000000',
-      type: BoxShadowTypes.DROP_SHADOW,
-    },
-    rawValue: '{typography.headlines.boxshadow}',
+    description: 'alias line height token',
+
   },
   {
     name: 'font-weight.regular',
     type: TokenTypes.FONT_WEIGHTS,
     value: 'Regular',
-    default: '400',
     rawValue: 'Regular',
+    description: 'regular font weight token',
   },
   {
     name: 'font-weight.alias',
     type: TokenTypes.FONT_WEIGHTS,
     value: 'Regular',
     rawValue: '{font-weight.regular}',
-    default: '400',
+    description: 'alias font weight token',
   },
   {
-    name: 'font-style.normal',
+    name: 'font-style.other',
     type: TokenTypes.OTHER,
     value: 'normal',
     rawValue: 'normal',
+    description: 'regular other token',
   },
   {
     name: 'font-style.alias',
     type: TokenTypes.OTHER,
     value: 'normal',
-    rawValue: '{font-style.normal}',
+    rawValue: '{font-style.other}',
+    description: 'alias other token',
   },
 ];
-// describe('TokenTooltip value', () => {
-//   it('tooltip value test', () => {
-//     tokens.forEach((token) => {
-//       const { getByText } = render(<TokenTooltipContent token={token} />);
-//       switch (token.type) {
-//         case TokenTypes.OTHER:
-//         case TokenTypes.COLOR:
-//         case TokenTypes.BORDER_RADIUS:
-//         case TokenTypes.SIZING:
-//         case TokenTypes.SPACING:
-//         case TokenTypes.TEXT:
-//         case TokenTypes.OPACITY:
-//         case TokenTypes.BORDER_WIDTH:
-//         case TokenTypes.FONT_FAMILIES:
-//         case TokenTypes.FONT_WEIGHTS:
-//         case TokenTypes.LINE_HEIGHTS:
-//         case TokenTypes.FONT_SIZES:
-//         case TokenTypes.LETTER_SPACING:
-//         case TokenTypes.PARAGRAPH_SPACING:
-//         case TokenTypes.TEXT_DECORATION:
-//         case TokenTypes.TEXT_CASE:
-//           // expect(getByText(token.rawValue)).toBeInTheDocument();
-//           break;
-//         case TokenTypes.BOX_SHADOW:
-//           expect(getByText('dropShadow')).toBeInTheDocument();
-//           break;
-//         case TokenTypes.TYPOGRAPHY:
-//           // expect(getByText('fontFamily')).toBeInTheDocument();
-//           break;
-//         case TokenTypes.COMPOSITION:
-//           expect(getByText('sizing : {size.12}')).toBeInTheDocument();
-//           break;
-//         default:
-//           break;
-//       }
-//     });
-//   });
-// });
+
+const customStore = {
+  resolvedTokens: tokens,
+};
+
 describe('TokenTooltip alias', () => {
-  it('size alias test', () => {
-    const input: SingleToken = {
-      name: 'size.alias',
-      type: TokenTypes.SIZING,
-      value: '{size.6}',
-      rawValue: '2',
-    };
-    const { getByText } = render(<TokenTooltipContent token={input} />);
-    expect(getByText('{size.6}')).toBeInTheDocument();
-    expect(getAliasValue(input, tokens)).toEqual(2);
-  });
-  it('color alias test', () => {
-    const input: SingleToken = {
-      name: 'color.alias',
-      type: TokenTypes.COLOR,
-      value: '{color.slate.50}',
-    };
-    expect(getAliasValue(input, tokens)).toEqual('#f8fafc');
-  });
-  it('border-radius alias test', () => {
-    const input: SingleToken = {
-      name: 'border-radius.alias',
-      type: TokenTypes.BORDER_RADIUS,
-      value: '{border-radius.0}',
-    };
-    expect(getAliasValue(input, tokens)).toEqual('64px');
-  });
-  it('opacity alias test', () => {
-    const input: SingleToken = {
-      name: 'opacity.alias',
-      type: TokenTypes.OPACITY,
-      value: '{opacity.10}',
-    };
-    expect(getAliasValue(input, tokens)).toEqual('10%');
-  });
-  it('typography alias test', () => {
-    const input: SingleToken = {
-      name: 'typography.alias',
-      type: TokenTypes.TYPOGRAPHY,
-      value: '{typography.headlines.small}',
-    };
-    expect(getAliasValue(input, tokens)).toEqual({
-      fontFamily: 'Inter',
-      fontWeight: 'Regular',
-      lineHeight: 'AUTO',
-      fontSize: '14',
-      letterSpacing: '0%',
-      paragraphSpacing: '0',
-      textDecoration: 'none',
-      textCase: 'none',
+  tokens.forEach((token) => {
+    it(`can resolve ${token.description}`, () => {
+      const { getByText } = render(<TokensContext.Provider value={customStore}><TokenTooltipContent token={{ ...token, value: token.rawValue }} /></TokensContext.Provider>);
+
+      expect(getByText(String(token.description))).toBeInTheDocument();
+      expect(getByText((content) => (typeof token.value === 'object' ? content.includes('test-value-object-value') : content.includes(String(token.value))))).toBeInTheDocument();
+      expect(getByText((content) => (typeof token.rawValue === 'object' ? content.includes('test-value-object-value') : content.includes(String(token.rawValue))))).toBeInTheDocument();
+      expect(getByText(String(token.name.split('.').pop()))).toBeInTheDocument();
     });
-  });
-  it('font-family alias test', () => {
-    const input: SingleToken = {
-      name: 'font-family.alias',
-      type: TokenTypes.FONT_FAMILIES,
-      value: '{font-family.serif}',
-    };
-    expect(getAliasValue(input, tokens)).toEqual('IBM Plex Serif');
   });
 });
