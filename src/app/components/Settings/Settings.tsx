@@ -2,16 +2,16 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import type { CheckedState } from '@radix-ui/react-checkbox';
-import SyncSettings from './SyncSettings';
-import Checkbox from './Checkbox';
-import Heading from './Heading';
-import { Dispatch } from '../store';
-import Label from './Label';
+import SyncSettings from '../SyncSettings';
+import Checkbox from '../Checkbox';
+import Heading from '../Heading';
+import { Dispatch } from '../../store';
+import Label from '../Label';
 import { ignoreFirstPartForStylesSelector, prefixStylesWithThemeNameSelector } from '@/selectors';
-import Stack from './Stack';
-import Box from './Box';
-import AddLicenseKey from './AddLicenseKey/AddLicenseKey';
-import { Divider } from './Divider';
+import Stack from '../Stack';
+import Box from '../Box';
+import AddLicenseKey from '../AddLicenseKey/AddLicenseKey';
+import { Divider } from '../Divider';
 
 function Settings() {
   const ignoreFirstPartForStyles = useSelector(ignoreFirstPartForStylesSelector);

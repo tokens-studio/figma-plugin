@@ -1,5 +1,6 @@
 import * as CheckboxPrimitive from '@radix-ui/react-checkbox';
 import React, { useMemo } from 'react';
+import { undefined } from 'zod';
 import { styled } from '@/stitches.config';
 import IconCheck from '@/icons/check.svg';
 import IconIndeterminate from '@/icons/indeterminate.svg';
@@ -19,7 +20,6 @@ const StyledCheckbox = styled(CheckboxPrimitive.Root, {
   width: 12,
   height: 12,
   '&:focus': { boxShadow: '0 0 0 2px black' },
-
   variants: {
     isChecked: {
       true: {
@@ -31,7 +31,6 @@ const StyledCheckbox = styled(CheckboxPrimitive.Root, {
         borderColor: '$interactionSubtle',
       },
     },
-
   },
 });
 
@@ -66,8 +65,9 @@ function Checkbox({
   return (
     <StyledCheckbox
       id={id ?? undefined}
+      data-testid={id ?? undefined}
       disabled={disabled}
-      isChecked={checked}
+      isChecked={!!checked}
       checked={checked}
       onCheckedChange={onCheckedChange}
       defaultChecked={defaultChecked}
