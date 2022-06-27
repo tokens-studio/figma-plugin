@@ -64,7 +64,7 @@ describe('Branch swither', () => {
     cy.get('[data-cy=branch-selector-create-new-branch-from-current-change]').click();
     cy.get('input[name=branch]').type('new-branch');
     cy.get('button[type=submit]').click();
-    cy.get('[for="commitMessage"]').type('push changes');
+    cy.get('[name="commitMessage"]').type('push changes');
     cy.get('button[type=submit]').click();
     cy.get('[data-cy=push-dialog-success]').should('have.length', 1);
   });
@@ -96,7 +96,7 @@ describe('Branch swither', () => {
     });
     cy.get('[data-cy=icon-button-badge]').should('have.length', 1);
     cy.get('[data-cy=footer-push-button]').click();
-    cy.get('[for="commitMessage"]').type('push changes');
+    cy.get('[name="commitMessage"]').type('push changes');
     cy.get('button[type=submit]').click();
     cy.get('[data-cy=push-dialog-success]').should('have.length', 1);
   });
