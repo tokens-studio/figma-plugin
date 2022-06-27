@@ -248,7 +248,7 @@ describe('TokenListing', () => {
           name: 'font-size.4',
           value: '4px',
           type: 'fontSizes'
-        },],
+        }],
         global: [{
           name: 'sizing.xs',
           value: 4,
