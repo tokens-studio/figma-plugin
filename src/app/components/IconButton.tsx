@@ -57,7 +57,7 @@ function IconButtonInnerContent({ icon, badge }: { icon: Props['icon']; badge?: 
   return (
     <>
       <Box css={{ transition: 'transform 200ms ease-in-out', transform: 'var(--transform)' }}>{icon}</Box>
-      {badge && <StyledDirtyStateBadge />}
+      {badge && <StyledDirtyStateBadge data-cy="icon-button-badge" />}
     </>
 
   );

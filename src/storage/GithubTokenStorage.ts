@@ -216,6 +216,8 @@ export class GithubTokenStorage extends GitTokenStorage {
   }
 
   public async writeChangeset(changeset: Record<string, string>, message: string, branch: string, shouldCreateBranch?: boolean): Promise<boolean> {
+    console.log('branh', branch, 'this', this.owner, 'repo', this.repository, shouldCreateBranch, 'message', message);
+    console.log('changese', changeset);
     const response = await this.octokitClient.repos.createOrUpdateFiles({
       branch,
       owner: this.owner,

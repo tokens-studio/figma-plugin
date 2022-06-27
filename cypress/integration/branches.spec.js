@@ -1,9 +1,17 @@
-import { StorageProviderType } from '@/constants/StorageProviderType';
+import {
+  StorageProviderType
+} from '@/constants/StorageProviderType';
 import MockEnv from '../support/mockEnv'
 
 describe('Branch swither', () => {
   const provider = {
-    provider: StorageProviderType.GITHUB, id: '122', secret: '456', name: 'dummy 2', branch: 'main'
+    provider: StorageProviderType.GITHUB,
+    id: '122/figma-tokens',
+    secret: '456',
+    name: 'dummy 2',
+    baseUrl: 'six7',
+    branch: 'main',
+    filePath: 'tokens.json'
   };
 
   beforeEach(() => {
@@ -34,5 +42,63 @@ describe('Branch swither', () => {
     cy.get('[data-cy=branch-switch-menu-radio-element-new-branch]').should('have.length', 1);
   });
 
+  it('successfully create a new branch from current change', () => {
+    cy.apiCredentials(provider);
+    cy.receiveSetTokens({
+      version: '5',
+      values: {
+        options: [{
+          name: 'sizing.xs',
+          value: 4,
+          type: 'sizing'
+        }],
+        global: [{
+          name: 'sizing.xs',
+          value: 4,
+          type: 'sizing'
+        }],
+      },
+    });
+    cy.get('[data-cy=branch-selector-menu-trigger]').click();
+    cy.get('[data-cy=branch-selector-create-new-branch-trigger]').click();
+    cy.get('[data-cy=branch-selector-create-new-branch-from-current-change]').click();
+    cy.get('input[name=branch]').type('new-branch');
+    cy.get('button[type=submit]').click();
+    cy.get('[for="commitMessage"]').type('push changes');
+    cy.get('button[type=submit]').click();
+    cy.get('[data-cy=push-dialog-success]').should('have.length', 1);
+  });
+
+  it('successfully change to an existing branch', () => {
+    cy.apiCredentials(provider);
+    cy.get('[data-cy=branch-selector-menu-trigger]').click();
+    cy.get('[data-cy=branch-switch-menu-radio-element-development]').click();
+    cy.get('[data-cy=branch-selector-menu-trigger]').click();
+    cy.get('[data-cy=branch-switch-menu-radio-element-development] [data-cy=branch-switch-menu-check-icon]').should('have.length', 1);
+  });
+
+  it('successfully push change', () => {
+    cy.apiCredentials(provider);
+    cy.receiveSetTokens({
+      version: '5',
+      values: {
+        options: [{
+          name: 'sizing.xs',
+          value: 4,
+          type: 'sizing'
+        }],
+        global: [{
+          name: 'sizing.xs',
+          value: 4,
+          type: 'sizing'
+        }],
+      },
+    });
+    cy.get('[data-cy=icon-button-badge]').should('have.length', 1);
+    cy.get('[data-cy=footer-push-button]').click();
+    cy.get('[for="commitMessage"]').type('push changes');
+    cy.get('button[type=submit]').click();
+    cy.get('[data-cy=push-dialog-success]').should('have.length', 1);
+  });
 
 });

@@ -62,7 +62,7 @@ export default function CreateBranchModal({
       // type casting because of "name" error - ignoring because not important
       const response = await addNewBranch(localApiState as StorageTypeCredentials, branch, startBranch ?? undefined);
       const branches = await fetchBranches(localApiState as StorageTypeCredentials);
-
+      console.log('respn', response);
       if (response) {
         onSuccess(branch, branches ?? []);
       } else {

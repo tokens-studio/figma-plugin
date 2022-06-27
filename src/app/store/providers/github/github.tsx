@@ -53,7 +53,10 @@ export function useGitHub() {
 
   const pushTokensToGitHub = useCallback(async (context: GithubCredentials): Promise<RemoteTokenStorageData<GitStorageMetadata> | null> => {
     const storage = storageClientFactory(context);
+    console.log('cnte');
     const content = await storage.retrieve();
+    console.log('content', content);
+
     if (content) {
       if (
         content
@@ -74,6 +77,7 @@ export function useGitHub() {
     const pushSettings = await pushDialog();
     if (pushSettings) {
       const { commitMessage, customBranch } = pushSettings;
+      console.log('commit', commitMessage);
       try {
         if (customBranch) storage.selectBranch(customBranch);
         await storage.save({
