@@ -131,7 +131,7 @@ function ConfirmDialog() {
         <Modal large isOpen close={onCancel}>
           <div className="text-center">
             <div className="mb-8 space-y-4">
-              <Heading id="push-dialog-success" size="medium">All done!</Heading>
+              <Heading id="push-dialog-success-heading" size="medium">All done!</Heading>
               <div className="text-xs">
                 Changes pushed to
                 {localApiState.provider === StorageProviderType.GITHUB && ' GitHub'}

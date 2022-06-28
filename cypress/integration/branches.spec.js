@@ -3,7 +3,7 @@ import {
 } from '@/constants/StorageProviderType';
 import MockEnv from '../support/mockEnv'
 
-describe('Branch swither', () => {
+describe('Branch switcher', () => {
   const provider = {
     provider: StorageProviderType.GITHUB,
     id: '122/figma-tokens',
@@ -66,7 +66,7 @@ describe('Branch swither', () => {
     cy.get('button[type=submit]').click();
     cy.get('[name="commitMessage"]').type('push changes');
     cy.get('button[type=submit]').click();
-    cy.get('[data-cy=push-dialog-success]').should('have.length', 1);
+    cy.get('[data-cy=push-dialog-success-heading]').should('have.length', 1);
   });
 
   it('successfully change to an existing branch', () => {
@@ -94,11 +94,10 @@ describe('Branch swither', () => {
         }],
       },
     });
-    cy.get('[data-cy=icon-button-badge]').should('have.length', 1);
     cy.get('[data-cy=footer-push-button]').click();
     cy.get('[name="commitMessage"]').type('push changes');
     cy.get('button[type=submit]').click();
-    cy.get('[data-cy=push-dialog-success]').should('have.length', 1);
+    cy.get('[data-cy=push-dialog-success-heading]').should('have.length', 1);
   });
 
 });
