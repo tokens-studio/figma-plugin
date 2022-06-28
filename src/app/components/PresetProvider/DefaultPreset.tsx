@@ -3,6 +3,7 @@ import { useDispatch } from 'react-redux';
 import { Dispatch } from '@/app/store';
 import Button from '../Button';
 import Stack from '../Stack';
+import Heading from '../Heading';
 
 type Props = {
   onCancel: () => void;
@@ -16,8 +17,8 @@ export default function DefaultPreset({ onCancel }: Props) {
   }, [dispatch, onCancel]);
 
   return (
-    <Stack direction="column" gap={2}>
-      <p className="text-xs text-gray-600">
+    <Stack direction="column" gap={4}>
+      <Heading size="small">
         Override your current tokens by applying a preset. Want your preset featured here? Submit it via
         {' '}
         <a
@@ -28,7 +29,7 @@ export default function DefaultPreset({ onCancel }: Props) {
         >
           GitHub
         </a>
-      </p>
+      </Heading>
       <Stack direction="row" gap={4} justify="between">
         <Button variant="secondary" onClick={onCancel}>
           Cancel

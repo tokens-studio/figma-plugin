@@ -20,7 +20,7 @@ export default function ExportModal({ onClose }: Props) {
   return (
     <Modal showClose isOpen close={onClose} title="Import">
       <Stack direction="column" justify="center" gap={4} css={{ textAlign: 'center' }}>
-        <Stack direction="column" gap={2}>
+        <Stack direction="column" gap={4}>
           <Stack direction="row" gap={1}>
             <LoadProviderItem
               isActive={loadProvider === LoadProviderType.PRESET}
