@@ -178,7 +178,6 @@ export class GithubTokenStorage extends GitTokenStorage {
           }
         }
       } else if ('content' in response.data) {
-        console.log('response.data: ', response.data);
         const data = decodeBase64(response.data.content);
         if (IsJSONString(data)) {
           const parsed = JSON.parse(data) as GitSingleFileObject;
