@@ -27,7 +27,7 @@ const StyledButton = styled('button', {
 
 type Props = {
   text: string;
-  onClick: () => void;
+  onClick: (id: string) => void;
   isActive: boolean;
   id: string;
 };
@@ -35,11 +35,14 @@ type Props = {
 export default function LoadItem({
   text, onClick, isActive, id,
 }: Props) {
+  const onButtonClicked = React.useCallback((id) => {
+    onClick(id);
+  }, [id]);
   return (
     <StyledButton
       isActive={isActive}
       type="button"
-      onClick={onClick}
+      onClick={onButtonClicked}
     >
       {text}
     </StyledButton>

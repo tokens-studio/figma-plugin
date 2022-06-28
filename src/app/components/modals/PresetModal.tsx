@@ -24,13 +24,13 @@ export default function ExportModal({ onClose }: Props) {
           <Stack direction="row" gap={1}>
             <LoadProviderItem
               isActive={loadProvider === LoadProviderType.PRESET}
-              onClick={() => handleProviderClick(LoadProviderType.PRESET)}
+              onClick={handleProviderClick}
               text="Preset"
               id={LoadProviderType.PRESET}
             />
             <LoadProviderItem
               isActive={loadProvider === LoadProviderType.FILE}
-              onClick={() => handleProviderClick(LoadProviderType.FILE)}
+              onClick={handleProviderClick}
               text="File"
               id={LoadProviderType.FILE}
             />
