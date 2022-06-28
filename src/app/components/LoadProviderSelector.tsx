@@ -35,7 +35,7 @@ type Props = {
 export default function LoadItem({
   text, onClick, isActive, id,
 }: Props) {
-  const onButtonClicked = React.useCallback((id) => {
+  const onButtonClicked = React.useCallback(() => {
     onClick(id);
   }, [id]);
   return (
