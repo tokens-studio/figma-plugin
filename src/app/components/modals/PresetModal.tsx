@@ -13,7 +13,7 @@ type Props = {
 export default function ExportModal({ onClose }: Props) {
   const [loadProvider, setLoadProvider] = useState<string>(LoadProviderType.PRESET);
 
-  const handleProviderClick = React.useCallback((provider: string) => () => {
+  const handleProviderClick = React.useCallback((provider: string) => {
     setLoadProvider(provider);
   }, [loadProvider]);
 
@@ -24,13 +24,13 @@ export default function ExportModal({ onClose }: Props) {
           <Stack direction="row" gap={1}>
             <LoadProviderItem
               isActive={loadProvider === LoadProviderType.PRESET}
-              onClick={handleProviderClick(LoadProviderType.PRESET)}
+              onClick={() => handleProviderClick(LoadProviderType.PRESET)}
               text="Preset"
               id={LoadProviderType.PRESET}
             />
             <LoadProviderItem
               isActive={loadProvider === LoadProviderType.FILE}
-              onClick={handleProviderClick(LoadProviderType.FILE)}
+              onClick={() => handleProviderClick(LoadProviderType.FILE)}
               text="File"
               id={LoadProviderType.FILE}
             />
