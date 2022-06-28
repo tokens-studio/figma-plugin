@@ -16,6 +16,18 @@
         "description": "Sizing value",
         "type": "sizing"
       }
+    },
+    "components": {
+      "cards": {
+        "default": {
+          "type": "composition",
+          "value": {
+            "borderRadius": "{sizing.base}",
+            "fill": "{theme.backgroundSubtle}",
+            "border": "{theme.background}"
+          }
+        }
+      }
     }
   }
 }
