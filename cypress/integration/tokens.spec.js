@@ -73,14 +73,18 @@ describe('TokenListing', () => {
       },
     });
     cy.receiveStorageTypeLocal();
-    cy.get('[data-cy=tokenlisting-sizing] [data-cy=button-add-new-token]').click({ timeout: 1000 });
+    cy.get('[data-cy=tokenlisting-sizing] [data-cy=button-add-new-token]').click({
+      timeout: 1000
+    });
     fillTokenForm({
       name: 'sizing.sm',
       value: '4',
     });
     cy.get('@postMessage').should('be.calledTwice');
     receiveRemoteComponents();
-    cy.get('[data-cy=tokenlisting-sizing] [data-cy=button-add-new-token]').click({ timeout: 1000 });
+    cy.get('[data-cy=tokenlisting-sizing] [data-cy=button-add-new-token]').click({
+      timeout: 1000
+    });
     fillTokenForm({
       name: 'sizing.md',
       value: '$sizing.sm * 2',
@@ -104,7 +108,9 @@ describe('TokenListing', () => {
       },
     });
     cy.receiveStorageTypeLocal();
-    cy.get('[data-cy=tokenlisting-boxShadow] [data-cy=button-add-new-token]').click({ timeout: 1000 });
+    cy.get('[data-cy=tokenlisting-boxShadow] [data-cy=button-add-new-token]').click({
+      timeout: 1000
+    });
     fillInput({
       input: 'name',
       value: 'boxshadow.regular',
@@ -152,7 +158,9 @@ describe('TokenListing', () => {
       },
     });
     cy.receiveStorageTypeLocal();
-    cy.get('[data-cy=tokenlisting-boxShadow] [data-cy=button-add-new-token]').click({ timeout: 1000 });
+    cy.get('[data-cy=tokenlisting-boxShadow] [data-cy=button-add-new-token]').click({
+      timeout: 1000
+    });
     fillInput({
       input: 'name',
       value: 'boxshadow.large',
@@ -177,7 +185,9 @@ describe('TokenListing', () => {
       input: 'blur',
       value: '0',
     });
-    cy.get('[data-cy=button-shadow-add-multiple]').click({ timeout: 1000 });
+    cy.get('[data-cy=button-shadow-add-multiple]').click({
+      timeout: 1000
+    });
     fillInputNth({
       input: 'x',
       value: '4',
@@ -189,6 +199,72 @@ describe('TokenListing', () => {
       nth: 1,
       submit: true,
     });
+    cy.get('@postMessage').should('be.calledTwice');
+    receiveRemoteComponents();
+  });
+
+  it('can add shadow tokens by alias using auto complete', () => {
+    cy.receiveSetTokens({
+      version: '5',
+      values: {
+        options: [{
+            name: 'sizing.xs',
+            value: 4,
+            type: 'sizing'
+          },
+          {
+            name: 'boxshadow.single',
+            value: {
+              blur: "3",
+              color: "red",
+              spread: "3",
+              type: "innerShadow",
+              x: "3",
+              y: "3",
+            },
+            type: 'boxShadow'
+          },
+          {
+            name: 'boxshadow.multi',
+            value: [{
+                blur: "3",
+                color: "red",
+                spread: "3",
+                type: "innerShadow",
+                x: "3",
+                y: "3",
+              },
+              {
+                blur: "1",
+                color: "blue",
+                spread: "1",
+                type: "dropShadow",
+                x: "1",
+                y: "1",
+              }
+            ],
+            type: 'boxShadow'
+          }
+        ],
+        global: [{
+          name: 'sizing.xs',
+          value: 4,
+          type: 'sizing'
+        }],
+      },
+    });
+    cy.receiveStorageTypeLocal();
+    cy.get('[data-cy=tokenlisting-boxShadow] [data-cy=button-add-new-token]').click({
+      timeout: 1000
+    });
+    cy.get('[data-cy=mode-change-button]').click();
+    fillInput({
+      input: 'name',
+      value: 'boxshadow.alias',
+    });
+    cy.get(`input[name=value]`).type('$boxshadow.sin');
+    cy.get('[data-cy=downshift-input-item]').click();
+    cy.get(`input[name=value]`).type('{enter}');
     cy.get('@postMessage').should('be.calledTwice');
     receiveRemoteComponents();
   });
@@ -210,7 +286,9 @@ describe('TokenListing', () => {
       },
     });
     cy.receiveStorageTypeLocal();
-    cy.get('[data-cy=tokenlisting-typography] [data-cy=button-add-new-token]').click({ timeout: 1000 });
+    cy.get('[data-cy=tokenlisting-typography] [data-cy=button-add-new-token]').click({
+      timeout: 1000
+    });
     fillInput({
       input: 'name',
       value: 'typography.regular',
@@ -244,7 +322,7 @@ describe('TokenListing', () => {
     receiveRemoteComponents();
   });
 
-  it('can add a new typography token by alias using autocomplete', () => {
+  it('can add a new typography token by alias using auto complete', () => {
     cy.receiveSetTokens({
       version: '5',
       values: {
@@ -323,7 +401,9 @@ describe('TokenListing', () => {
     cy.receiveStorageTypeLocal();
     cy.get(
       '[data-cy=tokenlisting-sizing] [data-cy=token-group-sizing] [data-cy=button-add-new-token-in-group]',
-    ).click({ timeout: 1000 });
+    ).click({
+      timeout: 1000
+    });
     fillTokenForm({
       name: 'lg',
       value: '8',
@@ -349,8 +429,12 @@ describe('TokenListing', () => {
       },
     });
     cy.receiveStorageTypeLocal();
-    cy.get('[data-cy=tokenlisting-header-sizing]').click({ timeout: 1000 });
-    cy.get('[data-cy=tokenlisting-opacity] [data-cy=button-add-new-token]').click({ timeout: 1000 });
+    cy.get('[data-cy=tokenlisting-header-sizing]').click({
+      timeout: 1000
+    });
+    cy.get('[data-cy=tokenlisting-opacity] [data-cy=button-add-new-token]').click({
+      timeout: 1000
+    });
     fillTokenForm({
       name: 'sizing.sm',
       value: '4',
@@ -383,7 +467,9 @@ describe('TokenListing', () => {
       },
     });
     cy.receiveStorageTypeLocal();
-    cy.get('[data-cy=tokenlisting-composition] [data-cy=button-add-new-token]').click({ timeout: 1000 });
+    cy.get('[data-cy=tokenlisting-composition] [data-cy=button-add-new-token]').click({
+      timeout: 1000
+    });
     fillInput({
       input: 'name',
       value: 'composition.regular',
