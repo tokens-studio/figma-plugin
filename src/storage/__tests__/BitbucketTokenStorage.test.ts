@@ -56,7 +56,7 @@ describe('BitbucketTokenStorage', () => {
     );
     mockListPermissions.mockImplementationOnce(() =>
       Promise.resolve({
-        data: { values: [{ permission: 'admin' || 'write' }] },
+        data: { values: [{ permission: 'admin' }] },
       })
     );
 

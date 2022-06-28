@@ -32,15 +32,6 @@ export class BitbucketTokenStorage extends GitTokenStorage {
     });
   }
 
-  public async fakeFunction() {
-    const response = await this.bitbucketClient.repositories.get({
-      workspace: this.owner,
-      repo_slug: this.repository,
-    });
-
-    return response;
-  }
-
   // https://bitbucketjs.netlify.app/#api-repositories-repositories_listBranches OR
   // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-refs/#api-repositories-workspace-repo-slug-refs-get
   public async fetchBranches(): Promise<string[]> {
