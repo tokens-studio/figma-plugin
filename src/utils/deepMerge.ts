@@ -19,22 +19,21 @@ const isObject = (obj: any) => {
   return false;
 };
 
-const deepMerge = <T extends IObject[]>(...objects: T): TUnionToIntersection<T[number]> =>
-  objects.reduce((result, current) => {
-    Object.keys(current).forEach((key) => {
-      if (Array.isArray(result[key]) && Array.isArray(current[key])) {
-        result[key] = deepMerge.options.mergeArrays
-          ? Array.from(new Set((result[key] as unknown[]).concat(current[key])))
-          : current[key];
-      } else if (isObject(result[key]) && isObject(current[key])) {
-        result[key] = deepMerge(result[key] as IObject, current[key] as IObject);
-      } else {
-        result[key] = current[key];
-      }
-    });
+const deepMerge = <T extends IObject[]>(...objects: T): TUnionToIntersection<T[number]> => objects.reduce((result, current) => {
+  Object.keys(current).forEach((key) => {
+    if (Array.isArray(result[key]) && Array.isArray(current[key])) {
+      result[key] = deepMerge.options.mergeArrays
+        ? Array.from(new Set((result[key] as unknown[]).concat(current[key])))
+        : current[key];
+    } else if (isObject(result[key]) && isObject(current[key])) {
+      result[key] = deepMerge(result[key] as IObject, current[key] as IObject);
+    } else {
+      result[key] = current[key];
+    }
+  });
 
-    return result;
-  }, {}) as any;
+  return result;
+}, {}) as any;
 
 interface IOptions {
   mergeArrays: boolean;
