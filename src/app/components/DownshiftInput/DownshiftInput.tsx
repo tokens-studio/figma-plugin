@@ -223,6 +223,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
                       backgroundColor: highlightedIndex === index ? '$interaction' : '$bgDefault',
                     }}
                     isFocused={highlightedIndex === index}
+                    
                   >
                     {type === 'color' && (
                     <StyledItemColorDiv>
