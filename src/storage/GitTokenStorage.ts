@@ -18,6 +18,8 @@ export type GitStorageMetadata = {
   commitMessage?: string
 };
 
+export type SupernovaStorageMetadata = Record<string, never>;
+
 export abstract class GitTokenStorage extends RemoteTokenStorage<GitStorageMetadata> {
   protected secret: string;
 

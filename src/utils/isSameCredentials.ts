@@ -17,6 +17,8 @@ function isSameCredentials(credential: StorageTypeCredentials, stored: StorageTy
     case StorageProviderType.URL: {
       return credential.id === stored.id && credential.provider === stored.provider;
     }
+    case StorageProviderType.SUPERNOVA:
+      return credential.id === stored.id && credential.provider === stored.provider;
     default:
       return false;
   }

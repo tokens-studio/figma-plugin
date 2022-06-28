@@ -2,6 +2,7 @@ import { DeepTokensMap, ThemeObjectsList } from '@/types';
 import type { AnyTokenList, SingleToken } from '@/types/tokens';
 import convertTokensToObject from '@/utils/convertTokensToObject';
 import parseTokenValues from '@/utils/parseTokenValues';
+import { SupernovaStorageMetadata } from './GitTokenStorage';
 
 export type RemoteTokenStorageData<Metadata = unknown> = {
   tokens: Record<string, AnyTokenList>
@@ -70,8 +71,8 @@ export abstract class RemoteTokenStorage<Metadata = unknown> {
     return this.write(files);
   }
 
-  public async retrieve(): Promise<RemoteTokenStorageData<Metadata> | null> {
-    const data: RemoteTokenStorageData<Metadata> = {
+  public async retrieve(): Promise<RemoteTokenStorageData<SupernovaStorageMetadata> | null> {
+    const data: RemoteTokenStorageData<SupernovaStorageMetadata> = {
       themes: [],
       tokens: {},
       metadata: null,

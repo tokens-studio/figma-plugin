@@ -159,6 +159,7 @@ export function Initiator() {
                     if (branches) dispatch.branchState.setBranches(branches);
                   }
 
+                  console.log(credentials);
                   dispatch.uiState.setApiData(credentials);
                   dispatch.uiState.setLocalApiState(credentials);
 

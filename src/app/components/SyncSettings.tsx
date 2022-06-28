@@ -51,7 +51,7 @@ const SyncSettings = () => {
     setStorageProvider(provider);
   }, []);
 
-  const selectedRemoteProvider = React.useMemo(() => [StorageProviderType.JSONBIN, StorageProviderType.GITHUB, StorageProviderType.GITLAB, StorageProviderType.ADO, StorageProviderType.URL].includes(
+  const selectedRemoteProvider = React.useMemo(() => [StorageProviderType.JSONBIN, StorageProviderType.GITHUB, StorageProviderType.GITLAB, StorageProviderType.ADO, StorageProviderType.URL, StorageProviderType.SUPERNOVA].includes(
     storageProvider as StorageProviderType,
   ), [storageProvider]);
 
@@ -119,6 +119,22 @@ const SyncSettings = () => {
             {' '}
             <a
               href="https://docs.tokens.studio/sync/ado"
+              target="_blank"
+              rel="noreferrer"
+              className="underline"
+            >
+              Read the guide
+            </a>
+            .
+          </div>
+        );
+      case StorageProviderType.SUPERNOVA:
+        return (
+          <div>
+            Sync your tokens with a Supernova.io so your design decisions are up to date with code.
+            {' '}
+            <a
+              href="https://learn.supernova.io"
               target="_blank"
               rel="noreferrer"
               className="underline"
@@ -235,6 +251,13 @@ const SyncSettings = () => {
                 onClick={handleProviderClick(StorageProviderType.ADO)}
                 text="ADO"
                 id={StorageProviderType.ADO}
+              />
+              <ProviderSelector
+                isActive={storageProvider === StorageProviderType.SUPERNOVA}
+                isStored={storageType?.provider === StorageProviderType.SUPERNOVA}
+                onClick={handleProviderClick(StorageProviderType.SUPERNOVA)}
+                text="Supernova.io"
+                id={StorageProviderType.SUPERNOVA}
               />
             </Stack>
           </Stack>

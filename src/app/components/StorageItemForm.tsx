@@ -5,6 +5,7 @@ import JSONBinForm from './StorageItemForm/JSONBinForm';
 import URLForm from './StorageItemForm/URLForm';
 import { StorageTypeFormValues } from '@/types/StorageType';
 import { StorageProviderType } from '@/constants/StorageProviderType';
+import SupernovaForm from './StorageItemForm/SupernovaForm';
 
 type Props = {
   values: StorageTypeFormValues<true>
@@ -57,6 +58,17 @@ export default function StorageItemForm({
       return (
         <JSONBinForm
           isNew={isNew}
+          onChange={onChange}
+          onSubmit={onSubmit}
+          onCancel={onCancel}
+          values={values}
+          hasErrored={hasErrored}
+        />
+      );
+    }
+    case StorageProviderType.SUPERNOVA: {
+      return (
+        <SupernovaForm
           onChange={onChange}
           onSubmit={onSubmit}
           onCancel={onCancel}

@@ -8,6 +8,7 @@ import { Dispatch } from '../store';
 import useStorage from './useStorage';
 import { useGitHub } from './providers/github';
 import { useGitLab } from './providers/gitlab';
+import { useSupernova } from './providers/supernova';
 import { useADO } from './providers/ado';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
 import { apiSelector } from '@/selectors';
@@ -39,6 +40,9 @@ export default function useRemoteTokens() {
   const {
     addNewGitLabCredentials, syncTokensWithGitLab, pullTokensFromGitLab, pushTokensToGitLab, fetchGitLabBranches, createGitLabBranch,
   } = useGitLab();
+  const {
+    addNewSupernovaCredentials, syncTokensWithSupernova, pullFromSupernova, pushToSupernova,
+  } = useSupernova();
   const {
     addNewADOCredentials, syncTokensWithADO, pullTokensFromADO, pushTokensToADO, createADOBranch, fetchADOBranches,
   } = useADO();
@@ -75,6 +79,10 @@ export default function useRemoteTokens() {
         remoteData = await pullTokensFromURL(context);
         break;
       }
+      case StorageProviderType.SUPERNOVA: {
+        remoteData = await pullFromSupernova(context);
+        break;
+      }
       default:
         throw new Error('Not implemented');
     }
@@ -103,6 +111,7 @@ export default function useRemoteTokens() {
     pullTokensFromJSONBin,
     pullTokensFromURL,
     pullTokensFromADO,
+    pullFromSupernova,
   ]);
 
   const restoreStoredProvider = useCallback(async (context: StorageTypeCredentials) => {
@@ -124,6 +133,10 @@ export default function useRemoteTokens() {
         await syncTokensWithADO(context);
         break;
       }
+      case StorageProviderType.SUPERNOVA: {
+        await syncTokensWithSupernova(context);
+        break;
+      }
       default:
         await pullTokens({ context });
     }
@@ -135,6 +148,7 @@ export default function useRemoteTokens() {
     syncTokensWithGitHub,
     syncTokensWithGitLab,
     syncTokensWithADO,
+    syncTokensWithSupernova,
   ]);
 
   const pushTokens = useCallback(async (context: StorageTypeCredentials = api) => {
@@ -152,6 +166,10 @@ export default function useRemoteTokens() {
         await pushTokensToADO(context);
         break;
       }
+      case StorageProviderType.SUPERNOVA: {
+        await pushToSupernova(context);
+        break;
+      }
       default:
         throw new Error('Not implemented');
     }
@@ -160,6 +178,7 @@ export default function useRemoteTokens() {
     pushTokensToGitHub,
     pushTokensToGitLab,
     pushTokensToADO,
+    pushToSupernova,
   ]);
 
   const addNewProviderItem = useCallback(async (credentials: StorageTypeFormValues<false>): Promise<boolean> => {
@@ -193,6 +212,10 @@ export default function useRemoteTokens() {
         data = await pullTokensFromURL(credentials);
         break;
       }
+      case StorageProviderType.SUPERNOVA: {
+        data = await addNewSupernovaCredentials(credentials);
+        break;
+      }
       default:
         throw new Error('Not implemented');
     }
@@ -209,6 +232,7 @@ export default function useRemoteTokens() {
     addNewGitLabCredentials,
     addNewGitHubCredentials,
     addNewADOCredentials,
+    addNewSupernovaCredentials,
     createNewJSONBin,
     pullTokensFromURL,
     setStorageType,
@@ -234,7 +258,7 @@ export default function useRemoteTokens() {
     }
 
     return newBranchCreated;
-  }, [createGithubBranch, createADOBranch]);
+  }, [createGithubBranch, createGitLabBranch, createADOBranch]);
 
   const fetchBranches = useCallback(async (context: StorageTypeCredentials) => {
     switch (context.provider) {
