@@ -22,12 +22,10 @@ export default function MultiFilesExport({ onCancel }: Props) {
           Cancel
         </Button>
         <Button
-          // href={`data:text/json;charset=utf-8,${encodeURIComponent(
-          //   getFormattedTokens({
-          //     includeAllTokens, includeParent, expandTypography, expandShadow,
-          //   }),
+          // href={`charset=utf-8,${encodeURIComponent(
+          //   'saffasdfasfd'
           // )}`}
-          download="tokens.json"
+          // download=''
           variant="primary"
         >
           Download

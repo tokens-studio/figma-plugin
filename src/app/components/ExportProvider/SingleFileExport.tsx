@@ -101,7 +101,7 @@ export default function SingleFileExport({ onCancel }: Props) {
           download="tokens.json"
           variant="primary"
         >
-          Download
+          Export
         </Button>
       </Stack>
     </Stack>
