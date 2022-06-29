@@ -25,7 +25,7 @@ type ExtendedTreeItem = TreeItem & {
   onRename: (tokenSet: string) => void;
   onDelete: (tokenSet: string) => void;
   onDuplicate: (tokenSet: string) => void;
-  saveScrollPosition: (tokenSet: string) => void;
+  saveScrollPositionSet: (tokenSet: string) => void;
 };
 type TreeRenderFunction = (props: React.PropsWithChildren<{
   item: ExtendedTreeItem
@@ -36,7 +36,7 @@ type Props = {
   onDelete: (tokenSet: string) => void;
   onReorder: (sets: string[]) => void;
   onDuplicate: (tokenSet: string) => void;
-  saveScrollPosition: (tokenSet: string) => void;
+  saveScrollPositionSet: (tokenSet: string) => void;
 };
 
 function TokenSetListItem({ item, children }: Parameters<TreeRenderFunction>[0]) {
@@ -77,14 +77,14 @@ export function TokenSetListItemContent({ item }: Parameters<TreeRenderFunction>
         const userChoice = await confirm({ text: 'You have unsaved changes.', description: 'Your changes will be discarded.' });
         if (userChoice) {
           dispatch.tokenState.setActiveTokenSet(set.path);
-          item.saveScrollPosition(activeTokenSet);
+          item.saveScrollPositionSet(activeTokenSet);
         }
       } else {
         dispatch.tokenState.setActiveTokenSet(set.path);
-        item.saveScrollPosition(activeTokenSet);
+        item.saveScrollPositionSet(activeTokenSet);
       }
     }
-  }, [confirm, dispatch, hasUnsavedChanges, item.saveScrollPosition, activeTokenSet]);
+  }, [confirm, dispatch, hasUnsavedChanges, item.saveScrollPositionSet, activeTokenSet]);
 
   const handleCheckedChange = useCallback((checked: boolean, item: TreeItem) => {
     dispatch.tokenState.toggleUsedTokenSet(item.path);
@@ -125,7 +125,7 @@ export default function TokenSetList({
   onDelete,
   onReorder,
   onDuplicate,
-  saveScrollPosition,
+  saveScrollPositionSet,
 }: Props) {
   const [items, setItems] = React.useState(tokenSetListToList(tokenSets));
 
@@ -136,9 +136,9 @@ export default function TokenSetList({
       onRename,
       onDelete,
       onDuplicate,
-      saveScrollPosition,
+      saveScrollPositionSet,
     } as unknown as ExtendedTreeItem))
-  ), [items, tokenSets, onRename, onDelete, onDuplicate, saveScrollPosition]);
+  ), [items, tokenSets, onRename, onDelete, onDuplicate, saveScrollPositionSet]);
 
   const handleReorder = React.useCallback((reorderedItems: ExtendedTreeItem[]) => {
     const nextItems = compact(

@@ -208,7 +208,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
     }
   }, [tokens, stringTokens, activeTokenSet]);
 
-  const saveScrollPosition = React.useCallback((tokenSet: string) => {
+  const saveScrollPositionSet = React.useCallback((tokenSet: string) => {
     if (tokenDiv.current) {
       dispatch.uiState.setScrollPositionSet({ ...scrollPositionSet, [tokenSet]: tokenDiv.current?.scrollTop });
     }
@@ -296,7 +296,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
         >
           {tokenSetsVisible && (
             <Box>
-              <TokenSetSelector saveScrollPosition={saveScrollPosition} />
+              <TokenSetSelector saveScrollPositionSet={saveScrollPositionSet} />
             </Box>
           )}
           <Box
