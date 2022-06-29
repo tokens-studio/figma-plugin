@@ -13,7 +13,16 @@ import {
   BranchSwitchMenuArrow,
 } from './BranchSwitchMenu';
 import {
-  branchSelector, lastSyncedStateSelector, tokensSelector, localApiStateBranchSelector, apiSelector, usedTokenSetSelector, localApiStateSelector, themesListSelector, activeThemeSelector,
+  branchSelector,
+  lastSyncedStateSelector,
+  tokensSelector,
+  localApiStateBranchSelector,
+  apiSelector,
+  usedTokenSetSelector,
+  localApiStateSelector,
+  themesListSelector,
+  activeThemeSelector,
+  storageTypeSelector,
 } from '@/selectors';
 import useRemoteTokens from '../store/remoteTokens';
 import useConfirm from '@/app/hooks/useConfirm';
@@ -21,6 +30,7 @@ import CreateBranchModal from './modals/CreateBranchModal';
 import { Dispatch } from '../store';
 import { BranchSwitchMenuRadioElement } from './BranchSwitchMenuRadioElement';
 import { isGitProvider } from '@/utils/is';
+import { stringifyLastSyncedState } from '@/utils/stringifyLastSyncedState';
 
 const BranchSwitchMenuItemElement: React.FC<{
   branch: string
@@ -49,6 +59,7 @@ export default function BranchSelector() {
   const tokens = useSelector(tokensSelector);
   const themes = useSelector(themesListSelector);
 
+  const storageType = useSelector(storageTypeSelector);
   const localApiState = useSelector(localApiStateSelector);
   const localApiStateBranch = useSelector(localApiStateBranchSelector);
   const apiData = useSelector(apiSelector);
@@ -66,9 +77,14 @@ export default function BranchSelector() {
   }, [localApiStateBranch, setCurrentBranch]);
 
   const checkForChanges = React.useCallback(() => {
-    const hasChanged = (lastSyncedState !== JSON.stringify([tokens, themes], null, 2));
+    const tokenSetOrder = Object.keys(tokens);
+    const hasChanged = (lastSyncedState !== stringifyLastSyncedState(
+      tokens,
+      themes,
+      isGitProvider(storageType) ? { tokenSetOrder } : null,
+    ));
     return hasChanged;
-  }, [lastSyncedState, tokens, themes]);
+  }, [lastSyncedState, tokens, themes, storageType]);
 
   const hasChanges = React.useMemo(() => checkForChanges(), [checkForChanges]);
 
