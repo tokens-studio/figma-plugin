@@ -69,6 +69,9 @@ async function updateRemoteTokens({
     case StorageProviderType.ADO: {
       break;
     }
+    case StorageProviderType.SUPERNOVA: {
+      break;
+    }
     default:
       throw new Error('Not implemented');
   }

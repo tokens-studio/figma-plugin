@@ -43,7 +43,7 @@
         "@stitches/react": "^1.2.7",
         "@storybook/addon-postcss": "^2.0.0",
         "@welldone-software/why-did-you-render": "^6.2.3",
-        "@supernovaio/supernova-sdk": "1.7.10",
+        "@supernovaio/supernova-sdk": "1.7.11",
         "autoprefixer": "^10.2.5",
         "axios": "^0.21.2",
         "azure-devops-node-api": "^11.1.1",

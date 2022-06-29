@@ -66,6 +66,8 @@ export default function Footer() {
         return 'ADO';
       case StorageProviderType.URL:
         return 'URL';
+      case StorageProviderType.SUPERNOVA:
+        return 'Supernova.io';
       default:
         return provider;
     }
@@ -95,10 +97,17 @@ export default function Footer() {
             <IconButton badge={hasChanges} icon={<UploadIcon />} onClick={onPushButtonClicked} tooltipSide="top" disabled={editProhibited} tooltip={`Push to ${transformProviderName(storageType.provider)}`} />
           </>
         )}
+        {storageType.provider === StorageProviderType.SUPERNOVA && (
+          <>
+            <IconButton icon={<DownloadIcon />} onClick={onPullButtonClicked} tooltipSide="top" tooltip={`Pull from ${transformProviderName(storageType.provider)}`} />
+            <IconButton badge={hasChanges} icon={<UploadIcon />} onClick={onPushButtonClicked} tooltipSide="top" disabled={editProhibited} tooltip={`Push to ${transformProviderName(storageType.provider)}`} />
+          </>
+        )}
         {storageType.provider !== StorageProviderType.LOCAL
           && storageType.provider !== StorageProviderType.GITHUB
           && storageType.provider !== StorageProviderType.GITLAB
           && storageType.provider !== StorageProviderType.ADO
+          && storageType.provider !== StorageProviderType.SUPERNOVA
           && (
             <Stack align="center" direction="row" gap={2}>
               <Text muted>Sync</Text>

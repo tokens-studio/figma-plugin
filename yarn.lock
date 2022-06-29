@@ -4659,10 +4659,10 @@
     regenerator-runtime "^0.13.7"
     resolve-from "^5.0.0"
 
-"@supernovaio/supernova-sdk@1.7.10":
-  version "1.7.10"
-  resolved "https://registry.yarnpkg.com/@supernovaio/supernova-sdk/-/supernova-sdk-1.7.10.tgz#80926e8ef8ee0343be5335f922f14e376840ba94"
-  integrity sha512-20qmmJWG55R0S+jiPere/LIHpyxkHm/nGLiGMVTdsEwVxe4+RBmNsjl4xu/t97Hs+VoBgZbG37qs+M5uIfLNQg==
+"@supernovaio/supernova-sdk@1.7.11":
+  version "1.7.11"
+  resolved "https://registry.yarnpkg.com/@supernovaio/supernova-sdk/-/supernova-sdk-1.7.11.tgz#9d7f37520237228b39f3053fbf43cf96748be3c3"
+  integrity sha512-ohVBQeEDgoxa0fMufElHbgHSj5lICcQsLM6BCSIqfoWdB7k3Q4YqwynWH2+yfov1Q7gGBybl00+jDBVCuIMpEg==
   dependencies:
     abab "^2.0.5"
     async-mutex "^0.3.1"
