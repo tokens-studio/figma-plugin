@@ -9,7 +9,7 @@ import Tooltip from './Tooltip';
 import { Dispatch } from '../store';
 import { TokenTypes } from '@/constants/TokenTypes';
 import {
-  collapsedSelector, displayTypeSelector, editProhibitedSelector, showEmptyGroupsSelector,
+  collapsedSelector, collapsedTokenTypeObjSelector, displayTypeSelector, editProhibitedSelector, showEmptyGroupsSelector,
 } from '@/selectors';
 import IconButton from './IconButton';
 import ListIcon from '@/icons/list.svg';
@@ -37,12 +37,11 @@ const TokenListing: React.FC<Props> = ({
   const displayType = useSelector(displayTypeSelector);
   const showEmptyGroups = useSelector(showEmptyGroupsSelector);
   const collapsed = useSelector(collapsedSelector);
+  const collapsedTokenTypeObj = useSelector(collapsedTokenTypeObjSelector);
   const dispatch = useDispatch<Dispatch>();
   const { gitBranchSelector } = useFlags();
 
   const showDisplayToggle = React.useMemo(() => schema.type === TokenTypes.COLOR, [schema.type]);
-
-  const [isIntCollapsed, setIntCollapsed] = React.useState(false);
 
   const showForm = React.useCallback(({ token, name, isPristine = false }: ShowFormOptions) => {
     dispatch.uiState.setShowEditForm(true);
@@ -71,13 +70,9 @@ const TokenListing: React.FC<Props> = ({
     if (e.altKey) {
       dispatch.uiState.toggleCollapsed();
     } else {
-      setIntCollapsed(!isIntCollapsed);
+      dispatch.tokenState.setCollapsedTokenTypeObj({ ...collapsedTokenTypeObj, [tokenKey]: !collapsedTokenTypeObj[tokenKey as TokenTypes] });
     }
-  }, [dispatch, isIntCollapsed]);
-
-  React.useEffect(() => {
-    setIntCollapsed(collapsed);
-  }, [collapsed]);
+  }, [dispatch, collapsedTokenTypeObj]);
 
   if (!values && !showEmptyGroups) return null;
 
@@ -86,7 +81,7 @@ const TokenListing: React.FC<Props> = ({
       <div className="relative flex items-center justify-between space-x-8">
         <button
           className={`flex items-center w-full h-full p-4 space-x-2 hover:bg-background-subtle focus:outline-none ${
-            isIntCollapsed ? 'opacity-50' : null
+            collapsedTokenTypeObj[tokenKey as TokenTypes] ? 'opacity-50' : null
           }`}
           data-cy={`tokenlisting-header-${tokenKey}`}
           type="button"
@@ -94,7 +89,7 @@ const TokenListing: React.FC<Props> = ({
         >
           <Tooltip label={`Alt + Click to ${collapsed ? 'expand' : 'collapse'} all`}>
             <div className="p-2 -m-2">
-              {isIntCollapsed ? (
+              {collapsedTokenTypeObj[tokenKey as TokenTypes] ? (
                 <svg width="6" height="6" viewBox="0 0 6 6" xmlns="http://www.w3.org/2000/svg">
                   <path d="M5 3L1 0v6l4-3z" fill="currentColor" />
                 </svg>
@@ -126,7 +121,7 @@ const TokenListing: React.FC<Props> = ({
       {values && (
         <DndProvider backend={HTML5Backend}>
           <div
-            className={`px-4 pb-4 ${isIntCollapsed ? 'hidden' : null}`}
+            className={`px-4 pb-4 ${collapsedTokenTypeObj[tokenKey as TokenTypes] ? 'hidden' : null}`}
             data-cy={`tokenlisting-${tokenKey}-content`}
           >
             <TokenTree

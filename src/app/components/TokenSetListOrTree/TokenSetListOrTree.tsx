@@ -35,8 +35,6 @@ export function TokenSetListOrTree<T extends TreeOrListItem>({
   const dispatch = useDispatch<Dispatch>();
 
   const handleToggleCollapsed = useCallback((key: string) => {
-    console.log('collapse', collapsed);
-    console.log('ddddddd', collapsed.includes(key) ? collapsed.filter((s) => s !== key) : [...collapsed, key]);
     dispatch.tokenState.setCollapsedTokenSets(collapsed.includes(key) ? collapsed.filter((s) => s !== key) : [...collapsed, key]);
   }, [collapsed]);
 
