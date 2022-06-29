@@ -134,8 +134,6 @@ export function useGitHub() {
   }, [dispatch, storageClientFactory]);
 
   const pullTokensFromGitHub = useCallback(async (context: GithubCredentials, receivedFeatureFlags?: LDProps['flags']) => {
-    console.log('pullTokensFromGitHub');
-
     const storage = storageClientFactory(context);
     if (receivedFeatureFlags?.multiFileSync) storage.enableMultiFile();
 
@@ -145,7 +143,6 @@ export function useGitHub() {
 
     try {
       const content = await storage.retrieve();
-      console.log('content', content);
 
       if (content) {
         const sortedTokens = applyTokenSetOrder(content.tokens, content.metadata?.tokenSetOrder ?? []);

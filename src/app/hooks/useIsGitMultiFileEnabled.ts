@@ -1,8 +1,8 @@
 import { useSelector } from 'react-redux';
 import { useMemo } from 'react';
-import { useFlags } from 'launchdarkly-react-client-sdk';
 import { apiSelector } from '@/selectors';
 import { StorageProviderType } from '@/constants/StorageProviderType';
+import { useFlags } from '../components/LaunchDarkly';
 
 export function useIsGitMultiFileEnabled() {
   const api = useSelector(apiSelector);

@@ -30,7 +30,7 @@ import CreateBranchModal from './modals/CreateBranchModal';
 import { Dispatch } from '../store';
 import { BranchSwitchMenuRadioElement } from './BranchSwitchMenuRadioElement';
 import { isGitProvider } from '@/utils/is';
-import { stringifyLastSyncedState } from '@/utils/stringifyLastSyncedState';
+import { compareLastSyncedState } from '@/utils/compareLastSyncedState';
 
 const BranchSwitchMenuItemElement: React.FC<{
   branch: string
@@ -78,11 +78,14 @@ export default function BranchSelector() {
 
   const checkForChanges = React.useCallback(() => {
     const tokenSetOrder = Object.keys(tokens);
-    const hasChanged = (lastSyncedState !== stringifyLastSyncedState(
+    const defaultMetadata = isGitProvider(storageType) ? { tokenSetOrder } : {};
+    const hasChanged = !compareLastSyncedState(
       tokens,
       themes,
-      isGitProvider(storageType) ? { tokenSetOrder } : null,
-    ));
+      defaultMetadata,
+      lastSyncedState,
+      [{}, [], defaultMetadata],
+    );
     return hasChanged;
   }, [lastSyncedState, tokens, themes, storageType]);
 
