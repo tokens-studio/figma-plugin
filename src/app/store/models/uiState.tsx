@@ -327,13 +327,13 @@ export const uiState = createModel<RootModel>()({
     setActiveTab: (payload: Tabs) => {
       const requiresSelectionValues = payload === Tabs.INSPECTOR;
 
-      AsyncMessageChannel.message({
+      AsyncMessageChannel.ReactInstance.message({
         type: AsyncMessageTypes.CHANGED_TABS,
         requiresSelectionValues,
       });
     },
     toggleShowEmptyGroups(payload: null | boolean, rootState) {
-      AsyncMessageChannel.message({
+      AsyncMessageChannel.ReactInstance.message({
         type: AsyncMessageTypes.SET_SHOW_EMPTY_GROUPS,
         showEmptyGroups: payload == null ? rootState.uiState.showEmptyGroups : payload,
       });

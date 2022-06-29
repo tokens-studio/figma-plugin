@@ -40,11 +40,12 @@ export function Initiator() {
   }, [confirm]);
 
   const onInitiate = useCallback(() => {
-    AsyncMessageChannel.message({ type: AsyncMessageTypes.INITIATE });
+    console.log('onInitiate');
+    AsyncMessageChannel.ReactInstance.message({ type: AsyncMessageTypes.INITIATE });
   }, []);
 
   const getApiCredentials = useCallback((shouldPull: boolean, featureFlags: LDProps['flags'] | null) => (
-    AsyncMessageChannel.message({
+    AsyncMessageChannel.ReactInstance.message({
       type: AsyncMessageTypes.GET_API_CREDENTIALS,
       shouldPull,
       featureFlags,

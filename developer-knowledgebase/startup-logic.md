@@ -31,5 +31,21 @@ However, for everyone's understanding the current logic is as follows:
 | `plugin/asyncMessageHandlers/initiate.ts` | `37` | This notifies the UI of the saved storage type. |  |
 | `app/components/Initiator.tsx` | `139-141` | This is the handler which receives storage type from the plugin | |
 | `app/store/models/uiState.tsx` | `225-230` | Here we just store the storage type locally. | |
+| `plugin/asyncMessageHandlers/initiate.ts` | `39-40` | Here we read the locally saved API providers and notify the UI of these. | ✅ |
+| `app/components/Initiator.tsx` | `188-191` | This is the handler which receives the API providers from the plugin | ✅ |
+| `app/store/models/uiState.tsx` | `243-248` | Here we just store the received API providers locally | ✅ |
+| `plugin/asyncMessageHandlers/initiate.ts` | `41-51` | Here we are reading the local token data and inform the UI of these. If these are not the same as the last pushed values (for remote storage), the user should be prompted whether to use these values or whether to discard them. | ✅ |
+| `app/components/Initiator.tsx` | `95-114` | This is the handler which receives the local token values from the plugin | ✅ |
+| `utils/fetchFeatureFlags.ts` | `...` | This utility function is used to fetch the available feature flags based on the license. This is required to determine the available functions | ✅ |
+| `app/components/Initiator.tsx` | `46-52` | This code can be triggered if the user confirms pulling the tokens or if there are no pending changes. | ✅ |
+| `plugin/asyncMessageHandlers/getApiCredentials.ts` | `...` | This is the handler for the `GET_API_CREDENTIALS` message. It will get the locally stored API credentials and attempt to match it with the selected storage provider. | ✅ |
+| `plugin/compareProviders.ts` | `...` | This code informs the UI of the matched API credentials or informs the UI that there are no matching credentials stored locally. | ✅ |
+| `app/components/Initiator.tsx` | `142-187` | This is the handler which receives the API credentials from the plugin. This is also where we will actually pull the tokens. | ✅ |
+
+As you may notice this logic is quite scattered and should/can be optimized as proposed below.
 
 ## [TODO] Desired situation
+We should simply split up the logic in 2 parts - the plugin side and the client side.
+1. First we need to get all the locally stored data as well as the user information and send it to the client. This is the base starting point for our UI.
+2. We can use this information to determine the license validity, get the feature flags and fetch the remote data all in one go.
+3. Any information that needs to be updated on the plugin side can be sent back once.

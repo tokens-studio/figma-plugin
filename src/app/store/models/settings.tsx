@@ -26,7 +26,7 @@ export interface SettingsState {
 }
 
 const setUI = (state: SettingsState) => {
-  AsyncMessageChannel.message({
+  AsyncMessageChannel.ReactInstance.message({
     type: AsyncMessageTypes.SET_UI,
     ...state,
   });
@@ -128,14 +128,14 @@ export const settings = createModel<RootModel>()({
   },
   effects: () => ({
     setWindowSize: (payload) => {
-      AsyncMessageChannel.message({
+      AsyncMessageChannel.ReactInstance.message({
         type: AsyncMessageTypes.RESIZE_WINDOW,
         width: payload.width,
         height: payload.height,
       });
     },
     setMinimizePluginWindow: (payload) => {
-      AsyncMessageChannel.message({
+      AsyncMessageChannel.ReactInstance.message({
         type: AsyncMessageTypes.RESIZE_WINDOW,
         width: payload.isMinimized ? 50 : payload.width,
         height: payload.isMinimized ? 50 : payload.height,

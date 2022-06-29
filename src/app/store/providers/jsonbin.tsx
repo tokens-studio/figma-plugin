@@ -74,7 +74,7 @@ export function useJSONbin() {
         themes,
         updatedAt,
       });
-      AsyncMessageChannel.message({
+      AsyncMessageChannel.ReactInstance.message({
         type: AsyncMessageTypes.CREDENTIALS,
         credential: {
           provider: StorageProviderType.JSONBIN,
@@ -103,7 +103,7 @@ export function useJSONbin() {
       const data = await storage.retrieve();
       dispatch.uiState.setProjectURL(`https://jsonbin.io/${id}`);
 
-      AsyncMessageChannel.message({
+      AsyncMessageChannel.ReactInstance.message({
         type: AsyncMessageTypes.CREDENTIALS,
         credential: {
           id,
