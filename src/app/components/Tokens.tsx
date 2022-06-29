@@ -110,17 +110,9 @@ function Tokens({ isActive }: { isActive: boolean }) {
 
   React.useEffect(() => {
     if (tokenDiv.current) {
-      tokenDiv.current.addEventListener('scroll', () => { }, false);
+      tokenDiv.current.addEventListener('scroll', () => {}, false);
     }
   }, [tokenDiv.current]);
-
-  React.useEffect(() => {
-    return () => {
-      if (tokenDiv.current) {
-        tokenDiv.current.removeEventListener('scroll', () => { }, false);
-      }
-    };
-  }, []);
 
   React.useEffect(() => {
     if (scrollPositionSet && tokenDiv.current) {
