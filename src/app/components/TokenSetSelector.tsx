@@ -49,6 +49,14 @@ export default function TokenSetSelector() {
   const tokenKeys = Object.keys(tokens).join(',');
 
   React.useEffect(() => {
+    const scollPositionSet = allTokenSets.reduce<Record<string, number>>((acc, crr) => {
+      acc[crr] = 0;
+      return acc;
+    }, {});
+    dispatch.uiState.setScrollPositionSet(scollPositionSet);
+  }, [allTokenSets, dispatch]);
+
+  React.useEffect(() => {
     setAllTokenSets(Object.keys(tokens));
   }, [tokenKeys]);
 

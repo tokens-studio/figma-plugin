@@ -7,6 +7,7 @@ import { Dispatch } from '../store';
 import {
   activeTokenSetSelector,
   editProhibitedSelector,
+  scrollPositionSetSelector,
   usedTokenSetSelector,
 } from '@/selectors';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
@@ -19,6 +20,7 @@ export default function TokenSetTree({
   const activeTokenSet = useSelector(activeTokenSetSelector);
   const usedTokenSet = useSelector(usedTokenSetSelector);
   const editProhibited = useSelector(editProhibitedSelector);
+  const scrollPositionSet = useSelector(scrollPositionSetSelector);
   const dispatch = useDispatch<Dispatch>();
   const [items, setItems] = useState<TreeItem[]>(tokenSetListToTree(tokenSets));
 
@@ -74,6 +76,7 @@ export default function TokenSetTree({
   const handleClick = useCallback((set: typeof items[number]) => {
     if (set.isLeaf) {
       dispatch.tokenState.setActiveTokenSet(set.path);
+      dispatch.uiState.setScrollPositionSet({ ...scrollPositionSet, [activeTokenSet]: document.getElementById('tokenBox')?.scrollTop ?? 0 });
     }
   }, [dispatch]);
 

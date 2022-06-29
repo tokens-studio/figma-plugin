@@ -12,6 +12,7 @@ import {
   activeTokenSetSelector,
   editProhibitedSelector,
   hasUnsavedChangesSelector,
+  scrollPositionSetSelector,
   usedTokenSetSelector,
 } from '@/selectors';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
@@ -67,6 +68,7 @@ export function TokenSetListItemContent({ item }: Parameters<TreeRenderFunction>
   const usedTokenSet = useSelector(usedTokenSetSelector);
   const editProhibited = useSelector(editProhibitedSelector);
   const hasUnsavedChanges = useSelector(hasUnsavedChangesSelector);
+  const scrollPositionSet = useSelector(scrollPositionSetSelector);
   const dispatch = useDispatch<Dispatch>();
 
   const handleClick = useCallback(async (set: TreeItem) => {
@@ -75,9 +77,11 @@ export function TokenSetListItemContent({ item }: Parameters<TreeRenderFunction>
         const userChoice = await confirm({ text: 'You have unsaved changes.', description: 'Your changes will be discarded.' });
         if (userChoice) {
           dispatch.tokenState.setActiveTokenSet(set.path);
+          dispatch.uiState.setScrollPositionSet({ ...scrollPositionSet, [activeTokenSet]: document.getElementById('tokenBox')?.scrollTop ?? 0 });
         }
       } else {
         dispatch.tokenState.setActiveTokenSet(set.path);
+        dispatch.uiState.setScrollPositionSet({ ...scrollPositionSet, [activeTokenSet]: document.getElementById('tokenBox')?.scrollTop ?? 0 });
       }
     }
   }, [confirm, dispatch, hasUnsavedChanges]);
