@@ -83,7 +83,8 @@ textarea::-webkit-scrollbar-thumb {
 }
 
 .content-dark::-webkit-scrollbar-thumb {
-  @apply bg-gray-400 border-gray-700;
+  background-color: var(--colors-contextMenuForegroundMuted, #000) !important;
+  border-color: var(--colors-contextMenuBackground, #333) !important;
   border-radius: 9px;
   border: 2px solid;
 }
