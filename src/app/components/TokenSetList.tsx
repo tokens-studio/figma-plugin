@@ -12,7 +12,6 @@ import {
   activeTokenSetSelector,
   editProhibitedSelector,
   hasUnsavedChangesSelector,
-  scrollPositionSetSelector,
   usedTokenSetSelector,
 } from '@/selectors';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
@@ -26,6 +25,7 @@ type ExtendedTreeItem = TreeItem & {
   onRename: (tokenSet: string) => void;
   onDelete: (tokenSet: string) => void;
   onDuplicate: (tokenSet: string) => void;
+  saveScrollPosition: (tokenSet: string) => void;
 };
 type TreeRenderFunction = (props: React.PropsWithChildren<{
   item: ExtendedTreeItem
@@ -36,6 +36,7 @@ type Props = {
   onDelete: (tokenSet: string) => void;
   onReorder: (sets: string[]) => void;
   onDuplicate: (tokenSet: string) => void;
+  saveScrollPosition: (tokenSet: string) => void;
 };
 
 function TokenSetListItem({ item, children }: Parameters<TreeRenderFunction>[0]) {
@@ -68,7 +69,6 @@ export function TokenSetListItemContent({ item }: Parameters<TreeRenderFunction>
   const usedTokenSet = useSelector(usedTokenSetSelector);
   const editProhibited = useSelector(editProhibitedSelector);
   const hasUnsavedChanges = useSelector(hasUnsavedChangesSelector);
-  const scrollPositionSet = useSelector(scrollPositionSetSelector);
   const dispatch = useDispatch<Dispatch>();
 
   const handleClick = useCallback(async (set: TreeItem) => {
@@ -77,14 +77,14 @@ export function TokenSetListItemContent({ item }: Parameters<TreeRenderFunction>
         const userChoice = await confirm({ text: 'You have unsaved changes.', description: 'Your changes will be discarded.' });
         if (userChoice) {
           dispatch.tokenState.setActiveTokenSet(set.path);
-          dispatch.uiState.setScrollPositionSet({ ...scrollPositionSet, [activeTokenSet]: document.getElementById('tokenBox')?.scrollTop ?? 0 });
+          item.saveScrollPosition(activeTokenSet);
         }
       } else {
         dispatch.tokenState.setActiveTokenSet(set.path);
-        dispatch.uiState.setScrollPositionSet({ ...scrollPositionSet, [activeTokenSet]: document.getElementById('tokenBox')?.scrollTop ?? 0 });
+        item.saveScrollPosition(activeTokenSet);
       }
     }
-  }, [confirm, dispatch, hasUnsavedChanges]);
+  }, [confirm, dispatch, hasUnsavedChanges, item.saveScrollPosition, activeTokenSet]);
 
   const handleCheckedChange = useCallback((checked: boolean, item: TreeItem) => {
     dispatch.tokenState.toggleUsedTokenSet(item.path);
@@ -125,6 +125,7 @@ export default function TokenSetList({
   onDelete,
   onReorder,
   onDuplicate,
+  saveScrollPosition,
 }: Props) {
   const [items, setItems] = React.useState(tokenSetListToList(tokenSets));
 
@@ -135,8 +136,9 @@ export default function TokenSetList({
       onRename,
       onDelete,
       onDuplicate,
+      saveScrollPosition,
     } as unknown as ExtendedTreeItem))
-  ), [items, tokenSets, onRename, onDelete, onDuplicate]);
+  ), [items, tokenSets, onRename, onDelete, onDuplicate, saveScrollPosition]);
 
   const handleReorder = React.useCallback((reorderedItems: ExtendedTreeItem[]) => {
     const nextItems = compact(

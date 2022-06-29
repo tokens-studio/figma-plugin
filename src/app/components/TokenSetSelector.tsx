@@ -34,7 +34,7 @@ const StyledButton = styled('button', {
   },
 });
 
-export default function TokenSetSelector() {
+export default function TokenSetSelector({saveScrollPosition} : {saveScrollPosition: (tokenSet: string) => void}) {
   const tokens = useSelector(tokensSelector);
   const editProhibited = useSelector(editProhibitedSelector);
   const mfsEnabled = useIsGitMultiFileEnabled();
@@ -151,6 +151,7 @@ export default function TokenSetSelector() {
             onRename={handleRenameTokenSet}
             onDelete={handleDelete}
             onDuplicate={handleDuplicateTokenSet}
+            saveScrollPosition={saveScrollPosition}
           />
         </Box>
       ) : (
@@ -160,6 +161,7 @@ export default function TokenSetSelector() {
           onRename={handleRenameTokenSet}
           onDelete={handleDeleteTokenSet}
           onDuplicate={handleDuplicateTokenSet}
+          saveScrollPosition={saveScrollPosition}
         />
       )}
       <Modal

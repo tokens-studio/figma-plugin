@@ -110,14 +110,16 @@ function Tokens({ isActive }: { isActive: boolean }) {
 
   React.useEffect(() => {
     if (tokenDiv.current) {
-      tokenDiv.current.addEventListener('scroll', () => {}, false);
+      tokenDiv.current.addEventListener('scroll', () => { }, false);
     }
   }, [tokenDiv.current]);
 
-  React.useEffect(() => () => {
-    if (tokenDiv.current) {
-      tokenDiv.current.removeEventListener('scroll', () => {}, false);
-    }
+  React.useEffect(() => {
+    return () => {
+      if (tokenDiv.current) {
+        tokenDiv.current.removeEventListener('scroll', () => { }, false);
+      }
+    };
   }, []);
 
   React.useEffect(() => {
@@ -214,6 +216,12 @@ function Tokens({ isActive }: { isActive: boolean }) {
     }
   }, [tokens, stringTokens, activeTokenSet]);
 
+  const saveScrollPosition = React.useCallback((tokenSet: string) => {
+    if (tokenDiv.current) {
+      dispatch.uiState.setScrollPositionSet({ ...scrollPositionSet, [tokenSet]: tokenDiv.current?.scrollTop });
+    }
+  }, [scrollPositionSet]);
+
   if (!isActive) return null;
 
   return (
@@ -296,7 +304,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
         >
           {tokenSetsVisible && (
             <Box>
-              <TokenSetSelector />
+              <TokenSetSelector saveScrollPosition={saveScrollPosition} />
             </Box>
           )}
           <Box
@@ -317,7 +325,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
                 />
               </Box>
             ) : (
-              <Box id="tokenBox" ref={tokenDiv} css={{ width: '100%', paddingBottom: '$6' }} className="content scroll-container">
+              <Box ref={tokenDiv} css={{ width: '100%', paddingBottom: '$6' }} className="content scroll-container">
                 {memoizedTokens.map(([key, { values, isPro, ...schema }]) => (
                   <div key={key}>
                     <TokenListing
