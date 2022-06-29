@@ -1,12 +1,10 @@
-class MessageEvent extends Event {
-  constructor(data) {
-    super('message')
-    this.data = data;
-  }
-}
+/** @type {[string, (...args: any[]) => any][]} */
+const figmaUiOnHandlers = []
 
 module.exports.mockShowUI = jest.fn(() => {});
-module.exports.mockOn = jest.fn(() => {});
+module.exports.mockOn = jest.fn((eventName, handler) => {
+  figmaUiOnHandlers.push([eventName, handler]);
+});
 module.exports.mockGetAsync = jest.fn(() => Promise.resolve());
 module.exports.mockSetAsync = jest.fn(() => Promise.resolve());
 module.exports.mockNotify = jest.fn(() => Promise.resolve({}));
@@ -21,14 +19,13 @@ module.exports.mockImportStyleByKeyAsync = jest.fn(() => Promise.reject());
 module.exports.mockUiOn = jest.fn(() => {});
 module.exports.mockRootSetSharedPluginData = jest.fn(() => {});
 module.exports.mockRootGetSharedPluginData = jest.fn(() => {});
-module.exports.mockPostMessage = jest.fn((message) => {
-  window.dispatchEvent(new MessageEvent({
-    pluginMessage: message,
-  }))
+module.exports.mockPostMessage = jest.fn(() => Promise.resolve());
+module.exports.mockParentPostMessage = jest.fn((data) => {
+  figmaUiOnHandlers
+    .filter(([eventName]) => eventName === 'message')
+    .forEach(([,handler]) => handler({ data }))
 });
-
-global.__html__ = '';
-global.figma = {
+module.exports.figma = {
   showUI: module.exports.mockShowUI,
   on: module.exports.mockOn,
   clientStorage: {
@@ -53,3 +50,7 @@ global.figma = {
   createEffectStyle: module.exports.mockCreateEffectStyle,
   importStyleByKeyAsync: module.exports.mockImportStyleByKeyAsync,
 };
+
+parent.postMessage = module.exports.mockParentPostMessage;
+global.figma = module.exports.figma;
+global.__html__ = '';

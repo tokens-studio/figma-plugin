@@ -40,7 +40,6 @@ export function Initiator() {
   }, [confirm]);
 
   const onInitiate = useCallback(() => {
-    console.log('onInitiate');
     AsyncMessageChannel.ReactInstance.message({ type: AsyncMessageTypes.INITIATE });
   }, []);
 
