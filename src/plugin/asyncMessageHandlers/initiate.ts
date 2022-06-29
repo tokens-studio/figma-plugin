@@ -22,6 +22,7 @@ export const initiate: AsyncMessageChannelHandlers[AsyncMessageTypes.INITIATE] =
     const userId = await getUserId();
     const lastOpened = await getLastOpened();
     const storageType = await getSavedStorageType();
+    console.log(storageType);
     store.inspectDeep = settings.inspectDeep;
     if (currentUser) {
       notifyUserId({
@@ -38,6 +39,7 @@ export const initiate: AsyncMessageChannelHandlers[AsyncMessageTypes.INITIATE] =
 
     const apiProviders = await ApiProvidersProperty.read();
     if (apiProviders) notifyAPIProviders(apiProviders);
+    console.log(apiProviders);
     const oldTokens = await getTokenData();
     if (oldTokens) {
       notifyTokenValues(

@@ -158,7 +158,8 @@ export function Initiator() {
                     const branches = await fetchBranches(credentials as StorageTypeCredentials);
                     if (branches) dispatch.branchState.setBranches(branches);
                   }
-
+                
+                  console.log('loading credentials');
                   console.log(credentials);
                   dispatch.uiState.setApiData(credentials);
                   dispatch.uiState.setLocalApiState(credentials);

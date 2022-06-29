@@ -121,6 +121,7 @@ function ConfirmDialog() {
               {localApiState.provider === StorageProviderType.GITHUB && ' GitHub'}
               {localApiState.provider === StorageProviderType.GITLAB && ' GitLab'}
               {localApiState.provider === StorageProviderType.ADO && ' ADO'}
+              {localApiState.provider === StorageProviderType.SUPERNOVA && ' Supernova.io'}
             </Heading>
           </Stack>
         </Modal>
@@ -137,6 +138,7 @@ function ConfirmDialog() {
                 {localApiState.provider === StorageProviderType.GITHUB && ' GitHub'}
                 {localApiState.provider === StorageProviderType.GITLAB && ' GitLab'}
                 {localApiState.provider === StorageProviderType.ADO && ' ADO'}
+                {localApiState.provider === StorageProviderType.SUPERNOVA && ' Supernova.io'}
                 .
               </div>
             </div>

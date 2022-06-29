@@ -23,6 +23,7 @@ export const getApiCredentials: AsyncMessageChannelHandlers[AsyncMessageTypes.GE
       case StorageProviderType.JSONBIN:
       case StorageProviderType.GITHUB:
       case StorageProviderType.GITLAB:
+      case StorageProviderType.SUPERNOVA:
       case StorageProviderType.ADO:
       case StorageProviderType.URL: {
         compareProvidersWithStored({

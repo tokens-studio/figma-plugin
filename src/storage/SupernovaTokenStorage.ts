@@ -54,7 +54,6 @@ export class SupernovaTokenStorage extends RemoteTokenStorage<SupernovaMetadata>
   }
 
   public async write(files: RemoteTokenStorageFile<SupernovaMetadata>[]): Promise<boolean> {
-    console.log("+++ WRITE");
     // Create Supernova instance, fetch design system and version
     const accessor = await this.readWriteInstance();
     // Use jSON token tool to synchronize tokens back to Supernova
@@ -73,14 +72,10 @@ export class SupernovaTokenStorage extends RemoteTokenStorage<SupernovaMetadata>
         }
         return acc;
       }, {}),
-    }, null, 2);
-    console.log(jsonDefinition);
+    }, null, 2); 
     // Merge remote with definition
-    // const incomingTokenPack = await tool.loadTokensFromDefinition(jsonDefinition);
-    console.log(`incoming token pack`);
-    console.log(incomingTokenPack);
-    // await tool.mergeWithRemoteSource(incomingTokenPack.processedNodes, true);
-    console.log(`merged with remote source`);
+    const incomingTokenPack = tool.loadTokensFromDefinition(jsonDefinition);
+    await tool.mergeWithRemoteSource(incomingTokenPack.processedNodes, true);
     return true;
   }
 
