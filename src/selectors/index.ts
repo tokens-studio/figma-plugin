@@ -42,3 +42,4 @@ export * from './tokenSetStatusSelector';
 export * from './allTokenSetsSelector';
 export * from './licenseStatusSelector';
 export * from './localApiStateBranchSelector';
+export * from './collapsedTokenSetsSelector';
