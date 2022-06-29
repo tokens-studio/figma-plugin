@@ -41,6 +41,7 @@ export class GitlabTokenStorage extends GitTokenStorage {
 
   public async assignProjectId() {
     const users = await this.gitlabClient.Users.username(this.owner);
+    // project is in the user namespace
     if (Array.isArray(users) && users.length > 0) {
       const projectsInPerson = await this.gitlabClient.Users.projects(users[0].id);
       const project = projectsInPerson.filter((p) => p.path === this.repository)[0];
@@ -50,12 +51,25 @@ export class GitlabTokenStorage extends GitTokenStorage {
       }
     }
 
+    // project is not in the user namespace
     if (!this.projectId) {
-      const projectsInGroup = await this.gitlabClient.Groups.projects(this.owner, { include_subgroups: true });
-      const project = projectsInGroup.filter((p) => p.path === this.repository)[0];
-      if (project) {
-        this.projectId = project.id;
-        this.groupId = project.namespace.id;
+      const groups = await this.gitlabClient.Groups.all();
+      let projects;
+
+      // gitlab saas - project is always in a group
+      if (groups.find((group) => group.path === this.owner)) {
+        projects = await this.gitlabClient.Groups.projects(this.owner, { include_subgroups: true });
+      } else {
+      // on prem gitlab
+        projects = await this.gitlabClient.Projects.all({ membership: true });
+      }
+
+      if (projects) {
+        const project = projects.filter((p) => p.path === this.repository)[0];
+        if (project) {
+          this.projectId = project.id;
+          this.groupId = project.namespace.id;
+        }
       }
     }
 
