@@ -4,4 +4,5 @@ export default function IsJSONString(str: string) {
   } catch (e) {
     return false;
   }
+  return true;
 }
