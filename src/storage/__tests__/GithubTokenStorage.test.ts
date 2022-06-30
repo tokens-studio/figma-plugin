@@ -307,6 +307,14 @@ describe('GithubTokenStorage', () => {
   });
 
   it('should be able to write', async () => {
+    mockGetContent.mockImplementationOnce(() => (
+      Promise.resolve({
+        data: {
+          content: 'ewogICJnbG9iYWwiOiB7CiAgICAicmVkIjogewogICAgICAidHlwZSI6ICJjb2xvciIsCiAgICAgICJuYW1lIjogInJlZCIsCiAgICAgICJ2YWx1ZSI6ICIjZmYwMDAwIgogICAgfSwKICAgICJibGFjayI6IHsKICAgICAgInR5cGUiOiAiY29sb3IiLAogICAgICAibmFtZSI6ICJibGFjayIsCiAgICAgICJ2YWx1ZSI6ICIjMDAwMDAwIgogICAgfQogIH0sCiAgIiR0aGVtZXMiOiBbCiAgICB7CiAgICAgICJpZCI6ICJsaWdodCIsCiAgICAgICJuYW1lIjogIkxpZ2h0IiwKICAgICAgInNlbGVjdGVkVG9rZW5TZXRzIjogewogICAgICAgICJnbG9iYWwiOiAiZW5hYmxlZCIKICAgICAgfQogICAgfQogIF0KfQ==',
+        },
+      })
+    ));
+
     mockCreateOrUpdateFiles.mockImplementationOnce(() => (
       Promise.resolve({
         data: {
@@ -453,6 +461,537 @@ describe('GithubTokenStorage', () => {
                 type: TokenTypes.COLOR,
                 name: 'red',
                 value: '#ff0000',
+              },
+            }, null, 2),
+          },
+        },
+      ],
+    });
+  });
+
+  it('should be able to rename and delete', async () => {
+    mockGetContent.mockImplementationOnce(() => (
+      Promise.resolve({
+        data: {
+          content: 'ewogICJnbG9iYWwiOiB7CiAgICAicmVkIjogewogICAgICAidHlwZSI6ICJjb2xvciIsCiAgICAgICJuYW1lIjogInJlZCIsCiAgICAgICJ2YWx1ZSI6ICIjZmYwMDAwIgogICAgfSwKICAgICJibGFjayI6IHsKICAgICAgInR5cGUiOiAiY29sb3IiLAogICAgICAibmFtZSI6ICJibGFjayIsCiAgICAgICJ2YWx1ZSI6ICIjMDAwMDAwIgogICAgfQogIH0sCiAgIiR0aGVtZXMiOiBbCiAgICB7CiAgICAgICJpZCI6ICJsaWdodCIsCiAgICAgICJuYW1lIjogIkxpZ2h0IiwKICAgICAgInNlbGVjdGVkVG9rZW5TZXRzIjogewogICAgICAgICJnbG9iYWwiOiAiZW5hYmxlZCIKICAgICAgfQogICAgfQogIF0KfQ==',
+        },
+      })
+    ));
+    mockCreateOrUpdateFiles.mockImplementationOnce(() => (
+      Promise.resolve({
+        data: {
+          content: {},
+        },
+      })
+    ));
+
+    storageProvider.changePath('data/tokens.json');
+    await storageProvider.write([
+      {
+        type: 'metadata',
+        path: 'metadata.json',
+        data: {
+          commitMessage: 'Initial commit',
+        },
+      },
+      {
+        type: 'themes',
+        path: '$themes.json',
+        data: [
+          {
+            id: 'light',
+            name: 'Light',
+            selectedTokenSets: {
+              global: TokenSetStatus.ENABLED,
+            },
+          },
+        ],
+      },
+      {
+        type: 'tokenSet',
+        name: 'global',
+        path: 'global.json',
+        data: {
+          red: {
+            type: TokenTypes.COLOR,
+            name: 'red',
+            value: '#ff0000',
+          },
+        },
+      },
+      {
+        type: 'tokenSet',
+        name: 'core-rename',
+        path: 'global.json',
+        data: {
+          red: {
+            type: TokenTypes.COLOR,
+            name: 'red',
+            value: '#ff0000',
+          },
+        },
+      },
+    ]);
+
+    expect(mockCreateOrUpdateFiles).toBeCalledWith({
+      branch: 'main',
+      owner: 'six7',
+      repo: 'figma-tokens',
+      createBranch: false,
+      changes: [
+        {
+          message: 'Initial commit',
+          files: {
+            'data/tokens.json': JSON.stringify({
+              $themes: [
+                {
+                  id: 'light',
+                  name: 'Light',
+                  selectedTokenSets: {
+                    global: TokenSetStatus.ENABLED,
+                  },
+                },
+              ],
+              global: {
+                red: {
+                  type: TokenTypes.COLOR,
+                  name: 'red',
+                  value: '#ff0000',
+                },
+              },
+              'core-rename': {
+                red: {
+                  type: TokenTypes.COLOR,
+                  name: 'red',
+                  value: '#ff0000',
+                },
+              },
+            }, null, 2),
+          },
+        },
+      ],
+    });
+  });
+
+  it('should be able to rename and delete a multifile structure', async () => {
+    mockGetContent.mockImplementation((opts: { path: string }) => {
+      if (opts.path === 'data') {
+        return Promise.resolve({
+          data: [
+            { path: 'data/$themes.json', sha: 'sha(data/$themes.json)', type: 'file' },
+            { path: 'data/global.json', sha: 'sha(data/global.json)', type: 'file' },
+            { path: 'data/core.json', sha: 'sha(data/core.json)', type: 'file' },
+            { path: 'data/internal.json', sha: 'sha(data/internal.json)', type: 'file' },
+          ],
+        });
+      }
+
+      if (opts.path === 'data/$themes.json') {
+        return Promise.resolve({
+          data: {
+            content: 'WwogIHsKICAgICJpZCI6ICJsaWdodCIsCiAgICAibmFtZSI6ICJMaWdodCIsCiAgICAic2VsZWN0ZWRUb2tlblNldHMiOiB7CiAgICAgICJnbG9iYWwiOiAiZW5hYmxlZCIKICAgIH0KICB9Cl0=',
+          },
+        });
+      }
+
+      if (opts.path === 'data/global.json') {
+        return Promise.resolve({
+          data: {
+            content: 'ewogICJyZWQiOiB7CiAgICAidHlwZSI6ICJjb2xvciIsCiAgICAibmFtZSI6ICJyZWQiLAogICAgInZhbHVlIjogIiNmZjAwMDAiCiAgfQp9',
+          },
+        });
+      }
+
+      if (opts.path === 'data/core.json') {
+        return Promise.resolve({
+          data: {
+            content: 'ewogICJyZWQiOiB7CiAgICAidHlwZSI6ICJjb2xvciIsCiAgICAibmFtZSI6ICJyZWQiLAogICAgInZhbHVlIjogIiNmZjAwMDAiCiAgfQp9',
+          },
+        });
+      }
+
+      if (opts.path === 'data/internal.json') {
+        return Promise.resolve({
+          data: {
+            content: 'ewogICJyZWQiOiB7CiAgICAidHlwZSI6ICJjb2xvciIsCiAgICAibmFtZSI6ICJyZWQiLAogICAgInZhbHVlIjogIiNmZjAwMDAiCiAgfQp9',
+          },
+        });
+      }
+
+      return Promise.reject();
+    });
+
+    mockCreateTree.mockImplementationOnce(() => (
+      Promise.resolve({
+        data: {
+          sha: 'sha(data)',
+          tree: [
+            {
+              type: 'tree',
+              path: 'data',
+              sha: 'sha(data)',
+            },
+          ],
+        },
+      })
+    ));
+
+    mockGetTree.mockImplementationOnce(() => (
+      Promise.resolve({
+        data: {
+          sha: 'sha(data)',
+          tree: [
+            { path: '$themes.json', type: 'blob', sha: 'sha($themes.json)' },
+            { path: 'global.json', type: 'blob', sha: 'sha(global.json)' },
+            { path: 'core.json', type: 'blob', sha: 'sha(core.json)' },
+            { path: 'internal.json', type: 'blob', sha: 'sha(internal.json)' },
+          ],
+        },
+      })
+    ));
+
+    mockCreateOrUpdateFiles.mockImplementationOnce(() => (
+      Promise.resolve({
+        data: {
+          content: {},
+        },
+      })
+    ));
+
+    storageProvider.enableMultiFile();
+    storageProvider.changePath('data');
+    await storageProvider.write([
+      {
+        type: 'metadata',
+        path: 'metadata.json',
+        data: {
+          commitMessage: 'Initial commit',
+        },
+      },
+      {
+        type: 'themes',
+        path: '$themes.json',
+        data: [
+          {
+            id: 'light',
+            name: 'Light',
+            selectedTokenSets: {
+              global: TokenSetStatus.ENABLED,
+            },
+          },
+        ],
+      },
+      {
+        type: 'tokenSet',
+        name: 'global',
+        path: 'global.json',
+        data: {
+          red: {
+            type: TokenTypes.COLOR,
+            name: 'red',
+            value: '#ff0000',
+          },
+        },
+      },
+      {
+        type: 'tokenSet',
+        name: 'core-rename',
+        path: 'core-rename.json',
+        data: {
+          red: {
+            type: TokenTypes.COLOR,
+            name: 'red',
+            value: '#ff0000',
+          },
+        },
+      },
+    ]);
+
+    expect(mockCreateOrUpdateFiles).toBeCalledTimes(1);
+    expect(mockCreateOrUpdateFiles).toBeCalledWith({
+      branch: 'main',
+      owner: 'six7',
+      repo: 'figma-tokens',
+      createBranch: false,
+      changes: [
+        {
+          message: 'Initial commit',
+          files: {
+            'data/$themes.json': JSON.stringify([
+              {
+                id: 'light',
+                name: 'Light',
+                selectedTokenSets: {
+                  global: TokenSetStatus.ENABLED,
+                },
+              },
+            ], null, 2),
+            'data/global.json': JSON.stringify({
+              red: {
+                type: TokenTypes.COLOR,
+                name: 'red',
+                value: '#ff0000',
+              },
+            }, null, 2),
+            'data/core-rename.json': JSON.stringify({
+              red: {
+                type: TokenTypes.COLOR,
+                name: 'red',
+                value: '#ff0000',
+              },
+            }, null, 2),
+          },
+          filesToDelete: ['data/core.json', 'data/internal.json'],
+          ignoreDeletionFailures: true,
+
+        },
+      ],
+    });
+  });
+
+  it('couldnt be able to rename and delete a multifile structure when there is no tree', async () => {
+    mockGetContent.mockImplementation((opts: { path: string }) => {
+      if (opts.path === 'data') {
+        return Promise.resolve({
+          data: [
+            { path: 'data/$themes.json', sha: 'sha(data/$themes.json)', type: 'file' },
+            { path: 'data/global.json', sha: 'sha(data/global.json)', type: 'file' },
+            { path: 'data/core.json', sha: 'sha(data/core.json)', type: 'file' },
+            { path: 'data/internal.json', sha: 'sha(data/internal.json)', type: 'file' },
+          ],
+        });
+      }
+
+      if (opts.path === 'data/$themes.json') {
+        return Promise.resolve({
+          data: {
+            content: 'WwogIHsKICAgICJpZCI6ICJsaWdodCIsCiAgICAibmFtZSI6ICJMaWdodCIsCiAgICAic2VsZWN0ZWRUb2tlblNldHMiOiB7CiAgICAgICJnbG9iYWwiOiAiZW5hYmxlZCIKICAgIH0KICB9Cl0=',
+          },
+        });
+      }
+
+      if (opts.path === 'data/global.json') {
+        return Promise.resolve({
+          data: {
+            content: 'ewogICJyZWQiOiB7CiAgICAidHlwZSI6ICJjb2xvciIsCiAgICAibmFtZSI6ICJyZWQiLAogICAgInZhbHVlIjogIiNmZjAwMDAiCiAgfQp9',
+          },
+        });
+      }
+
+      if (opts.path === 'data/core.json') {
+        return Promise.resolve({
+          data: {
+            content: 'ewogICJyZWQiOiB7CiAgICAidHlwZSI6ICJjb2xvciIsCiAgICAibmFtZSI6ICJyZWQiLAogICAgInZhbHVlIjogIiNmZjAwMDAiCiAgfQp9',
+          },
+        });
+      }
+
+      if (opts.path === 'data/internal.json') {
+        return Promise.resolve({
+          data: {
+            content: 'ewogICJyZWQiOiB7CiAgICAidHlwZSI6ICJjb2xvciIsCiAgICAibmFtZSI6ICJyZWQiLAogICAgInZhbHVlIjogIiNmZjAwMDAiCiAgfQp9',
+          },
+        });
+      }
+
+      return Promise.reject();
+    });
+
+    mockCreateTree.mockImplementationOnce(() => (
+      Promise.resolve({
+        data: {
+          sha: 'sha(data)',
+          tree: [
+            {
+              type: 'tree',
+              path: 'data',
+              sha: 'sha(data)',
+            },
+          ],
+        },
+      })
+    ));
+
+    mockGetTree.mockImplementationOnce(() => (
+      Promise.resolve({
+        data: {
+          sha: 'sha(data)',
+          tree: [],
+        },
+      })
+    ));
+
+    mockCreateOrUpdateFiles.mockImplementationOnce(() => (
+      Promise.resolve({
+        data: {
+          content: {},
+        },
+      })
+    ));
+
+    storageProvider.enableMultiFile();
+    storageProvider.changePath('data');
+    await storageProvider.write([
+      {
+        type: 'metadata',
+        path: 'metadata.json',
+        data: {
+          commitMessage: 'Initial commit',
+        },
+      },
+      {
+        type: 'themes',
+        path: '$themes.json',
+        data: [
+          {
+            id: 'light',
+            name: 'Light',
+            selectedTokenSets: {
+              global: TokenSetStatus.ENABLED,
+            },
+          },
+        ],
+      },
+      {
+        type: 'tokenSet',
+        name: 'global',
+        path: 'global.json',
+        data: {
+          red: {
+            type: TokenTypes.COLOR,
+            name: 'red',
+            value: '#ff0000',
+          },
+        },
+      },
+      {
+        type: 'tokenSet',
+        name: 'core-rename',
+        path: 'core-rename.json',
+        data: {
+          red: {
+            type: TokenTypes.COLOR,
+            name: 'red',
+            value: '#ff0000',
+          },
+        },
+      },
+    ]);
+
+    expect(mockCreateOrUpdateFiles).toBeCalledTimes(1);
+    expect(mockCreateOrUpdateFiles).toBeCalledWith({
+      branch: 'main',
+      owner: 'six7',
+      repo: 'figma-tokens',
+      createBranch: false,
+      changes: [
+        {
+          message: 'Initial commit',
+          files: {
+            'data/$themes.json': JSON.stringify([
+              {
+                id: 'light',
+                name: 'Light',
+                selectedTokenSets: {
+                  global: TokenSetStatus.ENABLED,
+                },
+              },
+            ], null, 2),
+            'data/global.json': JSON.stringify({
+              red: {
+                type: TokenTypes.COLOR,
+                name: 'red',
+                value: '#ff0000',
+              },
+            }, null, 2),
+            'data/core-rename.json': JSON.stringify({
+              red: {
+                type: TokenTypes.COLOR,
+                name: 'red',
+                value: '#ff0000',
+              },
+            }, null, 2),
+          },
+
+        },
+      ],
+    });
+  });
+
+  it('should be able to write even though reading results in an error', async () => {
+    mockGetContent.mockImplementationOnce(() => (
+      Promise.reject(new Error())
+    ));
+
+    mockCreateOrUpdateFiles.mockImplementationOnce(() => (
+      Promise.resolve({
+        data: {
+          content: {},
+        },
+      })
+    ));
+
+    storageProvider.changePath('data/tokens.json');
+    await storageProvider.write([
+      {
+        type: 'metadata',
+        path: 'metadata.json',
+        data: {
+          commitMessage: 'Initial commit',
+        },
+      },
+      {
+        type: 'themes',
+        path: '$themes.json',
+        data: [
+          {
+            id: 'light',
+            name: 'Light',
+            selectedTokenSets: {
+              global: TokenSetStatus.ENABLED,
+            },
+          },
+        ],
+      },
+      {
+        type: 'tokenSet',
+        name: 'global',
+        path: 'global.json',
+        data: {
+          red: {
+            type: TokenTypes.COLOR,
+            name: 'red',
+            value: '#ff0000',
+          },
+        },
+      },
+    ]);
+
+    expect(mockCreateOrUpdateFiles).toBeCalledWith({
+      branch: 'main',
+      owner: 'six7',
+      repo: 'figma-tokens',
+      createBranch: false,
+      changes: [
+        {
+          message: 'Initial commit',
+          files: {
+            'data/tokens.json': JSON.stringify({
+              $themes: [
+                {
+                  id: 'light',
+                  name: 'Light',
+                  selectedTokenSets: {
+                    global: TokenSetStatus.ENABLED,
+                  },
+                },
+              ],
+              global: {
+                red: {
+                  type: TokenTypes.COLOR,
+                  name: 'red',
+                  value: '#ff0000',
+                },
               },
             }, null, 2),
           },

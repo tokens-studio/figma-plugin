@@ -54,6 +54,7 @@ export function useGitHub() {
   const pushTokensToGitHub = useCallback(async (context: GithubCredentials): Promise<RemoteTokenStorageData<GitStorageMetadata> | null> => {
     const storage = storageClientFactory(context);
     const content = await storage.retrieve();
+
     if (content) {
       if (
         content
