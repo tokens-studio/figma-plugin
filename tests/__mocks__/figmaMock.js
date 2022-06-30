@@ -1,10 +1,15 @@
+class MessageEvent extends Event {
+  constructor(pluginMessage) {
+    super('message')
+    this.data = { pluginMessage }
+  }
+}
+
 /** @type {[string, (...args: any[]) => any][]} */
 const figmaUiOnHandlers = []
 
 module.exports.mockShowUI = jest.fn(() => {});
-module.exports.mockOn = jest.fn((eventName, handler) => {
-  figmaUiOnHandlers.push([eventName, handler]);
-});
+module.exports.mockOn = jest.fn(() => {});
 module.exports.mockGetAsync = jest.fn(() => Promise.resolve());
 module.exports.mockSetAsync = jest.fn(() => Promise.resolve());
 module.exports.mockNotify = jest.fn(() => Promise.resolve({}));
@@ -16,25 +21,33 @@ module.exports.mockCreateTextStyle = jest.fn();
 module.exports.mockCreatePaintStyle = jest.fn();
 module.exports.mockCreateEffectStyle = jest.fn();
 module.exports.mockImportStyleByKeyAsync = jest.fn(() => Promise.reject());
-module.exports.mockUiOn = jest.fn(() => {});
+module.exports.mockUiOn = jest.fn((eventName, handler) => {
+  figmaUiOnHandlers.push([eventName, handler]);
+});
+module.exports.mockUiPostMessage = jest.fn((pluginMessage) => {
+  window.dispatchEvent(new MessageEvent(pluginMessage))
+});
 module.exports.mockRootSetSharedPluginData = jest.fn(() => {});
 module.exports.mockRootGetSharedPluginData = jest.fn(() => {});
-module.exports.mockPostMessage = jest.fn(() => Promise.resolve());
 module.exports.mockParentPostMessage = jest.fn((data) => {
   figmaUiOnHandlers
     .filter(([eventName]) => eventName === 'message')
-    .forEach(([,handler]) => handler({ data }))
+    .forEach(([,handler]) => handler(data.pluginMessage))
 });
+
 module.exports.figma = {
   showUI: module.exports.mockShowUI,
   on: module.exports.mockOn,
+  currentPage: {
+    selection: [],
+  },
   clientStorage: {
     getAsync: module.exports.mockGetAsync,
     setAsync: module.exports.mockSetAsync,
   },
   notify: module.exports.mockNotify,
   ui: {
-    postMessage: module.exports.mockPostMessage,
+    postMessage: module.exports.mockUiPostMessage,
     on: module.exports.mockUiOn,
   },
   root: {
