@@ -58,7 +58,7 @@ export const ThemeSelector: React.FC<Props> = () => {
         <DropdownMenuRadioItem
           key={value}
           value={value}
-          data-cy="themeselector--themeoptions"
+          data-cy={`themeselector--themeoptions--${value}`}
           // @README we can disable this because we are using Memo for the whole list anyways
           // eslint-disable-next-line react/jsx-no-bind
           onSelect={handleSelect}
