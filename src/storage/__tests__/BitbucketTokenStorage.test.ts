@@ -25,7 +25,7 @@ jest.mock('bitbucket', () => ({
 }));
 
 describe('BitbucketTokenStorage', () => {
-  const storageProvider = new BitbucketTokenStorage('N5k4eqqk3Y2fqabVuELc', 'MattOliver', 'figma-tokens-testing');
+  const storageProvider = new BitbucketTokenStorage('', 'MattOliver', 'figma-tokens-testing');
   storageProvider.selectBranch('main');
 
   beforeEach(() => {
@@ -33,84 +33,72 @@ describe('BitbucketTokenStorage', () => {
   });
 
   it('canWrite should return false if unauthenticated', async () => {
-    mockGetAuthedUser.mockImplementationOnce(() =>
-      Promise.resolve({
-        data: {
-          values: [
-            {
-              permission: '' || 'read',
-            },
-          ],
-        },
-      })
-    );
+    mockGetAuthedUser.mockImplementationOnce(() => Promise.resolve({
+      data: {
+        values: [
+          {
+            permission: '' || 'read',
+          },
+        ],
+      },
+    }));
 
     expect(await storageProvider.canWrite()).toBe(false);
   });
 
   it('canWrite should return true if user has admin or write permissions', async () => {
-    mockGetAuthedUser.mockImplementationOnce(() =>
-      Promise.resolve({
-        currentUser: { data: { account_id: '70121:9a5142ab-930e-42ed-b0ca-854403a1f2e5' } },
-      })
-    );
-    mockListPermissions.mockImplementationOnce(() =>
-      Promise.resolve({
-        data: { values: [{ permission: 'admin' }] },
-      })
-    );
+    mockGetAuthedUser.mockImplementationOnce(() => Promise.resolve({
+      currentUser: { data: { account_id: '' } },
+    }));
+    mockListPermissions.mockImplementationOnce(() => Promise.resolve({
+      data: { values: [{ permission: 'admin' }] },
+    }));
 
     expect(await storageProvider.canWrite()).toBe(true);
   });
 
   it('listBranches should fetch branches as a simple list', async () => {
-    mockListBranches.mockImplementationOnce(() =>
-      Promise.resolve({ data: { values: [{ name: 'main' }, { name: 'different-branch' }] } })
-    );
+    mockListBranches.mockImplementationOnce(() => Promise.resolve({ data: { values: [{ name: 'main' }, { name: 'different-branch' }] } }));
 
     expect(await storageProvider.fetchBranches()).toEqual(['main', 'different-branch']);
   });
 
   it('should be able to write', async () => {
-    mockListBranches.mockImplementationOnce(() =>
-      Promise.resolve({
-        data: { values: [{ name: 'main' }] },
-      })
-    );
+    mockListBranches.mockImplementationOnce(() => Promise.resolve({
+      data: { values: [{ name: 'main' }] },
+    }));
 
-    mockCreateOrUpdateFiles.mockImplementationOnce(() =>
-      Promise.resolve({
-        owner: 'MattOliver',
-        repo: 'figma-tokens-testing',
-        branch: 'main',
-        changes: [
-          {
-            message: 'Initial commit',
-            files: {
-              'data/tokens.json':
-                '{\n' +
-                '  "$themes": [\n' +
-                '    {\n' +
-                '      "id": "light",\n' +
-                '      "name": "Light",\n' +
-                '      "selectedTokenSets": {\n' +
-                '        "global": "enabled"\n' +
-                '      }\n' +
-                '    }\n' +
-                '  ],\n' +
-                '  "global": {\n' +
-                '    "red": {\n' +
-                '      "type": "color",\n' +
-                '      "name": "red",\n' +
-                '      "value": "#ff0000"\n' +
-                '    }\n' +
-                '  }\n' +
-                '}',
-            },
+    mockCreateOrUpdateFiles.mockImplementationOnce(() => Promise.resolve({
+      owner: 'MattOliver',
+      repo: 'figma-tokens-testing',
+      branch: 'main',
+      changes: [
+        {
+          message: 'Initial commit',
+          files: {
+            'data/tokens.json':
+                '{\n'
+                + '  "$themes": [\n'
+                + '    {\n'
+                + '      "id": "light",\n'
+                + '      "name": "Light",\n'
+                + '      "selectedTokenSets": {\n'
+                + '        "global": "enabled"\n'
+                + '      }\n'
+                + '    }\n'
+                + '  ],\n'
+                + '  "global": {\n'
+                + '    "red": {\n'
+                + '      "type": "color",\n'
+                + '      "name": "red",\n'
+                + '      "value": "#ff0000"\n'
+                + '    }\n'
+                + '  }\n'
+                + '}',
           },
-        ],
-      })
-    );
+        },
+      ],
+    }));
 
     storageProvider.changePath('data/tokens.json');
     await storageProvider.write([
@@ -177,7 +165,7 @@ describe('BitbucketTokenStorage', () => {
                 },
               },
               null,
-              2
+              2,
             ),
           },
         },
