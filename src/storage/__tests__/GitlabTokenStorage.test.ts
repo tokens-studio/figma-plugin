@@ -196,8 +196,8 @@ describe('GitlabTokenStorage', () => {
     expect(await storageProvider.canWrite()).toBe(false);
   });
 
-  it('canWrite should return false if filePath is a folder and no multiFileSync flags are false', async () => {
-    storageProvider.disableMultiFile();
+  it('canWrite should return false if filePath is a folder and multiFileSync flag is false', async () => {
+    storageProvider.changePath('tokens');
 
     const canWrite = await storageProvider.canWrite();
     expect(canWrite).toBe(false);

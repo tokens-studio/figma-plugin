@@ -123,8 +123,8 @@ describe('ADOTokenStorage', () => {
     expect(canWrite).toBe(false);
   });
 
-  it('should return `false` for canWrite if filePath is a folder and no multiFileSync flags are false', async () => {
-    storageProvider.disableMultiFile();
+  it('should return `false` for canWrite if filePath is a folder and multiFileSync flag is false', async () => {
+    storageProvider.changePath('tokens');
 
     const canWrite = await storageProvider.canWrite();
     expect(canWrite).toBe(false);
