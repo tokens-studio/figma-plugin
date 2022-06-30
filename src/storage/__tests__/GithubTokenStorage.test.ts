@@ -807,4 +807,71 @@ describe('GithubTokenStorage', () => {
       ],
     });
   });
+
+  it('should be able to createOrUpdate', async () => {
+    mockCreateOrUpdateFiles.mockImplementationOnce(() => (
+      Promise.resolve({
+        data: {
+          content: {},
+        },
+      })
+    ));
+
+    storageProvider.changePath('data/tokens.json');
+    await storageProvider.createOrUpdate({
+      'data/tokens.json': JSON.stringify({
+        $themes: [
+          {
+            id: 'light',
+            name: 'Light',
+            selectedTokenSets: {
+              global: TokenSetStatus.ENABLED,
+            },
+          },
+        ],
+        global: {
+          red: {
+            type: TokenTypes.COLOR,
+            name: 'red',
+            value: '#ff0000',
+          },
+        }
+      }, null, 2),
+    }, 'Initial commit', 'main', false);
+
+    expect(mockCreateOrUpdateFiles).toBeCalledWith({
+      branch: 'main',
+      owner: 'six7',
+      repo: 'figma-tokens',
+      createBranch: false,
+      changes: [
+        {
+          message: 'Initial commit',
+          files: {
+            'data/tokens.json': JSON.stringify({
+              $themes: [
+                {
+                  id: 'light',
+                  name: 'Light',
+                  selectedTokenSets: {
+                    global: TokenSetStatus.ENABLED,
+                  },
+                },
+              ],
+              global: {
+                red: {
+                  type: TokenTypes.COLOR,
+                  name: 'red',
+                  value: '#ff0000',
+                },
+              }
+            }, null, 2),
+            filesToDelete: undefined,
+            ignoreDeletionFailures: undefined,
+            },
+        },
+      ],
+    });
+  });
+
 });
