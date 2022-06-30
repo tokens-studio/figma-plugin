@@ -1,14 +1,11 @@
 import React from 'react';
 import zod from 'zod';
-import { useSelector } from 'react-redux';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StorageTypeFormValues } from '@/types/StorageType';
 import Button from '../Button';
 import Input from '../Input';
 import Stack from '../Stack';
 import { generateId } from '@/utils/generateId';
-import { apiProvidersSelector } from '@/selectors';
-import useRemoteTokens from '@/app/store/remoteTokens';
 
 type ValidatedFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.URL; }>;
 type Props = {
@@ -17,11 +14,10 @@ type Props = {
   onCancel: () => void;
   onSubmit: (values: ValidatedFormValues) => void;
   hasErrored?: boolean;
-  isNew?: boolean;
 };
 
 export default function URLForm({
-  onChange, onSubmit, onCancel, values, hasErrored, isNew,
+  onChange, onSubmit, onCancel, values, hasErrored,
 }: Props) {
   const handleSubmit = React.useCallback((event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -38,7 +34,7 @@ export default function URLForm({
       const formFields = {
         ...validationResult.data,
         provider: StorageProviderType.URL,
-        internalId: generateId(24),
+        internalId: validationResult.data.internalId || generateId(24),
       } as ValidatedFormValues;
       onSubmit(formFields);
     }
