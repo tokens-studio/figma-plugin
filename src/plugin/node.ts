@@ -184,7 +184,6 @@ export async function updateNodes(
       defaultWorker.schedule(async () => {
         try {
           if (entry.tokens) {
-            console.log("entry.tokens", entry.tokens)
             const mappedTokens = destructureCompositionTokenForAlias(tokens, entry.tokens);
             let mappedValues = mapValuesToTokens(tokens, entry.tokens);
             mappedValues = destructureCompositionToken(mappedValues);
