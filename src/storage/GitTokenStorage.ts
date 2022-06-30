@@ -80,6 +80,8 @@ export abstract class GitTokenStorage extends RemoteTokenStorage<GitStorageMetad
   ): Promise<boolean>;
 
   public async write(files: RemoteTokenStorageFile<GitStorageMetadata>[]): Promise<boolean> {
+    console.log(this.path, this.flags);
+
     const branches = await this.fetchBranches();
     if (!branches) return false;
 
@@ -97,6 +99,8 @@ export abstract class GitTokenStorage extends RemoteTokenStorage<GitStorageMetad
           return acc;
         }, {}),
       }, null, 2);
+    } else if (!this.flags.multiFileEnabled) {
+      throw new Error('Multi-file storage is not enabled');
     } else if (this.flags.multiFileEnabled) {
       files.forEach((file) => {
         if (file.type === 'tokenSet') {

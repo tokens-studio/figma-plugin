@@ -17,6 +17,7 @@ describe('ADOTokenStorage', () => {
 
   beforeEach(() => {
     storageProvider.disableMultiFile();
+    storageProvider.changePath('tokens.json');
   });
 
   it('can fetch branches', async () => {
@@ -118,6 +119,13 @@ describe('ADOTokenStorage', () => {
     mockFetch.mockImplementationOnce(() => Promise.resolve({
       status: 400,
     }));
+    const canWrite = await storageProvider.canWrite();
+    expect(canWrite).toBe(false);
+  });
+
+  it('should return `false` for canWrite if filePath is a folder and no multiFileSync flags are false', async () => {
+    storageProvider.disableMultiFile();
+
     const canWrite = await storageProvider.canWrite();
     expect(canWrite).toBe(false);
   });

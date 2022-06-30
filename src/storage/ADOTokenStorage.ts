@@ -94,6 +94,8 @@ export class ADOTokenStorage extends GitTokenStorage {
   }
 
   public async canWrite(): Promise<boolean> {
+    if (!this.path.endsWith('.json') && !this.flags.multiFileEnabled) return false;
+
     const { status } = await this.fetchGit({
       gitResource: 'refs',
       orgUrl: this.orgUrl,

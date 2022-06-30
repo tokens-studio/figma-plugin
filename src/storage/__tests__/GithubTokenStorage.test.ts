@@ -48,6 +48,7 @@ describe('GithubTokenStorage', () => {
 
   beforeEach(() => {
     storageProvider.disableMultiFile();
+    storageProvider.changePath('tokens.json');
   });
 
   it('should fetch branches as a simple list', async () => {
@@ -155,6 +156,13 @@ describe('GithubTokenStorage', () => {
         'If-None-Match': '',
       },
     });
+  });
+
+  it('canWrite should return false if filePath is a folder and multiFileSync flag is false', async () => {
+    storageProvider.changePath('tokens');
+
+    const canWrite = await storageProvider.canWrite();
+    expect(canWrite).toBe(false);
   });
 
   it('canWrite should return true if a collaborator', async () => {

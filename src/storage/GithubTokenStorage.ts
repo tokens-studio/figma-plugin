@@ -90,6 +90,7 @@ export class GithubTokenStorage extends GitTokenStorage {
   }
 
   public async canWrite(): Promise<boolean> {
+    if (!this.path.endsWith('.json') && !this.flags.multiFileEnabled) return false;
     const currentUser = await this.octokitClient.rest.users.getAuthenticated();
     if (!currentUser.data.login) return false;
     try {
