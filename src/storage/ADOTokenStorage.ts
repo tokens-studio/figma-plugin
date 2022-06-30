@@ -4,13 +4,14 @@ import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StorageTypeCredentials } from '@/types/StorageType';
 import { GitStorageMetadata, GitTokenStorage } from './GitTokenStorage';
 import { RemoteTokenStorageFile, RemoteTokenStorageSingleTokenSetFile, RemoteTokenStorageThemesFile } from './RemoteTokenStorage';
-import { multiFileSchema, complexSingleFileSchema } from './schemas';
+import { complexSingleFileSchema, multiFileSchema } from './schemas';
 
 const apiVersion = 'api-version=6.0';
 
 enum ChangeType {
   add = 'add',
   edit = 'edit',
+  delete = 'delete',
 }
 enum ContentType {
   rawtext = 'rawtext',
@@ -335,7 +336,7 @@ export class ADOTokenStorage extends GitTokenStorage {
     const oldObjectId = await this.getOldObjectId(this.source, shouldCreateBranch);
     const { value } = await this.getItems();
     const tokensOnRemote = value?.map((val) => val.path) ?? [];
-    const changes = Object.entries(changeset)
+    const changesForUpdateOrCreate = Object.entries(changeset)
       .map(([path, content]) => {
         const formattedPath = path.startsWith('/') ? path : `/${path}`;
         return ({
@@ -349,13 +350,36 @@ export class ADOTokenStorage extends GitTokenStorage {
           },
         });
       });
+    if (!this.path.endsWith('.json')) {
+      const jsonFiles = value?.filter((file) => (file.path?.endsWith('.json')))?.map((val) => val.path) ?? [];
+      const filesToDelete = jsonFiles.filter((jsonFile) => !Object.keys(changeset).some((item) => jsonFile && jsonFile.endsWith(item)))
+        .map((fileToDelete) => (fileToDelete ?? ''));
+      const changesForDelete = filesToDelete.map((path) => {
+        const formattedPath = path.startsWith('/') ? path : `/${path}`;
+        return ({
+          changeType: ChangeType.delete,
+          item: {
+            path: formattedPath,
+          },
+        });
+      });
+      const changes = changesForDelete.concat(changesForUpdateOrCreate);
+
+      const response = await this.postPushes({
+        branch,
+        changes,
+        commitMessage: message,
+        oldObjectId,
+      });
+
+      return !!response;
+    }
     const response = await this.postPushes({
       branch,
-      changes,
+      changes: changesForUpdateOrCreate,
       commitMessage: message,
       oldObjectId,
     });
-
     return !!response;
   }
 }
