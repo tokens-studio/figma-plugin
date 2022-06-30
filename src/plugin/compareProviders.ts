@@ -18,6 +18,7 @@ export default function compareProvidersWithStored({
 }: Options) {
   if (providers?.length) {
     const matchingSet = providers.find((i) => isSameCredentials(i, storageType));
+    console.log('matchingSet', matchingSet);
     if (matchingSet) {
       // send a message to the UI with the credentials stored in the client
       figma.ui.postMessage({

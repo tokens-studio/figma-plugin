@@ -1,6 +1,11 @@
 export const mockGetRef = jest.fn();
 export const mockCreateRef = jest.fn();
-export const mockListBranches = jest.fn();
+export const mockListBranches = jest.fn(() => Promise.resolve({
+  data: [
+    { name: 'main' },
+    { name: 'development' },
+  ],
+}));
 export const mockGetAuthenticated = jest.fn(() => Promise.resolve({
   data: {},
 }));
@@ -9,15 +14,6 @@ export const mockGetContent = jest.fn();
 export const mockCreateOrUpdateFiles = jest.fn();
 export const mockCreateTree = jest.fn();
 export const mockGetTree = jest.fn();
-
-mockListBranches.mockImplementationOnce(() => (
-  Promise.resolve({
-    data: [
-      { name: 'main' },
-      { name: 'development' },
-    ],
-  })
-));
 
 jest.mock('@octokit/rest', () => ({
   Octokit: {
