@@ -13,6 +13,7 @@ import Stack from './Stack';
 import Spinner from './Spinner';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { isGitProvider } from '@/utils/is';
+import { getSupernovaOpenCloud } from '../store/providers/supernova/getSupernovaOpenCloud'
 
 function ConfirmDialog() {
   const { onConfirm, onCancel, showPushDialog } = usePushDialog();
@@ -31,6 +32,10 @@ function ConfirmDialog() {
           break;
         case StorageProviderType.GITLAB: {
           redirectHref = getGitlabCreatePullRequestUrl(localApiState.id, localApiState.baseUrl);
+          break;
+        }
+        case StorageProviderType.SUPERNOVA: {
+          redirectHref = getSupernovaOpenCloud(localApiState.id);
           break;
         }
         case StorageProviderType.ADO:
@@ -143,7 +148,10 @@ function ConfirmDialog() {
               </div>
             </div>
             <Button variant="primary" href={redirectHref}>
-              Create Pull Request
+
+              {localApiState.provider === StorageProviderType.SUPERNOVA
+                ? <>Open Supernova Workspace</>
+                : <>Create Pull Request</>}
             </Button>
           </div>
         </Modal>
