@@ -66,9 +66,9 @@ export function Initiator() {
             dispatch.uiState.setSelectedLayers(selectedNodes);
             dispatch.uiState.setDisabled(false);
             if (mainNodeSelectionValues.length > 1) {
-              const selectionValues = mainNodeSelectionValues.reduce((acc, crr) => {
-                return Object.assign(acc, crr);
-              }, {});
+              const selectionValues = mainNodeSelectionValues.reduce((acc, crr) => (
+                Object.assign(acc, crr)
+              ), {});
               dispatch.uiState.setMainNodeSelectionValues(selectionValues);
             } else if (mainNodeSelectionValues.length > 0) {
               // When only one node is selected, we can set the state
