@@ -68,15 +68,14 @@ export default function useRemoteTokens() {
   } = useADO();
   const { pullTokensFromURL } = useURL();
 
-  const pullTokens = useCallback(
-    async ({
-      context = api, featureFlags, usedTokenSet, activeTheme,
-    }: PullTokensOptions) => {
-      track('pullTokens', { provider: context.provider });
-      dispatch.uiState.startJob({
-        name: BackgroundJobs.UI_PULLTOKENS,
-        isInfinite: true,
-      });
+  const pullTokens = useCallback(async ({
+    context = api, featureFlags, usedTokenSet, activeTheme,
+  }: PullTokensOptions) => {
+    track('pullTokens', { provider: context.provider });
+    dispatch.uiState.startJob({
+      name: BackgroundJobs.UI_PULLTOKENS,
+      isInfinite: true,
+    });
 
       let remoteData: RemoteTokenStorageData<unknown> | null = null;
       switch (context.provider) {
@@ -108,20 +107,19 @@ export default function useRemoteTokens() {
           throw new Error('Not implemented');
       }
 
-      if (remoteData) {
-        dispatch.tokenState.setLastSyncedState(JSON.stringify([remoteData.tokens, remoteData.themes], null, 2));
-        dispatch.tokenState.setTokenData({
-          values: remoteData.tokens,
-          themes: remoteData.themes,
-          activeTheme: activeTheme ?? null,
-          usedTokenSet: usedTokenSet ?? {},
-        });
-        track('Launched with token sets', {
-          count: Object.keys(remoteData.tokens).length,
-          setNames: Object.keys(remoteData.tokens),
-        });
-      }
-
+    if (remoteData) {
+      dispatch.tokenState.setLastSyncedState(JSON.stringify([remoteData.tokens, remoteData.themes], null, 2));
+      dispatch.tokenState.setTokenData({
+        values: remoteData.tokens,
+        themes: remoteData.themes,
+        activeTheme: activeTheme ?? null,
+        usedTokenSet: usedTokenSet ?? {},
+      });
+      track('Launched with token sets', {
+        count: Object.keys(remoteData.tokens).length,
+        setNames: Object.keys(remoteData.tokens),
+      });
+    }
       dispatch.uiState.completeJob(BackgroundJobs.UI_PULLTOKENS);
       return remoteData;
     },
@@ -287,11 +285,11 @@ export default function useRemoteTokens() {
         default:
           throw new Error('Not implemented');
       }
-
       return newBranchCreated;
     },
     [createGithubBranch, createADOBranch, createBitbucketBranch],
   );
+
 
   const fetchBranches = useCallback(
     async (context: StorageTypeCredentials) => {
