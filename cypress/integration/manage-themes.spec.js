@@ -1,15 +1,3 @@
-function receiveRemoteComponents() {
-  cy.window().then(($window) => {
-    const message = {
-      pluginMessage: {
-        type: 'remotecomponents',
-        values: { remotes: [] },
-      },
-    };
-    $window.postMessage(message, '*');
-  });
-}
-
 const createTokenSet = ({ name }) => {
   cy.get('[data-cy="button-new-token-set"]').click({ timeout: 1000 })
       .get('[data-cy="token-set-input"]')
