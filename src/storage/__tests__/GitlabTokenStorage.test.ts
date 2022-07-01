@@ -1,3 +1,4 @@
+import { Gitlab } from '@gitbeaker/browser';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { GitlabTokenStorage } from '../GitlabTokenStorage';
@@ -54,6 +55,8 @@ describe('GitlabTokenStorage', () => {
   });
 
   it('should assign projectId by searching in projects', async () => {
+    const repoName = 'figma-tokens';
+    const namespace = 'six7';
     mockGetUserName.mockImplementationOnce(() => (
       Promise.resolve([])
     ));
@@ -61,10 +64,10 @@ describe('GitlabTokenStorage', () => {
     mockGetProjects.mockImplementationOnce(() => (
       Promise.resolve(
         [{
-          name: 'figma-tokens',
+          name: repoName,
           id: 35102363,
-          path: 'figma-tokens',
-          path_with_namespace: 'six7/figma-tokens',
+          path: repoName,
+          path_with_namespace: `${namespace}/${repoName}`,
           namespace: {
             full_path: 'six7',
             id: 51634506,
@@ -79,6 +82,9 @@ describe('GitlabTokenStorage', () => {
     expect(
       await storageProvider.assignProjectId(),
     ).toHaveProperty('groupId', 51634506);
+
+    const client = new Gitlab({});
+    expect(client.Projects.search).toHaveBeenCalledWith(repoName, { membership: true });
   });
 
   it('should fetch branches as a simple list', async () => {
