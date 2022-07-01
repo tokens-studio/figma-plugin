@@ -198,12 +198,13 @@ export default function TokenSetSelector() {
                 type="text"
                 name="tokensetname"
                 required
+                data-cy="token-set-input"
               />
               <Stack direction="row" gap={4}>
                 <Button variant="secondary" size="large" onClick={handleCloseNewTokenSetModal}>
                   Cancel
                 </Button>
-                <Button type="submit" variant="primary" size="large">
+                <Button data-cy="create-token-set" type="submit" variant="primary" size="large">
                   Create
                 </Button>
               </Stack>
@@ -211,7 +212,7 @@ export default function TokenSetSelector() {
           </form>
         </Stack>
       </Modal>
-      <StyledButton type="button" disabled={editProhibited} onClick={handleOpenNewTokenSetModal}>
+      <StyledButton data-cy="button-new-token-set" type="button" disabled={editProhibited} onClick={handleOpenNewTokenSetModal}>
         New set
         <IconAdd />
       </StyledButton>
