@@ -381,25 +381,25 @@ describe('getAliasValue', () => {
     {
       name: 'other.true',
       type: TokenTypes.OTHER,
-      value: true,
+      value: 'true',
       input: 'true',
     },
     {
       name: 'other-true.alias',
       type: TokenTypes.OTHER,
-      value: true,
+      value: 'true',
       input: '{other.true}',
     },
     {
       name: 'other.false',
       type: TokenTypes.OTHER,
-      value: false,
+      value: 'false',
       input: 'false',
     },
     {
       name: 'other-false.alias',
       type: TokenTypes.OTHER,
-      value: false,
+      value: 'false',
       input: '{other.false}',
     },
 

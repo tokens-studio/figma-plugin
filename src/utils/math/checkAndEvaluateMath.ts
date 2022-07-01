@@ -31,6 +31,6 @@ export function checkAndEvaluateMath(expr: string) {
   try {
     return unit ? `${evaluated}${unit}` : Number.parseFloat(evaluated.toFixed(3));
   } catch {
-    return evaluated;
+    return expr;
   }
 }
