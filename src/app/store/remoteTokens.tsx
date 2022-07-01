@@ -184,6 +184,7 @@ export default function useRemoteTokens() {
         break;
       }
       case StorageProviderType.GITLAB: {
+        console.log('add new gitlab credentials');
         data = await addNewGitLabCredentials(credentials);
         break;
       }

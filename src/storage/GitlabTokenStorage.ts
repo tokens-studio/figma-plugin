@@ -25,14 +25,17 @@ export class GitlabTokenStorage extends GitTokenStorage {
 
   private gitlabClient: (typeof Gitlab)['prototype'];
 
+  protected repoPathWithNamespace: string;
+
   constructor(
     secret: string,
-    owner: string,
     repository: string,
+    repoPathWithNamespace: string,
     baseUrl?: string,
   ) {
-    super(secret, owner, repository, baseUrl);
+    super(secret, '', repository, baseUrl);
 
+    this.repoPathWithNamespace = repoPathWithNamespace;
     this.gitlabClient = new Gitlab({
       token: this.secret,
       host: this.baseUrl || undefined,
@@ -40,36 +43,12 @@ export class GitlabTokenStorage extends GitTokenStorage {
   }
 
   public async assignProjectId() {
-    const users = await this.gitlabClient.Users.username(this.owner);
-    // project is in the user namespace
-    if (Array.isArray(users) && users.length > 0) {
-      const projectsInPerson = await this.gitlabClient.Users.projects(users[0].id);
-      const project = projectsInPerson.filter((p) => p.path === this.repository)[0];
+    const projects = await this.gitlabClient.Projects.search(this.repository, { membership: true });
+    if (projects) {
+      const project = projects.filter((p) => p.path_with_namespace === this.repoPathWithNamespace)[0];
       if (project) {
         this.projectId = project.id;
         this.groupId = project.namespace.id;
-      }
-    }
-
-    // project is not in the user namespace
-    if (!this.projectId) {
-      const groups = await this.gitlabClient.Groups.all();
-      let projects;
-
-      // gitlab saas - project is always in a group
-      if (groups.find((group) => group.path === this.owner)) {
-        projects = await this.gitlabClient.Groups.projects(this.owner, { include_subgroups: true });
-      } else {
-      // on prem gitlab
-        projects = await this.gitlabClient.Projects.all({ membership: true });
-      }
-
-      if (projects) {
-        const project = projects.filter((p) => p.path === this.repository)[0];
-        if (project) {
-          this.projectId = project.id;
-          this.groupId = project.namespace.id;
-        }
       }
     }
 

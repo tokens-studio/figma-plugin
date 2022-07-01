@@ -35,11 +35,15 @@ export function useGitLab() {
   const { confirm } = useConfirm();
   const { pushDialog } = usePushDialog();
 
-  const storageClientFactory = useCallback(async (context: GitlabCredentials, owner?: string, repo?: string) => {
-    const { ownerId, repositoryId } = getRepositoryInformation(context.id);
-    const storageClient = new GitlabTokenStorage(context.secret, owner ?? ownerId, repo ?? repositoryId, context.baseUrl ?? '');
-    if (context.filePath) storageClient.changePath(context.filePath);
-    if (context.branch) storageClient.selectBranch(context.branch);
+  const storageClientFactory = useCallback(async (context: GitlabCredentials) => {
+    const {
+      secret, baseUrl, id: repoPathWithNamespace, filePath, branch,
+    } = context;
+    const { repositoryId } = getRepositoryInformation(repoPathWithNamespace);
+
+    const storageClient = new GitlabTokenStorage(secret, repositoryId, repoPathWithNamespace, baseUrl ?? '');
+    if (filePath) storageClient.changePath(filePath);
+    if (branch) storageClient.selectBranch(branch);
     if (multiFileSync) storageClient.enableMultiFile();
     return storageClient.assignProjectId();
   }, [multiFileSync]);
@@ -117,8 +121,8 @@ export function useGitLab() {
     activeTheme,
   ]);
 
-  const checkAndSetAccess = useCallback(async ({ context, owner, repo }: { context: GitlabCredentials; owner: string; repo: string }) => {
-    const storage = await storageClientFactory(context, owner, repo);
+  const checkAndSetAccess = useCallback(async ({ context }: { context: GitlabCredentials }) => {
+    const storage = await storageClientFactory(context);
     const hasWriteAccess = await storage.canWrite();
     dispatch.tokenState.setEditProhibited(!hasWriteAccess);
   }, [dispatch, storageClientFactory]);
@@ -126,9 +130,8 @@ export function useGitLab() {
   const pullTokensFromGitLab = useCallback(async (context: GitlabCredentials, receivedFeatureFlags?: LDProps['flags']) => {
     const storage = await storageClientFactory(context);
     if (receivedFeatureFlags?.multiFileSync) storage.enableMultiFile();
-    const { ownerId: owner, repositoryId: repo } = getRepositoryInformation(context.id);
 
-    await checkAndSetAccess({ context, owner, repo });
+    await checkAndSetAccess({ context });
 
     try {
       const content = await storage.retrieve();
@@ -152,8 +155,7 @@ export function useGitLab() {
         return null;
       }
 
-      const { ownerId: owner, repositoryId: repo } = getRepositoryInformation(context.id);
-      await checkAndSetAccess({ context, owner, repo });
+      await checkAndSetAccess({ context });
 
       const content = await storage.retrieve();
       if (content) {
@@ -196,6 +198,7 @@ export function useGitLab() {
 
   const addNewGitLabCredentials = useCallback(async (context: GitlabFormValues): Promise<RemoteTokenStorageData<GitStorageMetadata> | null> => {
     const data = await syncTokensWithGitLab(context);
+
     if (data) {
       AsyncMessageChannel.message({
         type: AsyncMessageTypes.CREDENTIALS,
