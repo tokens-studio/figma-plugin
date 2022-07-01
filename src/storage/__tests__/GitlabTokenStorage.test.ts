@@ -1,4 +1,3 @@
-import { Gitlab } from '@gitbeaker/browser';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { GitlabTokenStorage } from '../GitlabTokenStorage';
@@ -83,8 +82,33 @@ describe('GitlabTokenStorage', () => {
       await storageProvider.assignProjectId(),
     ).toHaveProperty('groupId', 51634506);
 
-    const client = new Gitlab({});
-    expect(client.Projects.search).toHaveBeenCalledWith(repoName, { membership: true });
+    expect(mockGetProjects).toHaveBeenCalledWith(repoName, { membership: true });
+  });
+
+  it('should throw an error if no project is found', async () => {
+    const provider = new GitlabTokenStorage('', 'test-name', 'fullPath');
+    mockGetUserName.mockImplementationOnce(() => (
+      Promise.resolve([])
+    ));
+
+    mockGetProjects.mockImplementationOnce(() => (
+      Promise.resolve(
+        [{
+          name: 'name',
+          id: 35102363,
+          path: 'name',
+          path_with_namespace: 'namespace/project',
+          namespace: {
+            full_path: 'six7',
+            id: 51634506,
+          },
+        }],
+      )
+    ));
+
+    await expect(provider.assignProjectId())
+      .rejects
+      .toThrow('Project not accessible');
   });
 
   it('should fetch branches as a simple list', async () => {
