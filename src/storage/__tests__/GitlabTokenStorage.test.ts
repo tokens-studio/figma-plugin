@@ -128,6 +128,14 @@ describe('GitlabTokenStorage', () => {
     );
   });
 
+  it('should throw an error if there is no project id when trying to fetch branches', async () => {
+    const provider = new GitlabTokenStorage('', '', '');
+
+    await expect(provider.fetchBranches())
+      .rejects
+      .toThrow('Project ID not assigned');
+  });
+
   it('should try to create a branch', async () => {
     mockCreateBranch.mockImplementationOnce(() => (
       Promise.resolve({
@@ -136,6 +144,14 @@ describe('GitlabTokenStorage', () => {
     ));
     expect(await storageProvider.createBranch('development', 'main')).toBe(true);
     expect(mockCreateBranch).toBeCalledWith(35102363, 'development', 'heads/main');
+  });
+
+  it('should throw an error if there is no project id when trying to create a branch', async () => {
+    const provider = new GitlabTokenStorage('', '', '');
+
+    await expect(provider.createBranch('newBranch'))
+      .rejects
+      .toThrow('Project ID not assigned');
   });
 
   it('create a branch should return false when it is failed', async () => {
@@ -195,6 +211,14 @@ describe('GitlabTokenStorage', () => {
       })
     ));
     expect(await storageProvider.canWrite()).toBe(false);
+  });
+
+  it('canWrite should throw an error if there is no project or group id', async () => {
+    const provider = new GitlabTokenStorage('', '', '');
+
+    await expect(provider.canWrite())
+      .rejects
+      .toThrow('Missing Project or Group ID');
   });
 
   it('can read from Git in single file format', async () => {
@@ -319,6 +343,14 @@ describe('GitlabTokenStorage', () => {
         },
       },
     ]);
+  });
+
+  it('read should throw an error if there is no project id', async () => {
+    const provider = new GitlabTokenStorage('', '', '');
+
+    await expect(provider.read())
+      .rejects
+      .toThrow('Missing Project ID');
   });
 
   it('should return an empty array when reading results in an error', async () => {
@@ -497,5 +529,13 @@ describe('GitlabTokenStorage', () => {
       ],
       undefined,
     );
+  });
+
+  it('write should throw an error if there is no project id', async () => {
+    const provider = new GitlabTokenStorage('', '', '');
+
+    await expect(provider.write([]))
+      .rejects
+      .toThrow('Project ID not assigned');
   });
 });

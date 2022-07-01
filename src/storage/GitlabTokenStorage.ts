@@ -65,8 +65,8 @@ export class GitlabTokenStorage extends GitTokenStorage {
   }
 
   public async createBranch(branch: string, source?: string) {
+    if (!this.projectId) throw new Error('Project ID not assigned');
     try {
-      if (!this.projectId) throw new Error('Project ID not assigned');
       const response = await this.gitlabClient.Branches.create(
         this.projectId,
         branch,
