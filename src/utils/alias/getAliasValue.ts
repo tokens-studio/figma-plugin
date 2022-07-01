@@ -36,7 +36,6 @@ export function getAliasValue(token: SingleToken | string | number, tokens: Sing
   // The logic was copied from the original function in aliases.tsx
 
   let returnedValue: ReturnType<typeof getReturnedValue> | null = getReturnedValue(token);
-
   try {
     const tokenReferences = typeof returnedValue === 'string' ? findReferences(returnedValue) : null;
 
@@ -101,7 +100,6 @@ export function getAliasValue(token: SingleToken | string | number, tokens: Sing
         returnedValue = null;
       }
     }
-
     if (returnedValue && typeof returnedValue === 'string') {
       const remainingReferences = findReferences(returnedValue);
       if (!remainingReferences) {
