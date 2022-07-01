@@ -34,7 +34,6 @@ function replaceAliasWithResolvedReference(token: string | TokenTypograpyValue |
 export function getAliasValue(token: SingleToken | string | number, tokens: SingleToken[] = []): string | number | TokenTypograpyValue | TokenBoxshadowValue | Array<TokenBoxshadowValue> | null {
   // @TODO not sure how this will handle typography and boxShadow values. I don't believe it works.
   // The logic was copied from the original function in aliases.tsx
-
   let returnedValue: ReturnType<typeof getReturnedValue> | null = getReturnedValue(token);
 
   try {
