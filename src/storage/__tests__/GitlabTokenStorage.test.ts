@@ -4,7 +4,6 @@ import { GitlabTokenStorage } from '../GitlabTokenStorage';
 
 const mockGetUserName = jest.fn();
 const mockGetProjects = jest.fn();
-const mockGetProjectsInGroups = jest.fn();
 const mockGetBranches = jest.fn();
 const mockCreateBranch = jest.fn();
 const mockGetGroupMembers = jest.fn();
@@ -18,11 +17,10 @@ jest.mock('@gitbeaker/browser', () => ({
   Gitlab: jest.fn().mockImplementation(() => ({
     Users: {
       username: mockGetUserName,
-      projects: mockGetProjects,
       current: mockGetCurrentUser,
     },
-    Groups: {
-      projects: mockGetProjectsInGroups,
+    Projects: {
+      search: mockGetProjects,
     },
     Branches: {
       all: mockGetBranches,
@@ -48,43 +46,16 @@ jest.mock('@gitbeaker/browser', () => ({
 }));
 
 describe('GitlabTokenStorage', () => {
-  const storageProvider = new GitlabTokenStorage('', 'six7', 'figma-tokens');
+  const storageProvider = new GitlabTokenStorage('', 'figma-tokens', 'six7/figma-tokens');
   storageProvider.selectBranch('main');
 
   beforeEach(() => {
     storageProvider.disableMultiFile();
   });
 
-  it('should assign projectId by projects in group', async () => {
+  it('should assign projectId by searching in projects', async () => {
     mockGetUserName.mockImplementationOnce(() => (
       Promise.resolve([])
-    ));
-
-    mockGetProjectsInGroups.mockImplementationOnce(() => (
-      Promise.resolve(
-        [{
-          name: 'figma-tokens',
-          id: 35102363,
-          path: 'figma-tokens',
-          namespace: {
-            full_path: 'six7',
-            id: 51634506,
-          },
-        }],
-      )
-    ));
-
-    expect(
-      await storageProvider.assignProjectId(),
-    ).toHaveProperty('projectId', 35102363);
-    expect(
-      await storageProvider.assignProjectId(),
-    ).toHaveProperty('groupId', 51634506);
-  });
-
-  it('should assign projectId by projects in user', async () => {
-    mockGetUserName.mockImplementationOnce(() => (
-      Promise.resolve(['six7'])
     ));
 
     mockGetProjects.mockImplementationOnce(() => (
@@ -93,6 +64,7 @@ describe('GitlabTokenStorage', () => {
           name: 'figma-tokens',
           id: 35102363,
           path: 'figma-tokens',
+          path_with_namespace: 'six7/figma-tokens',
           namespace: {
             full_path: 'six7',
             id: 51634506,
