@@ -1,4 +1,5 @@
 export const mockShowUI: jest.Mock;
+export const dispatchFigmaEvent: jest.Mock;
 export const mockOn: jest.Mock;
 export const mockGetAsync: jest.Mock;
 export const mockSetAsync: jest.Mock;

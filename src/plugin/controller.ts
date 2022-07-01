@@ -47,6 +47,4 @@ AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.UPDATE, asyncHandler
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.SET_LICENSE_KEY, asyncHandlers.setLicenseKey);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.GET_API_CREDENTIALS, asyncHandlers.getApiCredentials);
 
-if (figma.root) {
-  figma.root.setSharedPluginData('tokens', 'nodemanagerCache', '');
-}
+figma.root.setSharedPluginData('tokens', 'nodemanagerCache', '');

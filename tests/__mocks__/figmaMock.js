@@ -6,10 +6,19 @@ class MessageEvent extends Event {
 }
 
 /** @type {[string, (...args: any[]) => any][]} */
+const figmaOnHandlers = []
+/** @type {[string, (...args: any[]) => any][]} */
 const figmaUiOnHandlers = []
 
+module.exports.dispatchFigmaEvent = jest.fn((name, args) => {
+  figmaOnHandlers
+    .filter((handler) => handler[0] === name)
+    .forEach((handler) => handler[1].apply(undefined, args))
+})
 module.exports.mockShowUI = jest.fn(() => {});
-module.exports.mockOn = jest.fn(() => {});
+module.exports.mockOn = jest.fn((name, handler) => {
+  figmaOnHandlers.push([name, handler])
+});
 module.exports.mockGetAsync = jest.fn(() => Promise.resolve());
 module.exports.mockSetAsync = jest.fn(() => Promise.resolve());
 module.exports.mockNotify = jest.fn(() => Promise.resolve({}));
