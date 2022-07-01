@@ -112,13 +112,13 @@ function Tokens({ isActive }: { isActive: boolean }) {
     if (tokenDiv.current) {
       tokenDiv.current.addEventListener('scroll', () => {}, false);
     }
-  }, [tokenDiv.current]);
+  }, []);
 
   React.useEffect(() => {
     if (scrollPositionSet && tokenDiv.current) {
       tokenDiv.current.scrollTo(0, scrollPositionSet[activeTokenSet]);
     }
-  }, [tokenDiv.current, activeTokenSet]);
+  }, [activeTokenSet]);
 
   const resolvedTokens = React.useMemo(
     () => resolveTokenValues(mergeTokenGroups(tokens, {

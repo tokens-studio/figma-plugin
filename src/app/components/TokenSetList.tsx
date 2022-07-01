@@ -84,7 +84,7 @@ export function TokenSetListItemContent({ item }: Parameters<TreeRenderFunction>
         item.saveScrollPositionSet(activeTokenSet);
       }
     }
-  }, [confirm, dispatch, hasUnsavedChanges, item.saveScrollPositionSet, activeTokenSet]);
+  }, [confirm, dispatch, hasUnsavedChanges, item, activeTokenSet]);
 
   const handleCheckedChange = useCallback((checked: boolean, item: TreeItem) => {
     dispatch.tokenState.toggleUsedTokenSet(item.path);

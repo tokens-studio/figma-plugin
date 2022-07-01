@@ -72,7 +72,7 @@ const TokenListing: React.FC<Props> = ({
     } else {
       dispatch.tokenState.setCollapsedTokenTypeObj({ ...collapsedTokenTypeObj, [tokenKey]: !collapsedTokenTypeObj[tokenKey as TokenTypes] });
     }
-  }, [dispatch, collapsedTokenTypeObj]);
+  }, [dispatch, collapsedTokenTypeObj, tokenKey]);
 
   if (!values && !showEmptyGroups) return null;
 
