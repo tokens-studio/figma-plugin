@@ -35,8 +35,19 @@ const itemStyles = {
 };
 
 const StyledItem = styled(ContextMenuPrimitive.Item, { ...itemStyles });
-const StyledCheckboxItem = styled(ContextMenuPrimitive.CheckboxItem, { ...itemStyles });
-const StyledRadioItem = styled(ContextMenuPrimitive.RadioItem, { ...itemStyles });
+const StyledCheckboxItem = styled(ContextMenuPrimitive.CheckboxItem, {
+  ...itemStyles,
+});
+const StyledCheckboxItemMulti = styled('div', {
+  ...itemStyles,
+  '&:hover': {
+    backgroundColor: '$interaction',
+    color: '$onInteraction',
+  },
+});
+const StyledRadioItem = styled(ContextMenuPrimitive.RadioItem, {
+  ...itemStyles,
+});
 const StyledTriggerItem = styled(ContextMenuPrimitive.TriggerItem, {
   '&[data-state="open"]': {
     backgroundColor: '$interaction',
@@ -67,6 +78,15 @@ const StyledItemIndicator = styled(ContextMenuPrimitive.ItemIndicator, {
   justifyContent: 'center',
 });
 
+const StyledItemIndicatorMulti = styled('span', {
+  position: 'absolute',
+  left: '$2',
+  width: '$5',
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+});
+
 const StyledArrow = styled(ContextMenuPrimitive.Arrow, {
   fill: 'white',
 });
@@ -77,9 +97,11 @@ export const ContextMenuTrigger = ContextMenuPrimitive.Trigger;
 export const ContextMenuContent = StyledContent;
 export const ContextMenuItem = StyledItem;
 export const ContextMenuCheckboxItem = StyledCheckboxItem;
+export const ContextMenuCheckboxItemMulti = StyledCheckboxItemMulti;
 export const ContextMenuRadioGroup = ContextMenuPrimitive.RadioGroup;
 export const ContextMenuRadioItem = StyledRadioItem;
 export const ContextMenuItemIndicator = StyledItemIndicator;
+export const ContextMenuItemIndicatorMulti = StyledItemIndicatorMulti;
 export const ContextMenuTriggerItem = StyledTriggerItem;
 export const ContextMenuLabel = StyledLabel;
 export const ContextMenuSeparator = StyledSeparator;

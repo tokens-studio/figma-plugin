@@ -11,3 +11,4 @@ package
 .idea
 storybook-static
 coverage
+DS_Store
