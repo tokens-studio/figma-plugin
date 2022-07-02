@@ -34,7 +34,7 @@ const StyledButton = styled('button', {
   },
 });
 
-export default function TokenSetSelector() {
+export default function TokenSetSelector({saveScrollPositionSet} : {saveScrollPositionSet: (tokenSet: string) => void}) {
   const tokens = useSelector(tokensSelector);
   const editProhibited = useSelector(editProhibitedSelector);
   const mfsEnabled = useIsGitMultiFileEnabled();
@@ -47,6 +47,14 @@ export default function TokenSetSelector() {
   const [tokenSetMarkedForChange, setTokenSetMarkedForChange] = React.useState('');
   const [allTokenSets, setAllTokenSets] = React.useState(Object.keys(tokens));
   const tokenKeys = Object.keys(tokens).join(',');
+
+  React.useEffect(() => {
+    const scollPositionSet = allTokenSets.reduce<Record<string, number>>((acc, crr) => {
+      acc[crr] = 0;
+      return acc;
+    }, {});
+    dispatch.uiState.setScrollPositionSet(scollPositionSet);
+  }, [allTokenSets, dispatch]);
 
   React.useEffect(() => {
     setAllTokenSets(Object.keys(tokens));
@@ -143,6 +151,7 @@ export default function TokenSetSelector() {
             onRename={handleRenameTokenSet}
             onDelete={handleDelete}
             onDuplicate={handleDuplicateTokenSet}
+            saveScrollPositionSet={saveScrollPositionSet}
           />
         </Box>
       ) : (
@@ -152,6 +161,7 @@ export default function TokenSetSelector() {
           onRename={handleRenameTokenSet}
           onDelete={handleDeleteTokenSet}
           onDuplicate={handleDuplicateTokenSet}
+          saveScrollPositionSet={saveScrollPositionSet}
         />
       )}
       <Modal
