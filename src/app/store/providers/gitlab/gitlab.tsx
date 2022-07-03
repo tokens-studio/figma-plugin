@@ -170,6 +170,7 @@ export function useGitLab() {
               usedTokenSet,
               activeTheme,
             });
+            dispatch.tokenState.setCollapsedTokenSets([]);
             notifyToUI('Pulled tokens from GitLab');
           }
         }

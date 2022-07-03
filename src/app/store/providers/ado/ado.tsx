@@ -164,6 +164,7 @@ export const useADO = () => {
               usedTokenSet: usedTokenSets,
               activeTheme,
             });
+            dispatch.tokenState.setCollapsedTokenSets([]);
             notifyToUI('Pulled tokens from ADO');
           }
         }

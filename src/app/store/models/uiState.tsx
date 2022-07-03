@@ -73,6 +73,7 @@ export interface UIState {
   collapsed: boolean;
   selectedLayers: number;
   manageThemesModalOpen: boolean;
+  scrollPositionSet: Record<string, number>;
 }
 
 const defaultConfirmState: ConfirmProps = {
@@ -119,6 +120,7 @@ export const uiState = createModel<RootModel>()({
     collapsed: false,
     selectedLayers: 0,
     manageThemesModalOpen: false,
+    scrollPositionSet: {},
   } as unknown as UIState,
   reducers: {
     setShowPushDialog: (state, data: string | false) => ({
@@ -315,6 +317,12 @@ export const uiState = createModel<RootModel>()({
       return {
         ...state,
         manageThemesModalOpen: open,
+      };
+    },
+    setScrollPositionSet(state, payload: Record<string, number>) {
+      return {
+        ...state,
+        scrollPositionSet: payload,
       };
     },
   },

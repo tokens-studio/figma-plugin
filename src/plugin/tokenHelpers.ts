@@ -86,7 +86,7 @@ export function resolveTokenValues(tokens: SingleToken[], previousCount: number 
           compositionReturnValue[property as CompositionTokenProperty] = resolvedValue;
         } else {
           const resolvedValue = getAliasValue(value, tokensInProgress);
-          if (resolvedValue) {
+          if (resolvedValue !== null) {
             compositionReturnValue[property as CompositionTokenProperty] = resolvedValue;
           }
           itemFailedToResolve = resolvedValue === null || checkIfContainsAlias(resolvedValue);

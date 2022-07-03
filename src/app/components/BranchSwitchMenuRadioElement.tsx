@@ -5,6 +5,7 @@ import {
   BranchSwitchMenuItemIndicator,
   BranchSwitchMenuRadioItem,
 } from './BranchSwitchMenu';
+import Box from './Box';
 
 type Props = {
   branch: string,
@@ -16,11 +17,15 @@ export const BranchSwitchMenuRadioElement: React.FC<Props> = ({ branch, branchSe
 
   return (
     <BranchSwitchMenuRadioItem data-cy={`branch-switch-menu-radio-element-${branch}`} value={branch} onSelect={onSelect}>
-      <BranchSwitchMenuItemIndicator>
-        <CheckIcon data-cy="branch-switch-menu-check-icon" />
-      </BranchSwitchMenuItemIndicator>
-      <GitBranchIcon size={12} />
-      {` ${branch}`}
+      <Box css={{ width: '$5' }}>
+        <BranchSwitchMenuItemIndicator>
+          <CheckIcon data-cy="branch-switch-menu-check-icon" />
+        </BranchSwitchMenuItemIndicator>
+      </Box>
+      <Box>
+        <GitBranchIcon size={12} />
+        {` ${branch}`}
+      </Box>
     </BranchSwitchMenuRadioItem>
   );
 };
