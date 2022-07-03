@@ -17,7 +17,7 @@ However, for everyone's understanding the current logic is as follows:
 | `app/components/Initiator.tsx` |  |This file handles the initialization of the React app. | ✅ |
 | | `55` | This effect is run on mount and triggers the plugin initialization. | ✅ |
 || `256-268` | This effect is run whenever the license changes and runs the license verification. This step is crucial for the plugin because it enables/disables certain features. | ✅ |
-| `plugin/asyncMessageHandlers/initiate.ts` | | This is the code which handles the plugin side initialization, triggered by the `INIIATE` message. | ✅ |
+| `plugin/asyncMessageHandlers/initiate.ts` | | This is the code which handles the plugin side initialization, triggered by the `INITIATE` message. | ✅ |
 | | `18-24` | Here we fetch the saved settings and inform the UI of them. | ✅ |
 | | `34` | Here we read the license key and inform the UI. | ✅ |
 | `app/components/Initiator.tsx` | | | |
