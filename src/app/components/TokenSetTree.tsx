@@ -14,8 +14,8 @@ import { TokenSetListOrTree } from './TokenSetListOrTree';
 import { tokenSetListToTree, TreeItem } from '@/utils/tokenset';
 
 export default function TokenSetTree({
-  tokenSets, onRename, onDelete, onDuplicate,
-}: { tokenSets: string[], onRename: (tokenSet: string) => void, onDelete: (tokenSet: string) => void, onDuplicate: (tokenSet: string) => void }) {
+  tokenSets, onRename, onDelete, onDuplicate, saveScrollPositionSet,
+}: { tokenSets: string[], onRename: (tokenSet: string) => void, onDelete: (tokenSet: string) => void, onDuplicate: (tokenSet: string) => void, saveScrollPositionSet: (tokenSet: string) => void }) {
   const activeTokenSet = useSelector(activeTokenSetSelector);
   const usedTokenSet = useSelector(usedTokenSetSelector);
   const editProhibited = useSelector(editProhibitedSelector);
@@ -74,8 +74,9 @@ export default function TokenSetTree({
   const handleClick = useCallback((set: typeof items[number]) => {
     if (set.isLeaf) {
       dispatch.tokenState.setActiveTokenSet(set.path);
+      saveScrollPositionSet(activeTokenSet);
     }
-  }, [dispatch]);
+  }, [dispatch, saveScrollPositionSet, activeTokenSet]);
 
   const handleTreatAsSource = useCallback((tokenSetPath: string) => {
     dispatch.tokenState.toggleTreatAsSource(tokenSetPath);

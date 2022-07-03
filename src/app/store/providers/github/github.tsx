@@ -56,6 +56,7 @@ export function useGitHub() {
   const pushTokensToGitHub = useCallback(async (context: GithubCredentials): Promise<RemoteTokenStorageData<GitStorageMetadata> | null> => {
     const storage = storageClientFactory(context);
     const content = await storage.retrieve();
+
     if (content) {
       if (
         content
@@ -191,6 +192,7 @@ export function useGitHub() {
               activeTheme,
               usedTokenSet,
             });
+            dispatch.tokenState.setCollapsedTokenSets([]);
             notifyToUI('Pulled tokens from GitHub');
           }
         }
@@ -217,7 +219,7 @@ export function useGitHub() {
   const addNewGitHubCredentials = useCallback(async (context: GithubFormValues): Promise<RemoteTokenStorageData<GitStorageMetadata> | null> => {
     const data = await syncTokensWithGitHub(context);
     if (data) {
-      AsyncMessageChannel.message({
+      AsyncMessageChannel.ReactInstance.message({
         type: AsyncMessageTypes.CREDENTIALS,
         credential: context,
       });

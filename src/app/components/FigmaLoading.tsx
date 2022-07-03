@@ -30,7 +30,7 @@ export default function FigmaLoading() {
 
   const handleCancel = React.useCallback(() => {
     dispatch.uiState.setActiveTab(Tabs.START);
-    AsyncMessageChannel.message({
+    AsyncMessageChannel.ReactInstance.message({
       type: AsyncMessageTypes.CANCEL_OPERATION,
     });
   }, [dispatch.uiState]);

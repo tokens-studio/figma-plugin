@@ -114,7 +114,6 @@ export abstract class GitTokenStorage extends RemoteTokenStorage<GitStorageMetad
         }
       });
     }
-
     return this.writeChangeset(
       filesChangeset,
       saveOptions.commitMessage ?? 'Commit from Figma',

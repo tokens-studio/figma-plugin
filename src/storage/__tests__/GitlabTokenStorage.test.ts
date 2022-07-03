@@ -441,7 +441,7 @@ describe('GitlabTokenStorage', () => {
     );
   });
 
-  it('should be able to write a multifile structure', async () => {
+  it('should be able to write, update, delete a multifile structure', async () => {
     storageProvider.enableMultiFile();
     mockGetBranches.mockImplementation(() => (
       Promise.resolve(
@@ -454,12 +454,45 @@ describe('GitlabTokenStorage', () => {
     storageProvider.changePath('data');
 
     mockGetRepositories.mockImplementationOnce(() => (
-      Promise.resolve([])
+      Promise.resolve([
+        {
+          id: 'b2ce0083a14576540b8eed3de53bc6d7a43e00e6',
+          mode: '100644',
+          name: 'global.json',
+          path: 'data/global.json',
+          type: 'blob',
+        },
+        {
+          id: 'b2ce0083a14576540b8eed3de53bc6d7a43e00e6',
+          mode: '100644',
+          name: 'core.json',
+          path: 'data/core.json',
+          type: 'blob',
+        },
+        {
+          id: 'b2ce0083a14576540b8eed3de53bc6d7a43e00e6',
+          mode: '100644',
+          name: 'internal.json',
+          path: 'data/internal.json',
+          type: 'blob',
+        },
+        {
+          id: '3d037ff17e986f4db21aabaefca3e3ddba113d85',
+          mode: '100644',
+          name: '$themes.json',
+          path: 'data/$themes.json',
+          type: 'blob',
+        },
+      ])
     ));
 
     mockCreateCommits.mockImplementationOnce(() => (
       Promise.resolve({
-        message: 'create a new file',
+        message: 'remove tokenSet',
+      })
+    )).mockImplementationOnce(() => (
+      Promise.resolve({
+        message: 'create or update',
       })
     ));
 
@@ -486,8 +519,19 @@ describe('GitlabTokenStorage', () => {
       },
       {
         type: 'tokenSet',
-        name: 'tokens',
-        path: 'tokens.json',
+        name: 'global',
+        path: 'global.json',
+        data: {
+          red: {
+            type: TokenTypes.COLOR,
+            value: '#ff0000',
+          },
+        },
+      },
+      {
+        type: 'tokenSet',
+        name: 'core-rename',
+        path: 'core-rename.json',
         data: {
           red: {
             type: TokenTypes.COLOR,
@@ -498,6 +542,23 @@ describe('GitlabTokenStorage', () => {
     ], {
       commitMessage: 'Initial commit',
     });
+
+    expect(mockCreateCommits).toBeCalledTimes(2);
+    expect(mockCreateCommits).toBeCalledWith(
+      35102363,
+      'main',
+      'remove tokenSet',
+      [
+        {
+          action: 'delete',
+          filePath: 'data/core.json',
+        },
+        {
+          action: 'delete',
+          filePath: 'data/internal.json',
+        },
+      ],
+    );
 
     expect(mockCreateCommits).toBeCalledWith(
       35102363,
@@ -512,7 +573,7 @@ describe('GitlabTokenStorage', () => {
           filePath: 'data/$metadata.json',
         },
         {
-          action: 'create',
+          action: 'update',
           content: JSON.stringify([{
             id: 'light',
             name: 'Light',
@@ -523,6 +584,16 @@ describe('GitlabTokenStorage', () => {
           filePath: 'data/$themes.json',
         },
         {
+          action: 'update',
+          content: JSON.stringify({
+            red: {
+              type: TokenTypes.COLOR,
+              value: '#ff0000',
+            },
+          }, null, 2),
+          filePath: 'data/global.json',
+        },
+        {
           action: 'create',
           content: JSON.stringify({
             red: {
@@ -530,7 +601,7 @@ describe('GitlabTokenStorage', () => {
               value: '#ff0000',
             },
           }, null, 2),
-          filePath: 'data/tokens.json',
+          filePath: 'data/core-rename.json',
         },
       ],
       undefined,

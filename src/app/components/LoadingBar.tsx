@@ -44,7 +44,7 @@ export default function LoadingBar() {
   );
 
   const handleCancel = React.useCallback(() => {
-    AsyncMessageChannel.message({
+    AsyncMessageChannel.ReactInstance.message({
       type: AsyncMessageTypes.CANCEL_OPERATION,
     });
   }, []);

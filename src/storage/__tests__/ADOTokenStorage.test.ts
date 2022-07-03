@@ -390,6 +390,8 @@ describe('ADOTokenStorage', () => {
         count: 1,
         value: [
           { path: '/multifile/global.json' },
+          { path: '/multifile/core.json' },
+          { path: '/multifile/internal.json' },
           { path: '/multifile/$themes.json' },
           { path: '/multifile/$metadata.json' },
         ],
@@ -434,6 +436,18 @@ describe('ADOTokenStorage', () => {
           },
         },
       },
+      {
+        type: 'tokenSet',
+        name: 'core-rename',
+        path: 'core-rename.json',
+        data: {
+          red: {
+            type: TokenTypes.COLOR,
+            name: 'red',
+            value: '#ff0000',
+          },
+        },
+      },
     ], {
       commitMessage: 'Initial commit',
     })).toBe(true);
@@ -457,6 +471,14 @@ describe('ADOTokenStorage', () => {
             {
               comment: 'Initial commit',
               changes: [
+                {
+                  changeType: 'delete',
+                  item: { path: '/multifile/core.json' },
+                },
+                {
+                  changeType: 'delete',
+                  item: { path: '/multifile/internal.json' },
+                },
                 {
                   changeType: 'edit',
                   item: { path: '/multifile/$metadata.json' },
@@ -497,6 +519,21 @@ describe('ADOTokenStorage', () => {
                     contentType: 'rawtext',
                   },
                 },
+                {
+                  changeType: 'add',
+                  item: { path: '/multifile/core-rename.json' },
+                  newContent: {
+                    content: JSON.stringify({
+                      red: {
+                        type: TokenTypes.COLOR,
+                        name: 'red',
+                        value: '#ff0000',
+                      },
+                    }, null, 2),
+                    contentType: 'rawtext',
+                  },
+                },
+
               ],
             },
           ],

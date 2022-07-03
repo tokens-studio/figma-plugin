@@ -176,6 +176,7 @@ export const useADO = () => {
               usedTokenSet: usedTokenSets,
               activeTheme,
             });
+            dispatch.tokenState.setCollapsedTokenSets([]);
             notifyToUI('Pulled tokens from ADO');
           }
         }
@@ -205,7 +206,7 @@ export const useADO = () => {
       const data = await syncTokensWithADO(context);
 
       if (data) {
-        AsyncMessageChannel.message({
+        AsyncMessageChannel.ReactInstance.message({
           type: AsyncMessageTypes.CREDENTIALS,
           credential: context,
         });
