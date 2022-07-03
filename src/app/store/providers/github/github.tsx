@@ -54,6 +54,7 @@ export function useGitHub() {
   const pushTokensToGitHub = useCallback(async (context: GithubCredentials): Promise<RemoteTokenStorageData<GitStorageMetadata> | null> => {
     const storage = storageClientFactory(context);
     const content = await storage.retrieve();
+
     if (content) {
       if (
         content
@@ -176,6 +177,7 @@ export function useGitHub() {
               activeTheme,
               usedTokenSet,
             });
+            dispatch.tokenState.setCollapsedTokenSets([]);
             notifyToUI('Pulled tokens from GitHub');
           }
         }

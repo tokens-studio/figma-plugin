@@ -9,6 +9,7 @@ import useStorage from './useStorage';
 import { useGitHub } from './providers/github';
 import { useGitLab } from './providers/gitlab';
 import { useADO } from './providers/ado';
+import useFile from '@/app/store/providers/file';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
 import { apiSelector } from '@/selectors';
 import { UsedTokenSetsMap } from '@/types';
@@ -43,6 +44,7 @@ export default function useRemoteTokens() {
     addNewADOCredentials, syncTokensWithADO, pullTokensFromADO, pushTokensToADO, createADOBranch, fetchADOBranches,
   } = useADO();
   const { pullTokensFromURL } = useURL();
+  const { readTokensFromFileOrDirectory } = useFile();
 
   const pullTokens = useCallback(async ({
     context = api, featureFlags, usedTokenSet, activeTheme,
@@ -87,6 +89,7 @@ export default function useRemoteTokens() {
         activeTheme: activeTheme ?? null,
         usedTokenSet: usedTokenSet ?? {},
       });
+      dispatch.tokenState.setCollapsedTokenSets([]);
       track('Launched with token sets', {
         count: Object.keys(remoteData.tokens).length,
         setNames: Object.keys(remoteData.tokens),
@@ -255,6 +258,32 @@ export default function useRemoteTokens() {
     });
   }, []);
 
+  const fetchTokensFromFileOrDirectory = useCallback(async (files: FileList | null) => {
+    track('fetchTokensFromFileOrDirectory');
+    dispatch.uiState.startJob({ name: BackgroundJobs.UI_FETCHTOKENSFROMFILE });
+
+    let remoteData: RemoteTokenStorageData<unknown> | null = null;
+    if (files) {
+      remoteData = await readTokensFromFileOrDirectory(files);
+      if (remoteData) {
+        dispatch.tokenState.setTokenData({
+          values: remoteData.tokens,
+          themes: remoteData.themes,
+        });
+        track('Launched with token sets', {
+          count: Object.keys(remoteData.tokens).length,
+          setNames: Object.keys(remoteData.tokens),
+        });
+      }
+    }
+
+    dispatch.uiState.completeJob(BackgroundJobs.UI_FETCHTOKENSFROMFILE);
+    return remoteData;
+  }, [
+    dispatch,
+    readTokensFromFileOrDirectory,
+  ]);
+
   return useMemo(() => ({
     restoreStoredProvider,
     deleteProvider,
@@ -263,6 +292,7 @@ export default function useRemoteTokens() {
     addNewProviderItem,
     fetchBranches,
     addNewBranch,
+    fetchTokensFromFileOrDirectory,
   }), [
     restoreStoredProvider,
     deleteProvider,
@@ -271,5 +301,6 @@ export default function useRemoteTokens() {
     addNewProviderItem,
     fetchBranches,
     addNewBranch,
+    fetchTokensFromFileOrDirectory,
   ]);
 }

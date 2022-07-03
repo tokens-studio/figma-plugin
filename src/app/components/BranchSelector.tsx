@@ -31,7 +31,7 @@ const BranchSwitchMenuItemElement: React.FC<{
   ), [branch, createNewBranchFrom]);
 
   return (
-    <BranchSwitchMenuItem onSelect={onSelect}>
+    <BranchSwitchMenuItem data-cy={`branch-selector-create-branch-from-branch-${branch}`} onSelect={onSelect}>
       <GitBranchIcon size={12} />
       {` ${branch}`}
     </BranchSwitchMenuItem>
@@ -157,25 +157,25 @@ export default function BranchSelector() {
     currentBranch
       ? (
         <BranchSwitchMenu open={menuOpened} onOpenChange={handleToggleMenu}>
-          <BranchSwitchMenuMainTrigger>
+          <BranchSwitchMenuMainTrigger data-cy="branch-selector-menu-trigger">
             <GitBranchIcon size={16} />
             <span>{currentBranch}</span>
           </BranchSwitchMenuMainTrigger>
 
           <BranchSwitchMenuContent side="top" sideOffset={5}>
-            <BranchSwitchMenuRadioGroup value={currentBranch}>
+            <BranchSwitchMenuRadioGroup className="content scroll-container" css={{ maxHeight: '$dropdownMaxHeight' }} value={currentBranch}>
               {branchState.branches.length > 0
                 && branchState.branches.map((branch, index) => <BranchSwitchMenuRadioElement key={`radio_${seed(index)}`} branch={branch} branchSelected={onBranchSelected} />)}
             </BranchSwitchMenuRadioGroup>
             <BranchSwitchMenu>
-              <BranchSwitchMenuTrigger>
+              <BranchSwitchMenuTrigger data-cy="branch-selector-create-new-branch-trigger">
                 Create new branch from
                 <ChevronRightIcon />
               </BranchSwitchMenuTrigger>
-              <BranchSwitchMenuContent side="left">
+              <BranchSwitchMenuContent className="content scroll-container" css={{ maxHeight: '$dropdownMaxHeight' }} side="left">
                 {hasChanges
                   && (
-                    <BranchSwitchMenuItem onSelect={createBranchByChange}>
+                    <BranchSwitchMenuItem data-cy="branch-selector-create-new-branch-from-current-change" onSelect={createBranchByChange}>
                       Current changes
                     </BranchSwitchMenuItem>
                   )}
