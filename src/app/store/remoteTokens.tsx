@@ -89,6 +89,7 @@ export default function useRemoteTokens() {
         activeTheme: activeTheme ?? null,
         usedTokenSet: usedTokenSet ?? {},
       });
+      dispatch.tokenState.setCollapsedTokenSets([]);
       track('Launched with token sets', {
         count: Object.keys(remoteData.tokens).length,
         setNames: Object.keys(remoteData.tokens),

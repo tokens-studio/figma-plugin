@@ -24,7 +24,7 @@ import parseJson from '@/utils/parseJson';
 import AttentionIcon from '@/icons/attention.svg';
 import { TokensContext } from '@/context';
 import {
-  activeTokenSetSelector, manageThemesModalOpenSelector, showEditFormSelector, tokenFilterSelector, tokensSelector, tokenTypeSelector, updateModeSelector, usedTokenSetSelector,
+  activeTokenSetSelector, manageThemesModalOpenSelector, scrollPositionSetSelector, showEditFormSelector, tokenFilterSelector, tokensSelector, tokenTypeSelector, updateModeSelector, usedTokenSetSelector,
 } from '@/selectors';
 import { ThemeSelector } from './ThemeSelector';
 import IconToggleableDisclosure from '@/app/components/IconToggleableDisclosure';
@@ -95,15 +95,28 @@ function Tokens({ isActive }: { isActive: boolean }) {
   const usedTokenSet = useSelector(usedTokenSetSelector);
   const showEditForm = useSelector(showEditFormSelector);
   const manageThemesModalOpen = useSelector(manageThemesModalOpenSelector);
+  const scrollPositionSet = useSelector(scrollPositionSetSelector);
   const tokenFilter = useSelector(tokenFilterSelector);
   const dispatch = useDispatch<Dispatch>();
   const [activeTokensTab, setActiveTokensTab] = React.useState('list');
   const [tokenSetsVisible, setTokenSetsVisible] = React.useState(true);
   const { getStringTokens } = useTokens();
-
+  const tokenDiv = React.useRef<HTMLDivElement>(null);
   const updateMode = useSelector(updateModeSelector);
   const { confirm } = useConfirm();
   const shouldConfirm = React.useMemo(() => updateMode === UpdateMode.DOCUMENT, [updateMode]);
+
+  React.useEffect(() => {
+    if (tokenDiv.current) {
+      tokenDiv.current.addEventListener('scroll', () => {}, false);
+    }
+  }, []);
+
+  React.useEffect(() => {
+    if (scrollPositionSet && tokenDiv.current) {
+      tokenDiv.current.scrollTo(0, scrollPositionSet[activeTokenSet]);
+    }
+  }, [activeTokenSet]);
 
   const resolvedTokens = React.useMemo(
     () => resolveTokenValues(mergeTokenGroups(tokens, {
@@ -205,6 +218,12 @@ function Tokens({ isActive }: { isActive: boolean }) {
     }
   }, [tokens, stringTokens, activeTokenSet]);
 
+  const saveScrollPositionSet = React.useCallback((tokenSet: string) => {
+    if (tokenDiv.current) {
+      dispatch.uiState.setScrollPositionSet({ ...scrollPositionSet, [tokenSet]: tokenDiv.current?.scrollTop });
+    }
+  }, [scrollPositionSet]);
+
   if (!isActive) return null;
 
   return (
@@ -287,7 +306,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
         >
           {tokenSetsVisible && (
             <Box>
-              <TokenSetSelector />
+              <TokenSetSelector saveScrollPositionSet={saveScrollPositionSet} />
             </Box>
           )}
           <Box
@@ -308,7 +327,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
                 />
               </Box>
             ) : (
-              <Box css={{ width: '100%', paddingBottom: '$6' }} className="content scroll-container">
+              <Box ref={tokenDiv} css={{ width: '100%', paddingBottom: '$6' }} className="content scroll-container">
                 {memoizedTokens.map(([key, { values, isPro, ...schema }]) => (
                   <div key={key}>
                     <TokenListing

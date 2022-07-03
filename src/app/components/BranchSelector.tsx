@@ -178,7 +178,7 @@ export default function BranchSelector() {
               <BranchSwitchMenuSeparator />
             </>
             )}
-            <BranchSwitchMenuRadioGroup value={currentBranch}>
+            <BranchSwitchMenuRadioGroup className="content scroll-container" css={{ maxHeight: '$dropdownMaxHeight' }} value={currentBranch}>
               {branchState.branches.length > 0
                 && branchState.branches.map((branch, index) => <BranchSwitchMenuRadioElement disabled={!gitBranchSelector} key={`radio_${seed(index)}`} branch={branch} branchSelected={onBranchSelected} />)}
             </BranchSwitchMenuRadioGroup>
@@ -187,7 +187,7 @@ export default function BranchSelector() {
                 Create new branch from
                 <ChevronRightIcon />
               </BranchSwitchMenuTrigger>
-              <BranchSwitchMenuContent side="left">
+              <BranchSwitchMenuContent className="content scroll-container" css={{ maxHeight: '$dropdownMaxHeight' }} side="left">
                 {hasChanges
                   && (
                     <BranchSwitchMenuItem data-cy="branch-selector-create-new-branch-from-current-change" onSelect={createBranchByChange}>
