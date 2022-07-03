@@ -447,6 +447,44 @@ describe('GithubTokenStorage', () => {
     });
   });
 
+  it('should not be able to write a multifile structure when multifile flag is off', async () => {
+    mockListBranches.mockImplementationOnce(() => (
+      Promise.resolve({
+        data: [
+          { name: 'main' },
+        ],
+      })
+    ));
+    mockCreateOrUpdateFiles.mockImplementationOnce(() => (
+      Promise.resolve({
+        data: {
+          content: {},
+        },
+      })
+    ));
+
+    storageProvider.disableMultiFile();
+    storageProvider.changePath('data');
+
+    await expect(async () => {
+      await storageProvider.write([
+        {
+          type: 'tokenSet',
+          name: 'global',
+          path: 'global.json',
+          data: {
+            red: {
+              type: TokenTypes.COLOR,
+              name: 'red',
+              value: '#ff0000',
+            },
+          },
+        },
+      ]);
+    }).rejects.toThrow('Multi-file storage is not enabled');
+    expect(mockCreateOrUpdateFiles).not.toHaveBeenCalled();
+  });
+
   it('should be able to write a multifile structure', async () => {
     mockListBranches.mockImplementationOnce(() => (
       Promise.resolve({
