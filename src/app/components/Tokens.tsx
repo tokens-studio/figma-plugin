@@ -115,7 +115,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
   }, []);
 
   React.useEffect(() => {
-    if (scrollPositionSet && tokenDiv.current) {
+    if (scrollPositionSet && tokenDiv.current && typeof tokenDiv.current.scrollTo === 'function') {
       tokenDiv.current.scrollTo(0, scrollPositionSet[activeTokenSet]);
     }
   }, [activeTokenSet]);
@@ -187,6 +187,18 @@ function Tokens({ isActive }: { isActive: boolean }) {
     }
   }, [confirm, shouldConfirm, dispatch.tokenState, activeTokensTab, stringTokens]);
 
+  const toggleTokenSetsVisible = React.useCallback(() => {
+    setTokenSetsVisible(!tokenSetsVisible);
+  }, [tokenSetsVisible]);
+
+  const openListTab = React.useCallback(() => {
+    setActiveTokensTab('list');
+  }, []);
+
+  const openJsonTab = React.useCallback(() => {
+    setActiveTokensTab('json');
+  }, []);
+
   const tokensContextValue = React.useMemo(() => ({
     resolvedTokens,
   }), [resolvedTokens]);
@@ -206,13 +218,13 @@ function Tokens({ isActive }: { isActive: boolean }) {
     } else {
       dispatch.tokenState.setHasUnsavedChanges(false);
     }
-  }, [tokens, stringTokens, activeTokenSet]);
+  }, [dispatch, tokens, stringTokens, activeTokenSet]);
 
   const saveScrollPositionSet = React.useCallback((tokenSet: string) => {
     if (tokenDiv.current) {
       dispatch.uiState.setScrollPositionSet({ ...scrollPositionSet, [tokenSet]: tokenDiv.current?.scrollTop });
     }
-  }, [scrollPositionSet]);
+  }, [dispatch, scrollPositionSet]);
 
   if (!isActive) return null;
 
@@ -237,7 +249,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
           }}
         >
           <Box>
-            <StyledButton style={{ height: '100%' }} type="button" onClick={() => setTokenSetsVisible(!tokenSetsVisible)}>
+            <StyledButton style={{ height: '100%' }} type="button" onClick={toggleTokenSetsVisible}>
               <Box
                 css={{
                   fontWeight: '$bold',
@@ -268,7 +280,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
             <IconButton
               variant={activeTokensTab === 'list' ? 'primary' : 'default'}
               dataCy="tokensTabList"
-              onClick={() => setActiveTokensTab('list')}
+              onClick={openListTab}
               icon={<IconListing />}
               tooltipSide="bottom"
               tooltip="Listing"
@@ -276,7 +288,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
             <IconButton
               variant={activeTokensTab === 'json' ? 'primary' : 'default'}
               dataCy="tokensTabJSON"
-              onClick={() => setActiveTokensTab('json')}
+              onClick={openJsonTab}
               icon={<IconJSON />}
               tooltipSide="bottom"
               tooltip="JSON"

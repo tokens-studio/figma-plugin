@@ -1,46 +1,16 @@
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { GithubTokenStorage } from '../GithubTokenStorage';
-
-const mockGetRef = jest.fn();
-const mockCreateRef = jest.fn();
-const mockListBranches = jest.fn();
-const mockGetAuthenticated = jest.fn();
-const mockGetCollaboratorPermissionLevel = jest.fn();
-const mockGetContent = jest.fn();
-const mockCreateOrUpdateFiles = jest.fn();
-const mockCreateTree = jest.fn();
-const mockGetTree = jest.fn();
-
-jest.mock('@octokit/rest', () => ({
-  Octokit: {
-    plugin: jest.fn().mockImplementation(() => (
-      jest.fn().mockImplementation(() => ({
-        rest: {
-          users: {
-            getAuthenticated: mockGetAuthenticated,
-          },
-          repos: {
-            getCollaboratorPermissionLevel: mockGetCollaboratorPermissionLevel,
-            getContent: mockGetContent,
-          },
-          git: {
-            createTree: mockCreateTree,
-            getTree: mockGetTree,
-          },
-        },
-        git: {
-          getRef: mockGetRef,
-          createRef: mockCreateRef,
-        },
-        repos: {
-          listBranches: mockListBranches,
-          createOrUpdateFiles: mockCreateOrUpdateFiles,
-        },
-      }))
-    )),
-  },
-}));
+import {
+  mockCreateOrUpdateFiles,
+  mockCreateRef,
+  mockCreateTree,
+  mockGetAuthenticated,
+  mockGetCollaboratorPermissionLevel,
+  mockGetContent,
+  mockGetRef,
+  mockGetTree,
+} from '../../../tests/__mocks__/octokitRestMock';
 
 describe('GithubTokenStorage', () => {
   const storageProvider = new GithubTokenStorage('', 'six7', 'figma-tokens');
@@ -51,15 +21,6 @@ describe('GithubTokenStorage', () => {
   });
 
   it('should fetch branches as a simple list', async () => {
-    mockListBranches.mockImplementationOnce(() => (
-      Promise.resolve({
-        data: [
-          { name: 'main' },
-          { name: 'development' },
-        ],
-      })
-    ));
-
     expect(
       await storageProvider.fetchBranches(),
     ).toEqual(['main', 'development']);
@@ -346,14 +307,6 @@ describe('GithubTokenStorage', () => {
   });
 
   it('should be able to write', async () => {
-    mockListBranches.mockImplementationOnce(() => (
-      Promise.resolve({
-        data: [
-          { name: 'main' },
-        ],
-      })
-    ));
-
     mockGetContent.mockImplementationOnce(() => (
       Promise.resolve({
         data: {
@@ -440,13 +393,6 @@ describe('GithubTokenStorage', () => {
   });
 
   it('should be able to write a multifile structure', async () => {
-    mockListBranches.mockImplementationOnce(() => (
-      Promise.resolve({
-        data: [
-          { name: 'main' },
-        ],
-      })
-    ));
     mockCreateOrUpdateFiles.mockImplementationOnce(() => (
       Promise.resolve({
         data: {
@@ -524,13 +470,6 @@ describe('GithubTokenStorage', () => {
   });
 
   it('should be able to rename and delete', async () => {
-    mockListBranches.mockImplementationOnce(() => (
-      Promise.resolve({
-        data: [
-          { name: 'main' },
-        ],
-      })
-    ));
     mockGetContent.mockImplementationOnce(() => (
       Promise.resolve({
         data: {
@@ -635,13 +574,6 @@ describe('GithubTokenStorage', () => {
   });
 
   it('should be able to rename and delete a multifile structure', async () => {
-    mockListBranches.mockImplementationOnce(() => (
-      Promise.resolve({
-        data: [
-          { name: 'main' },
-        ],
-      })
-    ));
     mockGetContent.mockImplementation((opts: { path: string }) => {
       if (opts.path === 'data') {
         return Promise.resolve({
@@ -818,13 +750,6 @@ describe('GithubTokenStorage', () => {
   });
 
   it('couldnt be able to rename and delete a multifile structure when there is no tree', async () => {
-    mockListBranches.mockImplementationOnce(() => (
-      Promise.resolve({
-        data: [
-          { name: 'main' },
-        ],
-      })
-    ));
     mockGetContent.mockImplementation((opts: { path: string }) => {
       if (opts.path === 'data') {
         return Promise.resolve({
@@ -994,14 +919,6 @@ describe('GithubTokenStorage', () => {
   });
 
   it('should be able to write even though reading results in an error', async () => {
-    mockListBranches.mockImplementationOnce(() => (
-      Promise.resolve({
-        data: [
-          { name: 'main' },
-        ],
-      })
-    ));
-
     mockGetContent.mockImplementationOnce(() => (
       Promise.reject(new Error())
     ));

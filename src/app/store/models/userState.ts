@@ -119,7 +119,7 @@ export const userState = createModel<RootModel>()({
           notifyToUI('License added succesfully!');
         }
         if (source !== AddLicenseSource.PLUGIN) {
-          AsyncMessageChannel.message({
+          AsyncMessageChannel.ReactInstance.message({
             type: AsyncMessageTypes.SET_LICENSE_KEY,
             licenseKey: key,
           });
@@ -138,7 +138,7 @@ export const userState = createModel<RootModel>()({
         if (error) {
           notifyToUI('Error removing license, please contact support', { error: true });
         } else {
-          AsyncMessageChannel.message({
+          AsyncMessageChannel.ReactInstance.message({
             type: AsyncMessageTypes.SET_LICENSE_KEY,
             licenseKey: null,
           });
