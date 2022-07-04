@@ -401,13 +401,6 @@ describe('GithubTokenStorage', () => {
   });
 
   it('should not be able to write a multifile structure when multifile flag is off', async () => {
-    mockListBranches.mockImplementationOnce(() => (
-      Promise.resolve({
-        data: [
-          { name: 'main' },
-        ],
-      })
-    ));
     mockCreateOrUpdateFiles.mockImplementationOnce(() => (
       Promise.resolve({
         data: {
