@@ -252,7 +252,7 @@ export default function useRemoteTokens() {
   }, [fetchGithubBranches, fetchGitLabBranches, fetchADOBranches]);
 
   const deleteProvider = useCallback((provider) => {
-    AsyncMessageChannel.message({
+    AsyncMessageChannel.ReactInstance.message({
       type: AsyncMessageTypes.REMOVE_SINGLE_CREDENTIAL,
       context: provider,
     });

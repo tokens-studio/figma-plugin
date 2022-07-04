@@ -195,7 +195,7 @@ export const useADO = () => {
       const data = await syncTokensWithADO(context);
 
       if (data) {
-        AsyncMessageChannel.message({
+        AsyncMessageChannel.ReactInstance.message({
           type: AsyncMessageTypes.CREDENTIALS,
           credential: context,
         });

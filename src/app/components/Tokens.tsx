@@ -113,7 +113,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
   }, []);
 
   React.useEffect(() => {
-    if (scrollPositionSet && tokenDiv.current) {
+    if (scrollPositionSet && tokenDiv.current && typeof tokenDiv.current.scrollTo === 'function') {
       tokenDiv.current.scrollTo(0, scrollPositionSet[activeTokenSet]);
     }
   }, [activeTokenSet]);
@@ -216,13 +216,13 @@ function Tokens({ isActive }: { isActive: boolean }) {
     } else {
       dispatch.tokenState.setHasUnsavedChanges(false);
     }
-  }, [tokens, stringTokens, activeTokenSet]);
+  }, [dispatch, tokens, stringTokens, activeTokenSet]);
 
   const saveScrollPositionSet = React.useCallback((tokenSet: string) => {
     if (tokenDiv.current) {
       dispatch.uiState.setScrollPositionSet({ ...scrollPositionSet, [tokenSet]: tokenDiv.current?.scrollTop });
     }
-  }, [scrollPositionSet]);
+  }, [dispatch, scrollPositionSet]);
 
   if (!isActive) return null;
 

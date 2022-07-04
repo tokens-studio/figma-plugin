@@ -1,6 +1,6 @@
 import compact from 'just-compact';
 import { Octokit } from '@octokit/rest';
-import { decodeBase64 } from '@/utils/string';
+import { decodeBase64 } from '@/utils/string/ui';
 import { RemoteTokenStorageFile } from './RemoteTokenStorage';
 import IsJSONString from '@/utils/isJSONString';
 import { AnyTokenSet } from '@/types/tokens';
