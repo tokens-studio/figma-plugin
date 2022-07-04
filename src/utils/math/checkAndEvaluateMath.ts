@@ -6,7 +6,6 @@ const parser = new Parser();
 
 export function checkAndEvaluateMath(expr: string) {
   let calcParsed: Root;
-
   try {
     calcParsed = calcAstParser.parse(expr);
   } catch (ex) {
@@ -29,6 +28,9 @@ export function checkAndEvaluateMath(expr: string) {
   } catch (ex) {
     return expr;
   }
-
-  return unit ? `${evaluated}${unit}` : Number.parseFloat(evaluated.toFixed(3));
+  try {
+    return unit ? `${evaluated}${unit}` : Number.parseFloat(evaluated.toFixed(3));
+  } catch {
+    return expr;
+  }
 }
