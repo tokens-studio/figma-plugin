@@ -95,6 +95,8 @@ export class ADOTokenStorage extends GitTokenStorage {
   }
 
   public async canWrite(): Promise<boolean> {
+    if (!this.path.endsWith('.json') && !this.flags.multiFileEnabled) return false;
+
     const { status } = await this.fetchGit({
       gitResource: 'refs',
       orgUrl: this.orgUrl,
@@ -230,7 +232,7 @@ export class ADOTokenStorage extends GitTokenStorage {
 
   public async read(): Promise<RemoteTokenStorageFile<GitStorageMetadata>[]> {
     try {
-      if (this.flags.multiFileEnabled && !this.path.endsWith('.json')) {
+      if (!this.path.endsWith('.json')) {
         const { value } = await this.getItems();
         const jsonFiles = value
           ?.filter((file) => (file.path?.endsWith('.json')))
