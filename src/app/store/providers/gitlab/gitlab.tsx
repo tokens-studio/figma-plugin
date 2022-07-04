@@ -49,8 +49,7 @@ export function useGitLab() {
       text: 'Pull from GitLab?',
       description: 'Your repo already contains tokens, do you want to pull these now?',
     });
-    if (confirmResult === false) return false;
-    return confirmResult.result;
+    return confirmResult;
   }, [confirm]);
 
   const pushTokensToGitLab = useCallback(async (context: GitlabCredentials) => {
@@ -91,7 +90,6 @@ export function useGitLab() {
           usedTokenSet,
           activeTheme,
         });
-
         pushDialog('success');
         return {
           tokens,
@@ -172,6 +170,7 @@ export function useGitLab() {
               usedTokenSet,
               activeTheme,
             });
+            dispatch.tokenState.setCollapsedTokenSets([]);
             notifyToUI('Pulled tokens from GitLab');
           }
         }
@@ -199,7 +198,7 @@ export function useGitLab() {
   const addNewGitLabCredentials = useCallback(async (context: GitlabFormValues): Promise<RemoteTokenStorageData<GitStorageMetadata> | null> => {
     const data = await syncTokensWithGitLab(context);
     if (data) {
-      AsyncMessageChannel.message({
+      AsyncMessageChannel.ReactInstance.message({
         type: AsyncMessageTypes.CREDENTIALS,
         credential: context,
       });

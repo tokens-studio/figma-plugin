@@ -73,6 +73,7 @@ export interface UIState {
   collapsed: boolean;
   selectedLayers: number;
   manageThemesModalOpen: boolean;
+  scrollPositionSet: Record<string, number>;
 }
 
 const defaultConfirmState: ConfirmProps = {
@@ -119,6 +120,7 @@ export const uiState = createModel<RootModel>()({
     collapsed: false,
     selectedLayers: 0,
     manageThemesModalOpen: false,
+    scrollPositionSet: {},
   } as unknown as UIState,
   reducers: {
     setShowPushDialog: (state, data: string | false) => ({
@@ -317,6 +319,12 @@ export const uiState = createModel<RootModel>()({
         manageThemesModalOpen: open,
       };
     },
+    setScrollPositionSet(state, payload: Record<string, number>) {
+      return {
+        ...state,
+        scrollPositionSet: payload,
+      };
+    },
   },
   effects: (dispatch) => ({
     setLastOpened: (payload) => {
@@ -327,13 +335,13 @@ export const uiState = createModel<RootModel>()({
     setActiveTab: (payload: Tabs) => {
       const requiresSelectionValues = payload === Tabs.INSPECTOR;
 
-      AsyncMessageChannel.message({
+      AsyncMessageChannel.ReactInstance.message({
         type: AsyncMessageTypes.CHANGED_TABS,
         requiresSelectionValues,
       });
     },
     toggleShowEmptyGroups(payload: null | boolean, rootState) {
-      AsyncMessageChannel.message({
+      AsyncMessageChannel.ReactInstance.message({
         type: AsyncMessageTypes.SET_SHOW_EMPTY_GROUPS,
         showEmptyGroups: payload == null ? rootState.uiState.showEmptyGroups : payload,
       });

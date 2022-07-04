@@ -48,8 +48,7 @@ export function useGitHub() {
       text: 'Pull from GitHub?',
       description: 'Your repo already contains tokens, do you want to pull these now?',
     });
-    if (confirmResult === false) return false;
-    return confirmResult.result;
+    return confirmResult;
   }, [confirm]);
 
   const pushTokensToGitHub = useCallback(async (context: GithubCredentials): Promise<RemoteTokenStorageData<GitStorageMetadata> | null> => {
@@ -136,6 +135,7 @@ export function useGitHub() {
 
     try {
       const content = await storage.retrieve();
+
       if (content) {
         return content;
       }
@@ -162,6 +162,7 @@ export function useGitHub() {
       await checkAndSetAccess({ context, owner, repo });
 
       const content = await storage.retrieve();
+
       if (content) {
         if (
           !isEqual(content.tokens, tokens)
@@ -176,6 +177,7 @@ export function useGitHub() {
               activeTheme,
               usedTokenSet,
             });
+            dispatch.tokenState.setCollapsedTokenSets([]);
             notifyToUI('Pulled tokens from GitHub');
           }
         }
@@ -202,7 +204,7 @@ export function useGitHub() {
   const addNewGitHubCredentials = useCallback(async (context: GithubFormValues): Promise<RemoteTokenStorageData<GitStorageMetadata> | null> => {
     const data = await syncTokensWithGitHub(context);
     if (data) {
-      AsyncMessageChannel.message({
+      AsyncMessageChannel.ReactInstance.message({
         type: AsyncMessageTypes.CREDENTIALS,
         credential: context,
       });

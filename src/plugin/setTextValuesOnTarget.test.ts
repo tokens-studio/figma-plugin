@@ -40,7 +40,6 @@ describe('setTextValuesOnTarget', () => {
       description: 'Use with care',
       value: { textDecoration: 'STRIKETHROUGH', textCase: 'TITLE' },
     });
-    console.log(textNodeMock);
     expect(textNodeMock).toEqual({
       ...textNodeMock,
       description: 'Use with care',

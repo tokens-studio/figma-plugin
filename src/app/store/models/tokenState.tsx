@@ -29,6 +29,8 @@ import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { isEqual } from '@/utils/isEqual';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { updateTokenSetsInState } from '@/utils/tokenset/updateTokenSetsInState';
+import { TokenTypes } from '@/constants/TokenTypes';
+import tokenTypes from '@/config/tokenType.defs.json';
 
 export interface TokenState {
   tokens: Record<string, AnyTokenList>;
@@ -43,6 +45,8 @@ export interface TokenState {
   usedTokenSet: UsedTokenSetsMap;
   editProhibited: boolean;
   hasUnsavedChanges: boolean;
+  collapsedTokenSets: string[];
+  collapsedTokenTypeObj: Record<TokenTypes, boolean>
 }
 
 export const tokenState = createModel<RootModel>()({
@@ -61,6 +65,11 @@ export const tokenState = createModel<RootModel>()({
     usedTokenSet: ['global'],
     editProhibited: false,
     hasUnsavedChanges: false,
+    collapsedTokenSets: [],
+    collapsedTokenTypeObj: Object.keys(tokenTypes).reduce<Partial<Record<TokenTypes, boolean>>>((acc, tokenType) => {
+      acc[tokenType as TokenTypes] = false;
+      return acc;
+    }, {}),
   } as unknown as TokenState,
   reducers: {
     setEditProhibited(state, payload: boolean) {
@@ -137,7 +146,8 @@ export const tokenState = createModel<RootModel>()({
       }
 
       const newName = `${name}_Copy`;
-      return updateTokenSetsInState(state, null, [newName]);
+
+      return updateTokenSetsInState(state, null, [newName, state.tokens[name]]);
     },
     deleteTokenSet: (state, name: string) => updateTokenSetsInState(
       state,
@@ -430,6 +440,14 @@ export const tokenState = createModel<RootModel>()({
         tokens: newTokens,
       };
     },
+    setCollapsedTokenSets: (state, data: string[]) => ({
+      ...state,
+      collapsedTokenSets: data,
+    }),
+    setCollapsedTokenTypeObj: (state, data: Record<TokenTypes, boolean>) => ({
+      ...state,
+      collapsedTokenTypeObj: data,
+    }),
     ...tokenStateReducers,
   },
   effects: (dispatch) => ({

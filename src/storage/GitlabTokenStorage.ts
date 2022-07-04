@@ -114,8 +114,10 @@ export class GitlabTokenStorage extends GitTokenStorage {
       const trees = await this.gitlabClient.Repositories.tree(this.projectId, {
         path: this.path,
         ref: this.branch,
+        recursive: true,
       });
-      if (trees.length > 0 && this.flags.multiFileEnabled) {
+
+      if (!this.path.endsWith('.json') && this.flags.multiFileEnabled) {
         const jsonFiles = trees.filter((file) => (
           file.path.endsWith('.json')
         )).sort((a, b) => (
@@ -151,6 +153,7 @@ export class GitlabTokenStorage extends GitTokenStorage {
           return null;
         }));
       }
+
       const data = await this.gitlabClient.RepositoryFiles.showRaw(this.projectId, this.path, { ref: this.branch });
       if (IsJSONString(data)) {
         const parsed = JSON.parse(data) as GitSingleFileObject;
@@ -188,15 +191,34 @@ export class GitlabTokenStorage extends GitTokenStorage {
     const tree = await this.gitlabClient.Repositories.tree(this.projectId, {
       path: rootPath,
       ref: branch,
+      recursive: true,
     });
-    const filesInTrees = tree.map((t) => t.path);
+    const jsonFiles = tree.filter((file) => (
+      file.path.endsWith('.json')
+    )).sort((a, b) => (
+      (a.path && b.path) ? a.path.localeCompare(b.path) : 0
+    )).map((jsonFile) => jsonFile.path);
+
+    if (!this.path.endsWith('.json')) {
+      const filesToDelete = jsonFiles.filter((jsonFile) => !Object.keys(changeset).some((item) => item.endsWith(jsonFile)));
+
+      await this.gitlabClient.Commits.create(
+        this.projectId,
+        branch,
+        'remove tokenSet',
+        filesToDelete.map((filePath) => ({
+          action: 'delete',
+          filePath,
+        })),
+      );
+    }
 
     const response = await this.gitlabClient.Commits.create(
       this.projectId,
       branch,
       message,
       Object.entries(changeset).map(([filePath, content]) => ({
-        action: filesInTrees.includes(filePath) ? 'update' : 'create',
+        action: jsonFiles.includes(filePath) ? 'update' : 'create',
         filePath,
         content,
       })),

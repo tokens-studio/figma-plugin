@@ -24,7 +24,7 @@ import parseJson from '@/utils/parseJson';
 import AttentionIcon from '@/icons/attention.svg';
 import { TokensContext } from '@/context';
 import {
-  activeTokenSetSelector, manageThemesModalOpenSelector, showEditFormSelector, tokenFilterSelector, tokensSelector, tokenTypeSelector, updateModeSelector, usedTokenSetSelector,
+  activeTokenSetSelector, manageThemesModalOpenSelector, scrollPositionSetSelector, showEditFormSelector, tokenFilterSelector, tokensSelector, tokenTypeSelector, updateModeSelector, usedTokenSetSelector,
 } from '@/selectors';
 import { ThemeSelector } from './ThemeSelector';
 import IconToggleableDisclosure from '@/app/components/IconToggleableDisclosure';
@@ -96,16 +96,29 @@ function Tokens({ isActive }: { isActive: boolean }) {
   const usedTokenSet = useSelector(usedTokenSetSelector);
   const showEditForm = useSelector(showEditFormSelector);
   const manageThemesModalOpen = useSelector(manageThemesModalOpenSelector);
+  const scrollPositionSet = useSelector(scrollPositionSetSelector);
   const tokenFilter = useSelector(tokenFilterSelector);
   const dispatch = useDispatch<Dispatch>();
   const [activeTokensTab, setActiveTokensTab] = React.useState('list');
   const [tokenSetsVisible, setTokenSetsVisible] = React.useState(true);
   const { getStringTokens } = useTokens();
   const { tokenThemes } = useFlags();
-
+  const tokenDiv = React.useRef<HTMLDivElement>(null);
   const updateMode = useSelector(updateModeSelector);
   const { confirm } = useConfirm();
   const shouldConfirm = React.useMemo(() => updateMode === UpdateMode.DOCUMENT, [updateMode]);
+
+  React.useEffect(() => {
+    if (tokenDiv.current) {
+      tokenDiv.current.addEventListener('scroll', () => {}, false);
+    }
+  }, []);
+
+  React.useEffect(() => {
+    if (scrollPositionSet && tokenDiv.current && typeof tokenDiv.current.scrollTo === 'function') {
+      tokenDiv.current.scrollTo(0, scrollPositionSet[activeTokenSet]);
+    }
+  }, [activeTokenSet]);
 
   const resolvedTokens = React.useMemo(
     () => resolveTokenValues(mergeTokenGroups(tokens, {
@@ -174,6 +187,18 @@ function Tokens({ isActive }: { isActive: boolean }) {
     }
   }, [confirm, shouldConfirm, dispatch.tokenState, activeTokensTab, stringTokens]);
 
+  const toggleTokenSetsVisible = React.useCallback(() => {
+    setTokenSetsVisible(!tokenSetsVisible);
+  }, [tokenSetsVisible]);
+
+  const openListTab = React.useCallback(() => {
+    setActiveTokensTab('list');
+  }, []);
+
+  const openJsonTab = React.useCallback(() => {
+    setActiveTokensTab('json');
+  }, []);
+
   const tokensContextValue = React.useMemo(() => ({
     resolvedTokens,
   }), [resolvedTokens]);
@@ -193,7 +218,13 @@ function Tokens({ isActive }: { isActive: boolean }) {
     } else {
       dispatch.tokenState.setHasUnsavedChanges(false);
     }
-  }, [tokens, stringTokens, activeTokenSet]);
+  }, [dispatch, tokens, stringTokens, activeTokenSet]);
+
+  const saveScrollPositionSet = React.useCallback((tokenSet: string) => {
+    if (tokenDiv.current) {
+      dispatch.uiState.setScrollPositionSet({ ...scrollPositionSet, [tokenSet]: tokenDiv.current?.scrollTop });
+    }
+  }, [dispatch, scrollPositionSet]);
 
   if (!isActive) return null;
 
@@ -218,7 +249,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
           }}
         >
           <Box>
-            <StyledButton style={{ height: '100%' }} type="button" onClick={() => setTokenSetsVisible(!tokenSetsVisible)}>
+            <StyledButton style={{ height: '100%' }} type="button" onClick={toggleTokenSetsVisible}>
               <Box
                 css={{
                   fontWeight: '$bold',
@@ -249,7 +280,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
             <IconButton
               variant={activeTokensTab === 'list' ? 'primary' : 'default'}
               dataCy="tokensTabList"
-              onClick={() => setActiveTokensTab('list')}
+              onClick={openListTab}
               icon={<IconListing />}
               tooltipSide="bottom"
               tooltip="Listing"
@@ -257,7 +288,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
             <IconButton
               variant={activeTokensTab === 'json' ? 'primary' : 'default'}
               dataCy="tokensTabJSON"
-              onClick={() => setActiveTokensTab('json')}
+              onClick={openJsonTab}
               icon={<IconJSON />}
               tooltipSide="bottom"
               tooltip="JSON"
@@ -277,7 +308,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
         >
           {tokenSetsVisible && (
             <Box>
-              <TokenSetSelector />
+              <TokenSetSelector saveScrollPositionSet={saveScrollPositionSet} />
             </Box>
           )}
           <Box
@@ -298,7 +329,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
                 />
               </Box>
             ) : (
-              <Box css={{ width: '100%', paddingBottom: '$6' }} className="content scroll-container">
+              <Box ref={tokenDiv} css={{ width: '100%', paddingBottom: '$6' }} className="content scroll-container">
                 {memoizedTokens.map(([key, { values, isPro, ...schema }]) => (
                   <div key={key}>
                     <TokenListing

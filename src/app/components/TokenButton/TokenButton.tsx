@@ -65,7 +65,6 @@ export const TokenButton: React.FC<Props> = ({
   }, [name]);
 
   const properties = usePropertiesForTokenType(type);
-
   // @TODO check type property typing
   const activeStateProperties = React.useMemo(() => (
     [...properties, ...DocumentationProperties]
@@ -109,6 +108,7 @@ export const TokenButton: React.FC<Props> = ({
     const tokenValue = name;
     track('Apply Token', { givenProperties });
     let value = isActive ? 'delete' : tokenValue;
+
     if (propsToSet[0].clear && !isActive) {
       value = 'delete';
       propsToSet[0].forcedValue = tokenValue;
@@ -117,6 +117,7 @@ export const TokenButton: React.FC<Props> = ({
       [propsToSet[0].name || propsToSet[0]]: propsToSet[0].forcedValue || value,
     };
     if (propsToSet[0].clear) propsToSet[0].clear.map((item) => Object.assign(newProps, { [item]: 'delete' }));
+
     if (type === 'composition' && value === 'delete') {
       // distructure composition token when it is unselected
       const compositionToken = tokensContext.resolvedTokens.find((token) => token.name === tokenValue);

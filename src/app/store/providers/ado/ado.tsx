@@ -45,8 +45,7 @@ export const useADO = () => {
       text: 'Pull from Ado?',
       description: 'Your repo already contains tokens, do you want to pull these now?',
     });
-    if (confirmResult === false) return false;
-    return confirmResult.result;
+    return confirmResult;
   }, [confirm]);
 
   const pushTokensToADO = React.useCallback(async (context: AdoCredentials) => {
@@ -165,6 +164,7 @@ export const useADO = () => {
               usedTokenSet: usedTokenSets,
               activeTheme,
             });
+            dispatch.tokenState.setCollapsedTokenSets([]);
             notifyToUI('Pulled tokens from ADO');
           }
         }
@@ -194,7 +194,7 @@ export const useADO = () => {
       const data = await syncTokensWithADO(context);
 
       if (data) {
-        AsyncMessageChannel.message({
+        AsyncMessageChannel.ReactInstance.message({
           type: AsyncMessageTypes.CREDENTIALS,
           credential: context,
         });
