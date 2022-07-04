@@ -121,7 +121,6 @@ export default function useRemoteTokens() {
           setNames: Object.keys(remoteData.tokens),
         });
       }
-
       dispatch.uiState.completeJob(BackgroundJobs.UI_PULLTOKENS);
       return remoteData;
     },
