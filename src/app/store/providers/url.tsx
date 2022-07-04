@@ -34,7 +34,7 @@ export default function useURL() {
       dispatch.uiState.setProjectURL(id);
 
       if (content) {
-        AsyncMessageChannel.message({
+        AsyncMessageChannel.ReactInstance.message({
           type: AsyncMessageTypes.CREDENTIALS,
           credential: {
             id,

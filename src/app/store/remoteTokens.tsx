@@ -89,6 +89,7 @@ export default function useRemoteTokens() {
         activeTheme: activeTheme ?? null,
         usedTokenSet: usedTokenSet ?? {},
       });
+      dispatch.tokenState.setCollapsedTokenSets([]);
       track('Launched with token sets', {
         count: Object.keys(remoteData.tokens).length,
         setNames: Object.keys(remoteData.tokens),
@@ -251,7 +252,7 @@ export default function useRemoteTokens() {
   }, [fetchGithubBranches, fetchGitLabBranches, fetchADOBranches]);
 
   const deleteProvider = useCallback((provider) => {
-    AsyncMessageChannel.message({
+    AsyncMessageChannel.ReactInstance.message({
       type: AsyncMessageTypes.REMOVE_SINGLE_CREDENTIAL,
       context: provider,
     });

@@ -33,23 +33,22 @@ export class FileTokenStorage extends RemoteTokenStorage {
           .sort((a, b) => (
             (a.webkitRelativePath && b.webkitRelativePath) ? a.webkitRelativePath.localeCompare(b.webkitRelativePath) : 0
           ));
-        const filePromises = jsonFiles.map((file) =>
-          // Return a promise per file
-          new Promise((resolve) => {
-            const reader = new FileReader();
-            reader.readAsText(file);
-            reader.onload = async () => {
-              const fileContent = reader.result as string;
-              if (fileContent && IsJSONString(fileContent)) {
-                const parsedJsonData = JSON.parse(fileContent);
-                const validationResult = await multiFileSchema.safeParseAsync(parsedJsonData);
-                if (validationResult.success) {
-                  resolve(validationResult.data);
-                }
+        // Return a promise per file
+        const filePromises = jsonFiles.map((file) => new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.readAsText(file);
+          reader.onload = async () => {
+            const fileContent = reader.result as string;
+            if (fileContent && IsJSONString(fileContent)) {
+              const parsedJsonData = JSON.parse(fileContent);
+              const validationResult = await multiFileSchema.safeParseAsync(parsedJsonData);
+              if (validationResult.success) {
+                resolve(validationResult.data);
               }
-              resolve(null);
-            };
-          }));
+            }
+            resolve(null);
+          };
+        }));
         // Wait for all promises to be resolved
         const jsonFileContents = await Promise.all(filePromises);
         return compact(jsonFileContents.map<RemoteTokenStorageFile | null>((fileContent, index) => {

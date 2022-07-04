@@ -41,7 +41,7 @@ export default function FilePreset({ onCancel }: Props) {
     const { files } = event.target;
     await fetchTokensFromFileOrDirectory(files);
     onCancel();
-  }, [fetchTokensFromFileOrDirectory]);
+  }, [fetchTokensFromFileOrDirectory, onCancel]);
 
   return (
     <Stack direction="column" gap={4}>
@@ -50,11 +50,11 @@ export default function FilePreset({ onCancel }: Props) {
         {' '}
         <br />
         {' '}
-        If you're using a single file, the first-level keys should be the token set names.
+        If you&lsquo;re using a single file, the first-level keys should be the token set names.
         {' '}
         <br />
         {' '}
-        If you're using multiple files, the file name / path are the set names.
+        If you&lsquo;re using multiple files, the file name / path are the set names.
       </Heading>
       <Stack direction="row" gap={4} justify="between">
         <Button variant="secondary" onClick={onCancel}>
