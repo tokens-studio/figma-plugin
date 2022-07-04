@@ -9,6 +9,8 @@ import { SingleTypographyValueDisplay } from './SingleTypograhpyValueDisplay';
 import { TokenBoxshadowValue, TokenTypograpyValue } from '@/types/values';
 import { SingleCompositionValueDisplay } from './SingleCompositionValueDisplay';
 import TooltipProperty from './TooltipProperty';
+import Stack from '../Stack';
+import { CompositionTokenValue } from '@/types/CompositionTokenProperty';
 
 type Props = {
   token: SingleToken;
@@ -25,24 +27,24 @@ export const TokenTooltipContentValue: React.FC<Props> = ({ token }) => {
     return (
       <SingleTypographyValueDisplay
         value={token.value as TokenTypograpyValue}
-        rawValue={resolvedValue as TokenTypograpyValue}
+        resolvedValue={resolvedValue as TokenTypograpyValue}
       />
     );
   }
 
   if (isSingleCompositionToken(token)) {
     return (
-      resolvedValue ? (
-        <div>
-          {Object.entries(resolvedValue).map(([property, value], index) => (
-            <SingleCompositionValueDisplay
-              key={seed(index)}
-              property={property}
-              value={value}
-            />
-          ))}
-        </div>
-      ) : null
+      <Stack direction="column" align="start" gap={2} wrap>
+        {Object.entries(token.value).map(([property, value], index) => (
+          <SingleCompositionValueDisplay
+            key={seed(index)}
+            property={property}
+            value={value}
+            // TODO: Fix this type error
+            resolvedValue={resolvedValue[property] as CompositionTokenValue}
+          />
+        ))}
+      </Stack>
     );
   }
 
@@ -54,7 +56,7 @@ export const TokenTooltipContentValue: React.FC<Props> = ({ token }) => {
             <SingleShadowValueDisplay
               key={seed(t)}
               value={t as TokenBoxshadowValue}
-              rawValue={resolvedValue[index] as TokenBoxshadowValue}
+              resolvedValue={resolvedValue[index] as TokenBoxshadowValue}
             />
           ))}
         </div>
@@ -65,7 +67,7 @@ export const TokenTooltipContentValue: React.FC<Props> = ({ token }) => {
       <SingleShadowValueDisplay
         // @TODO strengthen type checking here
         value={token.value as TokenBoxshadowValue}
-        rawValue={resolvedValue as TokenBoxshadowValue}
+        resolvedValue={resolvedValue as TokenBoxshadowValue}
       />
     );
   }
@@ -78,11 +80,11 @@ export const TokenTooltipContentValue: React.FC<Props> = ({ token }) => {
 
   if (resolvedValue && typeof resolvedValue !== 'string' && typeof resolvedValue !== 'number') {
     return (
-      <TooltipProperty value={token.value} rawValue={JSON.stringify(token.value, null, 2)} />
+      <TooltipProperty value={token.value} resolvedValue={JSON.stringify(token.value, null, 2)} />
     );
   }
 
   return (
-    <TooltipProperty value={token.value} rawValue={resolvedValue} />
+    <TooltipProperty value={token.value} resolvedValue={resolvedValue} />
   );
 };

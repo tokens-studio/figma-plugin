@@ -4,19 +4,27 @@ import TooltipProperty from './TooltipProperty';
 import Stack from '../Stack';
 
 type Props = {
-  value: TokenTypograpyValue
-  rawValue: TokenTypograpyValue
+  value: TokenTypograpyValue;
+  resolvedValue: TokenTypograpyValue;
 };
 
-export const SingleTypographyValueDisplay: React.FC<Props> = ({ value, rawValue }) => (
+export const SingleTypographyValueDisplay: React.FC<Props> = ({ value, resolvedValue }) => (
   <Stack direction="column" align="start" gap={1}>
-    <TooltipProperty label="Font" value={value.fontFamily} rawValue={rawValue?.fontFamily} />
-    <TooltipProperty label="Weight" value={value.fontWeight} rawValue={rawValue?.fontWeight} />
-    <TooltipProperty label="Size" value={value.fontSize} rawValue={rawValue?.fontSize} />
-    <TooltipProperty label="Line height" value={value.lineHeight} rawValue={rawValue?.lineHeight} />
-    <TooltipProperty label="Tracking" value={value.letterSpacing} rawValue={rawValue?.letterSpacing} />
-    <TooltipProperty label="Paragraph spacing" value={value.paragraphSpacing} rawValue={rawValue?.paragraphSpacing} />
-    <TooltipProperty label="Text case" value={value.textCase} rawValue={rawValue?.textCase} />
-    <TooltipProperty label="Text decoration" value={value.textDecoration} rawValue={rawValue?.textDecoration} />
+    <TooltipProperty label="Font" value={value.fontFamily} resolvedValue={resolvedValue?.fontFamily} />
+    <TooltipProperty label="Weight" value={value.fontWeight} resolvedValue={resolvedValue?.fontWeight} />
+    <TooltipProperty label="Size" value={value.fontSize} resolvedValue={resolvedValue?.fontSize} />
+    <TooltipProperty label="Line height" value={value.lineHeight} resolvedValue={resolvedValue?.lineHeight} />
+    <TooltipProperty label="Tracking" value={value.letterSpacing} resolvedValue={resolvedValue?.letterSpacing} />
+    <TooltipProperty
+      label="Paragraph spacing"
+      value={value.paragraphSpacing}
+      resolvedValue={resolvedValue?.paragraphSpacing}
+    />
+    <TooltipProperty label="Text case" value={value.textCase} resolvedValue={resolvedValue?.textCase} />
+    <TooltipProperty
+      label="Text decoration"
+      value={value.textDecoration}
+      resolvedValue={resolvedValue?.textDecoration}
+    />
   </Stack>
 );

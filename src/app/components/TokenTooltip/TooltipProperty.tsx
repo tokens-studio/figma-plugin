@@ -7,10 +7,10 @@ import AliasBadge from './AliasBadge';
 type Props = {
   label?: string;
   value?: string | number;
-  rawValue?: string | number | null;
+  resolvedValue?: string | number | null;
 };
 
-export default function TooltipProperty({ label, value, rawValue }: Props) {
+export default function TooltipProperty({ label, value, resolvedValue }: Props) {
   return value ? (
     <Stack
       direction="row"
@@ -33,11 +33,11 @@ export default function TooltipProperty({ label, value, rawValue }: Props) {
           {label}
         </Box>
         )}
-        <Box css={{ color: '$fgToolTipMuted' }}>
+        <Box css={{ color: '$fgToolTipMuted', flexShrink: 1, wordBreak: 'break-word' }}>
           {value}
         </Box>
       </Stack>
-      {rawValue && !isEqual(String(rawValue), String(value)) ? <AliasBadge value={rawValue} /> : null}
+      {resolvedValue && !isEqual(String(resolvedValue), String(value)) ? <AliasBadge value={resolvedValue} /> : null}
     </Stack>
   ) : null;
 }

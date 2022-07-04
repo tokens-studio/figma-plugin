@@ -1,5 +1,6 @@
 import { TokensContext, TokensContextValue } from '../../src/context/TokensContext';
 import { TokenTypes } from '@/constants/TokenTypes';
+import { BoxShadowTypes } from '@/constants/BoxShadowTypes';
 import { useParameter } from '@storybook/addons';
 import { useState } from 'react';
 
@@ -30,6 +31,26 @@ export default function TokensDecorator(Story, context) {
           textCase: 'none',
         },
         type: TokenTypes.TYPOGRAPHY,
+      },
+      {
+        name: 'card.default',
+        value: {
+          fill: '#ff0000',
+          border: '#cccccc',
+          borderWidth: '1px',
+          borderRadius: '6px',
+          boxShadow: {
+            x: '2',
+            y: '2',
+            blur: '2',
+            spread: '2',
+            color: '#000000',
+            type: BoxShadowTypes.DROP_SHADOW,
+          },
+          opacity: '10%',
+          itemSpacing: '16px',
+        },
+        type: TokenTypes.COMPOSITION,
       }
     ],
   });

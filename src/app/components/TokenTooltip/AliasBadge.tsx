@@ -6,6 +6,8 @@ const StyledAliasBadge = styled('div', {
   backgroundColor: '$bgOnDarkAccentSubtle',
   color: '$fgOnDarkAccent',
   height: '100%',
+  wordBreak: 'break-word',
+  flexShrink: 1,
 });
 
 type Props = {
