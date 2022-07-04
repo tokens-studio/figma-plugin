@@ -117,8 +117,11 @@ export function useGitLab() {
     activeTheme,
   ]);
 
-  const checkAndSetAccess = useCallback(async ({ context, owner, repo }: { context: GitlabCredentials; owner: string; repo: string }) => {
+  const checkAndSetAccess = useCallback(async ({
+    context, owner, repo, receivedFeatureFlags,
+  }: { context: GitlabCredentials; owner: string; repo: string, receivedFeatureFlags?: LDProps['flags'] }) => {
     const storage = await storageClientFactory(context, owner, repo);
+    if (receivedFeatureFlags?.multiFileSync) storage.enableMultiFile();
     const hasWriteAccess = await storage.canWrite();
     dispatch.tokenState.setEditProhibited(!hasWriteAccess);
   }, [dispatch, storageClientFactory]);
@@ -128,7 +131,9 @@ export function useGitLab() {
     if (receivedFeatureFlags?.multiFileSync) storage.enableMultiFile();
     const { ownerId: owner, repositoryId: repo } = getRepositoryInformation(context.id);
 
-    await checkAndSetAccess({ context, owner, repo });
+    await checkAndSetAccess({
+      context, owner, repo, receivedFeatureFlags,
+    });
 
     try {
       const content = await storage.retrieve();
