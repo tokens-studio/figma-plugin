@@ -15,13 +15,13 @@ export default function ExportModal({ onClose }: Props) {
 
   const handleProviderClick = React.useCallback((provider: string) => {
     setLoadProvider(provider);
-  }, [loadProvider]);
+  }, []);
 
   return (
     <Modal showClose isOpen close={onClose} title="Import">
-      <Stack direction="column" justify="center" gap={4} css={{ textAlign: 'center' }}>
+      <Stack direction="column" justify="center" gap={4}>
         <Stack direction="column" gap={4}>
-          <Stack direction="row" gap={1}>
+          <Stack direction="row" gap={2}>
             <LoadProviderItem
               isActive={loadProvider === LoadProviderType.PRESET}
               onClick={handleProviderClick}
