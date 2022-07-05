@@ -216,7 +216,7 @@ describe('GitlabTokenStorage', () => {
 
   it('canWrite should throw an error if there is no project or group id', async () => {
     const provider = new GitlabTokenStorage('', '', '');
-
+    provider.enableMultiFile();
     await expect(provider.canWrite())
       .rejects
       .toThrow('Missing Project or Group ID');
