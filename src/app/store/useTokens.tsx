@@ -20,7 +20,6 @@ import {
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { isEqual } from '@/utils/isEqual';
-import convertTokensToObject from '@/utils/convertTokensToObject';
 import { UpdateMode } from '@/constants/UpdateMode';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
@@ -160,11 +159,6 @@ export default function useTokens() {
     });
   }, [settings, tokens, usedTokenSet]);
 
-  const getTokenKeys = useCallback((data: Record<string, AnyTokenList>) => {
-    const tokenSetObjects = convertTokensToObject(data);
-    return Object.keys(tokenSetObjects).map((name) => (name));
- }, [tokens, activeTokenSet]);
-
   return useMemo(() => ({
     isAlias,
     getTokenValue,
@@ -175,7 +169,6 @@ export default function useTokens() {
     remapToken,
     removeTokensByValue,
     handleRemap,
-    getTokenKeys,
   }), [
     isAlias,
     getTokenValue,
@@ -186,6 +179,5 @@ export default function useTokens() {
     remapToken,
     removeTokensByValue,
     handleRemap,
-    getTokenKeys,
   ]);
 }

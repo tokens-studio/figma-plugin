@@ -1,12 +1,14 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
-import useTokens from '@/app/store/useTokens';
+import JSZip from 'jszip';
+import { saveAs } from 'file-saver';
+import convertTokensToObject from '@/utils/convertTokensToObject';
 import Button from '../Button';
 import Stack from '../Stack';
 import Heading from '../Heading';
 import { IconFile } from '@/icons';
 import Box from '../Box';
-import { tokensSelector } from '@/selectors';
+import { tokensSelector, themesListSelector } from '@/selectors';
 
 type Props = {
   onCancel: () => void;
@@ -14,14 +16,29 @@ type Props = {
 
 export default function MultiFilesExport({ onCancel }: Props) {
   const tokens = useSelector(tokensSelector);
-  const { getTokenKeys } = useTokens();
+  const themes = useSelector(themesListSelector);
+
+  const tokenSetObjects = React.useMemo(() => convertTokensToObject(tokens), [convertTokensToObject]);
+
+  const handleExportButtonClick = React.useCallback(() => {
+    const zip = new JSZip();
+    Object.entries(tokenSetObjects).forEach(([key, value]) => {
+      console.log('haah');
+      zip.file(`${key}.json`, JSON.stringify(value, null, 2));
+    });
+    zip.generateAsync({ type: 'blob' })
+      .then((content) => {
+        saveAs(content, 'tokens.zip');
+      });
+    onCancel();
+  }, [tokenSetObjects, onCancel]);
 
   return (
     <Stack direction="column" gap={4}>
       <Heading size="small">Preview</Heading>
-      <Stack direction='column' gap={3} css={{ height: '80px' }}>
+      <Stack direction="column" gap={3} css={{ height: '80px' }}>
         {
-          getTokenKeys(tokens).map((key) => (
+          Object.keys(tokenSetObjects).map((key) => (
             <Box>
               <IconFile />
               {key}
@@ -33,14 +50,8 @@ export default function MultiFilesExport({ onCancel }: Props) {
         <Button variant="secondary" onClick={onCancel}>
           Cancel
         </Button>
-        <Button
-          // href={`charset=utf-8,${encodeURIComponent(
-          //   'saffasdfasfd'
-          // )}`}
-          // download=''
-          variant="primary"
-        >
-          Download
+        <Button variant="primary" onClick={handleExportButtonClick}>
+          Export
         </Button>
       </Stack>
     </Stack>
