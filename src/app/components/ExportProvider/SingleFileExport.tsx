@@ -1,18 +1,18 @@
 import React from 'react';
-import { Checkbox } from '@radix-ui/react-checkbox';
 import useTokens from '@/app/store/useTokens';
-import Button from '../Button';
-import Stack from '../Stack';
 import Heading from '../Heading';
-import Box from '../Box';
-import Label from '../Label';
 import Textarea from '../Textarea';
+import Button from '../Button';
+import Checkbox from '../Checkbox';
+import Label from '../Label';
+import Box from '../Box';
+import Stack from '../Stack';
 
 type Props = {
-  onCancel: () => void;
+  onClose: () => void
 };
 
-export default function SingleFileExport({ onCancel }: Props) {
+export default function SingleFileExport({ onClose }: Props) {
   const { getFormattedTokens } = useTokens();
   const [includeAllTokens, setIncludeAllTokens] = React.useState(false);
   const [includeParent, setIncludeParent] = React.useState(true);
@@ -36,7 +36,7 @@ export default function SingleFileExport({ onCancel }: Props) {
   }, [expandShadow]);
 
   return (
-    <Stack direction="column" gap={4}>
+    <Stack gap={4} direction="column">
       <Box css={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
         <Box css={{ display: 'flex', alignItems: 'center', gap: 4 }}>
           <Checkbox
@@ -59,7 +59,6 @@ export default function SingleFileExport({ onCancel }: Props) {
             Include parent key
           </Label>
         </Box>
-        <Heading size="small">Options</Heading>
         <Box css={{ display: 'flex', alignItems: 'center', gap: 4 }}>
           <Checkbox
             id="expandTypography"
@@ -80,7 +79,7 @@ export default function SingleFileExport({ onCancel }: Props) {
         </Box>
       </Box>
 
-      <Heading size="small">Preview</Heading>
+      <Heading size="small">Output example</Heading>
       <Textarea
         rows={10}
         isDisabled
@@ -89,7 +88,7 @@ export default function SingleFileExport({ onCancel }: Props) {
         })}
       />
       <Stack width="full" direction="row" justify="end" gap={4}>
-        <Button variant="secondary" onClick={onCancel}>
+        <Button variant="secondary" onClick={onClose}>
           Cancel
         </Button>
         <Button

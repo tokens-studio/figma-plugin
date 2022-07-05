@@ -1,8 +1,8 @@
 import React from 'react';
+import { ExportProviderType } from '@/constants/ExportProviderType';
 import Modal from '../Modal';
 import Stack from '../Stack';
 import LoadProviderItem from '../LoadProviderSelector';
-import { ExportProviderType } from '@/constants/ExportProviderType';
 import SingleFileExport from '../ExportProvider/SingleFileExport';
 import MultiFilesExport from '../ExportProvider/MultiFilesExport';
 
@@ -36,8 +36,8 @@ export default function ExportModal({ onClose }: Props) {
         </Stack>
         {
           exportProvider === ExportProviderType.SINGLE
-            ? <SingleFileExport onCancel={onClose} />
-            : <MultiFilesExport onCancel={onClose} />
+            ? <SingleFileExport onClose={onClose} />
+            : <MultiFilesExport onClose={onClose} />
         }
       </Stack>
     </Modal>

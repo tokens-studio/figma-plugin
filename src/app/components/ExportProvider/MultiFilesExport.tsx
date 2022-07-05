@@ -11,10 +11,10 @@ import { IconFile } from '@/icons';
 import { tokensSelector, themesListSelector } from '@/selectors';
 
 type Props = {
-  onCancel: () => void;
+  onClose: () => void;
 };
 
-export default function MultiFilesExport({ onCancel }: Props) {
+export default function MultiFilesExport({ onClose }: Props) {
   const tokens = useSelector(tokensSelector);
   const themes = useSelector(themesListSelector);
   const seed = useUIDSeed();
@@ -37,8 +37,8 @@ export default function MultiFilesExport({ onCancel }: Props) {
       .then((content) => {
         saveAs(content, 'tokens.zip');
       });
-    onCancel();
-  }, [filesChangeset, onCancel]);
+    onClose();
+  }, [filesChangeset, onClose]);
 
   return (
     <Stack direction="column" gap={4}>
@@ -54,7 +54,7 @@ export default function MultiFilesExport({ onCancel }: Props) {
         }
       </Stack>
       <Stack width="full" direction="row" justify="end" gap={4}>
-        <Button variant="secondary" onClick={onCancel}>
+        <Button variant="secondary" onClick={onClose}>
           Cancel
         </Button>
         <Button variant="primary" onClick={downLoadDataAsZip}>
