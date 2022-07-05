@@ -1,5 +1,6 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
+import { useUIDSeed } from 'react-uid';
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
 import convertTokensToObject from '@/utils/convertTokensToObject';
@@ -7,7 +8,6 @@ import Button from '../Button';
 import Stack from '../Stack';
 import Heading from '../Heading';
 import { IconFile } from '@/icons';
-import Box from '../Box';
 import { tokensSelector, themesListSelector } from '@/selectors';
 
 type Props = {
@@ -17,6 +17,7 @@ type Props = {
 export default function MultiFilesExport({ onCancel }: Props) {
   const tokens = useSelector(tokensSelector);
   const themes = useSelector(themesListSelector);
+  const seed = useUIDSeed();
 
   const tokenSetObjects = React.useMemo(() => convertTokensToObject(tokens), [convertTokensToObject]);
 
@@ -36,14 +37,14 @@ export default function MultiFilesExport({ onCancel }: Props) {
 
   return (
     <Stack direction="column" gap={4}>
-      <Heading size="small">Preview</Heading>
-      <Stack direction="column" gap={3} css={{ height: '80px' }}>
+      <Heading size="medium">Preview</Heading>
+      <Stack direction="column" gap={3} className="content content-dark scroll-container" css={{ maxHeight: '$previewMaxHeight' }}>
         {
-          Object.keys(tokenSetObjects).map((key) => (
-            <Box>
+          Object.keys(tokenSetObjects).map((key, index) => (
+            <Stack direction="row" gap={3} key={seed(index)}>
               <IconFile />
               {key}
-            </Box>
+            </Stack>
           ))
         }
       </Stack>
