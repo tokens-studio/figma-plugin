@@ -26,12 +26,13 @@ export default function MultiFilesExport({ onCancel }: Props) {
       console.log('haah');
       zip.file(`${key}.json`, JSON.stringify(value, null, 2));
     });
+    zip.file('$themes.json', JSON.stringify(themes, null, 2));
     zip.generateAsync({ type: 'blob' })
       .then((content) => {
         saveAs(content, 'tokens.zip');
       });
     onCancel();
-  }, [tokenSetObjects, onCancel]);
+  }, [tokenSetObjects, themes, onCancel]);
 
   return (
     <Stack direction="column" gap={4}>
