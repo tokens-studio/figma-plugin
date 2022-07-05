@@ -37,9 +37,8 @@ export default function ExportModal({ onClose }: Props) {
   }, [expandShadow]);
 
   return (
-    <Modal large isOpen close={onClose}>
+    <Modal showClose large isOpen close={onClose} title="Export">
       <Stack gap={4} direction="column">
-        <Heading>Export</Heading>
         <p className="text-xs">
           This is an early version of a tokens export, if you encounter any issues please raise an
           {' '}

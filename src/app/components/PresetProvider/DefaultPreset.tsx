@@ -4,6 +4,7 @@ import { Dispatch } from '@/app/store';
 import Button from '../Button';
 import Stack from '../Stack';
 import Heading from '../Heading';
+import Text from '../Text';
 
 type Props = {
   onCancel: () => void;
@@ -18,19 +19,13 @@ export default function DefaultPreset({ onCancel }: Props) {
 
   return (
     <Stack direction="column" gap={4}>
-      <Heading size="small">
-        Override your current tokens by applying a preset. Want your preset featured here? Submit it via
-        {' '}
-        <a
-          target="_blank"
-          rel="noreferrer"
-          className="underline"
-          href="https://github.com/six7/figma-tokens/issues"
-        >
-          GitHub
-        </a>
-      </Heading>
-      <Stack direction="row" gap={4} justify="between">
+      <Stack direction="column" gap={2}>
+        <Heading size="small">
+          Override your current tokens by applying a preset.
+        </Heading>
+        <Text>The preset contains a wide variety of tokens and some token sets to give you an idea of what you can do.</Text>
+      </Stack>
+      <Stack direction="row" gap={2} justify="end">
         <Button variant="secondary" onClick={onCancel}>
           Cancel
         </Button>
