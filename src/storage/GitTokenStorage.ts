@@ -105,6 +105,9 @@ export abstract class GitTokenStorage extends RemoteTokenStorage<GitStorageMetad
           filesChangeset[joinPath(this.path, '$themes.json')] = JSON.stringify(file.data, null, 2);
         }
       });
+    } else {
+      // When path is a directory and multiFile is disabled return
+      throw new Error('Multi-file storage is not enabled');
     }
     return this.writeChangeset(
       filesChangeset,

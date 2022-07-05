@@ -53,6 +53,7 @@ describe('GitlabTokenStorage', () => {
 
   beforeEach(() => {
     storageProvider.disableMultiFile();
+    storageProvider.changePath('tokens.json');
   });
 
   it('should assign projectId by projects in group', async () => {
@@ -195,6 +196,13 @@ describe('GitlabTokenStorage', () => {
     expect(await storageProvider.canWrite()).toBe(false);
   });
 
+  it('canWrite should return false if filePath is a folder and multiFileSync flag is false', async () => {
+    storageProvider.changePath('tokens');
+
+    const canWrite = await storageProvider.canWrite();
+    expect(canWrite).toBe(false);
+  });
+
   it('can read from Git in single file format', async () => {
     mockGetRepositories.mockImplementationOnce(() => (
       Promise.resolve([])
@@ -251,7 +259,6 @@ describe('GitlabTokenStorage', () => {
   });
 
   it('can read from Git in a multifile format', async () => {
-    storageProvider.enableMultiFile();
     storageProvider.changePath('data');
 
     mockGetRepositories.mockImplementationOnce(() => (

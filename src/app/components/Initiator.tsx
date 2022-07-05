@@ -68,7 +68,7 @@ export function Initiator() {
             if (mainNodeSelectionValues.length > 1) {
               const selectionValues = mainNodeSelectionValues.reduce((acc, crr) => (
                 Object.assign(acc, crr)
-              ), {});            
+              ), {});
               dispatch.uiState.setMainNodeSelectionValues(selectionValues);
             } else if (mainNodeSelectionValues.length > 0) {
               // When only one node is selected, we can set the state

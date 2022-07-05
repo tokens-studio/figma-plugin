@@ -98,7 +98,7 @@ export default function IconButton({
           </Box>
         )
           : (
-            <StyledButton disabled={disabled} data-cy={dataCy} type="button" onClick={handleClick} buttonVariant={variant}>
+            <StyledButton disabled={disabled} data-testid={dataCy} data-cy={dataCy} type="button" onClick={handleClick} buttonVariant={variant}>
               <IconButtonInnerContent icon={icon} badge={badge} />
             </StyledButton>
           )}
