@@ -1,0 +1,6 @@
+[auth]
+token=140cde243f3644a29f7d5db5c05436ed3bad6cf272194f98a55cb508fb0b9e18
+
+[defaults]
+org=figma-tokens
+project=figma-tokens

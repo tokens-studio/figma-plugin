@@ -4,12 +4,13 @@ const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const HtmlInlineScriptPlugin = require('html-inline-script-webpack-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
+const SentryWebpackPlugin = require('@sentry/webpack-plugin');
 
 module.exports = (env, argv) => ({
   mode: argv.mode === 'production' ? 'production' : 'development',
 
   // This is necessary because Figma's 'eval' works differently than normal eval
-  devtool: argv.mode === 'production' ? false : 'inline-source-map',
+  devtool: argv.mode === 'production' ? 'source-map' : 'inline-source-map',
 
   entry: {
     ui: './src/app/index.tsx', // The entry point for your UI code
@@ -45,14 +46,16 @@ module.exports = (env, argv) => ({
       { test: /\.(png|jpg|gif|webp)$/, use: [{ loader: 'url-loader' }] },
       {
         test: /\.svg$/,
-        use: [{
-          loader: '@svgr/webpack',
-          options: {
-            svgoConfig: {
-              plugins: [{ removeViewBox: false }]
-            }
-          }
-        }],
+        use: [
+          {
+            loader: '@svgr/webpack',
+            options: {
+              svgoConfig: {
+                plugins: [{ removeViewBox: false }],
+              },
+            },
+          },
+        ],
       },
       {
         type: 'javascript/auto',
@@ -78,6 +81,7 @@ module.exports = (env, argv) => ({
 
   output: {
     filename: '[name].js',
+    sourceMapFilename: "[name].js.map",
     path: path.resolve(__dirname, 'dist'), // Compile into a folder called "dist"
   },
 
@@ -104,6 +108,6 @@ module.exports = (env, argv) => ({
     }),
     new webpack.ProvidePlugin({
       Buffer: ['buffer', 'Buffer'],
-  }),
+    }),
   ],
 });
