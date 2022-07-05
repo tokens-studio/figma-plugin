@@ -30,7 +30,7 @@ export default function MultiFilesExport({ onCancel }: Props) {
 
   const downLoadDataAsZip = React.useCallback(() => {
     const zip = new JSZip();
-    Object.entries(filesChangeset).forEach(([key, value]) => {
+    Object.entries(filesChangeset)?.forEach(([key, value]) => {
       zip.file(key, value);
     });
     zip.generateAsync({ type: 'blob' })
@@ -45,7 +45,7 @@ export default function MultiFilesExport({ onCancel }: Props) {
       <Heading size="medium">Preview</Heading>
       <Stack direction="column" gap={3} className="content content-dark scroll-container" css={{ maxHeight: '$previewMaxHeight' }}>
         {
-          Object.keys(filesChangeset).map((key, index) => (
+          Object.keys(filesChangeset)?.map((key, index) => (
             <Stack direction="row" gap={3} key={seed(index)}>
               <IconFile />
               {key}
