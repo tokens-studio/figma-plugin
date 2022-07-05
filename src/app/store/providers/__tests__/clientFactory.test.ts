@@ -32,7 +32,7 @@ describe('gitlab client factory', () => {
     expect(GitlabTokenStorage).toHaveBeenCalledWith(secret, repositoryId, fullPath, baseUrl);
   });
 
-  it('should call change path if ther is a filepath', async () => {
+  it('should call change path if there is a filepath', async () => {
     const testFilePath = 'test-filepath';
     const context = {
       filePath: testFilePath,

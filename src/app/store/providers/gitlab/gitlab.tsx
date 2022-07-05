@@ -124,8 +124,11 @@ export function useGitLab() {
     multiFileSync,
   ]);
 
-  const checkAndSetAccess = useCallback(async ({ context }: { context: GitlabCredentials }) => {
+  const checkAndSetAccess = useCallback(async ({
+    context, receivedFeatureFlags,
+  }: { context: GitlabCredentials; receivedFeatureFlags?: LDProps['flags'] }) => {
     const storage = await storageClientFactory(context, multiFileSync);
+    if (receivedFeatureFlags?.multiFileSync) storage.enableMultiFile();
     const hasWriteAccess = await storage.canWrite();
     dispatch.tokenState.setEditProhibited(!hasWriteAccess);
   }, [dispatch, storageClientFactory, multiFileSync]);
@@ -134,7 +137,9 @@ export function useGitLab() {
     const storage = await storageClientFactory(context, multiFileSync);
     if (receivedFeatureFlags?.multiFileSync) storage.enableMultiFile();
 
-    await checkAndSetAccess({ context });
+    await checkAndSetAccess({
+      context, receivedFeatureFlags,
+    });
 
     try {
       const content = await storage.retrieve();
@@ -175,6 +180,7 @@ export function useGitLab() {
               usedTokenSet,
               activeTheme,
             });
+            dispatch.tokenState.setCollapsedTokenSets([]);
             notifyToUI('Pulled tokens from GitLab');
           }
         }
@@ -204,7 +210,7 @@ export function useGitLab() {
     const data = await syncTokensWithGitLab(context);
 
     if (data) {
-      AsyncMessageChannel.message({
+      AsyncMessageChannel.ReactInstance.message({
         type: AsyncMessageTypes.CREDENTIALS,
         credential: context,
       });

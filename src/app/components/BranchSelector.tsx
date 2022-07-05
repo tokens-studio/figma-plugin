@@ -11,6 +11,7 @@ import {
   BranchSwitchMenuTrigger,
   BranchSwitchMenuRadioGroup,
   BranchSwitchMenuArrow,
+  BranchSwitchMenuSeparator,
 } from './BranchSwitchMenu';
 import {
   branchSelector, lastSyncedStateSelector, tokensSelector, localApiStateBranchSelector, apiSelector, usedTokenSetSelector, localApiStateSelector, themesListSelector, activeThemeSelector,
@@ -21,6 +22,8 @@ import CreateBranchModal from './modals/CreateBranchModal';
 import { Dispatch } from '../store';
 import { BranchSwitchMenuRadioElement } from './BranchSwitchMenuRadioElement';
 import { isGitProvider } from '@/utils/is';
+import { useFlags } from './LaunchDarkly';
+import ProBadge from './ProBadge';
 
 const BranchSwitchMenuItemElement: React.FC<{
   branch: string
@@ -43,6 +46,7 @@ export default function BranchSelector() {
   const { confirm } = useConfirm();
   const { pullTokens, pushTokens } = useRemoteTokens();
   const dispatch = useDispatch<Dispatch>();
+  const { gitBranchSelector } = useFlags();
 
   const branchState = useSelector(branchSelector);
   const lastSyncedState = useSelector(lastSyncedStateSelector);
@@ -163,16 +167,27 @@ export default function BranchSelector() {
           </BranchSwitchMenuMainTrigger>
 
           <BranchSwitchMenuContent side="top" sideOffset={5}>
-            <BranchSwitchMenuRadioGroup value={currentBranch}>
+            {!gitBranchSelector && (
+            <>
+              <BranchSwitchMenuItem css={{ display: 'flex', justifyContent: 'space-between' }}>
+
+                <span>Upgrade to Pro</span>
+                <ProBadge compact />
+
+              </BranchSwitchMenuItem>
+              <BranchSwitchMenuSeparator />
+            </>
+            )}
+            <BranchSwitchMenuRadioGroup className="content content-dark scroll-container" css={{ maxHeight: '$dropdownMaxHeight' }} value={currentBranch}>
               {branchState.branches.length > 0
-                && branchState.branches.map((branch, index) => <BranchSwitchMenuRadioElement key={`radio_${seed(index)}`} branch={branch} branchSelected={onBranchSelected} />)}
+                && branchState.branches.map((branch, index) => <BranchSwitchMenuRadioElement disabled={!gitBranchSelector} key={`radio_${seed(index)}`} branch={branch} branchSelected={onBranchSelected} />)}
             </BranchSwitchMenuRadioGroup>
             <BranchSwitchMenu>
-              <BranchSwitchMenuTrigger data-cy="branch-selector-create-new-branch-trigger">
+              <BranchSwitchMenuTrigger data-cy="branch-selector-create-new-branch-trigger" disabled={!gitBranchSelector}>
                 Create new branch from
                 <ChevronRightIcon />
               </BranchSwitchMenuTrigger>
-              <BranchSwitchMenuContent side="left">
+              <BranchSwitchMenuContent className="content scroll-container" css={{ maxHeight: '$dropdownMaxHeight' }} side="left">
                 {hasChanges
                   && (
                     <BranchSwitchMenuItem data-cy="branch-selector-create-new-branch-from-current-change" onSelect={createBranchByChange}>

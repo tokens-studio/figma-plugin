@@ -105,7 +105,6 @@ export const TokenButton: React.FC<Props> = ({
     const propsToSet = (Array.isArray(givenProperties) ? givenProperties : [givenProperties]).map((prop) => (
       extend(true, {}, prop) as typeof prop
     ));
-
     const tokenValue = name;
     track('Apply Token', { givenProperties });
     let value = isActive ? 'delete' : tokenValue;
