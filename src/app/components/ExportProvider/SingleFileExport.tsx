@@ -78,7 +78,7 @@ export default function SingleFileExport({ onClose }: Props) {
           <Label htmlFor="expandShadow">Expand Shadows</Label>
         </Box>
       </Box>
-      <Heading size="small">Output example</Heading>
+      <Heading size="small">Preview</Heading>
       <Textarea
         rows={10}
         isDisabled
