@@ -22,20 +22,22 @@ export default function formatTokens({
   const nestUnderParent = includeAllTokens ? true : includeParent;
   const tokenObj = {};
 
-  tokenSets.forEach((tokenSet) => {
-    tokens[tokenSet].forEach((token) => {
-      const { name, ...tokenWithoutName } = token;
-      if (
-        (token.type === 'typography' && expandTypography)
-        || (token.type === 'boxShadow' && expandShadow)
-      ) {
-        const expanded = expand(tokenWithoutName.value);
-        set(tokenObj, nestUnderParent ? [tokenSet, token.name].join('.') : token.name, { ...expanded });
-      } else {
-        set(tokenObj, nestUnderParent ? [tokenSet, token.name].join('.') : token.name, tokenWithoutName);
-      }
+  if (tokenSets) {
+    tokenSets.forEach((tokenSet) => {
+      tokens[tokenSet].forEach((token) => {
+        const { name, ...tokenWithoutName } = token;
+        if (
+          (token.type === 'typography' && expandTypography)
+          || (token.type === 'boxShadow' && expandShadow)
+        ) {
+          const expanded = expand(tokenWithoutName.value);
+          set(tokenObj, nestUnderParent ? [tokenSet, token.name].join('.') : token.name, { ...expanded });
+        } else {
+          set(tokenObj, nestUnderParent ? [tokenSet, token.name].join('.') : token.name, tokenWithoutName);
+        }
+      });
     });
-  });
+  }
 
   return JSON.stringify(tokenObj, null, 2);
 }

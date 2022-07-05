@@ -19,28 +19,33 @@ export default function MultiFilesExport({ onCancel }: Props) {
   const themes = useSelector(themesListSelector);
   const seed = useUIDSeed();
 
-  const tokenSetObjects = React.useMemo(() => convertTokensToObject(tokens), [convertTokensToObject]);
-
-  const handleExportButtonClick = React.useCallback(() => {
-    const zip = new JSZip();
-    Object.entries(tokenSetObjects).forEach(([key, value]) => {
-      console.log('haah');
-      zip.file(`${key}.json`, JSON.stringify(value, null, 2));
+  const filesChangeset = React.useMemo(() => {
+    const changeObj: Record<string, string> = {};
+    Object.entries(convertTokensToObject(tokens)).forEach(([key, value]) => {
+      changeObj[`${key}.json`] = JSON.stringify(value, null, 2);
     });
-    zip.file('$themes.json', JSON.stringify(themes, null, 2));
+    if (themes) changeObj['$themes.json'] = JSON.stringify(themes, null, 2);
+    return changeObj;
+  }, [tokens, themes]);
+
+  const downLoadDataAsZip = React.useCallback(() => {
+    const zip = new JSZip();
+    Object.entries(filesChangeset).forEach(([key, value]) => {
+      zip.file(key, value);
+    });
     zip.generateAsync({ type: 'blob' })
       .then((content) => {
         saveAs(content, 'tokens.zip');
       });
     onCancel();
-  }, [tokenSetObjects, themes, onCancel]);
+  }, [filesChangeset, onCancel]);
 
   return (
     <Stack direction="column" gap={4}>
       <Heading size="medium">Preview</Heading>
       <Stack direction="column" gap={3} className="content content-dark scroll-container" css={{ maxHeight: '$previewMaxHeight' }}>
         {
-          Object.keys(tokenSetObjects).map((key, index) => (
+          Object.keys(filesChangeset).map((key, index) => (
             <Stack direction="row" gap={3} key={seed(index)}>
               <IconFile />
               {key}
@@ -52,7 +57,7 @@ export default function MultiFilesExport({ onCancel }: Props) {
         <Button variant="secondary" onClick={onCancel}>
           Cancel
         </Button>
-        <Button variant="primary" onClick={handleExportButtonClick}>
+        <Button variant="primary" onClick={downLoadDataAsZip}>
           Export
         </Button>
       </Stack>
