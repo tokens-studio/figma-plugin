@@ -59,6 +59,7 @@ export default function SingleFileExport({ onClose }: Props) {
             Include parent key
           </Label>
         </Box>
+        <Heading size="medium">Options</Heading>
         <Box css={{ display: 'flex', alignItems: 'center', gap: 4 }}>
           <Checkbox
             id="expandTypography"
@@ -78,7 +79,7 @@ export default function SingleFileExport({ onClose }: Props) {
           <Label htmlFor="expandShadow">Expand Shadows</Label>
         </Box>
       </Box>
-      <Heading size="small">Preview</Heading>
+      <Heading size="medium">Preview</Heading>
       <Textarea
         rows={10}
         isDisabled
