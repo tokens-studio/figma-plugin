@@ -161,7 +161,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
       returnValue = Object.entries(token.value).reduce<string>((acc, [property, value]) => (
         `${acc}${property}:${value}`
       ), '');
-    } else if (typeof token.value === 'string') {
+    } else if (typeof token.value === 'string' || typeof token.value === 'number') {
       returnValue = token.value;
     }
     return returnValue;
