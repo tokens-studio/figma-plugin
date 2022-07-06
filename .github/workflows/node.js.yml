@@ -81,7 +81,10 @@ jobs:
         with:
           fullCoverageDiff: false
           runCommand: "npx jest --collectCoverageFrom='[\"src/**/*.{js,jsx,ts,tsx}\"]' --coverage --collectCoverage=true --coverageDirectory='./' --coverageReporters='json-summary' --forceExit --detectOpenHandles"
-          delta: 0.5
+          total_delta: 1
+          delta: 1
+          afterSwitchCommand: yarn --frozen-lockfile
+          useSameComment: true
   test-transform:
     name: Transformer Tests
     runs-on: ubuntu-latest
