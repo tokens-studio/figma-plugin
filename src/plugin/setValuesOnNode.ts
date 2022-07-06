@@ -14,8 +14,6 @@ export default async function setValuesOnNode(
   ignoreFirstPartForStyles = false,
 ) {
   try {
-    console.log('SET VALUES ON NODE', node, values, data, figmaStyleMaps);
-
     // BORDER RADIUS
     if (
       node.type !== 'CONNECTOR'
