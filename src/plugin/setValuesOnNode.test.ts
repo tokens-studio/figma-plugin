@@ -37,6 +37,12 @@ describe('setValuesOnNode', () => {
     },
   };
 
+  const zeroValues = {
+    value: 0,
+  };
+
+  const undefinedValues = {};
+
   const dataOnNode = {
     typography: 'type.heading.h1',
     boxShadow: 'shadows.default',
@@ -148,5 +154,17 @@ describe('setValuesOnNode', () => {
   it('doesnt change characters if not needed', async () => {
     await setValuesOnNode(textNodeMock, { fill: '#00ff00' }, { ...dataOnNode, fill: 'fg.default' }, emptyFigmaStylesMap);
     expect(textNodeMock.characters).toEqual('foobar');
+  });
+
+  it('should change characters when the value is 0', async () => {
+    await setValuesOnNode(textNodeMock, zeroValues, dataOnNode, emptyFigmaStylesMap);
+    expect(figma.loadFontAsync).toHaveBeenCalled();
+    expect(textNodeMock.characters).toEqual('0');
+  });
+
+  it('should not change characters when the value is undefined', async () => {
+    await setValuesOnNode(textNodeMock, undefinedValues, dataOnNode, emptyFigmaStylesMap);
+    expect(figma.loadFontAsync).not.toHaveBeenCalled();
+    expect(textNodeMock.characters).toEqual(textNodeMockOriginal.characters);
   });
 });
