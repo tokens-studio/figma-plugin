@@ -203,7 +203,7 @@ export default async function setValuesOnNode(
       }
 
       // Real value for text layers
-      if (values.value !== null) {
+      if ('value' in values && values.value !== null) {
         if ('characters' in node && node.fontName !== figma.mixed) {
           await figma.loadFontAsync(node.fontName);
           // If we're inserting an object, stringify that
