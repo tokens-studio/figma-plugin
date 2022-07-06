@@ -37,13 +37,29 @@ describe('updateNode', () => {
     },
   };
 
+  const zeroValues = {
+    value: 0,
+  };
+
+  const undefinedValues = {}
+
   const dataOnNode = {
     typography: 'type.heading.h1',
     boxShadow: 'shadows.default',
   };
 
+
   let textNodeMock;
   let solidNodeMock;
+
+  const characterNodeMock = {
+    type: 'TEXT',
+    fontName: {
+      family: 'Inter',
+      style: 'Regular',
+    },
+    characters: 'text'
+  }
 
   beforeEach(() => {
     textNodeMock = {
@@ -116,5 +132,15 @@ describe('updateNode', () => {
       ]),
     });
     expect(setEffectValuesOnTargetSpy).toHaveBeenCalled();
+  });
+
+  it('should change layer when the value is 0', async () => {
+    await setValuesOnNode(characterNodeMock, zeroValues, dataOnNode, emptyFigmaStylesMap);
+    expect(figma.loadFontAsync).toHaveBeenCalled();
+  });
+
+  it('should not change layer when the value is undefined', async () => {
+    await setValuesOnNode(characterNodeMock, undefinedValues, dataOnNode, emptyFigmaStylesMap);
+    expect(figma.loadFontAsync).not.toHaveBeenCalled();
   });
 });
