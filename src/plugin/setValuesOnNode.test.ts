@@ -3,7 +3,7 @@ import setValuesOnNode from './setValuesOnNode';
 import * as setTextValuesOnTarget from './setTextValuesOnTarget';
 import * as setEffectValuesOnTarget from './setEffectValuesOnTarget';
 
-describe('updateNode', () => {
+describe('setValuesOnNode', () => {
   const emptyFigmaStylesMap = {
     effectStyles: new Map(),
     paintStyles: new Map(),
@@ -44,35 +44,43 @@ describe('updateNode', () => {
 
   let textNodeMock;
   let solidNodeMock;
+  let textNodeMockOriginal;
+  let solidNodeMockOriginal;
 
   beforeEach(() => {
     textNodeMock = {
+      characters: 'foobar',
       type: 'TEXT',
       fontName: {
         family: 'Inter',
         style: 'Regular',
       },
+      fills: ['#000000'],
     };
 
     solidNodeMock = {
       type: 'SOLID',
       effects: [],
     };
+    textNodeMockOriginal = textNodeMock;
+    solidNodeMockOriginal = solidNodeMock;
   });
 
-  it('calls setTextValuesOnTarget if text node and atomic typography tokens are given', () => {
-    setValuesOnNode(textNodeMock, atomicValues, dataOnNode, emptyFigmaStylesMap);
+  it('calls setTextValuesOnTarget if text node and atomic typography tokens are given', async () => {
+    await setValuesOnNode(textNodeMock, atomicValues, dataOnNode, emptyFigmaStylesMap);
     expect(setTextValuesOnTargetSpy).toHaveBeenCalled();
+    expect(textNodeMock).toEqual({ ...textNodeMockOriginal, ...atomicValues });
   });
 
-  it('doesnt call setTextValuesOnTarget if no text node', () => {
-    setValuesOnNode(solidNodeMock, atomicValues, dataOnNode, emptyFigmaStylesMap);
+  it('doesnt call setTextValuesOnTarget if no text node', async () => {
+    await setValuesOnNode(solidNodeMock, atomicValues, dataOnNode, emptyFigmaStylesMap);
     expect(setTextValuesOnTargetSpy).not.toHaveBeenCalled();
   });
 
-  it('calls setTextValuesOnTarget if text node and composite typography tokens are given', () => {
-    setValuesOnNode(textNodeMock, typographyValues, dataOnNode, emptyFigmaStylesMap);
+  it('calls setTextValuesOnTarget if text node and composite typography tokens are given', async () => {
+    await setValuesOnNode(textNodeMock, typographyValues, dataOnNode, emptyFigmaStylesMap);
     expect(setTextValuesOnTargetSpy).toHaveBeenCalled();
+    expect(textNodeMock).toEqual({ ...textNodeMockOriginal, fontSize: 24, fontName: { family: 'Inter', style: 'Bold' } });
   });
 
   it('sets textstyle if matching Style is found', async () => {
@@ -83,7 +91,7 @@ describe('updateNode', () => {
       ]),
     });
     expect(setTextValuesOnTargetSpy).not.toHaveBeenCalled();
-    expect(textNodeMock).toEqual({ ...textNodeMock, textStyleId: '123' });
+    expect(textNodeMock).toEqual({ ...textNodeMockOriginal, textStyleId: '123' });
   });
 
   it('sets textstyle if matching Style is found and first part is ignored', async () => {
@@ -94,7 +102,7 @@ describe('updateNode', () => {
       ]),
     }, true);
     expect(setTextValuesOnTargetSpy).not.toHaveBeenCalled();
-    expect(textNodeMock).toEqual({ ...textNodeMock, textStyleId: '456' });
+    expect(textNodeMock).toEqual({ ...textNodeMockOriginal, textStyleId: '456' });
   });
 
   it('sets effectStyle if matching Style is found', async () => {
@@ -105,7 +113,7 @@ describe('updateNode', () => {
       ]),
     });
     expect(setEffectValuesOnTargetSpy).not.toHaveBeenCalled();
-    expect(solidNodeMock).toEqual({ ...solidNodeMock, effectStyleId: '123' });
+    expect(solidNodeMock).toEqual({ ...solidNodeMockOriginal, effectStyleId: '123' });
   });
 
   it('calls setEffectValuesOnTarget if effect node and effects are given', async () => {
@@ -116,5 +124,29 @@ describe('updateNode', () => {
       ]),
     });
     expect(setEffectValuesOnTargetSpy).toHaveBeenCalled();
+  });
+
+  it('changes fill if needed', async () => {
+    await setValuesOnNode(textNodeMock, { fill: '#ff0000' }, { ...dataOnNode, fill: 'fg.default' }, emptyFigmaStylesMap);
+    expect(textNodeMock).toEqual({
+      ...textNodeMockOriginal,
+      fills: [{
+        color: {
+          r: 1, g: 0, b: 0,
+        },
+        opacity: 1,
+        type: 'SOLID',
+      }],
+    });
+  });
+
+  it('changes characters if needed', async () => {
+    await setValuesOnNode(textNodeMock, { fill: '#ff0000', value: 'My new content' }, { ...dataOnNode, fill: 'default' }, emptyFigmaStylesMap);
+    expect(textNodeMock.characters).toEqual('My new content');
+  });
+
+  it('doesnt change characters if not needed', async () => {
+    await setValuesOnNode(textNodeMock, { fill: '#00ff00' }, { ...dataOnNode, fill: 'fg.default' }, emptyFigmaStylesMap);
+    expect(textNodeMock.characters).toEqual('foobar');
   });
 });
