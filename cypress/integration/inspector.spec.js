@@ -41,8 +41,8 @@ describe('Inspector tokens', () => {
           type: "sizing",
           value: "sizing.xs",
           nodes: [{
-            id: "3425:3",
-            name: "Rectangle 2",
+            id: "1",
+            name: "Rectangle",
             type: "RECTANGLE",
           }],
         },
@@ -51,8 +51,8 @@ describe('Inspector tokens', () => {
           type: "opacity",
           value: "opacity.50",
           nodes: [{
-            id: "3425:3",
-            name: "Rectangle 2",
+            id: "1",
+            name: "Rectangle",
             type: "RECTANGLE",
           }],
         },
@@ -61,8 +61,8 @@ describe('Inspector tokens', () => {
           type: "fontSizes",
           value: "font-size.12",
           nodes: [{
-            id: "3425:3",
-            name: "Rectangle 2",
+            id: "1",
+            name: "Rectangle",
             type: "RECTANGLE",
           }],
         },
@@ -74,10 +74,12 @@ describe('Inspector tokens', () => {
         fontSizes: "font-size.12",
       }
     });
-    cy.get('[data-cy=navitem-inspector]').click();
-    cy.get('[data-cy=inspector-token-single-sizing]').should('have.length', 1);
-    cy.get('[data-cy=inspector-token-single-opacity]').should('have.length', 1);
-    cy.get('[data-cy=inspector-token-single-fontSizes]').should('have.length', 1);
+    cy.get('[data-cy=navitem-inspector]').click({
+      timeout: 1000
+    });
+    cy.contains('sizing.xs');
+    cy.contains('opacity.50');
+    cy.contains('font-size.12');
   });
 
   it('successfully remap a token', () => {
@@ -118,8 +120,8 @@ describe('Inspector tokens', () => {
           type: "sizing",
           value: "sizing.xs",
           nodes: [{
-            id: "3425:3",
-            name: "Rectangle 2",
+            id: "1",
+            name: "Rectangle",
             type: "RECTANGLE",
           }],
         },
@@ -128,8 +130,8 @@ describe('Inspector tokens', () => {
           type: "opacity",
           value: "opacity.50",
           nodes: [{
-            id: "3425:3",
-            name: "Rectangle 2",
+            id: "1",
+            name: "Rectangle",
             type: "RECTANGLE",
           }],
         },
@@ -138,8 +140,8 @@ describe('Inspector tokens', () => {
           type: "fontSizes",
           value: "font-size.12",
           nodes: [{
-            id: "3425:3",
-            name: "Rectangle 2",
+            id: "1",
+            name: "Rectangle",
             type: "RECTANGLE",
           }],
         },
@@ -162,8 +164,8 @@ describe('Inspector tokens', () => {
           type: "sizing",
           value: "sizing.xs",
           nodes: [{
-            id: "3425:3",
-            name: "Rectangle 2",
+            id: "1",
+            name: "Rectangle",
             type: "RECTANGLE",
           }],
         },
@@ -172,8 +174,8 @@ describe('Inspector tokens', () => {
           type: "opacity",
           value: "opacity.100",
           nodes: [{
-            id: "3425:3",
-            name: "Rectangle 2",
+            id: "1",
+            name: "Rectangle",
             type: "RECTANGLE",
           }],
         },
@@ -182,8 +184,8 @@ describe('Inspector tokens', () => {
           type: "fontSizes",
           value: "font-size.12",
           nodes: [{
-            id: "3425:3",
-            name: "Rectangle 2",
+            id: "1",
+            name: "Rectangle",
             type: "RECTANGLE",
           }],
         },
