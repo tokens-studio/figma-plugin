@@ -21,12 +21,6 @@ export function compareLastSyncedState<Metadata = null>(
     return false;
   }
 
-  console.log(
-    parsedState,
-    compact([parsedState[0] ?? defaultSyncedState[0], parsedState[1] ?? defaultSyncedState[1], parsedState[2] ?? defaultSyncedState[2]]),
-    compact([tokens, themes, metadata ?? defaultSyncedState[2]]),
-  );
-
   return isEqual(
     compact([parsedState[0] ?? defaultSyncedState[0], parsedState[1] ?? defaultSyncedState[1], parsedState[2] ?? defaultSyncedState[2]]),
     compact([tokens, themes, metadata ?? defaultSyncedState[2]]),

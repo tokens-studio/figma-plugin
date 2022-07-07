@@ -22,23 +22,25 @@ import { RootState } from '@/app/store';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import IconIndeterminateAlt from '@/icons/indeterminate-alt.svg';
 import { TreeItem } from '@/utils/tokenset';
+import { StyledBeforeFlex } from './StyledBeforeFlex';
 
 export type TokenSetItemProps = {
   item: TreeItem;
   isCollapsed?: boolean;
   isActive?: boolean;
-  onClick: (item: TreeItem) => void;
   isChecked: boolean | 'indeterminate';
-  onCollapse?: (itemPath: string) => void;
-  onCheck: (checked: boolean, item: TreeItem) => void;
   canEdit: boolean;
   canDelete: boolean;
   canReorder?: boolean;
+  extraBefore?: React.ReactNode;
+  onClick: (item: TreeItem) => void;
+  onCollapse?: (itemPath: string) => void;
+  onCheck: (checked: boolean, item: TreeItem) => void;
   onRename: (set: string) => void;
   onDelete: (set: string) => void;
   onDuplicate: (set: string) => void;
   onTreatAsSource: (set: string) => void;
-  onDragStart?: (event: React.PointerEvent<HTMLDivElement>) => void;
+  onDragStart?: (event: React.PointerEvent<HTMLDivElement>, item: TreeItem) => void;
 };
 
 export function TokenSetItem({
@@ -50,6 +52,7 @@ export function TokenSetItem({
   canEdit,
   canDelete,
   canReorder = false,
+  extraBefore,
   onRename,
   onDelete,
   onDuplicate,
@@ -86,8 +89,8 @@ export function TokenSetItem({
   }, [item, isChecked, onCheck]);
 
   const handleGrabberPointerDown = useCallback<React.PointerEventHandler<HTMLDivElement>>((event) => {
-    if (onDragStart) onDragStart(event);
-  }, [onDragStart]);
+    if (onDragStart) onDragStart(event, item);
+  }, [item, onDragStart]);
 
   const renderIcon = useCallback((checked: typeof isChecked, fallbackIcon: React.ReactNode) => {
     if (tokenSetStatus === TokenSetStatus.SOURCE) {
@@ -96,18 +99,32 @@ export function TokenSetItem({
     return fallbackIcon;
   }, [tokenSetStatus]);
 
+  const tokenSetItemBefore = (canReorder || extraBefore) ? (
+    <StyledBeforeFlex>
+      {canReorder ? (
+        <StyledGrabber onPointerDown={handleGrabberPointerDown}>
+          <IconGrabber />
+        </StyledGrabber>
+      ) : null}
+      {extraBefore}
+    </StyledBeforeFlex>
+  ) : null;
+
   return (
     <StyledWrapper>
       {!item.isLeaf ? (
         <StyledButton
           itemType="folder"
           type="button"
+          css={{
+            paddingLeft: `${5 * item.level}px`,
+          }}
           isActive={isActive}
           onClick={handleClick}
         >
+          {tokenSetItemBefore}
           <Box
             css={{
-              paddingLeft: `${5 * item.level}px`,
               overflow: 'hidden',
               textOverflow: 'ellipsis',
               color: '$textMuted',
@@ -123,12 +140,15 @@ export function TokenSetItem({
           <ContextMenuTrigger asChild id={`${item.path}-trigger`}>
             <StyledButton
               type="button"
+              css={{
+                paddingLeft: `${5 * item.level}px`,
+              }}
               isActive={isActive}
               onClick={handleClick}
             >
+              {tokenSetItemBefore}
               <Box
                 css={{
-                  paddingLeft: `${5 * item.level}px`,
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
                   userSelect: 'none',
@@ -165,11 +185,6 @@ export function TokenSetItem({
           onCheckedChange={handleCheckedChange}
         />
       </StyledCheckbox>
-      {canReorder ? (
-        <StyledGrabber onPointerDown={handleGrabberPointerDown}>
-          <IconGrabber />
-        </StyledGrabber>
-      ) : null}
     </StyledWrapper>
   );
 }

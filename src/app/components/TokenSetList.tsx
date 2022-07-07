@@ -1,9 +1,6 @@
 import React, { useCallback, useEffect } from 'react';
 import compact from 'just-compact';
 import { useDispatch, useSelector } from 'react-redux';
-import {
-  Reorder, useDragControls, useMotionValue,
-} from 'framer-motion';
 import Box from './Box';
 import { Dispatch } from '../store';
 import { TokenSetItem } from './TokenSetItem';
@@ -16,9 +13,10 @@ import {
 } from '@/selectors';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { TokenSetListOrTree } from './TokenSetListOrTree';
-import { useRaisedShadow } from './use-raised-shadow';
 import { DragControlsContext } from '@/context';
 import { tokenSetListToList, TreeItem } from '@/utils/tokenset';
+import { TokenSetListOrTreeDragItem } from './TokenSetListOrTree/TokenSetListOrTreeDragItem';
+import { ReorderGroup } from '@/motion/ReorderGroup';
 
 type ExtendedTreeItem = TreeItem & {
   tokenSets: string[];
@@ -38,29 +36,6 @@ type Props = {
   onDuplicate: (tokenSet: string) => void;
   saveScrollPositionSet: (tokenSet: string) => void;
 };
-
-function TokenSetListItem({ item, children }: Parameters<TreeRenderFunction>[0]) {
-  const y = useMotionValue(0);
-  const boxShadow = useRaisedShadow(y);
-  const controls = useDragControls();
-  const editProhibited = useSelector(editProhibitedSelector);
-  const contextValue = React.useMemo(() => ({ controls }), [controls]);
-
-  return (!editProhibited)
-    ? (
-      <DragControlsContext.Provider value={contextValue}>
-        <Reorder.Item
-          dragListener={false}
-          dragControls={controls}
-          value={item}
-          style={{ boxShadow, y }}
-        >
-          {children}
-        </Reorder.Item>
-      </DragControlsContext.Provider>
-    )
-    : React.createElement(React.Fragment, {}, children);
-}
 
 export function TokenSetListItemContent({ item }: Parameters<TreeRenderFunction>[0]) {
   const { confirm } = useConfirm();
@@ -86,8 +61,8 @@ export function TokenSetListItemContent({ item }: Parameters<TreeRenderFunction>
     }
   }, [confirm, dispatch, hasUnsavedChanges, item, activeTokenSet]);
 
-  const handleCheckedChange = useCallback((checked: boolean, item: TreeItem) => {
-    dispatch.tokenState.toggleUsedTokenSet(item.path);
+  const handleCheckedChange = useCallback((checked: boolean, treeItem: TreeItem) => {
+    dispatch.tokenState.toggleUsedTokenSet(treeItem.path);
   }, [dispatch]);
 
   const handleTreatAsSource = useCallback((tokenSetPath: string) => {
@@ -119,6 +94,7 @@ export function TokenSetListItemContent({ item }: Parameters<TreeRenderFunction>
     />
   );
 }
+
 export default function TokenSetList({
   tokenSets,
   onRename,
@@ -137,7 +113,7 @@ export default function TokenSetList({
       onDelete,
       onDuplicate,
       saveScrollPositionSet,
-    } as unknown as ExtendedTreeItem))
+    }))
   ), [items, tokenSets, onRename, onDelete, onDuplicate, saveScrollPositionSet]);
 
   const handleReorder = React.useCallback((reorderedItems: ExtendedTreeItem[]) => {
@@ -157,14 +133,14 @@ export default function TokenSetList({
   // TODO: Handle reorder at end doesnt work yet
   return (
     <Box>
-      <Reorder.Group axis="y" layoutScroll values={mappedItems} onReorder={handleReorder}>
+      <ReorderGroup layoutScroll values={mappedItems} onReorder={handleReorder}>
         <TokenSetListOrTree<ExtendedTreeItem>
           displayType="list"
           items={mappedItems}
-          renderItem={TokenSetListItem}
+          renderItem={TokenSetListOrTreeDragItem}
           renderItemContent={TokenSetListItemContent}
         />
-      </Reorder.Group>
+      </ReorderGroup>
     </Box>
   );
 }
