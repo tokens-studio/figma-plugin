@@ -33,6 +33,15 @@ module.exports.mockImportStyleByKeyAsync = jest.fn(() => Promise.reject());
 module.exports.mockUiOn = jest.fn((eventName, handler) => {
   figmaUiOnHandlers.push([eventName, handler]);
 });
+module.exports.mockUiOff = jest.fn((eventName, handler) => {
+  const indexOf = figmaUiOnHandlers.findIndex((entry) => (
+    entry[0] === eventName
+    || entry[1] === handler
+  ))
+  if (indexOf > -1) {
+    figmaUiOnHandlers.splice(indexOf, 1);
+  }
+});
 module.exports.mockUiPostMessage = jest.fn((pluginMessage) => {
   window.dispatchEvent(new MessageEvent(pluginMessage))
 });
@@ -58,6 +67,7 @@ module.exports.figma = {
   ui: {
     postMessage: module.exports.mockUiPostMessage,
     on: module.exports.mockUiOn,
+    off: module.exports.mockUiOff,
   },
   root: {
     setSharedPluginData: module.exports.mockRootSetSharedPluginData,
