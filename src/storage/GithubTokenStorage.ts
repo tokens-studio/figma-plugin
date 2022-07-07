@@ -93,6 +93,7 @@ export class GithubTokenStorage extends GitTokenStorage {
   }
 
   public async canWrite(): Promise<boolean> {
+    if (!this.path.endsWith('.json') && !this.flags.multiFileEnabled) return false;
     const currentUser = await this.octokitClient.rest.users.getAuthenticated();
     if (!currentUser.data.login) return false;
     try {
@@ -118,7 +119,7 @@ export class GithubTokenStorage extends GitTokenStorage {
         headers: octokitClientDefaultHeaders,
       });
       // read entire directory
-      if (Array.isArray(response.data) && this.flags.multiFileEnabled) {
+      if (Array.isArray(response.data)) {
         const directoryTreeResponse = await this.octokitClient.rest.git.createTree({
           owner: this.owner,
           repo: this.repository,

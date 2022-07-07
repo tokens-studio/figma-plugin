@@ -116,8 +116,9 @@ export const useADO = () => {
     localApiState,
   ]);
 
-  const checkAndSetAccess = React.useCallback(async (context: AdoCredentials) => {
+  const checkAndSetAccess = React.useCallback(async (context: AdoCredentials, receivedFeatureFlags?: LDProps['flags']) => {
     const storage = storageClientFactory(context);
+    if (receivedFeatureFlags?.multiFileSync) storage.enableMultiFile();
     const hasWriteAccess = await storage.canWrite();
     dispatch.tokenState.setEditProhibited(!hasWriteAccess);
   }, [dispatch, storageClientFactory]);
@@ -126,7 +127,7 @@ export const useADO = () => {
     const storage = storageClientFactory(context);
     if (receivedFeatureFlags?.multiFileSync) storage.enableMultiFile();
 
-    await checkAndSetAccess(context);
+    await checkAndSetAccess(context, receivedFeatureFlags);
 
     try {
       const content = await storage.retrieve();

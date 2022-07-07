@@ -19,6 +19,7 @@ describe('GithubTokenStorage', () => {
 
   beforeEach(() => {
     storageProvider.disableMultiFile();
+    storageProvider.changePath('tokens.json');
   });
 
   it('should fetch branches as a simple list', async () => {
@@ -117,6 +118,13 @@ describe('GithubTokenStorage', () => {
         'If-None-Match': '',
       },
     });
+  });
+
+  it('canWrite should return false if filePath is a folder and multiFileSync flag is false', async () => {
+    storageProvider.changePath('tokens');
+
+    const canWrite = await storageProvider.canWrite();
+    expect(canWrite).toBe(false);
   });
 
   it('canWrite should return true if a collaborator', async () => {
@@ -403,6 +411,37 @@ describe('GithubTokenStorage', () => {
         },
       ],
     });
+  });
+
+  it('should not be able to write a multifile structure when multifile flag is off', async () => {
+    mockCreateOrUpdateFiles.mockImplementationOnce(() => (
+      Promise.resolve({
+        data: {
+          content: {},
+        },
+      })
+    ));
+
+    storageProvider.disableMultiFile();
+    storageProvider.changePath('data');
+
+    await expect(async () => {
+      await storageProvider.write([
+        {
+          type: 'tokenSet',
+          name: 'global',
+          path: 'global.json',
+          data: {
+            red: {
+              type: TokenTypes.COLOR,
+              name: 'red',
+              value: '#ff0000',
+            },
+          },
+        },
+      ]);
+    }).rejects.toThrow('Multi-file storage is not enabled');
+    expect(mockCreateOrUpdateFiles).not.toHaveBeenCalled();
   });
 
   it('should be able to write a multifile structure', async () => {
