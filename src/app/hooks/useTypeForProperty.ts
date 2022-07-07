@@ -9,23 +9,29 @@ export function useTypeForProperty(property: string): string {
       case Properties.height:
         type = Properties.sizing;
         break;
-      case Properties.paddingBottom:
-      case Properties.paddingLeft:
-      case Properties.paddingRight:
-      case Properties.paddingTop:
       case Properties.itemSpacing:
       case Properties.verticalPadding:
       case Properties.horizontalPadding:
+      case Properties.paddingTop:
+      case Properties.paddingLeft:
+      case Properties.paddingBottom:
+      case Properties.paddingRight:
         type = Properties.spacing;
         break;
-      case Properties.borderRadiusBottomLeft:
-      case Properties.borderRadiusBottomRight:
       case Properties.borderRadiusTopLeft:
       case Properties.borderRadiusTopRight:
+      case Properties.borderRadiusBottomLeft:
+      case Properties.borderRadiusBottomRight:
         type = Properties.borderRadius;
         break;
       case Properties.border:
         type = Properties.fill;
+        break;
+      case Properties.borderWidthTop:
+      case Properties.borderWidthLeft:
+      case Properties.borderWidthRight:
+      case Properties.borderWidthBottom:
+        type = Properties.borderWidth;
         break;
       default:
         type = property;
