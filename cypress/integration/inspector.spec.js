@@ -82,7 +82,7 @@ describe('Inspector tokens', () => {
     cy.contains('font-size.12');
   });
 
-  it('successfully remap a token', () => {
+  it('successfully remaps a token', () => {
     cy.receiveSetTokens({
       version: '5',
       values: {
