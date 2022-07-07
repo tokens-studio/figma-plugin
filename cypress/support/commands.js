@@ -107,48 +107,12 @@ Cypress.Commands.add('apiCredentials', (values) => {
   });
 });
 
-Cypress.Commands.add('receiveSelectionValues', () => {
+Cypress.Commands.add('receiveSelectionValues', (values) => {
   cy.window().then(($window) => {
     const message = {
       pluginMessage: {
         type: MessageFromPluginTypes.SELECTION,
-        selectionValues: [{
-            category: "sizing",
-            type: "sizing",
-            value: "sizing.xs",
-            nodes: [{
-              id: "3425:3",
-              name: "Rectangle 2",
-              type: "RECTANGLE",
-            }],
-          },
-          {
-            category: "opacity",
-            type: "opacity",
-            value: "opacity.50",
-            nodes: [{
-              id: "3425:3",
-              name: "Rectangle 2",
-              type: "RECTANGLE",
-            }],
-          },
-          {
-            category: "fontSizes",
-            type: "fontSizes",
-            value: "font-size.12",
-            nodes: [{
-              id: "3425:3",
-              name: "Rectangle 2",
-              type: "RECTANGLE",
-            }],
-          },
-        ],
-        selectedNodes: 1,
-        mainNodeSelectionValues: {
-          sizing: "sizing.xs",
-          opacity: "opacity.50",
-          fontSizes: "font-size.12",
-        }
+        ...values
       },
     };
     $window.postMessage(message, '*');
