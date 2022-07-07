@@ -4,7 +4,6 @@ const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const HtmlInlineScriptPlugin = require('html-inline-script-webpack-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
-const SentryWebpackPlugin = require('@sentry/webpack-plugin');
 
 module.exports = (env, argv) => ({
   mode: argv.mode === 'production' ? 'production' : 'development',
