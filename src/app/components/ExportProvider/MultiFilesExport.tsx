@@ -43,10 +43,10 @@ export default function MultiFilesExport({ onClose }: Props) {
   return (
     <Stack direction="column" gap={4}>
       <Heading size="medium">Preview</Heading>
-      <Stack direction="column" gap={3} className="content scroll-container" css={{ maxHeight: '$previewMaxHeight' }}>
+      <Stack direction="column" gap={3} className="content scroll-container" css={{ maxHeight: '200px' }}>
         {
           Object.keys(filesChangeset)?.map((key, index) => (
-            <Stack direction="row" gap={3} key={seed(index)}>
+            <Stack direction="row" align="start" gap={3} css={{ fontSize: '$xsmall' }} key={seed(index)}>
               <IconFile />
               {key}
             </Stack>
