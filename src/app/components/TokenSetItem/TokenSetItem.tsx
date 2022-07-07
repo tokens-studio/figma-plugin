@@ -102,7 +102,7 @@ export function TokenSetItem({
   const tokenSetItemBefore = (canReorder || extraBefore) ? (
     <StyledBeforeFlex>
       {canReorder ? (
-        <StyledGrabber onPointerDown={handleGrabberPointerDown}>
+        <StyledGrabber data-testid={`tokensetitem-${item.path}-grabber`} onPointerDown={handleGrabberPointerDown}>
           <IconGrabber />
         </StyledGrabber>
       ) : null}
@@ -116,6 +116,7 @@ export function TokenSetItem({
         <StyledButton
           itemType="folder"
           type="button"
+          data-testid={`tokensetitem-${item.path}`}
           css={{
             paddingLeft: `${5 * item.level}px`,
           }}
@@ -143,6 +144,7 @@ export function TokenSetItem({
               css={{
                 paddingLeft: `${5 * item.level}px`,
               }}
+              data-testid={`tokensetitem-${item.path}`}
               isActive={isActive}
               onClick={handleClick}
             >
@@ -180,6 +182,7 @@ export function TokenSetItem({
       <StyledCheckbox checked={isChecked}>
         <Checkbox
           id={item.path}
+          data-testid={`tokensetitem-${item.path}-checkbox`}
           checked={isChecked}
           renderIcon={renderIcon}
           onCheckedChange={handleCheckedChange}

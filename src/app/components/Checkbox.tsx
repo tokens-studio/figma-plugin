@@ -35,7 +35,7 @@ const StyledCheckbox = styled(CheckboxPrimitive.Root, {
   },
 });
 
-type Props = {
+type Props = Omit<React.HTMLAttributes<HTMLDivElement>, 'id'> & {
   checked: boolean | 'indeterminate';
   id: string | null;
   defaultChecked?: boolean;
@@ -51,6 +51,7 @@ function Checkbox({
   disabled = false,
   onCheckedChange,
   renderIcon,
+  ...props
 }: Props) {
   const icon = useMemo(() => {
     let fallbackIcon: React.ReactNode = null;
@@ -71,6 +72,7 @@ function Checkbox({
       checked={checked}
       onCheckedChange={onCheckedChange}
       defaultChecked={defaultChecked}
+      {...props}
     >
       <StyledIndicator>
         {icon}

@@ -48,7 +48,7 @@ export class AsyncMessageChannel {
         }
       };
       figma.ui.on('message', listener);
-      return listener;
+      return () => figma.ui.off('message', listener);
     }
 
     const listener = async (event: { data: { pluginMessage: Message } }) => {
@@ -58,7 +58,7 @@ export class AsyncMessageChannel {
       }
     };
     window.addEventListener('message', listener);
-    return listener;
+    return () => window.removeEventListener('message', listener);
   }
 
   public connect() {

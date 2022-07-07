@@ -104,7 +104,6 @@ export default function TokenSetList({
   saveScrollPositionSet,
 }: Props) {
   const [items, setItems] = React.useState(tokenSetListToList(tokenSets));
-
   const mappedItems = React.useMemo(() => (
     items.map<ExtendedTreeItem>((item) => ({
       ...item,
