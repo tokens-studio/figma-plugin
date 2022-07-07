@@ -164,38 +164,31 @@ describe('GithubTokenStorage', () => {
     ));
 
     storageProvider.changePath('data/tokens.json');
-    expect(await storageProvider.read()).toEqual([
-      {
-        type: 'themes',
-        path: 'data/tokens.json/$themes.json',
-        data: [
-          {
-            id: 'light',
-            name: 'Light',
-            selectedTokenSets: {
-              global: 'enabled',
-            },
+    expect(await storageProvider.retrieve()).toEqual({
+      themes: [
+        {
+          id: 'light',
+          name: 'Light',
+          selectedTokenSets: {
+            global: 'enabled',
           },
-        ],
-      },
-      {
-        name: 'global',
-        type: 'tokenSet',
-        path: 'data/tokens.json/global.json',
-        data: {
-          red: {
+        },
+      ],
+      tokens: {
+        global: [
+          {
             type: 'color',
             name: 'red',
             value: '#ff0000',
           },
-          black: {
+          {
             type: 'color',
             name: 'black',
             value: '#000000',
           },
-        },
+        ],
       },
-    ]);
+    });
     expect(mockGetContent).toBeCalledWith({
       owner: 'six7',
       repo: 'figma-tokens',
@@ -350,33 +343,27 @@ describe('GithubTokenStorage', () => {
     ));
 
     storageProvider.changePath('data/tokens.json');
-    await storageProvider.write([
-      {
-        type: 'themes',
-        path: '$themes.json',
-        data: [
+    await storageProvider.save({
+      themes: [{
+        id: 'light',
+        name: 'Light',
+        selectedTokenSets: {
+          global: TokenSetStatus.ENABLED,
+        },
+      }],
+      tokens: {
+        global: [
           {
-            id: 'light',
-            name: 'Light',
-            selectedTokenSets: {
-              global: TokenSetStatus.ENABLED,
-            },
-          },
-        ],
-      },
-      {
-        type: 'tokenSet',
-        name: 'global',
-        path: 'global.json',
-        data: {
-          red: {
             type: TokenTypes.COLOR,
             name: 'red',
             value: '#ff0000',
           },
-        },
+        ],
       },
-    ], {
+      metadata: {
+        tokenSetOrder: ['global'],
+      },
+    }, {
       commitMessage: 'Initial commit',
     });
 
@@ -390,6 +377,12 @@ describe('GithubTokenStorage', () => {
           message: 'Initial commit',
           files: {
             'data/tokens.json': JSON.stringify({
+              global: {
+                red: {
+                  type: TokenTypes.COLOR,
+                  value: '#ff0000',
+                },
+              },
               $themes: [
                 {
                   id: 'light',
@@ -399,15 +392,13 @@ describe('GithubTokenStorage', () => {
                   },
                 },
               ],
-              global: {
-                red: {
-                  type: TokenTypes.COLOR,
-                  name: 'red',
-                  value: '#ff0000',
-                },
+              $metadata: {
+                tokenSetOrder: ['global'],
               },
             }, null, 2),
           },
+          filesToDelete: undefined,
+          ignoreDeletionFailures: undefined,
         },
       ],
     });
@@ -439,7 +430,9 @@ describe('GithubTokenStorage', () => {
             },
           },
         },
-      ]);
+      ], {
+        commitMessage: '',
+      });
     }).rejects.toThrow('Multi-file storage is not enabled');
     expect(mockCreateOrUpdateFiles).not.toHaveBeenCalled();
   });
