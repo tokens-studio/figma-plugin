@@ -475,7 +475,6 @@ describe('GithubTokenStorage', () => {
         },
       },
     ], {
-      commitMessage: 'Initial commit',
     });
 
     expect(mockCreateOrUpdateFiles).toBeCalledWith({
@@ -485,7 +484,9 @@ describe('GithubTokenStorage', () => {
       createBranch: false,
       changes: [
         {
-          message: 'Initial commit',
+          message: 'Commit from Figma',
+          filesToDelete: undefined,
+          ignoreDeletionFailures: undefined,
           files: {
             'data/$themes.json': JSON.stringify([
               {
