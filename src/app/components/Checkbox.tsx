@@ -35,7 +35,7 @@ const StyledCheckbox = styled(CheckboxPrimitive.Root, {
   },
 });
 
-type Props = Omit<React.HTMLAttributes<HTMLDivElement>, 'id'> & {
+type CheckboxProps = {
   checked: boolean | 'indeterminate';
   id: string | null;
   defaultChecked?: boolean;
@@ -43,6 +43,8 @@ type Props = Omit<React.HTMLAttributes<HTMLDivElement>, 'id'> & {
   onCheckedChange: (checked: CheckboxPrimitive.CheckedState) => void;
   renderIcon?: (checked: boolean | 'indeterminate', fallback: React.ReactNode) => React.ReactNode;
 };
+
+type Props = Omit<React.HTMLAttributes<HTMLButtonElement>, keyof CheckboxProps> & CheckboxProps;
 
 function Checkbox({
   checked,
