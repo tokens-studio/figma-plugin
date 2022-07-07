@@ -6,7 +6,6 @@ describe('Inspector tokens', () => {
       },
     });
     cy.waitForReact(1000);
-    MockEnv();
   });
 
   it('successfully shows tokens applied on the node', () => {
@@ -36,5 +35,11 @@ describe('Inspector tokens', () => {
         }],
       },
     });
+    cy.receiveSelectionValues();
+    cy.get('[data-cy=navitem-inspector]').click();
+    cy.contains('sizing');
+    cy.contains('opacity');
+    cy.contains('fontSizes');
   });
+
 });

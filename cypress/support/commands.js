@@ -1,5 +1,9 @@
-import { MessageFromPluginTypes } from '../../src/types/messages';
-import { StorageProviderType } from '../../src/constants/StorageProviderType';
+import {
+  MessageFromPluginTypes
+} from '../../src/types/messages';
+import {
+  StorageProviderType
+} from '../../src/constants/StorageProviderType';
 
 // ***********************************************
 // This example commands.js shows you how to
@@ -32,7 +36,9 @@ Cypress.Commands.add('receiveStorageTypeLocal', () => {
     const message = {
       pluginMessage: {
         type: MessageFromPluginTypes.RECEIVED_STORAGE_TYPE,
-        storageType: { provider: StorageProviderType.LOCAL },
+        storageType: {
+          provider: StorageProviderType.LOCAL
+        },
       },
     };
     $window.postMessage(message, '*');
@@ -95,8 +101,56 @@ Cypress.Commands.add('apiCredentials', (values) => {
         type: MessageFromPluginTypes.API_CREDENTIALS,
         status: true,
         credentials: values,
-        },
+      },
     };
     $window.postMessage(message, '*');
   });
 });
+
+Cypress.Commands.add('receiveSelectionValues', () => {
+  cy.window().then(($window) => {
+    const message = {
+      pluginMessage: {
+        type: MessageFromPluginTypes.SELECTION,
+        selectionValues: [{
+            category: "sizing",
+            type: "sizing",
+            value: "sizing.xs",
+            nodes: [{
+              id: "3425:3",
+              name: "Rectangle 2",
+              type: "RECTANGLE",
+            }],
+          },
+          {
+            category: "opacity",
+            type: "opacity",
+            value: "opacity.50",
+            nodes: [{
+              id: "3425:3",
+              name: "Rectangle 2",
+              type: "RECTANGLE",
+            }],
+          },
+          {
+            category: "fontSizes",
+            type: "fontSizes",
+            value: "font-size.12",
+            nodes: [{
+              id: "3425:3",
+              name: "Rectangle 2",
+              type: "RECTANGLE",
+            }],
+          },
+        ],
+        selectedNodes: 1,
+        mainNodeSelectionValues: {
+          sizing: "sizing.xs",
+          opacity: "opacity.50",
+          fontSizes: "font-size.12",
+        }
+      },
+    };
+    $window.postMessage(message, '*');
+  });
+})
