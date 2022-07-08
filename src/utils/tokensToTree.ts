@@ -4,6 +4,8 @@ export type TreeItem = {
   key: string;
   path: string;
   parent: string | null;
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  value: string | Object | null;
   level: number;
   label: string;
   isLeaf: boolean;
@@ -24,6 +26,7 @@ export function tokensToTree(items: SingleToken[]) {
             path: parentNameSplit.slice(0, index + 1).join('.'),
             key: parentNameSplit.slice(0, index + 1).join('.'),
             parent: path.slice(0, index).join('.'),
+            value: curr.value,
             level: index,
             label,
           });
@@ -35,6 +38,7 @@ export function tokensToTree(items: SingleToken[]) {
       path: curr.name,
       key: path.join('.'),
       parent: parentName,
+      value: curr.value,
       level: path.length - 1,
       label: path[path.length - 1],
     });

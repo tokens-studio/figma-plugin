@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import TokenGroupHeading from './TokenGroupHeading';
 import { TokenButton } from './TokenButton';
@@ -42,22 +42,23 @@ const TokenTree: React.FC<Props> = ({
   const dispatch = useDispatch<Dispatch>();
 
   const [items] = useState<TreeItem[]>(tokensToTree(tokens[activeTokenSet]));
+  console.log('items', items);
   const handleToggleCollapsed = useCallback((key: string) => {
     dispatch.tokenState.setCollapsedTokens(collapsed.includes(key) ? collapsed.filter((s) => s !== key) : [...collapsed, key]);
-  }, [collapsed]);
+  }, [collapsed, dispatch.tokenState]);
 
-  const mappedItems = useMemo(() => (
-    items.filter((item) => (
-      // remove items which are in a collapsed parent
-      !collapsed.some((parentKey) => item.parent === parentKey
-      || (item.parent?.startsWith(parentKey) && item.parent?.charAt(parentKey.length) === '.'))
-    )).map((item) => ({
-      item,
-      onToggleCollapsed: () => handleToggleCollapsed(item.key),
-    }))
-  ), [items, collapsed, handleToggleCollapsed]);
-  console.log('mapped', mappedItems);
-  console.log('collapsed', collapsed);
+  // const mappedItems = useMemo(() => (
+  //   items.filter((item) => (
+  //     // remove items which are in a collapsed parent
+  //     !collapsed.some((parentKey) => item.parent === parentKey
+  //     || (item.parent?.startsWith(parentKey) && item.parent?.charAt(parentKey.length) === '.'))
+  //   )).map((item) => ({
+  //     item,
+  //     onToggleCollapsed: () => handleToggleCollapsed(item.key),
+  //   }))
+  // ), [items, collapsed, handleToggleCollapsed]);
+  // console.log('mapped', mappedItems);
+  // console.log('collapsed', collapsed);
 
   const tokenValuesEntries = React.useMemo(() => (
     Object.entries(tokenValues).map(([name, value]) => {
@@ -73,8 +74,8 @@ const TokenTree: React.FC<Props> = ({
         },
       };
     })
-  ), [tokenValues, path, showNewForm]);
-
+  ), [tokenValues, path, showNewForm, handleToggleCollapsed]);
+  console.log('tokenEntriValues', tokenValuesEntries);
   const [draggedToken, setDraggedToken] = useState<SingleToken | null>(null);
   const [dragOverToken, setDragOverToken] = useState<SingleToken | null>(null);
 
@@ -130,6 +131,7 @@ const TokenTree: React.FC<Props> = ({
             />
           )}
         </React.Fragment>
+      // eslint-disable-next-line react/jsx-no-comment-textnodes
       ))}
     </div>
   );
