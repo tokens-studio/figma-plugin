@@ -2,7 +2,11 @@
 
 ## Prerequisites
 
-In order to release a new version, first make sure you have the correct .env.production env variables setup.
+In order to release a new version, first make sure you have the correct `.env` variables setup.
+Important: You'll need to provide the `SENTRY_AUTH_TOKEN` in `.env` as that's where the script is looking for it.
+
+
+`.env.production`
 
 MIXPANEL_ACCESS_TOKEN=INSERT_MIXPANEL_ACCESS_TOKEN
 STORYBLOK_ACCESS_TOKEN=INSERT_STORYBLOK_ACCESS_TOKEN
@@ -10,6 +14,8 @@ ENVIRONMENT=production
 LICENSE_API_URL=https://figmatokens-api.herokuapp.com
 LAUNCHDARKLY_SDK_CLIENT=626fb05d52e5c715abd11b5e
 
+`.env`
+SENTRY_AUTH_TOKEN=INSERT_SENTRY_TOKEN
 ## Bundling the files
 
 Make sure that package.json contains the correct version number in the field `plugin_version`, for example 112.
