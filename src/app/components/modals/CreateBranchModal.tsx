@@ -120,7 +120,7 @@ export default function CreateBranchModal({
           {
             !isBranchNameValid && (
               <div className="bg-red-200 text-red-700 rounded p-4 text-xs font-bold" data-cy="provider-modal-error">
-                branch name cannot contain spaces
+                Branch name cannot contain spaces
               </div>
             )
           }
