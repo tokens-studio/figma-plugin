@@ -1,6 +1,8 @@
 import { Bitbucket } from 'bitbucket';
 import { RemoteTokenStorageFile } from './RemoteTokenStorage';
-import { GitMultiFileObject, GitSingleFileObject, GitStorageMetadata, GitTokenStorage } from './GitTokenStorage';
+import {
+  GitMultiFileObject, GitSingleFileObject, GitStorageMetadata, GitTokenStorage,
+} from './GitTokenStorage';
 
 type CreatedOrUpdatedFileType = {
   owner: string;
@@ -68,6 +70,8 @@ export class BitbucketTokenStorage extends GitTokenStorage {
 
       const newBranch = await this.bitbucketClient.refs.createBranch({
         workspace: this.owner,
+        _body: undefined,
+        repo_slug: '',
       });
 
       return !!newBranch.data.ref;
@@ -120,9 +124,11 @@ export class BitbucketTokenStorage extends GitTokenStorage {
 
   // https://bitbucketjs.netlify.app/#api-repositories-repositories_createSrcFileCommit
   // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-source/#api-repositories-workspace-repo-slug-src-post
-  public async createOrUpdateFiles({ owner, repo, branch, changes }: CreatedOrUpdatedFileType) {
+  public async createOrUpdateFiles({
+    owner, repo, branch, changes,
+  }: CreatedOrUpdatedFileType) {
     const { message, files } = changes[0];
-    console.log('changes: ', changes);
+
     const data = new FormData();
 
     // @README the files object is Record<string, string> here

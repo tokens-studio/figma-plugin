@@ -18,6 +18,7 @@ import Text from './Text';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import useRemoteTokens from '../store/remoteTokens';
 import { StorageTypeCredentials } from '@/types/StorageType';
+import { useFlags } from './LaunchDarkly';
 
 const SyncSettings = () => {
   const localApiState = useSelector(localApiStateSelector);
@@ -27,6 +28,7 @@ const SyncSettings = () => {
 
   const { setStorageType } = useStorage();
   const { fetchBranches } = useRemoteTokens();
+  const { bitBucketSync } = useFlags();
 
   const [confirmModalVisible, showConfirmModal] = React.useState(false);
   const [editStorageItemModalVisible, setShowEditStorageModalVisible] = React.useState(Boolean(localApiState.new));
@@ -115,7 +117,7 @@ const SyncSettings = () => {
           </div>
         );
       case StorageProviderType.BITBUCKET:
-        return (
+        return bitBucketSync ? (
           <div>
             Sync your tokens with a Bitbucket repository so your design decisions are up to date with code.
             {' '}
@@ -124,7 +126,7 @@ const SyncSettings = () => {
             </a>
             .
           </div>
-        );
+        ) : null;
       case StorageProviderType.ADO:
         return (
           <div>
@@ -237,13 +239,16 @@ const SyncSettings = () => {
                 text="GitLab"
                 id={StorageProviderType.GITLAB}
               />
-              <ProviderSelector
-                isActive={storageProvider === StorageProviderType.BITBUCKET}
-                isStored={storageType?.provider === StorageProviderType.BITBUCKET}
-                onClick={handleProviderClick(StorageProviderType.BITBUCKET)}
-                text="Bitbucket"
-                id={StorageProviderType.BITBUCKET}
-              />
+              {bitBucketSync ? (
+                <ProviderSelector
+                  isActive={storageProvider === StorageProviderType.BITBUCKET}
+                  isStored={storageType?.provider === StorageProviderType.BITBUCKET}
+                  onClick={handleProviderClick(StorageProviderType.BITBUCKET)}
+                  text="Bitbucket"
+                  id={StorageProviderType.BITBUCKET}
+                />
+              ) : null}
+
               <ProviderSelector
                 isActive={storageProvider === StorageProviderType.ADO}
                 isStored={storageType?.provider === StorageProviderType.ADO}
