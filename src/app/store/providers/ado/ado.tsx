@@ -26,7 +26,7 @@ export const useADO = () => {
   const themes = useSelector(themesListSelector);
   const localApiState = useSelector(localApiStateSelector);
   const activeTheme = useSelector(activeThemeSelector);
-  const usedTokenSets = useSelector(usedTokenSetSelector);
+  const usedTokenSet = useSelector(usedTokenSetSelector);
   const dispatch = useDispatch<Dispatch>();
   const { multiFileSync } = useFlags();
   const { confirm } = useConfirm();
@@ -80,9 +80,15 @@ export const useADO = () => {
           tokens,
           metadata: { commitMessage },
         });
-
+        dispatch.tokenState.setLastSyncedState(JSON.stringify([tokens, themes], null, 2));
         dispatch.uiState.setLocalApiState({ ...localApiState, branch: customBranch } as AdoCredentials);
         dispatch.uiState.setApiData({ ...context, branch: customBranch });
+        dispatch.tokenState.setTokenData({
+          values: tokens,
+          themes,
+          usedTokenSet,
+          activeTheme,
+        });
 
         pushDialog('success');
 
@@ -119,6 +125,9 @@ export const useADO = () => {
 
   const pullTokensFromADO = React.useCallback(async (context: AdoCredentials, receivedFeatureFlags?: LDProps['flags']) => {
     const storage = storageClientFactory(context);
+    if (context.branch) {
+      storage.setSource(context.branch);
+    }
     if (receivedFeatureFlags?.multiFileSync) storage.enableMultiFile();
 
     await checkAndSetAccess(context, receivedFeatureFlags);
@@ -162,7 +171,7 @@ export const useADO = () => {
             dispatch.tokenState.setTokenData({
               values: content.tokens,
               themes: content.themes,
-              usedTokenSet: usedTokenSets,
+              usedTokenSet,
               activeTheme,
             });
             dispatch.tokenState.setCollapsedTokenSets([]);
@@ -186,7 +195,7 @@ export const useADO = () => {
     themes,
     tokens,
     activeTheme,
-    usedTokenSets,
+    usedTokenSet,
     checkAndSetAccess,
   ]);
 
@@ -216,7 +225,7 @@ export const useADO = () => {
       dispatch,
       tokens,
       themes,
-      usedTokenSets,
+      usedTokenSet,
       activeTheme,
       syncTokensWithADO,
     ],
