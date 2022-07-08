@@ -34,7 +34,7 @@ export default function SingleTypographyDownShiftInput({
       handleChange={onChange}
       setInputValue={handleBoxshadowDownShiftInputChange}
       placeholder={
-        name === 'color' ? '#000000, hsla(), rgba() or {alias}' : 'Value or {alias}'
+        name === 'color' ? `${name} #000000, hsla(), rgba() or {alias}` : `${name} value or {alias}`
       }
       suffix
     />
