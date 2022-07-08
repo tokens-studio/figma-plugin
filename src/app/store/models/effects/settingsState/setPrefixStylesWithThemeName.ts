@@ -4,7 +4,7 @@ import { AsyncMessageTypes } from '@/types/AsyncMessages';
 
 export function setPrefixStylesWithThemeName() {
   return (payload: boolean, rootState: RootState): void => {
-    AsyncMessageChannel.message({
+    AsyncMessageChannel.ReactInstance.message({
       type: AsyncMessageTypes.SET_UI,
       ...rootState.settings,
     });

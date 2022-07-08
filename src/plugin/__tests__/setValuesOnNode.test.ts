@@ -28,10 +28,12 @@ describe('Can set values on node', () => {
   beforeEach(() => {
     textNodeMock = {
       type: 'TEXT',
+      characters: 'foobar',
       fontName: {
         family: 'Inter',
         style: 'Regular',
       },
+      fills: [],
       textStyleId: undefined,
     } as unknown as TextNode;
 
@@ -416,5 +418,58 @@ describe('Can set values on node', () => {
       paddingLeft: 'spacing.lg',
     }, emptyStylesMap, emptyThemeInfo);
     expect(frameNodeMock.paddingLeft).toBe(20);
+  });
+
+  it('changes fill if needed', async () => {
+    await setValuesOnNode(textNodeMock, { fill: '#ff0000' }, {
+      typography: 'type.heading.h1',
+      boxShadow: 'shadows.default',
+      fill: 'fg.default',
+    }, emptyStylesMap, emptyThemeInfo);
+    expect(textNodeMock.fills).toEqual([{
+      color: {
+        r: 1, g: 0, b: 0,
+      },
+      opacity: 1,
+      type: 'SOLID',
+    }]);
+  });
+
+  it('changes characters if needed', async () => {
+    await setValuesOnNode(textNodeMock, { fill: '#ff0000', value: 'My new content' }, {
+      typography: 'type.heading.h1',
+      boxShadow: 'shadows.default',
+      fill: 'default',
+    }, emptyStylesMap, emptyThemeInfo);
+    expect(textNodeMock.characters).toEqual('My new content');
+  });
+
+  it('doesnt change characters if not needed', async () => {
+    await setValuesOnNode(textNodeMock, { fill: '#00ff00' }, {
+      typography: 'type.heading.h1',
+      boxShadow: 'shadows.default',
+      fill: 'fg.default',
+    }, emptyStylesMap, emptyThemeInfo);
+    expect(textNodeMock.characters).toEqual('foobar');
+  });
+
+  it('should change characters when the value is 0', async () => {
+    await setValuesOnNode(textNodeMock, {
+      value: 0,
+    }, {
+      typography: 'type.heading.h1',
+      boxShadow: 'shadows.default',
+    }, emptyStylesMap, emptyThemeInfo);
+    expect(figma.loadFontAsync).toHaveBeenCalled();
+    expect(textNodeMock.characters).toEqual('0');
+  });
+
+  it('should not change characters when the value is undefined', async () => {
+    await setValuesOnNode(textNodeMock, {}, {
+      typography: 'type.heading.h1',
+      boxShadow: 'shadows.default',
+    }, emptyStylesMap, emptyThemeInfo);
+    expect(figma.loadFontAsync).not.toHaveBeenCalled();
+    expect(textNodeMock.characters).toEqual('foobar');
   });
 });

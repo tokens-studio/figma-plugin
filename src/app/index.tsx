@@ -21,8 +21,8 @@ import { AsyncMessageTypes } from '@/types/AsyncMessages';
 
 initializeAnalytics();
 
-AsyncMessageChannel.connect();
-AsyncMessageChannel.handle(AsyncMessageTypes.GET_THEME_INFO, asyncHandlers.getThemeInfo);
+AsyncMessageChannel.ReactInstance.connect();
+AsyncMessageChannel.ReactInstance.handle(AsyncMessageTypes.GET_THEME_INFO, asyncHandlers.getThemeInfo);
 
 if (process.env.ENVIRONMENT === 'production' || process.env.ENVIRONMENT === 'beta') {
   Sentry.init({

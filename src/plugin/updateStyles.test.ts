@@ -4,8 +4,8 @@ import * as updateTextStyles from './updateTextStyles';
 import * as updateEffectStyles from './updateEffectStyles';
 import { SingleToken } from '@/types/tokens';
 import { TokenTypes } from '@/constants/TokenTypes';
-import { mockAsyncMessageChannelMessage } from '../../tests/__mocks__/asyncMessageChannelMock';
-import { AsyncMessageTypes } from '@/types/AsyncMessages';
+import { AsyncMessageTypes, GetThemeInfoMessageResult } from '@/types/AsyncMessages';
+import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 
 type ExtendedSingleToken = SingleToken<true, { path: string }>;
 
@@ -13,6 +13,27 @@ describe('updateStyles', () => {
   const colorSpy = jest.spyOn(updateColorStyles, 'default');
   const textSpy = jest.spyOn(updateTextStyles, 'default');
   const effectSpy = jest.spyOn(updateEffectStyles, 'default');
+
+  let disconnectAsyncMessageChannel = () => {};
+  const mockGetThemeInfo = jest.fn(async (): Promise<GetThemeInfoMessageResult> => ({
+    type: AsyncMessageTypes.GET_THEME_INFO,
+    activeTheme: null,
+    themes: [],
+  }));
+
+  beforeAll(() => {
+    const disconnectPluginInstance = AsyncMessageChannel.PluginInstance.connect();
+    const disconnectReactInstance = AsyncMessageChannel.ReactInstance.connect();
+    AsyncMessageChannel.ReactInstance.handle(AsyncMessageTypes.GET_THEME_INFO, mockGetThemeInfo);
+    disconnectAsyncMessageChannel = () => {
+      disconnectPluginInstance();
+      disconnectReactInstance();
+    };
+  });
+
+  afterAll(() => {
+    disconnectAsyncMessageChannel();
+  });
 
   it('returns if no values are given', async () => {
     await updateStyles([{ name: 'borderRadius.small', value: '3', type: TokenTypes.BORDER_RADIUS }]);
@@ -155,13 +176,14 @@ describe('updateStyles', () => {
       },
     ] as ExtendedSingleToken[];
 
-    mockAsyncMessageChannelMessage.mockImplementationOnce(() => (
+    mockGetThemeInfo.mockImplementationOnce(() => (
       Promise.resolve({
         type: AsyncMessageTypes.GET_THEME_INFO,
         activeTheme: 'light',
         themes: [{
           id: 'light',
           name: 'light',
+          selectedTokenSets: {},
         }],
       })
     ));
