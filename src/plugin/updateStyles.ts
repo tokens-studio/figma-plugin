@@ -16,7 +16,7 @@ export default async function updateStyles(
   shouldCreate = false,
   settings: Partial<SettingsState> = {},
 ): Promise<Record<string, string>> {
-  const themeInfo = await AsyncMessageChannel.message({
+  const themeInfo = await AsyncMessageChannel.PluginInstance.message({
     type: AsyncMessageTypes.GET_THEME_INFO,
   });
   const activeThemeObject = themeInfo.activeTheme

@@ -168,7 +168,7 @@ export async function updateNodes(
 ) {
   const { ignoreFirstPartForStyles, prefixStylesWithThemeName } = settings ?? {};
   const figmaStyleMaps = getAllFigmaStyleMaps();
-  const themeInfo = await AsyncMessageChannel.message({
+  const themeInfo = await AsyncMessageChannel.PluginInstance.message({
     type: AsyncMessageTypes.GET_THEME_INFO,
   });
 
