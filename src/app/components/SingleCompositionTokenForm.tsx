@@ -57,7 +57,7 @@ export default function SingleCompositionTokenForm({
   }, [tokenValue]);
 
   const onAliasChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    tokenValue[property as CompositionTokenProperty] = e.target.value.trim();
+    tokenValue[property as CompositionTokenProperty] = e.target.value;
     setTokenValue(tokenValue);
   }, [tokenValue]);
 

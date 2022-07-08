@@ -65,7 +65,7 @@ export default function SingleBoxShadowInput({
   const onChange = React.useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
     if (Array.isArray(value)) {
       const values = value;
-      const newShadow = { ...value[index], [e.target.name]: e.target.value.trim() };
+      const newShadow = { ...value[index], [e.target.name]: e.target.value };
       values.splice(index, 1, newShadow);
 
       handleBoxShadowValueChange(values);
@@ -73,7 +73,7 @@ export default function SingleBoxShadowInput({
       handleBoxShadowValueChange({
         ...newTokenValue,
         ...value,
-        [e.target.name]: e.target.value.trim(),
+        [e.target.name]: e.target.value,
       });
     }
   }, [index, value, handleBoxShadowValueChange]);

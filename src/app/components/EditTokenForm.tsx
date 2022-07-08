@@ -8,7 +8,7 @@ import Input from './Input';
 import ColorPicker from './ColorPicker';
 import useConfirm from '../hooks/useConfirm';
 import useTokens from '../store/useTokens';
-import { EditTokenObject, SingleBoxShadowToken } from '@/types/tokens';
+import { EditTokenObject, SingleBoxShadowToken, SingleToken } from '@/types/tokens';
 import { checkIfContainsAlias, getAliasValue } from '@/utils/alias';
 import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
 import { activeTokenSetSelector, editTokenSelector } from '@/selectors';
@@ -112,7 +112,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
       setError(null);
       e.persist();
       if (internalEditToken) {
-        setInternalEditToken({ ...internalEditToken, [e.target.name]: e.target.value.trim() });
+        setInternalEditToken({ ...internalEditToken, [e.target.name]: e.target.value });
       }
     },
     [internalEditToken],
@@ -136,7 +136,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
           ...internalEditToken,
           value: {
             ...internalEditToken.value,
-            [e.target.name]: e.target.value.trim(),
+            [e.target.name]: e.target.value,
           },
         });
       }
@@ -149,7 +149,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
       setError(null);
       e.persist();
       if (internalEditToken) {
-        setInternalEditToken({ ...internalEditToken, [e.target.name]: e.target.value.trim() });
+        setInternalEditToken({ ...internalEditToken, [e.target.name]: e.target.value });
       }
     },
     [internalEditToken],
@@ -184,6 +184,23 @@ function EditTokenForm({ resolvedTokens }: Props) {
     [internalEditToken],
   );
 
+  const trimValue = React.useCallback((value: SingleToken['value']) => {
+    if (Array.isArray(value)) {
+      return value.map((item) => (
+        Object.entries(item).reduce<Record<string, string>>((acc, [key, value]) => {
+          acc[key] = value.toString().trim();
+          return acc;
+        }, {})
+      ));
+    } if (typeof value === 'object') {
+      return Object.entries(value).reduce<Record<string, string>>((acc, [key, value]) => {
+        acc[key] = value.toString().trim();
+        return acc;
+      }, {});
+    }
+    return value.toString().trim();
+  }, []);
+
   // @TODO update to useCallback
   const submitTokenValue = async ({ type, value, name }: EditTokenObject) => {
     if (internalEditToken && value && name) {
@@ -192,6 +209,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
         oldName = internalEditToken.initialName;
       }
 
+      const trimmedValue = trimValue(value);
       const newName = name
         .split('/')
         .map((n) => n.trim())
@@ -207,7 +225,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
           parent: activeTokenSet,
           name: newName,
           type,
-          value: typeof (value) === 'string' ? value.trim() : value,
+          value: trimmedValue as SingleToken['value'],
         });
       } else {
         editSingleToken({
@@ -219,7 +237,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
           name: newName,
           oldName,
           type,
-          value: typeof (value) === 'string' ? value.trim() : value,
+          value: trimmedValue as SingleToken['value'],
         });
         // When users change token names references are still pointing to the old name, ask user to remap
         if (oldName && oldName !== newName) {
