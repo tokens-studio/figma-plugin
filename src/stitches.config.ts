@@ -52,6 +52,7 @@ export const stitchesInstance = createStitches({
       contextMenuBackground: 'var(--figma-color-bg-menu)',
       contextMenuForeground: 'var(--figma-color-text-menu)',
       contextMenuForegroundMuted: 'var(--figma-color-text-menu-secondary)',
+      contextMenuForegroundDisabled: 'var(--figma-color-text-menu-disabled)',
       contextMenuSeperator: 'var(--figma-color-border-menu)',
       loadingScreenFg: '#FFFFFF',
       loadingScreenFgMuted: '#CECECE',
@@ -108,7 +109,6 @@ export const stitchesInstance = createStitches({
       7: '32px',
       8: '48px',
       9: '64px',
-      10: '38px',
     },
     sizes: {
       1: '2px',
@@ -119,7 +119,7 @@ export const stitchesInstance = createStitches({
       6: '24px',
       7: '32px',
       8: '48px',
-      10: '38px',
+      10: '28px',
       dropdownMaxHeight: '170px',
     },
     radii: {

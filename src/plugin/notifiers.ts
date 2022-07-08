@@ -17,7 +17,7 @@ export function notifyUI(msg: string, opts?: NotificationOptions) {
 }
 
 export function notifyToUI(msg: string, opts: NotifyAsyncMessage['opts'] = {}) {
-  AsyncMessageChannel.message({
+  AsyncMessageChannel.ReactInstance.message({
     type: AsyncMessageTypes.NOTIFY,
     msg,
     opts,

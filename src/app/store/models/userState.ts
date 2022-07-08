@@ -119,7 +119,7 @@ export const userState = createModel<RootModel>()({
           notifyToUI('License added succesfully!');
         }
         if (source !== AddLicenseSource.PLUGIN) {
-          AsyncMessageChannel.message({
+          AsyncMessageChannel.ReactInstance.message({
             type: AsyncMessageTypes.SET_LICENSE_KEY,
             licenseKey: key,
           });
@@ -131,26 +131,27 @@ export const userState = createModel<RootModel>()({
       }
     },
     removeLicenseKey: async (payload, rootState) => {
-      const { licenseKey, userId, licenseError } = rootState.userState;
-      if (!licenseError && licenseKey) {
+      const { licenseKey, userId } = rootState.userState;
+
+      if (licenseKey) {
         const { error } = await removeLicense(licenseKey, userId);
         if (error) {
           notifyToUI('Error removing license, please contact support', { error: true });
+        } else {
+          AsyncMessageChannel.ReactInstance.message({
+            type: AsyncMessageTypes.SET_LICENSE_KEY,
+            licenseKey: null,
+          });
+
+          dispatch.userState.setLicenseKey(undefined);
+          dispatch.userState.setLicenseError(undefined);
+          dispatch.userState.setLicenseDetails({
+            plan: '',
+            entitlements: [],
+            clientEmail: '',
+          });
         }
       }
-
-      AsyncMessageChannel.message({
-        type: AsyncMessageTypes.SET_LICENSE_KEY,
-        licenseKey: null,
-      });
-
-      dispatch.userState.setLicenseKey(undefined);
-      dispatch.userState.setLicenseError(undefined);
-      dispatch.userState.setLicenseDetails({
-        plan: '',
-        entitlements: [],
-        clientEmail: '',
-      });
     },
   }),
 });

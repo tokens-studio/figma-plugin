@@ -57,7 +57,7 @@ export function getValueWithReferences(token: SingleToken, options: TransformerO
     return token.value;
   }
 
-  if (token.type === TokenTypes.TYPOGRAPHY || token.type === TokenTypes.BOX_SHADOW) {
+  if (token.type === TokenTypes.TYPOGRAPHY || token.type === TokenTypes.BOX_SHADOW || token.type === TokenTypes.COMPOSITION) {
     if (Array.isArray(token.value)) {
       const rawValue = token.rawValue as TokenBoxshadowValue[];
       return token.value.map((shadow, index) => getComplexValue(shadow, rawValue[index], options));

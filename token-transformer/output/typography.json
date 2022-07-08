@@ -25,6 +25,14 @@
         "fontWeight": "Bold"
       },
       "type": "typography"
+    },
+    "reference": {
+      "value": {
+        "fontFamily": "Roboto",
+        "fontSize": 96,
+        "fontWeight": "Bold"
+      },
+      "type": "typography"
     }
   }
 }
