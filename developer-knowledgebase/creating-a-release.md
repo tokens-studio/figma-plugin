@@ -34,7 +34,7 @@ In order to provide source maps for Sentry, we need to publish a release everyti
 
 To do that, change the VERSION constant of the `script/release.sh` script to match the version that you're publishing (eg 112). 
 
-Once that is done and the plugin is published, you can run `bin script/release.sh`. 
+Once that is done and the plugin is published, you can run `script/release.sh`. 
 
 If that gives you an error, make sure that the file has the required permissions, e.g. `chmod …`
 

@@ -1,3 +1,4 @@
-VERSION=112.rc-3
-sentry-cli releases new "$VERSION"
+VERSION=figma-tokens@112
 sentry-cli releases -p figma-tokens files "$VERSION" upload-sourcemaps --ext ts --ext tsx --ext map --ext js --ignore-file .sentryignore .
+sentry-cli releases set-commits "$VERSION" --auto
+sentry-cli releases finalize "$VERSION"
