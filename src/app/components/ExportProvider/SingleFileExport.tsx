@@ -35,6 +35,10 @@ export default function SingleFileExport({ onClose }: Props) {
     setExpandShadow(!expandShadow);
   }, [expandShadow]);
 
+  const formattedTokens = React.useMemo(() => getFormattedTokens({
+    includeAllTokens, includeParent, expandTypography, expandShadow,
+  }), [includeAllTokens, includeParent, expandTypography, expandShadow, getFormattedTokens]);
+
   return (
     <Stack gap={4} direction="column">
       <Box css={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
@@ -83,20 +87,14 @@ export default function SingleFileExport({ onClose }: Props) {
       <Textarea
         rows={10}
         isDisabled
-        value={getFormattedTokens({
-          includeAllTokens, includeParent, expandTypography, expandShadow,
-        })}
+        value={formattedTokens}
       />
       <Stack width="full" direction="row" justify="end" gap={4}>
         <Button variant="secondary" onClick={onClose}>
           Cancel
         </Button>
         <Button
-          href={`data:text/json;charset=utf-8,${encodeURIComponent(
-            getFormattedTokens({
-              includeAllTokens, includeParent, expandTypography, expandShadow,
-            }),
-          )}`}
+          href={`data:text/json;charset=utf-8,${encodeURIComponent(formattedTokens)}`}
           download="tokens.json"
           variant="primary"
         >
