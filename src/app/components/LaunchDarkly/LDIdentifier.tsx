@@ -8,6 +8,7 @@ import { planSelector } from '@/selectors/planSelector';
 import { clientEmailSelector } from '@/selectors/getClientEmail';
 import { entitlementsSelector } from '@/selectors/getEntitlements';
 import { licenseKeySelector } from '@/selectors/licenseKeySelector';
+import { setUserData } from '@/utils/analytics';
 
 let ldIdentificationResolver: (flags: LDProps['flags']) => void = () => {};
 export const ldIdentificationPromise = new Promise<LDProps['flags']>((resolve) => {
@@ -24,6 +25,7 @@ export const LDIdentifier = () => {
 
   useEffect(() => {
     if (userId && licenseKey && ldClient) {
+      setUserData({ plan: plan ? 'pro' : 'free' });
       const userAttributes: Record<string, string | boolean> = {
         plan: plan || '',
       };
@@ -44,6 +46,7 @@ export const LDIdentifier = () => {
           ldIdentificationResolver(normalizedFlags);
         });
     } else {
+      setUserData({ plan: 'free' });
       ldIdentificationResolver({});
     }
   }, [userId, ldClient, licenseKey, plan, clientEmail, entitlements]);

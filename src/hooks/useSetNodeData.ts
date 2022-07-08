@@ -12,7 +12,7 @@ export function useSetNodeData() {
 
   const setNodeData = useCallback((data: SelectionValue, resolvedTokens: AnyTokenList) => {
     const settings = settingsStateSelector(store.getState());
-    AsyncMessageChannel.message({
+    AsyncMessageChannel.ReactInstance.message({
       type: AsyncMessageTypes.SET_NODE_DATA,
       values: data,
       tokens: resolvedTokens,

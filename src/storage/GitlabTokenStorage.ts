@@ -25,14 +25,17 @@ export class GitlabTokenStorage extends GitTokenStorage {
 
   private gitlabClient: (typeof Gitlab)['prototype'];
 
+  protected repoPathWithNamespace: string;
+
   constructor(
     secret: string,
-    owner: string,
     repository: string,
+    repoPathWithNamespace: string,
     baseUrl?: string,
   ) {
-    super(secret, owner, repository, baseUrl);
+    super(secret, '', repository, baseUrl);
 
+    this.repoPathWithNamespace = repoPathWithNamespace;
     this.gitlabClient = new Gitlab({
       token: this.secret,
       host: this.baseUrl || undefined,
@@ -40,19 +43,9 @@ export class GitlabTokenStorage extends GitTokenStorage {
   }
 
   public async assignProjectId() {
-    const users = await this.gitlabClient.Users.username(this.owner);
-    if (Array.isArray(users) && users.length > 0) {
-      const projectsInPerson = await this.gitlabClient.Users.projects(users[0].id);
-      const project = projectsInPerson.filter((p) => p.path === this.repository)[0];
-      if (project) {
-        this.projectId = project.id;
-        this.groupId = project.namespace.id;
-      }
-    }
-
-    if (!this.projectId) {
-      const projectsInGroup = await this.gitlabClient.Groups.projects(this.owner, { include_subgroups: true });
-      const project = projectsInGroup.filter((p) => p.path === this.repository)[0];
+    const projects = await this.gitlabClient.Projects.search(this.repository, { membership: true });
+    if (projects) {
+      const project = projects.filter((p) => p.path_with_namespace === this.repoPathWithNamespace)[0];
       if (project) {
         this.projectId = project.id;
         this.groupId = project.namespace.id;
@@ -72,8 +65,8 @@ export class GitlabTokenStorage extends GitTokenStorage {
   }
 
   public async createBranch(branch: string, source?: string) {
+    if (!this.projectId) throw new Error('Project ID not assigned');
     try {
-      if (!this.projectId) throw new Error('Project ID not assigned');
       const response = await this.gitlabClient.Branches.create(
         this.projectId,
         branch,
@@ -87,6 +80,7 @@ export class GitlabTokenStorage extends GitTokenStorage {
   }
 
   public async canWrite(): Promise<boolean> {
+    if (!this.path.endsWith('.json') && !this.flags.multiFileEnabled) return false;
     if (!this.groupId || !this.projectId) throw new Error('Missing Project or Group ID');
 
     const currentUser = await this.gitlabClient.Users.current();
@@ -117,7 +111,7 @@ export class GitlabTokenStorage extends GitTokenStorage {
         recursive: true,
       });
 
-      if (!this.path.endsWith('.json') && this.flags.multiFileEnabled) {
+      if (!this.path.endsWith('.json')) {
         const jsonFiles = trees.filter((file) => (
           file.path.endsWith('.json')
         )).sort((a, b) => (
@@ -193,14 +187,32 @@ export class GitlabTokenStorage extends GitTokenStorage {
       ref: branch,
       recursive: true,
     });
-    const filesInTrees = tree.map((t) => t.path);
+    const jsonFiles = tree.filter((file) => (
+      file.path.endsWith('.json')
+    )).sort((a, b) => (
+      (a.path && b.path) ? a.path.localeCompare(b.path) : 0
+    )).map((jsonFile) => jsonFile.path);
+
+    if (!this.path.endsWith('.json')) {
+      const filesToDelete = jsonFiles.filter((jsonFile) => !Object.keys(changeset).some((item) => item.endsWith(jsonFile)));
+
+      await this.gitlabClient.Commits.create(
+        this.projectId,
+        branch,
+        'remove tokenSet',
+        filesToDelete.map((filePath) => ({
+          action: 'delete',
+          filePath,
+        })),
+      );
+    }
 
     const response = await this.gitlabClient.Commits.create(
       this.projectId,
       branch,
       message,
       Object.entries(changeset).map(([filePath, content]) => ({
-        action: filesInTrees.includes(filePath) ? 'update' : 'create',
+        action: jsonFiles.includes(filePath) ? 'update' : 'create',
         filePath,
         content,
       })),

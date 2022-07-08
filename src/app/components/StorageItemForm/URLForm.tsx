@@ -34,7 +34,7 @@ export default function URLForm({
       const formFields = {
         ...validationResult.data,
         provider: StorageProviderType.URL,
-        internalId: generateId(24),
+        internalId: validationResult.data.internalId || generateId(24),
       } as ValidatedFormValues;
       onSubmit(formFields);
     }

@@ -3,15 +3,20 @@ import { styled } from '@/stitches.config';
 
 const itemStyles = {
   fontSize: '$xsmall',
-  padding: '$2 $3 $2 $6',
+  padding: '$2 $3 $2 $2',
   borderRadius: '$contextMenuItem',
   cursor: 'default',
   userselect: 'none',
+  display: 'flex',
 
-  '&:focus': {
+  '&:hover:not([data-disabled]), &:focus:not([data-disabled])': {
     outline: 'none',
     backgroundColor: '$interaction',
     color: '$onInteraction',
+  },
+
+  '&[data-disabled]': {
+    color: '$contextMenuForegroundDisabled',
   },
 };
 
@@ -25,12 +30,9 @@ const StyledBranchSwitchMenuContent = styled(BranchSwitchMenuPrimitive.Content, 
 });
 
 const StyledBranchSwitchMenuCheckboxItem = styled(BranchSwitchMenuPrimitive.CheckboxItem, itemStyles);
-const StyledBranchSwitchMenuItem = styled(BranchSwitchMenuPrimitive.Item, { ...itemStyles, paddingLeft: '$3' });
+const StyledBranchSwitchMenuItem = styled(BranchSwitchMenuPrimitive.Item, { ...itemStyles, paddingLeft: '$6' });
 
-const StyledBranchSwitchMenuItemIndicator = styled(BranchSwitchMenuPrimitive.ItemIndicator, {
-  position: 'absolute',
-  left: '$2',
-});
+const StyledBranchSwitchMenuItemIndicator = styled(BranchSwitchMenuPrimitive.ItemIndicator, {});
 
 const StyledBranchSwitchMenuSeparator = styled(BranchSwitchMenuPrimitive.Separator, {
   height: '1px',
@@ -69,7 +71,7 @@ const StyledBranchSwitchMenuTrigger = styled(BranchSwitchMenuPrimitive.Trigger, 
   color: '$contextMenuForeground',
   fontSize: '$xsmall',
 
-  '&:focus, &:hover': {
+  '&:hover:not([disabled]), &:focus:not([disabled])': {
     outline: 'none',
     boxShadow: 'none',
     backgroundColor: '$interaction',

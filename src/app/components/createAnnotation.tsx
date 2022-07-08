@@ -7,7 +7,7 @@ import type { SelectionValue } from '@/types';
 const createAnnotation = (selectionValue: SelectionValue, direction: Direction = Direction.LEFT) => {
   track('Created annotation', { direction });
 
-  AsyncMessageChannel.message({
+  AsyncMessageChannel.ReactInstance.message({
     type: AsyncMessageTypes.CREATE_ANNOTATION,
     tokens: selectionValue,
     direction,

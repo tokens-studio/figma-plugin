@@ -54,6 +54,7 @@ export function useGitHub() {
   const pushTokensToGitHub = useCallback(async (context: GithubCredentials): Promise<RemoteTokenStorageData<GitStorageMetadata> | null> => {
     const storage = storageClientFactory(context);
     const content = await storage.retrieve();
+
     if (content) {
       if (
         content
@@ -118,8 +119,11 @@ export function useGitHub() {
     activeTheme,
   ]);
 
-  const checkAndSetAccess = useCallback(async ({ context, owner, repo }: { context: GithubCredentials; owner: string; repo: string }) => {
+  const checkAndSetAccess = useCallback(async ({
+    context, owner, repo, receivedFeatureFlags,
+  }: { context: GithubCredentials; owner: string; repo: string, receivedFeatureFlags?: LDProps['flags'] }) => {
     const storage = storageClientFactory(context, owner, repo);
+    if (receivedFeatureFlags?.multiFileSync) storage.enableMultiFile();
     const hasWriteAccess = await storage.canWrite();
     dispatch.tokenState.setEditProhibited(!hasWriteAccess);
   }, [dispatch, storageClientFactory]);
@@ -130,7 +134,9 @@ export function useGitHub() {
 
     const [owner, repo] = context.id.split('/');
 
-    await checkAndSetAccess({ context, owner, repo });
+    await checkAndSetAccess({
+      context, owner, repo, receivedFeatureFlags,
+    });
 
     try {
       const content = await storage.retrieve();
@@ -176,6 +182,7 @@ export function useGitHub() {
               activeTheme,
               usedTokenSet,
             });
+            dispatch.tokenState.setCollapsedTokenSets([]);
             notifyToUI('Pulled tokens from GitHub');
           }
         }
@@ -202,7 +209,7 @@ export function useGitHub() {
   const addNewGitHubCredentials = useCallback(async (context: GithubFormValues): Promise<RemoteTokenStorageData<GitStorageMetadata> | null> => {
     const data = await syncTokensWithGitHub(context);
     if (data) {
-      AsyncMessageChannel.message({
+      AsyncMessageChannel.ReactInstance.message({
         type: AsyncMessageTypes.CREDENTIALS,
         credential: context,
       });

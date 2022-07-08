@@ -13,3 +13,4 @@ export * from './UsedTokenSetProperty';
 export * from './LastOpenedProperty';
 export * from './CheckForChangesProperty';
 export * from './UiSettingsProperty';
+export * from './LicenseKeyProperty';

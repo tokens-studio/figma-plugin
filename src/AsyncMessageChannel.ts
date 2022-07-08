@@ -26,13 +26,21 @@ export type AsyncMessageChannelHandlers = {
   >
 };
 
-const isInFigmaSandbox = typeof figma !== 'undefined';
-
 export class AsyncMessageChannel {
-  protected static $handlers: Partial<AsyncMessageChannelHandlers> = {};
+  public static PluginInstance: AsyncMessageChannel = new AsyncMessageChannel(true);
 
-  public static attachMessageListener<Message>(callback: (msg: Message) => void | false | Promise<void | false>) {
-    if (isInFigmaSandbox) {
+  public static ReactInstance: AsyncMessageChannel = new AsyncMessageChannel(false);
+
+  protected $handlers: Partial<AsyncMessageChannelHandlers> = {};
+
+  protected isInFigmaSandbox = false;
+
+  constructor(inFigmaSandbox: boolean) {
+    this.isInFigmaSandbox = inFigmaSandbox;
+  }
+
+  public attachMessageListener<Message>(callback: (msg: Message) => void | false | Promise<void | false>) {
+    if (this.isInFigmaSandbox) {
       const listener = async (msg: Message) => {
         const possiblePromise = callback(msg);
         if (possiblePromise === false || (possiblePromise && await possiblePromise === false)) {
@@ -53,10 +61,10 @@ export class AsyncMessageChannel {
     return listener;
   }
 
-  public static connect() {
-    AsyncMessageChannel.attachMessageListener(async (msg: { id?: string; message?: AsyncMessages }) => {
+  public connect() {
+    this.attachMessageListener(async (msg: { id?: string; message?: AsyncMessages }) => {
       if (!msg.id || !msg.message || !msg.message.type.startsWith('async/')) return;
-      const handler = AsyncMessageChannel.$handlers[msg.message.type] as AsyncMessageChannelHandlers[AsyncMessageTypes] | undefined;
+      const handler = this.$handlers[msg.message.type] as AsyncMessageChannelHandlers[AsyncMessageTypes] | undefined;
       if (handler) {
         try {
           // @README need to cast to any to make this work
@@ -66,7 +74,7 @@ export class AsyncMessageChannel {
             ? { ...result, type: msg.message.type }
             : { type: msg.message.type };
 
-          if (isInFigmaSandbox) {
+          if (this.isInFigmaSandbox) {
             figma.ui.postMessage({
               id: msg.id,
               message: payload,
@@ -78,7 +86,7 @@ export class AsyncMessageChannel {
           }
         } catch (err) {
           console.error(err);
-          if (isInFigmaSandbox) {
+          if (this.isInFigmaSandbox) {
             figma.ui.postMessage({
               id: msg.id,
               error: err,
@@ -93,20 +101,20 @@ export class AsyncMessageChannel {
     });
   }
 
-  public static handle<T extends AsyncMessageTypes>(
+  public handle<T extends AsyncMessageTypes>(
     type: T,
-    fn: typeof AsyncMessageChannel['$handlers'][T],
+    fn: AsyncMessageChannelHandlers[T],
   ) {
     this.$handlers[type] = fn;
   }
 
-  public static async message<Message extends AsyncMessages>(message: Message) {
+  public async message<Message extends AsyncMessages>(message: Message) {
     const messageId = hash({
       message,
       datetime: Date.now(),
     });
     const promise = new Promise<AsyncMessageResults & { type: Message['type'] }>((resolve, reject) => {
-      AsyncMessageChannel.attachMessageListener((msg: IncomingMessageEvent<AsyncMessageResults & { type: Message['type'] }>['data']['pluginMessage']) => {
+      this.attachMessageListener((msg: IncomingMessageEvent<AsyncMessageResults & { type: Message['type'] }>['data']['pluginMessage']) => {
         if (msg.id === messageId) {
           if ('message' in msg) {
             resolve(msg.message);
@@ -118,7 +126,7 @@ export class AsyncMessageChannel {
         return undefined;
       });
     });
-    if (isInFigmaSandbox) {
+    if (this.isInFigmaSandbox) {
       figma.ui.postMessage({ id: messageId, message });
     } else {
       parent.postMessage(
