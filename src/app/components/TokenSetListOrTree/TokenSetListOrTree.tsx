@@ -48,7 +48,7 @@ export function TokenSetListOrTree<T extends TreeOrListItem>({
       onToggleCollapsed: () => handleToggleCollapsed(item.key),
     }))
   ), [items, collapsed, handleToggleCollapsed]);
-  console.log('mappedItems', mappedItems);
+
   return (
     <>
       {mappedItems.map(({ item, onToggleCollapsed }) => (
