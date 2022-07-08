@@ -48,20 +48,21 @@ export function TokenSetListOrTree<T extends TreeOrListItem>({
       onToggleCollapsed: () => handleToggleCollapsed(item.key),
     }))
   ), [items, collapsed, handleToggleCollapsed]);
-
+  console.log('mappedItems', mappedItems);
   return (
     <>
       {mappedItems.map(({ item, onToggleCollapsed }) => (
         <RenderItem key={item.key} item={item}>
           <StyledItem>
             <RenderItemContent item={item}>
-              {(!item.isLeaf && displayType === 'tree') && (
+              {(!item.isLeaf && displayType === 'tree')
+              && (
                 <StyledFolderButton
                   type="button"
                   css={{ left: `${5 * item.level}px` }}
                   onClick={onToggleCollapsed}
                 >
-                  <StyledFolderButtonChevronBox collapsed={collapsed.includes(item.key)}>
+                  <StyledFolderButtonChevronBox>
                     <IconChevronDown />
                   </StyledFolderButtonChevronBox>
                 </StyledFolderButton>
