@@ -34,7 +34,7 @@ const StyledButton = styled('button', {
   },
 });
 
-export default function TokenSetSelector({saveScrollPositionSet} : {saveScrollPositionSet: (tokenSet: string) => void}) {
+export default function TokenSetSelector({ saveScrollPositionSet } : { saveScrollPositionSet: (tokenSet: string) => void }) {
   const tokens = useSelector(tokensSelector);
   const editProhibited = useSelector(editProhibitedSelector);
   const mfsEnabled = useIsGitMultiFileEnabled();
