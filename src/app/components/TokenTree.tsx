@@ -81,7 +81,7 @@ const TokenTree: React.FC<Props> = ({
               <div className="flex items-center group">
                 <button
                   className={`flex items-center p-2 space-x-2 hover:bg-background-subtle focus:outline-none ${collapsed.includes(item.stringPath) ? 'opacity-50' : null}`}
-                  data-cy={`tokenlisting-header-${item.stringPath}`}
+                  data-cy={`tokenlisting-group-${item.stringPath}`}
                   type="button"
                   onClick={onToggleCollapsed}
                 >
