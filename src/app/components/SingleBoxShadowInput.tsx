@@ -43,7 +43,7 @@ export default function SingleBoxShadowInput({
   isMultiple = false,
   shadowItem,
   index,
-  handleBoxShadowChange,
+  handleBoxShadowValueChange,
   onRemove,
   id,
   resolvedTokens,
@@ -52,7 +52,7 @@ export default function SingleBoxShadowInput({
   isMultiple?: boolean;
   shadowItem?: TokenBoxshadowValue;
   index: number;
-  handleBoxShadowChange: (shadow: TokenBoxshadowValue | TokenBoxshadowValue[]) => void;
+  handleBoxShadowValueChange: (shadow: TokenBoxshadowValue | TokenBoxshadowValue[]) => void;
   onRemove: (index: number) => void;
   id?: string;
   resolvedTokens: ResolveTokenValuesResult[];
@@ -65,54 +65,54 @@ export default function SingleBoxShadowInput({
   const onChange = React.useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
     if (Array.isArray(value)) {
       const values = value;
-      const newShadow = { ...value[index], [e.target.name]: e.target.value };
+      const newShadow = { ...value[index], [e.target.name]: e.target.value.trim() };
       values.splice(index, 1, newShadow);
 
-      handleBoxShadowChange(values);
+      handleBoxShadowValueChange(values);
     } else {
-      handleBoxShadowChange({
+      handleBoxShadowValueChange({
         ...newTokenValue,
         ...value,
-        [e.target.name]: e.target.value,
+        [e.target.name]: e.target.value.trim(),
       });
     }
-  }, [index, value, handleBoxShadowChange]);
+  }, [index, value, handleBoxShadowValueChange]);
 
-  const handleBoxshadowDownShiftInputChange = React.useCallback((newInputValue: string, property: string) => {
+  const handleBoxshadowValueDownShiftInputChange = React.useCallback((newInputValue: string, property: string) => {
     if (Array.isArray(value)) {
       const values = value;
       const newShadow = { ...value[index], [property]: newInputValue };
       values.splice(index, 1, newShadow);
 
-      handleBoxShadowChange(values);
+      handleBoxShadowValueChange(values);
     } else {
-      handleBoxShadowChange({
+      handleBoxShadowValueChange({
         ...newTokenValue,
         ...value,
         [property]: newInputValue,
       });
     }
-  }, [index, value, handleBoxShadowChange]);
+  }, [index, value, handleBoxShadowValueChange]);
 
   const exchangeBoxshadowValue = React.useCallback((newValue: TokenBoxshadowValue | TokenBoxshadowValue[]) => {
-    handleBoxShadowChange(newValue);
-  }, [handleBoxShadowChange]);
+    handleBoxShadowValueChange(newValue);
+  }, [handleBoxShadowValueChange]);
 
   const onColorChange = React.useCallback((color: string) => {
     if (Array.isArray(value)) {
       const values = value;
-      const newShadow = { ...value[index], color };
+      const newShadow = { ...value[index], color: color.trim() };
       values.splice(index, 1, newShadow);
 
-      handleBoxShadowChange(values);
+      handleBoxShadowValueChange(values);
     } else {
-      handleBoxShadowChange({
+      handleBoxShadowValueChange({
         ...newTokenValue,
         ...value,
         color,
       });
     }
-  }, [index, value, handleBoxShadowChange]);
+  }, [index, value, handleBoxShadowValueChange]);
 
   const onMoveDebounce = React.useCallback((dragIndex: number, hoverIndex: number) => {
     const values = value;
@@ -225,7 +225,7 @@ export default function SingleBoxShadowInput({
                 type={propertyTypes[key as keyof typeof propertyTypes]}
                 resolvedTokens={resolvedTokens}
                 handleChange={onChange}
-                setInputValue={handleBoxshadowDownShiftInputChange}
+                setInputValue={handleBoxshadowValueDownShiftInputChange}
                 handleToggleInputHelper={handleToggleInputHelper}
               />
               {inputHelperOpen && key === 'color' && (
