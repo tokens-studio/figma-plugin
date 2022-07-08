@@ -25,14 +25,17 @@ export class GitlabTokenStorage extends GitTokenStorage {
 
   private gitlabClient: (typeof Gitlab)['prototype'];
 
+  protected repoPathWithNamespace: string;
+
   constructor(
     secret: string,
-    owner: string,
     repository: string,
+    repoPathWithNamespace: string,
     baseUrl?: string,
   ) {
-    super(secret, owner, repository, baseUrl);
+    super(secret, '', repository, baseUrl);
 
+    this.repoPathWithNamespace = repoPathWithNamespace;
     this.gitlabClient = new Gitlab({
       token: this.secret,
       host: this.baseUrl || undefined,
@@ -40,19 +43,9 @@ export class GitlabTokenStorage extends GitTokenStorage {
   }
 
   public async assignProjectId() {
-    const users = await this.gitlabClient.Users.username(this.owner);
-    if (Array.isArray(users) && users.length > 0) {
-      const projectsInPerson = await this.gitlabClient.Users.projects(users[0].id);
-      const project = projectsInPerson.filter((p) => p.path === this.repository)[0];
-      if (project) {
-        this.projectId = project.id;
-        this.groupId = project.namespace.id;
-      }
-    }
-
-    if (!this.projectId) {
-      const projectsInGroup = await this.gitlabClient.Groups.projects(this.owner, { include_subgroups: true });
-      const project = projectsInGroup.filter((p) => p.path === this.repository)[0];
+    const projects = await this.gitlabClient.Projects.search(this.repository, { membership: true });
+    if (projects) {
+      const project = projects.filter((p) => p.path_with_namespace === this.repoPathWithNamespace)[0];
       if (project) {
         this.projectId = project.id;
         this.groupId = project.namespace.id;
@@ -72,8 +65,8 @@ export class GitlabTokenStorage extends GitTokenStorage {
   }
 
   public async createBranch(branch: string, source?: string) {
+    if (!this.projectId) throw new Error('Project ID not assigned');
     try {
-      if (!this.projectId) throw new Error('Project ID not assigned');
       const response = await this.gitlabClient.Branches.create(
         this.projectId,
         branch,

@@ -80,6 +80,7 @@ export default function InspectorTokenSingle({
         paddingTop: '$2',
         paddingBottom: '$2',
       }}
+      data-cy={`inspector-token-single-${token.category}`}
     >
       <Box
         css={{
