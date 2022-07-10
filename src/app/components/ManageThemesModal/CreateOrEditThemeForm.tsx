@@ -11,6 +11,7 @@ import { TokenSetThemeItem } from './TokenSetThemeItem';
 import { StyledForm } from './StyledForm';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import Box from '../Box';
+import { RootState } from '@/app/store';
 
 export type FormValues = {
   name: string
@@ -24,7 +25,7 @@ type Props = {
 };
 
 export const CreateOrEditThemeForm: React.FC<Props> = ({ defaultValues, onSubmit }) => {
-  const store = useStore();
+  const store = useStore<RootState>();
   const githubMfsEnabled = useIsGitMultiFileEnabled();
   const selectedTokenSets = useMemo(() => (
     usedTokenSetSelector(store.getState())
