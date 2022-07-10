@@ -10,6 +10,7 @@ const figmaOnHandlers = []
 /** @type {[string, (...args: any[]) => any][]} */
 const figmaUiOnHandlers = []
 
+
 module.exports.dispatchFigmaEvent = jest.fn((name, args) => {
   figmaOnHandlers
     .filter((handler) => handler[0] === name)
