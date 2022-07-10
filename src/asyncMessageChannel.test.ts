@@ -5,16 +5,18 @@ import {
 
 describe('Testing the mock functionality of the AsyncMessageChannel', () => {
   it('should be able to communicate between UI and plugin', async () => {
+    const runAfter: (() => void)[] = [];
+
     const getThemeInfoHandler = async (): Promise<GetThemeInfoMessageResult> => ({
       type: AsyncMessageTypes.GET_THEME_INFO,
       activeTheme: 'light',
       themes: [{ id: 'light', name: 'Light', selectedTokenSets: {} }],
     });
 
-    const disconnectPluginInstance = AsyncMessageChannel.PluginInstance.connect();
+    runAfter.push(AsyncMessageChannel.PluginInstance.connect());
     AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.GET_THEME_INFO, getThemeInfoHandler);
 
-    const disconnectReactInstance = AsyncMessageChannel.ReactInstance.connect();
+    runAfter.push(AsyncMessageChannel.ReactInstance.connect());
     const result = await AsyncMessageChannel.ReactInstance.message({
       type: AsyncMessageTypes.GET_THEME_INFO,
     });
@@ -24,21 +26,22 @@ describe('Testing the mock functionality of the AsyncMessageChannel', () => {
       themes: [{ id: 'light', name: 'Light', selectedTokenSets: {} }],
     });
 
-    disconnectReactInstance();
-    disconnectPluginInstance();
+    runAfter.forEach((fn) => fn());
   });
 
   it('should be able to communicate between plugin and UI', async () => {
+    const runAfter: (() => void)[] = [];
+
     const getThemeInfoHandler = async (): Promise<GetThemeInfoMessageResult> => ({
       type: AsyncMessageTypes.GET_THEME_INFO,
       activeTheme: 'light',
       themes: [{ id: 'light', name: 'Light', selectedTokenSets: {} }],
     });
 
-    const disconnectReactInstance = AsyncMessageChannel.ReactInstance.connect();
+    runAfter.push(AsyncMessageChannel.ReactInstance.connect());
     AsyncMessageChannel.ReactInstance.handle(AsyncMessageTypes.GET_THEME_INFO, getThemeInfoHandler);
 
-    const disconnectPluginInstance = AsyncMessageChannel.PluginInstance.connect();
+    runAfter.push(AsyncMessageChannel.PluginInstance.connect());
     const result = await AsyncMessageChannel.PluginInstance.message({
       type: AsyncMessageTypes.GET_THEME_INFO,
     });
@@ -48,7 +51,6 @@ describe('Testing the mock functionality of the AsyncMessageChannel', () => {
       themes: [{ id: 'light', name: 'Light', selectedTokenSets: {} }],
     });
 
-    disconnectReactInstance();
-    disconnectPluginInstance();
+    runAfter.forEach((fn) => fn());
   });
 });

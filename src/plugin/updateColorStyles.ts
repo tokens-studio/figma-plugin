@@ -1,24 +1,25 @@
-import { SingleToken } from '@/types/tokens';
+import { SingleColorToken } from '@/types/tokens';
 import setColorValuesOnTarget from './setColorValuesOnTarget';
-import { normalizeTokenName } from '@/utils/normalizeTokenName';
 import { getPaintStylesKeyMap } from '@/utils/getPaintStylesKeyMap';
-import { TokenTypes } from '@/constants/TokenTypes';
 
 // Iterate over colorTokens to create objects that match figma styles
-export default function updateColorStyles(colorTokens: SingleToken[], shouldCreate = false) {
+// @returns A map of token names and their respective style IDs (if created or found)
+export default function updateColorStyles(colorTokens: SingleColorToken<true, { path: string }>[], shouldCreate = false) {
   const paintToKeyMap = getPaintStylesKeyMap();
+  const tokenToStyleMap: Record<string, string> = {};
 
-  colorTokens.forEach((token: SingleToken) => {
-    if (token.type === TokenTypes.COLOR) {
-      const trimmedKey = normalizeTokenName(token.name);
-
-      if (paintToKeyMap.has(trimmedKey)) {
-        setColorValuesOnTarget(paintToKeyMap.get(trimmedKey)!, token);
-      } else if (shouldCreate) {
-        const style = figma.createPaintStyle();
-        style.name = token.name;
-        setColorValuesOnTarget(style, token);
-      }
+  colorTokens.forEach((token) => {
+    if (paintToKeyMap.has(token.path)) {
+      const paint = paintToKeyMap.get(token.path)!;
+      tokenToStyleMap[token.path] = paint.id;
+      setColorValuesOnTarget(paint, token);
+    } else if (shouldCreate) {
+      const style = figma.createPaintStyle();
+      style.name = token.path;
+      tokenToStyleMap[token.path] = style.id;
+      setColorValuesOnTarget(style, token);
     }
   });
+
+  return tokenToStyleMap;
 }

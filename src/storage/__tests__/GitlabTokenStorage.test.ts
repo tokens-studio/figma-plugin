@@ -4,7 +4,6 @@ import { GitlabTokenStorage } from '../GitlabTokenStorage';
 
 const mockGetUserName = jest.fn();
 const mockGetProjects = jest.fn();
-const mockGetProjectsInGroups = jest.fn();
 const mockGetBranches = jest.fn();
 const mockCreateBranch = jest.fn();
 const mockGetGroupMembers = jest.fn();
@@ -18,11 +17,10 @@ jest.mock('@gitbeaker/browser', () => ({
   Gitlab: jest.fn().mockImplementation(() => ({
     Users: {
       username: mockGetUserName,
-      projects: mockGetProjects,
       current: mockGetCurrentUser,
     },
-    Groups: {
-      projects: mockGetProjectsInGroups,
+    Projects: {
+      search: mockGetProjects,
     },
     Branches: {
       all: mockGetBranches,
@@ -48,7 +46,7 @@ jest.mock('@gitbeaker/browser', () => ({
 }));
 
 describe('GitlabTokenStorage', () => {
-  const storageProvider = new GitlabTokenStorage('', 'six7', 'figma-tokens');
+  const storageProvider = new GitlabTokenStorage('', 'figma-tokens', 'six7/figma-tokens');
   storageProvider.selectBranch('main');
 
   beforeEach(() => {
@@ -56,44 +54,20 @@ describe('GitlabTokenStorage', () => {
     storageProvider.changePath('tokens.json');
   });
 
-  it('should assign projectId by projects in group', async () => {
+  it('should assign projectId by searching in projects', async () => {
+    const repoName = 'figma-tokens';
+    const namespace = 'six7';
     mockGetUserName.mockImplementationOnce(() => (
       Promise.resolve([])
-    ));
-
-    mockGetProjectsInGroups.mockImplementationOnce(() => (
-      Promise.resolve(
-        [{
-          name: 'figma-tokens',
-          id: 35102363,
-          path: 'figma-tokens',
-          namespace: {
-            full_path: 'six7',
-            id: 51634506,
-          },
-        }],
-      )
-    ));
-
-    expect(
-      await storageProvider.assignProjectId(),
-    ).toHaveProperty('projectId', 35102363);
-    expect(
-      await storageProvider.assignProjectId(),
-    ).toHaveProperty('groupId', 51634506);
-  });
-
-  it('should assign projectId by projects in user', async () => {
-    mockGetUserName.mockImplementationOnce(() => (
-      Promise.resolve(['six7'])
     ));
 
     mockGetProjects.mockImplementationOnce(() => (
       Promise.resolve(
         [{
-          name: 'figma-tokens',
+          name: repoName,
           id: 35102363,
-          path: 'figma-tokens',
+          path: repoName,
+          path_with_namespace: `${namespace}/${repoName}`,
           namespace: {
             full_path: 'six7',
             id: 51634506,
@@ -108,6 +82,34 @@ describe('GitlabTokenStorage', () => {
     expect(
       await storageProvider.assignProjectId(),
     ).toHaveProperty('groupId', 51634506);
+
+    expect(mockGetProjects).toHaveBeenCalledWith(repoName, { membership: true });
+  });
+
+  it('should throw an error if no project is found', async () => {
+    const provider = new GitlabTokenStorage('', 'test-name', 'fullPath');
+    mockGetUserName.mockImplementationOnce(() => (
+      Promise.resolve([])
+    ));
+
+    mockGetProjects.mockImplementationOnce(() => (
+      Promise.resolve(
+        [{
+          name: 'name',
+          id: 35102363,
+          path: 'name',
+          path_with_namespace: 'namespace/project',
+          namespace: {
+            full_path: 'six7',
+            id: 51634506,
+          },
+        }],
+      )
+    ));
+
+    await expect(provider.assignProjectId())
+      .rejects
+      .toThrow('Project not accessible');
   });
 
   it('should fetch branches as a simple list', async () => {
@@ -127,6 +129,14 @@ describe('GitlabTokenStorage', () => {
     );
   });
 
+  it('should throw an error if there is no project id when trying to fetch branches', async () => {
+    const provider = new GitlabTokenStorage('', '', '');
+
+    await expect(provider.fetchBranches())
+      .rejects
+      .toThrow('Project ID not assigned');
+  });
+
   it('should try to create a branch', async () => {
     mockCreateBranch.mockImplementationOnce(() => (
       Promise.resolve({
@@ -135,6 +145,14 @@ describe('GitlabTokenStorage', () => {
     ));
     expect(await storageProvider.createBranch('development', 'main')).toBe(true);
     expect(mockCreateBranch).toBeCalledWith(35102363, 'development', 'heads/main');
+  });
+
+  it('should throw an error if there is no project id when trying to create a branch', async () => {
+    const provider = new GitlabTokenStorage('', '', '');
+
+    await expect(provider.createBranch('newBranch'))
+      .rejects
+      .toThrow('Project ID not assigned');
   });
 
   it('create a branch should return false when it is failed', async () => {
@@ -194,6 +212,14 @@ describe('GitlabTokenStorage', () => {
       })
     ));
     expect(await storageProvider.canWrite()).toBe(false);
+  });
+
+  it('canWrite should throw an error if there is no project or group id', async () => {
+    const provider = new GitlabTokenStorage('', '', '');
+    provider.enableMultiFile();
+    await expect(provider.canWrite())
+      .rejects
+      .toThrow('Missing Project or Group ID');
   });
 
   it('canWrite should return false if filePath is a folder and multiFileSync flag is false', async () => {
@@ -354,6 +380,14 @@ describe('GitlabTokenStorage', () => {
       path: 'data/global.json',
       type: 'tokenSet',
     });
+  });
+
+  it('read should throw an error if there is no project id', async () => {
+    const provider = new GitlabTokenStorage('', '', '');
+
+    await expect(provider.read())
+      .rejects
+      .toThrow('Missing Project ID');
   });
 
   it('should return an empty array when reading results in an error', async () => {
@@ -613,5 +647,13 @@ describe('GitlabTokenStorage', () => {
       ],
       undefined,
     );
+  });
+
+  it('write should throw an error if there is no project id', async () => {
+    const provider = new GitlabTokenStorage('', '', '');
+
+    await expect(provider.write([]))
+      .rejects
+      .toThrow('Project ID not assigned');
   });
 });

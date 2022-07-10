@@ -21,7 +21,7 @@ function getReturnedValue(token: SingleToken | string | number) {
 function replaceAliasWithResolvedReference(
   token: string | TokenTypograpyValue | TokenBoxshadowValue | TokenBoxshadowValue[] | null,
   reference: string,
-  resolvedReference: string | number | TokenBoxshadowValue | TokenTypograpyValue | TokenBoxshadowValue[] | null,
+  resolvedReference: string | number | TokenBoxshadowValue | TokenBoxshadowValue[] | Record<string, unknown> | null,
 ) {
   if (typeof resolvedReference === 'object') {
     return resolvedReference;

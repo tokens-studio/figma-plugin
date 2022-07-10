@@ -1,7 +1,7 @@
 {
   "name": "figma-tokens",
   "version": "1.0.0",
-  "plugin_version": "112.rc-3",
+  "plugin_version": "112",
   "description": "Figma Tokens",
   "license": "MIT",
   "scripts": {
@@ -92,7 +92,7 @@
     "react-error-boundary": "^3.1.1",
     "react-hook-form": "^7.29.0",
     "react-modal": "^3.11.2",
-    "react-redux": "^7.2.3",
+    "react-redux": "^8",
     "react-svg-loader": "^3.0.3",
     "react-uid": "^2.3.1",
     "react-window": "^1.8.6",
@@ -167,7 +167,7 @@
     "ts-node": "^10.8.1",
     "tslint": "^5.18.0",
     "tslint-react": "^4.0.0",
-    "typescript": "^4.6.3",
+    "typescript": "~4.7.4",
     "url-loader": "^2.1.0",
     "webpack": "5",
     "webpack-cli": "^3.3.6",

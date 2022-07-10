@@ -19,7 +19,6 @@ const StyledCheckbox = styled(CheckboxPrimitive.Root, {
   width: 12,
   height: 12,
   '&:focus': { boxShadow: '0 0 0 2px black' },
-
   variants: {
     isChecked: {
       true: {
@@ -31,7 +30,6 @@ const StyledCheckbox = styled(CheckboxPrimitive.Root, {
         borderColor: '$interactionSubtle',
       },
     },
-
   },
 });
 
@@ -69,8 +67,9 @@ function Checkbox({
   return (
     <StyledCheckbox
       id={id ?? undefined}
+      data-testid={id ?? undefined}
       disabled={disabled}
-      isChecked={checked}
+      isChecked={!!checked}
       checked={checked}
       onCheckedChange={onCheckedChange}
       defaultChecked={defaultChecked}
