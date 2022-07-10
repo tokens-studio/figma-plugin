@@ -6,6 +6,7 @@ import { SingleToken } from '@/types/tokens';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { AsyncMessageTypes, GetThemeInfoMessageResult } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
+import { createStyles } from './asyncMessageHandlers';
 
 type ExtendedSingleToken = SingleToken<true, { path: string }>;
 
@@ -25,6 +26,7 @@ describe('updateStyles', () => {
     const disconnectPluginInstance = AsyncMessageChannel.PluginInstance.connect();
     const disconnectReactInstance = AsyncMessageChannel.ReactInstance.connect();
     AsyncMessageChannel.ReactInstance.handle(AsyncMessageTypes.GET_THEME_INFO, mockGetThemeInfo);
+    AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.CREATE_STYLES, createStyles);
     disconnectAsyncMessageChannel = () => {
       disconnectPluginInstance();
       disconnectReactInstance();
@@ -36,7 +38,11 @@ describe('updateStyles', () => {
   });
 
   it('returns if no values are given', async () => {
-    await updateStyles([{ name: 'borderRadius.small', value: '3', type: TokenTypes.BORDER_RADIUS }]);
+    await AsyncMessageChannel.ReactInstance.message({
+      type: AsyncMessageTypes.CREATE_STYLES,
+      tokens: [{ name: 'borderRadius.small', value: '3', type: TokenTypes.BORDER_RADIUS }],
+      settings: {},
+    });
     expect(colorSpy).not.toHaveBeenCalled();
     expect(textSpy).not.toHaveBeenCalled();
     expect(effectSpy).not.toHaveBeenCalled();

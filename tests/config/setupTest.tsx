@@ -8,8 +8,8 @@ import { Provider } from 'react-redux';
 import { server } from '../../src/mocks/server';
 import { store } from '../../src/app/store';
 
-const AllTheProviders: FC = ({ children, options }) => (
-  <Provider store={store} {...options}>
+export const AllTheProviders: FC = ({ children }) => (
+  <Provider store={store}>
     {children}
   </Provider>
 );

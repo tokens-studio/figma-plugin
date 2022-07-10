@@ -61,7 +61,9 @@ export const tokenState = createModel<RootModel>()({
     },
     activeTheme: null,
     activeTokenSet: 'global',
-    usedTokenSet: ['global'],
+    usedTokenSet: {
+      global: TokenSetStatus.ENABLED,
+    },
     editProhibited: false,
     hasUnsavedChanges: false,
     collapsedTokenSets: [],
@@ -152,7 +154,7 @@ export const tokenState = createModel<RootModel>()({
         hasUnsavedChanges: payload,
       };
     },
-    setTokens: (state, newTokens) => ({
+    setTokens: (state, newTokens: Record<string, AnyTokenList>) => ({
       ...state,
       tokens: newTokens,
     }),

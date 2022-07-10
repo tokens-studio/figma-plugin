@@ -97,22 +97,6 @@ export class AsyncMessageChannel {
             }, '*');
           }
         }
-      } else if (process.env.NODE_ENV === 'test') {
-        if (this.isInFigmaSandbox) {
-          figma.ui.postMessage({
-            id: msg.id,
-            message: {
-              type: msg.message.type,
-            },
-          });
-        } else {
-          parent.postMessage({
-            pluginMessage: {
-              id: msg.id,
-              message: { type: msg.message.type },
-            },
-          }, '*');
-        }
       }
     });
   }
