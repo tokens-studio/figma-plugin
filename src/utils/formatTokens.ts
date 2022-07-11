@@ -32,7 +32,6 @@ export default function formatTokens({
         || (token.type === 'boxShadow' && expandShadow)
       ) {
         if (typeof token.value === 'string') {
-          console.log('tokensContext', resolvedTokens);
           const resolvedToken = resolvedTokens.find((t) => t.name === name);
           if (resolvedToken) {
             const expanded = expand(resolvedToken?.value);
