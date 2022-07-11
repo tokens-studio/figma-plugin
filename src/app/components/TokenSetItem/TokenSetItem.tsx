@@ -99,7 +99,7 @@ export function TokenSetItem({
     return fallbackIcon;
   }, [tokenSetStatus]);
 
-  const tokenSetItemBefore = (canReorder || extraBefore) ? (
+  const tokenSetItemBefore = (
     <StyledBeforeFlex>
       {canReorder ? (
         <StyledGrabber data-testid={`tokensetitem-${item.path}-grabber`} onPointerDown={handleGrabberPointerDown}>
@@ -108,7 +108,7 @@ export function TokenSetItem({
       ) : null}
       {extraBefore}
     </StyledBeforeFlex>
-  ) : null;
+  );
 
   return (
     <StyledWrapper>

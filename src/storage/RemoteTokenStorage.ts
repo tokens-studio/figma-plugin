@@ -40,11 +40,10 @@ export abstract class RemoteTokenStorage<Metadata = unknown, SaveOptions = unkno
 
   public async save(data: RemoteTokenStorageData<Metadata>, saveOptions?: SaveOptions): Promise<boolean> {
     const files: RemoteTokenStorageFile<Metadata>[] = [];
-
     // First we'll convert the incoming data into files
     // in this generic implementation we will ignore whether multi file is enabled or not (ie for Github)
     // how these "files" are written is up to the read and write implementation
-    const tokenSetObjects = convertTokensToObject(data.tokens);
+    const tokenSetObjects = convertTokensToObject({ ...data.tokens });
     Object.entries(tokenSetObjects).forEach(([name, tokenSet]) => {
       files.push({
         type: 'tokenSet',

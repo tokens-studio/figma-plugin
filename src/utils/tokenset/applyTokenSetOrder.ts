@@ -1,6 +1,10 @@
 import type { AnyTokenList } from '@/types/tokens';
 
-export function applyTokenSetOrder(tokenSets: Record<string, AnyTokenList> = {}, order: (string[] | null | undefined) = null) {
+export function applyTokenSetOrder(tokenSets: Record<string, AnyTokenList> = {}, order: (string[] | Record<string, unknown> | null | undefined) = null) {
+  if (typeof order === 'object' && !Array.isArray(order)) {
+    return tokenSets;
+  }
+
   return Object.fromEntries(
     Object.entries(tokenSets).sort((a, b) => {
       const indexOfA = order?.indexOf(a[0]) ?? -1;

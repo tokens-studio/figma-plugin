@@ -166,7 +166,9 @@ export default function TokenSetTree({
         items.find(({ key }) => item.key === key)
       )),
     );
-    onReorder(nextItems.map(({ path }) => path));
+    onReorder(nextItems
+      .filter(({ isLeaf }) => isLeaf)
+      .map(({ path }) => path));
     setItems(nextItems);
   }, [items, onReorder]);
 

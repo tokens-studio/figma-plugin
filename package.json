@@ -7,7 +7,7 @@
   "scripts": {
     "build-css": "postcss src/app/styles/tailwind.css -o src/app/styles/main.css",
     "watch-css": "postcss src/app/styles/tailwind.css -o src/app/styles/main.css -w",
-    "watch-js": "cross-env LAUNCHDARKLY_FLAGS=tokenThemes,gitBranchSelector,multiFileSync webpack --mode=development --watch",
+    "watch-js": "cross-env webpack --mode=development --watch",
     "watch-transform": "webpack --mode=development --watch --config webpack-transform.config.js",
     "build-js": "webpack --mode=production",
     "build": "yarn build-css && yarn build-js",
