@@ -20,6 +20,7 @@ import Button from './Button';
 import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 import { UpdateMode } from '@/constants/UpdateMode';
 import BoxShadowInput from './BoxShadowInput';
+import trimValue from '@/utils/trimValue';
 
 type Props = {
   resolvedTokens: ResolveTokenValuesResult[];
@@ -183,23 +184,6 @@ function EditTokenForm({ resolvedTokens }: Props) {
     },
     [internalEditToken],
   );
-
-  const trimValue = React.useCallback((value: SingleToken['value']) => {
-    if (Array.isArray(value)) {
-      return value.map((item) => (
-        Object.entries(item).reduce<Record<string, string>>((acc, [key, value]) => {
-          acc[key] = value.toString().trim();
-          return acc;
-        }, {})
-      ));
-    } if (typeof value === 'object') {
-      return Object.entries(value).reduce<Record<string, string>>((acc, [key, value]) => {
-        acc[key] = value.toString().trim();
-        return acc;
-      }, {});
-    }
-    return value.toString().trim();
-  }, []);
 
   // @TODO update to useCallback
   const submitTokenValue = async ({ type, value, name }: EditTokenObject) => {
