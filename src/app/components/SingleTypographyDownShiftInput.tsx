@@ -33,9 +33,7 @@ export default function SingleTypographyDownShiftInput({
       resolvedTokens={resolvedTokens}
       handleChange={onChange}
       setInputValue={handleBoxshadowDownShiftInputChange}
-      placeholder={
-        name === 'color' ? `${name} #000000, hsla(), rgba() or {alias}` : `${name} value or {alias}`
-      }
+      placeholder={`${name} value or {alias}`}
       suffix
     />
   );
