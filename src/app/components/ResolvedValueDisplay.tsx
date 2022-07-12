@@ -14,11 +14,12 @@ export const ResolvedValueDisplay: React.FC<Props> = ({ value, isColorToken }) =
     return <ResolvedShadowValueDisplay shadows={value as TokenBoxshadowValue[]} />;
   }
 
-  if (typeof value === 'object') {
-    return <ResolvedTypograhpyValueDisplay value={value as SingleTypographyToken['value']} />;
-  }
-
-  if (typeof value !== 'string' && typeof value !== 'number') {
+  if (value && typeof value === 'object') {
+    if ('fontFamily' in value) { // value is Typography value
+      return <ResolvedTypograhpyValueDisplay value={value as SingleTypographyToken['value']} />;
+    } if ('type' in value) { // value is BoxShadow value
+      return <ResolvedShadowValueDisplay shadows={[value as TokenBoxshadowValue]} />;
+    }
     return (
       <div className="flex p-2 mt-2 font-mono text-gray-700 bg-gray-100 border-gray-300 rounded text-xxs itms-center">
         {JSON.stringify(value, null, 2)}

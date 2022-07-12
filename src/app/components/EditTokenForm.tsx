@@ -20,7 +20,7 @@ import Button from './Button';
 import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 import { UpdateMode } from '@/constants/UpdateMode';
 import BoxShadowInput from './BoxShadowInput';
-import ResolvedValueDisplay from './ResolvedValueDisplay';
+import { ResolvedValueDisplay } from './ResolvedValueDisplay';
 
 type Props = {
   resolvedTokens: ResolveTokenValuesResult[];
