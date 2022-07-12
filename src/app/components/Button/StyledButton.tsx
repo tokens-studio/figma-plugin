@@ -37,6 +37,14 @@ export const StyledButton = styled('button', {
           background: '$bgHoverBtnGhost',
         },
       },
+      warning: {
+        background: 'transparent',
+        padding: '$2 $3',
+        color: '$red500',
+        '&:hover': {
+          background: '$bgHoverBtnGhost',
+        },
+      },
     },
   },
 });

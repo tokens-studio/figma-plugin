@@ -8,6 +8,7 @@ import { storageTypeSelector } from '@/selectors';
 import { StyledStorageItem } from './StyledStorageItem';
 import type { StorageTypeCredentials } from '@/types/StorageType';
 import { isGitProvider } from '@/utils/is';
+import useConfirm from '../hooks/useConfirm';
 
 type Props = {
   item: StorageTypeCredentials,
@@ -23,14 +24,22 @@ const StorageItem = ({ item, onEdit }: Props) => {
   const branch = isGitProvider(item) ? item.branch : null;
 
   const { restoreStoredProvider, deleteProvider } = useRemoteTokens();
+  const { confirm } = useConfirm();
+
+  const askUserIfDelete = React.useCallback(async () => {
+    const shouldPull = await confirm({
+      text: 'Do you really want to delete a sync setting?',
+    });
+    return shouldPull;
+  }, [confirm]);
 
   const isActive = React.useCallback(() => (
     isSameCredentials(item, storageType)
   ), [item, storageType]);
 
-  const handleDelete = React.useCallback(() => {
-    deleteProvider(item);
-  }, [deleteProvider, item]);
+  const handleDelete = React.useCallback(async () => {
+    if (await askUserIfDelete()) deleteProvider(item);
+  }, [deleteProvider, item, askUserIfDelete]);
 
   const handleRestore = React.useCallback(() => {
     restoreStoredProvider(item);
@@ -77,7 +86,7 @@ const StorageItem = ({ item, onEdit }: Props) => {
         ) : (
           <Button
             id="button-storageitem-delete"
-            variant="secondary"
+            variant="warning"
             onClick={handleDelete}
           >
             Delete
