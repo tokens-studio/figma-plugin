@@ -21,6 +21,8 @@ import { StorageType } from '@/types/StorageType';
 import {
   ActiveThemeProperty, CheckForChangesProperty, StorageTypeProperty, ThemesProperty, UpdatedAtProperty, ValuesProperty, VersionProperty,
 } from '@/figmaStorage';
+import { AsyncMessageChannel } from '@/AsyncMessageChannel';
+import { AsyncMessageTypes } from '@/types/AsyncMessages';
 
 // @TODO fix typings
 
@@ -164,8 +166,12 @@ export async function updateNodes(
   tokens: Map<string, AnyTokenList[number]>,
   settings?: UpdateNodesSettings,
 ) {
-  const { ignoreFirstPartForStyles } = settings ?? {};
+  const { ignoreFirstPartForStyles, prefixStylesWithThemeName } = settings ?? {};
   const figmaStyleMaps = getAllFigmaStyleMaps();
+  const themeInfo = await AsyncMessageChannel.PluginInstance.message({
+    type: AsyncMessageTypes.GET_THEME_INFO,
+  });
+
   postToUI({
     type: MessageFromPluginTypes.START_JOB,
     job: {
@@ -187,7 +193,15 @@ export async function updateNodes(
             const mappedTokens = destructureCompositionTokenForAlias(tokens, entry.tokens);
             let mappedValues = mapValuesToTokens(tokens, entry.tokens);
             mappedValues = destructureCompositionToken(mappedValues);
-            setValuesOnNode(entry.node, mappedValues, mappedTokens, figmaStyleMaps, ignoreFirstPartForStyles);
+            setValuesOnNode(
+              entry.node,
+              mappedValues,
+              mappedTokens,
+              figmaStyleMaps,
+              themeInfo,
+              ignoreFirstPartForStyles,
+              prefixStylesWithThemeName,
+            );
             store.successfulNodes.add(entry.node);
             returnedValues.add(entry.tokens);
           }

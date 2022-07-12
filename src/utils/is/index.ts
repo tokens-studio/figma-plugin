@@ -6,3 +6,6 @@ export * from './isPropertyType';
 export * from './isSingleBoxShadowToken';
 export * from './isTokenType';
 export * from './isGitProvider';
+export * from './isPrimitiveValue';
+export * from './isSingleBoxShadowValue';
+export * from './isSingleTypographyValue';
