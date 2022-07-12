@@ -60,6 +60,12 @@ describe('formatTokens', () => {
         type: TokenTypes.TYPOGRAPHY,
       },
       {
+        name: 'typography.heading.non_resolved',
+        value: '{typography.heading.new}',
+        description: 'Use for headings',
+        type: TokenTypes.TYPOGRAPHY,
+      },
+      {
         type: TokenTypes.BOX_SHADOW,
         name: 'shadows.md',
         value: [
@@ -138,6 +144,11 @@ describe('formatTokens', () => {
                     type: 'fontSize',
                   },
                 },
+                non_resolved: {
+                  value: '{typography.heading.new}',
+                  description: 'Use for headings',
+                  type: TokenTypes.TYPOGRAPHY,
+                },
               },
             },
             shadows: {
@@ -204,6 +215,11 @@ describe('formatTokens', () => {
                   value: '{typography.heading.h1}',
                   description: 'Use for headings',
                   type: 'typography',
+                },
+                non_resolved: {
+                  value: '{typography.heading.new}',
+                  description: 'Use for headings',
+                  type: TokenTypes.TYPOGRAPHY,
                 },
               },
             },
