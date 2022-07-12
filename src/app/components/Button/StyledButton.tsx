@@ -38,12 +38,9 @@ export const StyledButton = styled('button', {
         },
       },
       warning: {
-        background: 'transparent',
-        padding: '$2 $3',
-        color: '$red500',
-        '&:hover': {
-          background: '$bgHoverBtnGhost',
-        },
+        background: '$bgBtnSecondary',
+        color: '$dangerFg',
+        borderColor: '$border',
       },
     },
   },
