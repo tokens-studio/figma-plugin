@@ -11,7 +11,7 @@ import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
 import Heading from './Heading';
 import IconButton from './IconButton';
 import Box from './Box';
-import ResolvedValueBox from './ResolvedValueBox';
+import ResolvedTokenDisplay from './ResolvedTokenDisplay';
 import DownshiftInput from './DownshiftInput';
 import { TokenBoxshadowValue } from '@/types/values';
 import { TokenTypes } from '@/constants/TokenTypes';
@@ -149,7 +149,7 @@ export default function BoxShadowInput({
                 && typeof internalEditToken.value === 'string'
                 && checkIfContainsAlias(internalEditToken.value)
               ) && (
-              <ResolvedValueBox
+              <ResolvedTokenDisplay
                 alias={alias}
                 selectedToken={selectedToken}
               />

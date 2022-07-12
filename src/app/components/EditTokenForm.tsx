@@ -352,7 +352,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
                 {internalEditToken.type === 'color' ? (
                   <div className="w-4 h-4 mr-1 border border-gray-200 rounded" style={{ background: String(resolvedValue) }} />
                 ) : null}
-                {resolvedValue}
+                {typeof resolvedValue === 'string' ? resolvedValue : JSON.stringify(resolvedValue, null, 2)}
               </div>
             )}
           </div>
