@@ -66,13 +66,21 @@ const StorageItem = ({ item, onEdit }: Props) => {
             Edit
           </Button>
         )}
-        {!isActive() && (
+        {!isActive() ? (
           <Button
             id="button-storageitem-apply"
             variant="secondary"
             onClick={handleRestore}
           >
             Apply
+          </Button>
+        ) : (
+          <Button
+            id="button-storageitem-delete"
+            variant="secondary"
+            onClick={handleDelete}
+          >
+            Delete
           </Button>
         )}
       </div>
