@@ -38,9 +38,6 @@ function EditTokenForm({ resolvedTokens }: Props) {
   const [internalEditToken, setInternalEditToken] = React.useState<typeof editToken>(editToken);
   const { confirm } = useConfirm();
 
-  React.useEffect(() => {
-    console.log("useeff", internalEditToken)
-  }, [internalEditToken])
   const isValid = React.useMemo(() => {
     if (internalEditToken?.type === TokenTypes.COMPOSITION && internalEditToken.value
       && (internalEditToken.value.hasOwnProperty('') || Object.keys(internalEditToken.value).length === 0)) {
@@ -199,7 +196,6 @@ function EditTokenForm({ resolvedTokens }: Props) {
         .split('/')
         .map((n) => n.trim())
         .join('.');
-      console.log("isPristine", internalEditToken)
       if (internalEditToken.isPristine) {
         track('Create token', { type: internalEditToken.type });
         createSingleToken({
