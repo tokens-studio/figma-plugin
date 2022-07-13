@@ -349,7 +349,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
               <ColorPicker value={internalEditToken.value} onChange={handleColorValueChange} />
             )}
             {checkIfContainsAlias(internalEditToken.value) && (
-              <ResolvedValueDisplay value={resolvedValue} isColorToken={internalEditToken.type === 'color'} />
+              <ResolvedValueDisplay value={resolvedValue} isColorToken={internalEditToken.type === TokenTypes.COLOR} />
             )}
           </div>
         );

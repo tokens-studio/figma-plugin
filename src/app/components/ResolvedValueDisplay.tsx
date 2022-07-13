@@ -1,29 +1,33 @@
 import React from 'react';
-import { SingleTypographyToken } from '@/types/tokens';
+import { SingleToken } from '@/types/tokens';
 import { ResolvedShadowValueDisplay } from './ResolvedShadowValueDisplay';
 import { ResolvedTypograhpyValueDisplay } from './ResolvedTypograhpyValueDisplay';
 import { TokenBoxshadowValue, TokenTypograpyValue } from '@/types/values';
+import Box from './Box';
 
 type Props = {
-  value: string | number | TokenTypograpyValue | TokenBoxshadowValue | TokenBoxshadowValue[] | null;
+  value: SingleToken['value'] | number | null;
   isColorToken: boolean;
 };
 
 export const ResolvedValueDisplay: React.FC<Props> = ({ value, isColorToken }) => {
   if (Array.isArray(value)) {
-    return <ResolvedShadowValueDisplay shadows={value as TokenBoxshadowValue[]} />;
+    return <ResolvedShadowValueDisplay shadows={value} />;
   }
 
   if (value && typeof value === 'object') {
     if ('fontFamily' in value) { // value is Typography value
-      return <ResolvedTypograhpyValueDisplay value={value as SingleTypographyToken['value']} />;
+      return <ResolvedTypograhpyValueDisplay value={value as TokenTypograpyValue} />;
     } if ('type' in value) { // value is BoxShadow value
       return <ResolvedShadowValueDisplay shadows={[value as TokenBoxshadowValue]} />;
     }
     return (
-      <div className="flex p-2 mt-2 font-mono text-gray-700 bg-gray-100 border-gray-300 rounded text-xxs itms-center">
+      <Box css={{
+        display: 'flex', backgroundColor: '$bgSubtle', padding: '$4', fontSize: '$xsmall',
+      }}
+      >
         {JSON.stringify(value, null, 2)}
-      </div>
+      </Box>
     );
   }
 
