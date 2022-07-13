@@ -2,6 +2,7 @@ import React from 'react';
 import { styled } from '@/stitches.config';
 import Tooltip from './Tooltip';
 import { StyledDirtyStateBadge } from './StyledDirtyStateBadge';
+import { StitchesCSS } from '@/types';
 
 const commonStyles = {
   all: 'unset',
@@ -45,7 +46,7 @@ type Props = {
   tooltip?: string;
   dataCy?: string;
   icon: any;
-  css?: any;
+  css?: StitchesCSS;
   variant?: StyledButtonProps['buttonVariant'];
   tooltipSide?: 'bottom' | 'left' | 'top' | undefined;
   onClick?: () => void;
@@ -96,12 +97,19 @@ export default function IconButton({
               <IconButtonInnerContent icon={icon} badge={badge} />
             </StyledLink>
           </Box>
-        )
-          : (
-            <StyledButton disabled={disabled} data-testid={dataCy} data-cy={dataCy} type="button" onClick={handleClick} buttonVariant={variant}>
-              <IconButtonInnerContent icon={icon} badge={badge} />
-            </StyledButton>
-          )}
+        ) : (
+          <StyledButton
+            css={css}
+            disabled={disabled}
+            data-testid={dataCy}
+            data-cy={dataCy}
+            type="button"
+            onClick={handleClick}
+            buttonVariant={variant}
+          >
+            <IconButtonInnerContent icon={icon} badge={badge} />
+          </StyledButton>
+        )}
       </Tooltip>
     </Box>
   );
