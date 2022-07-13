@@ -498,10 +498,6 @@ describe('GitlabTokenStorage', () => {
 
     mockCreateCommits.mockImplementationOnce(() => (
       Promise.resolve({
-        message: 'remove tokenSet',
-      })
-    )).mockImplementationOnce(() => (
-      Promise.resolve({
         message: 'create or update',
       })
     ));
@@ -551,23 +547,7 @@ describe('GitlabTokenStorage', () => {
       },
     ]);
 
-    expect(mockCreateCommits).toBeCalledTimes(2);
-    expect(mockCreateCommits).toBeCalledWith(
-      35102363,
-      'main',
-      'remove tokenSet',
-      [
-        {
-          action: 'delete',
-          filePath: 'data/core.json',
-        },
-        {
-          action: 'delete',
-          filePath: 'data/internal.json',
-        },
-      ],
-    );
-
+    expect(mockCreateCommits).toBeCalledTimes(1);
     expect(mockCreateCommits).toBeCalledWith(
       35102363,
       'main',
@@ -603,6 +583,14 @@ describe('GitlabTokenStorage', () => {
             },
           }, null, 2),
           filePath: 'data/core-rename.json',
+        },
+        {
+          action: 'delete',
+          filePath: 'data/core.json',
+        },
+        {
+          action: 'delete',
+          filePath: 'data/internal.json',
         },
       ],
       undefined,
