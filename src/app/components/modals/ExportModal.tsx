@@ -19,6 +19,7 @@ export default function ExportModal({ onClose }: Props) {
   const [includeParent, setIncludeParent] = React.useState(true);
   const [expandTypography, setExpandTypography] = React.useState(false);
   const [expandShadow, setExpandShadow] = React.useState(false);
+  const [expandComposition, setExpandCompoexpandComposition] = React.useState(false);
 
   const handleToggleIncludeAllTokens = React.useCallback(() => {
     setIncludeAllTokens(!includeAllTokens);
@@ -35,6 +36,10 @@ export default function ExportModal({ onClose }: Props) {
   const handleToggleExpandShadow = React.useCallback(() => {
     setExpandShadow(!expandShadow);
   }, [expandShadow]);
+
+  const handleToggleExpandComposition = React.useCallback(() => {
+    setExpandCompoexpandComposition(!expandComposition);
+  }, [expandComposition]);
 
   return (
     <Modal showClose large isOpen close={onClose} title="Export">
@@ -92,6 +97,15 @@ export default function ExportModal({ onClose }: Props) {
             />
             <Label htmlFor="expandShadow">Expand Shadows</Label>
           </Box>
+          <Box css={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+            <Checkbox
+              id="expandComposition"
+              checked={expandComposition}
+              defaultChecked={expandComposition}
+              onCheckedChange={handleToggleExpandComposition}
+            />
+            <Label htmlFor="expandComposition">Expand Composition</Label>
+          </Box>
         </Box>
 
         <Heading size="small">Output example</Heading>
@@ -99,7 +113,7 @@ export default function ExportModal({ onClose }: Props) {
           rows={10}
           isDisabled
           value={getFormattedTokens({
-            includeAllTokens, includeParent, expandTypography, expandShadow,
+            includeAllTokens, includeParent, expandTypography, expandShadow, expandComposition,
           })}
         />
         <Stack width="full" direction="row" justify="end" gap={4}>
@@ -109,7 +123,7 @@ export default function ExportModal({ onClose }: Props) {
           <Button
             href={`data:text/json;charset=utf-8,${encodeURIComponent(
               getFormattedTokens({
-                includeAllTokens, includeParent, expandTypography, expandShadow,
+                includeAllTokens, includeParent, expandTypography, expandShadow, expandComposition,
               }),
             )}`}
             download="tokens.json"
