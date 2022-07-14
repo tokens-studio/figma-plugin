@@ -36,7 +36,9 @@ type Props = {
   onCancel: () => void
 };
 
-export const CreateOrEditThemeForm: React.FC<Props> = ({ defaultValues, onSubmit, onCancel }) => {
+export const CreateOrEditThemeForm: React.FC<Props> = ({
+  id, defaultValues, onSubmit, onCancel,
+}) => {
   const store = useStore<RootState>();
   const [activeTab, setActiveTab] = useState(ThemeFormTabs.SETS);
   const githubMfsEnabled = useIsGitMultiFileEnabled();
@@ -91,7 +93,7 @@ export const CreateOrEditThemeForm: React.FC<Props> = ({ defaultValues, onSubmit
           />
           <StyledCreateOrEditThemeFormTabsFlex>
             <TabButton name={ThemeFormTabs.SETS} activeTab={activeTab} label="Sets" onSwitch={setActiveTab} />
-            <TabButton name={ThemeFormTabs.STYLES} activeTab={activeTab} label="Styles" onSwitch={setActiveTab} />
+            <TabButton name={ThemeFormTabs.STYLES} disabled={!id} activeTab={activeTab} label="Styles" onSwitch={setActiveTab} />
           </StyledCreateOrEditThemeFormTabsFlex>
         </StyledCreateOrEditThemeFormHeaderFlex>
       </StyledNameInputBox>
@@ -104,9 +106,9 @@ export const CreateOrEditThemeForm: React.FC<Props> = ({ defaultValues, onSubmit
           />
         </Box>
       )}
-      {activeTab === ThemeFormTabs.STYLES && (
+      {(activeTab === ThemeFormTabs.STYLES && id) && (
         <Box css={{ paddingTop: '$4' }}>
-          <ThemeStyleManagementForm />
+          <ThemeStyleManagementForm id={id} />
         </Box>
       )}
     </StyledForm>

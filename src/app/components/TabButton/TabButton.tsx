@@ -7,6 +7,7 @@ type Props<T extends string> = {
   name: T
   label: string
   activeTab?: T
+  disabled?: boolean
   onSwitch: (tab: T) => void
 };
 
@@ -21,6 +22,9 @@ const StyledButton = styled('button', {
     boxShadow: 'none',
     color: '$text',
   },
+  '&:disabled': {
+    opacity: 0.5,
+  },
   variants: {
     isActive: {
       true: { color: '$text' },
@@ -29,7 +33,7 @@ const StyledButton = styled('button', {
 });
 
 export function TabButton<T extends string = Tabs>({
-  name, label, activeTab, onSwitch,
+  name, label, activeTab, disabled, onSwitch,
 }: Props<T>) {
   const onClick = React.useCallback(() => {
     track('Switched tab', { from: activeTab, to: name });
@@ -43,6 +47,7 @@ export function TabButton<T extends string = Tabs>({
       isActive={activeTab === name}
       data-active={activeTab === name}
       name={name}
+      disabled={disabled}
       onClick={onClick}
     >
       {label}

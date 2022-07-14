@@ -8,7 +8,7 @@ import Text from '../Text';
 import ResolvingLoader from '../ResolvingLoader';
 import Button from '../Button';
 
-type StyleInfo = {
+export type StyleInfo = {
   id: string
   name?: string
 };
