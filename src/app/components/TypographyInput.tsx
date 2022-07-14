@@ -4,7 +4,7 @@ import { TokensIcon, LinkBreak2Icon } from '@radix-ui/react-icons';
 import { useUIDSeed } from 'react-uid';
 import { checkIfContainsAlias } from '@/utils/alias';
 import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
-import ResolvedValueBox from './ResolvedValueBox';
+import ResolvedTokenDisplay from './ResolvedTokenDisplay';
 import { findReferences } from '@/utils/findReferences';
 import IconButton from './IconButton';
 import Heading from './Heading';
@@ -112,7 +112,7 @@ export default function TypographyInput({
           />
 
           {isAliasMode && typeof internalEditToken.value === 'string' && checkIfContainsAlias(internalEditToken.value) && (
-          <ResolvedValueBox
+          <ResolvedTokenDisplay
             alias={alias}
             selectedToken={selectedToken}
           />
