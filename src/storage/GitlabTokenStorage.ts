@@ -1,5 +1,6 @@
 import { Gitlab } from '@gitbeaker/browser';
 import compact from 'just-compact';
+import type { CommitAction } from '@gitbeaker/core/dist/types/resources/Commits';
 import IsJSONString from '@/utils/isJSONString';
 import {
   GitMultiFileObject, GitSingleFileObject, GitStorageMetadata, GitTokenStorage,
@@ -204,29 +205,25 @@ export class GitlabTokenStorage extends GitTokenStorage {
       (a.path && b.path) ? a.path.localeCompare(b.path) : 0
     )).map((jsonFile) => jsonFile.path);
 
+    let gitlabActions: CommitAction[] = Object.entries(changeset).map(([filePath, content]) => ({
+      action: jsonFiles.includes(filePath) ? 'update' : 'create',
+      filePath,
+      content,
+    }));
+
     if (!this.path.endsWith('.json')) {
       const filesToDelete = jsonFiles.filter((jsonFile) => !Object.keys(changeset).some((item) => item.endsWith(jsonFile)));
-
-      await this.gitlabClient.Commits.create(
-        this.projectId,
-        branch,
-        'remove tokenSet',
-        filesToDelete.map((filePath) => ({
-          action: 'delete',
-          filePath,
-        })),
-      );
+      gitlabActions = gitlabActions.concat(filesToDelete.map((filePath) => ({
+        action: 'delete',
+        filePath,
+      })));
     }
 
     const response = await this.gitlabClient.Commits.create(
       this.projectId,
       branch,
       message,
-      Object.entries(changeset).map(([filePath, content]) => ({
-        action: jsonFiles.includes(filePath) ? 'update' : 'create',
-        filePath,
-        content,
-      })),
+      gitlabActions,
       shouldCreateBranch ? {
         startBranch: branches[0],
       } : undefined,
