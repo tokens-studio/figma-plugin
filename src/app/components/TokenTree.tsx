@@ -10,7 +10,7 @@ import AddIcon from '@/icons/add.svg';
 
 export type ShowFormOptions = {
   name: string;
-  isPristine?: string;
+  status?: string;
   token: SingleToken | null;
 };
 

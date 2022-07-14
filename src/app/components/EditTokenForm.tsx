@@ -65,10 +65,10 @@ function EditTokenForm({ resolvedTokens }: Props) {
   ]);
 
   React.useEffect(() => {
-    if ((internalEditToken?.isPristine !== 'edit' || nameWasChanged) && hasNameThatExistsAlready) {
+    if ((internalEditToken?.status !== 'edit' || nameWasChanged) && hasNameThatExistsAlready) {
       setError('Token names must be unique');
     }
-    if ((internalEditToken?.isPristine !=='edit' || nameWasChanged) && hasAnotherTokenThatStartsWithName) {
+    if ((internalEditToken?.status !== 'edit' || nameWasChanged) && hasAnotherTokenThatStartsWithName) {
       setError('Must not use name of another group');
     }
   }, [internalEditToken, hasNameThatExistsAlready, nameWasChanged]);
@@ -197,7 +197,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
         .map((n) => n.trim())
         .join('.');
 
-      if (internalEditToken.isPristine === 'create') {
+      if (internalEditToken.status === 'create') {
         track('Create token', { type: internalEditToken.type });
         createSingleToken({
           description: (
@@ -209,7 +209,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
           type,
           value,
         });
-      } else if (internalEditToken.isPristine === 'edit') {
+      } else if (internalEditToken.status === 'edit') {
         editSingleToken({
           description: (
             internalEditToken.description
@@ -396,8 +396,8 @@ function EditTokenForm({ resolvedTokens }: Props) {
             Cancel
           </Button>
           <Button disabled={!isValid} variant="primary" type="submit">
-            {internalEditToken?.isPristine === 'create' ? 'Create'
-              : internalEditToken?.isPristine === 'edit' ? 'Update' : 'Duplicate'}
+            {internalEditToken?.status === 'create' ? 'Create'
+              : internalEditToken?.status === 'edit' ? 'Update' : 'Duplicate'}
           </Button>
         </Stack>
       </Stack>

@@ -109,7 +109,7 @@ export const uiState = createModel<RootModel>()({
     lastOpened: '',
     editToken: {
       type: TokenTypes.OTHER,
-      isPristine: 'create',
+      status: 'create',
     },
     showEditForm: false,
     tokenFilter: '',
