@@ -397,7 +397,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
             Cancel
           </Button>
           <Button disabled={!isValid} variant="primary" type="submit">
-            {internalEditToken?.status === EditTokenFormStatus.EDIT ? 'Create'
+            {internalEditToken?.status === EditTokenFormStatus.CREATE ? 'Create'
               : internalEditToken?.status === EditTokenFormStatus.EDIT ? 'Update' : 'Duplicate'}
           </Button>
         </Stack>
