@@ -65,10 +65,10 @@ function EditTokenForm({ resolvedTokens }: Props) {
   ]);
 
   React.useEffect(() => {
-    if ((internalEditToken?.isPristine || nameWasChanged) && hasNameThatExistsAlready) {
+    if ((internalEditToken?.isPristine !== 'edit' || nameWasChanged) && hasNameThatExistsAlready) {
       setError('Token names must be unique');
     }
-    if ((internalEditToken?.isPristine || nameWasChanged) && hasAnotherTokenThatStartsWithName) {
+    if ((internalEditToken?.isPristine !=='edit' || nameWasChanged) && hasAnotherTokenThatStartsWithName) {
       setError('Must not use name of another group');
     }
   }, [internalEditToken, hasNameThatExistsAlready, nameWasChanged]);
@@ -246,7 +246,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
         } else {
           track('Edit token', { renamed: false });
         }
-      } else {
+      } else if (oldName) {
         duplicateSingleToken({ parent: activeTokenSet, newName, oldName });
       }
     }
