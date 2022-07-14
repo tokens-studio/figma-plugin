@@ -178,27 +178,19 @@ export const tokenState = createModel<RootModel>()({
       };
     },
     duplicateToken: (state, data: DuplicateTokenPayload) => {
-      console.log("duplicate")
       let newTokens: TokenStore['values'] = {};
-      const existingTokenIndex = state.tokens[data.parent].findIndex((n) => n.name === data.name);
+      const existingTokenIndex = state.tokens[data.parent].findIndex((n) => n.name === data.oldName);
       if (existingTokenIndex > -1) {
         const existingTokens = [...state.tokens[data.parent]];
         existingTokens.splice(existingTokenIndex + 1, 0, {
           ...state.tokens[data.parent][existingTokenIndex],
-          name: data.name,
+          name: data.newName,
         });
 
         newTokens = {
           [data.parent]: existingTokens,
         };
       }
-      console.log("duplicate", {
-        ...state,
-        tokens: {
-          ...state.tokens,
-          ...newTokens,
-        },
-      })
       return {
         ...state,
         tokens: {

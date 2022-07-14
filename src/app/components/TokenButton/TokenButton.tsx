@@ -91,7 +91,7 @@ export const TokenButton: React.FC<Props> = ({
 
   const handleDuplicateClick = React.useCallback(() => {
     showForm({ name, token, isPristine: 'duplicate' });
-  }, [activeTokenSet, name, duplicateSingleToken]);
+  }, [showForm, name, token, duplicateSingleToken, activeTokenSet, name]);
 
   const setPluginValue = React.useCallback((value: SelectionValue) => {
     dispatch.uiState.startJob({ name: BackgroundJobs.UI_APPLYNODEVALUE });
