@@ -1,4 +1,5 @@
 /* eslint-disable import/prefer-default-export */
+import omit from 'just-omit';
 import { createModel } from '@rematch/core';
 import * as tokenStateReducers from './reducers/tokenState';
 import * as tokenStateEffects from './effects/tokenState';
@@ -247,10 +248,9 @@ export const tokenState = createModel<RootModel>()({
       const index = state.tokens[data.parent].findIndex((token) => token.name === nameToFind);
       const newArray = [...state.tokens[data.parent]];
       newArray[index] = {
-        ...newArray[index],
+        ...omit(newArray[index], 'description'),
         ...updateTokenPayloadToSingleToken(data),
       } as SingleToken;
-
       return {
         ...state,
         tokens: {

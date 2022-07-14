@@ -196,7 +196,6 @@ function EditTokenForm({ resolvedTokens }: Props) {
         .split('/')
         .map((n) => n.trim())
         .join('.');
-
       if (internalEditToken.isPristine) {
         track('Create token', { type: internalEditToken.type });
         createSingleToken({
