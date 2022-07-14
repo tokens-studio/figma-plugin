@@ -98,6 +98,7 @@ describe('Can set values on node', () => {
       type: 'DROP_SHADOW',
       spread: 4,
       radius: 10,
+      showShadowBehindNode: false,
       offset: { x: 2, y: 4 },
       blendMode: 'NORMAL',
       visible: true,
