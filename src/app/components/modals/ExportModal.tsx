@@ -19,7 +19,7 @@ export default function ExportModal({ onClose }: Props) {
   const [includeParent, setIncludeParent] = React.useState(true);
   const [expandTypography, setExpandTypography] = React.useState(false);
   const [expandShadow, setExpandShadow] = React.useState(false);
-  const [expandComposition, setExpandCompoexpandComposition] = React.useState(false);
+  const [expandComposition, setExpandComposition] = React.useState(false);
 
   const handleToggleIncludeAllTokens = React.useCallback(() => {
     setIncludeAllTokens(!includeAllTokens);
@@ -38,7 +38,7 @@ export default function ExportModal({ onClose }: Props) {
   }, [expandShadow]);
 
   const handleToggleExpandComposition = React.useCallback(() => {
-    setExpandCompoexpandComposition(!expandComposition);
+    setExpandComposition(!expandComposition);
   }, [expandComposition]);
 
   return (
