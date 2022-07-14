@@ -51,6 +51,10 @@ export const ManageThemesModal: React.FC<Props> = () => {
     }
   }, [dispatch, themeEditorOpen]);
 
+  const handleCancelEdit = useCallback(() => {
+    setThemeEditorOpen(false);
+  }, []);
+
   const handleSubmit = useCallback((values: FormValues) => {
     dispatch.tokenState.saveTheme({
       id: typeof themeEditorOpen === 'string' ? themeEditorOpen : undefined,
@@ -135,6 +139,7 @@ export const ManageThemesModal: React.FC<Props> = () => {
           id={typeof themeEditorOpen === 'string' ? themeEditorOpen : undefined}
           defaultValues={themeEditorDefaultValues}
           onSubmit={handleSubmit}
+          onCancel={handleCancelEdit}
         />
       )}
     </Modal>

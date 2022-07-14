@@ -29,6 +29,7 @@ const globalTokens = {
   radii: {
     sm: '2px',
     lg: '4px',
+    full: '999px',
   },
 };
 
@@ -130,6 +131,7 @@ export const stitchesInstance = createStitches({
       contextMenuItem: globalTokens.radii.sm,
       card: globalTokens.radii.lg,
       badge: globalTokens.radii.lg,
+      full: globalTokens.radii.full,
     },
     shadows: {
       default: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',

@@ -17,6 +17,7 @@ import IconButton from '../IconButton';
 import { IconBack } from '@/icons';
 import { StyledCreateOrEditThemeFormTabsFlex } from './StyledCreateOrEditThemeFormTabsFlex';
 import { TabButton } from '../TabButton';
+import { ThemeStyleManagementForm } from './ThemeStyleManagentForm';
 
 export type FormValues = {
   name: string
@@ -32,9 +33,10 @@ type Props = {
   id?: string
   defaultValues?: Partial<FormValues>
   onSubmit: (values: FormValues) => void
+  onCancel: () => void
 };
 
-export const CreateOrEditThemeForm: React.FC<Props> = ({ defaultValues, onSubmit }) => {
+export const CreateOrEditThemeForm: React.FC<Props> = ({ defaultValues, onSubmit, onCancel }) => {
   const store = useStore<RootState>();
   const [activeTab, setActiveTab] = useState(ThemeFormTabs.SETS);
   const githubMfsEnabled = useIsGitMultiFileEnabled();
@@ -81,6 +83,7 @@ export const CreateOrEditThemeForm: React.FC<Props> = ({ defaultValues, onSubmit
             data-cy="button-return-to-overview"
             data-testid="button-return-to-overview"
             icon={<IconBack />}
+            onClick={onCancel}
           />
           <Input
             data-cy="create-or-edit-theme-form--input--name"
@@ -102,7 +105,9 @@ export const CreateOrEditThemeForm: React.FC<Props> = ({ defaultValues, onSubmit
         </Box>
       )}
       {activeTab === ThemeFormTabs.STYLES && (
-        null
+        <Box css={{ paddingTop: '$4' }}>
+          <ThemeStyleManagementForm />
+        </Box>
       )}
     </StyledForm>
   );

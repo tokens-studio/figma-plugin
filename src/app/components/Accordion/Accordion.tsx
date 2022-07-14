@@ -10,9 +10,10 @@ import { StyledCollapseHandle } from './StyledCollapseHandle';
 import { IconChevronDown } from '@/icons';
 import IconButton from '../IconButton';
 import Box from '../Box';
+import { Flex } from '../Flex';
 
 type Props = PropsWithChildren<{
-  label: string
+  label: ReactNode
   extra?: ReactNode
   css?: StitchesCSS
   isOpenByDefault?: boolean
@@ -42,7 +43,9 @@ export function Accordion({
       </StyledCollapseHandle>
       <StyledHeader>
         <Box>{label}</Box>
-        {extra}
+        <Flex css={{ height: 0, alignItems: 'center' }}>
+          {extra}
+        </Flex>
       </StyledHeader>
       <AnimatePresence>
         {isOpen && (

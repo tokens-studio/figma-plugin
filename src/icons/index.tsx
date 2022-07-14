@@ -57,6 +57,7 @@ import IconTextCase from './text-case.svg';
 import IconTextDecoration from './text-decoration.svg';
 import IconLineHeight from './line-height.svg';
 import IconBack from './back.svg';
+import IconArrowRight from './arrow-right.svg';
 
 export {
   IconAdd,
@@ -118,4 +119,5 @@ export {
   IconTextDecoration,
   IconLineHeight,
   IconBack,
+  IconArrowRight,
 };
