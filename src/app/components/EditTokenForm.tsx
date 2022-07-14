@@ -30,7 +30,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
   const firstInput = React.useRef<HTMLInputElement | null>(null);
   const activeTokenSet = useSelector(activeTokenSetSelector);
   const editToken = useSelector(editTokenSelector);
-  const { editSingleToken, createSingleToken } = useManageTokens();
+  const { editSingleToken, createSingleToken, duplicateSingleToken } = useManageTokens();
   const { remapToken } = useTokens();
   const dispatch = useDispatch<Dispatch>();
   const [inputHelperOpen, setInputHelperOpen] = React.useState(false);
@@ -197,7 +197,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
         .map((n) => n.trim())
         .join('.');
 
-      if (internalEditToken.isPristine) {
+      if (internalEditToken.isPristine === 'create') {
         track('Create token', { type: internalEditToken.type });
         createSingleToken({
           description: (
@@ -209,7 +209,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
           type,
           value,
         });
-      } else {
+      } else if (internalEditToken.isPristine === 'edit') {
         editSingleToken({
           description: (
             internalEditToken.description
@@ -246,6 +246,8 @@ function EditTokenForm({ resolvedTokens }: Props) {
         } else {
           track('Edit token', { renamed: false });
         }
+      } else {
+        duplicateSingleToken({ parent: activeTokenSet, name });
       }
     }
   };
@@ -394,7 +396,8 @@ function EditTokenForm({ resolvedTokens }: Props) {
             Cancel
           </Button>
           <Button disabled={!isValid} variant="primary" type="submit">
-            {internalEditToken?.isPristine ? 'Create' : 'Update'}
+            {internalEditToken?.isPristine === 'create' ? 'Create'
+              : internalEditToken?.isPristine === 'edit' ? 'Update' : 'Duplicate'}
           </Button>
         </Stack>
       </Stack>

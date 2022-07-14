@@ -43,7 +43,7 @@ const TokenListing: React.FC<Props> = ({
 
   const showDisplayToggle = React.useMemo(() => schema.type === TokenTypes.COLOR, [schema.type]);
 
-  const showForm = React.useCallback(({ token, name, isPristine = false }: ShowFormOptions) => {
+  const showForm = React.useCallback(({ token, name, isPristine }: ShowFormOptions) => {
     dispatch.uiState.setShowEditForm(true);
     dispatch.uiState.setEditToken({
       ...token,
@@ -56,7 +56,7 @@ const TokenListing: React.FC<Props> = ({
   }, [schema, dispatch]);
 
   const showNewForm = React.useCallback(({ name = '' }: ShowNewFormOptions) => {
-    showForm({ token: null, name, isPristine: true });
+    showForm({ token: null, name, isPristine: 'create' });
   }, [showForm]);
 
   const handleShowNewForm = React.useCallback(() => showNewForm({ }), [showNewForm]);

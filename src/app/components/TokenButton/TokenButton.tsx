@@ -82,7 +82,7 @@ export const TokenButton: React.FC<Props> = ({
   }, [type, displayType]);
 
   const handleEditClick = React.useCallback(() => {
-    showForm({ name, token });
+    showForm({ name, token, isPristine: 'edit' });
   }, [name, token, showForm]);
 
   const handleDeleteClick = React.useCallback(() => {
@@ -90,7 +90,7 @@ export const TokenButton: React.FC<Props> = ({
   }, [activeTokenSet, name, deleteSingleToken]);
 
   const handleDuplicateClick = React.useCallback(() => {
-    duplicateSingleToken({ parent: activeTokenSet, name });
+    showForm({ name, token, isPristine: 'duplicate' });
   }, [activeTokenSet, name, duplicateSingleToken]);
 
   const setPluginValue = React.useCallback((value: SelectionValue) => {
