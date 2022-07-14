@@ -247,7 +247,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
         } else {
           track('Edit token', { renamed: false });
         }
-      } else if (oldName) {
+      } else if ( internalEditToken.status === EditTokenFormStatus.DUPLICATE && oldName) {
         duplicateSingleToken({ parent: activeTokenSet, newName, oldName });
       }
     }
