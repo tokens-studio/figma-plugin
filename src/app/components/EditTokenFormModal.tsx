@@ -5,6 +5,7 @@ import { Dispatch } from '../store';
 import EditTokenForm from './EditTokenForm';
 import Modal from './Modal';
 import { editTokenSelector } from '@/selectors';
+import { EditTokenFormStatus } from '@/constants/EditTokenFormStatus';
 
 type Props = {
   resolvedTokens: ResolveTokenValuesResult[];
@@ -28,7 +29,7 @@ const EditTokenFormModal: React.FC<Props> = ({ resolvedTokens }) => {
       large
       isOpen
       close={handleReset}
-      title={editToken.status === 'create' ? 'New Token' : editToken.initialName}
+      title={editToken.status === EditTokenFormStatus.CREATE ? 'New Token' : editToken.initialName}
     >
       <EditTokenForm resolvedTokens={resolvedTokens} />
     </Modal>

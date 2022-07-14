@@ -20,6 +20,7 @@ import Button from './Button';
 import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 import { UpdateMode } from '@/constants/UpdateMode';
 import BoxShadowInput from './BoxShadowInput';
+import { EditTokenFormStatus } from '@/constants/EditTokenFormStatus';
 
 type Props = {
   resolvedTokens: ResolveTokenValuesResult[];
@@ -65,10 +66,10 @@ function EditTokenForm({ resolvedTokens }: Props) {
   ]);
 
   React.useEffect(() => {
-    if ((internalEditToken?.status !== 'edit' || nameWasChanged) && hasNameThatExistsAlready) {
+    if ((internalEditToken?.status !== EditTokenFormStatus.EDIT || nameWasChanged) && hasNameThatExistsAlready) {
       setError('Token names must be unique');
     }
-    if ((internalEditToken?.status !== 'edit' || nameWasChanged) && hasAnotherTokenThatStartsWithName) {
+    if ((internalEditToken?.status !== EditTokenFormStatus.EDIT || nameWasChanged) && hasAnotherTokenThatStartsWithName) {
       setError('Must not use name of another group');
     }
   }, [internalEditToken, hasNameThatExistsAlready, nameWasChanged]);
@@ -197,7 +198,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
         .map((n) => n.trim())
         .join('.');
 
-      if (internalEditToken.status === 'create') {
+      if (internalEditToken.status === EditTokenFormStatus.CREATE) {
         track('Create token', { type: internalEditToken.type });
         createSingleToken({
           description: (
@@ -209,7 +210,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
           type,
           value,
         });
-      } else if (internalEditToken.status === 'edit') {
+      } else if (internalEditToken.status === EditTokenFormStatus.EDIT) {
         editSingleToken({
           description: (
             internalEditToken.description
@@ -396,8 +397,8 @@ function EditTokenForm({ resolvedTokens }: Props) {
             Cancel
           </Button>
           <Button disabled={!isValid} variant="primary" type="submit">
-            {internalEditToken?.status === 'create' ? 'Create'
-              : internalEditToken?.status === 'edit' ? 'Update' : 'Duplicate'}
+            {internalEditToken?.status === EditTokenFormStatus.EDIT ? 'Create'
+              : internalEditToken?.status === EditTokenFormStatus.EDIT ? 'Update' : 'Duplicate'}
           </Button>
         </Stack>
       </Stack>

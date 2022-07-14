@@ -17,6 +17,7 @@ import GridIcon from '@/icons/grid.svg';
 import AddIcon from '@/icons/add.svg';
 import ProBadge from './ProBadge';
 import { useFlags } from './LaunchDarkly';
+import { EditTokenFormStatus } from '@/constants/EditTokenFormStatus';
 
 type Props = {
   tokenKey: string
@@ -56,7 +57,7 @@ const TokenListing: React.FC<Props> = ({
   }, [schema, dispatch]);
 
   const showNewForm = React.useCallback(({ name = '' }: ShowNewFormOptions) => {
-    showForm({ token: null, name, status: 'create' });
+    showForm({ token: null, name, status: EditTokenFormStatus.CREATE });
   }, [showForm]);
 
   const handleShowNewForm = React.useCallback(() => showNewForm({ }), [showNewForm]);
