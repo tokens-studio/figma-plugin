@@ -2,10 +2,10 @@ import React, {
   useCallback, useContext, useEffect, useMemo, useState,
 } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import compact from 'just-compact';
 import { TokenSetItem } from './TokenSetItem';
 import {
   activeTokenSetSelector,
+  collapsedTokenSetsSelector,
   editProhibitedSelector,
   usedTokenSetSelector,
 } from '@/selectors';
@@ -102,6 +102,7 @@ export default function TokenSetTree({
   const activeTokenSet = useSelector(activeTokenSetSelector);
   const usedTokenSet = useSelector(usedTokenSetSelector);
   const editProhibited = useSelector(editProhibitedSelector);
+  const collapsed = useSelector(collapsedTokenSetsSelector);
   const [items, setItems] = useState<TreeItem[]>(tokenSetListToTree(tokenSets));
 
   const determineCheckedState = useCallback((item: TreeItem) => {
@@ -161,16 +162,27 @@ export default function TokenSetTree({
   ]);
 
   const handleReorder = React.useCallback((reorderedItems: ExtendedTreeItem[]) => {
-    const nextItems = compact(
-      reorderedItems.map((item) => (
-        items.find(({ key }) => item.key === key)
-      )),
-    );
+    const nextItems = reorderedItems.reduce<typeof items>((acc, item) => {
+      const found = items.find(({ key }) => item.key === key);
+      if (found) {
+        // check if this group is collapsed
+        acc.push(found);
+        const itemIsCollapsed = collapsed.includes(item.key);
+        if (itemIsCollapsed) {
+          // also include all children
+          return acc.concat(items.filter((possibleChild) => (
+            possibleChild.parent && possibleChild.parent.startsWith(item.path)
+          )));
+        }
+      }
+      return acc;
+    }, []);
+
     onReorder(nextItems
       .filter(({ isLeaf }) => isLeaf)
       .map(({ path }) => path));
     setItems(nextItems);
-  }, [items, onReorder]);
+  }, [items, collapsed, onReorder]);
 
   const handleCheckReorder = React.useCallback((
     order: ItemData<typeof mappedItems[number]>[],
