@@ -11,7 +11,7 @@ import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
 import Heading from './Heading';
 import IconButton from './IconButton';
 import Box from './Box';
-import ResolvedValueBox from './ResolvedValueBox';
+import ResolvedTokenDisplay from './ResolvedTokenDisplay';
 import DownshiftInput from './DownshiftInput';
 import { TokenBoxshadowValue } from '@/types/values';
 import { TokenTypes } from '@/constants/TokenTypes';
@@ -23,14 +23,14 @@ type EditTokenType = Extract<EditTokenObject, { type: TokenTypes.BOX_SHADOW }>;
 export default function BoxShadowInput({
   resolvedTokens,
   internalEditToken,
-  handleBoxShadowChange,
-  handleBoxShadowChangeByAlias,
+  handleBoxShadowValueChange,
+  handleBoxShadowAliasValueChange,
   handleDownShiftInputChange,
 }: {
   resolvedTokens: ResolveTokenValuesResult[];
   internalEditToken: EditTokenType;
-  handleBoxShadowChange: (shadow: TokenBoxshadowValue | TokenBoxshadowValue[]) => void;
-  handleBoxShadowChangeByAlias: React.ChangeEventHandler;
+  handleBoxShadowValueChange: (shadow: TokenBoxshadowValue | TokenBoxshadowValue[]) => void;
+  handleBoxShadowAliasValueChange: React.ChangeEventHandler;
   handleDownShiftInputChange: (newInputValue: string) => void;
 }) {
   const seed = useUIDSeed();
@@ -56,17 +56,17 @@ export default function BoxShadowInput({
 
   const addShadow = React.useCallback(() => {
     if (Array.isArray(internalEditToken.value)) {
-      handleBoxShadowChange([...internalEditToken.value, newTokenValue]);
+      handleBoxShadowValueChange([...internalEditToken.value, newTokenValue]);
     } else if (typeof internalEditToken.value !== 'string') {
-      handleBoxShadowChange(compact([internalEditToken.value, newTokenValue]));
+      handleBoxShadowValueChange(compact([internalEditToken.value, newTokenValue]));
     }
-  }, [internalEditToken, handleBoxShadowChange]);
+  }, [internalEditToken, handleBoxShadowValueChange]);
 
   const removeShadow = React.useCallback((index: number) => {
     if (Array.isArray(internalEditToken.value)) {
-      handleBoxShadowChange(internalEditToken.value.filter((_, i) => i !== index));
+      handleBoxShadowValueChange(internalEditToken.value.filter((_, i) => i !== index));
     }
-  }, [internalEditToken, handleBoxShadowChange]);
+  }, [internalEditToken, handleBoxShadowValueChange]);
 
   return (
     <div>
@@ -105,7 +105,7 @@ export default function BoxShadowInput({
                   <SingleBoxShadowInput
                     isMultiple
                     value={internalEditToken.value as TokenBoxshadowValue[]}
-                    handleBoxShadowChange={handleBoxShadowChange}
+                    handleBoxShadowValueChange={handleBoxShadowValueChange}
                     shadowItem={token}
                     index={index}
                     id={String(index)}
@@ -117,7 +117,7 @@ export default function BoxShadowInput({
               ) : (
                 typeof internalEditToken.value !== 'string' && (
                   <SingleBoxShadowInput
-                    handleBoxShadowChange={handleBoxShadowChange}
+                    handleBoxShadowValueChange={handleBoxShadowValueChange}
                     index={0}
                     value={internalEditToken.value}
                     shadowItem={internalEditToken.value}
@@ -138,7 +138,7 @@ export default function BoxShadowInput({
                 label={TokenTypes.BOX_SHADOW}
                 inlineLabel
                 resolvedTokens={resolvedTokens}
-                handleChange={handleBoxShadowChangeByAlias}
+                handleChange={handleBoxShadowAliasValueChange}
                 setInputValue={handleDownShiftInputChange}
                 placeholder="Value or {alias}"
                 suffix
@@ -149,7 +149,7 @@ export default function BoxShadowInput({
                 && typeof internalEditToken.value === 'string'
                 && checkIfContainsAlias(internalEditToken.value)
               ) && (
-              <ResolvedValueBox
+              <ResolvedTokenDisplay
                 alias={alias}
                 selectedToken={selectedToken}
               />
