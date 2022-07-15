@@ -20,3 +20,4 @@ export * from './update';
 export * from './setLicenseKey';
 export * from './getApiCredentials';
 export * from './attachLocalStylesToTheme';
+export * from './resolveStyleInfo';

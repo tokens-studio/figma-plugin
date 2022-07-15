@@ -162,7 +162,13 @@ export type AttachLocalStylesToThemeResult = AsyncMessage<AsyncMessageTypes.ATTA
 export type ResolveStyleInfo = AsyncMessage<AsyncMessageTypes.RESOLVE_STYLE_INFO, {
   styleIds: string[]
 }>;
-export type ResolveStyleInfoResult = AsyncMessage<AsyncMessageTypes.RESOLVE_STYLE_INFO>;
+export type ResolveStyleInfoResult = AsyncMessage<AsyncMessageTypes.RESOLVE_STYLE_INFO, {
+  resolvedValues: {
+    id: string
+    key?: string
+    name?: string
+  }[];
+}>;
 
 export type GetThemeInfoMessage = AsyncMessage<AsyncMessageTypes.GET_THEME_INFO>;
 export type GetThemeInfoMessageResult = AsyncMessage<AsyncMessageTypes.GET_THEME_INFO, {
