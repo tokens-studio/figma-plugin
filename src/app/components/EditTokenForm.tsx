@@ -72,6 +72,9 @@ function EditTokenForm({ resolvedTokens }: Props) {
     if ((internalEditToken?.isPristine || nameWasChanged) && hasAnotherTokenThatStartsWithName) {
       setError('Must not use name of another group');
     }
+    if (internalEditToken.value === 'value') {
+      setError('Token name should not use "value"');
+    }
   }, [internalEditToken, hasNameThatExistsAlready, nameWasChanged]);
 
   const handleToggleInputHelper = React.useCallback(() => {
