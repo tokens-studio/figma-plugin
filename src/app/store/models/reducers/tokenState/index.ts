@@ -9,3 +9,4 @@ export * from './renameTokenSet';
 export * from './toggleManyTokenSets';
 export * from './toggleUsedTokenSet';
 export * from './assignStyleIdsToTheme';
+export * from './disconnectStyleFromTheme';

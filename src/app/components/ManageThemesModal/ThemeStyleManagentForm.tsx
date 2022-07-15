@@ -9,11 +9,11 @@ import { convertTokenNameToPath } from '@/utils/convertTokenNameToPath';
 import { Dispatch, RootState } from '@/app/store';
 import { TokenTypes } from '@/constants/TokenTypes';
 import Box from '../Box';
-import { StyleInfo, ThemeStyleManagementCategory } from './ThemeStyleManagementCategory';
+import { ThemeStyleManagementCategory } from './ThemeStyleManagementCategory';
 import { AsyncMessageTypes, AttachLocalStylesToTheme } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
-import { isEqual } from '@/utils/isEqual';
+import type { StyleInfo } from './ThemeStyleManagementCategoryStyleEntry';
 
 type StyleInfoPerCategory = Partial<Record<'typography' | 'colors' | 'effects', Record<string, StyleInfo>>>;
 
@@ -22,7 +22,8 @@ type Props = {
 };
 
 export const ThemeStyleManagementForm: React.FC<Props> = ({ id }) => {
-  const [styleInfo, setStyleInfo] = useState<StyleInfoPerCategory>({});
+  const [rawStyleInfo, setRawStyleInfo] = useState<StyleInfoPerCategory>({});
+  const [resolvedStyleInfo, setResolvedStyleInfo] = useState<StyleInfoPerCategory>({});
   const dispatch = useDispatch<Dispatch>();
   const theme = useSelector(useCallback((state: RootState) => (
     themeByIdSelector(state, id)
@@ -91,6 +92,15 @@ export const ThemeStyleManagementForm: React.FC<Props> = ({ id }) => {
     }
   }, [theme, tokenSets, settings, dispatch]);
 
+  const handleDisconnectStyle = useCallback((token: string) => {
+    if (theme) {
+      dispatch.tokenState.disconnectStyleFromTheme({
+        id: theme.id,
+        key: token,
+      });
+    }
+  }, [theme, dispatch.tokenState]);
+
   const handleAttachLocalTextStyles = useCallback(() => {
     attachLocalStyles('typography');
   }, [attachLocalStyles]);
@@ -104,36 +114,34 @@ export const ThemeStyleManagementForm: React.FC<Props> = ({ id }) => {
   }, [attachLocalStyles]);
 
   useEffect(() => {
-    const allStyleIds = Object.values(styleInfo).reduce<string[]>((list, map) => (
+    const allStyleIds = Object.values(rawStyleInfo).reduce<string[]>((list, map) => (
       list.concat(Object.values(map).map((info) => info.id))
     ), []);
     AsyncMessageChannel.ReactInstance.message({
       type: AsyncMessageTypes.RESOLVE_STYLE_INFO,
       styleIds: allStyleIds,
     }).then(({ resolvedValues }) => {
-      const nextStyleInfo = Object.fromEntries(Object.entries(styleInfo).map(([category, stylesInfoMap]) => (
+      const nextStyleInfo = Object.fromEntries(Object.entries(rawStyleInfo).map(([category, stylesInfoMap]) => (
         [category, Object.fromEntries(Object.entries(stylesInfoMap).map(([tokenName, styleInfo]) => {
-          const resolvedStyleInfo = resolvedValues.find((resolved) => resolved.id === styleInfo.id);
+          const resolvedInfo = resolvedValues.find((resolved) => resolved.id === styleInfo.id);
           return [tokenName, {
             id: styleInfo.id,
-            name: resolvedStyleInfo?.name,
-            failedToResolve: !resolvedStyleInfo?.key,
+            name: resolvedInfo?.name,
+            failedToResolve: !resolvedInfo?.key,
           }];
         }))]
       )));
-      if (!isEqual(styleInfo, nextStyleInfo)) {
-        setStyleInfo(nextStyleInfo);
-      }
+      setResolvedStyleInfo(nextStyleInfo);
     }).catch((err) => {
       console.error(err);
       Sentry.captureException(err);
     });
-  }, [styleInfo]);
+  }, [rawStyleInfo]);
 
   useEffect(() => {
   // @TODO resolve names
     if (tokenStyleGroups) {
-      const rawStyleInfo = Object.entries(tokenStyleGroups).reduce<StyleInfoPerCategory>((acc, [category, styles]) => {
+      const styleInfo = Object.entries(tokenStyleGroups).reduce<StyleInfoPerCategory>((acc, [category, styles]) => {
         if (styles) {
           type StylesInfoMap = Record<string, StyleInfo>;
           acc[(category as keyof StyleInfoPerCategory)] = styles.reduce<StylesInfoMap>((map, { styleId, token }) => {
@@ -146,7 +154,8 @@ export const ThemeStyleManagementForm: React.FC<Props> = ({ id }) => {
         }
         return acc;
       }, {});
-      setStyleInfo(rawStyleInfo);
+      setResolvedStyleInfo(styleInfo);
+      setRawStyleInfo(styleInfo);
     }
   }, [tokenStyleGroups]);
 
@@ -158,18 +167,21 @@ export const ThemeStyleManagementForm: React.FC<Props> = ({ id }) => {
     <Box css={{ padding: '$3 0', display: 'grid', gap: '$6' }}>
       <ThemeStyleManagementCategory
         label="Typography"
-        styles={styleInfo.typography ?? {}}
+        styles={resolvedStyleInfo.typography ?? {}}
         onAttachLocalStyles={handleAttachLocalTextStyles}
+        onDisconnectStyle={handleDisconnectStyle}
       />
       <ThemeStyleManagementCategory
         label="Colors"
-        styles={styleInfo.colors ?? {}}
+        styles={resolvedStyleInfo.colors ?? {}}
         onAttachLocalStyles={handleAttachLocalColorStyles}
+        onDisconnectStyle={handleDisconnectStyle}
       />
       <ThemeStyleManagementCategory
         label="Effects"
-        styles={styleInfo.effects ?? {}}
+        styles={resolvedStyleInfo.effects ?? {}}
         onAttachLocalStyles={handleAttachLocaEffectStyles}
+        onDisconnectStyle={handleDisconnectStyle}
       />
     </Box>
   );

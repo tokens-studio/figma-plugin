@@ -1,28 +1,20 @@
 import React, { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import { IconArrowRight } from '@/icons';
 import Box from '../Box';
-import { Flex } from '../Flex';
 import Accordion from '../Accordion';
 import Heading from '../Heading';
-import Text from '../Text';
-import ResolvingLoader from '../ResolvingLoader';
 import Button from '../Button';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
 import { isWaitingForBackgroundJobSelector } from '@/selectors';
 import { RootState } from '@/app/store';
-
-export type StyleInfo = {
-  id: string
-  name?: string
-  failedToResolve?: boolean
-};
+import { StyleInfo, ThemeStyleManagementCategoryStyleEntry } from './ThemeStyleManagementCategoryStyleEntry';
 
 type Props = {
   label: string
   styles: Record<string, StyleInfo>
   icon?: React.ReactNode | null
   onAttachLocalStyles: () => void
+  onDisconnectStyle: (name: string) => void
 };
 
 export const ThemeStyleManagementCategory: React.FC<Props> = ({
@@ -30,6 +22,7 @@ export const ThemeStyleManagementCategory: React.FC<Props> = ({
   icon,
   styles,
   onAttachLocalStyles,
+  onDisconnectStyle,
 }) => {
   const isAttachingLocalStyles = useSelector(useCallback((state: RootState) => (
     isWaitingForBackgroundJobSelector(state, BackgroundJobs.UI_ATTACHING_LOCAL_STYLES)
@@ -57,35 +50,13 @@ export const ThemeStyleManagementCategory: React.FC<Props> = ({
     >
       <Box css={{ display: 'grid', gap: '$2' }}>
         {stylesEntries.map(([token, styleInfo]) => (
-          <Flex
+          <ThemeStyleManagementCategoryStyleEntry
             key={token}
-            css={{
-              gap: '$3',
-              justifyContent: 'flex-start',
-              alignItems: 'center',
-            }}
-          >
-            {icon && <Box>{icon}</Box>}
-            <Flex
-              css={{
-                gap: '$3',
-                justifyContent: 'flex-start',
-                alignItems: 'center',
-              }}
-            >
-              <Text size="small">{token}</Text>
-              <IconArrowRight width="16" />
-              {(!styleInfo.name && !styleInfo.failedToResolve) && (
-                <ResolvingLoader />
-              )}
-              {(!styleInfo.name && styleInfo.failedToResolve) && (
-                <Text bold size="small" css={{ color: '$fgDanger' }}>Failed to resolve</Text>
-              )}
-              {styleInfo.name && (
-                <Text bold size="small">{styleInfo.name}</Text>
-              )}
-            </Flex>
-          </Flex>
+            icon={icon}
+            token={token}
+            styleInfo={styleInfo}
+            onDisconnectStyle={onDisconnectStyle}
+          />
         ))}
       </Box>
     </Accordion>

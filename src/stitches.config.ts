@@ -73,6 +73,7 @@ export const stitchesInstance = createStitches({
       interactionDisabled: 'var(--figma-color-text-menu-disabled)',
       dangerFg: 'var(--figma-color-text-danger)',
       dangerBg: 'var(--figma-color-bg-danger)',
+      dangerBgHover: 'var(--figma-color-bg-danger-hover)',
       onDanger: 'var(--figma-color-text-ondanger)',
       border: 'var(--figma-color-border)',
       borderMuted: 'var(--figma-color-border)',

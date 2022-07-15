@@ -12,8 +12,7 @@ import { SingleThemeEntry } from './SingleThemeEntry';
 import { ThemeObject } from '@/types';
 import Box from '../Box';
 
-type Props = {
-};
+type Props = unknown;
 
 export const ManageThemesModal: React.FC<Props> = () => {
   const dispatch = useDispatch<Dispatch>();
