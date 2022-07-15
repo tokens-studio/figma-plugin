@@ -87,7 +87,6 @@ export abstract class RemoteTokenStorage<Metadata = unknown> {
       if (file.type === 'themes') {
         data.themes = [...data.themes, ...file.data];
       } else if (file.type === 'tokenSet') {
-        console.log("{ [file.name]: file.data }", { [file.name]: file.data })
         data.tokens = {
           ...data.tokens,
           ...parseTokenValues({ [file.name]: file.data }),

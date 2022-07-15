@@ -72,7 +72,6 @@ function EditTokenForm({ resolvedTokens }: Props) {
     if ((internalEditToken?.isPristine || nameWasChanged) && hasAnotherTokenThatStartsWithName) {
       setError('Must not use name of another group');
     }
-    console.log("inter", internalEditToken)
     if (internalEditToken.name === 'value') {
       setError('Token name should not use "value"');
     }
