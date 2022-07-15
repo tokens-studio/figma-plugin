@@ -6,6 +6,9 @@ import { ThemeStyleManagementCategory } from '../ThemeStyleManagementCategory';
 
 describe('ThemeStyleManagementCategory', () => {
   it('should work', async () => {
+    const mockAttachLocalStyles = jest.fn();
+    const mockDisconnectStyle = jest.fn();
+
     const result = render(
       <MotionConfig reducedMotion="always">
         <ThemeStyleManagementCategory
@@ -13,6 +16,7 @@ describe('ThemeStyleManagementCategory', () => {
           styles={{
             'typography/body/regular': {
               id: 'S:1234',
+              failedToResolve: true,
             },
             'typography/body/bold': {
               id: 'S:1235',
@@ -22,6 +26,8 @@ describe('ThemeStyleManagementCategory', () => {
           icon={(
             <Box data-testid="icon" />
           )}
+          onAttachLocalStyles={mockAttachLocalStyles}
+          onDisconnectStyle={mockDisconnectStyle}
         />
       </MotionConfig>,
     );
@@ -37,5 +43,13 @@ describe('ThemeStyleManagementCategory', () => {
     expect(result.queryByText('typography/body/regular')).not.toBeUndefined();
     expect(result.queryByText('typography/body/bold')).not.toBeUndefined();
     expect(result.queryByText('body/bold')).not.toBeUndefined();
+
+    const attachLocalStyles = await result.findByText('Attach local styles');
+    attachLocalStyles.click();
+    expect(mockAttachLocalStyles).toBeCalledTimes(1);
+
+    const unlinkButton = await result.findByTestId('themestylemanagementcategorystyleentry-unlink');
+    unlinkButton.click();
+    expect(mockDisconnectStyle).toBeCalledTimes(1);
   });
 });

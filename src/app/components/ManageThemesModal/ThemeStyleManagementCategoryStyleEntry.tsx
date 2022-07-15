@@ -52,7 +52,7 @@ export const ThemeStyleManagementCategoryStyleEntry: React.FC<Props> = ({
           <ResolvingLoader />
         )}
         {(!styleInfo.name && styleInfo.failedToResolve) && (
-          <StyledUnlinkButton type="button" onClick={handleDisconnectStyle}>
+          <StyledUnlinkButton data-testid="themestylemanagementcategorystyleentry-unlink" type="button" onClick={handleDisconnectStyle}>
             <IconUnlink />
           </StyledUnlinkButton>
         )}

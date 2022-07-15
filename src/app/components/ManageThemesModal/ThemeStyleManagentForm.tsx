@@ -117,29 +117,30 @@ export const ThemeStyleManagementForm: React.FC<Props> = ({ id }) => {
     const allStyleIds = Object.values(rawStyleInfo).reduce<string[]>((list, map) => (
       list.concat(Object.values(map).map((info) => info.id))
     ), []);
-    AsyncMessageChannel.ReactInstance.message({
-      type: AsyncMessageTypes.RESOLVE_STYLE_INFO,
-      styleIds: allStyleIds,
-    }).then(({ resolvedValues }) => {
-      const nextStyleInfo = Object.fromEntries(Object.entries(rawStyleInfo).map(([category, stylesInfoMap]) => (
-        [category, Object.fromEntries(Object.entries(stylesInfoMap).map(([tokenName, styleInfo]) => {
-          const resolvedInfo = resolvedValues.find((resolved) => resolved.id === styleInfo.id);
-          return [tokenName, {
-            id: styleInfo.id,
-            name: resolvedInfo?.name,
-            failedToResolve: !resolvedInfo?.key,
-          }];
-        }))]
-      )));
-      setResolvedStyleInfo(nextStyleInfo);
-    }).catch((err) => {
-      console.error(err);
-      Sentry.captureException(err);
-    });
+    if (allStyleIds.length > 0) {
+      AsyncMessageChannel.ReactInstance.message({
+        type: AsyncMessageTypes.RESOLVE_STYLE_INFO,
+        styleIds: allStyleIds,
+      }).then(({ resolvedValues }) => {
+        const nextStyleInfo = Object.fromEntries(Object.entries(rawStyleInfo).map(([category, stylesInfoMap]) => (
+          [category, Object.fromEntries(Object.entries(stylesInfoMap).map(([tokenName, styleInfo]) => {
+            const resolvedInfo = resolvedValues.find((resolved) => resolved.id === styleInfo.id);
+            return [tokenName, {
+              id: styleInfo.id,
+              name: resolvedInfo?.name,
+              failedToResolve: !resolvedInfo?.key,
+            }];
+          }))]
+        )));
+        setResolvedStyleInfo(nextStyleInfo);
+      }).catch((err) => {
+        console.error(err);
+        Sentry.captureException(err);
+      });
+    }
   }, [rawStyleInfo]);
 
   useEffect(() => {
-  // @TODO resolve names
     if (tokenStyleGroups) {
       const styleInfo = Object.entries(tokenStyleGroups).reduce<StyleInfoPerCategory>((acc, [category, styles]) => {
         if (styles) {
