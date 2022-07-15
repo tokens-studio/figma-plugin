@@ -15,6 +15,7 @@ import { RootState } from '@/app/store';
 export type StyleInfo = {
   id: string
   name?: string
+  failedToResolve?: boolean
 };
 
 type Props = {
@@ -74,9 +75,13 @@ export const ThemeStyleManagementCategory: React.FC<Props> = ({
             >
               <Text size="small">{token}</Text>
               <IconArrowRight width="16" />
-              {!styleInfo.name ? (
+              {(!styleInfo.name && !styleInfo.failedToResolve) && (
                 <ResolvingLoader />
-              ) : (
+              )}
+              {(!styleInfo.name && styleInfo.failedToResolve) && (
+                <Text bold size="small" css={{ color: '$fgDanger' }}>Failed to resolve</Text>
+              )}
+              {styleInfo.name && (
                 <Text bold size="small">{styleInfo.name}</Text>
               )}
             </Flex>

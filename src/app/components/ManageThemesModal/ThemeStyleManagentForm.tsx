@@ -2,6 +2,7 @@ import React, {
   useCallback, useEffect, useMemo, useState,
 } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import * as Sentry from '@sentry/react';
 import { settingsStateSelector, tokensSelector, themeByIdSelector } from '@/selectors';
 import { mapTokensToStyleInfo } from '@/utils/tokenset';
 import { convertTokenNameToPath } from '@/utils/convertTokenNameToPath';
@@ -12,6 +13,7 @@ import { StyleInfo, ThemeStyleManagementCategory } from './ThemeStyleManagementC
 import { AsyncMessageTypes, AttachLocalStylesToTheme } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
+import { isEqual } from '@/utils/isEqual';
 
 type StyleInfoPerCategory = Partial<Record<'typography' | 'colors' | 'effects', Record<string, StyleInfo>>>;
 
@@ -102,13 +104,43 @@ export const ThemeStyleManagementForm: React.FC<Props> = ({ id }) => {
   }, [attachLocalStyles]);
 
   useEffect(() => {
+    const allStyleIds = Object.values(styleInfo).reduce<string[]>((list, map) => (
+      list.concat(Object.values(map).map((info) => info.id))
+    ), []);
+    AsyncMessageChannel.ReactInstance.message({
+      type: AsyncMessageTypes.RESOLVE_STYLE_INFO,
+      styleIds: allStyleIds,
+    }).then(({ resolvedValues }) => {
+      const nextStyleInfo = Object.fromEntries(Object.entries(styleInfo).map(([category, stylesInfoMap]) => (
+        [category, Object.fromEntries(Object.entries(stylesInfoMap).map(([tokenName, styleInfo]) => {
+          const resolvedStyleInfo = resolvedValues.find((resolved) => resolved.id === styleInfo.id);
+          return [tokenName, {
+            id: styleInfo.id,
+            name: resolvedStyleInfo?.name,
+            failedToResolve: !resolvedStyleInfo?.key,
+          }];
+        }))]
+      )));
+      if (!isEqual(styleInfo, nextStyleInfo)) {
+        setStyleInfo(nextStyleInfo);
+      }
+    }).catch((err) => {
+      console.error(err);
+      Sentry.captureException(err);
+    });
+  }, [styleInfo]);
+
+  useEffect(() => {
   // @TODO resolve names
     if (tokenStyleGroups) {
       const rawStyleInfo = Object.entries(tokenStyleGroups).reduce<StyleInfoPerCategory>((acc, [category, styles]) => {
         if (styles) {
           type StylesInfoMap = Record<string, StyleInfo>;
           acc[(category as keyof StyleInfoPerCategory)] = styles.reduce<StylesInfoMap>((map, { styleId, token }) => {
-            map[token.name] = { id: styleId };
+            map[token.name] = {
+              id: styleId,
+              failedToResolve: false,
+            };
             return map;
           }, {});
         }
