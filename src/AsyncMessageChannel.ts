@@ -48,7 +48,7 @@ export class AsyncMessageChannel {
         }
       };
       figma.ui.on('message', listener);
-      return listener;
+      return () => figma.ui.off('message', listener);
     }
 
     const listener = async (event: { data: { pluginMessage: Message } }) => {
@@ -58,11 +58,11 @@ export class AsyncMessageChannel {
       }
     };
     window.addEventListener('message', listener);
-    return listener;
+    return () => window.removeEventListener('message', listener);
   }
 
   public connect() {
-    this.attachMessageListener(async (msg: { id?: string; message?: AsyncMessages }) => {
+    return this.attachMessageListener(async (msg: { id?: string; message?: AsyncMessages }) => {
       if (!msg.id || !msg.message || !msg.message.type.startsWith('async/')) return;
       const handler = this.$handlers[msg.message.type] as AsyncMessageChannelHandlers[AsyncMessageTypes] | undefined;
       if (handler) {

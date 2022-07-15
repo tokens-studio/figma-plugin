@@ -1,4 +1,4 @@
-import { useSelector, useStore } from 'react-redux';
+import { useDispatch, useSelector, useStore } from 'react-redux';
 import { useCallback, useMemo } from 'react';
 import {
   AnyTokenList,
@@ -24,7 +24,7 @@ import { UpdateMode } from '@/constants/UpdateMode';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { NodeInfo } from '@/types/NodeInfo';
-import type { RootState } from '../store';
+import { Dispatch, RootState } from '../store';
 
 type ConfirmResult =
   ('textStyles' | 'colorStyles' | 'effectStyles')[]
@@ -35,11 +35,13 @@ type GetFormattedTokensOptions = {
   includeParent: boolean;
   expandTypography: boolean;
   expandShadow: boolean;
+  expandComposition: boolean;
 };
 
 type RemoveTokensByValueData = { property: Properties; nodes: NodeInfo[] }[];
 
 export default function useTokens() {
+  const dispatch = useDispatch<Dispatch>();
   const usedTokenSet = useSelector(usedTokenSetSelector);
   const activeTokenSet = useSelector(activeTokenSetSelector);
   const tokens = useSelector(tokensSelector);
@@ -60,11 +62,11 @@ export default function useTokens() {
   // Returns formatted tokens for style dictionary
   const getFormattedTokens = useCallback((opts: GetFormattedTokensOptions) => {
     const {
-      includeAllTokens = false, includeParent = true, expandTypography = false, expandShadow = false,
+      includeAllTokens = false, includeParent = true, expandTypography = false, expandShadow = false, expandComposition = false,
     } = opts;
     const tokenSets = includeAllTokens ? Object.keys(tokens) : [activeTokenSet];
     return formatTokens({
-      tokens, tokenSets, includeAllTokens, includeParent, expandTypography, expandShadow,
+      tokens, tokenSets, includeAllTokens, includeParent, expandTypography, expandShadow, expandComposition,
     });
   }, [tokens, activeTokenSet]);
 
@@ -140,7 +142,7 @@ export default function useTokens() {
   }, [settings.updateMode]);
 
   // Calls Figma with all tokens to create styles
-  const createStylesFromTokens = useCallback(() => {
+  const createStylesFromTokens = useCallback(async () => {
     track('createStyles');
 
     const enabledTokenSets = Object.entries(usedTokenSet)
@@ -152,12 +154,13 @@ export default function useTokens() {
       && (!token.internal__Parent || enabledTokenSets.includes(token.internal__Parent)) // filter out SOURCE tokens
     ));
 
-    AsyncMessageChannel.ReactInstance.message({
+    const createStylesResult = await AsyncMessageChannel.ReactInstance.message({
       type: AsyncMessageTypes.CREATE_STYLES,
       tokens: withoutIgnoredAndSourceTokens,
       settings,
     });
-  }, [settings, tokens, usedTokenSet]);
+    dispatch.tokenState.assignStyleIdsToCurrentTheme(createStylesResult.styleIds);
+  }, [settings, tokens, usedTokenSet, dispatch.tokenState]);
 
   return useMemo(() => ({
     isAlias,

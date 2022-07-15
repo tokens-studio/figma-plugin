@@ -18,6 +18,7 @@ export default function SingleFileExport({ onClose }: Props) {
   const [includeParent, setIncludeParent] = React.useState(true);
   const [expandTypography, setExpandTypography] = React.useState(false);
   const [expandShadow, setExpandShadow] = React.useState(false);
+  const [expandComposition, setExpandComposition] = React.useState(false);
 
   const handleToggleIncludeAllTokens = React.useCallback(() => {
     setIncludeAllTokens(!includeAllTokens);
@@ -35,9 +36,13 @@ export default function SingleFileExport({ onClose }: Props) {
     setExpandShadow(!expandShadow);
   }, [expandShadow]);
 
+  const handleToggleExpandComposition = React.useCallback(() => {
+    setExpandComposition(!expandComposition);
+  }, [expandComposition]);
+
   const formattedTokens = React.useMemo(() => getFormattedTokens({
-    includeAllTokens, includeParent, expandTypography, expandShadow,
-  }), [includeAllTokens, includeParent, expandTypography, expandShadow, getFormattedTokens]);
+    includeAllTokens, includeParent, expandTypography, expandShadow, expandComposition,
+  }), [includeAllTokens, includeParent, expandTypography, expandShadow, expandComposition, getFormattedTokens]);
 
   return (
     <Stack gap={4} direction="column">
@@ -81,6 +86,15 @@ export default function SingleFileExport({ onClose }: Props) {
             onCheckedChange={handleToggleExpandShadow}
           />
           <Label htmlFor="expandShadow">Expand Shadows</Label>
+        </Box>
+        <Box css={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+          <Checkbox
+            id="expandComposition"
+            checked={expandComposition}
+            defaultChecked={expandComposition}
+            onCheckedChange={handleToggleExpandComposition}
+          />
+          <Label htmlFor="expandComposition">Expand Composition</Label>
         </Box>
       </Box>
       <Heading size="medium">Preview</Heading>
