@@ -88,7 +88,7 @@ interface DownShiftProps {
   inlineLabel?: boolean;
   error?: string;
   value?: string;
-  initialValue?: string;
+  initialName?: string;
   placeholder?: string;
   prefix?: React.ReactNode;
   suffix?: boolean;
@@ -104,7 +104,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
   inlineLabel = false,
   error,
   value,
-  initialValue,
+  initialName,
   prefix,
   suffix,
   placeholder,
@@ -140,7 +140,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
       .filter(
         (token: SingleToken) => !filteredValue || token.name.toLowerCase().includes(filteredValue.toLowerCase()),
       )
-      .filter((token: SingleToken) => token?.type === type && token.name !== initialValue),
+      .filter((token: SingleToken) => token?.type === type && token.name !== initialName),
     [resolvedTokens, filteredValue, type],
   );
 
