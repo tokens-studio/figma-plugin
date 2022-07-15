@@ -12,6 +12,7 @@ import type { UsedTokenSetsMap } from './UsedTokenSetsMap';
 import type { StorageType, StorageTypeCredentials } from './StorageType';
 import type { Direction } from '@/constants/Direction';
 import type { SelectionValue } from './SelectionValue';
+import type { ThemeObject } from './ThemeObject';
 
 export enum AsyncMessageTypes {
   // the below messages are going from UI to plugin
@@ -36,6 +37,8 @@ export enum AsyncMessageTypes {
   UPDATE = 'async/update',
   SET_LICENSE_KEY = 'async/set-license-key',
   GET_API_CREDENTIALS = 'async/get-api-credentials',
+  ATTACH_LOCAL_STYLES_TO_THEME = 'async/attach-local-styles-to-theme',
+  RESOLVE_STYLE_INFO = 'async/resolve-style-info',
   // the below messages are going from plugin to UI
   GET_THEME_INFO = 'async/get-theme-info',
 }
@@ -148,6 +151,19 @@ export type GetApiCredentials = AsyncMessage<AsyncMessageTypes.GET_API_CREDENTIA
 }>;
 export type GetApiCredentialsResult = AsyncMessage<AsyncMessageTypes.GET_API_CREDENTIALS>;
 
+export type AttachLocalStylesToTheme = AsyncMessage<AsyncMessageTypes.ATTACH_LOCAL_STYLES_TO_THEME, {
+  theme: ThemeObject
+  tokens: Record<string, AnyTokenList>
+  category: 'typography' | 'colors' | 'effects' | 'all'
+  settings?: Partial<SettingsState>
+}>;
+export type AttachLocalStylesToThemeResult = AsyncMessage<AsyncMessageTypes.ATTACH_LOCAL_STYLES_TO_THEME, ThemeObject>;
+
+export type ResolveStyleInfo = AsyncMessage<AsyncMessageTypes.RESOLVE_STYLE_INFO, {
+  styleIds: string[]
+}>;
+export type ResolveStyleInfoResult = AsyncMessage<AsyncMessageTypes.RESOLVE_STYLE_INFO>;
+
 export type GetThemeInfoMessage = AsyncMessage<AsyncMessageTypes.GET_THEME_INFO>;
 export type GetThemeInfoMessageResult = AsyncMessage<AsyncMessageTypes.GET_THEME_INFO, {
   activeTheme: string | null
@@ -176,7 +192,9 @@ export type AsyncMessages =
   | UpdateAsyncMessage
   | GetThemeInfoMessage
   | SetLicenseKeyMessage
-  | GetApiCredentials;
+  | GetApiCredentials
+  | AttachLocalStylesToTheme
+  | ResolveStyleInfo;
 export type AsyncMessageResults =
   CreateStylesAsyncMessageResult
   | InitiateAsyncMessageResult
@@ -199,7 +217,9 @@ export type AsyncMessageResults =
   | UpdateAsyncMessageResult
   | GetThemeInfoMessageResult
   | SetLicenseKeyMessageResult
-  | GetApiCredentialsResult;
+  | GetApiCredentialsResult
+  | AttachLocalStylesToThemeResult
+  | ResolveStyleInfoResult;
 
 export type AsyncMessagesMap = {
   [K in AsyncMessageTypes]: Extract<AsyncMessages, { type: K }>

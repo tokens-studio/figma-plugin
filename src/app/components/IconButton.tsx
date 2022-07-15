@@ -11,8 +11,12 @@ const commonStyles = {
   padding: '$2',
   borderRadius: '$button',
   cursor: 'pointer',
-  '&:hover, &:focus': {
+  '&:not(:disabled):hover, &:not(:disabled):focus': {
     boxShadow: 'none',
+  },
+  '&:disabled': {
+    pointerEvents: 'none',
+    opacity: 0.5,
   },
   variants: {
     buttonVariant: {
@@ -20,7 +24,7 @@ const commonStyles = {
         display: 'block',
         backgroundColor: '$interaction',
         color: '$onInteraction',
-        '&:hover, &:focus': {
+        '&:not(:disabled):hover, &:not(:disabled):focus': {
           backgroundColor: '$interactionSubtle',
         },
       },
@@ -28,7 +32,7 @@ const commonStyles = {
         display: 'block',
         backgroundColor: 'transparent',
         color: '$text',
-        '&:hover, &:focus': {
+        '&:not(:disabled):hover, &:not(:disabled):focus': {
           backgroundColor: '$bgSubtle',
         },
       },

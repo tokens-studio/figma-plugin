@@ -1,14 +1,17 @@
 import React, {
   useCallback, useEffect, useMemo, useState,
 } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { settingsStateSelector, tokensSelector, themeByIdSelector } from '@/selectors';
 import { mapTokensToStyleInfo } from '@/utils/tokenset';
 import { convertTokenNameToPath } from '@/utils/convertTokenNameToPath';
-import { RootState } from '@/app/store';
+import { Dispatch, RootState } from '@/app/store';
 import { TokenTypes } from '@/constants/TokenTypes';
 import Box from '../Box';
 import { StyleInfo, ThemeStyleManagementCategory } from './ThemeStyleManagementCategory';
+import { AsyncMessageTypes, AttachLocalStylesToTheme } from '@/types/AsyncMessages';
+import { AsyncMessageChannel } from '@/AsyncMessageChannel';
+import { BackgroundJobs } from '@/constants/BackgroundJobs';
 
 type StyleInfoPerCategory = Partial<Record<'typography' | 'colors' | 'effects', Record<string, StyleInfo>>>;
 
@@ -18,6 +21,7 @@ type Props = {
 
 export const ThemeStyleManagementForm: React.FC<Props> = ({ id }) => {
   const [styleInfo, setStyleInfo] = useState<StyleInfoPerCategory>({});
+  const dispatch = useDispatch<Dispatch>();
   const theme = useSelector(useCallback((state: RootState) => (
     themeByIdSelector(state, id)
   ), [id]));
@@ -62,6 +66,41 @@ export const ThemeStyleManagementForm: React.FC<Props> = ({ id }) => {
     return null;
   }, [stylesInfo]);
 
+  const attachLocalStyles = useCallback(async (category: AttachLocalStylesToTheme['category']) => {
+    if (theme) {
+      dispatch.uiState.startJob({
+        name: BackgroundJobs.UI_ATTACHING_LOCAL_STYLES,
+        isInfinite: true,
+      });
+      const result = await AsyncMessageChannel.ReactInstance.message({
+        type: AsyncMessageTypes.ATTACH_LOCAL_STYLES_TO_THEME,
+        tokens: tokenSets,
+        category,
+        theme,
+        settings,
+      });
+      if (result.$figmaStyleReferences) {
+        dispatch.tokenState.assignStyleIdsToTheme({
+          id: result.id,
+          styleIds: result.$figmaStyleReferences,
+        });
+      }
+      dispatch.uiState.completeJob(BackgroundJobs.UI_ATTACHING_LOCAL_STYLES);
+    }
+  }, [theme, tokenSets, settings, dispatch]);
+
+  const handleAttachLocalTextStyles = useCallback(() => {
+    attachLocalStyles('typography');
+  }, [attachLocalStyles]);
+
+  const handleAttachLocalColorStyles = useCallback(() => {
+    attachLocalStyles('colors');
+  }, [attachLocalStyles]);
+
+  const handleAttachLocaEffectStyles = useCallback(() => {
+    attachLocalStyles('effects');
+  }, [attachLocalStyles]);
+
   useEffect(() => {
   // @TODO resolve names
     if (tokenStyleGroups) {
@@ -84,21 +123,21 @@ export const ThemeStyleManagementForm: React.FC<Props> = ({ id }) => {
   }
 
   return (
-    <Box css={{ display: 'grid', gap: '$3' }}>
+    <Box css={{ padding: '$3 0', display: 'grid', gap: '$6' }}>
       <ThemeStyleManagementCategory
         label="Typography"
         styles={styleInfo.typography ?? {}}
-        onAttachLocalStyles={console.log}
+        onAttachLocalStyles={handleAttachLocalTextStyles}
       />
       <ThemeStyleManagementCategory
         label="Colors"
         styles={styleInfo.colors ?? {}}
-        onAttachLocalStyles={console.log}
+        onAttachLocalStyles={handleAttachLocalColorStyles}
       />
       <ThemeStyleManagementCategory
         label="Effects"
         styles={styleInfo.effects ?? {}}
-        onAttachLocalStyles={console.log}
+        onAttachLocalStyles={handleAttachLocaEffectStyles}
       />
     </Box>
   );

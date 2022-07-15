@@ -10,8 +10,8 @@ const bounceUpDown = keyframes({
 });
 
 const StyledResolvingLoaderBubble = styled('div', {
-  width: '.3rem',
-  height: '.3rem',
+  width: '4px',
+  height: '4px',
   borderRadius: '$full',
   background: '$fgSubtle',
   animation: `${bounceUpDown} 1000ms 0ms infinite linear`,

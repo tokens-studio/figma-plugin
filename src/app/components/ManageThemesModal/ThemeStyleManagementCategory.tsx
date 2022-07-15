@@ -1,4 +1,5 @@
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
+import { useSelector } from 'react-redux';
 import { IconArrowRight } from '@/icons';
 import Box from '../Box';
 import { Flex } from '../Flex';
@@ -7,6 +8,9 @@ import Heading from '../Heading';
 import Text from '../Text';
 import ResolvingLoader from '../ResolvingLoader';
 import Button from '../Button';
+import { BackgroundJobs } from '@/constants/BackgroundJobs';
+import { isWaitingForBackgroundJobSelector } from '@/selectors';
+import { RootState } from '@/app/store';
 
 export type StyleInfo = {
   id: string
@@ -26,16 +30,27 @@ export const ThemeStyleManagementCategory: React.FC<Props> = ({
   styles,
   onAttachLocalStyles,
 }) => {
+  const isAttachingLocalStyles = useSelector(useCallback((state: RootState) => (
+    isWaitingForBackgroundJobSelector(state, BackgroundJobs.UI_ATTACHING_LOCAL_STYLES)
+  ), []));
+
   const stylesEntries = useMemo(() => Object.entries(styles), [styles]);
 
   return (
     <Accordion
       data-testid={`themestylemanagementcategory-accordion-${label.toLowerCase()}`}
+      disabled={stylesEntries.length === 0}
       label={(
         <Heading size="medium">{label}</Heading>
       )}
       extra={(
-        <Button variant="secondary" onClick={onAttachLocalStyles}>Attach local styles</Button>
+        <Button
+          variant="secondary"
+          disabled={isAttachingLocalStyles}
+          onClick={onAttachLocalStyles}
+        >
+          Attach local styles
+        </Button>
       )}
       isOpenByDefault={false}
     >

@@ -17,12 +17,13 @@ const StyledButton = styled('button', {
   fontWeight: '$bold',
   cursor: 'pointer',
   color: '$textSubtle',
-  '&:focus, &:hover': {
+  '&:not(:disabled):focus, &:not(:disabled):hover': {
     outline: 'none',
     boxShadow: 'none',
     color: '$text',
   },
   '&:disabled': {
+    pointerEvents: 'none',
     opacity: 0.5,
   },
   variants: {

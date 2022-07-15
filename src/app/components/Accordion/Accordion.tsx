@@ -16,13 +16,14 @@ type Props = PropsWithChildren<{
   label: ReactNode
   extra?: ReactNode
   css?: StitchesCSS
+  disabled?: boolean
   isOpenByDefault?: boolean
 }>;
 
 const MotionStyledContent = motion(StyledContent);
 
 export function Accordion({
-  css, label, extra, isOpenByDefault, children,
+  css, label, extra, disabled, isOpenByDefault, children,
 }: Props) {
   const reducedMotion = useReducedMotion();
   const [isOpen, setIsOpen] = useState(isOpenByDefault ?? false);
@@ -38,6 +39,7 @@ export function Accordion({
           dataCy="accordion-toggle"
           css={{ marginTop: '$2', color: '$textMuted' }}
           icon={<IconChevronDown fill="currentColor" />}
+          disabled={disabled}
           onClick={handleToggle}
         />
       </StyledCollapseHandle>
@@ -60,7 +62,9 @@ export function Accordion({
             exit={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
           >
-            {children}
+            <Box css={{ paddingTop: '$4' }}>
+              {children}
+            </Box>
           </MotionStyledContent>
         )}
       </AnimatePresence>
