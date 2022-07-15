@@ -76,6 +76,8 @@ function checkForTokens({
     returnValue.name = returnValue.name.split('/').join('.');
   }
 
+  console.log("returnvalue", returnValue)
+  console.log("obj", obj)
   return [obj, returnValue as SingleToken | undefined];
 }
 
@@ -87,8 +89,11 @@ export default function convertToTokenArray({
   expandTypography?: boolean
   expandShadow?: boolean
 }) {
+  console.log("tokens", tokens)
   const [result] = checkForTokens({
     obj: [], root: null, token: tokens, returnValuesOnly, expandTypography, expandShadow,
   });
+  console.log("result", result);
+  console.log("Object.values(result)", Object.values(result))
   return Object.values(result);
 }

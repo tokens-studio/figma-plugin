@@ -85,7 +85,7 @@ export class FileTokenStorage extends RemoteTokenStorage {
             if (result && IsJSONString(result)) {
               const parsedJsonData = JSON.parse(result);
               const validationResult = await complexSingleFileSchema.safeParseAsync(parsedJsonData);
-
+              console.log("valie", validationResult)
               if (validationResult.success) {
                 const { $themes = [], ...data } = validationResult.data;
                 resolve([
