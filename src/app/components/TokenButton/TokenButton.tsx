@@ -55,7 +55,7 @@ export const TokenButton: React.FC<Props> = ({
   const tokensContext = React.useContext(TokensContext);
   const activeTokenSet = useSelector(activeTokenSetSelector);
   const setNodeData = useSetNodeData();
-  const { deleteSingleToken, duplicateSingleToken } = useManageTokens();
+  const { deleteSingleToken } = useManageTokens();
   const dispatch = useDispatch<Dispatch>();
 
   const { name } = token;
@@ -91,7 +91,7 @@ export const TokenButton: React.FC<Props> = ({
   }, [activeTokenSet, name, deleteSingleToken]);
 
   const handleDuplicateClick = React.useCallback(() => {
-    showForm({ name, token, status: EditTokenFormStatus.DUPLICATE });
+    showForm({ name: `${name}-copy`, token, status: EditTokenFormStatus.DUPLICATE });
   }, [showForm, name, token]);
 
   const setPluginValue = React.useCallback((value: SelectionValue) => {
