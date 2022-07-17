@@ -36,6 +36,7 @@ type GetFormattedTokensOptions = {
   includeParent: boolean;
   expandTypography: boolean;
   expandShadow: boolean;
+  expandComposition: boolean;
 };
 
 type RemoveTokensByValueData = { property: Properties; nodes: NodeInfo[] }[];
@@ -63,11 +64,11 @@ export default function useTokens() {
   // Returns formatted tokens for style dictionary
   const getFormattedTokens = useCallback((opts: GetFormattedTokensOptions) => {
     const {
-      includeAllTokens = false, includeParent = true, expandTypography = false, expandShadow = false,
+      includeAllTokens = false, includeParent = true, expandTypography = false, expandShadow = false, expandComposition = false,
     } = opts;
     const tokenSets = includeAllTokens ? Object.keys(tokens) : [activeTokenSet];
     return formatTokens({
-      tokens, tokenSets, resolvedTokens: tokensContext.resolvedTokens, includeAllTokens, includeParent, expandTypography, expandShadow,
+      tokens, tokenSets, resolvedTokens: tokensContext.resolvedTokens, includeAllTokens, includeParent, expandTypography, expandShadow, expandComposition,
     });
   }, [tokens, activeTokenSet]);
 

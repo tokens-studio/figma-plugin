@@ -25,7 +25,7 @@ const StyledButton = styled('button', {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
-  padding: '$3 $4',
+  padding: '$3 $4 $3 $5',
   gap: '$2',
   '&:focus, &:hover': {
     outline: 'none',
@@ -145,15 +145,14 @@ export default function TokenSetSelector({ saveScrollPositionSet } : { saveScrol
       className="content"
     >
       {mfsEnabled ? (
-        <Box>
-          <TokenSetTree
-            tokenSets={allTokenSets}
-            onRename={handleRenameTokenSet}
-            onDelete={handleDelete}
-            onDuplicate={handleDuplicateTokenSet}
-            saveScrollPositionSet={saveScrollPositionSet}
-          />
-        </Box>
+        <TokenSetTree
+          tokenSets={allTokenSets}
+          onRename={handleRenameTokenSet}
+          onDelete={handleDelete}
+          onDuplicate={handleDuplicateTokenSet}
+          onReorder={handleReorder}
+          saveScrollPositionSet={saveScrollPositionSet}
+        />
       ) : (
         <TokenSetList
           onReorder={handleReorder}

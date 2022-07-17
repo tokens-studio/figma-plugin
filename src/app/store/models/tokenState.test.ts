@@ -3,6 +3,7 @@ import { RootModel } from '@/types/RootModel';
 import { models } from './index';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
+import * as notifiers from '@/plugin/notifiers';
 
 const shadowArray = [
   {
@@ -350,6 +351,13 @@ describe('editToken', () => {
       global: TokenSetStatus.ENABLED,
       global_Copy: TokenSetStatus.DISABLED,
     });
+  });
+
+  it('will notify the UI if the token set to duplicate does not exist', () => {
+    const notifyToUISpy = jest.spyOn(notifiers, 'notifyToUI');
+    notifyToUISpy.mockReturnValueOnce();
+    store.dispatch.tokenState.duplicateTokenSet('nonexistant');
+    expect(notifyToUISpy).toBeCalledWith('Token set does not exist', { error: true });
   });
 
   it('can reset imported tokens', () => {

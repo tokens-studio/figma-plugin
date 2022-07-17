@@ -2,11 +2,12 @@ import { DeepTokensMap, ThemeObjectsList } from '@/types';
 import type { AnyTokenList, SingleToken } from '@/types/tokens';
 import convertTokensToObject from '@/utils/convertTokensToObject';
 import parseTokenValues from '@/utils/parseTokenValues';
+import { SystemFilenames } from './SystemFilenames';
 
 export type RemoteTokenStorageData<Metadata = unknown> = {
   tokens: Record<string, AnyTokenList>
   themes: ThemeObjectsList
-  metadata: Metadata | null
+  metadata?: Metadata | null
 };
 
 export interface RemoteTokenStorageSingleTokenSetFile {
@@ -33,17 +34,16 @@ export type RemoteTokenStorageFile<Metadata = unknown> =
   | RemoteTokenStorageThemesFile
   | RemoteTokenStorageMetadataFile<Metadata>;
 
-export abstract class RemoteTokenStorage<Metadata = unknown> {
-  public abstract write(files: RemoteTokenStorageFile<Metadata>[]): Promise<boolean>;
+export abstract class RemoteTokenStorage<Metadata = unknown, SaveOptions = unknown> {
+  public abstract write(files: RemoteTokenStorageFile<Metadata>[], saveOptions?: SaveOptions): Promise<boolean>;
   public abstract read(): Promise<RemoteTokenStorageFile<Metadata>[]>;
 
-  public async save(data: RemoteTokenStorageData<Metadata>): Promise<boolean> {
+  public async save(data: RemoteTokenStorageData<Metadata>, saveOptions?: SaveOptions): Promise<boolean> {
     const files: RemoteTokenStorageFile<Metadata>[] = [];
-
     // First we'll convert the incoming data into files
     // in this generic implementation we will ignore whether multi file is enabled or not (ie for Github)
     // how these "files" are written is up to the read and write implementation
-    const tokenSetObjects = convertTokensToObject(data.tokens);
+    const tokenSetObjects = convertTokensToObject({ ...data.tokens });
     Object.entries(tokenSetObjects).forEach(([name, tokenSet]) => {
       files.push({
         type: 'tokenSet',
@@ -56,25 +56,25 @@ export abstract class RemoteTokenStorage<Metadata = unknown> {
     // we will also include a separate file for the themes called $themes
     files.push({
       type: 'themes',
-      path: '$themes.json',
+      path: `${SystemFilenames.THEMES}.json`,
       data: data.themes,
     });
 
-    if (data.metadata) {
+    if ('metadata' in data && data.metadata) {
       files.push({
         type: 'metadata',
-        path: '$metadata.json',
+        path: `${SystemFilenames.METADATA}.json`,
         data: data.metadata,
       });
     }
-    return this.write(files);
+
+    return this.write(files, saveOptions);
   }
 
   public async retrieve(): Promise<RemoteTokenStorageData<Metadata> | null> {
     const data: RemoteTokenStorageData<Metadata> = {
       themes: [],
       tokens: {},
-      metadata: null,
     };
 
     // start by reading the files from the remote source

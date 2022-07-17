@@ -4,6 +4,7 @@ import { convertBoxShadowTypeToFigma } from './figmaTransforms/boxShadow';
 import { convertToFigmaColor } from './figmaTransforms/colors';
 import { convertTypographyNumberToFigma } from './figmaTransforms/generic';
 import convertOffsetToFigma from './figmaTransforms/offset';
+import { getShadowBehindNodeFromEffect } from './figmaUtils/getShadowBehindNodeFromEffect';
 
 export default function setEffectValuesOnTarget(
   // @TODO update this typing
@@ -15,7 +16,7 @@ export default function setEffectValuesOnTarget(
     const { description, value } = token;
 
     if (Array.isArray(value)) {
-      const effectsArray = value.map((v) => {
+      const effectsArray = value.map((v, index) => {
         const { color, opacity: a } = convertToFigmaColor(v.color);
         const { r, g, b } = color;
         return {
@@ -31,6 +32,7 @@ export default function setEffectValuesOnTarget(
           offset: convertOffsetToFigma(convertTypographyNumberToFigma(v.x.toString()), convertTypographyNumberToFigma(v.y.toString())),
           blendMode: v.blendMode || 'NORMAL' as BlendMode,
           visible: true,
+          ...v.type === 'dropShadow' && 'effects' in target ? { showShadowBehindNode: getShadowBehindNodeFromEffect(target.effects[index]) } : {},
         };
       }) as Effect[];
 
@@ -53,6 +55,7 @@ export default function setEffectValuesOnTarget(
             offset: convertOffsetToFigma(convertTypographyNumberToFigma(value.x.toString()), convertTypographyNumberToFigma(value.y.toString())),
             blendMode: (value.blendMode || 'NORMAL') as BlendMode,
             visible: true,
+            ...value.type === 'dropShadow' && 'effects' in target ? { showShadowBehindNode: getShadowBehindNodeFromEffect(target.effects[0]) } : {},
           },
         ];
       }
