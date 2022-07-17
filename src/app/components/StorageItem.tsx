@@ -59,15 +59,13 @@ const StorageItem = ({ item, onEdit }: Props) => {
           {' '}
           {branch && ` (${branch})`}
         </div>
-        {!isActive() && (
-          <button
-            type="button"
-            className="inline-flex text-left text-red-600 underline text-xxs"
-            onClick={handleDelete}
-          >
-            Delete local credentials
-          </button>
-        )}
+        <button
+          type="button"
+          className="inline-flex text-left text-red-600 underline text-xxs"
+          onClick={handleDelete}
+        >
+          Delete local credentials
+        </button>
       </div>
       <div className="space-x-2 flex-nowrap flex items-center">
         {onEdit && (
@@ -75,21 +73,13 @@ const StorageItem = ({ item, onEdit }: Props) => {
             Edit
           </Button>
         )}
-        {!isActive() ? (
+        {!isActive() && (
           <Button
             id="button-storageitem-apply"
             variant="secondary"
             onClick={handleRestore}
           >
             Apply
-          </Button>
-        ) : (
-          <Button
-            id="button-storageitem-delete"
-            variant="warning"
-            onClick={handleDelete}
-          >
-            Delete
           </Button>
         )}
       </div>
