@@ -1,6 +1,6 @@
 import '../../plugin/controller';
 import React from 'react';
-import { screen, waitFor } from '@testing-library/react';
+import { fireEvent, screen, waitFor } from '@testing-library/react';
 import App from './App';
 import { mockGetContent } from '../../../tests/__mocks__/octokitRestMock';
 import { render, resetStore } from '../../../tests/config/setupTest';
@@ -17,6 +17,9 @@ import { StorageProviderType } from '@/constants/StorageProviderType';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import * as validateLicenseModule from '@/utils/validateLicense';
 import { Entitlements } from '../store/models/userState';
+import { AsyncMessageChannel } from '@/AsyncMessageChannel';
+import { AsyncMessages, AsyncMessageTypes } from '@/types/AsyncMessages';
+import { store } from '../store';
 
 const storageTypePropertyReadSpy = jest.spyOn(StorageTypeProperty, 'read');
 const apiProvidersPropertyReadSpy = jest.spyOn(ApiProvidersProperty, 'read');
@@ -25,6 +28,17 @@ const themesPropertyReadSpy = jest.spyOn(ThemesProperty, 'read');
 const checkForChangesPropertyReadSpy = jest.spyOn(CheckForChangesProperty, 'read');
 const licenseKeyPropertyReadSpy = jest.spyOn(LicenseKeyProperty, 'read');
 const validateLicenseSpy = jest.spyOn(validateLicenseModule, 'default');
+
+const resetSuite = () => {
+  storageTypePropertyReadSpy.mockReset();
+  apiProvidersPropertyReadSpy.mockReset();
+  valuesPropertyReadSpy.mockReset();
+  themesPropertyReadSpy.mockReset();
+  checkForChangesPropertyReadSpy.mockReset();
+  licenseKeyPropertyReadSpy.mockReset();
+  validateLicenseSpy.mockReset();
+  resetStore();
+};
 
 const withMockValues = () => {
   valuesPropertyReadSpy.mockImplementation(async () => ({
@@ -38,6 +52,13 @@ const withMockValues = () => {
         type: TokenTypes.COLOR,
         value: '#000000',
         name: 'black',
+      },
+    ],
+    playground: [
+      {
+        type: TokenTypes.COLOR,
+        value: '#ff0000',
+        name: 'red',
       },
     ],
   }));
@@ -95,9 +116,19 @@ const withLicense = () => {
   }));
 };
 
+const waitForChangedTabs = () => new Promise<void>((resolve) => {
+  const unsubscribe = AsyncMessageChannel.ReactInstance.attachMessageListener(({ message }: { message?: AsyncMessages }) => {
+    if (message?.type === AsyncMessageTypes.CHANGED_TABS) {
+      unsubscribe();
+      resolve();
+    }
+  });
+});
+
 const withOrWithoutLicense = (fn: () => Promise<void>) => async () => {
   await fn();
 
+  resetSuite();
   withLicense();
   await fn();
 };
@@ -105,10 +136,7 @@ const withOrWithoutLicense = (fn: () => Promise<void>) => async () => {
 describe('App', () => {
   jest.setTimeout(10000);
 
-  beforeEach(() => {
-    jest.clearAllMocks();
-    resetStore();
-  });
+  beforeEach(resetSuite);
 
   it('shows the start screen in a blank file', withOrWithoutLicense(async () => {
     const result = render(<App />);
@@ -119,14 +147,10 @@ describe('App', () => {
   it('shows the tokens screen if local tokens are found', withOrWithoutLicense(async () => {
     withMockValues();
 
+    const waitForChangedTabsPromise = waitForChangedTabs();
     const result = render(<App />);
-    await waitFor(async () => (
-      expect(await result.queryByText('Loading, please wait.')).toBeNull()
-    ), {
-      timeout: 5000,
-    });
-
-    expect(await result.queryAllByText('global')).toHaveLength(2);
+    await waitForChangedTabsPromise;
+    expect(result.queryAllByText('global')).toHaveLength(2);
 
     result.unmount();
   }));
@@ -158,6 +182,35 @@ describe('App', () => {
     });
 
     expect(await result.findAllByText('global')).toHaveLength(2);
+
+    result.unmount();
+  }));
+
+  it('can switch to a different tokenset', withOrWithoutLicense(async () => {
+    withMockValues();
+    withMockThemes();
+
+    const waitForChangedTabsPromise = waitForChangedTabs();
+    const result = render(<App />);
+    await waitForChangedTabsPromise;
+    (await result.findByTestId('tokensetitem-playground'))?.click();
+    expect(store.getState().tokenState.activeTokenSet).toEqual('playground');
+    result.unmount();
+  }));
+
+  it('can toggle a tokenset', withOrWithoutLicense(async () => {
+    withMockValues();
+
+    const waitForChangedTabsPromise = waitForChangedTabs();
+    const result = render(<App />);
+    await waitForChangedTabsPromise;
+    const checkbox = await result.findByTestId('tokensetitem-playground-checkbox');
+    fireEvent.click(checkbox);
+
+    expect(store.getState().tokenState.usedTokenSet).toEqual({
+      global: TokenSetStatus.DISABLED,
+      playground: TokenSetStatus.ENABLED,
+    });
 
     result.unmount();
   }));

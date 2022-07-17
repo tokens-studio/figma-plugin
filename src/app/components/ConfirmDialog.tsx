@@ -75,7 +75,7 @@ function ConfirmDialog() {
   }, [chosen, inputValue, confirmState, onConfirm]);
 
   React.useEffect(() => {
-    setTimeout(() => {
+    const timeoutId = setTimeout(() => {
       if (confirmState.choices) setChosen(confirmState.choices.filter((c) => c.enabled).map((c) => c.key));
       if (firstInput.current) {
         firstInput.current.focus();
@@ -83,6 +83,7 @@ function ConfirmDialog() {
         confirmButton.current.focus();
       }
     }, 50);
+    return () => clearTimeout(timeoutId);
   }, [confirmState.show, confirmButton, confirmState.choices]);
 
   return confirmState.show ? (

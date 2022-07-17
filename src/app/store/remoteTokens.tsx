@@ -18,6 +18,7 @@ import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StorageTypeCredentials, StorageTypeFormValues } from '@/types/StorageType';
+import { saveLastSyncedState } from '@/utils/saveLastSyncedState';
 
 type PullTokensOptions = {
   context?: StorageTypeCredentials,
@@ -82,7 +83,7 @@ export default function useRemoteTokens() {
     }
 
     if (remoteData) {
-      dispatch.tokenState.setLastSyncedState(JSON.stringify([remoteData.tokens, remoteData.themes], null, 2));
+      saveLastSyncedState(dispatch, remoteData.tokens, remoteData.themes, remoteData.metadata);
       dispatch.tokenState.setTokenData({
         values: remoteData.tokens,
         themes: remoteData.themes,

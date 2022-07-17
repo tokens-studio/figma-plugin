@@ -17,6 +17,8 @@ import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { StorageTypeCredentials, StorageTypeFormValues } from '@/types/StorageType';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { useFlags } from '@/app/components/LaunchDarkly';
+import { applyTokenSetOrder } from '@/utils/tokenset';
+import { saveLastSyncedState } from '@/utils/saveLastSyncedState';
 
 type AdoCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.ADO; }>;
 type AdoFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.ADO; }>;
@@ -59,12 +61,12 @@ export const useADO = () => {
       content
       && isEqual(content.tokens, tokens)
       && isEqual(content.themes, themes)
+      && isEqual(content.metadata?.tokenSetOrder ?? Object.keys(tokens), Object.keys(tokens))
     ) {
       notifyToUI('Nothing to commit');
       return {
         tokens,
         themes,
-        metadata: {},
       };
     }
 
@@ -75,12 +77,18 @@ export const useADO = () => {
       const { commitMessage, customBranch } = pushSettings;
       try {
         if (customBranch) storage.selectBranch(customBranch);
+        const metadata = {
+          tokenSetOrder: Object.keys(tokens),
+        };
         await storage.save({
           themes,
           tokens,
-          metadata: { commitMessage },
+          metadata,
+        }, {
+          commitMessage,
         });
-        dispatch.tokenState.setLastSyncedState(JSON.stringify([tokens, themes], null, 2));
+
+        saveLastSyncedState(dispatch, tokens, themes, metadata);
         dispatch.uiState.setLocalApiState({ ...localApiState, branch: customBranch } as AdoCredentials);
         dispatch.uiState.setApiData({ ...context, branch: customBranch });
         dispatch.tokenState.setTokenData({
@@ -95,7 +103,6 @@ export const useADO = () => {
         return {
           tokens,
           themes,
-          metadata: { commitMessage },
         };
       } catch (e) {
         console.log('Error pushing to ADO', e);
@@ -105,7 +112,6 @@ export const useADO = () => {
     return {
       tokens,
       themes,
-      metadata: {},
     };
   }, [
     dispatch,
@@ -136,7 +142,11 @@ export const useADO = () => {
       const content = await storage.retrieve();
 
       if (content) {
-        return content;
+        const sortedTokens = applyTokenSetOrder(content.tokens, content.metadata?.tokenSetOrder ?? []);
+        return {
+          ...content,
+          tokens: sortedTokens,
+        };
       }
     } catch (e) {
       console.log('Error', e);
@@ -164,12 +174,14 @@ export const useADO = () => {
         if (
           !isEqual(content.tokens, tokens)
           || !isEqual(content.themes, themes)
+          || !isEqual(content.metadata?.tokenSetOrder ?? Object.keys(tokens), Object.keys(tokens))
         ) {
           const userDecision = await askUserIfPull();
           if (userDecision) {
-            dispatch.tokenState.setLastSyncedState(JSON.stringify([content.tokens, content.themes], null, 2));
+            const sortedValues = applyTokenSetOrder(content.tokens, content.metadata?.tokenSetOrder);
+            saveLastSyncedState(dispatch, sortedValues, content.themes, content.metadata);
             dispatch.tokenState.setTokenData({
-              values: content.tokens,
+              values: sortedValues,
               themes: content.themes,
               usedTokenSet,
               activeTheme,
