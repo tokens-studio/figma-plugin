@@ -138,6 +138,7 @@ export default function BoxShadowInput({
                 label={TokenTypes.BOX_SHADOW}
                 inlineLabel
                 resolvedTokens={resolvedTokens}
+                initialName={internalEditToken.initialName}
                 handleChange={handleBoxShadowAliasValueChange}
                 setInputValue={handleDownShiftInputChange}
                 placeholder="Value or {alias}"
