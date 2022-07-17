@@ -24,9 +24,8 @@ export default function formatTokens({
 }: Options) {
   const nestUnderParent = includeAllTokens ? true : includeParent;
   const tokenObj = {};
-
   tokenSets.forEach((tokenSet) => {
-    tokens[tokenSet].forEach((token) => {
+    tokens[tokenSet]?.forEach((token) => {
       const { name, ...tokenWithoutName } = token;
       if (
         (token.type === TokenTypes.TYPOGRAPHY && expandTypography)
