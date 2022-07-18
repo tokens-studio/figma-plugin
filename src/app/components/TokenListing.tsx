@@ -69,18 +69,15 @@ const TokenListing: React.FC<Props> = ({
     e.stopPropagation();
     if (e.altKey) {
       dispatch.uiState.toggleCollapsed();
+      const newCollapsedObj = Object.keys(collapsedTokenTypeObj).reduce<Record<string, boolean>>((acc, key) => {
+        acc[key] = !collapsed;
+        return acc;
+      }, {});
+      dispatch.tokenState.setCollapsedTokenTypeObj(newCollapsedObj);
     } else {
       dispatch.tokenState.setCollapsedTokenTypeObj({ ...collapsedTokenTypeObj, [tokenKey]: !collapsedTokenTypeObj[tokenKey as TokenTypes] });
     }
-  }, [dispatch, collapsedTokenTypeObj, tokenKey]);
-
-  React.useEffect(() => {
-    const newCollapsedObj = Object.keys(collapsedTokenTypeObj).reduce<Record<string, boolean>>((acc, key) => {
-      acc[key] = !collapsed;
-      return acc;
-    }, {});
-    dispatch.tokenState.setCollapsedTokenTypeObj(newCollapsedObj);
-  }, [dispatch, collapsed, collapsedTokenTypeObj]);
+  }, [dispatch, collapsedTokenTypeObj, tokenKey, collapsed]);
 
   if (!values && !showEmptyGroups) return null;
 
