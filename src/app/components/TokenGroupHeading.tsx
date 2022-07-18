@@ -35,7 +35,6 @@ export default function TokenGroupHeading({
   }, [oldTokenGroupName, isTokenGroupDuplicated, copyName, path]);
 
   const handleDelete = React.useCallback(() => {
-    console.log('ty0pe', type);
     deleteGroup(path, type);
   }, [path, deleteGroup]);
 

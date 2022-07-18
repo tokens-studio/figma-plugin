@@ -330,7 +330,6 @@ export const tokenState = createModel<RootModel>()({
       return newState;
     },
     deleteTokenGroup: (state, data: DeleteTokenGroupPayload) => {
-      console.log('data', data);
       const newState = {
         ...state,
         tokens: {
