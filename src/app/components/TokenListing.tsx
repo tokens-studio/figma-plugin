@@ -74,6 +74,14 @@ const TokenListing: React.FC<Props> = ({
     }
   }, [dispatch, collapsedTokenTypeObj, tokenKey]);
 
+  React.useEffect(() => {
+    const newCollapsedObj = Object.keys(collapsedTokenTypeObj).reduce<Record<string, boolean>>((acc, key) => {
+      acc[key] = !collapsed;
+      return acc;
+    }, {});
+    dispatch.tokenState.setCollapsedTokenTypeObj(newCollapsedObj);
+  }, [dispatch, collapsed, collapsedTokenTypeObj]);
+
   if (!values && !showEmptyGroups) return null;
 
   return (
