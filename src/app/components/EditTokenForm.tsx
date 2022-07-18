@@ -8,7 +8,7 @@ import Input from './Input';
 import ColorPicker from './ColorPicker';
 import useConfirm from '../hooks/useConfirm';
 import useTokens from '../store/useTokens';
-import { EditTokenObject, SingleBoxShadowToken } from '@/types/tokens';
+import { EditTokenObject, SingleBoxShadowToken, SingleToken } from '@/types/tokens';
 import { checkIfContainsAlias, getAliasValue } from '@/utils/alias';
 import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
 import { activeTokenSetSelector, editTokenSelector } from '@/selectors';
@@ -21,6 +21,7 @@ import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 import { UpdateMode } from '@/constants/UpdateMode';
 import BoxShadowInput from './BoxShadowInput';
 import { EditTokenFormStatus } from '@/constants/EditTokenFormStatus';
+import trimValue from '@/utils/trimValue';
 
 type Props = {
   resolvedTokens: ResolveTokenValuesResult[];
@@ -89,7 +90,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
     [internalEditToken],
   );
 
-  const handleBoxShadowChange = React.useCallback(
+  const handleBoxShadowValueChange = React.useCallback(
     (shadow: SingleBoxShadowToken['value']) => {
       setError(null);
       if (internalEditToken?.type === TokenTypes.BOX_SHADOW) {
@@ -108,7 +109,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
     [internalEditToken],
   );
 
-  const handleBoxShadowChangeByAlias = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>(
+  const handleBoxShadowAliasValueChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>(
     (e) => {
       setError(null);
       e.persist();
@@ -129,7 +130,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
     [internalEditToken],
   );
 
-  const handleTypographyChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>(
+  const handleTypographyValueChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>(
     (e) => {
       e.persist();
       if (internalEditToken?.type === TokenTypes.TYPOGRAPHY && typeof internalEditToken?.value !== 'string') {
@@ -145,7 +146,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
     [internalEditToken],
   );
 
-  const handleTypographyChangeByAlias = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>(
+  const handleTypographyAliasValueChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>(
     (e) => {
       setError(null);
       e.persist();
@@ -156,7 +157,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
     [internalEditToken],
   );
 
-  const handleTypographyDownShiftInputChange = React.useCallback((newInputValue: string, property: string) => {
+  const handleTypographyValueDownShiftInputChange = React.useCallback((newInputValue: string, property: string) => {
     if (internalEditToken?.type === TokenTypes.TYPOGRAPHY && typeof internalEditToken?.value !== 'string') {
       setInternalEditToken({
         ...internalEditToken,
@@ -193,6 +194,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
         oldName = internalEditToken.initialName;
       }
 
+      const trimmedValue = trimValue(value);
       const newName = name
         .split('/')
         .map((n) => n.trim())
@@ -207,7 +209,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
           parent: activeTokenSet,
           name: newName,
           type,
-          value,
+          value: trimmedValue as SingleToken['value'],
         });
       } else if (internalEditToken.status === EditTokenFormStatus.EDIT) {
         editSingleToken({
@@ -219,7 +221,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
           name: newName,
           oldName,
           type,
-          value,
+          value: trimmedValue as SingleToken['value'],
         });
         // When users change token names references are still pointing to the old name, ask user to remap
         if (oldName && oldName !== newName) {
@@ -290,8 +292,8 @@ function EditTokenForm({ resolvedTokens }: Props) {
       case TokenTypes.BOX_SHADOW: {
         return (
           <BoxShadowInput
-            handleBoxShadowChange={handleBoxShadowChange}
-            handleBoxShadowChangeByAlias={handleBoxShadowChangeByAlias}
+            handleBoxShadowValueChange={handleBoxShadowValueChange}
+            handleBoxShadowAliasValueChange={handleBoxShadowAliasValueChange}
             resolvedTokens={resolvedTokens}
             internalEditToken={internalEditToken}
             handleDownShiftInputChange={handleDownShiftInputChange}
@@ -302,10 +304,10 @@ function EditTokenForm({ resolvedTokens }: Props) {
         return (
           <TypographyInput
             internalEditToken={internalEditToken}
-            handleTypographyChange={handleTypographyChange}
-            handleTypographyChangeByAlias={handleTypographyChangeByAlias}
+            handleTypographyValueChange={handleTypographyValueChange}
+            handleTypographyAliasValueChange={handleTypographyAliasValueChange}
             resolvedTokens={resolvedTokens}
-            handleTypographyDownShiftInputChange={handleTypographyDownShiftInputChange}
+            handleTypographyValueDownShiftInputChange={handleTypographyValueDownShiftInputChange}
             handleDownShiftInputChange={handleDownShiftInputChange}
           />
         );
@@ -327,6 +329,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
               type={internalEditToken.type}
               label={internalEditToken.schema?.property}
               resolvedTokens={resolvedTokens}
+              initialName={internalEditToken.initialName}
               handleChange={handleChange}
               setInputValue={handleDownShiftInputChange}
               placeholder={
@@ -355,7 +358,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
                 {internalEditToken.type === 'color' ? (
                   <div className="w-4 h-4 mr-1 border border-gray-200 rounded" style={{ background: String(resolvedValue) }} />
                 ) : null}
-                {resolvedValue}
+                {resolvedValue?.toString()}
               </div>
             )}
           </div>

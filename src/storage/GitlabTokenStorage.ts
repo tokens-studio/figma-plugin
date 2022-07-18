@@ -1,5 +1,6 @@
 import { Gitlab } from '@gitbeaker/browser';
 import compact from 'just-compact';
+import type { CommitAction } from '@gitbeaker/core/dist/types/resources/Commits';
 import IsJSONString from '@/utils/isJSONString';
 import {
   GitMultiFileObject, GitSingleFileObject, GitStorageMetadata, GitTokenStorage,
@@ -7,6 +8,7 @@ import {
 import { RemoteTokenStorageFile } from './RemoteTokenStorage';
 import { AnyTokenSet } from '@/types/tokens';
 import { ThemeObjectsList } from '@/types';
+import { SystemFilenames } from './SystemFilenames';
 
 enum GitLabAccessLevel {
   NoAccess = 0,
@@ -128,11 +130,19 @@ export class GitlabTokenStorage extends GitTokenStorage {
             const name = path.replace('.json', '').replace(this.path, '').replace(/^\//, '').replace(/\/$/, '');
             const parsed = JSON.parse(fileContent) as GitMultiFileObject;
 
-            if (name === '$themes') {
+            if (name === SystemFilenames.THEMES) {
               return {
                 path,
                 type: 'themes',
                 data: parsed as ThemeObjectsList,
+              };
+            }
+
+            if (name === SystemFilenames.METADATA) {
+              return {
+                path,
+                type: 'metadata',
+                data: parsed as GitStorageMetadata,
               };
             }
 
@@ -154,10 +164,12 @@ export class GitlabTokenStorage extends GitTokenStorage {
         return [
           {
             type: 'themes',
-            path: `${this.path}/$themes.json`,
+            path: `${this.path}/${SystemFilenames.THEMES}.json`,
             data: parsed.$themes ?? [],
           },
-          ...(Object.entries(parsed).filter(([key]) => key !== '$themes') as [string, AnyTokenSet<false>][]).map<RemoteTokenStorageFile<GitStorageMetadata>>(([name, tokenSet]) => ({
+          ...(Object.entries(parsed).filter(([key]) => (
+            !Object.values<string>(SystemFilenames).includes(key)
+          )) as [string, AnyTokenSet<false>][]).map<RemoteTokenStorageFile<GitStorageMetadata>>(([name, tokenSet]) => ({
             name,
             type: 'tokenSet',
             path: `${this.path}/${name}.json`,
@@ -193,29 +205,25 @@ export class GitlabTokenStorage extends GitTokenStorage {
       (a.path && b.path) ? a.path.localeCompare(b.path) : 0
     )).map((jsonFile) => jsonFile.path);
 
+    let gitlabActions: CommitAction[] = Object.entries(changeset).map(([filePath, content]) => ({
+      action: jsonFiles.includes(filePath) ? 'update' : 'create',
+      filePath,
+      content,
+    }));
+
     if (!this.path.endsWith('.json')) {
       const filesToDelete = jsonFiles.filter((jsonFile) => !Object.keys(changeset).some((item) => item.endsWith(jsonFile)));
-
-      await this.gitlabClient.Commits.create(
-        this.projectId,
-        branch,
-        'remove tokenSet',
-        filesToDelete.map((filePath) => ({
-          action: 'delete',
-          filePath,
-        })),
-      );
+      gitlabActions = gitlabActions.concat(filesToDelete.map((filePath) => ({
+        action: 'delete',
+        filePath,
+      })));
     }
 
     const response = await this.gitlabClient.Commits.create(
       this.projectId,
       branch,
       message,
-      Object.entries(changeset).map(([filePath, content]) => ({
-        action: jsonFiles.includes(filePath) ? 'update' : 'create',
-        filePath,
-        content,
-      })),
+      gitlabActions,
       shouldCreateBranch ? {
         startBranch: branches[0],
       } : undefined,

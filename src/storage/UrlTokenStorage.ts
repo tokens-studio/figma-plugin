@@ -4,6 +4,7 @@ import { RemoteTokenStorage, RemoteTokenStorageFile } from './RemoteTokenStorage
 import { singleFileSchema } from './schemas/singleFileSchema';
 import IsJSONString from '@/utils/isJSONString';
 import { tokensMapSchema } from './schemas/tokensMapSchema';
+import { SystemFilenames } from './SystemFilenames';
 
 type UrlData = {
   values: Record<string, AnyTokenSet<false>>
@@ -25,7 +26,7 @@ export class UrlTokenStorage extends RemoteTokenStorage {
     return [
       {
         type: 'themes',
-        path: '$themes.json',
+        path: `${SystemFilenames.THEMES}.json`,
         data: data.$themes ?? [],
       },
       ...Object.entries(data.values).map<RemoteTokenStorageFile>(([name, tokenSet]) => ({

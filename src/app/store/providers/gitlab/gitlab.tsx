@@ -19,6 +19,8 @@ import { StorageTypeCredentials, StorageTypeFormValues } from '@/types/StorageTy
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { useFlags } from '@/app/components/LaunchDarkly';
 import { getRepositoryInformation } from '../getRepositoryInformation';
+import { applyTokenSetOrder } from '@/utils/tokenset';
+import { saveLastSyncedState } from '@/utils/saveLastSyncedState';
 
 export type GitlabCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.GITHUB | StorageProviderType.GITLAB; }>;
 type GitlabFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.GITHUB | StorageProviderType.GITLAB }>;
@@ -64,7 +66,12 @@ export function useGitLab() {
     const content = await storage.retrieve();
 
     if (content) {
-      if (content && isEqual(content.tokens, tokens) && isEqual(content.themes, themes)) {
+      if (
+        content
+        && isEqual(content.tokens, tokens)
+        && isEqual(content.themes, themes)
+        && isEqual(content.metadata?.tokenSetOrder ?? Object.keys(tokens), Object.keys(tokens))
+      ) {
         notifyToUI('Nothing to commit');
         return {
           tokens,
@@ -81,21 +88,26 @@ export function useGitLab() {
       const { commitMessage, customBranch } = pushSettings;
       try {
         if (customBranch) storage.selectBranch(customBranch);
+        const metadata = {
+          tokenSetOrder: Object.keys(tokens),
+        };
         await storage.save({
           themes,
           tokens,
-          metadata: { commitMessage },
+          metadata,
+        }, {
+          commitMessage,
         });
-        dispatch.tokenState.setLastSyncedState(JSON.stringify([tokens, themes], null, 2));
+        saveLastSyncedState(dispatch, tokens, themes, metadata);
         dispatch.uiState.setLocalApiState({ ...localApiState, branch: customBranch } as GitlabCredentials);
         dispatch.uiState.setApiData({ ...context, branch: customBranch });
-        dispatch.tokenState.setLastSyncedState(JSON.stringify([tokens, themes], null, 2));
         dispatch.tokenState.setTokenData({
           values: tokens,
           themes,
           usedTokenSet,
           activeTheme,
         });
+
         pushDialog('success');
         return {
           tokens,
@@ -112,9 +124,8 @@ export function useGitLab() {
       metadata: {},
     };
   }, [
+    dispatch,
     storageClientFactory,
-    dispatch.uiState,
-    dispatch.tokenState,
     pushDialog,
     tokens,
     themes,
@@ -145,7 +156,11 @@ export function useGitLab() {
       const content = await storage.retrieve();
 
       if (content) {
-        return content;
+        const sortedTokens = applyTokenSetOrder(content.tokens, content.metadata?.tokenSetOrder ?? []);
+        return {
+          ...content,
+          tokens: sortedTokens,
+        };
       }
     } catch (e) {
       console.log('Error', e);
@@ -170,12 +185,14 @@ export function useGitLab() {
         if (
           !isEqual(content.tokens, tokens)
           || !isEqual(content.themes, themes)
+          || !isEqual(content.metadata?.tokenSetOrder ?? Object.keys(tokens), Object.keys(tokens))
         ) {
           const userDecision = await askUserIfPull();
           if (userDecision) {
-            dispatch.tokenState.setLastSyncedState(JSON.stringify([content.tokens, content.themes], null, 2));
+            const sortedValues = applyTokenSetOrder(content.tokens, content.metadata?.tokenSetOrder);
+            saveLastSyncedState(dispatch, sortedValues, content.themes, content.metadata);
             dispatch.tokenState.setTokenData({
-              values: content.tokens,
+              values: sortedValues,
               themes: content.themes,
               usedTokenSet,
               activeTheme,
