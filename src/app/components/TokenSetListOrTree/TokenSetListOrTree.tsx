@@ -36,7 +36,7 @@ export function TokenSetListOrTree<T extends TreeOrListItem>({
 
   const handleToggleCollapsed = useCallback((key: string) => {
     dispatch.tokenState.setCollapsedTokenSets(collapsed.includes(key) ? collapsed.filter((s) => s !== key) : [...collapsed, key]);
-  }, [collapsed]);
+  }, [dispatch, collapsed]);
 
   const mappedItems = useMemo(() => (
     items.filter((item) => (
@@ -55,14 +55,13 @@ export function TokenSetListOrTree<T extends TreeOrListItem>({
         <RenderItem key={item.key} item={item}>
           <StyledItem>
             <RenderItemContent item={item}>
-              {(!item.isLeaf && displayType === 'tree')
-              && (
+              {(!item.isLeaf && displayType === 'tree') && (
                 <StyledFolderButton
                   type="button"
                   css={{ left: `${5 * item.level}px` }}
                   onClick={onToggleCollapsed}
                 >
-                  <StyledFolderButtonChevronBox>
+                  <StyledFolderButtonChevronBox collapsed={collapsed.includes(item.key)}>
                     <IconChevronDown />
                   </StyledFolderButtonChevronBox>
                 </StyledFolderButton>
