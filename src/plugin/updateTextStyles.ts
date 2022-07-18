@@ -12,12 +12,12 @@ export default function updateTextStyles(textTokens: SingleTypographyToken<true,
   textTokens.forEach((token) => {
     if (textStylesToKeyMap.has(token.path)) {
       const textStyle = textStylesToKeyMap.get(token.path)!;
-      tokenToStyleMap[token.path] = textStyle.id;
+      tokenToStyleMap[token.name] = textStyle.id;
       setTextValuesOnTarget(textStyle, token);
     } else if (shouldCreate) {
       const style = figma.createTextStyle();
       style.name = token.path;
-      tokenToStyleMap[token.path] = style.id;
+      tokenToStyleMap[token.name] = style.id;
       setTextValuesOnTarget(style, token);
     }
   });
