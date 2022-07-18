@@ -197,7 +197,6 @@ function EditTokenForm({ resolvedTokens }: Props) {
         .split('/')
         .map((n) => n.trim())
         .join('.');
-
       if (internalEditToken.status === EditTokenFormStatus.CREATE) {
         track('Create token', { type: internalEditToken.type });
         createSingleToken({
@@ -247,7 +246,8 @@ function EditTokenForm({ resolvedTokens }: Props) {
         } else {
           track('Edit token', { renamed: false });
         }
-      } else if ( internalEditToken.status === EditTokenFormStatus.DUPLICATE && oldName) {
+      } else if (internalEditToken.status === EditTokenFormStatus.DUPLICATE) {
+        oldName = internalEditToken.initialName?.slice(0, internalEditToken.initialName?.lastIndexOf('-copy'));
         duplicateSingleToken({ parent: activeTokenSet, newName, oldName });
       }
     }
