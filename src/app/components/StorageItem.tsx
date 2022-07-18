@@ -41,12 +41,11 @@ const StorageItem = ({ item, onEdit }: Props) => {
       data-cy={`storageitem-${provider}-${id}`}
       key={`${provider}-${id}`}
       active={isActive()}
-
     >
       <div className="flex flex-col grow items-start">
         <div className="text-xs font-bold">{name}</div>
         <div className="opacity-75 text-xxs">
-          {id}
+          {id}{id}{id}
           {' '}
           {branch && ` (${branch})`}
         </div>
