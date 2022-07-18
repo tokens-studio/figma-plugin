@@ -31,6 +31,9 @@ const TokenTree: React.FC<Props> = ({
   displayType, tokenValues, showNewForm, showForm, schema, path = null,
 }) => {
   const editProhibited = useSelector(editProhibitedSelector);
+  React.useEffect(() => {
+    console.log('tokenValues', tokenValues, 'path', path);
+  }, [tokenValues]);
   const tokenValuesEntries = React.useMemo(() => (
     Object.entries(tokenValues).map(([name, value]) => {
       const stringPath = [path, name].filter((n) => n).join('.');
