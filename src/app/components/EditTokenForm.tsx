@@ -82,7 +82,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
       setError('Must not use name of another group');
     }
     if ((internalEditToken?.isPristine || nameWasChanged) && hasPriorTokenName) {
-      setError('Must not use name of another group');
+      setError('Tokens can\'t share name with a group');
     }
   }, [internalEditToken, hasNameThatExistsAlready, nameWasChanged]);
 
