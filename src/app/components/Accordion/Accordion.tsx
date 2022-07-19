@@ -8,9 +8,9 @@ import { StyledHeader } from './StyledHeader';
 import { StyledContent } from './StyledContent';
 import { StyledCollapseHandle } from './StyledCollapseHandle';
 import { IconChevronDown } from '@/icons';
-import IconButton from '../IconButton';
 import Box from '../Box';
 import { Flex } from '../Flex';
+import { StyledIconButton } from './StyledIconButton';
 
 type Props = PropsWithChildren<{
   label: ReactNode
@@ -35,10 +35,10 @@ export function Accordion({
   return (
     <StyledContainer css={css}>
       <StyledCollapseHandle>
-        <IconButton
+        <StyledIconButton
+          open={isOpen}
           dataCy="accordion-toggle"
-          css={{ marginTop: '$2', color: '$textMuted' }}
-          icon={<IconChevronDown fill="currentColor" />}
+          icon={<IconChevronDown width={6} height={6} fill="currentColor" />}
           disabled={disabled}
           onClick={handleToggle}
         />

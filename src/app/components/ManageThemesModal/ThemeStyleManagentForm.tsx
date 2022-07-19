@@ -14,6 +14,7 @@ import { AsyncMessageTypes, AttachLocalStylesToTheme } from '@/types/AsyncMessag
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
 import type { StyleInfo } from './ThemeStyleManagementCategoryStyleEntry';
+import { track } from '@/utils/analytics';
 
 type StyleInfoPerCategory = Partial<Record<'typography' | 'colors' | 'effects', Record<string, StyleInfo>>>;
 
@@ -83,6 +84,10 @@ export const ThemeStyleManagementForm: React.FC<Props> = ({ id }) => {
         settings,
       });
       if (result.$figmaStyleReferences) {
+        track('Attach styles to theme', {
+          category,
+          count: Object.values(result.$figmaStyleReferences).length,
+        });
         dispatch.tokenState.assignStyleIdsToTheme({
           id: result.id,
           styleIds: result.$figmaStyleReferences,
@@ -94,6 +99,7 @@ export const ThemeStyleManagementForm: React.FC<Props> = ({ id }) => {
 
   const handleDisconnectStyle = useCallback((token: string) => {
     if (theme) {
+      track('Disconnect style', token);
       dispatch.tokenState.disconnectStyleFromTheme({
         id: theme.id,
         key: token,

@@ -19,6 +19,7 @@ import IconToggleableDisclosure from '@/app/components/IconToggleableDisclosure'
 import { Dispatch } from '@/app/store';
 import ProBadge from '../ProBadge';
 import { useFlags } from '../LaunchDarkly';
+import { track } from '@/utils/analytics';
 
 const ThemeDropdownLabel = styled(Text, {
   marginRight: '$2',
@@ -35,7 +36,13 @@ export const ThemeSelector: React.FC = () => {
   }, [dispatch]);
 
   const handleSelectTheme = useCallback((themeId: string) => {
-    dispatch.tokenState.setActiveTheme((activeTheme === themeId) ? null : themeId);
+    const nextTheme = (activeTheme === themeId) ? null : themeId;
+    if (nextTheme) {
+      track('Apply theme', { id: nextTheme });
+    } else {
+      track('Reset theme');
+    }
+    dispatch.tokenState.setActiveTheme(nextTheme);
   }, [dispatch, activeTheme]);
 
   const handleManageThemes = useCallback(() => {

@@ -11,6 +11,7 @@ import { CreateOrEditThemeForm, FormValues } from './CreateOrEditThemeForm';
 import { SingleThemeEntry } from './SingleThemeEntry';
 import { ThemeObject } from '@/types';
 import Box from '../Box';
+import { track } from '@/utils/analytics';
 
 type Props = unknown;
 
@@ -45,6 +46,7 @@ export const ManageThemesModal: React.FC<Props> = () => {
 
   const handleDeleteTheme = useCallback(() => {
     if (typeof themeEditorOpen === 'string') {
+      track('Delete theme', { id: themeEditorOpen });
       dispatch.tokenState.deleteTheme(themeEditorOpen);
       setThemeEditorOpen(false);
     }
@@ -55,8 +57,14 @@ export const ManageThemesModal: React.FC<Props> = () => {
   }, []);
 
   const handleSubmit = useCallback((values: FormValues) => {
+    const id = typeof themeEditorOpen === 'string' ? themeEditorOpen : undefined;
+    if (id) {
+      track('Edit theme', { id, values });
+    } else {
+      track('Create theme', { values });
+    }
     dispatch.tokenState.saveTheme({
-      id: typeof themeEditorOpen === 'string' ? themeEditorOpen : undefined,
+      id,
       name: values.name,
       selectedTokenSets: values.tokenSets,
     });

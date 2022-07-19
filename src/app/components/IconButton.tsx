@@ -51,6 +51,7 @@ type Props = {
   dataCy?: string;
   icon: any;
   css?: StitchesCSS;
+  className?: string
   variant?: StyledButtonProps['buttonVariant'];
   tooltipSide?: 'bottom' | 'left' | 'top' | undefined;
   onClick?: () => void;
@@ -76,6 +77,7 @@ export default function IconButton({
   href,
   icon,
   css,
+  className,
   variant = 'default',
   tooltipSide = 'left',
   badge,
@@ -87,7 +89,7 @@ export default function IconButton({
   }, [onClick]);
 
   return (
-    <Box css={{ position: 'relative', ...css }}>
+    <Box css={{ position: 'relative', ...css }} className={className}>
       <Tooltip side={tooltipSide} label={tooltip ?? ''}>
         {href ? (
           <Box>

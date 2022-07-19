@@ -48,7 +48,7 @@ export const ThemeStyleManagementCategory: React.FC<Props> = ({
       )}
       isOpenByDefault={false}
     >
-      <Box css={{ display: 'grid', gap: '$2' }}>
+      <Box css={{ display: 'grid', gap: '$2', gridTemplateColumns: 'minmax(0, 1fr)' }}>
         {stylesEntries.map(([token, styleInfo]) => (
           <ThemeStyleManagementCategoryStyleEntry
             key={token}

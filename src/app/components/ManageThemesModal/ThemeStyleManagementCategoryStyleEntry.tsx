@@ -44,6 +44,7 @@ export const ThemeStyleManagementCategoryStyleEntry: React.FC<Props> = ({
           gap: '$3',
           justifyContent: 'flex-start',
           alignItems: 'center',
+          width: '100%',
         }}
       >
         <Text size="small">{token}</Text>
@@ -57,7 +58,7 @@ export const ThemeStyleManagementCategoryStyleEntry: React.FC<Props> = ({
           </StyledUnlinkButton>
         )}
         {styleInfo.name && (
-          <Text bold size="small">{styleInfo.name}</Text>
+          <Text bold size="small" title={styleInfo.name} css={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{styleInfo.name}</Text>
         )}
       </Flex>
     </Flex>
