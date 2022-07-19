@@ -9,7 +9,7 @@ import IconButton from './IconButton';
 import AddIcon from '@/icons/add.svg';
 import { collapsedTokensSelector } from '@/selectors/collapsedTokensSelector';
 import { Dispatch } from '../store';
-import Tooltip from './Tooltip';
+import { styled } from '@/stitches.config';
 
 export type ShowFormOptions = {
   name: string;
@@ -20,6 +20,36 @@ export type ShowFormOptions = {
 export type ShowNewFormOptions = {
   name?: string;
 };
+
+const StyledTokenGroup = styled('div', {
+  display: 'flex',
+  flexDirection: 'row',
+  flexWrap: 'wrap',
+  justifyContent: 'flex-start',
+});
+
+const StyledCollapsableTokenGroupHeadingButton = styled('button', {
+  display: 'flex',
+  alignItems: 'center',
+  padding: '$1 $2',
+  gap: '$2',
+  borderRadius: '$1',
+  '&:hover, &:focus': {
+    backgroundColor: '$bgSubtle',
+    boxShadow: 'none',
+    border: 'none',
+  },
+  '> svg': {
+    opacity: 0.5,
+  },
+  variants: {
+    collapsed: {
+      true: {
+        opacity: 0.5,
+      },
+    },
+  },
+});
 
 type Props = {
   displayType: 'GRID' | 'LIST';
@@ -73,33 +103,29 @@ const TokenTree: React.FC<Props> = ({
   const [dragOverToken, setDragOverToken] = useState<SingleToken | null>(null);
 
   return (
-    <div className="flex justify-start flex-row flex-wrap pl-4">
+    <StyledTokenGroup>
       {mappedItems.map(({ item, onToggleCollapsed }) => (
         <React.Fragment key={item.stringPath}>
           {typeof item.value === 'object' && !isSingleToken(item.value) ? (
             <div className="property-wrapper w-full" data-cy={`token-group-${item.stringPath}`}>
-              <div className="flex items-center group">
-                <button
-                  className={`flex items-center p-2 space-x-2 hover:bg-background-subtle focus:outline-none ${collapsed.includes(item.stringPath) ? 'opacity-50' : null}`}
+              <div className="flex items-center justify-between group">
+                <StyledCollapsableTokenGroupHeadingButton
+                  collapsed={collapsed.includes(item.stringPath)}
                   data-cy={`tokenlisting-group-${item.stringPath}`}
                   type="button"
                   onClick={onToggleCollapsed}
                 >
-                  <Tooltip label={`Alt + Click to ${collapsed ? 'expand' : 'collapse'} all`}>
-                    <div className="p-2 -m-2">
-                      {collapsed.includes(item.stringPath) ? (
-                        <svg width="6" height="6" viewBox="0 0 6 6" xmlns="http://www.w3.org/2000/svg">
-                          <path d="M5 3L1 0v6l4-3z" fill="currentColor" />
-                        </svg>
-                      ) : (
-                        <svg width="6" height="6" viewBox="0 0 6 6" xmlns="http://www.w3.org/2000/svg">
-                          <path d="M3 5l3-4H0l3 4z" fill="currentColor" />
-                        </svg>
-                      )}
-                    </div>
-                  </Tooltip>
-                </button>
-                <TokenGroupHeading label={item.name} path={item.stringPath} id="listing" type={schema.type} />
+                  {collapsed.includes(item.stringPath) ? (
+                    <svg width="6" height="6" viewBox="0 0 6 6" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M5 3L1 0v6l4-3z" fill="currentColor" />
+                    </svg>
+                  ) : (
+                    <svg width="6" height="6" viewBox="0 0 6 6" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M3 5l3-4H0l3 4z" fill="currentColor" />
+                    </svg>
+                  )}
+                  <TokenGroupHeading label={item.name} path={item.stringPath} id="listing" type={schema.type} />
+                </StyledCollapsableTokenGroupHeadingButton>
                 <div className="opacity-0 group-hover:opacity-100 focus:opacity-100">
                   <IconButton
                     icon={<AddIcon />}
@@ -136,7 +162,7 @@ const TokenTree: React.FC<Props> = ({
         </React.Fragment>
       // eslint-disable-next-line react/jsx-no-comment-textnodes
       ))}
-    </div>
+    </StyledTokenGroup>
   );
 };
 
