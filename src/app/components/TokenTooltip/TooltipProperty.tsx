@@ -11,7 +11,7 @@ type Props = {
 };
 
 export default function TooltipProperty({ label, value, resolvedValue }: Props) {
-  return value ? (
+  return typeof value !== 'undefined' || typeof resolvedValue !== 'undefined' ? (
     <Stack
       direction="row"
       align="center"
@@ -22,22 +22,17 @@ export default function TooltipProperty({ label, value, resolvedValue }: Props) 
         display: 'inline-flex',
       }}
     >
-      <Stack
-        direction="row"
-        align="center"
-        gap={2}
-        css={{ padding: '$1 $2', display: 'flex', alignItems: 'center' }}
-      >
-        {label && (
-        <Box css={{ color: '$fgToolTip' }}>
+      {(label || typeof value !== 'undefined') && (
+        <Stack direction="row" align="center" gap={2} css={{ padding: '$1 $2', color: '$fgToolTip' }}>
           {label}
-        </Box>
-        )}
-        <Box css={{ color: '$fgToolTipMuted', flexShrink: 1, wordBreak: 'break-word' }}>
-          {value}
-        </Box>
-      </Stack>
-      {resolvedValue && !isEqual(String(resolvedValue), String(value)) ? <AliasBadge value={resolvedValue} /> : null}
+          {typeof value !== 'undefined' && (
+            <Box css={{ color: '$fgToolTipMuted', flexShrink: 1, wordBreak: 'break-word' }}>
+              {value}
+            </Box>
+          )}
+        </Stack>
+      )}
+      {typeof resolvedValue !== 'undefined' && !isEqual(String(resolvedValue), String(value)) ? <AliasBadge value={resolvedValue} /> : null}
     </Stack>
   ) : null;
 }

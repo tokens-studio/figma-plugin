@@ -10,7 +10,6 @@ import { TokenBoxshadowValue, TokenTypograpyValue } from '@/types/values';
 import { SingleCompositionValueDisplay } from './SingleCompositionValueDisplay';
 import TooltipProperty from './TooltipProperty';
 import Stack from '../Stack';
-import { CompositionTokenValue } from '@/types/CompositionTokenProperty';
 
 type Props = {
   token: SingleToken;
@@ -21,7 +20,11 @@ export const TokenTooltipContentValue: React.FC<Props> = ({ token }) => {
   const seed = useUIDSeed();
   const tokensContext = React.useContext(TokensContext);
   const { getTokenValue } = useTokens();
-  const resolvedValue = React.useMemo(() => getTokenValue(token.name, tokensContext.resolvedTokens)?.value, [token, getTokenValue, tokensContext.resolvedTokens]);
+  const resolvedValue = React.useMemo(() => getTokenValue(token.name, tokensContext.resolvedTokens)?.value, [
+    token,
+    getTokenValue,
+    tokensContext.resolvedTokens,
+  ]);
 
   if (isSingleTypographyToken(token)) {
     return (
@@ -40,7 +43,8 @@ export const TokenTooltipContentValue: React.FC<Props> = ({ token }) => {
             key={seed(index)}
             property={property}
             value={value}
-            // TODO: Fix this type error
+            // @Liam: I have no idea how to fix this type error
+            // @ts-ignore
             resolvedValue={resolvedValue[property] as CompositionTokenValue}
           />
         ))}
@@ -49,42 +53,48 @@ export const TokenTooltipContentValue: React.FC<Props> = ({ token }) => {
   }
 
   if (isSingleBoxShadowToken(token)) {
-    if (Array.isArray(resolvedValue) && Array.isArray(token.value)) {
+    if (Array.isArray(resolvedValue)) {
       return (
-        <div>
-          {token.value.map((t, index) => (
+        <Stack direction="column" align="start" gap={3} wrap>
+          {typeof token.value === 'string' ? (
+            <TooltipProperty
+              value={token.value}
+            />
+          ) : null}
+          {resolvedValue.map((t, index) => (
             <SingleShadowValueDisplay
               key={seed(t)}
-              value={t as TokenBoxshadowValue}
-              resolvedValue={resolvedValue[index] as TokenBoxshadowValue}
+              value={Array.isArray(token.value) ? token.value[index] as TokenBoxshadowValue : undefined}
+              resolvedValue={t as TokenBoxshadowValue}
             />
           ))}
-        </div>
+        </Stack>
       );
     }
 
     return (
-      <SingleShadowValueDisplay
+      <div>
+        {typeof token.value === 'string' ? (
+          <TooltipProperty
+            value={token.value}
+          />
+        ) : null}
+        <SingleShadowValueDisplay
         // @TODO strengthen type checking here
-        value={token.value as TokenBoxshadowValue}
-        resolvedValue={resolvedValue as TokenBoxshadowValue}
-      />
+          value={token.value as TokenBoxshadowValue}
+          resolvedValue={resolvedValue as TokenBoxshadowValue}
+        />
+      </div>
     );
   }
 
   if (typeof token.value !== 'string' && typeof token.value !== 'number') {
-    return (
-      <TooltipProperty value={JSON.stringify(token.value, null, 2)} />
-    );
+    return <TooltipProperty value={JSON.stringify(token.value, null, 2)} />;
   }
 
   if (resolvedValue && typeof resolvedValue !== 'string' && typeof resolvedValue !== 'number') {
-    return (
-      <TooltipProperty value={token.value} resolvedValue={JSON.stringify(token.value, null, 2)} />
-    );
+    return <TooltipProperty value={token.value} resolvedValue={JSON.stringify(token.value, null, 2)} />;
   }
 
-  return (
-    <TooltipProperty value={token.value} resolvedValue={resolvedValue} />
-  );
+  return <TooltipProperty value={token.value} resolvedValue={resolvedValue} />;
 };

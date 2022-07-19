@@ -5,19 +5,19 @@ import { TokenBoxshadowValue } from '@/types/values';
 import TooltipProperty from './TooltipProperty';
 
 type Props = {
-  value: TokenBoxshadowValue;
-  resolvedValue: TokenBoxshadowValue | null;
+  value?: TokenBoxshadowValue;
+  resolvedValue?: TokenBoxshadowValue | null;
 };
 
 export const SingleShadowValueDisplay: React.FC<Props> = ({ value, resolvedValue }) => (
   <Box>
-    <Box css={{ display: 'flex', color: '$fgToolTip', padding: '$1 $2' }}>{value.type}</Box>
+    <Box css={{ display: 'flex', color: '$fgToolTip' }}>{resolvedValue?.type}</Box>
     <Stack direction="row" align="start" gap={2} wrap>
-      <TooltipProperty value={value.x} resolvedValue={resolvedValue?.x} />
-      <TooltipProperty value={value.y} resolvedValue={resolvedValue?.y} />
-      <TooltipProperty value={value.blur} resolvedValue={resolvedValue?.blur} />
-      <TooltipProperty value={value.spread} resolvedValue={resolvedValue?.spread} />
-      <TooltipProperty value={value.color} resolvedValue={resolvedValue?.color} />
+      <TooltipProperty value={value?.x} resolvedValue={resolvedValue?.x} />
+      <TooltipProperty value={value?.y} resolvedValue={resolvedValue?.y} />
+      <TooltipProperty value={value?.blur} resolvedValue={resolvedValue?.blur} />
+      <TooltipProperty value={value?.spread} resolvedValue={resolvedValue?.spread} />
+      <TooltipProperty value={value?.color} resolvedValue={resolvedValue?.color} />
     </Stack>
   </Box>
 );

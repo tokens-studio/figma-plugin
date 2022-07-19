@@ -16,12 +16,13 @@ export const TokenTooltipContent: React.FC<Props> = ({ token }) => (
         fontWeight: '$bold',
         color: '$fgToolTip',
         position: 'relative',
-        padding: '$1 $2',
       }}
     >
       {token.name.split('.')[token.name.split('.').length - 1]}
     </Box>
-    <TokenTooltipContentValue token={token} />
+    <Stack direction="column" align="start" gap={2} wrap>
+      <TokenTooltipContentValue token={token} />
+    </Stack>
     {token.description && <Box css={{ color: '$fgToolTipMuted', padding: '$1 $2' }}>{token.description}</Box>}
   </Stack>
 );
