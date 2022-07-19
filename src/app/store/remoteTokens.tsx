@@ -6,7 +6,7 @@ import { useJSONbin } from './providers/jsonbin';
 import useURL from './providers/url';
 import { Dispatch } from '../store';
 import useStorage from './useStorage';
-import { useGitHub } from './providers/github';
+import { ResponseData, useGitHub } from './providers/github';
 import { useGitLab } from './providers/gitlab';
 import { useADO } from './providers/ado';
 import useFile from '@/app/store/providers/file';
@@ -165,7 +165,7 @@ export default function useRemoteTokens() {
     pushTokensToADO,
   ]);
 
-  const addNewProviderItem = useCallback(async (credentials: StorageTypeFormValues<false>): Promise<boolean> => {
+  const addNewProviderItem = useCallback(async (credentials: StorageTypeFormValues<false>): Promise<ResponseData> => {
     let data;
     switch (credentials.provider) {
       case StorageProviderType.JSONBIN: {

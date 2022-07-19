@@ -31,6 +31,7 @@ export default function CreateStorageItemModal({
       onSuccess();
     } else {
       setHasErrored(true);
+      // setErrorMessage(message);
     }
   }, [addNewProviderItem, onSuccess]);
 
