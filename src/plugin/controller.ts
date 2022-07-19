@@ -7,22 +7,9 @@ import { defaultWorker } from './Worker';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { sendSelectionChange } from './sendSelectionChange';
+import { startup } from '@/utils/plugin';
 
 figma.skipInvisibleInstanceChildren = true;
-
-figma.showUI(__html__, {
-  themeColors: true,
-  width: DefaultWindowSize.width,
-  height: DefaultWindowSize.height,
-});
-
-figma.on('close', () => {
-  defaultWorker.stop();
-});
-
-figma.on('selectionchange', () => {
-  sendSelectionChange();
-});
 
 AsyncMessageChannel.PluginInstance.connect();
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.INITIATE, asyncHandlers.initiate);
@@ -47,4 +34,25 @@ AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.UPDATE, asyncHandler
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.SET_LICENSE_KEY, asyncHandlers.setLicenseKey);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.GET_API_CREDENTIALS, asyncHandlers.getApiCredentials);
 
-figma.root.setSharedPluginData('tokens', 'nodemanagerCache', '');
+figma.on('close', () => {
+  defaultWorker.stop();
+});
+
+figma.on('selectionchange', () => {
+  sendSelectionChange();
+});
+
+startup().then(async (params) => {
+  figma.showUI(__html__, {
+    themeColors: true,
+    width: DefaultWindowSize.width,
+    height: DefaultWindowSize.height,
+  });
+
+  await AsyncMessageChannel.PluginInstance.message({
+    type: AsyncMessageTypes.STARTUP,
+    ...params,
+  });
+}).catch((err) => {
+  throw err;
+});
