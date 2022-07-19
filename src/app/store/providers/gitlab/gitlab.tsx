@@ -11,14 +11,13 @@ import {
 } from '@/selectors';
 import { GitlabTokenStorage } from '@/storage/GitlabTokenStorage';
 import { isEqual } from '@/utils/isEqual';
-import { RemoteTokenStorageData } from '@/storage/RemoteTokenStorage';
-import { GitStorageMetadata } from '@/storage/GitTokenStorage';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { StorageTypeCredentials, StorageTypeFormValues } from '@/types/StorageType';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { useFlags } from '@/app/components/LaunchDarkly';
 import { getRepositoryInformation } from '../getRepositoryInformation';
+import { RemoteResponseData } from '@/types/RemoteResponseData';
 
 type GitlabCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.GITHUB | StorageProviderType.GITLAB; }>;
 type GitlabFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.GITHUB | StorageProviderType.GITLAB }>;
@@ -52,7 +51,7 @@ export function useGitLab() {
     return confirmResult;
   }, [confirm]);
 
-  const pushTokensToGitLab = useCallback(async (context: GitlabCredentials) => {
+  const pushTokensToGitLab = useCallback(async (context: GitlabCredentials): Promise<RemoteResponseData> => {
     const storage = await storageClientFactory(context);
 
     const content = await storage.retrieve();
@@ -60,11 +59,15 @@ export function useGitLab() {
     if (content) {
       if (content && isEqual(content.tokens, tokens) && isEqual(content.themes, themes)) {
         notifyToUI('Nothing to commit');
-        return {
-          tokens,
-          themes,
-          metadata: {},
+        const returnValue = {
+          hasError: false,
+          data: {
+            tokens,
+            themes,
+            metadata: {},
+          },
         };
+        return returnValue;
       }
     }
 
@@ -91,20 +94,28 @@ export function useGitLab() {
           activeTheme,
         });
         pushDialog('success');
-        return {
-          tokens,
-          themes,
-          metadata: {},
+        const returnValue = {
+          hasError: false,
+          data: {
+            tokens,
+            themes,
+            metadata: {},
+          },
         };
+        return returnValue;
       } catch (e) {
         console.log('Error pushing to GitLab', e);
       }
     }
-    return {
-      tokens,
-      themes,
-      metadata: {},
+    const returnValue = {
+      hasError: false,
+      data: {
+        tokens,
+        themes,
+        metadata: {},
+      },
     };
+    return returnValue;
   }, [
     storageClientFactory,
     dispatch.uiState,
@@ -147,14 +158,20 @@ export function useGitLab() {
     return null;
   }, [storageClientFactory, checkAndSetAccess]);
 
-  const syncTokensWithGitLab = useCallback(async (context: GitlabCredentials): Promise<RemoteTokenStorageData<GitStorageMetadata> | null> => {
+  const syncTokensWithGitLab = useCallback(async (context: GitlabCredentials): Promise<RemoteResponseData> => {
     try {
       const storage = await storageClientFactory(context);
       const hasBranches = await storage.fetchBranches();
       dispatch.branchState.setBranches(hasBranches);
 
       if (!hasBranches || !hasBranches.length) {
-        return null;
+        const response = {
+          hasError: true,
+          data: {
+            errorMessage: 'There is no branch',
+          },
+        };
+        return response;
       }
 
       const { ownerId: owner, repositoryId: repo } = getRepositoryInformation(context.id);
@@ -179,13 +196,23 @@ export function useGitLab() {
             notifyToUI('Pulled tokens from GitLab');
           }
         }
-        return content;
+        const response = {
+          hasError: false,
+          data: content,
+        };
+        return response;
       }
       return await pushTokensToGitLab(context);
     } catch (err) {
       notifyToUI('Error syncing with GitLab, check credentials', { error: true });
       console.log('Error', err);
-      return null;
+      const response = {
+        hasError: true,
+        data: {
+          errorMessage: 'There is no branch',
+        },
+      };
+      return response;
     }
   }, [
     storageClientFactory,
@@ -200,9 +227,9 @@ export function useGitLab() {
     checkAndSetAccess,
   ]);
 
-  const addNewGitLabCredentials = useCallback(async (context: GitlabFormValues): Promise<RemoteTokenStorageData<GitStorageMetadata> | null> => {
-    const data = await syncTokensWithGitLab(context);
-    if (data) {
+  const addNewGitLabCredentials = useCallback(async (context: GitlabFormValues): Promise<RemoteResponseData> => {
+    const { data, hasError } = await syncTokensWithGitLab(context);
+    if (!hasError) {
       AsyncMessageChannel.ReactInstance.message({
         type: AsyncMessageTypes.CREDENTIALS,
         credential: context,
@@ -211,14 +238,23 @@ export function useGitLab() {
         notifyToUI('No tokens stored on remote');
       }
     } else {
-      return null;
+      const response = {
+        hasError: true,
+        data: {
+          errorMessage: 'Error syncing with GitHub, check credentials',
+        },
+      };
+      return response;
     }
-
-    return {
-      tokens: data.tokens ?? tokens,
-      themes: data.themes ?? themes,
-      metadata: {},
+    const response = {
+      hasError: false,
+      data: {
+        tokens: data.tokens ?? tokens,
+        themes: data.themes ?? themes,
+        metadata: {},
+      },
     };
+    return response;
   }, [
     syncTokensWithGitLab,
     tokens,
