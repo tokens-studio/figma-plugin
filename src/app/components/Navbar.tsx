@@ -11,7 +11,9 @@ import useMinimizeWindow from './useMinimizeWindow';
 import IconButton from './IconButton';
 import { IconFolder } from '@/icons';
 import useTokens from '@/app/store/useTokens';
-import { activeThemeSelector, themeOptionsSelector, usedTokenSetSelector } from '@/selectors';
+import {
+  themeObjectsSelector, activeThemeSelector, themeOptionsSelector, usedTokenSetSelector,
+} from '@/selectors';
 
 const Navbar: React.FC = () => {
   const { handleResize } = useMinimizeWindow();
@@ -19,6 +21,7 @@ const Navbar: React.FC = () => {
   const activeTheme = useSelector(activeThemeSelector);
   const availableThemes = useSelector(themeOptionsSelector);
   const usedTokenSet = useSelector(usedTokenSetSelector);
+  const themeObjects = useSelector(themeObjectsSelector);
 
   const handleOpenTokenFlowApp = useCallback(async () => {
     const tokens = getFormattedTokens({
@@ -37,10 +40,11 @@ const Navbar: React.FC = () => {
         activeTheme,
         availableThemes,
         usedTokenSet,
+        themeObjects,
       },
     });
     if (response.status === 200) window.open(`http://localhost:3000?id=${response.data.result}`);
-  }, [activeTheme, availableThemes, getFormattedTokens, usedTokenSet]);
+  }, [activeTheme, availableThemes, getFormattedTokens, themeObjects, usedTokenSet]);
 
   return (
     <Box
