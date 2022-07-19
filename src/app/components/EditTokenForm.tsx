@@ -325,6 +325,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
               type={internalEditToken.type}
               label={internalEditToken.schema?.property}
               resolvedTokens={resolvedTokens}
+              initialName={internalEditToken.initialName}
               handleChange={handleChange}
               setInputValue={handleDownShiftInputChange}
               placeholder={

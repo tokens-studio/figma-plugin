@@ -10,7 +10,7 @@ import Spinner from './Spinner';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 
-const backgroundJobTitles = {
+export const backgroundJobTitles = {
   [BackgroundJobs.NODEMANAGER_UPDATE]: 'Finding and caching tokens...',
   [BackgroundJobs.NODEMANAGER_FINDNODESWITHDATA]: 'Determing nodes to update...',
   [BackgroundJobs.PLUGIN_UPDATENODES]: 'Updating nodes...',
@@ -57,7 +57,7 @@ export default function LoadingBar() {
   const message = get(backgroundJobTitles, backgroundJobs[backgroundJobs.length - 1]?.name ?? '', '');
 
   return (
-    <div className="fixed w-full z-20" data-cy="loadingBar">
+    <div className="fixed w-full z-20" data-testid="loadingBar" data-cy="loadingBar">
       <Stack
         direction="row"
         align="center"

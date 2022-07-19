@@ -11,4 +11,6 @@ export const multiFileSchema = tokensMapSchema.or(z.array(z.object({
     TokenSetStatus.SOURCE,
   ])),
   $figmaStyleReferences: z.record(z.string()).optional(),
-})));
+}))).or(z.object({
+  tokenSetOrder: z.array(z.string()).optional(),
+}));
