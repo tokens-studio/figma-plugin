@@ -81,7 +81,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
     if ((internalEditToken?.isPristine || nameWasChanged) && hasPriorTokenName) {
       setError('Tokens can\'t share name with a group');
     }
-  }, [internalEditToken, hasNameThatExistsAlready, nameWasChanged]);
+  }, [internalEditToken, hasNameThatExistsAlready, nameWasChanged, hasPriorTokenName]);
 
   const handleToggleInputHelper = React.useCallback(() => {
     setInputHelperOpen(!inputHelperOpen);
