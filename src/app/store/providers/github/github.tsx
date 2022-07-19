@@ -16,7 +16,9 @@ import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { StorageTypeCredentials, StorageTypeFormValues } from '@/types/StorageType';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { useFlags } from '@/app/components/LaunchDarkly';
-import { RemoteResponseData } from '@/types/RemoteResponseData';
+import { RemoteResponseWithError, RemoteResponseData } from '@/types/RemoteResponseData';
+import { RemoteTokenStorageData } from '@/storage/RemoteTokenStorage';
+import { GitStorageMetadata } from '@/storage/GitTokenStorage';
 
 type GithubCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.GITHUB | StorageProviderType.GITLAB; }>;
 type GithubFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.GITHUB | StorageProviderType.GITLAB }>;
@@ -49,7 +51,7 @@ export function useGitHub() {
     return confirmResult;
   }, [confirm]);
 
-  const pushTokensToGitHub = useCallback(async (context: GithubCredentials): Promise<RemoteResponseData> => {
+  const pushTokensToGitHub = useCallback(async (context: GithubCredentials): Promise<RemoteTokenStorageData<GitStorageMetadata> | null> => {
     const storage = storageClientFactory(context);
     const content = await storage.retrieve();
 
@@ -60,15 +62,11 @@ export function useGitHub() {
         && isEqual(content.themes, themes)
       ) {
         notifyToUI('Nothing to commit');
-        const returnValue = {
-          hasError: false,
-          data: {
-            tokens,
-            themes,
-            metadata: {},
-          },
+        return {
+          tokens,
+          themes,
+          metadata: {},
         };
-        return returnValue;
       }
     }
 
@@ -94,29 +92,21 @@ export function useGitHub() {
           activeTheme,
         });
         pushDialog('success');
-        const returnValue = {
-          hasError: false,
-          data: {
-            tokens,
-            themes,
-            metadata: { commitMessage },
-          },
+        return {
+          tokens,
+          themes,
+          metadata: { commitMessage },
         };
-        return returnValue;
       } catch (e) {
         console.log('Error pushing to GitHub', e);
       }
     }
 
-    const returnValue = {
-      hasError: false,
-      data: {
-        tokens,
-        themes,
-        metadata: {},
-      },
+    return {
+      tokens,
+      themes,
+      metadata: {},
     };
-    return returnValue;
   }, [
     storageClientFactory,
     dispatch.uiState,
@@ -170,13 +160,11 @@ export function useGitHub() {
       const hasBranches = await storage.fetchBranches();
       dispatch.branchState.setBranches(hasBranches);
       if (!hasBranches || !hasBranches.length) {
-        const response = {
+        const returnValue = {
           hasError: true,
-          data: {
-            errorMessage: 'There is no branch',
-          },
+          errorMessage: 'There is no branch',
         };
-        return response;
+        return returnValue;
       }
 
       const [owner, repo] = context.id.split('/');
@@ -202,23 +190,26 @@ export function useGitHub() {
             notifyToUI('Pulled tokens from GitHub');
           }
         }
-        const response = {
+        const returnValue = {
           hasError: false,
-          data: content,
+          ...content,
         };
-        return response;
+        return returnValue;
       }
-      return await pushTokensToGitHub(context);
+      const pushData = await pushTokensToGitHub(context);
+      const returnValue = {
+        hasError: false,
+        ...pushData
+      };
+      return returnValue;
     } catch (e) {
       notifyToUI('Error syncing with GitHub, check credentials', { error: true });
       console.log('Error', e);
-      const response = {
+      const returnValue = {
         hasError: true,
-        data: {
-          errorMessage: 'Error syncing with GitHub, check credentials',
-        },
+        errorMessage: 'Error syncing with GitHub, check credentials',
       };
-      return response;
+      return returnValue;
     }
   }, [
     askUserIfPull,
@@ -232,9 +223,9 @@ export function useGitHub() {
     checkAndSetAccess,
   ]);
 
-  const addNewGitHubCredentials = useCallback(async (context: GithubFormValues): Promise<RemoteResponseData> => {
-    const { data, hasError } = await syncTokensWithGitHub(context);
-    if (!hasError) {
+  const addNewGitHubCredentials = useCallback(async (context: GithubFormValues): Promise<RemoteResponseWithError> => {
+    const data = await syncTokensWithGitHub(context);
+    if (!data.hasError) {
       AsyncMessageChannel.ReactInstance.message({
         type: AsyncMessageTypes.CREDENTIALS,
         credential: context,
@@ -243,23 +234,18 @@ export function useGitHub() {
         notifyToUI('No tokens stored on remote');
       }
     } else {
-      const response = {
+      const returnValue = {
         hasError: true,
         data: {
           errorMessage: 'Error syncing with GitHub, check credentials',
         },
       };
-      return response;
+      return returnValue;
     }
-    const response = {
+    const returnValue = {
       hasError: false,
-      data: {
-        tokens: data.tokens ?? tokens,
-        themes: data.themes ?? themes,
-        metadata: {},
-      },
     };
-    return response;
+    return returnValue;
   }, [
     syncTokensWithGitHub,
     tokens,

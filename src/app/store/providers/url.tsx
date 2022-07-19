@@ -8,6 +8,7 @@ import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StorageTypeCredentials } from '@/types/StorageType';
 import { activeThemeSelector, usedTokenSetSelector } from '@/selectors';
+import { RemoteResponseData } from '@/types/RemoteResponseData';
 
 type UrlCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.URL; }>;
 
@@ -21,11 +22,19 @@ export default function useURL() {
   ), []);
 
   // Read tokens from URL
-  const pullTokensFromURL = useCallback(async (context: UrlCredentials) => {
+  const pullTokensFromURL = useCallback(async (context: UrlCredentials): Promise<RemoteResponseData> => {
     const {
       id, secret, name, internalId,
     } = context;
-    if (!id && !secret) return null;
+    if (!id && !secret) {
+      const response = {
+        hasError: true,
+        data: {
+          errorMessage: 'ID or Secret is missing',
+        },
+      };
+      return response;
+    };
 
     const storage = storageClientFactory(context);
 
@@ -53,7 +62,11 @@ export default function useURL() {
             activeTheme,
           });
           dispatch.tokenState.setEditProhibited(true);
-          return content;
+          const response = {
+            hasError: false,
+            data: content,
+          };
+          return response;
         }
         notifyToUI('No tokens stored on remote', { error: true });
       }

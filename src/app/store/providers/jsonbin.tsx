@@ -14,6 +14,7 @@ import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StorageTypeCredentials, StorageTypeFormValues } from '@/types/StorageType';
+import { RemoteResponseData } from '@/types/RemoteResponseData';
 
 export async function updateJSONBinTokens({
   tokens, themes, context, updatedAt, oldUpdatedAt = null,
@@ -60,7 +61,7 @@ export function useJSONbin() {
   const activeTheme = useSelector(activeThemeSelector);
   const usedTokenSets = useSelector(usedTokenSetSelector);
 
-  const createNewJSONBin = useCallback(async (context: Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.JSONBIN }>) => {
+  const createNewJSONBin = useCallback(async (context: Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.JSONBIN }>): Promise<RemoteResponseData> => {
     const { secret, name, internalId } = context;
     const updatedAt = new Date().toISOString();
     const result = await JSONBinTokenStorage.create(name, updatedAt, secret);
@@ -86,10 +87,20 @@ export function useJSONbin() {
       });
       dispatch.uiState.setProjectURL(`https://jsonbin.io/${result.metadata.id}`);
 
-      return result.metadata.id;
+      const response = {
+        hasError: false,
+        data: result.metadata.id,
+      };
+      return response;
     }
     notifyToUI('Something went wrong. See console for details', { error: true });
-    return null;
+    const response = {
+      hasError: true,
+      data: {
+        errorMessage: 'ID or Secret is missing',
+      },
+    };
+    return response;
   }, [dispatch, themes, tokens]);
 
   // Read tokens from JSONBin
@@ -128,11 +139,19 @@ export function useJSONbin() {
     }
   }, [dispatch]);
 
-  const addJSONBinCredentials = useCallback(async (context: Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.JSONBIN }>) => {
+  const addJSONBinCredentials = useCallback(async (context: Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.JSONBIN }>): Promise<RemoteResponseData> => {
     const {
       provider, id, name, secret, internalId,
     } = context;
-    if (!id || !secret) return null;
+    if (!id || !secret) {
+      const response = {
+        hasError: true,
+        data: {
+          errorMessage: 'ID or Secret is missing',
+        },
+      };
+      return response;
+    };
 
     const content = await pullTokensFromJSONBin({
       provider,
@@ -158,9 +177,19 @@ export function useJSONbin() {
         usedTokenSet: usedTokenSets,
         activeTheme,
       });
+      const response = {
+        hasError: false,
+        data: content,
+      };
+      return response;
     }
-
-    return content;
+    const response = {
+      hasError: true,
+      data: {
+        errorMessage: 'ID or Secret is missing',
+      },
+    };
+    return response;
   }, [
     dispatch,
     pullTokensFromJSONBin,

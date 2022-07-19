@@ -174,7 +174,7 @@ export default function useRemoteTokens() {
         } else {
           const id = await createNewJSONBin(credentials);
           if (id) {
-            credentials.id = id;
+            // credentials.id = id;
             data = true;
           }
         }
