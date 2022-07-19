@@ -61,7 +61,7 @@ export function useJSONbin() {
   const activeTheme = useSelector(activeThemeSelector);
   const usedTokenSets = useSelector(usedTokenSetSelector);
 
-  const createNewJSONBin = useCallback(async (context: Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.JSONBIN }>): Promise<RemoteResponseData> => {
+  const createNewJSONBin = useCallback(async (context: Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.JSONBIN }>) => {
     const { secret, name, internalId } = context;
     const updatedAt = new Date().toISOString();
     const result = await JSONBinTokenStorage.create(name, updatedAt, secret);
@@ -87,20 +87,10 @@ export function useJSONbin() {
       });
       dispatch.uiState.setProjectURL(`https://jsonbin.io/${result.metadata.id}`);
 
-      const response = {
-        hasError: false,
-        data: result.metadata.id,
-      };
-      return response;
+      return result.metadata.id;
     }
     notifyToUI('Something went wrong. See console for details', { error: true });
-    const response = {
-      hasError: true,
-      data: {
-        errorMessage: 'ID or Secret is missing',
-      },
-    };
-    return response;
+    return null;
   }, [dispatch, themes, tokens]);
 
   // Read tokens from JSONBin
@@ -144,14 +134,10 @@ export function useJSONbin() {
       provider, id, name, secret, internalId,
     } = context;
     if (!id || !secret) {
-      const response = {
-        hasError: true,
-        data: {
-          errorMessage: 'ID or Secret is missing',
-        },
+      return {
+        errorMessage: 'ID or secret should be exist',
       };
-      return response;
-    };
+    }
 
     const content = await pullTokensFromJSONBin({
       provider,
@@ -177,19 +163,11 @@ export function useJSONbin() {
         usedTokenSet: usedTokenSets,
         activeTheme,
       });
-      const response = {
-        hasError: false,
-        data: content,
-      };
-      return response;
     }
-    const response = {
-      hasError: true,
-      data: {
-        errorMessage: 'ID or Secret is missing',
-      },
+    return {
+      ...content,
+      ...(content === null ? { errorMessage: 'Error fetching from JSONbin, check console (F12)' } : {}),
     };
-    return response;
   }, [
     dispatch,
     pullTokensFromJSONBin,

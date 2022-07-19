@@ -18,6 +18,7 @@ import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StorageTypeCredentials, StorageTypeFormValues } from '@/types/StorageType';
+import { RemoteResponseData } from '@/types/RemoteResponseData';
 
 type PullTokensOptions = {
   context?: StorageTypeCredentials,
@@ -165,8 +166,8 @@ export default function useRemoteTokens() {
     pushTokensToADO,
   ]);
 
-  const addNewProviderItem = useCallback(async (credentials: StorageTypeFormValues<false>): Promise<boolean> => {
-    let data;
+  const addNewProviderItem = useCallback(async (credentials: StorageTypeFormValues<false>): Promise<RemoteResponseData> => {
+    let data: RemoteResponseData = {};
     switch (credentials.provider) {
       case StorageProviderType.JSONBIN: {
         if (credentials.id) {
@@ -174,8 +175,8 @@ export default function useRemoteTokens() {
         } else {
           const id = await createNewJSONBin(credentials);
           if (id) {
-            // credentials.id = id;
-            data = true;
+            credentials.id = id;
+            data = {};
           }
         }
         break;
@@ -193,19 +194,22 @@ export default function useRemoteTokens() {
         break;
       }
       case StorageProviderType.URL: {
-        data = await pullTokensFromURL(credentials);
+        const pullData = await pullTokensFromURL(credentials);
+        data = {
+          ...pullData,
+          ...(pullData === null ? {errorMessage: 'Error fetching from URL, check console (F12)'} : {}),
+        }
         break;
       }
       default:
         throw new Error('Not implemented');
     }
-    if (data) {
+    if (!data.errorMessage) {
       dispatch.uiState.setLocalApiState(credentials as StorageTypeCredentials); // in JSONBIN the ID can technically be omitted, but this function handles this by creating a new JSONBin and assigning the ID
       dispatch.uiState.setApiData(credentials as StorageTypeCredentials);
       setStorageType({ provider: credentials as StorageTypeCredentials, shouldSetInDocument: true });
-      return true;
     }
-    return false;
+    return data;
   }, [
     dispatch,
     addJSONBinCredentials,

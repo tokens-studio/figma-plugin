@@ -16,7 +16,7 @@ import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { StorageTypeCredentials, StorageTypeFormValues } from '@/types/StorageType';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { useFlags } from '@/app/components/LaunchDarkly';
-import { RemoteResponseWithError, RemoteResponseData } from '@/types/RemoteResponseData';
+import { RemoteResponseData } from '@/types/RemoteResponseData';
 import { RemoteTokenStorageData } from '@/storage/RemoteTokenStorage';
 import { GitStorageMetadata } from '@/storage/GitTokenStorage';
 
@@ -160,11 +160,9 @@ export function useGitHub() {
       const hasBranches = await storage.fetchBranches();
       dispatch.branchState.setBranches(hasBranches);
       if (!hasBranches || !hasBranches.length) {
-        const returnValue = {
-          hasError: true,
+        return {
           errorMessage: 'There is no branch',
         };
-        return returnValue;
       }
 
       const [owner, repo] = context.id.split('/');
@@ -190,26 +188,19 @@ export function useGitHub() {
             notifyToUI('Pulled tokens from GitHub');
           }
         }
-        const returnValue = {
-          hasError: false,
-          ...content,
-        };
-        return returnValue;
+        return content;
       }
       const pushData = await pushTokensToGitHub(context);
-      const returnValue = {
-        hasError: false,
-        ...pushData
+      return {
+        ...pushData,
+        ...(pushData === null ? { errorMessage: 'Error syncing with GitHub, check credentials' } : {}),
       };
-      return returnValue;
     } catch (e) {
       notifyToUI('Error syncing with GitHub, check credentials', { error: true });
       console.log('Error', e);
-      const returnValue = {
-        hasError: true,
+      return {
         errorMessage: 'Error syncing with GitHub, check credentials',
       };
-      return returnValue;
     }
   }, [
     askUserIfPull,
@@ -223,9 +214,9 @@ export function useGitHub() {
     checkAndSetAccess,
   ]);
 
-  const addNewGitHubCredentials = useCallback(async (context: GithubFormValues): Promise<RemoteResponseWithError> => {
+  const addNewGitHubCredentials = useCallback(async (context: GithubFormValues): Promise<RemoteResponseData> => {
     const data = await syncTokensWithGitHub(context);
-    if (!data.hasError) {
+    if (!data.errorMessage) {
       AsyncMessageChannel.ReactInstance.message({
         type: AsyncMessageTypes.CREDENTIALS,
         credential: context,
@@ -234,18 +225,15 @@ export function useGitHub() {
         notifyToUI('No tokens stored on remote');
       }
     } else {
-      const returnValue = {
-        hasError: true,
-        data: {
-          errorMessage: 'Error syncing with GitHub, check credentials',
-        },
+      return {
+        errorMessage: data.errorMessage,
       };
-      return returnValue;
     }
-    const returnValue = {
-      hasError: false,
+    return {
+      tokens: data.tokens ?? tokens,
+      themes: data.themes ?? themes,
+      metadata: {},
     };
-    return returnValue;
   }, [
     syncTokensWithGitHub,
     tokens,

@@ -51,7 +51,7 @@ export function useGitLab() {
     return confirmResult;
   }, [confirm]);
 
-  const pushTokensToGitLab = useCallback(async (context: GitlabCredentials): Promise<RemoteResponseData> => {
+  const pushTokensToGitLab = useCallback(async (context: GitlabCredentials) => {
     const storage = await storageClientFactory(context);
 
     const content = await storage.retrieve();
@@ -59,15 +59,11 @@ export function useGitLab() {
     if (content) {
       if (content && isEqual(content.tokens, tokens) && isEqual(content.themes, themes)) {
         notifyToUI('Nothing to commit');
-        const returnValue = {
-          hasError: false,
-          data: {
-            tokens,
-            themes,
-            metadata: {},
-          },
+        return {
+          tokens,
+          themes,
+          metadata: {},
         };
-        return returnValue;
       }
     }
 
@@ -94,28 +90,20 @@ export function useGitLab() {
           activeTheme,
         });
         pushDialog('success');
-        const returnValue = {
-          hasError: false,
-          data: {
-            tokens,
-            themes,
-            metadata: {},
-          },
+        return {
+          tokens,
+          themes,
+          metadata: {},
         };
-        return returnValue;
       } catch (e) {
         console.log('Error pushing to GitLab', e);
       }
     }
-    const returnValue = {
-      hasError: false,
-      data: {
-        tokens,
-        themes,
-        metadata: {},
-      },
+    return {
+      tokens,
+      themes,
+      metadata: {},
     };
-    return returnValue;
   }, [
     storageClientFactory,
     dispatch.uiState,
@@ -165,13 +153,9 @@ export function useGitLab() {
       dispatch.branchState.setBranches(hasBranches);
 
       if (!hasBranches || !hasBranches.length) {
-        const response = {
-          hasError: true,
-          data: {
-            errorMessage: 'There is no branch',
-          },
+        return {
+          errorMessage: 'There is no branch',
         };
-        return response;
       }
 
       const { ownerId: owner, repositoryId: repo } = getRepositoryInformation(context.id);
@@ -196,23 +180,19 @@ export function useGitLab() {
             notifyToUI('Pulled tokens from GitLab');
           }
         }
-        const response = {
-          hasError: false,
-          data: content,
-        };
-        return response;
+        return content;
       }
-      return await pushTokensToGitLab(context);
+      const pushData = await pushTokensToGitLab(context);
+      return {
+        ...pushData,
+        ...(pushData === null ? { errorMessage: 'Error syncing with GitHub, check credentials' } : {}),
+      };
     } catch (err) {
       notifyToUI('Error syncing with GitLab, check credentials', { error: true });
       console.log('Error', err);
-      const response = {
-        hasError: true,
-        data: {
-          errorMessage: 'There is no branch',
-        },
+      return {
+        errorMessage: 'Error syncing with GitLab, check credentials',
       };
-      return response;
     }
   }, [
     storageClientFactory,
@@ -228,8 +208,8 @@ export function useGitLab() {
   ]);
 
   const addNewGitLabCredentials = useCallback(async (context: GitlabFormValues): Promise<RemoteResponseData> => {
-    const { data, hasError } = await syncTokensWithGitLab(context);
-    if (!hasError) {
+    const data = await syncTokensWithGitLab(context);
+    if (!data.errorMessage) {
       AsyncMessageChannel.ReactInstance.message({
         type: AsyncMessageTypes.CREDENTIALS,
         credential: context,
@@ -238,23 +218,15 @@ export function useGitLab() {
         notifyToUI('No tokens stored on remote');
       }
     } else {
-      const response = {
-        hasError: true,
-        data: {
-          errorMessage: 'Error syncing with GitHub, check credentials',
-        },
+      return {
+        errorMessage: data.errorMessage,
       };
-      return response;
     }
-    const response = {
-      hasError: false,
-      data: {
-        tokens: data.tokens ?? tokens,
-        themes: data.themes ?? themes,
-        metadata: {},
-      },
+    return {
+      tokens: data.tokens ?? tokens,
+      themes: data.themes ?? themes,
+      metadata: {},
     };
-    return response;
   }, [
     syncTokensWithGitLab,
     tokens,

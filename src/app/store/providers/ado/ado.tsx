@@ -47,7 +47,7 @@ export const useADO = () => {
     return confirmResult;
   }, [confirm]);
 
-  const pushTokensToADO = React.useCallback(async (context: AdoCredentials): Promise<RemoteResponseData> => {
+  const pushTokensToADO = React.useCallback(async (context: AdoCredentials) => {
     const storage = storageClientFactory(context);
     if (context.branch) {
       storage.setSource(context.branch);
@@ -60,15 +60,11 @@ export const useADO = () => {
       && isEqual(content.themes, themes)
     ) {
       notifyToUI('Nothing to commit');
-      const response = {
-        hasError: false,
-        data: {
-          tokens,
-          themes,
-          metadata: {},
-        },
+      return {
+        tokens,
+        themes,
+        metadata: {},
       };
-      return response;
     }
 
     dispatch.uiState.setLocalApiState({ ...context });
@@ -94,28 +90,22 @@ export const useADO = () => {
         });
 
         pushDialog('success');
-        const returnValue = {
-          hasError: false,
-          data: {
-            tokens,
-            themes,
-            metadata: { commitMessage },
-          },
+
+        return {
+          tokens,
+          themes,
+          metadata: { commitMessage },
         };
-        return returnValue;
       } catch (e) {
         console.log('Error pushing to ADO', e);
       }
     }
-    const returnValue = {
-      hasError: false,
-      data: {
-        tokens,
-        themes,
-        metadata: {},
-      },
+
+    return {
+      tokens,
+      themes,
+      metadata: {},
     };
-    return returnValue;
   }, [
     dispatch,
     storageClientFactory,
@@ -162,13 +152,9 @@ export const useADO = () => {
       const branches = await storage.fetchBranches();
       dispatch.branchState.setBranches(branches);
       if (branches.length === 0) {
-        const response = {
-          hasError: true,
-          data: {
-            errorMessage: 'There is no branch',
-          },
+        return {
+          errorMessage: 'there is no branch',
         };
-        return response;
       }
 
       await checkAndSetAccess(context);
@@ -193,23 +179,19 @@ export const useADO = () => {
             notifyToUI('Pulled tokens from ADO');
           }
         }
-        const returnValue = {
-          hasError: false,
-          data: content,
-        };
-        return returnValue;
+        return content;
       }
-      return await pushTokensToADO(context);
+      const pushData = await pushTokensToADO(context);
+      return {
+        ...pushData,
+        ...(pushData === null ? { errorMessage: 'Error syncing with ADO, check credentials' } : {}),
+      };
     } catch (e) {
       notifyToUI('Error syncing with ADO, check credentials', { error: true });
       console.log('Error', e);
-      const response = {
-        hasError: true,
-        data: {
-          errorMessage: 'There is no branch',
-        },
+      return {
+        errorMessage: 'Error syncing with ADO, check credentials',
       };
-      return response;
     }
   }, [
     askUserIfPull,
@@ -225,9 +207,9 @@ export const useADO = () => {
 
   const addNewADOCredentials = React.useCallback(
     async (context: AdoFormValues): Promise<RemoteResponseData> => {
-      const { data, hasError } = await syncTokensWithADO(context);
+      const data = await syncTokensWithADO(context);
 
-      if (!hasError) {
+      if (!data.errorMessage) {
         AsyncMessageChannel.ReactInstance.message({
           type: AsyncMessageTypes.CREDENTIALS,
           credential: context,
@@ -236,23 +218,15 @@ export const useADO = () => {
           notifyToUI('No tokens stored on remote');
         }
       } else {
-        const response = {
-          hasError: true,
-          data: {
-            errorMessage: 'There is no branch',
-          },
+        return {
+          errorMessage: data.errorMessage,
         };
-        return response;
       }
-      const returnValue = {
-        hasError: false,
-        data: {
-          tokens: data.tokens ?? tokens,
-          themes: data.themes ?? themes,
-          metadata: {},
-        },
+      return {
+        tokens: data.tokens ?? tokens,
+        themes: data.themes ?? themes,
+        metadata: {},
       };
-      return returnValue;
     },
     [
       dispatch,

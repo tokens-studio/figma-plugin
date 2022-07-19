@@ -19,6 +19,7 @@ export default function CreateStorageItemModal({
 }: Props) {
   const { addNewProviderItem } = useRemoteTokens();
   const [hasErrored, setHasErrored] = React.useState(false);
+  const [errorMessage, setErrorMessage] = React.useState<string>();
 
   const [formFields, setFormFields] = React.useState<StorageTypeFormValues<true>>(React.useMemo(() => ({
     provider: storageProvider,
@@ -27,11 +28,11 @@ export default function CreateStorageItemModal({
   const handleCreateNewClick = React.useCallback(async (values: StorageTypeFormValues<false>) => {
     setHasErrored(false);
     const response = await addNewProviderItem(values);
-    if (response) {
+    if (!response?.errorMessage) {
       onSuccess();
     } else {
       setHasErrored(true);
-      // setErrorMessage(message);
+      setErrorMessage(response?.errorMessage);
     }
   }, [addNewProviderItem, onSuccess]);
 
@@ -54,6 +55,7 @@ export default function CreateStorageItemModal({
           onCancel={onClose}
           values={formFields}
           hasErrored={hasErrored}
+          errorMessage={errorMessage}
         />
       </Stack>
     </Modal>

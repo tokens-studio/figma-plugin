@@ -13,10 +13,11 @@ type Props = {
   onSubmit: (values: StorageTypeFormValues<false>) => void;
   isNew?: boolean;
   hasErrored?: boolean;
+  errorMessage?: string;
 };
 
 export default function StorageItemForm({
-  isNew = false, onChange, onSubmit, onCancel, values, hasErrored,
+  isNew = false, onChange, onSubmit, onCancel, values, hasErrored, errorMessage,
 }: Props) {
   switch (values.provider) {
     case StorageProviderType.GITHUB:
@@ -28,6 +29,7 @@ export default function StorageItemForm({
           onCancel={onCancel}
           values={values}
           hasErrored={hasErrored}
+          errorMessage={errorMessage}
         />
       );
     }
@@ -39,6 +41,7 @@ export default function StorageItemForm({
           onCancel={onCancel}
           values={values}
           hasErrored={hasErrored}
+          errorMessage={errorMessage}
         />
       );
     }
@@ -50,6 +53,7 @@ export default function StorageItemForm({
           onCancel={onCancel}
           values={values}
           hasErrored={hasErrored}
+          errorMessage={errorMessage}
         />
       );
     }
@@ -62,6 +66,7 @@ export default function StorageItemForm({
           onCancel={onCancel}
           values={values}
           hasErrored={hasErrored}
+          errorMessage={errorMessage}
         />
       );
     }
