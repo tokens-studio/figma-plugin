@@ -10,7 +10,7 @@ const jsonbinSchema = singleFileSchema.extend({
   updatedAt: z.string().optional(),
 });
 
-export type JsonBinMetadata = {
+type JsonBinMetadata = {
   version: string
   updatedAt: string
 };
