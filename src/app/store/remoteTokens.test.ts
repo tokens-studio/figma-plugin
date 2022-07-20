@@ -362,7 +362,7 @@ describe('remoteTokens', () => {
 
   contexts.forEach((context) => {
     if (context === gitHubContext || context === gitLabContext || context === adoContext) {
-      it(`Add newProviderItem to ${context.provider}, should push tokens and return tokenData if there is no content`, async () => {
+      it(`Add newProviderItem to ${context.provider}, should push tokens and return token data if there is no content`, async () => {
         mockFetchBranches.mockImplementationOnce(() => (
           Promise.resolve(['main'])
         ));
@@ -379,13 +379,13 @@ describe('remoteTokens', () => {
         expect(mockPushDialog).toBeCalledTimes(2);
         expect(mockPushDialog.mock.calls[1][0]).toBe('success');
         expect(await result.current.addNewProviderItem(context as StorageTypeCredentials)).toEqual({
-          meatadata: {},
+          metadata: {},
           themes: [{
-              id: 'light',
-              name: 'Light',
-              selectedTokenSets: {
-                global: 'enabled',
-              },    
+            id: 'light',
+            name: 'Light',
+            selectedTokenSets: {
+              global: 'enabled',
+            },
           }],
           tokens: {
             global: [
@@ -394,8 +394,8 @@ describe('remoteTokens', () => {
                 type: 'color',
                 name: 'black',
               },
-            ],    
-          }
+            ],
+          },
         });
       });
     } else {
@@ -403,9 +403,15 @@ describe('remoteTokens', () => {
         mockRetrieve.mockImplementation(() => (
           Promise.resolve(null)
         ));
-        expect(await result.current.addNewProviderItem(context as StorageTypeCredentials)).toEqual({
-          errorMessage: 'Error fetching from URL, check console (F12)'
-        });
+        if (context === urlContext) {
+          expect(await result.current.addNewProviderItem(context as StorageTypeCredentials)).toEqual({
+            errorMessage: 'Error fetching from URL, check console (F12)',
+          });
+        } else {
+          expect(await result.current.addNewProviderItem(context as StorageTypeCredentials)).toEqual({
+            errorMessage: 'Error fetching from JSONbin, check console (F12)',
+          });
+        }
       });
     }
   });
@@ -442,18 +448,27 @@ describe('remoteTokens', () => {
         expect(notifyToUI).toBeCalledWith(`Pulled tokens from ${contextNames[index]}`);
         expect(notifyToUI).toBeCalledWith('No tokens stored on remote');
         expect(await result.current.addNewProviderItem(context as StorageTypeCredentials)).toEqual({
-          meatadata: {},
+          metadata: {},
           themes: [{
-              id: 'light',
-              name: 'Light',
-              selectedTokenSets: {
-                global: 'enabled',
-              },    
+            id: 'light',
+            name: 'Light',
+            selectedTokenSets: {
+              global: 'enabled',
+            },
           }],
+          tokens: {
+            global: [
+              {
+                value: '#ffffff',
+                type: 'color',
+                name: 'black',
+              },
+            ],
+          },
         });
       });
     } else {
-      it(`Add newProviderItem to ${context.provider}, should pull tokens and return false if there is no tokens on remote`, async () => {
+      it(`Add newProviderItem to ${context.provider}, should pull tokens and return error message if there is no tokens on remote`, async () => {
         mockRetrieve.mockImplementation(() => (
           Promise.resolve(
             {
@@ -473,18 +488,68 @@ describe('remoteTokens', () => {
             },
           )
         ));
-        expect(await result.current.addNewProviderItem(context as StorageTypeCredentials)).toEqual(false);
+        if (context === urlContext) {
+          expect(await result.current.addNewProviderItem(context as StorageTypeCredentials)).toEqual({
+            errorMessage: 'Error fetching from URL, check console (F12)',
+          });
+        } else {
+          expect(await result.current.addNewProviderItem(context as StorageTypeCredentials)).toEqual({
+            errorMessage: 'Error fetching from JSONbin, check console (F12)',
+          });
+        }
       });
     }
   });
 
   contexts.forEach((context) => {
-    it(`Add newProviderItem to ${context.provider}, should pull tokens and return true`, async () => {
+    it(`Add newProviderItem to ${context.provider}, should pull tokens and return token data`, async () => {
       mockFetchBranches.mockImplementation(() => (
         Promise.resolve(['main'])
       ));
       await waitFor(() => { result.current.addNewProviderItem(context as StorageTypeCredentials); });
-      expect(await result.current.addNewProviderItem(context as StorageTypeCredentials)).toEqual(true);
+      if (context === gitHubContext || context === gitLabContext || context === adoContext) {
+        expect(await result.current.addNewProviderItem(context as StorageTypeCredentials)).toEqual({
+          metadata: {},
+          themes: [{
+            id: 'light',
+            name: 'Light',
+            selectedTokenSets: {
+              global: 'enabled',
+            },
+          }],
+          tokens: {
+            global: [
+              {
+                value: '#ffffff',
+                type: 'color',
+                name: 'black',
+              },
+            ],
+          },
+        });
+      } else {
+        expect(await result.current.addNewProviderItem(context as StorageTypeCredentials)).toEqual({
+          metadata: {
+            commitMessage: 'Initial commit',
+          },
+          themes: [{
+            id: 'light',
+            name: 'Light',
+            selectedTokenSets: {
+              global: 'enabled',
+            },
+          }],
+          tokens: {
+            global: [
+              {
+                value: '#ffffff',
+                type: 'color',
+                name: 'black',
+              },
+            ],
+          },
+        });
+      }
     });
   });
 
