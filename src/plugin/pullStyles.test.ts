@@ -294,7 +294,7 @@ describe('pullStyles', () => {
         {
           name: 'shadow.xlarge',
           type: 'boxShadow',
-          description: 'the one with multiple shadow',
+          description: 'the one with multiple shadows',
           value: [
             {
               type: 'dropShadow',
