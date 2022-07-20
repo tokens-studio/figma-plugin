@@ -135,7 +135,7 @@ export function useJSONbin() {
     } = context;
     if (!id || !secret) {
       return {
-        errorMessage: 'ID or secret should be exist',
+        errorMessage: 'ID or Secret should be exist',
       };
     }
 

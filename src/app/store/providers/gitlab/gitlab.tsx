@@ -185,7 +185,7 @@ export function useGitLab() {
       const pushData = await pushTokensToGitLab(context);
       return {
         ...pushData,
-        ...(pushData === null ? { errorMessage: 'Error syncing with GitHub, check credentials' } : {}),
+        ...(pushData === null ? { errorMessage: 'Error syncing with GitLab, check credentials' } : {}),
       };
     } catch (err) {
       notifyToUI('Error syncing with GitLab, check credentials', { error: true });

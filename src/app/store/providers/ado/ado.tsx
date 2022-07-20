@@ -153,7 +153,7 @@ export const useADO = () => {
       dispatch.branchState.setBranches(branches);
       if (branches.length === 0) {
         return {
-          errorMessage: 'there is no branch',
+          errorMessage: 'There is no branch',
         };
       }
 
