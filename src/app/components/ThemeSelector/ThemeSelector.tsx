@@ -66,6 +66,7 @@ export const ThemeSelector: React.FC = () => {
           key={value}
           value={value}
           data-cy={`themeselector--themeoptions--${value}`}
+          data-testid={`themeselector--themeoptions--${value}`}
           // @README we can disable this because we are using Memo for the whole list anyways
           // eslint-disable-next-line react/jsx-no-bind
           onSelect={handleSelect}
@@ -82,7 +83,7 @@ export const ThemeSelector: React.FC = () => {
   return (
     <Flex alignItems="center" css={{ flexShrink: 0 }}>
       <DropdownMenu>
-        <DropdownMenuTrigger data-cy="themeselector-dropdown">
+        <DropdownMenuTrigger data-cy="themeselector-dropdown" data-testid="themeselector-dropdown">
           <Flex>
             <ThemeDropdownLabel muted size="small">Theme:</ThemeDropdownLabel>
             <Text size="small">{activeThemeLabel}</Text>
