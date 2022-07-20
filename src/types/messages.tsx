@@ -51,6 +51,7 @@ export type UiSettingsFromPluginMessage = {
     updateOnChange: boolean;
     updateStyles: boolean;
     ignoreFirstPartForStyles: boolean;
+    prefixStylesWithThemeName: boolean;
     inspectDeep: boolean;
   };
 };

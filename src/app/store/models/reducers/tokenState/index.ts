@@ -4,3 +4,7 @@ export * from './deleteTheme';
 export * from './setTokenData';
 export * from './setEmptyTokens';
 export * from './setDefaultTokens';
+export * from './assignStyleIdsToCurrentTheme';
+export * from './renameTokenSet';
+export * from './toggleManyTokenSets';
+export * from './toggleUsedTokenSet';

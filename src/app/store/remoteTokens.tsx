@@ -20,6 +20,7 @@ import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StorageTypeCredentials, StorageTypeFormValues } from '@/types/StorageType';
 import { RemoteResponseData } from '@/types/RemoteResponseData';
 import { ErrorMessages } from '@/constants/ErrorMessages';
+import { saveLastSyncedState } from '@/utils/saveLastSyncedState';
 
 type PullTokensOptions = {
   context?: StorageTypeCredentials,
@@ -84,7 +85,7 @@ export default function useRemoteTokens() {
     }
 
     if (remoteData) {
-      dispatch.tokenState.setLastSyncedState(JSON.stringify([remoteData.tokens, remoteData.themes], null, 2));
+      saveLastSyncedState(dispatch, remoteData.tokens, remoteData.themes, remoteData.metadata);
       dispatch.tokenState.setTokenData({
         values: remoteData.tokens,
         themes: remoteData.themes,
