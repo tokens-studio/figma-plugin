@@ -90,7 +90,11 @@ export const ThemeSelector: React.FC = () => {
           </Flex>
           <IconToggleableDisclosure />
         </DropdownMenuTrigger>
-        <DropdownMenuContent side="bottom" css={{ minWidth: '180px' }}>
+        <DropdownMenuContent
+          data-testid="themeselector-dropdown-content"
+          side="bottom"
+          css={{ minWidth: '180px' }}
+        >
           <DropdownMenuRadioGroup value={activeTheme ?? ''}>
             {availableThemes.length === 0 && (
               <DropdownMenuRadioItem value="" disabled={!activeTheme} onSelect={handleClearTheme}>
