@@ -2,7 +2,7 @@ import { SingleToken } from '@/types/tokens';
 
 type SingleTokenValueObject = Pick<SingleToken, 'value'>;
 
-export function isTokenGroupWithTypeOfGroupLevel(token: SingleTokenValueObject | any) {
+export function isTokenGroupWithTypeOfGroupLevel(token: SingleTokenValueObject | any): token is SingleTokenValueObject  {
   return !!(
     token
     && typeof token === 'object'

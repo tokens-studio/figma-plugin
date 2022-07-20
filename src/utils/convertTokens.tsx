@@ -47,7 +47,27 @@ function checkForTokens({
       delete returnValue.value.description;
       returnValue.description = token.description;
     }
-  } else if (typeof token === 'object' && isTokenGroupWithTypeOfGroupLevel(token)) {
+  } else if (isTokenGroupWithTypeOfGroupLevel(token)) {
+    let tokenToCheck = token;
+    if (isSingleTokenValueObject(token) && typeof token.value !== 'string') {
+      tokenToCheck = token.value as typeof tokenToCheck;
+    }
+    Object.entries(tokenToCheck).forEach(([key, value]) => {
+      const [, result] = checkForTokens({
+        obj,
+        token: value,
+        root: [root, key].filter((n) => n).join('.'),
+        returnValuesOnly,
+        expandTypography,
+        expandShadow,
+      });
+      console.log('result', result);
+      if (root && result) {
+        obj.push({ ...result, name: [root, key].join('.') });
+      } else if (result) {
+        obj.push({ ...result, name: key });
+      }
+    });
   } else if (typeof token === 'object') {
     let tokenToCheck = token;
     if (isSingleTokenValueObject(token) && typeof token.value !== 'string') {
