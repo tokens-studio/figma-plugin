@@ -1,6 +1,7 @@
 import { TokenTypes } from '@/constants/TokenTypes';
 import { AnyTokenList, SingleToken } from '@/types/tokens';
 import { isSingleBoxShadowToken, isSingleTokenValueObject, isSingleTypographyToken } from './is';
+import { isTokenGroupWithTypeOfGroupLevel } from './is/isTokenGroupWithTypeOfGroupLevel';
 
 type Tokens = AnyTokenList | Record<string, Partial<Record<TokenTypes, Record<string, SingleToken<false>>>>>;
 
@@ -46,6 +47,7 @@ function checkForTokens({
       delete returnValue.value.description;
       returnValue.description = token.description;
     }
+  } else if (typeof token === 'object' && isTokenGroupWithTypeOfGroupLevel(token)) {
   } else if (typeof token === 'object') {
     let tokenToCheck = token;
     if (isSingleTokenValueObject(token) && typeof token.value !== 'string') {
@@ -60,6 +62,7 @@ function checkForTokens({
         expandTypography,
         expandShadow,
       });
+      console.log('result', result);
       if (root && result) {
         obj.push({ ...result, name: [root, key].join('.') });
       } else if (result) {
