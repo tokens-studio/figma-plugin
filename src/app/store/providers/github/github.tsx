@@ -19,6 +19,7 @@ import { useFlags } from '@/app/components/LaunchDarkly';
 import { RemoteResponseData } from '@/types/RemoteResponseData';
 import { RemoteTokenStorageData } from '@/storage/RemoteTokenStorage';
 import { GitStorageMetadata } from '@/storage/GitTokenStorage';
+import { ErrorMessages } from '@/constants/ErrorMessages';
 
 type GithubCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.GITHUB | StorageProviderType.GITLAB; }>;
 type GithubFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.GITHUB | StorageProviderType.GITLAB }>;
@@ -161,7 +162,7 @@ export function useGitHub() {
       dispatch.branchState.setBranches(hasBranches);
       if (!hasBranches || !hasBranches.length) {
         return {
-          errorMessage: 'There is no branch',
+          errorMessage: ErrorMessages.EMPTY_BRNACH_ERROR,
         };
       }
 
@@ -193,13 +194,13 @@ export function useGitHub() {
       const pushData = await pushTokensToGitHub(context);
       return {
         ...pushData,
-        ...(pushData === null ? { errorMessage: 'Error syncing with GitHub, check credentials' } : {}),
+        ...(pushData === null ? { errorMessage: ErrorMessages.GITHUB_CREDNETIAL_ERROR } : {}),
       };
     } catch (e) {
-      notifyToUI('Error syncing with GitHub, check credentials', { error: true });
+      notifyToUI(ErrorMessages.GITHUB_CREDNETIAL_ERROR, { error: true });
       console.log('Error', e);
       return {
-        errorMessage: 'Error syncing with GitHub, check credentials',
+        errorMessage: ErrorMessages.GITHUB_CREDNETIAL_ERROR,
       };
     }
   }, [

@@ -19,6 +19,7 @@ import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StorageTypeCredentials, StorageTypeFormValues } from '@/types/StorageType';
 import { RemoteResponseData } from '@/types/RemoteResponseData';
+import { ErrorMessages } from '@/constants/ErrorMessages';
 
 type PullTokensOptions = {
   context?: StorageTypeCredentials,
@@ -197,8 +198,8 @@ export default function useRemoteTokens() {
         const pullData = await pullTokensFromURL(credentials);
         data = {
           ...pullData,
-          ...(pullData === null ? {errorMessage: 'Error fetching from URL, check console (F12)'} : {}),
-        }
+          ...(pullData === null ? { errorMessage: ErrorMessages.URL_CREDNETIAL_ERROR } : {}),
+        };
         break;
       }
       default:

@@ -15,6 +15,7 @@ import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StorageTypeCredentials, StorageTypeFormValues } from '@/types/StorageType';
 import { RemoteResponseData } from '@/types/RemoteResponseData';
+import { ErrorMessages } from '@/constants/ErrorMessages';
 
 export async function updateJSONBinTokens({
   tokens, themes, context, updatedAt, oldUpdatedAt = null,
@@ -123,7 +124,7 @@ export function useJSONbin() {
       notifyToUI('No tokens stored on remote', { error: true });
       return null;
     } catch (e) {
-      notifyToUI('Error fetching from JSONbin, check console (F12)', { error: true });
+      notifyToUI(ErrorMessages.JSONBIN_CREDNETIAL_ERROR, { error: true });
       console.log('Error:', e);
       return null;
     }
@@ -166,7 +167,7 @@ export function useJSONbin() {
     }
     return {
       ...content,
-      ...(content === null ? { errorMessage: 'Error fetching from JSONbin, check console (F12)' } : {}),
+      ...(content === null ? { errorMessage: ErrorMessages.JSONBIN_CREDNETIAL_ERROR } : {}),
     };
   }, [
     dispatch,

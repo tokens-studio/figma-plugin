@@ -8,6 +8,7 @@ import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StorageTypeCredentials } from '@/types/StorageType';
 import { activeThemeSelector, usedTokenSetSelector } from '@/selectors';
+import { ErrorMessages } from '@/constants/ErrorMessages';
 
 type UrlCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.URL; }>;
 
@@ -58,7 +59,7 @@ export default function useURL() {
         notifyToUI('No tokens stored on remote', { error: true });
       }
     } catch (err) {
-      notifyToUI('Error fetching from URL, check console (F12)', { error: true });
+      notifyToUI(ErrorMessages.URL_CREDNETIAL_ERROR, { error: true });
       console.log('Error:', err);
     }
 

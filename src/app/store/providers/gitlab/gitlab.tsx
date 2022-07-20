@@ -18,6 +18,7 @@ import { StorageProviderType } from '@/constants/StorageProviderType';
 import { useFlags } from '@/app/components/LaunchDarkly';
 import { getRepositoryInformation } from '../getRepositoryInformation';
 import { RemoteResponseData } from '@/types/RemoteResponseData';
+import { ErrorMessages } from '@/constants/ErrorMessages';
 
 type GitlabCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.GITHUB | StorageProviderType.GITLAB; }>;
 type GitlabFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.GITHUB | StorageProviderType.GITLAB }>;
@@ -154,7 +155,7 @@ export function useGitLab() {
 
       if (!hasBranches || !hasBranches.length) {
         return {
-          errorMessage: 'There is no branch',
+          errorMessage: ErrorMessages.EMPTY_BRNACH_ERROR,
         };
       }
 
@@ -185,13 +186,13 @@ export function useGitLab() {
       const pushData = await pushTokensToGitLab(context);
       return {
         ...pushData,
-        ...(pushData === null ? { errorMessage: 'Error syncing with GitLab, check credentials' } : {}),
+        ...(pushData === null ? { errorMessage: ErrorMessages.GITLAB_CREDNETIAL_ERROR } : {}),
       };
     } catch (err) {
-      notifyToUI('Error syncing with GitLab, check credentials', { error: true });
+      notifyToUI(ErrorMessages.GITLAB_CREDNETIAL_ERROR, { error: true });
       console.log('Error', err);
       return {
-        errorMessage: 'Error syncing with GitLab, check credentials',
+        errorMessage: ErrorMessages.GITLAB_CREDNETIAL_ERROR,
       };
     }
   }, [

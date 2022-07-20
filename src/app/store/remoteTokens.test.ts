@@ -8,6 +8,7 @@ import {
   tokensSelector,
 } from '@/selectors';
 import { notifyToUI } from '@/plugin/notifiers';
+import { ErrorMessages } from '@/constants/ErrorMessages';
 
 const mockStartJob = jest.fn();
 const mockRetrieve = jest.fn();
@@ -405,11 +406,11 @@ describe('remoteTokens', () => {
         ));
         if (context === urlContext) {
           expect(await result.current.addNewProviderItem(context as StorageTypeCredentials)).toEqual({
-            errorMessage: 'Error fetching from URL, check console (F12)',
+            errorMessage: ErrorMessages.URL_CREDNETIAL_ERROR,
           });
         } else {
           expect(await result.current.addNewProviderItem(context as StorageTypeCredentials)).toEqual({
-            errorMessage: 'Error fetching from JSONbin, check console (F12)',
+            errorMessage: ErrorMessages.JSONBIN_CREDNETIAL_ERROR,
           });
         }
       });
@@ -490,11 +491,11 @@ describe('remoteTokens', () => {
         ));
         if (context === urlContext) {
           expect(await result.current.addNewProviderItem(context as StorageTypeCredentials)).toEqual({
-            errorMessage: 'Error fetching from URL, check console (F12)',
+            errorMessage: ErrorMessages.URL_CREDNETIAL_ERROR,
           });
         } else {
           expect(await result.current.addNewProviderItem(context as StorageTypeCredentials)).toEqual({
-            errorMessage: 'Error fetching from JSONbin, check console (F12)',
+            errorMessage: ErrorMessages.JSONBIN_CREDNETIAL_ERROR,
           });
         }
       });

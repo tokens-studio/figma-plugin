@@ -16,6 +16,7 @@ import { StorageTypeCredentials, StorageTypeFormValues } from '@/types/StorageTy
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { useFlags } from '@/app/components/LaunchDarkly';
 import { RemoteResponseData } from '@/types/RemoteResponseData';
+import { ErrorMessages } from '@/constants/ErrorMessages';
 
 type AdoCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.ADO; }>;
 type AdoFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.ADO; }>;
@@ -153,7 +154,7 @@ export const useADO = () => {
       dispatch.branchState.setBranches(branches);
       if (branches.length === 0) {
         return {
-          errorMessage: 'There is no branch',
+          errorMessage: ErrorMessages.EMPTY_BRNACH_ERROR,
         };
       }
 
@@ -184,13 +185,13 @@ export const useADO = () => {
       const pushData = await pushTokensToADO(context);
       return {
         ...pushData,
-        ...(pushData === null ? { errorMessage: 'Error syncing with ADO, check credentials' } : {}),
+        ...(pushData === null ? { errorMessage: ErrorMessages.ADO_CREDNETIAL_ERROR } : {}),
       };
     } catch (e) {
-      notifyToUI('Error syncing with ADO, check credentials', { error: true });
+      notifyToUI(ErrorMessages.ADO_CREDNETIAL_ERROR, { error: true });
       console.log('Error', e);
       return {
-        errorMessage: 'Error syncing with ADO, check credentials',
+        errorMessage: ErrorMessages.ADO_CREDNETIAL_ERROR,
       };
     }
   }, [
