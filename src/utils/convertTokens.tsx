@@ -3,7 +3,7 @@ import { AnyTokenList, SingleToken } from '@/types/tokens';
 import { isSingleBoxShadowToken, isSingleTokenValueObject, isSingleTypographyToken } from './is';
 import { isTokenGroupWithTypeOfGroupLevel } from './is/isTokenGroupWithTypeOfGroupLevel';
 
-type Tokens = AnyTokenList | Record<string, Partial<Record<TokenTypes, Record<string, SingleToken<false>>>>>;
+type Tokens = AnyTokenList | Partial<Record<string, Partial<Record<TokenTypes, Record<string, SingleToken<false>>>>> | {type: string}>;
 
 // @TODO fix typings
 function checkForTokens({
@@ -31,6 +31,32 @@ function checkForTokens({
   const shouldExpandShadow = (expandShadow && 'value' in token) ? isSingleBoxShadowToken(token.value) : false;
   if (isSingleTokenValueObject(token) && !shouldExpandTypography && !shouldExpandShadow) {
     returnValue = token;
+  } else if (isTokenGroupWithTypeOfGroupLevel(token)) {
+    let {type, ...tokenToCheck} = token;
+    console.log("tokenTochekc", tokenToCheck)
+    // if (isSingleTokenValueObject(token) && typeof token.value !== 'string') {
+    //   tokenToCheck = token.value as typeof tokenToCheck;
+    //   console.log("yyyyy", tokenToCheck)
+    // }
+    Object.entries(tokenToCheck).forEach(([key, value]) => {
+      const [, result] = checkForTokens({
+        obj,
+        token: {
+          value: value.value,
+          type: type,
+        },
+        root: [root, key].filter((n) => n).join('.'),
+        returnValuesOnly,
+        expandTypography,
+        expandShadow,
+      });
+      console.log('result', result);
+      if (root && result) {
+        obj.push({ ...result, name: [root, key].join('.') });
+      } else if (result) {
+        obj.push({ ...result, name: key });
+      }
+    });
   } else if (
     (isSingleTypographyToken(token) && !expandTypography)
     || (isSingleBoxShadowToken(token) && !expandShadow)
@@ -47,32 +73,12 @@ function checkForTokens({
       delete returnValue.value.description;
       returnValue.description = token.description;
     }
-  } else if (isTokenGroupWithTypeOfGroupLevel(token)) {
-    let tokenToCheck = token;
-    if (isSingleTokenValueObject(token) && typeof token.value !== 'string') {
-      tokenToCheck = token.value as typeof tokenToCheck;
-    }
-    Object.entries(tokenToCheck).forEach(([key, value]) => {
-      const [, result] = checkForTokens({
-        obj,
-        token: value,
-        root: [root, key].filter((n) => n).join('.'),
-        returnValuesOnly,
-        expandTypography,
-        expandShadow,
-      });
-      console.log('result', result);
-      if (root && result) {
-        obj.push({ ...result, name: [root, key].join('.') });
-      } else if (result) {
-        obj.push({ ...result, name: key });
-      }
-    });
   } else if (typeof token === 'object') {
     let tokenToCheck = token;
     if (isSingleTokenValueObject(token) && typeof token.value !== 'string') {
       tokenToCheck = token.value as typeof tokenToCheck;
     }
+    console.log("44value", tokenToCheck)
     Object.entries(tokenToCheck).forEach(([key, value]) => {
       const [, result] = checkForTokens({
         obj,
