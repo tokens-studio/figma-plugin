@@ -1,4 +1,8 @@
-import { destructureCompositionToken, mapValuesToTokens, returnValueToLookFor } from './node';
+import { mockRootSetSharedPluginData } from '../../tests/__mocks__/figmaMock';
+import { StorageProviderType } from '@/constants/StorageProviderType';
+import {
+  destructureCompositionToken, mapValuesToTokens, returnValueToLookFor, saveStorageType,
+} from './node';
 
 const singleShadowToken = {
   type: 'boxShadow',
@@ -180,7 +184,7 @@ describe('mapValuesToTokens', () => {
 
 describe('destructureCompositionToken', () => {
   it('return properties in compositionToken', () => {
-    mappedTokens.map((token, index) => {
+    mappedTokens.forEach((token, index) => {
       expect(destructureCompositionToken(token)).toEqual(applyProperties[index]);
     });
   });
@@ -239,5 +243,23 @@ describe('returnValueToLookFor', () => {
     tokens.forEach((token) => {
       expect(returnValueToLookFor(token.key)).toEqual(token.output);
     });
+  });
+});
+
+describe('storage type', () => {
+  it('should save the storage type', () => {
+    const apiContext = {
+      id: 'gh',
+      internalId: 'gh',
+      provider: StorageProviderType.GITHUB,
+      branch: 'main',
+      filePath: 'data/tokens.json',
+      name: 'Github',
+      baseUrl: '',
+    };
+
+    saveStorageType(apiContext);
+
+    expect(mockRootSetSharedPluginData).toBeCalledWith('tokens', 'storageType', JSON.stringify(apiContext));
   });
 });

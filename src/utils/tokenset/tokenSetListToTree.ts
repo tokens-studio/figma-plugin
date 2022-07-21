@@ -38,14 +38,7 @@ export function tokenSetListToTree(items: string[]) {
     });
     return acc;
   }, []);
-  const sorted = tree.sort((a, b) => {
-    if (a.path < b.path) {
-      return -1;
-    }
-    if (a.path > b.path) {
-      return 1;
-    }
-    return 0;
-  });
-  return sorted;
+  // @README sorting used to happen here
+  // this logic has moved to where the tokensets are being pulled
+  return tree;
 }

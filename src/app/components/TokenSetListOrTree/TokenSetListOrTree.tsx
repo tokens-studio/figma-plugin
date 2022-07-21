@@ -36,7 +36,7 @@ export function TokenSetListOrTree<T extends TreeOrListItem>({
 
   const handleToggleCollapsed = useCallback((key: string) => {
     dispatch.tokenState.setCollapsedTokenSets(collapsed.includes(key) ? collapsed.filter((s) => s !== key) : [...collapsed, key]);
-  }, [collapsed]);
+  }, [dispatch, collapsed]);
 
   const mappedItems = useMemo(() => (
     items.filter((item) => (
