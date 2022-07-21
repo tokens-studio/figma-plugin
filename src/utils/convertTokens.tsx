@@ -3,7 +3,7 @@ import { AnyTokenList, SingleToken } from '@/types/tokens';
 import { isSingleBoxShadowToken, isSingleTokenValueObject, isSingleTypographyToken } from './is';
 import { isTokenGroupWithTypeOfGroupLevel } from './is/isTokenGroupWithTypeOfGroupLevel';
 
-type Tokens = AnyTokenList | Partial<Record<string, Partial<Record<TokenTypes, Record<string, SingleToken<false>>>>> | {type: string}>;
+type Tokens = AnyTokenList | Partial<Record<string, Partial<Record<TokenTypes, Record<string, SingleToken<false>>>>> | { type: string }>;
 
 // @TODO fix typings
 function checkForTokens({
@@ -48,25 +48,23 @@ function checkForTokens({
       returnValue.description = token.description;
     }
   } else if (isTokenGroupWithTypeOfGroupLevel(token)) {
-    let {type, ...tokenToCheck} = token;
-    console.log("tokenTochekc", tokenToCheck)
-    // if (isSingleTokenValueObject(token) && typeof token.value !== 'string') {
-    //   tokenToCheck = token.value as typeof tokenToCheck;
-    //   console.log("yyyyy", tokenToCheck)
-    // }
+    const { type, ...tokenWithOutType } = token;
+    let tokenToCheck = tokenWithOutType;
+    if (isSingleTokenValueObject(token) && typeof token.value !== 'string') {
+      tokenToCheck = token.value as typeof tokenToCheck;
+    }
     Object.entries(tokenToCheck).forEach(([key, value]) => {
       const [, result] = checkForTokens({
         obj,
         token: {
           value: value.value,
-          type: type,
+          type: value.type || type,
         },
         root: [root, key].filter((n) => n).join('.'),
         returnValuesOnly,
         expandTypography,
         expandShadow,
       });
-      console.log('result', result);
       if (root && result) {
         obj.push({ ...result, name: [root, key].join('.') });
       } else if (result) {
@@ -78,7 +76,6 @@ function checkForTokens({
     if (isSingleTokenValueObject(token) && typeof token.value !== 'string') {
       tokenToCheck = token.value as typeof tokenToCheck;
     }
-    console.log("44value", tokenToCheck)
     Object.entries(tokenToCheck).forEach(([key, value]) => {
       const [, result] = checkForTokens({
         obj,
@@ -88,7 +85,6 @@ function checkForTokens({
         expandTypography,
         expandShadow,
       });
-      console.log('result', result);
       if (root && result) {
         obj.push({ ...result, name: [root, key].join('.') });
       } else if (result) {
