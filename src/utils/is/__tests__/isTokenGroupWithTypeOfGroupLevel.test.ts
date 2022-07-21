@@ -1,8 +1,8 @@
 import { isTokenGroupWithTypeOfGroupLevel } from '../isTokenGroupWithTypeOfGroupLevel';
 
 describe('isTokenGroupWithTypeOfGroupLevel', () => {
-  it('should validate token group with type of group level', () => {
-    expect(isTokenGroupWithTypeOfGroupLevel({
+  const tokenGroupsWithType = [
+    {
       type: 'color',
       default: {
         value: 'colors.black',
@@ -10,8 +10,8 @@ describe('isTokenGroupWithTypeOfGroupLevel', () => {
       subtle: {
         value: 'colors.gray.500',
       },
-    })).toBe(true);
-    expect(isTokenGroupWithTypeOfGroupLevel({
+    },
+    {
       type: 'color',
       default: {
         value: 'colors.black',
@@ -20,8 +20,8 @@ describe('isTokenGroupWithTypeOfGroupLevel', () => {
         value: 'colors.gray.500',
         type: 'dimension',
       },
-    })).toBe(true);
-    expect(isTokenGroupWithTypeOfGroupLevel({
+    },
+    {
       type: 'color',
       value: {
         value: 'colors.black',
@@ -30,8 +30,8 @@ describe('isTokenGroupWithTypeOfGroupLevel', () => {
         value: 'colors.gray.500',
         type: 'dimension',
       },
-    })).toBe(true);
-    expect(isTokenGroupWithTypeOfGroupLevel({
+    },
+    {
       type: 'typography',
       value: {
         value: {
@@ -43,23 +43,23 @@ describe('isTokenGroupWithTypeOfGroupLevel', () => {
           fontFamily: 'aria',
         },
       },
-    })).toBe(true);
-  });
+    },
+  ];
 
-  it('should return false for token group with no type', () => {
-    expect(isTokenGroupWithTypeOfGroupLevel({
+  const tokenGroupsWithOutType = [
+    {
       default: {
         value: 'colors.black',
       },
       subtle: {
         value: 'colors.gray.500',
       },
-    })).toBe(false);
-    expect(isTokenGroupWithTypeOfGroupLevel({
+    },
+    {
       value: 'colors.gray.500',
       type: 'color',
-    })).toBe(false);
-    expect(isTokenGroupWithTypeOfGroupLevel({
+    },
+    {
       value: {
         fontFamily: 'Roboto',
       },
@@ -69,6 +69,18 @@ describe('isTokenGroupWithTypeOfGroupLevel', () => {
       type: {
         fontFamily: 'Roboto',
       },
-    })).toBe(false);
+    },
+  ];
+
+  it('should validate token group with type of group level', () => {
+    tokenGroupsWithType.forEach((item) => {
+      expect(isTokenGroupWithTypeOfGroupLevel(item)).toBe(true);
+    })
+  });
+
+  it('should return false for token group with no type', () => {
+    tokenGroupsWithOutType.forEach((item) => {
+      expect(isTokenGroupWithTypeOfGroupLevel(item)).toBe(false);
+    })
   });
 });
