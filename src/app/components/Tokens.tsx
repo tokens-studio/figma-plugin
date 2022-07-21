@@ -32,6 +32,7 @@ import { styled } from '@/stitches.config';
 import { ManageThemesModal } from './ManageThemesModal';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { UpdateMode } from '@/constants/UpdateMode';
+import stringifyTokens from '@/utils/stringifyTokens';
 
 const StyledButton = styled('button', {
   '&:focus, &:hover': {
@@ -166,6 +167,10 @@ function Tokens({ isActive }: { isActive: boolean }) {
 
   const handleSaveJSON = React.useCallback(() => {
     dispatch.tokenState.setJSONData(stringTokens);
+    const parsedTokens = parseJson(stringTokens);
+    const tokenValues = parseTokenValues({ [activeTokenSet]: parsedTokens });
+    const tokenString = stringifyTokens(tokenValues, activeTokenSet);
+    setStringTokens(tokenString);
   }, [dispatch.tokenState, stringTokens]);
 
   const handleToggleTokenSetsVisibility = React.useCallback(() => {
