@@ -1,5 +1,6 @@
 /* eslint-disable import/prefer-default-export */
 import { createModel } from '@rematch/core';
+import extend from 'just-extend';
 import * as tokenStateReducers from './reducers/tokenState';
 import * as tokenStateEffects from './effects/tokenState';
 
@@ -146,8 +147,13 @@ export const tokenState = createModel<RootModel>()({
       }
 
       const newName = `${name}_Copy`;
-
-      return updateTokenSetsInState(state, null, [newName, state.tokens[name]]);
+      return updateTokenSetsInState(
+        state,
+        null,
+        [newName, state.tokens[name].map((token) => (
+          extend(true, {}, token) as typeof token
+        ))],
+      );
     },
     deleteTokenSet: (state, name: string) => updateTokenSetsInState(
       state,
@@ -342,38 +348,36 @@ export const tokenState = createModel<RootModel>()({
 
     renameTokenGroup: (state, data: RenameTokenGroupPayload) => {
       const {
-        path, oldName, newName, type,
+        path, oldName, newName, type, parent,
       } = data;
 
-      const tokenSetsList = Object.keys(state.usedTokenSet);
-      const newTokenGroupState = tokenSetsList.map((tokenSets) => {
-        const newTokenGroups = state.tokens[tokenSets].map((token) => {
-          if (token.name.startsWith(`${path}${oldName}.`) && token.type === type) {
-            const { name, ...rest } = token;
-            const newTokenName = name.replace(`${path}${oldName}`, `${path}${newName}`);
-            return {
-              ...rest,
-              name: newTokenName,
-            };
-          }
-          if (token.value.toString().startsWith(`{${path}${oldName}.`)) {
-            const { value, ...rest } = token;
-            const updatedNewTokenValue = value.toString().replace(`${path}${oldName}`, `${path}${newName}`);
-            return {
-              ...rest,
-              value: updatedNewTokenValue,
-            };
-          }
-          return token;
-        });
-        return {
-          [tokenSets]: newTokenGroups,
-        };
-      });
+      const tokensInParent = state.tokens[parent] ?? [];
+      const renamedTokensInParent = tokensInParent.map((token) => {
+        if (token.name.startsWith(`${path}${oldName}.`) && token.type === type) {
+          const { name, ...rest } = token;
+          const newTokenName = name.replace(`${path}${oldName}`, `${path}${newName}`);
+          return {
+            ...rest,
+            name: newTokenName,
+          };
+        }
+        if (token.value.toString().startsWith(`{${path}${oldName}.`)) {
+          const { value, ...rest } = token;
+          const updatedNewTokenValue = value.toString().replace(`${path}${oldName}`, `${path}${newName}`);
+          return {
+            ...rest,
+            value: updatedNewTokenValue,
+          };
+        }
+        return token;
+      }) as AnyTokenList;
 
       const newState = {
         ...state,
-        tokens: newTokenGroupState.reduce((acc, cur) => ({ ...acc, ...cur }), {}),
+        tokens: {
+          ...state.tokens,
+          [parent]: renamedTokensInParent,
+        },
       };
       return newState as TokenState;
     },
