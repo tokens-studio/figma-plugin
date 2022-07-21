@@ -49,10 +49,7 @@ function checkForTokens({
     }
   } else if (isTokenGroupWithTypeOfGroupLevel(token)) {
     const { type, ...tokenWithOutType } = token;
-    let tokenToCheck = tokenWithOutType;
-    if (isSingleTokenValueObject(token) && typeof token.value !== 'string') {
-      tokenToCheck = token.value as typeof tokenToCheck;
-    }
+    const tokenToCheck = tokenWithOutType;
     Object.entries(tokenToCheck).forEach(([key, value]) => {
       const [, result] = checkForTokens({
         obj,
