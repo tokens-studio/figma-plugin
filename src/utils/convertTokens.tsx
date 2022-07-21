@@ -31,6 +31,22 @@ function checkForTokens({
   const shouldExpandShadow = (expandShadow && 'value' in token) ? isSingleBoxShadowToken(token.value) : false;
   if (isSingleTokenValueObject(token) && !shouldExpandTypography && !shouldExpandShadow) {
     returnValue = token;
+  } else if (
+    (isSingleTypographyToken(token) && !expandTypography)
+    || (isSingleBoxShadowToken(token) && !expandShadow)
+  ) {
+    returnValue = {
+      type: token.type,
+      value: Object.entries(token).reduce<Record<string, SingleToken['value']>>((acc, [key, val]) => {
+        acc[key] = isSingleTokenValueObject(val) && returnValuesOnly ? val.value : val;
+        return acc;
+      }, {}),
+    };
+
+    if (token.description) {
+      delete returnValue.value.description;
+      returnValue.description = token.description;
+    }
   } else if (isTokenGroupWithTypeOfGroupLevel(token)) {
     let {type, ...tokenToCheck} = token;
     console.log("tokenTochekc", tokenToCheck)
@@ -57,22 +73,6 @@ function checkForTokens({
         obj.push({ ...result, name: key });
       }
     });
-  } else if (
-    (isSingleTypographyToken(token) && !expandTypography)
-    || (isSingleBoxShadowToken(token) && !expandShadow)
-  ) {
-    returnValue = {
-      type: token.type,
-      value: Object.entries(token).reduce<Record<string, SingleToken['value']>>((acc, [key, val]) => {
-        acc[key] = isSingleTokenValueObject(val) && returnValuesOnly ? val.value : val;
-        return acc;
-      }, {}),
-    };
-
-    if (token.description) {
-      delete returnValue.value.description;
-      returnValue.description = token.description;
-    }
   } else if (typeof token === 'object') {
     let tokenToCheck = token;
     if (isSingleTokenValueObject(token) && typeof token.value !== 'string') {
