@@ -1,8 +1,6 @@
 import { Bitbucket } from 'bitbucket';
 import { RemoteTokenStorageFile } from './RemoteTokenStorage';
-import {
-  GitMultiFileObject, GitSingleFileObject, GitStorageMetadata, GitTokenStorage,
-} from './GitTokenStorage';
+import { GitStorageMetadata, GitTokenStorage } from './GitTokenStorage';
 
 type CreatedOrUpdatedFileType = {
   owner: string;
