@@ -69,8 +69,8 @@ export function pullTokensFactory(
             const remoteData = await useRemoteTokensResult.pullTokens({
               context: matchingSet,
               featureFlags: flags,
-              usedTokenSet: params.usedTokenSet,
               activeTheme: params.activeTheme,
+              usedTokenSet: params.localTokenData?.usedTokenSet,
             });
 
             const existTokens = hasTokenValues(remoteData?.tokens ?? {});

@@ -15,7 +15,10 @@ import { track } from '@/utils/analytics';
 import { withLDProviderWrapper } from '../LaunchDarkly';
 import { ApplicationInitSteps } from './ApplicationInitSteps';
 
-type Props = StartupMessage;
+type Props = StartupMessage & {
+  // @README only for unit testing purposes
+  startupProcess?: ReturnType<typeof useStartupProcess>
+};
 
 const applicationInitStepLabels = {
   [ApplicationInitSteps.SAVE_PLUGIN_DATA]: 'Receiving local data',

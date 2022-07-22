@@ -32,13 +32,15 @@ export async function startup() {
 
   return {
     settings,
-    usedTokenSet,
     activeTheme,
     lastOpened,
     storageType,
     localApiProviders,
     licenseKey,
-    localTokenData,
+    localTokenData: localTokenData ? {
+      ...localTokenData,
+      usedTokenSet,
+    } : null,
     user: figma.currentUser ? {
       userId,
       figmaId: figma.currentUser.id,
