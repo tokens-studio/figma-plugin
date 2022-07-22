@@ -48,7 +48,7 @@ describe('BitbucketTokenStorage', () => {
 
   it('canWrite should return true if user has admin or write permissions', async () => {
     mockGetAuthedUser.mockImplementationOnce(() => Promise.resolve({
-      currentUser: { data: { account_id: '' } },
+      data: { account_id: '123' },
     }));
     mockListPermissions.mockImplementationOnce(() => Promise.resolve({
       data: { values: [{ permission: 'admin' }] },
