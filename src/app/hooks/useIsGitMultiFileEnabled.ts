@@ -7,14 +7,11 @@ export function useIsGitMultiFileEnabled() {
   const api = useSelector(apiSelector);
 
   return useMemo(
-    () => Boolean(
-      multiFileSync
-          && (api?.provider === StorageProviderType.GITHUB
+    () => Boolean((api?.provider === StorageProviderType.GITHUB
             || api?.provider === StorageProviderType.GITLAB
             || api?.provider === StorageProviderType.ADO
             || api?.provider === StorageProviderType.BITBUCKET)
-          && !api?.filePath?.endsWith('.json'),
-    ),
-    [api, multiFileSync],
+          && !api?.filePath?.endsWith('.json')),
+    [api],
   );
 }
