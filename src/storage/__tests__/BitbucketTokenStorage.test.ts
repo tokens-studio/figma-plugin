@@ -1,5 +1,5 @@
-import { TokenTypes } from '@/constants/TokenTypes';
-import { TokenSetStatus } from '@/constants/TokenSetStatus';
+// import { TokenTypes } from '@/constants/TokenTypes';
+// import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { BitbucketTokenStorage } from '../BitbucketTokenStorage';
 
 const mockListBranches = jest.fn();
