@@ -59,6 +59,8 @@ export class BitbucketTokenStorage extends GitTokenStorage {
         repo_slug: this.repository,
         ref: originRef,
       });
+      console.log('originBranch', originBranch);
+      console.log('newRef', newRef);
       // TODO: createRef is not implemented on Bitbucket Cloud
       // const newBranch = await this.bitbucketClient.git.createRef({
       //   workspace: this.owner,
