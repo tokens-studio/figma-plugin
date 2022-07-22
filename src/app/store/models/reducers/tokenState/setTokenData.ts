@@ -4,6 +4,7 @@ import parseTokenValues from '@/utils/parseTokenValues';
 import type { TokenState } from '../../tokenState';
 
 export function setTokenData(state: TokenState, payload: SetTokenDataPayload): TokenState {
+  console.log(payload);
   const values = parseTokenValues(payload.values);
   const allAvailableTokenSets = Object.keys(values);
   const usedTokenSets = Object.fromEntries(

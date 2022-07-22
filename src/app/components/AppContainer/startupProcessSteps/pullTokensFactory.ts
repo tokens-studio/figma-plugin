@@ -11,6 +11,7 @@ import isSameCredentials from '@/utils/isSameCredentials';
 import { track } from '@/utils/analytics';
 import { notifyToUI } from '@/plugin/notifiers';
 import type useRemoteTokens from '@/app/store/remoteTokens';
+import { hasTokenValues } from '@/utils/hasTokenValues';
 
 export function pullTokensFactory(
   store: Store<RootState>,
@@ -30,58 +31,72 @@ export function pullTokensFactory(
   const getApiCredentials = async (shouldPull: boolean) => {
     const state = store.getState();
     const storageType = storageTypeSelector(state);
+    const isRemoteStorage = [
+      StorageProviderType.ADO,
+      StorageProviderType.GITHUB,
+      StorageProviderType.GITLAB,
+      StorageProviderType.JSONBIN,
+      StorageProviderType.URL,
+    ].includes(storageType.provider);
 
-    const matchingSet = params.localApiProviders?.find((provider) => (
-      isSameCredentials(provider, storageType)
-    ));
+    if (isRemoteStorage) {
+      const matchingSet = params.localApiProviders?.find((provider) => (
+        isSameCredentials(provider, storageType)
+      ));
 
-    if (matchingSet) {
-      // found API credentials
-      try {
-        track('Fetched from remote', { provider: matchingSet.provider });
-        if (!matchingSet.internalId) {
-          track('missingInternalId', { provider: matchingSet.provider });
-        }
-
-        if (
-          matchingSet.provider === StorageProviderType.GITHUB
-          || matchingSet.provider === StorageProviderType.GITLAB
-          || matchingSet.provider === StorageProviderType.ADO
-        ) {
-          const branches = await useRemoteTokensResult.fetchBranches(matchingSet);
-          if (branches) dispatch.branchState.setBranches(branches);
-        }
-
-        dispatch.uiState.setApiData(matchingSet);
-        dispatch.uiState.setLocalApiState(matchingSet);
-        dispatch.tokenState.setActiveTheme(params.activeTheme || null);
-
-        if (shouldPull) {
-          const remoteData = await useRemoteTokensResult.pullTokens({
-            context: matchingSet,
-            featureFlags: flags,
-            usedTokenSet: params.usedTokenSet,
-            activeTheme: params.activeTheme,
-          });
-
-          const existTokens = Object.values(remoteData?.tokens ?? {}).some((value) => value.length > 0);
-          if (existTokens) {
-            dispatch.uiState.setActiveTab(Tabs.TOKENS);
-          } else {
-            dispatch.uiState.setActiveTab(Tabs.START);
+      if (matchingSet) {
+        // found API credentials
+        try {
+          track('Fetched from remote', { provider: matchingSet.provider });
+          if (!matchingSet.internalId) {
+            track('missingInternalId', { provider: matchingSet.provider });
           }
-        } else {
-          dispatch.uiState.setActiveTab(Tabs.TOKENS);
+
+          if (
+            matchingSet.provider === StorageProviderType.GITHUB
+            || matchingSet.provider === StorageProviderType.GITLAB
+            || matchingSet.provider === StorageProviderType.ADO
+          ) {
+            const branches = await useRemoteTokensResult.fetchBranches(matchingSet);
+            if (branches) dispatch.branchState.setBranches(branches);
+          }
+
+          dispatch.uiState.setApiData(matchingSet);
+          dispatch.uiState.setLocalApiState(matchingSet);
+          dispatch.tokenState.setActiveTheme(params.activeTheme || null);
+
+          if (shouldPull) {
+            const remoteData = await useRemoteTokensResult.pullTokens({
+              context: matchingSet,
+              featureFlags: flags,
+              usedTokenSet: params.usedTokenSet,
+              activeTheme: params.activeTheme,
+            });
+
+            const existTokens = hasTokenValues(remoteData?.tokens ?? {});
+            if (existTokens) {
+              dispatch.uiState.setActiveTab(Tabs.TOKENS);
+            } else {
+              dispatch.uiState.setActiveTab(Tabs.START);
+            }
+          } else {
+            dispatch.uiState.setActiveTab(Tabs.TOKENS);
+          }
+        } catch (err) {
+          console.error(err);
+          Sentry.captureException(err);
+          dispatch.uiState.setActiveTab(Tabs.START);
+          notifyToUI('Failed to fetch tokens, check your credentials', { error: true });
         }
-      } catch (err) {
-        console.error(err);
-        Sentry.captureException(err);
+      } else {
+        // no API credentials available for storage type
         dispatch.uiState.setActiveTab(Tabs.START);
-        notifyToUI('Failed to fetch tokens, check your credentials', { error: true });
       }
-    } else {
-      // no API credentials available for storage type
-      dispatch.uiState.setActiveTab(Tabs.START);
+    } else if (params.localTokenData) {
+      dispatch.tokenState.setTokenData(params.localTokenData);
+      const existTokens = hasTokenValues(params.localTokenData.values);
+      if (existTokens) dispatch.uiState.setActiveTab(Tabs.TOKENS);
+      else dispatch.uiState.setActiveTab(Tabs.START);
     }
   };
 
