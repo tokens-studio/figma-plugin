@@ -89,13 +89,14 @@ export function pullTokensFactory(
     const state = store.getState();
 
     if (params.localTokenData) {
-      const existChanges = params.localTokenData.checkForChanges ?? false;
+      const checkForChanges = params.localTokenData.checkForChanges ?? false;
       const storageType = storageTypeSelector(state);
+
       if (
-        !existChanges
+        !checkForChanges
         || (
           (storageType && storageType.provider !== StorageProviderType.LOCAL)
-          && existChanges && await askUserIfPull(storageType.provider)
+          && checkForChanges && await askUserIfPull(storageType.provider)
         )
       ) {
         // get API credentials
