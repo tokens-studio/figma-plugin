@@ -34,11 +34,15 @@ export async function startup() {
     settings,
     usedTokenSet,
     activeTheme,
-    userId,
     lastOpened,
     storageType,
     localApiProviders,
     licenseKey,
     localTokenData,
+    user: figma.currentUser ? {
+      userId,
+      figmaId: figma.currentUser.id,
+      name: figma.currentUser.name,
+    } : null,
   };
 }

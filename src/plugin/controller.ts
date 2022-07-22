@@ -45,8 +45,8 @@ figma.on('selectionchange', () => {
 startup().then(async (params) => {
   figma.showUI(__html__, {
     themeColors: true,
-    width: DefaultWindowSize.width,
-    height: DefaultWindowSize.height,
+    width: params.settings.width ?? DefaultWindowSize.width,
+    height: params.settings.height ?? DefaultWindowSize.height,
   });
 
   await AsyncMessageChannel.PluginInstance.message({

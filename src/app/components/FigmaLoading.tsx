@@ -23,10 +23,13 @@ const StyledLoadingButton = styled('button', {
 
 type Props = PropsWithChildren<{
   isLoading?: boolean
+  label?: string
   onCancel?: () => void
 }>;
 
-export default function FigmaLoading({ isLoading, children, onCancel }: Props) {
+export default function FigmaLoading({
+  isLoading, label, onCancel, children,
+}: Props) {
   if (!isLoading) {
     return (
       <Box>
@@ -50,7 +53,7 @@ export default function FigmaLoading({ isLoading, children, onCancel }: Props) {
         <Stack direction="row" gap={4} justify="center" align="center">
           <Spinner inverse />
           <Stack direction="column" gap={4} justify="center" align="center">
-            Loading, please wait.
+            {label ?? 'Loading, please wait.'}
           </Stack>
         </Stack>
         <Stack direction="row" gap={4}>

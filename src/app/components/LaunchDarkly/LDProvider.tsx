@@ -22,3 +22,11 @@ export const LDProviderWrapper = ({ children }: LDProviderProps) => {
   }
   return children;
 };
+
+export function withLDProviderWrapper<P>(Component: React.ComponentType<P>) {
+  return (props: P) => (
+    <LDProviderWrapper>
+      <Component {...props} />
+    </LDProviderWrapper>
+  );
+}

@@ -260,9 +260,12 @@ export function Initiator() {
 
   useEffect(() => {
     async function getLicense() {
-      const { key } = await getLicenseKey(userId);
-      if (key) {
-        dispatch.userState.addLicenseKey({ key, source: AddLicenseSource.INITAL_LOAD });
+      const result = await getLicenseKey(userId);
+      if ('key' in result && result.key) {
+        dispatch.userState.addLicenseKey({
+          key: result.key,
+          source: AddLicenseSource.INITAL_LOAD,
+        });
       } else {
         dispatch.userState.setLicenseStatus(LicenseStatus.NO_LICENSE);
       }
