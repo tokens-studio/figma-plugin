@@ -18,7 +18,7 @@ export default function useStorage() {
     shouldSetInDocument = false,
   }: SetStorageTypeOptions) => {
     if (shouldSetInDocument) {
-      AsyncMessageChannel.message({
+      AsyncMessageChannel.ReactInstance.message({
         type: AsyncMessageTypes.SET_STORAGE_TYPE,
         storageType: provider,
       });

@@ -88,6 +88,7 @@ interface DownShiftProps {
   inlineLabel?: boolean;
   error?: string;
   value?: string;
+  initialName?: string;
   placeholder?: string;
   prefix?: React.ReactNode;
   suffix?: boolean;
@@ -103,6 +104,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
   inlineLabel = false,
   error,
   value,
+  initialName,
   prefix,
   suffix,
   placeholder,
@@ -138,7 +140,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
       .filter(
         (token: SingleToken) => !filteredValue || token.name.toLowerCase().includes(filteredValue.toLowerCase()),
       )
-      .filter((token: SingleToken) => token?.type === type),
+      .filter((token: SingleToken) => token?.type === type && token.name !== initialName),
     [resolvedTokens, filteredValue, type],
   );
 
@@ -161,7 +163,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
       returnValue = Object.entries(token.value).reduce<string>((acc, [property, value]) => (
         `${acc}${property}:${value}`
       ), '');
-    } else if (typeof token.value === 'string') {
+    } else if (typeof token.value === 'string' || typeof token.value === 'number') {
       returnValue = token.value;
     }
     return returnValue;
@@ -217,12 +219,14 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
               <StyledDropdown className="content scroll-container">
                 {filteredTokenItems.map((token: SingleToken, index: number) => (
                   <StyledItem
+                    data-cy="downshift-input-item"
                     className="dropdown-item"
                     {...getItemProps({ key: token.name, index, item: token })}
                     css={{
                       backgroundColor: highlightedIndex === index ? '$interaction' : '$bgDefault',
                     }}
                     isFocused={highlightedIndex === index}
+
                   >
                     {type === 'color' && (
                     <StyledItemColorDiv>

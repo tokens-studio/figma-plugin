@@ -31,6 +31,7 @@ const mockSetShowConfirm = jest.fn();
 const mockPushDialog = jest.fn();
 const mockCreateBranch = jest.fn();
 const mockSave = jest.fn();
+const mockSetCollapsedTokenSets = jest.fn();
 
 const mockSelector = (selector: Selector) => {
   switch (selector) {
@@ -74,6 +75,7 @@ jest.mock('react-redux', () => ({
       setLastSyncedState: mockSetLastSyncedState,
       setTokenData: mockSetTokenData,
       setEditProhibited: mockSetEditProhibited,
+      setCollapsedTokenSets: mockSetCollapsedTokenSets,
     },
     branchState: {
       setBranches: mockSetBranches,
@@ -200,6 +202,7 @@ const contexts = [gitHubContext, gitLabContext, jsonbinContext, adoContext, urlC
 const contextNames = ['GitHub', 'GitLab', 'jsonbin', 'ADO', 'url'];
 describe('remoteTokens', () => {
   let { result } = renderHook(() => useRemoteTokens());
+
   beforeEach(() => {
     result = renderHook(() => useRemoteTokens()).result;
     mockRetrieve.mockImplementation(() => (
@@ -230,6 +233,7 @@ describe('remoteTokens', () => {
       )
     ));
   });
+
   afterEach(() => {
     jest.clearAllMocks();
   });

@@ -17,6 +17,8 @@ import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { StorageTypeCredentials, StorageTypeFormValues } from '@/types/StorageType';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { useFlags } from '@/app/components/LaunchDarkly';
+import { applyTokenSetOrder } from '@/utils/tokenset';
+import { saveLastSyncedState } from '@/utils/saveLastSyncedState';
 
 type AdoCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.ADO; }>;
 type AdoFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.ADO; }>;
@@ -26,7 +28,7 @@ export const useADO = () => {
   const themes = useSelector(themesListSelector);
   const localApiState = useSelector(localApiStateSelector);
   const activeTheme = useSelector(activeThemeSelector);
-  const usedTokenSets = useSelector(usedTokenSetSelector);
+  const usedTokenSet = useSelector(usedTokenSetSelector);
   const dispatch = useDispatch<Dispatch>();
   const { multiFileSync } = useFlags();
   const { confirm } = useConfirm();
@@ -45,7 +47,7 @@ export const useADO = () => {
       text: 'Pull from Ado?',
       description: 'Your repo already contains tokens, do you want to pull these now?',
     });
-    return confirmResult
+    return confirmResult;
   }, [confirm]);
 
   const pushTokensToADO = React.useCallback(async (context: AdoCredentials) => {
@@ -59,12 +61,12 @@ export const useADO = () => {
       content
       && isEqual(content.tokens, tokens)
       && isEqual(content.themes, themes)
+      && isEqual(content.metadata?.tokenSetOrder ?? Object.keys(tokens), Object.keys(tokens))
     ) {
       notifyToUI('Nothing to commit');
       return {
         tokens,
         themes,
-        metadata: {},
       };
     }
 
@@ -75,21 +77,32 @@ export const useADO = () => {
       const { commitMessage, customBranch } = pushSettings;
       try {
         if (customBranch) storage.selectBranch(customBranch);
+        const metadata = {
+          tokenSetOrder: Object.keys(tokens),
+        };
         await storage.save({
           themes,
           tokens,
-          metadata: { commitMessage },
+          metadata,
+        }, {
+          commitMessage,
         });
 
+        saveLastSyncedState(dispatch, tokens, themes, metadata);
         dispatch.uiState.setLocalApiState({ ...localApiState, branch: customBranch } as AdoCredentials);
         dispatch.uiState.setApiData({ ...context, branch: customBranch });
+        dispatch.tokenState.setTokenData({
+          values: tokens,
+          themes,
+          usedTokenSet,
+          activeTheme,
+        });
 
         pushDialog('success');
 
         return {
           tokens,
           themes,
-          metadata: { commitMessage },
         };
       } catch (e) {
         console.log('Error pushing to ADO', e);
@@ -99,7 +112,6 @@ export const useADO = () => {
     return {
       tokens,
       themes,
-      metadata: {},
     };
   }, [
     dispatch,
@@ -110,23 +122,31 @@ export const useADO = () => {
     localApiState,
   ]);
 
-  const checkAndSetAccess = React.useCallback(async (context: AdoCredentials) => {
+  const checkAndSetAccess = React.useCallback(async (context: AdoCredentials, receivedFeatureFlags?: LDProps['flags']) => {
     const storage = storageClientFactory(context);
+    if (receivedFeatureFlags?.multiFileSync) storage.enableMultiFile();
     const hasWriteAccess = await storage.canWrite();
     dispatch.tokenState.setEditProhibited(!hasWriteAccess);
   }, [dispatch, storageClientFactory]);
 
   const pullTokensFromADO = React.useCallback(async (context: AdoCredentials, receivedFeatureFlags?: LDProps['flags']) => {
     const storage = storageClientFactory(context);
+    if (context.branch) {
+      storage.setSource(context.branch);
+    }
     if (receivedFeatureFlags?.multiFileSync) storage.enableMultiFile();
 
-    await checkAndSetAccess(context);
+    await checkAndSetAccess(context, receivedFeatureFlags);
 
     try {
       const content = await storage.retrieve();
 
       if (content) {
-        return content;
+        const sortedTokens = applyTokenSetOrder(content.tokens, content.metadata?.tokenSetOrder ?? []);
+        return {
+          ...content,
+          tokens: sortedTokens,
+        };
       }
     } catch (e) {
       console.log('Error', e);
@@ -154,16 +174,19 @@ export const useADO = () => {
         if (
           !isEqual(content.tokens, tokens)
           || !isEqual(content.themes, themes)
+          || !isEqual(content.metadata?.tokenSetOrder ?? Object.keys(tokens), Object.keys(tokens))
         ) {
           const userDecision = await askUserIfPull();
           if (userDecision) {
-            dispatch.tokenState.setLastSyncedState(JSON.stringify([content.tokens, content.themes], null, 2));
+            const sortedValues = applyTokenSetOrder(content.tokens, content.metadata?.tokenSetOrder);
+            saveLastSyncedState(dispatch, sortedValues, content.themes, content.metadata);
             dispatch.tokenState.setTokenData({
-              values: content.tokens,
+              values: sortedValues,
               themes: content.themes,
-              usedTokenSet: usedTokenSets,
+              usedTokenSet,
               activeTheme,
             });
+            dispatch.tokenState.setCollapsedTokenSets([]);
             notifyToUI('Pulled tokens from ADO');
           }
         }
@@ -184,7 +207,7 @@ export const useADO = () => {
     themes,
     tokens,
     activeTheme,
-    usedTokenSets,
+    usedTokenSet,
     checkAndSetAccess,
   ]);
 
@@ -193,7 +216,7 @@ export const useADO = () => {
       const data = await syncTokensWithADO(context);
 
       if (data) {
-        AsyncMessageChannel.message({
+        AsyncMessageChannel.ReactInstance.message({
           type: AsyncMessageTypes.CREDENTIALS,
           credential: context,
         });
@@ -214,7 +237,7 @@ export const useADO = () => {
       dispatch,
       tokens,
       themes,
-      usedTokenSets,
+      usedTokenSet,
       activeTheme,
       syncTokensWithADO,
     ],

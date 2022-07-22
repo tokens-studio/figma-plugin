@@ -18,7 +18,11 @@ function getReturnedValue(token: SingleToken | string | number) {
   return token.toString();
 }
 
-function replaceAliasWithResolvedReference(token: string | TokenTypograpyValue | TokenBoxshadowValue | TokenBoxshadowValue[] | null, reference: string, resolvedReference: string | number | object | null) {
+function replaceAliasWithResolvedReference(
+  token: string | TokenTypograpyValue | TokenBoxshadowValue | TokenBoxshadowValue[] | null,
+  reference: string,
+  resolvedReference: string | number | TokenBoxshadowValue | TokenBoxshadowValue[] | Record<string, unknown> | null,
+) {
   if (typeof resolvedReference === 'object') {
     return resolvedReference;
   }
@@ -34,9 +38,7 @@ function replaceAliasWithResolvedReference(token: string | TokenTypograpyValue |
 export function getAliasValue(token: SingleToken | string | number, tokens: SingleToken[] = []): string | number | TokenTypograpyValue | TokenBoxshadowValue | Array<TokenBoxshadowValue> | null {
   // @TODO not sure how this will handle typography and boxShadow values. I don't believe it works.
   // The logic was copied from the original function in aliases.tsx
-
   let returnedValue: ReturnType<typeof getReturnedValue> | null = getReturnedValue(token);
-
   try {
     const tokenReferences = typeof returnedValue === 'string' ? findReferences(returnedValue) : null;
 
@@ -101,7 +103,6 @@ export function getAliasValue(token: SingleToken | string | number, tokens: Sing
         returnedValue = null;
       }
     }
-
     if (returnedValue && typeof returnedValue === 'string') {
       const remainingReferences = findReferences(returnedValue);
       if (!remainingReferences) {

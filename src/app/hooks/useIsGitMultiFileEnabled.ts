@@ -1,12 +1,10 @@
 import { useSelector } from 'react-redux';
 import { useMemo } from 'react';
-import { useFlags } from 'launchdarkly-react-client-sdk';
 import { apiSelector } from '@/selectors';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 
 export function useIsGitMultiFileEnabled() {
   const api = useSelector(apiSelector);
-  const { multiFileSync } = useFlags();
 
   return useMemo(
     () => Boolean(

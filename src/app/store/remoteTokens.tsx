@@ -10,6 +10,7 @@ import { useGitHub } from './providers/github';
 import { useBitbucket } from './providers/bitbucket';
 import { useGitLab } from './providers/gitlab';
 import { useADO } from './providers/ado';
+import useFile from '@/app/store/providers/file';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
 import { apiSelector } from '@/selectors';
 import { UsedTokenSetsMap } from '@/types';
@@ -18,6 +19,7 @@ import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StorageTypeCredentials, StorageTypeFormValues } from '@/types/StorageType';
+import { saveLastSyncedState } from '@/utils/saveLastSyncedState';
 
 type PullTokensOptions = {
   context?: StorageTypeCredentials,
@@ -67,15 +69,17 @@ export default function useRemoteTokens() {
     fetchADOBranches,
   } = useADO();
   const { pullTokensFromURL } = useURL();
+  const { readTokensFromFileOrDirectory } = useFile();
 
-  const pullTokens = useCallback(async ({
-    context = api, featureFlags, usedTokenSet, activeTheme,
-  }: PullTokensOptions) => {
-    track('pullTokens', { provider: context.provider });
-    dispatch.uiState.startJob({
-      name: BackgroundJobs.UI_PULLTOKENS,
-      isInfinite: true,
-    });
+  const pullTokens = useCallback(
+    async ({
+      context = api, featureFlags, usedTokenSet, activeTheme,
+    }: PullTokensOptions) => {
+      track('pullTokens', { provider: context.provider });
+      dispatch.uiState.startJob({
+        name: BackgroundJobs.UI_PULLTOKENS,
+        isInfinite: true,
+      });
 
       let remoteData: RemoteTokenStorageData<unknown> | null = null;
       switch (context.provider) {
@@ -310,22 +314,55 @@ export default function useRemoteTokens() {
   );
 
   const deleteProvider = useCallback((provider) => {
-    AsyncMessageChannel.message({
+    AsyncMessageChannel.ReactInstance.message({
       type: AsyncMessageTypes.REMOVE_SINGLE_CREDENTIAL,
       context: provider,
     });
   }, []);
 
-  return useMemo(
-    () => ({
-      restoreStoredProvider,
-      deleteProvider,
-      pullTokens,
-      pushTokens,
-      addNewProviderItem,
-      fetchBranches,
-      addNewBranch,
-    }),
-    [restoreStoredProvider, deleteProvider, pullTokens, pushTokens, addNewProviderItem, fetchBranches, addNewBranch],
-  );
+  const fetchTokensFromFileOrDirectory = useCallback(async (files: FileList | null) => {
+    track('fetchTokensFromFileOrDirectory');
+    dispatch.uiState.startJob({ name: BackgroundJobs.UI_FETCHTOKENSFROMFILE });
+
+    let remoteData: RemoteTokenStorageData<unknown> | null = null;
+    if (files) {
+      remoteData = await readTokensFromFileOrDirectory(files);
+      if (remoteData) {
+        dispatch.tokenState.setTokenData({
+          values: remoteData.tokens,
+          themes: remoteData.themes,
+        });
+        track('Launched with token sets', {
+          count: Object.keys(remoteData.tokens).length,
+          setNames: Object.keys(remoteData.tokens),
+        });
+      }
+    }
+
+    dispatch.uiState.completeJob(BackgroundJobs.UI_FETCHTOKENSFROMFILE);
+    return remoteData;
+  }, [
+    dispatch,
+    readTokensFromFileOrDirectory,
+  ]);
+
+  return useMemo(() => ({
+    restoreStoredProvider,
+    deleteProvider,
+    pullTokens,
+    pushTokens,
+    addNewProviderItem,
+    fetchBranches,
+    addNewBranch,
+    fetchTokensFromFileOrDirectory,
+  }), [
+    restoreStoredProvider,
+    deleteProvider,
+    pullTokens,
+    pushTokens,
+    addNewProviderItem,
+    fetchBranches,
+    addNewBranch,
+    fetchTokensFromFileOrDirectory,
+  ]);
 }

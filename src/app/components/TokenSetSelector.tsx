@@ -25,7 +25,7 @@ const StyledButton = styled('button', {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
-  padding: '$3 $4',
+  padding: '$3 $4 $3 $5',
   gap: '$2',
   '&:focus, &:hover': {
     outline: 'none',
@@ -34,7 +34,7 @@ const StyledButton = styled('button', {
   },
 });
 
-export default function TokenSetSelector() {
+export default function TokenSetSelector({ saveScrollPositionSet } : { saveScrollPositionSet: (tokenSet: string) => void }) {
   const tokens = useSelector(tokensSelector);
   const editProhibited = useSelector(editProhibitedSelector);
   const mfsEnabled = useIsGitMultiFileEnabled();
@@ -47,6 +47,14 @@ export default function TokenSetSelector() {
   const [tokenSetMarkedForChange, setTokenSetMarkedForChange] = React.useState('');
   const [allTokenSets, setAllTokenSets] = React.useState(Object.keys(tokens));
   const tokenKeys = Object.keys(tokens).join(',');
+
+  React.useEffect(() => {
+    const scollPositionSet = allTokenSets.reduce<Record<string, number>>((acc, crr) => {
+      acc[crr] = 0;
+      return acc;
+    }, {});
+    dispatch.uiState.setScrollPositionSet(scollPositionSet);
+  }, [allTokenSets, dispatch]);
 
   React.useEffect(() => {
     setAllTokenSets(Object.keys(tokens));
@@ -137,14 +145,14 @@ export default function TokenSetSelector() {
       className="content"
     >
       {mfsEnabled ? (
-        <Box>
-          <TokenSetTree
-            tokenSets={allTokenSets}
-            onRename={handleRenameTokenSet}
-            onDelete={handleDelete}
-            onDuplicate={handleDuplicateTokenSet}
-          />
-        </Box>
+        <TokenSetTree
+          tokenSets={allTokenSets}
+          onRename={handleRenameTokenSet}
+          onDelete={handleDelete}
+          onDuplicate={handleDuplicateTokenSet}
+          onReorder={handleReorder}
+          saveScrollPositionSet={saveScrollPositionSet}
+        />
       ) : (
         <TokenSetList
           onReorder={handleReorder}
@@ -152,6 +160,7 @@ export default function TokenSetSelector() {
           onRename={handleRenameTokenSet}
           onDelete={handleDeleteTokenSet}
           onDuplicate={handleDuplicateTokenSet}
+          saveScrollPositionSet={saveScrollPositionSet}
         />
       )}
       <Modal
@@ -198,12 +207,13 @@ export default function TokenSetSelector() {
                 type="text"
                 name="tokensetname"
                 required
+                data-cy="token-set-input"
               />
               <Stack direction="row" gap={4}>
                 <Button variant="secondary" size="large" onClick={handleCloseNewTokenSetModal}>
                   Cancel
                 </Button>
-                <Button type="submit" variant="primary" size="large">
+                <Button data-cy="create-token-set" type="submit" variant="primary" size="large">
                   Create
                 </Button>
               </Stack>
@@ -211,7 +221,7 @@ export default function TokenSetSelector() {
           </form>
         </Stack>
       </Modal>
-      <StyledButton type="button" disabled={editProhibited} onClick={handleOpenNewTokenSetModal}>
+      <StyledButton data-cy="button-new-token-set" type="button" disabled={editProhibited} onClick={handleOpenNewTokenSetModal}>
         New set
         <IconAdd />
       </StyledButton>

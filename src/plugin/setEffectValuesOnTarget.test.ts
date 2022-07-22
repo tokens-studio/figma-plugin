@@ -87,7 +87,21 @@ describe('setEffectValuesOnTarget', () => {
     rectangleNodeMock = {
       type: 'RECTANGLE',
       fills: [],
-      effects: [],
+      effects: [{
+        type: 'DROP_SHADOW',
+        blendMode: 'NORMAL',
+        visible: true,
+        color: {
+          a: 0.5,
+          r: 0,
+          g: 0,
+          b: 0,
+        },
+        offset: { x: 0, y: 0 },
+        radius: 2,
+        spread: 4,
+        showShadowBehindNode: true,
+      }],
     } as unknown as RectangleNode;
   });
 
@@ -109,6 +123,7 @@ describe('setEffectValuesOnTarget', () => {
           offset: { x: 0, y: 0 },
           radius: 10,
           spread: 0,
+          showShadowBehindNode: true,
         },
       ],
     });
@@ -132,6 +147,7 @@ describe('setEffectValuesOnTarget', () => {
           offset: { x: 0, y: 0 },
           radius: 2,
           spread: 4,
+          showShadowBehindNode: true,
         },
         {
           type: 'DROP_SHADOW',
@@ -146,6 +162,7 @@ describe('setEffectValuesOnTarget', () => {
           offset: { x: 0, y: 4 },
           radius: 4,
           spread: 4,
+          showShadowBehindNode: false,
         },
         {
           type: 'DROP_SHADOW',
@@ -160,15 +177,17 @@ describe('setEffectValuesOnTarget', () => {
           offset: { x: 0, y: 8 },
           radius: 16,
           spread: 4,
+          showShadowBehindNode: false,
         },
       ],
     });
   });
 
   it('sets mixed shadow tokens', async () => {
+    const rectangleNodeMockOriginal = rectangleNodeMock;
     await setEffectValuesOnTarget(rectangleNodeMock, mixedShadowToken);
     expect(rectangleNodeMock).toEqual({
-      ...rectangleNodeMock,
+      ...rectangleNodeMockOriginal,
       effects: [
         {
           type: 'INNER_SHADOW',
@@ -197,6 +216,7 @@ describe('setEffectValuesOnTarget', () => {
           offset: { x: 0, y: 4 },
           radius: 4,
           spread: 4,
+          showShadowBehindNode: false,
         },
         {
           type: 'DROP_SHADOW',
@@ -211,6 +231,61 @@ describe('setEffectValuesOnTarget', () => {
           offset: { x: 0, y: 8 },
           radius: 16,
           spread: 4,
+          showShadowBehindNode: false,
+        },
+      ],
+    });
+  });
+
+  it('respects set show behind setting for mixed shadow tokens', async () => {
+    const rectangleNodeMockOriginal = rectangleNodeMock;
+    await setEffectValuesOnTarget(rectangleNodeMock, mixedShadowToken);
+    expect(rectangleNodeMock).toEqual({
+      ...rectangleNodeMockOriginal,
+      effects: [
+        {
+          type: 'INNER_SHADOW',
+          blendMode: 'NORMAL',
+          visible: true,
+          color: {
+            a: 0.5,
+            r: 0,
+            g: 0,
+            b: 0,
+          },
+          offset: { x: 0, y: 0 },
+          radius: 2,
+          spread: 4,
+        },
+        {
+          type: 'DROP_SHADOW',
+          blendMode: 'NORMAL',
+          visible: true,
+          color: {
+            a: 1,
+            r: 0,
+            g: 0,
+            b: 0,
+          },
+          offset: { x: 0, y: 4 },
+          radius: 4,
+          spread: 4,
+          showShadowBehindNode: false,
+        },
+        {
+          type: 'DROP_SHADOW',
+          blendMode: 'NORMAL',
+          visible: true,
+          color: {
+            a: 1,
+            r: 0,
+            g: 0,
+            b: 0,
+          },
+          offset: { x: 0, y: 8 },
+          radius: 16,
+          spread: 4,
+          showShadowBehindNode: false,
         },
       ],
     });

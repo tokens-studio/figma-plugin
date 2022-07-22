@@ -29,6 +29,7 @@ const globalTokens = {
   radii: {
     sm: '2px',
     lg: '4px',
+    full: '999px',
   },
 };
 
@@ -52,6 +53,7 @@ export const stitchesInstance = createStitches({
       contextMenuBackground: 'var(--figma-color-bg-menu)',
       contextMenuForeground: 'var(--figma-color-text-menu)',
       contextMenuForegroundMuted: 'var(--figma-color-text-menu-secondary)',
+      contextMenuForegroundDisabled: 'var(--figma-color-text-menu-disabled)',
       contextMenuSeperator: 'var(--figma-color-border-menu)',
       loadingScreenFg: '#FFFFFF',
       loadingScreenFgMuted: '#CECECE',
@@ -71,6 +73,7 @@ export const stitchesInstance = createStitches({
       interactionDisabled: 'var(--figma-color-text-menu-disabled)',
       dangerFg: 'var(--figma-color-text-danger)',
       dangerBg: 'var(--figma-color-bg-danger)',
+      dangerBgHover: 'var(--figma-color-bg-danger-hover)',
       onDanger: 'var(--figma-color-text-ondanger)',
       border: 'var(--figma-color-border)',
       borderMuted: 'var(--figma-color-border)',
@@ -108,7 +111,6 @@ export const stitchesInstance = createStitches({
       7: '32px',
       8: '48px',
       9: '64px',
-      10: '38px',
     },
     sizes: {
       1: '2px',
@@ -119,7 +121,7 @@ export const stitchesInstance = createStitches({
       6: '24px',
       7: '32px',
       8: '48px',
-      10: '38px',
+      10: '28px',
       dropdownMaxHeight: '170px',
     },
     radii: {
@@ -130,6 +132,7 @@ export const stitchesInstance = createStitches({
       contextMenuItem: globalTokens.radii.sm,
       card: globalTokens.radii.lg,
       badge: globalTokens.radii.lg,
+      full: globalTokens.radii.full,
     },
     shadows: {
       default: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',

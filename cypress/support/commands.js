@@ -1,5 +1,9 @@
-import { MessageFromPluginTypes } from '../../src/types/messages';
-import { StorageProviderType } from '../../src/constants/StorageProviderType';
+import {
+  MessageFromPluginTypes
+} from '../../src/types/messages';
+import {
+  StorageProviderType
+} from '../../src/constants/StorageProviderType';
 
 // ***********************************************
 // This example commands.js shows you how to
@@ -32,7 +36,9 @@ Cypress.Commands.add('receiveStorageTypeLocal', () => {
     const message = {
       pluginMessage: {
         type: MessageFromPluginTypes.RECEIVED_STORAGE_TYPE,
-        storageType: { provider: StorageProviderType.LOCAL },
+        storageType: {
+          provider: StorageProviderType.LOCAL
+        },
       },
     };
     $window.postMessage(message, '*');
@@ -87,3 +93,28 @@ Cypress.Commands.add('receiveSetTokens', (values) => {
     $window.postMessage(message, '*');
   });
 });
+
+Cypress.Commands.add('apiCredentials', (values) => {
+  cy.window().then(($window) => {
+    const message = {
+      pluginMessage: {
+        type: MessageFromPluginTypes.API_CREDENTIALS,
+        status: true,
+        credentials: values,
+      },
+    };
+    $window.postMessage(message, '*');
+  });
+});
+
+Cypress.Commands.add('receiveSelectionValues', (values) => {
+  cy.window().then(($window) => {
+    const message = {
+      pluginMessage: {
+        type: MessageFromPluginTypes.SELECTION,
+        ...values
+      },
+    };
+    $window.postMessage(message, '*');
+  });
+})

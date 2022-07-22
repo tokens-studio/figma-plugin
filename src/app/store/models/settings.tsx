@@ -5,6 +5,8 @@ import { RootModel } from '@/types/RootModel';
 import { UpdateMode } from '@/constants/UpdateMode';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
+import * as settingsStateReducers from './reducers/settingsState';
+import * as settingsStateEffects from './effects/settingsState';
 
 type WindowSettingsType = {
   width: number;
@@ -22,11 +24,12 @@ export interface SettingsState {
   updateStyles?: boolean;
   tokenType?: TokenModeType;
   ignoreFirstPartForStyles?: boolean;
+  prefixStylesWithThemeName?: boolean;
   inspectDeep: boolean;
 }
 
 const setUI = (state: SettingsState) => {
-  AsyncMessageChannel.message({
+  AsyncMessageChannel.ReactInstance.message({
     type: AsyncMessageTypes.SET_UI,
     ...state,
   });
@@ -45,9 +48,11 @@ export const settings = createModel<RootModel>()({
     updateStyles: true,
     tokenType: 'object',
     ignoreFirstPartForStyles: false,
+    prefixStylesWithThemeName: false,
     inspectDeep: false,
   } as SettingsState,
   reducers: {
+    ...settingsStateReducers,
     setInspectDeep(state, payload: boolean) {
       return {
         ...state,
@@ -128,14 +133,14 @@ export const settings = createModel<RootModel>()({
   },
   effects: () => ({
     setWindowSize: (payload) => {
-      AsyncMessageChannel.message({
+      AsyncMessageChannel.ReactInstance.message({
         type: AsyncMessageTypes.RESIZE_WINDOW,
         width: payload.width,
         height: payload.height,
       });
     },
     setMinimizePluginWindow: (payload) => {
-      AsyncMessageChannel.message({
+      AsyncMessageChannel.ReactInstance.message({
         type: AsyncMessageTypes.RESIZE_WINDOW,
         width: payload.isMinimized ? 50 : payload.width,
         height: payload.isMinimized ? 50 : payload.height,
@@ -159,5 +164,10 @@ export const settings = createModel<RootModel>()({
     setInspectDeep: (payload, rootState) => {
       setUI(rootState.settings);
     },
+    ...Object.fromEntries(
+      (Object.entries(settingsStateEffects).map(([key, factory]) => (
+        [key, factory()]
+      ))),
+    ),
   }),
 });

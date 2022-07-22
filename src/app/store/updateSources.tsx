@@ -104,8 +104,10 @@ export default async function updateTokensOnSources({
     });
   }
 
-  const mergedTokens = tokens ? resolveTokenValues(mergeTokenGroups(tokens, usedTokenSet)) : null;
-  AsyncMessageChannel.message({
+  const mergedTokens = tokens
+    ? resolveTokenValues(mergeTokenGroups(tokens, usedTokenSet))
+    : null;
+  AsyncMessageChannel.ReactInstance.message({
     type: AsyncMessageTypes.UPDATE,
     tokenValues,
     tokens: tokens ? mergedTokens : null,

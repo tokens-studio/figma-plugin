@@ -1,8 +1,13 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import IconChevronDown from '@/icons/chevrondown.svg';
 import { StyledFolderButton } from './StyledFolderButton';
 import { StyledItem } from './StyledItem';
 import { StyledFolderButtonChevronBox } from './StyledFolderButtonChevronBox';
+import { Dispatch } from '../../store';
+import {
+  collapsedTokenSetsSelector,
+} from '@/selectors';
 
 type TreeOrListItem<ItemType = unknown> = {
   key: string
@@ -26,11 +31,12 @@ export function TokenSetListOrTree<T extends TreeOrListItem>({
   renderItem: RenderItem = ({ children }) => React.createElement(React.Fragment, {}, children),
   renderItemContent: RenderItemContent,
 }: Props<T>) {
-  const [collapsed, setCollapsed] = useState<string[]>([]);
+  const collapsed = useSelector(collapsedTokenSetsSelector);
+  const dispatch = useDispatch<Dispatch>();
 
   const handleToggleCollapsed = useCallback((key: string) => {
-    setCollapsed(collapsed.includes(key) ? collapsed.filter((s) => s !== key) : [...collapsed, key]);
-  }, [collapsed]);
+    dispatch.tokenState.setCollapsedTokenSets(collapsed.includes(key) ? collapsed.filter((s) => s !== key) : [...collapsed, key]);
+  }, [dispatch, collapsed]);
 
   const mappedItems = useMemo(() => (
     items.filter((item) => (

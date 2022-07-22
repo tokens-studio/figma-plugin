@@ -43,18 +43,16 @@ export function Initiator() {
   );
 
   const onInitiate = useCallback(() => {
-    AsyncMessageChannel.message({ type: AsyncMessageTypes.INITIATE });
+    AsyncMessageChannel.ReactInstance.message({ type: AsyncMessageTypes.INITIATE });
   }, []);
 
-  const getApiCredentials = useCallback(
-    (shouldPull: boolean, featureFlags: LDProps['flags'] | null) =>
-      AsyncMessageChannel.message({
-        type: AsyncMessageTypes.GET_API_CREDENTIALS,
-        shouldPull,
-        featureFlags,
-      }),
-    []
-  );
+  const getApiCredentials = useCallback((shouldPull: boolean, featureFlags: LDProps['flags'] | null) => (
+    AsyncMessageChannel.ReactInstance.message({
+      type: AsyncMessageTypes.GET_API_CREDENTIALS,
+      shouldPull,
+      featureFlags,
+    })
+  ), []);
 
   useEffect(() => {
     onInitiate();
@@ -71,7 +69,10 @@ export function Initiator() {
             dispatch.uiState.setSelectedLayers(selectedNodes);
             dispatch.uiState.setDisabled(false);
             if (mainNodeSelectionValues.length > 1) {
-              dispatch.uiState.setMainNodeSelectionValues({});
+              const selectionValues = mainNodeSelectionValues.reduce((acc, crr) => (
+                Object.assign(acc, crr)
+              ), {});
+              dispatch.uiState.setMainNodeSelectionValues(selectionValues);
             } else if (mainNodeSelectionValues.length > 0) {
               // When only one node is selected, we can set the state
               dispatch.uiState.setMainNodeSelectionValues(mainNodeSelectionValues[0]);
@@ -171,6 +172,7 @@ export function Initiator() {
 
                   dispatch.uiState.setApiData(credentials);
                   dispatch.uiState.setLocalApiState(credentials);
+                  dispatch.tokenState.setActiveTheme(activeTheme || null); // @TODO look into this
 
                   if (shouldPull) {
                     const remoteData = await pullTokens({
