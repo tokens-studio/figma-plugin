@@ -39,6 +39,7 @@ export const initiate: AsyncMessageChannelHandlers[AsyncMessageTypes.INITIATE] =
     const apiProviders = await ApiProvidersProperty.read();
     if (apiProviders) notifyAPIProviders(apiProviders);
     const oldTokens = await getTokenData();
+
     if (oldTokens) {
       notifyTokenValues(
         {

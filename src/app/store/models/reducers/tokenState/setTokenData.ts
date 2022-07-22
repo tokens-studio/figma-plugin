@@ -10,6 +10,7 @@ export function setTokenData(state: TokenState, payload: SetTokenDataPayload): T
     allAvailableTokenSets
       .map((tokenSet) => ([tokenSet, payload.usedTokenSet?.[tokenSet] ?? TokenSetStatus.DISABLED])),
   );
+
   // @README (1) for the sake of normalization we will set the DISABLED status for all available token sets
   // this way we can always be certain the status is available. This behavior is also reflected in the createTokenSet logic
   return {

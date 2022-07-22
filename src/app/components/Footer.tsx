@@ -30,6 +30,7 @@ import { StorageProviderType } from '@/constants/StorageProviderType';
 import { isGitProvider } from '@/utils/is';
 import IconLibrary from '@/icons/library.svg';
 import ProBadge from './ProBadge';
+import { compareLastSyncedState } from '@/utils/compareLastSyncedState';
 
 export default function Footer() {
   const storageType = useSelector(storageTypeSelector);
@@ -45,10 +46,18 @@ export default function Footer() {
   const { pullTokens, pushTokens } = useRemoteTokens();
 
   const checkForChanges = React.useCallback(() => {
-    const hasChanged = (lastSyncedState !== JSON.stringify([tokens, themes], null, 2));
+    const tokenSetOrder = Object.keys(tokens);
+    const defaultMetadata = isGitProvider(storageType) ? { tokenSetOrder } : {};
+    const hasChanged = !compareLastSyncedState(
+      tokens,
+      themes,
+      defaultMetadata,
+      lastSyncedState,
+      [{}, [], defaultMetadata],
+    );
     dispatch.tokenState.updateCheckForChanges(hasChanged);
     return hasChanged;
-  }, [lastSyncedState, tokens, themes, dispatch.tokenState]);
+  }, [lastSyncedState, storageType, tokens, themes, dispatch.tokenState]);
 
   const hasChanges = React.useMemo(() => checkForChanges(), [checkForChanges]);
 

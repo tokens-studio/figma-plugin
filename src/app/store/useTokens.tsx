@@ -1,5 +1,5 @@
 import { useDispatch, useSelector, useStore } from 'react-redux';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useContext } from 'react';
 import {
   AnyTokenList,
   SingleToken,
@@ -24,6 +24,7 @@ import { UpdateMode } from '@/constants/UpdateMode';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { NodeInfo } from '@/types/NodeInfo';
+import { TokensContext } from '@/context';
 import { Dispatch, RootState } from '../store';
 
 type ConfirmResult =
@@ -35,6 +36,7 @@ type GetFormattedTokensOptions = {
   includeParent: boolean;
   expandTypography: boolean;
   expandShadow: boolean;
+  expandComposition: boolean;
 };
 
 type RemoveTokensByValueData = { property: Properties; nodes: NodeInfo[] }[];
@@ -47,6 +49,7 @@ export default function useTokens() {
   const settings = useSelector(settingsStateSelector, isEqual);
   const { confirm } = useConfirm<ConfirmResult>();
   const store = useStore<RootState>();
+  const tokensContext = useContext(TokensContext);
 
   // Gets value of token
   const getTokenValue = useCallback((name: string, resolved: AnyTokenList) => (
@@ -61,11 +64,11 @@ export default function useTokens() {
   // Returns formatted tokens for style dictionary
   const getFormattedTokens = useCallback((opts: GetFormattedTokensOptions) => {
     const {
-      includeAllTokens = false, includeParent = true, expandTypography = false, expandShadow = false,
+      includeAllTokens = false, includeParent = true, expandTypography = false, expandShadow = false, expandComposition = false,
     } = opts;
     const tokenSets = includeAllTokens ? Object.keys(tokens) : [activeTokenSet];
     return formatTokens({
-      tokens, tokenSets, includeAllTokens, includeParent, expandTypography, expandShadow,
+      tokens, tokenSets, resolvedTokens: tokensContext.resolvedTokens, includeAllTokens, includeParent, expandTypography, expandShadow, expandComposition,
     });
   }, [tokens, activeTokenSet]);
 
