@@ -3,7 +3,7 @@ import { AnyTokenList, SingleToken } from '@/types/tokens';
 import { isSingleBoxShadowToken, isSingleTokenValueObject, isSingleTypographyToken } from './is';
 import { isTokenGroupWithTypeOfGroupLevel } from './is/isTokenGroupWithTypeOfGroupLevel';
 
-type Tokens = AnyTokenList | Partial<Record<string, Partial<Record<TokenTypes, Record<string, SingleToken<false>>>>> | { type: string }>;
+type Tokens = AnyTokenList | Partial<Record<string, Partial<Record<TokenTypes, Record<string, SingleToken<false>>>>> | { type: string } | { inheritType?: string }>;
 
 // @TODO fix typings
 function checkForTokens({
@@ -56,6 +56,7 @@ function checkForTokens({
         token: {
           value: value.value,
           type: value.type || type,
+          ...(('type' in value) ? {} : { inheritType: type }),
         },
         root: [root, key].filter((n) => n).join('.'),
         returnValuesOnly,
@@ -109,6 +110,7 @@ export default function convertToTokenArray({
   expandTypography?: boolean
   expandShadow?: boolean
 }) {
+  console.log('tokens', tokens);
   const [result] = checkForTokens({
     obj: [], root: null, token: tokens, returnValuesOnly, expandTypography, expandShadow,
   });
