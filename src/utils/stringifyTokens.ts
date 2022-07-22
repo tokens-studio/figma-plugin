@@ -2,25 +2,35 @@ import set from 'set-value';
 import { appendTypeToToken } from '@/app/components/createTokenObj';
 import { AnyTokenList } from '@/types/tokens';
 
+function getNthPosition(string: string, subString: string, index: number = 0): number {
+  return string.split(subString, index).join(subString).length;
+}
+
+function getGroupTypeName(tokenName: string, groupLevel: number): string {
+  return `${tokenName.slice(0, getNthPosition(tokenName, '.', groupLevel - 1))}.type`;
+}
+
 export default function stringifyTokens(
   tokens: Record<string, AnyTokenList>,
   activeTokenSet: string,
 ): string {
   const tokenObj = {};
-  console.log('tokensactive', tokens[activeTokenSet]);
   tokens[activeTokenSet]?.forEach((token) => {
     const tokenWithType = appendTypeToToken(token);
     const { name, ...tokenWithoutName } = tokenWithType;
-    console.log('name', name, 'token.name', token.name, tokenWithoutName);
     if ('inheritType' in tokenWithoutName) {
-      const { type, inheritType, ...tokenWithoutType } = tokenWithoutName;
-      set(tokenObj, `${token.name.slice(0, token.name.indexOf('.'))}.type`, tokenWithoutName.inheritType);
+      const {
+        type, inheritType, inheritTypeLevel, ...tokenWithoutType
+      } = tokenWithoutName;
+      // set type of group level
+      if (inheritTypeLevel) {
+        set(tokenObj, getGroupTypeName(token.name, inheritTypeLevel), tokenWithoutName.inheritType);
+      }
       set(tokenObj, token.name, tokenWithoutType);
     } else {
       set(tokenObj, token.name, tokenWithoutName);
     }
   });
 
-  console.log('tokenObj', tokenObj);
   return JSON.stringify(tokenObj, null, 2);
 }

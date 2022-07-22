@@ -1,6 +1,6 @@
-import { isTokenGroupWithTypeOfGroupLevel } from '../isTokenGroupWithTypeOfGroupLevel';
+import { isTokenGroupWithType } from '../isTokenGroupWithType';
 
-describe('isTokenGroupWithTypeOfGroupLevel', () => {
+describe('isTokenGroupWithType', () => {
   const tokenGroupsWithType = [
     {
       type: 'color',
@@ -74,13 +74,13 @@ describe('isTokenGroupWithTypeOfGroupLevel', () => {
 
   it('should validate token group with type of group level', () => {
     tokenGroupsWithType.forEach((item) => {
-      expect(isTokenGroupWithTypeOfGroupLevel(item)).toBe(true);
-    })
+      expect(isTokenGroupWithType(item)).toBe(true);
+    });
   });
 
   it('should return false for token group with no type', () => {
     tokenGroupsWithOutType.forEach((item) => {
-      expect(isTokenGroupWithTypeOfGroupLevel(item)).toBe(false);
-    })
+      expect(isTokenGroupWithType(item)).toBe(false);
+    });
   });
 });
