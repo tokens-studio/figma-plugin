@@ -1,3 +1,4 @@
+import React from "react"
 import { TokensContext, TokensContextValue } from '../../src/context/TokensContext';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { BoxShadowTypes } from '@/constants/BoxShadowTypes';
@@ -51,7 +52,27 @@ export default function TokensDecorator(Story, context) {
           itemSpacing: '16px',
         },
         type: TokenTypes.COMPOSITION,
-      }
+      },
+      {
+        name: 'size.broken',
+        value: '{size.notfound}',
+        type: TokenTypes.SIZING,
+        failedToResolve: true
+      },
+      {
+        name: 'shadows.broken',
+        value: {
+          x: '2',
+          y: '2',
+          blur: '2',
+          spread: '2',
+          color: '{colors.red.500}',
+          type: BoxShadowTypes.DROP_SHADOW,
+        },
+        description: 'My default token',
+        type: TokenTypes.BOX_SHADOW,
+        failedToResolve: true
+      },
     ],
   });
 

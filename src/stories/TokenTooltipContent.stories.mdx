@@ -90,7 +90,7 @@ export const TokenTooltipContentDefaultStory = (args) => {
   </Story>
   <Story name='BoxShadow' args={{
     token: {
-      name: 'typography.headlines.boxshadow',
+      name: 'shadows.default',
       type: TokenTypes.BOX_SHADOW,
       value: {
         x: '2',
@@ -143,6 +143,31 @@ export const TokenTooltipContentDefaultStory = (args) => {
         boxShadow: '{typography.headlines.boxshadow}',
         opacity: '{opacity.10}',
         itemSpacing: '{size.6}',
+      },
+    },
+  }}>
+    {TokenTooltipContentDefaultStory.bind({})}
+  </Story>
+  <Story name='Not found (single)' args={{
+    token: {
+      name: 'size.broken',
+      type: TokenTypes.SIZING,
+      value: '{size.notfound}',
+    },
+  }}>
+    {TokenTooltipContentDefaultStory.bind({})}
+  </Story>
+  <Story name='Not found (shadow)' args={{
+    token: {
+      name: 'shadows.broken',
+      type: TokenTypes.BOX_SHADOW,
+      value: {
+        x: '2',
+        y: '2',
+        blur: '2',
+        spread: '2',
+        color: '{colors.red.500}',
+        type: BoxShadowTypes.DROP_SHADOW,
       },
     },
   }}>
