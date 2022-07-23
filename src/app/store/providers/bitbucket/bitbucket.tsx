@@ -7,7 +7,7 @@ import useConfirm from '@/app/hooks/useConfirm';
 import usePushDialog from '@/app/hooks/usePushDialog';
 import { notifyToUI } from '@/plugin/notifiers';
 import {
-  localApiStateSelector, themesListSelector, tokensSelector, usedTokenSetSelector,
+  activeThemeSelector, localApiStateSelector, themesListSelector, tokensSelector, usedTokenSetSelector,
 } from '@/selectors';
 import { BitbucketTokenStorage } from '@/storage/BitbucketTokenStorage';
 import { isEqual } from '@/utils/isEqual';
@@ -17,12 +17,16 @@ import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { StorageTypeCredentials, StorageTypeFormValues } from '@/types/StorageType';
 import { StorageProviderType } from '@/constants/StorageProviderType';
+import { saveLastSyncedState } from '@/utils/saveLastSyncedState';
+import { applyTokenSetOrder } from '@/utils/tokenset';
 
 type BitbucketCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.BITBUCKET }>;
 type BitbucketFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.BITBUCKET }>;
 
 export function useBitbucket() {
   const tokens = useSelector(tokensSelector);
+  const activeTheme = useSelector(activeThemeSelector);
+
   const themes = useSelector(themesListSelector);
   const localApiState = useSelector(localApiStateSelector);
   const usedTokenSet = useSelector(usedTokenSetSelector);
@@ -53,78 +57,88 @@ export function useBitbucket() {
       text: 'Pull from Bitbucket?',
       description: 'Your repo already contains tokens, do you want to pull these now?',
     });
-    if (confirmResult === false) return false;
-    return confirmResult.result;
+    return confirmResult;
   }, [confirm]);
 
-  const pushTokensToBitbucket = useCallback(
-    async (context: BitbucketCredentials): Promise<RemoteTokenStorageData<GitStorageMetadata> | null> => {
-      const storage = storageClientFactory(context);
-      const content = await storage.retrieve();
+  const pushTokensToBitbucket = useCallback(async (context: BitbucketCredentials): Promise<RemoteTokenStorageData<GitStorageMetadata> | null> => {
+    const storage = storageClientFactory(context);
+    const content = await storage.retrieve();
 
-      if (content) {
-        if (content && isEqual(content.tokens, tokens) && isEqual(content.themes, themes)) {
-          notifyToUI('Nothing to commit');
-          return {
-            tokens,
-            themes,
-            metadata: {},
-          };
-        }
+    if (content) {
+      if (
+        content
+        && isEqual(content.tokens, tokens)
+        && isEqual(content.themes, themes)
+        && isEqual(content.metadata?.tokenSetOrder ?? Object.keys(tokens), Object.keys(tokens))
+      ) {
+        notifyToUI('Nothing to commit');
+        return {
+          themes,
+          tokens,
+          metadata: {
+            tokenSetOrder: Object.keys(tokens),
+          },
+        };
       }
+    }
 
-      dispatch.uiState.setLocalApiState({ ...context });
+    dispatch.uiState.setLocalApiState({ ...context });
 
-      const pushSettings = await pushDialog();
-      if (pushSettings) {
-        const { commitMessage, customBranch } = pushSettings;
-        try {
-          if (customBranch) storage.selectBranch(customBranch);
-          await storage.save({
-            themes,
-            tokens,
-            metadata: { commitMessage },
-          });
-          dispatch.tokenState.setLastSyncedState(JSON.stringify([tokens, themes], null, 2));
-          dispatch.uiState.setLocalApiState({ ...localApiState, branch: customBranch } as BitbucketCredentials);
-          dispatch.uiState.setApiData({ ...context, branch: customBranch });
-          dispatch.tokenState.setTokenData({
-            values: tokens,
-            themes,
-            usedTokenSet,
-          });
-          pushDialog('success');
-          return {
-            tokens,
-            themes,
-            metadata: { commitMessage },
-          };
-        } catch (e) {
-          console.log('Error pushing to Bitbucket', e);
-        }
+    const pushSettings = await pushDialog();
+    if (pushSettings) {
+      const { commitMessage, customBranch } = pushSettings;
+      try {
+        if (customBranch) storage.selectBranch(customBranch);
+        const metadata = {
+          tokenSetOrder: Object.keys(tokens),
+        };
+        await storage.save({
+          themes,
+          tokens,
+          metadata,
+        }, { commitMessage });
+        saveLastSyncedState(dispatch, tokens, themes, metadata);
+        dispatch.uiState.setLocalApiState({ ...localApiState, branch: customBranch } as BitbucketCredentials);
+        dispatch.uiState.setApiData({ ...context, branch: customBranch });
+        dispatch.tokenState.setTokenData({
+          values: tokens,
+          themes,
+          usedTokenSet,
+          activeTheme,
+        });
+        pushDialog('success');
+        return {
+          tokens,
+          themes,
+        };
+      } catch (e) {
+        console.log('Error pushing to Bitbucket', e);
       }
+    }
 
-      return {
-        tokens,
-        themes,
-        metadata: {},
-      };
-    },
-    [
-      storageClientFactory,
-      dispatch.uiState,
-      dispatch.tokenState,
-      pushDialog,
+    return {
       tokens,
       themes,
-      localApiState,
-      usedTokenSet,
-    ],
-  );
+      metadata: {},
+    };
+  }, [
+    storageClientFactory,
+    dispatch.uiState,
+    dispatch.tokenState,
+    pushDialog,
+    tokens,
+    themes,
+    localApiState,
+    usedTokenSet,
+    activeTheme,
+  ]);
 
   const checkAndSetAccess = useCallback(
-    async ({ context, owner, repo }: { context: BitbucketCredentials; owner: string; repo: string }) => {
+    async ({
+      context, owner, repo, receivedFeatureFlags,
+    }: { context: BitbucketCredentials; owner: string; repo: string, receivedFeatureFlags?: LDProps['flags'] }) => {
       const storage = storageClientFactory(context, owner, repo);
+      if (receivedFeatureFlags?.multiFileSync) storage.enableMultiFile();
       const hasWriteAccess = await storage.canWrite();
       dispatch.tokenState.setEditProhibited(!hasWriteAccess);
     },
@@ -138,7 +152,9 @@ export function useBitbucket() {
 
       const [owner, repo] = context.id.split('/');
 
-      await checkAndSetAccess({ context, owner, repo });
+      await checkAndSetAccess({
+        context, owner, repo, receivedFeatureFlags,
+      });
 
       try {
         const content = await storage.retrieve();
@@ -169,15 +185,22 @@ export function useBitbucket() {
 
         const content = await storage.retrieve();
         if (content) {
-          if (!isEqual(content.tokens, tokens) || !isEqual(content.themes, themes)) {
+          if (
+            !isEqual(content.tokens, tokens)
+            || !isEqual(content.themes, themes)
+            || !isEqual(content.metadata?.tokenSetOrder ?? Object.keys(tokens), Object.keys(tokens))
+          ) {
             const userDecision = await askUserIfPull();
             if (userDecision) {
-              dispatch.tokenState.setLastSyncedState(JSON.stringify([content.tokens, content.themes], null, 2));
+              const sortedValues = applyTokenSetOrder(content.tokens, content.metadata?.tokenSetOrder);
+              saveLastSyncedState(dispatch, sortedValues, content.themes, content.metadata);
               dispatch.tokenState.setTokenData({
                 values: content.tokens,
                 themes: content.themes,
+                activeTheme,
                 usedTokenSet,
               });
+              dispatch.tokenState.setCollapsedTokenSets([]);
               notifyToUI('Pulled tokens from Bitbucket');
             }
           }
@@ -190,25 +213,28 @@ export function useBitbucket() {
         return null;
       }
     },
-    [askUserIfPull, dispatch, pushTokensToBitbucket, storageClientFactory, themes, tokens],
+    [
+      askUserIfPull,
+      dispatch,
+      pushTokensToBitbucket,
+      storageClientFactory,
+      usedTokenSet,
+      activeTheme,
+      themes,
+      tokens,
+      checkAndSetAccess,
+    ],
   );
 
   const addNewBitbucketCredentials = useCallback(
     async (context: BitbucketFormValues): Promise<RemoteTokenStorageData<GitStorageMetadata> | null> => {
       const data = await syncTokensWithBitbucket(context);
       if (data) {
-        AsyncMessageChannel.message({
+        AsyncMessageChannel.ReactInstance.message({
           type: AsyncMessageTypes.CREDENTIALS,
           credential: context,
         });
-        if (data?.tokens) {
-          dispatch.tokenState.setLastSyncedState(JSON.stringify([data.tokens, data.themes], null, 2));
-          dispatch.tokenState.setTokenData({
-            values: data.tokens,
-            themes: data.themes,
-            usedTokenSet,
-          });
-        } else {
+        if (!data.tokens) {
           notifyToUI('No tokens stored on remote');
         }
       } else {
@@ -220,7 +246,11 @@ export function useBitbucket() {
         metadata: {},
       };
     },
-    [syncTokensWithBitbucket, tokens, themes, dispatch.tokenState, usedTokenSet],
+    [
+      syncTokensWithBitbucket,
+      tokens,
+      themes,
+    ],
   );
 
   const fetchBitbucketBranches = useCallback(
