@@ -5,4 +5,5 @@ export enum StorageProviderType {
   GITLAB = 'gitlab',
   ADO = 'ado',
   URL = 'url',
+  BITBUCKET = 'bitbucket',
 }
