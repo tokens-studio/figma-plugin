@@ -18,6 +18,8 @@ import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { StorageTypeCredentials, StorageTypeFormValues } from '@/types/StorageType';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { useFlags } from '@/app/components/LaunchDarkly';
+import { applyTokenSetOrder } from '@/utils/tokenset';
+import { saveLastSyncedState } from '@/utils/saveLastSyncedState';
 
 type GithubCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.GITHUB | StorageProviderType.GITLAB; }>;
 type GithubFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.GITHUB | StorageProviderType.GITLAB }>;
@@ -60,12 +62,15 @@ export function useGitHub() {
         content
         && isEqual(content.tokens, tokens)
         && isEqual(content.themes, themes)
+        && isEqual(content.metadata?.tokenSetOrder ?? Object.keys(tokens), Object.keys(tokens))
       ) {
         notifyToUI('Nothing to commit');
         return {
-          tokens,
           themes,
-          metadata: {},
+          tokens,
+          metadata: {
+            tokenSetOrder: Object.keys(tokens),
+          },
         };
       }
     }
@@ -77,12 +82,17 @@ export function useGitHub() {
       const { commitMessage, customBranch } = pushSettings;
       try {
         if (customBranch) storage.selectBranch(customBranch);
+        const metadata = {
+          tokenSetOrder: Object.keys(tokens),
+        };
         await storage.save({
           themes,
           tokens,
-          metadata: { commitMessage },
+          metadata,
+        }, {
+          commitMessage,
         });
-        dispatch.tokenState.setLastSyncedState(JSON.stringify([tokens, themes], null, 2));
+        saveLastSyncedState(dispatch, tokens, themes, metadata);
         dispatch.uiState.setLocalApiState({ ...localApiState, branch: customBranch } as GithubCredentials);
         dispatch.uiState.setApiData({ ...context, branch: customBranch });
         dispatch.tokenState.setTokenData({
@@ -95,7 +105,6 @@ export function useGitHub() {
         return {
           tokens,
           themes,
-          metadata: { commitMessage },
         };
       } catch (e) {
         console.log('Error pushing to GitHub', e);
@@ -119,8 +128,11 @@ export function useGitHub() {
     activeTheme,
   ]);
 
-  const checkAndSetAccess = useCallback(async ({ context, owner, repo }: { context: GithubCredentials; owner: string; repo: string }) => {
+  const checkAndSetAccess = useCallback(async ({
+    context, owner, repo, receivedFeatureFlags,
+  }: { context: GithubCredentials; owner: string; repo: string, receivedFeatureFlags?: LDProps['flags'] }) => {
     const storage = storageClientFactory(context, owner, repo);
+    if (receivedFeatureFlags?.multiFileSync) storage.enableMultiFile();
     const hasWriteAccess = await storage.canWrite();
     dispatch.tokenState.setEditProhibited(!hasWriteAccess);
   }, [dispatch, storageClientFactory]);
@@ -131,13 +143,19 @@ export function useGitHub() {
 
     const [owner, repo] = context.id.split('/');
 
-    await checkAndSetAccess({ context, owner, repo });
+    await checkAndSetAccess({
+      context, owner, repo, receivedFeatureFlags,
+    });
 
     try {
       const content = await storage.retrieve();
 
       if (content) {
-        return content;
+        const sortedTokens = applyTokenSetOrder(content.tokens, content.metadata?.tokenSetOrder ?? []);
+        return {
+          ...content,
+          tokens: sortedTokens,
+        };
       }
     } catch (e) {
       console.log('Error', e);
@@ -167,12 +185,14 @@ export function useGitHub() {
         if (
           !isEqual(content.tokens, tokens)
           || !isEqual(content.themes, themes)
+          || !isEqual(content.metadata?.tokenSetOrder ?? Object.keys(tokens), Object.keys(tokens))
         ) {
           const userDecision = await askUserIfPull();
           if (userDecision) {
-            dispatch.tokenState.setLastSyncedState(JSON.stringify([content.tokens, content.themes], null, 2));
+            const sortedValues = applyTokenSetOrder(content.tokens, content.metadata?.tokenSetOrder);
+            saveLastSyncedState(dispatch, sortedValues, content.themes, content.metadata);
             dispatch.tokenState.setTokenData({
-              values: content.tokens,
+              values: sortedValues,
               themes: content.themes,
               activeTheme,
               usedTokenSet,
@@ -204,7 +224,7 @@ export function useGitHub() {
   const addNewGitHubCredentials = useCallback(async (context: GithubFormValues): Promise<RemoteTokenStorageData<GitStorageMetadata> | null> => {
     const data = await syncTokensWithGitHub(context);
     if (data) {
-      AsyncMessageChannel.message({
+      AsyncMessageChannel.ReactInstance.message({
         type: AsyncMessageTypes.CREDENTIALS,
         credential: context,
       });

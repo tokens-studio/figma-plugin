@@ -3,8 +3,11 @@ import compact from 'just-compact';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StorageTypeCredentials } from '@/types/StorageType';
 import { GitStorageMetadata, GitTokenStorage } from './GitTokenStorage';
-import { RemoteTokenStorageFile, RemoteTokenStorageSingleTokenSetFile, RemoteTokenStorageThemesFile } from './RemoteTokenStorage';
-import { complexSingleFileSchema, multiFileSchema } from './schemas';
+import {
+  RemoteTokenStorageFile, RemoteTokenStorageMetadataFile, RemoteTokenStorageSingleTokenSetFile, RemoteTokenStorageThemesFile,
+} from './RemoteTokenStorage';
+import { multiFileSchema, complexSingleFileSchema } from './schemas';
+import { SystemFilenames } from './SystemFilenames';
 
 const apiVersion = 'api-version=6.0';
 
@@ -95,6 +98,8 @@ export class ADOTokenStorage extends GitTokenStorage {
   }
 
   public async canWrite(): Promise<boolean> {
+    if (!this.path.endsWith('.json') && !this.flags.multiFileEnabled) return false;
+
     const { status } = await this.fetchGit({
       gitResource: 'refs',
       orgUrl: this.orgUrl,
@@ -230,7 +235,7 @@ export class ADOTokenStorage extends GitTokenStorage {
 
   public async read(): Promise<RemoteTokenStorageFile<GitStorageMetadata>[]> {
     try {
-      if (this.flags.multiFileEnabled && !this.path.endsWith('.json')) {
+      if (!this.path.endsWith('.json')) {
         const { value } = await this.getItems();
         const jsonFiles = value
           ?.filter((file) => (file.path?.endsWith('.json')))
@@ -254,7 +259,7 @@ export class ADOTokenStorage extends GitTokenStorage {
           const { path } = jsonFiles[index];
           if (fileContent) {
             const name = path?.replace(this.path, '')?.replace(/^\/+/, '')?.replace('.json', '');
-            if (name === '$themes' && Array.isArray(fileContent)) {
+            if (name === SystemFilenames.THEMES && Array.isArray(fileContent)) {
               return {
                 path,
                 type: 'themes',
@@ -263,6 +268,14 @@ export class ADOTokenStorage extends GitTokenStorage {
             }
 
             if (!Array.isArray(fileContent)) {
+              if (name === SystemFilenames.METADATA) {
+                return {
+                  path,
+                  type: 'metadata',
+                  data: fileContent,
+                } as RemoteTokenStorageMetadataFile<GitStorageMetadata>;
+              }
+
               return {
                 path,
                 name,

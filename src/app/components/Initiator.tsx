@@ -31,20 +31,23 @@ export function Initiator() {
   const checkedLocalStorage = useSelector(checkedLocalStorageForKeySelector);
   const userId = useSelector(userIdSelector);
 
-  const askUserIfPull: ((storageType: StorageProviderType | undefined) => Promise<any>) = useCallback(async (storageType) => {
-    const shouldPull = await confirm({
-      text: `Pull from ${storageType}?`,
-      description: 'You have unsaved changes that will be lost. Do you want to pull from your repo?',
-    });
-    return shouldPull;
-  }, [confirm]);
+  const askUserIfPull: (storageType: StorageProviderType | undefined) => Promise<any> = useCallback(
+    async (storageType) => {
+      const shouldPull = await confirm({
+        text: `Pull from ${storageType}?`,
+        description: 'You have unsaved changes that will be lost. Do you want to pull from your repo?',
+      });
+      return shouldPull;
+    },
+    [confirm]
+  );
 
   const onInitiate = useCallback(() => {
-    AsyncMessageChannel.message({ type: AsyncMessageTypes.INITIATE });
+    AsyncMessageChannel.ReactInstance.message({ type: AsyncMessageTypes.INITIATE });
   }, []);
 
   const getApiCredentials = useCallback((shouldPull: boolean, featureFlags: LDProps['flags'] | null) => (
-    AsyncMessageChannel.message({
+    AsyncMessageChannel.ReactInstance.message({
       type: AsyncMessageTypes.GET_API_CREDENTIALS,
       shouldPull,
       featureFlags,
@@ -68,7 +71,7 @@ export function Initiator() {
             if (mainNodeSelectionValues.length > 1) {
               const selectionValues = mainNodeSelectionValues.reduce((acc, crr) => (
                 Object.assign(acc, crr)
-              ), {});            
+              ), {});
               dispatch.uiState.setMainNodeSelectionValues(selectionValues);
             } else if (mainNodeSelectionValues.length > 0) {
               // When only one node is selected, we can set the state
@@ -100,9 +103,13 @@ export function Initiator() {
             let featureFlags: LDProps['flags'] | null;
             const existChanges = values.checkForChanges;
             const storageType = values.storageType?.provider;
-            if (!existChanges
-              || ((storageType && storageType !== StorageProviderType.LOCAL)
-              && existChanges && await askUserIfPull(storageType))) {
+            if (
+              !existChanges ||
+              (storageType &&
+                storageType !== StorageProviderType.LOCAL &&
+                existChanges &&
+                (await askUserIfPull(storageType)))
+            ) {
               featureFlags = await fetchFeatureFlags(userData);
               getApiCredentials(true, featureFlags);
             } else {
@@ -154,9 +161,10 @@ export function Initiator() {
 
                 if (credentials) {
                   if (
-                    credentials.provider === StorageProviderType.GITHUB
-                    || credentials.provider === StorageProviderType.GITLAB
-                    || credentials.provider === StorageProviderType.ADO
+                    credentials.provider === StorageProviderType.GITHUB ||
+                    credentials.provider === StorageProviderType.GITLAB ||
+                    credentials.provider === StorageProviderType.BITBUCKET ||
+                    credentials.provider === StorageProviderType.ADO
                   ) {
                     const branches = await fetchBranches(credentials as StorageTypeCredentials);
                     if (branches) dispatch.branchState.setBranches(branches);
@@ -164,13 +172,18 @@ export function Initiator() {
 
                   dispatch.uiState.setApiData(credentials);
                   dispatch.uiState.setLocalApiState(credentials);
+                  dispatch.tokenState.setActiveTheme(activeTheme || null); // @TODO look into this
 
                   if (shouldPull) {
                     const remoteData = await pullTokens({
                       context: credentials, featureFlags: receivedFlags, usedTokenSet, activeTheme,
                     });
                     const existTokens = Object.values(remoteData?.tokens ?? {}).some((value) => value.length > 0);
-                    if (existTokens) { dispatch.uiState.setActiveTab(Tabs.TOKENS); } else { dispatch.uiState.setActiveTab(Tabs.START); }
+                    if (existTokens) {
+                      dispatch.uiState.setActiveTab(Tabs.TOKENS);
+                    } else {
+                      dispatch.uiState.setActiveTab(Tabs.START);
+                    }
                   } else {
                     dispatch.uiState.setActiveTab(Tabs.TOKENS);
                   }

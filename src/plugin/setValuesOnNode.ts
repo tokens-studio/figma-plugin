@@ -1,18 +1,35 @@
-import { Properties } from '@/constants/Properties';
+import { MapValuesToTokensResult } from '@/types';
+import { GetThemeInfoMessageResult } from '@/types/AsyncMessages';
 import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
+import { convertTokenNameToPath } from '@/utils/convertTokenNameToPath';
 import { getAllFigmaStyleMaps } from '@/utils/getAllFigmaStyleMaps';
+import { isPrimitiveValue, isSingleBoxShadowValue, isSingleTypographyValue } from '@/utils/is';
+import { matchStyleName } from '@/utils/matchStyleName';
+import { trySetStyleId } from '@/utils/trySetStyleId';
 import { transformValue } from './helpers';
 import setColorValuesOnTarget from './setColorValuesOnTarget';
 import setEffectValuesOnTarget from './setEffectValuesOnTarget';
 import setTextValuesOnTarget from './setTextValuesOnTarget';
 
+// @README values typing is wrong
+
 export default async function setValuesOnNode(
   node: BaseNode,
-  values: Partial<Record<Properties, string>>,
+  values: MapValuesToTokensResult,
   data: NodeTokenRefMap,
   figmaStyleMaps: ReturnType<typeof getAllFigmaStyleMaps>,
+  themeInfo: Omit<GetThemeInfoMessageResult, 'type'>,
   ignoreFirstPartForStyles = false,
+  prefixStylesWithThemeName = false,
 ) {
+  const activeThemeObject = themeInfo.activeTheme
+    ? themeInfo.themes.find(({ id }) => themeInfo.activeTheme === id) ?? null
+    : null;
+  const stylePathSlice = ignoreFirstPartForStyles ? 1 : 0;
+  const stylePathPrefix = prefixStylesWithThemeName && activeThemeObject
+    ? activeThemeObject.name
+    : null;
+
   try {
     // BORDER RADIUS
     if (
@@ -21,85 +38,134 @@ export default async function setValuesOnNode(
       && node.type !== 'STICKY'
       && node.type !== 'CODE_BLOCK'
     ) {
-      if ('cornerRadius' in node && typeof values.borderRadius !== 'undefined') {
-        node.cornerRadius = transformValue(values.borderRadius, 'borderRadius');
+      if (
+        'cornerRadius' in node
+        && typeof values.borderRadius !== 'undefined'
+        && isPrimitiveValue(values.borderRadius)
+      ) {
+        node.cornerRadius = transformValue(String(values.borderRadius), 'borderRadius');
       }
-      if ('topLeftRadius' in node && typeof values.borderRadiusTopLeft !== 'undefined') {
-        node.topLeftRadius = transformValue(values.borderRadiusTopLeft, 'borderRadius');
+      if (
+        'topLeftRadius' in node
+        && typeof values.borderRadiusTopLeft !== 'undefined'
+        && isPrimitiveValue(values.borderRadiusTopLeft)
+      ) {
+        node.topLeftRadius = transformValue(String(values.borderRadiusTopLeft), 'borderRadius');
       }
-      if ('topRightRadius' in node && typeof values.borderRadiusTopRight !== 'undefined') {
-        node.topRightRadius = transformValue(values.borderRadiusTopRight, 'borderRadius');
+      if (
+        'topRightRadius' in node
+        && typeof values.borderRadiusTopRight !== 'undefined'
+        && isPrimitiveValue(values.borderRadiusTopRight)
+      ) {
+        node.topRightRadius = transformValue(String(values.borderRadiusTopRight), 'borderRadius');
       }
-      if ('bottomRightRadius' in node && typeof values.borderRadiusBottomRight !== 'undefined') {
-        node.bottomRightRadius = transformValue(values.borderRadiusBottomRight, 'borderRadius');
+      if (
+        'bottomRightRadius' in node
+        && typeof values.borderRadiusBottomRight !== 'undefined'
+        && isPrimitiveValue(values.borderRadiusBottomRight)
+      ) {
+        node.bottomRightRadius = transformValue(String(values.borderRadiusBottomRight), 'borderRadius');
       }
-      if ('bottomLeftRadius' in node && typeof values.borderRadiusBottomLeft !== 'undefined') {
-        node.bottomLeftRadius = transformValue(values.borderRadiusBottomLeft, 'borderRadius');
+      if (
+        'bottomLeftRadius' in node
+        && typeof values.borderRadiusBottomLeft !== 'undefined'
+        && isPrimitiveValue(values.borderRadiusBottomLeft)
+      ) {
+        node.bottomLeftRadius = transformValue(String(values.borderRadiusBottomLeft), 'borderRadius');
       }
 
       // BOX SHADOW
       if ('effects' in node && typeof values.boxShadow !== 'undefined' && data.boxShadow) {
-        const path = data.boxShadow.split('.');
-        const pathname = path.slice(ignoreFirstPartForStyles ? 1 : 0, path.length).join('/');
-        const matchingStyle = figmaStyleMaps.effectStyles.get(pathname);
-        if (matchingStyle) {
-          node.effectStyleId = matchingStyle.id;
-        } else {
-          setEffectValuesOnTarget(node, { value: values.boxShadow });
+        const pathname = convertTokenNameToPath(data.boxShadow, stylePathPrefix, stylePathSlice);
+        const matchingStyleId = matchStyleName(
+          data.boxShadow,
+          pathname,
+          activeThemeObject?.$figmaStyleReferences ?? {},
+          figmaStyleMaps.effectStyles,
+        );
+        if (!matchingStyleId || (matchingStyleId && !await trySetStyleId(node, 'effect', matchingStyleId))) {
+          if (isSingleBoxShadowValue(values.boxShadow)) {
+            setEffectValuesOnTarget(node, { value: values.boxShadow });
+          }
         }
       }
 
       // BORDER WIDTH
-      if ('strokeWeight' in node && typeof values.borderWidth !== 'undefined') {
-        node.strokeWeight = transformValue(values.borderWidth, 'borderWidth');
+      if (
+        'strokeWeight' in node
+        && typeof values.borderWidth !== 'undefined'
+        && isPrimitiveValue(values.borderWidth)
+      ) {
+        node.strokeWeight = transformValue(String(values.borderWidth), 'borderWidth');
       }
 
       if ('strokeTopWeight' in node && typeof values.borderWidthTop !== 'undefined') {
-        node.strokeTopWeight = transformValue(values.borderWidthTop, 'borderWidthTop');
+        node.strokeTopWeight = transformValue(String(values.borderWidthTop), 'borderWidthTop');
       }
 
       if ('strokeRightWeight' in node && typeof values.borderWidthRight !== 'undefined') {
-        node.strokeRightWeight = transformValue(values.borderWidthRight, 'borderWidthRight');
+        node.strokeRightWeight = transformValue(String(values.borderWidthRight), 'borderWidthRight');
       }
 
       if ('strokeBottomWeight' in node && typeof values.borderWidthBottom !== 'undefined') {
-        node.strokeBottomWeight = transformValue(values.borderWidthBottom, 'borderWidthBottom');
+        node.strokeBottomWeight = transformValue(String(values.borderWidthBottom), 'borderWidthBottom');
       }
 
       if ('strokeLeftWeight' in node && typeof values.borderWidthLeft !== 'undefined') {
-        node.strokeLeftWeight = transformValue(values.borderWidthLeft, 'borderWidthLeft');
+        node.strokeLeftWeight = transformValue(String(values.borderWidthLeft), 'borderWidthLeft');
       }
 
       // OPACITY
-      if ('opacity' in node && typeof values.opacity !== 'undefined') {
-        node.opacity = transformValue(values.opacity, 'opacity');
+      if (
+        'opacity' in node
+        && typeof values.opacity !== 'undefined'
+        && isPrimitiveValue(values.opacity)
+      ) {
+        node.opacity = transformValue(String(values.opacity), 'opacity');
       }
 
       // SIZING: BOTH
-      if ('resize' in node && typeof values.sizing !== 'undefined') {
-        node.resize(transformValue(values.sizing, 'sizing'), transformValue(values.sizing, 'sizing'));
+      if (
+        'resize' in node
+        && typeof values.sizing !== 'undefined'
+        && isPrimitiveValue(values.sizing)
+      ) {
+        const size = transformValue(String(values.sizing), 'sizing');
+        node.resize(size, size);
       }
 
       // SIZING: WIDTH
-      if ('resize' in node && typeof values.width !== 'undefined') {
-        node.resize(transformValue(values.width, 'sizing'), node.height);
+      if (
+        'resize' in node
+        && typeof values.width !== 'undefined'
+        && isPrimitiveValue(values.width)
+      ) {
+        node.resize(transformValue(String(values.width), 'sizing'), node.height);
       }
 
       // SIZING: HEIGHT
-      if ('resize' in node && typeof values.height !== 'undefined') {
-        node.resize(node.width, transformValue(values.height, 'sizing'));
+      if (
+        'resize' in node
+        && typeof values.height !== 'undefined'
+        && isPrimitiveValue(values.height)
+      ) {
+        node.resize(node.width, transformValue(String(values.height), 'sizing'));
       }
 
       // FILL
-      if (values.fill && typeof values.fill === 'string') {
+      if (
+        values.fill
+        && typeof values.fill === 'string'
+      ) {
         if ('fills' in node && data.fill) {
-          const path = data.fill.split('.');
-          const pathname = path.slice(ignoreFirstPartForStyles ? 1 : 0, path.length).join('/');
-          const matchingStyle = figmaStyleMaps.paintStyles.get(pathname);
-          if (matchingStyle) {
-            // matchingStyles[0].paints = [{color, opacity, type: 'SOLID'}];
-            node.fillStyleId = matchingStyle.id;
-          } else {
+          const pathname = convertTokenNameToPath(data.fill, stylePathPrefix, stylePathSlice);
+          const matchingStyleId = matchStyleName(
+            data.fill,
+            pathname,
+            activeThemeObject?.$figmaStyleReferences ?? {},
+            figmaStyleMaps.paintStyles,
+          );
+          if (!matchingStyleId || (matchingStyleId && !await trySetStyleId(node, 'fill', matchingStyleId))) {
             setColorValuesOnTarget(node, { value: values.fill }, 'fills');
           }
         }
@@ -109,13 +175,17 @@ export default async function setValuesOnNode(
       // Either set typography or individual values, if typography is present we prefer that.
       if (values.typography) {
         if (node.type === 'TEXT' && data.typography) {
-          const path = data.typography.split('.'); // extract to helper fn
-          const pathname = path.slice(ignoreFirstPartForStyles ? 1 : 0, path.length).join('/');
-          const matchingStyle = figmaStyleMaps.textStyles.get(pathname);
-          if (matchingStyle) {
-            node.textStyleId = matchingStyle.id;
-          } else {
-            setTextValuesOnTarget(node, { value: values.typography });
+          const pathname = convertTokenNameToPath(data.typography, stylePathPrefix, stylePathSlice);
+          const matchingStyleId = matchStyleName(
+            data.typography,
+            pathname,
+            activeThemeObject?.$figmaStyleReferences ?? {},
+            figmaStyleMaps.textStyles,
+          );
+          if (!matchingStyleId || (matchingStyleId && !await trySetStyleId(node, 'text', matchingStyleId))) {
+            if (isSingleTypographyValue(values.typography)) {
+              setTextValuesOnTarget(node, { value: values.typography });
+            }
           }
         }
       } else if (
@@ -131,64 +201,104 @@ export default async function setValuesOnNode(
         if (node.type === 'TEXT') {
           setTextValuesOnTarget(node, {
             value: {
-              fontFamily: values.fontFamilies,
-              fontWeight: values.fontWeights,
-              lineHeight: values.lineHeights,
-              fontSize: values.fontSizes,
-              letterSpacing: values.letterSpacing,
-              paragraphSpacing: values.paragraphSpacing,
-              textCase: values.textCase,
-              textDecoration: values.textDecoration,
+              fontFamily: isPrimitiveValue(values.fontFamilies) ? String(values.fontFamilies) : undefined,
+              fontWeight: isPrimitiveValue(values.fontWeights) ? String(values.fontWeights) : undefined,
+              lineHeight: isPrimitiveValue(values.lineHeights) ? String(values.lineHeights) : undefined,
+              fontSize: isPrimitiveValue(values.fontSizes) ? String(values.fontSizes) : undefined,
+              letterSpacing: isPrimitiveValue(values.letterSpacing) ? String(values.letterSpacing) : undefined,
+              paragraphSpacing: isPrimitiveValue(values.paragraphSpacing) ? String(values.paragraphSpacing) : undefined,
+              textCase: isPrimitiveValue(values.textCase) ? String(values.textCase) : undefined,
+              textDecoration: isPrimitiveValue(values.textDecoration) ? String(values.textDecoration) : undefined,
             },
           });
         }
       }
 
       // BORDER COLOR
-      if (typeof values.border !== 'undefined') {
+      if (typeof values.border !== 'undefined' && typeof values.border === 'string') {
         if ('strokes' in node && data.border) {
-          const path = data.border.split('.');
-          const pathname = path.slice(ignoreFirstPartForStyles ? 1 : 0, path.length).join('/');
-          const matchingStyle = figmaStyleMaps.paintStyles.get(pathname);
-          if (matchingStyle) {
-            node.strokeStyleId = matchingStyle.id;
-          } else {
+          const pathname = convertTokenNameToPath(data.border, stylePathPrefix, stylePathSlice);
+          const matchingStyleId = matchStyleName(
+            data.border,
+            pathname,
+            activeThemeObject?.$figmaStyleReferences ?? {},
+            figmaStyleMaps.paintStyles,
+          );
+          if (!matchingStyleId || (matchingStyleId && !await trySetStyleId(node, 'stroke', matchingStyleId))) {
             setColorValuesOnTarget(node, { value: values.border }, 'strokes');
           }
         }
       }
 
       // SPACING
-      if ('paddingLeft' in node && typeof values.spacing !== 'undefined') {
-        node.paddingLeft = transformValue(values.spacing, 'spacing');
-        node.paddingRight = transformValue(values.spacing, 'spacing');
-        node.paddingTop = transformValue(values.spacing, 'spacing');
-        node.paddingBottom = transformValue(values.spacing, 'spacing');
-        node.itemSpacing = transformValue(values.spacing, 'spacing');
+      if (
+        'paddingLeft' in node
+        && typeof values.spacing !== 'undefined'
+        && isPrimitiveValue(values.spacing)
+      ) {
+        const spacing = transformValue(String(values.spacing), 'spacing');
+        node.paddingLeft = spacing;
+        node.paddingRight = spacing;
+        node.paddingTop = spacing;
+        node.paddingBottom = spacing;
+        node.itemSpacing = spacing;
       }
-      if ('paddingLeft' in node && typeof values.horizontalPadding !== 'undefined') {
-        node.paddingLeft = transformValue(values.horizontalPadding, 'spacing');
-        node.paddingRight = transformValue(values.horizontalPadding, 'spacing');
+      if (
+        'paddingLeft' in node
+        && typeof values.horizontalPadding !== 'undefined'
+        && isPrimitiveValue(values.horizontalPadding)
+      ) {
+        const horizontalPadding = transformValue(String(values.horizontalPadding), 'spacing');
+        node.paddingLeft = horizontalPadding;
+        node.paddingRight = horizontalPadding;
       }
-      if ('paddingTop' in node && typeof values.verticalPadding !== 'undefined') {
-        node.paddingTop = transformValue(values.verticalPadding, 'spacing');
-        node.paddingBottom = transformValue(values.verticalPadding, 'spacing');
-      }
-      if ('itemSpacing' in node && typeof values.itemSpacing !== 'undefined') {
-        node.itemSpacing = transformValue(values.itemSpacing, 'spacing');
+      if (
+        'paddingTop' in node
+        && typeof values.verticalPadding !== 'undefined'
+        && isPrimitiveValue(values.verticalPadding)
+      ) {
+        const verticalPadding = transformValue(String(values.verticalPadding), 'spacing');
+        node.paddingTop = verticalPadding;
+        node.paddingBottom = verticalPadding;
       }
 
-      if ('paddingTop' in node && typeof values.paddingTop !== 'undefined') {
-        node.paddingTop = transformValue(values.paddingTop, 'spacing');
+      if (
+        'itemSpacing' in node
+        && typeof values.itemSpacing !== 'undefined'
+        && isPrimitiveValue(values.itemSpacing)
+      ) {
+        node.itemSpacing = transformValue(String(values.itemSpacing), 'spacing');
       }
-      if ('paddingRight' in node && typeof values.paddingRight !== 'undefined') {
-        node.paddingRight = transformValue(values.paddingRight, 'spacing');
+
+      if (
+        'paddingTop' in node
+        && typeof values.paddingTop !== 'undefined'
+        && isPrimitiveValue(values.paddingTop)
+      ) {
+        node.paddingTop = transformValue(String(values.paddingTop), 'spacing');
       }
-      if ('paddingBottom' in node && typeof values.paddingBottom !== 'undefined') {
-        node.paddingBottom = transformValue(values.paddingBottom, 'spacing');
+      if (
+        'paddingRight' in node
+        && typeof values.paddingRight !== 'undefined'
+        && isPrimitiveValue(values.paddingRight)
+      ) {
+        node.paddingRight = transformValue(String(values.paddingRight), 'spacing');
       }
-      if ('paddingLeft' in node && typeof values.paddingLeft !== 'undefined') {
-        node.paddingLeft = transformValue(values.paddingLeft, 'spacing');
+
+      if (
+        'paddingBottom' in node
+        && typeof values.paddingBottom !== 'undefined'
+        && isPrimitiveValue(values.paddingBottom)
+      ) {
+        node.paddingBottom = transformValue(String(values.paddingBottom), 'spacing');
+      }
+
+      if (
+        'paddingLeft' in node
+        && typeof values.paddingLeft !== 'undefined'
+        && isPrimitiveValue(values.paddingLeft)
+      ) {
+        node.paddingLeft = transformValue(String(values.paddingLeft), 'spacing');
       }
 
       // Raw value for text layers
@@ -203,7 +313,7 @@ export default async function setValuesOnNode(
       }
 
       // Real value for text layers
-      if (values.value) {
+      if ('value' in values) {
         if ('characters' in node && node.fontName !== figma.mixed) {
           await figma.loadFontAsync(node.fontName);
           // If we're inserting an object, stringify that

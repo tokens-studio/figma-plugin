@@ -11,9 +11,19 @@ import {
   BranchSwitchMenuTrigger,
   BranchSwitchMenuRadioGroup,
   BranchSwitchMenuArrow,
+  BranchSwitchMenuSeparator,
 } from './BranchSwitchMenu';
 import {
-  branchSelector, lastSyncedStateSelector, tokensSelector, localApiStateBranchSelector, apiSelector, usedTokenSetSelector, localApiStateSelector, themesListSelector, activeThemeSelector,
+  branchSelector,
+  lastSyncedStateSelector,
+  tokensSelector,
+  localApiStateBranchSelector,
+  apiSelector,
+  usedTokenSetSelector,
+  localApiStateSelector,
+  themesListSelector,
+  activeThemeSelector,
+  storageTypeSelector,
 } from '@/selectors';
 import useRemoteTokens from '../store/remoteTokens';
 import useConfirm from '@/app/hooks/useConfirm';
@@ -21,6 +31,9 @@ import CreateBranchModal from './modals/CreateBranchModal';
 import { Dispatch } from '../store';
 import { BranchSwitchMenuRadioElement } from './BranchSwitchMenuRadioElement';
 import { isGitProvider } from '@/utils/is';
+import { compareLastSyncedState } from '@/utils/compareLastSyncedState';
+import { useFlags } from './LaunchDarkly';
+import ProBadge from './ProBadge';
 
 const BranchSwitchMenuItemElement: React.FC<{
   branch: string
@@ -43,12 +56,14 @@ export default function BranchSelector() {
   const { confirm } = useConfirm();
   const { pullTokens, pushTokens } = useRemoteTokens();
   const dispatch = useDispatch<Dispatch>();
+  const { gitBranchSelector } = useFlags();
 
   const branchState = useSelector(branchSelector);
   const lastSyncedState = useSelector(lastSyncedStateSelector);
   const tokens = useSelector(tokensSelector);
   const themes = useSelector(themesListSelector);
 
+  const storageType = useSelector(storageTypeSelector);
   const localApiState = useSelector(localApiStateSelector);
   const localApiStateBranch = useSelector(localApiStateBranchSelector);
   const apiData = useSelector(apiSelector);
@@ -66,9 +81,17 @@ export default function BranchSelector() {
   }, [localApiStateBranch, setCurrentBranch]);
 
   const checkForChanges = React.useCallback(() => {
-    const hasChanged = (lastSyncedState !== JSON.stringify([tokens, themes], null, 2));
+    const tokenSetOrder = Object.keys(tokens);
+    const defaultMetadata = isGitProvider(storageType) ? { tokenSetOrder } : {};
+    const hasChanged = !compareLastSyncedState(
+      tokens,
+      themes,
+      defaultMetadata,
+      lastSyncedState,
+      [{}, [], defaultMetadata],
+    );
     return hasChanged;
-  }, [lastSyncedState, tokens, themes]);
+  }, [lastSyncedState, tokens, themes, storageType]);
 
   const hasChanges = React.useMemo(() => checkForChanges(), [checkForChanges]);
 
@@ -163,12 +186,23 @@ export default function BranchSelector() {
           </BranchSwitchMenuMainTrigger>
 
           <BranchSwitchMenuContent side="top" sideOffset={5}>
-            <BranchSwitchMenuRadioGroup className="content scroll-container" css={{ maxHeight: '$dropdownMaxHeight' }} value={currentBranch}>
+            {!gitBranchSelector && (
+            <>
+              <BranchSwitchMenuItem css={{ display: 'flex', justifyContent: 'space-between' }}>
+
+                <span>Upgrade to Pro</span>
+                <ProBadge compact />
+
+              </BranchSwitchMenuItem>
+              <BranchSwitchMenuSeparator />
+            </>
+            )}
+            <BranchSwitchMenuRadioGroup className="content content-dark scroll-container" css={{ maxHeight: '$dropdownMaxHeight' }} value={currentBranch}>
               {branchState.branches.length > 0
-                && branchState.branches.map((branch, index) => <BranchSwitchMenuRadioElement key={`radio_${seed(index)}`} branch={branch} branchSelected={onBranchSelected} />)}
+                && branchState.branches.map((branch, index) => <BranchSwitchMenuRadioElement disabled={!gitBranchSelector} key={`radio_${seed(index)}`} branch={branch} branchSelected={onBranchSelected} />)}
             </BranchSwitchMenuRadioGroup>
             <BranchSwitchMenu>
-              <BranchSwitchMenuTrigger data-cy="branch-selector-create-new-branch-trigger">
+              <BranchSwitchMenuTrigger data-cy="branch-selector-create-new-branch-trigger" disabled={!gitBranchSelector}>
                 Create new branch from
                 <ChevronRightIcon />
               </BranchSwitchMenuTrigger>

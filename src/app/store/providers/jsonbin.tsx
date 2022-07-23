@@ -14,6 +14,7 @@ import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StorageTypeCredentials, StorageTypeFormValues } from '@/types/StorageType';
+import { saveLastSyncedState } from '@/utils/saveLastSyncedState';
 
 export async function updateJSONBinTokens({
   tokens, themes, context, updatedAt, oldUpdatedAt = null,
@@ -74,7 +75,7 @@ export function useJSONbin() {
         themes,
         updatedAt,
       });
-      AsyncMessageChannel.message({
+      AsyncMessageChannel.ReactInstance.message({
         type: AsyncMessageTypes.CREDENTIALS,
         credential: {
           provider: StorageProviderType.JSONBIN,
@@ -103,7 +104,7 @@ export function useJSONbin() {
       const data = await storage.retrieve();
       dispatch.uiState.setProjectURL(`https://jsonbin.io/${id}`);
 
-      AsyncMessageChannel.message({
+      AsyncMessageChannel.ReactInstance.message({
         type: AsyncMessageTypes.CREDENTIALS,
         credential: {
           id,
@@ -151,7 +152,7 @@ export function useJSONbin() {
         },
         shouldSetInDocument: true,
       });
-      dispatch.tokenState.setLastSyncedState(JSON.stringify([content.tokens, content.themes], null, 2));
+      saveLastSyncedState(dispatch, content.tokens, content.themes, content.metadata);
       dispatch.tokenState.setTokenData({
         values: content.tokens,
         themes: content.themes,

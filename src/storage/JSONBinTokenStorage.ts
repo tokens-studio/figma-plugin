@@ -4,6 +4,7 @@ import { DeepTokensMap, ThemeObjectsList } from '@/types';
 import { SingleToken } from '@/types/tokens';
 import { RemoteTokenStorage, RemoteTokenStorageFile } from './RemoteTokenStorage';
 import { singleFileSchema } from './schemas/singleFileSchema';
+import { SystemFilenames } from './SystemFilenames';
 
 const jsonbinSchema = singleFileSchema.extend({
   version: z.string(),
@@ -71,12 +72,12 @@ export class JSONBinTokenStorage extends RemoteTokenStorage<JsonBinMetadata> {
     return [
       {
         type: 'themes',
-        path: '$themes.json',
+        path: `${SystemFilenames.THEMES}.json`,
         data: data.$themes ?? [],
       },
       {
         type: 'metadata',
-        path: '$metadata.json',
+        path: `${SystemFilenames.METADATA}.json`,
         data: {
           version: data.version,
           updatedAt: data.updatedAt,

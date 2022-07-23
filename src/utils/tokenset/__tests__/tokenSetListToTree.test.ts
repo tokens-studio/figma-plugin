@@ -21,6 +21,14 @@ describe('tokenSetListToTree', () => {
         label: 'theme',
       },
       {
+        isLeaf: true,
+        path: 'theme/type',
+        key: 'theme/type',
+        parent: 'theme',
+        level: 1,
+        label: 'type',
+      },
+      {
         isLeaf: false,
         path: 'theme/colors',
         key: 'theme/colors',
@@ -43,14 +51,6 @@ describe('tokenSetListToTree', () => {
         parent: 'theme/colors',
         level: 2,
         label: 'red',
-      },
-      {
-        isLeaf: true,
-        path: 'theme/type',
-        key: 'theme/type',
-        parent: 'theme',
-        level: 1,
-        label: 'type',
       },
     ];
     expect(tokenSetListToTree(input)).toEqual(output);

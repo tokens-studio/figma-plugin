@@ -2,6 +2,7 @@ import React from 'react';
 import { styled } from '@/stitches.config';
 import Tooltip from './Tooltip';
 import { StyledDirtyStateBadge } from './StyledDirtyStateBadge';
+import { StitchesCSS } from '@/types';
 
 const commonStyles = {
   all: 'unset',
@@ -10,8 +11,12 @@ const commonStyles = {
   padding: '$2',
   borderRadius: '$button',
   cursor: 'pointer',
-  '&:hover, &:focus': {
+  '&:not(:disabled):hover, &:not(:disabled):focus': {
     boxShadow: 'none',
+  },
+  '&:disabled': {
+    pointerEvents: 'none',
+    opacity: 0.5,
   },
   variants: {
     buttonVariant: {
@@ -19,7 +24,7 @@ const commonStyles = {
         display: 'block',
         backgroundColor: '$interaction',
         color: '$onInteraction',
-        '&:hover, &:focus': {
+        '&:not(:disabled):hover, &:not(:disabled):focus': {
           backgroundColor: '$interactionSubtle',
         },
       },
@@ -27,7 +32,7 @@ const commonStyles = {
         display: 'block',
         backgroundColor: 'transparent',
         color: '$text',
-        '&:hover, &:focus': {
+        '&:not(:disabled):hover, &:not(:disabled):focus': {
           backgroundColor: '$bgSubtle',
         },
       },
@@ -45,7 +50,8 @@ type Props = {
   tooltip?: string;
   dataCy?: string;
   icon: any;
-  css?: any;
+  css?: StitchesCSS;
+  className?: string
   variant?: StyledButtonProps['buttonVariant'];
   tooltipSide?: 'bottom' | 'left' | 'top' | undefined;
   onClick?: () => void;
@@ -71,6 +77,7 @@ export default function IconButton({
   href,
   icon,
   css,
+  className,
   variant = 'default',
   tooltipSide = 'left',
   badge,
@@ -82,7 +89,7 @@ export default function IconButton({
   }, [onClick]);
 
   return (
-    <Box css={{ position: 'relative', ...css }}>
+    <Box css={{ position: 'relative', ...css }} className={className}>
       <Tooltip side={tooltipSide} label={tooltip ?? ''}>
         {href ? (
           <Box>
@@ -96,12 +103,19 @@ export default function IconButton({
               <IconButtonInnerContent icon={icon} badge={badge} />
             </StyledLink>
           </Box>
-        )
-          : (
-            <StyledButton disabled={disabled} data-cy={dataCy} type="button" onClick={handleClick} buttonVariant={variant}>
-              <IconButtonInnerContent icon={icon} badge={badge} />
-            </StyledButton>
-          )}
+        ) : (
+          <StyledButton
+            css={css}
+            disabled={disabled}
+            data-testid={dataCy}
+            data-cy={dataCy}
+            type="button"
+            onClick={handleClick}
+            buttonVariant={variant}
+          >
+            <IconButtonInnerContent icon={icon} badge={badge} />
+          </StyledButton>
+        )}
       </Tooltip>
     </Box>
   );

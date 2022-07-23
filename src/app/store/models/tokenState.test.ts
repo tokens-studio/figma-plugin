@@ -3,6 +3,7 @@ import { RootModel } from '@/types/RootModel';
 import { models } from './index';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
+import * as notifiers from '@/plugin/notifiers';
 
 const shadowArray = [
   {
@@ -87,6 +88,8 @@ describe('editToken', () => {
               newTokens: [],
               updatedTokens: [],
             },
+            themes: [],
+            activeTheme: null,
             activeTokenSet: 'global',
           },
         },
@@ -275,5 +278,158 @@ describe('editToken', () => {
       },
     ]);
     expect(usedTokenSet).toEqual({});
+  });
+
+  it('can delete a token set', () => {
+    store.dispatch.tokenState.deleteTokenSet('global');
+    const {
+      tokens, usedTokenSet,
+    } = store.getState().tokenState;
+    expect(tokens).toEqual({
+      options: [
+        {
+          name: 'background',
+          value: '$primary',
+        },
+      ],
+    });
+    expect(usedTokenSet).toEqual({});
+  });
+
+  it('can treat set a token set as source', () => {
+    store.dispatch.tokenState.toggleTreatAsSource('global');
+    const { usedTokenSet } = store.getState().tokenState;
+    expect(usedTokenSet).toEqual({
+      global: TokenSetStatus.SOURCE,
+    });
+  });
+
+  it('can duplicate token set', () => {
+    store.dispatch.tokenState.duplicateTokenSet('global');
+    const { tokens, usedTokenSet } = store.getState().tokenState;
+    expect(tokens.global_Copy).toEqual([
+      {
+        name: 'primary',
+        value: '1',
+      },
+      {
+        name: 'alias',
+        value: '$primary',
+      },
+      {
+        name: 'primary50',
+        value: '0.50',
+      },
+      {
+        name: 'alias50',
+        value: '$primary50',
+      },
+      {
+        name: 'header 1',
+        type: 'typography',
+        value: {
+          fontWeight: '400',
+          fontSize: '16',
+        },
+      },
+      {
+        name: 'header 1',
+        type: 'typography',
+        value: {
+          fontWeight: '400',
+          fontSize: '16',
+        },
+      },
+      {
+        name: 'shadow.mixed',
+        type: 'boxShadow',
+        description: 'the one with mixed shadows',
+        value: shadowArray,
+      },
+    ]);
+    expect(usedTokenSet).toEqual({
+      global: TokenSetStatus.ENABLED,
+      global_Copy: TokenSetStatus.DISABLED,
+    });
+  });
+
+  it('will notify the UI if the token set to duplicate does not exist', () => {
+    const notifyToUISpy = jest.spyOn(notifiers, 'notifyToUI');
+    notifyToUISpy.mockReturnValueOnce();
+    store.dispatch.tokenState.duplicateTokenSet('nonexistant');
+    expect(notifyToUISpy).toBeCalledWith('Token set does not exist', { error: true });
+  });
+
+  it('can reset imported tokens', () => {
+    store.dispatch.tokenState.setTokensFromStyles({
+      colors: [
+        {
+          type: TokenTypes.COLOR,
+          name: 'primary',
+          value: '2',
+        },
+      ],
+    });
+    store.dispatch.tokenState.resetImportedTokens();
+    const { importedTokens } = store.getState().tokenState;
+    expect(importedTokens).toEqual({
+      newTokens: [],
+      updatedTokens: [],
+    });
+  });
+
+  it('can create token', () => {
+    store.dispatch.tokenState.createToken({
+      name: 'test',
+      parent: 'global',
+      type: TokenTypes.COLOR,
+      value: '#000000',
+    });
+    const { tokens } = store.getState().tokenState;
+    expect(tokens.global).toEqual([
+      {
+        name: 'primary',
+        value: '1',
+      },
+      {
+        name: 'alias',
+        value: '$primary',
+      },
+      {
+        name: 'primary50',
+        value: '0.50',
+      },
+      {
+        name: 'alias50',
+        value: '$primary50',
+      },
+      {
+        name: 'header 1',
+        type: 'typography',
+        value: {
+          fontWeight: '400',
+          fontSize: '16',
+        },
+      },
+      {
+        name: 'header 1',
+        type: 'typography',
+        value: {
+          fontWeight: '400',
+          fontSize: '16',
+        },
+      },
+      {
+        name: 'shadow.mixed',
+        type: 'boxShadow',
+        description: 'the one with mixed shadows',
+        value: shadowArray,
+      },
+      {
+        name: 'test',
+        type: TokenTypes.COLOR,
+        value: '#000000',
+      },
+    ]);
   });
 });
