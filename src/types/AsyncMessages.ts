@@ -1,4 +1,3 @@
-import { LDProps } from 'launchdarkly-react-client-sdk/lib/withLDConsumer';
 import { UpdateMode } from '@/constants/UpdateMode';
 import type { SettingsState } from '@/app/store/models/settings';
 import type { Properties } from '@/constants/Properties';
@@ -17,7 +16,6 @@ import type { ThemeObject } from './ThemeObject';
 
 export enum AsyncMessageTypes {
   // the below messages are going from UI to plugin
-  INITIATE = 'async/initiate',
   CREATE_STYLES = 'async/create-styles',
   CREDENTIALS = 'async/credentials',
   CHANGED_TABS = 'async/changed-tabs',
@@ -37,7 +35,6 @@ export enum AsyncMessageTypes {
   CREATE_ANNOTATION = 'async/create-annotation',
   UPDATE = 'async/update',
   SET_LICENSE_KEY = 'async/set-license-key',
-  GET_API_CREDENTIALS = 'async/get-api-credentials',
   ATTACH_LOCAL_STYLES_TO_THEME = 'async/attach-local-styles-to-theme',
   RESOLVE_STYLE_INFO = 'async/resolve-style-info',
   // the below messages are going from plugin to UI
@@ -46,9 +43,6 @@ export enum AsyncMessageTypes {
 }
 
 export type AsyncMessage<T extends AsyncMessageTypes, P = unknown> = P & { type: T };
-
-export type InitiateAsyncMessage = AsyncMessage<AsyncMessageTypes.INITIATE>;
-export type InitiateAsyncMessageResult = AsyncMessage<AsyncMessageTypes.INITIATE>;
 
 export type CredentialsAsyncMessage = AsyncMessage<AsyncMessageTypes.CREDENTIALS, {
   credential: StorageTypeCredentials;
@@ -147,12 +141,6 @@ export type SetLicenseKeyMessage = AsyncMessage<AsyncMessageTypes.SET_LICENSE_KE
 }>;
 export type SetLicenseKeyMessageResult = AsyncMessage<AsyncMessageTypes.SET_LICENSE_KEY>;
 
-export type GetApiCredentialsMessage = AsyncMessage<AsyncMessageTypes.GET_API_CREDENTIALS, {
-  shouldPull?: boolean
-  featureFlags?: LDProps['flags'] | null
-}>;
-export type GetApiCredentialsMessageResult = AsyncMessage<AsyncMessageTypes.GET_API_CREDENTIALS>;
-
 export type AttachLocalStylesToTheme = AsyncMessage<AsyncMessageTypes.ATTACH_LOCAL_STYLES_TO_THEME, {
   theme: ThemeObject
   tokens: Record<string, AnyTokenList>
@@ -185,7 +173,6 @@ export type StartupMessageResult = AsyncMessage<AsyncMessageTypes.STARTUP>;
 
 export type AsyncMessages =
   CreateStylesAsyncMessage
-  | InitiateAsyncMessage
   | CredentialsAsyncMessage
   | ChangedTabsAsyncMessage
   | RemoveSingleCredentialAsyncMessage
@@ -205,14 +192,12 @@ export type AsyncMessages =
   | UpdateAsyncMessage
   | GetThemeInfoMessage
   | SetLicenseKeyMessage
-  | GetApiCredentialsMessage
   | StartupMessage
   | AttachLocalStylesToTheme
   | ResolveStyleInfo;
 
 export type AsyncMessageResults =
   CreateStylesAsyncMessageResult
-  | InitiateAsyncMessageResult
   | CredentialsAsyncMessageResult
   | ChangedTabsAsyncMessageResult
   | RemoveSingleCredentialAsyncMessageResult
@@ -232,7 +217,6 @@ export type AsyncMessageResults =
   | UpdateAsyncMessageResult
   | GetThemeInfoMessageResult
   | SetLicenseKeyMessageResult
-  | GetApiCredentialsMessageResult
   | StartupMessageResult
   | AttachLocalStylesToThemeResult
   | ResolveStyleInfoResult;

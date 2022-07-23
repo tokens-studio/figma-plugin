@@ -7,8 +7,6 @@ import { MoreButton } from '../MoreButton';
 import useManageTokens from '../../store/useManageTokens';
 import { Dispatch } from '../../store';
 import BrokenReferenceIndicator from '../BrokenReferenceIndicator';
-import { waitForMessage } from '@/utils/waitForMessage';
-import { MessageFromPluginTypes } from '@/types/messages';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
 import { TokenTooltip } from '../TokenTooltip';
 import { TokensContext } from '@/context';
@@ -93,12 +91,10 @@ export const TokenButton: React.FC<Props> = ({
     duplicateSingleToken({ parent: activeTokenSet, name });
   }, [activeTokenSet, name, duplicateSingleToken]);
 
-  const setPluginValue = React.useCallback((value: SelectionValue) => {
+  const setPluginValue = React.useCallback(async (value: SelectionValue) => {
     dispatch.uiState.startJob({ name: BackgroundJobs.UI_APPLYNODEVALUE });
-    setNodeData(value, tokensContext.resolvedTokens);
-    waitForMessage(MessageFromPluginTypes.REMOTE_COMPONENTS).then(() => {
-      dispatch.uiState.completeJob(BackgroundJobs.UI_APPLYNODEVALUE);
-    });
+    await setNodeData(value, tokensContext.resolvedTokens);
+    dispatch.uiState.completeJob(BackgroundJobs.UI_APPLYNODEVALUE);
   }, [dispatch, tokensContext.resolvedTokens, setNodeData]);
 
   const handleClick = React.useCallback((givenProperties: PropertyObject | PropertyObject[], isActive = active) => {

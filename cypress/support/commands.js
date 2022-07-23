@@ -1,9 +1,6 @@
 import {
   MessageFromPluginTypes
 } from '../../src/types/messages';
-import {
-  StorageProviderType
-} from '../../src/constants/StorageProviderType';
 
 // ***********************************************
 // This example commands.js shows you how to
@@ -31,32 +28,6 @@ import {
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
 
-Cypress.Commands.add('receiveStorageTypeLocal', () => {
-  cy.window().then(($window) => {
-    const message = {
-      pluginMessage: {
-        type: MessageFromPluginTypes.RECEIVED_STORAGE_TYPE,
-        storageType: {
-          provider: StorageProviderType.LOCAL
-        },
-      },
-    };
-    $window.postMessage(message, '*');
-  });
-});
-
-Cypress.Commands.add('receiveStorageType', (storageType) => {
-  cy.window().then(($window) => {
-    const message = {
-      pluginMessage: {
-        type: MessageFromPluginTypes.RECEIVED_STORAGE_TYPE,
-        storageType,
-      },
-    };
-    $window.postMessage(message, '*');
-  });
-});
-
 Cypress.Commands.add('receiveApiProviders', (providers) => {
   cy.window().then(($window) => {
     const message = {
@@ -69,38 +40,12 @@ Cypress.Commands.add('receiveApiProviders', (providers) => {
   });
 });
 
-Cypress.Commands.add('receiveTokenValues', (values) => {
-  cy.window().then(($window) => {
-    const message = {
-      pluginMessage: {
-        type: MessageFromPluginTypes.TOKEN_VALUES,
-        values,
-        userData: {}
-      },
-    };
-    $window.postMessage(message, '*');
-  });
-});
-
 Cypress.Commands.add('receiveSetTokens', (values) => {
   cy.window().then(($window) => {
     const message = {
       pluginMessage: {
         type: MessageFromPluginTypes.SET_TOKENS,
         values,
-      },
-    };
-    $window.postMessage(message, '*');
-  });
-});
-
-Cypress.Commands.add('apiCredentials', (values) => {
-  cy.window().then(($window) => {
-    const message = {
-      pluginMessage: {
-        type: MessageFromPluginTypes.API_CREDENTIALS,
-        status: true,
-        credentials: values,
       },
     };
     $window.postMessage(message, '*');
