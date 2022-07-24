@@ -15,17 +15,16 @@ export default function stringifyTokens(
   activeTokenSet: string,
 ): string {
   const tokenObj = {};
+
   tokens[activeTokenSet]?.forEach((token) => {
     const tokenWithType = appendTypeToToken(token);
     const { name, ...tokenWithoutName } = tokenWithType;
-    if ('inheritType' in tokenWithoutName) {
+    if (tokenWithoutName.inheritType && tokenWithoutName.inheritTypeLevel) {
       const {
         type, inheritType, inheritTypeLevel, ...tokenWithoutType
       } = tokenWithoutName;
       // set type of group level
-      if (inheritTypeLevel) {
-        set(tokenObj, getGroupTypeName(token.name, inheritTypeLevel), tokenWithoutName.inheritType);
-      }
+      set(tokenObj, getGroupTypeName(token.name, inheritTypeLevel), tokenWithoutName.inheritType);
       set(tokenObj, token.name, tokenWithoutType);
     } else {
       set(tokenObj, token.name, tokenWithoutName);

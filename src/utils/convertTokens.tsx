@@ -59,7 +59,7 @@ function checkForTokens({
   } else if (typeof token === 'object') {
     let tokenToCheck = token;
     if (!isSingleTokenValueObject(token)) {
-      groupLevel = groupLevel + 1;
+      groupLevel += 1;
     }
     if (isTokenGroupWithType(token)) {
       const { type, ...tokenValues } = token;
@@ -109,7 +109,6 @@ export default function convertToTokenArray({
   expandTypography?: boolean
   expandShadow?: boolean
 }) {
-  console.log('tokens', tokens);
   const [result] = checkForTokens({
     obj: [], root: null, token: tokens, returnValuesOnly, expandTypography, expandShadow,
   });
