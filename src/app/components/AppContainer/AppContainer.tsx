@@ -14,6 +14,11 @@ import { ProcessStepStatus } from '@/hooks';
 import { track } from '@/utils/analytics';
 import { withLDProviderWrapper } from '../LaunchDarkly';
 import { ApplicationInitSteps } from './ApplicationInitSteps';
+import ConfirmDialog from '../ConfirmDialog';
+import WindowResizer from '../WindowResizer';
+import ImportedTokensDialog from '../ImportedTokensDialog';
+import PushDialog from '../PushDialog';
+import Changelog from '../Changelog';
 
 type Props = StartupMessage & {
   // @README only for unit testing purposes
@@ -66,16 +71,23 @@ export const AppContainer = withLDProviderWrapper((params: Props) => {
   }, [handlePerformStartup]);
 
   return (
-    <FigmaLoading
-      isLoading={showLoadingScreen}
-      label={(
-        startupProcess.currentStep
-          ? applicationInitStepLabels[startupProcess.currentStep]
-          : undefined
-      )}
-      onCancel={handleCancelLoadingScreen}
-    >
-      <App />
-    </FigmaLoading>
+    <>
+      <FigmaLoading
+        isLoading={showLoadingScreen}
+        label={(
+          startupProcess.currentStep
+            ? applicationInitStepLabels[startupProcess.currentStep]
+            : undefined
+        )}
+        onCancel={handleCancelLoadingScreen}
+      >
+        <App />
+      </FigmaLoading>
+      <ConfirmDialog />
+      <ImportedTokensDialog />
+      <PushDialog />
+      <WindowResizer />
+      <Changelog />
+    </>
   );
 });

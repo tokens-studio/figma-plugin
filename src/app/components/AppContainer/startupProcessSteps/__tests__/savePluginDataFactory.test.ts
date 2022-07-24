@@ -16,7 +16,7 @@ describe('savePluginDataFactory', () => {
         figmaId: 'figma:1234',
         name: 'Jan Six',
       },
-      lastOpened: '2022-07-21T10:00:00.000Z',
+      lastOpened: Date.now(),
       settings: {
         width: 500,
         height: 500,

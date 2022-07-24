@@ -7,11 +7,6 @@ import StartScreen from './StartScreen';
 import Navbar from './Navbar';
 import FigmaLoading from './FigmaLoading';
 import Footer from './Footer';
-import Changelog from './Changelog';
-import ImportedTokensDialog from './ImportedTokensDialog';
-import ConfirmDialog from './ConfirmDialog';
-import PushDialog from './PushDialog';
-import WindowResizer from './WindowResizer';
 import Box from './Box';
 import { activeTabSelector } from '@/selectors';
 import PluginResizerWrapper from './PluginResizer';
@@ -48,11 +43,6 @@ function App() {
             {activeTab === 'settings' && <Settings />}
           </Box>
           {activeTab !== 'loading' && activeTab !== 'start' && <Footer />}
-          <Changelog />
-          <ImportedTokensDialog />
-          <ConfirmDialog />
-          <PushDialog />
-          <WindowResizer />
         </Box>
       </PluginResizerWrapper>
     </Box>
