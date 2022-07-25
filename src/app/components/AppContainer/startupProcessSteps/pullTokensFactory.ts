@@ -35,6 +35,7 @@ export function pullTokensFactory(
       StorageProviderType.ADO,
       StorageProviderType.GITHUB,
       StorageProviderType.GITLAB,
+      StorageProviderType.BITBUCKET,
       StorageProviderType.JSONBIN,
       StorageProviderType.URL,
     ].includes(storageType.provider);
@@ -56,6 +57,7 @@ export function pullTokensFactory(
             matchingSet.provider === StorageProviderType.GITHUB
             || matchingSet.provider === StorageProviderType.GITLAB
             || matchingSet.provider === StorageProviderType.ADO
+            || matchingSet.provider === StorageProviderType.BITBUCKET
           ) {
             const branches = await useRemoteTokensResult.fetchBranches(matchingSet);
             if (branches) dispatch.branchState.setBranches(branches);
