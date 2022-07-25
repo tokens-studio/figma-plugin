@@ -70,7 +70,6 @@ function checkForTokens({
     if (isSingleTokenValueObject(token) && typeof token.value !== 'string') {
       tokenToCheck = token.value as typeof tokenToCheck;
     }
-    console.log('tokenToCheck', tokenToCheck);
     Object.entries(tokenToCheck).forEach(([key, value]) => {
       const [, result] = checkForTokens({
         obj,
@@ -83,7 +82,6 @@ function checkForTokens({
         groupLevel,
         currentTypeLevel,
       });
-      console.log('result', result);
       if (root && result) {
         obj.push({ ...result, name: [root, key].join('.') });
       } else if (result) {
