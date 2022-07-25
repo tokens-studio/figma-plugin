@@ -141,26 +141,51 @@ export default function useTokens() {
     });
   }, [settings.updateMode]);
 
-  // Calls Figma with all tokens to create styles
+  // Asks user which styles to create, then calls Figma with all tokens to create styles
   const createStylesFromTokens = useCallback(async () => {
-    track('createStyles');
-
-    const enabledTokenSets = Object.entries(usedTokenSet)
-      .filter(([, status]) => status === TokenSetStatus.ENABLED)
-      .map(([tokenSet]) => tokenSet);
-    const resolved = resolveTokenValues(mergeTokenGroups(tokens, usedTokenSet));
-    const withoutIgnoredAndSourceTokens = resolved.filter((token) => (
-      !token.name.split('.').some((part) => part.startsWith('_')) // filter out ignored tokens
-      && (!token.internal__Parent || enabledTokenSets.includes(token.internal__Parent)) // filter out SOURCE tokens
-    ));
-
-    const createStylesResult = await AsyncMessageChannel.ReactInstance.message({
-      type: AsyncMessageTypes.CREATE_STYLES,
-      tokens: withoutIgnoredAndSourceTokens,
-      settings,
+    const userDecision = await confirm({
+      text: 'Create styles',
+      description: 'What styles should be created?',
+      confirmAction: 'Create',
+      choices: [
+        { key: 'colorStyles', label: 'Color', enabled: true },
+        { key: 'textStyles', label: 'Text', enabled: true },
+        { key: 'effectStyles', label: 'Shadows', enabled: true },
+      ],
     });
-    dispatch.tokenState.assignStyleIdsToCurrentTheme(createStylesResult.styleIds);
-  }, [settings, tokens, usedTokenSet, dispatch.tokenState]);
+
+    if (userDecision && Array.isArray(userDecision.data) && userDecision.data.length) {
+      track('createStyles', {
+        textStyles: userDecision.data.includes('textStyles'),
+        colorStyles: userDecision.data.includes('colorStyles'),
+        effectStyles: userDecision.data.includes('effectStyles'),
+      });
+
+      const enabledTokenSets = Object.entries(usedTokenSet)
+        .filter(([, status]) => status === TokenSetStatus.ENABLED)
+        .map(([tokenSet]) => tokenSet);
+      const resolved = resolveTokenValues(mergeTokenGroups(tokens, usedTokenSet));
+      const withoutIgnoredAndSourceTokens = resolved.filter((token) => (
+        !token.name.split('.').some((part) => part.startsWith('_')) // filter out ignored tokens
+          && (!token.internal__Parent || enabledTokenSets.includes(token.internal__Parent)) // filter out SOURCE tokens
+      ));
+
+      const tokensToCreate = withoutIgnoredAndSourceTokens.filter((token) => (
+        [
+          userDecision.data.includes('textStyles') && token.type === TokenTypes.TYPOGRAPHY,
+          userDecision.data.includes('colorStyles') && token.type === TokenTypes.COLOR,
+          userDecision.data.includes('effectStyles') && token.type === TokenTypes.BOX_SHADOW,
+        ].some((isEnabled) => isEnabled)
+      ));
+
+      const createStylesResult = await AsyncMessageChannel.ReactInstance.message({
+        type: AsyncMessageTypes.CREATE_STYLES,
+        tokens: tokensToCreate,
+        settings,
+      });
+      dispatch.tokenState.assignStyleIdsToCurrentTheme(createStylesResult.styleIds);
+    }
+  }, [confirm, usedTokenSet, tokens, settings, dispatch.tokenState]);
 
   return useMemo(() => ({
     isAlias,
