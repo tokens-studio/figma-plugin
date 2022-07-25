@@ -82,11 +82,12 @@ export default function AddLicenseKey() {
       >
         <Box css={{ flexGrow: 1 }}>
           <Input
+            full
             size="large"
             name="license-key"
+            data-testid="settings-license-key-input"
             type="text"
             value={newKey || ''}
-            full
             onChange={onLicenseKeyChange}
             error={licenseKeyError}
           />

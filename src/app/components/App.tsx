@@ -14,6 +14,7 @@ import LoadingBar from './LoadingBar';
 
 function App() {
   const activeTab = useSelector(activeTabSelector);
+
   return (
     <Box css={{ backgroundColor: '$bgDefault' }}>
       {activeTab !== 'loading' && <LoadingBar />}
