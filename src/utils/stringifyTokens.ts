@@ -7,7 +7,10 @@ function getNthPosition(string: string, subString: string, index: number = 0): n
 }
 
 function getGroupTypeName(tokenName: string, groupLevel: number): string {
-  return `${tokenName.slice(0, getNthPosition(tokenName, '.', groupLevel - 1))}.type`;
+  if (tokenName.includes('.')) {
+    return `${tokenName.slice(0, getNthPosition(tokenName, '.', groupLevel - 1))}.type`;
+  }
+  return 'type';
 }
 
 export default function stringifyTokens(
@@ -15,16 +18,15 @@ export default function stringifyTokens(
   activeTokenSet: string,
 ): string {
   const tokenObj = {};
-
   tokens[activeTokenSet]?.forEach((token) => {
     const tokenWithType = appendTypeToToken(token);
     const { name, ...tokenWithoutName } = tokenWithType;
-    if (tokenWithoutName.inheritType && tokenWithoutName.inheritTypeLevel) {
+    if (tokenWithoutName.inheritTypeLevel) {
       const {
-        type, inheritType, inheritTypeLevel, ...tokenWithoutType
+        type, inheritTypeLevel, ...tokenWithoutType
       } = tokenWithoutName;
       // set type of group level
-      set(tokenObj, getGroupTypeName(token.name, inheritTypeLevel), tokenWithoutName.inheritType);
+      set(tokenObj, getGroupTypeName(token.name, inheritTypeLevel), tokenWithoutName.type);
       set(tokenObj, token.name, tokenWithoutType);
     } else {
       set(tokenObj, token.name, tokenWithoutName);
