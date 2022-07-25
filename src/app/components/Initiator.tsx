@@ -31,12 +31,12 @@ export function Initiator() {
   const checkedLocalStorage = useSelector(checkedLocalStorageForKeySelector);
   const userId = useSelector(userIdSelector);
 
-  const askUserIfPull: (() => Promise<any>) = useCallback(async () => {
-    const shouldPull = await confirm({
+  const askUserIfRecoverLocalChanges: (() => Promise<any>) = useCallback(async () => {
+    const shouldRecoverLocalChanges = await confirm({
       text: 'Recover local changes?',
-      description: 'You have local changes unsaved to the remote storage. Do you want these recoverd?',
+      description: 'You have local changes unsaved to the remote storage.',
     });
-    return shouldPull;
+    return shouldRecoverLocalChanges;
   }, [confirm]);
 
   const onInitiate = useCallback(() => {
@@ -102,7 +102,7 @@ export function Initiator() {
             const storageType = values.storageType?.provider;
             if (!existChanges
               || ((storageType && storageType !== StorageProviderType.LOCAL)
-              && existChanges && await askUserIfPull())) {
+              && existChanges && !await askUserIfRecoverLocalChanges())) {
               featureFlags = await fetchFeatureFlags(userData);
               getApiCredentials(true, featureFlags);
             } else {
