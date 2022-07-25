@@ -1,0 +1,36 @@
+import { Meta, Story, ArgsTable, Canvas, Preview } from '@storybook/addon-docs';
+import { ThemeStyleManagementCategory } from '@/app/components/ManageThemesModal/ThemeStyleManagementCategory';
+import ColorDisplayBubble from '@/app/components/ColorDisplayBubble';
+
+<Meta 
+  title='ThemeStyleManagementCategory' 
+  component={ThemeStyleManagementCategory}
+/>
+
+<ArgsTable of={ThemeStyleManagementCategory}/>
+
+export const ThemeStyleManagementCategoryDefaultStory = (args) => {
+  return (
+    <ThemeStyleManagementCategory {...args} />
+  )
+}
+
+<Canvas>
+  <Story name='Default' args={{
+    label: 'Typography',
+    styles: {
+      'typography/body/regular': {
+        'id': 'S:1234',
+      },
+      'typography/body/bold': {
+        'id': 'S:1235',
+        'name': 'body/bold',
+      },
+    },
+    icon: (
+      <ColorDisplayBubble color="#ff0000" />
+    )
+  }}>
+    {ThemeStyleManagementCategoryDefaultStory.bind({})}
+  </Story>
+</Canvas>

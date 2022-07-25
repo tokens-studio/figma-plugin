@@ -202,6 +202,7 @@ const contexts = [gitHubContext, gitLabContext, jsonbinContext, adoContext, urlC
 const contextNames = ['GitHub', 'GitLab', 'jsonbin', 'ADO', 'url'];
 describe('remoteTokens', () => {
   let { result } = renderHook(() => useRemoteTokens());
+
   beforeEach(() => {
     result = renderHook(() => useRemoteTokens()).result;
     mockRetrieve.mockImplementation(() => (
@@ -232,6 +233,7 @@ describe('remoteTokens', () => {
       )
     ));
   });
+
   afterEach(() => {
     jest.clearAllMocks();
   });
