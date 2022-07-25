@@ -29,7 +29,7 @@ const EditTokenFormModal: React.FC<Props> = ({ resolvedTokens }) => {
       large
       isOpen
       close={handleReset}
-      title={editToken.status === EditTokenFormStatus.CREATE ? 'New Token' : editToken.initialName}
+      title={editToken.EditTokenFormStatus === EditTokenFormStatus.CREATE ? 'New Token' : editToken.initialName}
     >
       <EditTokenForm resolvedTokens={resolvedTokens} />
     </Modal>

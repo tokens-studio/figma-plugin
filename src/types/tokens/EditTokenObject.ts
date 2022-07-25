@@ -21,7 +21,7 @@ import type { TokenTypeSchema } from './TokenTypeSchema';
 
 type EditTokenObjectProperties = {
   initialName: string;
-  status: string;
+  EditTokenFormStatus : string;
   schema: TokenTypeSchema;
 };
 
