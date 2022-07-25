@@ -2,13 +2,10 @@ import set from 'set-value';
 import { appendTypeToToken } from '@/app/components/createTokenObj';
 import { AnyTokenList } from '@/types/tokens';
 
-function getNthPosition(string: string, subString: string, index: number = 0): number {
-  return string.split(subString, index).join(subString).length;
-}
-
 function getGroupTypeName(tokenName: string, groupLevel: number): string {
   if (tokenName.includes('.')) {
-    return `${tokenName.slice(0, getNthPosition(tokenName, '.', groupLevel - 1))}.type`;
+    const lastDotPosition = tokenName.split('.', groupLevel - 1).join('.').length;
+    return `${tokenName.slice(0, lastDotPosition)}.type`;
   }
   return 'type';
 }
