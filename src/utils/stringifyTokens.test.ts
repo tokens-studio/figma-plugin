@@ -57,7 +57,16 @@ describe('stringfyTokens', () => {
           y: '2',
         },
       },
+      {
+        inheritTypeLevel: 1,
+        name: 'mx',
+        value: '4',
+        type: 'sizing',
+      },
     ],
+  };
+  const emptyTokens = {
+    core: [],
   };
   const activeTokenSet = 'global';
   it('convert token list to the JSON string with nested structure', () => {
@@ -110,6 +119,11 @@ describe('stringfyTokens', () => {
           },
         },
       },
+      type: 'sizing',
+      mx: {
+        value: '4',
+      },
     }, null, 2));
+    expect(stringifyTokens(emptyTokens, activeTokenSet)).toEqual('{}');
   });
 });
