@@ -64,7 +64,7 @@ describe('Initiator', () => {
     result.unmount();
   });
 
-  it('set main node selection values with specific order when multi node is selected', async () => {
+  it('set main node selection values with specific order when multi nodes are selected', async () => {
     const result = render(<App />);
     fireEvent(
       window,
