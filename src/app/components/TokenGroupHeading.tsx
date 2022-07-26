@@ -35,7 +35,7 @@ export default function TokenGroupHeading({
   }, [oldTokenGroupName, isTokenGroupDuplicated, copyName, path]);
 
   const handleDelete = React.useCallback(() => {
-    deleteGroup(path);
+    deleteGroup(path, type);
   }, [path, deleteGroup]);
 
   const handleRename = React.useCallback(() => {
