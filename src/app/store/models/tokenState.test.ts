@@ -72,6 +72,21 @@ describe('editToken', () => {
                   description: 'the one with mixed shadows',
                   value: shadowArray,
                 },
+                {
+                  name: 'font.big',
+                  type: 'sizing',
+                  value: '24px',
+                },
+                {
+                  name: 'font.small',
+                  type: 'sizing',
+                  value: '12px',
+                },
+                {
+                  name: 'font.medium',
+                  type: 'fontSizes',
+                  value: '18px',
+                },
               ],
               options: [
                 {
@@ -275,5 +290,25 @@ describe('editToken', () => {
       },
     ]);
     expect(usedTokenSet).toEqual({});
+  });
+
+  it('delete all tokens in a group', async () => {
+    await store.dispatch.tokenState.deleteTokenGroup({
+      parent: 'global',
+      path: 'font',
+      type: 'sizing',
+    });
+
+    const { tokens } = store.getState().tokenState;
+    expect(tokens.global).not.toContain({
+      name: 'font.big',
+      type: 'sizing',
+      value: '24px',
+    });
+    expect(tokens.global).not.toContain({
+      name: 'font.small',
+      type: 'sizing',
+      value: '12px',
+    });
   });
 });
