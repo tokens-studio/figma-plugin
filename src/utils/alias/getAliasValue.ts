@@ -18,7 +18,11 @@ function getReturnedValue(token: SingleToken | string | number) {
   return token.toString();
 }
 
-function replaceAliasWithResolvedReference(token: string | TokenTypograpyValue | TokenBoxshadowValue | TokenBoxshadowValue[] | null, reference: string, resolvedReference: string | number | object | null) {
+function replaceAliasWithResolvedReference(
+  token: string | TokenTypograpyValue | TokenBoxshadowValue | TokenBoxshadowValue[] | null,
+  reference: string,
+  resolvedReference: string | number | TokenBoxshadowValue | TokenBoxshadowValue[] | Record<string, unknown> | null,
+) {
   if (typeof resolvedReference === 'object') {
     return resolvedReference;
   }

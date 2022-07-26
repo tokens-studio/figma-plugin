@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useCallback } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import Box from './Box';
 import { Tabs } from '@/constants/Tabs';
 import Stack from './Stack';
@@ -7,9 +8,17 @@ import { NavbarUndoButton } from './NavbarUndoButton';
 import Minimize from '../assets/minimize.svg';
 import useMinimizeWindow from './useMinimizeWindow';
 import IconButton from './IconButton';
+import { activeTabSelector } from '@/selectors';
+import { Dispatch } from '../store';
 
 const Navbar: React.FC = () => {
+  const activeTab = useSelector(activeTabSelector);
+  const dispatch = useDispatch<Dispatch>();
   const { handleResize } = useMinimizeWindow();
+
+  const handleSwitch = useCallback((tab: Tabs) => {
+    dispatch.uiState.setActiveTab(tab);
+  }, [dispatch.uiState]);
 
   return (
     <Box
@@ -27,9 +36,9 @@ const Navbar: React.FC = () => {
     >
       <Stack gap={0} direction="row" align="center" justify="between" css={{ width: '100%' }}>
         <div>
-          <TabButton name={Tabs.TOKENS} label="Tokens" />
-          <TabButton name={Tabs.INSPECTOR} label="Inspect" />
-          <TabButton name={Tabs.SETTINGS} label="Settings" />
+          <TabButton name={Tabs.TOKENS} activeTab={activeTab} label="Tokens" onSwitch={handleSwitch} />
+          <TabButton name={Tabs.INSPECTOR} activeTab={activeTab} label="Inspect" onSwitch={handleSwitch} />
+          <TabButton name={Tabs.SETTINGS} activeTab={activeTab} label="Settings" onSwitch={handleSwitch} />
         </div>
         <NavbarUndoButton />
       </Stack>

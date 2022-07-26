@@ -44,6 +44,8 @@ export default function CreateBranchModal({
     }, 200);
   }, []);
 
+  const isBranchNameValid = React.useMemo(() => !/\s/.test(formFields.branch), [formFields]);
+
   const handleChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setFormFields({ ...formFields, [e.target.name]: e.target.value });
   }, [formFields]);
@@ -114,11 +116,18 @@ export default function CreateBranchModal({
             name="branch"
             inputRef={branchInputRef}
           />
+          {
+            !isBranchNameValid && (
+              <div className="bg-red-200 text-red-700 rounded p-4 text-xs font-bold" data-cy="provider-modal-error">
+                Branch name cannot contain spaces
+              </div>
+            )
+          }
           <Stack direction="row" gap={4}>
             <Button variant="secondary" size="large" onClick={handleModalClose}>
               Cancel
             </Button>
-            <Button variant="primary" type="submit" disabled={!formFields.branch}>
+            <Button variant="primary" type="submit" disabled={!('branch' in formFields && isBranchNameValid)}>
               Save
             </Button>
           </Stack>

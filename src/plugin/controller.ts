@@ -46,5 +46,7 @@ AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.CREATE_STYLES, async
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.UPDATE, asyncHandlers.update);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.SET_LICENSE_KEY, asyncHandlers.setLicenseKey);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.GET_API_CREDENTIALS, asyncHandlers.getApiCredentials);
+AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.ATTACH_LOCAL_STYLES_TO_THEME, asyncHandlers.attachLocalStylesToTheme);
+AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.RESOLVE_STYLE_INFO, asyncHandlers.resolveStyleInfo);
 
 figma.root.setSharedPluginData('tokens', 'nodemanagerCache', '');

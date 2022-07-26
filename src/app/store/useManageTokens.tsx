@@ -50,7 +50,6 @@ export default function useManageTokens() {
 
     // should be a setting which users can toggle on / off to disable auto-sync after each token change
     const shouldUpdate = true;
-
     if (shouldUpdate) {
       editToken({
         parent,
