@@ -475,11 +475,6 @@ describe('editToken', () => {
         value: shadowArray,
       },
       {
-        name: 'test',
-        type: TokenTypes.COLOR,
-        value: '#000000',
-      },
-      {
         name: 'font.big',
         type: 'sizing',
         value: '24px',
@@ -493,6 +488,11 @@ describe('editToken', () => {
         name: 'font.medium',
         type: 'fontSizes',
         value: '18px',
+      },
+      {
+        name: 'test',
+        type: TokenTypes.COLOR,
+        value: '#000000',
       },
     ]);
   });
