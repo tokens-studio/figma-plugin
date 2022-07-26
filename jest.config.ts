@@ -128,6 +128,7 @@ export default {
     './tests/__mocks__/textEncoderDecoderMock.js',
     './tests/__mocks__/octokitRestMock.js',
     './tests/__mocks__/figmaMock.js',
+    './tests/__mocks__/mixpanelMock.js',
     './tests/__mocks__/domRect.js',
   ],
 
