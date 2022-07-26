@@ -27,10 +27,10 @@ const StorageItem = ({ item, onEdit }: Props) => {
   const { confirm } = useConfirm();
 
   const askUserIfDelete = React.useCallback(async () => {
-    const shouldPull = await confirm({
+    const shouldDelete = await confirm({
       text: 'Do you really want to delete a sync setting?',
     });
-    return shouldPull;
+    return shouldDelete;
   }, [confirm]);
 
   const isActive = React.useCallback(() => (
