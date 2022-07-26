@@ -380,6 +380,21 @@ describe('editToken', () => {
         description: 'the one with mixed shadows',
         value: shadowArray,
       },
+      {
+        name: 'font.big',
+        type: 'sizing',
+        value: '24px',
+      },
+      {
+        name: 'font.small',
+        type: 'sizing',
+        value: '12px',
+      },
+      {
+        name: 'font.medium',
+        type: 'fontSizes',
+        value: '18px',
+      },
     ]);
     expect(usedTokenSet).toEqual({
       global: TokenSetStatus.ENABLED,
@@ -463,6 +478,21 @@ describe('editToken', () => {
         name: 'test',
         type: TokenTypes.COLOR,
         value: '#000000',
+      },
+      {
+        name: 'font.big',
+        type: 'sizing',
+        value: '24px',
+      },
+      {
+        name: 'font.small',
+        type: 'sizing',
+        value: '12px',
+      },
+      {
+        name: 'font.medium',
+        type: 'fontSizes',
+        value: '18px',
       },
     ]);
   });
