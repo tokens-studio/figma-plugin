@@ -6,7 +6,9 @@ import useConfirm from '../hooks/useConfirm';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
 import { activeTokenSetSelector } from '@/selectors';
 import { TokenTypes } from '@/constants/TokenTypes';
-import { DeleteTokenPayload, DuplicateTokenPayload, UpdateTokenPayload } from '@/types/payloads';
+import {
+  DeleteTokenPayload, DuplicateTokenPayload, UpdateTokenPayload,
+} from '@/types/payloads';
 
 // @TODO this typing could be more strict in the future
 
@@ -110,7 +112,7 @@ export default function useManageTokens() {
     }
   }, [confirm, deleteToken, dispatch.uiState]);
 
-  const deleteGroup = useCallback(async (path: string) => {
+  const deleteGroup = useCallback(async (path: string, type: string) => {
     const userConfirmation = await confirm({
       text: 'Delete group?',
       description: 'Are you sure you want to delete this group?',
@@ -121,7 +123,7 @@ export default function useManageTokens() {
         name: BackgroundJobs.UI_DELETETOKENGROUP,
         isInfinite: true,
       });
-      deleteTokenGroup({ parent: activeTokenSet, path });
+      deleteTokenGroup({ parent: activeTokenSet, path, type });
       dispatch.uiState.completeJob(BackgroundJobs.UI_DELETETOKENGROUP);
     }
   }, [store, confirm, deleteTokenGroup, dispatch.uiState]);

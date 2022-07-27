@@ -6,6 +6,9 @@ import useRemoteTokens from '../store/remoteTokens';
 import { Dispatch } from '../store';
 import useStorage from '../store/useStorage';
 import { Tabs } from '@/constants/Tabs';
+import { sortSelectionValueByProperties } from '@/utils/sortSelectionValueByProperties';
+import { convertToOrderObj } from '@/utils/convertToOrderObj';
+import { Properties } from '@/constants/Properties';
 
 // @README this component is not the "Initiator" anymore - as it is named
 // but solely acts as the interface between the plugin and the UI
@@ -29,13 +32,15 @@ export function Initiator() {
             dispatch.uiState.setSelectedLayers(selectedNodes);
             dispatch.uiState.setDisabled(false);
             if (mainNodeSelectionValues.length > 1) {
-              const selectionValues = mainNodeSelectionValues.reduce((acc, crr) => (
+              const allMainNodeSelectionValues = mainNodeSelectionValues.reduce((acc, crr) => (
                 Object.assign(acc, crr)
               ), {});
-              dispatch.uiState.setMainNodeSelectionValues(selectionValues);
+              const sortedMainNodeSelectionValues = sortSelectionValueByProperties(allMainNodeSelectionValues);
+              dispatch.uiState.setMainNodeSelectionValues(sortedMainNodeSelectionValues);
             } else if (mainNodeSelectionValues.length > 0) {
               // When only one node is selected, we can set the state
-              dispatch.uiState.setMainNodeSelectionValues(mainNodeSelectionValues[0]);
+              const sortedMainNodeSelectionValues = sortSelectionValueByProperties(mainNodeSelectionValues[0]);
+              dispatch.uiState.setMainNodeSelectionValues(sortedMainNodeSelectionValues);
             } else {
               // When only one is selected and it doesn't contain any tokens, reset.
               dispatch.uiState.setMainNodeSelectionValues({});
@@ -43,7 +48,9 @@ export function Initiator() {
 
             // Selection values are all tokens across all layers, used in Multi Inspector.
             if (selectionValues) {
-              dispatch.uiState.setSelectionValues(selectionValues);
+              const orderObj = convertToOrderObj(Properties);
+              const sortedSelectionValues = selectionValues.sort((a, b) => orderObj[a.type] - orderObj[b.type]);
+              dispatch.uiState.setSelectionValues(sortedSelectionValues);
             } else {
               dispatch.uiState.resetSelectionValues();
             }
