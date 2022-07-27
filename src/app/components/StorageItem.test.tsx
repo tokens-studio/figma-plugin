@@ -3,6 +3,7 @@ import * as reactRedux from 'react-redux';
 import { render } from '../../../tests/config/setupTest';
 import StorageItem from './StorageItem';
 
+const useSelectorMock = jest.spyOn(reactRedux, 'useSelector');
 const activeProvideer = {
   id: 'defalut',
   provider: 'github',
@@ -18,7 +19,6 @@ const gitProvider = {
 const onEdit = () => {};
 
 describe('StorageItem', () => {
-  const useSelectorMock = jest.spyOn(reactRedux, 'useSelector');
   beforeEach(() => {
     useSelectorMock.mockClear();
   });
