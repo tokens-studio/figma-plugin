@@ -19,9 +19,9 @@ import DownshiftInput from './DownshiftInput';
 import Button from './Button';
 import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 import { UpdateMode } from '@/constants/UpdateMode';
+import trimValue from '@/utils/trimValue';
 import BoxShadowInput from './BoxShadowInput';
 import { EditTokenFormStatus } from '@/constants/EditTokenFormStatus';
-import trimValue from '@/utils/trimValue';
 
 type Props = {
   resolvedTokens: ResolveTokenValuesResult[];
