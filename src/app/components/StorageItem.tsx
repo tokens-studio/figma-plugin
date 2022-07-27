@@ -8,6 +8,7 @@ import { storageTypeSelector } from '@/selectors';
 import { StyledStorageItem } from './StyledStorageItem';
 import type { StorageTypeCredentials } from '@/types/StorageType';
 import { isGitProvider } from '@/utils/is';
+import useConfirm from '../hooks/useConfirm';
 
 type Props = {
   item: StorageTypeCredentials;
@@ -21,12 +22,20 @@ const StorageItem = ({ item, onEdit }: Props) => {
   const branch = isGitProvider(item) ? item.branch : null;
 
   const { restoreStoredProvider, deleteProvider } = useRemoteTokens();
+  const { confirm } = useConfirm();
+
+  const askUserIfDelete = React.useCallback(async () => {
+    const shouldDelete = await confirm({
+      text: 'Do you really want to delete this sync setting?',
+    });
+    return shouldDelete;
+  }, [confirm]);
 
   const isActive = React.useCallback(() => isSameCredentials(item, storageType), [item, storageType]);
 
-  const handleDelete = React.useCallback(() => {
-    deleteProvider(item);
-  }, [deleteProvider, item]);
+  const handleDelete = React.useCallback(async () => {
+    if (await askUserIfDelete()) deleteProvider(item);
+  }, [deleteProvider, item, askUserIfDelete]);
 
   const handleRestore = React.useCallback(() => {
     restoreStoredProvider(item);
@@ -41,15 +50,13 @@ const StorageItem = ({ item, onEdit }: Props) => {
           {' '}
           {branch && ` (${branch})`}
         </div>
-        {!isActive() && (
-          <button
-            type="button"
-            className="inline-flex text-left text-red-600 underline text-xxs"
-            onClick={handleDelete}
-          >
-            Delete local credentials
-          </button>
-        )}
+        <button
+          type="button"
+          className="inline-flex text-left text-red-600 underline text-xxs"
+          onClick={handleDelete}
+        >
+          Delete local credentials
+        </button>
       </div>
       <div className="space-x-2 flex-nowrap flex items-center">
         {onEdit && (
