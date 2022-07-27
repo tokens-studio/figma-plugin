@@ -2,13 +2,11 @@
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 import * as asyncHandlers from './asyncMessageHandlers';
-import { DefaultWindowSize } from '@/constants/DefaultWindowSize';
 import { defaultWorker } from './Worker';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { sendSelectionChange } from './sendSelectionChange';
-import { startup } from '@/utils/plugin';
-import { notifyNoSelection } from './notifiers';
+import { init } from '@/utils/plugin';
 
 figma.skipInvisibleInstanceChildren = true;
 
@@ -43,21 +41,4 @@ figma.on('selectionchange', () => {
   sendSelectionChange();
 });
 
-startup().then(async (params) => {
-  figma.showUI(__html__, {
-    themeColors: true,
-    width: params.settings.width ?? DefaultWindowSize.width,
-    height: params.settings.height ?? DefaultWindowSize.height,
-  });
-
-  await AsyncMessageChannel.PluginInstance.message({
-    type: AsyncMessageTypes.STARTUP,
-    ...params,
-  });
-
-  if (!figma.currentPage.selection.length) {
-    notifyNoSelection();
-  }
-}).catch((err) => {
-  throw err;
-});
+init();
