@@ -2,7 +2,9 @@ import React, { PropsWithChildren } from 'react';
 import { Provider } from 'react-redux';
 import { renderHook } from '@testing-library/react-hooks';
 import ConfirmDialog from '../ConfirmDialog';
-import { act, createMockStore, render } from '../../../../tests/config/setupTest';
+import {
+  act, createMockStore, render,
+} from '../../../../tests/config/setupTest';
 import useConfirm, { ResolveCallbackPayload } from '@/app/hooks/useConfirm';
 
 describe('ConfirmDialog', () => {
@@ -85,6 +87,10 @@ describe('ConfirmDialog', () => {
           { key: 'effectStyles', label: 'Shadows', enabled: true },
         ],
       });
+      // @README the ConfirmDialog has a 50ms timeout effect
+      await new Promise<void>((resolve) => {
+        setTimeout(resolve, 100);
+      });
     });
 
     expect(result.queryByTestId('colorStyles')).toBeInTheDocument();
@@ -92,8 +98,8 @@ describe('ConfirmDialog', () => {
     expect(result.queryByTestId('effectStyles')).toBeInTheDocument();
 
     await act(async () => {
-      const colorStylesCheckbox = result.queryByTestId('colorStyles');
-      colorStylesCheckbox?.click();
+      const colorStylesCheckbox = await result.findByTestId('colorStyles');
+      colorStylesCheckbox.click();
     });
 
     await act(async () => {
