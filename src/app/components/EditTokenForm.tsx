@@ -80,7 +80,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
     if ((internalEditToken?.status !== EditTokenFormStatus.EDIT || nameWasChanged) && hasAnotherTokenThatStartsWithName) {
       setError('Must not use name of another group');
     }
-    if ((internalEditToken?.isPristine || nameWasChanged) && hasPriorTokenName) {
+    if ((internalEditToken?.status || nameWasChanged) && hasPriorTokenName) {
       setError('Tokens can\'t share name with a group');
     }
   }, [internalEditToken, hasNameThatExistsAlready, nameWasChanged, hasPriorTokenName]);
