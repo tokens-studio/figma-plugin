@@ -92,7 +92,7 @@ const TokenListing: React.FC<Props> = ({
           type="button"
           onClick={handleSetIntCollapsed}
         >
-          <Tooltip label={`Alt + Click to ${collapsed ? 'expand' : 'collapse'} all`}>
+          <Tooltip label={`Alt + Click to ${collapsed ? 'expand' : 'collapse'} all`} dataTestId={`tooltip-collapse-${tokenKey}`}>
             <div className="p-2 -m-2">
               {collapsedTokenTypeObj[tokenKey as TokenTypes] ? (
                 <svg width="6" height="6" viewBox="0 0 6 6" xmlns="http://www.w3.org/2000/svg">
