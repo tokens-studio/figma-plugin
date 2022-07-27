@@ -1,7 +1,7 @@
 import React from 'react';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { DeepKeyTokenMap, TokenTypeSchema } from '@/types/tokens';
-import { fireEvent, render } from '../../../tests/config/setupTest';
+import { fireEvent, render, waitFor, screen } from '../../../tests/config/setupTest';
 import TokenListing from './TokenListing';
 
 const key = 'sizing';
@@ -47,9 +47,10 @@ describe('TokenListing', () => {
       schema={schema as TokenTypeSchema}
       values={values as DeepKeyTokenMap}
     />);
-    fireEvent.click(getByTestId('tooltip-collapse-sizing'));
-    expect(
-      queryByText('small'),
-    ).not.toBeInTheDocument();
+    fireEvent.click(screen.getByTestId('button-collapse-sizing'));
+    fireEvent.mouseOver(screen.getByTestId('tooltip-collapse-sizing'));
+    await waitFor(() => screen.getByText('Alt + Click to collapse all'));
+    expect(screen.getByText('Alt + Click to collapse all')).toBeInTheDocument();
+    expect(screen.queryByText('small')).not.toBeInTheDocument();
   });
 });

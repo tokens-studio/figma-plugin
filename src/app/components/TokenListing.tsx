@@ -66,6 +66,7 @@ const TokenListing: React.FC<Props> = ({
   }, [displayType, dispatch]);
 
   const handleSetIntCollapsed = React.useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
+    console.log("collapseob", collapsedTokenTypeObj)
     e.stopPropagation();
     if (e.altKey) {
       dispatch.uiState.toggleCollapsed();
@@ -91,6 +92,7 @@ const TokenListing: React.FC<Props> = ({
           data-cy={`tokenlisting-header-${tokenKey}`}
           type="button"
           onClick={handleSetIntCollapsed}
+          data-testid={`button-collapse-${tokenKey}`}
         >
           <Tooltip label={`Alt + Click to ${collapsed ? 'expand' : 'collapse'} all`} dataTestId={`tooltip-collapse-${tokenKey}`}>
             <div className="p-2 -m-2">
