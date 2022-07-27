@@ -7,10 +7,11 @@ import { DeepKeyTokenMap, SingleToken, TokenTypeSchema } from '@/types/tokens';
 import { isSingleToken } from '@/utils/is';
 import IconButton from './IconButton';
 import AddIcon from '@/icons/add.svg';
+import { EditTokenFormStatus } from '@/constants/EditTokenFormStatus';
 
 export type ShowFormOptions = {
   name: string;
-  EditTokenFormStatus ?: string;
+  status?: EditTokenFormStatus;
   token: SingleToken | null;
 };
 

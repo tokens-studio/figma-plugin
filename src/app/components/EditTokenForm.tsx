@@ -67,10 +67,10 @@ function EditTokenForm({ resolvedTokens }: Props) {
   ]);
 
   React.useEffect(() => {
-    if ((internalEditToken?.EditTokenFormStatus !== EditTokenFormStatus.EDIT || nameWasChanged) && hasNameThatExistsAlready) {
+    if ((internalEditToken?.status !== EditTokenFormStatus.EDIT || nameWasChanged) && hasNameThatExistsAlready) {
       setError('Token names must be unique');
     }
-    if ((internalEditToken?.EditTokenFormStatus !== EditTokenFormStatus.EDIT || nameWasChanged) && hasAnotherTokenThatStartsWithName) {
+    if ((internalEditToken?.status !== EditTokenFormStatus.EDIT || nameWasChanged) && hasAnotherTokenThatStartsWithName) {
       setError('Must not use name of another group');
     }
   }, [internalEditToken, hasNameThatExistsAlready, nameWasChanged]);
@@ -199,7 +199,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
         .split('/')
         .map((n) => n.trim())
         .join('.');
-      if (internalEditToken.EditTokenFormStatus === EditTokenFormStatus.CREATE) {
+      if (internalEditToken.status === EditTokenFormStatus.CREATE) {
         track('Create token', { type: internalEditToken.type });
         createSingleToken({
           description: (
@@ -211,7 +211,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
           type,
           value: trimmedValue as SingleToken['value'],
         });
-      } else if (internalEditToken.EditTokenFormStatus === EditTokenFormStatus.EDIT) {
+      } else if (internalEditToken.status === EditTokenFormStatus.EDIT) {
         editSingleToken({
           description: (
             internalEditToken.description
@@ -248,7 +248,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
         } else {
           track('Edit token', { renamed: false });
         }
-      } else if (internalEditToken.EditTokenFormStatus === EditTokenFormStatus.DUPLICATE) {
+      } else if (internalEditToken.status === EditTokenFormStatus.DUPLICATE) {
         oldName = internalEditToken.initialName?.slice(0, internalEditToken.initialName?.lastIndexOf('-copy'));
         duplicateSingleToken({ parent: activeTokenSet, newName, oldName });
       }
@@ -400,8 +400,8 @@ function EditTokenForm({ resolvedTokens }: Props) {
             Cancel
           </Button>
           <Button disabled={!isValid} variant="primary" type="submit">
-            {internalEditToken?.EditTokenFormStatus === EditTokenFormStatus.CREATE ? 'Create'
-              : internalEditToken?.EditTokenFormStatus === EditTokenFormStatus.EDIT ? 'Update' : 'Duplicate'}
+            {internalEditToken?.status === EditTokenFormStatus.CREATE ? 'Create'
+              : internalEditToken?.status === EditTokenFormStatus.EDIT ? 'Update' : 'Duplicate'}
           </Button>
         </Stack>
       </Stack>
