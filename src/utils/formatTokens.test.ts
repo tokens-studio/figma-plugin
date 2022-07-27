@@ -3,6 +3,32 @@ import { AnyTokenList } from '@/types/tokens';
 import formatTokens from './formatTokens';
 
 describe('formatTokens', () => {
+  const resolvedTokens = [
+    {
+      name: 'typography.heading.alias',
+      value: {
+        fontFamily: 'Inter',
+        fontWeight: 'Bold',
+        fontSize: 36,
+      },
+      description: 'Use for headings',
+      type: TokenTypes.TYPOGRAPHY,
+    },
+    {
+      type: TokenTypes.BOX_SHADOW,
+      name: 'shadows.alias',
+      value: [
+        {
+          type: 'dropShadow',
+          color: 'rgba({colors.red.500}, 0.5)',
+          x: 0,
+          y: 0,
+          blur: 2,
+          spread: 4,
+        },
+      ],
+    },
+  ];
   const typographyTokens = {
     global: [
       { name: 'withValue', value: 'bar' },
@@ -28,6 +54,18 @@ describe('formatTokens', () => {
         type: TokenTypes.TYPOGRAPHY,
       },
       {
+        name: 'typography.heading.alias',
+        value: '{typography.heading.h1}',
+        description: 'Use for headings',
+        type: TokenTypes.TYPOGRAPHY,
+      },
+      {
+        name: 'typography.heading.non_resolved',
+        value: '{typography.heading.new}',
+        description: 'Use for headings',
+        type: TokenTypes.TYPOGRAPHY,
+      },
+      {
         type: TokenTypes.BOX_SHADOW,
         name: 'shadows.md',
         value: [
@@ -41,12 +79,17 @@ describe('formatTokens', () => {
           },
         ],
       },
+      {
+        type: TokenTypes.BOX_SHADOW,
+        name: 'shadows.alias',
+        value: '{shadows.md}',
+      },
     ],
   } as unknown as Record<string, AnyTokenList>;
 
   it('converts given tokens to an array', () => {
     expect(formatTokens({
-      tokens: typographyTokens, tokenSets: ['global'], expandTypography: true, expandShadow: false,
+      tokens: typographyTokens, tokenSets: ['global'], resolvedTokens: resolvedTokens as AnyTokenList, expandTypography: true, expandShadow: false,
     })).toEqual(
       JSON.stringify(
         {
@@ -87,6 +130,25 @@ describe('formatTokens', () => {
                     type: 'fontSize',
                   },
                 },
+                alias: {
+                  fontFamily: {
+                    value: 'Inter',
+                    type: 'fontFamily',
+                  },
+                  fontWeight: {
+                    value: 'Bold',
+                    type: 'fontWeight',
+                  },
+                  fontSize: {
+                    value: 36,
+                    type: 'fontSize',
+                  },
+                },
+                non_resolved: {
+                  value: '{typography.heading.new}',
+                  description: 'Use for headings',
+                  type: TokenTypes.TYPOGRAPHY,
+                },
               },
             },
             shadows: {
@@ -103,6 +165,10 @@ describe('formatTokens', () => {
                   },
                 ],
               },
+              alias: {
+                type: TokenTypes.BOX_SHADOW,
+                value: '{shadows.md}',
+              },
             },
           },
         },
@@ -114,7 +180,7 @@ describe('formatTokens', () => {
 
   it('converts given tokens to an array without expanding', () => {
     expect(formatTokens({
-      tokens: typographyTokens, tokenSets: ['global'], expandTypography: false, expandShadow: true,
+      tokens: typographyTokens, tokenSets: ['global'], resolvedTokens: resolvedTokens as AnyTokenList, expandTypography: false, expandShadow: true,
     })).toEqual(
       JSON.stringify(
         {
@@ -145,10 +211,48 @@ describe('formatTokens', () => {
                   description: 'Use for headings',
                   type: 'typography',
                 },
+                alias: {
+                  value: '{typography.heading.h1}',
+                  description: 'Use for headings',
+                  type: 'typography',
+                },
+                non_resolved: {
+                  value: '{typography.heading.new}',
+                  description: 'Use for headings',
+                  type: TokenTypes.TYPOGRAPHY,
+                },
               },
             },
             shadows: {
               md: {
+                0: {
+                  type: {
+                    value: 'dropShadow',
+                    type: 'type',
+                  },
+                  color: {
+                    value: 'rgba({colors.red.500}, 0.5)',
+                    type: 'color',
+                  },
+                  x: {
+                    value: 0,
+                    type: 'x',
+                  },
+                  y: {
+                    value: 0,
+                    type: 'y',
+                  },
+                  blur: {
+                    value: 2,
+                    type: 'blur',
+                  },
+                  spread: {
+                    value: 4,
+                    type: 'spread',
+                  },
+                },
+              },
+              alias: {
                 0: {
                   type: {
                     value: 'dropShadow',

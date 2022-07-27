@@ -22,6 +22,7 @@ import {
   RenameTokenGroupPayload,
   DuplicateTokenGroupPayload,
   DuplicateTokenPayload,
+  DeleteTokenGroupPayload,
 } from '@/types/payloads';
 import { updateTokenPayloadToSingleToken } from '@/utils/updateTokenPayloadToSingleToken';
 import { RootModel } from '@/types/RootModel';
@@ -276,12 +277,12 @@ export const tokenState = createModel<RootModel>()({
 
       return newState;
     },
-    deleteTokenGroup: (state, data: DeleteTokenPayload) => {
+    deleteTokenGroup: (state, data: DeleteTokenGroupPayload) => {
       const newState = {
         ...state,
         tokens: {
           ...state.tokens,
-          [data.parent]: state.tokens[data.parent].filter((token) => !token.name.startsWith(data.path)),
+          [data.parent]: state.tokens[data.parent].filter((token) => !(token.name.startsWith(`${data.path}.`) && token.type === data.type)),
         },
       };
 

@@ -10,23 +10,19 @@ import type { StorageTypeCredentials } from '@/types/StorageType';
 import { isGitProvider } from '@/utils/is';
 
 type Props = {
-  item: StorageTypeCredentials,
-  onEdit: () => void
+  item: StorageTypeCredentials;
+  onEdit: () => void;
 };
 
 const StorageItem = ({ item, onEdit }: Props) => {
   const storageType = useSelector(storageTypeSelector);
-  const {
-    provider, id, name,
-  } = item;
+  const { provider, id, name } = item;
 
   const branch = isGitProvider(item) ? item.branch : null;
 
   const { restoreStoredProvider, deleteProvider } = useRemoteTokens();
 
-  const isActive = React.useCallback(() => (
-    isSameCredentials(item, storageType)
-  ), [item, storageType]);
+  const isActive = React.useCallback(() => isSameCredentials(item, storageType), [item, storageType]);
 
   const handleDelete = React.useCallback(() => {
     deleteProvider(item);
@@ -37,12 +33,7 @@ const StorageItem = ({ item, onEdit }: Props) => {
   }, [item, restoreStoredProvider]);
 
   return (
-    <StyledStorageItem
-      data-cy={`storageitem-${provider}-${id}`}
-      key={`${provider}-${id}`}
-      active={isActive()}
-
-    >
+    <StyledStorageItem data-cy={`storageitem-${provider}-${id}`} key={`${provider}-${id}`} active={isActive()}>
       <div className="flex flex-col grow items-start">
         <div className="text-xs font-bold">{name}</div>
         <div className="opacity-75 text-xxs">
@@ -67,11 +58,7 @@ const StorageItem = ({ item, onEdit }: Props) => {
           </Button>
         )}
         {!isActive() && (
-          <Button
-            id="button-storageitem-apply"
-            variant="secondary"
-            onClick={handleRestore}
-          >
+          <Button id="button-storageitem-apply" variant="secondary" onClick={handleRestore}>
             Apply
           </Button>
         )}

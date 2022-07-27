@@ -62,6 +62,13 @@ function EditTokenForm({ resolvedTokens }: Props) {
     [internalEditToken, resolvedTokens, activeTokenSet],
   );
 
+  const hasPriorTokenName = React.useMemo(
+    () => resolvedTokens
+      .filter((t) => t.internal__Parent === activeTokenSet)
+      .find((t) => t.type === internalEditToken.type && internalEditToken.name?.startsWith(t.name)),
+    [internalEditToken, resolvedTokens, activeTokenSet],
+  );
+
   const nameWasChanged = React.useMemo(() => internalEditToken?.initialName !== internalEditToken?.name, [
     internalEditToken,
   ]);
@@ -73,7 +80,10 @@ function EditTokenForm({ resolvedTokens }: Props) {
     if ((internalEditToken?.status !== EditTokenFormStatus.EDIT || nameWasChanged) && hasAnotherTokenThatStartsWithName) {
       setError('Must not use name of another group');
     }
-  }, [internalEditToken, hasNameThatExistsAlready, nameWasChanged]);
+    if ((internalEditToken?.isPristine || nameWasChanged) && hasPriorTokenName) {
+      setError('Tokens can\'t share name with a group');
+    }
+  }, [internalEditToken, hasNameThatExistsAlready, nameWasChanged, hasPriorTokenName]);
 
   const handleToggleInputHelper = React.useCallback(() => {
     setInputHelperOpen(!inputHelperOpen);
