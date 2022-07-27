@@ -19,8 +19,8 @@ const gitProvider = {
 const onEdit = () => {};
 
 describe('StorageItem', () => {
-  beforeEach(() => {
-    useSelectorMock.mockClear();
+  afterEach(() => {
+    jest.clearAllMocks();
   });
 
   it('should render storageItem', () => {
