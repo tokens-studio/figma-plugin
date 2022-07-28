@@ -64,6 +64,11 @@ const mockValues: Record<string, AnyTokenList> = {
       value: '#000000',
       name: 'black',
     },
+    {
+      type: TokenTypes.BORDER_RADIUS,
+      value: '12px',
+      name: 'rounded.md',
+    },
   ],
   playground: [
     {
