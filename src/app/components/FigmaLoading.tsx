@@ -39,7 +39,7 @@ export default function FigmaLoading({
   }
 
   return (
-    <StyledLoadingScreen justify="center" direction="column" gap={4} className="content scroll-container">
+    <StyledLoadingScreen data-testid="figmaloading" justify="center" direction="column" gap={4} className="content scroll-container">
       <Stack direction="column" gap={4} align="center">
         <Stack direction="column" gap={4} align="center">
           <FigmaMark />
