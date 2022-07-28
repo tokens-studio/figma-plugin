@@ -40,17 +40,15 @@ describe('TokenListing', () => {
     expect(getByText('small')).toBeInTheDocument();
   });
 
-  it('should expand all', async () => {
-    const { getByText, getByTestId, queryByText } = render(<TokenListing
+  it('should collapse token list', async () => {
+    const { getByTestId } = render(<TokenListing
       tokenKey={key}
       label={key}
       schema={schema as TokenTypeSchema}
       values={values as DeepKeyTokenMap}
     />);
-    fireEvent.click(screen.getByTestId('button-collapse-sizing'));
-    fireEvent.mouseOver(screen.getByTestId('tooltip-collapse-sizing'));
-    await waitFor(() => screen.getByText('Alt + Click to collapse all'));
-    expect(screen.getByText('Alt + Click to collapse all')).toBeInTheDocument();
-    expect(screen.queryByText('small')).not.toBeInTheDocument();
+    fireEvent.click(screen.getByTestId('tokenlisting-sizing-collapse-button'));
+    fireEvent.mouseOver(screen.getByTestId('tokenlisting-sizing-tooltip'));
+    expect(getByTestId('tokenlisting-sizing-content')).toHaveClass('hidden');
   });
 });

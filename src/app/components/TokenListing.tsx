@@ -92,9 +92,9 @@ const TokenListing: React.FC<Props> = ({
           data-cy={`tokenlisting-header-${tokenKey}`}
           type="button"
           onClick={handleSetIntCollapsed}
-          data-testid={`button-collapse-${tokenKey}`}
+          data-testid={`tokenlisting-${tokenKey}-collapse-button`}
         >
-          <Tooltip label={`Alt + Click to ${collapsed ? 'expand' : 'collapse'} all`} dataTestId={`tooltip-collapse-${tokenKey}`}>
+          <Tooltip label={`Alt + Click to ${collapsed ? 'expand' : 'collapse'} all`} dataTestId={`tokenlisting-${tokenKey}-tooltip`}>
             <div className="p-2 -m-2">
               {collapsedTokenTypeObj[tokenKey as TokenTypes] ? (
                 <svg width="6" height="6" viewBox="0 0 6 6" xmlns="http://www.w3.org/2000/svg">
@@ -130,6 +130,7 @@ const TokenListing: React.FC<Props> = ({
           <div
             className={`px-4 pb-4 ${collapsedTokenTypeObj[tokenKey as TokenTypes] ? 'hidden' : null}`}
             data-cy={`tokenlisting-${tokenKey}-content`}
+            data-testid={`tokenlisting-${tokenKey}-content`}
           >
             <TokenTree
               tokenValues={values}
