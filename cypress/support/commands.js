@@ -1,6 +1,7 @@
 import {
   MessageFromPluginTypes
 } from '../../src/types/messages';
+import { AsyncMessageTypes } from '../../src/types/AsyncMessages'
 
 // ***********************************************
 // This example commands.js shows you how to
@@ -27,6 +28,21 @@ import {
 //
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
+
+Cypress.Commands.add('startup', (params) => {
+  cy.window().then(($window) => {
+    const message = {
+      pluginMessage: {
+        id: 'startup',
+        message: {
+          type: AsyncMessageTypes.STARTUP,
+          ...params,
+        },
+      },
+    };
+    $window.postMessage(message, '*');
+  });
+});
 
 Cypress.Commands.add('receiveApiProviders', (providers) => {
   cy.window().then(($window) => {

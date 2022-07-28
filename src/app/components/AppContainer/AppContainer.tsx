@@ -19,6 +19,7 @@ import WindowResizer from '../WindowResizer';
 import ImportedTokensDialog from '../ImportedTokensDialog';
 import PushDialog from '../PushDialog';
 import Changelog from '../Changelog';
+import { Initiator } from '../Initiator';
 
 type Props = StartupMessage & {
   // @README only for unit testing purposes
@@ -83,6 +84,7 @@ export const AppContainer = withLDProviderWrapper((params: Props) => {
       >
         <App />
       </FigmaLoading>
+      <Initiator />
       <ConfirmDialog />
       <ImportedTokensDialog />
       <PushDialog />
