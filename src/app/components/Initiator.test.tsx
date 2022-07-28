@@ -1,7 +1,11 @@
 import React from 'react';
-import { render, fireEvent, resetStore } from '../../../tests/config/setupTest';
+import { Provider } from 'react-redux';
+import {
+  render, fireEvent, resetStore, createMockStore,
+} from '../../../tests/config/setupTest';
 import App from './App';
 import { store } from '../store';
+import { Initiator } from './Initiator';
 
 describe('Initiator', () => {
   beforeEach(() => {
@@ -9,7 +13,13 @@ describe('Initiator', () => {
   });
 
   it('set main node selection values with specific order when one node is selected', async () => {
-    const result = render(<App />);
+    const mockStore = createMockStore({});
+
+    const result = render(
+      <Provider store={mockStore}>
+        <Initiator />
+      </Provider>,
+    );
     fireEvent(
       window,
       new MessageEvent('message', {
@@ -41,12 +51,12 @@ describe('Initiator', () => {
         },
       }),
     );
-    expect(store.getState().uiState.mainNodeSelectionValues).toEqual({
+    expect(mockStore.getState().uiState.mainNodeSelectionValues).toEqual({
       sizing: 'sizing.xs',
       opacity: 'opacity.50',
       fontSizes: 'font-size.12',
     });
-    expect(store.getState().uiState.selectionValues).toEqual([{
+    expect(mockStore.getState().uiState.selectionValues).toEqual([{
       category: 'sizing',
       type: 'sizing',
       value: 'sizing.xs',
@@ -65,7 +75,14 @@ describe('Initiator', () => {
   });
 
   it('set main node selection values with specific order when multi nodes are selected', async () => {
-    const result = render(<App />);
+    const mockStore = createMockStore({});
+
+    const result = render(
+      <Provider store={mockStore}>
+        <Initiator />
+      </Provider>,
+    );
+
     fireEvent(
       window,
       new MessageEvent('message', {
@@ -82,7 +99,7 @@ describe('Initiator', () => {
         },
       }),
     );
-    expect(store.getState().uiState.mainNodeSelectionValues).toEqual({
+    expect(mockStore.getState().uiState.mainNodeSelectionValues).toEqual({
       sizing: 'sizing.xs',
       opacity: 'opacity.50',
       fontSizes: 'font-size.12',
