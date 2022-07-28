@@ -11,10 +11,26 @@ describe('uiSettings', () => {
     await updateUISettings({
       width: 400,
       height: 400,
+      showEmptyGroups: true,
+      updateMode: UpdateMode.PAGE,
+      updateRemote: true,
+      updateOnChange: true,
+      updateStyles: true,
+      ignoreFirstPartForStyles: false,
+      prefixStylesWithThemeName: false,
+      inspectDeep: false,
     });
     expect(mockSetAsync).toBeCalledWith('uiSettings', JSON.stringify({
       width: 400,
       height: 400,
+      showEmptyGroups: true,
+      updateMode: UpdateMode.PAGE,
+      updateRemote: true,
+      updateOnChange: true,
+      updateStyles: true,
+      ignoreFirstPartForStyles: false,
+      prefixStylesWithThemeName: false,
+      inspectDeep: false,
     }));
   });
 
@@ -50,10 +66,7 @@ describe('uiSettings', () => {
     uiSettingsWriteSpy.mockImplementationOnce(() => {
       throw new Error('error');
     });
-    await updateUISettings({
-      width: 400,
-      height: 400,
-    });
+    await updateUISettings({});
     expect(mockNotify).toBeCalledTimes(1);
     expect(mockNotify).toBeCalledWith('There was an issue saving your credentials. Please try again.', undefined);
   });
