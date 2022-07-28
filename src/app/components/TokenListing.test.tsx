@@ -1,8 +1,10 @@
 import React from 'react';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { DeepKeyTokenMap, TokenTypeSchema } from '@/types/tokens';
-import { fireEvent, render, waitFor, screen } from '../../../tests/config/setupTest';
+import { fireEvent, render } from '../../../tests/config/setupTest';
 import TokenListing from './TokenListing';
+import { store } from '../store';
+import tokenTypes from '@/config/tokenType.defs.json';
 
 const key = 'sizing';
 const schema = {
@@ -47,8 +49,27 @@ describe('TokenListing', () => {
       schema={schema as TokenTypeSchema}
       values={values as DeepKeyTokenMap}
     />);
-    fireEvent.click(screen.getByTestId('tokenlisting-sizing-collapse-button'));
-    fireEvent.mouseOver(screen.getByTestId('tokenlisting-sizing-tooltip'));
-    expect(getByTestId('tokenlisting-sizing-content')).toHaveClass('hidden');
+    await fireEvent.click(getByTestId('tokenlisting-sizing-collapse-button'));
+    const { collapsedTokenTypeObj } = store.getState().tokenState;
+    expect(collapsedTokenTypeObj.sizing).toBe(true);
+  });
+
+  it('should collapse all token list', async () => {
+    const { getByTestId } = render(<TokenListing
+      tokenKey={key}
+      label={key}
+      schema={schema as TokenTypeSchema}
+      values={values as DeepKeyTokenMap}
+    />);
+    await fireEvent.click(getByTestId('tokenlisting-sizing-collapse-button'), {
+      bubbles: true,
+      cancelable: true,
+      altKey: true,
+    });
+    const { collapsedTokenTypeObj } = store.getState().tokenState;
+    expect(collapsedTokenTypeObj).toEqual(Object.keys(tokenTypes).reduce<Partial<Record<TokenTypes, boolean>>>((acc, tokenType) => {
+      acc[tokenType as TokenTypes] = true;
+      return acc;
+    }, {}));
   });
 });

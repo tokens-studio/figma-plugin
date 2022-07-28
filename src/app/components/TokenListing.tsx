@@ -66,7 +66,6 @@ const TokenListing: React.FC<Props> = ({
   }, [displayType, dispatch]);
 
   const handleSetIntCollapsed = React.useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
-    console.log("collapseob", collapsedTokenTypeObj)
     e.stopPropagation();
     if (e.altKey) {
       dispatch.uiState.toggleCollapsed();
@@ -94,7 +93,7 @@ const TokenListing: React.FC<Props> = ({
           onClick={handleSetIntCollapsed}
           data-testid={`tokenlisting-${tokenKey}-collapse-button`}
         >
-          <Tooltip label={`Alt + Click to ${collapsed ? 'expand' : 'collapse'} all`} dataTestId={`tokenlisting-${tokenKey}-tooltip`}>
+          <Tooltip label={`Alt + Click to ${collapsed ? 'expand' : 'collapse'} all`}>
             <div className="p-2 -m-2">
               {collapsedTokenTypeObj[tokenKey as TokenTypes] ? (
                 <svg width="6" height="6" viewBox="0 0 6 6" xmlns="http://www.w3.org/2000/svg">
@@ -130,7 +129,6 @@ const TokenListing: React.FC<Props> = ({
           <div
             className={`px-4 pb-4 ${collapsedTokenTypeObj[tokenKey as TokenTypes] ? 'hidden' : null}`}
             data-cy={`tokenlisting-${tokenKey}-content`}
-            data-testid={`tokenlisting-${tokenKey}-content`}
           >
             <TokenTree
               tokenValues={values}

@@ -28,18 +28,16 @@ type Props = {
   children: React.ReactElement;
   label?: string | React.ReactElement;
   side?: 'left' | 'bottom' | 'top';
-  dataTestId?: string;
 };
 
 const Toolip: React.FC<Props> = ({
   label,
   children,
   side = 'left',
-  dataTestId,
 }) => (
   label ? (
     <Tooltip.Root delayDuration={0}>
-      <Tooltip.Trigger as="div" data-testid={dataTestId}>{children}</Tooltip.Trigger>
+      <Tooltip.Trigger as="div">{children}</Tooltip.Trigger>
       <StyledContent side={side}>
         <StyledArrow offset={10} />
         {label}
