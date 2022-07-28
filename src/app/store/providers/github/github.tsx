@@ -54,10 +54,15 @@ export function useGitHub() {
     return confirmResult;
   }, [confirm]);
 
-  const pushTokensToGitHub = useCallback(async (context: GithubCredentials): Promise<RemoteTokenStorageData<GitStorageMetadata> | null> => {
+  const pushTokensToGitHub = useCallback(async (context: GithubCredentials): Promise<RemoteResponseData | null> => {
     const storage = storageClientFactory(context);
     const content = await storage.retrieve();
 
+    if (content?.errorMessage) {
+      return {
+        errorMessage: content?.errorMessage,
+      };
+    }
     if (content) {
       if (
         content
@@ -150,7 +155,11 @@ export function useGitHub() {
 
     try {
       const content = await storage.retrieve();
-
+      if (content?.errorMessage) {
+        return {
+          errorMessage: content.errorMessage,
+        };
+      }
       if (content) {
         const sortedTokens = applyTokenSetOrder(content.tokens, content.metadata?.tokenSetOrder ?? []);
         return {
@@ -184,6 +193,11 @@ export function useGitHub() {
 
       const content = await storage.retrieve();
 
+      if (content?.errorMessage) {
+        return {
+          errorMessage: content.errorMessage,
+        };
+      }
       if (content) {
         if (
           !isEqual(content.tokens, tokens)
@@ -210,6 +224,7 @@ export function useGitHub() {
       return {
         ...pushData,
         ...(pushData === null ? { errorMessage: ErrorMessages.GITHUB_CREDNETIAL_ERROR } : {}),
+        ...(pushData?.errorMessage ? { errorMessage: pushData.errorMessage } : {}),
       };
     } catch (e) {
       notifyToUI(ErrorMessages.GITHUB_CREDNETIAL_ERROR, { error: true });

@@ -1,7 +1,7 @@
 import compact from 'just-compact';
 import { Octokit } from '@octokit/rest';
 import { decodeBase64 } from '@/utils/string/ui';
-import { RemoteTokenStorageFile } from './RemoteTokenStorage';
+import { RemoteTokenstorageErrorMessage, RemoteTokenStorageFile } from './RemoteTokenStorage';
 import IsJSONString from '@/utils/isJSONString';
 import { AnyTokenSet } from '@/types/tokens';
 import { ThemeObjectsList } from '@/types';
@@ -109,7 +109,7 @@ export class GithubTokenStorage extends GitTokenStorage {
     }
   }
 
-  public async read(): Promise<RemoteTokenStorageFile<GitStorageMetadata>[]> {
+  public async read(): Promise<RemoteTokenStorageFile<GitStorageMetadata>[] | RemoteTokenstorageErrorMessage> {
     try {
       const response = await this.octokitClient.rest.repos.getContent({
         owner: this.owner,
@@ -120,6 +120,7 @@ export class GithubTokenStorage extends GitTokenStorage {
       });
       // read entire directory
       if (Array.isArray(response.data)) {
+        console.log('response', response);
         const directoryTreeResponse = await this.octokitClient.rest.git.createTree({
           owner: this.owner,
           repo: this.repository,
@@ -201,6 +202,7 @@ export class GithubTokenStorage extends GitTokenStorage {
         }
       } else if ('content' in response.data) {
         const data = decodeBase64(response.data.content);
+        console.log('daaadata', data);
         if (IsJSONString(data)) {
           const parsed = JSON.parse(data) as GitSingleFileObject;
           return [
