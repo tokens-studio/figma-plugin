@@ -4,10 +4,12 @@ import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StorageTypeCredentials } from '@/types/StorageType';
 import { GitStorageMetadata, GitTokenStorage } from './GitTokenStorage';
 import {
+  RemoteTokenstorageErrorMessage,
   RemoteTokenStorageFile, RemoteTokenStorageMetadataFile, RemoteTokenStorageSingleTokenSetFile, RemoteTokenStorageThemesFile,
 } from './RemoteTokenStorage';
 import { multiFileSchema, complexSingleFileSchema } from './schemas';
 import { SystemFilenames } from './SystemFilenames';
+import { ErrorMessages } from '@/constants/ErrorMessages';
 
 const apiVersion = 'api-version=6.0';
 
@@ -57,8 +59,8 @@ export class ADOTokenStorage extends GitTokenStorage {
     id: repositoryId,
     name: projectId,
   }: Pick<
-  Extract<StorageTypeCredentials, { provider: StorageProviderType.ADO }>,
-  'baseUrl' | 'secret' | 'id' | 'name'
+    Extract<StorageTypeCredentials, { provider: StorageProviderType.ADO }>,
+    'baseUrl' | 'secret' | 'id' | 'name'
   >) {
     super(secret, '', repositoryId, orgUrl);
     this.orgUrl = orgUrl;
@@ -233,7 +235,7 @@ export class ADOTokenStorage extends GitTokenStorage {
     }
   }
 
-  public async read(): Promise<RemoteTokenStorageFile<GitStorageMetadata>[]> {
+  public async read(): Promise<RemoteTokenStorageFile<GitStorageMetadata>[] | RemoteTokenstorageErrorMessage> {
     try {
       if (!this.path.endsWith('.json')) {
         const { value } = await this.getItems();
@@ -309,10 +311,15 @@ export class ADOTokenStorage extends GitTokenStorage {
           })),
         ];
       }
+      return {
+        errorMessage: ErrorMessages.VALIDATION_ERROR,
+      }
     } catch (e) {
       console.log(e);
     }
-    return [];
+    return {
+      errorMessage: ErrorMessages.ADO_CREDNETIAL_ERROR,
+    }
   }
 
   private async postPushes({
