@@ -4,11 +4,8 @@ import { RemoteTokenStorage, RemoteTokenstorageErrorMessage, RemoteTokenStorageF
 import { singleFileSchema } from './schemas/singleFileSchema';
 import IsJSONString from '@/utils/isJSONString';
 import { SystemFilenames } from './SystemFilenames';
-<<<<<<< HEAD
 import { ErrorMessages } from '@/constants/ErrorMessages';
-=======
 import { complexSingleFileSchema } from './schemas';
->>>>>>> 8c09d1fd0b5f65c77ddeddd4fcc163d301655fc4
 
 type UrlData = {
   values: Record<string, AnyTokenSet<false>>
