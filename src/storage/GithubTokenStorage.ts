@@ -9,6 +9,7 @@ import {
   GitMultiFileObject, GitSingleFileObject, GitStorageMetadata, GitTokenStorage,
 } from './GitTokenStorage';
 import { SystemFilenames } from './SystemFilenames';
+import { ErrorMessages } from '@/constants/ErrorMessages';
 
 type ExtendedOctokitClient = Omit<Octokit, 'repos'> & {
   repos: Octokit['repos'] & {
@@ -201,25 +202,31 @@ export class GithubTokenStorage extends GitTokenStorage {
           }
         }
       } else if ('content' in response.data) {
-        const data = decodeBase64(response.data.content);
-        console.log('daaadata', data);
-        if (IsJSONString(data)) {
-          const parsed = JSON.parse(data) as GitSingleFileObject;
-          return [
-            {
-              type: 'themes',
-              path: `${this.path}/${SystemFilenames.THEMES}.json`,
-              data: parsed.$themes ?? [],
-            },
-            ...(Object.entries(parsed).filter(([key]) => (
-              !Object.values<string>(SystemFilenames).includes(key)
-            )) as [string, AnyTokenSet<false>][]).map<RemoteTokenStorageFile<GitStorageMetadata>>(([name, tokenSet]) => ({
-              name,
-              type: 'tokenSet',
-              path: `${this.path}/${name}.json`,
-              data: tokenSet,
-            })),
-          ];
+        try{
+          const data = decodeBase64(response.data.content);
+          console.log('daaadata', data);
+          if (IsJSONString(data)) {
+            const parsed = JSON.parse(data) as GitSingleFileObject;
+            return [
+              {
+                type: 'themes',
+                path: `${this.path}/${SystemFilenames.THEMES}.json`,
+                data: parsed.$themes ?? [],
+              },
+              ...(Object.entries(parsed).filter(([key]) => (
+                !Object.values<string>(SystemFilenames).includes(key)
+              )) as [string, AnyTokenSet<false>][]).map<RemoteTokenStorageFile<GitStorageMetadata>>(([name, tokenSet]) => ({
+                name,
+                type: 'tokenSet',
+                path: `${this.path}/${name}.json`,
+                data: tokenSet,
+              })),
+            ];
+          }  
+        } catch(e) {
+          return {
+            errorMessage: ErrorMessages.VALIDATION_ERROR,
+          }
         }
       }
 

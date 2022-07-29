@@ -169,7 +169,7 @@ export default function useRemoteTokens() {
   ]);
 
   const addNewProviderItem = useCallback(async (credentials: StorageTypeFormValues<false>): Promise<RemoteResponseData> => {
-    let data: RemoteResponseData = {};
+    let data: RemoteResponseData;
     switch (credentials.provider) {
       case StorageProviderType.JSONBIN: {
         if (credentials.id) {
@@ -206,7 +206,7 @@ export default function useRemoteTokens() {
       default:
         throw new Error('Not implemented');
     }
-    if (!data.errorMessage) {
+    if (data.status === 'success') {
       dispatch.uiState.setLocalApiState(credentials as StorageTypeCredentials); // in JSONBIN the ID can technically be omitted, but this function handles this by creating a new JSONBin and assigning the ID
       dispatch.uiState.setApiData(credentials as StorageTypeCredentials);
       setStorageType({ provider: credentials as StorageTypeCredentials, shouldSetInDocument: true });

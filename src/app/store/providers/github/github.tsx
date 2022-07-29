@@ -17,7 +17,7 @@ import { StorageTypeCredentials, StorageTypeFormValues } from '@/types/StorageTy
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { useFlags } from '@/app/components/LaunchDarkly';
 import { RemoteResponseData } from '@/types/RemoteResponseData';
-import { RemoteTokenStorageData } from '@/storage/RemoteTokenStorage';
+import { RemoteTokenStorage, RemoteTokenStorageData } from '@/storage/RemoteTokenStorage';
 import { GitStorageMetadata } from '@/storage/GitTokenStorage';
 import { ErrorMessages } from '@/constants/ErrorMessages';
 import { applyTokenSetOrder } from '@/utils/tokenset';
@@ -54,12 +54,13 @@ export function useGitHub() {
     return confirmResult;
   }, [confirm]);
 
-  const pushTokensToGitHub = useCallback(async (context: GithubCredentials): Promise<RemoteResponseData | null> => {
+  const pushTokensToGitHub = useCallback(async (context: GithubCredentials): Promise<RemoteResponseData> => {
     const storage = storageClientFactory(context);
     const content = await storage.retrieve();
 
-    if (content?.errorMessage) {
+    if (content?.status === 'failure') {
       return {
+        status: 'failure',
         errorMessage: content?.errorMessage,
       };
     }
@@ -72,6 +73,7 @@ export function useGitHub() {
       ) {
         notifyToUI('Nothing to commit');
         return {
+          status: 'success',
           themes,
           tokens,
           metadata: {
@@ -109,6 +111,7 @@ export function useGitHub() {
         });
         pushDialog('success');
         return {
+          status: 'success',
           tokens,
           themes,
         };
@@ -118,6 +121,7 @@ export function useGitHub() {
     }
 
     return {
+      status: 'success',
       tokens,
       themes,
       metadata: {},
@@ -155,7 +159,7 @@ export function useGitHub() {
 
     try {
       const content = await storage.retrieve();
-      if (content?.errorMessage) {
+      if (content?.status === 'failure') {
         return {
           errorMessage: content.errorMessage,
         };
@@ -184,6 +188,7 @@ export function useGitHub() {
       dispatch.branchState.setBranches(hasBranches);
       if (!hasBranches || !hasBranches.length) {
         return {
+          status: 'failure',
           errorMessage: ErrorMessages.EMPTY_BRNACH_ERROR,
         };
       }
@@ -193,8 +198,9 @@ export function useGitHub() {
 
       const content = await storage.retrieve();
 
-      if (content?.errorMessage) {
+      if (content?.status === 'failure') {
         return {
+          status: 'failure',
           errorMessage: content.errorMessage,
         };
       }
@@ -220,16 +226,12 @@ export function useGitHub() {
         }
         return content;
       }
-      const pushData = await pushTokensToGitHub(context);
-      return {
-        ...pushData,
-        ...(pushData === null ? { errorMessage: ErrorMessages.GITHUB_CREDNETIAL_ERROR } : {}),
-        ...(pushData?.errorMessage ? { errorMessage: pushData.errorMessage } : {}),
-      };
+      return await pushTokensToGitHub(context);
     } catch (e) {
       notifyToUI(ErrorMessages.GITHUB_CREDNETIAL_ERROR, { error: true });
       console.log('Error', e);
       return {
+        status: 'failure',
         errorMessage: ErrorMessages.GITHUB_CREDNETIAL_ERROR,
       };
     }
@@ -247,7 +249,7 @@ export function useGitHub() {
 
   const addNewGitHubCredentials = useCallback(async (context: GithubFormValues): Promise<RemoteResponseData> => {
     const data = await syncTokensWithGitHub(context);
-    if (!data.errorMessage) {
+    if (data.status === 'success') {
       AsyncMessageChannel.ReactInstance.message({
         type: AsyncMessageTypes.CREDENTIALS,
         credential: context,
@@ -257,10 +259,12 @@ export function useGitHub() {
       }
     } else {
       return {
+        status: 'failure',
         errorMessage: data.errorMessage,
       };
     }
     return {
+      status: 'success',
       tokens: data.tokens ?? tokens,
       themes: data.themes ?? themes,
       metadata: {},
