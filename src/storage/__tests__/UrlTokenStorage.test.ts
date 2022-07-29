@@ -1,3 +1,4 @@
+import { ErrorMessages } from '@/constants/ErrorMessages';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { UrlTokenStorage } from '../UrlTokenStorage';
 
@@ -17,7 +18,9 @@ describe('Test URLTokenStorage', () => {
     ));
 
     const result = await urlTokenStorage.read();
-    expect(result).toEqual([]);
+    expect(result).toEqual({
+      errorMessage: ErrorMessages.VALIDATION_ERROR
+    });
   });
 
   it('should return themes and token sets', async () => {

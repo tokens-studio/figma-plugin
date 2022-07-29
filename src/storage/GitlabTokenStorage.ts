@@ -113,6 +113,7 @@ export class GitlabTokenStorage extends GitTokenStorage {
         ref: this.branch,
         recursive: true,
       });
+      console.log("gilabdatatrree", trees)
 
       if (!this.path.endsWith('.json')) {
         const jsonFiles = trees.filter((file) => (
@@ -160,6 +161,7 @@ export class GitlabTokenStorage extends GitTokenStorage {
       }
 
       const data = await this.gitlabClient.RepositoryFiles.showRaw(this.projectId, this.path, { ref: this.branch });
+      console.log("gilabdata", data)
       if (IsJSONString(data)) {
         const parsed = JSON.parse(data) as GitSingleFileObject;
         return [

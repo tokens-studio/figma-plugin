@@ -230,6 +230,7 @@ describe('remoteTokens', () => {
               },
             ],
           },
+          status: 'success',
         },
       )
     ));
@@ -296,6 +297,7 @@ describe('remoteTokens', () => {
                 },
               ],
             },
+            status: 'success',
           },
         )
       ));
@@ -365,7 +367,7 @@ describe('remoteTokens', () => {
 
   contexts.forEach((context) => {
     if (context === gitHubContext || context === gitLabContext || context === adoContext) {
-      it(`Add newProviderItem to ${context.provider}, should push tokens and return token data if there is no content`, async () => {
+      it(`Add newProviderItem to ${context.provider}, should push tokens and return status data if there is no content`, async () => {
         mockFetchBranches.mockImplementationOnce(() => (
           Promise.resolve(['main'])
         ));
@@ -382,23 +384,7 @@ describe('remoteTokens', () => {
         expect(mockPushDialog).toBeCalledTimes(2);
         expect(mockPushDialog.mock.calls[1][0]).toBe('success');
         expect(await result.current.addNewProviderItem(context as StorageTypeCredentials)).toEqual({
-          metadata: {},
-          themes: [{
-            id: 'light',
-            name: 'Light',
-            selectedTokenSets: {
-              global: 'enabled',
-            },
-          }],
-          tokens: {
-            global: [
-              {
-                value: '#ffffff',
-                type: 'color',
-                name: 'black',
-              },
-            ],
-          },
+          status: 'success',
         });
       });
     } else {
@@ -408,7 +394,8 @@ describe('remoteTokens', () => {
         ));
         if (context === urlContext) {
           expect(await result.current.addNewProviderItem(context as StorageTypeCredentials)).toEqual({
-            errorMessage: ErrorMessages.URL_CREDNETIAL_ERROR,
+            errorMessage: ErrorMessages.GENERAL_CONNECTION_ERROR,
+            status: 'failure',
           });
         } else {
           expect(await result.current.addNewProviderItem(context as StorageTypeCredentials)).toEqual({
@@ -440,6 +427,7 @@ describe('remoteTokens', () => {
                   },
                 },
               ],
+              status: 'success',
             },
           )
         ));
@@ -488,6 +476,7 @@ describe('remoteTokens', () => {
                 },
               ],
               tokens: null,
+              status: 'success',
             },
           )
         ));
