@@ -10,6 +10,7 @@ export function isSingleTokenValueObject(token: SingleTokenValueObject | any): t
     && (
       typeof token.value !== 'undefined'
       && token.value !== null
+      && !(typeof token?.value === 'object' && 'value' in token?.value)
     )
   );
 }

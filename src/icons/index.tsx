@@ -56,6 +56,9 @@ import IconParagraphSpacing from './paragraph-spacing.svg';
 import IconTextCase from './text-case.svg';
 import IconTextDecoration from './text-decoration.svg';
 import IconLineHeight from './line-height.svg';
+import IconBack from './back.svg';
+import IconArrowRight from './arrow-right.svg';
+import IconUnlink from './unlink.svg';
 import IconFile from './file.svg';
 
 export {
@@ -117,5 +120,8 @@ export {
   IconTextCase,
   IconTextDecoration,
   IconLineHeight,
+  IconBack,
+  IconArrowRight,
+  IconUnlink,
   IconFile,
 };

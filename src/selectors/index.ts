@@ -47,3 +47,5 @@ export * from './prefixStylesWithThemeNameSelector';
 export * from './collapsedTokenSetsSelector';
 export * from './collapsedTokenTypeObjSelector';
 export * from './scrollPositionSetSelector';
+export * from './themeByIdSelector';
+export * from './isWaitingForBackgroundJobSelector';

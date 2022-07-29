@@ -3,9 +3,12 @@ import { AnyTokenSet } from '@/types/tokens';
 import { RemoteTokenStorage, RemoteTokenstorageErrorMessage, RemoteTokenStorageFile } from './RemoteTokenStorage';
 import { singleFileSchema } from './schemas/singleFileSchema';
 import IsJSONString from '@/utils/isJSONString';
-import { tokensMapSchema } from './schemas/tokensMapSchema';
 import { SystemFilenames } from './SystemFilenames';
+<<<<<<< HEAD
 import { ErrorMessages } from '@/constants/ErrorMessages';
+=======
+import { complexSingleFileSchema } from './schemas';
+>>>>>>> 8c09d1fd0b5f65c77ddeddd4fcc163d301655fc4
 
 type UrlData = {
   values: Record<string, AnyTokenSet<false>>
@@ -64,7 +67,7 @@ export class UrlTokenStorage extends RemoteTokenStorage {
       }
 
       // @README if not this is an older format where we just have tokens
-      const onlyTokensValidationResult = await tokensMapSchema.safeParseAsync(parsedJsonData);
+      const onlyTokensValidationResult = await complexSingleFileSchema.safeParseAsync(parsedJsonData);
       if (onlyTokensValidationResult.success) {
         const urlstorageData = onlyTokensValidationResult.data as UrlData['values'];
         return this.convertUrlDataToFiles({ values: urlstorageData });

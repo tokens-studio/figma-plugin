@@ -86,7 +86,6 @@ export class FileTokenStorage extends RemoteTokenStorage {
             if (result && IsJSONString(result)) {
               const parsedJsonData = JSON.parse(result);
               const validationResult = await complexSingleFileSchema.safeParseAsync(parsedJsonData);
-
               if (validationResult.success) {
                 const { $themes = [], ...data } = validationResult.data;
                 resolve([
@@ -105,7 +104,7 @@ export class FileTokenStorage extends RemoteTokenStorage {
               }
               resolve({
                 errorMessage: ErrorMessages.VALIDATION_ERROR,
-              })
+              });
             }
             resolve([]);
           };

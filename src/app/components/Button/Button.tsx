@@ -5,7 +5,7 @@ import { StyledButton } from './StyledButton';
 
 export interface ButtonProps {
   type?: 'button' | 'submit';
-  form?: string
+  form?: string;
   variant: 'secondary' | 'primary' | 'ghost';
   onClick?: () => void;
   size?: 'large' | 'small';
