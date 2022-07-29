@@ -9,6 +9,7 @@ import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StorageTypeCredentials } from '@/types/StorageType';
 import { activeThemeSelector, usedTokenSetSelector } from '@/selectors';
 import { ErrorMessages } from '@/constants/ErrorMessages';
+import { RemoteResponseData } from '@/types/RemoteResponseData';
 
 type UrlCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.URL; }>;
 
@@ -22,18 +23,27 @@ export default function useURL() {
   ), []);
 
   // Read tokens from URL
-  const pullTokensFromURL = useCallback(async (context: UrlCredentials) => {
+  const pullTokensFromURL = useCallback(async (context: UrlCredentials): Promise<RemoteResponseData | null> => {
     const {
       id, secret, name, internalId,
     } = context;
-    if (!id && !secret) return null;
-
+    if (!id && !secret) {
+      return {
+        status: 'failure',
+        errorMessage: ErrorMessages.JSONBIN_ID_NON_EXIST_ERROR,
+      };
+    }
     const storage = storageClientFactory(context);
 
     try {
       const content = await storage.retrieve();
       dispatch.uiState.setProjectURL(id);
-
+      if (content?.status === 'failure') {
+        return {
+          status: 'failure',
+          errorMessage: content.errorMessage,
+        };
+      }
       if (content) {
         AsyncMessageChannel.ReactInstance.message({
           type: AsyncMessageTypes.CREDENTIALS,
@@ -61,8 +71,11 @@ export default function useURL() {
     } catch (err) {
       notifyToUI(ErrorMessages.URL_CREDNETIAL_ERROR, { error: true });
       console.log('Error:', err);
+      return {
+        status: 'failure',
+        errorMessage: ErrorMessages.URL_CREDNETIAL_ERROR,
+      };
     }
-
     return null;
   }, [
     dispatch,

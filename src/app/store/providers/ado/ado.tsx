@@ -113,6 +113,10 @@ export const useADO = () => {
         };
       } catch (e) {
         console.log('Error pushing to ADO', e);
+        return {
+          status: 'failure',
+          errorMessage: ErrorMessages.ADO_CREDNETIAL_ERROR,
+        };
       }
     }
 
@@ -163,6 +167,10 @@ export const useADO = () => {
       }
     } catch (e) {
       console.log('Error', e);
+      return {
+        status: 'failure',
+        errorMessage: ErrorMessages.ADO_CREDNETIAL_ERROR,
+      };
     }
     return null;
   }, [

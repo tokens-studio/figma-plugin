@@ -124,6 +124,10 @@ export function useGitLab() {
         };
       } catch (e) {
         console.log('Error pushing to GitLab', e);
+        return {
+          status: 'failure',
+          errorMessage: ErrorMessages.GITLAB_CREDNETIAL_ERROR,
+        };
       }
     }
     return {
@@ -179,6 +183,10 @@ export function useGitLab() {
       }
     } catch (e) {
       console.log('Error', e);
+      return {
+        status: 'failure',
+        errorMessage: ErrorMessages.GITLAB_CREDNETIAL_ERROR,
+      };
     }
     return null;
   }, [storageClientFactory, checkAndSetAccess, multiFileSync]);

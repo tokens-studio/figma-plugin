@@ -38,6 +38,13 @@ export async function updateJSONBinTokens({
 
     if (oldUpdatedAt) {
       const remoteTokens = await storage.retrieve();
+      if (remoteTokens?.status === 'failure') {
+        console.log('Error updating jsonbin', remoteTokens?.errorMessage);
+        return {
+          status: 'failure',
+          errorMessage: remoteTokens?.errorMessage,
+        };
+      }
       const comparison = await compareUpdatedAt(oldUpdatedAt, remoteTokens?.metadata?.updatedAt ?? '');
       if (comparison === 'remote_older') {
         storage.save(payload);
@@ -100,7 +107,12 @@ export function useJSONbin() {
     const {
       id, secret, name, internalId,
     } = context;
-    if (!id || !secret) return null;
+    if (!id || !secret) {
+      return {
+        status: 'failure',
+        errorMessage: ErrorMessages.JSONBIN_ID_NON_EXIST_ERROR,
+      };
+    }
     try {
       const storage = new JSONBinTokenStorage(id, secret);
       const data = await storage.retrieve();
@@ -132,11 +144,14 @@ export function useJSONbin() {
     } catch (e) {
       notifyToUI(ErrorMessages.JSONBIN_CREDNETIAL_ERROR, { error: true });
       console.log('Error:', e);
-      return null;
+      return {
+        status: 'failure',
+        errorMessage: ErrorMessages.JSONBIN_CREDNETIAL_ERROR,
+      };
     }
   }, [dispatch]);
 
-  const addJSONBinCredentials = useCallback(async (context: Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.JSONBIN }>): Promise<RemoteResponseData> => {
+  const addJSONBinCredentials = useCallback(async (context: Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.JSONBIN }>): Promise<RemoteResponseData | null> => {
     const {
       provider, id, name, secret, internalId,
     } = context;
@@ -179,10 +194,7 @@ export function useJSONbin() {
       });
       return content;
     }
-    return {
-      status: 'failure',
-      errorMessage: ErrorMessages.JSONBIN_CREDNETIAL_ERROR,
-    };
+    return content;
   }, [
     dispatch,
     pullTokensFromJSONBin,

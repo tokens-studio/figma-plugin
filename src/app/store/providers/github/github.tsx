@@ -117,6 +117,10 @@ export function useGitHub() {
         };
       } catch (e) {
         console.log('Error pushing to GitHub', e);
+        return {
+          status: 'failure',
+          errorMessage: ErrorMessages.GITHUB_CREDNETIAL_ERROR,
+        };
       }
     }
 
@@ -173,7 +177,10 @@ export function useGitHub() {
         };
       }
     } catch (e) {
-      console.log('Error', e);
+      return {
+        status: 'failure',
+        errorMessage: ErrorMessages.GITHUB_CREDNETIAL_ERROR,
+      };
     }
     return null;
   }, [
