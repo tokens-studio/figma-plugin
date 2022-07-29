@@ -55,7 +55,6 @@ export function useGitHub() {
   const pushTokensToGitHub = useCallback(async (context: GithubCredentials): Promise<RemoteResponseData> => {
     const storage = storageClientFactory(context);
     const content = await storage.retrieve();
-    console.log('sunccpushontent', content);
 
     if (content?.status === 'failure') {
       return {
@@ -162,7 +161,6 @@ export function useGitHub() {
 
     try {
       const content = await storage.retrieve();
-      console.log('conente', content);
       if (content?.status === 'failure') {
         return {
           status: 'failure',
@@ -205,7 +203,7 @@ export function useGitHub() {
       await checkAndSetAccess({ context, owner, repo });
 
       const content = await storage.retrieve();
-      console.log('sunccontent', content);
+      console.log();
       if (content?.status === 'failure') {
         return {
           status: 'failure',

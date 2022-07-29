@@ -121,7 +121,6 @@ export class GithubTokenStorage extends GitTokenStorage {
       });
       // read entire directory
       if (Array.isArray(response.data)) {
-        console.log('response', response);
         const directoryTreeResponse = await this.octokitClient.rest.git.createTree({
           owner: this.owner,
           repo: this.repository,
@@ -158,7 +157,6 @@ export class GithubTokenStorage extends GitTokenStorage {
                 headers: octokitClientDefaultHeaders,
               }) : Promise.resolve(null)
             )));
-            console.log('jsonFileContents', jsonFileContents);
             return compact(jsonFileContents.map<RemoteTokenStorageFile<GitStorageMetadata> | null>((fileContent, index) => {
               const { path } = jsonFiles[index];
 
