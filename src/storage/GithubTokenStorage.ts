@@ -158,7 +158,7 @@ export class GithubTokenStorage extends GitTokenStorage {
                 headers: octokitClientDefaultHeaders,
               }) : Promise.resolve(null)
             )));
-
+            console.log('jsonFileContents', jsonFileContents);
             return compact(jsonFileContents.map<RemoteTokenStorageFile<GitStorageMetadata> | null>((fileContent, index) => {
               const { path } = jsonFiles[index];
 
@@ -223,16 +223,14 @@ export class GithubTokenStorage extends GitTokenStorage {
         }
         return {
           errorMessage: ErrorMessages.VALIDATION_ERROR,
-        }
+        };
       }
 
       return [];
     } catch (e) {
       // Raise error (usually this is an auth error)
       console.log('Error', e);
-      return {
-        errorMessage: ErrorMessages.GITHUB_CREDNETIAL_ERROR,
-      };
+      return [];
     }
   }
 

@@ -59,8 +59,8 @@ export class ADOTokenStorage extends GitTokenStorage {
     id: repositoryId,
     name: projectId,
   }: Pick<
-    Extract<StorageTypeCredentials, { provider: StorageProviderType.ADO }>,
-    'baseUrl' | 'secret' | 'id' | 'name'
+  Extract<StorageTypeCredentials, { provider: StorageProviderType.ADO }>,
+  'baseUrl' | 'secret' | 'id' | 'name'
   >) {
     super(secret, '', repositoryId, orgUrl);
     this.orgUrl = orgUrl;
@@ -313,13 +313,11 @@ export class ADOTokenStorage extends GitTokenStorage {
       }
       return {
         errorMessage: ErrorMessages.VALIDATION_ERROR,
-      }
+      };
     } catch (e) {
       console.log(e);
     }
-    return {
-      errorMessage: ErrorMessages.ADO_CREDNETIAL_ERROR,
-    }
+    return [];
   }
 
   private async postPushes({

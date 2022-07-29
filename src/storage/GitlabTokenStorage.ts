@@ -178,16 +178,14 @@ export class GitlabTokenStorage extends GitTokenStorage {
           })),
         ];
       }
+      return {
+        errorMessage: ErrorMessages.VALIDATION_ERROR,
+      };
     } catch (err) {
       // Raise error (usually this is an auth error)
       console.error(err);
-      return {
-        errorMessage: ErrorMessages.GITLAB_CREDNETIAL_ERROR,
-      };
     }
-    return {
-      errorMessage: ErrorMessages.VALIDATION_ERROR,
-    };
+    return [];
   }
 
   public async writeChangeset(changeset: Record<string, string>, message: string, branch: string, shouldCreateBranch?: boolean): Promise<boolean> {

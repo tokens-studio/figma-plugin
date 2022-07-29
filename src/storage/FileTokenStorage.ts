@@ -113,10 +113,7 @@ export class FileTokenStorage extends RemoteTokenStorage {
       }
     } catch (e) {
       console.log(e);
-      return {
-        errorMessage: ErrorMessages.FILE_CREDNETIAL_ERROR,
-      }
-  }
+    }
     return [];
   }
 

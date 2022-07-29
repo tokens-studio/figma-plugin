@@ -115,12 +115,9 @@ export class JSONBinTokenStorage extends RemoteTokenStorage<JsonBinMetadata> {
       }
       return {
         errorMessage: ErrorMessages.VALIDATION_ERROR,
-      }
+      };
     }
-
-    return {
-      errorMessage: ErrorMessages.JSONBIN_CREDNETIAL_ERROR,
-    };
+    return [];
   }
 
   public async write(files: RemoteTokenStorageFile<JsonBinMetadata>[]): Promise<boolean> {

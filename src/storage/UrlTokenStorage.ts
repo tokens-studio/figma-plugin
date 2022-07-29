@@ -71,11 +71,9 @@ export class UrlTokenStorage extends RemoteTokenStorage {
       }
       return {
         errorMessage: ErrorMessages.VALIDATION_ERROR,
-      }
+      };
     }
-    return {
-      errorMessage: ErrorMessages.URL_CREDNETIAL_ERROR,
-    }
+    return [];
   }
 
   public async write(): Promise<boolean> {
