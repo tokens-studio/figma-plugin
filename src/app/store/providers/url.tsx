@@ -30,7 +30,7 @@ export default function useURL() {
     if (!id && !secret) {
       return {
         status: 'failure',
-        errorMessage: ErrorMessages.JSONBIN_ID_NON_EXIST_ERROR,
+        errorMessage: ErrorMessages.ID_NON_EXIST_ERROR,
       };
     }
     const storage = storageClientFactory(context);

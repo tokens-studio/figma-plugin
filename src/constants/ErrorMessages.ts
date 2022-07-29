@@ -9,6 +9,6 @@ export enum ErrorMessages {
   FILE_CREDNETIAL_ERROR = 'Error fetching from file, check console (F12)',
   EMPTY_BRNACH_ERROR = 'There is no branch',
   VALIDATION_ERROR = 'Contents don\'t pass schema validation',
-  JSONBIN_ID_NON_EXIST_ERROR = 'ID or Secret should be exist',
+  ID_NON_EXIST_ERROR = 'ID or Secret should be exist',
   JSONBIN_CREATE_ERROR = 'Error creating JSONbin token storage',
 }

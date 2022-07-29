@@ -183,7 +183,7 @@ export function useBitbucket() {
         console.log('Error', e);
         return {
           status: 'failure',
-          errorMessage: ErrorMessages.GITHUB_CREDNETIAL_ERROR,
+          errorMessage: ErrorMessages.BITBUCKET_CREDNETIAL_ERROR,
         };
       }
       return null;

@@ -110,7 +110,7 @@ export function useJSONbin() {
     if (!id || !secret) {
       return {
         status: 'failure',
-        errorMessage: ErrorMessages.JSONBIN_ID_NON_EXIST_ERROR,
+        errorMessage: ErrorMessages.ID_NON_EXIST_ERROR,
       };
     }
     try {
@@ -158,7 +158,7 @@ export function useJSONbin() {
     if (!id || !secret) {
       return {
         status: 'failure',
-        errorMessage: ErrorMessages.JSONBIN_ID_NON_EXIST_ERROR,
+        errorMessage: ErrorMessages.ID_NON_EXIST_ERROR,
       };
     }
 
