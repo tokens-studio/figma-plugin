@@ -18,7 +18,7 @@ import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StorageTypeCredentials, StorageTypeFormValues } from '@/types/StorageType';
-import { RemoteResponseData } from '@/types/RemoteResponseData';
+import { RemoteResponseData, RemoteResponseStatus } from '@/types/RemoteResponseData';
 import { ErrorMessages } from '@/constants/ErrorMessages';
 import { saveLastSyncedState } from '@/utils/saveLastSyncedState';
 
@@ -58,7 +58,7 @@ export default function useRemoteTokens() {
       isInfinite: true,
     });
 
-    let remoteData: RemoteTokenStorageData<unknown> | null = null;
+    let remoteData: RemoteResponseData<unknown> | null = null;
     switch (context.provider) {
       case StorageProviderType.JSONBIN: {
         remoteData = await pullTokensFromJSONBin(context);
@@ -83,8 +83,7 @@ export default function useRemoteTokens() {
       default:
         throw new Error('Not implemented');
     }
-
-    if (remoteData) {
+    if (remoteData?.status === 'success') {
       saveLastSyncedState(dispatch, remoteData.tokens, remoteData.themes, remoteData.metadata);
       dispatch.tokenState.setTokenData({
         values: remoteData.tokens,
@@ -168,50 +167,64 @@ export default function useRemoteTokens() {
     pushTokensToADO,
   ]);
 
-  const addNewProviderItem = useCallback(async (credentials: StorageTypeFormValues<false>): Promise<RemoteResponseData> => {
-    let data;
+  const addNewProviderItem = useCallback(async (credentials: StorageTypeFormValues<false>): Promise<RemoteResponseStatus> => {
+    let content: RemoteResponseData | null = null;
     switch (credentials.provider) {
       case StorageProviderType.JSONBIN: {
         if (credentials.id) {
-          data = await addJSONBinCredentials(credentials);
+          content = await addJSONBinCredentials(credentials);
         } else {
           const id = await createNewJSONBin(credentials);
           if (id) {
             credentials.id = id;
-            data = {};
+            return {
+              status: 'success',
+            }
+          }
+          return {
+            status: 'failure',
+            errorMessage: ErrorMessages.JSONBIN_CREATE_ERROR,
           }
         }
         break;
       }
       case StorageProviderType.GITHUB: {
-        data = await addNewGitHubCredentials(credentials);
+        content = await addNewGitHubCredentials(credentials);
         break;
       }
       case StorageProviderType.GITLAB: {
-        data = await addNewGitLabCredentials(credentials);
+        content = await addNewGitLabCredentials(credentials);
         break;
       }
       case StorageProviderType.ADO: {
-        data = await addNewADOCredentials(credentials);
+        content = await addNewADOCredentials(credentials);
         break;
       }
       case StorageProviderType.URL: {
-        const pullData = await pullTokensFromURL(credentials);
-        data = {
-          ...pullData,
-          ...(pullData === null ? { errorMessage: ErrorMessages.URL_CREDNETIAL_ERROR } : {}),
-        };
+        content = await pullTokensFromURL(credentials);
         break;
       }
       default:
         throw new Error('Not implemented');
     }
-    if (data.status === 'success') {
+    if (content?.status === 'failure') {
+      return {
+        status: 'failure',
+        errorMessage: content?.errorMessage,
+      };  
+    }
+    if (content) {
       dispatch.uiState.setLocalApiState(credentials as StorageTypeCredentials); // in JSONBIN the ID can technically be omitted, but this function handles this by creating a new JSONBin and assigning the ID
       dispatch.uiState.setApiData(credentials as StorageTypeCredentials);
       setStorageType({ provider: credentials as StorageTypeCredentials, shouldSetInDocument: true });
+      return {
+        status: 'success',
+      }
     }
-    return data;
+    return {
+      status: 'failure',
+      errorMessage: ErrorMessages.GENERAL_CONNECTION_ERROR,
+    };
   }, [
     dispatch,
     addJSONBinCredentials,

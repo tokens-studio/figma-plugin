@@ -170,9 +170,13 @@ export function Initiator() {
                     const remoteData = await pullTokens({
                       context: credentials, featureFlags: receivedFlags, usedTokenSet, activeTheme,
                     });
-                    const existTokens = Object.values(remoteData?.tokens ?? {}).some((value) => value.length > 0);
-                    if (existTokens) dispatch.uiState.setActiveTab(Tabs.TOKENS);
-                    else dispatch.uiState.setActiveTab(Tabs.START);
+                    if(remoteData?.status === 'failure') {
+                      notifyToUI('Failed to fetch tokens, check your credentials', { error: true });
+                    } else {
+                      const existTokens = Object.values(remoteData?.tokens ?? {}).some((value) => value.length > 0);
+                      if (existTokens) dispatch.uiState.setActiveTab(Tabs.TOKENS);
+                      else dispatch.uiState.setActiveTab(Tabs.START);  
+                    }
                   } else {
                     dispatch.uiState.setActiveTab(Tabs.TOKENS);
                   }

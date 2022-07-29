@@ -1,4 +1,3 @@
-import { RemoteTokenStorageData } from '@/storage/RemoteTokenStorage';
 import { ThemeObjectsList } from './ThemeObjectsList';
 import { AnyTokenList } from './tokens';
 
@@ -15,3 +14,7 @@ type RemoteResponseFailure = {
 };
 
 export type RemoteResponseData<Metadata = unknown> = RemoteResponseSuccess<Metadata> | RemoteResponseFailure;
+export type RemoteResponseStatus = {
+  status: 'success' | 'failure';
+  errorMessage?: string;
+}

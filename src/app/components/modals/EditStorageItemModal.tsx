@@ -27,11 +27,11 @@ export default function EditStorageItemModal({
 
   const handleSubmit = React.useCallback(async (values: StorageTypeFormValues<false>) => {
     const response = await addNewProviderItem(values);
-    if (response?.errorMessage) {
+    if (response.status === 'success') {
+      onSuccess();
+    } else {
       setHasErrored(true);
       setErrorMessage(response?.errorMessage);
-    } else {
-      onSuccess();
     }
   }, [addNewProviderItem, onSuccess]);
 

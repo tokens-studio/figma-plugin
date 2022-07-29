@@ -28,7 +28,7 @@ export default function CreateStorageItemModal({
   const handleCreateNewClick = React.useCallback(async (values: StorageTypeFormValues<false>) => {
     setHasErrored(false);
     const response = await addNewProviderItem(values);
-    if (!response?.errorMessage) {
+    if (response.status === 'success') {
       onSuccess();
     } else {
       setHasErrored(true);
