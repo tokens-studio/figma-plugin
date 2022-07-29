@@ -203,7 +203,6 @@ export function useGitHub() {
       await checkAndSetAccess({ context, owner, repo });
 
       const content = await storage.retrieve();
-      console.log();
       if (content?.status === 'failure') {
         return {
           status: 'failure',
