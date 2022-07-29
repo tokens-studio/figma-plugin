@@ -11,14 +11,14 @@ import {
 } from '@/selectors';
 import { BitbucketTokenStorage } from '@/storage/BitbucketTokenStorage';
 import { isEqual } from '@/utils/isEqual';
-import { RemoteTokenStorageData } from '@/storage/RemoteTokenStorage';
-import { GitStorageMetadata } from '@/storage/GitTokenStorage';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { StorageTypeCredentials, StorageTypeFormValues } from '@/types/StorageType';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { saveLastSyncedState } from '@/utils/saveLastSyncedState';
 import { applyTokenSetOrder } from '@/utils/tokenset';
+import { ErrorMessages } from '@/constants/ErrorMessages';
+import { RemoteResponseData } from '@/types/RemoteResponseData';
 
 type BitbucketCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.BITBUCKET }>;
 type BitbucketFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.BITBUCKET }>;
@@ -60,10 +60,15 @@ export function useBitbucket() {
     return confirmResult;
   }, [confirm]);
 
-  const pushTokensToBitbucket = useCallback(async (context: BitbucketCredentials): Promise<RemoteTokenStorageData<GitStorageMetadata> | null> => {
+  const pushTokensToBitbucket = useCallback(async (context: BitbucketCredentials): Promise<RemoteResponseData> => {
     const storage = storageClientFactory(context);
     const content = await storage.retrieve();
-
+    if (content?.status === 'failure') {
+      return {
+        status: 'failure',
+        errorMessage: content?.errorMessage,
+      };
+    }
     if (content) {
       if (
         content
@@ -73,6 +78,7 @@ export function useBitbucket() {
       ) {
         notifyToUI('Nothing to commit');
         return {
+          status: 'success',
           themes,
           tokens,
           metadata: {
@@ -108,15 +114,21 @@ export function useBitbucket() {
         });
         pushDialog('success');
         return {
+          status: 'success',
           tokens,
           themes,
         };
       } catch (e) {
         console.log('Error pushing to Bitbucket', e);
+        return {
+          status: 'failure',
+          errorMessage: ErrorMessages.BITBUCKET_CREDNETIAL_ERROR,
+        };
       }
     }
 
     return {
+      status: 'success',
       tokens,
       themes,
       metadata: {},
@@ -146,7 +158,7 @@ export function useBitbucket() {
   );
 
   const pullTokensFromBitbucket = useCallback(
-    async (context: BitbucketCredentials, receivedFeatureFlags?: LDProps['flags']) => {
+    async (context: BitbucketCredentials, receivedFeatureFlags?: LDProps['flags']): Promise<RemoteResponseData | null> => {
       const storage = storageClientFactory(context);
       if (receivedFeatureFlags?.multiFileSync) storage.enableMultiFile();
 
@@ -158,11 +170,21 @@ export function useBitbucket() {
 
       try {
         const content = await storage.retrieve();
+        if (content?.status === 'failure') {
+          return {
+            status: 'failure',
+            errorMessage: content.errorMessage,
+          };
+        }
         if (content) {
           return content;
         }
       } catch (e) {
         console.log('Error', e);
+        return {
+          status: 'failure',
+          errorMessage: ErrorMessages.GITHUB_CREDNETIAL_ERROR,
+        };
       }
       return null;
     },
@@ -171,19 +193,28 @@ export function useBitbucket() {
 
   // Function to initially check auth and sync tokens with Bitbucket
   const syncTokensWithBitbucket = useCallback(
-    async (context: BitbucketCredentials): Promise<RemoteTokenStorageData<GitStorageMetadata> | null> => {
+    async (context: BitbucketCredentials): Promise<RemoteResponseData> => {
       try {
         const storage = storageClientFactory(context);
         const hasBranches = await storage.fetchBranches();
         dispatch.branchState.setBranches(hasBranches);
         if (!hasBranches || !hasBranches.length) {
-          return null;
+          return {
+            status: 'failure',
+            errorMessage: ErrorMessages.EMPTY_BRNACH_ERROR,
+          };
         }
 
         const [owner, repo] = context.id.split('/');
         await checkAndSetAccess({ context, owner, repo });
 
         const content = await storage.retrieve();
+        if (content?.status === 'failure') {
+          return {
+            status: 'failure',
+            errorMessage: content.errorMessage,
+          };
+        }
         if (content) {
           if (
             !isEqual(content.tokens, tokens)
@@ -210,7 +241,10 @@ export function useBitbucket() {
       } catch (e) {
         notifyToUI('Error syncing with Bitbucket, check credentials', { error: true });
         console.log('Error', e);
-        return null;
+        return {
+          status: 'failure',
+          errorMessage: ErrorMessages.BITBUCKET_CREDNETIAL_ERROR,
+        };
       }
     },
     [
@@ -227,9 +261,9 @@ export function useBitbucket() {
   );
 
   const addNewBitbucketCredentials = useCallback(
-    async (context: BitbucketFormValues): Promise<RemoteTokenStorageData<GitStorageMetadata> | null> => {
+    async (context: BitbucketFormValues): Promise<RemoteResponseData> => {
       const data = await syncTokensWithBitbucket(context);
-      if (data) {
+      if (data.status === 'success') {
         AsyncMessageChannel.ReactInstance.message({
           type: AsyncMessageTypes.CREDENTIALS,
           credential: context,
@@ -238,9 +272,13 @@ export function useBitbucket() {
           notifyToUI('No tokens stored on remote');
         }
       } else {
-        return null;
+        return {
+          status: 'failure',
+          errorMessage: data.errorMessage,
+        };
       }
       return {
+        status: 'success',
         tokens: data.tokens ?? tokens,
         themes: data.themes ?? themes,
         metadata: {},
