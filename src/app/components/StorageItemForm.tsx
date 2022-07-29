@@ -46,7 +46,6 @@ export default function StorageItemForm({
     }
     case StorageProviderType.ADO: {
       return (
-<<<<<<< HEAD
         <ADOForm
           onChange={onChange}
           onSubmit={onSubmit}
@@ -55,14 +54,10 @@ export default function StorageItemForm({
           hasErrored={hasErrored}
           errorMessage={errorMessage}
         />
-=======
-        <ADOForm onChange={onChange} onSubmit={onSubmit} onCancel={onCancel} values={values} hasErrored={hasErrored} />
->>>>>>> 8c09d1fd0b5f65c77ddeddd4fcc163d301655fc4
       );
     }
     case StorageProviderType.URL: {
       return (
-<<<<<<< HEAD
         <URLForm
           onChange={onChange}
           onSubmit={onSubmit}
@@ -71,9 +66,6 @@ export default function StorageItemForm({
           hasErrored={hasErrored}
           errorMessage={errorMessage}
         />
-=======
-        <URLForm onChange={onChange} onSubmit={onSubmit} onCancel={onCancel} values={values} hasErrored={hasErrored} />
->>>>>>> 8c09d1fd0b5f65c77ddeddd4fcc163d301655fc4
       );
     }
     case StorageProviderType.JSONBIN: {
