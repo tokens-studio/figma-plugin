@@ -69,10 +69,15 @@ const TokenListing: React.FC<Props> = ({
     e.stopPropagation();
     if (e.altKey) {
       dispatch.uiState.toggleCollapsed();
+      const newCollapsedObj = Object.keys(collapsedTokenTypeObj).reduce<Record<string, boolean>>((acc, key) => {
+        acc[key] = !collapsed;
+        return acc;
+      }, {});
+      dispatch.tokenState.setCollapsedTokenTypeObj(newCollapsedObj);
     } else {
       dispatch.tokenState.setCollapsedTokenTypeObj({ ...collapsedTokenTypeObj, [tokenKey]: !collapsedTokenTypeObj[tokenKey as TokenTypes] });
     }
-  }, [dispatch, collapsedTokenTypeObj, tokenKey]);
+  }, [dispatch, collapsedTokenTypeObj, tokenKey, collapsed]);
 
   if (!values && !showEmptyGroups) return null;
 
@@ -86,6 +91,7 @@ const TokenListing: React.FC<Props> = ({
           data-cy={`tokenlisting-header-${tokenKey}`}
           type="button"
           onClick={handleSetIntCollapsed}
+          data-testid={`tokenlisting-${tokenKey}-collapse-button`}
         >
           <Tooltip label={`Alt + Click to ${collapsed ? 'expand' : 'collapse'} all`}>
             <div className="p-2 -m-2">
