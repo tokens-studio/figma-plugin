@@ -9,7 +9,7 @@ describe('Test URLTokenStorage', () => {
     jest.clearAllMocks();
   });
 
-  it('should return an empty array when the content(s) are invalid', async () => {
+  it('should return validation error when the content(s) are invalid', async () => {
     global.fetch = jest.fn(() => (
       Promise.resolve({
         ok: true,
@@ -103,4 +103,17 @@ describe('Test URLTokenStorage', () => {
       },
     ]);
   });
+
+    it('should return empty array when fetching data fail', async () => {
+    global.fetch = jest.fn(() => (
+      Promise.resolve({
+        ok: false,
+        json: () => Promise.resolve(''),
+      }) as Promise<Response>
+    ));
+
+    const result = await urlTokenStorage.read();
+    expect(result).toEqual([]);
+  });
+
 });
