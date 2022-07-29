@@ -59,8 +59,6 @@ export class BitbucketTokenStorage extends GitTokenStorage {
         repo_slug: this.repository,
         ref: originRef,
       });
-      console.log('originBranch', originBranch);
-      console.log('newRef', newRef);
       // TODO: createRef is not implemented on Bitbucket Cloud
       // const newBranch = await this.bitbucketClient.git.createRef({
       //   workspace: this.owner,
@@ -109,7 +107,6 @@ export class BitbucketTokenStorage extends GitTokenStorage {
         // path: this.path,
         // ref: this.branch,
       });
-      console.log('response', response);
 
       // TODO: create a tree structure and read the directory
       // the Bitbucket cloud API doesn't have a method like `createTree`

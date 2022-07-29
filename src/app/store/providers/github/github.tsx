@@ -56,7 +56,6 @@ export function useGitHub() {
     const storage = storageClientFactory(context);
     const content = await storage.retrieve();
     if (content?.status === 'failure') {
-      console.log("content", content)
       return {
         status: 'failure',
         errorMessage: content?.errorMessage,
