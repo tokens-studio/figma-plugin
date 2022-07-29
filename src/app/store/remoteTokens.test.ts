@@ -246,6 +246,7 @@ describe('remoteTokens', () => {
         metadata: {
           commitMessage: 'Initial commit',
         },
+        status: 'success',
         themes: [
           {
             id: 'light',
@@ -399,7 +400,8 @@ describe('remoteTokens', () => {
           });
         } else {
           expect(await result.current.addNewProviderItem(context as StorageTypeCredentials)).toEqual({
-            errorMessage: ErrorMessages.JSONBIN_CREDNETIAL_ERROR,
+            errorMessage: ErrorMessages.GENERAL_CONNECTION_ERROR,
+            status: 'failure',
           });
         }
       });
@@ -439,23 +441,7 @@ describe('remoteTokens', () => {
         expect(notifyToUI).toBeCalledWith(`Pulled tokens from ${contextNames[index]}`);
         expect(notifyToUI).toBeCalledWith('No tokens stored on remote');
         expect(await result.current.addNewProviderItem(context as StorageTypeCredentials)).toEqual({
-          metadata: {},
-          themes: [{
-            id: 'light',
-            name: 'Light',
-            selectedTokenSets: {
-              global: 'enabled',
-            },
-          }],
-          tokens: {
-            global: [
-              {
-                value: '#ffffff',
-                type: 'color',
-                name: 'black',
-              },
-            ],
-          },
+          status: 'success',
         });
       });
     } else {
@@ -483,10 +469,12 @@ describe('remoteTokens', () => {
         if (context === urlContext) {
           expect(await result.current.addNewProviderItem(context as StorageTypeCredentials)).toEqual({
             errorMessage: ErrorMessages.URL_CREDNETIAL_ERROR,
+            status: 'failure',
           });
         } else {
           expect(await result.current.addNewProviderItem(context as StorageTypeCredentials)).toEqual({
-            errorMessage: ErrorMessages.JSONBIN_CREDNETIAL_ERROR,
+            errorMessage: ErrorMessages.GENERAL_CONNECTION_ERROR,
+            status: 'failure',
           });
         }
       });
@@ -501,45 +489,11 @@ describe('remoteTokens', () => {
       await waitFor(() => { result.current.addNewProviderItem(context as StorageTypeCredentials); });
       if (context === gitHubContext || context === gitLabContext || context === adoContext) {
         expect(await result.current.addNewProviderItem(context as StorageTypeCredentials)).toEqual({
-          metadata: {},
-          themes: [{
-            id: 'light',
-            name: 'Light',
-            selectedTokenSets: {
-              global: 'enabled',
-            },
-          }],
-          tokens: {
-            global: [
-              {
-                value: '#ffffff',
-                type: 'color',
-                name: 'black',
-              },
-            ],
-          },
+          status: 'success',
         });
       } else {
         expect(await result.current.addNewProviderItem(context as StorageTypeCredentials)).toEqual({
-          metadata: {
-            commitMessage: 'Initial commit',
-          },
-          themes: [{
-            id: 'light',
-            name: 'Light',
-            selectedTokenSets: {
-              global: 'enabled',
-            },
-          }],
-          tokens: {
-            global: [
-              {
-                value: '#ffffff',
-                type: 'color',
-                name: 'black',
-              },
-            ],
-          },
+          status: 'success',
         });
       }
     });

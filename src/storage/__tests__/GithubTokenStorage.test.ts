@@ -12,6 +12,7 @@ import {
   mockGetTree,
   mockListBranches,
 } from '../../../tests/__mocks__/octokitRestMock';
+import { ErrorMessages } from '@/constants/ErrorMessages';
 
 describe('GithubTokenStorage', () => {
   const storageProvider = new GithubTokenStorage('', 'six7', 'figma-tokens');
@@ -165,6 +166,7 @@ describe('GithubTokenStorage', () => {
 
     storageProvider.changePath('data/tokens.json');
     expect(await storageProvider.retrieve()).toEqual({
+      status: 'success',
       themes: [
         {
           id: 'light',
@@ -210,7 +212,9 @@ describe('GithubTokenStorage', () => {
     ));
 
     storageProvider.changePath('data/tokens.json');
-    expect(await storageProvider.read()).toEqual([]);
+    expect(await storageProvider.read()).toEqual({
+      errorMessage: ErrorMessages.VALIDATION_ERROR,
+    });
   });
 
   it('can read from Git in a multifile format', async () => {
