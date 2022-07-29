@@ -84,13 +84,13 @@ export abstract class RemoteTokenStorage<Metadata = unknown, SaveOptions = unkno
 
     // start by reading the files from the remote source
     // it is up to the remote storage implementation to split it up into "File" objects
-    const readData = await this.read();
+    const content = await this.read();
     // successfully fetch data
-    if (Array.isArray(readData)) {
-      if (readData.length === 0) {
+    if (Array.isArray(content)) {
+      if (content.length === 0) {
         return null;
       }
-      readData.forEach((file) => {
+      content.forEach((file) => {
         if (file.type === 'themes') {
           data.themes = [...data.themes, ...file.data];
         } else if (file.type === 'tokenSet') {
@@ -112,7 +112,7 @@ export abstract class RemoteTokenStorage<Metadata = unknown, SaveOptions = unkno
     }
     return {
       status: 'failure',
-      ...readData,
+      ...content,
     }
   }
 }

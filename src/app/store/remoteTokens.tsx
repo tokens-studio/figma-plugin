@@ -281,10 +281,10 @@ export default function useRemoteTokens() {
     track('fetchTokensFromFileOrDirectory');
     dispatch.uiState.startJob({ name: BackgroundJobs.UI_FETCHTOKENSFROMFILE });
 
-    let remoteData: RemoteTokenStorageData<unknown> | null = null;
+    let remoteData: RemoteResponseData<unknown> | null = null;
     if (files) {
       remoteData = await readTokensFromFileOrDirectory(files);
-      if (remoteData) {
+      if (remoteData?.status === 'success') {
         dispatch.tokenState.setTokenData({
           values: remoteData.tokens,
           themes: remoteData.themes,

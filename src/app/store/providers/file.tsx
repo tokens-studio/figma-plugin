@@ -22,12 +22,6 @@ export default function useFile() {
 
     try {
       const content = await storage.retrieve();
-      if (content?.status === 'failure') {
-        return {
-          status: 'failure',
-          errorMessage: content.errorMessage,
-        };
-      }
       if (content) {
         return content;
       }
