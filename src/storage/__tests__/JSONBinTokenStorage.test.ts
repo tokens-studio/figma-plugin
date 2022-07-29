@@ -1,3 +1,4 @@
+import { ErrorMessages } from '@/constants/ErrorMessages';
 import { TokenTypes } from '@/constants/TokenTypes';
 import * as pjs from '../../../package.json';
 import { mockFetch } from '../../../tests/__mocks__/fetchMock';
@@ -184,4 +185,19 @@ describe('JSONBinTokenStorage', () => {
     const storage = new JSONBinTokenStorage('jsonbinid', 'secret');
     expect(await storage.write([])).toEqual(false);
   });
+
+  it('should return validation error when the content(s) are invalid', async () => {
+    mockFetch.mockImplementationOnce(() => (
+      Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve(''),
+      })
+    ));
+
+    const storage = new JSONBinTokenStorage('jsonbinid', 'secret');
+    expect(await storage.read()).toEqual({
+      errorMessage: ErrorMessages.VALIDATION_ERROR,
+    });
+  });
+
 });
