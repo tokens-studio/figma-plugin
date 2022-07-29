@@ -147,7 +147,7 @@ export function useGitHub() {
     dispatch.tokenState.setEditProhibited(!hasWriteAccess);
   }, [dispatch, storageClientFactory]);
 
-  const pullTokensFromGitHub = useCallback(async (context: GithubCredentials, receivedFeatureFlags?: LDProps['flags']) => {
+  const pullTokensFromGitHub = useCallback(async (context: GithubCredentials, receivedFeatureFlags?: LDProps['flags']): Promise<RemoteResponseData | null> => {
     const storage = storageClientFactory(context);
     if (receivedFeatureFlags?.multiFileSync) storage.enableMultiFile();
 
@@ -161,6 +161,7 @@ export function useGitHub() {
       const content = await storage.retrieve();
       if (content?.status === 'failure') {
         return {
+          status: 'failure',
           errorMessage: content.errorMessage,
         };
       }

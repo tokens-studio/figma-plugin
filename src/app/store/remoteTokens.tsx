@@ -169,7 +169,7 @@ export default function useRemoteTokens() {
   ]);
 
   const addNewProviderItem = useCallback(async (credentials: StorageTypeFormValues<false>): Promise<RemoteResponseData> => {
-    let data: RemoteResponseData;
+    let data;
     switch (credentials.provider) {
       case StorageProviderType.JSONBIN: {
         if (credentials.id) {

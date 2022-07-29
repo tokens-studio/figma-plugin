@@ -60,10 +60,16 @@ export function useGitLab() {
     return confirmResult;
   }, [confirm]);
 
-  const pushTokensToGitLab = useCallback(async (context: GitlabCredentials) => {
+  const pushTokensToGitLab = useCallback(async (context: GitlabCredentials): Promise<RemoteResponseData> => {
     const storage = await storageClientFactory(context, multiFileSync);
 
     const content = await storage.retrieve();
+    if (content?.status === 'failure') {
+      return {
+        status: 'failure',
+        errorMessage: content?.errorMessage,
+      };
+    }
 
     if (content) {
       if (
@@ -74,6 +80,7 @@ export function useGitLab() {
       ) {
         notifyToUI('Nothing to commit');
         return {
+          status: 'success',
           tokens,
           themes,
           metadata: {},
@@ -110,6 +117,7 @@ export function useGitLab() {
 
         pushDialog('success');
         return {
+          status: 'success',
           tokens,
           themes,
           metadata: {},
@@ -119,6 +127,7 @@ export function useGitLab() {
       }
     }
     return {
+      status: 'success',
       tokens,
       themes,
       metadata: {},
@@ -144,7 +153,7 @@ export function useGitLab() {
     dispatch.tokenState.setEditProhibited(!hasWriteAccess);
   }, [dispatch, storageClientFactory, multiFileSync]);
 
-  const pullTokensFromGitLab = useCallback(async (context: GitlabCredentials, receivedFeatureFlags?: LDProps['flags']) => {
+  const pullTokensFromGitLab = useCallback(async (context: GitlabCredentials, receivedFeatureFlags?: LDProps['flags']): Promise<RemoteResponseData | null>  => {
     const storage = await storageClientFactory(context, multiFileSync);
     if (receivedFeatureFlags?.multiFileSync) storage.enableMultiFile();
 
@@ -154,6 +163,12 @@ export function useGitLab() {
 
     try {
       const content = await storage.retrieve();
+      if (content?.status === 'failure') {
+        return {
+          status: 'failure',
+          errorMessage: content.errorMessage,
+        };
+      }
 
       if (content) {
         const sortedTokens = applyTokenSetOrder(content.tokens, content.metadata?.tokenSetOrder ?? []);
@@ -176,6 +191,7 @@ export function useGitLab() {
 
       if (!hasBranches || !hasBranches.length) {
         return {
+          status: 'failure',
           errorMessage: ErrorMessages.EMPTY_BRNACH_ERROR,
         };
       }
@@ -183,6 +199,12 @@ export function useGitLab() {
       await checkAndSetAccess({ context });
 
       const content = await storage.retrieve();
+      if (content?.status === 'failure') {
+        return {
+          status: 'failure',
+          errorMessage: content.errorMessage,
+        };
+      }
       if (content) {
         if (
           !isEqual(content.tokens, tokens)
@@ -205,15 +227,12 @@ export function useGitLab() {
         }
         return content;
       }
-      const pushData = await pushTokensToGitLab(context);
-      return {
-        ...pushData,
-        ...(pushData === null ? { errorMessage: ErrorMessages.GITLAB_CREDNETIAL_ERROR } : {}),
-      };
+      return await pushTokensToGitLab(context);
     } catch (err) {
       notifyToUI(ErrorMessages.GITLAB_CREDNETIAL_ERROR, { error: true });
       console.log('Error', err);
       return {
+        status: 'failure',
         errorMessage: ErrorMessages.GITLAB_CREDNETIAL_ERROR,
       };
     }
@@ -233,7 +252,7 @@ export function useGitLab() {
 
   const addNewGitLabCredentials = useCallback(async (context: GitlabFormValues): Promise<RemoteResponseData> => {
     const data = await syncTokensWithGitLab(context);
-    if (!data.errorMessage) {
+    if (data.status === 'success') {
       AsyncMessageChannel.ReactInstance.message({
         type: AsyncMessageTypes.CREDENTIALS,
         credential: context,
@@ -243,10 +262,12 @@ export function useGitLab() {
       }
     } else {
       return {
+        status: 'failure',
         errorMessage: data.errorMessage,
       };
     }
     return {
+      status: 'success',
       tokens: data.tokens ?? tokens,
       themes: data.themes ?? themes,
       metadata: {},
