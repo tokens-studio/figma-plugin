@@ -96,7 +96,7 @@ export function useJSONbin() {
   }, [dispatch, themes, tokens]);
 
   // Read tokens from JSONBin
-  const pullTokensFromJSONBin = useCallback(async (context: Extract<StorageTypeCredentials, { provider: StorageProviderType.JSONBIN }>) => {
+  const pullTokensFromJSONBin = useCallback(async (context: Extract<StorageTypeCredentials, { provider: StorageProviderType.JSONBIN }>): Promise<RemoteResponseData | null> => {
     const {
       id, secret, name, internalId,
     } = context;
@@ -116,7 +116,12 @@ export function useJSONbin() {
           provider: StorageProviderType.JSONBIN,
         },
       });
-
+      if (data?.status === 'failure') {
+        return {
+          status: 'failure',
+          errorMessage: data.errorMessage,
+        };
+      }
       if (data?.metadata && data?.tokens) {
         dispatch.tokenState.setEditProhibited(false);
 
@@ -137,7 +142,8 @@ export function useJSONbin() {
     } = context;
     if (!id || !secret) {
       return {
-        errorMessage: 'ID or Secret should be exist',
+        status: 'failure',
+        errorMessage: ErrorMessages.JSONBIN_ID_NON_EXIST_ERROR,
       };
     }
 
@@ -148,6 +154,12 @@ export function useJSONbin() {
       secret,
       internalId,
     });
+    if (content?.status === 'failure') {
+      return {
+        status: 'failure',
+        errorMessage: content.errorMessage,
+      };
+    }
     if (content) {
       dispatch.uiState.setApiData({
         provider, id, name, secret, internalId,
@@ -165,10 +177,11 @@ export function useJSONbin() {
         usedTokenSet: usedTokenSets,
         activeTheme,
       });
+      return content;
     }
     return {
-      ...content,
-      ...(content === null ? { errorMessage: ErrorMessages.JSONBIN_CREDNETIAL_ERROR } : {}),
+      status: 'failure',
+      errorMessage: ErrorMessages.JSONBIN_CREDNETIAL_ERROR,
     };
   }, [
     dispatch,
