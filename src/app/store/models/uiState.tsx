@@ -12,6 +12,7 @@ import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StorageType, StorageTypeCredentials, StorageTypeFormValues } from '@/types/StorageType';
 import { EditTokenObject } from '@/types/tokens';
 import { TokenTypes } from '@/constants/TokenTypes';
+import { EditTokenFormStatus } from '@/constants/EditTokenFormStatus';
 
 type DisplayType = 'GRID' | 'LIST';
 
@@ -109,7 +110,7 @@ export const uiState = createModel<RootModel>()({
     lastOpened: '',
     editToken: {
       type: TokenTypes.OTHER,
-      isPristine: true,
+      status: EditTokenFormStatus.CREATE,
     },
     showEditForm: false,
     tokenFilter: '',
