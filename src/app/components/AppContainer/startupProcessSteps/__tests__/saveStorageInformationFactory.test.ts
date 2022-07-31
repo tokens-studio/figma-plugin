@@ -1,7 +1,7 @@
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StartupMessage } from '@/types/AsyncMessages';
 import { createMockStore } from '../../../../../../tests/config/setupTest';
-import { saveStorageInforamationFactory } from '../saveStorageInforamationFactory';
+import { saveStorageInformationFactory } from '../saveStorageInformationFactory';
 
 describe('saveStorageInformationFactory', () => {
   it('should work', async () => {
@@ -16,7 +16,7 @@ describe('saveStorageInformationFactory', () => {
     } as unknown as StartupMessage;
     const mockSetStorageFn = jest.fn();
 
-    const fn = saveStorageInforamationFactory(mockStore.dispatch, mockParams, {
+    const fn = saveStorageInformationFactory(mockStore.dispatch, mockParams, {
       setStorageType: mockSetStorageFn,
     });
     await fn();

@@ -8,7 +8,7 @@ import { useProcess } from '@/hooks';
 import { ApplicationInitSteps } from './ApplicationInitSteps';
 import { Dispatch, RootState } from '@/app/store';
 import {
-  addLicenseFactory, savePluginDataFactory, getLdFlagsFactory, saveStorageInforamationFactory, pullTokensFactory,
+  addLicenseFactory, savePluginDataFactory, getLdFlagsFactory, saveStorageInformationFactory, pullTokensFactory,
 } from './startupProcessSteps';
 import useStorage from '@/app/store/useStorage';
 import { useFlags } from '../LaunchDarkly';
@@ -39,7 +39,7 @@ export function useStartupProcess(params: StartupMessage) {
     },
     {
       key: ApplicationInitSteps.SAVE_STORAGE_INFORMATION,
-      fn: saveStorageInforamationFactory(dispatch, params, useStorageResult),
+      fn: saveStorageInformationFactory(dispatch, params, useStorageResult),
     },
     {
       key: ApplicationInitSteps.PULL_TOKENS,

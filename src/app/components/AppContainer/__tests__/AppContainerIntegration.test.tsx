@@ -190,18 +190,8 @@ jest.mock('launchdarkly-react-client-sdk', () => ({
 describe('AppContainer (integration)', () => {
   beforeEach(resetSuite);
 
-  beforeAll(() => {
-    // useLDClientSpy.mockImplementation(() => ({
-    //   // identify: () => Promise.resolve(),
-    // } as any));
-    // useFlagsSpy.mockImplementation(() => ({
-    // }));
-  });
-
   afterAll(() => {
     resetSuite();
-    // useFlagsSpy.mockReset();
-    // useLDClientSpy.mockReset();
   });
 
   it(

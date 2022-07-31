@@ -2,7 +2,7 @@ import useStorage from '@/app/store/useStorage';
 import type { Dispatch } from '@/app/store';
 import type { StartupMessage } from '@/types/AsyncMessages';
 
-export function saveStorageInforamationFactory(
+export function saveStorageInformationFactory(
   dispatch: Dispatch,
   params: StartupMessage,
   useStorageResult: ReturnType<typeof useStorage>,

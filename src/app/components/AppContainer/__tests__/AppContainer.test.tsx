@@ -6,13 +6,13 @@ import { AppContainer } from '../AppContainer';
 import * as savePluginDataFactoryModule from '../startupProcessSteps/savePluginDataFactory';
 import * as addLicenseFactoryModule from '../startupProcessSteps/addLicenseFactory';
 import * as getLdFlagsFactorySpyModule from '../startupProcessSteps/getLdFlagsFactory';
-import * as saveStorageInforamationFactoryModule from '../startupProcessSteps/saveStorageInforamationFactory';
+import * as saveStorageInformationFactoryModule from '../startupProcessSteps/saveStorageInformationFactory';
 import * as pullTokensFactoryModule from '../startupProcessSteps/pullTokensFactory';
 
 const savePluginDataFactorySpy = jest.spyOn(savePluginDataFactoryModule, 'savePluginDataFactory');
 const addLicenseFactorySpy = jest.spyOn(addLicenseFactoryModule, 'addLicenseFactory');
 const getLdFlagsFactorySpy = jest.spyOn(getLdFlagsFactorySpyModule, 'getLdFlagsFactory');
-const saveStorageInforamationFactorySpy = jest.spyOn(saveStorageInforamationFactoryModule, 'saveStorageInforamationFactory');
+const saveStorageInformationFactorySpy = jest.spyOn(saveStorageInformationFactoryModule, 'saveStorageInformationFactory');
 const pullTokensFactorySpy = jest.spyOn(pullTokensFactoryModule, 'pullTokensFactory');
 
 describe('AppContainer', () => {
@@ -26,7 +26,7 @@ describe('AppContainer', () => {
     getLdFlagsFactorySpy.mockImplementation(() => (
       () => Promise.resolve()
     ));
-    saveStorageInforamationFactorySpy.mockImplementation(() => (
+    saveStorageInformationFactorySpy.mockImplementation(() => (
       () => Promise.resolve()
     ));
     pullTokensFactorySpy.mockImplementation(() => (
@@ -38,7 +38,7 @@ describe('AppContainer', () => {
     savePluginDataFactorySpy.mockReset();
     addLicenseFactorySpy.mockReset();
     getLdFlagsFactorySpy.mockReset();
-    saveStorageInforamationFactorySpy.mockReset();
+    saveStorageInformationFactorySpy.mockReset();
     pullTokensFactorySpy.mockReset();
   });
 
@@ -56,7 +56,7 @@ describe('AppContainer', () => {
       expect(savePluginDataFactorySpy).toBeCalledTimes(1);
       expect(addLicenseFactorySpy).toBeCalledTimes(1);
       expect(getLdFlagsFactorySpy).toBeCalledTimes(1);
-      expect(saveStorageInforamationFactorySpy).toBeCalledTimes(1);
+      expect(saveStorageInformationFactorySpy).toBeCalledTimes(1);
       expect(pullTokensFactorySpy).toBeCalledTimes(1);
     });
   });
