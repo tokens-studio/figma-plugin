@@ -12,6 +12,7 @@ import { track } from '@/utils/analytics';
 import { notifyToUI } from '@/plugin/notifiers';
 import type useRemoteTokens from '@/app/store/remoteTokens';
 import { hasTokenValues } from '@/utils/hasTokenValues';
+import { BackgroundJobs } from '@/constants/BackgroundJobs';
 
 export function pullTokensFactory(
   store: Store<RootState>,
@@ -88,6 +89,7 @@ export function pullTokensFactory(
           console.error(err);
           Sentry.captureException(err);
           dispatch.uiState.setActiveTab(Tabs.START);
+          dispatch.uiState.completeJob(BackgroundJobs.UI_PULLTOKENS);
           notifyToUI('Failed to fetch tokens, check your credentials', { error: true });
         }
       } else {
