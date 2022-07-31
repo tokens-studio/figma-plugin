@@ -18,6 +18,7 @@ import { AsyncMessageTypes, StartupMessage } from '@/types/AsyncMessages';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { UpdateMode } from '@/constants/UpdateMode';
 import { TokenTypes } from '@/constants/TokenTypes';
+import ConfirmDialog from '../ConfirmDialog';
 
 const notifyUISpy = jest.spyOn(Notifiers, 'notifyToUI');
 
@@ -126,8 +127,13 @@ describe('Add license key', () => {
   });
 
   it('Shows the backend error when added license is not valid and the remove key button', async () => {
+    const mockStore = createMockStore({});
     const user = userEvent.setup();
-    render(<AddLicenseKey />);
+    render(
+      <Provider store={mockStore}>
+        <AddLicenseKey />
+      </Provider>,
+    );
 
     const input = screen.getByRole('textbox') as HTMLInputElement;
     const addLicenseKeyButton = screen.getByRole('button', { name: /add license key/i });
@@ -153,15 +159,12 @@ describe('Add license key', () => {
     await act(async () => {
       result = render(
         <Provider store={mockStore}>
-          <AppContainer {...mockStartupParams} />
+          <AddLicenseKey />
         </Provider>,
       );
     });
 
     await act(async () => {
-      const settingsTab = await result.findByTestId('navitem-settings');
-      settingsTab.click();
-
       const licenseKeyInput = await result.findByTestId('settings-license-key-input') as HTMLInputElement;
       fireEvent.change(licenseKeyInput, {
         target: { value: LICENSE_FOR_ERROR_RESPONSE },
@@ -201,15 +204,14 @@ describe('Add license key', () => {
     await act(async () => {
       result = render(
         <Provider store={mockStore}>
-          <AppContainer {...mockStartupParams} />
+          <ConfirmDialog />
+          <AddLicenseKey />
         </Provider>,
       );
     });
 
     await act(async () => {
       await mockStore.dispatch.userState.addLicenseKey({ key: LICENSE_FOR_VALID_RESPONSE, source: AddLicenseSource.UI });
-      const settingsTab = await result.findByTestId('navitem-settings');
-      settingsTab.click();
     });
 
     await act(async () => {
@@ -229,15 +231,14 @@ describe('Add license key', () => {
     await act(async () => {
       result = render(
         <Provider store={mockStore}>
-          <AppContainer {...mockStartupParams} />
+          <ConfirmDialog />
+          <AddLicenseKey />
         </Provider>,
       );
     });
 
     await act(async () => {
       await mockStore.dispatch.userState.addLicenseKey({ key: LICENSE_FOR_VALID_RESPONSE, source: AddLicenseSource.UI });
-      const settingsTab = await result.findByTestId('navitem-settings');
-      settingsTab.click();
     });
 
     await act(async () => {

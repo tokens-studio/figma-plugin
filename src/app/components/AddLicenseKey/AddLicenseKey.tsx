@@ -24,9 +24,9 @@ export default function AddLicenseKey() {
   const userId = useSelector(userIdSelector);
   const ldClient = useLDClient();
 
-  const addKey = useCallback(() => {
+  const addKey = useCallback(async () => {
     if (newKey) {
-      dispatch.userState.addLicenseKey({ key: newKey, source: AddLicenseSource.UI });
+      await dispatch.userState.addLicenseKey({ key: newKey, source: AddLicenseSource.UI });
     }
   }, [newKey, dispatch]);
 
