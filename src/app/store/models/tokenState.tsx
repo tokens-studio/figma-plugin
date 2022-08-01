@@ -22,6 +22,7 @@ import {
   RenameTokenGroupPayload,
   DuplicateTokenGroupPayload,
   DuplicateTokenPayload,
+  DeleteTokenGroupPayload,
 } from '@/types/payloads';
 import { updateTokenPayloadToSingleToken } from '@/utils/updateTokenPayloadToSingleToken';
 import { RootModel } from '@/types/RootModel';
@@ -187,13 +188,12 @@ export const tokenState = createModel<RootModel>()({
     },
     duplicateToken: (state, data: DuplicateTokenPayload) => {
       let newTokens: TokenStore['values'] = {};
-      const existingTokenIndex = state.tokens[data.parent].findIndex((n) => n.name === data.name);
+      const existingTokenIndex = state.tokens[data.parent].findIndex((n) => n.name === data?.oldName);
       if (existingTokenIndex > -1) {
-        const newName = `${data.name}-copy`;
         const existingTokens = [...state.tokens[data.parent]];
         existingTokens.splice(existingTokenIndex + 1, 0, {
           ...state.tokens[data.parent][existingTokenIndex],
-          name: newName,
+          name: data.newName,
         });
 
         newTokens = {
@@ -277,12 +277,12 @@ export const tokenState = createModel<RootModel>()({
 
       return newState;
     },
-    deleteTokenGroup: (state, data: DeleteTokenPayload) => {
+    deleteTokenGroup: (state, data: DeleteTokenGroupPayload) => {
       const newState = {
         ...state,
         tokens: {
           ...state.tokens,
-          [data.parent]: state.tokens[data.parent].filter((token) => !token.name.startsWith(data.path)),
+          [data.parent]: state.tokens[data.parent].filter((token) => !(token.name.startsWith(`${data.path}.`) && token.type === data.type)),
         },
       };
 

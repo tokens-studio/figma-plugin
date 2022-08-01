@@ -89,7 +89,7 @@ const SyncSettings = () => {
             , copy the Secret Key into the field, and click on save. If you or your team already have a version stored,
             add the secret and the corresponding ID.
             {' '}
-            <a href="https://docs.tokens.studio/sync" target="_blank" rel="noreferrer" className="underline">
+            <a href="https://docs.tokens.studio/sync/jsonbin" target="_blank" rel="noreferrer" className="underline">
               Read more on docs.tokens.studio
             </a>
           </div>

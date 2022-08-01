@@ -21,6 +21,9 @@ import { notifyToUI } from '@/plugin/notifiers';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import useConfirm from '../hooks/useConfirm';
 import { StorageTypeCredentials } from '@/types/StorageType';
+import { sortSelectionValueByProperties } from '@/utils/sortSelectionValueByProperties';
+import { Properties } from '@/constants/Properties';
+import { convertToOrderObj } from '@/utils/convertToOrderObj';
 
 export function Initiator() {
   const dispatch = useDispatch<Dispatch>();
@@ -66,13 +69,15 @@ export function Initiator() {
             dispatch.uiState.setSelectedLayers(selectedNodes);
             dispatch.uiState.setDisabled(false);
             if (mainNodeSelectionValues.length > 1) {
-              const selectionValues = mainNodeSelectionValues.reduce((acc, crr) => (
+              const allMainNodeSelectionValues = mainNodeSelectionValues.reduce((acc, crr) => (
                 Object.assign(acc, crr)
               ), {});
-              dispatch.uiState.setMainNodeSelectionValues(selectionValues);
+              const sortedMainNodeSelectionValues = sortSelectionValueByProperties(allMainNodeSelectionValues);
+              dispatch.uiState.setMainNodeSelectionValues(sortedMainNodeSelectionValues);
             } else if (mainNodeSelectionValues.length > 0) {
               // When only one node is selected, we can set the state
-              dispatch.uiState.setMainNodeSelectionValues(mainNodeSelectionValues[0]);
+              const sortedMainNodeSelectionValues = sortSelectionValueByProperties(mainNodeSelectionValues[0]);
+              dispatch.uiState.setMainNodeSelectionValues(sortedMainNodeSelectionValues);
             } else {
               // When only one is selected and it doesn't contain any tokens, reset.
               dispatch.uiState.setMainNodeSelectionValues({});
@@ -80,7 +85,9 @@ export function Initiator() {
 
             // Selection values are all tokens across all layers, used in Multi Inspector.
             if (selectionValues) {
-              dispatch.uiState.setSelectionValues(selectionValues);
+              const orderObj = convertToOrderObj(Properties);
+              const sortedSelectionValues = selectionValues.sort((a, b) => orderObj[a.type] - orderObj[b.type]);
+              dispatch.uiState.setSelectionValues(sortedSelectionValues);
             } else {
               dispatch.uiState.resetSelectionValues();
             }
@@ -154,10 +161,10 @@ export function Initiator() {
 
                 if (credentials) {
                   if (
-                    credentials.provider === StorageProviderType.GITHUB ||
-                    credentials.provider === StorageProviderType.GITLAB ||
-                    credentials.provider === StorageProviderType.BITBUCKET ||
-                    credentials.provider === StorageProviderType.ADO
+                    credentials.provider === StorageProviderType.GITHUB
+                    || credentials.provider === StorageProviderType.GITLAB
+                    || credentials.provider === StorageProviderType.BITBUCKET
+                    || credentials.provider === StorageProviderType.ADO
                   ) {
                     const branches = await fetchBranches(credentials as StorageTypeCredentials);
                     if (branches) dispatch.branchState.setBranches(branches);

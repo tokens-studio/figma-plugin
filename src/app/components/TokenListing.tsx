@@ -17,6 +17,7 @@ import GridIcon from '@/icons/grid.svg';
 import AddIcon from '@/icons/add.svg';
 import ProBadge from './ProBadge';
 import { useFlags } from './LaunchDarkly';
+import { EditTokenFormStatus } from '@/constants/EditTokenFormStatus';
 
 type Props = {
   tokenKey: string
@@ -43,20 +44,20 @@ const TokenListing: React.FC<Props> = ({
 
   const showDisplayToggle = React.useMemo(() => schema.type === TokenTypes.COLOR, [schema.type]);
 
-  const showForm = React.useCallback(({ token, name, isPristine = false }: ShowFormOptions) => {
+  const showForm = React.useCallback(({ token, name, status }: ShowFormOptions) => {
     dispatch.uiState.setShowEditForm(true);
     dispatch.uiState.setEditToken({
       ...token,
       type: schema.type,
       schema,
-      isPristine,
+      status,
       initialName: name,
       name,
     } as EditTokenObject);
   }, [schema, dispatch]);
 
   const showNewForm = React.useCallback(({ name = '' }: ShowNewFormOptions) => {
-    showForm({ token: null, name, isPristine: true });
+    showForm({ token: null, name, status: EditTokenFormStatus.CREATE });
   }, [showForm]);
 
   const handleShowNewForm = React.useCallback(() => showNewForm({ }), [showNewForm]);
@@ -69,10 +70,15 @@ const TokenListing: React.FC<Props> = ({
     e.stopPropagation();
     if (e.altKey) {
       dispatch.uiState.toggleCollapsed();
+      const newCollapsedObj = Object.keys(collapsedTokenTypeObj).reduce<Record<string, boolean>>((acc, key) => {
+        acc[key] = !collapsed;
+        return acc;
+      }, {});
+      dispatch.tokenState.setCollapsedTokenTypeObj(newCollapsedObj);
     } else {
       dispatch.tokenState.setCollapsedTokenTypeObj({ ...collapsedTokenTypeObj, [tokenKey]: !collapsedTokenTypeObj[tokenKey as TokenTypes] });
     }
-  }, [dispatch, collapsedTokenTypeObj, tokenKey]);
+  }, [dispatch, collapsedTokenTypeObj, tokenKey, collapsed]);
 
   if (!values && !showEmptyGroups) return null;
 
@@ -86,6 +92,7 @@ const TokenListing: React.FC<Props> = ({
           data-cy={`tokenlisting-header-${tokenKey}`}
           type="button"
           onClick={handleSetIntCollapsed}
+          data-testid={`tokenlisting-${tokenKey}-collapse-button`}
         >
           <Tooltip label={`Alt + Click to ${collapsed ? 'expand' : 'collapse'} all`}>
             <div className="p-2 -m-2">
