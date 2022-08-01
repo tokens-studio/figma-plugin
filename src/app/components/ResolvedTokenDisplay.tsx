@@ -7,7 +7,7 @@ import { ResolvedShadowValueDisplay } from './ResolvedShadowValueDisplay';
 import { ResolvedTypograhpyValueDisplay } from './ResolvedTypograhpyValueDisplay';
 import { TokenBoxshadowValue } from '@/types/values';
 
-export default function ResolvedValueBox({
+export default function ResolvedTokenDisplay({
   alias,
   selectedToken,
 }: {

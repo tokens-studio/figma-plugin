@@ -17,6 +17,7 @@ import { DocumentationProperties } from '@/constants/DocumentationProperties';
 import { useGetActiveState } from '@/hooks';
 import { usePropertiesForTokenType } from '../../hooks/usePropertiesForType';
 import { TokenTypes } from '@/constants/TokenTypes';
+import { EditTokenFormStatus } from '@/constants/EditTokenFormStatus';
 import { PropertyObject } from '@/types/properties';
 import {
   activeTokenSetSelector,
@@ -54,7 +55,7 @@ export const TokenButton: React.FC<Props> = ({
   const tokensContext = React.useContext(TokensContext);
   const activeTokenSet = useSelector(activeTokenSetSelector);
   const setNodeData = useSetNodeData();
-  const { deleteSingleToken, duplicateSingleToken } = useManageTokens();
+  const { deleteSingleToken } = useManageTokens();
   const dispatch = useDispatch<Dispatch>();
 
   const { name } = token;
@@ -82,7 +83,7 @@ export const TokenButton: React.FC<Props> = ({
   }, [type, displayType]);
 
   const handleEditClick = React.useCallback(() => {
-    showForm({ name, token });
+    showForm({ name, token, status: EditTokenFormStatus.EDIT });
   }, [name, token, showForm]);
 
   const handleDeleteClick = React.useCallback(() => {
@@ -90,8 +91,8 @@ export const TokenButton: React.FC<Props> = ({
   }, [activeTokenSet, name, deleteSingleToken]);
 
   const handleDuplicateClick = React.useCallback(() => {
-    duplicateSingleToken({ parent: activeTokenSet, name });
-  }, [activeTokenSet, name, duplicateSingleToken]);
+    showForm({ name: `${name}-copy`, token, status: EditTokenFormStatus.DUPLICATE });
+  }, [showForm, name, token]);
 
   const setPluginValue = React.useCallback((value: SelectionValue) => {
     dispatch.uiState.startJob({ name: BackgroundJobs.UI_APPLYNODEVALUE });

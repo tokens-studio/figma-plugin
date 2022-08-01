@@ -1,0 +1,19 @@
+import { Meta, Story, ArgsTable, Canvas, Preview } from '@storybook/addon-docs';
+import ResolvingLoader from '@/app/components/ResolvingLoader';
+
+<Meta title='ResolvingLoader' component={ResolvingLoader}/>
+
+<ArgsTable of={ResolvingLoader} />
+
+export const ResolvingLoaderDefaultStory = (args) => {
+  return (
+    <ResolvingLoader {...args} />
+  )
+}
+
+<Canvas>
+  <Story name='Primary' args={{
+  }}>
+    {ResolvingLoaderDefaultStory.bind({})}
+  </Story>
+</Canvas>

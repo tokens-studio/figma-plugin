@@ -21,6 +21,9 @@ import { notifyToUI } from '@/plugin/notifiers';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import useConfirm from '../hooks/useConfirm';
 import { StorageTypeCredentials } from '@/types/StorageType';
+import { sortSelectionValueByProperties } from '@/utils/sortSelectionValueByProperties';
+import { Properties } from '@/constants/Properties';
+import { convertToOrderObj } from '@/utils/convertToOrderObj';
 
 export function Initiator() {
   const dispatch = useDispatch<Dispatch>();
@@ -31,12 +34,12 @@ export function Initiator() {
   const checkedLocalStorage = useSelector(checkedLocalStorageForKeySelector);
   const userId = useSelector(userIdSelector);
 
-  const askUserIfPull: ((storageType: StorageProviderType | undefined) => Promise<any>) = useCallback(async (storageType) => {
-    const shouldPull = await confirm({
-      text: `Pull from ${storageType}?`,
-      description: 'You have unsaved changes that will be lost. Do you want to pull from your repo?',
+  const askUserIfRecoverLocalChanges: (() => Promise<any>) = useCallback(async () => {
+    const shouldRecoverLocalChanges = await confirm({
+      text: 'Recover local changes?',
+      description: 'You have local changes unsaved to the remote storage.',
     });
-    return shouldPull;
+    return shouldRecoverLocalChanges;
   }, [confirm]);
 
   const onInitiate = useCallback(() => {
@@ -66,13 +69,15 @@ export function Initiator() {
             dispatch.uiState.setSelectedLayers(selectedNodes);
             dispatch.uiState.setDisabled(false);
             if (mainNodeSelectionValues.length > 1) {
-              const selectionValues = mainNodeSelectionValues.reduce((acc, crr) => (
+              const allMainNodeSelectionValues = mainNodeSelectionValues.reduce((acc, crr) => (
                 Object.assign(acc, crr)
               ), {});
-              dispatch.uiState.setMainNodeSelectionValues(selectionValues);
+              const sortedMainNodeSelectionValues = sortSelectionValueByProperties(allMainNodeSelectionValues);
+              dispatch.uiState.setMainNodeSelectionValues(sortedMainNodeSelectionValues);
             } else if (mainNodeSelectionValues.length > 0) {
               // When only one node is selected, we can set the state
-              dispatch.uiState.setMainNodeSelectionValues(mainNodeSelectionValues[0]);
+              const sortedMainNodeSelectionValues = sortSelectionValueByProperties(mainNodeSelectionValues[0]);
+              dispatch.uiState.setMainNodeSelectionValues(sortedMainNodeSelectionValues);
             } else {
               // When only one is selected and it doesn't contain any tokens, reset.
               dispatch.uiState.setMainNodeSelectionValues({});
@@ -80,7 +85,9 @@ export function Initiator() {
 
             // Selection values are all tokens across all layers, used in Multi Inspector.
             if (selectionValues) {
-              dispatch.uiState.setSelectionValues(selectionValues);
+              const orderObj = convertToOrderObj(Properties);
+              const sortedSelectionValues = selectionValues.sort((a, b) => orderObj[a.type] - orderObj[b.type]);
+              dispatch.uiState.setSelectionValues(sortedSelectionValues);
             } else {
               dispatch.uiState.resetSelectionValues();
             }
@@ -100,9 +107,13 @@ export function Initiator() {
             let featureFlags: LDProps['flags'] | null;
             const existChanges = values.checkForChanges;
             const storageType = values.storageType?.provider;
-            if (!existChanges
-              || ((storageType && storageType !== StorageProviderType.LOCAL)
-              && existChanges && await askUserIfPull(storageType))) {
+            if (
+              !existChanges
+              || (storageType
+                && storageType !== StorageProviderType.LOCAL
+                && existChanges
+                && (!await askUserIfRecoverLocalChanges()))
+            ) {
               featureFlags = await fetchFeatureFlags(userData);
               getApiCredentials(true, featureFlags);
             } else {
@@ -156,6 +167,7 @@ export function Initiator() {
                   if (
                     credentials.provider === StorageProviderType.GITHUB
                     || credentials.provider === StorageProviderType.GITLAB
+                    || credentials.provider === StorageProviderType.BITBUCKET
                     || credentials.provider === StorageProviderType.ADO
                   ) {
                     const branches = await fetchBranches(credentials as StorageTypeCredentials);
@@ -164,13 +176,18 @@ export function Initiator() {
 
                   dispatch.uiState.setApiData(credentials);
                   dispatch.uiState.setLocalApiState(credentials);
+                  dispatch.tokenState.setActiveTheme(activeTheme || null); // @TODO look into this
 
                   if (shouldPull) {
                     const remoteData = await pullTokens({
                       context: credentials, featureFlags: receivedFlags, usedTokenSet, activeTheme,
                     });
                     const existTokens = Object.values(remoteData?.tokens ?? {}).some((value) => value.length > 0);
-                    if (existTokens) { dispatch.uiState.setActiveTab(Tabs.TOKENS); } else { dispatch.uiState.setActiveTab(Tabs.START); }
+                    if (existTokens) {
+                      dispatch.uiState.setActiveTab(Tabs.TOKENS);
+                    } else {
+                      dispatch.uiState.setActiveTab(Tabs.START);
+                    }
                   } else {
                     dispatch.uiState.setActiveTab(Tabs.TOKENS);
                   }

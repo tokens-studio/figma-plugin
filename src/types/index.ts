@@ -9,3 +9,4 @@ export * from './StitchesCSS';
 export * from './UpdateRemoteFunction';
 export * from './ThemeObjectsList';
 export * from './DeepTokensMap';
+export * from './MapValuesToTokensResult';

@@ -4,7 +4,7 @@ import { TokensIcon, LinkBreak2Icon } from '@radix-ui/react-icons';
 import { useUIDSeed } from 'react-uid';
 import { checkIfContainsAlias } from '@/utils/alias';
 import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
-import ResolvedValueBox from './ResolvedValueBox';
+import ResolvedTokenDisplay from './ResolvedTokenDisplay';
 import { findReferences } from '@/utils/findReferences';
 import IconButton from './IconButton';
 import Heading from './Heading';
@@ -27,17 +27,17 @@ const properties = {
 
 export default function TypographyInput({
   internalEditToken,
-  handleTypographyChange,
-  handleTypographyChangeByAlias,
+  handleTypographyValueChange,
+  handleTypographyAliasValueChange,
   resolvedTokens,
-  handleTypographyDownShiftInputChange,
+  handleTypographyValueDownShiftInputChange,
   handleDownShiftInputChange,
 }: {
   internalEditToken: Extract<EditTokenObject, { type: TokenTypes.TYPOGRAPHY }>;
-  handleTypographyChange: React.ChangeEventHandler;
-  handleTypographyChangeByAlias: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleTypographyValueChange: React.ChangeEventHandler;
+  handleTypographyAliasValueChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   resolvedTokens: ResolveTokenValuesResult[];
-  handleTypographyDownShiftInputChange: (newInputValue: string, property: string) => void;
+  handleTypographyValueDownShiftInputChange: (newInputValue: string, property: string) => void;
   handleDownShiftInputChange: (newInputValue: string) => void;
 }) {
   const seed = useUIDSeed();
@@ -92,8 +92,8 @@ export default function TypographyInput({
               value={typeof internalEditToken.value === 'object' ? get(internalEditToken.value, key, '') : ''}
               type={properties[key as keyof typeof properties]}
               resolvedTokens={resolvedTokens}
-              handleChange={handleTypographyChange}
-              setInputValue={handleTypographyDownShiftInputChange}
+              handleChange={handleTypographyValueChange}
+              setInputValue={handleTypographyValueDownShiftInputChange}
             />
           ))}
         </Stack>
@@ -105,14 +105,15 @@ export default function TypographyInput({
             label={internalEditToken.schema.property}
             inlineLabel
             resolvedTokens={resolvedTokens}
-            handleChange={handleTypographyChangeByAlias}
+            initialName={internalEditToken.initialName}
+            handleChange={handleTypographyAliasValueChange}
             setInputValue={handleDownShiftInputChange}
             placeholder="Value or {alias}"
             suffix
           />
 
           {isAliasMode && typeof internalEditToken.value === 'string' && checkIfContainsAlias(internalEditToken.value) && (
-          <ResolvedValueBox
+          <ResolvedTokenDisplay
             alias={alias}
             selectedToken={selectedToken}
           />

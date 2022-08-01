@@ -145,7 +145,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
 
   const memoizedTokens = React.useMemo(() => {
     if (tokens[activeTokenSet]) {
-      return mappedTokens(tokens[activeTokenSet], tokenFilter).sort((a, b) => {
+      const mapped = mappedTokens(tokens[activeTokenSet], tokenFilter).sort((a, b) => {
         if (b[1].values) {
           return 1;
         }
@@ -154,6 +154,12 @@ function Tokens({ isActive }: { isActive: boolean }) {
         }
         return 0;
       });
+      return mapped.map(([key, { values, isPro, ...schema }]) => ({
+        key,
+        values,
+        schema,
+        isPro,
+      }));
     }
     return [];
   }, [tokens, activeTokenSet, tokenFilter]);
@@ -161,7 +167,6 @@ function Tokens({ isActive }: { isActive: boolean }) {
   const handleSaveJSON = React.useCallback(() => {
     dispatch.tokenState.setJSONData(stringTokens);
   }, [dispatch.tokenState, stringTokens]);
-
   const handleToggleTokenSetsVisibility = React.useCallback(() => {
     setTokenSetsVisible(!tokenSetsVisible);
   }, [tokenSetsVisible]);
@@ -328,7 +333,9 @@ function Tokens({ isActive }: { isActive: boolean }) {
               </Box>
             ) : (
               <Box ref={tokenDiv} css={{ width: '100%', paddingBottom: '$6' }} className="content scroll-container">
-                {memoizedTokens.map(([key, { values, isPro, ...schema }]) => (
+                {memoizedTokens.map(({
+                  key, values, isPro, schema,
+                }) => (
                   <div key={key}>
                     <TokenListing
                       tokenKey={key}

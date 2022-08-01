@@ -1,4 +1,5 @@
 import { SingleToken } from '@/types/tokens';
+import { convertToDefaultProperty } from './convertToDefaultProperty';
 
 interface Result {
   [K: string]: {
@@ -12,7 +13,7 @@ export function expand(token: SingleToken['value']) {
     if (typeof val === 'string' || typeof val === 'number') {
       acc[key] = {
         value: val,
-        type: key,
+        type: convertToDefaultProperty(key),
       };
     } else {
       acc[key] = expand(val);

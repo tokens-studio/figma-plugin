@@ -8,6 +8,7 @@ import { ThemeObjectsList } from '@/types';
 import {
   GitMultiFileObject, GitSingleFileObject, GitStorageMetadata, GitTokenStorage,
 } from './GitTokenStorage';
+import { SystemFilenames } from './SystemFilenames';
 
 type ExtendedOctokitClient = Omit<Octokit, 'repos'> & {
   repos: Octokit['repos'] & {
@@ -117,7 +118,6 @@ export class GithubTokenStorage extends GitTokenStorage {
         ref: this.branch,
         headers: octokitClientDefaultHeaders,
       });
-
       // read entire directory
       if (Array.isArray(response.data)) {
         const directoryTreeResponse = await this.octokitClient.rest.git.createTree({
@@ -170,11 +170,20 @@ export class GithubTokenStorage extends GitTokenStorage {
                 name = name.replace('.json', '');
                 const parsed = JSON.parse(decodeBase64(fileContent.data.content)) as GitMultiFileObject;
                 // @REAMDE we will need to ensure these reserved names
-                if (name === '$themes') {
+
+                if (name === SystemFilenames.THEMES) {
                   return {
                     path,
                     type: 'themes',
                     data: parsed as ThemeObjectsList,
+                  };
+                }
+
+                if (name === SystemFilenames.METADATA) {
+                  return {
+                    path,
+                    type: 'metadata',
+                    data: parsed as GitStorageMetadata,
                   };
                 }
 
@@ -197,10 +206,12 @@ export class GithubTokenStorage extends GitTokenStorage {
           return [
             {
               type: 'themes',
-              path: `${this.path}/$themes.json`,
+              path: `${this.path}/${SystemFilenames.THEMES}.json`,
               data: parsed.$themes ?? [],
             },
-            ...(Object.entries(parsed).filter(([key]) => key !== '$themes') as [string, AnyTokenSet<false>][]).map<RemoteTokenStorageFile<GitStorageMetadata>>(([name, tokenSet]) => ({
+            ...(Object.entries(parsed).filter(([key]) => (
+              !Object.values<string>(SystemFilenames).includes(key)
+            )) as [string, AnyTokenSet<false>][]).map<RemoteTokenStorageFile<GitStorageMetadata>>(([name, tokenSet]) => ({
               name,
               type: 'tokenSet',
               path: `${this.path}/${name}.json`,
