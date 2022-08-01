@@ -107,9 +107,13 @@ export function Initiator() {
             let featureFlags: LDProps['flags'] | null;
             const existChanges = values.checkForChanges;
             const storageType = values.storageType?.provider;
-            if (!existChanges
-              || ((storageType && storageType !== StorageProviderType.LOCAL)
-              && existChanges && !await askUserIfRecoverLocalChanges())) {
+            if (
+              !existChanges
+              || (storageType
+                && storageType !== StorageProviderType.LOCAL
+                && existChanges
+                && (!await askUserIfRecoverLocalChanges()))
+            ) {
               featureFlags = await fetchFeatureFlags(userData);
               getApiCredentials(true, featureFlags);
             } else {
