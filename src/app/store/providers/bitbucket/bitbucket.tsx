@@ -122,7 +122,7 @@ export function useBitbucket() {
         console.log('Error pushing to Bitbucket', e);
         return {
           status: 'failure',
-          errorMessage: ErrorMessages.BITBUCKET_CREDNETIAL_ERROR,
+          errorMessage: ErrorMessages.BITBUCKET_CREDENTIAL_ERROR,
         };
       }
     }
@@ -183,7 +183,7 @@ export function useBitbucket() {
         console.log('Error', e);
         return {
           status: 'failure',
-          errorMessage: ErrorMessages.BITBUCKET_CREDNETIAL_ERROR,
+          errorMessage: ErrorMessages.BITBUCKET_CREDENTIAL_ERROR,
         };
       }
       return null;
@@ -201,7 +201,7 @@ export function useBitbucket() {
         if (!hasBranches || !hasBranches.length) {
           return {
             status: 'failure',
-            errorMessage: ErrorMessages.EMPTY_BRNACH_ERROR,
+            errorMessage: ErrorMessages.EMPTY_BRANCH_ERROR,
           };
         }
 
@@ -243,7 +243,7 @@ export function useBitbucket() {
         console.log('Error', e);
         return {
           status: 'failure',
-          errorMessage: ErrorMessages.BITBUCKET_CREDNETIAL_ERROR,
+          errorMessage: ErrorMessages.BITBUCKET_CREDENTIAL_ERROR,
         };
       }
     },

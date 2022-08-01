@@ -126,7 +126,7 @@ export function useGitLab() {
         console.log('Error pushing to GitLab', e);
         return {
           status: 'failure',
-          errorMessage: ErrorMessages.GITLAB_CREDNETIAL_ERROR,
+          errorMessage: ErrorMessages.GITLAB_CREDENTIAL_ERROR,
         };
       }
     }
@@ -157,7 +157,7 @@ export function useGitLab() {
     dispatch.tokenState.setEditProhibited(!hasWriteAccess);
   }, [dispatch, storageClientFactory, multiFileSync]);
 
-  const pullTokensFromGitLab = useCallback(async (context: GitlabCredentials, receivedFeatureFlags?: LDProps['flags']): Promise<RemoteResponseData | null>  => {
+  const pullTokensFromGitLab = useCallback(async (context: GitlabCredentials, receivedFeatureFlags?: LDProps['flags']): Promise<RemoteResponseData | null> => {
     const storage = await storageClientFactory(context, multiFileSync);
     if (receivedFeatureFlags?.multiFileSync) storage.enableMultiFile();
 
@@ -185,7 +185,7 @@ export function useGitLab() {
       console.log('Error', e);
       return {
         status: 'failure',
-        errorMessage: ErrorMessages.GITLAB_CREDNETIAL_ERROR,
+        errorMessage: ErrorMessages.GITLAB_CREDENTIAL_ERROR,
       };
     }
     return null;
@@ -200,7 +200,7 @@ export function useGitLab() {
       if (!hasBranches || !hasBranches.length) {
         return {
           status: 'failure',
-          errorMessage: ErrorMessages.EMPTY_BRNACH_ERROR,
+          errorMessage: ErrorMessages.EMPTY_BRANCH_ERROR,
         };
       }
 
@@ -237,11 +237,11 @@ export function useGitLab() {
       }
       return await pushTokensToGitLab(context);
     } catch (err) {
-      notifyToUI(ErrorMessages.GITLAB_CREDNETIAL_ERROR, { error: true });
+      notifyToUI(ErrorMessages.GITLAB_CREDENTIAL_ERROR, { error: true });
       console.log('Error', err);
       return {
         status: 'failure',
-        errorMessage: ErrorMessages.GITLAB_CREDNETIAL_ERROR,
+        errorMessage: ErrorMessages.GITLAB_CREDENTIAL_ERROR,
       };
     }
   }, [

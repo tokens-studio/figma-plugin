@@ -350,7 +350,6 @@ describe('remoteTokens', () => {
     });
   });
 
-
   contexts.forEach((context) => {
     it(`Restore storedProvider from ${context.provider}, should push tokens if there is no content`, async () => {
       mockFetchBranches.mockImplementationOnce(() => (
@@ -404,7 +403,6 @@ describe('remoteTokens', () => {
       }
     });
   });
-
 
   contexts.forEach((context) => {
     it(`push tokens to ${context.provider}, should return noting to commit if the content is same`, async () => {
@@ -517,7 +515,7 @@ describe('remoteTokens', () => {
         ));
         if (context === urlContext) {
           expect(await result.current.addNewProviderItem(context as StorageTypeCredentials)).toEqual({
-            errorMessage: ErrorMessages.URL_CREDNETIAL_ERROR,
+            errorMessage: ErrorMessages.URL_CREDENTIAL_ERROR,
             status: 'failure',
           });
         } else {

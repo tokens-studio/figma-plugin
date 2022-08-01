@@ -29,7 +29,7 @@ export default function useFile() {
       console.log('Error', e);
       return {
         status: 'failure',
-        errorMessage: ErrorMessages.FILE_CREDNETIAL_ERROR,
+        errorMessage: ErrorMessages.FILE_CREDENTIAL_ERROR,
       };
     }
     return null;

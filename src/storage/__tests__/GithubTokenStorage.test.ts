@@ -155,52 +155,52 @@ describe('GithubTokenStorage', () => {
     });
   });
 
-  // it('can read from Git in single file format', async () => {
-  //   mockGetContent.mockImplementationOnce(() => (
-  //     Promise.resolve({
-  //       data: {
-  //         content: 'ewogICJnbG9iYWwiOiB7CiAgICAicmVkIjogewogICAgICAidHlwZSI6ICJjb2xvciIsCiAgICAgICJuYW1lIjogInJlZCIsCiAgICAgICJ2YWx1ZSI6ICIjZmYwMDAwIgogICAgfSwKICAgICJibGFjayI6IHsKICAgICAgInR5cGUiOiAiY29sb3IiLAogICAgICAibmFtZSI6ICJibGFjayIsCiAgICAgICJ2YWx1ZSI6ICIjMDAwMDAwIgogICAgfQogIH0sCiAgIiR0aGVtZXMiOiBbCiAgICB7CiAgICAgICJpZCI6ICJsaWdodCIsCiAgICAgICJuYW1lIjogIkxpZ2h0IiwKICAgICAgInNlbGVjdGVkVG9rZW5TZXRzIjogewogICAgICAgICJnbG9iYWwiOiAiZW5hYmxlZCIKICAgICAgfQogICAgfQogIF0sCiAgIiRtZXRhZGF0YSI6IHt9Cn0=',
-  //       },
-  //     })
-  //   ));
+  it('can read from Git in single file format', async () => {
+    mockGetContent.mockImplementationOnce(() => (
+      Promise.resolve({
+        data: {
+          content: 'ewogICJnbG9iYWwiOiB7CiAgICAicmVkIjogewogICAgICAidHlwZSI6ICJjb2xvciIsCiAgICAgICJuYW1lIjogInJlZCIsCiAgICAgICJ2YWx1ZSI6ICIjZmYwMDAwIgogICAgfSwKICAgICJibGFjayI6IHsKICAgICAgInR5cGUiOiAiY29sb3IiLAogICAgICAibmFtZSI6ICJibGFjayIsCiAgICAgICJ2YWx1ZSI6ICIjMDAwMDAwIgogICAgfQogIH0sCiAgIiR0aGVtZXMiOiBbCiAgICB7CiAgICAgICJpZCI6ICJsaWdodCIsCiAgICAgICJuYW1lIjogIkxpZ2h0IiwKICAgICAgInNlbGVjdGVkVG9rZW5TZXRzIjogewogICAgICAgICJnbG9iYWwiOiAiZW5hYmxlZCIKICAgICAgfQogICAgfQogIF0sCiAgIiRtZXRhZGF0YSI6IHt9Cn0=',
+        },
+      })
+    ));
 
-  //   storageProvider.changePath('data/tokens.json');
-  //   expect(await storageProvider.retrieve()).toEqual({
-  //     status: 'success',
-  //     themes: [
-  //       {
-  //         id: 'light',
-  //         name: 'Light',
-  //         selectedTokenSets: {
-  //           global: 'enabled',
-  //         },
-  //       },
-  //     ],
-  //     tokens: {
-  //       global: [
-  //         {
-  //           type: 'color',
-  //           name: 'red',
-  //           value: '#ff0000',
-  //         },
-  //         {
-  //           type: 'color',
-  //           name: 'black',
-  //           value: '#000000',
-  //         },
-  //       ],
-  //     },
-  //   });
-  //   expect(mockGetContent).toBeCalledWith({
-  //     owner: 'six7',
-  //     repo: 'figma-tokens',
-  //     path: 'data/tokens.json',
-  //     ref: 'main',
-  //     headers: {
-  //       'If-None-Match': '',
-  //     },
-  //   });
-  // });
+    storageProvider.changePath('data/tokens.json');
+    expect(await storageProvider.retrieve()).toEqual({
+      status: 'success',
+      themes: [
+        {
+          id: 'light',
+          name: 'Light',
+          selectedTokenSets: {
+            global: 'enabled',
+          },
+        },
+      ],
+      tokens: {
+        global: [
+          {
+            type: 'color',
+            name: 'red',
+            value: '#ff0000',
+          },
+          {
+            type: 'color',
+            name: 'black',
+            value: '#000000',
+          },
+        ],
+      },
+    });
+    expect(mockGetContent).toBeCalledWith({
+      owner: 'six7',
+      repo: 'figma-tokens',
+      path: 'data/tokens.json',
+      ref: 'main',
+      headers: {
+        'If-None-Match': '',
+      },
+    });
+  });
 
   it('should return error message about invalid data', async () => {
     storageProvider.changePath('data/tokens.json');
@@ -243,7 +243,6 @@ describe('GithubTokenStorage', () => {
     storageProvider.changePath('data/tokens.json');
     expect(await storageProvider.read()).toEqual([]);
   });
-
 
   it('can read from Git in a multifile format', async () => {
     mockGetContent.mockImplementation((opts: { path: string }) => {

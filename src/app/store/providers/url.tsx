@@ -69,11 +69,11 @@ export default function useURL() {
         notifyToUI('No tokens stored on remote', { error: true });
       }
     } catch (err) {
-      notifyToUI(ErrorMessages.URL_CREDNETIAL_ERROR, { error: true });
+      notifyToUI(ErrorMessages.URL_CREDENTIAL_ERROR, { error: true });
       console.log('Error:', err);
       return {
         status: 'failure',
-        errorMessage: ErrorMessages.URL_CREDNETIAL_ERROR,
+        errorMessage: ErrorMessages.URL_CREDENTIAL_ERROR,
       };
     }
     return null;

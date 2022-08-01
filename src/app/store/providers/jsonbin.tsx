@@ -142,11 +142,11 @@ export function useJSONbin() {
       notifyToUI('No tokens stored on remote', { error: true });
       return null;
     } catch (e) {
-      notifyToUI(ErrorMessages.JSONBIN_CREDNETIAL_ERROR, { error: true });
+      notifyToUI(ErrorMessages.JSONBIN_CREDENTIAL_ERROR, { error: true });
       console.log('Error:', e);
       return {
         status: 'failure',
-        errorMessage: ErrorMessages.JSONBIN_CREDNETIAL_ERROR,
+        errorMessage: ErrorMessages.JSONBIN_CREDENTIAL_ERROR,
       };
     }
   }, [dispatch]);

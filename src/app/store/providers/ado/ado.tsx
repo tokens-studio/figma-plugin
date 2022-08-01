@@ -115,7 +115,7 @@ export const useADO = () => {
         console.log('Error pushing to ADO', e);
         return {
           status: 'failure',
-          errorMessage: ErrorMessages.ADO_CREDNETIAL_ERROR,
+          errorMessage: ErrorMessages.ADO_CREDENTIAL_ERROR,
         };
       }
     }
@@ -169,7 +169,7 @@ export const useADO = () => {
       console.log('Error', e);
       return {
         status: 'failure',
-        errorMessage: ErrorMessages.ADO_CREDNETIAL_ERROR,
+        errorMessage: ErrorMessages.ADO_CREDENTIAL_ERROR,
       };
     }
     return null;
@@ -186,7 +186,7 @@ export const useADO = () => {
       if (branches.length === 0) {
         return {
           status: 'failure',
-          errorMessage: ErrorMessages.EMPTY_BRNACH_ERROR,
+          errorMessage: ErrorMessages.EMPTY_BRANCH_ERROR,
         };
       }
 
@@ -223,11 +223,11 @@ export const useADO = () => {
       }
       return await pushTokensToADO(context);
     } catch (e) {
-      notifyToUI(ErrorMessages.ADO_CREDNETIAL_ERROR, { error: true });
+      notifyToUI(ErrorMessages.ADO_CREDENTIAL_ERROR, { error: true });
       console.log('Error', e);
       return {
         status: 'failure',
-        errorMessage: ErrorMessages.ADO_CREDNETIAL_ERROR,
+        errorMessage: ErrorMessages.ADO_CREDENTIAL_ERROR,
       };
     }
   }, [

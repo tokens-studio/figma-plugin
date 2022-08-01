@@ -116,7 +116,7 @@ export function useGitHub() {
         console.log('Error pushing to GitHub', e);
         return {
           status: 'failure',
-          errorMessage: ErrorMessages.GITHUB_CREDNETIAL_ERROR,
+          errorMessage: ErrorMessages.GITHUB_CREDENTIAL_ERROR,
         };
       }
     }
@@ -176,7 +176,7 @@ export function useGitHub() {
     } catch (e) {
       return {
         status: 'failure',
-        errorMessage: ErrorMessages.GITHUB_CREDNETIAL_ERROR,
+        errorMessage: ErrorMessages.GITHUB_CREDENTIAL_ERROR,
       };
     }
     return null;
@@ -194,7 +194,7 @@ export function useGitHub() {
       if (!hasBranches || !hasBranches.length) {
         return {
           status: 'failure',
-          errorMessage: ErrorMessages.EMPTY_BRNACH_ERROR,
+          errorMessage: ErrorMessages.EMPTY_BRANCH_ERROR,
         };
       }
 
@@ -232,11 +232,11 @@ export function useGitHub() {
       }
       return await pushTokensToGitHub(context);
     } catch (e) {
-      notifyToUI(ErrorMessages.GITHUB_CREDNETIAL_ERROR, { error: true });
+      notifyToUI(ErrorMessages.GITHUB_CREDENTIAL_ERROR, { error: true });
       console.log('Error', e);
       return {
         status: 'failure',
-        errorMessage: ErrorMessages.GITHUB_CREDNETIAL_ERROR,
+        errorMessage: ErrorMessages.GITHUB_CREDENTIAL_ERROR,
       };
     }
   }, [
