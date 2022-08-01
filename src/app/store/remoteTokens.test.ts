@@ -596,6 +596,21 @@ describe('remoteTokens', () => {
     });
   });
 
+  contexts.forEach((context) => {
+    it(`Add newProviderItem to ${context.provider}, should return error message when there is no branch`, async () => {
+      mockFetchBranches.mockImplementation(() => (
+        Promise.resolve([])
+      ));
+      await waitFor(() => { result.current.addNewProviderItem(context as StorageTypeCredentials); });
+      if (context === gitHubContext || context === gitLabContext || context === adoContext || context === bitbucketContext) {
+        expect(await result.current.addNewProviderItem(context as StorageTypeCredentials)).toEqual({
+          status: 'failure',
+          errorMessage: ErrorMessages.EMPTY_BRANCH_ERROR,
+        });
+      }
+    });
+  });
+
   it('Add newProviderItem to JSONbin, should return error message when ID is not defined', async () => {
     const jsonbinContextWithoutId = {
       name: 'six7',
