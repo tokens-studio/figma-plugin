@@ -34,16 +34,13 @@ export function Initiator() {
   const checkedLocalStorage = useSelector(checkedLocalStorageForKeySelector);
   const userId = useSelector(userIdSelector);
 
-  const askUserIfPull: (storageType: StorageProviderType | undefined) => Promise<any> = useCallback(
-    async (storageType) => {
-      const shouldPull = await confirm({
-        text: `Pull from ${storageType}?`,
-        description: 'You have unsaved changes that will be lost. Do you want to pull from your repo?',
-      });
-      return shouldPull;
-    },
-    [confirm],
-  );
+  const askUserIfRecoverLocalChanges: (() => Promise<any>) = useCallback(async () => {
+    const shouldRecoverLocalChanges = await confirm({
+      text: 'Recover local changes?',
+      description: 'You have local changes unsaved to the remote storage.',
+    });
+    return shouldRecoverLocalChanges;
+  }, [confirm]);
 
   const onInitiate = useCallback(() => {
     AsyncMessageChannel.ReactInstance.message({ type: AsyncMessageTypes.INITIATE });
@@ -115,7 +112,7 @@ export function Initiator() {
               || (storageType
                 && storageType !== StorageProviderType.LOCAL
                 && existChanges
-                && (await askUserIfPull(storageType)))
+                && (!await askUserIfRecoverLocalChanges()))
             ) {
               featureFlags = await fetchFeatureFlags(userData);
               getApiCredentials(true, featureFlags);

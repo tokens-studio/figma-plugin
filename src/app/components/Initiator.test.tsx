@@ -115,7 +115,7 @@ describe('Initiator', () => {
         data: {
           pluginMessage: {
             type: 'selection',
-            mainNodeSelectionValues: []
+            mainNodeSelectionValues: [],
           },
         },
       }),
