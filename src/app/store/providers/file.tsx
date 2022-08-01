@@ -19,9 +19,10 @@ export default function useFile() {
 
   const readTokensFromFileOrDirectory = useCallback(async (files: FileList): Promise<RemoteResponseData | null> => {
     const storage = storageClientFactory(files);
-
+    console.log('files', files);
     try {
       const content = await storage.retrieve();
+      console.log('content', content);
       if (content) {
         return content;
       }

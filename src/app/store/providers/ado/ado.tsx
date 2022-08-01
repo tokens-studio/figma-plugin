@@ -51,6 +51,7 @@ export const useADO = () => {
   }, [confirm]);
 
   const pushTokensToADO = React.useCallback(async (context: AdoCredentials): Promise<RemoteResponseData> => {
+    console.log('push111');
     const storage = storageClientFactory(context);
     if (context.branch) {
       storage.setSource(context.branch);
@@ -75,13 +76,16 @@ export const useADO = () => {
         themes,
       };
     }
+    console.log('push222');
 
     dispatch.uiState.setLocalApiState({ ...context });
 
     const pushSettings = await pushDialog();
     if (pushSettings) {
+      console.log('push3333');
       const { commitMessage, customBranch } = pushSettings;
       try {
+        console.log('push44444');
         if (customBranch) storage.selectBranch(customBranch);
         const metadata = {
           tokenSetOrder: Object.keys(tokens),
@@ -105,6 +109,7 @@ export const useADO = () => {
         });
 
         pushDialog('success');
+        console.log('push6666');
 
         return {
           status: 'success',
@@ -113,12 +118,14 @@ export const useADO = () => {
         };
       } catch (e) {
         console.log('Error pushing to ADO', e);
+        console.log('push7777777');
         return {
           status: 'failure',
           errorMessage: ErrorMessages.ADO_CREDENTIAL_ERROR,
         };
       }
     }
+    console.log('push88888');
 
     return {
       status: 'success',
