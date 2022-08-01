@@ -13,8 +13,9 @@ export const update: AsyncMessageChannelHandlers[AsyncMessageTypes.UPDATE] = asy
   if (msg.settings.updateStyles && msg.tokens) {
     receivedStyleIds = await updateStyles(msg.tokens, false, msg.settings);
   }
-
+  console.log("msg", msg)
   if (msg.tokenValues && msg.updatedAt) {
+    console.log("ch2222", msg.checkForChanges)
     await updateLocalTokensData({
       tokens: msg.tokenValues,
       themes: msg.themes,

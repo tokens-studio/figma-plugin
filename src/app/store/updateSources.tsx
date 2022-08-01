@@ -107,6 +107,7 @@ export default async function updateTokensOnSources({
   const mergedTokens = tokens
     ? resolveTokenValues(mergeTokenGroups(tokens, usedTokenSet))
     : null;
+    console.log("4444", checkForChanges, 'tokens', tokens)
   AsyncMessageChannel.ReactInstance.message({
     type: AsyncMessageTypes.UPDATE,
     tokenValues,
