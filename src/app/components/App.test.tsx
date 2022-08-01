@@ -192,7 +192,7 @@ describe('App', () => {
 
     const result = render(<App />);
     await waitFor(async () => (
-      expect(await screen.queryByText(/Pull from Github/i)).not.toBeNull()
+      expect(await screen.queryByText(/Recover local changes?/i)).not.toBeNull()
     ), {
       timeout: 5000,
     });

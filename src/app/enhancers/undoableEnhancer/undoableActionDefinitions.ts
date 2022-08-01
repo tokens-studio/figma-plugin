@@ -80,7 +80,7 @@ export const undoableActionDefinitions = [
     undo: (dispatch, { payload }) => {
       dispatch({
         type: 'tokenState/deleteToken',
-        payload: { parent: payload.parent, path: `${payload.name}-copy` },
+        payload: { parent: payload.parent, path: payload.newName },
         meta: { silent: true },
       });
     },
