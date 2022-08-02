@@ -65,7 +65,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
   const hasPriorTokenName = React.useMemo(
     () => resolvedTokens
       .filter((t) => t.internal__Parent === activeTokenSet)
-      .find((t) => t.type === internalEditToken.type && internalEditToken.name?.startsWith(t.name)),
+      .find((t) => t.type === internalEditToken.type && internalEditToken.name?.startsWith(`${t.name}.`)),
     [internalEditToken, resolvedTokens, activeTokenSet],
   );
 
