@@ -322,7 +322,7 @@ describe('remoteTokens', () => {
     });
   });
 
-  it('Pull tokens from JSONbin, should return error message when ID is not defined', async () => {
+  it('Pull tokens from JSONbin, should return error message when secret is not defined', async () => {
     const jsonbinContextWithoutId = {
       name: 'six7',
       id: 'six7/figma-tokens',
@@ -330,6 +330,18 @@ describe('remoteTokens', () => {
     };
     await result.current.pullTokens({ context: jsonbinContextWithoutId as StorageTypeCredentials });
     expect(await result.current.pullTokens({ context: jsonbinContextWithoutId as StorageTypeCredentials })).toEqual({
+      status: 'failure',
+      errorMessage: ErrorMessages.ID_NON_EXIST_ERROR,
+    });
+  });
+
+  it('Pull tokens from url, should return error message when ID and secret are not defined', async () => {
+    const urlContextWithoutId = {
+      name: 'six7',
+      provider: 'url',
+    };
+    await result.current.pullTokens({ context: urlContextWithoutId as StorageTypeCredentials });
+    expect(await result.current.pullTokens({ context: urlContextWithoutId as StorageTypeCredentials })).toEqual({
       status: 'failure',
       errorMessage: ErrorMessages.ID_NON_EXIST_ERROR,
     });
