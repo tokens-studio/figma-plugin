@@ -12,7 +12,7 @@ import IconButton from './IconButton';
 import { IconFolder } from '@/icons';
 import useTokens from '@/app/store/useTokens';
 import {
-  themeObjectsSelector, activeThemeSelector, themeOptionsSelector, usedTokenSetSelector,
+  themeObjectsSelector, activeThemeSelector, themeOptionsSelector, usedTokenSetSelector, tokensSelector,
 } from '@/selectors';
 
 const Navbar: React.FC = () => {
@@ -22,15 +22,9 @@ const Navbar: React.FC = () => {
   const availableThemes = useSelector(themeOptionsSelector);
   const usedTokenSet = useSelector(usedTokenSetSelector);
   const themeObjects = useSelector(themeObjectsSelector);
+  const tokens = useSelector(tokensSelector);
 
   const handleOpenTokenFlowApp = useCallback(async () => {
-    const tokens = getFormattedTokens({
-      includeAllTokens: true,
-      includeParent: false,
-      expandTypography: false,
-      expandShadow: false,
-      expandComposition: false,
-    });
     const tokenData = JSON.stringify(tokens, null, 2);
     const response = await axios({
       method: 'post',
