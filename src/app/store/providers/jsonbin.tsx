@@ -14,6 +14,8 @@ import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StorageTypeCredentials, StorageTypeFormValues } from '@/types/StorageType';
+import { RemoteResponseData } from '@/types/RemoteResponseData';
+import { ErrorMessages } from '@/constants/ErrorMessages';
 import { saveLastSyncedState } from '@/utils/saveLastSyncedState';
 
 export async function updateJSONBinTokens({
@@ -36,6 +38,13 @@ export async function updateJSONBinTokens({
 
     if (oldUpdatedAt) {
       const remoteTokens = await storage.retrieve();
+      if (remoteTokens?.status === 'failure') {
+        console.log('Error updating jsonbin', remoteTokens?.errorMessage);
+        return {
+          status: 'failure',
+          errorMessage: remoteTokens?.errorMessage,
+        };
+      }
       const comparison = await compareUpdatedAt(oldUpdatedAt, remoteTokens?.metadata?.updatedAt ?? '');
       if (comparison === 'remote_older') {
         storage.save(payload);
@@ -94,11 +103,16 @@ export function useJSONbin() {
   }, [dispatch, themes, tokens]);
 
   // Read tokens from JSONBin
-  const pullTokensFromJSONBin = useCallback(async (context: Extract<StorageTypeCredentials, { provider: StorageProviderType.JSONBIN }>) => {
+  const pullTokensFromJSONBin = useCallback(async (context: Extract<StorageTypeCredentials, { provider: StorageProviderType.JSONBIN }>): Promise<RemoteResponseData | null> => {
     const {
       id, secret, name, internalId,
     } = context;
-    if (!id || !secret) return null;
+    if (!id || !secret) {
+      return {
+        status: 'failure',
+        errorMessage: ErrorMessages.ID_NON_EXIST_ERROR,
+      };
+    }
     try {
       const storage = new JSONBinTokenStorage(id, secret);
       const data = await storage.retrieve();
@@ -114,7 +128,12 @@ export function useJSONbin() {
           provider: StorageProviderType.JSONBIN,
         },
       });
-
+      if (data?.status === 'failure') {
+        return {
+          status: 'failure',
+          errorMessage: data.errorMessage,
+        };
+      }
       if (data?.metadata && data?.tokens) {
         dispatch.tokenState.setEditProhibited(false);
 
@@ -123,17 +142,25 @@ export function useJSONbin() {
       notifyToUI('No tokens stored on remote', { error: true });
       return null;
     } catch (e) {
-      notifyToUI('Error fetching from JSONbin, check console (F12)', { error: true });
+      notifyToUI(ErrorMessages.JSONBIN_CREDENTIAL_ERROR, { error: true });
       console.log('Error:', e);
-      return null;
+      return {
+        status: 'failure',
+        errorMessage: ErrorMessages.JSONBIN_CREDENTIAL_ERROR,
+      };
     }
   }, [dispatch]);
 
-  const addJSONBinCredentials = useCallback(async (context: Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.JSONBIN }>) => {
+  const addJSONBinCredentials = useCallback(async (context: Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.JSONBIN }>): Promise<RemoteResponseData | null> => {
     const {
       provider, id, name, secret, internalId,
     } = context;
-    if (!id || !secret) return null;
+    if (!id || !secret) {
+      return {
+        status: 'failure',
+        errorMessage: ErrorMessages.ID_NON_EXIST_ERROR,
+      };
+    }
 
     const content = await pullTokensFromJSONBin({
       provider,
@@ -142,6 +169,12 @@ export function useJSONbin() {
       secret,
       internalId,
     });
+    if (content?.status === 'failure') {
+      return {
+        status: 'failure',
+        errorMessage: content.errorMessage,
+      };
+    }
     if (content) {
       dispatch.uiState.setApiData({
         provider, id, name, secret, internalId,
@@ -159,8 +192,8 @@ export function useJSONbin() {
         usedTokenSet: usedTokenSets,
         activeTheme,
       });
+      return content;
     }
-
     return content;
   }, [
     dispatch,

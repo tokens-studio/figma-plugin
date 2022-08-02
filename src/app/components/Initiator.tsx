@@ -182,11 +182,16 @@ export function Initiator() {
                     const remoteData = await pullTokens({
                       context: credentials, featureFlags: receivedFlags, usedTokenSet, activeTheme,
                     });
-                    const existTokens = Object.values(remoteData?.tokens ?? {}).some((value) => value.length > 0);
-                    if (existTokens) {
-                      dispatch.uiState.setActiveTab(Tabs.TOKENS);
-                    } else {
+                    if (remoteData?.status === 'failure') {
+                      notifyToUI(remoteData.errorMessage, { error: true });
                       dispatch.uiState.setActiveTab(Tabs.START);
+                    } else {
+                      const existTokens = Object.values(remoteData?.tokens ?? {}).some((value) => value.length > 0);
+                      if (existTokens) {
+                        dispatch.uiState.setActiveTab(Tabs.TOKENS);
+                      } else {
+                        dispatch.uiState.setActiveTab(Tabs.START);
+                      }
                     }
                   } else {
                     dispatch.uiState.setActiveTab(Tabs.TOKENS);

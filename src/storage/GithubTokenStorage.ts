@@ -1,7 +1,7 @@
 import compact from 'just-compact';
 import { Octokit } from '@octokit/rest';
 import { decodeBase64 } from '@/utils/string/ui';
-import { RemoteTokenStorageFile } from './RemoteTokenStorage';
+import { RemoteTokenstorageErrorMessage, RemoteTokenStorageFile } from './RemoteTokenStorage';
 import IsJSONString from '@/utils/isJSONString';
 import { AnyTokenSet } from '@/types/tokens';
 import { ThemeObjectsList } from '@/types';
@@ -9,6 +9,7 @@ import {
   GitMultiFileObject, GitSingleFileObject, GitStorageMetadata, GitTokenStorage,
 } from './GitTokenStorage';
 import { SystemFilenames } from './SystemFilenames';
+import { ErrorMessages } from '@/constants/ErrorMessages';
 
 type ExtendedOctokitClient = Omit<Octokit, 'repos'> & {
   repos: Octokit['repos'] & {
@@ -109,7 +110,7 @@ export class GithubTokenStorage extends GitTokenStorage {
     }
   }
 
-  public async read(): Promise<RemoteTokenStorageFile<GitStorageMetadata>[]> {
+  public async read(): Promise<RemoteTokenStorageFile<GitStorageMetadata>[] | RemoteTokenstorageErrorMessage> {
     try {
       const response = await this.octokitClient.rest.repos.getContent({
         owner: this.owner,
@@ -156,7 +157,6 @@ export class GithubTokenStorage extends GitTokenStorage {
                 headers: octokitClientDefaultHeaders,
               }) : Promise.resolve(null)
             )));
-
             return compact(jsonFileContents.map<RemoteTokenStorageFile<GitStorageMetadata> | null>((fileContent, index) => {
               const { path } = jsonFiles[index];
 
@@ -219,6 +219,9 @@ export class GithubTokenStorage extends GitTokenStorage {
             })),
           ];
         }
+        return {
+          errorMessage: ErrorMessages.VALIDATION_ERROR,
+        };
       }
 
       return [];
