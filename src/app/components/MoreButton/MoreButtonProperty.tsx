@@ -19,7 +19,8 @@ export const MoreButtonProperty: React.FC<Props> = ({ value, property, onClick }
   const isActive = React.useMemo(() => (
     mainNodeSelectionValues[property.name] === value
   ), [value, property, mainNodeSelectionValues]);
-  const handleClick = React.useCallback(() => {
+  const handleClick = React.useCallback((e) => {
+    e.preventDefault();
     onClick(property, isActive);
   }, [property, isActive, onClick]);
 
@@ -27,7 +28,7 @@ export const MoreButtonProperty: React.FC<Props> = ({ value, property, onClick }
     <ContextMenuCheckboxItem
       key={property.label}
       checked={isActive}
-      onCheckedChange={handleClick}
+      onSelect={handleClick}
     >
       <ContextMenuItemIndicator>
         <CheckIcon />

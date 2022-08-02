@@ -10,10 +10,11 @@ import AddIcon from '@/icons/add.svg';
 import { collapsedTokensSelector } from '@/selectors/collapsedTokensSelector';
 import { Dispatch } from '../store';
 import { styled } from '@/stitches.config';
+import { EditTokenFormStatus } from '@/constants/EditTokenFormStatus';
 
 export type ShowFormOptions = {
   name: string;
-  isPristine?: boolean;
+  status?: EditTokenFormStatus;
   token: SingleToken | null;
 };
 

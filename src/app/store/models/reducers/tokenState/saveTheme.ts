@@ -8,6 +8,7 @@ type Payload = Omit<ThemeObject, 'id' | '$figmaStyleReferences'> & {
 };
 
 export function saveTheme(state: TokenState, data: Payload): TokenState {
+  const isNewTheme = !data.id;
   const themeId = data.id || hash([Date.now(), data]);
   const isActiveTheme = state.activeTheme === themeId;
   const themeObject = state.themes.find((theme) => theme.id === themeId);
@@ -25,8 +26,8 @@ export function saveTheme(state: TokenState, data: Payload): TokenState {
     ],
   };
 
-  if (isActiveTheme) {
-    // @README if this theme is currently active
+  if (isActiveTheme || isNewTheme) {
+    // @README if this theme is currently active or if it's a new theme
     // we will also run the setActiveTheme reducer
     // to update the usedTokenSets
     return setActiveTheme(nextState, themeId);

@@ -1,0 +1,30 @@
+import { Meta, Story, ArgsTable, Canvas, Preview } from '@storybook/addon-docs';
+import Accordion from '@/app/components/Accordion';
+
+<Meta 
+  title='Accordion' 
+  component={Accordion}
+/>
+
+<ArgsTable of={Accordion}/>
+
+export const AccordionDefaultStory = (args) => {
+  return (
+    <Accordion {...args} />
+  )
+}
+
+<Canvas>
+  <Story name='Default' args={{
+    label: 'Accordion header',
+    isOpenByDefault: true,
+    extra: (
+      <button>Click me</button>
+    ),
+    children: (
+      <div>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.</div>
+    )
+  }}>
+    {Accordion.bind({})}
+  </Story>
+</Canvas>

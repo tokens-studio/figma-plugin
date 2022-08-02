@@ -15,4 +15,5 @@ export enum BackgroundJobs {
   UI_FETCHTOKENSFROMFILE = 'ui_fetchtokensfromfile',
   UI_UNDOING = 'ui_undoing',
   UI_REDOING = 'ui_redoing',
+  UI_ATTACHING_LOCAL_STYLES = 'ui_attaching_local_styles',
 }

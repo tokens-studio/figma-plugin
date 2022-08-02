@@ -8,8 +8,10 @@ import { updatePluginData } from '../pluginData';
 import updateStyles from '../updateStyles';
 
 export const update: AsyncMessageChannelHandlers[AsyncMessageTypes.UPDATE] = async (msg) => {
+  let receivedStyleIds: Record<string, string> = {};
+
   if (msg.settings.updateStyles && msg.tokens) {
-    updateStyles(msg.tokens, false, msg.settings);
+    receivedStyleIds = await updateStyles(msg.tokens, false, msg.settings);
   }
 
   if (msg.tokenValues && msg.updatedAt) {
@@ -30,4 +32,8 @@ export const update: AsyncMessageChannelHandlers[AsyncMessageTypes.UPDATE] = asy
     await updateNodes(allWithData, tokensMap, msg.settings);
     await updatePluginData({ entries: allWithData, values: {} });
   }
+
+  return {
+    styleIds: receivedStyleIds,
+  };
 };

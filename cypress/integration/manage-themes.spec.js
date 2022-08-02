@@ -74,7 +74,9 @@ describe('TokenListing', () => {
     createTokenSet({ name: 'token-extra' });
 
     cy.get('[data-cy="themeselector-dropdown"]').click();
-    cy.contains('My first theme').click();
+    cy.contains('My first theme').click({
+      force: true,
+    });
     cy.get('[data-state="indeterminate"]').should('have.length', 2);
     cy.get('[data-state="checked"]').should('have.length', 2);
     cy.get('[data-state="unchecked"]').should('have.length', 4);
