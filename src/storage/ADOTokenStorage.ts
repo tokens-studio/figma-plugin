@@ -10,6 +10,7 @@ import {
 import { multiFileSchema, complexSingleFileSchema } from './schemas';
 import { SystemFilenames } from './SystemFilenames';
 import { ErrorMessages } from '@/constants/ErrorMessages';
+import { AnyTokenSet } from '@/types/tokens';
 
 const apiVersion = 'api-version=6.0';
 
@@ -295,7 +296,7 @@ export class ADOTokenStorage extends GitTokenStorage {
       const singleItemValidationResult = await complexSingleFileSchema.safeParseAsync(singleItem);
 
       if (singleItemValidationResult.success) {
-        const { $themes = [], ...data } = singleItemValidationResult.data;
+        const { $themes = [], $metadata = {}, ...data } = singleItemValidationResult.data;
 
         return [
           {
@@ -303,7 +304,14 @@ export class ADOTokenStorage extends GitTokenStorage {
             path: this.path,
             data: Array.isArray($themes) ? $themes : [],
           },
-          ...Object.entries(data).map<RemoteTokenStorageFile<GitStorageMetadata>>(([name, tokenSet]) => ({
+          {
+            type: 'metadata',
+            path: this.path,
+            data: $metadata,
+          },
+          ...(Object.entries(data).filter(([key]) => (
+            !Object.values<string>(SystemFilenames).includes(key)
+          )) as [string, AnyTokenSet<false>][]).map<RemoteTokenStorageFile<GitStorageMetadata>>(([name, tokenSet]) => ({
             name,
             type: 'tokenSet',
             path: this.path,
