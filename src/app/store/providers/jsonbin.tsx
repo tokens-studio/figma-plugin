@@ -116,6 +116,7 @@ export function useJSONbin() {
       });
 
       if (data?.metadata && data?.tokens) {
+        console.log('jsondata', data)
         dispatch.tokenState.setEditProhibited(false);
 
         return data;
@@ -152,6 +153,7 @@ export function useJSONbin() {
         },
         shouldSetInDocument: true,
       });
+      console.log("content", content)
       saveLastSyncedState(dispatch, content.tokens, content.themes, content.metadata);
       dispatch.tokenState.setTokenData({
         values: content.tokens,

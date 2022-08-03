@@ -110,8 +110,9 @@ export default function useRemoteTokens() {
         default:
           throw new Error('Not implemented');
       }
-
+      console.log("remote", remoteData)
       if (remoteData) {
+        console.log("if", remoteData)
         dispatch.tokenState.setLastSyncedState(JSON.stringify([remoteData.tokens, remoteData.themes], null, 2));
         dispatch.tokenState.setTokenData({
           values: remoteData.tokens,

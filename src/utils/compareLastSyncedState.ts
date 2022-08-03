@@ -17,6 +17,7 @@ export function compareLastSyncedState<Metadata = null>(
   defaultSyncedState: LastSyncedState<Metadata>,
 ) {
   const parsedState = tryParseJson<LastSyncedState<Metadata>>(lastSyncedState);
+  console.log("parsed", parsedState)
   if (!parsedState) {
     return false;
   }
