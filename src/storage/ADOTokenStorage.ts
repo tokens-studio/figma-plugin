@@ -296,7 +296,7 @@ export class ADOTokenStorage extends GitTokenStorage {
       const singleItemValidationResult = await complexSingleFileSchema.safeParseAsync(singleItem);
 
       if (singleItemValidationResult.success) {
-        const { $themes = [], $metadata = {}, ...data } = singleItemValidationResult.data;
+        const { $themes = [], $metadata, ...data } = singleItemValidationResult.data;
 
         return [
           {
@@ -304,11 +304,13 @@ export class ADOTokenStorage extends GitTokenStorage {
             path: this.path,
             data: Array.isArray($themes) ? $themes : [],
           },
-          {
-            type: 'metadata',
-            path: this.path,
-            data: $metadata,
-          },
+          ...($metadata ? [
+            {
+              type: 'metadata' as const,
+              path: this.path,
+              data: $metadata,
+            },
+          ] : []),
           ...(Object.entries(data).filter(([key]) => (
             !Object.values<string>(SystemFilenames).includes(key)
           )) as [string, AnyTokenSet<false>][]).map<RemoteTokenStorageFile<GitStorageMetadata>>(([name, tokenSet]) => ({
