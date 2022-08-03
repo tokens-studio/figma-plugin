@@ -48,7 +48,8 @@ export interface TokenState {
   editProhibited: boolean;
   hasUnsavedChanges: boolean;
   collapsedTokenSets: string[];
-  collapsedTokenTypeObj: Record<TokenTypes, boolean>
+  collapsedTokenTypeObj: Record<TokenTypes, boolean>;
+  collapsedTokens: string[];
 }
 
 export const tokenState = createModel<RootModel>()({
@@ -74,6 +75,7 @@ export const tokenState = createModel<RootModel>()({
       acc[tokenType as TokenTypes] = false;
       return acc;
     }, {}),
+    collapsedTokens: [],
   } as unknown as TokenState,
   reducers: {
     setEditProhibited(state, payload: boolean) {
@@ -394,6 +396,10 @@ export const tokenState = createModel<RootModel>()({
     setCollapsedTokenTypeObj: (state, data: Record<TokenTypes, boolean>) => ({
       ...state,
       collapsedTokenTypeObj: data,
+    }),
+    setCollapsedTokens: (state, data: string[]) => ({
+      ...state,
+      collapsedTokens: data,
     }),
     ...tokenStateReducers,
   },
