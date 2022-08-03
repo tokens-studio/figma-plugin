@@ -11,14 +11,14 @@ import {
 } from '@/selectors';
 import { GitlabTokenStorage } from '@/storage/GitlabTokenStorage';
 import { isEqual } from '@/utils/isEqual';
-import { RemoteTokenStorageData } from '@/storage/RemoteTokenStorage';
-import { GitStorageMetadata } from '@/storage/GitTokenStorage';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { StorageTypeCredentials, StorageTypeFormValues } from '@/types/StorageType';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { useFlags } from '@/app/components/LaunchDarkly';
 import { getRepositoryInformation } from '../getRepositoryInformation';
+import { RemoteResponseData } from '@/types/RemoteResponseData';
+import { ErrorMessages } from '@/constants/ErrorMessages';
 import { applyTokenSetOrder } from '@/utils/tokenset';
 import { saveLastSyncedState } from '@/utils/saveLastSyncedState';
 
@@ -60,10 +60,16 @@ export function useGitLab() {
     return confirmResult;
   }, [confirm]);
 
-  const pushTokensToGitLab = useCallback(async (context: GitlabCredentials) => {
+  const pushTokensToGitLab = useCallback(async (context: GitlabCredentials): Promise<RemoteResponseData> => {
     const storage = await storageClientFactory(context, multiFileSync);
 
     const content = await storage.retrieve();
+    if (content?.status === 'failure') {
+      return {
+        status: 'failure',
+        errorMessage: content?.errorMessage,
+      };
+    }
 
     if (content) {
       if (
@@ -74,6 +80,7 @@ export function useGitLab() {
       ) {
         notifyToUI('Nothing to commit');
         return {
+          status: 'success',
           tokens,
           themes,
           metadata: {},
@@ -110,15 +117,21 @@ export function useGitLab() {
 
         pushDialog('success');
         return {
+          status: 'success',
           tokens,
           themes,
           metadata: {},
         };
       } catch (e) {
         console.log('Error pushing to GitLab', e);
+        return {
+          status: 'failure',
+          errorMessage: ErrorMessages.GITLAB_CREDENTIAL_ERROR,
+        };
       }
     }
     return {
+      status: 'success',
       tokens,
       themes,
       metadata: {},
@@ -144,7 +157,7 @@ export function useGitLab() {
     dispatch.tokenState.setEditProhibited(!hasWriteAccess);
   }, [dispatch, storageClientFactory, multiFileSync]);
 
-  const pullTokensFromGitLab = useCallback(async (context: GitlabCredentials, receivedFeatureFlags?: LDProps['flags']) => {
+  const pullTokensFromGitLab = useCallback(async (context: GitlabCredentials, receivedFeatureFlags?: LDProps['flags']): Promise<RemoteResponseData | null> => {
     const storage = await storageClientFactory(context, multiFileSync);
     if (receivedFeatureFlags?.multiFileSync) storage.enableMultiFile();
 
@@ -154,6 +167,12 @@ export function useGitLab() {
 
     try {
       const content = await storage.retrieve();
+      if (content?.status === 'failure') {
+        return {
+          status: 'failure',
+          errorMessage: content.errorMessage,
+        };
+      }
 
       if (content) {
         const sortedTokens = applyTokenSetOrder(content.tokens, content.metadata?.tokenSetOrder ?? []);
@@ -164,23 +183,36 @@ export function useGitLab() {
       }
     } catch (e) {
       console.log('Error', e);
+      return {
+        status: 'failure',
+        errorMessage: ErrorMessages.GITLAB_CREDENTIAL_ERROR,
+      };
     }
     return null;
   }, [storageClientFactory, checkAndSetAccess, multiFileSync]);
 
-  const syncTokensWithGitLab = useCallback(async (context: GitlabCredentials): Promise<RemoteTokenStorageData<GitStorageMetadata> | null> => {
+  const syncTokensWithGitLab = useCallback(async (context: GitlabCredentials): Promise<RemoteResponseData> => {
     try {
       const storage = await storageClientFactory(context, multiFileSync);
       const hasBranches = await storage.fetchBranches();
       dispatch.branchState.setBranches(hasBranches);
 
       if (!hasBranches || !hasBranches.length) {
-        return null;
+        return {
+          status: 'failure',
+          errorMessage: ErrorMessages.EMPTY_BRANCH_ERROR,
+        };
       }
 
       await checkAndSetAccess({ context });
 
       const content = await storage.retrieve();
+      if (content?.status === 'failure') {
+        return {
+          status: 'failure',
+          errorMessage: content.errorMessage,
+        };
+      }
       if (content) {
         if (
           !isEqual(content.tokens, tokens)
@@ -205,9 +237,12 @@ export function useGitLab() {
       }
       return await pushTokensToGitLab(context);
     } catch (err) {
-      notifyToUI('Error syncing with GitLab, check credentials', { error: true });
+      notifyToUI(ErrorMessages.GITLAB_CREDENTIAL_ERROR, { error: true });
       console.log('Error', err);
-      return null;
+      return {
+        status: 'failure',
+        errorMessage: ErrorMessages.GITLAB_CREDENTIAL_ERROR,
+      };
     }
   }, [
     storageClientFactory,
@@ -223,10 +258,9 @@ export function useGitLab() {
     multiFileSync,
   ]);
 
-  const addNewGitLabCredentials = useCallback(async (context: GitlabFormValues): Promise<RemoteTokenStorageData<GitStorageMetadata> | null> => {
+  const addNewGitLabCredentials = useCallback(async (context: GitlabFormValues): Promise<RemoteResponseData> => {
     const data = await syncTokensWithGitLab(context);
-
-    if (data) {
+    if (data.status === 'success') {
       AsyncMessageChannel.ReactInstance.message({
         type: AsyncMessageTypes.CREDENTIALS,
         credential: context,
@@ -235,10 +269,13 @@ export function useGitLab() {
         notifyToUI('No tokens stored on remote');
       }
     } else {
-      return null;
+      return {
+        status: 'failure',
+        errorMessage: data.errorMessage,
+      };
     }
-
     return {
+      status: 'success',
       tokens: data.tokens ?? tokens,
       themes: data.themes ?? themes,
       metadata: {},

@@ -107,6 +107,37 @@ const withGithubStorageProvider = (checkForChanges = true) => {
   ));
 };
 
+const withGithubStorageProviderWithInvalidTokens = (checkForChanges = true) => {
+  checkForChangesPropertyReadSpy.mockImplementation(async () => checkForChanges);
+  storageTypePropertyReadSpy.mockImplementation(async () => ({
+    provider: StorageProviderType.GITHUB,
+    id: 'github',
+    internalId: 'github',
+    name: 'Github',
+    branch: 'main',
+    filePath: 'data/tokens.json',
+  }));
+  apiProvidersPropertyReadSpy.mockImplementation(async () => ([
+    {
+      provider: StorageProviderType.GITHUB,
+      id: 'github',
+      internalId: 'github',
+      name: 'Github',
+      branch: 'main',
+      filePath: 'data/tokens.json',
+      secret: 'github-secret',
+    },
+  ]));
+
+  mockGetContent.mockImplementation(() => (
+    Promise.resolve({
+      data: {
+        content: 'RW1wdHkgZmlsZQ==',
+      },
+    })
+  ));
+};
+
 const withLicense = () => {
   licenseKeyPropertyReadSpy.mockImplementation(() => Promise.resolve('abc-def-ghi'));
   validateLicenseSpy.mockImplementation(async () => ({
@@ -161,11 +192,28 @@ describe('App', () => {
 
     const result = render(<App />);
     await waitFor(async () => (
-      expect(await screen.queryByText(/Pull from Github/i)).not.toBeNull()
+      expect(await screen.queryByText(/Recover local changes?/i)).not.toBeNull()
     ), {
       timeout: 5000,
     });
 
+    result.unmount();
+  }));
+
+  it('shows the start screen if there are invalid tokens', withOrWithoutLicense(async () => {
+    withGithubStorageProviderWithInvalidTokens(false);
+    withMockValues();
+    withMockThemes();
+
+    const waitForChangedTabsPromise = waitForChangedTabs();
+    const result = render(<App />);
+    await waitForChangedTabsPromise;
+    await waitFor(async () => (
+      expect(await result.queryByText('Loading, please wait.')).toBeNull()
+    ), {
+      timeout: 5000,
+    });
+    expect(await result.findByText('Get started')).not.toBeUndefined();
     result.unmount();
   }));
 

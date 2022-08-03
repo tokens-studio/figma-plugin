@@ -5,10 +5,11 @@ import IsJSONString from '@/utils/isJSONString';
 import {
   GitMultiFileObject, GitSingleFileObject, GitStorageMetadata, GitTokenStorage,
 } from './GitTokenStorage';
-import { RemoteTokenStorageFile } from './RemoteTokenStorage';
+import { RemoteTokenstorageErrorMessage, RemoteTokenStorageFile } from './RemoteTokenStorage';
 import { AnyTokenSet } from '@/types/tokens';
 import { ThemeObjectsList } from '@/types';
 import { SystemFilenames } from './SystemFilenames';
+import { ErrorMessages } from '@/constants/ErrorMessages';
 
 enum GitLabAccessLevel {
   NoAccess = 0,
@@ -103,7 +104,7 @@ export class GitlabTokenStorage extends GitTokenStorage {
     return false;
   }
 
-  public async read(): Promise<RemoteTokenStorageFile<GitStorageMetadata>[]> {
+  public async read(): Promise<RemoteTokenStorageFile<GitStorageMetadata>[] | RemoteTokenstorageErrorMessage> {
     if (!this.projectId) throw new Error('Missing Project ID');
 
     try {
@@ -177,12 +178,13 @@ export class GitlabTokenStorage extends GitTokenStorage {
           })),
         ];
       }
+      return {
+        errorMessage: ErrorMessages.VALIDATION_ERROR,
+      };
     } catch (err) {
       // Raise error (usually this is an auth error)
       console.error(err);
-      return [];
     }
-
     return [];
   }
 

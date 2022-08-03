@@ -15,10 +15,11 @@ type Props = {
   onSubmit: (values: ValidatedFormValues) => void;
   onCancel: () => void;
   hasErrored?: boolean;
+  errorMessage?: string;
 };
 
 export default function BitbucketForm({
-  onChange, onSubmit, onCancel, values, hasErrored,
+  onChange, onSubmit, onCancel, values, hasErrored, errorMessage,
 }: Props) {
   const inputEl = useRef<HTMLInputElement | null>(null);
 
@@ -112,7 +113,7 @@ export default function BitbucketForm({
         </Stack>
         {hasErrored && (
           <div className="bg-red-200 text-red-700 rounded p-4 text-xs font-bold" data-cy="provider-modal-error">
-            There was an error connecting. Check your credentials.
+            {errorMessage}
           </div>
         )}
       </Stack>

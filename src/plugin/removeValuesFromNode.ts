@@ -36,6 +36,26 @@ export default function removeValuesFromNode(node: BaseNode, prop: Properties) {
         node.strokeWeight = 0;
       }
       break;
+    case 'borderWidthTop':
+      if ('strokeTopWeight' in node && typeof node.strokeWeight !== 'undefined') {
+        node.strokeWeight = 0;
+      }
+      break;
+    case 'borderWidthRight':
+      if ('strokeRightWeight' in node && typeof node.strokeWeight !== 'undefined') {
+        node.strokeWeight = 0;
+      }
+      break;
+    case 'borderWidthBottom':
+      if ('strokeBottomWeight' in node && typeof node.strokeWeight !== 'undefined') {
+        node.strokeWeight = 0;
+      }
+      break;
+    case 'borderWidthLeft':
+      if ('strokeLeftWeight' in node && typeof node.strokeWeight !== 'undefined') {
+        node.strokeWeight = 0;
+      }
+      break;
     case 'boxShadow':
       if ('effects' in node && typeof node.effects !== 'undefined') {
         node.effects = node.effects.filter((effect) => effect.type !== 'DROP_SHADOW');
