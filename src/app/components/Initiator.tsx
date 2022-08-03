@@ -7,6 +7,8 @@ import useStorage from '../store/useStorage';
 import { sortSelectionValueByProperties } from '@/utils/sortSelectionValueByProperties';
 import { convertToOrderObj } from '@/utils/convertToOrderObj';
 import { Properties } from '@/constants/Properties';
+import { Tabs } from '@/constants/Tabs';
+import { hasTokenValues } from '@/utils/hasTokenValues';
 
 // @README this component is not the "Initiator" anymore - as it is named
 // but solely acts as the interface between the plugin and the UI
@@ -59,6 +61,17 @@ export function Initiator() {
             dispatch.uiState.setSelectedLayers(0);
             dispatch.uiState.resetSelectionValues();
             dispatch.uiState.setMainNodeSelectionValues({});
+            break;
+          }
+          case MessageFromPluginTypes.SET_TOKENS: {
+            const { values } = pluginMessage;
+            if (values) {
+              dispatch.tokenState.setTokenData(values);
+              const existTokens = hasTokenValues(values?.values ?? {});
+
+              if (existTokens) dispatch.uiState.setActiveTab(Tabs.TOKENS);
+              else dispatch.uiState.setActiveTab(Tabs.START);
+            }
             break;
           }
           case MessageFromPluginTypes.API_PROVIDERS: {
