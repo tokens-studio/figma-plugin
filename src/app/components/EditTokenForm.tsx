@@ -65,7 +65,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
   const hasPriorTokenName = React.useMemo(
     () => resolvedTokens
       .filter((t) => t.internal__Parent === activeTokenSet)
-      .find((t) => t.type === internalEditToken.type && internalEditToken.name?.startsWith(t.name)),
+      .find((t) => t.type === internalEditToken.type && internalEditToken.name?.startsWith(`${t.name}.`)),
     [internalEditToken, resolvedTokens, activeTokenSet],
   );
 
@@ -410,8 +410,12 @@ function EditTokenForm({ resolvedTokens }: Props) {
             Cancel
           </Button>
           <Button disabled={!isValid} variant="primary" type="submit">
-            {internalEditToken?.status === EditTokenFormStatus.CREATE ? 'Create'
-              : internalEditToken?.status === EditTokenFormStatus.EDIT ? 'Update' : 'Duplicate'}
+            {internalEditToken?.status === EditTokenFormStatus.CREATE && 'Create'}
+            {internalEditToken?.status === EditTokenFormStatus.EDIT && 'Update'}
+            {(
+              internalEditToken?.status !== EditTokenFormStatus.CREATE
+              && internalEditToken?.status !== EditTokenFormStatus.EDIT
+            ) && 'Duplicate'}
           </Button>
         </Stack>
       </Stack>

@@ -260,7 +260,7 @@ describe('AppContainer (integration)', () => {
       );
 
       await waitFor(async () => {
-        expect(screen.queryByText(/Pull from Github/i)).not.toBeNull();
+        expect(screen.queryByText(/Recover local changes\?/i)).not.toBeNull();
       }, {
         timeout: 5000,
       });

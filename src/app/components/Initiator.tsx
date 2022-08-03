@@ -1,11 +1,9 @@
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { track } from '@/utils/analytics';
 import { MessageFromPluginTypes, PostToUIMessage } from '@/types/messages';
 import useRemoteTokens from '../store/remoteTokens';
 import { Dispatch } from '../store';
 import useStorage from '../store/useStorage';
-import { Tabs } from '@/constants/Tabs';
 import { sortSelectionValueByProperties } from '@/utils/sortSelectionValueByProperties';
 import { convertToOrderObj } from '@/utils/convertToOrderObj';
 import { Properties } from '@/constants/Properties';
@@ -61,26 +59,6 @@ export function Initiator() {
             dispatch.uiState.setSelectedLayers(0);
             dispatch.uiState.resetSelectionValues();
             dispatch.uiState.setMainNodeSelectionValues({});
-            break;
-          }
-          case MessageFromPluginTypes.SET_TOKENS: {
-            const { values } = pluginMessage;
-            if (values) {
-              dispatch.tokenState.setTokenData(values);
-              const existTokens = Object.values(values?.values ?? {}).some((value) => value.length > 0);
-
-              if (existTokens) dispatch.uiState.setActiveTab(Tabs.TOKENS);
-              else dispatch.uiState.setActiveTab(Tabs.START);
-            }
-            break;
-          }
-          case MessageFromPluginTypes.STYLES: {
-            const { values } = pluginMessage;
-            if (values) {
-              track('Import styles');
-              dispatch.tokenState.setTokensFromStyles(values);
-              dispatch.uiState.setActiveTab(Tabs.TOKENS);
-            }
             break;
           }
           case MessageFromPluginTypes.API_PROVIDERS: {

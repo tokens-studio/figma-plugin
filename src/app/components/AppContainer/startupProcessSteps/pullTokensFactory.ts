@@ -22,10 +22,10 @@ export function pullTokensFactory(
   useConfirmResult: ReturnType<typeof useConfirm>,
   useRemoteTokensResult: ReturnType<typeof useRemoteTokens>,
 ) {
-  const askUserIfPull = async (storageType: StorageProviderType) => {
+  const askUserIfPull = async () => {
     await useConfirmResult.confirm({
-      text: `Pull from ${storageType}?`,
-      description: 'You have unsaved changes that will be lost. Do you want to pull from your repo?',
+      text: 'Recover local changes?',
+      description: 'You have local changes unsaved to the remote storage.',
     });
   };
 
@@ -75,12 +75,16 @@ export function pullTokensFactory(
               activeTheme: params.activeTheme,
               usedTokenSet: params.localTokenData?.usedTokenSet,
             });
-
-            const existTokens = hasTokenValues(remoteData?.tokens ?? {});
-            if (existTokens) {
-              dispatch.uiState.setActiveTab(Tabs.TOKENS);
-            } else {
+            if (remoteData?.status === 'failure') {
+              notifyToUI(remoteData.errorMessage, { error: true });
               dispatch.uiState.setActiveTab(Tabs.START);
+            } else {
+              const existTokens = hasTokenValues(remoteData?.tokens ?? {});
+              if (existTokens) {
+                dispatch.uiState.setActiveTab(Tabs.TOKENS);
+              } else {
+                dispatch.uiState.setActiveTab(Tabs.START);
+              }
             }
           } else {
             dispatch.uiState.setActiveTab(Tabs.TOKENS);
@@ -115,7 +119,7 @@ export function pullTokensFactory(
         !checkForChanges
         || (
           (storageType && storageType.provider !== StorageProviderType.LOCAL)
-          && checkForChanges && await askUserIfPull(storageType.provider)
+          && checkForChanges && await askUserIfPull()
         )
       ) {
         // get API credentials

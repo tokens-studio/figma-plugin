@@ -2,6 +2,7 @@ import { ADOTokenStorage } from '../ADOTokenStorage';
 import { mockFetch } from '../../../tests/__mocks__/fetchMock';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
+import { ErrorMessages } from '@/constants/ErrorMessages';
 
 describe('ADOTokenStorage', () => {
   const baseUrl = 'https://brandcode.azure.com';
@@ -177,6 +178,19 @@ describe('ADOTokenStorage', () => {
           },
         },
       },
+    });
+  });
+
+  it('should return validation error when the content(s) are invalid', async () => {
+    mockFetch.mockImplementationOnce(() => Promise.resolve({
+      ok: true,
+      json: () => Promise.resolve(''),
+    }));
+
+    storageProvider.changePath('data/tokens.json');
+    const result = await storageProvider.read();
+    expect(result).toEqual({
+      errorMessage: ErrorMessages.VALIDATION_ERROR,
     });
   });
 
