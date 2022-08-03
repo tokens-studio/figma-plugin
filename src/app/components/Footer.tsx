@@ -46,7 +46,6 @@ export default function Footer() {
   const checkForChanges = React.useCallback(() => {
     const tokenSetOrder = Object.keys(tokens);
     const defaultMetadata = isGitProvider(storageType) ? { tokenSetOrder } : {};
-    console.log("footer", tokens, themes, lastSyncedState)
     const hasChanged = !compareLastSyncedState(
       tokens,
       themes,
@@ -54,7 +53,6 @@ export default function Footer() {
       lastSyncedState,
       [{}, [], defaultMetadata],
     );
-    console.log("haschange", hasChanged)
     dispatch.tokenState.updateCheckForChanges(hasChanged);
     return hasChanged;
   }, [lastSyncedState, storageType, tokens, themes, dispatch.tokenState]);

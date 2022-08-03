@@ -9,7 +9,6 @@ import updateStyles from '../updateStyles';
 
 export const update: AsyncMessageChannelHandlers[AsyncMessageTypes.UPDATE] = async (msg) => {
   let receivedStyleIds: Record<string, string> = {};
-  console.log("msg", msg.checkForChanges, msg.tokens)
   if (msg.tokenValues && msg.updatedAt) {
     await updateLocalTokensData({
       tokens: msg.tokenValues,
