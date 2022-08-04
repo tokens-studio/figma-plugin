@@ -37,9 +37,9 @@ function checkForTokens({
     value: Record<string, SingleToken['value']>;
     description?: string;
   } | undefined;
-  const shouldExpandTypography = (expandTypography && 'value' in token) ? isSingleTypographyToken(token.value) : false;
-  const shouldExpandShadow = (expandShadow && 'value' in token) ? isSingleBoxShadowToken(token.value) : false;
-  const shouldExpandComposition = (expandComposition && 'value' in token) ? isSingleCompositionToken(token.value) : false;
+  const shouldExpandTypography = (expandTypography && typeof token === 'object' && 'value' in token) ? isSingleTypographyToken(token.value) : false;
+  const shouldExpandShadow = (expandShadow && typeof token === 'object' && 'value' in token) ? isSingleBoxShadowToken(token.value) : false;
+  const shouldExpandComposition = (expandComposition && typeof token === 'object' && 'value' in token) ? isSingleCompositionToken(token.value) : false;
   if (isSingleTokenValueObject(token) && !shouldExpandTypography && !shouldExpandShadow && !shouldExpandComposition) {
     returnValue = {
       ...token,
