@@ -350,4 +350,33 @@ describe('AppContainer (integration)', () => {
       result.unmount();
     });
   }));
+
+  it('shows the remote storage callout', withOrWithoutLicense({
+    ...mockStartupParams,
+    localTokenData: {
+      ...mockStartupParams.localTokenData!,
+      checkForChanges: false,
+    },
+    storageType: {
+      provider: StorageProviderType.GITHUB,
+      branch: 'main',
+      filePath: 'data/tokens.json',
+      id: 'github',
+      internalId: 'github',
+      name: 'Github',
+    },
+  }, async (params) => {
+    const mockStore = createMockStore({});
+
+    await act(async () => {
+      const result = render(
+        <Provider store={mockStore}>
+          <AppContainer {...params} />
+        </Provider>,
+      );
+
+      await result.findByText('Remote storage detected');
+      expect(result.queryByText('Remote storage detected')).toBeInTheDocument();
+    });
+  }));
 });
