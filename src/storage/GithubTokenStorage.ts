@@ -121,83 +121,114 @@ export class GithubTokenStorage extends GitTokenStorage {
       });
       // read entire directory
       if (Array.isArray(response.data)) {
-        const directoryTreeResponse = await this.octokitClient.rest.git.createTree({
-          owner: this.owner,
-          repo: this.repository,
-          tree: response.data.map((item) => ({
-            path: item.path,
-            sha: item.sha,
-            mode: getTreeMode(item.type),
-          })),
-          headers: octokitClientDefaultHeaders,
-        });
-
-        if (directoryTreeResponse.data.sha) {
-          const treeResponse = await this.octokitClient.rest.git.getTree({
+        let treeResponse;
+        const filteredPath = this.path.replace(/^\/+/, '');
+        try {
+          const directoryTreeResponse = await this.octokitClient.rest.git.createTree({
             owner: this.owner,
             repo: this.repository,
-            tree_sha: directoryTreeResponse.data.sha,
-            recursive: 'true',
+            tree: response.data.map((item) => ({
+              path: item.path,
+              sha: item.sha,
+              mode: getTreeMode(item.type),
+            })),
             headers: octokitClientDefaultHeaders,
           });
-
-          if (treeResponse.data.tree.length > 0) {
-            const jsonFiles = treeResponse.data.tree.filter((file) => (
-              file.path?.endsWith('.json')
-            )).sort((a, b) => (
-              (a.path && b.path) ? a.path.localeCompare(b.path) : 0
-            ));
-
-            const jsonFileContents = await Promise.all(jsonFiles.map((treeItem) => (
-              treeItem.path ? this.octokitClient.rest.repos.getContent({
+          if (directoryTreeResponse.data.sha) {
+            treeResponse = await this.octokitClient.rest.git.getTree({
+              owner: this.owner,
+              repo: this.repository,
+              tree_sha: directoryTreeResponse.data.sha,
+              recursive: 'true',
+              headers: octokitClientDefaultHeaders,
+            });
+          }
+        } catch {
+          const parentPath = filteredPath.includes('/') ? filteredPath.slice(0, filteredPath.lastIndexOf('/')) : '';
+          const parentDirectoryTreeResponse = await this.octokitClient.rest.repos.getContent({
+            owner: this.owner,
+            repo: this.repository,
+            path: parentPath,
+            ref: this.branch,
+            headers: octokitClientDefaultHeaders,
+          });
+          if (Array.isArray(parentDirectoryTreeResponse.data)) {
+            const directory = parentDirectoryTreeResponse.data.find((item) => item.path === filteredPath);
+            if (directory) {
+              treeResponse = await this.octokitClient.rest.git.getTree({
                 owner: this.owner,
                 repo: this.repository,
-                path: treeItem.path,
-                ref: this.branch,
+                tree_sha: directory.sha,
+                recursive: 'true',
                 headers: octokitClientDefaultHeaders,
-              }) : Promise.resolve(null)
-            )));
-            return compact(jsonFileContents.map<RemoteTokenStorageFile<GitStorageMetadata> | null>((fileContent, index) => {
-              const { path } = jsonFiles[index];
+              });
+            }
+          } else if (parentDirectoryTreeResponse.data.path === filteredPath) {
+            treeResponse = await this.octokitClient.rest.git.getTree({
+              owner: this.owner,
+              repo: this.repository,
+              tree_sha: parentDirectoryTreeResponse.data.sha,
+              recursive: 'true',
+              headers: octokitClientDefaultHeaders,
+            });
+          }
+        }
+        if (treeResponse && treeResponse.data.tree.length > 0) {
+          const jsonFiles = treeResponse.data.tree.filter((file) => (
+            file.path?.endsWith('.json')
+          )).sort((a, b) => (
+            (a.path && b.path) ? a.path.localeCompare(b.path) : 0
+          ));
 
-              if (
-                path
-                && fileContent?.data
-                && !Array.isArray(fileContent?.data)
-                && 'content' in fileContent.data
-              ) {
-                let name = path.substring(this.path.length).replace(/^\/+/, '');
-                name = name.replace('.json', '');
-                const parsed = JSON.parse(decodeBase64(fileContent.data.content)) as GitMultiFileObject;
-                // @REAMDE we will need to ensure these reserved names
+          const jsonFileContents = await Promise.all(jsonFiles.map((treeItem) => (
+            treeItem.path ? this.octokitClient.rest.repos.getContent({
+              owner: this.owner,
+              repo: this.repository,
+              path: treeItem.path.startsWith(filteredPath) ? treeItem.path : `${filteredPath}/${treeItem.path}`,
+              ref: this.branch,
+              headers: octokitClientDefaultHeaders,
+            }) : Promise.resolve(null)
+          )));
+          return compact(jsonFileContents.map<RemoteTokenStorageFile<GitStorageMetadata> | null>((fileContent, index) => {
+            const { path } = jsonFiles[index];
+            if (
+              path
+              && fileContent?.data
+              && !Array.isArray(fileContent?.data)
+              && 'content' in fileContent.data
+            ) {
+              const filePath = path.startsWith(filteredPath) ? path : `${filteredPath}/${path}`;
+              let name = filePath.substring(this.path.length).replace(/^\/+/, '');
+              name = name.replace('.json', '');
+              const parsed = JSON.parse(decodeBase64(fileContent.data.content)) as GitMultiFileObject;
+              // @REAMDE we will need to ensure these reserved names
 
-                if (name === SystemFilenames.THEMES) {
-                  return {
-                    path,
-                    type: 'themes',
-                    data: parsed as ThemeObjectsList,
-                  };
-                }
-
-                if (name === SystemFilenames.METADATA) {
-                  return {
-                    path,
-                    type: 'metadata',
-                    data: parsed as GitStorageMetadata,
-                  };
-                }
-
+              if (name === SystemFilenames.THEMES) {
                 return {
-                  path,
-                  name,
-                  type: 'tokenSet',
-                  data: parsed as AnyTokenSet<false>,
+                  path: filePath,
+                  type: 'themes',
+                  data: parsed as ThemeObjectsList,
                 };
               }
 
-              return null;
-            }));
-          }
+              if (name === SystemFilenames.METADATA) {
+                return {
+                  path: filePath,
+                  type: 'metadata',
+                  data: parsed as GitStorageMetadata,
+                };
+              }
+
+              return {
+                path: filePath,
+                name,
+                type: 'tokenSet',
+                data: parsed as AnyTokenSet<false>,
+              };
+            }
+
+            return null;
+          }));
         }
       } else if ('content' in response.data) {
         const data = decodeBase64(response.data.content);
