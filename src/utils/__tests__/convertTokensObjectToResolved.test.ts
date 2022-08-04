@@ -1,3 +1,4 @@
+import { TokenTypes } from '@/constants/TokenTypes';
 import convertTokensObjectToResolved from '../convertTokensObjectToResolved';
 
 describe('convertTokensObjectToResolved', () => {
@@ -7,29 +8,29 @@ describe('convertTokensObjectToResolved', () => {
         colors: {
           red: {
             value: '#ff0000',
-            type: 'color',
+            type: TokenTypes.COLOR,
           },
           blue: {
             value: '#0000ff',
-            type: 'color',
+            type: TokenTypes.COLOR,
           },
         },
         sizing: {
           base: {
             value: '2',
-            type: 'sizing',
+            type: TokenTypes.SIZING,
           },
           scale: {
             value: '1.5',
-            type: 'sizing',
+            type: TokenTypes.SIZING,
           },
           small: {
             value: '1 * {sizing.base}',
-            type: 'sizing',
+            type: TokenTypes.SIZING,
           },
           medium: {
             value: '{sizing.small} * {sizing.scale}',
-            type: 'sizing',
+            type: TokenTypes.SIZING,
           },
         },
       },
@@ -37,7 +38,7 @@ describe('convertTokensObjectToResolved', () => {
         colors: {
           primary: {
             value: '$colors.red',
-            type: 'color',
+            type: TokenTypes.COLOR,
           },
         },
       },
@@ -52,11 +53,11 @@ describe('convertTokensObjectToResolved', () => {
         colors: {
           white: {
             value: '#ffffff',
-            type: 'color',
+            type: TokenTypes.COLOR,
           },
           black: {
             value: '#000000',
-            type: 'color',
+            type: TokenTypes.COLOR,
           },
         },
       },
@@ -64,7 +65,7 @@ describe('convertTokensObjectToResolved', () => {
         colors: {
           background: {
             value: '$colors.white',
-            type: 'color',
+            type: TokenTypes.COLOR,
           },
         },
       },
@@ -72,7 +73,7 @@ describe('convertTokensObjectToResolved', () => {
         colors: {
           background: {
             value: '$colors.black',
-            type: 'color',
+            type: TokenTypes.COLOR,
           },
         },
       },
@@ -86,7 +87,7 @@ describe('convertTokensObjectToResolved', () => {
       options: [
         {
           name: 'typography.h1',
-          type: 'typography',
+          type: TokenTypes.TYPOGRAPHY,
           value: {
             fontFamily: 'Roboto',
             fontSize: '96',
@@ -95,7 +96,7 @@ describe('convertTokensObjectToResolved', () => {
         },
         {
           name: 'typography.h2',
-          type: 'typography',
+          type: TokenTypes.TYPOGRAPHY,
           value: {
             fontFamily: 'Roboto',
             fontSize: '60',
@@ -104,7 +105,7 @@ describe('convertTokensObjectToResolved', () => {
         },
         {
           name: 'typography.h3',
-          type: 'typography',
+          type: TokenTypes.TYPOGRAPHY,
           value: {
             fontFamily: 'Roboto',
             fontSize: '48',
@@ -124,7 +125,7 @@ describe('convertTokensObjectToResolved', () => {
       options: [
         {
           name: 'shadow.1',
-          type: 'boxShadow',
+          type: TokenTypes.BOX_SHADOW,
           value: {
             x: '2',
             y: '3',
@@ -136,7 +137,7 @@ describe('convertTokensObjectToResolved', () => {
         },
         {
           name: 'shadow.2',
-          type: 'boxShadow',
+          type: TokenTypes.BOX_SHADOW,
           value: [
             {
               x: '2',
@@ -164,17 +165,105 @@ describe('convertTokensObjectToResolved', () => {
     })).toMatchSnapshot();
   });
 
+  it('does not expand composition when not needed', () => {
+    const tokens = {
+      global: {
+        size: {
+          12: {
+            type: TokenTypes.SIZING,
+            value: '12',
+          },
+        },
+        space: {
+          24: {
+            type: TokenTypes.SPACING,
+            value: '24',
+          },
+        },
+        opacity: {
+          50: {
+            type: TokenTypes.OPACITY,
+            value: '50%',
+          },
+        },
+        composition: {
+          heading: {
+            type: TokenTypes.COMPOSITION,
+            value: {
+              opacity: '{opacity.50}',
+            },
+          },
+          body: {
+            type: TokenTypes.COMPOSITION,
+            value: {
+              sizing: '{size.12}',
+              spacing: '{space.24}',
+            },
+          },
+        },
+      },
+    };
+
+    expect(convertTokensObjectToResolved(tokens, [], [], {
+      expandTypography: false, expandShadow: false, expandComposition: false, preserveRawValue: true,
+    })).toMatchSnapshot();
+  });
+
+  it('should expand composition when needed', () => {
+    const tokens = {
+      global: {
+        size: {
+          12: {
+            type: TokenTypes.SIZING,
+            value: '12',
+          },
+        },
+        space: {
+          24: {
+            type: TokenTypes.SPACING,
+            value: '24',
+          },
+        },
+        opacity: {
+          50: {
+            type: TokenTypes.OPACITY,
+            value: '50%',
+          },
+        },
+        composition: {
+          heading: {
+            type: TokenTypes.COMPOSITION,
+            value: {
+              opacity: '{opacity.50}',
+            },
+          },
+          body: {
+            type: TokenTypes.COMPOSITION,
+            value: {
+              sizing: '{size.12}',
+              spacing: '{space.24}',
+            },
+          },
+        },
+      },
+    };
+
+    expect(convertTokensObjectToResolved(tokens, [], [], {
+      expandTypography: false, expandShadow: false, expandComposition: true, preserveRawValue: true,
+    })).toMatchSnapshot();
+  });
+
   it('preserves rawValue when requested', () => {
     const tokens = {
       global: {
         colors: {
           white: {
             value: '#ffffff',
-            type: 'color',
+            type: TokenTypes.COLOR,
           },
           black: {
             value: '#000000',
-            type: 'color',
+            type: TokenTypes.COLOR,
           },
         },
       },
@@ -182,7 +271,7 @@ describe('convertTokensObjectToResolved', () => {
         colors: {
           background: {
             value: '$colors.white',
-            type: 'color',
+            type: TokenTypes.COLOR,
           },
         },
       },
@@ -190,7 +279,7 @@ describe('convertTokensObjectToResolved', () => {
         colors: {
           background: {
             value: '$colors.black',
-            type: 'color',
+            type: TokenTypes.COLOR,
           },
         },
       },
@@ -206,79 +295,79 @@ describe('convertTokensObjectToResolved', () => {
       global: {
         colors: {
           blue: {
-            type: 'color',
+            type: TokenTypes.COLOR,
             value: '#0000ff',
           },
           primary: {
             description: 'Should be resolved',
-            type: 'color',
+            type: TokenTypes.COLOR,
             value: '$colors.red',
           },
           red: {
-            type: 'color',
+            type: TokenTypes.COLOR,
             value: '#ff0000',
           },
           opaqueRed: {
             description: 'Should be resolved',
-            type: 'color',
+            type: TokenTypes.COLOR,
             value: 'rgba(255, 0, 0, {opacity.medium})',
           },
         },
         opacity: {
           medium: {
-            type: 'opacity',
+            type: TokenTypes.OPACITY,
             value: '0.5',
           },
         },
         radii: {
           full: {
             value: '100%',
-            type: 'borderRadius',
+            type: TokenTypes.BORDER_RADIUS,
           },
           leaf: {
             description: 'Should be resolved',
             value: '{radii.full} 0%',
-            type: 'borderRadius',
+            type: TokenTypes.BORDER_RADIUS,
           },
         },
         sizing: {
           base: {
             value: '2',
-            type: 'sizing',
+            type: TokenTypes.SIZING,
           },
           scale: {
             value: '1.5',
-            type: 'sizing',
+            type: TokenTypes.SIZING,
           },
           xsmall: {
             description: 'Should be resolved',
             value: '1 * {sizing.base}',
-            type: 'sizing',
+            type: TokenTypes.SIZING,
           },
           small: {
             description: 'Should be resolved',
             value: '{sizing.base}',
-            type: 'sizing',
+            type: TokenTypes.SIZING,
           },
           medium: {
             description: 'Should be resolved',
             value: '{sizing.small} * {sizing.scale}',
-            type: 'sizing',
+            type: TokenTypes.SIZING,
           },
           large: {
             description: 'Should be resolved',
             value: '$sizing.medium * $sizing.scale',
-            type: 'sizing',
+            type: TokenTypes.SIZING,
           },
           responsive25: {
             description: 'Should be resolved',
             value: 'calc(25vw * $sizing.small)',
-            type: 'sizing',
+            type: TokenTypes.SIZING,
           },
           responsive50: {
             description: 'Should be resolved',
             value: 'calc(50vw - {sizing.large}px)',
-            type: 'sizing',
+            type: TokenTypes.SIZING,
           },
         },
         text: {
@@ -316,7 +405,7 @@ describe('convertTokensObjectToResolved', () => {
           h1: {
             description: 'Should be resolved',
             name: 'typography.h1',
-            type: 'typography',
+            type: TokenTypes.TYPOGRAPHY,
             value: {
               fontFamily: 'Roboto',
               fontSize: '{text.size.h1}',
@@ -325,7 +414,7 @@ describe('convertTokensObjectToResolved', () => {
           },
           h2: {
             description: 'Should be resolved',
-            type: 'typography',
+            type: TokenTypes.TYPOGRAPHY,
             value: {
               fontFamily: 'Roboto',
               fontSize: '3.75 * {text.size.base}',
@@ -334,7 +423,7 @@ describe('convertTokensObjectToResolved', () => {
           },
           h3: {
             description: 'Should be resolved',
-            type: 'typography',
+            type: TokenTypes.TYPOGRAPHY,
             value: {
               fontFamily: 'Roboto',
               fontSize: '3 * {text.size.base}',
@@ -355,79 +444,79 @@ describe('convertTokensObjectToResolved', () => {
       global: {
         colors: {
           blue: {
-            type: 'color',
+            type: TokenTypes.COLOR,
             value: '#0000ff',
           },
           primary: {
             description: 'Should NOT be resolved',
-            type: 'color',
+            type: TokenTypes.COLOR,
             value: '$colors.red',
           },
           red: {
-            type: 'color',
+            type: TokenTypes.COLOR,
             value: '#ff0000',
           },
           opaqueRed: {
             description: 'Should NOT be resolved',
-            type: 'color',
+            type: TokenTypes.COLOR,
             value: 'rgba(255, 0, 0, {opacity.medium})',
           },
         },
         opacity: {
           medium: {
-            type: 'opacity',
+            type: TokenTypes.OPACITY,
             value: '0.5',
           },
         },
         radii: {
           full: {
             value: '100%',
-            type: 'borderRadius',
+            type: TokenTypes.BORDER_RADIUS,
           },
           leaf: {
             description: 'Should NOT be resolved',
             value: '{radii.full} 0%',
-            type: 'borderRadius',
+            type: TokenTypes.BORDER_RADIUS,
           },
         },
         sizing: {
           base: {
             value: '2',
-            type: 'sizing',
+            type: TokenTypes.SIZING,
           },
           scale: {
             value: '1.5',
-            type: 'sizing',
+            type: TokenTypes.SIZING,
           },
           xsmall: {
             description: 'Should NOT be resolved',
             value: '1 * {sizing.base}',
-            type: 'sizing',
+            type: TokenTypes.SIZING,
           },
           small: {
             description: 'Should NOT be resolved',
             value: '{sizing.base}',
-            type: 'sizing',
+            type: TokenTypes.SIZING,
           },
           medium: {
             description: 'Should NOT be resolved',
             value: '{sizing.small} * {sizing.scale}',
-            type: 'sizing',
+            type: TokenTypes.SIZING,
           },
           large: {
             description: 'Should NOT be resolved',
             value: '$sizing.medium * $sizing.scale',
-            type: 'sizing',
+            type: TokenTypes.SIZING,
           },
           responsive25: {
             description: 'Should NOT be resolved',
             value: 'calc(25vw * $sizing.small)',
-            type: 'sizing',
+            type: TokenTypes.SIZING,
           },
           responsive50: {
             description: 'Should NOT be resolved',
             value: 'calc(50vw - {sizing.large}px)',
-            type: 'sizing',
+            type: TokenTypes.SIZING,
           },
         },
         text: {
@@ -464,7 +553,7 @@ describe('convertTokensObjectToResolved', () => {
         typography: {
           h1: {
             description: 'Should NOT be resolved',
-            type: 'typography',
+            type: TokenTypes.TYPOGRAPHY,
             value: {
               fontFamily: 'Roboto',
               fontSize: '{text.size.h1}',
@@ -473,7 +562,7 @@ describe('convertTokensObjectToResolved', () => {
           },
           h2: {
             description: 'Should NOT be resolved',
-            type: 'typography',
+            type: TokenTypes.TYPOGRAPHY,
             value: {
               fontFamily: 'Roboto',
               fontSize: '3.75 * {text.size.base}',
@@ -482,7 +571,7 @@ describe('convertTokensObjectToResolved', () => {
           },
           h3: {
             description: 'Should NOT be resolved',
-            type: 'typography',
+            type: TokenTypes.TYPOGRAPHY,
             value: {
               fontFamily: 'Roboto',
               fontSize: '3 * {text.size.base}',
@@ -503,79 +592,79 @@ describe('convertTokensObjectToResolved', () => {
       global: {
         colors: {
           blue: {
-            type: 'color',
+            type: TokenTypes.COLOR,
             value: '#0000ff',
           },
           primary: {
             description: 'Should NOT be resolved',
-            type: 'color',
+            type: TokenTypes.COLOR,
             value: '$colors.red',
           },
           red: {
-            type: 'color',
+            type: TokenTypes.COLOR,
             value: '#ff0000',
           },
           opaqueRed: {
             description: 'Should NOT be resolved',
-            type: 'color',
+            type: TokenTypes.COLOR,
             value: 'rgba(255, 0, 0, {opacity.medium})',
           },
         },
         opacity: {
           medium: {
-            type: 'opacity',
+            type: TokenTypes.OPACITY,
             value: '0.5',
           },
         },
         radii: {
           full: {
             value: '100%',
-            type: 'borderRadius',
+            type: TokenTypes.BORDER_RADIUS,
           },
           leaf: {
             description: 'Should NOT be resolved',
             value: '{radii.full} 0%',
-            type: 'borderRadius',
+            type: TokenTypes.BORDER_RADIUS,
           },
         },
         sizing: {
           base: {
             value: '2',
-            type: 'sizing',
+            type: TokenTypes.SIZING,
           },
           scale: {
             value: '1.5',
-            type: 'sizing',
+            type: TokenTypes.SIZING,
           },
           xsmall: {
             description: 'Should be resolved',
             value: '1 * {sizing.base}',
-            type: 'sizing',
+            type: TokenTypes.SIZING,
           },
           small: {
             description: 'Should NOT be resolved',
             value: '{sizing.base}',
-            type: 'sizing',
+            type: TokenTypes.SIZING,
           },
           medium: {
             description: 'Should be resolved',
             value: '{sizing.small} * {sizing.scale}',
-            type: 'sizing',
+            type: TokenTypes.SIZING,
           },
           large: {
             description: 'Should be resolved',
             value: '$sizing.medium * $sizing.scale',
-            type: 'sizing',
+            type: TokenTypes.SIZING,
           },
           responsive25: {
             description: 'Should NOT be resolved',
             value: 'calc(25vw * $sizing.small)',
-            type: 'sizing',
+            type: TokenTypes.SIZING,
           },
           responsive50: {
             description: 'Should NOT be resolved',
             value: 'calc(50vw - {sizing.large}px)',
-            type: 'sizing',
+            type: TokenTypes.SIZING,
           },
         },
         text: {
@@ -612,7 +701,7 @@ describe('convertTokensObjectToResolved', () => {
         typography: {
           h1: {
             description: 'Should NOT be resolved',
-            type: 'typography',
+            type: TokenTypes.TYPOGRAPHY,
             value: {
               fontFamily: 'Roboto',
               fontSize: '{text.size.base}',
@@ -621,7 +710,7 @@ describe('convertTokensObjectToResolved', () => {
           },
           h2: {
             description: 'Should be resolved',
-            type: 'typography',
+            type: TokenTypes.TYPOGRAPHY,
             value: {
               fontFamily: 'Roboto',
               fontSize: '3.75 * {text.size.base}',
@@ -630,7 +719,7 @@ describe('convertTokensObjectToResolved', () => {
           },
           h3: {
             description: 'Should be resolved',
-            type: 'typography',
+            type: TokenTypes.TYPOGRAPHY,
             value: {
               fontFamily: 'Roboto',
               fontSize: '3 * {text.size.base}',
