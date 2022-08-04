@@ -9,7 +9,6 @@ import { LicenseStatus } from '@/constants/LicenseStatus';
 import * as userStateReducers from './reducers/userState';
 
 export enum AddLicenseSource {
-  PLUGIN,
   INITAL_LOAD,
   UI,
 }
@@ -19,9 +18,6 @@ export enum Entitlements {
   BETA = 'beta',
 }
 export interface UserState {
-  // this flag is used at initial plugin load
-  // We only want to get the license key from the backend if there is not license key stored in local storage
-  checkedLocalStorageForKey: boolean;
   userId: string | null;
   licenseKey: string | undefined;
   licenseError: string | undefined;
@@ -38,7 +34,6 @@ interface LicenseDetails {
 
 export const userState = createModel<RootModel>()({
   state: {
-    checkedLocalStorageForKey: false,
     userId: null,
     licenseStatus: LicenseStatus.UNKNOWN,
     licenseKey: undefined,
@@ -67,12 +62,6 @@ export const userState = createModel<RootModel>()({
       return {
         ...state,
         licenseKey: payload,
-      };
-    },
-    setCheckedLocalStorage(state, payload: boolean) {
-      return {
-        ...state,
-        checkedLocalStorageForKey: payload,
       };
     },
     setLicenseError(state, payload: string | undefined) {
@@ -118,17 +107,13 @@ export const userState = createModel<RootModel>()({
         if (source === AddLicenseSource.UI) {
           notifyToUI('License added succesfully!');
         }
-        if (source !== AddLicenseSource.PLUGIN) {
-          AsyncMessageChannel.ReactInstance.message({
-            type: AsyncMessageTypes.SET_LICENSE_KEY,
-            licenseKey: key,
-          });
-        }
+
+        AsyncMessageChannel.ReactInstance.message({
+          type: AsyncMessageTypes.SET_LICENSE_KEY,
+          licenseKey: key,
+        });
       }
       dispatch.userState.setLicenseKey(key);
-      if (source === AddLicenseSource.PLUGIN) {
-        dispatch.userState.setCheckedLocalStorage(true);
-      }
     },
     removeLicenseKey: async (payload, rootState) => {
       const { licenseKey, userId } = rootState.userState;

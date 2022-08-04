@@ -24,9 +24,9 @@ export default function AddLicenseKey() {
   const userId = useSelector(userIdSelector);
   const ldClient = useLDClient();
 
-  const addKey = useCallback(() => {
+  const addKey = useCallback(async () => {
     if (newKey) {
-      dispatch.userState.addLicenseKey({ key: newKey, source: AddLicenseSource.UI });
+      await dispatch.userState.addLicenseKey({ key: newKey, source: AddLicenseSource.UI });
     }
   }, [newKey, dispatch]);
 
@@ -82,11 +82,12 @@ export default function AddLicenseKey() {
       >
         <Box css={{ flexGrow: 1 }}>
           <Input
+            full
             size="large"
             name="license-key"
+            data-testid="settings-license-key-input"
             type="text"
             value={newKey || ''}
-            full
             onChange={onLicenseKeyChange}
             error={licenseKeyError}
           />

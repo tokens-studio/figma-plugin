@@ -19,7 +19,7 @@ describe('Test URLTokenStorage', () => {
 
     const result = await urlTokenStorage.read();
     expect(result).toEqual({
-      errorMessage: ErrorMessages.VALIDATION_ERROR
+      errorMessage: ErrorMessages.VALIDATION_ERROR,
     });
   });
 
@@ -104,7 +104,7 @@ describe('Test URLTokenStorage', () => {
     ]);
   });
 
-    it('should return empty array when fetching data fail', async () => {
+  it('should return empty array when fetching data fail', async () => {
     global.fetch = jest.fn(() => (
       Promise.resolve({
         ok: false,
@@ -115,5 +115,4 @@ describe('Test URLTokenStorage', () => {
     const result = await urlTokenStorage.read();
     expect(result).toEqual([]);
   });
-
 });

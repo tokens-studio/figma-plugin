@@ -60,6 +60,8 @@ export async function updateJSONBinTokens({
   } catch (e) {
     console.log('Error updating jsonbin', e);
   }
+
+  return undefined;
 }
 
 export function useJSONbin() {

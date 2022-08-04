@@ -199,5 +199,4 @@ describe('JSONBinTokenStorage', () => {
       errorMessage: ErrorMessages.VALIDATION_ERROR,
     });
   });
-
 });
