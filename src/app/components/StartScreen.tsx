@@ -56,15 +56,15 @@ function StartScreen() {
           </Button>
         </Stack>
         {storageType?.provider !== StorageProviderType.LOCAL && (
-        <Callout
-          id="callout-action-setupsync"
-          heading="Remote storage detected"
-          description={`This document is setup with a remote token source on ${storageType.provider}. Ask your team for the credentials, then enter them in the Sync dialog.`}
-          action={{
-            onClick: onSetSyncClick,
-            text: 'Set up sync',
-          }}
-        />
+          <Callout
+            id="callout-action-setupsync"
+            heading="Remote storage detected"
+            description={`This document is setup with a remote token source on ${storageType.provider}. Ask your team for the credentials, then enter them in the Sync dialog.`}
+            action={{
+              onClick: onSetSyncClick,
+              text: 'Set up sync',
+            }}
+          />
         )}
       </Stack>
     </div>

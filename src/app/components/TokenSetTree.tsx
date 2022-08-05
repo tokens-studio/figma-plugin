@@ -1,25 +1,108 @@
 import React, {
-  useCallback, useEffect, useMemo, useState,
+  useCallback, useContext, useEffect, useMemo, useState,
 } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { TokenSetItem } from './TokenSetItem';
-import { Dispatch } from '../store';
 import {
   activeTokenSetSelector,
+  collapsedTokenSetsSelector,
   editProhibitedSelector,
   usedTokenSetSelector,
 } from '@/selectors';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
-import { TokenSetListOrTree } from './TokenSetListOrTree';
-import { tokenSetListToTree, TreeItem } from '@/utils/tokenset';
+import { TokenSetListOrTree, TokenSetListOrTreeDragItem } from './TokenSetListOrTree';
+import {
+  tokenSetListToTree, TreeItem, findOrderableTargetIndexesInTokenSetTreeList, ensureFolderIsTogether,
+} from '@/utils/tokenset';
+import { ReorderGroup } from '@/motion/ReorderGroup';
+import { DragControlsContext, ItemData } from '@/context';
+import { checkReorder } from '@/utils/motion';
+
+type ExtendedTreeItem = TreeItem & {
+  tokenSets: string[];
+  items: TreeItem[]
+  isActive: boolean
+  canDelete: boolean
+  checkedState: boolean | 'indeterminate'
+  onRename: (tokenSet: string) => void
+  onDelete: (tokenSet: string) => void
+  onDuplicate: (tokenSet: string) => void
+  saveScrollPositionSet: (tokenSet: string) => void
+};
+
+type TokenSetTreeItemContentProps = React.PropsWithChildren<{
+  item: ExtendedTreeItem
+}>;
+
+type TokenSetTreeProps = {
+  tokenSets: string[]
+  onReorder: (sets: string[]) => void;
+  onRename: (tokenSet: string) => void
+  onDelete: (tokenSet: string) => void
+  onDuplicate: (tokenSet: string) => void
+  saveScrollPositionSet: (tokenSet: string) => void
+};
+
+export function TokenSetTreeItemContent({
+  item, children,
+}: TokenSetTreeItemContentProps) {
+  const dispatch = useDispatch();
+  const dragContext = useContext(DragControlsContext);
+  const activeTokenSet = useSelector(activeTokenSetSelector);
+  const editProhibited = useSelector(editProhibitedSelector);
+
+  const handleClick = useCallback((set: TreeItem) => {
+    if (set.isLeaf) {
+      dispatch.tokenState.setActiveTokenSet(set.path);
+      item.saveScrollPositionSet(activeTokenSet);
+    }
+  }, [dispatch, item, activeTokenSet]);
+
+  const handleCheckedChange = useCallback((shouldCheck: boolean, set: TreeItem) => {
+    if (set.isLeaf) {
+      dispatch.tokenState.toggleUsedTokenSet(set.path);
+    } else {
+      const itemPaths = item.items.filter((i) => i.path.startsWith(set.path) && i.path !== set.path).map((i) => i.path);
+      dispatch.tokenState.toggleManyTokenSets({ shouldCheck, sets: itemPaths });
+    }
+  }, [dispatch, item]);
+
+  const handleTreatAsSource = useCallback((tokenSetPath: string) => {
+    dispatch.tokenState.toggleTreatAsSource(tokenSetPath);
+  }, [dispatch]);
+
+  const handleDragStart = useCallback((event: React.PointerEvent<HTMLDivElement>) => {
+    dragContext.controls?.start(event);
+  }, [dragContext.controls]);
+
+  return (
+    <TokenSetItem
+      key={item.path}
+      isActive={item.isActive}
+      onClick={handleClick}
+      isChecked={item.checkedState}
+      item={item}
+      onCheck={handleCheckedChange}
+      canEdit={!editProhibited}
+      canReorder={!editProhibited}
+      canDelete={item.canDelete}
+      extraBefore={children}
+      onRename={item.onRename}
+      onDelete={item.onDelete}
+      onDuplicate={item.onDuplicate}
+      onTreatAsSource={handleTreatAsSource}
+      onDragStart={handleDragStart}
+    />
+  );
+}
 
 export default function TokenSetTree({
-  tokenSets, onRename, onDelete, onDuplicate, saveScrollPositionSet,
-}: { tokenSets: string[], onRename: (tokenSet: string) => void, onDelete: (tokenSet: string) => void, onDuplicate: (tokenSet: string) => void, saveScrollPositionSet: (tokenSet: string) => void }) {
+  tokenSets, onReorder, onRename, onDelete, onDuplicate, saveScrollPositionSet,
+}: TokenSetTreeProps) {
   const activeTokenSet = useSelector(activeTokenSetSelector);
   const usedTokenSet = useSelector(usedTokenSetSelector);
   const editProhibited = useSelector(editProhibitedSelector);
-  const dispatch = useDispatch<Dispatch>();
+  const collapsed = useSelector(collapsedTokenSetsSelector);
   const [items, setItems] = useState<TreeItem[]>(tokenSetListToTree(tokenSets));
 
   const determineCheckedState = useCallback((item: TreeItem) => {
@@ -56,68 +139,88 @@ export default function TokenSetTree({
   const mappedItems = useMemo(() => (
     items.map((item) => ({
       ...item,
+      tokenSets,
+      items,
+      onRename,
+      onDelete,
+      onDuplicate,
+      saveScrollPositionSet,
       isActive: activeTokenSet === item.path,
       canDelete: !editProhibited || Object.keys(tokenSets).length > 1,
       checkedState: determineCheckedState(item) as ReturnType<typeof determineCheckedState>,
     }))
-  ), [items, activeTokenSet, editProhibited, tokenSets, determineCheckedState]);
+  ), [
+    items,
+    activeTokenSet,
+    editProhibited,
+    tokenSets,
+    determineCheckedState,
+    onRename,
+    onDelete,
+    onDuplicate,
+    saveScrollPositionSet,
+  ]);
 
-  const handleCheckedChange = useCallback((shouldCheck: boolean, set: typeof items[number]) => {
-    if (set.isLeaf) {
-      dispatch.tokenState.toggleUsedTokenSet(set.path);
-    } else {
-      const itemPaths = items.filter((i) => i.path.startsWith(set.path) && i.path !== set.path).map((i) => i.path);
-      dispatch.tokenState.toggleManyTokenSets({ shouldCheck, sets: itemPaths });
+  const handleReorder = React.useCallback((reorderedItems: ExtendedTreeItem[]) => {
+    const nextItems = reorderedItems.reduce<typeof items>((acc, item) => {
+      const found = items.find(({ key }) => item.key === key);
+      if (found) {
+        // check if this group is collapsed
+        acc.push(found);
+        const itemIsCollapsed = collapsed.includes(item.key);
+        if (itemIsCollapsed) {
+          // also include all children
+          return acc.concat(items.filter((possibleChild) => (
+            possibleChild.parent && possibleChild.parent.startsWith(item.path)
+          )));
+        }
+      }
+      return acc;
+    }, []);
+
+    onReorder(nextItems
+      .filter(({ isLeaf }) => isLeaf)
+      .map(({ path }) => path));
+    setItems(nextItems);
+  }, [items, collapsed, onReorder]);
+
+  const handleCheckReorder = React.useCallback((
+    order: ItemData<typeof mappedItems[number]>[],
+    value: typeof mappedItems[number],
+    offset: number,
+    velocity: number,
+  ) => {
+    const availableIndexes = findOrderableTargetIndexesInTokenSetTreeList(
+      velocity,
+      value,
+      order,
+    );
+
+    let nextOrder = checkReorder(order, value, offset, velocity, availableIndexes);
+    // ensure folders stay together
+    if (!value.isLeaf) {
+      nextOrder = ensureFolderIsTogether(value, order, nextOrder);
     }
-  }, [dispatch, items]);
-
-  const handleClick = useCallback((set: typeof items[number]) => {
-    if (set.isLeaf) {
-      dispatch.tokenState.setActiveTokenSet(set.path);
-      saveScrollPositionSet(activeTokenSet);
-    }
-  }, [dispatch, saveScrollPositionSet, activeTokenSet]);
-
-  const handleTreatAsSource = useCallback((tokenSetPath: string) => {
-    dispatch.tokenState.toggleTreatAsSource(tokenSetPath);
-  }, [dispatch]);
-
-  type TreeRenderFunction = (props: React.PropsWithChildren<{ item: typeof mappedItems[number] }>) => React.ReactElement;
-
-  const renderItem = useCallback<TreeRenderFunction>(({ children }) => (
-    React.createElement(React.Fragment, {}, children)
-  ), []);
-
-  const renderItemContent = useCallback<TreeRenderFunction>(({ item, children }) => (
-    <>
-      {children}
-      <TokenSetItem
-        key={item.path}
-        isActive={item.isActive}
-        onClick={handleClick}
-        isChecked={item.checkedState}
-        item={item}
-        onCheck={handleCheckedChange}
-        canEdit={!editProhibited}
-        canDelete={item.canDelete}
-        onRename={onRename}
-        onDelete={onDelete}
-        onDuplicate={onDuplicate}
-        onTreatAsSource={handleTreatAsSource}
-      />
-    </>
-  ), [editProhibited, onRename, onDelete, onDuplicate, handleTreatAsSource, handleCheckedChange, handleClick]);
+    return nextOrder;
+  }, []);
 
   useEffect(() => {
     setItems(tokenSetListToTree(tokenSets));
   }, [tokenSets]);
 
   return (
-    <TokenSetListOrTree
-      displayType="tree"
-      items={mappedItems}
-      renderItem={renderItem}
-      renderItemContent={renderItemContent}
-    />
+    <ReorderGroup
+      layoutScroll
+      values={mappedItems}
+      checkReorder={handleCheckReorder}
+      onReorder={handleReorder}
+    >
+      <TokenSetListOrTree<ExtendedTreeItem>
+        displayType="tree"
+        items={mappedItems}
+        renderItem={TokenSetListOrTreeDragItem}
+        renderItemContent={TokenSetTreeItemContent}
+      />
+    </ReorderGroup>
   );
 }

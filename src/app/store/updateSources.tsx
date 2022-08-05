@@ -13,7 +13,7 @@ import { StorageType, StorageTypeCredentials } from '@/types/StorageType';
 type UpdateRemoteTokensPayload = {
   provider: StorageProviderType;
   tokens: Record<string, AnyTokenList>;
-  themes: ThemeObjectsList
+  themes: ThemeObjectsList;
   context: StorageTypeCredentials;
   updatedAt: string;
   oldUpdatedAt?: string;
@@ -64,6 +64,9 @@ async function updateRemoteTokens({
       break;
     }
     case StorageProviderType.GITLAB: {
+      break;
+    }
+    case StorageProviderType.BITBUCKET: {
       break;
     }
     case StorageProviderType.ADO: {

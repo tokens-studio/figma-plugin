@@ -105,6 +105,7 @@ export default function TypographyInput({
             label={internalEditToken.schema.property}
             inlineLabel
             resolvedTokens={resolvedTokens}
+            initialName={internalEditToken.initialName}
             handleChange={handleTypographyAliasValueChange}
             setInputValue={handleDownShiftInputChange}
             placeholder="Value or {alias}"

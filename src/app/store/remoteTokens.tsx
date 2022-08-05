@@ -8,16 +8,19 @@ import { Dispatch } from '../store';
 import useStorage from './useStorage';
 import { useGitHub } from './providers/github';
 import { useGitLab } from './providers/gitlab';
+import { useBitbucket } from './providers/bitbucket';
 import { useADO } from './providers/ado';
 import useFile from '@/app/store/providers/file';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
 import { apiSelector } from '@/selectors';
 import { UsedTokenSetsMap } from '@/types';
-import { RemoteTokenStorageData } from '@/storage/RemoteTokenStorage';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StorageTypeCredentials, StorageTypeFormValues } from '@/types/StorageType';
+import { RemoteResponseData, RemoteResponseStatus } from '@/types/RemoteResponseData';
+import { ErrorMessages } from '@/constants/ErrorMessages';
+import { saveLastSyncedState } from '@/utils/saveLastSyncedState';
 
 type PullTokensOptions = {
   context?: StorageTypeCredentials,
@@ -41,6 +44,14 @@ export default function useRemoteTokens() {
     addNewGitLabCredentials, syncTokensWithGitLab, pullTokensFromGitLab, pushTokensToGitLab, fetchGitLabBranches, createGitLabBranch,
   } = useGitLab();
   const {
+    addNewBitbucketCredentials,
+    syncTokensWithBitbucket,
+    pullTokensFromBitbucket,
+    pushTokensToBitbucket,
+    fetchBitbucketBranches,
+    createBitbucketBranch,
+  } = useBitbucket();
+  const {
     addNewADOCredentials, syncTokensWithADO, pullTokensFromADO, pushTokensToADO, createADOBranch, fetchADOBranches,
   } = useADO();
   const { pullTokensFromURL } = useURL();
@@ -55,7 +66,7 @@ export default function useRemoteTokens() {
       isInfinite: true,
     });
 
-    let remoteData: RemoteTokenStorageData<unknown> | null = null;
+    let remoteData: RemoteResponseData<unknown> | null = null;
     switch (context.provider) {
       case StorageProviderType.JSONBIN: {
         remoteData = await pullTokensFromJSONBin(context);
@@ -63,6 +74,10 @@ export default function useRemoteTokens() {
       }
       case StorageProviderType.GITHUB: {
         remoteData = await pullTokensFromGitHub(context, featureFlags);
+        break;
+      }
+      case StorageProviderType.BITBUCKET: {
+        remoteData = await pullTokensFromBitbucket(context, featureFlags);
         break;
       }
       case StorageProviderType.GITLAB: {
@@ -80,9 +95,8 @@ export default function useRemoteTokens() {
       default:
         throw new Error('Not implemented');
     }
-
-    if (remoteData) {
-      dispatch.tokenState.setLastSyncedState(JSON.stringify([remoteData.tokens, remoteData.themes], null, 2));
+    if (remoteData?.status === 'success') {
+      saveLastSyncedState(dispatch, remoteData.tokens, remoteData.themes, remoteData.metadata);
       dispatch.tokenState.setTokenData({
         values: remoteData.tokens,
         themes: remoteData.themes,
@@ -103,6 +117,7 @@ export default function useRemoteTokens() {
     api,
     pullTokensFromGitHub,
     pullTokensFromGitLab,
+    pullTokensFromBitbucket,
     pullTokensFromJSONBin,
     pullTokensFromURL,
     pullTokensFromADO,
@@ -123,6 +138,10 @@ export default function useRemoteTokens() {
         await syncTokensWithGitLab(context);
         break;
       }
+      case StorageProviderType.BITBUCKET: {
+        await syncTokensWithBitbucket(context);
+        break;
+      }
       case StorageProviderType.ADO: {
         await syncTokensWithADO(context);
         break;
@@ -137,6 +156,7 @@ export default function useRemoteTokens() {
     pullTokens,
     syncTokensWithGitHub,
     syncTokensWithGitLab,
+    syncTokensWithBitbucket,
     syncTokensWithADO,
   ]);
 
@@ -151,6 +171,10 @@ export default function useRemoteTokens() {
         await pushTokensToGitLab(context);
         break;
       }
+      case StorageProviderType.BITBUCKET: {
+        await pushTokensToBitbucket(context);
+        break;
+      }
       case StorageProviderType.ADO: {
         await pushTokensToADO(context);
         break;
@@ -162,55 +186,78 @@ export default function useRemoteTokens() {
     api,
     pushTokensToGitHub,
     pushTokensToGitLab,
+    pushTokensToBitbucket,
     pushTokensToADO,
   ]);
 
-  const addNewProviderItem = useCallback(async (credentials: StorageTypeFormValues<false>): Promise<boolean> => {
-    let data;
+  const addNewProviderItem = useCallback(async (credentials: StorageTypeFormValues<false>): Promise<RemoteResponseStatus> => {
+    let content: RemoteResponseData | null = null;
     switch (credentials.provider) {
       case StorageProviderType.JSONBIN: {
         if (credentials.id) {
-          data = await addJSONBinCredentials(credentials);
+          content = await addJSONBinCredentials(credentials);
         } else {
           const id = await createNewJSONBin(credentials);
           if (id) {
             credentials.id = id;
-            data = true;
+            return {
+              status: 'success',
+            };
           }
+          return {
+            status: 'failure',
+            errorMessage: ErrorMessages.JSONBIN_CREATE_ERROR,
+          };
         }
         break;
       }
       case StorageProviderType.GITHUB: {
-        data = await addNewGitHubCredentials(credentials);
+        content = await addNewGitHubCredentials(credentials);
         break;
       }
       case StorageProviderType.GITLAB: {
-        data = await addNewGitLabCredentials(credentials);
+        content = await addNewGitLabCredentials(credentials);
+        break;
+      }
+      case StorageProviderType.BITBUCKET: {
+        content = await addNewBitbucketCredentials(credentials);
         break;
       }
       case StorageProviderType.ADO: {
-        data = await addNewADOCredentials(credentials);
+        content = await addNewADOCredentials(credentials);
         break;
       }
       case StorageProviderType.URL: {
-        data = await pullTokensFromURL(credentials);
+        content = await pullTokensFromURL(credentials);
         break;
       }
       default:
         throw new Error('Not implemented');
     }
-    if (data) {
+    if (content?.status === 'failure') {
+      return {
+        status: 'failure',
+        errorMessage: content?.errorMessage,
+      };
+    }
+    if (content) {
       dispatch.uiState.setLocalApiState(credentials as StorageTypeCredentials); // in JSONBIN the ID can technically be omitted, but this function handles this by creating a new JSONBin and assigning the ID
       dispatch.uiState.setApiData(credentials as StorageTypeCredentials);
       setStorageType({ provider: credentials as StorageTypeCredentials, shouldSetInDocument: true });
-      return true;
+      return {
+        status: 'success',
+      };
     }
-    return false;
+    return {
+      status: 'failure',
+      errorMessage: ErrorMessages.GENERAL_CONNECTION_ERROR,
+    };
   }, [
     dispatch,
     addJSONBinCredentials,
     addNewGitLabCredentials,
     addNewGitHubCredentials,
+    addNewBitbucketCredentials,
     addNewADOCredentials,
     createNewJSONBin,
     pullTokensFromURL,
@@ -228,6 +275,10 @@ export default function useRemoteTokens() {
         newBranchCreated = await createGitLabBranch(context, branch, source);
         break;
       }
+      case StorageProviderType.BITBUCKET: {
+        newBranchCreated = await createBitbucketBranch(context, branch, source);
+        break;
+      }
       case StorageProviderType.ADO: {
         newBranchCreated = await createADOBranch(context, branch, source);
         break;
@@ -236,7 +287,7 @@ export default function useRemoteTokens() {
         throw new Error('Not implemented');
     }
     return newBranchCreated;
-  }, [createGithubBranch, createADOBranch]);
+  }, [createGithubBranch, createADOBranch, createBitbucketBranch]);
 
   const fetchBranches = useCallback(async (context: StorageTypeCredentials) => {
     switch (context.provider) {
@@ -244,12 +295,14 @@ export default function useRemoteTokens() {
         return fetchGithubBranches(context);
       case StorageProviderType.GITLAB:
         return fetchGitLabBranches(context);
+      case StorageProviderType.BITBUCKET:
+        return fetchBitbucketBranches(context);
       case StorageProviderType.ADO:
         return fetchADOBranches(context);
       default:
         return null;
     }
-  }, [fetchGithubBranches, fetchGitLabBranches, fetchADOBranches]);
+  }, [fetchGithubBranches, fetchGitLabBranches, fetchBitbucketBranches, fetchADOBranches]);
 
   const deleteProvider = useCallback((provider) => {
     AsyncMessageChannel.ReactInstance.message({
@@ -262,10 +315,10 @@ export default function useRemoteTokens() {
     track('fetchTokensFromFileOrDirectory');
     dispatch.uiState.startJob({ name: BackgroundJobs.UI_FETCHTOKENSFROMFILE });
 
-    let remoteData: RemoteTokenStorageData<unknown> | null = null;
+    let remoteData: RemoteResponseData<unknown> | null = null;
     if (files) {
       remoteData = await readTokensFromFileOrDirectory(files);
-      if (remoteData) {
+      if (remoteData?.status === 'success') {
         dispatch.tokenState.setTokenData({
           values: remoteData.tokens,
           themes: remoteData.themes,

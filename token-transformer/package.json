@@ -2,6 +2,11 @@
   "name": "token-transformer",
   "version": "0.0.24",
   "description": "A utility that transforms tokens from Figma Tokens to a format that is readable by Style Dictionary.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/six7/figma-tokens.git",
+    "directory": "token-transformer"
+  },
   "main": "index.js",
   "scripts": {
     "build-typography-test": "node index.js tokens.json temp/typography.json base/options,base/sizing,core/typography base/options,base/sizing",

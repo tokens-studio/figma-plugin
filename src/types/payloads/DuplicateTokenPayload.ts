@@ -1,5 +1,6 @@
 export type DuplicateTokenPayload = {
   parent: string;
-  name: string;
+  newName: string;
+  oldName?: string;
   shouldUpdate?: boolean;
 };

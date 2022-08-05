@@ -11,12 +11,12 @@ export default function updateColorStyles(colorTokens: SingleColorToken<true, { 
   colorTokens.forEach((token) => {
     if (paintToKeyMap.has(token.path)) {
       const paint = paintToKeyMap.get(token.path)!;
-      tokenToStyleMap[token.path] = paint.id;
+      tokenToStyleMap[token.name] = paint.id;
       setColorValuesOnTarget(paint, token);
     } else if (shouldCreate) {
       const style = figma.createPaintStyle();
       style.name = token.path;
-      tokenToStyleMap[token.path] = style.id;
+      tokenToStyleMap[token.name] = style.id;
       setColorValuesOnTarget(style, token);
     }
   });

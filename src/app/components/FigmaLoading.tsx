@@ -1,15 +1,11 @@
-import React from 'react';
-import { useDispatch } from 'react-redux';
-import { Tabs } from '@/constants/Tabs';
+import React, { PropsWithChildren } from 'react';
 import FigmaMark from '@/icons/figma-mark.svg';
 import FigmaLetter from '@/icons/figma-letter.svg';
 import * as pjs from '../../../package.json';
 import Stack from './Stack';
-import { Dispatch } from '../store';
 import { styled } from '@/stitches.config';
 import Spinner from './Spinner';
-import { AsyncMessageChannel } from '@/AsyncMessageChannel';
-import { AsyncMessageTypes } from '@/types/AsyncMessages';
+import Box from './Box';
 
 const StyledLoadingScreen = styled(Stack, {
   background: '$loadingScreenBg',
@@ -25,18 +21,25 @@ const StyledLoadingButton = styled('button', {
   },
 });
 
-export default function FigmaLoading() {
-  const dispatch = useDispatch<Dispatch>();
+type Props = PropsWithChildren<{
+  isLoading?: boolean
+  label?: string
+  onCancel?: () => void
+}>;
 
-  const handleCancel = React.useCallback(() => {
-    dispatch.uiState.setActiveTab(Tabs.START);
-    AsyncMessageChannel.ReactInstance.message({
-      type: AsyncMessageTypes.CANCEL_OPERATION,
-    });
-  }, [dispatch.uiState]);
+export default function FigmaLoading({
+  isLoading, label, onCancel, children,
+}: Props) {
+  if (!isLoading) {
+    return (
+      <Box>
+        {children}
+      </Box>
+    );
+  }
 
   return (
-    <StyledLoadingScreen justify="center" direction="column" gap={4} className="content scroll-container">
+    <StyledLoadingScreen data-testid="figmaloading" justify="center" direction="column" gap={4} className="content scroll-container">
       <Stack direction="column" gap={4} align="center">
         <Stack direction="column" gap={4} align="center">
           <FigmaMark />
@@ -50,11 +53,11 @@ export default function FigmaLoading() {
         <Stack direction="row" gap={4} justify="center" align="center">
           <Spinner inverse />
           <Stack direction="column" gap={4} justify="center" align="center">
-            Loading, please wait.
+            {label ?? 'Loading, please wait.'}
           </Stack>
         </Stack>
         <Stack direction="row" gap={4}>
-          <StyledLoadingButton type="button" onClick={handleCancel}>Cancel</StyledLoadingButton>
+          <StyledLoadingButton type="button" onClick={onCancel}>Cancel</StyledLoadingButton>
         </Stack>
       </Stack>
     </StyledLoadingScreen>

@@ -4,6 +4,7 @@ import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 import { convertTokenNameToPath } from '@/utils/convertTokenNameToPath';
 import { getAllFigmaStyleMaps } from '@/utils/getAllFigmaStyleMaps';
 import { isPrimitiveValue, isSingleBoxShadowValue, isSingleTypographyValue } from '@/utils/is';
+import { matchStyleName } from '@/utils/matchStyleName';
 import { trySetStyleId } from '@/utils/trySetStyleId';
 import { transformValue } from './helpers';
 import setColorValuesOnTarget from './setColorValuesOnTarget';
@@ -76,9 +77,11 @@ export default async function setValuesOnNode(
       // BOX SHADOW
       if ('effects' in node && typeof values.boxShadow !== 'undefined' && data.boxShadow) {
         const pathname = convertTokenNameToPath(data.boxShadow, stylePathPrefix, stylePathSlice);
-        const matchingStyleId = (
-          activeThemeObject?.$figmaStyleReferences?.[pathname]
-          || figmaStyleMaps.effectStyles.get(pathname)?.id
+        const matchingStyleId = matchStyleName(
+          data.boxShadow,
+          pathname,
+          activeThemeObject?.$figmaStyleReferences ?? {},
+          figmaStyleMaps.effectStyles,
         );
         if (!matchingStyleId || (matchingStyleId && !await trySetStyleId(node, 'effect', matchingStyleId))) {
           if (isSingleBoxShadowValue(values.boxShadow)) {
@@ -156,9 +159,11 @@ export default async function setValuesOnNode(
       ) {
         if ('fills' in node && data.fill) {
           const pathname = convertTokenNameToPath(data.fill, stylePathPrefix, stylePathSlice);
-          const matchingStyleId = (
-            activeThemeObject?.$figmaStyleReferences?.[pathname]
-            || figmaStyleMaps.paintStyles.get(pathname)?.id
+          const matchingStyleId = matchStyleName(
+            data.fill,
+            pathname,
+            activeThemeObject?.$figmaStyleReferences ?? {},
+            figmaStyleMaps.paintStyles,
           );
           if (!matchingStyleId || (matchingStyleId && !await trySetStyleId(node, 'fill', matchingStyleId))) {
             setColorValuesOnTarget(node, { value: values.fill }, 'fills');
@@ -171,9 +176,11 @@ export default async function setValuesOnNode(
       if (values.typography) {
         if (node.type === 'TEXT' && data.typography) {
           const pathname = convertTokenNameToPath(data.typography, stylePathPrefix, stylePathSlice);
-          const matchingStyleId = (
-            activeThemeObject?.$figmaStyleReferences?.[pathname]
-            || figmaStyleMaps.textStyles.get(pathname)?.id
+          const matchingStyleId = matchStyleName(
+            data.typography,
+            pathname,
+            activeThemeObject?.$figmaStyleReferences ?? {},
+            figmaStyleMaps.textStyles,
           );
           if (!matchingStyleId || (matchingStyleId && !await trySetStyleId(node, 'text', matchingStyleId))) {
             if (isSingleTypographyValue(values.typography)) {
@@ -211,9 +218,11 @@ export default async function setValuesOnNode(
       if (typeof values.border !== 'undefined' && typeof values.border === 'string') {
         if ('strokes' in node && data.border) {
           const pathname = convertTokenNameToPath(data.border, stylePathPrefix, stylePathSlice);
-          const matchingStyleId = (
-            activeThemeObject?.$figmaStyleReferences?.[pathname]
-            || figmaStyleMaps.paintStyles.get(pathname)?.id
+          const matchingStyleId = matchStyleName(
+            data.border,
+            pathname,
+            activeThemeObject?.$figmaStyleReferences ?? {},
+            figmaStyleMaps.paintStyles,
           );
           if (!matchingStyleId || (matchingStyleId && !await trySetStyleId(node, 'stroke', matchingStyleId))) {
             setColorValuesOnTarget(node, { value: values.border }, 'strokes');
@@ -258,6 +267,9 @@ export default async function setValuesOnNode(
         && typeof values.itemSpacing !== 'undefined'
         && isPrimitiveValue(values.itemSpacing)
       ) {
+        if (node.primaryAxisAlignItems === 'SPACE_BETWEEN') {
+          node.primaryAxisAlignItems = 'MIN';
+        }
         node.itemSpacing = transformValue(String(values.itemSpacing), 'spacing');
       }
 

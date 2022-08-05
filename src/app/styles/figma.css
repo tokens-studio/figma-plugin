@@ -17,3 +17,7 @@
   --shadow-context-menu: 0px 10px 16px rgba(0, 0, 0, 0.35), 0px 2px 5px rgba(0, 0, 0, 0.35),
     inset 0px 0.5px 0px rgba(255, 255, 255, 0.08), inset 0px 0px 0.5px rgba(255, 255, 255, 0.35);
 }
+
+#app {
+  height: 100%;
+}

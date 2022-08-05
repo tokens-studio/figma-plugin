@@ -6,6 +6,7 @@ import { TokenTypes } from '@/constants/TokenTypes';
 type Options = {
   tokens: Record<string, AnyTokenList>;
   tokenSets: string[];
+  resolvedTokens: AnyTokenList;
   includeAllTokens?: boolean;
   includeParent?: boolean;
   expandTypography?: boolean;
@@ -16,6 +17,7 @@ type Options = {
 export default function formatTokens({
   tokens,
   tokenSets,
+  resolvedTokens,
   includeAllTokens = false,
   includeParent = true,
   expandTypography = false,
@@ -24,17 +26,26 @@ export default function formatTokens({
 }: Options) {
   const nestUnderParent = includeAllTokens ? true : includeParent;
   const tokenObj = {};
-
   tokenSets.forEach((tokenSet) => {
-    tokens[tokenSet].forEach((token) => {
+    tokens[tokenSet]?.forEach((token) => {
       const { name, ...tokenWithoutName } = token;
       if (
         (token.type === TokenTypes.TYPOGRAPHY && expandTypography)
         || (token.type === TokenTypes.BOX_SHADOW && expandShadow)
         || (token.type === TokenTypes.COMPOSITION && expandComposition)
       ) {
-        const expanded = expand(tokenWithoutName.value);
-        set(tokenObj, nestUnderParent ? [tokenSet, token.name].join('.') : token.name, { ...expanded });
+        if (typeof token.value === 'string') {
+          const resolvedToken = resolvedTokens.find((t) => t.name === name);
+          if (resolvedToken) {
+            const expanded = expand(resolvedToken?.value);
+            set(tokenObj, nestUnderParent ? [tokenSet, token.name].join('.') : token.name, { ...expanded });
+          } else {
+            set(tokenObj, nestUnderParent ? [tokenSet, token.name].join('.') : token.name, tokenWithoutName);
+          }
+        } else {
+          const expanded = expand(tokenWithoutName.value);
+          set(tokenObj, nestUnderParent ? [tokenSet, token.name].join('.') : token.name, { ...expanded });
+        }
       } else {
         set(tokenObj, nestUnderParent ? [tokenSet, token.name].join('.') : token.name, tokenWithoutName);
       }

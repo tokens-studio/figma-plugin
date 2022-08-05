@@ -1,4 +1,6 @@
+import React from 'react';
 import { renderHook, act } from '@testing-library/react-hooks';
+import { Provider } from 'react-redux';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { BoxShadowTypes } from '@/constants/BoxShadowTypes';
 import useTokens from './useTokens';
@@ -8,14 +10,16 @@ import {
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes, GetThemeInfoMessageResult } from '@/types/AsyncMessages';
 import { createStyles } from '@/plugin/asyncMessageHandlers';
-import { AllTheProviders, resetStore } from '../../../tests/config/setupTest';
+import { AllTheProviders, createMockStore, resetStore } from '../../../tests/config/setupTest';
 import { store } from '../store';
+import { TokenSetStatus } from '@/constants/TokenSetStatus';
 
 type GetFormattedTokensOptions = {
   includeAllTokens: boolean;
   includeParent: boolean;
   expandTypography: boolean;
   expandShadow: boolean;
+  expandComposition: boolean;
 };
 
 const resolvedTokens: AnyTokenList = [
@@ -191,7 +195,7 @@ const resolvedTokens: AnyTokenList = [
   },
 ];
 
-const mockConfirm = jest.fn(() => {});
+const mockConfirm = jest.fn();
 const mockPullStylesHandler = jest.fn(async () => {});
 const mockRemapTokensHandler = jest.fn(async () => {});
 const mockRemoveTokensByValueHandler = jest.fn(async () => {});
@@ -204,6 +208,7 @@ jest.mock('../hooks/useConfirm', () => ({
 }));
 
 describe('useToken test', () => {
+  const mockStore = createMockStore({});
   let { result } = renderHook(() => useTokens(), {
     wrapper: AllTheProviders,
   });
@@ -211,7 +216,7 @@ describe('useToken test', () => {
   beforeEach(() => {
     resetStore();
     result = renderHook(() => useTokens(), {
-      wrapper: AllTheProviders,
+      wrapper: ({ children }: { children?: React.ReactNode }) => <Provider store={mockStore}>{children}</Provider>,
     }).result;
   });
 
@@ -242,6 +247,7 @@ describe('useToken test', () => {
       includeParent: false,
       expandTypography: false,
       expandShadow: false,
+      expandComposition: false,
     };
     expect(result.current.getFormattedTokens(opts)).toBeTruthy();
   });
@@ -251,18 +257,34 @@ describe('useToken test', () => {
   });
 
   it('pullStyles test', async () => {
-    mockConfirm.mockImplementation(() => {
-      Promise.resolve(['textStyles', 'colorStyles', 'effectStyles']);
-    });
+    mockConfirm.mockImplementation(() => Promise.resolve(['textStyles', 'colorStyles', 'effectStyles']));
     await act(async () => {
       await result.current.pullStyles();
     });
     await expect(result.current.pullStyles()).resolves.not.toThrow();
   });
 
-  it('createStylesFromTokens', async () => {
+  describe('createStylesFromTokens', () => {
+    const tokenMockStore = createMockStore({
+      tokenState: {
+        usedTokenSet: { global: TokenSetStatus.ENABLED, light: TokenSetStatus.ENABLED },
+        activeTheme: 'light',
+        themes: [{
+          id: 'light', name: 'Light', selectedTokenSets: {}, $figmaStyleReferences: {},
+        }],
+        tokens: {
+          global: [{ name: 'white', value: '#ffffff', type: TokenTypes.COLOR }, { name: 'headline', value: { fontFamily: 'Inter', fontWeight: 'Bold' }, type: TokenTypes.TYPOGRAPHY }, { name: 'shadow', value: '{shadows.default}', type: TokenTypes.BOX_SHADOW }],
+          light: [{ name: 'bg.default', value: '#ffffff', type: TokenTypes.COLOR }],
+        },
+      },
+    });
+    beforeEach(() => {
+      resetStore();
+      result = renderHook(() => useTokens(), {
+        wrapper: ({ children }: { children?: React.ReactNode }) => <Provider store={tokenMockStore}>{children}</Provider>,
+      }).result;
+    });
     const messageSpy = jest.spyOn(AsyncMessageChannel.ReactInstance, 'message');
-
     const runAfter: (() => void)[] = [];
     runAfter.push(AsyncMessageChannel.ReactInstance.connect());
     runAfter.push(AsyncMessageChannel.PluginInstance.connect());
@@ -275,14 +297,81 @@ describe('useToken test', () => {
       themes: [],
     }));
     AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.CREATE_STYLES, createStyles);
-    await result.current.createStylesFromTokens();
 
-    expect(messageSpy).toBeCalledWith({
-      type: AsyncMessageTypes.CREATE_STYLES,
-      tokens: [],
-      settings: store.getState().settings,
+    it('creates all styles', async () => {
+      mockConfirm.mockImplementation(() => Promise.resolve({ data: ['textStyles', 'colorStyles', 'effectStyles'] }));
+
+      await act(async () => {
+        await result.current.createStylesFromTokens();
+      });
+
+      expect(messageSpy).toBeCalledWith({
+        type: AsyncMessageTypes.CREATE_STYLES,
+        tokens: [
+          {
+            internal__Parent: 'light',
+            name: 'bg.default',
+            rawValue: '#ffffff',
+            type: 'color',
+            value: '#ffffff',
+          },
+          {
+            internal__Parent: 'global',
+            name: 'white',
+            rawValue: '#ffffff',
+            type: 'color',
+            value: '#ffffff',
+          },
+          {
+            internal__Parent: 'global',
+            name: 'headline',
+            rawValue: {
+              fontFamily: 'Inter',
+              fontWeight: 'Bold',
+            },
+            type: 'typography',
+            value: {
+              fontFamily: 'Inter',
+              fontWeight: 'Bold',
+            },
+          },
+          {
+            failedToResolve: true,
+            internal__Parent: 'global',
+            name: 'shadow',
+            rawValue: '{shadows.default}',
+            type: 'boxShadow',
+            value: '{shadows.default}',
+          },
+        ],
+        settings: store.getState().settings,
+      });
     });
+    it('respects decision to only create text styles', async () => {
+      mockConfirm.mockImplementation(() => Promise.resolve({ data: ['textStyles'] }));
 
-    runAfter.forEach((fn) => fn());
+      await act(async () => {
+        await result.current.createStylesFromTokens();
+      });
+
+      expect(messageSpy).toBeCalledWith({
+        type: AsyncMessageTypes.CREATE_STYLES,
+        tokens: [{
+          internal__Parent: 'global',
+          name: 'headline',
+          rawValue: {
+            fontFamily: 'Inter',
+            fontWeight: 'Bold',
+          },
+          type: 'typography',
+          value: {
+            fontFamily: 'Inter',
+            fontWeight: 'Bold',
+          },
+        },
+        ],
+        settings: store.getState().settings,
+      });
+    });
   });
 });

@@ -1,9 +1,11 @@
 import { ThemeObjectsList } from '@/types';
 import { AnyTokenSet } from '@/types/tokens';
-import { RemoteTokenStorage, RemoteTokenStorageFile } from './RemoteTokenStorage';
+import { RemoteTokenStorage, RemoteTokenstorageErrorMessage, RemoteTokenStorageFile } from './RemoteTokenStorage';
 import { singleFileSchema } from './schemas/singleFileSchema';
 import IsJSONString from '@/utils/isJSONString';
-import { tokensMapSchema } from './schemas/tokensMapSchema';
+import { SystemFilenames } from './SystemFilenames';
+import { ErrorMessages } from '@/constants/ErrorMessages';
+import { complexSingleFileSchema } from './schemas';
 
 type UrlData = {
   values: Record<string, AnyTokenSet<false>>
@@ -25,7 +27,7 @@ export class UrlTokenStorage extends RemoteTokenStorage {
     return [
       {
         type: 'themes',
-        path: '$themes.json',
+        path: `${SystemFilenames.THEMES}.json`,
         data: data.$themes ?? [],
       },
       ...Object.entries(data.values).map<RemoteTokenStorageFile>(([name, tokenSet]) => ({
@@ -37,7 +39,7 @@ export class UrlTokenStorage extends RemoteTokenStorage {
     ];
   }
 
-  public async read(): Promise<RemoteTokenStorageFile[]> {
+  public async read(): Promise<RemoteTokenStorageFile[] | RemoteTokenstorageErrorMessage> {
     const customHeaders = IsJSONString(this.secret)
       ? JSON.parse(this.secret) as Record<string, string>
       : {};
@@ -62,11 +64,14 @@ export class UrlTokenStorage extends RemoteTokenStorage {
       }
 
       // @README if not this is an older format where we just have tokens
-      const onlyTokensValidationResult = await tokensMapSchema.safeParseAsync(parsedJsonData);
+      const onlyTokensValidationResult = await complexSingleFileSchema.safeParseAsync(parsedJsonData);
       if (onlyTokensValidationResult.success) {
         const urlstorageData = onlyTokensValidationResult.data as UrlData['values'];
         return this.convertUrlDataToFiles({ values: urlstorageData });
       }
+      return {
+        errorMessage: ErrorMessages.VALIDATION_ERROR,
+      };
     }
 
     return [];

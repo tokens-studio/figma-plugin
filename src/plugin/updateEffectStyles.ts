@@ -11,12 +11,12 @@ export default function updateEffectStyles(effectTokens: SingleBoxShadowToken<tr
   effectTokens.forEach((token) => {
     if (effectStylesToKeyMap.has(token.path)) {
       const effectStyle = effectStylesToKeyMap.get(token.path)!;
-      tokenToStyleMap[token.path] = effectStyle.id;
+      tokenToStyleMap[token.name] = effectStyle.id;
       setEffectValuesOnTarget(effectStyle, token);
     } else if (shouldCreate) {
       const style = figma.createEffectStyle();
       style.name = token.path;
-      tokenToStyleMap[token.path] = style.id;
+      tokenToStyleMap[token.name] = style.id;
       setEffectValuesOnTarget(style, token);
     }
   });

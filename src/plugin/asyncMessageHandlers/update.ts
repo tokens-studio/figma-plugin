@@ -9,11 +9,6 @@ import updateStyles from '../updateStyles';
 
 export const update: AsyncMessageChannelHandlers[AsyncMessageTypes.UPDATE] = async (msg) => {
   let receivedStyleIds: Record<string, string> = {};
-
-  if (msg.settings.updateStyles && msg.tokens) {
-    receivedStyleIds = await updateStyles(msg.tokens, false, msg.settings);
-  }
-
   if (msg.tokenValues && msg.updatedAt) {
     await updateLocalTokensData({
       tokens: msg.tokenValues,
@@ -23,6 +18,9 @@ export const update: AsyncMessageChannelHandlers[AsyncMessageTypes.UPDATE] = asy
       updatedAt: msg.updatedAt,
       checkForChanges: msg.checkForChanges ?? false,
     });
+  }
+  if (msg.settings.updateStyles && msg.tokens) {
+    receivedStyleIds = await updateStyles(msg.tokens, false, msg.settings);
   }
   if (msg.tokens) {
     const tokensMap = tokenArrayGroupToMap(msg.tokens);

@@ -1,3 +1,4 @@
+import { EditTokenFormStatus } from '@/constants/EditTokenFormStatus';
 import { SingleBorderRadiusToken } from './SingleBorderRadiusToken';
 import { SingleBorderWidthToken } from './SingleBorderWidthToken';
 import { SingleBoxShadowToken } from './SingleBoxShadowToken';
@@ -21,7 +22,7 @@ import type { TokenTypeSchema } from './TokenTypeSchema';
 
 type EditTokenObjectProperties = {
   initialName: string;
-  isPristine: boolean;
+  status: EditTokenFormStatus;
   schema: TokenTypeSchema;
 };
 

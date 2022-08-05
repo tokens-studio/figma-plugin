@@ -3,8 +3,14 @@ import compact from 'just-compact';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StorageTypeCredentials } from '@/types/StorageType';
 import { GitStorageMetadata, GitTokenStorage } from './GitTokenStorage';
-import { RemoteTokenStorageFile, RemoteTokenStorageSingleTokenSetFile, RemoteTokenStorageThemesFile } from './RemoteTokenStorage';
-import { complexSingleFileSchema, multiFileSchema } from './schemas';
+import {
+  RemoteTokenstorageErrorMessage,
+  RemoteTokenStorageFile, RemoteTokenStorageMetadataFile, RemoteTokenStorageSingleTokenSetFile, RemoteTokenStorageThemesFile,
+} from './RemoteTokenStorage';
+import { multiFileSchema, complexSingleFileSchema } from './schemas';
+import { SystemFilenames } from './SystemFilenames';
+import { ErrorMessages } from '@/constants/ErrorMessages';
+import { AnyTokenSet } from '@/types/tokens';
 
 const apiVersion = 'api-version=6.0';
 
@@ -230,7 +236,7 @@ export class ADOTokenStorage extends GitTokenStorage {
     }
   }
 
-  public async read(): Promise<RemoteTokenStorageFile<GitStorageMetadata>[]> {
+  public async read(): Promise<RemoteTokenStorageFile<GitStorageMetadata>[] | RemoteTokenstorageErrorMessage> {
     try {
       if (!this.path.endsWith('.json')) {
         const { value } = await this.getItems();
@@ -256,7 +262,7 @@ export class ADOTokenStorage extends GitTokenStorage {
           const { path } = jsonFiles[index];
           if (fileContent) {
             const name = path?.replace(this.path, '')?.replace(/^\/+/, '')?.replace('.json', '');
-            if (name === '$themes' && Array.isArray(fileContent)) {
+            if (name === SystemFilenames.THEMES && Array.isArray(fileContent)) {
               return {
                 path,
                 type: 'themes',
@@ -265,6 +271,14 @@ export class ADOTokenStorage extends GitTokenStorage {
             }
 
             if (!Array.isArray(fileContent)) {
+              if (name === SystemFilenames.METADATA) {
+                return {
+                  path,
+                  type: 'metadata',
+                  data: fileContent,
+                } as RemoteTokenStorageMetadataFile<GitStorageMetadata>;
+              }
+
               return {
                 path,
                 name,
@@ -282,7 +296,7 @@ export class ADOTokenStorage extends GitTokenStorage {
       const singleItemValidationResult = await complexSingleFileSchema.safeParseAsync(singleItem);
 
       if (singleItemValidationResult.success) {
-        const { $themes = [], ...data } = singleItemValidationResult.data;
+        const { $themes = [], $metadata, ...data } = singleItemValidationResult.data;
 
         return [
           {
@@ -290,7 +304,16 @@ export class ADOTokenStorage extends GitTokenStorage {
             path: this.path,
             data: Array.isArray($themes) ? $themes : [],
           },
-          ...Object.entries(data).map<RemoteTokenStorageFile<GitStorageMetadata>>(([name, tokenSet]) => ({
+          ...($metadata ? [
+            {
+              type: 'metadata' as const,
+              path: this.path,
+              data: $metadata,
+            },
+          ] : []),
+          ...(Object.entries(data).filter(([key]) => (
+            !Object.values<string>(SystemFilenames).includes(key)
+          )) as [string, AnyTokenSet<false>][]).map<RemoteTokenStorageFile<GitStorageMetadata>>(([name, tokenSet]) => ({
             name,
             type: 'tokenSet',
             path: this.path,
@@ -298,6 +321,9 @@ export class ADOTokenStorage extends GitTokenStorage {
           })),
         ];
       }
+      return {
+        errorMessage: ErrorMessages.VALIDATION_ERROR,
+      };
     } catch (e) {
       console.log(e);
     }

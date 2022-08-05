@@ -5,9 +5,11 @@ import IsJSONString from '@/utils/isJSONString';
 import {
   GitMultiFileObject, GitSingleFileObject, GitStorageMetadata, GitTokenStorage,
 } from './GitTokenStorage';
-import { RemoteTokenStorageFile } from './RemoteTokenStorage';
+import { RemoteTokenstorageErrorMessage, RemoteTokenStorageFile } from './RemoteTokenStorage';
 import { AnyTokenSet } from '@/types/tokens';
 import { ThemeObjectsList } from '@/types';
+import { SystemFilenames } from './SystemFilenames';
+import { ErrorMessages } from '@/constants/ErrorMessages';
 
 enum GitLabAccessLevel {
   NoAccess = 0,
@@ -102,7 +104,7 @@ export class GitlabTokenStorage extends GitTokenStorage {
     return false;
   }
 
-  public async read(): Promise<RemoteTokenStorageFile<GitStorageMetadata>[]> {
+  public async read(): Promise<RemoteTokenStorageFile<GitStorageMetadata>[] | RemoteTokenstorageErrorMessage> {
     if (!this.projectId) throw new Error('Missing Project ID');
 
     try {
@@ -129,11 +131,19 @@ export class GitlabTokenStorage extends GitTokenStorage {
             const name = path.replace('.json', '').replace(this.path, '').replace(/^\//, '').replace(/\/$/, '');
             const parsed = JSON.parse(fileContent) as GitMultiFileObject;
 
-            if (name === '$themes') {
+            if (name === SystemFilenames.THEMES) {
               return {
                 path,
                 type: 'themes',
                 data: parsed as ThemeObjectsList,
+              };
+            }
+
+            if (name === SystemFilenames.METADATA) {
+              return {
+                path,
+                type: 'metadata',
+                data: parsed as GitStorageMetadata,
               };
             }
 
@@ -155,10 +165,12 @@ export class GitlabTokenStorage extends GitTokenStorage {
         return [
           {
             type: 'themes',
-            path: `${this.path}/$themes.json`,
+            path: `${this.path}/${SystemFilenames.THEMES}.json`,
             data: parsed.$themes ?? [],
           },
-          ...(Object.entries(parsed).filter(([key]) => key !== '$themes') as [string, AnyTokenSet<false>][]).map<RemoteTokenStorageFile<GitStorageMetadata>>(([name, tokenSet]) => ({
+          ...(Object.entries(parsed).filter(([key]) => (
+            !Object.values<string>(SystemFilenames).includes(key)
+          )) as [string, AnyTokenSet<false>][]).map<RemoteTokenStorageFile<GitStorageMetadata>>(([name, tokenSet]) => ({
             name,
             type: 'tokenSet',
             path: `${this.path}/${name}.json`,
@@ -166,12 +178,13 @@ export class GitlabTokenStorage extends GitTokenStorage {
           })),
         ];
       }
+      return {
+        errorMessage: ErrorMessages.VALIDATION_ERROR,
+      };
     } catch (err) {
       // Raise error (usually this is an auth error)
       console.error(err);
-      return [];
     }
-
     return [];
   }
 

@@ -53,4 +53,22 @@ describe('Testing the mock functionality of the AsyncMessageChannel', () => {
 
     runAfter.forEach((fn) => fn());
   });
+
+  it('should handle errors', async () => {
+    const runAfter: (() => void)[] = [];
+
+    const getThemeInfoHandler = async (): Promise<GetThemeInfoMessageResult> => {
+      throw new Error('error');
+    };
+
+    runAfter.push(AsyncMessageChannel.PluginInstance.connect());
+    AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.GET_THEME_INFO, getThemeInfoHandler);
+
+    runAfter.push(AsyncMessageChannel.ReactInstance.connect());
+    expect(AsyncMessageChannel.ReactInstance.message({
+      type: AsyncMessageTypes.GET_THEME_INFO,
+    })).rejects.toEqual(new Error('error'));
+
+    runAfter.forEach((fn) => fn());
+  });
 });
