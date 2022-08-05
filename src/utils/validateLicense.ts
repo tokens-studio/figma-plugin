@@ -7,7 +7,7 @@ export default async function validateLicense(
 ): Promise<{ plan?: string; entitlements?: Entitlements[]; email?: string; error?: string }> {
   try {
     const res = await fetch(
-      `${process.env.LICENSE_API_URL}/validate-license?licenseKey=${licenseKey}&userId=${userId}&userName=${userName}`,
+      `${process.env.LICENSE_API_URL}/validate-license?licenseKey=${licenseKey}&userId=${userId}${userName ? `&userName=${userName}` : ''}`,
     );
 
     if (res.status === 200) {
