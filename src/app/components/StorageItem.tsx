@@ -8,6 +8,7 @@ import { storageTypeSelector } from '@/selectors';
 import { StyledStorageItem } from './StyledStorageItem';
 import type { StorageTypeCredentials } from '@/types/StorageType';
 import { isGitProvider } from '@/utils/is';
+import Box from './Box';
 
 type Props = {
   item: StorageTypeCredentials,
@@ -42,11 +43,18 @@ const StorageItem = ({ item, onEdit }: Props) => {
       key={`${provider}-${id}`}
       active={isActive()}
     >
-      <div className="flex flex-col grow items-start">
+      <Box css={{
+        alignItems: 'flex-start', flexDirection: 'column', flexGrow: '1', display: 'flex', width: '80%',
+      }}
+      >
         <div className="text-xs font-bold">{name}</div>
+        <Box css={{
+          whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', opacity: '0.75', fontSize: '$xxsmall', maxWidth: '100%',
+        }}
+        >
+          {id}
+        </Box>
         <div className="opacity-75 text-xxs">
-          {id}{id}{id}
-          {' '}
           {branch && ` (${branch})`}
         </div>
         {!isActive() && (
@@ -58,7 +66,7 @@ const StorageItem = ({ item, onEdit }: Props) => {
             Delete local credentials
           </button>
         )}
-      </div>
+      </Box>
       <div className="space-x-2 flex-nowrap flex items-center">
         {onEdit && (
           <Button id="button-storageitem-edit" variant="secondary" onClick={onEdit}>
