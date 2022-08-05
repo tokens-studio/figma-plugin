@@ -67,9 +67,7 @@ describe('GithubTokenStorage', () => {
 
   it('should return false when creating a branch is failed', async () => {
     mockGetRef.mockImplementationOnce(() => (
-      Promise.reject({
-        error: 'fetching ref is failed',
-      })
+      Promise.reject()
     ));
     expect(await storageProvider.createBranch('development', 'main')).toBe(false);
   });
@@ -458,7 +456,7 @@ describe('GithubTokenStorage', () => {
     });
 
     mockCreateTree.mockImplementationOnce(() => (
-      Promise.reject({ error: 'can\'t create a tree' })
+      Promise.reject()
     ));
 
     mockGetTree.mockImplementationOnce(() => (
@@ -558,7 +556,7 @@ describe('GithubTokenStorage', () => {
     });
 
     mockCreateTree.mockImplementationOnce(() => (
-      Promise.reject({ error: 'can\'t create a tree' })
+      Promise.reject()
     ));
 
     mockGetTree.mockImplementationOnce(() => (
