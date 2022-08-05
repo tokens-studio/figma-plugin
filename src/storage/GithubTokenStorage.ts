@@ -152,6 +152,8 @@ export class GithubTokenStorage extends GitTokenStorage {
             ref: this.branch,
             headers: octokitClientDefaultHeaders,
           });
+          console.log('44444444', filteredPath, 'pared', parentPath);
+          console.log('6666', parentDirectoryTreeResponse.data);
           if (Array.isArray(parentDirectoryTreeResponse.data)) {
             const directory = parentDirectoryTreeResponse.data.find((item) => item.path === filteredPath);
             if (directory) {
@@ -164,6 +166,7 @@ export class GithubTokenStorage extends GitTokenStorage {
               });
             }
           } else if (parentDirectoryTreeResponse.data.path === filteredPath) {
+            console.log('88888888888888');
             treeResponse = await this.octokitClient.rest.git.getTree({
               owner: this.owner,
               repo: this.repository,
@@ -173,13 +176,13 @@ export class GithubTokenStorage extends GitTokenStorage {
             });
           }
         }
+        console.log('tree', treeResponse);
         if (treeResponse && treeResponse.data.tree.length > 0) {
           const jsonFiles = treeResponse.data.tree.filter((file) => (
             file.path?.endsWith('.json')
           )).sort((a, b) => (
             (a.path && b.path) ? a.path.localeCompare(b.path) : 0
           ));
-
           const jsonFileContents = await Promise.all(jsonFiles.map((treeItem) => (
             treeItem.path ? this.octokitClient.rest.repos.getContent({
               owner: this.owner,
@@ -189,6 +192,7 @@ export class GithubTokenStorage extends GitTokenStorage {
               headers: octokitClientDefaultHeaders,
             }) : Promise.resolve(null)
           )));
+          console.log('jsonfilecontes', jsonFileContents);
           return compact(jsonFileContents.map<RemoteTokenStorageFile<GitStorageMetadata> | null>((fileContent, index) => {
             const { path } = jsonFiles[index];
             if (
@@ -226,7 +230,7 @@ export class GithubTokenStorage extends GitTokenStorage {
                 data: parsed as AnyTokenSet<false>,
               };
             }
-
+            console.log('nul');
             return null;
           }));
         }
@@ -254,9 +258,11 @@ export class GithubTokenStorage extends GitTokenStorage {
           errorMessage: ErrorMessages.VALIDATION_ERROR,
         };
       }
+      console.log('1111111');
 
       return [];
     } catch (e) {
+      console.log('1111111eerrrr');
       // Raise error (usually this is an auth error)
       console.log('Error', e);
       return [];
