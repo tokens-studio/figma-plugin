@@ -47,16 +47,15 @@ const StorageItem = ({ item, onEdit }: Props) => {
         alignItems: 'flex-start', flexDirection: 'column', flexGrow: '1', display: 'flex', width: '80%',
       }}
       >
-        <div className="text-xs font-bold">{name}</div>
+        <Box css={{ fontSize: '$small', fontWeight: '$bold' }}>{name}</Box>
         <Box css={{
-          whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', opacity: '0.75', fontSize: '$xxsmall', maxWidth: '100%',
+          whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', opacity: '0.75', fontSize: '$xsmall', maxWidth: '100%',
         }}
         >
           {id}
-        </Box>
-        <div className="opacity-75 text-xxs">
+          {' '}
           {branch && ` (${branch})`}
-        </div>
+        </Box>
         {!isActive() && (
           <button
             type="button"
