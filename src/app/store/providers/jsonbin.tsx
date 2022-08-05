@@ -136,8 +136,10 @@ export function useJSONbin() {
       }
       if (data?.metadata && data?.tokens) {
         dispatch.tokenState.setEditProhibited(false);
-
-        return data;
+        return {
+          ...data,
+          metadata: {}
+        }
       }
       notifyToUI('No tokens stored on remote', { error: true });
       return null;
@@ -185,6 +187,7 @@ export function useJSONbin() {
         },
         shouldSetInDocument: true,
       });
+      console.log("metaData", content.metadata)
       saveLastSyncedState(dispatch, content.tokens, content.themes, {});
       dispatch.tokenState.setTokenData({
         values: content.tokens,
