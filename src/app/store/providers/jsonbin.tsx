@@ -187,7 +187,6 @@ export function useJSONbin() {
         },
         shouldSetInDocument: true,
       });
-      console.log("metaData", content.metadata)
       saveLastSyncedState(dispatch, content.tokens, content.themes, {});
       dispatch.tokenState.setTokenData({
         values: content.tokens,
