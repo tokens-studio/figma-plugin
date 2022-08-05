@@ -9,7 +9,7 @@ import { OptionalPartial } from './OptionalPartial';
 export type GenericStorageType<T extends StorageProviderType = StorageProviderType, P = unknown> = P & {
   provider: T;
 } & (T extends StorageProviderType.LOCAL
-  ? {}
+  ? unknown
   : {
     internalId: string;
   });

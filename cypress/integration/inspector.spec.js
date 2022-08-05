@@ -1,4 +1,45 @@
+import {
+  StorageProviderType
+} from '@/constants/StorageProviderType';
+import { UpdateMode } from '@/constants/UpdateMode';
+
+
 describe('Inspector tokens', () => {
+  const mockStartupParams = {
+    activeTheme: null,
+    lastOpened: Date.now(),
+    localApiProviders: [],
+    licenseKey: null,
+    settings: {
+      width: 800,
+      height: 500,
+      ignoreFirstPartForStyles: false,
+      inspectDeep: false,
+      prefixStylesWithThemeName: false,
+      showEmptyGroups: true,
+      updateMode: UpdateMode.PAGE,
+      updateOnChange: false,
+      updateRemote: true,
+      updateStyles: true,
+    },
+    storageType: { provider: StorageProviderType.LOCAL },
+    user: {
+      figmaId: 'figma:1234',
+      userId: 'uid:1234',
+      name: 'Jan Six',
+    },
+    localTokenData: {
+      activeTheme: null,
+      checkForChanges: false,
+      themes: [],
+      usedTokenSet: {},
+      updatedAt: new Date().toISOString(),
+      values: {
+      },
+      version: '91',
+    },
+  }
+
   beforeEach(() => {
     cy.visit('/', {
       onBeforeLoad(win) {
@@ -9,6 +50,8 @@ describe('Inspector tokens', () => {
   });
 
   it('successfully shows tokens applied on the node', () => {
+    cy.startup(mockStartupParams);
+    cy.get('[data-cy="button-configure"]').should('be.visible');
     cy.receiveSetTokens({
       version: '5',
       values: {
@@ -83,6 +126,8 @@ describe('Inspector tokens', () => {
   });
 
   it('successfully remaps a token', () => {
+    cy.startup(mockStartupParams);
+    cy.get('[data-cy="button-configure"]').should('be.visible');
     cy.receiveSetTokens({
       version: '5',
       values: {

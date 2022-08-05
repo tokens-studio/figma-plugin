@@ -17,18 +17,26 @@ type Props = {
   onSubmit: (values: StorageTypeFormValues<false>) => void;
   isNew?: boolean;
   hasErrored?: boolean;
+  errorMessage?: string;
 };
 
 export default function StorageItemForm({
-  isNew = false, onChange, onSubmit, onCancel, values, hasErrored,
+  isNew = false, onChange, onSubmit, onCancel, values, hasErrored, errorMessage,
 }: Props) {
   const { bitBucketSync } = useFlags();
-  
+
   switch (values.provider) {
     case StorageProviderType.GITHUB:
     case StorageProviderType.GITLAB: {
       return (
-        <GitForm onChange={onChange} onSubmit={onSubmit} onCancel={onCancel} values={values} hasErrored={hasErrored} />
+        <GitForm
+          onChange={onChange}
+          onSubmit={onSubmit}
+          onCancel={onCancel}
+          values={values}
+          hasErrored={hasErrored}
+          errorMessage={errorMessage}
+        />
       );
     }
     case StorageProviderType.BITBUCKET: {
@@ -39,17 +47,32 @@ export default function StorageItemForm({
           onCancel={onCancel}
           values={values}
           hasErrored={hasErrored}
+          errorMessage={errorMessage}
         />
       ) : null;
     }
     case StorageProviderType.ADO: {
       return (
-        <ADOForm onChange={onChange} onSubmit={onSubmit} onCancel={onCancel} values={values} hasErrored={hasErrored} />
+        <ADOForm
+          onChange={onChange}
+          onSubmit={onSubmit}
+          onCancel={onCancel}
+          values={values}
+          hasErrored={hasErrored}
+          errorMessage={errorMessage}
+        />
       );
     }
     case StorageProviderType.URL: {
       return (
-        <URLForm onChange={onChange} onSubmit={onSubmit} onCancel={onCancel} values={values} hasErrored={hasErrored} />
+        <URLForm
+          onChange={onChange}
+          onSubmit={onSubmit}
+          onCancel={onCancel}
+          values={values}
+          hasErrored={hasErrored}
+          errorMessage={errorMessage}
+        />
       );
     }
     case StorageProviderType.JSONBIN: {
@@ -61,6 +84,7 @@ export default function StorageItemForm({
           onCancel={onCancel}
           values={values}
           hasErrored={hasErrored}
+          errorMessage={errorMessage}
         />
       );
     }

@@ -169,7 +169,9 @@ const Input = React.forwardRef<HTMLInputElement, Props>(({
       {(!!label || !!error) && (
         <Stack direction="row" justify="between" align="center" css={{ marginBottom: '$1' }}>
           {label ? <div className={capitalize ? 'capitalize' : undefined}>{label}</div> : null}
-          {error ? <div className="text-red-500 font-bold">{error}</div> : null}
+          {error ? (
+            <div className="text-red-500 font-bold">{error}</div>
+          ) : null}
         </Stack>
       )}
       <Box css={{ display: 'flex', position: 'relative', width: full ? '100%' : '' }} className="input">

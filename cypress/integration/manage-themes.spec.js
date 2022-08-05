@@ -1,3 +1,8 @@
+import {
+  StorageProviderType
+} from '@/constants/StorageProviderType';
+import { UpdateMode } from '@/constants/UpdateMode';
+
 const createTokenSet = ({ name }) => {
   cy.get('[data-cy="button-new-token-set"]').click({ timeout: 1000 })
       .get('[data-cy="token-set-input"]')
@@ -5,6 +10,40 @@ const createTokenSet = ({ name }) => {
 };
 
 describe('TokenListing', () => {
+  const mockStartupParams = {
+    activeTheme: null,
+    lastOpened: Date.now(),
+    localApiProviders: [],
+    licenseKey: null,
+    settings: {
+      width: 800,
+      height: 500,
+      ignoreFirstPartForStyles: false,
+      inspectDeep: false,
+      prefixStylesWithThemeName: false,
+      showEmptyGroups: true,
+      updateMode: UpdateMode.PAGE,
+      updateOnChange: false,
+      updateRemote: true,
+      updateStyles: true,
+    },
+    storageType: { provider: StorageProviderType.LOCAL },
+    user: {
+      figmaId: 'figma:1234',
+      userId: 'uid:1234',
+      name: 'Jan Six',
+    },
+    localTokenData: {
+      activeTheme: null,
+      checkForChanges: false,
+      themes: [],
+      usedTokenSet: {},
+      updatedAt: new Date().toISOString(),
+      values: {},
+      version: '91',
+    },
+  }
+
   beforeEach(() => {
     cy.visit('/', {
       onBeforeLoad(win) {
@@ -15,6 +54,8 @@ describe('TokenListing', () => {
   });
 
   it('create token set', () => {
+    cy.startup(mockStartupParams);
+    cy.get('[data-cy="button-configure"]').should('be.visible');
     cy.receiveSetTokens({
       version: '5',
       values: {
@@ -30,14 +71,15 @@ describe('TokenListing', () => {
         }],
       },
     });
-    cy.receiveStorageTypeLocal();
-    
+
     createTokenSet({ name: 'token-source' });
     createTokenSet({ name: 'token-enabled' });
     createTokenSet({ name: 'token-disabled' });
   });
-  
+
   it('Can create a new theme & select theme', () => {
+    cy.startup(mockStartupParams);
+    cy.get('[data-cy="button-configure"]').should('be.visible');
     cy.receiveSetTokens({
       version: '5',
       values: {
@@ -53,7 +95,6 @@ describe('TokenListing', () => {
         }],
       },
     });
-    cy.receiveStorageTypeLocal();
 
     createTokenSet({ name: 'token-source' });
     createTokenSet({ name: 'token-enabled' });

@@ -12,6 +12,7 @@ import {
   mockGetTree,
   mockListBranches,
 } from '../../../tests/__mocks__/octokitRestMock';
+import { ErrorMessages } from '@/constants/ErrorMessages';
 
 describe('GithubTokenStorage', () => {
   const storageProvider = new GithubTokenStorage('', 'six7', 'figma-tokens');
@@ -165,6 +166,7 @@ describe('GithubTokenStorage', () => {
 
     storageProvider.changePath('data/tokens.json');
     expect(await storageProvider.retrieve()).toEqual({
+      status: 'success',
       themes: [
         {
           id: 'light',
@@ -200,12 +202,41 @@ describe('GithubTokenStorage', () => {
     });
   });
 
+  it('should return error message about invalid data', async () => {
+    storageProvider.changePath('data/tokens.json');
+    mockGetContent.mockImplementation(() => (
+      Promise.resolve({
+        data: {
+          content: 'RW1wdHkgZmlsZQ==',
+        },
+      })
+    ));
+
+    expect(await storageProvider.retrieve()).toEqual({
+      status: 'failure',
+      errorMessage: ErrorMessages.VALIDATION_ERROR,
+    });
+  });
+
   it('can handle invalid file content', async () => {
     mockGetContent.mockImplementationOnce(() => (
       Promise.resolve({
         data: {
           content: 'RW1wdHkgZmlsZQ==',
         },
+      })
+    ));
+
+    storageProvider.changePath('data/tokens.json');
+    expect(await storageProvider.read()).toEqual({
+      errorMessage: ErrorMessages.VALIDATION_ERROR,
+    });
+  });
+
+  it('should empty array when there is no content', async () => {
+    mockGetContent.mockImplementationOnce(() => (
+      Promise.resolve({
+        data: {},
       })
     ));
 

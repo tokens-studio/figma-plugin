@@ -267,6 +267,9 @@ export default async function setValuesOnNode(
         && typeof values.itemSpacing !== 'undefined'
         && isPrimitiveValue(values.itemSpacing)
       ) {
+        if (node.primaryAxisAlignItems === 'SPACE_BETWEEN') {
+          node.primaryAxisAlignItems = 'MIN';
+        }
         node.itemSpacing = transformValue(String(values.itemSpacing), 'spacing');
       }
 

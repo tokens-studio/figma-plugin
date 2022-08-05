@@ -6,7 +6,7 @@ import { Dispatch } from '../store';
 import { ConfirmProps } from '../store/models/uiState';
 import { confirmStateSelector } from '@/selectors';
 
-type ResolveCallbackPayload<C = any> = false | {
+export type ResolveCallbackPayload<C = any> = false | {
   result: true;
   data: C;
 };

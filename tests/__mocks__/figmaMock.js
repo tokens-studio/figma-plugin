@@ -59,12 +59,17 @@ module.exports.mockParentPostMessage = jest.fn((data) => {
     .filter(([eventName]) => eventName === 'message')
     .forEach(([,handler]) => handler(data.pluginMessage))
 });
+module.exports.mockGetNodeById = jest.fn();
+module.exports.mockScrollAndZoomIntoView = jest.fn();
 
 module.exports.figma = {
   showUI: module.exports.mockShowUI,
   on: module.exports.mockOn,
   currentPage: {
     selection: [],
+  },
+  viewport: {
+    scrollAndZoomIntoView: module.exports.mockScrollAndZoomIntoView,
   },
   clientStorage: {
     getAsync: module.exports.mockGetAsync,
@@ -88,6 +93,7 @@ module.exports.figma = {
   createPaintStyle: module.exports.mockCreatePaintStyle,
   createEffectStyle: module.exports.mockCreateEffectStyle,
   importStyleByKeyAsync: module.exports.mockImportStyleByKeyAsync,
+  getNodeById: module.exports.mockGetNodeById,
 };
 
 parent.postMessage = module.exports.mockParentPostMessage;
