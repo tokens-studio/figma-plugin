@@ -45,7 +45,7 @@ export const initiate: AsyncMessageChannelHandlers[AsyncMessageTypes.INITIATE] =
         {
           ...oldTokens, activeTheme, usedTokenSet, storageType,
         },
-        { userId: currentUser?.id, licenseKey },
+        { userId: currentUser?.id, licenseKey, userName: currentUser?.name },
       );
     } else {
       notifyNoTokenValues();
