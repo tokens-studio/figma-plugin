@@ -49,7 +49,7 @@ const StorageItem = ({ item, onEdit }: Props) => {
       active={isActive()}
     >
       <Box css={{
-        alignItems: 'flex-start', flexDirection: 'column', flexGrow: '1', display: 'flex', width: '80%',
+        alignItems: 'flex-start', flexDirection: 'column', flexGrow: '1', display: 'flex', overflow: 'hidden',
       }}
       >
         <Box css={{ fontSize: '$small', fontWeight: '$bold' }}>{name}</Box>
@@ -69,7 +69,7 @@ const StorageItem = ({ item, onEdit }: Props) => {
           Delete local credentials
         </button>
       </Box>
-      <div className="space-x-2 flex-nowrap flex items-center">
+      <div className="flex items-center space-x-2 flex-nowrap">
         {onEdit && (
           <Button id="button-storageitem-edit" variant="secondary" onClick={onEdit}>
             Edit
