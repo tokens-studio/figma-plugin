@@ -632,6 +632,14 @@ describe('GitlabTokenStorage', () => {
           action: 'delete',
           filePath: 'data/internal.json',
         },
+        {
+          action: 'delete',
+          filePath: 'data/core.json',
+        },
+        {
+          action: 'delete',
+          filePath: 'data/internal.json',
+        },
       ],
       undefined,
     );
