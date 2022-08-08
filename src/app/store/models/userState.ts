@@ -123,7 +123,7 @@ export const userState = createModel<RootModel>()({
         if (error) {
           notifyToUI('Error removing license, please contact support', { error: true });
         } else {
-          await AsyncMessageChannel.ReactInstance.message({
+          AsyncMessageChannel.ReactInstance.message({
             type: AsyncMessageTypes.SET_LICENSE_KEY,
             licenseKey: null,
           });
