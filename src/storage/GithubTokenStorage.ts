@@ -123,55 +123,33 @@ export class GithubTokenStorage extends GitTokenStorage {
       if (Array.isArray(response.data)) {
         let treeResponse;
         const filteredPath = this.path.replace(/^\/+/, '');
-        try {
-          const directoryTreeResponse = await this.octokitClient.rest.git.createTree({
-            owner: this.owner,
-            repo: this.repository,
-            tree: response.data.map((item) => ({
-              path: item.path,
-              sha: item.sha,
-              mode: getTreeMode(item.type),
-            })),
-            headers: octokitClientDefaultHeaders,
-          });
-          if (directoryTreeResponse.data.sha) {
+        const parentPath = filteredPath.includes('/') ? filteredPath.slice(0, filteredPath.lastIndexOf('/')) : '';
+        const parentDirectoryTreeResponse = await this.octokitClient.rest.repos.getContent({
+          owner: this.owner,
+          repo: this.repository,
+          path: parentPath,
+          ref: this.branch,
+          headers: octokitClientDefaultHeaders,
+        });
+        if (Array.isArray(parentDirectoryTreeResponse.data)) {
+          const directory = parentDirectoryTreeResponse.data.find((item) => item.path === filteredPath);
+          if (directory) {
             treeResponse = await this.octokitClient.rest.git.getTree({
               owner: this.owner,
               repo: this.repository,
-              tree_sha: directoryTreeResponse.data.sha,
+              tree_sha: directory.sha,
               recursive: 'true',
               headers: octokitClientDefaultHeaders,
             });
           }
-        } catch {
-          const parentPath = filteredPath.includes('/') ? filteredPath.slice(0, filteredPath.lastIndexOf('/')) : '';
-          const parentDirectoryTreeResponse = await this.octokitClient.rest.repos.getContent({
+        } else if (parentDirectoryTreeResponse.data.path === filteredPath) {
+          treeResponse = await this.octokitClient.rest.git.getTree({
             owner: this.owner,
             repo: this.repository,
-            path: parentPath,
-            ref: this.branch,
+            tree_sha: parentDirectoryTreeResponse.data.sha,
+            recursive: 'true',
             headers: octokitClientDefaultHeaders,
           });
-          if (Array.isArray(parentDirectoryTreeResponse.data)) {
-            const directory = parentDirectoryTreeResponse.data.find((item) => item.path === filteredPath);
-            if (directory) {
-              treeResponse = await this.octokitClient.rest.git.getTree({
-                owner: this.owner,
-                repo: this.repository,
-                tree_sha: directory.sha,
-                recursive: 'true',
-                headers: octokitClientDefaultHeaders,
-              });
-            }
-          } else if (parentDirectoryTreeResponse.data.path === filteredPath) {
-            treeResponse = await this.octokitClient.rest.git.getTree({
-              owner: this.owner,
-              repo: this.repository,
-              tree_sha: parentDirectoryTreeResponse.data.sha,
-              recursive: 'true',
-              headers: octokitClientDefaultHeaders,
-            });
-          }
         }
         if (treeResponse && treeResponse.data.tree.length > 0) {
           const jsonFiles = treeResponse.data.tree.filter((file) => (
