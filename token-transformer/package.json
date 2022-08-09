@@ -10,12 +10,12 @@
   "main": "index.js",
   "scripts": {
     "build-typography-test": "node index.js tokens.json temp/typography.json base/options,base/sizing,core/typography base/options,base/sizing",
-    "build-composition-test": "node index.js tokens.json temp/composition.json base/options,base/sizing,core/composition base/options,base/sizing",
+    "build-composition-test": "node index.js tokens.json temp/composition.json base/options,base/sizing,core/composition base/options,base/sizing --expandComposition=true",
     "build-light-test": "node index.js tokens.json temp/dark.json base/options,base/sizing,themes/dark,core/shadows base/options,base/sizing",
     "build-dark-test": "node index.js tokens.json temp/light.json base/options,base/sizing,themes/light,core/shadows base/options,base/sizing",
     "build-folder-test": "node index.js tokens temp/folder-light.json base/options,base/sizing,themes/light,core/shadows base/options,base/sizing",
     "build-resolve-false-test": "node index.js tokens.json temp/resolve-false.json base/options,base/sizing,themes/dark,core/shadows base/options,base/sizing --resolveReferences=false",
-    "test": "npm run build-typography-test && npm run build-light-test && npm run build-dark-test && npm run build-folder-test && npm run build-resolve-false-test && jest"
+    "test": "npm run build-typography-test && npm run build-light-test && npm run build-dark-test && npm run build-folder-test && npm run build-resolve-false-test && npm run build-composition-test && jest"
   },
   "author": "six7",
   "license": "MIT",
