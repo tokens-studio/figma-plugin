@@ -161,7 +161,7 @@ export class GithubTokenStorage extends GitTokenStorage {
             treeItem.path ? this.octokitClient.rest.repos.getContent({
               owner: this.owner,
               repo: this.repository,
-              path: treeItem.path.startsWith(filteredPath) ? treeItem.path : `${filteredPath}/${treeItem.path}`,
+              path: `${filteredPath}/${treeItem.path}`,
               ref: this.branch,
               headers: octokitClientDefaultHeaders,
             }) : Promise.resolve(null)
@@ -174,7 +174,7 @@ export class GithubTokenStorage extends GitTokenStorage {
               && !Array.isArray(fileContent?.data)
               && 'content' in fileContent.data
             ) {
-              const filePath = path.startsWith(filteredPath) ? path : `${filteredPath}/${path}`;
+              const filePath = `${filteredPath}/${path}`;
               let name = filePath.substring(this.path.length).replace(/^\/+/, '');
               name = name.replace('.json', '');
               const parsed = JSON.parse(decodeBase64(fileContent.data.content)) as GitMultiFileObject;
