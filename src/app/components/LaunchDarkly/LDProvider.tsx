@@ -14,14 +14,16 @@ export const LDProviderWrapper = ({ children }: LDProviderProps) => {
   const userId = useSelector(userIdSelector);
   // @README we only want to set-up LD if there is a license key to reduce the amount of API calls
   const licenseKey = useSelector(licenseKeySelector);
-  if (userId && licenseKey) {
-    return (
-      <LDProvider clientSideID={ldClientSideId} user={{ key: userId }}>
-        {children}
-      </LDProvider>
-    );
-  }
-  return children;
+
+  return (
+    <LDProvider
+      deferInitialization
+      clientSideID={ldClientSideId}
+      user={userId && licenseKey ? { key: userId } : undefined}
+    >
+      {children}
+    </LDProvider>
+  );
 };
 
 export function withLDProviderWrapper<P>(Component: React.ComponentType<P>) {
