@@ -14,10 +14,13 @@ import useConfirm from '@/app/hooks/useConfirm';
 import { AddLicenseSource } from '@/app/store/models/userState';
 import ProBadge from '../ProBadge';
 import { userIdSelector } from '@/selectors/userIdSelector';
+import { licenseDetailsSelector } from '@/selectors';
+import { ldUserFactory } from '@/utils/ldUserFactory';
 
 export default function AddLicenseKey() {
   const dispatch = useDispatch<Dispatch>();
   const existingKey = useSelector(licenseKeySelector);
+  const licenseDetails = useSelector(licenseDetailsSelector);
   const licenseKeyError = useSelector(licenseKeyErrorSelector);
   const [newKey, setLicenseKey] = useState(existingKey);
   const { confirm } = useConfirm();
@@ -54,6 +57,14 @@ export default function AddLicenseKey() {
   useEffect(() => {
     setLicenseKey(existingKey);
   }, [existingKey]);
+
+  useEffect(() => {
+    if (userId && existingKey && licenseDetails) {
+      ldClient?.identify(
+        ldUserFactory(userId, licenseDetails.plan, licenseDetails.entitlements, licenseDetails.clientEmail),
+      );
+    }
+  }, [userId, ldClient, existingKey, licenseDetails]);
 
   const onLicenseKeyChange = useCallback((ev: React.ChangeEvent<HTMLInputElement>) => {
     setLicenseKey(ev.target.value.trim());
