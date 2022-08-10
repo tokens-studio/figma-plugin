@@ -8,8 +8,9 @@ import { planSelector } from '@/selectors/planSelector';
 import type { StartupMessage } from '@/types/AsyncMessages';
 import { setUserData } from '@/utils/analytics';
 import { clientEmailSelector } from '@/selectors/getClientEmail';
+import { ldUserFactory } from '@/utils/ldUserFactory';
 
-export function getLdFlagsFactory(store: Store<RootState>, ldClient: LDClient | undefined, params: StartupMessage) {
+export function getLdFlagsFactory(store: Store<RootState>, ldClientPromise: Promise<LDClient>, params: StartupMessage) {
   return async () => {
     const { user } = params;
     const state = store.getState();
@@ -20,19 +21,13 @@ export function getLdFlagsFactory(store: Store<RootState>, ldClient: LDClient | 
 
     if (user?.userId && licenseKey) {
       setUserData({ plan: plan ? 'pro' : 'free' });
-      const userAttributes: Record<string, string | boolean> = {
-        plan: plan || '',
-      };
-      entitlements.forEach((entitlement) => {
-        userAttributes[entitlement] = true;
-      });
-
       try {
-        await ldClient?.identify({
-          key: user.userId,
-          custom: userAttributes,
-          email: clientEmail,
-        });
+        (await ldClientPromise)?.identify(ldUserFactory(
+          user.userId,
+          plan,
+          entitlements,
+          clientEmail,
+        ));
       } catch (err) {
         console.error(err);
         Sentry.captureException(err);

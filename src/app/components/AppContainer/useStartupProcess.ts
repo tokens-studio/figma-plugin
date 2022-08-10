@@ -1,8 +1,10 @@
 import {
+  useEffect,
   useMemo,
 } from 'react';
 import { useDispatch, useStore } from 'react-redux';
 import { useLDClient } from 'launchdarkly-react-client-sdk';
+import { LDClient } from 'launchdarkly-js-client-sdk';
 import { StartupMessage } from '@/types/AsyncMessages';
 import { useProcess } from '@/hooks';
 import { ApplicationInitSteps } from './ApplicationInitSteps';
@@ -14,6 +16,11 @@ import useStorage from '@/app/store/useStorage';
 import { useFlags } from '../LaunchDarkly';
 import useConfirm from '@/app/hooks/useConfirm';
 import useRemoteTokens from '@/app/store/remoteTokens';
+
+let ldClientPromiseResolver: (client: LDClient) => void;
+const ldClientPromise = new Promise<LDClient>((resolve) => {
+  ldClientPromiseResolver = resolve;
+});
 
 export function useStartupProcess(params: StartupMessage) {
   const ldClient = useLDClient();
@@ -35,7 +42,7 @@ export function useStartupProcess(params: StartupMessage) {
     },
     {
       key: ApplicationInitSteps.GET_LD_FLAGS,
-      fn: getLdFlagsFactory(store, ldClient, params),
+      fn: getLdFlagsFactory(store, ldClientPromise, params),
     },
     {
       key: ApplicationInitSteps.SAVE_STORAGE_INFORMATION,
@@ -48,13 +55,18 @@ export function useStartupProcess(params: StartupMessage) {
   ]), [
     params,
     store,
-    ldClient,
     useStorageResult,
     flags,
     dispatch,
     useConfirmResult,
     useRemoteTokensResult,
   ]));
+
+  useEffect(() => {
+    if (ldClient) {
+      ldClientPromiseResolver(ldClient);
+    }
+  }, [ldClient]);
 
   return startupProcess;
 }

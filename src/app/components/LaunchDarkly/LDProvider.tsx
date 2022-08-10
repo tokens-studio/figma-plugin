@@ -14,6 +14,7 @@ export const LDProviderWrapper = ({ children }: LDProviderProps) => {
   const userId = useSelector(userIdSelector);
   // @README we only want to set-up LD if there is a license key to reduce the amount of API calls
   const licenseKey = useSelector(licenseKeySelector);
+
   return (
     <LDProvider
       deferInitialization
