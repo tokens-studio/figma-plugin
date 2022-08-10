@@ -69,7 +69,6 @@ export function Initiator() {
             if (values) {
               dispatch.tokenState.setTokenData(values);
               const existTokens = hasTokenValues(values?.values ?? {});
-
               if (existTokens) dispatch.uiState.setActiveTab(Tabs.TOKENS);
               else dispatch.uiState.setActiveTab(Tabs.START);
             }
