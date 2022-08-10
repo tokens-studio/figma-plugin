@@ -2,6 +2,7 @@ import {
   useMemo,
 } from 'react';
 import { useDispatch, useStore } from 'react-redux';
+import { useLDClient } from 'launchdarkly-react-client-sdk';
 import { StartupMessage } from '@/types/AsyncMessages';
 import { useProcess } from '@/hooks';
 import { ApplicationInitSteps } from './ApplicationInitSteps';
@@ -15,6 +16,7 @@ import useConfirm from '@/app/hooks/useConfirm';
 import useRemoteTokens from '@/app/store/remoteTokens';
 
 export function useStartupProcess(params: StartupMessage) {
+  const ldClient = useLDClient();
   const store = useStore<RootState>();
   const dispatch = useDispatch<Dispatch>();
   const useStorageResult = useStorage();
@@ -33,7 +35,7 @@ export function useStartupProcess(params: StartupMessage) {
     },
     {
       key: ApplicationInitSteps.GET_LD_FLAGS,
-      fn: getLdFlagsFactory(store, params),
+      fn: getLdFlagsFactory(store, ldClient, params),
     },
     {
       key: ApplicationInitSteps.SAVE_STORAGE_INFORMATION,
@@ -46,6 +48,7 @@ export function useStartupProcess(params: StartupMessage) {
   ]), [
     params,
     store,
+    ldClient,
     useStorageResult,
     flags,
     dispatch,

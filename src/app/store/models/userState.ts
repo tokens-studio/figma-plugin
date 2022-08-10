@@ -7,7 +7,6 @@ import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { LicenseStatus } from '@/constants/LicenseStatus';
 import * as userStateReducers from './reducers/userState';
-import { identifyLdUser } from '@/LDClient';
 
 export enum AddLicenseSource {
   INITAL_LOAD,
@@ -104,15 +103,6 @@ export const userState = createModel<RootModel>()({
           entitlements: [...new Set(entitlements)],
         });
         dispatch.userState.setLicenseStatus(LicenseStatus.VERIFIED);
-
-        if (userId) {
-          await identifyLdUser(
-            userId,
-            plan,
-            [...new Set(entitlements)],
-            clientEmail,
-          );
-        }
 
         if (source === AddLicenseSource.UI) {
           notifyToUI('License added succesfully!');

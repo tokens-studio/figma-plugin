@@ -8,7 +8,6 @@ import { ProcessStepStatus } from './ProcessStepStatus';
 export type ProcessStep<T extends string> = {
   key: T
   fn: (cancelToken: ProcessCancelToken) => Promise<void>
-  waitFor?: Promise<void>
 };
 
 export function useProcess<T extends string = string>(steps: ProcessStep<T>[]) {
@@ -69,9 +68,6 @@ export function useProcess<T extends string = string>(steps: ProcessStep<T>[]) {
       const nextStep = steps[currentStepIndex + 1];
       setCurrentStep(nextStep.key);
       setCurrentStatus(ProcessStepStatus.IDLE);
-      if (nextStep.waitFor) {
-        await nextStep.waitFor;
-      }
       await perform(nextStep.key);
     }
   }, [steps, perform, currentStep]);
