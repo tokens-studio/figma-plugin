@@ -27,7 +27,7 @@ describe('getLdFlagsFactory', () => {
       identify: jest.fn(),
     } as unknown as LDClient;
 
-    const fn = getLdFlagsFactory(mockStore, mockLdClient, mockParams);
+    const fn = getLdFlagsFactory(mockStore, Promise.resolve(mockLdClient), mockParams);
     await fn();
 
     expect(setUserDataSpy).toBeCalledTimes(1);
@@ -56,7 +56,7 @@ describe('getLdFlagsFactory', () => {
       identify: jest.fn(),
     } as unknown as LDClient;
 
-    const fn = getLdFlagsFactory(mockStore, mockLdClient, mockParams);
+    const fn = getLdFlagsFactory(mockStore, Promise.resolve(mockLdClient), mockParams);
     await fn();
 
     expect(setUserDataSpy).toBeCalledTimes(1);
@@ -88,7 +88,7 @@ describe('getLdFlagsFactory', () => {
     } as unknown as LDClient;
 
     mockIdentify.mockRejectedValueOnce(new Error('error'));
-    const fn = getLdFlagsFactory(mockStore, mockLdClient, mockParams);
+    const fn = getLdFlagsFactory(mockStore, Promise.resolve(mockLdClient), mockParams);
     await fn();
 
     expect(setUserDataSpy).toBeCalledTimes(2);
