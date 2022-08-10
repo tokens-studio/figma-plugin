@@ -38,10 +38,7 @@ export default function CreateStorageItemModal({
 
   const handleChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const shallowObj = deepClone(formFields);
-
-
-
-    
+    setValue(shallowObj, e.target.name, e.target.value);
     setFormFields(shallowObj);
   }, [formFields]);
 
