@@ -1,5 +1,6 @@
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { OptionalPartial } from './OptionalPartial';
+import { GenericVersionedAdditionalHeaders } from '../storage/GenericVersionedStorage';
 
 /**
  * StorageTypes are meant to define the parameters of a storage provider
@@ -68,11 +69,18 @@ StorageProviderType.ADO,
 }
 >;
 
+export type GenericVersionedStorageType = GenericStorageType<StorageProviderType.GENERIC_VERSIONED_STORAGE, {
+  name?: string; // this is only for refrence
+  id: string // this would be the URL
+  additionalHeaders: GenericVersionedAdditionalHeaders ;
+}>;
+
 export type StorageType =
   | LocalStorageType
   | URLStorageType
   | JSONBinStorageType
   | GitStorageType
+  | GenericVersionedStorageType
   | ADOStorageType
   | BitbucketStorageType;
 
@@ -80,6 +88,7 @@ export type StorageTypeCredentials =
   | StorageTypeCredential<URLStorageType>
   | StorageTypeCredential<JSONBinStorageType>
   | StorageTypeCredential<GitStorageType>
+  | StorageTypeCredential<GenericVersionedStorageType, false>
   | StorageTypeCredential<BitbucketStorageType>
   | StorageTypeCredential<ADOStorageType>;
 
@@ -104,4 +113,5 @@ export type StorageTypeFormValues<Incomplete extends boolean = false> =
   Incomplete,
   Omit<StorageTypeCredential<ADOStorageType>, 'provider'>
   >)
+  | ({ new?: boolean; id?: string; provider: StorageProviderType.GENERIC_VERSIONED_STORAGE } & OptionalPartial<Incomplete, Omit<StorageTypeCredential<GenericVersionedStorageType>, 'provider'>>)
   | { new?: boolean; provider: StorageProviderType.LOCAL };

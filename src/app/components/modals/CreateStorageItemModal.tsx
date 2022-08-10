@@ -1,4 +1,6 @@
 import React from 'react';
+import setValue from 'deep-set-in';
+import deepClone from 'lodash.clonedeep';
 import Modal from '../Modal';
 import Heading from '../Heading';
 import StorageItemForm from '../StorageItemForm';
@@ -37,7 +39,12 @@ export default function CreateStorageItemModal({
   }, [addNewProviderItem, onSuccess]);
 
   const handleChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormFields({ ...formFields, [e.target.name]: e.target.value });
+    const shallowObj = deepClone(formFields);
+
+
+
+    
+    setFormFields(shallowObj);
   }, [formFields]);
 
   const handleSubmit = React.useCallback((values: StorageTypeFormValues<false>) => {

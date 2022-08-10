@@ -1,0 +1,200 @@
+import { TokenTypes } from '@/constants/TokenTypes';
+import * as pjs from '../../../package.json';
+import { mockFetch } from '../../../tests/__mocks__/fetchMock';
+import { GenericVersionedStorage } from '../GenericVersionedStorage';
+
+describe('GenericVersionedStorage', () => {
+  const url = 'https://api.example.io/v3/b';
+
+  const defaultHeaderName = 'X-ADD-HEADER';
+  const defaultHeaderValue = 'zzxxcc';
+
+  const defaultHeaders = [{
+    name: defaultHeaderName,
+    value: defaultHeaderValue,
+  }];
+
+  it('can create a new bin', async () => {
+    const updatedAt = new Date().toISOString();
+
+    const headers = [{
+      name: 'X-API-KEY',
+      value: 'aabbccddeeff',
+    }];
+    await GenericVersionedStorage.create(url, updatedAt, headers);
+    expect(mockFetch).toBeCalledWith(url, {
+      method: 'POST',
+      mode: 'cors',
+      cache: 'no-cache',
+      credentials: 'same-origin',
+      body: JSON.stringify({
+        version: pjs.plugin_version,
+        updatedAt,
+        values: {
+          options: {},
+        },
+      }, null, 2),
+      headers: new Headers([
+        ['Content-Type', 'application/json'],
+        ['X-API-KEY', 'aabbccddeeff'],
+      ]),
+    });
+  });
+
+  it('should return false when there is an error during creation', async () => {
+    mockFetch.mockImplementationOnce(() => ({
+      ok: false,
+    }));
+    expect(await GenericVersionedStorage.create(url, '')).toEqual(false);
+  });
+
+  it('can read GenericVersioned data', async () => {
+    mockFetch.mockImplementationOnce(() => (
+      Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve({
+          record: {
+            version: '1',
+            updatedAt: '2022-06-15T10:00:00.000Z',
+            values: {
+              global: {
+                colors: {
+                  red: {
+                    type: TokenTypes.COLOR,
+                    value: '#ff0000',
+                  },
+                },
+              },
+            },
+            $themes: [
+              {
+                id: 'light',
+                name: 'Light',
+                selectedTokenSets: {},
+              },
+            ],
+          },
+        }),
+      })
+    ));
+
+    const storage = new GenericVersionedStorage(url, defaultHeaders);
+    const result = await storage.read();
+    expect(result[0]).toEqual({
+      type: 'themes',
+      path: '$themes.json',
+      data: [
+        {
+          id: 'light',
+          name: 'Light',
+          selectedTokenSets: {},
+        },
+      ],
+    });
+    expect(result[1]).toEqual({
+      type: 'metadata',
+      path: '$metadata.json',
+      data: {
+        version: '1',
+        updatedAt: '2022-06-15T10:00:00.000Z',
+      },
+    });
+    expect(result[2]).toEqual({
+      type: 'tokenSet',
+      path: 'global.json',
+      name: 'global',
+      data: {
+        colors: {
+          red: {
+            type: TokenTypes.COLOR,
+            value: '#ff0000',
+          },
+        },
+      },
+    });
+  });
+
+  it('returns an empty dataset on error', async () => {
+    mockFetch.mockImplementationOnce(() => (
+      Promise.resolve({
+        ok: false,
+      })
+    ));
+
+    const storage = new GenericVersionedStorage(url, defaultHeaders);
+    expect(await storage.read()).toEqual([]);
+  });
+
+  it('can write to GenericVersioned endpoint', async () => {
+    jest.useFakeTimers('modern');
+    jest.setSystemTime(Date.UTC(2022, 5, 15, 10, 0, 0));
+
+    const storage = new GenericVersionedStorage(url, defaultHeaders);
+    await storage.write([
+      {
+        type: 'themes',
+        path: '$themes.json',
+        data: [
+          {
+            id: 'dark',
+            name: 'Dark',
+            selectedTokenSets: {},
+          },
+        ],
+      },
+      {
+        type: 'tokenSet',
+        name: 'global',
+        path: 'global.json',
+        data: {
+          colors: {
+            red: {
+              type: TokenTypes.COLOR,
+              value: '#ff0000',
+            },
+          },
+        },
+      },
+    ]);
+
+    expect(mockFetch).toBeCalledWith(url, {
+      method: 'PUT',
+      mode: 'cors',
+      cache: 'no-cache',
+      credentials: 'same-origin',
+      body: JSON.stringify({
+        version: pjs.plugin_version,
+        updatedAt: '2022-06-15T10:00:00.000Z',
+        values: {
+          global: {
+            colors: {
+              red: {
+                type: TokenTypes.COLOR,
+                value: '#ff0000',
+              },
+            },
+          },
+        },
+        $themes: [
+          {
+            id: 'dark',
+            name: 'Dark',
+            selectedTokenSets: {},
+          },
+        ],
+      }),
+      headers: new Headers([
+        ['Content-Type', 'application/json'],
+        [defaultHeaderName, defaultHeaderValue],
+      ]),
+    });
+  });
+
+  it('returns false on write error', async () => {
+    mockFetch.mockImplementationOnce(() => ({
+      ok: false,
+    }));
+    const storage = new GenericVersionedStorage(url, defaultHeaders);
+    expect(await storage.write([])).toEqual(false);
+  });
+});

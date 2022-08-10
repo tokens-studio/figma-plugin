@@ -62,17 +62,9 @@ const SyncSettings = () => {
     [],
   );
 
-  const selectedRemoteProvider = React.useMemo(
-    () => [
-      StorageProviderType.JSONBIN,
-      StorageProviderType.GITHUB,
-      StorageProviderType.GITLAB,
-      StorageProviderType.ADO,
-      StorageProviderType.URL,
-      StorageProviderType.BITBUCKET,
-    ].includes(storageProvider as StorageProviderType),
-    [storageProvider],
-  );
+  const selectedRemoteProvider = React.useMemo(() => [StorageProviderType.GENERIC_VERSIONED_STORAGE, StorageProviderType.JSONBIN, StorageProviderType.GITHUB, StorageProviderType.GITLAB, StorageProviderType.ADO, StorageProviderType.URL].includes(
+    storageProvider as StorageProviderType,
+  ), [storageProvider]);
 
   const storedApiProviders = () => apiProviders.filter((item) => item.provider === storageProvider);
 
@@ -138,6 +130,8 @@ const SyncSettings = () => {
             .
           </div>
         );
+      case StorageProviderType.GENERIC_VERSIONED_STORAGE:
+        return <div>Sync with a JSON stored on an external URL. This provides read/write access and versioning similar to JSONBin</div>;
       case StorageProviderType.URL:
         return <div>Sync with a JSON stored on an external URL. This mode only allows Read Only.</div>;
       default:
@@ -224,6 +218,13 @@ const SyncSettings = () => {
                 onClick={handleProviderClick(StorageProviderType.JSONBIN)}
                 text="JSONbin"
                 id={StorageProviderType.JSONBIN}
+              />
+              <ProviderSelector
+                isActive={storageProvider === StorageProviderType.GENERIC_VERSIONED_STORAGE}
+                isStored={storageType?.provider === StorageProviderType.GENERIC_VERSIONED_STORAGE}
+                onClick={handleProviderClick(StorageProviderType.GENERIC_VERSIONED_STORAGE)}
+                text="Generic Versioned Storage"
+                id={StorageProviderType.GENERIC_VERSIONED_STORAGE}
               />
               <ProviderSelector
                 isActive={storageProvider === StorageProviderType.GITHUB}

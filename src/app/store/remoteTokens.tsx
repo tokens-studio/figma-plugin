@@ -18,6 +18,7 @@ import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StorageTypeCredentials, StorageTypeFormValues } from '@/types/StorageType';
+import { useGenericVersionedStorage } from './providers/generic/versionedStorage';
 import { RemoteResponseData, RemoteResponseStatus } from '@/types/RemoteResponseData';
 import { ErrorMessages } from '@/constants/ErrorMessages';
 import { saveLastSyncedState } from '@/utils/saveLastSyncedState';
@@ -38,6 +39,7 @@ export default function useRemoteTokens() {
 
   const { setStorageType } = useStorage();
   const { pullTokensFromJSONBin, addJSONBinCredentials, createNewJSONBin } = useJSONbin();
+  const {  addGenericVersionedCredentials,    pullTokensFromGenericVersionedStorage,   createNewGenericVersionedStorage, } = useGenericVersionedStorage();
   const {
     addNewGitHubCredentials, syncTokensWithGitHub, pullTokensFromGitHub, pushTokensToGitHub, createGithubBranch, fetchGithubBranches,
   } = useGitHub();
@@ -71,6 +73,10 @@ export default function useRemoteTokens() {
     switch (context.provider) {
       case StorageProviderType.JSONBIN: {
         remoteData = await pullTokensFromJSONBin(context);
+        break;
+      }
+      case StorageProviderType.GENERIC_VERSIONED_STORAGE: {
+        remoteData = await pullTokensFromGenericVersionedStorage(context);
         break;
       }
       case StorageProviderType.GITHUB: {
@@ -116,6 +122,7 @@ export default function useRemoteTokens() {
   }, [
     dispatch,
     api,
+    pullTokensFromGenericVersionedStorage,
     pullTokensFromGitHub,
     pullTokensFromGitLab,
     pullTokensFromBitbucket,
@@ -212,6 +219,18 @@ export default function useRemoteTokens() {
         }
         break;
       }
+      case StorageProviderType.GENERIC_VERSIONED_STORAGE: {
+        if (credentials.id) {
+          data = await addGenericVersionedCredentials(credentials);
+        } else {
+          const id = await createNewGenericVersionedStorage(credentials);
+          if (id) {
+            credentials.id = id;
+            data = true;
+          }
+        }
+        break;
+      }
       case StorageProviderType.GITHUB: {
         content = await addNewGitHubCredentials(credentials);
         break;
@@ -256,11 +275,13 @@ export default function useRemoteTokens() {
   }, [
     dispatch,
     addJSONBinCredentials,
+    addGenericVersionedCredentials,
     addNewGitLabCredentials,
     addNewGitHubCredentials,
     addNewBitbucketCredentials,
     addNewADOCredentials,
     createNewJSONBin,
+    createNewGenericVersionedStorage,
     pullTokensFromURL,
     setStorageType,
   ]);

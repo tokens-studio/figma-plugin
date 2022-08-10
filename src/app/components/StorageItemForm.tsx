@@ -24,7 +24,9 @@ export default function StorageItemForm({
   isNew = false, onChange, onSubmit, onCancel, values, hasErrored, errorMessage,
 }: Props) {
   const { bitBucketSync } = useFlags();
-
+  if (isNew) {
+    values = getInitialValues(values);
+  }
   switch (values.provider) {
     case StorageProviderType.GITHUB:
     case StorageProviderType.GITLAB: {
