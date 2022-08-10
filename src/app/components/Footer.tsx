@@ -56,6 +56,8 @@ export default function Footer() {
     switch (provider) {
       case StorageProviderType.JSONBIN:
         return 'JSONBin.io';
+      case StorageProviderType.GENERIC_VERSIONED_STORAGE:
+        return 'Generic Versioned Storage';
       case StorageProviderType.GITHUB:
         return 'GitHub';
       case StorageProviderType.GITLAB:

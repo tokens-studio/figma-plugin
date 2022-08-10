@@ -1,4 +1,6 @@
 import React from 'react';
+import setValue from 'set-value';
+import deepClone from 'lodash.clonedeep';
 import Modal from '../Modal';
 import Heading from '../Heading';
 import StorageItemForm from '../StorageItemForm';
@@ -21,7 +23,9 @@ export default function EditStorageItemModal({
   const { addNewProviderItem } = useRemoteTokens();
 
   const handleChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormFields({ ...formFields, [e.target.name]: e.target.value });
+    const shallowObj = deepClone(formFields);
+    setValue(shallowObj, e.target.name, e.target.value);
+    setFormFields(shallowObj);
   }, [formFields]);
 
   const handleSubmit = React.useCallback(async (values: StorageTypeFormValues<false>) => {

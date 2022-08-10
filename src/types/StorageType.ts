@@ -1,5 +1,6 @@
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { OptionalPartial } from './OptionalPartial';
+import { GenericVersionedAdditionalHeaders } from '../storage/GenericVersionedStorage';
 
 /**
  * StorageTypes are meant to define the parameters of a storage provider
@@ -44,22 +45,31 @@ export type ADOStorageType = GenericStorageType<StorageProviderType.ADO, {
   filePath: string; // this is the path to the token file or files (depends on multifile support)
 }>;
 
+export type GenericVersionedStorageType = GenericStorageType<StorageProviderType.GENERIC_VERSIONED_STORAGE, {
+  name?: string; // this is only for refrence
+  id: string // this would be the URL
+  additionalHeaders: GenericVersionedAdditionalHeaders ;
+}>;
+
 export type StorageType =
   LocalStorageType
   | URLStorageType
   | JSONBinStorageType
   | GitStorageType
+  | GenericVersionedStorageType
   | ADOStorageType;
 
 export type StorageTypeCredentials =
   StorageTypeCredential<URLStorageType>
   | StorageTypeCredential<JSONBinStorageType>
   | StorageTypeCredential<GitStorageType>
+  | StorageTypeCredential<GenericVersionedStorageType, false>
   | StorageTypeCredential<ADOStorageType>;
 
 export type StorageTypeFormValues<Incomplete extends boolean = false> =
   ({ new?: boolean; provider: StorageProviderType.URL } & OptionalPartial<Incomplete, Omit<StorageTypeCredential<URLStorageType>, 'provider'>>)
   | ({ new?: boolean; id?: string; provider: StorageProviderType.JSONBIN } & OptionalPartial<Incomplete, Omit<StorageTypeCredential<JSONBinStorageType>, 'provider' | 'id'>>)
+  | ({ new?: boolean; id?: string; provider: StorageProviderType.GENERIC_VERSIONED_STORAGE } & OptionalPartial<Incomplete, Omit<StorageTypeCredential<GenericVersionedStorageType>, 'provider'>>)
   | ({ new?: boolean; provider: StorageProviderType.GITHUB | StorageProviderType.GITLAB } & OptionalPartial<Incomplete, Omit<StorageTypeCredential<GitStorageType>, 'provider'>>)
   | ({ new?: boolean; provider: StorageProviderType.ADO } & OptionalPartial<Incomplete, Omit<StorageTypeCredential<ADOStorageType>, 'provider'>>)
   | ({ new?: boolean; provider: StorageProviderType.LOCAL });

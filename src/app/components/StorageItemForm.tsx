@@ -5,6 +5,7 @@ import JSONBinForm from './StorageItemForm/JSONBinForm';
 import URLForm from './StorageItemForm/URLForm';
 import { StorageTypeFormValues } from '@/types/StorageType';
 import { StorageProviderType } from '@/constants/StorageProviderType';
+import GenericVersionedForm from './StorageItemForm/GenericVersioned';
 
 type Props = {
   values: StorageTypeFormValues<true>
@@ -15,9 +16,26 @@ type Props = {
   hasErrored?: boolean;
 };
 
+const getInitialValues = (values:StorageTypeFormValues<true>) => {
+  switch (values.provider) {
+    case StorageProviderType.GENERIC_VERSIONED_STORAGE:
+      return {
+        ...values,
+        additionalHeaders: [],
+      };
+
+    default:
+      return values;
+  }
+};
+
 export default function StorageItemForm({
   isNew = false, onChange, onSubmit, onCancel, values, hasErrored,
 }: Props) {
+  if (isNew) {
+    values = getInitialValues(values);
+  }
+
   switch (values.provider) {
     case StorageProviderType.GITHUB:
     case StorageProviderType.GITLAB: {
@@ -45,6 +63,17 @@ export default function StorageItemForm({
     case StorageProviderType.URL: {
       return (
         <URLForm
+          onChange={onChange}
+          onSubmit={onSubmit}
+          onCancel={onCancel}
+          values={values}
+          hasErrored={hasErrored}
+        />
+      );
+    }
+    case StorageProviderType.GENERIC_VERSIONED_STORAGE: {
+      return (
+        <GenericVersionedForm
           onChange={onChange}
           onSubmit={onSubmit}
           onCancel={onCancel}
