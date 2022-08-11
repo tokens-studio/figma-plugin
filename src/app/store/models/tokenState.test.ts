@@ -4,6 +4,7 @@ import { models } from './index';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import * as notifiers from '@/plugin/notifiers';
+import { tokenState } from './tokenState';
 
 const shadowArray = [
   {
@@ -495,5 +496,54 @@ describe('editToken', () => {
         value: '#000000',
       },
     ]);
+  });
+
+  it('should save tokens from json data', () => {
+    store.dispatch.tokenState.setJSONData(JSON.stringify(
+      {
+        1: {
+          value: 1,
+          type: 'sizing'
+        },
+        header: {
+          value: 3,
+          type: 'borderRadius'
+        },
+        black: {
+          100: {
+            value: '#0b0101'
+          },
+          500: {
+            value: '#130c0c'
+          },
+          type: 'color'
+        }
+      }
+    ));
+    const { tokens } = store.getState().tokenState;
+    expect(tokens.global).toEqual([
+      {
+        name: '1',
+        type: 'sizing',
+        value: 1,
+      },
+      {
+        name: 'header',
+        type: 'borderRadius',
+        value: 3,
+      },
+      {
+        inheritTypeLevel: 2,
+        name: 'black.100',
+        type: 'color',
+        value: '#0b0101',
+      },
+      {
+        inheritTypeLevel: 2,
+        name: 'black.500',
+        type: 'color',
+        value: '#130c0c',
+      }
+    ])
   });
 });
