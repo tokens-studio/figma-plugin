@@ -213,7 +213,6 @@ export const tokenState = createModel<RootModel>()({
       const newTokens: SingleToken[] = [];
       const existingTokens: SingleToken[] = [];
       const updatedTokens: SingleToken[] = [];
-
       // Iterate over received styles and check if they existed before or need updating
       Object.values(receivedStyles).forEach((values) => {
         values.forEach((token) => {
@@ -293,7 +292,6 @@ export const tokenState = createModel<RootModel>()({
       const {
         path, oldName, newName, type, parent,
       } = data;
-
       const tokensInParent = state.tokens[parent] ?? [];
       const renamedTokensInParent = tokensInParent.map((token) => {
         if (token.name.startsWith(`${path}${oldName}.`) && token.type === type) {
