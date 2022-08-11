@@ -188,7 +188,6 @@ export const tokenState = createModel<RootModel>()({
     },
     duplicateToken: (state, data: DuplicateTokenPayload) => {
       let newTokens: TokenStore['values'] = {};
-      console.log("payload", data)
       const existingTokenIndex = state.tokens[data.parent].findIndex((n) => n.name === data?.oldName);
       if (existingTokenIndex > -1) {
         const existingTokens = [...state.tokens[data.parent]];
@@ -294,7 +293,6 @@ export const tokenState = createModel<RootModel>()({
       const {
         path, oldName, newName, type, parent,
       } = data;
-
       const tokensInParent = state.tokens[parent] ?? [];
       const renamedTokensInParent = tokensInParent.map((token) => {
         if (token.name.startsWith(`${path}${oldName}.`) && token.type === type) {
