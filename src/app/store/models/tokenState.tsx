@@ -146,11 +146,9 @@ export const tokenState = createModel<RootModel>()({
       },
     }),
     setJSONData(state, payload) {
-      console.log("payload", payload)
       const parsedTokens = parseJson(payload);
       parseTokenValues(parsedTokens);
       const values = parseTokenValues({ [state.activeTokenSet]: parsedTokens });
-      console.log("values", values)
       return {
         ...state,
         tokens: {
@@ -190,6 +188,7 @@ export const tokenState = createModel<RootModel>()({
     },
     duplicateToken: (state, data: DuplicateTokenPayload) => {
       let newTokens: TokenStore['values'] = {};
+      console.log("payload", data)
       const existingTokenIndex = state.tokens[data.parent].findIndex((n) => n.name === data?.oldName);
       if (existingTokenIndex > -1) {
         const existingTokens = [...state.tokens[data.parent]];
