@@ -180,10 +180,10 @@ export default async function setValuesOnNode(
 
           if (!matchingStyleId) {
             // Local style not found - look for non-local matching style:
-            const fillStyleIdBackupKey = 'fillStyleId_original';
-            const fillStyleId = getStyleId(node, fillStyleIdBackupKey, 'fills');
+            const styleIdBackupKey = 'fillStyleId_original';
+            const fillStyleId = getStyleId(node, styleIdBackupKey, 'fills');
             matchingStyleId = findMatchingNonLocalPaintStyle(fillStyleId, values.fill)?.id;
-            setStyleIdBackup(node, matchingStyleId ? '' : fillStyleId, fillStyleIdBackupKey);
+            setStyleIdBackup(node, matchingStyleId ? '' : fillStyleId, styleIdBackupKey);
           }
 
           if (!matchingStyleId || (matchingStyleId && !await trySetStyleId(node, 'fill', matchingStyleId))) {
