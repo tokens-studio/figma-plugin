@@ -19,7 +19,6 @@ const StyledCheckbox = styled(CheckboxPrimitive.Root, {
   width: 12,
   height: 12,
   '&:focus': { boxShadow: '0 0 0 2px black' },
-
   variants: {
     isChecked: {
       true: {
@@ -31,11 +30,10 @@ const StyledCheckbox = styled(CheckboxPrimitive.Root, {
         borderColor: '$interactionSubtle',
       },
     },
-
   },
 });
 
-type Props = {
+type CheckboxProps = {
   checked: boolean | 'indeterminate';
   id: string | null;
   defaultChecked?: boolean;
@@ -44,6 +42,8 @@ type Props = {
   renderIcon?: (checked: boolean | 'indeterminate', fallback: React.ReactNode) => React.ReactNode;
 };
 
+type Props = Omit<React.HTMLAttributes<HTMLButtonElement>, keyof CheckboxProps> & CheckboxProps;
+
 function Checkbox({
   checked,
   id = null,
@@ -51,6 +51,7 @@ function Checkbox({
   disabled = false,
   onCheckedChange,
   renderIcon,
+  ...props
 }: Props) {
   const icon = useMemo(() => {
     let fallbackIcon: React.ReactNode = null;
@@ -66,11 +67,13 @@ function Checkbox({
   return (
     <StyledCheckbox
       id={id ?? undefined}
+      data-testid={id ?? undefined}
       disabled={disabled}
-      isChecked={checked}
+      isChecked={!!checked}
       checked={checked}
       onCheckedChange={onCheckedChange}
       defaultChecked={defaultChecked}
+      {...props}
     >
       <StyledIndicator>
         {icon}

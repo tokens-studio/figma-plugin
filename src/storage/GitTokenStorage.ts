@@ -1,24 +1,31 @@
 import { DeepTokensMap, ThemeObjectsList } from '@/types';
 import { AnyTokenSet, SingleToken } from '@/types/tokens';
-import { RemoteTokenStorage, RemoteTokenStorageFile, RemoteTokenStorageMetadataFile } from './RemoteTokenStorage';
+import { SystemFilenames } from './SystemFilenames';
+import { joinPath } from '@/utils/string';
+import { RemoteTokenStorage, RemoteTokenStorageFile } from './RemoteTokenStorage';
 
 type StorageFlags = {
   multiFileEnabled: boolean
+};
+
+export type GitStorageSaveOptions = {
+  commitMessage?: string
+};
+
+export type GitStorageMetadata = {
+  tokenSetOrder?: string[]
 };
 
 export type GitSingleFileObject = Record<string, (
   Record<string, SingleToken<false> | DeepTokensMap<false>>
 )> & {
   $themes?: ThemeObjectsList
+  $metadata?: GitStorageMetadata
 };
 
-export type GitMultiFileObject = AnyTokenSet<false> | ThemeObjectsList;
+export type GitMultiFileObject = AnyTokenSet<false> | ThemeObjectsList | GitStorageMetadata;
 
-export type GitStorageMetadata = {
-  commitMessage?: string
-};
-
-export abstract class GitTokenStorage extends RemoteTokenStorage<GitStorageMetadata> {
+export abstract class GitTokenStorage extends RemoteTokenStorage<GitStorageMetadata, GitStorageSaveOptions> {
   protected secret: string;
 
   protected owner: string;
@@ -27,7 +34,7 @@ export abstract class GitTokenStorage extends RemoteTokenStorage<GitStorageMetad
 
   protected branch: string = 'main';
 
-  protected path: string = '/';
+  protected path: string = '';
 
   protected baseUrl: string | undefined = undefined;
 
@@ -54,7 +61,7 @@ export abstract class GitTokenStorage extends RemoteTokenStorage<GitStorageMetad
   }
 
   public changePath(path: string) {
-    this.path = path;
+    this.path = joinPath(path);
     return this;
   }
 
@@ -78,11 +85,9 @@ export abstract class GitTokenStorage extends RemoteTokenStorage<GitStorageMetad
     shouldCreateBranch?: boolean
   ): Promise<boolean>;
 
-  public async write(files: RemoteTokenStorageFile<GitStorageMetadata>[]): Promise<boolean> {
+  public async write(files: RemoteTokenStorageFile<GitStorageMetadata>[], saveOptions: GitStorageSaveOptions): Promise<boolean> {
     const branches = await this.fetchBranches();
-    if (!branches) return false;
-
-    const metadataFile = files.find((file) => file.type === 'metadata') as RemoteTokenStorageMetadataFile<GitStorageMetadata> | undefined;
+    if (!branches.length) return false;
 
     const filesChangeset: Record<string, string> = {};
     if (this.path.endsWith('.json')) {
@@ -90,8 +95,10 @@ export abstract class GitTokenStorage extends RemoteTokenStorage<GitStorageMetad
         ...files.reduce<GitSingleFileObject>((acc, file) => {
           if (file.type === 'tokenSet') {
             acc[file.name] = file.data;
-          } if (file.type === 'themes') {
+          } else if (file.type === 'themes') {
             acc.$themes = [...acc.$themes ?? [], ...file.data];
+          } else if (file.type === 'metadata') {
+            acc.$metadata = { ...acc.$metadata ?? {}, ...file.data };
           }
           return acc;
         }, {}),
@@ -99,16 +106,20 @@ export abstract class GitTokenStorage extends RemoteTokenStorage<GitStorageMetad
     } else if (this.flags.multiFileEnabled) {
       files.forEach((file) => {
         if (file.type === 'tokenSet') {
-          filesChangeset[`${this.path}/${file.name}.json`] = JSON.stringify(file.data, null, 2);
+          filesChangeset[joinPath(this.path, `${file.name}.json`)] = JSON.stringify(file.data, null, 2);
         } else if (file.type === 'themes') {
-          filesChangeset[`${this.path}/$themes.json`] = JSON.stringify(file.data, null, 2);
+          filesChangeset[joinPath(this.path, `${SystemFilenames.THEMES}.json`)] = JSON.stringify(file.data, null, 2);
+        } else if (file.type === 'metadata') {
+          filesChangeset[joinPath(this.path, `${SystemFilenames.METADATA}.json`)] = JSON.stringify(file.data, null, 2);
         }
       });
+    } else {
+      // When path is a directory and multiFile is disabled return
+      throw new Error('Multi-file storage is not enabled');
     }
-
     return this.writeChangeset(
       filesChangeset,
-      metadataFile?.data.commitMessage ?? 'Commit from Figma',
+      saveOptions.commitMessage ?? 'Commit from Figma',
       this.branch,
       !branches.includes(this.branch),
     );

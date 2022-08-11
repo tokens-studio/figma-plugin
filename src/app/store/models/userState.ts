@@ -9,7 +9,6 @@ import { LicenseStatus } from '@/constants/LicenseStatus';
 import * as userStateReducers from './reducers/userState';
 
 export enum AddLicenseSource {
-  PLUGIN,
   INITAL_LOAD,
   UI,
 }
@@ -19,9 +18,6 @@ export enum Entitlements {
   BETA = 'beta',
 }
 export interface UserState {
-  // this flag is used at initial plugin load
-  // We only want to get the license key from the backend if there is not license key stored in local storage
-  checkedLocalStorageForKey: boolean;
   userId: string | null;
   licenseKey: string | undefined;
   licenseError: string | undefined;
@@ -38,7 +34,6 @@ interface LicenseDetails {
 
 export const userState = createModel<RootModel>()({
   state: {
-    checkedLocalStorageForKey: false,
     userId: null,
     licenseStatus: LicenseStatus.UNKNOWN,
     licenseKey: undefined,
@@ -69,12 +64,6 @@ export const userState = createModel<RootModel>()({
         licenseKey: payload,
       };
     },
-    setCheckedLocalStorage(state, payload: boolean) {
-      return {
-        ...state,
-        checkedLocalStorageForKey: payload,
-      };
-    },
     setLicenseError(state, payload: string | undefined) {
       return {
         ...state,
@@ -93,11 +82,11 @@ export const userState = createModel<RootModel>()({
     addLicenseKey: async (payload: { key: string; source: AddLicenseSource }, rootState) => {
       dispatch.userState.setLicenseStatus(LicenseStatus.VERIFYING);
 
-      const { userId } = rootState.userState;
+      const { userId, userName } = rootState.userState;
       const { key, source } = payload;
       const {
         error, plan, email: clientEmail, entitlements,
-      } = await validateLicense(key, userId);
+      } = await validateLicense(key, userId, userName);
 
       if (error) {
         dispatch.userState.setLicenseStatus(LicenseStatus.ERROR);
@@ -118,39 +107,36 @@ export const userState = createModel<RootModel>()({
         if (source === AddLicenseSource.UI) {
           notifyToUI('License added succesfully!');
         }
-        if (source !== AddLicenseSource.PLUGIN) {
-          AsyncMessageChannel.message({
-            type: AsyncMessageTypes.SET_LICENSE_KEY,
-            licenseKey: key,
-          });
-        }
+
+        AsyncMessageChannel.ReactInstance.message({
+          type: AsyncMessageTypes.SET_LICENSE_KEY,
+          licenseKey: key,
+        });
       }
       dispatch.userState.setLicenseKey(key);
-      if (source === AddLicenseSource.PLUGIN) {
-        dispatch.userState.setCheckedLocalStorage(true);
-      }
     },
     removeLicenseKey: async (payload, rootState) => {
-      const { licenseKey, userId, licenseError } = rootState.userState;
-      if (!licenseError && licenseKey) {
+      const { licenseKey, userId } = rootState.userState;
+
+      if (licenseKey) {
         const { error } = await removeLicense(licenseKey, userId);
         if (error) {
           notifyToUI('Error removing license, please contact support', { error: true });
+        } else {
+          AsyncMessageChannel.ReactInstance.message({
+            type: AsyncMessageTypes.SET_LICENSE_KEY,
+            licenseKey: null,
+          });
+
+          dispatch.userState.setLicenseKey(undefined);
+          dispatch.userState.setLicenseError(undefined);
+          dispatch.userState.setLicenseDetails({
+            plan: '',
+            entitlements: [],
+            clientEmail: '',
+          });
         }
       }
-
-      AsyncMessageChannel.message({
-        type: AsyncMessageTypes.SET_LICENSE_KEY,
-        licenseKey: null,
-      });
-
-      dispatch.userState.setLicenseKey(undefined);
-      dispatch.userState.setLicenseError(undefined);
-      dispatch.userState.setLicenseDetails({
-        plan: '',
-        entitlements: [],
-        clientEmail: '',
-      });
     },
   }),
 });

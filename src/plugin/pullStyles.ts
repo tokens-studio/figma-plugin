@@ -76,7 +76,7 @@ export default function pullStyles(styleTypes: PullStyleOptions): void {
 
     const figmaTextStyles = figma.getLocalTextStyles();
 
-    figmaTextStyles.map((style) => {
+    figmaTextStyles.forEach((style) => {
       if (!rawFontSizes.includes(style.fontSize)) rawFontSizes.push(style.fontSize);
       fontCombinations.push(style.fontName);
       rawLineHeights.push(style.lineHeight);
@@ -168,14 +168,14 @@ export default function pullStyles(styleTypes: PullStyleOptions): void {
       );
 
       const obj = {
-        fontFamily: `$${foundFamily?.name}`,
-        fontWeight: `$${foundFontWeight?.name}`,
-        lineHeight: `$${foundLineHeight?.name}`,
-        fontSize: `$${foundFontSize?.name}`,
-        letterSpacing: `$${foundLetterSpacing?.name}`,
-        paragraphSpacing: `$${foundParagraphSpacing?.name}`,
-        textCase: `$${foundTextCase?.name}`,
-        textDecoration: `$${foundTextDecoration?.name}`,
+        fontFamily: `{${foundFamily?.name}}`,
+        fontWeight: `{${foundFontWeight?.name}}`,
+        lineHeight: `{${foundLineHeight?.name}}`,
+        fontSize: `{${foundFontSize?.name}}`,
+        letterSpacing: `{${foundLetterSpacing?.name}}`,
+        paragraphSpacing: `{${foundParagraphSpacing?.name}}`,
+        textCase: `{${foundTextCase?.name}}`,
+        textDecoration: `{${foundTextDecoration?.name}}`,
       };
 
       const normalizedName = style.name

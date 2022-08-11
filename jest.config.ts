@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 /*
  * For a detailed explanation regarding each configuration property and type check, visit:
  * https://jestjs.io/docs/en/configuration.html
@@ -124,8 +126,10 @@ export default {
   // The paths to modules that run some code to configure or set up the testing environment before each test
   setupFiles: [
     './tests/__mocks__/textEncoderDecoderMock.js',
+    './tests/__mocks__/octokitRestMock.js',
     './tests/__mocks__/figmaMock.js',
-    './tests/__mocks__/asyncMessageChannelMock.js',
+    './tests/__mocks__/mixpanelMock.js',
+    './tests/__mocks__/domRect.js',
   ],
 
   // A list of paths to modules that run some code to configure or set up the testing framework before each test

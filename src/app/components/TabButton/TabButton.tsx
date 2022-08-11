@@ -1,14 +1,14 @@
 import React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import { Tabs } from '@/constants/Tabs';
 import { styled } from '@/stitches.config';
-import { Dispatch } from '@/app/store';
-import { activeTabSelector } from '@/selectors';
 import { track } from '@/utils/analytics';
 
-type Props = {
-  name: Tabs
+type Props<T extends string> = {
+  name: T
   label: string
+  activeTab?: T
+  disabled?: boolean
+  onSwitch: (tab: T) => void
 };
 
 const StyledButton = styled('button', {
@@ -16,36 +16,40 @@ const StyledButton = styled('button', {
   fontSize: '$xsmall',
   fontWeight: '$bold',
   cursor: 'pointer',
-  color: '$textMuted',
-  '&:focus, &:hover': {
+  color: '$textSubtle',
+  '&:not(:disabled):focus, &:not(:disabled):hover': {
     outline: 'none',
     boxShadow: 'none',
     color: '$text',
   },
+  '&:disabled': {
+    pointerEvents: 'none',
+    opacity: 0.5,
+  },
   variants: {
     isActive: {
-      true: {
-        color: '$text',
-      },
+      true: { color: '$text' },
     },
   },
 });
 
-export function TabButton({ name, label }: Props) {
-  const activeTab = useSelector(activeTabSelector);
-  const dispatch = useDispatch<Dispatch>();
-
+export function TabButton<T extends string = Tabs>({
+  name, label, activeTab, disabled, onSwitch,
+}: Props<T>) {
   const onClick = React.useCallback(() => {
     track('Switched tab', { from: activeTab, to: name });
-    dispatch.uiState.setActiveTab(name);
-  }, [activeTab, name, dispatch.uiState]);
+    onSwitch(name);
+  }, [activeTab, name, onSwitch]);
 
   return (
     <StyledButton
       data-cy={`navitem-${name}`}
+      data-testid={`navitem-${name}`}
       type="button"
       isActive={activeTab === name}
-      name="text"
+      data-active={activeTab === name}
+      name={name}
+      disabled={disabled}
       onClick={onClick}
     >
       {label}

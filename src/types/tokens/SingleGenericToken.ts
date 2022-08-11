@@ -8,6 +8,7 @@ export type SingleGenericToken<T extends TokenTypes, V = string, Named extends b
   oldDescription?: string;
   oldValue?: V;
   internal__Parent?: string;
+  inheritTypeLevel?: number;
 } & (Named extends true ? {
   name: string;
 } : {

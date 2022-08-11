@@ -1,15 +1,101 @@
-global.figma = {
+class MessageEvent extends Event {
+  constructor(pluginMessage) {
+    super('message')
+    this.data = { pluginMessage }
+  }
+}
+
+/** @type {[string, (...args: any[]) => any][]} */
+const figmaOnHandlers = []
+/** @type {[string, (...args: any[]) => any][]} */
+const figmaUiOnHandlers = []
+
+
+module.exports.dispatchFigmaEvent = jest.fn((name, args) => {
+  figmaOnHandlers
+    .filter((handler) => handler[0] === name)
+    .forEach((handler) => handler[1].apply(undefined, args))
+})
+module.exports.mockShowUI = jest.fn(() => {});
+module.exports.mockOn = jest.fn((name, handler) => {
+  figmaOnHandlers.push([name, handler])
+});
+module.exports.mockGetAsync = jest.fn(() => Promise.resolve());
+module.exports.mockSetAsync = jest.fn(() => Promise.resolve());
+module.exports.mockNotify = jest.fn(() => Promise.resolve({}));
+module.exports.mockGetLocalPaintStyles = jest.fn(() => []);
+module.exports.mockGetLocalTextStyles = jest.fn(() => []);
+module.exports.mockGetLocalEffectStyles = jest.fn(() => []);
+module.exports.mockLoadFontAsync = jest.fn(() => Promise.resolve());
+module.exports.mockCreateTextStyle = jest.fn(() => ({
+  id: 'textstyle',
+}));
+module.exports.mockCreatePaintStyle = jest.fn(() => ({
+  id: 'paintstyle',
+}));
+module.exports.mockCreateEffectStyle = jest.fn(() => ({
+  id: 'effectstyle',
+}));
+module.exports.mockImportStyleByKeyAsync = jest.fn(() => Promise.reject());
+module.exports.mockUiOn = jest.fn((eventName, handler) => {
+  figmaUiOnHandlers.push([eventName, handler]);
+});
+module.exports.mockUiOff = jest.fn((eventName, handler) => {
+  const indexOf = figmaUiOnHandlers.findIndex((entry) => (
+    entry[0] === eventName
+    && entry[1] === handler
+  ))
+  if (indexOf > -1) {
+    figmaUiOnHandlers.splice(indexOf, 1)
+  }
+});
+module.exports.mockUiPostMessage = jest.fn((pluginMessage) => {
+  window.dispatchEvent(new MessageEvent(pluginMessage))
+});
+module.exports.mockRootSetSharedPluginData = jest.fn(() => {});
+module.exports.mockRootGetSharedPluginData = jest.fn(() => {});
+module.exports.mockParentPostMessage = jest.fn((data) => {
+  figmaUiOnHandlers
+    .filter(([eventName]) => eventName === 'message')
+    .forEach(([,handler]) => handler(data.pluginMessage))
+});
+module.exports.mockGetNodeById = jest.fn();
+module.exports.mockScrollAndZoomIntoView = jest.fn();
+
+module.exports.figma = {
+  showUI: module.exports.mockShowUI,
+  on: module.exports.mockOn,
+  currentPage: {
+    selection: [],
+  },
+  viewport: {
+    scrollAndZoomIntoView: module.exports.mockScrollAndZoomIntoView,
+  },
   clientStorage: {
-    getAsync: jest.fn(() => Promise.resolve()),
-    setAsync: jest.fn(() => Promise.resolve()),
+    getAsync: module.exports.mockGetAsync,
+    setAsync: module.exports.mockSetAsync,
   },
-  notify: jest.fn(() => Promise.resolve({})),
+  notify: module.exports.mockNotify,
   ui: {
-    postMessage: jest.fn(() => Promise.resolve({})),
+    postMessage: module.exports.mockUiPostMessage,
+    on: module.exports.mockUiOn,
+    off: module.exports.mockUiOff,
   },
-  getLocalPaintStyles: jest.fn(() => []),
-  getLocalTextStyles: jest.fn(() => []),
-  getLocalEffectStyles: jest.fn(() => []),
-  loadFontAsync: jest.fn(() => Promise.resolve()),
-  createTextStyle: jest.fn(),
+  root: {
+    setSharedPluginData: module.exports.mockRootSetSharedPluginData,
+    getSharedPluginData: module.exports.mockRootGetSharedPluginData,
+  },
+  getLocalPaintStyles: module.exports.mockGetLocalPaintStyles,
+  getLocalTextStyles: module.exports.mockGetLocalTextStyles,
+  getLocalEffectStyles: module.exports.mockGetLocalEffectStyles,
+  loadFontAsync: module.exports.mockLoadFontAsync,
+  createTextStyle: module.exports.mockCreateTextStyle,
+  createPaintStyle: module.exports.mockCreatePaintStyle,
+  createEffectStyle: module.exports.mockCreateEffectStyle,
+  importStyleByKeyAsync: module.exports.mockImportStyleByKeyAsync,
+  getNodeById: module.exports.mockGetNodeById,
 };
+
+parent.postMessage = module.exports.mockParentPostMessage;
+global.figma = module.exports.figma;
+global.__html__ = '';

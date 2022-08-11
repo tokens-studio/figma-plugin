@@ -1,13 +1,15 @@
 import compact from 'just-compact';
 import { Octokit } from '@octokit/rest';
-import { decodeBase64 } from '@/utils/string';
-import { RemoteTokenStorageFile } from './RemoteTokenStorage';
+import { decodeBase64 } from '@/utils/string/ui';
+import { RemoteTokenstorageErrorMessage, RemoteTokenStorageFile } from './RemoteTokenStorage';
 import IsJSONString from '@/utils/isJSONString';
 import { AnyTokenSet } from '@/types/tokens';
 import { ThemeObjectsList } from '@/types';
 import {
   GitMultiFileObject, GitSingleFileObject, GitStorageMetadata, GitTokenStorage,
 } from './GitTokenStorage';
+import { SystemFilenames } from './SystemFilenames';
+import { ErrorMessages } from '@/constants/ErrorMessages';
 
 type ExtendedOctokitClient = Omit<Octokit, 'repos'> & {
   repos: Octokit['repos'] & {
@@ -18,7 +20,9 @@ type ExtendedOctokitClient = Omit<Octokit, 'repos'> & {
       createBranch?: boolean
       changes: {
         message: string
-        files: Record<string, string>
+        files: Record<string, string>,
+        filesToDelete?: string[],
+        ignoreDeletionFailures?: boolean,
       }[]
     }) => ReturnType<Octokit['repos']['createOrUpdateFileContents']>
   }
@@ -32,6 +36,11 @@ function getTreeMode(type: 'dir' | 'file' | string) {
       return '100644';
   }
 }
+
+// @README https://github.com/octokit/octokit.js/issues/890
+const octokitClientDefaultHeaders = {
+  'If-None-Match': '',
+};
 
 export class GithubTokenStorage extends GitTokenStorage {
   private octokitClient: ExtendedOctokitClient;
@@ -59,6 +68,7 @@ export class GithubTokenStorage extends GitTokenStorage {
     const branches = await this.octokitClient.repos.listBranches({
       owner: this.owner,
       repo: this.repository,
+      headers: octokitClientDefaultHeaders,
     });
     return branches.data.map((branch) => branch.name);
   }
@@ -68,7 +78,10 @@ export class GithubTokenStorage extends GitTokenStorage {
       const originRef = `heads/${source || this.branch}`;
       const newRef = `refs/heads/${branch}`;
       const originBranch = await this.octokitClient.git.getRef({
-        owner: this.owner, repo: this.repository, ref: originRef,
+        owner: this.owner,
+        repo: this.repository,
+        ref: originRef,
+        headers: octokitClientDefaultHeaders,
       });
       const newBranch = await this.octokitClient.git.createRef({
         owner: this.owner, repo: this.repository, ref: newRef, sha: originBranch.data.object.sha,
@@ -81,6 +94,7 @@ export class GithubTokenStorage extends GitTokenStorage {
   }
 
   public async canWrite(): Promise<boolean> {
+    if (!this.path.endsWith('.json') && !this.flags.multiFileEnabled) return false;
     const currentUser = await this.octokitClient.rest.users.getAuthenticated();
     if (!currentUser.data.login) return false;
     try {
@@ -88,6 +102,7 @@ export class GithubTokenStorage extends GitTokenStorage {
         owner: this.owner,
         repo: this.repository,
         username: currentUser.data.login,
+        headers: octokitClientDefaultHeaders,
       });
       return !!canWrite;
     } catch (e) {
@@ -95,7 +110,147 @@ export class GithubTokenStorage extends GitTokenStorage {
     }
   }
 
-  public async read(): Promise<RemoteTokenStorageFile<GitStorageMetadata>[]> {
+  public async read(): Promise<RemoteTokenStorageFile<GitStorageMetadata>[] | RemoteTokenstorageErrorMessage> {
+    try {
+      const response = await this.octokitClient.rest.repos.getContent({
+        owner: this.owner,
+        repo: this.repository,
+        path: this.path,
+        ref: this.branch,
+        headers: octokitClientDefaultHeaders,
+      });
+      // read entire directory
+      if (Array.isArray(response.data)) {
+        const directoryTreeResponse = await this.octokitClient.rest.git.createTree({
+          owner: this.owner,
+          repo: this.repository,
+          tree: response.data.map((item) => ({
+            path: item.path,
+            sha: item.sha,
+            mode: getTreeMode(item.type),
+          })),
+          headers: octokitClientDefaultHeaders,
+        });
+
+        if (directoryTreeResponse.data.sha) {
+          const treeResponse = await this.octokitClient.rest.git.getTree({
+            owner: this.owner,
+            repo: this.repository,
+            tree_sha: directoryTreeResponse.data.sha,
+            recursive: 'true',
+            headers: octokitClientDefaultHeaders,
+          });
+
+          if (treeResponse.data.tree.length > 0) {
+            const jsonFiles = treeResponse.data.tree.filter((file) => (
+              file.path?.endsWith('.json')
+            )).sort((a, b) => (
+              (a.path && b.path) ? a.path.localeCompare(b.path) : 0
+            ));
+
+            const jsonFileContents = await Promise.all(jsonFiles.map((treeItem) => (
+              treeItem.path ? this.octokitClient.rest.repos.getContent({
+                owner: this.owner,
+                repo: this.repository,
+                path: treeItem.path,
+                ref: this.branch,
+                headers: octokitClientDefaultHeaders,
+              }) : Promise.resolve(null)
+            )));
+            return compact(jsonFileContents.map<RemoteTokenStorageFile<GitStorageMetadata> | null>((fileContent, index) => {
+              const { path } = jsonFiles[index];
+
+              if (
+                path
+                && fileContent?.data
+                && !Array.isArray(fileContent?.data)
+                && 'content' in fileContent.data
+              ) {
+                let name = path.substring(this.path.length).replace(/^\/+/, '');
+                name = name.replace('.json', '');
+                const parsed = JSON.parse(decodeBase64(fileContent.data.content)) as GitMultiFileObject;
+                // @REAMDE we will need to ensure these reserved names
+
+                if (name === SystemFilenames.THEMES) {
+                  return {
+                    path,
+                    type: 'themes',
+                    data: parsed as ThemeObjectsList,
+                  };
+                }
+
+                if (name === SystemFilenames.METADATA) {
+                  return {
+                    path,
+                    type: 'metadata',
+                    data: parsed as GitStorageMetadata,
+                  };
+                }
+
+                return {
+                  path,
+                  name,
+                  type: 'tokenSet',
+                  data: parsed as AnyTokenSet<false>,
+                };
+              }
+
+              return null;
+            }));
+          }
+        }
+      } else if ('content' in response.data) {
+        const data = decodeBase64(response.data.content);
+        if (IsJSONString(data)) {
+          const parsed = JSON.parse(data) as GitSingleFileObject;
+          return [
+            {
+              type: 'themes',
+              path: `${this.path}/${SystemFilenames.THEMES}.json`,
+              data: parsed.$themes ?? [],
+            },
+            ...(Object.entries(parsed).filter(([key]) => (
+              !Object.values<string>(SystemFilenames).includes(key)
+            )) as [string, AnyTokenSet<false>][]).map<RemoteTokenStorageFile<GitStorageMetadata>>(([name, tokenSet]) => ({
+              name,
+              type: 'tokenSet',
+              path: `${this.path}/${name}.json`,
+              data: tokenSet,
+            })),
+          ];
+        }
+        return {
+          errorMessage: ErrorMessages.VALIDATION_ERROR,
+        };
+      }
+
+      return [];
+    } catch (e) {
+      // Raise error (usually this is an auth error)
+      console.log('Error', e);
+      return [];
+    }
+  }
+
+  public async createOrUpdate(changeset: Record<string, string>, message: string, branch: string, shouldCreateBranch?: boolean, filesToDelete?: string[], ignoreDeletionFailures?: boolean): Promise<boolean> {
+    const response = await this.octokitClient.repos.createOrUpdateFiles({
+      branch,
+      owner: this.owner,
+      repo: this.repository,
+      createBranch: shouldCreateBranch,
+      changes: [
+        {
+          message,
+          files: changeset,
+          filesToDelete,
+          ignoreDeletionFailures,
+        },
+      ],
+    });
+    return !!response;
+  }
+
+  public async writeChangeset(changeset: Record<string, string>, message: string, branch: string, shouldCreateBranch?: boolean): Promise<boolean> {
     try {
       const response = await this.octokitClient.rest.repos.getContent({
         owner: this.owner,
@@ -104,8 +259,7 @@ export class GithubTokenStorage extends GitTokenStorage {
         ref: this.branch,
       });
 
-      // read entire directory
-      if (Array.isArray(response.data) && this.flags.multiFileEnabled) {
+      if (Array.isArray(response.data)) {
         const directoryTreeResponse = await this.octokitClient.rest.git.createTree({
           owner: this.owner,
           repo: this.repository,
@@ -130,97 +284,17 @@ export class GithubTokenStorage extends GitTokenStorage {
             )).sort((a, b) => (
               (a.path && b.path) ? a.path.localeCompare(b.path) : 0
             ));
-            const DirectoryNameSplit = this.path.split('/');
-            const RootDirectoryName = DirectoryNameSplit[0];
-            let subDirectoryName: string;
-            if (DirectoryNameSplit.length > 1) {
-              subDirectoryName = `${DirectoryNameSplit.splice(1, DirectoryNameSplit.length - 1).join('/')}/`;
-            } else {
-              subDirectoryName = '';
-            }
 
-            const jsonFileContents = await Promise.all(jsonFiles.map((treeItem) => (
-              treeItem.path ? this.octokitClient.rest.repos.getContent({
-                owner: this.owner,
-                repo: this.repository,
-                path: `${RootDirectoryName}/${treeItem.path}`,
-                ref: this.branch,
-              }) : Promise.resolve(null)
-            )));
-            return compact(jsonFileContents.map<RemoteTokenStorageFile<GitStorageMetadata> | null>((fileContent, index) => {
-              const { path } = jsonFiles[index];
-
-              if (
-                path
-                && fileContent?.data
-                && !Array.isArray(fileContent?.data)
-                && 'content' in fileContent.data
-              ) {
-                let name = path.replace(subDirectoryName, '');
-                name = name.replace('.json', '');
-                const parsed = JSON.parse(decodeBase64(fileContent.data.content)) as GitMultiFileObject;
-                // @REAMDE we will need to ensure these reserved names
-                if (name === '$themes') {
-                  return {
-                    path,
-                    type: 'themes',
-                    data: parsed as ThemeObjectsList,
-                  };
-                }
-
-                return {
-                  path,
-                  name,
-                  type: 'tokenSet',
-                  data: parsed as AnyTokenSet<false>,
-                };
-              }
-
-              return null;
-            }));
+            const filesToDelete = jsonFiles.filter((jsonFile) => !Object.keys(changeset).some((item) => jsonFile.path && item.endsWith(jsonFile?.path)))
+              .map((fileToDelete) => (`${this.path.split('/')[0]}/${fileToDelete.path}` ?? ''));
+            return await this.createOrUpdate(changeset, message, branch, shouldCreateBranch, filesToDelete, true);
           }
-        }
-      } else if ('content' in response.data) {
-        const data = decodeBase64(response.data.content);
-        if (IsJSONString(data)) {
-          const parsed = JSON.parse(data) as GitSingleFileObject;
-          return [
-            {
-              type: 'themes',
-              path: `${this.path}/$themes.json`,
-              data: parsed.$themes ?? [],
-            },
-            ...(Object.entries(parsed).filter(([key]) => key !== '$themes') as [string, AnyTokenSet<false>][]).map<RemoteTokenStorageFile<GitStorageMetadata>>(([name, tokenSet]) => ({
-              name,
-              type: 'tokenSet',
-              path: `${this.path}/${name}.json`,
-              data: tokenSet,
-            })),
-          ];
         }
       }
 
-      return [];
-    } catch (e) {
-      // Raise error (usually this is an auth error)
-      console.log('Error', e);
-      return [];
+      return await this.createOrUpdate(changeset, message, branch, shouldCreateBranch);
+    } catch {
+      return await this.createOrUpdate(changeset, message, branch, shouldCreateBranch);
     }
-  }
-
-  public async writeChangeset(changeset: Record<string, string>, message: string, branch: string, shouldCreateBranch?: boolean): Promise<boolean> {
-    const response = await this.octokitClient.repos.createOrUpdateFiles({
-      branch,
-      owner: this.owner,
-      repo: this.repository,
-      createBranch: shouldCreateBranch,
-      changes: [
-        {
-          message,
-          files: changeset,
-        },
-      ],
-    });
-    return !!response;
   }
 }

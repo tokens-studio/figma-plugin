@@ -1,43 +1,45 @@
-import React from 'react';
-import { useDispatch } from 'react-redux';
-import { Dispatch } from '@/app/store';
-import Heading from '../Heading';
-import Button from '../Button';
+import React, { useState } from 'react';
 import Modal from '../Modal';
 import Stack from '../Stack';
+import LoadProviderItem from '../LoadProviderSelector';
+import { LoadProviderType } from '@/constants/LoadProviderType';
+import DefaultPreset from '../PresetProvider/DefaultPreset';
+import FilePreset from '../PresetProvider/FilePreset';
 
 type Props = {
   onClose: () => void
 };
 
 export default function ExportModal({ onClose }: Props) {
-  const dispatch = useDispatch<Dispatch>();
+  const [loadProvider, setLoadProvider] = useState<string>(LoadProviderType.PRESET);
 
-  const handleSetDefault = React.useCallback(() => {
-    dispatch.tokenState.setDefaultTokens();
-    onClose();
-  }, [dispatch, onClose]);
+  const handleProviderClick = React.useCallback((provider: string) => {
+    setLoadProvider(provider);
+  }, []);
 
   return (
-    <Modal showClose isOpen close={onClose}>
-      <Stack direction="column" justify="center" gap={4} css={{ textAlign: 'center' }}>
-        <Stack direction="column" gap={2}>
-          <Heading>Load a preset</Heading>
-          <p className="text-xs text-gray-600">
-            Override your current tokens by applying a preset. Want your preset featured here? Submit it via
-            {' '}
-            <a
-              target="_blank"
-              rel="noreferrer"
-              className="underline"
-              href="https://github.com/six7/figma-tokens/issues"
-            >
-              GitHub
-            </a>
-          </p>
-          <Button variant="primary" onClick={handleSetDefault}>
-            Apply default preset
-          </Button>
+    <Modal showClose isOpen close={onClose} title="Import">
+      <Stack direction="column" justify="center" gap={4}>
+        <Stack direction="column" gap={4}>
+          <Stack direction="row" gap={2}>
+            <LoadProviderItem
+              isActive={loadProvider === LoadProviderType.PRESET}
+              onClick={handleProviderClick}
+              text="Preset"
+              id={LoadProviderType.PRESET}
+            />
+            <LoadProviderItem
+              isActive={loadProvider === LoadProviderType.FILE}
+              onClick={handleProviderClick}
+              text="File"
+              id={LoadProviderType.FILE}
+            />
+          </Stack>
+          {
+            loadProvider === LoadProviderType.PRESET
+              ? <DefaultPreset onCancel={onClose} />
+              : <FilePreset onCancel={onClose} />
+          }
         </Stack>
       </Stack>
     </Modal>

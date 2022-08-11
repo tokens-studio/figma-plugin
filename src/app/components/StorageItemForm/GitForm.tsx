@@ -15,10 +15,11 @@ type Props = {
   onSubmit: (values: ValidatedFormValues) => void;
   onCancel: () => void;
   hasErrored?: boolean;
+  errorMessage?: string;
 };
 
 export default function GitForm({
-  onChange, onSubmit, onCancel, values, hasErrored,
+  onChange, onSubmit, onCancel, values, hasErrored, errorMessage,
 }: Props) {
   const inputEl = useRef<HTMLInputElement | null>(null);
 
@@ -44,6 +45,8 @@ export default function GitForm({
       onSubmit(formFields);
     }
   }, [values, onSubmit]);
+
+  const baseUrlPlaceholder = `https://${values.provider}.acme-inc.com${values.provider === StorageProviderType.GITHUB ? '/api/v3' : ''}`;
 
   return (
     <form onSubmit={handleSubmit}>
@@ -83,17 +86,17 @@ export default function GitForm({
         <Input
           full
           label="File Path (e.g. data/tokens.json)"
+          defaultValue=""
           value={values.filePath}
           onChange={onChange}
           type="text"
           name="filePath"
-          required
         />
         <Input
           full
           label="baseUrl (optional)"
           value={values.baseUrl}
-          placeholder="https://github.acme-inc.com/api/v3"
+          placeholder={baseUrlPlaceholder}
           onChange={onChange}
           type="text"
           name="baseUrl"
@@ -109,7 +112,7 @@ export default function GitForm({
         </Stack>
         {hasErrored && (
           <div className="bg-red-200 text-red-700 rounded p-4 text-xs font-bold" data-cy="provider-modal-error">
-            There was an error connecting. Check your credentials.
+            {errorMessage}
           </div>
         )}
       </Stack>
