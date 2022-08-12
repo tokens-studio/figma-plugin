@@ -240,6 +240,41 @@ describe('Initiator', () => {
     expect(state.uiState.activeTab).toEqual(Tabs.TOKENS);
   });
 
+  it('should skip to start screen when there is no tokens', () => {
+    const mockStore = createMockStore({});
+    render(
+      <Provider store={mockStore}>
+        <Initiator />
+      </Provider>,
+    );
+
+    fireEvent(
+      window,
+      new MessageEvent('message', {
+        data: {
+          pluginMessage: {
+            type: 'set_tokens',
+            values: {
+              version: '',
+              updatedAt: '',
+              values: {},
+              usedTokenSet: {},
+              checkForChanges: true,
+              activeTheme: null,
+              themes: [],
+              storageType: {
+                provider: StorageProviderType.LOCAL,
+              },
+            },
+          },
+        },
+      }),
+    );
+
+    const state = mockStore.getState();
+    expect(state.uiState.activeTab).toEqual(Tabs.START);
+  });
+
   it('should be able to set tokens', () => {
     const mockStore = createMockStore({});
     render(
@@ -294,6 +329,95 @@ describe('Initiator', () => {
 
     const state = mockStore.getState();
     expect(state.uiState.showEmptyGroups).toEqual(false);
+  });
+
+  it('should be able to import styles', () => {
+    const mockStore = createMockStore({});
+    render(
+      <Provider store={mockStore}>
+        <Initiator />
+      </Provider>,
+    );
+
+    fireEvent(
+      window,
+      new MessageEvent('message', {
+        data: {
+          pluginMessage: {
+            type: 'styles',
+            values: {
+              colors: [
+                {
+                  name: 'black',
+                  type: 'color',
+                  value: '#000000',
+                },
+              ],
+              effects: [
+                {
+                  name: 'light',
+                  type: 'boxShadow',
+                  value: {
+                    blur: 4,
+                    color: '#00000040',
+                    spread: 0,
+                    type: 'dropShadow',
+                    x: 0,
+                    y: 4,
+                  },
+                },
+              ],
+              typography: [
+                {
+                  fontFamily: '{fontFamilies.inter}',
+                  fontSize: '{fontSize.0}',
+                  fontWeight: '{fontWeights.inter-0}',
+                  letterSpacing: '{letterSpacing.0}',
+                  lineHeight: '{lineHeights.0}',
+                  paragraphSpacing: '{paragraphSpacing.0}',
+                  textCase: '{textCase.none}',
+                  textDecoration: '{textDecoration.none}',
+                },
+              ],
+            },
+          },
+        },
+      }),
+    );
+
+    const state = mockStore.getState();
+    expect(state.tokenState.importedTokens).toEqual({
+      newTokens: [
+        {
+          name: 'black',
+          type: 'color',
+          value: '#000000',
+        },
+        {
+          name: 'light',
+          type: 'boxShadow',
+          value: {
+            blur: 4,
+            color: '#00000040',
+            spread: 0,
+            type: 'dropShadow',
+            x: 0,
+            y: 4,
+          },
+        },
+        {
+          fontFamily: '{fontFamilies.inter}',
+          fontSize: '{fontSize.0}',
+          fontWeight: '{fontWeights.inter-0}',
+          letterSpacing: '{letterSpacing.0}',
+          lineHeight: '{lineHeights.0}',
+          paragraphSpacing: '{paragraphSpacing.0}',
+          textCase: '{textCase.none}',
+          textDecoration: '{textDecoration.none}',
+        },
+      ],
+      updatedTokens: [],
+    });
   });
 
   it('should be able to start a background job', () => {
