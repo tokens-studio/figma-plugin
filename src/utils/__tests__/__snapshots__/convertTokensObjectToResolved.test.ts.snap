@@ -37,6 +37,54 @@ Object {
 }
 `;
 
+exports[`convertTokensObjectToResolved does not expand composition when not needed 1`] = `
+Object {
+  "composition": Object {
+    "body": Object {
+      "rawValue": Object {
+        "sizing": "{size.12}",
+        "spacing": "{space.24}",
+      },
+      "type": "composition",
+      "value": Object {
+        "sizing": 12,
+        "spacing": 24,
+      },
+    },
+    "heading": Object {
+      "rawValue": Object {
+        "opacity": "{opacity.50}",
+      },
+      "type": "composition",
+      "value": Object {
+        "opacity": "50%",
+      },
+    },
+  },
+  "opacity": Object {
+    "50": Object {
+      "rawValue": "50%",
+      "type": "opacity",
+      "value": "50%",
+    },
+  },
+  "size": Object {
+    "12": Object {
+      "rawValue": "12",
+      "type": "sizing",
+      "value": 12,
+    },
+  },
+  "space": Object {
+    "24": Object {
+      "rawValue": "24",
+      "type": "spacing",
+      "value": 24,
+    },
+  },
+}
+`;
+
 exports[`convertTokensObjectToResolved does not expand shadows when not needed 1`] = `
 Object {
   "shadow": Object {
@@ -595,6 +643,50 @@ Object {
     "white": Object {
       "type": "color",
       "value": "#ffffff",
+    },
+  },
+}
+`;
+
+exports[`convertTokensObjectToResolved should expand composition when needed 1`] = `
+Object {
+  "composition": Object {
+    "body": Object {
+      "sizing": Object {
+        "type": "sizing",
+        "value": 12,
+      },
+      "spacing": Object {
+        "type": "spacing",
+        "value": 24,
+      },
+    },
+    "heading": Object {
+      "opacity": Object {
+        "type": "opacity",
+        "value": "50%",
+      },
+    },
+  },
+  "opacity": Object {
+    "50": Object {
+      "rawValue": "50%",
+      "type": "opacity",
+      "value": "50%",
+    },
+  },
+  "size": Object {
+    "12": Object {
+      "rawValue": "12",
+      "type": "sizing",
+      "value": 12,
+    },
+  },
+  "space": Object {
+    "24": Object {
+      "rawValue": "24",
+      "type": "spacing",
+      "value": 24,
     },
   },
 }

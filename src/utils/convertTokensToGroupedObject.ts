@@ -5,6 +5,7 @@ import { expand } from '@/utils/expand';
 import { getValueWithReferences } from '@/utils/getValueWithReferences';
 import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
 import { SingleToken } from '@/types/tokens';
+import { TokenTypes } from '@/constants/TokenTypes';
 
 // @TODO fix tokenObj
 export default function convertTokensToGroupedObject(
@@ -32,8 +33,9 @@ export default function convertTokensToGroupedObject(
     }
     delete tokenWithType.internal__Parent;
     if (
-      (!!options.expandTypography && tokenWithType.type === 'typography')
-      || (!!options.expandShadow && tokenWithType.type === 'boxShadow')
+      (!!options.expandTypography && tokenWithType.type === TokenTypes.TYPOGRAPHY)
+      || (!!options.expandShadow && tokenWithType.type === TokenTypes.BOX_SHADOW)
+      || (!!options.expandComposition && tokenWithType.type === TokenTypes.COMPOSITION)
     ) {
       const expanded = expand(tokenWithType.value);
       set(obj, token.name, { ...expanded });

@@ -26,4 +26,9 @@ describe('token-transformer', () => {
         var testResult = fs.readFileSync('temp/resolve-false.json');
         expect(testResult.toString()).toEqual(expectedResult.toString());
     });
+    it('generates composition theme files correctly', async () => {
+        var expectedResult = fs.readFileSync('output/composition.json');
+        var testResult = fs.readFileSync('temp/composition.json');
+        expect(testResult.toString()).toEqual(expectedResult.toString());
+    });
 });
