@@ -7,11 +7,11 @@ describe('usePropertiesForTokenType', () => {
   const testData = [
     {
       type: 'other',
-      output: [],
+      properties: [],
     },
     {
       type: 'color',
-      output: [
+      properties: [
         {
           label: 'Fill',
           name: Properties.fill,
@@ -24,7 +24,7 @@ describe('usePropertiesForTokenType', () => {
     },
     {
       type: 'borderRadius',
-      output: [
+      properties: [
         {
           label: 'All',
           name: Properties.borderRadius,
@@ -43,7 +43,7 @@ describe('usePropertiesForTokenType', () => {
     },
     {
       type: 'sizing',
-      output: [
+      properties: [
         {
           label: 'All',
           name: Properties.sizing,
@@ -55,7 +55,7 @@ describe('usePropertiesForTokenType', () => {
     },
     {
       type: 'spacing',
-      output: [
+      properties: [
         { label: 'Gap', name: Properties.itemSpacing, icon: 'Gap' },
         {
           label: 'All',
@@ -79,11 +79,11 @@ describe('usePropertiesForTokenType', () => {
     },
     {
       type: 'text',
-      output: [],
+      properties: [],
     },
     {
       type: 'typography',
-      output: [
+      properties: [
         {
           name: 'typography',
           label: 'typography',
@@ -92,7 +92,7 @@ describe('usePropertiesForTokenType', () => {
     },
     {
       type: 'opacity',
-      output: [
+      properties: [
         {
           name: 'opacity',
           label: 'opacity',
@@ -101,7 +101,7 @@ describe('usePropertiesForTokenType', () => {
     },
     {
       type: 'borderWidth',
-      output: [
+      properties: [
         {
           label: 'All',
           name: Properties.borderWidth,
@@ -120,7 +120,7 @@ describe('usePropertiesForTokenType', () => {
     },
     {
       type: 'boxShadow',
-      output: [
+      properties: [
         {
           name: 'boxShadow',
           label: 'boxShadow',
@@ -129,7 +129,7 @@ describe('usePropertiesForTokenType', () => {
     },
     {
       type: 'fontFamilies',
-      output: [
+      properties: [
         {
           name: 'fontFamilies',
           label: 'fontFamilies',
@@ -138,7 +138,7 @@ describe('usePropertiesForTokenType', () => {
     },
     {
       type: 'fontWeights',
-      output: [
+      properties: [
         {
           name: 'fontWeights',
           label: 'fontWeights',
@@ -147,7 +147,7 @@ describe('usePropertiesForTokenType', () => {
     },
     {
       type: 'lineHeights',
-      output: [
+      properties: [
         {
           name: 'lineHeights',
           label: 'lineHeights',
@@ -156,7 +156,7 @@ describe('usePropertiesForTokenType', () => {
     },
     {
       type: 'fontSizes',
-      output: [
+      properties: [
         {
           name: 'fontSizes',
           label: 'fontSizes',
@@ -165,7 +165,7 @@ describe('usePropertiesForTokenType', () => {
     },
     {
       type: 'letterSpacing',
-      output: [
+      properties: [
         {
           name: 'letterSpacing',
           label: 'letterSpacing',
@@ -174,7 +174,7 @@ describe('usePropertiesForTokenType', () => {
     },
     {
       type: 'paragraphSpacing',
-      output: [
+      properties: [
         {
           name: 'paragraphSpacing',
           label: 'paragraphSpacing',
@@ -183,7 +183,7 @@ describe('usePropertiesForTokenType', () => {
     },
     {
       type: 'textDecoration',
-      output: [
+      properties: [
         {
           name: 'textDecoration',
           label: 'textDecoration',
@@ -192,7 +192,7 @@ describe('usePropertiesForTokenType', () => {
     },
     {
       type: 'textCase',
-      output: [
+      properties: [
         {
           name: 'textCase',
           label: 'textCase',
@@ -201,7 +201,7 @@ describe('usePropertiesForTokenType', () => {
     },
     {
       type: 'composition',
-      output: [
+      properties: [
         {
           name: 'composition',
           label: 'composition',
@@ -212,7 +212,7 @@ describe('usePropertiesForTokenType', () => {
   it('should return properties', () => {
     testData.forEach((data) => {
       const { result } = renderHook(() => usePropertiesForTokenType(data.type as TokenTypes));
-      expect(result.current).toEqual(data.output);
+      expect(result.current).toEqual(data.properties);
     });
   });
 });
