@@ -67,6 +67,27 @@ describe('ConfirmDialog', () => {
     expect(result.queryByText('Set to document storage?')).toBeInTheDocument();
   });
 
+  it('should close ConfirmLocalStorageModal when clicking cancel button', async () => {
+    const mockStore = createMockStore(defaultStore);
+    const result = render(
+      <Provider store={mockStore}>
+        <SyncSettings />
+      </Provider>,
+    );
+
+    await act(async () => {
+      result.queryByText('Local document')?.click();
+    });
+
+    expect(result.queryByText('Set to document storage?')).toBeInTheDocument();
+
+    await act(async () => {
+      result.queryByText('Cancel')?.click();
+    });
+
+    expect(result.queryByText('Set to document storage?')).not.toBeInTheDocument();
+  });
+
   it('can convert to localStorage', async () => {
     const mockStore = createMockStore(defaultStore);
     const result = render(
