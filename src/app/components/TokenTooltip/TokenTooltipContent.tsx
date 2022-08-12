@@ -12,6 +12,9 @@ type Props = {
 
 export const TokenTooltipContent: React.FC<Props> = ({ token }) => {
   const tokensContext = React.useContext(TokensContext);
+  React.useEffect(() => {
+    console.log("toke", token, tokensContext)
+  }, [token])
   const { isAlias } = useTokens();
   const tokenIsAlias = React.useMemo(() => (
     isAlias(token, tokensContext.resolvedTokens)
