@@ -1,7 +1,7 @@
 {
   "name": "figma-tokens",
   "version": "1.0.0",
-  "plugin_version": "114-rc3",
+  "plugin_version": "114-rc4",
   "description": "Figma Tokens",
   "license": "MIT",
   "scripts": {
