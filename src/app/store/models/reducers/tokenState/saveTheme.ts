@@ -30,7 +30,8 @@ export function saveTheme(state: TokenState, data: Payload): TokenState {
     // @README if this theme is currently active or if it's a new theme
     // we will also run the setActiveTheme reducer
     // to update the usedTokenSets
-    return setActiveTheme(nextState, themeId);
+    // we don't want to update nodes or styles though.
+    return setActiveTheme(nextState, { themeId, shouldUpdateNodes: false });
   }
 
   return nextState;
