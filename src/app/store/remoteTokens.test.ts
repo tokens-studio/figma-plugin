@@ -8,6 +8,7 @@ import {
   tokensSelector,
 } from '@/selectors';
 import { notifyToUI } from '@/plugin/notifiers';
+import { ErrorMessages } from '@/constants/ErrorMessages';
 
 const mockStartJob = jest.fn();
 const mockRetrieve = jest.fn();
@@ -121,6 +122,20 @@ jest.mock('../../storage/GitlabTokenStorage', () => ({
     }
   )),
 }));
+jest.mock('../../storage/BitbucketTokenStorage', () => ({
+  BitbucketTokenStorage: jest.fn().mockImplementation(() => (
+    {
+      retrieve: mockRetrieve,
+      canWrite: mockCanWrite,
+      changePath: mockChangePath,
+      selectBranch: mockSelectBrach,
+      enableMultiFile: mockEnableMultiFile,
+      fetchBranches: mockFetchBranches,
+      save: mockSave,
+      createBranch: mockCreateBranch,
+    }
+  )),
+}));
 jest.mock('../../storage/JSONBinTokenStorage', () => ({
   JSONBinTokenStorage: jest.fn().mockImplementation(() => (
     {
@@ -149,6 +164,15 @@ jest.mock('../../storage/UrlTokenStorage', () => ({
     }
   )),
 }));
+jest.mock('../../storage/FileTokenStorage', () => ({
+  FileTokenStorage: jest.fn().mockImplementation(() => (
+    {
+      retrieve: mockRetrieve,
+      enableMultiFile: mockEnableMultiFile,
+    }
+  )),
+}));
+
 jest.mock('../hooks/useConfirm', () => ({
   __esModule: true,
   default: () => ({
@@ -179,6 +203,12 @@ const gitLabContext = {
   provider: 'gitlab',
   secret: 'gitlab',
 };
+const bitbucketContext = {
+  name: 'six7',
+  id: 'six7/figma-tokens',
+  provider: 'bitbucket',
+  secret: 'bitbucket',
+};
 const jsonbinContext = {
   name: 'six7',
   id: 'six7/figma-tokens',
@@ -197,9 +227,17 @@ const urlContext = {
   provider: 'url',
   secret: 'url',
 };
+const files = {
+  0: {
+    name: 'tokens.json',
+    path: 'Downloads\\tokens.json',
+    webkitRelativePath: '',
+  },
+  length: 1,
+};
 
-const contexts = [gitHubContext, gitLabContext, jsonbinContext, adoContext, urlContext];
-const contextNames = ['GitHub', 'GitLab', 'jsonbin', 'ADO', 'url'];
+const contexts = [gitHubContext, gitLabContext, bitbucketContext, adoContext, jsonbinContext, urlContext];
+const contextNames = ['GitHub', 'GitLab', 'Bitbucket', 'ADO', 'jsonbin', 'url'];
 describe('remoteTokens', () => {
   let { result } = renderHook(() => useRemoteTokens());
 
@@ -229,6 +267,7 @@ describe('remoteTokens', () => {
               },
             ],
           },
+          status: 'success',
         },
       )
     ));
@@ -240,29 +279,96 @@ describe('remoteTokens', () => {
 
   contexts.forEach((context) => {
     it(`Pull tokens from ${context.provider}`, async () => {
-      expect(await result.current.pullTokens({ context: context as StorageTypeCredentials })).toEqual({
-        metadata: {
-          commitMessage: 'Initial commit',
-        },
-        themes: [
-          {
-            id: 'light',
-            name: 'Light',
-            selectedTokenSets: {
-              global: 'enabled',
-            },
-          },
-        ],
-        tokens: {
-          global: [
+      if (context === jsonbinContext) {
+        expect(await result.current.pullTokens({ context: context as StorageTypeCredentials })).toEqual({
+          metadata: {},
+          status: 'success',
+          themes: [
             {
-              value: '#ffffff',
-              type: 'color',
-              name: 'black',
+              id: 'light',
+              name: 'Light',
+              selectedTokenSets: {
+                global: 'enabled',
+              },
             },
           ],
-        },
+          tokens: {
+            global: [
+              {
+                value: '#ffffff',
+                type: 'color',
+                name: 'black',
+              },
+            ],
+          },
+        });
+      } else {
+        expect(await result.current.pullTokens({ context: context as StorageTypeCredentials })).toEqual({
+          metadata: {
+            commitMessage: 'Initial commit',
+          },
+          status: 'success',
+          themes: [
+            {
+              id: 'light',
+              name: 'Light',
+              selectedTokenSets: {
+                global: 'enabled',
+              },
+            },
+          ],
+          tokens: {
+            global: [
+              {
+                value: '#ffffff',
+                type: 'color',
+                name: 'black',
+              },
+            ],
+          },
+        });
+      }
+    });
+  });
+
+  contexts.forEach((context) => {
+    it(`Pull tokens from ${context.provider}, should return error message when fetch data failed`, async () => {
+      await result.current.pullTokens({ context: context as StorageTypeCredentials });
+      mockRetrieve.mockImplementation(() => (
+        Promise.resolve({
+          status: 'failure',
+          errorMessage: ErrorMessages.GENERAL_CONNECTION_ERROR,
+        })
+      ));
+      expect(await result.current.pullTokens({ context: context as StorageTypeCredentials })).toEqual({
+        status: 'failure',
+        errorMessage: ErrorMessages.GENERAL_CONNECTION_ERROR,
       });
+    });
+  });
+
+  it('Pull tokens from JSONbin, should return error message when secret is not defined', async () => {
+    const jsonbinContextWithoutId = {
+      name: 'six7',
+      id: 'six7/figma-tokens',
+      provider: 'jsonbin',
+    };
+    await result.current.pullTokens({ context: jsonbinContextWithoutId as StorageTypeCredentials });
+    expect(await result.current.pullTokens({ context: jsonbinContextWithoutId as StorageTypeCredentials })).toEqual({
+      status: 'failure',
+      errorMessage: ErrorMessages.ID_NON_EXIST_ERROR,
+    });
+  });
+
+  it('Pull tokens from url, should return error message when ID and secret are not defined', async () => {
+    const urlContextWithoutId = {
+      name: 'six7',
+      provider: 'url',
+    };
+    await result.current.pullTokens({ context: urlContextWithoutId as StorageTypeCredentials });
+    expect(await result.current.pullTokens({ context: urlContextWithoutId as StorageTypeCredentials })).toEqual({
+      status: 'failure',
+      errorMessage: ErrorMessages.ID_NON_EXIST_ERROR,
     });
   });
 
@@ -295,6 +401,7 @@ describe('remoteTokens', () => {
                 },
               ],
             },
+            status: 'success',
           },
         )
       ));
@@ -302,7 +409,7 @@ describe('remoteTokens', () => {
         Promise.resolve(true)
       ));
       await waitFor(() => { result.current.restoreStoredProvider(context as StorageTypeCredentials); });
-      if (context === gitHubContext || context === gitLabContext || context === adoContext) {
+      if (context === gitHubContext || context === gitLabContext || context === adoContext || context === bitbucketContext) {
         expect(notifyToUI).toBeCalledTimes(1);
         expect(notifyToUI).toBeCalledWith(`Pulled tokens from ${contextNames[index]}`);
       } else {
@@ -315,6 +422,22 @@ describe('remoteTokens', () => {
   });
 
   contexts.forEach((context) => {
+    it(`Restore storedProvider from ${context.provider}, should return null when fetching data failed`, async () => {
+      await result.current.restoreStoredProvider(context as StorageTypeCredentials);
+      mockFetchBranches.mockImplementationOnce(() => (
+        Promise.resolve(['main'])
+      ));
+      mockRetrieve.mockImplementation(() => (
+        Promise.resolve({
+          status: 'failure',
+          errorMessage: ErrorMessages.GENERAL_CONNECTION_ERROR,
+        })
+      ));
+      expect(await result.current.restoreStoredProvider(context as StorageTypeCredentials)).toEqual(null);
+    });
+  });
+
+  contexts.forEach((context) => {
     it(`Restore storedProvider from ${context.provider}, should push tokens if there is no content`, async () => {
       mockFetchBranches.mockImplementationOnce(() => (
         Promise.resolve(['main'])
@@ -323,7 +446,7 @@ describe('remoteTokens', () => {
         Promise.resolve(null)
       ));
       await waitFor(() => { result.current.restoreStoredProvider(context as StorageTypeCredentials); });
-      if (context === gitHubContext || context === gitLabContext || context === adoContext) {
+      if (context === gitHubContext || context === gitLabContext || context === adoContext || context === bitbucketContext) {
         expect(mockPushDialog).toBeCalledTimes(1);
       } else {
         expect(mockStartJob).toBeCalledWith({
@@ -345,7 +468,7 @@ describe('remoteTokens', () => {
           commitMessage: 'Initial commit',
         })
       ));
-      if (context === gitHubContext || context === gitLabContext || context === adoContext) {
+      if (context === gitHubContext || context === gitLabContext || context === adoContext || context === bitbucketContext) {
         await waitFor(() => { result.current.pushTokens(context as StorageTypeCredentials); });
         expect(mockPushDialog).toBeCalledTimes(2);
         expect(mockPushDialog.mock.calls[1][0]).toBe('success');
@@ -354,8 +477,23 @@ describe('remoteTokens', () => {
   });
 
   contexts.forEach((context) => {
+    it(`push tokens to ${context.provider}, should not pop up push diaolog`, async () => {
+      mockRetrieve.mockImplementation(() => (
+        Promise.resolve({
+          status: 'failure',
+          errorMessage: ErrorMessages.GENERAL_CONNECTION_ERROR,
+        })
+      ));
+      if (context === gitHubContext || context === gitLabContext || context === adoContext || context === bitbucketContext) {
+        await waitFor(() => { result.current.pushTokens(context as StorageTypeCredentials); });
+        expect(mockPushDialog).toBeCalledTimes(0);
+      }
+    });
+  });
+
+  contexts.forEach((context) => {
     it(`push tokens to ${context.provider}, should return noting to commit if the content is same`, async () => {
-      if (context === gitHubContext || context === gitLabContext || context === adoContext) {
+      if (context === gitHubContext || context === gitLabContext || context === adoContext || context === bitbucketContext) {
         await waitFor(() => { result.current.pushTokens(context as StorageTypeCredentials); });
         expect(notifyToUI).toBeCalledWith('Nothing to commit');
       }
@@ -363,8 +501,8 @@ describe('remoteTokens', () => {
   });
 
   contexts.forEach((context) => {
-    if (context === gitHubContext || context === gitLabContext || context === adoContext) {
-      it(`Add newProviderItem to ${context.provider}, should push tokens and return true if there is no content`, async () => {
+    if (context === gitHubContext || context === gitLabContext || context === adoContext || context === bitbucketContext) {
+      it(`Add newProviderItem to ${context.provider}, should push tokens and return status data if there is no content`, async () => {
         mockFetchBranches.mockImplementationOnce(() => (
           Promise.resolve(['main'])
         ));
@@ -377,23 +515,35 @@ describe('remoteTokens', () => {
             commitMessage: 'Initial commit',
           })
         ));
-        await waitFor(() => { result.current.pushTokens(context as StorageTypeCredentials); });
+        await waitFor(() => { result.current.addNewProviderItem(context as StorageTypeCredentials); });
         expect(mockPushDialog).toBeCalledTimes(2);
         expect(mockPushDialog.mock.calls[1][0]).toBe('success');
-        expect(await result.current.addNewProviderItem(context as StorageTypeCredentials)).toEqual(true);
+        expect(await result.current.addNewProviderItem(context as StorageTypeCredentials)).toEqual({
+          status: 'success',
+        });
       });
     } else {
-      it(`Add newProviderItem to ${context.provider}, should pull tokens and return false if there is no content`, async () => {
+      it(`Add newProviderItem to ${context.provider}, should pull tokens and return error message if there is no content`, async () => {
         mockRetrieve.mockImplementation(() => (
           Promise.resolve(null)
         ));
-        expect(await result.current.addNewProviderItem(context as StorageTypeCredentials)).toEqual(false);
+        if (context === urlContext) {
+          expect(await result.current.addNewProviderItem(context as StorageTypeCredentials)).toEqual({
+            errorMessage: ErrorMessages.GENERAL_CONNECTION_ERROR,
+            status: 'failure',
+          });
+        } else {
+          expect(await result.current.addNewProviderItem(context as StorageTypeCredentials)).toEqual({
+            errorMessage: ErrorMessages.GENERAL_CONNECTION_ERROR,
+            status: 'failure',
+          });
+        }
       });
     }
   });
 
   contexts.forEach((context, index) => {
-    if (context === gitHubContext || context === gitLabContext || context === adoContext) {
+    if (context === gitHubContext || context === gitLabContext || context === adoContext || context === bitbucketContext) {
       it(`Add newProviderItem to ${context.provider}, should pull tokens and notify that no tokens stored on remote if there is no tokens on remote`, async () => {
         mockFetchBranches.mockImplementation(() => (
           Promise.resolve(['main'])
@@ -413,6 +563,7 @@ describe('remoteTokens', () => {
                   },
                 },
               ],
+              status: 'success',
             },
           )
         ));
@@ -423,10 +574,12 @@ describe('remoteTokens', () => {
         expect(notifyToUI).toBeCalledTimes(2);
         expect(notifyToUI).toBeCalledWith(`Pulled tokens from ${contextNames[index]}`);
         expect(notifyToUI).toBeCalledWith('No tokens stored on remote');
-        expect(await result.current.addNewProviderItem(context as StorageTypeCredentials)).toEqual(true);
+        expect(await result.current.addNewProviderItem(context as StorageTypeCredentials)).toEqual({
+          status: 'success',
+        });
       });
     } else {
-      it(`Add newProviderItem to ${context.provider}, should pull tokens and return false if there is no tokens on remote`, async () => {
+      it(`Add newProviderItem to ${context.provider}, should pull tokens and return error message if there is no tokens on remote`, async () => {
         mockRetrieve.mockImplementation(() => (
           Promise.resolve(
             {
@@ -443,27 +596,74 @@ describe('remoteTokens', () => {
                 },
               ],
               tokens: null,
+              status: 'success',
             },
           )
         ));
-        expect(await result.current.addNewProviderItem(context as StorageTypeCredentials)).toEqual(false);
+        if (context === urlContext) {
+          expect(await result.current.addNewProviderItem(context as StorageTypeCredentials)).toEqual({
+            errorMessage: ErrorMessages.URL_CREDENTIAL_ERROR,
+            status: 'failure',
+          });
+        } else {
+          expect(await result.current.addNewProviderItem(context as StorageTypeCredentials)).toEqual({
+            errorMessage: ErrorMessages.GENERAL_CONNECTION_ERROR,
+            status: 'failure',
+          });
+        }
       });
     }
   });
 
   contexts.forEach((context) => {
-    it(`Add newProviderItem to ${context.provider}, should pull tokens and return true`, async () => {
+    it(`Add newProviderItem to ${context.provider}, should pull tokens and return token data`, async () => {
       mockFetchBranches.mockImplementation(() => (
         Promise.resolve(['main'])
       ));
       await waitFor(() => { result.current.addNewProviderItem(context as StorageTypeCredentials); });
-      expect(await result.current.addNewProviderItem(context as StorageTypeCredentials)).toEqual(true);
+      if (context === gitHubContext || context === gitLabContext || context === adoContext || context === bitbucketContext) {
+        expect(await result.current.addNewProviderItem(context as StorageTypeCredentials)).toEqual({
+          status: 'success',
+        });
+      } else {
+        expect(await result.current.addNewProviderItem(context as StorageTypeCredentials)).toEqual({
+          status: 'success',
+        });
+      }
+    });
+  });
+
+  contexts.forEach((context) => {
+    it(`Add newProviderItem to ${context.provider}, should return error message when there is no branch`, async () => {
+      mockFetchBranches.mockImplementation(() => (
+        Promise.resolve([])
+      ));
+      await waitFor(() => { result.current.addNewProviderItem(context as StorageTypeCredentials); });
+      if (context === gitHubContext || context === gitLabContext || context === adoContext || context === bitbucketContext) {
+        expect(await result.current.addNewProviderItem(context as StorageTypeCredentials)).toEqual({
+          status: 'failure',
+          errorMessage: ErrorMessages.EMPTY_BRANCH_ERROR,
+        });
+      }
+    });
+  });
+
+  it('Add newProviderItem to JSONbin, should return error message when ID is not defined', async () => {
+    const jsonbinContextWithoutId = {
+      name: 'six7',
+      id: 'six7/figma-tokens',
+      provider: 'jsonbin',
+    };
+    await waitFor(() => { result.current.addNewProviderItem(jsonbinContextWithoutId as StorageTypeCredentials); });
+    expect(await result.current.addNewProviderItem(jsonbinContextWithoutId as StorageTypeCredentials)).toEqual({
+      status: 'failure',
+      errorMessage: ErrorMessages.ID_NON_EXIST_ERROR,
     });
   });
 
   contexts.forEach((context) => {
     it(`create branch in ${context.provider}`, async () => {
-      if (context === gitHubContext || context === gitLabContext || context === adoContext) {
+      if (context === gitHubContext || context === gitLabContext || context === adoContext || context === bitbucketContext) {
         mockCreateBranch.mockImplementation(() => (
           Promise.resolve(true)
         ));
@@ -474,7 +674,7 @@ describe('remoteTokens', () => {
 
   contexts.forEach((context) => {
     it(`fetch branchs in ${context.provider}`, async () => {
-      if (context === gitHubContext || context === gitLabContext || context === adoContext) {
+      if (context === gitHubContext || context === gitLabContext || context === adoContext || context === bitbucketContext) {
         mockFetchBranches.mockImplementation(() => (
           Promise.resolve(['main'])
         ));
@@ -483,5 +683,39 @@ describe('remoteTokens', () => {
         expect(await result.current.fetchBranches(context as StorageTypeCredentials)).toEqual(null);
       }
     });
+  });
+
+  it('Read tokens from File, should return token data', async () => {
+    expect(await result.current.fetchTokensFromFileOrDirectory(files as unknown as FileList)).toEqual({
+      metadata: {
+        commitMessage: 'Initial commit',
+      },
+      status: 'success',
+      themes: [
+        {
+          id: 'light',
+          name: 'Light',
+          selectedTokenSets: {
+            global: 'enabled',
+          },
+        },
+      ],
+      tokens: {
+        global: [
+          {
+            value: '#ffffff',
+            type: 'color',
+            name: 'black',
+          },
+        ],
+      },
+    });
+  });
+
+  it('Read tokens from File, should return null if there is no tokens on remote', async () => {
+    mockRetrieve.mockImplementation(() => (
+      Promise.resolve(null)
+    ));
+    expect(await result.current.fetchTokensFromFileOrDirectory(files as unknown as FileList)).toEqual(null);
   });
 });

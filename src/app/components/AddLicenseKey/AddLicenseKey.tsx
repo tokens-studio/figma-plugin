@@ -14,19 +14,22 @@ import useConfirm from '@/app/hooks/useConfirm';
 import { AddLicenseSource } from '@/app/store/models/userState';
 import ProBadge from '../ProBadge';
 import { userIdSelector } from '@/selectors/userIdSelector';
+import { licenseDetailsSelector } from '@/selectors';
+import { ldUserFactory } from '@/utils/ldUserFactory';
 
 export default function AddLicenseKey() {
   const dispatch = useDispatch<Dispatch>();
   const existingKey = useSelector(licenseKeySelector);
+  const licenseDetails = useSelector(licenseDetailsSelector);
   const licenseKeyError = useSelector(licenseKeyErrorSelector);
   const [newKey, setLicenseKey] = useState(existingKey);
   const { confirm } = useConfirm();
   const userId = useSelector(userIdSelector);
   const ldClient = useLDClient();
 
-  const addKey = useCallback(() => {
+  const addKey = useCallback(async () => {
     if (newKey) {
-      dispatch.userState.addLicenseKey({ key: newKey, source: AddLicenseSource.UI });
+      await dispatch.userState.addLicenseKey({ key: newKey, source: AddLicenseSource.UI });
     }
   }, [newKey, dispatch]);
 
@@ -55,6 +58,14 @@ export default function AddLicenseKey() {
     setLicenseKey(existingKey);
   }, [existingKey]);
 
+  useEffect(() => {
+    if (userId && existingKey && licenseDetails) {
+      ldClient?.identify(
+        ldUserFactory(userId, licenseDetails.plan, licenseDetails.entitlements, licenseDetails.clientEmail),
+      );
+    }
+  }, [userId, ldClient, existingKey, licenseDetails]);
+
   const onLicenseKeyChange = useCallback((ev: React.ChangeEvent<HTMLInputElement>) => {
     setLicenseKey(ev.target.value.trim());
   }, []);
@@ -82,11 +93,12 @@ export default function AddLicenseKey() {
       >
         <Box css={{ flexGrow: 1 }}>
           <Input
+            full
             size="large"
             name="license-key"
+            data-testid="settings-license-key-input"
             type="text"
             value={newKey || ''}
-            full
             onChange={onLicenseKeyChange}
             error={licenseKeyError}
           />

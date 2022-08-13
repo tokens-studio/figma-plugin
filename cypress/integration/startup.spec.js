@@ -1,57 +1,69 @@
+import {
+  StorageProviderType
+} from '@/constants/StorageProviderType';
+import {
+  TokenTypes
+} from '@/constants/TokenTypes';
+import { UpdateMode } from '@/constants/UpdateMode';
+
 describe('Loads application', () => {
+  const mockStartupParams = {
+    activeTheme: null,
+    lastOpened: Date.now(),
+    localApiProviders: [],
+    licenseKey: null,
+    settings: {
+      width: 800,
+      height: 500,
+      ignoreFirstPartForStyles: false,
+      inspectDeep: false,
+      prefixStylesWithThemeName: false,
+      showEmptyGroups: true,
+      updateMode: UpdateMode.PAGE,
+      updateOnChange: false,
+      updateRemote: true,
+      updateStyles: true,
+    },
+    storageType: { provider: StorageProviderType.LOCAL },
+    user: {
+      figmaId: 'figma:1234',
+      userId: 'uid:1234',
+      name: 'Jan Six',
+    },
+    localTokenData: {
+      activeTheme: null,
+      checkForChanges: false,
+      themes: [],
+      usedTokenSet: {},
+      updatedAt: new Date().toISOString(),
+      values: {},
+      version: '91',
+    },
+  }
+
   it('successfully loads when tokens are given', () => {
     cy.visit('/');
-
-    cy.window().then(($window) => {
-      const message = {
-        pluginMessage: {
-          type: 'set_tokens',
-          values: {
-            version: '5',
-            themes: [],
-            activeTheme: null,
-            values: {
-              options: [
-                {
-                  name: 'sizing.xs',
-                  value: 4,
-                },
-              ],
-              values: {
-                global: [
-                  {
-                    name: 'sizing.xs',
-                    value: 4,
-                    type: 'sizing'
-                  }
-                ],
-              },
-            }
-          },
+    cy.startup({
+      ...mockStartupParams,
+      localTokenData: {
+        ...mockStartupParams,
+        values: {
+          global: [
+            {
+              type: TokenTypes.COLOR,
+              name: 'colors.red',
+              value: '#ff0000',
+            },
+          ],
         },
-      };
-      $window.postMessage(message, '*');
+      },
     });
     cy.get('[data-cy=tokenlisting-sizing]').should('exist');
   });
 
   it('shows welcome page when no token values are given', () => {
     cy.visit('/');
-
-    cy.window().then(($window) => {
-      const message = {
-        pluginMessage: {
-          type: 'set_tokens',
-          values: {
-            values: {
-              global: [],
-            },
-          }
-
-        },
-      };
-      $window.postMessage(message, '*');
-    });
+    cy.startup(mockStartupParams);
     cy.get('p').contains('Welcome to Figma Tokens');
   });
 });

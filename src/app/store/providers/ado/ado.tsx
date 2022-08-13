@@ -10,13 +10,13 @@ import {
 } from '@/selectors';
 import { ADOTokenStorage } from '@/storage/ADOTokenStorage';
 import { isEqual } from '@/utils/isEqual';
-import { RemoteTokenStorageData } from '@/storage/RemoteTokenStorage';
-import { GitStorageMetadata } from '@/storage/GitTokenStorage';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { StorageTypeCredentials, StorageTypeFormValues } from '@/types/StorageType';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { useFlags } from '@/app/components/LaunchDarkly';
+import { RemoteResponseData } from '@/types/RemoteResponseData';
+import { ErrorMessages } from '@/constants/ErrorMessages';
 import { applyTokenSetOrder } from '@/utils/tokenset';
 import { saveLastSyncedState } from '@/utils/saveLastSyncedState';
 
@@ -50,13 +50,18 @@ export const useADO = () => {
     return confirmResult;
   }, [confirm]);
 
-  const pushTokensToADO = React.useCallback(async (context: AdoCredentials) => {
+  const pushTokensToADO = React.useCallback(async (context: AdoCredentials): Promise<RemoteResponseData> => {
     const storage = storageClientFactory(context);
     if (context.branch) {
       storage.setSource(context.branch);
     }
     const content = await storage.retrieve();
-
+    if (content?.status === 'failure') {
+      return {
+        status: 'failure',
+        errorMessage: content?.errorMessage,
+      };
+    }
     if (
       content
       && isEqual(content.tokens, tokens)
@@ -65,6 +70,7 @@ export const useADO = () => {
     ) {
       notifyToUI('Nothing to commit');
       return {
+        status: 'success',
         tokens,
         themes,
       };
@@ -101,15 +107,21 @@ export const useADO = () => {
         pushDialog('success');
 
         return {
+          status: 'success',
           tokens,
           themes,
         };
       } catch (e) {
         console.log('Error pushing to ADO', e);
+        return {
+          status: 'failure',
+          errorMessage: ErrorMessages.ADO_CREDENTIAL_ERROR,
+        };
       }
     }
 
     return {
+      status: 'success',
       tokens,
       themes,
     };
@@ -129,7 +141,7 @@ export const useADO = () => {
     dispatch.tokenState.setEditProhibited(!hasWriteAccess);
   }, [dispatch, storageClientFactory]);
 
-  const pullTokensFromADO = React.useCallback(async (context: AdoCredentials, receivedFeatureFlags?: LDProps['flags']) => {
+  const pullTokensFromADO = React.useCallback(async (context: AdoCredentials, receivedFeatureFlags?: LDProps['flags']): Promise<RemoteResponseData | null> => {
     const storage = storageClientFactory(context);
     if (context.branch) {
       storage.setSource(context.branch);
@@ -140,7 +152,12 @@ export const useADO = () => {
 
     try {
       const content = await storage.retrieve();
-
+      if (content?.status === 'failure') {
+        return {
+          status: 'failure',
+          errorMessage: content.errorMessage,
+        };
+      }
       if (content) {
         const sortedTokens = applyTokenSetOrder(content.tokens, content.metadata?.tokenSetOrder ?? []);
         return {
@@ -150,6 +167,10 @@ export const useADO = () => {
       }
     } catch (e) {
       console.log('Error', e);
+      return {
+        status: 'failure',
+        errorMessage: ErrorMessages.ADO_CREDENTIAL_ERROR,
+      };
     }
     return null;
   }, [
@@ -157,19 +178,27 @@ export const useADO = () => {
     storageClientFactory,
   ]);
 
-  const syncTokensWithADO = React.useCallback(async (context: AdoCredentials): Promise<RemoteTokenStorageData<GitStorageMetadata> | null> => {
+  const syncTokensWithADO = React.useCallback(async (context: AdoCredentials): Promise<RemoteResponseData> => {
     try {
       const storage = storageClientFactory(context);
       const branches = await storage.fetchBranches();
       dispatch.branchState.setBranches(branches);
       if (branches.length === 0) {
-        return null;
+        return {
+          status: 'failure',
+          errorMessage: ErrorMessages.EMPTY_BRANCH_ERROR,
+        };
       }
 
       await checkAndSetAccess(context);
 
       const content = await storage.retrieve();
-
+      if (content?.status === 'failure') {
+        return {
+          status: 'failure',
+          errorMessage: content.errorMessage,
+        };
+      }
       if (content) {
         if (
           !isEqual(content.tokens, tokens)
@@ -192,12 +221,14 @@ export const useADO = () => {
         }
         return content;
       }
-
       return await pushTokensToADO(context);
     } catch (e) {
-      notifyToUI('Error syncing with ADO, check credentials', { error: true });
+      notifyToUI(ErrorMessages.ADO_CREDENTIAL_ERROR, { error: true });
       console.log('Error', e);
-      return null;
+      return {
+        status: 'failure',
+        errorMessage: ErrorMessages.ADO_CREDENTIAL_ERROR,
+      };
     }
   }, [
     askUserIfPull,
@@ -212,10 +243,10 @@ export const useADO = () => {
   ]);
 
   const addNewADOCredentials = React.useCallback(
-    async (context: AdoFormValues): Promise<RemoteTokenStorageData<GitStorageMetadata> | null> => {
+    async (context: AdoFormValues): Promise<RemoteResponseData> => {
       const data = await syncTokensWithADO(context);
 
-      if (data) {
+      if (data.status === 'success') {
         AsyncMessageChannel.ReactInstance.message({
           type: AsyncMessageTypes.CREDENTIALS,
           credential: context,
@@ -224,10 +255,13 @@ export const useADO = () => {
           notifyToUI('No tokens stored on remote');
         }
       } else {
-        return null;
+        return {
+          status: 'failure',
+          errorMessage: data.errorMessage,
+        };
       }
-
       return {
+        status: 'success',
         tokens: data.tokens ?? tokens,
         themes: data.themes ?? themes,
         metadata: {},

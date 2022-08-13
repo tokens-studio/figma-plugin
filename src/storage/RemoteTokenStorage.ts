@@ -1,4 +1,5 @@
 import { DeepTokensMap, ThemeObjectsList } from '@/types';
+import { RemoteResponseData } from '@/types/RemoteResponseData';
 import type { AnyTokenList, SingleToken } from '@/types/tokens';
 import convertTokensToObject from '@/utils/convertTokensToObject';
 import parseTokenValues from '@/utils/parseTokenValues';
@@ -29,6 +30,10 @@ export interface RemoteTokenStorageMetadataFile<Metadata = unknown> {
   data: Metadata
 }
 
+export interface RemoteTokenstorageErrorMessage {
+  errorMessage: string
+}
+
 export type RemoteTokenStorageFile<Metadata = unknown> =
   RemoteTokenStorageSingleTokenSetFile
   | RemoteTokenStorageThemesFile
@@ -36,7 +41,7 @@ export type RemoteTokenStorageFile<Metadata = unknown> =
 
 export abstract class RemoteTokenStorage<Metadata = unknown, SaveOptions = unknown> {
   public abstract write(files: RemoteTokenStorageFile<Metadata>[], saveOptions?: SaveOptions): Promise<boolean>;
-  public abstract read(): Promise<RemoteTokenStorageFile<Metadata>[]>;
+  public abstract read(): Promise<RemoteTokenStorageFile<Metadata>[] | RemoteTokenstorageErrorMessage>;
 
   public async save(data: RemoteTokenStorageData<Metadata>, saveOptions?: SaveOptions): Promise<boolean> {
     const files: RemoteTokenStorageFile<Metadata>[] = [];
@@ -71,7 +76,7 @@ export abstract class RemoteTokenStorage<Metadata = unknown, SaveOptions = unkno
     return this.write(files, saveOptions);
   }
 
-  public async retrieve(): Promise<RemoteTokenStorageData<Metadata> | null> {
+  public async retrieve(): Promise<RemoteResponseData<Metadata> | null> {
     const data: RemoteTokenStorageData<Metadata> = {
       themes: [],
       tokens: {},
@@ -80,24 +85,34 @@ export abstract class RemoteTokenStorage<Metadata = unknown, SaveOptions = unkno
     // start by reading the files from the remote source
     // it is up to the remote storage implementation to split it up into "File" objects
     const files = await this.read();
-    if (files.length === 0) {
-      return null;
-    }
-    files.forEach((file) => {
-      if (file.type === 'themes') {
-        data.themes = [...data.themes, ...file.data];
-      } else if (file.type === 'tokenSet') {
-        data.tokens = {
-          ...data.tokens,
-          ...parseTokenValues({ [file.name]: file.data }),
-        };
-      } else if (file.type === 'metadata') {
-        data.metadata = {
-          ...data.metadata,
-          ...file.data,
-        };
+    // successfully fetch data
+    if (Array.isArray(files)) {
+      if (files.length === 0) {
+        return null;
       }
-    });
-    return data;
+      files.forEach((file) => {
+        if (file.type === 'themes') {
+          data.themes = [...data.themes, ...file.data];
+        } else if (file.type === 'tokenSet') {
+          data.tokens = {
+            ...data.tokens,
+            ...parseTokenValues({ [file.name]: file.data }),
+          };
+        } else if (file.type === 'metadata') {
+          data.metadata = {
+            ...data.metadata,
+            ...file.data,
+          };
+        }
+      });
+      return {
+        status: 'success',
+        ...data,
+      };
+    }
+    return {
+      status: 'failure',
+      ...files,
+    };
   }
 }
