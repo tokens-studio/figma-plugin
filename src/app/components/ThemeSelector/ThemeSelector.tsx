@@ -42,7 +42,7 @@ export const ThemeSelector: React.FC = () => {
     } else {
       track('Reset theme');
     }
-    dispatch.tokenState.setActiveTheme({ themeId: null, shouldUpdateNodes: true });
+    dispatch.tokenState.setActiveTheme({ themeId: nextTheme, shouldUpdateNodes: true });
   }, [dispatch, activeTheme]);
 
   const handleManageThemes = useCallback(() => {
