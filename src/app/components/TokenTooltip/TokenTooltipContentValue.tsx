@@ -5,8 +5,8 @@ import { SingleToken } from '@/types/tokens';
 import { SingleShadowValueDisplay } from './SingleShadowValueDisplay';
 import { TokensContext } from '@/context';
 import { isSingleBoxShadowToken, isSingleTypographyToken, isSingleCompositionToken } from '@/utils/is';
-import { SingleTypographyValueDisplay } from './SingleTypograhpyValueDisplay';
-import { TokenBoxshadowValue, TokenTypograpyValue } from '@/types/values';
+import { SingleTypographyValueDisplay } from './SingleTypographyValueDisplay';
+import { TokenBoxshadowValue, TokenTypographyValue } from '@/types/values';
 import Box from '../Box';
 import { SingleCompositionValueDisplay } from './SingleCompositionValueDisplay';
 
@@ -37,7 +37,7 @@ export const TokenTooltipContentValue: React.FC<Props> = ({ token, shouldResolve
   if (isSingleTypographyToken(token)) {
     return (
       <SingleTypographyValueDisplay
-        value={valueToCheck as TokenTypograpyValue}
+        value={valueToCheck as TokenTypographyValue}
         shouldResolve={shouldResolve}
       />
     );

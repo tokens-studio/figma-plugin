@@ -1,4 +1,4 @@
-export type TokenTypograpyValue = {
+export type TokenTypographyValue = {
   fontFamily?: string;
   fontWeight?: string;
   fontSize?: string;
