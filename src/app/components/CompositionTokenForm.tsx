@@ -57,8 +57,8 @@ export default function CompositionTokenForm({
 
   const removeToken = useCallback((property: string) => {
     const internalEditTokenValue = internalEditToken.value || internalEditToken.schema.schemas.value.properties;
-    delete internalEditTokenValue[property as CompositionTokenProperty];
-    setTokenValue(internalEditTokenValue as NodeTokenRefMap);
+    const { [property as keyof typeof internalEditTokenValue]: removeProperty, ...newTokenValue } = internalEditTokenValue;
+    setTokenValue(newTokenValue as NodeTokenRefMap);
   }, [internalEditToken]);
 
   const handleOrderObj = useCallback((newOrderObj: NodeTokenRefMap) => {

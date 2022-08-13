@@ -1,4 +1,10 @@
-export default async function getLicenseKey(userId: string | null): Promise<{ key?: string; error?: string }> {
+import { handleReactError } from './error/handleReactError';
+
+type GetLicenseKeyResponse =
+  { key: string; }
+  | { error: string; };
+
+export default async function getLicenseKey(userId: string | null): Promise<GetLicenseKeyResponse> {
   try {
     const res = await fetch(`${process.env.LICENSE_API_URL}/get-license?userId=${userId}`);
     if (res.status === 200) {
@@ -10,7 +16,7 @@ export default async function getLicenseKey(userId: string | null): Promise<{ ke
       error: message,
     };
   } catch (e) {
-    console.log(e);
+    handleReactError(e);
     return {
       error: 'Error fetching license',
     };

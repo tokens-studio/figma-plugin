@@ -103,11 +103,11 @@ jobs:
         run: yarn --frozen-lockfile
 
       # 4: Build package
-      - name: Build Package
+      - name: build:transform
         run: yarn build-transform
 
       # 5: Install dependencies
-      - name: Install dependencies
+      - name: Install dependencies - transformer
         run: cd token-transformer && yarn --frozen-lockfile
       
       # 6: Run tests

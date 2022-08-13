@@ -2,8 +2,10 @@ import z from 'zod';
 import * as pjs from '../../package.json';
 import { DeepTokensMap, ThemeObjectsList } from '@/types';
 import { SingleToken } from '@/types/tokens';
-import { RemoteTokenStorage, RemoteTokenStorageFile } from './RemoteTokenStorage';
+import { RemoteTokenStorage, RemoteTokenstorageErrorMessage, RemoteTokenStorageFile } from './RemoteTokenStorage';
 import { singleFileSchema } from './schemas/singleFileSchema';
+import { SystemFilenames } from './SystemFilenames';
+import { ErrorMessages } from '@/constants/ErrorMessages';
 
 const jsonbinSchema = singleFileSchema.extend({
   version: z.string(),
@@ -71,12 +73,12 @@ export class JSONBinTokenStorage extends RemoteTokenStorage<JsonBinMetadata> {
     return [
       {
         type: 'themes',
-        path: '$themes.json',
+        path: `${SystemFilenames.THEMES}.json`,
         data: data.$themes ?? [],
       },
       {
         type: 'metadata',
-        path: '$metadata.json',
+        path: `${SystemFilenames.METADATA}.json`,
         data: {
           version: data.version,
           updatedAt: data.updatedAt,
@@ -91,7 +93,7 @@ export class JSONBinTokenStorage extends RemoteTokenStorage<JsonBinMetadata> {
     ];
   }
 
-  public async read(): Promise<RemoteTokenStorageFile<JsonBinMetadata>[]> {
+  public async read(): Promise<RemoteTokenStorageFile<JsonBinMetadata>[] | RemoteTokenstorageErrorMessage> {
     const response = await fetch(`https://api.jsonbin.io/v3/b/${this.id}/latest`, {
       method: 'GET',
       mode: 'cors',
@@ -111,8 +113,10 @@ export class JSONBinTokenStorage extends RemoteTokenStorage<JsonBinMetadata> {
         const jsonbinData = validationResult.data.record as JsonbinData;
         return this.convertJsonBinDataToFiles(jsonbinData);
       }
+      return {
+        errorMessage: ErrorMessages.VALIDATION_ERROR,
+      };
     }
-
     return [];
   }
 

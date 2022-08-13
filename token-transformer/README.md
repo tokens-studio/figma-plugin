@@ -15,9 +15,11 @@ Install (either globally or local)
 
 `node token-transformer input.json output.json --expandTypography=false --expandShadow=false`
 
-`node token-transformer input.json output.json --expandTypography=false --expandShadow=false --preserveRawValue=true`
+`node token-transformer input.json output.json --expandTypography=false --expandShadow=false --expandComposition=false`
 
-`node token-transformer input.json output.json --expandTypography=false --expandShadow=false --preserveRawValue=true resolveReferences=false`
+`node token-transformer input.json output.json --expandTypography=false --expandShadow=false --expandComposition=false --preserveRawValue=true`
+
+`node token-transformer input.json output.json --expandTypography=false --expandShadow=false --expandComposition=false --preserveRawValue=true resolveReferences=false`
 
 ## Parameters
 

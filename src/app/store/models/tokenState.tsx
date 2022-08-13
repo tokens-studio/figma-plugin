@@ -1,4 +1,5 @@
 /* eslint-disable import/prefer-default-export */
+import omit from 'just-omit';
 import { createModel } from '@rematch/core';
 import extend from 'just-extend';
 import * as tokenStateReducers from './reducers/tokenState';
@@ -16,12 +17,12 @@ import {
   DeleteTokenPayload,
   SetTokenDataPayload,
   SetTokensFromStylesPayload,
-  ToggleManyTokenSetsPayload,
   UpdateDocumentPayload,
   UpdateTokenPayload,
   RenameTokenGroupPayload,
   DuplicateTokenGroupPayload,
   DuplicateTokenPayload,
+  DeleteTokenGroupPayload,
 } from '@/types/payloads';
 import { updateTokenPayloadToSingleToken } from '@/utils/updateTokenPayloadToSingleToken';
 import { RootModel } from '@/types/RootModel';
@@ -63,7 +64,9 @@ export const tokenState = createModel<RootModel>()({
     },
     activeTheme: null,
     activeTokenSet: 'global',
-    usedTokenSet: ['global'],
+    usedTokenSet: {
+      global: TokenSetStatus.ENABLED,
+    },
     editProhibited: false,
     hasUnsavedChanges: false,
     collapsedTokenSets: [],
@@ -77,46 +80,6 @@ export const tokenState = createModel<RootModel>()({
       return {
         ...state,
         editProhibited: payload,
-      };
-    },
-    toggleUsedTokenSet: (state, tokenSet: string) => ({
-      ...state,
-      activeTheme: null,
-      usedTokenSet: {
-        ...state.usedTokenSet,
-        // @README it was decided the user can not simply toggle to the intermediate SOURCE state
-        // this means for toggling we only switch between ENABLED and DISABLED
-        // setting as source is a separate action
-        [tokenSet]: state.usedTokenSet[tokenSet] === TokenSetStatus.DISABLED
-          ? TokenSetStatus.ENABLED
-          : TokenSetStatus.DISABLED,
-      },
-    }),
-    toggleManyTokenSets: (state, data: ToggleManyTokenSetsPayload) => {
-      const oldSetsWithoutInput = Object.fromEntries(
-        Object.entries(state.usedTokenSet)
-          .filter(([tokenSet]) => !data.sets.includes(tokenSet)),
-      );
-
-      if (data.shouldCheck) {
-        return {
-          ...state,
-          activeTheme: null,
-          usedTokenSet: {
-            ...oldSetsWithoutInput,
-            ...Object.fromEntries(data.sets.map((tokenSet) => ([tokenSet, TokenSetStatus.ENABLED]))),
-          },
-        };
-      }
-
-      return {
-        ...state,
-        activeTheme: null,
-        usedTokenSet: {
-          ...oldSetsWithoutInput,
-          ...Object.fromEntries(data.sets.map((tokenSet) => ([tokenSet, TokenSetStatus.DISABLED]))),
-          // @README see comment (1) - ensure that all token sets are always available
-        },
       };
     },
     toggleTreatAsSource: (state, tokenSet: string) => ({
@@ -161,24 +124,6 @@ export const tokenState = createModel<RootModel>()({
         setName === name ? null : [setName, tokenSet]
       ),
     ),
-    renameTokenSet: (state, data: { oldName: string; newName: string }) => {
-      if (
-        Object.keys(state.tokens).includes(data.newName)
-        && data.oldName !== data.newName
-      ) {
-        notifyToUI('Token set already exists', { error: true });
-        return state;
-      }
-
-      return updateTokenSetsInState(
-        state,
-        (setName, tokenSet) => (
-          setName === data.oldName
-            ? [data.newName, tokenSet]
-            : [setName, tokenSet]
-        ),
-      );
-    },
     setLastSyncedState: (state, data: string) => ({
       ...state,
       lastSyncedState: data,
@@ -218,7 +163,7 @@ export const tokenState = createModel<RootModel>()({
         hasUnsavedChanges: payload,
       };
     },
-    setTokens: (state, newTokens) => ({
+    setTokens: (state, newTokens: Record<string, AnyTokenList>) => ({
       ...state,
       tokens: newTokens,
     }),
@@ -243,13 +188,12 @@ export const tokenState = createModel<RootModel>()({
     },
     duplicateToken: (state, data: DuplicateTokenPayload) => {
       let newTokens: TokenStore['values'] = {};
-      const existingTokenIndex = state.tokens[data.parent].findIndex((n) => n.name === data.name);
+      const existingTokenIndex = state.tokens[data.parent].findIndex((n) => n.name === data?.oldName);
       if (existingTokenIndex > -1) {
-        const newName = `${data.name}-copy`;
         const existingTokens = [...state.tokens[data.parent]];
         existingTokens.splice(existingTokenIndex + 1, 0, {
           ...state.tokens[data.parent][existingTokenIndex],
-          name: newName,
+          name: data.newName,
         });
 
         newTokens = {
@@ -269,7 +213,6 @@ export const tokenState = createModel<RootModel>()({
       const newTokens: SingleToken[] = [];
       const existingTokens: SingleToken[] = [];
       const updatedTokens: SingleToken[] = [];
-
       // Iterate over received styles and check if they existed before or need updating
       Object.values(receivedStyles).forEach((values) => {
         values.forEach((token) => {
@@ -311,10 +254,9 @@ export const tokenState = createModel<RootModel>()({
       const index = state.tokens[data.parent].findIndex((token) => token.name === nameToFind);
       const newArray = [...state.tokens[data.parent]];
       newArray[index] = {
-        ...newArray[index],
+        ...omit(newArray[index], 'description'),
         ...updateTokenPayloadToSingleToken(data),
       } as SingleToken;
-
       return {
         ...state,
         tokens: {
@@ -334,12 +276,12 @@ export const tokenState = createModel<RootModel>()({
 
       return newState;
     },
-    deleteTokenGroup: (state, data: DeleteTokenPayload) => {
+    deleteTokenGroup: (state, data: DeleteTokenGroupPayload) => {
       const newState = {
         ...state,
         tokens: {
           ...state.tokens,
-          [data.parent]: state.tokens[data.parent].filter((token) => !token.name.startsWith(data.path)),
+          [data.parent]: state.tokens[data.parent].filter((token) => !(token.name.startsWith(`${data.path}.`) && token.type === data.type)),
         },
       };
 
@@ -350,7 +292,6 @@ export const tokenState = createModel<RootModel>()({
       const {
         path, oldName, newName, type, parent,
       } = data;
-
       const tokensInParent = state.tokens[parent] ?? [];
       const renamedTokensInParent = tokensInParent.map((token) => {
         if (token.name.startsWith(`${path}${oldName}.`) && token.type === type) {

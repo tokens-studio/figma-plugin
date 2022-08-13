@@ -2,7 +2,7 @@ import React, { useCallback, useContext, useMemo } from 'react';
 import { useDispatch, useSelector, useStore } from 'react-redux';
 import { activeTokenSetSelector, tokensSelector, uiDisabledSelector } from '@/selectors';
 import { SingleToken } from '@/types/tokens';
-import { Dispatch } from '@/app/store';
+import { Dispatch, RootState } from '@/app/store';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { lightOrDark } from '@/utils/color';
 import { TokensContext } from '@/context';
@@ -24,7 +24,7 @@ export const TokenButtonDraggable: React.FC<Props> = ({
   active, displayType, type, token, draggedToken, setDraggedToken, setDragOverToken, children,
 }) => {
   const tokensContext = useContext(TokensContext);
-  const store = useStore();
+  const store = useStore<RootState>();
   const dispatch = useDispatch<Dispatch>();
   const uiDisabled = useSelector(uiDisabledSelector);
   const activeTokenSet = useSelector(activeTokenSetSelector);
@@ -101,7 +101,6 @@ export const TokenButtonDraggable: React.FC<Props> = ({
           ...tokens,
           [activeTokenSet]: set,
         };
-
         dispatch.tokenState.setTokens(newTokens);
       }
     }

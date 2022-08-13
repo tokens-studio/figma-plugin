@@ -1,9 +1,10 @@
 import compact from 'just-compact';
 import {
-  RemoteTokenStorage, RemoteTokenStorageFile, RemoteTokenStorageSingleTokenSetFile, RemoteTokenStorageThemesFile,
+  RemoteTokenStorage, RemoteTokenstorageErrorMessage, RemoteTokenStorageFile, RemoteTokenStorageSingleTokenSetFile, RemoteTokenStorageThemesFile,
 } from './RemoteTokenStorage';
 import IsJSONString from '@/utils/isJSONString';
 import { complexSingleFileSchema, multiFileSchema } from './schemas';
+import { ErrorMessages } from '@/constants/ErrorMessages';
 
 type StorageFlags = {
   multiFileEnabled: boolean
@@ -26,7 +27,7 @@ export class FileTokenStorage extends RemoteTokenStorage {
     return this;
   }
 
-  public async read(): Promise<RemoteTokenStorageFile[]> {
+  public async read(): Promise<RemoteTokenStorageFile[] | RemoteTokenstorageErrorMessage> {
     try {
       if (this.flags.multiFileEnabled && this.files.length > 1) {
         const jsonFiles = Array.from(this.files).filter((file) => file.webkitRelativePath.endsWith('.json'))
@@ -78,14 +79,13 @@ export class FileTokenStorage extends RemoteTokenStorage {
       if (this.files[0].name.endsWith('.json')) {
         const reader = new FileReader();
         reader.readAsText(this.files[0]);
-        return await new Promise<RemoteTokenStorageFile[]>((resolve) => {
+        return await new Promise<RemoteTokenStorageFile[] | RemoteTokenstorageErrorMessage>((resolve) => {
           reader.onload = async () => {
             const result = reader.result as string;
 
             if (result && IsJSONString(result)) {
               const parsedJsonData = JSON.parse(result);
               const validationResult = await complexSingleFileSchema.safeParseAsync(parsedJsonData);
-
               if (validationResult.success) {
                 const { $themes = [], ...data } = validationResult.data;
                 resolve([
@@ -102,6 +102,9 @@ export class FileTokenStorage extends RemoteTokenStorage {
                   })),
                 ]);
               }
+              resolve({
+                errorMessage: ErrorMessages.VALIDATION_ERROR,
+              });
             }
             resolve([]);
           };

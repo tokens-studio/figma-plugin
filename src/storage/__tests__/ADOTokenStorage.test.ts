@@ -2,6 +2,7 @@ import { ADOTokenStorage } from '../ADOTokenStorage';
 import { mockFetch } from '../../../tests/__mocks__/fetchMock';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
+import { ErrorMessages } from '@/constants/ErrorMessages';
 
 describe('ADOTokenStorage', () => {
   const baseUrl = 'https://brandcode.azure.com';
@@ -180,15 +181,34 @@ describe('ADOTokenStorage', () => {
     });
   });
 
+  it('should return validation error when the content(s) are invalid', async () => {
+    mockFetch.mockImplementationOnce(() => Promise.resolve({
+      ok: true,
+      json: () => Promise.resolve(''),
+    }));
+
+    storageProvider.changePath('data/tokens.json');
+    const result = await storageProvider.read();
+    expect(result).toEqual({
+      errorMessage: ErrorMessages.VALIDATION_ERROR,
+    });
+  });
+
   it('can read from Git in a multifile format', async () => {
     mockFetch.mockImplementationOnce(() => Promise.resolve({
       ok: true,
       json: () => Promise.resolve({
         count: 2,
         value: [
+          { path: 'multifile/$metadata.json' },
           { path: 'multifile/$themes.json' },
           { path: 'multifile/global.json' },
         ],
+      }),
+    })).mockImplementationOnce(() => Promise.resolve({
+      ok: true,
+      json: () => Promise.resolve({
+        tokenSetOrder: ['global'],
       }),
     })).mockImplementationOnce(() => Promise.resolve({
       ok: true,
@@ -215,6 +235,13 @@ describe('ADOTokenStorage', () => {
 
     const result = await storageProvider.read();
     expect(result[0]).toEqual({
+      type: 'metadata',
+      path: 'multifile/$metadata.json',
+      data: {
+        tokenSetOrder: ['global'],
+      },
+    });
+    expect(result[1]).toEqual({
       type: 'themes',
       path: 'multifile/$themes.json',
       data: [{
@@ -223,7 +250,7 @@ describe('ADOTokenStorage', () => {
         selectedTokenSets: {},
       }],
     });
-    expect(result[1]).toEqual({
+    expect(result[2]).toEqual({
       type: 'tokenSet',
       name: 'global',
       path: 'multifile/global.json',
@@ -274,10 +301,8 @@ describe('ADOTokenStorage', () => {
     expect(await storageProvider.write([
       {
         type: 'metadata',
-        path: 'metadata.json',
-        data: {
-          commitMessage: 'Initial commit',
-        },
+        path: '$metadata.json',
+        data: {},
       },
       {
         type: 'themes',
@@ -304,7 +329,9 @@ describe('ADOTokenStorage', () => {
           },
         },
       },
-    ])).toBe(true);
+    ], {
+      commitMessage: 'Initial commit',
+    })).toBe(true);
     expect(mockFetch).toHaveBeenNthCalledWith(
       4,
       `${baseUrl}/${projectId}/_apis/git/repositories/${repositoryId}/pushes?api-version=6.0`,
@@ -330,6 +357,7 @@ describe('ADOTokenStorage', () => {
                   item: { path: '/data/tokens.json' },
                   newContent: {
                     content: JSON.stringify({
+                      $metadata: {},
                       $themes: [
                         {
                           id: 'light',
@@ -387,6 +415,7 @@ describe('ADOTokenStorage', () => {
           { path: '/multifile/core.json' },
           { path: '/multifile/internal.json' },
           { path: '/multifile/$themes.json' },
+          { path: '/multifile/$metadata.json' },
         ],
       }),
     }))
@@ -399,9 +428,9 @@ describe('ADOTokenStorage', () => {
     expect(await storageProvider.write([
       {
         type: 'metadata',
-        path: 'metadata.json',
+        path: '$metadata.json',
         data: {
-          commitMessage: 'Initial commit',
+          tokenSetOrder: ['global'],
         },
       },
       {
@@ -441,7 +470,9 @@ describe('ADOTokenStorage', () => {
           },
         },
       },
-    ])).toBe(true);
+    ], {
+      commitMessage: 'Initial commit',
+    })).toBe(true);
     expect(mockFetch).toHaveBeenNthCalledWith(
       4,
       `${baseUrl}/${projectId}/_apis/git/repositories/${repositoryId}/pushes?api-version=6.0`,
@@ -469,6 +500,16 @@ describe('ADOTokenStorage', () => {
                 {
                   changeType: 'delete',
                   item: { path: '/multifile/internal.json' },
+                },
+                {
+                  changeType: 'edit',
+                  item: { path: '/multifile/$metadata.json' },
+                  newContent: {
+                    content: JSON.stringify({
+                      tokenSetOrder: ['global'],
+                    }, null, 2),
+                    contentType: 'rawtext',
+                  },
                 },
                 {
                   changeType: 'edit',
