@@ -1,4 +1,3 @@
-import Tokens from '@/app/components/Tokens';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { AnyTokenList, SingleToken } from '@/types/tokens';
 import {
@@ -44,7 +43,7 @@ function checkForTokens({
   if (isSingleTokenValueObject(token) && !shouldExpandTypography && !shouldExpandShadow && !shouldExpandComposition) {
     returnValue = {
       ...token,
-      ...((!('type' in token)  && inheritType) ? { type: inheritType, inheritTypeLevel: currentTypeLevel } : { }),
+      ...((!('type' in token) && inheritType) ? { type: inheritType, inheritTypeLevel: currentTypeLevel } : { }),
     };
   } else if (
     (isSingleTypographyToken(token) && !expandTypography)
