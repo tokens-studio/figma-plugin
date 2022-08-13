@@ -19,6 +19,19 @@ module.exports = (env, argv) => ({
         ],
         exclude: /node_modules/,
       },
+      {
+        test: /\.svg$/,
+        use: [
+          {
+            loader: '@svgr/webpack',
+            options: {
+              svgoConfig: {
+                plugins: [{ removeViewBox: false }],
+              },
+            },
+          },
+        ],
+      },
     ],
   },
 
