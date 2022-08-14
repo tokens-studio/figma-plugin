@@ -5,6 +5,7 @@ import { TokenTypes } from '@/constants/TokenTypes';
 import { BoxShadowTypes } from '@/constants/BoxShadowTypes';
 import { render } from '../../../../tests/config/setupTest';
 import { TokensContext } from '@/context';
+import NotFoundBadge from './NotFoundBadge';
 
 const tokens: SingleToken[] = [
   {
@@ -166,6 +167,13 @@ const tokens: SingleToken[] = [
     rawValue: '{font-style.other}',
     description: 'alias other token',
   },
+  {
+    name: 'brokentoken',
+    type: TokenTypes.COLOR,
+    value: '{doesntexist}',
+    rawValue: '{doesntexist}',
+    failedToResolve: true,
+  },
 ];
 
 const customStore = {
@@ -182,5 +190,22 @@ describe('TokenTooltip alias', () => {
       expect(getByText((content) => (typeof token.rawValue === 'object' ? content.includes('test-value-object-value') : content.includes(String(token.rawValue))))).toBeInTheDocument();
       expect(getByText(String(token.name.split('.').pop()))).toBeInTheDocument();
     });
+  });
+
+  it('shows indicator when failed to resolve', () => {
+    const { getByText } = render(
+      <TokensContext.Provider value={customStore}>
+        <TokenTooltipContent token={{
+          name: 'brokentoken',
+          type: TokenTypes.COLOR,
+          value: '{doesntexist}',
+          rawValue: '{doesntexist}',
+        }}
+        />
+      </TokensContext.Provider>,
+    );
+
+    expect(getByText(String('brokentoken'))).toBeInTheDocument();
+    expect(NotFoundBadge).toBeInTheDocument();
   });
 });
