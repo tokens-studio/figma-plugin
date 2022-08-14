@@ -175,7 +175,8 @@ export function useGitLab() {
       }
 
       if (content) {
-        const sortedTokens = applyTokenSetOrder(content.tokens, content.metadata?.tokenSetOrder ?? []);
+        // If we didn't get a tokenSetOrder from metadata, use the order of the token sets as they appeared
+        const sortedTokens = applyTokenSetOrder(content.tokens, content.metadata?.tokenSetOrder ?? Object.keys(content.tokens));
         return {
           ...content,
           tokens: sortedTokens,
