@@ -5,7 +5,6 @@ import { TokenTypes } from '@/constants/TokenTypes';
 import { BoxShadowTypes } from '@/constants/BoxShadowTypes';
 import { render } from '../../../../tests/config/setupTest';
 import { TokensContext } from '@/context';
-import NotFoundBadge from './NotFoundBadge';
 
 const tokens: SingleToken[] = [
   {
@@ -172,6 +171,7 @@ const tokens: SingleToken[] = [
     type: TokenTypes.COLOR,
     value: '{doesntexist}',
     rawValue: '{doesntexist}',
+    description: 'a broken reference',
     failedToResolve: true,
   },
 ];
@@ -193,19 +193,20 @@ describe('TokenTooltip alias', () => {
   });
 
   it('shows indicator when failed to resolve', () => {
-    const { getByText } = render(
+    const { getByText, getByTestId } = render(
       <TokensContext.Provider value={customStore}>
         <TokenTooltipContent token={{
           name: 'brokentoken',
           type: TokenTypes.COLOR,
           value: '{doesntexist}',
           rawValue: '{doesntexist}',
+          description: 'a broken reference',
         }}
         />
       </TokensContext.Provider>,
     );
 
     expect(getByText(String('brokentoken'))).toBeInTheDocument();
-    expect(NotFoundBadge).toBeInTheDocument();
+    expect(getByTestId('not-found-badge')).toBeInTheDocument();
   });
 });

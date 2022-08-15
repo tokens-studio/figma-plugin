@@ -8,7 +8,7 @@ const StyledAliasBadge = styled('div', {
 
 export default function NotFoundBadge() {
   return (
-    <StyledAliasBadge>
+    <StyledAliasBadge data-testid="not-found-badge">
       <LinkBreak2Icon />
     </StyledAliasBadge>
   );
