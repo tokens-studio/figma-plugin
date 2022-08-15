@@ -1,4 +1,3 @@
-import Tokens from '@/app/components/Tokens';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { AnyTokenList, SingleToken } from '@/types/tokens';
 import {
