@@ -153,11 +153,11 @@ const tokens: SingleToken[] = [
     type: TokenTypes.COMPOSITION,
     value: {
       fill: '#f8fafc',
-      sizing: '10'
+      sizing: '10',
     },
     rawValue: {
       fill: '{color.slate.50}',
-      sizing: '{size.2}'
+      sizing: '{size.2}',
     },
     description: 'regular composition token',
   },
@@ -173,10 +173,12 @@ describe('TokenTooltipContent', () => {
       name: 'size.regular',
       type: TokenTypes.SIZING,
       value: '10',
-    }
+      description: 'regular sizing token',
+    };
     const result = render(<TokensContext.Provider value={customStore}><TokenTooltipContent token={sizingToken as SingleToken} /></TokensContext.Provider>);
     expect(result.queryByText(String(sizingToken.name.split('.').pop()))).toBeInTheDocument();
     expect(result.queryByText(sizingToken.value)).toBeInTheDocument();
+    expect(result.queryByText(sizingToken.description)).toBeInTheDocument();
   });
 
   it('should return alias typography token tooltip content', () => {
@@ -193,7 +195,7 @@ describe('TokenTooltipContent', () => {
         paragraphSpacing: '0',
         textDecoration: 'none',
         textCase: 'none',
-      }
+      },
     };
     const result = render(<TokensContext.Provider value={customStore}><TokenTooltipContent token={aliasTypographyToken as SingleToken} /></TokensContext.Provider>);
     expect(result.queryByText(String(aliasTypographyToken.name.split('.').pop()))).toBeInTheDocument();
@@ -285,7 +287,7 @@ describe('TokenTooltipContent', () => {
         color: '#f3f4f6',
         type: BoxShadowTypes.DROP_SHADOW,
       },
-      };
+    };
     const result = render(<TokensContext.Provider value={customStore}><TokenTooltipContent token={aliasBoxShadowToken as SingleToken} /></TokensContext.Provider>);
     expect(result.queryByText(String(aliasBoxShadowToken.name.split('.').pop()))).toBeInTheDocument();
     expect(result.queryByText(`${aliasBoxShadowToken.resolvedValue.x} ${aliasBoxShadowToken.resolvedValue.y} ${aliasBoxShadowToken.resolvedValue.blur} ${aliasBoxShadowToken.resolvedValue.spread} ${aliasBoxShadowToken.resolvedValue.color}`)).toBeInTheDocument();
@@ -297,12 +299,12 @@ describe('TokenTooltipContent', () => {
       type: TokenTypes.COMPOSITION,
       value: {
         fill: '{color.slate.50}',
-        sizing: '{size.2}'
+        sizing: '{size.2}',
       },
       resolvedValue: {
         fill: '#f8fafc',
-        sizing: '10'
-      }
+        sizing: '10',
+      },
     };
     const result = render(<TokensContext.Provider value={customStore}><TokenTooltipContent token={compositionToken as SingleToken} /></TokensContext.Provider>);
     expect(result.queryByText(String(compositionToken.name.split('.').pop()))).toBeInTheDocument();
