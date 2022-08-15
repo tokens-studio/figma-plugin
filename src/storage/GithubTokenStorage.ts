@@ -98,7 +98,13 @@ export class GithubTokenStorage extends GitTokenStorage {
       return directory.sha;
     }
 
-    throw new Error('Parent is not a directory');
+    // @README if the parent directory only contains a single subdirectory
+    // it will not return an array with 1 item - but rather it will return the item itself
+    if (parentDirectoryTreeResponse.data.path === path) {
+      return parentDirectoryTreeResponse.data.sha;
+    }
+
+    throw new Error('Could not find directory SHA');
   }
 
   public async fetchBranches() {
