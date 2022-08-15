@@ -269,7 +269,26 @@ describe('TokenTooltipContent', () => {
     const result = render(<TokensContext.Provider value={customStore}><TokenTooltipContent token={multiBoxShadowToken as SingleToken} /></TokensContext.Provider>);
     expect(result.queryByText(String(multiBoxShadowToken.name.split('.').pop()))).toBeInTheDocument();
     expect(result.queryByText(`${multiBoxShadowToken.value[0].x} ${multiBoxShadowToken.value[0].y} ${multiBoxShadowToken.value[0].blur} ${multiBoxShadowToken.value[0].spread} ${multiBoxShadowToken.value[0].color}`)).toBeInTheDocument();
-    expect(result.queryByText(`${multiBoxShadowToken.value[1].x} ${multiBoxShadowToken.value[1].y} ${multiBoxShadowToken.value[1].blur} ${multiBoxShadowToken.value[1].spread} ${multiBoxShadowToken.value[0].color}`)).toBeInTheDocument();
+    expect(result.queryByText(`${multiBoxShadowToken.value[1].x} ${multiBoxShadowToken.value[1].y} ${multiBoxShadowToken.value[1].blur} ${multiBoxShadowToken.value[1].spread} ${multiBoxShadowToken.value[1].color}`)).toBeInTheDocument();
+  });
+
+  it('should return alias boxShadow token tooltip content', () => {
+    const aliasBoxShadowToken = {
+      name: 'boxshadow.regular',
+      type: TokenTypes.BOX_SHADOW,
+      value: '{boxshadow.regular}',
+      resolvedValue: {
+        x: '2',
+        y: '2',
+        blur: '2',
+        spread: '2',
+        color: '#f3f4f6',
+        type: BoxShadowTypes.DROP_SHADOW,
+      },
+      };
+    const result = render(<TokensContext.Provider value={customStore}><TokenTooltipContent token={aliasBoxShadowToken as SingleToken} /></TokensContext.Provider>);
+    expect(result.queryByText(String(aliasBoxShadowToken.name.split('.').pop()))).toBeInTheDocument();
+    expect(result.queryByText(`${aliasBoxShadowToken.resolvedValue.x} ${aliasBoxShadowToken.resolvedValue.y} ${aliasBoxShadowToken.resolvedValue.blur} ${aliasBoxShadowToken.resolvedValue.spread} ${aliasBoxShadowToken.resolvedValue.color}`)).toBeInTheDocument();
   });
 
   it('should return composition token tooltip content', () => {
