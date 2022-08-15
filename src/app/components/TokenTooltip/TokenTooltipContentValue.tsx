@@ -33,7 +33,9 @@ export const TokenTooltipContentValue: React.FC<Props> = ({ token, shouldResolve
     if (shouldResolve) return getTokenValue(token.name, tokensContext.resolvedTokens)?.value;
     return token.value;
   }, [token, getTokenValue, shouldResolve, tokenIsShadowOrTypographyAlias, tokensContext.resolvedTokens]);
-
+  React.useEffect(() => {
+    console.log("valuetoche", valueToCheck)
+  }, [valueToCheck])
   if (isSingleTypographyToken(token)) {
     return (
       <SingleTypographyValueDisplay

@@ -131,13 +131,11 @@ const customStore = {
 };
 
 describe('TokenTooltipContent', () => {
-  it('should return normal token content', () => {
-    const token = {
-      name: 'size.regular',
-      type: 'sizing',
-      value: '10',
-    }
-    const result = render(<TokensContext.Provider value={customStore}><TokenTooltipContent token={token as SingleToken} /></TokensContext.Provider>);
-
-  })
+  it('should return token tooltip content', () => {
+    tokens.forEach((token) => {
+      const result = render(<TokensContext.Provider value={customStore}><TokenTooltipContent token={token as SingleToken} /></TokensContext.Provider>);
+      expect(result.queryByText(String(token.name.split('.').pop()))).toBeInTheDocument();
+      expect(result.queryByText(token.value)).toBeInTheDocument();  
+    })
+  });
 });
