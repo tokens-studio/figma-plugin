@@ -28,7 +28,7 @@ type ExtendedOctokitClient = Omit<Octokit, 'repos'> & {
   }
 };
 
-function getTreeMode(type: 'dir' | 'file' | string) {
+export function getTreeMode(type: 'dir' | 'file' | string) {
   switch (type) {
     case 'dir':
       return '040000';
@@ -94,7 +94,7 @@ export class GithubTokenStorage extends GitTokenStorage {
 
     if (Array.isArray(parentDirectoryTreeResponse.data)) {
       const directory = parentDirectoryTreeResponse.data.find((item) => item.path === path);
-      if (!directory) throw new Error(`Unable to find directory, ${parent}`);
+      if (!directory) throw new Error(`Unable to find directory, ${path}`);
       return directory.sha;
     }
 
