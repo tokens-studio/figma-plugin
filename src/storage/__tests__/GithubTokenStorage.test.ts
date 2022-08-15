@@ -1280,5 +1280,15 @@ describe('GithubTokenStorage', () => {
       })
     ));
     expect(await storageProvider.getTreeShaForDirectory('companyA/ds')).toEqual('single-directory-sha');
+
+    mockGetContent.mockImplementationOnce(() => (
+      Promise.resolve({
+        data: {
+          path: 'companyA',
+          sha: 'single-directory-sha',
+        },
+      })
+    ));
+    await expect(storageProvider.getTreeShaForDirectory('companyA/ds')).rejects.toThrow('Could not find directory SHA');
   });
 });
