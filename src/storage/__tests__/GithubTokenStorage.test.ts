@@ -1245,4 +1245,40 @@ describe('GithubTokenStorage', () => {
       commitMessage: '',
     })).toBe(false);
   });
+
+  it('should be able to get the tree sha for a given path', async () => {
+    mockListBranches.mockImplementationOnce(() => (
+      Promise.resolve({
+        data: [
+          {
+            name: 'main',
+            commit: { sha: 'root-sha' },
+          },
+        ],
+      })
+    ));
+    expect(await storageProvider.getTreeShaForDirectory('')).toEqual('root-sha');
+
+    mockGetContent.mockImplementationOnce(() => (
+      Promise.resolve({
+        data: [
+          {
+            path: 'companyA/ds',
+            sha: 'directory-sha',
+          },
+        ],
+      })
+    ));
+    expect(await storageProvider.getTreeShaForDirectory('companyA/ds')).toEqual('directory-sha');
+
+    mockGetContent.mockImplementationOnce(() => (
+      Promise.resolve({
+        data: {
+          path: 'companyA/ds',
+          sha: 'single-directory-sha',
+        },
+      })
+    ));
+    expect(await storageProvider.getTreeShaForDirectory('companyA/ds')).toEqual('single-directory-sha');
+  });
 });
