@@ -64,12 +64,45 @@ export class GithubTokenStorage extends GitTokenStorage {
     }) as ExtendedOctokitClient;
   }
 
-  public async fetchBranches() {
-    const branches = await this.octokitClient.repos.listBranches({
+  public async listBranches() {
+    return this.octokitClient.repos.listBranches({
       owner: this.owner,
       repo: this.repository,
       headers: octokitClientDefaultHeaders,
     });
+  }
+
+  public async getTreeShaForDirectory(path: string) {
+    // @README this is necessary because to figure out the tree SHA we need to fetch the parent directory contents
+    // however when pulling from the root directory we can  not do this, but we can take the SHA from the branch
+    if (path === '') {
+      const branches = await this.listBranches();
+      const branch = branches.data.find((entry) => entry.name === this.branch);
+      if (!branch) throw new Error(`Branch not found, ${this.branch}`);
+      return branch.commit.sha;
+    }
+
+    // get the parent directory content to find out the sha
+    const parent = path.includes('/') ? path.slice(0, path.lastIndexOf('/')) : '';
+    const parentDirectoryTreeResponse = await this.octokitClient.rest.repos.getContent({
+      owner: this.owner,
+      repo: this.repository,
+      path: parent,
+      ref: this.branch,
+      headers: octokitClientDefaultHeaders,
+    });
+
+    if (Array.isArray(parentDirectoryTreeResponse.data)) {
+      const directory = parentDirectoryTreeResponse.data.find((item) => item.path === path);
+      if (!directory) throw new Error(`Unable to find directory, ${parent}`);
+      return directory.sha;
+    }
+
+    throw new Error('Parent is not a directory');
+  }
+
+  public async fetchBranches() {
+    const branches = await this.listBranches();
     return branches.data.map((branch) => branch.name);
   }
 
@@ -112,45 +145,24 @@ export class GithubTokenStorage extends GitTokenStorage {
 
   public async read(): Promise<RemoteTokenStorageFile<GitStorageMetadata>[] | RemoteTokenstorageErrorMessage> {
     try {
+      const normalizedPath = compact(this.path.split('/')).join('/');
       const response = await this.octokitClient.rest.repos.getContent({
+        path: normalizedPath,
         owner: this.owner,
         repo: this.repository,
-        path: this.path,
         ref: this.branch,
         headers: octokitClientDefaultHeaders,
       });
       // read entire directory
       if (Array.isArray(response.data)) {
-        let treeResponse;
-        const filteredPath = this.path.replace(/^\/+/, '');
-        const parentPath = filteredPath.includes('/') ? filteredPath.slice(0, filteredPath.lastIndexOf('/')) : '';
-        const parentDirectoryTreeResponse = await this.octokitClient.rest.repos.getContent({
+        const directorySha = await this.getTreeShaForDirectory(normalizedPath);
+        const treeResponse = await this.octokitClient.rest.git.getTree({
           owner: this.owner,
           repo: this.repository,
-          path: parentPath,
-          ref: this.branch,
+          tree_sha: directorySha,
+          recursive: 'true',
           headers: octokitClientDefaultHeaders,
         });
-        if (Array.isArray(parentDirectoryTreeResponse.data)) {
-          const directory = parentDirectoryTreeResponse.data.find((item) => item.path === filteredPath);
-          if (directory) {
-            treeResponse = await this.octokitClient.rest.git.getTree({
-              owner: this.owner,
-              repo: this.repository,
-              tree_sha: directory.sha,
-              recursive: 'true',
-              headers: octokitClientDefaultHeaders,
-            });
-          }
-        } else if (parentDirectoryTreeResponse.data.path === filteredPath) {
-          treeResponse = await this.octokitClient.rest.git.getTree({
-            owner: this.owner,
-            repo: this.repository,
-            tree_sha: parentDirectoryTreeResponse.data.sha,
-            recursive: 'true',
-            headers: octokitClientDefaultHeaders,
-          });
-        }
         if (treeResponse && treeResponse.data.tree.length > 0) {
           const jsonFiles = treeResponse.data.tree.filter((file) => (
             file.path?.endsWith('.json')
@@ -161,7 +173,7 @@ export class GithubTokenStorage extends GitTokenStorage {
             treeItem.path ? this.octokitClient.rest.repos.getContent({
               owner: this.owner,
               repo: this.repository,
-              path: treeItem.path.startsWith(filteredPath) ? treeItem.path : `${filteredPath}/${treeItem.path}`,
+              path: treeItem.path.startsWith(normalizedPath) ? treeItem.path : `${normalizedPath}/${treeItem.path}`,
               ref: this.branch,
               headers: octokitClientDefaultHeaders,
             }) : Promise.resolve(null)
@@ -174,7 +186,7 @@ export class GithubTokenStorage extends GitTokenStorage {
               && !Array.isArray(fileContent?.data)
               && 'content' in fileContent.data
             ) {
-              const filePath = path.startsWith(filteredPath) ? path : `${filteredPath}/${path}`;
+              const filePath = path.startsWith(normalizedPath) ? path : `${normalizedPath}/${path}`;
               let name = filePath.substring(this.path.length).replace(/^\/+/, '');
               name = name.replace('.json', '');
               const parsed = JSON.parse(decodeBase64(fileContent.data.content)) as GitMultiFileObject;
@@ -234,7 +246,7 @@ export class GithubTokenStorage extends GitTokenStorage {
       return [];
     } catch (e) {
       // Raise error (usually this is an auth error)
-      console.log('Error', e);
+      console.error('Error', e);
       return [];
     }
   }
