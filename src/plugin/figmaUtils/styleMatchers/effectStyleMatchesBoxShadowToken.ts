@@ -28,29 +28,19 @@ function convertBoxShadowToFigmaEffect(value: TokenBoxshadowValue): Effect {
   };
 }
 
-export function findMatchingNonLocalEffectStyle(
-  styleId: string,
+export function effectStyleMatchesBoxShadowToken(
+  effectStyle: EffectStyle | undefined,
   boxShadowToken: string | TokenBoxshadowValue | TokenBoxshadowValue[],
 ) {
-  let matchingStyle: EffectStyle | undefined;
-
-  if (styleId) {
-    const nonLocalStyle = figma.getStyleById(styleId);
-    if (typeof boxShadowToken !== 'string' && nonLocalStyle?.type === 'EFFECT') {
-      const boxShadowTokenArr = Array.isArray(boxShadowToken) ? boxShadowToken : [boxShadowToken];
-      const styleEffects = (nonLocalStyle as EffectStyle).effects;
-      if (styleEffects.length === boxShadowTokenArr.length) {
-        if (
-          styleEffects.every((styleEffect, idx) => {
-            const tokenEffect = convertBoxShadowToFigmaEffect(boxShadowTokenArr[idx]);
-            return isEffectEqual(styleEffect, tokenEffect);
-          })
-        ) {
-          matchingStyle = nonLocalStyle as EffectStyle;
-        }
-      }
+  if (effectStyle && typeof boxShadowToken !== 'string') {
+    const boxShadowTokenArr = Array.isArray(boxShadowToken) ? boxShadowToken : [boxShadowToken];
+    const styleEffects = effectStyle.effects;
+    if (styleEffects.length === boxShadowTokenArr.length) {
+      return styleEffects.every((styleEffect, idx) => {
+        const tokenEffect = convertBoxShadowToFigmaEffect(boxShadowTokenArr[idx]);
+        return isEffectEqual(styleEffect, tokenEffect);
+      });
     }
   }
-
-  return matchingStyle;
+  return false;
 }

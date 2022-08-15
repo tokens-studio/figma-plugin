@@ -3,9 +3,12 @@ import { GetThemeInfoMessageResult } from '@/types/AsyncMessages';
 import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 import { convertTokenNameToPath } from '@/utils/convertTokenNameToPath';
 import { getAllFigmaStyleMaps } from '@/utils/getAllFigmaStyleMaps';
-import { findMatchingNonLocalEffectStyle, findMatchingNonLocalPaintStyle, findMatchingNonLocalTextStyle } from './figmaUtils/nonLocalStyles';
-import { getStyleId } from './figmaUtils/getStyleId';
-import { setStyleIdBackup } from './figmaUtils/setStyleIdBackup';
+import {
+  effectStyleMatchesBoxShadowToken,
+  paintStyleMatchesColorToken,
+  textStyleMatchesTypographyToken,
+} from './figmaUtils/styleMatchers';
+import { clearStyleIdBackup, getNonLocalStyle, setStyleIdBackup } from './figmaUtils/styleUtils';
 import { isPrimitiveValue, isSingleBoxShadowValue, isSingleTypographyValue } from '@/utils/is';
 import { matchStyleName } from '@/utils/matchStyleName';
 import { trySetStyleId } from '@/utils/trySetStyleId';
@@ -87,12 +90,22 @@ export default async function setValuesOnNode(
           figmaStyleMaps.effectStyles,
         );
 
-        if (!matchingStyleId && isSingleBoxShadowValue(values.boxShadow)) {
-          // Local style not found - look for non-local matching style:
-          const styleIdBackupKey = 'effectStyleId_original';
-          const styleId = getStyleId(node, styleIdBackupKey, 'effects');
-          matchingStyleId = findMatchingNonLocalEffectStyle(styleId, values.boxShadow)?.id;
-          setStyleIdBackup(node, matchingStyleId ? '' : styleId, styleIdBackupKey);
+        if (!matchingStyleId) {
+          // Local style not found - look for matching non-local style:
+          if (isSingleBoxShadowValue(values.boxShadow)) {
+            const styleIdBackupKey = 'effectStyleId_original';
+            const nonLocalStyle = getNonLocalStyle(node, styleIdBackupKey, 'effects');
+            if (nonLocalStyle) {
+              if (effectStyleMatchesBoxShadowToken(nonLocalStyle, values.boxShadow)) {
+                // Non-local style matches - use this and clear style id backup:
+                matchingStyleId = nonLocalStyle.id;
+                clearStyleIdBackup(node, styleIdBackupKey);
+              } else {
+                // Non-local style does NOT match - backup up style id before overwrting with token values:
+                setStyleIdBackup(node, styleIdBackupKey, nonLocalStyle.id);
+              }
+            }
+          }
         }
 
         if (!matchingStyleId || (matchingStyleId && !await trySetStyleId(node, 'effect', matchingStyleId))) {
@@ -179,11 +192,19 @@ export default async function setValuesOnNode(
           );
 
           if (!matchingStyleId) {
-            // Local style not found - look for non-local matching style:
+            // Local style not found - look for matching non-local style:
             const styleIdBackupKey = 'fillStyleId_original';
-            const fillStyleId = getStyleId(node, styleIdBackupKey, 'fills');
-            matchingStyleId = findMatchingNonLocalPaintStyle(fillStyleId, values.fill)?.id;
-            setStyleIdBackup(node, matchingStyleId ? '' : fillStyleId, styleIdBackupKey);
+            const nonLocalStyle = getNonLocalStyle(node, styleIdBackupKey, 'fills');
+            if (nonLocalStyle) {
+              if (paintStyleMatchesColorToken(nonLocalStyle, values.fill)) {
+                // Non-local style matches - use this and clear style id backup:
+                matchingStyleId = nonLocalStyle.id;
+                clearStyleIdBackup(node, styleIdBackupKey);
+              } else {
+                // Non-local style does NOT match - backup up style id before overwrting with token values:
+                setStyleIdBackup(node, styleIdBackupKey, nonLocalStyle.id);
+              }
+            }
           }
 
           if (!matchingStyleId || (matchingStyleId && !await trySetStyleId(node, 'fill', matchingStyleId))) {
@@ -205,11 +226,19 @@ export default async function setValuesOnNode(
           );
 
           if (!matchingStyleId && isSingleTypographyValue(values.typography)) {
-            // Local style not found - look for non-local matching style:
+            // Local style not found - look for matching non-local style:
             const styleIdBackupKey = 'textStyleId_original';
-            const styleId = getStyleId(node, styleIdBackupKey, 'typography');
-            matchingStyleId = findMatchingNonLocalTextStyle(styleId, values.typography)?.id;
-            setStyleIdBackup(node, matchingStyleId ? '' : styleId, styleIdBackupKey);
+            const nonLocalStyle = getNonLocalStyle(node, styleIdBackupKey, 'typography');
+            if (nonLocalStyle) {
+              if (textStyleMatchesTypographyToken(nonLocalStyle, values.typography)) {
+                // Non-local style matches - use this and clear style id backup:
+                matchingStyleId = nonLocalStyle.id;
+                clearStyleIdBackup(node, styleIdBackupKey);
+              } else {
+                // Non-local style does NOT match - backup up style id before overwrting with token values:
+                setStyleIdBackup(node, styleIdBackupKey, nonLocalStyle.id);
+              }
+            }
           }
 
           if (!matchingStyleId || (matchingStyleId && !await trySetStyleId(node, 'text', matchingStyleId))) {
@@ -256,11 +285,19 @@ export default async function setValuesOnNode(
           );
 
           if (!matchingStyleId) {
-            // Local style not found - look for non-local matching style:
+            // Local style not found - look for matching non-local style:
             const styleIdBackupKey = 'strokeStyleId_original';
-            const styleId = getStyleId(node, styleIdBackupKey, 'strokes');
-            matchingStyleId = findMatchingNonLocalPaintStyle(styleId, values.border)?.id;
-            setStyleIdBackup(node, matchingStyleId ? '' : styleId, styleIdBackupKey);
+            const nonLocalStyle = getNonLocalStyle(node, styleIdBackupKey, 'strokes');
+            if (nonLocalStyle) {
+              if (paintStyleMatchesColorToken(nonLocalStyle, values.border)) {
+                // Non-local style matches - use this and clear style id backup:
+                matchingStyleId = nonLocalStyle.id;
+                clearStyleIdBackup(node, styleIdBackupKey);
+              } else {
+                // Non-local style does NOT match - backup up style id before overwrting with token values:
+                setStyleIdBackup(node, styleIdBackupKey, nonLocalStyle.id);
+              }
+            }
           }
 
           if (!matchingStyleId || (matchingStyleId && !await trySetStyleId(node, 'stroke', matchingStyleId))) {
