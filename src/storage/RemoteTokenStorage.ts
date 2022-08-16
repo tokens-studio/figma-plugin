@@ -5,10 +5,14 @@ import convertTokensToObject from '@/utils/convertTokensToObject';
 import parseTokenValues from '@/utils/parseTokenValues';
 import { SystemFilenames } from './SystemFilenames';
 
-export type RemoteTokenStorageData<Metadata = unknown> = {
+export type RemoteTokenStorageMetadata = {
+  tokenSetOrder?: string[]
+};
+
+export type RemoteTokenStorageData<Metadata> = {
   tokens: Record<string, AnyTokenList>
   themes: ThemeObjectsList
-  metadata?: Metadata | null
+  metadata?: RemoteTokenStorageMetadata & Metadata | null
 };
 
 export interface RemoteTokenStorageSingleTokenSetFile {
@@ -27,7 +31,7 @@ export interface RemoteTokenStorageThemesFile {
 export interface RemoteTokenStorageMetadataFile<Metadata = unknown> {
   type: 'metadata'
   path: string
-  data: Metadata
+  data: RemoteTokenStorageMetadata & Metadata
 }
 
 export interface RemoteTokenstorageErrorMessage {

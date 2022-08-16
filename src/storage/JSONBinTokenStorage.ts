@@ -2,7 +2,9 @@ import z from 'zod';
 import * as pjs from '../../package.json';
 import { DeepTokensMap, ThemeObjectsList } from '@/types';
 import { SingleToken } from '@/types/tokens';
-import { RemoteTokenStorage, RemoteTokenstorageErrorMessage, RemoteTokenStorageFile } from './RemoteTokenStorage';
+import {
+  RemoteTokenStorage, RemoteTokenstorageErrorMessage, RemoteTokenStorageFile, RemoteTokenStorageMetadata,
+} from './RemoteTokenStorage';
 import { singleFileSchema } from './schemas/singleFileSchema';
 import { SystemFilenames } from './SystemFilenames';
 import { ErrorMessages } from '@/constants/ErrorMessages';
@@ -20,6 +22,7 @@ type JsonBinMetadata = {
 type JsonbinData = JsonBinMetadata & {
   values: Record<string, Record<string, SingleToken<false> | DeepTokensMap<false>>>
   $themes?: ThemeObjectsList
+  $metadata?: RemoteTokenStorageMetadata & JsonBinMetadata
 };
 
 export class JSONBinTokenStorage extends RemoteTokenStorage<JsonBinMetadata> {
@@ -82,6 +85,7 @@ export class JSONBinTokenStorage extends RemoteTokenStorage<JsonBinMetadata> {
         data: {
           version: data.version,
           updatedAt: data.updatedAt,
+          tokenSetOrder: data.$metadata?.tokenSetOrder,
         },
       },
       ...Object.entries(data.values).map<RemoteTokenStorageFile<JsonBinMetadata>>(([name, tokenSet]) => ({
@@ -133,6 +137,10 @@ export class JSONBinTokenStorage extends RemoteTokenStorage<JsonBinMetadata> {
           ...(dataObject.$themes ?? []),
           ...file.data,
         ];
+      } else if (file.type === 'metadata') {
+        dataObject.$metadata = {
+          ...file.data,
+        };
       } else if (file.type === 'tokenSet') {
         dataObject.values = {
           ...dataObject.values,
@@ -140,6 +148,8 @@ export class JSONBinTokenStorage extends RemoteTokenStorage<JsonBinMetadata> {
         };
       }
     });
+
+    console.log('dataObject', JSON.stringify(dataObject, null, 2));
 
     const response = await fetch(`https://api.jsonbin.io/v3/b/${this.id}`, {
       method: 'PUT',

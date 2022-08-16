@@ -76,6 +76,11 @@ describe('Test URLTokenStorage', () => {
         ],
       },
       {
+        data: {},
+        path: '$metadata.json',
+        type: 'metadata',
+      },
+      {
         name: 'global',
         type: 'tokenSet',
         path: 'global.json',

@@ -7,4 +7,7 @@ import { themeObjectSchema } from './themeObjectSchema';
 export const singleFileSchema = z.object({
   values: z.record(tokensMapSchema),
   $themes: z.array(themeObjectSchema).optional(),
+  $metadata: z.object({
+    tokenSetOrder: z.array(z.string()).optional(),
+  }).optional(),
 });

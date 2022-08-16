@@ -2,7 +2,7 @@ import { DeepTokensMap, ThemeObjectsList } from '@/types';
 import { AnyTokenSet, SingleToken } from '@/types/tokens';
 import { SystemFilenames } from './SystemFilenames';
 import { joinPath } from '@/utils/string';
-import { RemoteTokenStorage, RemoteTokenStorageFile } from './RemoteTokenStorage';
+import { RemoteTokenStorage, RemoteTokenStorageFile, RemoteTokenStorageMetadata } from './RemoteTokenStorage';
 
 type StorageFlags = {
   multiFileEnabled: boolean
@@ -12,20 +12,16 @@ export type GitStorageSaveOptions = {
   commitMessage?: string
 };
 
-export type GitStorageMetadata = {
-  tokenSetOrder?: string[]
-};
-
 export type GitSingleFileObject = Record<string, (
   Record<string, SingleToken<false> | DeepTokensMap<false>>
 )> & {
   $themes?: ThemeObjectsList
-  $metadata?: GitStorageMetadata
+  $metadata?: RemoteTokenStorageMetadata
 };
 
-export type GitMultiFileObject = AnyTokenSet<false> | ThemeObjectsList | GitStorageMetadata;
+export type GitMultiFileObject = AnyTokenSet<false> | ThemeObjectsList | RemoteTokenStorageMetadata;
 
-export abstract class GitTokenStorage extends RemoteTokenStorage<GitStorageMetadata, GitStorageSaveOptions> {
+export abstract class GitTokenStorage extends RemoteTokenStorage<GitStorageSaveOptions> {
   protected secret: string;
 
   protected owner: string;
@@ -85,7 +81,7 @@ export abstract class GitTokenStorage extends RemoteTokenStorage<GitStorageMetad
     shouldCreateBranch?: boolean
   ): Promise<boolean>;
 
-  public async write(files: RemoteTokenStorageFile<GitStorageMetadata>[], saveOptions: GitStorageSaveOptions): Promise<boolean> {
+  public async write(files: RemoteTokenStorageFile[], saveOptions: GitStorageSaveOptions): Promise<boolean> {
     const branches = await this.fetchBranches();
     if (!branches.length) return false;
 
