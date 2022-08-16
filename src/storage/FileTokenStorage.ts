@@ -5,12 +5,14 @@ import {
 import IsJSONString from '@/utils/isJSONString';
 import { complexSingleFileSchema, multiFileSchema } from './schemas';
 import { ErrorMessages } from '@/constants/ErrorMessages';
+import { SystemFilenames } from '@/constants/SystemFilenames';
+import { GitStorageMetadata } from './GitTokenStorage';
 
 type StorageFlags = {
   multiFileEnabled: boolean
 };
 
-export class FileTokenStorage extends RemoteTokenStorage {
+export class FileTokenStorage extends RemoteTokenStorage<GitStorageMetadata> {
   private files: FileList;
 
   protected flags: StorageFlags = {
@@ -27,7 +29,7 @@ export class FileTokenStorage extends RemoteTokenStorage {
     return this;
   }
 
-  public async read(): Promise<RemoteTokenStorageFile[] | RemoteTokenstorageErrorMessage> {
+  public async read(): Promise<RemoteTokenStorageFile<GitStorageMetadata>[] | RemoteTokenstorageErrorMessage> {
     try {
       if (this.flags.multiFileEnabled && this.files.length > 1) {
         const jsonFiles = Array.from(this.files).filter((file) => file.webkitRelativePath.endsWith('.json'))
@@ -52,16 +54,24 @@ export class FileTokenStorage extends RemoteTokenStorage {
         }));
         // Wait for all promises to be resolved
         const jsonFileContents = await Promise.all(filePromises);
-        return compact(jsonFileContents.map<RemoteTokenStorageFile | null>((fileContent, index) => {
+        return compact(jsonFileContents.map<RemoteTokenStorageFile<GitStorageMetadata> | null>((fileContent, index) => {
           const { webkitRelativePath } = jsonFiles[index];
           if (fileContent) {
             const name = webkitRelativePath?.substring(webkitRelativePath.indexOf('/') + 1)?.replace('.json', '');
-            if (name === '$themes' && Array.isArray(fileContent)) {
+            if (name === SystemFilenames.THEMES && Array.isArray(fileContent)) {
               return {
                 path: webkitRelativePath,
                 type: 'themes',
                 data: fileContent,
               } as RemoteTokenStorageThemesFile;
+            }
+
+            if (name === SystemFilenames.METADATA) {
+              return {
+                path: webkitRelativePath,
+                type: 'metadata',
+                data: fileContent as GitStorageMetadata,
+              };
             }
 
             if (!Array.isArray(fileContent)) {
@@ -79,7 +89,7 @@ export class FileTokenStorage extends RemoteTokenStorage {
       if (this.files[0].name.endsWith('.json')) {
         const reader = new FileReader();
         reader.readAsText(this.files[0]);
-        return await new Promise<RemoteTokenStorageFile[] | RemoteTokenstorageErrorMessage>((resolve) => {
+        return await new Promise<RemoteTokenStorageFile<GitStorageMetadata>[] | RemoteTokenstorageErrorMessage>((resolve) => {
           reader.onload = async () => {
             const result = reader.result as string;
 
@@ -94,7 +104,7 @@ export class FileTokenStorage extends RemoteTokenStorage {
                     path: this.files[0].name,
                     data: Array.isArray($themes) ? $themes : [],
                   },
-                  ...Object.entries(data).map<RemoteTokenStorageFile>(([name, tokenSet]) => ({
+                  ...Object.entries(data).map<RemoteTokenStorageFile<GitStorageMetadata>>(([name, tokenSet]) => ({
                     name,
                     type: 'tokenSet',
                     path: this.files[0].name,
