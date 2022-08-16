@@ -9,6 +9,7 @@ import { convertToOrderObj } from '@/utils/convertToOrderObj';
 import { Properties } from '@/constants/Properties';
 import { Tabs } from '@/constants/Tabs';
 import { hasTokenValues } from '@/utils/hasTokenValues';
+import { track } from '@/utils/analytics';
 
 // @README this component is not the "Initiator" anymore - as it is named
 // but solely acts as the interface between the plugin and the UI
@@ -68,7 +69,6 @@ export function Initiator() {
             if (values) {
               dispatch.tokenState.setTokenData(values);
               const existTokens = hasTokenValues(values?.values ?? {});
-
               if (existTokens) dispatch.uiState.setActiveTab(Tabs.TOKENS);
               else dispatch.uiState.setActiveTab(Tabs.START);
             }
@@ -81,6 +81,15 @@ export function Initiator() {
           case MessageFromPluginTypes.UI_SETTINGS: {
             dispatch.settings.setUISettings(pluginMessage.settings);
             dispatch.settings.triggerWindowChange();
+            break;
+          }
+          case MessageFromPluginTypes.STYLES: {
+            const { values } = pluginMessage;
+            if (values) {
+              track('Import styles');
+              dispatch.tokenState.setTokensFromStyles(values);
+              dispatch.uiState.setActiveTab(Tabs.TOKENS);
+            }
             break;
           }
           case MessageFromPluginTypes.SHOW_EMPTY_GROUPS: {

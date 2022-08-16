@@ -12,6 +12,7 @@ import Stack from '../Stack';
 import Box from '../Box';
 import AddLicenseKey from '../AddLicenseKey/AddLicenseKey';
 import { Divider } from '../Divider';
+import { track } from '@/utils/analytics';
 
 function Settings() {
   const ignoreFirstPartForStyles = useSelector(ignoreFirstPartForStylesSelector);
@@ -20,6 +21,7 @@ function Settings() {
 
   const handleIgnoreChange = React.useCallback(
     (state: CheckedState) => {
+      track('setIgnoreFirstPartForStyles', { value: state });
       dispatch.settings.setIgnoreFirstPartForStyles(!!state);
     },
     [dispatch.settings],
@@ -27,6 +29,8 @@ function Settings() {
 
   const handlePrefixWithThemeNameChange = React.useCallback(
     (state: CheckedState) => {
+      track('setPrefixStylesWithThemeName', { value: state });
+
       dispatch.settings.setPrefixStylesWithThemeName(!!state);
     },
     [dispatch.settings],

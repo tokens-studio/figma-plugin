@@ -1,12 +1,12 @@
 import React from 'react';
 import Box from '../Box';
-import { TokenTypograpyValue } from '@/types/values';
+import { TokenTypographyValue } from '@/types/values';
 
 // @TODO confirm whether the typography token values
 // can still have the .value property from legacy
 
 type Props = {
-  value: TokenTypograpyValue
+  value: TokenTypographyValue
   shouldResolve: boolean
 };
 

@@ -32,7 +32,7 @@ export const ThemeSelector: React.FC = () => {
   const availableThemes = useSelector(themeOptionsSelector);
 
   const handleClearTheme = useCallback(() => {
-    dispatch.tokenState.setActiveTheme(null);
+    dispatch.tokenState.setActiveTheme({ themeId: null, shouldUpdateNodes: true });
   }, [dispatch]);
 
   const handleSelectTheme = useCallback((themeId: string) => {
@@ -42,7 +42,7 @@ export const ThemeSelector: React.FC = () => {
     } else {
       track('Reset theme');
     }
-    dispatch.tokenState.setActiveTheme(nextTheme);
+    dispatch.tokenState.setActiveTheme({ themeId: nextTheme, shouldUpdateNodes: true });
   }, [dispatch, activeTheme]);
 
   const handleManageThemes = useCallback(() => {

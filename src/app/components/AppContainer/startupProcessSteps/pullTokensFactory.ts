@@ -22,11 +22,12 @@ export function pullTokensFactory(
   useConfirmResult: ReturnType<typeof useConfirm>,
   useRemoteTokensResult: ReturnType<typeof useRemoteTokens>,
 ) {
-  const askUserIfPull = async () => {
-    await useConfirmResult.confirm({
+  const askUserIfRecoverLocalChanges = async () => {
+    const shouldRecoverLocalChanges = await useConfirmResult.confirm({
       text: 'Recover local changes?',
       description: 'You have local changes unsaved to the remote storage.',
     });
+    return shouldRecoverLocalChanges;
   };
 
   const getApiCredentials = async (shouldPull: boolean) => {
@@ -66,7 +67,8 @@ export function pullTokensFactory(
 
           dispatch.uiState.setApiData(matchingSet);
           dispatch.uiState.setLocalApiState(matchingSet);
-          dispatch.tokenState.setActiveTheme(params.activeTheme || null);
+          // we don't want to update nodes if we're pulling from remote
+          dispatch.tokenState.setActiveTheme({ themeId: params.activeTheme || null, shouldUpdateNodes: false });
 
           if (shouldPull) {
             const remoteData = await useRemoteTokensResult.pullTokens({
@@ -119,7 +121,7 @@ export function pullTokensFactory(
         !checkForChanges
         || (
           (storageType && storageType.provider !== StorageProviderType.LOCAL)
-          && checkForChanges && await askUserIfPull()
+          && checkForChanges && (!await askUserIfRecoverLocalChanges())
         )
       ) {
         // get API credentials

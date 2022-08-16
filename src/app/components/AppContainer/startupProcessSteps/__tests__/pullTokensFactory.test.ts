@@ -221,6 +221,8 @@ describe('pullTokensFactory', () => {
       ],
     } as unknown as StartupMessage;
 
+    mockConfirm.mockResolvedValueOnce(true);
+
     const fn = pullTokensFactory(
       mockStore,
       mockStore.dispatch,
