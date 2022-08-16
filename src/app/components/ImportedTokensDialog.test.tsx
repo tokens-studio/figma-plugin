@@ -363,6 +363,20 @@ describe('ImportedTokensDialog', () => {
     expect(mockStore.getState().tokenState.tokens.global).toEqual(
       [
         {
+          name: 'light',
+          type: 'typography',
+          value: {
+            fontFamilies: 'aria',
+            fontSize: '24',
+            fontWeight: 'light'
+          },
+        },
+        {
+          name: 'opacity.50',
+          type: 'opacity',
+          value: '30%',
+        },
+        {
           name: 'small',
           type: 'sizing',
           value: '12',
@@ -385,20 +399,6 @@ describe('ImportedTokensDialog', () => {
             x: 1,
             y: 1,
           },
-        },
-        {
-          name: 'light',
-          type: 'typography',
-          value: {
-            fontFamilies: 'aria',
-            fontSize: '24',
-            fontWeight: 'light'
-          },
-        },
-        {
-          name: 'opacity.50',
-          type: 'opacity',
-          value: '30%',
         },
       ]
     )
