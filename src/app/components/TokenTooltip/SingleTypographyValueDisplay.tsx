@@ -1,11 +1,11 @@
 import React from 'react';
-import { TokenTypograpyValue } from '@/types/values';
+import { TokenTypographyValue } from '@/types/values';
 import TooltipProperty from './TooltipProperty';
 import Stack from '../Stack';
 
 type Props = {
-  value: TokenTypograpyValue;
-  resolvedValue: TokenTypograpyValue;
+  value: TokenTypographyValue;
+  resolvedValue: TokenTypographyValue;
 };
 
 export const SingleTypographyValueDisplay: React.FC<Props> = ({ value, resolvedValue }) => (
