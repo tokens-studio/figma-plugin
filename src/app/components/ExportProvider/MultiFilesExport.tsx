@@ -26,9 +26,10 @@ export default function MultiFilesExport({ onClose }: Props) {
       changeObj[`${key}.json`] = JSON.stringify(value, null, 2);
     });
     changeObj[`${SystemFilenames.THEMES}.json`] = JSON.stringify(themes, null, 2);
-    changeObj[`${SystemFilenames.METADATA}.json`] = JSON.stringify({
+    const metadata = {
       tokenSetOrder: Object.keys(tokens),
-    }, null, 2);
+    };
+    changeObj[`${SystemFilenames.METADATA}.json`] = JSON.stringify(metadata, null, 2);
     return changeObj;
   }, [tokens, themes]);
 
