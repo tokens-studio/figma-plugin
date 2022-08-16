@@ -1,3 +1,7 @@
+## v0.0.25 (2022-08-13)
+
+Adds support for expanding composition tokens
+
 ## v0.0.24 (2022-06-27)
 
 Adds support for shadow tokens that reference other shadow tokens

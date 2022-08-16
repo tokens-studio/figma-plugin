@@ -43,7 +43,7 @@ function checkForTokens({
   if (isSingleTokenValueObject(token) && !shouldExpandTypography && !shouldExpandShadow && !shouldExpandComposition) {
     returnValue = {
       ...token,
-      ...((!('type' in token)  && inheritType) ? { type: inheritType, inheritTypeLevel: currentTypeLevel } : { }),
+      ...((!('type' in token) && inheritType) ? { type: inheritType, inheritTypeLevel: currentTypeLevel } : { }),
     };
   } else if (
     (isSingleTypographyToken(token) && !expandTypography)

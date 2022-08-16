@@ -35,7 +35,7 @@ export const SingleThemeEntry: React.FC<Props> = ({ theme, isActive, onOpen }) =
 
   const handleToggle = useCallback(() => {
     const nextValue = isActive ? null : theme.id;
-    dispatch.tokenState.setActiveTheme(nextValue);
+    dispatch.tokenState.setActiveTheme({ themeId: nextValue, shouldUpdateNodes: true });
   }, [dispatch, theme.id, isActive]);
 
   return (
