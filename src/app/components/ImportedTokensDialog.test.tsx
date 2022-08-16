@@ -6,7 +6,7 @@ import {
 import ImportedTokensDialog from './ImportedTokensDialog';
 
 describe('ImportedTokensDialog', () => {
-  const mockStore = createMockStore({
+  const defaultStore = {
     tokenState: {
       importedTokens: {
         newTokens: [
@@ -53,9 +53,10 @@ describe('ImportedTokensDialog', () => {
         ],
       }
     }
-  });
+  }
 
-  it('shows newTokenlist and updateTokenlist with value and oldValue and description', () => {
+  it('shows dialog with newTokenlist and updateTokenlist', () => {
+    const mockStore = createMockStore(defaultStore);
     const result = render(
       <Provider store={mockStore}>
         <ImportedTokensDialog />
@@ -80,32 +81,73 @@ describe('ImportedTokensDialog', () => {
     expect(result.queryByText('Import all')).toBeInTheDocument();
   });
 
-  it('can ignore a token and import a token', async () => {
+  it('should create single token', async () => {
+    const mockStore = createMockStore(defaultStore);
     const result = render(
       <Provider store={mockStore}>
         <ImportedTokensDialog />
       </Provider>,
     );
+    // await act(async () => {
+    //   const removeButton = result.getAllByTestId('imported-tokens-dialog-remove-button')[0] as HTMLButtonElement;
+    //   removeButton.click();
+    // });
     await act(async () => {
-      const removeButton = result.getAllByTestId('imported-tokens-dialog-update-button')[0] as HTMLButtonElement;
-      removeButton.click();
-    });
-    await act(async () => {
-      const removeButton = result.getAllByTestId('imported-tokens-dialog-update-button')[2] as HTMLButtonElement;
-      removeButton.click();
+      const updateButton = result.getAllByTestId('imported-tokens-dialog-update-button')[0] as HTMLButtonElement;
+      updateButton.click();
     });
     await act(async () => {
       const importButton = result.queryByText('Import all') as HTMLButtonElement;
       importButton.click();
     });
-    expect(mockStore.getState().tokenState.tokens).toEqual(
+    expect(mockStore.getState().tokenState.tokens.global).toEqual(
       [
         {
+          name: 'small',
+          type: 'sizing',
+          value: '12',
+          description: 'regular sizing token',
+        }
+      ]
+    )
+  });
+
+  it('should create all tokens', async () => {
+    const mockStore = createMockStore(defaultStore);
+    const result = render(
+      <Provider store={mockStore}>
+        <ImportedTokensDialog />
+      </Provider>,
+    );
+    // await act(async () => {
+    //   const removeButton = result.getAllByTestId('imported-tokens-dialog-remove-button')[0] as HTMLButtonElement;
+    //   removeButton.click();
+    // });
+    // await act(async () => {
+    //   const updateButton = result.getAllByTestId('imported-tokens-dialog-update-button')[0] as HTMLButtonElement;
+    //   updateButton.click();
+    // });
+    await act(async () => {
+      const createButton = result.queryByText('Create all') as HTMLButtonElement;
+      createButton.click();
+    });
+    expect(mockStore.getState().tokenState.tokens.global).toEqual(
+      [
+        {
+          name: 'small',
+          type: 'sizing',
+          value: '12',
+          description: 'regular sizing token',
+        },
+        {
           name: 'black',
+          type: 'color',
           value: '#ffffff',
+          description: 'regular color token',
         },
         {
           name: 'headline',
+          type: 'boxShadow',
           value: {
             blur: 1,
             color: '#00000040',
@@ -114,7 +156,7 @@ describe('ImportedTokensDialog', () => {
             x: 1,
             y: 1,
           },
-        }
+        },
       ]
     )
   });
