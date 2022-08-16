@@ -8,6 +8,24 @@ import ImportedTokensDialog from './ImportedTokensDialog';
 describe('ImportedTokensDialog', () => {
   const defaultStore = {
     tokenState: {
+      tokens: {
+        global: [
+          {
+            name: 'light',
+            type: 'typography',
+            value: {
+              fontFamilies: 'aria',
+              fontSize: '12',
+              fontWeight: 'bold'
+            },
+          },
+          {
+            name: 'opacity.50',
+            type: 'opacity',
+            value: '50%',
+          },
+        ]
+      },
       importedTokens: {
         newTokens: [
           {
@@ -41,17 +59,17 @@ describe('ImportedTokensDialog', () => {
             type: 'typography',
             value: {
               fontFamilies: 'aria',
-              fontSize: '12',
-              fontWeight: 'bold'
+              fontSize: '24',
+              fontWeight: 'light'
             },
           },
           {
             name: 'opacity.50',
             type: 'opacity',
-            value: '50%',
+            value: '30%',
           },
         ],
-      }
+      },
     }
   }
 
@@ -95,6 +113,20 @@ describe('ImportedTokensDialog', () => {
     expect(mockStore.getState().tokenState.tokens.global).toEqual(
       [
         {
+          name: 'light',
+          type: 'typography',
+          value: {
+            fontFamilies: 'aria',
+            fontSize: '12',
+            fontWeight: 'bold'
+          },
+        },
+        {
+          name: 'opacity.50',
+          type: 'opacity',
+          value: '50%',
+        },
+        {
           name: 'small',
           type: 'sizing',
           value: '12',
@@ -117,6 +149,20 @@ describe('ImportedTokensDialog', () => {
     });
     expect(mockStore.getState().tokenState.tokens.global).toEqual(
       [
+        {
+          name: 'light',
+          type: 'typography',
+          value: {
+            fontFamilies: 'aria',
+            fontSize: '12',
+            fontWeight: 'bold'
+          },
+        },
+        {
+          name: 'opacity.50',
+          type: 'opacity',
+          value: '50%',
+        },
         {
           name: 'small',
           type: 'sizing',
@@ -164,6 +210,20 @@ describe('ImportedTokensDialog', () => {
     expect(mockStore.getState().tokenState.tokens.global).toEqual(
       [
         {
+          name: 'light',
+          type: 'typography',
+          value: {
+            fontFamilies: 'aria',
+            fontSize: '12',
+            fontWeight: 'bold'
+          },
+        },
+        {
+          name: 'opacity.50',
+          type: 'opacity',
+          value: '50%',
+        },
+        {
           name: 'black',
           type: 'color',
           value: '#ffffff',
@@ -185,5 +245,179 @@ describe('ImportedTokensDialog', () => {
     )
   });
 
+  it('should ignore a existing token', async () => {
+    const mockStore = createMockStore(defaultStore);
+    const result = render(
+      <Provider store={mockStore}>
+        <ImportedTokensDialog />
+      </Provider>,
+    );
+    await act(async () => {
+      const removeButton = result.getAllByTestId('imported-tokens-dialog-remove-button')[3] as HTMLButtonElement;
+      removeButton.click();
+    });
+
+    await act(async () => {
+      const updateButton = result.queryByText('Update all') as HTMLButtonElement;
+      updateButton.click();
+    });
+    expect(mockStore.getState().tokenState.tokens.global).toEqual(
+      [
+        {
+          name: 'light',
+          type: 'typography',
+          value: {
+            fontFamilies: 'aria',
+            fontSize: '12',
+            fontWeight: 'bold'
+          },
+        },
+        {
+          name: 'opacity.50',
+          type: 'opacity',
+          value: '30%',
+        },
+      ]
+    )
+  });
+
+  it('should update all token', async () => {
+    const mockStore = createMockStore(defaultStore);
+    const result = render(
+      <Provider store={mockStore}>
+        <ImportedTokensDialog />
+      </Provider>,
+    );
+
+    await act(async () => {
+      const updateButton = result.queryByText('Update all') as HTMLButtonElement;
+      updateButton.click();
+    });
+
+    expect(mockStore.getState().tokenState.tokens.global).toEqual(
+      [
+        {
+          name: 'light',
+          type: 'typography',
+          value: {
+            fontFamilies: 'aria',
+            fontSize: '24',
+            fontWeight: 'light'
+          },
+        },
+        {
+          name: 'opacity.50',
+          type: 'opacity',
+          value: '30%',
+        },
+      ]
+    )
+  });
+
+  it('should update a token', async () => {
+    const mockStore = createMockStore(defaultStore);
+    const result = render(
+      <Provider store={mockStore}>
+        <ImportedTokensDialog />
+      </Provider>,
+    );
+
+    await act(async () => {
+      const updateButton = result.getAllByTestId('imported-tokens-dialog-update-button')[3] as HTMLButtonElement;
+      updateButton.click();
+    });
+
+    expect(mockStore.getState().tokenState.tokens.global).toEqual(
+      [
+        {
+          name: 'light',
+          type: 'typography',
+          value: {
+            fontFamilies: 'aria',
+            fontSize: '24',
+            fontWeight: 'light'
+          },
+        },
+        {
+          name: 'opacity.50',
+          type: 'opacity',
+          value: '50%',
+        },
+      ]
+    )
+  });
+
+  it('should import all token', async () => {
+    const mockStore = createMockStore(defaultStore);
+    const result = render(
+      <Provider store={mockStore}>
+        <ImportedTokensDialog />
+      </Provider>,
+    );
+
+    await act(async () => {
+      const updateButton = result.queryByText('Import all') as HTMLButtonElement;
+      updateButton.click();
+    });
+
+    expect(mockStore.getState().tokenState.tokens.global).toEqual(
+      [
+        {
+          name: 'small',
+          type: 'sizing',
+          value: '12',
+          description: 'regular sizing token',
+        },
+        {
+          name: 'black',
+          type: 'color',
+          value: '#ffffff',
+          description: 'regular color token',
+        },
+        {
+          name: 'headline',
+          type: 'boxShadow',
+          value: {
+            blur: 1,
+            color: '#00000040',
+            spread: 1,
+            type: 'dropShadow',
+            x: 1,
+            y: 1,
+          },
+        },
+        {
+          name: 'light',
+          type: 'typography',
+          value: {
+            fontFamilies: 'aria',
+            fontSize: '24',
+            fontWeight: 'light'
+          },
+        },
+        {
+          name: 'opacity.50',
+          type: 'opacity',
+          value: '30%',
+        },
+      ]
+    )
+  });
+
+  it('should work close button', async () => {
+    const mockStore = createMockStore(defaultStore);
+    const result = render(
+      <Provider store={mockStore}>
+        <ImportedTokensDialog />
+      </Provider>,
+    );
+
+    await act(async () => {
+      const closeButton = result.queryByText('Cancel') as HTMLButtonElement;
+      closeButton.click();
+    });
+    expect(mockStore.getState().tokenState.importedTokens.newTokens).toEqual([]);
+    expect(mockStore.getState().tokenState.importedTokens.updatedTokens).toEqual([]);
+  });
 });
 
