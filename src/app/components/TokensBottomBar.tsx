@@ -22,8 +22,13 @@ export default function TokensBottomBar({ handleUpdate, handleSaveJSON, hasJSONE
   const [exportModalVisible, showExportModal] = React.useState(false);
   const [presetModalVisible, showPresetModal] = React.useState(false);
 
-  useShortcut(['ControlLeft', 'KeyS'], handleSaveJSON);
-  useShortcut(['ControlRight', 'KeyS'], handleSaveJSON);
+  const handleSaveShortcut = useCallback((event: KeyboardEvent) => {
+    if (event.metaKey || event.ctrlKey) {
+      handleSaveJSON();
+    }
+  }, [handleSaveJSON]);
+
+  useShortcut(['KeyS'], handleSaveShortcut);
 
   const handleShowPresetModal = useCallback(() => {
     showPresetModal(true);
