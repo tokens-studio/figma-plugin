@@ -118,6 +118,7 @@ export default function ImportedTokensDialog() {
     // Go through each token that needs to be updated
     // TODO: This should probably be a batch operation
     updatedTokens.forEach((token) => {
+      console.log("updateTokens", token)
       editSingleToken({
         parent: activeTokenSet,
         name: token.name,

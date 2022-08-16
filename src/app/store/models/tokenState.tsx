@@ -257,6 +257,7 @@ export const tokenState = createModel<RootModel>()({
         ...omit(newArray[index], 'description'),
         ...updateTokenPayloadToSingleToken(data),
       } as SingleToken;
+      console.log("newArray", newArray)
       return {
         ...state,
         tokens: {

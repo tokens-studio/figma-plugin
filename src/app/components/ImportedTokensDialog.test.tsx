@@ -88,17 +88,9 @@ describe('ImportedTokensDialog', () => {
         <ImportedTokensDialog />
       </Provider>,
     );
-    // await act(async () => {
-    //   const removeButton = result.getAllByTestId('imported-tokens-dialog-remove-button')[0] as HTMLButtonElement;
-    //   removeButton.click();
-    // });
     await act(async () => {
       const updateButton = result.getAllByTestId('imported-tokens-dialog-update-button')[0] as HTMLButtonElement;
       updateButton.click();
-    });
-    await act(async () => {
-      const importButton = result.queryByText('Import all') as HTMLButtonElement;
-      importButton.click();
     });
     expect(mockStore.getState().tokenState.tokens.global).toEqual(
       [
@@ -119,14 +111,6 @@ describe('ImportedTokensDialog', () => {
         <ImportedTokensDialog />
       </Provider>,
     );
-    // await act(async () => {
-    //   const removeButton = result.getAllByTestId('imported-tokens-dialog-remove-button')[0] as HTMLButtonElement;
-    //   removeButton.click();
-    // });
-    // await act(async () => {
-    //   const updateButton = result.getAllByTestId('imported-tokens-dialog-update-button')[0] as HTMLButtonElement;
-    //   updateButton.click();
-    // });
     await act(async () => {
       const createButton = result.queryByText('Create all') as HTMLButtonElement;
       createButton.click();
@@ -160,5 +144,46 @@ describe('ImportedTokensDialog', () => {
       ]
     )
   });
+
+  it('should ignore a new token', async () => {
+    const mockStore = createMockStore(defaultStore);
+    const result = render(
+      <Provider store={mockStore}>
+        <ImportedTokensDialog />
+      </Provider>,
+    );
+    await act(async () => {
+      const removeButton = result.getAllByTestId('imported-tokens-dialog-remove-button')[0] as HTMLButtonElement;
+      removeButton.click();
+    });
+
+    await act(async () => {
+      const createButton = result.queryByText('Create all') as HTMLButtonElement;
+      createButton.click();
+    });
+    expect(mockStore.getState().tokenState.tokens.global).toEqual(
+      [
+        {
+          name: 'black',
+          type: 'color',
+          value: '#ffffff',
+          description: 'regular color token',
+        },
+        {
+          name: 'headline',
+          type: 'boxShadow',
+          value: {
+            blur: 1,
+            color: '#00000040',
+            spread: 1,
+            type: 'dropShadow',
+            x: 1,
+            y: 1,
+          },
+        },
+      ]
+    )
+  });
+
 });
 
