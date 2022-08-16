@@ -89,12 +89,10 @@ export default function ImportedTokensDialog() {
   const [updatedTokens, setUpdatedTokens] = React.useState(importedTokens.updatedTokens);
 
   const handleIgnoreExistingToken = React.useCallback((token) => {
-    console.log("update", token)
     setUpdatedTokens((updatedTokens.filter((t) => t.name !== token.name)));
   }, [setUpdatedTokens, updatedTokens]);
 
   const handleIgnoreNewToken = React.useCallback((token) => {
-    console.log("ignor", token)
     setNewTokens(newTokens.filter((t) => t.name !== token.name));
   }, [setNewTokens, newTokens]);
 
@@ -118,7 +116,6 @@ export default function ImportedTokensDialog() {
     // Go through each token that needs to be updated
     // TODO: This should probably be a batch operation
     updatedTokens.forEach((token) => {
-      console.log("updateTokens", token)
       editSingleToken({
         parent: activeTokenSet,
         name: token.name,
@@ -134,13 +131,11 @@ export default function ImportedTokensDialog() {
   const handleImportAllClick = React.useCallback(() => {
     // Perform both actions for all the tokens
     // TODO: This should probably be a batch operation
-    console.log("create all")
     handleUpdateClick();
     handleCreateNewClick();
   }, [handleCreateNewClick, handleUpdateClick]);
 
   const handleCreateSingleClick = React.useCallback((token) => {
-    console.log("createsingle", token)
     // Create new tokens according to styles
     createSingleToken({
       parent: activeTokenSet,
@@ -154,7 +149,6 @@ export default function ImportedTokensDialog() {
   }, [newTokens, activeTokenSet, createSingleToken]);
 
   const handleUpdateSingleClick = React.useCallback((token) => {
-    console.log("updatesigletoke", token)
     // Go through each token that needs to be updated
     editSingleToken({
       parent: activeTokenSet,
