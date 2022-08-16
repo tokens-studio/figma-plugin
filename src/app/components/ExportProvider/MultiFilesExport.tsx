@@ -9,6 +9,7 @@ import Stack from '../Stack';
 import Heading from '../Heading';
 import { IconFile } from '@/icons';
 import { tokensSelector, themesListSelector } from '@/selectors';
+import { SystemFilenames } from '@/constants/SystemFilenames';
 
 type Props = {
   onClose: () => void;
@@ -24,7 +25,10 @@ export default function MultiFilesExport({ onClose }: Props) {
     Object.entries(convertTokensToObject(tokens)).forEach(([key, value]) => {
       changeObj[`${key}.json`] = JSON.stringify(value, null, 2);
     });
-    if (themes) changeObj['$themes.json'] = JSON.stringify(themes, null, 2);
+    changeObj[`${SystemFilenames.THEMES}.json`] = JSON.stringify(themes, null, 2);
+    changeObj[`${SystemFilenames.METADATA}.json`] = JSON.stringify({
+      tokenSetOrder: Object.keys(tokens),
+    }, null, 2);
     return changeObj;
   }, [tokens, themes]);
 
