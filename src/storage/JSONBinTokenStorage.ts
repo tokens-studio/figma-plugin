@@ -149,8 +149,6 @@ export class JSONBinTokenStorage extends RemoteTokenStorage<JsonBinMetadata> {
       }
     });
 
-    console.log('dataObject', JSON.stringify(dataObject, null, 2));
-
     const response = await fetch(`https://api.jsonbin.io/v3/b/${this.id}`, {
       method: 'PUT',
       mode: 'cors',
