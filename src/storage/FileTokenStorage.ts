@@ -97,13 +97,20 @@ export class FileTokenStorage extends RemoteTokenStorage<GitStorageMetadata> {
               const parsedJsonData = JSON.parse(result);
               const validationResult = await complexSingleFileSchema.safeParseAsync(parsedJsonData);
               if (validationResult.success) {
-                const { $themes = [], ...data } = validationResult.data;
+                const { $themes = [], $metadata, ...data } = validationResult.data;
                 resolve([
                   {
                     type: 'themes',
                     path: this.files[0].name,
                     data: Array.isArray($themes) ? $themes : [],
                   },
+                  ...($metadata ? [
+                    {
+                      type: 'metadata' as const,
+                      path: this.files[0].name,
+                      data: $metadata,
+                    },
+                  ] : []),
                   ...Object.entries(data).map<RemoteTokenStorageFile<GitStorageMetadata>>(([name, tokenSet]) => ({
                     name,
                     type: 'tokenSet',

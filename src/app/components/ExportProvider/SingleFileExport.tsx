@@ -54,12 +54,14 @@ export default function SingleFileExport({ onClose }: Props) {
 
   const exportData = React.useMemo(() => {
     const returnValue = JSON.parse(formattedTokens);
-    set(returnValue, SystemFilenames.THEMES, themes);
-    set(returnValue, SystemFilenames.METADATA, {
-      tokenSetOrder: Object.keys(tokens),
-    });
+    if (includeAllTokens) {
+      set(returnValue, SystemFilenames.THEMES, themes);
+      set(returnValue, SystemFilenames.METADATA, {
+        tokenSetOrder: Object.keys(tokens),
+      });  
+    }
     return JSON.stringify(returnValue, null, 2);
-  }, [formattedTokens, tokens, themes]);
+  }, [formattedTokens, tokens, themes, includeAllTokens]);
 
   return (
     <Stack gap={4} direction="column">

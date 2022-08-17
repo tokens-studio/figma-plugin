@@ -319,7 +319,7 @@ export default function useRemoteTokens() {
     if (files) {
       const remoteData = await readTokensFromFileOrDirectory(files);
       if (remoteData?.status === 'success') {
-        const sortedTokens = applyTokenSetOrder(remoteData.tokens, remoteData.metadata?.tokenSetOrder ?? []);
+        const sortedTokens = applyTokenSetOrder(remoteData.tokens, remoteData.metadata?.tokenSetOrder ?? Object.keys(remoteData.tokens));
         dispatch.tokenState.setTokenData({
           values: sortedTokens,
           themes: remoteData.themes,
