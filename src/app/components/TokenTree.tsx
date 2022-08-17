@@ -114,6 +114,7 @@ const TokenTree: React.FC<Props> = ({
                 <StyledCollapsableTokenGroupHeadingButton
                   collapsed={collapsed.includes(item.stringPath)}
                   data-cy={`tokenlisting-group-${item.stringPath}`}
+                  data-testid={`tokenlisting-group-${item.stringPath}`}
                   type="button"
                   onClick={onToggleCollapsed}
                 >
