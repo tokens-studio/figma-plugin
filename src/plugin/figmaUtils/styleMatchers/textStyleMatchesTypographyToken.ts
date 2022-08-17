@@ -1,9 +1,9 @@
 import { transformValue } from '../../helpers';
-import { TokenTypograpyValue } from '@/types/values';
+import { TokenTypographyValue } from '@/types/values';
 
 export function textStyleMatchesTypographyToken(
   textStyle: TextStyle | undefined,
-  typographyToken: string | TokenTypograpyValue,
+  typographyToken: string | TokenTypographyValue,
   description?: string,
 ) {
   if (!textStyle || typeof typographyToken === 'string') {
