@@ -69,6 +69,7 @@ const TokenTree: React.FC<Props> = ({
   const dispatch = useDispatch<Dispatch>();
 
   const handleToggleCollapsed = useCallback((key: string) => {
+    console.log("ddddd", collapsed.includes(key) ? collapsed.filter((s) => s !== key) : [...collapsed, key])
     dispatch.tokenState.setCollapsedTokens(collapsed.includes(key) ? collapsed.filter((s) => s !== key) : [...collapsed, key]);
   }, [collapsed, dispatch.tokenState]);
 
