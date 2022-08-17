@@ -551,6 +551,8 @@ describe('editToken', () => {
       newName: 'primary-copy',
       oldName: 'primary',
       parent: 'global',
+      value: '1',
+      type: 'sizing',
     });
     const { tokens } = store.getState().tokenState;
     expect(tokens.global).toEqual([
@@ -561,6 +563,7 @@ describe('editToken', () => {
       {
         name: 'primary-copy',
         value: '1',
+        type: 'sizing',
       },
       {
         name: 'alias',
@@ -740,10 +743,10 @@ describe('editToken', () => {
 
   it('can duplicate token group', () => {
     store.dispatch.tokenState.duplicateTokenGroup({
-      oldName: "font",
-      parent: "global",
-      path: "",
-      type: "sizing",
+      oldName: 'font',
+      parent: 'global',
+      path: '',
+      type: 'sizing',
     });
     const { tokens } = store.getState().tokenState;
     expect(tokens.global).toEqual([
