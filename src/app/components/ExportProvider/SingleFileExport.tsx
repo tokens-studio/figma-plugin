@@ -7,6 +7,7 @@ import Checkbox from '../Checkbox';
 import Label from '../Label';
 import Box from '../Box';
 import Stack from '../Stack';
+import { track } from '@/utils/analytics';
 
 type Props = {
   onClose: () => void
@@ -39,6 +40,12 @@ export default function SingleFileExport({ onClose }: Props) {
   const handleToggleExpandComposition = React.useCallback(() => {
     setExpandComposition(!expandComposition);
   }, [expandComposition]);
+
+  const handleClickExport = React.useCallback(() => {
+    track('Export file', {
+      includeParent, includeAllTokens, expandComposition, expandShadow, expandTypography,
+    });
+  }, [expandComposition, expandShadow, expandTypography, includeAllTokens, includeParent]);
 
   const formattedTokens = React.useMemo(() => getFormattedTokens({
     includeAllTokens, includeParent, expandTypography, expandShadow, expandComposition,
@@ -111,6 +118,7 @@ export default function SingleFileExport({ onClose }: Props) {
           href={`data:text/json;charset=utf-8,${encodeURIComponent(formattedTokens)}`}
           download="tokens.json"
           variant="primary"
+          onClick={handleClickExport}
         >
           Export
         </Button>

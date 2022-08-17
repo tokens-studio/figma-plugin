@@ -6,6 +6,7 @@ import Button from '../Button';
 import Stack from '../Stack';
 import Heading from '../Heading';
 import Text from '../Text';
+import { track } from '@/utils/analytics';
 
 declare module 'react' {
   interface InputHTMLAttributes<T> extends HTMLAttributes<T> {
@@ -31,15 +32,18 @@ export default function FilePreset({ onCancel }: Props) {
   const { fetchTokensFromFileOrDirectory } = useRemoteTokens();
 
   const handleFileButtonClick = React.useCallback(() => {
+    track('Import', { type: 'file' });
     hiddenFileInput.current?.click();
   }, [hiddenFileInput]);
 
   const handleDirectoryButtonClick = React.useCallback(() => {
+    track('Import', { type: 'directory' });
     hiddenDirectoryInput.current?.click();
   }, [hiddenDirectoryInput]);
 
   const handleFileOrDirectoryChange = React.useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
     const { files } = event.target;
+
     await fetchTokensFromFileOrDirectory(files);
     onCancel();
   }, [fetchTokensFromFileOrDirectory, onCancel]);
