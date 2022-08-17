@@ -14,7 +14,7 @@ describe('ImportedTokensDialog', () => {
             name: 'light',
             type: 'typography',
             value: {
-              fontFamilies: 'aria',
+              fontFamily: 'aria',
               fontSize: '12',
               fontWeight: 'bold',
             },
@@ -58,7 +58,7 @@ describe('ImportedTokensDialog', () => {
             name: 'light',
             type: 'typography',
             value: {
-              fontFamilies: 'aria',
+              fontFamily: 'aria',
               fontSize: '24',
               fontWeight: 'light',
             },
@@ -116,7 +116,7 @@ describe('ImportedTokensDialog', () => {
           name: 'light',
           type: 'typography',
           value: {
-            fontFamilies: 'aria',
+            fontFamily: 'aria',
             fontSize: '12',
             fontWeight: 'bold',
           },
@@ -144,7 +144,7 @@ describe('ImportedTokensDialog', () => {
       </Provider>,
     );
     await act(async () => {
-      const createButton = result.queryByText('Create all') as HTMLButtonElement;
+      const createButton = result.getByTestId('button-import-create-all') as HTMLButtonElement;
       createButton.click();
     });
     expect(mockStore.getState().tokenState.tokens.global).toEqual(
@@ -153,7 +153,7 @@ describe('ImportedTokensDialog', () => {
           name: 'light',
           type: 'typography',
           value: {
-            fontFamilies: 'aria',
+            fontFamily: 'aria',
             fontSize: '12',
             fontWeight: 'bold',
           },
@@ -213,7 +213,7 @@ describe('ImportedTokensDialog', () => {
           name: 'light',
           type: 'typography',
           value: {
-            fontFamilies: 'aria',
+            fontFamily: 'aria',
             fontSize: '12',
             fontWeight: 'bold',
           },
@@ -264,7 +264,7 @@ describe('ImportedTokensDialog', () => {
           name: 'light',
           type: 'typography',
           value: {
-            fontFamilies: 'aria',
+            fontFamily: 'aria',
             fontSize: '24',
             fontWeight: 'light',
           },
@@ -278,7 +278,7 @@ describe('ImportedTokensDialog', () => {
     );
   });
 
-  it('should update all token', async () => {
+  it('should update all tokens', async () => {
     const mockStore = createMockStore(defaultStore);
     const result = render(
       <Provider store={mockStore}>
@@ -287,7 +287,7 @@ describe('ImportedTokensDialog', () => {
     );
 
     await act(async () => {
-      const updateButton = result.queryByText('Update all') as HTMLButtonElement;
+      const updateButton = result.getByTestId('button-import-update-all') as HTMLButtonElement;
       updateButton.click();
     });
 
@@ -297,7 +297,7 @@ describe('ImportedTokensDialog', () => {
           name: 'light',
           type: 'typography',
           value: {
-            fontFamilies: 'aria',
+            fontFamily: 'aria',
             fontSize: '24',
             fontWeight: 'light',
           },
@@ -311,7 +311,7 @@ describe('ImportedTokensDialog', () => {
     );
   });
 
-  it('should ignore a existing token', async () => {
+  it('should ignore an existing token', async () => {
     const mockStore = createMockStore(defaultStore);
     const result = render(
       <Provider store={mockStore}>
@@ -333,7 +333,7 @@ describe('ImportedTokensDialog', () => {
           name: 'light',
           type: 'typography',
           value: {
-            fontFamilies: 'aria',
+            fontFamily: 'aria',
             fontSize: '12',
             fontWeight: 'bold',
           },
@@ -347,7 +347,7 @@ describe('ImportedTokensDialog', () => {
     );
   });
 
-  it('should import all token', async () => {
+  it('should import all tokens', async () => {
     const mockStore = createMockStore(defaultStore);
     const result = render(
       <Provider store={mockStore}>
@@ -366,7 +366,7 @@ describe('ImportedTokensDialog', () => {
           name: 'light',
           type: 'typography',
           value: {
-            fontFamilies: 'aria',
+            fontFamily: 'aria',
             fontSize: '24',
             fontWeight: 'light',
           },
@@ -404,7 +404,7 @@ describe('ImportedTokensDialog', () => {
     );
   });
 
-  it('should work close button', async () => {
+  it('should be able to close by clicking the close button', async () => {
     const mockStore = createMockStore(defaultStore);
     const result = render(
       <Provider store={mockStore}>
@@ -418,5 +418,6 @@ describe('ImportedTokensDialog', () => {
     });
     expect(mockStore.getState().tokenState.importedTokens.newTokens).toEqual([]);
     expect(mockStore.getState().tokenState.importedTokens.updatedTokens).toEqual([]);
+    expect(result.queryByText('Import Styles')).not.toBeInTheDocument();
   });
 });

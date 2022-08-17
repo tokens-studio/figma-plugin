@@ -48,6 +48,7 @@ const Button: React.FC<ButtonProps> = ({
         download={download}
         href={href}
         data-cy={id}
+        data-testid={id}
       >
         <StyledButton
           ref={buttonRef}
