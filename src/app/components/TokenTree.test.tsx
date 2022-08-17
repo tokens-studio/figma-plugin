@@ -1,7 +1,7 @@
 import React from 'react';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { DeepKeyTokenMap, TokenTypeSchema } from '@/types/tokens';
-import { fireEvent, render } from '../../../tests/config/setupTest';
+import { fireEvent, render, resetStore } from '../../../tests/config/setupTest';
 import { store } from '../store';
 import TokenTree, { ShowFormOptions, ShowNewFormOptions } from './TokenTree';
 
@@ -38,8 +38,8 @@ const tokenValues = {
         name: 'size.font.big',
         type: TokenTypes.SIZING,
         value: '20',
-      },        
-    }  
+      },
+    }
   },
   color: {
     black: {
@@ -51,7 +51,7 @@ const tokenValues = {
       name: 'color.white',
       type: TokenTypes.COLOR,
       value: '#000000',
-    },  
+    },
   }
 };
 
@@ -59,10 +59,14 @@ const showNewForm = (opts: ShowNewFormOptions) => { };
 const showForm = (opts: ShowFormOptions) => { };
 
 describe('TokenTree', () => {
+  beforeEach(() => {
+    resetStore();
+  });
+
   it('should be able to collpase token tree', async () => {
     const { getByTestId } = render(<TokenTree
       displayType={displayType}
-      tokenValues={tokenValues as DeepKeyTokenMap} 
+      tokenValues={tokenValues as DeepKeyTokenMap}
       showNewForm={showNewForm}
       showForm={showForm}
       schema={schema as TokenTypeSchema}
@@ -78,7 +82,7 @@ describe('TokenTree', () => {
   it('should be able to expand token tree', async () => {
     const { getByTestId } = render(<TokenTree
       displayType={displayType}
-      tokenValues={tokenValues as DeepKeyTokenMap} 
+      tokenValues={tokenValues as DeepKeyTokenMap}
       showNewForm={showNewForm}
       showForm={showForm}
       schema={schema as TokenTypeSchema}
