@@ -10,6 +10,7 @@ import Heading from '../Heading';
 import { IconFile } from '@/icons';
 import { tokensSelector, themesListSelector } from '@/selectors';
 import { SystemFilenames } from '@/constants/SystemFilenames';
+import { track } from '@/utils/analytics';
 
 type Props = {
   onClose: () => void;
@@ -42,6 +43,8 @@ export default function MultiFilesExport({ onClose }: Props) {
       .then((content) => {
         saveAs(content, 'tokens.zip');
       });
+    track('Export directory');
+
     onClose();
   }, [filesChangeset, onClose]);
 

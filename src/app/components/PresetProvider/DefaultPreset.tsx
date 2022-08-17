@@ -5,6 +5,7 @@ import Button from '../Button';
 import Stack from '../Stack';
 import Heading from '../Heading';
 import Text from '../Text';
+import { track } from '@/utils/analytics';
 
 type Props = {
   onCancel: () => void;
@@ -13,6 +14,7 @@ type Props = {
 export default function DefaultPreset({ onCancel }: Props) {
   const dispatch = useDispatch<Dispatch>();
   const handleSetDefault = React.useCallback(() => {
+    track('Load preset');
     dispatch.tokenState.setDefaultTokens();
     onCancel();
   }, [dispatch, onCancel]);
