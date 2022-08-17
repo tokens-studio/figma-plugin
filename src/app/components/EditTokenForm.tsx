@@ -260,7 +260,17 @@ function EditTokenForm({ resolvedTokens }: Props) {
         }
       } else if (internalEditToken.status === EditTokenFormStatus.DUPLICATE) {
         oldName = internalEditToken.initialName?.slice(0, internalEditToken.initialName?.lastIndexOf('-copy'));
-        duplicateSingleToken({ parent: activeTokenSet, newName, oldName });
+        duplicateSingleToken({
+          description: (
+            internalEditToken.description
+            ?? internalEditToken.oldDescription
+          ),
+          parent: activeTokenSet,
+          newName,
+          oldName,
+          type,
+          value: trimmedValue as SingleToken['value'],
+        });
       }
     }
   };
