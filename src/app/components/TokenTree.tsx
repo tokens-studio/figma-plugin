@@ -11,6 +11,7 @@ import { collapsedTokensSelector } from '@/selectors/collapsedTokensSelector';
 import { Dispatch } from '../store';
 import { EditTokenFormStatus } from '@/constants/EditTokenFormStatus';
 import { styled } from '@/stitches.config';
+import { IconCollapseArrow, IconExpandArrow } from '@/icons';
 
 export type ShowFormOptions = {
   name: string;
@@ -69,7 +70,6 @@ const TokenTree: React.FC<Props> = ({
   const dispatch = useDispatch<Dispatch>();
 
   const handleToggleCollapsed = useCallback((key: string) => {
-    console.log("ddddd", collapsed.includes(key) ? collapsed.filter((s) => s !== key) : [...collapsed, key])
     dispatch.tokenState.setCollapsedTokens(collapsed.includes(key) ? collapsed.filter((s) => s !== key) : [...collapsed, key]);
   }, [collapsed, dispatch.tokenState]);
 
@@ -118,13 +118,9 @@ const TokenTree: React.FC<Props> = ({
                   onClick={onToggleCollapsed}
                 >
                   {collapsed.includes(item.stringPath) ? (
-                    <svg width="6" height="6" viewBox="0 0 6 6" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M5 3L1 0v6l4-3z" fill="currentColor" />
-                    </svg>
+                    <IconCollapseArrow />
                   ) : (
-                    <svg width="6" height="6" viewBox="0 0 6 6" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M3 5l3-4H0l3 4z" fill="currentColor" />
-                    </svg>
+                    <IconExpandArrow />
                   )}
                   <TokenGroupHeading label={item.name} path={item.stringPath} id="listing" type={schema.type} />
                 </StyledCollapsableTokenGroupHeadingButton>
