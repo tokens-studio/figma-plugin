@@ -60,6 +60,8 @@ export async function updateJSONBinTokens({
   } catch (e) {
     console.log('Error updating jsonbin', e);
   }
+
+  return undefined;
 }
 
 export function useJSONbin() {
@@ -136,8 +138,10 @@ export function useJSONbin() {
       }
       if (data?.metadata && data?.tokens) {
         dispatch.tokenState.setEditProhibited(false);
-
-        return data;
+        return {
+          ...data,
+          metadata: {},
+        };
       }
       notifyToUI('No tokens stored on remote', { error: true });
       return null;
@@ -185,7 +189,7 @@ export function useJSONbin() {
         },
         shouldSetInDocument: true,
       });
-      saveLastSyncedState(dispatch, content.tokens, content.themes, content.metadata);
+      saveLastSyncedState(dispatch, content.tokens, content.themes, {});
       dispatch.tokenState.setTokenData({
         values: content.tokens,
         themes: content.themes,

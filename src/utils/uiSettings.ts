@@ -23,7 +23,7 @@ export async function updateUISettings(uiSettings: Partial<SavedSettings>) {
   }
 }
 
-export async function getUISettings(): Promise<SavedSettings> {
+export async function getUISettings(notify = true): Promise<SavedSettings> {
   let settings: SavedSettings = {} as SavedSettings;
   try {
     const data = await UiSettingsProperty.read();
@@ -62,9 +62,12 @@ export async function getUISettings(): Promise<SavedSettings> {
         inspectDeep,
       };
 
-      notifyUISettings(settings);
+      if (notify) {
+        notifyUISettings(settings);
+      }
     }
   } catch (err) {
+    console.error(err);
     notifyUI('There was an issue saving your credentials. Please try again.');
   }
   return settings;

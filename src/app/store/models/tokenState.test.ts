@@ -498,6 +498,325 @@ describe('editToken', () => {
     ]);
   });
 
+  it('should save tokens from json data', () => {
+    store.dispatch.tokenState.setJSONData(JSON.stringify(
+      {
+        1: {
+          value: 1,
+          type: 'sizing',
+        },
+        header: {
+          value: 3,
+          type: 'borderRadius',
+        },
+        black: {
+          100: {
+            value: '#0b0101',
+          },
+          500: {
+            value: '#130c0c',
+          },
+          type: 'color',
+        },
+      },
+    ));
+    const { tokens } = store.getState().tokenState;
+    expect(tokens.global).toEqual([
+      {
+        name: '1',
+        type: 'sizing',
+        value: 1,
+      },
+      {
+        name: 'header',
+        type: 'borderRadius',
+        value: 3,
+      },
+      {
+        inheritTypeLevel: 2,
+        name: 'black.100',
+        type: 'color',
+        value: '#0b0101',
+      },
+      {
+        inheritTypeLevel: 2,
+        name: 'black.500',
+        type: 'color',
+        value: '#130c0c',
+      },
+    ]);
+  });
+
+  it('can duplicate token', () => {
+    store.dispatch.tokenState.duplicateToken({
+      newName: 'primary-copy',
+      oldName: 'primary',
+      parent: 'global',
+      value: '1',
+      type: 'sizing',
+    });
+    const { tokens } = store.getState().tokenState;
+    expect(tokens.global).toEqual([
+      {
+        name: 'primary',
+        value: '1',
+      },
+      {
+        name: 'primary-copy',
+        value: '1',
+        type: 'sizing',
+      },
+      {
+        name: 'alias',
+        value: '$primary',
+      },
+      {
+        name: 'primary50',
+        value: '0.50',
+      },
+      {
+        name: 'alias50',
+        value: '$primary50',
+      },
+      {
+        name: 'header 1',
+        type: 'typography',
+        value: {
+          fontWeight: '400',
+          fontSize: '16',
+        },
+      },
+      {
+        name: 'header 1',
+        type: 'typography',
+        value: {
+          fontWeight: '400',
+          fontSize: '16',
+        },
+      },
+      {
+        name: 'shadow.mixed',
+        type: 'boxShadow',
+        description: 'the one with mixed shadows',
+        value: shadowArray,
+      },
+      {
+        name: 'font.big',
+        type: 'sizing',
+        value: '24px',
+      },
+      {
+        name: 'font.small',
+        type: 'sizing',
+        value: '12px',
+      },
+      {
+        name: 'font.medium',
+        type: 'fontSizes',
+        value: '18px',
+      },
+    ]);
+  });
+
+  it('can delete token', () => {
+    store.dispatch.tokenState.deleteToken({
+      parent: 'global',
+      path: 'font.big',
+    });
+    const { tokens } = store.getState().tokenState;
+    expect(tokens.global).toEqual([
+      {
+        name: 'primary',
+        value: '1',
+      },
+      {
+        name: 'alias',
+        value: '$primary',
+      },
+      {
+        name: 'primary50',
+        value: '0.50',
+      },
+      {
+        name: 'alias50',
+        value: '$primary50',
+      },
+      {
+        name: 'header 1',
+        type: 'typography',
+        value: {
+          fontWeight: '400',
+          fontSize: '16',
+        },
+      },
+      {
+        name: 'header 1',
+        type: 'typography',
+        value: {
+          fontWeight: '400',
+          fontSize: '16',
+        },
+      },
+      {
+        name: 'shadow.mixed',
+        type: 'boxShadow',
+        description: 'the one with mixed shadows',
+        value: shadowArray,
+      },
+      {
+        name: 'font.small',
+        type: 'sizing',
+        value: '12px',
+      },
+      {
+        name: 'font.medium',
+        type: 'fontSizes',
+        value: '18px',
+      },
+    ]);
+  });
+
+  it('can rename token group', () => {
+    store.dispatch.tokenState.renameTokenGroup({
+      newName: 'text',
+      oldName: 'font',
+      parent: 'global',
+      path: '',
+      type: 'sizing',
+    });
+    const { tokens } = store.getState().tokenState;
+    expect(tokens.global).toEqual([
+      {
+        name: 'primary',
+        value: '1',
+      },
+      {
+        name: 'alias',
+        value: '$primary',
+      },
+      {
+        name: 'primary50',
+        value: '0.50',
+      },
+      {
+        name: 'alias50',
+        value: '$primary50',
+      },
+      {
+        name: 'header 1',
+        type: 'typography',
+        value: {
+          fontWeight: '400',
+          fontSize: '16',
+        },
+      },
+      {
+        name: 'header 1',
+        type: 'typography',
+        value: {
+          fontWeight: '400',
+          fontSize: '16',
+        },
+      },
+      {
+        name: 'shadow.mixed',
+        type: 'boxShadow',
+        description: 'the one with mixed shadows',
+        value: shadowArray,
+      },
+      {
+        name: 'text.big',
+        type: 'sizing',
+        value: '24px',
+      },
+      {
+        name: 'text.small',
+        type: 'sizing',
+        value: '12px',
+      },
+      {
+        name: 'font.medium',
+        type: 'fontSizes',
+        value: '18px',
+      },
+    ]);
+  });
+
+  it('can duplicate token group', () => {
+    store.dispatch.tokenState.duplicateTokenGroup({
+      oldName: 'font',
+      parent: 'global',
+      path: '',
+      type: 'sizing',
+    });
+    const { tokens } = store.getState().tokenState;
+    expect(tokens.global).toEqual([
+      {
+        name: 'primary',
+        value: '1',
+      },
+      {
+        name: 'alias',
+        value: '$primary',
+      },
+      {
+        name: 'primary50',
+        value: '0.50',
+      },
+      {
+        name: 'alias50',
+        value: '$primary50',
+      },
+      {
+        name: 'header 1',
+        type: 'typography',
+        value: {
+          fontWeight: '400',
+          fontSize: '16',
+        },
+      },
+      {
+        name: 'header 1',
+        type: 'typography',
+        value: {
+          fontWeight: '400',
+          fontSize: '16',
+        },
+      },
+      {
+        name: 'shadow.mixed',
+        type: 'boxShadow',
+        description: 'the one with mixed shadows',
+        value: shadowArray,
+      },
+      {
+        name: 'font.big',
+        type: 'sizing',
+        value: '24px',
+      },
+      {
+        name: 'font.small',
+        type: 'sizing',
+        value: '12px',
+      },
+      {
+        name: 'font.medium',
+        type: 'fontSizes',
+        value: '18px',
+      },
+      {
+        name: 'font-copy.big',
+        type: 'sizing',
+        value: '24px',
+      },
+      {
+        name: 'font-copy.small',
+        type: 'sizing',
+        value: '12px',
+      },
+    ]);
+  });
+
   it('should be able to set collapsedTokens', () => {
     store.dispatch.tokenState.setCollapsedTokens(['color.gray', 'color.zinc', 'size']);
     const { collapsedTokens } = store.getState().tokenState;

@@ -2,30 +2,15 @@
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 import * as asyncHandlers from './asyncMessageHandlers';
-import { DefaultWindowSize } from '@/constants/DefaultWindowSize';
 import { defaultWorker } from './Worker';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { sendSelectionChange } from './sendSelectionChange';
+import { init } from '@/utils/plugin';
 
 figma.skipInvisibleInstanceChildren = true;
 
-figma.showUI(__html__, {
-  themeColors: true,
-  width: DefaultWindowSize.width,
-  height: DefaultWindowSize.height,
-});
-
-figma.on('close', () => {
-  defaultWorker.stop();
-});
-
-figma.on('selectionchange', () => {
-  sendSelectionChange();
-});
-
 AsyncMessageChannel.PluginInstance.connect();
-AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.INITIATE, asyncHandlers.initiate);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.CREDENTIALS, asyncHandlers.credentials);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.CHANGED_TABS, asyncHandlers.changedTabs);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.REMOVE_SINGLE_CREDENTIAL, asyncHandlers.removeSingleCredential);
@@ -45,8 +30,15 @@ AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.CREATE_ANNOTATION, a
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.CREATE_STYLES, asyncHandlers.createStyles);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.UPDATE, asyncHandlers.update);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.SET_LICENSE_KEY, asyncHandlers.setLicenseKey);
-AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.GET_API_CREDENTIALS, asyncHandlers.getApiCredentials);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.ATTACH_LOCAL_STYLES_TO_THEME, asyncHandlers.attachLocalStylesToTheme);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.RESOLVE_STYLE_INFO, asyncHandlers.resolveStyleInfo);
 
-figma.root.setSharedPluginData('tokens', 'nodemanagerCache', '');
+figma.on('close', () => {
+  defaultWorker.stop();
+});
+
+figma.on('selectionchange', () => {
+  sendSelectionChange();
+});
+
+init();

@@ -192,9 +192,7 @@ describe('ADOTokenStorage', () => {
     expect(result).toEqual({
       errorMessage: ErrorMessages.VALIDATION_ERROR,
     });
-
   });
-
 
   it('can read from Git in a multifile format', async () => {
     mockFetch.mockImplementationOnce(() => Promise.resolve({

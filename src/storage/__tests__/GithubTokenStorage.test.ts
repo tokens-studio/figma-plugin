@@ -1,6 +1,6 @@
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { TokenTypes } from '@/constants/TokenTypes';
-import { GithubTokenStorage } from '../GithubTokenStorage';
+import { getTreeMode, GithubTokenStorage } from '../GithubTokenStorage';
 import {
   mockCreateOrUpdateFiles,
   mockCreateRef,
@@ -21,6 +21,11 @@ describe('GithubTokenStorage', () => {
   beforeEach(() => {
     storageProvider.disableMultiFile();
     storageProvider.changePath('tokens.json');
+  });
+
+  it('should be able to get the tree mode', () => {
+    expect(getTreeMode('dir')).toEqual('040000');
+    expect(getTreeMode('file')).toEqual('100644');
   });
 
   it('should fetch branches as a simple list', async () => {
@@ -63,6 +68,13 @@ describe('GithubTokenStorage', () => {
       ref: 'refs/heads/development',
       sha: 'main-sha',
     });
+  });
+
+  it('should return false when creating a branch is failed', async () => {
+    mockGetRef.mockImplementationOnce(() => (
+      Promise.reject()
+    ));
+    expect(await storageProvider.createBranch('development', 'main')).toBe(false);
   });
 
   it('canWrite should return false if unauthenticated', async () => {
@@ -216,6 +228,7 @@ describe('GithubTokenStorage', () => {
       status: 'failure',
       errorMessage: ErrorMessages.VALIDATION_ERROR,
     });
+    mockGetContent.mockClear();
   });
 
   it('can handle invalid file content', async () => {
@@ -231,6 +244,7 @@ describe('GithubTokenStorage', () => {
     expect(await storageProvider.read()).toEqual({
       errorMessage: ErrorMessages.VALIDATION_ERROR,
     });
+    mockGetContent.mockClear();
   });
 
   it('should empty array when there is no content', async () => {
@@ -242,10 +256,160 @@ describe('GithubTokenStorage', () => {
 
     storageProvider.changePath('data/tokens.json');
     expect(await storageProvider.read()).toEqual([]);
+    mockGetContent.mockClear();
   });
 
-  it('can read from Git in a multifile format', async () => {
+  it('can read from Git in a multifile format and return empty array when there is no content', async () => {
     mockGetContent.mockImplementation((opts: { path: string }) => {
+      if (opts.path === '') {
+        return Promise.resolve({
+          data: [
+            { path: 'data', sha: 'sha(data)', type: 'dir' },
+          ],
+        });
+      }
+
+      if (opts.path === 'data') {
+        return Promise.resolve({
+          data: [
+            { path: 'data/empty.json', sha: 'sha(data/empty.json)', type: 'file' },
+          ],
+        });
+      }
+
+      if (opts.path === 'data/empty.json') {
+        return Promise.resolve({
+          data: {},
+        });
+      }
+
+      return Promise.reject();
+    });
+
+    mockGetTree.mockImplementationOnce(() => (
+      Promise.resolve({
+        data: {
+          sha: 'sha(data)',
+          tree: [
+            { path: 'data/empty.json', type: 'blob', sha: 'sha(empty.json)' },
+          ],
+        },
+      })
+    ));
+
+    storageProvider.enableMultiFile();
+    storageProvider.changePath('data');
+    expect(await storageProvider.read()).toEqual([]);
+
+    mockGetContent.mockClear();
+  });
+
+  it('can read from Git in a multifile format when parent directory has multiple directory', async () => {
+    mockGetContent.mockImplementation((opts: { path: string }) => {
+      if (opts.path === '') {
+        return Promise.resolve({
+          data: [
+            { path: 'data', sha: 'sha(data)', type: 'dir' },
+          ],
+        });
+      }
+
+      if (opts.path === 'data') {
+        return Promise.resolve({
+          data: [
+            { path: 'data/$metadata.json', sha: 'sha(data/$metadata.json)', type: 'file' },
+            { path: 'data/$themes.json', sha: 'sha(data/$themes.json)', type: 'file' },
+            { path: 'data/global.json', sha: 'sha(data/global.json)', type: 'file' },
+          ],
+        });
+      }
+
+      if (opts.path === 'data/$metadata.json') {
+        return Promise.resolve({
+          data: {
+            content: 'ewogICJ0b2tlblNldE9yZGVyIjogWyJnbG9iYWwiXQp9',
+          },
+        });
+      }
+
+      if (opts.path === 'data/$themes.json') {
+        return Promise.resolve({
+          data: {
+            content: 'WwogIHsKICAgICJpZCI6ICJsaWdodCIsCiAgICAibmFtZSI6ICJMaWdodCIsCiAgICAic2VsZWN0ZWRUb2tlblNldHMiOiB7CiAgICAgICJnbG9iYWwiOiAiZW5hYmxlZCIKICAgIH0KICB9Cl0=',
+          },
+        });
+      }
+
+      if (opts.path === 'data/global.json') {
+        return Promise.resolve({
+          data: {
+            content: 'ewogICJyZWQiOiB7CiAgICAidHlwZSI6ICJjb2xvciIsCiAgICAibmFtZSI6ICJyZWQiLAogICAgInZhbHVlIjogIiNmZjAwMDAiCiAgfQp9',
+          },
+        });
+      }
+
+      return Promise.reject();
+    });
+
+    mockGetTree.mockImplementationOnce(() => (
+      Promise.resolve({
+        data: {
+          sha: 'sha(data)',
+          tree: [
+            { path: 'data/$metadata.json', type: 'blob', sha: 'sha($metadata.json)' },
+            { path: 'data/$themes.json', type: 'blob', sha: 'sha($themes.json)' },
+            { path: 'data/global.json', type: 'blob', sha: 'sha(global.json)' },
+          ],
+        },
+      })
+    ));
+
+    storageProvider.enableMultiFile();
+    storageProvider.changePath('data');
+    expect(await storageProvider.read()).toEqual([
+      {
+        path: 'data/$metadata.json',
+        type: 'metadata',
+        data: {
+          tokenSetOrder: ['global'],
+        },
+      },
+      {
+        path: 'data/$themes.json',
+        type: 'themes',
+        data: [{
+          id: 'light',
+          name: 'Light',
+          selectedTokenSets: {
+            global: TokenSetStatus.ENABLED,
+          },
+        }],
+      },
+      {
+        path: 'data/global.json',
+        name: 'global',
+        type: 'tokenSet',
+        data: {
+          red: {
+            type: TokenTypes.COLOR,
+            name: 'red',
+            value: '#ff0000',
+          },
+        },
+      },
+    ]);
+
+    mockGetContent.mockClear();
+  });
+
+  it('can read from Git in a multifile format when parent directory has only one directory', async () => {
+    mockGetContent.mockImplementation((opts: { path: string }) => {
+      if (opts.path === '') {
+        return Promise.resolve({
+          data: { path: 'data', sha: 'sha(data)', type: 'dir' },
+        });
+      }
+
       if (opts.path === 'data') {
         return Promise.resolve({
           data: [
@@ -284,18 +448,7 @@ describe('GithubTokenStorage', () => {
     });
 
     mockCreateTree.mockImplementationOnce(() => (
-      Promise.resolve({
-        data: {
-          sha: 'sha(data)',
-          tree: [
-            {
-              type: 'tree',
-              path: 'data',
-              sha: 'sha(data)',
-            },
-          ],
-        },
-      })
+      Promise.reject()
     ));
 
     mockGetTree.mockImplementationOnce(() => (
@@ -648,6 +801,14 @@ describe('GithubTokenStorage', () => {
 
   it('should be able to rename and delete a multifile structure', async () => {
     mockGetContent.mockImplementation((opts: { path: string }) => {
+      if (opts.path === '') {
+        return Promise.resolve({
+          data: [
+            { path: 'data', sha: 'sha(data)', type: 'dir' },
+          ],
+        });
+      }
+
       if (opts.path === 'data') {
         return Promise.resolve({
           data: [
@@ -815,10 +976,19 @@ describe('GithubTokenStorage', () => {
         },
       ],
     });
+    mockGetContent.mockClear();
   });
 
   it('couldnt be able to rename and delete a multifile structure when there is no tree', async () => {
     mockGetContent.mockImplementation((opts: { path: string }) => {
+      if (opts.path === '') {
+        return Promise.resolve({
+          data: [
+            { path: 'data', sha: 'sha(data)', type: 'dir' },
+          ],
+        });
+      }
+
       if (opts.path === 'data') {
         return Promise.resolve({
           data: [
@@ -989,6 +1159,7 @@ describe('GithubTokenStorage', () => {
         },
       ],
     });
+    mockGetContent.mockClear();
   });
 
   it('should be able to write even though reading results in an error', async () => {
@@ -1078,5 +1249,65 @@ describe('GithubTokenStorage', () => {
     expect(await storageProvider.write([], {
       commitMessage: '',
     })).toBe(false);
+  });
+
+  it('should be able to get the tree sha for a given path', async () => {
+    mockListBranches.mockImplementationOnce(() => (
+      Promise.resolve({
+        data: [
+          {
+            name: 'main',
+            commit: { sha: 'root-sha' },
+          },
+        ],
+      })
+    ));
+    expect(await storageProvider.getTreeShaForDirectory('')).toEqual('root-sha');
+
+    mockGetContent.mockImplementationOnce(() => (
+      Promise.resolve({
+        data: [
+          {
+            path: 'companyA/ds',
+            sha: 'directory-sha',
+          },
+        ],
+      })
+    ));
+    expect(await storageProvider.getTreeShaForDirectory('companyA/ds')).toEqual('directory-sha');
+
+    mockGetContent.mockImplementationOnce(() => (
+      Promise.resolve({
+        data: {
+          path: 'companyA/ds',
+          sha: 'single-directory-sha',
+        },
+      })
+    ));
+    expect(await storageProvider.getTreeShaForDirectory('companyA/ds')).toEqual('single-directory-sha');
+
+    mockGetContent.mockImplementationOnce(() => (
+      Promise.resolve({
+        data: [
+          {
+            path: 'companyA',
+            sha: 'directory-sha',
+          },
+        ],
+      })
+    ));
+    await expect(storageProvider.getTreeShaForDirectory('companyA/ds')).rejects.toThrow(
+      'Unable to find directory, companyA/ds',
+    );
+
+    mockGetContent.mockImplementationOnce(() => (
+      Promise.resolve({
+        data: {
+          path: 'companyA',
+          sha: 'single-directory-sha',
+        },
+      })
+    ));
+    await expect(storageProvider.getTreeShaForDirectory('companyA/ds')).rejects.toThrow('Could not find directory SHA');
   });
 });

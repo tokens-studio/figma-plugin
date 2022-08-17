@@ -101,7 +101,6 @@ export const TokenButtonDraggable: React.FC<Props> = ({
           ...tokens,
           [activeTokenSet]: set,
         };
-
         dispatch.tokenState.setTokens(newTokens);
       }
     }

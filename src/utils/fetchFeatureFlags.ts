@@ -14,7 +14,7 @@ export default async function fetchFeatureFlags(userData: UserData) {
   if (userData.licenseKey && userData.userId) {
     const {
       plan, email: clientEmail, entitlements,
-    } = await validateLicense(userData.licenseKey, userData.userId);
+    } = await validateLicense(userData.licenseKey, userData.userId, userData.userName);
     const userAttributes: Record<string, string | boolean> = {
       plan: plan || '',
       email: clientEmail || '',

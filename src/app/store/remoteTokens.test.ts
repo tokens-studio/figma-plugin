@@ -279,30 +279,55 @@ describe('remoteTokens', () => {
 
   contexts.forEach((context) => {
     it(`Pull tokens from ${context.provider}`, async () => {
-      expect(await result.current.pullTokens({ context: context as StorageTypeCredentials })).toEqual({
-        metadata: {
-          commitMessage: 'Initial commit',
-        },
-        status: 'success',
-        themes: [
-          {
-            id: 'light',
-            name: 'Light',
-            selectedTokenSets: {
-              global: 'enabled',
-            },
-          },
-        ],
-        tokens: {
-          global: [
+      if (context === jsonbinContext) {
+        expect(await result.current.pullTokens({ context: context as StorageTypeCredentials })).toEqual({
+          metadata: {},
+          status: 'success',
+          themes: [
             {
-              value: '#ffffff',
-              type: 'color',
-              name: 'black',
+              id: 'light',
+              name: 'Light',
+              selectedTokenSets: {
+                global: 'enabled',
+              },
             },
           ],
-        },
-      });
+          tokens: {
+            global: [
+              {
+                value: '#ffffff',
+                type: 'color',
+                name: 'black',
+              },
+            ],
+          },
+        });
+      } else {
+        expect(await result.current.pullTokens({ context: context as StorageTypeCredentials })).toEqual({
+          metadata: {
+            commitMessage: 'Initial commit',
+          },
+          status: 'success',
+          themes: [
+            {
+              id: 'light',
+              name: 'Light',
+              selectedTokenSets: {
+                global: 'enabled',
+              },
+            },
+          ],
+          tokens: {
+            global: [
+              {
+                value: '#ffffff',
+                type: 'color',
+                name: 'black',
+              },
+            ],
+          },
+        });
+      }
     });
   });
 

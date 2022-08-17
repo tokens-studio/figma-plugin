@@ -260,7 +260,17 @@ function EditTokenForm({ resolvedTokens }: Props) {
         }
       } else if (internalEditToken.status === EditTokenFormStatus.DUPLICATE) {
         oldName = internalEditToken.initialName?.slice(0, internalEditToken.initialName?.lastIndexOf('-copy'));
-        duplicateSingleToken({ parent: activeTokenSet, newName, oldName });
+        duplicateSingleToken({
+          description: (
+            internalEditToken.description
+            ?? internalEditToken.oldDescription
+          ),
+          parent: activeTokenSet,
+          newName,
+          oldName,
+          type,
+          value: trimmedValue as SingleToken['value'],
+        });
       }
     }
   };
@@ -410,8 +420,12 @@ function EditTokenForm({ resolvedTokens }: Props) {
             Cancel
           </Button>
           <Button disabled={!isValid} variant="primary" type="submit">
-            {internalEditToken?.status === EditTokenFormStatus.CREATE ? 'Create'
-              : internalEditToken?.status === EditTokenFormStatus.EDIT ? 'Update' : 'Duplicate'}
+            {internalEditToken?.status === EditTokenFormStatus.CREATE && 'Create'}
+            {internalEditToken?.status === EditTokenFormStatus.EDIT && 'Update'}
+            {(
+              internalEditToken?.status !== EditTokenFormStatus.CREATE
+              && internalEditToken?.status !== EditTokenFormStatus.EDIT
+            ) && 'Duplicate'}
           </Button>
         </Stack>
       </Stack>

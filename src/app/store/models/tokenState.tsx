@@ -196,7 +196,12 @@ export const tokenState = createModel<RootModel>()({
         existingTokens.splice(existingTokenIndex + 1, 0, {
           ...state.tokens[data.parent][existingTokenIndex],
           name: data.newName,
-        });
+          value: data.value,
+          type: data.type,
+          ...(data.description ? {
+            description: data.description,
+          } : {}),
+        } as SingleToken);
 
         newTokens = {
           [data.parent]: existingTokens,
@@ -215,7 +220,6 @@ export const tokenState = createModel<RootModel>()({
       const newTokens: SingleToken[] = [];
       const existingTokens: SingleToken[] = [];
       const updatedTokens: SingleToken[] = [];
-
       // Iterate over received styles and check if they existed before or need updating
       Object.values(receivedStyles).forEach((values) => {
         values.forEach((token) => {
@@ -295,7 +299,6 @@ export const tokenState = createModel<RootModel>()({
       const {
         path, oldName, newName, type, parent,
       } = data;
-
       const tokensInParent = state.tokens[parent] ?? [];
       const renamedTokensInParent = tokensInParent.map((token) => {
         if (token.name.startsWith(`${path}${oldName}.`) && token.type === type) {

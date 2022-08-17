@@ -73,7 +73,7 @@ export class UrlTokenStorage extends RemoteTokenStorage {
         errorMessage: ErrorMessages.VALIDATION_ERROR,
       };
     }
-    
+
     return [];
   }
 

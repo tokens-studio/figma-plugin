@@ -1,6 +1,6 @@
 import { TokenTypes } from '@/constants/TokenTypes';
 import { SingleToken } from '@/types/tokens';
-import { TokenBoxshadowValue, TokenTypograpyValue } from '@/types/values';
+import { TokenBoxshadowValue, TokenTypographyValue } from '@/types/values';
 import { TransformerOptions } from './types';
 
 function getSimpleValue(resolvedValue: SingleToken['value'], rawValue: SingleToken['value'], options: TransformerOptions) {
@@ -62,7 +62,7 @@ export function getValueWithReferences(token: SingleToken, options: TransformerO
       const rawValue = token.rawValue as TokenBoxshadowValue[];
       return token.value.map((shadow, index) => getComplexValue(shadow, rawValue[index], options));
     }
-    return getComplexValue(token.value, token.rawValue as TokenTypograpyValue | TokenBoxshadowValue, options);
+    return getComplexValue(token.value, token.rawValue as TokenTypographyValue | TokenBoxshadowValue, options);
   }
 
   return getSimpleValue(token.value, token.rawValue, options);

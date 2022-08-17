@@ -1,3 +1,5 @@
+/* eslint "@typescript-eslint/no-unused-vars": off */
+// @TODO this needs to be finalized
 import { Bitbucket } from 'bitbucket';
 import { RemoteTokenStorageFile } from './RemoteTokenStorage';
 import { GitStorageMetadata, GitTokenStorage } from './GitTokenStorage';

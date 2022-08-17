@@ -24,6 +24,22 @@ describe('convertToTokenArray', () => {
         },
       },
     };
+    const compositionTokens = {
+      input: {
+        value: {
+          sizing: '{global.groupWithType.small}',
+          opacity: '{global.opacity.50}',
+        },
+        type: 'composition',
+      },
+      output: {
+        value: {
+          sizing: '{global.groupWithType.small}',
+          opacity: '{global.opacity.50}',
+        },
+        type: 'composition',
+      },
+    };
     const basicTokens = {
       global: {
         withValue: {
@@ -35,6 +51,15 @@ describe('convertToTokenArray', () => {
           heading: {
             h2: typographyTokens.withValue.input,
           },
+        },
+        opacity: {
+          50: {
+            type: 'opacity',
+            value: '50%',
+          },
+        },
+        composition: {
+          heading: compositionTokens.input,
         },
         groupWithType: {
           type: 'sizing',
@@ -65,6 +90,26 @@ describe('convertToTokenArray', () => {
       { name: 'global.withValue', value: 'bar', type: 'other' },
       { name: 'global.basic', value: '#ff0000' },
       { ...typographyTokens.withValue.output, name: 'global.typography.heading.h2' },
+      { name: 'global.opacity.50', value: '50%', type: 'opacity' },
+      { ...compositionTokens.output, name: 'global.composition.heading' },
+      {
+        name: 'global.groupWithType.small', value: '12px', type: 'sizing', inheritTypeLevel: 3,
+      },
+      { name: 'global.groupWithType.big', value: '24px', type: 'dimension' },
+      {
+        name: 'global.nestGroupWithType.font.small', value: '12px', type: 'sizing', inheritTypeLevel: 3,
+      },
+      { name: 'global.nestGroupWithType.font.big', value: '24px', type: 'dimension' },
+    ]);
+
+    expect(convertToTokenArray({
+      tokens: basicTokens, expandTypography: true, expandShadow: true, expandComposition: true,
+    })).toEqual([
+      { name: 'global.withValue', value: 'bar', type: 'other' },
+      { name: 'global.basic', value: '#ff0000' },
+      { ...typographyTokens.withValue.output, name: 'global.typography.heading.h2' },
+      { name: 'global.opacity.50', value: '50%', type: 'opacity' },
+      { ...compositionTokens.output, name: 'global.composition.heading' },
       {
         name: 'global.groupWithType.small', value: '12px', type: 'sizing', inheritTypeLevel: 3,
       },
