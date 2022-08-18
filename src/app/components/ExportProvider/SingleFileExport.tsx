@@ -29,10 +29,6 @@ export default function SingleFileExport({ onClose }: Props) {
   const tokens = useSelector(tokensSelector);
   const themes = useSelector(themesListSelector);
 
-  React.useEffect(() => {
-    console.log("tokens", tokens)
-  }, [tokens])
-
   const handleToggleIncludeAllTokens = React.useCallback(() => {
     setIncludeAllTokens(!includeAllTokens);
   }, [includeAllTokens]);
