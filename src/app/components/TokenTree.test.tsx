@@ -3,7 +3,7 @@ import { TokenTypes } from '@/constants/TokenTypes';
 import { DeepKeyTokenMap, TokenTypeSchema } from '@/types/tokens';
 import { fireEvent, render, resetStore } from '../../../tests/config/setupTest';
 import { store } from '../store';
-import TokenTree, { ShowFormOptions, ShowNewFormOptions } from './TokenTree';
+import TokenTree from './TokenTree';
 
 const displayType = 'GRID';
 const schema = {
@@ -52,11 +52,16 @@ const tokenValues = {
       type: TokenTypes.COLOR,
       value: '#000000',
     },
+  },
+  other: {
+    name: 'other',
+    type: TokenTypes.OTHER,
+    value: 'other',
   }
 };
 
-const showNewForm = (opts: ShowNewFormOptions) => { };
-const showForm = (opts: ShowFormOptions) => { };
+const showNewForm = jest.fn();
+const showForm = jest.fn();
 
 describe('TokenTree', () => {
   beforeEach(() => {
@@ -72,11 +77,11 @@ describe('TokenTree', () => {
       schema={schema as TokenTypeSchema}
     />);
 
-    await fireEvent.click(getByTestId('tokenlisting-group-size.font'));
+    await fireEvent.click(getByTestId('tokenlisting-group-size'));
     await fireEvent.click(getByTestId('tokenlisting-group-color'));
 
     const { collapsedTokens } = store.getState().tokenState;
-    expect(collapsedTokens).toEqual(['size.font', 'color']);
+    expect(collapsedTokens).toEqual(['size', 'color']);
   });
 
   it('should be able to expand token tree', async () => {
@@ -94,5 +99,18 @@ describe('TokenTree', () => {
 
     const { collapsedTokens } = store.getState().tokenState;
     expect(collapsedTokens).toEqual(['color']);
+  });
+
+  it('should be able to work add a new token', async () => {
+    const result = render(<TokenTree
+      displayType={displayType}
+      tokenValues={tokenValues as DeepKeyTokenMap}
+      showNewForm={showNewForm}
+      showForm={showForm}
+      schema={schema as TokenTypeSchema}
+    />);
+    
+    await fireEvent.click(result.getAllByTestId('button-add-new-token-in-group')[0]);
+    expect(showNewForm).toBeCalledTimes(1);
   });
 });
