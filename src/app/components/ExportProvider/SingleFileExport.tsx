@@ -125,7 +125,6 @@ export default function SingleFileExport({ onClose }: Props) {
       </Box>
       <Heading size="medium">Preview</Heading>
       <Textarea
-        data-testid='single-file-export-textarea'
         rows={10}
         isDisabled
         value={exportData}
