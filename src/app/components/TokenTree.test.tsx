@@ -77,11 +77,11 @@ describe('TokenTree', () => {
       schema={schema as TokenTypeSchema}
     />);
 
-    await fireEvent.click(getByTestId('tokenlisting-group-size'));
+    await fireEvent.click(getByTestId('tokenlisting-group-size.font'));
     await fireEvent.click(getByTestId('tokenlisting-group-color'));
 
     const { collapsedTokens } = store.getState().tokenState;
-    expect(collapsedTokens).toEqual(['size', 'color']);
+    expect(collapsedTokens).toEqual(['size.font', 'color']);
   });
 
   it('should be able to expand token tree', async () => {
@@ -109,7 +109,7 @@ describe('TokenTree', () => {
       showForm={showForm}
       schema={schema as TokenTypeSchema}
     />);
-    
+
     await fireEvent.click(result.getAllByTestId('button-add-new-token-in-group')[0]);
     expect(showNewForm).toBeCalledTimes(1);
   });

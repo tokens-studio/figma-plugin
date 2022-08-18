@@ -93,8 +93,8 @@ const TokenTree: React.FC<Props> = ({
   const mappedItems = useMemo(() => (
     tokenValuesEntries.filter((item) => (
       // remove items which are in a collapsed parent
-      !collapsed.some((parentKey) => item.parent === parentKey
-      || (item.parent?.startsWith(parentKey) && item.parent?.charAt(parentKey.length) === '.'))
+      !collapsed.some((parentKey) => (item.parent?.startsWith(parentKey) && item.parent?.charAt(parentKey.length) === '.')
+      || item.parent === parentKey)
     )).map((item) => ({
       item,
       onToggleCollapsed: () => handleToggleCollapsed(item.stringPath),
