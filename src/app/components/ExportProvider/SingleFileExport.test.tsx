@@ -72,7 +72,7 @@ describe('SingleFileExport', () => {
     );
   });
 
-  it('should return all token sets', () => {
+  it('should return all token sets, themes, metadata', () => {
     const mockStore = createMockStore(defaultStore);
     const result = render(
       <Provider store={mockStore}>
