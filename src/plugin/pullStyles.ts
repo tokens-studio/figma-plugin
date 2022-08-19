@@ -15,7 +15,6 @@ import { PullStyleOptions } from '@/types';
 import { slugify } from '@/utils/string';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { TokenBoxshadowValue } from '@/types/values';
-import { convertFontWeightToFigma } from './figmaTransforms/fontWeight';
 
 export default function pullStyles(styleTypes: PullStyleOptions): void {
   // @TODO should be specifically typed according to their type
@@ -114,7 +113,7 @@ export default function pullStyles(styleTypes: PullStyleOptions): void {
 
     fontWeights = uniqueFontCombinations.map((font, idx) => ({
       name: `fontWeights.${slugify(font.family)}-${idx}`,
-      value: convertFontWeightToFigma(font.style),
+      value: font.style,
       type: TokenTypes.FONT_WEIGHTS,
     }));
 

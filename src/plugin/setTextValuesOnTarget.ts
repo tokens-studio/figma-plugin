@@ -17,16 +17,14 @@ export default async function setTextValuesOnTarget(target: TextNode | TextStyle
         textCase,
         textDecoration,
       } = value;
-      console.log('fontwei', fontWeight);
-      const transformedValue = transformValue(String(fontWeight), 'fontWeights');
-      console.log('transfom', transformedValue);
       const family = fontFamily?.toString() || (target.fontName !== figma.mixed ? target.fontName.family : '');
-      const style = transformedValue || (target.fontName !== figma.mixed ? target.fontName.style : '');
-      await figma.loadFontAsync({ family, style });
+      const style = fontWeight?.toString() || (target.fontName !== figma.mixed ? target.fontName.style : '');
+      const transformedValue = transformValue(style, 'fontWeights');
+      await figma.loadFontAsync({ family, style: transformedValue });
       if (fontFamily || fontWeight) {
         target.fontName = {
           family,
-          style,
+          style: transformedValue,
         };
       }
 
