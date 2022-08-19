@@ -114,7 +114,9 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
 }) => {
   const [showAutoSuggest, setShowAutoSuggest] = React.useState<boolean>(false);
   const [isFirstLoading, setisFirstLoading] = React.useState<boolean>(true);
-
+  React.useEffect(() => {
+    console.log("value", value, 'type', type, 'resolve', resolvedTokens)
+  }, [value, type, resolvedTokens])
   const filteredValue = useMemo(() => ((showAutoSuggest || typeof value !== 'string') ? '' : value?.replace(/[{}$]/g, '')), [
     showAutoSuggest,
     value,
