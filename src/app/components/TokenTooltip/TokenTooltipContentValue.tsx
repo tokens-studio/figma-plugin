@@ -1,4 +1,5 @@
 import React from 'react';
+import get from 'just-safe-get';
 import { useUIDSeed } from 'react-uid';
 import useTokens from '../../store/useTokens';
 import { SingleToken } from '@/types/tokens';
@@ -10,6 +11,7 @@ import { TokenBoxshadowValue, TokenTypographyValue } from '@/types/values';
 import { SingleCompositionValueDisplay } from './SingleCompositionValueDisplay';
 import TooltipProperty from './TooltipProperty';
 import Stack from '../Stack';
+import { CompositionTokenValue } from '@/types/CompositionTokenProperty';
 
 type Props = {
   token: SingleToken;
@@ -35,7 +37,12 @@ export const TokenTooltipContentValue: React.FC<Props> = ({ token }) => {
     );
   }
 
-  if (isSingleCompositionToken(token)) {
+  if (
+    resolvedValue
+    && typeof resolvedValue !== 'string'
+    && !Array.isArray(resolvedValue)
+    && isSingleCompositionToken(token)
+  ) {
     return (
       <Stack direction="column" align="start" gap={2} wrap>
         {Object.entries(token.value).map(([property, value], index) => (
@@ -43,9 +50,8 @@ export const TokenTooltipContentValue: React.FC<Props> = ({ token }) => {
             key={seed(index)}
             property={property}
             value={value}
-            // @Liam: I have no idea how to fix this type error
-            // @ts-ignore
-            resolvedValue={resolvedValue[property] as CompositionTokenValue}
+            // @TODO strengthen the type checking here
+            resolvedValue={get(resolvedValue, property) as CompositionTokenValue}
           />
         ))}
       </Stack>
