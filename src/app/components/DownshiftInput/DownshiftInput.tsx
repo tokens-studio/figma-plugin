@@ -140,7 +140,15 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
       .filter(
         (token: SingleToken) => !filteredValue || token.name.toLowerCase().includes(filteredValue.toLowerCase()),
       )
-      .filter((token: SingleToken) => token?.type === type && token.name !== initialName),
+      .filter((token: SingleToken) => token?.type === type && token.name !== initialName).sort((a, b) => {
+        if (a.name < b.name) {
+          return -1;
+        }
+        if (a.name > b.name) {
+          return 1;
+        }
+        return 0;
+      }),
     [resolvedTokens, filteredValue, type],
   );
 
