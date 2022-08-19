@@ -1,5 +1,10 @@
 import React from 'react';
+import { useSelector } from 'react-redux';
+import set from 'set-value';
 import useTokens from '@/app/store/useTokens';
+import {
+  themesListSelector, tokensSelector,
+} from '@/selectors';
 import Heading from '../Heading';
 import Textarea from '../Textarea';
 import Button from '../Button';
@@ -7,6 +12,7 @@ import Checkbox from '../Checkbox';
 import Label from '../Label';
 import Box from '../Box';
 import Stack from '../Stack';
+import { SystemFilenames } from '@/constants/SystemFilenames';
 import { track } from '@/utils/analytics';
 
 type Props = {
@@ -20,6 +26,8 @@ export default function SingleFileExport({ onClose }: Props) {
   const [expandTypography, setExpandTypography] = React.useState(false);
   const [expandShadow, setExpandShadow] = React.useState(false);
   const [expandComposition, setExpandComposition] = React.useState(false);
+  const tokens = useSelector(tokensSelector);
+  const themes = useSelector(themesListSelector);
 
   const handleToggleIncludeAllTokens = React.useCallback(() => {
     setIncludeAllTokens(!includeAllTokens);
@@ -50,6 +58,17 @@ export default function SingleFileExport({ onClose }: Props) {
   const formattedTokens = React.useMemo(() => getFormattedTokens({
     includeAllTokens, includeParent, expandTypography, expandShadow, expandComposition,
   }), [includeAllTokens, includeParent, expandTypography, expandShadow, expandComposition, getFormattedTokens]);
+
+  const exportData = React.useMemo(() => {
+    const returnValue = JSON.parse(formattedTokens);
+    if (includeAllTokens) {
+      set(returnValue, SystemFilenames.THEMES, themes);
+      set(returnValue, SystemFilenames.METADATA, {
+        tokenSetOrder: Object.keys(tokens),
+      });
+    }
+    return JSON.stringify(returnValue, null, 2);
+  }, [formattedTokens, tokens, themes, includeAllTokens]);
 
   return (
     <Stack gap={4} direction="column">
@@ -108,14 +127,14 @@ export default function SingleFileExport({ onClose }: Props) {
       <Textarea
         rows={10}
         isDisabled
-        value={formattedTokens}
+        value={exportData}
       />
       <Stack width="full" direction="row" justify="end" gap={4}>
         <Button variant="secondary" onClick={onClose}>
           Cancel
         </Button>
         <Button
-          href={`data:text/json;charset=utf-8,${encodeURIComponent(formattedTokens)}`}
+          href={`data:text/json;charset=utf-8,${encodeURIComponent(exportData)}`}
           download="tokens.json"
           variant="primary"
           onClick={handleClickExport}
