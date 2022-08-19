@@ -140,8 +140,8 @@ export function useJSONbin() {
         dispatch.tokenState.setEditProhibited(false);
         return {
           ...data,
-          metadata: {}
-        }
+          metadata: {},
+        };
       }
       notifyToUI('No tokens stored on remote', { error: true });
       return null;
