@@ -5,6 +5,7 @@ import { transformValue } from './helpers';
 export default async function setTextValuesOnTarget(target: TextNode | TextStyle, token: Pick<SingleTypographyToken, 'value' | 'description'>) {
   try {
     const { value, description } = token;
+    console.log('value', value);
     if (typeof value !== 'string') {
       const {
         fontFamily,
@@ -16,8 +17,11 @@ export default async function setTextValuesOnTarget(target: TextNode | TextStyle
         textCase,
         textDecoration,
       } = value;
+      console.log('fontwei', fontWeight);
+      const transformedValue = transformValue(String(fontWeight), 'fontWeights');
+      console.log('transfom', transformedValue);
       const family = fontFamily?.toString() || (target.fontName !== figma.mixed ? target.fontName.family : '');
-      const style = fontWeight?.toString() || (target.fontName !== figma.mixed ? target.fontName.style : '');
+      const style = transformedValue || (target.fontName !== figma.mixed ? target.fontName.style : '');
       await figma.loadFontAsync({ family, style });
       if (fontFamily || fontWeight) {
         target.fontName = {
