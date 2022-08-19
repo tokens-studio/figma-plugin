@@ -8,7 +8,7 @@ import { ThemeObjectsList } from '@/types';
 import {
   GitMultiFileObject, GitSingleFileObject, GitStorageMetadata, GitTokenStorage,
 } from './GitTokenStorage';
-import { SystemFilenames } from './SystemFilenames';
+import { SystemFilenames } from '@/constants/SystemFilenames';
 import { ErrorMessages } from '@/constants/ErrorMessages';
 
 type ExtendedOctokitClient = Omit<Octokit, 'repos'> & {
