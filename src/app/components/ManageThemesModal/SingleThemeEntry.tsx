@@ -25,13 +25,17 @@ export const SingleThemeEntry: React.FC<Props> = ({ theme, isActive, onOpen }) =
       .length
   ), [theme]);
 
+  const stylesCount = useMemo(() => (
+    Object.values(theme.$figmaStyleReferences ?? {}).length
+  ), [theme]);
+
   const handleOpenClick = useCallback(() => {
     onOpen(theme);
   }, [theme, onOpen]);
 
   const handleToggle = useCallback(() => {
     const nextValue = isActive ? null : theme.id;
-    dispatch.tokenState.setActiveTheme(nextValue);
+    dispatch.tokenState.setActiveTheme({ themeId: nextValue, shouldUpdateNodes: true });
   }, [dispatch, theme.id, isActive]);
 
   return (
@@ -45,9 +49,7 @@ export const SingleThemeEntry: React.FC<Props> = ({ theme, isActive, onOpen }) =
         </Stack>
         <Stack gap={4} direction="row" align="center">
           <StyledThemeMetaLabel>
-            {tokenSetCount}
-            {' '}
-            Sets
+            {`${tokenSetCount} Sets, ${stylesCount} Styles`}
           </StyledThemeMetaLabel>
           <IconButton
             dataCy={`singlethemeentry-${theme.id}`}

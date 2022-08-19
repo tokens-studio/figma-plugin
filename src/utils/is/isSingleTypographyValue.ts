@@ -1,6 +1,6 @@
 import type { MapValuesToTokensResult } from '@/types';
 import type { SingleTypographyToken } from '@/types/tokens';
-import type { TokenTypograpyValue } from '@/types/values';
+import type { TokenTypographyValue } from '@/types/values';
 
 export function isSingleTypographyValue(value: MapValuesToTokensResult[string]): value is SingleTypographyToken['value'] {
   return Boolean(
@@ -8,7 +8,7 @@ export function isSingleTypographyValue(value: MapValuesToTokensResult[string]):
     && (
       typeof value === 'string'
       || ((Array.isArray(value) ? value : [value]) as (
-        (TokenTypograpyValue | Extract<MapValuesToTokensResult[string], { property: string }[]>[number])[]
+        (TokenTypographyValue | Extract<MapValuesToTokensResult[string], { property: string }[]>[number])[]
       )).every((v) => (
         v && typeof v === 'object'
         && (

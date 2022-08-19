@@ -1,3 +1,4 @@
+import { ErrorMessages } from '@/constants/ErrorMessages';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { UrlTokenStorage } from '../UrlTokenStorage';
 
@@ -8,7 +9,7 @@ describe('Test URLTokenStorage', () => {
     jest.clearAllMocks();
   });
 
-  it('should return an empty array when the content(s) are invalid', async () => {
+  it('should return validation error when the content(s) are invalid', async () => {
     global.fetch = jest.fn(() => (
       Promise.resolve({
         ok: true,
@@ -17,7 +18,9 @@ describe('Test URLTokenStorage', () => {
     ));
 
     const result = await urlTokenStorage.read();
-    expect(result).toEqual([]);
+    expect(result).toEqual({
+      errorMessage: ErrorMessages.VALIDATION_ERROR,
+    });
   });
 
   it('should return themes and token sets', async () => {
@@ -99,5 +102,17 @@ describe('Test URLTokenStorage', () => {
         },
       },
     ]);
+  });
+
+  it('should return empty array when fetching data fail', async () => {
+    global.fetch = jest.fn(() => (
+      Promise.resolve({
+        ok: false,
+        json: () => Promise.resolve(''),
+      }) as Promise<Response>
+    ));
+
+    const result = await urlTokenStorage.read();
+    expect(result).toEqual([]);
   });
 });

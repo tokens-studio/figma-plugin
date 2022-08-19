@@ -5,7 +5,7 @@ import { StyledButton } from './StyledButton';
 
 export interface ButtonProps {
   type?: 'button' | 'submit';
-  form?: string
+  form?: string;
   variant: 'secondary' | 'primary' | 'ghost';
   onClick?: () => void;
   size?: 'large' | 'small';
@@ -48,7 +48,8 @@ const Button: React.FC<ButtonProps> = ({
         download={download}
         href={href}
         data-cy={id}
-      >
+        data-testid={id}
+        >
         <StyledButton
           ref={buttonRef}
           disabled={disabled}
@@ -72,6 +73,7 @@ const Button: React.FC<ButtonProps> = ({
     // eslint-disable-next-line react/button-has-type
     <StyledButton
       data-cy={id}
+      data-testid={id}
       ref={buttonRef}
       disabled={disabled}
       type={type === 'button' ? 'button' : 'submit'}

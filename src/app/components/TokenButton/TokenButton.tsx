@@ -7,8 +7,6 @@ import { MoreButton } from '../MoreButton';
 import useManageTokens from '../../store/useManageTokens';
 import { Dispatch } from '../../store';
 import BrokenReferenceIndicator from '../BrokenReferenceIndicator';
-import { waitForMessage } from '@/utils/waitForMessage';
-import { MessageFromPluginTypes } from '@/types/messages';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
 import { TokenTooltip } from '../TokenTooltip';
 import { TokensContext } from '@/context';
@@ -17,6 +15,7 @@ import { DocumentationProperties } from '@/constants/DocumentationProperties';
 import { useGetActiveState } from '@/hooks';
 import { usePropertiesForTokenType } from '../../hooks/usePropertiesForType';
 import { TokenTypes } from '@/constants/TokenTypes';
+import { EditTokenFormStatus } from '@/constants/EditTokenFormStatus';
 import { PropertyObject } from '@/types/properties';
 import {
   activeTokenSetSelector,
@@ -54,7 +53,7 @@ export const TokenButton: React.FC<Props> = ({
   const tokensContext = React.useContext(TokensContext);
   const activeTokenSet = useSelector(activeTokenSetSelector);
   const setNodeData = useSetNodeData();
-  const { deleteSingleToken, duplicateSingleToken } = useManageTokens();
+  const { deleteSingleToken } = useManageTokens();
   const dispatch = useDispatch<Dispatch>();
 
   const { name } = token;
@@ -82,7 +81,7 @@ export const TokenButton: React.FC<Props> = ({
   }, [type, displayType]);
 
   const handleEditClick = React.useCallback(() => {
-    showForm({ name, token });
+    showForm({ name, token, status: EditTokenFormStatus.EDIT });
   }, [name, token, showForm]);
 
   const handleDeleteClick = React.useCallback(() => {
@@ -90,15 +89,13 @@ export const TokenButton: React.FC<Props> = ({
   }, [activeTokenSet, name, deleteSingleToken]);
 
   const handleDuplicateClick = React.useCallback(() => {
-    duplicateSingleToken({ parent: activeTokenSet, name });
-  }, [activeTokenSet, name, duplicateSingleToken]);
+    showForm({ name: `${name}-copy`, token, status: EditTokenFormStatus.DUPLICATE });
+  }, [showForm, name, token]);
 
-  const setPluginValue = React.useCallback((value: SelectionValue) => {
+  const setPluginValue = React.useCallback(async (value: SelectionValue) => {
     dispatch.uiState.startJob({ name: BackgroundJobs.UI_APPLYNODEVALUE });
-    setNodeData(value, tokensContext.resolvedTokens);
-    waitForMessage(MessageFromPluginTypes.REMOTE_COMPONENTS).then(() => {
-      dispatch.uiState.completeJob(BackgroundJobs.UI_APPLYNODEVALUE);
-    });
+    await setNodeData(value, tokensContext.resolvedTokens);
+    dispatch.uiState.completeJob(BackgroundJobs.UI_APPLYNODEVALUE);
   }, [dispatch, tokensContext.resolvedTokens, setNodeData]);
 
   const handleClick = React.useCallback((givenProperties: PropertyObject | PropertyObject[], isActive = active) => {

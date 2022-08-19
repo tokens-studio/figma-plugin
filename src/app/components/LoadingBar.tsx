@@ -23,6 +23,7 @@ export const backgroundJobTitles = {
   [BackgroundJobs.UI_DUPLICATETOKEN]: 'Duplicating token...',
   [BackgroundJobs.UI_REDOING]: 'Redoing action...',
   [BackgroundJobs.UI_UNDOING]: 'Undoing action...',
+  [BackgroundJobs.UI_ATTACHING_LOCAL_STYLES]: 'Attaching local styles to theme...',
 };
 
 export default function LoadingBar() {

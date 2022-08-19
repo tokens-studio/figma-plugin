@@ -72,7 +72,6 @@ export async function getTokenData(): Promise<{
     const version = await VersionProperty.read(figma.root);
     const updatedAt = await UpdatedAtProperty.read(figma.root);
     const checkForChanges = await CheckForChangesProperty.read(figma.root);
-
     if (Object.keys(values).length > 0) {
       const tokenObject = Object.entries(values).reduce<Record<string, AnyTokenList>>((acc, [key, groupValues]) => {
         acc[key] = typeof groupValues === 'string' ? JSON.parse(groupValues) : groupValues;

@@ -1,0 +1,37 @@
+{
+  "composition": {
+    "size": {
+      "value": "24",
+      "type": "sizing"
+    },
+    "opacity": {
+      "value": "50%",
+      "type": "opacity"
+    },
+    "fontFamily": {
+      "value": "Roboto",
+      "description": "Font value",
+      "type": "fontFamilies"
+    },
+    "fontWeight": {
+      "value": "Bold",
+      "description": "Weight value",
+      "type": "fontWeights"
+    },
+    "header": {
+      "value": {
+        "fontFamily": "{composition.fontFamily}",
+        "fontSize": "96",
+        "fontWeight": "{composition.fontWeight}"
+      },
+      "type": "composition"
+    },
+    "body": {
+      "value": {
+        "width": "{composition.size}",
+        "opacity": "{composition.opacity}"
+      },
+      "type": "composition"
+    }
+  }
+}

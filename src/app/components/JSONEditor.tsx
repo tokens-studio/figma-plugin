@@ -4,15 +4,17 @@ import Textarea from './Textarea';
 import Box from './Box';
 import { editProhibitedSelector } from '@/selectors';
 
+type Props = {
+  stringTokens: string;
+  handleChange: (tokens: string) => void;
+  hasError: boolean;
+};
+
 function JSONEditor({
   stringTokens,
   handleChange,
   hasError,
-}: {
-  stringTokens: string;
-  handleChange: (tokens: string) => void;
-  hasError: boolean;
-}) {
+}: Props) {
   const editProhibited = useSelector(editProhibitedSelector);
 
   return (

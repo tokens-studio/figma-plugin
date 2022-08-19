@@ -11,19 +11,18 @@ import {
 } from '@/selectors';
 import { GithubTokenStorage } from '@/storage/GithubTokenStorage';
 import { isEqual } from '@/utils/isEqual';
-import { RemoteTokenStorageData } from '@/storage/RemoteTokenStorage';
-import { GitStorageMetadata } from '@/storage/GitTokenStorage';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { StorageTypeCredentials, StorageTypeFormValues } from '@/types/StorageType';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { useFlags } from '@/app/components/LaunchDarkly';
+import { RemoteResponseData } from '@/types/RemoteResponseData';
+import { ErrorMessages } from '@/constants/ErrorMessages';
 import { applyTokenSetOrder } from '@/utils/tokenset';
 import { saveLastSyncedState } from '@/utils/saveLastSyncedState';
 
 type GithubCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.GITHUB | StorageProviderType.GITLAB; }>;
 type GithubFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.GITHUB | StorageProviderType.GITLAB }>;
-
 export function useGitHub() {
   const tokens = useSelector(tokensSelector);
   const activeTheme = useSelector(activeThemeSelector);
@@ -53,10 +52,15 @@ export function useGitHub() {
     return confirmResult;
   }, [confirm]);
 
-  const pushTokensToGitHub = useCallback(async (context: GithubCredentials): Promise<RemoteTokenStorageData<GitStorageMetadata> | null> => {
+  const pushTokensToGitHub = useCallback(async (context: GithubCredentials): Promise<RemoteResponseData> => {
     const storage = storageClientFactory(context);
     const content = await storage.retrieve();
-
+    if (content?.status === 'failure') {
+      return {
+        status: 'failure',
+        errorMessage: content?.errorMessage,
+      };
+    }
     if (content) {
       if (
         content
@@ -66,6 +70,7 @@ export function useGitHub() {
       ) {
         notifyToUI('Nothing to commit');
         return {
+          status: 'success',
           themes,
           tokens,
           metadata: {
@@ -103,15 +108,21 @@ export function useGitHub() {
         });
         pushDialog('success');
         return {
+          status: 'success',
           tokens,
           themes,
         };
       } catch (e) {
         console.log('Error pushing to GitHub', e);
+        return {
+          status: 'failure',
+          errorMessage: ErrorMessages.GITHUB_CREDENTIAL_ERROR,
+        };
       }
     }
 
     return {
+      status: 'success',
       tokens,
       themes,
       metadata: {},
@@ -137,7 +148,7 @@ export function useGitHub() {
     dispatch.tokenState.setEditProhibited(!hasWriteAccess);
   }, [dispatch, storageClientFactory]);
 
-  const pullTokensFromGitHub = useCallback(async (context: GithubCredentials, receivedFeatureFlags?: LDProps['flags']) => {
+  const pullTokensFromGitHub = useCallback(async (context: GithubCredentials, receivedFeatureFlags?: LDProps['flags']): Promise<RemoteResponseData | null> => {
     const storage = storageClientFactory(context);
     if (receivedFeatureFlags?.multiFileSync) storage.enableMultiFile();
 
@@ -149,16 +160,26 @@ export function useGitHub() {
 
     try {
       const content = await storage.retrieve();
-
+      if (content?.status === 'failure') {
+        return {
+          status: 'failure',
+          errorMessage: content.errorMessage,
+        };
+      }
       if (content) {
-        const sortedTokens = applyTokenSetOrder(content.tokens, content.metadata?.tokenSetOrder ?? []);
+        // If we didn't get a tokenSetOrder from metadata, use the order of the token sets as they appeared
+        const sortedTokens = applyTokenSetOrder(content.tokens, content.metadata?.tokenSetOrder ?? Object.keys(content.tokens));
+
         return {
           ...content,
           tokens: sortedTokens,
         };
       }
     } catch (e) {
-      console.log('Error', e);
+      return {
+        status: 'failure',
+        errorMessage: ErrorMessages.GITHUB_CREDENTIAL_ERROR,
+      };
     }
     return null;
   }, [
@@ -167,20 +188,28 @@ export function useGitHub() {
   ]);
 
   // Function to initially check auth and sync tokens with GitHub
-  const syncTokensWithGitHub = useCallback(async (context: GithubCredentials): Promise<RemoteTokenStorageData<GitStorageMetadata> | null> => {
+  const syncTokensWithGitHub = useCallback(async (context: GithubCredentials): Promise<RemoteResponseData> => {
     try {
       const storage = storageClientFactory(context);
       const hasBranches = await storage.fetchBranches();
       dispatch.branchState.setBranches(hasBranches);
       if (!hasBranches || !hasBranches.length) {
-        return null;
+        return {
+          status: 'failure',
+          errorMessage: ErrorMessages.EMPTY_BRANCH_ERROR,
+        };
       }
 
       const [owner, repo] = context.id.split('/');
       await checkAndSetAccess({ context, owner, repo });
 
       const content = await storage.retrieve();
-
+      if (content?.status === 'failure') {
+        return {
+          status: 'failure',
+          errorMessage: content.errorMessage,
+        };
+      }
       if (content) {
         if (
           !isEqual(content.tokens, tokens)
@@ -205,9 +234,12 @@ export function useGitHub() {
       }
       return await pushTokensToGitHub(context);
     } catch (e) {
-      notifyToUI('Error syncing with GitHub, check credentials', { error: true });
+      notifyToUI(ErrorMessages.GITHUB_CREDENTIAL_ERROR, { error: true });
       console.log('Error', e);
-      return null;
+      return {
+        status: 'failure',
+        errorMessage: ErrorMessages.GITHUB_CREDENTIAL_ERROR,
+      };
     }
   }, [
     askUserIfPull,
@@ -221,9 +253,9 @@ export function useGitHub() {
     checkAndSetAccess,
   ]);
 
-  const addNewGitHubCredentials = useCallback(async (context: GithubFormValues): Promise<RemoteTokenStorageData<GitStorageMetadata> | null> => {
+  const addNewGitHubCredentials = useCallback(async (context: GithubFormValues): Promise<RemoteResponseData> => {
     const data = await syncTokensWithGitHub(context);
-    if (data) {
+    if (data.status === 'success') {
       AsyncMessageChannel.ReactInstance.message({
         type: AsyncMessageTypes.CREDENTIALS,
         credential: context,
@@ -232,9 +264,13 @@ export function useGitHub() {
         notifyToUI('No tokens stored on remote');
       }
     } else {
-      return null;
+      return {
+        status: 'failure',
+        errorMessage: data.errorMessage,
+      };
     }
     return {
+      status: 'success',
       tokens: data.tokens ?? tokens,
       themes: data.themes ?? themes,
       metadata: {},

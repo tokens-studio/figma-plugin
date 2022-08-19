@@ -1,4 +1,3 @@
-import { LDProps } from 'launchdarkly-react-client-sdk/lib/withLDConsumer';
 import { UpdateMode } from '@/constants/UpdateMode';
 import type { SettingsState } from '@/app/store/models/settings';
 import type { Properties } from '@/constants/Properties';
@@ -12,10 +11,11 @@ import type { UsedTokenSetsMap } from './UsedTokenSetsMap';
 import type { StorageType, StorageTypeCredentials } from './StorageType';
 import type { Direction } from '@/constants/Direction';
 import type { SelectionValue } from './SelectionValue';
+import type { startup } from '@/utils/plugin';
+import type { ThemeObject } from './ThemeObject';
 
 export enum AsyncMessageTypes {
   // the below messages are going from UI to plugin
-  INITIATE = 'async/initiate',
   CREATE_STYLES = 'async/create-styles',
   CREDENTIALS = 'async/credentials',
   CHANGED_TABS = 'async/changed-tabs',
@@ -35,15 +35,14 @@ export enum AsyncMessageTypes {
   CREATE_ANNOTATION = 'async/create-annotation',
   UPDATE = 'async/update',
   SET_LICENSE_KEY = 'async/set-license-key',
-  GET_API_CREDENTIALS = 'async/get-api-credentials',
+  ATTACH_LOCAL_STYLES_TO_THEME = 'async/attach-local-styles-to-theme',
+  RESOLVE_STYLE_INFO = 'async/resolve-style-info',
   // the below messages are going from plugin to UI
+  STARTUP = 'async/startup',
   GET_THEME_INFO = 'async/get-theme-info',
 }
 
 export type AsyncMessage<T extends AsyncMessageTypes, P = unknown> = P & { type: T };
-
-export type InitiateAsyncMessage = AsyncMessage<AsyncMessageTypes.INITIATE>;
-export type InitiateAsyncMessageResult = AsyncMessage<AsyncMessageTypes.INITIATE>;
 
 export type CredentialsAsyncMessage = AsyncMessage<AsyncMessageTypes.CREDENTIALS, {
   credential: StorageTypeCredentials;
@@ -142,11 +141,24 @@ export type SetLicenseKeyMessage = AsyncMessage<AsyncMessageTypes.SET_LICENSE_KE
 }>;
 export type SetLicenseKeyMessageResult = AsyncMessage<AsyncMessageTypes.SET_LICENSE_KEY>;
 
-export type GetApiCredentials = AsyncMessage<AsyncMessageTypes.GET_API_CREDENTIALS, {
-  shouldPull?: boolean
-  featureFlags?: LDProps['flags'] | null
+export type AttachLocalStylesToTheme = AsyncMessage<AsyncMessageTypes.ATTACH_LOCAL_STYLES_TO_THEME, {
+  theme: ThemeObject
+  tokens: Record<string, AnyTokenList>
+  category: 'typography' | 'colors' | 'effects' | 'all'
+  settings?: Partial<SettingsState>
 }>;
-export type GetApiCredentialsResult = AsyncMessage<AsyncMessageTypes.GET_API_CREDENTIALS>;
+export type AttachLocalStylesToThemeResult = AsyncMessage<AsyncMessageTypes.ATTACH_LOCAL_STYLES_TO_THEME, ThemeObject>;
+
+export type ResolveStyleInfo = AsyncMessage<AsyncMessageTypes.RESOLVE_STYLE_INFO, {
+  styleIds: string[]
+}>;
+export type ResolveStyleInfoResult = AsyncMessage<AsyncMessageTypes.RESOLVE_STYLE_INFO, {
+  resolvedValues: {
+    id: string
+    key?: string
+    name?: string
+  }[];
+}>;
 
 export type GetThemeInfoMessage = AsyncMessage<AsyncMessageTypes.GET_THEME_INFO>;
 export type GetThemeInfoMessageResult = AsyncMessage<AsyncMessageTypes.GET_THEME_INFO, {
@@ -154,9 +166,13 @@ export type GetThemeInfoMessageResult = AsyncMessage<AsyncMessageTypes.GET_THEME
   themes: ThemeObjectsList
 }>;
 
+export type StartupMessage = AsyncMessage<AsyncMessageTypes.STARTUP, (
+  ReturnType<typeof startup> extends Promise<infer V> ? V : unknown
+)>;
+export type StartupMessageResult = AsyncMessage<AsyncMessageTypes.STARTUP>;
+
 export type AsyncMessages =
   CreateStylesAsyncMessage
-  | InitiateAsyncMessage
   | CredentialsAsyncMessage
   | ChangedTabsAsyncMessage
   | RemoveSingleCredentialAsyncMessage
@@ -176,10 +192,12 @@ export type AsyncMessages =
   | UpdateAsyncMessage
   | GetThemeInfoMessage
   | SetLicenseKeyMessage
-  | GetApiCredentials;
+  | StartupMessage
+  | AttachLocalStylesToTheme
+  | ResolveStyleInfo;
+
 export type AsyncMessageResults =
   CreateStylesAsyncMessageResult
-  | InitiateAsyncMessageResult
   | CredentialsAsyncMessageResult
   | ChangedTabsAsyncMessageResult
   | RemoveSingleCredentialAsyncMessageResult
@@ -199,7 +217,9 @@ export type AsyncMessageResults =
   | UpdateAsyncMessageResult
   | GetThemeInfoMessageResult
   | SetLicenseKeyMessageResult
-  | GetApiCredentialsResult;
+  | StartupMessageResult
+  | AttachLocalStylesToThemeResult
+  | ResolveStyleInfoResult;
 
 export type AsyncMessagesMap = {
   [K in AsyncMessageTypes]: Extract<AsyncMessages, { type: K }>

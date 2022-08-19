@@ -1,6 +1,10 @@
 import React, { useCallback } from 'react';
+<<<<<<< HEAD
 import axios from 'axios';
 import { useSelector } from 'react-redux';
+=======
+import { useDispatch, useSelector } from 'react-redux';
+>>>>>>> 63bf86ac13bcaa459692c5db8080863b78a62cde
 import Box from './Box';
 import { Tabs } from '@/constants/Tabs';
 import Stack from './Stack';
@@ -9,13 +13,20 @@ import { NavbarUndoButton } from './NavbarUndoButton';
 import Minimize from '../assets/minimize.svg';
 import useMinimizeWindow from './useMinimizeWindow';
 import IconButton from './IconButton';
+<<<<<<< HEAD
 import { IconFolder } from '@/icons';
 import useTokens from '@/app/store/useTokens';
 import {
   themeObjectsSelector, activeThemeSelector, themeOptionsSelector, usedTokenSetSelector, tokensSelector,
 } from '@/selectors';
+=======
+import { activeTabSelector } from '@/selectors';
+import { Dispatch } from '../store';
+>>>>>>> 63bf86ac13bcaa459692c5db8080863b78a62cde
 
 const Navbar: React.FC = () => {
+  const activeTab = useSelector(activeTabSelector);
+  const dispatch = useDispatch<Dispatch>();
   const { handleResize } = useMinimizeWindow();
   const { getFormattedTokens } = useTokens();
   const activeTheme = useSelector(activeThemeSelector);
@@ -40,6 +51,10 @@ const Navbar: React.FC = () => {
     if (response.status === 200) window.open(`http://localhost:3000?id=${response.data.result}`);
   }, [activeTheme, availableThemes, getFormattedTokens, themeObjects, usedTokenSet]);
 
+  const handleSwitch = useCallback((tab: Tabs) => {
+    dispatch.uiState.setActiveTab(tab);
+  }, [dispatch.uiState]);
+
   return (
     <Box
       css={{
@@ -56,9 +71,9 @@ const Navbar: React.FC = () => {
     >
       <Stack gap={0} direction="row" align="center" justify="between" css={{ width: '100%' }}>
         <div>
-          <TabButton name={Tabs.TOKENS} label="Tokens" />
-          <TabButton name={Tabs.INSPECTOR} label="Inspect" />
-          <TabButton name={Tabs.SETTINGS} label="Settings" />
+          <TabButton name={Tabs.TOKENS} activeTab={activeTab} label="Tokens" onSwitch={handleSwitch} />
+          <TabButton name={Tabs.INSPECTOR} activeTab={activeTab} label="Inspect" onSwitch={handleSwitch} />
+          <TabButton name={Tabs.SETTINGS} activeTab={activeTab} label="Settings" onSwitch={handleSwitch} />
         </div>
         <NavbarUndoButton />
       </Stack>
