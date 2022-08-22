@@ -9,12 +9,12 @@ import { singleFileSchema } from './schemas/singleFileSchema';
 import { SystemFilenames } from '@/constants/SystemFilenames';
 import { ErrorMessages } from '@/constants/ErrorMessages';
 
-type JsonBinMetadata = {
+type JsonBinMetadata = Partial<{
   version: string
   updatedAt: string
-};
+}>;
 
-type JsonbinData = Partial<JsonBinMetadata> & {
+type JsonbinData = JsonBinMetadata & {
   values: Record<string, Record<string, SingleToken<false> | DeepTokensMap<false>>>
   $themes?: ThemeObjectsList
   $metadata?: RemoteTokenStorageMetadata & JsonBinMetadata
@@ -87,7 +87,9 @@ export class JSONBinTokenStorage extends RemoteTokenStorage<JsonBinMetadata> {
         data: {
           version: data.$metadata?.version ?? data.version ?? pjs.plugin_version,
           updatedAt: data.$metadata?.updatedAt ?? data.updatedAt ?? new Date().toISOString(),
-          tokenSetOrder: data.$metadata?.tokenSetOrder,
+          ...(data.$metadata?.tokenSetOrder ? {
+            tokenSetOrder: data.$metadata.tokenSetOrder,
+          } : {}),
         },
       },
       ...Object.entries(data.values).map<RemoteTokenStorageFile<JsonBinMetadata>>(([name, tokenSet]) => ({
