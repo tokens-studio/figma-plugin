@@ -1,8 +1,6 @@
 import React from 'react';
 import { DownshiftInput } from './DownshiftInput';
-import {
-  render, fireEvent, createMockStore,
-} from '../../../../tests/config/setupTest';
+import { render } from '../../../../tests/config/setupTest';
 import { SingleToken } from '@/types/tokens';
 
 const resolvedTokens = [
@@ -54,7 +52,7 @@ const resolvedTokens = [
     rawValue: '1',
     type: 'sizing',
     value: 1,
-  }
+  },
 ] as SingleToken[];
 
 const mockSetInputValue = jest.fn();
@@ -95,12 +93,17 @@ describe('DownShiftInput', () => {
 
   it('should return matching tokens', () => {
     const result = render(
-      <DownshiftInput 
-        type='color'
+      <DownshiftInput
+        type="color"
         resolvedTokens={resolvedTokens}
         setInputValue={mockSetInputValue}
         handleChange={mockHandleChange}
-      />
+        value="{"
+        suffix
+      />,
     );
-  })
+    result.getByTestId('downshift-input-suffix-button').click();
+    expect(result.getByText('#e2e8f0')).toBeInTheDocument();
+    expect(result.getByText('#cbd5e1')).toBeInTheDocument();
+  });
 });
