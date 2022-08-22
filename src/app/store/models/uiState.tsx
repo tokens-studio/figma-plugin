@@ -13,6 +13,7 @@ import { StorageType, StorageTypeCredentials, StorageTypeFormValues } from '@/ty
 import { EditTokenObject } from '@/types/tokens';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { EditTokenFormStatus } from '@/constants/EditTokenFormStatus';
+import { UpdateMode } from '@/constants/UpdateMode';
 
 type DisplayType = 'GRID' | 'LIST';
 
@@ -75,6 +76,7 @@ export interface UIState {
   selectedLayers: number;
   manageThemesModalOpen: boolean;
   scrollPositionSet: Record<string, number>;
+  currentUpdateMode: string;
 }
 
 const defaultConfirmState: ConfirmProps = {
@@ -122,6 +124,7 @@ export const uiState = createModel<RootModel>()({
     selectedLayers: 0,
     manageThemesModalOpen: false,
     scrollPositionSet: {},
+    currentUpdateMode: UpdateMode.DOCUMENT,
   } as unknown as UIState,
   reducers: {
     setShowPushDialog: (state, data: string | false) => ({
@@ -324,6 +327,12 @@ export const uiState = createModel<RootModel>()({
       return {
         ...state,
         scrollPositionSet: payload,
+      };
+    },
+    setCurrentUpdateMode(state, payload: string) {
+      return {
+        ...state,
+        currentUpdateMode: payload,
       };
     },
   },
