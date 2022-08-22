@@ -21,6 +21,7 @@ import { StorageTypeCredentials, StorageTypeFormValues } from '@/types/StorageTy
 import { RemoteResponseData, RemoteResponseStatus } from '@/types/RemoteResponseData';
 import { ErrorMessages } from '@/constants/ErrorMessages';
 import { saveLastSyncedState } from '@/utils/saveLastSyncedState';
+import { applyTokenSetOrder } from '@/utils/tokenset';
 
 type PullTokensOptions = {
   context?: StorageTypeCredentials,
@@ -315,12 +316,12 @@ export default function useRemoteTokens() {
     track('fetchTokensFromFileOrDirectory');
     dispatch.uiState.startJob({ name: BackgroundJobs.UI_FETCHTOKENSFROMFILE });
 
-    let remoteData: RemoteResponseData<unknown> | null = null;
     if (files) {
-      remoteData = await readTokensFromFileOrDirectory(files);
+      const remoteData = await readTokensFromFileOrDirectory(files);
       if (remoteData?.status === 'success') {
+        const sortedTokens = applyTokenSetOrder(remoteData.tokens, remoteData.metadata?.tokenSetOrder ?? Object.keys(remoteData.tokens));
         dispatch.tokenState.setTokenData({
-          values: remoteData.tokens,
+          values: sortedTokens,
           themes: remoteData.themes,
         });
         track('Launched with token sets', {
@@ -328,10 +329,10 @@ export default function useRemoteTokens() {
           setNames: Object.keys(remoteData.tokens),
         });
       }
+      dispatch.uiState.completeJob(BackgroundJobs.UI_FETCHTOKENSFROMFILE);
+      return remoteData;
     }
-
-    dispatch.uiState.completeJob(BackgroundJobs.UI_FETCHTOKENSFROMFILE);
-    return remoteData;
+    return null;
   }, [
     dispatch,
     readTokensFromFileOrDirectory,

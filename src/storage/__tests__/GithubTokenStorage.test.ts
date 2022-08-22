@@ -1,6 +1,6 @@
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { TokenTypes } from '@/constants/TokenTypes';
-import { GithubTokenStorage } from '../GithubTokenStorage';
+import { getTreeMode, GithubTokenStorage } from '../GithubTokenStorage';
 import {
   mockCreateOrUpdateFiles,
   mockCreateRef,
@@ -21,6 +21,11 @@ describe('GithubTokenStorage', () => {
   beforeEach(() => {
     storageProvider.disableMultiFile();
     storageProvider.changePath('tokens.json');
+  });
+
+  it('should be able to get the tree mode', () => {
+    expect(getTreeMode('dir')).toEqual('040000');
+    expect(getTreeMode('file')).toEqual('100644');
   });
 
   it('should fetch branches as a simple list', async () => {
@@ -1244,5 +1249,65 @@ describe('GithubTokenStorage', () => {
     expect(await storageProvider.write([], {
       commitMessage: '',
     })).toBe(false);
+  });
+
+  it('should be able to get the tree sha for a given path', async () => {
+    mockListBranches.mockImplementationOnce(() => (
+      Promise.resolve({
+        data: [
+          {
+            name: 'main',
+            commit: { sha: 'root-sha' },
+          },
+        ],
+      })
+    ));
+    expect(await storageProvider.getTreeShaForDirectory('')).toEqual('root-sha');
+
+    mockGetContent.mockImplementationOnce(() => (
+      Promise.resolve({
+        data: [
+          {
+            path: 'companyA/ds',
+            sha: 'directory-sha',
+          },
+        ],
+      })
+    ));
+    expect(await storageProvider.getTreeShaForDirectory('companyA/ds')).toEqual('directory-sha');
+
+    mockGetContent.mockImplementationOnce(() => (
+      Promise.resolve({
+        data: {
+          path: 'companyA/ds',
+          sha: 'single-directory-sha',
+        },
+      })
+    ));
+    expect(await storageProvider.getTreeShaForDirectory('companyA/ds')).toEqual('single-directory-sha');
+
+    mockGetContent.mockImplementationOnce(() => (
+      Promise.resolve({
+        data: [
+          {
+            path: 'companyA',
+            sha: 'directory-sha',
+          },
+        ],
+      })
+    ));
+    await expect(storageProvider.getTreeShaForDirectory('companyA/ds')).rejects.toThrow(
+      'Unable to find directory, companyA/ds',
+    );
+
+    mockGetContent.mockImplementationOnce(() => (
+      Promise.resolve({
+        data: {
+          path: 'companyA',
+          sha: 'single-directory-sha',
+        },
+      })
+    ));
+    await expect(storageProvider.getTreeShaForDirectory('companyA/ds')).rejects.toThrow('Could not find directory SHA');
   });
 });

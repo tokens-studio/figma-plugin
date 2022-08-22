@@ -194,7 +194,12 @@ export const tokenState = createModel<RootModel>()({
         existingTokens.splice(existingTokenIndex + 1, 0, {
           ...state.tokens[data.parent][existingTokenIndex],
           name: data.newName,
-        });
+          value: data.value,
+          type: data.type,
+          ...(data.description ? {
+            description: data.description,
+          } : {}),
+        } as SingleToken);
 
         newTokens = {
           [data.parent]: existingTokens,
