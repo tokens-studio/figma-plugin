@@ -41,7 +41,7 @@ export default async function setTextValuesOnTarget(target: TextNode | TextStyle
                 }
               })
               .catch((e) => {
-                console.log('Error setting FontWeight on target', e);
+                console.log('Error setting fontWeight on target', e);
               })
           )),
         );
