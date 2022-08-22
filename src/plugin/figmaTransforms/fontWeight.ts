@@ -1,24 +1,24 @@
 export function convertFontWeightToFigma(value: string) {
   switch (value) {
     case '100':
-      return 'Thin';
+      return ['Thin', 'Hairline'];
     case '200':
-      return 'ExtraLight';
+      return ['ExtraLight', 'Extra Light', 'UltraLight', 'Ultra Light'];
     case '300':
-      return 'Light';
+      return ['Light'];
     case '400':
-      return 'Regular';
+      return ['Regular', 'Normal'];
     case '500':
-      return 'Medium';
+      return ['Medium'];
     case '600':
-      return 'SemiBold';
+      return ['SemiBold', 'Semi Bold', 'DemiBold', 'Demi Bold'];
     case '700':
-      return 'Bold';
+      return ['Bold'];
     case '800':
-      return 'ExtraBold';
+      return ['ExtraBold', 'Extra Bold', 'UltraBold', 'Ultra Bold'];
     case '900':
-      return 'Black';
+      return ['Black', 'Heavy'];
     default:
-      return value;
+      return [];
   }
 }

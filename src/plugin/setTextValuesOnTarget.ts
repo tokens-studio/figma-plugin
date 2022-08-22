@@ -5,7 +5,6 @@ import { transformValue } from './helpers';
 export default async function setTextValuesOnTarget(target: TextNode | TextStyle, token: Pick<SingleTypographyToken, 'value' | 'description'>) {
   try {
     const { value, description } = token;
-    console.log('value', value);
     if (typeof value !== 'string') {
       const {
         fontFamily,
@@ -19,15 +18,34 @@ export default async function setTextValuesOnTarget(target: TextNode | TextStyle
       } = value;
       const family = fontFamily?.toString() || (target.fontName !== figma.mixed ? target.fontName.family : '');
       const style = fontWeight?.toString() || (target.fontName !== figma.mixed ? target.fontName.style : '');
-      const transformedValue = transformValue(style, 'fontWeights');
-      await figma.loadFontAsync({ family, style: transformedValue });
-      if (fontFamily || fontWeight) {
-        target.fontName = {
-          family,
-          style: transformedValue,
-        };
-      }
 
+      try {
+        await figma.loadFontAsync({ family, style });
+        if (fontFamily || fontWeight) {
+          target.fontName = {
+            family,
+            style,
+          };
+        }
+      } catch {
+        const candidateStyles = transformValue(style, 'fontWeights');
+        await Promise.all(
+          candidateStyles.map((candidateStyle) => (
+            figma.loadFontAsync({ family, style: candidateStyle })
+              .then(() => {
+                if (fontFamily || fontWeight) {
+                  target.fontName = {
+                    family,
+                    style: candidateStyle,
+                  };
+                }
+              })
+              .catch((e) => {
+                console.log('Error setting FontWeight on target', e);
+              })
+          )),
+        );
+      }
       if (fontSize) {
         target.fontSize = transformValue(fontSize, 'fontSizes');
       }
