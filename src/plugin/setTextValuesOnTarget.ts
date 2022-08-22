@@ -30,8 +30,8 @@ export default async function setTextValuesOnTarget(target: TextNode | TextStyle
       } catch {
         const candidateStyles = transformValue(style, 'fontWeights');
         await Promise.all(
-          candidateStyles.map((candidateStyle) => (
-            figma.loadFontAsync({ family, style: candidateStyle })
+          candidateStyles.map(async (candidateStyle) => (
+            await figma.loadFontAsync({ family, style: candidateStyle })
               .then(() => {
                 if (fontFamily || fontWeight) {
                   target.fontName = {
