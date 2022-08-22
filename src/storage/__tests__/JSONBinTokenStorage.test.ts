@@ -14,10 +14,12 @@ describe('JSONBinTokenStorage', () => {
       cache: 'no-cache',
       credentials: 'same-origin',
       body: JSON.stringify({
-        version: pjs.plugin_version,
-        updatedAt,
         values: {
           options: {},
+        },
+        $metadata: {
+          version: pjs.plugin_version,
+          updatedAt,
         },
       }, null, 2),
       headers: new Headers([
@@ -151,8 +153,6 @@ describe('JSONBinTokenStorage', () => {
       cache: 'no-cache',
       credentials: 'same-origin',
       body: JSON.stringify({
-        version: pjs.plugin_version,
-        updatedAt: '2022-06-15T10:00:00.000Z',
         values: {
           global: {
             colors: {
@@ -162,6 +162,10 @@ describe('JSONBinTokenStorage', () => {
               },
             },
           },
+        },
+        $metadata: {
+          version: pjs.plugin_version,
+          updatedAt: '2022-06-15T10:00:00.000Z',
         },
         $themes: [
           {
