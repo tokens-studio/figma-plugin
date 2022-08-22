@@ -10,8 +10,8 @@ import AddIcon from '@/icons/add.svg';
 import { collapsedTokensSelector } from '@/selectors/collapsedTokensSelector';
 import { Dispatch } from '../store';
 import { EditTokenFormStatus } from '@/constants/EditTokenFormStatus';
-import { styled } from '@/stitches.config';
 import { IconCollapseArrow, IconExpandArrow } from '@/icons';
+import { StyledCollapsableTokenGroupHeadingButton, StyledTokenGroup } from './StyledTokenGroup';
 
 export type ShowFormOptions = {
   name: string;
@@ -22,36 +22,6 @@ export type ShowFormOptions = {
 export type ShowNewFormOptions = {
   name?: string;
 };
-
-const StyledTokenGroup = styled('div', {
-  display: 'flex',
-  flexDirection: 'row',
-  flexWrap: 'wrap',
-  justifyContent: 'flex-start',
-});
-
-const StyledCollapsableTokenGroupHeadingButton = styled('button', {
-  display: 'flex',
-  alignItems: 'center',
-  padding: '$1 $2',
-  gap: '$2',
-  borderRadius: '$1',
-  '&:hover, &:focus': {
-    backgroundColor: '$bgSubtle',
-    boxShadow: 'none',
-    border: 'none',
-  },
-  '> svg': {
-    opacity: 0.5,
-  },
-  variants: {
-    collapsed: {
-      true: {
-        opacity: 0.5,
-      },
-    },
-  },
-});
 
 type Props = {
   displayType: 'GRID' | 'LIST';

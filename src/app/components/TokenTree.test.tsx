@@ -39,7 +39,7 @@ const tokenValues = {
         type: TokenTypes.SIZING,
         value: '20',
       },
-    }
+    },
   },
   color: {
     black: {
@@ -57,7 +57,7 @@ const tokenValues = {
     name: 'other',
     type: TokenTypes.OTHER,
     value: 'other',
-  }
+  },
 };
 
 const showNewForm = jest.fn();
@@ -68,7 +68,7 @@ describe('TokenTree', () => {
     resetStore();
   });
 
-  it('should be able to collpase token tree', async () => {
+  it('should be able to collpase a token group', async () => {
     const { getByTestId } = render(<TokenTree
       displayType={displayType}
       tokenValues={tokenValues as DeepKeyTokenMap}
@@ -84,7 +84,7 @@ describe('TokenTree', () => {
     expect(collapsedTokens).toEqual(['size.font', 'color']);
   });
 
-  it('should be able to expand token tree', async () => {
+  it('should be able to expand a token group', async () => {
     const { getByTestId } = render(<TokenTree
       displayType={displayType}
       tokenValues={tokenValues as DeepKeyTokenMap}
@@ -101,7 +101,7 @@ describe('TokenTree', () => {
     expect(collapsedTokens).toEqual(['color']);
   });
 
-  it('should be able to work add a new token', async () => {
+  it('should be able to add a new token', async () => {
     const result = render(<TokenTree
       displayType={displayType}
       tokenValues={tokenValues as DeepKeyTokenMap}
