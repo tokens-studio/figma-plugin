@@ -4,7 +4,7 @@ import {
 } from './RemoteTokenStorage';
 import { singleFileSchema } from './schemas/singleFileSchema';
 import IsJSONString from '@/utils/isJSONString';
-import { SystemFilenames } from './SystemFilenames';
+import { SystemFilenames } from '@/constants/SystemFilenames';
 import { ErrorMessages } from '@/constants/ErrorMessages';
 import { complexSingleFileSchema } from './schemas';
 

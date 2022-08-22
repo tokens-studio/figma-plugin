@@ -6,7 +6,7 @@ import {
   RemoteTokenStorage, RemoteTokenstorageErrorMessage, RemoteTokenStorageFile, RemoteTokenStorageMetadata,
 } from './RemoteTokenStorage';
 import { singleFileSchema } from './schemas/singleFileSchema';
-import { SystemFilenames } from './SystemFilenames';
+import { SystemFilenames } from '@/constants/SystemFilenames';
 import { ErrorMessages } from '@/constants/ErrorMessages';
 
 type JsonBinMetadata = {

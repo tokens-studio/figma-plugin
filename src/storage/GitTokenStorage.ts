@@ -1,6 +1,6 @@
 import { DeepTokensMap, ThemeObjectsList } from '@/types';
 import { AnyTokenSet, SingleToken } from '@/types/tokens';
-import { SystemFilenames } from './SystemFilenames';
+import { SystemFilenames } from '@/constants/SystemFilenames';
 import { joinPath } from '@/utils/string';
 import { RemoteTokenStorage, RemoteTokenStorageFile, RemoteTokenStorageMetadata } from './RemoteTokenStorage';
 

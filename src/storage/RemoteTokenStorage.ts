@@ -3,7 +3,7 @@ import { RemoteResponseData } from '@/types/RemoteResponseData';
 import type { AnyTokenList, SingleToken } from '@/types/tokens';
 import convertTokensToObject from '@/utils/convertTokensToObject';
 import parseTokenValues from '@/utils/parseTokenValues';
-import { SystemFilenames } from './SystemFilenames';
+import { SystemFilenames } from '@/constants/SystemFilenames';
 
 export type RemoteTokenStorageMetadata = {
   tokenSetOrder?: string[]

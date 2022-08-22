@@ -8,7 +8,7 @@ import {
   RemoteTokenStorageFile, RemoteTokenStorageMetadataFile, RemoteTokenStorageSingleTokenSetFile, RemoteTokenStorageThemesFile,
 } from './RemoteTokenStorage';
 import { multiFileSchema, complexSingleFileSchema } from './schemas';
-import { SystemFilenames } from './SystemFilenames';
+import { SystemFilenames } from '@/constants/SystemFilenames';
 import { ErrorMessages } from '@/constants/ErrorMessages';
 import { AnyTokenSet } from '@/types/tokens';
 
