@@ -2,6 +2,7 @@ import setTextValuesOnTarget from './setTextValuesOnTarget';
 
 describe('setTextValuesOnTarget', () => {
   let textNodeMock;
+  const loadFontAsyncSpy = jest.spyOn(figma, 'loadFontAsync');
 
   beforeEach(() => {
     textNodeMock = {
@@ -33,6 +34,17 @@ describe('setTextValuesOnTarget', () => {
   it('sets fontWeight if that is given', async () => {
     await setTextValuesOnTarget(textNodeMock, { value: { fontWeight: 'Bold' } });
     expect(textNodeMock).toEqual({ ...textNodeMock, fontName: { ...textNodeMock.fontName, style: 'Bold' } });
+  });
+
+  it('convert number fontWeight and sets to the node', async () => {
+    loadFontAsyncSpy.mockImplementationOnce(() => (
+      Promise.reject()
+    ));
+    loadFontAsyncSpy.mockImplementation(() => (
+      Promise.resolve()
+    ));
+    await setTextValuesOnTarget(textNodeMock, { value: { fontWeight: '500' } });
+    expect(textNodeMock).toEqual({ ...textNodeMock, fontName: { ...textNodeMock.fontName, style: 'Medium' } });
   });
 
   it('sets textCase, textDecoration and description if those are given', async () => {
