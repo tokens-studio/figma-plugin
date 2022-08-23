@@ -302,7 +302,7 @@ export class ADOTokenStorage extends GitTokenStorage {
           {
             type: 'themes',
             path: this.path,
-            data: Array.isArray($themes) ? $themes : [],
+            data: $themes,
           },
           ...($metadata ? [
             {
