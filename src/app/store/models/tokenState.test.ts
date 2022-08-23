@@ -106,6 +106,7 @@ describe('editToken', () => {
             themes: [],
             activeTheme: null,
             activeTokenSet: 'global',
+            collapsedTokens: [],
           },
         },
       },
@@ -814,5 +815,11 @@ describe('editToken', () => {
         value: '12px',
       },
     ]);
+  });
+
+  it('should be able to set collapsedTokens', () => {
+    store.dispatch.tokenState.setCollapsedTokens(['color.gray', 'color.zinc', 'size']);
+    const { collapsedTokens } = store.getState().tokenState;
+    expect(collapsedTokens).toEqual(['color.gray', 'color.zinc', 'size']);
   });
 });

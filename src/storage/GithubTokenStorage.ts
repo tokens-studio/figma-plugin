@@ -1,12 +1,12 @@
 import compact from 'just-compact';
 import { Octokit } from '@octokit/rest';
 import { decodeBase64 } from '@/utils/string/ui';
-import { RemoteTokenstorageErrorMessage, RemoteTokenStorageFile } from './RemoteTokenStorage';
+import { RemoteTokenstorageErrorMessage, RemoteTokenStorageFile, RemoteTokenStorageMetadata } from './RemoteTokenStorage';
 import IsJSONString from '@/utils/isJSONString';
 import { AnyTokenSet } from '@/types/tokens';
 import { ThemeObjectsList } from '@/types';
 import {
-  GitMultiFileObject, GitSingleFileObject, GitStorageMetadata, GitTokenStorage,
+  GitMultiFileObject, GitSingleFileObject, GitTokenStorage,
 } from './GitTokenStorage';
 import { SystemFilenames } from '@/constants/SystemFilenames';
 import { ErrorMessages } from '@/constants/ErrorMessages';
@@ -149,7 +149,7 @@ export class GithubTokenStorage extends GitTokenStorage {
     }
   }
 
-  public async read(): Promise<RemoteTokenStorageFile<GitStorageMetadata>[] | RemoteTokenstorageErrorMessage> {
+  public async read(): Promise<RemoteTokenStorageFile[] | RemoteTokenstorageErrorMessage> {
     try {
       const normalizedPath = compact(this.path.split('/')).join('/');
       const response = await this.octokitClient.rest.repos.getContent({
@@ -184,7 +184,7 @@ export class GithubTokenStorage extends GitTokenStorage {
               headers: octokitClientDefaultHeaders,
             }) : Promise.resolve(null)
           )));
-          return compact(jsonFileContents.map<RemoteTokenStorageFile<GitStorageMetadata> | null>((fileContent, index) => {
+          return compact(jsonFileContents.map<RemoteTokenStorageFile | null>((fileContent, index) => {
             const { path } = jsonFiles[index];
             if (
               path
@@ -210,7 +210,7 @@ export class GithubTokenStorage extends GitTokenStorage {
                 return {
                   path: filePath,
                   type: 'metadata',
-                  data: parsed as GitStorageMetadata,
+                  data: parsed as RemoteTokenStorageMetadata,
                 };
               }
 
@@ -236,7 +236,7 @@ export class GithubTokenStorage extends GitTokenStorage {
             },
             ...(Object.entries(parsed).filter(([key]) => (
               !Object.values<string>(SystemFilenames).includes(key)
-            )) as [string, AnyTokenSet<false>][]).map<RemoteTokenStorageFile<GitStorageMetadata>>(([name, tokenSet]) => ({
+            )) as [string, AnyTokenSet<false>][]).map<RemoteTokenStorageFile>(([name, tokenSet]) => ({
               name,
               type: 'tokenSet',
               path: `${this.path}/${name}.json`,

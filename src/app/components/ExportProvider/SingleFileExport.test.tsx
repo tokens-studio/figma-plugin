@@ -1,6 +1,6 @@
+import React from 'react';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { AnyTokenList } from '@/types/tokens';
-import React from 'react';
 import { Provider } from 'react-redux';
 import {
   render, fireEvent, createMockStore,

@@ -114,7 +114,6 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
 }) => {
   const [showAutoSuggest, setShowAutoSuggest] = React.useState<boolean>(false);
   const [isFirstLoading, setisFirstLoading] = React.useState<boolean>(true);
-
   const filteredValue = useMemo(() => ((showAutoSuggest || typeof value !== 'string') ? '' : value?.replace(/[{}$]/g, '')), [
     showAutoSuggest,
     value,
@@ -140,7 +139,9 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
       .filter(
         (token: SingleToken) => !filteredValue || token.name.toLowerCase().includes(filteredValue.toLowerCase()),
       )
-      .filter((token: SingleToken) => token?.type === type && token.name !== initialName),
+      .filter((token: SingleToken) => token?.type === type && token.name !== initialName).sort((a, b) => (
+        a.name.localeCompare(b.name)
+      )),
     [resolvedTokens, filteredValue, type],
   );
 
@@ -206,7 +207,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
               getInputProps={getInputProps}
             />
             {suffix && (
-              <StyledInputSuffix type="button" onClick={handleAutoSuggest}>
+              <StyledInputSuffix type="button" data-testid="downshift-input-suffix-button" onClick={handleAutoSuggest}>
                 <StyledIconDisclosure />
               </StyledInputSuffix>
             )}
