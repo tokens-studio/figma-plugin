@@ -48,7 +48,7 @@ const TokenListing: React.FC<Props> = ({
     dispatch.uiState.setShowEditForm(true);
     dispatch.uiState.setEditToken({
       ...token,
-      type: schema.type,
+      type: token?.type || schema.type,
       schema,
       status,
       initialName: name,
