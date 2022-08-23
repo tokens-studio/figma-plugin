@@ -2,7 +2,7 @@
 // @TODO this needs to be finalized
 import { Bitbucket } from 'bitbucket';
 import { RemoteTokenStorageFile } from './RemoteTokenStorage';
-import { GitStorageMetadata, GitTokenStorage } from './GitTokenStorage';
+import { GitTokenStorage } from './GitTokenStorage';
 
 type CreatedOrUpdatedFileType = {
   owner: string;
@@ -101,7 +101,7 @@ export class BitbucketTokenStorage extends GitTokenStorage {
   // https://bitbucketjs.netlify.app/#api-source-source_readRoot OR
   // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-source/#api-repositories-workspace-repo-slug-src-commit-path-get
   // Equivalent to directly hitting /2.0/repositories/{username}/{repo_slug}/src/{commit}/{path} without having to know the name or SHA1 of the repo's main branch.
-  public async read(): Promise<RemoteTokenStorageFile<GitStorageMetadata>[]> {
+  public async read(): Promise<RemoteTokenStorageFile[]> {
     try {
       const response = await this.bitbucketClient.repositories.get({
         workspace: this.owner,
