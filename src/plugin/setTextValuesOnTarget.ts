@@ -20,8 +20,8 @@ export default async function setTextValuesOnTarget(target: TextNode | TextStyle
       const style = fontWeight?.toString() || (target.fontName !== figma.mixed ? target.fontName.style : '');
 
       try {
-        await figma.loadFontAsync({ family, style });
         if (fontFamily || fontWeight) {
+          await figma.loadFontAsync({ family, style });
           target.fontName = {
             family,
             style,
@@ -31,9 +31,9 @@ export default async function setTextValuesOnTarget(target: TextNode | TextStyle
         const candidateStyles = transformValue(style, 'fontWeights');
         await Promise.all(
           candidateStyles.map(async (candidateStyle) => (
-            await figma.loadFontAsync({ family, style: candidateStyle })
+            figma.loadFontAsync({ family, style: candidateStyle })
               .then(() => {
-                if (fontFamily || fontWeight) {
+                if (fontFamily || candidateStyle) {
                   target.fontName = {
                     family,
                     style: candidateStyle,

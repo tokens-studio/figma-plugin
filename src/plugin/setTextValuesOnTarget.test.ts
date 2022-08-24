@@ -36,7 +36,7 @@ describe('setTextValuesOnTarget', () => {
     expect(textNodeMock).toEqual({ ...textNodeMock, fontName: { ...textNodeMock.fontName, style: 'Bold' } });
   });
 
-  it('convert number fontWeight and sets to the node', async () => {
+  it('converts a numerical fontWeight and sets to the node', async () => {
     loadFontAsyncSpy.mockImplementationOnce(() => (
       Promise.reject()
     ));
@@ -47,7 +47,7 @@ describe('setTextValuesOnTarget', () => {
     expect(textNodeMock).toEqual({ ...textNodeMock, fontName: { ...textNodeMock.fontName, style: 'Medium' } });
   });
 
-  it(`can't set number fontWeight to the node if there is no match fontWeight`, async () => {
+  it('can\'t set number fontWeight to the node if there is no matching fontWeight', async () => {
     loadFontAsyncSpy.mockImplementation(() => (
       Promise.reject()
     ));
