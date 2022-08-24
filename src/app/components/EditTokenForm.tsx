@@ -256,7 +256,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
 
           if (shouldRemap) {
             remapToken(oldName, newName, shouldRemap.data[0]);
-            // dispatch.uiState.setupdateMode(shouldRemap.data[0]);
+            dispatch.settings.setUpdateMode(shouldRemap.data[0]);
           }
         } else {
           track('Edit token', { renamed: false });
