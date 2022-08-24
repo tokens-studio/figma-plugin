@@ -33,7 +33,7 @@ export default async function setTextValuesOnTarget(target: TextNode | TextStyle
           candidateStyles.map(async (candidateStyle) => (
             figma.loadFontAsync({ family, style: candidateStyle })
               .then(() => {
-                if (fontFamily || candidateStyle) {
+                if (candidateStyle) {
                   target.fontName = {
                     family,
                     style: candidateStyle,
