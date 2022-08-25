@@ -4,7 +4,6 @@ import { TokenTypographyValue } from '@/types/values';
 export function textStyleMatchesTypographyToken(
   textStyle: TextStyle | undefined,
   typographyToken: string | TokenTypographyValue,
-  description?: string,
 ) {
   if (!textStyle || typeof typographyToken === 'string') {
     return false;
@@ -70,10 +69,6 @@ export function textStyleMatchesTypographyToken(
   const tokenTextDecoration = transformValue(String(textDecoration), 'textDecoration');
   if (tokenTextDecoration !== textStyle.textDecoration) {
     return false;
-  }
-  // TODO: Should description also match? 🤷
-  if (textStyle.description !== '' && textStyle.description !== description) {
-    // return false;
   }
   return true; //  All checks passed - text style matches typography token
 }
