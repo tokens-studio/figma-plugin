@@ -247,7 +247,8 @@ export default async function setValuesOnNode(
             }
           }
         }
-      } else if (
+      }
+      if (
         values.fontFamilies
         || values.fontWeights
         || values.lineHeights

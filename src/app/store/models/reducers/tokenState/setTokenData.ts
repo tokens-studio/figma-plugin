@@ -26,7 +26,9 @@ export function setTokenData(state: TokenState, payload: SetTokenDataPayload): T
       ),
     })),
     activeTheme: payload.activeTheme ?? null,
-    activeTokenSet: Array.isArray(payload.values) ? 'global' : Object.keys(payload.values)[0],
+    ...(Object.keys(payload.values).includes(state.activeTokenSet) ? {} : {
+      activeTokenSet: Array.isArray(payload.values) ? 'global' : Object.keys(payload.values)[0],
+    }),
     usedTokenSet: Array.isArray(payload.values)
       ? { global: TokenSetStatus.ENABLED }
       : usedTokenSets,

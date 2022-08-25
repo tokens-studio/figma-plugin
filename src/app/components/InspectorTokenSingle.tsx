@@ -43,9 +43,7 @@ export default function InspectorTokenSingle({
   }, [inspectState.selectedTokens, token]);
 
   const handleDownShiftInputChange = React.useCallback((newInputValue: string) => {
-    if (newInputValue.charAt(0) === '$') setNewTokenName(newInputValue.slice(1, newInputValue.length));
-    if (newInputValue.charAt(0) === '{') setNewTokenName(newInputValue.slice(1, newInputValue.length - 1));
-    else setNewTokenName(newInputValue);
+    setNewTokenName(newInputValue.replace(/[{}$]/g, ''));
   }, []);
 
   const handleChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>((e) => {
