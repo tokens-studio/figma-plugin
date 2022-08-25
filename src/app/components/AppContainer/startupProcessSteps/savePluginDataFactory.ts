@@ -1,4 +1,4 @@
-import type { Dispatch } from '@/app/store';
+import { Dispatch } from '@/app/store';
 import type { StartupMessage } from '@/types/AsyncMessages';
 import { identify } from '@/utils/analytics';
 
@@ -6,9 +6,6 @@ export function savePluginDataFactory(dispatch: Dispatch, params: StartupMessage
   return async () => {
     const { user } = params;
     if (user) {
-      dispatch.userState.setUserId(user.figmaId);
-      dispatch.userState.setUserName(user.name);
-      dispatch.uiState.setLastOpened(params.lastOpened);
       const {
         width, height, showEmptyGroups, ...rest
       } = params.settings;
@@ -20,6 +17,9 @@ export function savePluginDataFactory(dispatch: Dispatch, params: StartupMessage
         },
         ...rest,
       };
+      dispatch.userState.setUserId(user.figmaId);
+      dispatch.userState.setUserName(user.name);
+      dispatch.uiState.setLastOpened(params.lastOpened);
       dispatch.settings.setUISettings(settings);
       identify(user);
     } else {
