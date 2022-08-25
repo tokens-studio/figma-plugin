@@ -157,17 +157,17 @@ describe('effectStyleMatchesBoxShadowToken', () => {
     };
     Object.entries(dummyEffectToken).forEach(([property, value]) => {
       it(`should NOT match boxShadowToken against effect style when effect.${property} is different`, () => {
-        const typedPropertry = property as keyof TokenBoxshadowValue;
+        const typedProperty = property as keyof TokenBoxshadowValue;
         const effectToken: TokenBoxshadowValue = { ...dummyEffectToken };
 
-        if (typedPropertry === 'color') {
-          effectToken[typedPropertry] = 'rgba(100,150,200,0.75)';
-        } else if (typedPropertry === 'type') {
-          effectToken[typedPropertry] = BoxShadowTypes.INNER_SHADOW;
-        } else if (typedPropertry === 'blendMode') {
-          effectToken[typedPropertry] = 'DARKEN';
+        if (typedProperty === 'color') {
+          effectToken[typedProperty] = 'rgba(100,150,200,0.75)';
+        } else if (typedProperty === 'type') {
+          effectToken[typedProperty] = BoxShadowTypes.INNER_SHADOW;
+        } else if (typedProperty === 'blendMode') {
+          effectToken[typedProperty] = 'DARKEN';
         } else {
-          effectToken[typedPropertry] = (value as number) + 1;
+          effectToken[typedProperty] = (value as number) + 1;
         }
 
         expect(effectStyleMatchesBoxShadowToken(figmaEffectStyle, effectToken)).toBe(false);
