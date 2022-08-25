@@ -1,4 +1,4 @@
-import { Dispatch } from '@/app/store';
+import type { Dispatch } from '@/app/store';
 import type { StartupMessage } from '@/types/AsyncMessages';
 import { identify } from '@/utils/analytics';
 
