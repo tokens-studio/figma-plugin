@@ -1,6 +1,11 @@
 import React from 'react';
+import { useSelector } from 'react-redux';
 import { DeepTokensMap, ThemeObjectsList } from '@/types';
 import { SingleToken } from '@/types/tokens';
+import {
+  usedTokenSetSelector,
+  activeThemeSelector,
+} from '@/selectors';
 import useRemoteTokens from '../../store/remoteTokens';
 import Button from '../Button';
 import Stack from '../Stack';
@@ -27,6 +32,8 @@ type Props = {
 };
 
 export default function FilePreset({ onCancel }: Props) {
+  const usedTokenSet = useSelector(usedTokenSetSelector);
+  const activeTheme = useSelector(activeThemeSelector);
   const hiddenFileInput = React.useRef<HTMLInputElement>(null);
   const hiddenDirectoryInput = React.useRef<HTMLInputElement>(null);
   const { fetchTokensFromFileOrDirectory } = useRemoteTokens();
@@ -44,7 +51,7 @@ export default function FilePreset({ onCancel }: Props) {
   const handleFileOrDirectoryChange = React.useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
     const { files } = event.target;
 
-    await fetchTokensFromFileOrDirectory(files);
+    await fetchTokensFromFileOrDirectory({ files, usedTokenSet, activeTheme });
     onCancel();
   }, [fetchTokensFromFileOrDirectory, onCancel]);
 
