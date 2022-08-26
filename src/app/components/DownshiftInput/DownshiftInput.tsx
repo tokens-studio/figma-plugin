@@ -10,6 +10,8 @@ import { TokenTypes } from '@/constants/TokenTypes';
 import { styled } from '@/stitches.config';
 import { StyledDownshiftInput } from './StyledDownshiftInput';
 import Tooltip from '../Tooltip';
+import { Properties } from '@/constants/Properties';
+import { isDocumentationType } from '@/utils/is/isDocumentationType';
 
 const StyledDropdown = styled('div', {
   position: 'absolute',
@@ -135,14 +137,25 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
   }, []);
 
   const filteredTokenItems = useMemo(
-    () => resolvedTokens
-      .filter(
-        (token: SingleToken) => !filteredValue || token.name.toLowerCase().includes(filteredValue.toLowerCase()),
-      )
-      .filter((token: SingleToken) => token?.type === type && token.name !== initialName).sort((a, b) => (
-        a.name.localeCompare(b.name)
-      )),
-    [resolvedTokens, filteredValue, type],
+    () => {
+      if (isDocumentationType(type as Properties)) {
+        return resolvedTokens
+          .filter(
+            (token: SingleToken) => !filteredValue || token.name.toLowerCase().includes(filteredValue.toLowerCase()),
+          )
+          .filter((token: SingleToken) => token.name !== initialName).sort((a, b) => (
+            a.name.localeCompare(b.name)
+          ));
+      }
+      return resolvedTokens
+        .filter(
+          (token: SingleToken) => !filteredValue || token.name.toLowerCase().includes(filteredValue.toLowerCase()),
+        )
+        .filter((token: SingleToken) => token?.type === type && token.name !== initialName).sort((a, b) => (
+          a.name.localeCompare(b.name)
+        ));
+    },
+    [resolvedTokens, filteredValue, type, isDocumentationType],
   );
 
   const resolveValue = useCallback((token: SingleToken) => {
