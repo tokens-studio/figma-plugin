@@ -67,6 +67,7 @@ export class JSONBinTokenStorage extends RemoteTokenStorage<JsonBinMetadata> {
     this.defaultHeaders = new Headers();
     this.defaultHeaders.append('Content-Type', 'application/json');
     this.defaultHeaders.append('X-Master-Key', this.secret);
+    this.defaultHeaders.append('X-Bin-Versioning', 'true');
   }
 
   private convertJsonBinDataToFiles(data: JsonbinData): RemoteTokenStorageFile<JsonBinMetadata>[] {
