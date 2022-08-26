@@ -815,4 +815,10 @@ describe('editToken', () => {
       },
     ]);
   });
+
+  it('should be able to update checkForChanges', () => {
+    store.dispatch.tokenState.updateCheckForChanges(true);
+    const { checkForChanges } = store.getState().tokenState;
+    expect(checkForChanges).toEqual(true);
+  });
 });
