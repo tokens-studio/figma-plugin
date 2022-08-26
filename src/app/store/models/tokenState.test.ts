@@ -823,7 +823,7 @@ describe('editToken', () => {
     expect(collapsedTokens).toEqual(['color.gray', 'color.zinc', 'size']);
   });
 
-  it('should be able to keep theme selected when there is a matching theme in themes', () => {
+  it('should be able to keep theme selected when there is a matching theme in themeList', () => {
     store.dispatch.tokenState.setTokenData({
       values: {
         global: [
@@ -831,25 +831,24 @@ describe('editToken', () => {
             name: 'primary',
             value: '1',
           },
-
         ],
       },
       themes: [
         {
-          id: 'default',
-          name: 'root',
+          id: "default",
+          name: "root",
           selectedTokenSets: {
             global: TokenSetStatus.ENABLED,
-          },
-        },
+          }
+        }
       ],
-      activeTheme: 'default',
+      activeTheme: 'default'
     });
     const { activeTheme } = store.getState().tokenState;
     expect(activeTheme).toBe('default');
   });
 
-  it('should be able to set activeTheme as null when there is no matching theme in themes', () => {
+  it('should be able to set activeTheme as null when there is no matching theme in themeList', () => {
     store.dispatch.tokenState.setTokenData({
       values: {
         global: [
@@ -861,23 +860,23 @@ describe('editToken', () => {
       },
       themes: [
         {
-          id: 'secondary',
-          name: 'root',
+          id: "secondary",
+          name: "root",
           selectedTokenSets: {
             global: TokenSetStatus.ENABLED,
-          },
-        },
+          }
+        }
       ],
-      activeTheme: 'default',
+      activeTheme: 'default'
     });
     const { activeTheme } = store.getState().tokenState;
     expect(activeTheme).toBe(null);
   });
 
-  it('should be able to keep activeTokenSet when there is no matching tokenSet in tokens', () => {
+  it('should be able to keep activeTokenSet when there is a matching tokenSet in tokenList', () => {
     store.dispatch.tokenState.setTokenData({
       values: {
-        core: [
+        global: [
           {
             name: 'primary',
             value: '1',
@@ -886,16 +885,16 @@ describe('editToken', () => {
       },
       themes: [
         {
-          id: 'default',
-          name: 'root',
+          id: "default",
+          name: "root",
           selectedTokenSets: {
             global: TokenSetStatus.ENABLED,
-          },
-        },
+          }
+        }
       ],
     });
     const { activeTokenSet } = store.getState().tokenState;
-    expect(activeTokenSet).toBe('core');
+    expect(activeTokenSet).toBe('global');
   });
 
   it('should be able to set activeTheme as global when there is no tokenSet', () => {
@@ -908,12 +907,12 @@ describe('editToken', () => {
       ],
       themes: [
         {
-          id: 'default',
-          name: 'root',
+          id: "default",
+          name: "root",
           selectedTokenSets: {
             global: TokenSetStatus.ENABLED,
-          },
-        },
+          }
+        }
       ],
     });
     const { activeTokenSet } = store.getState().tokenState;
