@@ -234,6 +234,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
                 {filteredTokenItems.map((token: SingleToken, index: number) => (
                   <StyledItem
                     data-cy="downshift-input-item"
+                    data-testid="downshift-input-item"
                     className="dropdown-item"
                     {...getItemProps({ key: token.name, index, item: token })}
                     css={{
