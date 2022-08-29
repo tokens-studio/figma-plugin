@@ -43,11 +43,9 @@ export function pullTokensFactory(
     ].includes(storageType.provider);
 
     if (isRemoteStorage) {
-      console.log("local", params.localApiProviders, storageType)
       const matchingSet = params.localApiProviders?.find((provider) => (
         isSameCredentials(provider, storageType)
       ));
-      console.log('matching', matchingSet)
 
       if (matchingSet) {
         // found API credentials
