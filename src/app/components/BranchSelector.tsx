@@ -34,6 +34,8 @@ import { isGitProvider } from '@/utils/is';
 import { compareLastSyncedState } from '@/utils/compareLastSyncedState';
 import { useFlags } from './LaunchDarkly';
 import ProBadge from './ProBadge';
+import { AsyncMessageChannel } from '@/AsyncMessageChannel';
+import { AsyncMessageTypes } from '@/types/AsyncMessages';
 
 const BranchSwitchMenuItemElement: React.FC<{
   branch: string
@@ -140,6 +142,10 @@ export default function BranchSelector() {
       dispatch.uiState.setApiData({ ...apiData, branch });
       dispatch.uiState.setLocalApiState({ ...localApiState, branch });
       await pullTokens({ context: { ...apiData, branch }, usedTokenSet, activeTheme });
+      AsyncMessageChannel.ReactInstance.message({
+        type: AsyncMessageTypes.CREDENTIALS,
+        credential: { ...apiData, branch },
+      });
     }
   }, [apiData, localApiState, pullTokens, usedTokenSet, activeTheme, dispatch]);
 
