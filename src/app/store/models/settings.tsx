@@ -164,6 +164,9 @@ export const settings = createModel<RootModel>()({
     setInspectDeep: (payload, rootState) => {
       setUI(rootState.settings);
     },
+    setUISettings: (payload, rootState) => {
+      setUI(rootState.settings);
+    },
     ...Object.fromEntries(
       (Object.entries(settingsStateEffects).map(([key, factory]) => (
         [key, factory()]
