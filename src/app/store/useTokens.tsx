@@ -131,6 +131,16 @@ export default function useTokens() {
     });
   }, [confirm]);
 
+  const handleBulkRemap = useCallback(async (newToken: string, matchingToken?: string) => {
+    const settings = settingsStateSelector(store.getState());
+    track('bulkRemapToken', { fromInspect: true });
+    AsyncMessageChannel.ReactInstance.message({
+      type: AsyncMessageTypes.BULK_REMAP_TOKENS,
+      matchingToken,
+      newToken,
+    });
+  }, [confirm]);
+
   // Calls Figma with an old name and new name and asks it to update all tokens that use the old name
   const remapToken = useCallback(async (oldName: string, newName: string, updateMode?: UpdateMode) => {
     track('remapToken', { fromRename: true });
@@ -199,6 +209,7 @@ export default function useTokens() {
     remapToken,
     removeTokensByValue,
     handleRemap,
+    handleBulkRemap,
   }), [
     isAlias,
     getTokenValue,
@@ -209,5 +220,6 @@ export default function useTokens() {
     remapToken,
     removeTokensByValue,
     handleRemap,
+    handleBulkRemap,
   ]);
 }

@@ -4,6 +4,7 @@ import Heading from '../Heading';
 import Button from '../Button';
 import Stack from '../Stack';
 import Input from '../Input';
+import useTokens from '../../store/useTokens';
 
 type Props = {
   isOpen: boolean
@@ -13,11 +14,15 @@ type Props = {
 export default function BulkRemapModal({ isOpen, onClose }: Props) {
   const [matchingToken, setMatchingToken] = React.useState('');
   const [newToken, setNewToken] = React.useState('');
+  const { handleBulkRemap } = useTokens();
+
   const handleClose = React.useCallback(() => {
     onClose();
   }, [onClose]);
 
   const onConfirm = React.useCallback(() => {
+    handleBulkRemap(newToken, matchingToken);
+    onClose();
   }, []);
 
   const handleMatchingTokenChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>((e) => {
