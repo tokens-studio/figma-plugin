@@ -100,12 +100,14 @@ export default function InspectorMultiView({ resolvedTokens }: { resolvedTokens:
                 Select all
               </Label>
             </Box>
-            <Button onClick={handleShowBulkRemap} variant="secondary">
-              Bulk remap
-            </Button>
-            <Button onClick={() => removeTokens()} disabled={inspectState.selectedTokens.length === 0} variant="secondary">
-              Remove selected
-            </Button>
+            <Box css={{ display: 'flex', flexDirection: 'row', gap: '$1' }}>
+              <Button onClick={handleShowBulkRemap} variant="secondary">
+                Bulk remap
+              </Button>
+              <Button onClick={() => removeTokens()} disabled={inspectState.selectedTokens.length === 0} variant="secondary">
+                Remove selected
+              </Button>
+            </Box>
           </Box>
           {Object.entries(groupedSelectionValues).map((group) => <InspectorTokenGroup key={`inspect-group-${group[0]}`} group={group as [Properties, SelectionGroup[]]} resolvedTokens={resolvedTokens} />)}
           {bulkRemapModalVisible && (

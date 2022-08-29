@@ -43,7 +43,6 @@ export default function BulkRemapModal({ isOpen, onClose }: Props) {
 
           </Stack>
           <Input
-            required
             full
             autofocus
             type="text"
