@@ -20,20 +20,22 @@ export default function BulkRemapModal({ isOpen, onClose }: Props) {
     onClose();
   }, [onClose]);
 
-  const onConfirm = React.useCallback(() => {
-    handleBulkRemap(newToken, matchingToken);
+  const onConfirm = React.useCallback(async () => {
+    await handleBulkRemap(newToken, matchingToken);
     onClose();
-  }, []);
+  }, [handleBulkRemap, onClose, newToken, matchingToken]);
 
-  const handleMatchingTokenChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>((e) => {
-    e.persist();
-    setMatchingToken(e.target.value);
-  }, [matchingToken]);
+  const handleMatchingTokenChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>(
+    (e) => {
+      e.persist();
+      setMatchingToken(e.target.value);
+    }, [matchingToken]);
 
-  const handleNewTokenChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>((e) => {
-    e.persist();
-    setNewToken(e.target.value);
-  }, [newToken]);
+  const handleNewTokenChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>(
+    (e) => {
+      e.persist();
+      setNewToken(e.target.value);
+    }, [newToken]);
 
   return (
     <Modal large isOpen={isOpen} close={handleClose}>
@@ -49,6 +51,7 @@ export default function BulkRemapModal({ isOpen, onClose }: Props) {
           </Stack>
           <Input
             full
+            required
             autofocus
             type="text"
             label="Match"
@@ -60,7 +63,6 @@ export default function BulkRemapModal({ isOpen, onClose }: Props) {
           <Input
             required
             full
-            autofocus
             type="text"
             label="Remap"
             value={newToken}

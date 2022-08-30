@@ -131,7 +131,7 @@ export default function useTokens() {
     });
   }, [confirm]);
 
-  const handleBulkRemap = useCallback(async (newToken: string, matchingToken?: string) => {
+  const handleBulkRemap = useCallback(async (newToken: string, matchingToken: string) => {
     const settings = settingsStateSelector(store.getState());
     track('bulkRemapToken', { fromInspect: true });
     AsyncMessageChannel.ReactInstance.message({
