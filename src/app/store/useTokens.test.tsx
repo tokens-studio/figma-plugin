@@ -373,5 +373,18 @@ describe('useToken test', () => {
         settings: store.getState().settings,
       });
     });
+
+    it('should remap all tokens', async () => {
+      await act(async () => {
+        await result.current.handleBulkRemap('newName', 'oldName');
+      });
+
+      expect(messageSpy).toBeCalledWith({
+        type: AsyncMessageTypes.BULK_REMAP_TOKENS,
+        oldName: 'oldName',
+        newName: 'newName',
+      });
+    });
   });
+
 });
