@@ -157,7 +157,7 @@ const processThemesConfigTransformAndWrite = (themes, tokens, input, options) =>
       themeSets,
       themeExcludes,
       options,
-      options.themeOutputPath ? path.join(options.themeOutputPath, theme.name + 'json') : `${theme.name}.json`
+      options.themeOutputPath ? path.join(options.themeOutputPath, theme.name + '.json') : `${theme.name}.json`
     );
   });
 };
