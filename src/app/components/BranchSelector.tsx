@@ -27,6 +27,7 @@ import {
 } from '@/selectors';
 import useRemoteTokens from '../store/remoteTokens';
 import useConfirm from '@/app/hooks/useConfirm';
+import useStorage from '@/app/store/useStorage';
 import CreateBranchModal from './modals/CreateBranchModal';
 import { Dispatch } from '../store';
 import { BranchSwitchMenuRadioElement } from './BranchSwitchMenuRadioElement';
@@ -34,6 +35,9 @@ import { isGitProvider } from '@/utils/is';
 import { compareLastSyncedState } from '@/utils/compareLastSyncedState';
 import { useFlags } from './LaunchDarkly';
 import ProBadge from './ProBadge';
+import { AsyncMessageChannel } from '@/AsyncMessageChannel';
+import { AsyncMessageTypes } from '@/types/AsyncMessages';
+import { StorageTypeCredentials } from '@/types/StorageType';
 
 const BranchSwitchMenuItemElement: React.FC<{
   branch: string
@@ -57,6 +61,7 @@ export default function BranchSelector() {
   const { pullTokens, pushTokens } = useRemoteTokens();
   const dispatch = useDispatch<Dispatch>();
   const { gitBranchSelector } = useFlags();
+  const { setStorageType } = useStorage();
 
   const branchState = useSelector(branchSelector);
   const lastSyncedState = useSelector(lastSyncedStateSelector);
@@ -140,6 +145,11 @@ export default function BranchSelector() {
       dispatch.uiState.setApiData({ ...apiData, branch });
       dispatch.uiState.setLocalApiState({ ...localApiState, branch });
       await pullTokens({ context: { ...apiData, branch }, usedTokenSet, activeTheme });
+      AsyncMessageChannel.ReactInstance.message({
+        type: AsyncMessageTypes.CREDENTIALS,
+        credential: { ...apiData, branch },
+      });
+      setStorageType({ provider: { ...apiData, branch } as StorageTypeCredentials, shouldSetInDocument: true });
     }
   }, [apiData, localApiState, pullTokens, usedTokenSet, activeTheme, dispatch]);
 
