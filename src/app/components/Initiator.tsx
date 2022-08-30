@@ -30,7 +30,6 @@ export function Initiator() {
         switch (pluginMessage.type) {
           case MessageFromPluginTypes.SELECTION: {
             const { selectionValues, mainNodeSelectionValues, selectedNodes } = pluginMessage;
-            console.log("main", pluginMessage)
             dispatch.uiState.setSelectedLayers(selectedNodes);
             dispatch.uiState.setDisabled(false);
             if (mainNodeSelectionValues.length > 1) {

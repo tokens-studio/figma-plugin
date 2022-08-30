@@ -12,8 +12,8 @@ type Props = {
 };
 
 export default function BulkRemapModal({ isOpen, onClose }: Props) {
-  const [matchingToken, setMatchingToken] = React.useState('');
-  const [newToken, setNewToken] = React.useState('');
+  const [oldName, setOldName] = React.useState('');
+  const [newName, setNewName] = React.useState('');
   const { handleBulkRemap } = useTokens();
 
   const handleClose = React.useCallback(() => {
@@ -21,21 +21,19 @@ export default function BulkRemapModal({ isOpen, onClose }: Props) {
   }, [onClose]);
 
   const onConfirm = React.useCallback(async () => {
-    await handleBulkRemap(newToken, matchingToken);
+    await handleBulkRemap(newName, oldName);
     onClose();
-  }, [handleBulkRemap, onClose, newToken, matchingToken]);
+  }, [handleBulkRemap, onClose, newName, oldName]);
 
-  const handleMatchingTokenChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>(
-    (e) => {
-      e.persist();
-      setMatchingToken(e.target.value);
-    }, [matchingToken]);
+  const handleOldNameChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>((e) => {
+    e.persist();
+    setOldName(e.target.value);
+  }, [oldName]);
 
-  const handleNewTokenChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>(
-    (e) => {
-      e.persist();
-      setNewToken(e.target.value);
-    }, [newToken]);
+  const handleNewNameChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>((e) => {
+    e.persist();
+    setNewName(e.target.value);
+  }, [newName]);
 
   return (
     <Modal large isOpen={isOpen} close={handleClose}>
@@ -47,7 +45,6 @@ export default function BulkRemapModal({ isOpen, onClose }: Props) {
             <Heading>
               Choose a new token for
             </Heading>
-
           </Stack>
           <Input
             full
@@ -55,20 +52,20 @@ export default function BulkRemapModal({ isOpen, onClose }: Props) {
             autofocus
             type="text"
             label="Match"
-            value={matchingToken}
+            value={oldName}
             placeholder=""
-            onChange={handleMatchingTokenChange}
-            name="matchingToken"
+            onChange={handleOldNameChange}
+            name="oldName"
           />
           <Input
             required
             full
             type="text"
             label="Remap"
-            value={newToken}
+            value={newName}
             placeholder=""
-            onChange={handleNewTokenChange}
-            name="newToken"
+            onChange={handleNewNameChange}
+            name="newName"
           />
           <Stack direction="row" gap={4} justify="between">
             <Button variant="secondary" onClick={onClose}>
