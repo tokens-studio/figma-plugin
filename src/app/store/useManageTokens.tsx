@@ -101,7 +101,13 @@ export default function useManageTokens() {
     const userConfirmation = await confirm({
       text: 'Delete token?',
       description: 'Are you sure you want to delete this token?',
+      choices: [
+        {
+          key: 'delete-style', label: 'Delete associated style',
+        },
+      ],
     });
+    console.log("usercon", userConfirmation)
     if (userConfirmation) {
       dispatch.uiState.startJob({
         name: BackgroundJobs.UI_DELETETOKEN,
