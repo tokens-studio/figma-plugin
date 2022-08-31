@@ -3,12 +3,12 @@ import { bulkRemapTokens } from '../bulkRemapTokens';
 import { defaultNodeManager } from '../../NodeManager';
 import { updatePluginData } from '@/plugin/pluginData';
 
+jest.mock('@/plugin/pluginData', (() => ({
+  updatePluginData: jest.fn(),
+})));
+
 describe('bulkRemapTokens', () => {
   const findNodesSpy = jest.spyOn(defaultNodeManager, 'findNodesWithData');
-  jest.mock('../../pluginData', (() => ({
-    updatePluginData: jest.fn(),
-  })));
-
   it('should work', async () => {
     findNodesSpy.mockImplementationOnce(() => Promise.resolve([
       {
@@ -50,6 +50,7 @@ describe('bulkRemapTokens', () => {
       oldName: 'old',
       newName: 'new'
     });
+
     expect(updatePluginData).toBeCalledWith({
       entries: [{
         hash: '9c7e97584a40179e12c9e2c75d34f80e66fe6f64',
