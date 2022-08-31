@@ -9,7 +9,7 @@ jest.mock('@/plugin/pluginData', (() => ({
 
 describe('bulkRemapTokens', () => {
   const findNodesSpy = jest.spyOn(defaultNodeManager, 'findNodesWithData');
-  it('should work', async () => {
+  it('should be able to replace all matching token names with new token name', async () => {
     findNodesSpy.mockImplementationOnce(() => Promise.resolve([
       {
         hash: '9c7e97584a40179e12c9e2c75d34f80e66fe6f64',
