@@ -126,6 +126,7 @@ export type CreateStylesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.CREA
 
 export type RemoveStylesAsyncMessage = AsyncMessage<AsyncMessageTypes.REMOVE_STYLES, {
   token: DeleteTokenPayload;
+  settings: Partial<SettingsState>;
 }>;
 export type RemoveStylesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.REMOVE_STYLES>;
 

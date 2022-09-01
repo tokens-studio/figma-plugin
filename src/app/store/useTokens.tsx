@@ -196,6 +196,7 @@ export default function useTokens() {
     await AsyncMessageChannel.ReactInstance.message({
       type: AsyncMessageTypes.REMOVE_STYLES,
       token,
+      settings,
     });
     // dispatch.tokenState.assignStyleIdsToCurrentTheme(createStylesResult.styleIds);
   }, []);
