@@ -33,7 +33,6 @@ import { StorageProviderType } from '@/constants/StorageProviderType';
 import { updateTokenSetsInState } from '@/utils/tokenset/updateTokenSetsInState';
 import { TokenTypes } from '@/constants/TokenTypes';
 import tokenTypes from '@/config/tokenType.defs.json';
-import { isMatchingStyle } from '@/utils/is/isMatchingStyle';
 
 export interface TokenState {
   tokens: Record<string, AnyTokenList>;
