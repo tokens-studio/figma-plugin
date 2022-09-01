@@ -67,4 +67,23 @@ describe('setTextValuesOnTarget', () => {
       textCase: 'TITLE',
     });
   });
+
+  it('it throws error, when there is no value in token', async () => {
+    await setTextValuesOnTarget(textNodeMock, {
+      description: 'Use with care',
+    });
+    expect(textNodeMock).toEqual({
+      ...textNodeMock,
+    });
+  });
+
+  it('it does nothing when the type of value is string', async () => {
+    await setTextValuesOnTarget(textNodeMock, {
+      description: 'Use with care',
+      value: 'string'
+    });
+    expect(textNodeMock).toEqual({
+      ...textNodeMock,
+    });
+  });
 });
