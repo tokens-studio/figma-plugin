@@ -33,6 +33,7 @@ import { StorageProviderType } from '@/constants/StorageProviderType';
 import { updateTokenSetsInState } from '@/utils/tokenset/updateTokenSetsInState';
 import { TokenTypes } from '@/constants/TokenTypes';
 import tokenTypes from '@/config/tokenType.defs.json';
+import { isRelatedStyle } from '@/utils/is/isRelatedStyle';
 
 export interface TokenState {
   tokens: Record<string, AnyTokenList>;
@@ -256,6 +257,13 @@ export const tokenState = createModel<RootModel>()({
         },
       } as TokenState;
     },
+    deleteStyles: (state, data: DeleteTokenPayload) => ({
+      ...state,
+      importedTokens: {
+        newTokens: state.importedTokens.newTokens.filter((style) => !isRelatedStyle(style, data)),
+        updatedTokens: state.importedTokens.updatedTokens.filter((style) => !isRelatedStyle(style, data)),
+      },
+    } as TokenState),
     editToken: (state, data: UpdateTokenPayload) => {
       const nameToFind = data.oldName ? data.oldName : data.name;
       const index = state.tokens[data.parent].findIndex((token) => token.name === nameToFind);

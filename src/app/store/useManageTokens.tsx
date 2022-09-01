@@ -36,7 +36,7 @@ export default function useManageTokens() {
   const dispatch = useDispatch<Dispatch>();
   const { confirm } = useConfirm();
   const {
-    editToken, createToken, deleteToken, duplicateToken, deleteTokenGroup, renameTokenGroup, duplicateTokenGroup,
+    editToken, createToken, deleteToken, duplicateToken, deleteTokenGroup, renameTokenGroup, duplicateTokenGroup, deleteStyles,
   } = dispatch.tokenState;
 
   const editSingleToken = useCallback(async (data: EditSingleTokenData) => {
@@ -107,7 +107,6 @@ export default function useManageTokens() {
         },
       ],
     });
-    console.log("usercon", userConfirmation)
     if (userConfirmation) {
       dispatch.uiState.startJob({
         name: BackgroundJobs.UI_DELETETOKEN,
@@ -115,6 +114,9 @@ export default function useManageTokens() {
       });
       deleteToken(data);
       dispatch.uiState.completeJob(BackgroundJobs.UI_DELETETOKEN);
+      if (userConfirmation.data.length) {
+        deleteStyles(data);
+      }
     }
   }, [confirm, deleteToken, dispatch.uiState]);
 
