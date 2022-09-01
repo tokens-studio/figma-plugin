@@ -56,7 +56,7 @@ export const TokenButton: React.FC<Props> = ({
   const { deleteSingleToken } = useManageTokens();
   const dispatch = useDispatch<Dispatch>();
 
-  const { name, value } = token;
+  const { name } = token;
   // Only show the last part of a token in a group
   const visibleName = React.useMemo(() => {
     const visibleDepth = 1;
@@ -85,7 +85,7 @@ export const TokenButton: React.FC<Props> = ({
   }, [name, token, showForm]);
 
   const handleDeleteClick = React.useCallback(() => {
-    deleteSingleToken({ parent: activeTokenSet, path: name, value });
+    deleteSingleToken({ parent: activeTokenSet, path: name });
   }, [activeTokenSet, name, deleteSingleToken]);
 
   const handleDuplicateClick = React.useCallback(() => {

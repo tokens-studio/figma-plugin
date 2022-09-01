@@ -4,7 +4,7 @@ import { SingleToken } from '@/types/tokens';
 import { Dispatch, RootState } from '../store';
 import useConfirm from '../hooks/useConfirm';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
-import { activeTokenSetSelector, tokensSelector } from '@/selectors';
+import { activeTokenSetSelector } from '@/selectors';
 import { TokenTypes } from '@/constants/TokenTypes';
 import {
   DeleteTokenPayload, DuplicateTokenPayload, UpdateTokenPayload,
@@ -110,19 +110,17 @@ export default function useManageTokens() {
       ],
     });
     if (userConfirmation) {
-      const tokens = tokensSelector(store.getState());
-      const tokenToDelete = tokens[data.parent].find((token) => token.name === data.path);
       dispatch.uiState.startJob({
         name: BackgroundJobs.UI_DELETETOKEN,
         isInfinite: true,
       });
       deleteToken(data);
       dispatch.uiState.completeJob(BackgroundJobs.UI_DELETETOKEN);
-      if (userConfirmation.data.length && tokenToDelete) {
-        removeStylesFromTokens(tokenToDelete);
+      if (userConfirmation.data.length) {
+        removeStylesFromTokens(data);
       }
     }
-  }, [confirm, deleteToken, dispatch.uiState, removeStylesFromTokens, store]);
+  }, [confirm, deleteToken, dispatch.uiState]);
 
   const deleteGroup = useCallback(async (path: string, type: string) => {
     const userConfirmation = await confirm({

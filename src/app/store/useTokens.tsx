@@ -26,6 +26,7 @@ import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { NodeInfo } from '@/types/NodeInfo';
 import { TokensContext } from '@/context';
 import { Dispatch, RootState } from '../store';
+import { DeleteTokenPayload } from '@/types/payloads';
 
 type ConfirmResult =
   ('textStyles' | 'colorStyles' | 'effectStyles')[]
@@ -189,13 +190,14 @@ export default function useTokens() {
     }
   }, [confirm, usedTokenSet, tokens, settings, dispatch.tokenState]);
 
-  const removeStylesFromTokens = useCallback(async (token: SingleToken) => {
+  const removeStylesFromTokens = useCallback(async (token: DeleteTokenPayload) => {
     track('removeStyles', token);
 
     await AsyncMessageChannel.ReactInstance.message({
       type: AsyncMessageTypes.REMOVE_STYLES,
       token,
     });
+    // dispatch.tokenState.assignStyleIdsToCurrentTheme(createStylesResult.styleIds);
   }, []);
 
   return useMemo(() => ({
