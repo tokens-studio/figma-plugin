@@ -6,14 +6,13 @@ import type { NodeInfo } from './NodeInfo';
 import type { NodeTokenRefMap } from './NodeTokenRefMap';
 import type { PullStyleOptions } from './PullStylesOptions';
 import type { ThemeObjectsList } from './ThemeObjectsList';
-import type { AnyTokenList } from './tokens';
+import type { AnyTokenList, SingleToken } from './tokens';
 import type { UsedTokenSetsMap } from './UsedTokenSetsMap';
 import type { StorageType, StorageTypeCredentials } from './StorageType';
 import type { Direction } from '@/constants/Direction';
 import type { SelectionValue } from './SelectionValue';
 import type { startup } from '@/utils/plugin';
 import type { ThemeObject } from './ThemeObject';
-import { DeleteTokenPayload } from './payloads';
 
 export enum AsyncMessageTypes {
   // the below messages are going from UI to plugin
@@ -125,7 +124,7 @@ export type CreateStylesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.CREA
 }>;
 
 export type RemoveStylesAsyncMessage = AsyncMessage<AsyncMessageTypes.REMOVE_STYLES, {
-  token: DeleteTokenPayload;
+  token: SingleToken;
 }>;
 export type RemoveStylesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.REMOVE_STYLES>;
 
