@@ -19,3 +19,4 @@ export * from './update';
 export * from './setLicenseKey';
 export * from './attachLocalStylesToTheme';
 export * from './resolveStyleInfo';
+export * from './removeStyles';

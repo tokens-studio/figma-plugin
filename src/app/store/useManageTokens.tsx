@@ -9,6 +9,7 @@ import { TokenTypes } from '@/constants/TokenTypes';
 import {
   DeleteTokenPayload, DuplicateTokenPayload, UpdateTokenPayload,
 } from '@/types/payloads';
+import useTokens from './useTokens';
 
 // @TODO this typing could be more strict in the future
 
@@ -35,8 +36,9 @@ export default function useManageTokens() {
   const store = useStore<RootState>();
   const dispatch = useDispatch<Dispatch>();
   const { confirm } = useConfirm();
+  const { removeStylesFromTokens } = useTokens();
   const {
-    editToken, createToken, deleteToken, duplicateToken, deleteTokenGroup, renameTokenGroup, duplicateTokenGroup, deleteStyles,
+    editToken, createToken, deleteToken, duplicateToken, deleteTokenGroup, renameTokenGroup, duplicateTokenGroup,
   } = dispatch.tokenState;
 
   const editSingleToken = useCallback(async (data: EditSingleTokenData) => {
@@ -115,7 +117,7 @@ export default function useManageTokens() {
       deleteToken(data);
       dispatch.uiState.completeJob(BackgroundJobs.UI_DELETETOKEN);
       if (userConfirmation.data.length) {
-        deleteStyles(data);
+        removeStylesFromTokens(data);
       }
     }
   }, [confirm, deleteToken, dispatch.uiState]);

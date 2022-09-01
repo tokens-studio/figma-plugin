@@ -26,6 +26,7 @@ import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { NodeInfo } from '@/types/NodeInfo';
 import { TokensContext } from '@/context';
 import { Dispatch, RootState } from '../store';
+import { DeleteTokenPayload } from '@/types/payloads';
 
 type ConfirmResult =
   ('textStyles' | 'colorStyles' | 'effectStyles')[]
@@ -169,7 +170,7 @@ export default function useTokens() {
       const resolved = resolveTokenValues(mergeTokenGroups(tokens, usedTokenSet));
       const withoutIgnoredAndSourceTokens = resolved.filter((token) => (
         !token.name.split('.').some((part) => part.startsWith('_')) // filter out ignored tokens
-          && (!token.internal__Parent || enabledTokenSets.includes(token.internal__Parent)) // filter out SOURCE tokens
+        && (!token.internal__Parent || enabledTokenSets.includes(token.internal__Parent)) // filter out SOURCE tokens
       ));
 
       const tokensToCreate = withoutIgnoredAndSourceTokens.filter((token) => (
@@ -189,6 +190,16 @@ export default function useTokens() {
     }
   }, [confirm, usedTokenSet, tokens, settings, dispatch.tokenState]);
 
+  const removeStylesFromTokens = useCallback(async (token: DeleteTokenPayload) => {
+    track('removeStyles', token);
+
+    await AsyncMessageChannel.ReactInstance.message({
+      type: AsyncMessageTypes.REMOVE_STYLES,
+      token,
+    });
+    // dispatch.tokenState.assignStyleIdsToCurrentTheme(createStylesResult.styleIds);
+  }, []);
+
   return useMemo(() => ({
     isAlias,
     getTokenValue,
@@ -199,6 +210,7 @@ export default function useTokens() {
     remapToken,
     removeTokensByValue,
     handleRemap,
+    removeStylesFromTokens,
   }), [
     isAlias,
     getTokenValue,
@@ -209,5 +221,6 @@ export default function useTokens() {
     remapToken,
     removeTokensByValue,
     handleRemap,
+    removeStylesFromTokens,
   ]);
 }
