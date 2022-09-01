@@ -18,14 +18,34 @@ export default async function setTextValuesOnTarget(target: TextNode | TextStyle
       } = value;
       const family = fontFamily?.toString() || (target.fontName !== figma.mixed ? target.fontName.family : '');
       const style = fontWeight?.toString() || (target.fontName !== figma.mixed ? target.fontName.style : '');
-      await figma.loadFontAsync({ family, style });
-      if (fontFamily || fontWeight) {
-        target.fontName = {
-          family,
-          style,
-        };
-      }
 
+      try {
+        if (fontFamily || fontWeight) {
+          await figma.loadFontAsync({ family, style });
+          target.fontName = {
+            family,
+            style,
+          };
+        }
+      } catch {
+        const candidateStyles = transformValue(style, 'fontWeights');
+        await Promise.all(
+          candidateStyles.map(async (candidateStyle) => (
+            figma.loadFontAsync({ family, style: candidateStyle })
+              .then(() => {
+                if (candidateStyle) {
+                  target.fontName = {
+                    family,
+                    style: candidateStyle,
+                  };
+                }
+              })
+              .catch((e) => {
+                console.log('Error setting fontWeight on target', e);
+              })
+          )),
+        );
+      }
       if (fontSize) {
         target.fontSize = transformValue(fontSize, 'fontSizes');
       }
