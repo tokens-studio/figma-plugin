@@ -1,7 +1,6 @@
 import { SettingsState } from '@/app/store/models/settings';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
-import { DeleteTokenPayload } from '@/types/payloads';
 import { convertTokenNameToPath } from '@/utils/convertTokenNameToPath';
 import { matchStyleName } from '@/utils/matchStyleName';
 
@@ -28,15 +27,15 @@ export default async function renameStylesFromPlugin(
     ? activeThemeObject.name
     : null;
 
-  // const pathname = convertTokenNameToPath(token.path, stylePathPrefix, stylePathSlice);
-  // const matchingStyleId = matchStyleName(
-  //   token.path,
-  //   pathname,
-  //   activeThemeObject?.$figmaStyleReferences ?? {},
-  //   figmaStyleMaps,
-  // );
-
-  // if (matchingStyleId) {
-  //   figma.getStyleById(matchingStyleId)?.remove();
-  // }
+  const pathname = convertTokenNameToPath(oldName, stylePathPrefix, stylePathSlice);
+  const matchingStyleId = matchStyleName(
+    oldName,
+    pathname,
+    activeThemeObject?.$figmaStyleReferences ?? {},
+    figmaStyleMaps,
+  );
+  if (matchingStyleId) {
+    const target = figma.getStyleById(matchingStyleId);
+    if (target) target.name = newName;
+  }
 }
