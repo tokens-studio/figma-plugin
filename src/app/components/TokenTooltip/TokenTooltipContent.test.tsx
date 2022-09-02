@@ -167,6 +167,19 @@ const tokens: SingleToken[] = [
     description: 'alias other token',
   },
   {
+    name: 'card.default',
+    type: TokenTypes.COMPOSITION,
+    value: {
+      spacing: 'test-value-object-value',
+      borderRadius: '6px',
+    },
+    rawValue: {
+      spacing: 'test-value-object-value',
+      borderRadius: '6px',
+    },
+    description: 'composition token',
+  },
+  {
     name: 'brokentoken',
     type: TokenTypes.COLOR,
     value: '{doesntexist}',
