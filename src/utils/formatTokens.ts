@@ -37,8 +37,12 @@ export default function formatTokens({
         if (typeof token.value === 'string') {
           const resolvedToken = resolvedTokens.find((t) => t.name === name);
           if (resolvedToken) {
-            const expanded = expand(resolvedToken?.value);
-            set(tokenObj, nestUnderParent ? [tokenSet, token.name].join('.') : token.name, { ...expanded });
+            if (typeof resolvedToken.value === 'string') {
+              set(tokenObj, nestUnderParent ? [tokenSet, token.name].join('.') : token.name, tokenWithoutName);
+            } else {
+              const expanded = expand(resolvedToken?.value);
+              set(tokenObj, nestUnderParent ? [tokenSet, token.name].join('.') : token.name, { ...expanded });
+            }
           } else {
             set(tokenObj, nestUnderParent ? [tokenSet, token.name].join('.') : token.name, tokenWithoutName);
           }

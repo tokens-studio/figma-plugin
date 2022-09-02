@@ -49,6 +49,7 @@ export interface TokenState {
   hasUnsavedChanges: boolean;
   collapsedTokenSets: string[];
   collapsedTokenTypeObj: Record<TokenTypes, boolean>;
+  checkForChanges: boolean;
   collapsedTokens: string[];
 }
 
@@ -75,6 +76,7 @@ export const tokenState = createModel<RootModel>()({
       acc[tokenType as TokenTypes] = false;
       return acc;
     }, {}),
+    checkForChanges: false,
     collapsedTokens: [],
   } as unknown as TokenState,
   reducers: {
@@ -400,6 +402,10 @@ export const tokenState = createModel<RootModel>()({
       ...state,
       collapsedTokenTypeObj: data,
     }),
+    updateCheckForChanges: (state, data: boolean) => ({
+      ...state,
+      checkForChanges: data,
+    }),
     setCollapsedTokens: (state, data: string[]) => ({
       ...state,
       collapsedTokens: data,
@@ -464,8 +470,8 @@ export const tokenState = createModel<RootModel>()({
         dispatch.tokenState.updateDocument();
       }
     },
-    updateCheckForChanges(checkForChanges: boolean) {
-      dispatch.tokenState.updateDocument({ checkForChanges, shouldUpdateNodes: false });
+    updateCheckForChanges() {
+      dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
     },
     updateDocument(options?: UpdateDocumentPayload, rootState?) {
       const defaults = { shouldUpdateNodes: true, updateRemote: true };
@@ -485,7 +491,7 @@ export const tokenState = createModel<RootModel>()({
           api: rootState.uiState.api,
           storageType: rootState.uiState.storageType,
           shouldUpdateRemote: params.updateRemote && rootState.settings.updateRemote,
-          checkForChanges: params.checkForChanges || false,
+          checkForChanges: rootState.tokenState.checkForChanges,
         });
       } catch (e) {
         console.error('Error updating document', e);

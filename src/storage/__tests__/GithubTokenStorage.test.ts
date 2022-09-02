@@ -202,6 +202,7 @@ describe('GithubTokenStorage', () => {
           },
         ],
       },
+      metadata: {},
     });
     expect(mockGetContent).toBeCalledWith({
       owner: 'six7',

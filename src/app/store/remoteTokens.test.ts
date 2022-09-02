@@ -686,7 +686,7 @@ describe('remoteTokens', () => {
   });
 
   it('Read tokens from File, should return token data', async () => {
-    expect(await result.current.fetchTokensFromFileOrDirectory(files as unknown as FileList)).toEqual({
+    expect(await result.current.fetchTokensFromFileOrDirectory({files: files as unknown as FileList})).toEqual({
       metadata: {
         commitMessage: 'Initial commit',
       },
@@ -716,10 +716,10 @@ describe('remoteTokens', () => {
     mockRetrieve.mockImplementation(() => (
       Promise.resolve(null)
     ));
-    expect(await result.current.fetchTokensFromFileOrDirectory(files as unknown as FileList)).toEqual(null);
+    expect(await result.current.fetchTokensFromFileOrDirectory({files: files as unknown as FileList})).toEqual(null);
   });
 
   it('Read tokens from File, should return null if there is no file', async () => {
-    expect(await result.current.fetchTokensFromFileOrDirectory(null)).toEqual(null);
+    expect(await result.current.fetchTokensFromFileOrDirectory({files: null})).toEqual(null);
   });
 });
