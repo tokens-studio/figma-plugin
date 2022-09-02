@@ -10,4 +10,4 @@ export * from './toggleManyTokenSets';
 export * from './toggleUsedTokenSet';
 export * from './assignStyleIdsToTheme';
 export * from './disconnectStyleFromTheme';
-export * from './removeStyleIdsToCurrentTheme';
+export * from './removeStyleIdsFromCurrentTheme';

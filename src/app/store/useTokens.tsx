@@ -198,8 +198,8 @@ export default function useTokens() {
       token,
       settings,
     });
-    dispatch.tokenState.removeStyleIdsToCurrentTheme(removeStylesResult.styleIds);
-  }, []);
+    dispatch.tokenState.removeStyleIdsFromCurrentTheme(removeStylesResult.styleIds);
+  }, [settings, dispatch.tokenState]);
 
   return useMemo(() => ({
     isAlias,

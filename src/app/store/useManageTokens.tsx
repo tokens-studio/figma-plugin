@@ -115,10 +115,10 @@ export default function useManageTokens() {
         isInfinite: true,
       });
       deleteToken(data);
-      dispatch.uiState.completeJob(BackgroundJobs.UI_DELETETOKEN);
       if (userConfirmation.data.length) {
         removeStylesFromTokens(data);
       }
+      dispatch.uiState.completeJob(BackgroundJobs.UI_DELETETOKEN);
     }
   }, [confirm, deleteToken, dispatch.uiState]);
 
