@@ -10,9 +10,15 @@ export function removeStyleIdsToCurrentTheme(state: TokenState, styleIds: Record
     themeObjectIndex === -1
     || isEqual(styleIds, state.themes[themeObjectIndex].$figmaStyleReferences)
   ) return state;
-
+  const tokenToRemove = Object.keys(styleIds)[0];
+  const updatedTokens = state.themes[themeObjectIndex].$figmaStyleReferences;
+  if (updatedTokens) delete updatedTokens[tokenToRemove];
   const updatedThemes = [...state.themes];
-  updatedThemes.splice(themeObjectIndex, 1);
+
+  updatedThemes.splice(themeObjectIndex, 1, {
+    ...state.themes[themeObjectIndex],
+    $figmaStyleReferences: updatedTokens,
+  });
 
   return {
     ...state,
