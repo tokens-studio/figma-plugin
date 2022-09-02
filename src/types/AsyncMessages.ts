@@ -17,6 +17,7 @@ import type { ThemeObject } from './ThemeObject';
 export enum AsyncMessageTypes {
   // the below messages are going from UI to plugin
   CREATE_STYLES = 'async/create-styles',
+  RENAME_STYLES = 'async/rename-styles',
   CREDENTIALS = 'async/credentials',
   CHANGED_TABS = 'async/changed-tabs',
   REMOVE_SINGLE_CREDENTIAL = 'async/remove-single-credential',
@@ -122,6 +123,13 @@ export type CreateStylesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.CREA
   styleIds: Record<string, string>;
 }>;
 
+export type RenameStylesAsyncMessage = AsyncMessage<AsyncMessageTypes.RENAME_STYLES, {
+  oldName: string;
+  newName: string;
+  settings: Partial<SettingsState>;
+}>;
+export type RenameStylesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.RENAME_STYLES>;
+
 export type UpdateAsyncMessage = AsyncMessage<AsyncMessageTypes.UPDATE, {
   tokenValues: Record<string, AnyTokenList>;
   tokens: AnyTokenList | null;
@@ -173,6 +181,7 @@ export type StartupMessageResult = AsyncMessage<AsyncMessageTypes.STARTUP>;
 
 export type AsyncMessages =
   CreateStylesAsyncMessage
+  | RenameStylesAsyncMessage
   | CredentialsAsyncMessage
   | ChangedTabsAsyncMessage
   | RemoveSingleCredentialAsyncMessage
@@ -198,6 +207,7 @@ export type AsyncMessages =
 
 export type AsyncMessageResults =
   CreateStylesAsyncMessageResult
+  | RenameStylesAsyncMessageResult
   | CredentialsAsyncMessageResult
   | ChangedTabsAsyncMessageResult
   | RemoveSingleCredentialAsyncMessageResult
