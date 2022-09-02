@@ -14,16 +14,19 @@ export default async function removeStylesFromPlugin(
   const textStyles = figma.getLocalTextStyles();
   const allStyles = [...effectStyles, ...paintStyles, ...textStyles];
   const figmaStyleMaps = new Map(allStyles.map((style) => ([style.name, style])));
+
   const themeInfo = await AsyncMessageChannel.PluginInstance.message({
     type: AsyncMessageTypes.GET_THEME_INFO,
   });
   const activeThemeObject = themeInfo.activeTheme
     ? themeInfo.themes.find(({ id }) => id === themeInfo.activeTheme)
     : null;
+
   const stylePathSlice = settings?.ignoreFirstPartForStyles ? 1 : 0;
   const stylePathPrefix = settings?.prefixStylesWithThemeName && activeThemeObject
     ? activeThemeObject.name
     : null;
+
   const pathname = convertTokenNameToPath(token.path, stylePathPrefix, stylePathSlice);
   const matchingStyleId = matchStyleName(
     token.path,
@@ -31,6 +34,7 @@ export default async function removeStylesFromPlugin(
     activeThemeObject?.$figmaStyleReferences ?? {},
     figmaStyleMaps,
   );
+
   if (matchingStyleId) {
     figma.getStyleById(matchingStyleId)?.remove();
   }
