@@ -198,7 +198,7 @@ export default function useTokens() {
       newName,
       settings,
     });
-    // dispatch.tokenState.renameStyleIdsFromCurrentTheme(oldName, newName);
+    dispatch.tokenState.renameStyleIdsToCurrentTheme(oldName, newName);
   }, [settings, dispatch.tokenState]);
 
   return useMemo(() => ({
