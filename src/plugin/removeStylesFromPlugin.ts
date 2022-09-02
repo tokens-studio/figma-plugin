@@ -3,14 +3,17 @@ import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { DeleteTokenPayload } from '@/types/payloads';
 import { convertTokenNameToPath } from '@/utils/convertTokenNameToPath';
-import { getAllFigmaStyleMaps } from '@/utils/getAllFigmaStyleMaps';
 import { matchStyleName } from '@/utils/matchStyleName';
 
 export default async function removeStylesFromPlugin(
   token: DeleteTokenPayload,
   settings: Partial<SettingsState> = {},
-) {
-  const figmaStyleMaps = getAllFigmaStyleMaps();
+): Promise<Record<string, string>> {
+  const effectStyles = figma.getLocalEffectStyles();
+  const paintStyles = figma.getLocalPaintStyles();
+  const textStyles = figma.getLocalTextStyles();
+  const allStyles = [...effectStyles, ...paintStyles, ...textStyles];
+  const figmaStyleMaps = new Map(allStyles.map((style) => ([style.name, style])));
   const themeInfo = await AsyncMessageChannel.PluginInstance.message({
     type: AsyncMessageTypes.GET_THEME_INFO,
   });
@@ -21,12 +24,15 @@ export default async function removeStylesFromPlugin(
   const stylePathPrefix = settings?.prefixStylesWithThemeName && activeThemeObject
     ? activeThemeObject.name
     : null;
-
   const pathname = convertTokenNameToPath(token.path, stylePathPrefix, stylePathSlice);
   const matchingStyleId = matchStyleName(
     token.path,
     pathname,
     activeThemeObject?.$figmaStyleReferences ?? {},
-    figmaStyleMaps.effectStyles,
+    figmaStyleMaps,
   );
+  if (matchingStyleId) {
+    figma.getStyleById(matchingStyleId)?.remove();
+  }
+  return matchingStyleId ? { [token.path]: matchingStyleId } : {};
 }

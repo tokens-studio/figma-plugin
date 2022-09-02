@@ -193,12 +193,12 @@ export default function useTokens() {
   const removeStylesFromTokens = useCallback(async (token: DeleteTokenPayload) => {
     track('removeStyles', token);
 
-    await AsyncMessageChannel.ReactInstance.message({
+    const styleId = await AsyncMessageChannel.ReactInstance.message({
       type: AsyncMessageTypes.REMOVE_STYLES,
       token,
       settings,
     });
-    // dispatch.tokenState.assignStyleIdsToCurrentTheme(createStylesResult.styleIds);
+    dispatch.tokenState.removeStyleIdsToCurrentTheme(styleId);
   }, []);
 
   return useMemo(() => ({

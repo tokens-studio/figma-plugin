@@ -128,7 +128,7 @@ export type RemoveStylesAsyncMessage = AsyncMessage<AsyncMessageTypes.REMOVE_STY
   token: DeleteTokenPayload;
   settings: Partial<SettingsState>;
 }>;
-export type RemoveStylesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.REMOVE_STYLES>;
+export type RemoveStylesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.REMOVE_STYLES, Record<string, string>>;
 
 export type UpdateAsyncMessage = AsyncMessage<AsyncMessageTypes.UPDATE, {
   tokenValues: Record<string, AnyTokenList>;
