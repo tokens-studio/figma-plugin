@@ -190,7 +190,7 @@ export default function useTokens() {
   }, [confirm, usedTokenSet, tokens, settings, dispatch.tokenState]);
 
   const renameStylesFromTokens = useCallback(async (oldName: string, newName: string) => {
-    track('removeStyles', { oldName, newName });
+    track('renameStyles', { oldName, newName });
 
     await AsyncMessageChannel.ReactInstance.message({
       type: AsyncMessageTypes.RENAME_STYLES,
