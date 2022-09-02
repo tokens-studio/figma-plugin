@@ -817,6 +817,12 @@ describe('editToken', () => {
     ]);
   });
 
+  it('should be able to update checkForChanges', () => {
+    store.dispatch.tokenState.updateCheckForChanges(true);
+    const { checkForChanges } = store.getState().tokenState;
+    expect(checkForChanges).toEqual(true);
+  });
+
   it('should be able to set collapsedTokens', () => {
     store.dispatch.tokenState.setCollapsedTokens(['color.gray', 'color.zinc', 'size']);
     const { collapsedTokens } = store.getState().tokenState;
@@ -835,14 +841,14 @@ describe('editToken', () => {
       },
       themes: [
         {
-          id: "default",
-          name: "root",
+          id: 'default',
+          name: 'root',
           selectedTokenSets: {
             global: TokenSetStatus.ENABLED,
-          }
-        }
+          },
+        },
       ],
-      activeTheme: 'default'
+      activeTheme: 'default',
     });
     const { activeTheme } = store.getState().tokenState;
     expect(activeTheme).toBe('default');
@@ -860,14 +866,14 @@ describe('editToken', () => {
       },
       themes: [
         {
-          id: "secondary",
-          name: "root",
+          id: 'secondary',
+          name: 'root',
           selectedTokenSets: {
             global: TokenSetStatus.ENABLED,
-          }
-        }
+          },
+        },
       ],
-      activeTheme: 'default'
+      activeTheme: 'default',
     });
     const { activeTheme } = store.getState().tokenState;
     expect(activeTheme).toBe(null);
@@ -885,12 +891,12 @@ describe('editToken', () => {
       },
       themes: [
         {
-          id: "default",
-          name: "root",
+          id: 'default',
+          name: 'root',
           selectedTokenSets: {
             global: TokenSetStatus.ENABLED,
-          }
-        }
+          },
+        },
       ],
     });
     const { activeTokenSet } = store.getState().tokenState;
@@ -907,12 +913,12 @@ describe('editToken', () => {
       ],
       themes: [
         {
-          id: "default",
-          name: "root",
+          id: 'default',
+          name: 'root',
           selectedTokenSets: {
             global: TokenSetStatus.ENABLED,
-          }
-        }
+          },
+        },
       ],
     });
     const { activeTokenSet } = store.getState().tokenState;
