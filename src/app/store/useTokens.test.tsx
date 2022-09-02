@@ -264,7 +264,7 @@ describe('useToken test', () => {
     await expect(result.current.pullStyles()).resolves.not.toThrow();
   });
 
-  describe('create or remove StylesFromTokens', () => {
+  describe('create or remove styles From Tokens', () => {
     const tokenMockStore = createMockStore({
       tokenState: {
         usedTokenSet: { global: TokenSetStatus.ENABLED, light: TokenSetStatus.ENABLED },
