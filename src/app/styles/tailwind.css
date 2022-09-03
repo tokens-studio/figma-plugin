@@ -4,57 +4,6 @@
 
 @tailwind components;
 
-/* Vars */
-:root {
-  /* COLORS */
-  /* Accent */
-  --blue: #18a0fb;
-  --purple: #7b61ff;
-  --hot-pink: #ff00ff;
-  --green: #1bc47d;
-  --red: #f24822;
-  --yellow: #ffeb00;
-  /* Basic foreground */
-  --black: #000000;
-  --black8: rgba(0, 0, 0, 0.8);
-  --black8-opaque: #333333;
-  --black3: rgba(0, 0, 0, 0.3);
-  --black3-opaque: #b3b3b3;
-  --white: #ffffff;
-  --white8: rgba(255, 255, 255, 0.8);
-  --white4: rgba(255, 255, 255, 0.4);
-  /* Basic background */
-  --grey: #f0f0f0;
-  --silver: #e5e5e5;
-  --hud: #222222;
-  --toolbar: #2c2c2c;
-  /* Special */
-  --black1: rgba(0, 0, 0, 0.1);
-  --blue3: rgba(24, 145, 251, 0.3);
-  --purple4: rgba(123, 97, 255, 0.4);
-  --hover-fill: rgba(0, 0, 0, 0.06);
-  --selection-a: #daebf7;
-  --selection-b: #edf5fa;
-  --white2: rgba(255, 255, 255, 0.2);
-  --font-stack: 'Inter', sans-serif;
-  --font-size-xsmall: 11px;
-  /* Font weights */
-  --font-weight-normal: 400;
-  --font-weight-medium: 500;
-  --font-weight-bold: 600;
-  --font-line-height: 16px;
-  --font-letter-spacing-pos-xsmall: 0.005em;
-  --border-radius-small: 2px;
-  --size-xxxsmall: 4px;
-  --size-xxsmall: 8px;
-  --size-xsmall: 16px;
-  --size-small: 24px;
-  --size-medium: 32px;
-  --size-large: 40px;
-  --size-xlarge: 48px;
-  --size-xxlarge: 64px;
-}
-
 .button-property + .property-wrapper {
   @apply mt-4;
 }
