@@ -32,27 +32,13 @@ export default function AnnotationBuilder() {
     <Box css={{ borderBottom: '1px solid $border', paddingBottom: '$4', marginBottom: '$4' }}>
       <Stack direction="row" align="center" justify="between">
         <Text bold>Add as annotation</Text>
-        <Stack direction="row" gap={0}>
-          <IconButton
-            onClick={createAnnotationLeft}
-            icon="←"
-          />
+        <Stack direction="row" align="center" gap={0}>
+          <IconButton onClick={createAnnotationLeft} icon="←" />
           <Stack direction="column">
-            <IconButton
-              onClick={createAnnotationTop}
-              icon="↑"
-            />
-            <IconButton
-              onClick={createAnnotationBottom}
-              icon="↓"
-            />
-
+            <IconButton onClick={createAnnotationTop} icon="↑" />
+            <IconButton onClick={createAnnotationBottom} icon="↓" />
           </Stack>
-          <IconButton
-            onClick={createAnnotationRight}
-            icon="→"
-          />
-
+          <IconButton onClick={createAnnotationRight} icon="→" />
         </Stack>
       </Stack>
     </Box>
