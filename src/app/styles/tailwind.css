@@ -30,14 +30,6 @@
   @apply border-border-muted;
 }
 
-.button-ghost {
-  @apply border-transparent bg-transparent px-2 py-1;
-}
-
-.button-ghost:hover {
-  @apply bg-gray-200;
-}
-
 .button-property {
   @apply border-none rounded bg-background-subtle px-0 py-0;
 }
