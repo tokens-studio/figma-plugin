@@ -7,6 +7,13 @@ export const globalStyles = globalCss({
     letterSpacing: '0',
     color: '$fgDefault',
   },
+  'button[disabled]': {
+    opacity: 0.5,
+  },
+  'button:focus': {
+    outline: 'none',
+    boxShadow: '0 0 0 4px $bgAccent',
+  },
   '.scroll-container': {
     overflowY: 'scroll',
   },

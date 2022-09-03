@@ -75,10 +75,6 @@
   @apply mb-0;
 }
 
-.button-disabled .button-extra {
-  @apply border-border-muted;
-}
-
 .button {
   @apply border border-border-muted rounded text-foreground-muted font-medium text-xs p-2;
 }
@@ -152,15 +148,6 @@
 
 .button-property-color .button-text {
   @apply p-0;
-}
-
-button[disabled] {
-  @apply opacity-50;
-}
-
-button:focus {
-  outline: none;
-  box-shadow: 0 0 0 4px theme('colors.primary.100');
 }
 
 textarea.input,
