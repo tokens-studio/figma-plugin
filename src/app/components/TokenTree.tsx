@@ -7,17 +7,7 @@ import { DeepKeyTokenMap, SingleToken, TokenTypeSchema } from '@/types/tokens';
 import { isSingleToken } from '@/utils/is';
 import IconButton from './IconButton';
 import AddIcon from '@/icons/add.svg';
-import { EditTokenFormStatus } from '@/constants/EditTokenFormStatus';
-
-export type ShowFormOptions = {
-  name: string;
-  status?: EditTokenFormStatus;
-  token: SingleToken | null;
-};
-
-export type ShowNewFormOptions = {
-  name?: string;
-};
+import { ShowFormOptions, ShowNewFormOptions } from '@/types';
 
 type Props = {
   displayType: 'GRID' | 'LIST';

@@ -4,7 +4,7 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import { DndProvider } from 'react-dnd';
 import { DeepKeyTokenMap, EditTokenObject, TokenTypeSchema } from '@/types/tokens';
 import Heading from './Heading';
-import TokenTree, { ShowFormOptions, ShowNewFormOptions } from './TokenTree';
+import TokenTree from './TokenTree';
 import Tooltip from './Tooltip';
 import { Dispatch } from '../store';
 import { TokenTypes } from '@/constants/TokenTypes';
@@ -18,6 +18,7 @@ import AddIcon from '@/icons/add.svg';
 import ProBadge from './ProBadge';
 import { useFlags } from './LaunchDarkly';
 import { EditTokenFormStatus } from '@/constants/EditTokenFormStatus';
+import { ShowFormOptions, ShowNewFormOptions } from '@/types';
 
 type Props = {
   tokenKey: string
