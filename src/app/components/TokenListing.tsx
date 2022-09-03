@@ -134,7 +134,6 @@ const TokenListing: React.FC<Props> = ({
               showNewForm={showNewForm}
               showForm={showForm}
               schema={schema}
-              displayType={displayType}
             />
           </div>
         </DndProvider>

@@ -116,7 +116,7 @@ export const MoreButton: React.FC<Props> = ({
       tokensInCompositionToken.composition = 'delete';
       setPluginValue(tokensInCompositionToken);
     } else setPluginValue(newProps);
-  }, [type, setPluginValue, tokensContext.resolvedTokens]);
+  }, [active, type, setPluginValue, tokensContext.resolvedTokens]);
 
   const handleTokenClick = React.useCallback(() => {
     handleClick(properties[0]);

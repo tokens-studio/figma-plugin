@@ -69,22 +69,18 @@ export default function TokenButtonContent({
     return [innerStyle, innerClass] as [typeof innerStyle, typeof innerClass];
   }, [type, active, displayValue, displayType]);
   return (
-    <div
-      className={`relative mb-1 mr-1 button button-property ${buttonClass.join(' ')} ${
-        uiDisabled && 'button-disabled'
-      } `}
-      style={style}
-    >
-      <TokenTooltip token={token}>
-        <button
-          className="w-full h-full relative"
-          type="button"
-          onClick={onClick}
-        >
-          <BrokenReferenceIndicator token={token} />
-          <div className="button-text">{showValue && <span>{visibleName}</span>}</div>
-        </button>
-      </TokenTooltip>
-    </div>
+    <TokenTooltip token={token}>
+      <button
+        className={`relative mb-1 mr-1 button button-property ${buttonClass.join(' ')} ${
+          uiDisabled && 'button-disabled'
+        } `}
+        style={style}
+        onClick={onClick}
+        type="button"
+      >
+        <BrokenReferenceIndicator token={token} />
+        <div className="button-text">{showValue && <span>{visibleName}</span>}</div>
+      </button>
+    </TokenTooltip>
   );
 }
