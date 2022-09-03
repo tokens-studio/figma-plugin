@@ -70,7 +70,7 @@ const tokens: SingleToken[] = [
       x: '2',
       y: '2',
       blur: '2',
-      spread: '2',
+      spread: '192px',
       color: 'test-value-object-value',
       type: BoxShadowTypes.DROP_SHADOW,
     },
@@ -78,7 +78,7 @@ const tokens: SingleToken[] = [
       x: '2',
       y: '2',
       blur: '2',
-      spread: '2',
+      spread: '192px',
       color: 'test-value-object-value',
       type: BoxShadowTypes.DROP_SHADOW,
     },
@@ -153,7 +153,6 @@ const tokens: SingleToken[] = [
     value: '130%',
     rawValue: '{line-height.1}',
     description: 'alias line height token',
-
   },
   {
     name: 'font-weight.regular',
@@ -206,14 +205,90 @@ const tokens: SingleToken[] = [
   },
 ];
 
+const shadowTokens = [
+  {
+    name: 'boxshadow.multiple',
+    type: TokenTypes.BOX_SHADOW,
+    value: [
+      {
+        x: '1px',
+        y: '2px',
+        blur: '3px',
+        spread: '14px',
+        color: '#212121',
+        type: BoxShadowTypes.DROP_SHADOW,
+      },
+      {
+        x: '8px',
+        y: '5px',
+        blur: '7px',
+        spread: '9px',
+        color: '#999999',
+        type: BoxShadowTypes.DROP_SHADOW,
+      },
+    ],
+    rawValue: [
+      {
+        x: '1px',
+        y: '2px',
+        blur: '3px',
+        spread: '14px',
+        color: '#212121',
+        type: BoxShadowTypes.DROP_SHADOW,
+      },
+      {
+        x: '8px',
+        y: '5px',
+        blur: '7px',
+        spread: '9px',
+        color: '#999999',
+        type: BoxShadowTypes.DROP_SHADOW,
+      },
+    ],
+    description: 'multiple shadow tokens',
+  },
+  {
+    name: 'boxshadow.reference',
+    type: TokenTypes.BOX_SHADOW,
+    value: [
+      {
+        x: '1px',
+        y: '2px',
+        blur: '3px',
+        spread: '14px',
+        color: '#212121',
+        type: BoxShadowTypes.DROP_SHADOW,
+      },
+      {
+        x: '8px',
+        y: '5px',
+        blur: '7px',
+        spread: '9px',
+        color: '#999999',
+        type: BoxShadowTypes.DROP_SHADOW,
+      },
+    ],
+    rawValue: '{boxshadow.multiple}',
+    description: 'reference shadow token',
+  },
+];
+
 const customStore = {
   resolvedTokens: tokens,
+};
+
+const shadowStore = {
+  resolvedTokens: shadowTokens,
 };
 
 describe('TokenTooltip alias', () => {
   tokens.forEach((token) => {
     it(`can resolve ${token.description}`, () => {
-      const { getByText } = render(<TokensContext.Provider value={customStore}><TokenTooltipContent token={{ ...token, value: token.rawValue }} /></TokensContext.Provider>);
+      const { getByText } = render(
+        <TokensContext.Provider value={customStore}>
+          <TokenTooltipContent token={{ ...token, value: token.rawValue }} />
+        </TokensContext.Provider>,
+      );
 
       expect(getByText(String(token.description))).toBeInTheDocument();
       expect(getByText((content) => (typeof token.value === 'object' ? content.includes('test-value-object-value') : content.includes(String(token.value))))).toBeInTheDocument();
@@ -222,16 +297,35 @@ describe('TokenTooltip alias', () => {
     });
   });
 
+  shadowTokens.forEach((token) => {
+    it(`can resolve ${token.description}`, () => {
+      const { getByText } = render(
+        <TokensContext.Provider value={shadowStore}>
+          <TokenTooltipContent token={{ ...token, value: token.rawValue }} />
+        </TokensContext.Provider>,
+      );
+
+      expect(getByText(String(token.description))).toBeInTheDocument();
+      expect(getByText(String(token.value[0].x))).toBeInTheDocument();
+      expect(getByText(String(token.value[0].y))).toBeInTheDocument();
+      expect(getByText(String(token.value[0].spread))).toBeInTheDocument();
+      expect(getByText(String(token.value[0].blur))).toBeInTheDocument();
+      expect(getByText(String(token.value[0].color))).toBeInTheDocument();
+      expect(getByText(String(token.name.split('.').pop()))).toBeInTheDocument();
+    });
+  });
+
   it('shows indicator when failed to resolve', () => {
     const { getByText, getByTestId } = render(
       <TokensContext.Provider value={customStore}>
-        <TokenTooltipContent token={{
-          name: 'brokentoken',
-          type: TokenTypes.COLOR,
-          value: '{doesntexist}',
-          rawValue: '{doesntexist}',
-          description: 'a broken reference',
-        }}
+        <TokenTooltipContent
+          token={{
+            name: 'brokentoken',
+            type: TokenTypes.COLOR,
+            value: '{doesntexist}',
+            rawValue: '{doesntexist}',
+            description: 'a broken reference',
+          }}
         />
       </TokensContext.Provider>,
     );
