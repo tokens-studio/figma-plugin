@@ -1,6 +1,9 @@
 import { globalCss } from '@/stitches.config';
 
 export const globalStyles = globalCss({
+  '@import': [
+    "url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap')",
+  ],
   body: {
     fontFamily: '$sans',
     fontSize: '$small',
