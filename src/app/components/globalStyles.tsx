@@ -1,6 +1,12 @@
 import { globalCss } from '@/stitches.config';
 
 export const globalStyles = globalCss({
+  body: {
+    fontFamily: '$sans',
+    fontSize: '$small',
+    letterSpacing: '0',
+    color: '$fgDefault',
+  },
   '#corner': {
     position: 'fixed',
     right: 0,

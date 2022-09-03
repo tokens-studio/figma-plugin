@@ -55,10 +55,6 @@
   --size-xxlarge: 64px;
 }
 
-body {
-  @apply font-body text-sm leading-normal text-foreground;
-}
-
 .scroll-container {
   overflow-y: scroll;
 }
