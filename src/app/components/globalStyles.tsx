@@ -17,6 +17,16 @@ export const globalStyles = globalCss({
     outline: 'none',
     boxShadow: '0 0 0 4px $bgAccent',
   },
+  'textarea.input, select.input, input.input': {
+    outline: 'none',
+    padding: '$2',
+  },
+  '.input textarea:focus, .input select:focus, .input input:focus': {
+    outline: 'none',
+  },
+  input: {
+    background: '$bgDefault',
+  },
   '.scroll-container': {
     overflowY: 'scroll',
   },

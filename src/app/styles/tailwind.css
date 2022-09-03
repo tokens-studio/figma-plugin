@@ -97,19 +97,6 @@
   @apply p-0;
 }
 
-textarea.input,
-select.input,
-input.input {
-  @apply outline-none;
-  @apply p-2;
-}
-
-.input textarea:focus,
-.input select:focus,
-.input input:focus {
-  @apply outline-none;
-}
-
 .drag-over-item-grid-absolute {
   position: absolute;
   content: '';
@@ -130,10 +117,6 @@ input.input {
 
 .ReactModal__Content {
   @apply bg-modal border-border-menu border !important;
-}
-
-input {
-  @apply bg-background;
 }
 
 @tailwind utilities;
