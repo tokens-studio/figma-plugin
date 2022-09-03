@@ -109,6 +109,23 @@ const tokens: SingleToken[] = [
     },
     description: 'regular typography token',
   },
+
+  {
+    name: 'typography.headlines.default',
+    type: TokenTypes.TYPOGRAPHY,
+    value: {
+      fontFamily: 'test-value-object-value',
+      fontWeight: 'Regular',
+      lineHeight: 'AUTO',
+      fontSize: '14',
+      letterSpacing: '0%',
+      paragraphSpacing: '0',
+      textDecoration: 'none',
+      textCase: 'none',
+    },
+    rawValue: '{typography.headlines.small}',
+    description: 'regular typography token',
+  },
   {
     name: 'font-family.serif',
     type: TokenTypes.FONT_FAMILIES,
