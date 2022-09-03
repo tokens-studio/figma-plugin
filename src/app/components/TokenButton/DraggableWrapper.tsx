@@ -20,7 +20,7 @@ type Props = {
   setDragOverToken: (token: SingleToken | null) => void;
 };
 
-export const TokenButtonDraggable: React.FC<Props> = ({
+export const DraggableWrapper: React.FC<Props> = ({
   active, displayType, type, token, draggedToken, setDraggedToken, setDragOverToken, children,
 }) => {
   const tokensContext = useContext(TokensContext);

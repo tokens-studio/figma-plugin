@@ -22,7 +22,7 @@ import {
 } from '@/selectors';
 import { useSetNodeData } from '@/hooks/useSetNodeData';
 import { DragOverItem } from './DragOverItem';
-import { TokenButtonDraggable } from './TokenButtonDraggable';
+import { DraggableWrapper } from './DraggableWrapper';
 import type { ShowFormOptions } from '../TokenTree';
 import { CompositionTokenProperty } from '@/types/CompositionTokenProperty';
 import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
@@ -70,14 +70,14 @@ export const TokenButton: React.FC<Props> = ({
   ), [properties]);
   const active = useGetActiveState(activeStateProperties, type, name);
   const showValue = React.useMemo(() => {
-    let showValue = true;
+    let show = true;
     if (type === TokenTypes.COLOR) {
-      showValue = false;
+      show = false;
       if (displayType === 'LIST') {
-        showValue = true;
+        show = true;
       }
     }
-    return showValue;
+    return show;
   }, [type, displayType]);
 
   const handleEditClick = React.useCallback(() => {
@@ -127,14 +127,14 @@ export const TokenButton: React.FC<Props> = ({
       tokensInCompositionToken.composition = 'delete';
       setPluginValue(tokensInCompositionToken);
     } else setPluginValue(newProps);
-  }, [name, active, setPluginValue]);
+  }, [active, name, type, setPluginValue, tokensContext.resolvedTokens]);
 
   const handleTokenClick = React.useCallback(() => {
     handleClick(properties[0]);
   }, [properties, handleClick]);
 
   return (
-    <TokenButtonDraggable
+    <DraggableWrapper
       active={active}
       type={type}
       token={token}
@@ -170,6 +170,6 @@ export const TokenButton: React.FC<Props> = ({
         draggedToken={draggedToken}
         dragOverToken={dragOverToken}
       />
-    </TokenButtonDraggable>
+    </DraggableWrapper>
   );
 };
