@@ -11,7 +11,7 @@ import useTokens from '../store/useTokens';
 import { EditTokenObject, SingleBoxShadowToken, SingleToken } from '@/types/tokens';
 import { checkIfContainsAlias, getAliasValue } from '@/utils/alias';
 import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
-import { activeTokenSetSelector, editTokenSelector } from '@/selectors';
+import { activeTokenSetSelector, updateModeSelector, editTokenSelector } from '@/selectors';
 import { TokenTypes } from '@/constants/TokenTypes';
 import TypographyInput from './TypographyInput';
 import Stack from './Stack';
@@ -32,6 +32,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
   const firstInput = React.useRef<HTMLInputElement | null>(null);
   const activeTokenSet = useSelector(activeTokenSetSelector);
   const editToken = useSelector(editTokenSelector);
+  const updateMode = useSelector(updateModeSelector);
   const { editSingleToken, createSingleToken, duplicateSingleToken } = useManageTokens();
   const { remapToken } = useTokens();
   const dispatch = useDispatch<Dispatch>();
@@ -241,19 +242,21 @@ function EditTokenForm({ resolvedTokens }: Props) {
             text: `Remap all tokens that use ${oldName} to ${newName}?`,
             description: 'This will change all layers that used the old token name. This could take a while.',
             choices: [
-              { key: UpdateMode.SELECTION, label: 'Selection', unique: true },
               {
-                key: UpdateMode.PAGE,
-                label: 'Page',
-                enabled: true,
-                unique: true,
+                key: UpdateMode.SELECTION, label: 'Selection', unique: true, enabled: UpdateMode.SELECTION === updateMode,
               },
-              { key: UpdateMode.DOCUMENT, label: 'Document', unique: true },
+              {
+                key: UpdateMode.PAGE, label: 'Page', unique: true, enabled: UpdateMode.PAGE === updateMode,
+              },
+              {
+                key: UpdateMode.DOCUMENT, label: 'Document', unique: true, enabled: UpdateMode.DOCUMENT === updateMode,
+              },
             ],
           });
 
           if (shouldRemap) {
             remapToken(oldName, newName, shouldRemap.data[0]);
+            dispatch.settings.setUpdateMode(shouldRemap.data[0]);
           }
         } else {
           track('Edit token', { renamed: false });

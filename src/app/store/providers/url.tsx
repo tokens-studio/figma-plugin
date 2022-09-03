@@ -10,6 +10,7 @@ import { StorageTypeCredentials } from '@/types/StorageType';
 import { activeThemeSelector, usedTokenSetSelector } from '@/selectors';
 import { ErrorMessages } from '@/constants/ErrorMessages';
 import { RemoteResponseData } from '@/types/RemoteResponseData';
+import { applyTokenSetOrder } from '@/utils/tokenset';
 
 type UrlCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.URL; }>;
 
@@ -58,7 +59,7 @@ export default function useURL() {
 
         if (Object.keys(content.tokens).length) {
           dispatch.tokenState.setTokenData({
-            values: content.tokens,
+            values: applyTokenSetOrder(content.tokens, content.metadata?.tokenSetOrder),
             themes: content.themes,
             usedTokenSet: usedTokenSets,
             activeTheme,

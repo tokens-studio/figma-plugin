@@ -60,6 +60,8 @@ import IconBack from './back.svg';
 import IconArrowRight from './arrow-right.svg';
 import IconUnlink from './unlink.svg';
 import IconFile from './file.svg';
+import IconCollapseArrow from './collapse-arrow.svg';
+import IconExpandArrow from './expand-arrow.svg';
 
 export {
   IconAdd,
@@ -124,4 +126,6 @@ export {
   IconArrowRight,
   IconUnlink,
   IconFile,
+  IconCollapseArrow,
+  IconExpandArrow,
 };
