@@ -145,9 +145,9 @@ export const stitchesInstance = createStitches({
 });
 
 const {
-  styled, css, keyframes, theme,
+  styled, css, keyframes, theme, globalCss,
 } = stitchesInstance;
 
 export {
-  styled, css, keyframes, theme,
+  styled, css, keyframes, theme, globalCss,
 };

@@ -4,7 +4,6 @@ import './assets/fonts/jetbrainsmono.css';
 import './styles/preflight.css';
 import './styles/figma.css';
 import './styles/main.css';
-import './styles/vendor.css';
 import * as Sentry from '@sentry/react';
 import * as asyncHandlers from './asyncMessageHandlers';
 import { initializeAnalytics } from '../utils/analytics';
