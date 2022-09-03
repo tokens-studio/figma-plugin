@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux';
 import { lightOrDark } from '@/utils/color';
 import { TokensContext } from '@/context';
 import { getAliasValue } from '@/utils/alias';
-import { theme } from '@/stitches.config';
+import { styled } from '@/stitches.config';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { SingleToken } from '@/types/tokens';
 import { TokenTooltip } from '../TokenTooltip';
@@ -17,6 +17,25 @@ type Props = {
   token: SingleToken;
   onClick: () => void;
 };
+
+const StyledTokenButton = styled('button', {
+  position: 'relative',
+  marginBottom: '$1',
+  marginRight: '$1',
+  variants: {
+    active: {
+      true: {
+        backgroundColor: '$bgAccent',
+        boxShadow: '$focus-muted',
+      },
+    },
+    disabled: {
+      true: {
+        borderColor: '$border',
+      },
+    },
+  },
+});
 
 export default function TokenButtonContent({
   token, active, type, onClick,
@@ -46,41 +65,53 @@ export default function TokenButtonContent({
     return (token.name ?? '').split('.').slice(-visibleDepth).join('.');
   }, [token.name]);
 
-  const [style, buttonClass] = React.useMemo(() => {
-    const innerStyle: React.CSSProperties = {};
-    const innerClass: string[] = [];
-
+  const cssOverrides = React.useMemo(() => {
     if (type === TokenTypes.BORDER_RADIUS) {
-      innerStyle.borderRadius = `${displayValue}px`;
-    } else if (type === TokenTypes.COLOR) {
-      innerStyle['--backgroundColor'] = String(displayValue);
-      innerStyle['--borderColor'] = lightOrDark(String(displayValue)) === 'light' ? String(theme.colors.border) : String(theme.colors.borderMuted);
-
-      innerClass.push('button-property-color');
-      if (displayType === 'LIST') {
-        innerClass.push('button-property-color-listing');
-      }
+      return {
+        borderRadius: `${displayValue}px`,
+      };
     }
 
-    if (active) {
-      innerClass.push('button-active');
-    }
+    if (type === TokenTypes.COLOR) {
+      const colorListOverride = (displayType === 'LIST') ? {
+        borderRadius: '$button',
+        width: '100%',
+        padding: '$1',
+        marginBottom: '-$1',
+      } : {};
 
-    return [innerStyle, innerClass] as [typeof innerStyle, typeof innerClass];
-  }, [type, active, displayValue, displayType]);
+      return {
+        '--backgroundColor': String(displayValue),
+        '--borderColor': lightOrDark(String(displayValue)) === 'light' ? '$border' : '$borderMuted',
+        borderRadius: '100px',
+        backgroundColor: 'transparent',
+        '&:focus': {
+          outline: 'none',
+          boxShadow: '0 0 0 2px $borderMuted',
+        },
+        '.button-text::before': {
+          width: '16px',
+          height: '16px',
+          margin: '0 auto',
+          flexShrink: 0,
+          border: '1px solid white',
+          content: '',
+          borderRadius: '100%',
+          background: 'var(--backgroundColor)',
+          borderColor: 'var(--borderColor)',
+        },
+        ...colorListOverride,
+      };
+    }
+    return {};
+  }, [type, displayValue, displayType]);
+
   return (
     <TokenTooltip token={token}>
-      <button
-        className={`relative mb-1 mr-1 button button-property ${buttonClass.join(' ')} ${
-          uiDisabled && 'button-disabled'
-        } `}
-        style={style}
-        onClick={onClick}
-        type="button"
-      >
+      <StyledTokenButton active={active} disabled={uiDisabled} type="button" onClick={onClick} css={cssOverrides}>
         <BrokenReferenceIndicator token={token} />
         <div className="button-text">{showValue && <span>{visibleName}</span>}</div>
-      </button>
+      </StyledTokenButton>
     </TokenTooltip>
   );
 }

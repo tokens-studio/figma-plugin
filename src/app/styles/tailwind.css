@@ -26,10 +26,6 @@
   @apply border border-border-muted rounded text-foreground-muted font-medium text-xs p-2;
 }
 
-.button-disabled {
-  @apply border-border-muted;
-}
-
 .button-property {
   @apply border-none rounded bg-background-subtle px-0 py-0;
 }
@@ -46,35 +42,8 @@
   @apply opacity-0;
 }
 
-.button-active {
-  @apply bg-primary-100 shadow-focus-muted;
-}
-
 .button-property button:focus {
   @apply bg-opacity-75 outline-none shadow-focus-subtle;
-}
-
-.button-property-color {
-  @apply rounded-full bg-transparent;
-}
-
-.button-property-color button:focus {
-  @apply rounded-full bg-transparent;
-  outline: none;
-  box-shadow: 0 0 0 2px theme('colors.primary.500');
-}
-
-.button-property-color .button-text::before {
-  @apply w-6 h-6 my-auto flex-shrink-0;
-  border: 1px solid white;
-  content: '';
-  border-radius: 100%;
-  background: var(--backgroundColor);
-  border-color: var(--borderColor);
-}
-
-.button-property-color-listing {
-  @apply rounded w-full p-1 -mb-1;
 }
 
 .button-text {
