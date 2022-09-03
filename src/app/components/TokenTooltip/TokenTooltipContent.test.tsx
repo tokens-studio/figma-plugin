@@ -85,6 +85,20 @@ const tokens: SingleToken[] = [
     description: 'regular shadow token',
   },
   {
+    name: 'boxshadow.regular',
+    type: TokenTypes.BOX_SHADOW,
+    value: {
+      x: '2',
+      y: '2',
+      blur: '2',
+      spread: '192px',
+      color: 'test-value-object-value',
+      type: BoxShadowTypes.DROP_SHADOW,
+    },
+    rawValue: '{boxshadow.regular}',
+    description: 'alias shadow token',
+  },
+  {
     name: 'typography.headlines.small',
     type: TokenTypes.TYPOGRAPHY,
     value: {
@@ -273,12 +287,39 @@ const shadowTokens = [
   },
 ];
 
+const faultyTokens = [
+  {
+    name: 'faulty.token',
+    type: TokenTypes.COLOR,
+    value: {
+      x: 'foobar',
+    },
+    rawValue: {
+      x: 'foobar',
+    },
+    description: 'when value is an object',
+  },
+  {
+    name: 'faulty.token.alias',
+    type: TokenTypes.COLOR,
+    value: {
+      x: 'foobar',
+    },
+    rawValue: '{faulty.token}',
+    description: 'when value is an object reference',
+  },
+];
+
 const customStore = {
   resolvedTokens: tokens,
 };
 
 const shadowStore = {
   resolvedTokens: shadowTokens,
+};
+
+const faultyStore = {
+  resolvedTokens: faultyTokens,
 };
 
 describe('TokenTooltip alias', () => {
@@ -312,6 +353,18 @@ describe('TokenTooltip alias', () => {
       expect(getByText(String(token.value[0].blur))).toBeInTheDocument();
       expect(getByText(String(token.value[0].color))).toBeInTheDocument();
       expect(getByText(String(token.name.split('.').pop()))).toBeInTheDocument();
+    });
+  });
+
+  faultyTokens.forEach((token) => {
+    it(`doesnt throw when using faulty value ${token.description}`, () => {
+      const { getByText } = render(
+        <TokensContext.Provider value={faultyStore}>
+          <TokenTooltipContent token={{ ...token, value: token.rawValue }} />
+        </TokensContext.Provider>,
+      );
+
+      expect(getByText(String(token.description))).toBeInTheDocument();
     });
   });
 
