@@ -7,6 +7,7 @@ import Text from './Text';
 import Box from './Box';
 import { isEqual } from '@/utils/isEqual';
 import { Direction } from '@/constants/Direction';
+import IconButton from './IconButton';
 
 export default function AnnotationBuilder() {
   const uiState = useSelector(uiStateSelector, isEqual);
@@ -32,36 +33,26 @@ export default function AnnotationBuilder() {
       <Stack direction="row" align="center" justify="between">
         <Text bold>Add as annotation</Text>
         <Stack direction="row" gap={0}>
-          <button
-            className="p-1 button button-secondary"
-            type="button"
+          <IconButton
             onClick={createAnnotationLeft}
-          >
-            ←
-          </button>
+            icon="←"
+          />
           <Stack direction="column">
-            <button
-              className="p-1 button button-secondary"
-              type="button"
+            <IconButton
               onClick={createAnnotationTop}
-            >
-              ↑
-            </button>
-            <button
-              className="p-1 button button-secondary"
-              type="button"
+              icon="↑"
+            />
+            <IconButton
               onClick={createAnnotationBottom}
-            >
-              ↓
-            </button>
+              icon="↓"
+            />
+
           </Stack>
-          <button
-            className="p-1 button button-secondary"
-            type="button"
+          <IconButton
             onClick={createAnnotationRight}
-          >
-            →
-          </button>
+            icon="→"
+          />
+
         </Stack>
       </Stack>
     </Box>

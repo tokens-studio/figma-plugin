@@ -188,14 +188,6 @@ textarea::-webkit-scrollbar-thumb {
   @apply p-0;
 }
 
-.button-secondary {
-  @apply bg-background text-foreground border border-border-muted;
-}
-
-.button-primary {
-  @apply bg-brand text-white border-transparent;
-}
-
 button[disabled] {
   @apply opacity-50;
 }
@@ -234,13 +226,6 @@ input.input {
   height: 4px;
   top: -4px;
   background-color: var(--blue);
-}
-
-#corner {
-  position: fixed;
-  right: 0px;
-  bottom: 0px;
-  cursor: nwse-resize;
 }
 
 .ReactModal__Content {
