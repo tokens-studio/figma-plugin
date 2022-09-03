@@ -37,7 +37,6 @@
     "@radix-ui/react-switch": "^0.1.5",
     "@radix-ui/react-toolbar": "^0.1.5",
     "@radix-ui/react-tooltip": "^0.0.19",
-    "@reach/portal": "^0.10.5",
     "@rematch/core": "^2.2.0",
     "@sentry/react": "^6.2.5",
     "@stitches/react": "^1.2.8",

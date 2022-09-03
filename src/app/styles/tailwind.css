@@ -109,41 +109,8 @@ textarea::-webkit-scrollbar-thumb {
   @apply mb-0;
 }
 
-.property-value {
-  @apply text-foreground-muted text-xs font-normal;
-}
-
-.button-group {
-  @apply rounded inline-flex border border-border-muted overflow-hidden;
-}
-
-.button-value {
-  @apply text-foreground-muted text-xs font-medium;
-}
-
-.button-extra {
-  @apply border-l border-border-muted px-2 py-1;
-}
-
 .button-disabled .button-extra {
   @apply border-border-muted;
-}
-
-.rotate {
-  animation: rotate 1000ms linear infinite;
-}
-
-@keyframes rotate {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.button-group .button {
-  @apply border-none rounded-none;
 }
 
 .button {
@@ -221,32 +188,12 @@ textarea::-webkit-scrollbar-thumb {
   @apply p-0;
 }
 
-.button-edit:hover .button-text {
-  @apply opacity-25;
-}
-
-.button-edit-overlay {
-  @apply opacity-0 absolute top-0 left-0 right-0 bottom-0 flex items-center justify-center;
-}
-
-.button-edit:hover .button-edit-overlay {
-  @apply opacity-100;
-}
-
-.button-link {
-  @apply bg-transparent border-transparent;
-}
-
 .button-secondary {
   @apply bg-background text-foreground border border-border-muted;
 }
 
 .button-primary {
   @apply bg-brand text-white border-transparent;
-}
-
-.button-large {
-  @apply py-3 px-4;
 }
 
 button[disabled] {
@@ -256,37 +203,6 @@ button[disabled] {
 button:focus {
   outline: none;
   box-shadow: 0 0 0 4px theme('colors.primary.100');
-}
-
-[data-reach-dialog-content] {
-  width: 75vw !important;
-  padding: 0 !important;
-}
-
-[data-reach-dialog-overlay] {
-  @apply z-1;
-}
-
-[data-reach-tooltip] {
-  @apply text-xs;
-  max-width: 50%;
-  text-overflow: ellipsis;
-  overflow: hidden;
-}
-
-.modal-wrapper {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.4);
-  @apply p-2 z-20;
-}
-
-.modal-content {
-  overflow-y: auto;
-  @apply bg-modal h-full rounded shadow-lg p-2;
 }
 
 textarea.input,
@@ -318,36 +234,6 @@ input.input {
   height: 4px;
   top: -4px;
   background-color: var(--blue);
-}
-
-.color-picker .react-colorful {
-  width: 100%;
-}
-
-.color-picker .react-colorful__saturation {
-  @apply rounded-sm;
-}
-
-.color-picker .react-colorful__hue,
-.color-picker .react-colorful__alpha {
-  @apply h-4;
-  @apply rounded-lg;
-}
-
-.color-picker .react-colorful__hue-pointer,
-.color-picker .react-colorful__alpha-pointer {
-  @apply h-4;
-  @apply w-4;
-}
-
-.color-picker .react-colorful__hue {
-  @apply mt-2;
-  @apply mb-1;
-}
-
-.color-picker .react-colorful__alpha {
-  @apply mt-1;
-  @apply mb-2;
 }
 
 #corner {

@@ -3487,23 +3487,6 @@
   dependencies:
     "@babel/runtime" "^7.13.10"
 
-"@reach/portal@^0.10.5":
-  version "0.10.5"
-  resolved "https://registry.yarnpkg.com/@reach/portal/-/portal-0.10.5.tgz#532ce8472fc99d6c556520f6c8d53333d89e49a4"
-  integrity sha512-K5K8gW99yqDPDCWQjEfSNZAbGOQWSx5AN2lpuR1gDVoz4xyWpTJ0k0LbetYJTDVvLP/InEcR7AU42JaDYDCXQw==
-  dependencies:
-    "@reach/utils" "0.10.5"
-    tslib "^2.0.0"
-
-"@reach/utils@0.10.5":
-  version "0.10.5"
-  resolved "https://registry.yarnpkg.com/@reach/utils/-/utils-0.10.5.tgz#fbac944d29565f6dd7abd0e1b13950e99b1e470b"
-  integrity sha512-5E/xxQnUbmpI/LrufBAOXjunl96DnqX6B4zC2MO2KH/dRzLug5gM5VuOwV26egsp0jvsSPxojwciOhS43px3qw==
-  dependencies:
-    "@types/warning" "^3.0.0"
-    tslib "^2.0.0"
-    warning "^4.0.3"
-
 "@react-dnd/asap@^4.0.0":
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/@react-dnd/asap/-/asap-4.0.0.tgz#b300eeed83e9801f51bd66b0337c9a6f04548651"
@@ -5304,11 +5287,6 @@
   version "0.0.3"
   resolved "https://registry.yarnpkg.com/@types/use-sync-external-store/-/use-sync-external-store-0.0.3.tgz#b6725d5f4af24ace33b36fafd295136e75509f43"
   integrity sha512-EwmlvuaxPNej9+T4v5AuBPJa2x2UOJVdjCtDHgcDqitUeOtjnJKJ+apYjVcAoBEMjKW1VVFGZLUb5+qqa09XFA==
-
-"@types/warning@^3.0.0":
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/@types/warning/-/warning-3.0.0.tgz#0d2501268ad8f9962b740d387c4654f5f8e23e52"
-  integrity sha1-DSUBJorY+ZYrdA04fEZU9fjiPlI=
 
 "@types/webpack-env@^1.16.0":
   version "1.16.4"
