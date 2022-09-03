@@ -104,7 +104,7 @@ export const MoreButton: React.FC<Props> = ({
     };
     if (propsToSet[0].clear) propsToSet[0].clear.map((item) => Object.assign(newProps, { [item]: 'delete' }));
 
-    if (type === 'composition' && value === 'delete') {
+    if (type === 'composition' && isActive && !propsToSet[0].clear) {
       // distructure composition token when it is unselected
       const compositionToken = tokensContext.resolvedTokens.find((token) => token.name === tokenValue);
       const tokensInCompositionToken: NodeTokenRefMap = {};

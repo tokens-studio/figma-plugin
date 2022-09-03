@@ -3,9 +3,9 @@ import compact from 'just-compact';
 import type { CommitAction } from '@gitbeaker/core/dist/types/resources/Commits';
 import IsJSONString from '@/utils/isJSONString';
 import {
-  GitMultiFileObject, GitSingleFileObject, GitStorageMetadata, GitTokenStorage,
+  GitMultiFileObject, GitSingleFileObject, GitTokenStorage,
 } from './GitTokenStorage';
-import { RemoteTokenstorageErrorMessage, RemoteTokenStorageFile } from './RemoteTokenStorage';
+import { RemoteTokenstorageErrorMessage, RemoteTokenStorageFile, RemoteTokenStorageMetadata } from './RemoteTokenStorage';
 import { AnyTokenSet } from '@/types/tokens';
 import { ThemeObjectsList } from '@/types';
 import { SystemFilenames } from '@/constants/SystemFilenames';
@@ -104,7 +104,7 @@ export class GitlabTokenStorage extends GitTokenStorage {
     return false;
   }
 
-  public async read(): Promise<RemoteTokenStorageFile<GitStorageMetadata>[] | RemoteTokenstorageErrorMessage> {
+  public async read(): Promise<RemoteTokenStorageFile[] | RemoteTokenstorageErrorMessage> {
     if (!this.projectId) throw new Error('Missing Project ID');
 
     try {
@@ -125,7 +125,7 @@ export class GitlabTokenStorage extends GitTokenStorage {
           this.gitlabClient.RepositoryFiles.showRaw(this.projectId!, treeItem.path, { ref: this.branch })
         )));
 
-        return compact(jsonFileContents.map<RemoteTokenStorageFile<GitStorageMetadata> | null>((fileContent, index) => {
+        return compact(jsonFileContents.map<RemoteTokenStorageFile | null>((fileContent, index) => {
           const { path } = jsonFiles[index];
           if (IsJSONString(fileContent)) {
             const name = path.replace('.json', '').replace(this.path, '').replace(/^\//, '').replace(/\/$/, '');
@@ -143,7 +143,7 @@ export class GitlabTokenStorage extends GitTokenStorage {
               return {
                 path,
                 type: 'metadata',
-                data: parsed as GitStorageMetadata,
+                data: parsed as RemoteTokenStorageMetadata,
               };
             }
 
@@ -168,9 +168,16 @@ export class GitlabTokenStorage extends GitTokenStorage {
             path: `${this.path}/${SystemFilenames.THEMES}.json`,
             data: parsed.$themes ?? [],
           },
+          ...(parsed.$metadata ? [
+            {
+              type: 'metadata' as const,
+              path: this.path,
+              data: parsed.$metadata,
+            },
+          ] : []),
           ...(Object.entries(parsed).filter(([key]) => (
             !Object.values<string>(SystemFilenames).includes(key)
-          )) as [string, AnyTokenSet<false>][]).map<RemoteTokenStorageFile<GitStorageMetadata>>(([name, tokenSet]) => ({
+          )) as [string, AnyTokenSet<false>][]).map<RemoteTokenStorageFile>(([name, tokenSet]) => ({
             name,
             type: 'tokenSet',
             path: `${this.path}/${name}.json`,

@@ -1,5 +1,6 @@
 import { Meta, Story, ArgsTable, Canvas, Preview } from '@storybook/addon-docs';
 import { Provider } from 'react-redux';
+import TokensDecorator from '../../.storybook/decorations/TokensDecorator';
 
 import { store } from '@/app/store';
 import { SingleToken } from '@/types/tokens';
@@ -12,6 +13,7 @@ import TokenTree from '@/app/components/TokenTree';
 <Meta
   title="TokenButton"
   component={TokenButton}
+  decorators={[TokensDecorator]}
   args={{
     displayType: 'GRID',
   }}
@@ -28,15 +30,170 @@ export const TokenButtonDefaultStory = (args) => {
 };
 
 <Canvas>
-	<Story name='ColorSwatch' args={{
-		token:{
-      name: 'colors.foo',
-      value: 'red',
-		},
-		type: TokenTypes.COLOR,
-	}}>
-		{TokenButtonDefaultStory.bind({})}
-	</Story>
-	
-
+  <Story
+    name="ColorSwatch"
+    args={{
+      token: {
+        name: 'theme.bg.default',
+        value: '{colors.red.500}',
+        description: 'My default token',
+      },
+      type: TokenTypes.COLOR,
+    }}
+  >
+    {TokenButtonDefaultStory.bind({})}
+  </Story>
+  <Story
+    name="BorderRadius"
+    args={{
+      token: {
+        name: 'border-radius.0',
+        value: '64px',
+      },
+      type: TokenTypes.BORDER_RADIUS,
+    }}
+  >
+    {TokenButtonDefaultStory.bind({})}
+  </Story>
+  <Story
+    name="Opacity"
+    args={{
+      token: {
+        name: 'opacity.10',
+        type: TokenTypes.OPACITY,
+        value: '10%',
+      },
+      type: TokenTypes.OPACITY,
+    }}
+  >
+    {TokenButtonDefaultStory.bind({})}
+  </Story>
+  <Story
+    name="Typography"
+    args={{
+      token: {
+        name: 'typography.headlines.small',
+        type: TokenTypes.TYPOGRAPHY,
+        value: {
+          fontFamily: '{fontFamilies.default}',
+          fontWeight: '{fontWeights.regular}',
+          lineHeight: '{lineHeight.headings}',
+          fontSize: '{fontSize.h5}',
+          letterSpacing: '{letterSpacing.default}',
+          paragraphSpacing: '0',
+          textDecoration: '{textDecoration.headings}',
+          textCase: 'none',
+        },
+      },
+      type: TokenTypes.TYPOGRAPHY,
+    }}
+  >
+    {TokenButtonDefaultStory.bind({})}
+  </Story>
+  <Story
+    name="FontFamily"
+    args={{
+      token: {
+        name: 'font-family.default',
+        type: TokenTypes.FONT_FAMILIES,
+        value: '{fontFamilies.serif}',
+      },
+      type: TokenTypes.FONT_FAMILIES,
+    }}
+  >
+    {TokenButtonDefaultStory.bind({})}
+  </Story>
+  <Story
+    name="LineHeight"
+    args={{
+      token: {
+        name: 'line-height.1',
+        type: TokenTypes.LINE_HEIGHTS,
+        value: '130%',
+      },
+      type: TokenTypes.LINE_HEIGHTS,
+    }}
+  >
+    {TokenButtonDefaultStory.bind({})}
+  </Story>
+  <Story
+    name="BoxShadow"
+    args={{
+      token: {
+        name: 'typography.headlines.boxshadow',
+        type: TokenTypes.BOX_SHADOW,
+        value: {
+          x: '2',
+          y: '2',
+          blur: '2',
+          spread: '2',
+          color: '#000000',
+          type: BoxShadowTypes.DROP_SHADOW,
+        },
+      },
+      type: TokenTypes.BOX_SHADOW,
+    }}
+  >
+    {TokenButtonDefaultStory.bind({})}
+  </Story>
+  <Story
+    name="FontWeight"
+    args={{
+      token: {
+        name: 'font-weight.regular',
+        type: TokenTypes.FONT_WEIGHTS,
+        value: 'Regular',
+      },
+      type: TokenTypes.FONT_WEIGHTS,
+    }}
+  >
+    {TokenButtonDefaultStory.bind({})}
+  </Story>
+  <Story
+    name="Other"
+    args={{
+      token: {
+        name: 'font-style.normal',
+        type: TokenTypes.OTHER,
+        value: 'normal',
+      },
+      type: TokenTypes.OTHER,
+    }}
+  >
+    {TokenButtonDefaultStory.bind({})}
+  </Story>
+  <Story
+    name="Sizing"
+    args={{
+      token: {
+        name: 'size.6',
+        type: TokenTypes.SIZING,
+        value: '2',
+      },
+      type: TokenTypes.SIZE,
+    }}
+  >
+    {TokenButtonDefaultStory.bind({})}
+  </Story>
+  <Story
+    name="Composition"
+    args={{
+      token: {
+        name: 'card.default',
+        type: TokenTypes.COMPOSITION,
+        value: {
+          fill: '{colors.white}',
+          border: '{colors.gray.300}',
+          borderWidth: '1px',
+          borderRadius: '{border-radius.0}',
+          boxShadow: '{typography.headlines.boxshadow}',
+          opacity: '{opacity.10}',
+          itemSpacing: '{size.6}',
+        },
+      },
+      type: TokenTypes.COMPOSITION,
+    }}
+  >
+    {TokenButtonDefaultStory.bind({})}
+  </Story>
 </Canvas>

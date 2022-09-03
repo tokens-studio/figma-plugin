@@ -50,7 +50,7 @@ async function updateRemoteTokens({
       track('pushTokens', { provider: StorageProviderType.JSONBIN });
 
       notifyToUI('Updating JSONBin...');
-      updateJSONBinTokens({
+      await updateJSONBinTokens({
         themes,
         tokens,
         context,
