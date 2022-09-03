@@ -17,8 +17,6 @@ import { MoreButtonProperty } from './MoreButtonProperty';
 import { DocumentationProperties } from '@/constants/DocumentationProperties';
 import { SingleToken } from '@/types/tokens';
 import { TokenTypes } from '@/constants/TokenTypes';
-import { TokenTooltip } from '../TokenTooltip';
-import BrokenReferenceIndicator from '../BrokenReferenceIndicator';
 import { useSetNodeData } from '@/hooks/useSetNodeData';
 import { Dispatch } from '@/app/store';
 import { TokensContext } from '@/context';
@@ -29,6 +27,8 @@ import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 import { CompositionTokenProperty } from '@/types/CompositionTokenProperty';
 import useManageTokens from '@/app/store/useManageTokens';
 import { EditTokenFormStatus } from '@/constants/EditTokenFormStatus';
+import TokenButtonContent from './TokenButtonContent';
+import { useGetActiveState } from '@/hooks';
 
 const RightSlot = styled('div', {
   marginLeft: 'auto',
@@ -43,7 +43,6 @@ const RightSlot = styled('div', {
 type Props = {
   properties: PropertyObject[];
   token: SingleToken;
-  displayType: 'LIST' | 'GRID';
   type: TokenTypes,
   showForm: (options: ShowFormOptions) => void;
 };
@@ -51,7 +50,6 @@ type Props = {
 export const MoreButton: React.FC<Props> = ({
   properties,
   token,
-  displayType,
   type,
   showForm,
 }) => {
@@ -65,23 +63,6 @@ export const MoreButton: React.FC<Props> = ({
   const visibleProperties = React.useMemo(() => (
     properties.filter((p) => p.label)
   ), [properties]);
-
-  const showValue = React.useMemo(() => {
-    let show = true;
-    if (type === TokenTypes.COLOR) {
-      show = false;
-      if (displayType === 'LIST') {
-        show = true;
-      }
-    }
-    return show;
-  }, [type, displayType]);
-
-  // Only show the last part of a token in a group
-  const visibleName = React.useMemo(() => {
-    const visibleDepth = 1;
-    return (token.name ?? '').split('.').slice(-visibleDepth).join('.');
-  }, [token.name]);
 
   const handleEditClick = React.useCallback(() => {
     showForm({ name: token.name, token, status: EditTokenFormStatus.EDIT });
@@ -100,6 +81,11 @@ export const MoreButton: React.FC<Props> = ({
     await setNodeData(value, tokensContext.resolvedTokens);
     dispatch.uiState.completeJob(BackgroundJobs.UI_APPLYNODEVALUE);
   }, [dispatch, tokensContext.resolvedTokens, setNodeData]);
+
+  const activeStateProperties = React.useMemo(() => (
+    [...properties, ...DocumentationProperties]
+  ), [properties]);
+  const active = useGetActiveState(activeStateProperties, type, token.name);
 
   const handleClick = React.useCallback((givenProperties: PropertyObject | PropertyObject[], isActive = active) => {
     const propsToSet = (Array.isArray(givenProperties) ? givenProperties : [givenProperties]).map((prop) => (
@@ -139,16 +125,7 @@ export const MoreButton: React.FC<Props> = ({
   return (
     <ContextMenu>
       <ContextMenuTrigger id={`${token.name}-button}`}>
-        <TokenTooltip token={token}>
-          <button
-            className="w-full h-full relative"
-            type="button"
-            onClick={handleTokenClick}
-          >
-            <BrokenReferenceIndicator token={token} />
-            <div className="button-text">{showValue && <span>{visibleName}</span>}</div>
-          </button>
-        </TokenTooltip>
+        <TokenButtonContent type={type} active={active} onClick={handleTokenClick} token={token} />
       </ContextMenuTrigger>
       <ContextMenuContent sideOffset={5} collisionTolerance={30}>
         {visibleProperties.map((property) => (

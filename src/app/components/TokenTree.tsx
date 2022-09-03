@@ -10,7 +10,6 @@ import AddIcon from '@/icons/add.svg';
 import { ShowFormOptions, ShowNewFormOptions } from '@/types';
 
 type Props = {
-  displayType: 'GRID' | 'LIST';
   schema: TokenTypeSchema;
   tokenValues: DeepKeyTokenMap;
   path?: string | null;
@@ -19,7 +18,7 @@ type Props = {
 };
 
 const TokenTree: React.FC<Props> = ({
-  displayType, tokenValues, showNewForm, showForm, schema, path = null,
+  tokenValues, showNewForm, showForm, schema, path = null,
 }) => {
   const editProhibited = useSelector(editProhibitedSelector);
   const tokenValuesEntries = React.useMemo(() => (
@@ -66,7 +65,6 @@ const TokenTree: React.FC<Props> = ({
                 showForm={showForm}
                 schema={schema}
                 path={stringPath}
-                displayType={displayType}
               />
             </div>
           ) : (
@@ -76,7 +74,6 @@ const TokenTree: React.FC<Props> = ({
               showForm={showForm}
               draggedToken={draggedToken}
               dragOverToken={dragOverToken}
-              displayType={displayType}
               setDraggedToken={setDraggedToken}
               setDragOverToken={setDragOverToken}
             />
