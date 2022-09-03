@@ -7,6 +7,26 @@ export const globalStyles = globalCss({
     letterSpacing: '0',
     color: '$fgDefault',
   },
+  '.scroll-container': {
+    overflowY: 'scroll',
+  },
+  '.content::-webkit-scrollbar, .ReactModal__Content::-webkit-scrollbar,  textarea::-webkit-scrollbar': {
+    width: '9px',
+  },
+  '.overflow-x-auto::-webkit-scrollbar': {
+    height: '9px',
+  },
+  '.content::-webkit-scrollbar-thumb, .overflow-x-auto::-webkit-scrollbar-thumb, .ReactModal__Content::-webkit-scrollbar-thumb, textarea::-webkit-scrollbar-thumb': {
+    backgroundColor: '$borderMuted',
+    borderRadius: '9px',
+    border: '2px solid var(--figma-color-bg)',
+  },
+  '.content-dark::-webkit-scrollbar-thumb': {
+    backgroundColor: 'var(--colors-contextMenuForegroundMuted, #000) !important',
+    borderColor: 'var(--colors-contextMenuBackground, #333) !important',
+    borderRadius: '9px',
+    border: '2px solid',
+  },
   '#corner': {
     position: 'fixed',
     right: 0,
