@@ -27,6 +27,23 @@ export const globalStyles = globalCss({
   input: {
     background: '$bgDefault',
   },
+  '.drag-over-item-grid-absolute': {
+    position: 'absolute',
+    content: "''",
+    width: '5px',
+    height: '24px',
+    top: '0px',
+    left: -'4px',
+    backgroundColor: '$interaction',
+  },
+  '.drag-over-item-list-absolute': {
+    position: 'absolute',
+    content: "''",
+    width: '100%',
+    height: '4px',
+    top: '-4px',
+    backgroundColor: '$interaction',
+  },
   '.scroll-container': {
     overflowY: 'scroll',
   },
@@ -79,5 +96,9 @@ export const globalStyles = globalCss({
     marginTop: '$2',
     marginBottom: '$3',
   },
-
+  '.ReactModal__Content': {
+    backgroundColor: '$bgDefault !important',
+    border: '1px solid !important',
+    borderColor: '$contextMenuBorder !important',
+  },
 });
