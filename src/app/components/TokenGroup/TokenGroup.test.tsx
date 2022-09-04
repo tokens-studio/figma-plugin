@@ -5,7 +5,6 @@ import { fireEvent, render, resetStore } from '../../../../tests/config/setupTes
 import { store } from '../../store';
 import TokenGroup from './TokenGroup';
 
-const displayType = 'GRID';
 const schema = {
   label: 'Sizing',
   property: 'Size',
@@ -70,7 +69,6 @@ describe('TokenGroup', () => {
 
   it('should be able to collpase a token group', async () => {
     const { getByTestId } = render(<TokenGroup
-      displayType={displayType}
       tokenValues={tokenValues as DeepKeyTokenMap}
       showNewForm={showNewForm}
       showForm={showForm}
@@ -86,7 +84,6 @@ describe('TokenGroup', () => {
 
   it('should be able to expand a token group', async () => {
     const { getByTestId } = render(<TokenGroup
-      displayType={displayType}
       tokenValues={tokenValues as DeepKeyTokenMap}
       showNewForm={showNewForm}
       showForm={showForm}
@@ -103,7 +100,6 @@ describe('TokenGroup', () => {
 
   it('should be able to add a new token', async () => {
     const result = render(<TokenGroup
-      displayType={displayType}
       tokenValues={tokenValues as DeepKeyTokenMap}
       showNewForm={showNewForm}
       showForm={showForm}
