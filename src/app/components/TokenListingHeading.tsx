@@ -1,4 +1,3 @@
-import { Tooltip } from '@radix-ui/react-tooltip';
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -11,6 +10,10 @@ import ProBadge from './ProBadge';
 
 import { useFlags } from './LaunchDarkly';
 import { Dispatch } from '../store';
+import Tooltip from './Tooltip';
+import Box from './Box';
+import Stack from './Stack';
+import { StyledTokenGroupHeadingButton } from './TokenGroup/StyledTokenGroupHeading';
 
 type Props = {
   isCollapsed: boolean;
@@ -43,23 +46,24 @@ export default function TokenListingHeading({
   }, [displayType, dispatch]);
 
   return (
-    <div className="relative flex items-center justify-between space-x-8">
-      <button
-        className={`flex items-center w-full h-full p-4 space-x-2 hover:bg-background-subtle focus:outline-none ${
-          isCollapsed ? 'opacity-50' : null
-        }`}
+    <Stack direction="row" align="center" justify="between" gap={4} css={{ position: 'relative' }}>
+      <StyledTokenGroupHeadingButton
+        isCollapsed={isCollapsed}
         data-cy={`tokenlisting-header-${tokenKey}`}
         type="button"
         onClick={onCollapse}
         data-testid={`tokenlisting-${tokenKey}-collapse-button`}
       >
         <Tooltip label={`Alt + Click to ${isCollapsed ? 'expand' : 'collapse'} all`}>
-          <div className="p-2 -m-2">{isCollapsed ? <IconCollapseArrow /> : <IconExpandArrow />}</div>
+          <Box css={{ padding: '$2', margin: '-$2' }}>{isCollapsed ? <IconCollapseArrow /> : <IconExpandArrow />}</Box>
         </Tooltip>
         <Heading size="small">{label}</Heading>
         {isPro ? <ProBadge /> : null}
-      </button>
-      <div className="absolute right-0 flex mr-2">
+      </StyledTokenGroupHeadingButton>
+      <Box css={{
+        position: 'absolute', right: 0, display: 'flex', marginRight: '$2',
+      }}
+      >
         {showDisplayToggle && (
           <IconButton
             icon={displayType === 'GRID' ? <IconList /> : <IconGrid />}
@@ -76,7 +80,7 @@ export default function TokenListingHeading({
           tooltip="Add a new token"
           onClick={handleShowNewForm}
         />
-      </div>
-    </div>
+      </Box>
+    </Stack>
   );
 }

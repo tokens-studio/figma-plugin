@@ -79,7 +79,7 @@ const TokenListing: React.FC<Props> = ({
             css={{
               padding: '$4',
               paddingTop: 0,
-              visibility: collapsedTokenTypeObj[tokenKey as TokenTypes] ? 'hidden' : 'visible',
+              display: collapsedTokenTypeObj[tokenKey as TokenTypes] ? 'none' : 'block',
             }}
           >
             <TokenGroup

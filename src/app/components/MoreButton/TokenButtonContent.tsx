@@ -42,7 +42,7 @@ const StyledTokenButton = styled('button', {
       displayType: 'LIST',
       tokenType: TokenTypes.COLOR,
       css: {
-        borderRadius: '$button',
+        borderRadius: '$tokenButton',
         width: '100%',
         padding: '$1',
       },
@@ -60,7 +60,7 @@ const StyledTokenButton = styled('button', {
   variants: {
     tokenType: {
       [TokenTypes.COLOR]: {
-        borderRadius: '100px',
+        borderRadius: '$full',
         backgroundColor: 'transparent',
         '&:focus': {
           outline: 'none',
@@ -72,7 +72,7 @@ const StyledTokenButton = styled('button', {
           flexShrink: 0,
           border: '1px solid',
           content: '',
-          borderRadius: '100%',
+          borderRadius: '$full',
           background: 'var(--backgroundColor)',
           borderColor: 'var(--borderColor)',
         },
@@ -80,12 +80,14 @@ const StyledTokenButton = styled('button', {
     },
     displayType: {
       LIST: {
+        width: '100%',
         [`& ${StyledTokenButtonText}`]: {
           borderRadius: '$button',
           justifyContent: 'flex-start',
         },
       },
       GRID: {
+        borderRadius: '$tokenButton',
         [`& ${StyledTokenButtonText}`]: {
           borderRadius: '$full',
         },

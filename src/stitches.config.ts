@@ -140,6 +140,7 @@ export const stitchesInstance = createStitches({
       card: globalTokens.radii.lg,
       badge: globalTokens.radii.lg,
       full: globalTokens.radii.full,
+      tokenButton: globalTokens.radii.lg,
       tree: globalTokens.radii.lg,
     },
     shadows: {

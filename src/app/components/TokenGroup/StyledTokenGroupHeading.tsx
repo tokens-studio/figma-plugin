@@ -45,3 +45,23 @@ export const StyledTokenGroupHeadingCollapsable = styled('button', {
     },
   },
 });
+
+export const StyledTokenGroupHeadingButton = styled('button', {
+  display: 'flex',
+  alignItems: 'center',
+  width: '100%',
+  height: '100%',
+  padding: '$4',
+  gap: '$2',
+  '&:hover, &:focus': {
+    backgroundColor: '$bgSubtle',
+    outline: 'none',
+  },
+  variants: {
+    isCollapsed: {
+      true: {
+        opacity: 0.5,
+      },
+    },
+  },
+});
