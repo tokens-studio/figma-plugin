@@ -31,8 +31,11 @@ const StyledTokenButtonText = styled('span', {
 
 const StyledTokenButton = styled('button', {
   position: 'relative',
+  marginBottom: '$1',
+  marginRight: '$1',
+  backgroundColor: '$bgSubtle',
   '&:hover, &:focus': {
-    backgroundColor: '$bgSubtle',
+    backgroundColor: '$bgAccent',
   },
   compoundVariants: [
     {

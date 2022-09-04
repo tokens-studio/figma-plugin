@@ -2,26 +2,6 @@
 
 @tailwind components;
 
-.button-property + .property-wrapper {
-  @apply mt-4;
-}
-
-.property-wrapper:not(:last-of-type) {
-  @apply mb-4;
-}
-
-.property-wrapper .heading {
-  @apply text-xs text-foreground-muted mb-2;
-}
-
-.property-wrapper .property-wrapper {
-  @apply mb-0 rounded-none pl-2 pb-2 border-l border-border-muted;
-}
-
-.property-wrapper:last-of-type {
-  @apply mb-0;
-}
-
 .button {
   @apply border border-border-muted rounded text-foreground-muted font-medium text-xs p-2;
 }
