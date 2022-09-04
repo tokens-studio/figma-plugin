@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { DndProvider } from 'react-dnd';
 import { DeepKeyTokenMap, EditTokenObject, TokenTypeSchema } from '@/types/tokens';
-import TokenTree from './TokenTree';
+import TokenGroup from './TokenGroup/TokenGroup';
 import { Dispatch } from '../store';
 import { TokenTypes } from '@/constants/TokenTypes';
 import {
@@ -82,7 +82,7 @@ const TokenListing: React.FC<Props> = ({
               visibility: collapsedTokenTypeObj[tokenKey as TokenTypes] ? 'hidden' : 'visible',
             }}
           >
-            <TokenTree
+            <TokenGroup
               tokenValues={values}
               showNewForm={showNewForm}
               showForm={showForm}

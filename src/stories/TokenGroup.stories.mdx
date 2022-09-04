@@ -5,13 +5,13 @@ import TokensDecorator from '../../.storybook/decorations/TokensDecorator';
 import { store } from '@/app/store';
 import { SingleToken } from '@/types/tokens';
 import { TokenTypes } from '@/constants/TokenTypes';
-import { tokensForStories } from "./tokensForStories";
+import { tokensForStories } from './tokensForStories';
 
-import TokenTree from '@/app/components/TokenTree';
+import TokenGroup from '@/app/components/TokenGroup/TokenGroup';
 
 <Meta
-  title="TokenTree"
-  component={TokenTree}
+  title="TokenGroup"
+  component={TokenGroup}
   decorators={[TokensDecorator]}
   args={{
     displayType: 'GRID',
@@ -20,23 +20,20 @@ import TokenTree from '@/app/components/TokenTree';
       property: 'color',
       type: TokenTypes.COLOR,
     },
-    tokenValues: tokensForStories["colors"]
+    tokenValues: tokensForStories['colors'],
   }}
 />
 
-export const TokenTreeDefaultStory = (args) => {
+export const TokenGroupDefaultStory = (args) => {
   return (
     <Provider store={store}>
-      <TokenTree {...args} />
+      <TokenGroup {...args} />
     </Provider>
   );
 };
 
 <Canvas>
-  <Story name="TokenTreeGrid" args={{}}>
-    {TokenTreeDefaultStory.bind({})}
-  </Story>
-  <Story name="TokenTreeList" args={{ displayType: 'LIST' }}>
-    {TokenTreeDefaultStory.bind({})}
+  <Story name="Default" args={{}}>
+    {TokenGroupDefaultStory.bind({})}
   </Story>
 </Canvas>

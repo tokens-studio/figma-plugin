@@ -17,12 +17,6 @@ export const StyledTokenGroup = styled('div', {
   },
 });
 
-export const StyledTokenGroupHeading = styled('div', {
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-});
-
 export const StyledTokenGroupItems = styled('div', {
   display: 'flex',
   flexDirection: 'column',
@@ -32,12 +26,12 @@ export const StyledTokenGroupItems = styled('div', {
     position: 'relative',
     '&::before': {
       content: '',
-      bottom: '12px',
+      bottom: '14px',
       top: 0,
       left: 0,
       position: 'absolute',
       width: '4px',
-      borderBottomLeftRadius: '6px',
+      borderBottomLeftRadius: '$tree',
       borderLeft: '1px solid $borderMuted',
       borderBottom: '1px solid $borderMuted',
     },
@@ -48,30 +42,6 @@ export const StyledTokenGroupItems = styled('div', {
       paddingBottom: 0,
       paddingLeft: 0,
       borderLeft: 'none',
-    },
-  },
-});
-
-export const StyledCollapsableTokenGroupHeadingButton = styled('button', {
-  display: 'flex',
-  alignItems: 'center',
-  padding: '$1 $2',
-  marginLeft: '-$2',
-  gap: '$2',
-  borderRadius: '$1',
-  '&:hover, &:focus': {
-    backgroundColor: '$bgSubtle',
-    boxShadow: 'none',
-    border: 'none',
-  },
-  '> svg': {
-    opacity: 0.5,
-  },
-  variants: {
-    collapsed: {
-      true: {
-        opacity: 0.5,
-      },
     },
   },
 });

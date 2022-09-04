@@ -2,19 +2,18 @@ import React, { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger,
-} from './ContextMenu';
-import Stack from './Stack';
-import Button from './Button';
-import Heading from './Heading';
-import Input from './Input';
-import Modal from './Modal';
-import useManageTokens from '../store/useManageTokens';
+} from '../ContextMenu';
+import Stack from '../Stack';
+import Button from '../Button';
+import Heading from '../Heading';
+import Input from '../Input';
+import Modal from '../Modal';
+import useManageTokens from '../../store/useManageTokens';
 import { editProhibitedSelector } from '@/selectors';
 import { IconCollapseArrow, IconExpandArrow, IconAdd } from '@/icons';
-import { StyledCollapsableTokenGroupHeadingButton, StyledTokenGroupHeading } from './StyledTokenGroup';
-import { Dispatch } from '../store';
+import { StyledTokenGroupHeading, StyledTokenGroupAddIcon, StyledTokenGroupHeadingCollapsable } from './StyledTokenGroupHeading';
+import { Dispatch } from '../../store';
 import { collapsedTokensSelector } from '@/selectors/collapsedTokensSelector';
-import IconButton from './IconButton';
 import { ShowNewFormOptions } from '@/types';
 
 export type Props = {
@@ -25,7 +24,7 @@ export type Props = {
   showNewForm: (opts: ShowNewFormOptions) => void;
 };
 
-export default function TokenGroupHeading({
+export function TokenGroupHeading({
   label, path, id, type, showNewForm,
 }: Props) {
   const editProhibited = useSelector(editProhibitedSelector);
@@ -83,7 +82,7 @@ export default function TokenGroupHeading({
 
   return (
     <StyledTokenGroupHeading>
-      <StyledCollapsableTokenGroupHeadingButton
+      <StyledTokenGroupHeadingCollapsable
         collapsed={collapsed.includes(path)}
         data-cy={`tokenlisting-group-${path}`}
         data-testid={`tokenlisting-group-${path}`}
@@ -139,17 +138,15 @@ export default function TokenGroupHeading({
             </Stack>
           </Stack>
         </Modal>
-      </StyledCollapsableTokenGroupHeadingButton>
-      <div className="opacity-0 group-hover:opacity-100 focus:opacity-100">
-        <IconButton
-          icon={<IconAdd />}
-          tooltip="Add a new token"
-          tooltipSide="left"
-          onClick={handleShowNewForm}
-          disabled={editProhibited}
-          dataCy="button-add-new-token-in-group"
-        />
-      </div>
+      </StyledTokenGroupHeadingCollapsable>
+      <StyledTokenGroupAddIcon
+        icon={<IconAdd />}
+        tooltip="Add a new token"
+        tooltipSide="left"
+        onClick={handleShowNewForm}
+        disabled={editProhibited}
+        dataCy="button-add-new-token-in-group"
+      />
     </StyledTokenGroupHeading>
   );
 }
