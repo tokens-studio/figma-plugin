@@ -2,36 +2,4 @@
 
 @tailwind components;
 
-.button {
-  @apply border border-border-muted rounded text-foreground-muted font-medium text-xs p-2;
-}
-
-.button-property {
-  @apply border-none rounded bg-background-subtle px-0 py-0;
-}
-
-.button-property button {
-  @apply rounded;
-}
-
-.button-property:hover {
-  @apply bg-background-hover bg-opacity-50;
-}
-
-.button-property-edit {
-  @apply opacity-0;
-}
-
-.button-property button:focus {
-  @apply bg-opacity-75 outline-none shadow-focus-subtle;
-}
-
-.button-property-color .button-text span {
-  @apply ml-2;
-}
-
-.button-property-color .button-text {
-  @apply p-0;
-}
-
 @tailwind utilities;
