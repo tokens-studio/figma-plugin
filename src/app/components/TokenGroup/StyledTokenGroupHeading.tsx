@@ -25,7 +25,7 @@ export const StyledTokenGroupHeadingCollapsable = styled('button', {
   padding: '$1 $2',
   marginLeft: '-$2',
   gap: '$2',
-  borderRadius: '$1',
+  borderRadius: '$button',
   '&:hover, &:focus': {
     backgroundColor: '$bgSubtle',
     boxShadow: 'none',

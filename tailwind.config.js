@@ -50,7 +50,7 @@ module.exports = {
       boxShadow: (theme) => ({
         focus: `0 0 0 2px var(--figma-color-border-selected)`,
         'focus-subtle': `0 0 0 2px var(--figma-color-border-selected)`,
-        'focus-muted': `0 0 0 2px var(--figma-color-border-selected)`,
+        'focusMuted': `0 0 0 2px var(--figma-color-border-selected)`,
         border: '0 0 0 1px',
       }),
     },

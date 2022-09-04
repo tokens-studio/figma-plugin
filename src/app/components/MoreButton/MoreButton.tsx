@@ -27,7 +27,7 @@ import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 import { CompositionTokenProperty } from '@/types/CompositionTokenProperty';
 import useManageTokens from '@/app/store/useManageTokens';
 import { EditTokenFormStatus } from '@/constants/EditTokenFormStatus';
-import TokenButtonContent from './TokenButtonContent';
+import TokenButtonContent from '../TokenButton/TokenButtonContent';
 import { useGetActiveState } from '@/hooks';
 
 const RightSlot = styled('div', {

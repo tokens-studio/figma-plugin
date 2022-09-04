@@ -148,7 +148,7 @@ export const stitchesInstance = createStitches({
       contextMenu: 'var(--shadow-context-menu, 0px 10px 38px -10px rgba(22, 23, 24, 0.35), 0px 10px 20px -15px rgba(22, 23, 24, 0.2))',
       focus: `0 0 0 2px ${globalTokens.colors.primary500}`,
       'focus-subtle': `0 0 0 2px ${globalTokens.colors.primary300}`,
-      'focus-muted': `0 0 0 2px ${globalTokens.colors.primary400}`,
+      focusMuted: `0 0 0 2px ${globalTokens.colors.primary400}`,
       tokenFocus: '0 0 0 2px $colors$borderMuted',
     },
   },

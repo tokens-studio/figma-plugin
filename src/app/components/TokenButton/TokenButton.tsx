@@ -40,6 +40,7 @@ export const TokenButton: React.FC<Props> = ({
       setDragOverToken={setDragOverToken}
       setDraggedToken={setDraggedToken}
     >
+      {/* TODO: We should restructure and rename MoreButton as it's only ever used in TokenButton */}
       <MoreButton
         properties={properties}
         token={token}
