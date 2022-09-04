@@ -18,11 +18,76 @@ type Props = {
   onClick: () => void;
 };
 
+const StyledTokenButtonText = styled('span', {
+  color: '$fgDefault',
+  padding: '$2 $3',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'flex-start',
+  flexShrink: 0,
+  textAlign: 'left',
+  gap: '$2',
+});
+
 const StyledTokenButton = styled('button', {
   position: 'relative',
-  marginBottom: '$1',
-  marginRight: '$1',
+  '&:hover, &:focus': {
+    backgroundColor: '$bgSubtle',
+  },
+  compoundVariants: [
+    {
+      displayType: 'LIST',
+      tokenType: TokenTypes.COLOR,
+      css: {
+        borderRadius: '$button',
+        width: '100%',
+        padding: '$1',
+      },
+    },
+    {
+      displayType: 'GRID',
+      tokenType: TokenTypes.COLOR,
+      css: {
+        [`& ${StyledTokenButtonText}`]: {
+          padding: 0,
+        },
+      },
+    },
+  ],
   variants: {
+    tokenType: {
+      [TokenTypes.COLOR]: {
+        borderRadius: '100px',
+        backgroundColor: 'transparent',
+        '&:focus': {
+          outline: 'none',
+          boxShadow: '$tokenFocus',
+        },
+        [`& ${StyledTokenButtonText}::before`]: {
+          width: '$6',
+          height: '$6',
+          flexShrink: 0,
+          border: '1px solid',
+          content: '',
+          borderRadius: '100%',
+          background: 'var(--backgroundColor)',
+          borderColor: 'var(--borderColor)',
+        },
+      },
+    },
+    displayType: {
+      LIST: {
+        [`& ${StyledTokenButtonText}`]: {
+          borderRadius: '$button',
+          justifyContent: 'flex-start',
+        },
+      },
+      GRID: {
+        [`& ${StyledTokenButtonText}`]: {
+          borderRadius: '$full',
+        },
+      },
+    },
     active: {
       true: {
         backgroundColor: '$bgAccent',
@@ -66,51 +131,29 @@ export default function TokenButtonContent({
   }, [token.name]);
 
   const cssOverrides = React.useMemo(() => {
-    if (type === TokenTypes.BORDER_RADIUS) {
-      return {
-        borderRadius: `${displayValue}px`,
-      };
+    switch (type) {
+      case TokenTypes.COLOR: {
+        return {
+          '--backgroundColor': String(displayValue),
+          '--borderColor': lightOrDark(String(displayValue)) === 'light' ? '$colors$border' : '$colors$borderMuted',
+        };
+      }
+      case TokenTypes.BORDER_RADIUS: {
+        return {
+          borderRadius: `${displayValue}px`,
+        };
+      }
+      default: {
+        return {};
+      }
     }
-
-    if (type === TokenTypes.COLOR) {
-      const colorListOverride = (displayType === 'LIST') ? {
-        borderRadius: '$button',
-        width: '100%',
-        padding: '$1',
-        marginBottom: '-$1',
-      } : {};
-
-      return {
-        '--backgroundColor': String(displayValue),
-        '--borderColor': lightOrDark(String(displayValue)) === 'light' ? '$border' : '$borderMuted',
-        borderRadius: '100px',
-        backgroundColor: 'transparent',
-        '&:focus': {
-          outline: 'none',
-          boxShadow: '0 0 0 2px $borderMuted',
-        },
-        '.button-text::before': {
-          width: '16px',
-          height: '16px',
-          margin: '0 auto',
-          flexShrink: 0,
-          border: '1px solid white',
-          content: '',
-          borderRadius: '100%',
-          background: 'var(--backgroundColor)',
-          borderColor: 'var(--borderColor)',
-        },
-        ...colorListOverride,
-      };
-    }
-    return {};
-  }, [type, displayValue, displayType]);
+  }, [type, displayValue]);
 
   return (
     <TokenTooltip token={token}>
-      <StyledTokenButton active={active} disabled={uiDisabled} type="button" onClick={onClick} css={cssOverrides}>
+      <StyledTokenButton tokenType={type as TokenTypes.COLOR} displayType={displayType} active={active} disabled={uiDisabled} type="button" onClick={onClick} css={cssOverrides}>
         <BrokenReferenceIndicator token={token} />
-        <div className="button-text">{showValue && <span>{visibleName}</span>}</div>
+        <StyledTokenButtonText>{showValue && <span>{visibleName}</span>}</StyledTokenButtonText>
       </StyledTokenButton>
     </TokenTooltip>
   );

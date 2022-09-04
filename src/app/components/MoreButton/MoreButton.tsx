@@ -76,6 +76,7 @@ export const MoreButton: React.FC<Props> = ({
     showForm({ name: `${token.name}-copy`, token, status: EditTokenFormStatus.DUPLICATE });
   }, [showForm, token]);
 
+  // TODO: This should probably move to state or a hook
   const setPluginValue = React.useCallback(async (value: SelectionValue) => {
     dispatch.uiState.startJob({ name: BackgroundJobs.UI_APPLYNODEVALUE });
     await setNodeData(value, tokensContext.resolvedTokens);
@@ -91,13 +92,12 @@ export const MoreButton: React.FC<Props> = ({
     const propsToSet = (Array.isArray(givenProperties) ? givenProperties : [givenProperties]).map((prop) => (
       extend(true, {}, prop) as typeof prop
     ));
-    const tokenValue = name;
     track('Apply Token', { givenProperties });
-    let value = isActive ? 'delete' : tokenValue;
+    let value = isActive ? 'delete' : token.name;
 
     if (propsToSet[0].clear && !isActive) {
       value = 'delete';
-      propsToSet[0].forcedValue = tokenValue;
+      propsToSet[0].forcedValue = String(token.name);
     }
     const newProps = {
       [propsToSet[0].name || propsToSet[0]]: propsToSet[0].forcedValue || value,
@@ -106,7 +106,7 @@ export const MoreButton: React.FC<Props> = ({
 
     if (type === 'composition' && isActive && !propsToSet[0].clear) {
       // distructure composition token when it is unselected
-      const compositionToken = tokensContext.resolvedTokens.find((token) => token.name === tokenValue);
+      const compositionToken = tokensContext.resolvedTokens.find((resolvedToken) => resolvedToken.name === String(token.name));
       const tokensInCompositionToken: NodeTokenRefMap = {};
       if (compositionToken) {
         Object.keys(compositionToken.value).forEach((property: string) => {
@@ -116,7 +116,7 @@ export const MoreButton: React.FC<Props> = ({
       tokensInCompositionToken.composition = 'delete';
       setPluginValue(tokensInCompositionToken);
     } else setPluginValue(newProps);
-  }, [active, type, setPluginValue, tokensContext.resolvedTokens]);
+  }, [active, token.name, type, setPluginValue, tokensContext.resolvedTokens]);
 
   const handleTokenClick = React.useCallback(() => {
     handleClick(properties[0]);

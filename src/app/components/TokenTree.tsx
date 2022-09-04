@@ -2,7 +2,7 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import TokenGroupHeading from './TokenGroupHeading';
 import { TokenButton } from './TokenButton';
-import { editProhibitedSelector } from '@/selectors';
+import { displayTypeSelector, editProhibitedSelector } from '@/selectors';
 import { DeepKeyTokenMap, SingleToken, TokenTypeSchema } from '@/types/tokens';
 import { isSingleToken } from '@/utils/is';
 import IconButton from './IconButton';
@@ -36,6 +36,7 @@ const TokenTree: React.FC<Props> = ({
 }) => {
   const editProhibited = useSelector(editProhibitedSelector);
   const collapsed = useSelector(collapsedTokensSelector);
+  const displayType = useSelector(displayTypeSelector);
   const dispatch = useDispatch<Dispatch>();
 
   const handleToggleCollapsed = useCallback((key: string) => {
@@ -74,7 +75,7 @@ const TokenTree: React.FC<Props> = ({
   const [dragOverToken, setDragOverToken] = useState<SingleToken | null>(null);
 
   return (
-    <StyledTokenGroup>
+    <StyledTokenGroup displayType={displayType}>
       {mappedItems.map(({ item, onToggleCollapsed }) => (
         <React.Fragment key={item.stringPath}>
           {typeof item.value === 'object' && !isSingleToken(item.value) ? (

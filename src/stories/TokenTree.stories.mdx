@@ -6,102 +6,121 @@ import { store } from '@/app/store';
 import { SingleToken } from '@/types/tokens';
 import { TokenTypes } from '@/constants/TokenTypes';
 
-import TokenButton from '@/app/components/TokenButton';
 import TokenTree from '@/app/components/TokenTree';
 
-<Meta title="TokenTree" component={TokenTree} decorators={[TokensDecorator]} />
+<Meta
+  title="TokenTree"
+  component={TokenTree}
+  decorators={[TokensDecorator]}
+  args={{
+    displayType: 'GRID',
+    schema: {
+      label: 'Colors',
+      property: 'color',
+      type: TokenTypes.COLOR,
+    },
+    tokenValues: {
+      theme: {
+        bg: {
+          default: {
+            name: 'theme.bg.default',
+            value: '{colors.red.500}',
+            description: 'My default token',
+            type: TokenTypes.COLOR,
+          },
+        },
+      },
+      color: {
+        black: {
+          name: 'color.black',
+          type: TokenTypes.COLOR,
+          value: '#ffffff',
+        },
+        white: {
+          name: 'color.white',
+          type: TokenTypes.COLOR,
+          value: '#000000',
+        },
+        gray: {
+          100: {
+            name: 'color.gray.100',
+            value: '#FAFBFC',
+            type: 'color',
+          },
+          200: {
+            name: 'color.gray.200',
+            value: '#EAEEF2',
+            type: 'color',
+          },
+          300: {
+            name: 'color.gray.300',
+            value: '#D4DAE0',
+            type: 'color',
+          },
+          400: {
+            name: 'color.gray.400',
+            value: '#B7BFC7',
+            type: 'color',
+          },
+          500: {
+            name: 'color.gray.500',
+            value: '#949DA7',
+            type: 'color',
+          },
+          600: {
+            name: 'color.gray.600',
+            value: '#707A84',
+            type: 'color',
+          },
+          700: {
+            name: 'color.gray.700',
+            value: '#57606A',
+            type: 'color',
+          },
+          800: {
+            name: 'color.gray.800',
+            value: '#424A53',
+            type: 'color',
+          },
+          900: {
+            name: 'color.gray.900',
+            value: '#1B1F24',
+            type: 'color',
+          },
+        },
+        theme: {
+          bg: {
+            default: {
+              name: 'theme.bg.default',
+              value: '#ffffff',
+              description: 'My default token',
+              type: TokenTypes.COLOR,
+            },
+          },
+        },
+        broken: {
+          name: 'color.broken',
+          value: '{color.notfound}',
+          type: 'color',
+        },
+      },
+    },
+  }}
+/>
 
 export const TokenTreeDefaultStory = (args) => {
-  const schema = {
-    label: 'Colors',
-    property: 'color',
-    type: TokenTypes.COLOR,
-  };
-  const tokenValues = {
-    theme: {
-      bg: {
-        default: {
-          name: 'theme.bg.default',
-          value: '{colors.red.500}',
-          description: 'My default token',
-          type: TokenTypes.COLOR,
-        },
-      },
-    },
-    color: {
-      black: {
-        name: 'color.black',
-        type: TokenTypes.COLOR,
-        value: '#ffffff',
-      },
-      white: {
-        name: 'color.white',
-        type: TokenTypes.COLOR,
-        value: '#000000',
-      },
-      gray: {
-        100: {
-          name: 'color.gray.100',
-          value: '#FAFBFC',
-          type: 'color',
-        },
-        200: {
-          name: 'color.gray.200',
-          value: '#EAEEF2',
-          type: 'color',
-        },
-        300: {
-          name: 'color.gray.300',
-          value: '#D4DAE0',
-          type: 'color',
-        },
-        400: {
-          name: 'color.gray.400',
-          value: '#B7BFC7',
-          type: 'color',
-        },
-        500: {
-          name: 'color.gray.500',
-          value: '#949DA7',
-          type: 'color',
-        },
-        600: {
-          name: 'color.gray.600',
-          value: '#707A84',
-          type: 'color',
-        },
-        700: {
-          name: 'color.gray.700',
-          value: '#57606A',
-          type: 'color',
-        },
-        800: {
-          name: 'color.gray.800',
-          value: '#424A53',
-          type: 'color',
-        },
-        900: {
-          name: 'color.gray.900',
-          value: '#1B1F24',
-          type: 'color',
-        },
-      },
-      broken: {
-        name: 'color.broken',
-        value: '{color.notfound}',
-        type: 'color',
-      },
-    },
-  };
   return (
     <Provider store={store}>
-      <TokenTree tokenValues={tokenValues} schema={schema} {...args} />
+      <TokenTree {...args} />
     </Provider>
   );
 };
 
 <Canvas>
-  <Story name="TokenTree" args={{}}>
+  <Story name="TokenTreeGrid" args={{}}>
+    {TokenTreeDefaultStory.bind({})}
+  </Story>
+  <Story name="TokenTreeList" args={{displayType: 'LIST'}}>
     {TokenTreeDefaultStory.bind({})}
   </Story>
 </Canvas>

@@ -46,10 +46,6 @@
   @apply bg-opacity-75 outline-none shadow-focus-subtle;
 }
 
-.button-text {
-  @apply text-foreground px-2 py-1 flex items-center justify-start flex-shrink-0;
-}
-
 .button-property-color .button-text span {
   @apply ml-2;
 }

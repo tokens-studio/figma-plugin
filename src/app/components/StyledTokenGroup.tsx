@@ -2,9 +2,19 @@ import { styled } from '@/stitches.config';
 
 export const StyledTokenGroup = styled('div', {
   display: 'flex',
-  flexDirection: 'row',
   flexWrap: 'wrap',
   justifyContent: 'flex-start',
+  gap: '$1',
+  variants: {
+    displayType: {
+      LIST: {
+        flexDirection: 'column',
+      },
+      GRID: {
+        flexDirection: 'row',
+      },
+    },
+  },
 });
 
 export const StyledCollapsableTokenGroupHeadingButton = styled('button', {

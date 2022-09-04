@@ -147,6 +147,7 @@ export const stitchesInstance = createStitches({
       focus: `0 0 0 2px ${globalTokens.colors.primary500}`,
       'focus-subtle': `0 0 0 2px ${globalTokens.colors.primary300}`,
       'focus-muted': `0 0 0 2px ${globalTokens.colors.primary400}`,
+      tokenFocus: '0 0 0 2px $colors$borderMuted',
     },
   },
 });
