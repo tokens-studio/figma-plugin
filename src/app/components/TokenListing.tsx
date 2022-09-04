@@ -52,6 +52,7 @@ const TokenListing: React.FC<Props> = ({
 
   const showDisplayToggle = React.useMemo(() => schema.type === TokenTypes.COLOR, [schema.type]);
 
+  // TODO: Move this to state
   const handleSetIntCollapsed = React.useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
     if (e.altKey) {
@@ -69,7 +70,7 @@ const TokenListing: React.FC<Props> = ({
   if (!values && !showEmptyGroups) return null;
 
   return (
-    <div className="border-b border-border-muted" data-cy={`tokenlisting-${tokenKey}`}>
+    <Box css={{ borderBottom: '1px solid $borderMuted' }} data-cy={`tokenlisting-${tokenKey}`}>
       <TokenListingHeading onCollapse={handleSetIntCollapsed} showDisplayToggle={showDisplayToggle} tokenKey={tokenKey} label={label} isPro={isPro} showNewForm={showNewForm} isCollapsed={collapsedTokenTypeObj[tokenKey as TokenTypes]} />
       {values && (
         <DndProvider backend={HTML5Backend}>
@@ -90,7 +91,7 @@ const TokenListing: React.FC<Props> = ({
           </Box>
         </DndProvider>
       )}
-    </div>
+    </Box>
   );
 };
 
