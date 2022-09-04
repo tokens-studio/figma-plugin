@@ -106,7 +106,7 @@ export const tokensForStories = {
         bg: {
           default: {
             name: 'theme.bg.default',
-            value: '#ffffff',
+            value: '{colors.gray.100}',
             description: 'My default token',
             type: TokenTypes.COLOR,
           },

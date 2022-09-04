@@ -51,6 +51,7 @@ const StyledTokenButton = styled('button', {
       displayType: 'GRID',
       tokenType: TokenTypes.COLOR,
       css: {
+        borderRadius: '$full',
         [`& ${StyledTokenButtonText}`]: {
           padding: 0,
         },
@@ -62,9 +63,10 @@ const StyledTokenButton = styled('button', {
       [TokenTypes.COLOR]: {
         borderRadius: '$full',
         backgroundColor: 'transparent',
-        '&:focus': {
+        '&:hover, &:focus': {
           outline: 'none',
           boxShadow: '$tokenFocus',
+          backgroundColor: 'transparent',
         },
         [`& ${StyledTokenButtonText}::before`]: {
           width: '$6',
