@@ -1,7 +1,6 @@
 import React from 'react';
 import { SingleToken } from '@/types/tokens';
 import { MoreButton } from '../MoreButton';
-import { usePropertiesForTokenType } from '../../hooks/usePropertiesForType';
 import { TokenTypes } from '@/constants/TokenTypes';
 
 import { DragOverItem } from './DragOverItem';
@@ -28,30 +27,24 @@ export const TokenButton: React.FC<Props> = ({
   dragOverToken,
   setDraggedToken,
   setDragOverToken,
-}) => {
-  const properties = usePropertiesForTokenType(type);
-  // @TODO check type property typing
-
-  return (
-    <DraggableWrapper
+}) => (
+  <DraggableWrapper
+    token={token}
+    dragOverToken={dragOverToken}
+    draggedToken={draggedToken}
+    setDragOverToken={setDragOverToken}
+    setDraggedToken={setDraggedToken}
+  >
+    {/* TODO: We should restructure and rename MoreButton as it's only ever used in TokenButton */}
+    <MoreButton
       token={token}
-      dragOverToken={dragOverToken}
+      type={type}
+      showForm={showForm}
+    />
+    <DragOverItem
+      token={token}
       draggedToken={draggedToken}
-      setDragOverToken={setDragOverToken}
-      setDraggedToken={setDraggedToken}
-    >
-      {/* TODO: We should restructure and rename MoreButton as it's only ever used in TokenButton */}
-      <MoreButton
-        properties={properties}
-        token={token}
-        type={type}
-        showForm={showForm}
-      />
-      <DragOverItem
-        token={token}
-        draggedToken={draggedToken}
-        dragOverToken={dragOverToken}
-      />
-    </DraggableWrapper>
-  );
-};
+      dragOverToken={dragOverToken}
+    />
+  </DraggableWrapper>
+);

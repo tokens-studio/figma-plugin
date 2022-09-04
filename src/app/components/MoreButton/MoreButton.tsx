@@ -29,6 +29,7 @@ import useManageTokens from '@/app/store/useManageTokens';
 import { EditTokenFormStatus } from '@/constants/EditTokenFormStatus';
 import TokenButtonContent from '../TokenButton/TokenButtonContent';
 import { useGetActiveState } from '@/hooks';
+import { usePropertiesForTokenType } from '../../hooks/usePropertiesForType';
 
 const RightSlot = styled('div', {
   marginLeft: 'auto',
@@ -41,14 +42,12 @@ const RightSlot = styled('div', {
 // @TODO typing
 
 type Props = {
-  properties: PropertyObject[];
   token: SingleToken;
   type: TokenTypes,
   showForm: (options: ShowFormOptions) => void;
 };
 
 export const MoreButton: React.FC<Props> = ({
-  properties,
   token,
   type,
   showForm,
@@ -59,7 +58,8 @@ export const MoreButton: React.FC<Props> = ({
   const editProhibited = useSelector(editProhibitedSelector);
   const activeTokenSet = useSelector(activeTokenSetSelector);
   const { deleteSingleToken } = useManageTokens();
-
+  const properties = usePropertiesForTokenType(type);
+  // @TODO check type property typing
   const visibleProperties = React.useMemo(() => (
     properties.filter((p) => p.label)
   ), [properties]);
