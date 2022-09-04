@@ -20,6 +20,7 @@ import ImportedTokensDialog from '../ImportedTokensDialog';
 import PushDialog from '../PushDialog';
 import Changelog from '../Changelog';
 import { Initiator } from '../Initiator';
+import { globalStyles } from '../globalStyles';
 
 type Props = StartupMessage & {
   // @README only for unit testing purposes
@@ -70,6 +71,8 @@ export const AppContainer = withLDProviderWrapper((params: Props) => {
   useEffect(() => {
     handlePerformStartup();
   }, [handlePerformStartup]);
+
+  globalStyles();
 
   return (
     <>

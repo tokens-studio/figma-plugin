@@ -111,9 +111,7 @@ export default function Footer() {
               <Text muted>Sync</Text>
               {storageType.provider === StorageProviderType.JSONBIN && (
                 <Tooltip label={`Go to ${transformProviderName(storageType.provider)}`}>
-                  <a href={projectURL} target="_blank" rel="noreferrer" className="block button button-ghost">
-                    <IconLibrary />
-                  </a>
+                  <IconButton icon={<IconLibrary />} href={projectURL} />
                 </Tooltip>
               )}
               <IconButton
