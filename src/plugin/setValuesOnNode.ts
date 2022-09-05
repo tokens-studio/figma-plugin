@@ -100,8 +100,11 @@ export default async function setValuesOnNode(
                 // Non-local style matches - use this and clear style id backup:
                 matchingStyleId = nonLocalStyle.id;
                 clearStyleIdBackup(node, styleIdBackupKey);
-              } else {
-                // Non-local style does NOT match - backup up style id before overwrting with token values:
+              } else if (pathname === nonLocalStyle.name) {
+                // Non-local style does NOT match, but style name and token path does,
+                // so we assume selected token value is an override (e.g. dark theme)
+                // Now backup up style id before overwriting with raw token value, so we
+                // can re-link the non-local style, when the token value matches again:
                 setStyleIdBackup(node, styleIdBackupKey, nonLocalStyle.id);
               }
             }
@@ -200,8 +203,11 @@ export default async function setValuesOnNode(
                 // Non-local style matches - use this and clear style id backup:
                 matchingStyleId = nonLocalStyle.id;
                 clearStyleIdBackup(node, styleIdBackupKey);
-              } else {
-                // Non-local style does NOT match - backup up style id before overwrting with token values:
+              } else if (pathname === nonLocalStyle.name) {
+                // Non-local style does NOT match, but style name and token path does,
+                // so we assume selected token value is an override (e.g. dark theme)
+                // Now backup up style id before overwriting with raw token value, so we
+                // can re-link the non-local style, when the token value matches again:
                 setStyleIdBackup(node, styleIdBackupKey, nonLocalStyle.id);
               }
             }
@@ -234,8 +240,11 @@ export default async function setValuesOnNode(
                 // Non-local style matches - use this and clear style id backup:
                 matchingStyleId = nonLocalStyle.id;
                 clearStyleIdBackup(node, styleIdBackupKey);
-              } else {
-                // Non-local style does NOT match - backup up style id before overwrting with token values:
+              } else if (pathname === nonLocalStyle.name) {
+                // Non-local style does NOT match, but style name and token path does,
+                // so we assume selected token value is an override (e.g. dark theme)
+                // Now backup up style id before overwriting with raw token value, so we
+                // can re-link the non-local style, when the token value matches again:
                 setStyleIdBackup(node, styleIdBackupKey, nonLocalStyle.id);
               }
             }
@@ -293,8 +302,11 @@ export default async function setValuesOnNode(
                 // Non-local style matches - use this and clear style id backup:
                 matchingStyleId = nonLocalStyle.id;
                 clearStyleIdBackup(node, styleIdBackupKey);
-              } else {
-                // Non-local style does NOT match - backup up style id before overwrting with token values:
+              } else if (pathname === nonLocalStyle.name) {
+                // Non-local style does NOT match, but style name and token path does,
+                // so we assume selected token value is an override (e.g. dark theme)
+                // Now backup up style id before overwriting with raw token value, so we
+                // can re-link the non-local style, when the token value matches again:
                 setStyleIdBackup(node, styleIdBackupKey, nonLocalStyle.id);
               }
             }
