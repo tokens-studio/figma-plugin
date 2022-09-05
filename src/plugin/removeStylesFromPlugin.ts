@@ -3,12 +3,12 @@ import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { DeleteTokenPayload } from '@/types/payloads';
 import { convertTokenNameToPath } from '@/utils/convertTokenNameToPath';
-import { matchStyleName } from '@/utils/matchStyleName';
+import { isMatchingStyle } from '@/utils/is/isMatchingStyle';
 
 export default async function removeStylesFromPlugin(
   token: DeleteTokenPayload,
   settings: Partial<SettingsState> = {},
-): Promise<Record<string, string>> {
+) {
   const effectStyles = figma.getLocalEffectStyles();
   const paintStyles = figma.getLocalPaintStyles();
   const textStyles = figma.getLocalTextStyles();
@@ -28,15 +28,10 @@ export default async function removeStylesFromPlugin(
     : null;
 
   const pathname = convertTokenNameToPath(token.path, stylePathPrefix, stylePathSlice);
-  const matchingStyleId = matchStyleName(
-    token.path,
-    pathname,
-    activeThemeObject?.$figmaStyleReferences ?? {},
-    figmaStyleMaps,
-  );
 
-  if (matchingStyleId) {
-    figma.getStyleById(matchingStyleId)?.remove();
-  }
-  return matchingStyleId ? { [token.path]: matchingStyleId } : {};
+  allStyles.forEach((style) => {
+    if (isMatchingStyle(token.path, pathname, activeThemeObject?.$figmaStyleReferences ?? {}, figmaStyleMaps)) {
+      style.remove();
+    }
+  });
 }

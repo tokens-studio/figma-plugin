@@ -28,7 +28,8 @@ describe('removeStyleIdsFromCurrentTheme', () => {
       models,
     });
     await store.dispatch.tokenState.removeStyleIdsFromCurrentTheme({
-      'colors.red': 'S:0283',
+      path: 'colors.red',
+      parent: 'global',
     });
     const { themes } = store.getState().tokenState;
     expect(themes).toEqual([{
@@ -62,7 +63,8 @@ describe('removeStyleIdsFromCurrentTheme', () => {
       models,
     });
     await store.dispatch.tokenState.removeStyleIdsFromCurrentTheme({
-      'colors.red': 'S:0283',
+      path: 'colors.red',
+      parent: 'global',
     });
     const { themes } = store.getState().tokenState;
     expect(themes).toEqual([{
