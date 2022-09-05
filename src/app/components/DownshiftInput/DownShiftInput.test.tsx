@@ -91,7 +91,7 @@ describe('DownShiftInput', () => {
     });
   });
 
-  it('should return matching tokens', () => {
+  it('should return color tokens when type is color', () => {
     const result = render(
       <DownshiftInput
         type="color"
@@ -105,5 +105,20 @@ describe('DownShiftInput', () => {
     result.getByTestId('downshift-input-suffix-button').click();
     expect(result.getByText('#e2e8f0')).toBeInTheDocument();
     expect(result.getByText('#cbd5e1')).toBeInTheDocument();
+  });
+
+  it('should return all tokens when type is documentation type', () => {
+    const result = render(
+      <DownshiftInput
+        type="tokenName"
+        resolvedTokens={resolvedTokens}
+        setInputValue={mockSetInputValue}
+        handleChange={mockHandleChange}
+        value="{"
+        suffix
+      />,
+    );
+    result.getByTestId('downshift-input-suffix-button').click();
+    expect(result.getAllByTestId('downshift-input-item')).toHaveLength(7);
   });
 });

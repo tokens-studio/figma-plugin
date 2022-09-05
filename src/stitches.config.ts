@@ -55,6 +55,7 @@ export const stitchesInstance = createStitches({
       contextMenuForegroundMuted: 'var(--figma-color-text-menu-secondary)',
       contextMenuForegroundDisabled: 'var(--figma-color-text-menu-disabled)',
       contextMenuSeperator: 'var(--figma-color-border-menu)',
+      contextMenuBorder: 'var(--figma-color-border-menu)',
       loadingScreenFg: '#FFFFFF',
       loadingScreenFgMuted: '#CECECE',
       loadingScreenBg: '#141414',
@@ -64,6 +65,7 @@ export const stitchesInstance = createStitches({
       textSubtle: 'var(--figma-color-text-tertiary)',
       textDisabled: 'var(--figma-color-text-disabled)',
       fgSubtle: 'var(--figma-color-text-secondary)',
+      fgAccent: 'var(--figma-color-text-brand)',
       bgSubtle: 'var(--figma-color-bg-secondary)',
       bgAccent: 'var(--figma-color-bg-selected)',
       bgAccentHover: 'var(--figma-color-bg-selected-hover)',
@@ -92,6 +94,11 @@ export const stitchesInstance = createStitches({
       bgToolTip: 'var(--figma-color-bg-tooltip)',
       fgToolTip: 'var(--figma-color-text-tooltip)',
       fgToolTipMuted: 'var(--figma-color-text-tooltip-secondary)',
+      bgOnDarkSubtle: '#2B2A2A',
+      bgOnDarkAccentSubtle: '#1F3D68',
+      fgOnDarkAccent: '#A0C0EF',
+      bgOnDarkDangerSubtle: '#422B2B',
+      fgOnDarkDanger: '#E05534',
       fgSuccess: 'var(--figma-color-text-success)',
       bgSuccess: 'var(--figma-color-bg-success-tertiary)',
       fgDanger: 'var(--figma-color-text-danger)',
@@ -145,9 +152,9 @@ export const stitchesInstance = createStitches({
 });
 
 const {
-  styled, css, keyframes, theme,
+  styled, css, keyframes, theme, globalCss,
 } = stitchesInstance;
 
 export {
-  styled, css, keyframes, theme,
+  styled, css, keyframes, theme, globalCss,
 };

@@ -2,6 +2,7 @@ import setTextValuesOnTarget from './setTextValuesOnTarget';
 
 describe('setTextValuesOnTarget', () => {
   let textNodeMock;
+  const loadFontAsyncSpy = jest.spyOn(figma, 'loadFontAsync');
 
   beforeEach(() => {
     textNodeMock = {
@@ -35,6 +36,25 @@ describe('setTextValuesOnTarget', () => {
     expect(textNodeMock).toEqual({ ...textNodeMock, fontName: { ...textNodeMock.fontName, style: 'Bold' } });
   });
 
+  it('converts a numerical fontWeight and sets to the node', async () => {
+    loadFontAsyncSpy.mockImplementationOnce(() => (
+      Promise.reject()
+    ));
+    loadFontAsyncSpy.mockImplementation(() => (
+      Promise.resolve()
+    ));
+    await setTextValuesOnTarget(textNodeMock, { value: { fontWeight: '500' } });
+    expect(textNodeMock).toEqual({ ...textNodeMock, fontName: { ...textNodeMock.fontName, style: 'Medium' } });
+  });
+
+  it('can\'t set number fontWeight to the node if there is no matching fontWeight', async () => {
+    loadFontAsyncSpy.mockImplementation(() => (
+      Promise.reject()
+    ));
+    await setTextValuesOnTarget(textNodeMock, { value: { fontWeight: '500' } });
+    expect(textNodeMock).toEqual({ ...textNodeMock, fontName: { ...textNodeMock.fontName } });
+  });
+
   it('sets textCase, textDecoration and description if those are given', async () => {
     await setTextValuesOnTarget(textNodeMock, {
       description: 'Use with care',
@@ -45,6 +65,25 @@ describe('setTextValuesOnTarget', () => {
       description: 'Use with care',
       textDecoration: 'STRIKETHROUGH',
       textCase: 'TITLE',
+    });
+  });
+
+  it('it throws error, when there is no value in token', async () => {
+    await setTextValuesOnTarget(textNodeMock, {
+      description: 'Use with care',
+    });
+    expect(textNodeMock).toEqual({
+      ...textNodeMock,
+    });
+  });
+
+  it('it does nothing when the type of value is string', async () => {
+    await setTextValuesOnTarget(textNodeMock, {
+      description: 'Use with care',
+      value: 'string',
+    });
+    expect(textNodeMock).toEqual({
+      ...textNodeMock,
     });
   });
 });

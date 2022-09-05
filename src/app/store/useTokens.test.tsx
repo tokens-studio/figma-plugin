@@ -13,6 +13,7 @@ import { createStyles, removeStyles } from '@/plugin/asyncMessageHandlers';
 import { AllTheProviders, createMockStore, resetStore } from '../../../tests/config/setupTest';
 import { store } from '../store';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
+import { UpdateMode } from '@/constants/UpdateMode';
 
 type GetFormattedTokensOptions = {
   includeAllTokens: boolean;
@@ -262,6 +263,23 @@ describe('useToken test', () => {
       await result.current.pullStyles();
     });
     await expect(result.current.pullStyles()).resolves.not.toThrow();
+  });
+
+  it('handleRemap test', async () => {
+    const messageSpy = jest.spyOn(AsyncMessageChannel.ReactInstance, 'message');
+    await act(async () => {
+      await result.current.handleRemap(TokenTypes.SIZING, 'sizing.small', 'sizing.sm', [{ name: 'sizing.small', value: 3, type: TokenTypes.SIZING }]);
+    });
+
+    expect(messageSpy).toBeCalledWith({
+      type: AsyncMessageTypes.REMAP_TOKENS,
+      category: TokenTypes.SIZING,
+      oldName: 'sizing.small',
+      newName: 'sizing.sm',
+      updateMode: UpdateMode.SELECTION,
+      tokens: [{ name: 'sizing.small', value: 3, type: TokenTypes.SIZING }],
+      settings: store.getState().settings,
+    });
   });
 
   describe('create or remove styles From Tokens', () => {
