@@ -348,13 +348,13 @@ describe('remoteTokens', () => {
   });
 
   it('Pull tokens from JSONbin, should return error message when secret is not defined', async () => {
-    const jsonbinContextWithoutId = {
+    const jsonbinContextWithoutSecret = {
       name: 'six7',
       id: 'six7/figma-tokens',
       provider: 'jsonbin',
     };
-    await result.current.pullTokens({ context: jsonbinContextWithoutId as StorageTypeCredentials });
-    expect(await result.current.pullTokens({ context: jsonbinContextWithoutId as StorageTypeCredentials })).toEqual({
+    await result.current.pullTokens({ context: jsonbinContextWithoutSecret as StorageTypeCredentials });
+    expect(await result.current.pullTokens({ context: jsonbinContextWithoutSecret as StorageTypeCredentials })).toEqual({
       status: 'failure',
       errorMessage: ErrorMessages.ID_NON_EXIST_ERROR,
     });
@@ -648,14 +648,14 @@ describe('remoteTokens', () => {
     });
   });
 
-  it('Add newProviderItem to JSONbin, should return error message when ID is not defined', async () => {
-    const jsonbinContextWithoutId = {
+  it('Add newProviderItem to JSONbin, should return error message when secret is not defined', async () => {
+    const jsonbinContextWithoutSecret = {
       name: 'six7',
       id: 'six7/figma-tokens',
       provider: 'jsonbin',
     };
-    await waitFor(() => { result.current.addNewProviderItem(jsonbinContextWithoutId as StorageTypeCredentials); });
-    expect(await result.current.addNewProviderItem(jsonbinContextWithoutId as StorageTypeCredentials)).toEqual({
+    await waitFor(() => { result.current.addNewProviderItem(jsonbinContextWithoutSecret as StorageTypeCredentials); });
+    expect(await result.current.addNewProviderItem(jsonbinContextWithoutSecret as StorageTypeCredentials)).toEqual({
       status: 'failure',
       errorMessage: ErrorMessages.ID_NON_EXIST_ERROR,
     });
@@ -717,5 +717,9 @@ describe('remoteTokens', () => {
       Promise.resolve(null)
     ));
     expect(await result.current.fetchTokensFromFileOrDirectory(files as unknown as FileList)).toEqual(null);
+  });
+
+  it('Read tokens from File, should return null if there is no file', async () => {
+    expect(await result.current.fetchTokensFromFileOrDirectory(null)).toEqual(null);
   });
 });

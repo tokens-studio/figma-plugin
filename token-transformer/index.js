@@ -100,7 +100,7 @@ const getAllFiles = function(dirPath, arrayOfFiles) {
     }
   })
 
-  return arrayOfFiles
+  return arrayOfFiles.filter(file => file.endsWith('.json'))
 }
 
 const getTokens = async (input) => {

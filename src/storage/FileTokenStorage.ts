@@ -1,10 +1,11 @@
 import compact from 'just-compact';
 import {
-  RemoteTokenStorage, RemoteTokenstorageErrorMessage, RemoteTokenStorageFile, RemoteTokenStorageSingleTokenSetFile, RemoteTokenStorageThemesFile,
+  RemoteTokenStorage, RemoteTokenstorageErrorMessage, RemoteTokenStorageFile, RemoteTokenStorageMetadata, RemoteTokenStorageSingleTokenSetFile, RemoteTokenStorageThemesFile,
 } from './RemoteTokenStorage';
 import IsJSONString from '@/utils/isJSONString';
 import { complexSingleFileSchema, multiFileSchema } from './schemas';
 import { ErrorMessages } from '@/constants/ErrorMessages';
+import { SystemFilenames } from '@/constants/SystemFilenames';
 
 type StorageFlags = {
   multiFileEnabled: boolean
@@ -56,12 +57,20 @@ export class FileTokenStorage extends RemoteTokenStorage {
           const { webkitRelativePath } = jsonFiles[index];
           if (fileContent) {
             const name = webkitRelativePath?.substring(webkitRelativePath.indexOf('/') + 1)?.replace('.json', '');
-            if (name === '$themes' && Array.isArray(fileContent)) {
+            if (name === SystemFilenames.THEMES && Array.isArray(fileContent)) {
               return {
                 path: webkitRelativePath,
                 type: 'themes',
                 data: fileContent,
               } as RemoteTokenStorageThemesFile;
+            }
+
+            if (name === SystemFilenames.METADATA) {
+              return {
+                path: webkitRelativePath,
+                type: 'metadata',
+                data: fileContent as RemoteTokenStorageMetadata,
+              };
             }
 
             if (!Array.isArray(fileContent)) {
@@ -87,13 +96,20 @@ export class FileTokenStorage extends RemoteTokenStorage {
               const parsedJsonData = JSON.parse(result);
               const validationResult = await complexSingleFileSchema.safeParseAsync(parsedJsonData);
               if (validationResult.success) {
-                const { $themes = [], ...data } = validationResult.data;
+                const { $themes = [], $metadata, ...data } = validationResult.data;
                 resolve([
                   {
                     type: 'themes',
                     path: this.files[0].name,
                     data: Array.isArray($themes) ? $themes : [],
                   },
+                  ...($metadata ? [
+                    {
+                      type: 'metadata' as const,
+                      path: this.files[0].name,
+                      data: $metadata,
+                    },
+                  ] : []),
                   ...Object.entries(data).map<RemoteTokenStorageFile>(([name, tokenSet]) => ({
                     name,
                     type: 'tokenSet',

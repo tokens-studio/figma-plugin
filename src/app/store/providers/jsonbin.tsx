@@ -17,6 +17,7 @@ import { StorageTypeCredentials, StorageTypeFormValues } from '@/types/StorageTy
 import { RemoteResponseData } from '@/types/RemoteResponseData';
 import { ErrorMessages } from '@/constants/ErrorMessages';
 import { saveLastSyncedState } from '@/utils/saveLastSyncedState';
+import { applyTokenSetOrder } from '@/utils/tokenset';
 
 export async function updateJSONBinTokens({
   tokens, themes, context, updatedAt, oldUpdatedAt = null,
@@ -31,6 +32,7 @@ export async function updateJSONBinTokens({
       tokens,
       themes,
       metadata: {
+        tokenSetOrder: Object.keys(tokens),
         updatedAt: updatedAt ?? new Date().toISOString(),
         version: pjs.plugin_version,
       },
@@ -45,23 +47,26 @@ export async function updateJSONBinTokens({
           errorMessage: remoteTokens?.errorMessage,
         };
       }
+
       const comparison = await compareUpdatedAt(oldUpdatedAt, remoteTokens?.metadata?.updatedAt ?? '');
       if (comparison === 'remote_older') {
-        storage.save(payload);
+        if (await storage.save(payload)) {
+          return payload;
+        }
       } else {
         // Tell the user to choose between:
         // A) Pull Remote values and replace local changes
         // B) Overwrite Remote changes
         notifyToUI('Error updating tokens as remote is newer, please update first', { error: true });
       }
-    } else {
-      storage.save(payload);
+    } else if (await storage.save(payload)) {
+      return payload;
     }
   } catch (e) {
     console.log('Error updating jsonbin', e);
   }
 
-  return undefined;
+  return null;
 }
 
 export function useJSONbin() {
@@ -77,7 +82,7 @@ export function useJSONbin() {
     const updatedAt = new Date().toISOString();
     const result = await JSONBinTokenStorage.create(name, updatedAt, secret);
     if (result) {
-      updateJSONBinTokens({
+      await updateJSONBinTokens({
         tokens,
         context: {
           id: result.metadata.id,
@@ -189,9 +194,9 @@ export function useJSONbin() {
         },
         shouldSetInDocument: true,
       });
-      saveLastSyncedState(dispatch, content.tokens, content.themes, {});
+      saveLastSyncedState(dispatch, content.tokens, content.themes, content.metadata);
       dispatch.tokenState.setTokenData({
-        values: content.tokens,
+        values: applyTokenSetOrder(content.tokens, content.metadata?.tokenSetOrder),
         themes: content.themes,
         usedTokenSet: usedTokenSets,
         activeTheme,

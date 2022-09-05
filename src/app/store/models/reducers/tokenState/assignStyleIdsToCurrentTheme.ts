@@ -15,7 +15,7 @@ export function assignStyleIdsToCurrentTheme(state: TokenState, styleIds: Record
   const updatedThemes = [...state.themes];
   updatedThemes.splice(themeObjectIndex, 1, {
     ...state.themes[themeObjectIndex],
-    $figmaStyleReferences: { ...styleIds },
+    $figmaStyleReferences: { ...state.themes[themeObjectIndex].$figmaStyleReferences, ...styleIds },
   });
 
   return {
