@@ -15,12 +15,13 @@ import { TokenTypes } from '@/constants/TokenTypes';
 import { Properties } from '@/constants/Properties';
 import { SelectionGroup } from '@/types';
 import { NodeInfo } from '@/types/NodeInfo';
+import BulkRemapModal from './modals/BulkRemapModal';
 
 export default function InspectorMultiView({ resolvedTokens }: { resolvedTokens: SingleToken[] }) {
   const inspectState = useSelector(inspectStateSelector, isEqual);
   const uiState = useSelector(uiStateSelector, isEqual);
   const { removeTokensByValue } = useTokens();
-
+  const [bulkRemapModalVisible, setShowBulkRemapModalVisible] = React.useState(false);
   const dispatch = useDispatch<Dispatch>();
 
   React.useEffect(() => {
@@ -59,6 +60,14 @@ export default function InspectorMultiView({ resolvedTokens }: { resolvedTokens:
     removeTokensByValue(valuesToRemove);
   }, [inspectState.selectedTokens, removeTokensByValue, uiState.selectionValues]);
 
+  const handleShowBulkRemap = React.useCallback(() => {
+    setShowBulkRemapModalVisible(true);
+  }, [bulkRemapModalVisible]);
+
+  const handleHideBulkRemap = React.useCallback(() => {
+    setShowBulkRemapModalVisible(false);
+  }, [bulkRemapModalVisible]);
+
   return (
     <Box
       css={{
@@ -91,11 +100,23 @@ export default function InspectorMultiView({ resolvedTokens }: { resolvedTokens:
                 Select all
               </Label>
             </Box>
-            <Button onClick={() => removeTokens()} disabled={inspectState.selectedTokens.length === 0} variant="secondary">
-              Remove selected
-            </Button>
+            <Box css={{ display: 'flex', flexDirection: 'row', gap: '$1' }}>
+              <Button onClick={handleShowBulkRemap} variant="secondary">
+                Bulk remap
+              </Button>
+              <Button onClick={() => removeTokens()} disabled={inspectState.selectedTokens.length === 0} variant="secondary">
+                Remove selected
+              </Button>
+            </Box>
           </Box>
           {Object.entries(groupedSelectionValues).map((group) => <InspectorTokenGroup key={`inspect-group-${group[0]}`} group={group as [Properties, SelectionGroup[]]} resolvedTokens={resolvedTokens} />)}
+          {bulkRemapModalVisible && (
+            <BulkRemapModal
+              isOpen={bulkRemapModalVisible}
+              onClose={handleHideBulkRemap}
+            />
+          )}
+
         </Box>
       ) : (
         <Blankslate title={uiState.selectedLayers > 0 ? 'No tokens found' : 'No layers selected'} text={uiState.selectedLayers > 0 ? 'None of the selected layers contain any tokens' : 'Select a layer to see applied tokens'} />
