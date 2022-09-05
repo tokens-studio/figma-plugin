@@ -199,7 +199,7 @@ const mockConfirm = jest.fn();
 const mockPullStylesHandler = jest.fn(async () => {});
 const mockRemapTokensHandler = jest.fn(async () => {});
 const mockRemoveTokensByValueHandler = jest.fn(async () => {});
-
+const mockRenameStylesHandler = jest.fn(async () => {});
 jest.mock('../hooks/useConfirm', () => ({
   __esModule: true,
   default: () => ({
@@ -264,7 +264,7 @@ describe('useToken test', () => {
     await expect(result.current.pullStyles()).resolves.not.toThrow();
   });
 
-  describe('createStylesFromTokens', () => {
+  describe('styles from tokens', () => {
     const tokenMockStore = createMockStore({
       tokenState: {
         usedTokenSet: { global: TokenSetStatus.ENABLED, light: TokenSetStatus.ENABLED },
@@ -291,6 +291,7 @@ describe('useToken test', () => {
     AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.REMOVE_TOKENS_BY_VALUE, mockRemoveTokensByValueHandler);
     AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.REMAP_TOKENS, mockRemapTokensHandler);
     AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.PULL_STYLES, mockPullStylesHandler);
+    AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.RENAME_STYLES, mockRenameStylesHandler);
     AsyncMessageChannel.ReactInstance.handle(AsyncMessageTypes.GET_THEME_INFO, async (): Promise<GetThemeInfoMessageResult> => ({
       type: AsyncMessageTypes.GET_THEME_INFO,
       activeTheme: null,
@@ -370,6 +371,18 @@ describe('useToken test', () => {
           },
         },
         ],
+        settings: store.getState().settings,
+      });
+    });
+    it('rename styles from current theme', async () => {
+      await act(async () => {
+        await result.current.renameStylesFromTokens('old', 'new');
+      });
+
+      expect(messageSpy).toBeCalledWith({
+        type: AsyncMessageTypes.RENAME_STYLES,
+        oldName: 'old',
+        newName: 'new',
         settings: store.getState().settings,
       });
     });
