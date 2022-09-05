@@ -101,7 +101,7 @@ describe('Branch switcher', () => {
     cy.get('[data-cy=branch-selector-create-new-branch-from-current-change]').click();
     cy.get('input[name=branch]').type('new-branch');
     cy.get('button[type=submit]').click();
-    cy.get('[name="commitMessage"]').type('push changes');
+    cy.get('[data-cy=push-dialog-commit-message]').type('push changes');
     cy.get('button[type=submit]').click();
     cy.get('[data-cy=push-dialog-success-heading]').should('have.length', 1);
   });
@@ -133,7 +133,7 @@ describe('Branch switcher', () => {
       },
     });
     cy.get('[data-cy=footer-push-button]').click();
-    cy.get('[name="commitMessage"]').type('push changes');
+    cy.get('[data-cy=push-dialog-commit-message]').type('push changes');
     cy.get('button[type=submit]').click();
     cy.get('[data-cy=push-dialog-success-heading]').should('have.length', 1);
   });

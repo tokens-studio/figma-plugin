@@ -98,11 +98,12 @@ function ConfirmDialog() {
                 </div>
                 <Heading size="medium">Commit message</Heading>
                 <Textarea
+                  id="push-dialog-commit-message"
+                  border
                   rows={3}
                   value={commitMessage}
                   onChange={handleCommitMessageChange}
                   placeholder="Enter commit message"
-                  css={{ border: '1px solid $borderMuted' }}
                 />
                 <Input
                   full
