@@ -1,6 +1,5 @@
 import React from 'react';
 import Modal from '../Modal';
-import Heading from '../Heading';
 import Button from '../Button';
 import Stack from '../Stack';
 import Input from '../Input';
@@ -28,24 +27,19 @@ export default function BulkRemapModal({ isOpen, onClose }: Props) {
   const handleOldNameChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>((e) => {
     e.persist();
     setOldName(e.target.value);
-  }, [oldName]);
+  }, []);
 
   const handleNewNameChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>((e) => {
     e.persist();
     setNewName(e.target.value);
-  }, [newName]);
+  }, []);
 
   return (
-    <Modal large isOpen={isOpen} close={handleClose}>
+    <Modal large showClose isOpen={isOpen} close={handleClose} title="Choose a new token for">
       <form
         onSubmit={onConfirm}
       >
-        <Stack direction="column" gap={4} css={{ minHeight: '215px', justifyContent: 'center' }}>
-          <Stack direction="column" gap={2}>
-            <Heading>
-              Choose a new token for
-            </Heading>
-          </Stack>
+        <Stack direction="column" gap={4}>
           <Input
             full
             required
