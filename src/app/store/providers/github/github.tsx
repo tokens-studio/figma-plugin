@@ -117,11 +117,11 @@ export function useGitHub() {
           themes,
         };
       } catch (e) {
-        console.log('Error pushing to GitHub', e);
         closeDialog();
+        console.log('Error pushing to GitHub', e);
         return {
           status: 'failure',
-          errorMessage: ErrorMessages.GITHUB_CREDENTIAL_ERROR,
+          errorMessage: e === ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR ? ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR : ErrorMessages.GITHUB_CREDENTIAL_ERROR,
         };
       }
     }

@@ -48,7 +48,7 @@ export function useGitLab() {
   const dispatch = useDispatch<Dispatch>();
 
   const { confirm } = useConfirm();
-  const { pushDialog } = usePushDialog();
+  const { pushDialog, closeDialog } = usePushDialog();
 
   const storageClientFactory = useCallback(clientFactory, []);
 
@@ -123,10 +123,11 @@ export function useGitLab() {
           metadata: {},
         };
       } catch (e) {
+        closeDialog();
         console.log('Error pushing to GitLab', e);
         return {
           status: 'failure',
-          errorMessage: ErrorMessages.GITLAB_CREDENTIAL_ERROR,
+          errorMessage: e === ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR ? ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR : ErrorMessages.GITLAB_CREDENTIAL_ERROR,
         };
       }
     }
