@@ -209,8 +209,8 @@ describe('MoreButton', () => {
         paddingLeft: 'delete',
         paddingRight: 'delete',
       },
-      tokens: [],
-      settings: { ...store.getState().settings, tokens: tokensContextStore.resolvedTokens },
+      tokens: tokensContextStore.resolvedTokens,
+      settings: { ...store.getState().settings },
     });
   });
 });
