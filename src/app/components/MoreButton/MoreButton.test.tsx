@@ -5,7 +5,6 @@ import { createMockStore, fireEvent, render } from '../../../../tests/config/set
 import { MoreButton } from './MoreButton';
 import { SingleToken } from '@/types/tokens';
 import { EditTokenFormStatus } from '@/constants/EditTokenFormStatus';
-import { TokensContext } from '@/context';
 
 const mockShowForm = jest.fn();
 const mockDeleteToken = jest.fn();
@@ -21,17 +20,6 @@ const token: SingleToken = {
   value: '16',
   name: 'my-large-token',
   type: TokenTypes.SPACING,
-};
-
-const tokensContextStore: { resolvedTokens: SingleToken[] } = {
-  resolvedTokens: [{
-    name: 'my-comp-token',
-    value: {
-      paddingLeft: 'my-large-token',
-      paddingRight: 'my-large-token',
-    },
-    type: TokenTypes.COMPOSITION,
-  }],
 };
 
 describe('MoreButton', () => {
@@ -150,41 +138,6 @@ describe('MoreButton', () => {
     await fireEvent.contextMenu(result.getByText(token.name));
     await fireEvent.click(result.getByText('Gap'));
     expect(mockSetNodeData).toHaveBeenCalledWith({ itemSpacing: 'delete' }, []);
-  });
-
-  it('should clear composition tokens', async () => {
-    const mockStore = createMockStore({
-      uiState: {
-        mainNodeSelectionValues: {
-          composition: 'my-comp-token',
-        },
-      },
-    });
-
-    const result = render(
-      <TokensContext.Provider value={tokensContextStore}>
-        <Provider store={mockStore}>
-          <MoreButton
-            type={TokenTypes.COMPOSITION}
-            showForm={mockShowForm}
-            token={{
-              name: 'my-comp-token',
-              value: {
-                paddingLeft: 'my-large-token',
-                paddingRight: 'my-large-token',
-              },
-              type: TokenTypes.COMPOSITION,
-            }}
-          />
-        </Provider>
-      </TokensContext.Provider>,
-    );
-    await fireEvent.click(result.getByText('my-comp-token'));
-    expect(mockSetNodeData).toHaveBeenCalledWith({
-      composition: 'delete',
-      paddingLeft: 'delete',
-      paddingRight: 'delete',
-    }, tokensContextStore.resolvedTokens);
   });
 
   it('should remove other properties if a main one is given', async () => {

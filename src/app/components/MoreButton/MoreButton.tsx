@@ -1,7 +1,6 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { ChevronRightIcon } from '@radix-ui/react-icons';
-import extend from 'just-extend';
 import { styled } from '@/stitches.config';
 import {
   ContextMenu,
@@ -23,8 +22,6 @@ import { TokensContext } from '@/context';
 import { SelectionValue, ShowFormOptions } from '@/types';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
 import { track } from '@/utils/analytics';
-import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
-import { CompositionTokenProperty } from '@/types/CompositionTokenProperty';
 import useManageTokens from '@/app/store/useManageTokens';
 import { EditTokenFormStatus } from '@/constants/EditTokenFormStatus';
 import TokenButtonContent from '../TokenButton/TokenButtonContent';
@@ -88,35 +85,17 @@ export const MoreButton: React.FC<Props> = ({
   ), [properties]);
   const active = useGetActiveState(activeStateProperties, type, token.name);
 
-  const handleClick = React.useCallback((givenProperties: PropertyObject | PropertyObject[], isActive = active) => {
-    const propsToSet = (Array.isArray(givenProperties) ? givenProperties : [givenProperties]).map((prop) => (
-      extend(true, {}, prop) as typeof prop
-    ));
+  const handleClick = React.useCallback((givenProperties: PropertyObject, isActive = active) => {
     track('Apply Token', { givenProperties });
-    let value = isActive ? 'delete' : token.name;
 
-    if (propsToSet[0].clear && !isActive) {
-      value = 'delete';
-      propsToSet[0].forcedValue = String(token.name);
-    }
-    const newProps = {
-      [propsToSet[0].name || propsToSet[0]]: propsToSet[0].forcedValue || value,
+    const newProps: SelectionValue = {
+      [givenProperties.name]: isActive ? 'delete' : token.name,
     };
-    if (propsToSet[0].clear) propsToSet[0].clear.map((item) => Object.assign(newProps, { [item]: 'delete' }));
-
-    if (type === 'composition' && isActive && !propsToSet[0].clear) {
-      // distructure composition token when it is unselected
-      const compositionToken = tokensContext.resolvedTokens.find((resolvedToken) => resolvedToken.name === String(token.name));
-      const tokensInCompositionToken: NodeTokenRefMap = {};
-      if (compositionToken) {
-        Object.keys(compositionToken.value).forEach((property: string) => {
-          tokensInCompositionToken[property as CompositionTokenProperty] = 'delete';
-        });
-      }
-      tokensInCompositionToken.composition = 'delete';
-      setPluginValue(tokensInCompositionToken);
-    } else setPluginValue(newProps);
-  }, [active, token.name, type, setPluginValue, tokensContext.resolvedTokens]);
+    if (givenProperties.clear) {
+      givenProperties.clear.map((item) => Object.assign(newProps, { [item]: 'delete' }));
+    }
+    setPluginValue(newProps);
+  }, [active, token.name, setPluginValue]);
 
   const handleTokenClick = React.useCallback(() => {
     handleClick(properties[0]);
