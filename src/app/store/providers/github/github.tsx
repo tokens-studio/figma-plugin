@@ -32,7 +32,7 @@ export function useGitHub() {
   const { multiFileSync } = useFlags();
   const dispatch = useDispatch<Dispatch>();
   const { confirm } = useConfirm();
-  const { pushDialog } = usePushDialog();
+  const { pushDialog, closeDialog } = usePushDialog();
 
   const storageClientFactory = useCallback((context: GithubCredentials, owner?: string, repo?: string) => {
     const splitContextId = context.id.split('/');
@@ -53,8 +53,10 @@ export function useGitHub() {
   }, [confirm]);
 
   const pushTokensToGitHub = useCallback(async (context: GithubCredentials): Promise<RemoteResponseData> => {
+    console.log('push');
     const storage = storageClientFactory(context);
     const content = await storage.retrieve();
+    console.log('retrconte', content);
     if (content?.status === 'failure') {
       return {
         status: 'failure',
@@ -90,6 +92,7 @@ export function useGitHub() {
         const metadata = {
           tokenSetOrder: Object.keys(tokens),
         };
+        console.log('befoirseave');
         await storage.save({
           themes,
           tokens,
@@ -97,6 +100,7 @@ export function useGitHub() {
         }, {
           commitMessage,
         });
+        console.log('save');
         saveLastSyncedState(dispatch, tokens, themes, metadata);
         dispatch.uiState.setLocalApiState({ ...localApiState, branch: customBranch } as GithubCredentials);
         dispatch.uiState.setApiData({ ...context, branch: customBranch });
@@ -114,6 +118,7 @@ export function useGitHub() {
         };
       } catch (e) {
         console.log('Error pushing to GitHub', e);
+        closeDialog();
         return {
           status: 'failure',
           errorMessage: ErrorMessages.GITHUB_CREDENTIAL_ERROR,
@@ -192,6 +197,7 @@ export function useGitHub() {
     try {
       const storage = storageClientFactory(context);
       const hasBranches = await storage.fetchBranches();
+      console.log('branh');
       dispatch.branchState.setBranches(hasBranches);
       if (!hasBranches || !hasBranches.length) {
         return {
