@@ -121,9 +121,15 @@ export function useBitbucket() {
       } catch (e) {
         closeDialog();
         console.log('Error pushing to Bitbucket', e);
+        if (e instanceof Error) {
+          return {
+            status: 'failure',
+            errorMessage: e.message === ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR ? ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR : ErrorMessages.BITBUCKET_CREDENTIAL_ERROR,
+          };
+        }
         return {
           status: 'failure',
-          errorMessage: e === ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR ? ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR : ErrorMessages.BITBUCKET_CREDENTIAL_ERROR,
+          errorMessage: ErrorMessages.GITHUB_CREDENTIAL_ERROR,
         };
       }
     }
@@ -139,6 +145,7 @@ export function useBitbucket() {
     dispatch.uiState,
     dispatch.tokenState,
     pushDialog,
+    closeDialog,
     tokens,
     themes,
     localApiState,

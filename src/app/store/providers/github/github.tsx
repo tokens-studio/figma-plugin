@@ -53,10 +53,8 @@ export function useGitHub() {
   }, [confirm]);
 
   const pushTokensToGitHub = useCallback(async (context: GithubCredentials): Promise<RemoteResponseData> => {
-    console.log('push');
     const storage = storageClientFactory(context);
     const content = await storage.retrieve();
-    console.log('retrconte', content);
     if (content?.status === 'failure') {
       return {
         status: 'failure',
@@ -92,7 +90,6 @@ export function useGitHub() {
         const metadata = {
           tokenSetOrder: Object.keys(tokens),
         };
-        console.log('befoirseave');
         await storage.save({
           themes,
           tokens,
@@ -100,7 +97,6 @@ export function useGitHub() {
         }, {
           commitMessage,
         });
-        console.log('save');
         saveLastSyncedState(dispatch, tokens, themes, metadata);
         dispatch.uiState.setLocalApiState({ ...localApiState, branch: customBranch } as GithubCredentials);
         dispatch.uiState.setApiData({ ...context, branch: customBranch });
@@ -119,9 +115,15 @@ export function useGitHub() {
       } catch (e) {
         closeDialog();
         console.log('Error pushing to GitHub', e);
+        if (e instanceof Error) {
+          return {
+            status: 'failure',
+            errorMessage: e.message === ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR ? ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR : ErrorMessages.GITHUB_CREDENTIAL_ERROR,
+          };
+        }
         return {
           status: 'failure',
-          errorMessage: e === ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR ? ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR : ErrorMessages.GITHUB_CREDENTIAL_ERROR,
+          errorMessage: ErrorMessages.GITHUB_CREDENTIAL_ERROR,
         };
       }
     }
@@ -137,6 +139,7 @@ export function useGitHub() {
     dispatch.uiState,
     dispatch.tokenState,
     pushDialog,
+    closeDialog,
     tokens,
     themes,
     localApiState,
@@ -197,7 +200,6 @@ export function useGitHub() {
     try {
       const storage = storageClientFactory(context);
       const hasBranches = await storage.fetchBranches();
-      console.log('branh');
       dispatch.branchState.setBranches(hasBranches);
       if (!hasBranches || !hasBranches.length) {
         return {

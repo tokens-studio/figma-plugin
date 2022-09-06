@@ -114,9 +114,15 @@ export const useADO = () => {
       } catch (e) {
         closeDialog();
         console.log('Error pushing to ADO', e);
+        if (e instanceof Error) {
+          return {
+            status: 'failure',
+            errorMessage: e.message === ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR ? ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR : ErrorMessages.ADO_CREDENTIAL_ERROR,
+          };
+        }
         return {
           status: 'failure',
-          errorMessage: e === ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR ? ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR : ErrorMessages.ADO_CREDENTIAL_ERROR,
+          errorMessage: ErrorMessages.GITHUB_CREDENTIAL_ERROR,
         };
       }
     }
@@ -132,6 +138,7 @@ export const useADO = () => {
     tokens,
     themes,
     pushDialog,
+    closeDialog,
     localApiState,
   ]);
 

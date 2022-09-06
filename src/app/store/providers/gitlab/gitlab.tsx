@@ -125,9 +125,15 @@ export function useGitLab() {
       } catch (e) {
         closeDialog();
         console.log('Error pushing to GitLab', e);
+        if (e instanceof Error) {
+          return {
+            status: 'failure',
+            errorMessage: e.message === ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR ? ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR : ErrorMessages.GITLAB_CREDENTIAL_ERROR,
+          };
+        }
         return {
           status: 'failure',
-          errorMessage: e === ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR ? ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR : ErrorMessages.GITLAB_CREDENTIAL_ERROR,
+          errorMessage: ErrorMessages.GITHUB_CREDENTIAL_ERROR,
         };
       }
     }
@@ -141,6 +147,7 @@ export function useGitLab() {
     dispatch,
     storageClientFactory,
     pushDialog,
+    closeDialog,
     tokens,
     themes,
     localApiState,
