@@ -11,7 +11,7 @@ import { mainNodeSelectionValuesSelector } from '@/selectors';
 type Props = {
   value: string;
   property: PropertyObject;
-  onClick: (properties: PropertyObject | PropertyObject[], isActive: boolean) => void;
+  onClick: (properties: PropertyObject, isActive: boolean) => void;
 };
 
 export const MoreButtonProperty: React.FC<Props> = ({ value, property, onClick }) => {
