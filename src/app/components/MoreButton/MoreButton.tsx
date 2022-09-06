@@ -17,7 +17,7 @@ import { MoreButtonProperty } from './MoreButtonProperty';
 import { DocumentationProperties } from '@/constants/DocumentationProperties';
 import { SingleToken } from '@/types/tokens';
 import { TokenTypes } from '@/constants/TokenTypes';
-import { useSetNodeData } from '@/hooks/useSetNodeData';
+import useSetNodeData from '@/hooks/useSetNodeData';
 import { Dispatch } from '@/app/store';
 import { TokensContext } from '@/context';
 import { SelectionValue, ShowFormOptions } from '@/types';

@@ -3,24 +3,19 @@ import { Provider } from 'react-redux';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { createMockStore, fireEvent, render } from '../../../../tests/config/setupTest';
 import { MoreButton } from './MoreButton';
-import { AsyncMessageChannel } from '@/AsyncMessageChannel';
-import { AsyncMessageTypes } from '@/types/AsyncMessages';
-import { store } from '@/app/store';
 import { SingleToken } from '@/types/tokens';
 import { EditTokenFormStatus } from '@/constants/EditTokenFormStatus';
 import { TokensContext } from '@/context';
 
 const mockShowForm = jest.fn();
 const mockDeleteToken = jest.fn();
-const mockSetNodeData = jest.fn();
-
-const messageSpy = jest.spyOn(AsyncMessageChannel.ReactInstance, 'message');
-
-AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.SET_NODE_DATA, mockSetNodeData);
+const mockSetNodeData = jest.fn(() => Promise.resolve());
 
 jest.mock('../../store/useManageTokens', () => jest.fn(() => ({
   deleteSingleToken: mockDeleteToken,
 })));
+
+jest.mock('../../../hooks/useSetNodeData', () => jest.fn(() => mockSetNodeData));
 
 const token: SingleToken = {
   value: '16',
@@ -105,14 +100,9 @@ describe('MoreButton', () => {
       />,
     );
     await fireEvent.click(getByText(token.name));
-    expect(messageSpy).toHaveBeenCalledWith({
-      type: AsyncMessageTypes.SET_NODE_DATA,
-      values: {
-        itemSpacing: token.name,
-      },
-      tokens: [],
-      settings: store.getState().settings,
-    });
+    expect(mockSetNodeData).toHaveBeenCalledWith({
+      itemSpacing: token.name,
+    }, []);
   });
 
   it('should clear when clicking', async () => {
@@ -134,14 +124,9 @@ describe('MoreButton', () => {
       </Provider>,
     );
     await fireEvent.click(result.getByText(token.name));
-    expect(messageSpy).toHaveBeenCalledWith({
-      type: AsyncMessageTypes.SET_NODE_DATA,
-      values: {
-        itemSpacing: 'delete',
-      },
-      tokens: [],
-      settings: store.getState().settings,
-    });
+    expect(mockSetNodeData).toHaveBeenCalledWith({
+      itemSpacing: 'delete',
+    }, []);
   });
 
   it('should clear when using context menu', async () => {
@@ -164,14 +149,7 @@ describe('MoreButton', () => {
     );
     await fireEvent.contextMenu(result.getByText(token.name));
     await fireEvent.click(result.getByText('Gap'));
-    expect(messageSpy).toHaveBeenCalledWith({
-      type: AsyncMessageTypes.SET_NODE_DATA,
-      values: {
-        itemSpacing: 'delete',
-      },
-      tokens: [],
-      settings: store.getState().settings,
-    });
+    expect(mockSetNodeData).toHaveBeenCalledWith({ itemSpacing: 'delete' }, []);
   });
 
   it('should clear composition tokens', async () => {
@@ -202,15 +180,42 @@ describe('MoreButton', () => {
       </TokensContext.Provider>,
     );
     await fireEvent.click(result.getByText('my-comp-token'));
-    expect(messageSpy).toHaveBeenCalledWith({
-      type: AsyncMessageTypes.SET_NODE_DATA,
-      values: {
-        composition: 'delete',
-        paddingLeft: 'delete',
-        paddingRight: 'delete',
+    expect(mockSetNodeData).toHaveBeenCalledWith({
+      composition: 'delete',
+      paddingLeft: 'delete',
+      paddingRight: 'delete',
+    }, tokensContextStore.resolvedTokens);
+  });
+
+  it('should remove other properties if a main one is given', async () => {
+    const mockStore = createMockStore({
+      uiState: {
+        mainNodeSelectionValues: {
+          paddingLeft: token.name,
+        },
       },
-      tokens: tokensContextStore.resolvedTokens,
-      settings: { ...store.getState().settings },
     });
+
+    const result = render(
+      <Provider store={mockStore}>
+        <MoreButton
+          type={TokenTypes.SPACING}
+          showForm={mockShowForm}
+          token={token}
+        />
+      </Provider>,
+    );
+    await fireEvent.contextMenu(result.getByText(token.name));
+    await fireEvent.click(result.getByText('All'));
+    expect(mockSetNodeData).toHaveBeenCalledWith({
+      horizontalPadding: 'delete',
+      verticalPadding: 'delete',
+      itemSpacing: 'delete',
+      spacing: token.name,
+      paddingLeft: 'delete',
+      paddingTop: 'delete',
+      paddingRight: 'delete',
+      paddingBottom: 'delete',
+    }, []);
   });
 });
