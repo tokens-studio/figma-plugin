@@ -28,10 +28,14 @@ export default async function removeStylesFromPlugin(
     : null;
 
   const pathname = convertTokenNameToPath(token.path, stylePathPrefix, stylePathSlice);
+  const tokenToStyleMap: Record<string, string> = {};
 
   allStyles.forEach((style) => {
     if (isMatchingStyle(token.path, pathname, activeThemeObject?.$figmaStyleReferences ?? {}, figmaStyleMaps)) {
+      tokenToStyleMap[token.path] = style.id;
       style.remove();
     }
   });
+
+  return tokenToStyleMap;
 }
