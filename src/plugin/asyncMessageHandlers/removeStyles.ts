@@ -12,6 +12,6 @@ export const removeStyles: AsyncMessageChannelHandlers[AsyncMessageTypes.REMOVE_
   }
 
   return {
-    styleIds: {},
+    styleIds: [],
   };
 };

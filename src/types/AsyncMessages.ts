@@ -129,7 +129,7 @@ export type RemoveStylesAsyncMessage = AsyncMessage<AsyncMessageTypes.REMOVE_STY
   settings: Partial<SettingsState>;
 }>;
 export type RemoveStylesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.REMOVE_STYLES, {
-  styleIds: Record<string, string>;
+  styleIds: string[];
 }>;
 
 export type UpdateAsyncMessage = AsyncMessage<AsyncMessageTypes.UPDATE, {

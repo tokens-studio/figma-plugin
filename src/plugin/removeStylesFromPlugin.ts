@@ -1,3 +1,4 @@
+import compact from 'just-compact';
 import { SettingsState } from '@/app/store/models/settings';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
@@ -28,14 +29,13 @@ export default async function removeStylesFromPlugin(
     : null;
 
   const pathname = convertTokenNameToPath(token.path, stylePathPrefix, stylePathSlice);
-  const tokenToStyleMap: Record<string, string> = {};
-
-  allStyles.forEach((style) => {
+  const allStyleIds = allStyles.map((style) => {
     if (isMatchingStyle(token.path, pathname, activeThemeObject?.$figmaStyleReferences ?? {}, figmaStyleMaps)) {
-      tokenToStyleMap[token.path] = style.id;
       style.remove();
+      return style.id;
     }
+    return null;
   });
 
-  return tokenToStyleMap;
+  return compact(allStyleIds);
 }
