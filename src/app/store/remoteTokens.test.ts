@@ -30,6 +30,7 @@ const mockSetBranches = jest.fn();
 const mockConfirm = jest.fn();
 const mockSetShowConfirm = jest.fn();
 const mockPushDialog = jest.fn();
+const mockCloseDialog = jest.fn();
 const mockCreateBranch = jest.fn();
 const mockSave = jest.fn();
 const mockSetCollapsedTokenSets = jest.fn();
@@ -183,6 +184,7 @@ jest.mock('../hooks/usePushDialog', () => ({
   __esModule: true,
   default: () => ({
     pushDialog: mockPushDialog,
+    closeDialog: mockCloseDialog,
   }),
 }));
 jest.mock('../../plugin/notifiers', (() => ({
@@ -502,6 +504,27 @@ describe('remoteTokens', () => {
 
   contexts.forEach((context) => {
     if (context === gitHubContext || context === gitLabContext || context === adoContext || context === bitbucketContext) {
+      it(`push tokens to ${context.provider}, should close dialog when a free user trying to save multi file`, async () => {
+        mockRetrieve.mockImplementation(() => (
+          Promise.resolve(null)
+        ));
+        mockPushDialog.mockImplementation(() => (
+          Promise.resolve({
+            customBranch: 'development',
+            commitMessage: 'Initial commit',
+          })
+        ));
+        mockSave.mockImplementationOnce(() => {
+          throw new Error(ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR);
+        });
+        await waitFor(() => { result.current.pushTokens(context as StorageTypeCredentials); });
+        expect(mockCloseDialog).toBeCalledTimes(1);
+      });
+    }
+  });
+
+  contexts.forEach((context) => {
+    if (context === gitHubContext || context === gitLabContext || context === adoContext || context === bitbucketContext) {
       it(`Add newProviderItem to ${context.provider}, should push tokens and return status data if there is no content`, async () => {
         mockFetchBranches.mockImplementationOnce(() => (
           Promise.resolve(['main'])
@@ -686,7 +709,7 @@ describe('remoteTokens', () => {
   });
 
   it('Read tokens from File, should return token data', async () => {
-    expect(await result.current.fetchTokensFromFileOrDirectory({files: files as unknown as FileList})).toEqual({
+    expect(await result.current.fetchTokensFromFileOrDirectory({ files: files as unknown as FileList })).toEqual({
       metadata: {
         commitMessage: 'Initial commit',
       },
@@ -716,10 +739,10 @@ describe('remoteTokens', () => {
     mockRetrieve.mockImplementation(() => (
       Promise.resolve(null)
     ));
-    expect(await result.current.fetchTokensFromFileOrDirectory({files: files as unknown as FileList})).toEqual(null);
+    expect(await result.current.fetchTokensFromFileOrDirectory({ files: files as unknown as FileList })).toEqual(null);
   });
 
   it('Read tokens from File, should return null if there is no file', async () => {
-    expect(await result.current.fetchTokensFromFileOrDirectory({files: null})).toEqual(null);
+    expect(await result.current.fetchTokensFromFileOrDirectory({ files: null })).toEqual(null);
   });
 });
