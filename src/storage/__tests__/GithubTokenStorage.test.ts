@@ -618,7 +618,7 @@ describe('GithubTokenStorage', () => {
       ], {
         commitMessage: '',
       });
-    }).rejects.toThrow('Multi-file storage is not enabled');
+    }).rejects.toThrow(ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR);
     expect(mockCreateOrUpdateFiles).not.toHaveBeenCalled();
   });
 
