@@ -45,6 +45,31 @@ describe('getLdFlagsFactory', () => {
     });
   });
 
+  it('should set a free plan if there is no plan', async () => {
+    const mockStore = createMockStore({
+      userState: {
+        licenseKey: 'FIGMA-TOKENS',
+      },
+    });
+    const mockParams = {
+      user: {
+        userId: 'uid:1234',
+      },
+    } as unknown as StartupMessage;
+    const mockLdClient = {
+      identify: jest.fn(),
+    } as unknown as LDClient;
+
+    const fn = getLdFlagsFactory(mockStore, Promise.resolve(mockLdClient), mockParams);
+    await fn();
+
+    expect(setUserDataSpy).toBeCalledTimes(1);
+    expect(setUserDataSpy).toBeCalledWith({
+      plan: 'free',
+    });
+    expect(mockLdClient.identify).toBeCalledTimes(1);
+  });
+
   it('should set a free plan', async () => {
     const mockStore = createMockStore({});
     const mockParams = {
