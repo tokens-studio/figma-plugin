@@ -583,6 +583,35 @@ describe('remoteTokens', () => {
 
   Object.entries(contextMap).forEach(([contextName, context]) => {
     if (context === gitHubContext || context === gitLabContext || context === adoContext || context === bitbucketContext) {
+      it(`Add newProviderItem to ${context.provider}, should return error message when a error occured while saving the data`, async () => {
+        mockFetchBranches.mockImplementation(() => (
+          Promise.resolve(['main'])
+        ));
+        mockRetrieve.mockImplementation(() => (
+          Promise.resolve(null)
+        ));
+        mockPushDialog.mockImplementation(() => (
+          Promise.resolve({
+            customBranch: 'development',
+            commitMessage: 'Initial commit',
+          })
+        ));
+        mockSave.mockImplementation(() => {
+          throw new Error(ErrorMessages.GENERAL_CONNECTION_ERROR);
+        });
+
+        await waitFor(() => { result.current.addNewProviderItem(context as StorageTypeCredentials); });
+        expect(mockCloseDialog).toBeCalledTimes(1);
+        expect(await result.current.addNewProviderItem(context as StorageTypeCredentials)).toEqual({
+          status: 'failure',
+          errorMessage: errorMessageMap[contextName as keyof typeof errorMessageMap],
+        });
+      });
+    }
+  });
+
+  Object.entries(contextMap).forEach(([contextName, context]) => {
+    if (context === gitHubContext || context === gitLabContext || context === adoContext || context === bitbucketContext) {
       it(`Add newProviderItem to ${context.provider}, should pull tokens and notify that no tokens stored on remote if there is no tokens on remote`, async () => {
         mockFetchBranches.mockImplementation(() => (
           Promise.resolve(['main'])
