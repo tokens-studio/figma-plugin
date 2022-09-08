@@ -80,7 +80,7 @@ describe('setTextValuesOnTarget', () => {
   it('it does nothing when the type of value is string', async () => {
     await setTextValuesOnTarget(textNodeMock, {
       description: 'Use with care',
-      value: 'string'
+      value: 'string',
     });
     expect(textNodeMock).toEqual({
       ...textNodeMock,

@@ -44,7 +44,10 @@ export const ResolvedTypograhpyValueDisplay: React.FC<Props> = ({ value }) => {
       </Box>
       <Box>
         {Object.keys(properties).map((key) => (
-          <StyledValueItem key={seed(key)}>{value[key as keyof typeof value]}&nbsp;</StyledValueItem>
+          <StyledValueItem key={seed(key)}>
+            {value[key as keyof typeof value]}
+&nbsp;
+          </StyledValueItem>
         ))}
       </Box>
     </Box>

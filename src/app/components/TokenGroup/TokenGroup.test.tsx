@@ -1,11 +1,10 @@
 import React from 'react';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { DeepKeyTokenMap, TokenTypeSchema } from '@/types/tokens';
-import { fireEvent, render, resetStore } from '../../../tests/config/setupTest';
-import { store } from '../store';
-import TokenTree from './TokenTree';
+import { fireEvent, render, resetStore } from '../../../../tests/config/setupTest';
+import { store } from '../../store';
+import TokenGroup from './TokenGroup';
 
-const displayType = 'GRID';
 const schema = {
   label: 'Sizing',
   property: 'Size',
@@ -63,14 +62,13 @@ const tokenValues = {
 const showNewForm = jest.fn();
 const showForm = jest.fn();
 
-describe('TokenTree', () => {
+describe('TokenGroup', () => {
   beforeEach(() => {
     resetStore();
   });
 
   it('should be able to collpase a token group', async () => {
-    const { getByTestId } = render(<TokenTree
-      displayType={displayType}
+    const { getByTestId } = render(<TokenGroup
       tokenValues={tokenValues as DeepKeyTokenMap}
       showNewForm={showNewForm}
       showForm={showForm}
@@ -85,8 +83,7 @@ describe('TokenTree', () => {
   });
 
   it('should be able to expand a token group', async () => {
-    const { getByTestId } = render(<TokenTree
-      displayType={displayType}
+    const { getByTestId } = render(<TokenGroup
       tokenValues={tokenValues as DeepKeyTokenMap}
       showNewForm={showNewForm}
       showForm={showForm}
@@ -102,8 +99,7 @@ describe('TokenTree', () => {
   });
 
   it('should be able to add a new token', async () => {
-    const result = render(<TokenTree
-      displayType={displayType}
+    const result = render(<TokenGroup
       tokenValues={tokenValues as DeepKeyTokenMap}
       showNewForm={showNewForm}
       showForm={showForm}

@@ -60,6 +60,12 @@ export default function TokensDecorator(Story, context) {
         failedToResolve: true
       },
       {
+        name: 'color.broken',
+        value: '{color.notfound}',
+        type: TokenTypes.COLOR,
+        failedToResolve: true
+      },
+      {
         name: 'shadows.broken',
         value: {
           x: '2',
