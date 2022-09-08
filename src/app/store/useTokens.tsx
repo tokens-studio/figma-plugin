@@ -207,7 +207,7 @@ export default function useTokens() {
       token,
       settings,
     });
-    dispatch.tokenState.removeStyleIdsFromCurrentTheme(removeStylesResult.styleIds);
+    dispatch.tokenState.removeStyleIdsFromThemes(removeStylesResult.styleIds);
   }, [settings, dispatch.tokenState]);
 
   return useMemo(() => ({

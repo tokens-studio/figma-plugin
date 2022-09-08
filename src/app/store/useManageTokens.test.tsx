@@ -21,7 +21,7 @@ jest.mock('./useTokens', () => ({
 }));
 
 describe('useManageTokens', () => {
-  it('should be able to remove styles from the currentTheme when the user select option', async () => {
+  it('Should be able to remove styles from any theme if the user deleted one', async () => {
     const tokenToDelete = {
       path: 'color.red',
       parent: 'global',
@@ -34,7 +34,7 @@ describe('useManageTokens', () => {
     expect(mockRemoveStylesFromTokens).toBeCalledTimes(1);
   });
 
-  it('doesn\'t remove styles from the currentTheme when the user doesn\'t select option', async () => {
+  it('doesn\'t remove styles from any theme when the user doesn\'t select option', async () => {
     const tokenToDelete = {
       path: 'color.red',
       parent: 'global',

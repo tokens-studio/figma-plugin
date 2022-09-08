@@ -1,6 +1,6 @@
 import type { TokenState } from '../../tokenState';
 
-export function removeStyleIdsFromCurrentTheme(state: TokenState, styleIds: string[]): TokenState {
+export function removeStyleIdsFromThemes(state: TokenState, styleIds: string[]): TokenState {
   const updatedThemes = [...state.themes];
   updatedThemes.forEach((theme) => {
     const updatedTokens = theme.$figmaStyleReferences;
