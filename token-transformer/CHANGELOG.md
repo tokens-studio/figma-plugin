@@ -1,3 +1,7 @@
+## v0.0.26 (2022-09-08)
+
+Fixes a crash when other file types than .json are present in the source folder. Thanks thomasmattheussen!
+
 ## v0.0.25 (2022-08-13)
 
 Adds support for expanding composition tokens
