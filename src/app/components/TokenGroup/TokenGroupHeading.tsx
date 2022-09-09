@@ -9,12 +9,15 @@ import Heading from '../Heading';
 import Input from '../Input';
 import Modal from '../Modal';
 import useManageTokens from '../../store/useManageTokens';
-import { editProhibitedSelector } from '@/selectors';
+import { editProhibitedSelector, updateModeSelector } from '@/selectors';
 import { IconCollapseArrow, IconExpandArrow, IconAdd } from '@/icons';
 import { StyledTokenGroupHeading, StyledTokenGroupAddIcon, StyledTokenGroupHeadingCollapsable } from './StyledTokenGroupHeading';
 import { Dispatch } from '../../store';
+import useConfirm from '../../hooks/useConfirm';
 import { collapsedTokensSelector } from '@/selectors/collapsedTokensSelector';
 import { ShowNewFormOptions } from '@/types';
+import { UpdateMode } from '@/constants/UpdateMode';
+import useTokens from '../../store/useTokens';
 
 export type Props = {
   id: string
@@ -36,6 +39,9 @@ export function TokenGroupHeading({
   const { deleteGroup, renameGroup, duplicateGroup } = useManageTokens();
   const dispatch = useDispatch<Dispatch>();
   const collapsed = useSelector(collapsedTokensSelector);
+  const updateMode = useSelector(updateModeSelector);
+  const { confirm } = useConfirm();
+  const { handleBulkRemap } = useTokens();
 
   React.useEffect(() => {
     setNewTokenGroupName(`${path.split('.').pop()}${copyName}` || '');
@@ -50,11 +56,31 @@ export function TokenGroupHeading({
     setShowNewGroupNameField(true);
   }, []);
 
-  const handleRenameTokenGroupSubmit = React.useCallback((e: React.FormEvent<HTMLFormElement>) => {
+  const handleRenameTokenGroupSubmit = React.useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     setShowNewGroupNameField(false);
     renameGroup(`${path}${copyName}`, `${newTokenGroupName}`, type);
+
+    const shouldRemap = await confirm({
+      text: `Remap all tokens that use ${path}${copyName} to ${newTokenGroupName}?`,
+      description: 'This will change all layers that used the old token name. This could take a while.',
+      choices: [
+        {
+          key: UpdateMode.SELECTION, label: 'Selection', unique: true, enabled: UpdateMode.SELECTION === updateMode,
+        },
+        {
+          key: UpdateMode.PAGE, label: 'Page', unique: true, enabled: UpdateMode.PAGE === updateMode,
+        },
+        {
+          key: UpdateMode.DOCUMENT, label: 'Document', unique: true, enabled: UpdateMode.DOCUMENT === updateMode,
+        },
+      ],
+    });
+    if (shouldRemap) {
+      await handleBulkRemap(`${newTokenGroupName}.`, `${path}${copyName}.`);
+      dispatch.settings.setUpdateMode(shouldRemap.data[0]);
+    }
     setIsTokenGroupDuplicated(false);
     setCopyName('');
   }, [copyName, newTokenGroupName, path, renameGroup, type]);
