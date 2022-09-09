@@ -63,7 +63,7 @@ export function TokenGroupHeading({
     renameGroup(`${path}${copyName}`, `${newTokenGroupName}`, type);
 
     const shouldRemap = await confirm({
-      text: `Remap all tokens that use ${path}${copyName} to ${newTokenGroupName}?`,
+      text: `Remap all tokens that use tokens in ${path}${copyName} group?`,
       description: 'This will change all layers that used the old token name. This could take a while.',
       choices: [
         {
