@@ -1,13 +1,9 @@
-export function isMatchingStyle<T extends EffectStyle | PaintStyle | TextStyle>(
-  tokenName: string,
+export function isMatchingStyle(
   tokenPath: string,
-  figmaStyleReferences: Record<string, string>,
-  stylesMap?: Map<string, T>,
+  style: EffectStyle | PaintStyle | TextStyle,
 ) {
-  return !!(
-    figmaStyleReferences[tokenName]
-      || stylesMap?.get(tokenName)?.id
-      || figmaStyleReferences[tokenPath]
-      || stylesMap?.get(tokenPath)?.id
-  );
+  const splitName = style.name.split('/').map((name) => name.trim());
+  const trimmedName = splitName.join('/');
+
+  return trimmedName === tokenPath;
 }

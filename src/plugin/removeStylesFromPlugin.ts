@@ -1,4 +1,3 @@
-import compact from 'just-compact';
 import { SettingsState } from '@/app/store/models/settings';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
@@ -14,7 +13,6 @@ export default async function removeStylesFromPlugin(
   const paintStyles = figma.getLocalPaintStyles();
   const textStyles = figma.getLocalTextStyles();
   const allStyles = [...effectStyles, ...paintStyles, ...textStyles];
-  const figmaStyleMaps = new Map(allStyles.map((style) => ([style.name, style])));
 
   const themeInfo = await AsyncMessageChannel.PluginInstance.message({
     type: AsyncMessageTypes.GET_THEME_INFO,
@@ -29,13 +27,11 @@ export default async function removeStylesFromPlugin(
     : null;
 
   const pathname = convertTokenNameToPath(token.path, stylePathPrefix, stylePathSlice);
-  const allStyleIds = allStyles.map((style) => {
-    if (isMatchingStyle(token.path, pathname, activeThemeObject?.$figmaStyleReferences ?? {}, figmaStyleMaps)) {
-      style.remove();
-      return style.id;
-    }
-    return null;
-  });
 
-  return compact(allStyleIds);
+  const allStyleIds = allStyles.filter((style) => isMatchingStyle(pathname, style))
+    .map((filtedStyle) => {
+      filtedStyle.remove();
+      return filtedStyle.id;
+    });
+  return allStyleIds;
 }
