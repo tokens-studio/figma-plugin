@@ -1,21 +1,23 @@
 import React, { useMemo } from 'react';
 import cx from 'classnames';
+import { useSelector } from 'react-redux';
 import { SingleToken } from '@/types/tokens';
 import { TokenTypes } from '@/constants/TokenTypes';
+import { displayTypeSelector } from '@/selectors';
 
 type Props = {
-  displayType: 'GRID' | 'LIST'; // @TODO enum
   token: SingleToken;
   draggedToken: SingleToken | null;
   dragOverToken: SingleToken | null;
 };
 
 export const DragOverItem: React.FC<Props> = ({
-  displayType,
   token,
   draggedToken,
   dragOverToken,
 }) => {
+  const displayType = useSelector(displayTypeSelector);
+
   const isDraggable = useMemo(() => (
     token.name && isNaN(Number(token.name.split('.')[token.name.split('.').length - 1]))
   ), [token]);

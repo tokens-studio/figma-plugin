@@ -7,7 +7,7 @@ import { RootState } from '@/app/store';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 
-export function useSetNodeData() {
+export default function useSetNodeData() {
   const store = useStore<RootState>();
 
   const setNodeData = useCallback(async (data: SelectionValue, resolvedTokens: AnyTokenList) => {

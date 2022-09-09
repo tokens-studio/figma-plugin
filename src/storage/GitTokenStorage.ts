@@ -3,6 +3,7 @@ import { AnyTokenSet, SingleToken } from '@/types/tokens';
 import { SystemFilenames } from '@/constants/SystemFilenames';
 import { joinPath } from '@/utils/string';
 import { RemoteTokenStorage, RemoteTokenStorageFile, RemoteTokenStorageMetadata } from './RemoteTokenStorage';
+import { ErrorMessages } from '@/constants/ErrorMessages';
 
 type StorageFlags = {
   multiFileEnabled: boolean
@@ -111,7 +112,7 @@ export abstract class GitTokenStorage extends RemoteTokenStorage<GitStorageSaveO
       });
     } else {
       // When path is a directory and multiFile is disabled return
-      throw new Error('Multi-file storage is not enabled');
+      throw new Error(ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR);
     }
     return this.writeChangeset(
       filesChangeset,

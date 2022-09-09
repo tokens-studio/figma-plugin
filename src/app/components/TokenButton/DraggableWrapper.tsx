@@ -1,18 +1,10 @@
-import React, { useCallback, useContext, useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { useDispatch, useSelector, useStore } from 'react-redux';
-import { activeTokenSetSelector, tokensSelector, uiDisabledSelector } from '@/selectors';
+import { activeTokenSetSelector, tokensSelector } from '@/selectors';
 import { SingleToken } from '@/types/tokens';
 import { Dispatch, RootState } from '@/app/store';
-import { TokenTypes } from '@/constants/TokenTypes';
-import { lightOrDark } from '@/utils/color';
-import { TokensContext } from '@/context';
-import { getAliasValue } from '@/utils/alias';
-import { theme } from '@/stitches.config';
 
 type Props = {
-  active: boolean;
-  displayType: 'GRID' | 'LIST'; // @TODO enum
-  type: TokenTypes;
   token: SingleToken;
   draggedToken: SingleToken | null;
   dragOverToken: SingleToken | null;
@@ -20,45 +12,16 @@ type Props = {
   setDragOverToken: (token: SingleToken | null) => void;
 };
 
-export const TokenButtonDraggable: React.FC<Props> = ({
-  active, displayType, type, token, draggedToken, setDraggedToken, setDragOverToken, children,
+export const DraggableWrapper: React.FC<Props> = ({
+  token, draggedToken, setDraggedToken, setDragOverToken, children,
 }) => {
-  const tokensContext = useContext(TokensContext);
   const store = useStore<RootState>();
   const dispatch = useDispatch<Dispatch>();
-  const uiDisabled = useSelector(uiDisabledSelector);
   const activeTokenSet = useSelector(activeTokenSetSelector);
 
   const isDraggable = useMemo(() => (
     token.name && isNaN(Number(token.name.split('.')[token.name.split('.').length - 1]))
   ), [token]);
-
-  const displayValue = useMemo(() => (
-    getAliasValue(token, tokensContext.resolvedTokens)
-  ), [token, tokensContext.resolvedTokens]);
-
-  const [style, buttonClass] = React.useMemo(() => {
-    const style: React.CSSProperties = {};
-    const buttonClass: string[] = [];
-
-    if (type === TokenTypes.BORDER_RADIUS) {
-      style.borderRadius = `${displayValue}px`;
-    } else if (type === TokenTypes.COLOR) {
-      style['--backgroundColor'] = String(displayValue);
-      style['--borderColor'] = lightOrDark(String(displayValue)) === 'light' ? String(theme.colors.border) : String(theme.colors.borderMuted);
-
-      buttonClass.push('button-property-color');
-      if (displayType === 'LIST') {
-        buttonClass.push('button-property-color-listing');
-      }
-    }
-
-    if (active) {
-      buttonClass.push('button-active');
-    }
-
-    return [style, buttonClass] as [typeof style, typeof buttonClass];
-  }, [type, active, displayValue, displayType]);
 
   const handleDrag = useCallback((e: React.DragEvent<HTMLDivElement>) => e.stopPropagation(), []);
   const handleDragEnter = useCallback((e: React.DragEvent<HTMLDivElement>) => e.stopPropagation(), []);
@@ -129,10 +92,6 @@ export const TokenButtonDraggable: React.FC<Props> = ({
   return (
     <div
       {...draggerProps}
-      className={`relative mb-1 mr-1 button button-property ${buttonClass.join(' ')} ${
-        uiDisabled && 'button-disabled'
-      } `}
-      style={style}
     >
       {children}
     </div>
