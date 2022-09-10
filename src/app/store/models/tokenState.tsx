@@ -468,7 +468,7 @@ export const tokenState = createModel<RootModel>()({
       } = data;
       const tokensInParent = rootState.tokenState.tokens[parent] ?? [];
       tokensInParent.filter((token) => token.name.startsWith(`${path}${newName}.`) && token.type === type).forEach((updatedToken) => {
-        dispatch.tokenState.updateAliases({ oldName: `${path}${oldName}.${updatedToken.name.split('.').pop()}`, newName: updatedToken.name });
+        dispatch.tokenState.updateAliases({ oldName: updatedToken.name.replace(`${path}${newName}`, `${path}${oldName}`), newName: updatedToken.name });
       });
     },
     updateCheckForChanges() {
