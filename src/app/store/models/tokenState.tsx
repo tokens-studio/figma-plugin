@@ -33,6 +33,7 @@ import { StorageProviderType } from '@/constants/StorageProviderType';
 import { updateTokenSetsInState } from '@/utils/tokenset/updateTokenSetsInState';
 import { TokenTypes } from '@/constants/TokenTypes';
 import tokenTypes from '@/config/tokenType.defs.json';
+import { UpdateMode } from '@/constants/UpdateMode';
 
 export interface TokenState {
   tokens: Record<string, AnyTokenList>;
@@ -473,6 +474,12 @@ export const tokenState = createModel<RootModel>()({
     updateCheckForChanges() {
       dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
     },
+    triggerSelectionEvent(payload: null, rootState) {
+      console.log('Triggering sel change', rootState.settings.watchMode);
+      if (rootState.settings.watchMode) {
+        dispatch.tokenState.updateDocument({ updateSelection: true });
+      }
+    },
     updateDocument(options?: UpdateDocumentPayload, rootState?) {
       const defaults = { shouldUpdateNodes: true, updateRemote: true };
       const params = { ...defaults, ...options };
@@ -483,7 +490,7 @@ export const tokenState = createModel<RootModel>()({
           usedTokenSet: rootState.tokenState.usedTokenSet,
           themes: rootState.tokenState.themes,
           activeTheme: rootState.tokenState.activeTheme,
-          settings: rootState.settings,
+          settings: { ...rootState.settings, updateMode: params.updateSelection ? UpdateMode.SELECTION : rootState.settings.updateMode },
           updatedAt: new Date().toISOString(),
           lastUpdatedAt: rootState.uiState.lastUpdatedAt ?? new Date().toISOString(),
           isLocal: rootState.uiState.storageType.provider === StorageProviderType.LOCAL,

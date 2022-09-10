@@ -22,6 +22,7 @@ export interface SettingsState {
   updateRemote: boolean;
   updateOnChange?: boolean;
   updateStyles?: boolean;
+  watchMode?: boolean;
   tokenType?: TokenModeType;
   ignoreFirstPartForStyles?: boolean;
   prefixStylesWithThemeName?: boolean;
@@ -46,6 +47,7 @@ export const settings = createModel<RootModel>()({
     updateRemote: true,
     updateOnChange: true,
     updateStyles: true,
+    watchMode: false,
     tokenType: 'object',
     ignoreFirstPartForStyles: false,
     prefixStylesWithThemeName: false,
@@ -118,6 +120,12 @@ export const settings = createModel<RootModel>()({
         updateStyles: payload,
       };
     },
+    setWatchMode(state, payload: boolean) {
+      return {
+        ...state,
+        watchMode: payload,
+      };
+    },
     setTokenType(state, payload: TokenModeType) {
       return {
         ...state,
@@ -147,6 +155,9 @@ export const settings = createModel<RootModel>()({
       });
     },
     setUpdateStyles: (payload, rootState) => {
+      setUI(rootState.settings);
+    },
+    setWatchMode: (payload, rootState) => {
       setUI(rootState.settings);
     },
     setUpdateMode: (payload, rootState) => {

@@ -39,6 +39,7 @@ export type UiSettingsFromPluginMessage = {
     updateRemote: boolean;
     updateOnChange: boolean;
     updateStyles: boolean;
+    watchMode: boolean;
     ignoreFirstPartForStyles: boolean;
     prefixStylesWithThemeName: boolean;
     inspectDeep: boolean;

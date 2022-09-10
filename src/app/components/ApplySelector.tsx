@@ -19,11 +19,11 @@ import { UpdateMode } from '@/constants/UpdateMode';
 
 export default function ApplySelector() {
   const {
-    updateMode, updateRemote, updateOnChange, updateStyles,
+    updateMode, updateRemote, updateOnChange, updateStyles, watchMode,
   } = useSelector(settingsStateSelector, isEqual);
 
   const {
-    setUpdateMode, setUpdateOnChange, setUpdateRemote, setUpdateStyles,
+    setUpdateMode, setUpdateOnChange, setUpdateRemote, setUpdateStyles, setWatchMode,
   } = useDispatch<Dispatch>().settings;
 
   const handleApplySelection = React.useCallback(() => {
@@ -49,6 +49,10 @@ export default function ApplySelector() {
   const handleUpdateStyles = React.useCallback(() => {
     setUpdateStyles(!updateStyles);
   }, [updateStyles, setUpdateStyles]);
+
+  const handleWatchMode = React.useCallback(() => {
+    setWatchMode(!watchMode);
+  }, [watchMode, setWatchMode]);
 
   return (
     <DropdownMenu>
@@ -102,6 +106,12 @@ export default function ApplySelector() {
             <CheckIcon />
           </DropdownMenuItemIndicator>
           Update styles
+        </DropdownMenuCheckboxItem>
+        <DropdownMenuCheckboxItem checked={watchMode} onCheckedChange={handleWatchMode}>
+          <DropdownMenuItemIndicator>
+            <CheckIcon />
+          </DropdownMenuItemIndicator>
+          Watch mode
         </DropdownMenuCheckboxItem>
       </DropdownMenuContent>
     </DropdownMenu>

@@ -47,6 +47,8 @@ export function Initiator() {
               dispatch.uiState.setMainNodeSelectionValues({});
             }
 
+            dispatch.tokenState.triggerSelectionEvent(null);
+
             // Selection values are all tokens across all layers, used in Multi Inspector.
             if (selectionValues) {
               const orderObj = convertToOrderObj(Properties);

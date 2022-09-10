@@ -57,6 +57,7 @@ export type SavedSettings = {
   updateRemote: boolean;
   updateOnChange: boolean;
   updateStyles: boolean;
+  watchMode: boolean;
   ignoreFirstPartForStyles: boolean;
   prefixStylesWithThemeName: boolean;
   inspectDeep: boolean;
@@ -69,6 +70,7 @@ export function notifyUISettings(
     updateMode,
     updateOnChange,
     updateStyles,
+    watchMode,
     showEmptyGroups,
     ignoreFirstPartForStyles,
     prefixStylesWithThemeName,
@@ -88,6 +90,7 @@ export function notifyUISettings(
       updateRemote,
       updateOnChange,
       updateStyles,
+      watchMode,
       ignoreFirstPartForStyles,
       prefixStylesWithThemeName,
       inspectDeep,

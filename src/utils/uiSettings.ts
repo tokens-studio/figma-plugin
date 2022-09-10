@@ -14,6 +14,7 @@ export async function updateUISettings(uiSettings: Partial<SavedSettings>) {
       updateRemote: uiSettings.updateRemote ?? data?.updateRemote,
       updateOnChange: uiSettings.updateOnChange ?? data?.updateOnChange,
       updateStyles: uiSettings.updateStyles ?? data?.updateStyles,
+      watchMode: uiSettings.watchMode ?? data?.watchMode,
       ignoreFirstPartForStyles: uiSettings.ignoreFirstPartForStyles ?? data?.ignoreFirstPartForStyles,
       prefixStylesWithThemeName: uiSettings.prefixStylesWithThemeName ?? data?.prefixStylesWithThemeName,
       inspectDeep: uiSettings.inspectDeep ?? data?.inspectDeep,
@@ -35,6 +36,7 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
     let updateRemote: boolean;
     let updateOnChange: boolean;
     let updateStyles: boolean;
+    let watchMode: boolean;
     let ignoreFirstPartForStyles: boolean;
     let prefixStylesWithThemeName: boolean;
     let inspectDeep: boolean;
@@ -46,6 +48,7 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
       updateRemote = typeof data.updateRemote === 'undefined' ? true : data.updateRemote;
       updateOnChange = typeof data.updateOnChange === 'undefined' ? true : data.updateOnChange;
       updateStyles = typeof data.updateStyles === 'undefined' ? true : data.updateStyles;
+      watchMode = typeof data.watchMode === 'undefined' ? true : data.watchMode;
       ignoreFirstPartForStyles = typeof data.ignoreFirstPartForStyles === 'undefined' ? false : data.ignoreFirstPartForStyles;
       prefixStylesWithThemeName = typeof data.prefixStylesWithThemeName === 'undefined' ? false : data.prefixStylesWithThemeName;
       inspectDeep = typeof data.inspectDeep === 'undefined' ? false : data.inspectDeep;
@@ -57,6 +60,7 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
         updateOnChange,
         updateRemote,
         updateStyles,
+        watchMode,
         ignoreFirstPartForStyles,
         prefixStylesWithThemeName,
         inspectDeep,
