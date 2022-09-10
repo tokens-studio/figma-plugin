@@ -15,6 +15,7 @@ import { StyledTokenGroupHeading, StyledTokenGroupAddIcon, StyledTokenGroupHeadi
 import { Dispatch } from '../../store';
 import { collapsedTokensSelector } from '@/selectors/collapsedTokensSelector';
 import { ShowNewFormOptions } from '@/types';
+import useTokens from '../../store/useTokens';
 
 export type Props = {
   id: string
@@ -36,6 +37,7 @@ export function TokenGroupHeading({
   const { deleteGroup, renameGroup, duplicateGroup } = useManageTokens();
   const dispatch = useDispatch<Dispatch>();
   const collapsed = useSelector(collapsedTokensSelector);
+  const { remapTokensInGroup } = useTokens();
 
   React.useEffect(() => {
     setNewTokenGroupName(`${path.split('.').pop()}${copyName}` || '');
@@ -50,14 +52,16 @@ export function TokenGroupHeading({
     setShowNewGroupNameField(true);
   }, []);
 
-  const handleRenameTokenGroupSubmit = React.useCallback((e: React.FormEvent<HTMLFormElement>) => {
+  const handleRenameTokenGroupSubmit = React.useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     setShowNewGroupNameField(false);
     renameGroup(`${path}${copyName}`, `${newTokenGroupName}`, type);
+
+    remapTokensInGroup({ oldGroupName: `${path}${copyName}.`, newGroupName: `${newTokenGroupName}.` });
     setIsTokenGroupDuplicated(false);
     setCopyName('');
-  }, [copyName, newTokenGroupName, path, renameGroup, type]);
+  }, [copyName, newTokenGroupName, path, renameGroup, type, remapTokensInGroup]);
 
   const handleNewTokenGroupNameChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setNewTokenGroupName(e.target.value);

@@ -152,6 +152,28 @@ export default function useTokens() {
     });
   }, [settings.updateMode]);
 
+  const remapTokensInGroup = useCallback(async ({ oldGroupName, newGroupName }: { oldGroupName: string, newGroupName: string }) => {
+    const shouldRemap = await confirm({
+      text: `Remap all tokens that use tokens in ${oldGroupName} group?`,
+      description: 'This will change all layers that used the old token name. This could take a while.',
+      choices: [
+        {
+          key: UpdateMode.SELECTION, label: 'Selection', unique: true, enabled: UpdateMode.SELECTION === settings.updateMode,
+        },
+        {
+          key: UpdateMode.PAGE, label: 'Page', unique: true, enabled: UpdateMode.PAGE === settings.updateMode,
+        },
+        {
+          key: UpdateMode.DOCUMENT, label: 'Document', unique: true, enabled: UpdateMode.DOCUMENT === settings.updateMode,
+        },
+      ],
+    });
+    if (shouldRemap) {
+      await handleBulkRemap(newGroupName, oldGroupName);
+      dispatch.settings.setUpdateMode(shouldRemap.data[0] as UpdateMode);
+    }
+  }, [settings.updateMode, confirm, handleBulkRemap, dispatch.settings]);
+
   // Asks user which styles to create, then calls Figma with all tokens to create styles
   const createStylesFromTokens = useCallback(async () => {
     const userDecision = await confirm({
@@ -206,6 +228,7 @@ export default function useTokens() {
     createStylesFromTokens,
     pullStyles,
     remapToken,
+    remapTokensInGroup,
     removeTokensByValue,
     handleRemap,
     handleBulkRemap,
@@ -217,6 +240,7 @@ export default function useTokens() {
     createStylesFromTokens,
     pullStyles,
     remapToken,
+    remapTokensInGroup,
     removeTokensByValue,
     handleRemap,
     handleBulkRemap,
