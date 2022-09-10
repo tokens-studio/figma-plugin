@@ -47,10 +47,7 @@ export * from './prefixStylesWithThemeNameSelector';
 export * from './collapsedTokenSetsSelector';
 export * from './collapsedTokenTypeObjSelector';
 export * from './scrollPositionSetSelector';
-<<<<<<< HEAD
 export * from './themeObjectsSelector';
-=======
 export * from './themeByIdSelector';
 export * from './isWaitingForBackgroundJobSelector';
 export * from './licenseDetailsSelector';
->>>>>>> 63bf86ac13bcaa459692c5db8080863b78a62cde

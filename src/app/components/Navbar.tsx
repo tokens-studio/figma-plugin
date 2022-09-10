@@ -1,10 +1,6 @@
 import React, { useCallback } from 'react';
-<<<<<<< HEAD
 import axios from 'axios';
-import { useSelector } from 'react-redux';
-=======
 import { useDispatch, useSelector } from 'react-redux';
->>>>>>> 63bf86ac13bcaa459692c5db8080863b78a62cde
 import Box from './Box';
 import { Tabs } from '@/constants/Tabs';
 import Stack from './Stack';
@@ -13,22 +9,22 @@ import { NavbarUndoButton } from './NavbarUndoButton';
 import Minimize from '../assets/minimize.svg';
 import useMinimizeWindow from './useMinimizeWindow';
 import IconButton from './IconButton';
-<<<<<<< HEAD
 import { IconFolder } from '@/icons';
-import useTokens from '@/app/store/useTokens';
 import {
-  themeObjectsSelector, activeThemeSelector, themeOptionsSelector, usedTokenSetSelector, tokensSelector,
+  themeObjectsSelector,
+  activeThemeSelector,
+  themeOptionsSelector,
+  usedTokenSetSelector,
+  tokensSelector,
+  activeTabSelector,
 } from '@/selectors';
-=======
-import { activeTabSelector } from '@/selectors';
+
 import { Dispatch } from '../store';
->>>>>>> 63bf86ac13bcaa459692c5db8080863b78a62cde
 
 const Navbar: React.FC = () => {
   const activeTab = useSelector(activeTabSelector);
   const dispatch = useDispatch<Dispatch>();
   const { handleResize } = useMinimizeWindow();
-  const { getFormattedTokens } = useTokens();
   const activeTheme = useSelector(activeThemeSelector);
   const availableThemes = useSelector(themeOptionsSelector);
   const usedTokenSet = useSelector(usedTokenSetSelector);
@@ -49,11 +45,14 @@ const Navbar: React.FC = () => {
       },
     });
     if (response.status === 200) window.open(`http://localhost:3000?id=${response.data.result}`);
-  }, [activeTheme, availableThemes, getFormattedTokens, themeObjects, usedTokenSet]);
+  }, [activeTheme, availableThemes, themeObjects, tokens, usedTokenSet]);
 
-  const handleSwitch = useCallback((tab: Tabs) => {
-    dispatch.uiState.setActiveTab(tab);
-  }, [dispatch.uiState]);
+  const handleSwitch = useCallback(
+    (tab: Tabs) => {
+      dispatch.uiState.setActiveTab(tab);
+    },
+    [dispatch.uiState],
+  );
 
   return (
     <Box

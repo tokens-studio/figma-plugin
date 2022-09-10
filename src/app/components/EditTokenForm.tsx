@@ -41,8 +41,11 @@ function EditTokenForm({ resolvedTokens }: Props) {
   const { confirm } = useConfirm();
 
   const isValid = React.useMemo(() => {
-    if (internalEditToken?.type === TokenTypes.COMPOSITION && internalEditToken.value
-      && (internalEditToken.value.hasOwnProperty('') || Object.keys(internalEditToken.value).length === 0)) {
+    if (
+      internalEditToken?.type === TokenTypes.COMPOSITION
+      && internalEditToken.value
+      && (internalEditToken.value.hasOwnProperty('') || Object.keys(internalEditToken.value).length === 0)
+    ) {
       return false;
     }
     return internalEditToken?.value && !error;
@@ -65,11 +68,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
   const hasPriorTokenName = React.useMemo(
     () => resolvedTokens
       .filter((t) => t.internal__Parent === activeTokenSet)
-<<<<<<< HEAD
-      .find((t) => t.type === internalEditToken.type && internalEditToken.name?.startsWith(t.name)),
-=======
       .find((t) => t.type === internalEditToken.type && internalEditToken.name?.startsWith(`${t.name}.`)),
->>>>>>> 63bf86ac13bcaa459692c5db8080863b78a62cde
     [internalEditToken, resolvedTokens, activeTokenSet],
   );
 
@@ -81,15 +80,14 @@ function EditTokenForm({ resolvedTokens }: Props) {
     if ((internalEditToken?.status !== EditTokenFormStatus.EDIT || nameWasChanged) && hasNameThatExistsAlready) {
       setError('Token names must be unique');
     }
-    if ((internalEditToken?.status !== EditTokenFormStatus.EDIT || nameWasChanged) && hasAnotherTokenThatStartsWithName) {
+    if (
+      (internalEditToken?.status !== EditTokenFormStatus.EDIT || nameWasChanged)
+      && hasAnotherTokenThatStartsWithName
+    ) {
       setError('Must not use name of another group');
     }
-<<<<<<< HEAD
-    if ((internalEditToken?.isPristine || nameWasChanged) && hasPriorTokenName) {
-=======
     if ((internalEditToken?.status || nameWasChanged) && hasPriorTokenName) {
->>>>>>> 63bf86ac13bcaa459692c5db8080863b78a62cde
-      setError('Tokens can\'t share name with a group');
+      setError("Tokens can't share name with a group");
     }
   }, [internalEditToken, hasNameThatExistsAlready, nameWasChanged, hasPriorTokenName]);
 
@@ -175,21 +173,27 @@ function EditTokenForm({ resolvedTokens }: Props) {
     [internalEditToken],
   );
 
-  const handleTypographyValueDownShiftInputChange = React.useCallback((newInputValue: string, property: string) => {
-    if (internalEditToken?.type === TokenTypes.TYPOGRAPHY && typeof internalEditToken?.value !== 'string') {
+  const handleTypographyValueDownShiftInputChange = React.useCallback(
+    (newInputValue: string, property: string) => {
+      if (internalEditToken?.type === TokenTypes.TYPOGRAPHY && typeof internalEditToken?.value !== 'string') {
+        setInternalEditToken({
+          ...internalEditToken,
+          value: { ...internalEditToken.value, [property]: newInputValue },
+        });
+      }
+    },
+    [internalEditToken],
+  );
+
+  const handleDownShiftInputChange = React.useCallback(
+    (newInputValue: string) => {
       setInternalEditToken({
         ...internalEditToken,
-        value: { ...internalEditToken.value, [property]: newInputValue },
-      });
-    }
-  }, [internalEditToken]);
-
-  const handleDownShiftInputChange = React.useCallback((newInputValue: string) => {
-    setInternalEditToken({
-      ...internalEditToken,
-      value: newInputValue,
-    } as typeof editToken);
-  }, [internalEditToken]);
+        value: newInputValue,
+      } as typeof editToken);
+    },
+    [internalEditToken],
+  );
 
   const handleDescriptionChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>(
     (e) => {
@@ -220,10 +224,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
       if (internalEditToken.status === EditTokenFormStatus.CREATE) {
         track('Create token', { type: internalEditToken.type });
         createSingleToken({
-          description: (
-            internalEditToken.description
-            ?? internalEditToken.oldDescription
-          ),
+          description: internalEditToken.description ?? internalEditToken.oldDescription,
           parent: activeTokenSet,
           name: newName,
           type,
@@ -231,10 +232,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
         });
       } else if (internalEditToken.status === EditTokenFormStatus.EDIT) {
         editSingleToken({
-          description: (
-            internalEditToken.description
-            ?? internalEditToken.oldDescription
-          ),
+          description: internalEditToken.description ?? internalEditToken.oldDescription,
           parent: activeTokenSet,
           name: newName,
           oldName,
@@ -269,10 +267,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
       } else if (internalEditToken.status === EditTokenFormStatus.DUPLICATE) {
         oldName = internalEditToken.initialName?.slice(0, internalEditToken.initialName?.lastIndexOf('-copy'));
         duplicateSingleToken({
-          description: (
-            internalEditToken.description
-            ?? internalEditToken.oldDescription
-          ),
+          description: internalEditToken.description ?? internalEditToken.oldDescription,
           parent: activeTokenSet,
           newName,
           oldName,
@@ -384,7 +379,10 @@ function EditTokenForm({ resolvedTokens }: Props) {
             {checkIfContainsAlias(internalEditToken.value) && (
               <div className="flex p-2 mt-2 font-mono text-gray-700 bg-gray-100 border-gray-300 rounded text-xxs itms-center">
                 {internalEditToken.type === 'color' ? (
-                  <div className="w-4 h-4 mr-1 border border-gray-200 rounded" style={{ background: String(resolvedValue) }} />
+                  <div
+                    className="w-4 h-4 mr-1 border border-gray-200 rounded"
+                    style={{ background: String(resolvedValue) }}
+                  />
                 ) : null}
                 {resolvedValue?.toString()}
               </div>
@@ -412,7 +410,9 @@ function EditTokenForm({ resolvedTokens }: Props) {
         />
         {renderTokenForm()}
 
-        {internalEditToken?.schema?.explainer && <div className="mt-1 text-gray-600 text-xxs">{internalEditToken.schema.explainer}</div>}
+        {internalEditToken?.schema?.explainer && (
+          <div className="mt-1 text-gray-600 text-xxs">{internalEditToken.schema.explainer}</div>
+        )}
         <Input
           full
           key="description"
@@ -430,10 +430,9 @@ function EditTokenForm({ resolvedTokens }: Props) {
           <Button disabled={!isValid} variant="primary" type="submit">
             {internalEditToken?.status === EditTokenFormStatus.CREATE && 'Create'}
             {internalEditToken?.status === EditTokenFormStatus.EDIT && 'Update'}
-            {(
-              internalEditToken?.status !== EditTokenFormStatus.CREATE
+            {internalEditToken?.status !== EditTokenFormStatus.CREATE
               && internalEditToken?.status !== EditTokenFormStatus.EDIT
-            ) && 'Duplicate'}
+              && 'Duplicate'}
           </Button>
         </Stack>
       </Stack>
