@@ -9,14 +9,12 @@ import Heading from '../Heading';
 import Input from '../Input';
 import Modal from '../Modal';
 import useManageTokens from '../../store/useManageTokens';
-import { editProhibitedSelector, updateModeSelector } from '@/selectors';
+import { editProhibitedSelector } from '@/selectors';
 import { IconCollapseArrow, IconExpandArrow, IconAdd } from '@/icons';
 import { StyledTokenGroupHeading, StyledTokenGroupAddIcon, StyledTokenGroupHeadingCollapsable } from './StyledTokenGroupHeading';
 import { Dispatch } from '../../store';
-import useConfirm from '../../hooks/useConfirm';
 import { collapsedTokensSelector } from '@/selectors/collapsedTokensSelector';
 import { ShowNewFormOptions } from '@/types';
-import { UpdateMode } from '@/constants/UpdateMode';
 import useTokens from '../../store/useTokens';
 
 export type Props = {
@@ -39,9 +37,7 @@ export function TokenGroupHeading({
   const { deleteGroup, renameGroup, duplicateGroup } = useManageTokens();
   const dispatch = useDispatch<Dispatch>();
   const collapsed = useSelector(collapsedTokensSelector);
-  const updateMode = useSelector(updateModeSelector);
-  const { confirm } = useConfirm();
-  const { handleBulkRemap } = useTokens();
+  const { remapTokensInGroup } = useTokens();
 
   React.useEffect(() => {
     setNewTokenGroupName(`${path.split('.').pop()}${copyName}` || '');
@@ -62,28 +58,10 @@ export function TokenGroupHeading({
     setShowNewGroupNameField(false);
     renameGroup(`${path}${copyName}`, `${newTokenGroupName}`, type);
 
-    const shouldRemap = await confirm({
-      text: `Remap all tokens that use tokens in ${path}${copyName} group?`,
-      description: 'This will change all layers that used the old token name. This could take a while.',
-      choices: [
-        {
-          key: UpdateMode.SELECTION, label: 'Selection', unique: true, enabled: UpdateMode.SELECTION === updateMode,
-        },
-        {
-          key: UpdateMode.PAGE, label: 'Page', unique: true, enabled: UpdateMode.PAGE === updateMode,
-        },
-        {
-          key: UpdateMode.DOCUMENT, label: 'Document', unique: true, enabled: UpdateMode.DOCUMENT === updateMode,
-        },
-      ],
-    });
-    if (shouldRemap) {
-      await handleBulkRemap(`${newTokenGroupName}.`, `${path}${copyName}.`);
-      dispatch.settings.setUpdateMode(shouldRemap.data[0]);
-    }
+    remapTokensInGroup({ oldGroupName: `${path}${copyName}.`, newGroupName: `${newTokenGroupName}.` });
     setIsTokenGroupDuplicated(false);
     setCopyName('');
-  }, [copyName, newTokenGroupName, path, renameGroup, type]);
+  }, [copyName, newTokenGroupName, path, renameGroup, type, remapTokensInGroup]);
 
   const handleNewTokenGroupNameChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setNewTokenGroupName(e.target.value);
