@@ -38,6 +38,7 @@ export enum AsyncMessageTypes {
   SET_LICENSE_KEY = 'async/set-license-key',
   ATTACH_LOCAL_STYLES_TO_THEME = 'async/attach-local-styles-to-theme',
   RESOLVE_STYLE_INFO = 'async/resolve-style-info',
+  EXTRACT_TOKENS_FROM_SELECTION = 'async/extract-tokens-from-selection',
   // the below messages are going from plugin to UI
   STARTUP = 'async/startup',
   GET_THEME_INFO = 'async/get-theme-info',
@@ -167,6 +168,13 @@ export type ResolveStyleInfoResult = AsyncMessage<AsyncMessageTypes.RESOLVE_STYL
   }[];
 }>;
 
+export type ExtractTokensFromSelection = AsyncMessage<AsyncMessageTypes.EXTRACT_TOKENS_FROM_SELECTION, {
+  categories: string[]
+}>;
+export type ExtractTokensFromSelectionResult = AsyncMessage<AsyncMessageTypes.EXTRACT_TOKENS_FROM_SELECTION, {
+  uniqueValues: Record<string, AnyTokenList>;
+}>;
+
 export type GetThemeInfoMessage = AsyncMessage<AsyncMessageTypes.GET_THEME_INFO>;
 export type GetThemeInfoMessageResult = AsyncMessage<AsyncMessageTypes.GET_THEME_INFO, {
   activeTheme: string | null
@@ -202,7 +210,8 @@ export type AsyncMessages =
   | SetLicenseKeyMessage
   | StartupMessage
   | AttachLocalStylesToTheme
-  | ResolveStyleInfo;
+  | ResolveStyleInfo
+  | ExtractTokensFromSelection;
 
 export type AsyncMessageResults =
   CreateStylesAsyncMessageResult
@@ -228,7 +237,8 @@ export type AsyncMessageResults =
   | SetLicenseKeyMessageResult
   | StartupMessageResult
   | AttachLocalStylesToThemeResult
-  | ResolveStyleInfoResult;
+  | ResolveStyleInfoResult
+  | ExtractTokensFromSelectionResult;
 
 export type AsyncMessagesMap = {
   [K in AsyncMessageTypes]: Extract<AsyncMessages, { type: K }>

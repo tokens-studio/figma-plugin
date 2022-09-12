@@ -19,11 +19,12 @@ export const MoreButtonProperty: React.FC<Props> = ({ value, property, onClick }
   const isActive = React.useMemo(() => (
     mainNodeSelectionValues[property.name] === value
   ), [value, property, mainNodeSelectionValues]);
+
   const handleClick = React.useCallback((e) => {
     e.preventDefault();
+
     onClick(property, isActive);
   }, [property, isActive, onClick]);
-
   return (
     <ContextMenuCheckboxItem
       key={property.label}
