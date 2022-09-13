@@ -10,6 +10,7 @@ import {
 } from './GitTokenStorage';
 import { SystemFilenames } from '@/constants/SystemFilenames';
 import { ErrorMessages } from '@/constants/ErrorMessages';
+import { joinPath } from '@/utils/string';
 
 type ExtendedOctokitClient = Omit<Octokit, 'repos'> & {
   repos: Octokit['repos'] & {
@@ -317,7 +318,7 @@ export class GithubTokenStorage extends GitTokenStorage {
               (a.path && b.path) ? a.path.localeCompare(b.path) : 0
             ));
 
-            const filesToDelete = jsonFiles.filter((jsonFile) => !Object.keys(changeset).some((item) => jsonFile.path && item.endsWith(jsonFile?.path)))
+            const filesToDelete = jsonFiles.filter((jsonFile) => !Object.keys(changeset).some((item) => jsonFile.path && item === joinPath(this.path, jsonFile?.path)))
               .map((fileToDelete) => (`${this.path.split('/')[0]}/${fileToDelete.path}` ?? ''));
             return await this.createOrUpdate(changeset, message, branch, shouldCreateBranch, filesToDelete, true);
           }
