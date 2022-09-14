@@ -1,7 +1,10 @@
 import React from 'react';
+import { init, RematchStore } from '@rematch/core';
 import { renderHook, act } from '@testing-library/react-hooks';
 import { Provider } from 'react-redux';
-import { AllTheProviders, createMockStore, resetStore } from '../../../tests/config/setupTest';
+import { RootModel } from '@/types/RootModel';
+import { models } from './models';
+import { AllTheProviders } from '../../../tests/config/setupTest';
 import useManageTokens from './useManageTokens';
 import { TokenTypes } from '@/constants/TokenTypes';
 
@@ -14,36 +17,42 @@ jest.mock('../hooks/useConfirm', () => ({
   }),
 }));
 
-describe('useManageToken test', () => {
-  const mockStore = createMockStore({
-    tokenState: {
-      tokens: {
-        global: [
-          {
-            name: 'size.new',
-            type: TokenTypes.SIZING,
-            value: '12px',
-          },
-          {
-            name: 'size.primary',
-            type: TokenTypes.SIZING,
-            value: '16px',
-          },
-        ],
-      },
-      activeTokenSet: 'global',
-    },
-  });
+type Store = RematchStore<RootModel, Record<string, never>>;
 
+describe('useManageToken test', () => {
+  let store: Store;
   let { result } = renderHook(() => useManageTokens(), {
     wrapper: AllTheProviders,
   });
 
   beforeEach(() => {
+    store = init<RootModel>({
+      redux: {
+        initialState: {
+          tokenState: {
+            tokens: {
+              global: [
+                {
+                  name: 'size.new',
+                  type: TokenTypes.SIZING,
+                  value: '12px',
+                },
+                {
+                  name: 'size.primary',
+                  type: TokenTypes.SIZING,
+                  value: '16px',
+                },
+              ],
+            },
+            activeTokenSet: 'global',
+          },
+        },
+      },
+      models,
+    });
     result = renderHook(() => useManageTokens(), {
-      wrapper: ({ children }: { children?: React.ReactNode }) => <Provider store={mockStore}>{children}</Provider>,
+      wrapper: ({ children }: { children?: React.ReactNode }) => <Provider store={store}>{children}</Provider>,
     }).result;
-    resetStore();
   });
 
   it('editSingleToken test', async () => {
@@ -86,7 +95,7 @@ describe('useManageToken test', () => {
     mockConfirm.mockImplementationOnce(() => Promise.resolve(false));
     await act(async () => result.current.deleteSingleToken(tokenToDelete));
 
-    expect(mockStore.getState().tokenState.tokens.global).toEqual([
+    expect(store.getState().tokenState.tokens.global).toEqual([
       {
         name: 'size.new',
         type: TokenTypes.SIZING,
@@ -108,7 +117,7 @@ describe('useManageToken test', () => {
     mockConfirm.mockImplementationOnce(() => Promise.resolve(true));
     await act(async () => result.current.deleteSingleToken(tokenToDelete));
 
-    expect(mockStore.getState().tokenState.tokens.global).toEqual([
+    expect(store.getState().tokenState.tokens.global).toEqual([
       {
         name: 'size.primary',
         type: TokenTypes.SIZING,
@@ -123,7 +132,7 @@ describe('useManageToken test', () => {
     const type = TokenTypes.SIZING;
     await act(async () => result.current.renameGroup(path, newName, type));
 
-    expect(mockStore.getState().tokenState.tokens.global).toEqual([
+    expect(store.getState().tokenState.tokens.global).toEqual([
       {
         name: 'newGroup.new',
         type: TokenTypes.SIZING,
@@ -142,7 +151,7 @@ describe('useManageToken test', () => {
     const type = TokenTypes.SIZING;
     await act(async () => result.current.duplicateGroup(path, type));
 
-    expect(mockStore.getState().tokenState.tokens.global).toEqual([
+    expect(store.getState().tokenState.tokens.global).toEqual([
       {
         name: 'size.new',
         type: TokenTypes.SIZING,
