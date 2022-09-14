@@ -95,7 +95,7 @@ export function TokenGroupHeading({
       >
         {collapsed.includes(path) ? <IconCollapseArrow /> : <IconExpandArrow />}
         <ContextMenu>
-          <ContextMenuTrigger id={`group-heading-${path}-${label}-${id}`} onClick={handleToggleCollapsed}>
+          <ContextMenuTrigger data-testid={`group-heading-${path}-${label}-${id}`} onClick={handleToggleCollapsed}>
             <Heading muted size="small">{label}</Heading>
           </ContextMenuTrigger>
           <ContextMenuContent>
