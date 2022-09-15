@@ -71,8 +71,7 @@ export function useBitbucket() {
     }
     if (content) {
       if (
-        content
-        && isEqual(content.tokens, tokens)
+        isEqual(content.tokens, tokens)
         && isEqual(content.themes, themes)
         && isEqual(content.metadata?.tokenSetOrder ?? Object.keys(tokens), Object.keys(tokens))
       ) {
