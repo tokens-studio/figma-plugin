@@ -115,10 +115,10 @@ export function useGitHub() {
       } catch (e) {
         closeDialog();
         console.log('Error pushing to GitHub', e);
-        if (e instanceof Error) {
+        if (e instanceof Error && e.message === ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR) {
           return {
             status: 'failure',
-            errorMessage: e.message === ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR ? ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR : ErrorMessages.GITHUB_CREDENTIAL_ERROR,
+            errorMessage: ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR,
           };
         }
         return {

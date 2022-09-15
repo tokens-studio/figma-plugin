@@ -295,7 +295,7 @@ describe('remoteTokens', () => {
     jest.clearAllMocks();
   });
 
-  Object.values(contextMap).forEach((context) => {
+  Object.values(contextMap).forEach(context => {
     it(`Pull tokens from ${context.provider}`, async () => {
       if (context === jsonbinContext) {
         expect(await result.current.pullTokens({ context: context as StorageTypeCredentials })).toEqual({
@@ -349,7 +349,7 @@ describe('remoteTokens', () => {
     });
   });
 
-  Object.values(contextMap).forEach((context) => {
+  Object.values(contextMap).forEach(context => {
     it(`Pull tokens from ${context.provider}, should return error message when fetch data failed`, async () => {
       await result.current.pullTokens({ context: context as StorageTypeCredentials });
       mockRetrieve.mockImplementation(() => (
@@ -362,6 +362,27 @@ describe('remoteTokens', () => {
         status: 'failure',
         errorMessage: ErrorMessages.GENERAL_CONNECTION_ERROR,
       });
+    });
+  });
+
+  Object.entries(contextMap).forEach(([contextName, context]) => {
+    it(`Pull tokens from ${context.provider}, should return credential error message when fetching a data throws an error`, async () => {
+      await result.current.pullTokens({ context: context as StorageTypeCredentials });
+      mockRetrieve.mockImplementation(() => {
+        throw new Error('Error');
+      });
+      expect(await result.current.pullTokens({ context: context as StorageTypeCredentials })).toEqual({
+        status: 'failure',
+        errorMessage: errorMessageMap[contextName as keyof typeof errorMessageMap],
+      });
+    });
+  });
+
+  Object.values(contextMap).forEach(context => {
+    it(`Pull tokens from ${context.provider}, should return null when there is no file on remote storage`, async () => {
+      await result.current.pullTokens({ context: context as StorageTypeCredentials });
+      mockRetrieve.mockImplementation(() => null);
+      expect(await result.current.pullTokens({ context: context as StorageTypeCredentials })).toEqual(null);
     });
   });
 
@@ -391,7 +412,7 @@ describe('remoteTokens', () => {
   });
 
   Object.entries(contextMap).forEach(([contextName, context]) => {
-    it(`Restore storedProvider from ${context.provider}, should pull tokens if the user agree`, async () => {
+    it(`Restore storedProvider from ${context.provider}, should pull tokens if the user agrees`, async () => {
       mockFetchBranches.mockImplementationOnce(() => (
         Promise.resolve(['main'])
       ));
@@ -439,7 +460,7 @@ describe('remoteTokens', () => {
     });
   });
 
-  Object.values(contextMap).forEach((context) => {
+  Object.values(contextMap).forEach(context => {
     it(`Restore storedProvider from ${context.provider}, should return null when fetching data failed`, async () => {
       await result.current.restoreStoredProvider(context as StorageTypeCredentials);
       mockFetchBranches.mockImplementationOnce(() => (
@@ -455,7 +476,7 @@ describe('remoteTokens', () => {
     });
   });
 
-  Object.values(contextMap).forEach((context) => {
+  Object.values(contextMap).forEach(context => {
     it(`Restore storedProvider from ${context.provider}, should push tokens if there is no content`, async () => {
       mockFetchBranches.mockImplementationOnce(() => (
         Promise.resolve(['main'])
@@ -475,7 +496,21 @@ describe('remoteTokens', () => {
     });
   });
 
-  Object.values(contextMap).forEach((context) => {
+  Object.entries(contextMap).forEach(([contextName, context]) => {
+    it(`Restore storedProvider from ${context.provider}, should notify error message when it throws an error`, async () => {
+      mockFetchBranches.mockImplementationOnce(() => (
+        Promise.resolve(['main'])
+      ));
+      mockRetrieve.mockImplementation(() => {
+        throw new Error('Error')
+      });
+      await waitFor(() => { result.current.restoreStoredProvider(context as StorageTypeCredentials); });
+      expect(notifyToUI).toBeCalledTimes(1);
+      expect(notifyToUI).toBeCalledWith(errorMessageMap[contextName as keyof typeof errorMessageMap], { error: true });
+    });
+  });
+
+  Object.values(contextMap).forEach(context => {
     it(`push tokens to ${context.provider}`, async () => {
       mockRetrieve.mockImplementation(() => (
         Promise.resolve(null)
@@ -494,7 +529,7 @@ describe('remoteTokens', () => {
     });
   });
 
-  Object.values(contextMap).forEach((context) => {
+  Object.values(contextMap).forEach(context => {
     it(`push tokens to ${context.provider}, should not pop up push diaolog`, async () => {
       mockRetrieve.mockImplementation(() => (
         Promise.resolve({
@@ -509,7 +544,7 @@ describe('remoteTokens', () => {
     });
   });
 
-  Object.values(contextMap).forEach((context) => {
+  Object.values(contextMap).forEach(context => {
     it(`push tokens to ${context.provider}, should return noting to commit if the content is same`, async () => {
       if (context === gitHubContext || context === gitLabContext || context === adoContext || context === bitbucketContext) {
         await waitFor(() => { result.current.pushTokens(context as StorageTypeCredentials); });
@@ -518,9 +553,9 @@ describe('remoteTokens', () => {
     });
   });
 
-  Object.values(contextMap).forEach((context) => {
+  Object.values(contextMap).forEach(context => {
     if (context === gitHubContext || context === gitLabContext || context === adoContext || context === bitbucketContext) {
-      it(`push tokens to ${context.provider}, should close dialog when a free user trying to save multi file`, async () => {
+      it(`push tokens to ${context.provider}, should close push dialog when there is a permission error`, async () => {
         mockRetrieve.mockImplementation(() => (
           Promise.resolve(null)
         ));
@@ -539,7 +574,7 @@ describe('remoteTokens', () => {
     }
   });
 
-  Object.values(contextMap).forEach((context) => {
+  Object.values(contextMap).forEach(context => {
     if (context === gitHubContext || context === gitLabContext || context === adoContext || context === bitbucketContext) {
       it(`Add newProviderItem to ${context.provider}, should push tokens and return status data if there is no content`, async () => {
         mockFetchBranches.mockImplementationOnce(() => (
@@ -683,7 +718,7 @@ describe('remoteTokens', () => {
     }
   });
 
-  Object.values(contextMap).forEach((context) => {
+  Object.values(contextMap).forEach(context => {
     it(`Add newProviderItem to ${context.provider}, should pull tokens and return token data`, async () => {
       mockFetchBranches.mockImplementation(() => (
         Promise.resolve(['main'])
@@ -701,7 +736,7 @@ describe('remoteTokens', () => {
     });
   });
 
-  Object.values(contextMap).forEach((context) => {
+  Object.values(contextMap).forEach(context => {
     it(`Add newProviderItem to ${context.provider}, should return error message when there is no branch`, async () => {
       mockFetchBranches.mockImplementation(() => (
         Promise.resolve([])
@@ -729,8 +764,8 @@ describe('remoteTokens', () => {
     });
   });
 
-  Object.values(contextMap).forEach((context) => {
-    it(`create branch in ${context.provider}`, async () => {
+  Object.values(contextMap).forEach(context => {
+    it(`create branch on ${context.provider}`, async () => {
       if (context === gitHubContext || context === gitLabContext || context === adoContext || context === bitbucketContext) {
         mockCreateBranch.mockImplementation(() => (
           Promise.resolve(true)
@@ -740,8 +775,8 @@ describe('remoteTokens', () => {
     });
   });
 
-  Object.values(contextMap).forEach((context) => {
-    it(`fetch branchs in ${context.provider}`, async () => {
+  Object.values(contextMap).forEach(context => {
+    it(`fetch branchs on ${context.provider}`, async () => {
       if (context === gitHubContext || context === gitLabContext || context === adoContext || context === bitbucketContext) {
         mockFetchBranches.mockImplementation(() => (
           Promise.resolve(['main'])
@@ -780,7 +815,7 @@ describe('remoteTokens', () => {
     });
   });
 
-  it('Read tokens from File, should return null if there is no tokens on remote', async () => {
+  it('Read tokens from File, should return null if there is no tokens on file', async () => {
     mockRetrieve.mockImplementation(() => (
       Promise.resolve(null)
     ));

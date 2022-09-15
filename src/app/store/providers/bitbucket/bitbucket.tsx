@@ -247,7 +247,7 @@ export function useBitbucket() {
         }
         return await pushTokensToBitbucket(context);
       } catch (e) {
-        notifyToUI('Error syncing with Bitbucket, check credentials', { error: true });
+        notifyToUI(ErrorMessages.BITBUCKET_CREDENTIAL_ERROR, { error: true });
         console.log('Error', e);
         return {
           status: 'failure',
