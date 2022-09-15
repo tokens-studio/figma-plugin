@@ -69,22 +69,21 @@ export function useBitbucket() {
         errorMessage: content?.errorMessage,
       };
     }
-    if (content) {
-      if (
-        isEqual(content.tokens, tokens)
-        && isEqual(content.themes, themes)
-        && isEqual(content.metadata?.tokenSetOrder ?? Object.keys(tokens), Object.keys(tokens))
-      ) {
-        notifyToUI('Nothing to commit');
-        return {
-          status: 'success',
-          themes,
-          tokens,
-          metadata: {
-            tokenSetOrder: Object.keys(tokens),
-          },
-        };
-      }
+    if (
+      content
+      && isEqual(content.tokens, tokens)
+      && isEqual(content.themes, themes)
+      && isEqual(content.metadata?.tokenSetOrder ?? Object.keys(tokens), Object.keys(tokens))
+    ) {
+      notifyToUI('Nothing to commit');
+      return {
+        status: 'success',
+        themes,
+        tokens,
+        metadata: {
+          tokenSetOrder: Object.keys(tokens),
+        },
+      };
     }
 
     dispatch.uiState.setLocalApiState({ ...context });

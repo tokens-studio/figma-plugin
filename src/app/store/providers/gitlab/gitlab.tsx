@@ -71,20 +71,19 @@ export function useGitLab() {
       };
     }
 
-    if (content) {
-      if (
-        isEqual(content.tokens, tokens)
-        && isEqual(content.themes, themes)
-        && isEqual(content.metadata?.tokenSetOrder ?? Object.keys(tokens), Object.keys(tokens))
-      ) {
-        notifyToUI('Nothing to commit');
-        return {
-          status: 'success',
-          tokens,
-          themes,
-          metadata: {},
-        };
-      }
+    if (
+      content
+      && isEqual(content.tokens, tokens)
+      && isEqual(content.themes, themes)
+      && isEqual(content.metadata?.tokenSetOrder ?? Object.keys(tokens), Object.keys(tokens))
+    ) {
+      notifyToUI('Nothing to commit');
+      return {
+        status: 'success',
+        tokens,
+        themes,
+        metadata: {},
+      };
     }
 
     dispatch.uiState.setLocalApiState({ ...context });
