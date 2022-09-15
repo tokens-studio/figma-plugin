@@ -69,12 +69,12 @@ const argv = yargs(hideBin(process.argv))
       })
       .option('theme', {
         type: 'boolean',
-        describe: 'use theme configuration to determine the sets and excludes and output name.',
+        describe: 'Use theme configuration ($themes) to determine sets, excludes and output name.',
         default: false,
       })
       .option('themeOutputPath', {
         type: 'string',
-        describe: 'specific path to write the output to, when using theme option',
+        describe: 'Specific path to write the output to, when using theme option',
       });
   })
 
