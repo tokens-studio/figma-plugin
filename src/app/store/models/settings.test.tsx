@@ -4,6 +4,7 @@ import { models } from './index';
 import { UpdateMode } from '@/constants/UpdateMode';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
+import { RootState } from '@/app/store';
 
 type Store = RematchStore<RootModel, Record<string, never>>;
 
@@ -66,6 +67,11 @@ describe('settings', () => {
       width: 50,
       height: 50,
     });
+  });
+
+  it('should be able to set update styles', () => {
+    store.dispatch.settings.setUpdateStyles(true);
+    expect(store.getState().settings.updateStyles).toBe(true);
   });
 
   it('should be able to set UI settings', () => {
