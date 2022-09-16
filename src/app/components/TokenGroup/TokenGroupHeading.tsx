@@ -79,7 +79,6 @@ export function TokenGroupHeading({
   }, [duplicateGroup, path, type]);
 
   const handleToggleCollapsed = useCallback(() => {
-    console.log('collapse');
     dispatch.tokenState.setCollapsedTokens(collapsed.includes(path) ? collapsed.filter((s) => s !== path) : [...collapsed, path]);
   }, [collapsed, dispatch.tokenState, path]);
 
