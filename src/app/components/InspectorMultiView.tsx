@@ -33,6 +33,7 @@ export default function InspectorMultiView({ resolvedTokens }: { resolvedTokens:
     Record<TokenTypes, SelectionGroup[]>
     & Record<Properties, SelectionGroup[]>
     >>((acc, curr) => {
+      if (curr.type === 'fillStyleId_original') return acc;
       if (acc[curr.category]) {
         const sameValueIndex = acc[curr.category]!.findIndex((v) => v.value === curr.value);
 
