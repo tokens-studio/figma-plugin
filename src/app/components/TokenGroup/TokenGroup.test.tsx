@@ -67,7 +67,7 @@ describe('TokenGroup', () => {
     resetStore();
   });
 
-  it('should be able to collpase a token group', async () => {
+  it('should be able to collapse a token group', async () => {
     const { getByTestId } = render(<TokenGroup
       tokenValues={tokenValues as DeepKeyTokenMap}
       showNewForm={showNewForm}
