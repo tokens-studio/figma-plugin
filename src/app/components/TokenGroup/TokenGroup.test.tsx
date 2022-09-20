@@ -75,8 +75,8 @@ describe('TokenGroup', () => {
       schema={schema as TokenTypeSchema}
     />);
 
-    await fireEvent.click(getByTestId('tokenlisting-group-size.font'));
-    await fireEvent.click(getByTestId('tokenlisting-group-color'));
+    await fireEvent.click(getByTestId('group-heading-size.font-font-listing'));
+    await fireEvent.click(getByTestId('group-heading-color-color-listing'));
 
     const { collapsedTokens } = store.getState().tokenState;
     expect(collapsedTokens).toEqual(['size.font', 'color']);
@@ -90,9 +90,9 @@ describe('TokenGroup', () => {
       schema={schema as TokenTypeSchema}
     />);
 
-    await fireEvent.click(getByTestId('tokenlisting-group-size.font'));
-    await fireEvent.click(getByTestId('tokenlisting-group-size.font'));
-    await fireEvent.click(getByTestId('tokenlisting-group-color'));
+    await fireEvent.click(getByTestId('group-heading-size.font-font-listing'));
+    await fireEvent.click(getByTestId('group-heading-size.font-font-listing'));
+    await fireEvent.click(getByTestId('group-heading-color-color-listing'));
 
     const { collapsedTokens } = store.getState().tokenState;
     expect(collapsedTokens).toEqual(['color']);
