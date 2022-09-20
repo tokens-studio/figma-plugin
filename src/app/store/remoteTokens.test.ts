@@ -9,6 +9,7 @@ import {
 } from '@/selectors';
 import { notifyToUI } from '@/plugin/notifiers';
 import { ErrorMessages } from '@/constants/ErrorMessages';
+import { JSONBinTokenStorage } from '@/storage';
 
 const mockStartJob = jest.fn();
 const mockRetrieve = jest.fn();
@@ -710,7 +711,7 @@ describe('remoteTokens', () => {
 
   Object.entries(contextMap).forEach(([contextName, context]) => {
     if (context === gitHubContext || context === gitLabContext || context === adoContext || context === bitbucketContext) {
-      it(`Add newProviderItem to ${context.provider}, should return error message when a error occured while saving the data`, async () => {
+      it(`Add newProviderItem to ${context.provider}, should return error message when there is a error while saving the data`, async () => {
         mockFetchBranches.mockImplementation(() => (
           Promise.resolve(['main'])
         ));
@@ -834,7 +835,7 @@ describe('remoteTokens', () => {
     });
   });
 
-  it('Add newProviderItem to JSONbin, should return error message when secret is not defined', async () => {
+  it('Add newProviderItem to JSONbin, should return error message when the secret is not defined', async () => {
     const jsonbinContextWithoutSecret = {
       name: 'six7',
       id: 'six7/figma-tokens',
@@ -844,6 +845,57 @@ describe('remoteTokens', () => {
     expect(await result.current.addNewProviderItem(jsonbinContextWithoutSecret as StorageTypeCredentials)).toEqual({
       status: 'failure',
       errorMessage: ErrorMessages.ID_NON_EXIST_ERROR,
+    });
+  });
+
+  it('Add newProviderItem to JSONbin, should return error message when there is a error while retrieving the data', async () => {
+    const jsonbinContextWithoutSecret = {
+      name: 'six7',
+      id: 'six7/figma-tokens',
+      provider: 'jsonbin',
+      secret: 'jsonbin',
+    };
+    mockRetrieve.mockImplementation(() => (
+      Promise.resolve({
+        status: 'failure',
+        errorMessage: ErrorMessages.GENERAL_CONNECTION_ERROR,
+      })
+    ));
+    expect(await result.current.addNewProviderItem(jsonbinContextWithoutSecret as StorageTypeCredentials)).toEqual({
+      status: 'failure',
+      errorMessage: ErrorMessages.GENERAL_CONNECTION_ERROR,
+    });
+  });
+
+  it('Add newProviderItem to JSONbin, should create new jsonbin storage', async () => {
+    const jsonbinContextWithoutId = {
+      name: 'six7',
+      provider: 'jsonbin',
+      secret: 'jsonbin',
+    };
+    const mockCreate = jest.fn().mockReturnValueOnce({
+      metadata: {
+        id: 'jsonbinId',
+      },
+    });
+    JSONBinTokenStorage.create = mockCreate;
+    await waitFor(() => { result.current.addNewProviderItem(jsonbinContextWithoutId as StorageTypeCredentials); });
+    expect(await result.current.addNewProviderItem(jsonbinContextWithoutId as StorageTypeCredentials)).toEqual({
+      status: 'success',
+    });
+  });
+
+  it('Add newProviderItem to JSONbin, should return error message when there is a error while creating token storage', async () => {
+    const jsonbinContextWithoutId = {
+      name: 'six7',
+      provider: 'jsonbin',
+      secret: 'jsonbin',
+    };
+    const mockCreate = jest.fn().mockReturnValueOnce(null);
+    JSONBinTokenStorage.create = mockCreate;
+    expect(await result.current.addNewProviderItem(jsonbinContextWithoutId as StorageTypeCredentials)).toEqual({
+      status: 'failure',
+      errorMessage: ErrorMessages.JSONBIN_CREATE_ERROR,
     });
   });
 
