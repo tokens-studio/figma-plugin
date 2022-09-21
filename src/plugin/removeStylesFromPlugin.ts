@@ -1,5 +1,6 @@
 import { SettingsState } from '@/app/store/models/settings';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
+import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { DeleteTokenPayload } from '@/types/payloads';
 import { convertTokenNameToPath } from '@/utils/convertTokenNameToPath';
@@ -17,9 +18,16 @@ export default async function removeStylesFromPlugin(
   const themeInfo = await AsyncMessageChannel.PluginInstance.message({
     type: AsyncMessageTypes.GET_THEME_INFO,
   });
+  console.log('theminf', themeInfo, 'toke', token)
   const activeThemeObject = themeInfo.activeTheme
     ? themeInfo.themes.find(({ id }) => id === themeInfo.activeTheme)
     : null;
+
+  const candidateThems = themeInfo.themes.filter(theme =>
+    Object.entries(theme.selectedTokenSets).some(([tokenSet, value]) => {
+      tokenSet === token.parent && value === TokenSetStatus.ENABLED
+    })
+  ).map(filteredTheme => filteredTheme.name);
 
   const stylePathSlice = settings?.ignoreFirstPartForStyles ? 1 : 0;
   const stylePathPrefix = settings?.prefixStylesWithThemeName && activeThemeObject
