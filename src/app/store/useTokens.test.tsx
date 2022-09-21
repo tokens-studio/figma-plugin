@@ -197,9 +197,9 @@ const resolvedTokens: AnyTokenList = [
 ];
 
 const mockConfirm = jest.fn();
-const mockPullStylesHandler = jest.fn(async () => {});
-const mockRemapTokensHandler = jest.fn(async () => {});
-const mockRemoveTokensByValueHandler = jest.fn(async () => {});
+const mockPullStylesHandler = jest.fn(async () => { });
+const mockRemapTokensHandler = jest.fn(async () => { });
+const mockRemoveTokensByValueHandler = jest.fn(async () => { });
 
 jest.mock('../hooks/useConfirm', () => ({
   __esModule: true,
@@ -283,6 +283,19 @@ describe('useToken test', () => {
   });
 
   describe('create or remove styles From Tokens', () => {
+    it('remapTokensInGroup', async () => {
+      const messageSpy = jest.spyOn(AsyncMessageChannel.ReactInstance, 'message');
+      mockConfirm.mockImplementation(() => Promise.resolve({ data: ['selection', 'page', 'document'] }));
+      await act(async () => {
+        await result.current.remapTokensInGroup({ oldGroupName: 'old.', newGroupName: 'new.' });
+      });
+      expect(messageSpy).toBeCalledWith({
+        type: AsyncMessageTypes.BULK_REMAP_TOKENS,
+        oldName: 'old.',
+        newName: 'new.',
+      });
+    });
+
     const tokenMockStore = createMockStore({
       tokenState: {
         usedTokenSet: { global: TokenSetStatus.ENABLED, light: TokenSetStatus.ENABLED },
@@ -392,7 +405,7 @@ describe('useToken test', () => {
         settings: store.getState().settings,
       });
     });
-    
+
     it('should remap all tokens', async () => {
       await act(async () => {
         await result.current.handleBulkRemap('newName', 'oldName');

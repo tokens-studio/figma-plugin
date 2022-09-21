@@ -15,6 +15,7 @@ import { StyledTokenGroupHeading, StyledTokenGroupAddIcon, StyledTokenGroupHeadi
 import { Dispatch } from '../../store';
 import { collapsedTokensSelector } from '@/selectors/collapsedTokensSelector';
 import { ShowNewFormOptions } from '@/types';
+import useTokens from '../../store/useTokens';
 
 export type Props = {
   id: string
@@ -36,6 +37,7 @@ export function TokenGroupHeading({
   const { deleteGroup, renameGroup, duplicateGroup } = useManageTokens();
   const dispatch = useDispatch<Dispatch>();
   const collapsed = useSelector(collapsedTokensSelector);
+  const { remapTokensInGroup } = useTokens();
 
   React.useEffect(() => {
     setNewTokenGroupName(`${path.split('.').pop()}${copyName}` || '');
@@ -50,14 +52,16 @@ export function TokenGroupHeading({
     setShowNewGroupNameField(true);
   }, []);
 
-  const handleRenameTokenGroupSubmit = React.useCallback((e: React.FormEvent<HTMLFormElement>) => {
+  const handleRenameTokenGroupSubmit = React.useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     setShowNewGroupNameField(false);
     renameGroup(`${path}${copyName}`, `${newTokenGroupName}`, type);
+
+    remapTokensInGroup({ oldGroupName: `${path}${copyName}.`, newGroupName: `${newTokenGroupName}.` });
     setIsTokenGroupDuplicated(false);
     setCopyName('');
-  }, [copyName, newTokenGroupName, path, renameGroup, type]);
+  }, [copyName, newTokenGroupName, path, renameGroup, type, remapTokensInGroup]);
 
   const handleNewTokenGroupNameChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setNewTokenGroupName(e.target.value);
@@ -87,11 +91,10 @@ export function TokenGroupHeading({
         data-cy={`tokenlisting-group-${path}`}
         data-testid={`tokenlisting-group-${path}`}
         type="button"
-        onClick={handleToggleCollapsed}
       >
         {collapsed.includes(path) ? <IconCollapseArrow /> : <IconExpandArrow />}
         <ContextMenu>
-          <ContextMenuTrigger id={`group-heading-${path}-${label}-${id}`}>
+          <ContextMenuTrigger data-testid={`group-heading-${path}-${label}-${id}`} onClick={handleToggleCollapsed}>
             <Heading muted size="small">{label}</Heading>
           </ContextMenuTrigger>
           <ContextMenuContent>
@@ -106,39 +109,39 @@ export function TokenGroupHeading({
             </ContextMenuItem>
           </ContextMenuContent>
         </ContextMenu>
-        <Modal
-          title={`Rename ${oldTokenGroupName}`}
-          isOpen={showNewGroupNameField}
-          close={handleSetNewTokenGroupNameFileClose}
-          footer={(
-            <form id="renameTokenGroup" onSubmit={handleRenameTokenGroupSubmit}>
-              <Stack direction="row" gap={4}>
-                <Button variant="secondary" size="large" onClick={handleSetNewTokenGroupNameFileClose}>
-                  Cancel
-                </Button>
-                <Button type="submit" variant="primary" size="large" disabled={oldTokenGroupName === newTokenGroupName}>
-                  Change
-                </Button>
-              </Stack>
-            </form>
-        )}
-        >
-          <Stack direction="column" justify="center" gap={4} css={{ textAlign: 'center' }}>
-            <Heading size="small">Renaming only affects tokens of the same type</Heading>
-            <Stack direction="column" gap={4}>
-              <Input
-                form="renameTokenGroup"
-                full
-                onChange={handleNewTokenGroupNameChange}
-                type="text"
-                name="tokengroupname"
-                value={newTokenGroupName}
-                required
-              />
-            </Stack>
-          </Stack>
-        </Modal>
       </StyledTokenGroupHeadingCollapsable>
+      <Modal
+        title={`Rename ${oldTokenGroupName}`}
+        isOpen={showNewGroupNameField}
+        close={handleSetNewTokenGroupNameFileClose}
+        footer={(
+          <form id="renameTokenGroup" onSubmit={handleRenameTokenGroupSubmit}>
+            <Stack direction="row" gap={4}>
+              <Button variant="secondary" size="large" onClick={handleSetNewTokenGroupNameFileClose}>
+                Cancel
+              </Button>
+              <Button type="submit" variant="primary" size="large" disabled={oldTokenGroupName === newTokenGroupName}>
+                Change
+              </Button>
+            </Stack>
+          </form>
+        )}
+      >
+        <Stack direction="column" justify="center" gap={4} css={{ textAlign: 'center' }}>
+          <Heading size="small">Renaming only affects tokens of the same type</Heading>
+          <Stack direction="column" gap={4}>
+            <Input
+              form="renameTokenGroup"
+              full
+              onChange={handleNewTokenGroupNameChange}
+              type="text"
+              name="tokengroupname"
+              value={newTokenGroupName}
+              required
+            />
+          </Stack>
+        </Stack>
+      </Modal>
       <StyledTokenGroupAddIcon
         icon={<IconAdd />}
         tooltip="Add a new token"

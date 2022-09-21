@@ -88,6 +88,11 @@ describe('editToken', () => {
                   type: 'fontSizes',
                   value: '18px',
                 },
+                {
+                  name: 'font.alias',
+                  type: 'sizing',
+                  value: '$font.small',
+                },
               ],
               options: [
                 {
@@ -315,6 +320,7 @@ describe('editToken', () => {
       value: '12px',
     });
   });
+
   it('can delete a token set', () => {
     store.dispatch.tokenState.deleteTokenSet('global');
     const {
@@ -395,6 +401,11 @@ describe('editToken', () => {
         name: 'font.medium',
         type: 'fontSizes',
         value: '18px',
+      },
+      {
+        name: 'font.alias',
+        type: 'sizing',
+        value: '$font.small',
       },
     ]);
     expect(usedTokenSet).toEqual({
@@ -489,6 +500,11 @@ describe('editToken', () => {
         name: 'font.medium',
         type: 'fontSizes',
         value: '18px',
+      },
+      {
+        name: 'font.alias',
+        type: 'sizing',
+        value: '$font.small',
       },
       {
         name: 'test',
@@ -615,6 +631,11 @@ describe('editToken', () => {
         type: 'fontSizes',
         value: '18px',
       },
+      {
+        name: 'font.alias',
+        type: 'sizing',
+        value: '$font.small',
+      },
     ]);
   });
 
@@ -672,6 +693,11 @@ describe('editToken', () => {
         name: 'font.medium',
         type: 'fontSizes',
         value: '18px',
+      },
+      {
+        name: 'font.alias',
+        type: 'sizing',
+        value: '$font.small',
       },
     ]);
   });
@@ -739,6 +765,11 @@ describe('editToken', () => {
         type: 'fontSizes',
         value: '18px',
       },
+      {
+        name: 'text.alias',
+        type: 'sizing',
+        value: '{text.small}',
+      },
     ]);
   });
 
@@ -805,6 +836,11 @@ describe('editToken', () => {
         value: '18px',
       },
       {
+        name: 'font.alias',
+        type: 'sizing',
+        value: '$font.small',
+      },
+      {
         name: 'font-copy.big',
         type: 'sizing',
         value: '24px',
@@ -813,6 +849,11 @@ describe('editToken', () => {
         name: 'font-copy.small',
         type: 'sizing',
         value: '12px',
+      },
+      {
+        name: 'font-copy.alias',
+        type: 'sizing',
+        value: '$font.small',
       },
     ]);
   });
