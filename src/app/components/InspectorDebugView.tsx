@@ -34,7 +34,7 @@ export default function InspectorDebugView({ resolvedTokens }: { resolvedTokens:
           ? (
             <Stack direction="column" gap={1}>
               {Object.entries(uiState.mainNodeSelectionValues)
-                .filter(([, value]) => value !== 'delete')
+                .filter(([key, value]) => key !== 'fillStyleId_original' && value !== 'delete')
                 .map(([property, value]) => (
                   <Stack key={property} direction="row" align="start" justify="between">
                     <code className="flex flex-wrap space-x-2">

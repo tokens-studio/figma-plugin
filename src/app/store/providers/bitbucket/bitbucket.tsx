@@ -33,7 +33,7 @@ export function useBitbucket() {
   const { multiFileSync } = useFlags();
   const dispatch = useDispatch<Dispatch>();
   const { confirm } = useConfirm();
-  const { pushDialog } = usePushDialog();
+  const { pushDialog, closeDialog } = usePushDialog();
 
   const storageClientFactory = useCallback(
     (context: BitbucketCredentials, owner?: string, repo?: string) => {
@@ -119,10 +119,17 @@ export function useBitbucket() {
           themes,
         };
       } catch (e) {
+        closeDialog();
         console.log('Error pushing to Bitbucket', e);
+        if (e instanceof Error) {
+          return {
+            status: 'failure',
+            errorMessage: e.message === ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR ? ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR : ErrorMessages.BITBUCKET_CREDENTIAL_ERROR,
+          };
+        }
         return {
           status: 'failure',
-          errorMessage: ErrorMessages.BITBUCKET_CREDENTIAL_ERROR,
+          errorMessage: ErrorMessages.GITHUB_CREDENTIAL_ERROR,
         };
       }
     }
@@ -138,6 +145,7 @@ export function useBitbucket() {
     dispatch.uiState,
     dispatch.tokenState,
     pushDialog,
+    closeDialog,
     tokens,
     themes,
     localApiState,

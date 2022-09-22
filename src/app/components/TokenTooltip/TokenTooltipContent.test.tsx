@@ -8,18 +8,18 @@ import { TokensContext } from '@/context';
 
 const tokens: SingleToken[] = [
   {
-    name: 'size.regular',
+    name: 'size.2',
     type: TokenTypes.SIZING,
-    value: '10',
-    rawValue: '10',
-    description: 'regular sizing token',
+    value: 'test-value-size.2',
+    rawValue: 'test-value-size.2',
+    description: 'regular size token',
   },
   {
     name: 'size.alias',
     type: TokenTypes.SIZING,
-    value: '10',
-    rawValue: '{size.regular}',
-    description: 'alias sizing token',
+    value: 'test-value-size.2',
+    rawValue: '{size.2}',
+    description: 'alias size token',
   },
   {
     name: 'color.slate.50',
@@ -36,72 +36,63 @@ const tokens: SingleToken[] = [
     description: 'alias color token',
   },
   {
+    name: 'border-radius.0',
+    type: TokenTypes.BORDER_RADIUS,
+    value: '64px',
+    rawValue: '64px',
+    description: 'regular radius token',
+  },
+  {
+    name: 'border-radius.alias',
+    type: TokenTypes.BORDER_RADIUS,
+    value: '64px',
+    rawValue: '{border-radius.0}',
+    description: 'alias size token',
+  },
+  {
+    name: 'opacity.10',
+    type: TokenTypes.OPACITY,
+    value: '10%',
+    rawValue: '10%',
+    description: 'regular opacity token',
+  },
+  {
+    name: 'opacity.alias',
+    type: TokenTypes.OPACITY,
+    value: '10%',
+    rawValue: '{opacity.10}',
+    description: 'alias size token',
+  },
+  {
     name: 'boxshadow.regular',
     type: TokenTypes.BOX_SHADOW,
     value: {
       x: '2',
       y: '2',
       blur: '2',
-      spread: '2',
-      color: '#f3f4f6',
+      spread: '192px',
+      color: 'test-value-object-value',
       type: BoxShadowTypes.DROP_SHADOW,
     },
     rawValue: {
       x: '2',
       y: '2',
       blur: '2',
-      spread: '2',
-      color: '#f3f4f6',
+      spread: '192px',
+      color: 'test-value-object-value',
       type: BoxShadowTypes.DROP_SHADOW,
     },
     description: 'regular shadow token',
   },
   {
-    name: 'boxshadow.multivalue',
-    type: TokenTypes.BOX_SHADOW,
-    value: [{
-      x: '2',
-      y: '2',
-      blur: '2',
-      spread: '2',
-      color: '#f3f4f6',
-      type: BoxShadowTypes.DROP_SHADOW,
-    },
-    {
-      x: '1',
-      y: '1',
-      blur: '1',
-      spread: '1',
-      color: '#ffffff',
-      type: BoxShadowTypes.INNER_SHADOW,
-    }],
-    rawValue: [{
-      x: '2',
-      y: '2',
-      blur: '2',
-      spread: '2',
-      color: '#f3f4f6',
-      type: BoxShadowTypes.DROP_SHADOW,
-    },
-    {
-      x: '1',
-      y: '1',
-      blur: '1',
-      spread: '1',
-      color: '#ffffff',
-      type: BoxShadowTypes.INNER_SHADOW,
-    }],
-    description: 'regular multi shadow token',
-  },
-  {
-    name: 'boxshadow.alias',
+    name: 'boxshadow.regular',
     type: TokenTypes.BOX_SHADOW,
     value: {
       x: '2',
       y: '2',
       blur: '2',
-      spread: '2',
-      color: '#f3f4f6',
+      spread: '192px',
+      color: 'test-value-object-value',
       type: BoxShadowTypes.DROP_SHADOW,
     },
     rawValue: '{boxshadow.regular}',
@@ -111,7 +102,7 @@ const tokens: SingleToken[] = [
     name: 'typography.headlines.small',
     type: TokenTypes.TYPOGRAPHY,
     value: {
-      fontFamily: 'aria',
+      fontFamily: 'test-value-object-value',
       fontWeight: 'Regular',
       lineHeight: 'AUTO',
       fontSize: '14',
@@ -121,7 +112,7 @@ const tokens: SingleToken[] = [
       textCase: 'none',
     },
     rawValue: {
-      fontFamily: 'aria',
+      fontFamily: 'test-value-object-value',
       fontWeight: 'Regular',
       lineHeight: 'AUTO',
       fontSize: '14',
@@ -132,11 +123,12 @@ const tokens: SingleToken[] = [
     },
     description: 'regular typography token',
   },
+
   {
-    name: 'typography.headlines.alias',
+    name: 'typography.headlines.default',
     type: TokenTypes.TYPOGRAPHY,
     value: {
-      fontFamily: 'aria',
+      fontFamily: 'test-value-object-value',
       fontWeight: 'Regular',
       lineHeight: 'AUTO',
       fontSize: '14',
@@ -146,20 +138,175 @@ const tokens: SingleToken[] = [
       textCase: 'none',
     },
     rawValue: '{typography.headlines.small}',
-    description: 'alias typography token',
+    description: 'regular typography token',
   },
   {
-    name: 'composition.regular',
+    name: 'font-family.serif',
+    type: TokenTypes.FONT_FAMILIES,
+    value: 'IBM Plex Serif',
+    rawValue: 'IBM Plex Serif',
+    description: 'regular fontFamily token',
+  },
+  {
+    name: 'font-family.alias',
+    type: TokenTypes.FONT_FAMILIES,
+    value: 'IBM Plex Serif',
+    rawValue: '{font-family.serif}',
+    description: 'alias fontFamily token',
+  },
+  {
+    name: 'line-height.1',
+    type: TokenTypes.LINE_HEIGHTS,
+    value: '130%',
+    rawValue: '130%',
+    description: 'regular line height token',
+  },
+  {
+    name: 'line-height.alias',
+    type: TokenTypes.LINE_HEIGHTS,
+    value: '130%',
+    rawValue: '{line-height.1}',
+    description: 'alias line height token',
+  },
+  {
+    name: 'font-weight.regular',
+    type: TokenTypes.FONT_WEIGHTS,
+    value: 'Regular',
+    rawValue: 'Regular',
+    description: 'regular font weight token',
+  },
+  {
+    name: 'font-weight.alias',
+    type: TokenTypes.FONT_WEIGHTS,
+    value: 'Regular',
+    rawValue: '{font-weight.regular}',
+    description: 'alias font weight token',
+  },
+  {
+    name: 'font-style.other',
+    type: TokenTypes.OTHER,
+    value: 'normal',
+    rawValue: 'normal',
+    description: 'regular other token',
+  },
+  {
+    name: 'font-style.alias',
+    type: TokenTypes.OTHER,
+    value: 'normal',
+    rawValue: '{font-style.other}',
+    description: 'alias other token',
+  },
+  {
+    name: 'card.default',
     type: TokenTypes.COMPOSITION,
     value: {
-      fill: '#f8fafc',
-      sizing: '10',
+      spacing: 'test-value-object-value',
+      borderRadius: '6px',
     },
     rawValue: {
-      fill: '{color.slate.50}',
-      sizing: '{size.2}',
+      spacing: 'test-value-object-value',
+      borderRadius: '6px',
     },
-    description: 'regular composition token',
+    description: 'composition token',
+  },
+  {
+    name: 'brokentoken',
+    type: TokenTypes.COLOR,
+    value: '{doesntexist}',
+    rawValue: '{doesntexist}',
+    description: 'a broken reference',
+    failedToResolve: true,
+  },
+];
+
+const shadowTokens = [
+  {
+    name: 'boxshadow.multiple',
+    type: TokenTypes.BOX_SHADOW,
+    value: [
+      {
+        x: '1px',
+        y: '2px',
+        blur: '3px',
+        spread: '14px',
+        color: '#212121',
+        type: BoxShadowTypes.DROP_SHADOW,
+      },
+      {
+        x: '8px',
+        y: '5px',
+        blur: '7px',
+        spread: '9px',
+        color: '#999999',
+        type: BoxShadowTypes.DROP_SHADOW,
+      },
+    ],
+    rawValue: [
+      {
+        x: '1px',
+        y: '2px',
+        blur: '3px',
+        spread: '14px',
+        color: '#212121',
+        type: BoxShadowTypes.DROP_SHADOW,
+      },
+      {
+        x: '8px',
+        y: '5px',
+        blur: '7px',
+        spread: '9px',
+        color: '#999999',
+        type: BoxShadowTypes.DROP_SHADOW,
+      },
+    ],
+    description: 'multiple shadow tokens',
+  },
+  {
+    name: 'boxshadow.reference',
+    type: TokenTypes.BOX_SHADOW,
+    value: [
+      {
+        x: '1px',
+        y: '2px',
+        blur: '3px',
+        spread: '14px',
+        color: '#212121',
+        type: BoxShadowTypes.DROP_SHADOW,
+      },
+      {
+        x: '8px',
+        y: '5px',
+        blur: '7px',
+        spread: '9px',
+        color: '#999999',
+        type: BoxShadowTypes.DROP_SHADOW,
+      },
+    ],
+    rawValue: '{boxshadow.multiple}',
+    description: 'reference shadow token',
+  },
+];
+
+const faultyTokens = [
+  {
+    name: 'faulty.token',
+    type: TokenTypes.COLOR,
+    value: {
+      x: 'foobar',
+    },
+    rawValue: {
+      x: 'foobar',
+    },
+    description: 'when value is an object',
+  },
+  {
+    name: 'faulty.token.alias',
+    type: TokenTypes.COLOR,
+    value: {
+      x: 'foobar',
+    },
+    rawValue: '{faulty.token}',
+    description: 'when value is an object reference',
   },
 ];
 
@@ -167,150 +314,76 @@ const customStore = {
   resolvedTokens: tokens,
 };
 
-describe('TokenTooltipContent', () => {
-  it('should return regular token tooltip content', () => {
-    const sizingToken = {
-      name: 'size.regular',
-      type: TokenTypes.SIZING,
-      value: '10',
-      description: 'regular sizing token',
-    };
-    const result = render(<TokensContext.Provider value={customStore}><TokenTooltipContent token={sizingToken as SingleToken} /></TokensContext.Provider>);
-    expect(result.queryByText(String(sizingToken.name.split('.').pop()))).toBeInTheDocument();
-    expect(result.queryByText(sizingToken.value)).toBeInTheDocument();
-    expect(result.queryByText(sizingToken.description)).toBeInTheDocument();
+const shadowStore = {
+  resolvedTokens: shadowTokens,
+};
+
+const faultyStore = {
+  resolvedTokens: faultyTokens,
+};
+
+describe('TokenTooltip alias', () => {
+  tokens.forEach((token) => {
+    it(`can resolve ${token.description}`, () => {
+      const { getByText } = render(
+        <TokensContext.Provider value={customStore}>
+          <TokenTooltipContent token={{ ...token, value: token.rawValue }} />
+        </TokensContext.Provider>,
+      );
+
+      expect(getByText(String(token.description))).toBeInTheDocument();
+      expect(getByText((content) => (typeof token.value === 'object' ? content.includes('test-value-object-value') : content.includes(String(token.value))))).toBeInTheDocument();
+      expect(getByText((content) => (typeof token.rawValue === 'object' ? content.includes('test-value-object-value') : content.includes(String(token.rawValue))))).toBeInTheDocument();
+      expect(getByText(String(token.name.split('.').pop()))).toBeInTheDocument();
+    });
   });
 
-  it('should return alias typography token tooltip content', () => {
-    const aliasTypographyToken = {
-      name: 'typography.headlines.alias',
-      type: TokenTypes.TYPOGRAPHY,
-      value: '{typography.headlines.small}',
-      resolvedValue: {
-        fontFamily: 'aria',
-        fontWeight: 'Regular',
-        lineHeight: 'AUTO',
-        fontSize: '14',
-        letterSpacing: '0%',
-        paragraphSpacing: '0',
-        textDecoration: 'none',
-        textCase: 'none',
-      },
-    };
-    const result = render(<TokensContext.Provider value={customStore}><TokenTooltipContent token={aliasTypographyToken as SingleToken} /></TokensContext.Provider>);
-    expect(result.queryByText(String(aliasTypographyToken.name.split('.').pop()))).toBeInTheDocument();
-    expect(result.queryByText(`${aliasTypographyToken.resolvedValue.fontFamily} ${aliasTypographyToken.resolvedValue.fontWeight} / ${aliasTypographyToken.resolvedValue.fontSize}`)).toBeInTheDocument();
+  shadowTokens.forEach((token) => {
+    it(`can resolve ${token.description}`, () => {
+      const { getByText } = render(
+        <TokensContext.Provider value={shadowStore}>
+          <TokenTooltipContent token={{ ...token, value: token.rawValue }} />
+        </TokensContext.Provider>,
+      );
+
+      expect(getByText(String(token.description))).toBeInTheDocument();
+      expect(getByText(String(token.value[0].x))).toBeInTheDocument();
+      expect(getByText(String(token.value[0].y))).toBeInTheDocument();
+      expect(getByText(String(token.value[0].spread))).toBeInTheDocument();
+      expect(getByText(String(token.value[0].blur))).toBeInTheDocument();
+      expect(getByText(String(token.value[0].color))).toBeInTheDocument();
+      expect(getByText(String(token.name.split('.').pop()))).toBeInTheDocument();
+    });
   });
 
-  it('should return typography token tooltip content', () => {
-    const typographyToken = {
-      name: 'typography.headlines.small',
-      type: TokenTypes.TYPOGRAPHY,
-      value: {
-        fontFamily: 'aria',
-        fontWeight: 'Regular',
-        lineHeight: 'AUTO',
-        fontSize: '14',
-        letterSpacing: '0%',
-        paragraphSpacing: '0',
-        textDecoration: 'none',
-        textCase: 'none',
-      },
-    };
-    const result = render(<TokensContext.Provider value={customStore}><TokenTooltipContent token={typographyToken as SingleToken} /></TokensContext.Provider>);
-    expect(result.queryByText(String(typographyToken.name.split('.').pop()))).toBeInTheDocument();
-    expect(result.queryByText(`Font: ${typographyToken.value.fontFamily}`)).toBeInTheDocument();
-    expect(result.queryByText(`Weight: ${typographyToken.value.fontWeight}`)).toBeInTheDocument();
-    expect(result.queryByText(`Size: ${typographyToken.value.fontSize}`)).toBeInTheDocument();
-    expect(result.queryByText(`Line Height: ${typographyToken.value.lineHeight}`)).toBeInTheDocument();
-    expect(result.queryByText(`Tracking: ${typographyToken.value.letterSpacing}`)).toBeInTheDocument();
-    expect(result.queryByText(`Paragraph Spacing: ${typographyToken.value.paragraphSpacing}`)).toBeInTheDocument();
-    expect(result.queryByText(`Text Case: ${typographyToken.value.textCase}`)).toBeInTheDocument();
-    expect(result.queryByText(`Text Decoration: ${typographyToken.value.textDecoration}`)).toBeInTheDocument();
+  faultyTokens.forEach((token) => {
+    it(`doesnt throw when using faulty value ${token.description}`, () => {
+      const { getByText } = render(
+        <TokensContext.Provider value={faultyStore}>
+          <TokenTooltipContent token={{ ...token, value: token.rawValue }} />
+        </TokensContext.Provider>,
+      );
+
+      expect(getByText(String(token.description))).toBeInTheDocument();
+    });
   });
 
-  it('should return boxShadow token tooltip content', () => {
-    const boxShadowToken = {
-      name: 'boxshadow.regular',
-      type: TokenTypes.BOX_SHADOW,
-      value: {
-        x: '2',
-        y: '2',
-        blur: '2',
-        spread: '2',
-        color: '#f3f4f6',
-        type: BoxShadowTypes.DROP_SHADOW,
-      },
-    };
-    const result = render(<TokensContext.Provider value={customStore}><TokenTooltipContent token={boxShadowToken as SingleToken} /></TokensContext.Provider>);
-    expect(result.queryByText(String(boxShadowToken.name.split('.').pop()))).toBeInTheDocument();
-    expect(result.queryByText(`${boxShadowToken.value.x} ${boxShadowToken.value.y} ${boxShadowToken.value.blur} ${boxShadowToken.value.spread} ${boxShadowToken.value.color}`)).toBeInTheDocument();
-  });
+  it('shows indicator when failed to resolve', () => {
+    const { getByText, getByTestId } = render(
+      <TokensContext.Provider value={customStore}>
+        <TokenTooltipContent
+          token={{
+            name: 'brokentoken',
+            type: TokenTypes.COLOR,
+            value: '{doesntexist}',
+            rawValue: '{doesntexist}',
+            description: 'a broken reference',
+          }}
+        />
+      </TokensContext.Provider>,
+    );
 
-  it('should return multi boxShadow token tooltip content', () => {
-    const multiBoxShadowToken = {
-      name: 'boxshadow.regular',
-      type: TokenTypes.BOX_SHADOW,
-      value: [{
-        x: '2',
-        y: '2',
-        blur: '2',
-        spread: '2',
-        color: '#f3f4f6',
-        type: BoxShadowTypes.DROP_SHADOW,
-      },
-      {
-        x: '1',
-        y: '1',
-        blur: '1',
-        spread: '1',
-        color: '#ffffff',
-        type: BoxShadowTypes.INNER_SHADOW,
-      }],
-    };
-    const result = render(<TokensContext.Provider value={customStore}><TokenTooltipContent token={multiBoxShadowToken as SingleToken} /></TokensContext.Provider>);
-    expect(result.queryByText(String(multiBoxShadowToken.name.split('.').pop()))).toBeInTheDocument();
-    expect(result.queryByText(`${multiBoxShadowToken.value[0].x} ${multiBoxShadowToken.value[0].y} ${multiBoxShadowToken.value[0].blur} ${multiBoxShadowToken.value[0].spread} ${multiBoxShadowToken.value[0].color}`)).toBeInTheDocument();
-    expect(result.queryByText(`${multiBoxShadowToken.value[1].x} ${multiBoxShadowToken.value[1].y} ${multiBoxShadowToken.value[1].blur} ${multiBoxShadowToken.value[1].spread} ${multiBoxShadowToken.value[1].color}`)).toBeInTheDocument();
-  });
-
-  it('should return alias boxShadow token tooltip content', () => {
-    const aliasBoxShadowToken = {
-      name: 'boxshadow.regular',
-      type: TokenTypes.BOX_SHADOW,
-      value: '{boxshadow.regular}',
-      resolvedValue: {
-        x: '2',
-        y: '2',
-        blur: '2',
-        spread: '2',
-        color: '#f3f4f6',
-        type: BoxShadowTypes.DROP_SHADOW,
-      },
-    };
-    const result = render(<TokensContext.Provider value={customStore}><TokenTooltipContent token={aliasBoxShadowToken as SingleToken} /></TokensContext.Provider>);
-    expect(result.queryByText(String(aliasBoxShadowToken.name.split('.').pop()))).toBeInTheDocument();
-    expect(result.queryByText(`${aliasBoxShadowToken.resolvedValue.x} ${aliasBoxShadowToken.resolvedValue.y} ${aliasBoxShadowToken.resolvedValue.blur} ${aliasBoxShadowToken.resolvedValue.spread} ${aliasBoxShadowToken.resolvedValue.color}`)).toBeInTheDocument();
-  });
-
-  it('should return composition token tooltip content', () => {
-    const compositionToken = {
-      name: 'composition.regular',
-      type: TokenTypes.COMPOSITION,
-      value: {
-        fill: '{color.slate.50}',
-        sizing: '{size.2}',
-      },
-      resolvedValue: {
-        fill: '#f8fafc',
-        sizing: '10',
-      },
-    };
-    const result = render(<TokensContext.Provider value={customStore}><TokenTooltipContent token={compositionToken as SingleToken} /></TokensContext.Provider>);
-    expect(result.queryByText(String(compositionToken.name.split('.').pop()))).toBeInTheDocument();
-    expect(result.queryByText('{color.slate.50}')).toBeInTheDocument();
-    expect(result.queryByText('#f8fafc')).toBeInTheDocument();
-    expect(result.queryByText('{size.2}')).toBeInTheDocument();
-    expect(result.queryByText('10')).toBeInTheDocument();
+    expect(getByText(String('brokentoken'))).toBeInTheDocument();
+    expect(getByTestId('not-found-badge')).toBeInTheDocument();
   });
 });

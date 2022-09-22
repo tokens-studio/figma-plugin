@@ -1,6 +1,7 @@
 import { TokenTypes } from '@/constants/TokenTypes';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { GitlabTokenStorage } from '../GitlabTokenStorage';
+import { ErrorMessages } from '@/constants/ErrorMessages';
 
 const mockGetUserName = jest.fn();
 const mockGetProjects = jest.fn();
@@ -388,6 +389,21 @@ describe('GitlabTokenStorage', () => {
     await expect(provider.read())
       .rejects
       .toThrow('Missing Project ID');
+  });
+
+  it('should return a validation error', async () => {
+    mockGetRepositories.mockImplementationOnce(() => (
+      Promise.resolve([])
+    ));
+
+    storageProvider.changePath('data/tokens.json');
+    mockGetRepositoryFiles.mockImplementationOnce(() => (
+      Promise.resolve('')
+    ));
+    expect(await storageProvider.read()).toEqual({
+      errorMessage: ErrorMessages.VALIDATION_ERROR,
+    });
+    expect(mockGetRepositoryFiles).toBeCalledWith(35102363, 'data/tokens.json', { ref: 'main' });
   });
 
   it('should return an empty array when reading results in an error', async () => {

@@ -1,25 +1,32 @@
-import React from 'react';
-import { useSelector } from 'react-redux';
+import React, { useCallback } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import {
   ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger,
-} from './ContextMenu';
-import Stack from './Stack';
-import Button from './Button';
-import Heading from './Heading';
-import Input from './Input';
-import Modal from './Modal';
-import useManageTokens from '../store/useManageTokens';
+} from '../ContextMenu';
+import Stack from '../Stack';
+import Button from '../Button';
+import Heading from '../Heading';
+import Input from '../Input';
+import Modal from '../Modal';
+import useManageTokens from '../../store/useManageTokens';
 import { editProhibitedSelector } from '@/selectors';
+import { IconCollapseArrow, IconExpandArrow, IconAdd } from '@/icons';
+import { StyledTokenGroupHeading, StyledTokenGroupAddIcon, StyledTokenGroupHeadingCollapsable } from './StyledTokenGroupHeading';
+import { Dispatch } from '../../store';
+import { collapsedTokensSelector } from '@/selectors/collapsedTokensSelector';
+import { ShowNewFormOptions } from '@/types';
+import useTokens from '../../store/useTokens';
 
 export type Props = {
   id: string
   label: string
   path: string
   type: string
+  showNewForm: (opts: ShowNewFormOptions) => void;
 };
 
-export default function TokenGroupHeading({
-  label, path, id, type,
+export function TokenGroupHeading({
+  label, path, id, type, showNewForm,
 }: Props) {
   const editProhibited = useSelector(editProhibitedSelector);
   const [newTokenGroupName, setNewTokenGroupName] = React.useState<string>('');
@@ -28,6 +35,9 @@ export default function TokenGroupHeading({
   const [isTokenGroupDuplicated, setIsTokenGroupDuplicated] = React.useState<boolean>(false);
   const [copyName, setCopyName] = React.useState<string>('');
   const { deleteGroup, renameGroup, duplicateGroup } = useManageTokens();
+  const dispatch = useDispatch<Dispatch>();
+  const collapsed = useSelector(collapsedTokensSelector);
+  const { remapTokensInGroup } = useTokens();
 
   React.useEffect(() => {
     setNewTokenGroupName(`${path.split('.').pop()}${copyName}` || '');
@@ -36,20 +46,22 @@ export default function TokenGroupHeading({
 
   const handleDelete = React.useCallback(() => {
     deleteGroup(path, type);
-  }, [path, deleteGroup]);
+  }, [deleteGroup, path, type]);
 
   const handleRename = React.useCallback(() => {
     setShowNewGroupNameField(true);
   }, []);
 
-  const handleRenameTokenGroupSubmit = React.useCallback((e: React.FormEvent<HTMLFormElement>) => {
+  const handleRenameTokenGroupSubmit = React.useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     setShowNewGroupNameField(false);
     renameGroup(`${path}${copyName}`, `${newTokenGroupName}`, type);
+
+    remapTokensInGroup({ oldGroupName: `${path}${copyName}.`, newGroupName: `${newTokenGroupName}.` });
     setIsTokenGroupDuplicated(false);
     setCopyName('');
-  }, [isTokenGroupDuplicated, newTokenGroupName, path, renameGroup, type]);
+  }, [copyName, newTokenGroupName, path, renameGroup, type, remapTokensInGroup]);
 
   const handleNewTokenGroupNameChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setNewTokenGroupName(e.target.value);
@@ -65,24 +77,39 @@ export default function TokenGroupHeading({
     setCopyName('-copy');
     setShowNewGroupNameField(true);
   }, [duplicateGroup, path, type]);
+
+  const handleToggleCollapsed = useCallback(() => {
+    dispatch.tokenState.setCollapsedTokens(collapsed.includes(path) ? collapsed.filter((s) => s !== path) : [...collapsed, path]);
+  }, [collapsed, dispatch.tokenState, path]);
+
+  const handleShowNewForm = useCallback(() => showNewForm({ name: `${path}.` }), [path, showNewForm]);
+
   return (
-    <>
-      <ContextMenu>
-        <ContextMenuTrigger id={`group-heading-${path}-${label}-${id}`}>
-          <Heading muted size="small">{label}</Heading>
-        </ContextMenuTrigger>
-        <ContextMenuContent>
-          <ContextMenuItem disabled={editProhibited} onSelect={handleDelete}>
-            Delete
-          </ContextMenuItem>
-          <ContextMenuItem disabled={editProhibited} onSelect={handleRename}>
-            Rename
-          </ContextMenuItem>
-          <ContextMenuItem disabled={editProhibited} onSelect={handleDuplicate}>
-            Duplicate
-          </ContextMenuItem>
-        </ContextMenuContent>
-      </ContextMenu>
+    <StyledTokenGroupHeading>
+      <StyledTokenGroupHeadingCollapsable
+        collapsed={collapsed.includes(path)}
+        data-cy={`tokenlisting-group-${path}`}
+        data-testid={`tokenlisting-group-${path}`}
+        type="button"
+      >
+        {collapsed.includes(path) ? <IconCollapseArrow /> : <IconExpandArrow />}
+        <ContextMenu>
+          <ContextMenuTrigger data-testid={`group-heading-${path}-${label}-${id}`} onClick={handleToggleCollapsed}>
+            <Heading muted size="small">{label}</Heading>
+          </ContextMenuTrigger>
+          <ContextMenuContent>
+            <ContextMenuItem disabled={editProhibited} onSelect={handleDelete}>
+              Delete
+            </ContextMenuItem>
+            <ContextMenuItem disabled={editProhibited} onSelect={handleRename}>
+              Rename
+            </ContextMenuItem>
+            <ContextMenuItem disabled={editProhibited} onSelect={handleDuplicate}>
+              Duplicate
+            </ContextMenuItem>
+          </ContextMenuContent>
+        </ContextMenu>
+      </StyledTokenGroupHeadingCollapsable>
       <Modal
         title={`Rename ${oldTokenGroupName}`}
         isOpen={showNewGroupNameField}
@@ -115,6 +142,14 @@ export default function TokenGroupHeading({
           </Stack>
         </Stack>
       </Modal>
-    </>
+      <StyledTokenGroupAddIcon
+        icon={<IconAdd />}
+        tooltip="Add a new token"
+        tooltipSide="left"
+        onClick={handleShowNewForm}
+        disabled={editProhibited}
+        dataCy="button-add-new-token-in-group"
+      />
+    </StyledTokenGroupHeading>
   );
 }

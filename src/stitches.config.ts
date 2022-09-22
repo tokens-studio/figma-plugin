@@ -55,6 +55,7 @@ export const stitchesInstance = createStitches({
       contextMenuForegroundMuted: 'var(--figma-color-text-menu-secondary)',
       contextMenuForegroundDisabled: 'var(--figma-color-text-menu-disabled)',
       contextMenuSeperator: 'var(--figma-color-border-menu)',
+      contextMenuBorder: 'var(--figma-color-border-menu)',
       loadingScreenFg: '#FFFFFF',
       loadingScreenFgMuted: '#CECECE',
       loadingScreenBg: '#141414',
@@ -64,6 +65,7 @@ export const stitchesInstance = createStitches({
       textSubtle: 'var(--figma-color-text-tertiary)',
       textDisabled: 'var(--figma-color-text-disabled)',
       fgSubtle: 'var(--figma-color-text-secondary)',
+      fgAccent: 'var(--figma-color-text-brand)',
       bgSubtle: 'var(--figma-color-bg-secondary)',
       bgAccent: 'var(--figma-color-bg-selected)',
       bgAccentHover: 'var(--figma-color-bg-selected-hover)',
@@ -92,6 +94,11 @@ export const stitchesInstance = createStitches({
       bgToolTip: 'var(--figma-color-bg-tooltip)',
       fgToolTip: 'var(--figma-color-text-tooltip)',
       fgToolTipMuted: 'var(--figma-color-text-tooltip-secondary)',
+      bgOnDarkSubtle: '#2B2A2A',
+      bgOnDarkAccentSubtle: '#1F3D68',
+      fgOnDarkAccent: '#A0C0EF',
+      bgOnDarkDangerSubtle: '#422B2B',
+      fgOnDarkDanger: '#E05534',
       fgSuccess: 'var(--figma-color-text-success)',
       bgSuccess: 'var(--figma-color-bg-success-tertiary)',
       fgDanger: 'var(--figma-color-text-danger)',
@@ -133,21 +140,24 @@ export const stitchesInstance = createStitches({
       card: globalTokens.radii.lg,
       badge: globalTokens.radii.lg,
       full: globalTokens.radii.full,
+      tokenButton: globalTokens.radii.lg,
+      tree: globalTokens.radii.lg,
     },
     shadows: {
       default: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
       contextMenu: 'var(--shadow-context-menu, 0px 10px 38px -10px rgba(22, 23, 24, 0.35), 0px 10px 20px -15px rgba(22, 23, 24, 0.2))',
       focus: `0 0 0 2px ${globalTokens.colors.primary500}`,
       'focus-subtle': `0 0 0 2px ${globalTokens.colors.primary300}`,
-      'focus-muted': `0 0 0 2px ${globalTokens.colors.primary400}`,
+      focusMuted: `0 0 0 2px ${globalTokens.colors.primary400}`,
+      tokenFocus: '0 0 0 2px $colors$borderMuted',
     },
   },
 });
 
 const {
-  styled, css, keyframes, theme,
+  styled, css, keyframes, theme, globalCss,
 } = stitchesInstance;
 
 export {
-  styled, css, keyframes, theme,
+  styled, css, keyframes, theme, globalCss,
 };

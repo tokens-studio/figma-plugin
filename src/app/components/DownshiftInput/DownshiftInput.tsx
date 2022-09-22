@@ -10,6 +10,8 @@ import { TokenTypes } from '@/constants/TokenTypes';
 import { styled } from '@/stitches.config';
 import { StyledDownshiftInput } from './StyledDownshiftInput';
 import Tooltip from '../Tooltip';
+import { Properties } from '@/constants/Properties';
+import { isDocumentationType } from '@/utils/is/isDocumentationType';
 
 const StyledDropdown = styled('div', {
   position: 'absolute',
@@ -114,7 +116,6 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
 }) => {
   const [showAutoSuggest, setShowAutoSuggest] = React.useState<boolean>(false);
   const [isFirstLoading, setisFirstLoading] = React.useState<boolean>(true);
-
   const filteredValue = useMemo(() => ((showAutoSuggest || typeof value !== 'string') ? '' : value?.replace(/[{}$]/g, '')), [
     showAutoSuggest,
     value,
@@ -136,12 +137,25 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
   }, []);
 
   const filteredTokenItems = useMemo(
-    () => resolvedTokens
-      .filter(
-        (token: SingleToken) => !filteredValue || token.name.toLowerCase().includes(filteredValue.toLowerCase()),
-      )
-      .filter((token: SingleToken) => token?.type === type && token.name !== initialName),
-    [resolvedTokens, filteredValue, type],
+    () => {
+      if (isDocumentationType(type as Properties)) {
+        return resolvedTokens
+          .filter(
+            (token: SingleToken) => !filteredValue || token.name.toLowerCase().includes(filteredValue.toLowerCase()),
+          )
+          .filter((token: SingleToken) => token.name !== initialName).sort((a, b) => (
+            a.name.localeCompare(b.name)
+          ));
+      }
+      return resolvedTokens
+        .filter(
+          (token: SingleToken) => !filteredValue || token.name.toLowerCase().includes(filteredValue.toLowerCase()),
+        )
+        .filter((token: SingleToken) => token?.type === type && token.name !== initialName).sort((a, b) => (
+          a.name.localeCompare(b.name)
+        ));
+    },
+    [resolvedTokens, filteredValue, type, isDocumentationType],
   );
 
   const resolveValue = useCallback((token: SingleToken) => {
@@ -206,7 +220,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
               getInputProps={getInputProps}
             />
             {suffix && (
-              <StyledInputSuffix type="button" onClick={handleAutoSuggest}>
+              <StyledInputSuffix type="button" data-testid="downshift-input-suffix-button" onClick={handleAutoSuggest}>
                 <StyledIconDisclosure />
               </StyledInputSuffix>
             )}
@@ -220,6 +234,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
                 {filteredTokenItems.map((token: SingleToken, index: number) => (
                   <StyledItem
                     data-cy="downshift-input-item"
+                    data-testid="downshift-input-item"
                     className="dropdown-item"
                     {...getItemProps({ key: token.name, index, item: token })}
                     css={{

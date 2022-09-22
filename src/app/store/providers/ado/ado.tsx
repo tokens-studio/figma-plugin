@@ -32,7 +32,7 @@ export const useADO = () => {
   const dispatch = useDispatch<Dispatch>();
   const { multiFileSync } = useFlags();
   const { confirm } = useConfirm();
-  const { pushDialog } = usePushDialog();
+  const { pushDialog, closeDialog } = usePushDialog();
 
   const storageClientFactory = React.useCallback((context: AdoCredentials) => {
     const storageClient = new ADOTokenStorage(context);
@@ -112,10 +112,17 @@ export const useADO = () => {
           themes,
         };
       } catch (e) {
+        closeDialog();
         console.log('Error pushing to ADO', e);
+        if (e instanceof Error) {
+          return {
+            status: 'failure',
+            errorMessage: e.message === ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR ? ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR : ErrorMessages.ADO_CREDENTIAL_ERROR,
+          };
+        }
         return {
           status: 'failure',
-          errorMessage: ErrorMessages.ADO_CREDENTIAL_ERROR,
+          errorMessage: ErrorMessages.GITHUB_CREDENTIAL_ERROR,
         };
       }
     }
@@ -131,6 +138,7 @@ export const useADO = () => {
     tokens,
     themes,
     pushDialog,
+    closeDialog,
     localApiState,
   ]);
 

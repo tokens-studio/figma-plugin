@@ -1,6 +1,6 @@
+import { renderHook } from '@testing-library/react-hooks';
 import { Properties } from '@/constants/Properties';
 import { TokenTypes } from '@/constants/TokenTypes';
-import { renderHook } from '@testing-library/react-hooks';
 import { usePropertiesForTokenType } from './usePropertiesForType';
 
 describe('usePropertiesForTokenType', () => {
@@ -87,7 +87,7 @@ describe('usePropertiesForTokenType', () => {
         {
           name: 'typography',
           label: 'typography',
-        }
+        },
       ],
     },
     {
@@ -96,7 +96,7 @@ describe('usePropertiesForTokenType', () => {
         {
           name: 'opacity',
           label: 'opacity',
-        }
+        },
       ],
     },
     {
@@ -124,7 +124,7 @@ describe('usePropertiesForTokenType', () => {
         {
           name: 'boxShadow',
           label: 'boxShadow',
-        }
+        },
       ],
     },
     {
@@ -133,7 +133,7 @@ describe('usePropertiesForTokenType', () => {
         {
           name: 'fontFamilies',
           label: 'fontFamilies',
-        }
+        },
       ],
     },
     {
@@ -142,7 +142,7 @@ describe('usePropertiesForTokenType', () => {
         {
           name: 'fontWeights',
           label: 'fontWeights',
-        }
+        },
       ],
     },
     {
@@ -151,7 +151,7 @@ describe('usePropertiesForTokenType', () => {
         {
           name: 'lineHeights',
           label: 'lineHeights',
-        }
+        },
       ],
     },
     {
@@ -160,7 +160,7 @@ describe('usePropertiesForTokenType', () => {
         {
           name: 'fontSizes',
           label: 'fontSizes',
-        }
+        },
       ],
     },
     {
@@ -169,7 +169,7 @@ describe('usePropertiesForTokenType', () => {
         {
           name: 'letterSpacing',
           label: 'letterSpacing',
-        }
+        },
       ],
     },
     {
@@ -178,7 +178,7 @@ describe('usePropertiesForTokenType', () => {
         {
           name: 'paragraphSpacing',
           label: 'paragraphSpacing',
-        }
+        },
       ],
     },
     {
@@ -187,7 +187,7 @@ describe('usePropertiesForTokenType', () => {
         {
           name: 'textDecoration',
           label: 'textDecoration',
-        }
+        },
       ],
     },
     {
@@ -196,7 +196,7 @@ describe('usePropertiesForTokenType', () => {
         {
           name: 'textCase',
           label: 'textCase',
-        }
+        },
       ],
     },
     {
@@ -205,7 +205,7 @@ describe('usePropertiesForTokenType', () => {
         {
           name: 'composition',
           label: 'composition',
-        }
+        },
       ],
     },
   ];

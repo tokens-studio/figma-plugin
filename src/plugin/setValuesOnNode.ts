@@ -3,6 +3,12 @@ import { GetThemeInfoMessageResult } from '@/types/AsyncMessages';
 import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 import { convertTokenNameToPath } from '@/utils/convertTokenNameToPath';
 import { getAllFigmaStyleMaps } from '@/utils/getAllFigmaStyleMaps';
+import {
+  effectStyleMatchesBoxShadowToken,
+  paintStyleMatchesColorToken,
+  textStyleMatchesTypographyToken,
+} from './figmaUtils/styleMatchers';
+import { clearStyleIdBackup, getNonLocalStyle, setStyleIdBackup } from './figmaUtils/styleUtils';
 import { isPrimitiveValue, isSingleBoxShadowValue, isSingleTypographyValue } from '@/utils/is';
 import { matchStyleName } from '@/utils/matchStyleName';
 import { trySetStyleId } from '@/utils/trySetStyleId';
@@ -29,7 +35,6 @@ export default async function setValuesOnNode(
   const stylePathPrefix = prefixStylesWithThemeName && activeThemeObject
     ? activeThemeObject.name
     : null;
-
   try {
     // BORDER RADIUS
     if (
@@ -77,12 +82,34 @@ export default async function setValuesOnNode(
       // BOX SHADOW
       if ('effects' in node && typeof values.boxShadow !== 'undefined' && data.boxShadow) {
         const pathname = convertTokenNameToPath(data.boxShadow, stylePathPrefix, stylePathSlice);
-        const matchingStyleId = matchStyleName(
+        let matchingStyleId = matchStyleName(
           data.boxShadow,
           pathname,
           activeThemeObject?.$figmaStyleReferences ?? {},
           figmaStyleMaps.effectStyles,
         );
+
+        if (!matchingStyleId) {
+          // Local style not found - look for matching non-local style:
+          if (isSingleBoxShadowValue(values.boxShadow)) {
+            const styleIdBackupKey = 'effectStyleId_original';
+            const nonLocalStyle = getNonLocalStyle(node, styleIdBackupKey, 'effects');
+            if (nonLocalStyle) {
+              if (effectStyleMatchesBoxShadowToken(nonLocalStyle, values.boxShadow)) {
+                // Non-local style matches - use this and clear style id backup:
+                matchingStyleId = nonLocalStyle.id;
+                clearStyleIdBackup(node, styleIdBackupKey);
+              } else if (pathname === nonLocalStyle.name) {
+                // Non-local style does NOT match, but style name and token path does,
+                // so we assume selected token value is an override (e.g. dark theme)
+                // Now backup up style id before overwriting with raw token value, so we
+                // can re-link the non-local style, when the token value matches again:
+                setStyleIdBackup(node, styleIdBackupKey, nonLocalStyle.id);
+              }
+            }
+          }
+        }
+
         if (!matchingStyleId || (matchingStyleId && !await trySetStyleId(node, 'effect', matchingStyleId))) {
           if (isSingleBoxShadowValue(values.boxShadow)) {
             setEffectValuesOnTarget(node, { value: values.boxShadow });
@@ -159,12 +186,32 @@ export default async function setValuesOnNode(
       ) {
         if ('fills' in node && data.fill) {
           const pathname = convertTokenNameToPath(data.fill, stylePathPrefix, stylePathSlice);
-          const matchingStyleId = matchStyleName(
+          let matchingStyleId = matchStyleName(
             data.fill,
             pathname,
             activeThemeObject?.$figmaStyleReferences ?? {},
             figmaStyleMaps.paintStyles,
           );
+
+          if (!matchingStyleId) {
+            // Local style not found - look for matching non-local style:
+            const styleIdBackupKey = 'fillStyleId_original';
+            const nonLocalStyle = getNonLocalStyle(node, styleIdBackupKey, 'fills');
+            if (nonLocalStyle) {
+              if (paintStyleMatchesColorToken(nonLocalStyle, values.fill)) {
+                // Non-local style matches - use this and clear style id backup:
+                matchingStyleId = nonLocalStyle.id;
+                clearStyleIdBackup(node, styleIdBackupKey);
+              } else if (pathname === nonLocalStyle.name) {
+                // Non-local style does NOT match, but style name and token path does,
+                // so we assume selected token value is an override (e.g. dark theme)
+                // Now backup up style id before overwriting with raw token value, so we
+                // can re-link the non-local style, when the token value matches again:
+                setStyleIdBackup(node, styleIdBackupKey, nonLocalStyle.id);
+              }
+            }
+          }
+
           if (!matchingStyleId || (matchingStyleId && !await trySetStyleId(node, 'fill', matchingStyleId))) {
             setColorValuesOnTarget(node, { value: values.fill }, 'fills');
           }
@@ -176,12 +223,32 @@ export default async function setValuesOnNode(
       if (values.typography) {
         if (node.type === 'TEXT' && data.typography) {
           const pathname = convertTokenNameToPath(data.typography, stylePathPrefix, stylePathSlice);
-          const matchingStyleId = matchStyleName(
+          let matchingStyleId = matchStyleName(
             data.typography,
             pathname,
             activeThemeObject?.$figmaStyleReferences ?? {},
             figmaStyleMaps.textStyles,
           );
+
+          if (!matchingStyleId && isSingleTypographyValue(values.typography)) {
+            // Local style not found - look for matching non-local style:
+            const styleIdBackupKey = 'textStyleId_original';
+            const nonLocalStyle = getNonLocalStyle(node, styleIdBackupKey, 'typography');
+            if (nonLocalStyle) {
+              if (textStyleMatchesTypographyToken(nonLocalStyle, values.typography)) {
+                // Non-local style matches - use this and clear style id backup:
+                matchingStyleId = nonLocalStyle.id;
+                clearStyleIdBackup(node, styleIdBackupKey);
+              } else if (pathname === nonLocalStyle.name) {
+                // Non-local style does NOT match, but style name and token path does,
+                // so we assume selected token value is an override (e.g. dark theme)
+                // Now backup up style id before overwriting with raw token value, so we
+                // can re-link the non-local style, when the token value matches again:
+                setStyleIdBackup(node, styleIdBackupKey, nonLocalStyle.id);
+              }
+            }
+          }
+
           if (!matchingStyleId || (matchingStyleId && !await trySetStyleId(node, 'text', matchingStyleId))) {
             if (isSingleTypographyValue(values.typography)) {
               setTextValuesOnTarget(node, { value: values.typography });
@@ -219,12 +286,32 @@ export default async function setValuesOnNode(
       if (typeof values.border !== 'undefined' && typeof values.border === 'string') {
         if ('strokes' in node && data.border) {
           const pathname = convertTokenNameToPath(data.border, stylePathPrefix, stylePathSlice);
-          const matchingStyleId = matchStyleName(
+          let matchingStyleId = matchStyleName(
             data.border,
             pathname,
             activeThemeObject?.$figmaStyleReferences ?? {},
             figmaStyleMaps.paintStyles,
           );
+
+          if (!matchingStyleId) {
+            // Local style not found - look for matching non-local style:
+            const styleIdBackupKey = 'strokeStyleId_original';
+            const nonLocalStyle = getNonLocalStyle(node, styleIdBackupKey, 'strokes');
+            if (nonLocalStyle) {
+              if (paintStyleMatchesColorToken(nonLocalStyle, values.border)) {
+                // Non-local style matches - use this and clear style id backup:
+                matchingStyleId = nonLocalStyle.id;
+                clearStyleIdBackup(node, styleIdBackupKey);
+              } else if (pathname === nonLocalStyle.name) {
+                // Non-local style does NOT match, but style name and token path does,
+                // so we assume selected token value is an override (e.g. dark theme)
+                // Now backup up style id before overwriting with raw token value, so we
+                // can re-link the non-local style, when the token value matches again:
+                setStyleIdBackup(node, styleIdBackupKey, nonLocalStyle.id);
+              }
+            }
+          }
+
           if (!matchingStyleId || (matchingStyleId && !await trySetStyleId(node, 'stroke', matchingStyleId))) {
             setColorValuesOnTarget(node, { value: values.border }, 'strokes');
           }

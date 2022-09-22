@@ -1,15 +1,16 @@
 import compact from 'just-compact';
 import { Octokit } from '@octokit/rest';
 import { decodeBase64 } from '@/utils/string/ui';
-import { RemoteTokenstorageErrorMessage, RemoteTokenStorageFile } from './RemoteTokenStorage';
+import { RemoteTokenstorageErrorMessage, RemoteTokenStorageFile, RemoteTokenStorageMetadata } from './RemoteTokenStorage';
 import IsJSONString from '@/utils/isJSONString';
 import { AnyTokenSet } from '@/types/tokens';
 import { ThemeObjectsList } from '@/types';
 import {
-  GitMultiFileObject, GitSingleFileObject, GitStorageMetadata, GitTokenStorage,
+  GitMultiFileObject, GitSingleFileObject, GitTokenStorage,
 } from './GitTokenStorage';
 import { SystemFilenames } from '@/constants/SystemFilenames';
 import { ErrorMessages } from '@/constants/ErrorMessages';
+import { joinPath } from '@/utils/string';
 
 type ExtendedOctokitClient = Omit<Octokit, 'repos'> & {
   repos: Octokit['repos'] & {
@@ -149,7 +150,7 @@ export class GithubTokenStorage extends GitTokenStorage {
     }
   }
 
-  public async read(): Promise<RemoteTokenStorageFile<GitStorageMetadata>[] | RemoteTokenstorageErrorMessage> {
+  public async read(): Promise<RemoteTokenStorageFile[] | RemoteTokenstorageErrorMessage> {
     try {
       const normalizedPath = compact(this.path.split('/')).join('/');
       const response = await this.octokitClient.rest.repos.getContent({
@@ -184,7 +185,7 @@ export class GithubTokenStorage extends GitTokenStorage {
               headers: octokitClientDefaultHeaders,
             }) : Promise.resolve(null)
           )));
-          return compact(jsonFileContents.map<RemoteTokenStorageFile<GitStorageMetadata> | null>((fileContent, index) => {
+          return compact(jsonFileContents.map<RemoteTokenStorageFile | null>((fileContent, index) => {
             const { path } = jsonFiles[index];
             if (
               path
@@ -196,7 +197,7 @@ export class GithubTokenStorage extends GitTokenStorage {
               let name = filePath.substring(this.path.length).replace(/^\/+/, '');
               name = name.replace('.json', '');
               const parsed = JSON.parse(decodeBase64(fileContent.data.content)) as GitMultiFileObject;
-              // @REAMDE we will need to ensure these reserved names
+              // @README we will need to ensure these reserved names
 
               if (name === SystemFilenames.THEMES) {
                 return {
@@ -210,7 +211,7 @@ export class GithubTokenStorage extends GitTokenStorage {
                 return {
                   path: filePath,
                   type: 'metadata',
-                  data: parsed as GitStorageMetadata,
+                  data: parsed as RemoteTokenStorageMetadata,
                 };
               }
 
@@ -234,9 +235,16 @@ export class GithubTokenStorage extends GitTokenStorage {
               path: `${this.path}/${SystemFilenames.THEMES}.json`,
               data: parsed.$themes ?? [],
             },
+            ...(parsed.$metadata ? [
+              {
+                type: 'metadata' as const,
+                path: this.path,
+                data: parsed.$metadata,
+              },
+            ] : []),
             ...(Object.entries(parsed).filter(([key]) => (
               !Object.values<string>(SystemFilenames).includes(key)
-            )) as [string, AnyTokenSet<false>][]).map<RemoteTokenStorageFile<GitStorageMetadata>>(([name, tokenSet]) => ({
+            )) as [string, AnyTokenSet<false>][]).map<RemoteTokenStorageFile>(([name, tokenSet]) => ({
               name,
               type: 'tokenSet',
               path: `${this.path}/${name}.json`,
@@ -310,7 +318,7 @@ export class GithubTokenStorage extends GitTokenStorage {
               (a.path && b.path) ? a.path.localeCompare(b.path) : 0
             ));
 
-            const filesToDelete = jsonFiles.filter((jsonFile) => !Object.keys(changeset).some((item) => jsonFile.path && item.endsWith(jsonFile?.path)))
+            const filesToDelete = jsonFiles.filter((jsonFile) => !Object.keys(changeset).some((item) => jsonFile.path && item === joinPath(this.path, jsonFile?.path)))
               .map((fileToDelete) => (`${this.path.split('/')[0]}/${fileToDelete.path}` ?? ''));
             return await this.createOrUpdate(changeset, message, branch, shouldCreateBranch, filesToDelete, true);
           }

@@ -131,6 +131,15 @@ export default function useTokens() {
     });
   }, [confirm]);
 
+  const handleBulkRemap = useCallback(async (newName: string, oldName: string) => {
+    track('bulkRemapToken', { fromInspect: true });
+    AsyncMessageChannel.ReactInstance.message({
+      type: AsyncMessageTypes.BULK_REMAP_TOKENS,
+      oldName,
+      newName,
+    });
+  }, []);
+
   // Calls Figma with an old name and new name and asks it to update all tokens that use the old name
   const remapToken = useCallback(async (oldName: string, newName: string, updateMode?: UpdateMode) => {
     track('remapToken', { fromRename: true });
@@ -142,6 +151,28 @@ export default function useTokens() {
       updateMode: updateMode || settings.updateMode,
     });
   }, [settings.updateMode]);
+
+  const remapTokensInGroup = useCallback(async ({ oldGroupName, newGroupName }: { oldGroupName: string, newGroupName: string }) => {
+    const shouldRemap = await confirm({
+      text: `Remap all tokens that use tokens in ${oldGroupName} group?`,
+      description: 'This will change all layers that used the old token name. This could take a while.',
+      choices: [
+        {
+          key: UpdateMode.SELECTION, label: 'Selection', unique: true, enabled: UpdateMode.SELECTION === settings.updateMode,
+        },
+        {
+          key: UpdateMode.PAGE, label: 'Page', unique: true, enabled: UpdateMode.PAGE === settings.updateMode,
+        },
+        {
+          key: UpdateMode.DOCUMENT, label: 'Document', unique: true, enabled: UpdateMode.DOCUMENT === settings.updateMode,
+        },
+      ],
+    });
+    if (shouldRemap) {
+      await handleBulkRemap(newGroupName, oldGroupName);
+      dispatch.settings.setUpdateMode(shouldRemap.data[0] as UpdateMode);
+    }
+  }, [settings.updateMode, confirm, handleBulkRemap, dispatch.settings]);
 
   // Asks user which styles to create, then calls Figma with all tokens to create styles
   const createStylesFromTokens = useCallback(async () => {
@@ -197,8 +228,10 @@ export default function useTokens() {
     createStylesFromTokens,
     pullStyles,
     remapToken,
+    remapTokensInGroup,
     removeTokensByValue,
     handleRemap,
+    handleBulkRemap,
   }), [
     isAlias,
     getTokenValue,
@@ -207,7 +240,9 @@ export default function useTokens() {
     createStylesFromTokens,
     pullStyles,
     remapToken,
+    remapTokensInGroup,
     removeTokensByValue,
     handleRemap,
+    handleBulkRemap,
   ]);
 }

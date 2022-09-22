@@ -50,6 +50,7 @@ export interface TokenState {
   collapsedTokenSets: string[];
   collapsedTokenTypeObj: Record<TokenTypes, boolean>;
   checkForChanges: boolean;
+  collapsedTokens: string[];
 }
 
 export const tokenState = createModel<RootModel>()({
@@ -76,6 +77,7 @@ export const tokenState = createModel<RootModel>()({
       return acc;
     }, {}),
     checkForChanges: false,
+    collapsedTokens: [],
   } as unknown as TokenState,
   reducers: {
     setEditProhibited(state, payload: boolean) {
@@ -309,14 +311,6 @@ export const tokenState = createModel<RootModel>()({
             name: newTokenName,
           };
         }
-        if (token.value.toString().startsWith(`{${path}${oldName}.`)) {
-          const { value, ...rest } = token;
-          const updatedNewTokenValue = value.toString().replace(`${path}${oldName}`, `${path}${newName}`);
-          return {
-            ...rest,
-            value: updatedNewTokenValue,
-          };
-        }
         return token;
       }) as AnyTokenList;
 
@@ -404,6 +398,10 @@ export const tokenState = createModel<RootModel>()({
       ...state,
       checkForChanges: data,
     }),
+    setCollapsedTokens: (state, data: string[]) => ({
+      ...state,
+      collapsedTokens: data,
+    }),
     ...tokenStateReducers,
   },
   effects: (dispatch) => ({
@@ -463,6 +461,15 @@ export const tokenState = createModel<RootModel>()({
       if (payload.shouldUpdate && rootState.settings.updateOnChange) {
         dispatch.tokenState.updateDocument();
       }
+    },
+    renameTokenGroup(data: RenameTokenGroupPayload, rootState) {
+      const {
+        path, oldName, newName, type, parent,
+      } = data;
+      const tokensInParent = rootState.tokenState.tokens[parent] ?? [];
+      tokensInParent.filter((token) => token.name.startsWith(`${path}${newName}.`) && token.type === type).forEach((updatedToken) => {
+        dispatch.tokenState.updateAliases({ oldName: updatedToken.name.replace(`${path}${newName}`, `${path}${oldName}`), newName: updatedToken.name });
+      });
     },
     updateCheckForChanges() {
       dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
