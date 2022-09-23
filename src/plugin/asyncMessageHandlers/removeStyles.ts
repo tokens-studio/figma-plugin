@@ -5,7 +5,7 @@ import removeStylesFromPlugin from '../removeStylesFromPlugin';
 export const removeStyles: AsyncMessageChannelHandlers[AsyncMessageTypes.REMOVE_STYLES] = async (msg) => {
   try {
     return {
-      styleIds: await removeStylesFromPlugin(msg.token, msg.settings),
+      styleIds: await removeStylesFromPlugin(msg.token),
     };
   } catch (e) {
     console.error(e);
