@@ -35,7 +35,7 @@ const Navbar: React.FC = () => {
     const tokenData = JSON.stringify(tokens, null, 2);
     const response = await axios({
       method: 'post',
-      url: 'http://localhost:3000/api/tokens',
+      url: 'https://token-flow-app.herokuapp.com/api/tokens',
       data: {
         tokenData,
         activeTheme,
@@ -44,7 +44,7 @@ const Navbar: React.FC = () => {
         themeObjects,
       },
     });
-    if (response.status === 200) window.open(`http://localhost:3000?id=${response.data.result}`);
+    if (response.status === 200) window.open(`https://token-flow-app.herokuapp.com?id=${response.data.result}`);
   }, [activeTheme, availableThemes, themeObjects, tokens, usedTokenSet]);
 
   const handleSwitch = useCallback(
