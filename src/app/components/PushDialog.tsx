@@ -14,6 +14,8 @@ import Stack from './Stack';
 import Spinner from './Spinner';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { isGitProvider } from '@/utils/is';
+import Textarea from './Textarea';
+import { useShortcut } from '@/hooks/useShortcut';
 
 function ConfirmDialog() {
   const { onConfirm, onCancel, showPushDialog } = usePushDialog();
@@ -59,8 +61,8 @@ function ConfirmDialog() {
   }, [branch, localApiState]);
 
   const handleCommitMessageChange = React.useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      setCommitMessage(event.target.value);
+    (val: string) => {
+      setCommitMessage(val);
     },
     [setCommitMessage],
   );
@@ -83,6 +85,14 @@ function ConfirmDialog() {
     }
   }, [showPushDialog, localApiState]);
 
+  const handleSaveShortcut = React.useCallback((event: KeyboardEvent) => {
+    if (event.metaKey || event.ctrlKey) {
+      handleSubmit();
+    }
+  }, [handleSubmit]);
+
+  useShortcut(['Enter'], handleSaveShortcut);
+
   switch (showPushDialog) {
     case 'initial': {
       return (
@@ -95,14 +105,14 @@ function ConfirmDialog() {
                 <div className="p-2 font-mono text-gray-600 bg-gray-100 rounded text-xxs">
                   {'id' in localApiState ? localApiState.id : null}
                 </div>
-                <Input
-                  full
-                  label="Commit message"
+                <Heading size="medium">Commit message</Heading>
+                <Textarea
+                  id="push-dialog-commit-message"
+                  border
+                  rows={3}
                   value={commitMessage}
                   onChange={handleCommitMessageChange}
-                  type="text"
-                  name="commitMessage"
-                  required
+                  placeholder="Enter commit message"
                 />
                 <Input
                   full

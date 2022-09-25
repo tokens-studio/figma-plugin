@@ -38,6 +38,7 @@ export const remapTokens: AsyncMessageChannelHandlers[AsyncMessageTypes.REMAP_TO
         }
         return acc;
       }, {});
+
       if (shouldBeRemapped) {
         updatedNodes.push({
           ...node,

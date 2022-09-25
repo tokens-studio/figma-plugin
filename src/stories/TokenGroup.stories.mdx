@@ -1,0 +1,39 @@
+import { Meta, Story, ArgsTable, Canvas, Preview } from '@storybook/addon-docs';
+import { Provider } from 'react-redux';
+import TokensDecorator from '../../.storybook/decorations/TokensDecorator';
+
+import { store } from '@/app/store';
+import { SingleToken } from '@/types/tokens';
+import { TokenTypes } from '@/constants/TokenTypes';
+import { tokensForStories } from './tokensForStories';
+
+import TokenGroup from '@/app/components/TokenGroup/TokenGroup';
+
+<Meta
+  title="TokenGroup"
+  component={TokenGroup}
+  decorators={[TokensDecorator]}
+  args={{
+    displayType: 'GRID',
+    schema: {
+      label: 'Colors',
+      property: 'color',
+      type: TokenTypes.COLOR,
+    },
+    tokenValues: tokensForStories['colors'],
+  }}
+/>
+
+export const TokenGroupDefaultStory = (args) => {
+  return (
+    <Provider store={store}>
+      <TokenGroup {...args} />
+    </Provider>
+  );
+};
+
+<Canvas>
+  <Story name="Default" args={{}}>
+    {TokenGroupDefaultStory.bind({})}
+  </Story>
+</Canvas>

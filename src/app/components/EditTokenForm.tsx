@@ -23,6 +23,8 @@ import trimValue from '@/utils/trimValue';
 import BoxShadowInput from './BoxShadowInput';
 import { EditTokenFormStatus } from '@/constants/EditTokenFormStatus';
 import { StyleOptions } from '@/constants/StyleOptions';
+import Textarea from './Textarea';
+import Heading from './Heading';
 
 type Props = {
   resolvedTokens: ResolveTokenValuesResult[];
@@ -85,7 +87,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
     if ((internalEditToken?.status || nameWasChanged) && hasPriorTokenName) {
       setError('Tokens can\'t share name with a group');
     }
-  }, [internalEditToken, hasNameThatExistsAlready, nameWasChanged, hasPriorTokenName]);
+  }, [internalEditToken, hasNameThatExistsAlready, nameWasChanged, hasPriorTokenName, hasAnotherTokenThatStartsWithName]);
 
   const handleToggleInputHelper = React.useCallback(() => {
     setInputHelperOpen(!inputHelperOpen);
@@ -185,13 +187,12 @@ function EditTokenForm({ resolvedTokens }: Props) {
     } as typeof editToken);
   }, [internalEditToken]);
 
-  const handleDescriptionChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>(
-    (e) => {
-      e.persist();
+  const handleDescriptionChange = React.useCallback(
+    (val: string) => {
       if (internalEditToken) {
         setInternalEditToken({
           ...internalEditToken,
-          description: e.target.value,
+          description: val,
         });
       }
     },
@@ -292,7 +293,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
         dispatch.uiState.setShowEditForm(false);
       }
     },
-    [dispatch, isValid, internalEditToken],
+    [dispatch, isValid, internalEditToken, submitTokenValue],
   );
 
   const handleReset = React.useCallback(() => {
@@ -414,15 +415,14 @@ function EditTokenForm({ resolvedTokens }: Props) {
         {renderTokenForm()}
 
         {internalEditToken?.schema?.explainer && <div className="mt-1 text-gray-600 text-xxs">{internalEditToken.schema.explainer}</div>}
-        <Input
-          full
+        <Heading size="small">Description</Heading>
+
+        <Textarea
           key="description"
-          label="description"
-          value={internalEditToken?.description}
+          value={internalEditToken?.description || ''}
           onChange={handleDescriptionChange}
-          type="text"
-          name="description"
-          capitalize
+          rows={3}
+          border
         />
         <Stack direction="row" justify="end" gap={2}>
           <Button variant="secondary" type="button" onClick={handleReset}>

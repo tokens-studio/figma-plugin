@@ -11,12 +11,10 @@ import Modal from './Modal';
 import TokenSetTree from './TokenSetTree';
 import Box from './Box';
 import { styled } from '@/stitches.config';
-import TokenSetList from './TokenSetList';
 import {
   editProhibitedSelector, tokensSelector,
 } from '@/selectors';
 import Stack from './Stack';
-import { useIsGitMultiFileEnabled } from '../hooks/useIsGitMultiFileEnabled';
 
 const StyledButton = styled('button', {
   flexShrink: 0,
@@ -37,7 +35,6 @@ const StyledButton = styled('button', {
 export default function TokenSetSelector({ saveScrollPositionSet } : { saveScrollPositionSet: (tokenSet: string) => void }) {
   const tokens = useSelector(tokensSelector);
   const editProhibited = useSelector(editProhibitedSelector);
-  const mfsEnabled = useIsGitMultiFileEnabled();
   const dispatch = useDispatch<Dispatch>();
   const { confirm } = useConfirm();
 
@@ -144,25 +141,14 @@ export default function TokenSetSelector({ saveScrollPositionSet } : { saveScrol
       }}
       className="content"
     >
-      {mfsEnabled ? (
-        <TokenSetTree
-          tokenSets={allTokenSets}
-          onRename={handleRenameTokenSet}
-          onDelete={handleDelete}
-          onDuplicate={handleDuplicateTokenSet}
-          onReorder={handleReorder}
-          saveScrollPositionSet={saveScrollPositionSet}
-        />
-      ) : (
-        <TokenSetList
-          onReorder={handleReorder}
-          tokenSets={allTokenSets}
-          onRename={handleRenameTokenSet}
-          onDelete={handleDeleteTokenSet}
-          onDuplicate={handleDuplicateTokenSet}
-          saveScrollPositionSet={saveScrollPositionSet}
-        />
-      )}
+      <TokenSetTree
+        tokenSets={allTokenSets}
+        onRename={handleRenameTokenSet}
+        onDelete={handleDelete}
+        onDuplicate={handleDuplicateTokenSet}
+        onReorder={handleReorder}
+        saveScrollPositionSet={saveScrollPositionSet}
+      />
       <Modal
         isOpen={showRenameTokenSetFields}
         close={handleCloseRenameModal}

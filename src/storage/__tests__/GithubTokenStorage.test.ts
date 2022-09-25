@@ -89,7 +89,7 @@ describe('GithubTokenStorage', () => {
     expect(await storageProvider.canWrite()).toBe(false);
   });
 
-  it('canWrite should return false if not a collaborator', async () => {
+  it('canWrite should return false if the user is not a collaborator', async () => {
     mockGetAuthenticated.mockImplementationOnce(() => (
       Promise.resolve({
         data: {
@@ -111,7 +111,7 @@ describe('GithubTokenStorage', () => {
     });
   });
 
-  it('canWrite should return false if it wasnt possible to fetch collaboration level', async () => {
+  it('canWrite should return false if it fails to fetch collaboration level', async () => {
     mockGetAuthenticated.mockImplementationOnce(() => (
       Promise.resolve({
         data: {
@@ -260,7 +260,7 @@ describe('GithubTokenStorage', () => {
     mockGetContent.mockClear();
   });
 
-  it('can read from Git in a multifile format and return empty array when there is no content', async () => {
+  it('can read from Git in a multi file format and return empty array when there is no content', async () => {
     mockGetContent.mockImplementation((opts: { path: string }) => {
       if (opts.path === '') {
         return Promise.resolve({
@@ -305,7 +305,7 @@ describe('GithubTokenStorage', () => {
     mockGetContent.mockClear();
   });
 
-  it('can read from Git in a multifile format when parent directory has multiple directory', async () => {
+  it('can read from Git in a multi file format when parent directory has multiple directory', async () => {
     mockGetContent.mockImplementation((opts: { path: string }) => {
       if (opts.path === '') {
         return Promise.resolve({
@@ -403,7 +403,7 @@ describe('GithubTokenStorage', () => {
     mockGetContent.mockClear();
   });
 
-  it('can read from Git in a multifile format when parent directory has only one directory', async () => {
+  it('can read from Git in a multi file format when parent directory has only one directory', async () => {
     mockGetContent.mockImplementation((opts: { path: string }) => {
       if (opts.path === '') {
         return Promise.resolve({
@@ -589,7 +589,7 @@ describe('GithubTokenStorage', () => {
     });
   });
 
-  it('should not be able to write a multifile structure when multifile flag is off', async () => {
+  it('should not be able to write a multi file structure when multi file flag is off', async () => {
     mockCreateOrUpdateFiles.mockImplementationOnce(() => (
       Promise.resolve({
         data: {
@@ -618,11 +618,11 @@ describe('GithubTokenStorage', () => {
       ], {
         commitMessage: '',
       });
-    }).rejects.toThrow('Multi-file storage is not enabled');
+    }).rejects.toThrow(ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR);
     expect(mockCreateOrUpdateFiles).not.toHaveBeenCalled();
   });
 
-  it('should be able to write a multifile structure', async () => {
+  it('should be able to write a multi file structure', async () => {
     mockCreateOrUpdateFiles.mockImplementationOnce(() => (
       Promise.resolve({
         data: {
@@ -800,7 +800,7 @@ describe('GithubTokenStorage', () => {
     });
   });
 
-  it('should be able to rename and delete a multifile structure', async () => {
+  it('should be able to rename and delete a multi file structure', async () => {
     mockGetContent.mockImplementation((opts: { path: string }) => {
       if (opts.path === '') {
         return Promise.resolve({
@@ -814,9 +814,9 @@ describe('GithubTokenStorage', () => {
         return Promise.resolve({
           data: [
             { path: 'data/$themes.json', sha: 'sha(data/$themes.json)', type: 'file' },
-            { path: 'data/global.json', sha: 'sha(data/global.json)', type: 'file' },
-            { path: 'data/core.json', sha: 'sha(data/core.json)', type: 'file' },
-            { path: 'data/internal.json', sha: 'sha(data/internal.json)', type: 'file' },
+            { path: 'data/colors/achieve.json', sha: 'sha(data/colors/achieve.json)', type: 'file' },
+            { path: 'data/base/achieve.json', sha: 'sha(data/base/achieve.json)', type: 'file' },
+            { path: 'data/achieve.json', sha: 'sha(data/achieve.json)', type: 'file' },
           ],
         });
       }
@@ -829,7 +829,7 @@ describe('GithubTokenStorage', () => {
         });
       }
 
-      if (opts.path === 'data/global.json') {
+      if (opts.path === 'data/colors/achieve.json') {
         return Promise.resolve({
           data: {
             content: 'ewogICJyZWQiOiB7CiAgICAidHlwZSI6ICJjb2xvciIsCiAgICAibmFtZSI6ICJyZWQiLAogICAgInZhbHVlIjogIiNmZjAwMDAiCiAgfQp9',
@@ -837,7 +837,7 @@ describe('GithubTokenStorage', () => {
         });
       }
 
-      if (opts.path === 'data/core.json') {
+      if (opts.path === 'data/base/achieve.json') {
         return Promise.resolve({
           data: {
             content: 'ewogICJyZWQiOiB7CiAgICAidHlwZSI6ICJjb2xvciIsCiAgICAibmFtZSI6ICJyZWQiLAogICAgInZhbHVlIjogIiNmZjAwMDAiCiAgfQp9',
@@ -845,7 +845,7 @@ describe('GithubTokenStorage', () => {
         });
       }
 
-      if (opts.path === 'data/internal.json') {
+      if (opts.path === 'data/achieve.json') {
         return Promise.resolve({
           data: {
             content: 'ewogICJyZWQiOiB7CiAgICAidHlwZSI6ICJjb2xvciIsCiAgICAibmFtZSI6ICJyZWQiLAogICAgInZhbHVlIjogIiNmZjAwMDAiCiAgfQp9',
@@ -877,9 +877,9 @@ describe('GithubTokenStorage', () => {
           sha: 'sha(data)',
           tree: [
             { path: '$themes.json', type: 'blob', sha: 'sha($themes.json)' },
-            { path: 'global.json', type: 'blob', sha: 'sha(global.json)' },
-            { path: 'core.json', type: 'blob', sha: 'sha(core.json)' },
-            { path: 'internal.json', type: 'blob', sha: 'sha(internal.json)' },
+            { path: 'base/achieve.json', type: 'blob', sha: 'sha(base/achieve.json)' },
+            { path: 'colors/achieve.json', type: 'blob', sha: 'sha(colors/achieve.json)' },
+            { path: 'achieve.json', type: 'blob', sha: 'sha(achieve.json)' },
           ],
         },
       })
@@ -911,8 +911,8 @@ describe('GithubTokenStorage', () => {
       },
       {
         type: 'tokenSet',
-        name: 'global',
-        path: 'global.json',
+        name: 'base/achieve',
+        path: 'base/achieve.json',
         data: {
           red: {
             type: TokenTypes.COLOR,
@@ -923,8 +923,20 @@ describe('GithubTokenStorage', () => {
       },
       {
         type: 'tokenSet',
-        name: 'core-rename',
-        path: 'core-rename.json',
+        name: 'achieve',
+        path: 'achieve.json',
+        data: {
+          red: {
+            type: TokenTypes.COLOR,
+            name: 'red',
+            value: '#ff0000',
+          },
+        },
+      },
+      {
+        type: 'tokenSet',
+        name: 'achieve-rename',
+        path: 'achieve-rename.json',
         data: {
           red: {
             type: TokenTypes.COLOR,
@@ -956,14 +968,21 @@ describe('GithubTokenStorage', () => {
                 },
               },
             ], null, 2),
-            'data/global.json': JSON.stringify({
+            'data/base/achieve.json': JSON.stringify({
               red: {
                 type: TokenTypes.COLOR,
                 name: 'red',
                 value: '#ff0000',
               },
             }, null, 2),
-            'data/core-rename.json': JSON.stringify({
+            'data/achieve.json': JSON.stringify({
+              red: {
+                type: TokenTypes.COLOR,
+                name: 'red',
+                value: '#ff0000',
+              },
+            }, null, 2),
+            'data/achieve-rename.json': JSON.stringify({
               red: {
                 type: TokenTypes.COLOR,
                 name: 'red',
@@ -971,7 +990,7 @@ describe('GithubTokenStorage', () => {
               },
             }, null, 2),
           },
-          filesToDelete: ['data/core.json', 'data/internal.json'],
+          filesToDelete: ['data/colors/achieve.json'],
           ignoreDeletionFailures: true,
 
         },
@@ -980,7 +999,7 @@ describe('GithubTokenStorage', () => {
     mockGetContent.mockClear();
   });
 
-  it('couldnt be able to rename and delete a multifile structure when there is no tree', async () => {
+  it('couldn\'t be able to rename and delete a multi file structure when there is no tree', async () => {
     mockGetContent.mockImplementation((opts: { path: string }) => {
       if (opts.path === '') {
         return Promise.resolve({

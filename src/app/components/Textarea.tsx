@@ -25,6 +25,7 @@ const StyledTextarea = styled('textarea', {
 });
 
 function Textarea({
+  id,
   rows = 2,
   value,
   placeholder,
@@ -33,6 +34,7 @@ function Textarea({
   css,
   border,
 }: {
+  id?: string;
   rows?: number;
   value: string;
   placeholder?: string;
@@ -43,6 +45,7 @@ function Textarea({
 }) {
   return (
     <StyledTextarea
+      data-cy={id}
       spellCheck={false}
       rows={rows}
       placeholder={placeholder}

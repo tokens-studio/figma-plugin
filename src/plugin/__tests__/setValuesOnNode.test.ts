@@ -35,6 +35,8 @@ describe('Can set values on node', () => {
       },
       fills: [],
       textStyleId: undefined,
+      getSharedPluginData: () => '',
+      setSharedPluginData: () => undefined,
     } as unknown as TextNode;
 
     solidNodeMock = {
@@ -52,6 +54,8 @@ describe('Can set values on node', () => {
       effectStyleId: '',
       fillStyleId: '',
       strokeStyleId: '',
+      getSharedPluginData: () => '',
+      setSharedPluginData: () => undefined,
     } as unknown as RectangleNode;
 
     frameNodeMock = {
