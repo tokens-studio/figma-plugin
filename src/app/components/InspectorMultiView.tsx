@@ -33,6 +33,7 @@ export default function InspectorMultiView({ resolvedTokens }: { resolvedTokens:
     Record<TokenTypes, SelectionGroup[]>
     & Record<Properties, SelectionGroup[]>
     >>((acc, curr) => {
+      if (curr.type === 'fillStyleId_original') return acc;
       if (acc[curr.category]) {
         const sameValueIndex = acc[curr.category]!.findIndex((v) => v.value === curr.value);
 
@@ -62,11 +63,23 @@ export default function InspectorMultiView({ resolvedTokens }: { resolvedTokens:
 
   const handleShowBulkRemap = React.useCallback(() => {
     setShowBulkRemapModalVisible(true);
-  }, [bulkRemapModalVisible]);
+  }, []);
 
   const handleHideBulkRemap = React.useCallback(() => {
     setShowBulkRemapModalVisible(false);
-  }, [bulkRemapModalVisible]);
+  }, []);
+
+  const handleSelectAll = React.useCallback(() => {
+    dispatch.inspectState.setSelectedTokens(
+      inspectState.selectedTokens.length === uiState.selectionValues.length
+        ? []
+        : uiState.selectionValues.map((v) => `${v.category}-${v.value}`),
+    );
+  }, [dispatch.inspectState, inspectState.selectedTokens.length, uiState.selectionValues]);
+
+  const handleRemoveSelected = React.useCallback(() => {
+    removeTokens();
+  }, [removeTokens]);
 
   return (
     <Box
@@ -88,13 +101,7 @@ export default function InspectorMultiView({ resolvedTokens }: { resolvedTokens:
               <Checkbox
                 checked={inspectState.selectedTokens.length === uiState.selectionValues.length}
                 id="selectAll"
-                onCheckedChange={() => {
-                  dispatch.inspectState.setSelectedTokens(
-                    inspectState.selectedTokens.length === uiState.selectionValues.length
-                      ? []
-                      : uiState.selectionValues.map((v) => `${v.category}-${v.value}`),
-                  );
-                }}
+                onCheckedChange={handleSelectAll}
               />
               <Label htmlFor="selectAll" css={{ fontSize: '$small', fontWeight: '$bold' }}>
                 Select all
@@ -104,7 +111,7 @@ export default function InspectorMultiView({ resolvedTokens }: { resolvedTokens:
               <Button onClick={handleShowBulkRemap} variant="secondary">
                 Bulk remap
               </Button>
-              <Button onClick={() => removeTokens()} disabled={inspectState.selectedTokens.length === 0} variant="secondary">
+              <Button onClick={handleRemoveSelected} disabled={inspectState.selectedTokens.length === 0} variant="secondary">
                 Remove selected
               </Button>
             </Box>

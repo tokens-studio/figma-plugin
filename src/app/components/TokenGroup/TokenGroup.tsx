@@ -8,6 +8,7 @@ import { DeepKeyTokenMap, SingleToken, TokenTypeSchema } from '@/types/tokens';
 import { isSingleToken } from '@/utils/is';
 import { collapsedTokensSelector } from '@/selectors/collapsedTokensSelector';
 import { ShowFormOptions, ShowNewFormOptions } from '@/types';
+import { TokenTypes } from '@/constants/TokenTypes';
 
 type Props = {
   schema: TokenTypeSchema;
@@ -57,7 +58,7 @@ const TokenGroup: React.FC<Props> = ({
   }
 
   return (
-    <StyledTokenGroup displayType={displayType}>
+    <StyledTokenGroup displayType={schema.type === TokenTypes.COLOR ? displayType : 'GRID'}>
       {mappedItems.map(({ item }) => (
         <React.Fragment key={item.stringPath}>
           {typeof item.value === 'object' && !isSingleToken(item.value) ? (

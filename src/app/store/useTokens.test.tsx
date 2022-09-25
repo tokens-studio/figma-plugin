@@ -282,6 +282,19 @@ describe('useToken test', () => {
     });
   });
 
+  it('remapTokensInGroup', async () => {
+    const messageSpy = jest.spyOn(AsyncMessageChannel.ReactInstance, 'message');
+    mockConfirm.mockImplementation(() => Promise.resolve({ data: ['selection', 'page', 'document'] }));
+    await act(async () => {
+      await result.current.remapTokensInGroup({ oldGroupName: 'old.', newGroupName: 'new.' });
+    });
+    expect(messageSpy).toBeCalledWith({
+      type: AsyncMessageTypes.BULK_REMAP_TOKENS,
+      oldName: 'old.',
+      newName: 'new.',
+    });
+  });
+
   describe('createStylesFromTokens', () => {
     const tokenMockStore = createMockStore({
       tokenState: {
@@ -404,5 +417,4 @@ describe('useToken test', () => {
       });
     });
   });
-
 });

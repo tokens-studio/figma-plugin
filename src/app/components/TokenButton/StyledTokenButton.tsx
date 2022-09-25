@@ -54,9 +54,9 @@ export const StyledTokenButton = styled('button', {
     active: {
       true: {
         backgroundColor: '$bgAccent',
-        boxShadow: '$focusMuted',
+        boxShadow: '$focusMuted !important',
         '&:hover, &:focus': {
-          boxShadow: '$focusMuted',
+          boxShadow: '$focusMuted !important',
         },
       },
     },
