@@ -22,10 +22,13 @@ export default async function renameStylesFromPlugin(
   const pathNames = themesToContainToken.map((theme) => convertTokenNameToPath(oldName, theme));
   const allStyleIds = allStyles.filter((style) => pathNames.some((pathName) => {
     if (isMatchingStyle(pathName, style)) {
-      style.name = pathName.replace(oldName.split('.').join('/'), newName.split('.').join('/'));
+      const oldPath = oldName.split('.').map((part) => part.trim()).join('/');
+      const newPath = newName.split('.').map((part) => part.trim()).join('/');
+      style.name = pathName.replace(oldPath, newPath);
       return true;
     }
     return false;
   })).map((filteredStyle) => filteredStyle.id);
+  
   return allStyleIds;
 }
