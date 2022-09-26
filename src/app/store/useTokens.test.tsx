@@ -9,7 +9,7 @@ import {
 } from '@/types/tokens';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes, GetThemeInfoMessageResult } from '@/types/AsyncMessages';
-import { createStyles } from '@/plugin/asyncMessageHandlers';
+import { createStyles, removeStyles } from '@/plugin/asyncMessageHandlers';
 import { AllTheProviders, createMockStore, resetStore } from '../../../tests/config/setupTest';
 import { store } from '../store';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
@@ -328,6 +328,7 @@ describe('useToken test', () => {
       themes: [],
     }));
     AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.CREATE_STYLES, createStyles);
+    AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.REMOVE_STYLES, removeStyles);
 
     it('creates all styles', async () => {
       mockConfirm.mockImplementation(() => Promise.resolve({ data: ['textStyles', 'colorStyles', 'effectStyles'] }));
@@ -378,6 +379,7 @@ describe('useToken test', () => {
         settings: store.getState().settings,
       });
     });
+
     it('respects decision to only create text styles', async () => {
       mockConfirm.mockImplementation(() => Promise.resolve({ data: ['textStyles'] }));
 
@@ -414,6 +416,21 @@ describe('useToken test', () => {
         type: AsyncMessageTypes.BULK_REMAP_TOKENS,
         oldName: 'oldName',
         newName: 'newName',
+      });
+    });
+
+    it('removeStylesFromTokens', async () => {
+      const tokenToDelete = {
+        path: 'color.red',
+        parent: 'global',
+      };
+      await act(async () => {
+        await result.current.removeStylesFromTokens(tokenToDelete);
+      });
+      expect(messageSpy).toBeCalledWith({
+        type: AsyncMessageTypes.REMOVE_STYLES,
+        token: tokenToDelete,
+        settings: store.getState().settings,
       });
     });
   });

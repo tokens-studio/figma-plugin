@@ -5,3 +5,4 @@ export * from './setEmptyTokens';
 export * from './assignStyleIdsToCurrentTheme';
 export * from './deleteTheme';
 export * from './assignStyleIdsToTheme';
+export * from './removeStyleIdsFromThemes';

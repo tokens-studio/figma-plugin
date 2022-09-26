@@ -20,3 +20,4 @@ export * from './setLicenseKey';
 export * from './attachLocalStylesToTheme';
 export * from './resolveStyleInfo';
 export * from './bulkRemapTokens';
+export * from './removeStyles';

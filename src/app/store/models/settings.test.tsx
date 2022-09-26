@@ -4,7 +4,6 @@ import { models } from './index';
 import { UpdateMode } from '@/constants/UpdateMode';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
-import { RootState } from '@/app/store';
 
 type Store = RematchStore<RootModel, Record<string, never>>;
 
