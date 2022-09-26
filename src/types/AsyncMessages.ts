@@ -133,9 +133,12 @@ export type CreateStylesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.CREA
 export type RenameStylesAsyncMessage = AsyncMessage<AsyncMessageTypes.RENAME_STYLES, {
   oldName: string;
   newName: string;
+  parent: string;
   settings: Partial<SettingsState>;
 }>;
-export type RenameStylesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.RENAME_STYLES>;
+export type RenameStylesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.RENAME_STYLES, {
+  styleIds: string[];
+}>;
 
 export type UpdateAsyncMessage = AsyncMessage<AsyncMessageTypes.UPDATE, {
   tokenValues: Record<string, AnyTokenList>;
