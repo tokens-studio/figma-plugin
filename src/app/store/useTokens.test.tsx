@@ -9,7 +9,7 @@ import {
 } from '@/types/tokens';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes, GetThemeInfoMessageResult } from '@/types/AsyncMessages';
-import { createStyles } from '@/plugin/asyncMessageHandlers';
+import { createStyles, renameStyles } from '@/plugin/asyncMessageHandlers';
 import { AllTheProviders, createMockStore, resetStore } from '../../../tests/config/setupTest';
 import { store } from '../store';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
@@ -200,7 +200,6 @@ const mockConfirm = jest.fn();
 const mockPullStylesHandler = jest.fn(async () => {});
 const mockRemapTokensHandler = jest.fn(async () => {});
 const mockRemoveTokensByValueHandler = jest.fn(async () => {});
-const mockRenameStylesHandler = jest.fn(async () => {});
 jest.mock('../hooks/useConfirm', () => ({
   __esModule: true,
   default: () => ({
@@ -322,13 +321,13 @@ describe('useToken test', () => {
     AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.REMOVE_TOKENS_BY_VALUE, mockRemoveTokensByValueHandler);
     AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.REMAP_TOKENS, mockRemapTokensHandler);
     AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.PULL_STYLES, mockPullStylesHandler);
-    AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.RENAME_STYLES, mockRenameStylesHandler);
     AsyncMessageChannel.ReactInstance.handle(AsyncMessageTypes.GET_THEME_INFO, async (): Promise<GetThemeInfoMessageResult> => ({
       type: AsyncMessageTypes.GET_THEME_INFO,
       activeTheme: null,
       themes: [],
     }));
     AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.CREATE_STYLES, createStyles);
+    AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.RENAME_STYLES, renameStyles);
 
     it('creates all styles', async () => {
       mockConfirm.mockImplementation(() => Promise.resolve({ data: ['textStyles', 'colorStyles', 'effectStyles'] }));
@@ -407,13 +406,14 @@ describe('useToken test', () => {
     });
     it('rename styles from current theme', async () => {
       await act(async () => {
-        await result.current.renameStylesFromTokens('old', 'new');
+        await result.current.renameStylesFromTokens({ oldName: 'old', newName: 'new', parent: 'global' });
       });
 
       expect(messageSpy).toBeCalledWith({
         type: AsyncMessageTypes.RENAME_STYLES,
         oldName: 'old',
         newName: 'new',
+        parent: 'global',
         settings: store.getState().settings,
       });
     });
