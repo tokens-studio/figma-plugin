@@ -53,6 +53,7 @@ import IconX from './x.svg';
 import IconFontSize from './font-size.svg';
 import IconLetterSpacing from './letter-spacing.svg';
 import IconParagraphSpacing from './paragraph-spacing.svg';
+import IconParagraphIndent from './paragraph-indent.svg';
 import IconTextCase from './text-case.svg';
 import IconTextDecoration from './text-decoration.svg';
 import IconLineHeight from './line-height.svg';
@@ -119,6 +120,7 @@ export {
   IconFontSize,
   IconLetterSpacing,
   IconParagraphSpacing,
+  IconParagraphIndent,
   IconTextCase,
   IconTextDecoration,
   IconLineHeight,

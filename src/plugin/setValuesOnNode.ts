@@ -263,6 +263,7 @@ export default async function setValuesOnNode(
         || values.fontSizes
         || values.letterSpacing
         || values.paragraphSpacing
+        || values.paragraphIndent
         || values.textCase
         || values.textDecoration
       ) {
@@ -275,6 +276,7 @@ export default async function setValuesOnNode(
               fontSize: isPrimitiveValue(values.fontSizes) ? String(values.fontSizes) : undefined,
               letterSpacing: isPrimitiveValue(values.letterSpacing) ? String(values.letterSpacing) : undefined,
               paragraphSpacing: isPrimitiveValue(values.paragraphSpacing) ? String(values.paragraphSpacing) : undefined,
+              paragraphIndent: isPrimitiveValue(values.paragraphIndent) ? String(values.paragraphIndent) : undefined,
               textCase: isPrimitiveValue(values.textCase) ? String(values.textCase) : undefined,
               textDecoration: isPrimitiveValue(values.textDecoration) ? String(values.textDecoration) : undefined,
             },

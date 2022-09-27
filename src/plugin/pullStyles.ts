@@ -27,6 +27,7 @@ export default function pullStyles(styleTypes: PullStyleOptions): void {
   let fontSizes: SingleToken[] = [];
   let letterSpacing: SingleToken[] = [];
   let paragraphSpacing: SingleToken[] = [];
+  let paragraphIndent: any[] = [];
   let textCase: SingleToken[] = [];
   let textDecoration: SingleToken[] = [];
   if (styleTypes.colorStyles) {
@@ -70,6 +71,7 @@ export default function pullStyles(styleTypes: PullStyleOptions): void {
     const fontCombinations: FontName[] = [];
     const rawLineHeights: LineHeight[] = [];
     const rawParagraphSpacing: number[] = [];
+    const rawParagraphIndent: number[] = [];
     const rawLetterSpacing: LetterSpacing[] = [];
     const rawTextCase: TextCase[] = [];
     const rawTextDecoration: TextDecoration[] = [];
@@ -81,6 +83,7 @@ export default function pullStyles(styleTypes: PullStyleOptions): void {
       fontCombinations.push(style.fontName);
       rawLineHeights.push(style.lineHeight);
       if (!rawParagraphSpacing.includes(style.paragraphSpacing)) rawParagraphSpacing.push(style.paragraphSpacing);
+      if (!rawParagraphIndent.includes(style.paragraphIndent)) rawParagraphIndent.push(style.paragraphIndent);
       rawLetterSpacing.push(style.letterSpacing);
       if (!rawTextCase.includes(style.textCase)) rawTextCase.push(style.textCase);
       if (!rawTextDecoration.includes(style.textDecoration)) rawTextDecoration.push(style.textDecoration);
@@ -125,6 +128,12 @@ export default function pullStyles(styleTypes: PullStyleOptions): void {
         type: TokenTypes.PARAGRAPH_SPACING,
       }));
 
+    paragraphIndent = rawParagraphIndent
+      .sort((a, b) => a - b)
+      .map((idx) => ({
+        name: `paragraphIndent.${idx}`,
+      }));
+
     letterSpacing = rawLetterSpacing
       .filter((v, i, a) => a.findIndex((t) => t.unit === v.unit && t.value === v.value) === i)
       .map((lh, idx) => ({
@@ -160,6 +169,9 @@ export default function pullStyles(styleTypes: PullStyleOptions): void {
       const foundParagraphSpacing = paragraphSpacing.find(
         (el: SingleToken) => el.value === style.paragraphSpacing.toString(),
       );
+      const foundParagraphIndent = paragraphIndent.find(
+        (el: SingleToken) => el.value === style.paragraphIndent.toString(),
+      );
       const foundTextCase = textCase.find(
         (el: SingleToken) => el.value === convertFigmaToTextCase(style.textCase.toString()),
       );
@@ -174,6 +186,7 @@ export default function pullStyles(styleTypes: PullStyleOptions): void {
         fontSize: `{${foundFontSize?.name}}`,
         letterSpacing: `{${foundLetterSpacing?.name}}`,
         paragraphSpacing: `{${foundParagraphSpacing?.name}}`,
+        paragraphIndent: `{${foundParagraphIndent?.name}}`,
         textCase: `{${foundTextCase?.name}}`,
         textDecoration: `{${foundTextDecoration?.name}}`,
       };

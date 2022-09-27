@@ -60,6 +60,7 @@ export function transformValue(value: string, type: string) {
     case 'paddingLeft':
     case 'itemSpacing':
     case 'paragraphSpacing':
+    case 'paragraphIndent':
     case 'fontSizes':
       return convertTypographyNumberToFigma(value);
     case 'fontWeights':
