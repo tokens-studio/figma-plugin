@@ -55,6 +55,7 @@ describe('textStyleMatchesTypographyToken', () => {
       const lineHeight = 'AUTO';
       const letterSpacing = 1;
       const paragraphSpacing = 2;
+      const paragraphIndent = 2;
       const textCase = 'ORIGINAL';
       const textDecoration = 'UNDERLINE';
       const typographyToken: TokenTypographyValue = {
@@ -64,6 +65,7 @@ describe('textStyleMatchesTypographyToken', () => {
         lineHeight,
         letterSpacing: `${letterSpacing}%`,
         paragraphSpacing: paragraphSpacing.toString(),
+        paragraphIndent: paragraphIndent.toString(),
         textCase: 'none',
         textDecoration,
       };
@@ -80,7 +82,7 @@ describe('textStyleMatchesTypographyToken', () => {
           unit: 'PERCENT',
         },
         lineHeight: { unit: lineHeight },
-        paragraphIndent: 0,
+        paragraphIndent,
         paragraphSpacing,
         textCase,
       };
@@ -94,6 +96,7 @@ describe('textStyleMatchesTypographyToken', () => {
       const fontSize = 9;
       const letterSpacing = 0;
       const paragraphSpacing = 2;
+      const paragraphIndent = 2;
       const textCase = 'ORIGINAL';
       const textDecoration = 'NONE';
       const typographyToken: TokenTypographyValue = {
@@ -101,6 +104,7 @@ describe('textStyleMatchesTypographyToken', () => {
         fontWeight,
         fontSize: fontSize.toString(),
         paragraphSpacing: paragraphSpacing.toString(),
+        paragraphIndent: paragraphIndent.toString(),
       };
       const figmaTextStyle: TextStyle = {
         ...dummyFigmaTextStyle,
@@ -115,7 +119,7 @@ describe('textStyleMatchesTypographyToken', () => {
           unit: 'PERCENT',
         },
         lineHeight: { unit: 'AUTO' },
-        paragraphIndent: 0,
+        paragraphIndent,
         paragraphSpacing,
         textCase,
       };
@@ -130,6 +134,7 @@ describe('textStyleMatchesTypographyToken', () => {
       const lineHeight = '0px';
       const letterSpacing = 0;
       const paragraphSpacing = 2;
+      const paragraphIndent = 2;
       const textCase = 'ORIGINAL';
       const textDecoration = 'NONE';
       const typographyToken: TokenTypographyValue = {
@@ -138,6 +143,7 @@ describe('textStyleMatchesTypographyToken', () => {
         fontSize: fontSize.toString(),
         lineHeight,
         paragraphSpacing: paragraphSpacing.toString(),
+        paragraphIndent: paragraphIndent.toString(),
       };
       const figmaTextStyle: TextStyle = {
         ...dummyFigmaTextStyle,
@@ -154,6 +160,7 @@ describe('textStyleMatchesTypographyToken', () => {
         lineHeight: { unit: 'PERCENT', value: 0 },
         paragraphIndent: 0,
         paragraphSpacing,
+        paragraphIndent,
         textCase,
       };
 

@@ -1,9 +1,7 @@
 /* eslint-disable no-param-reassign */
 import compact from 'just-compact';
 import { figmaRGBToHex } from '@figma-plugin/helpers';
-import {
-  SingleToken, SingleColorToken, AnyTokenList,
-} from '@/types/tokens';
+import { SingleToken, SingleColorToken, AnyTokenList } from '@/types/tokens';
 import { convertBoxShadowTypeFromFigma } from './figmaTransforms/boxShadow';
 import { convertFigmaGradientToString } from './figmaTransforms/gradients';
 import { convertFigmaToLetterSpacing } from './figmaTransforms/letterSpacing';
@@ -31,39 +29,44 @@ export default function pullStyles(styleTypes: PullStyleOptions): void {
   let textCase: SingleToken[] = [];
   let textDecoration: SingleToken[] = [];
   if (styleTypes.colorStyles) {
-    colors = compact(figma
-      .getLocalPaintStyles()
-      .filter((style) => style.paints.length === 1)
-      .map((style) => {
-        const paint = style.paints[0];
-        let styleObject: SingleColorToken | null = {} as SingleColorToken;
-        if (style.description) {
-          styleObject.description = style.description;
-        }
-        if (paint.type === 'SOLID') {
-          const { r, g, b } = paint.color;
-          const a = paint.opacity;
-          styleObject.value = figmaRGBToHex({
-            r, g, b, a,
-          });
-        } else if (paint.type === 'GRADIENT_LINEAR') {
-          styleObject.value = convertFigmaGradientToString(paint);
-        } else {
-          styleObject = null;
-        }
-        const normalizedName = style.name
-          .split('/')
-          .map((section) => section.trim())
-          .join('.');
-
-        return styleObject
-          ? {
-            ...styleObject,
-            name: normalizedName,
-            type: TokenTypes.COLOR,
+    colors = compact(
+      figma
+        .getLocalPaintStyles()
+        .filter((style) => style.paints.length === 1)
+        .map((style) => {
+          const paint = style.paints[0];
+          let styleObject: SingleColorToken | null = {} as SingleColorToken;
+          if (style.description) {
+            styleObject.description = style.description;
           }
-          : null;
-      }));
+          if (paint.type === 'SOLID') {
+            const { r, g, b } = paint.color;
+            const a = paint.opacity;
+            styleObject.value = figmaRGBToHex({
+              r,
+              g,
+              b,
+              a,
+            });
+          } else if (paint.type === 'GRADIENT_LINEAR') {
+            styleObject.value = convertFigmaGradientToString(paint);
+          } else {
+            styleObject = null;
+          }
+          const normalizedName = style.name
+            .split('/')
+            .map((section) => section.trim())
+            .join('.');
+
+          return styleObject
+            ? {
+              ...styleObject,
+              name: normalizedName,
+              type: TokenTypes.COLOR,
+            }
+            : null;
+        }),
+    );
   }
 
   if (styleTypes.textStyles) {
@@ -101,7 +104,9 @@ export default function pullStyles(styleTypes: PullStyleOptions): void {
       (v, i, a) => a.findIndex((t) => t.family === v.family && t.style === v.style) === i,
     );
     lineHeights = rawLineHeights
-      .filter((v, i, a) => a.findIndex((t) => t.unit === v.unit && ('value' in t && 'value' in v ? t.value === v.value : true)) === i)
+      .filter(
+        (v, i, a) => a.findIndex((t) => t.unit === v.unit && ('value' in t && 'value' in v ? t.value === v.value : true)) === i,
+      )
       .map((lh, idx) => ({
         name: `lineHeights.${idx}`,
         value: convertFigmaToLineHeight(lh).toString(),
@@ -130,8 +135,9 @@ export default function pullStyles(styleTypes: PullStyleOptions): void {
 
     paragraphIndent = rawParagraphIndent
       .sort((a, b) => a - b)
-      .map((idx) => ({
+      .map((size, idx) => ({
         name: `paragraphIndent.${idx}`,
+        value: size.toString(),
       }));
 
     letterSpacing = rawLetterSpacing
@@ -207,43 +213,45 @@ export default function pullStyles(styleTypes: PullStyleOptions): void {
   }
 
   if (styleTypes.effectStyles) {
-    effects = compact(figma
-      .getLocalEffectStyles()
-      .filter((style) => style.effects.every((effect) => ['DROP_SHADOW', 'INNER_SHADOW'].includes(effect.type)))
-      .map((style) => {
-        const effects = style.effects as DropShadowEffect[];
-        // convert paint to object containg x, y, spread, color
-        const shadows: TokenBoxshadowValue[] = effects.map((effect) => {
-          const effectObject: TokenBoxshadowValue = {} as TokenBoxshadowValue;
+    effects = compact(
+      figma
+        .getLocalEffectStyles()
+        .filter((style) => style.effects.every((effect) => ['DROP_SHADOW', 'INNER_SHADOW'].includes(effect.type)))
+        .map((style) => {
+          const effects = style.effects as DropShadowEffect[];
+          // convert paint to object containg x, y, spread, color
+          const shadows: TokenBoxshadowValue[] = effects.map((effect) => {
+            const effectObject: TokenBoxshadowValue = {} as TokenBoxshadowValue;
 
-          effectObject.color = figmaRGBToHex(effect.color);
-          effectObject.type = convertBoxShadowTypeFromFigma(effect.type);
-          effectObject.x = effect.offset.x;
-          effectObject.y = effect.offset.y;
-          effectObject.blur = effect.radius;
-          effectObject.spread = effect.spread || 0;
+            effectObject.color = figmaRGBToHex(effect.color);
+            effectObject.type = convertBoxShadowTypeFromFigma(effect.type);
+            effectObject.x = effect.offset.x;
+            effectObject.y = effect.offset.y;
+            effectObject.blur = effect.radius;
+            effectObject.spread = effect.spread || 0;
 
-          return effectObject;
-        });
+            return effectObject;
+          });
 
-        if (!shadows) return null;
+          if (!shadows) return null;
 
-        const normalizedName = style.name
-          .split('/')
-          .map((section) => section.trim())
-          .join('.');
+          const normalizedName = style.name
+            .split('/')
+            .map((section) => section.trim())
+            .join('.');
 
-        const styleObject: SingleToken = {
-          value: shadows.length > 1 ? shadows : shadows[0],
-          type: TokenTypes.BOX_SHADOW,
-          name: normalizedName,
-        };
-        if (style.description) {
-          styleObject.description = style.description;
-        }
+          const styleObject: SingleToken = {
+            value: shadows.length > 1 ? shadows : shadows[0],
+            type: TokenTypes.BOX_SHADOW,
+            name: normalizedName,
+          };
+          if (style.description) {
+            styleObject.description = style.description;
+          }
 
-        return styleObject;
-      }));
+          return styleObject;
+        }),
+    );
   }
 
   const stylesObject = {
