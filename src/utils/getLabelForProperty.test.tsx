@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-  IconFontSize, IconLetterSpacing, IconLineHeight, IconParagraphSpacing, IconTextCase, IconTextDecoration,
+  IconFontSize, IconLetterSpacing, IconLineHeight, IconParagraphIndent, IconParagraphSpacing, IconTextCase, IconTextDecoration,
 } from '@/icons';
 import { getLabelForProperty } from './getLabelForProperty';
 
@@ -10,6 +10,7 @@ describe('getLabelForProperty', () => {
     expect(getLabelForProperty('fontSize')).toEqual(<IconFontSize />);
     expect(getLabelForProperty('letterSpacing')).toEqual(<IconLetterSpacing />);
     expect(getLabelForProperty('paragraphSpacing')).toEqual(<IconParagraphSpacing />);
+    expect(getLabelForProperty('paragraphIndent')).toEqual(<IconParagraphIndent />);
     expect(getLabelForProperty('textDecoration')).toEqual(<IconTextDecoration />);
     expect(getLabelForProperty('textCase')).toEqual(<IconTextCase />);
   });
