@@ -124,7 +124,6 @@ export default function pullStyles(styleTypes: PullStyleOptions): void {
       value: font.style,
       type: TokenTypes.FONT_WEIGHTS,
     }));
-
     paragraphSpacing = rawParagraphSpacing
       .sort((a, b) => a - b)
       .map((size, idx) => ({
