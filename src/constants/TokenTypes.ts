@@ -15,6 +15,7 @@ export enum TokenTypes {
   FONT_SIZES = 'fontSizes',
   LETTER_SPACING = 'letterSpacing',
   PARAGRAPH_SPACING = 'paragraphSpacing',
+  PARAGRAPH_INDENT = 'paragraphIndent',
   TEXT_DECORATION = 'textDecoration',
   TEXT_CASE = 'textCase',
   COMPOSITION = 'composition',

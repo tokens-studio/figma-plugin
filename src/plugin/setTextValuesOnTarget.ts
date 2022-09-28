@@ -13,6 +13,7 @@ export default async function setTextValuesOnTarget(target: TextNode | TextStyle
         lineHeight,
         letterSpacing,
         paragraphSpacing,
+        paragraphIndent,
         textCase,
         textDecoration,
       } = value;
@@ -63,6 +64,9 @@ export default async function setTextValuesOnTarget(target: TextNode | TextStyle
       }
       if (paragraphSpacing) {
         target.paragraphSpacing = transformValue(paragraphSpacing, 'paragraphSpacing');
+      }
+      if (paragraphIndent) {
+        target.paragraphIndent = transformValue(paragraphIndent, 'paragraphIndent');
       }
       if (textCase) {
         target.textCase = transformValue(textCase, 'textCase');

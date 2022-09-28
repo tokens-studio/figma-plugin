@@ -96,6 +96,7 @@ const tokenTypes = {
         fontSize: '18',
         letterSpacing: '0%',
         paragraphSpacing: '0',
+        paragraphIndent: '0',
         textDecoration: 'none',
         textCase: 'none',
       },

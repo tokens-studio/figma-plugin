@@ -16,6 +16,7 @@ export function textStyleMatchesTypographyToken(
     lineHeight,
     letterSpacing,
     paragraphSpacing,
+    paragraphIndent,
     textCase,
     textDecoration,
   } = typographyToken;
@@ -57,6 +58,12 @@ export function textStyleMatchesTypographyToken(
   if (
     paragraphSpacing === undefined
     || textStyle.paragraphSpacing !== transformValue(paragraphSpacing, 'paragraphSpacing')
+  ) {
+    return false;
+  }
+  if (
+    paragraphIndent === undefined
+    || textStyle.paragraphIndent !== transformValue(paragraphIndent, 'paragraphIndent')
   ) {
     return false;
   }

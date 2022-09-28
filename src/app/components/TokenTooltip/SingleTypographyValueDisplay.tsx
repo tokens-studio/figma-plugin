@@ -25,6 +25,11 @@ export const SingleTypographyValueDisplay: React.FC<Props> = ({ value, resolvedV
       value={value.paragraphSpacing}
       resolvedValue={resolvedValue?.paragraphSpacing}
     />
+    <TooltipProperty
+      label="Paragraph indent"
+      value={value.paragraphIndent}
+      resolvedValue={resolvedValue?.paragraphIndent}
+    />
     <TooltipProperty label="Text case" value={value.textCase} resolvedValue={resolvedValue?.textCase} />
     <TooltipProperty
       label="Text decoration"
