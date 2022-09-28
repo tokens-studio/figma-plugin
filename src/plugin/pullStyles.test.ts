@@ -17,7 +17,7 @@ describe('pullStyles', () => {
         name: 'blue/500',
         id: '567',
         description: 'the blue one',
-        paints: [{ type: 'SOLID', color: { r: 0, g: 0, b: 1 }, opacity: 0.5 }],
+        paints: [{ type: 'other', color: { r: 0, g: 0, b: 1 }, opacity: 0.5 }],
       },
     ]);
     await pullStyles({ colorStyles: true });
@@ -29,12 +29,6 @@ describe('pullStyles', () => {
           type: 'color',
           value: '#ff0000',
           description: 'the red one',
-        },
-        {
-          name: 'blue.500',
-          type: 'color',
-          value: '#0000ff80',
-          description: 'the blue one',
         },
       ],
     });
