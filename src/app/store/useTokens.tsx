@@ -221,6 +221,19 @@ export default function useTokens() {
     }
   }, [confirm, usedTokenSet, tokens, settings, dispatch.tokenState]);
 
+  const renameStylesFromTokens = useCallback(async ({ oldName, newName, parent }: { oldName: string, newName: string, parent: string }) => {
+    track('renameStyles', { oldName, newName, parent });
+
+    const renameStylesResult = await AsyncMessageChannel.ReactInstance.message({
+      type: AsyncMessageTypes.RENAME_STYLES,
+      oldName,
+      newName,
+      parent,
+      settings,
+    });
+    dispatch.tokenState.renameStyleIdsToCurrentTheme(renameStylesResult.styleIds, newName);
+  }, [settings, dispatch.tokenState]);
+
   const removeStylesFromTokens = useCallback(async (token: DeleteTokenPayload) => {
     track('removeStyles', token);
 
@@ -243,6 +256,7 @@ export default function useTokens() {
     remapTokensInGroup,
     removeTokensByValue,
     handleRemap,
+    renameStylesFromTokens,
     handleBulkRemap,
     removeStylesFromTokens,
   }), [
@@ -256,6 +270,7 @@ export default function useTokens() {
     remapTokensInGroup,
     removeTokensByValue,
     handleRemap,
+    renameStylesFromTokens,
     handleBulkRemap,
     removeStylesFromTokens,
   ]);

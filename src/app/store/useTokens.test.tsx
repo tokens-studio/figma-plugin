@@ -9,7 +9,7 @@ import {
 } from '@/types/tokens';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes, GetThemeInfoMessageResult } from '@/types/AsyncMessages';
-import { createStyles, removeStyles } from '@/plugin/asyncMessageHandlers';
+import { createStyles, renameStyles, removeStyles } from '@/plugin/asyncMessageHandlers';
 import { AllTheProviders, createMockStore, resetStore } from '../../../tests/config/setupTest';
 import { store } from '../store';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
@@ -197,10 +197,9 @@ const resolvedTokens: AnyTokenList = [
 ];
 
 const mockConfirm = jest.fn();
-const mockPullStylesHandler = jest.fn(async () => {});
-const mockRemapTokensHandler = jest.fn(async () => {});
-const mockRemoveTokensByValueHandler = jest.fn(async () => {});
-
+const mockPullStylesHandler = jest.fn(async () => { });
+const mockRemapTokensHandler = jest.fn(async () => { });
+const mockRemoveTokensByValueHandler = jest.fn(async () => { });
 jest.mock('../hooks/useConfirm', () => ({
   __esModule: true,
   default: () => ({
@@ -328,6 +327,7 @@ describe('useToken test', () => {
       themes: [],
     }));
     AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.CREATE_STYLES, createStyles);
+    AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.RENAME_STYLES, renameStyles);
     AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.REMOVE_STYLES, removeStyles);
 
     it('creates all styles', async () => {
@@ -403,6 +403,19 @@ describe('useToken test', () => {
           },
         },
         ],
+        settings: store.getState().settings,
+      });
+    });
+    it('rename styles from current theme', async () => {
+      await act(async () => {
+        await result.current.renameStylesFromTokens({ oldName: 'old', newName: 'new', parent: 'global' });
+      });
+
+      expect(messageSpy).toBeCalledWith({
+        type: AsyncMessageTypes.RENAME_STYLES,
+        oldName: 'old',
+        newName: 'new',
+        parent: 'global',
         settings: store.getState().settings,
       });
     });

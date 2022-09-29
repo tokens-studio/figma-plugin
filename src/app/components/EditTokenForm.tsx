@@ -22,6 +22,7 @@ import { UpdateMode } from '@/constants/UpdateMode';
 import trimValue from '@/utils/trimValue';
 import BoxShadowInput from './BoxShadowInput';
 import { EditTokenFormStatus } from '@/constants/EditTokenFormStatus';
+import { StyleOptions } from '@/constants/StyleOptions';
 import Textarea from './Textarea';
 import Heading from './Heading';
 
@@ -36,7 +37,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
   const editToken = useSelector(editTokenSelector);
   const updateMode = useSelector(updateModeSelector);
   const { editSingleToken, createSingleToken, duplicateSingleToken } = useManageTokens();
-  const { remapToken } = useTokens();
+  const { remapToken, renameStylesFromTokens } = useTokens();
   const dispatch = useDispatch<Dispatch>();
   const [inputHelperOpen, setInputHelperOpen] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
@@ -86,7 +87,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
     if ((internalEditToken?.status || nameWasChanged) && hasPriorTokenName) {
       setError('Tokens can\'t share name with a group');
     }
-  }, [internalEditToken, hasNameThatExistsAlready, nameWasChanged, hasPriorTokenName]);
+  }, [internalEditToken, hasNameThatExistsAlready, nameWasChanged, hasPriorTokenName, hasAnotherTokenThatStartsWithName]);
 
   const handleToggleInputHelper = React.useCallback(() => {
     setInputHelperOpen(!inputHelperOpen);
@@ -252,12 +253,17 @@ function EditTokenForm({ resolvedTokens }: Props) {
               {
                 key: UpdateMode.DOCUMENT, label: 'Document', unique: true, enabled: UpdateMode.DOCUMENT === updateMode,
               },
+              {
+                key: StyleOptions.RENAME, label: 'Rename styles',
+              },
             ],
           });
-
           if (shouldRemap) {
             remapToken(oldName, newName, shouldRemap.data[0]);
             dispatch.settings.setUpdateMode(shouldRemap.data[0]);
+            if (shouldRemap.data.includes(StyleOptions.RENAME)) {
+              renameStylesFromTokens({ oldName, newName, parent: activeTokenSet });
+            }
           }
         } else {
           track('Edit token', { renamed: false });
@@ -287,7 +293,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
         dispatch.uiState.setShowEditForm(false);
       }
     },
-    [dispatch, isValid, internalEditToken],
+    [dispatch, isValid, internalEditToken, submitTokenValue],
   );
 
   const handleReset = React.useCallback(() => {
