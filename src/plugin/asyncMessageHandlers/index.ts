@@ -8,6 +8,7 @@ export * from './remapTokens';
 export * from './gotoNode';
 export * from './selectNodes';
 export * from './pullStyles';
+export * from './syncStyles';
 export * from './notify';
 export * from './cancelOperation';
 export * from './resizeWindow';

@@ -115,7 +115,7 @@ export default function useManageTokens() {
         isInfinite: true,
       });
       deleteToken(data);
-      if (userConfirmation.data && userConfirmation.data.length) {
+      if (Array.isArray(userConfirmation.data) && userConfirmation.data.length) {
         removeStylesFromTokens(data);
       }
       dispatch.uiState.completeJob(BackgroundJobs.UI_DELETETOKEN);

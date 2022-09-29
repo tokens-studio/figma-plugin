@@ -221,6 +221,27 @@ export default function useTokens() {
     }
   }, [confirm, usedTokenSet, tokens, settings, dispatch.tokenState]);
 
+  const syncStyles = useCallback(async () => {
+    const userConfirmation = await confirm({
+      text: 'Sync styles',
+      description: 'Choose sync option',
+      choices: [
+        { key: 'updateStyles', label: 'Remove styles without connection' },
+        { key: 'renameStyles', label: 'Rename styles' },
+      ],
+    });
+
+    if (userConfirmation && Array.isArray(userConfirmation.data) && userConfirmation.data.length) {
+      track('syncStyles', userConfirmation.data);
+
+      const syncStylesResult = await AsyncMessageChannel.ReactInstance.message({
+        type: AsyncMessageTypes.SYNC_STYLES,
+        tokens,
+      });
+      // dispatch.tokenState.assignStyleIdsToCurrentTheme(createStylesResult.styleIds);
+    }
+  }, [confirm, usedTokenSet, tokens, settings, dispatch.tokenState]);
+
   const removeStylesFromTokens = useCallback(async (token: DeleteTokenPayload) => {
     track('removeStyles', token);
 
@@ -245,6 +266,7 @@ export default function useTokens() {
     handleRemap,
     handleBulkRemap,
     removeStylesFromTokens,
+    syncStyles,
   }), [
     isAlias,
     getTokenValue,
@@ -258,5 +280,6 @@ export default function useTokens() {
     handleRemap,
     handleBulkRemap,
     removeStylesFromTokens,
+    syncStyles,
   ]);
 }
