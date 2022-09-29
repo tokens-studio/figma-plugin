@@ -16,6 +16,7 @@ import {
   settingsStateSelector,
   tokensSelector,
   usedTokenSetSelector,
+  themesListSelector,
 } from '@/selectors';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { TokenTypes } from '@/constants/TokenTypes';
@@ -27,6 +28,9 @@ import { NodeInfo } from '@/types/NodeInfo';
 import { TokensContext } from '@/context';
 import { Dispatch, RootState } from '../store';
 import { DeleteTokenPayload } from '@/types/payloads';
+import { theme } from '@/stitches.config';
+import { UsedTokenSetsMap } from '@/types';
+import { appendTypeToToken } from '../components/createTokenObj';
 
 type ConfirmResult =
   ('textStyles' | 'colorStyles' | 'effectStyles')[]
@@ -51,6 +55,7 @@ export default function useTokens() {
   const { confirm } = useConfirm<ConfirmResult>();
   const store = useStore<RootState>();
   const tokensContext = useContext(TokensContext);
+  const themes = useSelector(themesListSelector);
 
   // Gets value of token
   const getTokenValue = useCallback((name: string, resolved: AnyTokenList) => (
@@ -233,7 +238,6 @@ export default function useTokens() {
 
     if (userConfirmation && Array.isArray(userConfirmation.data) && userConfirmation.data.length) {
       track('syncStyles', userConfirmation.data);
-
       const syncStylesResult = await AsyncMessageChannel.ReactInstance.message({
         type: AsyncMessageTypes.SYNC_STYLES,
         tokens,
