@@ -2,13 +2,15 @@ import React from 'react';
 import { init, RematchStore } from '@rematch/core';
 import { renderHook, act } from '@testing-library/react-hooks';
 import { Provider } from 'react-redux';
-import { RootModel } from '@/types/RootModel';
-import { models } from './models';
 import { AllTheProviders } from '../../../tests/config/setupTest';
 import useManageTokens from './useManageTokens';
+import { RootModel } from '@/types/RootModel';
+import { models } from './models';
 import { TokenTypes } from '@/constants/TokenTypes';
 
 const mockConfirm = jest.fn();
+const mockRemoveStylesFromTokens = jest.fn();
+type Store = RematchStore<RootModel, Record<string, never>>;
 
 jest.mock('../hooks/useConfirm', () => ({
   __esModule: true,
@@ -17,9 +19,14 @@ jest.mock('../hooks/useConfirm', () => ({
   }),
 }));
 
-type Store = RematchStore<RootModel, Record<string, never>>;
+jest.mock('./useTokens', () => ({
+  __esModule: true,
+  default: () => ({
+    removeStylesFromTokens: mockRemoveStylesFromTokens,
+  }),
+}));
 
-describe('useManageToken test', () => {
+describe('useManageTokens', () => {
   let store: Store;
   let { result } = renderHook(() => useManageTokens(), {
     wrapper: AllTheProviders,
@@ -173,5 +180,31 @@ describe('useManageToken test', () => {
         value: '16px',
       },
     ]);
+  });
+
+  it('Should be able to remove styles from any theme if the user deleted one', async () => {
+    const tokenToDelete = {
+      path: 'color.red',
+      parent: 'global',
+    };
+    mockConfirm.mockImplementation(() => Promise.resolve({ data: ['delete-style'] }));
+    const { result } = renderHook(() => useManageTokens(), {
+      wrapper: AllTheProviders,
+    });
+    await act(async () => result.current.deleteSingleToken(tokenToDelete));
+    expect(mockRemoveStylesFromTokens).toBeCalledTimes(1);
+  });
+
+  it('doesn\'t remove styles from any theme when the user doesn\'t select option', async () => {
+    const tokenToDelete = {
+      path: 'color.red',
+      parent: 'global',
+    };
+    mockConfirm.mockImplementation(() => Promise.resolve({ data: [] }));
+    const { result } = renderHook(() => useManageTokens(), {
+      wrapper: AllTheProviders,
+    });
+    await act(async () => result.current.deleteSingleToken(tokenToDelete));
+    expect(mockRemoveStylesFromTokens).toBeCalledTimes(0);
   });
 });

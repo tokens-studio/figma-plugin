@@ -13,11 +13,13 @@ import type { Direction } from '@/constants/Direction';
 import type { SelectionValue } from './SelectionValue';
 import type { startup } from '@/utils/plugin';
 import type { ThemeObject } from './ThemeObject';
+import { DeleteTokenPayload } from './payloads';
 
 export enum AsyncMessageTypes {
   // the below messages are going from UI to plugin
   CREATE_STYLES = 'async/create-styles',
   RENAME_STYLES = 'async/rename-styles',
+  REMOVE_STYLES = 'async/remove-styles',
   CREDENTIALS = 'async/credentials',
   CHANGED_TABS = 'async/changed-tabs',
   REMOVE_SINGLE_CREDENTIAL = 'async/remove-single-credential',
@@ -140,6 +142,14 @@ export type RenameStylesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.RENA
   styleIds: string[];
 }>;
 
+export type RemoveStylesAsyncMessage = AsyncMessage<AsyncMessageTypes.REMOVE_STYLES, {
+  token: DeleteTokenPayload;
+  settings: Partial<SettingsState>;
+}>;
+export type RemoveStylesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.REMOVE_STYLES, {
+  styleIds: string[];
+}>;
+
 export type UpdateAsyncMessage = AsyncMessage<AsyncMessageTypes.UPDATE, {
   tokenValues: Record<string, AnyTokenList>;
   tokens: AnyTokenList | null;
@@ -192,6 +202,7 @@ export type StartupMessageResult = AsyncMessage<AsyncMessageTypes.STARTUP>;
 export type AsyncMessages =
   CreateStylesAsyncMessage
   | RenameStylesAsyncMessage
+  | RemoveStylesAsyncMessage
   | CredentialsAsyncMessage
   | ChangedTabsAsyncMessage
   | RemoveSingleCredentialAsyncMessage
@@ -219,6 +230,7 @@ export type AsyncMessages =
 export type AsyncMessageResults =
   CreateStylesAsyncMessageResult
   | RenameStylesAsyncMessageResult
+  | RemoveStylesAsyncMessageResult
   | CredentialsAsyncMessageResult
   | ChangedTabsAsyncMessageResult
   | RemoveSingleCredentialAsyncMessageResult

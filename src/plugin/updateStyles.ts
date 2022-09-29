@@ -51,6 +51,5 @@ export default async function updateStyles(
     ...(textTokens.length > 0 ? updateTextStyles(textTokens, shouldCreate) : {}),
     ...(effectTokens.length > 0 ? updateEffectStyles(effectTokens, shouldCreate) : {}),
   };
-
   return allStyleIds;
 }

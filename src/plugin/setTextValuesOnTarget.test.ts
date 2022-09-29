@@ -16,6 +16,7 @@ describe('setTextValuesOnTarget', () => {
       textDecoration: 'NONE',
       fontSize: 24,
       paragraphSpacing: 0,
+      paragraphIndent: 0,
       letterSpacing: 0,
       lineHeight: 'AUTO',
     };
@@ -85,5 +86,10 @@ describe('setTextValuesOnTarget', () => {
     expect(textNodeMock).toEqual({
       ...textNodeMock,
     });
+  });
+
+  it('sets paragraphIndent if that is given', async () => {
+    await setTextValuesOnTarget(textNodeMock, { value: { paragraphIndent: 5 } });
+    expect(textNodeMock).toEqual({ ...textNodeMock, paragraphIndent: 5 });
   });
 });

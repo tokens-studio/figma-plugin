@@ -23,12 +23,13 @@ const properties = {
   fontSize: 'Size',
   lineHeight: 'Line height',
   letterSpacing: 'Letter',
-  paragraphSpacing: 'Paragraph',
+  paragraphSpacing: 'Paragraph Spacing',
+  paragraphIndent: 'Paragraph Indent',
   textDecoration: 'Decoration',
   textCase: 'Text Case',
 };
 
-export const ResolvedTypograhpyValueDisplay: React.FC<Props> = ({ value }) => {
+export const ResolvedTypographyValueDisplay: React.FC<Props> = ({ value }) => {
   const seed = useUIDSeed();
 
   return (
@@ -46,7 +47,7 @@ export const ResolvedTypograhpyValueDisplay: React.FC<Props> = ({ value }) => {
         {Object.keys(properties).map((key) => (
           <StyledValueItem key={seed(key)}>
             {value[key as keyof typeof value]}
-&nbsp;
+            &nbsp;
           </StyledValueItem>
         ))}
       </Box>

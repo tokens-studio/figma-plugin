@@ -4,7 +4,6 @@ import type { TokenState } from '../../tokenState';
 export function assignStyleIdsToCurrentTheme(state: TokenState, styleIds: Record<string, string>): TokenState {
   // ignore if there is no active theme
   if (!state.activeTheme) return state;
-
   // ignore if the theme does not exist for some reason
   const themeObjectIndex = state.themes.findIndex(({ id }) => state.activeTheme === id);
   if (

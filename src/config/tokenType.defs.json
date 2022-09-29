@@ -83,6 +83,7 @@
           "fontSize": { "type": "string" },
           "letterSpacing": { "type": "string" },
           "paragraphSpacing": { "type": "string" },
+          "paragraphIndent": { "type": "string" },
           "textDecoration": { "type": "string" },
           "textCase": { "type": "string" }
         }
