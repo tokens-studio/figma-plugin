@@ -3,12 +3,15 @@ import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import {
-  AnyTokenList, SingleBoxShadowToken, SingleColorToken, SingleTypographyToken,
+  AnyTokenList, SingleBoxShadowToken, SingleColorToken, SingleToken, SingleTypographyToken,
 } from '@/types/tokens';
 import { convertTokenNameToPath } from '@/utils/convertTokenNameToPath';
 import { isMatchingStyle } from '@/utils/is/isMatchingStyle';
 import compareStyleValueWithTokenValue from './compareStyleWithToken';
-import updateStyles from './updateStyles';
+import { transformValue } from './helpers';
+import setColorValuesOnTarget from './setColorValuesOnTarget';
+import setEffectValuesOnTarget from './setEffectValuesOnTarget';
+import setTextValuesOnTarget from './setTextValuesOnTarget';
 
 export default async function syncStyles(tokens: Record<string, AnyTokenList>) {
   const effectStyles = figma.getLocalEffectStyles();
@@ -19,15 +22,24 @@ export default async function syncStyles(tokens: Record<string, AnyTokenList>) {
   const themeInfo = await AsyncMessageChannel.PluginInstance.message({
     type: AsyncMessageTypes.GET_THEME_INFO,
   });
+
   // styleSet store all possible styles which could be created from current tokens
-  const styleSet: Record<string, SingleColorToken | SingleBoxShadowToken | SingleTypographyToken> = {};
+  const styleSet: Record<string, SingleToken<true, { path: string }>> = {};
   themeInfo.themes.forEach((theme) => {
     Object.entries(theme.selectedTokenSets).forEach(([tokenSet, value]) => {
       if (value === TokenSetStatus.ENABLED) {
         tokens[tokenSet].forEach((token) => {
           if (token.type === TokenTypes.COLOR || token.type === TokenTypes.BOX_SHADOW || token.type === TokenTypes.TYPOGRAPHY) {
             const pathName = convertTokenNameToPath(token.name, theme.name);
-            styleSet[pathName] = token;
+            styleSet[pathName] = {
+              ...token,
+              path: pathName,
+              value: (typeof token.value === 'string')
+                ? transformValue(token.value, token.type)
+                : token.value,
+            } as SingleToken<true, {
+              path: string
+            }>;
           }
         });
       }
@@ -39,7 +51,15 @@ export default async function syncStyles(tokens: Record<string, AnyTokenList>) {
       style.remove();
     }
     if (!compareStyleValueWithTokenValue(style, styleSet[style.name])) {
-      // updateStyle();
+      if (style.type === 'PAINT' && styleSet[style.name].type === TokenTypes.COLOR) {
+        setColorValuesOnTarget(style, styleSet[style.name] as SingleColorToken);
+      }
+      if (style.type === 'TEXT' && styleSet[style.name].type === TokenTypes.TYPOGRAPHY) {
+        setTextValuesOnTarget(style, styleSet[style.name] as SingleTypographyToken);
+      }
+      if (style.type === 'EFFECT' && styleSet[style.name].type === TokenTypes.BOX_SHADOW) {
+        setEffectValuesOnTarget(style, styleSet[style.name] as SingleBoxShadowToken);
+      }
     }
   });
 }

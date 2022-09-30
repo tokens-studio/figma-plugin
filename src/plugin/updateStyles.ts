@@ -43,7 +43,7 @@ export default async function updateStyles(
   const colorTokens = styleTokens.filter((n) => [TokenTypes.COLOR].includes(n.type)) as Extract<typeof styleTokens[number], { type: TokenTypes.COLOR }>[];
   const textTokens = styleTokens.filter((n) => [TokenTypes.TYPOGRAPHY].includes(n.type)) as Extract<typeof styleTokens[number], { type: TokenTypes.TYPOGRAPHY }>[];
   const effectTokens = styleTokens.filter((n) => [TokenTypes.BOX_SHADOW].includes(n.type)) as Extract<typeof styleTokens[number], { type: TokenTypes.BOX_SHADOW }>[];
-  console.log('color', colorTokens);
+
   if (!colorTokens && !textTokens && !effectTokens) return {};
 
   const allStyleIds = {

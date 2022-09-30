@@ -1,28 +1,19 @@
-/* eslint-disable no-param-reassign */
 import { TokenTypes } from '@/constants/TokenTypes';
-import {
-  SingleToken, SingleColorToken, AnyTokenList, SingleBoxShadowToken, SingleTypographyToken,
-} from '@/types/tokens';
-import { isPaintEqual } from '@/utils/isPaintEqual';
-import { convertToFigmaColor } from './figmaTransforms/colors';
-import { convertStringToFigmaGradient } from './figmaTransforms/gradients';
+import { SingleToken } from '@/types/tokens';
+import { effectStyleMatchesBoxShadowToken, paintStyleMatchesColorToken, textStyleMatchesTypographyToken } from './figmaUtils/styleMatchers';
 
-export default function compareStyleValueWithTokenValue(style: PaintStyle | EffectStyle | TextStyle, token: SingleColorToken | SingleBoxShadowToken | SingleTypographyToken): boolean {
+export default function compareStyleValueWithTokenValue(style: PaintStyle | EffectStyle | TextStyle, token: SingleToken<true, { path: string }>): boolean {
   if (style.type === 'PAINT' && token.type === TokenTypes.COLOR) {
     const { value } = token;
-    const existingPaint = style.paints[0] ?? null;
-    if (value.startsWith('linear-gradient')) {
-      const { gradientStops, gradientTransform } = convertStringToFigmaGradient(value);
-      const newPaint: GradientPaint = {
-        type: 'GRADIENT_LINEAR',
-        gradientTransform,
-        gradientStops,
-      };
-      return isPaintEqual(newPaint, existingPaint);
-    }
-    const { color, opacity } = convertToFigmaColor(value);
-    const newPaint: SolidPaint = { color, opacity, type: 'SOLID' };
-    return isPaintEqual(newPaint, existingPaint);
+    return paintStyleMatchesColorToken(style, value);
+  }
+  if (style.type === 'TEXT' && token.type === TokenTypes.TYPOGRAPHY) {
+    const { value } = token;
+    return textStyleMatchesTypographyToken(style, value);
+  }
+  if (style.type === 'EFFECT' && token.type === TokenTypes.BOX_SHADOW) {
+    const { value } = token;
+    return effectStyleMatchesBoxShadowToken(style, value);
   }
   return false;
 }
