@@ -18,6 +18,7 @@ import { DeleteTokenPayload } from './payloads';
 export enum AsyncMessageTypes {
   // the below messages are going from UI to plugin
   CREATE_STYLES = 'async/create-styles',
+  RENAME_STYLES = 'async/rename-styles',
   REMOVE_STYLES = 'async/remove-styles',
   SYNC_STYLES = 'async/sync-styles',
   CREDENTIALS = 'async/credentials',
@@ -132,6 +133,16 @@ export type CreateStylesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.CREA
   styleIds: Record<string, string>;
 }>;
 
+export type RenameStylesAsyncMessage = AsyncMessage<AsyncMessageTypes.RENAME_STYLES, {
+  oldName: string;
+  newName: string;
+  parent: string;
+  settings: Partial<SettingsState>;
+}>;
+export type RenameStylesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.RENAME_STYLES, {
+  styleIds: string[];
+}>;
+
 export type RemoveStylesAsyncMessage = AsyncMessage<AsyncMessageTypes.REMOVE_STYLES, {
   token: DeleteTokenPayload;
   settings: Partial<SettingsState>;
@@ -196,6 +207,7 @@ export type StartupMessageResult = AsyncMessage<AsyncMessageTypes.STARTUP>;
 
 export type AsyncMessages =
   CreateStylesAsyncMessage
+  | RenameStylesAsyncMessage
   | RemoveStylesAsyncMessage
   | SyncStylesAsyncMessage
   | CredentialsAsyncMessage
@@ -224,6 +236,7 @@ export type AsyncMessages =
 
 export type AsyncMessageResults =
   CreateStylesAsyncMessageResult
+  | RenameStylesAsyncMessageResult
   | RemoveStylesAsyncMessageResult
   | SyncStylesAsyncMessageResult
   | CredentialsAsyncMessageResult

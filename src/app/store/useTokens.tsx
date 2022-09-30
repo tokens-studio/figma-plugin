@@ -16,7 +16,6 @@ import {
   settingsStateSelector,
   tokensSelector,
   usedTokenSetSelector,
-  themesListSelector,
 } from '@/selectors';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { TokenTypes } from '@/constants/TokenTypes';
@@ -28,9 +27,6 @@ import { NodeInfo } from '@/types/NodeInfo';
 import { TokensContext } from '@/context';
 import { Dispatch, RootState } from '../store';
 import { DeleteTokenPayload } from '@/types/payloads';
-import { theme } from '@/stitches.config';
-import { UsedTokenSetsMap } from '@/types';
-import { appendTypeToToken } from '../components/createTokenObj';
 
 type ConfirmResult =
   ('textStyles' | 'colorStyles' | 'effectStyles')[]
@@ -55,7 +51,6 @@ export default function useTokens() {
   const { confirm } = useConfirm<ConfirmResult>();
   const store = useStore<RootState>();
   const tokensContext = useContext(TokensContext);
-  const themes = useSelector(themesListSelector);
 
   // Gets value of token
   const getTokenValue = useCallback((name: string, resolved: AnyTokenList) => (
@@ -238,13 +233,26 @@ export default function useTokens() {
 
     if (userConfirmation && Array.isArray(userConfirmation.data) && userConfirmation.data.length) {
       track('syncStyles', userConfirmation.data);
-      const syncStylesResult = await AsyncMessageChannel.ReactInstance.message({
+      await AsyncMessageChannel.ReactInstance.message({
         type: AsyncMessageTypes.SYNC_STYLES,
         tokens,
       });
       // dispatch.tokenState.assignStyleIdsToCurrentTheme(createStylesResult.styleIds);
     }
   }, [confirm, usedTokenSet, tokens, settings, dispatch.tokenState]);
+
+  const renameStylesFromTokens = useCallback(async ({ oldName, newName, parent }: { oldName: string, newName: string, parent: string }) => {
+    track('renameStyles', { oldName, newName, parent });
+
+    const renameStylesResult = await AsyncMessageChannel.ReactInstance.message({
+      type: AsyncMessageTypes.RENAME_STYLES,
+      oldName,
+      newName,
+      parent,
+      settings,
+    });
+    dispatch.tokenState.renameStyleIdsToCurrentTheme(renameStylesResult.styleIds, newName);
+  }, [settings, dispatch.tokenState]);
 
   const removeStylesFromTokens = useCallback(async (token: DeleteTokenPayload) => {
     track('removeStyles', token);
@@ -268,6 +276,7 @@ export default function useTokens() {
     remapTokensInGroup,
     removeTokensByValue,
     handleRemap,
+    renameStylesFromTokens,
     handleBulkRemap,
     removeStylesFromTokens,
     syncStyles,
@@ -282,6 +291,7 @@ export default function useTokens() {
     remapTokensInGroup,
     removeTokensByValue,
     handleRemap,
+    renameStylesFromTokens,
     handleBulkRemap,
     removeStylesFromTokens,
     syncStyles,

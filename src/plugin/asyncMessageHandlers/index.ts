@@ -20,5 +20,6 @@ export * from './update';
 export * from './setLicenseKey';
 export * from './attachLocalStylesToTheme';
 export * from './resolveStyleInfo';
+export * from './renameStyles';
 export * from './bulkRemapTokens';
 export * from './removeStyles';
