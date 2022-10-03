@@ -1,8 +1,15 @@
 import { TokenTypes } from '@/constants/TokenTypes';
 import { SingleToken } from '@/types/tokens';
-import { effectStyleMatchesBoxShadowToken, paintStyleMatchesColorToken, textStyleMatchesTypographyToken } from './figmaUtils/styleMatchers';
+import {
+  effectStyleMatchesBoxShadowToken,
+  paintStyleMatchesColorToken,
+  textStyleMatchesTypographyToken,
+} from './figmaUtils/styleMatchers';
 
-export default function compareStyleValueWithTokenValue(style: PaintStyle | EffectStyle | TextStyle, token: SingleToken<true, { path: string }>): boolean {
+export default function compareStyleValueWithTokenValue(
+  style: PaintStyle | EffectStyle | TextStyle,
+  token: SingleToken<true, { path: string }>,
+): boolean {
   if (style.type === 'PAINT' && token.type === TokenTypes.COLOR) {
     const { value } = token;
     return paintStyleMatchesColorToken(style, value);

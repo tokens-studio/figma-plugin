@@ -14,6 +14,7 @@ import type { SelectionValue } from './SelectionValue';
 import type { startup } from '@/utils/plugin';
 import type { ThemeObject } from './ThemeObject';
 import { DeleteTokenPayload } from './payloads';
+import { SyncOption } from '@/app/store/useTokens';
 
 export enum AsyncMessageTypes {
   // the below messages are going from UI to plugin
@@ -153,6 +154,7 @@ export type RemoveStylesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.REMO
 
 export type SyncStylesAsyncMessage = AsyncMessage<AsyncMessageTypes.SYNC_STYLES, {
   tokens: Record<string, AnyTokenList>;
+  settings: Record<SyncOption, boolean>
 }>;
 export type SyncStylesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.SYNC_STYLES>;
 

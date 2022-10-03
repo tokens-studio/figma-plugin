@@ -1,9 +1,14 @@
+import { SyncOption } from '@/app/store/useTokens';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import {
-  AnyTokenList, SingleBoxShadowToken, SingleColorToken, SingleToken, SingleTypographyToken,
+  AnyTokenList,
+  SingleBoxShadowToken,
+  SingleColorToken,
+  SingleToken,
+  SingleTypographyToken,
 } from '@/types/tokens';
 import { convertTokenNameToPath } from '@/utils/convertTokenNameToPath';
 import { isMatchingStyle } from '@/utils/is/isMatchingStyle';
@@ -13,7 +18,7 @@ import setColorValuesOnTarget from './setColorValuesOnTarget';
 import setEffectValuesOnTarget from './setEffectValuesOnTarget';
 import setTextValuesOnTarget from './setTextValuesOnTarget';
 
-export default async function syncStyles(tokens: Record<string, AnyTokenList>) {
+export default async function syncStyles(tokens: Record<string, AnyTokenList>, settings: Record<SyncOption, boolean>) {
   const effectStyles = figma.getLocalEffectStyles();
   const paintStyles = figma.getLocalPaintStyles();
   const textStyles = figma.getLocalTextStyles();
@@ -29,17 +34,17 @@ export default async function syncStyles(tokens: Record<string, AnyTokenList>) {
     Object.entries(theme.selectedTokenSets).forEach(([tokenSet, value]) => {
       if (value === TokenSetStatus.ENABLED) {
         tokens[tokenSet].forEach((token) => {
-          if (token.type === TokenTypes.COLOR || token.type === TokenTypes.BOX_SHADOW || token.type === TokenTypes.TYPOGRAPHY) {
+          if (
+            token.type === TokenTypes.COLOR
+            || token.type === TokenTypes.BOX_SHADOW
+            || token.type === TokenTypes.TYPOGRAPHY
+          ) {
             const pathName = convertTokenNameToPath(token.name, theme.name);
             styleSet[pathName] = {
               ...token,
               path: pathName,
-              value: (typeof token.value === 'string')
-                ? transformValue(token.value, token.type)
-                : token.value,
-            } as SingleToken<true, {
-              path: string
-            }>;
+              value: typeof token.value === 'string' ? transformValue(token.value, token.type) : token.value,
+            } as SingleToken<true, { path: string }>;
           }
         });
       }
@@ -47,7 +52,7 @@ export default async function syncStyles(tokens: Record<string, AnyTokenList>) {
   });
 
   allStyles.forEach((style) => {
-    if (!Object.keys(styleSet).some((pathName) => isMatchingStyle(pathName, style))) {
+    if (settings.removeStyle && !Object.keys(styleSet).some((pathName) => isMatchingStyle(pathName, style))) {
       style.remove();
     }
     if (!compareStyleValueWithTokenValue(style, styleSet[style.name])) {

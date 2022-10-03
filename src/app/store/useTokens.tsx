@@ -7,7 +7,7 @@ import {
 import stringifyTokens from '@/utils/stringifyTokens';
 import formatTokens from '@/utils/formatTokens';
 import { mergeTokenGroups, resolveTokenValues } from '@/plugin/tokenHelpers';
-import useConfirm from '../hooks/useConfirm';
+import useConfirm, { ResolveCallbackPayload } from '../hooks/useConfirm';
 import { Properties } from '@/constants/Properties';
 import { track } from '@/utils/analytics';
 import { checkIfAlias } from '@/utils/alias';
@@ -41,6 +41,8 @@ type GetFormattedTokensOptions = {
 };
 
 type RemoveTokensByValueData = { property: Properties; nodes: NodeInfo[] }[];
+
+export type SyncOption = 'removeStyle' | 'renameStyle';
 
 export default function useTokens() {
   const dispatch = useDispatch<Dispatch>();
@@ -226,16 +228,20 @@ export default function useTokens() {
       text: 'Sync styles',
       description: 'Choose sync option',
       choices: [
-        { key: 'updateStyles', label: 'Remove styles without connection' },
+        { key: 'removeStyles', label: 'Remove styles without connection' },
         { key: 'renameStyles', label: 'Rename styles' },
       ],
-    });
+    }) as ResolveCallbackPayload<any>;
 
     if (userConfirmation && Array.isArray(userConfirmation.data) && userConfirmation.data.length) {
       track('syncStyles', userConfirmation.data);
       await AsyncMessageChannel.ReactInstance.message({
         type: AsyncMessageTypes.SYNC_STYLES,
         tokens,
+        settings: {
+          renameStyle: userConfirmation.data.includes('renameStyles'),
+          removeStyle: userConfirmation.data.includes('removeStyles'),
+        },
       });
       // dispatch.tokenState.assignStyleIdsToCurrentTheme(createStylesResult.styleIds);
     }
