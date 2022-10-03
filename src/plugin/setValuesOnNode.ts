@@ -28,6 +28,7 @@ export default async function setValuesOnNode(
   ignoreFirstPartForStyles = false,
   prefixStylesWithThemeName = false,
 ) {
+  console.log('values', values, 'data', data);
   const activeThemeObject = themeInfo.activeTheme
     ? themeInfo.themes.find(({ id }) => themeInfo.activeTheme === id) ?? null
     : null;
@@ -192,7 +193,6 @@ export default async function setValuesOnNode(
             activeThemeObject?.$figmaStyleReferences ?? {},
             figmaStyleMaps.paintStyles,
           );
-
           if (!matchingStyleId) {
             // Local style not found - look for matching non-local style:
             const styleIdBackupKey = 'fillStyleId_original';
