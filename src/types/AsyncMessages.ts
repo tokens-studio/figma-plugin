@@ -156,7 +156,10 @@ export type SyncStylesAsyncMessage = AsyncMessage<AsyncMessageTypes.SYNC_STYLES,
   tokens: Record<string, AnyTokenList>;
   settings: Record<SyncOption, boolean>
 }>;
-export type SyncStylesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.SYNC_STYLES>;
+export type SyncStylesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.SYNC_STYLES, {
+  styleIdsToCreate: Record<string, string>;
+  styleIdsToRemove: string[];
+}>;
 
 export type UpdateAsyncMessage = AsyncMessage<AsyncMessageTypes.UPDATE, {
   tokenValues: Record<string, AnyTokenList>;

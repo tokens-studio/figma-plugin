@@ -235,7 +235,7 @@ export default function useTokens() {
 
     if (userConfirmation && Array.isArray(userConfirmation.data) && userConfirmation.data.length) {
       track('syncStyles', userConfirmation.data);
-      await AsyncMessageChannel.ReactInstance.message({
+      const syncStyleResult = await AsyncMessageChannel.ReactInstance.message({
         type: AsyncMessageTypes.SYNC_STYLES,
         tokens,
         settings: {
@@ -243,7 +243,8 @@ export default function useTokens() {
           removeStyle: userConfirmation.data.includes('removeStyles'),
         },
       });
-      // dispatch.tokenState.assignStyleIdsToCurrentTheme(createStylesResult.styleIds);
+      dispatch.tokenState.assignStyleIdsToCurrentTheme(syncStyleResult.styleIdsToCreate);
+      dispatch.tokenState.removeStyleIdsFromThemes(syncStyleResult.styleIdsToRemove);
     }
   }, [confirm, usedTokenSet, tokens, settings, dispatch.tokenState]);
 

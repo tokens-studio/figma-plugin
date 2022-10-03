@@ -17,6 +17,7 @@ import { transformValue } from './helpers';
 import setColorValuesOnTarget from './setColorValuesOnTarget';
 import setEffectValuesOnTarget from './setEffectValuesOnTarget';
 import setTextValuesOnTarget from './setTextValuesOnTarget';
+import updateStyles from './updateStyles';
 
 export default async function syncStyles(tokens: Record<string, AnyTokenList>, settings: Record<SyncOption, boolean>) {
   const effectStyles = figma.getLocalEffectStyles();
@@ -27,7 +28,9 @@ export default async function syncStyles(tokens: Record<string, AnyTokenList>, s
   const themeInfo = await AsyncMessageChannel.PluginInstance.message({
     type: AsyncMessageTypes.GET_THEME_INFO,
   });
-
+  const activeThemeObject = themeInfo.activeTheme
+    ? themeInfo.themes.find(({ id }) => id === themeInfo.activeTheme)
+    : null;
   // styleSet store all possible styles which could be created from current tokens
   const styleSet: Record<string, SingleToken<true, { path: string }>> = {};
   themeInfo.themes.forEach((theme) => {
@@ -51,9 +54,11 @@ export default async function syncStyles(tokens: Record<string, AnyTokenList>, s
     });
   });
 
+  const styleIdsToRemove: string[] = [];
   allStyles.forEach((style) => {
     if (settings.removeStyle && !Object.keys(styleSet).some((pathName) => isMatchingStyle(pathName, style))) {
       style.remove();
+      styleIdsToRemove.push(style.id);
     }
     if (!compareStyleValueWithTokenValue(style, styleSet[style.name])) {
       if (style.type === 'PAINT' && styleSet[style.name].type === TokenTypes.COLOR) {
@@ -67,4 +72,23 @@ export default async function syncStyles(tokens: Record<string, AnyTokenList>, s
       }
     }
   });
+  const tokenToCreate: SingleToken[] = [];
+
+  if (settings.renameStyle && activeThemeObject) {
+    Object.entries(activeThemeObject.selectedTokenSets).forEach(([tokenSet, value]) => {
+      if (value === TokenSetStatus.ENABLED) {
+        tokens[tokenSet].forEach((token) => {
+          if (token.type === TokenTypes.TYPOGRAPHY || token.type === TokenTypes.COLOR || token.type === TokenTypes.BOX_SHADOW) {
+            tokenToCreate.push(token);
+          }
+        });
+      }
+    });
+  }
+
+  const styleIdsToCreate = await updateStyles(tokenToCreate);
+  return {
+    styleIdsToRemove,
+    styleIdsToCreate,
+  };
 }
