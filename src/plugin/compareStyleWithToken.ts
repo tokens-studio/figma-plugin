@@ -10,17 +10,22 @@ export default function compareStyleValueWithTokenValue(
   style: PaintStyle | EffectStyle | TextStyle,
   token: SingleToken<true, { path: string }>,
 ): boolean {
-  if (style.type === 'PAINT' && token.type === TokenTypes.COLOR) {
-    const { value } = token;
-    return paintStyleMatchesColorToken(style, value);
-  }
-  if (style.type === 'TEXT' && token.type === TokenTypes.TYPOGRAPHY) {
-    const { value } = token;
-    return textStyleMatchesTypographyToken(style, value);
-  }
-  if (style.type === 'EFFECT' && token.type === TokenTypes.BOX_SHADOW) {
-    const { value } = token;
-    return effectStyleMatchesBoxShadowToken(style, value);
+  console.log('compare', style, token)
+  try {
+    if (style.type === 'PAINT' && token.type === TokenTypes.COLOR) {
+      const { value } = token;
+      return paintStyleMatchesColorToken(style, value);
+    }
+    if (style.type === 'TEXT' && token.type === TokenTypes.TYPOGRAPHY) {
+      const { value } = token;
+      return textStyleMatchesTypographyToken(style, value);
+    }
+    if (style.type === 'EFFECT' && token.type === TokenTypes.BOX_SHADOW) {
+      const { value } = token;
+      return effectStyleMatchesBoxShadowToken(style, value);
+    }  
+  } catch (e) {
+    console.log('error in compare styles', e)
   }
   return false;
 }

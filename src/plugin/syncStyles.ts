@@ -19,7 +19,7 @@ import setEffectValuesOnTarget from './setEffectValuesOnTarget';
 import setTextValuesOnTarget from './setTextValuesOnTarget';
 import updateStyles from './updateStyles';
 
-export default async function syncStyles(tokens: Record<string, AnyTokenList>, settings: Record<SyncOption, boolean>) {
+export default async function syncStyles(tokens: AnyTokenList, settings: Record<SyncOption, boolean>) {
   const effectStyles = figma.getLocalEffectStyles();
   const paintStyles = figma.getLocalPaintStyles();
   const textStyles = figma.getLocalTextStyles();
@@ -32,16 +32,13 @@ export default async function syncStyles(tokens: Record<string, AnyTokenList>, s
     ? themeInfo.themes.find(({ id }) => id === themeInfo.activeTheme)
     : null;
   // styleSet store all possible styles which could be created from current tokens
+  console.log('tokens', tokens)
   const styleSet: Record<string, SingleToken<true, { path: string }>> = {};
   themeInfo.themes.forEach((theme) => {
     Object.entries(theme.selectedTokenSets).forEach(([tokenSet, value]) => {
       if (value === TokenSetStatus.ENABLED) {
-        tokens[tokenSet].forEach((token) => {
-          if (
-            token.type === TokenTypes.COLOR
-            || token.type === TokenTypes.BOX_SHADOW
-            || token.type === TokenTypes.TYPOGRAPHY
-          ) {
+        tokens.forEach((token) => {
+          if (token.internal__Parent === tokenSet) {
             const pathName = convertTokenNameToPath(token.name, theme.name);
             styleSet[pathName] = {
               ...token,
@@ -55,38 +52,49 @@ export default async function syncStyles(tokens: Record<string, AnyTokenList>, s
   });
 
   const styleIdsToRemove: string[] = [];
+  console.log('styleSet', styleSet, 'setting', settings, 'all', allStyles);
   allStyles.forEach((style) => {
+    console.log('style', style, 'boolea', !Object.keys(styleSet).some((pathName) => isMatchingStyle(pathName, style)));
+
     if (settings.removeStyle && !Object.keys(styleSet).some((pathName) => isMatchingStyle(pathName, style))) {
+      console.log('style', style);
       style.remove();
       styleIdsToRemove.push(style.id);
     }
-    if (!compareStyleValueWithTokenValue(style, styleSet[style.name])) {
-      if (style.type === 'PAINT' && styleSet[style.name].type === TokenTypes.COLOR) {
-        setColorValuesOnTarget(style, styleSet[style.name] as SingleColorToken);
-      }
-      if (style.type === 'TEXT' && styleSet[style.name].type === TokenTypes.TYPOGRAPHY) {
-        setTextValuesOnTarget(style, styleSet[style.name] as SingleTypographyToken);
-      }
-      if (style.type === 'EFFECT' && styleSet[style.name].type === TokenTypes.BOX_SHADOW) {
-        setEffectValuesOnTarget(style, styleSet[style.name] as SingleBoxShadowToken);
-      }
-    }
+    // console.log('!compareStyleValueWithTokenValue(style, styleSet[style.name])', !compareStyleValueWithTokenValue(style, styleSet[style.name]))
+    // if (!compareStyleValueWithTokenValue(style, styleSet[style.name])) {
+    //   console.log('update')
+    //   if (style.type === 'PAINT' && styleSet[style.name].type === TokenTypes.COLOR) {
+    //     console.log('paint', styleSet[style.name])
+    //     setColorValuesOnTarget(style, styleSet[style.name] as SingleColorToken);
+    //   }
+    //   if (style.type === 'TEXT' && styleSet[style.name].type === TokenTypes.TYPOGRAPHY) {
+    //     console.log('text', styleSet[style.name])
+    //     setTextValuesOnTarget(style, styleSet[style.name] as SingleTypographyToken);
+    //   }
+    //   if (style.type === 'EFFECT' && styleSet[style.name].type === TokenTypes.BOX_SHADOW) {
+    //     console.log('effect', styleSet[style.name])
+    //     setEffectValuesOnTarget(style, styleSet[style.name] as SingleBoxShadowToken);
+    //   }
+    // }
   });
+  // create styles for renamed tokens
   const tokenToCreate: SingleToken[] = [];
-
   if (settings.renameStyle && activeThemeObject) {
     Object.entries(activeThemeObject.selectedTokenSets).forEach(([tokenSet, value]) => {
       if (value === TokenSetStatus.ENABLED) {
-        tokens[tokenSet].forEach((token) => {
-          if (token.type === TokenTypes.TYPOGRAPHY || token.type === TokenTypes.COLOR || token.type === TokenTypes.BOX_SHADOW) {
+        tokens.forEach((token) => {
+          if (token.internal__Parent === tokenSet) {
             tokenToCreate.push(token);
           }
         });
       }
     });
   }
-
-  const styleIdsToCreate = await updateStyles(tokenToCreate);
+  console.log('token', tokenToCreate);
+  console.log('figmaStyleReferences', activeThemeObject?.$figmaStyleReferences)
+  const styleIdsToCreate = await updateStyles(tokenToCreate, true, { prefixStylesWithThemeName: true });
+  console.log('styleIdsToCreate', styleIdsToCreate);
   return {
     styleIdsToRemove,
     styleIdsToCreate,
