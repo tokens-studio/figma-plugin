@@ -11,7 +11,7 @@ export function convertFontWeightToFigma(value: string) {
     case '500':
       return ['Medium'];
     case '600':
-      return ['SemiBold', 'Semi Bold', 'DemiBold', 'Demi Bold'];
+      return ['SemiBold', 'Semibold', 'Semi Bold', 'DemiBold', 'Demi Bold'];
     case '700':
       return ['Bold'];
     case '800':
