@@ -247,7 +247,7 @@ export default function useTokens() {
       dispatch.tokenState.assignStyleIdsToCurrentTheme(syncStyleResult.styleIdsToCreate);
       dispatch.tokenState.removeStyleIdsFromThemes(syncStyleResult.styleIdsToRemove);
     }
-  }, [confirm, usedTokenSet, tokens, settings, dispatch.tokenState]);
+  }, [confirm, tokens, dispatch.tokenState]);
 
   const renameStylesFromTokens = useCallback(async ({ oldName, newName, parent }: { oldName: string, newName: string, parent: string }) => {
     track('renameStyles', { oldName, newName, parent });

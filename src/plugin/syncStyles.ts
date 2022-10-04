@@ -1,6 +1,5 @@
 import { SyncOption } from '@/app/store/useTokens';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
-import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import {
@@ -13,11 +12,11 @@ import {
 import { convertTokenNameToPath } from '@/utils/convertTokenNameToPath';
 import { isMatchingStyle } from '@/utils/is/isMatchingStyle';
 import compareStyleValueWithTokenValue from './compareStyleWithToken';
+import { generateTokensToCreate } from './generateTokensToCreate';
 import { transformValue } from './helpers';
 import setColorValuesOnTarget from './setColorValuesOnTarget';
 import setEffectValuesOnTarget from './setEffectValuesOnTarget';
 import setTextValuesOnTarget from './setTextValuesOnTarget';
-import { mergeTokenGroups, resolveTokenValues } from './tokenHelpers';
 import updateStyles from './updateStyles';
 
 export default async function syncStyles(tokens: Record<string, AnyTokenList>, settings: Record<SyncOption, boolean>) {
@@ -36,21 +35,8 @@ export default async function syncStyles(tokens: Record<string, AnyTokenList>, s
   // styleSet store all possible styles which could be created from current tokens
   const styleSet: Record<string, SingleToken<true, { path: string }>> = {};
   themeInfo.themes.forEach((theme) => {
-    const enabledTokenSets = Object.entries(theme.selectedTokenSets)
-      .filter(([, status]) => status === TokenSetStatus.ENABLED)
-      .map(([tokenSet]) => tokenSet);
-    const resolved = resolveTokenValues(mergeTokenGroups(tokens, theme.selectedTokenSets));
-    const withoutIgnoredAndSourceTokens = resolved.filter(
-      (token) => !token.name.split('.').some((part) => part.startsWith('_')) // filter out ignored tokens
-        && (!token.internal__Parent || enabledTokenSets.includes(token.internal__Parent)), // filter out SOURCE tokens
-    );
-
-    const styleTokens = withoutIgnoredAndSourceTokens.filter((token) => [
-      token.type === TokenTypes.TYPOGRAPHY,
-      token.type === TokenTypes.COLOR,
-      token.type === TokenTypes.BOX_SHADOW,
-    ].some((isEnabled) => isEnabled));
-    styleTokens.forEach((token) => {
+    const tokensToCreate = generateTokensToCreate(theme, tokens);
+    tokensToCreate.forEach((token) => {
       const pathName = convertTokenNameToPath(token.name, theme.name);
       styleSet[pathName] = {
         ...token,
@@ -76,19 +62,7 @@ export default async function syncStyles(tokens: Record<string, AnyTokenList>, s
   // Rename styles that are associated with a token and where the token name is different than the style name
   let styleIdsToCreate: Record<string, string> = {};
   if (settings.renameStyle && activeThemeObject) {
-    const enabledTokenSets = Object.entries(activeThemeObject.selectedTokenSets)
-      .filter(([, status]) => status === TokenSetStatus.ENABLED)
-      .map(([tokenSet]) => tokenSet);
-    const resolved = resolveTokenValues(mergeTokenGroups(tokens, activeThemeObject.selectedTokenSets));
-    const withoutIgnoredAndSourceTokens = resolved.filter(
-      (token) => !token.name.split('.').some((part) => part.startsWith('_')) // filter out ignored tokens
-        && (!token.internal__Parent || enabledTokenSets.includes(token.internal__Parent)), // filter out SOURCE tokens
-    );
-
-    const tokensToCreate = withoutIgnoredAndSourceTokens.filter((token) => [
-      token.type === TokenTypes.TYPOGRAPHY,
-      token.type === TokenTypes.COLOR,
-    ].some((isEnabled) => isEnabled));
+    const tokensToCreate = generateTokensToCreate(activeThemeObject, tokens);
     styleIdsToCreate = await updateStyles(tokensToCreate, true, { prefixStylesWithThemeName: true });
   }
 
