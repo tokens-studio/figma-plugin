@@ -10,7 +10,6 @@ export default function compareStyleValueWithTokenValue(
   style: PaintStyle | EffectStyle | TextStyle,
   token: SingleToken<true, { path: string }>,
 ): boolean {
-  console.log('compare', style, token)
   try {
     if (style.type === 'PAINT' && token.type === TokenTypes.COLOR) {
       const { value } = token;
@@ -23,9 +22,9 @@ export default function compareStyleValueWithTokenValue(
     if (style.type === 'EFFECT' && token.type === TokenTypes.BOX_SHADOW) {
       const { value } = token;
       return effectStyleMatchesBoxShadowToken(style, value);
-    }  
+    }
   } catch (e) {
-    console.log('error in compare styles', e)
+    console.log('error in compare styles', e);
   }
   return false;
 }

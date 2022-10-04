@@ -6,7 +6,7 @@ import {
 } from '@/types/tokens';
 import stringifyTokens from '@/utils/stringifyTokens';
 import formatTokens from '@/utils/formatTokens';
-import { mergeTokenGroups, resolveTokenValues, ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
+import { mergeTokenGroups, resolveTokenValues } from '@/plugin/tokenHelpers';
 import useConfirm, { ResolveCallbackPayload } from '../hooks/useConfirm';
 import { Properties } from '@/constants/Properties';
 import { track } from '@/utils/analytics';
@@ -14,7 +14,6 @@ import { checkIfAlias } from '@/utils/alias';
 import {
   activeTokenSetSelector,
   settingsStateSelector,
-  themesListSelector,
   tokensSelector,
   usedTokenSetSelector,
 } from '@/selectors';
@@ -50,7 +49,6 @@ export default function useTokens() {
   const usedTokenSet = useSelector(usedTokenSetSelector);
   const activeTokenSet = useSelector(activeTokenSetSelector);
   const tokens = useSelector(tokensSelector);
-  const themes = useSelector(themesListSelector);
   const settings = useSelector(settingsStateSelector, isEqual);
   const { confirm } = useConfirm<ConfirmResult>();
   const store = useStore<RootState>();
@@ -215,7 +213,6 @@ export default function useTokens() {
           userDecision.data.includes('effectStyles') && token.type === TokenTypes.BOX_SHADOW,
         ].some((isEnabled) => isEnabled)
       ));
-      console.log('token', tokensToCreate)
 
       const createStylesResult = await AsyncMessageChannel.ReactInstance.message({
         type: AsyncMessageTypes.CREATE_STYLES,
@@ -237,33 +234,11 @@ export default function useTokens() {
     }) as ResolveCallbackPayload<any>;
 
     if (userConfirmation && Array.isArray(userConfirmation.data) && userConfirmation.data.length) {
-      let tokensToCreate: ResolveTokenValuesResult[] = [];
       track('syncStyles', userConfirmation.data);
-      themes.forEach(theme => {
-        const enabledTokenSets = Object.entries(theme.selectedTokenSets)
-          .filter(([, status]) => status === TokenSetStatus.ENABLED)
-          .map(([tokenSet]) => tokenSet);
-        const resolved = resolveTokenValues(mergeTokenGroups(tokens, theme.selectedTokenSets));
-        console.log('resolve', resolved)
-        const withoutIgnoredAndSourceTokens = resolved.filter((token) => (
-          !token.name.split('.').some((part) => part.startsWith('_')) // filter out ignored tokens
-          && (!token.internal__Parent || enabledTokenSets.includes(token.internal__Parent)) // filter out SOURCE tokens
-        ));
-      
-        const candidateTokens = withoutIgnoredAndSourceTokens.filter((token) => (
-          [
-            token.type === TokenTypes.TYPOGRAPHY,
-            token.type === TokenTypes.COLOR,
-            token.type === TokenTypes.BOX_SHADOW,
-          ].some((isEnabled) => isEnabled)
-        ));
-        console.log('candida', candidateTokens)
-        tokensToCreate = [...tokensToCreate, ...candidateTokens];
-      });
 
       const syncStyleResult = await AsyncMessageChannel.ReactInstance.message({
         type: AsyncMessageTypes.SYNC_STYLES,
-        tokens: tokensToCreate,
+        tokens,
         settings: {
           renameStyle: userConfirmation.data.includes('renameStyles'),
           removeStyle: userConfirmation.data.includes('removeStyles'),

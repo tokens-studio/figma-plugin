@@ -29,9 +29,8 @@ export default async function updateStyles(
       ...token,
       path,
       value: typeof token.value === 'string' ? transformValue(token.value, token.type) : token.value,
-    } as SingleToken< true, { path: string }>;
+    } as SingleToken<true, { path: string }>;
   });
-  console.log('styleTokens', styleTokens)
 
   const colorTokens = styleTokens.filter((n) => [TokenTypes.COLOR].includes(n.type)) as Extract<
     typeof styleTokens[number],
@@ -47,7 +46,6 @@ export default async function updateStyles(
   >[];
 
   if (!colorTokens && !textTokens && !effectTokens) return {};
-  console.log('color', colorTokens)
 
   const allStyleIds = {
     ...(colorTokens.length > 0 ? updateColorStyles(colorTokens, shouldCreate) : {}),

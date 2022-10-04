@@ -153,7 +153,7 @@ export type RemoveStylesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.REMO
 }>;
 
 export type SyncStylesAsyncMessage = AsyncMessage<AsyncMessageTypes.SYNC_STYLES, {
-  tokens: AnyTokenList;
+  tokens: Record<string, AnyTokenList>;
   settings: Record<SyncOption, boolean>
 }>;
 export type SyncStylesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.SYNC_STYLES, {
