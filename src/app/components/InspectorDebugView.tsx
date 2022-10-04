@@ -10,6 +10,7 @@ import Stack from './Stack';
 import { isEqual } from '@/utils/isEqual';
 import { StyledInspectBadge } from './StyledInspectBadge';
 import Text from './Text';
+import { StyleIdBackupKeys } from '@/constants/StyleIdBackupKeys';
 
 export default function InspectorDebugView({ resolvedTokens }: { resolvedTokens: SingleToken[] }) {
   const uiState = useSelector(uiStateSelector, isEqual);
@@ -34,7 +35,7 @@ export default function InspectorDebugView({ resolvedTokens }: { resolvedTokens:
           ? (
             <Stack direction="column" gap={1}>
               {Object.entries(uiState.mainNodeSelectionValues)
-                .filter(([key, value]) => key !== 'fillStyleId_original' && value !== 'delete')
+                .filter(([key, value]) => !StyleIdBackupKeys.includes(key) && value !== 'delete')
                 .map(([property, value]) => (
                   <Stack key={property} direction="row" align="start" justify="between">
                     <code className="flex flex-wrap space-x-2">
