@@ -46,7 +46,6 @@ export function usePropertiesForTokenType(type: TokenTypes): PropertyObject[] {
         break;
       case TokenTypes.SPACING:
         properties.push(
-          { label: 'Gap', name: Properties.itemSpacing, icon: 'Gap' },
           {
             label: 'All',
             icon: 'Spacing',
@@ -61,6 +60,7 @@ export function usePropertiesForTokenType(type: TokenTypes): PropertyObject[] {
               Properties.paddingBottom,
             ],
           },
+          { label: 'Gap', name: Properties.itemSpacing, icon: 'Gap' },
           { label: 'Top', name: Properties.paddingTop },
           { label: 'Right', name: Properties.paddingRight },
           { label: 'Bottom', name: Properties.paddingBottom },

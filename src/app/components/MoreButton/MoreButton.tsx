@@ -87,7 +87,7 @@ export const MoreButton: React.FC<Props> = ({
 
   const handleClick = React.useCallback((givenProperties: PropertyObject, isActive = active) => {
     track('Apply Token', { givenProperties });
-
+    console.log('give', givenProperties)
     const newProps: SelectionValue = {
       [givenProperties.name]: isActive ? 'delete' : token.name,
     };
