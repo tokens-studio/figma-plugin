@@ -2,9 +2,7 @@ import { SettingsState } from '@/app/store/models/settings';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
-import {
-  AnyTokenList, SingleToken,
-} from '@/types/tokens';
+import { AnyTokenList, SingleToken } from '@/types/tokens';
 import { convertTokenNameToPath } from '@/utils/convertTokenNameToPath';
 import { transformValue } from './helpers';
 import updateColorStyles from './updateColorStyles';
@@ -24,25 +22,28 @@ export default async function updateStyles(
     : null;
 
   const styleTokens = tokens.map((token) => {
-    const prefix = settings.prefixStylesWithThemeName && activeThemeObject
-      ? activeThemeObject.name
-      : null;
+    const prefix = settings.prefixStylesWithThemeName && activeThemeObject ? activeThemeObject.name : null;
     const slice = settings?.ignoreFirstPartForStyles ? 1 : 0;
     const path = convertTokenNameToPath(token.name, prefix, slice);
     return {
       ...token,
       path,
-      value: (typeof token.value === 'string')
-        ? transformValue(token.value, token.type)
-        : token.value,
-    } as SingleToken<true, {
-      path: string
-    }>;
+      value: typeof token.value === 'string' ? transformValue(token.value, token.type) : token.value,
+    } as SingleToken<true, { path: string }>;
   });
 
-  const colorTokens = styleTokens.filter((n) => [TokenTypes.COLOR].includes(n.type)) as Extract<typeof styleTokens[number], { type: TokenTypes.COLOR }>[];
-  const textTokens = styleTokens.filter((n) => [TokenTypes.TYPOGRAPHY].includes(n.type)) as Extract<typeof styleTokens[number], { type: TokenTypes.TYPOGRAPHY }>[];
-  const effectTokens = styleTokens.filter((n) => [TokenTypes.BOX_SHADOW].includes(n.type)) as Extract<typeof styleTokens[number], { type: TokenTypes.BOX_SHADOW }>[];
+  const colorTokens = styleTokens.filter((n) => [TokenTypes.COLOR].includes(n.type)) as Extract<
+    typeof styleTokens[number],
+  { type: TokenTypes.COLOR }
+  >[];
+  const textTokens = styleTokens.filter((n) => [TokenTypes.TYPOGRAPHY].includes(n.type)) as Extract<
+    typeof styleTokens[number],
+  { type: TokenTypes.TYPOGRAPHY }
+  >[];
+  const effectTokens = styleTokens.filter((n) => [TokenTypes.BOX_SHADOW].includes(n.type)) as Extract<
+    typeof styleTokens[number],
+  { type: TokenTypes.BOX_SHADOW }
+  >[];
 
   if (!colorTokens && !textTokens && !effectTokens) return {};
 

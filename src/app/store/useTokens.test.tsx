@@ -9,7 +9,9 @@ import {
 } from '@/types/tokens';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes, GetThemeInfoMessageResult } from '@/types/AsyncMessages';
-import { createStyles, renameStyles, removeStyles } from '@/plugin/asyncMessageHandlers';
+import {
+  createStyles, renameStyles, removeStyles, syncStyles,
+} from '@/plugin/asyncMessageHandlers';
 import { AllTheProviders, createMockStore, resetStore } from '../../../tests/config/setupTest';
 import { store } from '../store';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
@@ -329,6 +331,7 @@ describe('useToken test', () => {
     AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.CREATE_STYLES, createStyles);
     AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.RENAME_STYLES, renameStyles);
     AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.REMOVE_STYLES, removeStyles);
+    AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.SYNC_STYLES, syncStyles);
 
     it('creates all styles', async () => {
       mockConfirm.mockImplementation(() => Promise.resolve({ data: ['textStyles', 'colorStyles', 'effectStyles'] }));
@@ -444,6 +447,25 @@ describe('useToken test', () => {
         type: AsyncMessageTypes.REMOVE_STYLES,
         token: tokenToDelete,
         settings: store.getState().settings,
+      });
+    });
+
+    it('syncStyles', async () => {
+      mockConfirm.mockImplementation(() => Promise.resolve({ data: ['renameStyles', 'removeStyles'] }));
+      await act(async () => {
+        await result.current.syncStyles();
+      });
+
+      expect(messageSpy).toBeCalledWith({
+        type: AsyncMessageTypes.SYNC_STYLES,
+        tokens: {
+          global: [{ name: 'white', value: '#ffffff', type: TokenTypes.COLOR }, { name: 'headline', value: { fontFamily: 'Inter', fontWeight: 'Bold' }, type: TokenTypes.TYPOGRAPHY }, { name: 'shadow', value: '{shadows.default}', type: TokenTypes.BOX_SHADOW }],
+          light: [{ name: 'bg.default', value: '#ffffff', type: TokenTypes.COLOR }],
+        },
+        settings: {
+          renameStyle: true,
+          removeStyle: true,
+        },
       });
     });
   });

@@ -29,6 +29,6 @@ export default async function renameStylesFromPlugin(
     }
     return false;
   })).map((filteredStyle) => filteredStyle.id);
-  
+
   return allStyleIds;
 }
