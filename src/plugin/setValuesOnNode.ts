@@ -339,12 +339,37 @@ export default async function setValuesOnNode(
 
       // SPACING
       if ('paddingLeft' in node && typeof values.spacing !== 'undefined' && isPrimitiveValue(values.spacing)) {
-        const spacing = transformValue(String(values.spacing), 'spacing');
-        node.paddingLeft = spacing;
-        node.paddingRight = spacing;
-        node.paddingTop = spacing;
-        node.paddingBottom = spacing;
-        node.itemSpacing = spacing;
+        const individualSpacing = String(values.spacing).split(' ');
+        switch (individualSpacing.length) {
+          case 1:
+              const spacing = transformValue(String(values.spacing), 'spacing');
+              node.paddingLeft = spacing;
+              node.paddingRight = spacing;
+              node.paddingTop = spacing;
+              node.paddingBottom = spacing;
+              node.itemSpacing = spacing;      
+            break;
+          case 2:
+              node.paddingTop = transformValue(String(individualSpacing[0]), 'spacing');
+              node.paddingRight = transformValue(String(individualSpacing[1]), 'spacing');
+              node.paddingBottom = transformValue(String(individualSpacing[0]), 'spacing');
+              node.paddingLeft = transformValue(String(individualSpacing[1]), 'spacing');
+            break;
+          case 3:
+              node.paddingTop = transformValue(String(individualSpacing[0]), 'spacing');
+              node.paddingRight = transformValue(String(individualSpacing[1]), 'spacing');
+              node.paddingBottom = transformValue(String(individualSpacing[2]), 'spacing');
+              node.paddingLeft = transformValue(String(individualSpacing[1]), 'spacing');
+            break;
+          case 4:
+              node.paddingTop = transformValue(String(individualSpacing[0]), 'spacing');
+              node.paddingRight = transformValue(String(individualSpacing[1]), 'spacing');
+              node.paddingBottom = transformValue(String(individualSpacing[2]), 'spacing');
+              node.paddingLeft = transformValue(String(individualSpacing[3]), 'spacing');
+            break;
+          default:
+            break;
+        }
       }
       if (
         'paddingLeft' in node
