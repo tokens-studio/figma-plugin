@@ -55,7 +55,7 @@ export const MoreButton: React.FC<Props> = ({
   const editProhibited = useSelector(editProhibitedSelector);
   const activeTokenSet = useSelector(activeTokenSetSelector);
   const { deleteSingleToken } = useManageTokens();
-  const properties = usePropertiesForTokenType(type);
+  const properties = usePropertiesForTokenType(type, token.value);
   // @TODO check type property typing
   const visibleProperties = React.useMemo(() => (
     properties.filter((p) => p.label)
@@ -86,14 +86,16 @@ export const MoreButton: React.FC<Props> = ({
   const active = useGetActiveState(activeStateProperties, type, token.name);
 
   const handleClick = React.useCallback((givenProperties: PropertyObject, isActive = active) => {
-    track('Apply Token', { givenProperties });
-    const newProps: SelectionValue = {
-      [givenProperties.name]: isActive ? 'delete' : token.name,
-    };
-    if (givenProperties.clear) {
-      givenProperties.clear.map((item) => Object.assign(newProps, { [item]: 'delete' }));
+    if (!givenProperties.disabled) {
+      track('Apply Token', { givenProperties });
+      const newProps: SelectionValue = {
+        [givenProperties.name]: isActive ? 'delete' : token.name,
+      };
+      if (givenProperties.clear) {
+        givenProperties.clear.map((item) => Object.assign(newProps, { [item]: 'delete' }));
+      }
+      setPluginValue(newProps);
     }
-    setPluginValue(newProps);
   }, [active, token.name, setPluginValue]);
 
   const handleTokenClick = React.useCallback(() => {
@@ -112,6 +114,7 @@ export const MoreButton: React.FC<Props> = ({
             value={token.name}
             property={property}
             onClick={handleClick}
+            disabled={property.disabled}
           />
         ))}
         <ContextMenu>

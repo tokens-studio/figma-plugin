@@ -3,8 +3,13 @@ import { Properties } from '@/constants/Properties';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { PropertyObject } from '@/types/properties';
 import { isPropertyType } from '@/utils/is';
+import { SingleToken } from '@/types/tokens';
 
-export function usePropertiesForTokenType(type: TokenTypes): PropertyObject[] {
+export function usePropertiesForTokenType(type: TokenTypes, value?: SingleToken['value']): PropertyObject[] {
+  let disabled = false;
+  if ((type === TokenTypes.BORDER_RADIUS || type === TokenTypes.SPACING) && typeof value === 'string') {
+    disabled = value.split(' ').length > 1;
+  }
   return useMemo(() => {
     const properties: PropertyObject[] = [];
     switch (type) {
@@ -20,10 +25,10 @@ export function usePropertiesForTokenType(type: TokenTypes): PropertyObject[] {
               Properties.borderRadiusBottomLeft,
             ],
           },
-          { label: 'Top Left', name: Properties.borderRadiusTopLeft },
-          { label: 'Top Right', name: Properties.borderRadiusTopRight },
-          { label: 'Bottom Right', name: Properties.borderRadiusBottomRight },
-          { label: 'Bottom Left', name: Properties.borderRadiusBottomLeft },
+          { label: 'Top Left', name: Properties.borderRadiusTopLeft, disabled },
+          { label: 'Top Right', name: Properties.borderRadiusTopRight, disabled },
+          { label: 'Bottom Right', name: Properties.borderRadiusBottomRight, disabled },
+          { label: 'Bottom Left', name: Properties.borderRadiusBottomLeft, disabled },
         );
         break;
       case TokenTypes.BORDER_WIDTH:
@@ -60,11 +65,13 @@ export function usePropertiesForTokenType(type: TokenTypes): PropertyObject[] {
               Properties.paddingBottom,
             ],
           },
-          { label: 'Gap', name: Properties.itemSpacing, icon: 'Gap' },
-          { label: 'Top', name: Properties.paddingTop },
-          { label: 'Right', name: Properties.paddingRight },
-          { label: 'Bottom', name: Properties.paddingBottom },
-          { label: 'Left', name: Properties.paddingLeft },
+          {
+            label: 'Gap', name: Properties.itemSpacing, icon: 'Gap', disabled,
+          },
+          { label: 'Top', name: Properties.paddingTop, disabled },
+          { label: 'Right', name: Properties.paddingRight, disabled },
+          { label: 'Bottom', name: Properties.paddingBottom, disabled },
+          { label: 'Left', name: Properties.paddingLeft, disabled },
         );
         break;
       case TokenTypes.SIZING:
