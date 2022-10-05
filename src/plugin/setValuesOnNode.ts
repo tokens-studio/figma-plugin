@@ -50,12 +50,7 @@ export default async function setValuesOnNode(
             }
             break;
           case 2:
-            if (
-              'topLeftRadius' in node
-              && 'topRightRadius' in node
-              && 'bottomRightRadius' in node
-              && 'bottomLeftRadius' in node
-            ) {
+            if ('topLeftRadius' in node) {
               node.topLeftRadius = transformValue(String(individualBorderRadius[0]), 'borderRadius');
               node.topRightRadius = transformValue(String(individualBorderRadius[1]), 'borderRadius');
               node.bottomRightRadius = transformValue(String(individualBorderRadius[0]), 'borderRadius');
@@ -63,12 +58,7 @@ export default async function setValuesOnNode(
             }
             break;
           case 3:
-            if (
-              'topLeftRadius' in node
-              && 'topRightRadius' in node
-              && 'bottomRightRadius' in node
-              && 'bottomLeftRadius' in node
-            ) {
+            if ('topLeftRadius' in node) {
               node.topLeftRadius = transformValue(String(individualBorderRadius[0]), 'borderRadius');
               node.topRightRadius = transformValue(String(individualBorderRadius[1]), 'borderRadius');
               node.bottomRightRadius = transformValue(String(individualBorderRadius[2]), 'borderRadius');
@@ -76,12 +66,7 @@ export default async function setValuesOnNode(
             }
             break;
           case 4:
-            if (
-              'topLeftRadius' in node
-              && 'topRightRadius' in node
-              && 'bottomRightRadius' in node
-              && 'bottomLeftRadius' in node
-            ) {
+            if ('topLeftRadius' in node) {
               node.topLeftRadius = transformValue(String(individualBorderRadius[0]), 'borderRadius');
               node.topRightRadius = transformValue(String(individualBorderRadius[1]), 'borderRadius');
               node.bottomRightRadius = transformValue(String(individualBorderRadius[2]), 'borderRadius');
@@ -342,30 +327,30 @@ export default async function setValuesOnNode(
         const individualSpacing = String(values.spacing).split(' ');
         switch (individualSpacing.length) {
           case 1:
-              const spacing = transformValue(String(values.spacing), 'spacing');
-              node.paddingLeft = spacing;
-              node.paddingRight = spacing;
-              node.paddingTop = spacing;
-              node.paddingBottom = spacing;
-              node.itemSpacing = spacing;      
+            const spacing = transformValue(String(values.spacing), 'spacing');
+            node.paddingLeft = spacing;
+            node.paddingRight = spacing;
+            node.paddingTop = spacing;
+            node.paddingBottom = spacing;
+            node.itemSpacing = spacing;
             break;
           case 2:
-              node.paddingTop = transformValue(String(individualSpacing[0]), 'spacing');
-              node.paddingRight = transformValue(String(individualSpacing[1]), 'spacing');
-              node.paddingBottom = transformValue(String(individualSpacing[0]), 'spacing');
-              node.paddingLeft = transformValue(String(individualSpacing[1]), 'spacing');
+            node.paddingTop = transformValue(String(individualSpacing[0]), 'spacing');
+            node.paddingRight = transformValue(String(individualSpacing[1]), 'spacing');
+            node.paddingBottom = transformValue(String(individualSpacing[0]), 'spacing');
+            node.paddingLeft = transformValue(String(individualSpacing[1]), 'spacing');
             break;
           case 3:
-              node.paddingTop = transformValue(String(individualSpacing[0]), 'spacing');
-              node.paddingRight = transformValue(String(individualSpacing[1]), 'spacing');
-              node.paddingBottom = transformValue(String(individualSpacing[2]), 'spacing');
-              node.paddingLeft = transformValue(String(individualSpacing[1]), 'spacing');
+            node.paddingTop = transformValue(String(individualSpacing[0]), 'spacing');
+            node.paddingRight = transformValue(String(individualSpacing[1]), 'spacing');
+            node.paddingBottom = transformValue(String(individualSpacing[2]), 'spacing');
+            node.paddingLeft = transformValue(String(individualSpacing[1]), 'spacing');
             break;
           case 4:
-              node.paddingTop = transformValue(String(individualSpacing[0]), 'spacing');
-              node.paddingRight = transformValue(String(individualSpacing[1]), 'spacing');
-              node.paddingBottom = transformValue(String(individualSpacing[2]), 'spacing');
-              node.paddingLeft = transformValue(String(individualSpacing[3]), 'spacing');
+            node.paddingTop = transformValue(String(individualSpacing[0]), 'spacing');
+            node.paddingRight = transformValue(String(individualSpacing[1]), 'spacing');
+            node.paddingBottom = transformValue(String(individualSpacing[2]), 'spacing');
+            node.paddingLeft = transformValue(String(individualSpacing[3]), 'spacing');
             break;
           default:
             break;
