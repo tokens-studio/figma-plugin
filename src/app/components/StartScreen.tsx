@@ -1,5 +1,7 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import FigmaMark from '@/icons/figma-mark.svg';
+import FigmaLetter from '@/icons/figma-letter.svg';
 import Heading from './Heading';
 import Text from './Text';
 import Button from './Button';
@@ -7,8 +9,19 @@ import Callout from './Callout';
 import { Dispatch } from '../store';
 import { storageTypeSelector } from '@/selectors';
 import Stack from './Stack';
+import { styled } from '@/stitches.config';
 import { Tabs } from '@/constants/Tabs';
 import { StorageProviderType } from '@/constants/StorageProviderType';
+
+const StyledFigmaLetter = styled(FigmaLetter, {
+  width: '90px',
+  height: '55px',
+});
+
+const StyledFigmaMark = styled(FigmaMark, {
+  width: '55px',
+  height: '55px',
+});
 
 function StartScreen() {
   const dispatch = useDispatch<Dispatch>();
@@ -32,16 +45,23 @@ function StartScreen() {
 
   return (
     <div className="h-auto p-4 my-auto content scroll-container">
-      <Stack direction="column" gap={4}>
-        <a href="https://jansix.at/resources/figma-tokens?ref=figma-tokens-plugin" target="_blank" rel="noreferrer">
-          {/* eslint-disable-next-line */}
-          <img alt="Figma Tokens Splashscreen" src={require('../assets/tokens-intro.jpg')} className="rounded" />
-        </a>
+      <Stack direction="column" gap={4} css={{ display: 'flex', padding: '2rem', background: '$startScreenBg' }}>
+        {/* <a href="https://jansix.at/resources/figma-tokens?ref=figma-tokens-plugin" target="_blank" rel="noreferrer"> */}
+        {/* eslint-disable-next-line */}
+          {/* <img alt="Figma Tokens Splashscreen" src={require('../assets/tokens-intro.jpg')} className="rounded" /> */}
+        {/* </a> */}
+        <Stack direction="row" gap={2}>
+          <StyledFigmaMark />
+          <StyledFigmaLetter />
+        </Stack>
         <Stack direction="column" gap={2}>
-          <Heading>Welcome to Figma Tokens.</Heading>
+          {/* <Heading>Welcome to Figma Tokens.</Heading> */}
           <Text muted>
-            Design with tokens to apply design decisions to border radii, spacing or many others. Use smart references or math features to change values dynamically or use token sets to quickly create themes. Work across documents by utilizing the Sync feature and store your design tokens on a single source of truth such as GitHub.
+            Figma Tokens allows you to use design tokens in Figma and sync those to an external source of truth, for example GitHub.
           </Text>
+        </Stack>
+        <Stack direction="column" gap={2}>
+          <Heading>Guides</Heading>
         </Stack>
         <Stack direction="row" gap={2} justify="between">
           <Button
