@@ -41,12 +41,6 @@ export default async function setValuesOnNode(
       && node.type !== 'STICKY'
       && node.type !== 'CODE_BLOCK'
     ) {
-      console.log('node', node,  
-      'values',values,
-      'data',data,
-      'fimga',figmaStyleMaps,
-      'them',themeInfo,
-    )
       if (typeof values.borderRadius !== 'undefined' && isPrimitiveValue(values.borderRadius)) {
         const individualBorderRadius = String(values.borderRadius).split(' ');
         switch (individualBorderRadius.length) {
@@ -331,9 +325,9 @@ export default async function setValuesOnNode(
       // SPACING
       if ('paddingLeft' in node && typeof values.spacing !== 'undefined' && isPrimitiveValue(values.spacing)) {
         const individualSpacing = String(values.spacing).split(' ');
+        const spacing = transformValue(String(values.spacing), 'spacing');
         switch (individualSpacing.length) {
           case 1:
-            const spacing = transformValue(String(values.spacing), 'spacing');
             node.paddingLeft = spacing;
             node.paddingRight = spacing;
             node.paddingTop = spacing;

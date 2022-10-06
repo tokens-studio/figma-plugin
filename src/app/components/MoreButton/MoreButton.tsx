@@ -86,16 +86,14 @@ export const MoreButton: React.FC<Props> = ({
   const active = useGetActiveState(activeStateProperties, type, token.name);
 
   const handleClick = React.useCallback((givenProperties: PropertyObject, isActive = active) => {
-    if (!givenProperties.disabled) {
-      track('Apply Token', { givenProperties });
-      const newProps: SelectionValue = {
-        [givenProperties.name]: isActive ? 'delete' : token.name,
-      };
-      if (givenProperties.clear) {
-        givenProperties.clear.map((item) => Object.assign(newProps, { [item]: 'delete' }));
-      }
-      setPluginValue(newProps);
+    track('Apply Token', { givenProperties });
+    const newProps: SelectionValue = {
+      [givenProperties.name]: isActive ? 'delete' : token.name,
+    };
+    if (givenProperties.clear) {
+      givenProperties.clear.map((item) => Object.assign(newProps, { [item]: 'delete' }));
     }
+    setPluginValue(newProps);
   }, [active, token.name, setPluginValue]);
 
   const handleTokenClick = React.useCallback(() => {

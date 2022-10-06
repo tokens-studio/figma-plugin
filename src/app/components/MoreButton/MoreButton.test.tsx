@@ -173,20 +173,18 @@ describe('MoreButton', () => {
   });
 
   it('gap property should not be applied when spacing token has multi value', async () => {
+    const multiSpacingToken: SingleToken = {
+      value: '16 20',
+      name: 'two-value-token',
+      type: TokenTypes.SPACING,
+    };
     const mockStore = createMockStore({
       uiState: {
         mainNodeSelectionValues: {
-          itemSpacing: token.name,
+          paddingLeft: multiSpacingToken.name,
         },
       },
     });
-
-    const multiSpacingToken: SingleToken = {
-      value: '16 20',
-      name: 'my-large-token',
-      type: TokenTypes.SPACING,
-    };
-    
 
     const result = render(
       <Provider store={mockStore}>
@@ -197,7 +195,7 @@ describe('MoreButton', () => {
         />
       </Provider>,
     );
-    await fireEvent.contextMenu(result.getByText(token.name));
+    await fireEvent.contextMenu(result.getByText(multiSpacingToken.name));
     await fireEvent.click(result.getByText('Gap'));
     expect(mockSetNodeData).toBeCalledTimes(0);
   });
