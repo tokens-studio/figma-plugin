@@ -9,7 +9,6 @@ import ToggleEmptyButton from './ToggleEmptyButton';
 import { mappedTokens } from './createTokenObj';
 import { Dispatch } from '../store';
 import TokenSetSelector from './TokenSetSelector';
-import TokenFilter from './TokenFilter';
 import EditTokenFormModal from './EditTokenFormModal';
 import JSONEditor from './JSONEditor';
 import Box from './Box';
@@ -32,6 +31,8 @@ import { styled } from '@/stitches.config';
 import { ManageThemesModal } from './ManageThemesModal';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { UpdateMode } from '@/constants/UpdateMode';
+import TokensTopBar from './TokensTopBar';
+import Stack from './Stack';
 
 const StyledButton = styled('button', {
   '&:focus, &:hover': {
@@ -246,6 +247,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
           css={{
             display: 'flex',
             flexDirection: 'row',
+            justifyContent: 'space-between',
             gap: '$2',
             borderBottom: '1px solid',
             borderColor: '$borderMuted',
@@ -269,34 +271,27 @@ function Tokens({ isActive }: { isActive: boolean }) {
               </Box>
             </StyledButton>
           </Box>
-          <TokenFilter />
-          <ThemeSelector />
-          <Box
-            css={{
-              display: 'flex',
-              gap: '$2',
-              flexDirection: 'row',
-              alignItems: 'center',
-              padding: '$4',
-            }}
-          >
-            <IconButton
-              variant={activeTokensTab === 'list' ? 'primary' : 'default'}
-              dataCy="tokensTabList"
-              onClick={handleSetTokensTabToList}
-              icon={<IconListing />}
-              tooltipSide="bottom"
-              tooltip="Listing"
-            />
-            <IconButton
-              variant={activeTokensTab === 'json' ? 'primary' : 'default'}
-              dataCy="tokensTabJSON"
-              onClick={handleSetTokensTabToJSON}
-              icon={<IconJSON />}
-              tooltipSide="bottom"
-              tooltip="JSON"
-            />
-          </Box>
+          <Stack direction="row" align="center" gap={2}>
+            <ThemeSelector />
+            <Stack direction="row" gap={1} css={{ padding: '$4' }}>
+              <IconButton
+                variant={activeTokensTab === 'list' ? 'primary' : 'default'}
+                dataCy="tokensTabList"
+                onClick={handleSetTokensTabToList}
+                icon={<IconListing />}
+                tooltipSide="bottom"
+                tooltip="Listing"
+              />
+              <IconButton
+                variant={activeTokensTab === 'json' ? 'primary' : 'default'}
+                dataCy="tokensTabJSON"
+                onClick={handleSetTokensTabToJSON}
+                icon={<IconJSON />}
+                tooltipSide="bottom"
+                tooltip="JSON"
+              />
+            </Stack>
+          </Stack>
         </Box>
         <Box
           css={{
@@ -323,6 +318,8 @@ function Tokens({ isActive }: { isActive: boolean }) {
               overflow: 'hidden',
             }}
           >
+
+            <TokensTopBar />
             {activeTokensTab === 'json' ? (
               <Box css={{ position: 'relative', height: '100%' }}>
                 <JSONEditor stringTokens={stringTokens} handleChange={handleChangeJSON} hasError={Boolean(error)} />
