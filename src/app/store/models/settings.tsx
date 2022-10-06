@@ -22,6 +22,7 @@ export interface SettingsState {
   updateRemote: boolean;
   updateOnChange?: boolean;
   updateStyles?: boolean;
+  swapStyles?: boolean;
   tokenType?: TokenModeType;
   ignoreFirstPartForStyles?: boolean;
   prefixStylesWithThemeName?: boolean;
@@ -46,6 +47,7 @@ export const settings = createModel<RootModel>()({
     updateRemote: true,
     updateOnChange: true,
     updateStyles: true,
+    swapStyles: false,
     tokenType: 'object',
     ignoreFirstPartForStyles: false,
     prefixStylesWithThemeName: false,

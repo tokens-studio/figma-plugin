@@ -25,9 +25,8 @@
     ],
     "paths": {
       "@emotion/core": ["./emotion.d.ts"],
-      "@/*": [
-        "src/*"
-      ]
+      "@tests/*": ["tests/*"],
+      "@/*": ["src/*"]
     },
   },
   "exclude": [

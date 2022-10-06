@@ -59,6 +59,7 @@
     "downshift": "^6.1.7",
     "eventemitter3": "^4.0.7",
     "expr-eval": "^2.0.2",
+    "fast-equals": "^4.0.3",
     "figma-plugin-ds": "^0.1.8",
     "file-loader": "^6.2.0",
     "file-saver": "^2.0.5",

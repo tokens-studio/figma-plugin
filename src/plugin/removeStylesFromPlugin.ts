@@ -15,11 +15,9 @@ export default async function removeStylesFromPlugin(token: DeleteTokenPayload) 
     type: AsyncMessageTypes.GET_THEME_INFO,
   });
   const themesToContainToken = themeInfo.themes
-    .filter((theme) =>
-      Object.entries(theme.selectedTokenSets).some(
-        ([tokenSet, value]) => tokenSet === token.parent && value === TokenSetStatus.ENABLED
-      )
-    )
+    .filter((theme) => Object.entries(theme.selectedTokenSets).some(
+      ([tokenSet, value]) => tokenSet === token.parent && value === TokenSetStatus.ENABLED,
+    ))
     .map((filteredTheme) => filteredTheme.name);
   const pathNames = themesToContainToken.map((theme) => convertTokenNameToPath(token.path, theme));
 

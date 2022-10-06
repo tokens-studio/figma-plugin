@@ -79,6 +79,7 @@ export default {
             '<rootDir>/tests/__mocks__/fileMock.js',
     '\\.(css)$': '<rootDir>/tests/__mocks__/styleMock.js',
     '^@/(.*)$': '<rootDir>/src/$1',
+    '^@tests/(.*)$': '<rootDir>/tests/$1',
     '^@/types/(.*)$': '<rootDir>/src/types/$1',
   },
 

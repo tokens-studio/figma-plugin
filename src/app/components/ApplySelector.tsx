@@ -19,11 +19,11 @@ import { UpdateMode } from '@/constants/UpdateMode';
 
 export default function ApplySelector() {
   const {
-    updateMode, updateRemote, updateOnChange, updateStyles,
+    updateMode, updateRemote, updateOnChange, updateStyles, swapStyles,
   } = useSelector(settingsStateSelector, isEqual);
 
   const {
-    setUpdateMode, setUpdateOnChange, setUpdateRemote, setUpdateStyles,
+    setUpdateMode, setUpdateOnChange, setUpdateRemote, setUpdateStyles, setSwapStyles,
   } = useDispatch<Dispatch>().settings;
 
   const handleApplySelection = React.useCallback(() => {
@@ -49,6 +49,10 @@ export default function ApplySelector() {
   const handleUpdateStyles = React.useCallback(() => {
     setUpdateStyles(!updateStyles);
   }, [updateStyles, setUpdateStyles]);
+
+  const handleSwapStyles = React.useCallback(() => {
+    setSwapStyles(!swapStyles);
+  }, [swapStyles, setSwapStyles]);
 
   return (
     <DropdownMenu>
@@ -102,6 +106,12 @@ export default function ApplySelector() {
             <CheckIcon />
           </DropdownMenuItemIndicator>
           Update styles
+        </DropdownMenuCheckboxItem>
+        <DropdownMenuCheckboxItem checked={swapStyles} onCheckedChange={handleSwapStyles}>
+          <DropdownMenuItemIndicator>
+            <CheckIcon />
+          </DropdownMenuItemIndicator>
+          Swap styles (slow)
         </DropdownMenuCheckboxItem>
       </DropdownMenuContent>
     </DropdownMenu>
