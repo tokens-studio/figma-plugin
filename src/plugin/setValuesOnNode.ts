@@ -41,6 +41,12 @@ export default async function setValuesOnNode(
       && node.type !== 'STICKY'
       && node.type !== 'CODE_BLOCK'
     ) {
+      console.log('node', node,  
+      'values',values,
+      'data',data,
+      'fimga',figmaStyleMaps,
+      'them',themeInfo,
+    )
       if (typeof values.borderRadius !== 'undefined' && isPrimitiveValue(values.borderRadius)) {
         const individualBorderRadius = String(values.borderRadius).split(' ');
         switch (individualBorderRadius.length) {

@@ -171,4 +171,34 @@ describe('MoreButton', () => {
       paddingBottom: 'delete',
     }, []);
   });
+
+  it('gap property should not be applied when spacing token has multi value', async () => {
+    const mockStore = createMockStore({
+      uiState: {
+        mainNodeSelectionValues: {
+          itemSpacing: token.name,
+        },
+      },
+    });
+
+    const multiSpacingToken: SingleToken = {
+      value: '16 20',
+      name: 'my-large-token',
+      type: TokenTypes.SPACING,
+    };
+    
+
+    const result = render(
+      <Provider store={mockStore}>
+        <MoreButton
+          type={TokenTypes.SPACING}
+          showForm={mockShowForm}
+          token={multiSpacingToken}
+        />
+      </Provider>,
+    );
+    await fireEvent.contextMenu(result.getByText(token.name));
+    await fireEvent.click(result.getByText('Gap'));
+    expect(mockSetNodeData).toBeCalledTimes(0);
+  });
 });
