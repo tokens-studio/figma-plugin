@@ -25,7 +25,7 @@ export default function Callout({
   heading, description, action, id,
 }: Props) {
   return (
-    <Box css={{ backgroundColor: '$bgSubtle', padding: '$4', borderRadius: '$default' }}>
+    <Box css={{ backgroundColor: '$startScreenAlertBg', padding: '$4', borderRadius: '$default' }}>
       <Stack direction="row" gap={2}>
         <Box css={{ color: '$interaction' }}>
           <IconBell />

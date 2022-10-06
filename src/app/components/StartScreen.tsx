@@ -46,16 +46,11 @@ function StartScreen() {
   return (
     <div className="h-auto p-4 my-auto content scroll-container">
       <Stack direction="column" gap={4} css={{ display: 'flex', padding: '2rem', background: '$startScreenBg' }}>
-        {/* <a href="https://jansix.at/resources/figma-tokens?ref=figma-tokens-plugin" target="_blank" rel="noreferrer"> */}
-        {/* eslint-disable-next-line */}
-          {/* <img alt="Figma Tokens Splashscreen" src={require('../assets/tokens-intro.jpg')} className="rounded" /> */}
-        {/* </a> */}
         <Stack direction="row" gap={2}>
           <StyledFigmaMark />
           <StyledFigmaLetter />
         </Stack>
         <Stack direction="column" gap={2}>
-          {/* <Heading>Welcome to Figma Tokens.</Heading> */}
           <Text muted>
             Figma Tokens allows you to use design tokens in Figma and sync those to an external source of truth, for example GitHub.
           </Text>
@@ -79,7 +74,7 @@ function StartScreen() {
           <Callout
             id="callout-action-setupsync"
             heading="Remote storage detected"
-            description={`This document is setup with a remote token source on ${storageType.provider}. Ask your team for the credentials, then enter them in the Sync dialog.`}
+            description="This document was setup with a remote storage. Ask your team for the credentials, then enter them in the Sync dialog."
             action={{
               onClick: onSetSyncClick,
               text: 'Set up sync',
