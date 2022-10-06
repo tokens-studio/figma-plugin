@@ -92,10 +92,12 @@ export function TokenGroupHeading({
         data-testid={`tokenlisting-group-${path}`}
         type="button"
       >
-        {collapsed.includes(path) ? <IconCollapseArrow /> : <IconExpandArrow />}
         <ContextMenu>
           <ContextMenuTrigger data-testid={`group-heading-${path}-${label}-${id}`} onClick={handleToggleCollapsed}>
-            <Heading muted size="small">{label}</Heading>
+            <Stack direction="row" gap={2} align="center" css={{ color: '$textMuted' }}>
+              {collapsed.includes(path) ? <IconCollapseArrow /> : <IconExpandArrow />}
+              <Heading muted size="small">{label}</Heading>
+            </Stack>
           </ContextMenuTrigger>
           <ContextMenuContent>
             <ContextMenuItem disabled={editProhibited} onSelect={handleDelete}>

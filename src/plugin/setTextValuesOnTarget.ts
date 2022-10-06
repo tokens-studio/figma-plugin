@@ -40,8 +40,8 @@ export default async function setTextValuesOnTarget(target: TextNode | TextStyle
                   };
                 }
               })
-              .catch((e) => {
-                console.log('Error setting fontWeight on target', e);
+              .catch(() => {
+                // TODO: Track this in mixpanel so we can add missing weights
               })
           )),
         );
