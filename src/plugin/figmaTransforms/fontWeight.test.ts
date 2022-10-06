@@ -24,7 +24,7 @@ describe('fontWeight', () => {
     },
     {
       input: '600',
-      output: ['SemiBold', 'Semi Bold', 'DemiBold', 'Demi Bold'],
+      output: ['SemiBold', 'Semibold', 'Semi Bold', 'DemiBold', 'Demi Bold'],
     },
     {
       input: '700',

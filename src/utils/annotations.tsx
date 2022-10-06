@@ -1,5 +1,6 @@
 /* eslint "no-multi-assign": 0 */
 import { Direction } from '@/constants/Direction';
+import { StyleIdBackupKeys } from '@/constants/StyleIdBackupKeys';
 import { notifyUI } from '@/plugin/notifiers';
 import { SelectionValue } from '@/types';
 
@@ -84,7 +85,7 @@ function createProperties(
   tokens: SelectionValue & { annoTitle: string },
 ) {
   Object.entries(tokens)
-    .filter(([key]) => key !== 'fillStyleId_original')
+    .filter(([key]) => !StyleIdBackupKeys.includes(key))
     .forEach(([key, value]) => {
       const prop = figma.createFrame();
       prop.layoutMode = 'HORIZONTAL';
