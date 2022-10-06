@@ -50,29 +50,53 @@ export function usePropertiesForTokenType(type: TokenTypes, value?: SingleToken[
         );
         break;
       case TokenTypes.SPACING:
-        properties.push(
-          {
-            label: 'All',
-            icon: 'Spacing',
-            name: Properties.spacing,
-            clear: [
-              Properties.horizontalPadding,
-              Properties.verticalPadding,
-              Properties.itemSpacing,
-              Properties.paddingLeft,
-              Properties.paddingRight,
-              Properties.paddingTop,
-              Properties.paddingBottom,
-            ],
-          },
-          {
-            label: 'Gap', name: Properties.itemSpacing, icon: 'Gap', disabled,
-          },
-          { label: 'Top', name: Properties.paddingTop, disabled },
-          { label: 'Right', name: Properties.paddingRight, disabled },
-          { label: 'Bottom', name: Properties.paddingBottom, disabled },
-          { label: 'Left', name: Properties.paddingLeft, disabled },
-        );
+        if (typeof value === 'string' && value.split(' ').length > 1) {
+          properties.push(
+            {
+              label: 'All',
+              icon: 'Spacing',
+              name: Properties.spacing,
+              clear: [
+                Properties.horizontalPadding,
+                Properties.verticalPadding,
+                Properties.itemSpacing,
+                Properties.paddingLeft,
+                Properties.paddingRight,
+                Properties.paddingTop,
+                Properties.paddingBottom,
+              ],
+            },
+            {
+              label: 'Gap', name: Properties.itemSpacing, icon: 'Gap', disabled,
+            },
+            { label: 'Top', name: Properties.paddingTop, disabled },
+            { label: 'Right', name: Properties.paddingRight, disabled },
+            { label: 'Bottom', name: Properties.paddingBottom, disabled },
+            { label: 'Left', name: Properties.paddingLeft, disabled },
+          );
+        } else {
+          properties.push(
+            { label: 'Gap', name: Properties.itemSpacing, icon: 'Gap' },
+            {
+              label: 'All',
+              icon: 'Spacing',
+              name: Properties.spacing,
+              clear: [
+                Properties.horizontalPadding,
+                Properties.verticalPadding,
+                Properties.itemSpacing,
+                Properties.paddingLeft,
+                Properties.paddingRight,
+                Properties.paddingTop,
+                Properties.paddingBottom,
+              ],
+            },
+            { label: 'Top', name: Properties.paddingTop },
+            { label: 'Right', name: Properties.paddingRight },
+            { label: 'Bottom', name: Properties.paddingBottom },
+            { label: 'Left', name: Properties.paddingLeft },
+          );
+        }
         break;
       case TokenTypes.SIZING:
         properties.push(
