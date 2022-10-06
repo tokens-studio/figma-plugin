@@ -17,7 +17,9 @@ export default async function setTextValuesOnTarget(target: TextNode | TextStyle
         textCase,
         textDecoration,
       } = value;
-      const family = fontFamily?.toString() || (target.fontName !== figma.mixed ? target.fontName.family : '');
+      const splitFontFamily = fontFamily?.split(',')[0];
+      const normalizedFontFamily = splitFontFamily?.replace(/['"]/g, '').trim();
+      const family = normalizedFontFamily?.toString() || (target.fontName !== figma.mixed ? target.fontName.family : '');
       const style = fontWeight?.toString() || (target.fontName !== figma.mixed ? target.fontName.style : '');
 
       try {
