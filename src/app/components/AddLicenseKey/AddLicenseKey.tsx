@@ -109,7 +109,7 @@ export default function AddLicenseKey() {
             size="large"
             name="license-key"
             data-testid="settings-license-key-input"
-            type="text"
+            type="password"
             value={newKey || ''}
             onChange={onLicenseKeyChange}
             error={licenseKeyError}
