@@ -43,6 +43,8 @@ function transformName(name: string): TokenTypes {
       return TokenTypes.PARAGRAPH_SPACING;
     case 'composition':
       return TokenTypes.COMPOSITION;
+    case 'asset':
+      return TokenTypes.ASSET;
     default:
       return TokenTypes.OTHER;
   }

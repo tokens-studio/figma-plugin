@@ -203,6 +203,17 @@ const tokenTypes = {
       },
     },
   },
+  asset: {
+    label: 'Assets',
+    property: 'Asset',
+    type: 'asset',
+    explainer: 'Public URL of your asset',
+    schema: {
+      options: {
+        description: '',
+      },
+    },
+  },
   other: {
     label: 'Other',
     property: 'other',
