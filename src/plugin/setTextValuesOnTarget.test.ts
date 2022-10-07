@@ -32,11 +32,6 @@ describe('setTextValuesOnTarget', () => {
     expect(textNodeMock).toEqual({ ...textNodeMock, fontName: { ...textNodeMock.fontName, family: 'Roboto' } });
   });
 
-  it('support fallback fonts', async () => {
-    await setTextValuesOnTarget(textNodeMock, { value: { fontFamily: "'Roboto Mono', 'Consolas', 'Menlo', 'Monaco', monospace" } });
-    expect(textNodeMock).toEqual({ ...textNodeMock, fontName: { ...textNodeMock.fontName, family: 'Roboto Mono' } });
-  });
-
   it('sets fontWeight if that is given', async () => {
     await setTextValuesOnTarget(textNodeMock, { value: { fontWeight: 'Bold' } });
     expect(textNodeMock).toEqual({ ...textNodeMock, fontName: { ...textNodeMock.fontName, style: 'Bold' } });

@@ -4,7 +4,7 @@ import { transformValue } from './helpers';
 
 export default async function setTextValuesOnTarget(
   target: TextNode | TextStyle,
-  token: Pick<SingleTypographyToken, 'value' | 'description'>,
+  token: Pick<SingleTypographyToken, 'value' | 'description'>
 ) {
   try {
     const { value, description } = token;
@@ -32,7 +32,7 @@ export default async function setTextValuesOnTarget(
           };
         }
       } catch (e) {
-        const splitFontFamily = fontFamily?.split(',');
+        const splitFontFamily = family.split(',');
         const candidateStyles = transformValue(style, 'fontWeights');
         const candidateFonts: { family: string; style: string }[] = [];
         splitFontFamily?.forEach((candidateFontFamily) => {
