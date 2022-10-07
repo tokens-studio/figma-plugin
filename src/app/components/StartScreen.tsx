@@ -7,6 +7,7 @@ import FigmaMark from '@/icons/figma-mark.svg';
 import FigmaLetter from '@/icons/figma-letter.svg';
 import Heading from './Heading';
 import Text from './Text';
+import Button from './Button';
 import Callout from './Callout';
 import { Dispatch } from '../store';
 import { storageTypeSelector } from '@/selectors';
@@ -39,6 +40,11 @@ function StartScreen() {
 
   const storageType = useSelector(storageTypeSelector);
 
+  const onSetDefaultTokens = React.useCallback(() => {
+    dispatch.uiState.setActiveTab(Tabs.TOKENS);
+    dispatch.tokenState.setEmptyTokens();
+  }, [dispatch]);
+
   const onSetSyncClick = React.useCallback(() => {
     dispatch.uiState.setActiveTab(Tabs.TOKENS);
     dispatch.tokenState.setEmptyTokens();
@@ -56,33 +62,37 @@ function StartScreen() {
           <StyledFigmaMark />
           <StyledFigmaLetter />
         </Stack>
-        {/* <Stack direction="column" gap={2}> */}
-        <Text muted>
-          Figma Tokens allows you to use design tokens in Figma and sync those to an external source of truth, for example GitHub.
-        </Text>
-        {/* </Stack> */}
-        <Stack direction="column" gap={4}>
-          <Heading>Guides</Heading>
-          <Stack direction="row" gap={2}>
-            <BookmarkIcon />
-            <HelpfulLinks href="https://docs.figmatokens.com/getting-started" target="_blank">
-              Getting started
-            </HelpfulLinks>
+        <Stack direction="column" gap={2}>
+          <Text muted>
+            Figma Tokens allows you to use design tokens in Figma and sync those to an external source of truth, for example GitHub.
+          </Text>
+        </Stack>
+        <Stack direction="column" gap={2}>
+          <Stack direction="column" gap={2}>
+            <Heading>Guides</Heading>
           </Stack>
-          <Stack direction="row" gap={2}>
-            <ReaderIcon />
-            <HelpfulLinks href="https://docs.figmatokens.com/" target="_blank">
-              Documentation
-            </HelpfulLinks>
-          </Stack>
-          <Stack direction="row" gap={2}>
-            <ChatBubbleIcon />
-            <HelpfulLinks href="https://figmatokens.com/slack" target="_blank">
-              Join our Slack
-            </HelpfulLinks>
+          <Stack direction="column" gap={2}>
+            <Stack direction="row" gap={2}>
+              <BookmarkIcon />
+              <HelpfulLinks href="https://docs.figmatokens.com/getting-started" target="_blank">
+                Getting started
+              </HelpfulLinks>
+            </Stack>
+            <Stack direction="row" gap={2}>
+              <ReaderIcon />
+              <HelpfulLinks href="https://docs.figmatokens.com/" target="_blank">
+                Documentation
+              </HelpfulLinks>
+            </Stack>
+            <Stack direction="row" gap={2}>
+              <ChatBubbleIcon />
+              <HelpfulLinks href="https://figmatokens.com/slack" target="_blank">
+                Join our Slack
+              </HelpfulLinks>
+            </Stack>
           </Stack>
         </Stack>
-        {storageType?.provider !== StorageProviderType.LOCAL && (
+        {storageType?.provider !== StorageProviderType.LOCAL ? (
           <Callout
             id="callout-action-setupsync"
             heading="Remote storage detected"
@@ -92,6 +102,12 @@ function StartScreen() {
               text: 'Enter credential',
             }}
           />
+        ) : (
+          <Stack direction="row" gap={2}>
+            <Button id="button-configure" size="small" variant="primary" onClick={onSetDefaultTokens}>
+              Get started with a new file
+            </Button>
+          </Stack>
         )}
         <Stack direction="row" gap={2}>
           <GitHubLogoIcon />
