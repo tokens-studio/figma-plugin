@@ -21,8 +21,8 @@ export default function Callout({
 }: Props) {
   return (
     <Box css={{ backgroundColor: '$startScreenAlertBg', padding: '$4', borderRadius: '$default' }}>
-      <Stack direction="row" gap={2}>
-        <Box css={{ color: '$dangerBg' }}>
+      <Stack direction="row" gap={4}>
+        <Box css={{ color: '$dangerBg', marginTop: '$3' }}>
           <ExclamationTriangleIcon />
         </Box>
         <Stack align="start" direction="column" gap={2}>

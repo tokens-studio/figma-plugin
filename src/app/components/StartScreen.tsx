@@ -57,7 +57,7 @@ function StartScreen() {
 
   return (
     <div className="h-auto p-4 my-auto content scroll-container">
-      <Stack direction="column" gap={4} css={{ display: 'flex', padding: '2rem', background: '$startScreenBg' }}>
+      <Stack direction="column" gap={4} css={{ padding: '2rem', background: '$startScreenBg' }}>
         <Stack direction="row" gap={2}>
           <StyledFigmaMark />
           <StyledFigmaLetter />
@@ -67,7 +67,7 @@ function StartScreen() {
             Figma Tokens allows you to use design tokens in Figma and sync those to an external source of truth, for example GitHub.
           </Text>
         </Stack>
-        <Stack direction="column" gap={2}>
+        <Stack direction="column" gap={4}>
           <Stack direction="column" gap={2}>
             <Heading>Guides</Heading>
           </Stack>
