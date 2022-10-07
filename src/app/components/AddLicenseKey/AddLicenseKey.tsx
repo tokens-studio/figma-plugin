@@ -8,6 +8,7 @@ import Button from '../Button';
 import { licenseKeySelector } from '@/selectors/licenseKeySelector';
 import Heading from '../Heading';
 import Stack from '../Stack';
+import { styled } from '@/stitches.config';
 import { Dispatch } from '@/app/store';
 import { licenseKeyErrorSelector } from '@/selectors/licenseKeyErrorSelector';
 import useConfirm from '@/app/hooks/useConfirm';
@@ -54,6 +55,12 @@ export default function AddLicenseKey() {
     }
   }, [dispatch, confirm, removeAccessToFeatures]);
 
+  const ManageSubscriptionLink = styled('a', {
+    color: '$fgAccent',
+    fontSize: '$xsmall',
+    rel: 'noreferrer',
+  });
+
   useEffect(() => {
     setLicenseKey(existingKey);
   }, [existingKey]);
@@ -80,7 +87,12 @@ export default function AddLicenseKey() {
     <Stack direction="column" gap={3} css={{ padding: '0 $4' }}>
       <Stack direction="row" gap={2} align="center" justify="between">
         <Heading size="medium">License key</Heading>
-        <ProBadge />
+        <Stack direction="row" gap={2} align="center">
+          <ProBadge />
+          <ManageSubscriptionLink href="https://docs.figmatokens.com/" target="_blank">
+            Manage subscription
+          </ManageSubscriptionLink>
+        </Stack>
       </Stack>
       <Stack
         direction="row"
