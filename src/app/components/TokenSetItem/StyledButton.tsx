@@ -3,7 +3,7 @@ import { StyledCheckbox } from './StyledCheckbox';
 import { StyledGrabber } from './StyledGrabber';
 
 export const StyledButton = styled('button', {
-  padding: '$3 $4 $3 $1',
+  padding: '$3 $6 $3 $1',
   display: 'flex',
   width: '100%',
   textAlign: 'left',

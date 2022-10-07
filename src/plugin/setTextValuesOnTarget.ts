@@ -67,6 +67,7 @@ export default async function setTextValuesOnTarget(
             })
             .catch((e) => {
               console.log('Error setting fontWeight on target', e);
+              // TODO: Track this in mixpanel so we can add missing weights
             });
           if (isApplied) break;
         }
