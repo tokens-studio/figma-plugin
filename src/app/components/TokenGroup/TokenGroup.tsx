@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { token, useTokenData } from 'figma-tokens-library';
 import { TokenGroupHeading } from './TokenGroupHeading';
 import { StyledTokenGroup, StyledTokenGroupItems } from './StyledTokenGroup';
 import { TokenButton } from '@/app/components/TokenButton';
@@ -9,18 +10,32 @@ import { isSingleToken } from '@/utils/is';
 import { collapsedTokensSelector } from '@/selectors/collapsedTokensSelector';
 import { ShowFormOptions, ShowNewFormOptions } from '@/types';
 import { TokenTypes } from '@/constants/TokenTypes';
+import { emitter } from '@/dataset';
+
+const [, groupType] = token.builder.first().use();
 
 type Props = {
   schema: TokenTypeSchema;
   tokenValues: DeepKeyTokenMap;
+  group: typeof groupType;
   path?: string | null;
   showNewForm: (opts: ShowNewFormOptions) => void;
   showForm: (opts: ShowFormOptions) => void;
 };
 
+// select all direct children of the group which have no type defined (-- thus inherit the group type)
+// or who have the same type as the group
+const [query, type] = token.builder.filter(`
+  tokenSet._ref == $group.tokenSet._ref
+  && (parent._ref == $group._id && (!defined(type) || type == $group.type))
+`).use();
+
 const TokenGroup: React.FC<Props> = ({
-  tokenValues, showNewForm, showForm, schema, path = null,
+  tokenValues, group, showNewForm, showForm, schema, path = null,
 }) => {
+  const children = useTokenData<typeof type>(emitter, query, { group }, {
+    debug: true,
+  });
   const collapsed = useSelector(collapsedTokensSelector);
   const displayType = useSelector(displayTypeSelector);
 
@@ -53,36 +68,37 @@ const TokenGroup: React.FC<Props> = ({
   const [draggedToken, setDraggedToken] = useState<SingleToken | null>(null);
   const [dragOverToken, setDragOverToken] = useState<SingleToken | null>(null);
 
-  if (mappedItems.length === 0) {
+  if (!children?.length) {
     return null;
   }
 
   return (
     <StyledTokenGroup displayType={schema.type === TokenTypes.COLOR ? displayType : 'GRID'}>
-      {mappedItems.map(({ item }) => (
-        <React.Fragment key={item.stringPath}>
-          {typeof item.value === 'object' && !isSingleToken(item.value) ? (
+      {children?.map((item) => (
+        <React.Fragment key={item._id}>
+          {!item.value ? (
             // Need to add class to self-reference in css traversal
-            <StyledTokenGroupItems className="property-wrapper" data-cy={`token-group-${item.stringPath}`}>
-              <TokenGroupHeading showNewForm={showNewForm} label={item.name} path={item.stringPath} id="listing" type={schema.type} />
+            <StyledTokenGroupItems className="property-wrapper" data-cy={`token-group-${item._id}`}>
+              <TokenGroupHeading showNewForm={showNewForm} label={item.name} path={item._id} id="listing" type={schema.type} />
               <TokenGroup
-                tokenValues={item.value}
+                tokenValues={{}}
+                group={item}
                 showNewForm={showNewForm}
                 showForm={showForm}
                 schema={schema}
-                path={item.stringPath}
               />
             </StyledTokenGroupItems>
           ) : (
-            <TokenButton
-              type={schema.type}
-              token={item.value}
-              showForm={showForm}
-              draggedToken={draggedToken}
-              dragOverToken={dragOverToken}
-              setDraggedToken={setDraggedToken}
-              setDragOverToken={setDragOverToken}
-            />
+            null
+            // <TokenButton
+            //   type={schema.type}
+            //   token={item.value}
+            //   showForm={showForm}
+            //   draggedToken={draggedToken}
+            //   dragOverToken={dragOverToken}
+            //   setDraggedToken={setDraggedToken}
+            //   setDragOverToken={setDragOverToken}
+            // />
           )}
         </React.Fragment>
       ))}

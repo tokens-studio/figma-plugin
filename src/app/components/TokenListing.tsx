@@ -2,6 +2,7 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { DndProvider } from 'react-dnd';
+import { token } from 'figma-tokens-library';
 import { DeepKeyTokenMap, EditTokenObject, TokenTypeSchema } from '@/types/tokens';
 import TokenGroup from './TokenGroup/TokenGroup';
 import { Dispatch } from '../store';
@@ -14,11 +15,14 @@ import { ShowFormOptions, ShowNewFormOptions } from '@/types';
 import Box from './Box';
 import TokenListingHeading from './TokenListingHeading';
 
+const [,groupType] = token.builder.use();
+
 type Props = {
   tokenKey: string
   label: string
   schema: TokenTypeSchema
   values: DeepKeyTokenMap
+  groups?: typeof groupType;
   isPro?: boolean
 };
 
@@ -27,6 +31,7 @@ const TokenListing: React.FC<Props> = ({
   label,
   schema,
   values,
+  groups,
   isPro,
 }) => {
   const showEmptyGroups = useSelector(showEmptyGroupsSelector);
@@ -71,8 +76,39 @@ const TokenListing: React.FC<Props> = ({
 
   return (
     <Box css={{ borderBottom: '1px solid $borderMuted' }} data-cy={`tokenlisting-${tokenKey}`}>
-      <TokenListingHeading onCollapse={handleSetIntCollapsed} showDisplayToggle={showDisplayToggle} tokenKey={tokenKey} label={label} isPro={isPro} showNewForm={showNewForm} isCollapsed={collapsedTokenTypeObj[tokenKey as TokenTypes]} />
-      {values && (
+      <TokenListingHeading
+        onCollapse={handleSetIntCollapsed}
+        showDisplayToggle={showDisplayToggle}
+        tokenKey={tokenKey}
+        label={label}
+        isPro={isPro}
+        showNewForm={showNewForm}
+        isCollapsed={collapsedTokenTypeObj[tokenKey as TokenTypes]}
+      />
+      {!!groups?.length && (
+        <DndProvider backend={HTML5Backend}>
+          <Box
+            data-cy={`tokenlisting-${tokenKey}-content`}
+            css={{
+              padding: '$4',
+              paddingTop: 0,
+              display: collapsedTokenTypeObj[tokenKey as TokenTypes] ? 'none' : 'block',
+            }}
+          >
+            {groups.map((group) => (
+              <TokenGroup
+                key={group._id}
+                tokenValues={{}}
+                group={group}
+                showNewForm={showNewForm}
+                showForm={showForm}
+                schema={schema}
+              />
+            ))}
+          </Box>
+        </DndProvider>
+      )}
+      {/* {values && (
         <DndProvider backend={HTML5Backend}>
           <Box
             data-cy={`tokenlisting-${tokenKey}-content`}
@@ -90,7 +126,7 @@ const TokenListing: React.FC<Props> = ({
             />
           </Box>
         </DndProvider>
-      )}
+      )} */}
     </Box>
   );
 };

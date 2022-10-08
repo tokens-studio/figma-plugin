@@ -33,7 +33,7 @@ function ColorDisplayBubbleComponent({
         '--backgroundColor': color,
         '--borderColor': borderColor,
         ...style,
-      }}
+      } as React.CSSProperties}
       {...props}
     />
   );

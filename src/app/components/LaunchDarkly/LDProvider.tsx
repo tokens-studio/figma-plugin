@@ -26,7 +26,7 @@ export const LDProviderWrapper = ({ children }: LDProviderProps) => {
   );
 };
 
-export function withLDProviderWrapper<P>(Component: React.ComponentType<P>) {
+export function withLDProviderWrapper<P extends JSX.IntrinsicAttributes>(Component: React.ComponentType<P>) {
   return (props: P) => (
     <LDProviderWrapper>
       <Component {...props} />

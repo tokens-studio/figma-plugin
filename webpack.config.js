@@ -35,14 +35,9 @@ module.exports = (env, argv) => ({
       // Imports webfonts
       {
         test: /\.(woff|woff2)$/,
-        use: {
-          loader: 'url-loader',
-          options: {
-            name: '[name].[ext]',
-          },
-        },
+        type: 'asset/inline',
       },
-      { test: /\.(png|jpg|gif|webp)$/, use: [{ loader: 'url-loader' }] },
+      { test: /\.(png|jpg|gif|webp)$/, type: 'asset/inline' },
       {
         test: /\.svg$/,
         use: [
@@ -50,7 +45,16 @@ module.exports = (env, argv) => ({
             loader: '@svgr/webpack',
             options: {
               svgoConfig: {
-                plugins: [{ removeViewBox: false }],
+                plugins: [
+                  {
+                    name: 'preset-default',
+                    params: {
+                      overrides: {
+                        removeViewBox: false,
+                      },
+                    },
+                  },
+                ],
               },
             },
           },

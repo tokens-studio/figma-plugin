@@ -1,12 +1,12 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AnimatePresence, motion } from 'framer-motion';
+import { token, useTokenData } from 'figma-tokens-library';
 import { mergeTokenGroups, resolveTokenValues } from '@/plugin/tokenHelpers';
 import TokenListing from './TokenListing';
 import TokensBottomBar from './TokensBottomBar';
 import ToggleEmptyButton from './ToggleEmptyButton';
-import { mappedTokens } from './createTokenObj';
 import { Dispatch } from '../store';
 import TokenSetSelector from './TokenSetSelector';
 import TokenFilter from './TokenFilter';
@@ -24,7 +24,7 @@ import parseJson from '@/utils/parseJson';
 import AttentionIcon from '@/icons/attention.svg';
 import { TokensContext } from '@/context';
 import {
-  activeTokenSetSelector, manageThemesModalOpenSelector, scrollPositionSetSelector, showEditFormSelector, tokenFilterSelector, tokensSelector, tokenTypeSelector, updateModeSelector, usedTokenSetSelector,
+  activeTokenSetSelector, manageThemesModalOpenSelector, scrollPositionSetSelector, showEditFormSelector, tokensSelector, tokenTypeSelector, updateModeSelector, usedTokenSetSelector,
 } from '@/selectors';
 import { ThemeSelector } from './ThemeSelector';
 import IconToggleableDisclosure from '@/app/components/IconToggleableDisclosure';
@@ -32,6 +32,10 @@ import { styled } from '@/stitches.config';
 import { ManageThemesModal } from './ManageThemesModal';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { UpdateMode } from '@/constants/UpdateMode';
+import { emitter } from '@/dataset';
+import tokenTypes from '@/config/tokenType.defs.json';
+import { TokenTypes } from '@/constants/TokenTypes';
+import { TokenTypeSchema } from '@/types/tokens';
 
 const StyledButton = styled('button', {
   '&:focus, &:hover': {
@@ -89,6 +93,13 @@ const StatusToast = ({ open, error }: { open: boolean; error: string | null }) =
   );
 };
 
+const [query, type] = token.builder.filter('tokenSet._ref == $tokenSet && !defined(parent._ref)').subquery({
+  typesInGroup: [
+    'array::compact(array::unique(*[_type == "token" && tokenSet._ref == ^.tokenSet._ref][_id in path(^._id + ".**")].type))',
+    [],
+  ] as [string, string[]],
+}).use();
+
 function Tokens({ isActive }: { isActive: boolean }) {
   const tokens = useSelector(tokensSelector);
   const activeTokenSet = useSelector(activeTokenSetSelector);
@@ -96,7 +107,6 @@ function Tokens({ isActive }: { isActive: boolean }) {
   const showEditForm = useSelector(showEditFormSelector);
   const manageThemesModalOpen = useSelector(manageThemesModalOpenSelector);
   const scrollPositionSet = useSelector(scrollPositionSetSelector);
-  const tokenFilter = useSelector(tokenFilterSelector);
   const dispatch = useDispatch<Dispatch>();
   const [activeTokensTab, setActiveTokensTab] = React.useState('list');
   const [tokenSetsVisible, setTokenSetsVisible] = React.useState(true);
@@ -105,6 +115,12 @@ function Tokens({ isActive }: { isActive: boolean }) {
   const updateMode = useSelector(updateModeSelector);
   const { confirm } = useConfirm();
   const shouldConfirm = React.useMemo(() => updateMode === UpdateMode.DOCUMENT, [updateMode]);
+
+  const v = useTokenData<typeof type>(emitter, query, {
+    tokenSet: `tokenSet.${activeTokenSet}`,
+  }, {
+    debug: true,
+  });
 
   React.useEffect(() => {
     if (tokenDiv.current) {
@@ -143,26 +159,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
     setStringTokens(val);
   }, []);
 
-  const memoizedTokens = React.useMemo(() => {
-    if (tokens[activeTokenSet]) {
-      const mapped = mappedTokens(tokens[activeTokenSet], tokenFilter).sort((a, b) => {
-        if (b[1].values) {
-          return 1;
-        }
-        if (a[1].values) {
-          return -1;
-        }
-        return 0;
-      });
-      return mapped.map(([key, { values, isPro, ...schema }]) => ({
-        key,
-        values,
-        schema,
-        isPro,
-      }));
-    }
-    return [];
-  }, [tokens, activeTokenSet, tokenFilter]);
+  const typeGroups = useMemo(() => Object.entries(tokenTypes) as [TokenTypes, TokenTypeSchema][], []);
 
   const handleSaveJSON = React.useCallback(() => {
     dispatch.tokenState.setJSONData(stringTokens);
@@ -333,19 +330,20 @@ function Tokens({ isActive }: { isActive: boolean }) {
               </Box>
             ) : (
               <Box ref={tokenDiv} css={{ width: '100%', paddingBottom: '$6' }} className="content scroll-container">
-                {memoizedTokens.map(({
-                  key, values, isPro, schema,
-                }) => (
-                  <div key={key}>
+                {typeGroups.map(([type, schema]) => {
+                  // @TODO tokenFilter
+                  const tokenGroups = v?.filter((group) => group.type === type || group.typesInGroup.includes(type)) ?? [];
+                  return (
                     <TokenListing
-                      tokenKey={key}
-                      label={schema.label || key}
+                      tokenKey={type}
+                      label={schema.label || type}
                       schema={schema}
-                      values={values}
-                      isPro={isPro}
+                      values={{}}
+                      groups={tokenGroups}
+                      isPro={schema.isPro}
                     />
-                  </div>
-                ))}
+                  );
+                })}
                 <ToggleEmptyButton />
                 {showEditForm && <EditTokenFormModal resolvedTokens={resolvedTokens} />}
                 {manageThemesModalOpen && <ManageThemesModal />}

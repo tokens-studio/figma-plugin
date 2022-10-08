@@ -1,9 +1,14 @@
+import { flatmapToDataset, flattenDesignTokensMap } from 'figma-tokens-library';
 import { DeepTokensMap, ThemeObjectsList } from '@/types';
 import { RemoteResponseData } from '@/types/RemoteResponseData';
 import type { AnyTokenList, SingleToken } from '@/types/tokens';
 import convertTokensToObject from '@/utils/convertTokensToObject';
 import parseTokenValues from '@/utils/parseTokenValues';
 import { SystemFilenames } from '@/constants/SystemFilenames';
+import { dataset, mutation } from '@/dataset';
+
+console.log(dataset);
+(window as any).dataset = dataset;
 
 export type RemoteTokenStorageMetadata = {
   tokenSetOrder?: string[]
@@ -98,6 +103,14 @@ export abstract class RemoteTokenStorage<Metadata = unknown, SaveOptions = unkno
         if (file.type === 'themes') {
           data.themes = [...data.themes, ...file.data];
         } else if (file.type === 'tokenSet') {
+          const tokenSet = mutation.add('tokenSet', file.name, {
+            name: file.name,
+          });
+          flatmapToDataset(flattenDesignTokensMap(file.data), {
+            tokenSet,
+            dataset,
+          });
+
           data.tokens = {
             ...data.tokens,
             ...parseTokenValues({ [file.name]: file.data }),

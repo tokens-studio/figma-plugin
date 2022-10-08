@@ -21,6 +21,7 @@ module.exports = {
     "class-methods-use-this": 0,
     "no-restricted-globals": 0,
     "max-len": 0,
+    "no-underscore-dangle": "warn",
     "react/function-component-definition": 0,
     "react/require-default-props": 0,
     "react/jsx-props-no-spreading": 0,

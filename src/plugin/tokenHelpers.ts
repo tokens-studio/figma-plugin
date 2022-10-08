@@ -101,8 +101,11 @@ export function resolveTokenValues(tokens: SingleToken[], previousCount: number 
       returnValue = getAliasValue(t, tokensInProgress);
       failedToResolve = returnValue === null || checkIfContainsAlias(typeof returnValue === 'string' ? returnValue : '');
     }
+    type SingleTokenWithFailedToResolve = typeof t & {
+      failedToResolve?: boolean
+    };
     const returnObject = {
-      ...omit(t, 'failedToResolve'),
+      ...omit<SingleTokenWithFailedToResolve, keyof SingleTokenWithFailedToResolve>(t, 'failedToResolve'),
       value: returnValue,
       rawValue: t.rawValue || t.value,
       ...(failedToResolve ? { failedToResolve } : {}),

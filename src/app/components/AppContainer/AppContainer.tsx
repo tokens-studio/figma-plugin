@@ -22,7 +22,7 @@ import Changelog from '../Changelog';
 import { Initiator } from '../Initiator';
 import { globalStyles } from '../globalStyles';
 
-type Props = StartupMessage & {
+type Props = JSX.IntrinsicAttributes & StartupMessage & {
   // @README only for unit testing purposes
   startupProcess?: ReturnType<typeof useStartupProcess>
 };
