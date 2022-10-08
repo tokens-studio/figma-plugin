@@ -4,7 +4,7 @@ import { transformValue } from './helpers';
 
 export default async function setTextValuesOnTarget(
   target: TextNode | TextStyle,
-  token: Pick<SingleTypographyToken, 'value' | 'description'>
+  token: Pick<SingleTypographyToken, 'value' | 'description'>,
 ) {
   try {
     const { value, description } = token;
@@ -65,8 +65,7 @@ export default async function setTextValuesOnTarget(
                 isApplied = true;
               }
             })
-            .catch((e) => {
-              console.log('Error setting fontWeight on target', e);
+            .catch(() => {
               // TODO: Track this in mixpanel so we can add missing weights
             });
           if (isApplied) break;
