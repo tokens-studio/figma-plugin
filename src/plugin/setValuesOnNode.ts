@@ -28,13 +28,12 @@ export default async function setValuesOnNode(
   ignoreFirstPartForStyles = false,
   prefixStylesWithThemeName = false,
 ) {
+  console.log('values', values);
   const activeThemeObject = themeInfo.activeTheme
     ? themeInfo.themes.find(({ id }) => themeInfo.activeTheme === id) ?? null
     : null;
   const stylePathSlice = ignoreFirstPartForStyles ? 1 : 0;
-  const stylePathPrefix = prefixStylesWithThemeName && activeThemeObject
-    ? activeThemeObject.name
-    : null;
+  const stylePathPrefix = prefixStylesWithThemeName && activeThemeObject ? activeThemeObject.name : null;
   try {
     // BORDER RADIUS
     if (
@@ -110,7 +109,7 @@ export default async function setValuesOnNode(
           }
         }
 
-        if (!matchingStyleId || (matchingStyleId && !await trySetStyleId(node, 'effect', matchingStyleId))) {
+        if (!matchingStyleId || (matchingStyleId && !(await trySetStyleId(node, 'effect', matchingStyleId)))) {
           if (isSingleBoxShadowValue(values.boxShadow)) {
             setEffectValuesOnTarget(node, { value: values.boxShadow });
           }
@@ -118,11 +117,7 @@ export default async function setValuesOnNode(
       }
 
       // BORDER WIDTH
-      if (
-        'strokeWeight' in node
-        && typeof values.borderWidth !== 'undefined'
-        && isPrimitiveValue(values.borderWidth)
-      ) {
+      if ('strokeWeight' in node && typeof values.borderWidth !== 'undefined' && isPrimitiveValue(values.borderWidth)) {
         node.strokeWeight = transformValue(String(values.borderWidth), 'borderWidth');
       }
 
@@ -143,47 +138,28 @@ export default async function setValuesOnNode(
       }
 
       // OPACITY
-      if (
-        'opacity' in node
-        && typeof values.opacity !== 'undefined'
-        && isPrimitiveValue(values.opacity)
-      ) {
+      if ('opacity' in node && typeof values.opacity !== 'undefined' && isPrimitiveValue(values.opacity)) {
         node.opacity = transformValue(String(values.opacity), 'opacity');
       }
 
       // SIZING: BOTH
-      if (
-        'resize' in node
-        && typeof values.sizing !== 'undefined'
-        && isPrimitiveValue(values.sizing)
-      ) {
+      if ('resize' in node && typeof values.sizing !== 'undefined' && isPrimitiveValue(values.sizing)) {
         const size = transformValue(String(values.sizing), 'sizing');
         node.resize(size, size);
       }
 
       // SIZING: WIDTH
-      if (
-        'resize' in node
-        && typeof values.width !== 'undefined'
-        && isPrimitiveValue(values.width)
-      ) {
+      if ('resize' in node && typeof values.width !== 'undefined' && isPrimitiveValue(values.width)) {
         node.resize(transformValue(String(values.width), 'sizing'), node.height);
       }
 
       // SIZING: HEIGHT
-      if (
-        'resize' in node
-        && typeof values.height !== 'undefined'
-        && isPrimitiveValue(values.height)
-      ) {
+      if ('resize' in node && typeof values.height !== 'undefined' && isPrimitiveValue(values.height)) {
         node.resize(node.width, transformValue(String(values.height), 'sizing'));
       }
 
       // FILL
-      if (
-        values.fill
-        && typeof values.fill === 'string'
-      ) {
+      if (values.fill && typeof values.fill === 'string') {
         if ('fills' in node && data.fill) {
           const pathname = convertTokenNameToPath(data.fill, stylePathPrefix, stylePathSlice);
           let matchingStyleId = matchStyleName(
@@ -212,7 +188,7 @@ export default async function setValuesOnNode(
             }
           }
 
-          if (!matchingStyleId || (matchingStyleId && !await trySetStyleId(node, 'fill', matchingStyleId))) {
+          if (!matchingStyleId || (matchingStyleId && !(await trySetStyleId(node, 'fill', matchingStyleId)))) {
             setColorValuesOnTarget(node, { value: values.fill }, 'fills');
           }
         }
@@ -249,7 +225,7 @@ export default async function setValuesOnNode(
             }
           }
 
-          if (!matchingStyleId || (matchingStyleId && !await trySetStyleId(node, 'text', matchingStyleId))) {
+          if (!matchingStyleId || (matchingStyleId && !(await trySetStyleId(node, 'text', matchingStyleId)))) {
             if (isSingleTypographyValue(values.typography)) {
               setTextValuesOnTarget(node, { value: values.typography });
             }
@@ -312,18 +288,14 @@ export default async function setValuesOnNode(
             }
           }
 
-          if (!matchingStyleId || (matchingStyleId && !await trySetStyleId(node, 'stroke', matchingStyleId))) {
+          if (!matchingStyleId || (matchingStyleId && !(await trySetStyleId(node, 'stroke', matchingStyleId)))) {
             setColorValuesOnTarget(node, { value: values.border }, 'strokes');
           }
         }
       }
 
       // SPACING
-      if (
-        'paddingLeft' in node
-        && typeof values.spacing !== 'undefined'
-        && isPrimitiveValue(values.spacing)
-      ) {
+      if ('paddingLeft' in node && typeof values.spacing !== 'undefined' && isPrimitiveValue(values.spacing)) {
         const spacing = transformValue(String(values.spacing), 'spacing');
         node.paddingLeft = spacing;
         node.paddingRight = spacing;
@@ -350,22 +322,14 @@ export default async function setValuesOnNode(
         node.paddingBottom = verticalPadding;
       }
 
-      if (
-        'itemSpacing' in node
-        && typeof values.itemSpacing !== 'undefined'
-        && isPrimitiveValue(values.itemSpacing)
-      ) {
+      if ('itemSpacing' in node && typeof values.itemSpacing !== 'undefined' && isPrimitiveValue(values.itemSpacing)) {
         if (node.primaryAxisAlignItems === 'SPACE_BETWEEN') {
           node.primaryAxisAlignItems = 'MIN';
         }
         node.itemSpacing = transformValue(String(values.itemSpacing), 'spacing');
       }
 
-      if (
-        'paddingTop' in node
-        && typeof values.paddingTop !== 'undefined'
-        && isPrimitiveValue(values.paddingTop)
-      ) {
+      if ('paddingTop' in node && typeof values.paddingTop !== 'undefined' && isPrimitiveValue(values.paddingTop)) {
         node.paddingTop = transformValue(String(values.paddingTop), 'spacing');
       }
       if (
@@ -384,12 +348,54 @@ export default async function setValuesOnNode(
         node.paddingBottom = transformValue(String(values.paddingBottom), 'spacing');
       }
 
-      if (
-        'paddingLeft' in node
-        && typeof values.paddingLeft !== 'undefined'
-        && isPrimitiveValue(values.paddingLeft)
-      ) {
+      if ('paddingLeft' in node && typeof values.paddingLeft !== 'undefined' && isPrimitiveValue(values.paddingLeft)) {
         node.paddingLeft = transformValue(String(values.paddingLeft), 'spacing');
+      }
+
+      if (values.asset && typeof values.asset === 'string') {
+        if ('fills' in node && data.asset) {
+          const imageUrl = values.asset;
+          fetch(imageUrl)
+            .then((response) => response.blob())
+            .then((imageBlob) => {
+              const imageObjectURL = URL.createObjectURL(imageBlob);
+              console.log(imageObjectURL);
+            });
+          // const newPaint = JSON.parse(JSON.stringify(paint))
+          // newPaint.imageHash = figma.createImage(newBytes).hash
+          // newFills.push(newPaint)
+
+          const pathname = convertTokenNameToPath(data.asset, stylePathPrefix, stylePathSlice);
+          let matchingStyleId = matchStyleName(
+            data.asset,
+            pathname,
+            activeThemeObject?.$figmaStyleReferences ?? {},
+            figmaStyleMaps.paintStyles,
+          );
+
+          if (!matchingStyleId) {
+            // Local style not found - look for matching non-local style:
+            const styleIdBackupKey = 'fillStyleId_original';
+            const nonLocalStyle = getNonLocalStyle(node, styleIdBackupKey, 'fills');
+            if (nonLocalStyle) {
+              if (paintStyleMatchesColorToken(nonLocalStyle, values.asset)) {
+                // Non-local style matches - use this and clear style id backup:
+                matchingStyleId = nonLocalStyle.id;
+                clearStyleIdBackup(node, styleIdBackupKey);
+              } else if (pathname === nonLocalStyle.name) {
+                // Non-local style does NOT match, but style name and token path does,
+                // so we assume selected token value is an override (e.g. dark theme)
+                // Now backup up style id before overwriting with raw token value, so we
+                // can re-link the non-local style, when the token value matches again:
+                setStyleIdBackup(node, styleIdBackupKey, nonLocalStyle.id);
+              }
+            }
+          }
+
+          if (!matchingStyleId || (matchingStyleId && !(await trySetStyleId(node, 'fill', matchingStyleId)))) {
+            setColorValuesOnTarget(node, { value: values.asset }, 'fills');
+          }
+        }
       }
 
       // Raw value for text layers
