@@ -16,23 +16,22 @@ import { styled } from '@/stitches.config';
 import { Tabs } from '@/constants/Tabs';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 
-const StyledFigmaLetter = styled(FigmaLetter, {
+const StyledFigmaTokensLogo = styled(FigmaLetter, {
   width: '90px',
   height: '55px',
 });
 
-const StyledFigmaMark = styled(FigmaMark, {
+const StyledFigmaTokensLogoMark = styled(FigmaMark, {
   width: '55px',
   height: '55px',
 });
 
-const HelpfulLinks = styled('a', {
+const HelpfulLink = styled('a', {
   color: '$textMuted',
   fontSize: '$xsmall',
   '&:hover, &:focus': {
-    color: '$onInteraction',
+    color: '$text',
   },
-  rel: 'noreferrer',
 });
 
 function StartScreen() {
@@ -46,7 +45,7 @@ function StartScreen() {
   }, [dispatch]);
 
   const onSetSyncClick = React.useCallback(() => {
-    dispatch.uiState.setActiveTab(Tabs.TOKENS);
+    dispatch.uiState.setActiveTab(Tabs.SETTINGS);
     dispatch.tokenState.setEmptyTokens();
     dispatch.uiState.setLocalApiState({
       ...storageType,
@@ -56,11 +55,11 @@ function StartScreen() {
   }, [dispatch, storageType]);
 
   return (
-    <div className="h-auto p-4 my-auto content scroll-container">
-      <Stack direction="column" gap={4} css={{ padding: '2rem', background: '$startScreenBg' }}>
+    <div className="p-4 content scroll-container" style={{ height: '100%', display: 'flex' }}>
+      <Stack direction="column" gap={4} css={{ padding: '2rem', background: '$bgSubtle', justifyContent: 'center' }}>
         <Stack direction="row" gap={2}>
-          <StyledFigmaMark />
-          <StyledFigmaLetter />
+          <StyledFigmaTokensLogoMark />
+          <StyledFigmaTokensLogo />
         </Stack>
         <Stack direction="column" gap={2}>
           <Text muted>
@@ -74,21 +73,21 @@ function StartScreen() {
           <Stack direction="column" gap={2}>
             <Stack direction="row" gap={2}>
               <BookmarkIcon />
-              <HelpfulLinks href="https://docs.figmatokens.com/getting-started" target="_blank">
+              <HelpfulLink href="https://docs.figmatokens.com/getting-started" target="_blank">
                 Getting started
-              </HelpfulLinks>
+              </HelpfulLink>
             </Stack>
             <Stack direction="row" gap={2}>
               <ReaderIcon />
-              <HelpfulLinks href="https://docs.figmatokens.com/" target="_blank">
+              <HelpfulLink href="https://docs.figmatokens.com/" target="_blank">
                 Documentation
-              </HelpfulLinks>
+              </HelpfulLink>
             </Stack>
             <Stack direction="row" gap={2}>
               <ChatBubbleIcon />
-              <HelpfulLinks href="https://figmatokens.com/slack" target="_blank">
+              <HelpfulLink href="https://figmatokens.com/slack" target="_blank">
                 Join our Slack
-              </HelpfulLinks>
+              </HelpfulLink>
             </Stack>
           </Stack>
         </Stack>
@@ -99,7 +98,7 @@ function StartScreen() {
             description="This document was setup with a remote storage. Ask your team for the credentials, then enter them in the Sync dialog."
             action={{
               onClick: onSetSyncClick,
-              text: 'Enter credential',
+              text: 'Enter credentials',
             }}
           />
         ) : (
@@ -112,7 +111,7 @@ function StartScreen() {
         <Stack direction="row" gap={2}>
           <GitHubLogoIcon />
           <a href="https://github.com/six7/figma-tokens" style={{ color: '$textMuted', fontSize: '$xsmall' }} target="_blank" rel="noreferrer" className="underline">
-            Found an issue We&#39;re on GitHub!
+            Found an issue? We&#39;re on GitHub!
           </a>
         </Stack>
       </Stack>

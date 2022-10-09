@@ -20,15 +20,15 @@ export default function Callout({
   heading, description, action, id,
 }: Props) {
   return (
-    <Box css={{ backgroundColor: '$startScreenAlertBg', padding: '$4', borderRadius: '$default' }}>
+    <Box css={{ backgroundColor: '$dangerBg', padding: '$4', borderRadius: '$default' }}>
       <Stack direction="row" gap={4}>
-        <Box css={{ color: '$dangerBg', marginTop: '$3' }}>
+        <Box css={{ color: '$dangerFg', marginTop: '$3' }}>
           <ExclamationTriangleIcon />
         </Box>
         <Stack align="start" direction="column" gap={2}>
           <Heading>{heading}</Heading>
           <Text size="xsmall">{description}</Text>
-          <Button data-cy={id} id="button-configure" size="small" variant="primary" onClick={action.onClick}>
+          <Button data-cy={id} size="small" variant="primary" onClick={action.onClick}>
             {action.text}
           </Button>
         </Stack>

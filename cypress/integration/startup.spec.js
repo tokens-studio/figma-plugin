@@ -64,6 +64,6 @@ describe('Loads application', () => {
   it('shows welcome page when no token values are given', () => {
     cy.visit('/');
     cy.startup(mockStartupParams);
-    cy.get('a').contains("Found an issue We're on GitHub!");
+    cy.get('a').contains("Found an issue? We're on GitHub!");
   });
 });

@@ -59,8 +59,6 @@ export const stitchesInstance = createStitches({
       loadingScreenFg: '#FFFFFF',
       loadingScreenFgMuted: '#CECECE',
       loadingScreenBg: '#141414',
-      startScreenBg: '#363636',
-      startScreenAlertBg: '#5a3234',
       text: 'var(--figma-color-text)',
       fgDefault: 'var(--figma-color-text)',
       textMuted: 'var(--figma-color-text-secondary)',
