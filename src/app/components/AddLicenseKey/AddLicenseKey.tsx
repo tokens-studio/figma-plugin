@@ -1,5 +1,7 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
-import React, { useCallback, useEffect, useState } from 'react';
+import React, {
+  useCallback, useEffect, useState, useRef,
+} from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLDClient } from 'launchdarkly-react-client-sdk';
 import Box from '../Box';
@@ -19,6 +21,7 @@ import { licenseDetailsSelector } from '@/selectors';
 import { ldUserFactory } from '@/utils/ldUserFactory';
 
 export default function AddLicenseKey() {
+  const inputEl = useRef<HTMLInputElement | null>(null);
   const dispatch = useDispatch<Dispatch>();
   const existingKey = useSelector(licenseKeySelector);
   const licenseDetails = useSelector(licenseDetailsSelector);
@@ -58,7 +61,6 @@ export default function AddLicenseKey() {
   const ManageSubscriptionLink = styled('a', {
     color: '$fgAccent',
     fontSize: '$xsmall',
-    rel: 'noreferrer',
   });
 
   useEffect(() => {
@@ -78,8 +80,14 @@ export default function AddLicenseKey() {
   }, []);
 
   const removeLicenseKeyButton = existingKey && (
-    <Button variant="secondary" onClick={removeKey} disabled={existingKey !== newKey}>
+    <Button variant="primary" onClick={removeKey} disabled={existingKey !== newKey}>
       Remove key
+    </Button>
+  );
+
+  const addLicenseKeyButton = !existingKey && (
+    <Button variant="primary" onClick={addKey}>
+      Add license key
     </Button>
   );
 
@@ -110,15 +118,14 @@ export default function AddLicenseKey() {
             name="license-key"
             data-testid="settings-license-key-input"
             type="password"
+            inputRef={inputEl}
+            isMasked
             value={newKey || ''}
             onChange={onLicenseKeyChange}
             error={licenseKeyError}
           />
         </Box>
-
-        <Button variant="primary" onClick={addKey} disabled={existingKey === newKey}>
-          {existingKey ? 'Update key' : 'Add license key'}
-        </Button>
+        <Box>{addLicenseKeyButton}</Box>
         <Box>{removeLicenseKeyButton}</Box>
       </Stack>
     </Stack>
