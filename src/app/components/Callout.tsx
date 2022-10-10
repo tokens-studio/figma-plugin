@@ -1,15 +1,10 @@
 import React from 'react';
-import { styled } from '@/stitches.config';
+import { ExclamationTriangleIcon } from '@radix-ui/react-icons';
 import Heading from './Heading';
-import IconBell from '@/icons/bell.svg';
 import Stack from './Stack';
 import Text from './Text';
 import Box from './Box';
-
-const StyledButton = styled('button', {
-  fontSize: '$xsmall',
-  color: '$interaction',
-});
+import Button from './Button';
 
 type Props = {
   id: string
@@ -17,7 +12,7 @@ type Props = {
   description: React.ReactNode
   action: {
     text: React.ReactNode
-    onClick: React.ComponentProps<typeof StyledButton>['onClick']
+    onClick: React.ComponentProps<typeof Button>['onClick']
   }
 };
 
@@ -25,17 +20,17 @@ export default function Callout({
   heading, description, action, id,
 }: Props) {
   return (
-    <Box css={{ backgroundColor: '$bgSubtle', padding: '$4', borderRadius: '$default' }}>
-      <Stack direction="row" gap={2}>
-        <Box css={{ color: '$interaction' }}>
-          <IconBell />
+    <Box css={{ backgroundColor: '$dangerBg', padding: '$4', borderRadius: '$default' }}>
+      <Stack direction="row" gap={4}>
+        <Box css={{ color: '$dangerFg', marginTop: '$3' }}>
+          <ExclamationTriangleIcon />
         </Box>
         <Stack align="start" direction="column" gap={2}>
           <Heading>{heading}</Heading>
           <Text size="xsmall">{description}</Text>
-          <StyledButton data-cy={id} type="button" onClick={action.onClick}>
+          <Button data-cy={id} size="small" variant="primary" onClick={action.onClick}>
             {action.text}
-          </StyledButton>
+          </Button>
         </Stack>
       </Stack>
     </Box>
