@@ -86,7 +86,7 @@ export default function AddLicenseKey() {
   );
 
   const addLicenseKeyButton = !existingKey && (
-    <Button variant="primary" onClick={addKey}>
+    <Button variant="primary" onClick={addKey} disabled={existingKey === newKey}>
       Add license key
     </Button>
   );
@@ -125,8 +125,8 @@ export default function AddLicenseKey() {
             error={licenseKeyError}
           />
         </Box>
-        <Box>{addLicenseKeyButton}</Box>
-        <Box>{removeLicenseKeyButton}</Box>
+        {addLicenseKeyButton}
+        {removeLicenseKeyButton}
       </Stack>
     </Stack>
   );

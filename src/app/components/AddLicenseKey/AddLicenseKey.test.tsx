@@ -181,10 +181,6 @@ describe('Add license key', () => {
         target: { value: LICENSE_FOR_VALID_RESPONSE },
       });
       expect(licenseKeyInput.value).toEqual(LICENSE_FOR_VALID_RESPONSE);
-
-      const updateKeyButton = await screen.findByText('Update key');
-      expect(updateKeyButton).not.toBeDisabled();
-      updateKeyButton.click();
     });
 
     await waitFor(() => {
