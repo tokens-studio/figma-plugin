@@ -18,7 +18,8 @@ import ConfirmDialog from '../ConfirmDialog';
 import WindowResizer from '../WindowResizer';
 import ImportedTokensDialog from '../ImportedTokensDialog';
 import PushDialog from '../PushDialog';
-import Changelog from '../Changelog';
+// import Changelog from '../Changelog';
+import OnboardingFlow from '../OnboardingFlow';
 import { Initiator } from '../Initiator';
 import { globalStyles } from '../globalStyles';
 
@@ -92,7 +93,8 @@ export const AppContainer = withLDProviderWrapper((params: Props) => {
       <ImportedTokensDialog />
       <PushDialog />
       <WindowResizer />
-      <Changelog />
+      {/* <Changelog /> */}
+      <OnboardingFlow />
     </>
   );
 });
