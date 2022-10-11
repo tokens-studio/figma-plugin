@@ -7,7 +7,7 @@ export default function setImageValuesOnTarget(
       const image = figma.createImage(new Uint8Array(token.value));
       const newPaint = {
         type: 'IMAGE',
-        scaleMode: 'FIT',
+        scaleMode: 'FILL',
         imageHash: image.hash,
       } as Paint;
       target.fills = [newPaint];
