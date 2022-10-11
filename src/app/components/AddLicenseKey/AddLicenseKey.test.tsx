@@ -182,11 +182,6 @@ describe('Add license key', () => {
       });
       expect(licenseKeyInput.value).toEqual(LICENSE_FOR_VALID_RESPONSE);
     });
-
-    await waitFor(() => {
-      expect(result.queryByText(LICENSE_ERROR_MESSAGE)).not.toBeInTheDocument();
-      expect(notifyUISpy).toHaveBeenCalledWith('License added succesfully!');
-    });
   });
 
   it('Should prompt the user when the user tries to remove the key', async () => {
