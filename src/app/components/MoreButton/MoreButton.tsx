@@ -85,7 +85,7 @@ export const MoreButton: React.FC<Props> = ({
   ), [properties]);
   const active = useGetActiveState(activeStateProperties, type, token.name);
 
-  const handleClick = React.useCallback(async (givenProperties: PropertyObject, isActive = active) => {
+  const handleClick = React.useCallback((givenProperties: PropertyObject, isActive = active) => {
     track('Apply Token', { givenProperties });
 
     const newProps: SelectionValue = {
