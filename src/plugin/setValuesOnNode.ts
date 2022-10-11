@@ -357,8 +357,7 @@ export default async function setValuesOnNode(
       if (values.asset && typeof values.asset === 'string') {
         if ('fills' in node && data.asset) {
           const imageUrl = values.asset;
-          const newPaint = await fetch(imageUrl)
-            .then((response) => response.arrayBuffer());
+          const newPaint = await fetch(imageUrl).then((response) => response.arrayBuffer());
           const pathname = convertTokenNameToPath(data.asset, stylePathPrefix, stylePathSlice);
           let matchingStyleId = matchStyleName(
             data.asset,
@@ -387,7 +386,7 @@ export default async function setValuesOnNode(
           }
 
           if (!matchingStyleId || (matchingStyleId && !(await trySetStyleId(node, 'fill', matchingStyleId)))) {
-            setImageValuesOnTarget(node, { value: new Uint8Array(newPaint), description: data.description }, 'fills');
+            setImageValuesOnTarget(node, { value: new Uint8Array(newPaint), description: data.description });
           }
         }
       }
