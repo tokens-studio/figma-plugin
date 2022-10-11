@@ -94,24 +94,6 @@ export const MoreButton: React.FC<Props> = ({
     if (givenProperties.clear) {
       givenProperties.clear.map((item) => Object.assign(newProps, { [item]: 'delete' }));
     }
-    const newPaint = await fetch('https://i.redd.it/13gpylqtoe571.jpg', {
-      method: "GET",
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-      },
-    })
-      .then((response) => {
-        console.log('response', response);
-        return response.arrayBuffer();
-      })
-      .catch((e) => {
-        console.log('e', e)
-      })
-    // .then((arrayBuffer) => {
-    //   console.log('arrayBuffer', arrayBuffer);
-    //   return new Uint8Array(arrayBuffer);
-    // });
-    console.log('newPaint', newPaint)
 
     setPluginValue(newProps);
   }, [active, token.name, setPluginValue]);

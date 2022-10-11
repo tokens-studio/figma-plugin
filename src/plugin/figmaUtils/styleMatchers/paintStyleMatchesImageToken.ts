@@ -4,7 +4,6 @@ export async function paintStyleMatchesImageToken(paintStyle: PaintStyle | undef
     if (stylePaint.imageHash) {
       const image = figma.getImageByHash(stylePaint.imageHash);
       const bytes = await image?.getBytesAsync();
-      console.log('bytes', bytes)
       return bytes === imageToken;
     }
   }
