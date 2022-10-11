@@ -27,6 +27,7 @@ export default function OnboardingFlow() {
   return (
     <Modal showClose isOpen={changelog.length > 0 && onboardingFlowOpen} close={handleClose}>
       <Stack direction="column" gap={4}>
+        <Heading>Get Started</Heading>
         <div>
           {changelog.map((item, index) => (
             <Stack
