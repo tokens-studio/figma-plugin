@@ -16,6 +16,8 @@ import { transformValue } from './helpers';
 import setColorValuesOnTarget from './setColorValuesOnTarget';
 import setEffectValuesOnTarget from './setEffectValuesOnTarget';
 import setTextValuesOnTarget from './setTextValuesOnTarget';
+import setImageValuesOnTarget from './setImageValuesOnTarget';
+import { paintStyleMatchesImageToken } from './figmaUtils/styleMatchers/paintStyleMatchesImageToken';
 
 // @README values typing is wrong
 
@@ -26,7 +28,7 @@ export default async function setValuesOnNode(
   figmaStyleMaps: ReturnType<typeof getAllFigmaStyleMaps>,
   themeInfo: Omit<GetThemeInfoMessageResult, 'type'>,
   ignoreFirstPartForStyles = false,
-  prefixStylesWithThemeName = false,
+  prefixStylesWithThemeName = false
 ) {
   console.log('values', values);
   const activeThemeObject = themeInfo.activeTheme
@@ -37,43 +39,43 @@ export default async function setValuesOnNode(
   try {
     // BORDER RADIUS
     if (
-      node.type !== 'CONNECTOR'
-      && node.type !== 'SHAPE_WITH_TEXT'
-      && node.type !== 'STICKY'
-      && node.type !== 'CODE_BLOCK'
+      node.type !== 'CONNECTOR' &&
+      node.type !== 'SHAPE_WITH_TEXT' &&
+      node.type !== 'STICKY' &&
+      node.type !== 'CODE_BLOCK'
     ) {
       if (
-        'cornerRadius' in node
-        && typeof values.borderRadius !== 'undefined'
-        && isPrimitiveValue(values.borderRadius)
+        'cornerRadius' in node &&
+        typeof values.borderRadius !== 'undefined' &&
+        isPrimitiveValue(values.borderRadius)
       ) {
         node.cornerRadius = transformValue(String(values.borderRadius), 'borderRadius');
       }
       if (
-        'topLeftRadius' in node
-        && typeof values.borderRadiusTopLeft !== 'undefined'
-        && isPrimitiveValue(values.borderRadiusTopLeft)
+        'topLeftRadius' in node &&
+        typeof values.borderRadiusTopLeft !== 'undefined' &&
+        isPrimitiveValue(values.borderRadiusTopLeft)
       ) {
         node.topLeftRadius = transformValue(String(values.borderRadiusTopLeft), 'borderRadius');
       }
       if (
-        'topRightRadius' in node
-        && typeof values.borderRadiusTopRight !== 'undefined'
-        && isPrimitiveValue(values.borderRadiusTopRight)
+        'topRightRadius' in node &&
+        typeof values.borderRadiusTopRight !== 'undefined' &&
+        isPrimitiveValue(values.borderRadiusTopRight)
       ) {
         node.topRightRadius = transformValue(String(values.borderRadiusTopRight), 'borderRadius');
       }
       if (
-        'bottomRightRadius' in node
-        && typeof values.borderRadiusBottomRight !== 'undefined'
-        && isPrimitiveValue(values.borderRadiusBottomRight)
+        'bottomRightRadius' in node &&
+        typeof values.borderRadiusBottomRight !== 'undefined' &&
+        isPrimitiveValue(values.borderRadiusBottomRight)
       ) {
         node.bottomRightRadius = transformValue(String(values.borderRadiusBottomRight), 'borderRadius');
       }
       if (
-        'bottomLeftRadius' in node
-        && typeof values.borderRadiusBottomLeft !== 'undefined'
-        && isPrimitiveValue(values.borderRadiusBottomLeft)
+        'bottomLeftRadius' in node &&
+        typeof values.borderRadiusBottomLeft !== 'undefined' &&
+        isPrimitiveValue(values.borderRadiusBottomLeft)
       ) {
         node.bottomLeftRadius = transformValue(String(values.borderRadiusBottomLeft), 'borderRadius');
       }
@@ -85,7 +87,7 @@ export default async function setValuesOnNode(
           data.boxShadow,
           pathname,
           activeThemeObject?.$figmaStyleReferences ?? {},
-          figmaStyleMaps.effectStyles,
+          figmaStyleMaps.effectStyles
         );
 
         if (!matchingStyleId) {
@@ -166,7 +168,7 @@ export default async function setValuesOnNode(
             data.fill,
             pathname,
             activeThemeObject?.$figmaStyleReferences ?? {},
-            figmaStyleMaps.paintStyles,
+            figmaStyleMaps.paintStyles
           );
 
           if (!matchingStyleId) {
@@ -203,7 +205,7 @@ export default async function setValuesOnNode(
             data.typography,
             pathname,
             activeThemeObject?.$figmaStyleReferences ?? {},
-            figmaStyleMaps.textStyles,
+            figmaStyleMaps.textStyles
           );
 
           if (!matchingStyleId && isSingleTypographyValue(values.typography)) {
@@ -233,14 +235,14 @@ export default async function setValuesOnNode(
         }
       }
       if (
-        values.fontFamilies
-        || values.fontWeights
-        || values.lineHeights
-        || values.fontSizes
-        || values.letterSpacing
-        || values.paragraphSpacing
-        || values.textCase
-        || values.textDecoration
+        values.fontFamilies ||
+        values.fontWeights ||
+        values.lineHeights ||
+        values.fontSizes ||
+        values.letterSpacing ||
+        values.paragraphSpacing ||
+        values.textCase ||
+        values.textDecoration
       ) {
         if (node.type === 'TEXT') {
           setTextValuesOnTarget(node, {
@@ -266,7 +268,7 @@ export default async function setValuesOnNode(
             data.border,
             pathname,
             activeThemeObject?.$figmaStyleReferences ?? {},
-            figmaStyleMaps.paintStyles,
+            figmaStyleMaps.paintStyles
           );
 
           if (!matchingStyleId) {
@@ -304,18 +306,18 @@ export default async function setValuesOnNode(
         node.itemSpacing = spacing;
       }
       if (
-        'paddingLeft' in node
-        && typeof values.horizontalPadding !== 'undefined'
-        && isPrimitiveValue(values.horizontalPadding)
+        'paddingLeft' in node &&
+        typeof values.horizontalPadding !== 'undefined' &&
+        isPrimitiveValue(values.horizontalPadding)
       ) {
         const horizontalPadding = transformValue(String(values.horizontalPadding), 'spacing');
         node.paddingLeft = horizontalPadding;
         node.paddingRight = horizontalPadding;
       }
       if (
-        'paddingTop' in node
-        && typeof values.verticalPadding !== 'undefined'
-        && isPrimitiveValue(values.verticalPadding)
+        'paddingTop' in node &&
+        typeof values.verticalPadding !== 'undefined' &&
+        isPrimitiveValue(values.verticalPadding)
       ) {
         const verticalPadding = transformValue(String(values.verticalPadding), 'spacing');
         node.paddingTop = verticalPadding;
@@ -333,17 +335,17 @@ export default async function setValuesOnNode(
         node.paddingTop = transformValue(String(values.paddingTop), 'spacing');
       }
       if (
-        'paddingRight' in node
-        && typeof values.paddingRight !== 'undefined'
-        && isPrimitiveValue(values.paddingRight)
+        'paddingRight' in node &&
+        typeof values.paddingRight !== 'undefined' &&
+        isPrimitiveValue(values.paddingRight)
       ) {
         node.paddingRight = transformValue(String(values.paddingRight), 'spacing');
       }
 
       if (
-        'paddingBottom' in node
-        && typeof values.paddingBottom !== 'undefined'
-        && isPrimitiveValue(values.paddingBottom)
+        'paddingBottom' in node &&
+        typeof values.paddingBottom !== 'undefined' &&
+        isPrimitiveValue(values.paddingBottom)
       ) {
         node.paddingBottom = transformValue(String(values.paddingBottom), 'spacing');
       }
@@ -352,51 +354,58 @@ export default async function setValuesOnNode(
         node.paddingLeft = transformValue(String(values.paddingLeft), 'spacing');
       }
 
-      if (values.asset && typeof values.asset === 'string') {
-        if ('fills' in node && data.asset) {
-          const imageUrl = values.asset;
-          fetch(imageUrl)
-            .then((response) => response.blob())
-            .then((imageBlob) => {
-              const imageObjectURL = URL.createObjectURL(imageBlob);
-              console.log(imageObjectURL);
-            });
-          // const newPaint = JSON.parse(JSON.stringify(paint))
-          // newPaint.imageHash = figma.createImage(newBytes).hash
-          // newFills.push(newPaint)
+      // if (values.asset && typeof values.asset === 'string') {
+      //   if ('fills' in node && data.asset) {
+      //     const imageUrl = values.asset;
+      //     const requestHeaders: HeadersInit = new Headers();
+      //     requestHeaders.set('Content-Type', 'application/json');
+      //     const newPaint = await fetch(imageUrl, {
+      //       mode: 'no-cors',
+      //       headers: {
+      //         'Access-Control-Allow-Origin': '*',
+      //       },
+      //     })
+      //       .then((response) => {
+      //         console.log('imageresponse', response);
+      //         return response.blob();
+      //       })
+      //       .then((imageBlob) => {
+      //         console.log('imageblob', imageBlob);
+      //         return imageBlob.arrayBuffer();
+      //       });
 
-          const pathname = convertTokenNameToPath(data.asset, stylePathPrefix, stylePathSlice);
-          let matchingStyleId = matchStyleName(
-            data.asset,
-            pathname,
-            activeThemeObject?.$figmaStyleReferences ?? {},
-            figmaStyleMaps.paintStyles,
-          );
+      //     const pathname = convertTokenNameToPath(data.asset, stylePathPrefix, stylePathSlice);
+      //     let matchingStyleId = matchStyleName(
+      //       data.asset,
+      //       pathname,
+      //       activeThemeObject?.$figmaStyleReferences ?? {},
+      //       figmaStyleMaps.paintStyles
+      //     );
 
-          if (!matchingStyleId) {
-            // Local style not found - look for matching non-local style:
-            const styleIdBackupKey = 'fillStyleId_original';
-            const nonLocalStyle = getNonLocalStyle(node, styleIdBackupKey, 'fills');
-            if (nonLocalStyle) {
-              if (paintStyleMatchesColorToken(nonLocalStyle, values.asset)) {
-                // Non-local style matches - use this and clear style id backup:
-                matchingStyleId = nonLocalStyle.id;
-                clearStyleIdBackup(node, styleIdBackupKey);
-              } else if (pathname === nonLocalStyle.name) {
-                // Non-local style does NOT match, but style name and token path does,
-                // so we assume selected token value is an override (e.g. dark theme)
-                // Now backup up style id before overwriting with raw token value, so we
-                // can re-link the non-local style, when the token value matches again:
-                setStyleIdBackup(node, styleIdBackupKey, nonLocalStyle.id);
-              }
-            }
-          }
+      //     if (!matchingStyleId) {
+      //       // Local style not found - look for matching non-local style:
+      //       const styleIdBackupKey = 'fillStyleId_original';
+      //       const nonLocalStyle = getNonLocalStyle(node, styleIdBackupKey, 'fills');
+      //       if (nonLocalStyle) {
+      //         if (await paintStyleMatchesImageToken(nonLocalStyle, newPaint as Uint8Array)) {
+      //           // Non-local style matches - use this and clear style id backup:
+      //           matchingStyleId = nonLocalStyle.id;
+      //           clearStyleIdBackup(node, styleIdBackupKey);
+      //         } else if (pathname === nonLocalStyle.name) {
+      //           // Non-local style does NOT match, but style name and token path does,
+      //           // so we assume selected token value is an override (e.g. dark theme)
+      //           // Now backup up style id before overwriting with raw token value, so we
+      //           // can re-link the non-local style, when the token value matches again:
+      //           setStyleIdBackup(node, styleIdBackupKey, nonLocalStyle.id);
+      //         }
+      //       }
+      //     }
 
-          if (!matchingStyleId || (matchingStyleId && !(await trySetStyleId(node, 'fill', matchingStyleId)))) {
-            setColorValuesOnTarget(node, { value: values.asset }, 'fills');
-          }
-        }
-      }
+      //     if (!matchingStyleId || (matchingStyleId && !(await trySetStyleId(node, 'fill', matchingStyleId)))) {
+      //       setImageValuesOnTarget(node, newPaint as Uint8Array, 'fills');
+      //     }
+      //   }
+      // }
 
       // Raw value for text layers
       if (values.tokenValue) {
