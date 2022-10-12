@@ -18,7 +18,7 @@ describe('usePropertiesForTokenType', () => {
         },
         {
           label: 'Border',
-          name: Properties.border,
+          name: Properties.borderColor,
         },
       ],
     },

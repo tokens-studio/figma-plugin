@@ -325,9 +325,9 @@ describe('Can set values on node', () => {
 
   it('sets strokeStyleId if matching Style', async () => {
     await setValuesOnNode(solidNodeMock, {
-      border: '#ff0000',
+      borderColor: '#ff0000',
     }, {
-      border: 'colors.red',
+      borderColor: 'colors.red',
     }, {
       ...emptyStylesMap,
       paintStyles: new Map([
@@ -340,9 +340,9 @@ describe('Can set values on node', () => {
 
   it('calls setColorValuesOnTarget if border node and border is given', async () => {
     await setValuesOnNode(solidNodeMock, {
-      border: '#ff0000',
+      borderColor: '#ff0000',
     }, {
-      border: 'colors.red',
+      borderColor: 'colors.red',
     }, emptyStylesMap, emptyThemeInfo);
     expect(setColorValuesOnTargetSpy).toHaveBeenCalledWith(solidNodeMock, { value: '#ff0000' }, 'strokes');
   });
