@@ -15,6 +15,7 @@ import Stack from './Stack';
 import { styled } from '@/stitches.config';
 import { Tabs } from '@/constants/Tabs';
 import { StorageProviderType } from '@/constants/StorageProviderType';
+import Box from './Box';
 
 const StyledFigmaTokensLogo = styled(FigmaLetter, {
   width: '90px',
@@ -28,6 +29,10 @@ const StyledFigmaTokensLogoMark = styled(FigmaMark, {
 
 const HelpfulLink = styled('a', {
   color: '$textMuted',
+  display: 'flex',
+  alignItems: 'center',
+  gap: '$3',
+  padding: '0 $1',
   fontSize: '$xsmall',
   '&:hover, &:focus': {
     color: '$text',
@@ -55,40 +60,37 @@ function StartScreen() {
   }, [dispatch, storageType]);
 
   return (
-    <div className="p-4 content scroll-container" style={{ height: '100%', display: 'flex' }}>
-      <Stack direction="column" gap={4} css={{ padding: '2rem', background: '$bgSubtle', justifyContent: 'center' }}>
-        <Stack direction="row" gap={2}>
+    <Box className="content scroll-container" css={{ padding: '$5', height: '100%', display: 'flex' }}>
+      <Stack
+        direction="column"
+        gap={6}
+        align="start"
+        css={{
+          padding: '$7', backgroundColor: '$bgSubtle', margin: 'auto', maxWidth: '400px', borderRadius: '$card',
+        }}
+      >
+        <Stack direction="row" gap={4}>
           <StyledFigmaTokensLogoMark />
           <StyledFigmaTokensLogo />
         </Stack>
-        <Stack direction="column" gap={2}>
-          <Text muted>
-            Figma Tokens allows you to use design tokens in Figma and sync those to an external source of truth, for example GitHub.
-          </Text>
-        </Stack>
+        <Text muted>
+          Figma Tokens allows you to use design tokens in Figma and sync those to an external source of truth, for example GitHub.
+        </Text>
         <Stack direction="column" gap={4}>
-          <Stack direction="column" gap={2}>
-            <Heading>Guides</Heading>
-          </Stack>
-          <Stack direction="column" gap={2}>
-            <Stack direction="row" gap={2}>
+          <Heading size="large">Guides</Heading>
+          <Stack direction="column" gap={3}>
+            <HelpfulLink href="https://docs.figmatokens.com/getting-started" target="_blank">
               <BookmarkIcon />
-              <HelpfulLink href="https://docs.figmatokens.com/getting-started" target="_blank">
-                Getting started
-              </HelpfulLink>
-            </Stack>
-            <Stack direction="row" gap={2}>
+              Getting started
+            </HelpfulLink>
+            <HelpfulLink href="https://docs.figmatokens.com/" target="_blank">
               <ReaderIcon />
-              <HelpfulLink href="https://docs.figmatokens.com/" target="_blank">
-                Documentation
-              </HelpfulLink>
-            </Stack>
-            <Stack direction="row" gap={2}>
+              Documentation
+            </HelpfulLink>
+            <HelpfulLink href="https://figmatokens.com/slack" target="_blank">
               <ChatBubbleIcon />
-              <HelpfulLink href="https://figmatokens.com/slack" target="_blank">
-                Join our Slack
-              </HelpfulLink>
-            </Stack>
+              Join our Slack
+            </HelpfulLink>
           </Stack>
         </Stack>
         {storageType?.provider !== StorageProviderType.LOCAL ? (
@@ -102,20 +104,18 @@ function StartScreen() {
             }}
           />
         ) : (
-          <Stack direction="row" gap={2}>
-            <Button id="button-configure" size="small" variant="primary" onClick={onSetDefaultTokens}>
-              Get started with a new file
-            </Button>
-          </Stack>
+          <Button id="button-configure" size="small" variant="primary" onClick={onSetDefaultTokens}>
+            Get started with a new file
+          </Button>
         )}
-        <Stack direction="row" gap={2}>
+        <Stack direction="row" align="center" gap={3}>
           <GitHubLogoIcon />
           <a href="https://github.com/six7/figma-tokens" style={{ color: '$textMuted', fontSize: '$xsmall' }} target="_blank" rel="noreferrer" className="underline">
             Found an issue? We&#39;re on GitHub!
           </a>
         </Stack>
       </Stack>
-    </div>
+    </Box>
   );
 }
 
