@@ -5,7 +5,7 @@ import Modal from './Modal';
 import Stack from './Stack';
 
 export default function OnboardingFlow() {
-  const changelog = [
+  const onboardingflow = [
     {
       image: {
         alt: '',
@@ -68,11 +68,11 @@ export default function OnboardingFlow() {
   }, []);
 
   return (
-    <Modal showClose isOpen={changelog.length > 0 && onboardingFlowOpen} close={handleClose}>
+    <Modal showClose isOpen={onboardingflow.length > 0 && onboardingFlowOpen} close={handleClose}>
       <Stack direction="column" gap={4}>
         <Heading size="medium">Get Started</Heading>
         <div>
-          {changelog.map((item, index) => (
+          {onboardingflow.map((item, index) => (
             <Stack
               // eslint-disable-next-line no-underscore-dangle
               direction="column"
@@ -102,7 +102,7 @@ export default function OnboardingFlow() {
               Previous
             </Button>
           )}
-          {changelog.length > activeIndex + 1 ? (
+          {onboardingflow.length > activeIndex + 1 ? (
             <Button id="button-changelog-next" variant="primary" onClick={handleNext}>
               Next
             </Button>
