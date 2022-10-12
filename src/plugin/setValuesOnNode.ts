@@ -409,8 +409,6 @@ export default async function setValuesOnNode(
 
       if (values.asset && typeof values.asset === 'string') {
         if ('fills' in node && data.asset) {
-          const imageUrl = values.asset;
-          const newPaint = await fetch(imageUrl).then((response) => response.arrayBuffer());
           const pathname = convertTokenNameToPath(data.asset, stylePathPrefix, stylePathSlice);
           let matchingStyleId = matchStyleName(
             data.asset,
@@ -424,7 +422,7 @@ export default async function setValuesOnNode(
             const styleIdBackupKey = 'fillStyleId_original';
             const nonLocalStyle = getNonLocalStyle(node, styleIdBackupKey, 'fills');
             if (nonLocalStyle) {
-              if (await paintStyleMatchesImageToken(nonLocalStyle, new Uint8Array(newPaint))) {
+              if (await paintStyleMatchesImageToken(nonLocalStyle, { value: values.asset })) {
                 // Non-local style matches - use this and clear style id backup:
                 matchingStyleId = nonLocalStyle.id;
                 clearStyleIdBackup(node, styleIdBackupKey);
@@ -439,7 +437,7 @@ export default async function setValuesOnNode(
           }
 
           if (!matchingStyleId || (matchingStyleId && !(await trySetStyleId(node, 'fill', matchingStyleId)))) {
-            setImageValuesOnTarget(node, { value: new Uint8Array(newPaint), description: data.description });
+            setImageValuesOnTarget(node, { value: values.asset });
           }
         }
       }

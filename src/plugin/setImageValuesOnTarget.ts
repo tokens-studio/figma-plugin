@@ -1,10 +1,14 @@
-export default function setImageValuesOnTarget(
+import { SingleAssetToken } from '@/types/tokens';
+
+export default async function setImageValuesOnTarget(
   target: BaseNode | PaintStyle,
-  token: { value: Uint8Array; description: string | undefined },
+  token: Pick<SingleAssetToken, 'value' | 'description'>,
 ) {
   try {
+    const { description, value } = token;
     if ('fills' in target && target.fills !== figma.mixed) {
-      const image = figma.createImage(new Uint8Array(token.value));
+      const imageArrayBuffer = await fetch(value).then((response) => response.arrayBuffer());
+      const image = figma.createImage(new Uint8Array(imageArrayBuffer));
       const newPaint = {
         type: 'IMAGE',
         scaleMode: 'FILL',
@@ -13,8 +17,8 @@ export default function setImageValuesOnTarget(
       target.fills = [newPaint];
     }
 
-    if (token.description && 'description' in target) {
-      target.description = token.description;
+    if (description && 'description' in target) {
+      target.description = description;
     }
   } catch (e) {
     console.error('Error setting color', e);
