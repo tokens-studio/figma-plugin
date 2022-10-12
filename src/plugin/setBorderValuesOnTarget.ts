@@ -4,10 +4,7 @@ import { isPrimitiveValue } from '@/utils/is';
 import { transformValue } from './helpers';
 import setColorValuesOnTarget from './setColorValuesOnTarget';
 
-export default async function setBorderValuesOnTarget(
-  target: BaseNode,
-  token: Pick<SingleBorderToken, 'value'>,
-) {
+export default async function setBorderValuesOnTarget(target: BaseNode, token: Pick<SingleBorderToken, 'value'>) {
   const { value } = token;
   const { color, width, style } = value;
   try {
@@ -17,11 +14,19 @@ export default async function setBorderValuesOnTarget(
     if (typeof color !== 'undefined' && typeof color === 'string') {
       setColorValuesOnTarget(target, { value: color }, 'strokes');
     }
-    if (typeof style !== 'undefined' && typeof style === 'string' && 'strokes' in target) {
-      const existingStroke = target.strokes[0];
-      const newStroke = JSON.parse(JSON.stringify(existingStroke));
-      newStroke.type = style;
-      target.strokes = [newStroke];
+    if (typeof style !== 'undefined' && typeof style === 'string' && 'dashPattern' in target) {
+      let newDashPattern = [0, 0];
+      switch (style) {
+        case 'solid':
+          newDashPattern = [0, 0];
+          break;
+        case 'dashed':
+          newDashPattern = [10, 10];
+          break;
+        default:
+          break;
+      }
+      target.dashPattern = newDashPattern;
     }
   } catch (e) {
     console.log('error setting border token', e);

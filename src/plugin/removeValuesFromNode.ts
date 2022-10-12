@@ -138,6 +138,9 @@ export default function removeValuesFromNode(node: BaseNode, prop: Properties) {
       if ('strokeWeight' in node && typeof node.strokeWeight !== 'undefined') {
         node.strokeWeight = 0;
       }
+      if ('dashPattern' in node && typeof node.dashPattern !== 'undefined') {
+        node.dashPattern = [0, 0];
+      }
       break;
 
     default:
