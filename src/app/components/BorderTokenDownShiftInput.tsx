@@ -3,6 +3,12 @@ import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
 import DownshiftInput from './DownshiftInput';
 import { getLabelForProperty } from '@/utils/getLabelForProperty';
 
+const mapTypeToPlaceHolder = {
+  color: 'Border color',
+  width: 'Border width',
+  style: 'solid | dashed',
+};
+
 export default function BorderTokenDownShiftInput({
   name,
   value,
@@ -33,9 +39,7 @@ export default function BorderTokenDownShiftInput({
       resolvedTokens={resolvedTokens}
       handleChange={onChange}
       setInputValue={handleBorderDownShiftInputChange}
-      placeholder={
-        name === 'color' ? '#000000, hsla(), rgba() or {alias}' : `${name} value or {alias}`
-      }
+      placeholder={mapTypeToPlaceHolder[name as keyof typeof mapTypeToPlaceHolder]}
       prefix={
         name === 'color' && (
           <button
