@@ -37,11 +37,11 @@ export default function BorderTokenDownShiftInput({
         name === 'color' ? '#000000, hsla(), rgba() or {alias}' : `${name} value or {alias}`
       }
       prefix={
-        name === 'color' && value && (
+        name === 'color' && (
           <button
             type="button"
             className="block w-4 h-4 rounded-sm cursor-pointer shadow-border shadow-gray-300 focus:shadow-focus focus:shadow-primary-400"
-            style={{ background: value, fontSize: 0 }}
+            style={{ background: value ?? '#000000', fontSize: 0 }}
             onClick={handleToggleInputHelper}
           >
             {value}

@@ -7,6 +7,7 @@ import { TokenTypes } from '@/constants/TokenTypes';
 import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
 import Stack from './Stack';
 import BorderTokenDownShiftInput from './BorderTokenDownShiftInput';
+import ColorPicker from './ColorPicker';
 
 const propertyTypes = {
   color: TokenTypes.COLOR,
@@ -26,6 +27,12 @@ export default function BorderTokenForm({
   handleBorderValueDownShiftInputChange: (newInputValue: string, property: string) => void;
 }) {
   const seed = useUIDSeed();
+  const [inputHelperOpen, setInputHelperOpen] = React.useState<boolean>(false);
+
+  const handleToggleInputHelper = React.useCallback(() => setInputHelperOpen(!inputHelperOpen), [inputHelperOpen]);
+  const onColorChange = React.useCallback((color: string) => {
+    handleBorderValueDownShiftInputChange(color, 'color');
+  }, [handleBorderValueChange]);
 
   return (
     <Stack direction="column" gap={2}>
@@ -34,16 +41,23 @@ export default function BorderTokenForm({
       </Stack>
       <Stack gap={2} direction="column">
         {Object.entries(internalEditToken.schema.schemas.value.properties ?? {}).map(([key], keyIndex) => (
-          <BorderTokenDownShiftInput
-            name={key}
-            key={`border-input-${seed(keyIndex)}`}
-            value={typeof internalEditToken.value === 'object' ? get(internalEditToken.value, key, '') : ''}
-            type={propertyTypes[key as keyof typeof propertyTypes]}
-            resolvedTokens={resolvedTokens}
-            handleChange={handleBorderValueChange}
-            setInputValue={handleBorderValueDownShiftInputChange}
-          />
+          <>
+            <BorderTokenDownShiftInput
+              name={key}
+              key={`border-input-${seed(keyIndex)}`}
+              value={typeof internalEditToken.value === 'object' ? get(internalEditToken.value, key, '') : ''}
+              type={propertyTypes[key as keyof typeof propertyTypes]}
+              resolvedTokens={resolvedTokens}
+              handleChange={handleBorderValueChange}
+              setInputValue={handleBorderValueDownShiftInputChange}
+              handleToggleInputHelper={handleToggleInputHelper}
+            />
+            {inputHelperOpen && key === 'color' && (
+              <ColorPicker value={typeof internalEditToken.value === 'object' && get(internalEditToken.value, key, '')} onChange={onColorChange} />
+            )}
+          </>
         ))}
+
       </Stack>
     </Stack>
   );

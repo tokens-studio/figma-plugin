@@ -218,10 +218,6 @@ const tokenTypes = {
     property: 'other',
     type: 'other',
     schema: {
-      value: {
-        color: '#000000',
-        type: 'solid',
-      },
       options: {
         description: '',
       },
