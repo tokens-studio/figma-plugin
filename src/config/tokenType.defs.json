@@ -170,6 +170,21 @@
       }
     }
   },
+  "border": {
+    "label": "Border",
+    "property": "Border",
+    "type": "border",
+    "schemas": {
+      "value": {
+        "type": "object",
+        "properties": {
+          "color": { "type": "string" },
+          "width": { "type": "string" },
+          "style": { "type": "string" }
+        }
+      }
+    }
+  },
   "other": {
     "label": "Other",
     "property": "other",

@@ -19,6 +19,7 @@ import {
   SingleOtherToken,
   SingleCompositionToken,
   SingleSizingToken,
+  SingleBorderToken,
 } from '../tokens';
 
 type GenericTokenInput<T extends TokenTypes, V = string> = {
@@ -51,4 +52,5 @@ export type UpdateTokenPayload =
   | GenericTokenInput<TokenTypes.SPACING, SingleSpacingToken['value']>
   | GenericTokenInput<TokenTypes.SIZING, SingleSizingToken['value']>
   | GenericTokenInput<TokenTypes.COMPOSITION, SingleCompositionToken['value']>
+  | GenericTokenInput<TokenTypes.BORDER, SingleBorderToken['value']>
   | GenericTokenInput<TokenTypes.OTHER, SingleOtherToken['value']>;
