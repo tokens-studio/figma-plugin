@@ -1,7 +1,9 @@
 import React from 'react';
+import { useSelector } from 'react-redux';
 import Heading from './Heading';
 import Button from './Button';
 import Modal from './Modal';
+import { changelogSelector } from '@/selectors';
 import Stack from './Stack';
 
 export default function OnboardingFlow() {
@@ -55,6 +57,8 @@ export default function OnboardingFlow() {
   const [onboardingFlowOpen, setOnboardingFlowOpen] = React.useState(true);
   const [activeIndex, setIndex] = React.useState(0);
 
+  const changelog = useSelector(changelogSelector);
+
   const handleNext = React.useCallback(() => {
     setIndex(activeIndex + 1);
   }, [activeIndex]);
@@ -68,7 +72,7 @@ export default function OnboardingFlow() {
   }, []);
 
   return (
-    <Modal showClose isOpen={onboardingflow.length > 0 && onboardingFlowOpen} close={handleClose}>
+    <Modal showClose isOpen={changelog.length === 0 && onboardingFlowOpen} close={handleClose}>
       <Stack direction="column" gap={4}>
         <Heading size="medium">Get Started</Heading>
         <div>
