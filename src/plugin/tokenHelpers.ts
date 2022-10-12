@@ -30,7 +30,7 @@ export function resolveTokenValues(tokens: SingleToken[], previousCount: number 
 
     let failedToResolve = false;
     // Iterate over Typography and boxShadow Object to get resolved values
-    if (t.type === TokenTypes.TYPOGRAPHY || t.type === TokenTypes.BOX_SHADOW) {
+    if (t.type === TokenTypes.TYPOGRAPHY || t.type === TokenTypes.BOX_SHADOW || t.type === TokenTypes.BORDER) {
       // If value is alias
       if (typeof t.value === 'string') {
         returnValue = getAliasValue(t.value, tokensInProgress);
