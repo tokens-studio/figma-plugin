@@ -43,12 +43,41 @@ export default async function setValuesOnNode(
       && node.type !== 'STICKY'
       && node.type !== 'CODE_BLOCK'
     ) {
-      if (
-        'cornerRadius' in node
-        && typeof values.borderRadius !== 'undefined'
-        && isPrimitiveValue(values.borderRadius)
-      ) {
-        node.cornerRadius = transformValue(String(values.borderRadius), 'borderRadius');
+      if (typeof values.borderRadius !== 'undefined' && isPrimitiveValue(values.borderRadius)) {
+        const individualBorderRadius = String(values.borderRadius).split(' ');
+        switch (individualBorderRadius.length) {
+          case 1:
+            if ('cornerRadius' in node) {
+              node.cornerRadius = transformValue(String(values.borderRadius), 'borderRadius');
+            }
+            break;
+          case 2:
+            if ('topLeftRadius' in node) {
+              node.topLeftRadius = transformValue(String(individualBorderRadius[0]), 'borderRadius');
+              node.topRightRadius = transformValue(String(individualBorderRadius[1]), 'borderRadius');
+              node.bottomRightRadius = transformValue(String(individualBorderRadius[0]), 'borderRadius');
+              node.bottomLeftRadius = transformValue(String(individualBorderRadius[1]), 'borderRadius');
+            }
+            break;
+          case 3:
+            if ('topLeftRadius' in node) {
+              node.topLeftRadius = transformValue(String(individualBorderRadius[0]), 'borderRadius');
+              node.topRightRadius = transformValue(String(individualBorderRadius[1]), 'borderRadius');
+              node.bottomRightRadius = transformValue(String(individualBorderRadius[2]), 'borderRadius');
+              node.bottomLeftRadius = transformValue(String(individualBorderRadius[1]), 'borderRadius');
+            }
+            break;
+          case 4:
+            if ('topLeftRadius' in node) {
+              node.topLeftRadius = transformValue(String(individualBorderRadius[0]), 'borderRadius');
+              node.topRightRadius = transformValue(String(individualBorderRadius[1]), 'borderRadius');
+              node.bottomRightRadius = transformValue(String(individualBorderRadius[2]), 'borderRadius');
+              node.bottomLeftRadius = transformValue(String(individualBorderRadius[3]), 'borderRadius');
+            }
+            break;
+          default:
+            break;
+        }
       }
       if (
         'topLeftRadius' in node
@@ -297,12 +326,37 @@ export default async function setValuesOnNode(
 
       // SPACING
       if ('paddingLeft' in node && typeof values.spacing !== 'undefined' && isPrimitiveValue(values.spacing)) {
+        const individualSpacing = String(values.spacing).split(' ');
         const spacing = transformValue(String(values.spacing), 'spacing');
-        node.paddingLeft = spacing;
-        node.paddingRight = spacing;
-        node.paddingTop = spacing;
-        node.paddingBottom = spacing;
-        node.itemSpacing = spacing;
+        switch (individualSpacing.length) {
+          case 1:
+            node.paddingLeft = spacing;
+            node.paddingRight = spacing;
+            node.paddingTop = spacing;
+            node.paddingBottom = spacing;
+            node.itemSpacing = spacing;
+            break;
+          case 2:
+            node.paddingTop = transformValue(String(individualSpacing[0]), 'spacing');
+            node.paddingRight = transformValue(String(individualSpacing[1]), 'spacing');
+            node.paddingBottom = transformValue(String(individualSpacing[0]), 'spacing');
+            node.paddingLeft = transformValue(String(individualSpacing[1]), 'spacing');
+            break;
+          case 3:
+            node.paddingTop = transformValue(String(individualSpacing[0]), 'spacing');
+            node.paddingRight = transformValue(String(individualSpacing[1]), 'spacing');
+            node.paddingBottom = transformValue(String(individualSpacing[2]), 'spacing');
+            node.paddingLeft = transformValue(String(individualSpacing[1]), 'spacing');
+            break;
+          case 4:
+            node.paddingTop = transformValue(String(individualSpacing[0]), 'spacing');
+            node.paddingRight = transformValue(String(individualSpacing[1]), 'spacing');
+            node.paddingBottom = transformValue(String(individualSpacing[2]), 'spacing');
+            node.paddingLeft = transformValue(String(individualSpacing[3]), 'spacing');
+            break;
+          default:
+            break;
+        }
       }
       if (
         'paddingLeft' in node
