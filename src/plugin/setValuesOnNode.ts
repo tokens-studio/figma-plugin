@@ -17,7 +17,6 @@ import setColorValuesOnTarget from './setColorValuesOnTarget';
 import setEffectValuesOnTarget from './setEffectValuesOnTarget';
 import setTextValuesOnTarget from './setTextValuesOnTarget';
 import setImageValuesOnTarget from './setImageValuesOnTarget';
-import { paintStyleMatchesImageToken } from './figmaUtils/styleMatchers/paintStyleMatchesImageToken';
 
 // @README values typing is wrong
 
@@ -409,36 +408,7 @@ export default async function setValuesOnNode(
 
       if (values.asset && typeof values.asset === 'string') {
         if ('fills' in node && data.asset) {
-          const pathname = convertTokenNameToPath(data.asset, stylePathPrefix, stylePathSlice);
-          let matchingStyleId = matchStyleName(
-            data.asset,
-            pathname,
-            activeThemeObject?.$figmaStyleReferences ?? {},
-            figmaStyleMaps.paintStyles,
-          );
-
-          if (!matchingStyleId) {
-            // Local style not found - look for matching non-local style:
-            const styleIdBackupKey = 'fillStyleId_original';
-            const nonLocalStyle = getNonLocalStyle(node, styleIdBackupKey, 'fills');
-            if (nonLocalStyle) {
-              if (await paintStyleMatchesImageToken(nonLocalStyle, { value: values.asset })) {
-                // Non-local style matches - use this and clear style id backup:
-                matchingStyleId = nonLocalStyle.id;
-                clearStyleIdBackup(node, styleIdBackupKey);
-              } else if (pathname === nonLocalStyle.name) {
-                // Non-local style does NOT match, but style name and token path does,
-                // so we assume selected token value is an override (e.g. dark theme)
-                // Now backup up style id before overwriting with raw token value, so we
-                // can re-link the non-local style, when the token value matches again:
-                setStyleIdBackup(node, styleIdBackupKey, nonLocalStyle.id);
-              }
-            }
-          }
-
-          if (!matchingStyleId || (matchingStyleId && !(await trySetStyleId(node, 'fill', matchingStyleId)))) {
-            setImageValuesOnTarget(node, { value: values.asset });
-          }
+          setImageValuesOnTarget(node, { value: values.asset });
         }
       }
 
