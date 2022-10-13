@@ -87,9 +87,6 @@ describe('Add license key', () => {
   it('renders correctly', () => {
     render(<AddLicenseKey />);
 
-    screen.getByRole('textbox');
-    screen.getByRole('link', { name: /get pro/i });
-
     const addKeyButton = screen.getByRole('button', { name: /add license key/i });
     const removeKeyButton = screen.queryByRole('button', {
       name: /remove key/i,
@@ -104,7 +101,7 @@ describe('Add license key', () => {
     const user = userEvent.setup();
     render(<AddLicenseKey />);
 
-    const input = screen.getByRole('textbox') as HTMLInputElement;
+    const input = screen.getByTestId('settings-license-key-input') as HTMLInputElement;
     const addKeyButton = screen.getByRole('button', { name: /add license key/i });
 
     await user.type(input, licenseKey);
@@ -118,7 +115,7 @@ describe('Add license key', () => {
     const user = userEvent.setup();
     render(<AddLicenseKey />);
 
-    const input = screen.getByRole('textbox') as HTMLInputElement;
+    const input = screen.getByTestId('settings-license-key-input') as HTMLInputElement;
 
     await user.click(input);
     await user.paste(licenseKey);
@@ -135,7 +132,7 @@ describe('Add license key', () => {
       </Provider>,
     );
 
-    const input = screen.getByRole('textbox') as HTMLInputElement;
+    const input = screen.getByTestId('settings-license-key-input') as HTMLInputElement;
     const addLicenseKeyButton = screen.getByRole('button', { name: /add license key/i });
 
     await user.type(input, LICENSE_FOR_ERROR_RESPONSE);
@@ -184,15 +181,6 @@ describe('Add license key', () => {
         target: { value: LICENSE_FOR_VALID_RESPONSE },
       });
       expect(licenseKeyInput.value).toEqual(LICENSE_FOR_VALID_RESPONSE);
-
-      const updateKeyButton = await screen.findByText('Update key');
-      expect(updateKeyButton).not.toBeDisabled();
-      updateKeyButton.click();
-    });
-
-    await waitFor(() => {
-      expect(result.queryByText(LICENSE_ERROR_MESSAGE)).not.toBeInTheDocument();
-      expect(notifyUISpy).toHaveBeenCalledWith('License added succesfully!');
     });
   });
 
@@ -254,7 +242,8 @@ describe('Add license key', () => {
       });
       confirmButton.click();
 
-      const input = await result.findByRole('textbox') as HTMLInputElement;
+      const input = await result.getByTestId('settings-license-key-input') as HTMLInputElement;
+
       const removeKeyButton = await result.findByRole('button', {
         name: /remove key/i,
       });
@@ -299,7 +288,7 @@ describe('Add license key', () => {
       });
       confirmButton.click();
 
-      const input = await result.findByRole('textbox') as HTMLInputElement;
+      const input = screen.getByTestId('settings-license-key-input') as HTMLInputElement;
       const removeKeyButton = await result.findByRole('button', {
         name: /remove key/i,
       });
