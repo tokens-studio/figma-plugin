@@ -11,7 +11,7 @@ export default function OnboardingFlow() {
     {
       image: {
         alt: '',
-        filename: 'https://user-images.githubusercontent.com/4548309/190957841-bc189fb7-0351-4206-9e38-a4b85506d300.png',
+        filename: '../assets/onboardingflow/0.png',
       },
       title: 'Welcome to Figma Tokens',
       excerpt: 'Hey there, awesome to have you with us. Figma Tokens allows you to use design tokens in Figma and sync those to an external source of truth, for example GitHub.',
@@ -19,7 +19,7 @@ export default function OnboardingFlow() {
     {
       image: {
         alt: '',
-        filename: 'https://user-images.githubusercontent.com/4548309/190957812-4d0b9b79-49a6-49fa-a8e6-03f5c42bcb8f.png',
+        filename: '../assets/onboardingflow/1.png',
       },
       title: 'Create tokens',
       excerpt: 'Start by creating your tokens, a good place to start is your colors. You can even import your existing styles!',
@@ -28,7 +28,7 @@ export default function OnboardingFlow() {
     {
       image: {
         alt: '',
-        filename: 'https://user-images.githubusercontent.com/4548309/190957965-165ff18f-d5c4-4379-994f-12102025ff2f.png',
+        filename: '../assets/onboardingflow/2.png',
       },
       title: 'Reference token values',
       excerpt: 'Use your token values inside other tokens by writing them inside curly brackets: {global.colors.red.500} — that way you are able to reuse your tokens.',
@@ -37,7 +37,7 @@ export default function OnboardingFlow() {
     {
       image: {
         alt: '',
-        filename: 'https://user-images.githubusercontent.com/4548309/190958036-e8261c6f-075c-47a0-b0df-afe06ac12109.png',
+        filename: '../assets/onboardingflow/3.png',
       },
       title: 'Apply tokens to a layer',
       excerpt: 'Select a layer in Figma and left-click any token to apply that token on it. Depending on the type of token you clicked on, a different action is performed. Right-click tokens for a context menu to choose what you want to apply.',
@@ -46,7 +46,7 @@ export default function OnboardingFlow() {
     {
       image: {
         alt: '',
-        filename: 'https://user-images.githubusercontent.com/4548309/190958143-f02a3368-ed29-4035-b251-9c6a4fafcea6.png',
+        filename: '../assets/onboardingflow/4.png',
       },
       title: 'Want to know more?',
       excerpt: 'Check out the Docs to find even more knowledge and guides. If there’s anything you’re struggling with, let us know!',
