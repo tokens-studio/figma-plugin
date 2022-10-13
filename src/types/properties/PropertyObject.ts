@@ -7,5 +7,6 @@ export type PropertyObject = {
   clear?: Properties[];
   forcedValue?: string; // @TODO check typing
   disabled?: boolean;
+  invisible?: boolean;
   childProperties?: PropertyObject[];
 };

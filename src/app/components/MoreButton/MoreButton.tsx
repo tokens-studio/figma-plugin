@@ -126,6 +126,7 @@ export const MoreButton: React.FC<Props> = ({
             </ContextMenuContent>
           </ContextMenu>
         ) : (
+          !property.invisible && (
           <MoreButtonProperty
             key={property.name}
             value={token.name}
@@ -133,6 +134,7 @@ export const MoreButton: React.FC<Props> = ({
             onClick={handleClick}
             disabled={property.disabled}
           />
+          )
         )))}
         <ContextMenu>
           <ContextMenuTriggerItem>
