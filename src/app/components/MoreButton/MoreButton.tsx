@@ -106,7 +106,26 @@ export const MoreButton: React.FC<Props> = ({
         <TokenButtonContent type={type} active={active} onClick={handleTokenClick} token={token} />
       </ContextMenuTrigger>
       <ContextMenuContent sideOffset={5} collisionTolerance={30}>
-        {visibleProperties.map((property) => (
+        {visibleProperties.map((property) => (property.childProperties ? (
+          <ContextMenu>
+            <ContextMenuTriggerItem>
+              {property.label}
+              <RightSlot>
+                <ChevronRightIcon />
+              </RightSlot>
+            </ContextMenuTriggerItem>
+            <ContextMenuContent sideOffset={2} alignOffset={-5} collisionTolerance={30}>
+              {property.childProperties.map((childProperty) => (
+                <MoreButtonProperty
+                  key={childProperty.name}
+                  value={token.name}
+                  property={childProperty}
+                  onClick={handleClick}
+                />
+              ))}
+            </ContextMenuContent>
+          </ContextMenu>
+        ) : (
           <MoreButtonProperty
             key={property.name}
             value={token.name}
@@ -114,7 +133,7 @@ export const MoreButton: React.FC<Props> = ({
             onClick={handleClick}
             disabled={property.disabled}
           />
-        ))}
+        )))}
         <ContextMenu>
           <ContextMenuTriggerItem>
             Documentation Tokens
