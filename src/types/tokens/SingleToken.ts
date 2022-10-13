@@ -16,6 +16,7 @@ import { SingleTextDecorationToken } from './SingleTextDecorationToken';
 import { SingleTextCaseToken } from './SingleTextCaseToken';
 import { SingleOtherToken } from './SingleOtherToken';
 import { SingleCompositionToken } from './SingleCompositionToken';
+import { SingleDimensionToken } from './SingleDimensionToken';
 
 export type SingleToken<Named extends boolean = true, P = unknown> =
   SingleColorToken<Named, P>
@@ -35,4 +36,5 @@ export type SingleToken<Named extends boolean = true, P = unknown> =
   | SingleTextCaseToken<Named, P>
   | SingleSpacingToken<Named, P>
   | SingleOtherToken<Named, P>
-  | SingleCompositionToken<Named, P>;
+  | SingleCompositionToken<Named, P>
+  | SingleDimensionToken<Named, P>;

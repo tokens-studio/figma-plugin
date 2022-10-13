@@ -203,6 +203,16 @@ const tokenTypes = {
       },
     },
   },
+  dimension: {
+    label: 'Dimension',
+    property: 'Dimension',
+    type: 'dimension',
+    schema: {
+      options: {
+        description: '',
+      },
+    },
+  },
   other: {
     label: 'Other',
     property: 'other',

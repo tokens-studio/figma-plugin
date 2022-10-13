@@ -8,8 +8,10 @@ import Input from './Input';
 import ColorPicker from './ColorPicker';
 import useConfirm from '../hooks/useConfirm';
 import useTokens from '../store/useTokens';
-import { EditTokenObject, SingleBoxShadowToken, SingleToken } from '@/types/tokens';
-import { checkIfContainsAlias, getAliasValue } from '@/utils/alias';
+import {
+  EditTokenObject, SingleBoxShadowToken, SingleDimensionToken, SingleToken,
+} from '@/types/tokens';
+import { checkIfAlias, checkIfContainsAlias, getAliasValue } from '@/utils/alias';
 import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
 import { activeTokenSetSelector, updateModeSelector, editTokenSelector } from '@/selectors';
 import { TokenTypes } from '@/constants/TokenTypes';
@@ -43,6 +45,8 @@ function EditTokenForm({ resolvedTokens }: Props) {
   const [error, setError] = React.useState<string | null>(null);
   const [internalEditToken, setInternalEditToken] = React.useState<typeof editToken>(editToken);
   const { confirm } = useConfirm();
+
+  const isValidDimensionToken = React.useMemo(() => internalEditToken.type === TokenTypes.DIMENSION && (internalEditToken.value?.endsWith('px') || internalEditToken.value?.endsWith('rem') || checkIfAlias(internalEditToken as SingleDimensionToken, resolvedTokens)), [internalEditToken, resolvedTokens, checkIfAlias]);
 
   const isValid = React.useMemo(() => {
     if (internalEditToken?.type === TokenTypes.COMPOSITION && internalEditToken.value
@@ -288,6 +292,10 @@ function EditTokenForm({ resolvedTokens }: Props) {
   const handleSubmit = React.useCallback(
     (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
+      if (!isValidDimensionToken) {
+        setError('Value must include either px or rem');
+        return;
+      }
       if (isValid && internalEditToken) {
         submitTokenValue(internalEditToken);
         dispatch.uiState.setShowEditForm(false);
