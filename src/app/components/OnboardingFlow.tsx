@@ -75,31 +75,29 @@ export default function OnboardingFlow() {
     <Modal showClose isOpen={lastOpened === 0 && onboardingFlowOpen} close={handleClose}>
       <Stack direction="column" gap={4}>
         <Heading size="medium">Get Started</Heading>
-        <div>
-          {onboardingflow.map((item, index) => (
-            <Stack
-              // eslint-disable-next-line no-underscore-dangle
-              direction="column"
-              gap={2}
-              align="start"
-              css={{ textAlign: 'left', display: index === activeIndex ? 'flex' : 'none' }}
-            >
-              {item.image && <img src={item.image.filename} alt={item.image.alt} className="mb-8 rounded" />}
-              <Heading size="medium">{item.title}</Heading>
-              <p className="text-xs">{item.excerpt}</p>
-              {item.read_more_link && (
-                <a
-                  target="_blank"
-                  rel="noreferrer"
-                  href={item.read_more_link}
-                  className="inline-flex text-xs text-primary-500"
-                >
-                  Read more
-                </a>
-              )}
-            </Stack>
-          ))}
-        </div>
+        {onboardingflow.map((item, index) => (
+          <Stack
+            // eslint-disable-next-line no-underscore-dangle
+            direction="column"
+            gap={2}
+            align="start"
+            css={{ textAlign: 'left', display: index === activeIndex ? 'flex' : 'none' }}
+          >
+            {item.image && <img src={item.image.filename} alt={item.image.alt} className="mb-8 rounded" />}
+            <Heading size="medium">{item.title}</Heading>
+            <p className="text-xs">{item.excerpt}</p>
+            {item.read_more_link && (
+              <a
+                target="_blank"
+                rel="noreferrer"
+                href={item.read_more_link}
+                className="inline-flex text-xs text-primary-500"
+              >
+                Read more
+              </a>
+            )}
+          </Stack>
+        ))}
         <Stack direction="row" gap={2} justify={activeIndex > 1 ? 'between' : 'end'}>
           {activeIndex > 1 && (
             <Button id="button-changelog-prev" onClick={handlePrev} variant="secondary">

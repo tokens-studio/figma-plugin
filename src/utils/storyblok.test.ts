@@ -2,15 +2,9 @@ import fetchChangelog, { formatDate } from './storyblok';
 import { mockFetch } from '../../tests/__mocks__/fetchMock';
 
 describe('fetchChangelog', () => {
-  it('get changelog data', async () => {
+  it('called correct api', async () => {
     const mockLastOnline = new Date();
     const mockSetChangelog = jest.fn();
-    mockFetch.mockImplementationOnce(() => Promise.resolve({
-      ok: true,
-      json: () => Promise.resolve({
-
-      }),
-    }));
 
     await fetchChangelog(mockLastOnline, mockSetChangelog);
     expect(mockFetch).toBeCalledWith(
