@@ -7,7 +7,6 @@ import { getLastopened } from '@/selectors';
 import Stack from './Stack';
 
 export default function OnboardingFlow() {
-  const FALLBACK_LAST_OPENED = 1616241985291;
   const onboardingflow = [
     {
       image: {
@@ -73,7 +72,7 @@ export default function OnboardingFlow() {
   }, []);
 
   return (
-    <Modal showClose isOpen={lastOpened === FALLBACK_LAST_OPENED && onboardingFlowOpen} close={handleClose}>
+    <Modal showClose isOpen={lastOpened === 0 && onboardingFlowOpen} close={handleClose}>
       <Stack direction="column" gap={4}>
         <Heading size="medium">Get Started</Heading>
         <div>

@@ -1,8 +1,6 @@
 import { StoryblokStory } from '@/types';
 
-const FALLBACK_LAST_OPENED = 1616241985291;
-
-function formatDate(date?: number | Date) {
+export function formatDate(date?: number | Date) {
   const formatter = new Intl.DateTimeFormat('en', {
     year: 'numeric',
     month: '2-digit',
@@ -19,10 +17,7 @@ function formatDate(date?: number | Date) {
 export default async function fetchChangelog(lastOnline: Date, setChangelog: (stories: StoryblokStory['content'][]) => void): Promise<void> {
   if (process.env.STORYBLOK_ACCESS_TOKEN) {
     const token = process.env.STORYBLOK_ACCESS_TOKEN;
-    let formattedDate = formatDate(new Date(lastOnline));
-    if (formattedDate === formatDate(new Date(FALLBACK_LAST_OPENED))) {
-      formattedDate = formatDate(new Date());
-    }
+    const formattedDate = lastOnline.toString() === '0' ? new Date() : formatDate(new Date(lastOnline));
     const response = await fetch(
       `https://api.storyblok.com/v1/cdn/stories?version=published&token=${token}&first_published_at_gt=${formattedDate}&startsWith=changelog/&sort_by=first_published_at`,
       {
