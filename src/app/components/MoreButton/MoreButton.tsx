@@ -80,9 +80,16 @@ export const MoreButton: React.FC<Props> = ({
     dispatch.uiState.completeJob(BackgroundJobs.UI_APPLYNODEVALUE);
   }, [dispatch, tokensContext.resolvedTokens, setNodeData]);
 
-  const activeStateProperties = React.useMemo(() => (
-    [...properties, ...DocumentationProperties]
-  ), [properties]);
+  const activeStateProperties = React.useMemo(() => {
+    const childProperties: PropertyObject[] = [];
+    properties.forEach((property) => {
+      if (property.childProperties) {
+        childProperties.push(...property.childProperties);
+      }
+    });
+    return [...properties, ...childProperties, ...DocumentationProperties];
+  }, [properties]);
+
   const active = useGetActiveState(activeStateProperties, type, token.name);
 
   const handleClick = React.useCallback((givenProperties: PropertyObject, isActive = active) => {
@@ -126,7 +133,6 @@ export const MoreButton: React.FC<Props> = ({
             </ContextMenuContent>
           </ContextMenu>
         ) : (
-          !property.invisible && (
           <MoreButtonProperty
             key={property.name}
             value={token.name}
@@ -134,7 +140,6 @@ export const MoreButton: React.FC<Props> = ({
             onClick={handleClick}
             disabled={property.disabled}
           />
-          )
         )))}
         <ContextMenu>
           <ContextMenuTriggerItem>

@@ -127,7 +127,6 @@ export function usePropertiesForTokenType(type: TokenTypes, value?: SingleToken[
       case TokenTypes.DIMENSION:
         properties.push(
           {
-            label: 'Dimension',
             name: Properties.dimension,
             invisible: true,
           },
