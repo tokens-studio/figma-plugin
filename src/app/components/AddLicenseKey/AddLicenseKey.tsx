@@ -97,7 +97,7 @@ export default function AddLicenseKey() {
         <Heading size="medium">License key</Heading>
         <Stack direction="row" gap={2} align="center">
           <ProBadge />
-          <ManageSubscriptionLink href="https://docs.figmatokens.com/" target="_blank">
+          <ManageSubscriptionLink href="https://account.figmatokens.com/" target="_blank">
             Manage subscription
           </ManageSubscriptionLink>
         </Stack>
