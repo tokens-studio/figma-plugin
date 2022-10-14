@@ -9,45 +9,25 @@ import Stack from './Stack';
 export default function OnboardingFlow() {
   const onboardingflow = [
     {
-      image: {
-        alt: '',
-        filename: '../assets/onboardingflow/0.png',
-      },
       title: 'Welcome to Figma Tokens',
       excerpt: 'Hey there, awesome to have you with us. Figma Tokens allows you to use design tokens in Figma and sync those to an external source of truth, for example GitHub.',
     },
     {
-      image: {
-        alt: '',
-        filename: '../assets/onboardingflow/1.png',
-      },
       title: 'Create tokens',
       excerpt: 'Start by creating your tokens, a good place to start is your colors. You can even import your existing styles!',
       read_more_link: 'https://docs.figmatokens.com/tokens/creating-tokens',
     },
     {
-      image: {
-        alt: '',
-        filename: '../assets/onboardingflow/2.png',
-      },
       title: 'Reference token values',
       excerpt: 'Use your token values inside other tokens by writing them inside curly brackets: {global.colors.red.500} — that way you are able to reuse your tokens.',
       read_more_link: 'https://docs.figmatokens.com/tokens/aliases',
     },
     {
-      image: {
-        alt: '',
-        filename: '../assets/onboardingflow/3.png',
-      },
       title: 'Apply tokens to a layer',
       excerpt: 'Select a layer in Figma and left-click any token to apply that token on it. Depending on the type of token you clicked on, a different action is performed. Right-click tokens for a context menu to choose what you want to apply.',
       read_more_link: 'https://docs.figmatokens.com/tokens/applying-tokens',
     },
     {
-      image: {
-        alt: '',
-        filename: '../assets/onboardingflow/4.png',
-      },
       title: 'Want to know more?',
       excerpt: 'Check out the Docs to find even more knowledge and guides. If there’s anything you’re struggling with, let us know!',
       read_more_link: 'https://docs.figmatokens.com',
@@ -83,7 +63,7 @@ export default function OnboardingFlow() {
             align="start"
             css={{ textAlign: 'left', display: index === activeIndex ? 'flex' : 'none' }}
           >
-            {item.image && <img src={item.image.filename} alt={item.image.alt} className="mb-8 rounded" />}
+            <img src={require(`../assets/onboardingflow/${index}.png`)} alt="" className="mb-8 rounded" />
             <Heading size="medium">{item.title}</Heading>
             <p className="text-xs">{item.excerpt}</p>
             {item.read_more_link && (
