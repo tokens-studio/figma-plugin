@@ -15,4 +15,12 @@ describe('fetchChangelog', () => {
     mockGetAsync.mockResolvedValueOnce('1664078400000');
     expect(await getLastOpened()).toEqual(1664078400000);
   });
+
+  it('sets current date even if theres an error reading', async () => {
+    mockGetAsync.mockImplementation(() => {
+      throw new Error('Error');
+    });
+
+    expect(await getLastOpened()).toEqual(0);
+  });
 });
