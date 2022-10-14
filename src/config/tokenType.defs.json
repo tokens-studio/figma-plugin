@@ -172,7 +172,7 @@
   },
   "asset": {
     "label": "Assets",
-    "property": "Assets",
+    "property": "Asset",
     "type": "asset",
     "explainer": "Public URL of your asset",
     "schemas": {
