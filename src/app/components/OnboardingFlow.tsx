@@ -1,3 +1,4 @@
+/* eslint-disable global-require */
 import React from 'react';
 import { useSelector } from 'react-redux';
 import Heading from './Heading';
@@ -5,6 +6,23 @@ import Button from './Button';
 import Modal from './Modal';
 import { getLastopened } from '@/selectors';
 import Stack from './Stack';
+
+function fetchOnboardingImage(idx: number) {
+  switch (idx) {
+    case 0:
+      return require('../assets/onboardingflow/0.webp');
+    case 1:
+      return require('../assets/onboardingflow/1.webp');
+    case 2:
+      return require('../assets/onboardingflow/2.webp');
+    case 3:
+      return require('../assets/onboardingflow/3.webp');
+    case 4:
+      return require('../assets/onboardingflow/4.webp');
+    default:
+      return '';
+  }
+}
 
 export default function OnboardingFlow() {
   const onboardingflow = [
@@ -57,13 +75,12 @@ export default function OnboardingFlow() {
         <Heading size="medium">Get Started</Heading>
         {onboardingflow.map((item, index) => (
           <Stack
-            // eslint-disable-next-line no-underscore-dangle
             direction="column"
             gap={2}
             align="start"
             css={{ textAlign: 'left', display: index === activeIndex ? 'flex' : 'none' }}
           >
-            <img src={require(`../assets/onboardingflow/${index}.png`)} alt="" className="mb-8 rounded" />
+            <img src={fetchOnboardingImage(index)} alt="" className="mb-8 rounded" />
             <Heading size="medium">{item.title}</Heading>
             <p className="text-xs">{item.excerpt}</p>
             {item.read_more_link && (
