@@ -4,7 +4,7 @@ import { isPrimitiveValue } from '@/utils/is';
 import { transformValue } from './helpers';
 import setColorValuesOnTarget from './setColorValuesOnTarget';
 
-export default async function setBorderValuesOnTarget(target: BaseNode, token: Pick<SingleBorderToken, 'value'>) {
+export default function setBorderValuesOnTarget(target: BaseNode, token: Pick<SingleBorderToken, 'value'>) {
   const { value } = token;
   const { color, width, style } = value;
   try {
