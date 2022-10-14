@@ -1,5 +1,5 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
-import React, { useCallback } from 'react';
+import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import type { CheckedState } from '@radix-ui/react-checkbox';
 import SyncSettings from '../SyncSettings';
@@ -37,9 +37,9 @@ function Settings() {
     [dispatch.settings],
   );
 
-  const handleResetButton = useCallback(() => {
-
-  }, []);
+  const handleResetButton = React.useCallback(() => {
+    dispatch.uiState.setLastOpened(0);
+  }, [dispatch.uiState]);
 
   return (
     <Box className="content scroll-container">
