@@ -1,4 +1,5 @@
 import { SingleAssetToken } from '@/types/tokens';
+import { notifyToUI } from '@/plugin/notifiers';
 
 export default async function setImageValuesOnTarget(
   target: BaseNode | PaintStyle,
@@ -7,14 +8,21 @@ export default async function setImageValuesOnTarget(
   try {
     const { description, value } = token;
     if ('fills' in target && target.fills !== figma.mixed) {
-      const imageArrayBuffer = await fetch(value).then((response) => response.arrayBuffer());
-      const image = figma.createImage(new Uint8Array(imageArrayBuffer));
-      const newPaint = {
-        type: 'IMAGE',
-        scaleMode: 'FILL',
-        imageHash: image.hash,
-      } as Paint;
-      target.fills = [newPaint];
+      const imageArrayBuffer = await fetch(value)
+        .then((response) => response.arrayBuffer())
+        .catch(() => {
+          notifyToUI('Error fetching image', { error: true });
+          return null;
+        });
+      if (imageArrayBuffer) {
+        const image = figma.createImage(new Uint8Array(imageArrayBuffer));
+        const newPaint = {
+          type: 'IMAGE',
+          scaleMode: 'FILL',
+          imageHash: image.hash,
+        } as Paint;
+        target.fills = [newPaint];
+      }
     }
 
     if (description && 'description' in target) {
