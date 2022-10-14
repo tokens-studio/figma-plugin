@@ -20,6 +20,7 @@ export function savePluginDataFactory(dispatch: Dispatch, params: StartupMessage
       dispatch.userState.setUserId(user.figmaId);
       dispatch.userState.setUserName(user.name);
       dispatch.uiState.setLastOpened(params.lastOpened);
+      dispatch.uiState.setOnboardingFlag(params.onboardingFlag);
       dispatch.settings.setUISettings(settings);
       identify(user);
     } else {

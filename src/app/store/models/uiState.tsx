@@ -65,6 +65,7 @@ export interface UIState {
   lastUpdatedAt: string | null;
   changelog: StoryblokStory['content'][];
   lastOpened: number | null;
+  onboardingFlag: boolean | true;
   editToken: EditTokenObject;
   showEditForm: boolean;
   tokenFilter: string;
@@ -108,6 +109,7 @@ export const uiState = createModel<RootModel>()({
     lastUpdatedAt: null,
     changelog: [],
     lastOpened: '',
+    onboardingFlag: true,
     editToken: {
       type: TokenTypes.OTHER,
       status: EditTokenFormStatus.CREATE,
@@ -259,6 +261,12 @@ export const uiState = createModel<RootModel>()({
       return {
         ...state,
         lastOpened: payload,
+      };
+    },
+    setOnboardingFlag(state, payload: boolean) {
+      return {
+        ...state,
+        onboardingFlag: payload,
       };
     },
     setTokenFilter(state, payload: string) {

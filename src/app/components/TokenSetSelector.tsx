@@ -32,7 +32,7 @@ const StyledButton = styled('button', {
   },
 });
 
-export default function TokenSetSelector({ saveScrollPositionSet } : { saveScrollPositionSet: (tokenSet: string) => void }) {
+export default function TokenSetSelector({ saveScrollPositionSet }: { saveScrollPositionSet: (tokenSet: string) => void }) {
   const tokens = useSelector(tokensSelector);
   const editProhibited = useSelector(editProhibitedSelector);
   const dispatch = useDispatch<Dispatch>();
@@ -211,6 +211,21 @@ export default function TokenSetSelector({ saveScrollPositionSet } : { saveScrol
         New set
         <IconAdd />
       </StyledButton>
+      <Box css={{
+        display: 'flex', flexDirection: 'column', gap: '$2', padding: '$4', borderBottom: '1px solid $borderMuted', borderTop: '1px solid $borderMuted',
+      }}
+      >
+        <Heading size="medium">Sets</Heading>
+        <p className="text-xs">Sets allow you to split your tokens up into multiple files. \n\nYou can activate different sets to control theming.</p>
+        <a
+          target="_blank"
+          rel="noreferrer"
+          href="https://docs.figmatokens.com/themes/token-sets?ref=onboarding_explainer_sets"
+          className="inline-flex text-xs text-primary-500"
+        >
+          Read more
+        </a>
+      </Box>
     </Box>
   );
 }
