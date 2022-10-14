@@ -13,6 +13,9 @@ const StyledHeading = styled('p', {
       medium: {
         fontSize: '$medium',
       },
+      large: {
+        fontSize: '$large',
+      },
     },
     muted: {
       true: {
@@ -23,7 +26,7 @@ const StyledHeading = styled('p', {
 });
 
 type HeadingProps = {
-  size?: 'small' | 'medium';
+  size?: 'small' | 'medium' | 'large';
   children: React.ReactNode;
   id?: string;
   muted?: boolean;

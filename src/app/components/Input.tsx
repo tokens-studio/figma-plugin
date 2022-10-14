@@ -83,8 +83,6 @@ const StyledInput = styled('input', {
 });
 
 const StyledSuffix = styled('button', {
-  width: '28px',
-  height: '28px',
   backgroundColor: '$bgDefault',
   border: '1px solid $borderMuted',
   borderTopLeftRadius: 0,
@@ -97,6 +95,19 @@ const StyledSuffix = styled('button', {
     outline: 'none',
     backgroundColor: '$interaction',
     color: '$onInteraction',
+  },
+
+  variants: {
+    size: {
+      small: {
+        width: '28px',
+        height: '28px',
+      },
+      large: {
+        width: '36px',
+        height: '36px',
+      },
+    },
   },
 });
 
