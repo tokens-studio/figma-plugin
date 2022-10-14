@@ -8,7 +8,7 @@ describe('fetchChangelog', () => {
 
     await fetchChangelog(mockLastOnline, mockSetChangelog);
     expect(mockFetch).toBeCalledWith(
-      `https://api.storyblok.com/v1/cdn/stories?version=published&token=w8hc5GRgee18nTpt2mHzAQtt&first_published_at_gt=${formatDate(mockLastOnline)}&startsWith=changelog/&sort_by=first_published_at`,
+      `https://api.storyblok.com/v1/cdn/stories?version=published&token=${process.env.STORYBLOK_ACCESS_TOKEN}&first_published_at_gt=${formatDate(mockLastOnline)}&startsWith=changelog/&sort_by=first_published_at`,
       {
         method: 'GET',
         mode: 'cors',

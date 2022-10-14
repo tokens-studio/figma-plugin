@@ -15,9 +15,9 @@ export function formatDate(date?: number | Date) {
 }
 
 export default async function fetchChangelog(lastOnline: Date, setChangelog: (stories: StoryblokStory['content'][]) => void): Promise<void> {
-  if (process.env.STORYBLOK_ACCESS_TOKEN) {
+  if (process.env.STORYBLOK_ACCESS_TOKEN && lastOnline.toString() !== '0') {
     const token = process.env.STORYBLOK_ACCESS_TOKEN;
-    const formattedDate = lastOnline.toString() === '0' ? new Date() : formatDate(new Date(lastOnline));
+    const formattedDate = formatDate(new Date(lastOnline));
     const response = await fetch(
       `https://api.storyblok.com/v1/cdn/stories?version=published&token=${token}&first_published_at_gt=${formattedDate}&startsWith=changelog/&sort_by=first_published_at`,
       {
