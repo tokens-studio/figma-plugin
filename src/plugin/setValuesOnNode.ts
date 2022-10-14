@@ -16,6 +16,7 @@ import { transformValue } from './helpers';
 import setColorValuesOnTarget from './setColorValuesOnTarget';
 import setEffectValuesOnTarget from './setEffectValuesOnTarget';
 import setTextValuesOnTarget from './setTextValuesOnTarget';
+import setImageValuesOnTarget from './setImageValuesOnTarget';
 
 // @README values typing is wrong
 
@@ -403,6 +404,12 @@ export default async function setValuesOnNode(
 
       if ('paddingLeft' in node && typeof values.paddingLeft !== 'undefined' && isPrimitiveValue(values.paddingLeft)) {
         node.paddingLeft = transformValue(String(values.paddingLeft), 'spacing');
+      }
+
+      if (values.asset && typeof values.asset === 'string') {
+        if ('fills' in node && data.asset) {
+          await setImageValuesOnTarget(node, { value: values.asset });
+        }
       }
 
       // Raw value for text layers

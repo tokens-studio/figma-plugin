@@ -8,7 +8,7 @@ type CreateTokensObjectResult = Partial<Record<TokenTypes, {
   values: DeepKeyTokenMap
 }>>;
 
-function transformName(name: string): TokenTypes {
+export function transformName(name: string): TokenTypes {
   switch (name) {
     case 'color':
     case 'colors':
@@ -43,6 +43,8 @@ function transformName(name: string): TokenTypes {
       return TokenTypes.PARAGRAPH_SPACING;
     case 'composition':
       return TokenTypes.COMPOSITION;
+    case 'asset':
+      return TokenTypes.ASSET;
     default:
       return TokenTypes.OTHER;
   }

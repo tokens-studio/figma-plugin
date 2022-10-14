@@ -170,6 +170,15 @@
       }
     }
   },
+  "asset": {
+    "label": "Assets",
+    "property": "Assets",
+    "type": "asset",
+    "explainer": "Public URL of your asset",
+    "schemas": {
+      "value": { "type": "string" }
+    }
+  },
   "other": {
     "label": "Other",
     "property": "other",
