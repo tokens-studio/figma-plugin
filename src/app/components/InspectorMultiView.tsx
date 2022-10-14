@@ -1,5 +1,6 @@
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import { InfoCircledIcon, Cross1Icon } from '@radix-ui/react-icons';
 import { Dispatch } from '../store';
 import useTokens from '../store/useTokens';
 import Button from './Button';
@@ -17,6 +18,9 @@ import { SelectionGroup } from '@/types';
 import { NodeInfo } from '@/types/NodeInfo';
 import BulkRemapModal from './modals/BulkRemapModal';
 import { StyleIdBackupKeys } from '@/constants/StyleIdBackupKeys';
+import IconButton from './IconButton';
+import Stack from './Stack';
+import Heading from './Heading';
 
 export default function InspectorMultiView({ resolvedTokens }: { resolvedTokens: SingleToken[] }) {
   const inspectState = useSelector(inspectStateSelector, isEqual);
@@ -123,7 +127,32 @@ export default function InspectorMultiView({ resolvedTokens }: { resolvedTokens:
 
         </Box>
       ) : (
-        <Blankslate title={uiState.selectedLayers > 0 ? 'No tokens found' : 'No layers selected'} text={uiState.selectedLayers > 0 ? 'None of the selected layers contain any tokens' : 'Select a layer to see applied tokens'} />
+        <Stack direction="column" gap={4} css={{ padding: '$5' }}>
+          <Blankslate title={uiState.selectedLayers > 0 ? 'No tokens found' : 'No layers selected'} text={uiState.selectedLayers > 0 ? 'None of the selected layers contain any tokens' : 'Select a layer to see applied tokens'} />
+          <Box css={{
+            display: 'flex', flexDirection: 'column', gap: '$2', padding: '$4', border: '1px solid $borderMuted', borderTop: '1px solid $borderMuted',
+          }}
+          >
+            <Stack direction="row" gap={2} justify="between">
+              <Stack direction="row" justify="between" gap={2} align="center">
+                <InfoCircledIcon className="text-primary-500" />
+                <Heading size="medium">Inspect</Heading>
+              </Stack>
+              <IconButton icon={<Cross1Icon />} />
+            </Stack>
+            <p className="text-xs">
+              This is where applied tokens of your selection show up, you can use Deep Inspect to scan the selected layers and all of its children.
+            </p>
+            <a
+              target="_blank"
+              rel="noreferrer"
+              href="https://docs.figmatokens.com/multi-inspect?ref=onboarding_explainer_inspect"
+              className="inline-flex text-xs text-primary-500"
+            >
+              Read more
+            </a>
+          </Box>
+        </Stack>
       )}
     </Box>
   );

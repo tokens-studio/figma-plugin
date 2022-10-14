@@ -1,18 +1,21 @@
 import React, { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { InfoCircledIcon, Cross1Icon } from '@radix-ui/react-icons';
 import { track } from '@/utils/analytics';
+import getOnboardingFlag from '@/utils/getOnboardingFlag';
 import useConfirm from '../hooks/useConfirm';
 import { Dispatch } from '../store';
 import Button from './Button';
 import Heading from './Heading';
 import IconAdd from '@/icons/add.svg';
 import Input from './Input';
+import IconButton from './IconButton';
 import Modal from './Modal';
 import TokenSetTree from './TokenSetTree';
 import Box from './Box';
 import { styled } from '@/stitches.config';
 import {
-  editProhibitedSelector, tokensSelector,
+  editProhibitedSelector, tokensSelector, uiStateSelector,
 } from '@/selectors';
 import Stack from './Stack';
 
@@ -35,6 +38,7 @@ const StyledButton = styled('button', {
 export default function TokenSetSelector({ saveScrollPositionSet }: { saveScrollPositionSet: (tokenSet: string) => void }) {
   const tokens = useSelector(tokensSelector);
   const editProhibited = useSelector(editProhibitedSelector);
+  const uiState = useSelector(uiStateSelector);
   const dispatch = useDispatch<Dispatch>();
   const { confirm } = useConfirm();
 
@@ -106,6 +110,12 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
 
   const handleReorder = useCallback((values: string[]) => {
     dispatch.tokenState.setTokenSetOrder(values);
+  }, [dispatch]);
+
+  const closeOnboarding = useCallback(async (): Promise<boolean> => {
+    dispatch.uiState.setOnboardingFlag(false);
+    console.log('getOnboarding: ', await getOnboardingFlag());
+    return getOnboardingFlag();
   }, [dispatch]);
 
   const handleDelete = useCallback((set: string) => {
@@ -211,21 +221,34 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
         New set
         <IconAdd />
       </StyledButton>
-      <Box css={{
-        display: 'flex', flexDirection: 'column', gap: '$2', padding: '$4', borderBottom: '1px solid $borderMuted', borderTop: '1px solid $borderMuted',
-      }}
-      >
-        <Heading size="medium">Sets</Heading>
-        <p className="text-xs">Sets allow you to split your tokens up into multiple files. \n\nYou can activate different sets to control theming.</p>
-        <a
-          target="_blank"
-          rel="noreferrer"
-          href="https://docs.figmatokens.com/themes/token-sets?ref=onboarding_explainer_sets"
-          className="inline-flex text-xs text-primary-500"
+      {uiState.onboardingFlag && (
+        <Box css={{
+          display: 'flex', flexDirection: 'column', gap: '$2', padding: '$4', borderBottom: '1px solid $borderMuted', borderTop: '1px solid $borderMuted',
+        }}
         >
-          Read more
-        </a>
-      </Box>
+          <Stack direction="row" gap={2} justify="between">
+            <Stack direction="row" justify="between" gap={2} align="center">
+              <InfoCircledIcon className="text-primary-500" />
+              <Heading size="medium">Sets</Heading>
+            </Stack>
+            <IconButton onClick={closeOnboarding} icon={<Cross1Icon />} />
+          </Stack>
+          <p className="text-xs">
+            Sets allow you to split your tokens up into multiple files.
+            <br />
+            <br />
+            You can activate different sets to control theming.
+          </p>
+          <a
+            target="_blank"
+            rel="noreferrer"
+            href="https://docs.figmatokens.com/themes/token-sets?ref=onboarding_explainer_sets"
+            className="inline-flex text-xs text-primary-500"
+          >
+            Read more
+          </a>
+        </Box>
+      )}
     </Box>
   );
 }
