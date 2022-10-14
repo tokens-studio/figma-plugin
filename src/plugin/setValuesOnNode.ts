@@ -28,7 +28,6 @@ export default async function setValuesOnNode(
   ignoreFirstPartForStyles = false,
   prefixStylesWithThemeName = false,
 ) {
-  console.log('value', values);
   const activeThemeObject = themeInfo.activeTheme
     ? themeInfo.themes.find(({ id }) => themeInfo.activeTheme === id) ?? null
     : null;

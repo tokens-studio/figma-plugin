@@ -292,7 +292,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
   const handleSubmit = React.useCallback(
     (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
-      if (!isValidDimensionToken) {
+      if (internalEditToken.type === TokenTypes.DIMENSION && !isValidDimensionToken) {
         setError('Value must include either px or rem');
         return;
       }

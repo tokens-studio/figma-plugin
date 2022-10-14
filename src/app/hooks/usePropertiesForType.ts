@@ -156,6 +156,26 @@ export function usePropertiesForTokenType(type: TokenTypes, value?: SingleToken[
             ],
           },
           {
+            label: 'Border Radius',
+            name: Properties.borderRadius,
+            childProperties: [
+              {
+                label: 'All',
+                name: Properties.borderRadius,
+                clear: [
+                  Properties.borderRadiusTopLeft,
+                  Properties.borderRadiusTopRight,
+                  Properties.borderRadiusBottomRight,
+                  Properties.borderRadiusBottomLeft,
+                ],
+              },
+              { label: 'Top Left', name: Properties.borderRadiusTopLeft },
+              { label: 'Top Right', name: Properties.borderRadiusTopRight },
+              { label: 'Bottom Right', name: Properties.borderRadiusBottomRight },
+              { label: 'Bottom Left', name: Properties.borderRadiusBottomLeft },
+            ],
+          },
+          {
             label: 'Sizing',
             name: Properties.sizing,
             childProperties: [
