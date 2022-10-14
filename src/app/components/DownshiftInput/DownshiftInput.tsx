@@ -118,7 +118,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
   handleBlur,
 }) => {
   const [showAutoSuggest, setShowAutoSuggest] = React.useState<boolean>(false);
-  const [isFirstLoading, setisFirstLoading] = React.useState<boolean>(true);
+  const [isFirstLoading, setIsFirstLoading] = React.useState<boolean>(true);
   const filteredValue = useMemo(() => ((showAutoSuggest || typeof value !== 'string') ? '' : value?.replace(/[{}$]/g, '')), [
     showAutoSuggest,
     value,
@@ -197,7 +197,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
   }, [showAutoSuggest]);
 
   const handleInputChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setisFirstLoading(false);
+    setIsFirstLoading(false);
     handleChange(e);
   }, [handleChange]);
 
