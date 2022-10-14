@@ -1,5 +1,5 @@
 import { SingleAssetToken } from '@/types/tokens';
-import { notifyToUI } from '@/plugin/notifiers';
+import { notifyUI } from '@/plugin/notifiers';
 
 export default async function setImageValuesOnTarget(
   target: BaseNode | PaintStyle,
@@ -11,7 +11,7 @@ export default async function setImageValuesOnTarget(
       const imageArrayBuffer = await fetch(value)
         .then((response) => response.arrayBuffer())
         .catch(() => {
-          notifyToUI('Error fetching image', { error: true });
+          notifyUI('Failed to image', { error: true });
           return null;
         });
       if (imageArrayBuffer) {
