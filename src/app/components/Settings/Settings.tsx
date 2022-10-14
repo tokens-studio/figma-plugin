@@ -1,8 +1,9 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import type { CheckedState } from '@radix-ui/react-checkbox';
 import SyncSettings from '../SyncSettings';
+import Button from '../Button';
 import Checkbox from '../Checkbox';
 import Heading from '../Heading';
 import { Dispatch } from '../../store';
@@ -36,6 +37,10 @@ function Settings() {
     [dispatch.settings],
   );
 
+  const handleResetButton = useCallback(() => {
+
+  }, []);
+
   return (
     <Box className="content scroll-container">
       <Stack direction="column" gap={4} css={{ padding: '$3 0' }}>
@@ -62,6 +67,9 @@ function Settings() {
               onCheckedChange={handlePrefixWithThemeNameChange}
             />
             <Label htmlFor="prefixStylesWithThemeName">Prefix styles with active theme name</Label>
+          </Stack>
+          <Stack direction="row" gap={3}>
+            <Button variant="primary" size="small" onClick={handleResetButton}>Reset onboarding</Button>
           </Stack>
         </Stack>
       </Stack>
