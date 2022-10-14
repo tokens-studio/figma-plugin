@@ -12,6 +12,7 @@ import { StyledDownshiftInput } from './StyledDownshiftInput';
 import Tooltip from '../Tooltip';
 import { Properties } from '@/constants/Properties';
 import { isDocumentationType } from '@/utils/is/isDocumentationType';
+import { useReferenceTokenType } from '@/app/hooks/useReferenceTokenType';
 
 const StyledDropdown = styled('div', {
   position: 'absolute',
@@ -122,6 +123,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
     showAutoSuggest,
     value,
   ]); // removing non-alphanumberic except . from the input value
+  const referenceTokenTypes = useReferenceTokenType(type as TokenTypes);
   const getHighlightedText = useCallback((text: string, highlight: string) => {
     // Split on highlight term and include term into parts, ignore case
     const parts = text.split(new RegExp(`(${highlight})`, 'gi'));
@@ -153,7 +155,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
         .filter(
           (token: SingleToken) => !filteredValue || token.name.toLowerCase().includes(filteredValue.toLowerCase()),
         )
-        .filter((token: SingleToken) => token?.type === type && token.name !== initialName).sort((a, b) => (
+        .filter((token: SingleToken) => referenceTokenTypes.includes(token?.type) && token.name !== initialName).sort((a, b) => (
           a.name.localeCompare(b.name)
         ));
     },
