@@ -408,7 +408,7 @@ export default async function setValuesOnNode(
 
       if (values.asset && typeof values.asset === 'string') {
         if ('fills' in node && data.asset) {
-          setImageValuesOnTarget(node, { value: values.asset });
+          await setImageValuesOnTarget(node, { value: values.asset });
         }
       }
 

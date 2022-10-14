@@ -22,8 +22,26 @@ const baseTokens = {
       name: 'global.colors.gray.50',
       value: '#ff0000',
     },
+    {
+      id: '123', type: 'asset', description: 'some assets', name: 'global.assets.image', value: 'http://image.png',
+    },
   ],
   output: {
+    asset: {
+      values: {
+        global: {
+          assets: {
+            image: {
+              id: '123',
+              type: 'asset',
+              description: 'some assets',
+              name: 'global.assets.image',
+              value: 'http://image.png',
+            },
+          },
+        },
+      },
+    },
     color: {
       values: {
         global: {
