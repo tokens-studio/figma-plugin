@@ -27,9 +27,7 @@ export default function setColorValuesOnTarget(target: BaseNode | PaintStyle, to
       if (!existingPaint || !isPaintEqual(newPaint, existingPaint)) {
         if (key === 'paints' && 'paints' in target) target.paints = [newPaint];
         if (key === 'fills' && 'fills' in target) target.fills = [newPaint];
-        if (key === 'strokes' && 'strokes' in target) {
-          target.strokes = [newPaint];
-        }
+        if (key === 'strokes' && 'strokes' in target) target.strokes = [newPaint];
       }
     } else {
       const { color, opacity } = convertToFigmaColor(value);
@@ -37,9 +35,7 @@ export default function setColorValuesOnTarget(target: BaseNode | PaintStyle, to
       if (!existingPaint || !isPaintEqual(newPaint, existingPaint)) {
         if (key === 'paints' && 'paints' in target) target.paints = [newPaint];
         if (key === 'fills' && 'fills' in target) target.fills = [newPaint];
-        if (key === 'strokes' && 'strokes' in target) {
-          target.strokes = [newPaint];
-        }
+        if (key === 'strokes' && 'strokes' in target) target.strokes = [newPaint];
       }
     }
 
