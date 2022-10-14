@@ -53,6 +53,9 @@ function EditTokenForm({ resolvedTokens }: Props) {
       && (internalEditToken.value.hasOwnProperty('') || Object.keys(internalEditToken.value).length === 0)) {
       return false;
     }
+    if (internalEditToken.type === TokenTypes.DIMENSION) {
+      return isValidDimensionToken;
+    }
     return internalEditToken?.value && !error;
   }, [internalEditToken, error]);
 
@@ -103,6 +106,15 @@ function EditTokenForm({ resolvedTokens }: Props) {
       e.persist();
       if (internalEditToken) {
         setInternalEditToken({ ...internalEditToken, [e.target.name]: e.target.value });
+      }
+    },
+    [internalEditToken],
+  );
+
+  const handleBlur = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>(
+    () => {
+      if (internalEditToken.type === TokenTypes.DIMENSION && !isValidDimensionToken) {
+        setError('Value must include either px or rem');
       }
     },
     [internalEditToken],
@@ -292,10 +304,6 @@ function EditTokenForm({ resolvedTokens }: Props) {
   const handleSubmit = React.useCallback(
     (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
-      if (internalEditToken.type === TokenTypes.DIMENSION && !isValidDimensionToken) {
-        setError('Value must include either px or rem');
-        return;
-      }
       if (isValid && internalEditToken) {
         submitTokenValue(internalEditToken);
         dispatch.uiState.setShowEditForm(false);
@@ -369,6 +377,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
               resolvedTokens={resolvedTokens}
               initialName={internalEditToken.initialName}
               handleChange={handleChange}
+              handleBlur={handleBlur}
               setInputValue={handleDownShiftInputChange}
               placeholder={
                 internalEditToken.type === 'color' ? '#000000, hsla(), rgba() or {alias}' : 'Value or {alias}'

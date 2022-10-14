@@ -97,6 +97,7 @@ interface DownShiftProps {
   resolvedTokens: ResolveTokenValuesResult[];
   setInputValue(value: string): void;
   handleChange: React.ChangeEventHandler<HTMLInputElement>;
+  handleBlur?: React.ChangeEventHandler<HTMLInputElement>;
 }
 
 export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
@@ -113,6 +114,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
   setInputValue,
   resolvedTokens,
   handleChange,
+  handleBlur,
 }) => {
   const [showAutoSuggest, setShowAutoSuggest] = React.useState<boolean>(false);
   const [isFirstLoading, setisFirstLoading] = React.useState<boolean>(true);
@@ -197,6 +199,12 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
     handleChange(e);
   }, [handleChange]);
 
+  const handleInputBlur = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    if (handleBlur) {
+      handleBlur(e);
+    }
+  }, [handleBlur]);
+
   return (
     <Downshift onSelect={handleSelect}>
       {({
@@ -218,6 +226,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
               value={value}
               onChange={handleInputChange}
               getInputProps={getInputProps}
+              onBlur={handleInputBlur}
             />
             {suffix && (
               <StyledInputSuffix type="button" data-testid="downshift-input-suffix-button" onClick={handleAutoSuggest}>
