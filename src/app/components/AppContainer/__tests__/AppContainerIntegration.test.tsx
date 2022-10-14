@@ -199,7 +199,7 @@ describe('AppContainer (integration)', () => {
       withOrWithoutLicense({
         ...mockStartupParams,
         localTokenData: null,
-        lastOpened: Date.now(),
+        lastOpened: 1,
       }, async (params) => {
         await act(async () => {
           const mockStore = createMockStore({});
