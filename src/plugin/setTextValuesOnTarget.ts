@@ -24,8 +24,8 @@ export default async function setTextValuesOnTarget(
       const style = fontWeight?.toString() || (target.fontName !== figma.mixed ? target.fontName.style : '');
 
       try {
+        await figma.loadFontAsync({ family, style });
         if (fontFamily || fontWeight) {
-          await figma.loadFontAsync({ family, style });
           target.fontName = {
             family,
             style,
