@@ -45,6 +45,8 @@ export function transformName(name: string): TokenTypes {
       return TokenTypes.COMPOSITION;
     case 'border':
       return TokenTypes.BORDER;
+    case 'asset':
+      return TokenTypes.ASSET;
     default:
       return TokenTypes.OTHER;
   }

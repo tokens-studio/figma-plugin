@@ -4,6 +4,8 @@ import * as setTextValuesOnTarget from '../setTextValuesOnTarget';
 import * as setEffectValuesOnTarget from '../setEffectValuesOnTarget';
 import * as setColorValuesOnTarget from '../setColorValuesOnTarget';
 import { BoxShadowTypes } from '@/constants/BoxShadowTypes';
+import { mockFetch } from '../../../tests/__mocks__/fetchMock';
+import { mockCreateImage } from '../../../tests/__mocks__/figmaMock';
 
 describe('Can set values on node', () => {
   const emptyStylesMap = {
@@ -640,6 +642,28 @@ describe('Can set values on node', () => {
     );
     expect(figma.loadFontAsync).not.toHaveBeenCalled();
     expect(textNodeMock.characters).toEqual('foobar');
+  });
+
+  it('can set assets token', async () => {
+    const values = { asset: 'http://image.png' };
+    const data = { asset: 'assets/avatar' };
+    mockFetch.mockImplementationOnce(() => (
+      Promise.resolve({
+        ok: true,
+        arrayBuffer: () => ('5678'),
+      })
+    ));
+    mockCreateImage.mockImplementation(() => ({
+      hash: '1234',
+    }));
+    await setValuesOnNode(solidNodeMock, values, data, emptyStylesMap, emptyThemeInfo);
+    expect(solidNodeMock.fills).toEqual([
+      {
+        type: 'IMAGE',
+        scaleMode: 'FILL',
+        imageHash: '1234',
+      },
+    ]);
   });
 
   it('can set border token', async () => {

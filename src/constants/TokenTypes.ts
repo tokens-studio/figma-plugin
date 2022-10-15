@@ -20,4 +20,5 @@ export enum TokenTypes {
   TEXT_CASE = 'textCase',
   COMPOSITION = 'composition',
   BORDER = 'border',
+  ASSET = 'asset',
 }

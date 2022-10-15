@@ -1,6 +1,6 @@
 import { StoryblokStory } from '@/types';
 
-function formatDate(date?: number | Date) {
+export function formatDate(date?: number | Date) {
   const formatter = new Intl.DateTimeFormat('en', {
     year: 'numeric',
     month: '2-digit',
@@ -15,7 +15,7 @@ function formatDate(date?: number | Date) {
 }
 
 export default async function fetchChangelog(lastOnline: Date, setChangelog: (stories: StoryblokStory['content'][]) => void): Promise<void> {
-  if (process.env.STORYBLOK_ACCESS_TOKEN) {
+  if (process.env.STORYBLOK_ACCESS_TOKEN && lastOnline.toString() !== '0') {
     const token = process.env.STORYBLOK_ACCESS_TOKEN;
     const formattedDate = formatDate(new Date(lastOnline));
     const response = await fetch(

@@ -64,6 +64,7 @@ import IconFile from './file.svg';
 import IconCollapseArrow from './collapse-arrow.svg';
 import IconExpandArrow from './expand-arrow.svg';
 import IconBorder from './border.svg';
+import IconImage from './image.svg';
 
 export {
   IconAdd,
@@ -132,4 +133,5 @@ export {
   IconCollapseArrow,
   IconExpandArrow,
   IconBorder,
+  IconImage,
 };

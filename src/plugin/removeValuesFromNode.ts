@@ -131,6 +131,11 @@ export default function removeValuesFromNode(node: BaseNode, prop: Properties) {
         node.itemSpacing = 0;
       }
       break;
+    case 'asset':
+      if ('fills' in node && typeof node.fills !== 'undefined') {
+        node.fills = [];
+      }
+      break;
     case 'border':
       if ('strokes' in node && typeof node.strokes !== 'undefined') {
         node.strokes = [];
