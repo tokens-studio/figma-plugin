@@ -35,6 +35,7 @@ export enum Properties {
   textCase = 'textCase',
   dimension = 'dimension',
   textDecoration = 'textDecoration',
+  asset = 'asset',
   tokenValue = 'tokenValue',
   value = 'value',
   tokenName = 'tokenName',

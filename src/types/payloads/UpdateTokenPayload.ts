@@ -20,6 +20,7 @@ import {
   SingleCompositionToken,
   SingleSizingToken,
   SingleDimensionToken,
+  SingleAssetToken,
 } from '../tokens';
 
 type GenericTokenInput<T extends TokenTypes, V = string> = {
@@ -53,4 +54,5 @@ export type UpdateTokenPayload =
   | GenericTokenInput<TokenTypes.SIZING, SingleSizingToken['value']>
   | GenericTokenInput<TokenTypes.COMPOSITION, SingleCompositionToken['value']>
   | GenericTokenInput<TokenTypes.DIMENSION, SingleDimensionToken['value']>
+  | GenericTokenInput<TokenTypes.ASSET, SingleAssetToken['value']>
   | GenericTokenInput<TokenTypes.OTHER, SingleOtherToken['value']>;
