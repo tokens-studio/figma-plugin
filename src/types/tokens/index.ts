@@ -28,4 +28,5 @@ export * from './DeepKeyTokenMap';
 export * from './SingleCompositionToken';
 export * from './ImportToken';
 export * from './EditTokenObject';
+export * from './SingleBorderToken';
 export * from './SingleAssetToken';

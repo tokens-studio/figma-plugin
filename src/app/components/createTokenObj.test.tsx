@@ -171,6 +171,10 @@ describe('createTokenObj', () => {
         output: 'composition',
       },
       {
+        input: 'border',
+        output: 'border',
+      },
+      {
         input: 'asset',
         output: 'asset',
       },
