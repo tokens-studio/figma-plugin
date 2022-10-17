@@ -59,7 +59,7 @@ function Settings() {
                   <InfoCircledIcon className="text-primary-500" />
                   <Heading size="medium">Set up where tokens should be stored</Heading>
                 </Stack>
-                <IconButton onClick={closeOnboarding} icon={<Cross1Icon />} />
+                <IconButton data-testid="onboardingCloseButton" onClick={closeOnboarding} icon={<Cross1Icon />} />
               </Stack>
               <p className="text-xs">
                 Connect your tokens to an external source of truth that you can push and pull to. This allows you to use tokens across files.

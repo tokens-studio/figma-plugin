@@ -39,4 +39,12 @@ describe('Settings Component', () => {
 
     expect(store.getState().settings.prefixStylesWithThemeName).toBe(true);
   });
+
+  it('show onboarding explainer syncproviders', () => {
+    store.dispatch.uiState.setOnboardingExplainerSyncProviders('true');
+
+    const result = render(<Settings />);
+
+    expect(result.findByText('Set up where tokens should be stored')).not.toBeUndefined();
+  });
 });
