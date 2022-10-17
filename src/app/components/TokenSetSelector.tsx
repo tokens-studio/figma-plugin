@@ -112,7 +112,7 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
   }, [dispatch]);
 
   const closeOnboarding = useCallback(async () => {
-    dispatch.uiState.setOnboardingFlag(2);
+    dispatch.uiState.setOnboardingExplainerSets('false');
   }, [dispatch]);
 
   const handleDelete = useCallback((set: string) => {
@@ -218,7 +218,7 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
         New set
         <IconAdd />
       </StyledButton>
-      {uiState.onboardingFlag === 1 && (
+      {uiState.onboardingExplainerSets === 'true' && (
         <Box css={{
           display: 'flex', flexDirection: 'column', gap: '$2', padding: '$4', borderBottom: '1px solid $borderMuted', borderTop: '1px solid $borderMuted',
         }}

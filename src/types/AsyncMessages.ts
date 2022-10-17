@@ -24,7 +24,7 @@ export enum AsyncMessageTypes {
   SYNC_STYLES = 'async/sync-styles',
   CREDENTIALS = 'async/credentials',
   CHANGED_TABS = 'async/changed-tabs',
-  SET_ONBOARDINGFLAG = 'async/set-onboardingflag',
+  SET_ONBOARDINGEXPLAINERSETS = 'async/set-onboardingExplainerSets',
   REMOVE_SINGLE_CREDENTIAL = 'async/remove-single-credential',
   SET_STORAGE_TYPE = 'async/set-storage-type',
   SET_NODE_DATA = 'async/set-node-data',
@@ -59,8 +59,8 @@ export type CredentialsAsyncMessageResult = AsyncMessage<AsyncMessageTypes.CREDE
 export type ChangedTabsAsyncMessage = AsyncMessage<AsyncMessageTypes.CHANGED_TABS, { requiresSelectionValues: boolean; }>;
 export type ChangedTabsAsyncMessageResult = AsyncMessage<AsyncMessageTypes.CHANGED_TABS>;
 
-export type SetOnboardingFlagAsyncMessage = AsyncMessage<AsyncMessageTypes.SET_ONBOARDINGFLAG, { onboardingFlag: number; }>;
-export type SetOnboardingFlagAsyncMessageResult = AsyncMessage<AsyncMessageTypes.SET_ONBOARDINGFLAG>;
+export type SetOnboardingExplainerSetsAsyncMessage = AsyncMessage<AsyncMessageTypes.SET_ONBOARDINGEXPLAINERSETS, { onboardingExplainerSets: string; }>;
+export type SetOnboardingExplainerSetsAsyncMessageResult = AsyncMessage<AsyncMessageTypes.SET_ONBOARDINGEXPLAINERSETS>;
 
 export type RemoveSingleCredentialAsyncMessage = AsyncMessage<AsyncMessageTypes.REMOVE_SINGLE_CREDENTIAL, { context: StorageTypeCredentials; }>;
 export type RemoveSingleCredentialAsyncMessageResult = AsyncMessage<AsyncMessageTypes.REMOVE_SINGLE_CREDENTIAL>;
@@ -223,7 +223,7 @@ export type AsyncMessages =
   | ChangedTabsAsyncMessage
   | RemoveSingleCredentialAsyncMessage
   | SetStorageTypeAsyncMessage
-  | SetOnboardingFlagAsyncMessage
+  | SetOnboardingExplainerSetsAsyncMessage
   | SetNodeDataAsyncMessage
   | RemoveTokensByValueAsyncMessage
   | RemapTokensAsyncMessage
@@ -253,7 +253,7 @@ export type AsyncMessageResults =
   | ChangedTabsAsyncMessageResult
   | RemoveSingleCredentialAsyncMessageResult
   | SetStorageTypeAsyncMessageResult
-  | SetOnboardingFlagAsyncMessageResult
+  | SetOnboardingExplainerSetsAsyncMessageResult
   | SetNodeDataAsyncMessageResult
   | RemoveTokensByValueAsyncMessageResult
   | RemapTokensMessageAsyncResult

@@ -1,6 +1,6 @@
 import { FigmaStorageProperty, FigmaStorageType } from './FigmaStorageProperty';
 
-export const OnboardingFlagProperty = new FigmaStorageProperty<number>(
+export const OnboardingExplainerSetsProperty = new FigmaStorageProperty<string>(
   FigmaStorageType.CLIENT_STORAGE,
-  'onboardingFlag',
+  'onboardingExplainerSets',
 );
