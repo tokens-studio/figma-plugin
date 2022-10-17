@@ -48,12 +48,12 @@ describe('Settings Component', () => {
     expect(result.findByText('Set up where tokens should be stored')).not.toBeUndefined();
   });
 
-  it('should call closeRightSection callback', async () => {
+  it('hide onboarding explainer syncproviders', async () => {
     store.dispatch.uiState.setOnboardingExplainerSyncProviders('true');
     const result = render(<Settings />);
 
     fireEvent.click(result.getByTestId('closeButton'));
 
-    expect(result.queryByText('closeButton')).toBeNull();
+    expect(result.queryByText('Set up where tokens should be stored')).toBeNull();
   });
 });

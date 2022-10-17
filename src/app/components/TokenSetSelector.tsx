@@ -228,7 +228,7 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
               <InfoCircledIcon className="text-primary-500" />
               <Heading size="medium">Sets</Heading>
             </Stack>
-            <IconButton onClick={closeOnboarding} icon={<Cross1Icon />} />
+            <IconButton dataCy="closeButton" onClick={closeOnboarding} icon={<Cross1Icon />} />
           </Stack>
           <p className="text-xs">
             Sets allow you to split your tokens up into multiple files.
