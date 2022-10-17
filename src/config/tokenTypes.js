@@ -203,6 +203,16 @@ const tokenTypes = {
       },
     },
   },
+  border: {
+    label: 'Border',
+    property: 'Border',
+    type: 'border',
+    schema: {
+      options: {
+        description: '',
+      },
+    },
+  },
   asset: {
     label: 'Assets',
     property: 'Asset',

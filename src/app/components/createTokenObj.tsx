@@ -43,6 +43,8 @@ export function transformName(name: string): TokenTypes {
       return TokenTypes.PARAGRAPH_SPACING;
     case 'composition':
       return TokenTypes.COMPOSITION;
+    case 'border':
+      return TokenTypes.BORDER;
     case 'asset':
       return TokenTypes.ASSET;
     default:

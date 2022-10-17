@@ -27,6 +27,7 @@ import { EditTokenFormStatus } from '@/constants/EditTokenFormStatus';
 import { StyleOptions } from '@/constants/StyleOptions';
 import Textarea from './Textarea';
 import Heading from './Heading';
+import BorderTokenForm from './BorderTokenForm';
 
 type Props = {
   resolvedTokens: ResolveTokenValuesResult[];
@@ -189,6 +190,31 @@ function EditTokenForm({ resolvedTokens }: Props) {
 
   const handleTypographyValueDownShiftInputChange = React.useCallback((newInputValue: string, property: string) => {
     if (internalEditToken?.type === TokenTypes.TYPOGRAPHY && typeof internalEditToken?.value !== 'string') {
+      setInternalEditToken({
+        ...internalEditToken,
+        value: { ...internalEditToken.value, [property]: newInputValue },
+      });
+    }
+  }, [internalEditToken]);
+
+  const handleBorderValueChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>(
+    (e) => {
+      e.persist();
+      if (internalEditToken?.type === TokenTypes.BORDER && typeof internalEditToken?.value !== 'string') {
+        setInternalEditToken({
+          ...internalEditToken,
+          value: {
+            ...internalEditToken.value,
+            [e.target.name]: e.target.value,
+          },
+        });
+      }
+    },
+    [internalEditToken],
+  );
+
+  const handleBorderValueDownShiftInputChange = React.useCallback((newInputValue: string, property: string) => {
+    if (internalEditToken?.type === TokenTypes.BORDER && typeof internalEditToken?.value !== 'string') {
       setInternalEditToken({
         ...internalEditToken,
         value: { ...internalEditToken.value, [property]: newInputValue },
@@ -364,6 +390,16 @@ function EditTokenForm({ resolvedTokens }: Props) {
             internalEditToken={internalEditToken}
             setTokenValue={handleCompositionChange}
             resolvedTokens={resolvedTokens}
+          />
+        );
+      }
+      case TokenTypes.BORDER: {
+        return (
+          <BorderTokenForm
+            internalEditToken={internalEditToken}
+            resolvedTokens={resolvedTokens}
+            handleBorderValueChange={handleBorderValueChange}
+            handleBorderValueDownShiftInputChange={handleBorderValueDownShiftInputChange}
           />
         );
       }

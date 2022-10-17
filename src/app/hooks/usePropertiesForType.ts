@@ -120,7 +120,7 @@ export function usePropertiesForTokenType(type: TokenTypes, value?: SingleToken[
           },
           {
             label: 'Border',
-            name: Properties.border,
+            name: Properties.borderColor,
           },
         );
         break;

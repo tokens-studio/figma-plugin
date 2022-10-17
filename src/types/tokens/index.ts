@@ -29,4 +29,5 @@ export * from './SingleCompositionToken';
 export * from './ImportToken';
 export * from './EditTokenObject';
 export * from './SingleDimensionToken';
+export * from './SingleBorderToken';
 export * from './SingleAssetToken';

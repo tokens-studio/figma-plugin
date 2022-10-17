@@ -1,5 +1,6 @@
 import { EditTokenFormStatus } from '@/constants/EditTokenFormStatus';
 import { SingleBorderRadiusToken } from './SingleBorderRadiusToken';
+import { SingleBorderToken } from './SingleBorderToken';
 import { SingleBorderWidthToken } from './SingleBorderWidthToken';
 import { SingleBoxShadowToken } from './SingleBoxShadowToken';
 import { SingleColorToken } from './SingleColorToken';
@@ -48,4 +49,5 @@ PartialExceptTypeAndSchema<Named, SingleColorToken<Named, EditTokenObjectPropert
 | PartialExceptTypeAndSchema<Named, SingleSpacingToken<Named, EditTokenObjectProperties>>
 | PartialExceptTypeAndSchema<Named, SingleOtherToken<Named, EditTokenObjectProperties>>
 | PartialExceptTypeAndSchema<Named, SingleCompositionToken<Named, EditTokenObjectProperties>>
-| PartialExceptTypeAndSchema<Named, SingleDimensionToken<Named, EditTokenObjectProperties>>;
+| PartialExceptTypeAndSchema<Named, SingleDimensionToken<Named, EditTokenObjectProperties>>
+| PartialExceptTypeAndSchema<Named, SingleBorderToken<Named, EditTokenObjectProperties>>;

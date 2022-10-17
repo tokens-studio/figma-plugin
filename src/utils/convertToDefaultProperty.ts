@@ -22,7 +22,7 @@ export function convertToDefaultProperty(property: string): string {
     case Properties.borderRadiusBottomRight:
       type = Properties.borderRadius;
       break;
-    case Properties.border:
+    case Properties.borderColor:
       type = Properties.fill;
       break;
     case Properties.borderWidthTop:
