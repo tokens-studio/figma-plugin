@@ -19,7 +19,7 @@ import { TokenTypes } from '@/constants/TokenTypes';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StorageType } from '@/types/StorageType';
 import {
-  ActiveThemeProperty, CheckForChangesProperty, StorageTypeProperty, ThemesProperty, UpdatedAtProperty, ValuesProperty, VersionProperty, OnboardingExplainerSetsProperty,
+  ActiveThemeProperty, CheckForChangesProperty, StorageTypeProperty, ThemesProperty, UpdatedAtProperty, ValuesProperty, VersionProperty, OnboardingExplainerSetsProperty, OnboardingExplainerInspectProperty, OnboardingExplainerSyncProvidersProperty,
 } from '@/figmaStorage';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
@@ -99,6 +99,14 @@ export async function saveStorageType(context: StorageType) {
 
 export async function saveOnboardingExplainerSets(onboardingExplainerSets: string) {
   await OnboardingExplainerSetsProperty.write(onboardingExplainerSets);
+}
+
+export async function saveOnboardingExplainerSyncProviders(onboardingExplainerSyncProviders: string) {
+  await OnboardingExplainerSyncProvidersProperty.write(onboardingExplainerSyncProviders);
+}
+
+export async function saveOnboardingExplainerInspect(onboardingExplainerInspect: string) {
+  await OnboardingExplainerInspectProperty.write(onboardingExplainerInspect);
 }
 
 export async function getSavedStorageType(): Promise<StorageType> {

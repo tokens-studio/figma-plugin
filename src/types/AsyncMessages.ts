@@ -25,6 +25,8 @@ export enum AsyncMessageTypes {
   CREDENTIALS = 'async/credentials',
   CHANGED_TABS = 'async/changed-tabs',
   SET_ONBOARDINGEXPLAINERSETS = 'async/set-onboardingExplainerSets',
+  SET_ONBOARDINGEXPLAINERSYNCPROVIDERS = 'async/set-onboardingExplainerSyncProviders',
+  SET_ONBOARDINGEXPLAINERINSPECT = 'async/set-onboardingExplainerInspect',
   REMOVE_SINGLE_CREDENTIAL = 'async/remove-single-credential',
   SET_STORAGE_TYPE = 'async/set-storage-type',
   SET_NODE_DATA = 'async/set-node-data',
@@ -61,6 +63,12 @@ export type ChangedTabsAsyncMessageResult = AsyncMessage<AsyncMessageTypes.CHANG
 
 export type SetOnboardingExplainerSetsAsyncMessage = AsyncMessage<AsyncMessageTypes.SET_ONBOARDINGEXPLAINERSETS, { onboardingExplainerSets: string; }>;
 export type SetOnboardingExplainerSetsAsyncMessageResult = AsyncMessage<AsyncMessageTypes.SET_ONBOARDINGEXPLAINERSETS>;
+
+export type SetOnboardingExplainerSyncProvidersAsyncMessage = AsyncMessage<AsyncMessageTypes.SET_ONBOARDINGEXPLAINERSYNCPROVIDERS, { onboardingExplainerSyncProviders: string; }>;
+export type SetOnboardingExplainerSyncProvidersAsyncMessageResult = AsyncMessage<AsyncMessageTypes.SET_ONBOARDINGEXPLAINERSYNCPROVIDERS>;
+
+export type SetOnboardingExplainerInspectAsyncMessage = AsyncMessage<AsyncMessageTypes.SET_ONBOARDINGEXPLAINERINSPECT, { onboardingExplainerInspect: string; }>;
+export type SetOnboardingExplainerInspectAsyncMessageResult = AsyncMessage<AsyncMessageTypes.SET_ONBOARDINGEXPLAINERINSPECT>;
 
 export type RemoveSingleCredentialAsyncMessage = AsyncMessage<AsyncMessageTypes.REMOVE_SINGLE_CREDENTIAL, { context: StorageTypeCredentials; }>;
 export type RemoveSingleCredentialAsyncMessageResult = AsyncMessage<AsyncMessageTypes.REMOVE_SINGLE_CREDENTIAL>;
@@ -224,6 +232,8 @@ export type AsyncMessages =
   | RemoveSingleCredentialAsyncMessage
   | SetStorageTypeAsyncMessage
   | SetOnboardingExplainerSetsAsyncMessage
+  | SetOnboardingExplainerInspectAsyncMessage
+  | SetOnboardingExplainerSyncProvidersAsyncMessage
   | SetNodeDataAsyncMessage
   | RemoveTokensByValueAsyncMessage
   | RemapTokensAsyncMessage
@@ -254,6 +264,8 @@ export type AsyncMessageResults =
   | RemoveSingleCredentialAsyncMessageResult
   | SetStorageTypeAsyncMessageResult
   | SetOnboardingExplainerSetsAsyncMessageResult
+  | SetOnboardingExplainerSyncProvidersAsyncMessageResult
+  | SetOnboardingExplainerInspectAsyncMessageResult
   | SetNodeDataAsyncMessageResult
   | RemoveTokensByValueAsyncMessageResult
   | RemapTokensMessageAsyncResult

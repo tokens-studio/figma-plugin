@@ -21,6 +21,8 @@ export function savePluginDataFactory(dispatch: Dispatch, params: StartupMessage
       dispatch.userState.setUserName(user.name);
       dispatch.uiState.setLastOpened(params.lastOpened);
       dispatch.uiState.setOnboardingExplainerSets(params.onboardingExplainerSets);
+      dispatch.uiState.setOnboardingExplainerSyncProviders(params.onboardingExplainerSyncProviders);
+      dispatch.uiState.setOnboardingExplainerInspect(params.onboardingExplainerInspect);
       dispatch.settings.setUISettings(settings);
       identify(user);
     } else {

@@ -66,6 +66,8 @@ export interface UIState {
   changelog: StoryblokStory['content'][];
   lastOpened: number | null;
   onboardingExplainerSets: string;
+  onboardingExplainerSyncProviders: string;
+  onboardingExplainerInspect: string;
   editToken: EditTokenObject;
   showEditForm: boolean;
   tokenFilter: string;
@@ -110,6 +112,8 @@ export const uiState = createModel<RootModel>()({
     changelog: [],
     lastOpened: '',
     onboardingExplainerSets: '',
+    onboardingExplainerSyncProviders: '',
+    onboardingExplainerInspect: '',
     editToken: {
       type: TokenTypes.OTHER,
       status: EditTokenFormStatus.CREATE,
@@ -269,6 +273,18 @@ export const uiState = createModel<RootModel>()({
         onboardingExplainerSets: payload,
       };
     },
+    setOnboardingExplainerSyncProviders(state, payload: string) {
+      return {
+        ...state,
+        onboardingExplainerSyncProviders: payload,
+      };
+    },
+    setOnboardingExplainerInspect(state, payload: string) {
+      return {
+        ...state,
+        onboardingExplainerInspect: payload,
+      };
+    },
     setTokenFilter(state, payload: string) {
       return {
         ...state,
@@ -345,6 +361,18 @@ export const uiState = createModel<RootModel>()({
       AsyncMessageChannel.ReactInstance.message({
         type: AsyncMessageTypes.SET_ONBOARDINGEXPLAINERSETS,
         onboardingExplainerSets: payload,
+      });
+    },
+    setOnboardingExplainerSyncProviders: (payload) => {
+      AsyncMessageChannel.ReactInstance.message({
+        type: AsyncMessageTypes.SET_ONBOARDINGEXPLAINERSYNCPROVIDERS,
+        onboardingExplainerSyncProviders: payload,
+      });
+    },
+    setOnboardingExplainerInspect: (payload) => {
+      AsyncMessageChannel.ReactInstance.message({
+        type: AsyncMessageTypes.SET_ONBOARDINGEXPLAINERINSPECT,
+        onboardingExplainerInspect: payload,
       });
     },
     setActiveTab: (payload: Tabs) => {
