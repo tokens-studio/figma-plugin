@@ -19,7 +19,7 @@ import { TokenTypes } from '@/constants/TokenTypes';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StorageType } from '@/types/StorageType';
 import {
-  ActiveThemeProperty, CheckForChangesProperty, StorageTypeProperty, ThemesProperty, UpdatedAtProperty, ValuesProperty, VersionProperty,
+  ActiveThemeProperty, CheckForChangesProperty, StorageTypeProperty, ThemesProperty, UpdatedAtProperty, ValuesProperty, VersionProperty, OnboardingFlagProperty,
 } from '@/figmaStorage';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
@@ -95,6 +95,10 @@ export async function getTokenData(): Promise<{
 // set storage type (i.e. local or some remote provider)
 export async function saveStorageType(context: StorageType) {
   await StorageTypeProperty.write(context);
+}
+
+export async function saveOnboardingFlag(onboardingFlag: number) {
+  await OnboardingFlagProperty.write(onboardingFlag);
 }
 
 export async function getSavedStorageType(): Promise<StorageType> {

@@ -2,6 +2,7 @@ export * from './credentials';
 export * from './changedTabs';
 export * from './removeSingleCredential';
 export * from './setStorageType';
+export * from './setOnboardingFlag';
 export * from './setNodeData';
 export * from './removeTokensByValue';
 export * from './remapTokens';

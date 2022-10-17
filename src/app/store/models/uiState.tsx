@@ -65,7 +65,7 @@ export interface UIState {
   lastUpdatedAt: string | null;
   changelog: StoryblokStory['content'][];
   lastOpened: number | null;
-  onboardingFlag: boolean | true;
+  onboardingFlag: number;
   editToken: EditTokenObject;
   showEditForm: boolean;
   tokenFilter: string;
@@ -109,7 +109,7 @@ export const uiState = createModel<RootModel>()({
     lastUpdatedAt: null,
     changelog: [],
     lastOpened: '',
-    onboardingFlag: true,
+    onboardingFlag: null,
     editToken: {
       type: TokenTypes.OTHER,
       status: EditTokenFormStatus.CREATE,
@@ -263,7 +263,7 @@ export const uiState = createModel<RootModel>()({
         lastOpened: payload,
       };
     },
-    setOnboardingFlag(state, payload: boolean) {
+    setOnboardingFlag(state, payload: number) {
       return {
         ...state,
         onboardingFlag: payload,
@@ -339,6 +339,12 @@ export const uiState = createModel<RootModel>()({
     setLastOpened: (payload) => {
       fetchChangelog(payload, (result) => {
         dispatch.uiState.setChangelog(result);
+      });
+    },
+    setOnboardingFlag: (payload) => {
+      AsyncMessageChannel.ReactInstance.message({
+        type: AsyncMessageTypes.SET_ONBOARDINGFLAG,
+        onboardingFlag: payload,
       });
     },
     setActiveTab: (payload: Tabs) => {

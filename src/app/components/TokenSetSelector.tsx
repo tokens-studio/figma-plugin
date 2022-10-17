@@ -2,7 +2,6 @@ import React, { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { InfoCircledIcon, Cross1Icon } from '@radix-ui/react-icons';
 import { track } from '@/utils/analytics';
-import getOnboardingFlag from '@/utils/getOnboardingFlag';
 import useConfirm from '../hooks/useConfirm';
 import { Dispatch } from '../store';
 import Button from './Button';
@@ -112,10 +111,8 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
     dispatch.tokenState.setTokenSetOrder(values);
   }, [dispatch]);
 
-  const closeOnboarding = useCallback(async (): Promise<boolean> => {
-    dispatch.uiState.setOnboardingFlag(false);
-    console.log('getOnboarding: ', await getOnboardingFlag());
-    return getOnboardingFlag();
+  const closeOnboarding = useCallback(async () => {
+    dispatch.uiState.setOnboardingFlag(2);
   }, [dispatch]);
 
   const handleDelete = useCallback((set: string) => {
@@ -221,7 +218,7 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
         New set
         <IconAdd />
       </StyledButton>
-      {uiState.onboardingFlag && (
+      {uiState.onboardingFlag === 1 && (
         <Box css={{
           display: 'flex', flexDirection: 'column', gap: '$2', padding: '$4', borderBottom: '1px solid $borderMuted', borderTop: '1px solid $borderMuted',
         }}

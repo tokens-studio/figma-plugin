@@ -1,7 +1,6 @@
 import { FigmaStorageProperty, FigmaStorageType } from './FigmaStorageProperty';
 
-export const OnboardingFlagProperty = new FigmaStorageProperty<boolean>(
+export const OnboardingFlagProperty = new FigmaStorageProperty<number>(
   FigmaStorageType.CLIENT_STORAGE,
   'onboardingFlag',
-  (value) => String(value),
 );
