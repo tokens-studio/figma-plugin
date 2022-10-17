@@ -33,6 +33,12 @@ export function getLabelForProperty(key: string): React.ReactElement | string {
     case 'fontWeight': {
       return 'Weight';
     }
+    case 'width': {
+      return 'Width';
+    }
+    case 'style': {
+      return 'Style';
+    }
 
     default: {
       return key;

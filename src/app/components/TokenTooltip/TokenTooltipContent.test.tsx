@@ -123,7 +123,6 @@ const tokens: SingleToken[] = [
     },
     description: 'regular typography token',
   },
-
   {
     name: 'typography.headlines.default',
     type: TokenTypes.TYPOGRAPHY,
@@ -216,6 +215,21 @@ const tokens: SingleToken[] = [
     rawValue: '{doesntexist}',
     description: 'a broken reference',
     failedToResolve: true,
+  },
+  {
+    name: 'border.regular',
+    type: TokenTypes.BORDER,
+    value: {
+      color: 'test-value-object-value',
+      width: '12px',
+      style: 'solid',
+    },
+    rawValue: {
+      color: 'test-value-object-value',
+      width: '12px',
+      style: 'solid',
+    },
+    description: 'border token',
   },
 ];
 

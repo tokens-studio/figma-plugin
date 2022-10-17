@@ -9,13 +9,18 @@ import {
   textStyleMatchesTypographyToken,
 } from './figmaUtils/styleMatchers';
 import { clearStyleIdBackup, getNonLocalStyle, setStyleIdBackup } from './figmaUtils/styleUtils';
-import { isPrimitiveValue, isSingleBoxShadowValue, isSingleTypographyValue } from '@/utils/is';
+import {
+  isPrimitiveValue, isSingleBoxShadowValue, isSingleTypographyValue,
+} from '@/utils/is';
 import { matchStyleName } from '@/utils/matchStyleName';
 import { trySetStyleId } from '@/utils/trySetStyleId';
 import { transformValue } from './helpers';
 import setColorValuesOnTarget from './setColorValuesOnTarget';
 import setEffectValuesOnTarget from './setEffectValuesOnTarget';
 import setTextValuesOnTarget from './setTextValuesOnTarget';
+import setBorderValuesOnTarget from './setBorderValuesOnTarget';
+import { isSingleBorderValue } from '@/utils/is/isSingleBorderValue';
+import setImageValuesOnTarget from './setImageValuesOnTarget';
 
 // @README values typing is wrong
 
@@ -41,6 +46,11 @@ export default async function setValuesOnNode(
       && node.type !== 'STICKY'
       && node.type !== 'CODE_BLOCK'
     ) {
+      // set border token
+      if (values.border && isSingleBorderValue(values.border)) {
+        setBorderValuesOnTarget(node, { value: values.border });
+      }
+
       if (typeof values.borderRadius !== 'undefined' && isPrimitiveValue(values.borderRadius)) {
         const individualBorderRadius = String(values.borderRadius).split(' ');
         switch (individualBorderRadius.length) {
@@ -287,11 +297,11 @@ export default async function setValuesOnNode(
       }
 
       // BORDER COLOR
-      if (typeof values.border !== 'undefined' && typeof values.border === 'string') {
-        if ('strokes' in node && data.border) {
-          const pathname = convertTokenNameToPath(data.border, stylePathPrefix, stylePathSlice);
+      if (typeof values.borderColor !== 'undefined' && typeof values.borderColor === 'string') {
+        if ('strokes' in node && data.borderColor) {
+          const pathname = convertTokenNameToPath(data.borderColor, stylePathPrefix, stylePathSlice);
           let matchingStyleId = matchStyleName(
-            data.border,
+            data.borderColor,
             pathname,
             activeThemeObject?.$figmaStyleReferences ?? {},
             figmaStyleMaps.paintStyles,
@@ -302,7 +312,7 @@ export default async function setValuesOnNode(
             const styleIdBackupKey = 'strokeStyleId_original';
             const nonLocalStyle = getNonLocalStyle(node, styleIdBackupKey, 'strokes');
             if (nonLocalStyle) {
-              if (paintStyleMatchesColorToken(nonLocalStyle, values.border)) {
+              if (paintStyleMatchesColorToken(nonLocalStyle, values.borderColor)) {
                 // Non-local style matches - use this and clear style id backup:
                 matchingStyleId = nonLocalStyle.id;
                 clearStyleIdBackup(node, styleIdBackupKey);
@@ -317,7 +327,7 @@ export default async function setValuesOnNode(
           }
 
           if (!matchingStyleId || (matchingStyleId && !(await trySetStyleId(node, 'stroke', matchingStyleId)))) {
-            setColorValuesOnTarget(node, { value: values.border }, 'strokes');
+            setColorValuesOnTarget(node, { value: values.borderColor }, 'strokes');
           }
         }
       }
@@ -403,6 +413,12 @@ export default async function setValuesOnNode(
 
       if ('paddingLeft' in node && typeof values.paddingLeft !== 'undefined' && isPrimitiveValue(values.paddingLeft)) {
         node.paddingLeft = transformValue(String(values.paddingLeft), 'spacing');
+      }
+
+      if (values.asset && typeof values.asset === 'string') {
+        if ('fills' in node && data.asset) {
+          await setImageValuesOnTarget(node, { value: values.asset });
+        }
       }
 
       // Raw value for text layers
