@@ -93,6 +93,7 @@ export const MoreButton: React.FC<Props> = ({
     if (givenProperties.clear) {
       givenProperties.clear.map((item) => Object.assign(newProps, { [item]: 'delete' }));
     }
+
     setPluginValue(newProps);
   }, [active, token.name, setPluginValue]);
 

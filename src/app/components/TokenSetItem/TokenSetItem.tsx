@@ -106,7 +106,6 @@ export function TokenSetItem({
           <IconGrabber />
         </StyledGrabber>
       ) : null}
-      {extraBefore}
     </StyledBeforeFlex>
   );
 
@@ -135,6 +134,7 @@ export function TokenSetItem({
           >
             {item.label}
           </Box>
+          {extraBefore}
         </StyledButton>
       ) : (
         <ContextMenu>

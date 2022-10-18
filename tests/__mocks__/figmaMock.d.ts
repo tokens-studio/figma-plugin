@@ -18,3 +18,4 @@ export const mockRootSetSharedPluginData: jest.Mock;
 export const mockRootGetSharedPluginData: jest.Mock;
 export const mockGetNodeById: jest.Mock;
 export const mockScrollAndZoomIntoView: jest.Mock;
+export const mockCreateImage: jest.Mock;
