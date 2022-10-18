@@ -20,7 +20,7 @@ export function useTypeForProperty(property: string): string {
       case Properties.borderRadiusBottomLeft:
       case Properties.borderRadiusBottomRight:
         return Properties.borderRadius;
-      case Properties.border:
+      case Properties.borderColor:
         return Properties.fill;
       case Properties.borderWidthTop:
       case Properties.borderWidthLeft:

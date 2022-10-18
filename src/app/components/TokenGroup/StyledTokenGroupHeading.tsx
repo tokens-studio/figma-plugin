@@ -40,7 +40,7 @@ export const StyledTokenGroupHeadingCollapsable = styled('button', {
   variants: {
     collapsed: {
       true: {
-        opacity: 0.5,
+        opacity: 0.75,
       },
     },
   },

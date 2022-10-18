@@ -12,6 +12,7 @@ export default function StylesDropdown() {
 
   const { pullStyles } = useTokens();
   const { createStylesFromTokens } = useTokens();
+  const { syncStyles } = useTokens();
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>
@@ -22,6 +23,7 @@ export default function StylesDropdown() {
       </DropdownMenuTrigger>
 
       <DropdownMenuContent side="top">
+        <DropdownMenuItem textValue="Sync styles" onSelect={syncStyles}>Sync styles</DropdownMenuItem>
         <DropdownMenuItem textValue="Import styles" disabled={editProhibited} onSelect={pullStyles}>Import styles</DropdownMenuItem>
         <DropdownMenuItem textValue="Create styles" onSelect={createStylesFromTokens}>Create styles</DropdownMenuItem>
       </DropdownMenuContent>

@@ -16,6 +16,7 @@ describe('setTextValuesOnTarget', () => {
       textDecoration: 'NONE',
       fontSize: 24,
       paragraphSpacing: 0,
+      paragraphIndent: 0,
       letterSpacing: 0,
       lineHeight: 'AUTO',
     };
@@ -34,6 +35,17 @@ describe('setTextValuesOnTarget', () => {
   it('sets fontWeight if that is given', async () => {
     await setTextValuesOnTarget(textNodeMock, { value: { fontWeight: 'Bold' } });
     expect(textNodeMock).toEqual({ ...textNodeMock, fontName: { ...textNodeMock.fontName, style: 'Bold' } });
+  });
+
+  it('sets fontFamily and fontWeight if that is given', async () => {
+    loadFontAsyncSpy.mockImplementationOnce(() => (
+      Promise.reject()
+    ));
+    loadFontAsyncSpy.mockImplementation(() => (
+      Promise.resolve()
+    ));
+    await setTextValuesOnTarget(textNodeMock, { value: { fontFamily: 'Roboto', fontWeight: 'Bold' } });
+    expect(textNodeMock).toEqual({ ...textNodeMock, fontName: { ...textNodeMock.fontName, family: 'Roboto', style: 'Bold' } });
   });
 
   it('converts a numerical fontWeight and sets to the node', async () => {
@@ -85,5 +97,10 @@ describe('setTextValuesOnTarget', () => {
     expect(textNodeMock).toEqual({
       ...textNodeMock,
     });
+  });
+
+  it('sets paragraphIndent if that is given', async () => {
+    await setTextValuesOnTarget(textNodeMock, { value: { paragraphIndent: 5 } });
+    expect(textNodeMock).toEqual({ ...textNodeMock, paragraphIndent: 5 });
   });
 });

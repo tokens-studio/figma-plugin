@@ -7,7 +7,7 @@ import {
 import stringifyTokens from '@/utils/stringifyTokens';
 import formatTokens from '@/utils/formatTokens';
 import { mergeTokenGroups, resolveTokenValues } from '@/plugin/tokenHelpers';
-import useConfirm from '../hooks/useConfirm';
+import useConfirm, { ResolveCallbackPayload } from '../hooks/useConfirm';
 import { Properties } from '@/constants/Properties';
 import { track } from '@/utils/analytics';
 import { checkIfAlias } from '@/utils/alias';
@@ -26,6 +26,7 @@ import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { NodeInfo } from '@/types/NodeInfo';
 import { TokensContext } from '@/context';
 import { Dispatch, RootState } from '../store';
+import { DeleteTokenPayload } from '@/types/payloads';
 
 type ConfirmResult =
   ('textStyles' | 'colorStyles' | 'effectStyles')[]
@@ -40,6 +41,8 @@ type GetFormattedTokensOptions = {
 };
 
 type RemoveTokensByValueData = { property: Properties; nodes: NodeInfo[] }[];
+
+export type SyncOption = 'removeStyle' | 'renameStyle';
 
 export default function useTokens() {
   const dispatch = useDispatch<Dispatch>();
@@ -200,7 +203,7 @@ export default function useTokens() {
       const resolved = resolveTokenValues(mergeTokenGroups(tokens, usedTokenSet));
       const withoutIgnoredAndSourceTokens = resolved.filter((token) => (
         !token.name.split('.').some((part) => part.startsWith('_')) // filter out ignored tokens
-          && (!token.internal__Parent || enabledTokenSets.includes(token.internal__Parent)) // filter out SOURCE tokens
+        && (!token.internal__Parent || enabledTokenSets.includes(token.internal__Parent)) // filter out SOURCE tokens
       ));
 
       const tokensToCreate = withoutIgnoredAndSourceTokens.filter((token) => (
@@ -220,6 +223,56 @@ export default function useTokens() {
     }
   }, [confirm, usedTokenSet, tokens, settings, dispatch.tokenState]);
 
+  const syncStyles = useCallback(async () => {
+    const userConfirmation = await confirm({
+      text: 'Sync styles',
+      description: 'Choose sync option',
+      choices: [
+        { key: 'removeStyles', label: 'Remove styles without connection' },
+        { key: 'renameStyles', label: 'Rename styles' },
+      ],
+    }) as ResolveCallbackPayload<any>;
+
+    if (userConfirmation && Array.isArray(userConfirmation.data) && userConfirmation.data.length) {
+      track('syncStyles', userConfirmation.data);
+
+      const syncStyleResult = await AsyncMessageChannel.ReactInstance.message({
+        type: AsyncMessageTypes.SYNC_STYLES,
+        tokens,
+        settings: {
+          renameStyle: userConfirmation.data.includes('renameStyles'),
+          removeStyle: userConfirmation.data.includes('removeStyles'),
+        },
+      });
+      dispatch.tokenState.assignStyleIdsToCurrentTheme(syncStyleResult.styleIdsToCreate);
+      dispatch.tokenState.removeStyleIdsFromThemes(syncStyleResult.styleIdsToRemove);
+    }
+  }, [confirm, tokens, dispatch.tokenState]);
+
+  const renameStylesFromTokens = useCallback(async ({ oldName, newName, parent }: { oldName: string, newName: string, parent: string }) => {
+    track('renameStyles', { oldName, newName, parent });
+
+    const renameStylesResult = await AsyncMessageChannel.ReactInstance.message({
+      type: AsyncMessageTypes.RENAME_STYLES,
+      oldName,
+      newName,
+      parent,
+      settings,
+    });
+    dispatch.tokenState.renameStyleIdsToCurrentTheme(renameStylesResult.styleIds, newName);
+  }, [settings, dispatch.tokenState]);
+
+  const removeStylesFromTokens = useCallback(async (token: DeleteTokenPayload) => {
+    track('removeStyles', token);
+
+    const removeStylesResult = await AsyncMessageChannel.ReactInstance.message({
+      type: AsyncMessageTypes.REMOVE_STYLES,
+      token,
+      settings,
+    });
+    dispatch.tokenState.removeStyleIdsFromThemes(removeStylesResult.styleIds);
+  }, [settings, dispatch.tokenState]);
+
   return useMemo(() => ({
     isAlias,
     getTokenValue,
@@ -231,7 +284,10 @@ export default function useTokens() {
     remapTokensInGroup,
     removeTokensByValue,
     handleRemap,
+    renameStylesFromTokens,
     handleBulkRemap,
+    removeStylesFromTokens,
+    syncStyles,
   }), [
     isAlias,
     getTokenValue,
@@ -243,6 +299,9 @@ export default function useTokens() {
     remapTokensInGroup,
     removeTokensByValue,
     handleRemap,
+    renameStylesFromTokens,
     handleBulkRemap,
+    removeStylesFromTokens,
+    syncStyles,
   ]);
 }

@@ -1,0 +1,20 @@
+import { AsyncMessageChannelHandlers } from '@/AsyncMessageChannel';
+import { AsyncMessageTypes } from '@/types/AsyncMessages';
+import syncStylesFn from '../syncStyles';
+
+export const syncStyles: AsyncMessageChannelHandlers[AsyncMessageTypes.SYNC_STYLES] = async (msg) => {
+  try {
+    const styleIds = await syncStylesFn(msg.tokens, msg.settings);
+    return {
+      styleIdsToCreate: styleIds.styleIdsToCreate,
+      styleIdsToRemove: styleIds.styleIdsToRemove,
+    };
+  } catch (e) {
+    console.error(e);
+  }
+
+  return {
+    styleIdsToCreate: {},
+    styleIdsToRemove: [],
+  };
+};
