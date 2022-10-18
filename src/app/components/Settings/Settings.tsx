@@ -38,8 +38,10 @@ function Settings() {
   );
 
   const handleResetButton = React.useCallback(() => {
-    dispatch.uiState.setLastOpened(0);
-  }, [dispatch.uiState]);
+    // dispatch.uiState.setOnboardingExplainerSets("true");
+    // dispatch.uiState.setOnboardingExplainerInspect("true");
+    // dispatch.uiState.setOnboardingExplainerSyncproviders("true");
+  }, [dispatch]);
 
   return (
     <Box className="content scroll-container">
