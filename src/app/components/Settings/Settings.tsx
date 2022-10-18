@@ -2,7 +2,6 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import type { CheckedState } from '@radix-ui/react-checkbox';
-import { InfoCircledIcon, Cross1Icon } from '@radix-ui/react-icons';
 import SyncSettings from '../SyncSettings';
 import Checkbox from '../Checkbox';
 import Heading from '../Heading';
@@ -14,9 +13,15 @@ import Box from '../Box';
 import AddLicenseKey from '../AddLicenseKey/AddLicenseKey';
 import { Divider } from '../Divider';
 import { track } from '@/utils/analytics';
-import IconButton from '../IconButton';
+import OnboardingExplainer from '../OnboardingExplainer';
 
 function Settings() {
+  const onboardingData = {
+    title: 'Set up where tokens should be stored',
+    text: 'Connect your tokens to an external source of truth that you can push and pull to. This allows you to use tokens across files.',
+    url: 'https://docs.figmatokens.com/sync/sync?ref=onboarding_explainer_syncproviders',
+  };
+
   const ignoreFirstPartForStyles = useSelector(ignoreFirstPartForStylesSelector);
   const prefixStylesWithThemeName = useSelector(prefixStylesWithThemeNameSelector);
   const uiState = useSelector(uiStateSelector);
@@ -50,29 +55,7 @@ function Settings() {
         <Divider />
         {uiState.onboardingExplainerSyncProviders === 'true' && (
           <Stack direction="column" gap={2} css={{ padding: '$4' }}>
-            <Box css={{
-              display: 'flex', flexDirection: 'column', gap: '$2', padding: '$4', border: '1px solid $borderMuted', borderTop: '1px solid $borderMuted',
-            }}
-            >
-              <Stack direction="row" gap={2} justify="between">
-                <Stack direction="row" justify="between" gap={2} align="center">
-                  <InfoCircledIcon className="text-primary-500" />
-                  <Heading size="medium">Set up where tokens should be stored</Heading>
-                </Stack>
-                <IconButton dataCy="closeButton" onClick={closeOnboarding} icon={<Cross1Icon />} />
-              </Stack>
-              <p className="text-xs">
-                Connect your tokens to an external source of truth that you can push and pull to. This allows you to use tokens across files.
-              </p>
-              <a
-                target="_blank"
-                rel="noreferrer"
-                href="https://docs.figmatokens.com/sync/sync?ref=onboarding_explainer_syncproviders"
-                className="inline-flex text-xs text-primary-500"
-              >
-                Read more
-              </a>
-            </Box>
+            <OnboardingExplainer data={onboardingData} closeOnboarding={closeOnboarding} />
           </Stack>
         )}
         <SyncSettings />

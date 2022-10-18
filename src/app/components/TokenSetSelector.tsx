@@ -1,6 +1,5 @@
 import React, { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { InfoCircledIcon, Cross1Icon } from '@radix-ui/react-icons';
 import { track } from '@/utils/analytics';
 import useConfirm from '../hooks/useConfirm';
 import { Dispatch } from '../store';
@@ -8,7 +7,6 @@ import Button from './Button';
 import Heading from './Heading';
 import IconAdd from '@/icons/add.svg';
 import Input from './Input';
-import IconButton from './IconButton';
 import Modal from './Modal';
 import TokenSetTree from './TokenSetTree';
 import Box from './Box';
@@ -17,6 +15,7 @@ import {
   editProhibitedSelector, tokensSelector, uiStateSelector,
 } from '@/selectors';
 import Stack from './Stack';
+import OnboardingExplainer from './OnboardingExplainer';
 
 const StyledButton = styled('button', {
   flexShrink: 0,
@@ -35,6 +34,12 @@ const StyledButton = styled('button', {
 });
 
 export default function TokenSetSelector({ saveScrollPositionSet }: { saveScrollPositionSet: (tokenSet: string) => void }) {
+  const onboardingData = {
+    title: 'Sets',
+    text: 'Sets allow you to split your tokens up into multiple files.\n\nYou can activate different sets to control theming.',
+    url: 'https://docs.figmatokens.com/themes/token-sets?ref=onboarding_explainer_sets',
+  };
+
   const tokens = useSelector(tokensSelector);
   const editProhibited = useSelector(editProhibitedSelector);
   const uiState = useSelector(uiStateSelector);
@@ -219,32 +224,7 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
         <IconAdd />
       </StyledButton>
       {uiState.onboardingExplainerSets === 'true' && (
-        <Box css={{
-          display: 'flex', flexDirection: 'column', gap: '$2', padding: '$4', borderBottom: '1px solid $borderMuted', borderTop: '1px solid $borderMuted',
-        }}
-        >
-          <Stack direction="row" gap={2} justify="between">
-            <Stack direction="row" justify="between" gap={2} align="center">
-              <InfoCircledIcon className="text-primary-500" />
-              <Heading size="medium">Sets</Heading>
-            </Stack>
-            <IconButton dataCy="closeButton" onClick={closeOnboarding} icon={<Cross1Icon />} />
-          </Stack>
-          <p className="text-xs">
-            Sets allow you to split your tokens up into multiple files.
-            <br />
-            <br />
-            You can activate different sets to control theming.
-          </p>
-          <a
-            target="_blank"
-            rel="noreferrer"
-            href="https://docs.figmatokens.com/themes/token-sets?ref=onboarding_explainer_sets"
-            className="inline-flex text-xs text-primary-500"
-          >
-            Read more
-          </a>
-        </Box>
+        <OnboardingExplainer data={onboardingData} closeOnboarding={closeOnboarding} />
       )}
     </Box>
   );
