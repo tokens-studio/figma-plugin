@@ -16,8 +16,8 @@ export const remapTokens: AsyncMessageChannelHandlers[AsyncMessageTypes.REMAP_TO
     const allWithData = await defaultNodeManager.findNodesWithData({
       updateMode,
     });
-    console.log('msg', msg)
-    console.log("allwih", allWithData)
+    console.log('msg', msg);
+    console.log('allwih', allWithData);
     // Go through allWithData and update all appearances of oldName to newName
     const updatedNodes: NodeManagerNode[] = [];
     const updatedNodesWithOldTokens: NodeManagerNode[] = [];
@@ -53,13 +53,14 @@ export const remapTokens: AsyncMessageChannelHandlers[AsyncMessageTypes.REMAP_TO
     });
     if (updateMode === UpdateMode.SELECTION && category && tokens) {
       const tokensMap = tokenArrayGroupToMap(tokens);
-      console.log('updatedNodesWithOldTokens', updatedNodesWithOldTokens, 'tokensMap', tokensMap)
-      console.log('updatedNodes', updatedNodes, 'tokensMap', tokensMap)
+      console.log('updatedNodesWithOldTokens', updatedNodesWithOldTokens, 'tokensMap', tokensMap);
+      console.log('updatedNodes', updatedNodes, 'tokensMap', tokensMap);
       if (category === TokenTypes.COMPOSITION) {
         await updatePluginData({
           entries: updatedNodesWithOldTokens, values: { [category]: newName }, shouldOverride: true, tokensMap,
         });
       } else {
+        console.log('updateplugindata');
         await updatePluginData({
           entries: updatedNodes, values: { [category]: newName }, shouldOverride: true, tokensMap,
         });
