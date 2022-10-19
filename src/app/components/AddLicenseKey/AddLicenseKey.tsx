@@ -98,10 +98,10 @@ export default function AddLicenseKey() {
         <Stack direction="row" gap={2} align="center">
           <ProBadge />
           {existingKey && (
-          <ManageSubscriptionLink href="https://account.figmatokens.com/" target="_blank">
-            Manage subscription
-          </ManageSubscriptionLink>
-          ) }
+            <ManageSubscriptionLink href="https://account.figmatokens.com/" target="_blank">
+              Manage subscription
+            </ManageSubscriptionLink>
+          )}
         </Stack>
       </Stack>
       <Stack
