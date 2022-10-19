@@ -79,13 +79,13 @@ export default function AddLicenseKey() {
     setLicenseKey(ev.target.value.trim());
   }, []);
 
-  const removeLicenseKeyButton = existingKey && (
+  const removeLicenseKeyButton = licenseDetails.entitlements.length !== 0 && (
     <Button variant="primary" onClick={removeKey} disabled={existingKey !== newKey}>
       Remove key
     </Button>
   );
 
-  const addLicenseKeyButton = !existingKey && (
+  const addLicenseKeyButton = licenseDetails.entitlements.length === 0 && (
     <Button variant="primary" onClick={addKey} disabled={existingKey === newKey}>
       Add license key
     </Button>
@@ -97,7 +97,7 @@ export default function AddLicenseKey() {
         <Heading size="medium">License key</Heading>
         <Stack direction="row" gap={2} align="center">
           <ProBadge />
-          {existingKey && (
+          {licenseDetails.entitlements.length !== 0 && (
             <ManageSubscriptionLink href="https://account.figmatokens.com/" target="_blank">
               Manage subscription
             </ManageSubscriptionLink>

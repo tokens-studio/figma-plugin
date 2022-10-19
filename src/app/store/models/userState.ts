@@ -114,6 +114,7 @@ export const userState = createModel<RootModel>()({
           licenseKey: key,
         });
       }
+      dispatch.userState.setLicenseKey(key);
     },
     removeLicenseKey: async (payload, rootState) => {
       const { licenseKey, userId } = rootState.userState;
