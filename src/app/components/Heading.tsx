@@ -7,6 +7,9 @@ const StyledHeading = styled('p', {
   letterSpacing: 0,
   variants: {
     size: {
+      xsmall: {
+        fontSize: '$xsmall',
+      },
       small: {
         fontSize: '$small',
       },
@@ -26,7 +29,7 @@ const StyledHeading = styled('p', {
 });
 
 type HeadingProps = {
-  size?: 'small' | 'medium' | 'large';
+  size?: 'xsmall' | 'small' | 'medium' | 'large';
   children: React.ReactNode;
   id?: string;
   muted?: boolean;

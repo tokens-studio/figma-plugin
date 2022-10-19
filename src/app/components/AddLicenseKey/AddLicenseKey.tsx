@@ -79,13 +79,13 @@ export default function AddLicenseKey() {
     setLicenseKey(ev.target.value.trim());
   }, []);
 
-  const removeLicenseKeyButton = existingKey && (
+  const removeLicenseKeyButton = existingKey && !licenseKeyError && (
     <Button variant="primary" onClick={removeKey} disabled={existingKey !== newKey}>
       Remove key
     </Button>
   );
 
-  const addLicenseKeyButton = !existingKey && (
+  const addLicenseKeyButton = (!existingKey || licenseKeyError) && (
     <Button variant="primary" onClick={addKey} disabled={existingKey === newKey}>
       Add license key
     </Button>
