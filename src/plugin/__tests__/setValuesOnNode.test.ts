@@ -447,7 +447,6 @@ describe('Can set values on node', () => {
     expect(frameNodeMock.paddingRight).toBe(20);
     expect(frameNodeMock.paddingTop).toBe(20);
     expect(frameNodeMock.paddingBottom).toBe(20);
-    expect(frameNodeMock.itemSpacing).toBe(20);
   });
 
   it('can set horizontalPadding', async () => {

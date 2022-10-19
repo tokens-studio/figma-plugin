@@ -75,6 +75,8 @@ export default function OnboardingFlow() {
         <Heading size="medium">Get Started</Heading>
         {onboardingflow.map((item, index) => (
           <Stack
+            // eslint-disable-next-line react/no-array-index-key
+            key={`onboarding-${index}`}
             direction="column"
             gap={2}
             align="start"

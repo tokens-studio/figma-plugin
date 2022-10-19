@@ -226,7 +226,7 @@ export default function useTokens() {
   const syncStyles = useCallback(async () => {
     const userConfirmation = await confirm({
       text: 'Sync styles',
-      description: 'Choose sync option',
+      description: 'This will try to rename any styles that were connected via Themes and try to remove any styles that are not connected to any theme.',
       choices: [
         { key: 'removeStyles', label: 'Remove styles without connection' },
         { key: 'renameStyles', label: 'Rename styles' },

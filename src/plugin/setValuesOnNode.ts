@@ -342,7 +342,6 @@ export default async function setValuesOnNode(
             node.paddingRight = spacing;
             node.paddingTop = spacing;
             node.paddingBottom = spacing;
-            node.itemSpacing = spacing;
             break;
           case 2:
             node.paddingTop = transformValue(String(individualSpacing[0]), 'spacing');

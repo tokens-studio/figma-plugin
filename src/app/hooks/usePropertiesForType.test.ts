@@ -64,7 +64,6 @@ describe('usePropertiesForTokenType', () => {
           clear: [
             Properties.horizontalPadding,
             Properties.verticalPadding,
-            Properties.itemSpacing,
             Properties.paddingLeft,
             Properties.paddingRight,
             Properties.paddingTop,
@@ -254,7 +253,6 @@ describe('usePropertiesForTokenType', () => {
         clear: [
           Properties.horizontalPadding,
           Properties.verticalPadding,
-          Properties.itemSpacing,
           Properties.paddingLeft,
           Properties.paddingRight,
           Properties.paddingTop,
