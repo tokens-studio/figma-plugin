@@ -25,6 +25,7 @@ import { EditTokenFormStatus } from '@/constants/EditTokenFormStatus';
 import { StyleOptions } from '@/constants/StyleOptions';
 import Textarea from './Textarea';
 import Heading from './Heading';
+import Box from './Box';
 
 type Props = {
   resolvedTokens: ResolveTokenValuesResult[];
@@ -415,15 +416,16 @@ function EditTokenForm({ resolvedTokens }: Props) {
         {renderTokenForm()}
 
         {internalEditToken?.schema?.explainer && <div className="mt-1 text-gray-600 text-xxs">{internalEditToken.schema.explainer}</div>}
-        <Heading size="small">Description</Heading>
-
-        <Textarea
-          key="description"
-          value={internalEditToken?.description || ''}
-          onChange={handleDescriptionChange}
-          rows={3}
-          border
-        />
+        <Box>
+          <Heading size="xsmall">Description</Heading>
+          <Textarea
+            key="description"
+            value={internalEditToken?.description || ''}
+            onChange={handleDescriptionChange}
+            rows={3}
+            border
+          />
+        </Box>
         <Stack direction="row" justify="end" gap={2}>
           <Button variant="secondary" type="button" onClick={handleReset}>
             Cancel

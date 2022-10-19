@@ -278,6 +278,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
               flexDirection: 'row',
               alignItems: 'center',
               padding: '$4',
+              paddingLeft: 0,
             }}
           >
             <IconButton
