@@ -94,7 +94,7 @@ export default function AddLicenseKey() {
   return (
     <Stack direction="column" gap={3} css={{ padding: '0 $4' }}>
       <Stack direction="row" gap={2} align="center" justify="between">
-        <Heading size="medium">License key</Heading>
+        <Heading size="small">License key</Heading>
         <Stack direction="row" gap={2} align="center">
           <ProBadge />
           {existingKey && (
