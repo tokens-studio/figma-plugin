@@ -59,9 +59,19 @@ export default async function syncStyles(tokens: Record<string, AnyTokenList>, s
     });
   }
 
-  // Rename styles that are associated with a token and where the token name is different than the style name
+  // Remove and Create to rename style
   let styleIdsToCreate: Record<string, string> = {};
   if (settings.renameStyle && activeThemeObject) {
+    if (!settings.removeStyle) {
+      allStyles = allStyles.filter((style) => style.name.startsWith(`${activeThemeObject.name}/`)).filter((style) => {
+        if (!Object.keys(styleSet).some((pathName) => isMatchingStyle(pathName, style))) {
+          style.remove();
+          styleIdsToRemove.push(style.id);
+          return false;
+        }
+        return true;
+      });
+    }
     const tokensToCreate = generateTokensToCreate(activeThemeObject, tokens);
     styleIdsToCreate = await updateStyles(tokensToCreate, true, { prefixStylesWithThemeName: true });
   }
@@ -80,7 +90,6 @@ export default async function syncStyles(tokens: Record<string, AnyTokenList>, s
       }
     }
   });
-
   return {
     styleIdsToRemove,
     styleIdsToCreate,
