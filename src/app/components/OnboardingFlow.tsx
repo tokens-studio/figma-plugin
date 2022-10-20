@@ -6,6 +6,13 @@ import Button from './Button';
 import Modal from './Modal';
 import { getLastopened } from '@/selectors';
 import Stack from './Stack';
+import { styled } from '@/stitches.config';
+
+const StyledLink = styled('a', {
+  display: 'inline-flex',
+  fontSize: '$1',
+  color: '$fgAccent',
+});
 
 function fetchOnboardingImage(idx: number) {
   switch (idx) {
@@ -37,7 +44,7 @@ export default function OnboardingFlow() {
     },
     {
       title: 'Reference token values',
-      excerpt: 'Use your token values inside other tokens by writing them inside curly brackets: {global.colors.red.500} — that way you are able to reuse your tokens.',
+      excerpt: 'Use your token values inside other tokens by writing them inside curly brackets: {colors.red.500} — that way you are able to reuse your tokens.',
       read_more_link: 'https://docs.figmatokens.com/tokens/aliases',
     },
     {
@@ -47,7 +54,7 @@ export default function OnboardingFlow() {
     },
     {
       title: 'Want to know more?',
-      excerpt: 'Check out the Docs to find even more knowledge and guides. If there’s anything you’re struggling with, let us know!',
+      excerpt: 'Check out the Docs to find even more knowledge and guides. If there’s anything you’re struggling with, let us know on Slack!',
       read_more_link: 'https://docs.figmatokens.com',
     },
   ];
@@ -72,26 +79,26 @@ export default function OnboardingFlow() {
   return (
     <Modal showClose isOpen={lastOpened === 0 && onboardingFlowOpen} close={handleClose}>
       <Stack direction="column" gap={4}>
-        <Heading size="medium">Get Started</Heading>
         {onboardingflow.map((item, index) => (
           <Stack
+            // eslint-disable-next-line react/no-array-index-key
+            key={`onboarding-${index}`}
             direction="column"
-            gap={2}
+            gap={3}
             align="start"
             css={{ textAlign: 'left', display: index === activeIndex ? 'flex' : 'none' }}
           >
-            <img src={fetchOnboardingImage(index)} alt="" className="mb-8 rounded" />
+            <img src={fetchOnboardingImage(index)} alt="" className="rounded" />
             <Heading size="medium">{item.title}</Heading>
             <p className="text-xs">{item.excerpt}</p>
             {item.read_more_link && (
-              <a
+              <StyledLink
                 target="_blank"
                 rel="noreferrer"
                 href={item.read_more_link}
-                className="inline-flex text-xs text-primary-500"
               >
                 Read more
-              </a>
+              </StyledLink>
             )}
           </Stack>
         ))}

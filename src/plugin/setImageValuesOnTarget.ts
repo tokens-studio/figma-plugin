@@ -11,7 +11,7 @@ export default async function setImageValuesOnTarget(
       const imageArrayBuffer = await fetch(value)
         .then((response) => response.arrayBuffer())
         .catch(() => {
-          notifyUI('Failed to image', { error: true });
+          notifyUI('Failed to load image', { error: true });
           return null;
         });
       if (imageArrayBuffer) {
@@ -29,6 +29,6 @@ export default async function setImageValuesOnTarget(
       target.description = description;
     }
   } catch (e) {
-    console.error('Error setting color', e);
+    console.error('Error setting image', e);
   }
 }

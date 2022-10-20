@@ -11,7 +11,6 @@ export const StyledButton = styled('button', {
   background: '$bgBtnPrimary',
   color: '$fgBtnPrimary',
   '&:disabled': {
-    borderColor: '$borderBtnDisabled',
     opacity: 0.5,
   },
   variants: {
