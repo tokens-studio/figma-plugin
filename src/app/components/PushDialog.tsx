@@ -86,10 +86,10 @@ function ConfirmDialog() {
   }, [showPushDialog, localApiState]);
 
   const handleSaveShortcut = React.useCallback((event: KeyboardEvent) => {
-    if (event.metaKey || event.ctrlKey) {
+    if (showPushDialog === 'success' && (event.metaKey || event.ctrlKey)) {
       handleSubmit();
     }
-  }, [handleSubmit]);
+  }, [handleSubmit, showPushDialog]);
 
   useShortcut(['Enter'], handleSaveShortcut);
 
