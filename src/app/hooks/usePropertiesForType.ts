@@ -59,7 +59,6 @@ export function usePropertiesForTokenType(type: TokenTypes, value?: SingleToken[
               clear: [
                 Properties.horizontalPadding,
                 Properties.verticalPadding,
-                Properties.itemSpacing,
                 Properties.paddingLeft,
                 Properties.paddingRight,
                 Properties.paddingTop,
@@ -84,7 +83,6 @@ export function usePropertiesForTokenType(type: TokenTypes, value?: SingleToken[
               clear: [
                 Properties.horizontalPadding,
                 Properties.verticalPadding,
-                Properties.itemSpacing,
                 Properties.paddingLeft,
                 Properties.paddingRight,
                 Properties.paddingTop,

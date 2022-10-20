@@ -163,7 +163,6 @@ describe('MoreButton', () => {
     expect(mockSetNodeData).toHaveBeenCalledWith({
       horizontalPadding: 'delete',
       verticalPadding: 'delete',
-      itemSpacing: 'delete',
       spacing: token.name,
       paddingLeft: 'delete',
       paddingTop: 'delete',
