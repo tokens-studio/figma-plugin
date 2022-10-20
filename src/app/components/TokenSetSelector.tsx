@@ -116,7 +116,7 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
     dispatch.tokenState.setTokenSetOrder(values);
   }, [dispatch]);
 
-  const closeOnboarding = useCallback(async () => {
+  const closeOnboarding = useCallback(() => {
     dispatch.uiState.setOnboardingExplainerSets('false');
   }, [dispatch]);
 

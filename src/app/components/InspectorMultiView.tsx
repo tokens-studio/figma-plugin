@@ -86,7 +86,7 @@ export default function InspectorMultiView({ resolvedTokens }: { resolvedTokens:
     );
   }, [dispatch.inspectState, inspectState.selectedTokens.length, uiState.selectionValues]);
 
-  const closeOnboarding = React.useCallback(async () => {
+  const closeOnboarding = React.useCallback(() => {
     dispatch.uiState.setOnboardingExplainerInspect('false');
   }, [dispatch]);
 

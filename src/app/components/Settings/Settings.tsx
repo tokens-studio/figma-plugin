@@ -44,7 +44,7 @@ function Settings() {
     [dispatch.settings],
   );
 
-  const closeOnboarding = React.useCallback(async () => {
+  const closeOnboarding = React.useCallback(() => {
     dispatch.uiState.setOnboardingExplainerSyncProviders('false');
   }, [dispatch]);
 
