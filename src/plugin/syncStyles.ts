@@ -20,6 +20,7 @@ import setTextValuesOnTarget from './setTextValuesOnTarget';
 import updateStyles from './updateStyles';
 
 export default async function syncStyles(tokens: Record<string, AnyTokenList>, settings: Record<SyncOption, boolean>) {
+  console.log('tokens', tokens);
   const effectStyles = figma.getLocalEffectStyles();
   const paintStyles = figma.getLocalPaintStyles();
   const textStyles = figma.getLocalTextStyles();
@@ -90,6 +91,8 @@ export default async function syncStyles(tokens: Record<string, AnyTokenList>, s
       }
     }
   });
+
+  console.log('rstyleIdsToRemove', styleIdsToRemove, 'styleIdsToCreate', styleIdsToCreate);
   return {
     styleIdsToRemove,
     styleIdsToCreate,

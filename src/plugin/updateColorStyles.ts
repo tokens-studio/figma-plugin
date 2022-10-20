@@ -20,6 +20,5 @@ export default function updateColorStyles(colorTokens: SingleColorToken<true, { 
       setColorValuesOnTarget(style, token);
     }
   });
-
   return tokenToStyleMap;
 }
