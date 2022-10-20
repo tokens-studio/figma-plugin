@@ -63,7 +63,7 @@ const StyledInput = styled('input', {
         height: '28px',
       },
       large: {
-        height: '36px',
+        height: '34px',
       },
     },
     hasSuffix: {
@@ -104,8 +104,8 @@ const StyledSuffix = styled('button', {
         height: '28px',
       },
       large: {
-        width: '36px',
-        height: '36px',
+        width: '34px',
+        height: '34px',
       },
     },
   },
@@ -176,12 +176,12 @@ const Input = React.forwardRef<HTMLInputElement, Props>(({
   }, [show, inputRef]);
 
   return (
-    <label htmlFor={name} className="text-xxs font-medium block">
+    <label htmlFor={name} className="block font-medium text-xxs">
       {(!!label || !!error) && (
         <Stack direction="row" justify="between" align="center" css={{ marginBottom: '$1' }}>
           {label ? <div className={capitalize ? 'capitalize' : undefined}>{label}</div> : null}
           {error ? (
-            <div className="text-red-500 font-bold">{error}</div>
+            <div className="font-bold text-red-500">{error}</div>
           ) : null}
         </Stack>
       )}

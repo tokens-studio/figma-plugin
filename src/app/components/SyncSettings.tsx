@@ -202,7 +202,7 @@ const SyncSettings = () => {
       <Box css={{ padding: '0 $4' }}>
         <Stack gap={4} direction="column" align="start">
           <Stack gap={3} direction="column">
-            <Heading size="medium">Token Storage</Heading>
+            <Heading size="small">Token Storage</Heading>
             <Stack direction="row" gap={2}>
               <ProviderSelector
                 isActive={storageProvider === StorageProviderType.LOCAL}

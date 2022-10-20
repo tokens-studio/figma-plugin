@@ -89,7 +89,7 @@ function ConfirmDialog() {
   return confirmState.show ? (
     <Modal isOpen close={onCancel}>
       <form onSubmit={handleConfirm}>
-        <Stack direction="column" justify="center" gap={4} css={{ textAlign: 'center' }}>
+        <Stack direction="column" justify="start" gap={4}>
           <Stack direction="column" gap={4}>
             <Stack direction="column" gap={2}>
               <Heading size="small">{confirmState?.text && confirmState.text}</Heading>
