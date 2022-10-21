@@ -83,27 +83,18 @@ describe('syncStyles', () => {
   it('should remove styles', async () => {
     expect(await syncStyles(mockValues, { removeStyle: true, renameStyle: false })).toEqual({
       styleIdsToRemove: ['567', '678'],
-      styleIdsToCreate: {},
     });
   });
 
   it('should rename styles', async () => {
     expect(await syncStyles(mockValues, { removeStyle: false, renameStyle: true })).toEqual({
-      styleIdsToRemove: ['567'],
-      styleIdsToCreate: {
-        red: '456',
-        black: 'paintstyle',
-      },
+      styleIdsToRemove: [],
     });
   });
 
   it('should rename & remove styles', async () => {
     expect(await syncStyles(mockValues, { removeStyle: true, renameStyle: true })).toEqual({
       styleIdsToRemove: ['567', '678'],
-      styleIdsToCreate: {
-        red: '456',
-        black: 'paintstyle',
-      },
     });
   });
 });
