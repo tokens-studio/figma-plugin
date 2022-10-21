@@ -92,7 +92,6 @@ export default async function syncStyles(tokens: Record<string, AnyTokenList>, s
     }
   });
 
-  console.log('rstyleIdsToRemove', styleIdsToRemove, 'styleIdsToCreate', styleIdsToCreate);
   return {
     styleIdsToRemove,
     styleIdsToCreate,
