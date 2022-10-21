@@ -11,15 +11,15 @@ export default function compareStyleValueWithTokenValue(
   token: SingleToken<true, { path: string }>,
 ): boolean {
   try {
-    if (style.type === 'PAINT' && token.type === TokenTypes.COLOR) {
+    if (style.type === 'PAINT' && token?.type === TokenTypes.COLOR) {
       const { value } = token;
       return paintStyleMatchesColorToken(style, value);
     }
-    if (style.type === 'TEXT' && token.type === TokenTypes.TYPOGRAPHY) {
+    if (style.type === 'TEXT' && token?.type === TokenTypes.TYPOGRAPHY) {
       const { value } = token;
       return textStyleMatchesTypographyToken(style, value);
     }
-    if (style.type === 'EFFECT' && token.type === TokenTypes.BOX_SHADOW) {
+    if (style.type === 'EFFECT' && token?.type === TokenTypes.BOX_SHADOW) {
       const { value } = token;
       return effectStyleMatchesBoxShadowToken(style, value);
     }

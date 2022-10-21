@@ -6,7 +6,6 @@ export const syncStyles: AsyncMessageChannelHandlers[AsyncMessageTypes.SYNC_STYL
   try {
     const styleIds = await syncStylesFn(msg.tokens, msg.settings);
     return {
-      styleIdsToCreate: styleIds.styleIdsToCreate,
       styleIdsToRemove: styleIds.styleIdsToRemove,
     };
   } catch (e) {
@@ -14,7 +13,6 @@ export const syncStyles: AsyncMessageChannelHandlers[AsyncMessageTypes.SYNC_STYL
   }
 
   return {
-    styleIdsToCreate: {},
     styleIdsToRemove: [],
   };
 };
