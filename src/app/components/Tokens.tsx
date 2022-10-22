@@ -167,6 +167,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
   const handleSaveJSON = React.useCallback(() => {
     dispatch.tokenState.setJSONData(stringTokens);
   }, [dispatch.tokenState, stringTokens]);
+
   const handleToggleTokenSetsVisibility = React.useCallback(() => {
     setTokenSetsVisible(!tokenSetsVisible);
   }, [tokenSetsVisible]);
