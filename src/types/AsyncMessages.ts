@@ -201,7 +201,8 @@ export type ResolveStyleInfoResult = AsyncMessage<AsyncMessageTypes.RESOLVE_STYL
 }>;
 
 export type ExtractTokensFromSelection = AsyncMessage<AsyncMessageTypes.EXTRACT_TOKENS_FROM_SELECTION, {
-  categories: string[]
+  categories: string[],
+  applyTokens: boolean,
 }>;
 export type ExtractTokensFromSelectionResult = AsyncMessage<AsyncMessageTypes.EXTRACT_TOKENS_FROM_SELECTION, {
   uniqueValues: Record<string, AnyTokenList>;
