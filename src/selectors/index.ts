@@ -50,3 +50,4 @@ export * from './scrollPositionSetSelector';
 export * from './themeByIdSelector';
 export * from './isWaitingForBackgroundJobSelector';
 export * from './licenseDetailsSelector';
+export * from './getLastopened';

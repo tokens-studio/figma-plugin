@@ -3,8 +3,13 @@ import { Properties } from '@/constants/Properties';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { PropertyObject } from '@/types/properties';
 import { isPropertyType } from '@/utils/is';
+import { SingleToken } from '@/types/tokens';
 
-export function usePropertiesForTokenType(type: TokenTypes): PropertyObject[] {
+export function usePropertiesForTokenType(type: TokenTypes, value?: SingleToken['value']): PropertyObject[] {
+  let disabled = false;
+  if ((type === TokenTypes.BORDER_RADIUS || type === TokenTypes.SPACING) && typeof value === 'string') {
+    disabled = value.split(' ').length > 1;
+  }
   return useMemo(() => {
     const properties: PropertyObject[] = [];
     switch (type) {
@@ -20,10 +25,10 @@ export function usePropertiesForTokenType(type: TokenTypes): PropertyObject[] {
               Properties.borderRadiusBottomLeft,
             ],
           },
-          { label: 'Top Left', name: Properties.borderRadiusTopLeft },
-          { label: 'Top Right', name: Properties.borderRadiusTopRight },
-          { label: 'Bottom Right', name: Properties.borderRadiusBottomRight },
-          { label: 'Bottom Left', name: Properties.borderRadiusBottomLeft },
+          { label: 'Top Left', name: Properties.borderRadiusTopLeft, disabled },
+          { label: 'Top Right', name: Properties.borderRadiusTopRight, disabled },
+          { label: 'Bottom Right', name: Properties.borderRadiusBottomRight, disabled },
+          { label: 'Bottom Left', name: Properties.borderRadiusBottomLeft, disabled },
         );
         break;
       case TokenTypes.BORDER_WIDTH:
@@ -45,27 +50,51 @@ export function usePropertiesForTokenType(type: TokenTypes): PropertyObject[] {
         );
         break;
       case TokenTypes.SPACING:
-        properties.push(
-          { label: 'Gap', name: Properties.itemSpacing, icon: 'Gap' },
-          {
-            label: 'All',
-            icon: 'Spacing',
-            name: Properties.spacing,
-            clear: [
-              Properties.horizontalPadding,
-              Properties.verticalPadding,
-              Properties.itemSpacing,
-              Properties.paddingLeft,
-              Properties.paddingRight,
-              Properties.paddingTop,
-              Properties.paddingBottom,
-            ],
-          },
-          { label: 'Top', name: Properties.paddingTop },
-          { label: 'Right', name: Properties.paddingRight },
-          { label: 'Bottom', name: Properties.paddingBottom },
-          { label: 'Left', name: Properties.paddingLeft },
-        );
+        if (typeof value === 'string' && value.split(' ').length > 1) {
+          properties.push(
+            {
+              label: 'All',
+              icon: 'Spacing',
+              name: Properties.spacing,
+              clear: [
+                Properties.horizontalPadding,
+                Properties.verticalPadding,
+                Properties.paddingLeft,
+                Properties.paddingRight,
+                Properties.paddingTop,
+                Properties.paddingBottom,
+              ],
+            },
+            {
+              label: 'Gap', name: Properties.itemSpacing, icon: 'Gap', disabled,
+            },
+            { label: 'Top', name: Properties.paddingTop, disabled },
+            { label: 'Right', name: Properties.paddingRight, disabled },
+            { label: 'Bottom', name: Properties.paddingBottom, disabled },
+            { label: 'Left', name: Properties.paddingLeft, disabled },
+          );
+        } else {
+          properties.push(
+            { label: 'Gap', name: Properties.itemSpacing, icon: 'Gap' },
+            {
+              label: 'All',
+              icon: 'Spacing',
+              name: Properties.spacing,
+              clear: [
+                Properties.horizontalPadding,
+                Properties.verticalPadding,
+                Properties.paddingLeft,
+                Properties.paddingRight,
+                Properties.paddingTop,
+                Properties.paddingBottom,
+              ],
+            },
+            { label: 'Top', name: Properties.paddingTop },
+            { label: 'Right', name: Properties.paddingRight },
+            { label: 'Bottom', name: Properties.paddingBottom },
+            { label: 'Left', name: Properties.paddingLeft },
+          );
+        }
         break;
       case TokenTypes.SIZING:
         properties.push(
@@ -86,7 +115,7 @@ export function usePropertiesForTokenType(type: TokenTypes): PropertyObject[] {
           },
           {
             label: 'Border',
-            name: Properties.border,
+            name: Properties.borderColor,
           },
         );
         break;

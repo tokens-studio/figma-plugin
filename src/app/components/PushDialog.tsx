@@ -15,6 +15,7 @@ import Spinner from './Spinner';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { isGitProvider } from '@/utils/is';
 import Textarea from './Textarea';
+import { useShortcut } from '@/hooks/useShortcut';
 
 function ConfirmDialog() {
   const { onConfirm, onCancel, showPushDialog } = usePushDialog();
@@ -83,6 +84,14 @@ function ConfirmDialog() {
       setBranch(localApiState.branch ?? '');
     }
   }, [showPushDialog, localApiState]);
+
+  const handleSaveShortcut = React.useCallback((event: KeyboardEvent) => {
+    if (showPushDialog === 'success' && (event.metaKey || event.ctrlKey)) {
+      handleSubmit();
+    }
+  }, [handleSubmit, showPushDialog]);
+
+  useShortcut(['Enter'], handleSaveShortcut);
 
   switch (showPushDialog) {
     case 'initial': {

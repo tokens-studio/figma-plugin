@@ -6,4 +6,5 @@ export type PropertyObject = {
   icon?: 'Gap' | 'Spacing';
   clear?: Properties[];
   forcedValue?: string; // @TODO check typing
+  disabled?: boolean;
 };

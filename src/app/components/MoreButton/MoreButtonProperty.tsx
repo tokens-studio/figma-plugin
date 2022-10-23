@@ -12,9 +12,12 @@ type Props = {
   value: string;
   property: PropertyObject;
   onClick: (properties: PropertyObject, isActive: boolean) => void;
+  disabled?: boolean;
 };
 
-export const MoreButtonProperty: React.FC<Props> = ({ value, property, onClick }) => {
+export const MoreButtonProperty: React.FC<Props> = ({
+  value, property, onClick, disabled = false,
+}) => {
   const mainNodeSelectionValues = useSelector(mainNodeSelectionValuesSelector);
   const isActive = React.useMemo(() => (
     mainNodeSelectionValues[property.name] === value
@@ -30,6 +33,7 @@ export const MoreButtonProperty: React.FC<Props> = ({ value, property, onClick }
       key={property.label}
       checked={isActive}
       onSelect={handleClick}
+      disabled={disabled}
     >
       <ContextMenuItemIndicator>
         <CheckIcon />
