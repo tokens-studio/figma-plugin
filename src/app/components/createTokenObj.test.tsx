@@ -1,4 +1,4 @@
-import { createTokensObject } from './createTokenObj';
+import { createTokensObject, transformName } from './createTokenObj';
 
 const baseTokens = {
   input: [
@@ -22,8 +22,26 @@ const baseTokens = {
       name: 'global.colors.gray.50',
       value: '#ff0000',
     },
+    {
+      id: '123', type: 'asset', description: 'some assets', name: 'global.assets.image', value: 'http://image.png',
+    },
   ],
   output: {
+    asset: {
+      values: {
+        global: {
+          assets: {
+            image: {
+              id: '123',
+              type: 'asset',
+              description: 'some assets',
+              name: 'global.assets.image',
+              value: 'http://image.png',
+            },
+          },
+        },
+      },
+    },
     color: {
       values: {
         global: {
@@ -76,5 +94,89 @@ const baseTokens = {
 describe('createTokenObj', () => {
   it('creates a token object', () => {
     expect(createTokensObject(baseTokens.input)).toEqual(baseTokens.output);
+  });
+
+  it('should transform name', () => {
+    const tokenNames = [
+      {
+        input: 'color',
+        output: 'color',
+      },
+      {
+        input: 'colors',
+        output: 'color',
+      },
+      {
+        input: 'space',
+        output: 'spacing',
+      },
+      {
+        input: 'spacing',
+        output: 'spacing',
+      },
+      {
+        input: 'size',
+        output: 'sizing',
+      },
+      {
+        input: 'sizing',
+        output: 'sizing',
+      },
+      {
+        input: 'boxShadow',
+        output: 'boxShadow',
+      },
+      {
+        input: 'borderRadius',
+        output: 'borderRadius',
+      },
+      {
+        input: 'borderWidth',
+        output: 'borderWidth',
+      },
+      {
+        input: 'opacity',
+        output: 'opacity',
+      },
+      {
+        input: 'fontFamilies',
+        output: 'fontFamilies',
+      },
+      {
+        input: 'fontWeights',
+        output: 'fontWeights',
+      },
+      {
+        input: 'fontSizes',
+        output: 'fontSizes',
+      },
+      {
+        input: 'lineHeights',
+        output: 'lineHeights',
+      },
+      {
+        input: 'typography',
+        output: 'typography',
+      },
+      {
+        input: 'letterSpacing',
+        output: 'letterSpacing',
+      },
+      {
+        input: 'paragraphSpacing',
+        output: 'paragraphSpacing',
+      },
+      {
+        input: 'composition',
+        output: 'composition',
+      },
+      {
+        input: 'asset',
+        output: 'asset',
+      },
+    ];
+    tokenNames.forEach((tokenName) => {
+      expect(transformName(tokenName.input)).toEqual(tokenName.output);
+    });
   });
 });

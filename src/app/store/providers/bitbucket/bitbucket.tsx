@@ -69,23 +69,21 @@ export function useBitbucket() {
         errorMessage: content?.errorMessage,
       };
     }
-    if (content) {
-      if (
-        content
-        && isEqual(content.tokens, tokens)
-        && isEqual(content.themes, themes)
-        && isEqual(content.metadata?.tokenSetOrder ?? Object.keys(tokens), Object.keys(tokens))
-      ) {
-        notifyToUI('Nothing to commit');
-        return {
-          status: 'success',
-          themes,
-          tokens,
-          metadata: {
-            tokenSetOrder: Object.keys(tokens),
-          },
-        };
-      }
+    if (
+      content
+      && isEqual(content.tokens, tokens)
+      && isEqual(content.themes, themes)
+      && isEqual(content.metadata?.tokenSetOrder ?? Object.keys(tokens), Object.keys(tokens))
+    ) {
+      notifyToUI('Nothing to commit');
+      return {
+        status: 'success',
+        themes,
+        tokens,
+        metadata: {
+          tokenSetOrder: Object.keys(tokens),
+        },
+      };
     }
 
     dispatch.uiState.setLocalApiState({ ...context });
@@ -121,15 +119,15 @@ export function useBitbucket() {
       } catch (e) {
         closeDialog();
         console.log('Error pushing to Bitbucket', e);
-        if (e instanceof Error) {
+        if (e instanceof Error && e.message === ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR) {
           return {
             status: 'failure',
-            errorMessage: e.message === ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR ? ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR : ErrorMessages.BITBUCKET_CREDENTIAL_ERROR,
+            errorMessage: ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR,
           };
         }
         return {
           status: 'failure',
-          errorMessage: ErrorMessages.GITHUB_CREDENTIAL_ERROR,
+          errorMessage: ErrorMessages.BITBUCKET_CREDENTIAL_ERROR,
         };
       }
     }
@@ -247,7 +245,7 @@ export function useBitbucket() {
         }
         return await pushTokensToBitbucket(context);
       } catch (e) {
-        notifyToUI('Error syncing with Bitbucket, check credentials', { error: true });
+        notifyToUI(ErrorMessages.BITBUCKET_CREDENTIAL_ERROR, { error: true });
         console.log('Error', e);
         return {
           status: 'failure',

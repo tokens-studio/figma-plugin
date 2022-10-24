@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-  IconFontSize, IconLetterSpacing, IconParagraphSpacing, IconLineHeight, IconTextCase, IconTextDecoration,
+  IconFontSize, IconLetterSpacing, IconParagraphSpacing, IconLineHeight, IconTextCase, IconTextDecoration, IconParagraphIndent,
 } from '@/icons';
 
 // write a function that maps a key to a react component and returns that component or the text label
@@ -17,6 +17,9 @@ export function getLabelForProperty(key: string): React.ReactElement | string {
     }
     case 'paragraphSpacing': {
       return <IconParagraphSpacing />;
+    }
+    case 'paragraphIndent': {
+      return <IconParagraphIndent />;
     }
     case 'textDecoration': {
       return <IconTextDecoration />;

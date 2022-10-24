@@ -4,7 +4,7 @@ import { isSingleBoxShadowToken, isSingleTypographyToken } from '@/utils/is';
 import { SingleTypographyToken } from '@/types/tokens';
 import Box from './Box';
 import { ResolvedShadowValueDisplay } from './ResolvedShadowValueDisplay';
-import { ResolvedTypograhpyValueDisplay } from './ResolvedTypograhpyValueDisplay';
+import { ResolvedTypographyValueDisplay } from './ResolvedTypographyValueDisplay';
 import { TokenBoxshadowValue } from '@/types/values';
 
 export default function ResolvedTokenDisplay({
@@ -20,7 +20,7 @@ export default function ResolvedTokenDisplay({
 
   if (selectedToken && isSingleTypographyToken(selectedToken)) {
     return (
-      <ResolvedTypograhpyValueDisplay
+      <ResolvedTypographyValueDisplay
         value={valueToCheck as SingleTypographyToken['value']}
       />
     );

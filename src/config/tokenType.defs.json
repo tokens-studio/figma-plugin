@@ -83,6 +83,7 @@
           "fontSize": { "type": "string" },
           "letterSpacing": { "type": "string" },
           "paragraphSpacing": { "type": "string" },
+          "paragraphIndent": { "type": "string" },
           "textDecoration": { "type": "string" },
           "textCase": { "type": "string" }
         }
@@ -167,6 +168,15 @@
         "type": "object",
         "properties": {}
       }
+    }
+  },
+  "asset": {
+    "label": "Assets",
+    "property": "Asset",
+    "type": "asset",
+    "explainer": "Public URL of your asset",
+    "schemas": {
+      "value": { "type": "string" }
     }
   },
   "other": {

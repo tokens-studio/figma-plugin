@@ -9,6 +9,7 @@ import { TokenTypes } from '@/constants/TokenTypes';
 import {
   DeleteTokenPayload, DuplicateTokenPayload, UpdateTokenPayload,
 } from '@/types/payloads';
+import useTokens from './useTokens';
 
 // @TODO this typing could be more strict in the future
 
@@ -35,6 +36,7 @@ export default function useManageTokens() {
   const store = useStore<RootState>();
   const dispatch = useDispatch<Dispatch>();
   const { confirm } = useConfirm();
+  const { removeStylesFromTokens } = useTokens();
   const {
     editToken, createToken, deleteToken, duplicateToken, deleteTokenGroup, renameTokenGroup, duplicateTokenGroup,
   } = dispatch.tokenState;
@@ -60,6 +62,9 @@ export default function useManageTokens() {
         oldName,
         shouldUpdate: shouldUpdateDocument,
       } as UpdateTokenPayload);
+      if (oldName) {
+        dispatch.tokenState.renameStyleNamesToCurrentTheme(oldName, name);
+      }
     }
     dispatch.uiState.completeJob(BackgroundJobs.UI_EDITSINGLETOKEN);
   }, [editToken, dispatch.uiState]);
@@ -101,6 +106,11 @@ export default function useManageTokens() {
     const userConfirmation = await confirm({
       text: 'Delete token?',
       description: 'Are you sure you want to delete this token?',
+      choices: [
+        {
+          key: 'delete-style', label: 'Delete associated style',
+        },
+      ],
     });
     if (userConfirmation) {
       dispatch.uiState.startJob({
@@ -108,7 +118,11 @@ export default function useManageTokens() {
         isInfinite: true,
       });
       deleteToken(data);
+      if (Array.isArray(userConfirmation.data) && userConfirmation.data.length) {
+        removeStylesFromTokens(data);
+      }
       dispatch.uiState.completeJob(BackgroundJobs.UI_DELETETOKEN);
+      dispatch.tokenState.removeStyleNamesFromThemes(data.path, data.parent);
     }
   }, [confirm, deleteToken, dispatch.uiState]);
 
