@@ -157,7 +157,6 @@ export type SyncStylesAsyncMessage = AsyncMessage<AsyncMessageTypes.SYNC_STYLES,
   settings: Record<SyncOption, boolean>
 }>;
 export type SyncStylesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.SYNC_STYLES, {
-  styleIdsToCreate: Record<string, string>;
   styleIdsToRemove: string[];
 }>;
 
