@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { ChevronRightIcon } from '@radix-ui/react-icons';
 import { styled } from '@/stitches.config';
@@ -27,6 +27,7 @@ import { EditTokenFormStatus } from '@/constants/EditTokenFormStatus';
 import TokenButtonContent from '../TokenButton/TokenButtonContent';
 import { useGetActiveState } from '@/hooks';
 import { usePropertiesForTokenType } from '../../hooks/usePropertiesForType';
+import { getAliasValue } from '@/utils/alias';
 
 const RightSlot = styled('div', {
   marginLeft: 'auto',
@@ -55,7 +56,13 @@ export const MoreButton: React.FC<Props> = ({
   const editProhibited = useSelector(editProhibitedSelector);
   const activeTokenSet = useSelector(activeTokenSetSelector);
   const { deleteSingleToken } = useManageTokens();
-  const properties = usePropertiesForTokenType(type, token.value);
+
+  const resolvedValue = useMemo(() => (
+    getAliasValue(token, tokensContext.resolvedTokens)
+  ), [token, tokensContext.resolvedTokens]);
+
+  const properties = usePropertiesForTokenType(type, resolvedValue?.toString());
+
   // @TODO check type property typing
   const visibleProperties = React.useMemo(() => (
     properties.filter((p) => p.label)
