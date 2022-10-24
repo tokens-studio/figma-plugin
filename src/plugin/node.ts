@@ -101,7 +101,7 @@ export async function saveOnboardingExplainerSets(onboardingExplainerSets: boole
   await OnboardingExplainerSetsProperty.write(onboardingExplainerSets);
 }
 
-export async function saveOnboardingExplainerSyncProviders(onboardingExplainerSyncProviders: string) {
+export async function saveOnboardingExplainerSyncProviders(onboardingExplainerSyncProviders: boolean) {
   await OnboardingExplainerSyncProvidersProperty.write(onboardingExplainerSyncProviders);
 }
 

@@ -66,7 +66,7 @@ export interface UIState {
   changelog: StoryblokStory['content'][];
   lastOpened: number | null;
   onboardingExplainerSets: boolean;
-  onboardingExplainerSyncProviders: string;
+  onboardingExplainerSyncProviders: boolean;
   onboardingExplainerInspect: boolean;
   editToken: EditTokenObject;
   showEditForm: boolean;
@@ -112,7 +112,7 @@ export const uiState = createModel<RootModel>()({
     changelog: [],
     lastOpened: '',
     onboardingExplainerSets: null,
-    onboardingExplainerSyncProviders: '',
+    onboardingExplainerSyncProviders: null,
     onboardingExplainerInspect: null,
     editToken: {
       type: TokenTypes.OTHER,
@@ -273,7 +273,7 @@ export const uiState = createModel<RootModel>()({
         onboardingExplainerSets: payload,
       };
     },
-    setOnboardingExplainerSyncProviders(state, payload: string) {
+    setOnboardingExplainerSyncProviders(state, payload: boolean) {
       return {
         ...state,
         onboardingExplainerSyncProviders: payload,

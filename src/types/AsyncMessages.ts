@@ -64,7 +64,7 @@ export type ChangedTabsAsyncMessageResult = AsyncMessage<AsyncMessageTypes.CHANG
 export type SetOnboardingExplainerSetsAsyncMessage = AsyncMessage<AsyncMessageTypes.SET_ONBOARDINGEXPLAINERSETS, { onboardingExplainerSets: boolean; }>;
 export type SetOnboardingExplainerSetsAsyncMessageResult = AsyncMessage<AsyncMessageTypes.SET_ONBOARDINGEXPLAINERSETS>;
 
-export type SetOnboardingExplainerSyncProvidersAsyncMessage = AsyncMessage<AsyncMessageTypes.SET_ONBOARDINGEXPLAINERSYNCPROVIDERS, { onboardingExplainerSyncProviders: string; }>;
+export type SetOnboardingExplainerSyncProvidersAsyncMessage = AsyncMessage<AsyncMessageTypes.SET_ONBOARDINGEXPLAINERSYNCPROVIDERS, { onboardingExplainerSyncProviders: boolean; }>;
 export type SetOnboardingExplainerSyncProvidersAsyncMessageResult = AsyncMessage<AsyncMessageTypes.SET_ONBOARDINGEXPLAINERSYNCPROVIDERS>;
 
 export type SetOnboardingExplainerInspectAsyncMessage = AsyncMessage<AsyncMessageTypes.SET_ONBOARDINGEXPLAINERINSPECT, { onboardingExplainerInspect: boolean; }>;

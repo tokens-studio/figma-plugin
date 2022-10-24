@@ -41,7 +41,7 @@ describe('Settings Component', () => {
   });
 
   it('show onboarding explainer syncproviders', () => {
-    store.dispatch.uiState.setOnboardingExplainerSyncProviders('true');
+    store.dispatch.uiState.setOnboardingExplainerSyncProviders(true);
 
     const result = render(<Settings />);
 
@@ -49,7 +49,7 @@ describe('Settings Component', () => {
   });
 
   it('hide onboarding explainer syncproviders', async () => {
-    store.dispatch.uiState.setOnboardingExplainerSyncProviders('true');
+    store.dispatch.uiState.setOnboardingExplainerSyncProviders(true);
     const result = render(<Settings />);
 
     fireEvent.click(result.getByTestId('closeButton'));

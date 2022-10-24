@@ -269,8 +269,8 @@ describe('storage type', () => {
 
 describe('onboarding explainer store', () => {
   it('should save the onboardingexplainersyncproviders', async () => {
-    saveOnboardingExplainerSyncProviders('true');
-    expect(await getOnboardingExplainerSyncProviders()).toEqual('true');
+    saveOnboardingExplainerSyncProviders(true);
+    expect(await getOnboardingExplainerSyncProviders()).toEqual(true);
   });
 
   it('should save the onboardingexplainersets', async () => {

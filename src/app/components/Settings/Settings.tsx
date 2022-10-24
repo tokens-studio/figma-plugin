@@ -45,7 +45,7 @@ function Settings() {
   );
 
   const closeOnboarding = React.useCallback(() => {
-    dispatch.uiState.setOnboardingExplainerSyncProviders('false');
+    dispatch.uiState.setOnboardingExplainerSyncProviders(false);
   }, [dispatch]);
 
   return (
@@ -53,7 +53,7 @@ function Settings() {
       <Stack direction="column" gap={4} css={{ padding: '$3 0' }}>
         <AddLicenseKey />
         <Divider />
-        {uiState.onboardingExplainerSyncProviders === 'true' && (
+        {uiState.onboardingExplainerSyncProviders && (
           <Stack direction="column" gap={2} css={{ padding: '$4' }}>
             <OnboardingExplainer data={onboardingData} closeOnboarding={closeOnboarding} />
           </Stack>
