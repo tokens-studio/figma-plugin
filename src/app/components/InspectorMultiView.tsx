@@ -87,7 +87,7 @@ export default function InspectorMultiView({ resolvedTokens }: { resolvedTokens:
   }, [dispatch.inspectState, inspectState.selectedTokens.length, uiState.selectionValues]);
 
   const closeOnboarding = React.useCallback(() => {
-    dispatch.uiState.setOnboardingExplainerInspect('false');
+    dispatch.uiState.setOnboardingExplainerInspect(false);
   }, [dispatch]);
 
   return (
@@ -136,7 +136,7 @@ export default function InspectorMultiView({ resolvedTokens }: { resolvedTokens:
       ) : (
         <Stack direction="column" gap={4} css={{ padding: '$5' }}>
           <Blankslate title={uiState.selectedLayers > 0 ? 'No tokens found' : 'No layers selected'} text={uiState.selectedLayers > 0 ? 'None of the selected layers contain any tokens' : 'Select a layer to see applied tokens'} />
-          {uiState.onboardingExplainerInspect === 'true' && (
+          {uiState.onboardingExplainerInspect && (
             <OnboardingExplainer data={onboardingData} closeOnboarding={closeOnboarding} />
           )}
         </Stack>

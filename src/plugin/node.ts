@@ -97,7 +97,7 @@ export async function saveStorageType(context: StorageType) {
   await StorageTypeProperty.write(context);
 }
 
-export async function saveOnboardingExplainerSets(onboardingExplainerSets: string) {
+export async function saveOnboardingExplainerSets(onboardingExplainerSets: boolean) {
   await OnboardingExplainerSetsProperty.write(onboardingExplainerSets);
 }
 
@@ -105,7 +105,7 @@ export async function saveOnboardingExplainerSyncProviders(onboardingExplainerSy
   await OnboardingExplainerSyncProvidersProperty.write(onboardingExplainerSyncProviders);
 }
 
-export async function saveOnboardingExplainerInspect(onboardingExplainerInspect: string) {
+export async function saveOnboardingExplainerInspect(onboardingExplainerInspect: boolean) {
   await OnboardingExplainerInspectProperty.write(onboardingExplainerInspect);
 }
 

@@ -274,12 +274,12 @@ describe('onboarding explainer store', () => {
   });
 
   it('should save the onboardingexplainersets', async () => {
-    saveOnboardingExplainerSets('true');
-    expect(await getOnboardingExplainerSets()).toEqual('true');
+    saveOnboardingExplainerSets(true);
+    expect(await getOnboardingExplainerSets()).toEqual(true);
   });
 
   it('should save the onboardingexplainerinspect', async () => {
-    saveOnboardingExplainerInspect('true');
-    expect(await getOnboardingExplainerInspect()).toEqual('true');
+    saveOnboardingExplainerInspect(true);
+    expect(await getOnboardingExplainerInspect()).toEqual(true);
   });
 });

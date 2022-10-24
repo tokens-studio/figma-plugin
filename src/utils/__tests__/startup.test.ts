@@ -9,7 +9,7 @@ describe('startup', () => {
       settings: {},
       activeTheme: null,
       lastOpened: 0,
-      onboardingExplainerSets: 'true',
+      onboardingExplainerSets: true,
       onboardingExplainerInspect: 'true',
       onboardingExplainerSyncProviders: 'true',
       storageType: { provider: 'local' },

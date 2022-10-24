@@ -117,7 +117,7 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
   }, [dispatch]);
 
   const closeOnboarding = useCallback(() => {
-    dispatch.uiState.setOnboardingExplainerSets('false');
+    dispatch.uiState.setOnboardingExplainerSets(false);
   }, [dispatch]);
 
   const handleDelete = useCallback((set: string) => {
@@ -223,7 +223,7 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
         New set
         <IconAdd />
       </StyledButton>
-      {uiState.onboardingExplainerSets === 'true' && (
+      {uiState.onboardingExplainerSets && (
         <OnboardingExplainer data={onboardingData} closeOnboarding={closeOnboarding} />
       )}
     </Box>
