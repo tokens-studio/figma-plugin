@@ -1,4 +1,3 @@
-import * as Sentry from '@sentry/react';
 import { handleReactError } from './error/handleReactError';
 
 type GetLicenseKeyResponse =
@@ -17,7 +16,6 @@ export default async function getLicenseKey(userId: string | null): Promise<GetL
       error: message,
     };
   } catch (e) {
-    Sentry.captureException(e);
     handleReactError(e);
     return {
       error: 'Error fetching license',
