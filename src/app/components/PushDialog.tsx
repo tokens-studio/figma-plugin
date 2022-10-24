@@ -89,7 +89,7 @@ function ConfirmDialog() {
     if (showPushDialog === 'initial' && (event.metaKey || event.ctrlKey)) {
       handleSubmit();
     }
-  }, [handleSubmit]);
+  }, [handleSubmit, showPushDialog]);
 
   useShortcut(['Enter'], handleSaveShortcut);
 

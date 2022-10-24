@@ -229,7 +229,7 @@ describe('AppContainer (integration)', () => {
               <AppContainer {...params} />
             </Provider>,
           );
-          expect(await result.findByText('Get Started')).not.toBeUndefined();
+          expect(await result.findByText('Getting started')).not.toBeUndefined();
           result.unmount();
         });
       })
