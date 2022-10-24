@@ -86,7 +86,7 @@ function ConfirmDialog() {
   }, [showPushDialog, localApiState]);
 
   const handleSaveShortcut = React.useCallback((event: KeyboardEvent) => {
-    if (showPushDialog === 'success' && (event.metaKey || event.ctrlKey)) {
+    if (showPushDialog === 'initial' && (event.metaKey || event.ctrlKey)) {
       handleSubmit();
     }
   }, [handleSubmit, showPushDialog]);
@@ -105,7 +105,7 @@ function ConfirmDialog() {
                 <div className="p-2 font-mono text-gray-600 bg-gray-100 rounded text-xxs">
                   {'id' in localApiState ? localApiState.id : null}
                 </div>
-                <Heading size="medium">Commit message</Heading>
+                <Heading size="small">Commit message</Heading>
                 <Textarea
                   id="push-dialog-commit-message"
                   border
