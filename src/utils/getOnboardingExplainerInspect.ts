@@ -1,15 +1,22 @@
-import { OnboardingExplainerInspectProperty } from '@/figmaStorage';
+import { OnboardingExplainerInspectProperty, LastOpenedProperty } from '@/figmaStorage';
 
 export default async function getOnboardingExplainerInspect() {
-  let data: string = 'true';
+  let data: boolean = true;
+  let lastopend: number = 0;
   try {
-    // Set specific date as lastOpened if none existed (when we started the changelog)
-    data = await OnboardingExplainerInspectProperty.read() || 'true';
-    await OnboardingExplainerInspectProperty.write('true');
+    // Set onboarding explainer status as true if lastopend none existed
+    lastopend = await LastOpenedProperty.read() || 0;
+    if (lastopend) {
+      data = await OnboardingExplainerInspectProperty.read() || false;
+      await OnboardingExplainerInspectProperty.write(false);
+    } else {
+      data = true;
+      await OnboardingExplainerInspectProperty.write(true);
+    }
   } catch (e) {
     console.error('error retrieving onboardingExplainerInspect', e);
-    await OnboardingExplainerInspectProperty.write('true');
-    data = 'true';
+    await OnboardingExplainerInspectProperty.write(true);
+    data = true;
   }
 
   return data;
