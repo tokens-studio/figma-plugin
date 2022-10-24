@@ -244,7 +244,6 @@ export default function useTokens() {
           removeStyle: userConfirmation.data.includes('removeStyles'),
         },
       });
-      dispatch.tokenState.assignStyleIdsToCurrentTheme(syncStyleResult.styleIdsToCreate);
       dispatch.tokenState.removeStyleIdsFromThemes(syncStyleResult.styleIdsToRemove);
     }
   }, [confirm, tokens, dispatch.tokenState]);

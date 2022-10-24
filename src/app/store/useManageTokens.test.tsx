@@ -52,6 +52,24 @@ describe('useManageTokens', () => {
               ],
             },
             activeTokenSet: 'global',
+            themes: [{
+              id: 'light',
+              name: 'Light',
+              selectedTokenSets: {},
+              $figmaStyleReferences: {
+                'colors.brand.primary': 'S:1234',
+                'colors.red': 'S:1235',
+                'colors.blue': 'S:1236',
+              },
+            }, {
+              id: 'dark',
+              name: 'Dark',
+              selectedTokenSets: {},
+              $figmaStyleReferences: {
+                'colors.brand.primary': 'S:2345',
+                'colors.red': 'S:2346',
+              },
+            }],
           },
         },
       },
