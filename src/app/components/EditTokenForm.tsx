@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { track } from '@/utils/analytics';
+import { useShortcut } from '@/hooks/useShortcut';
 import { Dispatch } from '../store';
 import useManageTokens from '../store/useManageTokens';
 import CompositionTokenForm from './CompositionTokenForm';
@@ -322,6 +323,17 @@ function EditTokenForm({ resolvedTokens }: Props) {
     },
     [dispatch, isValid, internalEditToken, submitTokenValue],
   );
+
+  const handleSaveShortcut = React.useCallback((event: KeyboardEvent) => {
+    if (event.metaKey || event.ctrlKey) {
+      if (isValid && internalEditToken) {
+        submitTokenValue(internalEditToken);
+        dispatch.uiState.setShowEditForm(false);
+      }
+    }
+  }, [handleSubmit, submitTokenValue, dispatch, internalEditToken, isValid]);
+
+  useShortcut(['Enter'], handleSaveShortcut);
 
   const handleReset = React.useCallback(() => {
     dispatch.uiState.setShowEditForm(false);
