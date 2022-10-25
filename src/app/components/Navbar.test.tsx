@@ -1,11 +1,26 @@
 import React from 'react';
-import { render, resetStore } from '../../../tests/config/setupTest';
+import { Provider } from 'react-redux';
+import { render, resetStore, createMockStore } from '../../../tests/config/setupTest';
 import { store } from '../store';
 import Navbar from './Navbar';
+
+jest.mock('launchdarkly-react-client-sdk', () => ({
+  LDProvider: (props: React.PropsWithChildren<unknown>) => props.children,
+  useLDClient: () => ({
+    identify: () => Promise.resolve(),
+  }),
+  useFlags: () => ({
+    tokenFlowButton: false,
+  }),
+}));
 
 describe('ProBadge', () => {
   beforeEach(() => {
     resetStore();
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
   });
 
   it('displays the buttons on navbar', () => {
@@ -16,8 +31,21 @@ describe('ProBadge', () => {
   });
 
   it('displays the token flow button if user is on pro plan', () => {
-    process.env.LAUNCHDARKLY_FLAGS = 'tokenFlowButton';
-    const result = render(<Navbar />);
+    const mockStore = createMockStore({
+      userState: {
+        licenseKey: 'FIGMA-TOKENS',
+        licenseDetails: {
+          plan: 'Pro Plan',
+          clientEmail: 'example@domain.com',
+          entitlements: ['pro'],
+        },
+      },
+    });
+    const result = render(
+      <Provider store={mockStore}>
+        <Navbar />
+      </Provider>,
+    );
 
     const tokenFlowButton = result.getByTestId('token-flow-button');
 
