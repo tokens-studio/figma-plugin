@@ -466,7 +466,7 @@ describe('TokenListing', () => {
       name: 'sizing.sm',
       value: '4',
     });
-    cy.get('[data-cy=tokenlisting-sizing-content]').should('have.class', 'hidden');
+    cy.get('[data-cy=tokenlisting-sizing-content]').should('be.hidden');
   });
 
   it('can add a new composition token', () => {

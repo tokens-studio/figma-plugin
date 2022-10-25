@@ -54,6 +54,12 @@ const StyledStack = styled('div', {
       4: {
         gap: '$4',
       },
+      5: {
+        gap: '$5',
+      },
+      6: {
+        gap: '$6',
+      },
     },
     width: {
       full: {
@@ -69,7 +75,7 @@ const StyledStack = styled('div', {
 });
 
 type StackProps = React.HTMLAttributes<HTMLDivElement> & {
-  gap?: 0 | 1 | 2 | 3 | 4;
+  gap?: 0 | 1 | 2 | 3 | 4 | 5 | 6;
   direction: 'row' | 'column';
   align?: 'center' | 'start' | 'end';
   justify?: 'center' | 'start' | 'end' | 'between';

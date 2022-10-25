@@ -5,8 +5,10 @@ export default function removeValuesFromNode(node: BaseNode, prop: Properties) {
   switch (prop) {
     case 'borderRadius':
       if (
-        'cornerRadius' in node && typeof node.cornerRadius !== 'undefined'
-        && node.type !== 'SHAPE_WITH_TEXT' && node.type !== 'CONNECTOR'
+        'cornerRadius' in node
+        && typeof node.cornerRadius !== 'undefined'
+        && node.type !== 'SHAPE_WITH_TEXT'
+        && node.type !== 'CONNECTOR'
       ) {
         node.cornerRadius = 0;
       }
@@ -63,8 +65,12 @@ export default function removeValuesFromNode(node: BaseNode, prop: Properties) {
       break;
     case 'opacity':
       if (
-        'opacity' in node && typeof node.opacity !== 'undefined'
-        && node.type !== 'STICKY' && node.type !== 'SHAPE_WITH_TEXT' && node.type !== 'CODE_BLOCK' && node.type !== 'CONNECTOR'
+        'opacity' in node
+        && typeof node.opacity !== 'undefined'
+        && node.type !== 'STICKY'
+        && node.type !== 'SHAPE_WITH_TEXT'
+        && node.type !== 'CODE_BLOCK'
+        && node.type !== 'CONNECTOR'
       ) {
         node.opacity = 1;
       }
@@ -123,6 +129,11 @@ export default function removeValuesFromNode(node: BaseNode, prop: Properties) {
     case 'itemSpacing':
       if ('itemSpacing' in node && typeof node.itemSpacing !== 'undefined') {
         node.itemSpacing = 0;
+      }
+      break;
+    case 'asset':
+      if ('fills' in node && typeof node.fills !== 'undefined') {
+        node.fills = [];
       }
       break;
     default:

@@ -48,7 +48,7 @@ export function useGitLab() {
   const dispatch = useDispatch<Dispatch>();
 
   const { confirm } = useConfirm();
-  const { pushDialog } = usePushDialog();
+  const { pushDialog, closeDialog } = usePushDialog();
 
   const storageClientFactory = useCallback(clientFactory, []);
 
@@ -71,21 +71,19 @@ export function useGitLab() {
       };
     }
 
-    if (content) {
-      if (
-        content
-        && isEqual(content.tokens, tokens)
-        && isEqual(content.themes, themes)
-        && isEqual(content.metadata?.tokenSetOrder ?? Object.keys(tokens), Object.keys(tokens))
-      ) {
-        notifyToUI('Nothing to commit');
-        return {
-          status: 'success',
-          tokens,
-          themes,
-          metadata: {},
-        };
-      }
+    if (
+      content
+      && isEqual(content.tokens, tokens)
+      && isEqual(content.themes, themes)
+      && isEqual(content.metadata?.tokenSetOrder ?? Object.keys(tokens), Object.keys(tokens))
+    ) {
+      notifyToUI('Nothing to commit');
+      return {
+        status: 'success',
+        tokens,
+        themes,
+        metadata: {},
+      };
     }
 
     dispatch.uiState.setLocalApiState({ ...context });
@@ -123,7 +121,14 @@ export function useGitLab() {
           metadata: {},
         };
       } catch (e) {
+        closeDialog();
         console.log('Error pushing to GitLab', e);
+        if (e instanceof Error && e.message === ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR) {
+          return {
+            status: 'failure',
+            errorMessage: ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR,
+          };
+        }
         return {
           status: 'failure',
           errorMessage: ErrorMessages.GITLAB_CREDENTIAL_ERROR,
@@ -140,6 +145,7 @@ export function useGitLab() {
     dispatch,
     storageClientFactory,
     pushDialog,
+    closeDialog,
     tokens,
     themes,
     localApiState,

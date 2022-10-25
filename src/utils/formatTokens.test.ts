@@ -15,6 +15,12 @@ describe('formatTokens', () => {
       type: TokenTypes.TYPOGRAPHY,
     },
     {
+      name: 'typography.heading.non_resolved',
+      value: '{typography.heading.new}',
+      description: 'Use for headings',
+      type: TokenTypes.TYPOGRAPHY,
+    },
+    {
       type: TokenTypes.BOX_SHADOW,
       name: 'shadows.alias',
       value: [
@@ -63,6 +69,11 @@ describe('formatTokens', () => {
         name: 'typography.heading.non_resolved',
         value: '{typography.heading.new}',
         description: 'Use for headings',
+        type: TokenTypes.TYPOGRAPHY,
+      },
+      {
+        name: 'typography.heading.no_matching',
+        value: '{typography.heading.no_matching}',
         type: TokenTypes.TYPOGRAPHY,
       },
       {
@@ -149,6 +160,10 @@ describe('formatTokens', () => {
                   description: 'Use for headings',
                   type: TokenTypes.TYPOGRAPHY,
                 },
+                no_matching: {
+                  value: '{typography.heading.no_matching}',
+                  type: TokenTypes.TYPOGRAPHY,
+                },
               },
             },
             shadows: {
@@ -219,6 +234,10 @@ describe('formatTokens', () => {
                 non_resolved: {
                   value: '{typography.heading.new}',
                   description: 'Use for headings',
+                  type: TokenTypes.TYPOGRAPHY,
+                },
+                no_matching: {
+                  value: '{typography.heading.no_matching}',
                   type: TokenTypes.TYPOGRAPHY,
                 },
               },

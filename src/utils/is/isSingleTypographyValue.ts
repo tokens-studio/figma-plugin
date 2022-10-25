@@ -18,6 +18,7 @@ export function isSingleTypographyValue(value: MapValuesToTokensResult[string]):
           || 'lineHeight' in v
           || 'letterSpacing' in v
           || 'paragraphSpacing' in v
+          || 'paragraphIndent' in v
           || 'textCase' in v
           || 'textDecoration' in v
         )

@@ -1,29 +1,23 @@
 import React from 'react';
 import Box from '../Box';
+import Stack from '../Stack';
 import { TokenBoxshadowValue } from '@/types/values';
+import TooltipProperty from './TooltipProperty';
 
 type Props = {
-  shadow: TokenBoxshadowValue
+  value?: TokenBoxshadowValue;
+  resolvedValue?: TokenBoxshadowValue | null;
 };
 
-// @TODO: Figure out how to display resolved shadow value without seeming duplicative / like we do for typography a shorthand
-
-export const SingleShadowValueDisplay: React.FC<Props> = ({ shadow }) => (
-  <Box css={{
-    display: 'flex', flexDirection: 'column', marginBottom: '$2', color: '$fgToolTipMuted',
-  }}
-  >
-    <Box css={{ display: 'flex', color: '$fgToolTipMuted' }}>{shadow.type}</Box>
-    <Box css={{ display: 'flex' }}>
-      {shadow.x}
-      {' '}
-      {shadow.y}
-      {' '}
-      {shadow.blur}
-      {' '}
-      {shadow.spread}
-      {' '}
-      {shadow.color}
-    </Box>
+export const SingleShadowValueDisplay: React.FC<Props> = ({ value, resolvedValue }) => (
+  <Box>
+    <Box css={{ display: 'flex', color: '$fgToolTip' }}>{resolvedValue?.type}</Box>
+    <Stack direction="row" align="start" gap={2} wrap>
+      <TooltipProperty value={value?.x} resolvedValue={resolvedValue?.x} />
+      <TooltipProperty value={value?.y} resolvedValue={resolvedValue?.y} />
+      <TooltipProperty value={value?.blur} resolvedValue={resolvedValue?.blur} />
+      <TooltipProperty value={value?.spread} resolvedValue={resolvedValue?.spread} />
+      <TooltipProperty value={value?.color} resolvedValue={resolvedValue?.color} />
+    </Stack>
   </Box>
 );

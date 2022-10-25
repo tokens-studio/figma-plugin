@@ -33,7 +33,7 @@ export function useBitbucket() {
   const { multiFileSync } = useFlags();
   const dispatch = useDispatch<Dispatch>();
   const { confirm } = useConfirm();
-  const { pushDialog } = usePushDialog();
+  const { pushDialog, closeDialog } = usePushDialog();
 
   const storageClientFactory = useCallback(
     (context: BitbucketCredentials, owner?: string, repo?: string) => {
@@ -69,23 +69,21 @@ export function useBitbucket() {
         errorMessage: content?.errorMessage,
       };
     }
-    if (content) {
-      if (
-        content
-        && isEqual(content.tokens, tokens)
-        && isEqual(content.themes, themes)
-        && isEqual(content.metadata?.tokenSetOrder ?? Object.keys(tokens), Object.keys(tokens))
-      ) {
-        notifyToUI('Nothing to commit');
-        return {
-          status: 'success',
-          themes,
-          tokens,
-          metadata: {
-            tokenSetOrder: Object.keys(tokens),
-          },
-        };
-      }
+    if (
+      content
+      && isEqual(content.tokens, tokens)
+      && isEqual(content.themes, themes)
+      && isEqual(content.metadata?.tokenSetOrder ?? Object.keys(tokens), Object.keys(tokens))
+    ) {
+      notifyToUI('Nothing to commit');
+      return {
+        status: 'success',
+        themes,
+        tokens,
+        metadata: {
+          tokenSetOrder: Object.keys(tokens),
+        },
+      };
     }
 
     dispatch.uiState.setLocalApiState({ ...context });
@@ -119,7 +117,14 @@ export function useBitbucket() {
           themes,
         };
       } catch (e) {
+        closeDialog();
         console.log('Error pushing to Bitbucket', e);
+        if (e instanceof Error && e.message === ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR) {
+          return {
+            status: 'failure',
+            errorMessage: ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR,
+          };
+        }
         return {
           status: 'failure',
           errorMessage: ErrorMessages.BITBUCKET_CREDENTIAL_ERROR,
@@ -138,6 +143,7 @@ export function useBitbucket() {
     dispatch.uiState,
     dispatch.tokenState,
     pushDialog,
+    closeDialog,
     tokens,
     themes,
     localApiState,
@@ -239,7 +245,7 @@ export function useBitbucket() {
         }
         return await pushTokensToBitbucket(context);
       } catch (e) {
-        notifyToUI('Error syncing with Bitbucket, check credentials', { error: true });
+        notifyToUI(ErrorMessages.BITBUCKET_CREDENTIAL_ERROR, { error: true });
         console.log('Error', e);
         return {
           status: 'failure',

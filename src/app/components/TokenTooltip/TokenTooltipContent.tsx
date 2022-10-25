@@ -1,10 +1,10 @@
 import React from 'react';
 import { SingleToken } from '@/types/tokens';
-import useTokens from '@/app/store/useTokens';
-import { TokensContext } from '@/context';
 import { TokenTooltipContentValue } from './TokenTooltipContentValue';
-import { TokenTypes } from '@/constants/TokenTypes';
 import Box from '../Box';
+import Stack from '../Stack';
+import { TokensContext } from '@/context';
+import NotFoundBadge from './NotFoundBadge';
 
 type Props = {
   token: SingleToken;
@@ -12,37 +12,33 @@ type Props = {
 
 export const TokenTooltipContent: React.FC<Props> = ({ token }) => {
   const tokensContext = React.useContext(TokensContext);
-  const { isAlias } = useTokens();
-  const tokenIsAlias = React.useMemo(() => (
-    isAlias(token, tokensContext.resolvedTokens)
-  ), [token, isAlias, tokensContext.resolvedTokens]);
-  const tokenIsShadowOrTypographyAlias = React.useMemo(
-    () => (
-      token.type === TokenTypes.TYPOGRAPHY || token.type === TokenTypes.BOX_SHADOW)
-      && typeof token.value === 'string',
-    [token],
-  );
+
+  const failedToResolve = React.useMemo(() => (
+    tokensContext.resolvedTokens.find((t) => t.name === token.name)?.failedToResolve
+  ), [token, tokensContext.resolvedTokens]);
 
   return (
-    <div>
-      <Box css={{ fontSize: '$0', fontWeight: '$bold', color: '$fgToolTip' }}>
+    <Stack direction="column" gap={1} css={{ background: '$bgToolTip' }}>
+      <Stack
+        direction="row"
+        justify="start"
+        align="center"
+        gap={2}
+        css={{
+          fontSize: '$0',
+          fontWeight: '$bold',
+          color: '$fgToolTip',
+          position: 'relative',
+        }}
+      >
         {token.name.split('.')[token.name.split('.').length - 1]}
-      </Box>
-      <TokenTooltipContentValue
-        token={token}
-        shouldResolve={false}
-        tokenIsShadowOrTypographyAlias={tokenIsShadowOrTypographyAlias}
-      />
-      {tokenIsAlias && (
-        <Box css={{ color: '$fgToolTipMuted' }}>
-          <TokenTooltipContentValue
-            token={token}
-            shouldResolve
-            tokenIsShadowOrTypographyAlias={tokenIsShadowOrTypographyAlias}
-          />
-        </Box>
-      )}
-      {token.description && <Box css={{ color: '$fgToolTipMuted' }}>{token.description}</Box>}
-    </div>
+        {failedToResolve ? <NotFoundBadge /> : null}
+      </Stack>
+
+      <Stack direction="column" align="start" gap={2} wrap>
+        <TokenTooltipContentValue token={token} />
+      </Stack>
+      {token.description && <Box css={{ color: '$fgToolTipMuted', padding: '$1 $2' }}>{token.description}</Box>}
+    </Stack>
   );
 };

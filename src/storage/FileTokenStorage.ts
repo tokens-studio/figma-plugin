@@ -1,18 +1,17 @@
 import compact from 'just-compact';
 import {
-  RemoteTokenStorage, RemoteTokenstorageErrorMessage, RemoteTokenStorageFile, RemoteTokenStorageSingleTokenSetFile, RemoteTokenStorageThemesFile,
+  RemoteTokenStorage, RemoteTokenstorageErrorMessage, RemoteTokenStorageFile, RemoteTokenStorageMetadata, RemoteTokenStorageSingleTokenSetFile, RemoteTokenStorageThemesFile,
 } from './RemoteTokenStorage';
 import IsJSONString from '@/utils/isJSONString';
 import { complexSingleFileSchema, multiFileSchema } from './schemas';
 import { ErrorMessages } from '@/constants/ErrorMessages';
 import { SystemFilenames } from '@/constants/SystemFilenames';
-import { GitStorageMetadata } from './GitTokenStorage';
 
 type StorageFlags = {
   multiFileEnabled: boolean
 };
 
-export class FileTokenStorage extends RemoteTokenStorage<GitStorageMetadata> {
+export class FileTokenStorage extends RemoteTokenStorage {
   private files: FileList;
 
   protected flags: StorageFlags = {
@@ -29,7 +28,7 @@ export class FileTokenStorage extends RemoteTokenStorage<GitStorageMetadata> {
     return this;
   }
 
-  public async read(): Promise<RemoteTokenStorageFile<GitStorageMetadata>[] | RemoteTokenstorageErrorMessage> {
+  public async read(): Promise<RemoteTokenStorageFile[] | RemoteTokenstorageErrorMessage> {
     try {
       if (this.flags.multiFileEnabled && this.files.length > 1) {
         const jsonFiles = Array.from(this.files).filter((file) => file.webkitRelativePath.endsWith('.json'))
@@ -54,7 +53,7 @@ export class FileTokenStorage extends RemoteTokenStorage<GitStorageMetadata> {
         }));
         // Wait for all promises to be resolved
         const jsonFileContents = await Promise.all(filePromises);
-        return compact(jsonFileContents.map<RemoteTokenStorageFile<GitStorageMetadata> | null>((fileContent, index) => {
+        return compact(jsonFileContents.map<RemoteTokenStorageFile | null>((fileContent, index) => {
           const { webkitRelativePath } = jsonFiles[index];
           if (fileContent) {
             const name = webkitRelativePath?.substring(webkitRelativePath.indexOf('/') + 1)?.replace('.json', '');
@@ -70,7 +69,7 @@ export class FileTokenStorage extends RemoteTokenStorage<GitStorageMetadata> {
               return {
                 path: webkitRelativePath,
                 type: 'metadata',
-                data: fileContent as GitStorageMetadata,
+                data: fileContent as RemoteTokenStorageMetadata,
               };
             }
 
@@ -89,7 +88,7 @@ export class FileTokenStorage extends RemoteTokenStorage<GitStorageMetadata> {
       if (this.files[0].name.endsWith('.json')) {
         const reader = new FileReader();
         reader.readAsText(this.files[0]);
-        return await new Promise<RemoteTokenStorageFile<GitStorageMetadata>[] | RemoteTokenstorageErrorMessage>((resolve) => {
+        return await new Promise<RemoteTokenStorageFile[] | RemoteTokenstorageErrorMessage>((resolve) => {
           reader.onload = async () => {
             const result = reader.result as string;
 
@@ -111,7 +110,7 @@ export class FileTokenStorage extends RemoteTokenStorage<GitStorageMetadata> {
                       data: $metadata,
                     },
                   ] : []),
-                  ...Object.entries(data).map<RemoteTokenStorageFile<GitStorageMetadata>>(([name, tokenSet]) => ({
+                  ...Object.entries(data).map<RemoteTokenStorageFile>(([name, tokenSet]) => ({
                     name,
                     type: 'tokenSet',
                     path: this.files[0].name,

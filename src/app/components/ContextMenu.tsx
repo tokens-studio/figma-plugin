@@ -32,6 +32,10 @@ const itemStyles = {
     backgroundColor: '$interaction',
     color: '$onInteraction',
   },
+  '&:disabled': {
+    pointerEvents: 'none',
+    opacity: 0.5,
+  },
 };
 
 const StyledItem = styled(ContextMenuPrimitive.Item, { ...itemStyles });

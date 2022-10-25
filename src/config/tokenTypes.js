@@ -96,6 +96,7 @@ const tokenTypes = {
         fontSize: '18',
         letterSpacing: '0%',
         paragraphSpacing: '0',
+        paragraphIndent: '0',
         textDecoration: 'none',
         textCase: 'none',
       },
@@ -197,6 +198,17 @@ const tokenTypes = {
     type: 'composition',
     schema: {
       value: {},
+      options: {
+        description: '',
+      },
+    },
+  },
+  asset: {
+    label: 'Assets',
+    property: 'Asset',
+    type: 'asset',
+    explainer: 'Public URL of your asset',
+    schema: {
       options: {
         description: '',
       },

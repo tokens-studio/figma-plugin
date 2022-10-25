@@ -1,0 +1,55 @@
+import { Meta, Story, ArgsTable, Canvas, Preview } from '@storybook/addon-docs';
+import { Provider } from 'react-redux';
+import TokensDecorator from '../../.storybook/decorations/TokensDecorator';
+
+import { store } from '@/app/store';
+import { SingleToken } from '@/types/tokens';
+import { TokenTypes } from '@/constants/TokenTypes';
+import { tokensForStories } from './tokensForStories';
+
+import TokenListing from '@/app/components/TokenListing';
+
+<Meta
+  title="TokenListing"
+  component={TokenListing}
+  decorators={[TokensDecorator]}
+  args={{
+    tokenKey: 'colors',
+    label: 'Colors',
+    schema: {
+      label: 'Colors',
+      property: 'color',
+      type: TokenTypes.COLOR,
+    },
+    values: tokensForStories['colors'],
+  }}
+/>
+
+export const TokenListingDefaultStory = (args) => {
+  return (
+    <Provider store={store}>
+      <TokenListing {...args} />
+    </Provider>
+  );
+};
+
+<Canvas>
+  <Story name="Colors" args={{}}>
+    {TokenListingDefaultStory.bind({})}
+  </Story>
+  <Story
+    name="Spacing"
+    args={{
+      tokenKey: 'spacing',
+      label: "Spacing",
+      schema: {
+        label: 'Spacing',
+        property: 'spacing',
+        type: TokenTypes.SPACING,
+      },
+      values: tokensForStories['spacing'],
+    }}
+  >
+    {TokenListingDefaultStory.bind({})}
+  </Story>
+</Canvas>

@@ -9,10 +9,13 @@ import {
 } from '@/types/tokens';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes, GetThemeInfoMessageResult } from '@/types/AsyncMessages';
-import { createStyles } from '@/plugin/asyncMessageHandlers';
+import {
+  createStyles, renameStyles, removeStyles, syncStyles,
+} from '@/plugin/asyncMessageHandlers';
 import { AllTheProviders, createMockStore, resetStore } from '../../../tests/config/setupTest';
 import { store } from '../store';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
+import { UpdateMode } from '@/constants/UpdateMode';
 
 type GetFormattedTokensOptions = {
   includeAllTokens: boolean;
@@ -196,10 +199,9 @@ const resolvedTokens: AnyTokenList = [
 ];
 
 const mockConfirm = jest.fn();
-const mockPullStylesHandler = jest.fn(async () => {});
-const mockRemapTokensHandler = jest.fn(async () => {});
-const mockRemoveTokensByValueHandler = jest.fn(async () => {});
-
+const mockPullStylesHandler = jest.fn(async () => { });
+const mockRemapTokensHandler = jest.fn(async () => { });
+const mockRemoveTokensByValueHandler = jest.fn(async () => { });
 jest.mock('../hooks/useConfirm', () => ({
   __esModule: true,
   default: () => ({
@@ -264,6 +266,36 @@ describe('useToken test', () => {
     await expect(result.current.pullStyles()).resolves.not.toThrow();
   });
 
+  it('handleRemap test', async () => {
+    const messageSpy = jest.spyOn(AsyncMessageChannel.ReactInstance, 'message');
+    await act(async () => {
+      await result.current.handleRemap(TokenTypes.SIZING, 'sizing.small', 'sizing.sm', [{ name: 'sizing.small', value: 3, type: TokenTypes.SIZING }]);
+    });
+
+    expect(messageSpy).toBeCalledWith({
+      type: AsyncMessageTypes.REMAP_TOKENS,
+      category: TokenTypes.SIZING,
+      oldName: 'sizing.small',
+      newName: 'sizing.sm',
+      updateMode: UpdateMode.SELECTION,
+      tokens: [{ name: 'sizing.small', value: 3, type: TokenTypes.SIZING }],
+      settings: store.getState().settings,
+    });
+  });
+
+  it('remapTokensInGroup', async () => {
+    const messageSpy = jest.spyOn(AsyncMessageChannel.ReactInstance, 'message');
+    mockConfirm.mockImplementation(() => Promise.resolve({ data: ['selection', 'page', 'document'] }));
+    await act(async () => {
+      await result.current.remapTokensInGroup({ oldGroupName: 'old.', newGroupName: 'new.' });
+    });
+    expect(messageSpy).toBeCalledWith({
+      type: AsyncMessageTypes.BULK_REMAP_TOKENS,
+      oldName: 'old.',
+      newName: 'new.',
+    });
+  });
+
   describe('createStylesFromTokens', () => {
     const tokenMockStore = createMockStore({
       tokenState: {
@@ -297,6 +329,9 @@ describe('useToken test', () => {
       themes: [],
     }));
     AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.CREATE_STYLES, createStyles);
+    AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.RENAME_STYLES, renameStyles);
+    AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.REMOVE_STYLES, removeStyles);
+    AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.SYNC_STYLES, syncStyles);
 
     it('creates all styles', async () => {
       mockConfirm.mockImplementation(() => Promise.resolve({ data: ['textStyles', 'colorStyles', 'effectStyles'] }));
@@ -347,6 +382,7 @@ describe('useToken test', () => {
         settings: store.getState().settings,
       });
     });
+
     it('respects decision to only create text styles', async () => {
       mockConfirm.mockImplementation(() => Promise.resolve({ data: ['textStyles'] }));
 
@@ -371,6 +407,65 @@ describe('useToken test', () => {
         },
         ],
         settings: store.getState().settings,
+      });
+    });
+    it('rename styles from current theme', async () => {
+      await act(async () => {
+        await result.current.renameStylesFromTokens({ oldName: 'old', newName: 'new', parent: 'global' });
+      });
+
+      expect(messageSpy).toBeCalledWith({
+        type: AsyncMessageTypes.RENAME_STYLES,
+        oldName: 'old',
+        newName: 'new',
+        parent: 'global',
+        settings: store.getState().settings,
+      });
+    });
+
+    it('should remap all tokens', async () => {
+      await act(async () => {
+        await result.current.handleBulkRemap('newName', 'oldName');
+      });
+
+      expect(messageSpy).toBeCalledWith({
+        type: AsyncMessageTypes.BULK_REMAP_TOKENS,
+        oldName: 'oldName',
+        newName: 'newName',
+      });
+    });
+
+    it('removeStylesFromTokens', async () => {
+      const tokenToDelete = {
+        path: 'color.red',
+        parent: 'global',
+      };
+      await act(async () => {
+        await result.current.removeStylesFromTokens(tokenToDelete);
+      });
+      expect(messageSpy).toBeCalledWith({
+        type: AsyncMessageTypes.REMOVE_STYLES,
+        token: tokenToDelete,
+        settings: store.getState().settings,
+      });
+    });
+
+    it('syncStyles', async () => {
+      mockConfirm.mockImplementation(() => Promise.resolve({ data: ['renameStyles', 'removeStyles'] }));
+      await act(async () => {
+        await result.current.syncStyles();
+      });
+
+      expect(messageSpy).toBeCalledWith({
+        type: AsyncMessageTypes.SYNC_STYLES,
+        tokens: {
+          global: [{ name: 'white', value: '#ffffff', type: TokenTypes.COLOR }, { name: 'headline', value: { fontFamily: 'Inter', fontWeight: 'Bold' }, type: TokenTypes.TYPOGRAPHY }, { name: 'shadow', value: '{shadows.default}', type: TokenTypes.BOX_SHADOW }],
+          light: [{ name: 'bg.default', value: '#ffffff', type: TokenTypes.COLOR }],
+        },
+        settings: {
+          renameStyle: true,
+          removeStyle: true,
+        },
       });
     });
   });

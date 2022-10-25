@@ -11,7 +11,7 @@ import useTokens from '../store/useTokens';
 import { EditTokenObject, SingleBoxShadowToken, SingleToken } from '@/types/tokens';
 import { checkIfContainsAlias, getAliasValue } from '@/utils/alias';
 import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
-import { activeTokenSetSelector, editTokenSelector } from '@/selectors';
+import { activeTokenSetSelector, updateModeSelector, editTokenSelector } from '@/selectors';
 import { TokenTypes } from '@/constants/TokenTypes';
 import TypographyInput from './TypographyInput';
 import Stack from './Stack';
@@ -22,6 +22,10 @@ import { UpdateMode } from '@/constants/UpdateMode';
 import trimValue from '@/utils/trimValue';
 import BoxShadowInput from './BoxShadowInput';
 import { EditTokenFormStatus } from '@/constants/EditTokenFormStatus';
+import { StyleOptions } from '@/constants/StyleOptions';
+import Textarea from './Textarea';
+import Heading from './Heading';
+import Box from './Box';
 
 type Props = {
   resolvedTokens: ResolveTokenValuesResult[];
@@ -32,8 +36,9 @@ function EditTokenForm({ resolvedTokens }: Props) {
   const firstInput = React.useRef<HTMLInputElement | null>(null);
   const activeTokenSet = useSelector(activeTokenSetSelector);
   const editToken = useSelector(editTokenSelector);
+  const updateMode = useSelector(updateModeSelector);
   const { editSingleToken, createSingleToken, duplicateSingleToken } = useManageTokens();
-  const { remapToken } = useTokens();
+  const { remapToken, renameStylesFromTokens } = useTokens();
   const dispatch = useDispatch<Dispatch>();
   const [inputHelperOpen, setInputHelperOpen] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
@@ -41,11 +46,8 @@ function EditTokenForm({ resolvedTokens }: Props) {
   const { confirm } = useConfirm();
 
   const isValid = React.useMemo(() => {
-    if (
-      internalEditToken?.type === TokenTypes.COMPOSITION
-      && internalEditToken.value
-      && (internalEditToken.value.hasOwnProperty('') || Object.keys(internalEditToken.value).length === 0)
-    ) {
+    if (internalEditToken?.type === TokenTypes.COMPOSITION && internalEditToken.value
+      && (internalEditToken.value.hasOwnProperty('') || Object.keys(internalEditToken.value).length === 0)) {
       return false;
     }
     return internalEditToken?.value && !error;
@@ -89,7 +91,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
     if ((internalEditToken?.status || nameWasChanged) && hasPriorTokenName) {
       setError("Tokens can't share name with a group");
     }
-  }, [internalEditToken, hasNameThatExistsAlready, nameWasChanged, hasPriorTokenName]);
+  }, [internalEditToken, hasNameThatExistsAlready, nameWasChanged, hasPriorTokenName, hasAnotherTokenThatStartsWithName]);
 
   const handleToggleInputHelper = React.useCallback(() => {
     setInputHelperOpen(!inputHelperOpen);
@@ -247,19 +249,26 @@ function EditTokenForm({ resolvedTokens }: Props) {
             text: `Remap all tokens that use ${oldName} to ${newName}?`,
             description: 'This will change all layers that used the old token name. This could take a while.',
             choices: [
-              { key: UpdateMode.SELECTION, label: 'Selection', unique: true },
               {
-                key: UpdateMode.PAGE,
-                label: 'Page',
-                enabled: true,
-                unique: true,
+                key: UpdateMode.SELECTION, label: 'Selection', unique: true, enabled: UpdateMode.SELECTION === updateMode,
               },
-              { key: UpdateMode.DOCUMENT, label: 'Document', unique: true },
+              {
+                key: UpdateMode.PAGE, label: 'Page', unique: true, enabled: UpdateMode.PAGE === updateMode,
+              },
+              {
+                key: UpdateMode.DOCUMENT, label: 'Document', unique: true, enabled: UpdateMode.DOCUMENT === updateMode,
+              },
+              {
+                key: StyleOptions.RENAME, label: 'Rename styles',
+              },
             ],
           });
-
           if (shouldRemap) {
             remapToken(oldName, newName, shouldRemap.data[0]);
+            dispatch.settings.setUpdateMode(shouldRemap.data[0]);
+            if (shouldRemap.data.includes(StyleOptions.RENAME)) {
+              renameStylesFromTokens({ oldName, newName, parent: activeTokenSet });
+            }
           }
         } else {
           track('Edit token', { renamed: false });
@@ -286,7 +295,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
         dispatch.uiState.setShowEditForm(false);
       }
     },
-    [dispatch, isValid, internalEditToken],
+    [dispatch, isValid, internalEditToken, submitTokenValue],
   );
 
   const handleReset = React.useCallback(() => {
@@ -379,10 +388,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
             {checkIfContainsAlias(internalEditToken.value) && (
               <div className="flex p-2 mt-2 font-mono text-gray-700 bg-gray-100 border-gray-300 rounded text-xxs itms-center">
                 {internalEditToken.type === 'color' ? (
-                  <div
-                    className="w-4 h-4 mr-1 border border-gray-200 rounded"
-                    style={{ background: String(resolvedValue) }}
-                  />
+                  <div className="w-4 h-4 mr-1 border border-gray-200 rounded" style={{ background: String(resolvedValue) }} />
                 ) : null}
                 {resolvedValue?.toString()}
               </div>
@@ -410,19 +416,17 @@ function EditTokenForm({ resolvedTokens }: Props) {
         />
         {renderTokenForm()}
 
-        {internalEditToken?.schema?.explainer && (
-          <div className="mt-1 text-gray-600 text-xxs">{internalEditToken.schema.explainer}</div>
-        )}
-        <Input
-          full
-          key="description"
-          label="description"
-          value={internalEditToken?.description}
-          onChange={handleDescriptionChange}
-          type="text"
-          name="description"
-          capitalize
-        />
+        {internalEditToken?.schema?.explainer && <div className="mt-1 text-gray-600 text-xxs">{internalEditToken.schema.explainer}</div>}
+        <Box>
+          <Heading size="xsmall">Description</Heading>
+          <Textarea
+            key="description"
+            value={internalEditToken?.description || ''}
+            onChange={handleDescriptionChange}
+            rows={3}
+            border
+          />
+        </Box>
         <Stack direction="row" justify="end" gap={2}>
           <Button variant="secondary" type="button" onClick={handleReset}>
             Cancel

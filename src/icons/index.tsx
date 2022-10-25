@@ -53,6 +53,7 @@ import IconX from './x.svg';
 import IconFontSize from './font-size.svg';
 import IconLetterSpacing from './letter-spacing.svg';
 import IconParagraphSpacing from './paragraph-spacing.svg';
+import IconParagraphIndent from './paragraph-indent.svg';
 import IconTextCase from './text-case.svg';
 import IconTextDecoration from './text-decoration.svg';
 import IconLineHeight from './line-height.svg';
@@ -60,6 +61,9 @@ import IconBack from './back.svg';
 import IconArrowRight from './arrow-right.svg';
 import IconUnlink from './unlink.svg';
 import IconFile from './file.svg';
+import IconCollapseArrow from './collapse-arrow.svg';
+import IconExpandArrow from './expand-arrow.svg';
+import IconImage from './image.svg';
 
 export {
   IconAdd,
@@ -117,6 +121,7 @@ export {
   IconFontSize,
   IconLetterSpacing,
   IconParagraphSpacing,
+  IconParagraphIndent,
   IconTextCase,
   IconTextDecoration,
   IconLineHeight,
@@ -124,4 +129,7 @@ export {
   IconArrowRight,
   IconUnlink,
   IconFile,
+  IconCollapseArrow,
+  IconExpandArrow,
+  IconImage,
 };

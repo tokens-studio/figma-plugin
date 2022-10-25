@@ -48,7 +48,9 @@ export interface TokenState {
   editProhibited: boolean;
   hasUnsavedChanges: boolean;
   collapsedTokenSets: string[];
-  collapsedTokenTypeObj: Record<TokenTypes, boolean>
+  collapsedTokenTypeObj: Record<TokenTypes, boolean>;
+  checkForChanges: boolean;
+  collapsedTokens: string[];
 }
 
 export const tokenState = createModel<RootModel>()({
@@ -74,6 +76,8 @@ export const tokenState = createModel<RootModel>()({
       acc[tokenType as TokenTypes] = false;
       return acc;
     }, {}),
+    checkForChanges: false,
+    collapsedTokens: [],
   } as unknown as TokenState,
   reducers: {
     setEditProhibited(state, payload: boolean) {
@@ -307,14 +311,6 @@ export const tokenState = createModel<RootModel>()({
             name: newTokenName,
           };
         }
-        if (token.value.toString().startsWith(`{${path}${oldName}.`)) {
-          const { value, ...rest } = token;
-          const updatedNewTokenValue = value.toString().replace(`${path}${oldName}`, `${path}${newName}`);
-          return {
-            ...rest,
-            value: updatedNewTokenValue,
-          };
-        }
         return token;
       }) as AnyTokenList;
 
@@ -398,6 +394,14 @@ export const tokenState = createModel<RootModel>()({
       ...state,
       collapsedTokenTypeObj: data,
     }),
+    updateCheckForChanges: (state, data: boolean) => ({
+      ...state,
+      checkForChanges: data,
+    }),
+    setCollapsedTokens: (state, data: string[]) => ({
+      ...state,
+      collapsedTokens: data,
+    }),
     ...tokenStateReducers,
   },
   effects: (dispatch) => ({
@@ -458,8 +462,17 @@ export const tokenState = createModel<RootModel>()({
         dispatch.tokenState.updateDocument();
       }
     },
-    updateCheckForChanges(checkForChanges: boolean) {
-      dispatch.tokenState.updateDocument({ checkForChanges, shouldUpdateNodes: false });
+    renameTokenGroup(data: RenameTokenGroupPayload, rootState) {
+      const {
+        path, oldName, newName, type, parent,
+      } = data;
+      const tokensInParent = rootState.tokenState.tokens[parent] ?? [];
+      tokensInParent.filter((token) => token.name.startsWith(`${path}${newName}.`) && token.type === type).forEach((updatedToken) => {
+        dispatch.tokenState.updateAliases({ oldName: updatedToken.name.replace(`${path}${newName}`, `${path}${oldName}`), newName: updatedToken.name });
+      });
+    },
+    updateCheckForChanges() {
+      dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
     },
     updateDocument(options?: UpdateDocumentPayload, rootState?) {
       const defaults = { shouldUpdateNodes: true, updateRemote: true };
@@ -479,7 +492,7 @@ export const tokenState = createModel<RootModel>()({
           api: rootState.uiState.api,
           storageType: rootState.uiState.storageType,
           shouldUpdateRemote: params.updateRemote && rootState.settings.updateRemote,
-          checkForChanges: params.checkForChanges || false,
+          checkForChanges: rootState.tokenState.checkForChanges,
         });
       } catch (e) {
         console.error('Error updating document', e);
