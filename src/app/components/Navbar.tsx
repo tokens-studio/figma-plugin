@@ -1,6 +1,7 @@
 import React, { useCallback } from 'react';
 import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux';
+import { LightningBoltIcon } from '@radix-ui/react-icons';
 import Box from './Box';
 import { Tabs } from '@/constants/Tabs';
 import Stack from './Stack';
@@ -9,7 +10,6 @@ import { NavbarUndoButton } from './NavbarUndoButton';
 import Minimize from '../assets/minimize.svg';
 import useMinimizeWindow from './useMinimizeWindow';
 import IconButton from './IconButton';
-import { IconFolder } from '@/icons';
 import {
   themeObjectsSelector,
   activeThemeSelector,
@@ -76,7 +76,7 @@ const Navbar: React.FC = () => {
         </div>
         <NavbarUndoButton />
       </Stack>
-      <IconButton tooltip="open tokenflow app" onClick={handleOpenTokenFlowApp} icon={<IconFolder />} />
+      <IconButton tooltip="open tokenflow app" onClick={handleOpenTokenFlowApp} icon={<LightningBoltIcon />} />
       <Stack direction="row" align="center">
         <IconButton tooltip="Minimize plugin" onClick={handleResize} icon={<Minimize />} />
       </Stack>
