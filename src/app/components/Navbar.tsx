@@ -78,7 +78,7 @@ const Navbar: React.FC = () => {
         </div>
         <NavbarUndoButton />
       </Stack>
-      {tokenFlowButton && <IconButton tooltip="open tokenflow app" onClick={handleOpenTokenFlowApp} icon={<LightningBoltIcon />} />}
+      {tokenFlowButton && <IconButton tooltip="open tokenflow app" dataCy="token-flow-button" onClick={handleOpenTokenFlowApp} icon={<LightningBoltIcon />} />}
       <Stack direction="row" align="center">
         <IconButton tooltip="Minimize plugin" onClick={handleResize} icon={<Minimize />} />
       </Stack>

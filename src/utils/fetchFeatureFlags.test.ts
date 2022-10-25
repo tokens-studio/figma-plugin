@@ -44,6 +44,7 @@ describe('fetchFeatureFlags', (() => {
         'git-branch-selector': true,
         'multi-file-sync': true,
         'token-themes': true,
+        'token-flow-button': true,
       }
     ));
     const flags = await fetchFeatureFlags(userData);
@@ -52,6 +53,7 @@ describe('fetchFeatureFlags', (() => {
         gitBranchSelector: true,
         multiFileSync: true,
         tokenThemes: true,
+        tokenFlowButton: true,
       },
     );
   }));
