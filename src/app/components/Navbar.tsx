@@ -10,6 +10,7 @@ import { NavbarUndoButton } from './NavbarUndoButton';
 import Minimize from '../assets/minimize.svg';
 import useMinimizeWindow from './useMinimizeWindow';
 import IconButton from './IconButton';
+import { useFlags } from './LaunchDarkly';
 import {
   themeObjectsSelector,
   activeThemeSelector,
@@ -30,6 +31,7 @@ const Navbar: React.FC = () => {
   const usedTokenSet = useSelector(usedTokenSetSelector);
   const themeObjects = useSelector(themeObjectsSelector);
   const tokens = useSelector(tokensSelector);
+  const { tokenFlowButton } = useFlags();
 
   const handleOpenTokenFlowApp = useCallback(async () => {
     const tokenData = JSON.stringify(tokens, null, 2);
@@ -76,7 +78,7 @@ const Navbar: React.FC = () => {
         </div>
         <NavbarUndoButton />
       </Stack>
-      <IconButton tooltip="open tokenflow app" onClick={handleOpenTokenFlowApp} icon={<LightningBoltIcon />} />
+      {tokenFlowButton && <IconButton tooltip="open tokenflow app" onClick={handleOpenTokenFlowApp} icon={<LightningBoltIcon />} />}
       <Stack direction="row" align="center">
         <IconButton tooltip="Minimize plugin" onClick={handleResize} icon={<Minimize />} />
       </Stack>
