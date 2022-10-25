@@ -61,13 +61,17 @@ const StorageItem = ({ item, onEdit }: Props) => {
           {' '}
           {branch && ` (${branch})`}
         </Box>
-        <button
-          type="button"
-          className="inline-flex text-left text-red-600 underline text-xxs"
-          onClick={handleDelete}
-        >
-          Delete local credentials
-        </button>
+        {
+          !isActive() && (
+            <button
+              type="button"
+              className="inline-flex text-left text-red-600 underline text-xxs"
+              onClick={handleDelete}
+            >
+              Delete local credentials
+            </button>
+          )
+        }
       </Box>
       <div className="flex items-center space-x-2 flex-nowrap">
         {onEdit && (
