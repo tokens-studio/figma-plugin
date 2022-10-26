@@ -26,7 +26,7 @@ export default function convertTokensObjectToResolved(
     // @README this function is only used in the utils/transform file
     // which in turn is only used for a local script -- in which case for now we do not
     // need to fully support the SOURCE state
-    Object.fromEntries(usedSets.map((tokenSet) => ([tokenSet, TokenSetStatus.ENABLED]))),
+    Object.fromEntries(usedSets.filter((tokenSet) => !excludedSets.includes(tokenSet)).map((tokenSet) => ([tokenSet, TokenSetStatus.ENABLED]))),
   );
   // Resolve aliases
   const resolved = resolveTokenValues(merged);
