@@ -9,7 +9,6 @@ import Minimize from '../assets/minimize.svg';
 import useMinimizeWindow from './useMinimizeWindow';
 import IconButton from './IconButton';
 import { activeTabSelector } from '@/selectors';
-
 import { Dispatch } from '../store';
 import TokenFlowButton from './TokenFlowButton';
 

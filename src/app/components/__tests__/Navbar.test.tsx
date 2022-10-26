@@ -39,6 +39,6 @@ describe('Navbar', () => {
     const tokenFlowButton = await result.findByTestId('token-flow-button');
     await act(async () => userEvent.click(tokenFlowButton));
 
-    expect(global.open).toHaveBeenCalledWith('https://token-flow-app.herokuapp.com?id=test-id');
+    expect(global.open).toHaveBeenCalledWith(`${process.env.TOKEN_FLOW_APP_URL}?id=test-id`);
   });
 });
