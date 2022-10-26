@@ -107,9 +107,9 @@ export default function useManageTokens() {
 
   const deleteSingleToken = useCallback(async (data: DeleteTokenPayload) => {
     const choices: Choice[] = [];
-    if (store.getState().tokenState.themes.length > 0) {
+    if (store.getState().tokenState.themes.length > 0 && data.type && [TokenTypes.COLOR, TokenTypes.TYPOGRAPHY, TokenTypes.BOX_SHADOW].includes(data?.type)) {
       choices.push({
-        key: StyleOptions.RENAME, label: 'Rename styles',
+        key: StyleOptions.REMOVE, label: 'Delete associated style',
       });
     }
 
@@ -124,8 +124,7 @@ export default function useManageTokens() {
         isInfinite: true,
       });
       deleteToken(data);
-      if (Array.isArray(userConfirmation.data) && userConfirmation.data.length) {
-        console.log('styles');
+      if (Array.isArray(userConfirmation.data) && userConfirmation.data.includes(StyleOptions.REMOVE)) {
         removeStylesFromTokens(data);
       }
       dispatch.uiState.completeJob(BackgroundJobs.UI_DELETETOKEN);
