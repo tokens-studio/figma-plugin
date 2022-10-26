@@ -6,7 +6,7 @@ name: Node.js CI
 on: [pull_request]
 
 env:
-  TOKEN_FLOW_APP_URL: https://token-flow-app.herokuapp.com
+  TOKEN_FLOW_APP_URL: ${{ secrets.TOKEN_FLOW_APP_URL }}
 
 jobs:
   # install dependencies and store artifact
