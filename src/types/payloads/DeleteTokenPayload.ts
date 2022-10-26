@@ -1,4 +1,5 @@
 export type DeleteTokenPayload = {
   parent: string;
-  path: string
+  path: string;
+  type?: string;
 };
