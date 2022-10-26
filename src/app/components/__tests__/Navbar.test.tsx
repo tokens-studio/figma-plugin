@@ -24,7 +24,7 @@ describe('Navbar', () => {
     expect(mockStore.getState().uiState.activeTab).toEqual(Tabs.SETTINGS);
   });
 
-  it('displays the token flow button if user is on pro plan', () => {
+  it('displays the token flow button if user has access to it', () => {
     const result = render(<Navbar />);
 
     const tokenFlowButton = result.getByTestId('token-flow-button');

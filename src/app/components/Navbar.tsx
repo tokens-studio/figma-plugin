@@ -1,7 +1,5 @@
 import React, { useCallback } from 'react';
-import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux';
-import { LightningBoltIcon } from '@radix-ui/react-icons';
 import Box from './Box';
 import { Tabs } from '@/constants/Tabs';
 import Stack from './Stack';
@@ -10,44 +8,15 @@ import { NavbarUndoButton } from './NavbarUndoButton';
 import Minimize from '../assets/minimize.svg';
 import useMinimizeWindow from './useMinimizeWindow';
 import IconButton from './IconButton';
-import { useFlags } from './LaunchDarkly';
-import {
-  themeObjectsSelector,
-  activeThemeSelector,
-  themeOptionsSelector,
-  usedTokenSetSelector,
-  tokensSelector,
-  activeTabSelector,
-} from '@/selectors';
+import { activeTabSelector } from '@/selectors';
 
 import { Dispatch } from '../store';
+import TokenFlowButton from './TokenFlowButton';
 
 const Navbar: React.FC = () => {
   const activeTab = useSelector(activeTabSelector);
   const dispatch = useDispatch<Dispatch>();
   const { handleResize } = useMinimizeWindow();
-  const activeTheme = useSelector(activeThemeSelector);
-  const availableThemes = useSelector(themeOptionsSelector);
-  const usedTokenSet = useSelector(usedTokenSetSelector);
-  const themeObjects = useSelector(themeObjectsSelector);
-  const tokens = useSelector(tokensSelector);
-  const { tokenFlowButton } = useFlags();
-
-  const handleOpenTokenFlowApp = useCallback(async () => {
-    const tokenData = JSON.stringify(tokens, null, 2);
-    const response = await axios({
-      method: 'post',
-      url: 'https://token-flow-app.herokuapp.com/api/tokens',
-      data: {
-        tokenData,
-        activeTheme,
-        availableThemes,
-        usedTokenSet,
-        themeObjects,
-      },
-    });
-    if (response.status === 200) window.open(`https://token-flow-app.herokuapp.com?id=${response.data.result}`);
-  }, [activeTheme, availableThemes, themeObjects, tokens, usedTokenSet]);
 
   const handleSwitch = useCallback(
     (tab: Tabs) => {
@@ -78,7 +47,7 @@ const Navbar: React.FC = () => {
         </div>
         <NavbarUndoButton />
       </Stack>
-      {tokenFlowButton && <IconButton tooltip="Open tokenflow app" dataCy="token-flow-button" onClick={handleOpenTokenFlowApp} icon={<LightningBoltIcon />} />}
+      <TokenFlowButton />
       <Stack direction="row" align="center">
         <IconButton tooltip="Minimize plugin" onClick={handleResize} icon={<Minimize />} />
       </Stack>

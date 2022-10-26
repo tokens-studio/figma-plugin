@@ -98,7 +98,7 @@ export default function useRemoteTokens() {
     }
     if (remoteData?.status === 'success') {
       saveLastSyncedState(dispatch, remoteData.tokens, remoteData.themes, remoteData.metadata);
-      console.log('values', remoteData.tokens);
+
       dispatch.tokenState.setTokenData({
         values: remoteData.tokens,
         themes: remoteData.themes,
