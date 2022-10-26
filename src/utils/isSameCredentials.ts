@@ -10,7 +10,7 @@ function isSameCredentials(
     case StorageProviderType.GITLAB:
     case StorageProviderType.ADO:
     case StorageProviderType.BITBUCKET: {
-      if (credential.internalId === stored.internalId) {
+      if (credential.internalId && stored.internalId && credential.internalId === stored.internalId) {
         return true;
       }
       return (
