@@ -82,14 +82,11 @@ function EditTokenForm({ resolvedTokens }: Props) {
     if ((internalEditToken?.status !== EditTokenFormStatus.EDIT || nameWasChanged) && hasNameThatExistsAlready) {
       setError('Token names must be unique');
     }
-    if (
-      (internalEditToken?.status !== EditTokenFormStatus.EDIT || nameWasChanged)
-      && hasAnotherTokenThatStartsWithName
-    ) {
+    if ((internalEditToken?.status !== EditTokenFormStatus.EDIT || nameWasChanged) && hasAnotherTokenThatStartsWithName) {
       setError('Must not use name of another group');
     }
     if ((internalEditToken?.status || nameWasChanged) && hasPriorTokenName) {
-      setError("Tokens can't share name with a group");
+      setError('Tokens can\'t share name with a group');
     }
   }, [internalEditToken, hasNameThatExistsAlready, nameWasChanged, hasPriorTokenName, hasAnotherTokenThatStartsWithName]);
 
@@ -175,35 +172,28 @@ function EditTokenForm({ resolvedTokens }: Props) {
     [internalEditToken],
   );
 
-  const handleTypographyValueDownShiftInputChange = React.useCallback(
-    (newInputValue: string, property: string) => {
-      if (internalEditToken?.type === TokenTypes.TYPOGRAPHY && typeof internalEditToken?.value !== 'string') {
-        setInternalEditToken({
-          ...internalEditToken,
-          value: { ...internalEditToken.value, [property]: newInputValue },
-        });
-      }
-    },
-    [internalEditToken],
-  );
-
-  const handleDownShiftInputChange = React.useCallback(
-    (newInputValue: string) => {
+  const handleTypographyValueDownShiftInputChange = React.useCallback((newInputValue: string, property: string) => {
+    if (internalEditToken?.type === TokenTypes.TYPOGRAPHY && typeof internalEditToken?.value !== 'string') {
       setInternalEditToken({
         ...internalEditToken,
-        value: newInputValue,
-      } as typeof editToken);
-    },
-    [internalEditToken],
-  );
+        value: { ...internalEditToken.value, [property]: newInputValue },
+      });
+    }
+  }, [internalEditToken]);
 
-  const handleDescriptionChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>(
-    (e) => {
-      e.persist();
+  const handleDownShiftInputChange = React.useCallback((newInputValue: string) => {
+    setInternalEditToken({
+      ...internalEditToken,
+      value: newInputValue,
+    } as typeof editToken);
+  }, [internalEditToken]);
+
+  const handleDescriptionChange = React.useCallback(
+    (val: string) => {
       if (internalEditToken) {
         setInternalEditToken({
           ...internalEditToken,
-          description: e.target.value,
+          description: val,
         });
       }
     },
@@ -226,7 +216,10 @@ function EditTokenForm({ resolvedTokens }: Props) {
       if (internalEditToken.status === EditTokenFormStatus.CREATE) {
         track('Create token', { type: internalEditToken.type });
         createSingleToken({
-          description: internalEditToken.description ?? internalEditToken.oldDescription,
+          description: (
+            internalEditToken.description
+            ?? internalEditToken.oldDescription
+          ),
           parent: activeTokenSet,
           name: newName,
           type,
@@ -234,7 +227,10 @@ function EditTokenForm({ resolvedTokens }: Props) {
         });
       } else if (internalEditToken.status === EditTokenFormStatus.EDIT) {
         editSingleToken({
-          description: internalEditToken.description ?? internalEditToken.oldDescription,
+          description: (
+            internalEditToken.description
+            ?? internalEditToken.oldDescription
+          ),
           parent: activeTokenSet,
           name: newName,
           oldName,
@@ -276,7 +272,10 @@ function EditTokenForm({ resolvedTokens }: Props) {
       } else if (internalEditToken.status === EditTokenFormStatus.DUPLICATE) {
         oldName = internalEditToken.initialName?.slice(0, internalEditToken.initialName?.lastIndexOf('-copy'));
         duplicateSingleToken({
-          description: internalEditToken.description ?? internalEditToken.oldDescription,
+          description: (
+            internalEditToken.description
+            ?? internalEditToken.oldDescription
+          ),
           parent: activeTokenSet,
           newName,
           oldName,
@@ -434,9 +433,10 @@ function EditTokenForm({ resolvedTokens }: Props) {
           <Button disabled={!isValid} variant="primary" type="submit">
             {internalEditToken?.status === EditTokenFormStatus.CREATE && 'Create'}
             {internalEditToken?.status === EditTokenFormStatus.EDIT && 'Update'}
-            {internalEditToken?.status !== EditTokenFormStatus.CREATE
+            {(
+              internalEditToken?.status !== EditTokenFormStatus.CREATE
               && internalEditToken?.status !== EditTokenFormStatus.EDIT
-              && 'Duplicate'}
+            ) && 'Duplicate'}
           </Button>
         </Stack>
       </Stack>
