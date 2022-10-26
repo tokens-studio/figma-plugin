@@ -7,6 +7,7 @@ import useManageTokens from './useManageTokens';
 import { RootModel } from '@/types/RootModel';
 import { models } from './models';
 import { TokenTypes } from '@/constants/TokenTypes';
+import { StyleOptions } from '@/constants/StyleOptions';
 
 const mockConfirm = jest.fn();
 const mockRemoveStylesFromTokens = jest.fn();
@@ -206,10 +207,7 @@ describe('useManageTokens', () => {
       parent: 'global',
       type: TokenTypes.COLOR,
     };
-    mockConfirm.mockImplementation(() => Promise.resolve({ data: ['delete-style'] }));
-    const { result } = renderHook(() => useManageTokens(), {
-      wrapper: AllTheProviders,
-    });
+    mockConfirm.mockImplementation(() => Promise.resolve({ data: [StyleOptions.REMOVE] }));
     await act(async () => result.current.deleteSingleToken(tokenToDelete));
     expect(mockRemoveStylesFromTokens).toBeCalledTimes(1);
   });
