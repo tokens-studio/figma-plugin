@@ -1,5 +1,6 @@
 import React from 'react';
 import { Provider } from 'react-redux';
+import userEvent from '@testing-library/user-event';
 import { Tabs } from '@/constants/Tabs';
 import { act, createMockStore, render } from '../../../../tests/config/setupTest';
 import Navbar from '../Navbar';
@@ -29,5 +30,15 @@ describe('Navbar', () => {
     const tokenFlowButton = result.getByTestId('token-flow-button');
 
     expect(tokenFlowButton).toBeInTheDocument();
+  });
+
+  it('should open the token flow page when the button is clicked', async () => {
+    global.open = jest.fn();
+    const result = render(<Navbar />);
+
+    const tokenFlowButton = await result.findByTestId('token-flow-button');
+    await act(async () => userEvent.click(tokenFlowButton));
+
+    expect(global.open).toHaveBeenCalledWith('https://token-flow-app.herokuapp.com?id=test-id');
   });
 });

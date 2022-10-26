@@ -13,26 +13,17 @@ export const mockGetLicenseHandler = jest.fn((req, res, ctx) => {
   const userId = req.url.searchParams.get('userId');
 
   if (userId === USER_ID_FOR_FOUND_LICENSE_KEY) {
-    return res(
-      ctx.status(200),
-      ctx.json({ key: LICENSE_FOR_VALID_RESPONSE }),
-    );
+    return res(ctx.status(200), ctx.json({ key: LICENSE_FOR_VALID_RESPONSE }));
   }
 
-  return res(
-    ctx.status(404),
-    ctx.json({ message: 'No license key found' }),
-  );
+  return res(ctx.status(404), ctx.json({ message: 'No license key found' }));
 });
 
 export const mockValidateLicenseHandler = jest.fn((req, res, ctx) => {
   const licenseKey = req.url.searchParams.get('licenseKey');
 
   if (licenseKey === LICENSE_FOR_ERROR_RESPONSE) {
-    return res(
-      ctx.status(500),
-      ctx.json({ message: LICENSE_ERROR_MESSAGE }),
-    );
+    return res(ctx.status(500), ctx.json({ message: LICENSE_ERROR_MESSAGE }));
   }
   if (licenseKey === LICENSE_FOR_VALID_RESPONSE) {
     return res(
@@ -51,10 +42,7 @@ export const mockValidateLicenseHandler = jest.fn((req, res, ctx) => {
 export const mockDetachLicenseHandler = jest.fn((req, res, ctx) => {
   const { licenseKey } = req.body as { licenseKey: string };
   if (licenseKey === LICENSE_FOR_ERROR_RESPONSE) {
-    return res(
-      ctx.status(500),
-      ctx.json({ message: DETACH_ERROR_MESSAGE }),
-    );
+    return res(ctx.status(500), ctx.json({ message: DETACH_ERROR_MESSAGE }));
   }
   if (licenseKey === LICENSE_FOR_VALID_RESPONSE) {
     return res(
@@ -74,4 +62,5 @@ export const handlers = [
 
   rest.put(`${process.env.LICENSE_API_URL}/detach-license`, mockDetachLicenseHandler),
 
+  rest.post('https://token-flow-app.herokuapp.com/api/tokens', (req, res, ctx) => res(ctx.status(200), ctx.json({ result: 'test-id' }))),
 ];
