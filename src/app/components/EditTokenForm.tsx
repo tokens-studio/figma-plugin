@@ -298,7 +298,6 @@ function EditTokenForm({ resolvedTokens }: Props) {
             remapToken(oldName, newName, shouldRemap.data[0]);
             dispatch.settings.setUpdateMode(shouldRemap.data[0]);
             if (shouldRemap.data.includes(StyleOptions.RENAME)) {
-              console.log('rename');
               renameStylesFromTokens({ oldName, newName, parent: activeTokenSet });
             }
           }

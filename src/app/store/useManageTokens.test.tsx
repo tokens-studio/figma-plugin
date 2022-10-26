@@ -204,6 +204,7 @@ describe('useManageTokens', () => {
     const tokenToDelete = {
       path: 'color.red',
       parent: 'global',
+      type: TokenTypes.COLOR,
     };
     mockConfirm.mockImplementation(() => Promise.resolve({ data: ['delete-style'] }));
     const { result } = renderHook(() => useManageTokens(), {
