@@ -33,6 +33,7 @@ export enum Properties {
   letterSpacing = 'letterSpacing',
   paragraphSpacing = 'paragraphSpacing',
   textCase = 'textCase',
+  dimension = 'dimension',
   border = 'border',
   textDecoration = 'textDecoration',
   asset = 'asset',

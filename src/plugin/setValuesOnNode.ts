@@ -431,6 +431,21 @@ export default async function setValuesOnNode(
         }
       }
 
+      if (
+        typeof values.dimension !== 'undefined'
+        && isPrimitiveValue(values.dimension)
+      ) {
+        if ('itemSpacing' in node) {
+          if (node.primaryAxisAlignItems === 'SPACE_BETWEEN') {
+            node.primaryAxisAlignItems = 'MIN';
+          }
+          node.itemSpacing = transformValue(String(values.dimension), 'spacing');
+        } else if ('resize' in node) {
+          const size = transformValue(String(values.dimension), 'sizing');
+          node.resize(size, size);
+        }
+      }
+
       // Real value for text layers
       if ('value' in values) {
         if ('characters' in node && node.fontName !== figma.mixed) {
