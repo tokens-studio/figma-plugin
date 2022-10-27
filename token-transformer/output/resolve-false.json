@@ -73,7 +73,8 @@
     "background": {
       "value": "{colors.gray.900}",
       "description": "Alias value",
-      "type": "color"
+      "type": "color",
+      "failedToResolve": true
     },
     "backgroundSubtle": {
       "value": "rgba({colors.gray.900}, 0.5)",
