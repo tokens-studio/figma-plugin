@@ -3,7 +3,7 @@
     "multiple": {
       "value": [
         {
-          "color": "#1B1F24",
+          "color": "{colors.gray.900}",
           "type": "dropShadow",
           "x": 0,
           "y": 4,
@@ -11,7 +11,7 @@
           "spread": 0
         },
         {
-          "color": "#1B1F24",
+          "color": "{colors.gray.900}",
           "type": "dropShadow",
           "x": 0,
           "y": 0,
@@ -19,23 +19,25 @@
           "spread": 0
         }
       ],
-      "type": "boxShadow"
+      "type": "boxShadow",
+      "failedToResolve": true
     },
     "single": {
       "value": {
-        "color": "#1B1F24",
+        "color": "{colors.gray.900}",
         "type": "dropShadow",
         "x": 0,
         "y": 4,
         "blur": 2,
         "spread": 0
       },
-      "type": "boxShadow"
+      "type": "boxShadow",
+      "failedToResolve": true
     },
     "reference-multiple": {
       "value": [
         {
-          "color": "#1B1F24",
+          "color": "{colors.gray.900}",
           "type": "dropShadow",
           "x": 0,
           "y": 4,
@@ -43,7 +45,7 @@
           "spread": 0
         },
         {
-          "color": "#1B1F24",
+          "color": "{colors.gray.900}",
           "type": "dropShadow",
           "x": 0,
           "y": 0,
@@ -51,36 +53,41 @@
           "spread": 0
         }
       ],
-      "type": "boxShadow"
+      "type": "boxShadow",
+      "failedToResolve": true
     },
     "reference-single": {
       "value": {
-        "color": "#1B1F24",
+        "color": "{colors.gray.900}",
         "type": "dropShadow",
         "x": 0,
         "y": 4,
         "blur": 2,
         "spread": 0
       },
-      "type": "boxShadow"
+      "type": "boxShadow",
+      "failedToResolve": true
     }
   },
   "theme": {
     "background": {
-      "value": "#FAFBFC",
+      "value": "{colors.gray.100}",
       "description": "Alias value",
-      "type": "color"
+      "type": "color",
+      "failedToResolve": true
     },
     "backgroundSubtle": {
-      "value": "#fafbfc80",
+      "value": "rgba({colors.gray.100}, 0.5)",
       "description": "Nested color value",
-      "type": "color"
+      "type": "color",
+      "failedToResolve": true
     },
     "size": {
       "default": {
-        "value": 8,
+        "value": "{sizing.large}",
         "description": "Sizing value",
-        "type": "sizing"
+        "type": "sizing",
+        "failedToResolve": true
       }
     }
   }
