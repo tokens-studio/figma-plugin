@@ -10,7 +10,7 @@ export function updateTokenSetsInState(
 ): TokenState {
   const deletedTokenSets = new Set<string>();
   const renamedTokenSets = new Map<string, string>();
-  const entries = Object.entries(state.tokens).reduce<[string, AnyTokenList][]>((acc, [name, tokenList]) => {
+  let entries = Object.entries(state.tokens).reduce<[string, AnyTokenList][]>((acc, [name, tokenList]) => {
     if (mutate) {
       const mutated = mutate(name, tokenList);
       if (mutated !== null) {
@@ -25,9 +25,20 @@ export function updateTokenSetsInState(
       acc.push([name, tokenList]);
     }
     return acc;
-  }, []).concat(newTokenSets.map((newSet) => (
+  }, []);
+  const index = Object.keys(state.tokens).findIndex((key) => {
+    if (key == 'a') return true;
+    return false;
+  })
+  const updatedSets =  (newTokenSets.map((newSet) => (
     newSet.length === 1 ? [newSet[0], []] : newSet
   )));
+  if (index > -1 && updatedSets.length === 1) {
+    entries.splice(index + 1, 0, updatedSets);
+  }
+
+
+
 
   let nextActiveTokenSet = state.activeTokenSet;
   if (deletedTokenSets.has(state.activeTokenSet)) {
