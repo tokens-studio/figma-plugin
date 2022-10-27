@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import axios from 'axios';
 import { useSelector } from 'react-redux';
 import { LightningBoltIcon } from '@radix-ui/react-icons';
@@ -12,6 +12,7 @@ import {
   usedTokenSetSelector,
   tokensSelector,
 } from '@/selectors';
+import { track } from '@/utils/analytics';
 
 export default function TokenFlowButton() {
   const { tokenFlowButton } = useFlags();
@@ -21,7 +22,11 @@ export default function TokenFlowButton() {
   const themeObjects = useSelector(themeObjectsSelector);
   const tokens = useSelector(tokensSelector);
 
+  const [loading, setLoading] = useState(false);
+
   const handleOpenTokenFlowApp = useCallback(async () => {
+    setLoading(true);
+    track('Open visualization');
     const tokenData = JSON.stringify(tokens, null, 2);
     const response = await axios({
       method: 'post',
@@ -35,13 +40,16 @@ export default function TokenFlowButton() {
       },
     });
     if (response.status === 200) window.open(`${process.env.TOKEN_FLOW_APP_URL}?id=${response.data.result}`);
+    setLoading(false);
   }, [activeTheme, availableThemes, themeObjects, tokens, usedTokenSet]);
 
   return (
     tokenFlowButton && (
       <IconButton
+        size="large"
         tooltip="Open visualization"
         dataCy="token-flow-button"
+        loading={loading}
         onClick={handleOpenTokenFlowApp}
         icon={<LightningBoltIcon />}
       />

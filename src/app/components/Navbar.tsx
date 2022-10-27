@@ -5,7 +5,7 @@ import { Tabs } from '@/constants/Tabs';
 import Stack from './Stack';
 import { TabButton } from './TabButton';
 import { NavbarUndoButton } from './NavbarUndoButton';
-import Minimize from '../assets/minimize.svg';
+import Minimize from '@/icons/minimize.svg';
 import useMinimizeWindow from './useMinimizeWindow';
 import IconButton from './IconButton';
 import { activeTabSelector } from '@/selectors';
@@ -46,9 +46,9 @@ const Navbar: React.FC = () => {
         </div>
         <NavbarUndoButton />
       </Stack>
-      <TokenFlowButton />
-      <Stack direction="row" align="center">
-        <IconButton tooltip="Minimize plugin" onClick={handleResize} icon={<Minimize />} />
+      <Stack direction="row" align="center" gap={1} css={{ paddingRight: '$2' }}>
+        <TokenFlowButton />
+        <IconButton size="large" tooltip="Minimize plugin" onClick={handleResize} icon={<Minimize />} />
       </Stack>
     </Box>
   );
