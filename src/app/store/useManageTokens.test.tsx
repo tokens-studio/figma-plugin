@@ -224,4 +224,16 @@ describe('useManageTokens', () => {
     await act(async () => result.current.deleteSingleToken(tokenToDelete));
     expect(mockRemoveStylesFromTokens).toBeCalledTimes(0);
   });
+
+  it('doesn\'t remove styles from themes when the token is not style token', async () => {
+    const tokenToDelete = {
+      path: 'size.regular',
+      parent: 'global',
+      type: TokenTypes.SIZING,
+    };
+    mockConfirm.mockImplementation(() => Promise.resolve({ data: [] }));
+    await act(async () => result.current.deleteSingleToken(tokenToDelete));
+    expect(mockRemoveStylesFromTokens).toBeCalledTimes(0);
+  });
+
 });
