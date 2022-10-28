@@ -26,19 +26,17 @@ export function updateTokenSetsInState(
     }
     return acc;
   }, []);
-  const index = Object.keys(state.tokens).findIndex((key) => {
-    if (key == 'a') return true;
-    return false;
-  })
-  const updatedSets =  (newTokenSets.map((newSet) => (
+
+  const newSets = newTokenSets.map((newSet) => (
     newSet.length === 1 ? [newSet[0], []] : newSet
-  )));
-  if (index > -1 && updatedSets.length === 1) {
-    entries.splice(index + 1, 0, updatedSets);
+  ));
+  if (newTokenSets.length === 1 && newTokenSets[0].length === 2 && newTokenSets[0][0].endsWith('_Copy')) {
+    const originalName = newTokenSets[0][0].substring(0, newTokenSets[0][0].lastIndexOf('_Copy'));
+    const originalSetIndex = entries.findIndex((group) => group[0] === originalName);
+    entries = entries.slice(0, originalSetIndex + 1).concat(newSets as [string, AnyTokenList][]).concat(entries.slice(originalSetIndex + 1));
+  } else {
+    entries = entries.concat(newSets as [string, AnyTokenList][]);
   }
-
-
-
 
   let nextActiveTokenSet = state.activeTokenSet;
   if (deletedTokenSets.has(state.activeTokenSet)) {
