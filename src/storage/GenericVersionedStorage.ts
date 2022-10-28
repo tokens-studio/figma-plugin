@@ -4,10 +4,15 @@ import { DeepTokensMap, ThemeObjectsList } from '@/types';
 import { SingleToken } from '@/types/tokens';
 import { RemoteTokenStorage, RemoteTokenStorageFile } from './RemoteTokenStorage';
 import { singleFileSchema } from './schemas/singleFileSchema';
+import { GenericVersionedStorageFlow } from '@/types/StorageType';
+import { tokensMapSchema } from './schemas/tokensMapSchema';
+import { themeObjectSchema } from './schemas/themeObjectSchema';
 
 const genericVersionedSchema = singleFileSchema.extend({
-  version: z.string(),
-  updatedAt: z.string().optional(),
+  values: z.record(tokensMapSchema),
+  version: z.string().optional(),
+  $themes: z.array(themeObjectSchema).optional(),
+  updatedAt: z.number().optional(),
 });
 
 type GenericVersionedMeta = {
@@ -15,7 +20,7 @@ type GenericVersionedMeta = {
   updatedAt: string
 };
 
-type GenericVersionedData = GenericVersionedMeta & {
+export type GenericVersionedData = GenericVersionedMeta & {
   values: Record<string, Record<string, SingleToken<false> | DeepTokensMap<false>>>
   $themes?: ThemeObjectsList
 };
@@ -25,7 +30,7 @@ export type GenericVersionedAdditionalHeaders = Array<{
   value: string
 }>;
 
-const flattenHeaders = (headers: GenericVersionedAdditionalHeaders) => headers.map((x) => [x.name, x.value]);
+const flattenHeaders = (headers: GenericVersionedAdditionalHeaders): Array<[key: string, val: string]> => headers.map((x) => [x.name, x.value]);
 
 // Life cycle is
 
@@ -38,21 +43,39 @@ export class GenericVersionedStorage extends RemoteTokenStorage<GenericVersioned
 
   private defaultHeaders: Headers;
 
-  public static async create(url: string, updatedAt: string, headers: GenericVersionedAdditionalHeaders = []): Promise<false | {
+  public static async create(url: string, updatedAt: string, flow: GenericVersionedStorageFlow, headers: GenericVersionedAdditionalHeaders = []): Promise<false | {
     metadata: { id: string }
   }> {
+    let body: string | undefined = JSON.stringify({
+      version: pjs.plugin_version,
+      updatedAt,
+      values: {
+        options: {},
+      },
+    }, null, 2);
+    let method: string;
+    switch (flow) {
+      case GenericVersionedStorageFlow.READ_ONLY:
+        method = 'GET';
+        body = undefined;
+        break;
+      case GenericVersionedStorageFlow.READ_WRITE:
+        method = 'PUT';
+        break;
+      case GenericVersionedStorageFlow.READ_WRITE_CREATE:
+        method = 'POST';
+        break;
+      default:
+        console.log('Unknown flow type');
+        return false;
+    }
+
     const response = await fetch(url, {
-      method: 'POST',
+      method,
       mode: 'cors',
       cache: 'no-cache',
       credentials: 'same-origin',
-      body: JSON.stringify({
-        version: pjs.plugin_version,
-        updatedAt,
-        values: {
-          options: {},
-        },
-      }, null, 2),
+      body,
       headers: new Headers([
         ['Content-Type', 'application/json'],
         ...flattenHeaders(headers),
@@ -110,13 +133,13 @@ export class GenericVersionedStorage extends RemoteTokenStorage<GenericVersioned
         ...this.defaultHeaders.entries(),
       ]),
     });
+
     if (response.ok) {
       const parsedJsonData = await response.json();
-      const validationResult = await z.object({
-        record: genericVersionedSchema,
-      }).safeParseAsync(parsedJsonData);
+      const validationResult = await genericVersionedSchema.safeParseAsync(parsedJsonData);
+
       if (validationResult.success) {
-        const GenericVersionedData = validationResult.data.record as GenericVersionedData;
+        const GenericVersionedData = validationResult.data as unknown as GenericVersionedData;
         return this.convertGenericVersionedDataToFiles(GenericVersionedData);
       }
     }

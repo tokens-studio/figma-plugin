@@ -1,3 +1,4 @@
+import { RemoteTokenStorageMetadata } from '@/storage/RemoteTokenStorage';
 import { ThemeObjectsList } from './ThemeObjectsList';
 import { AnyTokenList } from './tokens';
 
@@ -5,7 +6,7 @@ type RemoteResponseSuccess<Metadata = unknown> = {
   status: 'success',
   tokens: Record<string, AnyTokenList>
   themes: ThemeObjectsList
-  metadata?: Metadata | null
+  metadata?: RemoteTokenStorageMetadata & Metadata | null
 };
 
 type RemoteResponseFailure = {

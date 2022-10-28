@@ -20,6 +20,7 @@ const properties = {
   fontWeight: 'fontWeights',
   letterSpacing: 'letterSpacing',
   paragraphSpacing: 'paragraphSpacing',
+  paragraphIndent: 'paragraphIndent',
   textDecoration: 'textDecoration',
   lineHeight: 'lineHeights',
   textCase: 'textCase',

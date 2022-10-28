@@ -13,17 +13,20 @@ import { GenericVersionedStorage } from '@/storage';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { StorageProviderType } from '@/constants/StorageProviderType';
-import { StorageTypeCredentials, StorageTypeFormValues } from '@/types/StorageType';
+import {
+  StorageTypeCredentials, StorageTypeFormValues, GenericVersionedStorageFlow, GenericVersionedStorageType,
+} from '@/types/StorageType';
+import { RemoteResponseData } from '@/types/RemoteResponseData';
+import { saveLastSyncedState } from '@/utils/saveLastSyncedState';
 
 export async function updateGenericVersionedTokens({
   tokens, themes, context, updatedAt, oldUpdatedAt = null,
 }: UpdateRemoteFunctionPayload) {
-  const { id, additionalHeaders } = context;
+  const { id, additionalHeaders, flow } = context as GenericVersionedStorageType;
   try {
     if (!id) throw new Error('Missing Generic Versioned Storage ID ');
 
     const storage = new GenericVersionedStorage(id, additionalHeaders);
-
     const payload = {
       tokens,
       themes,
@@ -35,9 +38,25 @@ export async function updateGenericVersionedTokens({
 
     if (oldUpdatedAt) {
       const remoteTokens = await storage.retrieve();
+      if (remoteTokens?.status === 'failure') {
+        // eslint-disable-next-line no-console
+        console.log('Error updating Generic storage', remoteTokens?.errorMessage);
+        return {
+          status: 'failure',
+          errorMessage: remoteTokens?.errorMessage,
+        };
+      }
+
       const comparison = await compareUpdatedAt(oldUpdatedAt, remoteTokens?.metadata?.updatedAt ?? '');
       if (comparison === 'remote_older') {
-        storage.save(payload);
+        // Read Only is not allowed to save to external
+        switch (flow) {
+          case GenericVersionedStorageFlow.READ_WRITE:
+          case GenericVersionedStorageFlow.READ_WRITE_CREATE:
+            storage.save(payload);
+            break;
+          default:
+        }
       } else {
         // Tell the user to choose between:
         // A) Pull Remote values and replace local changes
@@ -48,8 +67,9 @@ export async function updateGenericVersionedTokens({
       storage.save(payload);
     }
   } catch (e) {
-    console.log('Error updating jsonbin', e);
+    console.log('Error updating Generic Storage', e);
   }
+  return undefined;
 }
 
 export function useGenericVersionedStorage() {
@@ -61,15 +81,18 @@ export function useGenericVersionedStorage() {
   const usedTokenSets = useSelector(usedTokenSetSelector);
 
   const createNewGenericVersionedStorage = useCallback(async (context: Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.GENERIC_VERSIONED_STORAGE }>) => {
-    const { id, name, additionalHeaders, internalId } = context;
+    const {
+      id, name, additionalHeaders, internalId, flow,
+    } = context;
     const updatedAt = new Date().toISOString();
-    const result = await GenericVersionedStorage.create(id, updatedAt, additionalHeaders);
+    const result = await GenericVersionedStorage.create(id, updatedAt, flow, additionalHeaders);
     if (result) {
       updateGenericVersionedTokens({
         tokens,
         context: {
           id,
           additionalHeaders,
+          flow,
         },
         themes,
         updatedAt,
@@ -79,6 +102,7 @@ export function useGenericVersionedStorage() {
         credential: {
           provider: StorageProviderType.GENERIC_VERSIONED_STORAGE,
           id,
+          flow,
           internalId,
           name,
           additionalHeaders,
@@ -92,10 +116,10 @@ export function useGenericVersionedStorage() {
     return null;
   }, [dispatch, themes, tokens]);
 
-  // Read tokens from JSONBin
-  const pullTokensFromGenericVersionedStorage = useCallback(async (context: Extract<StorageTypeCredentials, { provider: StorageProviderType.GENERIC_VERSIONED_STORAGE }>) => {
+  // Read tokens from endpoint
+  const pullTokensFromGenericVersionedStorage = useCallback(async (context: Extract<StorageTypeCredentials, { provider: StorageProviderType.GENERIC_VERSIONED_STORAGE }>): Promise<RemoteResponseData | null> => {
     const {
-      id, additionalHeaders, name, internalId,
+      id, additionalHeaders, name, internalId, flow,
     } = context;
     if (!id) return null;
     try {
@@ -109,14 +133,19 @@ export function useGenericVersionedStorage() {
           internalId,
           name,
           id,
+          flow,
           additionalHeaders,
           provider: StorageProviderType.GENERIC_VERSIONED_STORAGE,
         },
       });
-
-      if (data?.metadata && data?.tokens) {
+      if (data?.status === 'failure') {
+        return {
+          status: 'failure',
+          errorMessage: data.errorMessage,
+        };
+      }
+      if (data && data?.tokens) {
         dispatch.tokenState.setEditProhibited(false);
-
         return data;
       }
       notifyToUI('No tokens stored on remote', { error: true });
@@ -128,36 +157,38 @@ export function useGenericVersionedStorage() {
     }
   }, [dispatch]);
 
-  const addGenericVersionedCredentials = useCallback(async (context: Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.GENERIC_VERSIONED_STORAGE }>) => {
+  const addGenericVersionedCredentials = useCallback(async (context: Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.GENERIC_VERSIONED_STORAGE }>): Promise<RemoteResponseData | null> => {
     const {
-      provider, id, name, additionalHeaders, internalId,
+      provider, id, name, additionalHeaders, internalId, flow,
     } = context;
     if (!id) return null;
 
-    const content = await pullTokensFromGenericVersionedStorage({
-      provider,
-      name,
-      id,
-      additionalHeaders,
-      internalId,
-    });
+    const content = await pullTokensFromGenericVersionedStorage(context);
+
+    if (content?.status === 'failure') {
+      return {
+        status: 'failure',
+        errorMessage: content.errorMessage,
+      };
+    }
     if (content) {
       dispatch.uiState.setApiData({
-        provider, id, name, additionalHeaders, internalId,
+        provider, id, name, additionalHeaders, internalId, flow,
       });
       setStorageType({
         provider: {
-          provider, id, additionalHeaders, name, internalId,
+          provider, id, additionalHeaders, name, internalId, flow,
         },
         shouldSetInDocument: true,
       });
-      dispatch.tokenState.setLastSyncedState(JSON.stringify([content.tokens, content.themes], null, 2));
+      saveLastSyncedState(dispatch, content.tokens, content?.themes, {});
       dispatch.tokenState.setTokenData({
         values: content.tokens,
         themes: content.themes,
         usedTokenSet: usedTokenSets,
         activeTheme,
       });
+      return content;
     }
 
     return content;

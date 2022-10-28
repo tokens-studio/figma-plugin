@@ -13,10 +13,15 @@ import type { Direction } from '@/constants/Direction';
 import type { SelectionValue } from './SelectionValue';
 import type { startup } from '@/utils/plugin';
 import type { ThemeObject } from './ThemeObject';
+import { DeleteTokenPayload } from './payloads';
+import { SyncOption } from '@/app/store/useTokens';
 
 export enum AsyncMessageTypes {
   // the below messages are going from UI to plugin
   CREATE_STYLES = 'async/create-styles',
+  RENAME_STYLES = 'async/rename-styles',
+  REMOVE_STYLES = 'async/remove-styles',
+  SYNC_STYLES = 'async/sync-styles',
   CREDENTIALS = 'async/credentials',
   CHANGED_TABS = 'async/changed-tabs',
   REMOVE_SINGLE_CREDENTIAL = 'async/remove-single-credential',
@@ -24,6 +29,7 @@ export enum AsyncMessageTypes {
   SET_NODE_DATA = 'async/set-node-data',
   REMOVE_TOKENS_BY_VALUE = 'async/remove-tokens-by-value',
   REMAP_TOKENS = 'async/remap-tokens',
+  BULK_REMAP_TOKENS = 'async/bulk-remap-tokens',
   GOTO_NODE = 'async/goto-node',
   SELECT_NODES = 'async/select-nodes',
   PULL_STYLES = 'async/pull-styles',
@@ -76,6 +82,12 @@ export type RemapTokensAsyncMessage = AsyncMessage<AsyncMessageTypes.REMAP_TOKEN
 }>;
 export type RemapTokensMessageAsyncResult = AsyncMessage<AsyncMessageTypes.REMAP_TOKENS>;
 
+export type BulkRemapTokensAsyncMessage = AsyncMessage<AsyncMessageTypes.BULK_REMAP_TOKENS, {
+  oldName: string;
+  newName: string;
+}>;
+export type BulkRemapTokensMessageAsyncResult = AsyncMessage<AsyncMessageTypes.BULK_REMAP_TOKENS>;
+
 export type GotoNodeAsyncMessage = AsyncMessage<AsyncMessageTypes.GOTO_NODE, {
   id: string;
 }>;
@@ -120,6 +132,32 @@ export type CreateStylesAsyncMessage = AsyncMessage<AsyncMessageTypes.CREATE_STY
 }>;
 export type CreateStylesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.CREATE_STYLES, {
   styleIds: Record<string, string>;
+}>;
+
+export type RenameStylesAsyncMessage = AsyncMessage<AsyncMessageTypes.RENAME_STYLES, {
+  oldName: string;
+  newName: string;
+  parent: string;
+  settings: Partial<SettingsState>;
+}>;
+export type RenameStylesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.RENAME_STYLES, {
+  styleIds: string[];
+}>;
+
+export type RemoveStylesAsyncMessage = AsyncMessage<AsyncMessageTypes.REMOVE_STYLES, {
+  token: DeleteTokenPayload;
+  settings: Partial<SettingsState>;
+}>;
+export type RemoveStylesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.REMOVE_STYLES, {
+  styleIds: string[];
+}>;
+
+export type SyncStylesAsyncMessage = AsyncMessage<AsyncMessageTypes.SYNC_STYLES, {
+  tokens: Record<string, AnyTokenList>;
+  settings: Record<SyncOption, boolean>
+}>;
+export type SyncStylesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.SYNC_STYLES, {
+  styleIdsToRemove: string[];
 }>;
 
 export type UpdateAsyncMessage = AsyncMessage<AsyncMessageTypes.UPDATE, {
@@ -173,6 +211,9 @@ export type StartupMessageResult = AsyncMessage<AsyncMessageTypes.STARTUP>;
 
 export type AsyncMessages =
   CreateStylesAsyncMessage
+  | RenameStylesAsyncMessage
+  | RemoveStylesAsyncMessage
+  | SyncStylesAsyncMessage
   | CredentialsAsyncMessage
   | ChangedTabsAsyncMessage
   | RemoveSingleCredentialAsyncMessage
@@ -180,6 +221,7 @@ export type AsyncMessages =
   | SetNodeDataAsyncMessage
   | RemoveTokensByValueAsyncMessage
   | RemapTokensAsyncMessage
+  | BulkRemapTokensAsyncMessage
   | GotoNodeAsyncMessage
   | SelectNodesAsyncMessage
   | PullStylesAsyncMessage
@@ -198,6 +240,9 @@ export type AsyncMessages =
 
 export type AsyncMessageResults =
   CreateStylesAsyncMessageResult
+  | RenameStylesAsyncMessageResult
+  | RemoveStylesAsyncMessageResult
+  | SyncStylesAsyncMessageResult
   | CredentialsAsyncMessageResult
   | ChangedTabsAsyncMessageResult
   | RemoveSingleCredentialAsyncMessageResult
@@ -205,6 +250,7 @@ export type AsyncMessageResults =
   | SetNodeDataAsyncMessageResult
   | RemoveTokensByValueAsyncMessageResult
   | RemapTokensMessageAsyncResult
+  | BulkRemapTokensMessageAsyncResult
   | GotoNodeMessageAsyncResult
   | SelectNodesMessageAsyncResult
   | PullStylesAsyncMessageResult

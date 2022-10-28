@@ -1,6 +1,7 @@
 import { ThemeObjectsList } from '@/types';
-import { AnyTokenSet } from '@/types/tokens';
-import { RemoteTokenStorage, RemoteTokenstorageErrorMessage, RemoteTokenStorageFile } from './RemoteTokenStorage';
+import {
+  RemoteTokenStorage, RemoteTokenstorageErrorMessage, RemoteTokenStorageFile, RemoteTokenStorageMetadata, RemoteTokenStorageSingleTokenSetFile,
+} from './RemoteTokenStorage';
 import { singleFileSchema } from './schemas/singleFileSchema';
 import IsJSONString from '@/utils/isJSONString';
 import { SystemFilenames } from '@/constants/SystemFilenames';
@@ -8,8 +9,9 @@ import { ErrorMessages } from '@/constants/ErrorMessages';
 import { complexSingleFileSchema } from './schemas';
 
 type UrlData = {
-  values: Record<string, AnyTokenSet<false>>
+  values: Record<string, RemoteTokenStorageSingleTokenSetFile['data']>
   $themes?: ThemeObjectsList
+  $metadata?: RemoteTokenStorageMetadata
 };
 
 export class UrlTokenStorage extends RemoteTokenStorage {
@@ -29,6 +31,11 @@ export class UrlTokenStorage extends RemoteTokenStorage {
         type: 'themes',
         path: `${SystemFilenames.THEMES}.json`,
         data: data.$themes ?? [],
+      },
+      {
+        type: 'metadata',
+        path: `${SystemFilenames.METADATA}.json`,
+        data: data.$metadata ?? {},
       },
       ...Object.entries(data.values).map<RemoteTokenStorageFile>(([name, tokenSet]) => ({
         name,
@@ -66,8 +73,13 @@ export class UrlTokenStorage extends RemoteTokenStorage {
       // @README if not this is an older format where we just have tokens
       const onlyTokensValidationResult = await complexSingleFileSchema.safeParseAsync(parsedJsonData);
       if (onlyTokensValidationResult.success) {
-        const urlstorageData = onlyTokensValidationResult.data as UrlData['values'];
-        return this.convertUrlDataToFiles({ values: urlstorageData });
+        const urlstorageData = onlyTokensValidationResult.data;
+        const { $themes = [], $metadata = {}, ...values } = urlstorageData;
+        return this.convertUrlDataToFiles({
+          values,
+          $themes,
+          $metadata,
+        });
       }
       return {
         errorMessage: ErrorMessages.VALIDATION_ERROR,

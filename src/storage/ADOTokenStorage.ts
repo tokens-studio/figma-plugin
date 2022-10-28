@@ -2,7 +2,7 @@ import * as GitInterfaces from 'azure-devops-node-api/interfaces/GitInterfaces';
 import compact from 'just-compact';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StorageTypeCredentials } from '@/types/StorageType';
-import { GitStorageMetadata, GitTokenStorage } from './GitTokenStorage';
+import { GitTokenStorage } from './GitTokenStorage';
 import {
   RemoteTokenstorageErrorMessage,
   RemoteTokenStorageFile, RemoteTokenStorageMetadataFile, RemoteTokenStorageSingleTokenSetFile, RemoteTokenStorageThemesFile,
@@ -236,7 +236,7 @@ export class ADOTokenStorage extends GitTokenStorage {
     }
   }
 
-  public async read(): Promise<RemoteTokenStorageFile<GitStorageMetadata>[] | RemoteTokenstorageErrorMessage> {
+  public async read(): Promise<RemoteTokenStorageFile[] | RemoteTokenstorageErrorMessage> {
     try {
       if (!this.path.endsWith('.json')) {
         const { value } = await this.getItems();
@@ -258,7 +258,7 @@ export class ADOTokenStorage extends GitTokenStorage {
             return null;
           }),
         );
-        return compact(jsonFileContents.map<RemoteTokenStorageFile<GitStorageMetadata> | null>((fileContent, index) => {
+        return compact(jsonFileContents.map<RemoteTokenStorageFile | null>((fileContent, index) => {
           const { path } = jsonFiles[index];
           if (fileContent) {
             const name = path?.replace(this.path, '')?.replace(/^\/+/, '')?.replace('.json', '');
@@ -276,7 +276,7 @@ export class ADOTokenStorage extends GitTokenStorage {
                   path,
                   type: 'metadata',
                   data: fileContent,
-                } as RemoteTokenStorageMetadataFile<GitStorageMetadata>;
+                } as RemoteTokenStorageMetadataFile;
               }
 
               return {
@@ -302,7 +302,7 @@ export class ADOTokenStorage extends GitTokenStorage {
           {
             type: 'themes',
             path: this.path,
-            data: Array.isArray($themes) ? $themes : [],
+            data: $themes,
           },
           ...($metadata ? [
             {
@@ -313,7 +313,7 @@ export class ADOTokenStorage extends GitTokenStorage {
           ] : []),
           ...(Object.entries(data).filter(([key]) => (
             !Object.values<string>(SystemFilenames).includes(key)
-          )) as [string, AnyTokenSet<false>][]).map<RemoteTokenStorageFile<GitStorageMetadata>>(([name, tokenSet]) => ({
+          )) as [string, AnyTokenSet<false>][]).map<RemoteTokenStorageFile>(([name, tokenSet]) => ({
             name,
             type: 'tokenSet',
             path: this.path,

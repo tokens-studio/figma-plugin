@@ -2,6 +2,7 @@ import { TokenTypes } from '@/constants/TokenTypes';
 import * as pjs from '../../../package.json';
 import { mockFetch } from '../../../tests/__mocks__/fetchMock';
 import { GenericVersionedStorage } from '../GenericVersionedStorage';
+import { GenericVersionedStorageFlow } from '@/types/StorageType';
 
 describe('GenericVersionedStorage', () => {
   const url = 'https://api.example.io/v3/b';
@@ -21,7 +22,7 @@ describe('GenericVersionedStorage', () => {
       name: 'X-API-KEY',
       value: 'aabbccddeeff',
     }];
-    await GenericVersionedStorage.create(url, updatedAt, headers);
+    await GenericVersionedStorage.create(url, updatedAt, GenericVersionedStorageFlow.READ_WRITE_CREATE, headers);
     expect(mockFetch).toBeCalledWith(url, {
       method: 'POST',
       mode: 'cors',
@@ -45,7 +46,7 @@ describe('GenericVersionedStorage', () => {
     mockFetch.mockImplementationOnce(() => ({
       ok: false,
     }));
-    expect(await GenericVersionedStorage.create(url, '')).toEqual(false);
+    expect(await GenericVersionedStorage.create(url, '', GenericVersionedStorageFlow.READ_WRITE_CREATE)).toEqual(false);
   });
 
   it('can read GenericVersioned data', async () => {
@@ -53,33 +54,32 @@ describe('GenericVersionedStorage', () => {
       Promise.resolve({
         ok: true,
         json: () => Promise.resolve({
-          record: {
-            version: '1',
-            updatedAt: '2022-06-15T10:00:00.000Z',
-            values: {
-              global: {
-                colors: {
-                  red: {
-                    type: TokenTypes.COLOR,
-                    value: '#ff0000',
-                  },
+          version: '1',
+          updatedAt: 1666785400000,
+          values: {
+            global: {
+              colors: {
+                red: {
+                  type: TokenTypes.COLOR,
+                  value: '#ff0000',
                 },
               },
             },
-            $themes: [
-              {
-                id: 'light',
-                name: 'Light',
-                selectedTokenSets: {},
-              },
-            ],
           },
+          $themes: [
+            {
+              id: 'light',
+              name: 'Light',
+              selectedTokenSets: {},
+            },
+          ],
         }),
       })
     ));
 
     const storage = new GenericVersionedStorage(url, defaultHeaders);
     const result = await storage.read();
+
     expect(result[0]).toEqual({
       type: 'themes',
       path: '$themes.json',
@@ -96,7 +96,7 @@ describe('GenericVersionedStorage', () => {
       path: '$metadata.json',
       data: {
         version: '1',
-        updatedAt: '2022-06-15T10:00:00.000Z',
+        updatedAt: 1666785400000,
       },
     });
     expect(result[2]).toEqual({

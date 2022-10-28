@@ -39,7 +39,7 @@ export default function useRemoteTokens() {
 
   const { setStorageType } = useStorage();
   const { pullTokensFromJSONBin, addJSONBinCredentials, createNewJSONBin } = useJSONbin();
-  const {  addGenericVersionedCredentials,    pullTokensFromGenericVersionedStorage,   createNewGenericVersionedStorage, } = useGenericVersionedStorage();
+  const { addGenericVersionedCredentials, pullTokensFromGenericVersionedStorage, createNewGenericVersionedStorage } = useGenericVersionedStorage();
   const {
     addNewGitHubCredentials, syncTokensWithGitHub, pullTokensFromGitHub, pushTokensToGitHub, createGithubBranch, fetchGithubBranches,
   } = useGitHub();
@@ -104,6 +104,7 @@ export default function useRemoteTokens() {
     }
     if (remoteData?.status === 'success') {
       saveLastSyncedState(dispatch, remoteData.tokens, remoteData.themes, remoteData.metadata);
+
       dispatch.tokenState.setTokenData({
         values: remoteData.tokens,
         themes: remoteData.themes,
@@ -221,12 +222,14 @@ export default function useRemoteTokens() {
       }
       case StorageProviderType.GENERIC_VERSIONED_STORAGE: {
         if (credentials.id) {
-          data = await addGenericVersionedCredentials(credentials);
+          content = await addGenericVersionedCredentials(credentials);
         } else {
           const id = await createNewGenericVersionedStorage(credentials);
           if (id) {
             credentials.id = id;
-            data = true;
+            return {
+              status: 'success',
+            };
           }
         }
         break;
@@ -309,7 +312,7 @@ export default function useRemoteTokens() {
         throw new Error('Not implemented');
     }
     return newBranchCreated;
-  }, [createGithubBranch, createADOBranch, createBitbucketBranch]);
+  }, [createGithubBranch, createGitLabBranch, createBitbucketBranch, createADOBranch]);
 
   const fetchBranches = useCallback(async (context: StorageTypeCredentials) => {
     switch (context.provider) {
@@ -333,7 +336,9 @@ export default function useRemoteTokens() {
     });
   }, []);
 
-  const fetchTokensFromFileOrDirectory = useCallback(async (files: FileList | null) => {
+  const fetchTokensFromFileOrDirectory = useCallback(async ({
+    files, usedTokenSet, activeTheme,
+  } : { files: FileList | null, usedTokenSet?: UsedTokenSetsMap, activeTheme?: string | null }) => {
     track('fetchTokensFromFileOrDirectory');
     dispatch.uiState.startJob({ name: BackgroundJobs.UI_FETCHTOKENSFROMFILE });
 
@@ -344,6 +349,8 @@ export default function useRemoteTokens() {
         dispatch.tokenState.setTokenData({
           values: sortedTokens,
           themes: remoteData.themes,
+          activeTheme: activeTheme ?? null,
+          usedTokenSet: usedTokenSet ?? {},
         });
         track('Launched with token sets', {
           count: Object.keys(remoteData.tokens).length,

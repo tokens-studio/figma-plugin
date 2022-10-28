@@ -167,6 +167,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
   const handleSaveJSON = React.useCallback(() => {
     dispatch.tokenState.setJSONData(stringTokens);
   }, [dispatch.tokenState, stringTokens]);
+
   const handleToggleTokenSetsVisibility = React.useCallback(() => {
     setTokenSetsVisible(!tokenSetsVisible);
   }, [tokenSetsVisible]);
@@ -278,6 +279,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
               flexDirection: 'row',
               alignItems: 'center',
               padding: '$4',
+              paddingLeft: 0,
             }}
           >
             <IconButton

@@ -3,21 +3,37 @@ import GitForm from './StorageItemForm/GitForm';
 import ADOForm from './StorageItemForm/ADOForm';
 import JSONBinForm from './StorageItemForm/JSONBinForm';
 import URLForm from './StorageItemForm/URLForm';
+import GenericVersionedForm from './StorageItemForm/GenericVersioned';
 import BitbucketForm from './StorageItemForm/BitbucketForm';
 
 import { useFlags } from './LaunchDarkly';
-
-import { StorageTypeFormValues } from '@/types/StorageType';
+import { ChangeEventHandler } from './StorageItemForm/types';
+import { StorageTypeFormValues, GenericVersionedStorageFlow } from '@/types/StorageType';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 
 type Props = {
   values: StorageTypeFormValues<true>;
-  onChange: React.ChangeEventHandler<HTMLInputElement>;
+  onChange: ChangeEventHandler;
   onCancel: () => void;
   onSubmit: (values: StorageTypeFormValues<false>) => void;
   isNew?: boolean;
   hasErrored?: boolean;
   errorMessage?: string;
+
+};
+
+const getInitialValues = (values: StorageTypeFormValues<true>) => {
+  switch (values.provider) {
+    case StorageProviderType.GENERIC_VERSIONED_STORAGE:
+      return {
+        additionalHeaders: [],
+        flow: GenericVersionedStorageFlow.READ_WRITE,
+        ...values,
+      };
+
+    default:
+      return values;
+  }
 };
 
 export default function StorageItemForm({
@@ -68,6 +84,18 @@ export default function StorageItemForm({
     case StorageProviderType.URL: {
       return (
         <URLForm
+          onChange={onChange}
+          onSubmit={onSubmit}
+          onCancel={onCancel}
+          values={values}
+          hasErrored={hasErrored}
+          errorMessage={errorMessage}
+        />
+      );
+    }
+    case StorageProviderType.GENERIC_VERSIONED_STORAGE: {
+      return (
+        <GenericVersionedForm
           onChange={onChange}
           onSubmit={onSubmit}
           onCancel={onCancel}

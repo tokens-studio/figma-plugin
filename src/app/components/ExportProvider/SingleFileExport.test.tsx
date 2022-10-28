@@ -1,7 +1,7 @@
-import { TokenTypes } from '@/constants/TokenTypes';
-import { AnyTokenList } from '@/types/tokens';
 import React from 'react';
 import { Provider } from 'react-redux';
+import { TokenTypes } from '@/constants/TokenTypes';
+import { AnyTokenList } from '@/types/tokens';
 import {
   render, fireEvent, createMockStore,
 } from '../../../../tests/config/setupTest';
@@ -17,11 +17,17 @@ const defaultStore = {
       global: [
         { name: 'white', value: '#ffffff', type: TokenTypes.COLOR },
         { name: 'headline', value: { fontFamily: 'Inter', fontWeight: 'Bold' }, type: TokenTypes.TYPOGRAPHY },
-        { name: 'shadow', value: { blur: '2', color: '#000000', spread: '0', type: 'innerShadow', x: '2', y: '2' }, type: TokenTypes.BOX_SHADOW },
-        { name: 'composition', value: { fill: '$white' }, type: TokenTypes.COMPOSITION }
+        {
+          name: 'shadow',
+          value: {
+            blur: '2', color: '#000000', spread: '0', type: 'innerShadow', x: '2', y: '2',
+          },
+          type: TokenTypes.BOX_SHADOW,
+        },
+        { name: 'composition', value: { fill: '$white' }, type: TokenTypes.COMPOSITION },
       ],
       light: [
-        { name: 'bg.default', value: '#ffffff', type: TokenTypes.COLOR }
+        { name: 'bg.default', value: '#ffffff', type: TokenTypes.COLOR },
       ],
     } as Record<string, AnyTokenList>,
   },
@@ -41,14 +47,14 @@ describe('SingleFileExport', () => {
         global: {
           white: {
             value: '#ffffff',
-            type: 'color'
+            type: 'color',
           },
           headline: {
             value: {
               fontFamily: 'Inter',
-              fontWeight: 'Bold'
+              fontWeight: 'Bold',
             },
-            type: 'typography'
+            type: 'typography',
           },
           shadow: {
             value: {
@@ -57,18 +63,18 @@ describe('SingleFileExport', () => {
               spread: '0',
               type: 'innerShadow',
               x: '2',
-              y: '2'
+              y: '2',
             },
-            type: 'boxShadow'
+            type: 'boxShadow',
           },
           composition: {
             value: {
               fill: '$white',
             },
-            type: 'composition'
+            type: 'composition',
           },
-        }
-      }, null, 2)
+        },
+      }, null, 2),
     );
   });
 
@@ -87,14 +93,14 @@ describe('SingleFileExport', () => {
         global: {
           white: {
             value: '#ffffff',
-            type: 'color'
+            type: 'color',
           },
           headline: {
             value: {
               fontFamily: 'Inter',
-              fontWeight: 'Bold'
+              fontWeight: 'Bold',
             },
-            type: 'typography'
+            type: 'typography',
           },
           shadow: {
             value: {
@@ -103,40 +109,40 @@ describe('SingleFileExport', () => {
               spread: '0',
               type: 'innerShadow',
               x: '2',
-              y: '2'
+              y: '2',
             },
-            type: 'boxShadow'
+            type: 'boxShadow',
           },
           composition: {
             value: {
               fill: '$white',
             },
-            type: 'composition'
-          }
+            type: 'composition',
+          },
         },
         light: {
           bg: {
             default: {
               value: '#ffffff',
-              type: 'color'
-            }
-          }
+              type: 'color',
+            },
+          },
         },
         $themes: [
           {
             id: 'light',
             name: 'Light',
             selectedTokenSets: {},
-            $figmaStyleReferences: {}
-          }
+            $figmaStyleReferences: {},
+          },
         ],
         $metadata: {
           tokenSetOrder: [
             'global',
-            'light'
-          ]
-        }
-      }, null, 2)
+            'light',
+          ],
+        },
+      }, null, 2),
     );
   });
 
@@ -147,7 +153,7 @@ describe('SingleFileExport', () => {
           global: [
             { name: 'headline', value: { fontFamily: 'Inter', fontWeight: 'Bold' }, type: TokenTypes.TYPOGRAPHY },
             { name: 'alias', value: '$headline', type: TokenTypes.TYPOGRAPHY },
-          ]
+          ],
         },
       },
     });
@@ -165,19 +171,19 @@ describe('SingleFileExport', () => {
           headline: {
             fontFamily: {
               value: 'Inter',
-              type: 'fontFamily'
+              type: 'fontFamily',
             },
             fontWeight: {
               value: 'Bold',
-              type: 'fontWeight'
-            }
+              type: 'fontWeight',
+            },
           },
           alias: {
             value: '$headline',
-            type: 'typography'
-          }
-        }
-      }, null, 2)
+            type: 'typography',
+          },
+        },
+      }, null, 2),
     );
   });
 
@@ -186,10 +192,24 @@ describe('SingleFileExport', () => {
       tokenState: {
         tokens: {
           global: [
-            { name: 'shadow', value: { blur: '2', color: '#000000', spread: '0', type: 'innerShadow', x: '2', y: '2' }, type: TokenTypes.BOX_SHADOW },
-            { name: 'multiShadow', value: [{ blur: '2', color: '#000000', spread: '0', type: 'innerShadow', x: '2', y: '2' }, { blur: '4', color: '#000000', spread: '0', type: 'innerShadow', x: '4', y: '4' }], type: TokenTypes.BOX_SHADOW },
+            {
+              name: 'shadow',
+              value: {
+                blur: '2', color: '#000000', spread: '0', type: 'innerShadow', x: '2', y: '2',
+              },
+              type: TokenTypes.BOX_SHADOW,
+            },
+            {
+              name: 'multiShadow',
+              value: [{
+                blur: '2', color: '#000000', spread: '0', type: 'innerShadow', x: '2', y: '2',
+              }, {
+                blur: '4', color: '#000000', spread: '0', type: 'innerShadow', x: '4', y: '4',
+              }],
+              type: TokenTypes.BOX_SHADOW,
+            },
             { name: 'alias', value: '$shadow', type: TokenTypes.BOX_SHADOW },
-          ]
+          ],
         },
       },
     });
@@ -202,94 +222,94 @@ describe('SingleFileExport', () => {
     fireEvent.click(expandShadowCheckBox);
     const textArea = result.getByRole('textbox');
     expect(textArea).toHaveValue(
-      JSON.stringify( {
+      JSON.stringify({
         global: {
           shadow: {
             blur: {
               value: '2',
-              type: 'blur'
+              type: 'blur',
             },
             color: {
               value: '#000000',
-              type: 'color'
+              type: 'color',
             },
             spread: {
               value: '0',
-              type: 'spread'
+              type: 'spread',
             },
             type: {
               value: 'innerShadow',
-              type: 'type'
+              type: 'type',
             },
             x: {
               value: '2',
-              type: 'x'
+              type: 'x',
             },
             y: {
               value: '2',
-              type: 'y'
-            }
+              type: 'y',
+            },
           },
           multiShadow: {
             0: {
               blur: {
                 value: '2',
-                type: 'blur'
+                type: 'blur',
               },
               color: {
                 value: '#000000',
-                type: 'color'
+                type: 'color',
               },
               spread: {
                 value: '0',
-                type: 'spread'
+                type: 'spread',
               },
               type: {
                 value: 'innerShadow',
-                type: 'type'
+                type: 'type',
               },
               x: {
                 value: '2',
-                type: 'x'
+                type: 'x',
               },
               y: {
                 value: '2',
-                type: 'y'
-              }
+                type: 'y',
+              },
             },
             1: {
               blur: {
                 value: '4',
-                type: 'blur'
+                type: 'blur',
               },
               color: {
                 value: '#000000',
-                type: 'color'
+                type: 'color',
               },
               spread: {
                 value: '0',
-                type: 'spread'
+                type: 'spread',
               },
               type: {
                 value: 'innerShadow',
-                type: 'type'
+                type: 'type',
               },
               x: {
                 value: '4',
-                type: 'x'
+                type: 'x',
               },
               y: {
                 value: '4',
-                type: 'y'
-              }
-            }
+                type: 'y',
+              },
+            },
           },
           alias: {
             value: '$shadow',
-            type: 'boxShadow'
-          }
-        }
-      }, null, 2)
+            type: 'boxShadow',
+          },
+        },
+      }, null, 2),
     );
   });
 
@@ -308,14 +328,14 @@ describe('SingleFileExport', () => {
         global: {
           white: {
             value: '#ffffff',
-            type: 'color'
+            type: 'color',
           },
           headline: {
             value: {
               fontFamily: 'Inter',
-              fontWeight: 'Bold'
+              fontWeight: 'Bold',
             },
-            type: 'typography'
+            type: 'typography',
           },
           shadow: {
             value: {
@@ -324,18 +344,18 @@ describe('SingleFileExport', () => {
               spread: '0',
               type: 'innerShadow',
               x: '2',
-              y: '2'
+              y: '2',
             },
-            type: 'boxShadow'
+            type: 'boxShadow',
           },
           composition: {
             fill: {
               value: '$white',
-              type: 'fill'
-            }
-          }
-        }
-      }, null, 2)
+              type: 'fill',
+            },
+          },
+        },
+      }, null, 2),
     );
   });
 });

@@ -1,10 +1,13 @@
 import React from 'react';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { DeepKeyTokenMap, TokenTypeSchema } from '@/types/tokens';
-import { fireEvent, render } from '../../../tests/config/setupTest';
+import {
+  fireEvent, render,
+} from '../../../tests/config/setupTest';
 import TokenListing from './TokenListing';
 import { store } from '../store';
 import tokenTypes from '@/config/tokenType.defs.json';
+import { EditTokenFormStatus } from '@/constants/EditTokenFormStatus';
 
 const key = 'sizing';
 const schema = {
@@ -71,5 +74,24 @@ describe('TokenListing', () => {
       acc[tokenType as TokenTypes] = true;
       return acc;
     }, {}));
+  });
+
+  it('should show new form', async () => {
+    const { getByTestId } = render(
+      <TokenListing
+        tokenKey={key}
+        label={key}
+        schema={schema as TokenTypeSchema}
+        values={values as DeepKeyTokenMap}
+      />,
+    );
+    await fireEvent.click(getByTestId('button-add-new-token'));
+    expect(store.getState().uiState.editToken).toEqual({
+      initialName: '',
+      name: '',
+      schema,
+      type: TokenTypes.SIZING,
+      status: EditTokenFormStatus.CREATE,
+    });
   });
 });

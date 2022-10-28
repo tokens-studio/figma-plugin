@@ -69,9 +69,15 @@ StorageProviderType.ADO,
 }
 >;
 
+export enum GenericVersionedStorageFlow {
+  READ_WRITE_CREATE = 'Read/Write/Create',
+  READ_WRITE = 'Read/Write',
+  READ_ONLY = 'ReadOnly ',
+}
 export type GenericVersionedStorageType = GenericStorageType<StorageProviderType.GENERIC_VERSIONED_STORAGE, {
   name?: string; // this is only for refrence
   id: string // this would be the URL
+  flow: GenericVersionedStorageFlow,
   additionalHeaders: GenericVersionedAdditionalHeaders ;
 }>;
 

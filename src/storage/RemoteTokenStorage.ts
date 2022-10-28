@@ -5,10 +5,14 @@ import convertTokensToObject from '@/utils/convertTokensToObject';
 import parseTokenValues from '@/utils/parseTokenValues';
 import { SystemFilenames } from '@/constants/SystemFilenames';
 
-export type RemoteTokenStorageData<Metadata = unknown> = {
+export type RemoteTokenStorageMetadata = {
+  tokenSetOrder?: string[]
+};
+
+export type RemoteTokenStorageData<Metadata> = {
   tokens: Record<string, AnyTokenList>
   themes: ThemeObjectsList
-  metadata?: Metadata | null
+  metadata?: RemoteTokenStorageMetadata & Metadata | null
 };
 
 export interface RemoteTokenStorageSingleTokenSetFile {
@@ -27,7 +31,7 @@ export interface RemoteTokenStorageThemesFile {
 export interface RemoteTokenStorageMetadataFile<Metadata = unknown> {
   type: 'metadata'
   path: string
-  data: Metadata
+  data: RemoteTokenStorageMetadata & Metadata
 }
 
 export interface RemoteTokenstorageErrorMessage {
@@ -85,6 +89,7 @@ export abstract class RemoteTokenStorage<Metadata = unknown, SaveOptions = unkno
     // start by reading the files from the remote source
     // it is up to the remote storage implementation to split it up into "File" objects
     const files = await this.read();
+
     // successfully fetch data
     if (Array.isArray(files)) {
       if (files.length === 0) {

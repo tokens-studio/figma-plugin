@@ -1,6 +1,6 @@
+import { renderHook } from '@testing-library/react-hooks';
 import { Properties } from '@/constants/Properties';
 import { TokenTypes } from '@/constants/TokenTypes';
-import { renderHook } from '@testing-library/react-hooks';
 import { usePropertiesForTokenType } from './usePropertiesForType';
 
 describe('usePropertiesForTokenType', () => {
@@ -35,10 +35,10 @@ describe('usePropertiesForTokenType', () => {
             Properties.borderRadiusBottomLeft,
           ],
         },
-        { label: 'Top Left', name: Properties.borderRadiusTopLeft },
-        { label: 'Top Right', name: Properties.borderRadiusTopRight },
-        { label: 'Bottom Right', name: Properties.borderRadiusBottomRight },
-        { label: 'Bottom Left', name: Properties.borderRadiusBottomLeft },
+        { label: 'Top Left', name: Properties.borderRadiusTopLeft, disabled: false },
+        { label: 'Top Right', name: Properties.borderRadiusTopRight, disabled: false },
+        { label: 'Bottom Right', name: Properties.borderRadiusBottomRight, disabled: false },
+        { label: 'Bottom Left', name: Properties.borderRadiusBottomLeft, disabled: false },
       ],
     },
     {
@@ -64,7 +64,6 @@ describe('usePropertiesForTokenType', () => {
           clear: [
             Properties.horizontalPadding,
             Properties.verticalPadding,
-            Properties.itemSpacing,
             Properties.paddingLeft,
             Properties.paddingRight,
             Properties.paddingTop,
@@ -87,7 +86,7 @@ describe('usePropertiesForTokenType', () => {
         {
           name: 'typography',
           label: 'typography',
-        }
+        },
       ],
     },
     {
@@ -96,7 +95,7 @@ describe('usePropertiesForTokenType', () => {
         {
           name: 'opacity',
           label: 'opacity',
-        }
+        },
       ],
     },
     {
@@ -124,7 +123,7 @@ describe('usePropertiesForTokenType', () => {
         {
           name: 'boxShadow',
           label: 'boxShadow',
-        }
+        },
       ],
     },
     {
@@ -133,7 +132,7 @@ describe('usePropertiesForTokenType', () => {
         {
           name: 'fontFamilies',
           label: 'fontFamilies',
-        }
+        },
       ],
     },
     {
@@ -142,7 +141,7 @@ describe('usePropertiesForTokenType', () => {
         {
           name: 'fontWeights',
           label: 'fontWeights',
-        }
+        },
       ],
     },
     {
@@ -151,7 +150,7 @@ describe('usePropertiesForTokenType', () => {
         {
           name: 'lineHeights',
           label: 'lineHeights',
-        }
+        },
       ],
     },
     {
@@ -160,7 +159,7 @@ describe('usePropertiesForTokenType', () => {
         {
           name: 'fontSizes',
           label: 'fontSizes',
-        }
+        },
       ],
     },
     {
@@ -169,7 +168,7 @@ describe('usePropertiesForTokenType', () => {
         {
           name: 'letterSpacing',
           label: 'letterSpacing',
-        }
+        },
       ],
     },
     {
@@ -178,7 +177,7 @@ describe('usePropertiesForTokenType', () => {
         {
           name: 'paragraphSpacing',
           label: 'paragraphSpacing',
-        }
+        },
       ],
     },
     {
@@ -187,7 +186,7 @@ describe('usePropertiesForTokenType', () => {
         {
           name: 'textDecoration',
           label: 'textDecoration',
-        }
+        },
       ],
     },
     {
@@ -196,7 +195,7 @@ describe('usePropertiesForTokenType', () => {
         {
           name: 'textCase',
           label: 'textCase',
-        }
+        },
       ],
     },
     {
@@ -205,7 +204,7 @@ describe('usePropertiesForTokenType', () => {
         {
           name: 'composition',
           label: 'composition',
-        }
+        },
       ],
     },
   ];
@@ -214,5 +213,59 @@ describe('usePropertiesForTokenType', () => {
       const { result } = renderHook(() => usePropertiesForTokenType(data.type as TokenTypes));
       expect(result.current).toEqual(data.properties);
     });
+  });
+
+  it('properties should be disabled when borderRadius token has multi value', () => {
+    const multiBorderRadius = {
+      type: TokenTypes.BORDER_RADIUS,
+      value: '12px 5px',
+    };
+    const { result } = renderHook(() => usePropertiesForTokenType(multiBorderRadius.type, multiBorderRadius.value));
+    expect(result.current).toEqual([
+      {
+        label: 'All',
+        name: Properties.borderRadius,
+        clear: [
+          Properties.borderRadiusTopLeft,
+          Properties.borderRadiusTopRight,
+          Properties.borderRadiusBottomRight,
+          Properties.borderRadiusBottomLeft,
+        ],
+      },
+      { label: 'Top Left', name: Properties.borderRadiusTopLeft, disabled: true },
+      { label: 'Top Right', name: Properties.borderRadiusTopRight, disabled: true },
+      { label: 'Bottom Right', name: Properties.borderRadiusBottomRight, disabled: true },
+      { label: 'Bottom Left', name: Properties.borderRadiusBottomLeft, disabled: true },
+    ]);
+  });
+
+  it('properties should be disabled when spacing token has multi value', () => {
+    const multiSpacing = {
+      type: TokenTypes.SPACING,
+      value: '12px 5px',
+    };
+    const { result } = renderHook(() => usePropertiesForTokenType(multiSpacing.type, multiSpacing.value));
+    expect(result.current).toEqual([
+      {
+        label: 'All',
+        icon: 'Spacing',
+        name: Properties.spacing,
+        clear: [
+          Properties.horizontalPadding,
+          Properties.verticalPadding,
+          Properties.paddingLeft,
+          Properties.paddingRight,
+          Properties.paddingTop,
+          Properties.paddingBottom,
+        ],
+      },
+      {
+        label: 'Gap', name: Properties.itemSpacing, icon: 'Gap', disabled: true,
+      },
+      { label: 'Top', name: Properties.paddingTop, disabled: true },
+      { label: 'Right', name: Properties.paddingRight, disabled: true },
+      { label: 'Bottom', name: Properties.paddingBottom, disabled: true },
+      { label: 'Left', name: Properties.paddingLeft, disabled: true },
+    ]);
   });
 });

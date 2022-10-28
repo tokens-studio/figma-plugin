@@ -32,7 +32,7 @@ export function useGitHub() {
   const { multiFileSync } = useFlags();
   const dispatch = useDispatch<Dispatch>();
   const { confirm } = useConfirm();
-  const { pushDialog } = usePushDialog();
+  const { pushDialog, closeDialog } = usePushDialog();
 
   const storageClientFactory = useCallback((context: GithubCredentials, owner?: string, repo?: string) => {
     const splitContextId = context.id.split('/');
@@ -61,23 +61,21 @@ export function useGitHub() {
         errorMessage: content?.errorMessage,
       };
     }
-    if (content) {
-      if (
-        content
-        && isEqual(content.tokens, tokens)
-        && isEqual(content.themes, themes)
-        && isEqual(content.metadata?.tokenSetOrder ?? Object.keys(tokens), Object.keys(tokens))
-      ) {
-        notifyToUI('Nothing to commit');
-        return {
-          status: 'success',
-          themes,
-          tokens,
-          metadata: {
-            tokenSetOrder: Object.keys(tokens),
-          },
-        };
-      }
+    if (
+      content
+      && isEqual(content.tokens, tokens)
+      && isEqual(content.themes, themes)
+      && isEqual(content.metadata?.tokenSetOrder ?? Object.keys(tokens), Object.keys(tokens))
+    ) {
+      notifyToUI('Nothing to commit');
+      return {
+        status: 'success',
+        themes,
+        tokens,
+        metadata: {
+          tokenSetOrder: Object.keys(tokens),
+        },
+      };
     }
 
     dispatch.uiState.setLocalApiState({ ...context });
@@ -113,7 +111,14 @@ export function useGitHub() {
           themes,
         };
       } catch (e) {
+        closeDialog();
         console.log('Error pushing to GitHub', e);
+        if (e instanceof Error && e.message === ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR) {
+          return {
+            status: 'failure',
+            errorMessage: ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR,
+          };
+        }
         return {
           status: 'failure',
           errorMessage: ErrorMessages.GITHUB_CREDENTIAL_ERROR,
@@ -132,6 +137,7 @@ export function useGitHub() {
     dispatch.uiState,
     dispatch.tokenState,
     pushDialog,
+    closeDialog,
     tokens,
     themes,
     localApiState,

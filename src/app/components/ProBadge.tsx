@@ -2,6 +2,7 @@ import React from 'react';
 import { useSelector } from 'react-redux';
 import { styled } from '@/stitches.config';
 import { licenseKeySelector } from '@/selectors/licenseKeySelector';
+import { licenseKeyErrorSelector } from '@/selectors/licenseKeyErrorSelector';
 
 export const StyledProBadge = styled('a', {
   display: 'inline-flex',
@@ -28,8 +29,9 @@ type Props = {
 
 export default function ProBadge({ compact }: Props) {
   const existingKey = useSelector(licenseKeySelector);
+  const licenseKeyError = useSelector(licenseKeyErrorSelector);
 
   return (
-    <StyledProBadge href="https://figmatokens.com" target="_blank">{existingKey || compact ? 'Pro' : 'Get Pro'}</StyledProBadge>
+    <StyledProBadge href="https://figmatokens.com" target="_blank">{(existingKey && !licenseKeyError) || compact ? 'Pro' : 'Get Pro'}</StyledProBadge>
   );
 }

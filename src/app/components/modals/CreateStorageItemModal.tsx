@@ -1,6 +1,4 @@
 import React from 'react';
-import setValue from 'deep-set-in';
-import deepClone from 'lodash.clonedeep';
 import Modal from '../Modal';
 import Heading from '../Heading';
 import StorageItemForm from '../StorageItemForm';
@@ -8,6 +6,7 @@ import useRemoteTokens from '../../store/remoteTokens';
 import Stack from '../Stack';
 import { StorageTypeFormValues } from '@/types/StorageType';
 import { StorageProviderType } from '@/constants/StorageProviderType';
+import { Eventlike } from '../StorageItemForm/types';
 
 type Props = {
   isOpen: boolean
@@ -38,10 +37,8 @@ export default function CreateStorageItemModal({
     }
   }, [addNewProviderItem, onSuccess]);
 
-  const handleChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const shallowObj = deepClone(formFields);
-    setValue(shallowObj, e.target.name, e.target.value);
-    setFormFields(shallowObj);
+  const handleChange = React.useCallback((e: Eventlike) => {
+    setFormFields({ ...formFields, [e.target.name]: e.target.value });
   }, [formFields]);
 
   const handleSubmit = React.useCallback((values: StorageTypeFormValues<false>) => {

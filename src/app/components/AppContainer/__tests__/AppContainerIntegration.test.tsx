@@ -199,6 +199,7 @@ describe('AppContainer (integration)', () => {
       withOrWithoutLicense({
         ...mockStartupParams,
         localTokenData: null,
+        lastOpened: 1,
       }, async (params) => {
         await act(async () => {
           const mockStore = createMockStore({});
@@ -207,7 +208,28 @@ describe('AppContainer (integration)', () => {
               <AppContainer {...params} />
             </Provider>,
           );
-          expect(await result.findByText('Get started')).not.toBeUndefined();
+          expect(await result.findByText('Getting started')).not.toBeUndefined();
+          result.unmount();
+        });
+      })
+    ),
+  );
+
+  it(
+    'shows the onboarding flow modal', (
+      withOrWithoutLicense({
+        ...mockStartupParams,
+        localTokenData: null,
+        lastOpened: 0,
+      }, async (params) => {
+        await act(async () => {
+          const mockStore = createMockStore({});
+          const result = render(
+            <Provider store={mockStore}>
+              <AppContainer {...params} />
+            </Provider>,
+          );
+          expect(await result.findByText('Getting started')).not.toBeUndefined();
           result.unmount();
         });
       })

@@ -1,0 +1,33 @@
+import { Meta, Story, ArgsTable, Canvas, Preview } from '@storybook/addon-docs';
+import {  GenericVersionedStorageFlow } from '@/types/StorageType';
+import GenericVersioned from '@/app/components/StorageItemForm/GenericVersioned';
+
+<Meta 
+  title='GenericVersionedForm' 
+  component={GenericVersioned}
+  args={{
+    values: {
+      name: '', 
+      additionalHeaders: [],
+      flow: GenericVersionedStorageFlow.READ_WRITEt, 
+    }
+  }}
+/>
+
+
+
+<ArgsTable of={GenericVersioned}/>
+
+export const GenericVersionedDefaultStory = (args) => {
+  return (
+    <>
+    <GenericVersioned values={args.values}/>
+    </>
+  )
+}
+
+<Canvas>
+  <Story name='Default'>
+    {GenericVersionedDefaultStory.bind({})}
+  </Story>
+</Canvas>

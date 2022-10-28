@@ -19,7 +19,9 @@ import WindowResizer from '../WindowResizer';
 import ImportedTokensDialog from '../ImportedTokensDialog';
 import PushDialog from '../PushDialog';
 import Changelog from '../Changelog';
+import OnboardingFlow from '../OnboardingFlow';
 import { Initiator } from '../Initiator';
+import { globalStyles } from '../globalStyles';
 
 type Props = StartupMessage & {
   // @README only for unit testing purposes
@@ -71,6 +73,8 @@ export const AppContainer = withLDProviderWrapper((params: Props) => {
     handlePerformStartup();
   }, [handlePerformStartup]);
 
+  globalStyles();
+
   return (
     <>
       <FigmaLoading
@@ -89,6 +93,7 @@ export const AppContainer = withLDProviderWrapper((params: Props) => {
       <ImportedTokensDialog />
       <PushDialog />
       <WindowResizer />
+      <OnboardingFlow />
       <Changelog />
     </>
   );

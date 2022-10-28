@@ -1,5 +1,6 @@
 /* eslint "no-multi-assign": 0 */
 import { Direction } from '@/constants/Direction';
+import { StyleIdBackupKeys } from '@/constants/StyleIdBackupKeys';
 import { notifyUI } from '@/plugin/notifiers';
 import { SelectionValue } from '@/types';
 
@@ -83,38 +84,40 @@ function createProperties(
   anno: FrameNode,
   tokens: SelectionValue & { annoTitle: string },
 ) {
-  Object.entries(tokens).forEach(([key, value]) => {
-    const prop = figma.createFrame();
-    prop.layoutMode = 'HORIZONTAL';
-    prop.counterAxisAlignItems = 'CENTER';
-    prop.itemSpacing = BASE_SIZE / 2;
-    prop.fills = [{ visible: false, type: 'SOLID', color: BG_COLOR }];
-    prop.primaryAxisSizingMode = 'AUTO';
-    prop.counterAxisSizingMode = 'AUTO';
+  Object.entries(tokens)
+    .filter(([key]) => !StyleIdBackupKeys.includes(key))
+    .forEach(([key, value]) => {
+      const prop = figma.createFrame();
+      prop.layoutMode = 'HORIZONTAL';
+      prop.counterAxisAlignItems = 'CENTER';
+      prop.itemSpacing = BASE_SIZE / 2;
+      prop.fills = [{ visible: false, type: 'SOLID', color: BG_COLOR }];
+      prop.primaryAxisSizingMode = 'AUTO';
+      prop.counterAxisSizingMode = 'AUTO';
 
-    const propText = figma.createText();
-    const propValue = figma.createText();
-    propText.fontName = propValue.fontName = FONT_CODE;
-    propText.fontSize = propValue.fontSize = BASE_SIZE;
-    propValue.fills = [{ type: 'SOLID', color: VALUE_COLOR }];
+      const propText = figma.createText();
+      const propValue = figma.createText();
+      propText.fontName = propValue.fontName = FONT_CODE;
+      propText.fontSize = propValue.fontSize = BASE_SIZE;
+      propValue.fills = [{ type: 'SOLID', color: VALUE_COLOR }];
 
-    if (key === 'annoTitle') {
-      prop.name = 'annotation-title';
-      propText.fontName = FONT_TITLE;
-      propText.characters = value as string;
-      propText.fills = [{ type: 'SOLID', color: TITLE_COLOR }];
-      prop.appendChild(propText);
-    } else {
-      prop.name = 'annotation-prop';
-      propText.characters = `${key}:`;
-      propText.fills = [{ type: 'SOLID', color: PROP_COLOR }];
-      propValue.characters = value as string;
-      prop.appendChild(propText);
-      prop.appendChild(propValue);
-    }
+      if (key === 'annoTitle') {
+        prop.name = 'annotation-title';
+        propText.fontName = FONT_TITLE;
+        propText.characters = value as string;
+        propText.fills = [{ type: 'SOLID', color: TITLE_COLOR }];
+        prop.appendChild(propText);
+      } else {
+        prop.name = 'annotation-prop';
+        propText.characters = `${key}:`;
+        propText.fills = [{ type: 'SOLID', color: PROP_COLOR }];
+        propValue.characters = value as string;
+        prop.appendChild(propText);
+        prop.appendChild(propValue);
+      }
 
-    anno.appendChild(prop);
-  });
+      anno.appendChild(prop);
+    });
 }
 
 function createAnno(tokens: SelectionValue, direction: Direction) {

@@ -45,7 +45,7 @@ export default function Footer() {
 
   const checkForChanges = React.useCallback(() => {
     const tokenSetOrder = Object.keys(tokens);
-    const defaultMetadata = isGitProvider(storageType) ? { tokenSetOrder } : {};
+    const defaultMetadata = storageType.provider !== StorageProviderType.LOCAL ? { tokenSetOrder } : {};
     const hasChanged = !compareLastSyncedState(
       tokens,
       themes,
@@ -81,7 +81,7 @@ export default function Footer() {
   }, []);
 
   const onPushButtonClicked = React.useCallback(() => pushTokens(), [pushTokens]);
-  const onPullButtonClicked = React.useCallback(() => pullTokens({ usedTokenSet }), [pullTokens, usedTokenSet]);
+  const onPullButtonClicked = React.useCallback(() => pullTokens({ usedTokenSet, activeTheme }), [pullTokens, usedTokenSet, activeTheme]);
   const handlePullTokens = useCallback(() => {
     pullTokens({ usedTokenSet, activeTheme });
   }, [pullTokens, usedTokenSet, activeTheme]);
@@ -113,9 +113,7 @@ export default function Footer() {
               <Text muted>Sync</Text>
               {storageType.provider === StorageProviderType.JSONBIN && (
                 <Tooltip label={`Go to ${transformProviderName(storageType.provider)}`}>
-                  <a href={projectURL} target="_blank" rel="noreferrer" className="block button button-ghost">
-                    <IconLibrary />
-                  </a>
+                  <IconButton icon={<IconLibrary />} href={projectURL} />
                 </Tooltip>
               )}
               <IconButton

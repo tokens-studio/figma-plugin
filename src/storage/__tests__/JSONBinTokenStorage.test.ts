@@ -14,10 +14,12 @@ describe('JSONBinTokenStorage', () => {
       cache: 'no-cache',
       credentials: 'same-origin',
       body: JSON.stringify({
-        version: pjs.plugin_version,
-        updatedAt,
         values: {
           options: {},
+        },
+        $metadata: {
+          version: pjs.plugin_version,
+          updatedAt,
         },
       }, null, 2),
       headers: new Headers([
@@ -36,7 +38,7 @@ describe('JSONBinTokenStorage', () => {
     expect(await JSONBinTokenStorage.create('', '', '')).toEqual(false);
   });
 
-  it('can read JSONBin data', async () => {
+  it('can read JSONBin data (root version and updatedAt)', async () => {
     mockFetch.mockImplementationOnce(() => (
       Promise.resolve({
         ok: true,
@@ -102,6 +104,141 @@ describe('JSONBinTokenStorage', () => {
     });
   });
 
+  it('can read JSONBin data (metadata version and updatedAt)', async () => {
+    mockFetch.mockImplementationOnce(() => (
+      Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve({
+          record: {
+            $metadata: {
+              version: '1',
+              updatedAt: '2022-06-15T10:00:00.000Z',
+            },
+            values: {
+              global: {
+                colors: {
+                  red: {
+                    type: TokenTypes.COLOR,
+                    value: '#ff0000',
+                  },
+                },
+              },
+            },
+            $themes: [
+              {
+                id: 'light',
+                name: 'Light',
+                selectedTokenSets: {},
+              },
+            ],
+          },
+        }),
+      })
+    ));
+
+    const storage = new JSONBinTokenStorage('jsonbinid', 'secret');
+    const result = await storage.read();
+    expect(result[0]).toEqual({
+      type: 'themes',
+      path: '$themes.json',
+      data: [
+        {
+          id: 'light',
+          name: 'Light',
+          selectedTokenSets: {},
+        },
+      ],
+    });
+    expect(result[1]).toEqual({
+      type: 'metadata',
+      path: '$metadata.json',
+      data: {
+        version: '1',
+        updatedAt: '2022-06-15T10:00:00.000Z',
+      },
+    });
+    expect(result[2]).toEqual({
+      type: 'tokenSet',
+      path: 'global.json',
+      name: 'global',
+      data: {
+        colors: {
+          red: {
+            type: TokenTypes.COLOR,
+            value: '#ff0000',
+          },
+        },
+      },
+    });
+  });
+
+  it('can read JSONBin data (no version or updatedat)', async () => {
+    jest.useFakeTimers('modern');
+    jest.setSystemTime(Date.UTC(2022, 5, 15, 10, 0, 0));
+
+    mockFetch.mockImplementationOnce(() => (
+      Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve({
+          record: {
+            values: {
+              global: {
+                colors: {
+                  red: {
+                    type: TokenTypes.COLOR,
+                    value: '#ff0000',
+                  },
+                },
+              },
+            },
+            $themes: [
+              {
+                id: 'light',
+                name: 'Light',
+                selectedTokenSets: {},
+              },
+            ],
+          },
+        }),
+      })
+    ));
+
+    const storage = new JSONBinTokenStorage('jsonbinid', 'secret');
+    const result = await storage.read();
+    expect(result[0]).toEqual({
+      type: 'themes',
+      path: '$themes.json',
+      data: [
+        {
+          id: 'light',
+          name: 'Light',
+          selectedTokenSets: {},
+        },
+      ],
+    });
+    expect(result[1]).toEqual({
+      type: 'metadata',
+      path: '$metadata.json',
+      data: {
+        version: pjs.plugin_version,
+        updatedAt: '2022-06-15T10:00:00.000Z',
+      },
+    });
+    expect(result[2]).toEqual({
+      type: 'tokenSet',
+      path: 'global.json',
+      name: 'global',
+      data: {
+        colors: {
+          red: {
+            type: TokenTypes.COLOR,
+            value: '#ff0000',
+          },
+        },
+      },
+    });
+  });
+
   it('returns an empty dataset on error', async () => {
     mockFetch.mockImplementationOnce(() => (
       Promise.resolve({
@@ -113,7 +250,84 @@ describe('JSONBinTokenStorage', () => {
     expect(await storage.read()).toEqual([]);
   });
 
-  it('can write to JSONBin', async () => {
+  it('can write to JSONBin (with metadata)', async () => {
+    jest.useFakeTimers('modern');
+    jest.setSystemTime(Date.UTC(2022, 5, 15, 10, 0, 0));
+
+    const storage = new JSONBinTokenStorage('jsonbinid', 'secret');
+    await storage.write([
+      {
+        type: 'themes',
+        path: '$themes.json',
+        data: [
+          {
+            id: 'dark',
+            name: 'Dark',
+            selectedTokenSets: {},
+          },
+        ],
+      },
+      {
+        type: 'tokenSet',
+        name: 'global',
+        path: 'global.json',
+        data: {
+          colors: {
+            red: {
+              type: TokenTypes.COLOR,
+              value: '#ff0000',
+            },
+          },
+        },
+      },
+      {
+        type: 'metadata',
+        path: 'metadata.json',
+        data: {
+          version: pjs.plugin_version,
+          updatedAt: '2022-06-15T10:00:00.000Z',
+          tokenSetOrder: [],
+        },
+      },
+    ]);
+
+    expect(mockFetch).toBeCalledWith('https://api.jsonbin.io/v3/b/jsonbinid', {
+      method: 'PUT',
+      mode: 'cors',
+      cache: 'no-cache',
+      credentials: 'same-origin',
+      body: JSON.stringify({
+        values: {
+          global: {
+            colors: {
+              red: {
+                type: TokenTypes.COLOR,
+                value: '#ff0000',
+              },
+            },
+          },
+        },
+        $metadata: {
+          version: pjs.plugin_version,
+          updatedAt: '2022-06-15T10:00:00.000Z',
+          tokenSetOrder: [],
+        },
+        $themes: [
+          {
+            id: 'dark',
+            name: 'Dark',
+            selectedTokenSets: {},
+          },
+        ],
+      }),
+      headers: new Headers([
+        ['Content-Type', 'application/json'],
+        ['X-Master-Key', 'secret'],
+      ]),
+    });
+  });
+
+  it('can write to JSONBin (without metadata)', async () => {
     jest.useFakeTimers('modern');
     jest.setSystemTime(Date.UTC(2022, 5, 15, 10, 0, 0));
 
@@ -151,8 +365,6 @@ describe('JSONBinTokenStorage', () => {
       cache: 'no-cache',
       credentials: 'same-origin',
       body: JSON.stringify({
-        version: pjs.plugin_version,
-        updatedAt: '2022-06-15T10:00:00.000Z',
         values: {
           global: {
             colors: {
@@ -163,6 +375,10 @@ describe('JSONBinTokenStorage', () => {
             },
           },
         },
+        $metadata: {
+          version: pjs.plugin_version,
+          updatedAt: '2022-06-15T10:00:00.000Z',
+        },
         $themes: [
           {
             id: 'dark',
@@ -170,6 +386,56 @@ describe('JSONBinTokenStorage', () => {
             selectedTokenSets: {},
           },
         ],
+      }),
+      headers: new Headers([
+        ['Content-Type', 'application/json'],
+        ['X-Master-Key', 'secret'],
+      ]),
+    });
+  });
+
+  it('can write to JSONBin (without most keys)', async () => {
+    jest.useFakeTimers('modern');
+    jest.setSystemTime(Date.UTC(2022, 5, 15, 10, 0, 0));
+
+    const storage = new JSONBinTokenStorage('jsonbinid', 'secret');
+    await storage.write([
+      {
+        type: 'tokenSet',
+        name: 'global',
+        path: 'global.json',
+        data: {
+          colors: {
+            red: {
+              type: TokenTypes.COLOR,
+              value: '#ff0000',
+            },
+          },
+        },
+      },
+    ]);
+
+    expect(mockFetch).toBeCalledWith('https://api.jsonbin.io/v3/b/jsonbinid', {
+      method: 'PUT',
+      mode: 'cors',
+      cache: 'no-cache',
+      credentials: 'same-origin',
+      body: JSON.stringify({
+        values: {
+          global: {
+            colors: {
+              red: {
+                type: TokenTypes.COLOR,
+                value: '#ff0000',
+              },
+            },
+          },
+        },
+        $metadata: {
+          version: pjs.plugin_version,
+          updatedAt: '2022-06-15T10:00:00.000Z',
+        },
+        $themes: [],
       }),
       headers: new Headers([
         ['Content-Type', 'application/json'],

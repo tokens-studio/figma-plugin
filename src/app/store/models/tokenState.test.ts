@@ -88,6 +88,11 @@ describe('editToken', () => {
                   type: 'fontSizes',
                   value: '18px',
                 },
+                {
+                  name: 'font.alias',
+                  type: 'sizing',
+                  value: '$font.small',
+                },
               ],
               options: [
                 {
@@ -106,6 +111,7 @@ describe('editToken', () => {
             themes: [],
             activeTheme: null,
             activeTokenSet: 'global',
+            collapsedTokens: [],
           },
         },
       },
@@ -314,6 +320,7 @@ describe('editToken', () => {
       value: '12px',
     });
   });
+
   it('can delete a token set', () => {
     store.dispatch.tokenState.deleteTokenSet('global');
     const {
@@ -394,6 +401,11 @@ describe('editToken', () => {
         name: 'font.medium',
         type: 'fontSizes',
         value: '18px',
+      },
+      {
+        name: 'font.alias',
+        type: 'sizing',
+        value: '$font.small',
       },
     ]);
     expect(usedTokenSet).toEqual({
@@ -488,6 +500,11 @@ describe('editToken', () => {
         name: 'font.medium',
         type: 'fontSizes',
         value: '18px',
+      },
+      {
+        name: 'font.alias',
+        type: 'sizing',
+        value: '$font.small',
       },
       {
         name: 'test',
@@ -614,6 +631,11 @@ describe('editToken', () => {
         type: 'fontSizes',
         value: '18px',
       },
+      {
+        name: 'font.alias',
+        type: 'sizing',
+        value: '$font.small',
+      },
     ]);
   });
 
@@ -671,6 +693,11 @@ describe('editToken', () => {
         name: 'font.medium',
         type: 'fontSizes',
         value: '18px',
+      },
+      {
+        name: 'font.alias',
+        type: 'sizing',
+        value: '$font.small',
       },
     ]);
   });
@@ -738,6 +765,11 @@ describe('editToken', () => {
         type: 'fontSizes',
         value: '18px',
       },
+      {
+        name: 'text.alias',
+        type: 'sizing',
+        value: '{text.small}',
+      },
     ]);
   });
 
@@ -804,6 +836,11 @@ describe('editToken', () => {
         value: '18px',
       },
       {
+        name: 'font.alias',
+        type: 'sizing',
+        value: '$font.small',
+      },
+      {
         name: 'font-copy.big',
         type: 'sizing',
         value: '24px',
@@ -813,6 +850,11 @@ describe('editToken', () => {
         type: 'sizing',
         value: '12px',
       },
+      {
+        name: 'font-copy.alias',
+        type: 'sizing',
+        value: '$font.small',
+      },
     ]);
   });
 
@@ -820,5 +862,107 @@ describe('editToken', () => {
     store.dispatch.tokenState.updateCheckForChanges(true);
     const { checkForChanges } = store.getState().tokenState;
     expect(checkForChanges).toEqual(true);
+  });
+
+  it('should be able to set collapsedTokens', () => {
+    store.dispatch.tokenState.setCollapsedTokens(['color.gray', 'color.zinc', 'size']);
+    const { collapsedTokens } = store.getState().tokenState;
+    expect(collapsedTokens).toEqual(['color.gray', 'color.zinc', 'size']);
+  });
+
+  it('should be able to keep theme selected when there is a matching theme in themeList', () => {
+    store.dispatch.tokenState.setTokenData({
+      values: {
+        global: [
+          {
+            name: 'primary',
+            value: '1',
+          },
+        ],
+      },
+      themes: [
+        {
+          id: 'default',
+          name: 'root',
+          selectedTokenSets: {
+            global: TokenSetStatus.ENABLED,
+          },
+        },
+      ],
+      activeTheme: 'default',
+    });
+    const { activeTheme } = store.getState().tokenState;
+    expect(activeTheme).toBe('default');
+  });
+
+  it('should be able to set activeTheme as null when there is no matching theme in themeList', () => {
+    store.dispatch.tokenState.setTokenData({
+      values: {
+        global: [
+          {
+            name: 'primary',
+            value: '1',
+          },
+        ],
+      },
+      themes: [
+        {
+          id: 'secondary',
+          name: 'root',
+          selectedTokenSets: {
+            global: TokenSetStatus.ENABLED,
+          },
+        },
+      ],
+      activeTheme: 'default',
+    });
+    const { activeTheme } = store.getState().tokenState;
+    expect(activeTheme).toBe(null);
+  });
+
+  it('should be able to keep activeTokenSet when there is a matching tokenSet in tokenList', () => {
+    store.dispatch.tokenState.setTokenData({
+      values: {
+        global: [
+          {
+            name: 'primary',
+            value: '1',
+          },
+        ],
+      },
+      themes: [
+        {
+          id: 'default',
+          name: 'root',
+          selectedTokenSets: {
+            global: TokenSetStatus.ENABLED,
+          },
+        },
+      ],
+    });
+    const { activeTokenSet } = store.getState().tokenState;
+    expect(activeTokenSet).toBe('global');
+  });
+
+  it('should be able to set activeTheme as global when there is no tokenSet', () => {
+    store.dispatch.tokenState.setTokenData({
+      values: [
+        {
+          name: 'primary',
+          value: '1',
+        },
+      ],
+      themes: [
+        {
+          id: 'default',
+          name: 'root',
+          selectedTokenSets: {
+            global: TokenSetStatus.ENABLED,
+          },
+        },
+      ],
+    });
+    const { activeTokenSet } = store.getState().tokenState;
+    expect(activeTokenSet).toBe('global');
   });
 });

@@ -1,5 +1,7 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
-import React, { useCallback, useEffect, useState } from 'react';
+import React, {
+  useCallback, useEffect, useState, useRef,
+} from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLDClient } from 'launchdarkly-react-client-sdk';
 import Box from '../Box';
@@ -8,6 +10,7 @@ import Button from '../Button';
 import { licenseKeySelector } from '@/selectors/licenseKeySelector';
 import Heading from '../Heading';
 import Stack from '../Stack';
+import { styled } from '@/stitches.config';
 import { Dispatch } from '@/app/store';
 import { licenseKeyErrorSelector } from '@/selectors/licenseKeyErrorSelector';
 import useConfirm from '@/app/hooks/useConfirm';
@@ -18,6 +21,7 @@ import { licenseDetailsSelector } from '@/selectors';
 import { ldUserFactory } from '@/utils/ldUserFactory';
 
 export default function AddLicenseKey() {
+  const inputEl = useRef<HTMLInputElement | null>(null);
   const dispatch = useDispatch<Dispatch>();
   const existingKey = useSelector(licenseKeySelector);
   const licenseDetails = useSelector(licenseDetailsSelector);
@@ -54,6 +58,11 @@ export default function AddLicenseKey() {
     }
   }, [dispatch, confirm, removeAccessToFeatures]);
 
+  const ManageSubscriptionLink = styled('a', {
+    color: '$fgAccent',
+    fontSize: '$xsmall',
+  });
+
   useEffect(() => {
     setLicenseKey(existingKey);
   }, [existingKey]);
@@ -70,17 +79,30 @@ export default function AddLicenseKey() {
     setLicenseKey(ev.target.value.trim());
   }, []);
 
-  const removeLicenseKeyButton = existingKey && (
-    <Button variant="secondary" onClick={removeKey} disabled={existingKey !== newKey}>
+  const removeLicenseKeyButton = existingKey && !licenseKeyError && (
+    <Button variant="primary" onClick={removeKey} disabled={existingKey !== newKey}>
       Remove key
+    </Button>
+  );
+
+  const addLicenseKeyButton = (!existingKey || licenseKeyError) && (
+    <Button variant="primary" onClick={addKey} disabled={existingKey === newKey}>
+      Add license key
     </Button>
   );
 
   return (
     <Stack direction="column" gap={3} css={{ padding: '0 $4' }}>
       <Stack direction="row" gap={2} align="center" justify="between">
-        <Heading size="medium">License key</Heading>
-        <ProBadge />
+        <Heading size="small">License key</Heading>
+        <Stack direction="row" gap={2} align="center">
+          <ProBadge />
+          {existingKey && !licenseKeyError && (
+            <ManageSubscriptionLink href="https://account.figmatokens.com/" target="_blank">
+              Manage subscription
+            </ManageSubscriptionLink>
+          )}
+        </Stack>
       </Stack>
       <Stack
         direction="row"
@@ -97,17 +119,16 @@ export default function AddLicenseKey() {
             size="large"
             name="license-key"
             data-testid="settings-license-key-input"
-            type="text"
+            type="password"
+            inputRef={inputEl}
+            isMasked
             value={newKey || ''}
             onChange={onLicenseKeyChange}
             error={licenseKeyError}
           />
         </Box>
-
-        <Button variant="primary" onClick={addKey} disabled={existingKey === newKey}>
-          {existingKey ? 'Update key' : 'Add license key'}
-        </Button>
-        <Box>{removeLicenseKeyButton}</Box>
+        {addLicenseKeyButton}
+        {removeLicenseKeyButton}
       </Stack>
     </Stack>
   );
