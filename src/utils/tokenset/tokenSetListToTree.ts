@@ -29,7 +29,8 @@ export function tokenSetListToTree(items: string[]) {
         }
       });
     }
-    if (parentIndex > 0) {
+
+    if (parentIndex >= 0) {
       const childrenLength = acc.filter((item) => item.path.startsWith(`${parentName}/`)).length;
       acc.splice(parentIndex + childrenLength + 1, 0, {
         isLeaf: true,

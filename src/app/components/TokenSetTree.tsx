@@ -104,9 +104,6 @@ export default function TokenSetTree({
   const editProhibited = useSelector(editProhibitedSelector);
   const collapsed = useSelector(collapsedTokenSetsSelector);
   const [items, setItems] = useState<TreeItem[]>(tokenSetListToTree(tokenSets));
-  React.useEffect(() => {
-    console.log('items', items);
-  }, [items]);
 
   const determineCheckedState = useCallback((item: TreeItem) => {
     if (item.isLeaf) {
