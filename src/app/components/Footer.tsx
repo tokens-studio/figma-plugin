@@ -1,8 +1,6 @@
 import React, { useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import {
-  DownloadIcon, UploadIcon,
-} from '@primer/octicons-react';
+import { DownloadIcon, UploadIcon } from '@primer/octicons-react';
 import { Dispatch } from '../store';
 import * as pjs from '../../../package.json';
 import Box from './Box';
@@ -25,12 +23,12 @@ import DocsIcon from '@/icons/docs.svg';
 import RefreshIcon from '@/icons/refresh.svg';
 import FeedbackIcon from '@/icons/feedback.svg';
 import IconButton from './IconButton';
-import { useFlags } from './LaunchDarkly';
 import Tooltip from './Tooltip';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { isGitProvider } from '@/utils/is';
 import IconLibrary from '@/icons/library.svg';
 import ProBadge from './ProBadge';
+import { compareLastSyncedState } from '@/utils/compareLastSyncedState';
 
 export default function Footer() {
   const storageType = useSelector(storageTypeSelector);
@@ -43,14 +41,21 @@ export default function Footer() {
   const activeTheme = useSelector(activeThemeSelector);
   const dispatch = useDispatch<Dispatch>();
   const projectURL = useSelector(projectURLSelector);
-  const { gitBranchSelector } = useFlags();
   const { pullTokens, pushTokens } = useRemoteTokens();
 
   const checkForChanges = React.useCallback(() => {
-    const hasChanged = (lastSyncedState !== JSON.stringify([tokens, themes], null, 2));
+    const tokenSetOrder = Object.keys(tokens);
+    const defaultMetadata = storageType.provider !== StorageProviderType.LOCAL ? { tokenSetOrder } : {};
+    const hasChanged = !compareLastSyncedState(
+      tokens,
+      themes,
+      defaultMetadata,
+      lastSyncedState,
+      [{}, [], defaultMetadata],
+    );
     dispatch.tokenState.updateCheckForChanges(hasChanged);
     return hasChanged;
-  }, [lastSyncedState, tokens, themes, dispatch.tokenState]);
+  }, [lastSyncedState, storageType, tokens, themes, dispatch.tokenState]);
 
   const hasChanges = React.useMemo(() => checkForChanges(), [checkForChanges]);
 
@@ -62,6 +67,8 @@ export default function Footer() {
         return 'GitHub';
       case StorageProviderType.GITLAB:
         return 'GitLab';
+      case StorageProviderType.BITBUCKET:
+        return 'Bitbucket';
       case StorageProviderType.ADO:
         return 'ADO';
       case StorageProviderType.URL:
@@ -74,7 +81,7 @@ export default function Footer() {
   }, []);
 
   const onPushButtonClicked = React.useCallback(() => pushTokens(), [pushTokens]);
-  const onPullButtonClicked = React.useCallback(() => pullTokens({ usedTokenSet }), [pullTokens, usedTokenSet]);
+  const onPullButtonClicked = React.useCallback(() => pullTokens({ usedTokenSet, activeTheme }), [pullTokens, usedTokenSet, activeTheme]);
   const handlePullTokens = useCallback(() => {
     pullTokens({ usedTokenSet, activeTheme });
   }, [pullTokens, usedTokenSet, activeTheme]);
@@ -92,9 +99,9 @@ export default function Footer() {
       <Stack direction="row">
         {isGitProvider(localApiState) && localApiState.branch && (
           <>
-            {gitBranchSelector && <BranchSelector />}
-            <IconButton icon={<DownloadIcon />} onClick={onPullButtonClicked} tooltipSide="top" tooltip={`Pull from ${transformProviderName(storageType.provider)}`} />
-            <IconButton badge={hasChanges} icon={<UploadIcon />} onClick={onPushButtonClicked} tooltipSide="top" disabled={editProhibited} tooltip={`Push to ${transformProviderName(storageType.provider)}`} />
+            <BranchSelector />
+            <IconButton dataCy="footer-pull-button" icon={<DownloadIcon />} onClick={onPullButtonClicked} tooltipSide="top" tooltip={`Pull from ${transformProviderName(storageType.provider)}`} />
+            <IconButton dataCy="footer-push-button" badge={hasChanges} icon={<UploadIcon />} onClick={onPushButtonClicked} tooltipSide="top" disabled={editProhibited} tooltip={`Push to ${transformProviderName(storageType.provider)}`} />
           </>
         )}
         {storageType.provider === StorageProviderType.SUPERNOVA && (
@@ -107,26 +114,26 @@ export default function Footer() {
           && storageType.provider !== StorageProviderType.GITHUB
           && storageType.provider !== StorageProviderType.GITLAB
           && storageType.provider !== StorageProviderType.ADO
-          && storageType.provider !== StorageProviderType.SUPERNOVA
-          && (
+          && storageType.provider !== StorageProviderType.BITBUCKET
+          && storageType.provider !== StorageProviderType.SUPERNOVA (
             <Stack align="center" direction="row" gap={2}>
               <Text muted>Sync</Text>
               {storageType.provider === StorageProviderType.JSONBIN && (
                 <Tooltip label={`Go to ${transformProviderName(storageType.provider)}`}>
-                  <a href={projectURL} target="_blank" rel="noreferrer" className="block button button-ghost">
-                    <IconLibrary />
-                  </a>
+                  <IconButton icon={<IconLibrary />} href={projectURL} />
                 </Tooltip>
               )}
-              <IconButton tooltip={`Pull from ${transformProviderName(storageType.provider)}`} onClick={handlePullTokens} icon={<RefreshIcon />} />
+              <IconButton
+                tooltip={`Pull from ${transformProviderName(storageType.provider)}`}
+                onClick={handlePullTokens}
+                icon={<RefreshIcon />}
+              />
             </Stack>
-          )}
+        )}
       </Stack>
       <Stack direction="row" gap={4} align="center">
         <Box css={{ color: '$textMuted', fontSize: '$xsmall' }}>
-          V
-          {' '}
-          {pjs.plugin_version}
+          {`V ${pjs.plugin_version}`}
         </Box>
         <Stack direction="row" gap={1}>
           <ProBadge />

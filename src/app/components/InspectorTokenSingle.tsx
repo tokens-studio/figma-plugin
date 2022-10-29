@@ -30,7 +30,7 @@ export default function InspectorTokenSingle({
   const property = useTypeForProperty(token.category);
   const inspectState = useSelector(inspectStateSelector, shallowEqual);
   const dispatch = useDispatch<Dispatch>();
-  const [newTokenName, setNewTokenName] = React.useState<string>('');
+  const [newTokenName, setNewTokenName] = React.useState<string>(token.value);
   const [showDialog, setShowDialog] = React.useState<boolean>(false);
   const [isChecked, setChecked] = React.useState<boolean>(false);
   const [isBrokenLink, setIsBrokenLink] = React.useState<boolean>(false);
@@ -43,9 +43,7 @@ export default function InspectorTokenSingle({
   }, [inspectState.selectedTokens, token]);
 
   const handleDownShiftInputChange = React.useCallback((newInputValue: string) => {
-    if (newInputValue.charAt(0) === '$') setNewTokenName(newInputValue.slice(1, newInputValue.length));
-    if (newInputValue.charAt(0) === '{') setNewTokenName(newInputValue.slice(1, newInputValue.length - 1));
-    else setNewTokenName(newInputValue);
+    setNewTokenName(newInputValue.replace(/[{}$]/g, ''));
   }, []);
 
   const handleChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>((e) => {
@@ -80,6 +78,7 @@ export default function InspectorTokenSingle({
         paddingTop: '$2',
         paddingBottom: '$2',
       }}
+      data-cy={`inspector-token-single-${token.category}`}
     >
       <Box
         css={{

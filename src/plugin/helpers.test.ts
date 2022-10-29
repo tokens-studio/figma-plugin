@@ -67,6 +67,16 @@ describe('transformValue', () => {
       type: 'opacity',
       output: 0.6,
     },
+    {
+      input: '100',
+      type: 'fontWeights',
+      output: ['Thin', 'Hairline'],
+    },
+    {
+      input: 'bold',
+      type: 'fontWeights',
+      output: [],
+    },
   ];
   it('transforms non-conform values into their required formats', () => {
     tokens.forEach((token) => {

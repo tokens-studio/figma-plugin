@@ -10,6 +10,8 @@ import { TokenTypes } from '@/constants/TokenTypes';
 import { styled } from '@/stitches.config';
 import { StyledDownshiftInput } from './StyledDownshiftInput';
 import Tooltip from '../Tooltip';
+import { Properties } from '@/constants/Properties';
+import { isDocumentationType } from '@/utils/is/isDocumentationType';
 
 const StyledDropdown = styled('div', {
   position: 'absolute',
@@ -88,6 +90,7 @@ interface DownShiftProps {
   inlineLabel?: boolean;
   error?: string;
   value?: string;
+  initialName?: string;
   placeholder?: string;
   prefix?: React.ReactNode;
   suffix?: boolean;
@@ -103,6 +106,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
   inlineLabel = false,
   error,
   value,
+  initialName,
   prefix,
   suffix,
   placeholder,
@@ -112,8 +116,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
 }) => {
   const [showAutoSuggest, setShowAutoSuggest] = React.useState<boolean>(false);
   const [isFirstLoading, setisFirstLoading] = React.useState<boolean>(true);
-
-  const filteredValue = useMemo(() => ((showAutoSuggest || typeof value !== 'string') ? '' : value?.replace(/[^a-zA-Z0-9.]/g, '')), [
+  const filteredValue = useMemo(() => ((showAutoSuggest || typeof value !== 'string') ? '' : value?.replace(/[{}$]/g, '')), [
     showAutoSuggest,
     value,
   ]); // removing non-alphanumberic except . from the input value
@@ -134,12 +137,25 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
   }, []);
 
   const filteredTokenItems = useMemo(
-    () => resolvedTokens
-      .filter(
-        (token: SingleToken) => !filteredValue || token.name.toLowerCase().includes(filteredValue.toLowerCase()),
-      )
-      .filter((token: SingleToken) => token?.type === type),
-    [resolvedTokens, filteredValue, type],
+    () => {
+      if (isDocumentationType(type as Properties)) {
+        return resolvedTokens
+          .filter(
+            (token: SingleToken) => !filteredValue || token.name.toLowerCase().includes(filteredValue.toLowerCase()),
+          )
+          .filter((token: SingleToken) => token.name !== initialName).sort((a, b) => (
+            a.name.localeCompare(b.name)
+          ));
+      }
+      return resolvedTokens
+        .filter(
+          (token: SingleToken) => !filteredValue || token.name.toLowerCase().includes(filteredValue.toLowerCase()),
+        )
+        .filter((token: SingleToken) => token?.type === type && token.name !== initialName).sort((a, b) => (
+          a.name.localeCompare(b.name)
+        ));
+    },
+    [resolvedTokens, filteredValue, type, isDocumentationType],
   );
 
   const resolveValue = useCallback((token: SingleToken) => {
@@ -161,7 +177,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
       returnValue = Object.entries(token.value).reduce<string>((acc, [property, value]) => (
         `${acc}${property}:${value}`
       ), '');
-    } else if (typeof token.value === 'string') {
+    } else if (typeof token.value === 'string' || typeof token.value === 'number') {
       returnValue = token.value;
     }
     return returnValue;
@@ -204,7 +220,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
               getInputProps={getInputProps}
             />
             {suffix && (
-              <StyledInputSuffix type="button" onClick={handleAutoSuggest}>
+              <StyledInputSuffix type="button" data-testid="downshift-input-suffix-button" onClick={handleAutoSuggest}>
                 <StyledIconDisclosure />
               </StyledInputSuffix>
             )}
@@ -217,12 +233,15 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
               <StyledDropdown className="content scroll-container">
                 {filteredTokenItems.map((token: SingleToken, index: number) => (
                   <StyledItem
+                    data-cy="downshift-input-item"
+                    data-testid="downshift-input-item"
                     className="dropdown-item"
                     {...getItemProps({ key: token.name, index, item: token })}
                     css={{
                       backgroundColor: highlightedIndex === index ? '$interaction' : '$bgDefault',
                     }}
                     isFocused={highlightedIndex === index}
+
                   >
                     {type === 'color' && (
                     <StyledItemColorDiv>

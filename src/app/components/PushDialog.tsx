@@ -2,6 +2,7 @@ import React from 'react';
 import { useSelector } from 'react-redux';
 import { localApiStateSelector } from '@/selectors';
 import usePushDialog from '../hooks/usePushDialog';
+import { getBitbucketCreatePullRequestUrl } from '../store/providers/bitbucket';
 import { getGithubCreatePullRequestUrl } from '../store/providers/github';
 import { getGitlabCreatePullRequestUrl } from '../store/providers/gitlab';
 import { getADOCreatePullRequestUrl } from '../store/providers/ado';
@@ -14,6 +15,8 @@ import Spinner from './Spinner';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { isGitProvider } from '@/utils/is';
 import { getSupernovaOpenCloud } from '../store/providers/supernova/getSupernovaOpenCloud'
+import Textarea from './Textarea';
+import { useShortcut } from '@/hooks/useShortcut';
 
 function ConfirmDialog() {
   const { onConfirm, onCancel, showPushDialog } = usePushDialog();
@@ -27,7 +30,16 @@ function ConfirmDialog() {
       switch (localApiState.provider) {
         case StorageProviderType.GITHUB:
           redirectHref = getGithubCreatePullRequestUrl({
-            base: localApiState.baseUrl, repo: localApiState.id, branch,
+            base: localApiState.baseUrl,
+            repo: localApiState.id,
+            branch,
+          });
+          break;
+        case StorageProviderType.BITBUCKET:
+          redirectHref = getBitbucketCreatePullRequestUrl({
+            base: localApiState.baseUrl,
+            repo: localApiState.id,
+            branch,
           });
           break;
         case StorageProviderType.GITLAB: {
@@ -53,13 +65,19 @@ function ConfirmDialog() {
     return redirectHref;
   }, [branch, localApiState]);
 
-  const handleCommitMessageChange = React.useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    setCommitMessage(event.target.value);
-  }, [setCommitMessage]);
+  const handleCommitMessageChange = React.useCallback(
+    (val: string) => {
+      setCommitMessage(val);
+    },
+    [setCommitMessage],
+  );
 
-  const handleBranchChange = React.useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    setBranch(event.target.value);
-  }, [setBranch]);
+  const handleBranchChange = React.useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setBranch(event.target.value);
+    },
+    [setBranch],
+  );
 
   const handleSubmit = React.useCallback(() => {
     onConfirm(commitMessage, branch);
@@ -71,6 +89,14 @@ function ConfirmDialog() {
       setBranch(localApiState.branch ?? '');
     }
   }, [showPushDialog, localApiState]);
+
+  const handleSaveShortcut = React.useCallback((event: KeyboardEvent) => {
+    if (event.metaKey || event.ctrlKey) {
+      handleSubmit();
+    }
+  }, [handleSubmit]);
+
+  useShortcut(['Enter'], handleSaveShortcut);
 
   switch (showPushDialog) {
     case 'initial': {
@@ -84,14 +110,14 @@ function ConfirmDialog() {
                 <div className="p-2 font-mono text-gray-600 bg-gray-100 rounded text-xxs">
                   {'id' in localApiState ? localApiState.id : null}
                 </div>
-                <Input
-                  full
-                  label="Commit message"
+                <Heading size="medium">Commit message</Heading>
+                <Textarea
+                  id="push-dialog-commit-message"
+                  border
+                  rows={3}
                   value={commitMessage}
                   onChange={handleCommitMessageChange}
-                  type="text"
-                  name="commitMessage"
-                  required
+                  placeholder="Enter commit message"
                 />
                 <Input
                   full
@@ -125,6 +151,7 @@ function ConfirmDialog() {
               Pushing to
               {localApiState.provider === StorageProviderType.GITHUB && ' GitHub'}
               {localApiState.provider === StorageProviderType.GITLAB && ' GitLab'}
+              {localApiState.provider === StorageProviderType.BITBUCKET && ' Bitbucket'}
               {localApiState.provider === StorageProviderType.ADO && ' ADO'}
               {localApiState.provider === StorageProviderType.SUPERNOVA && ' Supernova.io'}
             </Heading>
@@ -137,11 +164,12 @@ function ConfirmDialog() {
         <Modal large isOpen close={onCancel}>
           <div className="text-center">
             <div className="mb-8 space-y-4">
-              <Heading size="medium">All done!</Heading>
+              <Heading id="push-dialog-success-heading" size="medium">All done!</Heading>
               <div className="text-xs">
                 Changes pushed to
                 {localApiState.provider === StorageProviderType.GITHUB && ' GitHub'}
                 {localApiState.provider === StorageProviderType.GITLAB && ' GitLab'}
+                {localApiState.provider === StorageProviderType.BITBUCKET && ' Bitbucket'}
                 {localApiState.provider === StorageProviderType.ADO && ' ADO'}
                 {localApiState.provider === StorageProviderType.SUPERNOVA && ' Supernova.io'}
                 .

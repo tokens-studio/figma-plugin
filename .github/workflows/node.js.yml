@@ -57,15 +57,34 @@ jobs:
       # 4: Run tests
       - name: Run test command
         run: yarn test
+  coverage:
+    name: Test coverage
+    runs-on: ubuntu-latest
+    steps:
+      # 1: Setup node
+      - name: Setup Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: '16.x'
+      # 2: Checkout repository
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      # 3: Install dependencies
+      - name: Install dependencies
+        run: yarn --frozen-lockfile
       
-      # 5: Run test coverage report
+      # 4: Run test coverage report
       - name: Run test coverage report
         id: testCoverage
         uses: anuraag016/Jest-Coverage-Diff@master
         with:
           fullCoverageDiff: false
           runCommand: "npx jest --collectCoverageFrom='[\"src/**/*.{js,jsx,ts,tsx}\"]' --coverage --collectCoverage=true --coverageDirectory='./' --coverageReporters='json-summary' --forceExit --detectOpenHandles"
-          delta: 0.5
+          total_delta: 1
+          delta: 1
+          afterSwitchCommand: yarn --frozen-lockfile
+          useSameComment: true
   test-transform:
     name: Transformer Tests
     runs-on: ubuntu-latest
@@ -84,11 +103,11 @@ jobs:
         run: yarn --frozen-lockfile
 
       # 4: Build package
-      - name: Build Package
+      - name: build:transform
         run: yarn build-transform
 
       # 5: Install dependencies
-      - name: Install dependencies
+      - name: Install dependencies - transformer
         run: cd token-transformer && yarn --frozen-lockfile
       
       # 6: Run tests

@@ -1,4 +1,4 @@
-# Token Transformer
+****# Token Transformer
 
 Converts tokens from Figma Tokens to something Style Dictionary can read, removing any math operations or aliases, only resulting in raw values.
 
@@ -15,9 +15,15 @@ Install (either globally or local)
 
 `node token-transformer input.json output.json --expandTypography=false --expandShadow=false`
 
-`node token-transformer input.json output.json --expandTypography=false --expandShadow=false --preserveRawValue=true`
+`node token-transformer input.json output.json --expandTypography=false --expandShadow=false --expandComposition=false`
 
-`node token-transformer input.json output.json --expandTypography=false --expandShadow=false --preserveRawValue=true resolveReferences=false`
+`node token-transformer input.json output.json --expandTypography=false --expandShadow=false --expandComposition=false --preserveRawValue=true`
+
+`node token-transformer input.json output.json --expandTypography=false --expandShadow=false --expandComposition=false --preserveRawValue=true resolveReferences=false`
+
+You can also set a directory as an input instead of providing just one file.
+
+`node token-transformer src output.json core/colors,themes/dark core/colors`
 
 ## Parameters
 

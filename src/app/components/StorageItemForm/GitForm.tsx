@@ -15,10 +15,11 @@ type Props = {
   onSubmit: (values: ValidatedFormValues) => void;
   onCancel: () => void;
   hasErrored?: boolean;
+  errorMessage?: string;
 };
 
 export default function GitForm({
-  onChange, onSubmit, onCancel, values, hasErrored,
+  onChange, onSubmit, onCancel, values, hasErrored, errorMessage,
 }: Props) {
   const inputEl = useRef<HTMLInputElement | null>(null);
 
@@ -85,11 +86,11 @@ export default function GitForm({
         <Input
           full
           label="File Path (e.g. data/tokens.json)"
+          defaultValue=""
           value={values.filePath}
           onChange={onChange}
           type="text"
           name="filePath"
-          required
         />
         <Input
           full
@@ -111,7 +112,7 @@ export default function GitForm({
         </Stack>
         {hasErrored && (
           <div className="bg-red-200 text-red-700 rounded p-4 text-xs font-bold" data-cy="provider-modal-error">
-            There was an error connecting. Check your credentials.
+            {errorMessage}
           </div>
         )}
       </Stack>

@@ -1,4 +1,3 @@
-import { LDProps } from 'launchdarkly-react-client-sdk/lib/withLDConsumer';
 import { UpdateMode } from '@/constants/UpdateMode';
 import type { SettingsState } from '@/app/store/models/settings';
 import type { Properties } from '@/constants/Properties';
@@ -9,12 +8,14 @@ import type { PullStyleOptions } from './PullStylesOptions';
 import type { ThemeObjectsList } from './ThemeObjectsList';
 import type { AnyTokenList } from './tokens';
 import type { UsedTokenSetsMap } from './UsedTokenSetsMap';
-import { StorageType, StorageTypeCredentials } from './StorageType';
-import { Direction } from '@/constants/Direction';
+import type { StorageType, StorageTypeCredentials } from './StorageType';
+import type { Direction } from '@/constants/Direction';
+import type { SelectionValue } from './SelectionValue';
+import type { startup } from '@/utils/plugin';
+import type { ThemeObject } from './ThemeObject';
 
 export enum AsyncMessageTypes {
   // the below messages are going from UI to plugin
-  INITIATE = 'async/initiate',
   CREATE_STYLES = 'async/create-styles',
   CREDENTIALS = 'async/credentials',
   CHANGED_TABS = 'async/changed-tabs',
@@ -23,6 +24,7 @@ export enum AsyncMessageTypes {
   SET_NODE_DATA = 'async/set-node-data',
   REMOVE_TOKENS_BY_VALUE = 'async/remove-tokens-by-value',
   REMAP_TOKENS = 'async/remap-tokens',
+  BULK_REMAP_TOKENS = 'async/bulk-remap-tokens',
   GOTO_NODE = 'async/goto-node',
   SELECT_NODES = 'async/select-nodes',
   PULL_STYLES = 'async/pull-styles',
@@ -34,15 +36,14 @@ export enum AsyncMessageTypes {
   CREATE_ANNOTATION = 'async/create-annotation',
   UPDATE = 'async/update',
   SET_LICENSE_KEY = 'async/set-license-key',
-  GET_API_CREDENTIALS = 'async/get-api-credentials',
+  ATTACH_LOCAL_STYLES_TO_THEME = 'async/attach-local-styles-to-theme',
+  RESOLVE_STYLE_INFO = 'async/resolve-style-info',
   // the below messages are going from plugin to UI
+  STARTUP = 'async/startup',
   GET_THEME_INFO = 'async/get-theme-info',
 }
 
 export type AsyncMessage<T extends AsyncMessageTypes, P = unknown> = P & { type: T };
-
-export type InitiateAsyncMessage = AsyncMessage<AsyncMessageTypes.INITIATE>;
-export type InitiateAsyncMessageResult = AsyncMessage<AsyncMessageTypes.INITIATE>;
 
 export type CredentialsAsyncMessage = AsyncMessage<AsyncMessageTypes.CREDENTIALS, {
   credential: StorageTypeCredentials;
@@ -75,6 +76,12 @@ export type RemapTokensAsyncMessage = AsyncMessage<AsyncMessageTypes.REMAP_TOKEN
   settings?: SettingsState;
 }>;
 export type RemapTokensMessageAsyncResult = AsyncMessage<AsyncMessageTypes.REMAP_TOKENS>;
+
+export type BulkRemapTokensAsyncMessage = AsyncMessage<AsyncMessageTypes.BULK_REMAP_TOKENS, {
+  oldName: string;
+  newName: string;
+}>;
+export type BulkRemapTokensMessageAsyncResult = AsyncMessage<AsyncMessageTypes.BULK_REMAP_TOKENS>;
 
 export type GotoNodeAsyncMessage = AsyncMessage<AsyncMessageTypes.GOTO_NODE, {
   id: string;
@@ -109,16 +116,18 @@ export type SetUiAsyncMessage = AsyncMessage<AsyncMessageTypes.SET_UI, SettingsS
 export type SetUiAsyncMessageResult = AsyncMessage<AsyncMessageTypes.SET_UI>;
 
 export type CreateAnnotationAsyncMessage = AsyncMessage<AsyncMessageTypes.CREATE_ANNOTATION, {
-  tokens: object;
+  tokens: SelectionValue;
   direction: Direction;
 }>;
 export type CreateAnnotationAsyncMessageResult = AsyncMessage<AsyncMessageTypes.CREATE_ANNOTATION>;
 
 export type CreateStylesAsyncMessage = AsyncMessage<AsyncMessageTypes.CREATE_STYLES, {
   tokens: AnyTokenList;
-  settings: SettingsState;
+  settings: Partial<SettingsState>;
 }>;
-export type CreateStylesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.CREATE_STYLES>;
+export type CreateStylesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.CREATE_STYLES, {
+  styleIds: Record<string, string>;
+}>;
 
 export type UpdateAsyncMessage = AsyncMessage<AsyncMessageTypes.UPDATE, {
   tokenValues: Record<string, AnyTokenList>;
@@ -130,18 +139,33 @@ export type UpdateAsyncMessage = AsyncMessage<AsyncMessageTypes.UPDATE, {
   activeTheme: string | null;
   checkForChanges?: boolean
 }>;
-export type UpdateAsyncMessageResult = AsyncMessage<AsyncMessageTypes.UPDATE>;
+export type UpdateAsyncMessageResult = AsyncMessage<AsyncMessageTypes.UPDATE, {
+  styleIds: Record<string, string>;
+}>;
 
 export type SetLicenseKeyMessage = AsyncMessage<AsyncMessageTypes.SET_LICENSE_KEY, {
   licenseKey: string | null
 }>;
 export type SetLicenseKeyMessageResult = AsyncMessage<AsyncMessageTypes.SET_LICENSE_KEY>;
 
-export type GetApiCredentials = AsyncMessage<AsyncMessageTypes.GET_API_CREDENTIALS, {
-  shouldPull?: boolean
-  featureFlags?: LDProps['flags'] | null
+export type AttachLocalStylesToTheme = AsyncMessage<AsyncMessageTypes.ATTACH_LOCAL_STYLES_TO_THEME, {
+  theme: ThemeObject
+  tokens: Record<string, AnyTokenList>
+  category: 'typography' | 'colors' | 'effects' | 'all'
+  settings?: Partial<SettingsState>
 }>;
-export type GetApiCredentialsResult = AsyncMessage<AsyncMessageTypes.GET_API_CREDENTIALS>;
+export type AttachLocalStylesToThemeResult = AsyncMessage<AsyncMessageTypes.ATTACH_LOCAL_STYLES_TO_THEME, ThemeObject>;
+
+export type ResolveStyleInfo = AsyncMessage<AsyncMessageTypes.RESOLVE_STYLE_INFO, {
+  styleIds: string[]
+}>;
+export type ResolveStyleInfoResult = AsyncMessage<AsyncMessageTypes.RESOLVE_STYLE_INFO, {
+  resolvedValues: {
+    id: string
+    key?: string
+    name?: string
+  }[];
+}>;
 
 export type GetThemeInfoMessage = AsyncMessage<AsyncMessageTypes.GET_THEME_INFO>;
 export type GetThemeInfoMessageResult = AsyncMessage<AsyncMessageTypes.GET_THEME_INFO, {
@@ -149,9 +173,13 @@ export type GetThemeInfoMessageResult = AsyncMessage<AsyncMessageTypes.GET_THEME
   themes: ThemeObjectsList
 }>;
 
+export type StartupMessage = AsyncMessage<AsyncMessageTypes.STARTUP, (
+  ReturnType<typeof startup> extends Promise<infer V> ? V : unknown
+)>;
+export type StartupMessageResult = AsyncMessage<AsyncMessageTypes.STARTUP>;
+
 export type AsyncMessages =
   CreateStylesAsyncMessage
-  | InitiateAsyncMessage
   | CredentialsAsyncMessage
   | ChangedTabsAsyncMessage
   | RemoveSingleCredentialAsyncMessage
@@ -159,6 +187,7 @@ export type AsyncMessages =
   | SetNodeDataAsyncMessage
   | RemoveTokensByValueAsyncMessage
   | RemapTokensAsyncMessage
+  | BulkRemapTokensAsyncMessage
   | GotoNodeAsyncMessage
   | SelectNodesAsyncMessage
   | PullStylesAsyncMessage
@@ -171,10 +200,12 @@ export type AsyncMessages =
   | UpdateAsyncMessage
   | GetThemeInfoMessage
   | SetLicenseKeyMessage
-  | GetApiCredentials;
+  | StartupMessage
+  | AttachLocalStylesToTheme
+  | ResolveStyleInfo;
+
 export type AsyncMessageResults =
   CreateStylesAsyncMessageResult
-  | InitiateAsyncMessageResult
   | CredentialsAsyncMessageResult
   | ChangedTabsAsyncMessageResult
   | RemoveSingleCredentialAsyncMessageResult
@@ -182,6 +213,7 @@ export type AsyncMessageResults =
   | SetNodeDataAsyncMessageResult
   | RemoveTokensByValueAsyncMessageResult
   | RemapTokensMessageAsyncResult
+  | BulkRemapTokensMessageAsyncResult
   | GotoNodeMessageAsyncResult
   | SelectNodesMessageAsyncResult
   | PullStylesAsyncMessageResult
@@ -194,7 +226,9 @@ export type AsyncMessageResults =
   | UpdateAsyncMessageResult
   | GetThemeInfoMessageResult
   | SetLicenseKeyMessageResult
-  | GetApiCredentialsResult;
+  | StartupMessageResult
+  | AttachLocalStylesToThemeResult
+  | ResolveStyleInfoResult;
 
 export type AsyncMessagesMap = {
   [K in AsyncMessageTypes]: Extract<AsyncMessages, { type: K }>

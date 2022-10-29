@@ -11,17 +11,18 @@ import {
 } from '@/selectors';
 import { GithubTokenStorage } from '@/storage/GithubTokenStorage';
 import { isEqual } from '@/utils/isEqual';
-import { RemoteTokenStorageData } from '@/storage/RemoteTokenStorage';
-import { GitStorageMetadata } from '@/storage/GitTokenStorage';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { StorageTypeCredentials, StorageTypeFormValues } from '@/types/StorageType';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { useFlags } from '@/app/components/LaunchDarkly';
+import { RemoteResponseData } from '@/types/RemoteResponseData';
+import { ErrorMessages } from '@/constants/ErrorMessages';
+import { applyTokenSetOrder } from '@/utils/tokenset';
+import { saveLastSyncedState } from '@/utils/saveLastSyncedState';
 
 type GithubCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.GITHUB | StorageProviderType.GITLAB; }>;
 type GithubFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.GITHUB | StorageProviderType.GITLAB }>;
-
 export function useGitHub() {
   const tokens = useSelector(tokensSelector);
   const activeTheme = useSelector(activeThemeSelector);
@@ -31,7 +32,7 @@ export function useGitHub() {
   const { multiFileSync } = useFlags();
   const dispatch = useDispatch<Dispatch>();
   const { confirm } = useConfirm();
-  const { pushDialog } = usePushDialog();
+  const { pushDialog, closeDialog } = usePushDialog();
 
   const storageClientFactory = useCallback((context: GithubCredentials, owner?: string, repo?: string) => {
     const splitContextId = context.id.split('/');
@@ -48,25 +49,33 @@ export function useGitHub() {
       text: 'Pull from GitHub?',
       description: 'Your repo already contains tokens, do you want to pull these now?',
     });
-    if (confirmResult === false) return false;
-    return confirmResult.result;
+    return confirmResult;
   }, [confirm]);
 
-  const pushTokensToGitHub = useCallback(async (context: GithubCredentials): Promise<RemoteTokenStorageData<GitStorageMetadata> | null> => {
+  const pushTokensToGitHub = useCallback(async (context: GithubCredentials): Promise<RemoteResponseData> => {
     const storage = storageClientFactory(context);
     const content = await storage.retrieve();
-
+    if (content?.status === 'failure') {
+      return {
+        status: 'failure',
+        errorMessage: content?.errorMessage,
+      };
+    }
     if (content) {
       if (
         content
         && isEqual(content.tokens, tokens)
         && isEqual(content.themes, themes)
+        && isEqual(content.metadata?.tokenSetOrder ?? Object.keys(tokens), Object.keys(tokens))
       ) {
         notifyToUI('Nothing to commit');
         return {
-          tokens,
+          status: 'success',
           themes,
-          metadata: {},
+          tokens,
+          metadata: {
+            tokenSetOrder: Object.keys(tokens),
+          },
         };
       }
     }
@@ -78,12 +87,17 @@ export function useGitHub() {
       const { commitMessage, customBranch } = pushSettings;
       try {
         if (customBranch) storage.selectBranch(customBranch);
+        const metadata = {
+          tokenSetOrder: Object.keys(tokens),
+        };
         await storage.save({
           themes,
           tokens,
-          metadata: { commitMessage },
+          metadata,
+        }, {
+          commitMessage,
         });
-        dispatch.tokenState.setLastSyncedState(JSON.stringify([tokens, themes], null, 2));
+        saveLastSyncedState(dispatch, tokens, themes, metadata);
         dispatch.uiState.setLocalApiState({ ...localApiState, branch: customBranch } as GithubCredentials);
         dispatch.uiState.setApiData({ ...context, branch: customBranch });
         dispatch.tokenState.setTokenData({
@@ -94,16 +108,28 @@ export function useGitHub() {
         });
         pushDialog('success');
         return {
+          status: 'success',
           tokens,
           themes,
-          metadata: { commitMessage },
         };
       } catch (e) {
+        closeDialog();
         console.log('Error pushing to GitHub', e);
+        if (e instanceof Error) {
+          return {
+            status: 'failure',
+            errorMessage: e.message === ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR ? ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR : ErrorMessages.GITHUB_CREDENTIAL_ERROR,
+          };
+        }
+        return {
+          status: 'failure',
+          errorMessage: ErrorMessages.GITHUB_CREDENTIAL_ERROR,
+        };
       }
     }
 
     return {
+      status: 'success',
       tokens,
       themes,
       metadata: {},
@@ -113,6 +139,7 @@ export function useGitHub() {
     dispatch.uiState,
     dispatch.tokenState,
     pushDialog,
+    closeDialog,
     tokens,
     themes,
     localApiState,
@@ -120,27 +147,47 @@ export function useGitHub() {
     activeTheme,
   ]);
 
-  const checkAndSetAccess = useCallback(async ({ context, owner, repo }: { context: GithubCredentials; owner: string; repo: string }) => {
+  const checkAndSetAccess = useCallback(async ({
+    context, owner, repo, receivedFeatureFlags,
+  }: { context: GithubCredentials; owner: string; repo: string, receivedFeatureFlags?: LDProps['flags'] }) => {
     const storage = storageClientFactory(context, owner, repo);
+    if (receivedFeatureFlags?.multiFileSync) storage.enableMultiFile();
     const hasWriteAccess = await storage.canWrite();
     dispatch.tokenState.setEditProhibited(!hasWriteAccess);
   }, [dispatch, storageClientFactory]);
 
-  const pullTokensFromGitHub = useCallback(async (context: GithubCredentials, receivedFeatureFlags?: LDProps['flags']) => {
+  const pullTokensFromGitHub = useCallback(async (context: GithubCredentials, receivedFeatureFlags?: LDProps['flags']): Promise<RemoteResponseData | null> => {
     const storage = storageClientFactory(context);
     if (receivedFeatureFlags?.multiFileSync) storage.enableMultiFile();
 
     const [owner, repo] = context.id.split('/');
 
-    await checkAndSetAccess({ context, owner, repo });
+    await checkAndSetAccess({
+      context, owner, repo, receivedFeatureFlags,
+    });
 
     try {
       const content = await storage.retrieve();
+      if (content?.status === 'failure') {
+        return {
+          status: 'failure',
+          errorMessage: content.errorMessage,
+        };
+      }
       if (content) {
-        return content;
+        // If we didn't get a tokenSetOrder from metadata, use the order of the token sets as they appeared
+        const sortedTokens = applyTokenSetOrder(content.tokens, content.metadata?.tokenSetOrder ?? Object.keys(content.tokens));
+
+        return {
+          ...content,
+          tokens: sortedTokens,
+        };
       }
     } catch (e) {
-      console.log('Error', e);
+      return {
+        status: 'failure',
+        errorMessage: ErrorMessages.GITHUB_CREDENTIAL_ERROR,
+      };
     }
     return null;
   }, [
@@ -149,33 +196,45 @@ export function useGitHub() {
   ]);
 
   // Function to initially check auth and sync tokens with GitHub
-  const syncTokensWithGitHub = useCallback(async (context: GithubCredentials): Promise<RemoteTokenStorageData<GitStorageMetadata> | null> => {
+  const syncTokensWithGitHub = useCallback(async (context: GithubCredentials): Promise<RemoteResponseData> => {
     try {
       const storage = storageClientFactory(context);
       const hasBranches = await storage.fetchBranches();
       dispatch.branchState.setBranches(hasBranches);
       if (!hasBranches || !hasBranches.length) {
-        return null;
+        return {
+          status: 'failure',
+          errorMessage: ErrorMessages.EMPTY_BRANCH_ERROR,
+        };
       }
 
       const [owner, repo] = context.id.split('/');
       await checkAndSetAccess({ context, owner, repo });
 
       const content = await storage.retrieve();
+      if (content?.status === 'failure') {
+        return {
+          status: 'failure',
+          errorMessage: content.errorMessage,
+        };
+      }
       if (content) {
         if (
           !isEqual(content.tokens, tokens)
           || !isEqual(content.themes, themes)
+          || !isEqual(content.metadata?.tokenSetOrder ?? Object.keys(tokens), Object.keys(tokens))
         ) {
           const userDecision = await askUserIfPull();
           if (userDecision) {
-            dispatch.tokenState.setLastSyncedState(JSON.stringify([content.tokens, content.themes], null, 2));
+            const sortedValues = applyTokenSetOrder(content.tokens, content.metadata?.tokenSetOrder);
+            saveLastSyncedState(dispatch, sortedValues, content.themes, content.metadata);
             dispatch.tokenState.setTokenData({
-              values: content.tokens,
+              values: sortedValues,
               themes: content.themes,
               activeTheme,
               usedTokenSet,
             });
+            dispatch.tokenState.setCollapsedTokenSets([]);
             notifyToUI('Pulled tokens from GitHub');
           }
         }
@@ -183,9 +242,12 @@ export function useGitHub() {
       }
       return await pushTokensToGitHub(context);
     } catch (e) {
-      notifyToUI('Error syncing with GitHub, check credentials', { error: true });
+      notifyToUI(ErrorMessages.GITHUB_CREDENTIAL_ERROR, { error: true });
       console.log('Error', e);
-      return null;
+      return {
+        status: 'failure',
+        errorMessage: ErrorMessages.GITHUB_CREDENTIAL_ERROR,
+      };
     }
   }, [
     askUserIfPull,
@@ -199,10 +261,10 @@ export function useGitHub() {
     checkAndSetAccess,
   ]);
 
-  const addNewGitHubCredentials = useCallback(async (context: GithubFormValues): Promise<RemoteTokenStorageData<GitStorageMetadata> | null> => {
+  const addNewGitHubCredentials = useCallback(async (context: GithubFormValues): Promise<RemoteResponseData> => {
     const data = await syncTokensWithGitHub(context);
-    if (data) {
-      AsyncMessageChannel.message({
+    if (data.status === 'success') {
+      AsyncMessageChannel.ReactInstance.message({
         type: AsyncMessageTypes.CREDENTIALS,
         credential: context,
       });
@@ -210,9 +272,13 @@ export function useGitHub() {
         notifyToUI('No tokens stored on remote');
       }
     } else {
-      return null;
+      return {
+        status: 'failure',
+        errorMessage: data.errorMessage,
+      };
     }
     return {
+      status: 'success',
       tokens: data.tokens ?? tokens,
       themes: data.themes ?? themes,
       metadata: {},

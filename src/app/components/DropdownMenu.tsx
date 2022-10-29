@@ -7,10 +7,14 @@ const itemStyles = {
   borderRadius: '$contextMenuItem',
   cursor: 'default',
 
-  '&:focus': {
+  '&:hover:not([data-disabled]), &:focus:not([data-disabled])': {
     outline: 'none',
     backgroundColor: '$interaction',
     color: '$onInteraction',
+  },
+
+  '&[data-disabled]': {
+    color: '$contextMenuForegroundDisabled',
   },
 };
 

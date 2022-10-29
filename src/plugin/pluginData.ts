@@ -59,7 +59,6 @@ export async function sendPluginValues({ nodes, shouldSendSelectionValues }: { n
     mainNodeSelectionValues = pluginValues.map((value) => value.tokens);
   }
   const selectedNodes = figma.currentPage.selection.length;
-
   notifySelection({ selectionValues: selectionValues ?? [], mainNodeSelectionValues, selectedNodes });
   return { selectionValues, mainNodeSelectionValues, selectedNodes };
 }

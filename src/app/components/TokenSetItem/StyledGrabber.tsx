@@ -3,8 +3,6 @@ import { styled } from '@/stitches.config';
 
 export const StyledGrabber = styled(Box, {
   cursor: 'grab',
-  position: 'absolute',
-  left: 0,
   display: 'flex',
   alignItems: 'center',
   width: '$4',

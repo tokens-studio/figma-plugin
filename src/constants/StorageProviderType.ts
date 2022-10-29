@@ -6,4 +6,5 @@ export enum StorageProviderType {
   SUPERNOVA = 'supernova',
   ADO = 'ado',
   URL = 'url',
+  BITBUCKET = 'bitbucket',
 }

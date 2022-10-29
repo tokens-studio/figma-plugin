@@ -1,12 +1,15 @@
 import { Gitlab } from '@gitbeaker/browser';
 import compact from 'just-compact';
+import type { CommitAction } from '@gitbeaker/core/dist/types/resources/Commits';
 import IsJSONString from '@/utils/isJSONString';
 import {
-  GitMultiFileObject, GitSingleFileObject, GitStorageMetadata, GitTokenStorage,
+  GitMultiFileObject, GitSingleFileObject, GitTokenStorage,
 } from './GitTokenStorage';
-import { RemoteTokenStorageFile } from './RemoteTokenStorage';
+import { RemoteTokenstorageErrorMessage, RemoteTokenStorageFile, RemoteTokenStorageMetadata } from './RemoteTokenStorage';
 import { AnyTokenSet } from '@/types/tokens';
 import { ThemeObjectsList } from '@/types';
+import { SystemFilenames } from '@/constants/SystemFilenames';
+import { ErrorMessages } from '@/constants/ErrorMessages';
 
 enum GitLabAccessLevel {
   NoAccess = 0,
@@ -25,14 +28,17 @@ export class GitlabTokenStorage extends GitTokenStorage {
 
   private gitlabClient: (typeof Gitlab)['prototype'];
 
+  protected repoPathWithNamespace: string;
+
   constructor(
     secret: string,
-    owner: string,
     repository: string,
+    repoPathWithNamespace: string,
     baseUrl?: string,
   ) {
-    super(secret, owner, repository, baseUrl);
+    super(secret, '', repository, baseUrl);
 
+    this.repoPathWithNamespace = repoPathWithNamespace;
     this.gitlabClient = new Gitlab({
       token: this.secret,
       host: this.baseUrl || undefined,
@@ -40,19 +46,9 @@ export class GitlabTokenStorage extends GitTokenStorage {
   }
 
   public async assignProjectId() {
-    const users = await this.gitlabClient.Users.username(this.owner);
-    if (Array.isArray(users) && users.length > 0) {
-      const projectsInPerson = await this.gitlabClient.Users.projects(users[0].id);
-      const project = projectsInPerson.filter((p) => p.path === this.repository)[0];
-      if (project) {
-        this.projectId = project.id;
-        this.groupId = project.namespace.id;
-      }
-    }
-
-    if (!this.projectId) {
-      const projectsInGroup = await this.gitlabClient.Groups.projects(this.owner, { include_subgroups: true });
-      const project = projectsInGroup.filter((p) => p.path === this.repository)[0];
+    const projects = await this.gitlabClient.Projects.search(this.repository, { membership: true });
+    if (projects) {
+      const project = projects.filter((p) => p.path_with_namespace === this.repoPathWithNamespace)[0];
       if (project) {
         this.projectId = project.id;
         this.groupId = project.namespace.id;
@@ -72,8 +68,8 @@ export class GitlabTokenStorage extends GitTokenStorage {
   }
 
   public async createBranch(branch: string, source?: string) {
+    if (!this.projectId) throw new Error('Project ID not assigned');
     try {
-      if (!this.projectId) throw new Error('Project ID not assigned');
       const response = await this.gitlabClient.Branches.create(
         this.projectId,
         branch,
@@ -87,6 +83,7 @@ export class GitlabTokenStorage extends GitTokenStorage {
   }
 
   public async canWrite(): Promise<boolean> {
+    if (!this.path.endsWith('.json') && !this.flags.multiFileEnabled) return false;
     if (!this.groupId || !this.projectId) throw new Error('Missing Project or Group ID');
 
     const currentUser = await this.gitlabClient.Users.current();
@@ -107,15 +104,17 @@ export class GitlabTokenStorage extends GitTokenStorage {
     return false;
   }
 
-  public async read(): Promise<RemoteTokenStorageFile<GitStorageMetadata>[]> {
+  public async read(): Promise<RemoteTokenStorageFile[] | RemoteTokenstorageErrorMessage> {
     if (!this.projectId) throw new Error('Missing Project ID');
 
     try {
       const trees = await this.gitlabClient.Repositories.tree(this.projectId, {
         path: this.path,
         ref: this.branch,
+        recursive: true,
       });
-      if (trees.length > 0 && this.flags.multiFileEnabled) {
+
+      if (!this.path.endsWith('.json')) {
         const jsonFiles = trees.filter((file) => (
           file.path.endsWith('.json')
         )).sort((a, b) => (
@@ -126,17 +125,25 @@ export class GitlabTokenStorage extends GitTokenStorage {
           this.gitlabClient.RepositoryFiles.showRaw(this.projectId!, treeItem.path, { ref: this.branch })
         )));
 
-        return compact(jsonFileContents.map<RemoteTokenStorageFile<GitStorageMetadata> | null>((fileContent, index) => {
+        return compact(jsonFileContents.map<RemoteTokenStorageFile | null>((fileContent, index) => {
           const { path } = jsonFiles[index];
           if (IsJSONString(fileContent)) {
             const name = path.replace('.json', '').replace(this.path, '').replace(/^\//, '').replace(/\/$/, '');
             const parsed = JSON.parse(fileContent) as GitMultiFileObject;
 
-            if (name === '$themes') {
+            if (name === SystemFilenames.THEMES) {
               return {
                 path,
                 type: 'themes',
                 data: parsed as ThemeObjectsList,
+              };
+            }
+
+            if (name === SystemFilenames.METADATA) {
+              return {
+                path,
+                type: 'metadata',
+                data: parsed as RemoteTokenStorageMetadata,
               };
             }
 
@@ -151,16 +158,26 @@ export class GitlabTokenStorage extends GitTokenStorage {
           return null;
         }));
       }
+
       const data = await this.gitlabClient.RepositoryFiles.showRaw(this.projectId, this.path, { ref: this.branch });
       if (IsJSONString(data)) {
         const parsed = JSON.parse(data) as GitSingleFileObject;
         return [
           {
             type: 'themes',
-            path: `${this.path}/$themes.json`,
+            path: `${this.path}/${SystemFilenames.THEMES}.json`,
             data: parsed.$themes ?? [],
           },
-          ...(Object.entries(parsed).filter(([key]) => key !== '$themes') as [string, AnyTokenSet<false>][]).map<RemoteTokenStorageFile<GitStorageMetadata>>(([name, tokenSet]) => ({
+          ...(parsed.$metadata ? [
+            {
+              type: 'metadata' as const,
+              path: this.path,
+              data: parsed.$metadata,
+            },
+          ] : []),
+          ...(Object.entries(parsed).filter(([key]) => (
+            !Object.values<string>(SystemFilenames).includes(key)
+          )) as [string, AnyTokenSet<false>][]).map<RemoteTokenStorageFile>(([name, tokenSet]) => ({
             name,
             type: 'tokenSet',
             path: `${this.path}/${name}.json`,
@@ -168,12 +185,13 @@ export class GitlabTokenStorage extends GitTokenStorage {
           })),
         ];
       }
+      return {
+        errorMessage: ErrorMessages.VALIDATION_ERROR,
+      };
     } catch (err) {
       // Raise error (usually this is an auth error)
       console.error(err);
-      return [];
     }
-
     return [];
   }
 
@@ -188,18 +206,33 @@ export class GitlabTokenStorage extends GitTokenStorage {
     const tree = await this.gitlabClient.Repositories.tree(this.projectId, {
       path: rootPath,
       ref: branch,
+      recursive: true,
     });
-    const filesInTrees = tree.map((t) => t.path);
+    const jsonFiles = tree.filter((file) => (
+      file.path.endsWith('.json')
+    )).sort((a, b) => (
+      (a.path && b.path) ? a.path.localeCompare(b.path) : 0
+    )).map((jsonFile) => jsonFile.path);
+
+    let gitlabActions: CommitAction[] = Object.entries(changeset).map(([filePath, content]) => ({
+      action: jsonFiles.includes(filePath) ? 'update' : 'create',
+      filePath,
+      content,
+    }));
+
+    if (!this.path.endsWith('.json')) {
+      const filesToDelete = jsonFiles.filter((jsonFile) => !Object.keys(changeset).some((item) => item.endsWith(jsonFile)));
+      gitlabActions = gitlabActions.concat(filesToDelete.map((filePath) => ({
+        action: 'delete',
+        filePath,
+      })));
+    }
 
     const response = await this.gitlabClient.Commits.create(
       this.projectId,
       branch,
       message,
-      Object.entries(changeset).map(([filePath, content]) => ({
-        action: filesInTrees.includes(filePath) ? 'update' : 'create',
-        filePath,
-        content,
-      })),
+      gitlabActions,
       shouldCreateBranch ? {
         startBranch: branches[0],
       } : undefined,

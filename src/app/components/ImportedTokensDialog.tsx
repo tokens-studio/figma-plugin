@@ -73,8 +73,8 @@ function NewOrExistingToken({
         )}
       </Stack>
       <Stack direction="row" align="center" gap={1}>
-        <IconButton tooltip={updateAction} icon={<AddIcon />} onClick={onUpdateToken} />
-        <IconButton tooltip="Ignore" icon={<TrashIcon />} onClick={onRemoveToken} />
+        <IconButton dataCy="imported-tokens-dialog-update-button" tooltip={updateAction} icon={<AddIcon />} onClick={onUpdateToken} />
+        <IconButton dataCy="imported-tokens-dialog-remove-button" tooltip="Ignore" icon={<TrashIcon />} onClick={onRemoveToken} />
       </Stack>
     </Stack>
   );

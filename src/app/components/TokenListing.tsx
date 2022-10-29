@@ -3,20 +3,16 @@ import { useDispatch, useSelector } from 'react-redux';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { DndProvider } from 'react-dnd';
 import { DeepKeyTokenMap, EditTokenObject, TokenTypeSchema } from '@/types/tokens';
-import Heading from './Heading';
-import TokenTree, { ShowFormOptions, ShowNewFormOptions } from './TokenTree';
-import Tooltip from './Tooltip';
+import TokenGroup from './TokenGroup/TokenGroup';
 import { Dispatch } from '../store';
 import { TokenTypes } from '@/constants/TokenTypes';
 import {
-  collapsedSelector, displayTypeSelector, editProhibitedSelector, showEmptyGroupsSelector,
+  collapsedSelector, collapsedTokenTypeObjSelector, showEmptyGroupsSelector,
 } from '@/selectors';
-import IconButton from './IconButton';
-import ListIcon from '@/icons/list.svg';
-import GridIcon from '@/icons/grid.svg';
-import AddIcon from '@/icons/add.svg';
-import ProBadge from './ProBadge';
-import { useFlags } from './LaunchDarkly';
+import { EditTokenFormStatus } from '@/constants/EditTokenFormStatus';
+import { ShowFormOptions, ShowNewFormOptions } from '@/types';
+import Box from './Box';
+import TokenListingHeading from './TokenListingHeading';
 
 type Props = {
   tokenKey: string
@@ -33,113 +29,69 @@ const TokenListing: React.FC<Props> = ({
   values,
   isPro,
 }) => {
-  const editProhibited = useSelector(editProhibitedSelector);
-  const displayType = useSelector(displayTypeSelector);
   const showEmptyGroups = useSelector(showEmptyGroupsSelector);
+  const collapsedTokenTypeObj = useSelector(collapsedTokenTypeObjSelector);
   const collapsed = useSelector(collapsedSelector);
   const dispatch = useDispatch<Dispatch>();
-  const { gitBranchSelector } = useFlags();
 
-  const showDisplayToggle = React.useMemo(() => schema.type === TokenTypes.COLOR, [schema.type]);
-
-  const [isIntCollapsed, setIntCollapsed] = React.useState(false);
-
-  const showForm = React.useCallback(({ token, name, isPristine = false }: ShowFormOptions) => {
+  const showForm = React.useCallback(({ token, name, status }: ShowFormOptions) => {
     dispatch.uiState.setShowEditForm(true);
     dispatch.uiState.setEditToken({
       ...token,
-      type: schema.type,
+      type: token?.type || schema.type,
       schema,
-      isPristine,
+      status,
       initialName: name,
       name,
     } as EditTokenObject);
   }, [schema, dispatch]);
 
   const showNewForm = React.useCallback(({ name = '' }: ShowNewFormOptions) => {
-    showForm({ token: null, name, isPristine: true });
+    showForm({ token: null, name, status: EditTokenFormStatus.CREATE });
   }, [showForm]);
 
-  const handleShowNewForm = React.useCallback(() => showNewForm({ }), [showNewForm]);
+  const showDisplayToggle = React.useMemo(() => schema.type === TokenTypes.COLOR, [schema.type]);
 
-  const handleToggleDisplayType = React.useCallback(() => {
-    dispatch.uiState.setDisplayType(displayType === 'GRID' ? 'LIST' : 'GRID');
-  }, [displayType, dispatch]);
-
+  // TODO: Move this to state
   const handleSetIntCollapsed = React.useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
     if (e.altKey) {
       dispatch.uiState.toggleCollapsed();
+      const newCollapsedObj = Object.keys(collapsedTokenTypeObj).reduce<Record<string, boolean>>((acc, key) => {
+        acc[key] = !collapsed;
+        return acc;
+      }, {});
+      dispatch.tokenState.setCollapsedTokenTypeObj(newCollapsedObj);
     } else {
-      setIntCollapsed(!isIntCollapsed);
+      dispatch.tokenState.setCollapsedTokenTypeObj({ ...collapsedTokenTypeObj, [tokenKey]: !collapsedTokenTypeObj[tokenKey as TokenTypes] });
     }
-  }, [dispatch, isIntCollapsed]);
-
-  React.useEffect(() => {
-    setIntCollapsed(collapsed);
-  }, [collapsed]);
+  }, [dispatch, collapsedTokenTypeObj, tokenKey, collapsed]);
 
   if (!values && !showEmptyGroups) return null;
 
   return (
-    <div className="border-b border-border-muted" data-cy={`tokenlisting-${tokenKey}`}>
-      <div className="relative flex items-center justify-between space-x-8">
-        <button
-          className={`flex items-center w-full h-full p-4 space-x-2 hover:bg-background-subtle focus:outline-none ${
-            isIntCollapsed ? 'opacity-50' : null
-          }`}
-          data-cy={`tokenlisting-header-${tokenKey}`}
-          type="button"
-          onClick={handleSetIntCollapsed}
-        >
-          <Tooltip label={`Alt + Click to ${collapsed ? 'expand' : 'collapse'} all`}>
-            <div className="p-2 -m-2">
-              {isIntCollapsed ? (
-                <svg width="6" height="6" viewBox="0 0 6 6" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M5 3L1 0v6l4-3z" fill="currentColor" />
-                </svg>
-              ) : (
-                <svg width="6" height="6" viewBox="0 0 6 6" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M3 5l3-4H0l3 4z" fill="currentColor" />
-                </svg>
-              )}
-            </div>
-          </Tooltip>
-          <Heading size="small">{label}</Heading>
-          {isPro ? <ProBadge /> : null}
-        </button>
-        <div className="absolute right-0 flex mr-2">
-          {showDisplayToggle && (
-            <IconButton icon={displayType === 'GRID' ? <ListIcon /> : <GridIcon />} tooltip={displayType === 'GRID' ? 'Show as List' : 'Show as Grid'} onClick={handleToggleDisplayType} />
-          )}
-
-          <IconButton
-            dataCy="button-add-new-token"
-            // TODO: Add proper logic to disable adding a token type depending on flags
-            disabled={editProhibited || (isPro && !gitBranchSelector)}
-            icon={<AddIcon />}
-            tooltip="Add a new token"
-            onClick={handleShowNewForm}
-          />
-        </div>
-      </div>
+    <Box css={{ borderBottom: '1px solid $borderMuted' }} data-cy={`tokenlisting-${tokenKey}`}>
+      <TokenListingHeading onCollapse={handleSetIntCollapsed} showDisplayToggle={showDisplayToggle} tokenKey={tokenKey} label={label} isPro={isPro} showNewForm={showNewForm} isCollapsed={collapsedTokenTypeObj[tokenKey as TokenTypes]} />
       {values && (
         <DndProvider backend={HTML5Backend}>
-          <div
-            className={`px-4 pb-4 ${isIntCollapsed ? 'hidden' : null}`}
+          <Box
             data-cy={`tokenlisting-${tokenKey}-content`}
+            css={{
+              padding: '$4',
+              paddingTop: 0,
+              display: collapsedTokenTypeObj[tokenKey as TokenTypes] ? 'none' : 'block',
+            }}
           >
-            <TokenTree
+            <TokenGroup
               tokenValues={values}
               showNewForm={showNewForm}
               showForm={showForm}
               schema={schema}
-              displayType={displayType}
             />
-          </div>
+          </Box>
         </DndProvider>
       )}
-    </div>
+    </Box>
   );
 };
 

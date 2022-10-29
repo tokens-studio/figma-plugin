@@ -11,12 +11,10 @@ import Modal from './Modal';
 import TokenSetTree from './TokenSetTree';
 import Box from './Box';
 import { styled } from '@/stitches.config';
-import TokenSetList from './TokenSetList';
 import {
   editProhibitedSelector, tokensSelector,
 } from '@/selectors';
 import Stack from './Stack';
-import { useIsGithubMultiFileEnabled } from '../hooks/useIsGithubMultiFileEnabled';
 
 const StyledButton = styled('button', {
   flexShrink: 0,
@@ -25,7 +23,7 @@ const StyledButton = styled('button', {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
-  padding: '$3 $4',
+  padding: '$3 $4 $3 $5',
   gap: '$2',
   '&:focus, &:hover': {
     outline: 'none',
@@ -34,10 +32,9 @@ const StyledButton = styled('button', {
   },
 });
 
-export default function TokenSetSelector() {
+export default function TokenSetSelector({ saveScrollPositionSet } : { saveScrollPositionSet: (tokenSet: string) => void }) {
   const tokens = useSelector(tokensSelector);
   const editProhibited = useSelector(editProhibitedSelector);
-  const mfsEnabled = useIsGithubMultiFileEnabled();
   const dispatch = useDispatch<Dispatch>();
   const { confirm } = useConfirm();
 
@@ -49,12 +46,20 @@ export default function TokenSetSelector() {
   const tokenKeys = Object.keys(tokens).join(',');
 
   React.useEffect(() => {
+    const scollPositionSet = allTokenSets.reduce<Record<string, number>>((acc, crr) => {
+      acc[crr] = 0;
+      return acc;
+    }, {});
+    dispatch.uiState.setScrollPositionSet(scollPositionSet);
+  }, [allTokenSets, dispatch]);
+
+  React.useEffect(() => {
     setAllTokenSets(Object.keys(tokens));
   }, [tokenKeys]);
 
   React.useEffect(() => {
     setShowNewTokenSetFields(false);
-    handleNewTokenSetNameChange('');
+    handleNewTokenSetNameChange(tokenSetMarkedForChange);
   }, [tokens]);
 
   const handleNewTokenSetSubmit = React.useCallback((e: React.FormEvent<HTMLFormElement>) => {
@@ -136,24 +141,14 @@ export default function TokenSetSelector() {
       }}
       className="content"
     >
-      {mfsEnabled ? (
-        <Box>
-          <TokenSetTree
-            tokenSets={allTokenSets}
-            onRename={handleRenameTokenSet}
-            onDelete={handleDelete}
-            onDuplicate={handleDuplicateTokenSet}
-          />
-        </Box>
-      ) : (
-        <TokenSetList
-          onReorder={handleReorder}
-          tokenSets={allTokenSets}
-          onRename={handleRenameTokenSet}
-          onDelete={handleDeleteTokenSet}
-          onDuplicate={handleDuplicateTokenSet}
-        />
-      )}
+      <TokenSetTree
+        tokenSets={allTokenSets}
+        onRename={handleRenameTokenSet}
+        onDelete={handleDelete}
+        onDuplicate={handleDuplicateTokenSet}
+        onReorder={handleReorder}
+        saveScrollPositionSet={saveScrollPositionSet}
+      />
       <Modal
         isOpen={showRenameTokenSetFields}
         close={handleCloseRenameModal}
@@ -198,12 +193,13 @@ export default function TokenSetSelector() {
                 type="text"
                 name="tokensetname"
                 required
+                data-cy="token-set-input"
               />
               <Stack direction="row" gap={4}>
                 <Button variant="secondary" size="large" onClick={handleCloseNewTokenSetModal}>
                   Cancel
                 </Button>
-                <Button type="submit" variant="primary" size="large">
+                <Button data-cy="create-token-set" type="submit" variant="primary" size="large">
                   Create
                 </Button>
               </Stack>
@@ -211,7 +207,7 @@ export default function TokenSetSelector() {
           </form>
         </Stack>
       </Modal>
-      <StyledButton type="button" disabled={editProhibited} onClick={handleOpenNewTokenSetModal}>
+      <StyledButton data-cy="button-new-token-set" type="button" disabled={editProhibited} onClick={handleOpenNewTokenSetModal}>
         New set
         <IconAdd />
       </StyledButton>

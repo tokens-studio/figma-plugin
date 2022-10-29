@@ -1,4 +1,4 @@
-import { hexToFigmaRGB, webRGBToFigmaRGB } from '@figma-plugin/helpers';
+import { figmaRGBToHex, hexToFigmaRGB, webRGBToFigmaRGB } from '@figma-plugin/helpers';
 import { toHex } from 'color2k';
 
 type WebRGBA = [number, number, number, number];
@@ -124,4 +124,15 @@ export function convertToFigmaColor(input: string) {
     color,
     opacity,
   };
+}
+
+export function convertFigmaColorToHex(color: RGBA | RGB, opacity?: number): string {
+  if ('a' in color) {
+    return figmaRGBToHex(color);
+  }
+  return figmaRGBToHex({ ...color, a: opacity });
+}
+
+export function convertFigmaPaintToHex(paint: SolidPaint): string {
+  return convertFigmaColorToHex(paint.color, paint.opacity);
 }

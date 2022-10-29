@@ -3,6 +3,7 @@ import { RootModel } from '@/types/RootModel';
 import { models } from './index';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
+import * as notifiers from '@/plugin/notifiers';
 
 const shadowArray = [
   {
@@ -72,6 +73,26 @@ describe('editToken', () => {
                   description: 'the one with mixed shadows',
                   value: shadowArray,
                 },
+                {
+                  name: 'font.big',
+                  type: 'sizing',
+                  value: '24px',
+                },
+                {
+                  name: 'font.small',
+                  type: 'sizing',
+                  value: '12px',
+                },
+                {
+                  name: 'font.medium',
+                  type: 'fontSizes',
+                  value: '18px',
+                },
+                {
+                  name: 'font.alias',
+                  type: 'sizing',
+                  value: '$font.small',
+                },
               ],
               options: [
                 {
@@ -87,7 +108,10 @@ describe('editToken', () => {
               newTokens: [],
               updatedTokens: [],
             },
+            themes: [],
+            activeTheme: null,
             activeTokenSet: 'global',
+            collapsedTokens: [],
           },
         },
       },
@@ -275,5 +299,670 @@ describe('editToken', () => {
       },
     ]);
     expect(usedTokenSet).toEqual({});
+  });
+
+  it('delete all tokens in a group', async () => {
+    await store.dispatch.tokenState.deleteTokenGroup({
+      parent: 'global',
+      path: 'font',
+      type: 'sizing',
+    });
+
+    const { tokens } = store.getState().tokenState;
+    expect(tokens.global).not.toContain({
+      name: 'font.big',
+      type: 'sizing',
+      value: '24px',
+    });
+    expect(tokens.global).not.toContain({
+      name: 'font.small',
+      type: 'sizing',
+      value: '12px',
+    });
+  });
+
+  it('can delete a token set', () => {
+    store.dispatch.tokenState.deleteTokenSet('global');
+    const {
+      tokens, usedTokenSet,
+    } = store.getState().tokenState;
+    expect(tokens).toEqual({
+      options: [
+        {
+          name: 'background',
+          value: '$primary',
+        },
+      ],
+    });
+    expect(usedTokenSet).toEqual({});
+  });
+
+  it('can treat set a token set as source', () => {
+    store.dispatch.tokenState.toggleTreatAsSource('global');
+    const { usedTokenSet } = store.getState().tokenState;
+    expect(usedTokenSet).toEqual({
+      global: TokenSetStatus.SOURCE,
+    });
+  });
+
+  it('can duplicate token set', () => {
+    store.dispatch.tokenState.duplicateTokenSet('global');
+    const { tokens, usedTokenSet } = store.getState().tokenState;
+    expect(tokens.global_Copy).toEqual([
+      {
+        name: 'primary',
+        value: '1',
+      },
+      {
+        name: 'alias',
+        value: '$primary',
+      },
+      {
+        name: 'primary50',
+        value: '0.50',
+      },
+      {
+        name: 'alias50',
+        value: '$primary50',
+      },
+      {
+        name: 'header 1',
+        type: 'typography',
+        value: {
+          fontWeight: '400',
+          fontSize: '16',
+        },
+      },
+      {
+        name: 'header 1',
+        type: 'typography',
+        value: {
+          fontWeight: '400',
+          fontSize: '16',
+        },
+      },
+      {
+        name: 'shadow.mixed',
+        type: 'boxShadow',
+        description: 'the one with mixed shadows',
+        value: shadowArray,
+      },
+      {
+        name: 'font.big',
+        type: 'sizing',
+        value: '24px',
+      },
+      {
+        name: 'font.small',
+        type: 'sizing',
+        value: '12px',
+      },
+      {
+        name: 'font.medium',
+        type: 'fontSizes',
+        value: '18px',
+      },
+      {
+        name: 'font.alias',
+        type: 'sizing',
+        value: '$font.small',
+      },
+    ]);
+    expect(usedTokenSet).toEqual({
+      global: TokenSetStatus.ENABLED,
+      global_Copy: TokenSetStatus.DISABLED,
+    });
+  });
+
+  it('will notify the UI if the token set to duplicate does not exist', () => {
+    const notifyToUISpy = jest.spyOn(notifiers, 'notifyToUI');
+    notifyToUISpy.mockReturnValueOnce();
+    store.dispatch.tokenState.duplicateTokenSet('nonexistant');
+    expect(notifyToUISpy).toBeCalledWith('Token set does not exist', { error: true });
+  });
+
+  it('can reset imported tokens', () => {
+    store.dispatch.tokenState.setTokensFromStyles({
+      colors: [
+        {
+          type: TokenTypes.COLOR,
+          name: 'primary',
+          value: '2',
+        },
+      ],
+    });
+    store.dispatch.tokenState.resetImportedTokens();
+    const { importedTokens } = store.getState().tokenState;
+    expect(importedTokens).toEqual({
+      newTokens: [],
+      updatedTokens: [],
+    });
+  });
+
+  it('can create token', () => {
+    store.dispatch.tokenState.createToken({
+      name: 'test',
+      parent: 'global',
+      type: TokenTypes.COLOR,
+      value: '#000000',
+    });
+    const { tokens } = store.getState().tokenState;
+    expect(tokens.global).toEqual([
+      {
+        name: 'primary',
+        value: '1',
+      },
+      {
+        name: 'alias',
+        value: '$primary',
+      },
+      {
+        name: 'primary50',
+        value: '0.50',
+      },
+      {
+        name: 'alias50',
+        value: '$primary50',
+      },
+      {
+        name: 'header 1',
+        type: 'typography',
+        value: {
+          fontWeight: '400',
+          fontSize: '16',
+        },
+      },
+      {
+        name: 'header 1',
+        type: 'typography',
+        value: {
+          fontWeight: '400',
+          fontSize: '16',
+        },
+      },
+      {
+        name: 'shadow.mixed',
+        type: 'boxShadow',
+        description: 'the one with mixed shadows',
+        value: shadowArray,
+      },
+      {
+        name: 'font.big',
+        type: 'sizing',
+        value: '24px',
+      },
+      {
+        name: 'font.small',
+        type: 'sizing',
+        value: '12px',
+      },
+      {
+        name: 'font.medium',
+        type: 'fontSizes',
+        value: '18px',
+      },
+      {
+        name: 'font.alias',
+        type: 'sizing',
+        value: '$font.small',
+      },
+      {
+        name: 'test',
+        type: TokenTypes.COLOR,
+        value: '#000000',
+      },
+    ]);
+  });
+
+  it('should save tokens from json data', () => {
+    store.dispatch.tokenState.setJSONData(JSON.stringify(
+      {
+        1: {
+          value: 1,
+          type: 'sizing',
+        },
+        header: {
+          value: 3,
+          type: 'borderRadius',
+        },
+        black: {
+          100: {
+            value: '#0b0101',
+          },
+          500: {
+            value: '#130c0c',
+          },
+          type: 'color',
+        },
+      },
+    ));
+    const { tokens } = store.getState().tokenState;
+    expect(tokens.global).toEqual([
+      {
+        name: '1',
+        type: 'sizing',
+        value: 1,
+      },
+      {
+        name: 'header',
+        type: 'borderRadius',
+        value: 3,
+      },
+      {
+        inheritTypeLevel: 2,
+        name: 'black.100',
+        type: 'color',
+        value: '#0b0101',
+      },
+      {
+        inheritTypeLevel: 2,
+        name: 'black.500',
+        type: 'color',
+        value: '#130c0c',
+      },
+    ]);
+  });
+
+  it('can duplicate token', () => {
+    store.dispatch.tokenState.duplicateToken({
+      newName: 'primary-copy',
+      oldName: 'primary',
+      parent: 'global',
+      value: '1',
+      type: 'sizing',
+    });
+    const { tokens } = store.getState().tokenState;
+    expect(tokens.global).toEqual([
+      {
+        name: 'primary',
+        value: '1',
+      },
+      {
+        name: 'primary-copy',
+        value: '1',
+        type: 'sizing',
+      },
+      {
+        name: 'alias',
+        value: '$primary',
+      },
+      {
+        name: 'primary50',
+        value: '0.50',
+      },
+      {
+        name: 'alias50',
+        value: '$primary50',
+      },
+      {
+        name: 'header 1',
+        type: 'typography',
+        value: {
+          fontWeight: '400',
+          fontSize: '16',
+        },
+      },
+      {
+        name: 'header 1',
+        type: 'typography',
+        value: {
+          fontWeight: '400',
+          fontSize: '16',
+        },
+      },
+      {
+        name: 'shadow.mixed',
+        type: 'boxShadow',
+        description: 'the one with mixed shadows',
+        value: shadowArray,
+      },
+      {
+        name: 'font.big',
+        type: 'sizing',
+        value: '24px',
+      },
+      {
+        name: 'font.small',
+        type: 'sizing',
+        value: '12px',
+      },
+      {
+        name: 'font.medium',
+        type: 'fontSizes',
+        value: '18px',
+      },
+      {
+        name: 'font.alias',
+        type: 'sizing',
+        value: '$font.small',
+      },
+    ]);
+  });
+
+  it('can delete token', () => {
+    store.dispatch.tokenState.deleteToken({
+      parent: 'global',
+      path: 'font.big',
+    });
+    const { tokens } = store.getState().tokenState;
+    expect(tokens.global).toEqual([
+      {
+        name: 'primary',
+        value: '1',
+      },
+      {
+        name: 'alias',
+        value: '$primary',
+      },
+      {
+        name: 'primary50',
+        value: '0.50',
+      },
+      {
+        name: 'alias50',
+        value: '$primary50',
+      },
+      {
+        name: 'header 1',
+        type: 'typography',
+        value: {
+          fontWeight: '400',
+          fontSize: '16',
+        },
+      },
+      {
+        name: 'header 1',
+        type: 'typography',
+        value: {
+          fontWeight: '400',
+          fontSize: '16',
+        },
+      },
+      {
+        name: 'shadow.mixed',
+        type: 'boxShadow',
+        description: 'the one with mixed shadows',
+        value: shadowArray,
+      },
+      {
+        name: 'font.small',
+        type: 'sizing',
+        value: '12px',
+      },
+      {
+        name: 'font.medium',
+        type: 'fontSizes',
+        value: '18px',
+      },
+      {
+        name: 'font.alias',
+        type: 'sizing',
+        value: '$font.small',
+      },
+    ]);
+  });
+
+  it('can rename token group', () => {
+    store.dispatch.tokenState.renameTokenGroup({
+      newName: 'text',
+      oldName: 'font',
+      parent: 'global',
+      path: '',
+      type: 'sizing',
+    });
+    const { tokens } = store.getState().tokenState;
+    expect(tokens.global).toEqual([
+      {
+        name: 'primary',
+        value: '1',
+      },
+      {
+        name: 'alias',
+        value: '$primary',
+      },
+      {
+        name: 'primary50',
+        value: '0.50',
+      },
+      {
+        name: 'alias50',
+        value: '$primary50',
+      },
+      {
+        name: 'header 1',
+        type: 'typography',
+        value: {
+          fontWeight: '400',
+          fontSize: '16',
+        },
+      },
+      {
+        name: 'header 1',
+        type: 'typography',
+        value: {
+          fontWeight: '400',
+          fontSize: '16',
+        },
+      },
+      {
+        name: 'shadow.mixed',
+        type: 'boxShadow',
+        description: 'the one with mixed shadows',
+        value: shadowArray,
+      },
+      {
+        name: 'text.big',
+        type: 'sizing',
+        value: '24px',
+      },
+      {
+        name: 'text.small',
+        type: 'sizing',
+        value: '12px',
+      },
+      {
+        name: 'font.medium',
+        type: 'fontSizes',
+        value: '18px',
+      },
+      {
+        name: 'text.alias',
+        type: 'sizing',
+        value: '{text.small}',
+      },
+    ]);
+  });
+
+  it('can duplicate token group', () => {
+    store.dispatch.tokenState.duplicateTokenGroup({
+      oldName: 'font',
+      parent: 'global',
+      path: '',
+      type: 'sizing',
+    });
+    const { tokens } = store.getState().tokenState;
+    expect(tokens.global).toEqual([
+      {
+        name: 'primary',
+        value: '1',
+      },
+      {
+        name: 'alias',
+        value: '$primary',
+      },
+      {
+        name: 'primary50',
+        value: '0.50',
+      },
+      {
+        name: 'alias50',
+        value: '$primary50',
+      },
+      {
+        name: 'header 1',
+        type: 'typography',
+        value: {
+          fontWeight: '400',
+          fontSize: '16',
+        },
+      },
+      {
+        name: 'header 1',
+        type: 'typography',
+        value: {
+          fontWeight: '400',
+          fontSize: '16',
+        },
+      },
+      {
+        name: 'shadow.mixed',
+        type: 'boxShadow',
+        description: 'the one with mixed shadows',
+        value: shadowArray,
+      },
+      {
+        name: 'font.big',
+        type: 'sizing',
+        value: '24px',
+      },
+      {
+        name: 'font.small',
+        type: 'sizing',
+        value: '12px',
+      },
+      {
+        name: 'font.medium',
+        type: 'fontSizes',
+        value: '18px',
+      },
+      {
+        name: 'font.alias',
+        type: 'sizing',
+        value: '$font.small',
+      },
+      {
+        name: 'font-copy.big',
+        type: 'sizing',
+        value: '24px',
+      },
+      {
+        name: 'font-copy.small',
+        type: 'sizing',
+        value: '12px',
+      },
+      {
+        name: 'font-copy.alias',
+        type: 'sizing',
+        value: '$font.small',
+      },
+    ]);
+  });
+
+  it('should be able to update checkForChanges', () => {
+    store.dispatch.tokenState.updateCheckForChanges(true);
+    const { checkForChanges } = store.getState().tokenState;
+    expect(checkForChanges).toEqual(true);
+  });
+
+  it('should be able to set collapsedTokens', () => {
+    store.dispatch.tokenState.setCollapsedTokens(['color.gray', 'color.zinc', 'size']);
+    const { collapsedTokens } = store.getState().tokenState;
+    expect(collapsedTokens).toEqual(['color.gray', 'color.zinc', 'size']);
+  });
+
+  it('should be able to keep theme selected when there is a matching theme in themeList', () => {
+    store.dispatch.tokenState.setTokenData({
+      values: {
+        global: [
+          {
+            name: 'primary',
+            value: '1',
+          },
+        ],
+      },
+      themes: [
+        {
+          id: 'default',
+          name: 'root',
+          selectedTokenSets: {
+            global: TokenSetStatus.ENABLED,
+          },
+        },
+      ],
+      activeTheme: 'default',
+    });
+    const { activeTheme } = store.getState().tokenState;
+    expect(activeTheme).toBe('default');
+  });
+
+  it('should be able to set activeTheme as null when there is no matching theme in themeList', () => {
+    store.dispatch.tokenState.setTokenData({
+      values: {
+        global: [
+          {
+            name: 'primary',
+            value: '1',
+          },
+        ],
+      },
+      themes: [
+        {
+          id: 'secondary',
+          name: 'root',
+          selectedTokenSets: {
+            global: TokenSetStatus.ENABLED,
+          },
+        },
+      ],
+      activeTheme: 'default',
+    });
+    const { activeTheme } = store.getState().tokenState;
+    expect(activeTheme).toBe(null);
+  });
+
+  it('should be able to keep activeTokenSet when there is a matching tokenSet in tokenList', () => {
+    store.dispatch.tokenState.setTokenData({
+      values: {
+        global: [
+          {
+            name: 'primary',
+            value: '1',
+          },
+        ],
+      },
+      themes: [
+        {
+          id: 'default',
+          name: 'root',
+          selectedTokenSets: {
+            global: TokenSetStatus.ENABLED,
+          },
+        },
+      ],
+    });
+    const { activeTokenSet } = store.getState().tokenState;
+    expect(activeTokenSet).toBe('global');
+  });
+
+  it('should be able to set activeTheme as global when there is no tokenSet', () => {
+    store.dispatch.tokenState.setTokenData({
+      values: [
+        {
+          name: 'primary',
+          value: '1',
+        },
+      ],
+      themes: [
+        {
+          id: 'default',
+          name: 'root',
+          selectedTokenSets: {
+            global: TokenSetStatus.ENABLED,
+          },
+        },
+      ],
+    });
+    const { activeTokenSet } = store.getState().tokenState;
+    expect(activeTokenSet).toBe('global');
   });
 });

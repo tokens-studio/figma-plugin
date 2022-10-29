@@ -93,6 +93,8 @@ export function Modal({
               type="button"
               onClick={handleClose}
               className="p-4 hover:bg-gray-100 rounded focus:outline-none"
+              data-cy="close-button"
+              data-testid="close-button"
             >
               <XIcon />
             </button>

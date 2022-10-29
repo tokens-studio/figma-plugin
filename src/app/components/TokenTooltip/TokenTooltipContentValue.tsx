@@ -1,89 +1,106 @@
 import React from 'react';
+import get from 'just-safe-get';
 import { useUIDSeed } from 'react-uid';
 import useTokens from '../../store/useTokens';
 import { SingleToken } from '@/types/tokens';
 import { SingleShadowValueDisplay } from './SingleShadowValueDisplay';
 import { TokensContext } from '@/context';
 import { isSingleBoxShadowToken, isSingleTypographyToken, isSingleCompositionToken } from '@/utils/is';
-import { SingleTypographyValueDisplay } from './SingleTypograhpyValueDisplay';
-import { TokenBoxshadowValue, TokenTypograpyValue } from '@/types/values';
-import Box from '../Box';
+import { SingleTypographyValueDisplay } from './SingleTypographyValueDisplay';
+import { TokenBoxshadowValue, TokenTypographyValue } from '@/types/values';
 import { SingleCompositionValueDisplay } from './SingleCompositionValueDisplay';
+import TooltipProperty from './TooltipProperty';
+import Stack from '../Stack';
+import { CompositionTokenValue } from '@/types/CompositionTokenProperty';
 
 type Props = {
   token: SingleToken;
-  shouldResolve: boolean;
-  tokenIsShadowOrTypographyAlias: boolean;
 };
 
 // Returns token value in display format
-export const TokenTooltipContentValue: React.FC<Props> = ({ token, shouldResolve, tokenIsShadowOrTypographyAlias }) => {
+export const TokenTooltipContentValue: React.FC<Props> = ({ token }) => {
   const seed = useUIDSeed();
   const tokensContext = React.useContext(TokensContext);
   const { getTokenValue } = useTokens();
-  const valueToCheck = React.useMemo(() => {
-    if (shouldResolve && tokenIsShadowOrTypographyAlias) {
-      let nameToLookFor: string = '';
-      const tokenValueString = String(token.value);
-      if (tokenIsShadowOrTypographyAlias && tokenValueString.charAt(0) === '$') nameToLookFor = tokenValueString.slice(1, tokenValueString.length);
-      if (tokenIsShadowOrTypographyAlias && tokenValueString.charAt(0) === '{') nameToLookFor = tokenValueString.slice(1, tokenValueString.length - 1);
-      const tokenValue = getTokenValue(nameToLookFor, tokensContext.resolvedTokens)?.value;
-      return tokenValue || token.value;
-    }
-    if (shouldResolve) return getTokenValue(token.name, tokensContext.resolvedTokens)?.value;
-    return token.value;
-  }, [token, getTokenValue, shouldResolve, tokenIsShadowOrTypographyAlias, tokensContext.resolvedTokens]);
+  const resolvedValue = React.useMemo(() => getTokenValue(token.name, tokensContext.resolvedTokens)?.value, [
+    token,
+    getTokenValue,
+    tokensContext.resolvedTokens,
+  ]);
 
   if (isSingleTypographyToken(token)) {
     return (
       <SingleTypographyValueDisplay
-        value={valueToCheck as TokenTypograpyValue}
-        shouldResolve={shouldResolve}
+        value={token.value as TokenTypographyValue}
+        resolvedValue={resolvedValue as TokenTypographyValue}
       />
     );
   }
 
-  if (isSingleCompositionToken(token)) {
+  if (
+    resolvedValue
+    && typeof resolvedValue !== 'string'
+    && !Array.isArray(resolvedValue)
+    && isSingleCompositionToken(token)
+  ) {
     return (
-      valueToCheck ? (
-        <div>
-          {Object.entries(valueToCheck).map(([property, value], index) => (
-            <SingleCompositionValueDisplay
-              key={seed(index)}
-              property={property}
-              value={value}
-            />
-          ))}
-        </div>
-      ) : null
+      <Stack direction="column" align="start" gap={2} wrap>
+        {Object.entries(token.value).map(([property, value], index) => (
+          <SingleCompositionValueDisplay
+            key={seed(index)}
+            property={property}
+            value={value}
+            // @TODO strengthen the type checking here
+            resolvedValue={get(resolvedValue, property) as CompositionTokenValue}
+          />
+        ))}
+      </Stack>
     );
   }
 
   if (isSingleBoxShadowToken(token)) {
-    if (Array.isArray(valueToCheck)) {
+    if (Array.isArray(resolvedValue)) {
       return (
-        <div>
-          {valueToCheck.map((t) => (
+        <Stack direction="column" align="start" gap={3} wrap>
+          {typeof token.value === 'string' ? (
+            <TooltipProperty
+              value={token.value}
+            />
+          ) : null}
+          {resolvedValue.map((t, index) => (
             <SingleShadowValueDisplay
               key={seed(t)}
-              shadow={t as TokenBoxshadowValue}
+              value={Array.isArray(token.value) ? token.value[index] as TokenBoxshadowValue : undefined}
+              resolvedValue={t as TokenBoxshadowValue}
             />
           ))}
-        </div>
+        </Stack>
       );
     }
 
     return (
-      <SingleShadowValueDisplay
+      <div>
+        {typeof token.value === 'string' ? (
+          <TooltipProperty
+            value={token.value}
+          />
+        ) : null}
+        <SingleShadowValueDisplay
         // @TODO strengthen type checking here
-        shadow={valueToCheck as TokenBoxshadowValue}
-      />
+          value={token.value as TokenBoxshadowValue}
+          resolvedValue={resolvedValue as TokenBoxshadowValue}
+        />
+      </div>
     );
   }
 
-  if (typeof valueToCheck !== 'string' && typeof valueToCheck !== 'number') {
-    return <Box css={{ color: '$fgToolTipMuted' }}>{JSON.stringify(valueToCheck, null, 2)}</Box>;
+  if (typeof token.value !== 'string' && typeof token.value !== 'number') {
+    return <TooltipProperty value={JSON.stringify(token.value, null, 2)} />;
   }
 
-  return <Box css={{ color: '$fgToolTipMuted' }}>{valueToCheck}</Box>;
+  if (resolvedValue && typeof resolvedValue !== 'string' && typeof resolvedValue !== 'number') {
+    return <TooltipProperty value={token.value} resolvedValue={JSON.stringify(token.value, null, 2)} />;
+  }
+
+  return <TooltipProperty value={token.value} resolvedValue={resolvedValue} />;
 };

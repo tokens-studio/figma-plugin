@@ -13,7 +13,7 @@ import { StorageType, StorageTypeCredentials } from '@/types/StorageType';
 type UpdateRemoteTokensPayload = {
   provider: StorageProviderType;
   tokens: Record<string, AnyTokenList>;
-  themes: ThemeObjectsList
+  themes: ThemeObjectsList;
   context: StorageTypeCredentials;
   updatedAt: string;
   oldUpdatedAt?: string;
@@ -50,7 +50,7 @@ async function updateRemoteTokens({
       track('pushTokens', { provider: StorageProviderType.JSONBIN });
 
       notifyToUI('Updating JSONBin...');
-      updateJSONBinTokens({
+      await updateJSONBinTokens({
         themes,
         tokens,
         context,
@@ -64,6 +64,9 @@ async function updateRemoteTokens({
       break;
     }
     case StorageProviderType.GITLAB: {
+      break;
+    }
+    case StorageProviderType.BITBUCKET: {
       break;
     }
     case StorageProviderType.ADO: {
@@ -107,7 +110,7 @@ export default async function updateTokensOnSources({
   const mergedTokens = tokens
     ? resolveTokenValues(mergeTokenGroups(tokens, usedTokenSet))
     : null;
-  AsyncMessageChannel.message({
+  AsyncMessageChannel.ReactInstance.message({
     type: AsyncMessageTypes.UPDATE,
     tokenValues,
     tokens: tokens ? mergedTokens : null,

@@ -5,8 +5,10 @@ import { convertLineHeightToFigma } from './figmaTransforms/lineHeight';
 import { convertBoxShadowTypeToFigma } from './figmaTransforms/boxShadow';
 import { convertTextCaseToFigma } from './figmaTransforms/textCase';
 import { convertTextDecorationToFigma } from './figmaTransforms/textDecoration';
+import { convertFontWeightToFigma } from './figmaTransforms/fontWeight';
 import { UserIdProperty } from '@/figmaStorage';
 import { generateId } from '@/utils/generateId';
+import { Properties } from '@/constants/Properties';
 
 export async function getUserId() {
   let userId = generateId(24);
@@ -26,6 +28,7 @@ export async function getUserId() {
   return userId;
 }
 
+export function transformValue(value: string, type: 'fontWeights'): ReturnType<typeof convertFontWeightToFigma>;
 export function transformValue(value: string, type: 'letterSpacing'): LetterSpacing | null;
 export function transformValue(value: string, type: 'lineHeights'): LineHeight | null;
 export function transformValue(value: string, type: 'boxShadowType'): ReturnType<typeof convertBoxShadowTypeToFigma>;
@@ -34,7 +37,11 @@ export function transformValue(value: string, type: 'textDecoration'): ReturnTyp
 export function transformValue(value: string, type: string): number;
 export function transformValue(value: string, type: string) {
   switch (type) {
-    case 'borderWidth':
+    case Properties.borderWidth:
+    case Properties.borderWidthTop:
+    case Properties.borderWidthRight:
+    case Properties.borderWidthBottom:
+    case Properties.borderWidthLeft:
     case 'width':
     case 'height':
     case 'sizing':
@@ -55,6 +62,8 @@ export function transformValue(value: string, type: string) {
     case 'paragraphSpacing':
     case 'fontSizes':
       return convertTypographyNumberToFigma(value);
+    case 'fontWeights':
+      return convertFontWeightToFigma(value);
     case 'letterSpacing':
       return convertLetterSpacingToFigma(value);
     case 'lineHeights':

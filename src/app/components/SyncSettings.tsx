@@ -18,6 +18,7 @@ import Text from './Text';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import useRemoteTokens from '../store/remoteTokens';
 import { StorageTypeCredentials } from '@/types/StorageType';
+import { useFlags } from './LaunchDarkly';
 
 const SyncSettings = () => {
   const localApiState = useSelector(localApiStateSelector);
@@ -27,33 +28,52 @@ const SyncSettings = () => {
 
   const { setStorageType } = useStorage();
   const { fetchBranches } = useRemoteTokens();
+  const { bitBucketSync } = useFlags();
 
   const [confirmModalVisible, showConfirmModal] = React.useState(false);
   const [editStorageItemModalVisible, setShowEditStorageModalVisible] = React.useState(Boolean(localApiState.new));
   const [createStorageItemModalVisible, setShowCreateStorageModalVisible] = React.useState(false);
   const [storageProvider, setStorageProvider] = React.useState(localApiState.provider);
 
-  const setLocalBranches = React.useCallback(async (provider: StorageTypeCredentials) => {
-    const branches = await fetchBranches(provider);
-    if (branches) {
-      dispatch.branchState.setBranches(branches);
-    }
-  }, [dispatch.branchState, fetchBranches]);
+  const setLocalBranches = React.useCallback(
+    async (provider: StorageTypeCredentials) => {
+      const branches = await fetchBranches(provider);
+      if (branches) {
+        dispatch.branchState.setBranches(branches);
+      }
+    },
+    [dispatch.branchState, fetchBranches],
+  );
 
-  const handleEditClick = React.useCallback((provider) => () => {
-    track('Edit Credentials');
-    dispatch.uiState.setLocalApiState(provider);
-    setShowEditStorageModalVisible(true);
-    setLocalBranches(provider);
-  }, [dispatch.uiState, setLocalBranches]);
+  const handleEditClick = React.useCallback(
+    (provider) => () => {
+      track('Edit Credentials');
+      dispatch.uiState.setLocalApiState(provider);
+      setShowEditStorageModalVisible(true);
+      setLocalBranches(provider);
+    },
+    [dispatch.uiState, setLocalBranches],
+  );
 
-  const handleProviderClick = React.useCallback((provider: StorageProviderType) => () => {
-    setStorageProvider(provider);
-  }, []);
+  const handleProviderClick = React.useCallback(
+    (provider: StorageProviderType) => () => {
+      setStorageProvider(provider);
+    },
+    [],
+  );
 
-  const selectedRemoteProvider = React.useMemo(() => [StorageProviderType.JSONBIN, StorageProviderType.GITHUB, StorageProviderType.GITLAB, StorageProviderType.ADO, StorageProviderType.URL, StorageProviderType.SUPERNOVA].includes(
-    storageProvider as StorageProviderType,
-  ), [storageProvider]);
+  const selectedRemoteProvider = React.useMemo(
+    () => [
+      StorageProviderType.JSONBIN,
+      StorageProviderType.GITHUB,
+      StorageProviderType.GITLAB,
+      StorageProviderType.ADO,
+      StorageProviderType.URL,
+      StorageProviderType.BITBUCKET,
+      StorageProviderType.SUPERNOVA,
+    ].includes(storageProvider as StorageProviderType),
+    [storageProvider],
+  );
 
   const storedApiProviders = () => apiProviders.filter((item) => item.provider === storageProvider);
 
@@ -67,15 +87,10 @@ const SyncSettings = () => {
             <a href="https://jsonbin.io/" target="_blank" rel="noreferrer" className="underline">
               JSONbin.io
             </a>
-            , copy the Secret Key into the field, and click on save. If you or your team already have a
-            version stored, add the secret and the corresponding ID.
+            , copy the Secret Key into the field, and click on save. If you or your team already have a version stored,
+            add the secret and the corresponding ID.
             {' '}
-            <a
-              href="https://docs.tokens.studio/sync"
-              target="_blank"
-              rel="noreferrer"
-              className="underline"
-            >
+            <a href="https://docs.tokens.studio/sync/jsonbin" target="_blank" rel="noreferrer" className="underline">
               Read more on docs.tokens.studio
             </a>
           </div>
@@ -85,12 +100,7 @@ const SyncSettings = () => {
           <div>
             Sync your tokens with a GitHub repository so your design decisions are up to date with code.
             {' '}
-            <a
-              href="https://docs.tokens.studio/sync/github"
-              target="_blank"
-              rel="noreferrer"
-              className="underline"
-            >
+            <a href="https://docs.tokens.studio/sync/github" target="_blank" rel="noreferrer" className="underline">
               Read the guide
             </a>
             .
@@ -101,28 +111,29 @@ const SyncSettings = () => {
           <div>
             Sync your tokens with a Gitlab repository so your design decisions are up to date with code.
             {' '}
-            <a
-              href="https://docs.tokens.studio/sync/gitlab"
-              target="_blank"
-              rel="noreferrer"
-              className="underline"
-            >
+            <a href="https://docs.tokens.studio/sync/gitlab" target="_blank" rel="noreferrer" className="underline">
               Read the guide
             </a>
             .
           </div>
         );
+      case StorageProviderType.BITBUCKET:
+        return bitBucketSync ? (
+          <div>
+            Sync your tokens with a Bitbucket repository so your design decisions are up to date with code.
+            {' '}
+            <a href="https://docs.tokens.studio/sync/bitbucket" target="_blank" rel="noreferrer" className="underline">
+              Read the guide
+            </a>
+            .
+          </div>
+        ) : null;
       case StorageProviderType.ADO:
         return (
           <div>
             Sync your tokens with a Azure DevOps repository so your design decisions are up to date with code.
             {' '}
-            <a
-              href="https://docs.tokens.studio/sync/ado"
-              target="_blank"
-              rel="noreferrer"
-              className="underline"
-            >
+            <a href="https://docs.tokens.studio/sync/ado" target="_blank" rel="noreferrer" className="underline">
               Read the guide
             </a>
             .
@@ -245,6 +256,16 @@ const SyncSettings = () => {
                 text="GitLab"
                 id={StorageProviderType.GITLAB}
               />
+              {bitBucketSync ? (
+                <ProviderSelector
+                  isActive={storageProvider === StorageProviderType.BITBUCKET}
+                  isStored={storageType?.provider === StorageProviderType.BITBUCKET}
+                  onClick={handleProviderClick(StorageProviderType.BITBUCKET)}
+                  text="Bitbucket"
+                  id={StorageProviderType.BITBUCKET}
+                />
+              ) : null}
+
               <ProviderSelector
                 isActive={storageProvider === StorageProviderType.ADO}
                 isStored={storageType?.provider === StorageProviderType.ADO}
@@ -263,12 +284,10 @@ const SyncSettings = () => {
           </Stack>
           {selectedRemoteProvider && (
             <>
-              <Text muted size="xsmall">{storageProviderText()}</Text>
-              <Button
-                id="button-add-new-credentials"
-                variant="secondary"
-                onClick={handleShowAddCredentials}
-              >
+              <Text muted size="xsmall">
+                {storageProviderText()}
+              </Text>
+              <Button id="button-add-new-credentials" variant="secondary" onClick={handleShowAddCredentials}>
                 Add new credentials
               </Button>
 

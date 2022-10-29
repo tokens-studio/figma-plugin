@@ -10,6 +10,7 @@ export function setTokenData(state: TokenState, payload: SetTokenDataPayload): T
     allAvailableTokenSets
       .map((tokenSet) => ([tokenSet, payload.usedTokenSet?.[tokenSet] ?? TokenSetStatus.DISABLED])),
   );
+
   // @README (1) for the sake of normalization we will set the DISABLED status for all available token sets
   // this way we can always be certain the status is available. This behavior is also reflected in the createTokenSet logic
   return {
@@ -24,8 +25,10 @@ export function setTokenData(state: TokenState, payload: SetTokenDataPayload): T
           )),
       ),
     })),
-    activeTheme: payload.activeTheme ?? null,
-    activeTokenSet: Array.isArray(payload.values) ? 'global' : Object.keys(payload.values)[0],
+    activeTheme: payload.themes?.find((theme) => theme.id === payload.activeTheme) ? payload.activeTheme ?? null : null,
+    ...(Object.keys(payload.values).includes(state.activeTokenSet) ? {} : {
+      activeTokenSet: Array.isArray(payload.values) ? 'global' : Object.keys(payload.values)[0],
+    }),
     usedTokenSet: Array.isArray(payload.values)
       ? { global: TokenSetStatus.ENABLED }
       : usedTokenSets,

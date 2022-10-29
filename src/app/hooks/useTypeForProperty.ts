@@ -3,32 +3,32 @@ import { Properties } from '@/constants/Properties';
 
 export function useTypeForProperty(property: string): string {
   return useMemo(() => {
-    let type: string = '';
     switch (property) {
       case Properties.width:
       case Properties.height:
-        type = Properties.sizing;
-        break;
-      case Properties.paddingBottom:
-      case Properties.paddingLeft:
-      case Properties.paddingRight:
-      case Properties.paddingTop:
+        return Properties.sizing;
       case Properties.itemSpacing:
-        type = Properties.spacing;
-        break;
-      case Properties.borderRadiusBottomLeft:
-      case Properties.borderRadiusBottomRight:
+      case Properties.verticalPadding:
+      case Properties.horizontalPadding:
+      case Properties.paddingTop:
+      case Properties.paddingLeft:
+      case Properties.paddingBottom:
+      case Properties.paddingRight:
+        return Properties.spacing;
       case Properties.borderRadiusTopLeft:
       case Properties.borderRadiusTopRight:
-        type = Properties.borderRadius;
-        break;
+      case Properties.borderRadiusBottomLeft:
+      case Properties.borderRadiusBottomRight:
+        return Properties.borderRadius;
       case Properties.border:
-        type = Properties.fill;
-        break;
+        return Properties.fill;
+      case Properties.borderWidthTop:
+      case Properties.borderWidthLeft:
+      case Properties.borderWidthRight:
+      case Properties.borderWidthBottom:
+        return Properties.borderWidth;
       default:
-        type = property;
-        break;
+        return property;
     }
-    return type;
   }, [property]);
 }
