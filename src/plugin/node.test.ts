@@ -3,9 +3,7 @@ import { StorageProviderType } from '@/constants/StorageProviderType';
 import {
   destructureCompositionToken, mapValuesToTokens, returnValueToLookFor, saveStorageType, saveOnboardingExplainerSets, saveOnboardingExplainerInspect, saveOnboardingExplainerSyncProviders,
 } from './node';
-import getOnboardingExplainerSyncProviders from '../utils/getOnboardingExplainerSyncProviders';
-import getOnboardingExplainerSets from '@/utils/getOnboardingExplainerSets';
-import getOnboardingExplainerInspect from '@/utils/getOnboardingExplainerInspect';
+import getOnboardingExplainer from '@/utils/getOnboardingExplainer';
 
 const singleShadowToken = {
   type: 'boxShadow',
@@ -270,16 +268,19 @@ describe('storage type', () => {
 describe('onboarding explainer store', () => {
   it('should save the onboardingexplainersyncproviders', async () => {
     saveOnboardingExplainerSyncProviders(true);
-    expect(await getOnboardingExplainerSyncProviders()).toEqual(true);
+    const data = await getOnboardingExplainer();
+    expect(data.syncProviders).toEqual(true);
   });
 
   it('should save the onboardingexplainersets', async () => {
     saveOnboardingExplainerSets(true);
-    expect(await getOnboardingExplainerSets()).toEqual(true);
+    const data = await getOnboardingExplainer();
+    expect(data.sets).toEqual(true);
   });
 
   it('should save the onboardingexplainerinspect', async () => {
     saveOnboardingExplainerInspect(true);
-    expect(await getOnboardingExplainerInspect()).toEqual(true);
+    const data = await getOnboardingExplainer();
+    expect(data.inspect).toEqual(true);
   });
 });

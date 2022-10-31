@@ -1,9 +1,7 @@
 import { ApiProvidersProperty, LicenseKeyProperty } from '@/figmaStorage';
 import { getActiveTheme } from '@/utils/getActiveTheme';
 import getLastOpened from '@/utils/getLastOpened';
-import getOnboardingExplainerSets from '@/utils/getOnboardingExplainerSets';
-import getOnboardingExplainerSyncProviders from '@/utils/getOnboardingExplainerSyncProviders';
-import getOnboardingExplainerInspect from '@/utils/getOnboardingExplainerInspect';
+import getOnboardingExplainer from '@/utils/getOnboardingExplainer';
 import { getUsedTokenSet } from '@/utils/getUsedTokenSet';
 import { getUISettings } from '@/utils/uiSettings';
 import { getUserId } from '../../plugin/helpers';
@@ -17,9 +15,7 @@ export async function startup() {
     activeTheme,
     userId, // the user ID is used for license key binding
     lastOpened,
-    onboardingExplainerSets,
-    onboardingExplainerSyncProviders,
-    onboardingExplainerInspect,
+    onboardingExplainer,
     storageType,
     localApiProviders,
     licenseKey,
@@ -30,9 +26,7 @@ export async function startup() {
     getActiveTheme(),
     getUserId(),
     getLastOpened(),
-    getOnboardingExplainerSets(),
-    getOnboardingExplainerSyncProviders(),
-    getOnboardingExplainerInspect(),
+    getOnboardingExplainer(),
     getSavedStorageType(),
     ApiProvidersProperty.read(),
     LicenseKeyProperty.read(),
@@ -43,9 +37,7 @@ export async function startup() {
     settings,
     activeTheme,
     lastOpened,
-    onboardingExplainerSets,
-    onboardingExplainerSyncProviders,
-    onboardingExplainerInspect,
+    onboardingExplainer,
     storageType,
     localApiProviders,
     licenseKey,

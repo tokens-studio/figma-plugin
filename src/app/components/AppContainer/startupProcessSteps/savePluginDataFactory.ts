@@ -20,9 +20,9 @@ export function savePluginDataFactory(dispatch: Dispatch, params: StartupMessage
       dispatch.userState.setUserId(user.figmaId);
       dispatch.userState.setUserName(user.name);
       dispatch.uiState.setLastOpened(params.lastOpened);
-      dispatch.uiState.setOnboardingExplainerSets(params.onboardingExplainerSets);
-      dispatch.uiState.setOnboardingExplainerSyncProviders(params.onboardingExplainerSyncProviders);
-      dispatch.uiState.setOnboardingExplainerInspect(params.onboardingExplainerInspect);
+      dispatch.uiState.setOnboardingExplainerSets(params.onboardingExplainer.sets);
+      dispatch.uiState.setOnboardingExplainerSyncProviders(params.onboardingExplainer.syncProviders);
+      dispatch.uiState.setOnboardingExplainerInspect(params.onboardingExplainer.inspect);
       dispatch.settings.setUISettings(settings);
       identify(user);
     } else {
