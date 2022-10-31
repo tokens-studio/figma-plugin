@@ -51,4 +51,9 @@ describe('token-transformer', () => {
     var testResult = fs.readFileSync('temp/composition.json');
     expect(testResult.toString()).toEqual(expectedResult.toString());
   });
+  it('generates dependant theme files correctly', async () => {
+    var expectedResult = fs.readFileSync('output/dependant.json');
+    var testResult = fs.readFileSync('temp/dependant.json');
+    expect(testResult.toString()).toEqual(expectedResult.toString());
+  });
 });

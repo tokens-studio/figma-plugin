@@ -1,0 +1,40 @@
+{
+  "global": {
+    "color": {
+      "neutral": {
+        "10": {
+          "value": "#E6EFFF",
+          "type": "color"
+        },
+        "50": {
+          "value": "#2B70E8",
+          "type": "color"
+        }
+      }
+    }
+  },
+  "dark": {
+    "gray": {
+      "value": "{default}",
+      "type": "color"
+    },
+    "background": {
+      "value": "{color.neutral.10}",
+      "type": "color"
+    }
+  },
+  "light": {
+    "default": {
+      "value": "{color.neutral.50}",
+      "type": "color"
+    },
+    "gray": {
+      "value": "{default}",
+      "type": "color"
+    },
+    "background": {
+      "value": "{color.neutral.10}",
+      "type": "color"
+    }
+  }
+}
