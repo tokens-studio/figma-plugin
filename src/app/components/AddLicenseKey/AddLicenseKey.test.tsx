@@ -26,6 +26,11 @@ const mockStartupParams: StartupMessage = {
   type: AsyncMessageTypes.STARTUP,
   activeTheme: null,
   lastOpened: Date.now(),
+  onboardingExplainer: {
+    sets: true,
+    inspect: true,
+    syncProviders: true,
+  },
   localApiProviders: [],
   licenseKey: null,
   settings: {

@@ -17,6 +17,11 @@ describe('savePluginDataFactory', () => {
         name: 'Jan Six',
       },
       lastOpened: Date.now(),
+      onboardingExplainer: {
+        sets: true,
+        inspect: true,
+        syncProviders: true,
+      },
       settings: {
         width: 500,
         height: 500,
