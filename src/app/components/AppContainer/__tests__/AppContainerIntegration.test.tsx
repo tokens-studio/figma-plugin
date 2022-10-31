@@ -114,6 +114,11 @@ const mockStartupParams: Omit<StartupMessage, 'licenseKey'> = {
   type: AsyncMessageTypes.STARTUP,
   activeTheme: null,
   lastOpened: Date.now(),
+  onboardingExplainer: {
+    sets: true,
+    inspect: true,
+    syncProviders: true,
+  },
   localApiProviders: [],
   settings: mockSettings,
   storageType: {
