@@ -44,9 +44,6 @@ export default function TokenSetSelector({ saveScrollPositionSet } : { saveScrol
   const [tokenSetMarkedForChange, setTokenSetMarkedForChange] = React.useState('');
   const [allTokenSets, setAllTokenSets] = React.useState(Object.keys(tokens));
   const tokenKeys = Object.keys(tokens).join(',');
-  React.useEffect(() => {
-    console.log('all', allTokenSets)
-  }, [allTokenSets])
 
   React.useEffect(() => {
     const scollPositionSet = allTokenSets.reduce<Record<string, number>>((acc, crr) => {

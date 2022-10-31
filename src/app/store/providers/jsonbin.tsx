@@ -78,6 +78,7 @@ export function useJSONbin() {
   const usedTokenSets = useSelector(usedTokenSetSelector);
 
   const createNewJSONBin = useCallback(async (context: Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.JSONBIN }>) => {
+    console.log('create');
     const { secret, name, internalId } = context;
     const updatedAt = new Date().toISOString();
     const result = await JSONBinTokenStorage.create(name, updatedAt, secret);
@@ -145,7 +146,9 @@ export function useJSONbin() {
         dispatch.tokenState.setEditProhibited(false);
         return {
           ...data,
-          metadata: {},
+          metadata: {
+            tokenSetOrder: Object.keys(data.tokens),
+          },
         };
       }
       notifyToUI('No tokens stored on remote', { error: true });
