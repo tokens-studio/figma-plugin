@@ -1,23 +1,20 @@
 {
   "theme": {
     "background": {
-      "value": "{colors.gray.100}",
+      "value": "#FAFBFC",
       "description": "Alias value",
-      "type": "color",
-      "failedToResolve": true
+      "type": "color"
     },
     "backgroundSubtle": {
-      "value": "rgba({colors.gray.100}, 0.5)",
+      "value": "#fafbfc80",
       "description": "Nested color value",
-      "type": "color",
-      "failedToResolve": true
+      "type": "color"
     },
     "size": {
       "default": {
-        "value": "{sizing.large}",
+        "value": 8,
         "description": "Sizing value",
-        "type": "sizing",
-        "failedToResolve": true
+        "type": "sizing"
       }
     }
   },
@@ -25,7 +22,7 @@
     "multiple": {
       "value": [
         {
-          "color": "{colors.gray.900}",
+          "color": "#1B1F24",
           "type": "dropShadow",
           "x": 0,
           "y": 4,
@@ -33,7 +30,7 @@
           "spread": 0
         },
         {
-          "color": "{colors.gray.900}",
+          "color": "#1B1F24",
           "type": "dropShadow",
           "x": 0,
           "y": 0,
@@ -41,25 +38,23 @@
           "spread": 0
         }
       ],
-      "type": "boxShadow",
-      "failedToResolve": true
+      "type": "boxShadow"
     },
     "single": {
       "value": {
-        "color": "{colors.gray.900}",
+        "color": "#1B1F24",
         "type": "dropShadow",
         "x": 0,
         "y": 4,
         "blur": 2,
         "spread": 0
       },
-      "type": "boxShadow",
-      "failedToResolve": true
+      "type": "boxShadow"
     },
     "reference-multiple": {
       "value": [
         {
-          "color": "{colors.gray.900}",
+          "color": "#1B1F24",
           "type": "dropShadow",
           "x": 0,
           "y": 4,
@@ -67,7 +62,7 @@
           "spread": 0
         },
         {
-          "color": "{colors.gray.900}",
+          "color": "#1B1F24",
           "type": "dropShadow",
           "x": 0,
           "y": 0,
@@ -75,20 +70,18 @@
           "spread": 0
         }
       ],
-      "type": "boxShadow",
-      "failedToResolve": true
+      "type": "boxShadow"
     },
     "reference-single": {
       "value": {
-        "color": "{colors.gray.900}",
+        "color": "#1B1F24",
         "type": "dropShadow",
         "x": 0,
         "y": 4,
         "blur": 2,
         "spread": 0
       },
-      "type": "boxShadow",
-      "failedToResolve": true
+      "type": "boxShadow"
     }
   }
 }
