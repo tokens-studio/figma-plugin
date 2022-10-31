@@ -1,9 +1,25 @@
 import React from 'react';
 import { InfoCircledIcon, Cross1Icon } from '@radix-ui/react-icons';
+import { styled } from '@/stitches.config';
 import Box from './Box';
 import Heading from './Heading';
 import Stack from './Stack';
 import IconButton from './IconButton';
+
+const StyledInfoIconButton = styled(InfoCircledIcon, {
+  color: '$interactionSubtle',
+});
+
+const StyledTextPlan = styled('p', {
+  fontWeight: '$medium',
+  color: '$text',
+  fontSize: 'normal',
+});
+
+const StyledReadMoreLink = styled('a', {
+  color: '$interaction',
+  fontSize: 'normal',
+});
 
 type Props = {
   data: {
@@ -22,25 +38,20 @@ export default function OnboardingExplainer({ data, closeOnboarding }: Props) {
     >
       <Stack direction="row" gap={2} justify="between">
         <Stack direction="row" justify="between" gap={2} align="center">
-          <InfoCircledIcon className="text-primary-500" />
+          <StyledInfoIconButton />
           <Heading size="medium">{data.title}</Heading>
         </Stack>
         <IconButton dataCy="closeButton" onClick={closeOnboarding} icon={<Cross1Icon />} />
       </Stack>
       {data.text.split('\n').map((text) => (
-        <p className="text-xs">
+        <StyledTextPlan>
           {text}
           <br />
-        </p>
+        </StyledTextPlan>
       ))}
-      <a
-        target="_blank"
-        rel="noreferrer"
-        href={data.url}
-        className="inline-flex text-xs text-primary-500"
-      >
+      <StyledReadMoreLink href={data.url} target="_blank" rel="noreferrer">
         Read more
-      </a>
+      </StyledReadMoreLink>
     </Box>
   );
 }
