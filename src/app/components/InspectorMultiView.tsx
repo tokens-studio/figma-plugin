@@ -17,8 +17,16 @@ import { SelectionGroup } from '@/types';
 import { NodeInfo } from '@/types/NodeInfo';
 import BulkRemapModal from './modals/BulkRemapModal';
 import { StyleIdBackupKeys } from '@/constants/StyleIdBackupKeys';
+import OnboardingExplainer from './OnboardingExplainer';
+import Stack from './Stack';
 
 export default function InspectorMultiView({ resolvedTokens }: { resolvedTokens: SingleToken[] }) {
+  const onboardingData = {
+    title: 'Inspect',
+    text: 'This is where applied tokens of your selection show up, you can use Deep Inspect to scan the selected layers and all of its children.',
+    url: 'https://docs.figmatokens.com/multi-inspect?ref=onboarding_explainer_inspect',
+  };
+
   const inspectState = useSelector(inspectStateSelector, isEqual);
   const uiState = useSelector(uiStateSelector, isEqual);
   const { removeTokensByValue } = useTokens();
@@ -78,6 +86,10 @@ export default function InspectorMultiView({ resolvedTokens }: { resolvedTokens:
     );
   }, [dispatch.inspectState, inspectState.selectedTokens.length, uiState.selectionValues]);
 
+  const closeOnboarding = React.useCallback(() => {
+    dispatch.uiState.setOnboardingExplainerInspect(false);
+  }, [dispatch]);
+
   return (
     <Box
       css={{
@@ -120,10 +132,14 @@ export default function InspectorMultiView({ resolvedTokens }: { resolvedTokens:
               onClose={handleHideBulkRemap}
             />
           )}
-
         </Box>
       ) : (
-        <Blankslate title={uiState.selectedLayers > 0 ? 'No tokens found' : 'No layers selected'} text={uiState.selectedLayers > 0 ? 'None of the selected layers contain any tokens' : 'Select a layer to see applied tokens'} />
+        <Stack direction="column" gap={4} css={{ padding: '$5' }}>
+          <Blankslate title={uiState.selectedLayers > 0 ? 'No tokens found' : 'No layers selected'} text={uiState.selectedLayers > 0 ? 'None of the selected layers contain any tokens' : 'Select a layer to see applied tokens'} />
+          {uiState.onboardingExplainerInspect && (
+            <OnboardingExplainer data={onboardingData} closeOnboarding={closeOnboarding} />
+          )}
+        </Stack>
       )}
     </Box>
   );
