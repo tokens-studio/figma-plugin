@@ -7,18 +7,18 @@ import Stack from './Stack';
 import IconButton from './IconButton';
 
 const StyledInfoIconButton = styled(InfoCircledIcon, {
-  color: '$interactionSubtle',
+  color: '$interaction',
 });
 
 const StyledTextPlan = styled('p', {
-  fontWeight: '$medium',
+  fontWeight: '$normal',
   color: '$text',
-  fontSize: 'normal',
+  fontSize: '$xsmall',
 });
 
 const StyledReadMoreLink = styled('a', {
   color: '$interaction',
-  fontSize: 'normal',
+  fontSize: '$xsmall',
 });
 
 type Props = {
@@ -39,14 +39,13 @@ export default function OnboardingExplainer({ data, closeOnboarding }: Props) {
       <Stack direction="row" gap={2} justify="between">
         <Stack direction="row" justify="between" gap={2} align="center">
           <StyledInfoIconButton />
-          <Heading size="medium">{data.title}</Heading>
+          <Heading size="small">{data.title}</Heading>
         </Stack>
         <IconButton dataCy="closeButton" onClick={closeOnboarding} icon={<Cross1Icon />} />
       </Stack>
       {data.text.split('\n').map((text) => (
         <StyledTextPlan>
           {text}
-          <br />
         </StyledTextPlan>
       ))}
       <StyledReadMoreLink href={data.url} target="_blank" rel="noreferrer">
