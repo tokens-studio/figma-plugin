@@ -14,6 +14,7 @@ describe('isSameCredentials', () => {
       provider: StorageProviderType.GITHUB,
       filePath: 'tokens.json',
       branch: 'main',
+      internalId: '123',
     };
     const correctCredentials = {
       id: '123',
@@ -29,10 +30,21 @@ describe('isSameCredentials', () => {
       filePath: 'tokens.json',
       branch: 'main',
     };
+    const gitHubCredentialsWithDifferentBranch = {
+      id: 'six7/figma-tokens',
+      provider: StorageProviderType.GITHUB,
+      secret: 'abc',
+      name: 'figmatokens',
+      filePath: 'tokens.json',
+      branch: 'default',
+      internalId: '123',
+    };
+
     expect(isSameCredentials(correctCredentials, storedJSONBin)).toBe(true);
     expect(isSameCredentials({ ...correctCredentials, id: '456' }, storedJSONBin)).toBe(false);
     expect(isSameCredentials(correctGitHubCredentials, storedGitHub)).toBe(true);
     expect(isSameCredentials({ ...correctGitHubCredentials, filePath: 'tokens2.json' }, storedGitHub)).toBe(false);
     expect(isSameCredentials({ ...correctGitHubCredentials, branch: 'next' }, storedGitHub)).toBe(false);
+    expect(isSameCredentials(gitHubCredentialsWithDifferentBranch, storedGitHub)).toBe(true);
   });
 });

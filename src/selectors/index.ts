@@ -47,6 +47,7 @@ export * from './prefixStylesWithThemeNameSelector';
 export * from './collapsedTokenSetsSelector';
 export * from './collapsedTokenTypeObjSelector';
 export * from './scrollPositionSetSelector';
+export * from './themeObjectsSelector';
 export * from './themeByIdSelector';
 export * from './isWaitingForBackgroundJobSelector';
 export * from './licenseDetailsSelector';

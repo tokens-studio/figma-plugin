@@ -300,7 +300,9 @@ describe('remoteTokens', () => {
     it(`Pull tokens from ${context.provider}`, async () => {
       if (context === jsonbinContext) {
         expect(await result.current.pullTokens({ context: context as StorageTypeCredentials })).toEqual({
-          metadata: {},
+          metadata: {
+            tokenSetOrder: ['global']
+          },
           status: 'success',
           themes: [
             {
