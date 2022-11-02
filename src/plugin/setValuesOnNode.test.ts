@@ -106,7 +106,6 @@ describe('setValuesOnNode', () => {
       paddingLeft: 10,
       paddingRight: 10,
       paddingTop: 10,
-      itemSpacing: 10,
     });
   });
 

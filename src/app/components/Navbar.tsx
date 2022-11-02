@@ -5,20 +5,24 @@ import { Tabs } from '@/constants/Tabs';
 import Stack from './Stack';
 import { TabButton } from './TabButton';
 import { NavbarUndoButton } from './NavbarUndoButton';
-import Minimize from '../assets/minimize.svg';
+import Minimize from '@/icons/minimize.svg';
 import useMinimizeWindow from './useMinimizeWindow';
 import IconButton from './IconButton';
 import { activeTabSelector } from '@/selectors';
 import { Dispatch } from '../store';
+import TokenFlowButton from './TokenFlowButton';
 
 const Navbar: React.FC = () => {
   const activeTab = useSelector(activeTabSelector);
   const dispatch = useDispatch<Dispatch>();
   const { handleResize } = useMinimizeWindow();
 
-  const handleSwitch = useCallback((tab: Tabs) => {
-    dispatch.uiState.setActiveTab(tab);
-  }, [dispatch.uiState]);
+  const handleSwitch = useCallback(
+    (tab: Tabs) => {
+      dispatch.uiState.setActiveTab(tab);
+    },
+    [dispatch.uiState],
+  );
 
   return (
     <Box
@@ -42,8 +46,9 @@ const Navbar: React.FC = () => {
         </div>
         <NavbarUndoButton />
       </Stack>
-      <Stack direction="row" align="center">
-        <IconButton tooltip="Minimize plugin" onClick={handleResize} icon={<Minimize />} />
+      <Stack direction="row" align="center" gap={1} css={{ paddingRight: '$2' }}>
+        <TokenFlowButton />
+        <IconButton size="large" tooltip="Minimize plugin" onClick={handleResize} icon={<Minimize />} />
       </Stack>
     </Box>
   );

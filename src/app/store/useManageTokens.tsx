@@ -62,6 +62,9 @@ export default function useManageTokens() {
         oldName,
         shouldUpdate: shouldUpdateDocument,
       } as UpdateTokenPayload);
+      if (oldName) {
+        dispatch.tokenState.renameStyleNamesToCurrentTheme(oldName, name);
+      }
     }
     dispatch.uiState.completeJob(BackgroundJobs.UI_EDITSINGLETOKEN);
   }, [editToken, dispatch.uiState]);
@@ -119,6 +122,7 @@ export default function useManageTokens() {
         removeStylesFromTokens(data);
       }
       dispatch.uiState.completeJob(BackgroundJobs.UI_DELETETOKEN);
+      dispatch.tokenState.removeStyleNamesFromThemes(data.path, data.parent);
     }
   }, [confirm, deleteToken, dispatch.uiState]);
 

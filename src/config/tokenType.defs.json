@@ -194,6 +194,14 @@
       "value": { "type": "string" }
     }
   },
+  "dimension": {
+    "label": "Dimension",
+    "property": "Dimension",
+    "type": "dimension",
+    "schemas": {
+      "value": { "type": "string" }
+    }
+  },
   "other": {
     "label": "Other",
     "property": "other",

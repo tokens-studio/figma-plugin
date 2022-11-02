@@ -17,7 +17,6 @@ import { transformValue } from './helpers';
 import setColorValuesOnTarget from './setColorValuesOnTarget';
 import setEffectValuesOnTarget from './setEffectValuesOnTarget';
 import setTextValuesOnTarget from './setTextValuesOnTarget';
-import updateStyles from './updateStyles';
 
 export default async function syncStyles(tokens: Record<string, AnyTokenList>, settings: Record<SyncOption, boolean>) {
   const effectStyles = figma.getLocalEffectStyles();
@@ -46,29 +45,45 @@ export default async function syncStyles(tokens: Record<string, AnyTokenList>, s
     });
   });
 
+  // rename styles
+  if (settings.renameStyle && activeThemeObject) {
+    allStyles.filter((style) => style.name.startsWith(`${activeThemeObject.name}/`)).forEach((style) => {
+      if (activeThemeObject.$figmaStyleReferences) {
+        Object.entries(activeThemeObject.$figmaStyleReferences).forEach(([key, value]) => {
+          if (style.id === value && style.name !== key) {
+            const newPath = key.split('.').map((part) => part.trim()).join('/');
+            const styleNameWithoutTheme = style.name.slice(style.name.indexOf('/') + 1);
+            style.name = style.name.replace(styleNameWithoutTheme, newPath);
+          }
+        });
+      }
+    });
+  }
+
   // Remove any styles that do not have a token that matches its name
   const styleIdsToRemove: string[] = [];
   if (settings.removeStyle) {
     allStyles = allStyles.filter((style) => {
       if (!Object.keys(styleSet).some((pathName) => isMatchingStyle(pathName, style))) {
-        style.remove();
-        styleIdsToRemove.push(style.id);
-        return false;
+        if (activeThemeObject && activeThemeObject.$figmaStyleReferences) {
+          if (!Object.entries(activeThemeObject.$figmaStyleReferences).some(([, value]) => value === style.id)) {
+            style.remove();
+            styleIdsToRemove.push(style.id);
+            return false;
+          }
+        } else {
+          style.remove();
+          styleIdsToRemove.push(style.id);
+          return false;
+        }
       }
       return true;
     });
   }
 
-  // Rename styles that are associated with a token and where the token name is different than the style name
-  let styleIdsToCreate: Record<string, string> = {};
-  if (settings.renameStyle && activeThemeObject) {
-    const tokensToCreate = generateTokensToCreate(activeThemeObject, tokens);
-    styleIdsToCreate = await updateStyles(tokensToCreate, true, { prefixStylesWithThemeName: true });
-  }
-
   // Update all different style values
   allStyles.forEach((style) => {
-    if (!compareStyleValueWithTokenValue(style, styleSet[style.name])) {
+    if (styleSet[style.name] && !compareStyleValueWithTokenValue(style, styleSet[style.name])) {
       if (style.type === 'PAINT' && styleSet[style.name].type === TokenTypes.COLOR) {
         setColorValuesOnTarget(style, styleSet[style.name] as SingleColorToken);
       }
@@ -80,9 +95,7 @@ export default async function syncStyles(tokens: Record<string, AnyTokenList>, s
       }
     }
   });
-
   return {
     styleIdsToRemove,
-    styleIdsToCreate,
   };
 }

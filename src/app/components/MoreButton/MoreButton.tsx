@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { ChevronRightIcon } from '@radix-ui/react-icons';
 import { styled } from '@/stitches.config';
@@ -27,6 +27,7 @@ import { EditTokenFormStatus } from '@/constants/EditTokenFormStatus';
 import TokenButtonContent from '../TokenButton/TokenButtonContent';
 import { useGetActiveState } from '@/hooks';
 import { usePropertiesForTokenType } from '../../hooks/usePropertiesForType';
+import { getAliasValue } from '@/utils/alias';
 
 const RightSlot = styled('div', {
   marginLeft: 'auto',
@@ -55,7 +56,13 @@ export const MoreButton: React.FC<Props> = ({
   const editProhibited = useSelector(editProhibitedSelector);
   const activeTokenSet = useSelector(activeTokenSetSelector);
   const { deleteSingleToken } = useManageTokens();
-  const properties = usePropertiesForTokenType(type, token.value);
+
+  const resolvedValue = useMemo(() => (
+    getAliasValue(token, tokensContext.resolvedTokens)
+  ), [token, tokensContext.resolvedTokens]);
+
+  const properties = usePropertiesForTokenType(type, resolvedValue?.toString());
+
   // @TODO check type property typing
   const visibleProperties = React.useMemo(() => (
     properties.filter((p) => p.label)
@@ -80,9 +87,16 @@ export const MoreButton: React.FC<Props> = ({
     dispatch.uiState.completeJob(BackgroundJobs.UI_APPLYNODEVALUE);
   }, [dispatch, tokensContext.resolvedTokens, setNodeData]);
 
-  const activeStateProperties = React.useMemo(() => (
-    [...properties, ...DocumentationProperties]
-  ), [properties]);
+  const activeStateProperties = React.useMemo(() => {
+    const childProperties: PropertyObject[] = [];
+    properties.forEach((property) => {
+      if (property.childProperties) {
+        childProperties.push(...property.childProperties);
+      }
+    });
+    return [...properties, ...childProperties, ...DocumentationProperties];
+  }, [properties]);
+
   const active = useGetActiveState(activeStateProperties, type, token.name);
 
   const handleClick = React.useCallback((givenProperties: PropertyObject, isActive = active) => {
@@ -107,7 +121,26 @@ export const MoreButton: React.FC<Props> = ({
         <TokenButtonContent type={type} active={active} onClick={handleTokenClick} token={token} />
       </ContextMenuTrigger>
       <ContextMenuContent sideOffset={5} collisionTolerance={30}>
-        {visibleProperties.map((property) => (
+        {visibleProperties.map((property) => (property.childProperties ? (
+          <ContextMenu>
+            <ContextMenuTriggerItem>
+              {property.label}
+              <RightSlot>
+                <ChevronRightIcon />
+              </RightSlot>
+            </ContextMenuTriggerItem>
+            <ContextMenuContent sideOffset={2} alignOffset={-5} collisionTolerance={30}>
+              {property.childProperties.map((childProperty) => (
+                <MoreButtonProperty
+                  key={childProperty.name}
+                  value={token.name}
+                  property={childProperty}
+                  onClick={handleClick}
+                />
+              ))}
+            </ContextMenuContent>
+          </ContextMenu>
+        ) : (
           <MoreButtonProperty
             key={property.name}
             value={token.name}
@@ -115,7 +148,7 @@ export const MoreButton: React.FC<Props> = ({
             onClick={handleClick}
             disabled={property.disabled}
           />
-        ))}
+        )))}
         <ContextMenu>
           <ContextMenuTriggerItem>
             Documentation Tokens

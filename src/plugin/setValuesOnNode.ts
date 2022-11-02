@@ -342,7 +342,6 @@ export default async function setValuesOnNode(
             node.paddingRight = spacing;
             node.paddingTop = spacing;
             node.paddingBottom = spacing;
-            node.itemSpacing = spacing;
             break;
           case 2:
             node.paddingTop = transformValue(String(individualSpacing[0]), 'spacing');
@@ -429,6 +428,21 @@ export default async function setValuesOnNode(
           // If we're inserting an object, stringify that
           const value = typeof values.tokenValue === 'object' ? JSON.stringify(values.tokenValue) : values.tokenValue;
           node.characters = String(value);
+        }
+      }
+
+      if (
+        typeof values.dimension !== 'undefined'
+        && isPrimitiveValue(values.dimension)
+      ) {
+        if ('itemSpacing' in node) {
+          if (node.primaryAxisAlignItems === 'SPACE_BETWEEN') {
+            node.primaryAxisAlignItems = 'MIN';
+          }
+          node.itemSpacing = transformValue(String(values.dimension), 'spacing');
+        } else if ('resize' in node) {
+          const size = transformValue(String(values.dimension), 'sizing');
+          node.resize(size, size);
         }
       }
 
