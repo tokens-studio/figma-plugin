@@ -56,4 +56,12 @@ describe('Settings Component', () => {
 
     expect(result.queryByText('Set up where tokens should be stored')).toBeNull();
   });
+
+  it('reset onboarding explainers', async () => {
+    const result = render(<Settings />);
+
+    fireEvent.click(result.getByTestId('reset-onboarding'));
+
+    expect(result.queryByText('Set up where tokens should be stored')).not.toBeNull();
+  });
 });

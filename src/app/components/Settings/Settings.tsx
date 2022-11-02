@@ -88,7 +88,7 @@ function Settings() {
             <Label htmlFor="prefixStylesWithThemeName">Prefix styles with active theme name</Label>
           </Stack>
           <Stack direction="row" gap={3}>
-            <Button variant="primary" size="small" onClick={handleResetButton}>Reset onboarding</Button>
+            <Button variant="primary" size="small" id="reset-onboarding" onClick={handleResetButton}>Reset onboarding</Button>
           </Stack>
         </Stack>
       </Stack>
