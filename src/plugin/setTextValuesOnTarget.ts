@@ -71,25 +71,25 @@ export default async function setTextValuesOnTarget(
           if (isApplied) break;
         }
       }
-      if (fontSize) {
+      if (typeof fontSize !== 'undefined') {
         target.fontSize = transformValue(fontSize, 'fontSizes');
       }
-      if (lineHeight) {
+      if (typeof lineHeight !== 'undefined') {
         const transformedValue = transformValue(String(lineHeight), 'lineHeights');
         if (transformedValue !== null) {
           target.lineHeight = transformedValue;
         }
       }
-      if (letterSpacing) {
+      if (typeof letterSpacing !== 'undefined') {
         const transformedValue = transformValue(letterSpacing, 'letterSpacing');
         if (transformedValue !== null) {
           target.letterSpacing = transformedValue;
         }
       }
-      if (paragraphSpacing) {
+      if (typeof paragraphSpacing !== 'undefined') {
         target.paragraphSpacing = transformValue(paragraphSpacing, 'paragraphSpacing');
       }
-      if (paragraphIndent) {
+      if (typeof paragraphIndent !== 'undefined') {
         target.paragraphIndent = transformValue(paragraphIndent, 'paragraphIndent');
       }
       if (textCase) {
