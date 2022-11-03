@@ -19,6 +19,8 @@ import { saveLastSyncedState } from '@/utils/saveLastSyncedState';
 import { applyTokenSetOrder } from '@/utils/tokenset';
 import { ErrorMessages } from '@/constants/ErrorMessages';
 import { RemoteResponseData } from '@/types/RemoteResponseData';
+import optimizeThemes from '@/utils/optimizeThemes';
+import recoverOptimizedThemes from '@/utils/recoverOptimizedThemes';
 
 type BitbucketCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.BITBUCKET }>;
 type BitbucketFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.BITBUCKET }>;
@@ -34,6 +36,7 @@ export function useBitbucket() {
   const dispatch = useDispatch<Dispatch>();
   const { confirm } = useConfirm();
   const { pushDialog, closeDialog } = usePushDialog();
+  const optimizedThemes = optimizeThemes(themes);
 
   const storageClientFactory = useCallback(
     (context: BitbucketCredentials, owner?: string, repo?: string) => {
@@ -72,7 +75,7 @@ export function useBitbucket() {
     if (
       content
       && isEqual(content.tokens, tokens)
-      && isEqual(content.themes, themes)
+      && isEqual(optimizeThemes(content.themes), optimizedThemes)
       && isEqual(content.metadata?.tokenSetOrder ?? Object.keys(tokens), Object.keys(tokens))
     ) {
       notifyToUI('Nothing to commit');
@@ -97,7 +100,7 @@ export function useBitbucket() {
           tokenSetOrder: Object.keys(tokens),
         };
         await storage.save({
-          themes,
+          themes: optimizedThemes,
           tokens,
           metadata,
         }, { commitMessage });
@@ -146,6 +149,7 @@ export function useBitbucket() {
     closeDialog,
     tokens,
     themes,
+    optimizedThemes,
     localApiState,
     usedTokenSet,
     activeTheme,
@@ -224,16 +228,17 @@ export function useBitbucket() {
         if (content) {
           if (
             !isEqual(content.tokens, tokens)
-            || !isEqual(content.themes, themes)
+            || !isEqual(optimizeThemes(content.themes), optimizedThemes)
             || !isEqual(content.metadata?.tokenSetOrder ?? Object.keys(tokens), Object.keys(tokens))
           ) {
             const userDecision = await askUserIfPull();
             if (userDecision) {
               const sortedValues = applyTokenSetOrder(content.tokens, content.metadata?.tokenSetOrder);
-              saveLastSyncedState(dispatch, sortedValues, content.themes, content.metadata);
+              const recoveredThemes = recoverOptimizedThemes(content.themes, content.tokens);
+              saveLastSyncedState(dispatch, sortedValues, recoveredThemes, content.metadata);
               dispatch.tokenState.setTokenData({
                 values: content.tokens,
-                themes: content.themes,
+                themes: recoveredThemes,
                 activeTheme,
                 usedTokenSet,
               });
@@ -261,6 +266,7 @@ export function useBitbucket() {
       usedTokenSet,
       activeTheme,
       themes,
+      optimizedThemes,
       tokens,
       checkAndSetAccess,
     ],

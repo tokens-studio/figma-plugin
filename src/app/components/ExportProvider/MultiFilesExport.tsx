@@ -11,6 +11,7 @@ import { IconFile } from '@/icons';
 import { tokensSelector, themesListSelector } from '@/selectors';
 import { SystemFilenames } from '@/constants/SystemFilenames';
 import { track } from '@/utils/analytics';
+import optimizeThemes from '@/utils/optimizeThemes';
 
 type Props = {
   onClose: () => void;
@@ -26,13 +27,13 @@ export default function MultiFilesExport({ onClose }: Props) {
     Object.entries(convertTokensToObject(tokens)).forEach(([key, value]) => {
       changeObj[`${key}.json`] = JSON.stringify(value, null, 2);
     });
-    changeObj[`${SystemFilenames.THEMES}.json`] = JSON.stringify(themes, null, 2);
+    changeObj[`${SystemFilenames.THEMES}.json`] = JSON.stringify(optimizeThemes(themes), null, 2);
     const metadata = {
       tokenSetOrder: Object.keys(tokens),
     };
     changeObj[`${SystemFilenames.METADATA}.json`] = JSON.stringify(metadata, null, 2);
     return changeObj;
-  }, [tokens, themes]);
+  }, [tokens, themes, optimizeThemes]);
 
   const downLoadDataAsZip = React.useCallback(() => {
     const zip = new JSZip();

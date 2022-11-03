@@ -21,6 +21,8 @@ import { RemoteResponseData } from '@/types/RemoteResponseData';
 import { ErrorMessages } from '@/constants/ErrorMessages';
 import { applyTokenSetOrder } from '@/utils/tokenset';
 import { saveLastSyncedState } from '@/utils/saveLastSyncedState';
+import optimizeThemes from '@/utils/optimizeThemes';
+import recoverOptimizedThemes from '@/utils/recoverOptimizedThemes';
 
 export type GitlabCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.GITHUB | StorageProviderType.GITLAB; }>;
 type GitlabFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.GITHUB | StorageProviderType.GITLAB }>;
@@ -46,6 +48,7 @@ export function useGitLab() {
   const activeTheme = useSelector(activeThemeSelector);
   const { multiFileSync } = useFlags();
   const dispatch = useDispatch<Dispatch>();
+  const optimizedThemes = optimizeThemes(themes);
 
   const { confirm } = useConfirm();
   const { pushDialog, closeDialog } = usePushDialog();
@@ -74,7 +77,7 @@ export function useGitLab() {
     if (
       content
       && isEqual(content.tokens, tokens)
-      && isEqual(content.themes, themes)
+      && isEqual(optimizeThemes(content.themes), optimizedThemes)
       && isEqual(content.metadata?.tokenSetOrder ?? Object.keys(tokens), Object.keys(tokens))
     ) {
       notifyToUI('Nothing to commit');
@@ -97,7 +100,7 @@ export function useGitLab() {
           tokenSetOrder: Object.keys(tokens),
         };
         await storage.save({
-          themes,
+          themes: optimizedThemes,
           tokens,
           metadata,
         }, {
@@ -148,6 +151,7 @@ export function useGitLab() {
     closeDialog,
     tokens,
     themes,
+    optimizedThemes,
     localApiState,
     usedTokenSet,
     activeTheme,
@@ -223,16 +227,17 @@ export function useGitLab() {
       if (content) {
         if (
           !isEqual(content.tokens, tokens)
-          || !isEqual(content.themes, themes)
+          || !isEqual(optimizeThemes(content.themes), optimizedThemes)
           || !isEqual(content.metadata?.tokenSetOrder ?? Object.keys(tokens), Object.keys(tokens))
         ) {
           const userDecision = await askUserIfPull();
           if (userDecision) {
             const sortedValues = applyTokenSetOrder(content.tokens, content.metadata?.tokenSetOrder);
-            saveLastSyncedState(dispatch, sortedValues, content.themes, content.metadata);
+            const recoveredThemes = recoverOptimizedThemes(content.themes, content.tokens);
+            saveLastSyncedState(dispatch, sortedValues, recoveredThemes, content.metadata);
             dispatch.tokenState.setTokenData({
               values: sortedValues,
-              themes: content.themes,
+              themes: recoveredThemes,
               usedTokenSet,
               activeTheme,
             });
@@ -258,6 +263,7 @@ export function useGitLab() {
     pushTokensToGitLab,
     tokens,
     themes,
+    optimizedThemes,
     askUserIfPull,
     usedTokenSet,
     activeTheme,

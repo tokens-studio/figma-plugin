@@ -19,6 +19,8 @@ import { RemoteResponseData } from '@/types/RemoteResponseData';
 import { ErrorMessages } from '@/constants/ErrorMessages';
 import { applyTokenSetOrder } from '@/utils/tokenset';
 import { saveLastSyncedState } from '@/utils/saveLastSyncedState';
+import optimizeThemes from '@/utils/optimizeThemes';
+import recoverOptimizedThemes from '@/utils/recoverOptimizedThemes';
 
 type AdoCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.ADO; }>;
 type AdoFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.ADO; }>;
@@ -33,6 +35,7 @@ export const useADO = () => {
   const { multiFileSync } = useFlags();
   const { confirm } = useConfirm();
   const { pushDialog, closeDialog } = usePushDialog();
+  const optimizedThemes = optimizeThemes(themes);
 
   const storageClientFactory = React.useCallback((context: AdoCredentials) => {
     const storageClient = new ADOTokenStorage(context);
@@ -65,7 +68,7 @@ export const useADO = () => {
     if (
       content
       && isEqual(content.tokens, tokens)
-      && isEqual(content.themes, themes)
+      && isEqual(optimizeThemes(content.themes), optimizedThemes)
       && isEqual(content.metadata?.tokenSetOrder ?? Object.keys(tokens), Object.keys(tokens))
     ) {
       notifyToUI('Nothing to commit');
@@ -137,6 +140,7 @@ export const useADO = () => {
     storageClientFactory,
     tokens,
     themes,
+    optimizedThemes,
     pushDialog,
     closeDialog,
     localApiState,
@@ -211,16 +215,17 @@ export const useADO = () => {
       if (content) {
         if (
           !isEqual(content.tokens, tokens)
-          || !isEqual(content.themes, themes)
+          || !isEqual(optimizeThemes(content.themes), optimizedThemes)
           || !isEqual(content.metadata?.tokenSetOrder ?? Object.keys(tokens), Object.keys(tokens))
         ) {
           const userDecision = await askUserIfPull();
           if (userDecision) {
             const sortedValues = applyTokenSetOrder(content.tokens, content.metadata?.tokenSetOrder);
-            saveLastSyncedState(dispatch, sortedValues, content.themes, content.metadata);
+            const recoveredThemes = recoverOptimizedThemes(content.themes, content.tokens);
+            saveLastSyncedState(dispatch, sortedValues, recoveredThemes, content.metadata);
             dispatch.tokenState.setTokenData({
               values: sortedValues,
-              themes: content.themes,
+              themes: recoveredThemes,
               usedTokenSet,
               activeTheme,
             });
@@ -245,6 +250,7 @@ export const useADO = () => {
     pushTokensToADO,
     storageClientFactory,
     themes,
+    optimizedThemes,
     tokens,
     activeTheme,
     usedTokenSet,
