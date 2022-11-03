@@ -68,8 +68,8 @@ export default async function setTextValuesOnTarget(
               }
             })
             .catch(() => {
-              notifyUI('Error setting font, font family/weight combination not found', { error: true });
-              Sentry.captureException({ error: 'Font not found', fontFamily, fontWeight });
+              notifyUI(`Error setting font family/weight combination for ${family}/${style}`, { error: true });
+              Sentry.captureException({ error: 'Font not found', family, style });
             });
           if (isApplied) break;
         }
