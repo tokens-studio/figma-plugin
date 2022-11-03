@@ -154,6 +154,23 @@ export default async function setValuesOnNode(
         }
       }
 
+      // BACKGROUND BLUR
+      if ('effects' in node && typeof values.backgroundBlur !== 'undefined' && isPrimitiveValue(values.backgroundBlur)) {
+        const existingEffectIndex = node.effects.findIndex((effect) => effect.type === 'BACKGROUND_BLUR');
+        let newEffects = [...node.effects];
+        const blurEffect: BlurEffect = {
+          type: 'BACKGROUND_BLUR',
+          visible: true,
+          radius: transformValue(String(values.backgroundBlur), 'backgroundBlur'),
+        };
+        if (existingEffectIndex > -1) {
+          newEffects = Object.assign([], node.effects, { [existingEffectIndex]: blurEffect });
+        } else {
+          newEffects.push(blurEffect);
+        }
+        node.effects = newEffects;
+      }
+
       // BORDER WIDTH
       if ('strokeWeight' in node && typeof values.borderWidth !== 'undefined' && isPrimitiveValue(values.borderWidth)) {
         node.strokeWeight = transformValue(String(values.borderWidth), 'borderWidth');

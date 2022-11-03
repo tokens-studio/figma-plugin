@@ -206,6 +206,10 @@ export function usePropertiesForTokenType(type: TokenTypes, value?: SingleToken[
               { label: 'Left', name: Properties.borderWidthLeft },
             ],
           },
+          {
+            label: 'Background blur',
+            name: Properties.backgroundBlur,
+          },
         );
         break;
 
