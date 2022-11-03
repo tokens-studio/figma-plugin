@@ -79,7 +79,7 @@ const tokens = new Map([
       },
       rawValue: {
         opacity: '{opacity.40}',
-        borderRadius: '{borde-radius.7}',
+        borderRadius: '{border-radius.7}',
       },
     },
   ],
