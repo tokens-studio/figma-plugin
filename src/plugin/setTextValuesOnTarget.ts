@@ -1,6 +1,8 @@
 /* eslint-disable no-param-reassign */
+import * as Sentry from '@sentry/react';
 import { SingleTypographyToken } from '@/types/tokens';
 import { transformValue } from './helpers';
+import { notifyUI } from './notifiers';
 
 export default async function setTextValuesOnTarget(
   target: TextNode | TextStyle,
@@ -66,7 +68,8 @@ export default async function setTextValuesOnTarget(
               }
             })
             .catch(() => {
-              // TODO: Track this in mixpanel so we can add missing weights
+              notifyUI('Error setting font, font family/weight combination not found', { error: true });
+              Sentry.captureException({ error: 'Font not found', fontFamily, fontWeight });
             });
           if (isApplied) break;
         }
