@@ -68,7 +68,7 @@ function Settings() {
         <SyncSettings />
         <Divider />
         <Stack direction="column" gap={3} css={{ padding: '0 $4' }}>
-          <Heading size="small">Styles</Heading>
+          <Heading size="small">Settings</Heading>
           <Stack direction="row" gap={2} align="center">
             <Checkbox
               id="ignoreFirstPartForStyles"
@@ -87,9 +87,9 @@ function Settings() {
             />
             <Label htmlFor="prefixStylesWithThemeName">Prefix styles with active theme name</Label>
           </Stack>
-          <Stack direction="row" gap={3}>
-            <Button variant="primary" size="small" id="reset-onboarding" onClick={handleResetButton}>Reset onboarding</Button>
-          </Stack>
+          <Box>
+            <Button variant="secondary" size="small" id="reset-onboarding" onClick={handleResetButton}>Reset onboarding</Button>
+          </Box>
         </Stack>
       </Stack>
     </Box>
