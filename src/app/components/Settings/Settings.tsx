@@ -3,6 +3,7 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import type { CheckedState } from '@radix-ui/react-checkbox';
 import SyncSettings from '../SyncSettings';
+import Button from '../Button';
 import Checkbox from '../Checkbox';
 import Heading from '../Heading';
 import { Dispatch } from '../../store';
@@ -48,6 +49,12 @@ function Settings() {
     dispatch.uiState.setOnboardingExplainerSyncProviders(false);
   }, [dispatch]);
 
+  const handleResetButton = React.useCallback(() => {
+    dispatch.uiState.setOnboardingExplainerSets(true);
+    dispatch.uiState.setOnboardingExplainerInspect(true);
+    dispatch.uiState.setOnboardingExplainerSyncProviders(true);
+  }, [dispatch]);
+
   return (
     <Box className="content scroll-container">
       <Stack direction="column" gap={4} css={{ padding: '$3 0' }}>
@@ -79,6 +86,9 @@ function Settings() {
               onCheckedChange={handlePrefixWithThemeNameChange}
             />
             <Label htmlFor="prefixStylesWithThemeName">Prefix styles with active theme name</Label>
+          </Stack>
+          <Stack direction="row" gap={3}>
+            <Button variant="primary" size="small" id="reset-onboarding" onClick={handleResetButton}>Reset onboarding</Button>
           </Stack>
         </Stack>
       </Stack>
