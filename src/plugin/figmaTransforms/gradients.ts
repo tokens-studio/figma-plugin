@@ -26,7 +26,7 @@ export function convertStringToFigmaGradient(value: string) {
   const degreesAsNumber = convertDegreeToNumber(gradientDegrees);
   const degrees = -(degreesAsNumber - 90);
   const rad = degrees * (Math.PI / 180);
-  const scale = Math.sqrt(1 + Math.tan(degreesAsNumber * (Math.PI / 180)) ** 2);
+  const scale = degreesAsNumber % 90 === 0 ? 1 : Math.sqrt(1 + Math.tan(degreesAsNumber * (Math.PI / 180)) ** 2);
 
   // start by transforming to the gradient center
   // which for figma is .5 .5 as it is a relative transform
