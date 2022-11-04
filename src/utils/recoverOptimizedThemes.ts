@@ -1,10 +1,15 @@
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { ThemeObjectsList } from '@/types';
-import { AnyTokenList } from '@/types/tokens';
+import { AnyTokenList, SingleToken } from '@/types/tokens';
 
-export default function recoverOptimizedThemes(themes: ThemeObjectsList, tokens: Record<string, AnyTokenList> | null): ThemeObjectsList {
+export default function recoverOptimizedThemes(themes: ThemeObjectsList, tokens: Record<string, AnyTokenList> | SingleToken<true, unknown>[] | null): ThemeObjectsList {
   if (tokens) {
-    const allAvailableTokenSets = Object.keys(tokens);
+    let allAvailableTokenSets: string[] = [];
+    if (Array.isArray(tokens)) {
+      allAvailableTokenSets = ['global'];
+    } else {
+      allAvailableTokenSets = Object.keys(tokens);
+    }
     return themes.map((theme) => {
       const updatedSelectedTokenSets = Object.fromEntries(
         allAvailableTokenSets
