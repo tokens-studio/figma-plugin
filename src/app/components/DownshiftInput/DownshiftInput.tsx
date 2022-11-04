@@ -126,7 +126,34 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
   const referenceTokenTypes = useReferenceTokenType(type as TokenTypes);
   const getHighlightedText = useCallback((text: string, highlight: string) => {
     // Split on highlight term and include term into parts, ignore case
-    const parts = text.split(new RegExp(`(${highlight})`, 'gi'));
+    let parts: string[] = [];
+    try {
+      parts = text.split(new RegExp(`(${highlight})`, 'gi'));
+    } catch {
+      const occurrences: number[] = [];
+      let pos = 0;
+      let i = -1;
+      while (pos !== -1) {
+        pos = text.indexOf(highlight, i + 1);
+        if (pos >= 0) {
+          occurrences.push(pos);
+        }
+        i = pos;
+      }
+      if (occurrences.length === 0) {
+        parts.push(text);
+      } else if (occurrences.length > 0) {
+        parts.push(text.substring(0, occurrences[0]));
+        occurrences.forEach((index) => {
+          parts.push(text.substring(occurrences[index], occurrences[index] + highlight.length));
+          if (index !== occurrences.length - 1) {
+            parts.push(text.substring(occurrences[index] + highlight.length, occurrences[index + 1]));
+          } else {
+            parts.push(text.substring(occurrences[index] + highlight.length, text.length));
+          }
+        });
+      }
+    }
     return (
       <span>
         {parts.map((part, i) => (
@@ -252,7 +279,6 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
                       backgroundColor: highlightedIndex === index ? '$interaction' : '$bgDefault',
                     }}
                     isFocused={highlightedIndex === index}
-
                   >
                     {type === 'color' && (
                     <StyledItemColorDiv>
