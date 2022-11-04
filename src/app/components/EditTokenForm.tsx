@@ -14,7 +14,9 @@ import {
 } from '@/types/tokens';
 import { checkIfAlias, checkIfContainsAlias, getAliasValue } from '@/utils/alias';
 import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
-import { activeTokenSetSelector, updateModeSelector, editTokenSelector } from '@/selectors';
+import {
+  activeTokenSetSelector, updateModeSelector, editTokenSelector, themesListSelector,
+} from '@/selectors';
 import { TokenTypes } from '@/constants/TokenTypes';
 import TypographyInput from './TypographyInput';
 import Stack from './Stack';
@@ -35,11 +37,14 @@ type Props = {
   resolvedTokens: ResolveTokenValuesResult[];
 };
 
+type Choice = { key: string; label: string; enabled?: boolean, unique?: boolean };
+
 // @TODO this needs to be reviewed from a typings perspective + performance
 function EditTokenForm({ resolvedTokens }: Props) {
   const firstInput = React.useRef<HTMLInputElement | null>(null);
   const activeTokenSet = useSelector(activeTokenSetSelector);
   const editToken = useSelector(editTokenSelector);
+  const themes = useSelector(themesListSelector);
   const updateMode = useSelector(updateModeSelector);
   const { editSingleToken, createSingleToken, duplicateSingleToken } = useManageTokens();
   const { remapToken, renameStylesFromTokens } = useTokens();
@@ -283,24 +288,27 @@ function EditTokenForm({ resolvedTokens }: Props) {
         // When users change token names references are still pointing to the old name, ask user to remap
         if (oldName && oldName !== newName) {
           track('Edit token', { renamed: true, type: internalEditToken.type });
+          const choices: Choice[] = [
+            {
+              key: UpdateMode.SELECTION, label: 'Selection', unique: true, enabled: UpdateMode.SELECTION === updateMode,
+            },
+            {
+              key: UpdateMode.PAGE, label: 'Page', unique: true, enabled: UpdateMode.PAGE === updateMode,
+            },
+            {
+              key: UpdateMode.DOCUMENT, label: 'Document', unique: true, enabled: UpdateMode.DOCUMENT === updateMode,
+            },
+          ];
+          if (themes.length > 0 && [TokenTypes.COLOR, TokenTypes.TYPOGRAPHY, TokenTypes.BOX_SHADOW].includes(internalEditToken.type)) {
+            choices.push({
+              key: StyleOptions.RENAME, label: 'Rename styles',
+            });
+          }
 
           const shouldRemap = await confirm({
             text: `Remap all tokens that use ${oldName} to ${newName}?`,
             description: 'This will change all layers that used the old token name. This could take a while.',
-            choices: [
-              {
-                key: UpdateMode.SELECTION, label: 'Selection', unique: true, enabled: UpdateMode.SELECTION === updateMode,
-              },
-              {
-                key: UpdateMode.PAGE, label: 'Page', unique: true, enabled: UpdateMode.PAGE === updateMode,
-              },
-              {
-                key: UpdateMode.DOCUMENT, label: 'Document', unique: true, enabled: UpdateMode.DOCUMENT === updateMode,
-              },
-              {
-                key: StyleOptions.RENAME, label: 'Rename styles',
-              },
-            ],
+            choices,
           });
           if (shouldRemap) {
             remapToken(oldName, newName, shouldRemap.data[0]);
