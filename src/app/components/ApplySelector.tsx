@@ -13,14 +13,16 @@ import {
 } from './DropdownMenu';
 import { Dispatch } from '../store';
 import IconChevronDown from '@/icons/chevrondown.svg';
-import { settingsStateSelector } from '@/selectors';
+import { settingsStateSelector, storageTypeSelector } from '@/selectors';
 import { isEqual } from '@/utils/isEqual';
+import { StorageProviderType } from '@/constants/StorageProviderType';
 import { UpdateMode } from '@/constants/UpdateMode';
 
 export default function ApplySelector() {
   const {
     updateMode, updateRemote, updateOnChange, updateStyles,
   } = useSelector(settingsStateSelector, isEqual);
+  const storageType = useSelector(storageTypeSelector);
 
   const {
     setUpdateMode, setUpdateOnChange, setUpdateRemote, setUpdateStyles,
@@ -91,12 +93,14 @@ export default function ApplySelector() {
           </DropdownMenuItemIndicator>
           Update on change
         </DropdownMenuCheckboxItem>
-        <DropdownMenuCheckboxItem checked={updateRemote} onCheckedChange={handleUpdateRemote}>
-          <DropdownMenuItemIndicator>
-            <CheckIcon />
-          </DropdownMenuItemIndicator>
-          Update remote
-        </DropdownMenuCheckboxItem>
+        {storageType.provider === StorageProviderType.JSONBIN && (
+          <DropdownMenuCheckboxItem checked={updateRemote} onCheckedChange={handleUpdateRemote}>
+            <DropdownMenuItemIndicator>
+              <CheckIcon />
+            </DropdownMenuItemIndicator>
+            Update remote
+          </DropdownMenuCheckboxItem>
+        )}
         <DropdownMenuCheckboxItem checked={updateStyles} onCheckedChange={handleUpdateStyles}>
           <DropdownMenuItemIndicator>
             <CheckIcon />
