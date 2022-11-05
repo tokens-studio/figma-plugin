@@ -36,6 +36,11 @@ export const StyledButton = styled('button', {
           background: '$bgHoverBtnGhost',
         },
       },
+      danger: {
+        background: '$bgBtnSecondary',
+        color: '$fgDanger',
+        borderColor: '$border',
+      },
     },
   },
 });

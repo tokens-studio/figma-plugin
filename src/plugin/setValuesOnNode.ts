@@ -38,6 +38,8 @@ export default async function setValuesOnNode(
     : null;
   const stylePathSlice = ignoreFirstPartForStyles ? 1 : 0;
   const stylePathPrefix = prefixStylesWithThemeName && activeThemeObject ? activeThemeObject.name : null;
+  console.log('style ids');
+
   try {
     // BORDER RADIUS
     if (
