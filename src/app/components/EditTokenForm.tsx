@@ -494,6 +494,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
           <Textarea
             key="description"
             value={internalEditToken?.description || ''}
+            placeholder="Optional description"
             onChange={handleDescriptionChange}
             rows={3}
             border

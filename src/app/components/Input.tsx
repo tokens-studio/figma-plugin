@@ -179,7 +179,9 @@ const Input = React.forwardRef<HTMLInputElement, Props>(({
 
   React.useEffect(() => {
     if (autofocus && htmlInputRef && htmlInputRef.current) {
-      htmlInputRef.current.focus();
+      setTimeout(() => {
+        htmlInputRef.current?.focus();
+      }, 50);
     }
   }, [autofocus, htmlInputRef]);
 
