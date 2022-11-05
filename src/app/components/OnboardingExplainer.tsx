@@ -45,11 +45,9 @@ export default function OnboardingExplainer({ data, closeOnboarding }: Props) {
         </Stack>
         <IconButton dataCy="closeButton" onClick={closeOnboarding} icon={<Cross1Icon />} />
       </Stack>
-      {data.text.split('\n').map((text) => (
-        <StyledTextPlan>
-          {text}
-        </StyledTextPlan>
-      ))}
+      <StyledTextPlan>
+        {data.text}
+      </StyledTextPlan>
       <StyledReadMoreLink href={data.url} target="_blank" rel="noreferrer">
         Read more
       </StyledReadMoreLink>

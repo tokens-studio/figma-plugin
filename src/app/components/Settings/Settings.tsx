@@ -53,6 +53,7 @@ function Settings() {
     dispatch.uiState.setOnboardingExplainerSets(true);
     dispatch.uiState.setOnboardingExplainerInspect(true);
     dispatch.uiState.setOnboardingExplainerSyncProviders(true);
+    dispatch.uiState.setLastOpened(0);
   }, [dispatch]);
 
   return (
