@@ -13,7 +13,6 @@ import TokenNodes from './inspector/TokenNodes';
 import { inspectStateSelector } from '@/selectors';
 import { useTypeForProperty } from '../hooks/useTypeForProperty';
 import Button from './Button';
-import Heading from './Heading';
 import DownshiftInput from './DownshiftInput';
 import Modal from './Modal';
 import Stack from './Stack';
@@ -115,28 +114,21 @@ export default function InspectorTokenSingle({
         </Box>
         {
           showDialog && (
-            <Modal large isOpen close={onCancel}>
+            <Modal title={`Choose a new token for ${mappedToken?.name || token.value}`} large isOpen close={onCancel}>
               <form
                 onSubmit={onConfirm}
               >
                 <Stack direction="column" gap={4} css={{ minHeight: '215px', justifyContent: 'center' }}>
-                  <Stack direction="column" gap={2}>
-                    <Heading>
-                      Choose a new token for
-                      {' '}
-                      {mappedToken?.name || token.value}
-                    </Heading>
-                    <DownshiftInput
-                      value={newTokenName}
-                      type={property === 'fill' ? 'color' : property}
-                      resolvedTokens={resolvedTokens}
-                      handleChange={handleChange}
-                      setInputValue={handleDownShiftInputChange}
-                      placeholder="Choose a new token"
-                      suffix
-                    />
+                  <DownshiftInput
+                    value={newTokenName}
+                    type={property === 'fill' ? 'color' : property}
+                    resolvedTokens={resolvedTokens}
+                    handleChange={handleChange}
+                    setInputValue={handleDownShiftInputChange}
+                    placeholder="Choose a new token"
+                    suffix
+                  />
 
-                  </Stack>
                   <Stack direction="row" gap={4} justify="between">
                     <Button variant="secondary" onClick={onCancel}>
                       Cancel
