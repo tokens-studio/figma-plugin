@@ -1,8 +1,9 @@
 import { mockRootSetSharedPluginData } from '../../tests/__mocks__/figmaMock';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import {
-  destructureCompositionToken, mapValuesToTokens, returnValueToLookFor, saveStorageType,
+  destructureCompositionToken, mapValuesToTokens, returnValueToLookFor, saveStorageType, saveOnboardingExplainerSets, saveOnboardingExplainerInspect, saveOnboardingExplainerSyncProviders,
 } from './node';
+import getOnboardingExplainer from '@/utils/getOnboardingExplainer';
 
 const singleShadowToken = {
   type: 'boxShadow',
@@ -78,7 +79,7 @@ const tokens = new Map([
       },
       rawValue: {
         opacity: '{opacity.40}',
-        borderRadius: '{borde-radius.7}',
+        borderRadius: '{border-radius.7}',
       },
     },
   ],
@@ -261,5 +262,25 @@ describe('storage type', () => {
     saveStorageType(apiContext);
 
     expect(mockRootSetSharedPluginData).toBeCalledWith('tokens', 'storageType', JSON.stringify(apiContext));
+  });
+});
+
+describe('onboarding explainer store', () => {
+  it('should save the onboardingexplainersyncproviders', async () => {
+    saveOnboardingExplainerSyncProviders(true);
+    const data = await getOnboardingExplainer();
+    expect(data.syncProviders).toEqual(true);
+  });
+
+  it('should save the onboardingexplainersets', async () => {
+    saveOnboardingExplainerSets(true);
+    const data = await getOnboardingExplainer();
+    expect(data.sets).toEqual(true);
+  });
+
+  it('should save the onboardingexplainerinspect', async () => {
+    saveOnboardingExplainerInspect(true);
+    const data = await getOnboardingExplainer();
+    expect(data.inspect).toEqual(true);
   });
 });

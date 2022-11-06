@@ -3,12 +3,12 @@ import { styled } from '@/stitches.config';
 import Tooltip from './Tooltip';
 import { StyledDirtyStateBadge } from './StyledDirtyStateBadge';
 import { StitchesCSS } from '@/types';
+import Spinner from './Spinner';
 
 const commonStyles = {
   all: 'unset',
   backgroundColor: 'red',
   border: 'none',
-  padding: '$2',
   borderRadius: '$button',
   cursor: 'pointer',
   '&:not(:disabled):hover, &:not(:disabled):focus': {
@@ -19,6 +19,14 @@ const commonStyles = {
     opacity: 0.5,
   },
   variants: {
+    size: {
+      medium: {
+        padding: '$2',
+      },
+      large: {
+        padding: '$3',
+      },
+    },
     buttonVariant: {
       primary: {
         display: 'block',
@@ -49,10 +57,12 @@ type Props = {
   disabled?: boolean;
   tooltip?: string;
   dataCy?: string;
+  loading?: boolean;
   icon: any;
   css?: StitchesCSS;
   className?: string
   variant?: StyledButtonProps['buttonVariant'];
+  size?: 'medium' | 'large';
   tooltipSide?: 'bottom' | 'left' | 'top' | undefined;
   onClick?: () => void;
   href?: string;
@@ -73,12 +83,14 @@ export default function IconButton({
   disabled = false,
   tooltip,
   dataCy,
+  loading,
   onClick,
   href,
   icon,
   css,
   className,
   variant = 'default',
+  size = 'medium',
   tooltipSide = 'left',
   badge,
 }: Props) {
@@ -98,9 +110,10 @@ export default function IconButton({
               rel="noreferrer"
               href={href}
               data-cy={dataCy}
+              size={size}
               buttonVariant={variant}
             >
-              <IconButtonInnerContent icon={icon} badge={badge} />
+              <IconButtonInnerContent icon={loading ? <Spinner /> : icon} badge={badge} />
             </StyledLink>
           </Box>
         ) : (
@@ -111,9 +124,10 @@ export default function IconButton({
             data-cy={dataCy}
             type="button"
             onClick={handleClick}
+            size={size}
             buttonVariant={variant}
           >
-            <IconButtonInnerContent icon={icon} badge={badge} />
+            <IconButtonInnerContent icon={loading ? <Spinner /> : icon} badge={badge} />
           </StyledButton>
         )}
       </Tooltip>
