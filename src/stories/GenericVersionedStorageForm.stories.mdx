@@ -6,6 +6,7 @@ import GenericVersioned from '@/app/components/StorageItemForm/GenericVersioned'
   title='GenericVersionedForm' 
   component={GenericVersioned}
   args={{
+    onChange:()=>{},
     values: {
       name: '', 
       additionalHeaders: [],
@@ -21,7 +22,7 @@ import GenericVersioned from '@/app/components/StorageItemForm/GenericVersioned'
 export const GenericVersionedDefaultStory = (args) => {
   return (
     <>
-    <GenericVersioned values={args.values}/>
+    <GenericVersioned {...args}/>
     </>
   )
 }

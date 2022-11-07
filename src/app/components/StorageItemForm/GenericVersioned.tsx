@@ -1,8 +1,9 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import zod from 'zod';
 import { StorageTypeFormValues, GenericVersionedStorageFlow } from '@/types/StorageType';
 import XIcon from '@/icons/x.svg';
 import Button from '../Button';
+import { StyledButton } from '../Button/StyledButton';
 import Input from '../Input';
 import Box from '../Box';
 import Stack from '../Stack';
@@ -36,13 +37,11 @@ const zodSchema = zod.object({
   internalId: zod.string().optional(),
 });
 
-
 export default function GenericVersionedForm({
   onChange, onSubmit, onCancel, values, hasErrored, errorMessage,
 }: Props) {
   const handleSubmit = React.useCallback((event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-
     const validationResult = zodSchema.safeParse(values);
     if (validationResult.success) {
       const formFields = {
@@ -54,14 +53,31 @@ export default function GenericVersionedForm({
     }
   }, [values, onSubmit]);
 
-  // Always leave headers at the end
-  const headers = [...(values.additionalHeaders || []), { name: '', value: '' }];
+  const handleValueChange = useCallback((flow: string) => onChange({
+    target: {
+      name: 'flow',
+      value: flow as GenericVersionedStorageFlow,
+    },
+  }), [onChange]);
 
-  const headerChange = useCallback((headers) => {
+  const flow = useMemo(() => {
+    // If the form was created initially, default to Read write flow
+    if (typeof values.flow === 'undefined') {
+      const defaultFlow = GenericVersionedStorageFlow.READ_WRITE;
+      handleValueChange(defaultFlow);
+      return defaultFlow;
+    }
+    return values.flow;
+  }, [handleValueChange, values.flow]);
+
+  // Always leave headers at the end
+  const headers = useMemo(() => [...(values.additionalHeaders || []), { name: '', value: '' }], [values.additionalHeaders]);
+
+  const headerChange = useCallback((changedHeaders) => {
     onChange({
       target: {
         name: 'additionalHeaders',
-        value: headers,
+        value: changedHeaders,
       },
     });
   }, [onChange]);
@@ -70,8 +86,7 @@ export default function GenericVersionedForm({
     const key = e.target.name;
     const { value } = e.target;
 
-    const index = Number(e.target.getAttribute('data-index'));
-    // const accessor = e.target.name.split('.');
+    const index = Number(e.target.dataset.index);
 
     // Attempt to access the header at that value
     const sampleHeader = headers[index];
@@ -89,20 +104,13 @@ export default function GenericVersionedForm({
   }, [headerChange, headers]);
 
   const handleClose = useCallback((e) => {
-    const index = Number(e.target.getAttribute('data-index'));
+    const index = Number(e.target.dataset.index);
 
     const removedHeaders = [...headers];
     removedHeaders.splice(index, 1);
     const newHeaders = removedHeaders.filter((x) => x.name.length);
     headerChange(newHeaders);
   }, [headers, headerChange]);
-
-  const handleValueChange = useCallback((flow: string) => onChange({
-    target: {
-      name: 'flow',
-      value: flow as GenericVersionedStorageFlow,
-    },
-  }), [onChange]);
 
   return (
     <form onSubmit={handleSubmit}>
@@ -121,7 +129,7 @@ export default function GenericVersionedForm({
           <DropdownMenuTrigger data-cy="flow-dropdown" data-testid="flow-dropdown">
             <Box css={{ display: 'flex', gap: '1em' }}>
               <Text size="small">Flow Type: </Text>
-              <Text size="small">{values.flow}</Text>
+              <Text size="small">{flow}</Text>
             </Box>
           </DropdownMenuTrigger>
           <DropdownMenuContent
@@ -168,14 +176,14 @@ export default function GenericVersionedForm({
                 name="value"
                 data-index={i}
               />
-              <button
-                type="button"
+              <StyledButton
                 onClick={handleClose}
                 data-index={i}
-                className="p-4 hover:bg-gray-100 rounded focus:outline-none"
+                size="small"
+                variant="ghost"
               >
                 <XIcon />
-              </button>
+              </StyledButton>
             </Box>
           ))}
         </Stack>

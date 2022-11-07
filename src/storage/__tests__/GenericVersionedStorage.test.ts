@@ -77,7 +77,7 @@ describe('GenericVersionedStorage', () => {
       })
     ));
 
-    const storage = new GenericVersionedStorage(url, defaultHeaders);
+    const storage = new GenericVersionedStorage(url, GenericVersionedStorageFlow.READ_WRITE_CREATE, defaultHeaders);
     const result = await storage.read();
 
     expect(result[0]).toEqual({
@@ -121,7 +121,7 @@ describe('GenericVersionedStorage', () => {
       })
     ));
 
-    const storage = new GenericVersionedStorage(url, defaultHeaders);
+    const storage = new GenericVersionedStorage(url, GenericVersionedStorageFlow.READ_WRITE_CREATE, defaultHeaders);
     expect(await storage.read()).toEqual([]);
   });
 
@@ -129,7 +129,7 @@ describe('GenericVersionedStorage', () => {
     jest.useFakeTimers('modern');
     jest.setSystemTime(Date.UTC(2022, 5, 15, 10, 0, 0));
 
-    const storage = new GenericVersionedStorage(url, defaultHeaders);
+    const storage = new GenericVersionedStorage(url, GenericVersionedStorageFlow.READ_WRITE_CREATE, defaultHeaders);
     await storage.write([
       {
         type: 'themes',
@@ -194,7 +194,7 @@ describe('GenericVersionedStorage', () => {
     mockFetch.mockImplementationOnce(() => ({
       ok: false,
     }));
-    const storage = new GenericVersionedStorage(url, defaultHeaders);
+    const storage = new GenericVersionedStorage(url, GenericVersionedStorageFlow.READ_WRITE_CREATE, defaultHeaders);
     expect(await storage.write([])).toEqual(false);
   });
 });

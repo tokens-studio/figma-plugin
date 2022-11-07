@@ -8,7 +8,7 @@ import BitbucketForm from './StorageItemForm/BitbucketForm';
 
 import { useFlags } from './LaunchDarkly';
 import { ChangeEventHandler } from './StorageItemForm/types';
-import { StorageTypeFormValues, GenericVersionedStorageFlow } from '@/types/StorageType';
+import { StorageTypeFormValues } from '@/types/StorageType';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 
 type Props = {
@@ -22,27 +22,11 @@ type Props = {
 
 };
 
-const getInitialValues = (values: StorageTypeFormValues<true>) => {
-  switch (values.provider) {
-    case StorageProviderType.GENERIC_VERSIONED_STORAGE:
-      return {
-        additionalHeaders: [],
-        flow: GenericVersionedStorageFlow.READ_WRITE,
-        ...values,
-      };
-
-    default:
-      return values;
-  }
-};
-
 export default function StorageItemForm({
   isNew = false, onChange, onSubmit, onCancel, values, hasErrored, errorMessage,
 }: Props) {
   const { bitBucketSync } = useFlags();
-  if (isNew) {
-    values = getInitialValues(values);
-  }
+
   switch (values.provider) {
     case StorageProviderType.GITHUB:
     case StorageProviderType.GITLAB: {

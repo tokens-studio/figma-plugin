@@ -26,7 +26,7 @@ export async function updateGenericVersionedTokens({
   try {
     if (!id) throw new Error('Missing Generic Versioned Storage ID ');
 
-    const storage = new GenericVersionedStorage(id, additionalHeaders);
+    const storage = new GenericVersionedStorage(id, flow, additionalHeaders);
     const payload = {
       tokens,
       themes,
@@ -123,7 +123,7 @@ export function useGenericVersionedStorage() {
     } = context;
     if (!id) return null;
     try {
-      const storage = new GenericVersionedStorage(id, additionalHeaders);
+      const storage = new GenericVersionedStorage(id, flow, additionalHeaders);
       const data = await storage.retrieve();
       dispatch.uiState.setProjectURL(id);
 

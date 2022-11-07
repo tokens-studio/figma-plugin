@@ -43,6 +43,8 @@ export class GenericVersionedStorage extends RemoteTokenStorage<GenericVersioned
 
   private defaultHeaders: Headers;
 
+  private flow: GenericVersionedStorageFlow;
+
   public static async create(url: string, updatedAt: string, flow: GenericVersionedStorageFlow, headers: GenericVersionedAdditionalHeaders = []): Promise<false | {
     metadata: { id: string }
   }> {
@@ -89,10 +91,10 @@ export class GenericVersionedStorage extends RemoteTokenStorage<GenericVersioned
     return false;
   }
 
-  constructor(url: string, headers: GenericVersionedAdditionalHeaders = []) {
+  constructor(url: string, flow: GenericVersionedStorageFlow, headers: GenericVersionedAdditionalHeaders = []) {
     super();
     this.url = url;
-
+    this.flow = flow;
     this.defaultHeaders = new Headers([
       ['Content-Type', 'application/json'],
       ...flattenHeaders(headers),
@@ -148,6 +150,10 @@ export class GenericVersionedStorage extends RemoteTokenStorage<GenericVersioned
   }
 
   public async write(files: RemoteTokenStorageFile<GenericVersionedMeta>[]): Promise<boolean> {
+    if (this.flow === GenericVersionedStorageFlow.READ_ONLY) {
+      throw new Error('Attempting to write to endpoint of Versioned storage when in Read Only mode');
+    }
+
     const dataObject: GenericVersionedData = {
       version: pjs.plugin_version,
       updatedAt: (new Date()).toISOString(),
