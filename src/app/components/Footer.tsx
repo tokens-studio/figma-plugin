@@ -29,6 +29,7 @@ import { isGitProvider } from '@/utils/is';
 import IconLibrary from '@/icons/library.svg';
 import ProBadge from './ProBadge';
 import { compareLastSyncedState } from '@/utils/compareLastSyncedState';
+import SecondScreen from './SecondScreen';
 
 export default function Footer() {
   const storageType = useSelector(storageTypeSelector);
@@ -46,13 +47,11 @@ export default function Footer() {
   const checkForChanges = React.useCallback(() => {
     const tokenSetOrder = Object.keys(tokens);
     const defaultMetadata = storageType.provider !== StorageProviderType.LOCAL ? { tokenSetOrder } : {};
-    const hasChanged = !compareLastSyncedState(
-      tokens,
-      themes,
+    const hasChanged = !compareLastSyncedState(tokens, themes, defaultMetadata, lastSyncedState, [
+      {},
+      [],
       defaultMetadata,
-      lastSyncedState,
-      [{}, [], defaultMetadata],
-    );
+    ]);
     dispatch.tokenState.updateCheckForChanges(hasChanged);
     return hasChanged;
   }, [lastSyncedState, storageType, tokens, themes, dispatch.tokenState]);
@@ -79,7 +78,11 @@ export default function Footer() {
   }, []);
 
   const onPushButtonClicked = React.useCallback(() => pushTokens(), [pushTokens]);
-  const onPullButtonClicked = React.useCallback(() => pullTokens({ usedTokenSet, activeTheme }), [pullTokens, usedTokenSet, activeTheme]);
+  const onPullButtonClicked = React.useCallback(() => pullTokens({ usedTokenSet, activeTheme }), [
+    pullTokens,
+    usedTokenSet,
+    activeTheme,
+  ]);
   const handlePullTokens = useCallback(() => {
     pullTokens({ usedTokenSet, activeTheme });
   }, [pullTokens, usedTokenSet, activeTheme]);
@@ -98,10 +101,25 @@ export default function Footer() {
         {isGitProvider(localApiState) && localApiState.branch && (
           <>
             <BranchSelector />
-            <IconButton dataCy="footer-pull-button" icon={<DownloadIcon />} onClick={onPullButtonClicked} tooltipSide="top" tooltip={`Pull from ${transformProviderName(storageType.provider)}`} />
-            <IconButton dataCy="footer-push-button" badge={hasChanges} icon={<UploadIcon />} onClick={onPushButtonClicked} tooltipSide="top" disabled={editProhibited} tooltip={`Push to ${transformProviderName(storageType.provider)}`} />
+            <IconButton
+              dataCy="footer-pull-button"
+              icon={<DownloadIcon />}
+              onClick={onPullButtonClicked}
+              tooltipSide="top"
+              tooltip={`Pull from ${transformProviderName(storageType.provider)}`}
+            />
+            <IconButton
+              dataCy="footer-push-button"
+              badge={hasChanges}
+              icon={<UploadIcon />}
+              onClick={onPushButtonClicked}
+              tooltipSide="top"
+              disabled={editProhibited}
+              tooltip={`Push to ${transformProviderName(storageType.provider)}`}
+            />
           </>
         )}
+        <SecondScreen />
         {storageType.provider !== StorageProviderType.LOCAL
           && storageType.provider !== StorageProviderType.GITHUB
           && storageType.provider !== StorageProviderType.GITLAB
@@ -123,9 +141,7 @@ export default function Footer() {
         )}
       </Stack>
       <Stack direction="row" gap={4} align="center">
-        <Box css={{ color: '$textMuted', fontSize: '$xsmall' }}>
-          {`V ${pjs.plugin_version}`}
-        </Box>
+        <Box css={{ color: '$textMuted', fontSize: '$xsmall' }}>{`V ${pjs.plugin_version}`}</Box>
         <Stack direction="row" gap={1}>
           <ProBadge />
           <IconButton href="https://docs.tokens.studio/?ref=pf" icon={<DocsIcon />} tooltip="Docs" />
