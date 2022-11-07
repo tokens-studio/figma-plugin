@@ -6,11 +6,11 @@ import { TokenSetStatus } from '@/constants/TokenSetStatus';
 export function updateTokenSetsInState(
   state: TokenState,
   mutate: ((name: string, tokenList: AnyTokenList) => null | [string, AnyTokenList]) | null,
-  ...newTokenSets: ([string] | [string, AnyTokenList])[]
+  ...newTokenSets: ([string] | [string, AnyTokenList] | [string, AnyTokenList, number])[]
 ): TokenState {
   const deletedTokenSets = new Set<string>();
   const renamedTokenSets = new Map<string, string>();
-  let entries = Object.entries(state.tokens).reduce<[string, AnyTokenList][]>((acc, [name, tokenList]) => {
+  const entries = Object.entries(state.tokens).reduce<[string, AnyTokenList][]>((acc, [name, tokenList]) => {
     if (mutate) {
       const mutated = mutate(name, tokenList);
       if (mutated !== null) {
@@ -27,16 +27,10 @@ export function updateTokenSetsInState(
     return acc;
   }, []);
 
-  const newSets = newTokenSets.map((newSet) => (
-    newSet.length === 1 ? [newSet[0], []] : newSet
-  ));
-  if (newTokenSets.length === 1 && newTokenSets[0].length === 2 && newTokenSets[0][0].endsWith('_Copy')) {
-    const originalName = newTokenSets[0][0].substring(0, newTokenSets[0][0].lastIndexOf('_Copy'));
-    const originalSetIndex = entries.findIndex((group) => group[0] === originalName);
-    entries = entries.slice(0, originalSetIndex + 1).concat(newSets as [string, AnyTokenList][]).concat(entries.slice(originalSetIndex + 1));
-  } else {
-    entries = entries.concat(newSets as [string, AnyTokenList][]);
-  }
+  newTokenSets.forEach((newSet) => {
+    const insertAt = newSet.length === 3 ? newSet[2] : entries.length;
+    entries.splice(insertAt, 0, [newSet[0], newSet?.[1] ?? []]);
+  });
 
   let nextActiveTokenSet = state.activeTokenSet;
   if (deletedTokenSets.has(state.activeTokenSet)) {
