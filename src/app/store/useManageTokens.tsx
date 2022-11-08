@@ -10,7 +10,7 @@ import {
   DeleteTokenPayload, DuplicateTokenPayload, UpdateTokenPayload,
 } from '@/types/payloads';
 import useTokens from './useTokens';
-
+import { StyleOptions } from '@/constants/StyleOptions';
 // @TODO this typing could be more strict in the future
 
 type EditSingleTokenData = {
@@ -31,6 +31,8 @@ type CreateSingleTokenData = {
   description?: string;
   shouldUpdateDocument?: boolean;
 };
+
+type Choice = { key: string; label: string; enabled?: boolean, unique?: boolean };
 
 export default function useManageTokens() {
   const store = useStore<RootState>();
@@ -103,14 +105,17 @@ export default function useManageTokens() {
   }, [duplicateToken, dispatch.uiState]);
 
   const deleteSingleToken = useCallback(async (data: DeleteTokenPayload) => {
+    const choices: Choice[] = [];
+    if (store.getState().tokenState.themes.length > 0 && data.type && [TokenTypes.COLOR, TokenTypes.TYPOGRAPHY, TokenTypes.BOX_SHADOW].includes(data?.type)) {
+      choices.push({
+        key: StyleOptions.REMOVE, label: 'Delete associated style',
+      });
+    }
+
     const userConfirmation = await confirm({
       text: 'Delete token?',
       description: 'Are you sure you want to delete this token?',
-      choices: [
-        {
-          key: 'delete-style', label: 'Delete associated style',
-        },
-      ],
+      choices,
     });
     if (userConfirmation) {
       dispatch.uiState.startJob({
@@ -118,7 +123,7 @@ export default function useManageTokens() {
         isInfinite: true,
       });
       deleteToken(data);
-      if (Array.isArray(userConfirmation.data) && userConfirmation.data.length) {
+      if (Array.isArray(userConfirmation.data) && userConfirmation.data.includes(StyleOptions.REMOVE)) {
         removeStylesFromTokens(data);
       }
       dispatch.uiState.completeJob(BackgroundJobs.UI_DELETETOKEN);

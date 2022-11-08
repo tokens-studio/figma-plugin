@@ -7,7 +7,7 @@ import Stack from './Stack';
 import IconButton from './IconButton';
 
 const StyledInfoIconButton = styled(InfoCircledIcon, {
-  color: '$interaction',
+  color: '$fgAccent',
 });
 
 const StyledTextPlan = styled('p', {
@@ -17,7 +17,7 @@ const StyledTextPlan = styled('p', {
 });
 
 const StyledReadMoreLink = styled('a', {
-  color: '$interaction',
+  color: '$fgAccent',
   fontSize: '$xsmall',
 });
 

@@ -24,7 +24,7 @@ export default function InspectorMultiView({ resolvedTokens }: { resolvedTokens:
   const onboardingData = {
     title: 'Inspect',
     text: 'This is where applied tokens of your selection show up, you can use Deep Inspect to scan the selected layers and all of its children.',
-    url: 'https://docs.figmatokens.com/multi-inspect?ref=onboarding_explainer_inspect',
+    url: 'https://docs.figmatokens.com/inspect/multi-inspect?ref=onboarding_explainer_inspect',
   };
 
   const inspectState = useSelector(inspectStateSelector, isEqual);
