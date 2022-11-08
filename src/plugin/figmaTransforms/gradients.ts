@@ -23,8 +23,10 @@ export function convertStringToFigmaGradient(value: string) {
     .split(', ');
     // subtract 90 and negate it -- figma's roation goes anti-clockwise and 0deg
     // is left-right as opposed to bottom-top in css
-  const degrees = -(convertDegreeToNumber(gradientDegrees) - 90);
+  const degreesAsNumber = convertDegreeToNumber(gradientDegrees);
+  const degrees = -(degreesAsNumber - 90);
   const rad = degrees * (Math.PI / 180);
+  const scale = degreesAsNumber % 90 === 0 ? 1 : Math.sqrt(1 + Math.tan(degreesAsNumber * (Math.PI / 180)) ** 2);
 
   // start by transforming to the gradient center
   // which for figma is .5 .5 as it is a relative transform
@@ -37,6 +39,13 @@ export function convertStringToFigmaGradient(value: string) {
     new Matrix([
       [Math.cos(rad), Math.sin(rad), 0],
       [-Math.sin(rad), Math.cos(rad), 0],
+      [0, 0, 1],
+    ]),
+  ).mmul(
+    // next we need to multiply it with a scale matrix to fill the entire shape
+    new Matrix([
+      [scale, 0, 0],
+      [0, scale, 0],
       [0, 0, 1],
     ]),
   ).mmul(
