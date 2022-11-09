@@ -49,6 +49,7 @@ export function Initiator() {
 
             // Selection values are all tokens across all layers, used in Multi Inspector.
             if (selectionValues) {
+              console.log('selectact', selectionValues)
               const orderObj = convertToOrderObj(Properties);
               const sortedSelectionValues = selectionValues.sort((a, b) => orderObj[a.type] - orderObj[b.type]);
               dispatch.uiState.setSelectionValues(sortedSelectionValues);

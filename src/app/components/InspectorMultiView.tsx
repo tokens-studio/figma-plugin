@@ -59,6 +59,10 @@ export default function InspectorMultiView({ resolvedTokens }: { resolvedTokens:
     }, {})
   ), [uiState.selectionValues]);
 
+  React.useEffect(() => {
+    console.log('uidsta', uiState.selectionValues)
+  }, [uiState.selectionValues])
+
   const removeTokens = React.useCallback(() => {
     const valuesToRemove = uiState.selectionValues
       .filter((v) => inspectState.selectedTokens.includes(`${v.category}-${v.value}`))
