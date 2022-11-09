@@ -8,6 +8,7 @@ import { sendPluginValues, updatePluginData } from '../pluginData';
 export const setNodeData: AsyncMessageChannelHandlers[AsyncMessageTypes.SET_NODE_DATA] = async (msg) => {
   try {
     if (figma.currentPage.selection.length) {
+      console.log('setnodedata')
       const tokensMap = tokenArrayGroupToMap(msg.tokens);
       const nodes = await defaultNodeManager.update(figma.currentPage.selection);
       await updatePluginData({ entries: nodes, values: msg.values, tokensMap });
