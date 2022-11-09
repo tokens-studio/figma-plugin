@@ -29,6 +29,7 @@ export function Initiator() {
         const { pluginMessage } = event.data;
         switch (pluginMessage.type) {
           case MessageFromPluginTypes.SELECTION: {
+            console.log('sdfsdf')
             const { selectionValues, mainNodeSelectionValues, selectedNodes } = pluginMessage;
             dispatch.uiState.setSelectedLayers(selectedNodes);
             dispatch.uiState.setDisabled(false);
