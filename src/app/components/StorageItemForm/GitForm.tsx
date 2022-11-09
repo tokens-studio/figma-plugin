@@ -67,7 +67,7 @@ export default function GitForm({
         </Box>
         <Input
           full
-          label="Repository (username/repo)"
+          label="Repository (owner/repo)"
           value={values.id}
           onChange={onChange}
           type="text"

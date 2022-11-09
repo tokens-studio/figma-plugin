@@ -103,8 +103,8 @@ function StartScreen() {
         {storageType?.provider !== StorageProviderType.LOCAL ? (
           <Callout
             id="callout-action-setupsync"
-            heading={`Couldn't fetch tokens stored on ${transformProviderName(storageType?.provider)}`}
-            description="Unable to fetch tokens, if you haven't added credentials yet add them in the next step. Otherwise make sure the file exists and you have access to it."
+            heading={`Couldn't load tokens stored on ${transformProviderName(storageType?.provider)}`}
+            description="Unable to fetch tokens from remote storage, if you haven't added credentials yet add them in the next step. Otherwise make sure the file exists and you have access to it."
             action={{
               onClick: onSetSyncClick,
               text: 'Enter credentials',

@@ -152,7 +152,7 @@ describe('pullTokensFactory', () => {
     expect(state.uiState.activeTab).toEqual(Tabs.TOKENS);
   });
 
-  it('should pull remote tokens and go to START tab if there are no tokens in the remote storage', async () => {
+  it('should pull remote tokens and go to Tokens tab if there are no tokens in the remote storage', async () => {
     const mockStore = createMockStore({
       uiState: {
         storageType: mockStorageType,
@@ -193,7 +193,7 @@ describe('pullTokensFactory', () => {
     expect(state.uiState.api).toEqual({ ...mockStorageType, secret: 'secret' });
     expect(state.uiState.localApiState).toEqual({ ...mockStorageType, secret: 'secret' });
     expect(mockPullTokens).toBeCalledTimes(1);
-    expect(state.uiState.activeTab).toEqual(Tabs.START);
+    expect(state.uiState.activeTab).toEqual(Tabs.TOKENS);
   });
 
   it('should verify the API credentials without pulling if there are local changes', async () => {
