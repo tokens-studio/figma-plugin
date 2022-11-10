@@ -160,6 +160,7 @@ export async function updatePluginData({
             break;
         }
       }));
+      console.log('newvaue', newValuesOnNode)
       await defaultNodeManager.updateNode(node, newValuesOnNode);
 
       const nodeHasNoValues = Object.keys(newValuesOnNode).length === 0 && newValuesOnNode.constructor === Object;

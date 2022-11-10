@@ -298,10 +298,11 @@ export class NodeManager {
       });
 
     await this.update(unregisteredNodes);
-
     const relevantNodeIds = relevantNodes.map((node) => node.id);
+    console.log('relevantNodeIds', relevantNodeIds)
     const resultingNodes = compact(relevantNodeIds.map((nodeId) => {
       const cache = this.nodes.get(nodeId);
+      console.log('cache', cache)
       if (cache && hasTokens(cache.tokens)) {
         return cache;
       }
