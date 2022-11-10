@@ -476,6 +476,7 @@ export const tokenState = createModel<RootModel>()({
       dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
     },
     updateDocument(options?: UpdateDocumentPayload, rootState?) {
+      console.log('update')
       const defaults = { shouldUpdateNodes: true, updateRemote: true };
       const params = { ...defaults, ...options };
       try {
