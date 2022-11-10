@@ -290,13 +290,8 @@ export class NodeManager {
     } else {
       relevantNodes = findAll([figma.root], false);
     }
-    const unregisteredNodes = relevantNodes
-      .filter((node) => {
-        const mainKey = getMainKey(node);
-        return !this.nodes.has(node.id) || (node.type === 'INSTANCE' && mainKey !== this.nodes.get(node.id)?.mainKey);
-      });
 
-    await this.update(unregisteredNodes);
+    await this.update(relevantNodes);
 
     const relevantNodeIds = relevantNodes.map((node) => node.id);
     const resultingNodes = compact(relevantNodeIds.map((nodeId) => {
@@ -316,9 +311,9 @@ export class NodeManager {
   }
 
   public async updateNode(node: BaseNode, tokensOrCallback: NodeTokenRefMap | ((tokens: NodeTokenRefMap) => NodeTokenRefMap)) {
-    // if (!this.nodes.has(node.id)) {
+    if (!this.nodes.has(node.id)) {
       await this.update([node]);
-    // }
+    }
 
     const entry = this.nodes.get(node.id);
     if (entry) {
