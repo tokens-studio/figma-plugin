@@ -295,7 +295,9 @@ export class NodeManager {
         const mainKey = getMainKey(node);
         return !this.nodes.has(node.id) || (node.type === 'INSTANCE' && mainKey !== this.nodes.get(node.id)?.mainKey);
       });
-    await this.update(relevantNodes);
+
+    await this.update(unregisteredNodes);
+
     const relevantNodeIds = relevantNodes.map((node) => node.id);
     const resultingNodes = compact(relevantNodeIds.map((nodeId) => {
       const cache = this.nodes.get(nodeId);
