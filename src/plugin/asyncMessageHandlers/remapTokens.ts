@@ -19,7 +19,6 @@ export const remapTokens: AsyncMessageChannelHandlers[AsyncMessageTypes.REMAP_TO
     // Go through allWithData and update all appearances of oldName to newName
     const updatedNodes: NodeManagerNode[] = [];
     const updatedNodesWithOldTokens: NodeManagerNode[] = [];
-    console.log("remap", msg)
 
     allWithData.forEach((node) => {
       const { tokens } = node;

@@ -29,7 +29,6 @@ export function Initiator() {
         const { pluginMessage } = event.data;
         switch (pluginMessage.type) {
           case MessageFromPluginTypes.SELECTION: {
-            console.log('sdfsdf')
             const { selectionValues, mainNodeSelectionValues, selectedNodes } = pluginMessage;
             dispatch.uiState.setSelectedLayers(selectedNodes);
             dispatch.uiState.setDisabled(false);
@@ -50,7 +49,6 @@ export function Initiator() {
 
             // Selection values are all tokens across all layers, used in Multi Inspector.
             if (selectionValues) {
-              console.log('selectact', selectionValues)
               const orderObj = convertToOrderObj(Properties);
               const sortedSelectionValues = selectionValues.sort((a, b) => orderObj[a.type] - orderObj[b.type]);
               dispatch.uiState.setSelectionValues(sortedSelectionValues);

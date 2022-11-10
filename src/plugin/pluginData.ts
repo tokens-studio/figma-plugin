@@ -52,7 +52,6 @@ export async function sendPluginValues({ nodes, shouldSendSelectionValues }: { n
   let mainNodeSelectionValues: SelectionValue[] = [];
   let selectionValues;
   const pluginValues = await defaultNodeManager.findNodesWithData({ nodes });
-  console.log('pluginvaues', pluginValues)
   // TODO: Handle all selected nodes share the same properties
   // TODO: Handle many selected and mixed (for Tokens tab)
   if (Array.isArray(pluginValues) && pluginValues?.length > 0) {
@@ -160,7 +159,6 @@ export async function updatePluginData({
             break;
         }
       }));
-      console.log('newvaue', newValuesOnNode)
       await defaultNodeManager.updateNode(node, newValuesOnNode);
 
       const nodeHasNoValues = Object.keys(newValuesOnNode).length === 0 && newValuesOnNode.constructor === Object;

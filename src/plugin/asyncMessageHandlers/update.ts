@@ -27,7 +27,6 @@ export const update: AsyncMessageChannelHandlers[AsyncMessageTypes.UPDATE] = asy
     const allWithData = await defaultNodeManager.findNodesWithData({
       updateMode: msg.settings.updateMode,
     });
-    console.log('allwithdata', allWithData)
     await updateNodes(allWithData, tokensMap, msg.settings);
     await updatePluginData({ entries: allWithData, values: {} });
   }

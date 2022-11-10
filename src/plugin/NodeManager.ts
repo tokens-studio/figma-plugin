@@ -80,18 +80,12 @@ export class NodeManager {
 
   private async getNodePluginData(node: BaseNode) {
     const checksum = await HashProperty.read(node);
-    console.log('sdf', this.persistentNodesCache)
     const registeredPersistentEntry = this.persistentNodesCache.get(node.id);
     if (
       registeredPersistentEntry
       && registeredPersistentEntry.hash === checksum
       && !this.nodes.has(node.id)
     ) {
-      console.log('ifififi', {
-        ...registeredPersistentEntry,
-        id: node.id,
-        node,
-      })
       this.nodes.set(node.id, {
         ...registeredPersistentEntry,
         id: node.id,
@@ -101,7 +95,6 @@ export class NodeManager {
 
     const registeredEntry = this.nodes.get(node.id);
     if (registeredEntry && registeredEntry.hash === checksum) {
-      console.log('registedentry')
       return registeredEntry;
     }
 
@@ -117,7 +110,6 @@ export class NodeManager {
       // @deprecated - moved to separated token values
       const deprecatedValuesProp = node.getPluginData('values');
       if (deprecatedValuesProp) {
-        console.log('deprecatedValuesProp', deprecatedValuesProp)
         tokens = JSON.parse(deprecatedValuesProp) as NodeTokenRefMap;
         // migrate values to new format
         // there's no need to keep supporting deprecated data structures
@@ -184,8 +176,6 @@ export class NodeManager {
         ),
       ) as NodeTokenRefMap;
     }
-
-    console.log('tokens', tokens)
 
     const entry = {
       node,
@@ -300,18 +290,15 @@ export class NodeManager {
     } else {
       relevantNodes = findAll([figma.root], false);
     }
-    // const unregisteredNodes = relevantNodes
-    //   .filter((node) => {
-    //     const mainKey = getMainKey(node);
-    //     return !this.nodes.has(node.id) || (node.type === 'INSTANCE' && mainKey !== this.nodes.get(node.id)?.mainKey);
-    //   });
-    //   console.log('unregisteredNodes', unregisteredNodes)
+    const unregisteredNodes = relevantNodes
+      .filter((node) => {
+        const mainKey = getMainKey(node);
+        return !this.nodes.has(node.id) || (node.type === 'INSTANCE' && mainKey !== this.nodes.get(node.id)?.mainKey);
+      });
     await this.update(relevantNodes);
     const relevantNodeIds = relevantNodes.map((node) => node.id);
-    console.log('relevantNodeIds', relevantNodeIds)
     const resultingNodes = compact(relevantNodeIds.map((nodeId) => {
       const cache = this.nodes.get(nodeId);
-      console.log('cache', cache)
       if (cache && hasTokens(cache.tokens)) {
         return cache;
       }
@@ -332,7 +319,6 @@ export class NodeManager {
     // }
 
     const entry = this.nodes.get(node.id);
-    console.log('beforeentry', entry)
     if (entry) {
       const tokens = typeof tokensOrCallback === 'function'
         ? tokensOrCallback({ ...entry.tokens })
@@ -352,7 +338,6 @@ export class NodeManager {
         await HashProperty.write(hash(tokens), node);
       }
     }
-    console.log('afterentry', entry)
   }
 }
 
