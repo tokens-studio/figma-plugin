@@ -122,7 +122,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
   ]); // removing non-alphanumberic except . from the input value
   const getHighlightedText = useCallback((text: string, highlight: string) => {
     // Split on highlight term and include term into parts, ignore case
-    const parts = text.split(new RegExp(`(${highlight})`, 'gi'));
+    const parts = text.split(new RegExp(`(${highlight.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')})`, 'gi'));
     return (
       <span>
         {parts.map((part, i) => (
