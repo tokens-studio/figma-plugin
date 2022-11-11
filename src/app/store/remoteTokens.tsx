@@ -22,7 +22,6 @@ import { RemoteResponseData, RemoteResponseStatus } from '@/types/RemoteResponse
 import { ErrorMessages } from '@/constants/ErrorMessages';
 import { saveLastSyncedState } from '@/utils/saveLastSyncedState';
 import { applyTokenSetOrder } from '@/utils/tokenset';
-import recoverOptimizedThemes from '@/utils/recoverOptimizedThemes';
 
 type PullTokensOptions = {
   context?: StorageTypeCredentials,
@@ -98,12 +97,11 @@ export default function useRemoteTokens() {
         throw new Error('Not implemented');
     }
     if (remoteData?.status === 'success') {
-      const recoveredThemes = recoverOptimizedThemes(remoteData.themes, remoteData.tokens);
-      saveLastSyncedState(dispatch, remoteData.tokens, recoveredThemes, remoteData.metadata);
+      saveLastSyncedState(dispatch, remoteData.tokens, remoteData.themes, remoteData.metadata);
 
       dispatch.tokenState.setTokenData({
         values: remoteData.tokens,
-        themes: recoveredThemes,
+        themes: remoteData.themes,
         activeTheme: activeTheme ?? null,
         usedTokenSet: usedTokenSet ?? {},
       });
@@ -325,10 +323,9 @@ export default function useRemoteTokens() {
       const remoteData = await readTokensFromFileOrDirectory(files);
       if (remoteData?.status === 'success') {
         const sortedTokens = applyTokenSetOrder(remoteData.tokens, remoteData.metadata?.tokenSetOrder ?? Object.keys(remoteData.tokens));
-        const recoveredThemes = recoverOptimizedThemes(remoteData.themes, remoteData.tokens);
         dispatch.tokenState.setTokenData({
           values: sortedTokens,
-          themes: recoveredThemes,
+          themes: remoteData.themes,
           activeTheme: activeTheme ?? null,
           usedTokenSet: usedTokenSet ?? {},
         });

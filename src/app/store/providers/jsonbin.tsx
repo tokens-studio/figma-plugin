@@ -18,8 +18,6 @@ import { RemoteResponseData } from '@/types/RemoteResponseData';
 import { ErrorMessages } from '@/constants/ErrorMessages';
 import { saveLastSyncedState } from '@/utils/saveLastSyncedState';
 import { applyTokenSetOrder } from '@/utils/tokenset';
-import optimizeThemes from '@/utils/optimizeThemes';
-import recoverOptimizedThemes from '@/utils/recoverOptimizedThemes';
 
 export async function updateJSONBinTokens({
   tokens, themes, context, updatedAt, oldUpdatedAt = null,
@@ -32,7 +30,7 @@ export async function updateJSONBinTokens({
 
     const payload = {
       tokens,
-      themes: optimizeThemes(themes),
+      themes,
       metadata: {
         tokenSetOrder: Object.keys(tokens),
         updatedAt: updatedAt ?? new Date().toISOString(),
@@ -198,11 +196,10 @@ export function useJSONbin() {
         },
         shouldSetInDocument: true,
       });
-      const recoveredThemes = recoverOptimizedThemes(content.themes, content.tokens);
-      saveLastSyncedState(dispatch, content.tokens, recoveredThemes, content.metadata);
+      saveLastSyncedState(dispatch, content.tokens, content.themes, content.metadata);
       dispatch.tokenState.setTokenData({
         values: applyTokenSetOrder(content.tokens, content.metadata?.tokenSetOrder),
-        themes: recoveredThemes,
+        themes: content.themes,
         usedTokenSet: usedTokenSets,
         activeTheme,
       });

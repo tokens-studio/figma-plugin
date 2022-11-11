@@ -14,7 +14,6 @@ import Box from '../Box';
 import Stack from '../Stack';
 import { SystemFilenames } from '@/constants/SystemFilenames';
 import { track } from '@/utils/analytics';
-import optimizeThemes from '@/utils/optimizeThemes';
 
 type Props = {
   onClose: () => void
@@ -63,7 +62,7 @@ export default function SingleFileExport({ onClose }: Props) {
   const exportData = React.useMemo(() => {
     const returnValue = JSON.parse(formattedTokens);
     if (includeAllTokens) {
-      set(returnValue, SystemFilenames.THEMES, optimizeThemes(themes));
+      set(returnValue, SystemFilenames.THEMES, themes);
       set(returnValue, SystemFilenames.METADATA, {
         tokenSetOrder: Object.keys(tokens),
       });

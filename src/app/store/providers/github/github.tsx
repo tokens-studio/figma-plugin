@@ -20,8 +20,6 @@ import { RemoteResponseData } from '@/types/RemoteResponseData';
 import { ErrorMessages } from '@/constants/ErrorMessages';
 import { applyTokenSetOrder } from '@/utils/tokenset';
 import { saveLastSyncedState } from '@/utils/saveLastSyncedState';
-import optimizeThemes from '@/utils/optimizeThemes';
-import recoverOptimizedThemes from '@/utils/recoverOptimizedThemes';
 
 type GithubCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.GITHUB | StorageProviderType.GITLAB; }>;
 type GithubFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.GITHUB | StorageProviderType.GITLAB }>;
@@ -35,7 +33,6 @@ export function useGitHub() {
   const dispatch = useDispatch<Dispatch>();
   const { confirm } = useConfirm();
   const { pushDialog, closeDialog } = usePushDialog();
-  const optimizedThemes = optimizeThemes(themes);
 
   const storageClientFactory = useCallback((context: GithubCredentials, owner?: string, repo?: string) => {
     const splitContextId = context.id.split('/');
@@ -67,7 +64,7 @@ export function useGitHub() {
     if (
       content
       && isEqual(content.tokens, tokens)
-      && isEqual(optimizeThemes(content.themes), optimizedThemes)
+      && isEqual(content.themes, themes)
       && isEqual(content.metadata?.tokenSetOrder ?? Object.keys(tokens), Object.keys(tokens))
     ) {
       notifyToUI('Nothing to commit');
@@ -92,7 +89,7 @@ export function useGitHub() {
           tokenSetOrder: Object.keys(tokens),
         };
         await storage.save({
-          themes: optimizedThemes,
+          themes,
           tokens,
           metadata,
         }, {
@@ -143,7 +140,6 @@ export function useGitHub() {
     closeDialog,
     tokens,
     themes,
-    optimizedThemes,
     localApiState,
     usedTokenSet,
     activeTheme,
@@ -223,17 +219,16 @@ export function useGitHub() {
       if (content) {
         if (
           !isEqual(content.tokens, tokens)
-          || !isEqual(optimizeThemes(content.themes), optimizedThemes)
+          || !isEqual(content.themes, themes)
           || !isEqual(content.metadata?.tokenSetOrder ?? Object.keys(tokens), Object.keys(tokens))
         ) {
           const userDecision = await askUserIfPull();
           if (userDecision) {
             const sortedValues = applyTokenSetOrder(content.tokens, content.metadata?.tokenSetOrder);
-            const recoveredThemes = recoverOptimizedThemes(content.themes, content.tokens);
-            saveLastSyncedState(dispatch, sortedValues, recoveredThemes, content.metadata);
+            saveLastSyncedState(dispatch, sortedValues, content.themes, content.metadata);
             dispatch.tokenState.setTokenData({
               values: sortedValues,
-              themes: recoveredThemes,
+              themes: content.themes,
               activeTheme,
               usedTokenSet,
             });
@@ -260,7 +255,6 @@ export function useGitHub() {
     usedTokenSet,
     activeTheme,
     themes,
-    optimizedThemes,
     tokens,
     checkAndSetAccess,
   ]);

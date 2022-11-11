@@ -11,7 +11,6 @@ import { activeThemeSelector, usedTokenSetSelector } from '@/selectors';
 import { ErrorMessages } from '@/constants/ErrorMessages';
 import { RemoteResponseData } from '@/types/RemoteResponseData';
 import { applyTokenSetOrder } from '@/utils/tokenset';
-import recoverOptimizedThemes from '@/utils/recoverOptimizedThemes';
 
 type UrlCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.URL; }>;
 
@@ -59,10 +58,9 @@ export default function useURL() {
         });
 
         if (Object.keys(content.tokens).length) {
-          const recoveredThemes = recoverOptimizedThemes(content.themes, content.tokens);
           dispatch.tokenState.setTokenData({
             values: applyTokenSetOrder(content.tokens, content.metadata?.tokenSetOrder),
-            themes: recoveredThemes,
+            themes: content.themes,
             usedTokenSet: usedTokenSets,
             activeTheme,
           });
