@@ -20,8 +20,8 @@ export function setTokenData(state: TokenState, payload: SetTokenDataPayload): T
       ...theme,
       selectedTokenSets: Object.fromEntries(
         Object.entries(theme.selectedTokenSets)
-          .filter(([setName]) => (
-            allAvailableTokenSets.includes(setName)
+          .filter(([setName, status]) => (
+            allAvailableTokenSets.includes(setName) && status !== TokenSetStatus.DISABLED
           )),
       ),
     })),
