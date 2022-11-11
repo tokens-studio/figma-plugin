@@ -124,7 +124,7 @@ describe('ConfirmDialog', () => {
       result.queryByText('Edit')?.click();
     });
 
-    expect(result.queryByText('Edit storage item')).toBeInTheDocument();
+    expect(result.queryByText('Edit credentials')).toBeInTheDocument();
   });
 
   it('should return CreateStorageItemModal when create new remote storage', async () => {
@@ -141,9 +141,9 @@ describe('ConfirmDialog', () => {
 
     expect(result.queryAllByText('Add new credentials')).toHaveLength(2);
     expect(result.queryByText('Personal Access Token')).toBeInTheDocument();
-    expect(result.queryByText('Repository (username/repo)')).toBeInTheDocument();
-    expect(result.queryByText('Default Branch')).toBeInTheDocument();
-    expect(result.queryByText('File Path (e.g. data/tokens.json)')).toBeInTheDocument();
+    expect(result.queryByText('Repository (owner/repo)')).toBeInTheDocument();
+    expect(result.queryByText('Branch')).toBeInTheDocument();
+    expect(result.queryByText('File Path (e.g. tokens.json) or Folder Path (e.g. tokens)')).toBeInTheDocument();
     expect(result.queryByText('baseUrl (optional)')).toBeInTheDocument();
     expect(result.queryByText('Save')).toBeInTheDocument();
   });
