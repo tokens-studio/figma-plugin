@@ -56,9 +56,8 @@ function StartScreen() {
       return;
     }
     const matchingProvider = apiProviders.find((i) => i.internalId === storageType?.internalId);
-    const credentialsToSet = { ...matchingProvider, provider: storageType.provider, new: true } || {
+    const credentialsToSet = matchingProvider ? { ...matchingProvider, provider: storageType.provider, new: true } : {
       ...storageType,
-      provider: storageType.provider,
       new: true,
     };
     dispatch.uiState.setActiveTab(Tabs.SETTINGS);
