@@ -32,8 +32,6 @@ export function saveTheme(state: TokenState, data: Payload): TokenState {
     ],
   };
 
-  console.log('nextstate', nextState);
-
   if (isActiveTheme || isNewTheme) {
     // @README if this theme is currently active or if it's a new theme
     // we will also run the setActiveTheme reducer
