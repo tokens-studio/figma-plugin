@@ -7,6 +7,7 @@ import useManageTokens from './useManageTokens';
 import { RootModel } from '@/types/RootModel';
 import { models } from './models';
 import { TokenTypes } from '@/constants/TokenTypes';
+import { StyleOptions } from '@/constants/StyleOptions';
 
 const mockConfirm = jest.fn();
 const mockRemoveStylesFromTokens = jest.fn();
@@ -52,6 +53,24 @@ describe('useManageTokens', () => {
               ],
             },
             activeTokenSet: 'global',
+            themes: [{
+              id: 'light',
+              name: 'Light',
+              selectedTokenSets: {},
+              $figmaStyleReferences: {
+                'colors.brand.primary': 'S:1234',
+                'colors.red': 'S:1235',
+                'colors.blue': 'S:1236',
+              },
+            }, {
+              id: 'dark',
+              name: 'Dark',
+              selectedTokenSets: {},
+              $figmaStyleReferences: {
+                'colors.brand.primary': 'S:2345',
+                'colors.red': 'S:2346',
+              },
+            }],
           },
         },
       },
@@ -186,11 +205,9 @@ describe('useManageTokens', () => {
     const tokenToDelete = {
       path: 'color.red',
       parent: 'global',
+      type: TokenTypes.COLOR,
     };
-    mockConfirm.mockImplementation(() => Promise.resolve({ data: ['delete-style'] }));
-    const { result } = renderHook(() => useManageTokens(), {
-      wrapper: AllTheProviders,
-    });
+    mockConfirm.mockImplementation(() => Promise.resolve({ data: [StyleOptions.REMOVE] }));
     await act(async () => result.current.deleteSingleToken(tokenToDelete));
     expect(mockRemoveStylesFromTokens).toBeCalledTimes(1);
   });
@@ -207,4 +224,16 @@ describe('useManageTokens', () => {
     await act(async () => result.current.deleteSingleToken(tokenToDelete));
     expect(mockRemoveStylesFromTokens).toBeCalledTimes(0);
   });
+
+  it('doesn\'t remove styles from themes when the token is not style token', async () => {
+    const tokenToDelete = {
+      path: 'size.regular',
+      parent: 'global',
+      type: TokenTypes.SIZING,
+    };
+    mockConfirm.mockImplementation(() => Promise.resolve({ data: [] }));
+    await act(async () => result.current.deleteSingleToken(tokenToDelete));
+    expect(mockRemoveStylesFromTokens).toBeCalledTimes(0);
+  });
+
 });

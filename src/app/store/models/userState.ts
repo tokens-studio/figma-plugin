@@ -106,6 +106,7 @@ export const userState = createModel<RootModel>()({
 
         if (source === AddLicenseSource.UI) {
           notifyToUI('License added succesfully!');
+          dispatch.userState.setLicenseKey(key);
         }
 
         AsyncMessageChannel.ReactInstance.message({

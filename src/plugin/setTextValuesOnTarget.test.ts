@@ -37,6 +37,17 @@ describe('setTextValuesOnTarget', () => {
     expect(textNodeMock).toEqual({ ...textNodeMock, fontName: { ...textNodeMock.fontName, style: 'Bold' } });
   });
 
+  it('sets fontFamily and fontWeight if that is given', async () => {
+    loadFontAsyncSpy.mockImplementationOnce(() => (
+      Promise.reject()
+    ));
+    loadFontAsyncSpy.mockImplementation(() => (
+      Promise.resolve()
+    ));
+    await setTextValuesOnTarget(textNodeMock, { value: { fontFamily: 'Roboto', fontWeight: 'Bold' } });
+    expect(textNodeMock).toEqual({ ...textNodeMock, fontName: { ...textNodeMock.fontName, family: 'Roboto', style: 'Bold' } });
+  });
+
   it('converts a numerical fontWeight and sets to the node', async () => {
     loadFontAsyncSpy.mockImplementationOnce(() => (
       Promise.reject()

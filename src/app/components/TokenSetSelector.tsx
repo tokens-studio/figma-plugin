@@ -12,9 +12,10 @@ import TokenSetTree from './TokenSetTree';
 import Box from './Box';
 import { styled } from '@/stitches.config';
 import {
-  editProhibitedSelector, tokensSelector,
+  editProhibitedSelector, tokensSelector, uiStateSelector,
 } from '@/selectors';
 import Stack from './Stack';
+import OnboardingExplainer from './OnboardingExplainer';
 
 const StyledButton = styled('button', {
   flexShrink: 0,
@@ -32,9 +33,16 @@ const StyledButton = styled('button', {
   },
 });
 
-export default function TokenSetSelector({ saveScrollPositionSet } : { saveScrollPositionSet: (tokenSet: string) => void }) {
+export default function TokenSetSelector({ saveScrollPositionSet }: { saveScrollPositionSet: (tokenSet: string) => void }) {
+  const onboardingData = {
+    title: 'Sets',
+    text: 'Sets allow you to split your tokens up into multiple files.\n\nYou can activate different sets to control theming.',
+    url: 'https://docs.figmatokens.com/themes/token-sets?ref=onboarding_explainer_sets',
+  };
+
   const tokens = useSelector(tokensSelector);
   const editProhibited = useSelector(editProhibitedSelector);
+  const uiState = useSelector(uiStateSelector);
   const dispatch = useDispatch<Dispatch>();
   const { confirm } = useConfirm();
 
@@ -106,6 +114,10 @@ export default function TokenSetSelector({ saveScrollPositionSet } : { saveScrol
 
   const handleReorder = useCallback((values: string[]) => {
     dispatch.tokenState.setTokenSetOrder(values);
+  }, [dispatch]);
+
+  const closeOnboarding = useCallback(() => {
+    dispatch.uiState.setOnboardingExplainerSets(false);
   }, [dispatch]);
 
   const handleDelete = useCallback((set: string) => {
@@ -211,6 +223,9 @@ export default function TokenSetSelector({ saveScrollPositionSet } : { saveScrol
         New set
         <IconAdd />
       </StyledButton>
+      {uiState.onboardingExplainerSets && (
+        <OnboardingExplainer data={onboardingData} closeOnboarding={closeOnboarding} />
+      )}
     </Box>
   );
 }

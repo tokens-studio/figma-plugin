@@ -3,20 +3,29 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import type { CheckedState } from '@radix-ui/react-checkbox';
 import SyncSettings from '../SyncSettings';
+import Button from '../Button';
 import Checkbox from '../Checkbox';
 import Heading from '../Heading';
 import { Dispatch } from '../../store';
 import Label from '../Label';
-import { ignoreFirstPartForStylesSelector, prefixStylesWithThemeNameSelector } from '@/selectors';
+import { ignoreFirstPartForStylesSelector, prefixStylesWithThemeNameSelector, uiStateSelector } from '@/selectors';
 import Stack from '../Stack';
 import Box from '../Box';
 import AddLicenseKey from '../AddLicenseKey/AddLicenseKey';
 import { Divider } from '../Divider';
 import { track } from '@/utils/analytics';
+import OnboardingExplainer from '../OnboardingExplainer';
 
 function Settings() {
+  const onboardingData = {
+    title: 'Set up where tokens should be stored',
+    text: 'Connect your tokens to an external source of truth that you can push and pull to. This allows you to use tokens across files.',
+    url: 'https://docs.figmatokens.com/sync/sync?ref=onboarding_explainer_syncproviders',
+  };
+
   const ignoreFirstPartForStyles = useSelector(ignoreFirstPartForStylesSelector);
   const prefixStylesWithThemeName = useSelector(prefixStylesWithThemeNameSelector);
+  const uiState = useSelector(uiStateSelector);
   const dispatch = useDispatch<Dispatch>();
 
   const handleIgnoreChange = React.useCallback(
@@ -36,15 +45,30 @@ function Settings() {
     [dispatch.settings],
   );
 
+  const closeOnboarding = React.useCallback(() => {
+    dispatch.uiState.setOnboardingExplainerSyncProviders(false);
+  }, [dispatch]);
+
+  const handleResetButton = React.useCallback(() => {
+    dispatch.uiState.setOnboardingExplainerSets(true);
+    dispatch.uiState.setOnboardingExplainerInspect(true);
+    dispatch.uiState.setOnboardingExplainerSyncProviders(true);
+  }, [dispatch]);
+
   return (
     <Box className="content scroll-container">
       <Stack direction="column" gap={4} css={{ padding: '$3 0' }}>
         <AddLicenseKey />
         <Divider />
+        {uiState.onboardingExplainerSyncProviders && (
+          <Stack direction="column" gap={2} css={{ padding: '$4' }}>
+            <OnboardingExplainer data={onboardingData} closeOnboarding={closeOnboarding} />
+          </Stack>
+        )}
         <SyncSettings />
         <Divider />
         <Stack direction="column" gap={3} css={{ padding: '0 $4' }}>
-          <Heading size="medium">Styles</Heading>
+          <Heading size="small">Settings</Heading>
           <Stack direction="row" gap={2} align="center">
             <Checkbox
               id="ignoreFirstPartForStyles"
@@ -63,6 +87,9 @@ function Settings() {
             />
             <Label htmlFor="prefixStylesWithThemeName">Prefix styles with active theme name</Label>
           </Stack>
+          <Box>
+            <Button variant="secondary" size="small" id="reset-onboarding" onClick={handleResetButton}>Reset onboarding</Button>
+          </Box>
         </Stack>
       </Stack>
     </Box>

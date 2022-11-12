@@ -19,4 +19,7 @@ export enum TokenTypes {
   TEXT_DECORATION = 'textDecoration',
   TEXT_CASE = 'textCase',
   COMPOSITION = 'composition',
+  DIMENSION = 'dimension',
+  BORDER = 'border',
+  ASSET = 'asset',
 }

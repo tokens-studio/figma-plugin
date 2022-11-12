@@ -12,3 +12,5 @@ export * from './assignStyleIdsToTheme';
 export * from './disconnectStyleFromTheme';
 export * from './renameStyleIdsToCurrentTheme';
 export * from './removeStyleIdsFromThemes';
+export * from './renameStyleNamesToCurrentTheme';
+export * from './removeStyleNamesFromThemes';
