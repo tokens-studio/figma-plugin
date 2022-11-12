@@ -125,8 +125,13 @@ export function mergeTokenGroups(tokens: Record<string, SingleToken[]>, usedSets
     .filter(([, status]) => status === TokenSetStatus.ENABLED || status === TokenSetStatus.SOURCE)
     .map(([tokenSet]) => tokenSet);
 
+  const tokenSetOrder = tokens?.$metadata?.map(({ value }) => value);
+
+  const tokenEntries = tokenSetOrder ? Object.entries(tokens)
+    .sort((a, b) => tokenSetOrder.indexOf(a[0]) - tokenSetOrder.indexOf(b[0])) : Object.entries(tokens);
+
   // Reverse token set order (right-most win) and check for duplicates
-  Object.entries(tokens)
+  tokenEntries
     .reverse()
     .forEach((tokenGroup: [string, SingleToken[]]) => {
       if (tokenSetsToMerge.length === 0 || tokenSetsToMerge.includes(tokenGroup[0])) {
