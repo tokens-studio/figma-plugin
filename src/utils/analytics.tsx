@@ -8,8 +8,8 @@ export function track(name: string, opts = {}) {
 }
 
 export function identify({ userId, figmaId, name }: { userId: string; figmaId?: string | null; name?: string }) {
-  if (process.env.MIXPANEL_ACCESS_TOKEN) {
-    mixpanel.identify(figmaId || userId);
+  if (process.env.MIXPANEL_ACCESS_TOKEN && figmaId) {
+    mixpanel.identify(figmaId);
 
     mixpanel.people.set({
       USER_ID: userId,
