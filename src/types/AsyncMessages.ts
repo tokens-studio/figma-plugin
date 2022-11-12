@@ -181,7 +181,7 @@ export type UpdateAsyncMessage = AsyncMessage<AsyncMessageTypes.UPDATE, {
   usedTokenSet: UsedTokenSetsMap;
   activeTheme: string | null;
   checkForChanges?: boolean
-  shouldSwapStyles?: boolean;
+  swapStyles?: boolean;
 }>;
 export type UpdateAsyncMessageResult = AsyncMessage<AsyncMessageTypes.UPDATE, {
   styleIds: Record<string, string>;
