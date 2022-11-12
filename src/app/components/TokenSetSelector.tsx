@@ -164,39 +164,47 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
         title={`Rename ${tokenSetMarkedForChange}`}
         isOpen={showRenameTokenSetFields}
         close={handleCloseRenameModal}
-        footer={(
-          <form id="renameTokenSet" onSubmit={handleRenameTokenSetSubmit}>
-            <Stack direction="row" justify="end" gap={4}>
-              <Button variant="secondary" onClick={handleCloseRenameModal}>
+      >
+        <form onSubmit={handleRenameTokenSetSubmit}>
+          <Stack direction="column" gap={4}>
+            <Input
+              full
+              autofocus
+              value={newTokenSetName}
+              onChange={handleChangeName}
+              type="text"
+              name="tokensetname"
+              required
+            />
+            <Stack direction="row" gap={4}>
+              <Button variant="secondary" size="large" onClick={handleCloseRenameModal}>
                 Cancel
               </Button>
-              <Button type="submit" variant="primary" disabled={tokenSetMarkedForChange === newTokenSetName}>
+              <Button type="submit" variant="primary" size="large" disabled={tokenSetMarkedForChange === newTokenSetName}>
                 Change
               </Button>
             </Stack>
-          </form>
-        )}
-      >
-        <Stack direction="column" gap={4}>
-          <Input
-            form="renameTokenSet"
-            full
-            value={newTokenSetName}
-            onChange={handleChangeName}
-            type="text"
-            name="tokensetname"
-            autofocus
-            required
-          />
-        </Stack>
+          </Stack>
+        </form>
       </Modal>
       <Modal
         title="New set"
         isOpen={showNewTokenSetFields}
         close={handleCloseNewTokenSetModal}
-        footer={(
-          <form name="newTokenSetForm" onSubmit={handleNewTokenSetSubmit}>
-            <Stack direction="row" justify="end" gap={4}>
+      >
+        <form onSubmit={handleNewTokenSetSubmit}>
+          <Stack direction="column" gap={4}>
+            <Input
+              full
+              value={newTokenSetName}
+              onChange={handleChangeName}
+              type="text"
+              name="tokensetname"
+              required
+              data-cy="token-set-input"
+              autofocus
+            />
+            <Stack direction="row" gap={4}>
               <Button variant="secondary" size="large" onClick={handleCloseNewTokenSetModal}>
                 Cancel
               </Button>
@@ -204,20 +212,8 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
                 Create
               </Button>
             </Stack>
-          </form>
-        )}
-      >
-        <Input
-          form="newTokenSetForm"
-          full
-          value={newTokenSetName}
-          onChange={handleChangeName}
-          type="text"
-          name="tokensetname"
-          required
-          data-cy="token-set-input"
-          autofocus
-        />
+          </Stack>
+        </form>
       </Modal>
       <StyledButton data-cy="button-new-token-set" type="button" disabled={editProhibited} onClick={handleOpenNewTokenSetModal}>
         New set
