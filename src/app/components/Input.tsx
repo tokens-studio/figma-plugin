@@ -140,7 +140,7 @@ const StyledPrefix = styled('div', {
   },
 });
 
-const Input = React.forwardRef<HTMLInputElement, Props>(({
+const Input = ({
   form,
   name,
   autofocus,
@@ -157,13 +157,13 @@ const Input = React.forwardRef<HTMLInputElement, Props>(({
   suffix,
   step,
   custom = '',
-  inputRef = null,
+  inputRef,
   placeholder = '',
   capitalize = false,
   isMasked = false,
   size = 'small',
   ...inputProps
-}) => {
+}: Props) => {
   // if isMasked is true, then we need to handle toggle visibility
   const [show, setShow] = React.useState(false);
 
@@ -226,7 +226,7 @@ const Input = React.forwardRef<HTMLInputElement, Props>(({
       </Box>
     </label>
   );
-});
+};
 
 export default Input;
 export { StyledInput, StyledPrefix, StyledSuffix };
