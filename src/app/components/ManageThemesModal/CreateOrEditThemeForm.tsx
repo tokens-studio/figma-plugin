@@ -88,7 +88,6 @@ export const CreateOrEditThemeForm: React.FC<Props> = ({
             onClick={onCancel}
           />
           <Input
-            autofocus
             data-cy="create-or-edit-theme-form--input--name"
             data-testid="create-or-edit-theme-form--input--name"
             {...register('name', { required: true })}
