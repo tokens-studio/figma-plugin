@@ -157,7 +157,7 @@ export default async function setValuesOnNode(
 
       // BACKGROUND BLUR
       if ('effects' in node && typeof values.backgroundBlur !== 'undefined' && isPrimitiveValue(values.backgroundBlur)) {
-        setBackgroundBlurOnTarget(node, { value: values.backgroundBlur });
+        setBackgroundBlurOnTarget(node, { value: String(values.backgroundBlur) });
       }
 
       // BORDER WIDTH
