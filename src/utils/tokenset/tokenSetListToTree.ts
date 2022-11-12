@@ -11,8 +11,9 @@ export function tokenSetListToTree(items: string[]) {
   const tree = items.reduce<TreeItem[]>((acc, curr) => {
     const path = curr.split('/');
     const parentName = path.length > 1 ? path.slice(0, -1).join('/') : '';
+    const parentIndex = acc.findIndex((item) => item.path === parentName);
 
-    if (parentName !== '' && !acc.find((item) => item.path === parentName)) {
+    if (parentName !== '' && parentIndex < 0) {
       const parentNameSplit = parentName.split('/');
       parentNameSplit.forEach((directory, index) => {
         const label = directory;
@@ -28,14 +29,27 @@ export function tokenSetListToTree(items: string[]) {
         }
       });
     }
-    acc.push({
-      isLeaf: true,
-      path: curr,
-      key: path.join('/'),
-      parent: parentName,
-      level: path.length - 1,
-      label: path[path.length - 1],
-    });
+
+    if (parentIndex >= 0) {
+      const childrenLength = acc.filter((item) => item.path.startsWith(`${parentName}/`)).length;
+      acc.splice(parentIndex + childrenLength + 1, 0, {
+        isLeaf: true,
+        path: curr,
+        key: path.join('/'),
+        parent: parentName,
+        level: path.length - 1,
+        label: path[path.length - 1],
+      });
+    } else {
+      acc.push({
+        isLeaf: true,
+        path: curr,
+        key: path.join('/'),
+        parent: parentName,
+        level: path.length - 1,
+        label: path[path.length - 1],
+      });
+    }
     return acc;
   }, []);
   // @README sorting used to happen here

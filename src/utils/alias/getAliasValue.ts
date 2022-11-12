@@ -58,37 +58,37 @@ export function getAliasValue(token: SingleToken | string | number, tokens: Sing
             return isSingleTokenValueObject(token) ? token.value.toString() : token.toString();
           }
 
-          const tokenAliasSplited = nameToLookFor.split('.');
-          const tokenAliasSplitedLast: TokenNameNodeType = tokenAliasSplited.pop();
-          const tokenAliasLastExcluded = tokenAliasSplited.join('.');
-          const tokenAliasSplitedLastPrevious: number = Number(tokenAliasSplited.pop());
-          const tokenAliasLastPreviousExcluded = tokenAliasSplited.join('.');
+          const tokenAliasSplitted = nameToLookFor.split('.');
+          const tokenAliasSplittedLast: TokenNameNodeType = tokenAliasSplitted.pop();
+          const tokenAliasLastExcluded = tokenAliasSplitted.join('.');
+          const tokenAliasSplittedLastPrevious: number = Number(tokenAliasSplitted.pop());
+          const tokenAliasLastPreviousExcluded = tokenAliasSplitted.join('.');
           const foundToken = tokens.find((t) => t.name === nameToLookFor || t.name === tokenAliasLastExcluded || t.name === tokenAliasLastPreviousExcluded);
 
           if (foundToken?.name === nameToLookFor) { return getAliasValue(foundToken, tokens); }
 
           if (
-            !!tokenAliasSplitedLast
+            !!tokenAliasSplittedLast
             && foundToken?.name === tokenAliasLastExcluded
-            && foundToken.rawValue?.hasOwnProperty(tokenAliasSplitedLast)
+            && foundToken.rawValue?.hasOwnProperty(tokenAliasSplittedLast)
           ) {
             const { rawValue } = foundToken;
             if (typeof rawValue === 'object' && !Array.isArray(rawValue)) {
-              const value = rawValue[tokenAliasSplitedLast as keyof typeof rawValue] as string | number;
+              const value = rawValue[tokenAliasSplittedLast as keyof typeof rawValue] as string | number;
               return getAliasValue(value, tokens);
             }
           }
 
           if (
-            tokenAliasSplitedLastPrevious !== undefined
-            && !!tokenAliasSplitedLast
+            tokenAliasSplittedLastPrevious !== undefined
+            && !!tokenAliasSplittedLast
             && foundToken?.name === tokenAliasLastPreviousExcluded
             && Array.isArray(foundToken?.rawValue)
-            && !!foundToken?.rawValue[tokenAliasSplitedLastPrevious]
-            && foundToken?.rawValue[tokenAliasSplitedLastPrevious].hasOwnProperty(tokenAliasSplitedLast)
+            && !!foundToken?.rawValue[tokenAliasSplittedLastPrevious]
+            && foundToken?.rawValue[tokenAliasSplittedLastPrevious].hasOwnProperty(tokenAliasSplittedLast)
           ) {
-            const rawValueEntry = foundToken?.rawValue[tokenAliasSplitedLastPrevious];
-            return getAliasValue(rawValueEntry[tokenAliasSplitedLast as keyof typeof rawValueEntry] || tokenAliasSplitedLastPrevious, tokens);
+            const rawValueEntry = foundToken?.rawValue[tokenAliasSplittedLastPrevious];
+            return getAliasValue(rawValueEntry[tokenAliasSplittedLast as keyof typeof rawValueEntry] || tokenAliasSplittedLastPrevious, tokens);
           }
         }
         return ref;

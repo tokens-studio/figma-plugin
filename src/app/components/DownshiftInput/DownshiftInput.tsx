@@ -12,6 +12,7 @@ import { StyledDownshiftInput } from './StyledDownshiftInput';
 import Tooltip from '../Tooltip';
 import { Properties } from '@/constants/Properties';
 import { isDocumentationType } from '@/utils/is/isDocumentationType';
+import { useReferenceTokenType } from '@/app/hooks/useReferenceTokenType';
 
 const StyledDropdown = styled('div', {
   position: 'absolute',
@@ -97,6 +98,7 @@ interface DownShiftProps {
   resolvedTokens: ResolveTokenValuesResult[];
   setInputValue(value: string): void;
   handleChange: React.ChangeEventHandler<HTMLInputElement>;
+  handleBlur?: React.ChangeEventHandler<HTMLInputElement>;
 }
 
 export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
@@ -113,16 +115,18 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
   setInputValue,
   resolvedTokens,
   handleChange,
+  handleBlur,
 }) => {
   const [showAutoSuggest, setShowAutoSuggest] = React.useState<boolean>(false);
-  const [isFirstLoading, setisFirstLoading] = React.useState<boolean>(true);
+  const [isFirstLoading, setIsFirstLoading] = React.useState<boolean>(true);
   const filteredValue = useMemo(() => ((showAutoSuggest || typeof value !== 'string') ? '' : value?.replace(/[{}$]/g, '')), [
     showAutoSuggest,
     value,
   ]); // removing non-alphanumberic except . from the input value
+  const referenceTokenTypes = useReferenceTokenType(type as TokenTypes);
   const getHighlightedText = useCallback((text: string, highlight: string) => {
     // Split on highlight term and include term into parts, ignore case
-    const parts = text.split(new RegExp(`(${highlight})`, 'gi'));
+    const parts = text.split(new RegExp(`(${highlight.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')})`, 'gi'));
     return (
       <span>
         {parts.map((part, i) => (
@@ -151,7 +155,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
         .filter(
           (token: SingleToken) => !filteredValue || token.name.toLowerCase().includes(filteredValue.toLowerCase()),
         )
-        .filter((token: SingleToken) => token?.type === type && token.name !== initialName).sort((a, b) => (
+        .filter((token: SingleToken) => referenceTokenTypes.includes(token?.type) && token.name !== initialName).sort((a, b) => (
           a.name.localeCompare(b.name)
         ));
     },
@@ -193,9 +197,15 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
   }, [showAutoSuggest]);
 
   const handleInputChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setisFirstLoading(false);
+    setIsFirstLoading(false);
     handleChange(e);
   }, [handleChange]);
+
+  const handleInputBlur = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    if (handleBlur) {
+      handleBlur(e);
+    }
+  }, [handleBlur]);
 
   return (
     <Downshift onSelect={handleSelect}>
@@ -218,6 +228,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
               value={value}
               onChange={handleInputChange}
               getInputProps={getInputProps}
+              onBlur={handleInputBlur}
             />
             {suffix && (
               <StyledInputSuffix type="button" data-testid="downshift-input-suffix-button" onClick={handleAutoSuggest}>
@@ -241,7 +252,6 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
                       backgroundColor: highlightedIndex === index ? '$interaction' : '$bgDefault',
                     }}
                     isFocused={highlightedIndex === index}
-
                   >
                     {type === 'color' && (
                     <StyledItemColorDiv>
