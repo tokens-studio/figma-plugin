@@ -21,15 +21,15 @@
     "header": {
       "fontFamily": {
         "value": "Roboto",
-        "type": "fontFamily"
+        "type": "fontFamilies"
       },
       "fontSize": {
         "value": 96,
-        "type": "fontSize"
+        "type": "fontSizes"
       },
       "fontWeight": {
         "value": "Bold",
-        "type": "fontWeight"
+        "type": "fontWeights"
       }
     },
     "body": {
