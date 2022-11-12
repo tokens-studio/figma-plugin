@@ -194,7 +194,6 @@ export default function TokenSetSelector({ saveScrollPositionSet } : { saveScrol
                 name="tokensetname"
                 required
                 data-cy="token-set-input"
-                autofocus
               />
               <Stack direction="row" gap={4}>
                 <Button variant="secondary" size="large" onClick={handleCloseNewTokenSetModal}>

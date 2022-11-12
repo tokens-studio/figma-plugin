@@ -468,7 +468,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
           </Button>
           <Button disabled={!isValid} variant="primary" type="submit">
             {internalEditToken?.status === EditTokenFormStatus.CREATE && 'Create'}
-            {internalEditToken?.status === EditTokenFormStatus.EDIT && 'Save'}
+            {internalEditToken?.status === EditTokenFormStatus.EDIT && 'Update'}
             {(
               internalEditToken?.status !== EditTokenFormStatus.CREATE
               && internalEditToken?.status !== EditTokenFormStatus.EDIT

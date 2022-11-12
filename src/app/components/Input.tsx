@@ -163,7 +163,7 @@ const Input = React.forwardRef<HTMLInputElement, Props>(({
   isMasked = false,
   size = 'small',
   ...inputProps
-}) => {
+}, ref) => {
   // if isMasked is true, then we need to handle toggle visibility
   const [show, setShow] = React.useState(false);
 
@@ -174,14 +174,6 @@ const Input = React.forwardRef<HTMLInputElement, Props>(({
       inputRef.current.type = inputRef?.current?.type === 'password' ? 'text' : 'password';
     }
   }, [show, inputRef]);
-
-  const htmlInputRef = React.useRef<HTMLInputElement>(null);
-
-  React.useEffect(() => {
-    if (autofocus && htmlInputRef && htmlInputRef.current) {
-      htmlInputRef.current.focus();
-    }
-  }, [autofocus, htmlInputRef]);
 
   return (
     <label htmlFor={name} className="block font-medium text-xxs">
@@ -197,7 +189,7 @@ const Input = React.forwardRef<HTMLInputElement, Props>(({
         {!!prefix && <StyledPrefix>{prefix}</StyledPrefix>}
         <StyledInput
           form={form}
-          ref={inputRef ?? htmlInputRef}
+          ref={inputRef ?? ref}
           spellCheck={false}
           tabIndex={tabindex ?? undefined}
           type={type}
