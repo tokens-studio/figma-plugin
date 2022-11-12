@@ -10,12 +10,13 @@ import Text from './Text';
 import Button from './Button';
 import Callout from './Callout';
 import { Dispatch } from '../store';
-import { storageTypeSelector } from '@/selectors';
+import { apiProvidersSelector, storageTypeSelector } from '@/selectors';
 import Stack from './Stack';
 import { styled } from '@/stitches.config';
 import { Tabs } from '@/constants/Tabs';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import Box from './Box';
+import { transformProviderName } from '@/utils/transformProviderName';
 
 const StyledFigmaTokensLogo = styled(FigmaLetter, {
   width: '90px',
@@ -43,6 +44,7 @@ function StartScreen() {
   const dispatch = useDispatch<Dispatch>();
 
   const storageType = useSelector(storageTypeSelector);
+  const apiProviders = useSelector(apiProvidersSelector);
 
   const onSetDefaultTokens = React.useCallback(() => {
     dispatch.uiState.setActiveTab(Tabs.TOKENS);
@@ -50,14 +52,18 @@ function StartScreen() {
   }, [dispatch]);
 
   const onSetSyncClick = React.useCallback(() => {
+    if (storageType.provider === StorageProviderType.LOCAL) {
+      return;
+    }
+    const matchingProvider = apiProviders.find((i) => i.internalId === storageType?.internalId);
+    const credentialsToSet = matchingProvider ? { ...matchingProvider, provider: storageType.provider, new: true } : {
+      ...storageType,
+      new: true,
+    };
     dispatch.uiState.setActiveTab(Tabs.SETTINGS);
     dispatch.tokenState.setEmptyTokens();
-    dispatch.uiState.setLocalApiState({
-      ...storageType,
-      provider: storageType.provider,
-      new: true,
-    });
-  }, [dispatch, storageType]);
+    dispatch.uiState.setLocalApiState(credentialsToSet);
+  }, [apiProviders, dispatch.tokenState, dispatch.uiState, storageType]);
 
   return (
     <Box className="content scroll-container" css={{ padding: '$5', height: '100%', display: 'flex' }}>
@@ -96,8 +102,8 @@ function StartScreen() {
         {storageType?.provider !== StorageProviderType.LOCAL ? (
           <Callout
             id="callout-action-setupsync"
-            heading="Remote storage detected"
-            description="This document was setup with a remote storage. Ask your team for the credentials, then enter them in the Sync dialog."
+            heading={`Couldn't load tokens stored on ${transformProviderName(storageType?.provider)}`}
+            description="Unable to fetch tokens from remote storage, if you haven't added credentials yet add them in the next step. Otherwise make sure the file exists and you have access to it."
             action={{
               onClick: onSetSyncClick,
               text: 'Enter credentials',

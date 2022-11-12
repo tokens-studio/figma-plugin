@@ -39,4 +39,29 @@ describe('Settings Component', () => {
 
     expect(store.getState().settings.prefixStylesWithThemeName).toBe(true);
   });
+
+  it('show onboarding explainer syncproviders', () => {
+    store.dispatch.uiState.setOnboardingExplainerSyncProviders(true);
+
+    const result = render(<Settings />);
+
+    expect(result.findByText('Set up where tokens should be stored')).not.toBeUndefined();
+  });
+
+  it('hide onboarding explainer syncproviders', async () => {
+    store.dispatch.uiState.setOnboardingExplainerSyncProviders(true);
+    const result = render(<Settings />);
+
+    fireEvent.click(result.getByTestId('closeButton'));
+
+    expect(result.queryByText('Set up where tokens should be stored')).toBeNull();
+  });
+
+  it('reset onboarding explainers', async () => {
+    const result = render(<Settings />);
+
+    fireEvent.click(result.getByTestId('reset-onboarding'));
+
+    expect(result.queryByText('Set up where tokens should be stored')).not.toBeNull();
+  });
 });

@@ -6,7 +6,7 @@ import { TokenSetStatus } from '@/constants/TokenSetStatus';
 export function updateTokenSetsInState(
   state: TokenState,
   mutate: ((name: string, tokenList: AnyTokenList) => null | [string, AnyTokenList]) | null,
-  ...newTokenSets: ([string] | [string, AnyTokenList])[]
+  ...newTokenSets: ([string] | [string, AnyTokenList] | [string, AnyTokenList, number])[]
 ): TokenState {
   const deletedTokenSets = new Set<string>();
   const renamedTokenSets = new Map<string, string>();
@@ -25,9 +25,12 @@ export function updateTokenSetsInState(
       acc.push([name, tokenList]);
     }
     return acc;
-  }, []).concat(newTokenSets.map((newSet) => (
-    newSet.length === 1 ? [newSet[0], []] : newSet
-  )));
+  }, []);
+
+  newTokenSets.forEach((newSet) => {
+    const insertAt = newSet.length === 3 ? newSet[2] : entries.length;
+    entries.splice(insertAt, 0, [newSet[0], newSet?.[1] ?? []]);
+  });
 
   let nextActiveTokenSet = state.activeTokenSet;
   if (deletedTokenSets.has(state.activeTokenSet)) {
