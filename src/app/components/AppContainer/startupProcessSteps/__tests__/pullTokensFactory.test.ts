@@ -152,7 +152,7 @@ describe('pullTokensFactory', () => {
     expect(state.uiState.activeTab).toEqual(Tabs.TOKENS);
   });
 
-  it('should pull remote tokens and go to START tab if there are no tokens in the remote storage', async () => {
+  it('should pull remote tokens and go to Tokens tab if there are no tokens in the remote storage', async () => {
     const mockStore = createMockStore({
       uiState: {
         storageType: mockStorageType,
@@ -186,6 +186,45 @@ describe('pullTokensFactory', () => {
       themes: [],
       metadata: {},
     });
+
+    await fn();
+    const state = mockStore.getState();
+    expect(state.branchState.branches).toEqual(['main']);
+    expect(state.uiState.api).toEqual({ ...mockStorageType, secret: 'secret' });
+    expect(state.uiState.localApiState).toEqual({ ...mockStorageType, secret: 'secret' });
+    expect(mockPullTokens).toBeCalledTimes(1);
+    expect(state.uiState.activeTab).toEqual(Tabs.TOKENS);
+  });
+
+  it('should go to Start if the file on the remote cannot be read', async () => {
+    const mockStore = createMockStore({
+      uiState: {
+        storageType: mockStorageType,
+      },
+    });
+
+    const mockParams = {
+      localTokenData: {
+        checkForChanges: false,
+        values: {
+        },
+      },
+      localApiProviders: [
+        { ...mockStorageType, secret: 'secret' },
+      ],
+    } as unknown as StartupMessage;
+
+    const fn = pullTokensFactory(
+      mockStore,
+      mockStore.dispatch,
+      {},
+      mockParams,
+      mockUseConfirm,
+      mockUseRemoteTokens,
+    );
+
+    mockFetchBranches.mockResolvedValueOnce(['main']);
+    mockPullTokens.mockResolvedValueOnce(null);
 
     await fn();
     const state = mockStore.getState();

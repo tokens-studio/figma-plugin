@@ -19,7 +19,7 @@ import { TokenTypes } from '@/constants/TokenTypes';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StorageType } from '@/types/StorageType';
 import {
-  ActiveThemeProperty, CheckForChangesProperty, StorageTypeProperty, ThemesProperty, UpdatedAtProperty, ValuesProperty, VersionProperty,
+  ActiveThemeProperty, CheckForChangesProperty, StorageTypeProperty, ThemesProperty, UpdatedAtProperty, ValuesProperty, VersionProperty, OnboardingExplainerSetsProperty, OnboardingExplainerInspectProperty, OnboardingExplainerSyncProvidersProperty,
 } from '@/figmaStorage';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
@@ -95,6 +95,18 @@ export async function getTokenData(): Promise<{
 // set storage type (i.e. local or some remote provider)
 export async function saveStorageType(context: StorageType) {
   await StorageTypeProperty.write(context);
+}
+
+export async function saveOnboardingExplainerSets(onboardingExplainerSets: boolean) {
+  await OnboardingExplainerSetsProperty.write(onboardingExplainerSets);
+}
+
+export async function saveOnboardingExplainerSyncProviders(onboardingExplainerSyncProviders: boolean) {
+  await OnboardingExplainerSyncProvidersProperty.write(onboardingExplainerSyncProviders);
+}
+
+export async function saveOnboardingExplainerInspect(onboardingExplainerInspect: boolean) {
+  await OnboardingExplainerInspectProperty.write(onboardingExplainerInspect);
 }
 
 export async function getSavedStorageType(): Promise<StorageType> {

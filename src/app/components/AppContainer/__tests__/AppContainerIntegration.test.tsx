@@ -114,6 +114,11 @@ const mockStartupParams: Omit<StartupMessage, 'licenseKey'> = {
   type: AsyncMessageTypes.STARTUP,
   activeTheme: null,
   lastOpened: Date.now(),
+  onboardingExplainer: {
+    sets: true,
+    inspect: true,
+    syncProviders: true,
+  },
   localApiProviders: [],
   settings: mockSettings,
   storageType: {
@@ -396,9 +401,8 @@ describe('AppContainer (integration)', () => {
           <AppContainer {...params} />
         </Provider>,
       );
-
-      await result.findByText('Remote storage detected');
-      expect(result.queryByText('Remote storage detected')).toBeInTheDocument();
+      await result.findByText("Couldn't load tokens stored on GitHub");
+      expect(result.queryByText("Couldn't load tokens stored on GitHub")).toBeInTheDocument();
     });
   }));
 });

@@ -10,6 +10,11 @@ describe('Loads application', () => {
   const mockStartupParams = {
     activeTheme: null,
     lastOpened: Date.now(),
+    onboardingExplainer: {
+      sets: true,
+      inspect: true,
+      syncProviders: true,
+    },
     localApiProviders: [],
     licenseKey: null,
     settings: {

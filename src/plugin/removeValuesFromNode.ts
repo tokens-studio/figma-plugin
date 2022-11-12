@@ -80,7 +80,7 @@ export default function removeValuesFromNode(node: BaseNode, prop: Properties) {
         node.fills = [];
       }
       break;
-    case 'border':
+    case 'borderColor':
       if ('strokes' in node && typeof node.strokes !== 'undefined') {
         node.strokes = [];
       }
@@ -136,6 +136,18 @@ export default function removeValuesFromNode(node: BaseNode, prop: Properties) {
         node.fills = [];
       }
       break;
+    case 'border':
+      if ('strokes' in node && typeof node.strokes !== 'undefined') {
+        node.strokes = [];
+      }
+      if ('strokeWeight' in node && typeof node.strokeWeight !== 'undefined') {
+        node.strokeWeight = 0;
+      }
+      if ('dashPattern' in node && typeof node.dashPattern !== 'undefined') {
+        node.dashPattern = [0, 0];
+      }
+      break;
+
     default:
       break;
   }
