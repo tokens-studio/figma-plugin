@@ -145,6 +145,6 @@ describe('ConfirmDialog', () => {
     expect(result.queryByText('Default Branch')).toBeInTheDocument();
     expect(result.queryByText('File Path (e.g. data/tokens.json)')).toBeInTheDocument();
     expect(result.queryByText('baseUrl (optional)')).toBeInTheDocument();
-    expect(result.queryByText('Save')).toBeInTheDocument();
+    expect(result.queryByText('Save credentials')).toBeInTheDocument();
   });
 });
