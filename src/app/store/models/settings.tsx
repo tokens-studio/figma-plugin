@@ -26,6 +26,7 @@ export interface SettingsState {
   ignoreFirstPartForStyles?: boolean;
   prefixStylesWithThemeName?: boolean;
   inspectDeep: boolean;
+  shouldSwapStyles: boolean;
 }
 
 const setUI = (state: SettingsState) => {
@@ -50,6 +51,7 @@ export const settings = createModel<RootModel>()({
     ignoreFirstPartForStyles: false,
     prefixStylesWithThemeName: false,
     inspectDeep: false,
+    shouldSwapStyles: false,
   } as SettingsState,
   reducers: {
     ...settingsStateReducers,
@@ -116,6 +118,12 @@ export const settings = createModel<RootModel>()({
       return {
         ...state,
         updateStyles: payload,
+      };
+    },
+    setShouldSwapStyles(state, payload: boolean) {
+      return {
+        ...state,
+        shouldSwapStyles: payload,
       };
     },
     setTokenType(state, payload: TokenModeType) {

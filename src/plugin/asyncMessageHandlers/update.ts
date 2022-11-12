@@ -28,10 +28,9 @@ export const update: AsyncMessageChannelHandlers[AsyncMessageTypes.UPDATE] = asy
     const allWithData = await defaultNodeManager.findNodesWithData({
       updateMode: msg.settings.updateMode,
     });
-
     await updateNodes(allWithData, tokensMap, msg.settings);
     await updatePluginData({ entries: allWithData, values: {} });
-    if (msg.activeTheme && msg.themes) {
+    if (msg.activeTheme && msg.themes && shouldSwapStyles) {
       await swapStyles(msg.activeTheme, msg.themes);
     }
   }
