@@ -47,7 +47,7 @@ describe('notifySetTokens', () => {
 
 describe('notifyException', () => {
   it('should work', () => {
-    notifyException({ error: 'does not work', opts: { foo: 'bar' } });
+    notifyException('does not work', { foo: 'bar' });
     expect(mockUiPostMessage).toBeCalledTimes(1);
     expect(mockUiPostMessage).toBeCalledWith({
       type: MessageFromPluginTypes.NOTIFY_EXCEPTION,
