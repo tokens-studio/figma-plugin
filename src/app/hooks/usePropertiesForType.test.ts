@@ -292,6 +292,10 @@ describe('usePropertiesForTokenType', () => {
             { label: 'Left', name: Properties.borderWidthLeft },
           ],
         },
+        {
+          label: 'Background blur',
+          name: Properties.backgroundBlur,
+        },
       ],
     },
   ];

@@ -19,6 +19,7 @@ import setColorValuesOnTarget from './setColorValuesOnTarget';
 import setEffectValuesOnTarget from './setEffectValuesOnTarget';
 import setTextValuesOnTarget from './setTextValuesOnTarget';
 import setBorderValuesOnTarget from './setBorderValuesOnTarget';
+import setBackgroundBlurOnTarget from './setBackgroundBlurOnTarget';
 import { isSingleBorderValue } from '@/utils/is/isSingleBorderValue';
 import setImageValuesOnTarget from './setImageValuesOnTarget';
 
@@ -156,19 +157,7 @@ export default async function setValuesOnNode(
 
       // BACKGROUND BLUR
       if ('effects' in node && typeof values.backgroundBlur !== 'undefined' && isPrimitiveValue(values.backgroundBlur)) {
-        const existingEffectIndex = node.effects.findIndex((effect) => effect.type === 'BACKGROUND_BLUR');
-        let newEffects = [...node.effects];
-        const blurEffect: BlurEffect = {
-          type: 'BACKGROUND_BLUR',
-          visible: true,
-          radius: transformValue(String(values.backgroundBlur), 'backgroundBlur'),
-        };
-        if (existingEffectIndex > -1) {
-          newEffects = Object.assign([], node.effects, { [existingEffectIndex]: blurEffect });
-        } else {
-          newEffects.push(blurEffect);
-        }
-        node.effects = newEffects;
+        setBackgroundBlurOnTarget(node, { value: values.backgroundBlur });
       }
 
       // BORDER WIDTH
