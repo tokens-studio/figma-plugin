@@ -6,6 +6,7 @@ import {
 import Stack from '../Stack';
 import Button from '../Button';
 import Heading from '../Heading';
+import Text from '../Text';
 import Input from '../Input';
 import Modal from '../Modal';
 import useManageTokens from '../../store/useManageTokens';
@@ -100,14 +101,14 @@ export function TokenGroupHeading({
             </Stack>
           </ContextMenuTrigger>
           <ContextMenuContent>
-            <ContextMenuItem disabled={editProhibited} onSelect={handleDelete}>
-              Delete
-            </ContextMenuItem>
             <ContextMenuItem disabled={editProhibited} onSelect={handleRename}>
               Rename
             </ContextMenuItem>
             <ContextMenuItem disabled={editProhibited} onSelect={handleDuplicate}>
               Duplicate
+            </ContextMenuItem>
+            <ContextMenuItem disabled={editProhibited} onSelect={handleDelete}>
+              Delete
             </ContextMenuItem>
           </ContextMenuContent>
         </ContextMenu>
@@ -118,30 +119,29 @@ export function TokenGroupHeading({
         close={handleSetNewTokenGroupNameFileClose}
         footer={(
           <form id="renameTokenGroup" onSubmit={handleRenameTokenGroupSubmit}>
-            <Stack direction="row" gap={4}>
-              <Button variant="secondary" size="large" onClick={handleSetNewTokenGroupNameFileClose}>
+            <Stack direction="row" justify="end" gap={4}>
+              <Button variant="secondary" onClick={handleSetNewTokenGroupNameFileClose}>
                 Cancel
               </Button>
-              <Button type="submit" variant="primary" size="large" disabled={oldTokenGroupName === newTokenGroupName}>
+              <Button type="submit" variant="primary" disabled={oldTokenGroupName === newTokenGroupName}>
                 Change
               </Button>
             </Stack>
           </form>
         )}
       >
-        <Stack direction="column" justify="center" gap={4} css={{ textAlign: 'center' }}>
-          <Heading size="small">Renaming only affects tokens of the same type</Heading>
-          <Stack direction="column" gap={4}>
-            <Input
-              form="renameTokenGroup"
-              full
-              onChange={handleNewTokenGroupNameChange}
-              type="text"
-              name="tokengroupname"
-              value={newTokenGroupName}
-              required
-            />
-          </Stack>
+        <Stack direction="column" gap={4}>
+          <Input
+            form="renameTokenGroup"
+            full
+            onChange={handleNewTokenGroupNameChange}
+            type="text"
+            name="tokengroupname"
+            value={newTokenGroupName}
+            autofocus
+            required
+          />
+          <Text muted>Renaming only affects tokens of the same type</Text>
         </Stack>
       </Modal>
       <StyledTokenGroupAddIcon

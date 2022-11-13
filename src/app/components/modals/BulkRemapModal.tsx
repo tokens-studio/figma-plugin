@@ -35,7 +35,7 @@ export default function BulkRemapModal({ isOpen, onClose }: Props) {
   }, []);
 
   return (
-    <Modal large showClose isOpen={isOpen} close={handleClose} title="Choose a new token for">
+    <Modal large showClose isOpen={isOpen} close={handleClose} title="Bulk remap">
       <form
         onSubmit={onConfirm}
       >

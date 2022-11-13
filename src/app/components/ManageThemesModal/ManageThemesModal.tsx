@@ -97,24 +97,24 @@ export const ManageThemesModal: React.FC<Props> = () => {
           {themeEditorOpen && (
             <>
               <Box css={{ marginRight: 'auto' }}>
-                <Button
-                  id="button-manage-themes-modal-cancel"
-                  variant="secondary"
-                  onClick={handleToggleThemeEditor}
-                >
-                  Cancel
-                </Button>
-              </Box>
-              {typeof themeEditorOpen === 'string' && (
+                {typeof themeEditorOpen === 'string' && (
                 <Button
                   id="button-manage-themes-modal-delete-theme"
-                  variant="secondary"
+                  variant="danger"
                   type="submit"
                   onClick={handleDeleteTheme}
                 >
                   Delete
                 </Button>
-              )}
+                )}
+              </Box>
+              <Button
+                id="button-manage-themes-modal-cancel"
+                variant="secondary"
+                onClick={handleToggleThemeEditor}
+              >
+                Cancel
+              </Button>
               <Button
                 id="button-manage-themes-modal-save-theme"
                 variant="primary"

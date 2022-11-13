@@ -134,7 +134,7 @@ export default function InspectorMultiView({ resolvedTokens }: { resolvedTokens:
           )}
         </Box>
       ) : (
-        <Stack direction="column" gap={4} css={{ padding: '$5' }}>
+        <Stack direction="column" gap={4} css={{ padding: '$5', margin: 'auto' }}>
           <Blankslate title={uiState.selectedLayers > 0 ? 'No tokens found' : 'No layers selected'} text={uiState.selectedLayers > 0 ? 'None of the selected layers contain any tokens' : 'Select a layer to see applied tokens'} />
           {uiState.onboardingExplainerInspect && (
             <OnboardingExplainer data={onboardingData} closeOnboarding={closeOnboarding} />
