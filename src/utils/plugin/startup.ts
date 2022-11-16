@@ -1,4 +1,4 @@
-import { ApiProvidersProperty, LicenseKeyProperty } from '@/figmaStorage';
+import { ApiProvidersProperty, AuthDataProperty, LicenseKeyProperty } from '@/figmaStorage';
 import { getActiveTheme } from '@/utils/getActiveTheme';
 import getLastOpened from '@/utils/getLastOpened';
 import getOnboardingExplainer from '@/utils/getOnboardingExplainer';
@@ -20,6 +20,7 @@ export async function startup() {
     localApiProviders,
     licenseKey,
     localTokenData,
+    authData,
   ] = await Promise.all([
     getUISettings(false),
     getUsedTokenSet(),
@@ -31,6 +32,7 @@ export async function startup() {
     ApiProvidersProperty.read(),
     LicenseKeyProperty.read(),
     getTokenData(),
+    AuthDataProperty.read(),
   ]);
 
   return {
@@ -50,5 +52,6 @@ export async function startup() {
       figmaId: figma.currentUser.id,
       name: figma.currentUser.name,
     } : null,
+    authData,
   };
 }

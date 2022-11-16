@@ -22,7 +22,7 @@ export type ConfirmProps = {
   show?: boolean;
   text?: string;
   description?: React.ReactNode;
-  choices?: { key: string; label: string; enabled?: boolean, unique?: boolean }[];
+  choices?: { key: string; label: string; enabled?: boolean; unique?: boolean }[];
   confirmAction?: string;
   cancelAction?: string;
   input?: {
@@ -51,9 +51,9 @@ export type BackgroundJob = {
   totalTasks?: number;
 };
 export interface UIState {
-  backgroundJobs: BackgroundJob[]
+  backgroundJobs: BackgroundJob[];
   selectionValues: SelectionGroup[];
-  mainNodeSelectionValues: SelectionValue
+  mainNodeSelectionValues: SelectionValue;
   displayType: DisplayType;
   disabled: boolean;
   activeTab: Tabs;
@@ -78,6 +78,7 @@ export interface UIState {
   selectedLayers: number;
   manageThemesModalOpen: boolean;
   scrollPositionSet: Record<string, number>;
+  secondScreenEnabled: boolean;
 }
 
 const defaultConfirmState: ConfirmProps = {
@@ -91,7 +92,7 @@ const defaultConfirmState: ConfirmProps = {
 };
 
 export const uiState = createModel<RootModel>()({
-  state: {
+  state: ({
     selectionValues: [] as SelectionGroup[],
     mainNodeSelectionValues: {} as SelectionValue,
     disabled: false,
@@ -128,7 +129,8 @@ export const uiState = createModel<RootModel>()({
     selectedLayers: 0,
     manageThemesModalOpen: false,
     scrollPositionSet: {},
-  } as unknown as UIState,
+    secondScreenEnabled: false,
+  } as unknown) as UIState,
   reducers: {
     setShowPushDialog: (state, data: string | false) => ({
       ...state,
@@ -208,9 +210,7 @@ export const uiState = createModel<RootModel>()({
     completeJob(state, name: string) {
       return {
         ...state,
-        backgroundJobs: state.backgroundJobs.filter((job) => (
-          job.name !== name
-        )),
+        backgroundJobs: state.backgroundJobs.filter((job) => job.name !== name),
       };
     },
     clearJobs(state) {
@@ -303,6 +303,12 @@ export const uiState = createModel<RootModel>()({
         collapsed: !state.collapsed,
       };
     },
+    toggleSecondScreen(state) {
+      return {
+        ...state,
+        secondScreenEnabled: !state.secondScreenEnabled,
+      };
+    },
     addJobTasks(state, payload: AddJobTasksPayload) {
       return {
         ...state,
@@ -310,9 +316,11 @@ export const uiState = createModel<RootModel>()({
           if (job.name === payload.name) {
             return {
               ...job,
-              ...(payload.expectedTimePerTask ? {
-                timePerTask: payload.expectedTimePerTask,
-              } : {}),
+              ...(payload.expectedTimePerTask
+                ? {
+                  timePerTask: payload.expectedTimePerTask,
+                }
+                : {}),
               completedTasks: job.completedTasks ?? 0,
               totalTasks: (job.totalTasks ?? 0) + payload.count,
             };
@@ -331,7 +339,7 @@ export const uiState = createModel<RootModel>()({
               ...job,
               timePerTask: payload.timePerTask ?? job.timePerTask,
               completedTasks: totalCompletedTasks,
-              totalTasks: (job.totalTasks ?? totalCompletedTasks),
+              totalTasks: job.totalTasks ?? totalCompletedTasks,
             };
           }
           return job;

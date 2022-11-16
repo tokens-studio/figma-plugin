@@ -1,6 +1,4 @@
-import React, {
-  useCallback, useEffect, useState,
-} from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import * as pjs from '../../../../package.json';
 import App from '../App';
@@ -22,10 +20,11 @@ import Changelog from '../Changelog';
 import OnboardingFlow from '../OnboardingFlow';
 import { Initiator } from '../Initiator';
 import { globalStyles } from '../globalStyles';
+import { AuthContextProvider } from '@/context/AuthContext';
 
 type Props = StartupMessage & {
   // @README only for unit testing purposes
-  startupProcess?: ReturnType<typeof useStartupProcess>
+  startupProcess?: ReturnType<typeof useStartupProcess>;
 };
 
 const applicationInitStepLabels = {
@@ -76,25 +75,23 @@ export const AppContainer = withLDProviderWrapper((params: Props) => {
   globalStyles();
 
   return (
-    <>
-      <FigmaLoading
-        isLoading={showLoadingScreen}
-        label={(
-          startupProcess.currentStep
-            ? applicationInitStepLabels[startupProcess.currentStep]
-            : undefined
-        )}
-        onCancel={handleCancelLoadingScreen}
-      >
-        <App />
-      </FigmaLoading>
-      <Initiator />
-      <ConfirmDialog />
-      <ImportedTokensDialog />
-      <PushDialog />
-      <WindowResizer />
-      <OnboardingFlow />
-      <Changelog />
-    </>
+    <AuthContextProvider authData={params.authData}>
+      <>
+        <FigmaLoading
+          isLoading={showLoadingScreen}
+          label={startupProcess.currentStep ? applicationInitStepLabels[startupProcess.currentStep] : undefined}
+          onCancel={handleCancelLoadingScreen}
+        >
+          <App />
+        </FigmaLoading>
+        <Initiator />
+        <ConfirmDialog />
+        <ImportedTokensDialog />
+        <PushDialog />
+        <WindowResizer />
+        <OnboardingFlow />
+        <Changelog />
+      </>
+    </AuthContextProvider>
   );
 });

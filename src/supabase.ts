@@ -1,7 +1,141 @@
-import { createClient } from '@supabase/supabase-js';
+import { PostgrestClient } from '@supabase/postgrest-js';
+import { StorageClient } from '@supabase/storage-js';
+import { AuthData, AuthInfo } from './context/AuthContext';
 
-export const supabase = createClient(
-  // replace with your URL and API key
-  'https://vzociuaifoouyldntyxo.supabase.co',
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ6b2NpdWFpZm9vdXlsZG50eXhvIiwicm9sZSI6ImFub24iLCJpYXQiOjE2Njc1NTMwMjYsImV4cCI6MTk4MzEyOTAyNn0.InqfZcT5ggHUoS6Aib2aMpMcMZR3ppf9v3HB3Sew7rQ',
-);
+const authUri = '/auth/v1';
+
+class SupabaseClient {
+  apiUrl: string;
+
+  apikey: string;
+
+  headers: { [key: string]: string };
+
+  auth: any;
+
+  postgrest: any;
+
+  storage: any;
+
+  /**
+   * @param apiUrl  supabase api url.
+   * @param apikey  supabase key.
+   */
+  constructor(apiUrl: string, apikey: string) {
+    this.apiUrl = apiUrl;
+    this.apikey = apikey;
+    this.headers = this.getAuthHeaders(null);
+  }
+
+  private getAuthHeaders(auth: AuthData | null): { [key: string]: string } {
+    const headers: { [key: string]: string } = {};
+    const authBearer = auth?.access_token ?? process.env.SUPABASE_ANON_KEY;
+    headers.apikey = process.env.SUPABASE_ANON_KEY ?? '';
+    headers.Authorization = `Bearer ${authBearer}`;
+    headers['Content-Type'] = 'application/json';
+    return headers;
+  }
+
+  private initPostgrest() {
+    const REST_URL = `${process.env.SUPABASE_URL}/rest/v1`;
+    const postgrest = new PostgrestClient(REST_URL, {
+      schema: 'public',
+      headers: this.headers,
+    });
+    return postgrest;
+  }
+
+  private initStorage() {
+    const STORAGE_URL = `${process.env.SUPABASE_URL}/storage/v1`;
+    const storageHeaders = { ...this.headers };
+    delete storageHeaders['Content-Type'];
+    const storage = new StorageClient(STORAGE_URL, storageHeaders);
+    return storage;
+  }
+
+  private initializeAuth(auth: AuthData) {
+    this.auth = auth;
+    this.headers = this.getAuthHeaders(auth);
+    this.postgrest = this.initPostgrest();
+    this.storage = this.initStorage();
+  }
+
+  private checkToken(auth: AuthData) {
+    const now = new Date().getTime() / 1000;
+    const diff = auth.expires_at - now;
+    if (diff > 0) {
+      // Almost expired
+      if (diff < 20) {
+        return 'near';
+      }
+      return 'safe';
+    }
+    // Expired
+    return 'expired';
+  }
+
+  async verifyAuth(auth: AuthData, callback: (data: AuthData | null) => void) {
+    const tokenState = this.checkToken(auth);
+    if (tokenState === 'near') {
+      // Refresh token automatically if token is almost expired
+      const { data, error } = await this.signIn({
+        refresh_token: auth.refresh_token,
+      });
+      if (error) {
+        console.error(data);
+      } else {
+        // Reset auth data
+        this.initializeAuth(data);
+        callback(data);
+      }
+    } else if (tokenState === 'expired') {
+      callback(null);
+    } else if (tokenState === 'safe') {
+      // Initialize auth data
+      this.initializeAuth(auth);
+      callback(auth);
+    }
+  }
+
+  async signUp(data: AuthInfo) {
+    const auth = await fetch(`${this.apiUrl + authUri}/signup`, {
+      method: 'POST',
+      headers: this.headers,
+      body: JSON.stringify(data),
+    }).then((res) => res.json());
+
+    if (!auth.user) {
+      return { data: null, error: auth };
+    }
+    const now = new Date().getTime() / 1000;
+    const authData = { ...auth, expires_at: Math.floor(now + auth.expires_in) };
+
+    // Logged in, initialize auth data
+    this.initializeAuth(authData);
+    return { data: authData, error: null };
+  }
+
+  async signIn(data: AuthInfo) {
+    const url = `/token?grant_type=${data.email ? 'password' : 'refresh_token'}`;
+
+    const auth = await fetch(this.apiUrl + authUri + url, {
+      method: 'POST',
+      headers: this.headers,
+      body: JSON.stringify(data),
+    }).then((res) => res.json());
+
+    if (auth.error) {
+      return { data: null, error: auth };
+    }
+    const now = new Date().getTime() / 1000;
+    const authData = { ...auth, expires_at: Math.floor(now + auth.expires_in) };
+
+    // Logged in, initialize auth data
+    this.initializeAuth(authData);
+    return { data: authData, error: null };
+  }
+}
+
+const supabase = new SupabaseClient(process.env.SUPABASE_URL ?? '', process.env.SUPABASE_ANON_KEY ?? '');
+
+export default supabase;

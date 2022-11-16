@@ -1,50 +1,45 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
-import { EnterFullScreenIcon } from '@radix-ui/react-icons';
-import IconButton from '../IconButton';
-import { tokenStateSelector } from '@/selectors';
-import { supabase } from '@/supabase';
-import { clientEmailSelector } from '@/selectors/getClientEmail';
+import React, { useCallback } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { LightningBoltIcon } from '@radix-ui/react-icons';
+import { useAuth } from '@/context/AuthContext';
+import Box from '../Box';
+import { secondScreenSelector } from '@/selectors/secondScreenSelector';
+import { Dispatch } from '@/app/store';
 
 export default function SecondScreen() {
-  //   const { secondScreen } = useFlags();
-  const tokenState = useSelector(tokenStateSelector);
-  const email = useSelector(clientEmailSelector);
+  const isEnabled = useSelector(secondScreenSelector);
+  const dispatch = useDispatch<Dispatch>();
+  const { user, handleLogout } = useAuth();
 
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    async function getTokens() {
-      if (email) {
-        const { data } = await supabase.from('tokens').select('data').eq('owner_email', email);
-        console.log('get tokenz', data);
-      }
-    }
-
-    getTokens();
-  }, [email]);
-
-  const handleOpenSecondScreen = useCallback(async () => {
-    setLoading(true);
-    try {
-      //   getDatabase();
-      // const db = getDatabase(app);
-    } catch (error) {
-      console.log(error);
-    }
-
-    console.log({ themes: tokenState.themes, tokens: tokenState.tokens });
-    setLoading(false);
-  }, [tokenState]);
+  const onSyncClick = useCallback(() => {
+    dispatch.uiState.toggleSecondScreen();
+  }, [user, handleLogout, dispatch.uiState]);
 
   return (
-    <IconButton
-      size="large"
-      tooltip="Activate screen"
-      dataCy="token-flow-button"
-      loading={loading}
-      onClick={handleOpenSecondScreen}
-      icon={<EnterFullScreenIcon />}
-    />
+    <Box
+      css={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        gap: '$3',
+        padding: '$2 $4',
+        background: isEnabled ? 'rgba(65, 63, 63, 1)' : 'transparent',
+        borderRadius: '6px',
+        cursor: 'pointer',
+        marginLeft: '$4',
+      }}
+      onClick={onSyncClick}
+    >
+      <LightningBoltIcon />
+      Live-Sync
+      <Box
+        css={{
+          height: '7px',
+          width: '7px',
+          borderRadius: '50%',
+          background: isEnabled && user ? '#93DD66' : '$fgDanger',
+        }}
+      />
+    </Box>
   );
 }

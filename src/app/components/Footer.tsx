@@ -30,6 +30,7 @@ import IconLibrary from '@/icons/library.svg';
 import ProBadge from './ProBadge';
 import { compareLastSyncedState } from '@/utils/compareLastSyncedState';
 import SecondScreen from './SecondScreen';
+import AuthModal from './AuthModal';
 
 export default function Footer() {
   const storageType = useSelector(storageTypeSelector);
@@ -120,6 +121,7 @@ export default function Footer() {
           </>
         )}
         <SecondScreen />
+        <AuthModal />
         {storageType.provider !== StorageProviderType.LOCAL
           && storageType.provider !== StorageProviderType.GITHUB
           && storageType.provider !== StorageProviderType.GITLAB

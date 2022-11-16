@@ -41,6 +41,8 @@
     "@sentry/react": "^6.2.5",
     "@stitches/react": "^1.2.8",
     "@storybook/addon-postcss": "^2.0.0",
+    "@supabase/postgrest-js": "^1.1.0",
+    "@supabase/storage-js": "^2.0.0",
     "@supabase/supabase-js": "^2.0.5",
     "@types/file-saver": "^2.0.5",
     "@welldone-software/why-did-you-render": "^6.2.3",
