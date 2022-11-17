@@ -67,7 +67,6 @@ const AuthContextProvider = ({
     setAuthData(data);
     // Store user auth data in figma.clientStorage
 
-    sendMessageToBackground('ui:set-auth', { auth: data });
     AsyncMessageChannel.ReactInstance.message({
       type: AsyncMessageTypes.SET_AUTH_DATA,
       auth: data,

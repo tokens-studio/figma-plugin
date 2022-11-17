@@ -5,6 +5,9 @@ import { useAuth } from '@/context/AuthContext';
 import Box from '../Box';
 import { secondScreenSelector } from '@/selectors/secondScreenSelector';
 import { Dispatch } from '@/app/store';
+import {
+  ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger,
+} from '../ContextMenu';
 
 export default function SecondScreen() {
   const isEnabled = useSelector(secondScreenSelector);
@@ -13,9 +16,13 @@ export default function SecondScreen() {
 
   const onSyncClick = useCallback(() => {
     dispatch.uiState.toggleSecondScreen();
-  }, [user, handleLogout, dispatch.uiState]);
+  }, [dispatch.uiState]);
 
-  return (
+  const handleOpenSecondScreen = useCallback(() => {
+    window.open(process.env.SECOND_SCREEN_APP_URL);
+  }, []);
+
+  const secondScreenButton = (
     <Box
       css={{
         display: 'flex',
@@ -42,4 +49,18 @@ export default function SecondScreen() {
       />
     </Box>
   );
+
+  if (user && isEnabled) {
+    return (
+      <ContextMenu>
+        <ContextMenuTrigger>{secondScreenButton}</ContextMenuTrigger>
+        <ContextMenuContent>
+          <ContextMenuItem onSelect={handleLogout}>Logout</ContextMenuItem>
+          <ContextMenuItem onSelect={handleOpenSecondScreen}>Open second screen</ContextMenuItem>
+        </ContextMenuContent>
+      </ContextMenu>
+    );
+  }
+
+  return secondScreenButton;
 }
