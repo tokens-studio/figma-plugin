@@ -6,7 +6,7 @@ import { UpdateMode } from '@/constants/UpdateMode';
 
 export async function sendSelectionChange(): Promise<SelectionContent | null> {
   const nodes = store.inspectDeep && store.shouldSendSelectionValues
-    ? (await defaultNodeManager.findNodesWithData({ updateMode: UpdateMode.SELECTION, invalidateCache: true })).map((node) => node.node)
+    ? (await defaultNodeManager.findNodesWithData({ updateMode: UpdateMode.SELECTION })).map((node) => node.node)
     : Array.from(figma.currentPage.selection);
   const currentSelectionLength = figma.currentPage.selection.length;
 
@@ -14,5 +14,5 @@ export async function sendSelectionChange(): Promise<SelectionContent | null> {
     notifyNoSelection();
     return null;
   }
-  return sendPluginValues({ nodes, shouldSendSelectionValues: store.shouldSendSelectionValues });
+  return sendPluginValues({ nodes, shouldSendSelectionValues: store.shouldSendSelectionValues, invalidateCache: true });
 }

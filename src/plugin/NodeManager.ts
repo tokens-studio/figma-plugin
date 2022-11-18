@@ -291,9 +291,8 @@ export class NodeManager {
     } else {
       relevantNodes = findAll([figma.root], false);
     }
-
     if (invalidateCache) {
-      await this.update(relevantNodes);
+      await this.update(Array.from(figma.currentPage.selection));
     } else {
       const unregisteredNodes = relevantNodes
         .filter((node) => {

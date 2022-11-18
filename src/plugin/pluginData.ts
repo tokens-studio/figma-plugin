@@ -48,10 +48,10 @@ export type SelectionContent = {
   selectedNodes: number
 };
 
-export async function sendPluginValues({ nodes, shouldSendSelectionValues }: { nodes: readonly BaseNode[], shouldSendSelectionValues: boolean }): Promise<SelectionContent> {
+export async function sendPluginValues({ nodes, shouldSendSelectionValues, invalidateCache }: { nodes: readonly BaseNode[], shouldSendSelectionValues: boolean, invalidateCache?: boolean }): Promise<SelectionContent> {
   let mainNodeSelectionValues: SelectionValue[] = [];
   let selectionValues;
-  const pluginValues = await defaultNodeManager.findNodesWithData({ nodes });
+  const pluginValues = await defaultNodeManager.findNodesWithData({ nodes, invalidateCache });
   // TODO: Handle all selected nodes share the same properties
   // TODO: Handle many selected and mixed (for Tokens tab)
   if (Array.isArray(pluginValues) && pluginValues?.length > 0) {
