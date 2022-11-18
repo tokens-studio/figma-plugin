@@ -51,4 +51,14 @@ describe('token-transformer', () => {
     var testResult = fs.readFileSync('temp/composition.json');
     expect(testResult.toString()).toEqual(expectedResult.toString());
   });
+  it('respects order set in $metadata for dark theme', async () => {
+    var expectedResult = fs.readFileSync('output/darkOrder.json');
+    var testResult = fs.readFileSync('temp/darkOrder.json');
+    expect(testResult.toString()).toEqual(expectedResult.toString());
+  });
+  it('respects order set in $metadata for light hteme', async () => {
+    var expectedResult = fs.readFileSync('output/lightOrder.json');
+    var testResult = fs.readFileSync('temp/lightOrder.json');
+    expect(testResult.toString()).toEqual(expectedResult.toString());
+  });
 });
