@@ -268,6 +268,7 @@ export class NodeManager {
   public async findNodesWithData(opts: {
     updateMode?: UpdateMode;
     nodes?: readonly BaseNode[];
+    invalidateCache?: boolean;
   }) {
     postToUI({
       type: MessageFromPluginTypes.START_JOB,
@@ -279,7 +280,7 @@ export class NodeManager {
     // wait for previous update
     await this.waitForUpdating();
 
-    const { updateMode, nodes } = opts;
+    const { updateMode, nodes, invalidateCache } = opts;
     let relevantNodes: BaseNode[] = [];
     if (nodes) {
       relevantNodes = Array.from(nodes);
@@ -291,7 +292,17 @@ export class NodeManager {
       relevantNodes = findAll([figma.root], false);
     }
 
-    await this.update(relevantNodes);
+    if (invalidateCache) {
+      await this.update(relevantNodes);
+    } else {
+      const unregisteredNodes = relevantNodes
+        .filter((node) => {
+          const mainKey = getMainKey(node);
+          return !this.nodes.has(node.id) || (node.type === 'INSTANCE' && mainKey !== this.nodes.get(node.id)?.mainKey);
+        });
+
+      await this.update(unregisteredNodes);
+    }
 
     const relevantNodeIds = relevantNodes.map((node) => node.id);
     const resultingNodes = compact(relevantNodeIds.map((nodeId) => {
