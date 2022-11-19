@@ -60,6 +60,7 @@ export type SavedSettings = {
   ignoreFirstPartForStyles: boolean;
   prefixStylesWithThemeName: boolean;
   inspectDeep: boolean;
+  swapStyles: boolean;
 };
 
 export function notifyUISettings(
@@ -74,6 +75,7 @@ export function notifyUISettings(
     prefixStylesWithThemeName,
     updateRemote = true,
     inspectDeep,
+    swapStyles,
   }: SavedSettings,
 ) {
   postToUI({
@@ -91,6 +93,7 @@ export function notifyUISettings(
       ignoreFirstPartForStyles,
       prefixStylesWithThemeName,
       inspectDeep,
+      swapStyles,
     },
   });
   postToUI({

@@ -42,6 +42,7 @@ export type UiSettingsFromPluginMessage = {
     ignoreFirstPartForStyles: boolean;
     prefixStylesWithThemeName: boolean;
     inspectDeep: boolean;
+    swapStyles: boolean;
   };
 };
 

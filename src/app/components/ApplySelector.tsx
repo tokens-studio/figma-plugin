@@ -22,6 +22,8 @@ export default function ApplySelector() {
     updateMode, updateRemote, updateOnChange, updateStyles, swapStyles,
   } = useSelector(settingsStateSelector, isEqual);
 
+  const { swapStylesAlpha } = useFlags();
+
   const {
     setUpdateMode, setUpdateOnChange, setUpdateRemote, setUpdateStyles, setSwapStyles,
   } = useDispatch<Dispatch>().settings;
@@ -107,12 +109,14 @@ export default function ApplySelector() {
           </DropdownMenuItemIndicator>
           Update styles
         </DropdownMenuCheckboxItem>
+        {swapStylesAlpha && (
         <DropdownMenuCheckboxItem checked={swapStyles} onCheckedChange={handleSwapStyles}>
           <DropdownMenuItemIndicator>
             <CheckIcon />
           </DropdownMenuItemIndicator>
-          Swap styles (slow)
+          Swap styles (Alpha)
         </DropdownMenuCheckboxItem>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   );
