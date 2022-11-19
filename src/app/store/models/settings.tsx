@@ -119,7 +119,7 @@ export const settings = createModel<RootModel>()({
         updateStyles: payload,
       };
     },
-    setswapStyles(state, payload: boolean) {
+    setSwapStyles(state, payload: boolean) {
       return {
         ...state,
         swapStyles: payload,
@@ -154,6 +154,9 @@ export const settings = createModel<RootModel>()({
       });
     },
     setUpdateStyles: (payload, rootState) => {
+      setUI(rootState.settings);
+    },
+    setSwapStyles: (payload, rootState) => {
       setUI(rootState.settings);
     },
     setUpdateMode: (payload, rootState) => {

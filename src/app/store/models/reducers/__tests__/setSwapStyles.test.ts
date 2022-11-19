@@ -1,4 +1,4 @@
-import { createMockStore } from '@tests/config/setupTest';
+import { createMockStore } from '../../../../../../tests/config/setupTest';
 
 describe('Can set swap styles', () => {
   it('should work', () => {
