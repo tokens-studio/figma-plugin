@@ -621,7 +621,7 @@ describe('Initiator', () => {
         height: 300,
         isMinimized: false,
       },
-      swapStyles: false,
+      shouldSwapStyles: false,
       tokenType: 'object',
       updateMode: UpdateMode.PAGE,
       updateRemote: false,

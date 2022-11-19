@@ -20,13 +20,13 @@ import { useFlags } from './LaunchDarkly';
 
 export default function ApplySelector() {
   const {
-    updateMode, updateRemote, updateOnChange, updateStyles, swapStyles,
+    updateMode, updateRemote, updateOnChange, updateStyles, shouldSwapStyles,
   } = useSelector(settingsStateSelector, isEqual);
 
   const { swapStylesAlpha } = useFlags();
 
   const {
-    setUpdateMode, setUpdateOnChange, setUpdateRemote, setUpdateStyles, setSwapStyles,
+    setUpdateMode, setUpdateOnChange, setUpdateRemote, setUpdateStyles, setShouldSwapStyles,
   } = useDispatch<Dispatch>().settings;
 
   const handleApplySelection = React.useCallback(() => {
@@ -53,9 +53,9 @@ export default function ApplySelector() {
     setUpdateStyles(!updateStyles);
   }, [updateStyles, setUpdateStyles]);
 
-  const handleSwapStyles = React.useCallback(() => {
-    setSwapStyles(!swapStyles);
-  }, [swapStyles, setSwapStyles]);
+  const handleShouldSwapStyles = React.useCallback(() => {
+    setShouldSwapStyles(!shouldSwapStyles);
+  }, [shouldSwapStyles, setShouldSwapStyles]);
 
   return (
     <DropdownMenu>
@@ -111,7 +111,7 @@ export default function ApplySelector() {
           Update styles
         </DropdownMenuCheckboxItem>
         {swapStylesAlpha && (
-        <DropdownMenuCheckboxItem checked={swapStyles} onCheckedChange={handleSwapStyles}>
+        <DropdownMenuCheckboxItem checked={shouldSwapStyles} onCheckedChange={handleShouldSwapStyles}>
           <DropdownMenuItemIndicator>
             <CheckIcon />
           </DropdownMenuItemIndicator>

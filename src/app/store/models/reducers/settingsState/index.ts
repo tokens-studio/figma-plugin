@@ -1,2 +1,2 @@
 export * from './setPrefixStylesWithThemeName';
-export * from './setSwapStyles';
+export * from './setShouldSwapStyles';

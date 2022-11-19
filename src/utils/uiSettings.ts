@@ -17,7 +17,7 @@ export async function updateUISettings(uiSettings: Partial<SavedSettings>) {
       ignoreFirstPartForStyles: uiSettings.ignoreFirstPartForStyles ?? data?.ignoreFirstPartForStyles,
       prefixStylesWithThemeName: uiSettings.prefixStylesWithThemeName ?? data?.prefixStylesWithThemeName,
       inspectDeep: uiSettings.inspectDeep ?? data?.inspectDeep,
-      swapStyles: uiSettings.swapStyles ?? data?.swapStyles,
+      shouldSwapStyles: uiSettings.shouldSwapStyles ?? data?.shouldSwapStyles,
     });
   } catch (err) {
     notifyUI('There was an issue saving your credentials. Please try again.');
@@ -39,7 +39,7 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
     let ignoreFirstPartForStyles: boolean;
     let prefixStylesWithThemeName: boolean;
     let inspectDeep: boolean;
-    let swapStyles: boolean;
+    let shouldSwapStyles: boolean;
     if (data) {
       width = data.width || 400;
       height = data.height || 600;
@@ -51,7 +51,7 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
       ignoreFirstPartForStyles = typeof data.ignoreFirstPartForStyles === 'undefined' ? false : data.ignoreFirstPartForStyles;
       prefixStylesWithThemeName = typeof data.prefixStylesWithThemeName === 'undefined' ? false : data.prefixStylesWithThemeName;
       inspectDeep = typeof data.inspectDeep === 'undefined' ? false : data.inspectDeep;
-      swapStyles = typeof data.swapStyles === 'undefined' ? false : data.swapStyles;
+      shouldSwapStyles = typeof data.shouldSwapStyles === 'undefined' ? false : data.shouldSwapStyles;
       settings = {
         width: Math.max(300, width),
         height: Math.max(200, height),
@@ -63,7 +63,7 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
         ignoreFirstPartForStyles,
         prefixStylesWithThemeName,
         inspectDeep,
-        swapStyles,
+        shouldSwapStyles,
       };
 
       if (notify) {

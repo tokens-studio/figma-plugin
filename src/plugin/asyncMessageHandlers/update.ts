@@ -30,7 +30,7 @@ export const update: AsyncMessageChannelHandlers[AsyncMessageTypes.UPDATE] = asy
     });
     await updateNodes(allWithData, tokensMap, msg.settings);
     await updatePluginData({ entries: allWithData, values: {} });
-    if (msg.activeTheme && msg.themes && swapStyles) {
+    if (msg.activeTheme && msg.themes && msg.settings.shouldSwapStyles) {
       await swapStyles(msg.activeTheme, msg.themes);
     }
   }
