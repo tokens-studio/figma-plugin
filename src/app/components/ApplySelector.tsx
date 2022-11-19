@@ -16,6 +16,7 @@ import IconChevronDown from '@/icons/chevrondown.svg';
 import { settingsStateSelector } from '@/selectors';
 import { isEqual } from '@/utils/isEqual';
 import { UpdateMode } from '@/constants/UpdateMode';
+import { useFlags } from './LaunchDarkly';
 
 export default function ApplySelector() {
   const {
