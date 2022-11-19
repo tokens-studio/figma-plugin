@@ -126,7 +126,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
   const referenceTokenTypes = useReferenceTokenType(type as TokenTypes);
   const getHighlightedText = useCallback((text: string, highlight: string) => {
     // Split on highlight term and include term into parts, ignore case
-    const parts = text.split(new RegExp(`(${highlight})`, 'gi'));
+    const parts = text.split(new RegExp(`(${highlight.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')})`, 'gi'));
     return (
       <span>
         {parts.map((part, i) => (
@@ -252,7 +252,6 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
                       backgroundColor: highlightedIndex === index ? '$interaction' : '$bgDefault',
                     }}
                     isFocused={highlightedIndex === index}
-
                   >
                     {type === 'color' && (
                     <StyledItemColorDiv>

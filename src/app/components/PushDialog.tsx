@@ -17,7 +17,7 @@ import { isGitProvider } from '@/utils/is';
 import Textarea from './Textarea';
 import { useShortcut } from '@/hooks/useShortcut';
 
-function ConfirmDialog() {
+function PushDialog() {
   const { onConfirm, onCancel, showPushDialog } = usePushDialog();
   const localApiState = useSelector(localApiStateSelector);
   const [commitMessage, setCommitMessage] = React.useState('');
@@ -179,4 +179,4 @@ function ConfirmDialog() {
     }
   }
 }
-export default ConfirmDialog;
+export default PushDialog;

@@ -4,7 +4,6 @@ import { track } from '@/utils/analytics';
 import useConfirm from '../hooks/useConfirm';
 import { Dispatch } from '../store';
 import Button from './Button';
-import Heading from './Heading';
 import IconAdd from '@/icons/add.svg';
 import Input from './Input';
 import Modal from './Modal';
@@ -162,62 +161,59 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
         saveScrollPositionSet={saveScrollPositionSet}
       />
       <Modal
+        title={`Rename ${tokenSetMarkedForChange}`}
         isOpen={showRenameTokenSetFields}
         close={handleCloseRenameModal}
       >
-        <Stack direction="column" justify="center" gap={4} css={{ textAlign: 'center' }}>
-          <Heading size="small">
-            Rename
-            {' '}
-            {tokenSetMarkedForChange}
-          </Heading>
-          <form onSubmit={handleRenameTokenSetSubmit}>
-            <Stack direction="column" gap={4}>
-              <Input
-                full
-                value={newTokenSetName}
-                onChange={handleChangeName}
-                type="text"
-                name="tokensetname"
-                required
-              />
-              <Stack direction="row" gap={4}>
-                <Button variant="secondary" size="large" onClick={handleCloseRenameModal}>
-                  Cancel
-                </Button>
-                <Button type="submit" variant="primary" size="large" disabled={tokenSetMarkedForChange === newTokenSetName}>
-                  Change
-                </Button>
-              </Stack>
+        <form onSubmit={handleRenameTokenSetSubmit}>
+          <Stack direction="column" gap={4}>
+            <Input
+              full
+              autofocus
+              value={newTokenSetName}
+              onChange={handleChangeName}
+              type="text"
+              name="tokensetname"
+              required
+            />
+            <Stack direction="row" gap={4}>
+              <Button variant="secondary" size="large" onClick={handleCloseRenameModal}>
+                Cancel
+              </Button>
+              <Button type="submit" variant="primary" size="large" disabled={tokenSetMarkedForChange === newTokenSetName}>
+                Change
+              </Button>
             </Stack>
-          </form>
-        </Stack>
+          </Stack>
+        </form>
       </Modal>
-      <Modal isOpen={showNewTokenSetFields} close={handleCloseNewTokenSetModal}>
-        <Stack direction="column" justify="center" gap={4} css={{ textAlign: 'center' }}>
-          <Heading size="small">New set</Heading>
-          <form onSubmit={handleNewTokenSetSubmit}>
-            <Stack direction="column" gap={4}>
-              <Input
-                full
-                value={newTokenSetName}
-                onChange={handleChangeName}
-                type="text"
-                name="tokensetname"
-                required
-                data-cy="token-set-input"
-              />
-              <Stack direction="row" gap={4}>
-                <Button variant="secondary" size="large" onClick={handleCloseNewTokenSetModal}>
-                  Cancel
-                </Button>
-                <Button data-cy="create-token-set" type="submit" variant="primary" size="large">
-                  Create
-                </Button>
-              </Stack>
+      <Modal
+        title="New set"
+        isOpen={showNewTokenSetFields}
+        close={handleCloseNewTokenSetModal}
+      >
+        <form onSubmit={handleNewTokenSetSubmit}>
+          <Stack direction="column" gap={4}>
+            <Input
+              full
+              value={newTokenSetName}
+              onChange={handleChangeName}
+              type="text"
+              name="tokensetname"
+              required
+              data-cy="token-set-input"
+              autofocus
+            />
+            <Stack direction="row" gap={4}>
+              <Button variant="secondary" size="large" onClick={handleCloseNewTokenSetModal}>
+                Cancel
+              </Button>
+              <Button data-cy="create-token-set" type="submit" variant="primary" size="large">
+                Create
+              </Button>
             </Stack>
-          </form>
-        </Stack>
+          </Stack>
+        </form>
       </Modal>
       <StyledButton data-cy="button-new-token-set" type="button" disabled={editProhibited} onClick={handleOpenNewTokenSetModal}>
         New set

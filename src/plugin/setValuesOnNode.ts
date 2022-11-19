@@ -19,6 +19,7 @@ import setColorValuesOnTarget from './setColorValuesOnTarget';
 import setEffectValuesOnTarget from './setEffectValuesOnTarget';
 import setTextValuesOnTarget from './setTextValuesOnTarget';
 import setBorderValuesOnTarget from './setBorderValuesOnTarget';
+import setBackgroundBlurOnTarget from './setBackgroundBlurOnTarget';
 import { isSingleBorderValue } from '@/utils/is/isSingleBorderValue';
 import setImageValuesOnTarget from './setImageValuesOnTarget';
 
@@ -153,6 +154,11 @@ export default async function setValuesOnNode(
             setEffectValuesOnTarget(node, { value: values.boxShadow });
           }
         }
+      }
+
+      // BACKGROUND BLUR
+      if ('effects' in node && typeof values.backgroundBlur !== 'undefined' && isPrimitiveValue(values.backgroundBlur)) {
+        setBackgroundBlurOnTarget(node, { value: String(values.backgroundBlur) });
       }
 
       // BORDER WIDTH

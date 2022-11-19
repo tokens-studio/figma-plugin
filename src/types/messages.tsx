@@ -18,6 +18,7 @@ export enum MessageFromPluginTypes {
   ADD_JOB_TASKS = 'add_job_tasks',
   COMPLETE_JOB_TASKS = 'complete_job_tasks',
   SET_TOKENS = 'set_tokens',
+  NOTIFY_EXCEPTION = 'notify_exception',
 }
 
 export type NoSelectionFromPluginMessage = { type: MessageFromPluginTypes.NO_SELECTION };
@@ -87,6 +88,12 @@ export type SetTokensFromPluginMessage = {
   values: TokenStore;
 };
 
+export type NotifyExceptionFromPluginMessage = {
+  type: MessageFromPluginTypes.NOTIFY_EXCEPTION;
+  error: string;
+  opts?: Record<string, unknown>;
+};
+
 export type PostToUIMessage =
   | NoSelectionFromPluginMessage
   | SelectionFromPluginMessage
@@ -99,4 +106,5 @@ export type PostToUIMessage =
   | ClearJobsFromPluginMessage
   | AddJobTasksFromPluginMessage
   | CompleteJobTasksFromPluginMessage
-  | SetTokensFromPluginMessage;
+  | SetTokensFromPluginMessage
+  | NotifyExceptionFromPluginMessage;

@@ -41,7 +41,6 @@ type Choice = { key: string; label: string; enabled?: boolean, unique?: boolean 
 
 // @TODO this needs to be reviewed from a typings perspective + performance
 function EditTokenForm({ resolvedTokens }: Props) {
-  const firstInput = React.useRef<HTMLInputElement | null>(null);
   const activeTokenSet = useSelector(activeTokenSetSelector);
   const editToken = useSelector(editTokenSelector);
   const themes = useSelector(themesListSelector);
@@ -363,12 +362,6 @@ function EditTokenForm({ resolvedTokens }: Props) {
     dispatch.uiState.setShowEditForm(false);
   }, [dispatch]);
 
-  React.useEffect(() => {
-    setTimeout(() => {
-      firstInput.current?.focus();
-    }, 50);
-  }, []);
-
   const resolvedValue = React.useMemo(() => {
     if (internalEditToken) {
       return typeof internalEditToken?.value === 'string'
@@ -481,8 +474,8 @@ function EditTokenForm({ resolvedTokens }: Props) {
           value={internalEditToken?.name}
           onChange={handleChange}
           type="text"
+          autofocus
           name="name"
-          inputRef={firstInput}
           error={error}
           placeholder="Unique name"
         />
@@ -494,6 +487,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
           <Textarea
             key="description"
             value={internalEditToken?.description || ''}
+            placeholder="Optional description"
             onChange={handleDescriptionChange}
             rows={3}
             border
@@ -505,7 +499,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
           </Button>
           <Button disabled={!isValid} variant="primary" type="submit">
             {internalEditToken?.status === EditTokenFormStatus.CREATE && 'Create'}
-            {internalEditToken?.status === EditTokenFormStatus.EDIT && 'Update'}
+            {internalEditToken?.status === EditTokenFormStatus.EDIT && 'Save'}
             {(
               internalEditToken?.status !== EditTokenFormStatus.CREATE
               && internalEditToken?.status !== EditTokenFormStatus.EDIT

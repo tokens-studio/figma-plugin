@@ -113,3 +113,11 @@ export function notifyStyleValues(values: Record<string, AnyTokenList>) {
 export function notifySetTokens(values: TokenStore) {
   postToUI({ type: MessageFromPluginTypes.SET_TOKENS, values });
 }
+
+export function notifyException(error: string, opts = {}) {
+  postToUI({
+    type: MessageFromPluginTypes.NOTIFY_EXCEPTION,
+    error,
+    opts,
+  });
+}

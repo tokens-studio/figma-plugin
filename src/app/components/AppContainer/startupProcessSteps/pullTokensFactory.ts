@@ -77,16 +77,20 @@ export function pullTokensFactory(
               activeTheme: params.activeTheme,
               usedTokenSet: params.localTokenData?.usedTokenSet,
             });
+            // If there's no data stored on the remote, show a message - e.g. file doesn't exist.
+            if (!remoteData) {
+              notifyToUI('Failed to fetch tokens from remote storage', { error: true });
+              dispatch.uiState.setActiveTab(Tabs.START);
+              return;
+            }
+
             if (remoteData?.status === 'failure') {
+              // If we have some error reading tokens, we let the user know - e.g. schema validation doesn't pass.
               notifyToUI(remoteData.errorMessage, { error: true });
               dispatch.uiState.setActiveTab(Tabs.START);
             } else {
-              const existTokens = hasTokenValues(remoteData?.tokens ?? {});
-              if (existTokens) {
-                dispatch.uiState.setActiveTab(Tabs.TOKENS);
-              } else {
-                dispatch.uiState.setActiveTab(Tabs.START);
-              }
+              // If we succeeded we can move on to show the tokens screen
+              dispatch.uiState.setActiveTab(Tabs.TOKENS);
             }
           } else {
             dispatch.uiState.setActiveTab(Tabs.TOKENS);
