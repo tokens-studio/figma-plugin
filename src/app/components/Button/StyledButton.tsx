@@ -53,11 +53,6 @@ export const StyledButton = styled('button', {
           boxShadow: '$focusDanger',
         },
       },
-      danger: {
-        background: '$bgBtnSecondary',
-        color: '$fgDanger',
-        borderColor: '$border',
-      },
     },
   },
 });
