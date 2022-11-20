@@ -93,7 +93,7 @@ export default async function updateTokensOnSources({
   api,
   lastUpdatedAt,
   checkForChanges,
-  shouldSwapStyles = false,
+  shouldSwapStyles,
 }: UpdateTokensOnSourcesPayload) {
   if (tokens && !isLocal && shouldUpdateRemote && !editProhibited) {
     updateRemoteTokens({
