@@ -59,7 +59,7 @@ export default function ApplySelector() {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger bordered>
+      <DropdownMenuTrigger bordered data-testid="apply-selector">
         <span>
           Apply to
           {' '}
@@ -92,26 +92,26 @@ export default function ApplySelector() {
 
         <DropdownMenuSeparator />
 
-        <DropdownMenuCheckboxItem checked={updateOnChange} onCheckedChange={handleUpdateOnChange}>
+        <DropdownMenuCheckboxItem data-testid="update-on-change" checked={updateOnChange} onCheckedChange={handleUpdateOnChange}>
           <DropdownMenuItemIndicator>
             <CheckIcon />
           </DropdownMenuItemIndicator>
           Update on change
         </DropdownMenuCheckboxItem>
-        <DropdownMenuCheckboxItem checked={updateRemote} onCheckedChange={handleUpdateRemote}>
+        <DropdownMenuCheckboxItem data-testid="update-remote" checked={updateRemote} onCheckedChange={handleUpdateRemote}>
           <DropdownMenuItemIndicator>
             <CheckIcon />
           </DropdownMenuItemIndicator>
           Update remote
         </DropdownMenuCheckboxItem>
-        <DropdownMenuCheckboxItem checked={updateStyles} onCheckedChange={handleUpdateStyles}>
+        <DropdownMenuCheckboxItem data-testid="update-styles" checked={updateStyles} onCheckedChange={handleUpdateStyles}>
           <DropdownMenuItemIndicator>
             <CheckIcon />
           </DropdownMenuItemIndicator>
           Update styles
         </DropdownMenuCheckboxItem>
         {swapStylesAlpha && (
-        <DropdownMenuCheckboxItem checked={shouldSwapStyles} onCheckedChange={handleShouldSwapStyles}>
+        <DropdownMenuCheckboxItem data-testid="swap-styles-alpha" checked={shouldSwapStyles} onCheckedChange={handleShouldSwapStyles}>
           <DropdownMenuItemIndicator>
             <CheckIcon />
           </DropdownMenuItemIndicator>
