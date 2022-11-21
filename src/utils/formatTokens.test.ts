@@ -116,43 +116,43 @@ describe('formatTokens', () => {
                 h1: {
                   fontFamily: {
                     value: 'Inter',
-                    type: 'fontFamily',
+                    type: 'fontFamilies',
                   },
                   fontWeight: {
                     value: 'Bold',
-                    type: 'fontWeight',
+                    type: 'fontWeights',
                   },
                   fontSize: {
                     value: 36,
-                    type: 'fontSize',
+                    type: 'fontSizes',
                   },
                 },
                 h2: {
                   fontFamily: {
                     value: 'Inter',
-                    type: 'fontFamily',
+                    type: 'fontFamilies',
                   },
                   fontWeight: {
                     value: 'Regular',
-                    type: 'fontWeight',
+                    type: 'fontWeights',
                   },
                   fontSize: {
                     value: 24,
-                    type: 'fontSize',
+                    type: 'fontSizes',
                   },
                 },
                 alias: {
                   fontFamily: {
                     value: 'Inter',
-                    type: 'fontFamily',
+                    type: 'fontFamilies',
                   },
                   fontWeight: {
                     value: 'Bold',
-                    type: 'fontWeight',
+                    type: 'fontWeights',
                   },
                   fontSize: {
                     value: 36,
-                    type: 'fontSize',
+                    type: 'fontSizes',
                   },
                 },
                 non_resolved: {

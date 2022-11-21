@@ -11,6 +11,7 @@ export enum Properties {
   paddingLeft = 'paddingLeft',
   itemSpacing = 'itemSpacing',
   fill = 'fill',
+  backgroundBlur = 'backgroundBlur',
   borderColor = 'borderColor',
   borderRadius = 'borderRadius',
   borderRadiusTopLeft = 'borderRadiusTopLeft',

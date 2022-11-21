@@ -1,6 +1,7 @@
 /* eslint-disable no-param-reassign */
 import { SingleTypographyToken } from '@/types/tokens';
 import { transformValue } from './helpers';
+import { notifyException, notifyUI } from './notifiers';
 
 export default async function setTextValuesOnTarget(
   target: TextNode | TextStyle,
@@ -66,7 +67,8 @@ export default async function setTextValuesOnTarget(
               }
             })
             .catch(() => {
-              // TODO: Track this in mixpanel so we can add missing weights
+              notifyUI(`Error setting font family/weight combination for ${family}/${style}`, { error: true });
+              notifyException('Font not found', { family, style });
             });
           if (isApplied) break;
         }
