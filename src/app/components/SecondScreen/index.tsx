@@ -1,13 +1,12 @@
 import React, { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { LightningBoltIcon } from '@radix-ui/react-icons';
+import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu';
 import { useAuth } from '@/context/AuthContext';
 import Box from '../Box';
 import { secondScreenSelector } from '@/selectors/secondScreenSelector';
 import { Dispatch } from '@/app/store';
-import {
-  ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger,
-} from '../ContextMenu';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem } from '../DropdownMenu';
 
 export default function SecondScreen() {
   const isEnabled = useSelector(secondScreenSelector);
@@ -21,6 +20,10 @@ export default function SecondScreen() {
   const handleOpenSecondScreen = useCallback(() => {
     window.open(process.env.SECOND_SCREEN_APP_URL);
   }, []);
+
+  const handleTurnOffSync = useCallback(() => {
+    dispatch.uiState.toggleSecondScreen();
+  }, [dispatch.uiState]);
 
   const secondScreenButton = (
     <Box
@@ -52,13 +55,14 @@ export default function SecondScreen() {
 
   if (user && isEnabled) {
     return (
-      <ContextMenu>
-        <ContextMenuTrigger>{secondScreenButton}</ContextMenuTrigger>
-        <ContextMenuContent>
-          <ContextMenuItem onSelect={handleLogout}>Logout</ContextMenuItem>
-          <ContextMenuItem onSelect={handleOpenSecondScreen}>Open second screen</ContextMenuItem>
-        </ContextMenuContent>
-      </ContextMenu>
+      <DropdownMenu>
+        <DropdownMenuPrimitive.Trigger>{secondScreenButton}</DropdownMenuPrimitive.Trigger>
+        <DropdownMenuContent>
+          <DropdownMenuItem onSelect={handleTurnOffSync}>Turn off sync</DropdownMenuItem>
+          <DropdownMenuItem onSelect={handleOpenSecondScreen}>Open second screen</DropdownMenuItem>
+          <DropdownMenuItem onSelect={handleLogout}>Logout</DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     );
   }
 

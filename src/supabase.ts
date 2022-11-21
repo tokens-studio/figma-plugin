@@ -1,5 +1,8 @@
 import { PostgrestClient } from '@supabase/postgrest-js';
 import { StorageClient } from '@supabase/storage-js';
+import {
+  RealtimeChannel, RealtimeChannelOptions, RealtimeClient, RealtimeClientOptions,
+} from '@supabase/realtime-js';
 import { AuthData, AuthInfo } from './context/AuthContext';
 
 const authUri = '/auth/v1';
@@ -17,6 +20,10 @@ class SupabaseClient {
 
   storage: any;
 
+  realtime: RealtimeClient;
+
+  realtimeUrl: string;
+
   /**
    * @param apiUrl  supabase api url.
    * @param apikey  supabase key.
@@ -25,6 +32,8 @@ class SupabaseClient {
     this.apiUrl = apiUrl;
     this.apikey = apikey;
     this.headers = this.getAuthHeaders(null);
+    this.realtimeUrl = `${process.env.SUPABASE_URL}/realtime/v1`.replace(/^http/i, 'ws');
+    this.realtime = this.initRealtimeClient({});
   }
 
   private getAuthHeaders(auth: AuthData | null): { [key: string]: string } {
@@ -34,6 +43,13 @@ class SupabaseClient {
     headers.Authorization = `Bearer ${authBearer}`;
     headers['Content-Type'] = 'application/json';
     return headers;
+  }
+
+  private initRealtimeClient(options: RealtimeClientOptions) {
+    return new RealtimeClient(this.realtimeUrl, {
+      ...options,
+      params: { ...{ apikey: this.apikey }, ...options?.params },
+    });
   }
 
   private initPostgrest() {
@@ -133,6 +149,17 @@ class SupabaseClient {
     // Logged in, initialize auth data
     this.initializeAuth(authData);
     return { data: authData, error: null };
+  }
+
+  /**
+   * Creates a Realtime channel with Broadcast, Presence, and Postgres Changes.
+   *
+   * @param {string} name - The name of the Realtime channel.
+   * @param {Object} opts - The options to pass to the Realtime channel.
+   *
+   */
+  channel(name: string, opts: RealtimeChannelOptions = { config: {} }): RealtimeChannel {
+    return this.realtime.channel(name, opts);
   }
 }
 
