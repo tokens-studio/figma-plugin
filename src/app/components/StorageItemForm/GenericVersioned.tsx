@@ -14,6 +14,7 @@ import Text from '../Text';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { generateId } from '@/utils/generateId';
 import { ChangeEventHandler } from './types';
+import Heading from '../Heading';
 
 type ValidatedFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.GENERIC_VERSIONED_STORAGE; }>;
 type Props = {
@@ -156,7 +157,7 @@ export default function GenericVersionedForm({
           </DropdownMenuContent>
         </DropdownMenu>
         <Stack direction="column" gap={4}>
-          <div className="font-bold">Additional Headers</div>
+          <Heading>Additional Headers</Heading>
           {headers.map((x, i) => (
             <Box css={{ display: 'flex', gap: '1em' }}>
               <Input

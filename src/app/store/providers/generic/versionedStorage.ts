@@ -24,7 +24,7 @@ export async function updateGenericVersionedTokens({
 }: UpdateRemoteFunctionPayload) {
   const { id, additionalHeaders, flow } = context as GenericVersionedStorageType;
   try {
-    if (!id) throw new Error('Missing Generic Versioned Storage ID ');
+    if (!id) throw new Error('Missing Generic Versioned Storage ID');
 
     const storage = new GenericVersionedStorage(id, flow, additionalHeaders);
     const payload = {
@@ -58,9 +58,6 @@ export async function updateGenericVersionedTokens({
           default:
         }
       } else {
-        // Tell the user to choose between:
-        // A) Pull Remote values and replace local changes
-        // B) Overwrite Remote changes
         notifyToUI('Error updating tokens as remote is newer, please update first', { error: true });
       }
     } else {
