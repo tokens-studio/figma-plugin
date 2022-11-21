@@ -42,6 +42,6 @@ module.exports = {
       allowFunctions: false,
       allowBind: false,
     }],
-    "@typescript-eslint/no-shadow": 1
+    "@typescript-eslint/no-shadow": 1,
   }
 };

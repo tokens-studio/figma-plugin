@@ -7,6 +7,7 @@ import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { sendSelectionChange } from './sendSelectionChange';
 import { init } from '@/utils/plugin';
+import { sendDocumentChange } from './sendDocumentChange';
 
 figma.skipInvisibleInstanceChildren = true;
 
@@ -45,7 +46,12 @@ figma.on('close', () => {
 });
 
 figma.on('selectionchange', () => {
+  console.log('sendselectionchange');
   sendSelectionChange();
+});
+
+figma.on('documentchange', (event: DocumentChangeEvent) => {
+  sendDocumentChange(event);
 });
 
 init();

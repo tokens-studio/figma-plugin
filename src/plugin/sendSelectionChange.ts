@@ -14,5 +14,5 @@ export async function sendSelectionChange(): Promise<SelectionContent | null> {
     notifyNoSelection();
     return null;
   }
-  return sendPluginValues({ nodes, shouldSendSelectionValues: store.shouldSendSelectionValues, invalidateCache: true });
+  return sendPluginValues({ nodes, shouldSendSelectionValues: store.shouldSendSelectionValues });
 }
