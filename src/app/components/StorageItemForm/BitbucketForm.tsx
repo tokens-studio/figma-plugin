@@ -78,7 +78,7 @@ export default function BitbucketForm({
         />
         <Input
           full
-          label="Default Branch"
+          label="Branch"
           value={values.branch}
           onChange={onChange}
           type="text"
@@ -87,7 +87,7 @@ export default function BitbucketForm({
         />
         <Input
           full
-          label="File Path (e.g. data/tokens.json)"
+          label="File Path (e.g. tokens.json) or Folder Path (e.g. tokens)"
           value={values.filePath}
           onChange={onChange}
           type="text"

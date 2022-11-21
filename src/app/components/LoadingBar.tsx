@@ -12,7 +12,7 @@ import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 
 export const backgroundJobTitles = {
   [BackgroundJobs.NODEMANAGER_UPDATE]: 'Finding and caching tokens...',
-  [BackgroundJobs.NODEMANAGER_FINDNODESWITHDATA]: 'Determing nodes to update...',
+  [BackgroundJobs.NODEMANAGER_FINDNODESWITHDATA]: 'Determining nodes to update...',
   [BackgroundJobs.PLUGIN_UPDATENODES]: 'Updating nodes...',
   [BackgroundJobs.PLUGIN_UPDATEPLUGINDATA]: 'Updating plugin data...',
   [BackgroundJobs.UI_PULLTOKENS]: 'Fetching remote tokens...',
