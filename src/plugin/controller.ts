@@ -46,7 +46,6 @@ figma.on('close', () => {
 });
 
 figma.on('selectionchange', () => {
-  console.log('sendselectionchange');
   sendSelectionChange();
 });
 
