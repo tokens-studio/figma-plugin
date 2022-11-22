@@ -76,6 +76,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
   const hasAnotherTokenThatStartsWithName = React.useMemo(
     () => resolvedTokens
       .filter((t) => t.internal__Parent === activeTokenSet)
+      .filter((t) => t.name !== internalEditToken?.initialName)
       .find((t) => t.name.startsWith(`${internalEditToken?.name}.`)),
     [internalEditToken, resolvedTokens, activeTokenSet],
   );
