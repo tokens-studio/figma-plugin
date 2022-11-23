@@ -160,10 +160,10 @@ export function destructureCompositionTokenForAlias(tokens: Map<string, AnyToken
     const tokensInCompositionToken: NodeTokenRefMap = {};
     if (resolvedToken?.rawValue) {
       Object.entries(resolvedToken?.rawValue).forEach(([property, value]) => {
-        let strExcludedSymbol: string = '';
-        if (String(value).startsWith('$')) strExcludedSymbol = String(value).slice(1, String(value).length);
-        if (String(value).startsWith('{')) strExcludedSymbol = String(value).slice(1, String(value).length - 1);
-        tokensInCompositionToken[property as CompositionTokenProperty] = strExcludedSymbol;
+        let tokenName: string = resolvedToken.name;
+        if (String(value).startsWith('$')) tokenName = String(value).slice(1, String(value).length);
+        if (String(value).startsWith('{')) tokenName = String(value).slice(1, String(value).length - 1);
+        tokensInCompositionToken[property as CompositionTokenProperty] = tokenName;
       });
       const { composition, ...objExcludedCompositionToken } = values;
       values = { ...tokensInCompositionToken, ...objExcludedCompositionToken };
