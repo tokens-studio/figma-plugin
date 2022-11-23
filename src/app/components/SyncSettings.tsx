@@ -2,7 +2,6 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { track } from '@/utils/analytics';
-import Button from './Button';
 import Heading from './Heading';
 import ConfirmLocalStorageModal from './modals/ConfirmLocalStorageModal';
 import StorageItem from './StorageItem';
@@ -17,13 +16,11 @@ import Box from './Box';
 import Text from './Text';
 import {
   DropdownMenu,
-  DropdownMenuItem,
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuItemIndicator,
-  DropdownMenuSeparator,
 } from './DropdownMenu';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import useRemoteTokens from '../store/remoteTokens';

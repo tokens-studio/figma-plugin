@@ -10,16 +10,12 @@ import type { StorageTypeCredentials } from '@/types/StorageType';
 import { isGitProvider } from '@/utils/is';
 import Box from './Box';
 import useConfirm from '../hooks/useConfirm';
-import { DotaVertical, IconGithub } from '@/icons';
+import { IconDotaVertical, IconGithub } from '@/icons';
 import {
   DropdownMenu,
   DropdownMenuItem,
   DropdownMenuTrigger,
   DropdownMenuContent,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuItemIndicator,
-  DropdownMenuSeparator,
 } from './DropdownMenu';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 
@@ -31,9 +27,7 @@ type Props = {
 const StorageItem = ({ item, onEdit }: Props) => {
   const storageType = useSelector(storageTypeSelector);
   const { provider, id, name } = item;
-
   const branch = isGitProvider(item) ? item.branch : null;
-
   const { restoreStoredProvider, deleteProvider } = useRemoteTokens();
   const { confirm } = useConfirm();
 
@@ -79,10 +73,12 @@ const StorageItem = ({ item, onEdit }: Props) => {
       active={isActive()}
     >
       <Box css={{
-        alignItems: 'flex-start', flexDirection: 'column', flexGrow: '1', display: 'flex', overflow: 'hidden',
+        alignItems: 'center', flexDirection: 'row', flexGrow: '1', display: 'flex', overflow: 'hidden', gap: '$3',
       }}
       >
-        { getProviderIcon() }
+        <Box>
+          { getProviderIcon() }
+        </Box>
         <Box css={{ fontSize: '$small', fontWeight: '$bold' }}>{name}</Box>
         <Box css={{
           whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', opacity: '0.75', fontSize: '$xsmall', maxWidth: '100%',
@@ -93,16 +89,14 @@ const StorageItem = ({ item, onEdit }: Props) => {
           {branch && ` (${branch})`}
         </Box>
       </Box>
-      <div className="flex items-center space-x-2 flex-nowrap">
-        {!isActive() && (
-          <Button id="button-storageitem-apply" variant="secondary" onClick={handleRestore}>
-            {isActive() ? 'Active' : 'Apply'}
-          </Button>
-        )}
-      </div>
+      <Box css={{ marginRight: '$3' }}>
+        <Button id="button-storage-item-apply" variant={isActive() ? 'primary' : 'secondary'} onClick={handleRestore}>
+          {isActive() ? 'Active' : 'Apply'}
+        </Button>
+      </Box>
       <DropdownMenu>
-        <DropdownMenuTrigger>
-          <DotaVertical />
+        <DropdownMenuTrigger css={{ padding: '$1', background: 'none' }}>
+          <IconDotaVertical />
         </DropdownMenuTrigger>
         <DropdownMenuContent>
           <DropdownMenuItem textValue="Edit" onSelect={onEdit}>Edit</DropdownMenuItem>
