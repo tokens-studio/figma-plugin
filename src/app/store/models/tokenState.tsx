@@ -54,7 +54,7 @@ export interface TokenState {
 }
 
 export const tokenState = createModel<RootModel>()({
-  state: {
+  state: ({
     tokens: {
       global: [],
     },
@@ -78,7 +78,7 @@ export const tokenState = createModel<RootModel>()({
     }, {}),
     checkForChanges: false,
     collapsedTokens: [],
-  } as unknown as TokenState,
+  } as unknown) as TokenState,
   reducers: {
     setEditProhibited(state, payload: boolean) {
       return {
@@ -86,18 +86,26 @@ export const tokenState = createModel<RootModel>()({
         editProhibited: payload,
       };
     },
+
     toggleTreatAsSource: (state, tokenSet: string) => ({
       ...state,
       usedTokenSet: {
         ...state.usedTokenSet,
-        [tokenSet]: state.usedTokenSet[tokenSet] === TokenSetStatus.SOURCE
-          ? TokenSetStatus.DISABLED
-          : TokenSetStatus.SOURCE,
+        [tokenSet]:
+          state.usedTokenSet[tokenSet] === TokenSetStatus.SOURCE ? TokenSetStatus.DISABLED : TokenSetStatus.SOURCE,
       },
     }),
     setActiveTokenSet: (state, data: string) => ({
       ...state,
       activeTokenSet: data,
+    }),
+    setUsedTokenSet: (state, data: UsedTokenSetsMap) => ({
+      ...state,
+      usedTokenSet: data,
+    }),
+    setThemes: (state, data: ThemeObjectsList) => ({
+      ...state,
+      themes: data,
     }),
     addTokenSet: (state, name: string): TokenState => {
       if (name in state.tokens) {
@@ -114,20 +122,12 @@ export const tokenState = createModel<RootModel>()({
       }
 
       const newName = `${name}_Copy`;
-      return updateTokenSetsInState(
-        state,
-        null,
-        [newName, state.tokens[name].map((token) => (
-          extend(true, {}, token) as typeof token
-        ))],
-      );
+      return updateTokenSetsInState(state, null, [
+        newName,
+        state.tokens[name].map((token) => extend(true, {}, token) as typeof token),
+      ]);
     },
-    deleteTokenSet: (state, name: string) => updateTokenSetsInState(
-      state,
-      (setName, tokenSet) => (
-        setName === name ? null : [setName, tokenSet]
-      ),
-    ),
+    deleteTokenSet: (state, name: string) => updateTokenSetsInState(state, (setName, tokenSet) => (setName === name ? null : [setName, tokenSet])),
     setLastSyncedState: (state, data: string) => ({
       ...state,
       lastSyncedState: data,
@@ -176,10 +176,7 @@ export const tokenState = createModel<RootModel>()({
       const existingToken = state.tokens[data.parent].find((n) => n.name === data.name);
       if (!existingToken) {
         newTokens = {
-          [data.parent]: [
-            ...state.tokens[data.parent],
-            updateTokenPayloadToSingleToken(data),
-          ],
+          [data.parent]: [...state.tokens[data.parent], updateTokenPayloadToSingleToken(data)],
         };
       }
       return {
@@ -200,9 +197,11 @@ export const tokenState = createModel<RootModel>()({
           name: data.newName,
           value: data.value,
           type: data.type,
-          ...(data.description ? {
-            description: data.description,
-          } : {}),
+          ...(data.description
+            ? {
+              description: data.description,
+            }
+            : {}),
         } as SingleToken);
 
         newTokens = {
@@ -290,7 +289,9 @@ export const tokenState = createModel<RootModel>()({
         ...state,
         tokens: {
           ...state.tokens,
-          [data.parent]: state.tokens[data.parent].filter((token) => !(token.name.startsWith(`${data.path}.`) && token.type === data.type)),
+          [data.parent]: state.tokens[data.parent].filter(
+            (token) => !(token.name.startsWith(`${data.path}.`) && token.type === data.type),
+          ),
         },
       };
 
@@ -328,7 +329,9 @@ export const tokenState = createModel<RootModel>()({
       const {
         parent, path, oldName, type,
       } = data;
-      const selectedTokenGroup = state.tokens[parent].filter((token) => (token.name.startsWith(`${path}${oldName}.`) && token.type === type));
+      const selectedTokenGroup = state.tokens[parent].filter(
+        (token) => token.name.startsWith(`${path}${oldName}.`) && token.type === type,
+      );
       const newTokenGroup = selectedTokenGroup.map((token) => {
         const { name, ...rest } = token;
         const duplicatedTokenGroupName = token.name.replace(`${path}${oldName}`, `${path}${oldName}-copy`);
@@ -347,39 +350,36 @@ export const tokenState = createModel<RootModel>()({
       };
     },
     updateAliases: (state, data: { oldName: string; newName: string }) => {
-      const newTokens = Object.entries(state.tokens).reduce<TokenState['tokens']>(
-        (acc, [key, values]) => {
-          const newValues = values.map<SingleToken>((token) => {
-            if (Array.isArray(token.value)) {
-              return {
-                ...token,
-                value: token.value.map((t) => Object.entries(t).reduce<Record<string, string | number>>((a, [k, v]) => {
-                  a[k] = replaceReferences(v.toString(), data.oldName, data.newName);
-                  return a;
-                }, {})),
-              } as SingleToken;
-            }
-            if (typeof token.value === 'object') {
-              return {
-                ...token,
-                value: Object.entries(token.value).reduce<Record<string, string | number>>((a, [k, v]) => {
-                  a[k] = replaceReferences(v.toString(), data.oldName, data.newName);
-                  return a;
-                }, {}),
-              } as SingleToken;
-            }
-
+      const newTokens = Object.entries(state.tokens).reduce<TokenState['tokens']>((acc, [key, values]) => {
+        const newValues = values.map<SingleToken>((token) => {
+          if (Array.isArray(token.value)) {
             return {
               ...token,
-              value: replaceReferences(token.value.toString(), data.oldName, data.newName),
+              value: token.value.map((t) => Object.entries(t).reduce<Record<string, string | number>>((a, [k, v]) => {
+                a[k] = replaceReferences(v.toString(), data.oldName, data.newName);
+                return a;
+              }, {})),
             } as SingleToken;
-          });
+          }
+          if (typeof token.value === 'object') {
+            return {
+              ...token,
+              value: Object.entries(token.value).reduce<Record<string, string | number>>((a, [k, v]) => {
+                a[k] = replaceReferences(v.toString(), data.oldName, data.newName);
+                return a;
+              }, {}),
+            } as SingleToken;
+          }
 
-          acc[key] = newValues;
-          return acc;
-        },
-        {},
-      );
+          return {
+            ...token,
+            value: replaceReferences(token.value.toString(), data.oldName, data.newName),
+          } as SingleToken;
+        });
+
+        acc[key] = newValues;
+        return acc;
+      }, {});
 
       return {
         ...state,
@@ -467,9 +467,14 @@ export const tokenState = createModel<RootModel>()({
         path, oldName, newName, type, parent,
       } = data;
       const tokensInParent = rootState.tokenState.tokens[parent] ?? [];
-      tokensInParent.filter((token) => token.name.startsWith(`${path}${newName}.`) && token.type === type).forEach((updatedToken) => {
-        dispatch.tokenState.updateAliases({ oldName: updatedToken.name.replace(`${path}${newName}`, `${path}${oldName}`), newName: updatedToken.name });
-      });
+      tokensInParent
+        .filter((token) => token.name.startsWith(`${path}${newName}.`) && token.type === type)
+        .forEach((updatedToken) => {
+          dispatch.tokenState.updateAliases({
+            oldName: updatedToken.name.replace(`${path}${newName}`, `${path}${oldName}`),
+            newName: updatedToken.name,
+          });
+        });
     },
     updateCheckForChanges() {
       dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
@@ -498,10 +503,6 @@ export const tokenState = createModel<RootModel>()({
         console.error('Error updating document', e);
       }
     },
-    ...Object.fromEntries(
-      (Object.entries(tokenStateEffects).map(([key, factory]) => (
-        [key, factory(dispatch)]
-      ))),
-    ),
+    ...Object.fromEntries(Object.entries(tokenStateEffects).map(([key, factory]) => [key, factory(dispatch)])),
   }),
 });

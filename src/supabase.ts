@@ -20,7 +20,7 @@ class SupabaseClient {
 
   storage: any;
 
-  realtime: RealtimeClient;
+  realtime: any;
 
   realtimeUrl: string;
 
@@ -33,7 +33,6 @@ class SupabaseClient {
     this.apikey = apikey;
     this.headers = this.getAuthHeaders(null);
     this.realtimeUrl = `${process.env.SUPABASE_URL}/realtime/v1`.replace(/^http/i, 'ws');
-    this.realtime = this.initRealtimeClient({});
   }
 
   private getAuthHeaders(auth: AuthData | null): { [key: string]: string } {
@@ -48,7 +47,7 @@ class SupabaseClient {
   private initRealtimeClient(options: RealtimeClientOptions) {
     return new RealtimeClient(this.realtimeUrl, {
       ...options,
-      params: { ...{ apikey: this.apikey }, ...options?.params },
+      params: { ...{ apikey: this.apikey }, ...options?.params, headers: this.headers },
     });
   }
 
@@ -74,6 +73,8 @@ class SupabaseClient {
     this.headers = this.getAuthHeaders(auth);
     this.postgrest = this.initPostgrest();
     this.storage = this.initStorage();
+    this.realtime = this.initRealtimeClient({});
+    this.realtime.setAuth(auth.access_token);
   }
 
   private checkToken(auth: AuthData) {
