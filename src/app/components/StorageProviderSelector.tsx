@@ -11,44 +11,18 @@ const StyledButton = styled('button', {
   '&:focus': {
     outline: 'none',
   },
-  variants: {
-    isActive: {
-      true: {
-        backgroundColor: '$bgAccent',
-        borderColor: '$interaction',
-      },
-      false: {
-        backgroundColor: '$bgSubtle',
-        borderColor: '$bgSubtle',
-      },
-    },
-    isStored: {
-      true: {
-        backgroundColor: '$bgAccent',
-        borderColor: '$interactionSubtle',
-      },
-    },
-  },
 });
 
 type Props = {
   text: string;
-  onClick: () => void;
-  isActive: boolean;
-  isStored: boolean;
-  id: string;
 };
 
 export default function StorageItem({
-  text, onClick, isActive, isStored, id,
+  text,
 }: Props) {
   return (
     <StyledButton
-      data-cy={`provider-${id}`}
-      isActive={isActive}
-      isStored={isStored}
       type="button"
-      onClick={onClick}
     >
       {text}
     </StyledButton>
