@@ -152,8 +152,9 @@ const SyncSettings = () => {
       provider: { provider: StorageProviderType.LOCAL },
       shouldSetInDocument: true,
     });
+    dispatch.tokenState.setEditProhibited(false);
     showConfirmModal(false);
-  }, [dispatch.uiState, setStorageType]);
+  }, [dispatch.uiState, setStorageType, dispatch.tokenState]);
 
   const handleSetLocalStorage = React.useCallback(() => {
     if (storageType?.provider !== StorageProviderType.LOCAL) {
