@@ -25,9 +25,9 @@ import {
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import useRemoteTokens from '../store/remoteTokens';
 import { StorageTypeCredentials } from '@/types/StorageType';
-import { useFlags } from './LaunchDarkly';
 import { Flex } from './Flex';
 import IconToggleableDisclosure from './IconToggleableDisclosure';
+import LocalStorageItem from './LocalStorageItem';
 
 const providers = [
   {
@@ -60,7 +60,6 @@ const SyncSettings = () => {
 
   const { setStorageType } = useStorage();
   const { fetchBranches } = useRemoteTokens();
-  const { bitBucketSync } = useFlags();
 
   const [confirmModalVisible, showConfirmModal] = React.useState(false);
   const [editStorageItemModalVisible, setShowEditStorageModalVisible] = React.useState(Boolean(localApiState.new));
@@ -156,10 +155,7 @@ const SyncSettings = () => {
           </Stack>
           {apiProviders.length > 0 && (
             <Stack direction="column" gap={2} width="full" align="start">
-              {/* <StorageItem
-                key="localStorage"
-                onEdit={handleSetLocalStorage}
-              /> */}
+              <LocalStorageItem onClick={handleSetLocalStorage} isActive={storageType.provider === StorageProviderType.LOCAL} />
               {apiProviders.map((item) => (
                 <StorageItem
                   key={item?.internalId || `${item.provider}-${item.id}-${item.secret}`}
