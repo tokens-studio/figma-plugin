@@ -35,7 +35,6 @@ export default function CreateStorageItemModal({
   }, [addNewProviderItem, onSuccess]);
 
   const handleChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log('formfile', formFields);
     setFormFields({ ...formFields, [e.target.name]: e.target.value });
   }, [formFields]);
 
