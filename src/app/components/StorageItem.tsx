@@ -84,9 +84,11 @@ const StorageItem = ({ item, onEdit }: Props) => {
           </Box>
         </Box>
         {hasErrored && isActive() && (
-          <Box css={{
-            display: 'flex', flexDirection: 'row', color: '$fgDanger', gap: '$3', marginTop: '$3',
-          }}
+          <Box
+            css={{
+              display: 'flex', flexDirection: 'row', color: '$fgDanger', gap: '$3', marginTop: '$3',
+            }}
+            data-testid="error-message"
           >
             <ExclamationTriangleIcon />
             {errorMessage}
