@@ -41,6 +41,7 @@ const StorageItem = ({ item, onEdit }: Props) => {
   }, [confirm]);
 
   const isActive = React.useCallback(() => isSameCredentials(item, storageType), [item, storageType]);
+
   const handleDelete = React.useCallback(async () => {
     if (await askUserIfDelete()) deleteProvider(item);
   }, [deleteProvider, item, askUserIfDelete]);
