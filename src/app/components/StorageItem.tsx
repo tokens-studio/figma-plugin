@@ -58,16 +58,15 @@ const StorageItem = ({ item, onEdit }: Props) => {
   return (
     <StyledStorageItem
       data-cy={`storageitem-${provider}-${id}`}
-      css={{ alignItems: 'center' }}
       key={`${provider}-${id}`}
       active={isActive()}
     >
       <Box css={{
-        alignItems: 'flex-start', flexDirection: 'column', flexGrow: '1', display: 'flex', overflow: 'hidden', gap: '$3',
+        alignItems: 'flex-start', flexDirection: 'column', flexGrow: '1', display: 'flex', overflow: 'hidden',
       }}
       >
         <Box css={{
-          alignItems: 'flex-start', flexDirection: 'row', flexGrow: '1', display: 'flex', overflow: 'hidden', gap: '$3',
+          alignItems: 'flex-start', flexDirection: 'row', flexGrow: '1', display: 'flex', overflow: 'hidden', gap: '$3', maxWidth: 'stretch',
         }}
         >
           <Box>
@@ -83,16 +82,15 @@ const StorageItem = ({ item, onEdit }: Props) => {
             {branch && ` (${branch})`}
           </Box>
         </Box>
-        <Box>
-          {hasErrored && isActive() && (
-          <Box css={{ display: 'flex', color: '$fgDanger' }}>
-            <Box css={{ marginRight: '$3' }}>
-              <ExclamationTriangleIcon />
-            </Box>
+        {hasErrored && isActive() && (
+          <Box css={{
+            display: 'flex', flexDirection: 'row', color: '$fgDanger', gap: '$3', marginTop: '$3',
+          }}
+          >
+            <ExclamationTriangleIcon />
             {errorMessage}
           </Box>
-          )}
-        </Box>
+        )}
       </Box>
       <Box css={{ marginRight: '$3' }}>
         <Button id="button-storage-item-apply" variant={isActive() ? 'primary' : 'secondary'} onClick={handleRestore}>
