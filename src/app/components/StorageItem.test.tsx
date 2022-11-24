@@ -81,7 +81,7 @@ describe('StorageItem', () => {
     expect(mockRestoreStoredProvider).toBeCalledTimes(1);
   });
 
-  it('should be able show error message', async () => {
+  it('should return error message', async () => {
     const mockStore = createMockStore(defaultStore);
     mockRestoreStoredProvider.mockImplementationOnce(() => (
       Promise.resolve({
