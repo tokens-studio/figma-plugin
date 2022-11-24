@@ -164,7 +164,7 @@ const SyncSettings = () => {
             </Stack>
           )}
           <DropdownMenu>
-            <DropdownMenuTrigger css={{ border: '1px solid $borderMuted' }}>
+            <DropdownMenuTrigger css={{ border: '1px solid $borderMuted' }} data-testid="add-storage-item-dropdown">
               <Flex>
                 <Text size="small">Add new</Text>
               </Flex>
@@ -176,7 +176,7 @@ const SyncSettings = () => {
             >
               {
                   providers.map((provider) => (
-                    <DropdownMenuItem onSelect={handleProviderClick(provider.type)} css={{ display: 'flex', gap: '$3', padding: '$5' }}>
+                    <DropdownMenuItem onSelect={handleProviderClick(provider.type)} css={{ display: 'flex', gap: '$3', padding: '$5' }} data-testid={`add-${provider.text}-credential`}>
                       {getProviderIcon(provider.type)}
                       {provider.text}
                     </DropdownMenuItem>

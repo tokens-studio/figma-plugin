@@ -99,7 +99,7 @@ const StorageItem = ({ item, onEdit }: Props) => {
         </Button>
       </Box>
       <DropdownMenu>
-        <DropdownMenuTrigger css={{ padding: '$1', background: 'none' }}>
+        <DropdownMenuTrigger css={{ padding: '$1', background: 'none' }} data-testid="storage-item-tools-dropdown">
           <IconDotaVertical />
         </DropdownMenuTrigger>
         <DropdownMenuContent>
